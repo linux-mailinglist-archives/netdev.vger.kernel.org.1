@@ -1,319 +1,179 @@
-Return-Path: <netdev+bounces-229040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94C54BD7692
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 07:24:31 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B4C8BD770D
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 07:35:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C138218A1E10
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 05:24:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5FCF64EB66C
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 05:35:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB36B2877CB;
-	Tue, 14 Oct 2025 05:24:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 109F3296BBD;
+	Tue, 14 Oct 2025 05:35:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="p8leib+/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AItdC9qr"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407C086342
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 05:24:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B7928727C
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 05:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760419465; cv=none; b=BRoOCjRq5GHg7eY4ansXm8YjwH8fm32PAOjJeMary7gwftwI2UNjj4xXNkAO57Dm1onB/otOWbczTXhg5SvwNpaEIegztY1LN9PsOSGROeuxolsuhp18PqzpT+8Oxe8T/KUrxsgL+INPjwe3Hf8Pv9GYQlfn35KQnFikd4mxqg0=
+	t=1760420116; cv=none; b=lDgouZEyZdQQNP3F3DiQRoAW11AJ8yV1Ig6+ofMj5fgPQYBCPRyCNooC/Uqap3TOZLcrMqIy6/DejXV4/cWXrsoM+k56rvB78H4GpYUCZ8ts1wrnTJmwHuwa0AOrCHLLk5jshJbDuOLkGyX/lOZbs5hiLunz+uh2znGMCLpV1n4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760419465; c=relaxed/simple;
-	bh=BGq6gtuVw1ZkzpsV6xc9p1v0Lm/eZZH90GULnLK4vPM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=T3p/ApWK/wsDsPLLW9WJNe4YHh6PHLfmUNuRuim0whhOkJpC4tRMFzI63hFu2XZLV+3rHRnmAbGnuE7Yv1ASn/l5MStd3SMmi/pPZtE7CaZpbSq6SUYh8JyV+s+/JSM6NaLe+bfCQ4Zv+kydnm0GoyPTTa0xdk6JGqfIPcPRqtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=p8leib+/; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <588c1935-835f-4cab-9679-f31c1e903a9a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760419449;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rpX3fKP+qE+Cx5wSUCGxJKl073ySrCz333lfcH4KD3U=;
-	b=p8leib+/+Uzn8bRajg1xnIwVcJSrt3m0lLnVFEIkwQAkMvKJQmbU9EGJUvpUGsXfHbBKMz
-	ViA1mGiVwlTmDegFHZtPQpjF1hQMZ/LGvEipWPUwAW24TAK7NbpWInZInaEKhsMcGnXez2
-	/yS+HTRDNOUcLHOMcRQGei7svVjH4HY=
-Date: Tue, 14 Oct 2025 13:23:58 +0800
+	s=arc-20240116; t=1760420116; c=relaxed/simple;
+	bh=wvn8CM5LXYun0vdXHMxoU4ZtILqmL0vMJS+JvrBjifY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CejF0y5S6tfcpUNEKEMGpqHZrYWjHfXhqTIdbMz6WFJrF/Z+HpiKCvVgIgsqbfeq+pxcW00BUVr3+UNPZ4BI9Vlk6B4v0mswID6B7W925xo4Y8LjQ6XsffNXjTSElHym1Nwm/soWk16aJs9lhYvsL0nDNoAMVQOQCWqPeitZ/PM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AItdC9qr; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760420114; x=1791956114;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wvn8CM5LXYun0vdXHMxoU4ZtILqmL0vMJS+JvrBjifY=;
+  b=AItdC9qrLUlqzpR6nY7Vx2Ywqrd56mmvLYkw4trPreROfeNfPmyANa2s
+   ZJdlFiAtRb0k7hus4w2XWk7ECbhwvIFBE+HZVW+gOQ7owTUlU+/63uKfg
+   wXdf5RiAb4c06jyeREUSCLg4KcOcRWTP/zWwKReEgHRcAT87dSfScYlxd
+   o7AXNLq/GgSaU/OkFV6C9kLSFTs+7BTvCifxYdcF9Fz+dDLfrN1ABGXGz
+   EIXwkkuzqwau5TCPQ84HO1TttItLnnmRkL9Ofjpr4tE5OCm4GzbwzWwba
+   8i4aUKZ9LH677nBF7rv506/f24jh+t5SWhMq+zdREKOpkyIvssTfl4udJ
+   A==;
+X-CSE-ConnectionGUID: FpiwwnMKSa2HTjuXdU+5Cw==
+X-CSE-MsgGUID: TXWBa2kURgudYYFteWpHeQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11581"; a="62607772"
+X-IronPort-AV: E=Sophos;i="6.19,227,1754982000"; 
+   d="scan'208";a="62607772"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2025 22:35:13 -0700
+X-CSE-ConnectionGUID: 3OHmFtQLTaOU8AUdGPdWFw==
+X-CSE-MsgGUID: +YnTXWAXRxyO/QtXh2txIA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,227,1754982000"; 
+   d="scan'208";a="186041594"
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by orviesa004.jf.intel.com with ESMTP; 13 Oct 2025 22:35:09 -0700
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1v8Xgg-0002P9-0l;
+	Tue, 14 Oct 2025 05:35:06 +0000
+Date: Tue, 14 Oct 2025 13:28:10 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daniel Jurgens <danielj@nvidia.com>, netdev@vger.kernel.org,
+	mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com,
+	pabeni@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, virtualization@lists.linux.dev,
+	parav@nvidia.com, shshitrit@nvidia.com, yohadt@nvidia.com,
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+	shameerali.kolothum.thodi@huawei.com, jgg@ziepe.ca,
+	kevin.tian@intel.com, kuba@kernel.org, andrew+netdev@lunn.ch,
+	edumazet@google.com, Daniel Jurgens <danielj@nvidia.com>
+Subject: Re: [PATCH net-next v4 01/12] virtio_pci: Remove supported_cap size
+ build assert
+Message-ID: <202510141339.ne1O8cPc-lkp@intel.com>
+References: <20251013152742.619423-2-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH][v3] hung_task: Panic after fixed number of hung tasks
-Content-Language: en-US
-To: lirongqing <lirongqing@baidu.com>
-References: <20251012115035.2169-1-lirongqing@baidu.com>
-Cc: wireguard@lists.zx2c4.com, linux-arm-kernel@lists.infradead.org,
- "Liam R . Howlett" <Liam.Howlett@oracle.com>, linux-doc@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Randy Dunlap <rdunlap@infradead.org>,
- Stanislav Fomichev <sdf@fomichev.me>, linux-aspeed@lists.ozlabs.org,
- Andrew Jeffery <andrew@codeconstruct.com.au>, Joel Stanley <joel@jms.id.au>,
- Russell King <linux@armlinux.org.uk>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Shuah Khan <shuah@kernel.org>,
- Steven Rostedt <rostedt@goodmis.org>, Jonathan Corbet <corbet@lwn.net>,
- Petr Mladek <pmladek@suse.com>, Joel Granados <joel.granados@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, Phil Auld <pauld@redhat.com>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Masami Hiramatsu <mhiramat@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
- Simon Horman <horms@kernel.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
- Kees Cook <kees@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- "Paul E . McKenney" <paulmck@kernel.org>,
- Feng Tang <feng.tang@linux.alibaba.com>,
- "Jason A . Donenfeld" <Jason@zx2c4.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Lance Yang <lance.yang@linux.dev>
-In-Reply-To: <20251012115035.2169-1-lirongqing@baidu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251013152742.619423-2-danielj@nvidia.com>
 
-Thanks for the patch!
+Hi Daniel,
 
-I noticed the implementation panics only when N tasks are detected
-within a single scan, because total_hung_task is reset for each
-check_hung_uninterruptible_tasks() run.
+kernel test robot noticed the following build warnings:
 
-So some suggestions to align the documentation with the code's
-behavior below :)
+[auto build test WARNING on net-next/main]
 
-On 2025/10/12 19:50, lirongqing wrote:
-> From: Li RongQing <lirongqing@baidu.com>
-> 
-> Currently, when 'hung_task_panic' is enabled, the kernel panics
-> immediately upon detecting the first hung task. However, some hung
-> tasks are transient and the system can recover, while others are
-> persistent and may accumulate progressively.
-> 
-> This patch extends the 'hung_task_panic' sysctl to allow specifying
-> the number of hung tasks that must be detected before triggering
-> a kernel panic. This provides finer control for environments where
-> transient hangs may occur but persistent hangs should still be fatal.
-> 
-> The sysctl can be set to:
-> - 0: disabled (never panic)
-> - 1: original behavior (panic on first hung task)
-> - N: panic when N hung tasks are detected
-> 
-> This maintains backward compatibility while providing more flexibility
-> for handling different hang scenarios.
-> 
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> ---
-> Diff with v2: not add new sysctl, extend hung_task_panic
-> 
->   Documentation/admin-guide/kernel-parameters.txt      | 20 +++++++++++++-------
->   Documentation/admin-guide/sysctl/kernel.rst          |  3 ++-
->   arch/arm/configs/aspeed_g5_defconfig                 |  2 +-
->   kernel/configs/debug.config                          |  2 +-
->   kernel/hung_task.c                                   | 16 +++++++++++-----
->   lib/Kconfig.debug                                    | 10 ++++++----
->   tools/testing/selftests/wireguard/qemu/kernel.config |  2 +-
->   7 files changed, 35 insertions(+), 20 deletions(-)
-> 
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index a51ab46..7d9a8ee 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -1992,14 +1992,20 @@
->   			the added memory block itself do not be affected.
->   
->   	hung_task_panic=
-> -			[KNL] Should the hung task detector generate panics.
-> -			Format: 0 | 1
-> +			[KNL] Number of hung tasks to trigger kernel panic.
-> +			Format: <int>
-> +
-> +			Set this to the number of hung tasks that must be
-> +			detected before triggering a kernel panic.
-> +
-> +			0: don't panic
-> +			1: panic immediately on first hung task
-> +			N: panic after N hung tasks are detect
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Jurgens/virtio_pci-Remove-supported_cap-size-build-assert/20251014-004146
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20251013152742.619423-2-danielj%40nvidia.com
+patch subject: [PATCH net-next v4 01/12] virtio_pci: Remove supported_cap size build assert
+config: x86_64-defconfig (https://download.01.org/0day-ci/archive/20251014/202510141339.ne1O8cPc-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251014/202510141339.ne1O8cPc-lkp@intel.com/reproduce)
 
-The description should be more specific :)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202510141339.ne1O8cPc-lkp@intel.com/
 
-N: panic after N hung tasks are detected in a single scan
+All warnings (new ones prefixed by >>):
 
-Would it be better and cleaner?
+   In file included from include/linux/byteorder/little_endian.h:5,
+                    from arch/x86/include/uapi/asm/byteorder.h:5,
+                    from include/asm-generic/qrwlock_types.h:6,
+                    from arch/x86/include/asm/spinlock_types.h:7,
+                    from include/linux/spinlock_types_raw.h:7,
+                    from include/linux/ratelimit_types.h:7,
+                    from include/linux/printk.h:9,
+                    from include/asm-generic/bug.h:22,
+                    from arch/x86/include/asm/bug.h:103,
+                    from arch/x86/include/asm/alternative.h:9,
+                    from arch/x86/include/asm/segment.h:6,
+                    from arch/x86/include/asm/ptrace.h:5,
+                    from arch/x86/include/asm/math_emu.h:5,
+                    from arch/x86/include/asm/processor.h:13,
+                    from include/linux/sched.h:13,
+                    from include/linux/delay.h:13,
+                    from drivers/virtio/virtio_pci_modern.c:17:
+   drivers/virtio/virtio_pci_modern.c: In function 'virtio_pci_admin_cmd_cap_init':
+   drivers/virtio/virtio_pci_modern.c:326:33: error: 'struct virtio_admin_cmd_query_cap_id_result' has no member named 'support_caps'; did you mean 'supported_caps'?
+     326 |         if (!(le64_to_cpu(data->support_caps[0]) & (1 << VIRTIO_DEV_PARTS_CAP)))
+         |                                 ^~~~~~~~~~~~
+   include/uapi/linux/byteorder/little_endian.h:33:51: note: in definition of macro '__le64_to_cpu'
+      33 | #define __le64_to_cpu(x) ((__force __u64)(__le64)(x))
+         |                                                   ^
+   drivers/virtio/virtio_pci_modern.c:326:15: note: in expansion of macro 'le64_to_cpu'
+     326 |         if (!(le64_to_cpu(data->support_caps[0]) & (1 << VIRTIO_DEV_PARTS_CAP)))
+         |               ^~~~~~~~~~~
+>> drivers/virtio/virtio_pci_modern.c:307:35: warning: unused variable 'vp_dev' [-Wunused-variable]
+     307 |         struct virtio_pci_device *vp_dev = to_vp_device(virtio_dev);
+         |                                   ^~~~~~
 
->   
-> -			A value of 1 instructs the kernel to panic when a
-> -			hung task is detected. The default value is controlled
-> -			by the CONFIG_BOOTPARAM_HUNG_TASK_PANIC build-time
-> -			option. The value selected by this boot parameter can
-> -			be changed later by the kernel.hung_task_panic sysctl.
-> +			The default value is controlled by the
-> +			CONFIG_BOOTPARAM_HUNG_TASK_PANIC build-time option. The value
-> +			selected by this boot parameter can be changed later by the
-> +			kernel.hung_task_panic sysctl.
->   
->   	hvc_iucv=	[S390]	Number of z/VM IUCV hypervisor console (HVC)
->   				terminal devices. Valid values: 0..8
-> diff --git a/Documentation/admin-guide/sysctl/kernel.rst b/Documentation/admin-guide/sysctl/kernel.rst
-> index f3ee807..0a8dfab 100644
-> --- a/Documentation/admin-guide/sysctl/kernel.rst
-> +++ b/Documentation/admin-guide/sysctl/kernel.rst
-> @@ -397,7 +397,8 @@ a hung task is detected.
->   hung_task_panic
->   ===============
->   
-> -Controls the kernel's behavior when a hung task is detected.
-> +When set to a non-zero value, a kernel panic will be triggered if the
-> +number of detected hung tasks reaches this value
 
-Hmm... that is also ambiguous ...
+vim +/vp_dev +307 drivers/virtio/virtio_pci_modern.c
 
-+When set to a non-zero value, a kernel panic will be triggered if the
-+number of hung tasks found during a single scan reaches this value.
+bfcad518605d92 Yishai Hadas   2024-11-13  304  
+bfcad518605d92 Yishai Hadas   2024-11-13  305  static void virtio_pci_admin_cmd_cap_init(struct virtio_device *virtio_dev)
+bfcad518605d92 Yishai Hadas   2024-11-13  306  {
+bfcad518605d92 Yishai Hadas   2024-11-13 @307  	struct virtio_pci_device *vp_dev = to_vp_device(virtio_dev);
+bfcad518605d92 Yishai Hadas   2024-11-13  308  	struct virtio_admin_cmd_query_cap_id_result *data;
+bfcad518605d92 Yishai Hadas   2024-11-13  309  	struct virtio_admin_cmd cmd = {};
+bfcad518605d92 Yishai Hadas   2024-11-13  310  	struct scatterlist result_sg;
+bfcad518605d92 Yishai Hadas   2024-11-13  311  	int ret;
+bfcad518605d92 Yishai Hadas   2024-11-13  312  
+bfcad518605d92 Yishai Hadas   2024-11-13  313  	data = kzalloc(sizeof(*data), GFP_KERNEL);
+bfcad518605d92 Yishai Hadas   2024-11-13  314  	if (!data)
+bfcad518605d92 Yishai Hadas   2024-11-13  315  		return;
+bfcad518605d92 Yishai Hadas   2024-11-13  316  
+bfcad518605d92 Yishai Hadas   2024-11-13  317  	sg_init_one(&result_sg, data, sizeof(*data));
+bfcad518605d92 Yishai Hadas   2024-11-13  318  	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_CAP_ID_LIST_QUERY);
+16c22c56d42825 Daniel Jurgens 2025-03-04  319  	cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SELF);
+bfcad518605d92 Yishai Hadas   2024-11-13  320  	cmd.result_sg = &result_sg;
+bfcad518605d92 Yishai Hadas   2024-11-13  321  
+bfcad518605d92 Yishai Hadas   2024-11-13  322  	ret = vp_modern_admin_cmd_exec(virtio_dev, &cmd);
+bfcad518605d92 Yishai Hadas   2024-11-13  323  	if (ret)
+bfcad518605d92 Yishai Hadas   2024-11-13  324  		goto end;
+bfcad518605d92 Yishai Hadas   2024-11-13  325  
+c1e3216169ec0d Daniel Jurgens 2025-10-13 @326  	if (!(le64_to_cpu(data->support_caps[0]) & (1 << VIRTIO_DEV_PARTS_CAP)))
+bfcad518605d92 Yishai Hadas   2024-11-13  327  		goto end;
+bfcad518605d92 Yishai Hadas   2024-11-13  328  
+bfcad518605d92 Yishai Hadas   2024-11-13  329  	virtio_pci_admin_cmd_dev_parts_objects_enable(virtio_dev);
+bfcad518605d92 Yishai Hadas   2024-11-13  330  end:
+bfcad518605d92 Yishai Hadas   2024-11-13  331  	kfree(data);
+bfcad518605d92 Yishai Hadas   2024-11-13  332  }
+bfcad518605d92 Yishai Hadas   2024-11-13  333  
 
->   This file shows up if ``CONFIG_DETECT_HUNG_TASK`` is enabled.
->   
->   = =================================================
-> diff --git a/arch/arm/configs/aspeed_g5_defconfig b/arch/arm/configs/aspeed_g5_defconfig
-> index 61cee1e..c3b0d5f 100644
-> --- a/arch/arm/configs/aspeed_g5_defconfig
-> +++ b/arch/arm/configs/aspeed_g5_defconfig
-> @@ -308,7 +308,7 @@ CONFIG_PANIC_ON_OOPS=y
->   CONFIG_PANIC_TIMEOUT=-1
->   CONFIG_SOFTLOCKUP_DETECTOR=y
->   CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC=y
-> -CONFIG_BOOTPARAM_HUNG_TASK_PANIC=y
-> +CONFIG_BOOTPARAM_HUNG_TASK_PANIC=1
->   CONFIG_WQ_WATCHDOG=y
->   # CONFIG_SCHED_DEBUG is not set
->   CONFIG_FUNCTION_TRACER=y
-> diff --git a/kernel/configs/debug.config b/kernel/configs/debug.config
-> index e81327d..9f6ab7d 100644
-> --- a/kernel/configs/debug.config
-> +++ b/kernel/configs/debug.config
-> @@ -83,7 +83,7 @@ CONFIG_SLUB_DEBUG_ON=y
->   #
->   # Debug Oops, Lockups and Hangs
->   #
-> -# CONFIG_BOOTPARAM_HUNG_TASK_PANIC is not set
-> +CONFIG_BOOTPARAM_HUNG_TASK_PANIC=0
->   # CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC is not set
->   CONFIG_DEBUG_ATOMIC_SLEEP=y
->   CONFIG_DETECT_HUNG_TASK=y
-> diff --git a/kernel/hung_task.c b/kernel/hung_task.c
-> index b2c1f14..3929ed9 100644
-> --- a/kernel/hung_task.c
-> +++ b/kernel/hung_task.c
-> @@ -81,7 +81,7 @@ static unsigned int __read_mostly sysctl_hung_task_all_cpu_backtrace;
->    * hung task is detected:
->    */
->   static unsigned int __read_mostly sysctl_hung_task_panic =
-> -	IS_ENABLED(CONFIG_BOOTPARAM_HUNG_TASK_PANIC);
-> +	CONFIG_BOOTPARAM_HUNG_TASK_PANIC;
->   
->   static int
->   hung_task_panic(struct notifier_block *this, unsigned long event, void *ptr)
-> @@ -218,8 +218,11 @@ static inline void debug_show_blocker(struct task_struct *task, unsigned long ti
->   }
->   #endif
->   
-> -static void check_hung_task(struct task_struct *t, unsigned long timeout)
-> +static void check_hung_task(struct task_struct *t, unsigned long timeout,
-> +		unsigned long prev_detect_count)
->   {
-> +	unsigned long total_hung_task;
-> +
->   	if (!task_is_hung(t, timeout))
->   		return;
->   
-> @@ -229,9 +232,11 @@ static void check_hung_task(struct task_struct *t, unsigned long timeout)
->   	 */
->   	sysctl_hung_task_detect_count++;
->   
-> +	total_hung_task = sysctl_hung_task_detect_count - prev_detect_count;
->   	trace_sched_process_hang(t);
->   
-> -	if (sysctl_hung_task_panic) {
-> +	if (sysctl_hung_task_panic &&
-> +			(total_hung_task >= sysctl_hung_task_panic)) {
->   		console_verbose();
->   		hung_task_show_lock = true;
->   		hung_task_call_panic = true;
-> @@ -300,6 +305,7 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
->   	int max_count = sysctl_hung_task_check_count;
->   	unsigned long last_break = jiffies;
->   	struct task_struct *g, *t;
-> +	unsigned long prev_detect_count = sysctl_hung_task_detect_count;
->   
->   	/*
->   	 * If the system crashed already then all bets are off,
-> @@ -320,7 +326,7 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
->   			last_break = jiffies;
->   		}
->   
-> -		check_hung_task(t, timeout);
-> +		check_hung_task(t, timeout, prev_detect_count);
->   	}
->    unlock:
->   	rcu_read_unlock();
-> @@ -389,7 +395,7 @@ static const struct ctl_table hung_task_sysctls[] = {
->   		.mode		= 0644,
->   		.proc_handler	= proc_dointvec_minmax,
->   		.extra1		= SYSCTL_ZERO,
-> -		.extra2		= SYSCTL_ONE,
-> +		.extra2		= SYSCTL_INT_MAX,
->   	},
->   	{
->   		.procname	= "hung_task_check_count",
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index 3034e294..077b9e4 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -1258,12 +1258,14 @@ config DEFAULT_HUNG_TASK_TIMEOUT
->   	  Keeping the default should be fine in most cases.
->   
->   config BOOTPARAM_HUNG_TASK_PANIC
-> -	bool "Panic (Reboot) On Hung Tasks"
-> +	int "Number of hung tasks to trigger kernel panic"
->   	depends on DETECT_HUNG_TASK
-> +	default 0
->   	help
-> -	  Say Y here to enable the kernel to panic on "hung tasks",
-> -	  which are bugs that cause the kernel to leave a task stuck
-> -	  in uninterruptible "D" state.
-> +	  The number of hung tasks must be detected to trigger kernel panic.
-> +
-> +	  - 0: Don't trigger panic
-> +	  - N: Panic when N hung tasks are detected
-
-+	  - N: Panic when N hung tasks are detected in a single scan
-
-With these documentation changes, this patch would accurately describe 
-its behavior, IMHO.
-
->   
->   	  The panic can be used in combination with panic_timeout,
->   	  to cause the system to reboot automatically after a
-> diff --git a/tools/testing/selftests/wireguard/qemu/kernel.config b/tools/testing/selftests/wireguard/qemu/kernel.config
-> index 936b18b..0504c11 100644
-> --- a/tools/testing/selftests/wireguard/qemu/kernel.config
-> +++ b/tools/testing/selftests/wireguard/qemu/kernel.config
-> @@ -81,7 +81,7 @@ CONFIG_WQ_WATCHDOG=y
->   CONFIG_DETECT_HUNG_TASK=y
->   CONFIG_BOOTPARAM_HARDLOCKUP_PANIC=y
->   CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC=y
-> -CONFIG_BOOTPARAM_HUNG_TASK_PANIC=y
-> +CONFIG_BOOTPARAM_HUNG_TASK_PANIC=1
->   CONFIG_PANIC_TIMEOUT=-1
->   CONFIG_STACKTRACE=y
->   CONFIG_EARLY_PRINTK=y
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
