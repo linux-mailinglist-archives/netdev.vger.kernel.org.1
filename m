@@ -1,82 +1,209 @@
-Return-Path: <netdev+bounces-229223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 341EBBD9796
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:56:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84795BD97FC
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:00:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D53B3354428
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 12:56:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF6EF3A726E
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 13:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8273630F949;
-	Tue, 14 Oct 2025 12:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BD528C864;
+	Tue, 14 Oct 2025 13:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n0kqeqk4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="epqoEHI6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553AA20296A;
-	Tue, 14 Oct 2025 12:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28151C84AB
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 13:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760446573; cv=none; b=PJSaArew0qXavXAJcQ2NXjlIVPZol4GTtEoPkfCR2pq+i2H0xSzLuO3PBX4ACjbQIopd5IA9RsOx+23+XW7Qe3eQ/8L7qycfTMpMj9wZ6tudln3PdZi6IKSx3TKbiQzk47jx13cd/r63uA7nfZc0U3Rn59HBuwaKlI+Tef8O7n4=
+	t=1760446832; cv=none; b=RTBdGXjvMXqTbJCQvwqOOj6pPHh/EiNgoJQy7B69RaAwrJVtC78BH2x88I2L5JP33WaGJz1/Zm851gt0jy84NW4y5lTSyocbD9MaKoZT55jEWuRdwWj5f0Z3oNq3kb8iVJ3lf0gI0xP7B+mRuAYVH6EyWzNmlyUXSHB5oseluls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760446573; c=relaxed/simple;
-	bh=jVQUGnJkT132sqqUC4K2V431C09qQ1EnlNkzaiHH5s0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fhk5+pgbIY7q3eJ0zRLPZGQZFOQnwk6oCxIeMpgVQKiaDvIkqfFboev/FzxRFbQoykS4zb9uHZWCv22j5tSUuuE/WquY7bf0zKL4n7eVK59OEg2LJhSSSsaRUxqhbNdDbfQGR/k5eM55ENx0ZovYJuXyMrUtVAiB7p0KG/4/SbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n0kqeqk4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1D49C4CEE7;
-	Tue, 14 Oct 2025 12:56:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760446570;
-	bh=jVQUGnJkT132sqqUC4K2V431C09qQ1EnlNkzaiHH5s0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n0kqeqk46jGWaHFooZ5s3lITr7eDBWe9DATV1EUJnDMbXkm/9WSGVuVrP9XWw0P9e
-	 RUzCOm3dANljAq/iNOH7kmEjRLs1gzt1jTiGkZ5tafnl/DHYunGgMlU8QIh1YMbKL0
-	 ckwMsxHtP1xWL9TwPjCDu6mzX8oTK6SjXspcd/J2JJ09NoRrgnL4TpNsNf//7GFWQQ
-	 ADxcF1aWBLDie2t9lfY7JLzK2StnOFlRLkLD97a5+/ZkiFuov7FTWOAaF2KMY6guUO
-	 5aG4gik+ghrn8qGC+o6ULwgAjvPqLM5LIBj0wCHyDzdhOGSZh2KP2RfrbCcn8myecu
-	 uh+Q8iMtRTR/g==
-Date: Tue, 14 Oct 2025 13:56:05 +0100
-From: Simon Horman <horms@kernel.org>
-To: Harshitha Ramamurthy <hramamurthy@google.com>
-Cc: netdev@vger.kernel.org, joshwash@google.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, willemb@google.com, pkaligineedi@google.com,
-	jfraker@google.com, ziweixiao@google.com, thostet@google.com,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net] gve: Check valid ts bit on RX descriptor before hw
- timestamping
-Message-ID: <aO5IZYjGHe3xpzPK@horms.kernel.org>
-References: <20251014004740.2775957-1-hramamurthy@google.com>
+	s=arc-20240116; t=1760446832; c=relaxed/simple;
+	bh=yC16Cf9FMJscSBzx0tg70+ZAO1nULgzq46Rq7RWDwRk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZJqqJWHmk6+IR1zavmn96/JfNhuNbc/xmGUaf7ZgVr6lGTg3UlpZ1+kWLrMPyL2bYCU/wv5cDEhN+lRnLaN2M1XwD8uMEyqzpZdiYaa4iWumO2si6+MRGPPmkt/NP0i5jRzmAO98gij8Jhx02wkg5ODtWasMPLB0RpoSiu9Z058=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=epqoEHI6; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3f0ae439b56so3169491f8f.3
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 06:00:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760446829; x=1761051629; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=drtmDZAOmuCnQVy+ATNHRyErjp9xi9I5nuXjriiDL/I=;
+        b=epqoEHI6UasjISOjXZQ5jSX+wK5NAIYmDIcr8EBc1M4BHt4ZYNokrEpVkU1XrNBayS
+         PdsasiSjsXFQ1rv7m9urjGR+eAN9YCah8FJTySyNgyUQr/+3Q8A/qH372S00H2leXvX0
+         sllY2k9gE8Y73a+1RpJGW0UtpkY0/uo3Cl/gAxVGxoQYnd+6BzImW/OFeT4JkcatAIwa
+         IL97z2hCxTbHiJl/VBCVudgqBzK+F3+q3kMBwsYvDzgiuWtYPXylJ2V3TC4g3JQ48slv
+         6Hb/mK3Zk+FkEgTc/J7XO5Qo5IRM8sxCxZVnY0tleD1sVjOM58AkBewfMiM5gCYwJToE
+         OJlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760446829; x=1761051629;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=drtmDZAOmuCnQVy+ATNHRyErjp9xi9I5nuXjriiDL/I=;
+        b=jtJCJX5o9OGIeTvxx4M7U/Bx0hrPl7NYaLmDSfgJEFF6P+Rm1w6rf51zIN4Z3xmkSM
+         G9rFIXLsktsxJx+83P0H4Kj9vMZVAN6jhw/cZ4GwyYlDywCE9L5izDLSr2koyQqWnFyt
+         kux6IEIb6KjhSPfjbBw6GRS152O6d3Y7VnvNlUGw22NP9zOd7Y0z90YDmssKHzHo3493
+         KChfaoi6IU/xfTH31XMcYh7tovKXVmQdGGgz1TlkuFgD4D3r2Y8rtd5ZfuApjol/A9TK
+         d1zOr7r3Q4h1wrd+N3gx3qGgrqOnMngz1TLKarRCU1ZAI4fXexNrFYWjMUi21CXaLExP
+         e6MA==
+X-Gm-Message-State: AOJu0YzTbJAkZupN3MwzOeFKfwPLScxOKO6R7kCqPbO5lkIoAFUKRWDt
+	+O8JIeUnHRySznTIg2ViSlOeI5wyl4bh8bRtzBOC/7prczK95wXIJGPKPuBdmoLY
+X-Gm-Gg: ASbGncsh+pwSrT8SVhDiirEH5VjIQRXmyEP3OYY0euG94DdcUtRiZrFjfjg5wIXqvBB
+	5DO+1OUPw3rd4rwKXwIz64TNlJVLe2yh3rYCEVwpGSMf+7tCbIbzMfxCzP9/WLsXOaeoMDqFkoV
+	gk7VQGxmFMtHgyihrFpPO039C8t0T6thzc7uUnWRS1FfhUsM6ZJDfL8c14OZLVdFJpNLEk872Rq
+	j2Sa0YOGt79WkIbi+NJ9d62XkJyyh/Xwu88tIPecMdFp/u6xGgQWE7l6E8VJk/Vaz8P49Y7iz+C
+	BaEEamKnPwt594EUjtupKLusuYW+4DFlR9tAo+lubA7eC7qs20HOPsjEEaaxx2IxbwPfW7LLkfA
+	4dxAgqUkJUyEmUHv6TVUi5W2jECfFoAqBpSI=
+X-Google-Smtp-Source: AGHT+IGQ0Gd56K7JwPfQZZ3tAk3u4pF1GdKS8UOWl4Tdgb55qv85ApxtPpM/O9AT16A2P/7TiGsfKw==
+X-Received: by 2002:a05:6000:26d0:b0:425:8bf9:557d with SMTP id ffacd0b85a97d-4266e8dd3c2mr17404314f8f.44.1760446823887;
+        Tue, 14 Oct 2025 06:00:23 -0700 (PDT)
+Received: from 127.com ([2620:10d:c092:600::1:7ec0])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce582b39sm23296494f8f.15.2025.10.14.06.00.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Oct 2025 06:00:22 -0700 (PDT)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: netdev@vger.kernel.org,
+	io-uring@vger.kernel.org
+Cc: Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Simon Horman <horms@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	David Wei <dw@davidwei.uk>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v5 00/24][pull request] Add support for providers with large rx buffer
+Date: Tue, 14 Oct 2025 14:01:20 +0100
+Message-ID: <cover.1760440268.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251014004740.2775957-1-hramamurthy@google.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 14, 2025 at 12:47:39AM +0000, Harshitha Ramamurthy wrote:
-> From: Tim Hostetler <thostet@google.com>
-> 
-> The device returns a valid bit in the LSB of the low timestamp byte in
-> the completion descriptor that the driver should check before
-> setting the SKB's hardware timestamp. If the timestamp is not valid, do not
-> hardware timestamp the SKB.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: b2c7aeb49056 ("gve: Implement ndo_hwtstamp_get/set for RX timestamping")
-> Reviewed-by: Joshua Washington <joshwash@google.com>
-> Signed-off-by: Tim Hostetler <thostet@google.com>
-> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Many modern network cards support configurable rx buffer lengths larger
+than typically used PAGE_SIZE. When paired with hw-gro larger rx buffer
+sizes can drastically reduce the number of buffers traversing the stack
+and save a lot of processing time. Another benefit for memory providers
+like zcrx is that the userspace will be getting larger contiguous chunks
+as well.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This series adds net infrastructure for memory providers configuring
+the size and implements it for bnxt. It'll be used by io_uring/zcrx,
+which is intentionally separated to simplify merging. You can find
+a branch that includes zcrx changes at [1] and an example liburing
+program at [3].
+
+It's an opt-in feature for drivers, they should advertise support for
+the parameter in the qops and must check if the hardware supports
+the given size. It's limited to memory providers as it drastically
+simplifies the series comparing with previous revisions and detangles
+it from ethtool api discussions.
+
+The idea was first floated around by Saeed during netdev conf 2024.
+The series also borrows some patches from [2].
+
+Benchmarks with zcrx [3] show up to ~30% improvement in CPU util.
+E.g. comparison for 4K vs 32K buffers using a 200Gbit NIC, napi and
+userspace pinned to the same CPU:
+
+packets=23987040 (MB=2745098), rps=199559 (MB/s=22837)
+CPU    %usr   %nice    %sys %iowait    %irq   %soft   %idle
+  0    1.53    0.00   27.78    2.72    1.31   66.45    0.22
+packets=24078368 (MB=2755550), rps=200319 (MB/s=22924)
+CPU    %usr   %nice    %sys %iowait    %irq   %soft   %idle
+  0    0.69    0.00    8.26   31.65    1.83   57.00    0.57
+
+netdev + zcrx changes:
+[1] https://github.com/isilence/linux.git zcrx/large-buffers-v5
+Per queue configuration series:
+[2] https://lore.kernel.org/all/20250421222827.283737-1-kuba@kernel.org/
+Liburing example:
+[3] https://github.com/isilence/liburing.git zcrx/rx-buf-len
+
+---
+The following changes since commit 3a8660878839faadb4f1a6dd72c3179c1df56787:
+
+  Linux 6.18-rc1 (2025-10-12 13:42:36 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/isilence/linux.git tags/net-for-6.19-queue-rx-buf-len-v5
+
+for you to fetch changes up to f389276330412ec4305fb423944261e78490f06a:
+
+  eth: bnxt: allow providers to set rx buf size (2025-10-14 00:11:59 +0100)
+
+
+v5: Remove all unnecessary bits like configuration via netlink, and
+    multi-stage queue configuration.
+
+v4: https://lore.kernel.org/all/cover.1760364551.git.asml.silence@gmail.com/
+    - Update fbnic qops
+    - Propagate max buf len for hns3
+    - Use configured buf size in __bnxt_alloc_rx_netmem
+    - Minor stylistic changes
+v3: https://lore.kernel.org/all/cover.1755499375.git.asml.silence@gmail.com/
+    - Rebased, excluded zcrx specific patches
+    - Set agg_size_fac to 1 on warning
+v2: https://lore.kernel.org/all/cover.1754657711.git.asml.silence@gmail.com/
+    - Add MAX_PAGE_ORDER check on pp init
+    - Applied comments rewording
+    - Adjust pp.max_len based on order
+    - Patch up mlx5 queue callbacks after rebase
+    - Minor ->queue_mgmt_ops refactoring
+    - Rebased to account for both fill level and agg_size_fac
+    - Pass providers buf length in struct pp_memory_provider_params and
+      apply it in __netdev_queue_confi().
+    - Use ->supported_ring_params to validate drivers support of set
+      qcfg parameters.
+
+Jakub Kicinski (1):
+  eth: bnxt: adjust the fill level of agg queues with larger buffers
+
+Pavel Begunkov (5):
+  net: page_pool: sanitise allocation order
+  net: memzero mp params when closing a queue
+  net: let pp memory provider to specify rx buf len
+  eth: bnxt: store rx buffer size per queue
+  eth: bnxt: allow providers to set rx buf size
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 118 ++++++++++++++----
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   2 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |   6 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h |   2 +-
+ include/net/netdev_queues.h                   |   9 ++
+ include/net/page_pool/types.h                 |   1 +
+ net/core/netdev_rx_queue.c                    |  14 ++-
+ net/core/page_pool.c                          |   3 +
+ 8 files changed, 118 insertions(+), 37 deletions(-)
+
+-- 
+2.49.0
 
 
