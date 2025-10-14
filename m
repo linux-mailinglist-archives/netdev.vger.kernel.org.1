@@ -1,236 +1,344 @@
-Return-Path: <netdev+bounces-229380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBD82BDB670
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 23:21:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AFE08BDB685
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 23:27:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7B1F84EAAFE
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 21:21:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4DADF4EDFF9
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 21:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3402DF71C;
-	Tue, 14 Oct 2025 21:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B9D30C352;
+	Tue, 14 Oct 2025 21:27:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KcVP8tWQ"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Y4MUHUT9"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2DCE2DE202
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 21:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2789B270553;
+	Tue, 14 Oct 2025 21:27:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760476907; cv=none; b=KmT1DGiS66fnDg4Mq0MkjdOtJPl2VAL50hvsGSAKhF+/0WgLlnRhK4Q8WjlV/oKqKHgUdWc+N8kuevPFXZb5SbhqnM1ZQpa8EqsW13RKTnfbxelwfpo2IqzyjBJPyWesLOYZVWuBi7hFIFzPD3O28SleP4qOnBleJfdEN9eMYcA=
+	t=1760477242; cv=none; b=Hu3wE9jxOxjHaNd8rdiX35FZEtoePNQnsWN9BiyT8chPXzriSsPDSKYVn+Poic+rR0+8j02EDMPBdM5YeZjKPS878loWk+fashQV0uHtWJgQXVA7DFNsXkHOhDaX5eR/MOh7LtdzTJBAnQ03BRkAFPIV8FWUs2o1DoH0J5/W3mI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760476907; c=relaxed/simple;
-	bh=Kg/cKYNu75hX4cxFjLuiVFsCNzeyHrXt3FuiCvzQ5zk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fiEgBpXlqkicySeHPzaMYS26L0AoStKQbCHFDjXzfLw/82i3+s5Nmmr2P4MqtgPsVbnjVk7gon6zIpQ4QASPenU3PGu0QIDoLc8LqwGefcKY+ZRfmg73R0a/uTwtgQr5htdP73h4OA9goGnxyFazeJ2aeBLvr9HAPJJViXO0p9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KcVP8tWQ; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760476902;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=U8dNo68ZSUoZou1dQJ6uS5OmcpwaCXlR69MzCPyrbBI=;
-	b=KcVP8tWQVx42CqxBcj70ARDt3l/Bxe3uoxxc5wkITxhjXqiZuMLXiaz7wyyrL3R0Ib8TXD
-	6EIYQeGdpESK0RDGMuenubDwSYX2Ev6wv9dWi3wZNmpoJVc8rm/cFdgto2rXpeZ+iAL/Ll
-	AYA6VAiGTo6fj6nItWBsPUMDcCntI2o=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: mkubecek@suse.cz
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1760477242; c=relaxed/simple;
+	bh=FZEEdU24UxBJeTL+XTVmDjgu7pDp5qgDs7GTltmTjCc=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=hLJW4xMak7xNQRLwEkZiELINzNNOtOv6wENqBferxxFZOhqi3bjV1PNIb1br+YLCgkyu69fxhN8uYLs4/GM61LDpvJB/DHI3OAbX9TS56ppzFf7w+G7NaMD/Iu2FsVeo72ZkjknhdUOvo3pgPWeC8COnsKqgHgpjqxMGnR6//V8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Y4MUHUT9; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1006)
+	id AC971206596C; Tue, 14 Oct 2025 14:27:19 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AC971206596C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1760477239;
+	bh=mOLifcEof82JC7MsvCTYACckyTNoj1LBbMyEvy7qcyo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Y4MUHUT9aL1mLYq1E97ysNWfSicPWaCg0xzogluhXpHK1GQieNIZtZ48Dno4CTMi/
+	 U1JJqUS+/RHIZRn6YREauzgluifxgYbJ67F1ffNV19JDbqrbQYqGSWn9F7sSY5AHiA
+	 KK1aM5B/cdKm/A9k2GvLgl+w8uMq7brpe4WECy1w=
+From: Haiyang Zhang <haiyangz@linux.microsoft.com>
+To: linux-hyperv@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH ethtool-next v2] netlink: fec: add errors histogram statistics
-Date: Tue, 14 Oct 2025 21:20:18 +0000
-Message-ID: <20251014212018.7933-1-vadim.fedorenko@linux.dev>
+Cc: haiyangz@microsoft.com,
+	paulros@microsoft.com,
+	decui@microsoft.com,
+	kys@microsoft.com,
+	wei.liu@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	longli@microsoft.com,
+	ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com,
+	kotaranov@microsoft.com,
+	horms@kernel.org,
+	shradhagupta@linux.microsoft.com,
+	leon@kernel.org,
+	mlevitsk@redhat.com,
+	yury.norov@gmail.com,
+	shirazsaleem@microsoft.com,
+	andrew+netdev@lunn.ch,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next,v2] net: mana: Support HW link state events
+Date: Tue, 14 Oct 2025 14:26:49 -0700
+Message-Id: <1760477209-9026-1-git-send-email-haiyangz@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Linux 6.18 has FEC errors histogram statistics API added. Add support
-for extra attributes in ethtool.
+From: Haiyang Zhang <haiyangz@microsoft.com>
 
- # ethtool -I --show-fec eni8np1
-FEC parameters for eni8np1:
-Supported/Configured FEC encodings: None
-Active FEC encoding: None
-Statistics:
-  corrected_blocks: 123
-  uncorrectable_blocks: 4
-  fec_symbol_err_0: 445 [ per_lane:  125, 120, 100, 100 ]
-  fec_symbol_err_1_to_3: 12
-  fec_symbol_err_4_to_7: 2
+Handle the HW link state events received from HW channel, and
+set the proper link state, also stop/wake queues accordingly.
 
- # ethtool -j -I --show-fec eni8np1
-[ {
-        "ifname": "eni8np1",
-        "config": [ "None" ],
-        "active": [ "None" ],
-        "statistics": {
-            "corrected_blocks": {
-                "total": 123
-            },
-            "uncorrectable_blocks": {
-                "total": 4
-            },
-            "hist": [ {
-                    "bin_low": 0,
-                    "bin_high": 0,
-                    "total": 445,
-                    "lanes": [ 125,120,100,100 ]
-                },{
-                    "bin_low": 1,
-                    "bin_high": 3,
-                    "total": 12
-                },{
-                    "bin_low": 4,
-                    "bin_high": 7,
-                    "total": 2
-                } ]
-        }
-    } ]
-
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
 ---
+v2:
+  Updated link up/down to be symmetric, and other minor changes based
+  on comments from Andrew Lunn.
 
-v1 -> v2:
-- change field name fec_bit_error -> fec_symbol_error as by standard
-- align format of blocks per-lane statistics to histogram per-lane
+---
+ .../net/ethernet/microsoft/mana/gdma_main.c   |  1 +
+ .../net/ethernet/microsoft/mana/hw_channel.c  | 19 +++++
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 76 +++++++++++++++++--
+ include/net/mana/gdma.h                       |  4 +-
+ include/net/mana/hw_channel.h                 |  2 +
+ include/net/mana/mana.h                       |  6 ++
+ 6 files changed, 99 insertions(+), 9 deletions(-)
 
- netlink/fec.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 81 insertions(+), 5 deletions(-)
-
-diff --git a/netlink/fec.c b/netlink/fec.c
-index ed100d7..36ad3f5 100644
---- a/netlink/fec.c
-+++ b/netlink/fec.c
-@@ -44,6 +44,64 @@ fec_mode_walk(unsigned int idx, const char *name, bool val, void *data)
- 	print_string(PRINT_ANY, NULL, " %s", name);
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 43f034e180c4..effe0a2f207a 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -528,6 +528,7 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
+ 	case GDMA_EQE_HWC_INIT_DONE:
+ 	case GDMA_EQE_HWC_SOC_SERVICE:
+ 	case GDMA_EQE_RNIC_QP_FATAL:
++	case GDMA_EQE_HWC_SOC_RECONFIG_DATA:
+ 		if (!eq->eq.callback)
+ 			break;
+ 
+diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+index ada6c78a2bef..eae68995492a 100644
+--- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
++++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+@@ -118,6 +118,7 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
+ 	struct gdma_dev *gd = hwc->gdma_dev;
+ 	union hwc_init_type_data type_data;
+ 	union hwc_init_eq_id_db eq_db;
++	struct mana_context *ac;
+ 	u32 type, val;
+ 	int ret;
+ 
+@@ -196,6 +197,24 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
+ 			hwc->hwc_timeout = val;
+ 			break;
+ 
++		case HWC_DATA_HW_LINK_CONNECT:
++		case HWC_DATA_HW_LINK_DISCONNECT:
++			ac = gd->gdma_context->mana.driver_data;
++			if (!ac)
++				break;
++
++			if (ac->mana_removing) {
++				dev_info(hwc->dev,
++					 "Removing: skip link event %u\n",
++					 type);
++				break;
++			}
++
++			ac->link_event = type;
++			schedule_work(&ac->link_change_work);
++
++			break;
++
+ 		default:
+ 			dev_warn(hwc->dev, "Received unknown reconfig type %u\n", type);
+ 			break;
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 0142fd98392c..51959d37b0a7 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -20,6 +20,7 @@
+ 
+ #include <net/mana/mana.h>
+ #include <net/mana/mana_auxiliary.h>
++#include <net/mana/hw_channel.h>
+ 
+ static DEFINE_IDA(mana_adev_ida);
+ 
+@@ -84,8 +85,9 @@ static int mana_open(struct net_device *ndev)
+ 	/* Ensure port state updated before txq state */
+ 	smp_wmb();
+ 
+-	netif_carrier_on(ndev);
+-	netif_tx_wake_all_queues(ndev);
++	if (netif_carrier_ok(ndev))
++		netif_tx_wake_all_queues(ndev);
++
+ 	netdev_dbg(ndev, "%s successful\n", __func__);
+ 	return 0;
+ }
+@@ -100,6 +102,59 @@ static int mana_close(struct net_device *ndev)
+ 	return mana_detach(ndev, true);
  }
  
-+static void fec_show_hist_bin(const struct nlattr *hist)
++static void mana_link_state_handle(struct work_struct *w)
 +{
-+	const struct nlattr *tb[ETHTOOL_A_FEC_HIST_MAX + 1] = {};
-+	DECLARE_ATTR_TB_INFO(tb);
-+	unsigned int i, lanes, bin_high, bin_low;
-+	uint64_t val, *vals;
-+	int ret;
++	struct mana_port_context *apc;
++	struct mana_context *ac;
++	struct net_device *ndev;
++	bool link_up;
++	int i;
 +
-+	ret = mnl_attr_parse_nested(hist, attr_cb, &tb_info);
-+	if (ret < 0)
++	ac = container_of(w, struct mana_context, link_change_work);
++
++	if (ac->mana_removing)
 +		return;
 +
-+	if (!tb[ETHTOOL_A_FEC_HIST_BIN_LOW] || !tb[ETHTOOL_A_FEC_HIST_BIN_HIGH])
-+		return;
++	rtnl_lock();
 +
-+	bin_high = mnl_attr_get_u32(tb[ETHTOOL_A_FEC_HIST_BIN_HIGH]);
-+	bin_low  = mnl_attr_get_u32(tb[ETHTOOL_A_FEC_HIST_BIN_LOW]);
-+	/* Bin value is uint, so it may be u32 or u64 depeding on the value */
-+	if (mnl_attr_validate(tb[ETHTOOL_A_FEC_HIST_BIN_VAL], MNL_TYPE_U32) < 0)
-+		val = mnl_attr_get_u64(tb[ETHTOOL_A_FEC_HIST_BIN_VAL]);
++	if (ac->link_event == HWC_DATA_HW_LINK_CONNECT)
++		link_up = true;
++	else if (ac->link_event == HWC_DATA_HW_LINK_DISCONNECT)
++		link_up = false;
 +	else
-+		val = mnl_attr_get_u32(tb[ETHTOOL_A_FEC_HIST_BIN_VAL]);
++		goto out;
 +
-+	if (is_json_context()) {
-+		print_u64(PRINT_JSON, "bin_low", NULL, bin_low);
-+		print_u64(PRINT_JSON, "bin_high", NULL, bin_high);
-+		print_u64(PRINT_JSON, "total", NULL, val);
-+	} else {
-+		printf("  fec_symbols_err_%d", bin_low);
-+		if (bin_low != bin_high)
-+			printf("_to_%d", bin_high);
-+		printf(": %" PRIu64, val);
-+	}
-+	if (!tb[ETHTOOL_A_FEC_HIST_BIN_VAL_PER_LANE]) {
-+		if (!is_json_context())
-+			print_nl();
-+		return;
-+	}
++	/* Process all ports */
++	for (i = 0; i < ac->num_ports; i++) {
++		ndev = ac->ports[i];
++		if (!ndev)
++			continue;
 +
-+	vals = mnl_attr_get_payload(tb[ETHTOOL_A_FEC_HIST_BIN_VAL_PER_LANE]);
-+	lanes = mnl_attr_get_payload_len(tb[ETHTOOL_A_FEC_HIST_BIN_VAL_PER_LANE]) / 8;
-+	if (is_json_context())
-+		open_json_array("lanes", "");
-+	else
-+		printf(" [ per_lane:");
-+	for (i = 0; i < lanes; i++) {
-+		if (is_json_context())
-+			print_u64(PRINT_JSON, NULL, NULL, *vals++);
-+		else
-+			printf("%s %" PRIu64, i ? "," : "", *vals++);
-+	}
++		apc = netdev_priv(ndev);
 +
-+	if (is_json_context())
-+		close_json_array("");
-+	else
-+		printf(" ]\n");
-+}
++		if (link_up) {
++			if (!netif_carrier_ok(ndev)) {
++				netif_carrier_on(ndev);
 +
- static int fec_show_stats(const struct nlattr *nest)
- {
- 	const struct nlattr *tb[ETHTOOL_A_FEC_STAT_MAX + 1] = {};
-@@ -87,27 +145,45 @@ static int fec_show_stats(const struct nlattr *nest)
- 		lanes = mnl_attr_get_payload_len(tb[stats[i].attr]) / 8 - 1;
- 
- 		if (!is_json_context()) {
--			fprintf(stdout, "  %s: %" PRIu64 "\n",
-+			fprintf(stdout, "  %s: %" PRIu64,
- 				stats[i].name, *vals++);
- 		} else {
- 			open_json_object(stats[i].name);
- 			print_u64(PRINT_JSON, "total", NULL, *vals++);
- 		}
- 
--		if (lanes)
-+		if (lanes) {
- 			open_json_array("lanes", "");
-+			printf(" [ per_lane:");
-+		}
++				if (apc->port_is_up)
++					netif_tx_wake_all_queues(ndev);
++			}
 +
- 		for (l = 0; l < lanes; l++) {
- 			if (!is_json_context())
--				fprintf(stdout, "    Lane %d: %" PRIu64 "\n",
--					l, *vals++);
-+				printf("%s %" PRIu64, l ? "," : "", *vals++);
- 			else
- 				print_u64(PRINT_JSON, NULL, NULL, *vals++);
- 		}
--		if (lanes)
-+		if (lanes) {
- 			close_json_array("");
-+			printf(" ]\n");
-+		}
- 
- 		close_json_object();
- 	}
++			__netdev_notify_peers(ndev);
++		} else {
++			if (netif_carrier_ok(ndev)) {
++				if (apc->port_is_up)
++					netif_tx_disable(ndev);
 +
-+	if (tb[ETHTOOL_A_FEC_STAT_HIST]) {
-+		const struct nlattr *attr;
-+
-+		open_json_array("hist", "");
-+		mnl_attr_for_each_nested(attr, nest) {
-+			if (mnl_attr_get_type(attr) == ETHTOOL_A_FEC_STAT_HIST) {
-+				open_json_object(NULL);
-+				fec_show_hist_bin(attr);
-+				close_json_object();
++				netif_carrier_off(ndev);
 +			}
 +		}
-+		close_json_array("");
 +	}
- 	close_json_object();
++
++out:
++	rtnl_unlock();
++}
++
+ static bool mana_can_tx(struct gdma_queue *wq)
+ {
+ 	return mana_gd_wq_avail_space(wq) >= MAX_TX_WQE_SIZE;
+@@ -3059,9 +3114,6 @@ int mana_attach(struct net_device *ndev)
+ 	/* Ensure port state updated before txq state */
+ 	smp_wmb();
+ 
+-	if (apc->port_is_up)
+-		netif_carrier_on(ndev);
+-
+ 	netif_device_attach(ndev);
  
  	return 0;
+@@ -3153,8 +3205,8 @@ int mana_detach(struct net_device *ndev, bool from_close)
+ 	/* Ensure port state updated before txq state */
+ 	smp_wmb();
+ 
+-	netif_tx_disable(ndev);
+-	netif_carrier_off(ndev);
++	if (netif_carrier_ok(ndev))
++		netif_tx_disable(ndev);
+ 
+ 	if (apc->port_st_save) {
+ 		err = mana_dealloc_queues(ndev);
+@@ -3212,7 +3264,7 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 
+ 	netif_set_tso_max_size(ndev, GSO_MAX_SIZE);
+ 
+-	netif_carrier_off(ndev);
++	netif_carrier_on(ndev);
+ 
+ 	netdev_rss_key_fill(apc->hashkey, MANA_HASH_KEY_SIZE);
+ 
+@@ -3431,6 +3483,8 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+ 
+ 	if (!resuming) {
+ 		ac->num_ports = num_ports;
++
++		INIT_WORK(&ac->link_change_work, mana_link_state_handle);
+ 	} else {
+ 		if (ac->num_ports != num_ports) {
+ 			dev_err(dev, "The number of vPorts changed: %d->%d\n",
+@@ -3481,6 +3535,8 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+ 	if (err) {
+ 		mana_remove(gd, false);
+ 	} else {
++		ac->mana_removing = false;
++
+ 		dev_dbg(dev, "gd=%p, id=%u, num_ports=%d, type=%u, instance=%u\n",
+ 			gd, gd->dev_id.as_uint32, ac->num_ports,
+ 			gd->dev_id.type, gd->dev_id.instance);
+@@ -3500,6 +3556,10 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 	int err;
+ 	int i;
+ 
++	ac->mana_removing = true;
++
++	cancel_work_sync(&ac->link_change_work);
++
+ 	/* adev currently doesn't support suspending, always remove it */
+ 	if (gd->adev)
+ 		remove_adev(gd);
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index 57df78cfbf82..637f42485dba 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -590,6 +590,7 @@ enum {
+ 
+ /* Driver can self reset on FPGA Reconfig EQE notification */
+ #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
++#define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
+ 
+ #define GDMA_DRV_CAP_FLAGS1 \
+ 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
+@@ -599,7 +600,8 @@ enum {
+ 	 GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP | \
+ 	 GDMA_DRV_CAP_FLAG_1_DYNAMIC_IRQ_ALLOC_SUPPORT | \
+ 	 GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE | \
+-	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE)
++	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE | \
++	 GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE)
+ 
+ #define GDMA_DRV_CAP_FLAGS2 0
+ 
+diff --git a/include/net/mana/hw_channel.h b/include/net/mana/hw_channel.h
+index 83cf93338eb3..16feb39616c1 100644
+--- a/include/net/mana/hw_channel.h
++++ b/include/net/mana/hw_channel.h
+@@ -24,6 +24,8 @@
+ #define HWC_INIT_DATA_PF_DEST_CQ_ID	11
+ 
+ #define HWC_DATA_CFG_HWC_TIMEOUT 1
++#define HWC_DATA_HW_LINK_CONNECT 2
++#define HWC_DATA_HW_LINK_DISCONNECT 3
+ 
+ #define HW_CHANNEL_WAIT_RESOURCE_TIMEOUT_MS 30000
+ 
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 0921485565c0..d59e1f4656ce 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -477,6 +477,12 @@ struct mana_context {
+ 	struct dentry *mana_eqs_debugfs;
+ 
+ 	struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
++
++	/* Link state change work */
++	struct work_struct link_change_work;
++	u32 link_event;
++
++	bool mana_removing;
+ };
+ 
+ struct mana_port_context {
 -- 
-2.47.3
+2.34.1
 
 
