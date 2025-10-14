@@ -1,108 +1,92 @@
-Return-Path: <netdev+bounces-229375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D644BDB4FB
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 22:48:13 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4361FBDB513
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 22:50:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17C043AC51A
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 20:48:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 318D34E3231
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 20:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C842DCC13;
-	Tue, 14 Oct 2025 20:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D99306D36;
+	Tue, 14 Oct 2025 20:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ac1UXg+S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SnlTStHO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1063A2877FA;
-	Tue, 14 Oct 2025 20:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB8B27F736;
+	Tue, 14 Oct 2025 20:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760474890; cv=none; b=IskXLde4tYer1iicF+3UMowtCx1RwJjDaXHDrS9SuHLs+2C+Afu+8ldnMisgyAqyXJm2Z28xv2cJpX3b0MV1NDXaju75lUarDj2oK40+TesvxPiDtx8zbhzcVSrASfuFWo1IMC30Kiwha0bAtzjjLfspWVlzwQJK4rbpJ25161c=
+	t=1760475021; cv=none; b=jelSFZrVe2AZDznSVjwHh84dYBBSh6gT8ror4MQFWEmg6JK/43cgV1321ZOgqpFWhlP9Kzc51Eea1iw9xl5qd8Mw1z4DvSsHDKkoc1eYPB6vEYJxoc9l8Nt2NV/PxZ6+fdG75EWlIA1+lTHHcf7ChGyXJYkEE7ca3FaT6kGFwE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760474890; c=relaxed/simple;
-	bh=Em10QkwHKTKXlsyI+2+xjbCURDQJuQZ+0ngrcp0Ttxw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KLVZ+YS2IjHi0JYNjfuSNuEcm9EPfWwSd/ab4UHzSryPUXjNznEzUH+MtkNcWefwoFD7KQHNnjJJyWliLfkDd2u0bVHENt8HFSf8TIaVW2K9gDBvT/CY7BbFeD82LSBIg6PYIJMkiSTIGoxw57uy8JOFmMq5pv7TwKg9G37CWaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ac1UXg+S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1A1BC4CEE7;
-	Tue, 14 Oct 2025 20:48:09 +0000 (UTC)
+	s=arc-20240116; t=1760475021; c=relaxed/simple;
+	bh=pUZy9tdk4f39b5vD2vlJ6uCU8Q+eks0yazNcf05FS+A=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RxJM3pBZc5Fv71X/iJScmooVCf0RohPVcdaMRGjbxCdPNYn6EXy4zSclcgf0N909TBH4/GpERerKrilAJdlVfEKyKH4KWP40jsKBcv8yz0g3/OI4t6hYeZReCYLKgqR0CPMZ2pH5C5MJEDN7MZGTNrZHZYiIrxm/EpZmQiIq2sA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SnlTStHO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16847C4CEE7;
+	Tue, 14 Oct 2025 20:50:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760474889;
-	bh=Em10QkwHKTKXlsyI+2+xjbCURDQJuQZ+0ngrcp0Ttxw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ac1UXg+SCBy9/GWTf/+/DigHGLV9tHgtMrbSVcPYyXrhuFmiThCmMHN9AJKuNqNRL
-	 Ufwo89GtcIXqjUwkdu3ynzYbGkO63J+XIJCkkYNhxXhwFaIraxXRmPVVgCpB5OxjTD
-	 d+y1Y6UGQ8TXXfnUwedOEYs9+m8PTH5ZLOHJ6IEkftT19EHlmcdOf5TVHTY+aeuNs1
-	 Cgmwt2YB0p9Az1C5Q8QjcVdYsNv4u9Pay4JrOzxRSSRGPxz9uyvbUUhXBR9L3XJivv
-	 APhB4MK8AyEYDnP8wl0QR0Ec37I4RM/KnZFPeLgRu3Te76fy7uR2LKIAubikoL6FXJ
-	 HCeltuj8/Nmfw==
-Date: Tue, 14 Oct 2025 15:48:07 -0500
-From: Rob Herring <robh@kernel.org>
-To: Conor Dooley <conor@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
-Subject: Re: [PATCH 1/1] dt-bindings: net: dsa: nxp,sja1105: Add optional
- clock
-Message-ID: <20251014204807.GA1075103-robh@kernel.org>
-References: <20251010183418.2179063-1-Frank.Li@nxp.com>
- <20251014-flattop-limping-46220a9eda46@spud>
- <20251014-projector-immovably-59a2a48857cc@spud>
- <20251014120213.002308f2@kernel.org>
- <20251014-unclothed-outsource-d0438fbf1b23@spud>
+	s=k20201202; t=1760475021;
+	bh=pUZy9tdk4f39b5vD2vlJ6uCU8Q+eks0yazNcf05FS+A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SnlTStHO1aECjfnAfqYP27nfOEIcO4c0qT4K7cjiRR8XSkDr6+NFTe00+RFLFnHiy
+	 gim8syMGGZmyHdKu32QQfD1GW0Jdb8qNuleNakomcy+B5HLkCxepRhyXWKgGn4R4mD
+	 Lxek+Y50EkP2RJbzdmMtLIcyAqQWOV2nINAtr/a+fRgRrgAxg/Ol9njW2NTn6yNwPc
+	 49wT9OmKe68ROTMNhwU/ygmICfBWBMxf4qXpuUd7GfACwnRcd6dC3NRVDVWQshojSV
+	 8gkSQdaDqO8trRqB//l75g9G8IVJXXqF1pk/67DTWQGD3c3u5DoASn7Iq3ceQgN3Ho
+	 SUfH/H5OWIXqw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71746380AAF2;
+	Tue, 14 Oct 2025 20:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251014-unclothed-outsource-d0438fbf1b23@spud>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: dsa: b53: implement port isolation support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176047500627.92082.6355801879246780611.git-patchwork-notify@kernel.org>
+Date: Tue, 14 Oct 2025 20:50:06 +0000
+References: <20251013152834.100169-1-jonas.gorski@gmail.com>
+In-Reply-To: <20251013152834.100169-1-jonas.gorski@gmail.com>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: florian.fainelli@broadcom.com, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Oct 14, 2025 at 08:35:04PM +0100, Conor Dooley wrote:
-> On Tue, Oct 14, 2025 at 12:02:13PM -0700, Jakub Kicinski wrote:
-> > On Tue, 14 Oct 2025 19:12:23 +0100 Conor Dooley wrote:
-> > > On Tue, Oct 14, 2025 at 07:02:50PM +0100, Conor Dooley wrote:
-> > > > On Fri, Oct 10, 2025 at 02:34:17PM -0400, Frank Li wrote:  
-> > > > > Add optional clock for OSC_IN and fix the below CHECK_DTBS warnings:
-> > > > >   arch/arm/boot/dts/nxp/imx/imx6qp-prtwd3.dtb: switch@0 (nxp,sja1105q): Unevaluated properties are not allowed ('clocks' was unexpected)
-> > > > > 
-> > > > > Signed-off-by: Frank Li <Frank.Li@nxp.com>  
-> > > > 
-> > > > Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> > > > pw-bot: not-applicable  
-> > > 
-> > > Hmm, I think this pw-bot command, intended for the dt patchwork has
-> > > probably screwed with the state in the netdev patchwork. Hopefully I can
-> > > fix that via
-> > 
-> > The pw-bot commands are a netdev+bpf thing :) They won't do anything
-> > to dt patchwork. IOW the pw-bot is a different bot than the one that
-> > replies when patch is applied.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 13 Oct 2025 17:28:34 +0200 you wrote:
+> Implement port isolation support via the Protected Ports register.
 > 
-> Rob's recently added it to our patchwork too.
+> Protected ports can only communicate with unprotected ports, but not
+> with each other, matching the expected behaviour of isolated ports.
+> 
+> Tested on BCM963268BU.
+> 
+> [...]
 
-And the issue is that both PW projects might get updated and both don't 
-necessarily want the same state (like this case). So we need to 
-distinguish. Perhaps like one of the following:
+Here is the summary with links:
+  - [net-next] net: dsa: b53: implement port isolation support
+    https://git.kernel.org/netdev/net-next/c/bdec4271e808
 
-dt-pw-bot: <state>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-or
 
-pw-bot: <project> <state>
-
-Rob
 
