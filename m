@@ -1,65 +1,55 @@
-Return-Path: <netdev+bounces-229294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D98EBDA5A0
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:27:23 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 496BDBDA60D
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:29:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 665413AB147
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:19:04 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 548B6502EC2
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D00C2C0F64;
-	Tue, 14 Oct 2025 15:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9F02FFFBE;
+	Tue, 14 Oct 2025 15:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="qnv0okSO";
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="WXLBrPuw"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="sZKWoSnr"
 X-Original-To: netdev@vger.kernel.org
-Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CAE2BE7BA;
-	Tue, 14 Oct 2025 15:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8812FFDF9;
+	Tue, 14 Oct 2025 15:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760455143; cv=none; b=FYkITpIEvE+BdGL8kqTGsBJgLwwhGIZGevYjbnjfE4DVeEnpKaulm7vGWxlnZ/UgklpMJ+JE7HqtdDZI4mNLekwi8ZSYlOMg4N7KLzmBVRkSGf0ZnADrqKEeJ9q4ZzX9QdPz1Jo5tERF5x9Z0+uMTyUGNXkpoIYpx6KUwi9HTSQ=
+	t=1760455544; cv=none; b=UxmRma1nqIrNkU8Yj0U4fZmblInoplg//I3+39uPaYKkKIeZl6WjBRXTCpB4JM/n/fEkXb08ULgJ4ZHb1jq/YW/kOCTuzxUQ423u1nxc1gpTUd8uJ1g46tDmgeRVs/VTkJzGKaPIwUk3n+X2usKtxPtGqzKw0fqNkCQ7wTJuhLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760455143; c=relaxed/simple;
-	bh=6/Gv575Zd0T6fBvEJXFzYQT8enxJt/ST9LZpFAmyPE0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=O887loCtFPMf3sQLJUjxeWI2ZyqX7J6e0he36/Ua4UV58uouick/4MYIG5vh2IDuHnyrGsbwbfDMyeANdlXd85Ymf2cf5tmNkhYJvuGJRLZlqszp3lwpTcVBsWp2Q2z/aYpjwHOBdqFVkuM2tLkrer3dF09jBrRT1QCbv5m5KbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=qnv0okSO; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=WXLBrPuw; arc=none smtp.client-ip=23.88.97.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1760455138;
-	bh=6/Gv575Zd0T6fBvEJXFzYQT8enxJt/ST9LZpFAmyPE0=;
-	h=From:Date:Subject:To:Cc:From;
-	b=qnv0okSO4HIBHiXxreqpN6TjDCN6ctk0QN7nkYcMKfWXuucuJ2KCUk+hqKTohuQWR
-	 k6VKi12r2nA4lbQJ5S9k/S3DcH4T4pf96N6YcP25tc1iNhEpEUarvf4QOMwEDtpaFO
-	 hLXqtdfm7rAXeBRfoliNzWpvf+xu8AaIDzl3hTH8jbclE6e6FEFFUklGlvmE39RWCu
-	 8HSkukk1d2lgMlKpYPYl4U1eLkrsReSGpog9EUaJ5JBmEBVjy8nk1BjBQbntBmVmh9
-	 6WXYbRjRnLmeyNbPe+3jS0OvTRZkNlslZ0PF5ApxlTDm1sWthGjahx0v6jM8THzJ/L
-	 h0DsH1NaiASdA==
-Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
-	id B03D448544; Tue, 14 Oct 2025 15:18:58 +0000 (UTC)
-X-Spam-Level: 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1760455137;
-	bh=6/Gv575Zd0T6fBvEJXFzYQT8enxJt/ST9LZpFAmyPE0=;
-	h=From:Date:Subject:To:Cc:From;
-	b=WXLBrPuwWVzuo3YbBka1kB09oojZxjjNw3vhUpDL3Jp2U7WSDUTbjCamVk0y32nZs
-	 HZS8ovPfvBVDRG1yFGKKw7NGSgBMUdZtwUMrFvkigCFlcfcEPF+WX0Kb6/7k/UfZsm
-	 0xjgn4neab8r/VHj98smS0aqizYpQvThEe73fMo1CeH4zSiU3HhRrKliMeFYtasIDy
-	 gb8SEeQSl5twpq915IpU6L9+upx5Vf8qL3+JbOUhlg8LR/svp0GJi2ma8Kyfjm25Sr
-	 Rwym2M6JqnzGAwofnUlkqxnusZGkYbsB9v7mix9K1TFjw36E6nux21Vba6gvP1du/T
-	 mI5pATwoZwS5g==
-Received: from AMDDesktop.lan (unknown [IPv6:2a00:6020:47a3:e800:94d3:d213:724a:4e07])
-	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 3CABC48521;
-	Tue, 14 Oct 2025 15:18:57 +0000 (UTC)
-From: Birger Koblitz <mail@birger-koblitz.de>
-Date: Tue, 14 Oct 2025 17:18:46 +0200
-Subject: [PATCH net-next v3] ixgbe: Add 10G-BX support
+	s=arc-20240116; t=1760455544; c=relaxed/simple;
+	bh=krvauSEhJ1khgpbOy1S/5kMw6skc96mbQJbK77h4jIc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EofC3Ia2I81jXqGhsQfLZuj52aDcq4nBgL7DaSyC1+qLDNZsX30XBDJiqjaWuKYtt4HkOFoDzAsqdOtQuZjcd6It+X3bb7Ap0tKeRx5XfFfLPAxMMlUMVo9o0lJOccBuBd+x1UiJ8dobEwEu9E3TymMSwinJvddIjGmuJMV9Uro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=sZKWoSnr; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 5C832C09F95;
+	Tue, 14 Oct 2025 15:25:20 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 537DE606EC;
+	Tue, 14 Oct 2025 15:25:39 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2FDB8102F226E;
+	Tue, 14 Oct 2025 17:25:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1760455538; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=8btb3cYWBCi2fD6kO9Qe/Zw0nyJJHpRTiZ2PSM3h1jo=;
+	b=sZKWoSnrDq4Y2e3rUgqskKukJEB+clPsD6+pUzG934MwjHnqCwDrYRENiH/cLmi4tMAyE/
+	eF/IxBktLq+/PJXyfcaH8XCqPYdQ+AYFiuqjjcSyD8LqQWvqH3NLMIP5Ls3uGZEOkWx5O0
+	74Uxb3NV9iv1Frb8QURozRVPvCx78CDI4gTg/rNjCE5dN2OymAtMMvK+n3iwyaL+OuvRZq
+	UBlcmWJDR8w2fgzzRGRMzQD5uXdSu3x31cXDmrD1VPe9wpASfFcr8BGS/v4PcNIPALXn0x
+	/6gxX4xo0Igy7vB2JfLtN+hWstQxRtZeNg1uGmC/Jil7l6jbbXCWuKK5zPknrw==
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: [PATCH net-next 00/15] net: macb: various cleanups
+Date: Tue, 14 Oct 2025 17:25:01 +0200
+Message-Id: <20251014-macb-cleanup-v1-0-31cd266e22cd@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,235 +57,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251014-10gbx-v3-1-50cda8627198@birger-koblitz.de>
-X-B4-Tracking: v=1; b=H4sIANVp7mgC/22OQQ6CMBBFr0K6tqZTWi2uvIdxQekAEw2QljQo4
- e4WIokLl+9n3svMLKAnDOySzcxjpEB9lyA/ZKxqy65BTi4xk0JqECA5iMZOvLTKyEojOK1Yuh0
- 81jRtnds9cUth7P1ry0ZY172QfwsROKRMYYpTWedOm6sl36Dnj94+aXwfHbK1FOWvrXY7PcILI
- yotFQDg+Z+9LMsHQeF2PuAAAAA=
-X-Change-ID: 20251012-10gbx-ab482c5e1d54
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAE1r7mgC/x3MQQqDMBBG4avIrDtgQm2LV5EukvG3HaijJFoE8
+ e4Gl9/ivZ0ykiJTW+2U8NeskxW4W0XyDfYBa19MvvaNq92dxyCR5Ydg68xe8Iyv6CDNg0oyJwy
+ 6XbuODAsbtoXex3ECPD1YEWgAAAA=
+X-Change-ID: 20251014-macb-cleanup-2ce7b8b1ec56
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Birger Koblitz <mail@birger-koblitz.de>, 
- Andrew Lunn <andrew@lunn.ch>
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
+ Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ =?utf-8?q?Gr=C3=A9gory_Clement?= <gregory.clement@bootlin.com>, 
+ =?utf-8?q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+ Andrew Lunn <andrew@lunn.ch>, Sean Anderson <sean.anderson@linux.dev>
 X-Mailer: b4 0.14.2
+X-Last-TLS-Session-Version: TLSv1.3
 
-Adds support for 10G-BX modules, i.e. 10GBit Ethernet over a single strand
-Single-Mode fiber
-The initialization of a 10G-BX SFP+ is the same as for a 10G SX/LX module,
-and is identified according to SFF-8472 table 5-3, footnote 3 by the
-10G Ethernet Compliance Codes field being empty, the Nominal Bit
-Rate being compatible with 12.5GBit, and the module being a fiber module
-with a Single Mode fiber link length.
+Fix many oddities inside the MACB driver. They accumulated in my
+work-in-progress branch while working on MACB/GEM EyeQ5 support.
 
-This was tested using a Lightron WSPXG-HS3LC-IEA 1270/1330nm 10km
-transceiver:
-$ sudo ethtool -m enp1s0f1
-   Identifier                          : 0x03 (SFP)
-   Extended identifier                 : 0x04 (GBIC/SFP defined by 2-wire interface ID)
-   Connector                           : 0x07 (LC)
-   Transceiver codes                   : 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   Encoding                            : 0x01 (8B/10B)
-   BR Nominal                          : 10300MBd
-   Rate identifier                     : 0x00 (unspecified)
-   Length (SMF)                        : 10km
-   Length (OM2)                        : 0m
-   Length (OM1)                        : 0m
-   Length (Copper or Active cable)     : 0m
-   Length (OM3)                        : 0m
-   Laser wavelength                    : 1330nm
-   Vendor name                         : Lightron Inc.
-   Vendor OUI                          : 00:13:c5
-   Vendor PN                           : WSPXG-HS3LC-IEA
-   Vendor rev                          : 0000
-   Option values                       : 0x00 0x1a
-   Option                              : TX_DISABLE implemented
-   BR margin max                       : 0%
-   BR margin min                       : 0%
-   Vendor SN                           : S142228617
-   Date code                           : 140611
-   Optical diagnostics support         : Yes
+Part of this series has been seen on the lkml in March then June.
+See below for a semblance of a changelog.
 
-Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+The initial goal was to post them alongside EyeQ5 support, but that
+makes for too big of a series. It'll come afterwards, with new
+features (interrupt coalescing, ethtool .set_channels() and XDP mostly).
+
+Thanks,
+Have a nice day,
+Théo
+
+[0]: https://lore.kernel.org/lkml/20250627-macb-v2-0-ff8207d0bb77@bootlin.com/
+
+Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
-Changes in v3:
-  Added "Reviewed-by". There also was a possible mailserver DKIM misconfiguration
-  that may have prevented recipients to recieve the previous mails 
-- Link to v2: https://lore.kernel.org/r/20251014-10gbx-v2-1-980c524111e7@birger-koblitz.de
-
-Changes in v2:
-  Allow also modules with only Byte 15 (100m SM link length) set to
-  be identified as BX
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c   |  7 ++++
- drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c |  2 ++
- drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c     | 43 +++++++++++++++++++++---
- drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h     |  2 ++
- drivers/net/ethernet/intel/ixgbe/ixgbe_type.h    |  2 ++
- 5 files changed, 51 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
-index d5b1b974b4a33e7dd51b7cfe5ea211ff038a36f0..892a73a4bc6b0bb1c976ca95bf874059b987054f 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
-@@ -342,6 +342,13 @@ static int ixgbe_get_link_capabilities_82599(struct ixgbe_hw *hw,
- 		return 0;
- 	}
- 
-+	if (hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
-+	    hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1) {
-+		*speed = IXGBE_LINK_SPEED_10GB_FULL;
-+		*autoneg = false;
-+		return 0;
-+	}
-+
- 	/*
- 	 * Determine link capabilities based on the stored value of AUTOC,
- 	 * which represents EEPROM defaults.  If AUTOC value has not been
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index 2d660e9edb80af8fc834e097703dfd6a82b8c45b..76edf02bc47e5dd24bb0936f730f036181f6dc2a 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -351,6 +351,8 @@ static int ixgbe_get_link_ksettings(struct net_device *netdev,
- 		case ixgbe_sfp_type_1g_lx_core1:
- 		case ixgbe_sfp_type_1g_bx_core0:
- 		case ixgbe_sfp_type_1g_bx_core1:
-+		case ixgbe_sfp_type_10g_bx_core0:
-+		case ixgbe_sfp_type_10g_bx_core1:
- 			ethtool_link_ksettings_add_link_mode(cmd, supported,
- 							     FIBRE);
- 			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-index 2449e4cf2679ddf3277f4ada7619303eb618d393..ad6a1eae6042bb16e329fb817bcfcb87e9008ce8 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-@@ -1541,6 +1541,8 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
- 	u8 identifier = 0;
- 	u8 cable_tech = 0;
- 	u8 cable_spec = 0;
-+	u8 sm_length_km = 0;
-+	u8 sm_length_100m = 0;
- 	int status;
- 
- 	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_fiber) {
-@@ -1678,6 +1680,31 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
- 			else
- 				hw->phy.sfp_type =
- 					ixgbe_sfp_type_1g_bx_core1;
-+		/* Support Ethernet 10G-BX, checking the Bit Rate
-+		 * Nominal Value as per SFF-8472 to be 12.5 Gb/s (67h) and
-+		 * Single Mode fibre with at least 1km link length
-+		 */
-+		} else if ((!comp_codes_10g) && (bitrate_nominal == 0x67) &&
-+			   (!(cable_tech & IXGBE_SFF_DA_PASSIVE_CABLE)) &&
-+			   (!(cable_tech & IXGBE_SFF_DA_ACTIVE_CABLE))) {
-+			status = hw->phy.ops.read_i2c_eeprom(hw,
-+					    IXGBE_SFF_SM_LENGTH_KM,
-+					    &sm_length_km);
-+			if (status != 0)
-+				goto err_read_i2c_eeprom;
-+			status = hw->phy.ops.read_i2c_eeprom(hw,
-+					    IXGBE_SFF_SM_LENGTH_100M,
-+					    &sm_length_100m);
-+			if (status != 0)
-+				goto err_read_i2c_eeprom;
-+			if (sm_length_km > 0 || sm_length_100m >= 10) {
-+				if (hw->bus.lan_id == 0)
-+					hw->phy.sfp_type =
-+						ixgbe_sfp_type_10g_bx_core0;
-+				else
-+					hw->phy.sfp_type =
-+						ixgbe_sfp_type_10g_bx_core1;
-+			}
- 		} else {
- 			hw->phy.sfp_type = ixgbe_sfp_type_unknown;
- 		}
-@@ -1768,7 +1795,9 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
- 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
- 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
- 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
--	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1)) {
-+	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
-+	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
-+	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1)) {
- 		hw->phy.type = ixgbe_phy_sfp_unsupported;
- 		return -EOPNOTSUPP;
- 	}
-@@ -1786,7 +1815,9 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
- 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
- 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
- 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
--	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1)) {
-+	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
-+	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
-+	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1)) {
- 		/* Make sure we're a supported PHY type */
- 		if (hw->phy.type == ixgbe_phy_sfp_intel)
- 			return 0;
-@@ -2016,20 +2047,22 @@ int ixgbe_get_sfp_init_sequence_offsets(struct ixgbe_hw *hw,
- 		return -EOPNOTSUPP;
- 
- 	/*
--	 * Limiting active cables and 1G Phys must be initialized as
-+	 * Limiting active cables, 10G BX and 1G Phys must be initialized as
- 	 * SR modules
- 	 */
- 	if (sfp_type == ixgbe_sfp_type_da_act_lmt_core0 ||
- 	    sfp_type == ixgbe_sfp_type_1g_lx_core0 ||
- 	    sfp_type == ixgbe_sfp_type_1g_cu_core0 ||
- 	    sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
--	    sfp_type == ixgbe_sfp_type_1g_bx_core0)
-+	    sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
-+	    sfp_type == ixgbe_sfp_type_10g_bx_core0)
- 		sfp_type = ixgbe_sfp_type_srlr_core0;
- 	else if (sfp_type == ixgbe_sfp_type_da_act_lmt_core1 ||
- 		 sfp_type == ixgbe_sfp_type_1g_lx_core1 ||
- 		 sfp_type == ixgbe_sfp_type_1g_cu_core1 ||
- 		 sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
--		 sfp_type == ixgbe_sfp_type_1g_bx_core1)
-+		 sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
-+		 sfp_type == ixgbe_sfp_type_10g_bx_core1)
- 		sfp_type = ixgbe_sfp_type_srlr_core1;
- 
- 	/* Read offset to PHY init contents */
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
-index 81179c60af4e0199a8b9d0fcdf34654b02eedfac..039ba4b6c120f3e824c93cb00fdd9483e7cf9cba 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
-@@ -32,6 +32,8 @@
- #define IXGBE_SFF_QSFP_1GBE_COMP	0x86
- #define IXGBE_SFF_QSFP_CABLE_LENGTH	0x92
- #define IXGBE_SFF_QSFP_DEVICE_TECH	0x93
-+#define IXGBE_SFF_SM_LENGTH_KM		0xE
-+#define IXGBE_SFF_SM_LENGTH_100M	0xF
- 
- /* Bitmasks */
- #define IXGBE_SFF_DA_PASSIVE_CABLE		0x4
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-index b1bfeb21537acc44c31aedcb0584374e8f6ecd45..61f2ef67defddeab9ff4aa83c8f017819594996b 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-@@ -3286,6 +3286,8 @@ enum ixgbe_sfp_type {
- 	ixgbe_sfp_type_1g_lx_core1 = 14,
- 	ixgbe_sfp_type_1g_bx_core0 = 15,
- 	ixgbe_sfp_type_1g_bx_core1 = 16,
-+	ixgbe_sfp_type_10g_bx_core0 = 17,
-+	ixgbe_sfp_type_10g_bx_core1 = 18,
- 
- 	ixgbe_sfp_type_not_present = 0xFFFE,
- 	ixgbe_sfp_type_unknown = 0xFFFF
+Changes since June V2:
+ - Six patches are straight copies:
+   dt-bindings: net: cdns,macb: sort compatibles
+   net: macb: use BIT() macro for capability definitions
+   net: macb: Remove local variables clk_init and init in macb_probe()
+   net: macb: drop macb_config NULL checking
+   net: macb: introduce DMA descriptor helpers (is 64bit? is PTP?)
+   net: macb: sort #includes
+ - The "introduce DMA descriptor helpers" patch was split in two:
+   net: macb: simplify macb_dma_desc_get_size()
+   net: macb: introduce DMA descriptor helpers (is 64bit? is PTP?)
+ - Three patches come from Sean's feedback:
+   net: macb: remove gap in MACB_CAPS_* flags
+   net: macb: simplify macb_adj_dma_desc_idx()
+   net: macb: move bp->hw_dma_cap flags to bp->caps
+ - Take 1x Reviewed-by: Krzysztof Kozlowski
+ - Take 3x Reviewed-by: Sean Anderson
+ - Link: https://lore.kernel.org/lkml/20250627-macb-v2-0-ff8207d0bb77@bootlin.com/
 
 ---
-base-commit: 67029a49db6c1f21106a1b5fcdd0ea234a6e0711
-change-id: 20251012-10gbx-ab482c5e1d54
+Théo Lebrun (15):
+      dt-bindings: net: cdns,macb: sort compatibles
+      net: macb: use BIT() macro for capability definitions
+      net: macb: remove gap in MACB_CAPS_* flags
+      net: macb: Remove local variables clk_init and init in macb_probe()
+      net: macb: drop macb_config NULL checking
+      net: macb: simplify macb_dma_desc_get_size()
+      net: macb: simplify macb_adj_dma_desc_idx()
+      net: macb: move bp->hw_dma_cap flags to bp->caps
+      net: macb: introduce DMA descriptor helpers (is 64bit? is PTP?)
+      net: macb: remove bp->queue_mask
+      net: macb: replace min() with umin() calls
+      net: macb: drop `entry` local variable in macb_tx_map()
+      net: macb: drop `count` local variable in macb_tx_map()
+      net: macb: apply reverse christmas tree in macb_tx_map()
+      net: macb: sort #includes
+
+ .../devicetree/bindings/net/cdns,macb.yaml         |   8 +-
+ drivers/net/ethernet/cadence/macb.h                |  71 +++---
+ drivers/net/ethernet/cadence/macb_main.c           | 257 +++++++++------------
+ drivers/net/ethernet/cadence/macb_ptp.c            |  16 +-
+ 4 files changed, 151 insertions(+), 201 deletions(-)
+---
+base-commit: 6a445aebc188bdb9a82519c5fe64eb92b1d025b9
+change-id: 20251014-macb-cleanup-2ce7b8b1ec56
 
 Best regards,
 -- 
-Birger Koblitz <mail@birger-koblitz.de>
+Théo Lebrun <theo.lebrun@bootlin.com>
 
 
