@@ -1,303 +1,151 @@
-Return-Path: <netdev+bounces-229195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30A38BD9132
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 13:43:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C937BD90F3
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 13:35:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0C21F4FAEC4
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:43:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D86CE3BAC44
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:35:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E1F30E849;
-	Tue, 14 Oct 2025 11:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1C72FE053;
+	Tue, 14 Oct 2025 11:35:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="MuGny2fw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jX+0Belh"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC6C304968
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 11:43:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E4F1F239B
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 11:35:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760442199; cv=none; b=dHUTSg+f/MMl0cp6oJ2KMwbhNxzKZFrkiVJkTel7qBlCDnggDxIGFeIPXDlBn5+K1WvkWhoQzGZo3SC5JJy/bbDXE1Pr/Tc4Xs5Rq2N27jDkdFPN0PJirSHx0PEnPyIWquP8/5ZoJSmpt0r4KQyIlWkG0YD3Tf2P+7BgbpVJPFM=
+	t=1760441707; cv=none; b=c05LSi76x8cWcRF4tuwH5Qnc9OIxltC7yPdLfrT+EFpp/igCyAMhdEkHCaQ8k+aRAFTAwKuw/rj4g60ah4iXC1M+Uj3r3TDuyMySxXP3LziBS5E/vVkz/jECRsIpNCk7Bgku7MkSKtSqkA3cnzUcyIr6ylp0xK2HSAnSNaGZ0QA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760442199; c=relaxed/simple;
-	bh=fop943o6Wr7krlLuhY+A/L0lmKCKTRtK52xoFzXNEsk=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=bzyD9L0j3B28uhGx9TSQskeC1rc8xaMgQh3uGFdpfZNpeQipGmJXblQ6MOsPEBFZEkVuGpJFngrZV31bI5EbhqCAD2B860gWh14Gi0aR3rkA5ZnJeYylwBvflJDviBLBrvBPS7qBI8kfBXyBv+nFO4EgtZ8k1O3lYzkergLtHmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=MuGny2fw; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1760442194; h=Message-ID:Subject:Date:From:To;
-	bh=P0z2O4rxFMH3PJkgW9Ke1tx+hDmvIb6pYaqqJlalReM=;
-	b=MuGny2fw+PZKmfdHbF++YbCpruY7YrzqHGRIzqImYSw42Rz7WIVKJoZUQbZjgdMjhR8vhnFMuCJoQUyd5gQnUnSkKnlCq45dhdJ4Id3J3M4SZ6BIF1ZSBSQpCb4mftciZ9+Wjr2mHKT66zKpENnjEgrxro7wz7dshYZJKkygYy8=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WqBpOpH_1760442192 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 14 Oct 2025 19:43:12 +0800
-Message-ID: <1760441688.9352384-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v5] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
-Date: Tue, 14 Oct 2025 19:34:48 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Wen Gu <guwen@linux.alibaba.com>,
- Philo Lu <lulie@linux.alibaba.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Lukas Bulwahn <lukas.bulwahn@redhat.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Vivian Wang <wangruikang@iscas.ac.cn>,
- Troy Mitchell <troy.mitchell@linux.spacemit.com>,
- Dust Li <dust.li@linux.alibaba.com>,
- alok.a.tiwari@oracle.com,
- kalesh-anakkur.purayil@broadcom.com,
- netdev@vger.kernel.org
-References: <20251013021833.100459-1-xuanzhuo@linux.alibaba.com>
- <8b853379-1601-4387-adaf-31f786f306ca@redhat.com>
-In-Reply-To: <8b853379-1601-4387-adaf-31f786f306ca@redhat.com>
+	s=arc-20240116; t=1760441707; c=relaxed/simple;
+	bh=T3t0+cYCuL3VKAnxS7+KPj15eJ+4z2KvH9LNLJxNSNc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YuxsCMliaI/sshPHd161/7RUljaUQ7ODBoi55KAcIGsYTUgqI/eGLfyAvehZX+6BAQrM5spUbcj8SFn9lq+PewwnF6dsF1uEoQt/V5JzrG/8P5sFWwS32zGTEbXkpnwooxwNWs9f5xICjTnC5SOiLX7BDKB3xG298vIvaH6KNNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jX+0Belh; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-791fd6bffbaso81442586d6.3
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 04:35:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760441704; x=1761046504; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dVR3/U6+ocxlCfncD6DTY1Wi6NUabWM18tL8EPxbc4Y=;
+        b=jX+0BelhB8lxTjS2WHUN00H1b5qUxNC1UR5HsXAvRrWLBSOfI9Y9yjfqw0JaHoFY7P
+         EHNhUexNSLw58+60kIx9JvUJz8PCPobaNnlAvdTilfSgLsznbtRhnsJDtCFzSN7llCS7
+         2Ms5qLGRPuL5pHhX2VfKLjA4WBFLR5Mz9JXArSVKnkstfuSLA2Vb6IcIZCmU8gBiHggf
+         Z3+oqfDcFGpBk6rvfpBbtES0FrGn4sj2qe+Kse1Phow8a3AjZ6sJCMUqIPJWIRvqr+e/
+         ceErRjXozyEUeODKJ25Q5DEt+a2QBMAyt/dXkGjq4Ma3/P0e9cFEsTJE/JvJWFUrfzrW
+         hj9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760441704; x=1761046504;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dVR3/U6+ocxlCfncD6DTY1Wi6NUabWM18tL8EPxbc4Y=;
+        b=i9mmlYv3yBXSHJ4sgA4upryGMf+AYlp61YQMbXi1L920herf/Oj6zOIVCtDjxtQXCy
+         5LqC8F+2pQEAguUjq61gsuYlNIGAC832vtJt34XwbHEn723IGhTgxdvYwamNvwOr9xTy
+         kQ7cxV3uqDIPx7SPb5AgOOqegnz4D/WL0Dm/J4YY2+XBZuJCPr6cYCgHD1qsVyegQTto
+         Y2a8iNktPbvqE26SirBr1++rlJl+f0jpjZLWW33ZmYOkbQjMuhJQJO5+hz0OJk7DqLSB
+         9GMZVFW7jVDHSpwGEwfiEwyAxz3AiEwrYEDuu3//wxsTd06A2+G2KixR9+LwJTc40kfT
+         Z05Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVziaGagH//fHfDeFyTfBldpXR3LsgLYeTxK9rm0CbZpDjlHDYjDXQOvzav+q6xKnff5gKiasU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzE0FLyyhV6vkkwMl6JXBavbWVTijESHsiZwl8KhNxdBu9+XOgU
+	SXMFS7lFiHJSL310/RLPoOBl06hSPQnaMMQybVmN5gu9bcgw0uuCzpBxTV57WCYAKtf7Du2XMmg
+	aeMUlkAITCDYcu2BDUdrwx9PnEuZj8cF5Ql7pUmBT
+X-Gm-Gg: ASbGncvldNJnbL8gCu9vsVhOwN1R0PCCJC1VK5S8gerZuxV10tD9SDkRvAAIDqsBkJ7
+	CfulL/V6WUvclibJOuigOMwoK8l9x76SqOfCaNn+czn7ZBQlYAgWrp6r1mE3nOwCy/zlQ71lmjq
+	W8cUwsycvK0wYMtI/h0Kx7kzVuABCi6e1r80QkFsQ413NCNYZCKx7DH0F5qM8Xg1w0dnX7ZGF2N
+	HMst8I/xYCv2a+2hc61rpBIRuiNGWTHhTjXlLbNPzM=
+X-Google-Smtp-Source: AGHT+IErcRymCqmHzYzspQCDTX2dPgmRiGtPAAIxOL8F0bRuGV7TpK34yxFU37vdJGxxLCf7JJaaqFOhRNfZu9x3EEM=
+X-Received: by 2002:a05:622a:250d:b0:4b5:e9e3:3c90 with SMTP id
+ d75a77b69052e-4e6eacceb54mr399056251cf.9.1760441704251; Tue, 14 Oct 2025
+ 04:35:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20251014060454.1841122-1-edumazet@google.com> <aO3voj4IbAoHgDoP@krikkit>
+ <c502f3e2-7d6b-4510-a812-c5b656d081d6@redhat.com> <CANn89i+t9e6qRwvkc70dbxAXLz2bGC6uamB==cfcJee3d8tbgQ@mail.gmail.com>
+ <CANn89iJguZEYBP7K_x9LmWGhJw0zf7msbxrVHM0m99pS3dYKKg@mail.gmail.com>
+ <CANn89iK6w0CNzMqRJiA7QN2Ap3AFWpqWYhbB55RcHPeLq6xzyg@mail.gmail.com>
+ <CANn89iLKAm=Pe=S=7727hDZSTGhrodqO-9aMhT0c4sFYE38jxA@mail.gmail.com> <tdxplao4k3tru2ydqrjg5wzt4mmllblmilys456y7latayvdex@3l7xabhdjf2d>
+In-Reply-To: <tdxplao4k3tru2ydqrjg5wzt4mmllblmilys456y7latayvdex@3l7xabhdjf2d>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Oct 2025 04:34:52 -0700
+X-Gm-Features: AS18NWAmZCgDyqvKRL6Rox3zhzKYp8P6DV9AS8hTvm7VAVuJ3moVlXts4gNWtVs
+Message-ID: <CANn89iKQYN1qTZoSW4+1v6scDgH53zi9pP_O_mEbTdYQYie1uQ@mail.gmail.com>
+Subject: Re: [PATCH net] udp: drop secpath before storing an skb in a receive queue
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: Paolo Abeni <pabeni@redhat.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 14 Oct 2025 13:25:47 +0200, Paolo Abeni <pabeni@redhat.com> wrote:
-> On 10/13/25 4:18 AM, Xuan Zhuo wrote:
-> > Add a driver framework for EEA that will be available in the future.
+On Tue, Oct 14, 2025 at 4:20=E2=80=AFAM Michal Kubecek <mkubecek@suse.cz> w=
+rote:
+>
+> On Tue, Oct 14, 2025 at 01:27:13AM GMT, Eric Dumazet wrote:
+> > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > index 95241093b7f0..932c21838b9b 100644
+> > --- a/net/ipv4/udp.c
+> > +++ b/net/ipv4/udp.c
+> > @@ -1851,8 +1851,13 @@ void skb_consume_udp(struct sock *sk, struct
+> > sk_buff *skb, int len)
+> >                 sk_peek_offset_bwd(sk, len);
 > >
-> > This driver is currently quite minimal, implementing only fundamental
-> > core functionalities. Key features include: I/O queue management via
-> > adminq, basic PCI-layer operations, and essential RX/TX data
-> > communication capabilities. It also supports the creation,
-> > initialization, and management of network devices (netdev). Furthermore,
-> > the ring structures for both I/O queues and adminq have been abstracted
-> > into a simple, unified, and reusable library implementation,
-> > facilitating future extension and maintenance.
-> >
-> > Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-> > Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
-> > Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >
-> > v5: Thanks for the comments from Kalesh Anakkur Purayil, ALOK TIWARI
-> > v4: Thanks for the comments from Troy Mitchell, Przemek Kitszel, Andrew Lunn, Kalesh Anakkur Purayil
-> > v3: Thanks for the comments from Paolo Abenchi
-> > v2: Thanks for the comments from Simon Horman and Andrew Lunn
-> > v1: Thanks for the comments from Simon Horman and Andrew Lunn
+> >         if (!skb_shared(skb)) {
+> > -               if (unlikely(udp_skb_has_head_state(skb)))
+> > -                       skb_release_head_state(skb);
+> > +               if (unlikely(udp_skb_has_head_state(skb))) {
+> > +                       /* Make sure that skb_release_head_state()
+> > will have nothing to do. */
+> > +                       DEBUG_NET_WARN_ON_ONCE(skb_dst(skb));
+> > +                       DEBUG_NET_WARN_ON_ONCE(skb->destructor);
+> > +                       DEBUG_NET_WARN_ON_ONCE(skb_nfct(skb));
+> > +                       skb_ext_reset(skb);
+> > +               }
+> >                 skb_attempt_defer_free(skb);
+> >                 return;
+> >         }
 >
-> You should add a synopsis of the major changes vs the previous revision
-> to make reiviewer's work easier.
+> Tested this version on my system (with DEBUG_NET enabled) and everything
+> seems to work fine so far.
+>
+> Tested-by: Michal Kubecek <mkubecek@suse.cz>
 
-Generally yes, but all the changes are so minor that I can't possibly list them
-all, so I'm using this format.
+Thanks for testing. I will follow Sabrina suggestion and send :
 
->
-> >
-> > This commit is indeed quite large, but further splitting it would not be
-> > meaningful. Historically, many similar drivers have been introduced with
-> > commits of similar size and scope, so we chose not to invest excessive
-> > effort into finer-grained splitting.
->
-> That also means that you require the reviewers to invest a lot of extra
-> effort here, which in turn does not help making progresses.
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 95241093b7f0..d66f273f9070 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1851,8 +1851,13 @@ void skb_consume_udp(struct sock *sk, struct
+sk_buff *skb, int len)
+                sk_peek_offset_bwd(sk, len);
 
-Indeed, it's been quite a while, but I haven't made any substantial progress on
-this patchset, and I'm really considering this. Would splitting up a few commits
-speed up the review process?
-
->
-> [...]> +/* resources: ring, buffers, irq */
-> > +int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_tmp *tmp)
-> > +{
-> > +	struct eea_net_tmp _tmp = {};
-> > +	int err;
-> > +
-> > +	if (!tmp) {
-> > +		enet_mk_tmp_cfg(enet, &_tmp);
-> > +		tmp = &_tmp;
-> This is quite ugly. Let the caller always pass non zero 'tmp'. Also a
-> more describing name would help.
->
-> > +	}
-> > +
-> > +	if (!netif_running(enet->netdev)) {
-> > +		enet->cfg = tmp->cfg;
-> > +		return 0;
-> > +	}
-> > +
-> > +	err = eea_alloc_rxtx_q_mem(tmp);
-> > +	if (err) {
-> > +		netdev_warn(enet->netdev,
-> > +			    "eea reset: alloc q failed. stop reset. err %d\n",
-> > +			    err);
-> > +		return err;
-> > +	}
-> > +
-> > +	eea_netdev_stop(enet->netdev);
-> > +
-> > +	enet_bind_new_q_and_cfg(enet, tmp);
-> > +
-> > +	err = eea_active_ring_and_irq(enet);
-> > +	if (err) {
-> > +		netdev_warn(enet->netdev,
-> > +			    "eea reset: active new ring and irq failed. err %d\n",
-> > +			    err);
-> > +		return err;
-> > +	}
-> > +
-> > +	err = eea_start_rxtx(enet->netdev);
-> > +	if (err)
-> > +		netdev_warn(enet->netdev,
-> > +			    "eea reset: start queue failed. err %d\n", err);
->
-> I'm unsure why you ignore my feedback on v2 WRT errors generated here?
-
-Do you mean this?
-
-	Here you should try harder to avoid any NIC changes in case of failure.
-	i.e. you could activate and start only the new queues, and destroy the
-	to-be-deleted one only after successful real queues update.
-
-Sorry, I missed that. This function handles the scenario where the entire setup
-fails, not just a few queues, so I need to allocate all the queues and
-reactivate them.
-
-Thanks.
-
-
->
-> > +
-> > +	return err;
-> > +}
-> > +
-> > +int eea_queues_check_and_reset(struct eea_device *edev)
-> > +{
-> > +	struct eea_aq_dev_status *dstatus __free(kfree) = NULL;
-> > +	struct eea_aq_queue_status *qstatus;
-> > +	struct eea_aq_queue_status *qs;
-> > +	bool need_reset = false;
-> > +	int num, i, err = 0;
-> > +
-> > +	num = edev->enet->cfg.tx_ring_num * 2 + 1;
->
-> The above should probably moved under the RTNL lock or you could access
-> stale values.
->
-> > +
-> > +	rtnl_lock();
-> > +
-> > +	dstatus = eea_adminq_dev_status(edev->enet);
-> > +	if (!dstatus) {
-> > +		netdev_warn(edev->enet->netdev, "query queue status failed.\n");
->
->
-> 		err = -ENOMEM;
-> 		goto out_unlock;
->
->
-> > +		rtnl_unlock();
-> > +		return -ENOMEM;
-> > +	}
-> > +
-> > +	if (le16_to_cpu(dstatus->link_status) == EEA_LINK_DOWN_STATUS) {
-> > +		eea_netdev_stop(edev->enet->netdev);
-> > +		edev->enet->link_err = EEA_LINK_ERR_LINK_DOWN;
-> > +		netdev_warn(edev->enet->netdev, "device link is down. stop device.\n");
-> > +		rtnl_unlock();
-> > +		return 0;
->
-> 		goto out_unlock;
->
-> > +	}
-> > +
-> > +	qstatus = dstatus->q_status;
-> > +
-> > +	for (i = 0; i < num; ++i) {
-> > +		qs = &qstatus[i];
-> > +
-> > +		if (le16_to_cpu(qs->status) == EEA_QUEUE_STATUS_NEED_RESET) {
-> > +			netdev_warn(edev->enet->netdev,
-> > +				    "queue status: queue %u needs to reset\n",
-> > +				    le16_to_cpu(qs->qidx));
-> > +			need_reset = true;
-> > +		}
-> > +	}
-> > +
-> > +	if (need_reset)
-> > +		err = eea_reset_hw_resources(edev->enet, NULL);
-> > +
->
-> out_unlock:> +	rtnl_unlock();
-> > +	return err;
->
->
-> [...]> +/* ha handle code */
-> > +static void eea_ha_handle_work(struct work_struct *work)
-> > +{
-> > +	struct eea_pci_device *ep_dev;
-> > +	struct eea_device *edev;
-> > +	struct pci_dev *pci_dev;
-> > +	u16 reset;
-> > +
-> > +	ep_dev = container_of(work, struct eea_pci_device, ha_handle_work);
-> > +	edev = &ep_dev->edev;
-> > +
-> > +	/* Ha interrupt is triggered, so there maybe some error, we may need to
-> > +	 * reset the device or reset some queues.
-> > +	 */
-> > +	dev_warn(&ep_dev->pci_dev->dev, "recv ha interrupt.\n");
-> > +
-> > +	if (ep_dev->reset_pos) {
-> > +		pci_read_config_word(ep_dev->pci_dev, ep_dev->reset_pos,
-> > +				     &reset);
-> > +		/* clear bit */
-> > +		pci_write_config_word(ep_dev->pci_dev, ep_dev->reset_pos,
-> > +				      0xFFFF);
-> > +
-> > +		if (reset & EEA_PCI_CAP_RESET_FLAG) {
-> > +			dev_warn(&ep_dev->pci_dev->dev,
-> > +				 "recv device reset request.\n");
-> > +
-> > +			pci_dev = ep_dev->pci_dev;
-> > +
-> > +			/* The pci remove callback may hold this lock. If the
-> > +			 * pci remove callback is called, then we can ignore the
-> > +			 * ha interrupt.
-> > +			 */
-> > +			if (mutex_trylock(&edev->ha_lock)) {
-> > +				edev->ha_reset = true;
-> > +
-> > +				__eea_pci_remove(pci_dev, false);
-> > +				__eea_pci_probe(pci_dev, ep_dev);
-> > +
-> > +				edev->ha_reset = false;
-> > +				mutex_unlock(&edev->ha_lock);
-> > +			} else {
-> > +				dev_warn(&ep_dev->pci_dev->dev,
-> > +					 "ha device reset: trylock failed.\n");
->
-> Nesting here is quite high, possibly move the above in a separate helper.
->
-> > +			}
-> > +			return;
-> > +		}
-> > +	}
-> > +
-> > +	eea_queues_check_and_reset(&ep_dev->edev);
-> > +}
->
->
-> I'm sorry, EPATCHISTOOBIG I can't complete the review even in with an
-> unreasonable amount of time.
->
-> /P
->
+        if (!skb_shared(skb)) {
+-               if (unlikely(udp_skb_has_head_state(skb)))
+-                       skb_release_head_state(skb);
++               /* Make sure that this skb has no dst, destructor
++                * or conntracking parts, because it might stay
++                * in a remote cpu list for a very long time.
++                */
++               DEBUG_NET_WARN_ON_ONCE(skb_dst(skb));
++               DEBUG_NET_WARN_ON_ONCE(skb->destructor);
++               DEBUG_NET_WARN_ON_ONCE(skb_nfct(skb));
+                skb_attempt_defer_free(skb);
+                return;
+        }
 
