@@ -1,120 +1,176 @@
-Return-Path: <netdev+bounces-229106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD257BD83B0
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:42:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 557A8BD84D7
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:55:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 344504EB0D2
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:41:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FBAE1921B83
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:55:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8BB30F940;
-	Tue, 14 Oct 2025 08:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 687982E0411;
+	Tue, 14 Oct 2025 08:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VTLIt68X"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b="ngGd1scu";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=valla.it header.i=@valla.it header.b="cxNKIHTN"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from delivery.antispam.mailspamprotection.com (delivery.antispam.mailspamprotection.com [185.56.87.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5678E30F937
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760431299; cv=none; b=cqSB0kC4nQgI6CuiOvUVijpVRqG0spz0Seof7vvf0nUIIEe5tV1/rck1VS2bAjD9a8nB8QYDExo62pqIm86wMAY3UfGFizaG9BMpN2g65rhrjs8BMJAdOuSDE64q6NHjG3xTCxTRRgB0AB5y4Shrb8Y7P78njBYsSNmXvetV1vs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760431299; c=relaxed/simple;
-	bh=VQQ0cSA27uMDgoOksZ9nAA8/qTPIu0hBMexqjmJ6kwc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ezoagAntnbXM7wJeh7XdVs6hNTuZ8K1mHfk9NN3lYwdMZja30sh+ALtAMAGr2D47uVMG2IUiFzh1LsNQCt9BDhl4snFyf7vKeJG2DlrjTRYSNIAvrnglQwwiy2pJKIFjCthx+9QCLVROORkiEI+ctj+Gv7y+h61TklIz5T1K4UU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VTLIt68X; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760431296;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=g+5bhDzSA+Udc5qJjyVCOEZAN6FwwM9bAyimGF6b+f0=;
-	b=VTLIt68XJFcBGoOk4QiOID1QEZMojU6n7D0dfRWMOGrH2BDk6XWOzF/ICGwmRRlb7Ksbu4
-	5Sqd7E1nqIc93od/wJ0NFt6ItGSBUhzgdz4YnbiZAwFfiQfSMuZaE2NlQecDWmsFNQdLfs
-	5kIOpTcWM44v2/gEJWOSRs/SyOhVAms=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-589-iFG2ai3bNhGcMraI2mrl1A-1; Tue,
- 14 Oct 2025 04:41:32 -0400
-X-MC-Unique: iFG2ai3bNhGcMraI2mrl1A-1
-X-Mimecast-MFC-AGG-ID: iFG2ai3bNhGcMraI2mrl1A_1760431291
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 95EE1180057B;
-	Tue, 14 Oct 2025 08:41:31 +0000 (UTC)
-Received: from fedora (unknown [10.44.34.41])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 85A601800577;
-	Tue, 14 Oct 2025 08:41:29 +0000 (UTC)
-From: Jan Vaclav <jvaclav@redhat.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Simon Horman <horms@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	Jan Vaclav <jvaclav@redhat.com>
-Subject: [PATCH v3 net-next] net/hsr: add protocol version to fill_info output
-Date: Thu,  9 Oct 2025 23:09:08 +0200
-Message-ID: <20251009210903.1055187-6-jvaclav@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980322D876F;
+	Tue, 14 Oct 2025 08:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.56.87.1
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760432103; cv=pass; b=HdXXWotKYh78/i9u3Ee8gxHFjW7QX28rWvMiTaRTiMzPVEYuLGadcjsV5qgdjxACbrKWcrkxoXHR68VilpwuBklc7w2Yful0S1WG5F1VzwHYWfU1cJLqCKMD74rt+Xt4RbcgcLKvtiJPoCoTYJg6gne6iwnnPaIDWRjLKULL8qw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760432103; c=relaxed/simple;
+	bh=+KOCzTUQxF7tBG8tIQArtu0WukAm1yPCMNY0jgO/01A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=smv8gHCiwesSzU+oIEYpj60FlXuKxrJEASsKgW8RbToAgs5xovNLKTTjGGMPRW7+qZ/BDwXQqktxzHnQuwyqhXmXDVyYNOpq5BZTCPsAiTLxZuRc9fs/Lw9vpWBcVHYPJpL30f6ELim9fnf4gFxCKft+jCBwEA2alaecAQV68xI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it; spf=pass smtp.mailfrom=valla.it; dkim=pass (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b=ngGd1scu; dkim=pass (1024-bit key) header.d=valla.it header.i=@valla.it header.b=cxNKIHTN; arc=pass smtp.client-ip=185.56.87.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=valla.it
+ARC-Seal: i=1; cv=none; a=rsa-sha256; d=outgoing.instance-europe-west4-glw0.prod.antispam.mailspamprotection.com; s=arckey; t=1760432100;
+	 b=JXCtVIFRhgOtJzCDDH7CiOqK13YaILrtEmI0Xf8JaWJxVRurBpqZzySPpjzngQIeEiW2Sh1rac
+	  4fxqvP0MK2UZNBrFCUfX4JEThWQIjyA00+yAkdQkPS36mvo9/MNWe+OoLQ93122pO34TnuLKmu
+	  MxCf4xXD5AkJTnujWBMaTNBrKrqDLMfS2Trvslnt/bJRqyL2JquYP6kxDASdsBDcY6EIdInVfd
+	  XAzU9fp+aXcbajV31S7E7P1imt2Ug+ac8dCY2Fxk2owvYGq21mXWZ9iI9A9cv9o8aKmDkrn49o
+	  2k8z1bZR4dUS3Y0GV1Oqu4uEjGMemMjZhPT7uviXXawPZg==;
+ARC-Authentication-Results: i=1; outgoing.instance-europe-west4-glw0.prod.antispam.mailspamprotection.com; smtp.remote-ip=35.214.173.214;
+	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
+	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
+	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
+	arc=none
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed; d=outgoing.instance-europe-west4-glw0.prod.antispam.mailspamprotection.com; s=arckey; t=1760432100;
+	bh=+KOCzTUQxF7tBG8tIQArtu0WukAm1yPCMNY0jgO/01A=;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
+	  Message-ID:Date:Subject:Cc:To:From:DKIM-Signature:DKIM-Signature;
+	b=EpwfR2gcZL36igiG1iyKMBxqn8SQEm/gyy9Flsaq6Tk6oENFTBeJlbnxQEy/GxDyte92MJtPGB
+	  adDhjb11fnnfMzzSiV3wFEGgDo4l8xowWMfDMEinnWgFsMGbQAizI0Rxb4SgnnXQVioCLeCbjL
+	  pSXHGPEJZqUv4YjKPqT2k21deQhRTHwggBL+7bKqYbwdYtuLhJklyytKUoeAHEKFhKLoh1b47C
+	  8UYH1I0rwE6RIalvqzm69Cf2Db1z+oJyHlctIhFY9YnNndfLXEGC/4Qs0PbelzVFhNymjh/H12
+	  8BjJ+KV91ZYPlcVKNpFJ+csRmEyrXoTgM+2+2d+tpyg7Kw==;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=antispam.mailspamprotection.com; s=default; h=CFBL-Feedback-ID:CFBL-Address
+	:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Reply-To:List-Unsubscribe;
+	bh=+RRcVYG+JUhl3wwxa7uQJx37j5Sku3cHAniytdo2VwQ=; b=ngGd1scuyL146Rjl0fZAqcXeID
+	F+xueOFpnVES7xVlo3yf0p6UVSbP9rsn4pkn5ahUdYTMeecTqKCvag8favFgXYywFlYzOsBkmfCQ1
+	K3R/FwBKEtBd6Ahew60E42MCpAnQRkmrR7O2sA78LZFDwsSrWSoBgVWdu+cu5co/KgsE=;
+Received: from 214.173.214.35.bc.googleusercontent.com ([35.214.173.214] helo=esm19.siteground.biz)
+	by instance-europe-west4-drbk.prod.antispam.mailspamprotection.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <francesco@valla.it>)
+	id 1v8Yvg-000000063Jf-1U9W;
+	Tue, 14 Oct 2025 06:54:42 +0000
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=valla.it;
+	s=default; h=Date:Subject:Cc:To:From:list-help:list-unsubscribe:
+	list-subscribe:list-post:list-owner:list-archive;
+	bh=+RRcVYG+JUhl3wwxa7uQJx37j5Sku3cHAniytdo2VwQ=; b=cxNKIHTNYmuzDNfeOKfMSXI46U
+	HXOanL9R91tN80jMXt+g62vZhFF46VPRinAMUPxr1ZCeUnrqsYsyLtmQPuLt/vJPwGCGUsGLbGvFu
+	1tKEk4BT3+rasp2VKC1WjtVb0M9JQDmAuFt1Vp1/6BE7axLKcgmUCvGCczdUGS7ikmQ0=;
+Received: from [87.16.13.60] (port=63318 helo=fedora.fritz.box)
+	by esm19.siteground.biz with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <francesco@valla.it>)
+	id 1v8YvQ-000000003P6-0BXm;
+	Tue, 14 Oct 2025 06:54:24 +0000
+From: Francesco Valla <francesco@valla.it>
+To: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>,
+ Harald Mommer <harald.mommer@opensynergy.com>,
+ Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com>,
+ Wolfgang Grandegger <wg@grandegger.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Damir Shaikhutdinov <Damir.Shaikhutdinov@opensynergy.com>,
+ linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ development@redaril.me
+Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
+Date: Tue, 14 Oct 2025 08:54:23 +0200
+Message-ID: <2332595.vFx2qVVIhK@fedora.fritz.box>
+In-Reply-To: <aO0qZ4kKcgpRmlIl@fedora>
+References:
+ <20240108131039.2234044-1-Mikhail.Golubev-Ciuchea@opensynergy.com>
+ <2243144.yiUUSuA9gR@fedora.fritz.box> <aO0qZ4kKcgpRmlIl@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - esm19.siteground.biz
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - valla.it
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-SGantispam-id: daf0a63d4e4924339fe71702a2ced5de
+AntiSpam-DLS: false
+AntiSpam-DLSP: 
+AntiSpam-DLSRS: 
+AntiSpam-TS: 1.0
+CFBL-Address: feedback@antispam.mailspamprotection.com; report=arf
+CFBL-Feedback-ID: 1v8Yvg-000000063Jf-1U9W-feedback@antispam.mailspamprotection.com
+Authentication-Results: outgoing.instance-europe-west4-glw0.prod.antispam.mailspamprotection.com;
+	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
+	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
+	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
+	arc=none
 
-Currently, it is possible to configure IFLA_HSR_VERSION, but
-there is no way to check in userspace what the currently
-configured HSR protocol version is.
+On Monday, 13 October 2025 at 18:35:51 Matias Ezequiel Vara Larsen <mvaralar@redhat.com> wrote:
+> On Thu, Sep 11, 2025 at 10:59:40PM +0200, Francesco Valla wrote:
+> > [...]
+> > 
+> > > +
+> > > +/* TX queue message types */
+> > > +struct virtio_can_tx_out {
+> > > +#define VIRTIO_CAN_TX                   0x0001
+> > > +	__le16 msg_type;
+> > > +	__le16 length; /* 0..8 CC, 0..64 CAN-FD, 0..2048 CAN-XL, 12 bits */
+> > > +	__u8 reserved_classic_dlc; /* If CAN classic length = 8 then DLC can be 8..15 */
+> > > +	__u8 padding;
+> > > +	__le16 reserved_xl_priority; /* May be needed for CAN XL priority */
+> > > +	__le32 flags;
+> > > +	__le32 can_id;
+> > > +	__u8 sdu[64];
+> > > +};
+> > > +
+> > 
+> > sdu[] here might be a flexible array, if the driver allocates
+> > virtio_can_tx_out structs dyncamically (see above). This would be
+> > beneficial in case of CAN-XL frames (if/when they will be supported).
+> > 
+> 
+> If we use a flexible array for sdu[] here, then we will have a problem
+> when defining the virtio_can_tx struct since it is not in the end of the
+> structure. I think it is a good idea to define it as a flexible array
+> but I do not know how. 
 
-Add it to the output of hsr_fill_info(), when the interface
-is using the HSR protocol. Let's not expose it when using
-the PRP protocol, since it only has one version and it's
-not possible to set it from userspace.
+In this case, I'd move struct virtio_can_tx_out at the end of the
+virtio_can_tx struct - in this way, sdu[] would be at the end:
 
-This info could then be used by e.g. ip(8), like so:
-$ ip -d link show hsr0
-12: hsr0: <BROADCAST,MULTICAST> mtu ...
-    ...
-    hsr slave1 veth0 slave2 veth1 ... proto 0 version 1
----
-v3: Changed after discussion so that IFLA_HSR_VERSION is filled
-    only when the protocol is HSR (and not PRP, since setting
-    the version is prohibited if the protocol is PRP).
+struct virtio_can_tx {
+	struct list_head list;
+	unsigned int putidx;
+	struct virtio_can_tx_in tx_in;
+	struct virtio_can_tx_out tx_out;
+};
 
-v2: https://lore.kernel.org/netdev/20250922093743.1347351-3-jvaclav@redhat.com/
+Maybe an additional comment declaring why it is done this way would
+be a good idea? Also considering that the two structures are defined
+in different files.
 
-v1: https://lore.kernel.org/netdev/20250918125337.111641-2-jvaclav@redhat.com/
+Francesco
 
- net/hsr/hsr_netlink.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/net/hsr/hsr_netlink.c b/net/hsr/hsr_netlink.c
-index b12047024..4461adf69 100644
---- a/net/hsr/hsr_netlink.c
-+++ b/net/hsr/hsr_netlink.c
-@@ -166,6 +166,8 @@ static int hsr_fill_info(struct sk_buff *skb, const struct net_device *dev)
- 		goto nla_put_failure;
- 	if (hsr->prot_version == PRP_V1)
- 		proto = HSR_PROTOCOL_PRP;
-+	else if (nla_put_u8(skb, IFLA_HSR_VERSION, hsr->prot_version))
-+		goto nla_put_failure;
- 	if (nla_put_u8(skb, IFLA_HSR_PROTOCOL, proto))
- 		goto nla_put_failure;
- 
--- 
-2.51.0
+
 
 
