@@ -1,167 +1,130 @@
-Return-Path: <netdev+bounces-229285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36E68BDA189
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 16:42:50 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6963FBDA16E
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 16:41:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F1643A6105
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:41:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 55E944E4727
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859CE302CA2;
-	Tue, 14 Oct 2025 14:36:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98AC52FBE17;
+	Tue, 14 Oct 2025 14:38:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="cPd2oBQg"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="N7PD/BUD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC85330217E;
-	Tue, 14 Oct 2025 14:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908892F6194
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 14:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760452606; cv=none; b=XmPG7S0Q2u8c4E3igXhouLdB1KA3s2RxK+IuNdG/FJUSbQ4DHdGnDYsWhQTrG19phCPHvMwN2uVt/4A8YuatThViE6ZG7DwBCv1fLh9oT97L+ngMPWnZHu5SI2dDqeUUIMPM2Rkiw0ayyWe4sI4Tmi0SR8WihH83fH4EVH2xGFg=
+	t=1760452698; cv=none; b=GpzmMAWG+GWXEer/Y2TeKzWHzmcEXfr33fTojuxBlFDGnxJfmIpV/bra3dC9cNrtITlf9C8lqDFj3MsCDUHtF7qwJFq7dyDphCxTYGN/Ayj8f33fcLTqbFIoYpZJFy3nHD4pv/eBISwGFcjZlylDqNCCr5fJbP1gEzF7apTCmMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760452606; c=relaxed/simple;
-	bh=GtG58/enpOmzqNC+68Zu2nFR08TJRD8qy0yK2jlXpGE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=SeZ340SaGPjS6Y/Xb9Kns7HH4CDhecj9OSNzl0beAURCJiakHGP4q60TjRmhdYWNmv72juVy3fQP/5yx60OsdLBjtzBwjyPfvNyPRV8B8G45EtbM8eiMm8ycFqBCUoXo23eschCFZAXhfQ8P5EDBKFezvv5fR1m0owJpZ58pyE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=cPd2oBQg; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59E87KUK020052;
-	Tue, 14 Oct 2025 14:36:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	HHp72nypWYixrH9s++XlvQ+W5L9Rj75DBjIx86zvWS0=; b=cPd2oBQgS9k/s5sr
-	28TncrSrhyxpOUOriVBHUBrcHmorq+eJM7Z6VlUOkrlQZH+3RQ2zlJLW8XGNyRIl
-	e5w9A7oTbSsknpcqI5LNfcfythc+lB9zWo8kLgoIJD3gpBcUty03d17vO868MCyJ
-	s8pqLegLzp59+nqBroX/kWW4T44Q24iDEEBEY6fN9G2zc70zCFTtRTqZcSs8sMpY
-	1l7BeI3NDQBac1aj/6SiHPritVEHMtquysSx/zbInvWgT/kWo4PJsj3rd9eLS5pP
-	IELO8uQYsWqc0kAPTtGB+bP3n+wT8eyZr5EzAGF7yiin0b5Wec131M3CB/SyBN30
-	qTOtaA==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 49qg0c0t2f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Oct 2025 14:36:38 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 59EEabv5007619
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Oct 2025 14:36:37 GMT
-Received: from nsssdc-sh01-lnx.ap.qualcomm.com (10.80.80.8) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.24; Tue, 14 Oct 2025 07:36:32 -0700
-From: Luo Jie <quic_luoj@quicinc.com>
-Date: Tue, 14 Oct 2025 22:35:35 +0800
-Subject: [PATCH v7 10/10] arm64: defconfig: Build NSS clock controller
- driver for IPQ5424
+	s=arc-20240116; t=1760452698; c=relaxed/simple;
+	bh=VmZbhs3xevNRT7QCNeeCFCNlM8H/SQbw3GEXhb4kOs4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AwIf5XKaWfSYiLLicc0nxJSE2KZojc1dM4+0acgbIathbGTtRC3LyKf8lb8OPtT8P2Z/MzPvuf59oXZM2vCpoD6cvkGRBCYwW8M/f1zRJAaPK0eHlXQ0gRaFnqsOwSHR+Jwd5jZ6rc7GNbpMIlbnX1R4nXtMYns5LgvXtXPZG90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=N7PD/BUD; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 14 Oct 2025 07:37:57 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760452684;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O+WxWTN/C2HyVblMAccwywFAotrd7QpsKNQRxf1sI58=;
+	b=N7PD/BUDXc/bOVA2AS0yKahxhqfyPMfGVj13erv8XHxrFxgs9quAQp7uIdx7ICDzbZMTS6
+	/pd4lzjh4mPDJMpa+8NUiKnRE6quyJb5WjesKAC5YmqWv0+fbd8lZDwA3zzAFWkaSNd/WK
+	yqDMrA9ChLKXKNM0Q+XNxGFRKTJ5ncs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Barry Song <21cnbao@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, 
+	Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org, linux-mm@kvack.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Barry Song <v-songbaohua@oppo.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	Brendan Jackman <jackmanb@google.com>, Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Huacai Zhou <zhouhuacai@oppo.com>
+Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network
+ buffer allocation
+Message-ID: <pow5zt7dmo2wiydophoap6ntaycyjt2yrszo3ue7mg2hgnzcmv@oi3epbtyoufn>
+References: <20251013101636.69220-1-21cnbao@gmail.com>
+ <aO11jqD6jgNs5h8K@casper.infradead.org>
+ <CAGsJ_4x9=Be2Prbjia8-p97zAsoqjsPHkZOfXwz74Z_T=RjKAA@mail.gmail.com>
+ <CANn89iJpNqZJwA0qKMNB41gKDrWBCaS+CashB9=v1omhJncGBw@mail.gmail.com>
+ <CAGsJ_4xGSrfori6RvC9qYEgRhVe3bJKYfgUM6fZ0bX3cjfe74Q@mail.gmail.com>
+ <CANn89iKSW-kk-h-B0f1oijwYiCWYOAO0jDrf+Z+fbOfAMJMUbA@mail.gmail.com>
+ <CAGsJ_4wJHpD10ECtWJtEWHkEyP67sNxHeivkWoA5k5++BCfccA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20251014-qcom_ipq5424_nsscc-v7-10-081f4956be02@quicinc.com>
-References: <20251014-qcom_ipq5424_nsscc-v7-0-081f4956be02@quicinc.com>
-In-Reply-To: <20251014-qcom_ipq5424_nsscc-v7-0-081f4956be02@quicinc.com>
-To: Bjorn Andersson <andersson@kernel.org>,
-        Michael Turquette
-	<mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        "Varadarajan
- Narayanan" <quic_varada@quicinc.com>,
-        Rob Herring <robh@kernel.org>,
-        "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        "Anusha Rao" <quic_anusha@quicinc.com>,
-        Devi Priya
-	<quic_devipriy@quicinc.com>,
-        Manikanta Mylavarapu
-	<quic_mmanikan@quicinc.com>,
-        Georgi Djakov <djakov@kernel.org>,
-        Philipp Zabel
-	<p.zabel@pengutronix.de>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Konrad
- Dybcio <konradybcio@kernel.org>
-CC: <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski@linaro.org>,
-        <devicetree@vger.kernel.org>, <linux-pm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <quic_kkumarcs@quicinc.com>,
-        <quic_linchen@quicinc.com>, <quic_leiwei@quicinc.com>,
-        <quic_pavir@quicinc.com>, <quic_suruchia@quicinc.com>,
-        Luo Jie <quic_luoj@quicinc.com>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1760452536; l=836;
- i=quic_luoj@quicinc.com; s=20250209; h=from:subject:message-id;
- bh=GtG58/enpOmzqNC+68Zu2nFR08TJRD8qy0yK2jlXpGE=;
- b=xPw5JggRsSsxPiGvMeu2KUDJacEyHNxsTUi7/9PUSl3CxojphL0tcSeMbEBfhyqhJ3kv/joUB
- 2kM3WpZW/szBjdLkI7OEqvIotYRZGFlGDwT8OiId5yAubkbnTfXNKIs
-X-Developer-Key: i=quic_luoj@quicinc.com; a=ed25519;
- pk=pzwy8bU5tJZ5UKGTv28n+QOuktaWuriznGmriA9Qkfc=
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: -1x-ssqL_iPiD0MGoZW0lIkUBUJ_FG21
-X-Proofpoint-ORIG-GUID: -1x-ssqL_iPiD0MGoZW0lIkUBUJ_FG21
-X-Authority-Analysis: v=2.4 cv=eaIwvrEH c=1 sm=1 tr=0 ts=68ee5ff6 cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=KKAkSRfTAAAA:8 a=COk6AnOGAAAA:8
- a=ikIlBLl75NxfxiEf-eQA:9 a=QEXdDO2ut3YA:10 a=cvBusfyB2V15izCimMoJ:22
- a=TjNXssC_j7lpFel5tvFf:22 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDExMDAyMiBTYWx0ZWRfX62wdkgCCheoX
- CMeGmVbGeTYmzNw6WWUbaHjaR2tjakPoMwpOBb91TX3m8dIdloyrGHSJ2N+yfAd2cLZhAk6vlrc
- MqcHchmqcZrhrHfmZcSUj6iHPfjY2k96zbkNjF/ERawR0sEEQtnXz7z9OYBYTua8EvdpEqpiC5m
- SJ5MEGb4gmch0gP+zSU6IExjdMh5Dpg8aZ4RdiJV8N2T1TRcHEQxEuJjYLzOgyxMs5Q1nTbHcwA
- M/oMiYCOc64laXmeusgt7SPldwucbClHsFLbmOW2T+8OrIKDS8cAIiZ7o/yQzNxK4eVbINBz4yg
- qNWqOP38GdWEXA04A7CezHs+WiefFDGXIBEgN3gLYUGsPRCEvWAGPvWObRC1vKuqxNu97hK4+ar
- QlAxgRJPFUzmW+GtPnVg68R6h3E3Dw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-14_03,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 priorityscore=1501 spamscore=0 impostorscore=0 phishscore=0
- adultscore=0 lowpriorityscore=0 clxscore=1015 suspectscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510110022
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGsJ_4wJHpD10ECtWJtEWHkEyP67sNxHeivkWoA5k5++BCfccA@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-NSS clock controller is needed for supplying clocks and resets to the
-networking blocks for the Ethernet functions on the IPQ5424 platforms.
+On Tue, Oct 14, 2025 at 06:19:05PM +0800, Barry Song wrote:
+> > >
+> > > >
+> > > > I think you are missing something to control how much memory  can be
+> > > > pushed on each TCP socket ?
+> > > >
+> > > > What is tcp_wmem on your phones ? What about tcp_mem ?
+> > > >
+> > > > Have you looked at /proc/sys/net/ipv4/tcp_notsent_lowat
+> > >
+> > > # cat /proc/sys/net/ipv4/tcp_wmem
+> > > 524288  1048576 6710886
+> >
+> > Ouch. That is insane tcp_wmem[0] .
+> >
+> > Please stick to 4096, or risk OOM of various sorts.
+> >
+> > >
+> > > # cat /proc/sys/net/ipv4/tcp_notsent_lowat
+> > > 4294967295
+> > >
+> > > Any thoughts on these settings?
+> >
+> > Please look at
+> > https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
+> >
+> > tcp_notsent_lowat - UNSIGNED INTEGER
+> > A TCP socket can control the amount of unsent bytes in its write queue,
+> > thanks to TCP_NOTSENT_LOWAT socket option. poll()/select()/epoll()
+> > reports POLLOUT events if the amount of unsent bytes is below a per
+> > socket value, and if the write queue is not full. sendmsg() will
+> > also not add new buffers if the limit is hit.
+> >
+> > This global variable controls the amount of unsent data for
+> > sockets not using TCP_NOTSENT_LOWAT. For these sockets, a change
+> > to the global variable has immediate effect.
+> >
+> >
+> > Setting this sysctl to 2MB can effectively reduce the amount of memory
+> > in TCP write queues by 66 %,
+> > or allow you to increase tcp_wmem[2] so that only flows needing big
+> > BDP can get it.
+> 
+> We obtained these settings from our hardware vendors.
+> 
+> It might be worth exploring these settings further, but I can’t quite see
+> their connection to high-order allocations,
 
-All boards based on the IPQ5424 SoC will require this driver to be enabled.
-
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
----
- arch/arm64/configs/defconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index e401915e2f2f..d4fc8e6683cb 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -1414,6 +1414,7 @@ CONFIG_IPQ_GCC_5424=y
- CONFIG_IPQ_GCC_6018=y
- CONFIG_IPQ_GCC_8074=y
- CONFIG_IPQ_GCC_9574=y
-+CONFIG_IPQ_NSSCC_5424=m
- CONFIG_IPQ_NSSCC_9574=m
- CONFIG_MSM_GCC_8916=y
- CONFIG_MSM_MMCC_8994=m
-
--- 
-2.34.1
-
+I don't think there is a connection between them. Is there a reason you
+are expecting a connection/relation between them?
 
