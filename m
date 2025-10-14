@@ -1,95 +1,80 @@
-Return-Path: <netdev+bounces-229109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E9DEBD8456
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:48:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53551BD84C5
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:54:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2B8218A4DD7
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:49:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5C813BCDBD
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:54:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA88A18F2FC;
-	Tue, 14 Oct 2025 08:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCBFD2DE701;
+	Tue, 14 Oct 2025 08:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nRvV0Fza";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LZrzqOwc";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nRvV0Fza";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LZrzqOwc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RgaO6zD7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E2B202997
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752582D73BE
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760431732; cv=none; b=KHe89kIrj2mMRbFbQsId+S5ge5KS3zR7NhpzH5MoVAzsRqRTEskE3aEuXP7Lf0PROgOQd5UV44es17AoUhPyyHkhF+GvjNr7mUNqqNv/mUz70dKnyH1/Uaxi25m++RBnKP1YVgQ5SkdysQehviOpkB5qygG+RoLdgIjghja+kI4=
+	t=1760432084; cv=none; b=MGfbYGufdCK8/h4ljpzeWz7GBavpn1ObtGxfU7tpnNtKI1UOnqCBXtTQ9PmcJlQMRROy1pOCIXlzhXecvyJz1bbUL1zzUYmCP5qSqaudWEYObc59JT/feL4l6pmilsL8jPp0bUBMD/LYK6l1S5qr+ZJOnuwvpVYt6At+Xr4g/vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760431732; c=relaxed/simple;
-	bh=+RQaq5vqP59DNT8zkULHUKzCvsuMS8MlEztgp4oLc3w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dsvnLDhgaW+IJVzfHSRxVc1SJikhHiVnAuxbC19ljYtZj7R0KowiZoB5IDpmikbYPvrRwpcnfBvmjvAh57Qm/clF9Yz9/+uVmpmrzMgCnF8momNB28Ho8I4jYC4jdExaZ3H1JiLx0wHx1H0ZahEEE/+tee2VIPfzLZiY7A4y8hU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nRvV0Fza; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LZrzqOwc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nRvV0Fza; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LZrzqOwc; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 5517521E7B;
-	Tue, 14 Oct 2025 08:48:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760431729; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YLfbWqw2DUKPdHxynRii/9hz+IfkKtwNMprspvuWD0Y=;
-	b=nRvV0FzaigLhb8FuB25fq7kEgOqgNhIPtIZ1fpR5pEyu55IYWCa+xLK8TBmrz92geI0b7g
-	nmtvPXQvnSVMJFNlBmDAKKQVTsjM66rKYa6XHlodt9R3c71weW2wd3dJa5iMeuh06DIAKp
-	vplFazF0CNftGsT+naC4Ewil5djRNTc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760431729;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YLfbWqw2DUKPdHxynRii/9hz+IfkKtwNMprspvuWD0Y=;
-	b=LZrzqOwcj27rzis2iqSLMOaFp6Y5ZSoXyIzmWviafx/cIetUSJHDT13dLKa/7uMPITJ/YD
-	09cTMnnw0DlU+FCg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760431729; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YLfbWqw2DUKPdHxynRii/9hz+IfkKtwNMprspvuWD0Y=;
-	b=nRvV0FzaigLhb8FuB25fq7kEgOqgNhIPtIZ1fpR5pEyu55IYWCa+xLK8TBmrz92geI0b7g
-	nmtvPXQvnSVMJFNlBmDAKKQVTsjM66rKYa6XHlodt9R3c71weW2wd3dJa5iMeuh06DIAKp
-	vplFazF0CNftGsT+naC4Ewil5djRNTc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760431729;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YLfbWqw2DUKPdHxynRii/9hz+IfkKtwNMprspvuWD0Y=;
-	b=LZrzqOwcj27rzis2iqSLMOaFp6Y5ZSoXyIzmWviafx/cIetUSJHDT13dLKa/7uMPITJ/YD
-	09cTMnnw0DlU+FCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E512313A44;
-	Tue, 14 Oct 2025 08:48:48 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id AJ4ONXAO7mhKKAAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Tue, 14 Oct 2025 08:48:48 +0000
-Message-ID: <b25a73bf-1309-4f9f-9cd7-795e0615635b@suse.de>
-Date: Tue, 14 Oct 2025 10:48:44 +0200
+	s=arc-20240116; t=1760432084; c=relaxed/simple;
+	bh=7x1ksEGRUIlN/JRIZWql+/rRJiRrxtl9r0MDlxoj8Co=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=dYPEEVBmbYctDjqM22amnyY9yffuLNq9EIFv+I182/kzw2Oy3Ny2kfNa179djqKA5wnHlpVuj20eGy1pVk8/r8ef3p9qdolXcmHZhQj8WvqNvExhw41brUDXMWyqWodflTMGBGnfUJ0rgIEabZ+wpBN9op8VQR/3YryDPx/E8LI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RgaO6zD7; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-782bfd0a977so4294028b3a.3
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:54:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760432082; x=1761036882; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ISi9f6KzQSpnphkygLBuAPANu77cvnhCFWLhBPhHgsY=;
+        b=RgaO6zD7JIq0U1oTpkDVKzmcZUfv7rs1fKBnpjk22jmaEJeOhOopafaZAqyFnmyEhH
+         AGRlxGAZ8oyhvit0nMn7qf4QrELfs4w6o3YMAIQYf5et4EmHgEJsDuJjZPk9vHVkR8Qq
+         tDN4faYddijCXim041/EKruc2EiJuki368SkZLekMxUYssjkvzpt27/+xV07/CL4uk7J
+         WpEILnCEl6K5rvoc+py9mTY2zYnWpddaSWY7n5/ge29ZQ+IMqVwNNYQnMzn4MWvIn96u
+         ywCsstlWGSYIlKdYoEAWqPebmtROZ9qYtKHsPwDynY+c6XMIw411qIDc982ytjKffXQo
+         hbUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760432082; x=1761036882;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ISi9f6KzQSpnphkygLBuAPANu77cvnhCFWLhBPhHgsY=;
+        b=B5ksWCAUn6XzaB3Irw4Vr4y/nplyI08vw5baKGo3X1bImnwaGvnf+BmDRI+a0MWIN6
+         kRh+uRAQPPBygCuQ14zfJwhbUWgEhC8H5GwtiJ6CcCvSWUJtNhYwMpYfjTQK2nddKf5w
+         Z9TOqmdwq5U7mQ9SyqVgnXxwrWbRChcL/otcjZg2tmzekom+oPSY0K+0oO4y+rc/6usv
+         rDLxT7HD5wZwEwJR78/rrffuiGr1sqaWc3AeJONS3QEicbaLyfpQVD1Pe8lFoxmFsJm9
+         /pSmIpjxDdlDYZFHxIGBmkbzzt/DehkYyepWhN3I9aMLXz3rfMYS7NPt+MIhxQzsizvi
+         XgTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXanprWtAK5yOCidrMuc6aSXKPgeIf3uKg97E+ZgxXTIm4q5IF7b0jLVDaXV2IpGTCmFsrmHtk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIFcJ0phY3FpfI+NzelHCOq5HIGQcDK/4QO2va2dNuHeKLuA3S
+	eRqn/lPzLjtgTxAlnz81CLCxMEKdDa5rdlWJkZ5DY11RyN9yzE0//lfE
+X-Gm-Gg: ASbGnctYHioZltkOxF4/KUiE8TcmotzjVeum4ajNDymj9vMdhs5GHe+KuwLM8rf5fDf
+	pv5AUXwpZ26YKSEzKcDmUCZ6jwgLhPq+BgEW1Cq2yDWBv2BBrtoagsan6n41AP/ZSmdLE1g0PlG
+	2H1c106Su/xB1KXKRSCYry0jmMCNetBvDQz0CzT46KwEwDFzUuQeQZd4ClH2GF/chkXuV+pIeQ9
+	lrsl3IiIFIXzeTerzoQ1OsHvJzMQYnyIp87k7ck+aLwqcF1X/jya6jj1w6xxYwcUexqAGLbQ4ch
+	/njovx3kFENTRoGwxri2+yWk3ewAj8IvRLy6mjjPwhUuP9WVplPNibuQRRYXumbmFXzOnlMs5gd
+	0PI2yYByh1TatoKwtuKuvSIVnG2M8Ckeb6R+Iq470eUh9b6OM8y32FA==
+X-Google-Smtp-Source: AGHT+IGqTpN25zTj2NoGAGnl9jeNvvTw7CBNIuJy1oxy3KZR2C7Ji/G8drrYLcEK31MzNn+ZS3y/Fg==
+X-Received: by 2002:a05:6a00:4fd3:b0:776:12ea:c737 with SMTP id d2e1a72fcca58-79387e05323mr21822249b3a.23.1760432081535;
+        Tue, 14 Oct 2025 01:54:41 -0700 (PDT)
+Received: from [192.168.0.13] ([172.92.174.155])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992b060b66sm14499599b3a.8.2025.10.14.01.54.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Oct 2025 01:54:41 -0700 (PDT)
+Message-ID: <8226884b-96f9-483e-bcee-466ff3e04b23@gmail.com>
+Date: Tue, 14 Oct 2025 01:53:38 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,59 +82,190 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net-next] net/hsr: add protocol version to fill_info
- output
-To: Jan Vaclav <jvaclav@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20251009210903.1055187-6-jvaclav@redhat.com>
+From: Bo Gan <ganboing@gmail.com>
+Subject: Re: [PATCH v7 1/2] dt-bindings: ethernet: eswin: Document for EIC7700
+ SoC
+To: weishangjuan@eswincomputing.com, devicetree@vger.kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, vladimir.oltean@nxp.com,
+ rmk+kernel@armlinux.org.uk, yong.liang.choong@linux.intel.com,
+ anthony.l.nguyen@intel.com, prabhakar.mahadev-lad.rj@bp.renesas.com,
+ jan.petrous@oss.nxp.com, jszhang@kernel.org, inochiama@gmail.com,
+ 0x1207@gmail.com, boon.khai.ng@altera.com, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+Cc: ningyu@eswincomputing.com, linmin@eswincomputing.com,
+ lizhi2@eswincomputing.com, pinkesh.vaghela@einfochips.com,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+References: <20250918085612.3176-1-weishangjuan@eswincomputing.com>
+ <20250918085903.3228-1-weishangjuan@eswincomputing.com>
 Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20251009210903.1055187-6-jvaclav@redhat.com>
+In-Reply-To: <20250918085903.3228-1-weishangjuan@eswincomputing.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
 
-On 10/9/25 11:09 PM, Jan Vaclav wrote:
-> Currently, it is possible to configure IFLA_HSR_VERSION, but
-> there is no way to check in userspace what the currently
-> configured HSR protocol version is.
+On 9/18/25 01:59, weishangjuan@eswincomputing.com wrote:
+> From: Shangjuan Wei <weishangjuan@eswincomputing.com>
 > 
-> Add it to the output of hsr_fill_info(), when the interface
-> is using the HSR protocol. Let's not expose it when using
-> the PRP protocol, since it only has one version and it's
-> not possible to set it from userspace.
+> Add ESWIN EIC7700 Ethernet controller, supporting clock
+> configuration, delay adjustment and speed adaptive functions.
 > 
-> This info could then be used by e.g. ip(8), like so:
-> $ ip -d link show hsr0
-> 12: hsr0: <BROADCAST,MULTICAST> mtu ...
->      ...
->      hsr slave1 veth0 slave2 veth1 ... proto 0 version 1
+> Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
+> Signed-off-by: Shangjuan Wei <weishangjuan@eswincomputing.com>
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>   .../bindings/net/eswin,eic7700-eth.yaml       | 127 ++++++++++++++++++
+>   1 file changed, 127 insertions(+)
+>   create mode 100644 Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
+> new file mode 100644
+> index 000000000000..57d6d0efc126
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
+> @@ -0,0 +1,127 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/eswin,eic7700-eth.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Eswin EIC7700 SOC Eth Controller
+> +
+> +maintainers:
+> +  - Shuang Liang <liangshuang@eswincomputing.com>
+> +  - Zhi Li <lizhi2@eswincomputing.com>
+> +  - Shangjuan Wei <weishangjuan@eswincomputing.com>
+> +
+> +description:
+> +  Platform glue layer implementation for STMMAC Ethernet driver.
+> +
+> +select:
+> +  properties:
+> +    compatible:
+> +      contains:
+> +        enum:
+> +          - eswin,eic7700-qos-eth
+> +  required:
+> +    - compatible
+> +
+> +allOf:
+> +  - $ref: snps,dwmac.yaml#
+> +
+> +properties:
+> +  compatible:
+> +    items:
+> +      - const: eswin,eic7700-qos-eth
+> +      - const: snps,dwmac-5.20
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  interrupt-names:
+> +    const: macirq
+> +
+> +  clocks:
+> +    items:
+> +      - description: AXI clock
+> +      - description: Configuration clock
+> +      - description: GMAC main clock
+> +      - description: Tx clock
+> +
+> +  clock-names:
+> +    items:
+> +      - const: axi
+> +      - const: cfg
+> +      - const: stmmaceth
+> +      - const: tx
+> +
+> +  resets:
+> +    maxItems: 1
+> +
+> +  reset-names:
+> +    items:
+> +      - const: stmmaceth
+> +
+> +  rx-internal-delay-ps:
+> +    enum: [0, 200, 600, 1200, 1600, 1800, 2000, 2200, 2400]
+> +
+> +  tx-internal-delay-ps:
+> +    enum: [0, 200, 600, 1200, 1600, 1800, 2000, 2200, 2400]
+> +
+> +  eswin,hsp-sp-csr:
+> +    $ref: /schemas/types.yaml#/definitions/phandle-array
+> +    items:
+> +      - description: Phandle to HSP(High-Speed Peripheral) device
+> +      - description: Offset of phy control register for internal
+> +                     or external clock selection
+> +      - description: Offset of AXI clock controller Low-Power request
+> +                     register
+> +      - description: Offset of register controlling TX/RX clock delay
+> +    description: |
+> +      High-Speed Peripheral device needed to configure clock selection,
+> +      clock low-power mode and clock delay.
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - clocks
+> +  - clock-names
+> +  - interrupts
+> +  - interrupt-names
+> +  - phy-mode
+> +  - resets
+> +  - reset-names
+> +  - rx-internal-delay-ps
+> +  - tx-internal-delay-ps
+> +  - eswin,hsp-sp-csr
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    ethernet@50400000 {
+> +        compatible = "eswin,eic7700-qos-eth", "snps,dwmac-5.20";
+> +        reg = <0x50400000 0x10000>;
+> +        clocks = <&d0_clock 186>, <&d0_clock 171>, <&d0_clock 40>,
+> +                <&d0_clock 193>;
+> +        clock-names = "axi", "cfg", "stmmaceth", "tx";
+> +        interrupt-parent = <&plic>;
+> +        interrupts = <61>;
+> +        interrupt-names = "macirq";
+> +        phy-mode = "rgmii-id";
+> +        phy-handle = <&phy0>;
+> +        resets = <&reset 95>;
+> +        reset-names = "stmmaceth";
+> +        rx-internal-delay-ps = <200>;
+> +        tx-internal-delay-ps = <200>;
+> +        eswin,hsp-sp-csr = <&hsp_sp_csr 0x100 0x108 0x118>;
+> +        snps,axi-config = <&stmmac_axi_setup>;
+> +        snps,aal;
+> +        snps,fixed-burst;
+> +        snps,tso;
+> +        stmmac_axi_setup: stmmac-axi-config {
+> +            snps,blen = <0 0 0 0 16 8 4>;
+> +            snps,rd_osr_lmt = <2>;
+> +            snps,wr_osr_lmt = <2>;
+> +        };
+> +    };
+> \ No newline at end of file
+> --
+> 2.17.1
+> 
 
-I think this is missing the 'Signed-off-by' tag. Other than that, it 
-looks good to me. Not sure if it can be added while merging.
+Hi ShangJuan,
 
-Reviewed-by: Fernando Fernandez Mancera <fmancera@suse.de>
+I'm active user of HiFive p550. I'd like to test out this driver. Do you have
+the device tree section of phy0 for Hifive p550 board? Or it's optional for
+p550 board and I can just provide an empty &phy0 node? Regarding hsp_sp_csr
+node, I should be able to use
+https://github.com/sifiveinc/riscv-linux/blob/b4a753400e624a0eba3ec475fba2866dd7efb767/arch/riscv/boot/dts/eswin/eic7700.dtsi#L167
+correct?
+
+Bo
 
