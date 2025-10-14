@@ -1,136 +1,108 @@
-Return-Path: <netdev+bounces-229374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0732BDB4EC
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 22:47:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D644BDB4FB
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 22:48:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB0513E49FA
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 20:47:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17C043AC51A
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 20:48:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46EB2D9EDA;
-	Tue, 14 Oct 2025 20:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C842DCC13;
+	Tue, 14 Oct 2025 20:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s2tnmVxt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ac1UXg+S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756442BD5BC;
-	Tue, 14 Oct 2025 20:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1063A2877FA;
+	Tue, 14 Oct 2025 20:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760474824; cv=none; b=EFgO6rcjC85Cl6cmaw2w5JiSSW8oKV7a2DUyGX5NR1gAY+98Tb8HPo/BYXqPc6RueLfmHT+EBJw6oVZgMV+pWDn97rXBa/tNgCpxAK1jTbOU0Zyx3A3Hq0mGEh28sqY69iwzUuBBmWbPYqV1tz/MyvFqr9a43WkBxe3NxBFHm2g=
+	t=1760474890; cv=none; b=IskXLde4tYer1iicF+3UMowtCx1RwJjDaXHDrS9SuHLs+2C+Afu+8ldnMisgyAqyXJm2Z28xv2cJpX3b0MV1NDXaju75lUarDj2oK40+TesvxPiDtx8zbhzcVSrASfuFWo1IMC30Kiwha0bAtzjjLfspWVlzwQJK4rbpJ25161c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760474824; c=relaxed/simple;
-	bh=BeXYJ7TDDA12WXKKfS+OYrqQ57gzlsQbH9llrXbQhUQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=qFSiM+cLyn5cTflp8gP3bRymc238FI4zEJ2DP1ckKnlJzkhKmAbWBetjr0s3LPg4I3waIHlKcPfOK8VuNEHzWDSctIsS/9Th8KDakYcRsvJKGWvobe4IAgT/0mBecNAN1+nQpjZPoSr24YDR38SnjSjCGD8UiznLpt5a+vmktLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s2tnmVxt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBB18C4CEE7;
-	Tue, 14 Oct 2025 20:47:00 +0000 (UTC)
+	s=arc-20240116; t=1760474890; c=relaxed/simple;
+	bh=Em10QkwHKTKXlsyI+2+xjbCURDQJuQZ+0ngrcp0Ttxw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KLVZ+YS2IjHi0JYNjfuSNuEcm9EPfWwSd/ab4UHzSryPUXjNznEzUH+MtkNcWefwoFD7KQHNnjJJyWliLfkDd2u0bVHENt8HFSf8TIaVW2K9gDBvT/CY7BbFeD82LSBIg6PYIJMkiSTIGoxw57uy8JOFmMq5pv7TwKg9G37CWaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ac1UXg+S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1A1BC4CEE7;
+	Tue, 14 Oct 2025 20:48:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760474824;
-	bh=BeXYJ7TDDA12WXKKfS+OYrqQ57gzlsQbH9llrXbQhUQ=;
-	h=From:Date:Subject:To:Cc:From;
-	b=s2tnmVxt8iPDADIbTLFWzPs01vJJBfChUPoVQYRyU+SLtHET8iGF+ti7bcY+wmW6j
-	 foXPNZOspgMzU1r1XC3auiH8DSPYhy2gmxmQJZs69DpBLH8JL6i3wwBjJ75jq4V8US
-	 xQfcx5v+trLzkka7CifMbEDuBZuX+rZBQ0SqngOREkgaZVxyz8U/I6RdzgJimSGHFa
-	 qQtMuUpbaT3cmMdo4GiJKw1pZxPkOAgWNajAewOyzfKuuHNsORZdy7fpEwmKk1ZvyN
-	 RR1+OP8QSs+BdrIWfdpr6a9xsdf4wcZbGKi69HX/j3+T4oJ6F+8H8+XcJQzc3ELv+f
-	 O9nbMuB+88KLQ==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Tue, 14 Oct 2025 13:46:49 -0700
-Subject: [PATCH net] net/mlx5e: Return 1 instead of 0 in invalid case in
- mlx5e_mpwrq_umr_entry_size()
+	s=k20201202; t=1760474889;
+	bh=Em10QkwHKTKXlsyI+2+xjbCURDQJuQZ+0ngrcp0Ttxw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ac1UXg+SCBy9/GWTf/+/DigHGLV9tHgtMrbSVcPYyXrhuFmiThCmMHN9AJKuNqNRL
+	 Ufwo89GtcIXqjUwkdu3ynzYbGkO63J+XIJCkkYNhxXhwFaIraxXRmPVVgCpB5OxjTD
+	 d+y1Y6UGQ8TXXfnUwedOEYs9+m8PTH5ZLOHJ6IEkftT19EHlmcdOf5TVHTY+aeuNs1
+	 Cgmwt2YB0p9Az1C5Q8QjcVdYsNv4u9Pay4JrOzxRSSRGPxz9uyvbUUhXBR9L3XJivv
+	 APhB4MK8AyEYDnP8wl0QR0Ec37I4RM/KnZFPeLgRu3Te76fy7uR2LKIAubikoL6FXJ
+	 HCeltuj8/Nmfw==
+Date: Tue, 14 Oct 2025 15:48:07 -0500
+From: Rob Herring <robh@kernel.org>
+To: Conor Dooley <conor@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Frank Li <Frank.Li@nxp.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
+Subject: Re: [PATCH 1/1] dt-bindings: net: dsa: nxp,sja1105: Add optional
+ clock
+Message-ID: <20251014204807.GA1075103-robh@kernel.org>
+References: <20251010183418.2179063-1-Frank.Li@nxp.com>
+ <20251014-flattop-limping-46220a9eda46@spud>
+ <20251014-projector-immovably-59a2a48857cc@spud>
+ <20251014120213.002308f2@kernel.org>
+ <20251014-unclothed-outsource-d0438fbf1b23@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251014-mlx5e-avoid-zero-div-from-mlx5e_mpwrq_umr_entry_size-v1-1-dc186b8819ef@kernel.org>
-X-B4-Tracking: v=1; b=H4sIALi27mgC/yWNQQrCMBAAv1L27EJTU1G/IhJCs9EFk9RNjbWlf
- zfocRiYWSGTMGU4NysIFc6cYgW1a2C423gjZFcZurbrVas0hsfcE9qS2OFCktBxQS8p/I0J41u
- e5hXEUJzkYzIvhHRw+jSoo9V7DzU9Cnmef9sLRJrgum1f7BnEIosAAAA=
-X-Change-ID: 20251014-mlx5e-avoid-zero-div-from-mlx5e_mpwrq_umr_entry_size-e6d49c18a43f
-To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org, patches@lists.linux.dev, 
- llvm@lists.linux.dev, Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2781; i=nathan@kernel.org;
- h=from:subject:message-id; bh=BeXYJ7TDDA12WXKKfS+OYrqQ57gzlsQbH9llrXbQhUQ=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDBnvth1JEHQ6uG/+jVmr7pfkMvF7x4ea3zytzHqfkT+Za
- +GUKVrVHaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAie48zMsxXuiAQ1HdP1aVo
- av8pGckjFzXN9hy0mha7OXj7x/UMSuaMDL887qgc+/U28E/J6jTOnhMXvx9+Wbx9Su8R42ndcV1
- f9vMCAA==
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251014-unclothed-outsource-d0438fbf1b23@spud>
 
-When building with Clang 20 or newer, there are some objtool warnings
-from unexpected fallthroughs to other functions:
+On Tue, Oct 14, 2025 at 08:35:04PM +0100, Conor Dooley wrote:
+> On Tue, Oct 14, 2025 at 12:02:13PM -0700, Jakub Kicinski wrote:
+> > On Tue, 14 Oct 2025 19:12:23 +0100 Conor Dooley wrote:
+> > > On Tue, Oct 14, 2025 at 07:02:50PM +0100, Conor Dooley wrote:
+> > > > On Fri, Oct 10, 2025 at 02:34:17PM -0400, Frank Li wrote:  
+> > > > > Add optional clock for OSC_IN and fix the below CHECK_DTBS warnings:
+> > > > >   arch/arm/boot/dts/nxp/imx/imx6qp-prtwd3.dtb: switch@0 (nxp,sja1105q): Unevaluated properties are not allowed ('clocks' was unexpected)
+> > > > > 
+> > > > > Signed-off-by: Frank Li <Frank.Li@nxp.com>  
+> > > > 
+> > > > Acked-by: Conor Dooley <conor.dooley@microchip.com>
+> > > > pw-bot: not-applicable  
+> > > 
+> > > Hmm, I think this pw-bot command, intended for the dt patchwork has
+> > > probably screwed with the state in the netdev patchwork. Hopefully I can
+> > > fix that via
+> > 
+> > The pw-bot commands are a netdev+bpf thing :) They won't do anything
+> > to dt patchwork. IOW the pw-bot is a different bot than the one that
+> > replies when patch is applied.
+> 
+> Rob's recently added it to our patchwork too.
 
-  vmlinux.o: warning: objtool: mlx5e_mpwrq_mtts_per_wqe() falls through to next function mlx5e_mpwrq_max_num_entries()
-  vmlinux.o: warning: objtool: mlx5e_mpwrq_max_log_rq_size() falls through to next function mlx5e_get_linear_rq_headroom()
+And the issue is that both PW projects might get updated and both don't 
+necessarily want the same state (like this case). So we need to 
+distinguish. Perhaps like one of the following:
 
-LLVM 20 contains an (admittedly problematic [1]) optimization [2] to
-convert divide by zero into the equivalent of __builtin_unreachable(),
-which invokes undefined behavior and destroys code generation when it is
-encountered in a control flow graph.
+dt-pw-bot: <state>
 
-mlx5e_mpwrq_umr_entry_size() returns 0 in the default case of an
-unrecognized mlx5e_mpwrq_umr_mode value. mlx5e_mpwrq_mtts_per_wqe(),
-which is inlined into mlx5e_mpwrq_max_log_rq_size(), uses the result of
-mlx5e_mpwrq_umr_entry_size() in a divide operation without checking for
-zero, so LLVM is able to infer there will be a divide by zero in this
-case and invokes undefined behavior. While there is some proposed work
-to isolate this undefined behavior and avoid the destructive code
-generation that results in these objtool warnings, code should still be
-defensive against divide by zero.
+or
 
-As the WARN_ONCE() implies that an invalid value should be handled
-gracefully, return 1 instead of 0 in the default case so that the
-results of this division operation is always valid.
+pw-bot: <project> <state>
 
-Fixes: 168723c1f8d6 ("net/mlx5e: xsk: Use umr_mode to calculate striding RQ parameters")
-Link: https://lore.kernel.org/CAGG=3QUk8-Ak7YKnRziO4=0z=1C_7+4jF+6ZeDQ9yF+kuTOHOQ@mail.gmail.com/ [1]
-Link: https://github.com/llvm/llvm-project/commit/37932643abab699e8bb1def08b7eb4eae7ff1448 [2]
-Closes: https://github.com/ClangBuiltLinux/linux/issues/2131
-Closes: https://github.com/ClangBuiltLinux/linux/issues/2132
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
- drivers/net/ethernet/mellanox/mlx5/core/en/params.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-index 3692298e10f2..c9bdee9a8b30 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-@@ -100,7 +100,7 @@ u8 mlx5e_mpwrq_umr_entry_size(enum mlx5e_mpwrq_umr_mode mode)
- 		return sizeof(struct mlx5_ksm) * 4;
- 	}
- 	WARN_ONCE(1, "MPWRQ UMR mode %d is not known\n", mode);
--	return 0;
-+	return 1;
- }
- 
- u8 mlx5e_mpwrq_log_wqe_sz(struct mlx5_core_dev *mdev, u8 page_shift,
-
----
-base-commit: 4f86eb0a38bc719ba966f155071a6f0594327f34
-change-id: 20251014-mlx5e-avoid-zero-div-from-mlx5e_mpwrq_umr_entry_size-e6d49c18a43f
-
-Best regards,
---  
-Nathan Chancellor <nathan@kernel.org>
-
+Rob
 
