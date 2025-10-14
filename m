@@ -1,57 +1,56 @@
-Return-Path: <netdev+bounces-229304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7C16BDA5DA
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:28:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5032FBDA5EF
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:29:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28F73188EB85
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:28:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 491DC1925C5F
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1934304BC1;
-	Tue, 14 Oct 2025 15:26:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C35A3054D3;
+	Tue, 14 Oct 2025 15:26:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="vFzR7pjG"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FOpV4hhQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E853002D3;
-	Tue, 14 Oct 2025 15:26:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AE5304963
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 15:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760455563; cv=none; b=OvovVRSUu9I20SqAVKSf3rHJdL1kAmwSc4naf7MLzt+IiVuHU+SrwCw74mPBVc7XqY5DazETwZ6Grisvw2311LrQjt+Lt2SGs6yihjgG8sOkr3uWFID/5dvsTyzMMa3mJeH6xIuBIjcMuP9w5lFI3d3gbIfpxzrEogHPk0wyRFA=
+	t=1760455565; cv=none; b=AznuQKp/NvoDLUyG3qZuy0xC9DuAefrgQ4RGiPcC2zKb6m7Be0NOL8dgmVrY7hoGJN7eFt2ejVyP/WUARdA4EsKhFEaHHgQOf93BhWQu3yRUJDT1Ocn4L39PJCT7hKpfhxCaP7K0nuc/Ezy3CKK1eV0iYbnde27W4DXnNCYP6Yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760455563; c=relaxed/simple;
-	bh=HTY2ijRO1tf1eTSEVXlg5CpDj5modXR4DH8kaYDg27E=;
+	s=arc-20240116; t=1760455565; c=relaxed/simple;
+	bh=92e/0H7vLbswdPeWDdzTlQk4ifp2T00n8ZPVF4Bqkvw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=q64ixrPXRHT+Y68GFY3nv7+lPIQjSd0hM1L5hvMBpJvZdaJSUN/YsIcp8vHROPtEtjb/PJC1OmTpBZ0UdLimuEhhCARHzW0wNbeNtwjvMX7Kta+XfvjDgKaYnozGm9GJJJUxYvHD8myGhrirFR5zqOCUJ3tnYqws7xZPugmUngs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=vFzR7pjG; arc=none smtp.client-ip=185.246.85.4
+	 In-Reply-To:To:Cc; b=UYjFalmzV7ojuheN+nwBjeRhJzjVDlGKXbJzrqPVt9M6jDTdsbyTpZlEFjbj5OUA+9FSbylSscblF9KrDb2cvg2aTMxYjI5cPokiIh7KzpIHx5ki+hWuoKC7OZbHyYtp8OjYTNs09Dgy3yXn4ht9qggrFCe7y4LrfKHjYhIsSv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FOpV4hhQ; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id B4D484E4108F;
-	Tue, 14 Oct 2025 15:25:58 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 6B104C09F95;
+	Tue, 14 Oct 2025 15:25:41 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 8AD82606EC;
-	Tue, 14 Oct 2025 15:25:58 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EF7DC102F22B4;
-	Tue, 14 Oct 2025 17:25:55 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 75B75606EC;
+	Tue, 14 Oct 2025 15:26:00 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E3037102F22B1;
+	Tue, 14 Oct 2025 17:25:57 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760455557; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1760455559; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=ZY8fyxY5lDryOsTY56WS6WnXIkM/Swh6Q0iFUBtZEVA=;
-	b=vFzR7pjGZjPkz9QxC12zGuKLdY0CpCDe6hMFKn9llWwpZFbTeU9DxccZDUezdgm4Y/vTJV
-	W0PuuY8KGP/+AsAFw2uoKnIdAZxbb7+cWgxUZM0Gp+KmjtcrKSa7YOJ7m0uaho3y/Z+gqN
-	cC3boS/jB8fDl+BQddMpjsy3ffExWa6zL/PrB6ZBlov1yd9jz7u6sGocJNoT3jhAADkT30
-	SIqHCMjCRJuNqn1gjKO7VVNwz4qDFFBzRKNtH55wzvRcGrXfJSQoGLi9p8/UNzAM+WjVgz
-	tlXQUM6nnT6/aclsGdfg7L+O7JCBamchI0IQwWOJ2G61GJ9opCKH9gAO0ul9uw==
+	bh=jaSOvhbWIl9I6598VXUOOMnqnEToCtsJCRhNQilmR1k=;
+	b=FOpV4hhQL1t1xsz0iIKzX8i6Dm3KaPPEhuFQyOl1BUuRZWZNNCizR7tHgjh6gza8DJZdsM
+	Qv7B2fxNVuDzFEyakPETSsd2tPnKyz1snQZRtT5lI6XY4jBhNJUWazosDaNkmg+3Jlq2QT
+	voLi0JiZsWbYjXHZ0cOGQAETpFJQZMsaAiBiZv+bwC5DZ8fC1ptRYOlRWFX+Q8lQZbjK1+
+	I9MJYhwreVVIajjrnGjLFXm9IHWkr/Cup0A4Khc7GVI+im/jwSXBhq8EFkpy0jlRJpH+tY
+	75lj2c/RmTdkt5FMrkjMGUUtWPzo9SID3pptT6Xt2TsDRSsanEFY0E6OC1OE4Q==
 From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Tue, 14 Oct 2025 17:25:10 +0200
-Subject: [PATCH net-next 09/15] net: macb: introduce DMA descriptor helpers
- (is 64bit? is PTP?)
+Date: Tue, 14 Oct 2025 17:25:11 +0200
+Subject: [PATCH net-next 10/15] net: macb: remove bp->queue_mask
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20251014-macb-cleanup-v1-9-31cd266e22cd@bootlin.com>
+Message-Id: <20251014-macb-cleanup-v1-10-31cd266e22cd@bootlin.com>
 References: <20251014-macb-cleanup-v1-0-31cd266e22cd@bootlin.com>
 In-Reply-To: <20251014-macb-cleanup-v1-0-31cd266e22cd@bootlin.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -84,267 +83,194 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
 X-Mailer: b4 0.14.2
 X-Last-TLS-Session-Version: TLSv1.3
 
-Introduce macb_dma64() and macb_dma_ptp() helper functions.
-Many codepaths are made simpler by dropping conditional compilation.
+The low 16 bits of GEM_DCFG6 tell us which queues are enabled in HW. In
+theory, there could be holes in the bitfield. In practice, the macb
+driver would fail if there were holes as most loops iterate upon
+bp->num_queues. Only macb_init() iterated correctly.
 
-This implies two additional changes:
- - Always compile related structure definitions inside <macb.h>.
- - MACB_EXT_DESC can be dropped as it is useless now.
-
-The common case:
-
-	#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-		struct macb_dma_desc_64 *desc_64;
-		if (bp->hw_dma_cap & HW_DMA_CAP_64B) {
-			desc_64 = macb_64b_desc(bp, desc);
-			// ...
-		}
-	#endif
-
-Is replaced by:
-
-	if (macb_dma64(bp)) {
-		struct macb_dma_desc_64 *desc_64 = macb_64b_desc(bp, desc);
-		// ...
-	}
+ - Drop bp->queue_mask field.
+ - Error out at probe if a hole is in the queue mask.
+ - Rely upon bp->num_queues for iteration.
+ - As we drop the queue_mask probe local variable, fix RCT.
+ - Compute queue_mask on the fly for TAPRIO using bp->num_queues.
 
 Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
- drivers/net/ethernet/cadence/macb.h      | 18 +++++++----
- drivers/net/ethernet/cadence/macb_main.c | 55 ++++++++++----------------------
- drivers/net/ethernet/cadence/macb_ptp.c  |  8 ++---
- 3 files changed, 32 insertions(+), 49 deletions(-)
+ drivers/net/ethernet/cadence/macb.h      |  1 -
+ drivers/net/ethernet/cadence/macb_main.c | 69 +++++++++++++++++---------------
+ 2 files changed, 37 insertions(+), 33 deletions(-)
 
 diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index b3a4c9534240a3195adbd7acd325cdaafab60039..f696b2ddc412bffdbdee5dd32c59b338130907f3 100644
+index f696b2ddc412bffdbdee5dd32c59b338130907f3..5b7d4cdb204d8362bfa81dcc58965edbbf4dd1f8 100644
 --- a/drivers/net/ethernet/cadence/macb.h
 +++ b/drivers/net/ethernet/cadence/macb.h
-@@ -15,10 +15,6 @@
- #include <linux/phy/phy.h>
- #include <linux/workqueue.h>
+@@ -1290,7 +1290,6 @@ struct macb {
+ 	unsigned int		tx_ring_size;
  
--#if defined(CONFIG_ARCH_DMA_ADDR_T_64BIT) || defined(CONFIG_MACB_USE_HWSTAMP)
--#define MACB_EXT_DESC
--#endif
--
- #define MACB_GREGS_NBR 16
- #define MACB_GREGS_VERSION 2
- #define MACB_MAX_QUEUES 8
-@@ -855,7 +851,6 @@ struct macb_dma_desc {
- 	u32	ctrl;
- };
+ 	unsigned int		num_queues;
+-	unsigned int		queue_mask;
+ 	struct macb_queue	queues[MACB_MAX_QUEUES];
  
--#ifdef MACB_EXT_DESC
- struct macb_dma_desc_64 {
- 	u32 addrh;
- 	u32 resvd;
-@@ -865,7 +860,6 @@ struct macb_dma_desc_ptp {
- 	u32	ts_1;
- 	u32	ts_2;
- };
--#endif
- 
- /* DMA descriptor bitfields */
- #define MACB_RX_USED_OFFSET			0
-@@ -1437,6 +1431,18 @@ static inline u64 enst_max_hw_interval(u32 speed_mbps)
- 			    ENST_TIME_GRANULARITY_NS * 1000, (speed_mbps));
- }
- 
-+static inline bool macb_dma64(struct macb *bp)
-+{
-+	return IS_ENABLED(CONFIG_ARCH_DMA_ADDR_T_64BIT) &&
-+	       bp->caps & MACB_CAPS_DMA_64B;
-+}
-+
-+static inline bool macb_dma_ptp(struct macb *bp)
-+{
-+	return IS_ENABLED(CONFIG_MACB_USE_HWSTAMP) &&
-+	       bp->caps & MACB_CAPS_DMA_PTP;
-+}
-+
- /**
-  * struct macb_platform_data - platform data for MACB Ethernet used for PCI registration
-  * @pclk:		platform clock
+ 	spinlock_t		lock;
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 44b96bf53ff6bcb351b27a165451cac852528501..9db419b94d0b47c19cdafb707b1e500124b682c8 100644
+index 9db419b94d0b47c19cdafb707b1e500124b682c8..98e28d51a6e12c24ef27c939363eb43c0aec1951 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -123,35 +123,24 @@ static unsigned int macb_dma_desc_get_size(struct macb *bp)
- {
- 	unsigned int desc_size = sizeof(struct macb_dma_desc);
- 
--#ifdef MACB_EXT_DESC
--	if (bp->caps & MACB_CAPS_DMA_64B)
-+	if (macb_dma64(bp))
- 		desc_size += sizeof(struct macb_dma_desc_64);
--	if (bp->caps & MACB_CAPS_DMA_PTP)
-+	if (macb_dma_ptp(bp))
- 		desc_size += sizeof(struct macb_dma_desc_ptp);
--#endif
- 
- 	return desc_size;
- }
- 
- static unsigned int macb_adj_dma_desc_idx(struct macb *bp, unsigned int desc_idx)
- {
--#ifdef MACB_EXT_DESC
--	bool is_ptp = bp->caps & MACB_CAPS_DMA_PTP;
--	bool is_64b = bp->caps & MACB_CAPS_DMA_64B;
--
--	return desc_idx * (1 + is_64b + is_ptp);
--#else
--	return desc_idx;
--#endif
-+	return desc_idx * (1 + macb_dma64(bp) + macb_dma_ptp(bp));
- }
- 
--#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
- static struct macb_dma_desc_64 *macb_64b_desc(struct macb *bp, struct macb_dma_desc *desc)
- {
- 	return (struct macb_dma_desc_64 *)((void *)desc
- 		+ sizeof(struct macb_dma_desc));
- }
--#endif
- 
- /* Ring buffer accessors */
- static unsigned int macb_tx_ring_wrap(struct macb *bp, unsigned int index)
-@@ -473,15 +462,13 @@ static void macb_init_buffers(struct macb *bp)
+@@ -4066,6 +4066,8 @@ static int macb_taprio_setup_replace(struct net_device *ndev,
+ 	struct macb *bp = netdev_priv(ndev);
+ 	struct ethtool_link_ksettings kset;
  	struct macb_queue *queue;
++	u32 queue_mask;
++	u8 queue_id;
+ 	size_t i;
+ 	int err;
+ 
+@@ -4117,8 +4119,9 @@ static int macb_taprio_setup_replace(struct net_device *ndev,
+ 			goto cleanup;
+ 		}
+ 
+-		/* gate_mask must not select queues outside the valid queue_mask */
+-		if (entry->gate_mask & ~bp->queue_mask) {
++		/* gate_mask must not select queues outside the valid queues */
++		queue_id = order_base_2(entry->gate_mask);
++		if (queue_id >= bp->num_queues) {
+ 			netdev_err(ndev, "Entry %zu: gate_mask 0x%x exceeds queue range (max_queues=%d)\n",
+ 				   i, entry->gate_mask, bp->num_queues);
+ 			err = -EINVAL;
+@@ -4152,7 +4155,7 @@ static int macb_taprio_setup_replace(struct net_device *ndev,
+ 			goto cleanup;
+ 		}
+ 
+-		enst_queue[i].queue_id = order_base_2(entry->gate_mask);
++		enst_queue[i].queue_id = queue_id;
+ 		enst_queue[i].start_time_mask =
+ 			(start_time_sec << GEM_START_TIME_SEC_OFFSET) |
+ 			start_time_nsec;
+@@ -4180,8 +4183,9 @@ static int macb_taprio_setup_replace(struct net_device *ndev,
+ 	/* All validations passed - proceed with hardware configuration */
+ 	scoped_guard(spinlock_irqsave, &bp->lock) {
+ 		/* Disable ENST queues if running before configuring */
++		queue_mask = BIT_U32(bp->num_queues) - 1;
+ 		gem_writel(bp, ENST_CONTROL,
+-			   bp->queue_mask << GEM_ENST_DISABLE_QUEUE_OFFSET);
++			   queue_mask << GEM_ENST_DISABLE_QUEUE_OFFSET);
+ 
+ 		for (i = 0; i < conf->num_entries; i++) {
+ 			queue = &bp->queues[enst_queue[i].queue_id];
+@@ -4210,15 +4214,16 @@ static void macb_taprio_destroy(struct net_device *ndev)
+ {
+ 	struct macb *bp = netdev_priv(ndev);
+ 	struct macb_queue *queue;
+-	u32 enst_disable_mask;
++	u32 queue_mask;
  	unsigned int q;
  
--#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
- 	/* Single register for all queues' high 32 bits. */
--	if (bp->caps & MACB_CAPS_DMA_64B) {
-+	if (macb_dma64(bp)) {
- 		macb_writel(bp, RBQPH,
- 			    upper_32_bits(bp->queues[0].rx_ring_dma));
- 		macb_writel(bp, TBQPH,
- 			    upper_32_bits(bp->queues[0].tx_ring_dma));
- 	}
--#endif
+ 	netdev_reset_tc(ndev);
+-	enst_disable_mask = bp->queue_mask << GEM_ENST_DISABLE_QUEUE_OFFSET;
++	queue_mask = BIT_U32(bp->num_queues) - 1;
  
- 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
- 		queue_writel(queue, RBQP, lower_32_bits(queue->rx_ring_dma));
-@@ -1006,10 +993,9 @@ static void macb_tx_unmap(struct macb *bp, struct macb_tx_skb *tx_skb, int budge
+ 	scoped_guard(spinlock_irqsave, &bp->lock) {
+ 		/* Single disable command for all queues */
+-		gem_writel(bp, ENST_CONTROL, enst_disable_mask);
++		gem_writel(bp, ENST_CONTROL,
++			   queue_mask << GEM_ENST_DISABLE_QUEUE_OFFSET);
  
- static void macb_set_addr(struct macb *bp, struct macb_dma_desc *desc, dma_addr_t addr)
- {
--#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
--	struct macb_dma_desc_64 *desc_64;
-+	if (macb_dma64(bp)) {
-+		struct macb_dma_desc_64 *desc_64;
- 
--	if (bp->caps & MACB_CAPS_DMA_64B) {
- 		desc_64 = macb_64b_desc(bp, desc);
- 		desc_64->addrh = upper_32_bits(addr);
- 		/* The low bits of RX address contain the RX_USED bit, clearing
-@@ -1018,26 +1004,23 @@ static void macb_set_addr(struct macb *bp, struct macb_dma_desc *desc, dma_addr_
- 		 */
- 		dma_wmb();
- 	}
--#endif
-+
- 	desc->addr = lower_32_bits(addr);
+ 		/* Clear all queue ENST registers in batch */
+ 		for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+@@ -4341,26 +4346,25 @@ static void macb_configure_caps(struct macb *bp,
+ 	dev_dbg(&bp->pdev->dev, "Cadence caps 0x%08x\n", bp->caps);
  }
  
- static dma_addr_t macb_get_addr(struct macb *bp, struct macb_dma_desc *desc)
+-static void macb_probe_queues(void __iomem *mem,
+-			      bool native_io,
+-			      unsigned int *queue_mask,
+-			      unsigned int *num_queues)
++static int macb_probe_queues(struct device *dev, void __iomem *mem, bool native_io)
  {
- 	dma_addr_t addr = 0;
--#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
--	struct macb_dma_desc_64 *desc_64;
+-	*queue_mask = 0x1;
+-	*num_queues = 1;
++	/* BIT(0) is never set but queue 0 always exists. */
++	unsigned int queue_mask = 0x1;
  
--	if (bp->caps & MACB_CAPS_DMA_64B) {
-+	if (macb_dma64(bp)) {
-+		struct macb_dma_desc_64 *desc_64;
+-	/* is it macb or gem ?
+-	 *
+-	 * We need to read directly from the hardware here because
+-	 * we are early in the probe process and don't have the
+-	 * MACB_CAPS_MACB_IS_GEM flag positioned
+-	 */
+-	if (!hw_is_gem(mem, native_io))
+-		return;
++	/* Use hw_is_gem() as MACB_CAPS_MACB_IS_GEM is not yet positioned. */
++	if (hw_is_gem(mem, native_io)) {
++		if (native_io)
++			queue_mask |= __raw_readl(mem + GEM_DCFG6) & 0xFF;
++		else
++			queue_mask |= readl_relaxed(mem + GEM_DCFG6) & 0xFF;
+ 
+-	/* bit 0 is never set but queue 0 always exists */
+-	*queue_mask |= readl_relaxed(mem + GEM_DCFG6) & 0xff;
+-	*num_queues = hweight32(*queue_mask);
++		if (fls(queue_mask) != ffz(queue_mask)) {
++			dev_err(dev, "queue mask %#x has a hole\n", queue_mask);
++			return -EINVAL;
++		}
++	}
 +
- 		desc_64 = macb_64b_desc(bp, desc);
- 		addr = ((u64)(desc_64->addrh) << 32);
- 	}
--#endif
- 	addr |= MACB_BF(RX_WADDR, MACB_BFEXT(RX_WADDR, desc->addr));
--#ifdef CONFIG_MACB_USE_HWSTAMP
--	if (bp->caps & MACB_CAPS_DMA_PTP)
-+	if (macb_dma_ptp(bp))
- 		addr &= ~GEM_BIT(DMA_RXVALID);
--#endif
- 	return addr;
++	return hweight32(queue_mask);
  }
  
-@@ -2299,11 +2282,9 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		return ret;
+ static void macb_clks_disable(struct clk *pclk, struct clk *hclk, struct clk *tx_clk,
+@@ -4478,10 +4482,7 @@ static int macb_init(struct platform_device *pdev)
+ 	 * register mapping but we don't want to test the queue index then
+ 	 * compute the corresponding register offset at run time.
+ 	 */
+-	for (hw_q = 0, q = 0; hw_q < MACB_MAX_QUEUES; ++hw_q) {
+-		if (!(bp->queue_mask & (1 << hw_q)))
+-			continue;
+-
++	for (hw_q = 0, q = 0; hw_q < bp->num_queues; ++hw_q) {
+ 		queue = &bp->queues[q];
+ 		queue->bp = bp;
+ 		spin_lock_init(&queue->tx_ptr_lock);
+@@ -5385,14 +5386,14 @@ static int macb_probe(struct platform_device *pdev)
+ 	struct device_node *np = pdev->dev.of_node;
+ 	struct clk *pclk, *hclk = NULL, *tx_clk = NULL, *rx_clk = NULL;
+ 	struct clk *tsu_clk = NULL;
+-	unsigned int queue_mask, num_queues;
+-	bool native_io;
+ 	phy_interface_t interface;
+ 	struct net_device *dev;
+ 	struct resource *regs;
+ 	u32 wtrmrk_rst_val;
+ 	void __iomem *mem;
+ 	struct macb *bp;
++	int num_queues;
++	bool native_io;
+ 	int err, val;
+ 
+ 	mem = devm_platform_get_and_ioremap_resource(pdev, 0, &regs);
+@@ -5418,7 +5419,12 @@ static int macb_probe(struct platform_device *pdev)
+ 	pm_runtime_enable(&pdev->dev);
+ 	native_io = hw_is_native_io(mem);
+ 
+-	macb_probe_queues(mem, native_io, &queue_mask, &num_queues);
++	num_queues = macb_probe_queues(&pdev->dev, mem, native_io);
++	if (num_queues < 0) {
++		err = num_queues;
++		goto err_disable_clocks;
++	}
++
+ 	dev = alloc_etherdev_mq(sizeof(*bp), num_queues);
+ 	if (!dev) {
+ 		err = -ENOMEM;
+@@ -5442,7 +5448,6 @@ static int macb_probe(struct platform_device *pdev)
+ 		bp->macb_reg_writel = hw_writel;
  	}
- 
--#ifdef CONFIG_MACB_USE_HWSTAMP
--	if ((skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) &&
--	    (bp->caps & MACB_CAPS_DMA_PTP))
-+	if (macb_dma_ptp(bp) &&
-+	    (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP))
- 		skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
--#endif
- 
- 	is_lso = (skb_shinfo(skb)->gso_size != 0);
- 
-@@ -2780,14 +2761,10 @@ static void macb_configure_dma(struct macb *bp)
- 			dmacfg &= ~GEM_BIT(TXCOEN);
- 
- 		dmacfg &= ~GEM_BIT(ADDR64);
--#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
--		if (bp->caps & MACB_CAPS_DMA_64B)
-+		if (macb_dma64(bp))
- 			dmacfg |= GEM_BIT(ADDR64);
--#endif
--#ifdef CONFIG_MACB_USE_HWSTAMP
--		if (bp->caps & MACB_CAPS_DMA_PTP)
-+		if (macb_dma_ptp(bp))
- 			dmacfg |= GEM_BIT(RXEXT) | GEM_BIT(TXEXT);
--#endif
- 		netdev_dbg(bp->dev, "Cadence configure DMA with 0x%08x\n",
- 			   dmacfg);
- 		gem_writel(bp, DMACFG, dmacfg);
-@@ -3563,7 +3540,7 @@ static int gem_get_ts_info(struct net_device *dev,
- {
- 	struct macb *bp = netdev_priv(dev);
- 
--	if (!(bp->caps & MACB_CAPS_DMA_PTP)) {
-+	if (!macb_dma_ptp(bp)) {
- 		ethtool_op_get_ts_info(dev, info);
- 		return 0;
- 	}
-diff --git a/drivers/net/ethernet/cadence/macb_ptp.c b/drivers/net/ethernet/cadence/macb_ptp.c
-index f4ab379f28493cffe30275fd335844ae2fefc89a..c9e77819196e17a5b88f6dab77dadabfe087a1bd 100644
---- a/drivers/net/ethernet/cadence/macb_ptp.c
-+++ b/drivers/net/ethernet/cadence/macb_ptp.c
-@@ -28,10 +28,10 @@
- static struct macb_dma_desc_ptp *macb_ptp_desc(struct macb *bp,
- 					       struct macb_dma_desc *desc)
- {
--	if (!(bp->caps & MACB_CAPS_DMA_PTP))
-+	if (!macb_dma_ptp(bp))
- 		return NULL;
- 
--	if (bp->caps & MACB_CAPS_DMA_64B)
-+	if (macb_dma64(bp))
- 		return (struct macb_dma_desc_ptp *)
- 				((u8 *)desc + sizeof(struct macb_dma_desc)
- 				+ sizeof(struct macb_dma_desc_64));
-@@ -382,7 +382,7 @@ int gem_get_hwtst(struct net_device *dev,
- 	struct macb *bp = netdev_priv(dev);
- 
- 	*tstamp_config = bp->tstamp_config;
--	if (!(bp->caps & MACB_CAPS_DMA_PTP))
-+	if (!macb_dma_ptp(bp))
- 		return -EOPNOTSUPP;
- 
- 	return 0;
-@@ -409,7 +409,7 @@ int gem_set_hwtst(struct net_device *dev,
- 	struct macb *bp = netdev_priv(dev);
- 	u32 regval;
- 
--	if (!(bp->caps & MACB_CAPS_DMA_PTP))
-+	if (!macb_dma_ptp(bp))
- 		return -EOPNOTSUPP;
- 
- 	switch (tstamp_config->tx_type) {
+ 	bp->num_queues = num_queues;
+-	bp->queue_mask = queue_mask;
+ 	bp->dma_burst_length = macb_config->dma_burst_length;
+ 	bp->pclk = pclk;
+ 	bp->hclk = hclk;
 
 -- 
 2.51.0
