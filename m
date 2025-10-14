@@ -1,57 +1,56 @@
-Return-Path: <netdev+bounces-229298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47AACBDA588
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:26:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C09E2BDA628
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:30:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AC2EC354893
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:26:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D70B43AED15
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:27:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A923016FD;
-	Tue, 14 Oct 2025 15:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB82301027;
+	Tue, 14 Oct 2025 15:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="eOXbD9sD"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AX0X6Lzv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0C2301006
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 15:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00912301000;
+	Tue, 14 Oct 2025 15:25:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760455551; cv=none; b=XEi+6pxjgRg2g6Whu1MCH+P3x01zlJftC0zziPyqAd2boeNeVapXo6efQVh4noGPH45pr2paRgyR/qjs/YMeOvQPIqn8OBQ9cxcxFh5UsClJWRbW1InM/hj+MvGhlW5UwFuvJJxeeS12oJdGJ/fyiZK7zKQOUEDJdAFMhHjdSOA=
+	t=1760455553; cv=none; b=JoYhddvhY0nDfDan9NQzRMP6VsevnVT4OGqjJKNu+ByOSHY+YY90MHqGxAck1/ZeJ5hGIWKfEWZFFTkn8zhJ/7lz2x/ptWAVcK85AxvMQe+g/dRQYrLUTOwGpDp2wuBIk9oKhttCPS3Q+R14X4s2bTFZb6cBYAy3aw83bTlhoqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760455551; c=relaxed/simple;
-	bh=rUUnrH/sSuEDfrtW6ug/Kmv3e2YKbWh1q7RDvw2MkE0=;
+	s=arc-20240116; t=1760455553; c=relaxed/simple;
+	bh=wNa3DuvAMhvPEjR2gCMGl0nFFBwN+pt81lUdYbdjvA0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZC8vVVMtlOTBOCCJHhfQXXR9K2RCqHDBcDXXrAjw2/KImJGbRJwOU1l/o20s3RdlT3dqtRHM6mAFu0uQui5g9+uPrQ1TaDOxYrLYcsAFvz0QCHFna9Qq8HJcO1Nt3Db3nXtcaPMDjbft0uSaOizV1Hca4YbPzTsXfZAqeaaDvJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=eOXbD9sD; arc=none smtp.client-ip=185.246.84.56
+	 In-Reply-To:To:Cc; b=l754pzbh4ZTG/UTzx37A+Xwcpggx2HSG/D+YdtqQL/QXNocn4isyNm5TXBuksgWOOUUi55ZqUd+noZlHrMY2LLGQYEdE3FUdcehExlOSJ2sNVOFqyX+MUWY06RggiQupk4qAL7hljM0IVN6Vdjs4Eoaa4T1Pm8R45hzGA8CUf2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AX0X6Lzv; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 4DCA41A1381;
-	Tue, 14 Oct 2025 15:25:48 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 4A248C09F98;
+	Tue, 14 Oct 2025 15:25:31 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 234B3606EC;
-	Tue, 14 Oct 2025 15:25:48 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5E210102F22A4;
-	Tue, 14 Oct 2025 17:25:45 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 543E1606EC;
+	Tue, 14 Oct 2025 15:25:50 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 744C7102F22B0;
+	Tue, 14 Oct 2025 17:25:47 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760455547; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1760455549; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=pc+arER1ZhOJQit1tkbjRVmQdT2HfO4hl2eG12FrhwE=;
-	b=eOXbD9sDXQw31kaUI+I0rWwhN+0FcVJLuwMC7b2ke4y78MDx/bWgBaKMgz7RH6rbaZJWZ7
-	FQc+qnq72IEAixUtJAf1Ciz1TxmYMimDhTTzeY1bZPNb8W44WQxILhrai91QwJSpEulyjg
-	oC2pWRaj5onOLWOz0lh0hBIWTkOg2IbXStDRZ++xQnB9T5IvKK6Kat7QZe0D3j4FOeNPIw
-	bdTd50yDNQVWJ8/6I6bjYXbnS5IeUCp2rgd0l0CRlMtQaKzagvrX7b7tl+cI6FhgVmc7bQ
-	Ex469KkNPI0A2xSQT8f3i4hRYf4p08s3mhOIcnOiIOSUboh7NZsbzFN8zerwZw==
+	bh=L8xSHmDqJqypWN0BQtijSoqyQPcRedqk94nr6mZnyuk=;
+	b=AX0X6Lzv5aXzbg9C7x7kW0oI2A69pahCmRCe8s3K7MmSVJDi9dHyXFWBIOhc2oYGFDR0Te
+	5YrZJ9zl3n5KgVMB1BdJuQWyt1QLfLtun4cM2Gpxm8Y20PA7Xk+PwtT0eBvNcdfFQJmFZO
+	/cVo2ytrdpuyp+ZZPJUcximFgFBErcyfak5tpyc3aa9GqlV9gqeEoeMFVjASYTG5jRu07S
+	zOUVK4bs9p1ooITh3nuXIRFI0IJDlqzlTdWrPaOdYg7bL/1mLtHEryY8kI90dhQDT7KCrh
+	35ugoWkdUF/VKiTiMwggiP+XfbP0aeIZPRx2/oxa1fU3MyAIvaww0/0deJv14A==
 From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Tue, 14 Oct 2025 17:25:05 +0200
-Subject: [PATCH net-next 04/15] net: macb: Remove local variables clk_init
- and init in macb_probe()
+Date: Tue, 14 Oct 2025 17:25:06 +0200
+Subject: [PATCH net-next 05/15] net: macb: drop macb_config NULL checking
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20251014-macb-cleanup-v1-4-31cd266e22cd@bootlin.com>
+Message-Id: <20251014-macb-cleanup-v1-5-31cd266e22cd@bootlin.com>
 References: <20251014-macb-cleanup-v1-0-31cd266e22cd@bootlin.com>
 In-Reply-To: <20251014-macb-cleanup-v1-0-31cd266e22cd@bootlin.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -85,56 +84,38 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
 X-Mailer: b4 0.14.2
 X-Last-TLS-Session-Version: TLSv1.3
 
-Remove local variables clk_init and init. Those function pointers are
-always equivalent to macb_config->clk_init and macb_config->init.
+Remove NULL checks on macb_config as it is always valid:
+ - either it is its default value &default_gem_config,
+ - or it got overridden using match data.
 
 Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
 Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index ca2386b8347371810845290f6a7177a326fda4e7..dad1188ef9d87fc3846590032995223174177e89 100644
+index dad1188ef9d87fc3846590032995223174177e89..33e99aab1dcb360a699d0e80762ef421001d19a1 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -5424,10 +5424,6 @@ static const struct macb_config default_gem_config = {
- static int macb_probe(struct platform_device *pdev)
- {
- 	const struct macb_config *macb_config = &default_gem_config;
--	int (*clk_init)(struct platform_device *, struct clk **,
--			struct clk **, struct clk **,  struct clk **,
--			struct clk **) = macb_config->clk_init;
--	int (*init)(struct platform_device *) = macb_config->init;
- 	struct device_node *np = pdev->dev.of_node;
- 	struct clk *pclk, *hclk = NULL, *tx_clk = NULL, *rx_clk = NULL;
- 	struct clk *tsu_clk = NULL;
-@@ -5449,14 +5445,11 @@ static int macb_probe(struct platform_device *pdev)
- 		const struct of_device_id *match;
- 
- 		match = of_match_node(macb_dt_ids, np);
--		if (match && match->data) {
-+		if (match && match->data)
- 			macb_config = match->data;
--			clk_init = macb_config->clk_init;
--			init = macb_config->init;
--		}
+@@ -5485,15 +5485,13 @@ static int macb_probe(struct platform_device *pdev)
  	}
+ 	bp->num_queues = num_queues;
+ 	bp->queue_mask = queue_mask;
+-	if (macb_config)
+-		bp->dma_burst_length = macb_config->dma_burst_length;
++	bp->dma_burst_length = macb_config->dma_burst_length;
+ 	bp->pclk = pclk;
+ 	bp->hclk = hclk;
+ 	bp->tx_clk = tx_clk;
+ 	bp->rx_clk = rx_clk;
+ 	bp->tsu_clk = tsu_clk;
+-	if (macb_config)
+-		bp->jumbo_max_len = macb_config->jumbo_max_len;
++	bp->jumbo_max_len = macb_config->jumbo_max_len;
  
--	err = clk_init(pdev, &pclk, &hclk, &tx_clk, &rx_clk, &tsu_clk);
-+	err = macb_config->clk_init(pdev, &pclk, &hclk, &tx_clk, &rx_clk, &tsu_clk);
- 	if (err)
- 		return err;
- 
-@@ -5594,7 +5587,7 @@ static int macb_probe(struct platform_device *pdev)
- 		bp->phy_interface = interface;
- 
- 	/* IP specific init */
--	err = init(pdev);
-+	err = macb_config->init(pdev);
- 	if (err)
- 		goto err_out_free_netdev;
- 
+ 	if (!hw_is_gem(bp->regs, bp->native_io))
+ 		bp->max_tx_length = MACB_MAX_TX_LEN;
 
 -- 
 2.51.0
