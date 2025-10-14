@@ -1,129 +1,168 @@
-Return-Path: <netdev+bounces-229143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9898CBD87B1
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:40:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B32E9BD8868
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:46:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 525FD4068A3
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:40:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E08DE1923929
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D9D2EA74C;
-	Tue, 14 Oct 2025 09:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD391305958;
+	Tue, 14 Oct 2025 09:45:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dVfHq2am"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="XDV77NON"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6E52E7BB5
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 09:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A6532ED871
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 09:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760434853; cv=none; b=uVScmqNLyJ8OI9/+C5DP11jpKzz8UiaFbXC2XcQ2zHLXH5Klg2G9R5CX7JD1n6LWh7gKk3NLXQjc5NDvTETk9LedS4KNDhkQTD1loPkk9ioI7YYFmKgVBh5YWMHuuD8svGoS+40kuZiW/QeR7tkCa4CX6yneyQx362JAudTrYcQ=
+	t=1760435111; cv=none; b=mOGWGjO/2B3Fg2u3UkZqEuiefRo0KVhGjUweLvjL2sd/9Wwh+d50MmM+dpDfhdzFedE/ej2rsDOlaoiYBi1rrzf3fn4BcjcVrtu3AnKEvraP/sx5/W4TXlq2NR42kIeDuqfLP46ypRBVbm+lRY3XS57X1zM9kDc1Lp3cb3K/sBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760434853; c=relaxed/simple;
-	bh=KrqI6BN/pG8sniH9prZ9lemJ+Px5buZPfBBQDsr3OFc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E1qDH75kzGhV6NVlgXcD1IIY4eyYLzgSgUCWFaPgsYO9QNwQahkVNya7fULirXD2fXH4CNuMQ8ltmKQC+BhlHKMn/cmw+B1Q1jJ1uZ0nkDNKzP5rqqnFtQr+D4lJJK5qp+iVYC/kjq1ewV2N4wuN63cUO7aDneCIZgO0jMsIv34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dVfHq2am; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7f04816589bso657761785a.3
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 02:40:51 -0700 (PDT)
+	s=arc-20240116; t=1760435111; c=relaxed/simple;
+	bh=9+jzJmhp4NDYlmVAzrpZPo68lQ6Jij+VLE6Up3JnboA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M5dJJTJ8BegW7XflxiVsqrEjYxyq5Y9OghCKUJEPvASKbTkrmo9swlfN+lIkKZF17ClxwSCtZ2U3MYIZYRGW/RoehInQicBtqKnUQK1plSd7a0+GqwLm3iY2Cs/sKD8ArGUPoljGe5pkN71sj+94q4zvX7Ngr2Dnrlf/wBqa+zQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=XDV77NON; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-46e5980471eso27629215e9.2
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 02:45:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760434851; x=1761039651; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y0K5zqPBUa6pAT3aN4BIC0pePwm6+irtg+vq3VpmDXw=;
-        b=dVfHq2amJepyAq4CshvY5G7xsf2Q8BOC2E5iXeeyY0OxaLQUUCmS1plA25rr3z/lVD
-         Kzfmd6RQSRUYZv2Gg7l23JqmA0EPHD7tcFBke9B+WdUYPA9v9H0bPfkQU3GyZVT+GQir
-         3017SPrU75cNyl+FCe94CYY3Pt0/LbRKOh/u8qFcOk1MkHcT/ADpldNwg/JvJ6VZ+XXG
-         7JCLtoPmeEtEg1Q5FHEn73RnGB7E1HmGd+QuVz2sC8KcXCXwbnx9jy/4ssEGXuiwBQ/E
-         ET51pjfnWxFN8Rp4S0uUoINu1iNQ5Ht7eYKhUIuVkzZG+Ic+QhSSrhUPWjr0yi8TBWvR
-         rI+Q==
+        d=suse.com; s=google; t=1760435108; x=1761039908; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=R75CvrIgcbILYeZyEie2SvMudL4DW8xIUI8yCH+RsPE=;
+        b=XDV77NONhb6aE+xpGklpzVTPYklSS5txSxipRmfV54Mbn08SCU/o8mWQddE3WtE8Sl
+         gXJYwCIf9nQCIWLFmIIDwKH5tskqCGjOZnmb8DLrKlYO3BHBVq82H/3l6WdI3dRxkJwh
+         TLmut742gMNO3teiW8MPJ/aeDjaZWHLf/93D1stKQ3bHi0p7HwyJ9zLceSnAMqUECGvx
+         49IRbGIa9zjSZLaeTNnVd7+uc8eRC7BTqVguORDDmNVXZypPxP0VyiuxjAaIXDP230zk
+         Jee9KvOcUqzAFW7wjCAVhS4eLPLEGds2OUIepeCFn+13Br1QwjDsBisnKBG82f8oWLla
+         YhYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760434851; x=1761039651;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y0K5zqPBUa6pAT3aN4BIC0pePwm6+irtg+vq3VpmDXw=;
-        b=kj355t7IfcA2khm35k+l6cK1QfwGtWPw6um/NIN96MSarySC74JhUX/PqsDcTg+9OY
-         FGJoJndDgjNloFL72z1NoVkEp77gCluWVYEQvtzjrkjmxby2CxTPB+f4G8dsctWau2QK
-         kfPVVfcHryTOGDcLEZwrWpGr0+p5q/tvTL1GkC+mL9vSfpldsyivvOsUApNlkN0YIyVt
-         Cxor6jmz0UMFDD0pP2vMy5O1aPsi03IjaAgUt7Bfl7AAEGRYJlsomi3q8rxvMN/tnAXG
-         hl6+irZSprSuobIC6tOxRw8RpT0Tgl+apN9H2ro0wgrJNcCPrDmWUwq7+NWUCKfYAoI6
-         4k0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUrmxMZl68QPdWqxW3/WH99OhOdYq4SxXUHgFp2gEq5suun1WL5cWVl0pfSW9Mtddoc5aQdSHo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPPJ5oSqcBJjEZLG29gLrbSUq7kmw/ht1IPN7glnPr9Bw1njoQ
-	vJ+YgQRXJ1zJ8dNs4ldt7mIxClTyk2tjBpo62BoDhDiLiCTWC+R3zQxcSKiXXK40z+DgdzuYi1r
-	4dBUH+sB23FwUkTRCq8bDPgbOwq1YSWgZ9rXDPiSU
-X-Gm-Gg: ASbGnctm4Zh7rqXIXDZkeOglGGdAAG/PBHD/lp/S+bfB3M3FOKZSY2tWGtb7a0cUNjm
-	ih5hWt71pIQOCOYvAAAoDUUNQAzdXWN3aPzqNCHLOIV8QX+joLcLsLdHqiLFbk52Ivqw4VwZXlY
-	oeqEzjKsW7kLRbcStdWN++s4V9knGZpjNX5XojrgOoPofRK2ddGHZOqjmrXTmwgueSIVbn16h1T
-	ReZZp1pvDDbEePV2j2AD2u0nyn9U0zI71W/cNxwxWY=
-X-Google-Smtp-Source: AGHT+IFIcauElXf63dvIvtCYlffelgR7gOw7ZLKhFdnOZazAbdT98c9ka9EyWFhYBvRfbrOg3Kp5ADj4VDBMwgtSBb0=
-X-Received: by 2002:ac8:5d0e:0:b0:4d4:ac0e:1d8 with SMTP id
- d75a77b69052e-4e6ead7c5e5mr304086291cf.80.1760434850713; Tue, 14 Oct 2025
- 02:40:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760435108; x=1761039908;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R75CvrIgcbILYeZyEie2SvMudL4DW8xIUI8yCH+RsPE=;
+        b=HXWpt+uUO+E+EwZTp1Qa2qkSSaxQhYjRfTFJzi3v3TuyosT9wpdNeJr9DJCuRAiGkj
+         wKZiXAkp4g7oqPZN0hNCvHWpRpMPPsHxseOJ5XGechdVFU5zdc1dbVUHq90OgMJn053d
+         aLC7ZQSyWXfn3ItzVyPijlTRecyG6qNgyne2LwpM9riWDM2jS+tq9RZgQyXuAC6Yeibf
+         EylhatH2HoGoeCvSYeL12E9Quxk9emZL+T2opXGIcNLzd0YTwihke15tpY1gdE8swXnn
+         lOJPYfLEQwDMne833Dq9YlxRgxN77vBUjN+NRq6QDQtPyH3LykNfjv3xqQR3kcT+4T72
+         pEvw==
+X-Forwarded-Encrypted: i=1; AJvYcCXN5S4PvOwMfwHbVzthqUSbPAvOCCZGqHKdc27+bzGWoj69CyspScZqC2lQtTx+UgVt75Edvk4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOzheuXijahhApJxbfQhLyhiYzMGZgiKNwVS3qveWcOC/LJqqq
+	ZqhMYuJkHFIcRV9IGq/77w+SwE4C7V3OdgWj0Vzs2ndPxDGHbzo19Ou8+XxQyGjnkt4=
+X-Gm-Gg: ASbGncvQjkZUvFsTEkcc381psmcaVxa7lTVG0HfzjDTYOA/C5vif0Mu7hWBCWiifUJj
+	TBf9gdKooopOqBQxXj4n3azfzOgD5+JQmsrbK7MCX0/QDOiGFK3f7UMd8o53HOsl4bKh52IQEQ0
+	h/K30cNd6RhD9YvSTc/eJKYUy0/FBwYYaNOjacibC9ab8mjIs7TFO/wR46HPWA6LuEcn22mZoKI
+	00IOmkTODl9bSQzG3Urtrz3qrxZKQIiz3rcTCRncKBzqWavu3Lw7eOUfwTjxxmG5oCRbYdomUG/
+	1g0L79XoA/qdJ3+dnwad+yVJGYWiNP0U1mwC9PxBOhyfuhvyEM0VysV4B7mNNU+/3Ufk1gsaBz/
+	zRb7VtnEjlncY+0Npdnr/wohA4YZ8p7UASq12i4zCAGHVdVju3S5gmUsvRoU65RVnosh3tw==
+X-Google-Smtp-Source: AGHT+IFLMF/oRlSecQb1AgZUj9ViudEM8BAiQCOLkhiN8cHZAWDwJ7zBbTzbicn8TdmEii38ZLu7Sw==
+X-Received: by 2002:a05:600c:890d:b0:46e:32f7:98fc with SMTP id 5b1f17b1804b1-46fa9af3656mr132535685e9.21.1760435107774;
+        Tue, 14 Oct 2025 02:45:07 -0700 (PDT)
+Received: from pathway.suse.cz (nat2.prg.suse.com. [195.250.132.146])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fb489ad27sm230711415e9.15.2025.10.14.02.45.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Oct 2025 02:45:07 -0700 (PDT)
+Date: Tue, 14 Oct 2025 11:45:05 +0200
+From: Petr Mladek <pmladek@suse.com>
+To: Lance Yang <lance.yang@linux.dev>
+Cc: lirongqing <lirongqing@baidu.com>, wireguard@lists.zx2c4.com,
+	linux-arm-kernel@lists.infradead.org,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	linux-doc@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Stanislav Fomichev <sdf@fomichev.me>, linux-aspeed@lists.ozlabs.org,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	Joel Stanley <joel@jms.id.au>, Russell King <linux@armlinux.org.uk>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Shuah Khan <shuah@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Joel Granados <joel.granados@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Phil Auld <pauld@redhat.com>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
+	Kees Cook <kees@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	"Paul E . McKenney" <paulmck@kernel.org>,
+	Feng Tang <feng.tang@linux.alibaba.com>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH][v3] hung_task: Panic after fixed number of hung tasks
+Message-ID: <aO4boXFaIb0_Wiif@pathway.suse.cz>
+References: <20251012115035.2169-1-lirongqing@baidu.com>
+ <588c1935-835f-4cab-9679-f31c1e903a9a@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251013145926.833198-1-edumazet@google.com> <3b20bfde-1a99-4018-a8d9-bb7323b33285@redhat.com>
- <CANn89iKu7jjnjc1QdUrvbetti2AGhKe0VR+srecrpJ2s-hfkKA@mail.gmail.com>
- <CANn89iL8YKZZQZSmg5WqrYVtyd2PanNXzTZ2Z0cObpv9_XSmoQ@mail.gmail.com> <ffa599b8-2a9c-4c25-a65f-ed79cee4fa21@redhat.com>
-In-Reply-To: <ffa599b8-2a9c-4c25-a65f-ed79cee4fa21@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 14 Oct 2025 02:40:39 -0700
-X-Gm-Features: AS18NWA1dj4wj0sa5FEYlFgWa2ljToVLzKl2oeJLeQwenPjJ3fwXt1fgIM8frTM
-Message-ID: <CANn89iLyO66z_r0hfY62dFBuhA-WmYcW+YhuAkDHaShmhUMZwQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: better handle TCP_TX_DELAY on established flows
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <588c1935-835f-4cab-9679-f31c1e903a9a@linux.dev>
 
-On Tue, Oct 14, 2025 at 2:38=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
+On Tue 2025-10-14 13:23:58, Lance Yang wrote:
+> Thanks for the patch!
+> 
+> I noticed the implementation panics only when N tasks are detected
+> within a single scan, because total_hung_task is reset for each
+> check_hung_uninterruptible_tasks() run.
 
-> What about using a nf rule to drop all the 'tun0' egress packet, instead
-> of a qdisc?
->
-> In any case I think the pending patches should be ok.
+Great catch!
 
-Or add a best effort, so that TCP can have some clue, vast majority of
-cases is that the batch is 1 skb :)
+Does it make sense?
+Is is the intended behavior, please?
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index e281bae9b150..4b938f4d4759 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4226,6 +4226,13 @@ static inline int __dev_xmit_skb(struct sk_buff
-*skb, struct Qdisc *q,
-                        __qdisc_run(q);
-                qdisc_run_end(q);
-        } else {
-+               if (!llist_next(ll_list)) {
-+                       DEBUG_NET_WARN_ON_ONCE(skb !=3D llist_entry(ll_list=
-,
-+
-struct sk_buff,
-+                                                                 ll_node))=
-;
-+                       rc =3D dev_qdisc_enqueue(skb, q, &to_free, txq);
-+                       ll_list =3D NULL;
-+               }
-                llist_for_each_entry_safe(skb, next, ll_list, ll_node) {
-                        prefetch(next);
-                        skb_mark_not_on_list(skb);
+> So some suggestions to align the documentation with the code's
+> behavior below :)
+
+> On 2025/10/12 19:50, lirongqing wrote:
+> > From: Li RongQing <lirongqing@baidu.com>
+> > 
+> > Currently, when 'hung_task_panic' is enabled, the kernel panics
+> > immediately upon detecting the first hung task. However, some hung
+> > tasks are transient and the system can recover, while others are
+> > persistent and may accumulate progressively.
+
+My understanding is that this patch wanted to do:
+
+   + report even temporary stalls
+   + panic only when the stall was much longer and likely persistent
+
+Which might make some sense. But the code does something else.
+
+> > --- a/kernel/hung_task.c
+> > +++ b/kernel/hung_task.c
+> > @@ -229,9 +232,11 @@ static void check_hung_task(struct task_struct *t, unsigned long timeout)
+> >   	 */
+> >   	sysctl_hung_task_detect_count++;
+> > +	total_hung_task = sysctl_hung_task_detect_count - prev_detect_count;
+> >   	trace_sched_process_hang(t);
+> > -	if (sysctl_hung_task_panic) {
+> > +	if (sysctl_hung_task_panic &&
+> > +			(total_hung_task >= sysctl_hung_task_panic)) {
+> >   		console_verbose();
+> >   		hung_task_show_lock = true;
+> >   		hung_task_call_panic = true;
+
+I would expect that this patch added another counter, similar to
+sysctl_hung_task_detect_count. It would be incremented only
+once per check when a hung task was detected. And it would
+be cleared (reset) when no hung task was found.
+
+Best Regards,
+Petr
 
