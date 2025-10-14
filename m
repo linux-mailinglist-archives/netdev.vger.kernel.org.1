@@ -1,286 +1,125 @@
-Return-Path: <netdev+bounces-229121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBDA2BD85B8
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:12:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D98DBD860D
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:17:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 967D83E77ED
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:12:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF20419232D8
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 933F82E0B5F;
-	Tue, 14 Oct 2025 09:12:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D71923F294;
+	Tue, 14 Oct 2025 09:17:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="maHLEgR7"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="FI4c+NkK";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WhRG93at"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EAEA1E3DED
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 09:12:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E80218A6AD
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 09:17:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760433142; cv=none; b=HWcwLiL140jjpFALK77YNXqmeSMF7zw0kiwbiM7r1i95wt3uENkWKqNzE83ofy0wq9tCgm2MeqruWWF635ZZ6fUdg0H7xh8UBAjqWTAoknKxCkeEJeztyGt8ErhxewCxYpIJv39lucIW/1iayZMkj2hHc//6gCJIc294qXi1kSQ=
+	t=1760433468; cv=none; b=Bpmw4Nrd9CxnLAV49bosGtSztkJtQjQiwitDffuoyHLX3UP+jEVQXkaYa0iBKNM+s5V8aor6fN7dJxxLikgpjFpT8DG7NKxSrBSa1/wP3v3N43X9JobfdJ2JzZ9hJEtIpODiI0UEImuVCnTL7IUAy64WVfNIFc1V+/VSSy8e1Sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760433142; c=relaxed/simple;
-	bh=CDJ+sSMRFaP+/xhysWoc/+hKchwyBju2hWcXHYYiMKI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uhIOAr+Upa8WNDNFZUOCRvoMl//MhNaU+nyeD/DgUPNRD9hZ1njjeA3eg1+NXauAK9wn1jsidABaUhruKXx3WfQhbIeTLE95vQ9JnTkYYuR3l5tFklod4cAMygbUbmKqbCfN+rkpN3YJHwgzsF9jgAzMyoHpDmOI9sZTwTmVrMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=maHLEgR7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0F63C4CEFE;
-	Tue, 14 Oct 2025 09:12:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760433142;
-	bh=CDJ+sSMRFaP+/xhysWoc/+hKchwyBju2hWcXHYYiMKI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=maHLEgR79CF36xb0KLLfXu8dmnKPxMsqlkC1oPxzo0LYI9taVphjiwLjVv/KHdemS
-	 NjB2X3+GZythv1NF2p06LVCguJnTlbLj5EVw5BOn8Lq001AhEqF4EHvrrV888PULI4
-	 JQdLVHy0CvtiZlm0X1+o7O5vYxtBnOyPeK9edmy2yjdiEldnsof57kaTm75SQSowUi
-	 mW09ql94D4hPDbXyJnniWgoGKOT2katxT8HwCG+Zaax/XmVx7lKiyW0vrZTz+sbFR+
-	 brQDg3n8fX2CTQNt7hnD9ojEgymzK+cB3hJqlFDubpugRaBG1oWOykTq0KT4FAvWQB
-	 7hxDLwBMESf0A==
-Message-ID: <a97e6e1e-81bc-4a79-8352-9e4794b0d2ca@kernel.org>
-Date: Tue, 14 Oct 2025 11:12:16 +0200
+	s=arc-20240116; t=1760433468; c=relaxed/simple;
+	bh=xVt2KhMxkaUlBnmeC282awEVKhiozCUy/8oazMpuzgw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cxaUPQ7RB+uqloLL5qU3aHZv9Kz8wUC/HkKP5VUOin4o0P0SA+5ULY7vzT2FddAa1qLWJ+Qlsfu+ryaerL3O6bpA94tCQXwT7PG+LjApth5xllUKTr2zZrfMniX3lVD7qRdsMxob/CwDfuWEVEj6DZYCGcSBaIMnMFxhxHGYUEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=FI4c+NkK; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WhRG93at; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfout.phl.internal (Postfix) with ESMTP id 48D55EC0235;
+	Tue, 14 Oct 2025 05:17:44 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Tue, 14 Oct 2025 05:17:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
+	:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to; s=fm3; t=1760433464; x=1760519864; bh=62isxslHQy
+	oOt9jOlfr68WvoD6r2j2MzXP3zmd6RWDo=; b=FI4c+NkKW8mp11VHJ+5OYgJYAj
+	JatltGhAFrvKPKqMeI8veybq3H/ml7q8j6rI7x29NFAayBw1k9UaJm65kWuh11Ds
+	pzVnbQiQgxXBQL+I8GkPEepkwWC+zczh/89W/TEcJVEnAjtYBj/zhvOnt2CNDD4J
+	Q6M/Z5f4tEEmScoFdOQdJoj6bOKh3pw3TZsIVeGXI6ByS6G4qFKp35wFyCGSqK5d
+	m+rIvGnthjU8yR8B5Tji7CST2TzLl9kuVv+1M5043UzG8QRMehkg9ASqErYnhZ/a
+	+ebQSl3t+Kyt5NmnKRQCdi3exQiw6D1bqO2QCTekwe+hXZCst26qCX1Q8ccg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1760433464; x=1760519864; bh=62isxslHQyoOt9jOlfr68WvoD6r2j2MzXP3
+	zmd6RWDo=; b=WhRG93atYy+OsBOrvfARCEuY9xD4UJiL3bRjAAiSRUa2bN0/ijX
+	gQQQJ88THZNKe+xp8IcJfYRgN9y+eMqyZLsZKK80rxHysM+4MocZMRxknITjcMQ5
+	/NSwQLyXUjEpLZNRjvCxym+osu0VI3YotW/tnUVsRxIWqFcdDx4hb78E7cW0csMI
+	INHEEOcnu7gYbjfUZRedFofQ1IgInWPLUfUyq9BArquDpwN/Fw3iLJRm3fOOuc2L
+	M/kafJPWym0eHKtNoRHaPCWF3dlrGhY4O3+ZS8hbZbop7pwm+NWSFvLHkjRvDw5O
+	U6GzGf9kwT96MiggmCb6+SzElu9guC+75lw==
+X-ME-Sender: <xms:NxXuaIW8N59h9SwKrHPwCHFEqSEcxKT31wjzBqvMNLpj4n20BN4CYQ>
+    <xme:NxXuaDep4xm2-j5RIDbSziHARQVIq15BkgmHTDIzNitUq-ARg8zE204rWn3QrSD3u
+    DPhl9GWtxMtAAuxho6Wcx3_sTzW8Igqq9_W5bykoQzpq8gMkF7W-eY>
+X-ME-Received: <xmr:NxXuaEsJveMKjoJWhDX9w61oBvyyw3G8TpZWuilivtU4sCDtveAMzD8s6Oo4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvddtudehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffoggfgsedtkeertdertd
+    dtnecuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihs
+    nhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeejtdeugfffkeejfeehkeeiiedvje
+    ehvdduffevfeetueffheegteetvdfhffevffenucevlhhushhtvghrufhiiigvpedtnecu
+    rfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnh
+    gspghrtghpthhtohephedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepnhgvthgu
+    vghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshgusehquhgvrghshi
+    hsnhgrihhlrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopehjrghnnhhhsehgohhoghhlvgdrtghomhdprhgtphhtthhopehjohhhnhdrfh
+    grshhtrggsvghnugesghhmrghilhdrtghomh
+X-ME-Proxy: <xmx:NxXuaC-Bm-4SI7Jn4q0goBvZ9ZWFeRrt0m_gUoaNJBn2xgdzYGMpIQ>
+    <xmx:NxXuaP33r1yaeopHN0She4yl69L8muvcSTjD-ScS26nU4JXLgZvfpw>
+    <xmx:NxXuaHA-8pYoJNBplJAH_VB4mVWbwNZwgNsH1PrqWeLKHgp7D_pw6w>
+    <xmx:NxXuaLd9tu4CBHcuLeX5agi-fn5MtKunwYr1edNGi60H88oWunXhWw>
+    <xmx:OBXuaEYP_g_E9eKJGKFF_MokO8Kowi6GzaYl_o7_g5uNJbH7T-CJPkG7>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 14 Oct 2025 05:17:42 -0400 (EDT)
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: netdev@vger.kernel.org
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+	kuba@kernel.org,
+	jannh@google.com,
+	john.fastabend@gmail.com
+Subject: [PATCH net 0/7] tls: misc bugfixes
+Date: Tue, 14 Oct 2025 11:16:55 +0200
+Message-ID: <cover.1760432043.git.sd@queasysnail.net>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next v8 1/3] net: bonding: add broadcast_neighbor option for
- 802.3ad
-To: Tonghao Zhang <tonghao@bamaicloud.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Nikolay Aleksandrov <razor@blackwall.org>,
- Zengbing Tu <tuzengbing@didiglobal.com>
-References: <cover.1751031306.git.tonghao@bamaicloud.com>
- <84d0a044514157bb856a10b6d03a1028c4883561.1751031306.git.tonghao@bamaicloud.com>
-Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <84d0a044514157bb856a10b6d03a1028c4883561.1751031306.git.tonghao@bamaicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 27. 06. 25, 15:49, Tonghao Zhang wrote:
-> Stacking technology is a type of technology used to expand ports on
-> Ethernet switches. It is widely used as a common access method in
-> large-scale Internet data center architectures. Years of practice
-> have proved that stacking technology has advantages and disadvantages
-> in high-reliability network architecture scenarios. For instance,
-> in stacking networking arch, conventional switch system upgrades
-> require multiple stacked devices to restart at the same time.
-> Therefore, it is inevitable that the business will be interrupted
-> for a while. It is for this reason that "no-stacking" in data centers
-> has become a trend. Additionally, when the stacking link connecting
-> the switches fails or is abnormal, the stack will split. Although it is
-> not common, it still happens in actual operation. The problem is that
-> after the split, it is equivalent to two switches with the same
-> configuration appearing in the network, causing network configuration
-> conflicts and ultimately interrupting the services carried by the
-> stacking system.
-> 
-> To improve network stability, "non-stacking" solutions have been
-> increasingly adopted, particularly by public cloud providers and
-> tech companies like Alibaba, Tencent, and Didi. "non-stacking" is
-> a method of mimicing switch stacking that convinces a LACP peer,
-> bonding in this case, connected to a set of "non-stacked" switches
-> that all of its ports are connected to a single switch
-> (i.e., LACP aggregator), as if those switches were stacked. This
-> enables the LACP peer's ports to aggregate together, and requires
-> (a) special switch configuration, described in the linked article,
-> and (b) modifications to the bonding 802.3ad (LACP) mode to send
-> all ARP/ND packets across all ports of the active aggregator.
-> 
-> Note that, with multiple aggregators, the current broadcast mode
-> logic will send only packets to the selected aggregator(s).
-> 
->   +-----------+   +-----------+
->   |  switch1  |   |  switch2  |
->   +-----------+   +-----------+
->           ^           ^
->           |           |
->        +-----------------+
->        |   bond4 lacp    |
->        +-----------------+
->           |           |
->           | NIC1      | NIC2
->        +-----------------+
->        |     server      |
->        +-----------------+
+Jann Horn reported multiple bugs in kTLS. This series addresses them,
+and adds some corresponding selftests for those that are reproducible
+(and without failure injection).
 
-Hi,
+Sabrina Dubroca (7):
+  tls: trim encrypted message to match the plaintext on short splice
+  tls: wait for async encrypt in case of error during latter iterations
+    of sendmsg
+  tls: always set record_type in tls_process_cmsg
+  tls: wait for pending async decryptions if tls_strp_msg_hold fails
+  tls: don't rely on tx_work during send()
+  selftests: net: tls: add tests for cmsg vs MSG_MORE
+  selftests: tls: add test for short splice due to full skmsg
 
-this breaks broadcast bonding in 6.17. Reverting these three (the two 
-depend on this one) makes 6.17 work again:
-2f9afffc399d net: bonding: send peer notify when failure recovery
-3d98ee52659c net: bonding: add broadcast_neighbor netlink option
-ce7a381697cb net: bonding: add broadcast_neighbor option for 802.3ad
-
-This was reported downstream as an error in our openQA:
-https://bugzilla.suse.com/show_bug.cgi?id=1250894
-
-I bisected using this in qemu:
-systemctl stop network
-ip link del bond0 || true
-ip link set dev eth0 down
-ip addr flush eth0
-ip link add bond0 type bond mode broadcast
-ip link set dev eth0 master bond0
-ip addr add 10.0.2.15/24 dev bond0
-ip link set bond0 up
-sleep 1
-exec nmap -sS 10.0.2.2/32
-
-Any ideas?
-
-> - https://www.ruijie.com/fr-fr/support/tech-gallery/de-stack-data-center-network-architecture/
-> 
-> Cc: Jay Vosburgh <jv@jvosburgh.net>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Simon Horman <horms@kernel.org>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> Cc: Steven Rostedt <rostedt@goodmis.org>
-> Cc: Masami Hiramatsu <mhiramat@kernel.org>
-> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-> Cc: Nikolay Aleksandrov <razor@blackwall.org>
-> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
-> Signed-off-by: Zengbing Tu <tuzengbing@didiglobal.com>
-> ---
-> v8: add comments info in bond_option_mode_set, explain why we only
-> clear broadcast_neighbor to 0.
-> Note that selftest will be post after I post the iproute2 patch about
-> this option.
-> ---
->   Documentation/networking/bonding.rst |  6 +++
->   drivers/net/bonding/bond_main.c      | 66 +++++++++++++++++++++++++---
->   drivers/net/bonding/bond_options.c   | 42 ++++++++++++++++++
->   include/net/bond_options.h           |  1 +
->   include/net/bonding.h                |  3 ++
->   5 files changed, 112 insertions(+), 6 deletions(-)
-> 
-...
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-...
-> @@ -5329,17 +5369,27 @@ static netdev_tx_t bond_3ad_xor_xmit(struct sk_buff *skb,
->   	return bond_tx_drop(dev, skb);
->   }
->   
-> -/* in broadcast mode, we send everything to all usable interfaces. */
-> +/* in broadcast mode, we send everything to all or usable slave interfaces.
-> + * under rcu_read_lock when this function is called.
-> + */
->   static netdev_tx_t bond_xmit_broadcast(struct sk_buff *skb,
-> -				       struct net_device *bond_dev)
-> +				       struct net_device *bond_dev,
-> +				       bool all_slaves)
->   {
->   	struct bonding *bond = netdev_priv(bond_dev);
-> -	struct slave *slave = NULL;
-> -	struct list_head *iter;
-> +	struct bond_up_slave *slaves;
->   	bool xmit_suc = false;
->   	bool skb_used = false;
-> +	int slaves_count, i;
->   
-> -	bond_for_each_slave_rcu(bond, slave, iter) {
-> +	if (all_slaves)
-> +		slaves = rcu_dereference(bond->all_slaves);
-> +	else
-> +		slaves = rcu_dereference(bond->usable_slaves);
-> +
-> +	slaves_count = slaves ? READ_ONCE(slaves->count) : 0;
-
-OK, slaves_count is now 0 (slaves and bond->all_slaves are NULL), but 
-bond_for_each_slave_rcu() used to yield 1 iface.
-
-Well, bond_update_slave_arr() is not called for broadcast AFAICS.
-
-> +	for (i = 0; i < slaves_count; i++) {
-> +		struct slave *slave = slaves->arr[i];
->   		struct sk_buff *skb2;
->   
->   		if (!(bond_slave_is_up(slave) && slave->link == BOND_LINK_UP))
-> @@ -5577,10 +5627,13 @@ static netdev_tx_t __bond_start_xmit(struct sk_buff *skb, struct net_device *dev
->   	case BOND_MODE_ACTIVEBACKUP:
->   		return bond_xmit_activebackup(skb, dev);
->   	case BOND_MODE_8023AD:
-> +		if (bond_should_broadcast_neighbor(skb, dev))
-> +			return bond_xmit_broadcast(skb, dev, false);
-> +		fallthrough;
->   	case BOND_MODE_XOR:
->   		return bond_3ad_xor_xmit(skb, dev);
->   	case BOND_MODE_BROADCAST:
-> -		return bond_xmit_broadcast(skb, dev);
-> +		return bond_xmit_broadcast(skb, dev, true);
->   	case BOND_MODE_ALB:
->   		return bond_alb_xmit(skb, dev);
->   	case BOND_MODE_TLB:
-> @@ -6456,6 +6509,7 @@ static int __init bond_check_params(struct bond_params *params)
->   	eth_zero_addr(params->ad_actor_system);
->   	params->ad_user_port_key = ad_user_port_key;
->   	params->coupled_control = 1;
-> +	params->broadcast_neighbor = 0;
->   	if (packets_per_slave > 0) {
->   		params->reciprocal_packets_per_slave =
->   			reciprocal_value(packets_per_slave);
+ net/tls/tls_main.c                |  7 +---
+ net/tls/tls_sw.c                  | 31 ++++++++++++---
+ tools/testing/selftests/net/tls.c | 65 +++++++++++++++++++++++++++++++
+ 3 files changed, 92 insertions(+), 11 deletions(-)
 
 -- 
-js
-suse labs
+2.51.0
 
 
