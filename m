@@ -1,148 +1,175 @@
-Return-Path: <netdev+bounces-229114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AA79BD84E0
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:55:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E8E7BD8542
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:59:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 53E854EADB8
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:55:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 296EF4EB5A3
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:59:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27C4A2E62DC;
-	Tue, 14 Oct 2025 08:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F4E32DF706;
+	Tue, 14 Oct 2025 08:58:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="StxdurEr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mtXN8YGD"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A76E2DC785
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB28C29ACF0
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:58:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760432112; cv=none; b=kbu7//Z3NLz2tdMUfCkLS14I75ZgAh985Gwt3ntWY8Qd1if/Sr51BCUsw+vJwpde/1VVjdhkGyFFifLexCUTz00ndYo7KfPzKq4Y3QLIPGvPZhnHVUbmFSUxEMQBX67RdyHh75KGcwMhmromflsRjFZQ96d6aDH5LXRbpPLVESw=
+	t=1760432337; cv=none; b=iIqqu5s9cdbz+f0WxoS3Ehx0Zf93qXjKslXUul3WXnHK4gwscOQoaoGF27FEtBZP8bcK8i5C+CcGMBhCfPvEN4gIUDgQzdKUgFiFv57YzWVuie5LKgew5NE1PeHXHc+bkfOTs9DCfiXyjnDGkjVlLbQNVaxBBkwF8o2UAh7ft9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760432112; c=relaxed/simple;
-	bh=XmVZxL3Grj83XcH+ZS+ytQRp6em9DeekCbOWgku9hIM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hVd7kiab5i8R0SYqp+nHTTwVw42l49G/L+tDdf7xHM9ZoojHDST3nsmhLmfnVeQ6t7yXuhj5yFv8ba2S7ap23j46spwDZMt5mtkyRiwIjh3LemadcDO1BkzYVQ+w0g+DI/F93htW61iZ/DnyMITnTrBYEU/qJqtAFGwfQQmyVTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=StxdurEr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760432109;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oqPRg2ro9xBxSN344p+L1BaUDWdpu8yzEem7qRevF4M=;
-	b=StxdurErTIoq+NM1wwW/TnqHu/8aytOHZ5WFOOJcbmZ98gx59zfPUSz7FaTMBxyybx2skr
-	RAq5rKrm4mDCZeku++WUxEkB/pq5sDl2oGGhI2Wm5zIRqyHmMRrvRdkDQM/tIzOMClbECh
-	QHd+aOgyDzg3lL5vCrESwTID7/24T4A=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-377-z3Rwr1oROGeL4Tnngyqi8w-1; Tue, 14 Oct 2025 04:55:08 -0400
-X-MC-Unique: z3Rwr1oROGeL4Tnngyqi8w-1
-X-Mimecast-MFC-AGG-ID: z3Rwr1oROGeL4Tnngyqi8w_1760432107
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3fba0d9eb87so3157099f8f.0
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:55:08 -0700 (PDT)
+	s=arc-20240116; t=1760432337; c=relaxed/simple;
+	bh=k7HmEga+OGGjtgmIR/2QroLQNi9uv52kHnYxNBFHLV4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GMO/lvyuOHX4OP4pUdvo2AlEdroiPi5n2QB/JY3H+VvmMBuAzFo1KzT8Lk66XFW9zheuUdZV/y8dSO5l3UDUW9HbgApuNmSDjLuwbYhsuMeYVzj6in22i7c4iw0g5QG0P+903etPvPMokNNuKbPpUmElnM7Ox/ExfBmmws/yS9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mtXN8YGD; arc=none smtp.client-ip=209.85.222.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-930c4cd6ccbso2360895241.3
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:58:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760432335; x=1761037135; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gLYcGa961yhxxYkbsF/rLk6YVjYontQ0KHKihOwI8T4=;
+        b=mtXN8YGDM0aISxB1DFvAzepVL1SlQTXIBH/eXYSynkkF62flVL0bcfSFF4YgFvOE2Z
+         VDZ+HZjn6sMYNJus6FjEkZ3JKqpk577g14t6Ap5QU2EZzHfn7PbH8tuL1/+8Bxpe8a1W
+         mfeQvTRWaXHGTsMcUE4KHla8XG6jkqEDdvmiyP8sYQyOtJUrKYVUfMxcqsGDP7l6eXU7
+         jgrAztgdpiFtHXrQd1eDz0dCaeAAEpaOq9mPhm1fEbbtOosJeiKm8U27IyoQ4NFA47YZ
+         DEj2P1BxTsuQsxF5hwByvDFU5D5Y2Bz+jB5vvMCT3wj2fRo5rv/jn0chWIYmoNifgLNS
+         9Xgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760432107; x=1761036907;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oqPRg2ro9xBxSN344p+L1BaUDWdpu8yzEem7qRevF4M=;
-        b=QYXzuX13wxeUDUmEkcqyWmhk9Zf9uccR8r8886fk0pUTcahiOhcpL1pgouF/2qfrdt
-         /bzPab7h8OhENXSRFwmgKPTr00f1Mq5ThiS2eaXAPV2yxN2l7Wlvm0uliSEq1sz/lMAN
-         u1ZSfkbVUo4dxtA+CvtS1MJhAtQD5VHee8SXzj1fgwlYKOCwDAhTZeB2sTDvZTrWDTEe
-         XJGORUvPWJ+COqqbihi9SnkToM5LT7eB/LWh4P1zBAGc+qDF0DZI7UlTzDh09qJ5nHOv
-         Au2WEUZ9+QRuRteaMxys5ODwwap+Jnbda0C+7pZh+pXafCVXCB29ES9CBA5b26/NcDmg
-         xeNA==
-X-Forwarded-Encrypted: i=1; AJvYcCWBXcSn2RcYI/32QXI3GoRJP7gyzZDAK8bmNhEyEi+/rwobRgygKUjSRenQz4DXBnfaKdGlLiY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5uO7vwcyC25u89qts0EgtLirw/ejElt0DcYUGqzT67BJaFzeb
-	i6MM6YjBKDxoKhQ217aFVXmqAaW/EDii3PhH3bHovrJGAQsKt6ugnS01qpCXd/Kho0zBV5KaOln
-	seFdTBcMK8s5ox8kPWsWDl+2HD9HSdxwfHAnWUnUXbCibyGjdpTwlBVmo6g==
-X-Gm-Gg: ASbGncvqyuZy4dQhn2StdS3k7HZsCK6o7Lqw+5IabP5kkhkURlSMo5x6UGmduAxmJVq
-	MzWfvcavQeMPPEt5/nOyagSM5eL1ZdAfTEa3ejUY9RO5sut+y1SaYD9octkWdkYUnA+/pJTjwcA
-	/4XkjEUUlqmlK0HoX9t7f5DcWxgajF7vt6FV9NamYW6xhwsEtxeYxmH/LbhRf7PnbdtD1Lk6HYN
-	o5RS3W99/bHN1ww3fPKafwke6ky0SUWu3NJv8wtcSeD8fuTYPMVsYmy3XaCZ4POvlyCgDoLnJkw
-	dmchiW0q9RyTPpgsR1Oiwv+kFAiZrQYIK9OQOoLD932dbYg58kzLfs+BRGUZRh0GCZOX24e2lJZ
-	y42UvfeT6rI/f
-X-Received: by 2002:a05:600c:3b11:b0:46e:59aa:cd51 with SMTP id 5b1f17b1804b1-46fa9a86409mr173314155e9.6.1760432106984;
-        Tue, 14 Oct 2025 01:55:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHX8BWcTcunxn8A9kC7sxirtAX54R59ktx6EDeNPIPV0tcKePqF0T2wrbrVTpQwz92Plcrflg==
-X-Received: by 2002:a05:600c:3b11:b0:46e:59aa:cd51 with SMTP id 5b1f17b1804b1-46fa9a86409mr173313855e9.6.1760432106631;
-        Tue, 14 Oct 2025 01:55:06 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fab36a773sm153672205e9.0.2025.10.14.01.55.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Oct 2025 01:55:06 -0700 (PDT)
-Message-ID: <22bfd253-7d0b-4323-8314-5f4f49cc3dd0@redhat.com>
-Date: Tue, 14 Oct 2025 10:55:04 +0200
+        d=1e100.net; s=20230601; t=1760432335; x=1761037135;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gLYcGa961yhxxYkbsF/rLk6YVjYontQ0KHKihOwI8T4=;
+        b=LDuKS+TUoZlG4QquiKxBD7Rd65JM4rxNUjqjjBqaQsU8V0SzOgDmBiuKImG79sU7OM
+         jnGbrryhyptvoA5YQKZhlNfEzjVgLqI3GRjDDJhooFAzChWn+d5GoFzkcvxiWSOAyZAB
+         OWE183gjjHo7qfGZiS3efNEm47xRvSjXwNHrOOJwgVrOto4wJQJaCEk6PCHeGrb0AGK7
+         KZdLWCMonX2eI0dvOqngsPvSm5WDBXzIKmgQrVGbdA/VV00ryH7XuUw1Rumecf44Qogs
+         OiqV1stgMg0QegGnYykPOXmgH8wrgPMEzNWqOAeyLhFUOct6FchZ/roN1rAy6ktD9umy
+         SWrg==
+X-Forwarded-Encrypted: i=1; AJvYcCUyW6y8/vEnw3KaO/wnNzU3WRsPpXx9mSrsuyj5rdu+Bvz3k3zChCjVIOF9ijH1+1YbIX6zUfo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2cBUTr1e1gg43V2ftSjmRKuW6AvIPClOqjlbaPJroe8xczBHC
+	xcxtRwppPh+VnJE3TfXgkepMwHPUoKHfWUwheqwrrv6Y8QXltxw/5xH4B3da3TzaLnrxoA4Y84W
+	48u/COlu2N0+TPJjo8jZYDXHv7uCH1/A=
+X-Gm-Gg: ASbGnctSJUkgtXlrexHzHLM03oXhFbmVolM8RT8f2eCI0n5qnOhT63FWWkTz+iZWG46
+	dZmkApikh7lO1k2w9aPekYmSBE0/jcinkgjfawpFejIXTLSrL2Q9WyrDDUMitFXR1lGkZab69Kx
+	8Ggbc7hXXw1dG5SOz2ceZgxzyO6OkbF4EByR5IgcdQ50K08xC5b7JycV8Y77fFBdQzuJEN3Dcvq
+	XgrjCkRdsYcnHM/u9j0aajYSs+etMJEHdI6BKtzNp/VuXheD1XTdzm4mA==
+X-Google-Smtp-Source: AGHT+IGX4PksrMyWa5G15wFPdlRrAfYAlpyBh8eq+zBl1laEShj5dhtzQCGqBWE2Cgx+teji5G7o41ixrF4TOb83K1Q=
+X-Received: by 2002:a05:6102:3e14:b0:529:e9a5:c216 with SMTP id
+ ada2fe7eead31-5d5e22127b3mr9320305137.4.1760432334547; Tue, 14 Oct 2025
+ 01:58:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] udp: drop secpath before storing an skb in a receive
- queue
+References: <20251013101636.69220-1-21cnbao@gmail.com> <aO11jqD6jgNs5h8K@casper.infradead.org>
+ <CAGsJ_4x9=Be2Prbjia8-p97zAsoqjsPHkZOfXwz74Z_T=RjKAA@mail.gmail.com> <CANn89iJpNqZJwA0qKMNB41gKDrWBCaS+CashB9=v1omhJncGBw@mail.gmail.com>
+In-Reply-To: <CANn89iJpNqZJwA0qKMNB41gKDrWBCaS+CashB9=v1omhJncGBw@mail.gmail.com>
+From: Barry Song <21cnbao@gmail.com>
+Date: Tue, 14 Oct 2025 16:58:43 +0800
+X-Gm-Features: AS18NWBgpajHqeXyjq2SfshUK90UReXA3HYugsOOoYy5fZXYwfWha3ufAj0-PzY
+Message-ID: <CAGsJ_4xGSrfori6RvC9qYEgRhVe3bJKYfgUM6fZ0bX3cjfe74Q@mail.gmail.com>
+Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network buffer allocation
 To: Eric Dumazet <edumazet@google.com>
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- Michal Kubecek <mkubecek@suse.cz>
-References: <20251014060454.1841122-1-edumazet@google.com>
- <aO3voj4IbAoHgDoP@krikkit> <c502f3e2-7d6b-4510-a812-c5b656d081d6@redhat.com>
- <CANn89i+t9e6qRwvkc70dbxAXLz2bGC6uamB==cfcJee3d8tbgQ@mail.gmail.com>
- <CANn89iJguZEYBP7K_x9LmWGhJw0zf7msbxrVHM0m99pS3dYKKg@mail.gmail.com>
- <CANn89iK6w0CNzMqRJiA7QN2Ap3AFWpqWYhbB55RcHPeLq6xzyg@mail.gmail.com>
- <CANn89iLKAm=Pe=S=7727hDZSTGhrodqO-9aMhT0c4sFYE38jxA@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CANn89iLKAm=Pe=S=7727hDZSTGhrodqO-9aMhT0c4sFYE38jxA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Cc: Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org, linux-mm@kvack.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Barry Song <v-songbaohua@oppo.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	Brendan Jackman <jackmanb@google.com>, Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Huacai Zhou <zhouhuacai@oppo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/14/25 10:27 AM, Eric Dumazet wrote:
-> On Tue, Oct 14, 2025 at 1:06 AM Eric Dumazet <edumazet@google.com> wrote:
->> Perhaps not use skb_release_head_state() ?
->>
->> We know there is no dst, and no destructor.
->>
-> 
-> An no conntrack either from UDP
-> 
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 95241093b7f0..932c21838b9b 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -1851,8 +1851,13 @@ void skb_consume_udp(struct sock *sk, struct
-> sk_buff *skb, int len)
->                 sk_peek_offset_bwd(sk, len);
-> 
->         if (!skb_shared(skb)) {
-> -               if (unlikely(udp_skb_has_head_state(skb)))
-> -                       skb_release_head_state(skb);
-> +               if (unlikely(udp_skb_has_head_state(skb))) {
-> +                       /* Make sure that skb_release_head_state()
-> will have nothing to do. */
-> +                       DEBUG_NET_WARN_ON_ONCE(skb_dst(skb));
-> +                       DEBUG_NET_WARN_ON_ONCE(skb->destructor);
-> +                       DEBUG_NET_WARN_ON_ONCE(skb_nfct(skb));
-> +                       skb_ext_reset(skb);
-> +               }
->                 skb_attempt_defer_free(skb);
->                 return;
->         }
+On Tue, Oct 14, 2025 at 1:04=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Mon, Oct 13, 2025 at 9:09=E2=80=AFPM Barry Song <21cnbao@gmail.com> wr=
+ote:
+> >
+> > On Tue, Oct 14, 2025 at 5:56=E2=80=AFAM Matthew Wilcox <willy@infradead=
+.org> wrote:
+> > >
+> > > On Mon, Oct 13, 2025 at 06:16:36PM +0800, Barry Song wrote:
+> > > > On phones, we have observed significant phone heating when running =
+apps
+> > > > with high network bandwidth. This is caused by the network stack fr=
+equently
+> > > > waking kswapd for order-3 allocations. As a result, memory reclamat=
+ion becomes
+> > > > constantly active, even though plenty of memory is still available =
+for network
+> > > > allocations which can fall back to order-0.
+> > >
+> > > I think we need to understand what's going on here a whole lot more t=
+han
+> > > this!
+> > >
+> > > So, we try to do an order-3 allocation.  kswapd runs and ... succeeds=
+ in
+> > > creating order-3 pages?  Or fails to?
+> > >
+> >
+> > Our team observed that most of the time we successfully obtain order-3
+> > memory, but the cost is excessive memory reclamation, since we end up
+> > over-reclaiming order-0 pages that could have remained in memory.
+> >
+> > > If it fails, that's something we need to sort out.
+> > >
+> > > If it succeeds, now we have several order-3 pages, great.  But where =
+do
+> > > they all go that we need to run kswapd again?
+> >
+> > The network app keeps running and continues to issue new order-3 alloca=
+tion
+> > requests, so those few order-3 pages won=E2=80=99t be enough to satisfy=
+ the
+> > continuous demand.
+>
+> These pages are freed as order-3 pages, and should replenish the buddy
+> as if nothing happened.
 
-LGTM, thanks!
+Ideally, that would be the case if the workload were simple. However, the
+system may have many other processes and kernel drivers running
+simultaneously, also consuming memory from the buddy allocator and possibly
+taking the replenished pages. As a result, we can still observe multiple
+kswapd wakeups and instances of over-reclamation caused by the network
+stack=E2=80=99s high-order allocations.
 
-/P
+>
+> I think you are missing something to control how much memory  can be
+> pushed on each TCP socket ?
+>
+> What is tcp_wmem on your phones ? What about tcp_mem ?
+>
+> Have you looked at /proc/sys/net/ipv4/tcp_notsent_lowat
 
+# cat /proc/sys/net/ipv4/tcp_wmem
+524288  1048576 6710886
+
+# cat /proc/sys/net/ipv4/tcp_mem
+131220  174961  262440
+
+# cat /proc/sys/net/ipv4/tcp_notsent_lowat
+4294967295
+
+Any thoughts on these settings?
+
+Thanks
+Barry
 
