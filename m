@@ -1,137 +1,176 @@
-Return-Path: <netdev+bounces-229101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15838BD82E0
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:30:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12A80BD8317
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:33:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7BC13B9920
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:30:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FCE7423628
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:33:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65FCB30F921;
-	Tue, 14 Oct 2025 08:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD3730F53D;
+	Tue, 14 Oct 2025 08:33:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="swJo4U9a"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4G4MFTvH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2EE24A046
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412102DCF5B
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760430604; cv=none; b=gBWqHJ6aLS4MigECh8W3sXE9U+H5EZZFXSK0ulcwqrqtyI7cur9XUBnjDPI+ToU2PeYZD+Bj02G1JZyoWp2s3dE8SO7VxmlaXnATyG2tp9NNbS/3XXk/hnkkFSrFK+kvxj3v+tBEn/KEJDeh4Vh1/s6/T1qgZOEeke7DSl2YxdU=
+	t=1760430818; cv=none; b=AZ0R1Z/VVYbxMaL+Uhaye3VuPCLrOhib50T/O/gzPaH5dl1n1nqzohF2GKqMVbRpCUdhEXoe0D/PIW6z1BCD3XURUhwu8JbI+waxOR2yEFE89Lar9tww5KNiKTA3z2S0kFh5iUuYK3ysXbFxd9nzAA1VCaYgoDgBLZm6fmsjHSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760430604; c=relaxed/simple;
-	bh=TesxODKziGU9W7eGyPR3WzVG+TN2W2VglPXs2zQjW5I=;
+	s=arc-20240116; t=1760430818; c=relaxed/simple;
+	bh=rmbd0/SmSIL0MhnxOdWl4HO3LgnmKXWuvHx3vCvjCrU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UWTCld2dW2gS6EHNXE/V8I03FK2gB6OogCkNUHeMQ7s+1Z8NdspTdV+iGBR/bKLMu6dxPceHWb2gK0EEb6Ggh21L+CfIE6QNzHs1AOGJAuuvdpmBjG0e6MUzE2xUYWdlkC97cITVz4tFrrmKp5S/Jc+OPMYmZ3moQwIYjA0wKCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=swJo4U9a; arc=none smtp.client-ip=209.85.219.53
+	 To:Cc:Content-Type; b=O4dmCGFJtdaDTNh90Z+SFIlmrCslnkyPIdzr7cCA/QL/7fIfAf21T6/8V/3bWTJTdep1Fv0jt/CbUvPbSy4TVVN1GpHUjaLvglL4VE9l/d4hSH9sQ6ohfAyPLD64FIuycZsDTnl4KfjYupoYpChs9cUZvTmK/lYfwA9LudpP6cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4G4MFTvH; arc=none smtp.client-ip=209.85.219.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-799572d92b0so66870056d6.3
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:30:02 -0700 (PDT)
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-79ad9aa2d95so88478706d6.1
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:33:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760430602; x=1761035402; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760430816; x=1761035616; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xXmgDIF1sFqL6K9TWHB3ywbQ4jmUGZeIqIRTxjmCg0M=;
-        b=swJo4U9a+E0e5TWqvlHiO3P0v+PZBSbBdKd5pjXSbnQ76QfSc1f94ZJDG0e95tmCxM
-         IituxPrQ/YW9nnsxK+Eegwyk6jUu3G6H4IXuW3R0jZdN/E7azBoLokOIB8QjWN1C+07K
-         B2q7FpvGi/Ngja08pQoEYLaH+9oLv3XTPQGLg9nPZhEGGWOOWgSaWSMIQXmwdFP9iBeo
-         4XQWLYkZjROPI44luXz9juLqp/pUg6sG3kCQoRReJ2eZt8Yba66IImazptpbVVjXpPQB
-         BrSmnMiHXKyIhV7rM+2L3QAvMy2nvKDMdt5GV3gpdL+Ha+B2vOzaBxSMcB5GRvosLcD/
-         xK5Q==
+        bh=G5ki8eO3D7Ty74myIbidYqj2332TSTDOhoTV2Fp3soE=;
+        b=4G4MFTvHQ8n88JaeEMUSceir98f73ZFK415GwLkWnxCJ7PUZPwE+gyRMbTsI+7x+Wj
+         yaedIaUNBoOqZ8Hc4OEpbmxxEUwQ8wT6iZvY+nCItUqEjXi40IsCJxijLJtxeVag9WkA
+         mJqCZgNkcG6q2MhaCGYTWyUGhuu8rR28yS0dc1ej1CCbl+1jDHULE4TR/otB6wGsS3vw
+         csvhZ0NeLzX8qsmWU79qW3jMVMYy93iAGnEzt0hWyoZN20HXDgIZyGP8apvPgMo2JSr9
+         3CRJJhUqXydW35a/2cIEdhIrse0D6+xPqt1PoI2j/D9LpED0QXiB/hx5B/NCb/6LPWyW
+         kH2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760430602; x=1761035402;
+        d=1e100.net; s=20230601; t=1760430816; x=1761035616;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xXmgDIF1sFqL6K9TWHB3ywbQ4jmUGZeIqIRTxjmCg0M=;
-        b=rP9xXzRWJR2FU/gYQdN4sUpv6rbqnJ6WNMfhg0s3X0QaYTmxiHPvdbqj09TdSeHKuV
-         TjieIwHgV1DUSAAyxwUEzyRbzNjMQpjiVLgBccBbaB1eb3Jgn+SJX3QSjd8/U5HWyeZv
-         SR9fpv+I+w+SmbxCviyWnCesHij/ubLywBVDM+Ugj+ghfyvBb/zOKYocm3icJl+lqNqN
-         qxY0r9NpebEfc1KEACz7S+RG6nEgZ9I+/tZhsRDvwXppIz7/6To9w/hTE3d8oud0WtdJ
-         bkLPjgxLExt3nDKCvCe+vaI4lIggR3OLdas+rEOgdK7OCUtetO7tKOoBm2vCrLAxP/5V
-         /AeA==
-X-Forwarded-Encrypted: i=1; AJvYcCXtv/kxowxT98NE8rsBrBGFYfvvde1XSxXuBn5NMZqXGMdM9cXGX0F2Vj+LiwawLiu5Y6YP64E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfWEI1lL9y71a9+iGUMNxfN7jAvHOZTaMtjSV+RvWJuBcOHgsA
-	noODSz6+hYNA61iYZyouAGjsOtW3uhjZ5gybuHwRI9UcN2RSS+6PYoocxCVwIZymXK7DuSZR1cE
-	YWlb9V8uD5jKwTj00ECsyOIW8EIbm6ErKZP4nr6WH
-X-Gm-Gg: ASbGnctjwX0Z0lX3vS4oqwK68HioenKj9e/tFfx7EKyYjJSWhf2wUHc9wdFCQsCyY4g
-	nMYq5PZlyqBQUdd86IxJjASw85BoAUSkyzRNcba+ItXiHCPeuos0gM49K3dijWdk/QOlS7PbLCO
-	S6hylt7h/ZtlK+Q/DmF2zjvPxOpcXO6BfJd5+wvFW96ZS4vbMtTNrFXlpPt8Rgto/kGaY5QCdMv
-	yKCQvVeBbXbPoMYT0k24f5csG3glAaeL298KtQcvgg=
-X-Google-Smtp-Source: AGHT+IGkPpVMIvZfA2IQGSAz8UXRG4sEt4rJvn8s73ceXC5wE5vkmTf95J1Hr5ZThEjiu5nMcZR/U5ZDd3AwgiJW1Eo=
-X-Received: by 2002:ac8:5d50:0:b0:4e7:251e:e1cc with SMTP id
- d75a77b69052e-4e7251eeaecmr95046941cf.27.1760430601331; Tue, 14 Oct 2025
- 01:30:01 -0700 (PDT)
+        bh=G5ki8eO3D7Ty74myIbidYqj2332TSTDOhoTV2Fp3soE=;
+        b=ZyU5pZkpK5MHYnk0uPQ+EVU6t4vpfcca8GPjuM+ncpDiqQ+nk31cWwUaQhtQTcjL2f
+         7ol6gsyOLpV/0pZol0rYpiSMvbVAiAPB7axTr2PHYd/fiXFzpi7d4giupBGmH795Rn+C
+         WWNvY22s6Gk6mVgFobJ59h8rXUr1DaFjYRBiZPRR+ews7yxvZQmWUJupbA2tlC/ZCkOb
+         MAWXHQ4+IdePA4P7D/y63pcB4jH5RbocbNsdlY+Fhvl9LKHrl1zwoRVPHax081YiZGUe
+         auATmaP/+1mv6IrAGTeTUTMv9r6XZpgiwEdUZv3LsA59s2RFG/shymt6H1lv196136YW
+         RCJA==
+X-Forwarded-Encrypted: i=1; AJvYcCXc4513vA3+b0Q9GvjLH8zs8Sk/lkrI37LrY9ozJShoJ1dJud6owrsGazde3GQOvzlukjM0X4M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDmniy47YC1YY5g6melEFaJyyWYQv5iLAE02nzbDUBJdrJyDTs
+	9SJWwbxBV/JtS6HhjLw3wUfj6ihh7cdE/Dimpbina4Lugbdhx93dKNCufuB4Sz5a798YDLaw1Q+
+	1t8MWL0kz9XtSVrSkmgTJyTHM53Rp5wweJPMEJRPqcGDHA3sVQL7m3kbr
+X-Gm-Gg: ASbGnct8zzpq3XTdPZwKy0MjyPR28fDyYITjyJEIhD7wj7BZPGxLVF+jHPEhAiAD0LG
+	ul372Yk6FnwvwKjwuZBgH7WVipusUDNFdyWce/mZUjPeCnEcxng5aQYyrkm3g5g32O4uyvp/UJ+
+	bB2sMAl7iRE0CF2pyj3/E4ZQ4SRq9R0ielG1R/zmyuGXmxdw7fs0yijEKHrUPLJ6CivIk13LUeo
+	zBrZAHBFdzOw1MrMo6SPqpIjcRitKn2
+X-Google-Smtp-Source: AGHT+IFH54MT50hNqDb6HE6AU0St/fKsTDcWdJom82KiknKN60SG1UT50A/i9xfKyb2sSd1IDZ8yOsF3iF/RL5GTQ4U=
+X-Received: by 2002:ac8:5755:0:b0:4e7:2b6a:643a with SMTP id
+ d75a77b69052e-4e72b6a671cmr60433281cf.12.1760430815645; Tue, 14 Oct 2025
+ 01:33:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251013145926.833198-1-edumazet@google.com> <3b20bfde-1a99-4018-a8d9-bb7323b33285@redhat.com>
-In-Reply-To: <3b20bfde-1a99-4018-a8d9-bb7323b33285@redhat.com>
+References: <20251014060454.1841122-1-edumazet@google.com> <aO3voj4IbAoHgDoP@krikkit>
+ <c502f3e2-7d6b-4510-a812-c5b656d081d6@redhat.com> <CANn89i+t9e6qRwvkc70dbxAXLz2bGC6uamB==cfcJee3d8tbgQ@mail.gmail.com>
+ <CANn89iJguZEYBP7K_x9LmWGhJw0zf7msbxrVHM0m99pS3dYKKg@mail.gmail.com>
+ <CANn89iK6w0CNzMqRJiA7QN2Ap3AFWpqWYhbB55RcHPeLq6xzyg@mail.gmail.com> <aO4JqeYJftHa-I8O@krikkit>
+In-Reply-To: <aO4JqeYJftHa-I8O@krikkit>
 From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 14 Oct 2025 01:29:49 -0700
-X-Gm-Features: AS18NWCPvaVgui9h6mLynr2pYgfII83Q4Tf3p-Gxh3XMVC2VPd2xNrgfFwqqZLo
-Message-ID: <CANn89iKu7jjnjc1QdUrvbetti2AGhKe0VR+srecrpJ2s-hfkKA@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: better handle TCP_TX_DELAY on established flows
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
+Date: Tue, 14 Oct 2025 01:33:24 -0700
+X-Gm-Features: AS18NWAOuBILqWC2YQZIUDNrGMhSRr31kxh5jDbSfWP5BfgZalObTIcjz-PByH0
+Message-ID: <CANn89iJLDmLZAxOJE0DV5HinTXZVCviBxn1OJBOorddNNywtCg@mail.gmail.com>
+Subject: Re: [PATCH net] udp: drop secpath before storing an skb in a receive queue
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Paolo Abeni <pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Michal Kubecek <mkubecek@suse.cz>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 14, 2025 at 1:22=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Tue, Oct 14, 2025 at 1:28=E2=80=AFAM Sabrina Dubroca <sd@queasysnail.net=
+> wrote:
 >
-> On 10/13/25 4:59 PM, Eric Dumazet wrote:
-> > Some applications uses TCP_TX_DELAY socket option after TCP flow
-> > is established.
+> 2025-10-14, 01:06:04 -0700, Eric Dumazet wrote:
+> > On Tue, Oct 14, 2025 at 1:01=E2=80=AFAM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > On Tue, Oct 14, 2025 at 12:43=E2=80=AFAM Eric Dumazet <edumazet@googl=
+e.com> wrote:
+> > > >
+> > > > On Tue, Oct 14, 2025 at 12:32=E2=80=AFAM Paolo Abeni <pabeni@redhat=
+.com> wrote:
+> > > > >
+> > > > >
+> > > > >
+> > > > > On 10/14/25 8:37 AM, Sabrina Dubroca wrote:
+> > > > > > 2025-10-14, 06:04:54 +0000, Eric Dumazet wrote:
+> > > > > >> Michal reported and bisected an issue after recent adoption
+> > > > > >> of skb_attempt_defer_free() in UDP.
+> > > > > >>
+> > > > > >> We had the same issue for TCP, that Sabrina fixed in commit 9b=
+6412e6979f
+> > > > > >> ("tcp: drop secpath at the same time as we currently drop dst"=
+)
+> > > > > >
+> > > > > > I'm not convinced this is the same bug. The TCP one was a "leak=
+ed"
+> > > > > > reference (delayed put). This looks more like a double put/miss=
+ing
+> > > > > > hold to me (we get to the destroy path without having done the =
+proper
+> > > > > > delete, which would set XFRM_STATE_DEAD).
+> > > > > >
+> > > > > > And this shouldn't be an issue after b441cf3f8c4b ("xfrm: delet=
+e
+> > > > > > x->tunnel as we delete x").
+> > > > >
+> > > > > I think Sabrina is right. If the skb carries a secpath,
+> > > > > UDP_SKB_IS_STATELESS is not set, and skb_release_head_state() wil=
+l be
+> > > > > called by skb_consume_udp().
+> > > > >
+> > > > > skb_ext_put() does not clear skb->extensions nor ext->refcnt, if
+> > > > > skb_attempt_defer_free() enters the slow path (kfree_skb_napi_cac=
+he()),
+> > > > > the skb will go through again skb_release_head_state(), with a do=
+uble free.
+> > > > >
+> > > > > I think something alike the following (completely untested) shoul=
+d work:
+> > > > > ---
+> > > > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > > > index 95241093b7f0..4a308fd6aa6c 100644
+> > > > > --- a/net/ipv4/udp.c
+> > > > > +++ b/net/ipv4/udp.c
+> > > > > @@ -1851,8 +1851,10 @@ void skb_consume_udp(struct sock *sk, stru=
+ct
+> > > > > sk_buff *skb, int len)
+> > > > >                 sk_peek_offset_bwd(sk, len);
+> > > > >
+> > > > >         if (!skb_shared(skb)) {
+> > > > > -               if (unlikely(udp_skb_has_head_state(skb)))
+> > > > > +               if (unlikely(udp_skb_has_head_state(skb))) {
+> > > > >                         skb_release_head_state(skb);
+> > > > > +                       skb->active_extensions =3D 0;
+> > >
+> > > We probably also want to clear CONNTRACK state as well.
 > >
-> > Some metrics need to be updated, otherwise TCP might take time to
-> > adapt to the new (emulated) RTT.
+> > Perhaps not use skb_release_head_state() ?
 > >
-> > This patch adjusts tp->srtt_us, tp->rtt_min, icsk_rto
-> > and sk->sk_pacing_rate.
-> >
-> > This is best effort, and for instance icsk_rto is reset
-> > without taking backoff into account.
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > We know there is no dst, and no destructor.
 >
-> The CI is consistently reporting pktdrill failures on top of this patch:
+> Then, do we need to do anything before calling skb_attempt_defer_free()?
+> skb_attempt_defer_free() only wants no dst and no destructor, and the
+> secpath issue that we dealt with in TCP is not a problem anymore.
 >
-> # selftests: net/packetdrill: tcp_user_timeout_user-timeout-probe.pkt
-> # TAP version 13
-> # 1..2
-> # tcp_user_timeout_user-timeout-probe.pkt:35: error in Python code
-> # Traceback (most recent call last):
-> #   File "/tmp/code_T7S7S4", line 202, in <module>
-> #     assert tcpi_probes =3D=3D 6, tcpi_probes; \
-> # AssertionError: 0
-> # tcp_user_timeout_user-timeout-probe.pkt: error executing code:
-> 'python3' returned non-zero status 1
->
-> To be accurate, the patches batch under tests also includes:
->
-> https://patchwork.kernel.org/project/netdevbpf/list/?series=3D1010780
->
-> but the latter looks even more unlikely to cause the reported issues?!?
->
-> Tentatively setting this patch to changes request, to for CI's sake.
+> Can we just drop the udp_skb_has_head_state() special handling and
+> simply call skb_attempt_defer_free()?
 
-I will take a look, thanks.
-
-I ran our ~2000 packetdrill tests for the tcp_tso_should_defer() fix,
-but had no coverage yet for TCP_TX_DELAY, and started adding
-packetdrill tests for that.
+Good point ! I need a second cup of coffee !
 
