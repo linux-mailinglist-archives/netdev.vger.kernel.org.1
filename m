@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-229084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14503BD8147
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:05:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DE15BD8159
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:05:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE7A31922755
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:04:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95C291921D01
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:04:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2253230F958;
-	Tue, 14 Oct 2025 08:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270E930FC10;
+	Tue, 14 Oct 2025 08:03:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dE4Gb+Wq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g2C41zQJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836EA30F94C
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE2730FC06
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760428975; cv=none; b=qv6ku4PlR50O5ilBp/Hq5xCdJP9PQQohEFmC3DaPBFkww7l/koNVNfjoac1vcs+z9of79n5JjfW/QADOOnCqTVeqjww14CT3/S9Be1jt2nrs2kAZF6I3xLzfCWEPrMFv5gIRP1vBIS8rQm7fy6P54vXjo/wDjiRr0Ngd6aDBtSQ=
+	t=1760428983; cv=none; b=nR83jWlMMyN5N8cDRVHRk06VN3I2ZMH5iSwGhIjXNkAxyeIvxSnt09wsEQ6arBPlg8bL0ZzX1s/ya4GcX2P3exzBgEMVQpViZc4iIVRD2kLNMx/Zc/CzQek7ZPxeUvXVbeApXXkCtZH42s8mcgsjGlsAgPVv+rpFRT9NEWNVLpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760428975; c=relaxed/simple;
-	bh=v/wIJVHymXR0j0ByP0dl5kdKBXrbvxjnB4cnfrt0E4M=;
+	s=arc-20240116; t=1760428983; c=relaxed/simple;
+	bh=lH3Fg0xYXRRKlOcO2hIA1PKojnFE7636KmAX1iarqLE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XRh68my64axbGjDGUFWTwY750pdMqeoMSTB45FfEmVW39iKCr42lUgTk22eyY9voDQ6H6mWNRkp2Ag4aBLDXIU55KD0ACmbOWVgHSm7LX4m1ERKiGF+pVB0m6hPcmPse4w5u4fqwdkLn0+oMf1WEPR2JS/HzTOp7Ul2dvUmlbns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dE4Gb+Wq; arc=none smtp.client-ip=209.85.210.170
+	 MIME-Version; b=JjYXO1Pr3HVi7pKlfqs1IgG7slcoDj36dfAPedFtBIp5jTR26xsXnZn/Yoi2CJPH3MKEcoB0u1GHyOWJIOjH88RxtajTmT/UiwndUKIc0p8QjRyuanaIYE7R4tmIniGP89QIpBkB4iJC1d3JAVUllq/KyiIRElvK469Us+JQKjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g2C41zQJ; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-782023ca359so5126770b3a.2
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:02:53 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-77f605f22easo4347320b3a.2
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:03:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760428973; x=1761033773; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760428980; x=1761033780; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=N7prt04ADWx0fn0Z7pGOB9FoDOjfwgNqGHsIR96eCJc=;
-        b=dE4Gb+WqI2j9zzJG2KBX6Shjz9lColDalE0S9m9zCytOZIJSzfAnGfkjdnLEx5llR6
-         MESncMtZjhKm8UGAbq8J2p1N2v64AGMTm2eM7U9vKuewU18A64rE3ZLSk31jl8V4kOz7
-         PqxznhGG3WQmEJqVVe3wNzP9bdTh5Fl5mENRgMOEL3QmjT8JcA8scGxB7KzCZ+oElHJz
-         Vip29wTk0hbNJ0ckPR3zBnLHbFlFsdKG3tUm6CJXa54Cu7gZJd1t+4KzYeTkb/2kt+hE
-         TDX2ak8MvUnun0mbEEV6cylhw/hcGVVamPzXP7sfa2ASsnuVKohCKrjPIqzzRwHxNVyx
-         caHw==
+        bh=c6CIivt01bOqUoEaRvA5upBzPrQco5NjM7gJAaWtH0s=;
+        b=g2C41zQJjuwDI67yltLMcXdAOVYUIPtcSJUT8dpeoBo88e/9f97HXvu5r4KG/FwFI5
+         f/ua0emcRxJsH+orpQzpULCcjhyqfZNFavTdnZdldoBAr4GWklXVMt9XCPIRHbv3E1Fu
+         A3nDdnEM1sAZtR59+Q9HgfwE/Psr/eEHA4Lq4Wa+Wjcm+uN7Cd+iwH8VEFuvukA2UL5U
+         kfsJwFelc/WJ03+jrKpQv1eoQem7cHx9yW+6AjCBPuE+ndq16Dx/2xXdUTl7HAO5UXaR
+         HnLB0ssKbUqRYHJEEQ0tdEnNzJo2CYYRVxElYzOjTPfupX1fvr0aW4aXxEVHR2cF5CC8
+         FEGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760428973; x=1761033773;
+        d=1e100.net; s=20230601; t=1760428980; x=1761033780;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=N7prt04ADWx0fn0Z7pGOB9FoDOjfwgNqGHsIR96eCJc=;
-        b=kH398nw2CzpnjWF4uU1/vawuzwQF+Ym2TUFKUGSaKV/QvH7a7Hw+3nNC0aRLZ3RviD
-         jUgj1UnE/J/3HoPyY0lg6vdFZ7n0qVv1tpGk+XtuBQjHfJZzm530Tw6+Mkb3NS51GNMk
-         MYRXYgD/p01z0FW6WIXhQxgar6Q96wCfQ9jBwCvjvciOuzj6zZyjpQBfHtyp6evuVgz/
-         HLCUE8DM0YzYfMjE6lWmOZaamlBLWsydDVUtPHx1hN2M9jzRr50RDwjeNFanD5czr5oU
-         MvZnIXOIxB/lmobMEfDejVnKBN2hxh+mSxozfR7IoEL0UkDXM1ZWF58Hd/sH7pO7E3SE
-         XE3g==
-X-Gm-Message-State: AOJu0YzpTSkOe0rz+p+Y9ytjn3KeL8O3WH3O1TYepe7wIIBpXGpyqVBO
-	Yodpc/4o4GKXu/ImgZxxnV4E5nSVsDEJDt+cs/eZXhnxgxMTR/h+4ydxzWWesaanoPo=
-X-Gm-Gg: ASbGncsktVbWh+7JUS1OL+6qbN6S3Ah8Sy1Jje7EVjq5Ih+LAKMJGcMxFVdydGif1cO
-	OmpTS6SqQXg8L2ryOtb0jlOCLSGEjlXszMSWfxgKr+cSQkcvieASFVLM1i6zxndMTzL8TKH/ifK
-	r71kHXV9tYQ74ApNbJumeyihYZM+64tgy1d5dA2t2/9luggJ36TrXYNIwD46QyXFHTKRNyxsYUg
-	jTc1Zmp37MTJaPTEj8YAtfUtSUTaBj5EVJKzOwZv2kq5SNsqiOs01kskwdToBDKcdYw2QoamdKH
-	JLaDfCd6UHG4s+aC/0b1KpGj2YeaWF/eJyeo2naozjRK6zPjgnIpwyj+c4fvv5AO0ytI6WgVCGw
-	NZFEuWRKJF234Po0VdiA7nXOLKPPnOjNG5B7Km0jplACYxA==
-X-Google-Smtp-Source: AGHT+IEVofAHMNuGc7LSVEwbMFdV5baxM3Yag0mW/ybZvJCPq+vu8y2XQS23VTKmvMmHIC3b+TxwEw==
-X-Received: by 2002:a17:90b:4a52:b0:332:84c1:31de with SMTP id 98e67ed59e1d1-33b513ced6emr30004724a91.25.1760428972626;
-        Tue, 14 Oct 2025 01:02:52 -0700 (PDT)
+        bh=c6CIivt01bOqUoEaRvA5upBzPrQco5NjM7gJAaWtH0s=;
+        b=lwvcnAHC2DRK3JWwT/cHvDNh4MWapWWR4iIifn6NPr/MmVvktMIsw2pm2dRELwJDtv
+         7eRx2swPxiNFKiK5A6xtncp+4q0QjGdBp6g/0P0/gla2+mf86cABLshhR+yUS4rV+eWG
+         tzttr5DnrLo7r90VjfrW3ae59A3ji1GoIpPTXKn6phI0FrAZx0v0gFHfHmUncg4zbbmV
+         YbTKuyTFIiviFQQfn77GAe0UXTFNhxQMl34MKzUEfin6PAgQrzLQRSTFlxxIMg5BgWLQ
+         sJl7LHYO7yjehtJMz6oohrC3W6RiHOECb1xiT6lrcw5yK2owRGUR5r2vX0ofUVlW81cf
+         ytxQ==
+X-Gm-Message-State: AOJu0YyrEpUQpQAhDI4CsHdAhQ7lFE8ILVszifIjVDQcmOKiWVuGIt+u
+	cIfBCO8X6071CJxirulsojADu9S9qAqM8THteOTLeMJq6pd5HXASmlAVmEcAXe6slrE=
+X-Gm-Gg: ASbGncs87myyDRbSjoJ1iBD4JsYKRAXOhpdSyVB5oDIv9AkbeiZbcwhtLhAbZmoq20/
+	3cvbO6QsvNeDkl2znX6IcLosLAocQYRAS6xXH9RZdQYgC1adp6/9UzlR4AD5QGacHObUIhZ5FiT
+	kNds1ctwVpuTACbCXtvQ//7NiaFuJHSPvwHkihW10GB98T337smfDthwdFvZEx2GhWJSsTW+Kc8
+	0UZAdmd7IBNW4Z51SrkBeCE0XrWXsOXQFWHmPmjLoKOYkW9tMdp1Msp2Tg3G2/yKlgir9XnWnCx
+	l077d7VPlNJXJUdv5PEXIE9s1ZS4nbwJ36maoTTPxYtvJT0ElFKVLZ0zK3Hbai0LmOml/Zv4aWh
+	TBn/ZpMzGH9e0UH5RleMBptzkUDQAC2YJbhI4ttezFhfYdw==
+X-Google-Smtp-Source: AGHT+IGSzBQQGsbNRR3SZqd7vh9nZGoC7PUS1lh3+/p13pc6t1WziAuBTsyvJqOXqUW55QcL91DiiQ==
+X-Received: by 2002:a05:6a20:3d96:b0:2df:37cb:6b73 with SMTP id adf61e73a8af0-32da80bb9c4mr30115116637.11.1760428980002;
+        Tue, 14 Oct 2025 01:03:00 -0700 (PDT)
 Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33b626407c4sm14648210a91.6.2025.10.14.01.02.45
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33b626407c4sm14648210a91.6.2025.10.14.01.02.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Oct 2025 01:02:52 -0700 (PDT)
+        Tue, 14 Oct 2025 01:02:59 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Jay Vosburgh <jv@jvosburgh.net>,
@@ -93,9 +93,9 @@ Cc: Jay Vosburgh <jv@jvosburgh.net>,
 	bridge@lists.linux.dev,
 	linux-kselftest@vger.kernel.org,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv4 net-next 3/4] team: use common function to compute the features
-Date: Tue, 14 Oct 2025 08:02:16 +0000
-Message-ID: <20251014080217.47988-4-liuhangbin@gmail.com>
+Subject: [PATCHv4 net-next 4/4] net: bridge: use common function to compute the features
+Date: Tue, 14 Oct 2025 08:02:17 +0000
+Message-ID: <20251014080217.47988-5-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20251014080217.47988-1-liuhangbin@gmail.com>
 References: <20251014080217.47988-1-liuhangbin@gmail.com>
@@ -107,169 +107,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use the new helper netdev_compute_features_from_lowers() to compute the
-team device features. This helper performs both the feature computation
-and the netdev_change_features() call.
+Previously, bridge ignored all features propagation and DST retention,
+only handling explicitly the GSO limits.
 
-Note that such change replace the lower layer traversing currently done
-using team->port_list with netdev_for_each_lower_dev(). Such change is
-safe as `port_list` contains exactly the same elements as
-`team->dev->adj_list.lower` and the helper is always invoked under the
-RTNL lock.
+By switching to the new helper netdev_compute_features_from_lowers(),
+the bridge now expose additional features, depending on the lowers
+capabilities.
 
-With this change, the explicit netdev_change_features() in
-team_add_slave() can be safely removed, as team_port_add()
-already takes care of the notification via
-netdev_compute_features_from_lowers(), and same thing for team_del_slave()
+Since br_set_gso_limits() is already covered by the helper, it can be
+removed safely.
 
-This also fixes missing computations for MPLS, XFRM, and TSO/GSO partial
-features.
+Bridge has it's own way to update needed_headroom. So we don't need to
+update it in the helper.
 
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- drivers/net/team/team_core.c | 83 +++---------------------------------
- 1 file changed, 6 insertions(+), 77 deletions(-)
+ net/bridge/br_if.c | 22 +++-------------------
+ 1 file changed, 3 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index 17f07eb0ee52..03df6a06e0b8 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -982,63 +982,6 @@ static void team_port_disable(struct team *team,
- 	team_lower_state_changed(port);
+diff --git a/net/bridge/br_if.c b/net/bridge/br_if.c
+index 98c5b9c3145f..d614378245f8 100644
+--- a/net/bridge/br_if.c
++++ b/net/bridge/br_if.c
+@@ -525,20 +525,6 @@ void br_mtu_auto_adjust(struct net_bridge *br)
+ 	br_opt_toggle(br, BROPT_MTU_SET_BY_USER, false);
  }
  
--#define TEAM_VLAN_FEATURES (NETIF_F_HW_CSUM | NETIF_F_SG | \
--			    NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE | \
--			    NETIF_F_HIGHDMA | NETIF_F_LRO | \
--			    NETIF_F_GSO_ENCAP_ALL)
--
--#define TEAM_ENC_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
--				 NETIF_F_RXCSUM | NETIF_F_GSO_SOFTWARE)
--
--static void __team_compute_features(struct team *team)
+-static void br_set_gso_limits(struct net_bridge *br)
 -{
--	struct team_port *port;
--	netdev_features_t vlan_features = TEAM_VLAN_FEATURES;
--	netdev_features_t enc_features  = TEAM_ENC_FEATURES;
--	unsigned short max_hard_header_len = ETH_HLEN;
--	unsigned int dst_release_flag = IFF_XMIT_DST_RELEASE |
--					IFF_XMIT_DST_RELEASE_PERM;
+-	unsigned int tso_max_size = TSO_MAX_SIZE;
+-	const struct net_bridge_port *p;
+-	u16 tso_max_segs = TSO_MAX_SEGS;
 -
--	rcu_read_lock();
--	if (list_empty(&team->port_list))
--		goto done;
--
--	vlan_features = netdev_base_features(vlan_features);
--	enc_features = netdev_base_features(enc_features);
--
--	list_for_each_entry_rcu(port, &team->port_list, list) {
--		vlan_features = netdev_increment_features(vlan_features,
--					port->dev->vlan_features,
--					TEAM_VLAN_FEATURES);
--		enc_features =
--			netdev_increment_features(enc_features,
--						  port->dev->hw_enc_features,
--						  TEAM_ENC_FEATURES);
--
--		dst_release_flag &= port->dev->priv_flags;
--		if (port->dev->hard_header_len > max_hard_header_len)
--			max_hard_header_len = port->dev->hard_header_len;
+-	list_for_each_entry(p, &br->port_list, list) {
+-		tso_max_size = min(tso_max_size, p->dev->tso_max_size);
+-		tso_max_segs = min(tso_max_segs, p->dev->tso_max_segs);
 -	}
--done:
--	rcu_read_unlock();
--
--	team->dev->vlan_features = vlan_features;
--	team->dev->hw_enc_features = enc_features | NETIF_F_GSO_ENCAP_ALL |
--				     NETIF_F_HW_VLAN_CTAG_TX |
--				     NETIF_F_HW_VLAN_STAG_TX;
--	team->dev->hard_header_len = max_hard_header_len;
--
--	team->dev->priv_flags &= ~IFF_XMIT_DST_RELEASE;
--	if (dst_release_flag == (IFF_XMIT_DST_RELEASE | IFF_XMIT_DST_RELEASE_PERM))
--		team->dev->priv_flags |= IFF_XMIT_DST_RELEASE;
+-	netif_set_tso_max_size(br->dev, tso_max_size);
+-	netif_set_tso_max_segs(br->dev, tso_max_segs);
 -}
 -
--static void team_compute_features(struct team *team)
--{
--	__team_compute_features(team);
--	netdev_change_features(team->dev);
--}
--
- static int team_port_enter(struct team *team, struct team_port *port)
- {
- 	int err = 0;
-@@ -1300,7 +1243,7 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
- 	port->index = -1;
- 	list_add_tail_rcu(&port->list, &team->port_list);
- 	team_port_enable(team, port);
--	__team_compute_features(team);
-+	netdev_compute_features_from_lowers(team->dev, true);
- 	__team_port_change_port_added(port, !!netif_oper_up(port_dev));
- 	__team_options_change_check(team);
+ /*
+  * Recomputes features using slave's features
+  */
+@@ -652,8 +638,6 @@ int br_add_if(struct net_bridge *br, struct net_device *dev,
+ 			netdev_err(dev, "failed to sync bridge static fdb addresses to this port\n");
+ 	}
  
-@@ -1382,7 +1325,7 @@ static int team_port_del(struct team *team, struct net_device *port_dev)
- 	dev_set_mtu(port_dev, port->orig.mtu);
- 	kfree_rcu(port, rcu);
- 	netdev_info(dev, "Port device %s removed\n", portname);
--	__team_compute_features(team);
-+	netdev_compute_features_from_lowers(team->dev, true);
+-	netdev_update_features(br->dev);
+-
+ 	br_hr = br->dev->needed_headroom;
+ 	dev_hr = netdev_get_fwd_headroom(dev);
+ 	if (br_hr < dev_hr)
+@@ -694,7 +678,8 @@ int br_add_if(struct net_bridge *br, struct net_device *dev,
+ 		call_netdevice_notifiers(NETDEV_CHANGEADDR, br->dev);
+ 
+ 	br_mtu_auto_adjust(br);
+-	br_set_gso_limits(br);
++
++	netdev_compute_features_from_lowers(br->dev, false);
+ 
+ 	kobject_uevent(&p->kobj, KOBJ_ADD);
+ 
+@@ -740,7 +725,6 @@ int br_del_if(struct net_bridge *br, struct net_device *dev)
+ 	del_nbp(p);
+ 
+ 	br_mtu_auto_adjust(br);
+-	br_set_gso_limits(br);
+ 
+ 	spin_lock_bh(&br->lock);
+ 	changed_addr = br_stp_recalculate_bridge_id(br);
+@@ -749,7 +733,7 @@ int br_del_if(struct net_bridge *br, struct net_device *dev)
+ 	if (changed_addr)
+ 		call_netdevice_notifiers(NETDEV_CHANGEADDR, br->dev);
+ 
+-	netdev_update_features(br->dev);
++	netdev_compute_features_from_lowers(br->dev, false);
  
  	return 0;
  }
-@@ -1970,33 +1913,19 @@ static int team_add_slave(struct net_device *dev, struct net_device *port_dev,
- 			  struct netlink_ext_ack *extack)
- {
- 	struct team *team = netdev_priv(dev);
--	int err;
- 
- 	ASSERT_RTNL();
- 
--	err = team_port_add(team, port_dev, extack);
--
--	if (!err)
--		netdev_change_features(dev);
--
--	return err;
-+	return team_port_add(team, port_dev, extack);
- }
- 
- static int team_del_slave(struct net_device *dev, struct net_device *port_dev)
- {
- 	struct team *team = netdev_priv(dev);
--	int err;
- 
- 	ASSERT_RTNL();
- 
--	err = team_port_del(team, port_dev);
--
--	if (err)
--		return err;
--
--	netdev_change_features(dev);
--
--	return err;
-+	return team_port_del(team, port_dev);
- }
- 
- static netdev_features_t team_fix_features(struct net_device *dev,
-@@ -2190,7 +2119,7 @@ static void team_setup(struct net_device *dev)
- 
- 	dev->features |= NETIF_F_GRO;
- 
--	dev->hw_features = TEAM_VLAN_FEATURES |
-+	dev->hw_features = VIRTUAL_DEV_VLAN_FEATURES |
- 			   NETIF_F_HW_VLAN_CTAG_RX |
- 			   NETIF_F_HW_VLAN_CTAG_FILTER |
- 			   NETIF_F_HW_VLAN_STAG_RX |
-@@ -2994,7 +2923,7 @@ static int team_device_event(struct notifier_block *unused,
- 	case NETDEV_FEAT_CHANGE:
- 		if (!port->team->notifier_ctx) {
- 			port->team->notifier_ctx = true;
--			team_compute_features(port->team);
-+			netdev_compute_features_from_lowers(port->team->dev, true);
- 			port->team->notifier_ctx = false;
- 		}
- 		break;
 -- 
 2.50.1
 
