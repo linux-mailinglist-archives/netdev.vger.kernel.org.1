@@ -1,102 +1,93 @@
-Return-Path: <netdev+bounces-229345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCD8DBDAC73
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 19:30:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34077BDABC4
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 19:05:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9E45A3561D8
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:30:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D25B1895CBB
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D4A30BBB2;
-	Tue, 14 Oct 2025 17:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546D02FC007;
+	Tue, 14 Oct 2025 17:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="h5HZ0LTz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TFyoYh9o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B50F307AC8;
-	Tue, 14 Oct 2025 17:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3A2226863
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 17:04:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760462993; cv=none; b=CIq4QbZBiYk4/kJtpqrQ7ZWqDxNxKRohviqQBthTL0sC5+q9YPT/fVlQQRF7GfHhOQlILclzo3DJEJxuRVrZpVqOFHelkJ7YpKwWZpDQkb1yAZaZc8DCPZwNBjbuRrzfiH8GRag3TQNMODwRHABJznoRDBgtl8w5WNK+UJ8NOKw=
+	t=1760461499; cv=none; b=jkW9/khO340JRbduPQMmnOrA+Mfgh7LyZ1q4NNeRNaIjfy6BNiUUgOduXHBqWnKVdgEXhnw1xq8KqPB+5IWskKV41hy6z8r6RMsX3Rl66CZcs+0n1uHPMOPUXLOjUNLAAKufUbkB2+R1nLYdE2Vm0pGstkbW46DjEvpdmW+Gyr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760462993; c=relaxed/simple;
-	bh=rYh9uNFhpbkALLzDDpNk48XhoTr0ObqQoknbFwkH+T0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u2C3Zgp3oruvq1P1tP6A7M2aN4/qn6VrnvtsQol/fP6cInzQeeY6teB1+jnuRvGcdVK8992bIpzB5wkYg9DbYDBk21hBexBweuafz9Op2cGmTnt+7ek69ORx8fobmD0ExjcI/hiyWPtE8/Q/UzBM87kNr8rEq5uLDQSN+fn2sfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=h5HZ0LTz; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1760462979;
-	bh=rYh9uNFhpbkALLzDDpNk48XhoTr0ObqQoknbFwkH+T0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=h5HZ0LTzFdFDdVVhX6f3+D53NzTFsW75zEqrj7V++EewILtyZYrBj4U4207ScOJNR
-	 9qTnwPd3SuDd/VisXQVtGf3FNwPAS5gE/zLOTAY62VnQP/4OX5uzqJG0C4Z53uKDbT
-	 vsA1KhOolrU1ZHOJOiKqVYlilOFJRL9oOtVH9/4cRnrEXLTsgXcydnjbdt6mJvR402
-	 ZoIOKI9lXnudxQFOtfbabM8PmkFg5NAlTbV2jzj9ntxKpdtA5u6kfP2EFROooKx3Hm
-	 Na956xRQ4NwoY9XhLBBQX2X2D3VGTKB0YFteH7iDwLogfTIrtEYa88ukb2HN2znyFi
-	 hi31jFUStamnw==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 80327600BF;
-	Tue, 14 Oct 2025 17:29:38 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 10DDB202092;
-	Tue, 14 Oct 2025 17:04:15 +0000 (UTC)
-Message-ID: <5c944395-141c-415b-b29a-8f70cafaa24d@fiberby.net>
-Date: Tue, 14 Oct 2025 17:04:14 +0000
+	s=arc-20240116; t=1760461499; c=relaxed/simple;
+	bh=zR4mj2V8xlY6/bkgaX0KeLu9NGXdt0uBdeyroBZnuXA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FXxPvUSATUiuPllXGw+hRos/nxNZoxcjphtF0HRC71jkzQT70NP/w5rBeIiUeB9pYAO0/TycXMhGE0mfs6lu6RZlxXoJrUk3qET+xnmzqIwQvCbv9yE6BKczWgB01GFhqV/YYVwkmo+YEMK79/Yblkc+/0nTIeDmwOljhp31hR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TFyoYh9o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 458A5C4CEE7;
+	Tue, 14 Oct 2025 17:04:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760461498;
+	bh=zR4mj2V8xlY6/bkgaX0KeLu9NGXdt0uBdeyroBZnuXA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TFyoYh9o1mQ5kRzm/lKPzZS2fjgxXcSn1Nnr/oXwplmENuJsQ+unynLLSU53rtYdL
+	 fAIcSo1h9oE85Jn9xsptxcJlQMdKWMvYCqYTCka57w5BqgLpeBa+d1sT3b4Rkllj0e
+	 DaiXXRkC6PdSyHDUdgLtPCWxVmemEQ6h+DYZV2p7JZf7iI930fNlfEj316TfVyGAhm
+	 LUjFzZr0a1iKMjZkwq8vjcOtWFPxNmWCeW0XfgV+hurQL2dga+fuhYRTXIDXauS8Uv
+	 N5flbSPxy8AHQXimgfErnfv+DD7BXSOZ9iU+d/FMlC0oUf9whZq75iglUtwQ8O6Yes
+	 ZMip35fh/+gdg==
+Date: Tue, 14 Oct 2025 10:04:57 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, "David S . Miller"
+ <davem@davemloft.net>, Simon Horman <horms@kernel.org>, Neal Cardwell
+ <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, Kuniyuki
+ Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next] tcp: better handle TCP_TX_DELAY on established
+ flows
+Message-ID: <20251014100457.3f6de3e0@kernel.org>
+In-Reply-To: <CANn89iL0ZjuH-YiuBbm2+s_2adQzVUVOi4VYDvwGBXjTBYHb=A@mail.gmail.com>
+References: <20251013145926.833198-1-edumazet@google.com>
+	<3b20bfde-1a99-4018-a8d9-bb7323b33285@redhat.com>
+	<CANn89iKu7jjnjc1QdUrvbetti2AGhKe0VR+srecrpJ2s-hfkKA@mail.gmail.com>
+	<CANn89iL8YKZZQZSmg5WqrYVtyd2PanNXzTZ2Z0cObpv9_XSmoQ@mail.gmail.com>
+	<ffa599b8-2a9c-4c25-a65f-ed79cee4fa21@redhat.com>
+	<CANn89iLyO66z_r0hfY62dFBuhA-WmYcW+YhuAkDHaShmhUMZwQ@mail.gmail.com>
+	<20251014090629.7373baa7@kernel.org>
+	<CANn89iL0ZjuH-YiuBbm2+s_2adQzVUVOi4VYDvwGBXjTBYHb=A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/6] tools: ynl-gen: refactor render-max enum
- generation
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Daniel Borkmann <daniel@iogearbox.net>, Daniel Zahka
- <daniel.zahka@gmail.com>, Donald Hunter <donald.hunter@gmail.com>,
- Jacob Keller <jacob.e.keller@intel.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
- Joe Damato <jdamato@fastly.com>, John Fastabend <john.fastabend@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Simon Horman <horms@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Willem de Bruijn <willemb@google.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251013165005.83659-1-ast@fiberby.net>
- <20251013165005.83659-3-ast@fiberby.net> <20251013175826.6dbf6c78@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <20251013175826.6dbf6c78@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On 10/14/25 12:58 AM, Jakub Kicinski wrote:
-> On Mon, 13 Oct 2025 16:49:59 +0000 Asbjørn Sloth Tønnesen wrote:
->> +        suffix = yaml['type'] == 'flags' and 'mask' or 'max'
-> 
-> This construct looks highly non-pythonic to me
+On Tue, 14 Oct 2025 09:16:23 -0700 Eric Dumazet wrote:
+> On Tue, Oct 14, 2025 at 9:06=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> > On Tue, 14 Oct 2025 02:40:39 -0700 Eric Dumazet wrote: =20
+> > > Or add a best effort, so that TCP can have some clue, vast majority of
+> > > cases is that the batch is 1 skb :) =20
+> >
+> > FWIW I don't see an official submission and CI is quite behind
+> > so I'll set the test to ignored for now. =20
+>=20
+> You mean this TCP_TX_DELAY patch ? Or the series ?
+>=20
+> I will send V2 of the series soon.  (I added the test unflake in it)
 
-I don't mind changing it to it's multi-line form, but this line might go
-away (see below).
+Great, I wasn't clear whether you'll send a separate fix or v2.
+So I disabled the test itself.=20
+Not the patches, patches are still queued.=20
 
->> +        self.enum_max_name = f'{self.value_pfx}{suffix}'
-> 
-> sometimes its max sometimes is mask, so we shouldn't call it max always
-
-I'm fine with splitting them to render-max, enum-max-name, render-mask and
-enum-mask-name. I was just following along the current lines in the code,
-as started in commit 96a611b6b60c.
+Sorry for the confusion, our CI is what it is - just carry on as normal
+and I'll try to keep up.
 
