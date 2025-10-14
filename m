@@ -1,243 +1,174 @@
-Return-Path: <netdev+bounces-229054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DAA3BD792B
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:33:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A64F2BD794C
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:37:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1E0B14E236E
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 06:33:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FA553BCEC0
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 06:37:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE92025A353;
-	Tue, 14 Oct 2025 06:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9737029A31D;
+	Tue, 14 Oct 2025 06:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mqBjH/Kn"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="uYBg/4EL";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WPbWCE/6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE7B1DA62E
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 06:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6582F258EC8
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 06:37:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760423615; cv=none; b=T1AgPsWSqL2LzJZHbi9Y8GWQBPg+JFXTmglcqiBmYdk3LtA+Jny4ZbP1PssjZ8Bb6CCeSw799Fiw/6CXf+qG9PfDYhROXQrK8VpgiXjdlI+yysTX7+kilh/qwvV0jx8Z0I1E1QtromEF4GhAs8c1CW0uNborrw1ItFH8bAwEm1M=
+	t=1760423849; cv=none; b=Zw+ZKWl51pSGtk3k5PZh1fcAb90lzodnFQiYeX6KJypck1bbZk08BQ3dyF+PTGqd8GkcXUhUsvMcn5PtdvjD+T+OSz1r4ZSY00fEm4Hgne+bPLvf9tU+pv9tJDwj4bi8rMOP8fX2BVRlKhswPeX5dCP5MFshfbCqRokhDcRMw+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760423615; c=relaxed/simple;
-	bh=bItmwAuM1kJCIqmjLQgrg55Hiv1GTpbgngNNX+tPC80=;
+	s=arc-20240116; t=1760423849; c=relaxed/simple;
+	bh=ibQgSkoNKfjEinMbrU1UbHO7wYvQd772aT7SponiIYw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qnPsfC8HwCXshL5/yb2n7iCDooCOiqpDfSqD+cnLvUKIvpzpf8nHWt2ZSpMo6gNEsFELlitaKnjfRsESFZWPtispeNpfMAgwnTwtUYHgWg7WE5s6FQz4NxTffiTrwbgvFd8HsoZ6nkbr0J2PjsHvbWz0QRw3Pvva/qLTVu0iAz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mqBjH/Kn; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760423614; x=1791959614;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=bItmwAuM1kJCIqmjLQgrg55Hiv1GTpbgngNNX+tPC80=;
-  b=mqBjH/KniBNUu0+duBXV06HQ/DeS+5vVTGp9VnL2Jxqj0nO6IqcQD8wC
-   Lx6HsS15najqsY76VtvbPPDLjTfH5nW018PObxKGINxL8lUaTyeY+x3zv
-   RVgoeOwyc/pGESfMFOiZDDou6idj7nVMlXqyxXfckqwMxk2HDNQENXY1N
-   JGs2c5WUq7miu7PYQrYDpOR9i0j9T3uml3+qZDfz4pwNr75+a3oVmJ4Dj
-   /6zcEWGTjCgQZYOO8iXwa4e3p59r8VfNf7JwbgcvQjLTPe2iCzOMOxdxI
-   dSMuC1+VreWaXTp+Hut/SUm8QHPuYFUXj/u7vozpt0Q4W6fO6jltGrXhT
-   A==;
-X-CSE-ConnectionGUID: 4MXmXYSORTmrJkfc4VkZgg==
-X-CSE-MsgGUID: +qloASd3TSW1IFYJAjjsnw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11581"; a="73678264"
-X-IronPort-AV: E=Sophos;i="6.19,227,1754982000"; 
-   d="scan'208";a="73678264"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2025 23:33:33 -0700
-X-CSE-ConnectionGUID: 6EuriOAgTJuvDYz/dmx8Pw==
-X-CSE-MsgGUID: cVO5Mr4bTZKkNcO4avyV8w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,227,1754982000"; 
-   d="scan'208";a="181756438"
-Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
-  by fmviesa006.fm.intel.com with ESMTP; 13 Oct 2025 23:33:26 -0700
-Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1v8Yb0-0002Tb-1V;
-	Tue, 14 Oct 2025 06:33:19 +0000
-Date: Tue, 14 Oct 2025 14:32:52 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Jurgens <danielj@nvidia.com>, netdev@vger.kernel.org,
-	mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com,
-	pabeni@redhat.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	virtualization@lists.linux.dev, parav@nvidia.com,
-	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, shameerali.kolothum.thodi@huawei.com,
-	jgg@ziepe.ca, kevin.tian@intel.com, kuba@kernel.org,
-	andrew+netdev@lunn.ch, edumazet@google.com,
-	Daniel Jurgens <danielj@nvidia.com>
-Subject: Re: [PATCH net-next v4 05/12] virtio_net: Query and set flow filter
- caps
-Message-ID: <202510141423.IeIhJgQG-lkp@intel.com>
-References: <20251013152742.619423-6-danielj@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hge2rBqD8qqmSb6WA8LE61cpt3wBETMQoPiALDy2aNKoWcsIUQatNqu4DIaqwm8hNKfksGEv7B4XK31AbYTfbFnPdChmMsJPYYCpJcVMwRzpeCPywxlmtX5BMd4s7M9mQYg/fZ69EYAUHGuFrQoHHyn7ZCgHoIXBsUGo1dUA1mI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=uYBg/4EL; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WPbWCE/6; arc=none smtp.client-ip=103.168.172.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
+	by mailfout.phl.internal (Postfix) with ESMTP id 30CBCEC0170;
+	Tue, 14 Oct 2025 02:37:25 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-08.internal (MEProxy); Tue, 14 Oct 2025 02:37:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1760423845; x=
+	1760510245; bh=QmuXo3+ZmKbt3wm+WDptWod43pu/kVhknWh/Wc8Zyes=; b=u
+	YBg/4EL6oBmYHNz/esmaCfPdhyNLyKmDBRrcm0rbNkpqapxFmc9FxLUrxND4FxD/
+	BawrD3mOsjJEX+iQd1DPcvQAxDeVGjK/fuJbUJXZ9vaG2DJe1V+BeJpAW1QcTjho
+	T4DEh/9fQFNbboFyfze2ZQ0owdOz3FglUoJDK18e+Q8qJ906pCeOH/IF/AwUJdRe
+	OfpnlmAJM9gg1lRc9H+ONVxQk1Sk6zaAO/9/Hz7rOYsy2nz0VTmA7cLEvGlaMLge
+	dijcPe3sCoteSG1AWQZEk36S+jd0HdFnTHuy0+XlE8eGqNM5C5e3sJgnp4LxcN8a
+	JzuMXlldUxVIGUIdyyhaQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1760423845; x=1760510245; bh=QmuXo3+ZmKbt3wm+WDptWod43pu/kVhknWh
+	/Wc8Zyes=; b=WPbWCE/6iFXxiW+KakDW2gqSIaNM9hEwPilmAOGA7Wcl8ogsY9q
+	8uV701Wr1Z1QkCzsnznB1k0r0GbDi8JbuDfWpfFeV5elBrbMLD3fDfxOHUhgsGpO
+	UtVXfkimDo3pifcPbhZpp7MTV9t9tbFaMamCKumoRCOFIhk2OqP8dsvcqm81MEk/
+	LYpW8AXr7Z2+fPF0BrLbbWbEDD5eSIaGSVtbenUAke4q71ug+3MyDtN0xNtNY4iT
+	7zgGCQcKiT6MRPrWLLGxkJ7UMNIdZnwneAq/zP8QX6BdTWO+4I8oLQHJmDLHEJZF
+	RLv5SXtleDeOIYC2n+sKkvgeQzKe9TbCG3A==
+X-ME-Sender: <xms:pO_taBM-an_qc60vWOvb9fqhO7ufzpXdA4gtfSicpvr8VXhotJR58g>
+    <xme:pO_taGhgOZq7RT07BRaIsA2ugS6WPHwir0l0BZUyHLMODpzI7Dp_KxsBIW8-Ao0Hf
+    H7MD5_yukcBOSAUdv0mo8BbBwBSA0Hgl0d8OxwTFqGnnDiUOiVvLzs>
+X-ME-Received: <xmr:pO_taD5RCc559DTH-Lj-RGjALDR5kbT0YUBNwiru1KxSsxQpW1lrZ48HrtYU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduudelkeefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfetffeffefghedvvefhjeejvdek
+    feelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
+    nhgvthdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
+    epvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopegurghvvghmsegu
+    rghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
+    dprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhho
+    rhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepfihilhhlvghmsgesghhoohhglh
+    gvrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtohepvghrihgtrdguuhhmrgiivghtsehgmhgrihhlrdgtohhmpdhrtghpth
+    htohepmhhkuhgsvggtvghksehsuhhsvgdrtgii
+X-ME-Proxy: <xmx:pO_taN0Aqs9flNOPvRhXulLd0_BOTdjEaFQQ2KK4QGk1ziN9FbgfiA>
+    <xmx:pO_taOsbZRudy7emKM1dIApD5pbRLQok0imTOhMGGN4djqFyIwaxdg>
+    <xmx:pO_taD67Zxnpl2SQNiMvgktJunRXfts0Lc7y_KGkW6nN28Z4ylz3cA>
+    <xmx:pO_taKdpky0EYwxPaa4LZfoc6I_RoP2Ur8-9cy_zKzQupHQRGRwZOA>
+    <xmx:pe_taInDdE0uVTn8GKBfNgc9IbTtDGnjwFgB8N3ardfTvkN7RM7uQ2iZ>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 14 Oct 2025 02:37:23 -0400 (EDT)
+Date: Tue, 14 Oct 2025 08:37:22 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Michal Kubecek <mkubecek@suse.cz>
+Subject: Re: [PATCH net] udp: drop secpath before storing an skb in a receive
+ queue
+Message-ID: <aO3voj4IbAoHgDoP@krikkit>
+References: <20251014060454.1841122-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251013152742.619423-6-danielj@nvidia.com>
+In-Reply-To: <20251014060454.1841122-1-edumazet@google.com>
 
-Hi Daniel,
+2025-10-14, 06:04:54 +0000, Eric Dumazet wrote:
+> Michal reported and bisected an issue after recent adoption
+> of skb_attempt_defer_free() in UDP.
+> 
+> We had the same issue for TCP, that Sabrina fixed in commit 9b6412e6979f
+> ("tcp: drop secpath at the same time as we currently drop dst")
 
-kernel test robot noticed the following build errors:
+I'm not convinced this is the same bug. The TCP one was a "leaked"
+reference (delayed put). This looks more like a double put/missing
+hold to me (we get to the destroy path without having done the proper
+delete, which would set XFRM_STATE_DEAD).
 
-[auto build test ERROR on net-next/main]
+And this shouldn't be an issue after b441cf3f8c4b ("xfrm: delete
+x->tunnel as we delete x").
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Jurgens/virtio_pci-Remove-supported_cap-size-build-assert/20251014-004146
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20251013152742.619423-6-danielj%40nvidia.com
-patch subject: [PATCH net-next v4 05/12] virtio_net: Query and set flow filter caps
-config: i386-buildonly-randconfig-003-20251014 (https://download.01.org/0day-ci/archive/20251014/202510141423.IeIhJgQG-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251014/202510141423.IeIhJgQG-lkp@intel.com/reproduce)
+> Many thanks to Michal and Sabrina.
+> 
+> Fixes: 6471658dc66c ("udp: use skb_attempt_defer_free()")
+> Reported-and-bisected-by: Michal Kubecek <mkubecek@suse.cz>
+> Closes: https://lore.kernel.org/netdev/gpjh4lrotyephiqpuldtxxizrsg6job7cvhiqrw72saz2ubs3h@g6fgbvexgl3r/
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Sabrina Dubroca <sd@queasysnail.net>
+> ---
+>  net/ipv4/udp.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index 95241093b7f0..3f05ee70029c 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -1709,6 +1709,8 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
+>  	int dropcount;
+>  	int nb = 0;
+>  
+> +	secpath_reset(skb);
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202510141423.IeIhJgQG-lkp@intel.com/
+See also the comment for udp_try_make_stateless:
 
-All errors (new ones prefixed by >>):
+/* all head states (dst, sk, nf conntrack) except skb extensions are
+ * cleared by udp_rcv().
+ *
+ * We need to preserve secpath, if present, to eventually process
+ * IP_CMSG_PASSSEC at recvmsg() time.
+ *
+ * Other extensions can be cleared.
+ */
 
->> drivers/net/virtio_net.c:6868:32: error: called object type 'unsigned int' is not a function or function pointer
-    6868 |                 if (sel->length > MAX_SEL_LEN()) {
-         |                                   ~~~~~~~~~~~^
-   1 error generated.
 
+It looks like this patch would re-introduce the problem fixed by
+dce4551cb2ad ("udp: preserve head state for IP_CMSG_PASSSEC").
 
-vim +6868 drivers/net/virtio_net.c
-
-  6788	
-  6789	static void virtnet_ff_init(struct virtnet_ff *ff, struct virtio_device *vdev)
-  6790	{
-  6791		size_t ff_mask_size = sizeof(struct virtio_net_ff_cap_mask_data) +
-  6792				      sizeof(struct virtio_net_ff_selector) *
-  6793				      VIRTIO_NET_FF_MASK_TYPE_MAX;
-  6794		struct virtio_admin_cmd_query_cap_id_result *cap_id_list;
-  6795		struct virtio_net_ff_selector *sel;
-  6796		int err;
-  6797		int i;
-  6798	
-  6799		cap_id_list = kzalloc(sizeof(*cap_id_list), GFP_KERNEL);
-  6800		if (!cap_id_list)
-  6801			return;
-  6802	
-  6803		err = virtio_admin_cap_id_list_query(vdev, cap_id_list);
-  6804		if (err)
-  6805			goto err_cap_list;
-  6806	
-  6807		if (!(VIRTIO_CAP_IN_LIST(cap_id_list,
-  6808					 VIRTIO_NET_FF_RESOURCE_CAP) &&
-  6809		      VIRTIO_CAP_IN_LIST(cap_id_list,
-  6810					 VIRTIO_NET_FF_SELECTOR_CAP) &&
-  6811		      VIRTIO_CAP_IN_LIST(cap_id_list,
-  6812					 VIRTIO_NET_FF_ACTION_CAP)))
-  6813			goto err_cap_list;
-  6814	
-  6815		ff->ff_caps = kzalloc(sizeof(*ff->ff_caps), GFP_KERNEL);
-  6816		if (!ff->ff_caps)
-  6817			goto err_cap_list;
-  6818	
-  6819		err = virtio_admin_cap_get(vdev,
-  6820					   VIRTIO_NET_FF_RESOURCE_CAP,
-  6821					   ff->ff_caps,
-  6822					   sizeof(*ff->ff_caps));
-  6823	
-  6824		if (err)
-  6825			goto err_ff;
-  6826	
-  6827		/* VIRTIO_NET_FF_MASK_TYPE start at 1 */
-  6828		for (i = 1; i <= VIRTIO_NET_FF_MASK_TYPE_MAX; i++)
-  6829			ff_mask_size += get_mask_size(i);
-  6830	
-  6831		ff->ff_mask = kzalloc(ff_mask_size, GFP_KERNEL);
-  6832		if (!ff->ff_mask)
-  6833			goto err_ff;
-  6834	
-  6835		err = virtio_admin_cap_get(vdev,
-  6836					   VIRTIO_NET_FF_SELECTOR_CAP,
-  6837					   ff->ff_mask,
-  6838					   ff_mask_size);
-  6839	
-  6840		if (err)
-  6841			goto err_ff_mask;
-  6842	
-  6843		ff->ff_actions = kzalloc(sizeof(*ff->ff_actions) +
-  6844						VIRTIO_NET_FF_ACTION_MAX,
-  6845						GFP_KERNEL);
-  6846		if (!ff->ff_actions)
-  6847			goto err_ff_mask;
-  6848	
-  6849		err = virtio_admin_cap_get(vdev,
-  6850					   VIRTIO_NET_FF_ACTION_CAP,
-  6851					   ff->ff_actions,
-  6852					   sizeof(*ff->ff_actions) + VIRTIO_NET_FF_ACTION_MAX);
-  6853	
-  6854		if (err)
-  6855			goto err_ff_action;
-  6856	
-  6857		err = virtio_admin_cap_set(vdev,
-  6858					   VIRTIO_NET_FF_RESOURCE_CAP,
-  6859					   ff->ff_caps,
-  6860					   sizeof(*ff->ff_caps));
-  6861		if (err)
-  6862			goto err_ff_action;
-  6863	
-  6864		ff_mask_size = sizeof(struct virtio_net_ff_cap_mask_data);
-  6865		sel = &ff->ff_mask->selectors[0];
-  6866	
-  6867		for (i = 0; i < ff->ff_mask->count; i++) {
-> 6868			if (sel->length > MAX_SEL_LEN()) {
-  6869				err = -EINVAL;
-  6870				goto err_ff_action;
-  6871			}
-  6872			ff_mask_size += sizeof(struct virtio_net_ff_selector) + sel->length;
-  6873			sel = (void *)sel + sizeof(*sel) + sel->length;
-  6874		}
-  6875	
-  6876		err = virtio_admin_cap_set(vdev,
-  6877					   VIRTIO_NET_FF_SELECTOR_CAP,
-  6878					   ff->ff_mask,
-  6879					   ff_mask_size);
-  6880		if (err)
-  6881			goto err_ff_action;
-  6882	
-  6883		err = virtio_admin_cap_set(vdev,
-  6884					   VIRTIO_NET_FF_ACTION_CAP,
-  6885					   ff->ff_actions,
-  6886					   sizeof(*ff->ff_actions) + VIRTIO_NET_FF_ACTION_MAX);
-  6887		if (err)
-  6888			goto err_ff_action;
-  6889	
-  6890		ff->vdev = vdev;
-  6891		ff->ff_supported = true;
-  6892	
-  6893		kfree(cap_id_list);
-  6894	
-  6895		return;
-  6896	
-  6897	err_ff_action:
-  6898		kfree(ff->ff_actions);
-  6899	err_ff_mask:
-  6900		kfree(ff->ff_mask);
-  6901	err_ff:
-  6902		kfree(ff->ff_caps);
-  6903	err_cap_list:
-  6904		kfree(cap_id_list);
-  6905	}
-  6906	
+> +
+>  	rmem = atomic_read(&sk->sk_rmem_alloc);
+>  	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
+>  	size = skb->truesize;
+> -- 
+> 2.51.0.788.g6d19910ace-goog
+> 
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Sabrina
 
