@@ -1,343 +1,280 @@
-Return-Path: <netdev+bounces-228992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20D4CBD6D10
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 01:58:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBEBCBD6D62
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 02:11:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 52DF34F5C08
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 23:58:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F082A42168B
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 00:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27F872FE057;
-	Mon, 13 Oct 2025 23:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E61224FA;
+	Tue, 14 Oct 2025 00:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ocKz2BhP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EMsClh19"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6238124338F
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 23:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E0335971
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 00:10:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760399924; cv=none; b=gk2R4ZnbbH8715l8u+qhfevhjUSXWPXVU/kqtaTdnukPX6A/MXgXGsBiH2Ee1MSCb361m2Z/602IFDA6c7mWeFeeBh8rLvhOwhz5fkUQM0J/01H/LMuRSD8wX+EUBS5jFa08H4e8IknuSs6Ll3QaI6gJrpTLA7QaaipSdnoFT9I=
+	t=1760400644; cv=none; b=H9kPOvPVRctQ8uvJ4OCXU8RDz+iFPerroxAou97nchR2wjYiA2uLPFnHVVOc2gdWCoHN+HS/syVjxSZqPWTnsx1P5fm3GgvOIOFpy8pAo3VprAiel1Rg/FCFWoem03yAVWRtIDM0AnRccIBzzmJn5IoKAznDU/Q3D6M0dAHKI38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760399924; c=relaxed/simple;
-	bh=RjVX0+fh60icQs4qAmVz5aiY4ZsI2zoYCS/N63llVfY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FlUrC9K2MMusxdcvYe5tox4Bf7vTbarR+UapraI7dn5AhcXvx2bxn4fzVepvD3D1tOchrL1EenFKTUBlvT9pEblggzFYMcXioIuoB14DMPxzxZpWOsmEpDuwTYwuxW565wbHkKgMGs2vipN307bPLkS1UVUQf3nk0blPyDVGZeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ocKz2BhP; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59DMh1OT006283;
-	Mon, 13 Oct 2025 23:58:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=hvYhcvH+hR8nemcby
-	JPEGtNOLvvnXKTeNbzANEjooyA=; b=ocKz2BhPZyHr0q4HJyqPhb5XnLR1InApg
-	fYKr0+EIGd3Ny1SYG3jvYDbep5b1frDraFWM3xfF1tCjOu56enfLyjk8GTPw0ani
-	Yte+bzAj2u+vQrU2/VvM/iUfTX1JeXS9tnWIVkD5FZ2rA7QsxPA5GCIa8iwPXKJr
-	ajLJ+6bUG6mumWed/EdBT2W/n/4zRWd9JEOmxssFn0MRLBcc/2IxPn5/bTfYC7P6
-	GrlSz0EyAZ5SnIHPbbec7L/Nkc8SgMAHJvFHp5UuDkGKWXyongycFYvA7R1Pk9lP
-	ReXzacRgqlCW1tCpA5iArmfdekcbHO/LoG/CRONmajOg6W4znCFbw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49qevyuaaa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Oct 2025 23:58:36 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 59DNwaeq015949;
-	Mon, 13 Oct 2025 23:58:36 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49qevyuaa7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Oct 2025 23:58:36 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59DN3792018362;
-	Mon, 13 Oct 2025 23:58:35 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 49s3rf1xe6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Oct 2025 23:58:35 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59DNwWxY27394788
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 13 Oct 2025 23:58:33 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B42B958052;
-	Mon, 13 Oct 2025 23:58:32 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4F6E858045;
-	Mon, 13 Oct 2025 23:58:32 +0000 (GMT)
-Received: from localhost (unknown [9.61.176.140])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 13 Oct 2025 23:58:32 +0000 (GMT)
-From: David Wilder <wilder@us.ibm.com>
-To: netdev@vger.kernel.org
-Cc: jv@jvosburgh.net, wilder@us.ibm.com, pradeep@us.ibm.com,
-        i.maximets@ovn.org, amorenoz@redhat.com, haliu@redhat.com,
-        stephen@networkplumber.org, dsahern@gmail.com
-Subject: [PATCH iproute2-next v7 1/1] iproute: Extend bonding's "arp_ip_target" parameter to add vlan tags.
-Date: Mon, 13 Oct 2025 16:57:40 -0700
-Message-ID: <20251013235827.1291202-2-wilder@us.ibm.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20251013235827.1291202-1-wilder@us.ibm.com>
-References: <20251013235827.1291202-1-wilder@us.ibm.com>
+	s=arc-20240116; t=1760400644; c=relaxed/simple;
+	bh=zKQXpWSM/9juP+o/FRcoKuWdqiWCx/NaLVc0YDlhAdM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kMpdy8aUqX+TXNLMfs1Ugjff28zhMxk/+HNWdUPqlTEKmtUmbbe7eNoafFtamW1zlQM7sjO+S9a/4+AW/GIRe9d3D/s6y73RGa+BvzohX8TPtL1CYRopeEn6kE78i9ty7L/zaw8EN3GiRv+Zq00jB1fw6/R9irqvyCTFUNQX0+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EMsClh19; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-3305c08d9f6so3821363a91.1
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 17:10:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760400642; x=1761005442; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mbI7VdlcoLK5j++SIdQul9mBT5JZEkngCuUhU52TEAs=;
+        b=EMsClh19yeVviBLY2hyO0+c10KbxHxM+5NUv2rW0D8q37jXf/X0EYX+4BkndiktSv2
+         1vrSggpwsQ4FOkOTPWeba3kMPew+oX9fzCgcVseXU8WAljZzgf9Joj/OzclZacT5zn3T
+         nzVuHbkccr0BgKtETJxRX+7RVby9AEwQDh4F9NoqNGdU5DoVwIRX3Qa3+IB6Xgul6F0N
+         Ht0mfIBNnhNmEgAQx48h5c3zemFDsd0LKyLmO61ROLkPqtFF5PM/bbwQ0LPbUThNYj01
+         HwGJLGw+p3muzb7e6Op5kV9rcLS39RYP1kMb38FntatJU/wR62cUJHKTgE7sTfB0Ru8F
+         hDdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760400642; x=1761005442;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mbI7VdlcoLK5j++SIdQul9mBT5JZEkngCuUhU52TEAs=;
+        b=XHzDMH5jsMdBKRUEu0w0cmWg7tJ7p/Z9A54y9jZnGzWaPXtZY5wc+Tg4NXdlBChbT/
+         YF49GKvgQJGAVFeWLRkVxuMDHFQvUciX7apcj/j6mzD65LXaqLEsQCpGfMbSk/EFLpa/
+         sOPLxDRn7RZcRZbwgxUa2auHddYJ0JE0BD1lkQnXpB8JDUuuBxtkw9H9Qclmc/jsR8EG
+         dtXnJPqOUrFp/K4cBsfIaEmvLzAKZRvXI9oXdTWF/+xEFAKA4tSiOGgL+7CPslMfn3us
+         QCnmdIaV+3hodioaiyuyyRJErYPo+wAkl89ax7QbAJdOP/B7yLKz53KitcoNDuj/qFRg
+         6Nmw==
+X-Forwarded-Encrypted: i=1; AJvYcCUejkJnOcgS3h20OwkRKX3KjZpn4LfL8tvJYKNlnrv/+GlJLMy+PTJjOg+/lKildFvzZ8YYIoQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw25BN3NP9lwhirjfw+PAawaCapQH2SXKT6pN5JgJ6Jii4RvJVW
+	fd4ePNjis6AewQwIXRbZd4AiMJxiNw+JwYaVkGzG/0r7hjuVKkMy1nd090ZKd/QXzBLUTflh9Ic
+	npJ5BQKx87QrvegGFa6kW845Bwd388jI=
+X-Gm-Gg: ASbGncuk4rZTvsbIYcpcWqfUHOrWPn2mS8wiRCWtkYr5LxtErbZaJCafp2zjrLHsVTb
+	UuF+2m/wDi0ymbOZcwBKIoqVXNjOu0hqV5VUthNMs1JcltxQIZT2+SGG5DMw2UuSCaBiOiAz3tD
+	ZiFGhmc55i63LLugZ36hWNx77uEkZlzB0L1uzcMamgCksm9issJ3GwKyhnC++Kg4GQaes6ivAdy
+	ZIdvZIiBjMOYcAMeqfeABqfexymfhc4wcuFCu0hENo4ozsAf2Jt
+X-Google-Smtp-Source: AGHT+IHbu1GM2aDcBiqmQoDs8+SoFkL8t2HF1enBCIjOCS29d6T2ouFBevmexYyoaIdhDi6zdfit7i+cqR5nm8vF60g=
+X-Received: by 2002:a17:90b:4984:b0:32b:94a2:b0c4 with SMTP id
+ 98e67ed59e1d1-339edac69f1mr36300886a91.16.1760400642466; Mon, 13 Oct 2025
+ 17:10:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: pCcsdxF8O_LCBgtorjrG1kSTzBLH5Jqt
-X-Authority-Analysis: v=2.4 cv=eJkeTXp1 c=1 sm=1 tr=0 ts=68ed922c cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
- a=ih_k2vk3dtMi9XJ1s-oA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDExMDAxNCBTYWx0ZWRfXxaVVF0tPi+Zv
- 7KTendz4p1uCJz1cYZpRfMhtUoFiT34MutzW5IZO2mmLjUSt81tu2c1qWUOLdXRX0irBlVg5TnV
- g7BeqaEQ4Qu0Dns2yCcd9Y4lYORfyIVf7CbU9+y5zwMsDFIBmMW1vroBXUeDp1fGXoimoeO8Mjv
- a+mGA5rgR6kO+W8ZTMf4UGLjftKqckqqNz+w4dt3AVHSIJ0Dwzn0fTFzeUo+bKgo4DAh1NOYy63
- 7SHhCqmtaT5zsjWEaEEsIFZfnGGYpr9mrEu0IKbK+hCxt8q3/YbrLAnX18a5hL85wI2FoprFN8s
- /vvecrgto916Zi8snloR8cuVvxpPjy6vmIamJT8srkwTQo7Y3uiTDV0h9ioswxytbosjLuT8FZj
- /RBViJcNMKQoN+gftthY16IXWXQU3A==
-X-Proofpoint-GUID: UjTeQnNqKIVB7Lw8sD1ASGKnfSqv5cv2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-13_09,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 lowpriorityscore=0 spamscore=0 clxscore=1031 impostorscore=0
- phishscore=0 malwarescore=0 adultscore=0 priorityscore=1501 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510110014
+References: <20251010174953.2884682-1-ameryhung@gmail.com> <20251010174953.2884682-3-ameryhung@gmail.com>
+In-Reply-To: <20251010174953.2884682-3-ameryhung@gmail.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Mon, 13 Oct 2025 17:10:26 -0700
+X-Gm-Features: AS18NWAseG-_S7Q3MH24JafLagyXqAj7vn3v4db_S9XBFH0PhSieYJiEz4HGwPI
+Message-ID: <CAEf4BzZgc3tqzDER5HN1Jz7JL7nN3K6MiFGTrouE69Pm-Vo+8Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 bpf-next 2/4] bpf: Support associating BPF program
+ with struct_ops
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
+	kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This change extends the "arp_ip_target" parameter format to allow for
-a list of vlan tags to be included for each arp target.
+On Fri, Oct 10, 2025 at 10:49=E2=80=AFAM Amery Hung <ameryhung@gmail.com> w=
+rote:
+>
+> Add a new BPF command BPF_STRUCT_OPS_ASSOCIATE_PROG to allow associating
+> a BPF program with a struct_ops. This command takes a file descriptor of
+> a struct_ops map and a BPF program and set prog->aux->st_ops_assoc to
+> the kdata of the struct_ops map.
+>
+> The command does not accept a struct_ops program or a non-struct_ops
+> map. Programs of a struct_ops map is automatically associated with the
+> map during map update. If a program is shared between two struct_ops
+> maps, the first one will be the map associated with the program. The
+> associated struct_ops map, once set cannot be changed later. This
+> restriction may be lifted in the future if there is a use case.
+>
+> Each associated programs except struct_ops programs of the map will take
+> a refcount on the map to pin it so that prog->aux->st_ops_assoc, if set,
+> is always valid. However, it is not guaranteed whether the map members
+> are fully updated nor is it attached or not. For example, a BPF program
+> can be associated with a struct_ops map before map_update. The
+> struct_ops implementer will be responsible for maintaining and checking
+> the state of the associated struct_ops map before accessing it.
+>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
+>  include/linux/bpf.h            | 11 ++++++++++
+>  include/uapi/linux/bpf.h       | 16 ++++++++++++++
+>  kernel/bpf/bpf_struct_ops.c    | 32 ++++++++++++++++++++++++++++
+>  kernel/bpf/core.c              |  6 ++++++
+>  kernel/bpf/syscall.c           | 38 ++++++++++++++++++++++++++++++++++
+>  tools/include/uapi/linux/bpf.h | 16 ++++++++++++++
+>  6 files changed, 119 insertions(+)
+>
+> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> index a98c83346134..d5052745ffc6 100644
+> --- a/include/linux/bpf.h
+> +++ b/include/linux/bpf.h
+> @@ -1710,6 +1710,8 @@ struct bpf_prog_aux {
+>                 struct rcu_head rcu;
+>         };
+>         struct bpf_stream stream[2];
+> +       struct mutex st_ops_assoc_mutex;
 
-The new format for arp_ip_target is:
-arp_ip_target=ipv4-address[vlan-tag\...],...
+do we need a mutex at all? cmpxchg() should work just fine. We'll also
+potentially need to access st_ops_assoc from kprobes/fentry anyways,
+and we can't just take mutex there
 
-Examples:
-arp_ip_target=10.0.0.1[10]
-arp_ip_target=10.0.0.1[100/200]
+> +       void *st_ops_assoc;
+>  };
+>
+>  struct bpf_prog {
 
-The inclusion of the list of vlan tags is optional. The new logic
-preserves both forward and backward compatibility with the kernel
-and iproute2 versions.
+[...]
 
-Signed-off-by: David Wilder <wilder@us.ibm.com>
----
- ip/iplink_bond.c | 149 ++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 123 insertions(+), 26 deletions(-)
+>
+> @@ -1890,6 +1901,11 @@ union bpf_attr {
+>                 __u32           prog_fd;
+>         } prog_stream_read;
+>
+> +       struct {
+> +               __u32           map_fd;
+> +               __u32           prog_fd;
 
-diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
-index d6960f6d..0f34125d 100644
---- a/ip/iplink_bond.c
-+++ b/ip/iplink_bond.c
-@@ -173,6 +173,55 @@ static void explain(void)
- 	print_explain(stderr);
- }
- 
-+#define BOND_VLAN_PROTO_NONE htons(0xffff)
-+#define BOND_MAX_VLAN_TAGS 5
-+#define VLAN_VID_MASK 0x0fff
-+
-+struct bond_vlan_tag {
-+	__be16  vlan_proto;
-+	__be16  vlan_id;
-+};
-+
-+static struct bond_vlan_tag *bond_vlan_tags_parse(char *vlan_list, int level, int *size)
-+{
-+	struct bond_vlan_tag *tags = NULL;
-+	char *vlan;
-+	int n;
-+
-+	if (level > BOND_MAX_VLAN_TAGS) {
-+		fprintf(stderr, "Error: Too many vlan tags specified, maximum is %d.\n",
-+			BOND_MAX_VLAN_TAGS);
-+		exit(1);
-+	}
-+
-+	if (!vlan_list || strlen(vlan_list) == 0) {
-+		tags = calloc(level + 1, sizeof(*tags));
-+		*size = (level + 1) * (sizeof(*tags));
-+		if (tags)
-+			tags[level].vlan_proto = BOND_VLAN_PROTO_NONE;
-+		return tags;
-+	}
-+
-+	for (vlan = strsep(&vlan_list, "/"); (vlan != 0); level++) {
-+		tags = bond_vlan_tags_parse(vlan_list, level + 1, size);
-+		if (!tags)
-+			continue;
-+
-+		tags[level].vlan_proto = htons(ETH_P_8021Q);
-+		n = sscanf(vlan, "%hu", &(tags[level].vlan_id));
-+
-+		if (n != 1 || tags[level].vlan_id < 1 || tags[level].vlan_id >= VLAN_VID_MASK) {
-+			fprintf(stderr, "Error: Invalid vlan_id specified: %hu\n",
-+				tags[level].vlan_id);
-+			exit(1);
-+		}
-+
-+		return tags;
-+	}
-+
-+	return NULL;
-+}
-+
- static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
- 			  struct nlmsghdr *n)
- {
-@@ -239,12 +288,28 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
- 				NEXT_ARG();
- 				char *targets = strdupa(*argv);
- 				char *target = strtok(targets, ",");
--				int i;
-+				struct bond_vlan_tag *tags;
-+				int size, i;
- 
- 				for (i = 0; target && i < BOND_MAX_ARP_TARGETS; i++) {
--					__u32 addr = get_addr32(target);
--
--					addattr32(n, 1024, i, addr);
-+					struct {
-+						__u32 addr;
-+						struct bond_vlan_tag vlans[];
-+					} data;
-+					char *vlan_list, *dup;
-+
-+					dup = strdupa(target);
-+					data.addr = get_addr32(strsep(&dup, "["));
-+					vlan_list = strsep(&dup, "]");
-+
-+					if (vlan_list) {
-+						tags = bond_vlan_tags_parse(vlan_list, 0, &size);
-+						memcpy(&data.vlans, tags, size);
-+						addattr_l(n, 1024, i, &data,
-+							  sizeof(data.addr)+size);
-+					} else {
-+						addattr32(n, 1024, i, data.addr);
-+					}
- 					target = strtok(NULL, ",");
- 				}
- 				addattr_nest_end(n, nest);
-@@ -429,6 +494,22 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
- 	return 0;
- }
- 
-+static void bond_vlan_tags_print(const struct bond_vlan_tag *vlan)
-+{
-+	for (unsigned int l = 0; l < BOND_MAX_VLAN_TAGS + 1; l++, vlan++) {
-+		if (vlan->vlan_proto == BOND_VLAN_PROTO_NONE)
-+			return;
-+
-+		if (l > 0)
-+			print_string(PRINT_FP, NULL, "/", NULL);
-+
-+		print_uint(PRINT_ANY, NULL, "%u", vlan->vlan_id);
-+	}
-+
-+	fprintf(stderr, "Internal Error: too many vlan tags.\n");
-+	exit(1);
-+}
-+
- static void bond_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- {
- 	int i;
-@@ -499,24 +580,44 @@ static void bond_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 	if (tb[IFLA_BOND_ARP_IP_TARGET]) {
- 		struct rtattr *iptb[BOND_MAX_ARP_TARGETS + 1];
- 
--		parse_rtattr_nested(iptb, BOND_MAX_ARP_TARGETS,
--				    tb[IFLA_BOND_ARP_IP_TARGET]);
-+		parse_rtattr_nested(iptb, BOND_MAX_ARP_TARGETS, tb[IFLA_BOND_ARP_IP_TARGET]);
- 
- 		if (iptb[0]) {
- 			open_json_array(PRINT_JSON, "arp_ip_target");
- 			print_string(PRINT_FP, NULL, "arp_ip_target ", NULL);
- 		}
- 
--		for (i = 0; i < BOND_MAX_ARP_TARGETS; i++) {
--			if (iptb[i])
--				print_string(PRINT_ANY,
--					     NULL,
--					     "%s",
--					     rt_addr_n2a_rta(AF_INET, iptb[i]));
--			if (!is_json_context()
--			    && i < BOND_MAX_ARP_TARGETS-1
--			    && iptb[i+1])
--				fprintf(f, ",");
-+		for (unsigned int i = 0; i < BOND_MAX_ARP_TARGETS && iptb[i]; i++) {
-+			struct {
-+				__u32 addr;
-+				struct bond_vlan_tag vlans[BOND_MAX_VLAN_TAGS + 1];
-+			} data;
-+
-+			if (RTA_PAYLOAD(iptb[i]) < sizeof(data.addr) ||
-+				RTA_PAYLOAD(iptb[i]) > sizeof(data)) {
-+				fprintf(stderr, "Internal Error: Bad payload for arp_ip_target.\n");
-+				exit(1);
-+			}
-+			memcpy(&data, RTA_DATA(iptb[i]), RTA_PAYLOAD(iptb[i]));
-+
-+			open_json_object(NULL);
-+			print_color_string(PRINT_ANY, COLOR_INET, "addr", "%s",
-+					   rt_addr_n2a(AF_INET, sizeof(data.addr), &data.addr));
-+
-+			if (RTA_PAYLOAD(iptb[i]) > sizeof(data.addr)) {
-+				open_json_array(PRINT_JSON, "vlan");
-+				print_string(PRINT_FP, NULL, "[", NULL);
-+
-+				bond_vlan_tags_print(data.vlans);
-+
-+				close_json_array(PRINT_JSON, NULL);
-+				print_string(PRINT_FP, NULL, "]", NULL);
-+			}
-+
-+			if (i < BOND_MAX_ARP_TARGETS - 1 && iptb[i+1])
-+				print_string(PRINT_FP, NULL, ",", NULL);
-+
-+			close_json_object();
- 		}
- 
- 		if (iptb[0]) {
-@@ -528,8 +629,7 @@ static void bond_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 	if (tb[IFLA_BOND_NS_IP6_TARGET]) {
- 		struct rtattr *ip6tb[BOND_MAX_NS_TARGETS + 1];
- 
--		parse_rtattr_nested(ip6tb, BOND_MAX_NS_TARGETS,
--				    tb[IFLA_BOND_NS_IP6_TARGET]);
-+		parse_rtattr_nested(ip6tb, BOND_MAX_NS_TARGETS, tb[IFLA_BOND_NS_IP6_TARGET]);
- 
- 		if (ip6tb[0]) {
- 			open_json_array(PRINT_JSON, "ns_ip6_target");
-@@ -538,14 +638,11 @@ static void bond_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 
- 		for (i = 0; i < BOND_MAX_NS_TARGETS; i++) {
- 			if (ip6tb[i])
--				print_string(PRINT_ANY,
--					     NULL,
--					     "%s",
--					     rt_addr_n2a_rta(AF_INET6, ip6tb[i]));
--			if (!is_json_context()
--			    && i < BOND_MAX_NS_TARGETS-1
--			    && ip6tb[i+1])
--				fprintf(f, ",");
-+				print_color_string(PRINT_ANY, COLOR_INET6, NULL, "%s",
-+						   rt_addr_n2a_rta(AF_INET6, ip6tb[i]));
-+
-+			if (i < BOND_MAX_NS_TARGETS - 1 && ip6tb[i+1])
-+				print_string(PRINT_FP, NULL, ",", NULL);
- 		}
- 
- 		if (ip6tb[0]) {
--- 
-2.50.1
+let's add flags, we normally have some sort of flags for commands for
+extensibility
 
+> +       } struct_ops_assoc_prog;
+> +
+>  } __attribute__((aligned(8)));
+>
+>  /* The description below is an attempt at providing documentation to eBP=
+F
+> diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+> index a41e6730edcf..e57428e1653b 100644
+> --- a/kernel/bpf/bpf_struct_ops.c
+> +++ b/kernel/bpf/bpf_struct_ops.c
+> @@ -528,6 +528,7 @@ static void bpf_struct_ops_map_put_progs(struct bpf_s=
+truct_ops_map *st_map)
+>         for (i =3D 0; i < st_map->funcs_cnt; i++) {
+>                 if (!st_map->links[i])
+>                         break;
+> +               bpf_struct_ops_disassoc_prog(st_map->links[i]->prog);
+>                 bpf_link_put(st_map->links[i]);
+>                 st_map->links[i] =3D NULL;
+>         }
+> @@ -801,6 +802,11 @@ static long bpf_struct_ops_map_update_elem(struct bp=
+f_map *map, void *key,
+>                         goto reset_unlock;
+>                 }
+>
+> +               /* Don't stop a program from being reused. prog->aux->st_=
+ops_assoc
+
+nit: comment style, we are converging onto /* on separate line
+
+> +                * will point to the first struct_ops kdata.
+> +                */
+> +               bpf_struct_ops_assoc_prog(&st_map->map, prog);
+
+ignoring error? we should do something better here... poisoning this
+association altogether if program is used in multiple struct_ops seems
+like the only thing we can reasonable do, no?
+
+> +
+>                 link =3D kzalloc(sizeof(*link), GFP_USER);
+>                 if (!link) {
+>                         bpf_prog_put(prog);
+
+[...]
+
+>
+> +#define BPF_STRUCT_OPS_ASSOCIATE_PROG_LAST_FIELD struct_ops_assoc_prog.p=
+rog_fd
+> +
+
+looking at libbpf side, it's quite a mouthful to write out
+bpf_struct_ops_associate_prog()... maybe let's shorten this to
+BPF_STRUCT_OPS_ASSOC or BPF_ASSOC_STRUCT_OPS (with the idea that we
+associate struct_ops with a program). The latter is actually a bit
+more preferable, because then we can have a meaningful high-level
+bpf_program__assoc_struct_ops(struct bpf_program *prog, struct bpf_map
+*map), where map has to be struct_ops. Having bpf_map__assoc_prog() is
+a bit too generic, as this works only for struct_ops maps.
+
+It's all not major, but I think that lends for a bit better naming and
+more logical usage throughout.
+
+> +static int struct_ops_assoc_prog(union bpf_attr *attr)
+> +{
+> +       struct bpf_prog *prog;
+> +       struct bpf_map *map;
+> +       int ret;
+> +
+> +       if (CHECK_ATTR(BPF_STRUCT_OPS_ASSOCIATE_PROG))
+> +               return -EINVAL;
+> +
+> +       prog =3D bpf_prog_get(attr->struct_ops_assoc_prog.prog_fd);
+> +       if (IS_ERR(prog))
+> +               return PTR_ERR(prog);
+> +
+> +       map =3D bpf_map_get(attr->struct_ops_assoc_prog.map_fd);
+> +       if (IS_ERR(map)) {
+> +               ret =3D PTR_ERR(map);
+> +               goto out;
+> +       }
+> +
+> +       if (map->map_type !=3D BPF_MAP_TYPE_STRUCT_OPS ||
+> +           prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS) {
+
+you can check prog->type earlier, before getting map itself
+
+> +               ret =3D -EINVAL;
+> +               goto out;
+> +       }
+> +
+> +       ret =3D bpf_struct_ops_assoc_prog(map, prog);
+> +out:
+> +       if (ret && !IS_ERR(map))
+
+nit: purely stylistic preference, but I'd rather have a clear
+error-only clean up path, and success with explicit return 0, instead
+of checking ret or IS_ERR(map)
+
+    ...
+
+    /* goto to put_{map,prog}, depending on how far we've got */
+
+    err =3D bpf_struct_ops_assoc_prog(map, prog);
+    if (err)
+        goto put_map;
+
+    return 0;
+
+put_map:
+    bpf_map_put(map);
+put_prog:
+    bpf_prog_put(prog);
+    return err;
+
+
+> +               bpf_map_put(map);
+> +       bpf_prog_put(prog);
+> +       return ret;
+> +}
+> +
+
+[...]
 
