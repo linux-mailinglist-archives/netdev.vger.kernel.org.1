@@ -1,158 +1,200 @@
-Return-Path: <netdev+bounces-229145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A286BD88DA
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:49:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3896BD8964
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:54:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 368A31923E0D
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:49:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6D80541B5D
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2F6D2EBDC8;
-	Tue, 14 Oct 2025 09:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE492EBB83;
+	Tue, 14 Oct 2025 09:49:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YF/Pocbf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TPBBf6/S"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BFC52E7641
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 09:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2350E2E2F1A
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 09:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760435240; cv=none; b=oM0cU4n9cO0DFL+DTHJUrgjrLte7tOgq7jTnM6ehMfkCRsAy6qH1x/eUtbDfV8lmO+Sp/pqif+erN+VvV2RT8Ynt5E/F360+dgWKA2tKg4ZT90OOi+/SnnJm6UjJ36krAfebbrKSg1jFibCfdSCbAbiyGOermMUmOoangGk63hA=
+	t=1760435358; cv=none; b=MaWTFZjj8FvsSP/+LbTcC2y9V6//P6NXRY9fEX3lhgmAKNXJcY2FqA4+xnNYqPPQltLSDSBmpQp7IoB4gBkQA6UqM+enNaNRkRm2iSiTy5GGFV4ioTkeJ0vJtXOzsgd93MAQCtLbohUL/v99T0p+SkFennPBNuzhEV2Gllpo0YY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760435240; c=relaxed/simple;
-	bh=so4LHqIHw3CFGt8OZscMcsX45wmcCRUdVqsTf7gb+EY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rB5b+t5VV76bp1Ln7D7OCeQvlfWHWosPG6ze6q9NRCZtTgSImKBlI5OsZ8me7Mm1FPjcY+xpAMDdqNSn+U5bZHOsYkBEVFPKXNMHbx3nII+5dZ+iKu3Hs4PLfTk6odHplTdJh+p4HBii6QhF/jwxilJazMzJG7EBMZ9Y03ju2vA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YF/Pocbf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760435238;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5N6OEeG5CmV81eCe6A/4zE10OVgeRQaahrUEjZTGJf8=;
-	b=YF/PocbfHXofEjyMDgXzH6fORI969uEJxlhwb4gJOxBWRNzzpiZCZtdhkMFhSX4OipUuCB
-	iBAkUsNL09UhaRPR12moSNVVG9iw7dFjIyN5VynlYQcAZx3dAuzPY/c3cfVnT0G35QKxgo
-	eTk4LhtiG3GSvcxW4OpIRBb/u//Ei4U=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-662-NlcdX5T1OdSFFcufPQ81cA-1; Tue, 14 Oct 2025 05:47:15 -0400
-X-MC-Unique: NlcdX5T1OdSFFcufPQ81cA-1
-X-Mimecast-MFC-AGG-ID: NlcdX5T1OdSFFcufPQ81cA_1760435234
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-46e4c8fa2b1so21625515e9.0
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 02:47:14 -0700 (PDT)
+	s=arc-20240116; t=1760435358; c=relaxed/simple;
+	bh=gGb9eDVa6GvVYjR9gyWIr55BgaGdEpmDwy6Ql2lMG9k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R3mHJbvOOLpiLutS1Wjd+4WyURaI4iII7O9Oz6QuAf8TniSuQv65rxdC3v4Iz1ke5/vKVB/hjR4PXAhbuNhnj2DxyC+90jCe4NkSXO/WrVf4HKvU632pwJIJt5VCuS+ytu9pNb8+wWLNv6dL1g4Ba57D1nIezsXrftUaLUxxf44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TPBBf6/S; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-816ac9f9507so788202085a.1
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 02:49:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760435355; x=1761040155; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/rejcU5EZuKfOaVf3kGuy7qqlEcfNKn49oLZoxZhzh8=;
+        b=TPBBf6/S0rF6DBgg/Wz6eF6o71OngV/9WOKH+K/UYrQblEDvVMR7IaIGypoGhrh8uD
+         ss+yUof6CvLRyK+JXyOUkeW+5rSmaePXuJ8enm63d41z60mvtYwbVjzJSkE3Grcr39qx
+         eeEHy7y9LnJ5H7j/KfhQVb2u7iFArdxPUWwPM/E1tQ/NoNXg365BMOxnXEGM/Z8gAemY
+         MZa1Ycgcm06UjxLaiqzTbKtkc97SNKuf+PCnGLZMvxIFV8ZcbqKmWFEx4vo4A6nbFVS4
+         EhA0ya4zDQ20x6dQD0GtlAioNSQn2okTe8ORycShgj6bcNWq0Bl9z4TMSJC4mKsTAokm
+         neqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760435234; x=1761040034;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5N6OEeG5CmV81eCe6A/4zE10OVgeRQaahrUEjZTGJf8=;
-        b=An22kOwehA+/FVMmov5MeAkGoi5aprcy55A5Oyf5eZesEH2b6qa3+iQJl6qbTzkT3s
-         D1Mjk2t0s7WWiQtDbhmoDwe/8FtIDqoL+y6s5nlwGRQMjm9xu0vNUwHWYlRIgN8A5m7V
-         eNJDZGz2W9mRciw1aQKokr4He7dTLAqhyGSidlEgC+vNdkydjnvN7HDOa6arQGsnfqX3
-         3V0QTdmyyv5p7wuyUiWlm50c90rH1lPIoSiMjNrYqJrfI4EV9GyPRPGHcYvdq7YSTYGp
-         n5bv5/f/us6p1LWzPx5WCIb/xT2jy0F9c8WHQ4AshB2CYf7fRQ1d7f5bGFtbaD8IAZId
-         OIdw==
-X-Forwarded-Encrypted: i=1; AJvYcCX2TLMYCIOs51n4x/ef/c55OJug3tacS8iZqbThtKMiCaMpNJTQeVOGP0MJiEY6xEK2ZUa12rs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0ZK+KiIzYjBn6tp2+nSmyc4DMBgH1dEo+jVWH/6w6sMgTrbFD
-	ktqTxyUHv0iBf2gR5WWykdgMoyqcIOMIa31i8cfGJU4s+KToW5M9uvkvp2dPcCRFZR0N8iE4NuL
-	AeOrO2IVXa1XxkF/69iDLt6wqlBGlINHks/mxT6z6Q9ki9r5WHlp37bntIQ==
-X-Gm-Gg: ASbGncsfTNIAk76ZKXYd5jFF64timlOJ2CP1Aq6LNiOzcRZaarHb4l9ADyAFkZzkssw
-	wiblMW8r0BaoAdWW7i56VOEXNoQJbbkJUfb0vffz1gC6jW6hcSMUOFBhiHO9jEecOe/znArM52V
-	VBDuua9DSWs89dk136j3eRdEVBqXWKhlaVXrNgujCR0QHzmcSAosBFe9yjvQ3rTo7FKC5lleEqs
-	eb7Vc1Vsftyx/LfZaa56ZaMgEaKj2WBJi4tU0f4NETIA/pjEJKur9kOZdA6dxlu6uKIoa+eDCyu
-	BBfKljFndcYMNtWr2cDFY6Nt3GVOh/pT3XFXEYva/hPTOAXsTHyk7r6+VtPsMXgwQGtG8ezjY7L
-	ZDdYz0evwL7AR
-X-Received: by 2002:a05:600c:4690:b0:46e:3dc2:ebac with SMTP id 5b1f17b1804b1-46fa9afbb62mr156259755e9.27.1760435233752;
-        Tue, 14 Oct 2025 02:47:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGCHYgG+2qltz9vAWbpxtZa9W5FNzHR/pFUCq82szUc8pklfr6PSxnc4vOKKExKos7pXzHLrg==
-X-Received: by 2002:a05:600c:4690:b0:46e:3dc2:ebac with SMTP id 5b1f17b1804b1-46fa9afbb62mr156259465e9.27.1760435233351;
-        Tue, 14 Oct 2025 02:47:13 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fb479c171sm230297745e9.0.2025.10.14.02.47.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Oct 2025 02:47:12 -0700 (PDT)
-Message-ID: <2b9e0f15-6e4f-4510-91b6-8e4586e5f665@redhat.com>
-Date: Tue, 14 Oct 2025 11:47:11 +0200
+        d=1e100.net; s=20230601; t=1760435355; x=1761040155;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/rejcU5EZuKfOaVf3kGuy7qqlEcfNKn49oLZoxZhzh8=;
+        b=FuMVEdlvJPF6MsvhjlzVkwgv0Hwxz4p6PDT+7hDq6yzZyqoS04wMz6CaMQojpKLMW8
+         odINCuY9rfkEHb1x83XgI90YUhShNncSue85El+WoN50a6EVpXWADacQk3gglbnV4aYa
+         Cj6Mn34bAy9JzfbtQg9RjObd+EwexKEQMxVeh/acn1+juhlLqnpoaan2ojgNkILi/xV7
+         W5ydqS/jDQoW4v08Z2O85RDktV4FGwYUwUp+zMy5rAXxjjtjnPMrIGh0YwvIPOo19BuA
+         3sEX8lv2hESbV2TE3giO4o224Qo4ZLwf1N1UCQP98iDpNM2rnV3j2+YtIDKwnou+QW8G
+         yf9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXr+jV/ITThBgwkUfaLKxWMtBIrSS42DjKCj7G2nTtwbN9eYm0NdwO47Iwak2TV5aWQGFZMQ7k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxv+7hmOceeDQ4ZoIcmDU8j4p8zjpfLX3UWDVjSIA6b7sDzhHMy
+	TvGbYdpoP+hm3xeOxeRCzlNhZODG6aSJc8hWl+uHDwKwmvafuS4aYSRPG5BD5oYR2w4jXo8SuaI
+	rEQzOn8zYnszNgR56j5sPFJ9W5p1a31GWOzqIv17s
+X-Gm-Gg: ASbGncv8/CO5RJanSj2OtZ3T1l/vdhloJYJlClouKMFXCd/pdSho9fncZtA8upr5deW
+	oUdJh6Q2NM7HRm7q/+OL6tOJkahlHAhECXymo1vz7jD1kqaC0pXfWMTkxYO06Bz7XJhe3P6y6MC
+	/N8yEr81jcDKQYgf+/HWiEak9tkP4yBHRw4ANqLf/2XHTneAbLI3kGCwmwSijNmSNpioRAzhEOZ
+	yIdfrUTP1aUkHfxHz9IYhMdxxIRVBIZPnJQYl+Vse8=
+X-Google-Smtp-Source: AGHT+IHl4KYhns6HjXctJUP8o5ymMntOlhxSsAztTQ/ElyRGupOcA1nshFbafOIGxpIMTBr9aCbejFNLuYJavjSBG/8=
+X-Received: by 2002:a05:622a:1651:b0:4b7:a1b6:cf29 with SMTP id
+ d75a77b69052e-4e6de928b64mr379844891cf.41.1760435354432; Tue, 14 Oct 2025
+ 02:49:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Octeontx2-af: Fix missing error code in cgx_probe()
-To: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
- Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
- hariprasad <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: dan.carpenter@linaro.org, kernel-janitors@vger.kernel.org,
- error27@gmail.com
-References: <20251010204239.94237-1-harshit.m.mogalapalli@oracle.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251010204239.94237-1-harshit.m.mogalapalli@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251013101636.69220-1-21cnbao@gmail.com> <aO11jqD6jgNs5h8K@casper.infradead.org>
+ <CAGsJ_4x9=Be2Prbjia8-p97zAsoqjsPHkZOfXwz74Z_T=RjKAA@mail.gmail.com>
+ <CANn89iJpNqZJwA0qKMNB41gKDrWBCaS+CashB9=v1omhJncGBw@mail.gmail.com> <CAGsJ_4xGSrfori6RvC9qYEgRhVe3bJKYfgUM6fZ0bX3cjfe74Q@mail.gmail.com>
+In-Reply-To: <CAGsJ_4xGSrfori6RvC9qYEgRhVe3bJKYfgUM6fZ0bX3cjfe74Q@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Oct 2025 02:49:03 -0700
+X-Gm-Features: AS18NWCJcjmV12JbFBOiX1xuqww7glxnYRIPGxjvTUEA69A11zlzBQw_qx0TUQI
+Message-ID: <CANn89iKSW-kk-h-B0f1oijwYiCWYOAO0jDrf+Z+fbOfAMJMUbA@mail.gmail.com>
+Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network buffer allocation
+To: Barry Song <21cnbao@gmail.com>
+Cc: Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org, linux-mm@kvack.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Barry Song <v-songbaohua@oppo.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	Brendan Jackman <jackmanb@google.com>, Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Huacai Zhou <zhouhuacai@oppo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Oct 14, 2025 at 1:58=E2=80=AFAM Barry Song <21cnbao@gmail.com> wrot=
+e:
+>
+> On Tue, Oct 14, 2025 at 1:04=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Mon, Oct 13, 2025 at 9:09=E2=80=AFPM Barry Song <21cnbao@gmail.com> =
+wrote:
+> > >
+> > > On Tue, Oct 14, 2025 at 5:56=E2=80=AFAM Matthew Wilcox <willy@infrade=
+ad.org> wrote:
+> > > >
+> > > > On Mon, Oct 13, 2025 at 06:16:36PM +0800, Barry Song wrote:
+> > > > > On phones, we have observed significant phone heating when runnin=
+g apps
+> > > > > with high network bandwidth. This is caused by the network stack =
+frequently
+> > > > > waking kswapd for order-3 allocations. As a result, memory reclam=
+ation becomes
+> > > > > constantly active, even though plenty of memory is still availabl=
+e for network
+> > > > > allocations which can fall back to order-0.
+> > > >
+> > > > I think we need to understand what's going on here a whole lot more=
+ than
+> > > > this!
+> > > >
+> > > > So, we try to do an order-3 allocation.  kswapd runs and ... succee=
+ds in
+> > > > creating order-3 pages?  Or fails to?
+> > > >
+> > >
+> > > Our team observed that most of the time we successfully obtain order-=
+3
+> > > memory, but the cost is excessive memory reclamation, since we end up
+> > > over-reclaiming order-0 pages that could have remained in memory.
+> > >
+> > > > If it fails, that's something we need to sort out.
+> > > >
+> > > > If it succeeds, now we have several order-3 pages, great.  But wher=
+e do
+> > > > they all go that we need to run kswapd again?
+> > >
+> > > The network app keeps running and continues to issue new order-3 allo=
+cation
+> > > requests, so those few order-3 pages won=E2=80=99t be enough to satis=
+fy the
+> > > continuous demand.
+> >
+> > These pages are freed as order-3 pages, and should replenish the buddy
+> > as if nothing happened.
+>
+> Ideally, that would be the case if the workload were simple. However, the
+> system may have many other processes and kernel drivers running
+> simultaneously, also consuming memory from the buddy allocator and possib=
+ly
+> taking the replenished pages. As a result, we can still observe multiple
+> kswapd wakeups and instances of over-reclamation caused by the network
+> stack=E2=80=99s high-order allocations.
+>
+> >
+> > I think you are missing something to control how much memory  can be
+> > pushed on each TCP socket ?
+> >
+> > What is tcp_wmem on your phones ? What about tcp_mem ?
+> >
+> > Have you looked at /proc/sys/net/ipv4/tcp_notsent_lowat
+>
+> # cat /proc/sys/net/ipv4/tcp_wmem
+> 524288  1048576 6710886
+
+Ouch. That is insane tcp_wmem[0] .
+
+Please stick to 4096, or risk OOM of various sorts.
+
+>
+> # cat /proc/sys/net/ipv4/tcp_notsent_lowat
+> 4294967295
+>
+> Any thoughts on these settings?
+
+Please look at
+https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
+
+tcp_notsent_lowat - UNSIGNED INTEGER
+A TCP socket can control the amount of unsent bytes in its write queue,
+thanks to TCP_NOTSENT_LOWAT socket option. poll()/select()/epoll()
+reports POLLOUT events if the amount of unsent bytes is below a per
+socket value, and if the write queue is not full. sendmsg() will
+also not add new buffers if the limit is hit.
+
+This global variable controls the amount of unsent data for
+sockets not using TCP_NOTSENT_LOWAT. For these sockets, a change
+to the global variable has immediate effect.
 
 
-
-On 10/10/25 10:42 PM, Harshit Mogalapalli wrote:
-> When CGX fails mapping to NIX, set the error code to -ENODEV, currently
-> err is zero and that is treated as success path.
-> 
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Closes: https://lore.kernel.org/all/aLAdlCg2_Yv7Y-3h@stanley.mountain/
-> Fixes: d280233fc866 ("Octeontx2-af: Fix NIX X2P calibration failures")
-> Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-> ---
-> This is based on static analysis with smatch and only compile tested.
-> ---
->  drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> index d374a4454836..ec0e11c77cbf 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> @@ -1981,6 +1981,7 @@ static int cgx_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  	    !is_cgx_mapped_to_nix(pdev->subsystem_device, cgx->cgx_id)) {
->  		dev_notice(dev, "CGX %d not mapped to NIX, skipping probe\n",
->  			   cgx->cgx_id);
-> +		err = -ENODEV;
->  		goto err_release_regions;
->  	}
->  
-
-Side note, a few lines below there is this check:
-
-	err = pci_alloc_irq_vectors(pdev, nvec, nvec, PCI_IRQ_MSIX);
-	if (err < 0 || err != nvec) {
-		dev_err(dev, "Request for %d msix vectors failed, err %d\n",
-			nvec, err);
-		goto err_release_regions;
-	}
-
-AFAICS err can never be a positive value in that error path, but the
-
-	if (err < 0 || err != nvec)
-
-check is confusing and should possibly be changed to:
-
-	if (err < 0)
-
-/P
-
+Setting this sysctl to 2MB can effectively reduce the amount of memory
+in TCP write queues by 66 %,
+or allow you to increase tcp_wmem[2] so that only flows needing big
+BDP can get it.
 
