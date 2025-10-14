@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-229416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00DFDBDBD70
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 01:56:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36D69BDBD78
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 01:57:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB82A3E5F6F
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 23:56:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 033311925F10
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 23:57:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535062F548A;
-	Tue, 14 Oct 2025 23:56:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F6442F8BC0;
+	Tue, 14 Oct 2025 23:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y6SHkDUX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Os7JnQOl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63EE2F1FC2
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 23:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC212F5A2B
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 23:56:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760486174; cv=none; b=tKYSmk0/+OV8432BCbINm7tAX8FU0YCBZ2TyrY0p6xtg0OK+gT4YqHu/tqmqtIexlUTF7SC+24OT7DHSFh2i3Ugbw4uWBpv6i+37Xt+LYpTCxuG+OUT7JtZ42SLXN3MpoJHybGUMIEJEiVq5gieMUcR+IhSP+9B4UB8szu2ylMY=
+	t=1760486176; cv=none; b=mGHETkORTm0+98Uamg7mpBfs8ZALSLgOIOUBBcS5rSHHYu13kNwTSairUvP/1nx15+9T8j+KtS5IKl3vsymaf58RouOQ5YPv3FDgRVdnhg6p0rQ7nUKCV7FahH5YsHvaEQW2oEtQAR3m74CuH87NU4zq4GVKCjMZy1lRG1mIFH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760486174; c=relaxed/simple;
-	bh=Ayn372PAhRcvI+nHsbUuCvWiMh/ePpZHFkSbbtjQrho=;
+	s=arc-20240116; t=1760486176; c=relaxed/simple;
+	bh=Wx3oonPnxTQAfbSYtCzb3IA6bDpF1UtjNCV0U7bhOy4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XRg/ISmjLVOcm663Mb7EZFX+EXgmESp6wZiHTMC11ONVdN/pxO18TppdoGosw0XSNG/uR0d1lVLS4sdyxumcMw0kVS/KurRmQE25hIVNMrojgT8fQdJdWb6g64Zxk+B6xt/NEEqxgMdFPZy2Fr6O2r2gow4TJ1CgcIeXwokW2Cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y6SHkDUX; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=uIUHdY6B65WqW/QnmT7VT5TwN4pxJrBdtTjo/5xG62rHNtLUGTWxHMbpNhR5+rSL8mKWqxt1Pns3HpJXaT07V0iSw4MhLB+VaAWdjg2P5D5C1+AXR6p3AWwqfNFgnX56kV1aNCb+ourIDGqt8t80JJkj2bE8ZLeXaFYpWmRuhLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Os7JnQOl; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-336b9f3b5b0so12196390a91.3
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 16:56:12 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7a144677fd9so947956b3a.3
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 16:56:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760486172; x=1761090972; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760486174; x=1761090974; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LkMGz3z9AcP8ndOWtKXwgJOYtduiE1p/LMD8mE1xD+w=;
-        b=Y6SHkDUXKCE0Vy9jexqVPfWSVRMjz1HgDhOnlXMSyK4JbvtHfEyjNRfOB65h/GrXXN
-         TbYJmufXtPJ82QdUib+yNDd2XfIM7mBdktAbDGbCJhHAcb1UCItVWpgD8EpdtEYdyWed
-         3nziZSgkG6rQpv7ytmBWqziwbFyndH2iCxEkLOSIUvxQ2ObfKKW+2pNyX+3xO2l0lttJ
-         hw3DL4Z0HyCtQciUC8G6AFM7BtYWRIVSq29QFHPB1uyXYuNtY7Yooe1vLBO9TGT8XaFi
-         L8PGIeicLVJZv9IsU+YWCSMKIMfwCR1c7vgPxkelpSb2qpMAjvUAc9mx6JB0fiP0Fk2N
-         bP5g==
+        bh=4/RCVCGaPK6LjlPKGEvZncrbwe4KtV9jki2AWAAnogk=;
+        b=Os7JnQOlc+Jx/0w/XwkF8pU53CKVqBz7lmSRKDeLQi/0acY8gffeT0QlmIUavUuawd
+         LuyKsKMSb8MLf2aeTlMyeUgO/SBkeJ32upMG2NWsVOnevZHDRIC0KL2GXo1v6BY6caf9
+         CJdPo9oEdhC37Axx7cf05GxrqzbbDfcwFoBmKHJjN/4I3n7/lcayk175nFxaWCGKZqby
+         hfgGmHulatSxbjBItEPhePF2qSNIlUVdZVT0SjTVnlB9ANaBpOxHP6s0PU0U8yM+tRcy
+         YRnQBQ2p/FvIC3dTacr3+vTMw6oX/IXmbfpabl/iLymUELIl8SjNrYXuj1qxnmYPOgRo
+         PMgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760486172; x=1761090972;
+        d=1e100.net; s=20230601; t=1760486174; x=1761090974;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LkMGz3z9AcP8ndOWtKXwgJOYtduiE1p/LMD8mE1xD+w=;
-        b=OMnGbDaMQf2AYCa0eQ3bRAHE29augSHYEH0LmZPJaIoTdFyXPvhitdoHVYijgPWJaP
-         z+TO2RIZLeL1cOTttIYb9ejkuovC+vZ/L9cmGwueILoZThDPUMwySvzQSHjtds46YPbR
-         u0E3Tz+m6b9La6iuDu9eo/7HyzDMolljewvg10PVGUP8Xh5CHRy6uEmjzZfBDoGgj+7Y
-         iNCVPzo4eFIVhla0MyhjDMZwipPn1DLsAc5BFAUIr8nQtQbh1970DZ5DQBNlCfy26dLP
-         Q3wKSeHSA/KEUM7+ydUoF+oVViycIw8Mjyr2j22Tol1kG4ytCaWYBIwcSvD6hrSTFmYT
-         dgAg==
-X-Forwarded-Encrypted: i=1; AJvYcCWKHYDXCnnrCWO6MJpia3e+P9EBrtJzIpKzieUjZYc/NU2bDkq0/B1FUFGwfdv722eY1hT+0kU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVCzKNnLgvppaK34mF1o61EiJW38tXwo1HVDN8iAVCg+9PJsO7
-	A3IEREtdIDL6QYNUZu3Xgb+r86XPcw9sFlSTRTFMxPmUQOzyO/bQ9JiWc7WCqZWMTdQP3wyrY1U
-	7d3aXgg==
-X-Google-Smtp-Source: AGHT+IEiHimrgfpAzrW83/IDIFg3bQ/7vg2Px1o2QRdIC841HPosVY3EfhtqR13Knjq6uEtibQQfr8OGkec=
-X-Received: from pjqc13.prod.google.com ([2002:a17:90a:a60d:b0:330:82c6:d413])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3c06:b0:339:eff5:ef26
- with SMTP id 98e67ed59e1d1-33b513ced9cmr36967058a91.30.1760486171979; Tue, 14
- Oct 2025 16:56:11 -0700 (PDT)
-Date: Tue, 14 Oct 2025 23:54:56 +0000
+        bh=4/RCVCGaPK6LjlPKGEvZncrbwe4KtV9jki2AWAAnogk=;
+        b=HCtGHiuYo0Ih0yb+N6JTZm9qdq03mOLVW7MvZ0ZjJH0osYjXWR6tduw9zcmXfejlfE
+         QkIXcPtghTkCGDyvOvkoi70PrvNZ/RXH+Ipc3Z9yDS1UK4k9yMptVr+RkUlGzSnm5e//
+         ysbwNrHBh8WXqp25AWvcb8CY+ZYn0a8RXxVL2vIjCeyRfNrQsd9VZHbc71iLLU+jSw/x
+         23WNA3p7MRP3Ghxc7G4VS/roxSwYmV3UVZgEFrafmw33D1N6CVVEA1cztbUAAnuA1pdM
+         mAzFijli8qahDoC4Q4Vf6bfVlC/HjF3/EUERkRYnAZ+mQ+LEjURo2vPiNExybSjpM0RK
+         uL5A==
+X-Forwarded-Encrypted: i=1; AJvYcCU8L6MHyBTEoLjtCHhpYntf7JsghIp2N/Jm4xZu56lj+MNt5Yj7E43zRLFmCDZLm828aVngxDw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8CYNkhD0qJnCu2z6E5ezZ59QJZaqUctjy2yn6JsgT7uql63PU
+	nKoEVhoghrrqBlY1CSebB+CHm0DmdIN24pQ09cIJw0qy/Vv+/hBf03ezBIBEqV5z36X24WUyF3B
+	X3eUHMg==
+X-Google-Smtp-Source: AGHT+IFAB4XV4F12HPB1uOsT3Hefu/mSk4BZ2sJZZSN7huJgUsy/c6ZkatLRWl2WmtL7dTGtG7rc88+y/TY=
+X-Received: from pgnb6.prod.google.com ([2002:a63:7146:0:b0:b54:f4ad:a4aa])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:999c:b0:2ef:1d19:3d3
+ with SMTP id adf61e73a8af0-32da8139359mr38371184637.14.1760486173580; Tue, 14
+ Oct 2025 16:56:13 -0700 (PDT)
+Date: Tue, 14 Oct 2025 23:54:57 +0000
 In-Reply-To: <20251014235604.3057003-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251014235604.3057003-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.51.0.788.g6d19910ace-goog
-Message-ID: <20251014235604.3057003-4-kuniyu@google.com>
-Subject: [PATCH v2 bpf-next/net 3/6] net: Introduce net.core.bypass_prot_mem sysctl.
+Message-ID: <20251014235604.3057003-5-kuniyu@google.com>
+Subject: [PATCH v2 bpf-next/net 4/6] bpf: Support bpf_setsockopt() for BPF_CGROUP_INET_SOCK_CREATE.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
 	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>
@@ -88,137 +88,96 @@ Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.
 	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-If a socket has sk->sk_bypass_prot_mem flagged, the socket opts out
-of the global protocol memory accounting.
+We will support flagging sk->sk_bypass_prot_mem via bpf_setsockopt()
+at the BPF_CGROUP_INET_SOCK_CREATE hook.
 
-Let's control the flag by a new sysctl knob.
+BPF_CGROUP_INET_SOCK_CREATE is invoked by __cgroup_bpf_run_filter_sk()
+that passes a pointer to struct sock to the bpf prog as void *ctx.
 
-The flag is written once during socket(2) and is inherited to child
-sockets.
+But there are no bpf_func_proto for bpf_setsockopt() that receives
+the ctx as a pointer to struct sock.
 
-Tested with a script that creates local socket pairs and send()s a
-bunch of data without recv()ing.
+Also, bpf_getsockopt() will be necessary for a cgroup with multiple
+bpf progs running.
 
-Setup:
+Let's add new bpf_setsockopt() and bpf_getsockopt() variants for
+BPF_CGROUP_INET_SOCK_CREATE.
 
-  # mkdir /sys/fs/cgroup/test
-  # echo $$ >> /sys/fs/cgroup/test/cgroup.procs
-  # sysctl -q net.ipv4.tcp_mem="1000 1000 1000"
-  # ulimit -n 524288
-
-Without net.core.bypass_prot_mem, charged to tcp_mem & memcg
-
-  # python3 pressure.py &
-  # cat /sys/fs/cgroup/test/memory.stat | grep sock
-  sock 22642688 <-------------------------------------- charged to memcg
-  # cat /proc/net/sockstat| grep TCP
-  TCP: inuse 2006 orphan 0 tw 0 alloc 2008 mem 5376 <-- charged to tcp_mem
-  # ss -tn | head -n 5
-  State Recv-Q Send-Q Local Address:Port  Peer Address:Port
-  ESTAB 2000   0          127.0.0.1:34479    127.0.0.1:53188
-  ESTAB 2000   0          127.0.0.1:34479    127.0.0.1:49972
-  ESTAB 2000   0          127.0.0.1:34479    127.0.0.1:53868
-  ESTAB 2000   0          127.0.0.1:34479    127.0.0.1:53554
-  # nstat | grep Pressure || echo no pressure
-  TcpExtTCPMemoryPressures        1                  0.0
-
-With net.core.bypass_prot_mem=1, charged to memcg only:
-
-  # sysctl -q net.core.bypass_prot_mem=1
-  # python3 pressure.py &
-  # cat /sys/fs/cgroup/test/memory.stat | grep sock
-  sock 2757468160 <------------------------------------ charged to memcg
-  # cat /proc/net/sockstat | grep TCP
-  TCP: inuse 2006 orphan 0 tw 0 alloc 2008 mem 0 <- NOT charged to tcp_mem
-  # ss -tn | head -n 5
-  State Recv-Q Send-Q  Local Address:Port  Peer Address:Port
-  ESTAB 111000 0           127.0.0.1:36019    127.0.0.1:49026
-  ESTAB 110000 0           127.0.0.1:36019    127.0.0.1:45630
-  ESTAB 110000 0           127.0.0.1:36019    127.0.0.1:44870
-  ESTAB 111000 0           127.0.0.1:36019    127.0.0.1:45274
-  # nstat | grep Pressure || echo no pressure
-  no pressure
+Note that inet_create() is not under lock_sock() and has the same
+semantics with bpf_lsm_unlocked_sockopt_hooks.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 Acked-by: Roman Gushchin <roman.gushchin@linux.dev>
-Reviewed-by: Shakeel Butt <shakeel.butt@linux.dev>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
 ---
- Documentation/admin-guide/sysctl/net.rst | 8 ++++++++
- include/net/netns/core.h                 | 1 +
- net/core/sock.c                          | 5 +++++
- net/core/sysctl_net_core.c               | 9 +++++++++
- 4 files changed, 23 insertions(+)
+ net/core/filter.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/Documentation/admin-guide/sysctl/net.rst b/Documentation/admin-guide/sysctl/net.rst
-index 2ef50828aff16..3dbe0ea212e81 100644
---- a/Documentation/admin-guide/sysctl/net.rst
-+++ b/Documentation/admin-guide/sysctl/net.rst
-@@ -212,6 +212,14 @@ mem_pcpu_rsv
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 76628df1fc82f..ed3f0e5360595 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -5733,6 +5733,40 @@ static const struct bpf_func_proto bpf_sock_addr_getsockopt_proto = {
+ 	.arg5_type	= ARG_CONST_SIZE,
+ };
  
- Per-cpu reserved forward alloc cache size in page units. Default 1MB per CPU.
- 
-+bypass_prot_mem
-+---------------
++BPF_CALL_5(bpf_sock_create_setsockopt, struct sock *, sk, int, level,
++	   int, optname, char *, optval, int, optlen)
++{
++	return __bpf_setsockopt(sk, level, optname, optval, optlen);
++}
 +
-+Skip charging socket buffers to the global per-protocol memory
-+accounting controlled by net.ipv4.tcp_mem, net.ipv4.udp_mem, etc.
++static const struct bpf_func_proto bpf_sock_create_setsockopt_proto = {
++	.func		= bpf_sock_create_setsockopt,
++	.gpl_only	= false,
++	.ret_type	= RET_INTEGER,
++	.arg1_type	= ARG_PTR_TO_CTX,
++	.arg2_type	= ARG_ANYTHING,
++	.arg3_type	= ARG_ANYTHING,
++	.arg4_type	= ARG_PTR_TO_MEM | MEM_RDONLY,
++	.arg5_type	= ARG_CONST_SIZE,
++};
 +
-+Default: 0 (off)
++BPF_CALL_5(bpf_sock_create_getsockopt, struct sock *, sk, int, level,
++	   int, optname, char *, optval, int, optlen)
++{
++	return __bpf_getsockopt(sk, level, optname, optval, optlen);
++}
 +
- rmem_default
- ------------
- 
-diff --git a/include/net/netns/core.h b/include/net/netns/core.h
-index 9b36f0ff0c200..e9053d64c8efc 100644
---- a/include/net/netns/core.h
-+++ b/include/net/netns/core.h
-@@ -16,6 +16,7 @@ struct netns_core {
- 	int	sysctl_optmem_max;
- 	u8	sysctl_txrehash;
- 	u8	sysctl_tstamp_allow_data;
-+	u8	sysctl_bypass_prot_mem;
- 
- #ifdef CONFIG_PROC_FS
- 	struct prot_inuse __percpu *prot_inuse;
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 7de189ec2556a..b28373e20d743 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2306,8 +2306,13 @@ struct sock *sk_alloc(struct net *net, int family, gfp_t priority,
- 		 * why we need sk_prot_creator -acme
- 		 */
- 		sk->sk_prot = sk->sk_prot_creator = prot;
++static const struct bpf_func_proto bpf_sock_create_getsockopt_proto = {
++	.func		= bpf_sock_create_getsockopt,
++	.gpl_only	= false,
++	.ret_type	= RET_INTEGER,
++	.arg1_type	= ARG_PTR_TO_CTX,
++	.arg2_type	= ARG_ANYTHING,
++	.arg3_type	= ARG_ANYTHING,
++	.arg4_type	= ARG_PTR_TO_UNINIT_MEM,
++	.arg5_type	= ARG_CONST_SIZE,
++};
 +
-+		if (READ_ONCE(net->core.sysctl_bypass_prot_mem))
-+			sk->sk_bypass_prot_mem = 1;
-+
- 		sk->sk_kern_sock = kern;
- 		sock_lock_init(sk);
-+
- 		sk->sk_net_refcnt = kern ? 0 : 1;
- 		if (likely(sk->sk_net_refcnt)) {
- 			get_net_track(net, &sk->ns_tracker, priority);
-diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
-index 8cf04b57ade1e..2e91fe728969b 100644
---- a/net/core/sysctl_net_core.c
-+++ b/net/core/sysctl_net_core.c
-@@ -676,6 +676,15 @@ static struct ctl_table netns_core_table[] = {
- 		.extra1		= SYSCTL_ZERO,
- 		.extra2		= SYSCTL_ONE
- 	},
-+	{
-+		.procname	= "bypass_prot_mem",
-+		.data		= &init_net.core.sysctl_bypass_prot_mem,
-+		.maxlen		= sizeof(u8),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dou8vec_minmax,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ONE
-+	},
- 	/* sysctl_core_net_init() will set the values after this
- 	 * to readonly in network namespaces
- 	 */
+ BPF_CALL_5(bpf_sock_ops_setsockopt, struct bpf_sock_ops_kern *, bpf_sock,
+ 	   int, level, int, optname, char *, optval, int, optlen)
+ {
+@@ -8062,6 +8096,20 @@ sock_filter_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
+ 		return &bpf_sk_storage_get_cg_sock_proto;
+ 	case BPF_FUNC_ktime_get_coarse_ns:
+ 		return &bpf_ktime_get_coarse_ns_proto;
++	case BPF_FUNC_setsockopt:
++		switch (prog->expected_attach_type) {
++		case BPF_CGROUP_INET_SOCK_CREATE:
++			return &bpf_sock_create_setsockopt_proto;
++		default:
++			return NULL;
++		}
++	case BPF_FUNC_getsockopt:
++		switch (prog->expected_attach_type) {
++		case BPF_CGROUP_INET_SOCK_CREATE:
++			return &bpf_sock_create_getsockopt_proto;
++		default:
++			return NULL;
++		}
+ 	default:
+ 		return bpf_base_func_proto(func_id, prog);
+ 	}
 -- 
 2.51.0.788.g6d19910ace-goog
 
