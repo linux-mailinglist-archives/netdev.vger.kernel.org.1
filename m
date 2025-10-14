@@ -1,93 +1,103 @@
-Return-Path: <netdev+bounces-229331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34077BDABC4
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 19:05:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF41EBDABEC
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 19:13:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D25B1895CBB
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:05:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37C373E833A
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:13:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546D02FC007;
-	Tue, 14 Oct 2025 17:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A692F49F8;
+	Tue, 14 Oct 2025 17:13:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TFyoYh9o"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="sDBydC1F"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3A2226863
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 17:04:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 338C0242D97
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 17:13:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760461499; cv=none; b=jkW9/khO340JRbduPQMmnOrA+Mfgh7LyZ1q4NNeRNaIjfy6BNiUUgOduXHBqWnKVdgEXhnw1xq8KqPB+5IWskKV41hy6z8r6RMsX3Rl66CZcs+0n1uHPMOPUXLOjUNLAAKufUbkB2+R1nLYdE2Vm0pGstkbW46DjEvpdmW+Gyr4=
+	t=1760461995; cv=none; b=T0KrPQbkge/TMAfv8dhCFgT/QHXOaLQqXcZ0V1+ujXTj6zG4k6d3hiEs5W4U8bNqeZdJbrPSJmwe1a+km/6VLkO6A1l7ZXea5kQ88xBE9LJhwyQuPz7KuMhkiLIgC7aqMSAf0tzZcY9vfuew6soY/mBiDXG1rSomOrZvvsVhx+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760461499; c=relaxed/simple;
-	bh=zR4mj2V8xlY6/bkgaX0KeLu9NGXdt0uBdeyroBZnuXA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FXxPvUSATUiuPllXGw+hRos/nxNZoxcjphtF0HRC71jkzQT70NP/w5rBeIiUeB9pYAO0/TycXMhGE0mfs6lu6RZlxXoJrUk3qET+xnmzqIwQvCbv9yE6BKczWgB01GFhqV/YYVwkmo+YEMK79/Yblkc+/0nTIeDmwOljhp31hR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TFyoYh9o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 458A5C4CEE7;
-	Tue, 14 Oct 2025 17:04:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760461498;
-	bh=zR4mj2V8xlY6/bkgaX0KeLu9NGXdt0uBdeyroBZnuXA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TFyoYh9o1mQ5kRzm/lKPzZS2fjgxXcSn1Nnr/oXwplmENuJsQ+unynLLSU53rtYdL
-	 fAIcSo1h9oE85Jn9xsptxcJlQMdKWMvYCqYTCka57w5BqgLpeBa+d1sT3b4Rkllj0e
-	 DaiXXRkC6PdSyHDUdgLtPCWxVmemEQ6h+DYZV2p7JZf7iI930fNlfEj316TfVyGAhm
-	 LUjFzZr0a1iKMjZkwq8vjcOtWFPxNmWCeW0XfgV+hurQL2dga+fuhYRTXIDXauS8Uv
-	 N5flbSPxy8AHQXimgfErnfv+DD7BXSOZ9iU+d/FMlC0oUf9whZq75iglUtwQ8O6Yes
-	 ZMip35fh/+gdg==
-Date: Tue, 14 Oct 2025 10:04:57 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, "David S . Miller"
- <davem@davemloft.net>, Simon Horman <horms@kernel.org>, Neal Cardwell
- <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, Kuniyuki
- Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] tcp: better handle TCP_TX_DELAY on established
- flows
-Message-ID: <20251014100457.3f6de3e0@kernel.org>
-In-Reply-To: <CANn89iL0ZjuH-YiuBbm2+s_2adQzVUVOi4VYDvwGBXjTBYHb=A@mail.gmail.com>
-References: <20251013145926.833198-1-edumazet@google.com>
-	<3b20bfde-1a99-4018-a8d9-bb7323b33285@redhat.com>
-	<CANn89iKu7jjnjc1QdUrvbetti2AGhKe0VR+srecrpJ2s-hfkKA@mail.gmail.com>
-	<CANn89iL8YKZZQZSmg5WqrYVtyd2PanNXzTZ2Z0cObpv9_XSmoQ@mail.gmail.com>
-	<ffa599b8-2a9c-4c25-a65f-ed79cee4fa21@redhat.com>
-	<CANn89iLyO66z_r0hfY62dFBuhA-WmYcW+YhuAkDHaShmhUMZwQ@mail.gmail.com>
-	<20251014090629.7373baa7@kernel.org>
-	<CANn89iL0ZjuH-YiuBbm2+s_2adQzVUVOi4VYDvwGBXjTBYHb=A@mail.gmail.com>
+	s=arc-20240116; t=1760461995; c=relaxed/simple;
+	bh=NuAsb1w8NLgDS8QqD1VxcmP2E+E2Rik3hj4154+lvbs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YWvwQ4Ou+acMeFLq8rCnaOZAkvyZJzUUjT3KLezvrkDp3c1F5gy9Mmbsj1fbSN5I+yByIDnIF9fiAqo3/hvOfZ7xeQ+d65SPZrx9S7dQhlNisPaLK1RxdAR03l7pqyiRhSz+btQ4uZWfgBrSsUbVjRduyvUMCZKPqNnchcRtrpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=sDBydC1F; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from ubuntu.home (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 353E7200A8C0;
+	Tue, 14 Oct 2025 19:07:07 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 353E7200A8C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1760461627;
+	bh=zFLurzG9VYw7z45KhSzX6d66KojjsftffxwY34E068Y=;
+	h=From:To:Cc:Subject:Date:From;
+	b=sDBydC1FHmOaoA9sfUfzEwD09A39ZWKEuaptM8VvxZ2AItKgeYbQxLuBqkqNmN3rV
+	 5udIlyjzao+0oMFZpLivHGzYoI1kCZ+HkwLoflE3USIVZsKMcy6UY6LAcm2WiU4pSM
+	 /omlqxvIJChG3UmYPCe8NfDMO6JRyQHx71WbEV4UHI+8G0WAXjhQeF/chf+Pq6PQKF
+	 qWi/iZWO5zLlc+nLcHUQMI9XnOI1ZKpjYmHflM+GDC9Ul2YcALXMS7qQRFmftkTTXH
+	 Kh0eSeHW1sNS9QVQKdP5b+oIkU4l4awjAr2cr7Y4hgloFcCtjAF8FdhgFXYOl1FoRO
+	 G+4Zlgd1TXnQQ==
+From: Justin Iurman <justin.iurman@uliege.be>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	justin.iurman@uliege.be
+Subject: [PATCH net-next] MAINTAINERS: new entry for IPv6 IOAM
+Date: Tue, 14 Oct 2025 19:06:50 +0200
+Message-Id: <20251014170650.27679-1-justin.iurman@uliege.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, 14 Oct 2025 09:16:23 -0700 Eric Dumazet wrote:
-> On Tue, Oct 14, 2025 at 9:06=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> > On Tue, 14 Oct 2025 02:40:39 -0700 Eric Dumazet wrote: =20
-> > > Or add a best effort, so that TCP can have some clue, vast majority of
-> > > cases is that the batch is 1 skb :) =20
-> >
-> > FWIW I don't see an official submission and CI is quite behind
-> > so I'll set the test to ignored for now. =20
->=20
-> You mean this TCP_TX_DELAY patch ? Or the series ?
->=20
-> I will send V2 of the series soon.  (I added the test unflake in it)
+Create a maintainer entry for IPv6 IOAM. Add myself as I authored most
+if not all of the IPv6 IOAM code in the kernel and actively participate
+in the related IETF groups.
 
-Great, I wasn't clear whether you'll send a separate fix or v2.
-So I disabled the test itself.=20
-Not the patches, patches are still queued.=20
+Acked-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+---
+ MAINTAINERS | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Sorry for the confusion, our CI is what it is - just carry on as normal
-and I'll try to keep up.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 3a27901781c2..95b1e5054ea0 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -18011,6 +18011,16 @@ X:	net/rfkill/
+ X:	net/wireless/
+ X:	tools/testing/selftests/net/can/
+ 
++NETWORKING [IOAM]
++M:	Justin Iurman <justin.iurman@uliege.be>
++S:	Maintained
++F:	Documentation/networking/ioam6*
++F:	include/linux/ioam6*
++F:	include/net/ioam6*
++F:	include/uapi/linux/ioam6*
++F:	net/ipv6/ioam6*
++F:	tools/testing/selftests/net/ioam6*
++
+ NETWORKING [IPSEC]
+ M:	Steffen Klassert <steffen.klassert@secunet.com>
+ M:	Herbert Xu <herbert@gondor.apana.org.au>
+-- 
+2.34.1
+
 
