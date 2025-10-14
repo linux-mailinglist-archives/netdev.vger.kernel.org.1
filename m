@@ -1,96 +1,355 @@
-Return-Path: <netdev+bounces-229149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0882EBD8A2B
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 12:03:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC7C7BD8A4C
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 12:04:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A75C13A573D
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:00:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C9BF3A8240
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C1D2FDC4C;
-	Tue, 14 Oct 2025 10:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 886B4305940;
+	Tue, 14 Oct 2025 10:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h3PhrNjV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VV3yxcrR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361912ED14B;
-	Tue, 14 Oct 2025 10:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760436021; cv=none; b=ZmXsVVJpE8yeWXCE07XuYgF+LrL7H56rVVRYJHs8KCd+ziIG1DFYrCI5Nix00NhyJqA17cdC7UbGBONFcIPIjrI0vzqfpe0wCEjqZlOkERCj5N1L5QE1wCuJ61QcXJ40NaPxpVM9bG6dbioK1lu5ztcs0EPf5k3ADDK7lPMJtpY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760436021; c=relaxed/simple;
-	bh=UHMe3b81m1UgQXFwSvOBKeHPx1lLJ4CKMtlBBgihsAs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aLNV9ErtCqPUrdzvw0xiBVNGZWJwNi+F7vRmdI1Acy8yfeBJcZAn+lT2w2KnMPxwHjIsz0NF6UIBJB/ixFJgHM5slP99V2pmniRlj/u73RTY2wYQSesnDQ9HTUTA46zSnuaqxlSYVimhhDV4stPulLnGh/RaeCff9GS0nxVIyIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h3PhrNjV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11498C4CEFE;
-	Tue, 14 Oct 2025 10:00:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760436021;
-	bh=UHMe3b81m1UgQXFwSvOBKeHPx1lLJ4CKMtlBBgihsAs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=h3PhrNjVfWTy6iRKoQmoH1fhNUUDKL6nVZHtEv5WQYVvgNR4aOdwg7knoWRs38K6b
-	 HJ9NY6pX/SgLC5AffA+yvjjt3MH8Hcdq0J0AtJGm5tH80hVFvbh/AjQZjG0G1NMQnT
-	 2mbxtE99AvqYAX2jNAEdrORMoNkC8k8tqR8HF4ds7yMgLXqw+gaJicP1NqifbO0DCy
-	 UFoMbegNeio814b7oslK4LxHbXDUSmmjWSAZqu2ebAzR3WJ3fd8Hm39Qe4Rcd2ajrj
-	 KRvrf/gd13esjseTOaQFmAzOhOWfMC0AK/fpgkLyx4K3U37iA7pJGpey2I62bOMC9e
-	 U1vk8d+I6/PXA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AEB7C380A97F;
-	Tue, 14 Oct 2025 10:00:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7E717A305
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 10:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760436024; cv=fail; b=ahVV52ToPV3ou7LQx5DZrYa0eHUg0T2aca1I+h94wRgMom3532DewzKxyYTrNFwniNSRRGzLNZijwZg1+U7IbMFW6Brw+KGVZx+SU4I2ZUi1KEi0UABBi4pAr+OA50OxvJi5OEuvFT0GwMMhtYk6Y1QboA9kMgjzLkEH2DxZyRQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760436024; c=relaxed/simple;
+	bh=PT683y/3F45VKyolQOTdVlRmS6PrR1BW7L4qbwWnSZc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=icuF5cmsferL9TYEDuqw5tsbLnXgp4sbOZ9tkYSUG+79b7RyFsmulYxpO3EOzOJPzeVfx+WVcjZltMcxj8zYLO6p+P/s1ymGiPMkKaFb0l7U7gJk2Li45bppZXayg5PJX5WMZ30ep8VTu/ruTHBdipGrV9H3/lFzKExmAepiJ1Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VV3yxcrR; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760436021; x=1791972021;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=PT683y/3F45VKyolQOTdVlRmS6PrR1BW7L4qbwWnSZc=;
+  b=VV3yxcrRSeZA1pwpbo0lyMIjqfmy2MwLQrGFqNRq0veSP9wEI3OKZR2b
+   ixsPkvMeVRCKIemFrbinbvvA5f0nHia5kBeQ0c6cvDUawSg6RS4dyr5sq
+   Ze3QcJHtyYmVy1z78SHEuP5U4ioAirZdPz0/ra0iit1bzeYKKTmFH6dRG
+   +K1nZ7uTD0WSfh0HO6CzCEY7LO3MeQUmsgWJFUqLsM8K8lCk9wwuVv7OM
+   fl6bvLH7o5j6Em1gallFj+lPyLySvmr2Qt6N3/YHNmEQypJuh2LcioYz/
+   +65npw+k6tTnijbCKBOQx7PD2+87KtoTQgBg6h1IytHUFaXKxjCcWX6bk
+   A==;
+X-CSE-ConnectionGUID: e8YK2IWVRFCy2OJxCLDwfw==
+X-CSE-MsgGUID: xSjyGr1RTVmJ2hKzQsOIxA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11581"; a="72860318"
+X-IronPort-AV: E=Sophos;i="6.19,227,1754982000"; 
+   d="scan'208";a="72860318"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2025 03:00:20 -0700
+X-CSE-ConnectionGUID: JYV8t/v2Q8CT5ek5ofNrbg==
+X-CSE-MsgGUID: vTkYanGnS0uVTbA3Xk0VZw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,227,1754982000"; 
+   d="scan'208";a="205542155"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2025 03:00:17 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Tue, 14 Oct 2025 03:00:16 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Tue, 14 Oct 2025 03:00:16 -0700
+Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.38) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Tue, 14 Oct 2025 03:00:16 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JlGyDXs0NdHgDZuqh1Hpi+Dp/+OhbHSL0YeXbzvOFJqaoFNhh0DokbdgYbHCgnqsaSQN9CzK4PggZM2X8wWsli4sxs9+fbauiR81M9jwX+Jr2hEbU11D6u2wqjNEdIJFxNdhPYUrSXF4TUedSQs/jl9hgpbDzjp0dlmyWBLLExHckoCqJqaUTujZtKXyAi+yDE02d7Qeo4xmn+7UQ/kjG+4BPonqJ3xS9BXx1c6mpogLbv7/Z03n18CvT7pHzWlYY/FtFV/Wh7wHFfGJk63IVGYl0bh2P0HFwr7rK1iYks78IN4QKJE8qg89M7hK7HbaafPgN1yJciQKYVIVsKzxDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+I/ONCLfkSIBXDkCi+DhYJbGnic0zDiQsElNErVHUac=;
+ b=lwi6DbNX/frYlp3e9vHkA2AMrNCI6mOG7TnEKmg5/GOYdV+pksxa8aLHzNCygh1Ch/QBRwicJZ63x07PO4bJWxVyblSNSwExArr0khdsYUDSQYy+N6izNEUBGR6aIHKwt5zfhewsl8/PQpwr0sok32X+Knm21OjwhVrkqWv42UVFJqQje3AKFgkLlxfvt0sr27DsanorbmZsVLUW+6fANDrIol18h4QQTpGgguHgh/IjjrIWhNMhxqjWv+Bq30K75yuElvmXllocaibo3v3MOpzObZ7IZYjgIq3r+Q6T6GFsblNRyG+IRWS9UeBsE3V1dZaO0n8t3v9iSqq2acQrPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by PH7PR11MB7452.namprd11.prod.outlook.com (2603:10b6:510:27d::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9203.13; Tue, 14 Oct
+ 2025 10:00:13 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919%4]) with mapi id 15.20.9203.009; Tue, 14 Oct 2025
+ 10:00:13 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "Loktionov, Aleksandr"
+	<aleksandr.loktionov@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Korba, Przemyslaw"
+	<przemyslaw.korba@intel.com>, "Olech, Milena" <milena.olech@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH v10 iwl-next] ice: add recovery clock
+ and clock 1588 control for E825c
+Thread-Topic: [Intel-wired-lan] [PATCH v10 iwl-next] ice: add recovery clock
+ and clock 1588 control for E825c
+Thread-Index: AQHcHndsubICbHmWYkSPxlJPJjrrL7TBoLxg
+Date: Tue, 14 Oct 2025 10:00:12 +0000
+Message-ID: <IA1PR11MB62410DD80696835C74F231688BEBA@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20250905150947.871566-1-grzegorz.nitka@intel.com>
+In-Reply-To: <20250905150947.871566-1-grzegorz.nitka@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|PH7PR11MB7452:EE_
+x-ms-office365-filtering-correlation-id: c0286742-9b12-491d-747c-08de0b0877bf
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021|7053199007;
+x-microsoft-antispam-message-info: =?us-ascii?Q?jN/TUs6HFn2b3egqdu8DBJ+bPJXbPu8Eu6Q9i87cZhRh7SLWQq2XRCXGd9Bt?=
+ =?us-ascii?Q?5FWOOu5anuBysEGRQ6Ucyx8GEGFW66/Z6IUfgigvCzMGA/HFkXL2izqfWT7m?=
+ =?us-ascii?Q?fHoq08dL0eEpcL3KWOcR9zK5lbb84nBU0Rk0tT/nHTpJmXb3/uvca5MHd8gF?=
+ =?us-ascii?Q?/FvdomGcAEaWP+pBQ+RSZImJJYM1xzGsoBo6NGoqLrUzOuJuRXKp9+DgaxE6?=
+ =?us-ascii?Q?YgVOJ5H/E2HcBO4SyMKayigLYg0j93TbNCTbqmAypT4JZP0QLNdcmcARRepM?=
+ =?us-ascii?Q?PGRjGJ8zhOghWhvIZvNBmm/3BhELdJCDDjS8kjVbPys2dKcdHSQ2a+UpnR5B?=
+ =?us-ascii?Q?q+xpnVT/FcQi3Iea+UuvQzmq4ns3qH+oje6aUHRBpXqYVd6bJjnb4BZboCON?=
+ =?us-ascii?Q?WIcOKkhbwxl+U4YfNQEMqYuF23aF9oLcTyrnf7GqgMM07k1ez4KNs0OQPs5U?=
+ =?us-ascii?Q?r0Fk4KCoDkY0GYOP/hpHUsVU8ycz7h6aWLLGus70mTY36xuBcK/k2Jb9zFwz?=
+ =?us-ascii?Q?rGBL54fBlzgaZ2vNYE82LWn6pXNe57RTWsRz3Q4EUWFbOCUxn7wAE2e+uVpu?=
+ =?us-ascii?Q?yN86/gX7dlRQaxpL63M6ScYkI7+dHOE9Kw5XR57HWglJF5s540KwSGvUZInv?=
+ =?us-ascii?Q?5zhGYprZ5C81WGMZctKWyAmhbmdJiMDANuRsUHK5j0TpsON5N4GgOGi3d1VP?=
+ =?us-ascii?Q?+20rQDifbMolpdLMZoAXRyuf/9XpNuGoF5gDrcDjFp+J6F0JOoU5dxnrzH45?=
+ =?us-ascii?Q?+iDY+aT7b/qGes1HjCDWf0kOYuPkZ7x6UMNtF33prlRdHtveNga549mdnI5d?=
+ =?us-ascii?Q?/kqtuPH9py2PpjnEUZnpevRO4rI5qlCf87aRY7f6PIxFgJLN/zsXn9wseCnH?=
+ =?us-ascii?Q?dgANDkpIJLL5wZy99BS78C/D4EaEDkeGfOzYX6Rd6mrA9v536P7Ti46DNT33?=
+ =?us-ascii?Q?QA9CGIpW06rf853+cwmtGhJo79vxoXbjbOwTsPqc5RgFvh2iI2SZVXL6gCU2?=
+ =?us-ascii?Q?LOCKqAZ2EhXKI3q0gy1cLIC0/RzlwcM6AL7zilxPG4lXWKY+z9bXQJK7eLih?=
+ =?us-ascii?Q?ddkNvSUpZrekoNkE4bDyw5aPtW27tRZ+nl1Ne4OKJeYfMpekBEe+o/qRoK9W?=
+ =?us-ascii?Q?CRYKIERoyEpQVlPMaRFWF/BELQom3jjFEjEtqrN7ajeh0YGe09WXJsgsZMhJ?=
+ =?us-ascii?Q?92QzHSq0XrJfldIwTTbUHDOZ7mNRXttt7obFGXQL3iGIAZdWPH4QsTMYkto/?=
+ =?us-ascii?Q?l+oUxBs2M1HESKoByqAjcFS2OjAvzOI7U0nMX6wbvZudGlozM+RnfN8XuuAO?=
+ =?us-ascii?Q?6qhHuOzN7wMpmg3pEmE6HtaNc1DQAeYYbFVrYER2giHLsWZ24AWfoHK85KZH?=
+ =?us-ascii?Q?pFWOFwKvmeErtIp7LlfgSZQpjqFIau2ehVYLT+eMwqg9z50BPJqSZFUYzXN1?=
+ =?us-ascii?Q?13bWHMxqWvMYLJw1VKrR5owc2mFCXyPDBrjpUTdfOXollvCspc2DLqnMWv16?=
+ =?us-ascii?Q?XowuA23VzbDZtecDc3dZO8a3SBz2oiYqXS8I?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?lNBh+s9+UHuq6wMzpe/41F34Y8gzPXU6lIcLsMIbVp2vr0SOGO2xKkv7U/ug?=
+ =?us-ascii?Q?15gUPaMwWV7gj2BDwymzgLgG9yfIiEHL8Rsrw+zxMGrWKCk4NH9nBMwIQc1U?=
+ =?us-ascii?Q?TN1vFU5mNOHClQQTgH/VARam2YUeiJFUfCMfdsm+kmyr22g2A2z2wGGQLMj4?=
+ =?us-ascii?Q?P6ywpVhTSQrswMUZ34OvShEmzk8yrK8Yg3r1RS1jQNtEshdsll99UePI/fnU?=
+ =?us-ascii?Q?1ypO/T9vuOrleNT6PLrzoJpANfADBF7I7mGuOQHx4Ip5a+o9OtVuyN8vMCMS?=
+ =?us-ascii?Q?ZC2oxyz4l4aom+aGJlJyXD4QDL8APUNKDjvpwj/8lX/1sImUgk88lsNLyMfU?=
+ =?us-ascii?Q?yMoYMLRYGQRrebTOdWANxdfp2m5srbLBBZm3IT2N2qqBnVq2GoysFFAzhHjn?=
+ =?us-ascii?Q?shAZBeHBbMYlr+gdNxXsUFsPk+O5+Jky4p0+COgNRwZZgnpuFyk0XSTNQnQ+?=
+ =?us-ascii?Q?QvSz9Wg4AJiR1Lmf+7VXWdbGJGa6mnMalSCVn9frNUbGW6z7wmoFlki0Poet?=
+ =?us-ascii?Q?/OlJngJImUjhi/qgfYRXSIovDeRwb4ovLFo9yqDasyXvXHOgBBIVJjD3Ljo+?=
+ =?us-ascii?Q?/J2+1bjiVrme6hlC+MPHvrOBqigssFsIcfDlZJ/WMYLtZhqTaf+K2rcQpH68?=
+ =?us-ascii?Q?PpkaEJG2bENVkZd2+f1o90WTHVhqAz/qWtQr9C6fnFSp3sVdVCr9AkdU28+5?=
+ =?us-ascii?Q?ITnQIgH2CH3C+UrPZ0yKDy4t/lyJGsIb8ec9iC/ESvcdkaHOKAa9dexKAW1L?=
+ =?us-ascii?Q?Yl/6rurPV/r7M1Qh1kAgN8m1TnWgHs5G1DE8tXb2u/Ksbjd3QG5tv3cJS/Yl?=
+ =?us-ascii?Q?xTSbRZOISat9FeQN3//TJ/BW+cVjs5NnjQr4JrQdGH3yqUyita4AQyTDtBPO?=
+ =?us-ascii?Q?SDeNH2Qhvrvy35W3XYmYbnNPqQv1y6dOT7yeQYo5SJH6jkv1cIY/+DyVVYDE?=
+ =?us-ascii?Q?9ixdl5BbiHXX1kYrqD0MQDjasT5wx4+F55qbjfLU1grVM93WtogMlALhWo21?=
+ =?us-ascii?Q?pLiHNesJf6ohFFWuPA80aoRDbKsP4tUWsQ9vvL8nIfI6aSR6VAaYgWeHmqmz?=
+ =?us-ascii?Q?BAqIiZTfNDrpZqLKkOEqzYXHS3HErIg1bYxmHtuQ2YvI6Bmnn+nOh2m8tKkw?=
+ =?us-ascii?Q?p6W3vffmF9dC2IHZD9O503dkfaewe4khaWYT+kAIjh/Z9obLapEkozcaF3op?=
+ =?us-ascii?Q?7b9hJXuC6xLo/muiEG9V20Kfev8V9//o3/VPIac/DIerd+hU+3PfuCl9skNL?=
+ =?us-ascii?Q?L2bI66p+Q4UlqRbY8dO5BvrC0fF6+dUCTQkd0WgKda7hKKHtit6HqJMmjMCJ?=
+ =?us-ascii?Q?uYmEKEDovdewQPTAMdmT+BugA/qdiE3JZHoxRzphXXcY7DohCkgetnEw5eIH?=
+ =?us-ascii?Q?86Q+oxJ/fnJX81tn+fdTxhLtIn8YKwEIyhY5+hGGFMPPi35pUSpfOXbo1jVx?=
+ =?us-ascii?Q?vmLR6gjxQ+Z4OTwbIOtl7bZVftRq/6VJiC0l81eyCyaEAqP9gjOx1myvvDx9?=
+ =?us-ascii?Q?hV4kYrxSx2XRAbg/ht09qCr2fDLMY03zNZxO5wk18gwFrDPNWcp27e8AzKpF?=
+ =?us-ascii?Q?GwwngBEUtRgN4uZbspRreIB9aTdkZMnMjuFoFmDw?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Octeontx2-af: Fix missing error code in cgx_probe()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176043600652.3625307.14243303958438003684.git-patchwork-notify@kernel.org>
-Date: Tue, 14 Oct 2025 10:00:06 +0000
-References: <20251010204239.94237-1-harshit.m.mogalapalli@oracle.com>
-In-Reply-To: <20251010204239.94237-1-harshit.m.mogalapalli@oracle.com>
-To: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-Cc: sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
- jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, dan.carpenter@linaro.org,
- kernel-janitors@vger.kernel.org, error27@gmail.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0286742-9b12-491d-747c-08de0b0877bf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Oct 2025 10:00:12.8271
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +qW1mjEL4lXKImHhvmyctWlLbk0+qYGw9o49f9zj6DDJnkXWziHLoFeOSs4ky5E67ZAdE5x14uIHVzrp8RarsA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7452
+X-OriginatorOrg: intel.com
 
-Hello:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of G=
+rzegorz Nitka
+> Sent: 05 September 2025 20:40
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: pmenzel@molgen.mpg.de; netdev@vger.kernel.org; Kubalewski, Arkadiusz =
+<arkadiusz.kubalewski@intel.com>; Loktionov, Aleksandr <aleksandr.loktionov=
+@intel.com>; Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Korba, Przemys=
+law <przemyslaw.korba@intel.com>; Olech, Milena <milena.olech@intel.com>
+> Subject: [Intel-wired-lan] [PATCH v10 iwl-next] ice: add recovery clock a=
+nd clock 1588 control for E825c
+>
+> From: Przemyslaw Korba <przemyslaw.korba@intel.com>
+>
+> Add control for E825 input pins: phy clock recovery and clock 1588.
+> E825 does not provide control over platform level DPLL but it provides co=
+ntrol over PHY clock recovery, and PTP/timestamp driven inputs for platform=
+ level DPLL [1].
+>
+> Introduce a software controlled layer of abstraction to:
+> - create a DPLL of type EEC for E825c,
+> - create recovered clock pin for each PF, and control them through writin=
+g to registers,
+> - create pin to control clock 1588 for PF0, and control it through writin=
+g to registers.
+>
+> Usage example:
+> - to get EEC PLL info
+> $ ynl --family dpll --dump device-get
+> [{'clock-id': 0,
+> 'id': 6,
+>  'lock-status': 'locked',
+>  'mode': 'manual',
+>  'mode-supported': ['manual'],
+>  'module-name': 'ice',
+>  'type': 'eec'},
+> ...
+>  ]
+>
+> - to get 1588 and rclk pins info
+> (note: in the output below, pin id=3D31 is a representor for 1588 input, =
+while pins 32..35 corresponds to PHY clock inputs to SyncE  module) $ ynl -=
+-family dpll --dump pin-get
+> [{'board-label': 'CLK_IN_0',
+>  'capabilities': set(),
+>  'clock-id': 0,
+>  'id': 27,
+>  'module-name': 'ice',
+>  'parent-device': [{'direction': 'input',
+>                     'parent-id': 6,
+>                     'state': 'connected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'mux'},
+> {'board-label': 'CLK_IN_1',
+>  'capabilities': set(),
+>  'clock-id': 0,
+>  'id': 28,
+>  'module-name': 'ice',
+>  'parent-device': [{'direction': 'input',
+>                     'parent-id': 6,
+>                     'state': 'connected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'mux'},
+> {'board-label': 'pin_1588',
+>  'capabilities': {'state-can-change'},
+>  'clock-id': 0,
+>  'id': 31,
+>  'module-name': 'ice',
+>  'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                 {'parent-id': 28, 'state': 'disconnected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'synce-eth-port'},
+> {'capabilities': {'state-can-change'},
+>  'clock-id': 0,
+>  'id': 32,
+>  'module-name': 'ice',
+>  'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                 {'parent-id': 28, 'state': 'disconnected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'synce-eth-port'},
+> {'capabilities': {'state-can-change'},
+>  'clock-id': 0,
+>  'id': 33,
+>  'module-name': 'ice',
+>  'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                 {'parent-id': 28, 'state': 'disconnected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'synce-eth-port'},
+> {'capabilities': {'state-can-change'},
+>  'clock-id': 0,
+>  'id': 34,
+>  'module-name': 'ice',
+>  'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                 {'parent-id': 28, 'state': 'disconnected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'synce-eth-port'},
+> {'capabilities': {'state-can-change'},
+>  'clock-id': 0,
+>  'id': 35,
+>  'module-name': 'ice',
+>  'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                 {'parent-id': 28, 'state': 'disconnected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'synce-eth-port'}]
+>
+> - to set PHY0 clock as SyncE module input $ ynl --family dpll --do pin-se=
+t --json '{"id":32,"parent-pin":\
+>    {"parent-id":27, "state":"connected"}}'
+>
+> - to set 1588 Main Timer as source into SyncE module $ ynl --family dpll =
+--do pin-set --json '{"id":31,"parent-pin":\
+>    {"parent-id":27, "state":"connected"}}'
+>
+> [1] Granite Rapids D SAS - Timesync and	SyncE
+>
+> Reviewed-by: Milena Olech <milena.olech@intel.com>
+> Co-developed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+> ---
+> v9->v10:
+> - replaced SET_PIN_STATE with inline function
+> - fixed wrong conflict resolution in ice_dpll_deinit_dpll()
+> v8->v9:
+> - rebased
+> - moved ice_dpll_cfg_bypass_mux_e825c, ice_dpll_cfg_synce_ethdiv_e825c,
+>  ice_dpll_get_div_e825c to ice_tspll.c module
+> - re-applying ts_pll settings on ptp status change (added
+>  ice_tspll_bypass_mux_active_e825c function)
+> - improved doc strings
+> - removed unrealted changes
+> - renamed dpll to DPLL in doc strings where applicable
+> v7->v8:
+> - rebased
+> - removed unrelated changes
+> - change pin_1588 type to DPLL_PIN_TYPE_EXT
+> - use ICE_SYNCE_CLK_NUM to determine the number of rclk pins
+> ---
+> drivers/net/ethernet/intel/ice/ice_dpll.c   | 675 ++++++++++++++++++--
+> drivers/net/ethernet/intel/ice/ice_dpll.h   |  20 +
+> drivers/net/ethernet/intel/ice/ice_lib.c    |   3 +
+> drivers/net/ethernet/intel/ice/ice_ptp.c    |  29 +
+> drivers/net/ethernet/intel/ice/ice_ptp_hw.c |  34 +-
+> drivers/net/ethernet/intel/ice/ice_ptp_hw.h |   1 +
+> drivers/net/ethernet/intel/ice/ice_tspll.c  | 223 +++++++  drivers/net/et=
+hernet/intel/ice/ice_tspll.h  |  14 +-
+> drivers/net/ethernet/intel/ice/ice_type.h   |   6 +
+> 9 files changed, 945 insertions(+), 60 deletions(-)
+>
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 10 Oct 2025 13:42:39 -0700 you wrote:
-> When CGX fails mapping to NIX, set the error code to -ENODEV, currently
-> err is zero and that is treated as success path.
-> 
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Closes: https://lore.kernel.org/all/aLAdlCg2_Yv7Y-3h@stanley.mountain/
-> Fixes: d280233fc866 ("Octeontx2-af: Fix NIX X2P calibration failures")
-> Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - Octeontx2-af: Fix missing error code in cgx_probe()
-    https://git.kernel.org/netdev/net/c/c5705a2a4aa3
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
