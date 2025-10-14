@@ -1,214 +1,82 @@
-Return-Path: <netdev+bounces-229221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82223BD9736
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:52:18 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 341EBBD9796
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:56:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F0B31927252
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 12:52:38 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D53B3354428
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 12:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0EA313558;
-	Tue, 14 Oct 2025 12:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8273630F949;
+	Tue, 14 Oct 2025 12:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BXHBtvVE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n0kqeqk4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CBE30DEB7
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 12:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553AA20296A;
+	Tue, 14 Oct 2025 12:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760446322; cv=none; b=P7dJI/sKcmC8tgydOgPzwoU2lfNS86FTrIsKsSWzoRK78+19J6Ifdaxz3+NVu5TPbVq79pgahOdDKYwAoUO28SbjSiU1RC8AUBJZtJLD/X6bCuoyRceK83FYmTccLvjPE4Zb2CQvAJVs+o/ZlI2Mxuu+edqtQo1ReijGO2p9iOc=
+	t=1760446573; cv=none; b=PJSaArew0qXavXAJcQ2NXjlIVPZol4GTtEoPkfCR2pq+i2H0xSzLuO3PBX4ACjbQIopd5IA9RsOx+23+XW7Qe3eQ/8L7qycfTMpMj9wZ6tudln3PdZi6IKSx3TKbiQzk47jx13cd/r63uA7nfZc0U3Rn59HBuwaKlI+Tef8O7n4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760446322; c=relaxed/simple;
-	bh=lhZBS8xqXDtT7VbeKEzjyokyMGNBcF56sXqc2Q9DJ68=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TWXUqtwhotN4Jo3nDG6LD9jixSd5dsvcq9pCAamhQ4th9EkwEkPwXEDldbf/64OUJqMLhMxQEX9axHLr8KlSVd18/VBOSFS6m7qs/rbtAJqivfNrQ6Qhv7NSYViHW1SQFuBITLdojFWbw7f8Z6DyRlTK8rdX4gSD+c/rV2w9FOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BXHBtvVE; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-46e2e6a708fso32262525e9.0
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 05:52:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760446319; x=1761051119; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=u4vnL+R+LVejZqTBCW/1skmQQQlc0ydc7YfiCLUDn0w=;
-        b=BXHBtvVEHAvK7Q8mmiYMJ16/vlxIoeSfAY9jPRq63rqfaWa7kEfrgh0fWWyDM0JKqI
-         micUk2eB38L2gXyvom/wA1grjij6QkM5ucpC9ltqywt/NgoFiGoF7gD5IAHyWF/mLq64
-         XIVoKnOnrjFmMCi67uGaDQ5h67+U/zuYKStcmGPjZ/wZzl7FFd0FjWg340EGH0S53WGk
-         v+jW5oxqXIHKzIYR8vJu/Wei8UWKveHZo1wAhWRubqIX3avD504xMbQKEAkDFnOaHV1A
-         UF+znnyPRNAoaxpYKM/3i8X6Z2pXbLhe2F1KguuumllWUYEPWcDfAiuhHJHZKh7S366i
-         A6hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760446319; x=1761051119;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u4vnL+R+LVejZqTBCW/1skmQQQlc0ydc7YfiCLUDn0w=;
-        b=KIZ9b6lN03fHLCXF4lzb0+N11FeDHsCaf8GZckzQBh/94kEY9QKkqOWJb0C6l3BKFx
-         lVZObn0ag9KRhvDUo4SF46/rKYYQUhSHE9JzoseRf/JJ8EXJo3LPT2cF0v9ffe4qY39E
-         WSxGoCxGojhKZsPzU9GjSn3OZh4FoIQZPjkhLvk7et2TZVdEOgrfTSReBiBsETtfyspV
-         TNpgERf/RlsSGVCEFYlFpR6+cq/pN0/H6x43QK2u0CN48Ao+3oImqQoDhQFlkunvCFgN
-         D2vNwLLdc9adix/citJVOY4AbfEoNc6a8rLi0+irVAyO+ucItFG/lcl9evbfieI25bh5
-         xW9A==
-X-Forwarded-Encrypted: i=1; AJvYcCVmJkK7R1ACHIJp+tGTZKJBE6l9qTN5Jc2zH9MVfob5Vi/fdnZEecEuy5XmCjzdMxOTSyONEZk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXdvxjK6h2pvn0BV+eT3d9Heid6zen6PU8lu6JOXMsfsYyNG2u
-	oRfb2HXx0HhbPVQlE0OdOepc0ZxNiPrjdZU9QzyPEWFzbmx1smHruAaI
-X-Gm-Gg: ASbGncsfOsLEY5ASsiLvtQRd8S0eQdDg8O0ixQql95ZsaMb7lDYpzxLVztISdeQlxak
-	BwdeKpX2MW4RCgZMRZSILdGReeLgPWckiXq+EzBoyQ/Hl+KxbEWrFj1Nmxas7JWbrrOFYLp6Uf8
-	4KroqK0Kc0O1wzC0KHLqwzWYzHJ4peQvSL3gafJkhtKrobSmm5t3y25Pe8RAr9h599rN/gDPxoy
-	jSbL7q+9VoPz1nmw76GvuC3no0VN35k/F1iF0pB6Q6QT/4KKt5O7+cC4pSg3WN/eVXT3K8dla77
-	oPoed1zsKImE5xagoOt0rTiBiDWg7+Ek7eI1L+witjntfcgj6D+05mwZx3cKs+4udNEehQU00N/
-	wDUx3S59PpE+xSm6CgCZClpteDP3RrFlKVQWrS6GpSMwjwR/58oK49uxddKq5aNePgZrgtgErW7
-	J6es7ruPyz
-X-Google-Smtp-Source: AGHT+IHGhuXiI705ZMy4gT9FBX9BE9BgWkwpuFDltW+qidBa5CYSY2HjmkpobxQOHA/DrJoT1AzhIA==
-X-Received: by 2002:a05:600c:1f93:b0:46e:376c:b1f0 with SMTP id 5b1f17b1804b1-46fa9a8ca9fmr177984195e9.7.1760446319404;
-        Tue, 14 Oct 2025 05:51:59 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:7ec0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fb49bdfd0sm239969845e9.10.2025.10.14.05.51.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Oct 2025 05:51:58 -0700 (PDT)
-Message-ID: <85a85b35-3862-4260-833c-267720125817@gmail.com>
-Date: Tue, 14 Oct 2025 13:53:14 +0100
+	s=arc-20240116; t=1760446573; c=relaxed/simple;
+	bh=jVQUGnJkT132sqqUC4K2V431C09qQ1EnlNkzaiHH5s0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fhk5+pgbIY7q3eJ0zRLPZGQZFOQnwk6oCxIeMpgVQKiaDvIkqfFboev/FzxRFbQoykS4zb9uHZWCv22j5tSUuuE/WquY7bf0zKL4n7eVK59OEg2LJhSSSsaRUxqhbNdDbfQGR/k5eM55ENx0ZovYJuXyMrUtVAiB7p0KG/4/SbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n0kqeqk4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1D49C4CEE7;
+	Tue, 14 Oct 2025 12:56:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760446570;
+	bh=jVQUGnJkT132sqqUC4K2V431C09qQ1EnlNkzaiHH5s0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n0kqeqk46jGWaHFooZ5s3lITr7eDBWe9DATV1EUJnDMbXkm/9WSGVuVrP9XWw0P9e
+	 RUzCOm3dANljAq/iNOH7kmEjRLs1gzt1jTiGkZ5tafnl/DHYunGgMlU8QIh1YMbKL0
+	 ckwMsxHtP1xWL9TwPjCDu6mzX8oTK6SjXspcd/J2JJ09NoRrgnL4TpNsNf//7GFWQQ
+	 ADxcF1aWBLDie2t9lfY7JLzK2StnOFlRLkLD97a5+/ZkiFuov7FTWOAaF2KMY6guUO
+	 5aG4gik+ghrn8qGC+o6ULwgAjvPqLM5LIBj0wCHyDzdhOGSZh2KP2RfrbCcn8myecu
+	 uh+Q8iMtRTR/g==
+Date: Tue, 14 Oct 2025 13:56:05 +0100
+From: Simon Horman <horms@kernel.org>
+To: Harshitha Ramamurthy <hramamurthy@google.com>
+Cc: netdev@vger.kernel.org, joshwash@google.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, willemb@google.com, pkaligineedi@google.com,
+	jfraker@google.com, ziweixiao@google.com, thostet@google.com,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] gve: Check valid ts bit on RX descriptor before hw
+ timestamping
+Message-ID: <aO5IZYjGHe3xpzPK@horms.kernel.org>
+References: <20251014004740.2775957-1-hramamurthy@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 06/24] net: clarify the meaning of
- netdev_config members
-To: Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>,
- Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Joshua Washington
- <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
- Jian Shen <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
- Jijie Shao <shaojijie@huawei.com>, Sunil Goutham <sgoutham@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
- <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
- Bharat Bhushan <bbhushan2@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Alexander Duyck <alexanderduyck@fb.com>,
- kernel-team@meta.com, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Joe Damato <joe@dama.to>, David Wei <dw@davidwei.uk>,
- Willem de Bruijn <willemb@google.com>, Mina Almasry
- <almasrymina@google.com>, Breno Leitao <leitao@debian.org>,
- Dragos Tatulea <dtatulea@nvidia.com>, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
- Jonathan Corbet <corbet@lwn.net>
-References: <cover.1760364551.git.asml.silence@gmail.com>
- <fa4a6200c614f9f6652624b03e46b3bfa2539a72.1760364551.git.asml.silence@gmail.com>
- <572c425e-d29d-43e5-930f-4be7220e89fc@infradead.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <572c425e-d29d-43e5-930f-4be7220e89fc@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251014004740.2775957-1-hramamurthy@google.com>
 
-On 10/13/25 18:12, Randy Dunlap wrote:
-> Hi,
+On Tue, Oct 14, 2025 at 12:47:39AM +0000, Harshitha Ramamurthy wrote:
+> From: Tim Hostetler <thostet@google.com>
 > 
-> On 10/13/25 7:54 AM, Pavel Begunkov wrote:
->> From: Jakub Kicinski <kuba@kernel.org>
->>
->> hds_thresh and hds_config are both inside struct netdev_config
->> but have quite different semantics. hds_config is the user config
->> with ternary semantics (on/off/unset). hds_thresh is a straight
->> up value, populated by the driver at init and only modified by
->> user space. We don't expect the drivers to have to pick a special
->> hds_thresh value based on other configuration.
->>
->> The two approaches have different advantages and downsides.
->> hds_thresh ("direct value") gives core easy access to current
->> device settings, but there's no way to express whether the value
->> comes from the user. It also requires the initialization by
->> the driver.
->>
->> hds_config ("user config values") tells us what user wanted, but
->> doesn't give us the current value in the core.
->>
->> Try to explain this a bit in the comments, so at we make a conscious
->> choice for new values which semantics we expect.
->>
->> Move the init inside ethtool_ringparam_get_cfg() to reflect the semantics.
->> Commit 216a61d33c07 ("net: ethtool: fix ethtool_ringparam_get_cfg()
->> returns a hds_thresh value always as 0.") added the setting for the
->> benefit of netdevsim which doesn't touch the value at all on get.
->> Again, this is just to clarify the intention, shouldn't cause any
->> functional change.
->>
->> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->> [pavel: applied clarification on relationship b/w HDS thresh and config]
->> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
->> ---
->>   include/net/netdev_queues.h | 20 ++++++++++++++++++--
->>   net/ethtool/common.c        |  3 ++-
->>   2 files changed, 20 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
->> index cd00e0406cf4..9d5dde36c2e5 100644
->> --- a/include/net/netdev_queues.h
->> +++ b/include/net/netdev_queues.h
->> @@ -6,11 +6,27 @@
->>   
->>   /**
->>    * struct netdev_config - queue-related configuration for a netdev
->> - * @hds_thresh:		HDS Threshold value.
->> - * @hds_config:		HDS value from userspace.
->>    */
->>   struct netdev_config {
->> +	/* Direct value
->> +	 *
->> +	 * Driver default is expected to be fixed, and set in this struct
->> +	 * at init. From that point on user may change the value. There is
->> +	 * no explicit way to "unset" / restore driver default. Used only
->> +	 * when @hds_config is set.
->> +	 */
->> +	/** @hds_thresh: HDS Threshold value (ETHTOOL_A_RINGS_HDS_THRESH).
->> +	 */
->>   	u32	hds_thresh;
->> +
->> +	/* User config values
->> +	 *
->> +	 * Contain user configuration. If "set" driver must obey.
->> +	 * If "unset" driver is free to decide, and may change its choice
->> +	 * as other parameters change.
->> +	 */
->> +	/** @hds_config: HDS enabled (ETHTOOL_A_RINGS_TCP_DATA_SPLIT).
->> +	 */
->>   	u8	hds_config;
->>   };
+> The device returns a valid bit in the LSB of the low timestamp byte in
+> the completion descriptor that the driver should check before
+> setting the SKB's hardware timestamp. If the timestamp is not valid, do not
+> hardware timestamp the SKB.
 > 
-> kernel-doc comments should being with
-> /**
-> on a separate line. This will prevent warnings like these new ones:
-> 
-> Warning: include/net/netdev_queues.h:36 struct member 'hds_thresh' not described in 'netdev_config'
-> Warning: include/net/netdev_queues.h:36 struct member 'hds_config' not described in 'netdev_config'
-> Warning: include/net/netdev_queues.h:36 struct member 'rx_buf_len' not described in 'netdev_config'
-> 
-> (but there are 4 variables that this applies to. I don't know why kernel-doc.py
-> only reported 3 of them.)
+> Cc: stable@vger.kernel.org
+> Fixes: b2c7aeb49056 ("gve: Implement ndo_hwtstamp_get/set for RX timestamping")
+> Reviewed-by: Joshua Washington <joshwash@google.com>
+> Signed-off-by: Tim Hostetler <thostet@google.com>
+> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
 
-Thanks for taking a look! I was a bit reluctant to change it
-too much since it's not authored by me. I'll be moving in direction
-of removing the patch completely.
-
--- 
-Pavel Begunkov
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
