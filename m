@@ -1,344 +1,229 @@
-Return-Path: <netdev+bounces-229381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFE08BDB685
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 23:27:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAC12BDB824
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 23:58:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4DADF4EDFF9
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 21:27:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70BF43AF6FE
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 21:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B9D30C352;
-	Tue, 14 Oct 2025 21:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E602E54B0;
+	Tue, 14 Oct 2025 21:58:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Y4MUHUT9"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="T7hq7VxW"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2789B270553;
-	Tue, 14 Oct 2025 21:27:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A812E8E11;
+	Tue, 14 Oct 2025 21:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760477242; cv=none; b=Hu3wE9jxOxjHaNd8rdiX35FZEtoePNQnsWN9BiyT8chPXzriSsPDSKYVn+Poic+rR0+8j02EDMPBdM5YeZjKPS878loWk+fashQV0uHtWJgQXVA7DFNsXkHOhDaX5eR/MOh7LtdzTJBAnQ03BRkAFPIV8FWUs2o1DoH0J5/W3mI=
+	t=1760479098; cv=none; b=mn2Fml8p/Da87JCwVkC8Dm7LLh9U9nurfpdUaIwQOd4Zs+H2LwA9ILQjfsbEkSkFCE3Ivm0SJgmN8gwKnc1x9JVjwBdXXQolCMx+S7F3tq2CJOPnD8v82GT44QLnDz0yPjQuHLFmRwkwQLdbasmcGA5IMvYYfulmjl+3poZbXXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760477242; c=relaxed/simple;
-	bh=FZEEdU24UxBJeTL+XTVmDjgu7pDp5qgDs7GTltmTjCc=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=hLJW4xMak7xNQRLwEkZiELINzNNOtOv6wENqBferxxFZOhqi3bjV1PNIb1br+YLCgkyu69fxhN8uYLs4/GM61LDpvJB/DHI3OAbX9TS56ppzFf7w+G7NaMD/Iu2FsVeo72ZkjknhdUOvo3pgPWeC8COnsKqgHgpjqxMGnR6//V8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Y4MUHUT9; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1006)
-	id AC971206596C; Tue, 14 Oct 2025 14:27:19 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AC971206596C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1760477239;
-	bh=mOLifcEof82JC7MsvCTYACckyTNoj1LBbMyEvy7qcyo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Y4MUHUT9aL1mLYq1E97ysNWfSicPWaCg0xzogluhXpHK1GQieNIZtZ48Dno4CTMi/
-	 U1JJqUS+/RHIZRn6YREauzgluifxgYbJ67F1ffNV19JDbqrbQYqGSWn9F7sSY5AHiA
-	 KK1aM5B/cdKm/A9k2GvLgl+w8uMq7brpe4WECy1w=
-From: Haiyang Zhang <haiyangz@linux.microsoft.com>
-To: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: haiyangz@microsoft.com,
-	paulros@microsoft.com,
-	decui@microsoft.com,
-	kys@microsoft.com,
-	wei.liu@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	longli@microsoft.com,
-	ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	kotaranov@microsoft.com,
-	horms@kernel.org,
-	shradhagupta@linux.microsoft.com,
-	leon@kernel.org,
-	mlevitsk@redhat.com,
-	yury.norov@gmail.com,
-	shirazsaleem@microsoft.com,
-	andrew+netdev@lunn.ch,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next,v2] net: mana: Support HW link state events
-Date: Tue, 14 Oct 2025 14:26:49 -0700
-Message-Id: <1760477209-9026-1-git-send-email-haiyangz@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1760479098; c=relaxed/simple;
+	bh=MU32Uf17vhJNmgQ+q3c45nMjWHFPK0nmpNTytsj5ufY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K33ZVAnBRbFF347UJzqbudfJSgOoOhVmCwQiwiQo0Mh48Eb5MaPDimfzZzcnYMOGcHTVk4a+3GZAASt3/1v0AqSVqVAzhR2dYWcKYX0KsumnHs0SH5514Ml3AHNuGZdredWg5oX03VFBcBb4RqbLetpM/q+Q5Rh3iU4erWCQMr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=T7hq7VxW; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=XxnfDRKN9o/tjcf4e+ZHTtKwkTd93J07pUeKthYb3wQ=; b=T7hq7VxWOOfvkWkFQtmY0Wi8lC
+	7cGsW2sWrEp7Besg9hJxrhHAmHGlNPU7c8OdSAPZ7WIOBSfsT6ywKvyJWn2JEpBCnOj+J+8OFIUhT
+	T7RQnD/y1wjhUC7/IPOXi7IFJGczARkhsurkAGgFagHvjaRakqbZWLil8b9GKZbkSYH8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v8n1w-00AxMX-4b; Tue, 14 Oct 2025 23:58:04 +0200
+Date: Tue, 14 Oct 2025 23:58:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parvathi Pudi <parvathi@couthit.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, danishanwar@ti.com,
+	rogerq@kernel.org, pmohan@couthit.com, basharath@couthit.com,
+	afd@ti.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, pratheesh@ti.com,
+	prajith@ti.com, vigneshr@ti.com, praneeth@ti.com, srk@ti.com,
+	rogerq@ti.com, krishna@couthit.com, mohan@couthit.com
+Subject: Re: [PATCH net-next v3 1/3] net: ti: icssm-prueth: Adds helper
+ functions to configure and maintain FDB
+Message-ID: <ff651c3d-108b-48f8-b69b-fb0b522edd4e@lunn.ch>
+References: <20251014124018.1596900-1-parvathi@couthit.com>
+ <20251014124018.1596900-2-parvathi@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251014124018.1596900-2-parvathi@couthit.com>
 
-From: Haiyang Zhang <haiyangz@microsoft.com>
+> +void icssm_prueth_sw_fdb_tbl_init(struct prueth *prueth)
+> +{
+> +	struct fdb_tbl *t = prueth->fdb_tbl;
+> +
+> +	t->index_a = (struct fdb_index_array_t *)((__force const void *)
+> +			prueth->mem[V2_1_FDB_TBL_LOC].va +
+> +			V2_1_FDB_TBL_OFFSET);
 
-Handle the HW link state events received from HW channel, and
-set the proper link state, also stop/wake queues accordingly.
+We have
 
-Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
----
-v2:
-  Updated link up/down to be symmetric, and other minor changes based
-  on comments from Andrew Lunn.
+> +#define V2_1_FDB_TBL_LOC          PRUETH_MEM_SHARED_RAM
 
----
- .../net/ethernet/microsoft/mana/gdma_main.c   |  1 +
- .../net/ethernet/microsoft/mana/hw_channel.c  | 19 +++++
- drivers/net/ethernet/microsoft/mana/mana_en.c | 76 +++++++++++++++++--
- include/net/mana/gdma.h                       |  4 +-
- include/net/mana/hw_channel.h                 |  2 +
- include/net/mana/mana.h                       |  6 ++
- 6 files changed, 99 insertions(+), 9 deletions(-)
+and existing code like:
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 43f034e180c4..effe0a2f207a 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -528,6 +528,7 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
- 	case GDMA_EQE_HWC_INIT_DONE:
- 	case GDMA_EQE_HWC_SOC_SERVICE:
- 	case GDMA_EQE_RNIC_QP_FATAL:
-+	case GDMA_EQE_HWC_SOC_RECONFIG_DATA:
- 		if (!eq->eq.callback)
- 			break;
- 
-diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-index ada6c78a2bef..eae68995492a 100644
---- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-+++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-@@ -118,6 +118,7 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
- 	struct gdma_dev *gd = hwc->gdma_dev;
- 	union hwc_init_type_data type_data;
- 	union hwc_init_eq_id_db eq_db;
-+	struct mana_context *ac;
- 	u32 type, val;
- 	int ret;
- 
-@@ -196,6 +197,24 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
- 			hwc->hwc_timeout = val;
- 			break;
- 
-+		case HWC_DATA_HW_LINK_CONNECT:
-+		case HWC_DATA_HW_LINK_DISCONNECT:
-+			ac = gd->gdma_context->mana.driver_data;
-+			if (!ac)
-+				break;
-+
-+			if (ac->mana_removing) {
-+				dev_info(hwc->dev,
-+					 "Removing: skip link event %u\n",
-+					 type);
-+				break;
-+			}
-+
-+			ac->link_event = type;
-+			schedule_work(&ac->link_change_work);
-+
-+			break;
-+
- 		default:
- 			dev_warn(hwc->dev, "Received unknown reconfig type %u\n", type);
- 			break;
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 0142fd98392c..51959d37b0a7 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -20,6 +20,7 @@
- 
- #include <net/mana/mana.h>
- #include <net/mana/mana_auxiliary.h>
-+#include <net/mana/hw_channel.h>
- 
- static DEFINE_IDA(mana_adev_ida);
- 
-@@ -84,8 +85,9 @@ static int mana_open(struct net_device *ndev)
- 	/* Ensure port state updated before txq state */
- 	smp_wmb();
- 
--	netif_carrier_on(ndev);
--	netif_tx_wake_all_queues(ndev);
-+	if (netif_carrier_ok(ndev))
-+		netif_tx_wake_all_queues(ndev);
-+
- 	netdev_dbg(ndev, "%s successful\n", __func__);
- 	return 0;
- }
-@@ -100,6 +102,59 @@ static int mana_close(struct net_device *ndev)
- 	return mana_detach(ndev, true);
- }
- 
-+static void mana_link_state_handle(struct work_struct *w)
-+{
-+	struct mana_port_context *apc;
-+	struct mana_context *ac;
-+	struct net_device *ndev;
-+	bool link_up;
-+	int i;
-+
-+	ac = container_of(w, struct mana_context, link_change_work);
-+
-+	if (ac->mana_removing)
-+		return;
-+
-+	rtnl_lock();
-+
-+	if (ac->link_event == HWC_DATA_HW_LINK_CONNECT)
-+		link_up = true;
-+	else if (ac->link_event == HWC_DATA_HW_LINK_DISCONNECT)
-+		link_up = false;
-+	else
-+		goto out;
-+
-+	/* Process all ports */
-+	for (i = 0; i < ac->num_ports; i++) {
-+		ndev = ac->ports[i];
-+		if (!ndev)
-+			continue;
-+
-+		apc = netdev_priv(ndev);
-+
-+		if (link_up) {
-+			if (!netif_carrier_ok(ndev)) {
-+				netif_carrier_on(ndev);
-+
-+				if (apc->port_is_up)
-+					netif_tx_wake_all_queues(ndev);
-+			}
-+
-+			__netdev_notify_peers(ndev);
-+		} else {
-+			if (netif_carrier_ok(ndev)) {
-+				if (apc->port_is_up)
-+					netif_tx_disable(ndev);
-+
-+				netif_carrier_off(ndev);
-+			}
-+		}
-+	}
-+
-+out:
-+	rtnl_unlock();
-+}
-+
- static bool mana_can_tx(struct gdma_queue *wq)
- {
- 	return mana_gd_wq_avail_space(wq) >= MAX_TX_WQE_SIZE;
-@@ -3059,9 +3114,6 @@ int mana_attach(struct net_device *ndev)
- 	/* Ensure port state updated before txq state */
- 	smp_wmb();
- 
--	if (apc->port_is_up)
--		netif_carrier_on(ndev);
--
- 	netif_device_attach(ndev);
- 
- 	return 0;
-@@ -3153,8 +3205,8 @@ int mana_detach(struct net_device *ndev, bool from_close)
- 	/* Ensure port state updated before txq state */
- 	smp_wmb();
- 
--	netif_tx_disable(ndev);
--	netif_carrier_off(ndev);
-+	if (netif_carrier_ok(ndev))
-+		netif_tx_disable(ndev);
- 
- 	if (apc->port_st_save) {
- 		err = mana_dealloc_queues(ndev);
-@@ -3212,7 +3264,7 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
- 
- 	netif_set_tso_max_size(ndev, GSO_MAX_SIZE);
- 
--	netif_carrier_off(ndev);
-+	netif_carrier_on(ndev);
- 
- 	netdev_rss_key_fill(apc->hashkey, MANA_HASH_KEY_SIZE);
- 
-@@ -3431,6 +3483,8 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
- 
- 	if (!resuming) {
- 		ac->num_ports = num_ports;
-+
-+		INIT_WORK(&ac->link_change_work, mana_link_state_handle);
- 	} else {
- 		if (ac->num_ports != num_ports) {
- 			dev_err(dev, "The number of vPorts changed: %d->%d\n",
-@@ -3481,6 +3535,8 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
- 	if (err) {
- 		mana_remove(gd, false);
- 	} else {
-+		ac->mana_removing = false;
-+
- 		dev_dbg(dev, "gd=%p, id=%u, num_ports=%d, type=%u, instance=%u\n",
- 			gd, gd->dev_id.as_uint32, ac->num_ports,
- 			gd->dev_id.type, gd->dev_id.instance);
-@@ -3500,6 +3556,10 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
- 	int err;
- 	int i;
- 
-+	ac->mana_removing = true;
-+
-+	cancel_work_sync(&ac->link_change_work);
-+
- 	/* adev currently doesn't support suspending, always remove it */
- 	if (gd->adev)
- 		remove_adev(gd);
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 57df78cfbf82..637f42485dba 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -590,6 +590,7 @@ enum {
- 
- /* Driver can self reset on FPGA Reconfig EQE notification */
- #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
-+#define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
- 
- #define GDMA_DRV_CAP_FLAGS1 \
- 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
-@@ -599,7 +600,8 @@ enum {
- 	 GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP | \
- 	 GDMA_DRV_CAP_FLAG_1_DYNAMIC_IRQ_ALLOC_SUPPORT | \
- 	 GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE | \
--	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE)
-+	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE | \
-+	 GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE)
- 
- #define GDMA_DRV_CAP_FLAGS2 0
- 
-diff --git a/include/net/mana/hw_channel.h b/include/net/mana/hw_channel.h
-index 83cf93338eb3..16feb39616c1 100644
---- a/include/net/mana/hw_channel.h
-+++ b/include/net/mana/hw_channel.h
-@@ -24,6 +24,8 @@
- #define HWC_INIT_DATA_PF_DEST_CQ_ID	11
- 
- #define HWC_DATA_CFG_HWC_TIMEOUT 1
-+#define HWC_DATA_HW_LINK_CONNECT 2
-+#define HWC_DATA_HW_LINK_DISCONNECT 3
- 
- #define HW_CHANNEL_WAIT_RESOURCE_TIMEOUT_MS 30000
- 
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 0921485565c0..d59e1f4656ce 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -477,6 +477,12 @@ struct mana_context {
- 	struct dentry *mana_eqs_debugfs;
- 
- 	struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
-+
-+	/* Link state change work */
-+	struct work_struct link_change_work;
-+	u32 link_event;
-+
-+	bool mana_removing;
- };
- 
- struct mana_port_context {
--- 
-2.34.1
+void __iomem *sram_base = prueth->mem[PRUETH_MEM_SHARED_RAM].va;
 
+so it seems like
+
+t->index_a = sram_base + V2_1_FDB_TBL_OFFSET;
+
+with no needs for any casts, since sram_base is a void * so can be
+assigned to any pointer type.
+
+And there are lots of cascading defines like:
+
+/* 4 queue descriptors for port 0 (host receive). 32 bytes */
+#define HOST_QUEUE_DESC_OFFSET          (HOST_QUEUE_SIZE_ADDR + 16)
+
+/* table offset for queue size:
+ * 3 ports * 4 Queues * 1 byte offset = 12 bytes
+ */
+#define HOST_QUEUE_SIZE_ADDR            (HOST_QUEUE_OFFSET_ADDR + 8)
+/* table offset for queue:
+ * 4 Queues * 2 byte offset = 8 bytes
+ */
+#define HOST_QUEUE_OFFSET_ADDR          (HOST_QUEUE_DESCRIPTOR_OFFSET_ADDR + 8)
+/* table offset for Host queue descriptors:
+ * 1 ports * 4 Queues * 2 byte offset = 8 bytes
+ */
+#define HOST_QUEUE_DESCRIPTOR_OFFSET_ADDR       (HOST_Q4_RX_CONTEXT_OFFSET + 8)
+
+allowing code like:
+
+	sram = sram_base + HOST_QUEUE_SIZE_ADDR;
+	sram = sram_base + HOST_Q1_RX_CONTEXT_OFFSET;
+	sram = sram_base + HOST_QUEUE_OFFSET_ADDR;
+	sram = sram_base + HOST_QUEUE_DESCRIPTOR_OFFSET_ADDR;
+	sram = sram_base + HOST_QUEUE_DESC_OFFSET;
+
+> +	t->mac_tbl_a = (struct fdb_mac_tbl_array_t *)((__force const void *)
+> +			t->index_a + FDB_INDEX_TBL_MAX_ENTRIES *
+> +			sizeof(struct fdb_index_tbl_entry_t));
+
+So i think this could follow the same pattern, also allowing some of
+these casts to be removed.
+
+I just don't like casts, they suggest bad design.
+
+> +static u8 icssm_pru_lock_done(struct fdb_tbl *fdb_tbl)
+> +{
+> +	return readb((u8 __iomem *)&fdb_tbl->locks->pru_locks);
+
+And maybe the __iomem attribute can be added to struct, either per
+member, or at the top level? It is all iomem, so we want sparse to be
+able to check all accesses.
+
+> +static int icssm_prueth_sw_fdb_spin_lock(struct fdb_tbl *fdb_tbl)
+> +{
+> +	u8 done;
+> +	int ret;
+> +
+> +	/* Take the host lock */
+> +	writeb(1, (u8 __iomem *)&fdb_tbl->locks->host_lock);
+> +
+> +	/* Wait for the PRUs to release their locks */
+> +	ret = read_poll_timeout(icssm_pru_lock_done, done, done == 0,
+> +				1, 10, false, fdb_tbl);
+> +	if (ret)
+> +		return -ETIMEDOUT;
+> +
+> +	return 0;
+
+Documentation says:
+
+ * Returns: 0 on success and -ETIMEDOUT upon a timeout.
+
+So no need for the if statement.
+
+
+> +static s16
+> +icssm_prueth_sw_fdb_search(struct fdb_mac_tbl_array_t *mac_tbl,
+> +			   struct fdb_index_tbl_entry_t *bucket_info,
+> +			   const u8 *mac)
+> +{
+> +	u8 mac_tbl_idx = bucket_info->bucket_idx;
+> +	int i;
+> +
+> +	for (i = 0; i < bucket_info->bucket_entries; i++, mac_tbl_idx++) {
+> +		if (ether_addr_equal(mac,
+> +				     mac_tbl->mac_tbl_entry[mac_tbl_idx].mac))
+> +			return mac_tbl_idx;
+> +	}
+> +
+> +	return -ENODATA;
+
+It is traditional to return errno in an int. But i don't see why a s16
+cannot be used.
+
+> +icssm_prueth_sw_fdb_find_bucket_insert_point(struct fdb_tbl *fdb,
+> +					     struct fdb_index_tbl_entry_t
+> +					     *bkt_info,
+> +					     const u8 *mac, const u8 port)
+> +{
+> +	struct fdb_mac_tbl_array_t *mac_tbl = fdb->mac_tbl_a;
+> +	struct fdb_mac_tbl_entry_t *e;
+> +	u8 mac_tbl_idx;
+> +	int i, ret;
+> +	s8 cmp;
+> +
+> +	mac_tbl_idx = bkt_info->bucket_idx;
+> +
+> +	for (i = 0; i < bkt_info->bucket_entries; i++, mac_tbl_idx++) {
+> +		e = &mac_tbl->mac_tbl_entry[mac_tbl_idx];
+> +		cmp = memcmp(mac, e->mac, ETH_ALEN);
+> +		if (cmp < 0) {
+> +			return mac_tbl_idx;
+> +		} else if (cmp == 0) {
+> +			if (e->port != port) {
+> +				/* MAC is already in FDB, only port is
+> +				 * different. So just update the port.
+> +				 * Note: total_entries and bucket_entries
+> +				 * remain the same.
+> +				 */
+> +				ret = icssm_prueth_sw_fdb_spin_lock(fdb);
+> +				if (ret) {
+> +					pr_err("PRU lock timeout\n");
+> +					return -ETIMEDOUT;
+> +				}
+
+icssm_prueth_sw_fdb_spin_lock() returns an errno. Don't replace it.
+
+Also, pr_err() is bad practice and probably checkpatch is telling you
+this. Ideally you want to indicate which device has an error, so you
+should be using dev_err(), or maybe netdev_err().
+
+> +	if (left > 0) {
+> +		hash_prev =
+> +			icssm_prueth_sw_fdb_hash
+> +			(FDB_MAC_TBL_ENTRY(left - 1)->mac);
+> +	}
+
+> +		empty_slot_idx =
+> +			icssm_prueth_sw_fdb_check_empty_slot_right(mt, mti);
+
+There are a couple of odd indentations like this. I wounder if it
+makes sense to shorten the prefix? Do you really need all of
+icssm_prueth_sw_fdb_ ?
+
+	Andrew
 
