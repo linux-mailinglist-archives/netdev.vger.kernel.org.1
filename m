@@ -1,169 +1,213 @@
-Return-Path: <netdev+bounces-229013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65FACBD7002
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 03:44:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FC53BD70A1
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 04:04:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8607518A7F23
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 01:44:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62CED18A3529
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 02:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE0012550CD;
-	Tue, 14 Oct 2025 01:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C60303A1A;
+	Tue, 14 Oct 2025 02:04:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FTfxEID/"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="aPAKJ8Im"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABACA1E98EF
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C072DDAB;
+	Tue, 14 Oct 2025 02:04:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760406251; cv=none; b=ZWhjO0ljUuWEEMsHBkAIParsEcgQIj3Q3cCWNEzOk/SQTts5/MKHPwoqEpvF24G/md0NOyfbww1cR2/3L1cH/eZ1SxKLTbm/6/UaRhsOIVz3bck2X1xijO2W6jCFCvqeG9yjfSsMqo4s6otnDTFOCfKskZuTg0w2kTxodZkyXuY=
+	t=1760407475; cv=none; b=mz/OSMA8iQZPPH1M/JvypatU/CgImnBmvgfHurGCq2NxS1QIA0UO+HtT/N1B76lKRIIJgXCCo4m7RTfjEthZP9bKwg69uic9WSfLLR5pQKomGJJcoc9jcrb9dUsMGC9YJg7b6L5kCPJBlISPShOCem5+lc++5qadUy0t1tH/8m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760406251; c=relaxed/simple;
-	bh=IyIx6WhWzH3QfEjg9TeTpMEVNRzJZtsFVjeIaWYGLdU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=i+itZeHvZjm2QzVf1n1HrOfPodHS53ICU8jZmP6PdmF1Aepcmky57UL0JRm5f4EgNZdl+X/shq0e0ZMOCoHbmMo39JPV6RmL0/PXf1Jw2MPZbQEOB1UcDIKDzvMrttQKe5/JwZlovJe+P1NDL2E7HHCcoqZaVTH5jVSoe9j21v8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FTfxEID/; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760406237;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vO/ZDB4TMtmLh64kPiFotXh5bUAaUBwq3BsPKySjreM=;
-	b=FTfxEID/GkjBTTNzzbc45gGoh12Ba6wQqrzY/bO5nzi4cY4mfksqWw34ZkxG1aUz4cnX5l
-	taZo3/Bi+V1OBjRFo9bvgPqAb9tbY0t0Dknl/C/QBjFoIbPjxAIWONbpk1/ahMJVoCvZBq
-	INPVlegL1EDnAvlD6y6JwifiV1O529E=
-From: Roman Gushchin <roman.gushchin@linux.dev>
-To: Daniel Sedlak <daniel.sedlak@cdn77.com>
-Cc: Shakeel Butt <shakeel.butt@linux.dev>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
- Horman <horms@kernel.org>,  Jonathan Corbet <corbet@lwn.net>,  Neal
- Cardwell <ncardwell@google.com>,  Kuniyuki Iwashima <kuniyu@google.com>,
-  David Ahern <dsahern@kernel.org>,  Andrew Morton
- <akpm@linux-foundation.org>,  Yosry Ahmed <yosry.ahmed@linux.dev>,
-  linux-mm@kvack.org,  netdev@vger.kernel.org,  Johannes Weiner
- <hannes@cmpxchg.org>,  Michal Hocko <mhocko@kernel.org>,  Muchun Song
- <muchun.song@linux.dev>,  cgroups@vger.kernel.org,  Tejun Heo
- <tj@kernel.org>,  Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
-  Matyas Hurtik
- <matyas.hurtik@cdn77.com>
-Subject: Re: [PATCH v5] memcg: expose socket memory pressure in a cgroup
-In-Reply-To: <89618dcb-7fe3-4f15-931b-17929287c323@cdn77.com> (Daniel Sedlak's
-	message of "Mon, 13 Oct 2025 16:30:53 +0200")
-References: <20251007125056.115379-1-daniel.sedlak@cdn77.com>
-	<87qzvdqkyh.fsf@linux.dev>
-	<13b5aeb6-ee0a-4b5b-a33a-e1d1d6f7f60e@cdn77.com>
-	<87o6qgnl9w.fsf@linux.dev>
-	<tr7hsmxqqwpwconofyr2a6czorimltte5zp34sp6tasept3t4j@ij7acnr6dpjp>
-	<87a5205544.fsf@linux.dev>
-	<qdblzbalf3xqohvw2az3iogevzvgn3c3k64nsmyv2hsxyhw7r4@oo7yrgsume2h>
-	<875xcn526v.fsf@linux.dev>
-	<89618dcb-7fe3-4f15-931b-17929287c323@cdn77.com>
-Date: Mon, 13 Oct 2025 18:43:45 -0700
-Message-ID: <87h5w2w94e.fsf@linux.dev>
+	s=arc-20240116; t=1760407475; c=relaxed/simple;
+	bh=dww80B3Hk7HPkJ5DlFsPZ2Wkdo+EJLE2Aw1BA4evdsk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wto4RfpiSzPkLnwQDv9Ku/NnWN0+Y5VmNGiCUiOFkABMRmu6Qr0i43kd/QvWO/3DnNf6YJPg1NATO3LW2hRO0LO8hO/HDelG9WD5JgunZXjo1Tt6ZUUnPfxbVulEYtmVLDoLwzRSzntIdXuetkOpLscHoa1I/zsMeNrwQdxRMPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=aPAKJ8Im; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1760407468; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=NC6lAq5v+naNOL8xOJgDemeTBmw5nvWnLwrWkWNVO60=;
+	b=aPAKJ8ImAoAehFNTbdRkyxle/vDDcbTQuP8WP9BnWDLcCRyIMBk4tc8xATDtoAUIrgOzgvK/FdjaMrivCppbFkeui6wdCb6Y7yyjzln5i+p8ymrqRm7RjXoYNUgV+5QfYrq5Wm7R4UBhBE/5dGLO7mw9R62e9aiAbEjpJXTqDoQ=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WqA-Nit_1760407467 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 14 Oct 2025 10:04:28 +0800
+Date: Tue, 14 Oct 2025 10:04:27 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Wang Liang <wangliang74@huawei.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>,
+	Eric Dumazet <edumazet@google.com>, alibuda@linux.alibaba.com,
+	dust.li@linux.alibaba.com, sidraya@linux.ibm.com,
+	wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, yuehaibing@huawei.com, zhangchangzhong@huawei.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH net] net/smc: fix general protection fault in
+ __smc_diag_dump
+Message-ID: <20251014020427.GA109537@j66a10360.sqa.eu95>
+References: <20250922121818.654011-1-wangliang74@huawei.com>
+ <CANn89iLOyFnwD+monMHCmTgfZEAPWmhrZu-=8mvtMGyM9FG49g@mail.gmail.com>
+ <CAAVpQUBxoWW_4U2an4CZNoSi95OduUhArezHnzKgpV3oOYs5Jg@mail.gmail.com>
+ <CANn89i+V847kRTTFW43ouZXXuaBs177fKv5_bqfbvRutpg+s6g@mail.gmail.com>
+ <CAAVpQUBriJFUhq2MpfwFTBLkF0rJfaVp1gaJ3wdhZuD7NWOaXw@mail.gmail.com>
+ <CANn89i+Ntwzm2A=NSHbKdFuGVR6kar00AjrJE91Lu0e5BUsVow@mail.gmail.com>
+ <CAAVpQUAd1oba6cy-hSub-iS0cnh7WH=HXgVnUwj8MXZLyU=a+w@mail.gmail.com>
+ <8ab4d343-d287-4b42-94f7-511f46e131d3@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8ab4d343-d287-4b42-94f7-511f46e131d3@huawei.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Daniel Sedlak <daniel.sedlak@cdn77.com> writes:
+On Fri, Sep 26, 2025 at 04:42:35PM +0800, Wang Liang wrote:
+> 
+> 在 2025/9/26 3:51, Kuniyuki Iwashima 写道:
+> >On Thu, Sep 25, 2025 at 12:37 PM Eric Dumazet <edumazet@google.com> wrote:
+> >>On Thu, Sep 25, 2025 at 12:25 PM Kuniyuki Iwashima <kuniyu@google.com> wrote:
+> >>>On Thu, Sep 25, 2025 at 11:54 AM Eric Dumazet <edumazet@google.com> wrote:
+> >>>>On Thu, Sep 25, 2025 at 11:46 AM Kuniyuki Iwashima <kuniyu@google.com> wrote:
+> >>>>>Thanks Eric for CCing me.
+> >>>>>
+> >>>>>On Thu, Sep 25, 2025 at 7:32 AM Eric Dumazet <edumazet@google.com> wrote:
+> >>>>>>On Mon, Sep 22, 2025 at 4:57 AM Wang Liang <wangliang74@huawei.com> wrote:
+> >>>>>>>The syzbot report a crash:
+> >>>>>>>
+> >>>>>>>   Oops: general protection fault, probably for non-canonical address 0xfbd5a5d5a0000003: 0000 [#1] SMP KASAN NOPTI
+> >>>>>>>   KASAN: maybe wild-memory-access in range [0xdead4ead00000018-0xdead4ead0000001f]
+> >>>>>>>   CPU: 1 UID: 0 PID: 6949 Comm: syz.0.335 Not tainted syzkaller #0 PREEMPT(full)
+> >>>>>>>   Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+> >>>>>>>   RIP: 0010:smc_diag_msg_common_fill net/smc/smc_diag.c:44 [inline]
+> >>>>>>>   RIP: 0010:__smc_diag_dump.constprop.0+0x3ca/0x2550 net/smc/smc_diag.c:89
+> >>>>>>>   Call Trace:
+> >>>>>>>    <TASK>
+> >>>>>>>    smc_diag_dump_proto+0x26d/0x420 net/smc/smc_diag.c:217
+> >>>>>>>    smc_diag_dump+0x27/0x90 net/smc/smc_diag.c:234
+> >>>>>>>    netlink_dump+0x539/0xd30 net/netlink/af_netlink.c:2327
+> >>>>>>>    __netlink_dump_start+0x6d6/0x990 net/netlink/af_netlink.c:2442
+> >>>>>>>    netlink_dump_start include/linux/netlink.h:341 [inline]
+> >>>>>>>    smc_diag_handler_dump+0x1f9/0x240 net/smc/smc_diag.c:251
+> >>>>>>>    __sock_diag_cmd net/core/sock_diag.c:249 [inline]
+> >>>>>>>    sock_diag_rcv_msg+0x438/0x790 net/core/sock_diag.c:285
+> >>>>>>>    netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2552
+> >>>>>>>    netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+> >>>>>>>    netlink_unicast+0x5a7/0x870 net/netlink/af_netlink.c:1346
+> >>>>>>>    netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1896
+> >>>>>>>    sock_sendmsg_nosec net/socket.c:714 [inline]
+> >>>>>>>    __sock_sendmsg net/socket.c:729 [inline]
+> >>>>>>>    ____sys_sendmsg+0xa95/0xc70 net/socket.c:2614
+> >>>>>>>    ___sys_sendmsg+0x134/0x1d0 net/socket.c:2668
+> >>>>>>>    __sys_sendmsg+0x16d/0x220 net/socket.c:2700
+> >>>>>>>    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+> >>>>>>>    do_syscall_64+0xcd/0x4e0 arch/x86/entry/syscall_64.c:94
+> >>>>>>>    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> >>>>>>>    </TASK>
+> >>>>>>>
+> >>>>>>>The process like this:
+> >>>>>>>
+> >>>>>>>                (CPU1)              |             (CPU2)
+> >>>>>>>   ---------------------------------|-------------------------------
+> >>>>>>>   inet_create()                    |
+> >>>>>>>     // init clcsock to NULL        |
+> >>>>>>>     sk = sk_alloc()                |
+> >>>>>>>                                    |
+> >>>>>>>     // unexpectedly change clcsock |
+> >>>>>>>     inet_init_csk_locks()          |
+> >>>>>>>                                    |
+> >>>>>>>     // add sk to hash table        |
+> >>>>>>>     smc_inet_init_sock()           |
+> >>>>>>>       smc_sk_init()                |
+> >>>>>>>         smc_hash_sk()              |
+> >>>>>>>                                    | // traverse the hash table
+> >>>>>>>                                    | smc_diag_dump_proto
+> >>>>>>>                                    |   __smc_diag_dump()
+> >>>>>>>                                    |     // visit wrong clcsock
+> >>>>>>>                                    |     smc_diag_msg_common_fill()
+> >>>>>>>     // alloc clcsock               |
+> >>>>>>>     smc_create_clcsk               |
+> >>>>>>>       sock_create_kern             |
+> >>>>>>>
+> >>>>>>>With CONFIG_DEBUG_LOCK_ALLOC=y, the smc->clcsock is unexpectedly changed
+> >>>>>>>in inet_init_csk_locks(), because the struct smc_sock does not have struct
+> >>>>>>>inet_connection_sock as the first member.
+> >>>>>>>
+> >>>>>>>Previous commit 60ada4fe644e ("smc: Fix various oops due to inet_sock type
+> >>>>>>>confusion.") add inet_sock as the first member of smc_sock. For protocol
+> >>>>>>>with INET_PROTOSW_ICSK, use inet_connection_sock instead of inet_sock is
+> >>>>>>>more appropriate.
+> >>>>>Why is INET_PROTOSW_ICSK necessary in the first place ?
+> >>>>>
+> >>>>>I don't see a clear reason because smc_clcsock_accept() allocates
+> >>>>>a new sock by smc_sock_alloc() and does not use inet_accept().
+> >>>>>
+> >>>>>Or is there any other path where smc_sock is cast to
+> >>>>>inet_connection_sock ?
+> >>>>What I saw in this code was a missing protection.
+> >>>>
+> >>>>smc_diag_msg_common_fill() runs without socket lock being held.
+> >>>>
+> >>>>I was thinking of this fix, but apparently syzbot still got crashes.
+> >>>Looking at the test result,
+> >>>
+> >>>https://syzkaller.appspot.com/x/report.txt?x=15944c7c580000
+> >>>KASAN: maybe wild-memory-access in range [0xdead4ead00000018-0xdead4ead0000001f]
+> >>>
+> >>>the top half of the address is SPINLOCK_MAGIC (0xdead4ead),
+> >>>so the type confusion mentioned in the commit message makes
+> >>>sense to me.
+> >>>
+> >>>$ pahole -C inet_connection_sock vmlinux
+> >>>struct inet_connection_sock {
+> >>>...
+> >>>     struct request_sock_queue  icsk_accept_queue;    /*   992    80 */
+> >>>
+> >>>$ pahole -C smc_sock vmlinux
+> >>>struct smc_sock {
+> >>>...
+> >>>     struct socket *            clcsock;              /*   992     8 */
+> >>>
+> >>>The option is 1) let inet_init_csk_locks() init inet_connection_sock
+> >>>or 2) avoid inet_init_csk_locks(), and I guess 2) could be better to
+> >>>avoid potential issues in IS_ICSK branches.
+> >>>
+> >>I definitely vote to remove INET_PROTOSW_ICSK from smc.
+> >>
+> >>We want to reserve inet_connection_sock to TCP only, so that we can
+> >>move fields to better
+> >>cache friendly locations in tcp_sock hopefully for linux-6.19
+> >Fully agreed.
+> >
+> >Wang: please squash the revert of 6fd27ea183c2 for
+> >INET_PROTOSW_ICSK removal.  This is for one of
+> >IS_ICSK branches.
+> 
+> 
+> Thanks for your suggestions, they are helpful!
+> 
+> I will remove INET_PROTOSW_ICSK from smc_inet_protosw and smc_inet6_protosw,
+> 
 
-> On 10/9/25 9:02 PM, Roman Gushchin wrote:
->> Shakeel Butt <shakeel.butt@linux.dev> writes:
->> 
->>> On Thu, Oct 09, 2025 at 10:58:51AM -0700, Roman Gushchin wrote:
->>>> Shakeel Butt <shakeel.butt@linux.dev> writes:
->>>>
->>>>> On Thu, Oct 09, 2025 at 08:32:27AM -0700, Roman Gushchin wrote:
->>>>>> Daniel Sedlak <daniel.sedlak@cdn77.com> writes:
->>>>>>
->>>>>>> Hi Roman,
->>>>>>>
->>>>>>> On 10/8/25 8:58 PM, Roman Gushchin wrote:
->>>>>>>>> This patch exposes a new file for each cgroup in sysfs which is a
->>>>>>>>> read-only single value file showing how many microseconds this cgroup
->>>>>>>>> contributed to throttling the throughput of network sockets. The file is
->>>>>>>>> accessible in the following path.
->>>>>>>>>
->>>>>>>>>     /sys/fs/cgroup/**/<cgroup name>/memory.net.throttled_usec
->>>>>>>> Hi Daniel!
->>>>>>>> How this value is going to be used? In other words, do you need an
->>>>>>>> exact number or something like memory.events::net_throttled would be
->>>>>>>> enough for your case?
->>>>>>>
->>>>>>> Just incrementing a counter each time the vmpressure() happens IMO
->>>>>>> provides bad semantics of what is actually happening, because it can
->>>>>>> hide important details, mainly the _time_ for how long the network
->>>>>>> traffic was slowed down.
->>>>>>>
->>>>>>> For example, when memory.events::net_throttled=1000, it can mean that
->>>>>>> the network was slowed down for 1 second or 1000 seconds or something
->>>>>>> between, and the memory.net.throttled_usec proposed by this patch
->>>>>>> disambiguates it.
->>>>>>>
->>>>>>> In addition, v1/v2 of this series started that way, then from v3 we
->>>>>>> rewrote it to calculate the duration instead, which proved to be
->>>>>>> better information for debugging, as it is easier to understand
->>>>>>> implications.
->>>>>>
->>>>>> But how are you planning to use this information? Is this just
->>>>>> "networking is under pressure for non-trivial amount of time ->
->>>>>> raise the memcg limit" or something more complicated?
->
-> We plan to use it mostly for observability purposes and to better
-> understand which traffic patterns affect the socket pressure the most
-> (so we can try to fix/delay/improve it). We do not know how commonly
-> this issue appears in other deployments, but in our deployment, many
-> of servers were affected by this slowdown, which varied in terms of
-> hardware and software configuration. Currently, it is very hard to
-> detect if the socket is under pressure without using tools like
-> bpftrace, so we would like to expose this metric in a more accessible
-> way. So in the end, we do not really care in which file this "socket
-> pressure happened" notification will be stored.
->>>>>> I totally get it from the debugging perspective, but not sure about
->>>>>> usefulness of it as a permanent metric. This is why I'm asking if there
->>>>>> are lighter alternatives, e.g. memory.events or maybe even tracepoints.
->
-> If the combination of memory.events(.local) and tracepoint hook(s) is
-> okay with you(?), we can use that and export the same information as
-> in the current patch version. We can incorporate that into the next
-> version.
+This is a bit of a long story. The INET_PROTOSW_ICSK flag was originally
+introduced for an effort to merge smc_sock and clcsock. The goal was to
+allow the merged socket to behave like a standard tcp_sock during
+fallback, thus avoiding the need for any special handling.
 
-In my opinion
-tracepoint > memory.events entry > memory.stat entry > new cgroupfs file.
+However, this approach was later abandoned. Since the original reason
+for this flag no longer exists, so the removal makes sense.
 
->
-> Also, would it be possible to make the socket pressure signal
-> configurable, e.g., allowing it to be configured via sysctl or per
-> cgroup not to trigger the socket pressure signal? I cannot find the
-> reasoning why this throttling cannot (maybe it can) be opt-out.
-
-It's a good point.
-
-First, I think that vmpressure implementation is not the best
-and we might want to switch to PSI (or something else) there.
-This is why I'm resistant to exposing implementation-specific
-metrics.
-
-That said, I believe that some level of customization here is justified.
-Maybe opting out completely is too much, but in the end it's hard for
-the kernel to balance the importance of e.g. page cache vs networking
-buffers as it might be really workload-dependent. Or some workloads
-would prefer to risk being oom-killed rather than to tolerate a sub-par
-networking performance.
-
-Thanks!
+> 
 
