@@ -1,247 +1,217 @@
-Return-Path: <netdev+bounces-229315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D25B0BDA8AC
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 18:01:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E410BDA8D9
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 18:05:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 51061503C71
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:59:28 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9179B503981
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 16:02:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 668973009EE;
-	Tue, 14 Oct 2025 15:59:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D366301709;
+	Tue, 14 Oct 2025 16:01:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BC6vOCHd"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b="wwjOp8Yv";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=valla.it header.i=@valla.it header.b="IegT3koj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from delivery.antispam.mailspamprotection.com (delivery.antispam.mailspamprotection.com [185.56.87.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53762BE029;
-	Tue, 14 Oct 2025 15:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760457553; cv=none; b=oS0wrP1cNoLgu407fuyV+lqUtSf2qO3/TGIan1JZEbFu7x/mG7QPNk9k6Ys/AV4JHQjuD/uC3+38Bl96uTuCA7lcEQdMw0n7bDpVRaZvPNvUZjWcJz2AkCVSM/Y8+uU4OQY80x8MTq5Ztv4DPfPxDgiKRoqTQwPUbtCtmKGpW/c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760457553; c=relaxed/simple;
-	bh=Cv3+0bdWHxsmuDhQ8zLrQ2TdE8JMQBBh3cle+GrPpPg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WYbIHzR9vAC1rHhuw7dFG27R9lGQ79TQ+RO7IHyLXY9WqXZSpXMmJGk1z7KnmOxGOkpM5iINrX4TNtYue3nmJuUDUijJTw7+bK6HuIwl7fRZQBFnircqg6aYvQ5EMbDOR+cTmT7Z96SFskXesqMxcKVeAlW4jDU5aLliMM0bgas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BC6vOCHd; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59EBLWCC020097;
-	Tue, 14 Oct 2025 15:59:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=ATCasm+SNbcvU+hgj+0l+2g8Eiuvo3QQPP16vdtgz
-	MU=; b=BC6vOCHdmg04nV6qYMRKOhhPrJ7cwhlvYVlTvfafsFo35TMTIz6/mIWXW
-	DiFKXhALI/PFlRStnoGbIqY6nMbG9eS0tapdgA4Zryv/64jOJHhNZtCdG/iULraC
-	HLb6D2Vyh+hNAdC8G3Na6sVzKVURvPHazSu8EEmfZCiqJGDvW9WLXl6Ep5WoKQhT
-	2rOTiQNJCQNx8IFGPbkXCgtkZWUvSrJDRrTwpUHx7WoWc2vFUM6JrARf1qiOVKt0
-	zV2ihiNOzRCUXGCM+WK+TVjA03H2vWk0CEb8wa5Ohfs5otuoBS0F14frE4BoN+2g
-	bHmJr+EZFM/hO1JzBmyQGsNfNjxAQ==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49qey8qpra-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Oct 2025 15:59:04 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59EEGtDX003663;
-	Tue, 14 Oct 2025 15:59:03 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49r1xxuvdr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Oct 2025 15:59:03 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59EFwxLY17563972
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 14 Oct 2025 15:58:59 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6CEE02006A;
-	Tue, 14 Oct 2025 15:58:59 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A6F1C20063;
-	Tue, 14 Oct 2025 15:58:52 +0000 (GMT)
-Received: from tuxmaker.lnxne.boe (unknown [9.152.85.9])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 14 Oct 2025 15:58:52 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Shay Drori <shayd@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: Gerd Bayer <gbayer@linux.ibm.com>, Tariq Toukan <tariqt@nvidia.com>,
-        Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-        netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [PATCH] s390/pci: Avoid deadlock between PCI error recovery and mlx5 crdump
-Date: Tue, 14 Oct 2025 17:58:52 +0200
-Message-ID: <20251014155852.1684916-1-gbayer@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6AC3009DD;
+	Tue, 14 Oct 2025 16:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.56.87.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760457711; cv=pass; b=NNSX6g4IC4q1fo4lBOJMhLpql1UYbXfcEUEw7MrPoIr2GHtWziYRXdB1YipeGuRS6Gz14kaMzbwmq1BJuWuwJ18VmYOFQqPFg+jKn+U3xLvv6quLQ96dizA86ojxW9POjWp2fNew9n/aB4F11uo2i7+mqFaHO9DWKy+1BrA37SQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760457711; c=relaxed/simple;
+	bh=qLEHI8X92rzJVvNe3sz2L6E08H2+TevfCQD5cWiQSTY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=biUTxAQ4YcRMfk+jT180kBxx7gBnPlm6hAvwaizFDlK/bU4yt1+kA51AR4WeaULC3Un2RSN4g4l31woRtGvp6DwFnw5lERbzmEIRZn/QUjv6Jy0YxHsarrJtaWXN1Zmd7QLX/Y8GLXRQA5aS0RFdoOajBltXT44lkHcnpOtHodI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it; spf=pass smtp.mailfrom=valla.it; dkim=pass (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b=wwjOp8Yv; dkim=pass (1024-bit key) header.d=valla.it header.i=@valla.it header.b=IegT3koj; arc=pass smtp.client-ip=185.56.87.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=valla.it
+ARC-Seal: i=1; cv=none; a=rsa-sha256; d=outgoing.instance-europe-west4-s3hj.prod.antispam.mailspamprotection.com; s=arckey; t=1760457710;
+	 b=u+RGO511c/NQC3PQJt93GRy8I5/xVPTZ9Jlh6NTFbw/wMjovJIG8d7o9t97bj6NDZuEM+aH3IS
+	  ouTwBdttLy885Uv02jBz92xZ/NbRmMS9ryxEO53+qqN33jP2Km3XaD7PL5kUCqYQPqKPM5hfLH
+	  hlNHuRLRcJAUxT4uF2lMkLWaZGzMOWH/6fzYifu8HrswqlVOTwWO4blFk/D7aqvPoFfGuwkrUk
+	  1AxOm5PdoKkgNTECc2fKM/cIQGHFoU0n86pfUPWn6Uzz3PhoMZnzgENqapw4027Sj3r/2A4SVP
+	  vBSdRjOL7ablUj7yH7qqPIVJVkSuIWDghUtK4wxeo0Agvg==;
+ARC-Authentication-Results: i=1; outgoing.instance-europe-west4-s3hj.prod.antispam.mailspamprotection.com; smtp.remote-ip=35.214.173.214;
+	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
+	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
+	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
+	arc=none
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed; d=outgoing.instance-europe-west4-s3hj.prod.antispam.mailspamprotection.com; s=arckey; t=1760457710;
+	bh=qLEHI8X92rzJVvNe3sz2L6E08H2+TevfCQD5cWiQSTY=;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
+	  Message-ID:Date:Subject:Cc:To:From:DKIM-Signature:DKIM-Signature;
+	b=fApZEgvl1k6LUWPcpLTvVDCWsasYxKDNlTua4nad9Zocc9YDYY3gVwUZ3rrwvbh4LFCCSNhuVX
+	  d36sSBLFzj9RlUJF8Uit4E3YG/zTgOLn0u/MJ3tnYBHn2wbYasuFFLbc5HaZLeSnDgAVGt+aEX
+	  YQ6LUnUuDpHjwbOP0IcIx987LJgeSPFmoRvy84BXm4iBlBRideFKcFlA+P6L7YxJuYpuEfTsWX
+	  hbIRq20hhBgfUj+SssY2A2X1StzGXb+0sbZyJhL43MJpT/rvRrhdNwC6+rj+IRtJrY9lQSduFk
+	  5QNG2tOIy4zr23CozSGkm2A3jOS75Ba79SWZENqlA7vEiQ==;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=antispam.mailspamprotection.com; s=default; h=CFBL-Feedback-ID:CFBL-Address
+	:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Reply-To:List-Unsubscribe;
+	bh=JxnkS9Xl8ClOOgOP8ITCaK9nVGvTdorwPDwhCQjD3DA=; b=wwjOp8YvufxLnVrspryK7V6w7Z
+	V/PGdbm9KGvyg0RifIor2Tbw871hn4gVFtFFc4fnGtOZeqZyxTlVsZKWum4wkkfXNsmxbulxuokTV
+	qoCaJ+xmvWi35omJNlwOwyBdY0ug7N+k383aU5CuZrGboTUzpcxQrAs7MP9aWbBSCTKk=;
+Received: from 214.173.214.35.bc.googleusercontent.com ([35.214.173.214] helo=esm19.siteground.biz)
+	by instance-europe-west4-s3hj.prod.antispam.mailspamprotection.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <francesco@valla.it>)
+	id 1v8hT5-00000001rNs-1i14;
+	Tue, 14 Oct 2025 16:01:46 +0000
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=valla.it;
+	s=default; h=Date:Subject:Cc:To:From:list-help:list-unsubscribe:
+	list-subscribe:list-post:list-owner:list-archive;
+	bh=JxnkS9Xl8ClOOgOP8ITCaK9nVGvTdorwPDwhCQjD3DA=; b=IegT3kojrdmO1lVOS4CJKRgmIQ
+	Ku/3vNp3AcCq47IJz59MMmZPIzaCehDt/+PZ/E11cYe7tguhrjZY3XhHa6pdoSyBfKB0KFT/RB65g
+	Y/OAPrp5c+DmC+SibBLuNbgYd1/pd88fzBGMutKkhYbE+8pGufNP9zN7A/nlbDbZmzS0=;
+Received: from [87.16.13.60] (port=63204 helo=fedora.fritz.box)
+	by esm19.siteground.biz with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <francesco@valla.it>)
+	id 1v8hSW-00000000HlS-1DDE;
+	Tue, 14 Oct 2025 16:01:08 +0000
+From: Francesco Valla <francesco@valla.it>
+To: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>,
+ Harald Mommer <harald.mommer@opensynergy.com>,
+ Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com>,
+ Wolfgang Grandegger <wg@grandegger.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Damir Shaikhutdinov <Damir.Shaikhutdinov@opensynergy.com>,
+ linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ development@redaril.me
+Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
+Date: Tue, 14 Oct 2025 18:01:07 +0200
+Message-ID: <1997333.7Z3S40VBb9@fedora.fritz.box>
+In-Reply-To: <aO4isIfRbgKuCvRX@fedora>
+References:
+ <20240108131039.2234044-1-Mikhail.Golubev-Ciuchea@opensynergy.com>
+ <2243144.yiUUSuA9gR@fedora.fritz.box> <aO4isIfRbgKuCvRX@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: t567cn2NCJ0Gnp5Ep6bO0w1cB8b52nrw
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDExMDAxMSBTYWx0ZWRfX0WTciNDtlrxZ
- fujmjphion22mM0VCyDMkVeQF30fIVe7pSI1SZadFFiMpwDFVvrtBtAIS55I9BHNaNN4Z/jmiwr
- 4Jcb8CLT1Kg/SJhxKJD8qqHgFkJiQmOa5y6aBZQ/W8fV9p4I80RRmNJ0Ytmm2qV/QvhRGQboWTq
- d5iNWJGieTXTCO1LszOmSWrkbYGOc24hTduR7CdLGpkGaIfc5cDN+DEPWbxJUqwAP4croGCAZlf
- PI7jbfMO4wFVQbaIeLFdJ9G6ciCOeNmOsWCxKvNE2Z1i8cUsUWdTYbE7y4A/tL3NTmDnGebzEQq
- YxV0norOqsJ0vanoUxvBfp7nc+pQ9P4cW9NoHE2Fja935UE2jAJYFwd+n5pw8KSvaW9/uE0x16g
- 9sebdN825ectDVSVG2j2pYqXCr5wQA==
-X-Proofpoint-GUID: t567cn2NCJ0Gnp5Ep6bO0w1cB8b52nrw
-X-Authority-Analysis: v=2.4 cv=QZ5rf8bv c=1 sm=1 tr=0 ts=68ee7348 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8
- a=ZSSbZbepod2aoZfJsqwA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-14_03,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 priorityscore=1501 phishscore=0 bulkscore=0 suspectscore=0
- spamscore=0 malwarescore=0 impostorscore=0 clxscore=1015 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510110011
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - esm19.siteground.biz
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - valla.it
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-SGantispam-id: 17455a6c8a999985856092c8447c12d4
+AntiSpam-DLS: false
+AntiSpam-DLSP: 
+AntiSpam-DLSRS: 
+AntiSpam-TS: 1.0
+CFBL-Address: feedback@antispam.mailspamprotection.com; report=arf
+CFBL-Feedback-ID: 1v8hT5-00000001rNs-1i14-feedback@antispam.mailspamprotection.com
+Authentication-Results: outgoing.instance-europe-west4-s3hj.prod.antispam.mailspamprotection.com;
+	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
+	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
+	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
+	arc=none
 
-Do not block PCI config accesses through pci_cfg_access_lock() when
-executing the s390 variant of PCI error recovery: Acquire just
-device_lock() instead of pci_dev_lock() as powerpc's EEH and
-generig PCI AER processing do.
+On Tuesday, 14 October 2025 at 12:15:12 Matias Ezequiel Vara Larsen <mvaralar@redhat.com> wrote:
+> On Thu, Sep 11, 2025 at 10:59:40PM +0200, Francesco Valla wrote:
+> > Hello Mikhail, Harald,
+> > 
+> > hoping there will be a v6 of this patch soon, a few comments:
+> > 
+> > On Monday, 8 January 2024 at 14:10:35 Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com> wrote:
+> > 
+> > [...]
+> > > +
+> > > +/* Compare with m_can.c/m_can_echo_tx_event() */
+> > > +static int virtio_can_read_tx_queue(struct virtqueue *vq)
+> > > +{
+> > > +	struct virtio_can_priv *can_priv = vq->vdev->priv;
+> > > +	struct net_device *dev = can_priv->dev;
+> > > +	struct virtio_can_tx *can_tx_msg;
+> > > +	struct net_device_stats *stats;
+> > > +	unsigned long flags;
+> > > +	unsigned int len;
+> > > +	u8 result;
+> > > +
+> > > +	stats = &dev->stats;
+> > > +
+> > > +	/* Protect list and virtio queue operations */
+> > > +	spin_lock_irqsave(&can_priv->tx_lock, flags);
+> > > +
+> > > +	can_tx_msg = virtqueue_get_buf(vq, &len);
+> > > +	if (!can_tx_msg) {
+> > > +		spin_unlock_irqrestore(&can_priv->tx_lock, flags);
+> > > +		return 0; /* No more data */
+> > > +	}
+> > > +
+> > > +	if (unlikely(len < sizeof(struct virtio_can_tx_in))) {
+> > > +		netdev_err(dev, "TX ACK: Device sent no result code\n");
+> > > +		result = VIRTIO_CAN_RESULT_NOT_OK; /* Keep things going */
+> > > +	} else {
+> > > +		result = can_tx_msg->tx_in.result;
+> > > +	}
+> > > +
+> > > +	if (can_priv->can.state < CAN_STATE_BUS_OFF) {
+> > > +		/* Here also frames with result != VIRTIO_CAN_RESULT_OK are
+> > > +		 * echoed. Intentional to bring a waiting process in an upper
+> > > +		 * layer to an end.
+> > > +		 * TODO: Any better means to indicate a problem here?
+> > > +		 */
+> > > +		if (result != VIRTIO_CAN_RESULT_OK)
+> > > +			netdev_warn(dev, "TX ACK: Result = %u\n", result);
+> > 
+> > Maybe an error frame reporting CAN_ERR_CRTL_UNSPEC would be better?
+> > 
+> I am not sure. In xilinx_can.c, CAN_ERR_CRTL_UNSPEC is indicated during
+> a problem in the rx path and this is the tx path. I think the comment
+> refers to improving the way the driver informs this error to the user
+> but I may be wrong.
+> 
 
-During error recovery testing a pair of tasks was reported to be hung:
+Since we have no detail of what went wrong here, I suggested
+CAN_ERR_CRTL_UNSPEC as it is "unspecified error", to be coupled with a
+controller error with id CAN_ERR_CRTL; however, a different error might be
+more appropriate.
 
-[10144.859042] mlx5_core 0000:00:00.1: mlx5_health_try_recover:338:(pid 5553): health recovery flow aborted, PCI reads still not working
-[10320.359160] INFO: task kmcheck:72 blocked for more than 122 seconds.
-[10320.359169]       Not tainted 5.14.0-570.12.1.bringup7.el9.s390x #1
-[10320.359171] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[10320.359172] task:kmcheck         state:D stack:0     pid:72    tgid:72    ppid:2      flags:0x00000000
-[10320.359176] Call Trace:
-[10320.359178]  [<000000065256f030>] __schedule+0x2a0/0x590
-[10320.359187]  [<000000065256f356>] schedule+0x36/0xe0
-[10320.359189]  [<000000065256f572>] schedule_preempt_disabled+0x22/0x30
-[10320.359192]  [<0000000652570a94>] __mutex_lock.constprop.0+0x484/0x8a8
-[10320.359194]  [<000003ff800673a4>] mlx5_unload_one+0x34/0x58 [mlx5_core]
-[10320.359360]  [<000003ff8006745c>] mlx5_pci_err_detected+0x94/0x140 [mlx5_core]
-[10320.359400]  [<0000000652556c5a>] zpci_event_attempt_error_recovery+0xf2/0x398
-[10320.359406]  [<0000000651b9184a>] __zpci_event_error+0x23a/0x2c0
-[10320.359411]  [<00000006522b3958>] chsc_process_event_information.constprop.0+0x1c8/0x1e8
-[10320.359416]  [<00000006522baf1a>] crw_collect_info+0x272/0x338
-[10320.359418]  [<0000000651bc9de0>] kthread+0x108/0x110
-[10320.359422]  [<0000000651b42ea4>] __ret_from_fork+0x3c/0x58
-[10320.359425]  [<0000000652576642>] ret_from_fork+0xa/0x30
-[10320.359440] INFO: task kworker/u1664:6:1514 blocked for more than 122 seconds.
-[10320.359441]       Not tainted 5.14.0-570.12.1.bringup7.el9.s390x #1
-[10320.359442] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[10320.359443] task:kworker/u1664:6 state:D stack:0     pid:1514  tgid:1514  ppid:2      flags:0x00000000
-[10320.359447] Workqueue: mlx5_health0000:00:00.0 mlx5_fw_fatal_reporter_err_work [mlx5_core]
-[10320.359492] Call Trace:
-[10320.359521]  [<000000065256f030>] __schedule+0x2a0/0x590
-[10320.359524]  [<000000065256f356>] schedule+0x36/0xe0
-[10320.359526]  [<0000000652172e28>] pci_wait_cfg+0x80/0xe8
-[10320.359532]  [<0000000652172f94>] pci_cfg_access_lock+0x74/0x88
-[10320.359534]  [<000003ff800916b6>] mlx5_vsc_gw_lock+0x36/0x178 [mlx5_core]
-[10320.359585]  [<000003ff80098824>] mlx5_crdump_collect+0x34/0x1c8 [mlx5_core]
-[10320.359637]  [<000003ff80074b62>] mlx5_fw_fatal_reporter_dump+0x6a/0xe8 [mlx5_core]
-[10320.359680]  [<0000000652512242>] devlink_health_do_dump.part.0+0x82/0x168
-[10320.359683]  [<0000000652513212>] devlink_health_report+0x19a/0x230
-[10320.359685]  [<000003ff80075a12>] mlx5_fw_fatal_reporter_err_work+0xba/0x1b0 [mlx5_core]
-[10320.359728]  [<0000000651bbf852>] process_one_work+0x1c2/0x458
-[10320.359733]  [<0000000651bc073e>] worker_thread+0x3ce/0x528
-[10320.359735]  [<0000000651bc9de0>] kthread+0x108/0x110
-[10320.359737]  [<0000000651b42ea4>] __ret_from_fork+0x3c/0x58
-[10320.359739]  [<0000000652576642>] ret_from_fork+0xa/0x30
+For sure, at least in my experience, having a warn printed to kmsg is *not*
+enough, as the application sending the message(s) would not be able to detect
+the error.
 
-No kernel log of the exact same error with an upstream kernel is
-available - but the very same deadlock situation can be constructed there,
-too:
 
-- task: kmcheck
-  mlx5_unload_one() tries to acquire devlink lock while the PCI error
-  recovery code has set pdev->block_cfg_access by way of
-  pci_cfg_access_lock()
-- task: kworker
-  mlx5_crdump_collect() tries to set block_cfg_access through
-  pci_cfg_access_lock() while devlink_health_report() had acquired
-  the devlink lock.
+> > For sure, counting the known errors as valid tx_packets and tx_bytes
+> > is misleading.
+> > 
+> 
+> I'll remove the counters below.
+> 
 
-A similar deadlock situation can be reproduced by requesting a
-crdump with
-  > devlink health dump show pci/<BDF> reporter fw_fatal
+We don't really know what's wrong here - the packet might have been sent and
+and then not ACK'ed, as well as any other error condition (as it happens in the
+reference implementation from the original authors [1]). Echoing the packet
+only "to bring a waiting process in an upper layer to an end" and incrementing
+counters feels wrong, but maybe someone more expert than me can advise better
+here.
 
-while PCI error recovery is executed on the same <BDF> physical function
-by mlx5_core's pci_error_handlers. On s390 this can be injected with
-  > zpcictl --reset-fw <BDF>
 
-Tests with this patch failed to reproduce that second deadlock situation,
-the devlink command is rejected with "kernel answers: Permission denied" -
-and we get a kernel log message of:
+[1] https://github.com/OpenSynergy/qemu/commit/115540168f92ba5351a20b9c62552782ea1e3e04
 
-Oct 14 13:32:39 b46lp03.lnxne.boe kernel: mlx5_core 1ed0:00:00.1: mlx5_crdump_collect:50:(pid 254382): crdump: failed to lock vsc gw err -5
 
-because the config read of VSC_SEMAPHORE is rejected by the underlying
-hardware.
+Regards,
+Francesco
 
-Two prior attempts to address this issue have been discussed and
-ultimately rejected [1], with the primary argument that s390's
-implementation of PCI error recovery is imposing restriction that
-neither powerpc's EEH nor PCI AER handling need. Tests show that PCI
-error recovery on s390 is running to completion even without blocking
-access to PCI config space.
 
-Link[1]: https://lore.kernel.org/all/20251007144826.2825134-1-gbayer@linux.ibm.com/
-
-Fixes: 4cdf2f4e24ff ("s390/pci: implement minimal PCI error recovery")
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-
----
-
-Hi Niklas, Shay, Jason,
-
-by now I believe fixing this in s390/pci is the right way to go, since
-the other PCI error recovery implementations apparently don't require
-this strict blocking of accesses to the PCI config space.
-
-Hi Alexander, Vasily, Heiko,
-
-while I sent this to netdev since prior versions were discussed there,
-I assume this patch will go through the s390 tree, right?
-
-Thanks,
-Gerd
----
- arch/s390/pci/pci_event.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/s390/pci/pci_event.c b/arch/s390/pci/pci_event.c
-index d930416d4c90..da0de34d2e5c 100644
---- a/arch/s390/pci/pci_event.c
-+++ b/arch/s390/pci/pci_event.c
-@@ -187,7 +187,7 @@ static pci_ers_result_t zpci_event_attempt_error_recovery(struct pci_dev *pdev)
- 	 * is unbound or probed and that userspace can't access its
- 	 * configuration space while we perform recovery.
- 	 */
--	pci_dev_lock(pdev);
-+	device_lock(&pdev->dev);
- 	if (pdev->error_state == pci_channel_io_perm_failure) {
- 		ers_res = PCI_ERS_RESULT_DISCONNECT;
- 		goto out_unlock;
-@@ -254,7 +254,7 @@ static pci_ers_result_t zpci_event_attempt_error_recovery(struct pci_dev *pdev)
- 	if (driver->err_handler->resume)
- 		driver->err_handler->resume(pdev);
- out_unlock:
--	pci_dev_unlock(pdev);
-+	device_unlock(&pdev->dev);
- 	zpci_report_status(zdev, "recovery", status_str);
- 
- 	return ers_res;
--- 
-2.48.1
 
 
