@@ -1,69 +1,57 @@
-Return-Path: <netdev+bounces-229216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2D01BD96BC
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:43:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4EF9BD96E0
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:45:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7054F3B09D9
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 12:43:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8781E3A3B76
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 12:45:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC4F313E01;
-	Tue, 14 Oct 2025 12:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A017F313554;
+	Tue, 14 Oct 2025 12:44:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HszG6qEZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G167CHZP"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33EA31282E
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 12:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6FE30594D
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 12:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760445814; cv=none; b=ivqZxAxePh6nk5xWgpVnfIHgil3kZLRN/cE8JjPvD4EOmVY1eWiWoMivvubwFqsONAQQP2pmMPwCcBLh8tRR9vv2H+4LVTZA6u+zLgWpmuS7JjDH3SuwpmJWdib/OWODeLXnofNQuV4DQ5MGDg4boUvKHIbfMlfuuXTSNxZ+BWE=
+	t=1760445893; cv=none; b=lThqE/AKA9iOaktjhSM7rBCanED3qV9kxkVwYoFmwraKIDXV7d0nua5QSbIkqDnzkTi7pVUlnBzpodRu6UBDaf2nuvmESNL/uZ98FQq1oJYRkyMYwLj0mt/ADv5uuRE7OtSKEtEsYNIbi3PMqfUFcVtqt2H7ye1LJWHT/vTicA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760445814; c=relaxed/simple;
-	bh=aun758XjXsavxlUOdhTmZDa4cnyGL+oy6vyIW57NBu0=;
+	s=arc-20240116; t=1760445893; c=relaxed/simple;
+	bh=dneaycE8iKApW+fwsjcx5c8D+x9zckwhip7LcpS9qA4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o9xrnunkU7ZHioNWShVANk0CofpNlAzVr89jGyGmJSeAkdqzKr3Y8pW7fJBQD2/TZtEfyTlsZw6CSdwd1AidS2UMi03FdZhRq9PCX8qw2uVe6C8f/n3CrtsEFKuy+Powmn0W+Z5HacvXwDt1WhhI8mH6WNhrnczMb1LT845PfxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HszG6qEZ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=iSoZPghPppYlVYccoAoi+S1SyqL5zo9Qqnbc1CiKQfY=; b=HszG6qEZ0ENWvKJlkRc1qHZsqz
-	w1EN0NI78hmW4WDTsUfzm22mgyhvevczopIL7PYHsWsSKJo6Qs2NVshvbFF+yrpgUhKV5A0SHMa93
-	Mp0wnD60rogZ+vs/Gg20/T+URFLwti4WtHmPKiMRRMHX40ePllDZ+tnDNpTvfQ1Zg/vY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1v8eMn-00AuSc-QX; Tue, 14 Oct 2025 14:43:01 +0200
-Date: Tue, 14 Oct 2025 14:43:01 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Wen Gu <guwen@linux.alibaba.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Vivian Wang <wangruikang@iscas.ac.cn>,
-	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
-	Dust Li <dust.li@linux.alibaba.com>, alok.a.tiwari@oracle.com,
-	kalesh-anakkur.purayil@broadcom.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v5] eea: Add basic driver framework for Alibaba
- Elastic Ethernet Adaptor
-Message-ID: <a8936e7e-da32-4562-a88e-af5d763a883e@lunn.ch>
-References: <20251013021833.100459-1-xuanzhuo@linux.alibaba.com>
- <8b853379-1601-4387-adaf-31f786f306ca@redhat.com>
- <1760441688.9352384-1-xuanzhuo@linux.alibaba.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RT8MBE2MTDgphdOCTTj0g9zPcgJx7u9E/UeyxbwuPieKaiOenv1TklQ1hCID0chJkA62bPKy1dhxJb9YmDoseRfoF0kr5xIJnWAq8O5y83O1RiiV/Xb7fDLBsxnmMtQ7TjXCYVvk2sekxcWAmJpMSTsjNWu11r9LY6XP9pPt46s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G167CHZP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE400C4CEE7;
+	Tue, 14 Oct 2025 12:44:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760445893;
+	bh=dneaycE8iKApW+fwsjcx5c8D+x9zckwhip7LcpS9qA4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G167CHZPA49hlPl/LwFcZEWjqVqi43EA9dMdxhE7YTesjSvVQAX1EjVYMNz48IGDR
+	 NKH5976ZU7dM+XRTiu99QzzSDDc6hakm1vmCTU5YVz1ZomfuuBpV8WFe69nrV/8w6h
+	 nEc5mRk9EG9GrpiHhOAd2W2erwzbmqXCkBskuw3D6+Axwq5kXIMpPOanpO/XiYH7m6
+	 0tB+vajgs8sDZ4KFS4dncw3YsHnqMl75Gn3NfpBhPnho/vD7/8NjDFfA/z4TdnTajN
+	 6wkuXgm9Bkz07oFulVniD8Acff2heF5ka8t7dr6m6UuWatIKu1+N8+y27KDEDq2E51
+	 oMdbqBEF9/i9A==
+Date: Tue, 14 Oct 2025 13:44:49 +0100
+From: Simon Horman <horms@kernel.org>
+To: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Alexander Duyck <alexanderduyck@fb.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net: fbnic: Fix page chunking logic when
+ PAGE_SIZE > 4K
+Message-ID: <aO5FwdsNaO_H7s8i@horms.kernel.org>
+References: <20251013211449.1377054-1-dimitri.daskalakis1@gmail.com>
+ <20251013211449.1377054-2-dimitri.daskalakis1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,25 +60,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1760441688.9352384-1-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20251013211449.1377054-2-dimitri.daskalakis1@gmail.com>
 
-> > That also means that you require the reviewers to invest a lot of extra
-> > effort here, which in turn does not help making progresses.
+On Mon, Oct 13, 2025 at 02:14:48PM -0700, Dimitri Daskalakis wrote:
+> The HW always works on a 4K page size. When the OS supports larger
+> pages, we fragment them across multiple BDQ descriptors.
+> We were not properly incrementing the descriptor, which resulted in us
+> specifying the last chunks id/addr and then 15 zero descriptors. This
+> would cause packet loss and driver crashes. This is not a fix since the
+> Kconfig prevents use outside of x86.
 > 
-> Indeed, it's been quite a while, but I haven't made any substantial progress on
-> this patchset, and I'm really considering this. Would splitting up a few commits
-> speed up the review process?
+> Signed-off-by: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Flip the question around, say you where asked to review this work
-mixed in with all your other work. Would you not find it easier to
-review 15 small patches, one per coffee break, after lunch, before
-setting off home, waiting for a kernel to compile, etc, than one huge
-patch.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Also, good subject lines attacks reviews who have interests in
-subsections. If the subject line says ethtool, i'm more likely to look
-at that one patch, and you will get a review of it. When ethtool is
-not obvious, i probably won't bother.
-
-	Andrew
 
