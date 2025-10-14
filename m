@@ -1,146 +1,148 @@
-Return-Path: <netdev+bounces-229080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73936BD8120
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:04:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CDCFBD8108
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:03:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 658A11922804
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:04:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5955F3BE2AD
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDB530F54D;
-	Tue, 14 Oct 2025 08:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB44130E823;
+	Tue, 14 Oct 2025 08:02:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J4jzwApa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iG9Ls7mc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C200C30F555
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF992DC323
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760428905; cv=none; b=gHnpWtoOIFmI/VH2yL0mJXLvQ3bg2oVqy+WPIohmK0Bm3vSeqovLjFD/EITk7PhHwr8unWVyH1SaHwn3AHX2bvCCkUDHGpufa/a2z0wy6hk5RAzncA1snOFV5jjTNcrdee/mIMfMsuAz/QOD5g85ynohrUDsKsYUapP/eC/79Gc=
+	t=1760428951; cv=none; b=tW4j6apQInjNoB2yWmJWKIxwyHMTmQfZRURFDa9ey8EoOC3ztQeDGmLoJ/H+4s0zXXBNAQMmEGKPNt8GvVbyqbIEYpbzRzCmGWNM9lMylQeoAxpHh0clv4kbdUKXMdLbqFNPYt9nAIcedUP5Ntx3n8ovO4uDLO2Il7g+WcpNAZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760428905; c=relaxed/simple;
-	bh=h945n2tX0hRCi2/XGYNekabLz1wkUR0DboGrkFD/ceU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dNv0Hu3ivh6nsyQErpQM62hq9NDdo5F73uyZpEZIY0c/QJWTFdRqDameMM6WUdsUumwcvxVeViq2MspCL0Qbx7PPQ3XCbvb6wvGphyofnSM5LkDlpfx5+3INcaFaMRAItK1XgBr1/A81UDP0HEUDcWkQeIPSxgIfApxhF4ruutU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J4jzwApa; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-87a092251eeso78591986d6.0
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:01:43 -0700 (PDT)
+	s=arc-20240116; t=1760428951; c=relaxed/simple;
+	bh=zm7I7mmq5AscDvbVH2A6TlacZ/3e2PAL3DahCNCm4U0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LPPciohkxt/aydLCC7E2obxOgBrPBIYHDIs50KIZunxSyXhZtID3mGclRp+HdPYZ/YMEZ1UtAfUoqlvGTxQ7HAOWt0m70ZIfLcKjEMXl2mR1gigP7WlqT5U9hRyzmyBDMpoxYatTX9uuTC9tt9zWzQR9ZUdI7vJZlCIETgfk8II=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iG9Ls7mc; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-339d7c403b6so4839261a91.2
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:02:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760428903; x=1761033703; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ej1XZzpzLLlS67kemjQbbuKwXS8XEJbjTOnSk8Bgc24=;
-        b=J4jzwApa+/ZAnuy/brDMP+GoXrhF5j+teS4ptJ+Te66N0Cy05KB7YQji2REYjwbCUf
-         aFfQLPWtqtPYu4b+rIrpgvY5QlZzNnx8G7Bn4wk51FMWVGDhNG3EicaIfWTdJC2BO8I6
-         Y9TxBV12rglBECtPwFpsjoFi1KAre16lCXCErXriMGC/5dTyhxW9XcUZyi4ZkAbfcajD
-         GCH52pAUYNHfhy0d1tL5FD7Uh9fS4x6HO5JHOoTTugu9yKwfsiBAvqGA7BzxyXwxOOPJ
-         STZ0ZHXTZB78L62cldaSLfybhWgtRYdGuK0cIxXlFvdLq9CuW8ws9Jzot/2cOEC6E/DU
-         F91A==
+        d=gmail.com; s=20230601; t=1760428949; x=1761033749; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6GyH1jrLC1slm1gXZQb4T5nA8guMeRrq7L+/TaRkyp8=;
+        b=iG9Ls7mctgOgLwPHiCZwYMrLi9mhkQgr4Cj8JReCXY3TIIYu9srrHvJDYH2gCyQHyY
+         omNg5p8UGaUsHWvnUe+1kWqX2q2cdFgzftSPLV0/zbK5W2g9fd17JS6o7CiFLoHfsx/2
+         eJ45MghGMUF8JPt78CYpiRTH5I32cVI/wHCA6IILhWAKpQzG2BGSEj3N9yXfstNHXI+o
+         t/dhDyUu/U3W02iZjZZ9ZVmNPH49DaaTesQqpbhCJN2jMIM2BPx4WDu0V555Tb8Atgvl
+         vY63UpmvvK9EzaqqobGeMnN1sgYMxVmU2ugLNFCEeNmsC9rc3RMrF5cw+8AxgA1cIh8m
+         wFOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760428903; x=1761033703;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ej1XZzpzLLlS67kemjQbbuKwXS8XEJbjTOnSk8Bgc24=;
-        b=vsgMlXkoQM49C2TdJzSutZD0G8nxvXyg/6GGjv6ETRg7JPfmyd6R9i4djyjT+OIKBj
-         rlnzacojDRv3ofpxvcFSPIuvxID1bI6Ngo73pP/6DrY48p6F6C9OrXRXRv8qjhPgTe10
-         K67t6dBTElEMAaONK9lSwUTba8FSyj4BnS0flhgks/etXhAXNYwXWqcRvG6g7khRLdO6
-         XPPuPiSD3COPG3+8b8n2+AoI9xpQRwTXMGf07YLLvaa5Jkrg7LD1Hb0L61oAsY0t8QD7
-         6a77jJQSW7vHFjwzcvyWsOiP13T57j7tfbXU+7C0K870ujlAJ1FhGYjRsGCJypMxkuhX
-         NaPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWlRW8y+I+Oqdb+5Egow2XTh3FZE5jiD81dzU2cyBuVjoV/dzrwhZ51gkzI+rCw9GyLkKPWg98=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsiEYR3vgigMvPLuwdzvZwAE44Nfri7piI1GizIibVrfqu6gSD
-	CA0xVxv5QcDPCwhYRpCjXEsFjIgXGLo4ZOeRO+E2RFewOuJJAofgCFbdgQQaqBigDYeVSmBoiqB
-	snJisVw6ZL+F/grYEhwGyOjsG29azgTTVPNMhpiQp
-X-Gm-Gg: ASbGncsv8sfFbr7eJuVOFvMCN1UZETeGL3MGYMGaOePTj4dtkTMpjdVInw62xlzaWnb
-	Av6ap396Rpc0cdIP/5S2Z0fKzTZKbb3ASF090C4ZDPY304TYdWy050E43cJwg+ouHH42bU+SEk9
-	ivRbRY9+3cEFBWXEyxquJqVUhMPrSxvFNyjOIOzPCcDfFRkkanWBZLB/IFBuPO/PeinQ3wq5sPs
-	J530kQDuF1Rh2LeCB03mwlYNmQPMli7NVKb0xgH5dE=
-X-Google-Smtp-Source: AGHT+IFOjZr87Sa8nBIk4CLkMQDGzdar8eYeb+O4U2yekEyv5QMj/d1F4sOLs7kioeAcSSEabh2dlhk2bsPcq3M/5LY=
-X-Received: by 2002:a05:622a:189e:b0:4cb:979:6467 with SMTP id
- d75a77b69052e-4e6eafdb9dfmr312053551cf.17.1760428902136; Tue, 14 Oct 2025
- 01:01:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760428949; x=1761033749;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6GyH1jrLC1slm1gXZQb4T5nA8guMeRrq7L+/TaRkyp8=;
+        b=oOa3VENgfCMnVJZoyskwYXAnLXWCUvEaw6GzHQISktFZ9+ytIoV98sgZW/iyZrgxPT
+         +xbVViRbtyKTFO3octchY1aj76DFL71K4QHF7H8wPBrc1TjHUonXGNEJ7t5FM679dcnl
+         L9DYkhjgAm6+H4uFqDyOsHIeOMZ49YCDGuV3oQDrZ/lYwvZ0rMFC0xICx3xg8lf6gDvi
+         AqZ+5McjUl6zWiZ39hBhg0rZth77wF8SkfTAdK0ixwLsjvLSukmv7d8kWbcuFFuwgkSh
+         Twh/0BFUmDQlxrwO3StcXMTiaLIgA9SJ3ByllUL6aVQT+me74R8aeofFMW7byCYClosF
+         BQng==
+X-Gm-Message-State: AOJu0Yxv/4dv78HbhMrCz8aESOZZbrq5VKsFoYstOQXet7p/DcQxuiIH
+	qkWp6Of4lYLW/rHOaTVirNhGn7XBXDhFn7dw3SQQt+hfJ1mcDrPL8mz7c4kzY0VqrsE=
+X-Gm-Gg: ASbGncs2lhTDrfNfVgxyrKJQxv13sSycwebiK7IrZs3zt/h9Ri0QZXApALGAc1Dvdyo
+	i6YJvq63j8QP/3Ekd2eQbQ53QFIXaFAhjwCFLJTo4mlzNHUbiomJ2YTs9hQws6gh39iXNpfIq0U
+	lyKtvQ73qXlPXUuA/Kj/FTC/PU9gPrQ4GzhJ2hP6K/LmjCtYHYscii7f7Uc/F/DsBmiiIfNAFon
+	rZc1uNMDjmItBH0bnUZAgi7tr7rjjeyJnH3ytADLJibhS+Jr7LUszRJifs0RAOpkHSh9qXuFiGm
+	wbKkFG/spLC/waTqoZ1KUQq8AZQim/CBLUOq8NN2dWer8kUUObDpp9FWQhJbTEaqK7xHDh2AHps
+	XUL6h464zSdsiDzBQtnIAhwx6uzu5TOjB73nVLQDqHlHlJUVQoPOQAiPx
+X-Google-Smtp-Source: AGHT+IHgLYdPneakAA8pkp65cfa+3QOkYNTGyvgYvXWd6kxyTFqG4Cd7C1Vhd1fBH4ZNLOQ1Qrmfhg==
+X-Received: by 2002:a17:90b:3b84:b0:32d:d8de:191e with SMTP id 98e67ed59e1d1-33b51165115mr31684698a91.10.1760428949390;
+        Tue, 14 Oct 2025 01:02:29 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33b626407c4sm14648210a91.6.2025.10.14.01.02.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Oct 2025 01:02:28 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sabrina Dubroca <sdubroca@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Simon Horman <horms@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bridge@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv4 net-next 0/4] net: common feature compute for upper interface
+Date: Tue, 14 Oct 2025 08:02:13 +0000
+Message-ID: <20251014080217.47988-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251014060454.1841122-1-edumazet@google.com> <aO3voj4IbAoHgDoP@krikkit>
- <c502f3e2-7d6b-4510-a812-c5b656d081d6@redhat.com> <CANn89i+t9e6qRwvkc70dbxAXLz2bGC6uamB==cfcJee3d8tbgQ@mail.gmail.com>
-In-Reply-To: <CANn89i+t9e6qRwvkc70dbxAXLz2bGC6uamB==cfcJee3d8tbgQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 14 Oct 2025 01:01:30 -0700
-X-Gm-Features: AS18NWAEXUzAImILCQghr4WXzNGVp7hELV1LnCGwr0A4eG47GGkBiPpPrH8H3D4
-Message-ID: <CANn89iJguZEYBP7K_x9LmWGhJw0zf7msbxrVHM0m99pS3dYKKg@mail.gmail.com>
-Subject: Re: [PATCH net] udp: drop secpath before storing an skb in a receive queue
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Sabrina Dubroca <sd@queasysnail.net>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Michal Kubecek <mkubecek@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 14, 2025 at 12:43=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Tue, Oct 14, 2025 at 12:32=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> >
-> >
-> >
-> > On 10/14/25 8:37 AM, Sabrina Dubroca wrote:
-> > > 2025-10-14, 06:04:54 +0000, Eric Dumazet wrote:
-> > >> Michal reported and bisected an issue after recent adoption
-> > >> of skb_attempt_defer_free() in UDP.
-> > >>
-> > >> We had the same issue for TCP, that Sabrina fixed in commit 9b6412e6=
-979f
-> > >> ("tcp: drop secpath at the same time as we currently drop dst")
-> > >
-> > > I'm not convinced this is the same bug. The TCP one was a "leaked"
-> > > reference (delayed put). This looks more like a double put/missing
-> > > hold to me (we get to the destroy path without having done the proper
-> > > delete, which would set XFRM_STATE_DEAD).
-> > >
-> > > And this shouldn't be an issue after b441cf3f8c4b ("xfrm: delete
-> > > x->tunnel as we delete x").
-> >
-> > I think Sabrina is right. If the skb carries a secpath,
-> > UDP_SKB_IS_STATELESS is not set, and skb_release_head_state() will be
-> > called by skb_consume_udp().
-> >
-> > skb_ext_put() does not clear skb->extensions nor ext->refcnt, if
-> > skb_attempt_defer_free() enters the slow path (kfree_skb_napi_cache()),
-> > the skb will go through again skb_release_head_state(), with a double f=
-ree.
-> >
-> > I think something alike the following (completely untested) should work=
-:
-> > ---
-> > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> > index 95241093b7f0..4a308fd6aa6c 100644
-> > --- a/net/ipv4/udp.c
-> > +++ b/net/ipv4/udp.c
-> > @@ -1851,8 +1851,10 @@ void skb_consume_udp(struct sock *sk, struct
-> > sk_buff *skb, int len)
-> >                 sk_peek_offset_bwd(sk, len);
-> >
-> >         if (!skb_shared(skb)) {
-> > -               if (unlikely(udp_skb_has_head_state(skb)))
-> > +               if (unlikely(udp_skb_has_head_state(skb))) {
-> >                         skb_release_head_state(skb);
-> > +                       skb->active_extensions =3D 0;
+Some high-level virtual drivers need to compute features from their
+lower devices, but each currently has its own implementation and may
+miss some feature computations. This patch set introduces a common function
+to compute features for such devices.
 
-We probably also want to clear CONNTRACK state as well.
+Currently, bonding, team, and bridge have been updated to use the new
+helper.
+
+v4:
+* update needed_{headroom, tailroom} in the common helper (Ido Schimmel)
+* remove unneeded err in team (Stanislav Fomichev)
+* remove selftest as `ethtool -k` does not test the dev->*_features. We
+  can add back the selftest when there is a good way to test. (Sabrina Dubroca)
+
+v3:
+a) fix hw_enc_features asign order (Sabrina Dubroca)
+b) set virtual dev feature defination in netdev_features.h (Jakub Kicinski)
+c) remove unneeded err in team_del_slave (Stanislav Fomichev)
+d) remove NETIF_F_HW_ESP test as it needs to be test with GSO pkts (Sabrina Dubroca)
+
+v2:
+a) remove hard_header_len setting. I will set needed_headroom for bond/team
+   in a separate patch as bridge has it's own ways. (Ido Schimmel)
+b) Add test file to Makefile, set RET=0 to a proper location. (Ido Schimmel)
+
+Hangbin Liu (4):
+  net: add a common function to compute features from lowers devices
+  bonding: use common function to compute the features
+  team: use common function to compute the features
+  net: bridge: use common function to compute the features
+
+ drivers/net/bonding/bond_main.c | 99 ++-------------------------------
+ drivers/net/team/team_core.c    | 83 ++-------------------------
+ include/linux/netdev_features.h | 18 ++++++
+ include/linux/netdevice.h       |  1 +
+ net/bridge/br_if.c              | 22 +-------
+ net/core/dev.c                  | 95 +++++++++++++++++++++++++++++++
+ 6 files changed, 127 insertions(+), 191 deletions(-)
+
+-- 
+2.50.1
+
 
