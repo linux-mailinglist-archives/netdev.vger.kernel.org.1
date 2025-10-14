@@ -1,147 +1,301 @@
-Return-Path: <netdev+bounces-229293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E123FBDA513
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:22:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D98EBDA5A0
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:27:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E8A1D5078FA
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:15:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 665413AB147
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288A53002B9;
-	Tue, 14 Oct 2025 15:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D00C2C0F64;
+	Tue, 14 Oct 2025 15:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ZeXvKawD"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="qnv0okSO";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="WXLBrPuw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1331E2FE059
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 15:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CAE2BE7BA;
+	Tue, 14 Oct 2025 15:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760454892; cv=none; b=GqbMHnw+vZBxLXDm39rHMlf/bzJUN96yUl9i7NNuP1KjTQiglL4TAVdDUl2sXtbctvX0hqP2liLLuaeJ1m1XJY2fuu7hN97PH05wuigW527BOrmA0F8ew/fPf95TqbqDlgc9I3yXabWIpCWs85o1nId9Qs3FU/F4tXPAez864PQ=
+	t=1760455143; cv=none; b=FYkITpIEvE+BdGL8kqTGsBJgLwwhGIZGevYjbnjfE4DVeEnpKaulm7vGWxlnZ/UgklpMJ+JE7HqtdDZI4mNLekwi8ZSYlOMg4N7KLzmBVRkSGf0ZnADrqKEeJ9q4ZzX9QdPz1Jo5tERF5x9Z0+uMTyUGNXkpoIYpx6KUwi9HTSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760454892; c=relaxed/simple;
-	bh=PhjtL3HD6534h9vTcz70HRQ4Ghvd6KaR4lsu8s+WwWU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OBmm9Hcttu/urXfJCsj1Hp1/7C5U4JbarKzhHHbqNDxdhUhk8bY2KmOistX6p9BqDG2KRYOmgAADkwUbENNCKI0p17EwfjVTi2PjGlOiXqDZieaAtH/mpv9GN1p0Vjgghw1K8KAL7BV1zXsWQNYZZtkNouqkGWohSVhtgaOsf1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ZeXvKawD; arc=none smtp.client-ip=209.85.128.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-46e491a5b96so30932315e9.2
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:14:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1760454888; x=1761059688; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xQLfTHNnTKNjH+34TPL7Pi8OhXbeEQ0J4cWXx6jAeow=;
-        b=ZeXvKawD1Tj/ucKm6ywTes/XRey9q5W9b146tXZlHWh3i8RMXKREAE6WQzD3JMbrLv
-         CmBEKfgGnIVFQRYN8Tq06YaKVtZNvRqozEkPbW6FPKWZ3pLVOP9s7IjfSThQ9iT4Si4J
-         fN+VbPJGoJgrhJyZDurPKz0AG+ol5cCNS0mnPqesXsN6Kz12exiOX1ugKLfQvppybecy
-         gXfYKnP75sQnm5M+2s+ZzDbpAuHPkG1/d3Y06xPnonQr29FSN367krqdWuS4Uiu3lWsp
-         LzNzdoKzaq4wrM5EQ3wEjflxJ7WLZqfUvTEGsDKuwvj2crreP0qgWzyaxm7arXLFgW3N
-         nCpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760454888; x=1761059688;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xQLfTHNnTKNjH+34TPL7Pi8OhXbeEQ0J4cWXx6jAeow=;
-        b=llzKO+wMZtw/frlxvz3RG4xG9N7+0EvWaEdVRpMiBgg1MZz1Kq4PEegvdUREKLehzK
-         suLC3u983yc3I2DKFwBSkNZhBRPoRDT6uqrxalPiyvSz/lH8BeR8IGq2V/gqE/1qxsQX
-         bu7fS96ZHDR6Ib8I41Wc1ATuXgRnLfgDfPHBze05aqE8rLXw2h2Rm9KMuz+btcVfaEEw
-         RmNHDf5nkG2UR0tAvs0DtJzfFXArOe49Esa5O5+iehEg8cz7T6uT4V7bRixeKBW+j3c8
-         Mk2rcI2c5J3nISMLR55dPOhkkasT6m2RxcCz+tXLDyFXy7i0DqT5yCU5wY+ENooG6tLx
-         0+lg==
-X-Forwarded-Encrypted: i=1; AJvYcCUbq14I+aZNXklzyVRKRkid41+ChLhDtXd7eOGcap5+Han1Q8jYcndNRU4eblzxe6iSGiBkOSc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9Su6kWEiJb2Q801qrMZM5UYNvW8EQuFdek2t9ihF+QtEPznE/
-	PSyyScer+SUuNGVOSk2sGApqeYZ8VNTY5yuoCmPfDoFiqyqrD0X0p2mEDE/F6aht7Xs=
-X-Gm-Gg: ASbGncvdoj55KabD9y1pTZpJolC7/6s3ZOVEmc00LwVnjgjXzExs6eXms37UrmGAdlu
-	5aB0unq82MZ4WjHQA1TiY2VaZtaMHqzDxAEdlbWYEGw46pxbylldFAbpzH8vzKJzBHSwGf9Alwe
-	qW74/XvPdlo/MHEZKAyrxbQZdrZ0fl3VqPPtKeRZ8UVwLkc8sFty65Jn5IhJ5KurUnAXpKjxuBq
-	DEcfRVzbiPQkUERq8jyzuyZvzGi0Z6UGOdyZYRqHpLFczIWeePbrDEAXG7Xi95DnXWx1ZAYsePs
-	xGigK2gXmwqwzqY/aQQPjWB5gYvUQxnYvhnSGkVSzGA0+5CosR5XmCniV3tZypL2wPYRIv3SiQq
-	wJ4ISE0x+VOwl6T6e28pB0JiRXG7IdPw8bLnQonREsthMVrZUaZeav+cEJpsCc1hwZcarz8Z3SA
-	==
-X-Google-Smtp-Source: AGHT+IFTHGjFphXZexQjbUWRV0zNN1oAawyBZFjG8j79GJAZYI0e5RFLHEUzsaTaFKvHfVpvOLq1+w==
-X-Received: by 2002:a05:600c:6818:b0:46e:36fa:6b40 with SMTP id 5b1f17b1804b1-46fa9af915emr172798525e9.24.1760454888343;
-        Tue, 14 Oct 2025 08:14:48 -0700 (PDT)
-Received: from localhost (109-81-16-57.rct.o2.cz. [109.81.16.57])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-46fab500706sm157838725e9.3.2025.10.14.08.14.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Oct 2025 08:14:47 -0700 (PDT)
-Date: Tue, 14 Oct 2025 17:14:47 +0200
-From: Michal Hocko <mhocko@suse.com>
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Vlastimil Babka <vbabka@suse.cz>, Barry Song <21cnbao@gmail.com>,
-	netdev@vger.kernel.org, linux-mm@kvack.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Barry Song <v-songbaohua@oppo.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Brendan Jackman <jackmanb@google.com>,
-	Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Huacai Zhou <zhouhuacai@oppo.com>,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Harry Yoo <harry.yoo@oracle.com>,
-	David Hildenbrand <david@redhat.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>
-Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network
- buffer allocation
-Message-ID: <aO5o548uQAuBcw0P@tiehlicka>
-References: <20251013101636.69220-1-21cnbao@gmail.com>
- <927bcdf7-1283-4ddd-bd5e-d2e399b26f7d@suse.cz>
- <aO37Od0VxOGmWCjm@tiehlicka>
- <qztimgoebp5ecdmvvgro6sdsng6r7t3pnddg7ddlxagaom73ge@a5wta5ym7enu>
+	s=arc-20240116; t=1760455143; c=relaxed/simple;
+	bh=6/Gv575Zd0T6fBvEJXFzYQT8enxJt/ST9LZpFAmyPE0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=O887loCtFPMf3sQLJUjxeWI2ZyqX7J6e0he36/Ua4UV58uouick/4MYIG5vh2IDuHnyrGsbwbfDMyeANdlXd85Ymf2cf5tmNkhYJvuGJRLZlqszp3lwpTcVBsWp2Q2z/aYpjwHOBdqFVkuM2tLkrer3dF09jBrRT1QCbv5m5KbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=qnv0okSO; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=WXLBrPuw; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1760455138;
+	bh=6/Gv575Zd0T6fBvEJXFzYQT8enxJt/ST9LZpFAmyPE0=;
+	h=From:Date:Subject:To:Cc:From;
+	b=qnv0okSO4HIBHiXxreqpN6TjDCN6ctk0QN7nkYcMKfWXuucuJ2KCUk+hqKTohuQWR
+	 k6VKi12r2nA4lbQJ5S9k/S3DcH4T4pf96N6YcP25tc1iNhEpEUarvf4QOMwEDtpaFO
+	 hLXqtdfm7rAXeBRfoliNzWpvf+xu8AaIDzl3hTH8jbclE6e6FEFFUklGlvmE39RWCu
+	 8HSkukk1d2lgMlKpYPYl4U1eLkrsReSGpog9EUaJ5JBmEBVjy8nk1BjBQbntBmVmh9
+	 6WXYbRjRnLmeyNbPe+3jS0OvTRZkNlslZ0PF5ApxlTDm1sWthGjahx0v6jM8THzJ/L
+	 h0DsH1NaiASdA==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id B03D448544; Tue, 14 Oct 2025 15:18:58 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1760455137;
+	bh=6/Gv575Zd0T6fBvEJXFzYQT8enxJt/ST9LZpFAmyPE0=;
+	h=From:Date:Subject:To:Cc:From;
+	b=WXLBrPuwWVzuo3YbBka1kB09oojZxjjNw3vhUpDL3Jp2U7WSDUTbjCamVk0y32nZs
+	 HZS8ovPfvBVDRG1yFGKKw7NGSgBMUdZtwUMrFvkigCFlcfcEPF+WX0Kb6/7k/UfZsm
+	 0xjgn4neab8r/VHj98smS0aqizYpQvThEe73fMo1CeH4zSiU3HhRrKliMeFYtasIDy
+	 gb8SEeQSl5twpq915IpU6L9+upx5Vf8qL3+JbOUhlg8LR/svp0GJi2ma8Kyfjm25Sr
+	 Rwym2M6JqnzGAwofnUlkqxnusZGkYbsB9v7mix9K1TFjw36E6nux21Vba6gvP1du/T
+	 mI5pATwoZwS5g==
+Received: from AMDDesktop.lan (unknown [IPv6:2a00:6020:47a3:e800:94d3:d213:724a:4e07])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 3CABC48521;
+	Tue, 14 Oct 2025 15:18:57 +0000 (UTC)
+From: Birger Koblitz <mail@birger-koblitz.de>
+Date: Tue, 14 Oct 2025 17:18:46 +0200
+Subject: [PATCH net-next v3] ixgbe: Add 10G-BX support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <qztimgoebp5ecdmvvgro6sdsng6r7t3pnddg7ddlxagaom73ge@a5wta5ym7enu>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251014-10gbx-v3-1-50cda8627198@birger-koblitz.de>
+X-B4-Tracking: v=1; b=H4sIANVp7mgC/22OQQ6CMBBFr0K6tqZTWi2uvIdxQekAEw2QljQo4
+ e4WIokLl+9n3svMLKAnDOySzcxjpEB9lyA/ZKxqy65BTi4xk0JqECA5iMZOvLTKyEojOK1Yuh0
+ 81jRtnds9cUth7P1ry0ZY172QfwsROKRMYYpTWedOm6sl36Dnj94+aXwfHbK1FOWvrXY7PcILI
+ yotFQDg+Z+9LMsHQeF2PuAAAAA=
+X-Change-ID: 20251012-10gbx-ab482c5e1d54
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Birger Koblitz <mail@birger-koblitz.de>, 
+ Andrew Lunn <andrew@lunn.ch>
+X-Mailer: b4 0.14.2
 
-On Tue 14-10-25 07:27:06, Shakeel Butt wrote:
-> On Tue, Oct 14, 2025 at 09:26:49AM +0200, Michal Hocko wrote:
-> > On Mon 13-10-25 20:30:13, Vlastimil Babka wrote:
-> > > On 10/13/25 12:16, Barry Song wrote:
-> > > > From: Barry Song <v-songbaohua@oppo.com>
-> > [...]
-> > > I wonder if we should either:
-> > > 
-> > > 1) sacrifice a new __GFP flag specifically for "!allow_spin" case to
-> > > determine it precisely.
-> > 
-> > As said in other reply I do not think this is a good fit for this
-> > specific case as it is all or nothing approach. Soon enough we discover
-> > that "no effort to reclaim/compact" hurts other usecases. So I do not
-> > think we need a dedicated flag for this specific case. We need a way to
-> > tell kswapd/kcompactd how much to try instead.
-> 
-> To me this new floag is to decouple two orthogonal requests i.e. no lock
-> semantic and don't wakeup kswapd. At the moment the lack of kswapd gfp
-> flag convey the semantics of no lock. This can lead to unintended usage
-> of no lock semantics by users which for whatever reason don't want to
-> wakeup kswapd.
+Adds support for 10G-BX modules, i.e. 10GBit Ethernet over a single strand
+Single-Mode fiber
+The initialization of a 10G-BX SFP+ is the same as for a 10G SX/LX module,
+and is identified according to SFF-8472 table 5-3, footnote 3 by the
+10G Ethernet Compliance Codes field being empty, the Nominal Bit
+Rate being compatible with 12.5GBit, and the module being a fiber module
+with a Single Mode fiber link length.
 
-I would argue that callers should have no business into saying whether
-the MM should wake up kswapd or not. The flag name currently suggests
-that but that is mostly for historic reasons. A random page allocator
-user shouldn't really care about this low level detail, really.
+This was tested using a Lightron WSPXG-HS3LC-IEA 1270/1330nm 10km
+transceiver:
+$ sudo ethtool -m enp1s0f1
+   Identifier                          : 0x03 (SFP)
+   Extended identifier                 : 0x04 (GBIC/SFP defined by 2-wire interface ID)
+   Connector                           : 0x07 (LC)
+   Transceiver codes                   : 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+   Encoding                            : 0x01 (8B/10B)
+   BR Nominal                          : 10300MBd
+   Rate identifier                     : 0x00 (unspecified)
+   Length (SMF)                        : 10km
+   Length (OM2)                        : 0m
+   Length (OM1)                        : 0m
+   Length (Copper or Active cable)     : 0m
+   Length (OM3)                        : 0m
+   Laser wavelength                    : 1330nm
+   Vendor name                         : Lightron Inc.
+   Vendor OUI                          : 00:13:c5
+   Vendor PN                           : WSPXG-HS3LC-IEA
+   Vendor rev                          : 0000
+   Option values                       : 0x00 0x1a
+   Option                              : TX_DISABLE implemented
+   BR margin max                       : 0%
+   BR margin min                       : 0%
+   Vendor SN                           : S142228617
+   Date code                           : 140611
+   Optical diagnostics support         : Yes
+
+Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+---
+Changes in v3:
+  Added "Reviewed-by". There also was a possible mailserver DKIM misconfiguration
+  that may have prevented recipients to recieve the previous mails 
+- Link to v2: https://lore.kernel.org/r/20251014-10gbx-v2-1-980c524111e7@birger-koblitz.de
+
+Changes in v2:
+  Allow also modules with only Byte 15 (100m SM link length) set to
+  be identified as BX
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c   |  7 ++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c |  2 ++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c     | 43 +++++++++++++++++++++---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h     |  2 ++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h    |  2 ++
+ 5 files changed, 51 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
+index d5b1b974b4a33e7dd51b7cfe5ea211ff038a36f0..892a73a4bc6b0bb1c976ca95bf874059b987054f 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
+@@ -342,6 +342,13 @@ static int ixgbe_get_link_capabilities_82599(struct ixgbe_hw *hw,
+ 		return 0;
+ 	}
+ 
++	if (hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
++	    hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1) {
++		*speed = IXGBE_LINK_SPEED_10GB_FULL;
++		*autoneg = false;
++		return 0;
++	}
++
+ 	/*
+ 	 * Determine link capabilities based on the stored value of AUTOC,
+ 	 * which represents EEPROM defaults.  If AUTOC value has not been
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+index 2d660e9edb80af8fc834e097703dfd6a82b8c45b..76edf02bc47e5dd24bb0936f730f036181f6dc2a 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+@@ -351,6 +351,8 @@ static int ixgbe_get_link_ksettings(struct net_device *netdev,
+ 		case ixgbe_sfp_type_1g_lx_core1:
+ 		case ixgbe_sfp_type_1g_bx_core0:
+ 		case ixgbe_sfp_type_1g_bx_core1:
++		case ixgbe_sfp_type_10g_bx_core0:
++		case ixgbe_sfp_type_10g_bx_core1:
+ 			ethtool_link_ksettings_add_link_mode(cmd, supported,
+ 							     FIBRE);
+ 			ethtool_link_ksettings_add_link_mode(cmd, advertising,
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
+index 2449e4cf2679ddf3277f4ada7619303eb618d393..ad6a1eae6042bb16e329fb817bcfcb87e9008ce8 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
+@@ -1541,6 +1541,8 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+ 	u8 identifier = 0;
+ 	u8 cable_tech = 0;
+ 	u8 cable_spec = 0;
++	u8 sm_length_km = 0;
++	u8 sm_length_100m = 0;
+ 	int status;
+ 
+ 	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_fiber) {
+@@ -1678,6 +1680,31 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+ 			else
+ 				hw->phy.sfp_type =
+ 					ixgbe_sfp_type_1g_bx_core1;
++		/* Support Ethernet 10G-BX, checking the Bit Rate
++		 * Nominal Value as per SFF-8472 to be 12.5 Gb/s (67h) and
++		 * Single Mode fibre with at least 1km link length
++		 */
++		} else if ((!comp_codes_10g) && (bitrate_nominal == 0x67) &&
++			   (!(cable_tech & IXGBE_SFF_DA_PASSIVE_CABLE)) &&
++			   (!(cable_tech & IXGBE_SFF_DA_ACTIVE_CABLE))) {
++			status = hw->phy.ops.read_i2c_eeprom(hw,
++					    IXGBE_SFF_SM_LENGTH_KM,
++					    &sm_length_km);
++			if (status != 0)
++				goto err_read_i2c_eeprom;
++			status = hw->phy.ops.read_i2c_eeprom(hw,
++					    IXGBE_SFF_SM_LENGTH_100M,
++					    &sm_length_100m);
++			if (status != 0)
++				goto err_read_i2c_eeprom;
++			if (sm_length_km > 0 || sm_length_100m >= 10) {
++				if (hw->bus.lan_id == 0)
++					hw->phy.sfp_type =
++						ixgbe_sfp_type_10g_bx_core0;
++				else
++					hw->phy.sfp_type =
++						ixgbe_sfp_type_10g_bx_core1;
++			}
+ 		} else {
+ 			hw->phy.sfp_type = ixgbe_sfp_type_unknown;
+ 		}
+@@ -1768,7 +1795,9 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
+-	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1)) {
++	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
++	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
++	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1)) {
+ 		hw->phy.type = ixgbe_phy_sfp_unsupported;
+ 		return -EOPNOTSUPP;
+ 	}
+@@ -1786,7 +1815,9 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
+-	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1)) {
++	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
++	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
++	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1)) {
+ 		/* Make sure we're a supported PHY type */
+ 		if (hw->phy.type == ixgbe_phy_sfp_intel)
+ 			return 0;
+@@ -2016,20 +2047,22 @@ int ixgbe_get_sfp_init_sequence_offsets(struct ixgbe_hw *hw,
+ 		return -EOPNOTSUPP;
+ 
+ 	/*
+-	 * Limiting active cables and 1G Phys must be initialized as
++	 * Limiting active cables, 10G BX and 1G Phys must be initialized as
+ 	 * SR modules
+ 	 */
+ 	if (sfp_type == ixgbe_sfp_type_da_act_lmt_core0 ||
+ 	    sfp_type == ixgbe_sfp_type_1g_lx_core0 ||
+ 	    sfp_type == ixgbe_sfp_type_1g_cu_core0 ||
+ 	    sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
+-	    sfp_type == ixgbe_sfp_type_1g_bx_core0)
++	    sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
++	    sfp_type == ixgbe_sfp_type_10g_bx_core0)
+ 		sfp_type = ixgbe_sfp_type_srlr_core0;
+ 	else if (sfp_type == ixgbe_sfp_type_da_act_lmt_core1 ||
+ 		 sfp_type == ixgbe_sfp_type_1g_lx_core1 ||
+ 		 sfp_type == ixgbe_sfp_type_1g_cu_core1 ||
+ 		 sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
+-		 sfp_type == ixgbe_sfp_type_1g_bx_core1)
++		 sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
++		 sfp_type == ixgbe_sfp_type_10g_bx_core1)
+ 		sfp_type = ixgbe_sfp_type_srlr_core1;
+ 
+ 	/* Read offset to PHY init contents */
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+index 81179c60af4e0199a8b9d0fcdf34654b02eedfac..039ba4b6c120f3e824c93cb00fdd9483e7cf9cba 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+@@ -32,6 +32,8 @@
+ #define IXGBE_SFF_QSFP_1GBE_COMP	0x86
+ #define IXGBE_SFF_QSFP_CABLE_LENGTH	0x92
+ #define IXGBE_SFF_QSFP_DEVICE_TECH	0x93
++#define IXGBE_SFF_SM_LENGTH_KM		0xE
++#define IXGBE_SFF_SM_LENGTH_100M	0xF
+ 
+ /* Bitmasks */
+ #define IXGBE_SFF_DA_PASSIVE_CABLE		0x4
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+index b1bfeb21537acc44c31aedcb0584374e8f6ecd45..61f2ef67defddeab9ff4aa83c8f017819594996b 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+@@ -3286,6 +3286,8 @@ enum ixgbe_sfp_type {
+ 	ixgbe_sfp_type_1g_lx_core1 = 14,
+ 	ixgbe_sfp_type_1g_bx_core0 = 15,
+ 	ixgbe_sfp_type_1g_bx_core1 = 16,
++	ixgbe_sfp_type_10g_bx_core0 = 17,
++	ixgbe_sfp_type_10g_bx_core1 = 18,
+ 
+ 	ixgbe_sfp_type_not_present = 0xFFFE,
+ 	ixgbe_sfp_type_unknown = 0xFFFF
+
+---
+base-commit: 67029a49db6c1f21106a1b5fcdd0ea234a6e0711
+change-id: 20251012-10gbx-ab482c5e1d54
+
+Best regards,
 -- 
-Michal Hocko
-SUSE Labs
+Birger Koblitz <mail@birger-koblitz.de>
+
 
