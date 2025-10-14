@@ -1,219 +1,221 @@
-Return-Path: <netdev+bounces-229252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A7DCBD9D4F
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:58:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ADA88BD9D67
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:59:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE25F4205BB
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 13:58:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67E493B3497
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 13:59:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DDAB30E0DB;
-	Tue, 14 Oct 2025 13:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FFFC31353C;
+	Tue, 14 Oct 2025 13:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="z5X+UJP7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AqbrlJD0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF2F2EAB76;
-	Tue, 14 Oct 2025 13:58:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C98B30CD9E
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 13:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760450304; cv=none; b=F/SdufLviud6eH/09XY+sYdiYIYB19Z+nO/Ar40hjEr152JZKS86eqY8yEX0+X+1Qe4VwL1/n17IjJfnTAJGfpV3OkT4vUAE7x93cs+s1Nnr/h3dLuA/oY5k8S85R9gIEDeSlrVwRYsCpqbVcR8kXd7QZLYQkvFiMkYCyUTJOdQ=
+	t=1760450394; cv=none; b=sTnu0zuSgDx8Q4xCESQ6vw3UxpMh+6JchcyHwh0kgzVzuFYVFtuKRvgm56wu5t83P/5rB1mPLABaiK8AOtLjuo8nHaXIwHyljK+mb/Nmw1GCj/+JJTfm3Gv4YWmSxEDKUeXcyeLnZnz9WI5Arn6ZbFC5cJgwcbyYyIQ1WGbFnqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760450304; c=relaxed/simple;
-	bh=hy7zK4pvJp5ofsjdaQMbdkac0RR7nGAsw6/3tVCZomQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YTfUnCb32vB9sDIa8RbhsQXay4R8+Hpjyvd1Nmrkly0lxv4V57z/PG1wRg6AwdcC3PQc65jLhDrD/k+SCaUIm64P1sicUEju4Mg39A+K1bBNa7uRujbJg7tQ4GaTETnudxueMzOyCwvsKhSB4Jb1fioc6t6BW6fzl/ZlFHzUTrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=z5X+UJP7; arc=none smtp.client-ip=95.168.196.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cdn77.com
-DKIM-Signature: a=rsa-sha256; t=1760450299; x=1761055099; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=DPbeUy3W/9rBcRrgYSjHO9WvnXLnpPKdc9WYHVyaao0=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:In-Reply-To:References;
-   b=z5X+UJP7KNYEOVYguIFQVOx04anzOqXAPzZKMMaBJHfVc41kWbvnVrOlSN9tasPg/gAWsonoKN2zj2a/ChsC/BTcEw68j68B4gSG3WA3tM9qhYpcIuwSB3O59MEbDyuM8GIckxgEyfDqCiMUfx6eXokXxP23Y5Za9BT9wLc2wZY=
-Received: from [10.0.5.28] ([95.168.203.222])
-        by mail.sh.cz (14.1.0 build 17 ) with ASMTP (SSL) id 202510141558173878;
-        Tue, 14 Oct 2025 15:58:17 +0200
-Message-ID: <58c7b900-6152-4b17-9308-ed971f6a1f9a@cdn77.com>
-Date: Tue, 14 Oct 2025 15:58:17 +0200
+	s=arc-20240116; t=1760450394; c=relaxed/simple;
+	bh=nhnZY29oAMEmAcEp0j7Tsrqu0C0/+duWzEQfWjMWXHk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pDRoX9p3A92ce8z7EMrZ8CJtGtr4E5mqJ8DIDBXcDeMqjUHTkPc43Hib7D84xdjHb0axdoZAqGALCDtyUqzq8hO+hlncx7JlcAr8Ybw0vhMcnwQMg5vCNhtsAMHupfxKN+Satl8lFCLaIBwhiGrNivycQdiViNIBU+KEeP6jxw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AqbrlJD0; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-85b94fe19e2so761067485a.3
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 06:59:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760450391; x=1761055191; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fiJcJ1553CNt1W0zyJKQLz2bZiHr9+/j5jOOwpBlpmg=;
+        b=AqbrlJD0NIc00XufTVRAcYKCIPKWsf27t7pQx4HjABtSkbTUXg48vw72Xo0tc9YnGh
+         SsKQgmQi83mY2IrHPDgJAd1z0AJ+xMUketNK+PXNmDz2OH0I56vvwmpKHXdNjHu5LmrS
+         C9fJtNgokjUG8v71/ZfjUbSbgS245P50UWLJ9wnICd0NiAp7MAj42BuitWRInzEBIkHZ
+         nEwWCEe22ehK4MSqe6P3c1NJHsg/NRF9uxyMAvcnRDXnVKKzHGBR+I3uNSyI/0nGgcCi
+         DkUwQppAGzvF1O7gqvYZZwILr2S71mGVKJJGI6/o+xwWO8BXceuRcIq35ota/W8WhASS
+         BuyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760450391; x=1761055191;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fiJcJ1553CNt1W0zyJKQLz2bZiHr9+/j5jOOwpBlpmg=;
+        b=eXDox5KcMbvheZBGZ0znE4VL+AqhPyEwRgt1Qw/8jZ/eqkIwNm0wUhRmy5JJfC2HtI
+         XsbZpfEk31tPKqDrnRP/Vj0eDYxeYhgqpDklanVV5G7H/ikwRl+c5XexBsTChLQhau0s
+         BNC51M9aneEuqNlJE+nZQfM0KCFnQnn/cf5XxvHiIqs5lObr4U8qYE2YBUUl5DXzeHUg
+         ZEb1Dfste0Qk3GW4ARtGPwOau6j0T2e8eyP1/qgkLDf5iILcRk5KGtcDj/b/rnf/fRZa
+         QL2IA6xySjIHN/ARmlCCw9GJeAzn+gIeLU6V+PLfNhYnZtALRc6bREj1bv6wDTf4kS56
+         EiGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU1GpoIpyjOcQ8akxzirQwDRPvLGTr1sl5deYP+WbY6La/trAseF0TUDX3NhXpgM1VXV7N9OFs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKxGvIwx7OhTtI4SMR61BRt1rO9G9Ns6rw/MUU7hyGtwlvATJc
+	F+DpXd/HOsaNih7QoDGgFBQDHA+3N8Tc5y8Fal5TOO8YGl6iiflBXIYGVAKunronGhgLZFjc4vC
+	AQLv5jqLwGxF76WYE8yOOyLJrJPrRPNg5SZGZpi99
+X-Gm-Gg: ASbGncv/0HExEM9mRTBSEwXLii3B3Bx1FeAOySLcSm1M83WkXIbtnFnO0Sns/WrHJfR
+	+nqQykL6udT758lsV63WqVFji1/6dGb59WwnboM/VF9bKtPzRueYmlH52Nii4VE3BYzZqXaokDq
+	KOSeRLjvW7JixI4o5Wkv9fERDW2oeXKtDovnzBONGTNWQ9grA/7LqFfKIzfWAW//1N2cDf83gPZ
+	rHRvwsZXgBwLTCSp1lOsUO99aeNVafBG+YC5vCixYBzXoIJ6FscmA==
+X-Google-Smtp-Source: AGHT+IHcZl0nNVHCVnd2WKWq5gM3PRNKOiXacSPDA28wyU7Q6etDhfytDq4k7HvYYGSxIW2bZO8abZpkKNw6HpNGbgQ=
+X-Received: by 2002:ac8:5d46:0:b0:4ce:9cdc:6f2f with SMTP id
+ d75a77b69052e-4e72122afacmr133744731cf.13.1760450391187; Tue, 14 Oct 2025
+ 06:59:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5] memcg: expose socket memory pressure in a cgroup
-To: Roman Gushchin <roman.gushchin@linux.dev>
-Cc: Shakeel Butt <shakeel.butt@linux.dev>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org,
- netdev@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Muchun Song <muchun.song@linux.dev>,
- cgroups@vger.kernel.org, Tejun Heo <tj@kernel.org>,
- =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Matyas Hurtik <matyas.hurtik@cdn77.com>
-References: <20251007125056.115379-1-daniel.sedlak@cdn77.com>
- <87qzvdqkyh.fsf@linux.dev> <13b5aeb6-ee0a-4b5b-a33a-e1d1d6f7f60e@cdn77.com>
- <87o6qgnl9w.fsf@linux.dev>
- <tr7hsmxqqwpwconofyr2a6czorimltte5zp34sp6tasept3t4j@ij7acnr6dpjp>
- <87a5205544.fsf@linux.dev>
- <qdblzbalf3xqohvw2az3iogevzvgn3c3k64nsmyv2hsxyhw7r4@oo7yrgsume2h>
- <875xcn526v.fsf@linux.dev> <89618dcb-7fe3-4f15-931b-17929287c323@cdn77.com>
- <87h5w2w94e.fsf@linux.dev>
-Content-Language: en-US
-From: Daniel Sedlak <daniel.sedlak@cdn77.com>
-In-Reply-To: <87h5w2w94e.fsf@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CTCH: RefID="str=0001.0A2D030E.68EE56FA.0022,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
+References: <20251014022703.1387794-1-xuanqiang.luo@linux.dev> <20251014022703.1387794-3-xuanqiang.luo@linux.dev>
+In-Reply-To: <20251014022703.1387794-3-xuanqiang.luo@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Oct 2025 06:59:39 -0700
+X-Gm-Features: AS18NWBADVQ-EonwFHxi8Izz0NUUghMI-JUjvf4CIj2cjRMPAfjjRpT16RXLvyg
+Message-ID: <CANn89iJyKo0xLh5EE1hTJQF8vmqKT-yeK1oWokRpguEdjF-eoA@mail.gmail.com>
+Subject: Re: [RESEND PATCH net-next v7 2/3] inet: Avoid ehash lookup race in inet_ehash_insert()
+To: xuanqiang.luo@linux.dev
+Cc: kuniyu@google.com, pabeni@redhat.com, kerneljasonxing@gmail.com, 
+	davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org, 
+	horms@kernel.org, jiayuan.chen@linux.dev, 
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/14/25 3:43 AM, Roman Gushchin wrote:
-> Daniel Sedlak <daniel.sedlak@cdn77.com> writes:
-> 
->> On 10/9/25 9:02 PM, Roman Gushchin wrote:
->>> Shakeel Butt <shakeel.butt@linux.dev> writes:
->>>
->>>> On Thu, Oct 09, 2025 at 10:58:51AM -0700, Roman Gushchin wrote:
->>>>> Shakeel Butt <shakeel.butt@linux.dev> writes:
->>>>>
->>>>>> On Thu, Oct 09, 2025 at 08:32:27AM -0700, Roman Gushchin wrote:
->>>>>>> Daniel Sedlak <daniel.sedlak@cdn77.com> writes:
->>>>>>>
->>>>>>>> Hi Roman,
->>>>>>>>
->>>>>>>> On 10/8/25 8:58 PM, Roman Gushchin wrote:
->>>>>>>>>> This patch exposes a new file for each cgroup in sysfs which is a
->>>>>>>>>> read-only single value file showing how many microseconds this cgroup
->>>>>>>>>> contributed to throttling the throughput of network sockets. The file is
->>>>>>>>>> accessible in the following path.
->>>>>>>>>>
->>>>>>>>>>      /sys/fs/cgroup/**/<cgroup name>/memory.net.throttled_usec
->>>>>>>>> Hi Daniel!
->>>>>>>>> How this value is going to be used? In other words, do you need an
->>>>>>>>> exact number or something like memory.events::net_throttled would be
->>>>>>>>> enough for your case?
->>>>>>>>
->>>>>>>> Just incrementing a counter each time the vmpressure() happens IMO
->>>>>>>> provides bad semantics of what is actually happening, because it can
->>>>>>>> hide important details, mainly the _time_ for how long the network
->>>>>>>> traffic was slowed down.
->>>>>>>>
->>>>>>>> For example, when memory.events::net_throttled=1000, it can mean that
->>>>>>>> the network was slowed down for 1 second or 1000 seconds or something
->>>>>>>> between, and the memory.net.throttled_usec proposed by this patch
->>>>>>>> disambiguates it.
->>>>>>>>
->>>>>>>> In addition, v1/v2 of this series started that way, then from v3 we
->>>>>>>> rewrote it to calculate the duration instead, which proved to be
->>>>>>>> better information for debugging, as it is easier to understand
->>>>>>>> implications.
->>>>>>>
->>>>>>> But how are you planning to use this information? Is this just
->>>>>>> "networking is under pressure for non-trivial amount of time ->
->>>>>>> raise the memcg limit" or something more complicated?
->>
->> We plan to use it mostly for observability purposes and to better
->> understand which traffic patterns affect the socket pressure the most
->> (so we can try to fix/delay/improve it). We do not know how commonly
->> this issue appears in other deployments, but in our deployment, many
->> of servers were affected by this slowdown, which varied in terms of
->> hardware and software configuration. Currently, it is very hard to
->> detect if the socket is under pressure without using tools like
->> bpftrace, so we would like to expose this metric in a more accessible
->> way. So in the end, we do not really care in which file this "socket
->> pressure happened" notification will be stored.
->>>>>>> I totally get it from the debugging perspective, but not sure about
->>>>>>> usefulness of it as a permanent metric. This is why I'm asking if there
->>>>>>> are lighter alternatives, e.g. memory.events or maybe even tracepoints.
->>
->> If the combination of memory.events(.local) and tracepoint hook(s) is
->> okay with you(?), we can use that and export the same information as
->> in the current patch version. We can incorporate that into the next
->> version.
-> 
-> In my opinion
-> tracepoint > memory.events entry > memory.stat entry > new cgroupfs file.
+On Mon, Oct 13, 2025 at 7:28=E2=80=AFPM <xuanqiang.luo@linux.dev> wrote:
+>
+> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>
+> Since ehash lookups are lockless, if one CPU performs a lookup while
+> another concurrently deletes and inserts (removing reqsk and inserting sk=
+),
+> the lookup may fail to find the socket, an RST may be sent.
+>
+> The call trace map is drawn as follows:
+>    CPU 0                           CPU 1
+>    -----                           -----
+>                                 inet_ehash_insert()
+>                                 spin_lock()
+>                                 sk_nulls_del_node_init_rcu(osk)
+> __inet_lookup_established()
+>         (lookup failed)
+>                                 __sk_nulls_add_node_rcu(sk, list)
+>                                 spin_unlock()
+>
+> As both deletion and insertion operate on the same ehash chain, this patc=
+h
+> introduces a new sk_nulls_replace_node_init_rcu() helper functions to
+> implement atomic replacement.
+>
+> Fixes: 5e0724d027f0 ("tcp/dccp: fix hashdance race for passive sessions")
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+> ---
+>  include/net/sock.h         | 14 ++++++++++++++
+>  net/ipv4/inet_hashtables.c |  8 ++++++--
+>  2 files changed, 20 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index 60bcb13f045c..5d299a954859 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -858,6 +858,20 @@ static inline bool sk_nulls_del_node_init_rcu(struct=
+ sock *sk)
+>         return rc;
+>  }
+>
+> +static inline bool sk_nulls_replace_node_init_rcu(struct sock *old,
+> +                                                 struct sock *new)
+> +{
+> +       if (sk_hashed(old)) {
+> +               hlist_nulls_replace_init_rcu(&old->sk_nulls_node,
+> +                                            &new->sk_nulls_node);
+> +               DEBUG_NET_WARN_ON_ONCE(refcount_read(&old->sk_refcnt) =3D=
+=3D 1);
 
-Thanks, noted, we will incorporate it to the next version.
->> Also, would it be possible to make the socket pressure signal
->> configurable, e.g., allowing it to be configured via sysctl or per
->> cgroup not to trigger the socket pressure signal? I cannot find the
->> reasoning why this throttling cannot (maybe it can) be opt-out.
-> 
-> It's a good point.
-> 
-> First, I think that vmpressure implementation is not the best
-> and we might want to switch to PSI (or something else) there.
-> This is why I'm resistant to exposing implementation-specific
-> metrics.
-> 
-> That said, I believe that some level of customization here is justified.
-> Maybe opting out completely is too much, but in the end it's hard for
-> the kernel to balance the importance of e.g. page cache vs networking
-> buffers as it might be really workload-dependent. Or some workloads
-> would prefer to risk being oom-killed rather than to tolerate a sub-par
-> networking performance.
+This  DEBUG_NET_WARN_ON_ONCE() is not needed.
 
-As of now, socket pressure throttling can be disabled by moving 
-processes, causing the pressure, into the root cgroup. So we would 
-definitely benefit from disabling it more idiomatically.
+You copied a WARN_ON(refcount_read(&sk->sk_refcnt) =3D=3D 1) which
+predates the conversion
+of sk_refcnt from atomic_t to refcount_t
 
-This bpftrace output is captured from a production server using nginx 
-proxy (the left-most column is a timestamp in nanoseconds) which we use 
-as a HTTP cache. As you can see, it fluctuates a lot.
+refcount_dec() has a check which will complain just the same.
 
-26920285712831843, unified:/system.slice/nginx.service, scanned: 556, 
-reclaimed: 146, pressure: 73
-26920285731493743, unified:/system.slice/nginx.service, scanned: 22886, 
-reclaimed: 13606, pressure: 40
-26920285779559500, unified:/system.slice/nginx.service, scanned: 21775, 
-reclaimed: 11525, pressure: 47
-26920285784845147, unified:/system.slice/nginx.service, scanned: 698, 
-reclaimed: 522, pressure: 25
-26920285833808666, unified:/system.slice/nginx.service, scanned: 740, 
-reclaimed: 232, pressure: 68
-26920285835668081, unified:/system.slice/nginx.service, scanned: 1475, 
-reclaimed: 1224, pressure: 17
-26920285838877445, unified:/system.slice/nginx.service, scanned: 2919, 
-reclaimed: 2334, pressure: 20
-26920285854811898, unified:/system.slice/nginx.service, scanned: 11586, 
-reclaimed: 7666, pressure: 33
-26920285873634643, unified:/system.slice/nginx.service, scanned: 22898, 
-reclaimed: 13387, pressure: 41
-26920285899176135, unified:/system.slice/nginx.service, scanned: 10957, 
-reclaimed: 7077, pressure: 35
-26920285901529378, unified:/system.slice/nginx.service, scanned: 587, 
-reclaimed: 156, pressure: 73
-26920286020702357, unified:/system.slice/nginx.service, scanned: 563, 
-reclaimed: 87, pressure: 84
-26920286037434038, unified:/system.slice/nginx.service, scanned: 22072, 
-reclaimed: 14161, pressure: 35
-26920285789562313, unified:/system.slice/nginx.service, scanned: 2810, 
-reclaimed: 1696, pressure: 39
-26920285879597883, unified:/system.slice/nginx.service, scanned: 693, 
-reclaimed: 625, pressure: 9
-26920285884686863, unified:/system.slice/nginx.service, scanned: 2768, 
-reclaimed: 2284, pressure: 17
+I will send a patch  removing the leftovers:
 
-We believe that the issue originates from suboptimally chosen constants, 
-as seen in [1]. Currently, the vmpressure triggers when it cannot 
-reclaim a few MiB of memory on a server that has over 500 GiB of memory.
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 60bcb13f045c..596302bffedf 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -828,11 +828,9 @@ static inline bool sk_del_node_init(struct sock *sk)
+ {
+        bool rc =3D __sk_del_node_init(sk);
 
-Link: 
-https://elixir.bootlin.com/linux/v6.17.1/source/mm/vmpressure.c#L38 [1]
+-       if (rc) {
+-               /* paranoid for a while -acme */
+-               WARN_ON(refcount_read(&sk->sk_refcnt) =3D=3D 1);
++       if (rc)
+                __sock_put(sk);
+-       }
++
+        return rc;
+ }
+ #define sk_del_node_init_rcu(sk)       sk_del_node_init(sk)
+@@ -850,11 +848,9 @@ static inline bool
+sk_nulls_del_node_init_rcu(struct sock *sk)
+ {
+        bool rc =3D __sk_nulls_del_node_init_rcu(sk);
 
-We would like to work on that more after this patch to try to find a 
-better constant or at least make it _more configurable_ if that makes 
-sense for you.
+-       if (rc) {
+-               /* paranoid for a while -acme */
+-               WARN_ON(refcount_read(&sk->sk_refcnt) =3D=3D 1);
++       if (rc)
+                __sock_put(sk);
+-       }
++
+        return rc;
+ }
 
-Thanks!
-Daniel
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index 2b46c0cd752a..687a84c48882 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -596,10 +596,8 @@ static void netlink_remove(struct sock *sk)
 
+        table =3D &nl_table[sk->sk_protocol];
+        if (!rhashtable_remove_fast(&table->hash, &nlk_sk(sk)->node,
+-                                   netlink_rhashtable_params)) {
+-               WARN_ON(refcount_read(&sk->sk_refcnt) =3D=3D 1);
++                                   netlink_rhashtable_params))
+                __sock_put(sk);
+-       }
+
+        netlink_table_grab();
+        if (nlk_sk(sk)->subscriptions) {
+diff --git a/net/tipc/socket.c b/net/tipc/socket.c
+index 1574a83384f8..bc614a1f019c 100644
+--- a/net/tipc/socket.c
++++ b/net/tipc/socket.c
+@@ -3031,10 +3031,8 @@ static void tipc_sk_remove(struct tipc_sock *tsk)
+        struct sock *sk =3D &tsk->sk;
+        struct tipc_net *tn =3D net_generic(sock_net(sk), tipc_net_id);
+
+-       if (!rhashtable_remove_fast(&tn->sk_rht, &tsk->node, tsk_rht_params=
+)) {
+-               WARN_ON(refcount_read(&sk->sk_refcnt) =3D=3D 1);
++       if (!rhashtable_remove_fast(&tn->sk_rht, &tsk->node, tsk_rht_params=
+))
+                __sock_put(sk);
+-       }
+ }
+
+ static const struct rhashtable_params tsk_rht_params =3D {
 
