@@ -1,216 +1,220 @@
-Return-Path: <netdev+bounces-229392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FAB9BDBB08
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 00:45:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 146CDBDBB8F
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 01:09:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 437064F78F4
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 22:44:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6275518A21B7
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 23:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B7530F954;
-	Tue, 14 Oct 2025 22:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0232D9EDA;
+	Tue, 14 Oct 2025 23:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aSQXqy8A"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iV86aDRd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160BD2FE07B;
-	Tue, 14 Oct 2025 22:43:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13DE017A2EA
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 23:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760481815; cv=none; b=QXzeZi+6267Fw0MSzw3E42Ve7x32DE9Tq1uFLFOgOevL3aIDCSvaCV9WEsDtFjpzMSha2CJsOl4rIaXiJooal1g2iGuwwoKVhrrl1ce3h6cfs53yBnW7Ygwcxw1/pp9lZ3AM4p1c1Jm6bupFqRIZf+2znLG7otAzBkUOOACBNkE=
+	t=1760483360; cv=none; b=VMdfk6Mti/qMGwkrhLwt+lYq8iJx61DWQqx1366Kwo07PgOFC3qgr0jza4hvz+Pcid6SgGen3Vvz8OUFuUbDSBX/KXkjTxQQvHZv85XjbwZt5NcDnMKmp1Lxg0z+ACt1PYqRVKKO98Gz6znfocLfl97q62FTlSpks6Y+X1VUYG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760481815; c=relaxed/simple;
-	bh=SCu74n1QPb+l2An5uCSZFkG0ZSJa3rxMAjAeYpfmuRs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XfzJkSzZIoK3Fh8OUQY6SwGEAepnhqBoH1cP0TQgJ4yrJiKzwDciHLnHF1rhQsY597WBvVrmNSu5oDDNM9+0czF1SGu9QSWe2QV+a5C+zDAdKKfM4lKo9PXmEfWOEKeoOhMTOXOQ3y7MTZOzN2v8KI/YP3tLJJ4NpXklDZmkFA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aSQXqy8A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1D56C2BCB4;
-	Tue, 14 Oct 2025 22:43:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760481814;
-	bh=SCu74n1QPb+l2An5uCSZFkG0ZSJa3rxMAjAeYpfmuRs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aSQXqy8AUKC5UtJny77311sXYVq1AUY7VuBjdZiQ4c/KsTDrwZVJXe5wGNUOBzSWg
-	 QI6reDaaKtF5gKyuVskA8NEVj7819ABywl72FoEMsrA7KkpVoZ5SwsoHYPJ2k+nFxf
-	 GLMxNzgHb2wi+skpXBiJNtHY2V95WPhdWGwPuQP5mAFUP4B1Px+f2l02Go2LKU/YRK
-	 Lket5ITuS3H/pP880YX/ErXPPOfO5zimbBDjnfQNpyRK9nzhyfnCqE2xqBBqTm9F43
-	 K0rV9ff+iUubu9CK9jGNLjvalsTWn2gKVzXJy7jjNSuWv1AeNZdOLwpKRpquyY8zCd
-	 HUlt7Qy/USmgw==
-From: Kees Cook <kees@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH v2 10/10] net: Convert struct sockaddr to fixed-size "sa_data[14]"
-Date: Tue, 14 Oct 2025 15:43:32 -0700
-Message-Id: <20251014224334.2344521-10-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251014223349.it.173-kees@kernel.org>
-References: <20251014223349.it.173-kees@kernel.org>
+	s=arc-20240116; t=1760483360; c=relaxed/simple;
+	bh=vu4nw3WfFop+3BzE1QhLywGaWk937F1FIkK9sJLlHE0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ArjufMUsQ0Q7zzuyYXBg0p715MGxKDNlYvfHhyXB1NR/nTfvEIMmr4M5FjtvJXbQjpzs/IRyL0/IBmUPZkTSxNrtK4Q+3qKl99JyYumY+gdEmzyzNNaN2Raq7/XVWftwZ/WXCBXPXdIOQCeu7cGRyvNNwJdzghA8HUN5Hrceq6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iV86aDRd; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6e790a70-bb02-47d2-9330-f2eb9078c671@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760483355;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nMZ0tOuQFw64RjaBh1c7+1IgZYvZYBxMu7v4FXEnQN8=;
+	b=iV86aDRdppgZQ/WU9jXSXqShVzK2luXQE4yXHNRZgnZER6MIr+lUj34Ro8z6cbdzLLheAU
+	mgjofJUcKZ7i4aIKrpo6ICf66xoqS5+8y7pWx5ex9ThsIW4N8w22qCg0jp7Nk1yNqHhlXV
+	PEd9fvo+MAW6ffmFPeqBRedAO7TVO5c=
+Date: Tue, 14 Oct 2025 16:09:08 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5439; i=kees@kernel.org; h=from:subject; bh=SCu74n1QPb+l2An5uCSZFkG0ZSJa3rxMAjAeYpfmuRs=; b=owGbwMvMwCVmps19z/KJym7G02pJDBnvLglHni+0KhBxmfq1hiHc+Z380vp3eaJBtjMdM85M0 pT7cOBoRykLgxgXg6yYIkuQnXuci8fb9nD3uYowc1iZQIYwcHEKwESCeBgZzvpU3FvHdUNJ96Hi DkVFpoVGXGb7Eg/M1wzeJztjiWy6GSPDYuFzd13uCnxb6ZdtPIl9+87IwCP/Nznbfg9UOTvt+Y9 dDAA=
-X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next/net 6/6] selftest: bpf: Add test for
+ sk->sk_bypass_prot_mem.
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
+ Mina Almasry <almasrymina@google.com>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20251007001120.2661442-1-kuniyu@google.com>
+ <20251007001120.2661442-7-kuniyu@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20251007001120.2661442-7-kuniyu@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Revert struct sockaddr from flexible array to fixed 14-byte "sa_data",
-solves over 36,000 -Wflex-array-member-not-at-end warnings, since struct
-sockaddr is embedded within many network structs.
+On 10/6/25 5:07 PM, Kuniyuki Iwashima wrote:
+> +static int tcp_create_sockets(struct test_case *test_case, int sk[], int len)
+> +{
+> +	int server, i;
+> +
+> +	server = start_server(test_case->family, test_case->type, NULL, 0, 0);
+> +	ASSERT_GE(server, 0, "start_server_str");
+> +
+> +	/* Keep for-loop so we can change NR_SOCKETS easily. */
+> +	for (i = 0; i < len; i += 2) {
+> +		sk[i] = connect_to_fd(server, 0);
+> +		if (sk[i] < 0) {
+> +			ASSERT_GE(sk[i], 0, "connect_to_fd");
+> +			return sk[i];
 
-With socket/proto sockaddr-based internal APIs switched to use struct
-sockaddr_unspec, there should be no more uses of struct sockaddr that
-depend on reading beyond the end of struct sockaddr::sa_data that might
-trigger bounds checking.
+The "server" fd is leaked, and...
 
-Comparing an x86_64 "allyesconfig" vmlinux build before and after this
-patch showed no new "ud1" instructions from CONFIG_UBSAN_BOUNDS nor any
-explicit "field-spanning" memcpy CONFIG_FORTIFY_SOURCE instrumentations.
+> +		}
+> +
+> +		sk[i + 1] = accept(server, NULL, NULL);
+> +		if (sk[i + 1] < 0) {
+> +			ASSERT_GE(sk[i + 1], 0, "accept");
+> +			return sk[i + 1];
 
-Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Signed-off-by: Kees Cook <kees@kernel.org>
----
- include/linux/socket.h                         |  6 ++----
- tools/perf/trace/beauty/include/linux/socket.h |  5 +----
- net/core/dev.c                                 |  2 +-
- net/core/dev_ioctl.c                           |  2 +-
- net/ipv4/arp.c                                 |  2 +-
- net/packet/af_packet.c                         | 10 +++++-----
- 6 files changed, 11 insertions(+), 16 deletions(-)
+same here.
 
-diff --git a/include/linux/socket.h b/include/linux/socket.h
-index 27f57c7ee02a..5e9d83cec850 100644
---- a/include/linux/socket.h
-+++ b/include/linux/socket.h
-@@ -32,12 +32,10 @@ typedef __kernel_sa_family_t	sa_family_t;
-  *	1003.1g requires sa_family_t and that sa_data is char.
-  */
- 
-+/* Deprecated for in-kernel use. Use struct sockaddr_unspec instead. */
- struct sockaddr {
- 	sa_family_t	sa_family;	/* address family, AF_xxx	*/
--	union {
--		char sa_data_min[14];		/* Minimum 14 bytes of protocol address	*/
--		DECLARE_FLEX_ARRAY(char, sa_data);
--	};
-+	char		sa_data[14];	/* 14 bytes of protocol address	*/
- };
- 
- /**
-diff --git a/tools/perf/trace/beauty/include/linux/socket.h b/tools/perf/trace/beauty/include/linux/socket.h
-index 3b262487ec06..77d7c59f5d8b 100644
---- a/tools/perf/trace/beauty/include/linux/socket.h
-+++ b/tools/perf/trace/beauty/include/linux/socket.h
-@@ -34,10 +34,7 @@ typedef __kernel_sa_family_t	sa_family_t;
- 
- struct sockaddr {
- 	sa_family_t	sa_family;	/* address family, AF_xxx	*/
--	union {
--		char sa_data_min[14];		/* Minimum 14 bytes of protocol address	*/
--		DECLARE_FLEX_ARRAY(char, sa_data);
--	};
-+	char		sa_data[14];	/* 14 bytes of protocol address	*/
- };
- 
- struct linger {
-diff --git a/net/core/dev.c b/net/core/dev.c
-index a64cef2c537e..6dc5861f87b0 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -9885,7 +9885,7 @@ DECLARE_RWSEM(dev_addr_sem);
- /* "sa" is a true struct sockaddr with limited "sa_data" member. */
- int netif_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name)
- {
--	size_t size = sizeof(sa->sa_data_min);
-+	size_t size = sizeof(sa->sa_data);
- 	struct net_device *dev;
- 	int ret = 0;
- 
-diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-index ad54b12d4b4c..b3ce0fb24a69 100644
---- a/net/core/dev_ioctl.c
-+++ b/net/core/dev_ioctl.c
-@@ -596,7 +596,7 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
- 		if (ifr->ifr_hwaddr.sa_family != dev->type)
- 			return -EINVAL;
- 		memcpy(dev->broadcast, ifr->ifr_hwaddr.sa_data,
--		       min(sizeof(ifr->ifr_hwaddr.sa_data_min),
-+		       min(sizeof(ifr->ifr_hwaddr.sa_data),
- 			   (size_t)dev->addr_len));
- 		netdev_lock_ops(dev);
- 		call_netdevice_notifiers(NETDEV_CHANGEADDR, dev);
-diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
-index 833f2cf97178..8316ca59088a 100644
---- a/net/ipv4/arp.c
-+++ b/net/ipv4/arp.c
-@@ -1189,7 +1189,7 @@ static int arp_req_get(struct net *net, struct arpreq *r)
- 
- 	read_lock_bh(&neigh->lock);
- 	memcpy(r->arp_ha.sa_data, neigh->ha,
--	       min(dev->addr_len, sizeof(r->arp_ha.sa_data_min)));
-+	       min(dev->addr_len, sizeof(r->arp_ha.sa_data)));
- 	r->arp_flags = arp_state_to_flags(neigh);
- 	read_unlock_bh(&neigh->lock);
- 
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index 73bea76ea45d..d21483cae94f 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -3284,7 +3284,7 @@ static int packet_bind_spkt(struct socket *sock, struct sockaddr_unspec *uaddr,
- {
- 	struct sock *sk = sock->sk;
- 	struct sockaddr *sa = (struct sockaddr *)uaddr;
--	char name[sizeof(sa->sa_data_min) + 1];
-+	char name[sizeof(sa->sa_data) + 1];
- 
- 	/*
- 	 *	Check legality
-@@ -3295,8 +3295,8 @@ static int packet_bind_spkt(struct socket *sock, struct sockaddr_unspec *uaddr,
- 	/* uaddr->sa_data comes from the userspace, it's not guaranteed to be
- 	 * zero-terminated.
- 	 */
--	memcpy(name, sa->sa_data, sizeof(sa->sa_data_min));
--	name[sizeof(sa->sa_data_min)] = 0;
-+	memcpy(name, sa->sa_data, sizeof(sa->sa_data));
-+	name[sizeof(sa->sa_data)] = 0;
- 
- 	return packet_do_bind(sk, name, 0, 0);
- }
-@@ -3581,11 +3581,11 @@ static int packet_getname_spkt(struct socket *sock, struct sockaddr *uaddr,
- 		return -EOPNOTSUPP;
- 
- 	uaddr->sa_family = AF_PACKET;
--	memset(uaddr->sa_data, 0, sizeof(uaddr->sa_data_min));
-+	memset(uaddr->sa_data, 0, sizeof(uaddr->sa_data));
- 	rcu_read_lock();
- 	dev = dev_get_by_index_rcu(sock_net(sk), READ_ONCE(pkt_sk(sk)->ifindex));
- 	if (dev)
--		strscpy(uaddr->sa_data, dev->name, sizeof(uaddr->sa_data_min));
-+		strscpy(uaddr->sa_data, dev->name, sizeof(uaddr->sa_data));
- 	rcu_read_unlock();
- 
- 	return sizeof(*uaddr);
--- 
-2.34.1
+> +		}
+> +	}
+> +
+> +	close(server);
+> +
+> +	return 0;
+> +}
+> +
+> +static int udp_create_sockets(struct test_case *test_case, int sk[], int len)
+> +{
+> +	int i, j, err, rcvbuf = BUF_TOTAL;
+> +
+> +	/* Keep for-loop so we can change NR_SOCKETS easily. */
+> +	for (i = 0; i < len; i += 2) {
+> +		sk[i] = start_server(test_case->family, test_case->type, NULL, 0, 0);
+> +		if (sk[i] < 0) {
+> +			ASSERT_GE(sk[i], 0, "start_server");
+> +			return sk[i];
+> +		}
+> +
+> +		sk[i + 1] = connect_to_fd(sk[i], 0);
+> +		if (sk[i + 1] < 0) {
+> +			ASSERT_GE(sk[i + 1], 0, "connect_to_fd");
+> +			return sk[i + 1];
+> +		}
+> +
+> +		err = connect_fd_to_fd(sk[i], sk[i + 1], 0);
+> +		if (err) {
+> +			ASSERT_EQ(err, 0, "connect_fd_to_fd");
+> +			return err;
+> +		}
+> +
+> +		for (j = 0; j < 2; j++) {
+> +			err = setsockopt(sk[i + j], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
+> +			if (err) {
+> +				ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)");
+> +				return err;
+> +			}
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
 
+
+> +
+> +static int check_bypass(struct test_case *test_case,
+> +			struct sk_bypass_prot_mem *skel, bool bypass)
+> +{
+> +	char buf[BUF_SINGLE] = {};
+> +	long memory_allocated[2];
+> +	int sk[NR_SOCKETS] = {};
+> +	int err, i, j;
+> +
+> +	err = test_case->create_sockets(test_case, sk, ARRAY_SIZE(sk));
+> +	if (err)
+> +		goto close;
+> +
+> +	memory_allocated[0] = test_case->get_memory_allocated(test_case, skel);
+> +
+> +	/* allocate pages >= NR_PAGES */
+> +	for (i = 0; i < ARRAY_SIZE(sk); i++) {
+> +		for (j = 0; j < NR_SEND; j++) {
+> +			int bytes = send(sk[i], buf, sizeof(buf), 0);
+> +
+> +			/* Avoid too noisy logs when something failed. */
+> +			if (bytes != sizeof(buf)) {
+> +				ASSERT_EQ(bytes, sizeof(buf), "send");
+> +				if (bytes < 0) {
+> +					err = bytes;
+> +					goto drain;
+> +				}
+> +			}
+> +		}
+> +	}
+> +
+> +	memory_allocated[1] = test_case->get_memory_allocated(test_case, skel);
+> +
+> +	if (bypass)
+> +		ASSERT_LE(memory_allocated[1], memory_allocated[0] + 10, "bypass");
+> +	else
+> +		ASSERT_GT(memory_allocated[1], memory_allocated[0] + NR_PAGES, "no bypass");
+> +
+> +drain:
+> +	if (test_case->type == SOCK_DGRAM) {
+> +		/* UDP starts purging sk->sk_receive_queue after one RCU
+> +		 * grace period, then udp_memory_allocated goes down,
+> +		 * so drain the queue before close().
+> +		 */
+> +		for (i = 0; i < ARRAY_SIZE(sk); i++) {
+> +			for (j = 0; j < NR_SEND; j++) {
+> +				int bytes = recv(sk[i], buf, 1, MSG_DONTWAIT | MSG_TRUNC);
+> +
+> +				if (bytes == sizeof(buf))
+> +					continue;
+> +				if (bytes != -1 || errno != EAGAIN)
+> +					PRINT_FAIL("bytes: %d, errno: %s\n", bytes, strerror(errno));
+> +				break;
+> +			}
+> +		}
+> +	}
+> +
+> +close:
+> +	for (i = 0; i < ARRAY_SIZE(sk); i++)
+> +		close(sk[i]);
+
+It could close(0) here depending on how the "->create_sockets()" above has 
+failed. The fd 0 could be something useful for the test_progs.
+
+Other than that, the set lgtm. Please re-spin and carry the review/ack tags.
+
+pw-bot: cr
+
+> +
+> +	return err;
+> +}
+> +
 
