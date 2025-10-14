@@ -1,154 +1,135 @@
-Return-Path: <netdev+bounces-229110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D147BD84BC
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:54:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3B00BD84D4
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:55:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D86A3B40D0
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:54:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4575E1921BA9
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22672DC79B;
-	Tue, 14 Oct 2025 08:54:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C03432DCF65;
+	Tue, 14 Oct 2025 08:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x1oG+WBJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZrCF4ZsQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F81C2DCF65
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:54:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6BCA1AC44D
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:54:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760432078; cv=none; b=cpgD9kzfxBY3RS7ZY10mpFvQcJOLLB6BJc3rcxVavKbMNsMm//1GUvAUUtqMZx06El7LUwyw1BjexyWa1XHVePHY/KAJNapQFuABaRZj5nnLdNxPlIp7ntFQhXTWBQvOS0ZjgErMdJ3toFJDjhlCZ3M5WgNUX4INq68wV7ZhIis=
+	t=1760432097; cv=none; b=IkVNn7oknil364XK7FwKxvBjZ4qCDirYeAb0Es5qml0teeH2f9pV4UMaEVsoJLxHfghdub50+9jOZvdY3j5LiUsf7TrpuztbWk3IMxMiLM3xc8VAOjSYPMGD2n8wIU4lktk4RBlGvWM/LY9MN/z6V6g4ncVjdXWoTnzh1lzjSh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760432078; c=relaxed/simple;
-	bh=6LgNKZNmgF10jIXqxGjeEBugATe/LKxXcOJp3lARXDc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aLIShMZT7V+UeovGeR4+SCq731lHVEsG5XsffX8tQY1qdb0wfeD1myWZ3y2yLRHnFfdDIeovZryI4Pc+t934GM95FIYPc+0Tzrmvhi/2eqvVNwZuVFBnDJ2I2WeYrx0ikIMvgIclUo/Sz9NI5DQQ1RFDEii5mhlSbmU7obSb3CE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x1oG+WBJ; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-78f15d5846dso83975176d6.0
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:54:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760432076; x=1761036876; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T4VySRwz9m1JU+ZDg+Fh3/d34BuS0ZBZLOysYt4I24I=;
-        b=x1oG+WBJhate8zQn30/BPtcFzz2cgKy0LbB1TwuFmClLe4MIfjkNJqoFuvP+D0YmkL
-         WWQ1OKApyOt0SshG/dfPy5zlL/qS4R/87Nx6g2WzRjX6OHF0rFEUSm8SdMpPPeq75wgo
-         iliBuQChj8EWtwLF+N25ApN8QzjGgRsTqYLaCQwaU3Sq4QJ6clRSye1+bqWODYERTVSj
-         7Zbvi4Kv2aNAU5gRNO1lawGyjKq337+5gztuHsnYLmM+MoHqN9+tp92pkaL8Y324fwmU
-         w0CMdNIXjuW1ZOXyKHJCLuJgW2yWiVDahmea/asR60BFT1+klc9U0AVTvnrIArAC5TCC
-         fbdA==
+	s=arc-20240116; t=1760432097; c=relaxed/simple;
+	bh=iX6E6+YxRDwUo/T30nKPqiL+qYTIhbpnXBcRNSEmfHY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Elk/bwT86w6OU7zHlXpocvtJqHGqMVED3VrKMOxtB/7W3DjFoxJ/wdbf0TomAmaDBYLZiSBVNbLGHqZnoMYlzE+CdG2a6g2QaYQkI8Ny2WIdmoK/nTu86fXW4n1oxbaYrhtdjU5Cd5y9DL0uu0dYwMWEK7RoU8K4RTyvJHLo2lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZrCF4ZsQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760432094;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C3ePW8DmjVhMlthty30rI8us0wQNWvGq1RuzdSVHC7M=;
+	b=ZrCF4ZsQfL6lRX9Ac/EUwZ1U0NF0/s+FiYDo787jVP0vcRK0/4oQSM1kgM67tW46wisszi
+	YpcZhgMouVMFgovc/XPhdfexcMLVbmkSCOs6E7dYj7sggMk+OvNhBF9lqygLG4cnyD4rSO
+	xLVJbem1/eCa5dwH78e7XGO+XyP5XX8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-152-RR7o9_7HP3-pGFIKLYy4uw-1; Tue, 14 Oct 2025 04:54:51 -0400
+X-MC-Unique: RR7o9_7HP3-pGFIKLYy4uw-1
+X-Mimecast-MFC-AGG-ID: RR7o9_7HP3-pGFIKLYy4uw_1760432090
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-46e3d9bf9e1so34093085e9.1
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:54:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760432076; x=1761036876;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T4VySRwz9m1JU+ZDg+Fh3/d34BuS0ZBZLOysYt4I24I=;
-        b=w63OOq+TmLTioZd7vWMxsM1YEjnJnnpuF2kMqKMXMFDVdZyuLfm2MDiEcN7TdRNhKs
-         AZg0EuJLc4vfDEjuLWFuUg66zna0Wlg0p2Xz5jnfKELy7Z/uTlBFwYjRodeFhRC1wsU0
-         zMmI15PGMmIcfaMvSS9GyS/Di/ui8uOIOcwXim3DB9SLJF8uqchH2+uqmUt/lR+AXHde
-         KDsUNBYJxZRlTc0VVa91VyKDLcAL/WGAVqRWesSzquzsDFwWqt3394NDQ29MLHvZAdh2
-         1scJgiMN24PEMgWSfgzypXTDqVv6WHKnA+OI4rvL6cGUAKBDXBTHWStcRMo0PImh2t+r
-         K7jg==
-X-Forwarded-Encrypted: i=1; AJvYcCWSH/8cTWC8+auLD76M59OHe5D4Ib6O2fLqdp9uwUQsPsgavJo+gOj3Du/zF1BVMAmJJ5Kb0DM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCiRWvYzwtNjlAnvsHbuRZ+0sXTCT/UUtOSIxk5nH2IP6IxiR0
-	hTnibnzfwbUjqug7NZaYhlBAdYdYqfXMHOfILxJg+ebDUJsVjxoUCWiGDW5pIJRlzcLekyvR1iQ
-	NmiAthK2nogaBqewyFBnc3qRIGt4p9YFAQ1/eS2Z0
-X-Gm-Gg: ASbGncv6+2hIDMqHUmJtmNBmG538O0JQ7eB58eom4I0YVdzObwHcsRitaQ7EvuAkuqo
-	gQeJccJn9WpFWixP+3EG4UWrhmiaqZtL9ZTHbZR4n6H+FZjpJXlW8MfKAggjIYV3WDRkJnYSi/l
-	JDuAwvZkN6/IYC/k0jiReBsTGBtqrsNeZ2BNaHYh813rJKzecULeeaVr4rPkfp68//GpfSR3Hxw
-	5g+ysqfYcMv2DXAE6ktXhtAU0h4y3f/
-X-Google-Smtp-Source: AGHT+IFA8xut4GWM2ihOQCr4R8bWnXf5T+nPRO/dqWNWbF48zVbKNVA6mwY9MPlWQGhl4PI0B5Nf/QP3ZfC1nQzoVWM=
-X-Received: by 2002:a05:622a:8a:b0:4df:4174:8239 with SMTP id
- d75a77b69052e-4e6eaceafe1mr343666951cf.29.1760432075575; Tue, 14 Oct 2025
- 01:54:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760432090; x=1761036890;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=C3ePW8DmjVhMlthty30rI8us0wQNWvGq1RuzdSVHC7M=;
+        b=SAz8eIcA1znCmutsWhM0KuNPsyrNA61QRJZaJcTlgHbRMDhixF1eSCnZ0t5fYabwBB
+         pTA42n1e5ARP6XCd6IJanhP4fho2C0X2J47DI6lZddC/ZCQL80x6p4I4QqcLcO00f3mZ
+         loCYgqy2+VjMWAz5iCdHHWTWs1i6PQdVLy8U9bRU2pf8hCDiZm6R6A01wGZAmBY6aXXQ
+         VhPD8fuj8pBqxIpuSUuIC+iyfvXZ7DE1NcGfY2kqb69GcD8zrVNB3aU8MgWJGLB4rlNg
+         LqRzq8PW+TJyAc+Bm09uZe/7Q9jNGNHgQkSB5FvQ0fNtx2D22tAGPn3sYHgDzZrveeNC
+         Z5vA==
+X-Forwarded-Encrypted: i=1; AJvYcCVqgjdTxyij5NwgFx+jQIgSTxQnuJ0LC10ddrbnz6mKeJnTb+jlX1qOby/W8GRaglHjKdoB0R0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzzampw6BTdQ/uV2M9gG8E0eW9mqYbHFn+Fd0tBpQ0g1f92T3CT
+	0u9jpTiAug4eRJJmC9pkoYJSCaEVJ8yyCfQo6UQs3OE21AqjJkaJi+EHqzqhP2V+tMTzJDxeW3w
+	udsczEpshE8Vi2yAq1mK0uXH35aHvPayh41pw0GRR32K+BjLH+BC0dDR80A==
+X-Gm-Gg: ASbGncs8abNs8XcI99ELrbmH3s8H2K5HQT5uomEdANAMmykQsQ8dcFTX3xQAatDlEiG
+	UHKHJM0hm8mBoVIwwHTtAOSTksn8tTwEXQOPYxnaF7J1OO8sXmWVclFu/Ey6aFPJxAqDmdfhUwQ
+	KoS0yFtBzIGwly88BNV+/Oo5m+o6yW+u5/H7P2r7wvXc06xHTsCtRrpGxdPlIp9dUfasnUzwSCV
+	ax29dzx4KcNK7hDSaXU1wyU9L8XK9o3sYNpyRF+FZ+lpk01f9QjiZvFjjvHYG6gpjfMuozbjKE6
+	V7Qz7IojuU0TylFkc5LQYfWSL1hY/cKPuosdT/GAwVkNCA92PXfVgVakwUwN3nh80chvA6j0ryT
+	bBTU=
+X-Received: by 2002:a05:600c:6383:b0:465:a51d:d4 with SMTP id 5b1f17b1804b1-46fa9a8b48dmr175305655e9.6.1760432090036;
+        Tue, 14 Oct 2025 01:54:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEBAxEVuWznXYrtCAfwzB3hkJ+PRTe54mZDm2xs6IpSViayrzrzE+Zj57deGdejp9cH6//nGA==
+X-Received: by 2002:a05:600c:6383:b0:465:a51d:d4 with SMTP id 5b1f17b1804b1-46fa9a8b48dmr175305415e9.6.1760432089597;
+        Tue, 14 Oct 2025 01:54:49 -0700 (PDT)
+Received: from [10.0.0.23] (ip-89-177-97-11.bb.vodafone.cz. [89.177.97.11])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fc1c5227fsm162559065e9.9.2025.10.14.01.54.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Oct 2025 01:54:49 -0700 (PDT)
+Message-ID: <6e7b63e0-65f5-4920-8908-f6f6ede9716b@redhat.com>
+Date: Tue, 14 Oct 2025 10:54:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251013145926.833198-1-edumazet@google.com> <3b20bfde-1a99-4018-a8d9-bb7323b33285@redhat.com>
- <CANn89iKu7jjnjc1QdUrvbetti2AGhKe0VR+srecrpJ2s-hfkKA@mail.gmail.com>
-In-Reply-To: <CANn89iKu7jjnjc1QdUrvbetti2AGhKe0VR+srecrpJ2s-hfkKA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 14 Oct 2025 01:54:24 -0700
-X-Gm-Features: AS18NWABPuN2ltBmI73WriTakkV-8ehTeL9FJW2CFHXHDKq3zSwQiuxYu4RFeag
-Message-ID: <CANn89iL8YKZZQZSmg5WqrYVtyd2PanNXzTZ2Z0cObpv9_XSmoQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: better handle TCP_TX_DELAY on established flows
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 net-next] net/hsr: add protocol version to fill_info
+ output
+To: Fernando Fernandez Mancera <fmancera@suse.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <20251009210903.1055187-6-jvaclav@redhat.com>
+ <b25a73bf-1309-4f9f-9cd7-795e0615635b@suse.de>
+Content-Language: en-US
+From: Jan Vaclav <jvaclav@redhat.com>
+In-Reply-To: <b25a73bf-1309-4f9f-9cd7-795e0615635b@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 14, 2025 at 1:29=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Tue, Oct 14, 2025 at 1:22=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> w=
-rote:
-> >
-> > On 10/13/25 4:59 PM, Eric Dumazet wrote:
-> > > Some applications uses TCP_TX_DELAY socket option after TCP flow
-> > > is established.
-> > >
-> > > Some metrics need to be updated, otherwise TCP might take time to
-> > > adapt to the new (emulated) RTT.
-> > >
-> > > This patch adjusts tp->srtt_us, tp->rtt_min, icsk_rto
-> > > and sk->sk_pacing_rate.
-> > >
-> > > This is best effort, and for instance icsk_rto is reset
-> > > without taking backoff into account.
-> > >
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> >
-> > The CI is consistently reporting pktdrill failures on top of this patch=
-:
-> >
-> > # selftests: net/packetdrill: tcp_user_timeout_user-timeout-probe.pkt
-> > # TAP version 13
-> > # 1..2
-> > # tcp_user_timeout_user-timeout-probe.pkt:35: error in Python code
-> > # Traceback (most recent call last):
-> > #   File "/tmp/code_T7S7S4", line 202, in <module>
-> > #     assert tcpi_probes =3D=3D 6, tcpi_probes; \
-> > # AssertionError: 0
-> > # tcp_user_timeout_user-timeout-probe.pkt: error executing code:
-> > 'python3' returned non-zero status 1
-> >
-> > To be accurate, the patches batch under tests also includes:
-> >
-> > https://patchwork.kernel.org/project/netdevbpf/list/?series=3D1010780
-> >
-> > but the latter looks even more unlikely to cause the reported issues?!?
+On 14.10.2025 10:48, Fernando Fernandez Mancera wrote:
+> On 10/9/25 11:09 PM, Jan Vaclav wrote:
+>> Currently, it is possible to configure IFLA_HSR_VERSION, but
+>> there is no way to check in userspace what the currently
+>> configured HSR protocol version is.
+>>
+>> Add it to the output of hsr_fill_info(), when the interface
+>> is using the HSR protocol. Let's not expose it when using
+>> the PRP protocol, since it only has one version and it's
+>> not possible to set it from userspace.
+>>
+>> This info could then be used by e.g. ip(8), like so:
+>> $ ip -d link show hsr0
+>> 12: hsr0: <BROADCAST,MULTICAST> mtu ...
+>>      ...
+>>      hsr slave1 veth0 slave2 veth1 ... proto 0 version 1
+> 
+> I think this is missing the 'Signed-off-by' tag. Other than that, it 
+> looks good to me. Not sure if it can be added while merging.
+> 
+> Reviewed-by: Fernando Fernandez Mancera <fmancera@suse.de>
+> 
 
-Not sure, look at the packetdrill test "`tc qdisc delete dev tun0 root
-2>/dev/null ; tc qdisc add dev tun0 root pfifo limit 0`"
+Yes, it looks like I dropped my signoff somewhere along the way, my 
+apologies. If it's possible to add it while merging, please consider 
+this patch as:
 
-After "net: dev_queue_xmit() llist adoption" __dev_xmit_skb() might
-return NET_XMIT_SUCCESS instead of NET_XMIT_DROP
+Signed-off-by: Jan Vaclav <jvaclav@redhat.com>
 
-__tcp_transmit_skb() has some code to detect NET_XMIT_DROP
-immediately, instead of relying on a timer.
-
-I can fix the 'single packet' case, but not the case of many packets
-being sent in //
-
-Note this issue was there already, for qdisc with TCQ_F_CAN_BYPASS :
-We were returning NET_XMIT_SUCCESS even if the driver had to drop the packe=
-t.
-
-Test is flaky even without the
-https://patchwork.kernel.org/project/netdevbpf/list/?series=3D1010780
-series.
 
