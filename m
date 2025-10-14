@@ -1,97 +1,113 @@
-Return-Path: <netdev+bounces-229200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41871BD9171
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 13:46:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3330DBD91D1
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 13:52:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D286420CBE
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:46:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B97EA420786
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:52:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2B33101C1;
-	Tue, 14 Oct 2025 11:46:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qBYr2o8Y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 157EA30FF23;
+	Tue, 14 Oct 2025 11:52:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from baidu.com (mx20.baidu.com [111.202.115.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B873101B9;
-	Tue, 14 Oct 2025 11:46:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099402FE053;
+	Tue, 14 Oct 2025 11:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.202.115.85
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760442389; cv=none; b=isGJHnHBCISC6XQJdCUuN2ItrJSE8JT3Qiy8/n5thfeZ1hSZTH2L639yvn36a9k9MA3rHAkmrrVlTz8mdYG6+i24BEPno+LqPZiahOIsB/IrPjG/++fooULjqtIBxmGLREoiEyN2l4iOpm3EFS+RwvKVWEZ0G6oVMS+xpk29Gbs=
+	t=1760442721; cv=none; b=g79nWei4DrMPohKtTaVy57nMm+aYgVU8DXAttUJsEAz/SMfHVUMl6wDUHJddfYMrJ8ZY2XtqnzWFHhS5BOw55xjXebw0fuqE8thpcCybEe4tqq0nchgiEmp6MmBmkFJuF0WAOY0LSSk3SRMa0icrinaGZwTtXeed2ux8ynuruoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760442389; c=relaxed/simple;
-	bh=WjQN6OgexOgkYV132WA2dstwjo/wqMvxhCI46O1Q5pg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Klol/w3HMT+NuNnpXQ5getBFWsYLudWc0sEW0szXvPlTgI9xytI22hCF/84hQIVsY7Atwyf0fM+0EB+VCxvUvw8iZWmFSjLoakIoaTAvY1XrV5kUp7i9gG/Mppt4NgQg05WQmhw0+BpisGg2hjebeluqPLz3Wxw1tRVmfefuG7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qBYr2o8Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 522E5C113D0;
-	Tue, 14 Oct 2025 11:46:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760442389;
-	bh=WjQN6OgexOgkYV132WA2dstwjo/wqMvxhCI46O1Q5pg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qBYr2o8Y4k7vrPe9r+6dvpVQR/K5MY5yEdvR+aVl1Yc0aRRjK6L8d1ZWiTE32JUrc
-	 l9uPELxx9ec+svIOexPAy4hDEXeL4MtW4rGrgpryGP+xn1p6auNZA2IvtSuPGjBgLO
-	 Ou3eDMH9qG0PKthx163yn/rnmDLNOMFIVFr25ogFBnsyPeo3L86xzr3QlJb+9A8tmK
-	 awAKJeYVF+5A4mpXqDiFa4dZbgMX4lwVIdjuDYsv9s/9Vs6xRhnTBMV8ifx4IaHTs3
-	 koyZd2SNnA9OWyCyA041HhdaWp2nC7o2S8x9b6GDiZM0fbqPDK6VtMsPY40J6Us5wv
-	 d4msa6Fjn2+PQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEB5380AA4F;
-	Tue, 14 Oct 2025 11:46:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1760442721; c=relaxed/simple;
+	bh=Hfs/oyD16dhuLjpqiLOj0BghJMlBJWnviczL0Y3NGms=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=upUz62G3iS47rYWNN9h4O/w5z2zcWOyvzgnmvFFOQVL8ly0GSbWUWw6YxDXmmePIPdxiUMdIokMyvJHQlBbGk8hwB675tMjAY1sZORMrbzscTACfl4Rg3baqYQ6GzEtmOL/LXYtzLB3dIGDh5Ehq8fzl5J/d9+xnZSqlDYt+m3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.202.115.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: lirongqing <lirongqing@baidu.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
+	<kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter
+	<phil@nwl.cc>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Li RongQing <lirongqing@baidu.com>
+Subject: [PATCH net-next] netfilter: conntrack: Reduce cond_resched frequency in gc_worker
+Date: Tue, 14 Oct 2025 19:51:03 +0800
+Message-ID: <20251014115103.2678-1-lirongqing@baidu.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [RESEND PATCH net-next v3] netmem: replace __netmem_clear_lsb()
- with
- netmem_to_nmdesc()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176044237474.3633772.6843370754394921970.git-patchwork-notify@kernel.org>
-Date: Tue, 14 Oct 2025 11:46:14 +0000
-References: <20251013044133.69472-1-byungchul@sk.com>
-In-Reply-To: <20251013044133.69472-1-byungchul@sk.com>
-To: Byungchul Park <byungchul@sk.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel_team@skhynix.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, almasrymina@google.com,
- hawk@kernel.org, toke@redhat.com, asml.silence@gmail.com
+Content-Type: text/plain
+X-ClientProxiedBy: bjhj-exc9.internal.baidu.com (172.31.3.19) To
+ bjkjy-exc3.internal.baidu.com (172.31.50.47)
+X-FEAS-Client-IP: 172.31.50.47
+X-FE-Policy-ID: 52:10:53:SYSTEM
 
-Hello:
+From: Li RongQing <lirongqing@baidu.com>
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+The current implementation calls cond_resched() in every iteration
+of the garbage collection loop. This creates some overhead when
+processing large conntrack tables with billions of entries,
+as each cond_resched() invocation involves scheduler operations.
 
-On Mon, 13 Oct 2025 13:41:33 +0900 you wrote:
-> Now that we have struct netmem_desc, it'd better access the pp fields
-> via struct netmem_desc rather than struct net_iov.
-> 
-> Introduce netmem_to_nmdesc() for safely converting netmem_ref to
-> netmem_desc regardless of the type underneath e.i. netmem_desc, net_iov.
-> 
-> While at it, remove __netmem_clear_lsb() and make netmem_to_nmdesc()
-> used instead.
-> 
-> [...]
+To reduce this overhead, implement a time-based throttling mechanism
+that calls cond_resched() at most once per millisecond. This maintains
+system responsiveness while minimizing scheduler contention.
 
-Here is the summary with links:
-  - [RESEND,net-next,v3] netmem: replace __netmem_clear_lsb() with netmem_to_nmdesc()
-    https://git.kernel.org/netdev/net-next/c/53615ad26e97
+gc_worker() with hashsize=10000 shows measurable improvement:
 
-You are awesome, thank you!
+Before: 7114.274us
+After:  5993.518us (15.8% reduction)
+
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
+---
+ net/netfilter/nf_conntrack_core.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
+index 344f882..779ca03 100644
+--- a/net/netfilter/nf_conntrack_core.c
++++ b/net/netfilter/nf_conntrack_core.c
+@@ -1513,7 +1513,7 @@ static bool gc_worker_can_early_drop(const struct nf_conn *ct)
+ static void gc_worker(struct work_struct *work)
+ {
+ 	unsigned int i, hashsz, nf_conntrack_max95 = 0;
+-	u32 end_time, start_time = nfct_time_stamp;
++	u32 end_time, resched_time, start_time = nfct_time_stamp;
+ 	struct conntrack_gc_work *gc_work;
+ 	unsigned int expired_count = 0;
+ 	unsigned long next_run;
+@@ -1536,6 +1536,7 @@ static void gc_worker(struct work_struct *work)
+ 	count = gc_work->count;
+ 
+ 	end_time = start_time + GC_SCAN_MAX_DURATION;
++	resched_time = nfct_time_stamp;
+ 
+ 	do {
+ 		struct nf_conntrack_tuple_hash *h;
+@@ -1615,7 +1616,10 @@ static void gc_worker(struct work_struct *work)
+ 		 * we will just continue with next hash slot.
+ 		 */
+ 		rcu_read_unlock();
+-		cond_resched();
++		if (nfct_time_stamp - resched_time > msecs_to_jiffies(1)) {
++			cond_resched();
++			resched_time = nfct_time_stamp;
++		}
+ 		i++;
+ 
+ 		delta_time = nfct_time_stamp - end_time;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.9.4
 
 
