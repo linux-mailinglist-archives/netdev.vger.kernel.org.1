@@ -1,126 +1,129 @@
-Return-Path: <netdev+bounces-229142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EE0BBD87AB
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:40:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9898CBD87B1
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:40:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2F34C4F980D
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:40:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 525FD4068A3
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3AC62EA73D;
-	Tue, 14 Oct 2025 09:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D9D2EA74C;
+	Tue, 14 Oct 2025 09:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="lI7AwmEf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dVfHq2am"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7EB82EA15B
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 09:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6E52E7BB5
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 09:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760434831; cv=none; b=fOO03UX8+xS77vbiwBLzyLjbuIkJKQ1/IKjeYEHwdb1WhZhKc8imCLpxuRewtDTaJ/hDL3sKFr2oEZCrWMs41iEGWAIR9ne4/9IXdl2TGRbYmBS4rqxX7+vCICBEAvMIDeakZ8Ik7G05Kg2mN7nOy/4P3pMrXTe4T6oOQG634FM=
+	t=1760434853; cv=none; b=uVScmqNLyJ8OI9/+C5DP11jpKzz8UiaFbXC2XcQ2zHLXH5Klg2G9R5CX7JD1n6LWh7gKk3NLXQjc5NDvTETk9LedS4KNDhkQTD1loPkk9ioI7YYFmKgVBh5YWMHuuD8svGoS+40kuZiW/QeR7tkCa4CX6yneyQx362JAudTrYcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760434831; c=relaxed/simple;
-	bh=wRKvHPeq0IjJrOaHI66asnH+YnrNb0PTfpXzCuY2EDk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fzqxJh4dElzck1Y4TWRcCWqGRA8i8nT1K6TsDARGVlNHNtpD5LlaVL0yweDcViEQfQ+s6wLJ7oOicfjJfzqBS7yDCCZIphWGtrMvrG3bI4sye2M58XF69CUGv8JzYY0Cs9maSuj1GHEVkuEC3ycHNlh2QKchVSmlvT0F6ZGndi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=lI7AwmEf; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-46e34bd8eb2so51934175e9.3
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 02:40:29 -0700 (PDT)
+	s=arc-20240116; t=1760434853; c=relaxed/simple;
+	bh=KrqI6BN/pG8sniH9prZ9lemJ+Px5buZPfBBQDsr3OFc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E1qDH75kzGhV6NVlgXcD1IIY4eyYLzgSgUCWFaPgsYO9QNwQahkVNya7fULirXD2fXH4CNuMQ8ltmKQC+BhlHKMn/cmw+B1Q1jJ1uZ0nkDNKzP5rqqnFtQr+D4lJJK5qp+iVYC/kjq1ewV2N4wuN63cUO7aDneCIZgO0jMsIv34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dVfHq2am; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7f04816589bso657761785a.3
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 02:40:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1760434828; x=1761039628; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xwcAcEVMFbFagSHujABEn/5LkWsDvenqWgEz+Q71K50=;
-        b=lI7AwmEfjwytcy7C9GNZ0iRsPyf1sPDlnB5TcU2LUbmfCvQMhfh1DBO3drMmzCHQ/C
-         wZC1qvcREs5DOYRivHuvTYKpDHPaCNXfNWtZnvBRDV7r+PZ5709mt4hSuPhXKHZG3kOe
-         w/z7r6UMfPuqC/f+WybTZuF+X0Pwv5bws1EA24+izYd3sNobRi1TfOw3M1SP5VPb1AHN
-         xbrrM1v0ssR0xpNynrjvC3mko41ooOFAeIF5Umtr+jOQzUCXsUq5F8c4QRB3y1FpurFc
-         3gVROPP0SqGaDc+NmlS9BYwoo0teA5cfpGNjaZq4E2KIUJUJQmGj9pUzw1/wJyM/lrZs
-         3z+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760434828; x=1761039628;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1760434851; x=1761039651; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xwcAcEVMFbFagSHujABEn/5LkWsDvenqWgEz+Q71K50=;
-        b=h3njAd+kxBsisYwbQG5SIZLeoqiG3Cjeq1SdFXsRGQwsV1rIh0hW5NWvyAWTNW6RXj
-         bBo4xGLGsOjos/1iZpGus2fWH3MoHo0yQw6sORdLtQqQhTfU6OQaHLrlcSvis07MnzCs
-         zsr7V7bCMk9qK6CW4gYY8RtusLs/dIUdSCfhMPgdghJcmLJ+ClsFL1pA50DLZ/TFa5JW
-         T9vYd/Cuh4bRLu1vjr9JhNHjgfdvJajjWkX5EJwOqQL/UbX12IrRgTLKVNjNx0WGeXvg
-         7VJ5QGwj2iTWc+DWnqGQDGa8Yx500kQRc1zzLvwMhOlSfl5YUoNsenGHf4C/L+tB9/qt
-         iRlA==
-X-Gm-Message-State: AOJu0Yx4rjbhlHy167rZ2eNlCfJ2VVJ8oSlEMTlXXRyu+7upJyLgHCJT
-	wfTlWbP9S0jnXmWeOfHWEXVgHbVH9TNrfnThcn6wW37uEmst+VsLhSKe2vb6fMfS+OO+TGe4byb
-	FDN/sWwttzw==
-X-Gm-Gg: ASbGncu9FrB6Y95AfpAeOwbzHjR55sxZ7TsCY5zhs+X5hJ8kOzWPrTuGaM5R0LizAgB
-	Z8C5m++45mOMbgIQOCAlhp95F4vaLYl/vdnUG1kiH1j7ozkckUTEBzd8oTDUqn89h8xw8YCn53H
-	KwZ7PKZTbXKStHUvA9T6mlWMO7SSQsFi0zUYX+z3G6dvvSi8eC3virVtiWT8UXNc5jA8pyVj6U7
-	bmsouxN3xpbuFpNX8S1X5CgB4ZO1ComQb3TU7xh4hV9d0lnRoyXRqVENQOBNzvHyASi2hsHe7TA
-	3vAt3GrbA4p/ovuSmMI5LReD6g6vv9VPYfvONlixxrP4TzA/kbcBnl9hnD7jJakCxm/vygWIyHl
-	Zq7bQHvf7ZIaEheERqh5BeW7y1IQQOM+ausa/NESZC3cQ3s/gI1n50MzSpyw1AC+msJw=
-X-Google-Smtp-Source: AGHT+IHXmiUu6VVSyfoi7gU/XjlYIF2/0bxO4RUXhVMSkCCmaHjzamtRFltrBIEPIqHHZ3nvWstrgQ==
-X-Received: by 2002:a05:600c:468e:b0:46e:4b79:551 with SMTP id 5b1f17b1804b1-46fa9b092femr190108795e9.31.1760434827487;
-        Tue, 14 Oct 2025 02:40:27 -0700 (PDT)
-Received: from jiri-mlt.client.nvidia.com ([128.77.52.125])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce57d49bsm23512241f8f.10.2025.10.14.02.40.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Oct 2025 02:40:27 -0700 (PDT)
-Date: Tue, 14 Oct 2025 11:40:12 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Sabrina Dubroca <sdubroca@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, Shuah Khan <shuah@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Stanislav Fomichev <stfomichev@gmail.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Ahmed Zaki <ahmed.zaki@intel.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, bridge@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCHv4 net-next 1/4] net: add a common function to compute
- features from lowers devices
-Message-ID: <sfjjkeub7fmvsktzrx6mmv6zvilno3un665tbqe2punw4azefo@jwuhk23763gc>
-References: <20251014080217.47988-1-liuhangbin@gmail.com>
- <20251014080217.47988-2-liuhangbin@gmail.com>
+        bh=Y0K5zqPBUa6pAT3aN4BIC0pePwm6+irtg+vq3VpmDXw=;
+        b=dVfHq2amJepyAq4CshvY5G7xsf2Q8BOC2E5iXeeyY0OxaLQUUCmS1plA25rr3z/lVD
+         Kzfmd6RQSRUYZv2Gg7l23JqmA0EPHD7tcFBke9B+WdUYPA9v9H0bPfkQU3GyZVT+GQir
+         3017SPrU75cNyl+FCe94CYY3Pt0/LbRKOh/u8qFcOk1MkHcT/ADpldNwg/JvJ6VZ+XXG
+         7JCLtoPmeEtEg1Q5FHEn73RnGB7E1HmGd+QuVz2sC8KcXCXwbnx9jy/4ssEGXuiwBQ/E
+         ET51pjfnWxFN8Rp4S0uUoINu1iNQ5Ht7eYKhUIuVkzZG+Ic+QhSSrhUPWjr0yi8TBWvR
+         rI+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760434851; x=1761039651;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y0K5zqPBUa6pAT3aN4BIC0pePwm6+irtg+vq3VpmDXw=;
+        b=kj355t7IfcA2khm35k+l6cK1QfwGtWPw6um/NIN96MSarySC74JhUX/PqsDcTg+9OY
+         FGJoJndDgjNloFL72z1NoVkEp77gCluWVYEQvtzjrkjmxby2CxTPB+f4G8dsctWau2QK
+         kfPVVfcHryTOGDcLEZwrWpGr0+p5q/tvTL1GkC+mL9vSfpldsyivvOsUApNlkN0YIyVt
+         Cxor6jmz0UMFDD0pP2vMy5O1aPsi03IjaAgUt7Bfl7AAEGRYJlsomi3q8rxvMN/tnAXG
+         hl6+irZSprSuobIC6tOxRw8RpT0Tgl+apN9H2ro0wgrJNcCPrDmWUwq7+NWUCKfYAoI6
+         4k0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUrmxMZl68QPdWqxW3/WH99OhOdYq4SxXUHgFp2gEq5suun1WL5cWVl0pfSW9Mtddoc5aQdSHo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPPJ5oSqcBJjEZLG29gLrbSUq7kmw/ht1IPN7glnPr9Bw1njoQ
+	vJ+YgQRXJ1zJ8dNs4ldt7mIxClTyk2tjBpo62BoDhDiLiCTWC+R3zQxcSKiXXK40z+DgdzuYi1r
+	4dBUH+sB23FwUkTRCq8bDPgbOwq1YSWgZ9rXDPiSU
+X-Gm-Gg: ASbGnctm4Zh7rqXIXDZkeOglGGdAAG/PBHD/lp/S+bfB3M3FOKZSY2tWGtb7a0cUNjm
+	ih5hWt71pIQOCOYvAAAoDUUNQAzdXWN3aPzqNCHLOIV8QX+joLcLsLdHqiLFbk52Ivqw4VwZXlY
+	oeqEzjKsW7kLRbcStdWN++s4V9knGZpjNX5XojrgOoPofRK2ddGHZOqjmrXTmwgueSIVbn16h1T
+	ReZZp1pvDDbEePV2j2AD2u0nyn9U0zI71W/cNxwxWY=
+X-Google-Smtp-Source: AGHT+IFIcauElXf63dvIvtCYlffelgR7gOw7ZLKhFdnOZazAbdT98c9ka9EyWFhYBvRfbrOg3Kp5ADj4VDBMwgtSBb0=
+X-Received: by 2002:ac8:5d0e:0:b0:4d4:ac0e:1d8 with SMTP id
+ d75a77b69052e-4e6ead7c5e5mr304086291cf.80.1760434850713; Tue, 14 Oct 2025
+ 02:40:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251014080217.47988-2-liuhangbin@gmail.com>
+References: <20251013145926.833198-1-edumazet@google.com> <3b20bfde-1a99-4018-a8d9-bb7323b33285@redhat.com>
+ <CANn89iKu7jjnjc1QdUrvbetti2AGhKe0VR+srecrpJ2s-hfkKA@mail.gmail.com>
+ <CANn89iL8YKZZQZSmg5WqrYVtyd2PanNXzTZ2Z0cObpv9_XSmoQ@mail.gmail.com> <ffa599b8-2a9c-4c25-a65f-ed79cee4fa21@redhat.com>
+In-Reply-To: <ffa599b8-2a9c-4c25-a65f-ed79cee4fa21@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Oct 2025 02:40:39 -0700
+X-Gm-Features: AS18NWA1dj4wj0sa5FEYlFgWa2ljToVLzKl2oeJLeQwenPjJ3fwXt1fgIM8frTM
+Message-ID: <CANn89iLyO66z_r0hfY62dFBuhA-WmYcW+YhuAkDHaShmhUMZwQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: better handle TCP_TX_DELAY on established flows
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Tue, Oct 14, 2025 at 10:02:14AM +0200, liuhangbin@gmail.com wrote:
+On Tue, Oct 14, 2025 at 2:38=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
 
-[..]
+> What about using a nf rule to drop all the 'tun0' egress packet, instead
+> of a qdisc?
+>
+> In any case I think the pending patches should be ok.
 
+Or add a best effort, so that TCP can have some clue, vast majority of
+cases is that the batch is 1 skb :)
 
->+#define VIRTUAL_DEV_VLAN_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
-
-
-I don't like the "virtual" naming. In the past, we always tried to avoid
-that for lower-upper devices like bond/team/bridge/others. Soft-device
-was the used term. Please let the "virtual" term for vitrualization,
-would that be possible?
-
-How about "master_upper"? This is already widely used to refer to
-bond/team/bridge/other master soft devices.
-
-MASTER_UPPER_DEV_VLAN_FEATURES?
-
-[..]
-
-
->+void netdev_compute_features_from_lowers(struct net_device *dev, bool update_header)
-
-netdev_compute_master_upper_features?
-
+diff --git a/net/core/dev.c b/net/core/dev.c
+index e281bae9b150..4b938f4d4759 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4226,6 +4226,13 @@ static inline int __dev_xmit_skb(struct sk_buff
+*skb, struct Qdisc *q,
+                        __qdisc_run(q);
+                qdisc_run_end(q);
+        } else {
++               if (!llist_next(ll_list)) {
++                       DEBUG_NET_WARN_ON_ONCE(skb !=3D llist_entry(ll_list=
+,
++
+struct sk_buff,
++                                                                 ll_node))=
+;
++                       rc =3D dev_qdisc_enqueue(skb, q, &to_free, txq);
++                       ll_list =3D NULL;
++               }
+                llist_for_each_entry_safe(skb, next, ll_list, ll_node) {
+                        prefetch(next);
+                        skb_mark_not_on_list(skb);
 
