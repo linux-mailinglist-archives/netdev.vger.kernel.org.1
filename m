@@ -1,369 +1,297 @@
-Return-Path: <netdev+bounces-229047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 810C0BD781C
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:02:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD804BD7852
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:05:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 291574E7271
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 06:02:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B59484F7576
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 06:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10357308F09;
-	Tue, 14 Oct 2025 06:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C832D30DEC0;
+	Tue, 14 Oct 2025 06:04:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gVw2TnHv"
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="feuEu4GR";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LMmTDW13"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-a5-smtp.messagingengine.com (flow-a5-smtp.messagingengine.com [103.168.172.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056D92253A1
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 06:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C3B30CDAB;
+	Tue, 14 Oct 2025 06:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760421755; cv=none; b=cAb1ZUX2WznEFgqrHPJsgB0wlnyqe52vu3p3IWJO1YC2Dcv53pa+A03v1+bxwD6fAECnGssKYbJkYqAiWogExIpaY3kkZ98F1MKMoRKdzelCRljuvOqTj1a2HxDpyWOvZD+SV1GS3w2SiQ5elsYO0QOzKCnSyJGS81YHXkfrxpw=
+	t=1760421897; cv=none; b=OkiEv8+ktHZDGzhravyd/r6qy28b+reRDiexcz3iVdYWsW/blocqZRcGVI0OavFyU5jk08yhGHYOwZkfUc7Q+Tw115US+jU9zmz9U5qPRD9ofy+3B7sWY1Ko45cm4WDqWSZ53ZSPFPYBSgoexSsMftKPVC6LfaULXdC66HboHms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760421755; c=relaxed/simple;
-	bh=+WvPH/mTUVsGMPv5CMilL+BtFHN+XNHyFqUjLMz9ufI=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=DLUZ/GBTPCYSDzHk/5VtE/8H/C7udGqFFdSm56WuEs5tA/DF0s5q0TrNu5l6lm0k+1a08eabYqVADfy6LjwSwS8R9+lZjGo25OQgwdpD4mzijCz3sXr2h3h3LVADqFy7Yd39AltMXFX2scjnLBvD6YOU5KvLayktBRbHeUgwOSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gVw2TnHv; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6399706fd3cso7246388a12.2
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 23:02:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760421752; x=1761026552; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MxIuoKPmbsQGFRUq9Uz0pwlu09QSHSAsCPW55HSmNHs=;
-        b=gVw2TnHvZh8h+qk/p5y6yWJhMozPafYfOCm6jEHOdhTx0xklB3N10G+wuQGmTWFNTY
-         3KHhqnaNMAIuBHq+2xMs0kkwCgsxNahA+B4BEcVHEq+dBK7kbkQvA1J8/6J/qcbRc0T2
-         HgFMbw1Fk1KB0zDRPqRDmNNnz4/+W2A6wWiPlJv4E0byJlkhS/fdSqAXeTRx2DHamvGn
-         vVDPUe/1NyM+bIFvzItn1sC+dw75viaPiAhUqDEGMSwpclVrki4WTmNOjs/r70X6XDpa
-         Pr++CYoOlbV2nJUaGoIb0k9mGZu10yiQ3FJwmXMjmHu0/JbpYgKh3zLnhQntmEZsnB9p
-         pC6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760421752; x=1761026552;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MxIuoKPmbsQGFRUq9Uz0pwlu09QSHSAsCPW55HSmNHs=;
-        b=i7TFlLn82vWAEt9cg6kJUiLCUDyhQvgBQRURgZnnkVUHExZqetCMpSKWKHJyIRBqX7
-         ivv2Xxl/D5qtGAUT81j1yBpKAz3WKcYWlgYVDefDDjZ2S0+7DZ6GsPYX9prKNXtCc78J
-         alLqqlyAJLhnTy1VQpAuD2G8HXMbQIx71pJJtiGd/ujYdbgWY5I3tfKq/aDO3Z/WnvYp
-         iqrq3tEe6GS3hJX+WcIYwGOUCu6mZMq93x3NLqXGqxQquRiPXxz8OeGTrr74tOIJWYGh
-         f2saJXD/VETcHdVah0Ai+Wa7F/88TFCgLlS2RoQru6FzDSt8ogVcSUO9dN4Ttqhk1tMw
-         KENQ==
-X-Gm-Message-State: AOJu0YybUg6eAZNxRT/tYCOX+D6XG2Xd4fHwqBmQ1nUXXApxqThFQCzH
-	kAohq2VQBY00PbA5MYpKjTMvp9XAIGy53wcZEwPnRT9OhPfWF4WRu4auuAPsfQ==
-X-Gm-Gg: ASbGncs/nJCvNStMxR22onlkb6WyO63uXEKCxzt6hyjl5bPaaw+9en9YBuBnLP5KXpC
-	uhBHj0bSud5NyfNXlp1CpDZ+rAVcmYmiFDKWXutT3bRgTDKnRqBjpr90vgpsyWLuNQHH5bhkMgF
-	OPuDfQciy3w8Ghw1TfWbLujKxEFdx7K/rgIdP+LCkLaQFhSKbifiELpxu8uPOkWTpl2CYYuAdUe
-	I3Y0TTnRC8uGhObTGFy2OIq1l3v2/x1B/yHevxUkf4EwU8CsAkX2u5cNM2KDNCiWJdnhFy6K06T
-	XoQRlmU7WOYrL7NcvWGTLjUUCGFLYW4oEF+fjIIgeFnmzpH/09aO2syzLfeD1G+joujGw/h7t+z
-	ad331VJs4uVtJKd4sSOeW1vbdVdJ5c7KEkDM+/h1r/8yOUK0n/FH/sLIqFW1mZnsGpP3qQeFJy4
-	ww33ZXyd44j5kfm9E7byD5es/PvdiClbDGtbH/ugLLcr85qgdzB93b0jRYynKcSndW06R+4LR3N
-	ISdhQ5g
-X-Google-Smtp-Source: AGHT+IGR0EearOhxXIr0J+wNFghRbIPnFCvYklBmj3prjq+bOqw1A+0PGFFoJ9k9+Rf79uEZnCdRaA==
-X-Received: by 2002:a05:6402:2787:b0:639:e04d:b0c4 with SMTP id 4fb4d7f45d1cf-639e04db4dbmr19356514a12.33.1760421752057;
-        Mon, 13 Oct 2025 23:02:32 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f27:2e00:4c84:392f:3bb3:e763? (p200300ea8f272e004c84392f3bb3e763.dip0.t-ipconnect.de. [2003:ea:8f27:2e00:4c84:392f:3bb3:e763])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-63b616d12fesm9868669a12.24.2025.10.13.23.02.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Oct 2025 23:02:31 -0700 (PDT)
-Message-ID: <108b4e64-55d4-4b4e-9a11-3c810c319d66@gmail.com>
-Date: Tue, 14 Oct 2025 08:02:47 +0200
+	s=arc-20240116; t=1760421897; c=relaxed/simple;
+	bh=v2JPSGhSphxT4CRQrxJsBzP2zNqZpcixsb06q7URYzs=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=VU/kFYtaUTW8F+DZGeUYVMHHJtAdauFvyYSFYdIGKYkSy4YygMrdxjogYWrgwCOZ6qPIt9uh7Ub2NQJV2k1EaNqId3dPUg4YJJAEiGPLQdtMFKSgNrQwieRkdzNaTzc55LgFuVzNnKWUV2e1aJPHBCdSc1f1p8T3STov6ONRGaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=feuEu4GR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LMmTDW13; arc=none smtp.client-ip=103.168.172.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailflow.phl.internal (Postfix) with ESMTP id 62E6C13802DE;
+	Tue, 14 Oct 2025 02:04:54 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-10.internal (MEProxy); Tue, 14 Oct 2025 02:04:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
+	1760421894; x=1760429094; bh=E4Iph9Kl8wZz1HAHn20rKGPeYlZdEw1yUQf
+	1mGdkCUQ=; b=feuEu4GRf6dcErALPk+2jItHSg4i5KWiC9i417b4FIhcTbE2y2T
+	+Bt4amVdnCGAM1tUKaufU8N3iC3xA2wxgMF91QjmRsfDtS8TkU58KsBcsHLC3Qe9
+	9uGqg12zMyyNWlr0tHrmSZMAjHsrqR6wDDn9puU8TZhvuKVCpBBV0N4hnJN5njSM
+	BHj+IqFdfGfwsjivQNzH5S2eCArfr2wTYNfe0VVD6mjQGTf1nZkL/z9FmU6wkxeC
+	XP7HcSdYhv3lxXdbaxFn3pGRdVj5H/ibkL+9weFKyTuxGadyOlFat4dNTrwfckpc
+	EQEtGwZGFoj2V5Cu3Q3Qg7NpyQpILU9t7YQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760421894; x=
+	1760429094; bh=E4Iph9Kl8wZz1HAHn20rKGPeYlZdEw1yUQf1mGdkCUQ=; b=L
+	MmTDW13ZQy/vvnXJJHqO2e4Nwp/4f0wIhr5NAnj31qKE+wHoQadph71IrqSc5Ib0
+	lhC6eeRCRQGeEFwXVh03+zoKg7JvrvXHWp4EZblBZwrgx5uc1e3QbyqDIz2/xuRM
+	x58UYYm8Gs2/BlOkdLgAp+C2Ud0eKKK7HOOKvovGP+SYaw8MNisjOrZV9Q+WOQVr
+	FACIlwg4aSWFz83NZUIVVjDgZX3yrjk6q9Sx+4ahYsr/hpjT7Or3pU7QIuTtJpqV
+	mwz8Vk/OvGuxNfinjrygxj11QA1kr2UinaJmSCRd7/tXGKs1xZ9lzd3VsMgSyHLG
+	tetmXGjlWtEDy8ZH9tV3g==
+X-ME-Sender: <xms:_eftaCHyqV6o3FVefhsjNT8IhmMyfFHwk8jZHMhbo-HUFu5X_n6urg>
+    <xme:_eftaEnN6jBrfj20h2AuPNDCuOMyqF6Plg83kg-Wm7c0-k_CfdsL7XEtnlxZx9Zc4
+    vdnWYhYYsNNXJvyiFNgoRvI7Kazc6WaYj_Vgo60bnGRd5AR>
+X-ME-Received: <xmr:_eftaD6dxLXuqheOCQURHeHPfO7bW-CXtJ1AseJtZXeLq0oSGG1WRKKPAy8NkEw4I49DhwHKvB2Po8CEgxiioKrKzekCRYBLjrQ5r26_DkV4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduudeljeeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurheptgfgggfhvfevufgjfhffkfhrsehtjeertddttdejnecuhfhrohhmpefpvghilheu
+    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
+    epudetfefhudevhedvfeeufedvffekveekgfdtfefggfekheejgefhteeihffggfelnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
+    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepudegledpmhhouggvpehsmhht
+    phhouhhtpdhrtghpthhtohephhhprgesiiihthhorhdrtghomhdprhgtphhtthhopehlih
+    hnkhesvhhivhhordgtohhmpdhrtghpthhtoheprhgtuhesvhhgvghrrdhkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopehlihhnuhigqdhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtoheplhhinhhugidqmhhoughulhgvshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopehlihhnuhigqdhmvgguihgrsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
+    hrtghpthhtoheplhhinhhugidqihguvgesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:_eftaCbgmYlvEUe7c8diYxkm08sFcYy0h1FLId3hRvl3Wygr1PpoUA>
+    <xmx:_eftaO0MJ_hLSTek3S8a6e-GF_TCbTx0v6w4rpkXwlvonZGXG2N4kw>
+    <xmx:_eftaNhIc-WZoUYTLfzJpLzI2fsWLLjvzv3kaEG6CxTMcM2aAlX2EQ>
+    <xmx:_eftaFhY4IYteGvByEUJUmCKSZRYVweFZ66sE_nYkeHRJBJf5cUvxA>
+    <xmx:BujtaI-jqBpV57I5Iv3W1WU6_3vCyGvF2hAPelzIt6ARNYBJwHSB75rK>
+Feedback-ID: iab3e480c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 14 Oct 2025 02:04:01 -0400 (EDT)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Doug Berger <opendmb@gmail.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>, Florian Fainelli <f.fainelli@gmail.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: bcmgenet: remove unused platform code
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: NeilBrown <neilb@ownmail.net>
+To: "Byungchul Park" <byungchul@sk.com>
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+ torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+ linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+ linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
+ will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+ joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+ duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+ tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+ amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
+ linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+ minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+ sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+ penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+ ngupta@vflare.org, linux-block@vger.kernel.org, josef@toxicpanda.com,
+ linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org,
+ dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+ dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+ melissa.srw@gmail.com, hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+ chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+ max.byungchul.park@gmail.com, boqun.feng@gmail.com, longman@redhat.com,
+ yunseong.kim@ericsson.com, ysk@kzalloc.com, yeoreum.yun@arm.com,
+ netdev@vger.kernel.org, matthew.brost@intel.com, her0gyugyu@gmail.com,
+ corbet@lwn.net, catalin.marinas@arm.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ luto@kernel.org, sumit.semwal@linaro.org, gustavo@padovan.org,
+ christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
+ lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, rppt@kernel.org,
+ surenb@google.com, mcgrof@kernel.org, petr.pavlu@suse.com,
+ da.gomez@kernel.org, samitolvanen@google.com, paulmck@kernel.org,
+ frederic@kernel.org, neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com,
+ josh@joshtriplett.org, urezki@gmail.com, mathieu.desnoyers@efficios.com,
+ jiangshanlai@gmail.com, qiang.zhang@linux.dev, juri.lelli@redhat.com,
+ vincent.guittot@linaro.org, dietmar.eggemann@arm.com, bsegall@google.com,
+ mgorman@suse.de, vschneid@redhat.com, chuck.lever@oracle.com,
+ okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
+ trondmy@kernel.org, anna@kernel.org, kees@kernel.org,
+ bigeasy@linutronix.de, clrkwllms@kernel.org, mark.rutland@arm.com,
+ ada.coupriediaz@arm.com, kristina.martsenko@arm.com,
+ wangkefeng.wang@huawei.com, broonie@kernel.org, kevin.brodsky@arm.com,
+ dwmw@amazon.co.uk, shakeel.butt@linux.dev, ast@kernel.org,
+ ziy@nvidia.com, yuzhao@google.com, baolin.wang@linux.alibaba.com,
+ usamaarif642@gmail.com, joel.granados@kernel.org,
+ richard.weiyang@gmail.com, geert+renesas@glider.be,
+ tim.c.chen@linux.intel.com, linux@treblig.org,
+ alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+ chenhuacai@kernel.org, francesco@valla.it, guoweikang.kernel@gmail.com,
+ link@vivo.com, jpoimboe@kernel.org, masahiroy@kernel.org,
+ brauner@kernel.org, thomas.weissschuh@linutronix.de, oleg@redhat.com,
+ mjguzik@gmail.com, andrii@kernel.org, wangfushuai@baidu.com,
+ linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+ linux-i2c@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-modules@vger.kernel.org, rcu@vger.kernel.org,
+ linux-nfs@vger.kernel.org, linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH v17 28/47] dept: add documentation for dept
+In-reply-to: <20251013052354.GA75512@system.software.com>
+References: <20251002081247.51255-1-byungchul@sk.com>,
+ <20251002081247.51255-29-byungchul@sk.com>,
+ <175947451487.247319.6809470356431942803@noble.neil.brown.name>,
+ <20251013052354.GA75512@system.software.com>
+Date: Tue, 14 Oct 2025 17:03:58 +1100
+Message-id: <176042183810.1793333.13639772065939276568@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-This effectively reverts b0ba512e25d7 ("net: bcmgenet: enable driver to
-work without a device tree"). There has never been an in-tree user of
-struct bcmgenet_platform_data, all devices use OF or ACPI.
+On Mon, 13 Oct 2025, Byungchul Park wrote:
+> On Fri, Oct 03, 2025 at 04:55:14PM +1000, NeilBrown wrote:
+> > On Thu, 02 Oct 2025, Byungchul Park wrote:
+> > > This document describes the concept and APIs of dept.
+> > >
+> > 
+> > Thanks for the documentation.  I've been trying to understand it.
+> 
+> You're welcome.  Feel free to ask me if you have any questions.
+> 
+> > > +How DEPT works
+> > > +--------------
+> > > +
+> > > +Let's take a look how DEPT works with the 1st example in the section
+> > > +'Limitation of lockdep'.
+> > > +
+> > > +   context X    context Y       context Z
+> > > +
+> > > +                mutex_lock A
+> > > +   folio_lock B
+> > > +                folio_lock B <- DEADLOCK
+> > > +                                mutex_lock A <- DEADLOCK
+> > > +                                folio_unlock B
+> > > +                folio_unlock B
+> > > +                mutex_unlock A
+> > > +                                mutex_unlock A
+> > > +
+> > > +Adding comments to describe DEPT's view in terms of wait and event:
+> > > +
+> > > +   context X    context Y       context Z
+> > > +
+> > > +                mutex_lock A
+> > > +                /* wait for A */
+> > > +   folio_lock B
+> > > +   /* wait for A */
+> > > +   /* start event A context */
+> > > +
+> > > +                folio_lock B
+> > > +                /* wait for B */ <- DEADLOCK
+> > > +                /* start event B context */
+> > > +
+> > > +                                mutex_lock A
+> > > +                                /* wait for A */ <- DEADLOCK
+> > > +                                /* start event A context */
+> > > +
+> > > +                                folio_unlock B
+> > > +                                /* event B */
+> > > +                folio_unlock B
+> > > +                /* event B */
+> > > +
+> > > +                mutex_unlock A
+> > > +                /* event A */
+> > > +                                mutex_unlock A
+> > > +                                /* event A */
+> > > +
+> > 
+> > I can't see the value of the above section.
+> > The first section with no comments is useful as it is easy to see the
+> > deadlock being investigate.  The section below is useful as it add
+> > comments to explain how DEPT sees the situation.  But the above section,
+> > with some but not all of the comments, does seem (to me) to add anything
+> > useful.
+> 
+> I just wanted to convert 'locking terms' to 'wait and event terms' by
+> one step.  However, I can remove the section you pointed out that you
+> thought was useless.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- MAINTAINERS                                   |  1 -
- .../net/ethernet/broadcom/genet/bcmgenet.c    | 20 ++---
- drivers/net/ethernet/broadcom/genet/bcmmii.c  | 75 +------------------
- include/linux/platform_data/bcmgenet.h        | 19 -----
- 4 files changed, 7 insertions(+), 108 deletions(-)
- delete mode 100644 include/linux/platform_data/bcmgenet.h
+But it seems you did it in two steps???
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 07363437c..cf00f6327 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -5111,7 +5111,6 @@ F:	Documentation/devicetree/bindings/net/brcm,unimac-mdio.yaml
- F:	drivers/net/ethernet/broadcom/genet/
- F:	drivers/net/ethernet/broadcom/unimac.h
- F:	drivers/net/mdio/mdio-bcm-unimac.c
--F:	include/linux/platform_data/bcmgenet.h
- F:	include/linux/platform_data/mdio-bcm-unimac.h
- 
- BROADCOM IPROC ARM ARCHITECTURE
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 98971ae4f..d99ef92fe 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -35,7 +35,6 @@
- #include <linux/ip.h>
- #include <linux/ipv6.h>
- #include <linux/phy.h>
--#include <linux/platform_data/bcmgenet.h>
- 
- #include <linux/unaligned.h>
- 
-@@ -3926,7 +3925,6 @@ MODULE_DEVICE_TABLE(of, bcmgenet_match);
- 
- static int bcmgenet_probe(struct platform_device *pdev)
- {
--	struct bcmgenet_platform_data *pd = pdev->dev.platform_data;
- 	const struct bcmgenet_plat_data *pdata;
- 	struct bcmgenet_priv *priv;
- 	struct net_device *dev;
-@@ -4010,9 +4008,6 @@ static int bcmgenet_probe(struct platform_device *pdev)
- 		priv->version = pdata->version;
- 		priv->dma_max_burst_length = pdata->dma_max_burst_length;
- 		priv->flags = pdata->flags;
--	} else {
--		priv->version = pd->genet_version;
--		priv->dma_max_burst_length = DMA_MAX_BURST_LENGTH;
- 	}
- 
- 	priv->clk = devm_clk_get_optional(&priv->pdev->dev, "enet");
-@@ -4062,16 +4057,13 @@ static int bcmgenet_probe(struct platform_device *pdev)
- 	if (device_get_phy_mode(&pdev->dev) == PHY_INTERFACE_MODE_INTERNAL)
- 		bcmgenet_power_up(priv, GENET_POWER_PASSIVE);
- 
--	if (pd && !IS_ERR_OR_NULL(pd->mac_address))
--		eth_hw_addr_set(dev, pd->mac_address);
--	else
--		if (device_get_ethdev_address(&pdev->dev, dev))
--			if (has_acpi_companion(&pdev->dev)) {
--				u8 addr[ETH_ALEN];
-+	if (device_get_ethdev_address(&pdev->dev, dev))
-+		if (has_acpi_companion(&pdev->dev)) {
-+			u8 addr[ETH_ALEN];
- 
--				bcmgenet_get_hw_addr(priv, addr);
--				eth_hw_addr_set(dev, addr);
--			}
-+			bcmgenet_get_hw_addr(priv, addr);
-+			eth_hw_addr_set(dev, addr);
-+		}
- 
- 	if (!is_valid_ether_addr(dev->dev_addr)) {
- 		dev_warn(&pdev->dev, "using random Ethernet MAC\n");
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
-index 573e8b279..ce60b7330 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
-@@ -20,7 +20,6 @@
- #include <linux/of.h>
- #include <linux/of_net.h>
- #include <linux/of_mdio.h>
--#include <linux/platform_data/bcmgenet.h>
- #include <linux/platform_data/mdio-bcm-unimac.h>
- 
- #include "bcmgenet.h"
-@@ -436,23 +435,6 @@ static struct device_node *bcmgenet_mii_of_find_mdio(struct bcmgenet_priv *priv)
- 	return priv->mdio_dn;
- }
- 
--static void bcmgenet_mii_pdata_init(struct bcmgenet_priv *priv,
--				    struct unimac_mdio_pdata *ppd)
--{
--	struct device *kdev = &priv->pdev->dev;
--	struct bcmgenet_platform_data *pd = kdev->platform_data;
--
--	if (pd->phy_interface != PHY_INTERFACE_MODE_MOCA && pd->mdio_enabled) {
--		/*
--		 * Internal or external PHY with MDIO access
--		 */
--		if (pd->phy_address >= 0 && pd->phy_address < PHY_MAX_ADDR)
--			ppd->phy_mask = 1 << pd->phy_address;
--		else
--			ppd->phy_mask = 0;
--	}
--}
--
- static int bcmgenet_mii_wait(void *wait_func_data)
- {
- 	struct bcmgenet_priv *priv = wait_func_data;
-@@ -467,7 +449,6 @@ static int bcmgenet_mii_wait(void *wait_func_data)
- static int bcmgenet_mii_register(struct bcmgenet_priv *priv)
- {
- 	struct platform_device *pdev = priv->pdev;
--	struct bcmgenet_platform_data *pdata = pdev->dev.platform_data;
- 	struct device_node *dn = pdev->dev.of_node;
- 	struct unimac_mdio_pdata ppd;
- 	struct platform_device *ppdev;
-@@ -511,8 +492,6 @@ static int bcmgenet_mii_register(struct bcmgenet_priv *priv)
- 	ppdev->dev.parent = &pdev->dev;
- 	if (dn)
- 		ppdev->dev.of_node = bcmgenet_mii_of_find_mdio(priv);
--	else if (pdata)
--		bcmgenet_mii_pdata_init(priv, &ppd);
- 	else
- 		ppd.phy_mask = ~0;
- 
-@@ -594,58 +573,6 @@ static int bcmgenet_mii_of_init(struct bcmgenet_priv *priv)
- 	return 0;
- }
- 
--static int bcmgenet_mii_pd_init(struct bcmgenet_priv *priv)
--{
--	struct device *kdev = &priv->pdev->dev;
--	struct bcmgenet_platform_data *pd = kdev->platform_data;
--	char phy_name[MII_BUS_ID_SIZE + 3];
--	char mdio_bus_id[MII_BUS_ID_SIZE];
--	struct phy_device *phydev;
--
--	snprintf(mdio_bus_id, MII_BUS_ID_SIZE, "%s-%d",
--		 UNIMAC_MDIO_DRV_NAME, priv->pdev->id);
--
--	if (pd->phy_interface != PHY_INTERFACE_MODE_MOCA && pd->mdio_enabled) {
--		snprintf(phy_name, MII_BUS_ID_SIZE, PHY_ID_FMT,
--			 mdio_bus_id, pd->phy_address);
--
--		/*
--		 * Internal or external PHY with MDIO access
--		 */
--		phydev = phy_attach(priv->dev, phy_name, pd->phy_interface);
--		if (IS_ERR(phydev)) {
--			dev_err(kdev, "failed to register PHY device\n");
--			return PTR_ERR(phydev);
--		}
--	} else {
--		/*
--		 * MoCA port or no MDIO access.
--		 * Use fixed PHY to represent the link layer.
--		 */
--		struct fixed_phy_status fphy_status = {
--			.link = 1,
--			.speed = pd->phy_speed,
--			.duplex = pd->phy_duplex,
--			.pause = 0,
--			.asym_pause = 0,
--		};
--
--		phydev = fixed_phy_register(&fphy_status, NULL);
--		if (IS_ERR(phydev)) {
--			dev_err(kdev, "failed to register fixed PHY device\n");
--			return PTR_ERR(phydev);
--		}
--
--		/* Make sure we initialize MoCA PHYs with a link down */
--		phydev->link = 0;
--
--	}
--
--	priv->phy_interface = pd->phy_interface;
--
--	return 0;
--}
--
- static int bcmgenet_mii_bus_init(struct bcmgenet_priv *priv)
- {
- 	struct device *kdev = &priv->pdev->dev;
-@@ -656,7 +583,7 @@ static int bcmgenet_mii_bus_init(struct bcmgenet_priv *priv)
- 	else if (has_acpi_companion(kdev))
- 		return bcmgenet_phy_interface_init(priv);
- 	else
--		return bcmgenet_mii_pd_init(priv);
-+		return -EINVAL;
- }
- 
- int bcmgenet_mii_init(struct net_device *dev)
-diff --git a/include/linux/platform_data/bcmgenet.h b/include/linux/platform_data/bcmgenet.h
-deleted file mode 100644
-index d8f873862..000000000
---- a/include/linux/platform_data/bcmgenet.h
-+++ /dev/null
-@@ -1,19 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#ifndef __LINUX_PLATFORM_DATA_BCMGENET_H__
--#define __LINUX_PLATFORM_DATA_BCMGENET_H__
--
--#include <linux/types.h>
--#include <linux/if_ether.h>
--#include <linux/phy.h>
--
--struct bcmgenet_platform_data {
--	bool		mdio_enabled;
--	phy_interface_t	phy_interface;
--	int		phy_address;
--	int		phy_speed;
--	int		phy_duplex;
--	u8		mac_address[ETH_ALEN];
--	int		genet_version;
--};
--
--#endif
--- 
-2.51.0
+If you think the middle section with some but not all of the comments
+adds value (And maybe it does - maybe I just haven't seen it yet), the
+please explain what value is being added at each step.
 
+It is currently documented as:
+
+ +Adding comments to describe DEPT's view in terms of wait and event:
+
+then
+
+ +Adding more supplementary comments to describe DEPT's view in detail:
+
+Maybe if you said more DEPT's view so at this point so that when we see
+the supplementary comments, we can understand how they relate to DEPT's
+view.
+
+
+> 
+> > > +
+> > > +   context X    context Y       context Z
+> > > +
+> > > +                mutex_lock A
+> > > +                /* might wait for A */
+> > > +                /* start to take into account event A's context */
+> > 
+> > What do you mean precisely by "context".
+> 
+> That means one of task context, irq context, wq worker context (even
+> though it can also be considered as task context), or something.
+
+OK, that makes sense.  If you provide this definition for "context"
+before you use the term, I think that will help the reader.
+
+
+> > If the examples that follow It seems that the "context" for event A
+> > starts at "mutex lock A" when it (possibly) waits for a mutex and ends
+> > at "mutex unlock A" - which are both in the same process.  Clearly
+> > various other events that happen between these two points in the same
+> > process could be seen as the "context" for event A.
+> > 
+> > However event B starts in "context X" with "folio_lock B" and ends in
+> > "context Z" or "context Y" with "folio_unlock B".  Is that right?
+> 
+> Right.
+> 
+> > My question then is: how do you decide which, of all the event in all
+> > the processes in all the system, between the start[S] and the end[E] are
+> > considered to be part of the "context" of event A.
+> 
+> DEPT can identify the "context" of event A only *once* the event A is
+> actually executed, and builds dependencies between the event and the
+> recorded waits in the "context" of event A since [S].
+
+So a dependency is an ordered set of pairs of "context" and "wait" or
+"context" and "event".  "wait"s and "event"s are linked by some abstract
+identifier for the event (like lockdep's lock classes).
+How are the contexts abstracted. Is it just "same" or "different"
+
+I'll try reading the document again and see how much further I get.
+
+Thanks,
+NeilBrown
 
