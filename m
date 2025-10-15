@@ -1,185 +1,297 @@
-Return-Path: <netdev+bounces-229692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3634BDFD54
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:21:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED978BDFDA2
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:28:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84B5918958BC
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:21:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9ABD61A2262C
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29852DFF18;
-	Wed, 15 Oct 2025 17:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E342C33A015;
+	Wed, 15 Oct 2025 17:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ESET1QWN"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="Xnn2uZZW";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gkTihk1+"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15AAA21B9F5;
-	Wed, 15 Oct 2025 17:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A4B1C3C18;
+	Wed, 15 Oct 2025 17:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760548867; cv=none; b=g4o8SQVzKf6HUDxS/B+WWg4HrB/qKnZWyG7yM1WkfWZB+ax1vx0FAdziIZKEG+x90hZfodDiq6LbSsTDMqcboij+dfBdVu091m9OAsza4FMOu/4OfUNWu/6gtyWusRXhz4ONxbdo3E5PN2UWrHAtQ1Lezn2u++tqicj3U/w7uBo=
+	t=1760549303; cv=none; b=RqqwWtaVPd4ifQwb7ZHgQtgrtZTtwhDUWJnstJyHeiDI1ZAFQMZ+bQjRv+rjZ+Y+2GATjuiy0s3zIbXwuF5W2b3uAe8J+UWogS9hts2Gfgytd5V7C/KRPfGCdA53WA3a0lZ6cDuIhRngJvZyKd3l/njjKHXSBsqSWX4/y0EYWOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760548867; c=relaxed/simple;
-	bh=6yQ2mN4Lteo3bR5j0fbnB+JIR14pL0OnjYwcg0ikrso=;
+	s=arc-20240116; t=1760549303; c=relaxed/simple;
+	bh=KLAu0WkbxTquj5UduIpU9D4+mgxcmJNvrmsIXpRUhts=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N8TS1CcrEHBqFlum78df4+EP9ztdg7CmHCUR/r9Wn23R/3IwwLwIs9CA0Q4Rm6WeQtLOHea08knYwsDve6Lw4K6FnfkHJcOeU0i7HFrJNurK2wR76aaSHzLNzAp+t7NoyIk2apmrSk5psHUj33kPJGgwKEozM/uQsbyoZLTmAAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ESET1QWN; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=N6aNZCIcI2zN3R1/BCJoGwM/7sTPHIJJPl1PJ4HpJBE=; b=ESET1QWNsqJm/GD1mJtk4L3OD+
-	OXmTrnMQv+PAWuxEh9Ta/Wij7meIB2/sHARKmpQq3g9Kyj5C29OuLWc9niG5RrzQDnlsru6vMVECW
-	X2wNF+Ds/0F4bn1vTpVjApZu7e8vEpesWB3e2subPPAFivrKyA2mA7KNcUPleqCl9B7sS7IFRu2C/
-	kNaGX59mFWpcqwzYs1XmRjzfucorGGk61pSh9tcapwwY4pmbHvF7US7TwWRrG5wfU35PWTO/thLNf
-	iI0AggyCB4fbWGSJAb5HxTvQNz/O0p0GM2+nqTZheEr2O+LzU6YzL7ogAuKmt8S1ki5v5Fd+of3Io
-	K5dLpsEg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47568)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1v95B7-000000005Fe-34CR;
-	Wed, 15 Oct 2025 18:20:45 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1v95B2-000000002RJ-3ZAm;
-	Wed, 15 Oct 2025 18:20:40 +0100
-Date: Wed, 15 Oct 2025 18:20:40 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+	 Content-Type:Content-Disposition:In-Reply-To; b=QjTNhN5LlBR9s1hyxpPbBACDCRP18OXt83SuMH39EnQYV3SmiTF5BOuMdhr49JyJNktDfcV+h8Y5hBwMbmZ347qarOzw1nFNj+tDwl7f80CpL/9+x2aOXQS7tAF0u4+FlLYx6eRDkoUfcfWJdMaLSaBcKy2G9s69sjbhHXmO+sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=Xnn2uZZW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gkTihk1+; arc=none smtp.client-ip=202.12.124.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfout.stl.internal (Postfix) with ESMTP id ABF5A1D000B4;
+	Wed, 15 Oct 2025 13:28:19 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-12.internal (MEProxy); Wed, 15 Oct 2025 13:28:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1760549299;
+	 x=1760635699; bh=uxcF+OfUHtuRDJBNiFRogPSSql7FFz2iQUFoqpX5I9A=; b=
+	Xnn2uZZWVGZqlBaDMyuZ6VI+5w3mcoAUvQgBxttKlaaaRKOJYdJseMth7LBOHy6q
+	ph9xxOIZX2tfHqDaQ1ONRWnhcetVfIlBkZp1QTsEpS/WSpgri8sUq1sFVpyolnnW
+	1lRGPAOZgpwEwDSKMZV2K9Np9iMEDuxfB883JV1Yy1JDDzWguHsEASmpEOmU/OlI
+	8jIX9MMUtntmriVBcaKunU6FoOd49EMPI7pLjO1J4FuQ7XZdZI6Ttt9963NMwTua
+	pVOa+vuUJU9355ph8A5aHIRVKLrQ8cy3jr6+F7+EfBzcCE8bX++Z/DabnFgv3H5/
+	U/dITq4THg9fFBPpFJYAiw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760549299; x=
+	1760635699; bh=uxcF+OfUHtuRDJBNiFRogPSSql7FFz2iQUFoqpX5I9A=; b=g
+	kTihk1+WS5RN+TCnGVAuAw9bHT3cCmEYz2R70ZbAe4WXMoZ7V5f89T9XFJhcQd9n
+	2twKJGJQwG8FwfltgqOMNJMOPkt/qY79DmmSlpIhSN1z657lfDFikxXQcZUbFc00
+	N5jTKyNIZBEz9HtygI+WKA5DZ4XZHABwPSF7BqL58WIbWBgjDO/IeVWJA+q6PrJ6
+	2Qlj598eWApJQl17+gwMkO7H6qNqxHcxuZguNVgPhYy/KzUyBvEGwtsF70dSlW1Q
+	4ZGOsT6mhyP0h+PcGes8/2Z1oIL1adE4laScUFv5CtDiPuQnBw7+hGQG3bC6peP+
+	q1V4YDrgE9CPJiYM2TLDQ==
+X-ME-Sender: <xms:stnvaHXOF_iP5kl8BcHKaq414OHVk1T-ZQ3xvxKR426YdAQhkE8QGg>
+    <xme:stnvaLaNzePPZ6q27NNqPeC-W7IhzYbTU_43zVuANUaHNFIjRqJE1uDHr27ODJfQ1
+    L69di3XG5cRZ9Q-YTUau_TssoPFPjvP3_7Mz_vb-sTNDFbK3RfHyQ>
+X-ME-Received: <xmr:stnvaI4YJQNRk9u-8_lkDU-VF_D0tH5Lq60OqTr-Wb-NyNAaKakghgulFAO8GxVrtl7-UYPnO4nVdE5CwI29kBSGoY3mwAs>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdegtdduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhklhgr
+    shcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugesrhgrghhnrg
+    htvggthhdrshgvqeenucggtffrrghtthgvrhhnpeevteegtddvvdfhtdekgefhfeefheet
+    heekkeegfeejudeiudeuleegtdehkeekteenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggvrhhluhhnugesrhgrghhn
+    rghtvggthhdrshgvpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpd
+    hrtghpthhtohepphhrrggshhgrkhgrrhdrtghsvghnghhgsehgmhgrihhlrdgtohhmpdhr
+    tghpthhtohepphgruhhlsehpsggrrhhkvghrrdguvghvpdhrtghpthhtoheprghnughrvg
+    ifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghm
+    lhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
+    dprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggv
+    nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehsvghrghgvihdrshhhthihlhihoh
+    hvsegtohhgvghnthgvmhgsvgguuggvugdrtghomhdprhgtphhtthhopehnvghtuggvvhes
+    vhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:stnvaEwkv-et2aou0xaC26sh9W-E0OF3YkX4Z3kr8vzt00QSUme08A>
+    <xmx:stnvaBoIdZYIzWWQ4jl8atJnqc32Y4A6u-IV9Mt-cuMDBTb1rq8qlA>
+    <xmx:stnvaO0MEwnZWG4AJG2OFqjaDPAbv8VMGUsqMt1IqL8kXEiMoby4EQ>
+    <xmx:stnvaCDtbae2Qb9k34FccCPnvwMAfm3yuf1-4cASv8jHDITvPWfAIA>
+    <xmx:s9nvaKRIh6aAROuVrR_dVzF1H-TWh1Wh3NpMzeF1VZKwr9w0rTk6czye>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 15 Oct 2025 13:28:18 -0400 (EDT)
+Date: Wed, 15 Oct 2025 19:28:15 +0200
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] net: stmmac: Move subsecond increment
- configuration in dedicated helper
-Message-ID: <aO_X6Hv2R_mgpOXR@shell.armlinux.org.uk>
-References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
- <20251015102725.1297985-2-maxime.chevallier@bootlin.com>
- <aO-4hnUINpQ0JORE@shell.armlinux.org.uk>
- <27800f8c-eb0d-41c2-9e45-b45cf1767c23@bootlin.com>
+	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 3/3] net: ravb: Enforce descriptor type ordering to
+ prevent early DMA start
+Message-ID: <20251015172815.GG439570@ragnatech.se>
+References: <20251015150026.117587-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251015150026.117587-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251015155622.GE439570@ragnatech.se>
+ <CA+V-a8vudn0=kSnaAT4qDCcRtVShmS+n2A4GOQH2iogYizUBzw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <27800f8c-eb0d-41c2-9e45-b45cf1767c23@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+V-a8vudn0=kSnaAT4qDCcRtVShmS+n2A4GOQH2iogYizUBzw@mail.gmail.com>
 
-On Wed, Oct 15, 2025 at 06:20:03PM +0200, Maxime Chevallier wrote:
-> Hi Russell,
+Hello,
+
+On 2025-10-15 18:01:13 +0100, Lad, Prabhakar wrote:
+> Hi Niklas,
 > 
-> On 15/10/2025 17:06, Russell King (Oracle) wrote:
-> > On Wed, Oct 15, 2025 at 12:27:21PM +0200, Maxime Chevallier wrote:
-> >> +static void stmmac_update_subsecond_increment(struct stmmac_priv *priv)
-> >> +{
-> >> +	bool xmac = priv->plat->has_gmac4 || priv->plat->has_xgmac;
-> > 
-> > Just to say that I have patches that get rid of these has_xxx flags for
-> > the cores, and these changes (and the additional platform glue patches
-> > that have been posted) will conflict with them.
+> Thank you for the review.
 > 
-> Fair, I was in your position not so long ago :)
+> On Wed, Oct 15, 2025 at 4:56 PM Niklas Söderlund
+> <niklas.soderlund@ragnatech.se> wrote:
+> >
+> > Hi Prabhakar,
+> >
+> > Thanks for your work.
+> >
+> > On 2025-10-15 16:00:26 +0100, Prabhakar wrote:
+> > > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> > >
+> > > Ensure TX descriptor type fields are written in a safe order so the DMA
+> > > engine does not begin processing a chain before all descriptors are
+> > > fully initialised.
+> > >
+> > > For multi-descriptor transmissions the driver writes DT_FEND into the
+> > > last descriptor and DT_FSTART into the first. The DMA engine starts
+> > > processing when it sees DT_FSTART. If the compiler or CPU reorders the
+> > > writes and publishes DT_FSTART before DT_FEND, the DMA can start early
+> > > and process an incomplete chain, leading to corrupted transmissions or
+> > > DMA errors.
+> > >
+> > > Fix this by writing DT_FEND before the dma_wmb() barrier, executing
+> > > dma_wmb() immediately before DT_FSTART (or DT_FSINGLE in the single
+> > > descriptor case), and then adding a wmb() after the type updates to
+> > > ensure CPU-side ordering before ringing the hardware doorbell.
+> > >
+> > > On an RZ/G2L platform running an RT kernel, this reordering hazard was
+> > > observed as TX stalls and timeouts:
+> > >
+> > >   [  372.968431] NETDEV WATCHDOG: end0 (ravb): transmit queue 0 timed out
+> > >   [  372.968494] WARNING: CPU: 0 PID: 10 at net/sched/sch_generic.c:467 dev_watchdog+0x4a4/0x4ac
+> > >   [  373.969291] ravb 11c20000.ethernet end0: transmit timed out, status 00000000, resetting...
+> > >
+> > > This change enforces the required ordering and prevents the DMA engine
+> > > from observing DT_FSTART before the rest of the descriptor chain is
+> > > valid.
+> > >
+> > > Fixes: 2f45d1902acf ("ravb: minimize TX data copying")
+> > > Cc: stable@vger.kernel.org
+> > > Co-developed-by: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
+> > > Signed-off-by: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
+> > > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> > > ---
+> > >  drivers/net/ethernet/renesas/ravb_main.c | 14 +++++++++-----
+> > >  1 file changed, 9 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> > > index a200e205825a..2a995fa9bfff 100644
+> > > --- a/drivers/net/ethernet/renesas/ravb_main.c
+> > > +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> > > @@ -2211,15 +2211,19 @@ static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+> > >
+> > >               skb_tx_timestamp(skb);
+> > >       }
+> > > -     /* Descriptor type must be set after all the above writes */
+> > > -     dma_wmb();
+> > > +
+> > > +     /* For multi-descriptors set DT_FEND before calling dma_wmb() */
+> > >       if (num_tx_desc > 1) {
+> > >               desc->die_dt = DT_FEND;
+> > >               desc--;
+> > > -             desc->die_dt = DT_FSTART;
+> > > -     } else {
+> > > -             desc->die_dt = DT_FSINGLE;
+> > >       }
+> > > +
+> > > +     /* Descriptor type must be set after all the above writes */
+> > > +     dma_wmb();
+> > > +     desc->die_dt = (num_tx_desc > 1) ? DT_FSTART : DT_FSINGLE;
+> >
+> > IMHO it's ugly to evaluate num_tx_desc twice. I would rather just open
+> > code the full steps in each branch of the if above. It would make it
+> > easier to read and understand.
+> >
+> I did this just to avoid compiler optimizations. With the previous
+> similar code on 5.10 CIP RT it was observed that the compiler
+> optimized code in such a way that the DT_FSTART was written first
+> before DT_FEND while the DMA was active because of which we ran into
+> DMA issues causing QEF errors.
+
+I was thinking of something like
+
+  /* Descriptor type must be set after all the above writes */
+  dma_wmb();
+
+  if (num_tx_desc > 1) {
+          desc->die_dt = DT_FEND;
+          desc--;
+	  /* For multi-descriptors ensure DT_FEND before start
+           * TODO: Add explanation about compiler optimised code etc.
+           */
+          dma_wmb();
+          desc->die_dt = DT_FSTART;
+  } else {
+          desc->die_dt = DT_FSINGLE;
+  }
+
+
+Would make new new special case clearer to understand. And if we figure 
+out different way of doing it it's very clear why the second dma_wmb() 
+is needed. But after writing it out I'm not so sure anymore, maybe 
+adding a temporary variable instead would make it a clearer read.
+
+    u8 die_dt = DT_FSINGLE;
+
+    /* For multi-descriptors ensure DT_FEND before DT_FEND
+     * TODO: Add explanation about compiler optimised code etc.
+     */
+    if (num_tx_desc > 1) {
+        desc->die_dt = DT_FEND;
+        desc--;
+        die_dt = DT_FSTART;
+    }
+
+    /* Descriptor type must be set after all the above writes */
+    dma_wmb();
+    desc->die_dt = die_dt;
+
+I think my main complaint is that evaluating num_tx_desc > 1 multiple 
+times makes the code read as stuff was just thrown into the driver until 
+a test-case passed without understanding the root cause.
+
 > 
-> For this particular series, it should be straightforward to fix the
-> conflict, but for the pending new glue divers we'll have to
-> find the sweet spot for these changes.
+> > > +
+> > > +     /* Ensure data is written to RAM before initiating DMA transfer */
+> > > +     wmb();
+> >
+> > All of this looks a bit odd, why not just do a single dma_wmb() or wmb()
+> > before ringing the doorbell? Maybe I'm missing something obvious?
+> >
+> This wmb() was mainly added to ensure all the descriptor data is in
+> RAM. The HW manual for RZ/G1/2, R-Car Gen1/2 and RZ/G2L family
+> mentions that we need to read back the last written descriptor before
+> triggering the DMA. Please let me know if you think this can be
+> handled differently.
+
+Have you observed any issues without the wmb() here?
+
+What I'm trying to understand is why a new barrier is needed here when 
+it have worked without one before. I'm likely just slow but what I'm 
+trying to grasp is the need for the intermittent dma_wmb() above in 
+relation to this one.
+
+Should it not be, setup the descriptors, barrier to ensure it's in RAM, 
+ring doorbell. The staggered method of setup descriptors, barrier, setup 
+more descriptors, barrier, ring doorbell is what confuses me, I think 
+:-)
+
 > 
-> Maybe send it as an RFC so that people can see what to expect ?
-
-My experience of sending RFCs is the engagement is sadly low to non-
-existent, leading to the question of whether sending RFCs has any
-use at all. I'm pretty fed up with the whole mainline kernel process,
-trying to get engagement from people, that I question why I bother
-most of the time.
-
-> > Given the rate of change in stmmac, at some point we're going to have
-> > to work out some way of stopping stmmac development to get such an
-> > invasive cleanup change merged
+> Cheers,
+> Prabhakar
 > 
-> Agreed.
-> 
->  - but with my variability and pressures
-> > on the time I can spend even submitting patches, I've no idea how that
-> > will work... I was going to send them right at the start of this
-> > cycle, but various appointments on Monday and Tuesday this week plus
-> > work pressures prevented that happening.
-> 
-> To give your more visibility, that's the only work I plan to do on
-> stmmac for that cycle, the rest is going to be phy_port,
-> and probably some netdevsim-phy.
-
-I'd prefer that my five patch series I've just sent out is merged
-(the patches I'm talking about w.r.t. has_xxx follow immediately
-after these in my queue.) However, I don't think there's any
-conflicts between the five I've sent out and these changes looking
-at their overall diffs. That said, pushing out loads of patches in
-one day isn't helpful to the already overworked reviewers.
-
-> Do you plan to send the next round of PCS stuff next, or the cleanups
-> for the has_xxx flags you were mentioning ?
-
-It depends whether there's any conflicting changes. I have such a
-backlog that I'm trying to send out as many non-conflicting netdev
-related topics as I can to get the maximum merged when I have the
-opportunity, even if the topics end up touching the same files.
-I just totalled up the backlog - it's around 120 stmmac related
-patches (including adding the phylink core WoL support), plus about
-20 for marvell PTP. Eek! :/
-
-When one has so many patches, "what to send out next" becomes a major
-decision, and really depends on previous patch set progress.
-
-As you explicitly ask about the PCS stuff and cleanups, I've sent
-the first batch (which is the bulk) of PCS stuff today, and non-
-overlapping cleanup changes.  If the cleanup changes go in, then
-the next tranch of cleanups will have the has_xxx change in.
-
-If the PCS changes go in, then I'll send out the next two patches
-which move the PCS interrupt control over to phylink. After that
-comes the potentially regression inducing change - making stmmac's
-PCS follow what phylink requests of it. I'm expecting that to cause
-trouble, but I have no confidence that it'll get enough testing to
-uncover issues before being merged. This change really needs testing
-on those platforms that use the DWMAC integrated PCS (not xpcs).
-
-If all goes well with the patches I've sent today, then I'm expecting
-them to be merged over this coming weekend. That means the next patches
-will be sent early next week.
-
-So... if your changes can be merged before or around the time that my
-5-patch cleanup gets merged, I can rebase my changes on top, but if
-your patch set needs re-posting, I suggest we have another discussion
-how we proceed.
-
-As mentioned, I'm aware that there are other patches that have already
-been submitted that add platform glue that reference the has_xxx stuff,
-so if these get merged, a rebase is going to be required. (annoyingly,
-this will be high-risk because of getting the compile coverage to
-catch every reference.. unless I remember to grep for them after
-rebasing.)
+> > >       ravb_modify(ndev, TCCR, TCCR_TSRQ0 << q, TCCR_TSRQ0 << q);
+> > >
+> > >       priv->cur_tx[q] += num_tx_desc;
+> > > --
+> > > 2.43.0
+> > >
+> >
+> > --
+> > Kind Regards,
+> > Niklas Söderlund
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Kind Regards,
+Niklas Söderlund
 
