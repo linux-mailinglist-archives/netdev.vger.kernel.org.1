@@ -1,183 +1,125 @@
-Return-Path: <netdev+bounces-229445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7276BDC58F
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 05:32:45 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F61CBDC5B0
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 05:36:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3FAA3351E2B
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 03:32:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 973E04E3133
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 03:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E6C271A71;
-	Wed, 15 Oct 2025 03:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 543E129BDA9;
+	Wed, 15 Oct 2025 03:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RdSVyHs2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LfiZNw19"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB1C24BD04
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 03:32:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3E721ABAA
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 03:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760499160; cv=none; b=KJuz+BJELZ03cjRgFwQZBHJTSt9cT41ahGvg9BBMd66khLevrWNHU22NOv6rw5XVeyFof7m2zOB2mwNoLhj6BVKj93FtxvJuTztJCo5FSo30oVIJkQDslme3lTFu0jlWAXVDyalcldfJh+WKBe+4GSnE1NaelEiJ8R3zdzV6rIM=
+	t=1760499389; cv=none; b=T5oAwETorMpp9H2Ou4RuPYljjmC1RZ2KoGNPKzjz1SSRnZEnbaXsw/ShSqlAJ+CHditOddLfJoMgoZyb4etyb/qJvP9AmfqbWbatlemrpDVRdv1QfW/Yp3jBoZz3gmZoDPNJ1q15pj2Obysdqan/EnHa9yY6J5XGoSdUh7hHAls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760499160; c=relaxed/simple;
-	bh=Pz6nngEdfPUUO5xvQ/zWhuJRUfr2ha7g58JGlqumYAo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qlmWnsK1hSrP/WZzCiLaJDb9WUnl8EyCJdMVOHPzlKGY6HaffmcYDdt9Byb6GWu/pVOLF1dlaNzfGB2ph4mmnLCAuW2OlVTiGCnEYaz21Dn41XDoifN+kHyJiECWpgD6H5PAuMSWvHpJ6NlSHaf6D8w7rXv51tEIJsyRQOibjjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RdSVyHs2; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b6271ea3a6fso3898283a12.0
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 20:32:37 -0700 (PDT)
+	s=arc-20240116; t=1760499389; c=relaxed/simple;
+	bh=ZRiPWlChbTX8QD34/GocV2uiR6hTkWmH7awH8K5lg+A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Znd6CWNoNFDHNhdpzqOTChmXNwcXfcemARL70Ci/U1+YVWrI7KwruRm5GL67h2liD666QGSqcwCxSpHYnta8GZ99WZ7ElLTkgG0CTWKAPdNs8DEWz1JrT4FNDMnb2aEmh53tRWZ2UeXphFEmg9vqg7DRCl4CK1SQtuUEZityS2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LfiZNw19; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b49c1c130c9so3850930a12.0
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 20:36:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760499157; x=1761103957; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hn+FugEl89PAJ/jo6uI9O6Ew3xgKbFJ9DgRqOoYyfr4=;
-        b=RdSVyHs2cq04HykmFrwHmNZaZxPbsqK18wFfIJIJIg8HAEoqdSkTc4O1obMF8NcpIh
-         EnRB+Unk4z0xIlhg+rR1rc9B8HanPEUNQ/JMYOhBQtUFpRJisW57vAglmEFBbK5+zuh8
-         uuber3ChszA4srA9CQkcqMOqc/7hQPuLAgl8qzj96zTehMQFso4jmonAGh26o/U+yKXH
-         3DhM0z7l9/rLrPt2Qr9cr97BeVTFmtb/S2ZUpQOtDftiVohmQ2uqJyHW49wtRk2srx1w
-         VJiOn9AYIO0r7teJvke2xZO32nC3s/IL7xFQQW3UKrPn7DIwh/hva9B3w4SjUaCXg5cC
-         L6IQ==
+        d=gmail.com; s=20230601; t=1760499387; x=1761104187; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jklX+1/Pw1F3UPnYdJ4RZq1dg6P2hKnec2uCFgxHyYI=;
+        b=LfiZNw19QhmDut1r2q5uX8DibQUGpAm9Hq6uFmUZ9PGGu7efnStnxp8syYwj2asH35
+         GU7aZ9C0KUreIJn6FZ/u3zqyq3DkAYt0uF54E9PCptb0SA7Czu7okaShaW+ylm/n0oph
+         MR5d1qPOVxEwDvid6kXwQTaRMsmoJMqfgc29SxbCJRQfiz8xBTfo7HFQ8wdF1lHxSKcg
+         PFLsCXB2on//qZwk8hz7oE14M5AZuQUT/geX51Hd4kGgcwprIlO2tWUFYqTqDSY4SOdZ
+         xzvHyGML0/o2DLCC64wxpBDtwrBpTIi3xdGwRkkc1UdbSJ82uS0zDoA4ipBmb7Z8443c
+         ETXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760499157; x=1761103957;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hn+FugEl89PAJ/jo6uI9O6Ew3xgKbFJ9DgRqOoYyfr4=;
-        b=h/knbH/N7jIx1X4z2UiY+IChDoYdR4HoENbEDYRq+5KpfNMUzawixTRxgFjpmR6aTD
-         JVf2lvsPT2I5qHC5zYFQDEdrFS2+jpZ/s3popT2eYIPRJinzmWrC4B8QXeO8SF2DXvCx
-         xyQPnmR2brSg0enaLRGfgU5Q91/Gg16G3BDLladVYnC3dCVIO6L5f3/QtrIA+b8g0I9w
-         ZVCj2DRYgrPl7zC4RLv2/V03S3CRCyuzconuYMXlfqFAwwlVHO0DV62YMXetVb8hvpqK
-         ivP80RAU1K3Nq0r3CrKpXcnQtn/0wQ1iVqNMbiY946gS9vDKy7jt/pC0kmk6q/+E3gME
-         Gu9g==
-X-Forwarded-Encrypted: i=1; AJvYcCX5ppRtwDYxnQmyeXMCV+i4l7th2sIUhRKsqwGo/qA5p0iwpX+AczYEw0tYrKKd3jvj6nebu1Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9s3lNuLXK+GAei78o0eh+heCLL+5LPlG+I3ce3hvhYam/wUhE
-	HzmHsT9+9YY96g67PLaz4DvKO0a7dOcl7pdnLH0+7TPLcvaHLDIFYG/gT5w7LX/mLNlRvh1ChGF
-	OVLETvJXkgLxixN893kVWWf4BwNr0QzoXVnJECPc5
-X-Gm-Gg: ASbGncsB79VRPT77IVQuxW20VxQ4c//T29Gu8gFhG18tYuGuLXMbxADbSLyxBbNAlLF
-	0HloqckgvDJdnmKbRnNh7K+FkJK3QOyE5dsUQ8zarr5zKzxRr4xWDSxO4pGsdKwOCKfJN4rVT6D
-	uSw8/gtnPxm4xQ9+ytVQgzbgNM2BoJZKLpG0NzrUJgMwnO6K8U14RGGUOdTSG1zrJfMiM/1xsb0
-	6uhsXjFsVl4ICQOap9QzqkRf7ZMoQOztcyRex7GwGjN7aJX+YSyR/M4jmVO+BxP7Spk639CyGc=
-X-Google-Smtp-Source: AGHT+IG0/+UHUfYVfe7gRzeMwx4QZHQVm5sQlY3riYJh0Y38oTn1O05miGuUVfmHNrFj2veLWx2PQIsyGzpLa3wuuIs=
-X-Received: by 2002:a17:903:faf:b0:26a:ac66:ef3f with SMTP id
- d9443c01a7336-290272161e2mr295799995ad.8.1760499156996; Tue, 14 Oct 2025
- 20:32:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760499387; x=1761104187;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jklX+1/Pw1F3UPnYdJ4RZq1dg6P2hKnec2uCFgxHyYI=;
+        b=W/2KaWhuEKg9kYXyFFZmrhjIIGYy0QoJH+fBruHv97N1pYizDawfirNPNNzWtHlG9h
+         I6cSe6rPjliUhZuT5dQfOJGTooetChvTdePGAypRSLcQbvq+ha9RBwsPnyipc11zzgPB
+         EkDXJ+KWbfyO7Rl9Tv561VWb/r80qCvxdkl0mcEx2HkMCE6sYQXKoAQFODxRzBN3ePeM
+         0pxW2FLLHuCghNOaOJUqKvdnV/m/bH4CWBrAaL5pOn6Y+cygpKd//nVh1dfEHDl//hwm
+         AtOPyjSuVxp3lUJgWWZwPkJMEHWIx/jEzRTRqYil0d/KNVEd8ij/rPNF8dn6XnJa1+uC
+         HIYA==
+X-Gm-Message-State: AOJu0YxhxwShuRnZXMPpCDUfH7CPfhzhaO72MZY5dpNCsBlXWQpXCebZ
+	ZhEmyi8GSz9/nQBX8ObqNYkU1kR6KGeFh4SobRTvZw+uJE4z3TSbHWI9
+X-Gm-Gg: ASbGncuW5powTXKsM27iq/M1B9FgA3XgDEHp3XMBd7SuXkgBdN0AXMyBcuyL6HmcGxk
+	PvD8o3fe5U/HmM4RkVOsyqqxjNupbCnWvVS7Yb6yaOV7FqEjxL6zSwmiMW4zWz/5JIZp/IrgkWm
+	FqRh1Q6So5r0UIEUx+pntC4Q678vZZRcdQdfgGUcSFvUoLj6sHTm6pO8oBPSQf6RNbDq0GqcGZX
+	x3ywCZfqfhe9qnVLnxvYegUTQJzXKs3Rb+d63mEmBRaTcZ7ZCXh1bbgeDrqEvrplZhEfMUKO4/d
+	WMlvezluxYLKP9XEdSs0nEGbsXq4s6ENIJRGq8aRcZNOWg90oSjg0hkXy+t9VziFaR/rVNiungn
+	Gcc1+lNNDff6/JV971sOqlm5UDARjN4pCWHc86fGagkS3CyzKW4qhQSep
+X-Google-Smtp-Source: AGHT+IHfSbDZYeePRUk7AUk5UIU+8/HST88SCuQrgfaeFYNIi4uWGC/HFLBZ8gSHUE5RZPD73lTd1A==
+X-Received: by 2002:a17:902:d50f:b0:278:9051:8ea9 with SMTP id d9443c01a7336-290272dc4a7mr374811585ad.40.1760499387069;
+        Tue, 14 Oct 2025 20:36:27 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29084078e2bsm16777145ad.64.2025.10.14.20.36.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Oct 2025 20:36:26 -0700 (PDT)
+Date: Wed, 15 Oct 2025 03:36:18 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Tonghao Zhang <tonghao@bamaicloud.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Zengbing Tu <tuzengbing@didiglobal.com>,
+	Antoine Tenart <atenart@kernel.org>
+Subject: Re: [net-next v8 3/3] net: bonding: send peer notify when failure
+ recovery
+Message-ID: <aO8WsjvT_kY_rL2v@fedora>
+References: <cover.1751031306.git.tonghao@bamaicloud.com>
+ <3993652dc093fffa9504ce1c2448fb9dea31d2d2.1751031306.git.tonghao@bamaicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251013152234.842065-1-edumazet@google.com> <20251013152234.842065-3-edumazet@google.com>
-In-Reply-To: <20251013152234.842065-3-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 14 Oct 2025 20:32:25 -0700
-X-Gm-Features: AS18NWBtP2RQHHMuPg30YnQuCZigRkdvFm_88ergQQq-MpB95X7VjIF90A633ek
-Message-ID: <CAAVpQUC+7GWuGxZa4=3k3XCNSuLddpZbhoeEmmpWe930jpycWA@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 2/4] net: control skb->ooo_okay from skb_set_owner_w()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3993652dc093fffa9504ce1c2448fb9dea31d2d2.1751031306.git.tonghao@bamaicloud.com>
 
-On Mon, Oct 13, 2025 at 8:22=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> 15 years after Tom Herbert added skb->ooo_okay, only TCP transport
-> benefits from it.
->
-> We can support other transports directly from skb_set_owner_w().
->
-> If no other TX packet for this socket is in a host queue (qdisc, NIC queu=
-e)
-> there is no risk of self-inflicted reordering, we can set skb->ooo_okay.
->
-> This allows netdev_pick_tx() to choose a TX queue based on XPS settings,
-> instead of reusing the queue chosen at the time the first packet was sent
-> for connected sockets.
->
-> Tested:
->   500 concurrent UDP_RR connected UDP flows, host with 32 TX queues,
->   512 cpus, XPS setup.
->
->   super_netperf 500 -t UDP_RR -H <host> -l 1000 -- -r 100,100 -Nn &
->
-> This patch saves between 10% and 20% of cycles, depending on how
-> process scheduler migrates threads among cpus.
->
-> Using following bpftrace script, we can see the effect on Qdisc/NIC tx qu=
-eues
-> being better used (less cache line misses).
->
-> bpftrace -e '
-> k:__dev_queue_xmit { @start[cpu] =3D nsecs; }
-> kr:__dev_queue_xmit {
->  if (@start[cpu]) {
->     $delay =3D nsecs - @start[cpu];
->     delete(@start[cpu]);
->     @__dev_queue_xmit_ns =3D hist($delay);
->  }
-> }
-> END { clear(@start); }'
->
-> Before:
-> @__dev_queue_xmit_ns:
-> [128, 256)             6 |                                               =
-     |
-> [256, 512)        116283 |                                               =
-     |
-> [512, 1K)        1888205 |@@@@@@@@@@@                                    =
-     |
-> [1K, 2K)         8106167 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@    |
-> [2K, 4K)         8699293 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@|
-> [4K, 8K)         2600676 |@@@@@@@@@@@@@@@                                =
-     |
-> [8K, 16K)         721688 |@@@@                                           =
-     |
-> [16K, 32K)        122995 |                                               =
-     |
-> [32K, 64K)         10639 |                                               =
-     |
-> [64K, 128K)          119 |                                               =
-     |
-> [128K, 256K)           1 |                                               =
-     |
->
-> After:
-> @__dev_queue_xmit_ns:
-> [128, 256)             3 |                                               =
-     |
-> [256, 512)        651112 |@@                                             =
-     |
-> [512, 1K)        8109938 |@@@@@@@@@@@@@@@@@@@@@@@@@@                     =
-     |
-> [1K, 2K)        16081031 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@|
-> [2K, 4K)         2411692 |@@@@@@@                                        =
-     |
-> [4K, 8K)           98994 |                                               =
-     |
-> [8K, 16K)           1536 |                                               =
-     |
-> [16K, 32K)           587 |                                               =
-     |
-> [32K, 64K)             2 |                                               =
-     |
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Reviewed-by: Neal Cardwell <ncardwell@google.com>
+On Fri, Jun 27, 2025 at 09:49:30PM +0800, Tonghao Zhang wrote:
+> +static void ad_cond_set_peer_notif(struct port *port)
+> +{
+> +	struct bonding *bond = port->slave->bond;
+> +
+> +	if (bond->params.broadcast_neighbor && rtnl_trylock()) {
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Hi Tonghao,
+
+When do our internal review, Antoine pointed that this rtnl_trylock() may
+fail and cause the notify not send. The other places of bonding using
+workqueues to reschedule when the rtnl_trylock() failed. Do you think
+if we should also do some similar thing to avoid notify failed?
+
+Thanks
+Hangbin
+> +		bond->send_peer_notif = bond->params.num_peer_notif *
+> +			max(1, bond->params.peer_notif_delay);
+> +		rtnl_unlock();
+> +	}
+> +}
 
