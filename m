@@ -1,143 +1,150 @@
-Return-Path: <netdev+bounces-229797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 895C6BE0E23
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 23:57:45 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D4A8BE0E34
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 00:00:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 77D714E5F7C
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:57:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 037A54E90B2
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA222F5A37;
-	Wed, 15 Oct 2025 21:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDF0253B71;
+	Wed, 15 Oct 2025 22:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mn7QF/uG"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="3HiREFP8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F0729D279;
-	Wed, 15 Oct 2025 21:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E7B833086
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 22:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760565461; cv=none; b=Vs2pEguLTGxrjGWK/O6G4iJthDxWYPpSz/xhieMIFw/gvG0TqOmpyKWZX+x+Cy8UVTmRBeOt75tEWR9RE1hv4ScI/YkaPf4COSrf91qfNG15YG7JuEHBy+NL1bCHccjsavjm9uccEeRuIlwUYqW7nD+oNCo7L8JSkI5y2wXfPr8=
+	t=1760565634; cv=none; b=NY+sCEm69ndaJ2MNTyzHkHfaP2/0y0D2N5Fl5WG5SGOYMldrEv/p5idpRc+rVL7z8AE0Sv4tvJUjjsaMBLokIMgrH2GHqmUs4v48zD8C+Rj/qbUIiYV2idIldtRPyt4oMwCWCPfal3OrCDiZxpNxzzuQnTNJXi+VqBGlYj2PUvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760565461; c=relaxed/simple;
-	bh=WUMK/p1NpKi6lgRs+bVf1M0kCd8OsC05g8BX3feRS7I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gVhFauIrHKH+vM6/5db/oczeg6QexGGCj2HYdQg7DkVU8dGScciG/YpQn4ESi2rVzKKsM0YO0udWvmmaZvVCmQ4u8W8V60FuAfFZOgotavfSK4j02CsTgqYYpOQREyjHqKNo8ONujVlADNH7iMoOCGn5b3QBhjNZWW919YHo+0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mn7QF/uG; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=w4Vhb+pWajT1Ug9vm6p2q425XInEco8nPyGgnsCFC6I=; b=mn7QF/uGABpKN3xNzZQhmz2z8B
-	o11ld6ctbXR/ky2Bzy9GmguS3MZrXnF1v2rYnkjP5YhUCZo59ImkCcNqhMFbUqqZQngxwTgx92ZgP
-	uUcm3aQsK5C3oeuTJBBTA4Gjy7CdOrDM7lZERKde429KjydqJBEKRvmUAlv4qS4lv/4CxMntHi6Ri
-	B4m95goSjEKH1jPj2ZEIvSgu3K+3K8pRLhYL5jP6gUIBKXXpuBTVy5nhRltxZuXFPSEphg8trRGUe
-	DyxHgnVYT6D5oWp5MRGliTSF6l4qTUbUxfZn86zYEQT44SrSmakBSNxf9lqsMxS+akwDPJ+7/yJjR
-	NxC1+iNw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33366)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1v99Uh-000000005Vv-0ZMi;
-	Wed, 15 Oct 2025 22:57:15 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1v99Ua-000000002di-3k6X;
-	Wed, 15 Oct 2025 22:57:08 +0100
-Date: Wed, 15 Oct 2025 22:57:08 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Abhishek Chauhan <quic_abchauha@quicinc.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexis Lothore <alexis.lothore@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Boon Khai Ng <boon.khai.ng@altera.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Drew Fustini <dfustini@tenstorrent.com>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Furong Xu <0x1207@gmail.com>, Inochi Amaoto <inochiama@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
-	Jisheng Zhang <jszhang@kernel.org>, Kees Cook <kees@kernel.org>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Matthew Gerlach <matthew.gerlach@altera.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rohan G Thomas <rohan.g.thomas@altera.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Simon Horman <horms@kernel.org>,
-	Song Yoong Siang <yoong.siang.song@intel.com>,
-	Swathi K S <swathi.ks@samsung.com>,
-	Tiezhu Yang <yangtiezhu@loongson.cn>, Vinod Koul <vkoul@kernel.org>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH net-next 14/14] net: stmmac: convert to phylink PCS
- support
-Message-ID: <aPAYtHPcF5bes7Xi@shell.armlinux.org.uk>
-References: <aO-tbQCVu47R3izM@shell.armlinux.org.uk>
- <E1v92NJ-0000000AmHi-1ZGJ@rmk-PC.armlinux.org.uk>
- <040a2f29-4c95-4561-87c0-2a70308d3f00@lunn.ch>
+	s=arc-20240116; t=1760565634; c=relaxed/simple;
+	bh=sBNT/ZJL3UJS59HYufpHQ3aOPRt/eMCT7ydwYQnOzEk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gBrSb4t7XnsmSdDquVp04N6wRT4+bc1mJWf1cruaVRjTtN0VcgdR+4FQWbXdlTzFEgp1Y8GILzI5rzpS4/fPubBhyFl3CVDniUKS9c10+viFJBDR+ygRFFtsT2gFMxl1CbbMUpiGTAyaYH4CQnAFZMbMKYmLz5f0R9TCa++Vy/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=3HiREFP8; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-29091d29fc8so734445ad.0
+        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 15:00:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1760565632; x=1761170432; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5bxrYbA/aVh0ezEHvSBK0eCaN/Xx2Rs835EWBUCbM8k=;
+        b=3HiREFP88aLRusegHjHX6WtffWgDjwsP/Dn6rLC8tJKKRkG0SWfVgCWwZab3JhRKxr
+         Nd8ZHwul8ey49XmR7pJYYmFidnsfKjcCR0QVj8Ep/Gf3vQdN1q+v3u2eNPJS8cV+OlB6
+         ozAgnsXOVVCIiB4jAwhc1R50TjOM9YNggh8RYTjtztXnWAuT9JkulIDbTKktt5JcU5TJ
+         UB5lxqRy4hN9NLrvHBZFyYw9hgbH9GjZxXYlbYvckHGPRNxa/ZlR5/yVOOdQOWLH4+HI
+         rFFjxckKdKEpMY0cHpUupMRZIUK5fnAi36Fr9pYxWHsK0n86XGtMXyJ7a+krA5mll5cE
+         ny8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760565632; x=1761170432;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5bxrYbA/aVh0ezEHvSBK0eCaN/Xx2Rs835EWBUCbM8k=;
+        b=ji9E19sU1FF5obHezDCiWgvMAjLdAZoEwKT7NgI43VwarOFTjA6SL8s93PDEzQQ5iZ
+         ZyncuKLFudzAnY2KRYNgLpYWyhANJY2Xeb5Q/X9Kbm1vZBV50hrlgRPu3+pq3kYhuzMV
+         gocRBZSRgm/YHpAt3RYrQQdKYPX/omhBcNO7DqT7FCfq1ULm7piNAALOAt6NBTGOIqG8
+         +lyhY6WVl7K9MtWw0yZLrNNNouulenVizghRUkpXQRjQYmqSAekCsPOOYzGA19DNncvZ
+         XFFZHO7++VcYF0DIJ7Z/tVZw9IfNOyP8/rrcHmkGKNR9dofPf/pNKyMTIYTg8nuUX/v4
+         WWEA==
+X-Forwarded-Encrypted: i=1; AJvYcCWDrQKlGjFde7Ck4+k1Sb9CWFdhsJDZTQs3/x5heEEkIRJdpZ9OCPcJnqecFazequBVhI5hOJw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAPhRlnxeltB2sRXSQHW6EnVg6S4evXRpEo8UltrjiiWhaJdoC
+	fvc65daFQu7Gw4tyngA+d/VN8EX8NQL96JsVwZWhV+vGRaiOy8mc/txqubcp9TwJ4Gwde3MTiYU
+	pdNW0qg/8C6HWa4Q7F6iqVmdENBLT6ErLaE0yvOpX
+X-Gm-Gg: ASbGnctLdIowuQCtJYaek8fWtlRBUg6Q7WM1RxpCifc3XV/TGzKvjHLuVcKTvzCt91r
+	REBW007y4Nlr3d9u5RR1hlMaLPxcIjD1GlF1gXnC6rCQxe0AlDFZ+cKnSsViR3uJZziru78vT5H
+	KrEFgU2WW2s8cM4ZaQ77n1do0F6VYC68LjoZD+BrAhzdvX8pNdJCv5kUbLdGm+xXgIb+aoCDuHA
+	1rMZSs+Tx7omVynzn4CqGTfzI+GzO9FwYiEp9wHZZCVEuP0nukimqXCNSonGRLNSD57i3UWpn4V
+	ZMjH32VE9U0HBijoq5ZVQqKT5K4BRqCHPLm0
+X-Google-Smtp-Source: AGHT+IHRlV+MLyseGxUVQRMKzETHOpgwAcuG87f74U4jV5Y6r3+ySDjIi/KpY5XTjoj2kuKJ/aEinbvbKyRpq8/Ja0Y=
+X-Received: by 2002:a17:903:2d2:b0:267:6754:8fd9 with SMTP id
+ d9443c01a7336-290272c9322mr362529005ad.39.1760565631783; Wed, 15 Oct 2025
+ 15:00:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <040a2f29-4c95-4561-87c0-2a70308d3f00@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20251014171907.3554413-1-edumazet@google.com>
+In-Reply-To: <20251014171907.3554413-1-edumazet@google.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 15 Oct 2025 18:00:20 -0400
+X-Gm-Features: AS18NWDemmVexSlgj-cGOW3aTyGqdzwJ-k-4rkPbpwYJYpHRJgltJURxs43WJbA
+Message-ID: <CAM0EoMnvMZQpjNP5vCneur8GR+3oW3PxvzjtthNjFTtLBF5GtA@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 0/6] net: optimize TX throughput and efficiency
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 15, 2025 at 11:31:37PM +0200, Andrew Lunn wrote:
-> > - create stmmac_pcs.c, which contains the phylink_pcs_ops structure, a
-> >   dummy .pcs_get_state() method which always reports link-down
-> 
-> I've not followed the PCS code too closely. Why always report link
-> down? Why is a dummy method needed?
+On Tue, Oct 14, 2025 at 1:19=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> In this series, I replace the busylock spinlock we have in
+> __dev_queue_xmit() and use lockless list (llist) to reduce
+> spinlock contention to the minimum.
+>
+> Idea is that only one cpu might spin on the qdisc spinlock,
+> while others simply add their skb in the llist.
+>
+> After this series, we get a 300 % (4x) improvement on heavy TX workloads,
+> sending twice the number of packets per second, for half the cpu cycles.
+>
 
-If phylink is put into inband mode, and a PCS is supplied to phylink
-where this method left NULL, the kernel will oops.
+Not important but i am curious: you didnt mention what NIC this was in
+the commit messages ;->
 
-As the code stands today in mainline, if phylink were to be put into
-inband mode with the integrated PCS, then there will be no phylink PCS,
-and so phylink_mac_pcs_get_state() will fall into the "else" path of:
+For the patchset, I have done testing with existing tdc tests and no
+regression..
+It does inspire new things when time becomes available.... so will be
+doing more testing and likely small extensions etc.
+So:
+Tested-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+(For the tc bits, since the majority of the code touches tc related stuff)
 
-        pcs = pl->pcs;
-        if (pcs)
-                pcs->ops->pcs_get_state(pcs, pl->pcs_neg_mode, state);
-        else
-                state->link = 0;
+cheers,
+jamal
 
-and force the link down.
 
-So, adding this method keeps the status quo - not oopsing the kernel
-and not allowing the link to come up. No unintended behavioural
-change in this regard from how it would behave today. :)
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> v2: deflake tcp_user_timeout_user-timeout-probe.pkt.
+>     Ability to return a different code than NET_XMIT_SUCCESS
+>     when __dev_xmit_skb() has a single skb to send.
+>
+> Eric Dumazet (6):
+>   selftests/net: packetdrill: unflake
+>     tcp_user_timeout_user-timeout-probe.pkt
+>   net: add add indirect call wrapper in skb_release_head_state()
+>   net/sched: act_mirred: add loop detection
+>   Revert "net/sched: Fix mirred deadlock on device recursion"
+>   net: sched: claim one cache line in Qdisc
+>   net: dev_queue_xmit() llist adoption
+>
+>  include/linux/netdevice_xmit.h                |  9 +-
+>  include/net/sch_generic.h                     | 23 ++---
+>  net/core/dev.c                                | 97 +++++++++++--------
+>  net/core/skbuff.c                             | 11 ++-
+>  net/sched/act_mirred.c                        | 62 +++++-------
+>  net/sched/sch_generic.c                       |  7 --
+>  .../tcp_user_timeout_user-timeout-probe.pkt   |  6 +-
+>  7 files changed, 111 insertions(+), 104 deletions(-)
+>
+> --
+> 2.51.0.788.g6d19910ace-goog
+>
 
