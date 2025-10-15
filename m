@@ -1,149 +1,105 @@
-Return-Path: <netdev+bounces-229526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60034BDD928
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 10:59:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 312EFBDD91F
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 10:59:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C3B75454A2
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 08:59:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9143E1920656
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 08:59:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B868F3195FC;
-	Wed, 15 Oct 2025 08:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15D41E260D;
+	Wed, 15 Oct 2025 08:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=aosc.io header.i=@aosc.io header.b="Mz2JIfLy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rH+F/PFS"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5.mymailcheap.com (relay5.mymailcheap.com [159.100.241.64])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8462231A059;
-	Wed, 15 Oct 2025 08:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.100.241.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62A13195FC;
+	Wed, 15 Oct 2025 08:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760518768; cv=none; b=j5AlNkEgWCiCb7Gt9cstxd2ZuSkm0Sj/AXaA2TBI+sRBCg0mB8NbkW1TtmU3v6UxBhxC9TgXzk4zkcIwQ+iNZUYwhSofbfbj7b3HHx+zMb+w9m1E305xuowpK8vNuU1p/miDD2fg6aAec0xftnqAx3HMB940kCVtgjnBCRMh8Y8=
+	t=1760518764; cv=none; b=hAGiWlsw6TLakxlj7M3Yvvs3r7WnqqMTFGZYhrrhdjkjwGLzWCBkTJJP36vDLcOxqe2FMgY/8YzXfPP/MCYCY3iVsq2F0FEXc9u3lHz/6ZDf9ipdQWzRpODsyW3c/9+B2YXwR9cce/mpR+HICZWaxSI8Ky9lQtPUM/mdIx5G9Uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760518768; c=relaxed/simple;
-	bh=FhSMyl4w4nMUmZ/ooeWLYdkz987VgtI9XmryqjAPbqA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hNkOImTLGrMRlbTvDVPX4nQ3JKSqWUn7wm/t26XMpNm/OW7IPd0FOAJjIrBZmjYS8i4goV8O8RnMXfd1mU//x28WpBvD4vg6X5Ly7hgW6Q3hoXB7dhMPb+7niw7w0CqyZa9cRH8Ras6jaMATJ2MoLLPy2SXLeR9EuSPAoQoe76A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aosc.io; spf=pass smtp.mailfrom=aosc.io; dkim=pass (1024-bit key) header.d=aosc.io header.i=@aosc.io header.b=Mz2JIfLy; arc=none smtp.client-ip=159.100.241.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aosc.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aosc.io
-Received: from relay3.mymailcheap.com (relay3.mymailcheap.com [217.182.119.157])
-	by relay5.mymailcheap.com (Postfix) with ESMTPS id 2639720112;
-	Wed, 15 Oct 2025 08:59:19 +0000 (UTC)
-Received: from nf2.mymailcheap.com (nf2.mymailcheap.com [54.39.180.165])
-	by relay3.mymailcheap.com (Postfix) with ESMTPS id 1108B3E917;
-	Wed, 15 Oct 2025 08:59:11 +0000 (UTC)
-Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
-	by nf2.mymailcheap.com (Postfix) with ESMTPSA id C406D40099;
-	Wed, 15 Oct 2025 08:59:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=aosc.io; s=default;
-	t=1760518748; bh=FhSMyl4w4nMUmZ/ooeWLYdkz987VgtI9XmryqjAPbqA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Mz2JIfLy3mmf+zltTznP1Q+ZrFDQFmBEmsQCXapdoWGz38J/ImAuMFcolU7TYlnvj
-	 y5zz17BA3j8BMwp03UpwjDFK8TuIJttqYBHrdbVKUA5rO47xViJPwRBrRvGGqLs2Vt
-	 6ZoXfxeR+IrKf/1qOb1N0wcbbCsCBGwfOi6Fepj0=
-Received: from [198.18.0.1] (unknown [223.76.243.206])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail20.mymailcheap.com (Postfix) with ESMTPSA id 487DE41420;
-	Wed, 15 Oct 2025 08:59:02 +0000 (UTC)
-Message-ID: <a8739f95-681c-406a-9f61-a1a171db99c5@aosc.io>
-Date: Wed, 15 Oct 2025 16:58:54 +0800
+	s=arc-20240116; t=1760518764; c=relaxed/simple;
+	bh=EUYhWksXVGZIMju1edC1CGm/fB7mrhfKVvKphQHqdsE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mGgA3kwyWNpmY1UZYTXa+rTX9GcSFMWxxb180bNudd19DS5BJNSuKCjRAqrnzsAQPY2Bru6HbpPOJdJC66VnZ0D9gG6HB3Cw0CKCXWNYMCCfCtLdgodERg1PNt1ppGigZu9yZ6XrgKZkd2zMLauWFhUSsxiHfeJkxv/SKNHH4yI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rH+F/PFS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D39BC4CEF8;
+	Wed, 15 Oct 2025 08:59:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760518763;
+	bh=EUYhWksXVGZIMju1edC1CGm/fB7mrhfKVvKphQHqdsE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rH+F/PFSbSD5IInXuBF4/jDYiiMZTN23+ow/kLEFM6BYicaDp13195B7+KbDTI4tx
+	 qhl2be3E56oVhlCNoJrZACe3iLiwODwZXbjnhIJVlLPZgQyR6PwHbuWuTT0EQ5qmN0
+	 68o3n3a8sn21DrcdRfN6su9UF0QA8wFe/ESAf4DfVKcN+aET1TFCDWEB43P8BmhHD0
+	 y3zHF6P4eoKJoqI5f3xmaBlmo4z9ivcLLyzynb5Vn8dgMdajJQzJqC662g6RBMyFz2
+	 mRef9MD4sI4guKNrC8BZ8truUf0o5P5kllFhvS5pASuefg47i3npqJx0h2dzZQRDc5
+	 gX11R2L66LkQA==
+Date: Wed, 15 Oct 2025 09:59:18 +0100
+From: Simon Horman <horms@kernel.org>
+To: Lizhe <sensor1010@163.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
+	jonas@kwiboo.se, chaoyi.chen@rock-chips.com,
+	david.wu@rock-chips.com, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dwmac-rk: No need to check the return
+ value of the phy_power_on()
+Message-ID: <aO9iZiMBs3pUnb77@horms.kernel.org>
+References: <20251015040847.6421-1-sensor1010@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/4] Add DWMAC glue driver for Motorcomm YT6801
-To: Yao Zi <ziyao@disroot.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Frank <Frank.Sae@motor-comm.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Bjorn Helgaas <bhelgaas@google.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Choong Yong Liang <yong.liang.choong@linux.intel.com>,
- Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
- Furong Xu <0x1207@gmail.com>, Xi Ruoyao <xry111@xry111.site>,
- Kexy Biscuit <kexybiscuit@aosc.io>, Runhua He <hua@aosc.io>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org
-References: <20251014164746.50696-2-ziyao@disroot.org>
-Content-Language: en-US
-From: Mingcong Bai <jeffbai@aosc.io>
-In-Reply-To: <20251014164746.50696-2-ziyao@disroot.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C406D40099
-X-Rspamd-Server: nf2.mymailcheap.com
-X-Spamd-Result: default: False [1.40 / 10.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MIME_GOOD(-0.10)[text/plain];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_ONE(0.00)[1];
-	ASN(0.00)[asn:16276, ipnet:51.83.0.0/16, country:FR];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_RCPT(0.00)[kernel,netdev];
-	FREEMAIL_TO(0.00)[disroot.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,motor-comm.com,gmail.com,armlinux.org.uk,nxp.com,linux.intel.com,csie.org,xry111.site,aosc.io];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	SPFBL_URIBL_EMAIL_FAIL(0.00)[hua.aosc.io:server fail,jeffbai.aosc.io:server fail,xry111.xry111.site:server fail];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Action: no action
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251015040847.6421-1-sensor1010@163.com>
 
-Hi Yao,
-
-在 2025/10/15 00:47, Yao Zi 写道:
-> This series adds glue driver for Motorcomm YT6801 PCIe ethernet
-> controller, which is considered mostly compatible with DWMAC-4 IP by
-> inspecting the register layout[1]. It integrates a Motorcomm YT8531S PHY
-> (confirmed by reading PHY ID) and GMII is used to connect the PHY to
-> MAC[2].
+On Tue, Oct 14, 2025 at 09:08:47PM -0700, Lizhe wrote:
+> 'phy_power_on' is a local scope one within the driver, since the return
+> value of the phy_power_on() function is always 0, checking its return
+> value is redundant.
 > 
-> The initialization logic of the MAC is mostly based on previous upstream
-> effort for the controller[3] and the Deepin-maintained downstream Linux
-> driver[4] licensed under GPL-2.0 according to its SPDX headers. However,
-> this series is a completely re-write of the previous patch series,
-> utilizing the existing DWMAC4 driver and introducing a glue driver only.
+> the function name 'phy_power_on()' conflicts with the existing
+> phy_power_on() function in the PHY subsystem. a suitable alternative
+> name would be rk_phy_power_set(), particularly since when the second
+> argument is false, this function actually powers off the PHY
 > 
-> This series only aims to add basic networking functions for the
-> controller, features like WoL, RSS and LED control are omitted for now.
-> Testing is done on Loongson 3A5000 machine. Through a local GbE switch,
-> it reaches 871Mbps (TX)/942Mbps (RX) on average,
+> Signed-off-by: Lizhe <sensor1010@163.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 17 ++++-------------
+>  1 file changed, 4 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> index 51ea0caf16c1..9d296bfab013 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> @@ -1461,23 +1461,18 @@ static int gmac_clk_enable(struct rk_priv_data *bsp_priv, bool enable)
+>  	return 0;
+>  }
+>  
+> -static int phy_power_on(struct rk_priv_data *bsp_priv, bool enable)
+> +static void rk_phy_power_on(struct rk_priv_data *bsp_priv, bool enable)
 
-We (along with Xi Ruoyao and Runhua He) tested this patchset against 
-v6.18-rc1 on the following platforms featuring YT6801:
+Hi Lizhe,
 
-- Loongson XA61201 (LoongArch, Loongson 3A6000-HV)
-- Loongson AC612A0_V1.1 (LoongArch, Loongson 3C6000/S)
-- Loongson XB612B0_V1.1 (LoongArch, Loongson 3B6000)
-- MECHREVO WUJIE14-GX4HRXL (x86-64)
+This introduces a compilation error because phy_power_on()
+is still used on line 1670.
 
-With performance within expectation and S3/reboot working. Both ports 
-work on those with two interfaces (AC612A0_V1.1 and XB612B0_V1.1). LED 
-indicators do not seem to work properly at this moment, but this was 
-already described in your original email.
+Perhaps the hunk to update that line got lost somewhere.
 
-With that:
+-- 
+pw-bot: changes-requested
 
-Tested-by: Mingcong Bai <jeffbai@aosc.io>
-Tested-by: Runhua He <hua@aosc.io>
-Tested-by: Xi Ruoyao <xry111@xry111.site>
-
-Best Regards,
-Mingcong Bai
+...
 
