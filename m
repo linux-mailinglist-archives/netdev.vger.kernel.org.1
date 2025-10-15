@@ -1,175 +1,106 @@
-Return-Path: <netdev+bounces-229653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA128BDF759
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:45:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7BB5BDF780
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:47:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AB7134F6551
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:45:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54BCA18869C1
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65AD732F762;
-	Wed, 15 Oct 2025 15:45:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93DE4335BA3;
+	Wed, 15 Oct 2025 15:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="diEsTYlb";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="w8mq62Yk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oGH0xtdS"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C12532ED5C;
-	Wed, 15 Oct 2025 15:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E51A30BB9A;
+	Wed, 15 Oct 2025 15:47:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760543120; cv=none; b=dZW/3GnySrF230ct3NRXixPoZD8QmucXcD537o7IcyTl+fTcGi7MD8cQkXcx1pMQzf3085+cmd5EWyG8NYZBBhLO9tnbwnnJHGkzKdqDF5yqy5PTQwOhXIQwioafT9sigKktQ3QUPgUpbYH4MinVxPmXs7GgY7BalwFt23vyFdI=
+	t=1760543259; cv=none; b=LwbNNlxl9MqUqoVerR0WKfr4RcDQCgD4F4RIWK3EN06j732DU+hHgsDqAR41gxRgl8XfsuG3yeff30NdETxRTVRxqYBzZDBDFIWaVe8XKwGvILEXJjSnwswXLC8p8wsRDPsRtFS8UEgPPJZLg/5MK65GlRHS9BxG+NfapJZB0ZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760543120; c=relaxed/simple;
-	bh=meP/Aq84K171eC4phODrHaDH0svAHCll1WQAHZlh6kg=;
+	s=arc-20240116; t=1760543259; c=relaxed/simple;
+	bh=7SSKvHAijSlWofXaTTSRV6RFLX2i1LcCrhGDKzWlQ20=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fWlaWph734ucnuip6JtX5s0h/tGtZx2qP+sJQlVZ3e/jO8VBKwt3DTQKX4MIrmBULQkHytp8Z/wD6KZNma6ICZrRLnSxJM9AOl9Yhzs3yfqBb9G35AQ07tHf0sRfstmoC1evWRz/MHjsbXSiXxb9k+MW9GBaXA6idGdxLKHuAig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=diEsTYlb; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=w8mq62Yk; arc=none smtp.client-ip=202.12.124.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.stl.internal (Postfix) with ESMTP id 5E3571D000C4;
-	Wed, 15 Oct 2025 11:45:17 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Wed, 15 Oct 2025 11:45:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1760543117;
-	 x=1760629517; bh=V/erT+QWunXqRIIEBMFZDjF8ybSTlOX6XftGy/9IXo8=; b=
-	diEsTYlbRtS1xFOXXCLQq/ZnnwsfpRu+LWagHq+qkQkmV/LALEesnuC3MI935oYH
-	ogk8vRYMRvuVlMUCHCf74A90DiS2j5C2I+rWXYcTHxY6JXmRdusU5r5M+Hy4IdnQ
-	nEN3DrWnjTJrLfkrb5WVJ8LZaIeyf8rmpZszXJ/tUC4/XCqyhCWpFxj7XtSnDQb/
-	Dq2LJpouh0UUfpXwBLZCY5HaXIlh/8Qr4HCWeXHRoKoiYUMET8i2DFcSZF4DvieR
-	YbYueYDNkds+yJkG0PkoQ9THFsErWhKwym9vU9Q4tsqD9fIEPBvu6u1tYCgxfAs0
-	9Rn3iBc8xKlfcoBlemC5Zg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760543117; x=
-	1760629517; bh=V/erT+QWunXqRIIEBMFZDjF8ybSTlOX6XftGy/9IXo8=; b=w
-	8mq62Ykr/bAnjg1p0SKj80LNm40Q331it/cN3MK/7w/Dq3GiIhmICAgDY2g3oQuo
-	wy6Hlq/iRlIY2WF/yc6PobD2RAO3PVMfKdGPjhjlFjeAALenatav3bwfWYXM9PB0
-	43JExsjRJLPLQk4WLHr6MdQLwl4/OWD1Kzitqz6N+vUkm0r2ywt6ei8GKv7vv3HX
-	vpMiRbL2U2CreJ8ONtRr9kZyA/Ubl/VKiGHIGsTGV/7QQyHUAkWKfD2pFpFh1LIA
-	0DKYVHstFwi913Zz7eIzzFTrKTG7djnfgHjymBKYRQWF64JNyq7o7fvh+kC1+3aQ
-	ZwMVhyiEOXkpy6TZy7W2Q==
-X-ME-Sender: <xms:i8HvaO_9L8t-M7hutUTD_Fidk4RBTg9yIJTIrfHYEJqj31qEi54qBw>
-    <xme:i8HvaEQ4m69lKUsKgdVdNBxovmgr7eGyBYMhu_fZtw8nGupeaafBviw8wJFyfR5zk
-    DtFxdOqz18gHXsjQDbOYh2QVWjuWE8b3skcPHIcz1yM59nNCZ__VeY>
-X-ME-Received: <xmr:i8HvaNmUpSSNv2Aig13nn3zl1m9H8Gd1N75C8ReZUj6DDj06C4nYFeussE3OzhXkRZOEA2L0M0YsHvi8Gq9XMHr4suzAw50>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdefkedtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhklhgr
-    shcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugesrhgrghhnrg
-    htvggthhdrshgvqeenucggtffrrghtthgvrhhnpeevteegtddvvdfhtdekgefhfeefheet
-    heekkeegfeejudeiudeuleegtdehkeekteenucevlhhushhtvghrufhiiigvpedtnecurf
-    grrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggvrhhluhhnugesrhgrghhn
-    rghtvggthhdrshgvpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpd
-    hrtghpthhtohepphhrrggshhgrkhgrrhdrtghsvghnghhgsehgmhgrihhlrdgtohhmpdhr
-    tghpthhtohepphgruhhlsehpsggrrhhkvghrrdguvghvpdhrtghpthhtoheprghnughrvg
-    ifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghm
-    lhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
-    dprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggv
-    nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehsvghrghgvihdrshhhthihlhihoh
-    hvsegtohhgvghnthgvmhgsvgguuggvugdrtghomhdprhgtphhtthhopehnvghtuggvvhes
-    vhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:i8HvaHWUzaMbpdnHQPSJy0V57I4ehPAIAp42itlniFChwvNKuZEwaQ>
-    <xmx:i8HvaKdvwTnMkNusNvFnBd7hFfrlZzWBw2ZXbHsPzKUIMSF1w3oxOw>
-    <xmx:i8HvaNnfBvOpFk03o7yQ3az12EetK3b2a70K6n2sFHLB9BX3nfhsIg>
-    <xmx:i8HvaECDFQE2nsMdTvhirfdNqvbr4-uFIFx-pRpML3B272LNQVBPwg>
-    <xmx:jcHvaA9OIHd8vfIiECDt5OZaJ0CD0ig5Sb2cc4oA5-Flr5h_x-a60sih>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 15 Oct 2025 11:45:15 -0400 (EDT)
-Date: Wed, 15 Oct 2025 17:45:14 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=k4BrMoFbOkNdeGUfrclbTdg5/VTB+lzpA/MPM+WHsTtcGG/TRPgcsDhH7ZQPvT9ON4MTewPVN81dhW1KTJh/jWtcS0Zak3Lmpr/2h3dR1yilFwi2YOpNvXeBIVVwal4TvMZR99SEo+uWKR72VXNEMvEHV55lZADVXo0Z53O6+9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oGH0xtdS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD489C4CEF9;
+	Wed, 15 Oct 2025 15:47:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760543258;
+	bh=7SSKvHAijSlWofXaTTSRV6RFLX2i1LcCrhGDKzWlQ20=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oGH0xtdSIVA/HLIi76/6tLihtexifn5/54YloqXYWip65ngHLQGryac6RYlBgpG4e
+	 HoTJwhinxEre29f3obZE9DuhzfKqbkzarHV6a2pbH8uONhgDyT5NSoSEa1GqQ5Tkci
+	 pMC/ntF1HlI1keUJDF12UQvI3jGdpDQCeSNwWbDbtsj6cKzmaEDQBYM87d0znGg1lY
+	 3ial0Zih5TGRkkfb6e6wHK5VV9eSJRmE/iiJp1D2e/2Y2aho2V0hgfAd3KA2BnEfOa
+	 HFcpgCORI2M8wWfslJQTMWYPWn/Ma2F0WXHIDpxwYxlLGTp8dlwj10e2UoVVeg9j3I
+	 xc0QomtzAgiEg==
+Date: Wed, 15 Oct 2025 16:47:33 +0100
+From: Simon Horman <horms@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 2/3] net: ravb: Allocate correct number of queues based
- on SoC support
-Message-ID: <20251015154514.GD439570@ragnatech.se>
-References: <20251015150026.117587-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251015150026.117587-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 08/12] net: airoha: ppe: Configure SRAM PPE
+ entries via the cpu
+Message-ID: <aO_CFRYy6vXCQIS2@horms.kernel.org>
+References: <20251015-an7583-eth-support-v1-0-064855f05923@kernel.org>
+ <20251015-an7583-eth-support-v1-8-064855f05923@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251015150026.117587-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <20251015-an7583-eth-support-v1-8-064855f05923@kernel.org>
 
-Hi Prabhakar,
-
-Thanks for your work.
-
-On 2025-10-15 16:00:25 +0100, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On Wed, Oct 15, 2025 at 09:15:08AM +0200, Lorenzo Bianconi wrote:
+> Introduce airoha_ppe_foe_commit_sram_entry routine in order to configure
+> the SRAM PPE entries directly via the CPU instead of using the NPU APIs.
+> This is a preliminary patch to enable netfilter flowtable hw offload for
+> AN7583 SoC.
 > 
-> On SoCs that only support the best-effort queue and not the network
-> control queue, calling alloc_etherdev_mqs() with fixed values for
-> TX/RX queues is not appropriate. Use the nc_queues flag from the
-> per-SoC match data to determine whether the network control queue
-> is available, and fall back to a single TX/RX queue when it is not.
-> This ensures correct queue allocation across all supported SoCs.
-> 
-> Fixes: a92f4f0662bf ("ravb: Add nc_queue to struct ravb_hw_info")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-
-Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 > ---
->  drivers/net/ethernet/renesas/ravb_main.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  drivers/net/ethernet/airoha/airoha_ppe.c | 30 +++++++++++++++++++++++-------
+>  1 file changed, 23 insertions(+), 7 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 69d382e8757d..a200e205825a 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -2926,13 +2926,14 @@ static int ravb_probe(struct platform_device *pdev)
->  		return dev_err_probe(&pdev->dev, PTR_ERR(rstc),
->  				     "failed to get cpg reset\n");
+> diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+> index fcfd2d8826a9c2f8f94f1962c2b2a69f67f7f598..0ee2e41489aaa9de9c1e99d242ee0bec11549750 100644
+> --- a/drivers/net/ethernet/airoha/airoha_ppe.c
+> +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+> @@ -662,6 +662,27 @@ static bool airoha_ppe_foe_compare_entry(struct airoha_flow_table_entry *e,
+>  	return !memcmp(&e->data.d, &hwe->d, len - sizeof(hwe->ib1));
+>  }
 >  
-> +	info = of_device_get_match_data(&pdev->dev);
+> +static int airoha_ppe_foe_commit_sram_entry(struct airoha_ppe *ppe, u32 hash)
+> +{
+> +	struct airoha_foe_entry *hwe = ppe->foe + hash * sizeof(*hwe);
+> +	bool ppe2 = hash >= PPE_SRAM_NUM_ENTRIES;
+> +	u32 *ptr = (u32 *)hwe, val;
+> +	int i;
 > +
->  	ndev = alloc_etherdev_mqs(sizeof(struct ravb_private),
-> -				  NUM_TX_QUEUE, NUM_RX_QUEUE);
-> +				  info->nc_queues ? NUM_TX_QUEUE : 1,
-> +				  info->nc_queues ? NUM_RX_QUEUE : 1);
->  	if (!ndev)
->  		return -ENOMEM;
->  
-> -	info = of_device_get_match_data(&pdev->dev);
-> -
->  	ndev->features = info->net_features;
->  	ndev->hw_features = info->net_hw_features;
->  	ndev->vlan_features = info->vlan_features;
-> -- 
-> 2.43.0
-> 
+> +	for (i = 0; i < sizeof(*hwe) / 4; i++)
+> +		airoha_fe_wr(ppe->eth, REG_PPE_RAM_ENTRY(ppe2, i), ptr[i]);
 
--- 
-Kind Regards,
-Niklas Söderlund
+I realise that a similar pattern it is already used elsewhere,
+but '4' seems somewhat magic here.
+
+...
 
