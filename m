@@ -1,154 +1,118 @@
-Return-Path: <netdev+bounces-229593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E6CEBDEC30
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:29:40 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB301BDEC98
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6CB1408084
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 13:29:38 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 87DE735017B
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 13:42:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40731FC0EF;
-	Wed, 15 Oct 2025 13:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C942622B8A6;
+	Wed, 15 Oct 2025 13:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="AoLPHUbg"
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="PpEwZzlg"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.couthit.com (server.couthit.com [162.240.164.96])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F6B1F2361;
-	Wed, 15 Oct 2025 13:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB0C229B2E;
+	Wed, 15 Oct 2025 13:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760534975; cv=none; b=XKVVtLRmdQuNgYeJMUWrAVe+xeFIJfeOcASscAd3V5j7j2lyUQB4FznE3JyVFMdL5knpunhRpczdD8dKnGn/A2a8RRFHwBFQzQyJPu9tDtRKjOaCPOTAQHjFr6XHGT++x6M2/4JXSOv5JuopafS1SegFEQFInLrUmdURcM8aPck=
+	t=1760535715; cv=none; b=OW0EA2g1gJFT6suLIpVb/4BZSD1lUuPEv70X9gYXzZZJfmu11nn3lS3btnNiapy2B8Dm4rpGS41LwQO+dae1WioF/m9j8x7Yqld+rEBxab72V7OH17ZcBGn6n5MwPfKOraS2fsxp01fWAc40YOwX+oEKgZu3EjRq96GyhfAoS88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760534975; c=relaxed/simple;
-	bh=2hmMvyH8KAC2yhT2Ax5Nx8K1FAV9uq1Qg41rzGl0+Sg=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=dSGqucfgzpH+kHQMep12DH2k3FvR8MnPfe9oqV9M08qyCaCS6qVdcaSaP/Y45eQ/GLsPfAhcDeT71EXrBI2fgE0Ds+z+t2VOMFJ3CvKSVJdV9flZTvPuhattmPa3bNgyWAkaCLzAaSBJktTbckCplfO6Mf7K1W5gkKPd/bqX6xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=AoLPHUbg; arc=none smtp.client-ip=162.240.164.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=s2K7GHGVKyAUUpmTe3FDfYNRYK/z1701QaUyzv3V8Bk=; b=AoLPHUbgLksgoj0K49hCkx+uRb
-	qARH+UxQl33YfSHLev1gfxrnblxG7tOE+50CzE5Vt+ceUCU+GGPIIu88Q7OPjmaifo8/m2mkdvyb+
-	Ap5R0k1VrOZiblWEM8ZyqOtw8mbU4bL/hfYHwEHjirrQQn1h4p6r5EYAzQ93WrYy+eZqoZ/l9TJFt
-	nFDBoZNcqE6ETJphRGP40R7dtZqpZQ3KV/ayLxhxFmmJNvOYuF7FRbaDagJOSjFkZbygu+YKs428U
-	at6+zbWmwH7K64Fu48WMla9D0+XzIcAiTMkcGcnZsTXdTI0JhzYGy6Kp3MKPpwJP/5EtXNsG9whdM
-	BnYuZ0gw==;
-Received: from [122.175.9.182] (port=34500 helo=zimbra.couthit.local)
-	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1v91ZK-00000006HKz-2vEc;
-	Wed, 15 Oct 2025 09:29:30 -0400
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id 92F2F17823F4;
-	Wed, 15 Oct 2025 18:59:26 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 7C0F617820AC;
-	Wed, 15 Oct 2025 18:59:26 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id DEQ94I0dxhEn; Wed, 15 Oct 2025 18:59:26 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id EF5711781F3C;
-	Wed, 15 Oct 2025 18:59:25 +0530 (IST)
-Date: Wed, 15 Oct 2025 18:59:25 +0530 (IST)
-From: Parvathi Pudi <parvathi@couthit.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: parvathi <parvathi@couthit.com>, tony <tony@atomide.com>, 
-	robh <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
-	conor+dt <conor+dt@kernel.org>, 
-	richardcochran <richardcochran@gmail.com>, 
-	linux-omap <linux-omap@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	netdev <netdev@vger.kernel.org>, danishanwar <danishanwar@ti.com>, 
-	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, mohan <mohan@couthit.com>, 
-	pmohan <pmohan@couthit.com>, basharath <basharath@couthit.com>, 
-	afd <afd@ti.com>, m-karicheri2 <m-karicheri2@ti.com>
-Message-ID: <1064878067.81811.1760534965853.JavaMail.zimbra@couthit.local>
-In-Reply-To: <8cfc5ece-6c2e-48d9-a65c-3edbcc9edc39@lunn.ch>
-References: <20251013125401.1435486-1-parvathi@couthit.com> <20251013125401.1435486-2-parvathi@couthit.com> <8cfc5ece-6c2e-48d9-a65c-3edbcc9edc39@lunn.ch>
-Subject: Re: [PATCH 1/2] arm: dts: ti: Adds device tree nodes for PRU Cores,
- IEP and eCAP modules of PRU-ICSS2 Instance.
+	s=arc-20240116; t=1760535715; c=relaxed/simple;
+	bh=0+udvwqXk3pMUuV5a3E5/kGYHpUynWhFjTBJiTghSno=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T5cDAx/lZpoMmApceU9d17RR+Y3oxksDaKKOrXkf61GtXBEGG9FQV8zrTJ225Ph/V6LsvXQ1vBFt93kkQMv6ArvVW91qWHkIyVQswAtiBW/MoDpjvORpbL4FShdQ3MpmQ2NF5aBQbmF3ogDRzwQ4vT//Z/yhZWUKQyqoHbGQalA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=PpEwZzlg; arc=none smtp.client-ip=178.21.23.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
+Received: from mail01.disroot.lan (localhost [127.0.0.1])
+	by disroot.org (Postfix) with ESMTP id 1448F22F40;
+	Wed, 15 Oct 2025 15:41:51 +0200 (CEST)
+X-Virus-Scanned: SPAM Filter at disroot.org
+Received: from layka.disroot.org ([127.0.0.1])
+ by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id E3_5OJxubVeS; Wed, 15 Oct 2025 15:41:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
+	t=1760535710; bh=0+udvwqXk3pMUuV5a3E5/kGYHpUynWhFjTBJiTghSno=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=PpEwZzlg/BI/Hcu/apLLJ3kweCff9EOMZxnrgY5bOpuzbDqccQExq6wYKeuQofRO+
+	 mY7lXrUNGF6VJohT/qGVoBSByDuCt7XqQZoS/G95emBvViDaROxbUstGqse9DFF0wx
+	 gkDAzng9Hkg0NeGGKv4hlxSefXYKUELcj3TRDXKy5CWM0HUX4e7wqHK0UFYwOAWhld
+	 mdSap61d8i/zp692PPtqoXeoNro/rpY5iH2fUGGdNIM8qSkknwFNqsu6EYaw3px6bH
+	 IhuY9wrfZPwiyy8e9fSJ0I4oTMBvOHMRRyBOoPfrgSX/0u8ZPsUsshUKEU6lXAZ+bk
+	 ki+5cpE/qh6gA==
+Date: Wed, 15 Oct 2025 13:41:31 +0000
+From: Yao Zi <ziyao@disroot.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Frank <Frank.Sae@motor-comm.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
+	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH net-next 2/4] net: phy: motorcomm: Support YT8531S PHY in
+ YT6801 Ethernet controller
+Message-ID: <aO-kH5-CVt5Gbd3C@pie>
+References: <20251014164746.50696-2-ziyao@disroot.org>
+ <20251014164746.50696-4-ziyao@disroot.org>
+ <aO6Dk0rK0nobGClc@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - GC138 (Linux)/8.8.15_GA_3968)
-Thread-Topic: Adds device tree nodes for PRU Cores, IEP and eCAP modules of PRU-ICSS2 Instance.
-Thread-Index: E3LIn1f4mOg6FaK5tJjNCk6cQUoE5Q==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.couthit.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aO6Dk0rK0nobGClc@shell.armlinux.org.uk>
 
-Hi,
-
->> +				interrupt-names = "rx", "emac_ptp_tx",
->> +								"hsr_ptp_tx";
+On Tue, Oct 14, 2025 at 06:08:35PM +0100, Russell King (Oracle) wrote:
+> On Tue, Oct 14, 2025 at 04:47:45PM +0000, Yao Zi wrote:
+> > YT6801's internal PHY is confirmed as a GMII-capable variant of YT8531S
+> > by a previous series[1] and reading PHY ID. Add support for
+> > PHY_INTERFACE_MODE_INTERNAL for YT8531S to allow the Ethernet driver to
+> > reuse the PHY code for its internal PHY.
 > 
-> Something looks wrong with the indentation here. The same happens in
-> at least one other place.
+> If it's known to be connected via a GMII interface, even if it's on the
+> SoC, please use PHY_INTERFACE_MODE_GMII in preference to
+> PHY_INTERFACE_MODE_INTERNAL. PHY_INTERFACE_MODE_INTERNAL is really for
+> "we don't know what the internal interface is".
+
+I use PHY_INTERFACE_MODE_INTERNAL for the driver based on Andrew's
+feedback[1] on the series submitted by Motorcomm people,
+
+> Is it really GMII? If so, add GMII to the yt8531 driver.
+>
+> Often this is described as PHY_INTERFACE_MODE_INTERNAL, meaning it
+> does not matter what is being used between the MAC and the PHY, it is
+> internal to the SoC. You might want to add that to the PHY driver.
+
+Does PHY_INTERFACE_MODE_INTERNAL mean "unknown interface" or "interface
+that doesn't matter"? I think this could lead to different choices for
+the mode in YT6801's case.
+
+Thanks for your answer,
+
+Best regards,
+Yao Zi
+
+> Thanks.
 > 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
-we will correct the indentation of the interrupt-names property to properly
-align the continuation line as shown below.
-
-interrupt-names = "rx", "emac_ptp_tx",
-                  "hsr_ptp_tx";
-
-We will make sure to address this in all the applicable places and include
-this fix in the next version.
-
-
->> +&pruss2_mdio {
->> +	status = "okay";
->> +	pruss2_eth0_phy: ethernet-phy@0 {
->> +		reg = <0>;
->> +		interrupt-parent = <&gpio3>;
->> +		interrupts = <30 IRQ_TYPE_EDGE_FALLING>;
->> +	};
->> +
->> +	pruss2_eth1_phy: ethernet-phy@1 {
->> +		reg = <1>;
->> +		interrupt-parent = <&gpio3>;
->> +		interrupts = <31 IRQ_TYPE_EDGE_FALLING>;
->> +	};
-> 
-> 
-> PHY interrupts are 99% level, not edge, because they represent an
-> interrupt controller in the PHY, and you need to clear all the
-> interrupts in the controller before it deasserts the interrupt pin.
-> 
->    Andrew
-
-
-Sure, we will check and come back with more details on this.
-
-
-Thanks and Regards,
-Parvathi.
+[1]: https://lore.kernel.org/all/fde04f06-df39-41a8-8f74-036e315e9a8b@lunn.ch/
 
