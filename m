@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-229431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5BDEBDC192
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 04:04:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3242BDC195
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 04:04:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18BA019A2626
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 02:04:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E70DC3AC816
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 02:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF59D2F9D98;
-	Wed, 15 Oct 2025 02:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7971C2FE577;
+	Wed, 15 Oct 2025 02:04:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FW0XcrnI"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YL5+l60U"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E978D1DED64
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 02:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83DFC1DED64
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 02:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760493860; cv=none; b=Vk3VgZDiznUKI6bXb+IVVvXTC8lIn+y412p2c2G4CpNep8qrqNtLIRNcdqVIfgsb8vSLohNa2l+eRS67Ppb9XSFUpSNyxkn58S/RdtsYiZJkD2kddNGcLgQQd15+jwtxc+h7HKwObIy+L71S7ZKYaMpF/UT7SFWHv/P+OQ5YIYg=
+	t=1760493866; cv=none; b=BZ5I2d01yDBs3vKF70RZVn7X5k4XkTkh/nC8L/U5txtF1QwsGENXZqQkHmDMJ5a6PdB3MGzgclhmOl08CnmNp471RUWzfZr3I95fGPdKJLwF1xVxfIRoQ8ynpNrIPVCWdCiinQXTtAOI/3w+xg/4Y4QzgnXjbHW12JROmEu1/Po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760493860; c=relaxed/simple;
-	bh=A0Hbhf1LuTCOQICJ7pWh5ohsb5YnZU3oGqxLkwuNUCs=;
+	s=arc-20240116; t=1760493866; c=relaxed/simple;
+	bh=ksZiRo2nynoYSBmv3cDqsAe2cNViVYNgp/q0GzE1Gxc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Twiidk+b9W1AtLpgVwWgT8Tgw+8xmcD6RuTDkzC6U2/m3z4I9RRmrXi1QT+sM2Yit2ClnTQ4v7ennmqfZSc+7MrTVLlIrZuZDQIETQo5HpPGHUKCQJ7LZMt6at88YbV2ArMtIFdtSRSHO2Ovf6SkOk5SvGnWh6ssvrIt/8wCPTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FW0XcrnI; arc=none smtp.client-ip=95.215.58.172
+	 MIME-Version; b=Tzdc6P9s5ciqYKaUmjsmyLc7QcsqlYh3oBU9700/pweB+1D2cb8aAO2jvGZfIew6vZrP3flGA1i44BEciXEu4FBKKsnGyKIdUwlf+DbjbRszw2kDsvFrQv+05fS0q3vcIaJ0Zbmqj5YFXf5xHmeFJY+5g7GuE/lvIkIs8z397r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YL5+l60U; arc=none smtp.client-ip=95.215.58.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760493857;
+	t=1760493862;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=pAnPJBAybQSLwCuOaYwqStH7InN07AacT/9POxIPPew=;
-	b=FW0XcrnIb9uc0SO8HAgPbvZjv0tnsg+TWGg+Znsx+g2pbYP7bpV6PBjTlCAD5+en8jYmvP
-	Z3qrAskkxLnd60PEgnw3e48rKsiR3QFGDUBFO6txbQdPLSM2bYuvI80OupBuBSckbVuV2D
-	461L28mE4N/OYeAF46sE3WgJscanDI8=
+	bh=PPjkTJOkbszO5j/VYiQ1emN/R2k1X+fYunWZQdT/Y3A=;
+	b=YL5+l60UQ0wu87MDb+Szj6uGGOUGTUc0JBGei5V73DKLQ0ji3RX+h4LzIccU4Y+IaVRJuc
+	Jm2UbhS04bzhry1XqjI+GxTGaPIQ+FdfM1lBjUeggnR+tWeo1UwmxA9qpBvloN8Lp/dRrn
+	tGTJwi/QJlBoYadcSRZHMz7T66Y7M4c=
 From: xuanqiang.luo@linux.dev
 To: edumazet@google.com,
 	kuniyu@google.com,
@@ -55,9 +55,9 @@ Cc: kerneljasonxing@gmail.com,
 	ncardwell@google.com,
 	dsahern@kernel.org,
 	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Subject: [PATCH net-next v8 2/3] inet: Avoid ehash lookup race in inet_ehash_insert()
-Date: Wed, 15 Oct 2025 10:02:35 +0800
-Message-Id: <20251015020236.431822-3-xuanqiang.luo@linux.dev>
+Subject: [PATCH net-next v8 3/3] inet: Avoid ehash lookup race in inet_twsk_hashdance_schedule()
+Date: Wed, 15 Oct 2025 10:02:36 +0800
+Message-Id: <20251015020236.431822-4-xuanqiang.luo@linux.dev>
 In-Reply-To: <20251015020236.431822-1-xuanqiang.luo@linux.dev>
 References: <20251015020236.431822-1-xuanqiang.luo@linux.dev>
 Precedence: bulk
@@ -71,84 +71,107 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-Since ehash lookups are lockless, if one CPU performs a lookup while
-another concurrently deletes and inserts (removing reqsk and inserting sk),
-the lookup may fail to find the socket, an RST may be sent.
+Since ehash lookups are lockless, if another CPU is converting sk to tw
+concurrently, fetching the newly inserted tw with tw->tw_refcnt == 0 cause
+lookup failure.
 
 The call trace map is drawn as follows:
-   CPU 0                           CPU 1
-   -----                           -----
-				inet_ehash_insert()
-                                spin_lock()
-                                sk_nulls_del_node_init_rcu(osk)
+   CPU 0                                CPU 1
+   -----                                -----
+				     inet_twsk_hashdance_schedule()
+				     spin_lock()
+				     inet_twsk_add_node_rcu(tw, ...)
 __inet_lookup_established()
-	(lookup failed)
-                                __sk_nulls_add_node_rcu(sk, list)
-                                spin_unlock()
+(find tw, failure due to tw_refcnt = 0)
+				     __sk_nulls_del_node_init_rcu(sk)
+				     refcount_set(&tw->tw_refcnt, 3)
+				     spin_unlock()
 
-As both deletion and insertion operate on the same ehash chain, this patch
-introduces a new sk_nulls_replace_node_init_rcu() helper functions to
-implement atomic replacement.
+By replacing sk with tw atomically via hlist_nulls_replace_init_rcu() after
+setting tw_refcnt, we ensure that tw is either fully initialized or not
+visible to other CPUs, eliminating the race.
 
-Fixes: 5e0724d027f0 ("tcp/dccp: fix hashdance race for passive sessions")
+It's worth noting that we held lock_sock() before the replacement, so
+there's no need to check if sk is hashed. Thanks to Kuniyuki Iwashima!
+
+Fixes: 3ab5aee7fe84 ("net: Convert TCP & DCCP hash tables to use RCU / hlist_nulls")
 Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 ---
- include/net/sock.h         | 13 +++++++++++++
- net/ipv4/inet_hashtables.c |  8 ++++++--
- 2 files changed, 19 insertions(+), 2 deletions(-)
+ net/ipv4/inet_timewait_sock.c | 35 ++++++++++++-----------------------
+ 1 file changed, 12 insertions(+), 23 deletions(-)
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 60bcb13f045c..ddf7ab55685b 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -858,6 +858,19 @@ static inline bool sk_nulls_del_node_init_rcu(struct sock *sk)
- 	return rc;
+diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+index c96d61d08854..d4c781a0667f 100644
+--- a/net/ipv4/inet_timewait_sock.c
++++ b/net/ipv4/inet_timewait_sock.c
+@@ -88,12 +88,6 @@ void inet_twsk_put(struct inet_timewait_sock *tw)
  }
+ EXPORT_SYMBOL_GPL(inet_twsk_put);
  
-+static inline bool sk_nulls_replace_node_init_rcu(struct sock *old,
-+						  struct sock *new)
-+{
-+	if (sk_hashed(old)) {
-+		hlist_nulls_replace_init_rcu(&old->sk_nulls_node,
-+					     &new->sk_nulls_node);
-+		__sock_put(old);
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- static inline void __sk_add_node(struct sock *sk, struct hlist_head *list)
+-static void inet_twsk_add_node_rcu(struct inet_timewait_sock *tw,
+-				   struct hlist_nulls_head *list)
+-{
+-	hlist_nulls_add_head_rcu(&tw->tw_node, list);
+-}
+-
+ static void inet_twsk_schedule(struct inet_timewait_sock *tw, int timeo)
  {
- 	hlist_add_head(&sk->sk_node, list);
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index b7024e3d9ac3..f5826ec4bcaa 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -720,8 +720,11 @@ bool inet_ehash_insert(struct sock *sk, struct sock *osk, bool *found_dup_sk)
+ 	__inet_twsk_schedule(tw, timeo, false);
+@@ -113,13 +107,12 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+ {
+ 	const struct inet_sock *inet = inet_sk(sk);
+ 	const struct inet_connection_sock *icsk = inet_csk(sk);
+-	struct inet_ehash_bucket *ehead = inet_ehash_bucket(hashinfo, sk->sk_hash);
+ 	spinlock_t *lock = inet_ehash_lockp(hashinfo, sk->sk_hash);
+ 	struct inet_bind_hashbucket *bhead, *bhead2;
+ 
+-	/* Step 1: Put TW into bind hash. Original socket stays there too.
+-	   Note, that any socket with inet->num != 0 MUST be bound in
+-	   binding cache, even if it is closed.
++	/* Put TW into bind hash. Original socket stays there too.
++	 * Note, that any socket with inet->num != 0 MUST be bound in
++	 * binding cache, even if it is closed.
+ 	 */
+ 	bhead = &hashinfo->bhash[inet_bhashfn(twsk_net(tw), inet->inet_num,
+ 			hashinfo->bhash_size)];
+@@ -141,19 +134,6 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+ 
  	spin_lock(lock);
- 	if (osk) {
- 		WARN_ON_ONCE(sk->sk_hash != osk->sk_hash);
--		ret = sk_nulls_del_node_init_rcu(osk);
--	} else if (found_dup_sk) {
-+		ret = sk_nulls_replace_node_init_rcu(osk, sk);
-+		goto unlock;
-+	}
+ 
+-	/* Step 2: Hash TW into tcp ehash chain */
+-	inet_twsk_add_node_rcu(tw, &ehead->chain);
+-
+-	/* Step 3: Remove SK from hash chain */
+-	if (__sk_nulls_del_node_init_rcu(sk))
+-		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+-
+-
+-	/* Ensure above writes are committed into memory before updating the
+-	 * refcount.
+-	 * Provides ordering vs later refcount_inc().
+-	 */
+-	smp_wmb();
+ 	/* tw_refcnt is set to 3 because we have :
+ 	 * - one reference for bhash chain.
+ 	 * - one reference for ehash chain.
+@@ -163,6 +143,15 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+ 	 */
+ 	refcount_set(&tw->tw_refcnt, 3);
+ 
++	/* Ensure tw_refcnt has been set before tw is published.
++	 * smp_wmb() provides the necessary memory barrier to enforce this
++	 * ordering.
++	 */
++	smp_wmb();
 +
-+	if (found_dup_sk) {
- 		*found_dup_sk = inet_ehash_lookup_by_sk(sk, list);
- 		if (*found_dup_sk)
- 			ret = false;
-@@ -730,6 +733,7 @@ bool inet_ehash_insert(struct sock *sk, struct sock *osk, bool *found_dup_sk)
- 	if (ret)
- 		__sk_nulls_add_node_rcu(sk, list);
++	hlist_nulls_replace_init_rcu(&sk->sk_nulls_node, &tw->tw_node);
++	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
++
+ 	inet_twsk_schedule(tw, timeo);
  
-+unlock:
  	spin_unlock(lock);
- 
- 	return ret;
 -- 
 2.25.1
 
