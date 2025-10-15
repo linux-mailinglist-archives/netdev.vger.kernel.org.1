@@ -1,161 +1,155 @@
-Return-Path: <netdev+bounces-229794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3031BE0DDB
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 23:48:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCDD8BE0DF3
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 23:50:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 927CE4E68DC
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:48:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96DE6426FE3
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:50:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EADF30274E;
-	Wed, 15 Oct 2025 21:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127BF303A2E;
+	Wed, 15 Oct 2025 21:50:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YuylOvSu"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="QE+WS5VA"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27331E51E1;
-	Wed, 15 Oct 2025 21:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A162D24AC
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 21:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760564936; cv=none; b=nsllUdQP43067TjEA0ZAvh9uixou1p36/jkRpvHpDtT3m+BcQKECPMaAdgmY9nENrhGsgO7XYQ9gi5WBBIPgpRyy7NYKcCy9kEAFamh9u0+ATSWPTjMTyoDf2vwfoVfmO3SH9TbVLX1gIm2Ai3bBv4vDhqpLzB/YjjVQhe7nOQk=
+	t=1760565056; cv=none; b=SBrGaTOpAHa8s6l/XwgZVACOtIG5NwUaFhvLcljByTn39A75pz0U+Id5jkFDn7cu8BzouqGRuL1Sf2Ogp+avc4eitzbPZLg9xlQyK2gmlitY1/Y0FOf5PM3ZfIU592XFI3flpMXAXABnV+scWLuMd787mZZvM+w2lmBOht6zTIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760564936; c=relaxed/simple;
-	bh=lGh4aWLHX59TIOJDOl60FMg8mwZEfvTCoAPa6IWqX6k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mgbArTLpB0mcdSo0t0pr3ItHD1ss/MAO+srwjJzEclZHCwwu/h0VjjoNP1OhKVljdQZbr3ZANTwVEa41aLr5SkcSUUb5fpcIugRIVr4cvF5rAZ4XYSYlv1eDr/k7tdu+yJ9kwtF/fy99Kpz+1ruG3FFGo/xElJ/ITS1s/c8kMUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YuylOvSu; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZTSdOvDlbsuQj/667Lv/041NU1iVeaPF8hOZogCvbXQ=; b=YuylOvSujLmb3kYb3oa3KZhd1o
-	wcivn+oEGR5jMG+fLOcoNiGMQFOKlJReF4ZhQCgW6UNgwmkI7KBv/Rwe7BlB8vQBvcxbkJM/FS25R
-	nbkiY2chbvHiaGiXJbu3uf20ojRKMuT53zFf1J2Vf4jui+7wXJdVEhEPIEYB3on4i4Z/ijLr3qM2t
-	5pMpZA4Bg/QIYfx62+RbxJ00uIQTNyetpbTjGOrPLJvbE8pLkT9GtmaUtTSoyx3s3qK8bSjc+uYNQ
-	aJ4+ULCk2sB3TksqCuRGzjct29p90b4FiKHUhV0wbNIgFvMGQR+yHmUjhLcpll5Gzf3Tl7vYPHTBd
-	Oxs7DzZQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50176)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1v99MA-000000005Ut-17h0;
-	Wed, 15 Oct 2025 22:48:26 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1v99M1-000000002dZ-0S6N;
-	Wed, 15 Oct 2025 22:48:17 +0100
-Date: Wed, 15 Oct 2025 22:48:16 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Abhishek Chauhan <quic_abchauha@quicinc.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexis Lothore <alexis.lothore@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Boon Khai Ng <boon.khai.ng@altera.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Drew Fustini <dfustini@tenstorrent.com>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Furong Xu <0x1207@gmail.com>, Inochi Amaoto <inochiama@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
-	Jisheng Zhang <jszhang@kernel.org>, Kees Cook <kees@kernel.org>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Matthew Gerlach <matthew.gerlach@altera.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rohan G Thomas <rohan.g.thomas@altera.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Simon Horman <horms@kernel.org>,
-	Song Yoong Siang <yoong.siang.song@intel.com>,
-	Swathi K S <swathi.ks@samsung.com>,
-	Tiezhu Yang <yangtiezhu@loongson.cn>, Vinod Koul <vkoul@kernel.org>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH net-next 11/14] net: stmmac: do not require snps,ps-speed
- for SGMII
-Message-ID: <aPAWoDGVgeRFV95b@shell.armlinux.org.uk>
-References: <aO-tbQCVu47R3izM@shell.armlinux.org.uk>
- <E1v92N3-0000000AmHQ-4Bm2@rmk-PC.armlinux.org.uk>
- <15ea57e0-d127-4722-b752-4989d5a443c0@lunn.ch>
+	s=arc-20240116; t=1760565056; c=relaxed/simple;
+	bh=iduM9BCUy9A1PPFJTP7NoUXJkN4FJL3UKtirvC6QjRM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sIwlYOdHkS9RieBsSk0Uxda91xuOoMpPRGU6JK6ZDuhzlrDlbGK6li+YyMZAFiSo6qCSQwYdWv4IP+Xh7ubqHbSXOa9wg/CYSqFi+5fIdd32XCMLWr7Jc5LtEbz5NPrz2BbyTXs4YHGnj/fOZM1V+NxWVIy2ujMPsAWSCwM5zjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=QE+WS5VA; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-781001e3846so92069b3a.2
+        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 14:50:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1760565054; x=1761169854; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iduM9BCUy9A1PPFJTP7NoUXJkN4FJL3UKtirvC6QjRM=;
+        b=QE+WS5VA0TWfN8btw/Vp76HeZs4mypDhpa/gyTXyDKRq59mTPhWVwpj9gwDtwLMNWc
+         36Ik+ISxb11fTe7AIvf92Qo24MO+sgJrXz7N/p3O5njUhOAuiVa2+mJp1Fy77dQl5zEY
+         RHtjmkBiAmXWuOrSEcfUGXO7Mw3PW7eoG0tEL4/m8nvwJDfi42IFSRV5zvzy8cWErBkU
+         623bk8sFmoF+YsWSfIVVslJf7SiNXRSTU/zcEGx97td4jr1v2ujTOpEw5GH0YgnLLk/I
+         bDQHBZFd6btSKeH2SpQ93FS5dyDYeOaCho4DtcHi3afivDgFKTRMvczRctUOFClI6dpe
+         xZkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760565054; x=1761169854;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iduM9BCUy9A1PPFJTP7NoUXJkN4FJL3UKtirvC6QjRM=;
+        b=kRP4QzKrz8v7dRGzx7E14V1rnccyAkKvifglzXO+B3+Fo2czNJtKsCWI8ihFtFBy7s
+         DZnVIUagZTBgKlYoQOkRlAyXmsD3WS2mViW0OZkMH1Uy/PJzaL78Fe4HLd/OweVSdjlK
+         XZZm362GZ2Nw0+LIgOCOi3Ma7i3p1bdynaKrZUe72Q6Pd3KcemXkXVBPojoGfwtryhwK
+         4qo6GA/yiBPzbsQDMZ+m2o4n/4AxvTrFv9yCU7vxVexW8/y72FWu6aGp8UR9ASiBooIl
+         xuzVBL5dlcy6r6GZesbPlIXzIu19/vejqQ/tBnhnzpqJCu0Sc+FvtrIP1VV4H1sfuUBU
+         /xWw==
+X-Forwarded-Encrypted: i=1; AJvYcCWz9TPxpks12k2Wuyo54wSIlCCK9hXP4xvtL9fdRGCkH02rDq+gmEsa81obXOzQlm6Jwkp/LDI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy40loXFrpGuX5dOd2xWwc9+oJCT6f5brM1d1TLrNzIEQ6NM0sx
+	eAJL2JJJbkVybpuFdHE8gElsVNd9t0i2qn1/k2VLcroIVeTqT7dV1fj8bx0o8xrF/vuNXUCKQhu
+	UtIXd3bH6i8vnx0uC699AfspehUt/xshiAxGwEqan
+X-Gm-Gg: ASbGncsVtSbKq8u0TOlJQ7wd5iu632uwajjjx1n3N2rR66KySi4gEuDfs19TAeaaEqG
+	ti/ifga6eGNyfpI2tW/6DWHxyxRbcIPhVDRTK6cgzU2Rpslz8Sv5xKHBEWjuoU2DpUDWF46gYRX
+	NWrU47lab0V6fLdzDGTEI+ixWGyTA9sYkXmL9GwnnvrPupdedPKK9Q6VYUGEWzUrUBZNQ4wdaod
+	PeeP7vCZ8WA6nVUlLV9wWKVlSN2qrvVjlM93V+mRIBR8xluN0MaJGnrLP7DxnJFXTzpwX/Jt9f8
+	DS3Td+PNbJQp8hJMo8iqulc/BeCShTh4HxE/
+X-Google-Smtp-Source: AGHT+IFwZrRh7ZKAhbIlR4D12tk51kY/fRatZwY2OQID0vS3YYNT414SduS1rI4gvIe3Me4Ogb4ysXIQ+xiEjdpPLrE=
+X-Received: by 2002:a05:6a20:3ca7:b0:2e5:c9ee:96fb with SMTP id
+ adf61e73a8af0-32da84ed584mr41211395637.59.1760565053849; Wed, 15 Oct 2025
+ 14:50:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <15ea57e0-d127-4722-b752-4989d5a443c0@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <681a1770.050a0220.a19a9.000d.GAE@google.com> <68ea0a24.050a0220.91a22.01ca.GAE@google.com>
+ <CANn89iLjjtXV3ZMxfQDb1bbsVJ6a_Chexu4FwqeejxGTwsR_kg@mail.gmail.com>
+ <CAM0EoMnGLqKU7AnsgS00SEgU0eq71f-kiqNniCNyfiyAfNm8og@mail.gmail.com>
+ <CAM0EoMmK7TJ4w_heeMuD+YmUdMyEz7VWKY+a+qMO2UN4GYZ5jQ@mail.gmail.com> <20251014201149.ckkw7okat3cv55qk@skbuf>
+In-Reply-To: <20251014201149.ckkw7okat3cv55qk@skbuf>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 15 Oct 2025 17:50:41 -0400
+X-Gm-Features: AS18NWBoDDX5v9apL36RaGrCWfEkUt2MPnhglXFLB138k75uT3ov8ARY2TM2AaI
+Message-ID: <CAM0EoM=1swUNW5F2Ha4JCf3VW309m1S0JEpSqiyR5wH7e=YyJw@mail.gmail.com>
+Subject: Re: [syzbot] [net?] [mm?] INFO: rcu detected stall in
+ inet_rtm_newaddr (2)
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Eric Dumazet <edumazet@google.com>, 
+	syzbot <syzbot+51cd74c5dfeafd65e488@syzkaller.appspotmail.com>, 
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>, davem@davemloft.net, dsahern@kernel.org, 
+	hdanton@sina.com, horms@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, tglx@linutronix.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 15, 2025 at 11:26:03PM +0200, Andrew Lunn wrote:
-> On Wed, Oct 15, 2025 at 03:20:53PM +0100, Russell King (Oracle) wrote:
-> > SGMII mode does not require port-speed to be specified; this only
-> > switches SGMII to use the MAC configuration register speed settings
-> > and the actual value is irrelevant when the link comes up.
-> > 
-> > As it seems the intention was to support "reverse SGMII" with this
-> > setting, but the code didn't actually configure that due to a typo,
-> > the warning and bad DT binding documentation has led people to
-> > specify snps,ps-speed in their DT files inappropriately.
-> 
-> I know you hit the patch limit. Do you have a patch in the next series
-> which updates the binding?
+On Tue, Oct 14, 2025 at 4:11=E2=80=AFPM Vladimir Oltean <vladimir.oltean@nx=
+p.com> wrote:
+>
+> Hi Jamal,
+>
+> On Sun, Oct 12, 2025 at 11:52:54AM -0400, Jamal Hadi Salim wrote:
+> > > > Yet another taprio report.
+> > > >
+> > > > If taprio can not be fixed, perhaps we should remove it from the
+> > > > kernel, or clearly marked as broken.
+> > > > (Then ask syzbot to no longer include it)
+> > >
+> > > Agreed on the challenge with taprio.
+> > > We need the stakeholders input: Vinicius - are you still working in
+> > > this space? Vladimir you also seem to have interest (or maybe nxp
+> > > does) in this?
+> >
+> > + Vladmir..
+> >
+> > > At a minimum, we should mark it as broken unless the stakeholders wan=
+t
+> > > to actively fix these issues.
+> > > Would syzbot still look at it if it was marked broken?
+>
+> I still have interest in taprio, but at the moment I can't look at this
+> any sooner than the second half of next week (unless someone else beats
+> me to it). I've added a note not to lose track.
+>
 
-I don't at present, and I'm not sure what the point of updating it
-would actually be, because this is another thing that's just broken.
+Thanks!
 
-The purpose of this property is to allow DT to specify the operating
-speed of the link when acting as if it were a PHY on the end of a
-SGMII (or RGMII) link using in-band signalling. However, because the
-code mixes up GMAC_CONTROL_TE instead of GMAC_CONTROL_TC, when this
-is set, the _transmit enable_ is set, rather than the _transmit
-configuration_ bit, meaning the core doesn't actually send the
-inband status as if it were a PHY.
+> What is the situation with syzbot reports? I don't actively monitor them,
+> only if somebody happens to email me.
 
-So, the whole thing is pointless, it's never worked from what I can
-see, and lastly... this property should not even be specifying a
-speed at all, because that's what we have the fixed-link stuff for.
-At best, this should have triggered a discussion about PHY
-interface modes such as reverse-SGMII and reverse-RGMII that we've
-recently had where the MAC is acting as if it were a PHY.
+These issues have been lingering forever..
+They do get posted on the list. Here are samples:
+https://lore.kernel.org/netdev/676d25b2.050a0220.2f3838.0464.GAE@google.com=
+/#r
+https://lore.kernel.org/netdev/67d2a576.050a0220.14e108.0030.GAE@google.com=
+/
+https://lore.kernel.org/netdev/67946a0c.050a0220.3ab881.0010.GAE@google.com=
+/
+https://lore.kernel.org/netdev/66e96979.050a0220.252d9a.000a.GAE@google.com=
+/
+https://lore.kernel.org/netdev/6777334a.050a0220.3a8527.0058.GAE@google.com=
+/#t
 
-We can't get rid of it because doing so would break existing DTS
-files. We can't fix it to work, because given the vagueness of the
-current definition, people have added this property even when they
-do not want to be operating in reverse mode.
+They all point to the same bisected commit, but am not sure whether
+they are the same issue
 
-Hence, I would like this property a slow and painful^h^h^hfree death.
-Maybe mark the property deprecated, and remove all explanation of it
-apart from stating that it's obsolete after this patch series has
-been merged and we've proven that it's never been useful.
+To get you on Cc from syzbot - i think we'll have to add you as a
+maintainer for taprio if you'd be okk with that..
 
-IMHO, it's a property that should never have existed.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+cheers,
+jamal
 
