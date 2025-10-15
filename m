@@ -1,178 +1,102 @@
-Return-Path: <netdev+bounces-229647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 964ACBDF440
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:07:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26692BDF458
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:07:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 69343508AF6
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:02:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53EF73A8EF3
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:05:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736742EF65C;
-	Wed, 15 Oct 2025 15:00:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6AC82D6E74;
+	Wed, 15 Oct 2025 15:05:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K2+JimHg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aYGsImU3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D442E54A1
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 15:00:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F33B2046BA;
+	Wed, 15 Oct 2025 15:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760540459; cv=none; b=LKKB4DTxDeYcaOdVeYg+mIDF7pnF8X1PYzP6DTee8gNzXcZ+qJ3xXYP6k8IRKpdYeEJvTa5/CyiFoHAoZ34+k92BJF8fjyZHRxUDwe98TD+BskszstG3lH+t+38Rjti62tnvFUxm3SK/LrGvYWiXLD2aF6iyxpg5tBrPAkVjbH4=
+	t=1760540702; cv=none; b=QCOr22Dt9Gu8fyC2a+Vop28Ik5KmbWKnj21A1Al691Gi+2L0qZhBTZGSOR6K99Qv/RPovZueVPJfI/JpwyU922xANs+MC0BFBc2DLguLR8gJh1RT3HRM9deh6bmvCsXSkRELo1LFYREf/8aR/BOHTIRh+BJJEXeRL1NcZmA60fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760540459; c=relaxed/simple;
-	bh=60XT5SO34ddHtpkn/CIdJmvGQY2Mb1sF34YxFyRKDfE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n1ykkO9fH77g9dNeDJTktA7L6dz78X946srmXo0kND4vKis7twbfNafGBhdZuOeHTgoxxUFRYICthctLroozSYJRVBffuAJveLkCdr4RorlBP+l7JvAtx5X8j/tNorTmzcmmV4GGXZAOHcjGswAV3Ij2vRyTtWqtkIuMw2vfR7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K2+JimHg; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-271d1305ad7so104954875ad.2
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 08:00:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760540457; x=1761145257; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ifGvImgtMbsz18j1645Ok+33OIuHZ/lnBEplV9+70Ps=;
-        b=K2+JimHgj0OETor0U2PUWLzJe0XalgSCzoHcek+QuqM49FaXClZNjlwZef/myuLBfe
-         hX6BQ4BEp+OSEZbtLXkvK/4uITCr9tVcthgkh3sim5kHYWh0ZGL/Q1bglm3rAFkvUHGd
-         hejdzMeGEw2cbKRocB/DFBC2ywbCjJSr8LrcnO3+jLuwFJADWg0AM6JCO9rL0/7buJJE
-         QNgZOvVyLd6+zL3Y5FhQ1CId7uQlges7VPZVmmPaEiXd2wiRvCdzHBjW1wyjBqe34+a9
-         kFCTLo6b9aocn+fdDZrpIUnP4OXxM8qXWH/mKgY1FDdRqd1i6VYTZgfBaA4Fo0Zb3v4y
-         du0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760540457; x=1761145257;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ifGvImgtMbsz18j1645Ok+33OIuHZ/lnBEplV9+70Ps=;
-        b=GDG+fdUbwnWiDbalWwj6rV0ERglWrz7DnokhR+JzvZRrwpTSaKH+W1SufChF22d11g
-         qu9bPgKe33oUDaFAVj8yHP9neMBjAm/YBI91XjBM6N0NNaW2+D565UtkLkmmivAS+xyT
-         KmV5yp9NUhRPRtshIb1Yxr5O31lcwqaDB0OnnKXamP+HgJoS4/gHOCIsq7wfyPYjHtEm
-         2nWaSaPbJDByYm7tlB9cjc95ltvycE9/5sDA0yDwfX5YUA7maQJDr/Ae5qZzWiwufstR
-         Pod4Xwwa4WbfuMYy4bno1ybfi6MS9J71zg37RunaASGGwSpADD0tvKy5PJ2L0lbPRK9P
-         TtvQ==
-X-Gm-Message-State: AOJu0Yzi5ElidfTgVylYm34h1Cy/EKpFezvS2jjBz2B9AnOQ9tcDvsck
-	7+1bIBj2dj48mSG/cu7pLspcUMgMX/BFDVDEc61Nbl+yGZo1TFUPeqfV
-X-Gm-Gg: ASbGnctHraggg7fFSMD3qLxm+braWUosT/hHt0wW3FmEA7g58u8olW2NeIp7/vHXqtf
-	2EtO5E9OzovxAZXoI1zOX/VXqAqilSAiDynIv8zGkkHyqR72RXrzD4ylG+rC4Y8Qu0iez4dqpXU
-	RUYaB5MJ5aPHU3U+CBY4quOmCdj+W5dinpyqWxlgmd23ftjvO7PuwaesRyB0Ssoj1rS5GPiYrYL
-	wxNt/jSYNkq6CCmmM1pf7zepgL5gkP/TOdkC19akBQBNMDXKb9TkiW3N75My2rWPD9SBhzLtOqC
-	fX4U8gtUQsf3IphZF1rQlQ7Lwu0mtbozELQcoMMinXMD90LNscv35htxVA9I4bEmHul8iDFbHhs
-	xcoacnRPDHM7cown8gTDOQSViuymEvOXD72E9QEb7G0Z07LnwX1rZiYtxn7h6lITCI/XJLI4tDQ
-	==
-X-Google-Smtp-Source: AGHT+IGqxIssqtEE1gKMyZ/xPQWAaQDO4XMp/cQx9E/SYok7KUMOpcA7WPjXYLzfNma9OBCD3O8baQ==
-X-Received: by 2002:a17:903:298c:b0:265:982a:d450 with SMTP id d9443c01a7336-290273ffbf1mr386779325ad.40.1760540456721;
-        Wed, 15 Oct 2025 08:00:56 -0700 (PDT)
-Received: from iku.. ([2401:4900:1c07:c7d3:f449:63fb:7005:808e])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29034f36408sm199642265ad.91.2025.10.15.08.00.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Oct 2025 08:00:56 -0700 (PDT)
-From: Prabhakar <prabhakar.csengg@gmail.com>
-X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-	Paul Barker <paul@pbarker.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Prabhakar <prabhakar.csengg@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 3/3] net: ravb: Enforce descriptor type ordering to prevent early DMA start
-Date: Wed, 15 Oct 2025 16:00:26 +0100
-Message-ID: <20251015150026.117587-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251015150026.117587-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-References: <20251015150026.117587-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	s=arc-20240116; t=1760540702; c=relaxed/simple;
+	bh=Wdbu91UHG7NXXe6k08cBk3T/+pvUqlyl9VvW3phwgNc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZcUN7JG+uA06W536WkbobNGVp6FD9q4dMVetKp+WFbc4Sju1Uk++AadgP5iCrr9JjpmofIakMi3sg4cP1hkHAG130FfveH710CmflnkfzVlZQFB+isHGvml5CxgRMHNCMVSkABCsEYxBVyFBdueHgnYBHVq/huvIQRAM2QvOXTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aYGsImU3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 842CFC4CEF8;
+	Wed, 15 Oct 2025 15:05:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760540701;
+	bh=Wdbu91UHG7NXXe6k08cBk3T/+pvUqlyl9VvW3phwgNc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aYGsImU3Per5JLsRWKEDgSU53GVias3oxkv3lcMOJyTF2/c5lzyw2mtJxaYSCavuH
+	 wbaCEkmbUtHKcgzV8+Rd9HkAU542mDJJNLVv7ZLIwh7hHX65uxF02j6/qf+HBCWCr5
+	 a3SDnYLcIaJLj3CG8shPVh1uDD9PGHxB0uwfo6dsz01FKRPCdWlYOJ5Fr2Ur+oEy8m
+	 HzxrY4ov7Z1kbMBdW2sPJBcEDJVajDnhRpxhR69uKn2pllOAh6ktBWAQvIYb8QmygG
+	 i9hUEjmhdzalFSGO5bNoADPFDFBTlJjew3xdACovDj0EokV3my/h3MUgQn0EZN/yiO
+	 mzmbfLOBm1LVw==
+Date: Wed, 15 Oct 2025 08:04:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?0K/QvdCwINCR0LDRiNC70YvQutC+0LLQsA==?= <yana2bsh@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer
+ Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Nathan
+ Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>,
+ Tom Rix <trix@redhat.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-riscv@lists.infradead.org, bpf@vger.kernel.org, llvm@lists.linux.dev,
+ lvc-project@linuxtesting.org
+Subject: Re: [PATCH 6.1 00/15] genetlink: Test Netlink subsystem of Linux
+ v6.1
+Message-ID: <20251015080459.6e681582@kernel.org>
+In-Reply-To: <CAEP49o+-=HeW4NgB5a0H6gM9tPJg=oNeUA1iCbXq_1qZPPaGnA@mail.gmail.com>
+References: <20250912195339.20635-1-yana2bsh@gmail.com>
+	<20250912131722.74658ec0@kernel.org>
+	<CAEP49o+-=HeW4NgB5a0H6gM9tPJg=oNeUA1iCbXq_1qZPPaGnA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On Wed, 15 Oct 2025 17:49:22 +0300 =D0=AF=D0=BD=D0=B0 =D0=91=D0=B0=D1=88=D0=
+=BB=D1=8B=D0=BA=D0=BE=D0=B2=D0=B0 wrote:
+> The motivation for this work is to improve the test coverage and
+> reliability of the Netlink subsystem, specifically for the core
+> af_netlink.c and genetlink.c components. While the subsystem is
+> critical for kernel-userspace communication, its coverage by the
+> existing selftests is quite limited.
+>=20
+> To quantify the improvement, these new selftests achieve the following
+> line coverage (as measured by gcov):
+> - net/netlink/af_netlink.c: 84.0%
+> - net/netlink/genetlink.c: 88.8%
 
-Ensure TX descriptor type fields are written in a safe order so the DMA
-engine does not begin processing a chain before all descriptors are
-fully initialised.
+For what it's worth syzbot has:
 
-For multi-descriptor transmissions the driver writes DT_FEND into the
-last descriptor and DT_FSTART into the first. The DMA engine starts
-processing when it sees DT_FSTART. If the compiler or CPU reorders the
-writes and publishes DT_FSTART before DT_FEND, the DMA can start early
-and process an incomplete chain, leading to corrupted transmissions or
-DMA errors.
+    af_netlink.c  91%
+    genetlink.c   68%
 
-Fix this by writing DT_FEND before the dma_wmb() barrier, executing
-dma_wmb() immediately before DT_FSTART (or DT_FSINGLE in the single
-descriptor case), and then adding a wmb() after the type updates to
-ensure CPU-side ordering before ringing the hardware doorbell.
+Without a line of code added to the kernel. Of course it's not
+functional testing.
 
-On an RZ/G2L platform running an RT kernel, this reordering hazard was
-observed as TX stalls and timeouts:
+> Integrating these tests into the upstream suite will provide long-term
+> stability and make it safer to refactor or add new features to the
+> Netlink core in the future.
 
-  [  372.968431] NETDEV WATCHDOG: end0 (ravb): transmit queue 0 timed out
-  [  372.968494] WARNING: CPU: 0 PID: 10 at net/sched/sch_generic.c:467 dev_watchdog+0x4a4/0x4ac
-  [  373.969291] ravb 11c20000.ethernet end0: transmit timed out, status 00000000, resetting...
-
-This change enforces the required ordering and prevents the DMA engine
-from observing DT_FSTART before the rest of the descriptor chain is
-valid.
-
-Fixes: 2f45d1902acf ("ravb: minimize TX data copying")
-Cc: stable@vger.kernel.org
-Co-developed-by: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
-Signed-off-by: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
-Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
----
- drivers/net/ethernet/renesas/ravb_main.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index a200e205825a..2a995fa9bfff 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -2211,15 +2211,19 @@ static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
- 
- 		skb_tx_timestamp(skb);
- 	}
--	/* Descriptor type must be set after all the above writes */
--	dma_wmb();
-+
-+	/* For multi-descriptors set DT_FEND before calling dma_wmb() */
- 	if (num_tx_desc > 1) {
- 		desc->die_dt = DT_FEND;
- 		desc--;
--		desc->die_dt = DT_FSTART;
--	} else {
--		desc->die_dt = DT_FSINGLE;
- 	}
-+
-+	/* Descriptor type must be set after all the above writes */
-+	dma_wmb();
-+	desc->die_dt = (num_tx_desc > 1) ? DT_FSTART : DT_FSINGLE;
-+
-+	/* Ensure data is written to RAM before initiating DMA transfer */
-+	wmb();
- 	ravb_modify(ndev, TCCR, TCCR_TSRQ0 << q, TCCR_TSRQ0 << q);
- 
- 	priv->cur_tx[q] += num_tx_desc;
--- 
-2.43.0
-
+Happy to hear from others if they disagree but what kernel tests get
+merged into the tree is pretty subjective. Do we have a lot of bugs=20
+in genetlink? Are you planning to do major development in this area
+and want to catch regressions? If the answers to both of those questions
+is "no" IMHO this 7kLoC is not worth carrying in the tree.
 
