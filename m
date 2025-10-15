@@ -1,167 +1,287 @@
-Return-Path: <netdev+bounces-229511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BCD3BDD33D
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 09:51:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E79CEBDD45E
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 10:01:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EF40E4F77EB
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 07:50:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C37B3B8E18
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 08:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6750F313E3B;
-	Wed, 15 Oct 2025 07:50:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="AP6FJBPR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2195D2C11C9;
+	Wed, 15 Oct 2025 08:00:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DADF313E39;
-	Wed, 15 Oct 2025 07:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F2C2C21F6;
+	Wed, 15 Oct 2025 08:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760514656; cv=none; b=RBTzFyOzPgR1t1JUu1ozGVtpFzRNL0ew/JoWUZPk5xQ6V8a/2FtOPQmWxgcKAq6h9m/t5MeGUjvxCVISrK3iRNRmISN4uq1wzTKtocliHUNh5AZ2hrqtHH3k0eCN3LYflYLnes5GRdRr5W8WUX+j59iOjdBDEssFRtcv9U8vNfM=
+	t=1760515239; cv=none; b=cC+1ogBYroXCo97tPWXuae4uRTiRVBt7yPdVxB/2xzbo0h5OY/Hub3wxiL4Q/W3gnelEoOf7NUkjX0grMKyFbGDzSoIE/KkWFguduAkeocWxx6IwrgkkSnxCLrmrZjImsX94YGNuMFE8n3dqF+VNqChyyJr2W1/+am0HjEXRnNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760514656; c=relaxed/simple;
-	bh=ZNR/1vZHBuEZZ1lROgCkXjOzslv+2Dewz4AC5zPfhIE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TtX0gaRWoagYYfhv8HmpW20z4qjfa6dTmyUnammo7SHKtg/K95cAGmxJ+elsKrK5BGyfEdErdqZ6CFI3gkZYkx6U599oYmI0ZlSWGlU0k0vDWyyeuVQ1a5L2bFbz9TqfJ4MyNaKm0pRDoh1GFbM9d3XUrAPkXqGhNfHg2UFKi1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=AP6FJBPR; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 80EF0207B2;
-	Wed, 15 Oct 2025 09:43:14 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lxxDAAhui_Ho; Wed, 15 Oct 2025 09:43:13 +0200 (CEST)
-Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	s=arc-20240116; t=1760515239; c=relaxed/simple;
+	bh=V0UJWio6hmKAlTfx0k9Sak5puIpWgTXuRYjRDkwvHck=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aYvR3VlLfETyQGJKrMe6wsx6n+DF3ScwYKjmArCSIESNnU8Y4sH+Cq3BAcjFGQjKMzrbh1f/vTGBd94wH4ffdo4SIr78pNm4HXpZ0V+dtDSjNMWT4ocvKFrfjIquGev/CaVJmuxtjFl2RKGqWDvpm/MhJeizOn2KX2uJDpXQ/gI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.212] (p57bd968e.dip0.t-ipconnect.de [87.189.150.142])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 771D1205E3;
-	Wed, 15 Oct 2025 09:43:13 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 771D1205E3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1760514193;
-	bh=8DAGPi9RRU3NyqKZzw7sWRwKSj7xVgafKgfGA9J4HSE=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=AP6FJBPRR+t6JvtgYIFR2wVHWR/TZdm6ikQu4S9x9hcttmwYZpG5GQqs5Azp2MNDj
-	 Cpj5cPBfQe3bpnKeCk1v61JIobXQpjiTSfFzNvforlegqaIVQfMLsYpljQPwV9fNh6
-	 ku6Towru4ywx42HJY8H29CBvc5eENPa2m9lSP6wZ9h6nvMvn+9OC1erHYPtZdBEHSF
-	 +KpRPK8nlTnz/IxH4tQ3kArTzohXM84CTWKag6XuTbcPVtgMDKztZkdJ0PzC/pBiAM
-	 WIqBpdfyIMXG5o1tiGY8jG75U5M1A/cltnYolDoZ3xJA1WCvs7mIwlhH4kx2EI4kA/
-	 ea91ltf89aN2w==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Wed, 15 Oct
- 2025 09:43:12 +0200
-Received: (nullmailer pid 3606862 invoked by uid 1000);
-	Wed, 15 Oct 2025 07:43:12 -0000
-Date: Wed, 15 Oct 2025 09:43:12 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-CC: syzbot <syzbot+5cd6299ede4d4f70987b@syzkaller.appspotmail.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <herbert@gondor.apana.org.au>,
-	<horms@kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<syzkaller-bugs@googlegroups.com>
-Subject: Re: [syzbot] [net?] WARNING in xfrm_state_migrate (2)
-Message-ID: <aO9QkNNkZ1JLnnIl@secunet.com>
-References: <68e2ad62.a00a0220.2ba410.0018.GAE@google.com>
- <aO5PnU4dhUuzM34e@krikkit>
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 83C0A6028F366;
+	Wed, 15 Oct 2025 09:59:58 +0200 (CEST)
+Message-ID: <21a53fe4-7cad-4717-87db-2f433659e174@molgen.mpg.de>
+Date: Wed, 15 Oct 2025 09:59:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aO5PnU4dhUuzM34e@krikkit>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- EXCH-01.secunet.de (10.32.0.171)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next v2] ixgbe: Add 10G-BX support
+To: Birger Koblitz <mail@birger-koblitz.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251014-10gbx-v2-1-980c524111e7@birger-koblitz.de>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251014-10gbx-v2-1-980c524111e7@birger-koblitz.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 14, 2025 at 03:26:53PM +0200, Sabrina Dubroca wrote:
-> 2025-10-05, 10:39:46 -0700, syzbot wrote:
-> > Hello,
-> > 
-> > syzbot found the following issue on:
-> > 
-> > HEAD commit:    4b946f6bb7d6 selftests/bpf: Fix realloc size in bpf_get_ad..
-> > git tree:       bpf
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=13be46e2580000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=8f1ac8502efee0ee
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=5cd6299ede4d4f70987b
-> > compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-> > 
-> > Unfortunately, I don't have any reproducer for this issue yet.
-> > 
-> > Downloadable assets:
-> > disk image: https://storage.googleapis.com/syzbot-assets/f0ef71bdead6/disk-4b946f6b.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/0c8251d5df12/vmlinux-4b946f6b.xz
-> > kernel image: https://storage.googleapis.com/syzbot-assets/29bad3cdad16/bzImage-4b946f6b.xz
-> > 
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by: syzbot+5cd6299ede4d4f70987b@syzkaller.appspotmail.com
-> > 
-> > ------------[ cut here ]------------
-> > WARNING: CPU: 0 PID: 30386 at net/xfrm/xfrm_state.c:800 __xfrm_state_destroy net/xfrm/xfrm_state.c:800 [inline]
-> > WARNING: CPU: 0 PID: 30386 at net/xfrm/xfrm_state.c:800 xfrm_state_put include/net/xfrm.h:928 [inline]
-> > WARNING: CPU: 0 PID: 30386 at net/xfrm/xfrm_state.c:800 xfrm_state_migrate+0x13bc/0x1b10 net/xfrm/xfrm_state.c:2165
-> 
-> Steffen, this looks like we simply forgot to set XFRM_STATE_DEAD
-> before the final put() in the error path of xfrm_state_migrate (and
-> xfrm_state_clone_and_setup):
-> 
-> 
-> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> index 9ea1d45b79e3..7ae10fac7b31 100644
-> --- a/net/xfrm/xfrm_state.c
-> +++ b/net/xfrm/xfrm_state.c
-> @@ -2074,6 +2074,7 @@ static struct xfrm_state *xfrm_state_clone_and_setup(struct xfrm_state *orig,
->  	return x;
->  
->   error:
-> +	x->km.state = XFRM_STATE_DEAD;
->  	xfrm_state_put(x);
->  out:
->  	return NULL;
-> @@ -2163,6 +2164,7 @@ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
->  
->  	return xc;
->  error:
-> +	xc->km.state = XFRM_STATE_DEAD;
->  	xfrm_state_put(xc);
->  	return NULL;
->  }
-> 
-> 
-> Does that look reasonable? The state was never add()/insert()'ed, so
-> it goes through put()/destroy() without delete() first that would set
-> XFRM_STATE_DEAD.
+Dear Birger,
 
-Right. Looks like this is broken since the migrate API exists.
 
-> It also looks like we're missing a xfrm_dev_state_delete if
-> xfrm_state_migrate -> xfrm_state_add fails, since
-> xfrm_dev_state_delete gets called during __xfrm_state_delete, and this
-> new state will only see xfrm_state_put/__xfrm_state_destroy:
+Thank you for your patch.
+
+Am 14.10.25 um 06:18 schrieb Birger Koblitz:
+> Adds support for 10G-BX modules, i.e. 10GBit Ethernet over a single strand
+> Single-Mode fiber
+
+I’d use imperative mood, and add a dot/period at the end.
+
+> The initialization of a 10G-BX SFP+ is the same as for a 10G SX/LX module,
+> and is identified according to SFF-8472 table 5-3, footnote 3 by the
+> 10G Ethernet Compliance Codes field being empty, the Nominal Bit
+> Rate being compatible with 12.5GBit, and the module being a fiber module
+> with a Single Mode fiber link length.
 > 
-> @@ -2159,10 +2159,13 @@ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
->  		xfrm_state_insert(xc);
->  	} else {
->  		if (xfrm_state_add(xc) < 0)
-> -			goto error;
-> +			goto error_add;
->  	}
->  
->  	return xc;
-> +error_add:
-> +	if (xuo)
-> +		xfrm_dev_state_delete(xc);
+> This was tested using a Lightron WSPXG-HS3LC-IEA 1270/1330nm 10km
+> transceiver:
+> $ sudo ethtool -m enp1s0f1
+>     Identifier                          : 0x03 (SFP)
+>     Extended identifier                 : 0x04 (GBIC/SFP defined by 2-wire interface ID)
+>     Connector                           : 0x07 (LC)
+>     Transceiver codes                   : 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>     Encoding                            : 0x01 (8B/10B)
+>     BR Nominal                          : 10300MBd
+>     Rate identifier                     : 0x00 (unspecified)
+>     Length (SMF)                        : 10km
+>     Length (OM2)                        : 0m
+>     Length (OM1)                        : 0m
+>     Length (Copper or Active cable)     : 0m
+>     Length (OM3)                        : 0m
+>     Laser wavelength                    : 1330nm
+>     Vendor name                         : Lightron Inc.
+>     Vendor OUI                          : 00:13:c5
+>     Vendor PN                           : WSPXG-HS3LC-IEA
+>     Vendor rev                          : 0000
+>     Option values                       : 0x00 0x1a
+>     Option                              : TX_DISABLE implemented
+>     BR margin max                       : 0%
+>     BR margin min                       : 0%
+>     Vendor SN                           : S142228617
+>     Date code                           : 140611
+>     Optical diagnostics support         : Yes
+> 
+> Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
+> ---
+> Changes in v2:
+>    Allow also modules with only Byte 15 (100m SM link length) set to
+>    be identified as BX
+> ---
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c   |  7 ++++
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c |  2 ++
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c     | 43 +++++++++++++++++++++---
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h     |  2 ++
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_type.h    |  2 ++
+>   5 files changed, 51 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
+> index d5b1b974b4a33e7dd51b7cfe5ea211ff038a36f0..892a73a4bc6b0bb1c976ca95bf874059b987054f 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
+> @@ -342,6 +342,13 @@ static int ixgbe_get_link_capabilities_82599(struct ixgbe_hw *hw,
+>   		return 0;
+>   	}
+>   
+> +	if (hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
+> +	    hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1) {
+> +		*speed = IXGBE_LINK_SPEED_10GB_FULL;
+> +		*autoneg = false;
+> +		return 0;
+> +	}
+> +
+>   	/*
+>   	 * Determine link capabilities based on the stored value of AUTOC,
+>   	 * which represents EEPROM defaults.  If AUTOC value has not been
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+> index 2d660e9edb80af8fc834e097703dfd6a82b8c45b..76edf02bc47e5dd24bb0936f730f036181f6dc2a 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+> @@ -351,6 +351,8 @@ static int ixgbe_get_link_ksettings(struct net_device *netdev,
+>   		case ixgbe_sfp_type_1g_lx_core1:
+>   		case ixgbe_sfp_type_1g_bx_core0:
+>   		case ixgbe_sfp_type_1g_bx_core1:
+> +		case ixgbe_sfp_type_10g_bx_core0:
+> +		case ixgbe_sfp_type_10g_bx_core1:
+>   			ethtool_link_ksettings_add_link_mode(cmd, supported,
+>   							     FIBRE);
+>   			ethtool_link_ksettings_add_link_mode(cmd, advertising,
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
+> index 2449e4cf2679ddf3277f4ada7619303eb618d393..ad6a1eae6042bb16e329fb817bcfcb87e9008ce8 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
+> @@ -1541,6 +1541,8 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+>   	u8 identifier = 0;
+>   	u8 cable_tech = 0;
+>   	u8 cable_spec = 0;
+> +	u8 sm_length_km = 0;
+> +	u8 sm_length_100m = 0;
+>   	int status;
+>   
+>   	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_fiber) {
+> @@ -1678,6 +1680,31 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+>   			else
+>   				hw->phy.sfp_type =
+>   					ixgbe_sfp_type_1g_bx_core1;
+> +		/* Support Ethernet 10G-BX, checking the Bit Rate
+> +		 * Nominal Value as per SFF-8472 to be 12.5 Gb/s (67h) and
+> +		 * Single Mode fibre with at least 1km link length
+> +		 */
+> +		} else if ((!comp_codes_10g) && (bitrate_nominal == 0x67) &&
+> +			   (!(cable_tech & IXGBE_SFF_DA_PASSIVE_CABLE)) &&
+> +			   (!(cable_tech & IXGBE_SFF_DA_ACTIVE_CABLE))) {
+> +			status = hw->phy.ops.read_i2c_eeprom(hw,
+> +					    IXGBE_SFF_SM_LENGTH_KM,
+> +					    &sm_length_km);
+> +			if (status != 0)
+> +				goto err_read_i2c_eeprom;
 
-This is correct as well. Thanks for catching these!
+Should an error be logged?
+
+> +			status = hw->phy.ops.read_i2c_eeprom(hw,
+> +					    IXGBE_SFF_SM_LENGTH_100M,
+> +					    &sm_length_100m);
+> +			if (status != 0)
+> +				goto err_read_i2c_eeprom;
+
+Should an error be logged?
+
+> +			if (sm_length_km > 0 || sm_length_100m >= 10) {
+> +				if (hw->bus.lan_id == 0)
+> +					hw->phy.sfp_type =
+> +						ixgbe_sfp_type_10g_bx_core0;
+> +				else
+> +					hw->phy.sfp_type =
+> +						ixgbe_sfp_type_10g_bx_core1;
+
+I’d prefer the ternary operator, if only the same variable is assigned 
+in both branches.
+
+> +			}
+>   		} else {
+>   			hw->phy.sfp_type = ixgbe_sfp_type_unknown;
+>   		}
+> @@ -1768,7 +1795,9 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+>   	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
+>   	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
+>   	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
+> -	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1)) {
+> +	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
+> +	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
+> +	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1)) {
+>   		hw->phy.type = ixgbe_phy_sfp_unsupported;
+>   		return -EOPNOTSUPP;
+>   	}
+> @@ -1786,7 +1815,9 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+>   	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
+>   	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
+>   	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
+> -	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1)) {
+> +	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
+> +	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
+> +	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1)) {
+>   		/* Make sure we're a supported PHY type */
+>   		if (hw->phy.type == ixgbe_phy_sfp_intel)
+>   			return 0;
+> @@ -2016,20 +2047,22 @@ int ixgbe_get_sfp_init_sequence_offsets(struct ixgbe_hw *hw,
+>   		return -EOPNOTSUPP;
+>   
+>   	/*
+> -	 * Limiting active cables and 1G Phys must be initialized as
+> +	 * Limiting active cables, 10G BX and 1G Phys must be initialized as
+>   	 * SR modules
+>   	 */
+>   	if (sfp_type == ixgbe_sfp_type_da_act_lmt_core0 ||
+>   	    sfp_type == ixgbe_sfp_type_1g_lx_core0 ||
+>   	    sfp_type == ixgbe_sfp_type_1g_cu_core0 ||
+>   	    sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
+> -	    sfp_type == ixgbe_sfp_type_1g_bx_core0)
+> +	    sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
+> +	    sfp_type == ixgbe_sfp_type_10g_bx_core0)
+>   		sfp_type = ixgbe_sfp_type_srlr_core0;
+>   	else if (sfp_type == ixgbe_sfp_type_da_act_lmt_core1 ||
+>   		 sfp_type == ixgbe_sfp_type_1g_lx_core1 ||
+>   		 sfp_type == ixgbe_sfp_type_1g_cu_core1 ||
+>   		 sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
+> -		 sfp_type == ixgbe_sfp_type_1g_bx_core1)
+> +		 sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
+> +		 sfp_type == ixgbe_sfp_type_10g_bx_core1)
+>   		sfp_type = ixgbe_sfp_type_srlr_core1;
+>   
+>   	/* Read offset to PHY init contents */
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+> index 81179c60af4e0199a8b9d0fcdf34654b02eedfac..039ba4b6c120f3e824c93cb00fdd9483e7cf9cba 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+> @@ -32,6 +32,8 @@
+>   #define IXGBE_SFF_QSFP_1GBE_COMP	0x86
+>   #define IXGBE_SFF_QSFP_CABLE_LENGTH	0x92
+>   #define IXGBE_SFF_QSFP_DEVICE_TECH	0x93
+> +#define IXGBE_SFF_SM_LENGTH_KM		0xE
+> +#define IXGBE_SFF_SM_LENGTH_100M	0xF
+>   
+>   /* Bitmasks */
+>   #define IXGBE_SFF_DA_PASSIVE_CABLE		0x4
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+> index b1bfeb21537acc44c31aedcb0584374e8f6ecd45..61f2ef67defddeab9ff4aa83c8f017819594996b 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+> @@ -3286,6 +3286,8 @@ enum ixgbe_sfp_type {
+>   	ixgbe_sfp_type_1g_lx_core1 = 14,
+>   	ixgbe_sfp_type_1g_bx_core0 = 15,
+>   	ixgbe_sfp_type_1g_bx_core1 = 16,
+> +	ixgbe_sfp_type_10g_bx_core0 = 17,
+> +	ixgbe_sfp_type_10g_bx_core1 = 18,
+>   
+>   	ixgbe_sfp_type_not_present = 0xFFFE,
+>   	ixgbe_sfp_type_unknown = 0xFFFF
+
+
+Kind regards,
+
+Paul
 
