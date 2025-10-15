@@ -1,150 +1,145 @@
-Return-Path: <netdev+bounces-229798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D4A8BE0E34
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 00:00:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 663CFBE0E46
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 00:02:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 037A54E90B2
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:00:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E472B19C6598
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDF0253B71;
-	Wed, 15 Oct 2025 22:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F063016F5;
+	Wed, 15 Oct 2025 22:02:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="3HiREFP8"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Gf5wz45Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E7B833086
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 22:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED307262F
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 22:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760565634; cv=none; b=NY+sCEm69ndaJ2MNTyzHkHfaP2/0y0D2N5Fl5WG5SGOYMldrEv/p5idpRc+rVL7z8AE0Sv4tvJUjjsaMBLokIMgrH2GHqmUs4v48zD8C+Rj/qbUIiYV2idIldtRPyt4oMwCWCPfal3OrCDiZxpNxzzuQnTNJXi+VqBGlYj2PUvY=
+	t=1760565764; cv=none; b=inz5WeKIheWFCaoEWbOJw7fribe+yA5jwhuGJfnsi75k/Ufi1yL5EieJ1SL5iu0i38ZSqd/dJgYi0dmajb3fh63r33KDwZHh7xXnEMgrwDFLnEJBHaFosVsCPQddmn1aHP5LPJp98zgmU1+7c5C4ZVMvF5wpSiUVFVUwt7+SnpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760565634; c=relaxed/simple;
-	bh=sBNT/ZJL3UJS59HYufpHQ3aOPRt/eMCT7ydwYQnOzEk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gBrSb4t7XnsmSdDquVp04N6wRT4+bc1mJWf1cruaVRjTtN0VcgdR+4FQWbXdlTzFEgp1Y8GILzI5rzpS4/fPubBhyFl3CVDniUKS9c10+viFJBDR+ygRFFtsT2gFMxl1CbbMUpiGTAyaYH4CQnAFZMbMKYmLz5f0R9TCa++Vy/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=3HiREFP8; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-29091d29fc8so734445ad.0
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 15:00:33 -0700 (PDT)
+	s=arc-20240116; t=1760565764; c=relaxed/simple;
+	bh=/K3AFUK1IcU9Ry//EL9eWIshPL06i0vDN77GSYa92KU=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=XEa5uUMfvkprlHvsxzWL9q/IYW/l7tQI+49I52ccbdn9YYMmhy6ZYaOTukFbf+iZDIE0Wa9LBmqy30H0SKCE2MyVo7vwIPKAxO/+FOoF9Ydim6NWls90aTGyzHqBe7ulnESlS2MVXjF+Lq3dYj9c2WHIpffGJcWFZPgDCbkCuIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Gf5wz45Y; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-781001e3846so100075b3a.2
+        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 15:02:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1760565632; x=1761170432; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5bxrYbA/aVh0ezEHvSBK0eCaN/Xx2Rs835EWBUCbM8k=;
-        b=3HiREFP88aLRusegHjHX6WtffWgDjwsP/Dn6rLC8tJKKRkG0SWfVgCWwZab3JhRKxr
-         Nd8ZHwul8ey49XmR7pJYYmFidnsfKjcCR0QVj8Ep/Gf3vQdN1q+v3u2eNPJS8cV+OlB6
-         ozAgnsXOVVCIiB4jAwhc1R50TjOM9YNggh8RYTjtztXnWAuT9JkulIDbTKktt5JcU5TJ
-         UB5lxqRy4hN9NLrvHBZFyYw9hgbH9GjZxXYlbYvckHGPRNxa/ZlR5/yVOOdQOWLH4+HI
-         rFFjxckKdKEpMY0cHpUupMRZIUK5fnAi36Fr9pYxWHsK0n86XGtMXyJ7a+krA5mll5cE
-         ny8w==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1760565761; x=1761170561; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2JN4CWkUUC+xol10wiulNeLtn5DhTpmfhFyymGFUs7M=;
+        b=Gf5wz45YRehPALQwc4l3LhhuaiJlpwHvlEBFYNs8ThVvkyUTkU4xp6Dqinuk2z6JfW
+         kQ6f8ASs0PIzGwMbSFbqQFXBX4LXggszYQbncT01ydCZGfWHHITGgqQpa2V3TfAmpTQL
+         oUWqkulZ3d+/lfdW9Ix5CRlltxAvm60H6BJ/MBOSo7uPNxJIzjCBhy0CCu9Nja3G8jPR
+         P2JbrNgEUevXSttp2zmKqiI7W48pqurLx/hi6WYg8Vyh46SXg7K/bw3XwibkJIHfQC6S
+         6MZINijIxzHXe+vVs/55COXAXtcm4SlSsXyoH3f6MeoXq1BraVFqWq05QeC455oa6r+X
+         jY1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760565632; x=1761170432;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5bxrYbA/aVh0ezEHvSBK0eCaN/Xx2Rs835EWBUCbM8k=;
-        b=ji9E19sU1FF5obHezDCiWgvMAjLdAZoEwKT7NgI43VwarOFTjA6SL8s93PDEzQQ5iZ
-         ZyncuKLFudzAnY2KRYNgLpYWyhANJY2Xeb5Q/X9Kbm1vZBV50hrlgRPu3+pq3kYhuzMV
-         gocRBZSRgm/YHpAt3RYrQQdKYPX/omhBcNO7DqT7FCfq1ULm7piNAALOAt6NBTGOIqG8
-         +lyhY6WVl7K9MtWw0yZLrNNNouulenVizghRUkpXQRjQYmqSAekCsPOOYzGA19DNncvZ
-         XFFZHO7++VcYF0DIJ7Z/tVZw9IfNOyP8/rrcHmkGKNR9dofPf/pNKyMTIYTg8nuUX/v4
-         WWEA==
-X-Forwarded-Encrypted: i=1; AJvYcCWDrQKlGjFde7Ck4+k1Sb9CWFdhsJDZTQs3/x5heEEkIRJdpZ9OCPcJnqecFazequBVhI5hOJw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAPhRlnxeltB2sRXSQHW6EnVg6S4evXRpEo8UltrjiiWhaJdoC
-	fvc65daFQu7Gw4tyngA+d/VN8EX8NQL96JsVwZWhV+vGRaiOy8mc/txqubcp9TwJ4Gwde3MTiYU
-	pdNW0qg/8C6HWa4Q7F6iqVmdENBLT6ErLaE0yvOpX
-X-Gm-Gg: ASbGnctLdIowuQCtJYaek8fWtlRBUg6Q7WM1RxpCifc3XV/TGzKvjHLuVcKTvzCt91r
-	REBW007y4Nlr3d9u5RR1hlMaLPxcIjD1GlF1gXnC6rCQxe0AlDFZ+cKnSsViR3uJZziru78vT5H
-	KrEFgU2WW2s8cM4ZaQ77n1do0F6VYC68LjoZD+BrAhzdvX8pNdJCv5kUbLdGm+xXgIb+aoCDuHA
-	1rMZSs+Tx7omVynzn4CqGTfzI+GzO9FwYiEp9wHZZCVEuP0nukimqXCNSonGRLNSD57i3UWpn4V
-	ZMjH32VE9U0HBijoq5ZVQqKT5K4BRqCHPLm0
-X-Google-Smtp-Source: AGHT+IHRlV+MLyseGxUVQRMKzETHOpgwAcuG87f74U4jV5Y6r3+ySDjIi/KpY5XTjoj2kuKJ/aEinbvbKyRpq8/Ja0Y=
-X-Received: by 2002:a17:903:2d2:b0:267:6754:8fd9 with SMTP id
- d9443c01a7336-290272c9322mr362529005ad.39.1760565631783; Wed, 15 Oct 2025
- 15:00:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760565761; x=1761170561;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2JN4CWkUUC+xol10wiulNeLtn5DhTpmfhFyymGFUs7M=;
+        b=mi2zLewB/XBagZ9ze2lcGdxfOGmwnh6ZI+moTsf5bnSC89NJlEj3huMG68yxAqd9SZ
+         4zqDl48GvKOSuYyiNnTJ4e0bWmNR1dCFCN1ol2/nSmECbCjVo7ZX5z5eVbM+XuyRMrEZ
+         MIP8x0w7tWrryykNQUBRnABEjl+9n4pA322PBI7JdA1TgoaWQz9LF1dOJ9zBjBHguXiT
+         bUfS3UPTqhmHAX4Ab3ECvW/f2AoKw9XmxIVfdbLBcTpv+/ZU2jur2dXAL/tf8odU9OY6
+         NYoje/WvFgOGldLlo4jPkiEf52I//t8nPJ67M38Q+Cr3Jd/VV06cfZA3YAgnVHrEtjfl
+         sw1g==
+X-Gm-Message-State: AOJu0Yz5PU6+YPzYL0c2vVq4ynreW12QcYjSyeV3wTmy0y/SY6CnM0kX
+	lkDqOZDodTPZDbCh42bZ4oiqxmxQn+4fh910Ok7qj1FFlN4BQRHsN1tmCffXpgUcMxp5JZWNToI
+	r28Fv4eE=
+X-Gm-Gg: ASbGncsvF9gv0ygvogKqdHblK2WLbJ/wVHSgOcnPQXcyOuc2AFnYgJkmRThR1EhYfFR
+	ok0Ivt7CSwCalqirl8YqdAbBehGhAx454X1/ygD3jCiiuPOcnKnpTzCwIqWn6rqYWxOl0FJyS9L
+	qySueK6L6FY79eLZKJ2Ch+jMpbljJUDxzjq2oIZ/M4dJDyKn5NyRhfhgDLQnzCn48pPPoEKjB6/
+	m/SE4nHMZ9OvsOFnQjt9exTSYcQ+lY2dkkTuoXSFAkpvBoN9W1fH+Ev/4bitD1xI1AFHwvkaPo7
+	776HMZpf99bUFQOvQj+WHupFhb3T3KdufRDdhXj4sbAOyjC56UEU89fBBRm0kgKQ9x5S+YSkJ6+
+	fruYqK8C3AbTMXjH1pi0iFsfvvBEftDuOzq35RPk1YpPm2ojJ0xB0C2VsgIF//s+9tdutZJppE5
+	k+nnkSABXPo7zQajt06JnGWn369pCOA2iUhslurFJlksp+Z3Uc6T+n
+X-Google-Smtp-Source: AGHT+IGvCys6FwOVsJlJ3xj26XEFov2nmhWbSNsLQcwumIN8VMNBMb90O7J7RcfQBblGmKaTQlrEug==
+X-Received: by 2002:a05:6a21:99aa:b0:24e:9d94:7b17 with SMTP id adf61e73a8af0-32da80da6bemr34859806637.9.1760565761292;
+        Wed, 15 Oct 2025 15:02:41 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33ba383dbe2sm681492a91.2.2025.10.15.15.02.40
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Oct 2025 15:02:41 -0700 (PDT)
+Date: Wed, 15 Oct 2025 15:02:38 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Subject: Fw: [Bug 220649] New: A bug is happening at
+ __dev_change_net_namespace when runnning LXC/Incus service in 6.17
+Message-ID: <20251015150238.6849de11@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251014171907.3554413-1-edumazet@google.com>
-In-Reply-To: <20251014171907.3554413-1-edumazet@google.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 15 Oct 2025 18:00:20 -0400
-X-Gm-Features: AS18NWDemmVexSlgj-cGOW3aTyGqdzwJ-k-4rkPbpwYJYpHRJgltJURxs43WJbA
-Message-ID: <CAM0EoMnvMZQpjNP5vCneur8GR+3oW3PxvzjtthNjFTtLBF5GtA@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 0/6] net: optimize TX throughput and efficiency
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Oct 14, 2025 at 1:19=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> In this series, I replace the busylock spinlock we have in
-> __dev_queue_xmit() and use lockless list (llist) to reduce
-> spinlock contention to the minimum.
->
-> Idea is that only one cpu might spin on the qdisc spinlock,
-> while others simply add their skb in the llist.
->
-> After this series, we get a 300 % (4x) improvement on heavy TX workloads,
-> sending twice the number of packets per second, for half the cpu cycles.
->
-
-Not important but i am curious: you didnt mention what NIC this was in
-the commit messages ;->
-
-For the patchset, I have done testing with existing tdc tests and no
-regression..
-It does inspire new things when time becomes available.... so will be
-doing more testing and likely small extensions etc.
-So:
-Tested-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-(For the tc bits, since the majority of the code touches tc related stuff)
-
-cheers,
-jamal
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
 
-> v2: deflake tcp_user_timeout_user-timeout-probe.pkt.
->     Ability to return a different code than NET_XMIT_SUCCESS
->     when __dev_xmit_skb() has a single skb to send.
->
-> Eric Dumazet (6):
->   selftests/net: packetdrill: unflake
->     tcp_user_timeout_user-timeout-probe.pkt
->   net: add add indirect call wrapper in skb_release_head_state()
->   net/sched: act_mirred: add loop detection
->   Revert "net/sched: Fix mirred deadlock on device recursion"
->   net: sched: claim one cache line in Qdisc
->   net: dev_queue_xmit() llist adoption
->
->  include/linux/netdevice_xmit.h                |  9 +-
->  include/net/sch_generic.h                     | 23 ++---
->  net/core/dev.c                                | 97 +++++++++++--------
->  net/core/skbuff.c                             | 11 ++-
->  net/sched/act_mirred.c                        | 62 +++++-------
->  net/sched/sch_generic.c                       |  7 --
->  .../tcp_user_timeout_user-timeout-probe.pkt   |  6 +-
->  7 files changed, 111 insertions(+), 104 deletions(-)
->
-> --
-> 2.51.0.788.g6d19910ace-goog
->
+
+Begin forwarded message:
+
+Date: Thu, 09 Oct 2025 13:08:57 +0000
+From: bugzilla-daemon@kernel.org
+To: stephen@networkplumber.org
+Subject: [Bug 220649] New: A bug is happening at __dev_change_net_namespace when runnning LXC/Incus service in 6.17
+
+
+https://bugzilla.kernel.org/show_bug.cgi?id=220649
+
+            Bug ID: 220649
+           Summary: A bug is happening at __dev_change_net_namespace when
+                    runnning LXC/Incus service in 6.17
+           Product: Networking
+           Version: 2.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Other
+          Assignee: stephen@networkplumber.org
+          Reporter: kosmx.mc@gmail.com
+        Regression: No
+
+Created attachment 308780
+  --> https://bugzilla.kernel.org/attachment.cgi?id=308780&action=edit  
+Archive containing the dmesg slice with stack trace, and the git bisect log
+
+Log from kernel dmesg is attached. 
+
+Steps to Reproduce in a Libvirt/QEMU VM:
+1) Install ArchLinux (all dependencies are available). I recommend using
+archinstall, but anything can go
+2) Install LXC/Incus (pacman -S incus)
+3) configure incus for running: usermod -v 1000000-1000999999 -w
+1000000-1000999999 root &&
+incus admin init &&
+incus launch images:debian/12 first
+4) Previous step should trigger incus to do namespaces. I'm not sure what
+syscall is causing the bug, so I do not have a mini C program. This should be
+enough to see the log in the dmesg. (it can be done on any OS, VM is not
+needed, but it was easier for me)
+
+
+I also did a git bisect on the kernel, the first commit to have the bug is
+0c17270f9b920e4e1777488f1911bbfdaf2af3be
+
+-- 
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.
 
