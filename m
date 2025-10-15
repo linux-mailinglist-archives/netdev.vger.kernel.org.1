@@ -1,164 +1,137 @@
-Return-Path: <netdev+bounces-229478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF7C6BDCD45
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 09:09:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7791BBDCD60
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 09:11:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 152FA3BA365
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 07:09:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 358033E0185
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 07:11:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709EB305948;
-	Wed, 15 Oct 2025 07:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 238C8311941;
+	Wed, 15 Oct 2025 07:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QcI6kY0q"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="m7sBQsCH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C8931327D
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 07:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803782BDC34
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 07:11:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760512160; cv=none; b=LyaHD1BERGdUKzHVcQS4kjvlrUZqYg5PadGWkcR6QEROFhOZ4vOGJmrlIq+Svext+L+G1UA/kTCLf+FoPYoIiRrY/iquFdoomT6KymjxotrKTh703FOhp+HpvVgLZn0yc4Qmw3uITXyMAT1vKl9y+oRYF3foqWlnv6Zvqk68W/w=
+	t=1760512312; cv=none; b=NGA3tXki59GsDBuyt1qptLChFpvMeYqSaLaVUz+9WLvRmPVykdJQchCIXvgMTVnex6KqEuMtMGh44PJTNaE+KJ79ypDaWI+TcuLAJLWNlMw7yDXyW09WtVE5AqLbjw3SMgq1w0Lw4VyJaYbVqVVb4vXq5NesAleOAWMBZ5JU5Qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760512160; c=relaxed/simple;
-	bh=yd03i++/xv88QJgZo0ZPNbQK9vi5VCi99MKHAR0GtX8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aoyYjCW2w6dEJCKs4HqwVblwL65BFLA/QJK7UaDr6KAO4QkVON11nWlRZ904jqRxTtiFfS9H8dzj91IigQqo0yZNPY/u9nU5PCDdnzK2d2vP60tSEJni79jASEnUKXDtXPppOX/2ezOnhv+rDEt7mAvfgw2GOC4TIAPifKxtFlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QcI6kY0q; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-63b9da57cecso5594167a12.0
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 00:09:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760512157; x=1761116957; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=R+Xzhf/EFNne2mEAT5tPrrO/yOV+bjpVxO1xTpLKaG4=;
-        b=QcI6kY0qbUbz8Ug3dXubOLDfLs9mt3HYi16UDdTcjdId67R8GCJQVTdP9MvT5a2+9T
-         NRfihVnPc2ZSUmCOgW5EZyw3dJJuobkiDdjqwUv2L5msE45UiY8q1TUahpS1g6KbshFo
-         XVO7bMkGND2ylJWOOM1Lqeognb4Y0HuCBOIvso/2bCPPOpf0nxJFEOnu11bPPBEefgNN
-         Trp0BfCeMRXUCAq4jpCI/edshoKP7BTXV7SQv2ySHTrSp1v3c4CY/han68RztRDq0zCn
-         j7EBe+hI2EaWsoM6y0XLI8lxsP0HCgCQTgDdJouVE/et0FTfp0nWnLXFHjULP3ZQ4XWe
-         NkbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760512157; x=1761116957;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=R+Xzhf/EFNne2mEAT5tPrrO/yOV+bjpVxO1xTpLKaG4=;
-        b=oqKKfqNjxWtOBQl2oceyHCXg3ANDq7YnHk5KwATuM/UeTyxdVz2Heg+wjXMnFpdEtY
-         gULXZFzO1AVou4cURNmx9m5foyXsH0ioNMB6bl4Fjs5i8OmMfUG/uPzXfy4kVT4SCkcy
-         KuR0mQNv/GDz65JBcLtZYphNIJ50MWqxPM03eg2An66UnELXGeU1LKkhyVWewLSw/kK+
-         HjBrf+h9KbgxImc8668zBZnQvCQAd5P9kk0BoyMOgLqgI6OH7CuvuNATSMmVQhxIpK8T
-         7jWl/9sEgIp4kbwHsIW09Vs0LdZes5niJUYJV9dXU6Kg7UXUBSzlqVV4SZsShhTkh/+v
-         VbeA==
-X-Gm-Message-State: AOJu0YwC0itOVCAKngIxhOd/3UwiyBbgrkq3/sgMEjSEqRt0QPDBev5n
-	Q0FpDnh0c34R438JC62jzS0c4nYn21qOLm9+CprTQV7OtH7/DZKG7SH7
-X-Gm-Gg: ASbGncsaFn3CBX9AcRlzMXGxM7CRGT+ndK/5xaco/z1QTukAZYrrqcPIgn8vm3Oyq7L
-	mFouiyTEWS+tjF8bA09KHjVhw36gDS9QDxJ0j34nS2sMO8X74n7K3O1L1S7Nsl5aVrV/sO2iW8q
-	fMt3m5ICYUftt9dTC1nizxaai9MCAxK11oPej6TtJ4PDlCxqScmkuOc7xm3CBdY6PtusBLsKyeH
-	o8TgpAEO1Y2BGnyp+y4R+0PLBaz63FbfuceUV/gw/fFuymTIoc7hHiTPPIQ8rzRGxg6kr+GbP49
-	Ze+DHmPDXTaZfi5Kg+1OEnDZHn5R8UzzRcgcgEl9mYTpGfcxCst94qLeHGLHsZnoZrv2tbAaMcv
-	fJ5+F04oR9p2/rR4tCcdZtztd8nWgmgF+cqO7mSVDFLlEXp1/zY0vv9pC9I1/ZaeNnY19Wt2S4X
-	Hq2Gwu7d5dSEjhEfKbvyzt0w==
-X-Google-Smtp-Source: AGHT+IGi4c772T1EvouKGzfpRwCrJWZt2fsMF2Lmdp3HYx9/OqUd/nTP8dW704aXN7545LxIfOBBMQ==
-X-Received: by 2002:a17:906:4788:b0:b0c:fdb7:4df5 with SMTP id a640c23a62f3a-b50aa08f7f4mr3152911866b.18.1760512156566;
-        Wed, 15 Oct 2025 00:09:16 -0700 (PDT)
-Received: from localhost (dslb-002-205-018-108.002.205.pools.vodafone-ip.de. [2.205.18.108])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b5ccccaaba9sm157597666b.55.2025.10.15.00.09.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Oct 2025 00:09:15 -0700 (PDT)
-From: Jonas Gorski <jonas.gorski@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
+	s=arc-20240116; t=1760512312; c=relaxed/simple;
+	bh=R7UG4RHzg6L4h/qHmm6RhK5ik2qcPCP/Wn9r1WyAbiY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Wq940KQ1NDfkwcQLJ0HrdRz3IqLQUTgR7FRI5f272TtF3hjOlE5kxtFHCw4HD1euZRRfxh6hhWw9H1P2sr74soSUyKVCs55JBFKHjQsaKaMQhl2KnlnLh9Yf/3oSSLlVROv5KqJ4BYv96x5EVDFxTdGuE+SXR5igR7c1zNlAka4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=m7sBQsCH; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1760512307; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=wo7XeaFSgKrH6hdp3xAOmseboJ82BLVa7EKGjzi7W2g=;
+	b=m7sBQsCHPXu0G4Fd94rEn854wwlES8HRlK0NAqVtOl93QM+M9+4oJ68nbITtckAlb0rBOjBPPg/B6q/YKOJzbCmkPYmMsjBhhOq+HLN4GDNpXhyIWScRsQwu+5Y5oDTLMhYiqhfazuVLS5Umv7x8fduduONo4wujBP6TiHDOgmA=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WqFOTns_1760512305 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 15 Oct 2025 15:11:45 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	=?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: dsa: tag_brcm: legacy: fix untagged rx on unbridged ports for bcm63xx
-Date: Wed, 15 Oct 2025 09:08:54 +0200
-Message-ID: <20251015070854.36281-1-jonas.gorski@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Vivian Wang <wangruikang@iscas.ac.cn>,
+	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: [PATCH net-next v6 0/5] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
+Date: Wed, 15 Oct 2025 15:11:40 +0800
+Message-Id: <20251015071145.63774-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Git-Hash: a1c6aa4df11e
 Content-Transfer-Encoding: 8bit
 
-The internal switch on BCM63XX SoCs will unconditionally add 802.1Q VLAN
-tags on egress to CPU when 802.1Q mode is enabled. We do this
-unconditionally since commit ed409f3bbaa5 ("net: dsa: b53: Configure
-VLANs while not filtering").
+Add a driver framework for EEA that will be available in the future.
 
-This is fine for VLAN aware bridges, but for standalone ports and vlan
-unaware bridges this means all packets are tagged with the default VID,
-which is 0.
+This driver is currently quite minimal, implementing only fundamental
+core functionalities. Key features include: I/O queue management via
+adminq, basic PCI-layer operations, and essential RX/TX data
+communication capabilities. It also supports the creation,
+initialization, and management of network devices (netdev). Furthermore,
+the ring structures for both I/O queues and adminq have been abstracted
+into a simple, unified, and reusable library implementation,
+facilitating future extension and maintenance.
 
-While the kernel will treat that like untagged, this can break userspace
-applications processing raw packets, expecting untagged traffic, like
-STP daemons.
 
-This also breaks several bridge tests, where the tcpdump output then
-does not match the expected output anymore.
+v6: Split the big one commit to five commits
+v5: Thanks for the comments from Kalesh Anakkur Purayil, ALOK TIWARI
+v4: Thanks for the comments from Troy Mitchell, Przemek Kitszel, Andrew Lunn, Kalesh Anakkur Purayil
+v3: Thanks for the comments from Paolo Abenchi
+v2: Thanks for the comments from Simon Horman and Andrew Lunn
+v1: Thanks for the comments from Simon Horman and Andrew Lunn
 
-Since 0 isn't a valid VID, just strip out the VLAN tag if we encounter
-it, unless the priority field is set, since that would be a valid tag
-again.
+Xuan Zhuo (5):
+  eea: introduce PCI framework
+  eea: introduce ring and descriptor structures
+  eea: probe the netdevice and create adminq
+  eea: create/destroy rx,tx queues for netdevice open and stop
+  eea: introduce ethtool support
 
-Fixes: 964dbf186eaa ("net: dsa: tag_brcm: add support for legacy tags")
-Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
----
- net/dsa/tag_brcm.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/alibaba/Kconfig          |  29 +
+ drivers/net/ethernet/alibaba/Makefile         |   5 +
+ drivers/net/ethernet/alibaba/eea/Makefile     |   9 +
+ drivers/net/ethernet/alibaba/eea/eea_adminq.c | 445 ++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_adminq.h |  70 ++
+ drivers/net/ethernet/alibaba/eea/eea_desc.h   | 156 ++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.c    | 311 +++++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.h    |  51 ++
+ drivers/net/ethernet/alibaba/eea/eea_net.c    | 575 +++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_net.h    | 196 +++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.c    | 575 +++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.h    |  68 ++
+ drivers/net/ethernet/alibaba/eea/eea_ring.c   | 260 ++++++
+ drivers/net/ethernet/alibaba/eea/eea_ring.h   |  91 ++
+ drivers/net/ethernet/alibaba/eea/eea_rx.c     | 782 ++++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_tx.c     | 406 +++++++++
+ 19 files changed, 4039 insertions(+)
+ create mode 100644 drivers/net/ethernet/alibaba/Kconfig
+ create mode 100644 drivers/net/ethernet/alibaba/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_desc.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_rx.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_tx.c
 
-diff --git a/net/dsa/tag_brcm.c b/net/dsa/tag_brcm.c
-index 26bb657ceac3..32879d1b908b 100644
---- a/net/dsa/tag_brcm.c
-+++ b/net/dsa/tag_brcm.c
-@@ -224,12 +224,14 @@ static struct sk_buff *brcm_leg_tag_rcv(struct sk_buff *skb,
- {
- 	int len = BRCM_LEG_TAG_LEN;
- 	int source_port;
-+	__be16 *proto;
- 	u8 *brcm_tag;
- 
- 	if (unlikely(!pskb_may_pull(skb, BRCM_LEG_TAG_LEN + VLAN_HLEN)))
- 		return NULL;
- 
- 	brcm_tag = dsa_etype_header_pos_rx(skb);
-+	proto = (__be16 *)(brcm_tag + BRCM_LEG_TAG_LEN);
- 
- 	source_port = brcm_tag[5] & BRCM_LEG_PORT_ID;
- 
-@@ -237,8 +239,14 @@ static struct sk_buff *brcm_leg_tag_rcv(struct sk_buff *skb,
- 	if (!skb->dev)
- 		return NULL;
- 
--	/* VLAN tag is added by BCM63xx internal switch */
--	if (netdev_uses_dsa(skb->dev))
-+	/* The internal switch in BCM63XX SoCs will add a 802.1Q VLAN tag on
-+	 * egress to the CPU port for all packets, regardless of the untag bit
-+	 * in the VLAN table.  VID 0 is used for untagged traffic on unbridged
-+	 * ports and vlan unaware bridges. If we encounter a VID 0 tagged
-+	 * packet, we know it is supposed to be untagged, so strip the VLAN
-+	 * tag as well in that case.
-+	 */
-+	if (proto[0] == htons(ETH_P_8021Q) && proto[1] == 0)
- 		len += VLAN_HLEN;
- 
- 	/* Remove Broadcom tag and update checksum */
-
-base-commit: 7f0fddd817ba6daebea1445ae9fab4b6d2294fa8
--- 
-2.43.0
+--
+2.32.0.3.g01195cf9f
 
 
