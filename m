@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-229813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62007BE0F2E
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 00:35:15 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4769BE0F61
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 00:37:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 895171A23E88
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:35:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8B186560414
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:35:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C3730DD23;
-	Wed, 15 Oct 2025 22:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11CB30E824;
+	Wed, 15 Oct 2025 22:33:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C56330DD0D;
-	Wed, 15 Oct 2025 22:33:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216CE30CD9F;
+	Wed, 15 Oct 2025 22:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760567630; cv=none; b=CToOGGjlmb1xhZvrmFMZjw1Vx5zHnQaMhLmHALO5sIkErL/BANT4lA7dLNtuok36trrPSA/PDfXXRNUmaLrILAn/TuH8/djN1mvqoywq35m+9wrLhvrRGyI8qeEirM0AFx/cdL51fO/uBuRgfM2NcCpPwUVJ/8t/FuOTWtGbiAc=
+	t=1760567638; cv=none; b=QhPHC0sKf+wS9ojI7/QRnnMrmq4No4zBnfkf36v0Rh7v02Km2+jjXKhtT0CqGD0nIOR2fun2vqFZT+6ncPudXMgLBdsLYMkhnZCoLrASPdoS5Wj874+RGk3qExYtJR+KIRToE3RMoRpAziNp3TUG6N/Ttctoj4RXKKapYdsJ7SI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760567630; c=relaxed/simple;
-	bh=ydN0CQk9eCQObKh2zNgXLlMg5I8r3uoaYzkJUDBSmDk=;
+	s=arc-20240116; t=1760567638; c=relaxed/simple;
+	bh=hI6zhUaPUnSyYaYYUOCoj1r0gchkEgn6E8nlapACsZ4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ELKmOukqdhKyUngU2b79IKsCRGtN3rAT5pQ19HlmfjIeDDklQ1iaCk43ouJmparcBz/IhlYR68MhwYn5Dh4DRw4vFMPS/XpckQ+P31X5te5QYXH45RAZ8ml1xOB4POHiOpW/Bpl70b+sKkevoIG5ilsuN6Sw//wBcfeeG3p7DZM=
+	 Content-Type:Content-Disposition:In-Reply-To; b=NpIcI+uIM5DKtgVoaQopikXnY5/ulaYkXfSW++fe/1v9rKxOeP1VdQUKOt+4HzMWIvQFFuz5S4CBtTtk0nM8RnePjn5+35eBZAc6XNC3OfB8PshbxTCqk7SPSiwmnRwh+uQ7iDh9e6+sV+MDXFh1KaujTRBQT30jUdraMg7xSUk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1v9A41-000000006X2-160l;
-	Wed, 15 Oct 2025 22:33:45 +0000
-Date: Wed, 15 Oct 2025 23:33:41 +0100
+	id 1v9A49-000000006XG-38pp;
+	Wed, 15 Oct 2025 22:33:53 +0000
+Date: Wed, 15 Oct 2025 23:33:50 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -54,9 +54,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next 09/11] net: dsa: lantiq_gswip: put a more
- descriptive error print in gswip_vlan_remove()
-Message-ID: <abd4ec58e0f0f53eb3d7027097a20af0bd7b1d6d.1760566491.git.daniel@makrotopia.org>
+Subject: [PATCH net-next 10/11] net: dsa: lantiq_gswip: drop untagged on
+ VLAN-aware bridge ports with no PVID
+Message-ID: <787aa807d00b726d75db2a40add215c8b8ba7466.1760566491.git.daniel@makrotopia.org>
 References: <cover.1760566491.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -70,29 +70,59 @@ In-Reply-To: <cover.1760566491.git.daniel@makrotopia.org>
 
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Improve the error message printed in case of a port VLAN entry not being
-found upon removal.
+Implement the required functionality, as written in
+Documentation/networking/switchdev.rst section "Bridge VLAN filtering",
+by using the "VLAN Ingress Tag Rule" feature of the switch.
+
+The bit field definitions for this were found while browsing the Intel
+dual BSD/GPLv2 licensed drivers for this switch IP.
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/net/dsa/lantiq/lantiq_gswip.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/dsa/lantiq/lantiq_gswip.c | 6 ++++++
+ drivers/net/dsa/lantiq/lantiq_gswip.h | 4 ++++
+ 2 files changed, 10 insertions(+)
 
 diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-index d9a7a004f9eb..cfdeb8148500 100644
+index cfdeb8148500..1ff0932dae31 100644
 --- a/drivers/net/dsa/lantiq/lantiq_gswip.c
 +++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
-@@ -875,7 +875,8 @@ static int gswip_vlan_remove(struct gswip_priv *priv,
+@@ -551,6 +551,7 @@ static void gswip_port_commit_pvid(struct gswip_priv *priv, int port)
+ {
+ 	struct dsa_port *dp = dsa_to_port(priv->ds, port);
+ 	struct net_device *br = dsa_port_bridge_dev_get(dp);
++	u32 vinr;
+ 	int idx;
+ 
+ 	if (!dsa_port_is_user(dp))
+@@ -582,6 +583,11 @@ static void gswip_port_commit_pvid(struct gswip_priv *priv, int port)
+ 		idx = port + 1;
  	}
  
- 	if (idx == -1) {
--		dev_err(priv->dev, "bridge to leave does not exists\n");
-+		dev_err(priv->dev, "Port %d cannot find VID %u of bridge %s\n",
-+			port, vid, bridge ? bridge->name : "(null)");
- 		return -ENOENT;
- 	}
- 
++	vinr = idx ? GSWIP_PCE_VCTRL_VINR_ALL : GSWIP_PCE_VCTRL_VINR_TAGGED;
++	gswip_switch_mask(priv, GSWIP_PCE_VCTRL_VINR,
++			  FIELD_PREP(GSWIP_PCE_VCTRL_VINR, vinr),
++			  GSWIP_PCE_VCTRL(port));
++
+ 	/* GSWIP 2.2 (GRX300) and later program here the VID directly. */
+ 	gswip_switch_w(priv, idx, GSWIP_PCE_DEFPVID(port));
+ }
+diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
+index 4590a1a7dbd9..69c8d2deff2d 100644
+--- a/drivers/net/dsa/lantiq/lantiq_gswip.h
++++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
+@@ -159,6 +159,10 @@
+ #define  GSWIP_PCE_PCTRL_0_PSTATE_MASK	GENMASK(2, 0)
+ #define GSWIP_PCE_VCTRL(p)		(0x485 + ((p) * 0xA))
+ #define  GSWIP_PCE_VCTRL_UVR		BIT(0)	/* Unknown VLAN Rule */
++#define  GSWIP_PCE_VCTRL_VINR		GENMASK(2, 1) /* VLAN Ingress Tag Rule */
++#define  GSWIP_PCE_VCTRL_VINR_ALL	0 /* Admit tagged and untagged packets */
++#define  GSWIP_PCE_VCTRL_VINR_TAGGED	1 /* Admit only tagged packets */
++#define  GSWIP_PCE_VCTRL_VINR_UNTAGGED	2 /* Admit only untagged packets */
+ #define  GSWIP_PCE_VCTRL_VIMR		BIT(3)	/* VLAN Ingress Member violation rule */
+ #define  GSWIP_PCE_VCTRL_VEMR		BIT(4)	/* VLAN Egress Member violation rule */
+ #define  GSWIP_PCE_VCTRL_VSR		BIT(5)	/* VLAN Security */
 -- 
 2.51.0
 
