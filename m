@@ -1,145 +1,103 @@
-Return-Path: <netdev+bounces-229455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94CD4BDC95E
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 07:16:36 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CDE2BDC974
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 07:17:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6D3844E62F7
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 05:16:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3553E4E55CC
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 05:17:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B093019AB;
-	Wed, 15 Oct 2025 05:16:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C28330214D;
+	Wed, 15 Oct 2025 05:17:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="IZCxiCu/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZlJosagQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AD23016E2;
-	Wed, 15 Oct 2025 05:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7FF2D3EC7
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 05:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760505391; cv=none; b=u03syqfzKD8qLKVbp8/FfTRdfh5kHrPWUo7jKranwopVZW28HHitQexkYNrzWPFGGvNQzZAHbLJSotomCr+nlQwqaCra1oerqDAcf0Jui42nyCHCAnKTFuirIw7wm1//qsPUoQHY4R1Jkzh6tKQY/OAujq29fsVJvUROiXTJYMM=
+	t=1760505469; cv=none; b=TV1lXys19Brk9iejwTIh7pndTMGVoSzui/H6qtbgno0EY8Cke+Z8wtkQNttMQ/R9gvdgMCz3uAhAJ9loS+ammsKwAsqHcn5ad6vah2kVgdEiwQIcU+/KfRXbQo3tWkDq9Jukc4uG1qpx0SK5iBND9iwPb7mxIkKIdUPvlQAL/WU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760505391; c=relaxed/simple;
-	bh=wgKM6x3Yhy8jmtIn6xOwrUMNqwYV8Rli1qUtnZeVb54=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=Fw1o6pmgCazPm7nxkzTSSrEfqTRFGMTa/zWqSwjHsHKnq449J9S6YpwqaQ6Fcl08sREoV1euJd3jonFlxXvx1gmrKE+0xUcWx1Z0k06z0qT6wxN0U6ldATaVBbj656qm4jdowGZsks8xaUdQOOiRaFs8SRIyPEPkUIb89zRasxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=IZCxiCu/; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id; bh=vkfC6oyc+tLRX6p
-	AwVB+5VChWivTatMtNmzCnEAtV8E=; b=IZCxiCu/r6Hb/EqJWciCLAtIAxvXOZp
-	mcNdDpjjx/DQqiT0He8sYn6aK/VnrTICv5kjxM3e/38lGkunTWsv4Ix2bpHcWNK1
-	o1Lewgfy3VxxtMkdIclIkVsRLDogrEOXlwucgVA+OsTW/m8LkwGFWsuxZOVV705n
-	4ydacRZzF2zk=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp4 (Coremail) with SMTP id PygvCgB3A5TILe9ovbHOAA--.30995S2;
-	Wed, 15 Oct 2025 13:15:06 +0800 (CST)
-From: Lizhe <sensor1010@163.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk,
-	jonas@kwiboo.se,
-	chaoyi.chen@rock-chips.com,
-	david.wu@rock-chips.com
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Lizhe <sensor1010@163.com>
-Subject: [PATCH net-next] net: dwmac-rk: No need to check the return value of phy_power_on()
-Date: Tue, 14 Oct 2025 22:14:46 -0700
-Message-Id: <20251015051446.2677-1-sensor1010@163.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:PygvCgB3A5TILe9ovbHOAA--.30995S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Ww4xKw13WFyfXr15Gr4fGrg_yoW8tr13pa
-	93GF9Fyr1kXa4xGa12yFsrZa45C3y3try0qF1xA34ruF13AF1Dtr10yryFvF1j9rykXFya
-	yr4UAF1xC3Z8ur7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRrb1bUUUUU=
-X-CM-SenderInfo: 5vhq20jurqiii6rwjhhfrp/1tbiKBrnq2jvHAA8gQABsZ
+	s=arc-20240116; t=1760505469; c=relaxed/simple;
+	bh=sW2EkWYty4TqIIIozFdnB9LR/4D4aFQ/vJdp1EEpNmY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JQDG+5bPdo4IJSdH/b+ZN2/jnpXeyXthqX0I9/8kiieUFfY3pvcKZt3Pv1XrHzeRzGdTeILx/Y3e7yA5fJYUshCMzkKSDfNNDyscWUBu12T9sDP3aTfpY0ESl93RvCNTw/HK9tLsmMiJjKOGWmNblGpcZa8xPEu968H7en5PEac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZlJosagQ; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-88e68c0a7bfso34206085a.0
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 22:17:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760505466; x=1761110266; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YLBmb50auxeEeQdpqgB8+uBnKMw+hlM1UtdT7FG+Uvw=;
+        b=ZlJosagQX9OeyOhpUm+yOV5HwIQAgu1hsi1aSbugOPPlF2UEC0K72uzJ4ksOvs45uj
+         sq2knOOVVjFULBHC0oHn1RoCZGa4bOOFrI5V36YeuGL78TEpUuw8pVOr8FGYn0OmqsnN
+         KYssb5qAbIwNo5uzIprDJh2f93iuJDhXvkY7ytN3pwCcHyZhniGPKsBUdYK+zcpV1dPj
+         eCON3WtdohTSu0NIfKbndIaouc65oEGwDQwj/dBWwbCTBDeMS8eJcrU3qwVUhO9qLItk
+         Syq5YHEibmf4dtrw9Jie4G/yezA03sttKN1deluz+bPcyn+U/vT545XA2OpWP1xVXEr5
+         HtrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760505466; x=1761110266;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YLBmb50auxeEeQdpqgB8+uBnKMw+hlM1UtdT7FG+Uvw=;
+        b=Jy3WWoW2nG9FlC5kvJVSfa6goCmQPV5LERKFCdYrXqHI9XOXIoOPXzf83m232vqMEy
+         bjFZ59IyOIDTzgMd8/KIxoqYG2lEWs5AzpHx47DQYePXfYkj7V1aEylNrKGDbQ8zlKtF
+         JEzM2N6j3LH8Kkt6DsS3NS9vhEqUKdmN4yQK4xu20enYYNf0y1QARjzoBMSZ0xlEt1dy
+         jzUfmkXkgiEHCisId+28XxnxpnvzleJCoOCTbffPelGboe2KmJzXJ73MKEr8fxl+vifa
+         grTqe9ngbojPrnL7RUJGWQjxLww9m5H11W4oqv4IxaNBahvbzv4xqZvbqtY9jSHss1+P
+         CSbA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGvJgcWnGBhZB2B4mthmISKX0ZlYUdsyGHtEL1EUNerATQI5SY5xmBhqeFUb3Lac02gJQzzUE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoMWFP2QoD6xsV7HvxTkiODbHtSrqrTyI7050YynuazF0T4sM+
+	OJuiOFdLB+cF4HaH96wnWzFJOPzd5+Vxcb+Pfw6NLSMSJC/sheimZngYZGvHKXjj/WJoxlbm8bD
+	89fKSUAdRiF3Pz+12jX+TEfMLSWSnhC6pr+IlbYGO
+X-Gm-Gg: ASbGncs8lgoWjNWnjjHqN/o0PRYUEdjGE2rw7Jjhbb8RukGRbjMTM4I2+w5dTOWepd3
+	+zDMXVKsfhTjWVCMXR2vvQVbD42pbcfOICGbsarI3qrZ4ksyM2OlbBQ6ZYm/Dc1R6zeT8BQgiUQ
+	zAoW4zqCGZNZb57Bq0rhftIvNHI++NfLzgHSFc68jwDXEJZwo6ng4t9crKJl/5+Gi4kSJiVnvAx
+	G9NO8ATrKdkKJ5/mpud+lt2aneOpOFJjwICWzZI0ERc
+X-Google-Smtp-Source: AGHT+IGDWniU89pgwjBHrC1ZpYMkSVaDZQOxI+Hp+JEl63Ox+QCyC+kX0TcT/qZSYVF4F1CTAtcsRNpumu2WkATMqwc=
+X-Received: by 2002:a05:622a:5914:b0:4e5:3418:3db0 with SMTP id
+ d75a77b69052e-4e6ead4c550mr376365421cf.50.1760505466124; Tue, 14 Oct 2025
+ 22:17:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20251013145926.833198-1-edumazet@google.com> <20251014193431.534653d5@kernel.org>
+In-Reply-To: <20251014193431.534653d5@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Oct 2025 22:17:35 -0700
+X-Gm-Features: AS18NWBw_uAmkdCStJ7FdABggvzIsXAOKtcgM3AoF-bO7np2Iu7t6ttBoNlnycc
+Message-ID: <CANn89i+-N2Z1ASuUhFM8nC0AfJg=Lg4sQ8OccucuO7BEDvitUw@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: better handle TCP_TX_DELAY on established flows
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-'phy_power_on' is a local scope one within the driver, since the
-return value of the phy_power_on() function is always 0, checking
-its return value is redundant.
+On Tue, Oct 14, 2025 at 7:34=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 13 Oct 2025 14:59:26 +0000 Eric Dumazet wrote:
+> > +             if (val < 0 || val >=3D (1U << (31 - 3)) ) {
+>
+> Is the space between the ))) brackets intentional?
+> Sorry for asking late.. we can fix when applying.
 
-the function name 'phy_power_on()' conflicts with the existing
-phy_power_on() function in the PHY subsystem. a suitable alternative
-name would be rk_phy_power_set(), particularly since when the
-second argument is false, this function actually powers off the PHY
-
-Signed-off-by: Lizhe <sensor1010@163.com>
----
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 19 +++++--------------
- 1 file changed, 5 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 51ea0caf16c1..ac3324430b2d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -1461,23 +1461,18 @@ static int gmac_clk_enable(struct rk_priv_data *bsp_priv, bool enable)
- 	return 0;
- }
- 
--static int phy_power_on(struct rk_priv_data *bsp_priv, bool enable)
-+static void rk_phy_power_set(struct rk_priv_data *bsp_priv, bool enable)
- {
- 	struct regulator *ldo = bsp_priv->regulator;
- 	struct device *dev = bsp_priv->dev;
--	int ret;
- 
- 	if (enable) {
--		ret = regulator_enable(ldo);
--		if (ret)
-+		if (regulator_enable(ldo))
- 			dev_err(dev, "fail to enable phy-supply\n");
- 	} else {
--		ret = regulator_disable(ldo);
--		if (ret)
-+		if (regulator_disable(ldo))
- 			dev_err(dev, "fail to disable phy-supply\n");
- 	}
--
--	return 0;
- }
- 
- static struct rk_priv_data *rk_gmac_setup(struct platform_device *pdev,
-@@ -1655,11 +1650,7 @@ static int rk_gmac_powerup(struct rk_priv_data *bsp_priv)
- 		dev_err(dev, "NO interface defined!\n");
- 	}
- 
--	ret = phy_power_on(bsp_priv, true);
--	if (ret) {
--		gmac_clk_enable(bsp_priv, false);
--		return ret;
--	}
-+	rk_phy_power_set(bsp_priv, true);
- 
- 	pm_runtime_get_sync(dev);
- 
-@@ -1676,7 +1667,7 @@ static void rk_gmac_powerdown(struct rk_priv_data *gmac)
- 
- 	pm_runtime_put_sync(gmac->dev);
- 
--	phy_power_on(gmac, false);
-+	rk_phy_power_set(gmac, false);
- 	gmac_clk_enable(gmac, false);
- }
- 
--- 
-2.17.1
-
+This was not intentional, sorry for this.
 
