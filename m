@@ -1,309 +1,223 @@
-Return-Path: <netdev+bounces-229474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6435ABDCC49
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 08:40:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DDE0BDCC3A
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 08:39:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F9ED3B01BB
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 06:40:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A92C3403B6D
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 06:39:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6ED313266;
-	Wed, 15 Oct 2025 06:40:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30E773128DD;
+	Wed, 15 Oct 2025 06:39:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jE3xKu67"
 X-Original-To: netdev@vger.kernel.org
-Received: from baidu.com (mx24.baidu.com [111.206.215.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0BD43126CE;
-	Wed, 15 Oct 2025 06:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACDD73128D9
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 06:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760510434; cv=none; b=tlHskyFuxrX4PZESdCL6dlmdE174+WIHQoHv8H8TLjQ1ud1lLPqLdnS/vIe3x1nKIz9mHA+9Iq7o9Bb44cTBmGoooxRykBYpSvBeIgaOO3jLI7wlUH9gfmcJgs8fGGevTMqatQAW3gqc0OybcemLny0V98ZaSH/JEJG7fn7EPoY=
+	t=1760510355; cv=none; b=PvIsG0r6Vq5N5T/9AblbgoiykUSxbWznHMxsqIQ0CSExE873eweCaNjF5vYTYMOBL8Js/l/73RuCLy+x6naUI8juQyyhcUl6gUzM21ynABUTDw3R888Ce2n6f5xrDj12T8iSNFQ2rMgiHkcM/PCzeJad7B92xdJmbQNVgcH9kLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760510434; c=relaxed/simple;
-	bh=WKmoCAdhwJeXGa3LefrmfEnCthO+1fO4s7DJYsIMQTA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S0tfa3xL5fsHoYl2XY2UiVb1jlWUq0lZzmwlCiep68kdBZLOD9DNeacLfYl3XR2RmpkewhcN37StpCwwb3vGrVoWqnzsCOCQz6Q5Z86a+x4sTRz5VZhkycsbOW2/ztYKcr7R9Czj+B51SMf1azFBJ9L2M1f0lMSCHib+5mrV+3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: lirongqing <lirongqing@baidu.com>
-To: Andrew Morton <akpm@linux-foundation.org>, Lance Yang
-	<lance.yang@linux.dev>, Masami Hiramatsu <mhiramat@kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <linux-doc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-aspeed@lists.ozlabs.org>, <wireguard@lists.zx2c4.com>,
-	<netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>, Li RongQing
-	<lirongqing@baidu.com>, Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Anshuman Khandual <anshuman.khandual@arm.com>, Arnd Bergmann <arnd@arndb.de>,
-	David Hildenbrand <david@redhat.com>, Florian Wesphal <fw@strlen.de>, Jakub
- Kacinski <kuba@kernel.org>, "Jason A . Donenfeld" <jason@zx2c4.com>, Joel
- Granados <joel.granados@kernel.org>, Joel Stanley <joel@jms.id.au>, Jonathan
- Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>, Liam Howlett
-	<liam.howlett@oracle.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Paul E . McKenney" <paulmck@kernel.org>, Pawan Gupta
-	<pawan.kumar.gupta@linux.intel.com>, Petr Mladek <pmladek@suse.com>, Phil
- Auld <pauld@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Russell King
-	<linux@armlinux.org.uk>, Shuah Khan <shuah@kernel.org>, Simon Horman
-	<horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Steven Rostedt
-	<rostedt@goodmis.org>
-Subject: [PATCH][v4] hung_task: Panic when there are more than N hung tasks at the same time
-Date: Wed, 15 Oct 2025 14:36:15 +0800
-Message-ID: <20251015063615.2632-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1760510355; c=relaxed/simple;
+	bh=u8e4JWFCFnh7H9/29cWjqArFxpug4mrQezkIEidS3TE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Pm+ZYSjZSDsb6D7CfiE+bjt1qvRNY2vFoGSVnKDeELHMfz+73LJa7UAG3ZpOoUuxx8cM45ltSJXJm7DbzlqYyqEkI7iZZC6ArDwPWGW1WcOpZnxyqtewRW9RsPEofdy6eKxFa0Sxin+nfY+Mj3BqIMoG8EDleYCt0Sr3zkthtxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jE3xKu67; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-87a092251eeso11378486d6.0
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 23:39:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760510351; x=1761115151; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bsukMYa0AUCqYEvcLXRhuapsU2hd6Y80454Ux1AAjL4=;
+        b=jE3xKu67I8l7hnrtOK2eT11G8SXY9iP93v+Af2PO/YaQoNBGITcg2MpnpnS+qAKCiq
+         FaDoYj19a8hlUbQZV5mCYIItZ3iMurOoyMww13fC828qFYpJkbGTmsvMNOEGD+d40DLe
+         kUp0hV3ELWOIjDoCScx68YCvV+RCpaM5UyX3dwRehoIeuNpMYjuyV9fcZfYh/O7SyDfY
+         onh6GkjEcjIgLggnzs3optEDl+KorDFecPxh6IEdxV17IXKwqxdLRqzXE7VS5vWQ2P3R
+         J+QEMr2fh9wapgquSvBC1MCWV2qABApfHHtRghy7gf862xTtxK+jnLv8trcS4ys6WaHD
+         xqZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760510351; x=1761115151;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bsukMYa0AUCqYEvcLXRhuapsU2hd6Y80454Ux1AAjL4=;
+        b=brU6KsUIRqIpJ+XrXHzMHUjZ77HY4bjeWhpntohmPmdqh0ybfp7YWlTFDRqc6JP2PM
+         yWxIuaXHuvfXNHVAutTgBwKjxCjzogcdD8Lz3M0sQ7sBIu8IVb4m9aiP1+ouzPi2H9wB
+         o2BpMQEX3694fss3/fC/R/8zudgPj2kd7Dj5js9mXZ6ODEZU1XNy2uPOJfc39vmOPIEE
+         o5+mtWcEN78gdGXEIkVmeZuMsLuxX9lROA7YLKCqdXsDCawkQkV1a44CVnt7LIy/2tzL
+         dQwslZn0qNpG2sAQjYjqrz5JAiX3xCTfK8ujLqpHtxLwL1g/5/VlyE5wJx59fFCz867l
+         zqBg==
+X-Forwarded-Encrypted: i=1; AJvYcCWkVV3rMPsYrbaiZhiAFLjrTbWcVGl8K8omizcan1SKFXssJcMbUwqF25Nunh+DNVdS2DjoXys=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJHaP4OBkcG3qz031Y+bXwsus3iqvOvCeIWlgAO4UE0czazMHw
+	nvVem9TYbMWmBk1upw7mwhl0lrOgEDXPAMYn2atu7VWSw/RrCoR7csY8I+kas1YP5/ltQDLINCA
+	XH0LI9MjbMruPhoWE7zf68vooGM7CydDLAEuHcy3b
+X-Gm-Gg: ASbGncs65BSV0Jd6REgOrkxMV1+S+giLKonNxtxHi8oKI7hXkVeifyr6w7kxMECxCUy
+	LWYkj14V4efQMKGbXCY6VZBXJp8C+0oKREna1ZiMve/Hhd2YIlYlCNkyuHuuWrn3Vyh8ehhYrpI
+	tl6wbYlic7vxwDsUSVTJCr5bp0n35dUbcXrTusm1VM/a/mUWcOQ9hrf1r3rIBm8lZB0y6T3j9kF
+	UYGZ6qFTkyffpZrzLusPZ+46TNiTQCWEg==
+X-Google-Smtp-Source: AGHT+IFK/RWWMbmryZERBFoMRzd6/kz9EwXNSWCusWT0Lc+3vQtZfacIx3bleY22OD0BqECfDUYhjeSl5kCs+LlgdPM=
+X-Received: by 2002:ac8:4799:0:b0:4d1:212f:6689 with SMTP id
+ d75a77b69052e-4e6eb068d71mr314051311cf.41.1760510351122; Tue, 14 Oct 2025
+ 23:39:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: bjhj-exc9.internal.baidu.com (172.31.3.19) To
- bjkjy-exc3.internal.baidu.com (172.31.50.47)
-X-FEAS-Client-IP: 172.31.50.47
-X-FE-Policy-ID: 52:10:53:SYSTEM
+References: <20251013101636.69220-1-21cnbao@gmail.com> <aO11jqD6jgNs5h8K@casper.infradead.org>
+ <CAGsJ_4x9=Be2Prbjia8-p97zAsoqjsPHkZOfXwz74Z_T=RjKAA@mail.gmail.com>
+ <CANn89iJpNqZJwA0qKMNB41gKDrWBCaS+CashB9=v1omhJncGBw@mail.gmail.com>
+ <CAGsJ_4xGSrfori6RvC9qYEgRhVe3bJKYfgUM6fZ0bX3cjfe74Q@mail.gmail.com>
+ <CANn89iKSW-kk-h-B0f1oijwYiCWYOAO0jDrf+Z+fbOfAMJMUbA@mail.gmail.com>
+ <CAGsJ_4wJHpD10ECtWJtEWHkEyP67sNxHeivkWoA5k5++BCfccA@mail.gmail.com>
+ <CANn89iKC_y6Fae9E5ETOE46y-RCqD6cLHnp=7GynL_=sh3noKg@mail.gmail.com> <CAGsJ_4x5v=M0=jYGOqy1rHL9aVg-76OgiE0qQMdEu70FhZcmUg@mail.gmail.com>
+In-Reply-To: <CAGsJ_4x5v=M0=jYGOqy1rHL9aVg-76OgiE0qQMdEu70FhZcmUg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Oct 2025 23:39:00 -0700
+X-Gm-Features: AS18NWDMOlh0tBS4TlU64c6PgouY_kRH71v_bFl3FqJI9-6cAzN_kZLryiaCnBA
+Message-ID: <CANn89iJYaNZ+fkKosRVx+8i17HJAB4th645ySMWQEAo6WoCg3w@mail.gmail.com>
+Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network buffer allocation
+To: Barry Song <21cnbao@gmail.com>
+Cc: Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org, linux-mm@kvack.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Barry Song <v-songbaohua@oppo.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	Brendan Jackman <jackmanb@google.com>, Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Huacai Zhou <zhouhuacai@oppo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Li RongQing <lirongqing@baidu.com>
+On Tue, Oct 14, 2025 at 1:17=E2=80=AFPM Barry Song <21cnbao@gmail.com> wrot=
+e:
+>
+> On Tue, Oct 14, 2025 at 6:39=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Tue, Oct 14, 2025 at 3:19=E2=80=AFAM Barry Song <21cnbao@gmail.com> =
+wrote:
+> > >
+> > > > >
+> > > > > >
+> > > > > > I think you are missing something to control how much memory  c=
+an be
+> > > > > > pushed on each TCP socket ?
+> > > > > >
+> > > > > > What is tcp_wmem on your phones ? What about tcp_mem ?
+> > > > > >
+> > > > > > Have you looked at /proc/sys/net/ipv4/tcp_notsent_lowat
+> > > > >
+> > > > > # cat /proc/sys/net/ipv4/tcp_wmem
+> > > > > 524288  1048576 6710886
+> > > >
+> > > > Ouch. That is insane tcp_wmem[0] .
+> > > >
+> > > > Please stick to 4096, or risk OOM of various sorts.
+> > > >
+> > > > >
+> > > > > # cat /proc/sys/net/ipv4/tcp_notsent_lowat
+> > > > > 4294967295
+> > > > >
+> > > > > Any thoughts on these settings?
+> > > >
+> > > > Please look at
+> > > > https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
+> > > >
+> > > > tcp_notsent_lowat - UNSIGNED INTEGER
+> > > > A TCP socket can control the amount of unsent bytes in its write qu=
+eue,
+> > > > thanks to TCP_NOTSENT_LOWAT socket option. poll()/select()/epoll()
+> > > > reports POLLOUT events if the amount of unsent bytes is below a per
+> > > > socket value, and if the write queue is not full. sendmsg() will
+> > > > also not add new buffers if the limit is hit.
+> > > >
+> > > > This global variable controls the amount of unsent data for
+> > > > sockets not using TCP_NOTSENT_LOWAT. For these sockets, a change
+> > > > to the global variable has immediate effect.
+> > > >
+> > > >
+> > > > Setting this sysctl to 2MB can effectively reduce the amount of mem=
+ory
+> > > > in TCP write queues by 66 %,
+> > > > or allow you to increase tcp_wmem[2] so that only flows needing big
+> > > > BDP can get it.
+> > >
+> > > We obtained these settings from our hardware vendors.
+> >
+> > Tell them they are wrong.
+>
+> Well, we checked Qualcomm and MTK, and it seems both set these values
+> relatively high. In other words, all the AOSP products we examined also
+> use high values for these settings. Nobody is using tcp_wmem[0]=3D4096.
+>
 
-Currently, when 'hung_task_panic' is enabled, the kernel panics
-immediately upon detecting the first hung task. However, some hung
-tasks are transient and allow system recovery, while persistent hangs
-should trigger a panic when accumulating beyond a threshold.
+The (fine and safe) default should be PAGE_SIZE.
 
-Extend the 'hung_task_panic' sysctl to accept a threshold value
-specifying the number of hung tasks that must be detected before
-triggering a kernel panic. This provides finer control for environments
-where transient hangs may occur but persistent hangs should be fatal.
+Perhaps they are dealing with systems with PAGE_SIZE=3D65536, but then
+the skb_page_frag_refill() would be a non issue there, because it would
+only allocate order-0 pages.
 
-The sysctl now accepts:
-- 0: don't panic (maintains original behavior)
-- 1: panic on first hung task (maintains original behavior)
-- N > 1: panic after N hung tasks are detected in a single scan
+> We=E2=80=99ll need some time to understand why these are configured this =
+way in
+> AOSP hardware.
+>
+> >
+> > >
+> > > It might be worth exploring these settings further, but I can=E2=80=
+=99t quite see
+> > > their connection to high-order allocations, since high-order allocati=
+ons are
+> > > kernel macros.
+> > >
+> > > #define SKB_FRAG_PAGE_ORDER     get_order(32768)
+> > > #define PAGE_FRAG_CACHE_MAX_SIZE        __ALIGN_MASK(32768, ~PAGE_MAS=
+K)
+> > > #define PAGE_FRAG_CACHE_MAX_ORDER       get_order(PAGE_FRAG_CACHE_MAX=
+_SIZE)
+> > >
+> > > Is there anything I=E2=80=99m missing?
+> >
+> > What is your question exactly ? You read these macros just fine. What
+> > is your point ?
+>
+> My question is whether these settings influence how often high-order
+> allocations occur. In other words, would lowering these values make
+> high-order allocations less frequent? If so, why?
 
-This maintains backward compatibility while providing flexibility for
-different hang scenarios.
+Because almost all of the buffers stored in TCP write queues are using
+order-3 pages
+on arches with 4K pages.
 
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
-Cc: Andrew Jeffery <andrew@codeconstruct.com.au>
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Florian Wesphal <fw@strlen.de>
-Cc: Jakub Kacinski <kuba@kernel.org>
-Cc: Jason A. Donenfeld <jason@zx2c4.com>
-Cc: Joel Granados <joel.granados@kernel.org>
-Cc: Joel Stanley <joel@jms.id.au>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Kees Cook <kees@kernel.org>
-Cc: Lance Yang <lance.yang@linux.dev>
-Cc: Liam Howlett <liam.howlett@oracle.com>
-Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: "Masami Hiramatsu (Google)" <mhiramat@kernel.org>
-Cc: "Paul E . McKenney" <paulmck@kernel.org>
-Cc: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: Petr Mladek <pmladek@suse.com>
-Cc: Phil Auld <pauld@redhat.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Stanislav Fomichev <sdf@fomichev.me>
-Cc: Steven Rostedt <rostedt@goodmis.org>
----
-diff with v3: comments modification, suggested by Lance, Masami, Randy and Petr
-diff with v2: do not add a new sysctl, extend hung_task_panic, suggested by Kees Cook
+I am a bit confused because you posted a patch changing skb_page_frag_refil=
+l()
+without realizing its first user is TCP.
 
- Documentation/admin-guide/kernel-parameters.txt      | 20 +++++++++++++-------
- Documentation/admin-guide/sysctl/kernel.rst          |  9 +++++----
- arch/arm/configs/aspeed_g5_defconfig                 |  2 +-
- kernel/configs/debug.config                          |  2 +-
- kernel/hung_task.c                                   | 15 ++++++++++-----
- lib/Kconfig.debug                                    |  9 +++++----
- tools/testing/selftests/wireguard/qemu/kernel.config |  2 +-
- 7 files changed, 36 insertions(+), 23 deletions(-)
+Look for sk_page_frag_refill() in tcp_sendmsg_locked()
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index a51ab46..492f0bc 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -1992,14 +1992,20 @@
- 			the added memory block itself do not be affected.
- 
- 	hung_task_panic=
--			[KNL] Should the hung task detector generate panics.
--			Format: 0 | 1
-+			[KNL] Number of hung tasks to trigger kernel panic.
-+			Format: <int>
-+
-+			When set to a non-zero value, a kernel panic will be triggered if
-+			the number of detected hung tasks reaches this value.
-+
-+			0: don't panic
-+			1: panic immediately on first hung task
-+			N: panic after N hung tasks are detected in a single scan
- 
--			A value of 1 instructs the kernel to panic when a
--			hung task is detected. The default value is controlled
--			by the CONFIG_BOOTPARAM_HUNG_TASK_PANIC build-time
--			option. The value selected by this boot parameter can
--			be changed later by the kernel.hung_task_panic sysctl.
-+			The default value is controlled by the
-+			CONFIG_BOOTPARAM_HUNG_TASK_PANIC build-time option. The value
-+			selected by this boot parameter can be changed later by the
-+			kernel.hung_task_panic sysctl.
- 
- 	hvc_iucv=	[S390]	Number of z/VM IUCV hypervisor console (HVC)
- 				terminal devices. Valid values: 0..8
-diff --git a/Documentation/admin-guide/sysctl/kernel.rst b/Documentation/admin-guide/sysctl/kernel.rst
-index f3ee807..0065a55 100644
---- a/Documentation/admin-guide/sysctl/kernel.rst
-+++ b/Documentation/admin-guide/sysctl/kernel.rst
-@@ -397,13 +397,14 @@ a hung task is detected.
- hung_task_panic
- ===============
- 
--Controls the kernel's behavior when a hung task is detected.
-+When set to a non-zero value, a kernel panic will be triggered if the
-+number of hung tasks found during a single scan reaches this value.
- This file shows up if ``CONFIG_DETECT_HUNG_TASK`` is enabled.
- 
--= =================================================
-+= =======================================================
- 0 Continue operation. This is the default behavior.
--1 Panic immediately.
--= =================================================
-+N Panic when N hung tasks are found during a single scan.
-+= =======================================================
- 
- 
- hung_task_check_count
-diff --git a/arch/arm/configs/aspeed_g5_defconfig b/arch/arm/configs/aspeed_g5_defconfig
-index 61cee1e..c3b0d5f 100644
---- a/arch/arm/configs/aspeed_g5_defconfig
-+++ b/arch/arm/configs/aspeed_g5_defconfig
-@@ -308,7 +308,7 @@ CONFIG_PANIC_ON_OOPS=y
- CONFIG_PANIC_TIMEOUT=-1
- CONFIG_SOFTLOCKUP_DETECTOR=y
- CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC=y
--CONFIG_BOOTPARAM_HUNG_TASK_PANIC=y
-+CONFIG_BOOTPARAM_HUNG_TASK_PANIC=1
- CONFIG_WQ_WATCHDOG=y
- # CONFIG_SCHED_DEBUG is not set
- CONFIG_FUNCTION_TRACER=y
-diff --git a/kernel/configs/debug.config b/kernel/configs/debug.config
-index e81327d..9f6ab7d 100644
---- a/kernel/configs/debug.config
-+++ b/kernel/configs/debug.config
-@@ -83,7 +83,7 @@ CONFIG_SLUB_DEBUG_ON=y
- #
- # Debug Oops, Lockups and Hangs
- #
--# CONFIG_BOOTPARAM_HUNG_TASK_PANIC is not set
-+CONFIG_BOOTPARAM_HUNG_TASK_PANIC=0
- # CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC is not set
- CONFIG_DEBUG_ATOMIC_SLEEP=y
- CONFIG_DETECT_HUNG_TASK=y
-diff --git a/kernel/hung_task.c b/kernel/hung_task.c
-index b2c1f14..84b4b04 100644
---- a/kernel/hung_task.c
-+++ b/kernel/hung_task.c
-@@ -81,7 +81,7 @@ static unsigned int __read_mostly sysctl_hung_task_all_cpu_backtrace;
-  * hung task is detected:
-  */
- static unsigned int __read_mostly sysctl_hung_task_panic =
--	IS_ENABLED(CONFIG_BOOTPARAM_HUNG_TASK_PANIC);
-+	CONFIG_BOOTPARAM_HUNG_TASK_PANIC;
- 
- static int
- hung_task_panic(struct notifier_block *this, unsigned long event, void *ptr)
-@@ -218,8 +218,11 @@ static inline void debug_show_blocker(struct task_struct *task, unsigned long ti
- }
- #endif
- 
--static void check_hung_task(struct task_struct *t, unsigned long timeout)
-+static void check_hung_task(struct task_struct *t, unsigned long timeout,
-+		unsigned long prev_detect_count)
- {
-+	unsigned long total_hung_task;
-+
- 	if (!task_is_hung(t, timeout))
- 		return;
- 
-@@ -229,9 +232,10 @@ static void check_hung_task(struct task_struct *t, unsigned long timeout)
- 	 */
- 	sysctl_hung_task_detect_count++;
- 
-+	total_hung_task = sysctl_hung_task_detect_count - prev_detect_count;
- 	trace_sched_process_hang(t);
- 
--	if (sysctl_hung_task_panic) {
-+	if (sysctl_hung_task_panic && total_hung_task >= sysctl_hung_task_panic) {
- 		console_verbose();
- 		hung_task_show_lock = true;
- 		hung_task_call_panic = true;
-@@ -300,6 +304,7 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
- 	int max_count = sysctl_hung_task_check_count;
- 	unsigned long last_break = jiffies;
- 	struct task_struct *g, *t;
-+	unsigned long prev_detect_count = sysctl_hung_task_detect_count;
- 
- 	/*
- 	 * If the system crashed already then all bets are off,
-@@ -320,7 +325,7 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
- 			last_break = jiffies;
- 		}
- 
--		check_hung_task(t, timeout);
-+		check_hung_task(t, timeout, prev_detect_count);
- 	}
-  unlock:
- 	rcu_read_unlock();
-@@ -389,7 +394,7 @@ static const struct ctl_table hung_task_sysctls[] = {
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_minmax,
- 		.extra1		= SYSCTL_ZERO,
--		.extra2		= SYSCTL_ONE,
-+		.extra2		= SYSCTL_INT_MAX,
- 	},
- 	{
- 		.procname	= "hung_task_check_count",
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 3034e294..3976c90 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1258,12 +1258,13 @@ config DEFAULT_HUNG_TASK_TIMEOUT
- 	  Keeping the default should be fine in most cases.
- 
- config BOOTPARAM_HUNG_TASK_PANIC
--	bool "Panic (Reboot) On Hung Tasks"
-+	int "Number of hung tasks to trigger kernel panic"
- 	depends on DETECT_HUNG_TASK
-+	default 0
- 	help
--	  Say Y here to enable the kernel to panic on "hung tasks",
--	  which are bugs that cause the kernel to leave a task stuck
--	  in uninterruptible "D" state.
-+	  When set to a non-zero value, a kernel panic will be triggered
-+	  if the number of hung tasks found during a single scan reaches
-+	  this value.
- 
- 	  The panic can be used in combination with panic_timeout,
- 	  to cause the system to reboot automatically after a
-diff --git a/tools/testing/selftests/wireguard/qemu/kernel.config b/tools/testing/selftests/wireguard/qemu/kernel.config
-index 936b18b..0504c11 100644
---- a/tools/testing/selftests/wireguard/qemu/kernel.config
-+++ b/tools/testing/selftests/wireguard/qemu/kernel.config
-@@ -81,7 +81,7 @@ CONFIG_WQ_WATCHDOG=y
- CONFIG_DETECT_HUNG_TASK=y
- CONFIG_BOOTPARAM_HARDLOCKUP_PANIC=y
- CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC=y
--CONFIG_BOOTPARAM_HUNG_TASK_PANIC=y
-+CONFIG_BOOTPARAM_HUNG_TASK_PANIC=1
- CONFIG_PANIC_TIMEOUT=-1
- CONFIG_STACKTRACE=y
- CONFIG_EARLY_PRINTK=y
--- 
-2.9.4
-
+> I=E2=80=99m not a network expert, apologies if the question sounds naive.
+>
+> >
+> > We had in the past something dynamic that we removed
+> >
+> > commit d9b2938aabf757da2d40153489b251d4fc3fdd18
+> > Author: Eric Dumazet <edumazet@google.com>
+> > Date:   Wed Aug 27 20:49:34 2014 -0700
+> >
+> >     net: attempt a single high order allocation
+>
+> Thanks
+> Barry
 
