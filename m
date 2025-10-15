@@ -1,130 +1,166 @@
-Return-Path: <netdev+bounces-229711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7665BE03CC
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 20:46:10 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3282EBE03ED
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 20:46:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33BC148784E
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 18:46:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CB95C502008
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 18:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7EAF26F2BF;
-	Wed, 15 Oct 2025 18:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxSNe3T7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459CD27464F;
+	Wed, 15 Oct 2025 18:46:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB5F19E81F
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 18:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0517829BD91
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 18:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760553963; cv=none; b=Yt35ZuaSvM0R2upOx+lcXluqA3kMLpxU6Yvp/hdZzcfmrTnljb4ia9MCJ6BTvZhg7dQwmHVvGvUJ8Jkt1Br6TL/6nue9oLOslJwrd5HTRVaksLrCNDwQIDucxxEZYjNChaxZ9OrUknerboIf0WTx1s4rOAuOTEqEvN3afv+dRlw=
+	t=1760554011; cv=none; b=RHXSTRH/Zyqc0dveTv77id0sm19v7ISkP1W5snf15N32D25MiNe+LXNjWQsE199qt9ioOMGJ75QEzBHNy2MPo5yL783mIJraefdLRlXMlpF4YX0QF9944BYBea9wIfBkMst59seaaEoGU2K6bQdQ6nQqrIjoHS133/IWNyWgHIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760553963; c=relaxed/simple;
-	bh=j0dB+z1QJhokdFNrZJ4E2TDUIMNX6UmtknIL+sRxQg4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KJKOorXwbiMNkatyT/iYcXdMCCcSxas2LUHpqxP8J9H0yGRoEXeoXIPs9ncEMazFM97In9cQta0Gm0HQklbpuQgltEjEju6S3x0pHHFFhcHY98NiMpCDXgA1wMt68ce4q6bSuWmIwhZXFAsNDhxt4SHz5IBPHTgdUgOV9bLaXB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TxSNe3T7; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-367444a3e2aso71273231fa.2
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 11:46:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760553959; x=1761158759; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4/Q7+5bvyc+y+xZiQH200o3xNZSiEQX4GGlTPGcAOz4=;
-        b=TxSNe3T7NP1QCopkMkf9WLGdc8jdENZmQtC5TpmmE1uY2ZC05kCXet1N18RNHFthPI
-         bRP4p+IJsmWGtsgfC9ar7HTXRvk+EnJLiyqCHY0qDNo9hoZDVPL6hl0xXRBvS4F6XABK
-         jAExM8nGify0l+2sikJavOlRSI+rV5HIWa5sndZUyHI4GeZSzzO2kry0QAkHgnqnlYu0
-         SUXPhjn5sTCx7BAy57qyZ/DvMRHUICFBB2H/JE6duqGhM/dSuLQQZ0J5JGPS3EGm2eM8
-         cI4flGJXt2uQNyT4SfW9ugRvXmza9GSmXN6ZYeQFJuwk8n+6/GYD5cAGdg0q1bktPmvo
-         oWYg==
+	s=arc-20240116; t=1760554011; c=relaxed/simple;
+	bh=2DaIaoIXWN56Be8bR2S9RRLT3aBPlvYLWdZ9/CV3OeQ=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=nQs7PzsXdCkQ71JPpbaDWYIN4DugA6tfT91RJz7asSZh5ISCU6UFJiEUJZEjXq0f4kCoPA/XonSN9saPsxq17h7J3OhJsmfvPVTBKBM/69RIHeOrnqUxD8XrG8S8DqQDbtdNzVIrtij69eVYjKt6Yv5ELxQE1Wjn7WI5ApGTWCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-9286199b46fso1302532539f.3
+        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 11:46:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760553959; x=1761158759;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4/Q7+5bvyc+y+xZiQH200o3xNZSiEQX4GGlTPGcAOz4=;
-        b=IxbcneFxWE+n5kQsdUUZHbd91J4C3xe8HoQwM2DhjZ+QETjzIH9AmVGDWzD1O2kz9w
-         9i2CmmxG4RVxBeQ2f+oB10U3a2m9ABiIVIyLsRuD4BwVwXKd9op3tD/9LX5Op1smEuBU
-         Nzd4dVCPFmSdY7PNBjwv0FPPyW/n1EkIHicC4SgSDjMlw0pWdm5Zm6mPS+IwO6gehq6b
-         ZRQCiJiPlEEqLtGxAQoW6O8ymsy5H7so9R1qCh60p2uuhFQEGJi/FXOsKvR+ksaEdM1O
-         bMKUYJbAyQPGwt9/Tm5jt1PUbhg6mjRED/E4ti2eSMUOyE+e8x6H5N5tniggQmAiAPpb
-         +ElA==
-X-Forwarded-Encrypted: i=1; AJvYcCXZ8FmF2TDV0bnN+KaHtMHh0CMIC7gwGHoZetuM+7DsgbD+zfLAiIGEYiI5cTN/NgeP0QFII6A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPMpPju8RYwII//tr7MatSaS6DNxTcZGiLJI+9lIsbTQCA4T+f
-	W0R99X7oRyYjWUyBms2Z/JjZCuQnOk5y/v3F09ebIzf15az5skc7Hf2X
-X-Gm-Gg: ASbGncuK8miZkKOlQ8QF/DSfhJISXu4Z8VIwpKXD+ISb/nJdNZdHDBF5GuzuuAFrfGz
-	+yKr/EGb5Wnn8P8Paq8u0QY5MyBWtJ2ZA3KlIHix0FKmqA3/dvpYGsv8dU54cfNdskjzvWy1ubY
-	avRRN3Hr6EltwSVag64N06RfX+yUki3d8SZoIAkGZqkMHzxAQoLV2I/Cq+Y8Zb8u5xWK0VaueCo
-	QGwXf5ajsbdecLH/7PN7xwnUv2OeULd1FRXlXl130JaJQvTUmtJ7/MxsbIMmMq1ThkvsPwWkEdz
-	E89quwuIRw83LeYqNx/yS2exKpvNEqtmSFa76CeNFicqmT9iR4jFtQSUIBhhWvLornvbDCDHrNk
-	AtjgkGXS3yzQjOyRRWRX5WZMIWClrK+TqN+9fKOmpCT+UV8jCoBKGY/fEsg==
-X-Google-Smtp-Source: AGHT+IEQ8J7mN7zmFb/mTib/dJL7UdCidB0M0c96bKSMNuCRBOVnxZ/30d1D7ryje52tDGkLhm1OBA==
-X-Received: by 2002:a05:651c:990:b0:371:fb14:39bb with SMTP id 38308e7fff4ca-37609d72cc1mr85265531fa.16.1760553959064;
-        Wed, 15 Oct 2025 11:45:59 -0700 (PDT)
-Received: from home-server.lan ([82.208.126.183])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3762e7b6cf1sm50005891fa.24.2025.10.15.11.45.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Oct 2025 11:45:58 -0700 (PDT)
-From: Alexey Simakov <bigalex934@gmail.com>
-To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Cc: Alexey Simakov <bigalex934@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH net] sctp: avoid NULL dereference when chunk data buffer is missing
-Date: Wed, 15 Oct 2025 21:45:10 +0300
-Message-Id: <20251015184510.6547-1-bigalex934@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1760554007; x=1761158807;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DS4Sxr0k4RTUlUgBlQ5Ey66j42nijDvXrm5qaLRzbiU=;
+        b=LxbwXp/65hfrlOiQzmN9iRHgUAH5pZVYHgNoxkMCXqZQS1vaBlCCk7JI+17FpDcpfb
+         DhrV6hQ7jeuiLEleJsn3mQqnHpQfay8UghSh65XeyvPm9Y5iAhWG34xscck+8hKZQv2P
+         ZpL5GenGCx4S3K9j2v8ij5kSxzHHR1kUcZsUYaULTHF8g+faUYG7MqMnJ+y6hhhvj8aV
+         bNBaj4C7LXnRJra6jBWoMvVZLBfocWyEdU+3/V924hDwIK1ctTvoT4EvTbTqwtW+3Qwe
+         B1XIh3+wIELYOrH20t3WLFBs/gSLwaBTwaFMeIealnha8XcW6gUMEnCH0TouoDFJrjlm
+         LhIw==
+X-Forwarded-Encrypted: i=1; AJvYcCUlbijO4xfn13Z0qh3c+MnY/0PbN/v3tx5uTDIyGeNRUK9L6HKLLNndH9+HhEds8LwWZdLhZgM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxclXhwMD2AAEiJpnOvgFYv/hapQUMXIfZ6dtNpURpSduFfPQ29
+	L58fOxFXNuAn2Cw9K0tqNF9rJRc9TyM0sMk+dgBxWqJbST1KxJGrFSbIjphM1rjwaZOz2W+wnfR
+	b1ds+lFdbM2RJfBc9K0UAWCOEzT7ZE7YOUufZP9n3IZJzt800aHc7dGuM8SA=
+X-Google-Smtp-Source: AGHT+IF1Nhhx8xlXgwy7bHy4Bj/MouB5mfv4Es/HoDZfRYkKDe+frFhndkYR8i0znrnn8O5rkHCRZqvTVzzaQoFlCeUPsA0/6JQL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:160d:b0:42f:991f:60a9 with SMTP id
+ e9e14a558f8ab-42f991f6190mr218827185ab.7.1760554007102; Wed, 15 Oct 2025
+ 11:46:47 -0700 (PDT)
+Date: Wed, 15 Oct 2025 11:46:47 -0700
+In-Reply-To: <20251015140140.62273-1-daniel@iogearbox.net>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68efec17.050a0220.91a22.02ca.GAE@google.com>
+Subject: [syzbot ci] Re: netkit: Support for io_uring zero-copy and AF_XDP
+From: syzbot ci <syzbot+ci7c73a60f40f79ce2@syzkaller.appspotmail.com>
+To: bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
+	dw@davidwei.uk, john.fastabend@gmail.com, jordan@jrife.io, kuba@kernel.org, 
+	maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, 
+	martin.lau@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	razor@blackwall.org, sdf@fomichev.me, toke@redhat.com, 
+	wangdongdong.6@bytedance.com, willemb@google.com, yangzhenze@bytedance.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-chunk->skb pointer is dereferenced in the if-block where it's supposed
-to be NULL only.
+syzbot ci has tested the following series
 
-Use the chunk header instead, which should be available at this point
-in execution.
+[v2] netkit: Support for io_uring zero-copy and AF_XDP
+https://lore.kernel.org/all/20251015140140.62273-1-daniel@iogearbox.net
+* [PATCH net-next v2 01/15] net: Add bind-queue operation
+* [PATCH net-next v2 02/15] net: Implement netdev_nl_bind_queue_doit
+* [PATCH net-next v2 03/15] net: Add peer info to queue-get response
+* [PATCH net-next v2 04/15] net, ethtool: Disallow peered real rxqs to be resized
+* [PATCH net-next v2 05/15] net: Proxy net_mp_{open,close}_rxq for mapped queues
+* [PATCH net-next v2 06/15] xsk: Move NETDEV_XDP_ACT_ZC into generic header
+* [PATCH net-next v2 07/15] xsk: Move pool registration into single function
+* [PATCH net-next v2 08/15] xsk: Add small helper xp_pool_bindable
+* [PATCH net-next v2 09/15] xsk: Change xsk_rcv_check to check netdev/queue_id from pool
+* [PATCH net-next v2 10/15] xsk: Proxy pool management for mapped queues
+* [PATCH net-next v2 11/15] netkit: Add single device mode for netkit
+* [PATCH net-next v2 12/15] netkit: Document fast vs slowpath members via macros
+* [PATCH net-next v2 13/15] netkit: Implement rtnl_link_ops->alloc and ndo_queue_create
+* [PATCH net-next v2 14/15] netkit: Add io_uring zero-copy support for TCP
+* [PATCH net-next v2 15/15] netkit: Add xsk support for af_xdp applications
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+and found the following issue:
+WARNING in netif_get_rx_queue_peer_locked
 
-Fixes: 90017accff61 ("sctp: Add GSO support")
-Signed-off-by: Alexey Simakov <bigalex934@gmail.com>
+Full report is available here:
+https://ci.syzbot.org/series/19b5990a-1eef-44da-a6f0-ffb03bd8adff
+
+***
+
+WARNING in netif_get_rx_queue_peer_locked
+
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      18a7e218cfcdca6666e1f7356533e4c988780b57
+arch:      amd64
+compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+config:    https://ci.syzbot.org/builds/7583f7f3-9e92-4fe2-85f2-761655062852/config
+C repro:   https://ci.syzbot.org/findings/75520448-5da8-4fc1-817b-a6c9e4d487e1/c_repro
+syz repro: https://ci.syzbot.org/findings/75520448-5da8-4fc1-817b-a6c9e4d487e1/syz_repro
+
+UDPLite6: UDP-Lite is deprecated and scheduled to be removed in 2025, please contact the netdev mailing list
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 5959 at ./include/net/netdev_lock.h:17 netdev_assert_locked include/net/netdev_lock.h:17 [inline]
+WARNING: CPU: 1 PID: 5959 at ./include/net/netdev_lock.h:17 netif_get_rx_queue_peer_locked+0x2f1/0x3a0 net/core/netdev_rx_queue.c:71
+Modules linked in:
+CPU: 1 UID: 0 PID: 5959 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:netdev_assert_locked include/net/netdev_lock.h:17 [inline]
+RIP: 0010:netif_get_rx_queue_peer_locked+0x2f1/0x3a0 net/core/netdev_rx_queue.c:71
+Code: 6c 7e f8 eb 08 e8 3f 6c 7e f8 45 31 f6 4c 89 f0 48 83 c4 38 5b 41 5c 41 5d 41 5e 41 5f 5d e9 c6 1c 0d 02 cc e8 20 6c 7e f8 90 <0f> 0b 90 e9 a9 fd ff ff 48 c7 c1 90 44 9e 8f 80 e1 07 80 c1 03 38
+RSP: 0018:ffffc90003f17ab0 EFLAGS: 00010293
+RAX: ffffffff894127e0 RBX: ffffc90003f17b60 RCX: ffff8881709cba00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffffffff8f4df8a7 R09: 1ffffffff1e9bf14
+R10: dffffc0000000000 R11: fffffbfff1e9bf15 R12: dffffc0000000000
+R13: 0000000000000001 R14: 1ffff920007e2f6c R15: ffff8881b1832000
+FS:  0000555580884500(0000) GS:ffff8882a9d0f000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000555580884808 CR3: 00000001ba58c000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ xsk_reg_pool_at_qid+0x20b/0x630 net/xdp/xsk.c:159
+ xp_assign_dev+0x115/0x760 net/xdp/xsk_buff_pool.c:181
+ xsk_bind+0x473/0xf90 net/xdp/xsk.c:1407
+ __sys_bind_socket net/socket.c:1874 [inline]
+ __sys_bind+0x2c6/0x3e0 net/socket.c:1905
+ __do_sys_bind net/socket.c:1910 [inline]
+ __se_sys_bind net/socket.c:1908 [inline]
+ __x64_sys_bind+0x7a/0x90 net/socket.c:1908
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fb19bd8eec9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffd789e00a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
+RAX: ffffffffffffffda RBX: 00007fb19bfe5fa0 RCX: 00007fb19bd8eec9
+RDX: 0000000000000010 RSI: 0000200000000180 RDI: 0000000000000003
+RBP: 00007fb19be11f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fb19bfe5fa0 R14: 00007fb19bfe5fa0 R15: 0000000000000003
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
 ---
- net/sctp/inqueue.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/sctp/inqueue.c b/net/sctp/inqueue.c
-index 5c1652181805..f1830c21953f 100644
---- a/net/sctp/inqueue.c
-+++ b/net/sctp/inqueue.c
-@@ -173,7 +173,8 @@ struct sctp_chunk *sctp_inq_pop(struct sctp_inq *queue)
- 				chunk->skb = skb_shinfo(chunk->skb)->frag_list;
- 
- 			if (WARN_ON(!chunk->skb)) {
--				__SCTP_INC_STATS(dev_net(chunk->skb->dev), SCTP_MIB_IN_PKT_DISCARDS);
-+				__SCTP_INC_STATS(dev_net(chunk->head_skb->dev),
-+						 SCTP_MIB_IN_PKT_DISCARDS);
- 				sctp_chunk_free(chunk);
- 				goto next_chunk;
- 			}
--- 
-2.34.1
-
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
