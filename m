@@ -1,215 +1,91 @@
-Return-Path: <netdev+bounces-229689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A28DBDFCC2
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:02:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D715BDFCB3
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:01:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD3723BDA59
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:01:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 186783BA7D6
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD67E33CE8B;
-	Wed, 15 Oct 2025 17:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAB5F33A031;
+	Wed, 15 Oct 2025 17:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ax1dUAgF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lRcGM+jf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35B133A02B
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 17:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F68A33A02C;
+	Wed, 15 Oct 2025 17:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760547705; cv=none; b=VGTUnMmrMaNIh8hKBVqUlc/gcLyTFVMt/8Q4fJOJN52yVboc6soHI1bm6QT302RMcDmyDv+eGolC6QLJQDRU2rGaIQCW1J+ttkVTecpRoZDLC18RSYEc6TFeAuKygQHbpDJbqnUbzcI5YtsjRIglpPrcElGqdYT1Zx5l8AM3RZY=
+	t=1760547696; cv=none; b=GgSOui9CXCaGCI2GmJxgB524EPcI8rPlU/e/cJrTGff47RGe2Av7rJ0f/7wJMlHMatNm4OXK0UuR7JCdW0LzXsCgevzYQcniS1ujy7U/T5SAh3BjsJM9FbqAgZxv17Tw5Y0NKYRkxpIZM3NxM2QqoOBxuCzJDVDVg4QYYCXSTmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760547705; c=relaxed/simple;
-	bh=wZR6LntXfylrJ2V1qOt0fxUP8eztdGw15uvAPV9vivY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zxw6mtlWZmzNv3DdCUaLZz2QB+3Fgby9pcj+r4SxmpXJ/phaZDUwNZr1ppg5dHWYOdU0qnga1PVbfnlheMy3WsFz6bpmbooiWUWOfnCUWqZIl9Hz+ysAbMoNjaGS2mCmYdlXCWVQ8tEIePYVowI4KMzKZMI0TwedQzySoszEf48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ax1dUAgF; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3ee1221ceaaso5662573f8f.3
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 10:01:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760547702; x=1761152502; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DaW+UC1rq0W26plsE3XiljyBBYTy7XtdEOWVsRu/CF4=;
-        b=ax1dUAgF/U95+L6xAJK5KBZWQK/+0ySfcT2o8X9wXDCjvW7IbS12nuLwyzqL6OdeMy
-         9VlFIQ8yirXBY4oMf7rfCM465B5DNd3Wk7SvB4crbpSZS8Ap+rSZSNmFo3yKz5fqrOyI
-         D1+VsUDts+DomVczXAEV+yNrvsyoKh9Yd81+5tM3vTNCGiL3Ppdcp/hx7GpmrsqzQZPB
-         A2wGQ3eRAUG+Z9oFN6rcVV8s9eGtuRoiDTxoeylzfvvfWi9OetQoskSyAD8s4/0vW3Nn
-         dmUjcVqMiBYf3uhdTTXiaFDTRp7bJpAT1SWqGscDG/EUVGwS5fbbfDLnVAUYrfINcLpD
-         DceQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760547702; x=1761152502;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DaW+UC1rq0W26plsE3XiljyBBYTy7XtdEOWVsRu/CF4=;
-        b=UPfmQMhYZOB6QeNeu/ZYy3clKj9JxJ3AL9AsQa/9gnujqYD6om+P3thqLgAMGhfKQC
-         8RL+iDKCOuiwXClT1CKx7d6FloXDFjV3IFZbQOXMIAN7kGKYMzJUYkVkgkv+yRkEmDxK
-         GHPECqb6vw+m9UkeUoFeH1GlBj+5wNHLQsg1yHeV5OjPdBF+OAIEsGU1HcWBi4OSMvlY
-         QD7Y+N+LISQj9t0omPlhppiBQQxs9bdENGsikVexKxng1G4Nrzyx0RhxllGS8r5RnJ8T
-         A3Uugc/6l+zLZJvNH6s5ba+bk7OmHuuAM3i85EdsOD16UCrNdTwVuk5PYdT+JizGYy3X
-         jL9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUo6KBJuYTsNhennEhkY4ubQZKsmMPbt6pKeNxEsIYS4w71AtfG/mUl9je4ZQZalZRlx4wnjdo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYNMEnPrUfVIi0sa3RRhHAwJSkjdCwBrIlWBXjTkOMmbSCS541
-	Hk86mtoi+FVVyW70nw2oJ1coU4F72t/EqPBhwHtP3AbzzlJ/KLarixbajMJaps3Jzjhx5mQ1VOJ
-	z9LodlFQzGJUiuyldEh1pkuMtg72ex2U=
-X-Gm-Gg: ASbGncvpn34y9nEVfUMkC9ZTDOtEhXL2Vgv1TgtXZ2bFc7H03wY9WqhvYlTD/CG3/HJ
-	sk+BPshH0fyoatq6ipHOCP3ZDT8vUD01J5tPAIRnncbMIA5fULLrJ/qjSVdtIjTHahjzRtrcXHK
-	cI+3QKINTbEhyW/Q2a+J2ztJx5beb5s75jfAY65OzzqeV62gifVkDb9eKTGFTquRXtcuzOYDas6
-	zzw2eJWBZxKUee5WLf0NFedvW4kMpFaM2mwdep/fT/A/UzXOagb17DsBTpD
-X-Google-Smtp-Source: AGHT+IH5q1G3vp7aIr9j+CFjigJLEQjjsDRUdRuc/pR1f5LEo5EYFqYYYI4jZqNguXo6x33gVKJAo9u1xzKoFN4WqTc=
-X-Received: by 2002:a05:6000:2389:b0:3fd:eb15:77a with SMTP id
- ffacd0b85a97d-42666ac2da4mr17608172f8f.6.1760547700123; Wed, 15 Oct 2025
- 10:01:40 -0700 (PDT)
+	s=arc-20240116; t=1760547696; c=relaxed/simple;
+	bh=pTf+7Y3EmYxCZvAsBOkLFh1gMXWom1x1UMWCNNYwxcw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PNvaLp664JGbFZONxEeE6okKtzCTsD8wPUofitu5Ht/HE5ryuzwL0we0FHR8+EaTCfb4eACBe/X/UZKaqxKyXTkIQbgn7DT7TWMBrKoU7T38oYx1+ULolkuOY2cf6hg/vg/OF9L+5MsWtisTncAOJqGId2Z5bEyUwOrKtpzMKZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lRcGM+jf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9EB1C4CEF8;
+	Wed, 15 Oct 2025 17:01:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760547696;
+	bh=pTf+7Y3EmYxCZvAsBOkLFh1gMXWom1x1UMWCNNYwxcw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lRcGM+jfmcX1azO+9iu+4pPmmQXNz9mWGbXzLmWCcQG+Mmd1nhY3Q3k3k/gmVtkzc
+	 lBn8gI/Q+tVLMVN2khMulSnpodfiQf1qCW0qxlsTHMryviRp/dyFKuhQIYMxbucTTb
+	 c38yJUjFkNnr9YcMUvhKw03ZaFoPn0LQrKWzEm2hGBtnsniV70TJ44zkrR3M+vtZ6z
+	 Nhckl4CBXLuJHC/fX2FVhLBDwjypXMGRzKK8RMOlj9A00/br/itIDEUOu/zS8j0rpv
+	 96J7vBOkgw5hU6j+iauIXjD7VVclIfxkzQxhjD5mjIGuW0PZ7ONTHSZrT9U8bmbhTT
+	 9T5kkTuJw7sKw==
+Date: Wed, 15 Oct 2025 12:01:34 -0500
+From: Rob Herring <robh@kernel.org>
+To: =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: brcm,bcm54xx: add binding
+ for Broadcom Ethernet PHYs
+Message-ID: <20251015170134.GA4058510-robh@kernel.org>
+References: <20251013202944.14575-1-zajec5@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251015150026.117587-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251015150026.117587-4-prabhakar.mahadev-lad.rj@bp.renesas.com> <20251015155622.GE439570@ragnatech.se>
-In-Reply-To: <20251015155622.GE439570@ragnatech.se>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Wed, 15 Oct 2025 18:01:13 +0100
-X-Gm-Features: AS18NWCWlXKzJu_T8GRmOVtHfDBm-KRfIcMNJ-tWiuVV4eOyaIOISimJkQVzUdE
-Message-ID: <CA+V-a8vudn0=kSnaAT4qDCcRtVShmS+n2A4GOQH2iogYizUBzw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] net: ravb: Enforce descriptor type ordering to
- prevent early DMA start
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
-Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251013202944.14575-1-zajec5@gmail.com>
 
-Hi Niklas,
+On Mon, Oct 13, 2025 at 10:29:43PM +0200, Rafał Miłecki wrote:
+> From: Rafał Miłecki <rafal@milecki.pl>
+> 
+> Some network devices (e.g. access points) come with BCM54210E PHY that
+> requires being set into master mode to work properly.
+> 
+> Add binding for BCM54210E as found in Luxul AP devices (600d:84a6) and
+> the "brcm,master-mode" property.
 
-Thank you for the review.
+Can't this mode be implied from the compatible string (or id registers)?
 
-On Wed, Oct 15, 2025 at 4:56=E2=80=AFPM Niklas S=C3=B6derlund
-<niklas.soderlund@ragnatech.se> wrote:
->
-> Hi Prabhakar,
->
-> Thanks for your work.
->
-> On 2025-10-15 16:00:26 +0100, Prabhakar wrote:
-> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> >
-> > Ensure TX descriptor type fields are written in a safe order so the DMA
-> > engine does not begin processing a chain before all descriptors are
-> > fully initialised.
-> >
-> > For multi-descriptor transmissions the driver writes DT_FEND into the
-> > last descriptor and DT_FSTART into the first. The DMA engine starts
-> > processing when it sees DT_FSTART. If the compiler or CPU reorders the
-> > writes and publishes DT_FSTART before DT_FEND, the DMA can start early
-> > and process an incomplete chain, leading to corrupted transmissions or
-> > DMA errors.
-> >
-> > Fix this by writing DT_FEND before the dma_wmb() barrier, executing
-> > dma_wmb() immediately before DT_FSTART (or DT_FSINGLE in the single
-> > descriptor case), and then adding a wmb() after the type updates to
-> > ensure CPU-side ordering before ringing the hardware doorbell.
-> >
-> > On an RZ/G2L platform running an RT kernel, this reordering hazard was
-> > observed as TX stalls and timeouts:
-> >
-> >   [  372.968431] NETDEV WATCHDOG: end0 (ravb): transmit queue 0 timed o=
-ut
-> >   [  372.968494] WARNING: CPU: 0 PID: 10 at net/sched/sch_generic.c:467=
- dev_watchdog+0x4a4/0x4ac
-> >   [  373.969291] ravb 11c20000.ethernet end0: transmit timed out, statu=
-s 00000000, resetting...
-> >
-> > This change enforces the required ordering and prevents the DMA engine
-> > from observing DT_FSTART before the rest of the descriptor chain is
-> > valid.
-> >
-> > Fixes: 2f45d1902acf ("ravb: minimize TX data copying")
-> > Cc: stable@vger.kernel.org
-> > Co-developed-by: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
-> > Signed-off-by: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
-> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > ---
-> >  drivers/net/ethernet/renesas/ravb_main.c | 14 +++++++++-----
-> >  1 file changed, 9 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/eth=
-ernet/renesas/ravb_main.c
-> > index a200e205825a..2a995fa9bfff 100644
-> > --- a/drivers/net/ethernet/renesas/ravb_main.c
-> > +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> > @@ -2211,15 +2211,19 @@ static netdev_tx_t ravb_start_xmit(struct sk_bu=
-ff *skb, struct net_device *ndev)
-> >
-> >               skb_tx_timestamp(skb);
-> >       }
-> > -     /* Descriptor type must be set after all the above writes */
-> > -     dma_wmb();
-> > +
-> > +     /* For multi-descriptors set DT_FEND before calling dma_wmb() */
-> >       if (num_tx_desc > 1) {
-> >               desc->die_dt =3D DT_FEND;
-> >               desc--;
-> > -             desc->die_dt =3D DT_FSTART;
-> > -     } else {
-> > -             desc->die_dt =3D DT_FSINGLE;
-> >       }
-> > +
-> > +     /* Descriptor type must be set after all the above writes */
-> > +     dma_wmb();
-> > +     desc->die_dt =3D (num_tx_desc > 1) ? DT_FSTART : DT_FSINGLE;
->
-> IMHO it's ugly to evaluate num_tx_desc twice. I would rather just open
-> code the full steps in each branch of the if above. It would make it
-> easier to read and understand.
->
-I did this just to avoid compiler optimizations. With the previous
-similar code on 5.10 CIP RT it was observed that the compiler
-optimized code in such a way that the DT_FSTART was written first
-before DT_FEND while the DMA was active because of which we ran into
-DMA issues causing QEF errors.
-
-> > +
-> > +     /* Ensure data is written to RAM before initiating DMA transfer *=
-/
-> > +     wmb();
->
-> All of this looks a bit odd, why not just do a single dma_wmb() or wmb()
-> before ringing the doorbell? Maybe I'm missing something obvious?
->
-This wmb() was mainly added to ensure all the descriptor data is in
-RAM. The HW manual for RZ/G1/2, R-Car Gen1/2 and RZ/G2L family
-mentions that we need to read back the last written descriptor before
-triggering the DMA. Please let me know if you think this can be
-handled differently.
-
-Cheers,
-Prabhakar
-
-> >       ravb_modify(ndev, TCCR, TCCR_TSRQ0 << q, TCCR_TSRQ0 << q);
-> >
-> >       priv->cur_tx[q] +=3D num_tx_desc;
-> > --
-> > 2.43.0
-> >
->
-> --
-> Kind Regards,
-> Niklas S=C3=B6derlund
+> 
+> Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
+> ---
+>  .../devicetree/bindings/net/brcm,bcm54xx.yaml | 37 +++++++++++++++++++
+>  1 file changed, 37 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/brcm,bcm54xx.yaml
 
