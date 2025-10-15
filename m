@@ -1,307 +1,187 @@
-Return-Path: <netdev+bounces-229816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 475B1BE0F3A
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 00:36:21 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 867AABE0F7C
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 00:43:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83C5C1A2496F
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:35:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5AA5B4E10D5
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:43:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9825330EF8C;
-	Wed, 15 Oct 2025 22:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD50C3115A9;
+	Wed, 15 Oct 2025 22:43:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mwNP+xh7"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="FqhVJ7WC";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="DLrCdUvz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80A724291B
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 22:35:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE2F2E1F02;
+	Wed, 15 Oct 2025 22:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760567718; cv=none; b=hAeb6bhSSDwDIFjRD49ZEJ64ZFRuu8ckdCUR3Z7hJ8NT5hdeAEiEPhdvzpZpPoQmG186AHIGjyCBXBfQsV1Da9pXZIZ4nH34rWd1dKhqJ6QBlU+xoRuyJS3Z9PQaqjlWZwaORI4ZWi+HbbEhHR9SgeVAjtAizCQNkDPZ7IDCtXU=
+	t=1760568227; cv=none; b=cJQP9C9S3avavBaezihsrzlvMKzTwIhFPte14th19paeZDwSF8hBj/TU/fksXlClU/KEjVn40XycyinbJwoOlCpn5VLFPtGtS+FmpoXsvB0e8xbEVuuahnC1JkvMf10stZZy2vkyB9n0xpuCQkOJKhSM3EkWuVxJuX7WlPXeKm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760567718; c=relaxed/simple;
-	bh=I+EPs1nM/tFurseNY9griVIUH2B3KLQYSeKxn+jFCAY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LD2BX36aEwwkOU4/emBDN2O2QvB3+Fby3PgU2Ys/yq8kK2bMRtqhZgF1vkwhEdyCFZg8F4mkWBFmkS7t0JBr2XVYQ8Us41f8zl3F+sYpOHTa+AANcPGJJo5L0QQ5/gvR0zOwYooxLluFy6259aa1CkHGrWOJCVzyW6mD4kZFjpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mwNP+xh7; arc=none smtp.client-ip=74.125.224.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-63bc1aeb427so130009d50.3
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 15:35:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760567716; x=1761172516; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4LQnHep4LQvoskqdWTslmBQiP/xWAT4BZwA6p78xI1o=;
-        b=mwNP+xh7sL7XjZs0lYResLXsm+gPsOI7jr4L0YiTfCR6R3sXRvWm84tJbVg7UwmXMi
-         fLa5UnsQ+V0dADmGRGzdoPazG4Zt4ZZ5eOh/iIP7KxD6V5RdGcbXkwao0KQEpcdxqgAF
-         J5m6oKG94J8KR5e5A3bzT3SB783HWGa549bB4I/BP5h4PdniishMAmb5PIYUDACdEckI
-         3m++hMJNG2c7tYKW4wemQFKCo7oI6V/79U6iFMIZhUSAgQzUR9/YxeM40GdujiV4frkF
-         xhg7ZzexxNGHDkqh6aTN4d9iIKO95z+qRmczvG2XAKpqZTbJnLiPDL8WTB6w7hwuNUYo
-         6i7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760567716; x=1761172516;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4LQnHep4LQvoskqdWTslmBQiP/xWAT4BZwA6p78xI1o=;
-        b=SIFld+D/4Oc99/cTt+ewlSFW4OK9BSgMKcEunNNdrRgmJwjLN5c3MZNNMvOHfTs2+L
-         xiI1uWucKecpL3KgS3s1LHfhwzMoy/hn6uT8WhE9XGBcK8KuGToabfaE/AJYOpZEFnNh
-         +tymYg6GPkNy+7mU/kVpH+Hli5YOljGsbL/4wyPZ1wYBJG0UN3v638GlzqN8gp4+adLD
-         F+EOiYvUaWMIDVygiXuLhSq4ewTL/zqjeUHAP7pkXWLn/zzFlrfQ+e4FfZYjD3NGYto1
-         0Qe/OyiSdh2AgECgXFS08X8rWkKBg7TwiP+HgRBGJ2PZq4oYtE6tajr+GSJpxyfxytXT
-         Inbg==
-X-Forwarded-Encrypted: i=1; AJvYcCVbXmsU/qBVAOUSeaOcLForX4ySk+gvZ//KVVggBR4E2R6n8dpApWt8/8OP1fvd6iZ2iL9S/30=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJULlorZk/NvLMOMv5Jst+OBS8t0IiuxO+HyPtNL/4kFQGiVjl
-	Vzr4mga+XNU2XWmNjzerJEo2UZkoMzTGI4mrPflKn8BT3Pjbt/qIcWPtmOmUhLZJlVv/h4HoYgQ
-	4zpaeD/oae0SMCSJP92wZ/IWZts/QeFI=
-X-Gm-Gg: ASbGncudkttfWd+FeejlTv44iz35ZQLsHnrQseWvYGO4wNcSzpIeisdhJ8ww0Myy0XO
-	at7n5za5zYhJ7PEsmAqjrbkzCJsUN0wp5RFlo27dy4jmy47lRCT+gi7TOTpB9/1sIZrqALQyGbH
-	NEWuLrmtp//2bRwkFbW4xCqjyYvy+XnOvsMo+KNCKzIWB/nrqWL7pS/zaUoN3KYxwODZv9o12Tl
-	O0TYBxUDOU0sv3npl/ihfH4TSdCyaGIVqIL0WJhWpppRb0rEP0spiPc3rhJXLNhF8BiPjgKzipv
-	70Hc50M2ggMbjGE2QPUSNg==
-X-Google-Smtp-Source: AGHT+IFOQFXA5WS6kJb7R8PciG7Flr1IdKR0ejCDXi3YmX/ajBlJq3wP/cx4AN7yacF3lIzA8kYFXwzNV3NkgXZj548=
-X-Received: by 2002:a05:690e:164f:b0:63c:db25:6406 with SMTP id
- 956f58d0204a3-63cdb2584d8mr14713560d50.42.1760567715523; Wed, 15 Oct 2025
- 15:35:15 -0700 (PDT)
+	s=arc-20240116; t=1760568227; c=relaxed/simple;
+	bh=2B5d/DNK2MDj2tgCsKOW6zvpdYahTcXjjQFhoYn+WR8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mWGw5c0kunPD+/JNUD+EKlp3GjQ+iMZg//GrnH43ifOYpOB/tNjqn4hLwOrAkvQrUj+pyD9mntMgEtX2FPIpkb9o/o51SZxK3s/brit5UKwil7Aydz0kBD7zjyEjprX2RoZQ8vDf82DPKyYJ8xeJ3Yvg20/EamZ68UWV1WZih2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=FqhVJ7WC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=DLrCdUvz; arc=none smtp.client-ip=202.12.124.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id 868001D00109;
+	Wed, 15 Oct 2025 18:43:42 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Wed, 15 Oct 2025 18:43:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1760568222; x=
+	1760654622; bh=RZ7g3F3t9IBrmhQNcaWUuHVEd50extydIwUW9LGNnFE=; b=F
+	qhVJ7WCGbPwoc2LOHWLjXBsH+uU1KonxRUTdwyzX7ESM4w8uSsSDC7rodgp8xwiS
+	955cEz3e1XPd9+HnX8jCtMCySXKrd6vCL6WDGT95RecjNsDf7iIcXGjzStHBkuM4
+	hDZ12SivkxG81NfzbhGr7/8hYXr1Cz62C/fN+kUfyK5UfpWHFLjuOvIq+9CGlRmO
+	o1Uc+W0D0iwkLhPYlYv5hY/jtGtFEgwlPP9KQreHpZHA82a1T/TqF24at3Vm2/Lw
+	VCB21UpIgJAaABu4M3HgLfwyqI5vCEusqCkFpVTWA2M22uFk0/u5gPwpA5r4F2BB
+	3FX7ifX2dpb0gKjKMTcbA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1760568222; x=1760654622; bh=RZ7g3F3t9IBrmhQNcaWUuHVEd50extydIwU
+	W9LGNnFE=; b=DLrCdUvzhsqs58F+d8DuE20GgqkBdH51uJhSoWxbvjHfOAgfk2c
+	nYKnKDw7BrVFsSDSBenbU2+F3Rm6wHIHe1sClSKD8N6sgdKxonx8Pyzqz1F3pwR4
+	dA1zzsjJ7Nk9jx8fEO9wb9OgwVbBk4CQnuWcbu7QQ7UYy5N5SZ35wMyROcwUpg/q
+	rDAqCmcIVfpdwf9My5DqXkmkkVHysVG4F2kH2CBLqvQ6zXFDL4eCa0VH40cVrpiX
+	GeyUm0NsoNcx/mDbdh27ZKm6T0yhTP53h5zRDyTOOSaT9dgNIpbbTJcwkeg0l+H3
+	30A3jQC95rs9CdaOg+8TjbRg4I5MpnfiXzQ==
+X-ME-Sender: <xms:nSPwaAKOiPZXlNyNhRO_DjqxN3KW-J4M0l44FGfYw1xC1WIuXUHgmg>
+    <xme:nSPwaHsSJKQzjquCns-8cTeoSZXdLK7Zsq_2EjtFTz1yg5DnQjzrP5Itq05hZLQdP
+    Q4QyH5RWWAOOCvSOlBNF-I_JCqRZ3GGhfVOmSapw_cN6Gm8Shbeww>
+X-ME-Received: <xmr:nSPwaAVrBRoS9gpLw-04gfB1HgU-O6qf25fhfjkqKuvD07fY1Wq9-iyIrq8v>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdegieegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduhedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepfihilhhfrhgvugdrohhpvghnshhouhhrtg
+    gvsehgmhgrihhlrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdp
+    rhgtphhtthhopehlihhnuhigqdguohgtsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtoheplhhinhhugidqkhhsvghlfhhtvghsthesvhhgvghrrdhkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuh
+    hmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughh
+    rghtrdgtohhm
+X-ME-Proxy: <xmx:nSPwaKJuxKT6pHOuWXA29Lbxi80U2C1H0ttC2-9MqzYxC-Y4ZXDfbQ>
+    <xmx:nSPwaN8usjD_lWOuU_TbOdEpugD-hY21P4CXHcWn2hDhjx5Qbpnl1A>
+    <xmx:nSPwaAONFEl8k487AtCZTiwz3KcRzisNp5tAJwudxkPr3N_uD-Bmig>
+    <xmx:nSPwaB3YMKNnopdMMPVs0sQ145brnxrPxs07gVwEk5KMb3a4f_TLVg>
+    <xmx:niPwaKqQsxBWSJEywjfIwFrCnt1fc3VZJT-PlvHrUO_gZgO1JHrp_vGV>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 15 Oct 2025 18:43:41 -0400 (EDT)
+Date: Thu, 16 Oct 2025 00:43:39 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Wilfred Mallawa <wilfred.opensource@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+	syzbot@syzkaller.appspotmail.com
+Subject: Re: [PATCH net-next v6 1/2] net/tls: support setting the maximum
+ payload size
+Message-ID: <aPAjm1tKMKxIdUlj@krikkit>
+References: <20251015015243.72259-2-wilfred.opensource@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251010174953.2884682-1-ameryhung@gmail.com> <20251010174953.2884682-3-ameryhung@gmail.com>
- <CAEf4BzZgc3tqzDER5HN1Jz7JL7nN3K6MiFGTrouE69Pm-Vo+8Q@mail.gmail.com>
-In-Reply-To: <CAEf4BzZgc3tqzDER5HN1Jz7JL7nN3K6MiFGTrouE69Pm-Vo+8Q@mail.gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Wed, 15 Oct 2025 15:35:02 -0700
-X-Gm-Features: AS18NWCwVgjeseYjnxu1eHsbaNGrQXqF4YKiOEnVMz4OGpzYFREj857hyRRBcwE
-Message-ID: <CAMB2axN7o0pHca_u2HnbMb+pEOJubRR8Y8JewExzwxaRWtKUmQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v1 bpf-next 2/4] bpf: Support associating BPF program
- with struct_ops
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
-	kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251015015243.72259-2-wilfred.opensource@gmail.com>
 
-On Mon, Oct 13, 2025 at 5:10=E2=80=AFPM Andrii Nakryiko
-<andrii.nakryiko@gmail.com> wrote:
->
-> On Fri, Oct 10, 2025 at 10:49=E2=80=AFAM Amery Hung <ameryhung@gmail.com>=
- wrote:
-> >
-> > Add a new BPF command BPF_STRUCT_OPS_ASSOCIATE_PROG to allow associatin=
-g
-> > a BPF program with a struct_ops. This command takes a file descriptor o=
-f
-> > a struct_ops map and a BPF program and set prog->aux->st_ops_assoc to
-> > the kdata of the struct_ops map.
-> >
-> > The command does not accept a struct_ops program or a non-struct_ops
-> > map. Programs of a struct_ops map is automatically associated with the
-> > map during map update. If a program is shared between two struct_ops
-> > maps, the first one will be the map associated with the program. The
-> > associated struct_ops map, once set cannot be changed later. This
-> > restriction may be lifted in the future if there is a use case.
-> >
-> > Each associated programs except struct_ops programs of the map will tak=
-e
-> > a refcount on the map to pin it so that prog->aux->st_ops_assoc, if set=
-,
-> > is always valid. However, it is not guaranteed whether the map members
-> > are fully updated nor is it attached or not. For example, a BPF program
-> > can be associated with a struct_ops map before map_update. The
-> > struct_ops implementer will be responsible for maintaining and checking
-> > the state of the associated struct_ops map before accessing it.
-> >
-> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > ---
-> >  include/linux/bpf.h            | 11 ++++++++++
-> >  include/uapi/linux/bpf.h       | 16 ++++++++++++++
-> >  kernel/bpf/bpf_struct_ops.c    | 32 ++++++++++++++++++++++++++++
-> >  kernel/bpf/core.c              |  6 ++++++
-> >  kernel/bpf/syscall.c           | 38 ++++++++++++++++++++++++++++++++++
-> >  tools/include/uapi/linux/bpf.h | 16 ++++++++++++++
-> >  6 files changed, 119 insertions(+)
-> >
-> > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> > index a98c83346134..d5052745ffc6 100644
-> > --- a/include/linux/bpf.h
-> > +++ b/include/linux/bpf.h
-> > @@ -1710,6 +1710,8 @@ struct bpf_prog_aux {
-> >                 struct rcu_head rcu;
-> >         };
-> >         struct bpf_stream stream[2];
-> > +       struct mutex st_ops_assoc_mutex;
->
-> do we need a mutex at all? cmpxchg() should work just fine. We'll also
-> potentially need to access st_ops_assoc from kprobes/fentry anyways,
-> and we can't just take mutex there
->
-> > +       void *st_ops_assoc;
-> >  };
-> >
-> >  struct bpf_prog {
->
-> [...]
->
-> >
-> > @@ -1890,6 +1901,11 @@ union bpf_attr {
-> >                 __u32           prog_fd;
-> >         } prog_stream_read;
-> >
-> > +       struct {
-> > +               __u32           map_fd;
-> > +               __u32           prog_fd;
->
-> let's add flags, we normally have some sort of flags for commands for
-> extensibility
+2025-10-15, 11:52:43 +1000, Wilfred Mallawa wrote:
+> diff --git a/Documentation/networking/tls.rst b/Documentation/networking/tls.rst
+> index 36cc7afc2527..dabab17ab84a 100644
+> --- a/Documentation/networking/tls.rst
+> +++ b/Documentation/networking/tls.rst
+> @@ -280,6 +280,17 @@ If the record decrypted turns out to had been padded or is not a data
+>  record it will be decrypted again into a kernel buffer without zero copy.
+>  Such events are counted in the ``TlsDecryptRetry`` statistic.
+>  
+> +TLS_TX_MAX_PAYLOAD_LEN
+> +~~~~~~~~~~~~~~~~~~~~~~
+> +
+> +Sets the maximum size for the plaintext of a protected record.
+> +
+> +When this option is set, the kernel enforces this limit on all transmitted TLS
+> +records, ensuring no plaintext fragment exceeds the specified size. This can be
+> +used to specify the TLS Record Size Limit [1].
 
-I will add a flag
+Since this is now "max payload" instead of directly the record size,
+we should probably add something to describe how to derive the value
+to pass to TLS_TX_MAX_PAYLOAD_LEN from the record size limit:
 
->
-> > +       } struct_ops_assoc_prog;
-> > +
-> >  } __attribute__((aligned(8)));
-> >
-> >  /* The description below is an attempt at providing documentation to e=
-BPF
-> > diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
-> > index a41e6730edcf..e57428e1653b 100644
-> > --- a/kernel/bpf/bpf_struct_ops.c
-> > +++ b/kernel/bpf/bpf_struct_ops.c
-> > @@ -528,6 +528,7 @@ static void bpf_struct_ops_map_put_progs(struct bpf=
-_struct_ops_map *st_map)
-> >         for (i =3D 0; i < st_map->funcs_cnt; i++) {
-> >                 if (!st_map->links[i])
-> >                         break;
-> > +               bpf_struct_ops_disassoc_prog(st_map->links[i]->prog);
-> >                 bpf_link_put(st_map->links[i]);
-> >                 st_map->links[i] =3D NULL;
-> >         }
-> > @@ -801,6 +802,11 @@ static long bpf_struct_ops_map_update_elem(struct =
-bpf_map *map, void *key,
-> >                         goto reset_unlock;
-> >                 }
-> >
-> > +               /* Don't stop a program from being reused. prog->aux->s=
-t_ops_assoc
->
-> nit: comment style, we are converging onto /* on separate line
-
-Got it, so I assume it applies to kerne/bpf/* even existing comments
-in the file are netdev style. Is it also the case for
-net/core/filter.c?
+    For TLS1.2, the record size limit can be used directly.
+    For TLS1.3, limit-1 should be passed, as the record size limit
+    includes 1B for the ContentType.
 
 
->
-> > +                * will point to the first struct_ops kdata.
-> > +                */
-> > +               bpf_struct_ops_assoc_prog(&st_map->map, prog);
->
-> ignoring error? we should do something better here... poisoning this
-> association altogether if program is used in multiple struct_ops seems
-> like the only thing we can reasonable do, no?
->
-> > +
-> >                 link =3D kzalloc(sizeof(*link), GFP_USER);
-> >                 if (!link) {
-> >                         bpf_prog_put(prog);
->
-> [...]
->
-> >
-> > +#define BPF_STRUCT_OPS_ASSOCIATE_PROG_LAST_FIELD struct_ops_assoc_prog=
-.prog_fd
-> > +
->
-> looking at libbpf side, it's quite a mouthful to write out
-> bpf_struct_ops_associate_prog()... maybe let's shorten this to
-> BPF_STRUCT_OPS_ASSOC or BPF_ASSOC_STRUCT_OPS (with the idea that we
-> associate struct_ops with a program). The latter is actually a bit
-> more preferable, because then we can have a meaningful high-level
-> bpf_program__assoc_struct_ops(struct bpf_program *prog, struct bpf_map
-> *map), where map has to be struct_ops. Having bpf_map__assoc_prog() is
-> a bit too generic, as this works only for struct_ops maps.
->
-> It's all not major, but I think that lends for a bit better naming and
-> more logical usage throughout.
+And possibly mention that TLS1.3 record padding is currently
+unsupported, so whether it should be counted in the value passed via
+this setsockopt or not is undecided. (I'm not sure we need to go that
+far. Jakub, WDYT?)
 
-Will change the naming.
 
->
-> > +static int struct_ops_assoc_prog(union bpf_attr *attr)
-> > +{
-> > +       struct bpf_prog *prog;
-> > +       struct bpf_map *map;
-> > +       int ret;
-> > +
-> > +       if (CHECK_ATTR(BPF_STRUCT_OPS_ASSOCIATE_PROG))
-> > +               return -EINVAL;
-> > +
-> > +       prog =3D bpf_prog_get(attr->struct_ops_assoc_prog.prog_fd);
-> > +       if (IS_ERR(prog))
-> > +               return PTR_ERR(prog);
-> > +
-> > +       map =3D bpf_map_get(attr->struct_ops_assoc_prog.map_fd);
-> > +       if (IS_ERR(map)) {
-> > +               ret =3D PTR_ERR(map);
-> > +               goto out;
-> > +       }
-> > +
-> > +       if (map->map_type !=3D BPF_MAP_TYPE_STRUCT_OPS ||
-> > +           prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS) {
->
-> you can check prog->type earlier, before getting map itself
+[...]
+> +static int do_tls_setsockopt_tx_payload_len(struct sock *sk, sockptr_t optval,
+> +					    unsigned int optlen)
+> +{
+> +	struct tls_context *ctx = tls_get_ctx(sk);
+> +	struct tls_sw_context_tx *sw_ctx = tls_sw_ctx_tx(ctx);
+> +	u16 value;
+> +
+> +	if (sw_ctx && sw_ctx->open_rec)
+> +		return -EBUSY;
+> +
+> +	if (sockptr_is_null(optval) || optlen != sizeof(value))
+> +		return -EINVAL;
+> +
+> +	if (copy_from_sockptr(&value, optval, sizeof(value)))
+> +		return -EFAULT;
+> +
+> +	if (value < TLS_MIN_RECORD_SIZE_LIM || value > TLS_MAX_PAYLOAD_SIZE)
 
-Got it. I will make it a separate check right after getting prog.
+For 1.3, should we allow TLS_MIN_RECORD_SIZE_LIM-1? The smallest valid
+record size limit (according to rfc8449) is 64
+(TLS_MIN_RECORD_SIZE_LIM), so after userspace subtracts 1 we would get
+TLS_MIN_RECORD_SIZE_LIM-1?
 
->
-> > +               ret =3D -EINVAL;
-> > +               goto out;
-> > +       }
-> > +
-> > +       ret =3D bpf_struct_ops_assoc_prog(map, prog);
-> > +out:
-> > +       if (ret && !IS_ERR(map))
->
-> nit: purely stylistic preference, but I'd rather have a clear
-> error-only clean up path, and success with explicit return 0, instead
-> of checking ret or IS_ERR(map)
->
->     ...
->
->     /* goto to put_{map,prog}, depending on how far we've got */
->
->     err =3D bpf_struct_ops_assoc_prog(map, prog);
->     if (err)
->         goto put_map;
->
->     return 0;
->
-> put_map:
->     bpf_map_put(map);
-> put_prog:
->     bpf_prog_put(prog);
->     return err;
+(but this would bring back one "are we 1.2 or 1.3?" check :/)
 
-I will separate error path out.
+> +		return -EINVAL;
+> +
+> +	ctx->tx_max_payload_len = value;
+> +
+> +	return 0;
+> +}
 
->
->
-> > +               bpf_map_put(map);
-> > +       bpf_prog_put(prog);
-> > +       return ret;
-> > +}
-> > +
->
-> [...]
+-- 
+Sabrina
 
