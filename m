@@ -1,244 +1,347 @@
-Return-Path: <netdev+bounces-229425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B24F7BDC047
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 03:45:36 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E824BDC0F5
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 03:53:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 632443A7AE8
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 01:45:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1C6704E56F0
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 01:53:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C930E1E51EC;
-	Wed, 15 Oct 2025 01:45:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1D42FD7DE;
+	Wed, 15 Oct 2025 01:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BAz1p/lU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA3C3BB5A
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 01:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D401EDA2C
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 01:53:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760492733; cv=none; b=Nq/LIguYsCbJCf/Wwyjhz+NPiJNpbdPYSqScr8sk2wKtr2f4OMRHT6s0G7ZhDQm+xQwUGVbWjQ7AhOYIeS3paZ6nmyzlZxVw0vr7UBRMpqzuD9n2BOHtQsrww1vi71/vTKwxWEEHjd0nQP27vnpf0s5wYxlsIk0fcr4YGjfgHXU=
+	t=1760493201; cv=none; b=nzxD8z55CdNcUbQ5WgOA2RBjKJpQARhiUIRNdSQuXzVb4P23Ap6zzHK6jSYJ5/kxhNgefvyCEXddbUXLHFbDjGmcxHCCve0wzebGGtrU7RIpd9IGA1KDSwDJuqV7l0qtQ9ua1uoFe84Gmm+x/SdzmzWNsVcYcIe1rosujgUIC48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760492733; c=relaxed/simple;
-	bh=9LN+Zs6NCjQa+t54cqHrhyWKQ1argIw0P9swlzuGlO8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NdIzuCgIx2P6LZZmUWJgzoC4OdMRn5zIhEbwn5nrANsnORr6/BhUG5PPd+59nMGzQZB3KSbr+fBuwfITw/C31Wdrobzg8j+r8kxdoLgxxGoGH27+c0hIVOJzTiePNO4PwcKSM+5kPNlTpo21qEtpWImqg2He38z6Ev5neCGZ050=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-42f86e96381so154496625ab.1
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 18:45:31 -0700 (PDT)
+	s=arc-20240116; t=1760493201; c=relaxed/simple;
+	bh=0hy+oJrv/mQUZob3CzQtNjKXe+vVz0bQ1yHJdbwhbJI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fbBy+gZ+A8TyLOaCkR0+xH9y2eIum07f85SJLRC+8hDtuX2hpunaJ6KYKKkficgqNl75T87PbTrLySO/HZtKJ9gtLUR1078qMBN/y9U8q58f/n5IWBA+pCPFb4JNjl0jVcpvxSSQnUS1uEb63tFx6ZfYRsgqoWl5cnlcBR7p7lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BAz1p/lU; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-781db5068b8so4779276b3a.0
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 18:53:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760493191; x=1761097991; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9fSNovR8GCQhp646i3Esw04KgILDfFypv9+ma98ObAU=;
+        b=BAz1p/lU3gayLFTmYwf2n1kvW/jemUuRooVvx5HTXtSvEWPnh7j53+yfVvZNdIvfEA
+         tlqHu6FZEs5y3LjFFk+5u2D2BGDalp0b1FdCNurUo1HRLAFAqZ0UPkUBlw79yun8f07Y
+         4hZWA22Rv8zN8qpbQo2m9HfYl5sjTpjwSETi73DKLKLRoA+dL9NHD9gOBOe/9g9RNttf
+         FS8jufN9Yw4sDMI4JJ03S8J9KYopNpiaw/tKDh1Cjbj4jB3Bt+vQU0J6+Os3OXKzLJwW
+         U0tiZovVhiTfJqNkb8c1OjrAO60EgOmUuHI2TutyLWzPUSe8AB2hBQRWFsMxj/JPUJR4
+         Xulw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760492731; x=1761097531;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=J366MR2M7sKoRrXuFnkKIqxbANSCO0h9QS9aVAEV1kM=;
-        b=I0o/rkz909mHyTOOzEb3wp9RmisVyVCFAyPMtFh5joDYFTHA5J1sVLLu6i4j6ALm6N
-         un3wTzwMLQc7rESMlJH6HaAW+zOlqX0PsXpqMH1tYn4iz4HzMZSuG7MlovBhgsPtOSgb
-         I7787xZqdUVmJ30p+nD8XhcP4M+GbVc7kHhRJTEyEMKJKX/1ZrGo1DbdtH/fKCiVtdB6
-         dBNXDWFP19EanE4Pdus0lOZYBmia9z4gEongF3lzSO2uoT8FhMV3FfTS5STUtkkGEZZG
-         qdijFjz0I83dLhlGEylpNQ/RMJeZx69Ky+Q9WZAbWm4fLJRTB6+7WgRExQbn16+GqFYe
-         Cx8g==
-X-Forwarded-Encrypted: i=1; AJvYcCUhQGbN9BHv+etrRlLtf6VMqlbNrq4GIMfKC+P7IRX2aOxUQLDWIH4tGZjpeG2CpnnwweO+Hpc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymQj+MpENJ58sECUaEkPo3VMRFBR6kQF7ae14Ble8ecQnu95F3
-	PYVUz3t3ieB+CL95FC81K4AcnmIWvoaOZD/4cdrTKAD2N9TQbaJ298y+ooj9v3FDss2r51NtxY8
-	nEc98MiHxaP2QmuNyay+jJ+GFbRMMKVEQnRg1gnBeeovQr3SRatZ5gxHJHhQ=
-X-Google-Smtp-Source: AGHT+IFG4yP9H5c+k6xaEmWTyp3AfP2MgGIsiZlU3OcrCbCiINaRQfeZRXV2R7N4pCbai5xzJzvB1fmB/ddKLZx28OQuBTwb1Yql
+        d=1e100.net; s=20230601; t=1760493191; x=1761097991;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9fSNovR8GCQhp646i3Esw04KgILDfFypv9+ma98ObAU=;
+        b=xLAqU+ZyKJO5tmCFQyRTisqLT8f/CiBCbDJrM0TAueMFirIFnifRRKwrh/kdG7k78t
+         CufUgBq7abuHUC2j0Eup142yyKz3Bk3lL6stP+WmeEuexsmFjsS8wQxLYC5rB5UNzMxe
+         jjwuQ+FNsNo2Y/kAwaUq1UgCu2W/sJu4IQrE2Iq65zLVmSpf93Sq0GxQe5VaNY/sEJ1F
+         AzO5JSsO0weD9lAEKKXninkjcY5uA1h2JCDfny/poZa8KgXjIMZ+UOtEARCBajIbZQKu
+         f07ZNoOpll/Bwx0iio79ivfMBbZRK/AQ+i3EBoE0m2vp9r5m6HQzFy0sYLPOOxAgr//1
+         cQAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUq7U69YyZCBnkEgxm9q6oFu5oeueDuPE6waakGP9C6RPa15MhOhbYtW6vD9znKR1Tfq1dXjUc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8C3uYHprCvv4wjR1yTeKq3gQKxuxflDVYHprh4PitugE4DxHs
+	plMpY3YHqe5jj8HSC4DGf4dTsGJs54uEUxKvuWGi0fVS/O7/RSmpRuxo
+X-Gm-Gg: ASbGnctuvJLLuCQoQo7QB/rP7RFVLmkGrKVh6fReZyd9ld45Eb3+6etM9d5aUA7wsBD
+	CF6lgHsz4DSzlRI1un3ituqL4c9u3UDz8f41VVR1r87F+ZGKPyjVygG0tKzdblwjgXOvXyEOWY/
+	EncHLrQ4CtJgyyYVZofLDHfDNzEwzcOx82FjNVrf66ruoiEerWOsNh4eyA33lX3zVqvZiGrjG4r
+	z8Wrpa+AG55UNxjNRGULjjiqraPYk+pwRbMX0ifuc+eoJsObn2U55nYgW907rqrQr0bcFzySozt
+	O7O6DqKwFmYDQJSSYbwHh/X0/QDAGXmlQQGwwFAIt+OMtPtpFnWDKS7Rvkq9npc0z45TiS3nFp/
+	A4YrCGc27KO13AiDSYuVnwfuvBIGdJEXFVBnu4LVi1XXAj/UdShbbPkMs
+X-Google-Smtp-Source: AGHT+IHBHNsg3laOg4wrn3EMfMJNLLH9CA6cG2zOPseNfTboaCct+HIkokNs/SxWCNjjoow63NRVIQ==
+X-Received: by 2002:a17:902:f690:b0:267:95ad:8cb8 with SMTP id d9443c01a7336-290272e1913mr350710035ad.44.1760493191070;
+        Tue, 14 Oct 2025 18:53:11 -0700 (PDT)
+Received: from fedora ([159.196.5.243])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29055badc54sm111789325ad.37.2025.10.14.18.53.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Oct 2025 18:53:10 -0700 (PDT)
+From: Wilfred Mallawa <wilfred.opensource@gmail.com>
+To: linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Shuah Khan <shuah@kernel.org>,
+	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+	syzbot@syzkaller.appspotmail.com
+Subject: [PATCH net-next v6 1/2] net/tls: support setting the maximum payload size
+Date: Wed, 15 Oct 2025 11:52:43 +1000
+Message-ID: <20251015015243.72259-2-wilfred.opensource@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1648:b0:42f:85fb:38be with SMTP id
- e9e14a558f8ab-42f87423707mr292381045ab.29.1760492731092; Tue, 14 Oct 2025
- 18:45:31 -0700 (PDT)
-Date: Tue, 14 Oct 2025 18:45:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68eefcbb.050a0220.91a22.0228.GAE@google.com>
-Subject: [syzbot] [kernfs?] [x86?] [mm?] general protection fault in
- call_timer_fn (2)
-From: syzbot <syzbot+dbca4dcd735c25501713@syzkaller.appspotmail.com>
-To: gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, 
-	tj@kernel.org, virtualization@lists.linux.dev, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
 
-syzbot found the following issue on:
+During a handshake, an endpoint may specify a maximum record size limit.
+Currently, the kernel defaults to TLS_MAX_PAYLOAD_SIZE (16KB) for the
+maximum record size. Meaning that, the outgoing records from the kernel
+can exceed a lower size negotiated during the handshake. In such a case,
+the TLS endpoint must send a fatal "record_overflow" alert [1], and
+thus the record is discarded.
 
-HEAD commit:    d3abefe89740 selftests/bpf: Fix typos and grammar in test ..
-git tree:       bpf-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=172edc62580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c321f33e4545e2a1
-dashboard link: https://syzkaller.appspot.com/bug?extid=dbca4dcd735c25501713
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+Upcoming Western Digital NVMe-TCP hardware controllers implement TLS
+support. For these devices, supporting TLS record size negotiation is
+necessary because the maximum TLS record size supported by the controller
+is less than the default 16KB currently used by the kernel.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Currently, there is no way to inform the kernel of such a limit. This patch
+adds support to a new setsockopt() option `TLS_TX_MAX_PAYLOAD_LEN` that
+allows for setting the maximum plaintext fragment size. Once set, outgoing
+records are no larger than the size specified. This option can be used to
+specify the record size limit.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/067335e1be92/disk-d3abefe8.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8ea133347d7e/vmlinux-d3abefe8.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/5ef631484984/bzImage-d3abefe8.xz
+[1] https://www.rfc-editor.org/rfc/rfc8449
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+dbca4dcd735c25501713@syzkaller.appspotmail.com
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
-CPU: 1 UID: 0 PID: 6784 Comm: syz-executor Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:trace_event_get_offsets_lock_acquire include/trace/events/lock.h:24 [inline]
-RIP: 0010:do_perf_trace_lock_acquire include/trace/events/lock.h:24 [inline]
-RIP: 0010:perf_trace_lock_acquire+0xa1/0x410 include/trace/events/lock.h:24
-Code: 3c 08 04 f3 f3 f3 48 c7 44 24 60 00 00 00 00 c7 84 24 80 00 00 00 00 00 00 00 48 89 74 24 30 48 8d 5e 18 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 70 7c 86 00 48 8b 03 48 85 c0 48
-RSP: 0018:ffffc90000a08940 EFLAGS: 00010006
-RAX: 0000000000000006 RBX: 0000000000000030 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000018 RDI: ffffffff8e008e60
-RBP: ffffc90000a08a40 R08: 0000000000000000 R09: 0000000000000001
-R10: dffffc0000000000 R11: ffffed10044f692f R12: 1ffff92000141130
-R13: 0000000000000018 R14: ffffffff8e008e60 R15: dffffc0000000000
-FS:  0000555585eed500(0000) GS:ffff888125d1c000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055555f2285c8 CR3: 0000000026022000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
-Call Trace:
- <IRQ>
- __do_trace_lock_acquire include/trace/events/lock.h:24 [inline]
- trace_lock_acquire include/trace/events/lock.h:24 [inline]
- lock_acquire+0x311/0x360 kernel/locking/lockdep.c:5831
- __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
- _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
- __queue_work+0x809/0xfb0 kernel/workqueue.c:-1
- call_timer_fn+0x17b/0x5f0 kernel/time/timer.c:1747
- expire_timers kernel/time/timer.c:1793 [inline]
- __run_timers kernel/time/timer.c:2372 [inline]
- __run_timer_base+0x646/0x860 kernel/time/timer.c:2384
- run_timer_base kernel/time/timer.c:2393 [inline]
- run_timer_softirq+0xb7/0x180 kernel/time/timer.c:2403
- handle_softirqs+0x283/0x870 kernel/softirq.c:579
- __do_softirq kernel/softirq.c:613 [inline]
- invoke_softirq kernel/softirq.c:453 [inline]
- __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:680
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1050 [inline]
- sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1050
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:lock_is_held_type+0x137/0x190 kernel/locking/lockdep.c:5945
-Code: 01 75 44 48 c7 04 24 00 00 00 00 9c 8f 04 24 f7 04 24 00 02 00 00 75 4c 41 f7 c4 00 02 00 00 74 01 fb 65 48 8b 05 f9 03 27 07 <48> 3b 44 24 08 75 43 89 d8 48 83 c4 10 5b 41 5c 41 5d 41 5e 41 5f
-RSP: 0018:ffffc9001d826770 EFLAGS: 00000206
-RAX: b973a21ede490300 RBX: 0000000000000001 RCX: b973a21ede490300
-RDX: 0000000000000003 RSI: ffffffff8dba5ce5 RDI: ffffffff8be33300
-RBP: 00000000ffffffff R08: 0000000000000000 R09: ffffffff825d3aac
-R10: dffffc0000000000 R11: ffffed100365ff25 R12: 0000000000000246
-R13: ffff88807bd43c00 R14: ffff88801b2ff988 R15: 0000000000000002
- lock_is_held include/linux/lockdep.h:249 [inline]
- kernfs_root_is_locked fs/kernfs/kernfs-internal.h:109 [inline]
- kernfs_rcu_name fs/kernfs/kernfs-internal.h:119 [inline]
- kernfs_sd_compare fs/kernfs/dir.c:349 [inline]
- kernfs_link_sibling+0xf7/0x3e0 fs/kernfs/dir.c:380
- kernfs_add_one+0x1e0/0x520 fs/kernfs/dir.c:810
- __kernfs_create_file+0x22b/0x2e0 fs/kernfs/file.c:1068
- sysfs_add_file_mode_ns+0x238/0x300 fs/sysfs/file.c:319
- create_files fs/sysfs/group.c:76 [inline]
- internal_create_group+0x66d/0x1110 fs/sysfs/group.c:183
- internal_create_groups fs/sysfs/group.c:223 [inline]
- sysfs_create_groups+0x59/0x120 fs/sysfs/group.c:249
- device_add_groups drivers/base/core.c:2836 [inline]
- device_add_attrs+0xe0/0x5a0 drivers/base/core.c:2900
- device_add+0x496/0xb50 drivers/base/core.c:3643
- netdev_register_kobject+0x178/0x310 net/core/net-sysfs.c:2356
- register_netdevice+0x126c/0x1ae0 net/core/dev.c:11189
- veth_newlink+0x5cc/0xa50 drivers/net/veth.c:1884
- rtnl_newlink_create+0x30d/0xb00 net/core/rtnetlink.c:3825
- __rtnl_newlink net/core/rtnetlink.c:3942 [inline]
- rtnl_newlink+0x16d6/0x1c70 net/core/rtnetlink.c:4057
- rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6946
- netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2552
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x82c/0x9e0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:729
- __sys_sendto+0x3bd/0x520 net/socket.c:2228
- __do_sys_sendto net/socket.c:2235 [inline]
- __se_sys_sendto net/socket.c:2231 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2231
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f7d15f90a7c
-Code: 2a 5f 02 00 44 8b 4c 24 2c 4c 8b 44 24 20 89 c5 44 8b 54 24 28 48 8b 54 24 18 b8 2c 00 00 00 48 8b 74 24 10 8b 7c 24 08 0f 05 <48> 3d 00 f0 ff ff 77 34 89 ef 48 89 44 24 08 e8 70 5f 02 00 48 8b
-RSP: 002b:00007ffdb7942f30 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f7d16ce4620 RCX: 00007f7d15f90a7c
-RDX: 000000000000002c RSI: 00007f7d16ce4670 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 00007ffdb7942f84 R09: 000000000000000c
-R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
-R13: 0000000000000000 R14: 00007f7d16ce4670 R15: 0000000000000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:trace_event_get_offsets_lock_acquire include/trace/events/lock.h:24 [inline]
-RIP: 0010:do_perf_trace_lock_acquire include/trace/events/lock.h:24 [inline]
-RIP: 0010:perf_trace_lock_acquire+0xa1/0x410 include/trace/events/lock.h:24
-Code: 3c 08 04 f3 f3 f3 48 c7 44 24 60 00 00 00 00 c7 84 24 80 00 00 00 00 00 00 00 48 89 74 24 30 48 8d 5e 18 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 70 7c 86 00 48 8b 03 48 85 c0 48
-RSP: 0018:ffffc90000a08940 EFLAGS: 00010006
-RAX: 0000000000000006 RBX: 0000000000000030 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000018 RDI: ffffffff8e008e60
-RBP: ffffc90000a08a40 R08: 0000000000000000 R09: 0000000000000001
-R10: dffffc0000000000 R11: ffffed10044f692f R12: 1ffff92000141130
-R13: 0000000000000018 R14: ffffffff8e008e60 R15: dffffc0000000000
-FS:  0000555585eed500(0000) GS:ffff888125d1c000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055555f2285c8 CR3: 0000000026022000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
-----------------
-Code disassembly (best guess):
-   0:	3c 08                	cmp    $0x8,%al
-   2:	04 f3                	add    $0xf3,%al
-   4:	f3 f3 48 c7 44 24 60 	repz xrelease movq $0x0,0x60(%rsp)
-   b:	00 00 00 00
-   f:	c7 84 24 80 00 00 00 	movl   $0x0,0x80(%rsp)
-  16:	00 00 00 00
-  1a:	48 89 74 24 30       	mov    %rsi,0x30(%rsp)
-  1f:	48 8d 5e 18          	lea    0x18(%rsi),%rbx
-  23:	48 89 d8             	mov    %rbx,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	48 89 df             	mov    %rbx,%rdi
-  34:	e8 70 7c 86 00       	call   0x867ca9
-  39:	48 8b 03             	mov    (%rbx),%rax
-  3c:	48 85 c0             	test   %rax,%rax
-  3f:	48                   	rex.W
-
-
+Tested-by: syzbot@syzkaller.appspotmail.com
+Signed-off-by: Wilfred Mallawa <wilfred.mallawa@wdc.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Changes V5 -> V6:
+	- Add NULL check for sw_ctx. Reported by syzbot.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+V5: https://lore.kernel.org/netdev/20251014051825.1084403-2-wilfred.opensource@gmail.com/ 
+---
+ Documentation/networking/tls.rst | 11 ++++++
+ include/net/tls.h                |  3 ++
+ include/uapi/linux/tls.h         |  2 ++
+ net/tls/tls_device.c             |  2 +-
+ net/tls/tls_main.c               | 62 ++++++++++++++++++++++++++++++++
+ net/tls/tls_sw.c                 |  2 +-
+ 6 files changed, 80 insertions(+), 2 deletions(-)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+diff --git a/Documentation/networking/tls.rst b/Documentation/networking/tls.rst
+index 36cc7afc2527..dabab17ab84a 100644
+--- a/Documentation/networking/tls.rst
++++ b/Documentation/networking/tls.rst
+@@ -280,6 +280,17 @@ If the record decrypted turns out to had been padded or is not a data
+ record it will be decrypted again into a kernel buffer without zero copy.
+ Such events are counted in the ``TlsDecryptRetry`` statistic.
+ 
++TLS_TX_MAX_PAYLOAD_LEN
++~~~~~~~~~~~~~~~~~~~~~~
++
++Sets the maximum size for the plaintext of a protected record.
++
++When this option is set, the kernel enforces this limit on all transmitted TLS
++records, ensuring no plaintext fragment exceeds the specified size. This can be
++used to specify the TLS Record Size Limit [1].
++
++[1] https://datatracker.ietf.org/doc/html/rfc8449
++
+ Statistics
+ ==========
+ 
+diff --git a/include/net/tls.h b/include/net/tls.h
+index 857340338b69..f2af113728aa 100644
+--- a/include/net/tls.h
++++ b/include/net/tls.h
+@@ -53,6 +53,8 @@ struct tls_rec;
+ 
+ /* Maximum data size carried in a TLS record */
+ #define TLS_MAX_PAYLOAD_SIZE		((size_t)1 << 14)
++/* Minimum record size limit as per RFC8449 */
++#define TLS_MIN_RECORD_SIZE_LIM		((size_t)1 << 6)
+ 
+ #define TLS_HEADER_SIZE			5
+ #define TLS_NONCE_OFFSET		TLS_HEADER_SIZE
+@@ -226,6 +228,7 @@ struct tls_context {
+ 	u8 rx_conf:3;
+ 	u8 zerocopy_sendfile:1;
+ 	u8 rx_no_pad:1;
++	u16 tx_max_payload_len;
+ 
+ 	int (*push_pending_record)(struct sock *sk, int flags);
+ 	void (*sk_write_space)(struct sock *sk);
+diff --git a/include/uapi/linux/tls.h b/include/uapi/linux/tls.h
+index b66a800389cc..b8b9c42f848c 100644
+--- a/include/uapi/linux/tls.h
++++ b/include/uapi/linux/tls.h
+@@ -41,6 +41,7 @@
+ #define TLS_RX			2	/* Set receive parameters */
+ #define TLS_TX_ZEROCOPY_RO	3	/* TX zerocopy (only sendfile now) */
+ #define TLS_RX_EXPECT_NO_PAD	4	/* Attempt opportunistic zero-copy */
++#define TLS_TX_MAX_PAYLOAD_LEN	5	/* Maximum plaintext size */
+ 
+ /* Supported versions */
+ #define TLS_VERSION_MINOR(ver)	((ver) & 0xFF)
+@@ -194,6 +195,7 @@ enum {
+ 	TLS_INFO_RXCONF,
+ 	TLS_INFO_ZC_RO_TX,
+ 	TLS_INFO_RX_NO_PAD,
++	TLS_INFO_TX_MAX_PAYLOAD_LEN,
+ 	__TLS_INFO_MAX,
+ };
+ #define TLS_INFO_MAX (__TLS_INFO_MAX - 1)
+diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
+index a64ae15b1a60..c6289c73cffc 100644
+--- a/net/tls/tls_device.c
++++ b/net/tls/tls_device.c
+@@ -461,7 +461,7 @@ static int tls_push_data(struct sock *sk,
+ 	/* TLS_HEADER_SIZE is not counted as part of the TLS record, and
+ 	 * we need to leave room for an authentication tag.
+ 	 */
+-	max_open_record_len = TLS_MAX_PAYLOAD_SIZE +
++	max_open_record_len = tls_ctx->tx_max_payload_len +
+ 			      prot->prepend_size;
+ 	do {
+ 		rc = tls_do_allocation(sk, ctx, pfrag, prot->prepend_size);
+diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+index a3ccb3135e51..b96c825b90e9 100644
+--- a/net/tls/tls_main.c
++++ b/net/tls/tls_main.c
+@@ -544,6 +544,28 @@ static int do_tls_getsockopt_no_pad(struct sock *sk, char __user *optval,
+ 	return 0;
+ }
+ 
++static int do_tls_getsockopt_tx_payload_len(struct sock *sk, char __user *optval,
++					    int __user *optlen)
++{
++	struct tls_context *ctx = tls_get_ctx(sk);
++	u16 payload_len = ctx->tx_max_payload_len;
++	int len;
++
++	if (get_user(len, optlen))
++		return -EFAULT;
++
++	if (len < sizeof(payload_len))
++		return -EINVAL;
++
++	if (put_user(sizeof(payload_len), optlen))
++		return -EFAULT;
++
++	if (copy_to_user(optval, &payload_len, sizeof(payload_len)))
++		return -EFAULT;
++
++	return 0;
++}
++
+ static int do_tls_getsockopt(struct sock *sk, int optname,
+ 			     char __user *optval, int __user *optlen)
+ {
+@@ -563,6 +585,9 @@ static int do_tls_getsockopt(struct sock *sk, int optname,
+ 	case TLS_RX_EXPECT_NO_PAD:
+ 		rc = do_tls_getsockopt_no_pad(sk, optval, optlen);
+ 		break;
++	case TLS_TX_MAX_PAYLOAD_LEN:
++		rc = do_tls_getsockopt_tx_payload_len(sk, optval, optlen);
++		break;
+ 	default:
+ 		rc = -ENOPROTOOPT;
+ 		break;
+@@ -812,6 +837,30 @@ static int do_tls_setsockopt_no_pad(struct sock *sk, sockptr_t optval,
+ 	return rc;
+ }
+ 
++static int do_tls_setsockopt_tx_payload_len(struct sock *sk, sockptr_t optval,
++					    unsigned int optlen)
++{
++	struct tls_context *ctx = tls_get_ctx(sk);
++	struct tls_sw_context_tx *sw_ctx = tls_sw_ctx_tx(ctx);
++	u16 value;
++
++	if (sw_ctx && sw_ctx->open_rec)
++		return -EBUSY;
++
++	if (sockptr_is_null(optval) || optlen != sizeof(value))
++		return -EINVAL;
++
++	if (copy_from_sockptr(&value, optval, sizeof(value)))
++		return -EFAULT;
++
++	if (value < TLS_MIN_RECORD_SIZE_LIM || value > TLS_MAX_PAYLOAD_SIZE)
++		return -EINVAL;
++
++	ctx->tx_max_payload_len = value;
++
++	return 0;
++}
++
+ static int do_tls_setsockopt(struct sock *sk, int optname, sockptr_t optval,
+ 			     unsigned int optlen)
+ {
+@@ -833,6 +882,11 @@ static int do_tls_setsockopt(struct sock *sk, int optname, sockptr_t optval,
+ 	case TLS_RX_EXPECT_NO_PAD:
+ 		rc = do_tls_setsockopt_no_pad(sk, optval, optlen);
+ 		break;
++	case TLS_TX_MAX_PAYLOAD_LEN:
++		lock_sock(sk);
++		rc = do_tls_setsockopt_tx_payload_len(sk, optval, optlen);
++		release_sock(sk);
++		break;
+ 	default:
+ 		rc = -ENOPROTOOPT;
+ 		break;
+@@ -1022,6 +1076,7 @@ static int tls_init(struct sock *sk)
+ 
+ 	ctx->tx_conf = TLS_BASE;
+ 	ctx->rx_conf = TLS_BASE;
++	ctx->tx_max_payload_len = TLS_MAX_PAYLOAD_SIZE;
+ 	update_sk_prot(sk, ctx);
+ out:
+ 	write_unlock_bh(&sk->sk_callback_lock);
+@@ -1111,6 +1166,12 @@ static int tls_get_info(struct sock *sk, struct sk_buff *skb, bool net_admin)
+ 			goto nla_failure;
+ 	}
+ 
++	err = nla_put_u16(skb, TLS_INFO_TX_MAX_PAYLOAD_LEN,
++			  ctx->tx_max_payload_len);
++
++	if (err)
++		goto nla_failure;
++
+ 	rcu_read_unlock();
+ 	nla_nest_end(skb, start);
+ 	return 0;
+@@ -1132,6 +1193,7 @@ static size_t tls_get_info_size(const struct sock *sk, bool net_admin)
+ 		nla_total_size(sizeof(u16)) +	/* TLS_INFO_TXCONF */
+ 		nla_total_size(0) +		/* TLS_INFO_ZC_RO_TX */
+ 		nla_total_size(0) +		/* TLS_INFO_RX_NO_PAD */
++		nla_total_size(sizeof(u16)) +   /* TLS_INFO_TX_MAX_PAYLOAD_LEN */
+ 		0;
+ 
+ 	return size;
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index daac9fd4be7e..e76ea38b712a 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1079,7 +1079,7 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+ 		orig_size = msg_pl->sg.size;
+ 		full_record = false;
+ 		try_to_copy = msg_data_left(msg);
+-		record_room = TLS_MAX_PAYLOAD_SIZE - msg_pl->sg.size;
++		record_room = tls_ctx->tx_max_payload_len - msg_pl->sg.size;
+ 		if (try_to_copy >= record_room) {
+ 			try_to_copy = record_room;
+ 			full_record = true;
+-- 
+2.51.0
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
