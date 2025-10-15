@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-229652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C279BDF690
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:36:17 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA128BDF759
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:45:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5E423AA78A
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:36:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AB7134F6551
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A3C274B59;
-	Wed, 15 Oct 2025 15:36:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65AD732F762;
+	Wed, 15 Oct 2025 15:45:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="okey7Jxx";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="qPoTrkYt"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="diEsTYlb";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="w8mq62Yk"
 X-Original-To: netdev@vger.kernel.org
 Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F8028B3E7;
-	Wed, 15 Oct 2025 15:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C12532ED5C;
+	Wed, 15 Oct 2025 15:45:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760542567; cv=none; b=ZeXLS0anH3aUTXScmKWC/YSx7h/zk7PZJxYqibUAm4WShXDLYl7JhjQHLSFg49M8ZzL3MXoTsSrXtWuEjgMKaM7FKqRl3OupSwn/1X3dsD0whWW4Dkwyl+lqjFi8SGUktFDT6mnjQ4s+BE3fC1jetTUsYmu6YmNDW8XX1NuG30M=
+	t=1760543120; cv=none; b=dZW/3GnySrF230ct3NRXixPoZD8QmucXcD537o7IcyTl+fTcGi7MD8cQkXcx1pMQzf3085+cmd5EWyG8NYZBBhLO9tnbwnnJHGkzKdqDF5yqy5PTQwOhXIQwioafT9sigKktQ3QUPgUpbYH4MinVxPmXs7GgY7BalwFt23vyFdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760542567; c=relaxed/simple;
-	bh=b3XNeJ043/GZIdvxE2tPziVWO1Z1tp3ag7pc0IcuOOI=;
+	s=arc-20240116; t=1760543120; c=relaxed/simple;
+	bh=meP/Aq84K171eC4phODrHaDH0svAHCll1WQAHZlh6kg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uFyfs7YzUZ62IetYjNbd2V8Uhyb8FhrLGdhcPUXwojk2MfrfO3Ifeb5RwBFNjJkLjQdB7SWK/pTUb4xd8GDtqog60vKlhKfctCtzx38baHv6bPgpsCYIZfM/Xi8D9cPWcg+4W2ovZ5tuRBpl2tQQeguHe9tWkoOoymcAvGTv35k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=okey7Jxx; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=qPoTrkYt; arc=none smtp.client-ip=202.12.124.151
+	 Content-Type:Content-Disposition:In-Reply-To; b=fWlaWph734ucnuip6JtX5s0h/tGtZx2qP+sJQlVZ3e/jO8VBKwt3DTQKX4MIrmBULQkHytp8Z/wD6KZNma6ICZrRLnSxJM9AOl9Yhzs3yfqBb9G35AQ07tHf0sRfstmoC1evWRz/MHjsbXSiXxb9k+MW9GBaXA6idGdxLKHuAig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=diEsTYlb; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=w8mq62Yk; arc=none smtp.client-ip=202.12.124.151
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id F063D1D00165;
-	Wed, 15 Oct 2025 11:36:00 -0400 (EDT)
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.stl.internal (Postfix) with ESMTP id 5E3571D000C4;
+	Wed, 15 Oct 2025 11:45:17 -0400 (EDT)
 Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Wed, 15 Oct 2025 11:36:01 -0400
+  by phl-compute-06.internal (MEProxy); Wed, 15 Oct 2025 11:45:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
 	cc:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1760542560;
-	 x=1760628960; bh=EgHwv9WjnZoGe6jMQYPkCOJwkRlt61B1V48ek/U9E1s=; b=
-	okey7JxxAJTddB/vqMhWc+PTwrbbgUw7a818VoWE5psHG6Ry1wI14Ferco/alBDE
-	rORG8Gzqhwk3oBSt92ozQGoSkIPJ9d9M8BKEK+o0pz619b+/CJtb7v+9pQndTr+e
-	FCQf7nmQOnrS+CQ1+SJGlV98/hZ1QyxsJB7UBmjVjt/LKzHYUEI17ORZWx8EvWLR
-	V8j8fvbzEyV7Tp4gM5dp3wBzXCKE7a+M6hSCVjbduS/SKJLz1KLB2G1Cp8qyTNnW
-	43smCqP+O82h0SVXW8DTQpu6tCwkmE7bRfjZ8p2DkpJ1UGDypnipjb9AMppCCaaD
-	GK8QCGV5LvdjQeVXAdCf+g==
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1760543117;
+	 x=1760629517; bh=V/erT+QWunXqRIIEBMFZDjF8ybSTlOX6XftGy/9IXo8=; b=
+	diEsTYlbRtS1xFOXXCLQq/ZnnwsfpRu+LWagHq+qkQkmV/LALEesnuC3MI935oYH
+	ogk8vRYMRvuVlMUCHCf74A90DiS2j5C2I+rWXYcTHxY6JXmRdusU5r5M+Hy4IdnQ
+	nEN3DrWnjTJrLfkrb5WVJ8LZaIeyf8rmpZszXJ/tUC4/XCqyhCWpFxj7XtSnDQb/
+	Dq2LJpouh0UUfpXwBLZCY5HaXIlh/8Qr4HCWeXHRoKoiYUMET8i2DFcSZF4DvieR
+	YbYueYDNkds+yJkG0PkoQ9THFsErWhKwym9vU9Q4tsqD9fIEPBvu6u1tYCgxfAs0
+	9Rn3iBc8xKlfcoBlemC5Zg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760542560; x=
-	1760628960; bh=EgHwv9WjnZoGe6jMQYPkCOJwkRlt61B1V48ek/U9E1s=; b=q
-	PoTrkYtbH8W1eanxnfrZr+PDCTEA/CXFgCf2vT7hwBEDRcSp2C4VV8fnCMX8wiz5
-	IgCt8K86XD2CxgVcL5u/5ZQJhBIA0Q6K9SEfZGwVhvxIghwG4bX3gCyzDKY02wFS
-	CKdHpv4Ce12ZDskxYzHUDmmyAI1rY1ICS6gfOSBp0tFkYqX1jFTPDuZ7rABQsCJb
-	VycCaMCAbeNOrdceUE+EuwARA9WToqM853iYzt4nyz+jh5lMNOjmBxSIC3NQLA/l
-	PyZ291lvJjaPrpXtkPwxYuUgRded/ZEMMt8ssdxf9yNWaGWKSxGhm6FNTm63ISsA
-	U9/k0pibirtkX2r22Zw8Q==
-X-ME-Sender: <xms:X7_vaGhYkMXceChRuTalNKHTLcvoc7yxATglkDQvGeHjwhMInPzPfA>
-    <xme:X7_vaMlzdjEogzgzIHuQ9SDTkXgDsMM27tsnHIUtaWIiyEysmyNQZ2th6aaOgyBWg
-    xEBAG0TEAHlsaGZqOPNIErC2q0pjF8kRzeeUF4-tq-RazjTGlIESGU>
-X-ME-Received: <xmr:X7_vaHpqE5uIz99naj-QOtuSpKqUL9y78R4FyPDJHd8ePYdErlPpwYTctBLsQQUg4zJBu0nE49Q1gnROlDCVTA4PmW_ERow>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdefjeekucetufdoteggodetrf
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760543117; x=
+	1760629517; bh=V/erT+QWunXqRIIEBMFZDjF8ybSTlOX6XftGy/9IXo8=; b=w
+	8mq62Ykr/bAnjg1p0SKj80LNm40Q331it/cN3MK/7w/Dq3GiIhmICAgDY2g3oQuo
+	wy6Hlq/iRlIY2WF/yc6PobD2RAO3PVMfKdGPjhjlFjeAALenatav3bwfWYXM9PB0
+	43JExsjRJLPLQk4WLHr6MdQLwl4/OWD1Kzitqz6N+vUkm0r2ywt6ei8GKv7vv3HX
+	vpMiRbL2U2CreJ8ONtRr9kZyA/Ubl/VKiGHIGsTGV/7QQyHUAkWKfD2pFpFh1LIA
+	0DKYVHstFwi913Zz7eIzzFTrKTG7djnfgHjymBKYRQWF64JNyq7o7fvh+kC1+3aQ
+	ZwMVhyiEOXkpy6TZy7W2Q==
+X-ME-Sender: <xms:i8HvaO_9L8t-M7hutUTD_Fidk4RBTg9yIJTIrfHYEJqj31qEi54qBw>
+    <xme:i8HvaEQ4m69lKUsKgdVdNBxovmgr7eGyBYMhu_fZtw8nGupeaafBviw8wJFyfR5zk
+    DtFxdOqz18gHXsjQDbOYh2QVWjuWE8b3skcPHIcz1yM59nNCZ__VeY>
+X-ME-Received: <xmr:i8HvaNmUpSSNv2Aig13nn3zl1m9H8Gd1N75C8ReZUj6DDj06C4nYFeussE3OzhXkRZOEA2L0M0YsHvi8Gq9XMHr4suzAw50>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdefkedtucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
     gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhklhgr
@@ -82,15 +82,15 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdefjeekucetufdote
     nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehsvghrghgvihdrshhhthihlhihoh
     hvsegtohhgvghnthgvmhgsvgguuggvugdrtghomhdprhgtphhtthhopehnvghtuggvvhes
     vhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:X7_vaAIw7EyMAeJwOqxQ1u-SU8J5ho84E9T8XD03CDQyld_l_DGy7w>
-    <xmx:X7_vaLBYhmdvCQNS9mVcpIF4tgxXqH3O1a8ABBNBsBnnOOx-FTY-3g>
-    <xmx:X7_vaK4uiPug7wzwV5h64KZmfYZ7RVkqi1YUfS46v3NyWILWuXtCEw>
-    <xmx:X7_vaPFxUy-h3P1SxqN_J2jyt6kNLrhczQRFg4VPbmMc0i7t1vYvPQ>
-    <xmx:YL_vaGVBg_TRMXvh4yNUSbfTvjWrjQNYX3t_LC_73UpqMlwW2nExhfg0>
+X-ME-Proxy: <xmx:i8HvaHWUzaMbpdnHQPSJy0V57I4ehPAIAp42itlniFChwvNKuZEwaQ>
+    <xmx:i8HvaKdvwTnMkNusNvFnBd7hFfrlZzWBw2ZXbHsPzKUIMSF1w3oxOw>
+    <xmx:i8HvaNnfBvOpFk03o7yQ3az12EetK3b2a70K6n2sFHLB9BX3nfhsIg>
+    <xmx:i8HvaECDFQE2nsMdTvhirfdNqvbr4-uFIFx-pRpML3B272LNQVBPwg>
+    <xmx:jcHvaA9OIHd8vfIiECDt5OZaJ0CD0ig5Sb2cc4oA5-Flr5h_x-a60sih>
 Feedback-ID: i80c9496c:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 15 Oct 2025 11:35:58 -0400 (EDT)
-Date: Wed, 15 Oct 2025 17:35:56 +0200
+ 15 Oct 2025 11:45:15 -0400 (EDT)
+Date: Wed, 15 Oct 2025 17:45:14 +0200
 From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
 To: Prabhakar <prabhakar.csengg@gmail.com>
 Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -103,10 +103,11 @@ Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
 	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
 	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
 	stable@vger.kernel.org
-Subject: Re: [PATCH 1/3] net: ravb: Make DBAT entry count configurable per-SoC
-Message-ID: <20251015153556.GC439570@ragnatech.se>
+Subject: Re: [PATCH 2/3] net: ravb: Allocate correct number of queues based
+ on SoC support
+Message-ID: <20251015154514.GD439570@ragnatech.se>
 References: <20251015150026.117587-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251015150026.117587-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251015150026.117587-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -116,131 +117,54 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251015150026.117587-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <20251015150026.117587-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
 
 Hi Prabhakar,
 
 Thanks for your work.
 
-On 2025-10-15 16:00:24 +0100, Prabhakar wrote:
+On 2025-10-15 16:00:25 +0100, Prabhakar wrote:
 > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 > 
-> The number of CDARq (Current Descriptor Address Register) registers is not
-> fixed to 22 across all SoC variants. For example, the GBETH implementation
-> uses only two entries. Hardcoding the value leads to incorrect resource
-> allocation on such platforms.
+> On SoCs that only support the best-effort queue and not the network
+> control queue, calling alloc_etherdev_mqs() with fixed values for
+> TX/RX queues is not appropriate. Use the nc_queues flag from the
+> per-SoC match data to determine whether the network control queue
+> is available, and fall back to a single TX/RX queue when it is not.
+> This ensures correct queue allocation across all supported SoCs.
 > 
-> Pass the DBAT entry count through the per-SoC hardware info struct and use
-> it during probe instead of relying on a fixed constant. This ensures
-> correct descriptor table sizing and initialization across different SoCs.
-> 
-> Fixes: feab85c7ccea ("ravb: Add support for RZ/G2L SoC")
+> Fixes: a92f4f0662bf ("ravb: Add nc_queue to struct ravb_hw_info")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-I have not verified with documentation the setting of 2 for 
-gbeth_hw_info. But the change itself is good.
-
-> ---
->  drivers/net/ethernet/renesas/ravb.h      | 2 +-
->  drivers/net/ethernet/renesas/ravb_main.c | 9 +++++++--
->  2 files changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
-> index 7b48060c250b..d65cd83ddd16 100644
-> --- a/drivers/net/ethernet/renesas/ravb.h
-> +++ b/drivers/net/ethernet/renesas/ravb.h
-> @@ -1017,7 +1017,6 @@ enum CSR2_BIT {
->  #define CSR2_CSUM_ENABLE (CSR2_RTCP4 | CSR2_RUDP4 | CSR2_RICMP4 | \
->  			  CSR2_RTCP6 | CSR2_RUDP6 | CSR2_RICMP6)
->  
-> -#define DBAT_ENTRY_NUM	22
->  #define RX_QUEUE_OFFSET	4
->  #define NUM_RX_QUEUE	2
->  #define NUM_TX_QUEUE	2
-> @@ -1062,6 +1061,7 @@ struct ravb_hw_info {
->  	u32 rx_max_frame_size;
->  	u32 rx_buffer_size;
->  	u32 rx_desc_size;
-> +	u32 dbat_entry_num;
-
-I have been wondering for some time if we shall not start to document 
-these fields as they always take so much time to get back to what each 
-of them represent. How do you feel about starting a header?
-
-/**
- * dbat_entry_num: Describe me here.
- */
-
-Without, but preferably with, this added.
-
 Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 
->  	unsigned aligned_tx: 1;
->  	unsigned coalesce_irqs:1;	/* Needs software IRQ coalescing */
->  
+> ---
+>  drivers/net/ethernet/renesas/ravb_main.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
 > diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 9d3bd65b85ff..69d382e8757d 100644
+> index 69d382e8757d..a200e205825a 100644
 > --- a/drivers/net/ethernet/renesas/ravb_main.c
 > +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -2694,6 +2694,7 @@ static const struct ravb_hw_info ravb_gen2_hw_info = {
->  	.rx_buffer_size = SZ_2K +
->  			  SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
->  	.rx_desc_size = sizeof(struct ravb_ex_rx_desc),
-> +	.dbat_entry_num = 22,
->  	.aligned_tx = 1,
->  	.gptp = 1,
->  	.nc_queues = 1,
-> @@ -2717,6 +2718,7 @@ static const struct ravb_hw_info ravb_gen3_hw_info = {
->  	.rx_buffer_size = SZ_2K +
->  			  SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
->  	.rx_desc_size = sizeof(struct ravb_ex_rx_desc),
-> +	.dbat_entry_num = 22,
->  	.internal_delay = 1,
->  	.tx_counters = 1,
->  	.multi_irqs = 1,
-> @@ -2743,6 +2745,7 @@ static const struct ravb_hw_info ravb_gen4_hw_info = {
->  	.rx_buffer_size = SZ_2K +
->  			  SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
->  	.rx_desc_size = sizeof(struct ravb_ex_rx_desc),
-> +	.dbat_entry_num = 22,
->  	.internal_delay = 1,
->  	.tx_counters = 1,
->  	.multi_irqs = 1,
-> @@ -2769,6 +2772,7 @@ static const struct ravb_hw_info ravb_rzv2m_hw_info = {
->  	.rx_buffer_size = SZ_2K +
->  			  SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
->  	.rx_desc_size = sizeof(struct ravb_ex_rx_desc),
-> +	.dbat_entry_num = 22,
->  	.multi_irqs = 1,
->  	.err_mgmt_irqs = 1,
->  	.gptp = 1,
-> @@ -2794,6 +2798,7 @@ static const struct ravb_hw_info gbeth_hw_info = {
->  	.rx_max_frame_size = SZ_8K,
->  	.rx_buffer_size = SZ_2K,
->  	.rx_desc_size = sizeof(struct ravb_rx_desc),
-> +	.dbat_entry_num = 2,
->  	.aligned_tx = 1,
->  	.coalesce_irqs = 1,
->  	.tx_counters = 1,
-> @@ -3025,7 +3030,7 @@ static int ravb_probe(struct platform_device *pdev)
->  	ravb_parse_delay_mode(np, ndev);
+> @@ -2926,13 +2926,14 @@ static int ravb_probe(struct platform_device *pdev)
+>  		return dev_err_probe(&pdev->dev, PTR_ERR(rstc),
+>  				     "failed to get cpg reset\n");
 >  
->  	/* Allocate descriptor base address table */
-> -	priv->desc_bat_size = sizeof(struct ravb_desc) * DBAT_ENTRY_NUM;
-> +	priv->desc_bat_size = sizeof(struct ravb_desc) * info->dbat_entry_num;
->  	priv->desc_bat = dma_alloc_coherent(ndev->dev.parent, priv->desc_bat_size,
->  					    &priv->desc_bat_dma, GFP_KERNEL);
->  	if (!priv->desc_bat) {
-> @@ -3035,7 +3040,7 @@ static int ravb_probe(struct platform_device *pdev)
->  		error = -ENOMEM;
->  		goto out_rpm_put;
->  	}
-> -	for (q = RAVB_BE; q < DBAT_ENTRY_NUM; q++)
-> +	for (q = RAVB_BE; q < info->dbat_entry_num; q++)
->  		priv->desc_bat[q].die_dt = DT_EOS;
+> +	info = of_device_get_match_data(&pdev->dev);
+> +
+>  	ndev = alloc_etherdev_mqs(sizeof(struct ravb_private),
+> -				  NUM_TX_QUEUE, NUM_RX_QUEUE);
+> +				  info->nc_queues ? NUM_TX_QUEUE : 1,
+> +				  info->nc_queues ? NUM_RX_QUEUE : 1);
+>  	if (!ndev)
+>  		return -ENOMEM;
 >  
->  	/* Initialise HW timestamp list */
+> -	info = of_device_get_match_data(&pdev->dev);
+> -
+>  	ndev->features = info->net_features;
+>  	ndev->hw_features = info->net_hw_features;
+>  	ndev->vlan_features = info->vlan_features;
 > -- 
 > 2.43.0
 > 
