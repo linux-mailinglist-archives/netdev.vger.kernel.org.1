@@ -1,134 +1,173 @@
-Return-Path: <netdev+bounces-229679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6229BBDFA61
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 18:27:05 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A78FBDFA9A
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 18:32:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AEF8A4FE4B0
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 16:26:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9DBC74E547E
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 16:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F73337683;
-	Wed, 15 Oct 2025 16:26:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E282B2F7AAC;
+	Wed, 15 Oct 2025 16:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GKbferZy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MyQfhI81"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F268F3375CF;
-	Wed, 15 Oct 2025 16:26:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4560205AB6;
+	Wed, 15 Oct 2025 16:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760545596; cv=none; b=QXUYsK+H0JHOCuyUGWCSLrfq+McxQMKvltBhi1Hb2uLat08PKCk8g+z/+XcdJK4/kJMVQ8yxLbcYQ1lKq2QGVKwBSlX/UBnzTDTHy+NJ+Lz0V8iBfaeXot15eGrlFl6AWt7Bta72Y7zR1kqCLXq+HNjDrDgzwicEe0eIK2shhXc=
+	t=1760545918; cv=none; b=RhgGGzicslwt0u18fYk6jCc/j0Oae5Z1rGnH0PhzO6edMEmhex2EangBKy6/xREUTZgYA/HtLsXM6tjcHDwXi9ePnuueHGvZYPCEuhYSZpeqxYCO7GuBXOYZe7PxrJVP9WCJiHpEg/NMVdocbCQ9xleCAWU4KaL4iKem0XEQ0qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760545596; c=relaxed/simple;
-	bh=h2pgmTJ0LgxlrM1/acjmNVSi/h0KgG0d5PCKw7PpGzU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=BGxCTcXhgYaG9T1a3V+G25nBaUQaoE4PvXZFVlalTMMhN031YCeZEawHfPpb0qY8W6Te14LVIzayXTK5HBjogYU6q+0r6+Eyw/XFEnZ1WE3t+rD665K11/bCRFMHFxgeL1A3nI5ayD/NadbRFML3joa/Xj/ch+YMPaZLHRziXHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GKbferZy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95644C4CEF9;
-	Wed, 15 Oct 2025 16:26:30 +0000 (UTC)
+	s=arc-20240116; t=1760545918; c=relaxed/simple;
+	bh=BDBgHqGKg8kxASakOnsE9eu2W0NBeHR9L7btp+ec49k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UTVGKqxHb46MhKlbhtaA6C8FcgnKfJqHnJQo8ewImhBHn9c4rvbQ1XPyV2KLXkPil2V7p/295c3+6D350X/dJFRpggN0Hw2oDvZ8gHWGh5qtqa1Oj0hUMXssukxdpYPqGI70NquuBe4cwD0ROmVkSn2YWZwgoYWbiD4K4ApMb1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MyQfhI81; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEF2CC4CEF8;
+	Wed, 15 Oct 2025 16:31:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760545595;
-	bh=h2pgmTJ0LgxlrM1/acjmNVSi/h0KgG0d5PCKw7PpGzU=;
-	h=From:Date:Subject:To:Cc:From;
-	b=GKbferZypZzvoGx9e5v3V0cEprXcMRaUpcL/uxc/59vZ74BX5f7T1DKxQI0IldU3s
-	 2anQ3m5diDjQI3buQO8ny2lOkJUMkgY+XkNNsIjVH2GLuc2qP1GuCKErs16c984O2J
-	 wqByHPN0c1KLD9tBBjDzCBOmuOSUS6MkymSb3LX2CPx5RPwxVwl769LFxfECjgN5LW
-	 MecplRWKTBJJbsDnFfNkeEkQfLVxgoJy509nrYs21wGtbvHCKc/I0Xut8SWi10PW2c
-	 I00EAYb7CurNL+ZP/RwhHsPz8xD0wJc6/LbShydUqDuecHE4emAUaT0EYfnjo/cNeT
-	 XXwAsO/nNcKng==
-From: Konrad Dybcio <konradybcio@kernel.org>
-Date: Wed, 15 Oct 2025 18:26:12 +0200
-Subject: [PATCH net-next v5] dt-bindings: net: qcom: ethernet: Add
- interconnect properties
+	s=k20201202; t=1760545918;
+	bh=BDBgHqGKg8kxASakOnsE9eu2W0NBeHR9L7btp+ec49k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MyQfhI81TQhBnjopIRKsT6OpIuahtU9FssuD/WqoqsswyzKW6JnWA+xQc757bJQeW
+	 e2brIY6CGQ5WYCVpyLd2XMQoXcU3RTDWB2MP282SIip/+mUz1ZPQvubWMKfhRmc0rX
+	 Fi8MrcjB7zgmmki2Qs5Df8WywUwqUoFk8vRbRXRgutVC1OoAZw4bNu59UMyRN/Nf+9
+	 e9pAznvqX6zMoE0ZS7jo5Y7ehmbyqoadfzcXkI11Y0OmUJymVtaoCNImp9T2HdDsK6
+	 +9ksMjXgzkz9nX/Q/TtT/wvQdaZfdojKymCaEUaYQjn7ZIZAqcpOWFZmi1Kv9z2GyZ
+	 No774+bwlAO6Q==
+Date: Wed, 15 Oct 2025 17:31:53 +0100
+From: Simon Horman <horms@kernel.org>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>,
+	Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sharath Chandra Vurukala <quic_sharathv@quicinc.com>
+Subject: Re: [PATCH net] net: rmnet: Fix checksum offload header v5 and
+ aggregation packet formatting
+Message-ID: <aO_MefPIlQQrCU3j@horms.kernel.org>
+References: <20251015092540.32282-2-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251015-topic-qc_stmmac_icc_bindings-v5-1-da39126cff28@oss.qualcomm.com>
-X-B4-Tracking: v=1; b=H4sIACPL72gC/x3MQQqDMBAF0KvIrBswKUHbq0gJdjLRvzBqRkpBv
- HtDl2/zTlIpEKVnc1KRDxRrrvC3hnge8yQGsZpc67xtrTfHuoHNzkGPZRk5gDm8kSPypIaTu/d
- 9TDY+OqrFViTh+++H13X9AHw2Jv9uAAAA
-X-Change-ID: 20251015-topic-qc_stmmac_icc_bindings-cf2388df1d97
-To: Vinod Koul <vkoul@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Sagar Cheluvegowda <quic_scheluve@quicinc.com>, 
- Andrew Halaney <ahalaney@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1760545590; l=1712;
- i=konrad.dybcio@oss.qualcomm.com; s=20230215; h=from:subject:message-id;
- bh=mTgsTgNTQHi6x0kc6W7bMbDPsez0DQhNORpyI2cjZWM=;
- b=vOIYMZd18lravoZ2+MqSK9dXKTZJqNRIlHSAlzZCiR1xYdG6d4uxY/2j13c7dXGLbDb8yvHS+
- 1BI2wBrilQJC1jACi/7SocdCVV1FdIEbF6xsirTuYa9X01QdAx/vc77
-X-Developer-Key: i=konrad.dybcio@oss.qualcomm.com; a=ed25519;
- pk=iclgkYvtl2w05SSXO5EjjSYlhFKsJ+5OSZBjOkQuEms=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251015092540.32282-2-bagasdotme@gmail.com>
 
-From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+On Wed, Oct 15, 2025 at 04:25:41PM +0700, Bagas Sanjaya wrote:
+> Packet format for checksum offload header v5 and aggregation, and header
+> type table for the former, are shown in normal paragraphs instead.
+> 
+> Use appropriate markup.
+> 
+> Fixes: 710b797cf61b ("docs: networking: Add documentation for MAPv5")
+> Fixes: ceed73a2cf4a ("drivers: net: ethernet: qualcomm: rmnet: Initial implementation")
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 
-Add documentation for the interconnect and interconnect-names
-properties required when voting for AHB and AXI buses.
+Thanks Bagas,
 
-Suggested-by: Andrew Halaney <ahalaney@redhat.com>
-Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
----
-I picked this up because it hasn't been merged for a year and the
-original author didn't seem to react to that either..
+I agree these are all good improvements.
 
-The original driver change that was paired with this patch has
-bitrotted, but this is still useful on its own (if only to reduce the
-number of DT checker warnings in qcom/..)
+I would like to add the following, which I noticed during review, for your
+consideration.
 
-No changes besides `b4 trailers -u && git commit --amend -s`
+diff --git a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
+index 6877a3260582..b532128ee709 100644
+--- a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
++++ b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
+@@ -27,7 +27,8 @@ these MAP frames and send them to appropriate PDN's.
+ 2. Packet format
+ ================
 
-v4: https://lore.kernel.org/linux-arm-msm/20240708-icc_bw_voting_from_ethqos-v4-0-c6bc3db86071@quicinc.com/
----
- Documentation/devicetree/bindings/net/qcom,ethqos.yaml | 8 ++++++++
- 1 file changed, 8 insertions(+)
+-a. MAP packet v1 (data / control)
++A. MAP packet v1 (data / control)
++---------------------------------
 
-diff --git a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-index e7ee0d9efed8..423959cb928d 100644
---- a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-+++ b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-@@ -73,6 +73,14 @@ properties:
- 
-   dma-coherent: true
- 
-+  interconnects:
-+    maxItems: 2
+ MAP header fields are in big endian format.
+
+@@ -53,7 +54,8 @@ Multiplexer ID is to indicate the PDN on which data has to be sent.
+ Payload length includes the padding length but does not include MAP header
+ length.
+
+-b. Map packet v4 (data / control)
++B. Map packet v4 (data / control)
++---------------------------------
+
+ MAP header fields are in big endian format.
+
+@@ -80,7 +82,7 @@ Payload length includes the padding length but does not include MAP header
+ length.
+
+ Checksum offload header, has the information about the checksum processing done
+-by the hardware.Checksum offload header fields are in big endian format.
++by the hardware. Checksum offload header fields are in big endian format.
+
+ Packet format::
+
+@@ -106,7 +108,8 @@ over which checksum is computed.
+
+ Checksum value, indicates the checksum computed.
+
+-c. MAP packet v5 (data / control)
++C. MAP packet v5 (data / control)
++---------------------------------
+
+ MAP header fields are in big endian format.
+
+@@ -133,7 +136,8 @@ Multiplexer ID is to indicate the PDN on which data has to be sent.
+ Payload length includes the padding length but does not include MAP header
+ length.
+
+-d. Checksum offload header v5
++D. Checksum offload header v5
++-----------------------------
+
+ Checksum offload header fields are in big endian format.
+
+@@ -158,7 +162,10 @@ indicates that the calculated packet checksum is invalid.
+
+ Reserved bits must be zero when sent and ignored when received.
+
+-e. MAP packet v1/v5 (command specific)::
++E. MAP packet v1/v5 (command specific)
++--------------------------------------
 +
-+  interconnect-names:
-+    items:
-+      - const: cpu-mac
-+      - const: mac-mem
-+
-   phys: true
- 
-   phy-names:
++Packet format::
 
----
-base-commit: 52ba76324a9d7c39830c850999210a36ef023cde
-change-id: 20251015-topic-qc_stmmac_icc_bindings-cf2388df1d97
+     Bit             0             1         2-7      8 - 15           16 - 31
+     Function   Command         Reserved     Pad   Multiplexer ID    Payload length
+@@ -169,7 +176,7 @@ e. MAP packet v1/v5 (command specific)::
+     Bit          96 - 127
+     Function   Command data
 
-Best regards,
--- 
-Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+-Command 1 indicates disabling flow while 2 is enabling flow
++Command 1 indicates disabling flow while 2 enables flow.
+
+ Command types
+
+@@ -180,7 +187,8 @@ Command types
+ 3 is for error during processing of commands
+ = ==========================================
+
+-f. Aggregation
++F. Aggregation
++--------------
+
+ Aggregation is multiple MAP packets (can be data or command) delivered to
+ rmnet in a single linear skb. rmnet will process the individual
 
 
