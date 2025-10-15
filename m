@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-229805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EDD2BE0F10
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 00:33:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C1DBE0F01
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 00:32:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7B2434FD41A
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:32:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5A7718866AD
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:33:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6055130C34D;
-	Wed, 15 Oct 2025 22:32:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A34307AEB;
+	Wed, 15 Oct 2025 22:32:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DC230C341;
-	Wed, 15 Oct 2025 22:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC0B19F48D;
+	Wed, 15 Oct 2025 22:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760567534; cv=none; b=kqGHU92EInosh5yo+PzLJrC2P5r1fS8+UBzBofoA0sDV78jOV/ZIwJ7O9zuZJtCAOlHaOfvwdlMGxgeBn1GOyyBJIzlth3KN8DuGfIIDcLkihEa2VtnWMbPkuye+3O3PYxSunvwSk2onBtNtM7F/FMlTqN+hVArPl0qprKQiDvM=
+	t=1760567545; cv=none; b=WVfXZj+l8BPFVx8wa9560Z1NhiWpgpDBDH6LTPeKZxKNYTLcobGS0IGwp6L7oQKXobjzGuA3J81EV8ATOcbH4uB40WrY+Z6s4m8ZEEeI7RUOKreS3MOowYeajBY1TevMjUHbrCJkiQ1aKZCrx+l5D0xFxjMgM5Xjls1wN9uItS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760567534; c=relaxed/simple;
-	bh=i4MtLydCOkah6LEWx1Hc9n1iNqvBqkn1EqVksiJBB5w=;
+	s=arc-20240116; t=1760567545; c=relaxed/simple;
+	bh=U9blwsk4OVt9UrRakM3tsBcbBMnypAVW5Y1XkJY1u5k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xc5yr+3rWUIsulpNdkSCxyzrizv/W4QhAr5cBqMEyRVd+5mHHSdX1OsOoq3OWba9UlhyOsay8Ldu15htgliBoyG2uj+ayybLLqOOBPXZpPRaQt6qJDLa6ejfeLGSMfMoj9oh2LX7F2M/K6Z/wbzz1oeEe5c9MtrYfSC7LnzMiUU=
+	 Content-Type:Content-Disposition:In-Reply-To; b=OHzA5/xYfWJ/p1hD4BElxf3qnd3/Rs6ALAnRqSlPkGBEda+dV3+Ky4t7vIoaBqAi4I98fmV4bOmVuDby8Qu0sNV+oFNJaX2T8A9sqg8PAX/heqWrRrmsfIud9Py3LxrgRI/cCxiqWlgIZgvEV1M8aaKizrRW8vjeAIBnfkzD9mk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1v9A2S-000000006UK-3f4Q;
-	Wed, 15 Oct 2025 22:32:08 +0000
-Date: Wed, 15 Oct 2025 23:32:05 +0100
+	id 1v9A2c-000000006Ub-3iD1;
+	Wed, 15 Oct 2025 22:32:18 +0000
+Date: Wed, 15 Oct 2025 23:32:15 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -54,9 +54,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next 01/11] net: dsa: lantiq_gswip: support bridge FDB
- entries on the CPU port
-Message-ID: <ed9d847c0356f0fec81422bdad9ebdcc6a59da79.1760566491.git.daniel@makrotopia.org>
+Subject: [PATCH net-next 02/11] net: dsa: lantiq_gswip: define VLAN ID 0
+ constant
+Message-ID: <e8862239d0bb727723cf60947d2262473b46c96d.1760566491.git.daniel@makrotopia.org>
 References: <cover.1760566491.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -70,76 +70,80 @@ In-Reply-To: <cover.1760566491.git.daniel@makrotopia.org>
 
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Currently, the driver takes the bridge from dsa_port_bridge_dev_get(),
-which only works for user ports. This is why it has to ignore FDB
-entries installed on the CPU port.
-
-Commit c26933639b54 ("net: dsa: request drivers to perform FDB
-isolation") introduced the possibility of getting the originating bridge
-from the passed dsa_db argument, so let's do that instead. This way, we
-can act on the local FDB entries coming from the bridge.
-
-Note that we do not expect FDB events for the DSA_DB_PORT database,
-because this driver doesn't fulfill the dsa_switch_supports_uc_filtering()
-requirements. So we can just return -EOPNOTSUPP and expect it will never
-be triggered.
+This patch adds an explicit definition for VID 0 to the Lantiq GSWIP DSA
+driver, clarifying its special meaning.
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/net/dsa/lantiq/lantiq_gswip.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ drivers/net/dsa/lantiq/lantiq_gswip.c | 12 +++++++-----
+ drivers/net/dsa/lantiq/lantiq_gswip.h |  2 ++
+ 2 files changed, 9 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-index 2169c0814a48..91755a5972fa 100644
+index 91755a5972fa..9526317443a1 100644
 --- a/drivers/net/dsa/lantiq/lantiq_gswip.c
 +++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
-@@ -1140,9 +1140,9 @@ static void gswip_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+@@ -432,7 +432,7 @@ static int gswip_add_single_port_br(struct gswip_priv *priv, int port, bool add)
+ 
+ 	vlan_active.index = port + 1;
+ 	vlan_active.table = GSWIP_TABLE_ACTIVE_VLAN;
+-	vlan_active.key[0] = 0; /* vid */
++	vlan_active.key[0] = GSWIP_VLAN_UNAWARE_PVID;
+ 	vlan_active.val[0] = port + 1 /* fid */;
+ 	vlan_active.valid = add;
+ 	err = gswip_pce_table_entry_write(priv, &vlan_active);
+@@ -446,7 +446,7 @@ static int gswip_add_single_port_br(struct gswip_priv *priv, int port, bool add)
+ 
+ 	vlan_mapping.index = port + 1;
+ 	vlan_mapping.table = GSWIP_TABLE_VLAN_MAPPING;
+-	vlan_mapping.val[0] = 0 /* vid */;
++	vlan_mapping.val[0] = GSWIP_VLAN_UNAWARE_PVID;
+ 	vlan_mapping.val[1] = BIT(port) | dsa_cpu_ports(priv->ds);
+ 	vlan_mapping.val[2] = 0;
+ 	err = gswip_pce_table_entry_write(priv, &vlan_mapping);
+@@ -772,7 +772,8 @@ static int gswip_vlan_add_unaware(struct gswip_priv *priv,
+ 	 * entry in a free slot and prepare the VLAN mapping table entry.
+ 	 */
+ 	if (idx == -1) {
+-		idx = gswip_vlan_active_create(priv, bridge, -1, 0);
++		idx = gswip_vlan_active_create(priv, bridge, -1,
++					       GSWIP_VLAN_UNAWARE_PVID);
+ 		if (idx < 0)
+ 			return idx;
+ 		active_vlan_created = true;
+@@ -780,7 +781,7 @@ static int gswip_vlan_add_unaware(struct gswip_priv *priv,
+ 		vlan_mapping.index = idx;
+ 		vlan_mapping.table = GSWIP_TABLE_VLAN_MAPPING;
+ 		/* VLAN ID byte, maps to the VLAN ID of vlan active table */
+-		vlan_mapping.val[0] = 0;
++		vlan_mapping.val[0] = GSWIP_VLAN_UNAWARE_PVID;
+ 	} else {
+ 		/* Read the existing VLAN mapping entry from the switch */
+ 		vlan_mapping.index = idx;
+@@ -977,7 +978,8 @@ static void gswip_port_bridge_leave(struct dsa_switch *ds, int port,
+ 	 * specific bridges. No bridge is configured here.
+ 	 */
+ 	if (!br_vlan_enabled(br))
+-		gswip_vlan_remove(priv, br, port, 0, true, false);
++		gswip_vlan_remove(priv, br, port, GSWIP_VLAN_UNAWARE_PVID, true,
++				  false);
  }
  
- static int gswip_port_fdb(struct dsa_switch *ds, int port,
--			  const unsigned char *addr, u16 vid, bool add)
-+			  struct net_device *bridge, const unsigned char *addr,
-+			  u16 vid, bool add)
- {
--	struct net_device *bridge = dsa_port_bridge_dev_get(dsa_to_port(ds, port));
- 	struct gswip_priv *priv = ds->priv;
- 	struct gswip_pce_table_entry mac_bridge = {0,};
- 	unsigned int max_ports = priv->hw_info->max_ports;
-@@ -1150,10 +1150,6 @@ static int gswip_port_fdb(struct dsa_switch *ds, int port,
- 	int i;
- 	int err;
+ static int gswip_port_vlan_prepare(struct dsa_switch *ds, int port,
+diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
+index 2df9c8e8cfd0..6aae1ff2f130 100644
+--- a/drivers/net/dsa/lantiq/lantiq_gswip.h
++++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
+@@ -222,6 +222,8 @@
+  */
+ #define GSWIP_MAX_PACKET_LENGTH	2400
  
--	/* Operation not supported on the CPU port, don't throw errors */
--	if (!bridge)
--		return 0;
--
- 	for (i = max_ports; i < ARRAY_SIZE(priv->vlans); i++) {
- 		if (priv->vlans[i].bridge == bridge) {
- 			fid = priv->vlans[i].fid;
-@@ -1188,14 +1184,20 @@ static int gswip_port_fdb_add(struct dsa_switch *ds, int port,
- 			      const unsigned char *addr, u16 vid,
- 			      struct dsa_db db)
- {
--	return gswip_port_fdb(ds, port, addr, vid, true);
-+	if (db.type != DSA_DB_BRIDGE)
-+		return -EOPNOTSUPP;
++#define GSWIP_VLAN_UNAWARE_PVID	0
 +
-+	return gswip_port_fdb(ds, port, db.bridge.dev, addr, vid, true);
- }
- 
- static int gswip_port_fdb_del(struct dsa_switch *ds, int port,
- 			      const unsigned char *addr, u16 vid,
- 			      struct dsa_db db)
- {
--	return gswip_port_fdb(ds, port, addr, vid, false);
-+	if (db.type != DSA_DB_BRIDGE)
-+		return -EOPNOTSUPP;
-+
-+	return gswip_port_fdb(ds, port, db.bridge.dev, addr, vid, false);
- }
- 
- static int gswip_port_fdb_dump(struct dsa_switch *ds, int port,
+ struct gswip_pce_microcode {
+ 	u16 val_3;
+ 	u16 val_2;
 -- 
 2.51.0
 
