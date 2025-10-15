@@ -1,102 +1,112 @@
-Return-Path: <netdev+bounces-229648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26692BDF458
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:07:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07550BDF47F
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:09:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53EF73A8EF3
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:05:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB8A73A384B
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:07:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6AC82D6E74;
-	Wed, 15 Oct 2025 15:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FF926D4C2;
+	Wed, 15 Oct 2025 15:07:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aYGsImU3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="04hQz4eK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F33B2046BA;
-	Wed, 15 Oct 2025 15:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C9E17B50F;
+	Wed, 15 Oct 2025 15:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760540702; cv=none; b=QCOr22Dt9Gu8fyC2a+Vop28Ik5KmbWKnj21A1Al691Gi+2L0qZhBTZGSOR6K99Qv/RPovZueVPJfI/JpwyU922xANs+MC0BFBc2DLguLR8gJh1RT3HRM9deh6bmvCsXSkRELo1LFYREf/8aR/BOHTIRh+BJJEXeRL1NcZmA60fg=
+	t=1760540821; cv=none; b=cYRuelq83WJW6kJBS7fxyU0GAn8cIzLfdJHusEt6KG8ab4bDdww+LgZwZdHzEfW2oQP2z13KHp4flIrI/dZuLIiMunpxjbRp3O2yPyieGDg8jevFv/UK8X7tmrOaFG5yFh9Vm4VChKXf4PGJRNY/WDbshUdleEOTuNha2TTlyPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760540702; c=relaxed/simple;
-	bh=Wdbu91UHG7NXXe6k08cBk3T/+pvUqlyl9VvW3phwgNc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZcUN7JG+uA06W536WkbobNGVp6FD9q4dMVetKp+WFbc4Sju1Uk++AadgP5iCrr9JjpmofIakMi3sg4cP1hkHAG130FfveH710CmflnkfzVlZQFB+isHGvml5CxgRMHNCMVSkABCsEYxBVyFBdueHgnYBHVq/huvIQRAM2QvOXTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aYGsImU3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 842CFC4CEF8;
-	Wed, 15 Oct 2025 15:05:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760540701;
-	bh=Wdbu91UHG7NXXe6k08cBk3T/+pvUqlyl9VvW3phwgNc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aYGsImU3Per5JLsRWKEDgSU53GVias3oxkv3lcMOJyTF2/c5lzyw2mtJxaYSCavuH
-	 wbaCEkmbUtHKcgzV8+Rd9HkAU542mDJJNLVv7ZLIwh7hHX65uxF02j6/qf+HBCWCr5
-	 a3SDnYLcIaJLj3CG8shPVh1uDD9PGHxB0uwfo6dsz01FKRPCdWlYOJ5Fr2Ur+oEy8m
-	 HzxrY4ov7Z1kbMBdW2sPJBcEDJVajDnhRpxhR69uKn2pllOAh6ktBWAQvIYb8QmygG
-	 i9hUEjmhdzalFSGO5bNoADPFDFBTlJjew3xdACovDj0EokV3my/h3MUgQn0EZN/yiO
-	 mzmbfLOBm1LVw==
-Date: Wed, 15 Oct 2025 08:04:59 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?0K/QvdCwINCR0LDRiNC70YvQutC+0LLQsA==?= <yana2bsh@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer
- Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Nathan
- Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>,
- Tom Rix <trix@redhat.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-riscv@lists.infradead.org, bpf@vger.kernel.org, llvm@lists.linux.dev,
- lvc-project@linuxtesting.org
-Subject: Re: [PATCH 6.1 00/15] genetlink: Test Netlink subsystem of Linux
- v6.1
-Message-ID: <20251015080459.6e681582@kernel.org>
-In-Reply-To: <CAEP49o+-=HeW4NgB5a0H6gM9tPJg=oNeUA1iCbXq_1qZPPaGnA@mail.gmail.com>
-References: <20250912195339.20635-1-yana2bsh@gmail.com>
-	<20250912131722.74658ec0@kernel.org>
-	<CAEP49o+-=HeW4NgB5a0H6gM9tPJg=oNeUA1iCbXq_1qZPPaGnA@mail.gmail.com>
+	s=arc-20240116; t=1760540821; c=relaxed/simple;
+	bh=paHTQ7+eFNh+tQ69LcRC1uClOsSq9bwcalYHiasb8S8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X2wYhcx9bUvLTUYVrQL7vSRu4uZUzAiisvuA8MiiHhhg+OdmogtBvbTeMdn7oWzx9xIbNR1O5TQ7qD/jd86NxcBNQacymNZY16LvNZnfJ2kh/O2xZ5hRIolSt/wk8GfDrUjP+JRz/d3IzPeAezkXjhKE6j3vG2KiSY1ZRbncHh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=04hQz4eK; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=i8WH71db750jps9WxI3z1NEUJwkE3VXRhtPG7iUgTWY=; b=04hQz4eK43+AW/wKb5wdQbpX7W
+	9qjxEPcOHoILOsxV1PI8IytNEk84VUOiE3we1jZwRHbOWnulNKUJp706hKrMypx3oAeFgwVnxQJp1
+	7NcBfL3w49o/pLRiGOLUQIQ/mWRC0KCTP8+VfDs1dsu+lXWJju+rDn+BWTwR/+t0mRP2hDyld2Iy+
+	Y+3njCB/O24OWRDwUd5m5IiCMsrA2qo8dBfgqnXLAfyzO2XLKOXq0hFkLwNxW1dEVY+Dz3X9mnDRT
+	2VTa9nPxpngzLSATgjGK+7eSuRfEQT3c4w5Fc5pxwzaBcGyASUd1jlsNEB+d8MwZ634P3VQG8TnLz
+	W4C0Q8HQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37834)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v935W-000000004wH-29yk;
+	Wed, 15 Oct 2025 16:06:50 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v935S-000000002Le-3AO4;
+	Wed, 15 Oct 2025 16:06:46 +0100
+Date: Wed, 15 Oct 2025 16:06:46 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] net: stmmac: Move subsecond increment
+ configuration in dedicated helper
+Message-ID: <aO-4hnUINpQ0JORE@shell.armlinux.org.uk>
+References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
+ <20251015102725.1297985-2-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251015102725.1297985-2-maxime.chevallier@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, 15 Oct 2025 17:49:22 +0300 =D0=AF=D0=BD=D0=B0 =D0=91=D0=B0=D1=88=D0=
-=BB=D1=8B=D0=BA=D0=BE=D0=B2=D0=B0 wrote:
-> The motivation for this work is to improve the test coverage and
-> reliability of the Netlink subsystem, specifically for the core
-> af_netlink.c and genetlink.c components. While the subsystem is
-> critical for kernel-userspace communication, its coverage by the
-> existing selftests is quite limited.
->=20
-> To quantify the improvement, these new selftests achieve the following
-> line coverage (as measured by gcov):
-> - net/netlink/af_netlink.c: 84.0%
-> - net/netlink/genetlink.c: 88.8%
+On Wed, Oct 15, 2025 at 12:27:21PM +0200, Maxime Chevallier wrote:
+> +static void stmmac_update_subsecond_increment(struct stmmac_priv *priv)
+> +{
+> +	bool xmac = priv->plat->has_gmac4 || priv->plat->has_xgmac;
 
-For what it's worth syzbot has:
+Just to say that I have patches that get rid of these has_xxx flags for
+the cores, and these changes (and the additional platform glue patches
+that have been posted) will conflict with them.
 
-    af_netlink.c  91%
-    genetlink.c   68%
+Given the rate of change in stmmac, at some point we're going to have
+to work out some way of stopping stmmac development to get such an
+invasive cleanup change merged - but with my variability and pressures
+on the time I can spend even submitting patches, I've no idea how that
+will work... I was going to send them right at the start of this
+cycle, but various appointments on Monday and Tuesday this week plus
+work pressures prevented that happening.
 
-Without a line of code added to the kernel. Of course it's not
-functional testing.
+So, I decided instead to send out the first stmmac PCS series... which
+means I now need to wait for that to be merged before I can think about
+sending out anything else stmmac-related. (and there's more PCS patches
+to come beyond the 14 I sent today.)
 
-> Integrating these tests into the upstream suite will provide long-term
-> stability and make it safer to refactor or add new features to the
-> Netlink core in the future.
-
-Happy to hear from others if they disagree but what kernel tests get
-merged into the tree is pretty subjective. Do we have a lot of bugs=20
-in genetlink? Are you planning to do major development in this area
-and want to catch regressions? If the answers to both of those questions
-is "no" IMHO this 7kLoC is not worth carrying in the tree.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
