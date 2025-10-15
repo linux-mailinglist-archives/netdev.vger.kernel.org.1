@@ -1,224 +1,229 @@
-Return-Path: <netdev+bounces-229774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E19AEBE0AB3
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:41:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37794BE0ADA
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BDBE44E5C94
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 20:41:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80EC01A219B8
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 20:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8583090FD;
-	Wed, 15 Oct 2025 20:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49382C11F9;
+	Wed, 15 Oct 2025 20:45:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lqAhSq63"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xZiJDm8G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B190303C97
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 20:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50ECA134CB;
+	Wed, 15 Oct 2025 20:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760560886; cv=none; b=sCsmtZitxHHDw3sgPF0tOpnwjSCRL2qu7fGY3Hk5YKqcVvjHPUsbzAdnevRpdJHk85u2yHI23meFH+kHOqRuOHV4olKHVD3TKZZqMJbgXLnup2iXI48hbBqOWFfYfOjTJVwC89bC9JBv8KA27rBVh7wweIk3WbO42R4PAiv+01c=
+	t=1760561110; cv=none; b=KcXdyO6FtREupNUVZ4EUzi82uniYbptq9iIFx4hZO0eHEz1g2HJf9Bc8usY0ZDgMnCU1UG1Yuq7D6u/WTVMnsOO5Y+oPBG2FQvHtRdXbs5EVAJrS64cqZ9R1cEBGBPd2dhrEHtyHU/uzPhLhprc6J3/h0JtYBeIRCeBL5zk1WZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760560886; c=relaxed/simple;
-	bh=TO62kgHWAJogfqthzQuEdhjyqSf0Knw+0u56RFKCWLA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=enu5mq5Q6qunDEapQYWu7uaLEr4uaS2mjq57Y9H1+YRexpMRv2Qk4+tA85G54uBflCY9nOMCSQDZDFhVaRWUlqxEeSiuBv5MCFSYfsXQ+wcovtSYuvgNxxTdTxfAb/1czJbgPLT83smcAOoBXCvR0oK4qUDhdmP7b+Tkn5RhAuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lqAhSq63; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-631df7b2dffso3240906a12.1
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 13:41:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760560883; x=1761165683; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x4SkHnSxaTY1A0hm6Dgf/9uSLFR76gbsoH7lLnef4XM=;
-        b=lqAhSq63bYQ3yZeHYZ/UfaN2cSYM083VsgyBMdXdoSzo29raRd6Dvtqp7E2CrTC3Vm
-         oPVqhJD4SZQZhc7LXJF1u81GOt6vI8GJN6QVkUnAWD53NcgI29QedZlbECL5kyCySAOL
-         aCmFmg/QGIIM0sy/UzadyF9M3Wr9IuMT+ynyD0YOJ++H3nimDPau+NDfnvwc8wDTp3hk
-         x8IYdzx+rgfA3CTS0UzTzmecu36NocmOJonWT8e+nfFC7XeH8199uZsLgvQ7e6KcbRT4
-         BkSrrgTI4O++v+aHu5zWvt1ie5La4+Og7seNYTj/Nk5z9Zp9cW8/7TWL0jzzaVUSD+Fx
-         BjHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760560883; x=1761165683;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x4SkHnSxaTY1A0hm6Dgf/9uSLFR76gbsoH7lLnef4XM=;
-        b=Dj/i+Js7NFSwwkZ2e9rNFv3OVYucMdWpNiLezRjzpyT3t3ND3MoGCOYRtx/WPgURta
-         HF2pNTbXTQlsaGIBxlv8Xld1Ocyijnk/G8dtHpZ6p2Y/nWV+/OOgWQ0ExxriiZpr1HY2
-         lKC+3SIYc8tPatOf0ePJ4QiFJQlVxZf5JXcgGx/wlMW18IZ4GK6UMcBQngPRljjqxxwe
-         wY0/Px+3nggWHyFtDm3yGNzy05acUG1OCf9HRFEKZKKh5wIikFKtrDD4s6IRs8x4Z3RA
-         HRLXYdTrMfOZzb80ZSgt2VaZDtpzEyo+JDXviZMjfaCcHBHWRsn53BZa7MN9fBm/kS0W
-         mSuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXFZA4dHSOVpc5bk0pZcpVKWWbJDRbS1mx3StW/UYh2BSEqWv59wulZc6S+E+TUBniSMx9T25E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmFwUOFFcbPtG7ywW8VeWtka+uNQDhwC3YDDqky2bFttKWRS66
-	BhZpl/TznLkRal5sfGHDx+vEx+Fxq0btrxBRe5I4LCJJ3o9xc317PCpzABZXIH9sZkpNyrw8Tj8
-	zYHODtefRAqHs7KYu6AmJ5BDvAq993wZ3gStbamQQ
-X-Gm-Gg: ASbGnctrwZ8MXNOIc45k0i9l/a8nP32rhJB3JIkFJdQI2DbR5PdsDfrvkq3oMtq4Muf
-	/CYIpTVf9aKf/pb1kDx58NYMO40w3vzmX8Qwpv3AqsmQunulq9Olp3qXauZlu1zc4T8NVS5xFq4
-	KwMtDoQOjo1Erpj5QZ9mFNJyrWYM66On0BttzSL+GK7c243+sWfBNtG3FjfcU+C1ok2N9qwEIIP
-	7mXPI8I+LmMpYmAU4iOtw1ftRoO6ZY1+sdjvnyeGgEYHDhLwKMBEQVoX+1hP0s=
-X-Google-Smtp-Source: AGHT+IEyIxFaGj5K0QoKX1UlKomoKcT+vrcyw05X0GgkG4XlTuFiMLuSu0Z3D0b7QJBSsC9LXmWhsW3j6bf7UAc7IMk=
-X-Received: by 2002:a05:6402:8cb:b0:634:9acf:f33f with SMTP id
- 4fb4d7f45d1cf-63bfde982b0mr1073168a12.16.1760560882454; Wed, 15 Oct 2025
- 13:41:22 -0700 (PDT)
+	s=arc-20240116; t=1760561110; c=relaxed/simple;
+	bh=Iq2BotJ/9tDHq+cw5nKriSOWuVBVhxvAUcr1x5nMkqk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XUW5yw4EQOeVFKqYiyOccjzaq79HKgIcT0tUM+J+gd+drv+JPDRMGUMaCBZaeNVm15TIiwI3i92XHOYuXPoiZ5Nic1osFRHtKke6jbqlinBbKpk72LapA05gFdBUSg1FgdCuMXEkfeS1V0wGudc8kzMQNAcE5LmzXx/QEqT7MHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xZiJDm8G; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=V4qHh0SKCML66MNRzOdx5c40VzjCCEykcjU71IxLqCM=; b=xZiJDm8GSZk7IPE6k2ZlvGYy09
+	2vvPl1kjspU6dp7WSofd+ttfV/tOvvkYU0hleUAzhJnG4MdCF1qKYKhlnRWxZPpp21fQz70SLMpD6
+	aoTstzQjDMnFX7EdJNElHgwAfEhll5o+xAOQdNgxV7jcAj0HycPphyzyIpxLIcsAFy4I=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v98MJ-00B4XL-DQ; Wed, 15 Oct 2025 22:44:31 +0200
+Date: Wed, 15 Oct 2025 22:44:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Abhishek Chauhan <quic_abchauha@quicinc.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexis Lothore <alexis.lothore@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Drew Fustini <dfustini@tenstorrent.com>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
+	Furong Xu <0x1207@gmail.com>, Inochi Amaoto <inochiama@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+	Jisheng Zhang <jszhang@kernel.org>, Kees Cook <kees@kernel.org>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthew Gerlach <matthew.gerlach@altera.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rohan G Thomas <rohan.g.thomas@altera.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Simon Horman <horms@kernel.org>,
+	Song Yoong Siang <yoong.siang.song@intel.com>,
+	Swathi K S <swathi.ks@samsung.com>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>, Vinod Koul <vkoul@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH net-next 01/14] net: stmmac: remove broken PCS code
+Message-ID: <26d9cccd-2351-483f-a417-03d484fd25a4@lunn.ch>
+References: <aO-tbQCVu47R3izM@shell.armlinux.org.uk>
+ <E1v92ME-0000000AmGD-1VsS@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251014235604.3057003-1-kuniyu@google.com> <20251014235604.3057003-7-kuniyu@google.com>
- <fa80d5a7-790d-4f10-bef3-f5c708218f83@linux.dev>
-In-Reply-To: <fa80d5a7-790d-4f10-bef3-f5c708218f83@linux.dev>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 15 Oct 2025 13:41:09 -0700
-X-Gm-Features: AS18NWDyZRhG6Af-rwDk7wCdbtSwcuv6uguz17phGgky8w6XA8MQHqsYXcH-7qw
-Message-ID: <CAAVpQUB_ME3bteNW07gCz-Ao3jZ7HzsLY9FiSy9TWecF7LiUOQ@mail.gmail.com>
-Subject: Re: [PATCH v2 bpf-next/net 6/6] selftest: bpf: Add test for sk->sk_bypass_prot_mem.
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Mina Almasry <almasrymina@google.com>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1v92ME-0000000AmGD-1VsS@rmk-PC.armlinux.org.uk>
 
-On Wed, Oct 15, 2025 at 12:07=E2=80=AFPM Martin KaFai Lau <martin.lau@linux=
-.dev> wrote:
->
-> On 10/14/25 4:54 PM, Kuniyuki Iwashima wrote:
-> > +static int tcp_create_sockets(struct test_case *test_case, int sk[], i=
-nt len)
-> > +{
-> > +     int server, i, err =3D 0;
-> > +
-> > +     server =3D start_server(test_case->family, test_case->type, NULL,=
- 0, 0);
-> > +     if (!ASSERT_GE(server, 0, "start_server_str"))
-> > +             return server;
-> > +
-> > +     /* Keep for-loop so we can change NR_SOCKETS easily. */
-> > +     for (i =3D 0; i < len; i +=3D 2) {
-> > +             sk[i] =3D connect_to_fd(server, 0);
-> > +             if (sk[i] < 0) {
-> > +                     ASSERT_GE(sk[i], 0, "connect_to_fd");
-> > +                     err =3D sk[i];
-> > +                     break;
-> > +             }
-> > +
-> > +             sk[i + 1] =3D accept(server, NULL, NULL);
-> > +             if (sk[i + 1] < 0) {
-> > +                     ASSERT_GE(sk[i + 1], 0, "accept");
-> > +                     err =3D sk[i + 1];
-> > +                     break;
-> > +             }
-> > +     }
-> > +
-> > +     close(server);
-> > +
-> > +     return err;
-> > +}
-> > +
->
-> > +static int check_bypass(struct test_case *test_case,
-> > +                     struct sk_bypass_prot_mem *skel, bool bypass)
-> > +{
-> > +     char buf[BUF_SINGLE] =3D {};
-> > +     long memory_allocated[2];
-> > +     int sk[NR_SOCKETS] =3D {};
-> > +     int err, i, j;
-> > +
-> > +     err =3D test_case->create_sockets(test_case, sk, ARRAY_SIZE(sk));
-> > +     if (err)
-> > +             goto close;
-> > +
-> > +     memory_allocated[0] =3D test_case->get_memory_allocated(test_case=
-, skel);
-> > +
-> > +     /* allocate pages >=3D NR_PAGES */
-> > +     for (i =3D 0; i < ARRAY_SIZE(sk); i++) {
-> > +             for (j =3D 0; j < NR_SEND; j++) {
-> > +                     int bytes =3D send(sk[i], buf, sizeof(buf), 0);
-> > +
-> > +                     /* Avoid too noisy logs when something failed. */
-> > +                     if (bytes !=3D sizeof(buf)) {
-> > +                             ASSERT_EQ(bytes, sizeof(buf), "send");
-> > +                             if (bytes < 0) {
-> > +                                     err =3D bytes;
-> > +                                     goto drain;
-> > +                             }
-> > +                     }
-> > +             }
-> > +     }
-> > +
-> > +     memory_allocated[1] =3D test_case->get_memory_allocated(test_case=
-, skel);
-> > +
-> > +     if (bypass)
-> > +             ASSERT_LE(memory_allocated[1], memory_allocated[0] + 10, =
-"bypass");
-> > +     else
-> > +             ASSERT_GT(memory_allocated[1], memory_allocated[0] + NR_P=
-AGES, "no bypass");
-> > +
-> > +drain:
-> > +     if (test_case->type =3D=3D SOCK_DGRAM) {
-> > +             /* UDP starts purging sk->sk_receive_queue after one RCU
-> > +              * grace period, then udp_memory_allocated goes down,
-> > +              * so drain the queue before close().
-> > +              */
-> > +             for (i =3D 0; i < ARRAY_SIZE(sk); i++) {
-> > +                     for (j =3D 0; j < NR_SEND; j++) {
-> > +                             int bytes =3D recv(sk[i], buf, 1, MSG_DON=
-TWAIT | MSG_TRUNC);
-> > +
-> > +                             if (bytes =3D=3D sizeof(buf))
-> > +                                     continue;
-> > +                             if (bytes !=3D -1 || errno !=3D EAGAIN)
-> > +                                     PRINT_FAIL("bytes: %d, errno: %s\=
-n", bytes, strerror(errno));
-> > +                             break;
-> > +                     }
-> > +             }
-> > +     }
-> > +
-> > +close:
-> > +     for (i =3D 0; i < ARRAY_SIZE(sk); i++) {
-> > +             if (sk[i] <=3D 0)
->
-> Theoretically, 0 is a legit fd. The tcp_create_sockets above is also test=
-ing
-> ASSERT_GE(sk[i], 0, ...). I changed to test "< 0" here and initialize all=
- sk[]
-> to -1 at the beginning of this function.
->
-> > +                     break;
-> > +
-> > +             close(sk[i]);
-> > +     }
-> > +
-> > +     return err;
-> > +}
-> > +
->
->
-> > +struct test_case test_cases[] =3D {
->
-> Added static.
->
-> Applied. Thanks.
+On Wed, Oct 15, 2025 at 03:20:02PM +0100, Russell King (Oracle) wrote:
+> Changing the netif_carrier_*() state behind phylink's back has always
+> been prohibited because it messes up with phylinks state tracking, and
+> means that phylink no longer guarantees to call the mac_link_down()
+> and mac_link_up() methods at the appropriate times.  This was later
+> documented in the sfp-phylink network driver conversion guide.
+> 
+> stmmac was converted to phylink in 2019, but nothing was done with the
+> "PCS" code. Since then, apart from the updates as part of phylink
+> development, nothing has happened with stmmac to improve its use of
+> phylink, or even to address this point.
+> 
+> A couple of years ago, a has_integrated_pcs boolean was added by Bart,
+> which later became the STMMAC_FLAG_HAS_INTEGRATED_PCS flag, to avoid
+> manipulating the netif_carrier_*() state. This flag is mis-named,
+> because whenever the stmmac is synthesized for its native SGMII, TBI
+> or RTBI interfaces, it has an "integrated PCS". This boolean/flag
+> actually means "ignore the status from the integrated PCS".
+> 
+> Discussing with Bart, the reasons for this are lost to the winds of
+> time (which is why we should always document the reasons in the commit
+> message.)
+> 
+> RGMII also has in-band status, and the dwmac cores and stmmac code
+> supports this but with one bug that saves the day.
+> 
+> When dwmac cores are synthesised for RGMII only, they do not contain
+> an integrated PCS, and so priv->dma_cap.pcs is clear, which prevents
+> (incorrectly) the "RGMII PCS" being used, meaning we don't read the
+> in-band status. However, a core synthesised for RGMII and also SGMII,
+> TBI or RTBI will have this capability bit set, thus making these
+> code paths reachable.
+> 
+> The Jetson Xavier NX uses RGMII mode to talk to its PHY, and removing
+> the incorrect check for priv->dma_cap.pcs reveals the theortical issue
+> with netif_carrier_*() manipulation is real:
+> 
+> dwc-eth-dwmac 2490000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
+> dwc-eth-dwmac 2490000.ethernet eth0: PHY [stmmac-0:00] driver [RTL8211F Gigabit Ethernet] (irq=141)
+> dwc-eth-dwmac 2490000.ethernet eth0: No Safety Features support found
+> dwc-eth-dwmac 2490000.ethernet eth0: IEEE 1588-2008 Advanced Timestamp supported
+> dwc-eth-dwmac 2490000.ethernet eth0: registered PTP clock
+> dwc-eth-dwmac 2490000.ethernet eth0: configuring for phy/rgmii-id link mode
+> 8021q: adding VLAN 0 to HW filter on device eth0
+> dwc-eth-dwmac 2490000.ethernet eth0: Adding VLAN ID 0 is not supported
+> Link is Up - 1000/Full
+> Link is Down
+> Link is Up - 1000/Full
+> 
+> This looks good until one realises that the phylink "Link" status
+> messages are missing, even when the RJ45 cable is reconnected. Nothing
+> one can do results in the interface working. The interrupt handler
+> (which prints those "Link is" messages) always wins over phylink's
+> resolve worker, meaning phylink never calls the mac_link_up() nor
+> mac_link_down() methods.
+> 
+> eth0 also sees no traffic received, and is unable to obtain a DHCP
+> address:
+> 
+> 3: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group defa
+> ult qlen 1000
+>     link/ether e6:d3:6a:e6:92:de brd ff:ff:ff:ff:ff:ff
+>     RX: bytes  packets  errors  dropped overrun mcast
+>     0          0        0       0       0       0
+>     TX: bytes  packets  errors  dropped carrier collsns
+>     27686      149      0       0       0       0
+> 
+> With the STMMAC_FLAG_HAS_INTEGRATED_PCS flag set, which disables the
+> netif_carrier_*() manipulation then stmmac works normally:
+> 
+> dwc-eth-dwmac 2490000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
+> dwc-eth-dwmac 2490000.ethernet eth0: PHY [stmmac-0:00] driver [RTL8211F Gigabit Ethernet] (irq=141)
+> dwc-eth-dwmac 2490000.ethernet eth0: No Safety Features support found
+> dwc-eth-dwmac 2490000.ethernet eth0: IEEE 1588-2008 Advanced Timestamp supported
+> dwc-eth-dwmac 2490000.ethernet eth0: registered PTP clock
+> dwc-eth-dwmac 2490000.ethernet eth0: configuring for phy/rgmii-id link mode
+> 8021q: adding VLAN 0 to HW filter on device eth0
+> dwc-eth-dwmac 2490000.ethernet eth0: Adding VLAN ID 0 is not supported
+> Link is Up - 1000/Full
+> dwc-eth-dwmac 2490000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx
+> 
+> and packets can be transferred.
+> 
+> This clearly shows that when priv->hw->pcs is set, but
+> STMMAC_FLAG_HAS_INTEGRATED_PCS is clear, the driver reliably fails.
+> 
+> Discovering whether a platform falls into this is impossible as
+> parsing all the dtsi and dts files to find out which use the stmmac
+> driver, whether any of them use RGMII or SGMII and also depends
+> whether an external interface is being used. The kernel likely
+> doesn't contain all dts files either.
+> 
+> The only driver that sets this flag uses the qcom,sa8775p-ethqos
+> compatible, and uses SGMII or 2500BASE-X.
+> 
+> but these are saved from this problem by the incorrect check for
+> priv->dma_cap.pcs.
+> 
+> So, we have to assume that for every other platform that uses SGMII
+> with stmmac is using an external PCS.
+> 
+> Moreover, ethtool output can be incorrect. With the full-duplex link
+> negotiated, ethtool reports:
+> 
+>         Speed: 1000Mb/s
+>         Duplex: Half
+> 
+> because with dwmac4, the full-duplex bit is in bit 16 of the status,
+> priv->xstats.pcs_duplex becomes BIT(16) for full duplex, but the
+> ethtool ksettings duplex member is u8 - so becomes zero. Moreover,
+> the supported, advertised and link partner modes are all "not
+> reported".
+> 
+> Finally, ksettings_set() won't be able to set the advertisement on
+> a PHY if this PCS code is activated, which is incorrect when SGMII
+> is used with a PHY.
+> 
+> Thus, remove:
+> 1. the incorrect netif_carrier_*() manipulation.
+> 2. the broken ethtool ksettings code.
+> 
+> Given that all uses of STMMAC_FLAG_HAS_INTEGRATED_PCS are now gone,
+> remove the flag from stmmac.h and dwmac-qcom-ethqos.c.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Thank you for fixups, Martin !
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
