@@ -1,136 +1,139 @@
-Return-Path: <netdev+bounces-229820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97A8DBE10DC
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 01:43:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 85502BE10E8
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 01:56:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22CEE18913A7
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 23:44:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06CA719C63FA
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 23:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F384316905;
-	Wed, 15 Oct 2025 23:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B6D1F91E3;
+	Wed, 15 Oct 2025 23:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K3tgJbwu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EmNo3KLc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C856E1E285A;
-	Wed, 15 Oct 2025 23:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB6D239562
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 23:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760571834; cv=none; b=lOE/r/JyOHzOJV2nxbX4F983cMGoGJAWd8Qkk61oamXajs1Ynd/3D28jDr5y0SBtLKe1h1baGVIQi06wtn2gUSpKUM0pL+GZTaJDNJ879UhyhXrSz/qf6OHyLuLyR5C3gM/D2RO3/InbdefSPlcdnOaIWXB4/tNXsgfP+vf1o1Q=
+	t=1760572608; cv=none; b=r1I5Py/Xz8Is9L8hsOdeNB44fyI1JRJomWm+c5cMo75siFQvNjlQrCeJa5Oi0PbNYH2ElsZZaZ1A5+hg+AKk+OJpOjN3tFAtl01P4fD4mOs1J14VY/7nuDZ5cW8kwXFaRrFPxYY5I38BxexTUi2yG6GVyIdC0UFwrgEFh2Zm1Bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760571834; c=relaxed/simple;
-	bh=0xdTqDw9WUR1MHTE6JTRUHIGJ2mKZvvcYBTUUih42x4=;
+	s=arc-20240116; t=1760572608; c=relaxed/simple;
+	bh=VrdjKA95pfJlziaCm9nOUEwTPMyNUSWxkOAgrsJdVf0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yw/rLc1yemoSFFcnVjuO7L7SyV8Ed4wzFzgdqrx1dygaKr31X/Q10c89wF2fZBLuiqtDbvYZJl585VKD6i5ohioEIbGPwQjOckWeBOD29Zs11IerYQqBF4ieIka0UzfuS/y0pyMkAPJbXR7VWGYf5qwIhIKf87v7h/tqmdljQOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K3tgJbwu; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760571832; x=1792107832;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0xdTqDw9WUR1MHTE6JTRUHIGJ2mKZvvcYBTUUih42x4=;
-  b=K3tgJbwuU+EHnJwLDXudQqYISdk1LcmvH781B8it6NJMcaX7+FiHq0LI
-   CyGYNUE+Fms9h1uqj2smU2OMB3OgNnEBXdgedZjiNYFHjWULTDL3vNCAk
-   kTnVMxrctN+BrhUHtnitYP+OF9aotBJRCimVN5Npqt0sRhAZdFRLUbv03
-   qd5N2jBlCrUwtjENCOhKgBSPGNTygwMWeZ5STqYEkGTibpQjgY4Dd88AW
-   gimF8kd7yfqWkNTeQ85H+IBAlkU52xL1ZDC6PM4VpeD3dhcJLXc2UvSIl
-   tc42gUxBuZ8dsjZ85j2Cc8eXgdKR7QJKVb3fnBDkYmpwP5JjUse53Rq9e
-   g==;
-X-CSE-ConnectionGUID: Hpyh25SQS1yRcA3/ye6QQQ==
-X-CSE-MsgGUID: jieR0m0fTjOSMbb1ijqDEA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="74204108"
-X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
-   d="scan'208";a="74204108"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 16:43:52 -0700
-X-CSE-ConnectionGUID: Hso+wECATpWtOfTbPJ+EBQ==
-X-CSE-MsgGUID: NhZgz1k0SL+mUJXovZND2w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
-   d="scan'208";a="181853552"
-Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
-  by orviesa009.jf.intel.com with ESMTP; 15 Oct 2025 16:43:48 -0700
-Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1v9B9g-0004Id-38;
-	Wed, 15 Oct 2025 23:43:42 +0000
-Date: Thu, 16 Oct 2025 07:43:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Lizhe <sensor1010@163.com>, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk, jonas@kwiboo.se,
-	chaoyi.chen@rock-chips.com, david.wu@rock-chips.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Lizhe <sensor1010@163.com>
-Subject: Re: [PATCH net-next] net: dwmac-rk: No need to check the return
- value of the phy_power_on()
-Message-ID: <202510160726.OejMgsW0-lkp@intel.com>
-References: <20251015040847.6421-1-sensor1010@163.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=F2uMzdSltgGSL8RS+3zVca6LWTb64ts3SCfrLIPPif/G6tYDJCAVICuQkEXj2uJ8jaTYe53JcKhjH3kyXVYFt63w2ezgtHdl5HzQr9FtsBvPlYiKeAD1FkCx4ZXV/6F6VsYB+A4HoFW35k2tficax1A4OsI9QzbC/HPmLHpq8zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EmNo3KLc; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-28832ad6f64so1637545ad.1
+        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 16:56:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760572606; x=1761177406; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VrdjKA95pfJlziaCm9nOUEwTPMyNUSWxkOAgrsJdVf0=;
+        b=EmNo3KLchX5BOKY+Gug74htQ8237XXTPl3MyGg0kEITSNrVU8h1+FLzUn28cRCsDPA
+         llyHcg+S7CNE7CkiQHold5YA/XgVMZmYq1sIB+nIcBrEtFlnTI5bLbFPQa4a7yTOiZno
+         9eAQLi/pTtJRsshVJ262jo7eCXIWorVjq6ADgz0EejBNAko1bw8mztDFN2kvdmFal2Ub
+         8fgIYZGor3QsKXjOsrbL5/Hllp/ttwSCO+pv2ImM+sGSRI24e0GouTxd/VEqZiQf9DUh
+         Ie6DG8CZ+cehNFLnIRPmYVMVOV4NsS8Vg35M4BxtOSq6eyxvMf37h5ilaE11pSOpO+xM
+         bF9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760572606; x=1761177406;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VrdjKA95pfJlziaCm9nOUEwTPMyNUSWxkOAgrsJdVf0=;
+        b=vBT8q2vehIbejquyhKSuPOFHFYDO1PIInpt2DTwZfl8i0h6lK7aX0vX/Fu+u3RoOEd
+         PHVwZgJYaZ+Glw8YB1y3oUOJGgcrTBQd3tA34f2r2CSrCGVB1AU+pHoqQfL8NyUiY5tV
+         nC9yA06L7x6kPABKz0g3dqJrTVOS2Uswp43zJwdY+TfC7jSDPnv1jKvaMdPAKaehfP8O
+         DUyPydB7DebIoCo/y0JdcwJMb5Vy3T9h+jGgv6lJtFIdKs3WJwewg4fsRpFD3/2uk2Vp
+         zAjmBPdD+2TGP9GeWZFykTFaXKzfO0hvG5BZFh8fiCSlEbr2f/aawbsbAxo1AJGSfCdJ
+         tvlA==
+X-Forwarded-Encrypted: i=1; AJvYcCX101/97p/5Sp8LOp58LetBa0TG6sdzotb2FgY7Vi3azQT4m5PEUxiUov4vOzhDLTFgLvukIiM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2qMkFGj+hCGHlNwGxnrevrU9Ot0syGiP+i9++lwYNa9KiVhnN
+	MZqMsp+GzUVV3Pv/jcSINp0unQRciYbyGAnOqUtAU/qTLfdCY5ycZibT
+X-Gm-Gg: ASbGncv+yBKOHt6DDTTi927ARGOHOVgn+oG1vtY3QNi8pwv0GhzHJyyY3W/BpKd9uy8
+	R/tvrypYU6vr4xgQqYq8z7g3lcy4A3+6A+V224/0Za9OLnT9SFH28RCDArvR3UQX9gLSEtwlORB
+	nokqZwWMdIkEN6qUOorRaPd1bepKWRSzhzXbQROnTiGcDR95js6nzWqC0ehNoCLdGkfUnrPf/cw
+	tySmhSUMXkwVoyaH9V6n+vvsei+GrxswPB6iMSaNzPstQjoo/7AaUcDbCaaEV7PJfAmfevnQCZG
+	KDdyC+VSOfeqzhFkWivNl24IKqNYpLo47x03MDcYmnbNNMpNRlNVAmCpcwpPVg+odXlI0AP48qQ
+	d6m1i2Al2Fvi00rBKK8GTBdXGM+E4CxiLL2pbr/a60SivESZMGu+vAqPwCPd3kY8GESvFqQktt3
+	XZC4iXdyJZoszPbYjx3/lF3x2o
+X-Google-Smtp-Source: AGHT+IGSJiLb5NMgZSUQODUANG+2COIewb92cwb9YvRlW3gs67WecUf+O5HmxRj2ud/Z7M+Voe3WDQ==
+X-Received: by 2002:a17:902:cf41:b0:267:776b:a315 with SMTP id d9443c01a7336-290272c2019mr363652655ad.32.1760572605763;
+        Wed, 15 Oct 2025 16:56:45 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33b97878b03sm3872453a91.16.2025.10.15.16.56.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Oct 2025 16:56:44 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 27E53419B28D; Thu, 16 Oct 2025 06:56:42 +0700 (WIB)
+Date: Thu, 16 Oct 2025 06:56:41 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Vasudev Kamath <vasudev@copyninja.info>,
+	Krishna Kumar <krikku@gmail.com>
+Subject: Re: [PATCH net] Documentation: net: net_failover: Separate
+ cloud-ifupdown-helper and reattach-vf.sh code blocks marker
+Message-ID: <aPA0ucheaqqhuUqb@archie.me>
+References: <20251015094502.35854-2-bagasdotme@gmail.com>
+ <aO_OPBukiAjmO43g@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pwZlaeVNL9Fp5cUU"
 Content-Disposition: inline
-In-Reply-To: <20251015040847.6421-1-sensor1010@163.com>
-
-Hi Lizhe,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Lizhe/net-dwmac-rk-No-need-to-check-the-return-value-of-the-phy_power_on/20251015-121214
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20251015040847.6421-1-sensor1010%40163.com
-patch subject: [PATCH net-next] net: dwmac-rk: No need to check the return value of the phy_power_on()
-config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20251016/202510160726.OejMgsW0-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251016/202510160726.OejMgsW0-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202510160726.OejMgsW0-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c: In function 'rk_gmac_powerdown':
->> drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c:1670:9: error: implicit declaration of function 'phy_power_on'; did you mean 'rk_phy_power_on'? [-Wimplicit-function-declaration]
-    1670 |         phy_power_on(gmac, false);
-         |         ^~~~~~~~~~~~
-         |         rk_phy_power_on
+In-Reply-To: <aO_OPBukiAjmO43g@horms.kernel.org>
 
 
-vim +1670 drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+--pwZlaeVNL9Fp5cUU
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-7ad269ea1a2b7d Roger Chen            2014-12-29  1662  
-229666c14c75ae Vincent Palatin       2016-06-15  1663  static void rk_gmac_powerdown(struct rk_priv_data *gmac)
-7ad269ea1a2b7d Roger Chen            2014-12-29  1664  {
-32c7bc0747bbd8 Jonas Karlman         2025-03-19  1665  	if (gmac->integrated_phy && gmac->ops->integrated_phy_powerdown)
-32c7bc0747bbd8 Jonas Karlman         2025-03-19  1666  		gmac->ops->integrated_phy_powerdown(gmac);
-fecd4d7eef8b21 David Wu              2017-08-10  1667  
-8f6503993911f0 Russell King (Oracle  2025-06-16  1668) 	pm_runtime_put_sync(gmac->dev);
-aec3f415f7244b Punit Agrawal         2021-09-29  1669  
-7ad269ea1a2b7d Roger Chen            2014-12-29 @1670  	phy_power_on(gmac, false);
-7ad269ea1a2b7d Roger Chen            2014-12-29  1671  	gmac_clk_enable(gmac, false);
-7ad269ea1a2b7d Roger Chen            2014-12-29  1672  }
-7ad269ea1a2b7d Roger Chen            2014-12-29  1673  
+On Wed, Oct 15, 2025 at 05:39:24PM +0100, Simon Horman wrote:
+> Hi Bagas,
+>=20
+> For the above maybe this is more succinct and intuitive:
+>=20
+> Debian cloud images::
+>=20
+> ...
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks for the suggestion! I will include it in v2.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--pwZlaeVNL9Fp5cUU
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaPA0tQAKCRD2uYlJVVFO
+o4oFAQDBERR//Sh1k48W7RWGnLb3IrKcEpaa2Ru8q8OMSFVD/wEAzCIBRrvx10Ap
+XZKRtUoSLGf+YfhBQfKerigKla/hpg0=
+=GtTb
+-----END PGP SIGNATURE-----
+
+--pwZlaeVNL9Fp5cUU--
 
