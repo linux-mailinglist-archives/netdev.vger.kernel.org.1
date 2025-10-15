@@ -1,112 +1,102 @@
-Return-Path: <netdev+bounces-229649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07550BDF47F
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:09:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C4C7BDF488
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:10:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB8A73A384B
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:07:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BCE23BF794
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FF926D4C2;
-	Wed, 15 Oct 2025 15:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="04hQz4eK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E48C12D73B4;
+	Wed, 15 Oct 2025 15:08:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from relay.hostedemail.com (smtprelay0013.hostedemail.com [216.40.44.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C9E17B50F;
-	Wed, 15 Oct 2025 15:06:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175052D7DDE
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 15:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760540821; cv=none; b=cYRuelq83WJW6kJBS7fxyU0GAn8cIzLfdJHusEt6KG8ab4bDdww+LgZwZdHzEfW2oQP2z13KHp4flIrI/dZuLIiMunpxjbRp3O2yPyieGDg8jevFv/UK8X7tmrOaFG5yFh9Vm4VChKXf4PGJRNY/WDbshUdleEOTuNha2TTlyPQ=
+	t=1760540893; cv=none; b=si2zHmLRSGIYXklD3qwVUTQjH5OBruDvB2hJGVg9cZTombFFeoNx5pC00FDVDTS9JnMS6bwEcdl01Y0waTPbo+4RQ9kO9nZ8B0PM/vDIHpOyfqszgXkkrtEdYHU16oVxxpHwJwxlFIiQuEwyUq65VBpIGViB+H+hZXlSH+wxXjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760540821; c=relaxed/simple;
-	bh=paHTQ7+eFNh+tQ69LcRC1uClOsSq9bwcalYHiasb8S8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X2wYhcx9bUvLTUYVrQL7vSRu4uZUzAiisvuA8MiiHhhg+OdmogtBvbTeMdn7oWzx9xIbNR1O5TQ7qD/jd86NxcBNQacymNZY16LvNZnfJ2kh/O2xZ5hRIolSt/wk8GfDrUjP+JRz/d3IzPeAezkXjhKE6j3vG2KiSY1ZRbncHh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=04hQz4eK; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=i8WH71db750jps9WxI3z1NEUJwkE3VXRhtPG7iUgTWY=; b=04hQz4eK43+AW/wKb5wdQbpX7W
-	9qjxEPcOHoILOsxV1PI8IytNEk84VUOiE3we1jZwRHbOWnulNKUJp706hKrMypx3oAeFgwVnxQJp1
-	7NcBfL3w49o/pLRiGOLUQIQ/mWRC0KCTP8+VfDs1dsu+lXWJju+rDn+BWTwR/+t0mRP2hDyld2Iy+
-	Y+3njCB/O24OWRDwUd5m5IiCMsrA2qo8dBfgqnXLAfyzO2XLKOXq0hFkLwNxW1dEVY+Dz3X9mnDRT
-	2VTa9nPxpngzLSATgjGK+7eSuRfEQT3c4w5Fc5pxwzaBcGyASUd1jlsNEB+d8MwZ634P3VQG8TnLz
-	W4C0Q8HQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37834)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1v935W-000000004wH-29yk;
-	Wed, 15 Oct 2025 16:06:50 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1v935S-000000002Le-3AO4;
-	Wed, 15 Oct 2025 16:06:46 +0100
-Date: Wed, 15 Oct 2025 16:06:46 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] net: stmmac: Move subsecond increment
- configuration in dedicated helper
-Message-ID: <aO-4hnUINpQ0JORE@shell.armlinux.org.uk>
-References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
- <20251015102725.1297985-2-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1760540893; c=relaxed/simple;
+	bh=DuiPtryBBi0eCs251UEa0Jkk3wsagB+gMqFBrhTj2FU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=l+zuKFlEx/rKpVSFOY+X9rM8jeRh6y5EXI7pCT01z9YG5E3WzQGgFCUYSlftziy3nXrjBKXLwW52lGneUa7bK7l/FZL2a97MnEgkxrjRKp2kx8gk30n9HyKrHOmO/Ww6LUh/CkDtsJmZakIYsiLiAGyWWxkXCYN1ZY7Q0RjWzhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf10.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay07.hostedemail.com (Postfix) with ESMTP id 09D4B1601E2;
+	Wed, 15 Oct 2025 15:08:03 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf10.hostedemail.com (Postfix) with ESMTPA id CDEDB32;
+	Wed, 15 Oct 2025 15:08:01 +0000 (UTC)
+Date: Wed, 15 Oct 2025 11:08:09 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "andrew@lunn.ch" <andrew@lunn.ch>,
+ "bigeasy@linutronix.de" <bigeasy@linutronix.de>, "clrkwllms@kernel.org"
+ <clrkwllms@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-rt-devel@lists.linux.dev" <linux-rt-devel@lists.linux.dev>
+Subject: Re: Query about the impact of using CONFIG_PREEMPT_RT on locking
+ mechanisms within networking drivers
+Message-ID: <20251015110809.324e980e@gandalf.local.home>
+In-Reply-To: <TYCPR01MB12093B8476E1B9EC33CBA4953C2E8A@TYCPR01MB12093.jpnprd01.prod.outlook.com>
+References: <TYCPR01MB12093B8476E1B9EC33CBA4953C2E8A@TYCPR01MB12093.jpnprd01.prod.outlook.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251015102725.1297985-2-maxime.chevallier@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Stat-Signature: 5ebdw4je9ujae9w9spy77bg6u1sxo74f
+X-Rspamd-Server: rspamout08
+X-Rspamd-Queue-Id: CDEDB32
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX1/D8EB/L4/HKo5DEYJn+Etmid2SyCYmDs4=
+X-HE-Tag: 1760540881-33100
+X-HE-Meta: U2FsdGVkX19kRaSX07wJF0XB8ocgV/LvGjJs7grkpUyDX6RqBpNGOgPQbe0x473ECyIwu9zeaIJ/P+m5qB01bKl5k8I+aZO4doDcR3wtm8i7IsBqzQ4QRKXa8BG53r5vdlGJCYzHLj5f8nl3aQybYXf3y3CTfRA3PIhocDRqDQVFXG3augxdssqnCh9+95xsINZLD9NPDX76H9+iF5ARCFUKLYYlOpkjuegYHfqS0eNmDts6oT56SYi7FMlSYnS2sbKPo0E+iaC5h9s9JN/hK+pzy96oj+NL1oiJDfap4O3sSV5DyAu6t3PO94ItTQFyNgmA988YRnZRWpMw/uo46N8TcatgR/iF
 
-On Wed, Oct 15, 2025 at 12:27:21PM +0200, Maxime Chevallier wrote:
-> +static void stmmac_update_subsecond_increment(struct stmmac_priv *priv)
-> +{
-> +	bool xmac = priv->plat->has_gmac4 || priv->plat->has_xgmac;
+On Wed, 15 Oct 2025 11:24:35 +0000
+Fabrizio Castro <fabrizio.castro.jz@renesas.com> wrote:
 
-Just to say that I have patches that get rid of these has_xxx flags for
-the cores, and these changes (and the additional platform glue patches
-that have been posted) will conflict with them.
+> Dear All,
+> 
+> We have recently started debugging some issues that only show up
+> with the kernel built with CONFIG_PREEMPT_RT=y, and we have noticed
+> some differences w.r.t. the non-RT version.
+> 
+> One of the major differences that we have noticed is that spin locks
+> basically become rtmutexes with the RT kernel, whereas they are mapped
+> to raw spin locks in non-RT kernels.
+> 
+> When is using raw spin locks directly in networking drivers considered
+> acceptable (if ever)?
+> 
+> Thank you for taking the time for reading this email, comments welcome.
 
-Given the rate of change in stmmac, at some point we're going to have
-to work out some way of stopping stmmac development to get such an
-invasive cleanup change merged - but with my variability and pressures
-on the time I can spend even submitting patches, I've no idea how that
-will work... I was going to send them right at the start of this
-cycle, but various appointments on Monday and Tuesday this week plus
-work pressures prevented that happening.
+The reason for the spin locks conversion to mutexes is simply to allow for
+more preemption. A raw spin lock can not be preempted. If a lock is held
+for more than a microsecond, you can consider it too long. There's a few
+places that may hold locks longer (like the scheduler) but there's no
+choice.
 
-So, I decided instead to send out the first stmmac PCS series... which
-means I now need to wait for that to be merged before I can think about
-sending out anything else stmmac-related. (and there's more PCS patches
-to come beyond the 14 I sent today.)
+To allow spin locks to become mutexes, interrupts are also converted into
+threads (including softirqs). There are also "local locks" that are used
+for places that need to protect per-cpu data that is usually protected by
+preempt_disable().
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+What issues are you having? It's likely that it can be tweaked so that you
+do not have issues with PREEMPT_RT.
+
+-- Steve
+
 
