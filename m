@@ -1,160 +1,143 @@
-Return-Path: <netdev+bounces-229796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6E8EBE0E14
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 23:56:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 895C6BE0E23
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 23:57:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9530A4E7D19
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:56:47 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 77D714E5F7C
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73BCF304975;
-	Wed, 15 Oct 2025 21:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA222F5A37;
+	Wed, 15 Oct 2025 21:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VgFN27n8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mn7QF/uG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 462381BC3F;
-	Wed, 15 Oct 2025 21:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F0729D279;
+	Wed, 15 Oct 2025 21:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760565404; cv=none; b=oCUw2uSoSgzZcawRY4erJJkOlEowhUMWGnAr/abcZMDnQZhJ8nJQLFxHuB4DUlcvghIxrGf+3CM9fAvMtWWBzXYhjVqXhkRGxGoVMWQQgU83whpcPkWp4CHHSYm0Lx+3EaaePnX+SFU7n7hI2ojHrywte9FCSHC6eXPMzhk14Xc=
+	t=1760565461; cv=none; b=Vs2pEguLTGxrjGWK/O6G4iJthDxWYPpSz/xhieMIFw/gvG0TqOmpyKWZX+x+Cy8UVTmRBeOt75tEWR9RE1hv4ScI/YkaPf4COSrf91qfNG15YG7JuEHBy+NL1bCHccjsavjm9uccEeRuIlwUYqW7nD+oNCo7L8JSkI5y2wXfPr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760565404; c=relaxed/simple;
-	bh=Kp0Iv++zsrADvxWS0araI63hW5WvxHZ8ddvo36MGl0I=;
+	s=arc-20240116; t=1760565461; c=relaxed/simple;
+	bh=WUMK/p1NpKi6lgRs+bVf1M0kCd8OsC05g8BX3feRS7I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dTh+oCCPFyFjK1xVUvGVrjJeTMTpgQa/gwoLMT0+MZYp/gM9Vp6ahebAZP0cYL7jJXwL/B06Gtds5RgWhmnJLda/JWLZQNnhNhlwlbAr+/4AqJ7EKBNzCTnYkZettjTrn8yt3LdRvukbeQapKbO12qZX1jZobpbQywGxs7FYdv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VgFN27n8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45A45C4CEF8;
-	Wed, 15 Oct 2025 21:56:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760565403;
-	bh=Kp0Iv++zsrADvxWS0araI63hW5WvxHZ8ddvo36MGl0I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VgFN27n8KEZT1Aexm3NiOKMCpgxMK5/iNB/6gyxMh42xozmYKs2CwNbMJd3VYddrk
-	 nVF9I9zF4UM5xPWCHLHHUkUE5WFGw8trJ3y+zD1zsgflrgCmEF1NzGCI3il8D2p8vN
-	 R0otY5WNbeZmdbPfibx0elo+Oz3Zs2N2fGVh8KiC63ddY4BJxY619ZNPsHrJuSIU4m
-	 rivDVbx1Myql7IOe7+LkKKF4OhSsN9TLo4m/Fu9sSg5suVVLgKXeuagzqXvdIHzYhp
-	 yrZWQBA8xAk3nbZd3GgBa3R5ybrdI91l9Tk3CJauYFNcpzjBkJmJtQR1mpNjBzWccw
-	 5unwHv2a3Mszw==
-Date: Wed, 15 Oct 2025 22:56:38 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Rob Herring <robh@kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=gVhFauIrHKH+vM6/5db/oczeg6QexGGCj2HYdQg7DkVU8dGScciG/YpQn4ESi2rVzKKsM0YO0udWvmmaZvVCmQ4u8W8V60FuAfFZOgotavfSK4j02CsTgqYYpOQREyjHqKNo8ONujVlADNH7iMoOCGn5b3QBhjNZWW919YHo+0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mn7QF/uG; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=w4Vhb+pWajT1Ug9vm6p2q425XInEco8nPyGgnsCFC6I=; b=mn7QF/uGABpKN3xNzZQhmz2z8B
+	o11ld6ctbXR/ky2Bzy9GmguS3MZrXnF1v2rYnkjP5YhUCZo59ImkCcNqhMFbUqqZQngxwTgx92ZgP
+	uUcm3aQsK5C3oeuTJBBTA4Gjy7CdOrDM7lZERKde429KjydqJBEKRvmUAlv4qS4lv/4CxMntHi6Ri
+	B4m95goSjEKH1jPj2ZEIvSgu3K+3K8pRLhYL5jP6gUIBKXXpuBTVy5nhRltxZuXFPSEphg8trRGUe
+	DyxHgnVYT6D5oWp5MRGliTSF6l4qTUbUxfZn86zYEQT44SrSmakBSNxf9lqsMxS+akwDPJ+7/yJjR
+	NxC1+iNw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33366)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v99Uh-000000005Vv-0ZMi;
+	Wed, 15 Oct 2025 22:57:15 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v99Ua-000000002di-3k6X;
+	Wed, 15 Oct 2025 22:57:08 +0100
+Date: Wed, 15 Oct 2025 22:57:08 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Abhishek Chauhan <quic_abchauha@quicinc.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexis Lothore <alexis.lothore@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
-Subject: Re: [PATCH 1/1] dt-bindings: net: dsa: nxp,sja1105: Add optional
- clock
-Message-ID: <20251015-convent-handprint-8717277bbffd@spud>
-References: <20251014-flattop-limping-46220a9eda46@spud>
- <20251014-projector-immovably-59a2a48857cc@spud>
- <20251014120213.002308f2@kernel.org>
- <20251014-unclothed-outsource-d0438fbf1b23@spud>
- <20251014204807.GA1075103-robh@kernel.org>
- <20251014181302.44537f00@kernel.org>
- <CAL_Jsq+SSiMCbGvbYcrS1mGUJOakqZF=gZOJ4iC=Y5LbcfTAUQ@mail.gmail.com>
- <20251015072547.40c38a2f@kernel.org>
- <CAL_Jsq+wHG_DW1D_=dR6Q_mwyqFAXKGx771PsqjvW+XCRKM3tw@mail.gmail.com>
- <20251015105323.7342652f@kernel.org>
+	Drew Fustini <dfustini@tenstorrent.com>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
+	Furong Xu <0x1207@gmail.com>, Inochi Amaoto <inochiama@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+	Jisheng Zhang <jszhang@kernel.org>, Kees Cook <kees@kernel.org>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthew Gerlach <matthew.gerlach@altera.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rohan G Thomas <rohan.g.thomas@altera.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Simon Horman <horms@kernel.org>,
+	Song Yoong Siang <yoong.siang.song@intel.com>,
+	Swathi K S <swathi.ks@samsung.com>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>, Vinod Koul <vkoul@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH net-next 14/14] net: stmmac: convert to phylink PCS
+ support
+Message-ID: <aPAYtHPcF5bes7Xi@shell.armlinux.org.uk>
+References: <aO-tbQCVu47R3izM@shell.armlinux.org.uk>
+ <E1v92NJ-0000000AmHi-1ZGJ@rmk-PC.armlinux.org.uk>
+ <040a2f29-4c95-4561-87c0-2a70308d3f00@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="GRWFZBjSWdozFA2g"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251015105323.7342652f@kernel.org>
+In-Reply-To: <040a2f29-4c95-4561-87c0-2a70308d3f00@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Wed, Oct 15, 2025 at 11:31:37PM +0200, Andrew Lunn wrote:
+> > - create stmmac_pcs.c, which contains the phylink_pcs_ops structure, a
+> >   dummy .pcs_get_state() method which always reports link-down
+> 
+> I've not followed the PCS code too closely. Why always report link
+> down? Why is a dummy method needed?
 
---GRWFZBjSWdozFA2g
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+If phylink is put into inband mode, and a PCS is supplied to phylink
+where this method left NULL, the kernel will oops.
 
-On Wed, Oct 15, 2025 at 10:53:23AM -0700, Jakub Kicinski wrote:
-> On Wed, 15 Oct 2025 12:32:14 -0500 Rob Herring wrote:
-> > On Wed, Oct 15, 2025 at 9:25=E2=80=AFAM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > > On Wed, 15 Oct 2025 06:53:01 -0500 Rob Herring wrote: =20
-> > > > That's fine. Though it will be optional for you, but not us? We have
-> > > > to ignore tags without the project if tags intended for netdev are
-> > > > continued without the project. Or does no project mean I want to
-> > > > update every project? =20
-> > >
-> > > Fair :( I imagine your workflow is that patches land in your pw, and
-> > > once a DT maintainer reviewed them you don't care about them any more=
-? =20
-> >=20
-> > Not exactly. Often I don't, but for example sometimes I need to apply
-> > the patch (probably should setup a group tree, but it's enough of an
-> > exception I haven't.).
+As the code stands today in mainline, if phylink were to be put into
+inband mode with the integrated PCS, then there will be no phylink PCS,
+and so phylink_mac_pcs_get_state() will fall into the "else" path of:
 
-I think myself and Krzysztof (well, I can only really speak for myself)
-have some idea about what things are likely to be material for the dt
-tree. I just don't set a status for them if I interact or I outright
-leave them for Rob.
+        pcs = pl->pcs;
+        if (pcs)
+                pcs->ops->pcs_get_state(pcs, pl->pcs_neg_mode, state);
+        else
+                state->link = 0;
 
-> > > So perhaps a better bot on your end would be a bot which listens to
-> > > Ack/Review tags from DT maintainers. When tag is received the patch
-> > > gets dropped from PW as "Handled Elsewhere", and patch id (or whatever
-> > > that patch hash thing is called) gets recorded to automatically disca=
-rd
-> > > pure reposts. =20
-> >=20
-> > I already have that in place too. Well, kind of, it updates my
-> > review/ack automatically on subsequent versions, but I currently do a
-> > separate pass of what Conor and Krzysztof reviewed. Where the pw-bot
-> > tags are useful is when there are changes requested. I suppose I could
-> > look for replies from them without acks, but while that usually
-> > indicates changes are needed, not always. So the pw-bot tag is useful
-> > to say the other DT maintainers don't need to look at this patch at
-> > all.
+and force the link down.
 
-Yeah, I think it's better to leave it explicit. Often a non-tag reply is
-looking for clarification before providing one. Both Krzysztof and I
-maintain platforms and minor subsystems (very minor in my case) so
-there's b4-ty or manual patch acceptance emails too that obviously are
-not requesting changes!
+So, adding this method keeps the status quo - not oopsing the kernel
+and not allowing the link to come up. No unintended behavioural
+change in this regard from how it would behave today. :)
 
-> I don't think we need to do anything, then. Changes-requested will=20
-> apply across all the patchwork instances. Only not-applicable /
-> handled-elsewhere gets tricky with multiple instances.
-
-I'm sort of unclear about what to do here. What would make sense to me
-is that the bots disallow each other's maintainers to set the
-not-applicable or handled-elsewhere states, since those are the ones
-with unintended consequences if set in the wrong place, like I did here.
-
-"I don't think we need to do anything" sounds like I can do
-changes-requested when I feel like it, but need to be careful about
-netdev when I do others, which is fine, I just need to know where I
-stand.
-
-Cheers,
-Conor.
-
---GRWFZBjSWdozFA2g
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaPAYkgAKCRB4tDGHoIJi
-0haWAQDdsl/23JKRW6xnXbeGdTB7WLabxh/De7vIHVpZ2DOyBwEAxWNmQ3XOAI0t
-zvf1Fn/Wx4usSz47ObgAJdGJ3PNlDwQ=
-=fYM1
------END PGP SIGNATURE-----
-
---GRWFZBjSWdozFA2g--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
