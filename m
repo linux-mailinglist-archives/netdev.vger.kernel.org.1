@@ -1,95 +1,158 @@
-Return-Path: <netdev+bounces-229669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BE0FBDF944
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 18:10:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A14CBDF958
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 18:11:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C6EFE503E3B
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 16:10:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1D7B1A2119C
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 16:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D347335BAB;
-	Wed, 15 Oct 2025 16:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8D8330D29;
+	Wed, 15 Oct 2025 16:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UGSCRyC+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zPIbxYT2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F46326D77;
-	Wed, 15 Oct 2025 16:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA7725CC79
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 16:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760544625; cv=none; b=spks3oYwT5lIJ4V1vZCQgJJtoIeArdXIATZhxDT9CEIF5LsSk7cfOVc8yHsoFzZeQSMpHx/VUFuQhG4G2hE07exGchY447G5DAatMMnu+1Yv21H6VfveN7MiIHtV4ahSEvX1V4yv7Yozpbtjp1x9C6KMixAfvUtxiKITeEh+ElI=
+	t=1760544655; cv=none; b=K/1MKGZGXMBnkEiHZ7C1lD2767Y8nvjML3m+IvcYyBcZeCiwdIttVxDeDU8yXyAU+5dcAHYBcMwHJPm11MngvGSqXGPJdnF8fLJvQDMmWsPyP377qptaWlScm50bVc2NZv7VlEOu6/OWlAVenNoEh3TOsO4viC58SRu6XfocFOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760544625; c=relaxed/simple;
-	bh=dcFZNHJd7u8P5PsF+UUqJjsNe+og2T6bb+SyhmTtPE4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hperUdPmOGzhLwFOjtUxWjh8HazUSWK0VTScmVg925WKWr9mQR8oNgFuDWEWJ5Kjl3PnWgzxwvP4PGYFu2fmC774wg181ODRyMcTqTfsFIK5Wkc3JLmnxUZCegd5GETusTBiAo6FOLuBsglhrAyptB+hwj5DYEm0p/IPhFqN9T4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UGSCRyC+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9DCCC4CEF8;
-	Wed, 15 Oct 2025 16:10:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760544625;
-	bh=dcFZNHJd7u8P5PsF+UUqJjsNe+og2T6bb+SyhmTtPE4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UGSCRyC+Wctl2ezwDbUvTrJw7KCQLsjC1eB5uGn6ETblajcg1p0rQKWqZg7Hgqta9
-	 1P35K+uKmA0KaC3QOpSVfNhQF6jFul1zCWjPNjWuHgLhrByKBGWB60o2SkLY8Hr8SB
-	 9jXq4yCkuOmxONoy0s6jcZ9vilsyPEItUPfKJolkKjNNdHdLGRfbUGFNEVvL61mh3u
-	 Wcy7kmmxJNaHz6QGWrWvDYee4en29vasNTO+UWwZdBp6X5FE1KG4MUVrr67MiYS4V+
-	 akJSChivgxRn2btqVtWWt/tLqwDUpKjwjIvNL4nKug9FGe6kxNHrn6OOFa2etinj8c
-	 k9vg/S+/tVbKw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD1B380CFFF;
-	Wed, 15 Oct 2025 16:10:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1760544655; c=relaxed/simple;
+	bh=vJ9W7pSZ9Ey0EoSvcXCY2sl7JfouXXUt8ZBUq3RvEQc=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=kjPk7idCH6AvsV6BvgXVNv08XZd8N8iCovljl7d+YRP9FkDxwcVwgZoEDZ+VMEMGxmsCgArNRWJvPfAX7CKPbAXFRBBYp8fwgrUQAS6v0+oPdJ1mTurofUGlltfgo7jbogQFjITzxiKbXv0LqrsoPE411ptUBxlamzOSHlr0Icw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zPIbxYT2; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=rD9sxXXcMPCdPzJUHRNkbrU7OVhc+3FqTiQbvaq4qKA=; b=zPIbxYT2T4pXpUpYZgf1evBIL8
+	jisw/dzamHSTXVee/35trO3vQnd3oafAsZiH55/E+MYSdOA4nrwS4e/EguiWjg+ujbT3FRgIM015L
+	/Ngz4fuS/DOBdbbkr5hDM6cQN7bCrP5hOBLDo36YmJpeAfqGbZVH004xz9Rw7PbeJ80O1bqYOwQCf
+	bKmqkoV38Vx0QwNGVnusn3scCNtUGvDpk8+fKM7rR/7ly73pZM2fITEA7QwNnV84lHKjJT2JHBf65
+	jdDp6KfWRN6zMXngWSbF7uLPtEmuuveTEzYr3Ny0NhMzOGWl0Vr2Q9pRy19j1ldNDxeY8f9MnqM2o
+	C70FcEDQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38608 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1v945K-0000000059q-0yvh;
+	Wed, 15 Oct 2025 17:10:42 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1v945J-0000000AmeJ-1GOb;
+	Wed, 15 Oct 2025 17:10:41 +0100
+In-Reply-To: <aO_HIwT_YvxkDS8D@shell.armlinux.org.uk>
+References: <aO_HIwT_YvxkDS8D@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 1/5] net: stmmac: dwc-qos-eth: move MDIO bus locking
+ into stmmac_mdio
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] gve: Check valid ts bit on RX descriptor before hw
- timestamping
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176054461024.940684.9782106410239743246.git-patchwork-notify@kernel.org>
-Date: Wed, 15 Oct 2025 16:10:10 +0000
-References: <20251014004740.2775957-1-hramamurthy@google.com>
-In-Reply-To: <20251014004740.2775957-1-hramamurthy@google.com>
-To: Harshitha Ramamurthy <hramamurthy@google.com>
-Cc: netdev@vger.kernel.org, joshwash@google.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- willemb@google.com, pkaligineedi@google.com, jfraker@google.com,
- ziweixiao@google.com, thostet@google.com, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1v945J-0000000AmeJ-1GOb@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 15 Oct 2025 17:10:41 +0100
 
-Hello:
+Rather than dwc-qos-eth manipulating the MDIO bus lock directly, add
+helpers to the stmmac MDIO layer and use them in dwc-qos-eth. This
+improves my commit 87f43e6f06a2 ("net: stmmac: dwc-qos: calibrate tegra
+with mdio bus idle").
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ .../ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c    |  4 ++--
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h       |  2 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c  | 14 ++++++++++++++
+ 3 files changed, 18 insertions(+), 2 deletions(-)
 
-On Tue, 14 Oct 2025 00:47:39 +0000 you wrote:
-> From: Tim Hostetler <thostet@google.com>
-> 
-> The device returns a valid bit in the LSB of the low timestamp byte in
-> the completion descriptor that the driver should check before
-> setting the SKB's hardware timestamp. If the timestamp is not valid, do not
-> hardware timestamp the SKB.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] gve: Check valid ts bit on RX descriptor before hw timestamping
-    https://git.kernel.org/netdev/net/c/bfdd74166a63
-
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+index e8539cad4602..f1c2e35badf7 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+@@ -162,7 +162,7 @@ static void tegra_eqos_fix_speed(void *bsp_priv, int speed, unsigned int mode)
+ 		priv = netdev_priv(dev_get_drvdata(eqos->dev));
+ 
+ 		/* Calibration should be done with the MDIO bus idle */
+-		mutex_lock(&priv->mii->mdio_lock);
++		stmmac_mdio_lock(priv);
+ 
+ 		/* calibrate */
+ 		value = readl(eqos->regs + SDMEMCOMPPADCTRL);
+@@ -198,7 +198,7 @@ static void tegra_eqos_fix_speed(void *bsp_priv, int speed, unsigned int mode)
+ 		value &= ~SDMEMCOMPPADCTRL_PAD_E_INPUT_OR_E_PWRD;
+ 		writel(value, eqos->regs + SDMEMCOMPPADCTRL);
+ 
+-		mutex_unlock(&priv->mii->mdio_lock);
++		stmmac_mdio_unlock(priv);
+ 	} else {
+ 		value = readl(eqos->regs + AUTO_CAL_CONFIG);
+ 		value &= ~AUTO_CAL_CONFIG_ENABLE;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+index 7ca5477be390..ec8bddc1c37f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+@@ -388,6 +388,8 @@ static inline bool stmmac_wol_enabled_phy(struct stmmac_priv *priv)
+ int stmmac_mdio_unregister(struct net_device *ndev);
+ int stmmac_mdio_register(struct net_device *ndev);
+ int stmmac_mdio_reset(struct mii_bus *mii);
++void stmmac_mdio_lock(struct stmmac_priv *priv);
++void stmmac_mdio_unlock(struct stmmac_priv *priv);
+ int stmmac_pcs_setup(struct net_device *ndev);
+ void stmmac_pcs_clean(struct net_device *ndev);
+ void stmmac_set_ethtool_ops(struct net_device *netdev);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
+index f408737f6fc7..d62b2870899d 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
+@@ -734,3 +734,17 @@ int stmmac_mdio_unregister(struct net_device *ndev)
+ 
+ 	return 0;
+ }
++
++void stmmac_mdio_lock(struct stmmac_priv *priv)
++{
++	if (priv->mii)
++		mutex_lock(&priv->mii->mdio_lock);
++}
++EXPORT_SYMBOL_GPL(stmmac_mdio_lock);
++
++void stmmac_mdio_unlock(struct stmmac_priv *priv)
++{
++	if (priv->mii)
++		mutex_unlock(&priv->mii->mdio_lock);
++}
++EXPORT_SYMBOL_GPL(stmmac_mdio_unlock);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.47.3
 
 
