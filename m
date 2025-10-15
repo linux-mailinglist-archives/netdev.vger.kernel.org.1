@@ -1,113 +1,115 @@
-Return-Path: <netdev+bounces-229729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13475BE04A2
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:00:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EFF40BE04BA
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:01:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BD823A98C7
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:00:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE5B5545388
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95DA61FDE14;
-	Wed, 15 Oct 2025 19:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4B830596F;
+	Wed, 15 Oct 2025 19:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="T2gFrar5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BgBFlW5N"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B252714B96E
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 19:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA575302CAB;
+	Wed, 15 Oct 2025 19:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760554840; cv=none; b=DC9ENtXqvegUC9jWPZc9tLY/C7RlSAyOZozIjfIiRyiLdf64LHKl3VWWxP5F0Tw0WBeBh0rGhFs1pDl6zAE+k5CUa6ftkvIb7EbZtcUoCBwND6GEwKr2O8JuMXC5gr5hRxpTXlGb9X7lbsRcvPAqnc3BPMlO10dYl1ZBJCBHN9s=
+	t=1760554854; cv=none; b=RafCs1NzsPNwUGH2EH2nxJ4E6kD/AhEU7X7Mi+eGQMRcDtXYOkl7SSSYQ6AfA+gj52xBBD9WOeS9sOjxCDmxBTLVGbH2+UTh97GXnJIFfMFePpsTZiJPRlC14Vznvbx0eATE0opbbo8AmHfOw4z11d6J2Uv8csLznRLw0wSTl9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760554840; c=relaxed/simple;
-	bh=FgyJRLpm6GvA8r1CRZcDFbvJgDwQ911aKdVKpy4Rd5c=;
+	s=arc-20240116; t=1760554854; c=relaxed/simple;
+	bh=U1O5JJjDwfsLfdO35GX3nUek30Grms+9GVEVpNFCLUU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hBjZ/PYabPkYf95WNRTr0ZSg2Z75L9clBPbIcJ+KqAoZnhPorPtOkICWSEK4cGZ9P1S3nrJEBx14C7gE4k+tM5wpop+68KXIajGD8eyWOvWqHwKN0E+Z3kw0LtLpOl8nHpP+oPVk0u12Ohh08cy3kiSii8SFUhNIE0rS9XoThbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=T2gFrar5; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e8aeb1b8-06f0-4eb3-a1ef-26b943d1c6b4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760554824;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ViHS6o7TjQ1SExpzKDwFLJCmbItkiEqx2/j5dGG/ukQ=;
-	b=T2gFrar5CIyG+IQEbo3W6MQ8gPxv7Xz0mhPtS3mh+9fEnd5MeDp9NzZN7kUSmQy4uRU4y3
-	fsZRl52NYp7FOi8pqoNKTd8sxehhOGZ11yWw/LY+yUwAO8s1TqNXTgWQ36tbOvZ5ghjKKz
-	sedlnUNciiaFAt/OPKcsblPl+sSaZ/k=
-Date: Wed, 15 Oct 2025 12:00:18 -0700
+	 In-Reply-To:Content-Type; b=Ixj0sTMwktCtWkc/zxV3QggfAv11Jsq4t0iW6zgPkMiBPUS16eU511/+yNksZbLVO7mZbb/U6ms5D4ubD2PLMPFLDJJACcKMzprPQs8rre24KGSqsczGr5lq6HU+kdCAHTe86J6UpnQ83KW/LJR/dTNka+4VfD3ZpVw9mpoJMrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BgBFlW5N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FADDC113D0;
+	Wed, 15 Oct 2025 19:00:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760554853;
+	bh=U1O5JJjDwfsLfdO35GX3nUek30Grms+9GVEVpNFCLUU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BgBFlW5NsWOtmAhzyadk7XleOyG2zwnk2bAhFHIHHFUFkgpOCBhE1uTpFzClsHmKU
+	 3hhsQsksjGAeomuL1twLTBYfiGivSv1RJcF2Uwn5aNcsLwHR8mvrFOF5CqEPLUMf6G
+	 zwftn98cbaXtvZ4NMA2jAYkx3tSdIfqSuz42ddfjLJgRQnUR2obncd5gxZ50i0wcu2
+	 GRUOjz/Gyi1xKhkld7IVvK+a3HIvGt6yADpEa0v8zpiJ6x47u4DQKWECYM7FiBJ7To
+	 tXXURm0Uw61CkJhTmYNSNt5u/hd3hEEUsthhGIn+KYfcVEFSTxDYFRy6M8cHbbpRX4
+	 8NkCiv0SiP1Qg==
+Message-ID: <578cc11f-654d-44fb-829a-ae6421863d50@kernel.org>
+Date: Wed, 15 Oct 2025 13:00:52 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 bpf-next/net 5/6] bpf: Introduce
- SK_BPF_BYPASS_PROT_MEM.
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
- Mina Almasry <almasrymina@google.com>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20251014235604.3057003-1-kuniyu@google.com>
- <20251014235604.3057003-6-kuniyu@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net: usb: lan78xx: fix use of improperly
+ initialized dev->chipid in lan78xx_reset
+To: I Viswanath <viswanathiyyappan@gmail.com>
+Cc: Thangaraj.S@microchip.com, Rengarajan.S@microchip.com,
+ UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+ linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com
+References: <20251013181648.35153-1-viswanathiyyappan@gmail.com>
+ <1adfe818-c74f-4eb1-b9f4-1271c6451786@kernel.org>
+ <CAPrAcgPs48t731neW4iLq3d+HXEQAezHj5Ad9KR8EK+TNu5wbg@mail.gmail.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20251014235604.3057003-6-kuniyu@google.com>
+From: Khalid Aziz <khalid@kernel.org>
+In-Reply-To: <CAPrAcgPs48t731neW4iLq3d+HXEQAezHj5Ad9KR8EK+TNu5wbg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 10/14/25 4:54 PM, Kuniyuki Iwashima wrote:
->   BPF_CALL_5(bpf_sock_create_getsockopt, struct sock *, sk, int, level,
->   	   int, optname, char *, optval, int, optlen)
->   {
-> +	if (level == SOL_SOCKET && optname == SK_BPF_BYPASS_PROT_MEM)
-> +		return sk_bpf_set_get_bypass_prot_mem(sk, optval, optlen, true);
+On 10/15/25 10:51 AM, I Viswanath wrote:
+> On Wed, 15 Oct 2025 at 21:25, Khalid Aziz <khalid@kernel.org> wrote:
+> 
+>> How did you determine this is the commit that introduced this bug?
+>>
+>>   From what I can see, commit a0db7d10b76e does not touch lan78xx_reset()
+>> function. This bug was introduced when devid was replaced by chipid
+>> (commit 87177ba6e47e "lan78xx: replace devid to chipid & chiprev") or
+>> even earlier when the order of calls to lan78xx_init_mac_address() and
+>> lan78xx_read_reg() was introduced in lan78xx_reset() depending upon if
+>> lan78xx_init_mac_address() at that time used devid in its call sequence
+>> at the time.
+> 
+> The commit a0db7d10b76e introduced the dependency on devid to
+> lan78xx_read_raw_eeprom() and
+> lan78xx_read_eeprom() and ultimately lan78xx_init_mac_address() and
+> lan78xx_reset()
+> 
+> In lan78xx_init_mac_address()
+> 
+> Only lan78xx_read_eeprom() depends on devid as
+> 
+> lan78xx_read_reg() and lan78xx_write_reg() do not use devid
+> 
+> lan78xx_read_otp() depends on lan78xx_read_raw_otp() which depends
+> only on lan78xx_write_reg() and lan78xx_read_reg()
+> and hence doesn't use devid either
+> 
+> is_valid_ether_addr(), random_ether_addr() and ether_addr_copy() are
+> net core functions and do not care about driver specific data
+> 
+> The devid read exists in this commit (was added in ce85e13ad6ef4)
+> 
+> a0db7d10b76e was supposed to move the devid read before the
+> lan78xx_init_mac_address() because of the newly added
+> dependency but it was a tricky detail that the author failed to see
+> 
+> Thanks,
+> I Viswanath
 
-The optval (ARG_PTR_TO_UNINIT_MEM) needs to be initialized for error case.
-The __bpf_getsockopt below does that but it returns early here.
-I changed to this:
+Ah, I see. That makes sense.
 
-	if (level == SOL_SOCKET && optname == SK_BPF_BYPASS_PROT_MEM) {
-		int err = sk_bpf_set_get_bypass_prot_mem(sk, optval, optlen, true);
-
-		if (err)
-			memset(optval, 0, optlen);
-
-		return err;
-	}
-
-> +
->   	return __bpf_getsockopt(sk, level, optname, optval, optlen);
->   }
->   
-> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-> index 6829936d33f58..9b17d937edf73 100644
-> --- a/tools/include/uapi/linux/bpf.h
-> +++ b/tools/include/uapi/linux/bpf.h
-> @@ -7200,6 +7200,7 @@ enum {
->   	TCP_BPF_SYN_MAC         = 1007, /* Copy the MAC, IP[46], and TCP header */
->   	TCP_BPF_SOCK_OPS_CB_FLAGS = 1008, /* Get or Set TCP sock ops flags */
->   	SK_BPF_CB_FLAGS		= 1009, /* Get or set sock ops flags in socket */
-> +	SK_BPF_BYPASS_PROT_MEM	= 1010, /* Get or Set sk->sk_bypass_prot_mem */
->   };
->   
->   enum {
-
+--
+Khalid
 
