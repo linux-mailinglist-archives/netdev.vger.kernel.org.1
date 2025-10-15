@@ -1,131 +1,163 @@
-Return-Path: <netdev+bounces-229677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34BA0BDFA0D
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 18:21:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8DABDFA73
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 18:29:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DACA53B3B23
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 16:20:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6524E3E2D0B
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 16:29:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4FA3375DE;
-	Wed, 15 Oct 2025 16:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C13A3375DC;
+	Wed, 15 Oct 2025 16:29:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="wtHq3Gd0"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="AtcptlUP";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="iDgGd8K0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3680F3376BE
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 16:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6688337687
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 16:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760545226; cv=none; b=eNc4k8bdkO02mTi+RhPu3mdgpR7e8+d4wVzKipRN4/qMfPJIgBkvD1Tp7+vQiRuZF/Xifze+97i4eYSMdGHv+k8EkED4LeTz1e2n06m3zZ72zjtHViPjtBFsfa7O4Q8buRB3a79zsXFKrQt2jwkDp17/v6Ek8PAkAg33UZa+9d8=
+	t=1760545770; cv=none; b=QlxzQzyLSrUgZcF5jgH03+XPLT4/+HSC61oB51sZhd4c6SZ/e7ZUAc/3SY7An1wPu1TsMMK/QAd8Bs5aVkeS4CYljDfltCKIxJKrf6AYTC2xS8ndvZUXGQhpi1Ph1M9pgDWuWmeNJGSwta/2AOLr1VmqVFwMgNtvabtSi57Cu1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760545226; c=relaxed/simple;
-	bh=0bPnnNJxYEoXI1b70YZlgulOQQNFqx0526wcE/urorU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sB0ttLn7EX904H2IZqewj17kB0PfszWSKTZedVw8StkrJ38mQOB4GPb4l/8TrN1wi5JKFopM9G8AQ1Kr9J5RcXfC/7frijk6OBMGze81axWib4ROg7HYB5fRJUqrvYUp5F6VMVqvHwZ1Hdchq3cH1bFT6n7MgFYZZjCCJYZ6zyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=wtHq3Gd0; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 4C1EEC09FBB;
-	Wed, 15 Oct 2025 16:20:01 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 487D560673;
-	Wed, 15 Oct 2025 16:20:20 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 138CA102F22DF;
-	Wed, 15 Oct 2025 18:20:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760545219; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=JJ6rH+xzmRM4qbGD1O8szCgtSQ2QdUeo9drcU82TAhs=;
-	b=wtHq3Gd0pQyjV6eyAK7fkRd9w/l0K0lC4FEfqkfWEo6k637Nboqx9312H1X9fnaRV/2wfb
-	QaZ6QKn/SgxEG7NppA04nggZ69c6MQyB2QdfPZpPZs7aRKxHJD8eY66Gr283U2WCMTmDak
-	88guPcGFdZVaksfpnPKksUJJnae0T4LLkdX0RllszUHzwp8koW7AkW3d42+ZT82a7iuP7G
-	nDuOFOMUrmu/iMcqebvj3mX2x8m7+8+umoL7QjmNGO4Lxs1r06oZx9uCz+/jpvM07WporL
-	jqoVHJIuWENfI7kHqcyASHjuMNN1yYfK86sc1rke62SvxbTpWJvvR1KIZpJ/0g==
-Message-ID: <27800f8c-eb0d-41c2-9e45-b45cf1767c23@bootlin.com>
-Date: Wed, 15 Oct 2025 18:20:03 +0200
+	s=arc-20240116; t=1760545770; c=relaxed/simple;
+	bh=Gk08VLbkpFi1ZC2IutxuohSOPRuJHP5SOA0jS5dQ+Uw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eA0irRLoxW4i+wXYqSMGij3NiRUczE+mriQyqr2e4HDawypTyhRw1CS+cngQrXnV4hI0odF2otekT/CGY4DYryPOAH3gXo8iodJbZUx4X+4ZoHnOMlUEEFnB8M79qtEBXykfvkT4BRYN+Tcr9grr6yixUoenQrm+50Rmi0sp2Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=AtcptlUP; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=iDgGd8K0; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 15 Oct 2025 18:23:40 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1760545421;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MGbjAiF1jSY4711BNsD/ZIqHEDwtp6KfdPgBKFfNs1k=;
+	b=AtcptlUPp5d4CErT0D0hFhCau1ubgfYZ6RZPhpKlXTgRfNAQHpPDHWEujZA9Gp3DuOQ7+y
+	7fABLmbJLPDYnjNjfXjFeBkgfQGYFRzu1M8OThwd2h6Zoq270jEcglnZpu4TNNwUpG9CWL
+	ojGX7I+xUKLmWKPqrOao5IedfOzUA+8B5oP9L1J2ZI9XCkeCUB25bxSJcEN7BnFchDTDrX
+	a0zj8wrGMFzeBHIfJu1QFi2jKj0k5g56OMza7ha6QWTma0snSzd3qqCKySZvfpZbDpLf1i
+	xufRBHuhMIkI+O5DVy026bsM/2+6cLLQGCouXUdXlTsstOUsemGS4bsRk9cvxg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1760545421;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MGbjAiF1jSY4711BNsD/ZIqHEDwtp6KfdPgBKFfNs1k=;
+	b=iDgGd8K03a9bWMEnFJyasLik3s7j5+HKVWjWIvnlBN4gmGC0jyT6tujdcyfP+cZJVyFH+L
+	+/duVBhJKivkvPDA==
+From: "bigeasy@linutronix.de" <bigeasy@linutronix.de>
+To: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"andrew@lunn.ch" <andrew@lunn.ch>,
+	"clrkwllms@kernel.org" <clrkwllms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-rt-devel@lists.linux.dev" <linux-rt-devel@lists.linux.dev>,
+	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: RE: Query about the impact of using CONFIG_PREEMPT_RT on locking
+ mechanisms within networking drivers
+Message-ID: <20251015162340.i7K71rpM@linutronix.de>
+References: <TYCPR01MB12093B8476E1B9EC33CBA4953C2E8A@TYCPR01MB12093.jpnprd01.prod.outlook.com>
+ <20251015110809.324e980e@gandalf.local.home>
+ <TYCPR01MB120933E9C8A96EE9CF617CF1BC2E8A@TYCPR01MB12093.jpnprd01.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] net: stmmac: Move subsecond increment
- configuration in dedicated helper
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
- <20251015102725.1297985-2-maxime.chevallier@bootlin.com>
- <aO-4hnUINpQ0JORE@shell.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <aO-4hnUINpQ0JORE@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <TYCPR01MB120933E9C8A96EE9CF617CF1BC2E8A@TYCPR01MB12093.jpnprd01.prod.outlook.com>
 
-Hi Russell,
-
-On 15/10/2025 17:06, Russell King (Oracle) wrote:
-> On Wed, Oct 15, 2025 at 12:27:21PM +0200, Maxime Chevallier wrote:
->> +static void stmmac_update_subsecond_increment(struct stmmac_priv *priv)
->> +{
->> +	bool xmac = priv->plat->has_gmac4 || priv->plat->has_xgmac;
+On 2025-10-15 15:48:46 [+0000], Fabrizio Castro wrote:
+> > The reason for the spin locks conversion to mutexes is simply to allow for
+> > more preemption. A raw spin lock can not be preempted. If a lock is held
+> > for more than a microsecond, you can consider it too long. There's a few
 > 
-> Just to say that I have patches that get rid of these has_xxx flags for
-> the cores, and these changes (and the additional platform glue patches
-> that have been posted) will conflict with them.
+> That actually gives us a good way of gauging when holding a lock is not
+> appropriate. Thanks for this.
 
-Fair, I was in your position not so long ago :)
+Other than that, the other thing is that if you have acquired a
+raw_spinlock_t the resulting API of what can be used is minimized. You
+can't invoke any function that acquires a spinlock_t which includes
+something like kmalloc(, GFP_ATOMIC).
 
-For this particular series, it should be straightforward to fix the
-conflict, but for the pending new glue divers we'll have to
-find the sweet spot for these changes.
+> > places that may hold locks longer (like the scheduler) but there's no
+> > choice.
+> > 
+> > To allow spin locks to become mutexes, interrupts are also converted into
+> > threads (including softirqs). There are also "local locks" that are used
+> > for places that need to protect per-cpu data that is usually protected by
+> > preempt_disable().
+> > 
+> > What issues are you having? It's likely that it can be tweaked so that you
+> > do not have issues with PREEMPT_RT.
+> 
+> The first issue (which is the one that sparked this discussion) has been
+> addressed by a patch that was sent out today.
+> While the issue addressed by that patch is not related in any way to locking,
+> it sparked a series of discussions within my team about locking because when
+> PREEMPT_RT is used there are cases where the driver gets preempted at
+> inconvenient times (while holding a spin lock, that gets translated to an
+> rtmutex with PREEMPT_RT), and the issue itself is fully masked when using
+> raw spin locks (and that's because the code doesn't get preempted, making
+> the issue a lot less likely to show up).
 
-Maybe send it as an RFC so that people can see what to expect ?
+The driver shouldn't get preempted under normal circumstances. It (the
+threaded interrupt where the NAPI callback gets invoked) runs by default
+at SCHED_FIFO 50 which is higher than any user thread (there are some HI
+priority kernel threads, yes). Unless there is a user thread with a
+higher priority there is no preemption.
+If it gets preempted due to $reason, the "time out check function"
+should check if the condition is true before reporting a failure due to
+timeout. (Which mean if the timeout is exceeded but the waiting
+condition is met then it should not report an error due to timeout).
 
-> Given the rate of change in stmmac, at some point we're going to have
-> to work out some way of stopping stmmac development to get such an
-> invasive cleanup change merged
+> The above picked our curiosity, and therefore we had a look at what's
+> under `drivers/net` and there doesn't seem to be much code using raw spin
+> locks directly, hence the question.  
+> 
+> Here is a link to the patch I was mentioning (although not relevant to
+> locking):
+> https://lore.kernel.org/netdev/20251015150026.117587-4-prabhakar.mahadev-lad.rj@bp.renesas.com/T/#u
+> 
+> Another issue we have seen is around CPU stalling on a couple of drivers
+> when PREEMPT_RT is enabled:
+> https://lore.kernel.org/all/CA+V-a8tWytDVmsk-PK23e4gChXH0pMDR9cKc_xEO4WXpNtr3eA@mail.gmail.com/
+> 
+> The above is more luckily related to locking issues, even though we didn't
+> have the time to dive into it just yet, so we are not 100% sure about what's
+> happening just yet.
 
-Agreed.
+It shouldn't stall. From the backtrace, stmmac_tx_clean() blocks on
+spinlock_t so someone should own it. Why is the owner not making
+progress?
+The second backtrace originates from trylock from within in
+mem_cgroup_sk_charge()/ try_charge_memcg(). As far as I remember the
+code, it does trylock once and if it fails it moves on. So it could show
+up by chance in the backtrace while it got preempted. If it spins on the
+lock via trylock then it will lockup as in the backtrace.
+If it got preempted, then there needs to be a thread with higher
+priority. 
 
- - but with my variability and pressures
-> on the time I can spend even submitting patches, I've no idea how that
-> will work... I was going to send them right at the start of this
-> cycle, but various appointments on Monday and Tuesday this week plus
-> work pressures prevented that happening.
+LOCKDEP and CONFIG_DEBUG_ATOMIC_SLEEP might show where something goes
+wrong.
 
-To give your more visibility, that's the only work I plan to do on
-stmmac for that cycle, the rest is going to be phy_port,
-and probably some netdevsim-phy.
+> Again, thanks a lot for your answer.
+> 
+> Kind regards,
+> Fab
 
-> So, I decided instead to send out the first stmmac PCS series... which
-> means I now need to wait for that to be merged before I can think about
-> sending out anything else stmmac-related. (and there's more PCS patches
-> to come beyond the 14 I sent today.)
-
-Do you plan to send the next round of PCS stuff next, or the cleanups
-for the has_xxx flags you were mentioning ?
-
-In any case, I'll be happy to help testing :)
-
-Maxime
+Sebastian
 
