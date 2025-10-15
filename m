@@ -1,105 +1,250 @@
-Return-Path: <netdev+bounces-229443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2710BDC3F6
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 05:00:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A0F7BDC3FF
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 05:03:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BBFD44E8EE9
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 03:00:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 368A4421BD9
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 03:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F246F2F2;
-	Wed, 15 Oct 2025 03:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1109D2522BE;
+	Wed, 15 Oct 2025 03:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YrjBk/St"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LBJovzoS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96556610B
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 03:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319824A08
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 03:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760497228; cv=none; b=U9p6jk/Je9tWJ/M6gVRvoeaez30o/twSC9u3xuj+BEu4+6c+enZEK7cNkTxf+Vddvh9W/jppgqSeJ3x7TgSG4IrINOjtQWrzKFwQLEk4+XG8aId7GhlPPt9RCjFxGJLSpxeU9SMci2JT7Smmsr6kGlXrMY04VscIRIj/aYQ/LIM=
+	t=1760497426; cv=none; b=eQHfqvyqUFjA88UksCNQDndlrj6aGD8nfi3rTETVssQzZw9eKs00HDqdyicgRHWUnW6DHfZbULH+2IdfN3rfKMvW7on0KOSdrVxelSv5EAx/qnJ3NPu4jPTSyf2TaILtflIoZF/CQ9DE4i2FMnG4tkTFG0dyOArineKVLbLx1LI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760497228; c=relaxed/simple;
-	bh=9HgpQOaIl0KpCDGGUx9mTKuzi12dKVgUfglVa6ujcd0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UZu/quK9nuFmbIrG7hgHGjMywa2Eb+SpAECMuBHijNIcmQn7MNYAYiANkqjlC8s3mrykRSouCpGCqaDD+U6XaeuYMYOo8kCN/Kbq5GaEbprxGMvSbg1rzhXdjB/ZrsnoqTMl07YYoyeBzcXFKyAEzANuKKxRuSCBvfVpzOinMyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YrjBk/St; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-273a0aeed57so7030455ad.1
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 20:00:26 -0700 (PDT)
+	s=arc-20240116; t=1760497426; c=relaxed/simple;
+	bh=IKc+jkIsO9mgc1GUn3H5nunONRgZo9m8m6soz3UG1+w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O2ukab5w+G1q1g6pSxFQY/pYbAOFQOzmUYpG/gs8IWatycqz27PLVBZVcbdb0qUPE9cHM19PRKKVmZqRSepAzshnFKwCF+uZ94ZXZSK83BVykrv+RpIOhqk70jgN1TnAxboz2cfpeYnVx01XON+bza9UUv97CaFCJ1D/Wk1wj+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LBJovzoS; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-27c369f898fso87313825ad.3
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 20:03:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760497226; x=1761102026; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9HgpQOaIl0KpCDGGUx9mTKuzi12dKVgUfglVa6ujcd0=;
-        b=YrjBk/StzVhvQNCieUQojA8qIfutj05/xpde5Sgga/JhqlwD3bCZ2wma0UMv5AZXOJ
-         uBwHMRRjPerDAPU2/sJf8mez3M1LFC2Rj1CYyAcJ89uPB7eE4waUSZmW6ilFMV8mz7BF
-         s+soC/aQBs3bb2ga8hGTu0r9uJk/WmvSz4VMQCBLaqbdpU82q2MIwcOEtZ7iGd71FBI8
-         /D40jpJOFOISYbAxftyN9RiEuz1LgsYnR1MOZlyDriMdQiRAV5alAggK6w0sTLJqqUXH
-         Tl//SiJdVsie951ufxms8ysUoHd77mLW0sutwdgA9HtcjJvZU6FddhZAU/IipUhTE8WI
-         6yAQ==
+        d=gmail.com; s=20230601; t=1760497422; x=1761102222; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AJRtMauxgy5L7Cll4qsdqgeV1KauSjYifSS43lZLtuI=;
+        b=LBJovzoSqKf9udA9UVg1Cvs40Lg3rqzWMX4+mjgwALr7lGviVDbLiAAlBZVS/2J6Rl
+         JrImUUk/S9W4si2WQzt4wNjVXPN2yRtX6hxFT8tr2z26ZgprQvBmoMcbf9lUNXCb0wj+
+         AvKiRAsjOEzZI+9HUImYm7N4W1imwYU7CQaGjAAFi5EWPwSy2wkm4q/kp5T8NpUcrem3
+         muZ4ijrnu5kc0HgnpVszC9irmF93um5fceZ2E5eJcNZ86K8yJMaGPHs7y53yo5Yn2HEp
+         6xC+w7BKssxUZFeitSc6udwqnjCLJIMu/DvcFquuEREM0oldecMBPDyS/ihMtgPiQLne
+         hd6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760497226; x=1761102026;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9HgpQOaIl0KpCDGGUx9mTKuzi12dKVgUfglVa6ujcd0=;
-        b=NzXvjasPA3Bg3e3bkmBNSqMHjSGXg94kpCTtqb6ijuxtiXinfkxjkexOaEX8zxRuMS
-         qihdQueyE8I28d8e9SWfj4s13dYzyM7DdUhjbgLv15rIYcHaGF0tKKCDcvHJfG19beLu
-         i9wA1D9kQvkxAL5ti+6FRFpAZNJWfTduSSnR6d0WM01HmOrljqBOxz7ZlScGVS7Rb0mg
-         6tjFT/2o4K3ZgD7X3wHGaQ+BCOVvTG4HZalc5CVyjevnkSPWK5bk+9zHvVCpQ/WakbK0
-         dPXDiKjNuADPdkQn3Vmg9T/ry+r+RyAUjXuefLc/k8f6IZ9HcisJfe+WiwKoJSvKuX56
-         Y5Yw==
-X-Forwarded-Encrypted: i=1; AJvYcCUU44X2EZ87jyVQer0o1xrlWkqsmxC3KwBXXmqr+tYMLjI/WicEwPfy4QWUDaKJHxz62ei/MkU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzcux3FnI1VAkGtsZArKPAKuyxYaG68XxeFA9Gd3t3Saz3vYi3L
-	eXmE6kyVSLBBxEEJBHNYKqGy3Sx3uFbUEb/kG7jpBwprzYzWeZgRUgmDAHYJhVeyqTi9ALbSc97
-	x2htx1Atd7c1BdUBuF5915PGnBqNOeSvFrdzCrizw
-X-Gm-Gg: ASbGncsbi87NwH0AldzCTuKy1AtBgYh8E6jdiG8ndUoeDBsXm/z4MH1vOsFM/WR7Ewy
-	uz4gw0Z559vv79sL4YZQpdkafvBJlv5jhQdBUKREkVHSrELZuUS0Xynn+yFBx2k9LTmK4W9rQd8
-	ZMK8az4KAQNxRUIq6hb+IFfxzwQ5bfEViVUH+hTkmA0qtverdIKTVtfZDb+5IfvMcZXxM9G9pmZ
-	ThBkGe8Q3jGtNJFi47eAN6WcegaacvmBRw6DVcdRivd3GnqN1vn4irPx5lvyaN+0ur6Dk+QoWo=
-X-Google-Smtp-Source: AGHT+IHbyjC3tkd7t+D0Ym1B1Nlt9k4ZBbEztyW5W4g8Chd/upIFcAaikk1ReXgUGa0VRVNdl7JBEXYhnBlvVKOEfw4=
-X-Received: by 2002:a17:903:1b6b:b0:26a:6d5a:944e with SMTP id
- d9443c01a7336-29027f271ecmr303284365ad.24.1760497225536; Tue, 14 Oct 2025
- 20:00:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760497422; x=1761102222;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AJRtMauxgy5L7Cll4qsdqgeV1KauSjYifSS43lZLtuI=;
+        b=sp9V0cqF31BFABkcWeCmp2DPWGqjfkMKvH5daiT9i3LM+dCDmnMokeMd6H0KWf9MIm
+         FhBlDhusUyVlAjPKw0kK5DxqOxctWzfrPgaGYyrSFj9qqSw7ndriT/u6FfAwFTZyifT5
+         hR87eE+CNvwmdqrIgdv/o3Jp2NAlh/pYm1a2ZmByu3mE4h0HI54lpp5qEBwinQFBqoFP
+         S4ZTEury0d4hwDjwkjchqWUuEtRlMNFO2Ds+K325q4sWxLRlsMBeveT4nsDQrFKQJj8J
+         dkp5uEXM1iz0Z1Tk3xfAgYlp+YsiaRNSSe2tHpPfZSf69mKwckV+eNobqc8IwoIxIQH9
+         2aew==
+X-Gm-Message-State: AOJu0YzOnBx94Ae9hvgD+oLGefqVhil3Q8NrhEDLgAIegZTS0qknuqYa
+	jLfPhc7zwJIQIFJC9XDX1bWokouSkz01UKnIhGNYj6HgN1zoWVdCt6Fc
+X-Gm-Gg: ASbGnctmqEDGz4EE8X+rtp/iCn1sh0lOKKRUkV4EOEnOiZWve23BqXX+M7nlV/t4UR0
+	WAtvOCyczdKg8wHIlcKxy8JLgUeKFbBxUI5n5wU2OZIegQ+h0uWIwNlvR5SaE2Z1Z9rMnO4m+97
+	d8XUar+hx8iX/iRIKR7r6OKHUSNLLGes1r/mPEZf/Zgeukrh4qJfvFuXuQf/Y08nfIel25HfHke
+	z+akPT38tAqbothr6ArnTniZD/ne+1s6jJL6reE3dOF9t0dspEu+cdOC3THCKqCrfMVQZ/GnQ3D
+	tfoSN9KjXraMEFBTkUIlJSWU97qa03iI22i0jmaLY5jNzf715ZYclOHrTXjXsjR73JSngNcpyyH
+	33rNpoXEpPxBzR+K5dEHxuaRCtvL477GtPZlSeTYWJtQ9dA==
+X-Google-Smtp-Source: AGHT+IGeFwOgcx2BiZRTvdSnQWCMeJtnp0M7gNlhEon3I1UQqUGSTj5fxR7SdCplRAQzjxgQdmFNIA==
+X-Received: by 2002:a17:902:d58f:b0:290:2735:7285 with SMTP id d9443c01a7336-2902735728emr343125225ad.47.1760497422453;
+        Tue, 14 Oct 2025 20:03:42 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29034f08de5sm180126235ad.83.2025.10.14.20.03.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Oct 2025 20:03:41 -0700 (PDT)
+Date: Wed, 15 Oct 2025 03:03:32 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sabrina Dubroca <sdubroca@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Ido Schimmel <idosch@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bridge@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv4 net-next 1/4] net: add a common function to compute
+ features from lowers devices
+Message-ID: <aO8PBOMk_EqyaGKN@fedora>
+References: <20251014080217.47988-1-liuhangbin@gmail.com>
+ <20251014080217.47988-2-liuhangbin@gmail.com>
+ <aO5X7368r8veRe5J@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251013152234.842065-1-edumazet@google.com> <20251013152234.842065-2-edumazet@google.com>
-In-Reply-To: <20251013152234.842065-2-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 14 Oct 2025 20:00:13 -0700
-X-Gm-Features: AS18NWDL522VB6a8_N2uN79XrgodotPp4xuj-wWtwmfLr3jDUl9stz0hUQejUgI
-Message-ID: <CAAVpQUCUf7LbREaUzEVK3_j=01Xfo452anr+-DF0K9UW7KbRfA@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 1/4] net: add SK_WMEM_ALLOC_BIAS constant
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aO5X7368r8veRe5J@horms.kernel.org>
 
-On Mon, Oct 13, 2025 at 8:22=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> sk->sk_wmem_alloc is initialized to 1, and sk_wmem_alloc_get()
-> takes care of this initial value.
->
-> Add SK_WMEM_ALLOC_BIAS define to not spread this magic value.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Reviewed-by: Neal Cardwell <ncardwell@google.com>
+Hi Simon,
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Thanks for the comments, I will fix all of them.
+
+Regards
+Hangbin
+On Tue, Oct 14, 2025 at 03:02:23PM +0100, Simon Horman wrote:
+> On Tue, Oct 14, 2025 at 08:02:14AM +0000, Hangbin Liu wrote:
+> 
+> ...
+> 
+> > diff --git a/net/core/dev.c b/net/core/dev.c
+> > index a64cef2c537e..54f0e792fbd2 100644
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -12616,6 +12616,101 @@ netdev_features_t netdev_increment_features(netdev_features_t all,
+> >  }
+> >  EXPORT_SYMBOL(netdev_increment_features);
+> >  
+> > +/**
+> > + *	netdev_compute_features_from_lowers - compute feature from lowers
+> > + *	@dev: the upper device
+> > + *	@update_header: whether to update upper device's header_len/headroom/tailroom
+> > + *
+> > + *	Recompute the upper device's feature based on all lower devices.
+> > + */
+> > +void netdev_compute_features_from_lowers(struct net_device *dev, bool update_header)
+> > +{
+> > +	unsigned int dst_release_flag = IFF_XMIT_DST_RELEASE | IFF_XMIT_DST_RELEASE_PERM;
+> > +	netdev_features_t gso_partial_features = VIRTUAL_DEV_GSO_PARTIAL_FEATURES;
+> > +#ifdef CONFIG_XFRM_OFFLOAD
+> > +	netdev_features_t xfrm_features = VIRTUAL_DEV_XFRM_FEATURES;
+> > +#endif
+> 
+> Hi Hangbin,
+> 
+> It would be nice to avoid the #ifdefs in this function.
+> 
+> Could xfrm_features be declared unconditoinally.
+> And then used behind if(IS_ENABLED(CONFIG_XFRM_OFFLOAD)) conditions?
+> This would increase compile coverage (and readability IMHO).
+> 
+> > +	netdev_features_t mpls_features = VIRTUAL_DEV_MPLS_FEATURES;
+> > +	netdev_features_t vlan_features = VIRTUAL_DEV_VLAN_FEATURES;
+> > +	netdev_features_t enc_features = VIRTUAL_DEV_ENC_FEATURES;
+> > +	unsigned short max_header_len = ETH_HLEN;
+> > +	unsigned int tso_max_size = TSO_MAX_SIZE;
+> > +	u16 tso_max_segs = TSO_MAX_SEGS;
+> > +	struct net_device *lower_dev;
+> > +	unsigned short max_headroom;
+> > +	unsigned short max_tailroom;
+> > +	struct list_head *iter;
+> > +
+> > +	mpls_features = netdev_base_features(mpls_features);
+> > +	vlan_features = netdev_base_features(vlan_features);
+> > +	enc_features = netdev_base_features(enc_features);
+> > +
+> > +	netdev_for_each_lower_dev(dev, lower_dev, iter) {
+> > +		gso_partial_features = netdev_increment_features(gso_partial_features,
+> > +								 lower_dev->gso_partial_features,
+> > +								 VIRTUAL_DEV_GSO_PARTIAL_FEATURES);
+> > +
+> > +		vlan_features = netdev_increment_features(vlan_features,
+> > +							  lower_dev->vlan_features,
+> > +							  VIRTUAL_DEV_VLAN_FEATURES);
+> > +
+> > +		enc_features = netdev_increment_features(enc_features,
+> > +							 lower_dev->hw_enc_features,
+> > +							 VIRTUAL_DEV_ENC_FEATURES);
+> > +
+> > +#ifdef CONFIG_XFRM_OFFLOAD
+> > +		xfrm_features = netdev_increment_features(xfrm_features,
+> > +							  lower_dev->hw_enc_features,
+> > +							  VIRTUAL_DEV_XFRM_FEATURES);
+> > +#endif
+> > +
+> > +		mpls_features = netdev_increment_features(mpls_features,
+> > +							  lower_dev->mpls_features,
+> > +							  VIRTUAL_DEV_MPLS_FEATURES);
+> > +
+> > +		dst_release_flag &= lower_dev->priv_flags;
+> > +
+> > +		if (update_header) {
+> > +			max_header_len = max_t(unsigned short, max_header_len,
+> > +					lower_dev->hard_header_len);
+> 
+> Both the type of max_header_len and .hard_header_len is unsigned short.
+> So I think max() can be used here instead of max_t(). Likewise for the
+> following two lines.
+> 
+> > +			max_headroom = max_t(unsigned short, max_headroom,
+> > +					lower_dev->needed_headroom);
+> 
+> Max Headroom [1] is used uninitialised the first time we reach here.
+> Likewise for max_tailroom below.
+> 
+> [1] https://en.wikipedia.org/wiki/Max_Headroom
+> 
+> Flagged by Smatch.
+> 
+> > +			max_tailroom = max_t(unsigned short, max_tailroom,
+> > +					lower_dev->needed_tailroom);
+> > +		}
+> > +
+> > +		tso_max_size = min(tso_max_size, lower_dev->tso_max_size);
+> > +		tso_max_segs = min(tso_max_segs, lower_dev->tso_max_segs);
+> > +	}
+> > +
+> > +	dev->gso_partial_features = gso_partial_features;
+> > +	dev->vlan_features = vlan_features;
+> > +	dev->hw_enc_features = enc_features | NETIF_F_GSO_ENCAP_ALL |
+> > +				    NETIF_F_HW_VLAN_CTAG_TX |
+> > +				    NETIF_F_HW_VLAN_STAG_TX;
+> > +#ifdef CONFIG_XFRM_OFFLOAD
+> > +	dev->hw_enc_features |= xfrm_features;
+> > +#endif
+> > +	dev->mpls_features = mpls_features;
+> > +
+> > +	dev->priv_flags &= ~IFF_XMIT_DST_RELEASE;
+> > +	if ((dev->priv_flags & IFF_XMIT_DST_RELEASE_PERM) &&
+> > +	    dst_release_flag == (IFF_XMIT_DST_RELEASE | IFF_XMIT_DST_RELEASE_PERM))
+> > +		dev->priv_flags |= IFF_XMIT_DST_RELEASE;
+> > +
+> > +	if (update_header) {
+> > +		dev->hard_header_len = max_header_len;
+> > +		dev->needed_headroom = max_headroom;
+> > +		dev->needed_tailroom = max_tailroom;
+> 
+> Also, maybe it can't happen in practice. But I think that max_headroom and
+> max_tailroom will may be used uninitialised here if the previous
+> 'update_header' condition is never reached/met.
+> 
+> Also flagged by Smatch.
+> 
+> > +	}
+> > +
+> > +	netif_set_tso_max_segs(dev, tso_max_segs);
+> > +	netif_set_tso_max_size(dev, tso_max_size);
+> > +
+> > +	netdev_change_features(dev);
+> > +}
+> > +EXPORT_SYMBOL(netdev_compute_features_from_lowers);
+> > +
+> 
+> ...
 
