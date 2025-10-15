@@ -1,108 +1,307 @@
-Return-Path: <netdev+bounces-229815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1321CBE0F67
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 00:37:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 475B1BE0F3A
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 00:36:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3719C508AFB
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:35:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83C5C1A2496F
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8CDC30E85A;
-	Wed, 15 Oct 2025 22:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9825330EF8C;
+	Wed, 15 Oct 2025 22:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mwNP+xh7"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F38D30BB84;
-	Wed, 15 Oct 2025 22:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80A724291B
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 22:35:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760567649; cv=none; b=GMJluY+RrMxmW0xkVmAc8XRCDASZvUqMSLJWNdftI7VK0PSe+S+RCkpOxhrY2q7kcdPkOXEXSdKDIhPo02EXc/CFHbOvufBceo9t4Rg7XrdqM4zyt9w6DigPNd7tMCBqmIibHQ3IxhnKJ+N7JG7KDFDFnbmRE/vxlDbBWv5B3ew=
+	t=1760567718; cv=none; b=hAeb6bhSSDwDIFjRD49ZEJ64ZFRuu8ckdCUR3Z7hJ8NT5hdeAEiEPhdvzpZpPoQmG186AHIGjyCBXBfQsV1Da9pXZIZ4nH34rWd1dKhqJ6QBlU+xoRuyJS3Z9PQaqjlWZwaORI4ZWi+HbbEhHR9SgeVAjtAizCQNkDPZ7IDCtXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760567649; c=relaxed/simple;
-	bh=f3ZXJTPXaLUSOHR0DUO+dULY39lV+saUqdm+RMnvqdU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nOdH4S4hI+WadpgJFu870QxKTx7kOTZwjzOJSclyt3VrdPzLZ9+m9PDcpcUY0qjMWM1fAuk9glkzLA8pOXv1fo241HEKljNXPpFHUJDjE967/gVMCCDhhr98x/6Oj87cg6G503HS3Xd9Flwuk/U+E6hmZCK+4rvCQdn1IAUpp1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1v9A4K-000000006Xf-310e;
-	Wed, 15 Oct 2025 22:34:04 +0000
-Date: Wed, 15 Oct 2025 23:34:01 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next 11/11] net: dsa: lantiq_gswip: treat VID 0 like the
- PVID
-Message-ID: <b220ac149922839a261b754202c05df5bb253c98.1760566491.git.daniel@makrotopia.org>
-References: <cover.1760566491.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1760567718; c=relaxed/simple;
+	bh=I+EPs1nM/tFurseNY9griVIUH2B3KLQYSeKxn+jFCAY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LD2BX36aEwwkOU4/emBDN2O2QvB3+Fby3PgU2Ys/yq8kK2bMRtqhZgF1vkwhEdyCFZg8F4mkWBFmkS7t0JBr2XVYQ8Us41f8zl3F+sYpOHTa+AANcPGJJo5L0QQ5/gvR0zOwYooxLluFy6259aa1CkHGrWOJCVzyW6mD4kZFjpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mwNP+xh7; arc=none smtp.client-ip=74.125.224.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-63bc1aeb427so130009d50.3
+        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 15:35:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760567716; x=1761172516; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4LQnHep4LQvoskqdWTslmBQiP/xWAT4BZwA6p78xI1o=;
+        b=mwNP+xh7sL7XjZs0lYResLXsm+gPsOI7jr4L0YiTfCR6R3sXRvWm84tJbVg7UwmXMi
+         fLa5UnsQ+V0dADmGRGzdoPazG4Zt4ZZ5eOh/iIP7KxD6V5RdGcbXkwao0KQEpcdxqgAF
+         J5m6oKG94J8KR5e5A3bzT3SB783HWGa549bB4I/BP5h4PdniishMAmb5PIYUDACdEckI
+         3m++hMJNG2c7tYKW4wemQFKCo7oI6V/79U6iFMIZhUSAgQzUR9/YxeM40GdujiV4frkF
+         xhg7ZzexxNGHDkqh6aTN4d9iIKO95z+qRmczvG2XAKpqZTbJnLiPDL8WTB6w7hwuNUYo
+         6i7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760567716; x=1761172516;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4LQnHep4LQvoskqdWTslmBQiP/xWAT4BZwA6p78xI1o=;
+        b=SIFld+D/4Oc99/cTt+ewlSFW4OK9BSgMKcEunNNdrRgmJwjLN5c3MZNNMvOHfTs2+L
+         xiI1uWucKecpL3KgS3s1LHfhwzMoy/hn6uT8WhE9XGBcK8KuGToabfaE/AJYOpZEFnNh
+         +tymYg6GPkNy+7mU/kVpH+Hli5YOljGsbL/4wyPZ1wYBJG0UN3v638GlzqN8gp4+adLD
+         F+EOiYvUaWMIDVygiXuLhSq4ewTL/zqjeUHAP7pkXWLn/zzFlrfQ+e4FfZYjD3NGYto1
+         0Qe/OyiSdh2AgECgXFS08X8rWkKBg7TwiP+HgRBGJ2PZq4oYtE6tajr+GSJpxyfxytXT
+         Inbg==
+X-Forwarded-Encrypted: i=1; AJvYcCVbXmsU/qBVAOUSeaOcLForX4ySk+gvZ//KVVggBR4E2R6n8dpApWt8/8OP1fvd6iZ2iL9S/30=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJULlorZk/NvLMOMv5Jst+OBS8t0IiuxO+HyPtNL/4kFQGiVjl
+	Vzr4mga+XNU2XWmNjzerJEo2UZkoMzTGI4mrPflKn8BT3Pjbt/qIcWPtmOmUhLZJlVv/h4HoYgQ
+	4zpaeD/oae0SMCSJP92wZ/IWZts/QeFI=
+X-Gm-Gg: ASbGncudkttfWd+FeejlTv44iz35ZQLsHnrQseWvYGO4wNcSzpIeisdhJ8ww0Myy0XO
+	at7n5za5zYhJ7PEsmAqjrbkzCJsUN0wp5RFlo27dy4jmy47lRCT+gi7TOTpB9/1sIZrqALQyGbH
+	NEWuLrmtp//2bRwkFbW4xCqjyYvy+XnOvsMo+KNCKzIWB/nrqWL7pS/zaUoN3KYxwODZv9o12Tl
+	O0TYBxUDOU0sv3npl/ihfH4TSdCyaGIVqIL0WJhWpppRb0rEP0spiPc3rhJXLNhF8BiPjgKzipv
+	70Hc50M2ggMbjGE2QPUSNg==
+X-Google-Smtp-Source: AGHT+IFOQFXA5WS6kJb7R8PciG7Flr1IdKR0ejCDXi3YmX/ajBlJq3wP/cx4AN7yacF3lIzA8kYFXwzNV3NkgXZj548=
+X-Received: by 2002:a05:690e:164f:b0:63c:db25:6406 with SMTP id
+ 956f58d0204a3-63cdb2584d8mr14713560d50.42.1760567715523; Wed, 15 Oct 2025
+ 15:35:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1760566491.git.daniel@makrotopia.org>
+References: <20251010174953.2884682-1-ameryhung@gmail.com> <20251010174953.2884682-3-ameryhung@gmail.com>
+ <CAEf4BzZgc3tqzDER5HN1Jz7JL7nN3K6MiFGTrouE69Pm-Vo+8Q@mail.gmail.com>
+In-Reply-To: <CAEf4BzZgc3tqzDER5HN1Jz7JL7nN3K6MiFGTrouE69Pm-Vo+8Q@mail.gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Wed, 15 Oct 2025 15:35:02 -0700
+X-Gm-Features: AS18NWCwVgjeseYjnxu1eHsbaNGrQXqF4YKiOEnVMz4OGpzYFREj857hyRRBcwE
+Message-ID: <CAMB2axN7o0pHca_u2HnbMb+pEOJubRR8Y8JewExzwxaRWtKUmQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 bpf-next 2/4] bpf: Support associating BPF program
+ with struct_ops
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
+	kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
+On Mon, Oct 13, 2025 at 5:10=E2=80=AFPM Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+>
+> On Fri, Oct 10, 2025 at 10:49=E2=80=AFAM Amery Hung <ameryhung@gmail.com>=
+ wrote:
+> >
+> > Add a new BPF command BPF_STRUCT_OPS_ASSOCIATE_PROG to allow associatin=
+g
+> > a BPF program with a struct_ops. This command takes a file descriptor o=
+f
+> > a struct_ops map and a BPF program and set prog->aux->st_ops_assoc to
+> > the kdata of the struct_ops map.
+> >
+> > The command does not accept a struct_ops program or a non-struct_ops
+> > map. Programs of a struct_ops map is automatically associated with the
+> > map during map update. If a program is shared between two struct_ops
+> > maps, the first one will be the map associated with the program. The
+> > associated struct_ops map, once set cannot be changed later. This
+> > restriction may be lifted in the future if there is a use case.
+> >
+> > Each associated programs except struct_ops programs of the map will tak=
+e
+> > a refcount on the map to pin it so that prog->aux->st_ops_assoc, if set=
+,
+> > is always valid. However, it is not guaranteed whether the map members
+> > are fully updated nor is it attached or not. For example, a BPF program
+> > can be associated with a struct_ops map before map_update. The
+> > struct_ops implementer will be responsible for maintaining and checking
+> > the state of the associated struct_ops map before accessing it.
+> >
+> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > ---
+> >  include/linux/bpf.h            | 11 ++++++++++
+> >  include/uapi/linux/bpf.h       | 16 ++++++++++++++
+> >  kernel/bpf/bpf_struct_ops.c    | 32 ++++++++++++++++++++++++++++
+> >  kernel/bpf/core.c              |  6 ++++++
+> >  kernel/bpf/syscall.c           | 38 ++++++++++++++++++++++++++++++++++
+> >  tools/include/uapi/linux/bpf.h | 16 ++++++++++++++
+> >  6 files changed, 119 insertions(+)
+> >
+> > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> > index a98c83346134..d5052745ffc6 100644
+> > --- a/include/linux/bpf.h
+> > +++ b/include/linux/bpf.h
+> > @@ -1710,6 +1710,8 @@ struct bpf_prog_aux {
+> >                 struct rcu_head rcu;
+> >         };
+> >         struct bpf_stream stream[2];
+> > +       struct mutex st_ops_assoc_mutex;
+>
+> do we need a mutex at all? cmpxchg() should work just fine. We'll also
+> potentially need to access st_ops_assoc from kprobes/fentry anyways,
+> and we can't just take mutex there
+>
+> > +       void *st_ops_assoc;
+> >  };
+> >
+> >  struct bpf_prog {
+>
+> [...]
+>
+> >
+> > @@ -1890,6 +1901,11 @@ union bpf_attr {
+> >                 __u32           prog_fd;
+> >         } prog_stream_read;
+> >
+> > +       struct {
+> > +               __u32           map_fd;
+> > +               __u32           prog_fd;
+>
+> let's add flags, we normally have some sort of flags for commands for
+> extensibility
 
-Documentation/networking/switchdev.rst says that VLAN-aware bridges must
-treat packets tagged with VID 0 the same as untagged. It appears from
-the documentation that setting the GSWIP_PCE_VCTRL_VID0 flag (which this
-driver already had defined) might achieve this.
+I will add a flag
 
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/dsa/lantiq/lantiq_gswip.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> > +       } struct_ops_assoc_prog;
+> > +
+> >  } __attribute__((aligned(8)));
+> >
+> >  /* The description below is an attempt at providing documentation to e=
+BPF
+> > diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+> > index a41e6730edcf..e57428e1653b 100644
+> > --- a/kernel/bpf/bpf_struct_ops.c
+> > +++ b/kernel/bpf/bpf_struct_ops.c
+> > @@ -528,6 +528,7 @@ static void bpf_struct_ops_map_put_progs(struct bpf=
+_struct_ops_map *st_map)
+> >         for (i =3D 0; i < st_map->funcs_cnt; i++) {
+> >                 if (!st_map->links[i])
+> >                         break;
+> > +               bpf_struct_ops_disassoc_prog(st_map->links[i]->prog);
+> >                 bpf_link_put(st_map->links[i]);
+> >                 st_map->links[i] =3D NULL;
+> >         }
+> > @@ -801,6 +802,11 @@ static long bpf_struct_ops_map_update_elem(struct =
+bpf_map *map, void *key,
+> >                         goto reset_unlock;
+> >                 }
+> >
+> > +               /* Don't stop a program from being reused. prog->aux->s=
+t_ops_assoc
+>
+> nit: comment style, we are converging onto /* on separate line
 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-index 1ff0932dae31..25f6b46957a0 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
-@@ -603,7 +603,7 @@ static int gswip_port_vlan_filtering(struct dsa_switch *ds, int port,
- 		gswip_switch_mask(priv,
- 				  GSWIP_PCE_VCTRL_VSR,
- 				  GSWIP_PCE_VCTRL_UVR | GSWIP_PCE_VCTRL_VIMR |
--				  GSWIP_PCE_VCTRL_VEMR,
-+				  GSWIP_PCE_VCTRL_VEMR | GSWIP_PCE_VCTRL_VID0,
- 				  GSWIP_PCE_VCTRL(port));
- 		gswip_switch_mask(priv, GSWIP_PCE_PCTRL_0_TVM, 0,
- 				  GSWIP_PCE_PCTRL_0p(port));
-@@ -611,7 +611,7 @@ static int gswip_port_vlan_filtering(struct dsa_switch *ds, int port,
- 		/* Use port based VLAN */
- 		gswip_switch_mask(priv,
- 				  GSWIP_PCE_VCTRL_UVR | GSWIP_PCE_VCTRL_VIMR |
--				  GSWIP_PCE_VCTRL_VEMR,
-+				  GSWIP_PCE_VCTRL_VEMR | GSWIP_PCE_VCTRL_VID0,
- 				  GSWIP_PCE_VCTRL_VSR,
- 				  GSWIP_PCE_VCTRL(port));
- 		gswip_switch_mask(priv, 0, GSWIP_PCE_PCTRL_0_TVM,
--- 
-2.51.0
+Got it, so I assume it applies to kerne/bpf/* even existing comments
+in the file are netdev style. Is it also the case for
+net/core/filter.c?
+
+
+>
+> > +                * will point to the first struct_ops kdata.
+> > +                */
+> > +               bpf_struct_ops_assoc_prog(&st_map->map, prog);
+>
+> ignoring error? we should do something better here... poisoning this
+> association altogether if program is used in multiple struct_ops seems
+> like the only thing we can reasonable do, no?
+>
+> > +
+> >                 link =3D kzalloc(sizeof(*link), GFP_USER);
+> >                 if (!link) {
+> >                         bpf_prog_put(prog);
+>
+> [...]
+>
+> >
+> > +#define BPF_STRUCT_OPS_ASSOCIATE_PROG_LAST_FIELD struct_ops_assoc_prog=
+.prog_fd
+> > +
+>
+> looking at libbpf side, it's quite a mouthful to write out
+> bpf_struct_ops_associate_prog()... maybe let's shorten this to
+> BPF_STRUCT_OPS_ASSOC or BPF_ASSOC_STRUCT_OPS (with the idea that we
+> associate struct_ops with a program). The latter is actually a bit
+> more preferable, because then we can have a meaningful high-level
+> bpf_program__assoc_struct_ops(struct bpf_program *prog, struct bpf_map
+> *map), where map has to be struct_ops. Having bpf_map__assoc_prog() is
+> a bit too generic, as this works only for struct_ops maps.
+>
+> It's all not major, but I think that lends for a bit better naming and
+> more logical usage throughout.
+
+Will change the naming.
+
+>
+> > +static int struct_ops_assoc_prog(union bpf_attr *attr)
+> > +{
+> > +       struct bpf_prog *prog;
+> > +       struct bpf_map *map;
+> > +       int ret;
+> > +
+> > +       if (CHECK_ATTR(BPF_STRUCT_OPS_ASSOCIATE_PROG))
+> > +               return -EINVAL;
+> > +
+> > +       prog =3D bpf_prog_get(attr->struct_ops_assoc_prog.prog_fd);
+> > +       if (IS_ERR(prog))
+> > +               return PTR_ERR(prog);
+> > +
+> > +       map =3D bpf_map_get(attr->struct_ops_assoc_prog.map_fd);
+> > +       if (IS_ERR(map)) {
+> > +               ret =3D PTR_ERR(map);
+> > +               goto out;
+> > +       }
+> > +
+> > +       if (map->map_type !=3D BPF_MAP_TYPE_STRUCT_OPS ||
+> > +           prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS) {
+>
+> you can check prog->type earlier, before getting map itself
+
+Got it. I will make it a separate check right after getting prog.
+
+>
+> > +               ret =3D -EINVAL;
+> > +               goto out;
+> > +       }
+> > +
+> > +       ret =3D bpf_struct_ops_assoc_prog(map, prog);
+> > +out:
+> > +       if (ret && !IS_ERR(map))
+>
+> nit: purely stylistic preference, but I'd rather have a clear
+> error-only clean up path, and success with explicit return 0, instead
+> of checking ret or IS_ERR(map)
+>
+>     ...
+>
+>     /* goto to put_{map,prog}, depending on how far we've got */
+>
+>     err =3D bpf_struct_ops_assoc_prog(map, prog);
+>     if (err)
+>         goto put_map;
+>
+>     return 0;
+>
+> put_map:
+>     bpf_map_put(map);
+> put_prog:
+>     bpf_prog_put(prog);
+>     return err;
+
+I will separate error path out.
+
+>
+>
+> > +               bpf_map_put(map);
+> > +       bpf_prog_put(prog);
+> > +       return ret;
+> > +}
+> > +
+>
+> [...]
 
