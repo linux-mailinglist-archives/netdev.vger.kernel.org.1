@@ -1,387 +1,165 @@
-Return-Path: <netdev+bounces-229567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5215BBDE4E6
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 13:41:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49392BDE513
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 13:45:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C5DBA502A1D
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 11:41:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F379C426B97
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 11:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7653322555;
-	Wed, 15 Oct 2025 11:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC01322A25;
+	Wed, 15 Oct 2025 11:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="i4/7zSlq"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja2lje4os43os4xodqa.icoremail.net (zg8tmja2lje4os43os4xodqa.icoremail.net [206.189.79.184])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97FD6322549;
-	Wed, 15 Oct 2025 11:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.79.184
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7BD322523;
+	Wed, 15 Oct 2025 11:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760528497; cv=none; b=mw2NFT1d+xrZjV7ujBga/+ioah7/qg7KkfjatDAxMpl12Ge7hZ2FsiHoqpbeHwka1ppmJxjv8uzzQECXR90R7INUk2AJKHMUPvHi4YoMNbOxpW0fdBIbveMHmxOYQs8aUN+uMEhbS5l88PMBu7V9ulL0YEwdomCIyuQYpNBxuaI=
+	t=1760528698; cv=none; b=tZ0D9h5aThZ/rlBAm4lOWJawb8k5+NbpbZI+lBNzf0guGAhssLtfUMLCOuHjQpS1XqZn3cwT8D4c6djSv54U7NRQLtepZ15RgHaeS18k/NyCAddnAWbEsz+HujLpTGjXsUG/5WtKqsowh8KSqJmni89YxppznXBUHZZC1ANYWbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760528497; c=relaxed/simple;
-	bh=y4KRpmFExJi/t0jNgbv7Yd3AFoFTw1cdZS5HuRAc4AM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gIBxnxzv4b/zj52C1GJ5yffzh5lmJoOk4Br0bD2Gln3co3suu39d8mTIOyPqNJioH0Rf/4r2HPZRUmvC5tuH7+fc+XYSE4WN52la7fAf3P7qJTMgS3Xg3PaH9RlqHAjbCXqbqx6dEZPwCkQzY9cJ4yfJXe9wXcgZ5mwoAeNRgK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=206.189.79.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from E0005182LT.eswin.cn (unknown [10.12.96.155])
-	by app2 (Coremail) with SMTP id TQJkCgAnxpRQiO9oaBMLAQ--.9206S2;
-	Wed, 15 Oct 2025 19:41:06 +0800 (CST)
-From: weishangjuan@eswincomputing.com
-To: devicetree@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk,
-	yong.liang.choong@linux.intel.com,
-	vladimir.oltean@nxp.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com,
-	weishangjuan@eswincomputing.com,
-	jan.petrous@oss.nxp.com,
-	inochiama@gmail.com,
-	jszhang@kernel.org,
-	0x1207@gmail.com,
-	boon.khai.ng@altera.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Cc: ningyu@eswincomputing.com,
-	linmin@eswincomputing.com,
-	lizhi2@eswincomputing.com,
-	pinkesh.vaghela@einfochips.com,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH v8 2/2] net: stmmac: add Eswin EIC7700 glue driver
-Date: Wed, 15 Oct 2025 19:41:01 +0800
-Message-Id: <20251015114101.1218-1-weishangjuan@eswincomputing.com>
-X-Mailer: git-send-email 2.31.1.windows.1
-In-Reply-To: <20251015113751.1114-1-weishangjuan@eswincomputing.com>
-References: <20251015113751.1114-1-weishangjuan@eswincomputing.com>
+	s=arc-20240116; t=1760528698; c=relaxed/simple;
+	bh=+UYna7j626X3GstXLWaKHsufcJRW7DHMHxNOWyvJdgQ=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=A/O9Z0TdZ53FIpqiw40rX0Rx7wJVwQYuSOVTTKxbsl9hwtUABv916A0RLqPcXFNha9a3QQBJMgeA53xQcKtqooSuaKkCisPONeQfpdRl4SDofAxDh7LiUE9lK9mJ4ipwAbqe43Z1XJ1hs1z9fblyBqoeqY1xE7b66+RRhNEt0qI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=i4/7zSlq; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1760528688; x=1761133488; i=markus.elfring@web.de;
+	bh=+UYna7j626X3GstXLWaKHsufcJRW7DHMHxNOWyvJdgQ=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=i4/7zSlq4OMKgthxdwDJQk8LqDvaMqv/yOT+YXE2znmgHHjzSDHLCkHzkxaRVy0W
+	 GROOGZUPXO2UEGWpZqeDCp7XSmjK21G/at5+GL6U5IM+F/AAyE/WGiE+IUW1zrJqV
+	 LcB3ql540JB1gOMD0jXkMSJyFXVHj0icySk+Rzwk+x4C2sdJyw3vRpkxhGFR7OTus
+	 k1z+peex4SBwaxmB4H4H0LRZanjdZQXJAQVKau8HbbIMw67j47qZh9H1nIedobag+
+	 yuHbYjpSATIeAM75LiUMN2Nb6OUCCYIXw+41lM38t1nkV2uB3Iko6xcD5r9JdTg9I
+	 CoRnUoCxgvQV3FP+mA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.69.181]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MzTLI-1uMYAy2xf6-00vbzT; Wed, 15
+ Oct 2025 13:44:48 +0200
+Message-ID: <848585e2-9fa6-4a6e-b852-e99f37f47a5e@web.de>
+Date: Wed, 15 Oct 2025 13:44:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: Cosmin Ratiu <cratiu@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ Tariq Toukan <tariqt@nvidia.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Gal Pressman <gal@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+ Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+ Moshe Shemesh <moshe@nvidia.com>, Paolo Abeni <pabeni@redhat.com>,
+ Saeed Mahameed <saeedm@nvidia.com>
+References: <1760511923-890650-1-git-send-email-tariqt@nvidia.com>
+Subject: Re: [PATCH net] net/mlx5e: psp, avoid 'accel' NULL pointer
+ dereference
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <1760511923-890650-1-git-send-email-tariqt@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:TQJkCgAnxpRQiO9oaBMLAQ--.9206S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxuFWxKr4UZFWxGFykXw4UXFb_yoWDXr18pF
-	WkAa4YqrnrJFyfK3yrJF40ka95Kw47KF1YkryfK3Zaqa90yryDXw4kta45tFWkJryDuw13
-	ta1UCFWxuFn0k3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBl14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26r4a6rW5MxkIecxEwVCm-wCF04
-	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
-	MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr4
-	1lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1U
-	MIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I
-	8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7sRiWrW5UUUUU==
-X-CM-SenderInfo: pzhl2xxdqjy31dq6v25zlqu0xpsx3x1qjou0bp/
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:897SkDtkkGduIbV2Ns1XogGEesiu2+wH2lvQSyNJVYB+LdNc0oY
+ krSAQfZWLJSH05l8ZlMIU5a7S+6BFqKpXYO/63mCtO/ITJixR0XGcqykiuSOdRtFdjpiQa+
+ 67PP33gKIN+5gtuXQs1Wt+kYxI6+Hi9iQOs1lQAX9h7v0rJ8YU4hTJqtlkV27k2AmU7ru3J
+ GcCaAnEfrqKBhf7H9I6Uw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:FfO4GWzkodg=;PU5jJUkAmxv2LbwtVGrYU3QcXRJ
+ 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
+ +3gsw==
 
-From: Shangjuan Wei <weishangjuan@eswincomputing.com>
+=E2=80=A6
+> guaranteeing that 'accel' is never NULL. Also remove an unnecessary
+> check from mlx5e_tx_wqe_inline_mode().
 
-Add Ethernet controller support for Eswin's eic7700 SoC. The driver
-implements hardware initialization, clock configuration, delay
-adjustment functions based on DWC Ethernet controller, and supports
-device tree configuration and platform driver integration.
+See also once more:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/submitting-patches.rst?h=3Dv6.17#n81
 
-Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
-Signed-off-by: Shangjuan Wei <weishangjuan@eswincomputing.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |   9 +
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../ethernet/stmicro/stmmac/dwmac-eic7700.c   | 235 ++++++++++++++++++
- 3 files changed, 245 insertions(+)
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index 9507131875b2..716daa51df7e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -67,6 +67,15 @@ config DWMAC_ANARION
-
- 	  This selects the Anarion SoC glue layer support for the stmmac driver.
-
-+config DWMAC_EIC7700
-+	tristate "Support for Eswin eic7700 ethernet driver"
-+	depends on OF && HAS_DMA && ARCH_ESWIN || COMPILE_TEST
-+	help
-+	  This driver supports the Eswin EIC7700 Ethernet controller,
-+	  which integrates Synopsys DesignWare QoS features. It enables
-+	  high-speed networking with DMA acceleration and is optimized
-+	  for embedded systems.
-+
- config DWMAC_INGENIC
- 	tristate "Ingenic MAC support"
- 	default MACH_INGENIC
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-index 51e068e26ce4..ec56bcf2db62 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-+++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-@@ -14,6 +14,7 @@ stmmac-$(CONFIG_STMMAC_SELFTESTS) += stmmac_selftests.o
- # Ordering matters. Generic driver must be last.
- obj-$(CONFIG_STMMAC_PLATFORM)	+= stmmac-platform.o
- obj-$(CONFIG_DWMAC_ANARION)	+= dwmac-anarion.o
-+obj-$(CONFIG_DWMAC_EIC7700)	+= dwmac-eic7700.o
- obj-$(CONFIG_DWMAC_INGENIC)	+= dwmac-ingenic.o
- obj-$(CONFIG_DWMAC_IPQ806X)	+= dwmac-ipq806x.o
- obj-$(CONFIG_DWMAC_LPC18XX)	+= dwmac-lpc18xx.o
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
-new file mode 100644
-index 000000000000..1dcf2037001e
---- /dev/null
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
-@@ -0,0 +1,235 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Eswin DWC Ethernet linux driver
-+ *
-+ * Copyright 2025, Beijing ESWIN Computing Technology Co., Ltd.
-+ *
-+ * Authors:
-+ *   Zhi Li <lizhi2@eswincomputing.com>
-+ *   Shuang Liang <liangshuang@eswincomputing.com>
-+ *   Shangjuan Wei <weishangjuan@eswincomputing.com>
-+ */
-+
-+#include <linux/platform_device.h>
-+#include <linux/mfd/syscon.h>
-+#include <linux/pm_runtime.h>
-+#include <linux/stmmac.h>
-+#include <linux/regmap.h>
-+#include <linux/of.h>
-+
-+#include "stmmac_platform.h"
-+
-+/* eth_phy_ctrl_offset eth0:0x100 */
-+#define EIC7700_ETH_TX_CLK_SEL		BIT(16)
-+#define EIC7700_ETH_PHY_INTF_SELI	BIT(0)
-+
-+/* eth_axi_lp_ctrl_offset eth0:0x108 */
-+#define EIC7700_ETH_CSYSREQ_VAL		BIT(0)
-+
-+/*
-+ * TX/RX Clock Delay Bit Masks:
-+ * - TX Delay: bits [14:8] — TX_CLK delay (unit: 0.1ns per bit)
-+ * - RX Delay: bits [30:24] — RX_CLK delay (unit: 0.1ns per bit)
-+ */
-+#define EIC7700_ETH_TX_ADJ_DELAY	GENMASK(14, 8)
-+#define EIC7700_ETH_RX_ADJ_DELAY	GENMASK(30, 24)
-+
-+#define EIC7700_MAX_DELAY_UNIT 0x7F
-+
-+static const char * const eic7700_clk_names[] = {
-+	"tx", "axi", "cfg",
-+};
-+
-+struct eic7700_qos_priv {
-+	struct plat_stmmacenet_data *plat_dat;
-+};
-+
-+static int eic7700_clks_config(void *priv, bool enabled)
-+{
-+	struct eic7700_qos_priv *dwc = (struct eic7700_qos_priv *)priv;
-+	struct plat_stmmacenet_data *plat = dwc->plat_dat;
-+	int ret = 0;
-+
-+	if (enabled)
-+		ret = clk_bulk_prepare_enable(plat->num_clks, plat->clks);
-+	else
-+		clk_bulk_disable_unprepare(plat->num_clks, plat->clks);
-+
-+	return ret;
-+}
-+
-+static int eic7700_dwmac_init(struct platform_device *pdev, void *priv)
-+{
-+	struct eic7700_qos_priv *dwc = priv;
-+
-+	return eic7700_clks_config(dwc, true);
-+}
-+
-+static void eic7700_dwmac_exit(struct platform_device *pdev, void *priv)
-+{
-+	struct eic7700_qos_priv *dwc = priv;
-+
-+	eic7700_clks_config(dwc, false);
-+}
-+
-+static int eic7700_dwmac_suspend(struct device *dev, void *priv)
-+{
-+	return pm_runtime_force_suspend(dev);
-+}
-+
-+static int eic7700_dwmac_resume(struct device *dev, void *priv)
-+{
-+	int ret;
-+
-+	ret = pm_runtime_force_resume(dev);
-+	if (ret)
-+		dev_err(dev, "%s failed: %d\n", __func__, ret);
-+
-+	return ret;
-+}
-+
-+static int eic7700_dwmac_probe(struct platform_device *pdev)
-+{
-+	struct plat_stmmacenet_data *plat_dat;
-+	struct stmmac_resources stmmac_res;
-+	struct eic7700_qos_priv *dwc_priv;
-+	struct regmap *eic7700_hsp_regmap;
-+	u32 eth_axi_lp_ctrl_offset;
-+	u32 eth_phy_ctrl_offset;
-+	u32 eth_phy_ctrl_regset;
-+	u32 eth_rxd_dly_offset;
-+	u32 eth_dly_param = 0;
-+	u32 delay_ps;
-+	int i, ret;
-+
-+	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret,
-+				"failed to get resources\n");
-+
-+	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
-+	if (IS_ERR(plat_dat))
-+		return dev_err_probe(&pdev->dev, PTR_ERR(plat_dat),
-+				"dt configuration failed\n");
-+
-+	dwc_priv = devm_kzalloc(&pdev->dev, sizeof(*dwc_priv), GFP_KERNEL);
-+	if (!dwc_priv)
-+		return -ENOMEM;
-+
-+	/* Read rx-internal-delay-ps and update rx_clk delay */
-+	if (!of_property_read_u32(pdev->dev.of_node,
-+				  "rx-internal-delay-ps", &delay_ps)) {
-+		u32 val = min(delay_ps / 100, EIC7700_MAX_DELAY_UNIT);
-+
-+		eth_dly_param &= ~EIC7700_ETH_RX_ADJ_DELAY;
-+		eth_dly_param |= FIELD_PREP(EIC7700_ETH_RX_ADJ_DELAY, val);
-+	} else {
-+		return dev_err_probe(&pdev->dev, -EINVAL,
-+			"missing required property rx-internal-delay-ps\n");
-+	}
-+
-+	/* Read tx-internal-delay-ps and update tx_clk delay */
-+	if (!of_property_read_u32(pdev->dev.of_node,
-+				  "tx-internal-delay-ps", &delay_ps)) {
-+		u32 val = min(delay_ps / 100, EIC7700_MAX_DELAY_UNIT);
-+
-+		eth_dly_param &= ~EIC7700_ETH_TX_ADJ_DELAY;
-+		eth_dly_param |= FIELD_PREP(EIC7700_ETH_TX_ADJ_DELAY, val);
-+	} else {
-+		return dev_err_probe(&pdev->dev, -EINVAL,
-+			"missing required property tx-internal-delay-ps\n");
-+	}
-+
-+	eic7700_hsp_regmap = syscon_regmap_lookup_by_phandle(pdev->dev.of_node,
-+							     "eswin,hsp-sp-csr");
-+	if (IS_ERR(eic7700_hsp_regmap))
-+		return dev_err_probe(&pdev->dev,
-+				PTR_ERR(eic7700_hsp_regmap),
-+				"Failed to get hsp-sp-csr regmap\n");
-+
-+	ret = of_property_read_u32_index(pdev->dev.of_node,
-+					 "eswin,hsp-sp-csr",
-+					 1, &eth_phy_ctrl_offset);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret,
-+				     "can't get eth_phy_ctrl_offset\n");
-+
-+	regmap_read(eic7700_hsp_regmap, eth_phy_ctrl_offset,
-+		    &eth_phy_ctrl_regset);
-+	eth_phy_ctrl_regset |=
-+		(EIC7700_ETH_TX_CLK_SEL | EIC7700_ETH_PHY_INTF_SELI);
-+	regmap_write(eic7700_hsp_regmap, eth_phy_ctrl_offset,
-+		     eth_phy_ctrl_regset);
-+
-+	ret = of_property_read_u32_index(pdev->dev.of_node,
-+					 "eswin,hsp-sp-csr",
-+					 2, &eth_axi_lp_ctrl_offset);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret,
-+				     "can't get eth_axi_lp_ctrl_offset\n");
-+
-+	regmap_write(eic7700_hsp_regmap, eth_axi_lp_ctrl_offset,
-+		     EIC7700_ETH_CSYSREQ_VAL);
-+
-+	ret = of_property_read_u32_index(pdev->dev.of_node,
-+					 "eswin,hsp-sp-csr",
-+					 3, &eth_rxd_dly_offset);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret,
-+				     "can't get eth_rxd_dly_offset\n");
-+
-+	regmap_write(eic7700_hsp_regmap, eth_rxd_dly_offset,
-+		     eth_dly_param);
-+
-+	plat_dat->num_clks = ARRAY_SIZE(eic7700_clk_names);
-+	plat_dat->clks = devm_kcalloc(&pdev->dev,
-+				      plat_dat->num_clks,
-+				      sizeof(*plat_dat->clks),
-+				      GFP_KERNEL);
-+	if (!plat_dat->clks)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < ARRAY_SIZE(eic7700_clk_names); i++)
-+		plat_dat->clks[i].id = eic7700_clk_names[i];
-+
-+	ret = devm_clk_bulk_get_optional(&pdev->dev,
-+					 plat_dat->num_clks,
-+					 plat_dat->clks);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret,
-+				     "Failed to get clocks\n");
-+
-+	plat_dat->clk_tx_i = stmmac_pltfr_find_clk(plat_dat, "tx");
-+	plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
-+	plat_dat->clks_config = eic7700_clks_config;
-+	plat_dat->bsp_priv = dwc_priv;
-+	dwc_priv->plat_dat = plat_dat;
-+	plat_dat->init = eic7700_dwmac_init;
-+	plat_dat->exit = eic7700_dwmac_exit;
-+	plat_dat->suspend = eic7700_dwmac_suspend;
-+	plat_dat->resume = eic7700_dwmac_resume;
-+
-+	return devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
-+}
-+
-+static const struct of_device_id eic7700_dwmac_match[] = {
-+	{ .compatible = "eswin,eic7700-qos-eth" },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, eic7700_dwmac_match);
-+
-+static struct platform_driver eic7700_dwmac_driver = {
-+	.probe  = eic7700_dwmac_probe,
-+	.driver = {
-+		.name           = "eic7700-eth-dwmac",
-+		.pm             = &stmmac_pltfr_pm_ops,
-+		.of_match_table = eic7700_dwmac_match,
-+	},
-+};
-+module_platform_driver(eic7700_dwmac_driver);
-+
-+MODULE_AUTHOR("Zhi Li <lizhi2@eswincomputing.com>");
-+MODULE_AUTHOR("Shuang Liang <liangshuang@eswincomputing.com>");
-+MODULE_AUTHOR("Shangjuan Wei <weishangjuan@eswincomputing.com>");
-+MODULE_DESCRIPTION("Eswin eic7700 qos ethernet driver");
-+MODULE_LICENSE("GPL");
---
-2.17.1
-
+Regards,
+Markus
 
