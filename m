@@ -1,100 +1,170 @@
-Return-Path: <netdev+bounces-229428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22322BDC15F
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 03:57:28 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 455CBBDC18C
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 04:04:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D68663A9A18
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 01:57:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1E9024E6E47
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 02:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB2925C711;
-	Wed, 15 Oct 2025 01:57:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8E22F5322;
+	Wed, 15 Oct 2025 02:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xnkw5fWG"
 X-Original-To: netdev@vger.kernel.org
-Received: from baidu.com (mx21.baidu.com [220.181.3.85])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD381F4191;
-	Wed, 15 Oct 2025 01:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.181.3.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81601DED64
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 02:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760493443; cv=none; b=J6t3MZ6/AXcqWVGX6mZk8Ln0PhgHLwIfJecov/jUPPpudvnlQ4O/R3sUkHcc7rjD9tX3Ra2LMwo5TRb7gDEB1cTRKHzKRy7SIFupaNoZkIdm1XWnr3NTk68gPEk0lYlYU5AkrCKmRhUF34ty8MQNJw1/dKHrM2OGuZAULi9kK4E=
+	t=1760493852; cv=none; b=XmHOH7zD9cXyXuspnLAGMqokCzwx/s05rqR39/zBS16ByXmJUlOW453mr6nAL46Amm7iU3EVclcQ3EoKrY5DiaNpwOk5dujs1rzR3YeX2hk4lhkzC98A8b3JHdF+hEHDADHMjbTIcg9KapyApLO3nAaOMXLXhHDVCRom9HEwNPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760493443; c=relaxed/simple;
-	bh=/zC2WZ0f+zEXcM6rYZXPDJMMSq/9n/5kb+d0paxVClg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=AMBUiA+xv4BBLm9mpnQ2IeJhqD9sWRTaZE+hXqd5U8D9XKLkpnvRcIn3K8sQ8O6j/e9r6cIlOKMN0P/JPISdIKxPwOW+jzJgZV9DftQSMuEnYR4sSRtSQLF9yHPKXdVljQ5HD3MGYFvq+0CKIJAZTWrGVKCR5wP+RqvdT1JBFVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=220.181.3.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: "Li,Rongqing" <lirongqing@baidu.com>
-To: Florian Westphal <fw@strlen.de>
-CC: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
-	<kadlec@netfilter.org>, Phil Sutter <phil@nwl.cc>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, "netfilter-devel@vger.kernel.org"
-	<netfilter-devel@vger.kernel.org>, "coreteam@netfilter.org"
-	<coreteam@netfilter.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [????] Re: [PATCH net-next] netfilter: conntrack: Reduce
- cond_resched frequency in gc_worker
-Thread-Topic: [????] Re: [PATCH net-next] netfilter: conntrack: Reduce
- cond_resched frequency in gc_worker
-Thread-Index: AQHcPQDVgdtchoaPFky/o8HNXziejLTBFqYAgAFcacA=
-Date: Wed, 15 Oct 2025 01:56:35 +0000
-Message-ID: <13de94827815469193e10d6fb0c0d45b@baidu.com>
-References: <20251014115103.2678-1-lirongqing@baidu.com>
- <aO5K4mICGHVNlkHJ@strlen.de>
-In-Reply-To: <aO5K4mICGHVNlkHJ@strlen.de>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1760493852; c=relaxed/simple;
+	bh=P+qJdRj0ZKTor8K8PjlIhCDwwsoMKieqgiARaMjCz4E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=raMgq56YRJTOAfW3gufPlLxBoj9vOv9KxPGkxWYCjXcaZViTG6ibizXRIjKGlACmwqeHB22rSE8Xyqf7YVFAfuD15/RpOvYrS5jXTqJb4+mX1ZBn++V2jQAXHANWIqs59A5Qw1VdIpNOxYVq85X73t2KerA39voljZkd7kWjDC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xnkw5fWG; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760493846;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gZdR7/DIaqb474hrnDF2LoJOo8NUfyvOLOezc26QOtk=;
+	b=Xnkw5fWGSkyVrugKXdx+0aF6+Uo3OBQdfKQebeJi9Jtv7N/Fjh5nskzNn0ZgmmTh0HDc/p
+	wOoQ0uEw6rTu1TO+gsecddh0ysn3otihQk/NcEn1oV7mYIivL1hx4efJwrwt2z90BRoZEX
+	PR2I+w2rEHZMwY31RwV0PkhwwRdbx3E=
+From: xuanqiang.luo@linux.dev
+To: edumazet@google.com,
+	kuniyu@google.com,
+	pabeni@redhat.com,
+	"Paul E. McKenney" <paulmck@kernel.org>
+Cc: kerneljasonxing@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	horms@kernel.org,
+	jiayuan.chen@linux.dev,
+	ncardwell@google.com,
+	dsahern@kernel.org,
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>
+Subject: [PATCH net-next v8 0/3] net: Avoid ehash lookup races
+Date: Wed, 15 Oct 2025 10:02:33 +0800
+Message-Id: <20251015020236.431822-1-xuanqiang.luo@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-FEAS-Client-IP: 172.31.50.46
-X-FE-Policy-ID: 52:10:53:SYSTEM
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-> > The current implementation calls cond_resched() in every iteration of
-> > the garbage collection loop. This creates some overhead when
-> > processing large conntrack tables with billions of entries, as each
-> > cond_resched() invocation involves scheduler operations.
-> >
-> > To reduce this overhead, implement a time-based throttling mechanism
-> > that calls cond_resched() at most once per millisecond. This maintains
-> > system responsiveness while minimizing scheduler contention.
-> >
-> > gc_worker() with hashsize=3D10000 shows measurable improvement:
-> >
-> > Before: 7114.274us
-> > After:  5993.518us (15.8% reduction)
->=20
-> I dislike this, I have never seen this pattern.
->=20
+From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-This patch is similar as=20
+After replacing R/W locks with RCU in commit 3ab5aee7fe84 ("net: Convert
+TCP & DCCP hash tables to use RCU / hlist_nulls"), a race window emerged
+during the switch from reqsk/sk to sk/tw.
 
-commit 271557de7cbfdecb08e89ae1ca74647ceb57224f
-    xfs: reduce the rate of cond_resched calls inside scrub
+Now that both timewait sock (tw) and full sock (sk) reside on the same
+ehash chain, it is appropriate to introduce hlist_nulls replace
+operations, to eliminate the race conditions caused by this window.
 
-> Whole point of cond_resched() is to let scheduler decide.
->=20
-> Maybe it would be better to move gc_worker off to its own work queue
-> (create_workqueue()) instead of reusing system wq so one can tune the
-> priority instead?
+Before this series of patches, I previously sent another version of the
+patch, attempting to avoid the issue using a lock mechanism. However, it
+seems there are some problems with that approach now, so I've switched to
+the "replace" method in the current patches to resolve the issue.
+For details, refer to:
+https://lore.kernel.org/netdev/20250903024406.2418362-1-xuanqiang.luo@linux.dev/
 
-I am fine to move gc_worker to its own work queue
+Before I encountered this type of issue recently, I found there had been
+several historical discussions about it. Therefore, I'm adding this
+background information for those interested to reference:
+1. https://lore.kernel.org/lkml/20230118015941.1313-1-kerneljasonxing@gmail.com/
+2. https://lore.kernel.org/netdev/20230606064306.9192-1-duanmuquan@baidu.com/
 
-Thanks
+---
 
--Li
+Changes:
+  v8:
+    * Patch2
+        * Remove the unnecessary DEBUG_NET_WARN_ON_ONCE() - thanks to Eric!
+
+  v7:https://lore.kernel.org/all/20251014022703.1387794-1-xuanqiang.luo@linux.dev/
+    * Patch1
+        * Fix the checkpatch complaints.
+        * Introduces hlist_nulls_pprev_rcu() to replace
+          (*((struct hlist_nulls_node __rcu __force **)(node)->pprev)).
+        * Use next->pprev instead of new->next->pprev.
+    * Patch2
+        * Remove else if in inet_ehash_insert(), use if instead.
+    * Patch3
+        * Fix legacy comment style issues in
+          inet_twsk_hashdance_schedule().
+
+  v6: https://lore.kernel.org/all/20250925021628.886203-1-xuanqiang.luo@linux.dev/
+    * Patch 1
+        * Send and CC to the RCU maintainers.
+    * Patch 3
+        * Remove the unused function inet_twsk_add_node_rcu() and variable
+          ehead fix build warnings.
+
+  v5: https://lore.kernel.org/all/20250924015034.587056-1-xuanqiang.luo@linux.dev/
+    * Patch 1
+        * Rename __hlist_nulls_replace_rcu() to hlist_nulls_replace_rcu()
+          and update the description of hlist_nulls_replace_init_rcu().
+    * Patch 2
+        * Remove __sk_nulls_replace_node_init_rcu() and inline it into
+          sk_nulls_replace_node_init_rcu().
+        * Use DEBUG_NET_WARN_ON_ONCE() instead of WARN_ON().
+    * Patch 3
+        * Move smp_wmb() after setting the refcount.
+
+  v4: https://lore.kernel.org/all/20250920105945.538042-1-xuanqiang.luo@linux.dev/
+    * Patch 1
+        * Use WRITE_ONCE() for ->next in __hlist_nulls_replace_rcu(), and
+          add why in the commit message.
+        * Remove the node hash check in hlist_nulls_replace_init_rcu() to
+          avoid redundancy. Also remove the return value, as it serves no
+          purpose in this patch series.
+    * Patch 3
+        * Remove the check of hlist_nulls_replace_init_rcu() return value
+          in inet_twsk_hashdance_schedule() as it is unnecessary.
+          Thanks to Kuni for clarifying this.
+
+  v3: https://lore.kernel.org/all/20250916103054.719584-1-xuanqiang.luo@linux.dev/
+    * Add more background information on this type of issue to the letter
+      cover.
+
+  v2: https://lore.kernel.org/all/20250916064614.605075-1-xuanqiang.luo@linux.dev/
+    * Patch 1
+        * Use WRITE_ONCE() to initialize old->pprev.
+    * Patch 2&3
+        * Optimize sk hashed check. Thanks Kuni for pointing it out!
+
+  v1: https://lore.kernel.org/all/20250915070308.111816-1-xuanqiang.luo@linux.dev/
+
+Xuanqiang Luo (3):
+  rculist: Add hlist_nulls_replace_rcu() and
+    hlist_nulls_replace_init_rcu()
+  inet: Avoid ehash lookup race in inet_ehash_insert()
+  inet: Avoid ehash lookup race in inet_twsk_hashdance_schedule()
+
+ include/linux/rculist_nulls.h | 59 +++++++++++++++++++++++++++++++++++
+ include/net/sock.h            | 13 ++++++++
+ net/ipv4/inet_hashtables.c    |  8 +++--
+ net/ipv4/inet_timewait_sock.c | 35 +++++++--------------
+ 4 files changed, 90 insertions(+), 25 deletions(-)
+
+-- 
+2.25.1
+
 
