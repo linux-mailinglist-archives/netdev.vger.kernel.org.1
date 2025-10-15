@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-229646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4855BDF3FB
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:05:02 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 964ACBDF440
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:07:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 636AD4837D2
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:02:23 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 69343508AF6
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10052EB5A1;
-	Wed, 15 Oct 2025 15:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736742EF65C;
+	Wed, 15 Oct 2025 15:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QO/Xyg0w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K2+JimHg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C686C2E5B11
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 15:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D442E54A1
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 15:00:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760540454; cv=none; b=scLtNFUCOn91rVbM4cB2OAx3KS1+EybhGiUgk/Y0TJf1DptsfjDmWzlisEjvm8VgKPI5zzL2ddrxhaazc5FcEuu9WQGK1w4Cb/GkrnpZ/BhVGit98g8wgKUK+UrFaa7wHEbjorVLbt6l/g2b3D0rEZzA9uB6o7tbrTuOY2HEASs=
+	t=1760540459; cv=none; b=LKKB4DTxDeYcaOdVeYg+mIDF7pnF8X1PYzP6DTee8gNzXcZ+qJ3xXYP6k8IRKpdYeEJvTa5/CyiFoHAoZ34+k92BJF8fjyZHRxUDwe98TD+BskszstG3lH+t+38Rjti62tnvFUxm3SK/LrGvYWiXLD2aF6iyxpg5tBrPAkVjbH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760540454; c=relaxed/simple;
-	bh=RwSzv+8gQB1+H127TYDuoUR0wJ+1TmPyBKKgVRzUJEc=;
+	s=arc-20240116; t=1760540459; c=relaxed/simple;
+	bh=60XT5SO34ddHtpkn/CIdJmvGQY2Mb1sF34YxFyRKDfE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V/efYm3GeQ9wA9s6R6pVaJ0Z8QiExzf8zgf6dKJbSfUifoSD/ag33rSyiZR/jb6Sysb8Q/1DXy0yV5dpp6Kyctxm3NFV07c2BhqmPToD6TU/vwokhlKfzQG2lcFmzt2ssPyM3HA6T5e9+eyNwsoADimNNKGFYqJWP4iQGRa2Lms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QO/Xyg0w; arc=none smtp.client-ip=209.85.215.175
+	 MIME-Version; b=n1ykkO9fH77g9dNeDJTktA7L6dz78X946srmXo0kND4vKis7twbfNafGBhdZuOeHTgoxxUFRYICthctLroozSYJRVBffuAJveLkCdr4RorlBP+l7JvAtx5X8j/tNorTmzcmmV4GGXZAOHcjGswAV3Ij2vRyTtWqtkIuMw2vfR7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K2+JimHg; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-b57bffc0248so833595a12.0
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 08:00:51 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-271d1305ad7so104954875ad.2
+        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 08:00:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760540451; x=1761145251; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760540457; x=1761145257; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rm72wEzVMr9IsZ30OMPLzaYiRU5ZuIof9e+ZCzfB2E0=;
-        b=QO/Xyg0w4qeP5j4izl1rOx+O+69bickpQlD22a2hPrnBnbJ5ooWh71q7FCvmyoiXcZ
-         KyxmElcCQMqyga8p/IS75BR3BVDkxaLeHqYfyB1PBOropWz+V4YZoeT3p0EkRdsGmQoe
-         IqsmlKZAeHppZt4LJ4qab4AG5K4yTPRTSv9GjR1fZdbVSaobVbGwA0LRGaD9GnM9LbIS
-         TW9W1MBRHH3QLmKZfrfohf+2rWYX2AEUnsMyJpSaj5nZb1Ku7sTYcpCv3E2mqPfacRPX
-         CVKJGGagmhL4qCkBvVmqdgqXAreaX60RqGl4U4kMxdjEomeaYe7fiRsxDx1dBJFaiHFE
-         NUew==
+        bh=ifGvImgtMbsz18j1645Ok+33OIuHZ/lnBEplV9+70Ps=;
+        b=K2+JimHgj0OETor0U2PUWLzJe0XalgSCzoHcek+QuqM49FaXClZNjlwZef/myuLBfe
+         hX6BQ4BEp+OSEZbtLXkvK/4uITCr9tVcthgkh3sim5kHYWh0ZGL/Q1bglm3rAFkvUHGd
+         hejdzMeGEw2cbKRocB/DFBC2ywbCjJSr8LrcnO3+jLuwFJADWg0AM6JCO9rL0/7buJJE
+         QNgZOvVyLd6+zL3Y5FhQ1CId7uQlges7VPZVmmPaEiXd2wiRvCdzHBjW1wyjBqe34+a9
+         kFCTLo6b9aocn+fdDZrpIUnP4OXxM8qXWH/mKgY1FDdRqd1i6VYTZgfBaA4Fo0Zb3v4y
+         du0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760540451; x=1761145251;
+        d=1e100.net; s=20230601; t=1760540457; x=1761145257;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rm72wEzVMr9IsZ30OMPLzaYiRU5ZuIof9e+ZCzfB2E0=;
-        b=cT645K11uEcGEHhx0RA8P9Wti+cAD1zS4KYQDGCOp5CGxKox4SzKmOCkBT2fjrRZlp
-         cdt7JhqKdGk5OCTZ5MLxmRTQ2MXCKXrOg8JgdVARVeCgMg4him1Gdamw6qxZ/I4TKBiF
-         o4wtFEsuV4uHdi5XfVuPWLy+Kblyi5j1gzqAGDIAd8+u1iK4iKKBLdYxOZYXfNOv+nTd
-         QCmtxDkncWq9YpkZ64dY6jR1UiJwQAbV6xHZJj7Napzxc1c50WGOtO40gf+jwFeM4kqA
-         Gr8rhhCT9f9ueTiPG6n9Twb5/t1T9Ly3J0nyJjNZ8SGNaqzMeKgF9cKEIHfZH0ruwd0u
-         ep6g==
-X-Gm-Message-State: AOJu0YzMXeNnXAS/9ERWWcf+2pyubCwt4RtWKDTKvV/FSfmdxGOq0gQ8
-	u3khRHx6AfgQBZt6iqDO5oPlRu1enMVN30nyy7izlU+b+H0Y8vLhPZhE
-X-Gm-Gg: ASbGncu3QJALEv5xkDEC2cAddJ7O+6b+/o7ZCLQ3j0P7QGaBIoZfMm1NFGCaWurilIO
-	PV+FngRyNHAAWIATMNCSzvzQOBYuDyxVf92Z6q69mITkZAmMAcNd5ws85MtPdm3eDzYr4Ypb+BO
-	/XlqKDyTVoNVM86XVCGsgKyLOjv+ziS4+R0KcXGxhi6UNRebZUrZaliHDpJ7Fv04uRzyJox7KeX
-	4ZJbsQzWpXdwtevvcpOyfwk1naaJHBSIolkCJ5QqtE+qkGt+uqE1iWH/KAvEltPQvl0pPxk1Bdw
-	4oz5p0IxW49WsP0rt7Jc4NAWWzVciRPbed4VE6/pKKTHTutRNLVV1VYOSIjiTmBRe8wrkVsks1L
-	qtZEIFucCiP/kMIaVAtoHf2d5eUKZOTc4ON7zBaa/rjV/AgNQN2N8l+wE5ZApjx+rkxrFzvy3DA
+        bh=ifGvImgtMbsz18j1645Ok+33OIuHZ/lnBEplV9+70Ps=;
+        b=GDG+fdUbwnWiDbalWwj6rV0ERglWrz7DnokhR+JzvZRrwpTSaKH+W1SufChF22d11g
+         qu9bPgKe33oUDaFAVj8yHP9neMBjAm/YBI91XjBM6N0NNaW2+D565UtkLkmmivAS+xyT
+         KmV5yp9NUhRPRtshIb1Yxr5O31lcwqaDB0OnnKXamP+HgJoS4/gHOCIsq7wfyPYjHtEm
+         2nWaSaPbJDByYm7tlB9cjc95ltvycE9/5sDA0yDwfX5YUA7maQJDr/Ae5qZzWiwufstR
+         Pod4Xwwa4WbfuMYy4bno1ybfi6MS9J71zg37RunaASGGwSpADD0tvKy5PJ2L0lbPRK9P
+         TtvQ==
+X-Gm-Message-State: AOJu0Yzi5ElidfTgVylYm34h1Cy/EKpFezvS2jjBz2B9AnOQ9tcDvsck
+	7+1bIBj2dj48mSG/cu7pLspcUMgMX/BFDVDEc61Nbl+yGZo1TFUPeqfV
+X-Gm-Gg: ASbGnctHraggg7fFSMD3qLxm+braWUosT/hHt0wW3FmEA7g58u8olW2NeIp7/vHXqtf
+	2EtO5E9OzovxAZXoI1zOX/VXqAqilSAiDynIv8zGkkHyqR72RXrzD4ylG+rC4Y8Qu0iez4dqpXU
+	RUYaB5MJ5aPHU3U+CBY4quOmCdj+W5dinpyqWxlgmd23ftjvO7PuwaesRyB0Ssoj1rS5GPiYrYL
+	wxNt/jSYNkq6CCmmM1pf7zepgL5gkP/TOdkC19akBQBNMDXKb9TkiW3N75My2rWPD9SBhzLtOqC
+	fX4U8gtUQsf3IphZF1rQlQ7Lwu0mtbozELQcoMMinXMD90LNscv35htxVA9I4bEmHul8iDFbHhs
+	xcoacnRPDHM7cown8gTDOQSViuymEvOXD72E9QEb7G0Z07LnwX1rZiYtxn7h6lITCI/XJLI4tDQ
 	==
-X-Google-Smtp-Source: AGHT+IHL1rGxPYL4gon+pNH5suaietGYpXTK0qY/tw1k5qOqO1eGaSYosHoMCad+WaJfRavoeJ3/NA==
-X-Received: by 2002:a17:902:d4c2:b0:274:506d:7fcc with SMTP id d9443c01a7336-290918cbc9bmr5514205ad.6.1760540450611;
-        Wed, 15 Oct 2025 08:00:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGqxIssqtEE1gKMyZ/xPQWAaQDO4XMp/cQx9E/SYok7KUMOpcA7WPjXYLzfNma9OBCD3O8baQ==
+X-Received: by 2002:a17:903:298c:b0:265:982a:d450 with SMTP id d9443c01a7336-290273ffbf1mr386779325ad.40.1760540456721;
+        Wed, 15 Oct 2025 08:00:56 -0700 (PDT)
 Received: from iku.. ([2401:4900:1c07:c7d3:f449:63fb:7005:808e])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29034f36408sm199642265ad.91.2025.10.15.08.00.44
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29034f36408sm199642265ad.91.2025.10.15.08.00.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Oct 2025 08:00:49 -0700 (PDT)
+        Wed, 15 Oct 2025 08:00:56 -0700 (PDT)
 From: Prabhakar <prabhakar.csengg@gmail.com>
 X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 To: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
@@ -91,9 +91,9 @@ Cc: netdev@vger.kernel.org,
 	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
 	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
 	stable@vger.kernel.org
-Subject: [PATCH 2/3] net: ravb: Allocate correct number of queues based on SoC support
-Date: Wed, 15 Oct 2025 16:00:25 +0100
-Message-ID: <20251015150026.117587-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: [PATCH 3/3] net: ravb: Enforce descriptor type ordering to prevent early DMA start
+Date: Wed, 15 Oct 2025 16:00:26 +0100
+Message-ID: <20251015150026.117587-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251015150026.117587-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 References: <20251015150026.117587-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
@@ -107,42 +107,71 @@ Content-Transfer-Encoding: 8bit
 
 From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-On SoCs that only support the best-effort queue and not the network
-control queue, calling alloc_etherdev_mqs() with fixed values for
-TX/RX queues is not appropriate. Use the nc_queues flag from the
-per-SoC match data to determine whether the network control queue
-is available, and fall back to a single TX/RX queue when it is not.
-This ensures correct queue allocation across all supported SoCs.
+Ensure TX descriptor type fields are written in a safe order so the DMA
+engine does not begin processing a chain before all descriptors are
+fully initialised.
 
-Fixes: a92f4f0662bf ("ravb: Add nc_queue to struct ravb_hw_info")
+For multi-descriptor transmissions the driver writes DT_FEND into the
+last descriptor and DT_FSTART into the first. The DMA engine starts
+processing when it sees DT_FSTART. If the compiler or CPU reorders the
+writes and publishes DT_FSTART before DT_FEND, the DMA can start early
+and process an incomplete chain, leading to corrupted transmissions or
+DMA errors.
+
+Fix this by writing DT_FEND before the dma_wmb() barrier, executing
+dma_wmb() immediately before DT_FSTART (or DT_FSINGLE in the single
+descriptor case), and then adding a wmb() after the type updates to
+ensure CPU-side ordering before ringing the hardware doorbell.
+
+On an RZ/G2L platform running an RT kernel, this reordering hazard was
+observed as TX stalls and timeouts:
+
+  [  372.968431] NETDEV WATCHDOG: end0 (ravb): transmit queue 0 timed out
+  [  372.968494] WARNING: CPU: 0 PID: 10 at net/sched/sch_generic.c:467 dev_watchdog+0x4a4/0x4ac
+  [  373.969291] ravb 11c20000.ethernet end0: transmit timed out, status 00000000, resetting...
+
+This change enforces the required ordering and prevents the DMA engine
+from observing DT_FSTART before the rest of the descriptor chain is
+valid.
+
+Fixes: 2f45d1902acf ("ravb: minimize TX data copying")
 Cc: stable@vger.kernel.org
+Co-developed-by: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
+Signed-off-by: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
 Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 ---
- drivers/net/ethernet/renesas/ravb_main.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/renesas/ravb_main.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 69d382e8757d..a200e205825a 100644
+index a200e205825a..2a995fa9bfff 100644
 --- a/drivers/net/ethernet/renesas/ravb_main.c
 +++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -2926,13 +2926,14 @@ static int ravb_probe(struct platform_device *pdev)
- 		return dev_err_probe(&pdev->dev, PTR_ERR(rstc),
- 				     "failed to get cpg reset\n");
+@@ -2211,15 +2211,19 @@ static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
  
-+	info = of_device_get_match_data(&pdev->dev);
+ 		skb_tx_timestamp(skb);
+ 	}
+-	/* Descriptor type must be set after all the above writes */
+-	dma_wmb();
 +
- 	ndev = alloc_etherdev_mqs(sizeof(struct ravb_private),
--				  NUM_TX_QUEUE, NUM_RX_QUEUE);
-+				  info->nc_queues ? NUM_TX_QUEUE : 1,
-+				  info->nc_queues ? NUM_RX_QUEUE : 1);
- 	if (!ndev)
- 		return -ENOMEM;
++	/* For multi-descriptors set DT_FEND before calling dma_wmb() */
+ 	if (num_tx_desc > 1) {
+ 		desc->die_dt = DT_FEND;
+ 		desc--;
+-		desc->die_dt = DT_FSTART;
+-	} else {
+-		desc->die_dt = DT_FSINGLE;
+ 	}
++
++	/* Descriptor type must be set after all the above writes */
++	dma_wmb();
++	desc->die_dt = (num_tx_desc > 1) ? DT_FSTART : DT_FSINGLE;
++
++	/* Ensure data is written to RAM before initiating DMA transfer */
++	wmb();
+ 	ravb_modify(ndev, TCCR, TCCR_TSRQ0 << q, TCCR_TSRQ0 << q);
  
--	info = of_device_get_match_data(&pdev->dev);
--
- 	ndev->features = info->net_features;
- 	ndev->hw_features = info->net_hw_features;
- 	ndev->vlan_features = info->vlan_features;
+ 	priv->cur_tx[q] += num_tx_desc;
 -- 
 2.43.0
 
