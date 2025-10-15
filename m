@@ -1,143 +1,117 @@
-Return-Path: <netdev+bounces-229757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D875BE0931
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:04:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2327CBE093D
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:05:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2B6BD4E0FE7
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 20:04:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88C9D19A7BC8
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 20:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D5528BA81;
-	Wed, 15 Oct 2025 20:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F2328BA81;
+	Wed, 15 Oct 2025 20:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="SDAlH8RV";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ejhgGfK3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Z30A4E12"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7224624E4A1
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 20:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6CD41DDC07
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 20:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760558671; cv=none; b=X04s8NBFxui1VmvAUVuJKZUkH1H9rIaGkX+cGfY7JsG8NLYCiimAzEHHy11on0Po9LbCHBXciSBn/QyZ/Z1F4qXBpq+U3OAr+kVfSmb7MRab7kOd87wEdJ6C/W+rJ6bV9NCOQBceyv2N5luQeUDfEapb8JWUggUhl1jbzY4Koxc=
+	t=1760558724; cv=none; b=gNt8ZH/jifHJpUjaesdAmb7zUHf3FZhye5n6iV4m6TvV63OiGyfoe0c9FArILJUiE0eG2R82/xhj3/WAcjnsiHWVXPYUPRgmMH9Pf8y2xpuLyN+AKmRoCDBh6dKKkCEUfrXkf06UtBcNk0PaWIschV28f1gUVZ301h1GFH6Br38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760558671; c=relaxed/simple;
-	bh=PJUJnoYeA5w1Ae58zoEnn6bVrYcrFL0tv61A4SS6iAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sEhb3cvU1rLcn/3T8xpNq3CyCWEjivWom0vTm+n1VpfroPwjv+uODUNHaRiHqqMEgl2iDKvyqUIV5M7F8GD33qo0oZzhxHJZKrG02pz/zov0TryGM1py18PASLlLSgLM53iFyn85wUVGNv9S1aW72GEkxhYcZ7HM17Two46Ij54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=SDAlH8RV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ejhgGfK3; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfout.stl.internal (Postfix) with ESMTP id 02C9B1D00154;
-	Wed, 15 Oct 2025 16:04:26 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-10.internal (MEProxy); Wed, 15 Oct 2025 16:04:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1760558666; x=
-	1760645066; bh=U1j0HZ9G4dvGS60QtFN/2FsItJLixYeAckVtyuncVSk=; b=S
-	DAlH8RVk9sQQEPQjYwQNQz8nY6csO67MyrjcGYDgp4niqbEVqoL9kADKiBtOrX56
-	z0pdP50DUF8pmwwmezqrzXkzJAISKV672uV3WRlSmqKLNn40gLgkVPrZLyjdeM8a
-	Kg4VdXVYob7yrJyhh1lyrYzJpIoyGGQqePNWC+1aA99eArC0e/m4FJRY/LLluhpT
-	n7HcwpWvCfgwxxY0Rx3Lot50WD9Xc1J2uK5q2z+aFvALeoyTT/V4+Quo3tY8RN14
-	JiCNFTumhwY8w+5Dterlw1nd6Q59ri5lw1YDnaBcEP9bZQ6U/26TaAPQpFTZCL82
-	uTVORJSEFqCsaFKANFoEg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1760558666; x=1760645066; bh=U1j0HZ9G4dvGS60QtFN/2FsItJLixYeAckV
-	tyuncVSk=; b=ejhgGfK3b8/UMTJJ+GRVP7F+/wqww7Z88tGGs8tRUxN13fl3FLE
-	vOSubfrmXIcs1JcpxAPi5JefkGytdI7RdXQN5NMzBedUvNd4aCv4ixz88KFgc3M5
-	AyOJoFgZdDSMgkt1G/X3sRguBPuu0viq9/JAz9tRGsPn+FTOND/MUznypPtpxiqW
-	EoOsmmpz+NxAJ2aWYk8kAIBpD9l45g08IM3ZG5AjUViz33cFImwRr5ep8a247u8h
-	wbJsLrGNpZVwPe4cHTGfDFYnQi5purXOV39MVlJiW9s2GORNu6O7Jp85LrQpr67B
-	ZvnoiOBxjcdnUHU0+gDFSfnxt8ODqfpSFDw==
-X-ME-Sender: <xms:Sf7vaGbap5FpGHlZzGBRVl1y9jH2BMrdbpx7IngyPQar9qVUFN4M1w>
-    <xme:Sf7vaF-IgxRYLO6NYuDa8WKEPPgxvtomrwRZS1UjFT_ARpwnx5E1bxkEn5Z12nh3C
-    zcQWUVbV48qY8T6e0-0SXgeNf5DOiBrSMRJaBvveXOJ4gSg38w6VaY>
-X-ME-Received: <xmr:Sf7vaFajwHVJwcYsFL3m3GlRCXCwq-x_EpnrGKVgQsBoigWESXxEayqg6mt7>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdegfedvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfetffeffefghedvvefhjeejvdek
-    feelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
-    nhgvthdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtth
-    hopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepuggrvhgvmhes
-    uggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehh
-    ohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopeifihhllhgvmhgssehgohhogh
-    hlvgdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopegvrhhitgdrughumhgriigvthesghhmrghilhdrtghomhdprhgtph
-    htthhopehmkhhusggvtggvkhesshhushgvrdgtii
-X-ME-Proxy: <xmx:Sf7vaPfQgY0TxN7QarweDd_2dHCwarHTTnOxjsLPfVqiydv11-_sKQ>
-    <xmx:Sf7vaCm71RMtt9kP7ZpadWEk2iTRV30UjJ9Rk3vXHUJ2G1kIXxgR3Q>
-    <xmx:Sf7vaP399WgeekRCntomQQ7dvxXx1ZFZJIcXfEAVfwo9XOmW5lRDvg>
-    <xmx:Sf7vaLfb6tHQ6QHkXa-zih7R0poel1zgkoP0La-S8x92f0NLY7zssA>
-    <xmx:Sv7vaH-ay1AkguXetidaGxAPazS36gW23iDowSPKrimgMJz2bBU-UELJ>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 15 Oct 2025 16:04:25 -0400 (EDT)
-Date: Wed, 15 Oct 2025 22:04:23 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Michal Kubecek <mkubecek@suse.cz>,
-	Florian Westphal <fw@strlen.de>
-Subject: Re: [PATCH v3 net] udp: do not use skb_release_head_state() before
- skb_attempt_defer_free()
-Message-ID: <aO_-R4TlViHk_HB7@krikkit>
-References: <20251015052715.4140493-1-edumazet@google.com>
+	s=arc-20240116; t=1760558724; c=relaxed/simple;
+	bh=0qiDxOuu2yCWrCtYNQQJQ5nsm8opD9K0+H+qVjLN9c4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hXGbUY8w1waiewtJBNa2jnPGTRwuAiwA+YAa5zBx7T3VOaL7dx/+nOZiqizqx24jVkKI+rpZ7DXWsU5MbppfkWPSJlt+mBTUayqTHDq993Yaj5rMDBI6VIULOWnjqvz/biXZXEqk8yoGCKZR3vNnqliSlBelrthg5S96zLOE7jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Z30A4E12; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <1639cc31-b57f-4370-8062-6a06252451f0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760558719;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HhI+YWV+MQ/zsGtekn1H8fCQlsoHB7Hu0mNXLHEte/M=;
+	b=Z30A4E12wWKQgkrOkSHfii3Ji2k7MkVj38ZzSojaE1uECXQm9qhi3O4bKeZfp47x2ly3CK
+	iqvQSnkdMfbhWJn7bYjaoobgsmxIjdmgP+R7BCYsU7RaMMfhgIzGKbSbU/nS1Uu4z7RPh0
+	beCZANdYdYko6WpRwz3B3lUX/kL9sSo=
+Date: Wed, 15 Oct 2025 21:05:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251015052715.4140493-1-edumazet@google.com>
+Subject: Re: [PATCH net-next v2 5/7] cxgb4: convert to ndo_hwtstamp API
+To: Simon Horman <horms@kernel.org>
+Cc: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Egor Pomozov <epomozov@marvell.com>, Potnuri Bharat Teja
+ <bharat@chelsio.com>, Dimitris Michailidis <dmichail@fungible.com>,
+ MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+References: <20251014224216.8163-1-vadim.fedorenko@linux.dev>
+ <20251014224216.8163-6-vadim.fedorenko@linux.dev>
+ <aO9x7EpgTMiBBfER@horms.kernel.org>
+ <193627cf-a8c7-4428-a5d3-8813b1edc04d@linux.dev>
+ <aO-xnXskSie2PKQq@horms.kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <aO-xnXskSie2PKQq@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-2025-10-15, 05:27:15 +0000, Eric Dumazet wrote:
-> Michal reported and bisected an issue after recent adoption
-> of skb_attempt_defer_free() in UDP.
+On 15.10.2025 15:37, Simon Horman wrote:
+> On Wed, Oct 15, 2025 at 11:33:02AM +0100, Vadim Fedorenko wrote:
+>> On 15/10/2025 11:05, Simon Horman wrote:
+>>> On Tue, Oct 14, 2025 at 10:42:14PM +0000, Vadim Fedorenko wrote:
+>>>> Convert to use .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
+>>>>
+>>>> Though I'm not quite sure it worked properly before the conversion.
+>>>>
+>>>> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>>>
+>>> Hi Vadim,
+>>>
+>>> There is quite a lot of change here. Probably it's not worth "fixing"
+>>> the current code before migrating it. But I think it would be worth
+>>> expanding a bit on the statement about not being sure it worked?
+>>
+>> Hi Simon!
+>>
+>> Well, let me try to explain the statement about not being sure it
+>> worked. The original code was copying new configuration into netdev's
+>> private structure before validating that the values are acceptable by
+>> the hardware. In case of error, the driver was not restoring original
+>> values, and after the call:
+>>
+>> ioctl(SIOCSHWTSTAMP, <unsupported_config>) = -ERANGE
+>>
+>> the driver would have configuration which could not be reapplied and not
+>> synced to the actual hardware config:
+>>
+>> ioctl(SIOCGHWTSTAMP) = <unsupported_config>
+>>
+>> The logic change in the patch is to just keep original configuration in
+>> case of -ERANGE error. Otherwise the logic is not changed.
 > 
-> The issue here is that skb_release_head_state() is called twice per skb,
-> one time from skb_consume_udp(), then a second time from skb_defer_free_flush()
-> and napi_consume_skb().
+> Thanks Vadim,
 > 
-> As Sabrina suggested, remove skb_release_head_state() call from
-> skb_consume_udp().
-> 
-> Add a DEBUG_NET_WARN_ON_ONCE(skb_nfct(skb)) in skb_attempt_defer_free()
-> 
-> Many thanks to Michal, Sabrina, Paolo and Florian for their help.
-> 
-> Fixes: 6471658dc66c ("udp: use skb_attempt_defer_free()")
-> Reported-and-bisected-by: Michal Kubecek <mkubecek@suse.cz>
-> Closes: https://lore.kernel.org/netdev/gpjh4lrotyephiqpuldtxxizrsg6job7cvhiqrw72saz2ubs3h@g6fgbvexgl3r/
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Tested-by: Michal Kubecek <mkubecek@suse.cz>
-> Cc: Sabrina Dubroca <sd@queasysnail.net>
-> Cc: Florian Westphal <fw@strlen.de>
+> I see that now and it makes sense to me.
+> I do think it would be worth mentioning in the patch description.
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-
-Thanks Eric.
-
--- 
-Sabrina
+Fair point, I'll update commit message for v3.
 
