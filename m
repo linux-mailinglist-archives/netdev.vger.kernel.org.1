@@ -1,51 +1,53 @@
-Return-Path: <netdev+bounces-229551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39B6DBDDFF4
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 12:30:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C530BDE000
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 12:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCAEB4266A4
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 10:30:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8937F3AC108
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 10:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB33731D75C;
-	Wed, 15 Oct 2025 10:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2404C320A1B;
+	Wed, 15 Oct 2025 10:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mrzSQhaf"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XSBuRolC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33CA731DDAF
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 10:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FF431E0F7
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 10:27:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760524077; cv=none; b=cNk4m+s2YH/NEwtYrRyvKvvug+UiqToVTt0s6k7edq0CbZ2tKe7mkDdLCDF4hqbPZjGJiZwERE/CqWExOglcD8C1r3nKT8nSfLupJjPzYDUAnW3d/ilNvVF2QMIPyWMqZcq0Fs4HSVXEaSoCieRl2sPsuZADNcM+1pIuZyncJ0w=
+	t=1760524079; cv=none; b=KwuZbQ8x/nMiC0LdAYbFDgMoOGdnlvNR6sTjTklxxoVv5ZCh6dKzqr4f/RGmaykOLUGakkkJ9GV0XWMve9f3mv1rplwg7SojLOqVJlSIesms46A6wRZnt8+et0pQvW9mjSsBzhU6jmeX60teegxebva+GhjX0k+/Xb6aka8f6Qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760524077; c=relaxed/simple;
-	bh=zlAWA6lAmWBGFuiYtzMhVaY/0YT7pAq9umdSkR6GfMc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PvXLNLVkJClCs4ZRZ62D6cgLOsY94RvgllF8Eizd11tr+qwLh7m9DR9OzJvLw4RmZIe6MXlQH/AlAkF0NfV18jzJovWLMapa3Au2I9Z/+HL/eGgRpsD9+xLDfBtdN3FiGqBTlRWqcMuuQf/4Ytk0ugUUIDHvWf6kdzLZVEiOU8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mrzSQhaf; arc=none smtp.client-ip=185.246.84.56
+	s=arc-20240116; t=1760524079; c=relaxed/simple;
+	bh=NYSK67UaKTt6ePTsH2+/an5FnpshwDQGbnEUVoFh8KY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Aaubzpvk3LjO83wG+I4ZVsgAFuE0v6BJu1X7srfq/9B+9/bhbX589hv57LqgqGtncJ3U31EGh8kmk5Xj3abKDH419q57Ff7R9OV1tB1jl6PhoL+XSapGARCvzakW/yGSKa6y8aXNSVJBhTYzr2DlGwcI7wp44pKUDyvlJb/rfi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XSBuRolC; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 648741A13B0;
-	Wed, 15 Oct 2025 10:27:51 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 1F5D91A13C0;
+	Wed, 15 Oct 2025 10:27:54 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 329BB606F9;
-	Wed, 15 Oct 2025 10:27:51 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 56F12102F22C9;
-	Wed, 15 Oct 2025 12:27:30 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id E1B5E606F9;
+	Wed, 15 Oct 2025 10:27:53 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 02430102F22B6;
+	Wed, 15 Oct 2025 12:27:50 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760524070; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding; bh=LNu33L8ch36XV1cxGKgfSp3VX2drrLW9N8Hj5z/i8aw=;
-	b=mrzSQhafXforNEw0F6kYH3MNXoL/dVHRTdiC2HIEhVwsAJ+CGjuKjlRoQ0ks59MMKitynJ
-	lIZtyI9CYYmfNiciyApCb+qZyprauasRMJ9n8bFCDY8JKgH0i0ohcqhMHFe2GVN43CWtqQ
-	h4wtx3/ioG62e9D5c+y4B+gJeDa3NbOnnRsrcvWYvb1gwL0fjAu3SE6YDod/NmmdzGCaaT
-	HbHro0ZpyGy2LDJ1iytiHhO5kwGBfUe2wwEcGxhabSxX4utJNxQWMokrfJKeH+8AB+lLId
-	YbL1o5EevDqCCSbOWpip8PDXdsQOAsLy2IvtzGcjEjfKiDVvpCIpxTB2kA+S7A==
+	t=1760524072; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=QHVnsSy8bd4MBHdkXAoKW/zEg8SUtl8twOZfbMKVdIg=;
+	b=XSBuRolCicBkNJm8OH1Xd8R5w3Q8ZF5Tt5gZJzjGi5wmyvKOA7n7zpn+oEpXRd0ZOGotmB
+	zVbgUqeZYcrpTXDcm4FUe/M+ZNzceoKZV7HEdOwYruNARjNQGZ+ECPR7veLInMp/bP7sOq
+	RtJHttX25uC4rB3OmIiTZyAhFWzJzxH5CIlacffkU2/cLNRu2FVqjlXOuk+Y9BbovwwYe2
+	t08dlaBqLA1OkfVVGAWW/Z8oP1J1Allq4tM9ptcGExAeYN64SwQTxWz68ita3Rlw0A0Hxa
+	fe21oratbSDiLL7OtW592xBPYSMqecFEnNBVx5yHkO98kdkkWR88GX3rsarHug==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Jose Abreu <joabreu@synopsys.com>,
@@ -65,10 +67,12 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 0/3] net: stmmac: Add support for coarse timestamping
-Date: Wed, 15 Oct 2025 12:27:20 +0200
-Message-ID: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next 1/3] net: stmmac: Move subsecond increment configuration in dedicated helper
+Date: Wed, 15 Oct 2025 12:27:21 +0200
+Message-ID: <20251015102725.1297985-2-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
+References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,55 +82,88 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
 
-Hello everyone,
+In preparation for fine/coarse support, let's move the subsecond increment
+and addend configuration in a dedicated helper.
 
-This is another attempt to support the fine vs coarse timestamping modes
-in stmmac.
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 48 +++++++++++--------
+ 1 file changed, 28 insertions(+), 20 deletions(-)
 
-This mode allows trading off PTP clock frequency adjustment precision
-versus timestamping precision.
-
-In coarse mode, we lose the ability to fine-tune the PTP clock
-frequency, but get better timestamping precision instead. This is
-especially useful when acting as a PTP Grand Master, where the PTP clock
-in sync'd to a high-precision GPS clock through PPS inputs.
-
-This has been submitted before as a dedicated ioctl() back in 2020 [1].
-Since then, we now have a better representation of timestamp providers
-with a dedicated qualifier (approx vs precise).
-
-This series attempts to map these new qualifiers to stmmac's
-timestamping modes, see patch 2 for details.
-
-The main drawback IMO is that the qualifiers don't map very well to our
-timestamping modes, as the "approx" qualifier actually maps to stmmac's
-"coars" mode, but we actually gain in timestamping precision (while
-losing frequency precision).
-
-Patch 1 is prep work for the stmmac driver,
-Patch 2 adds the mode adjustment. Most of the plumbing to compute addend
-values and sub-second increment is already there in the driver.
-
-Patch 3 makes sure our NDO for timestamping provider reconfiguration is
-called upon changing the qualifier.
-
-Let me kow what you think of this approach,
-
-Maxime
-
-[1] : https://lore.kernel.org/netdev/20200514102808.31163-1-olivier.dautricourt@orolia.com/
-
-Maxime Chevallier (3):
-  net: stmmac: Move subsecond increment configuration in dedicated
-    helper
-  net: stmmac: Allow supporting coarse adjustment mode
-  net: ethtool: tsconfig: Re-configure hwtstamp upon provider change
-
- .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  2 +
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 62 +++++++++++++------
- net/ethtool/tsconfig.c                        |  2 +-
- 3 files changed, 45 insertions(+), 21 deletions(-)
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 650d75b73e0b..3f79b61d64b9 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -463,6 +463,33 @@ static void stmmac_get_rx_hwtstamp(struct stmmac_priv *priv, struct dma_desc *p,
+ 	}
+ }
+ 
++static void stmmac_update_subsecond_increment(struct stmmac_priv *priv)
++{
++	bool xmac = priv->plat->has_gmac4 || priv->plat->has_xgmac;
++	u32 sec_inc = 0;
++	u64 temp = 0;
++
++	stmmac_config_hw_tstamping(priv, priv->ptpaddr, priv->systime_flags);
++
++	/* program Sub Second Increment reg */
++	stmmac_config_sub_second_increment(priv, priv->ptpaddr,
++					   priv->plat->clk_ptp_rate,
++					   xmac, &sec_inc);
++	temp = div_u64(1000000000ULL, sec_inc);
++
++	/* Store sub second increment for later use */
++	priv->sub_second_inc = sec_inc;
++
++	/* calculate default added value:
++	 * formula is :
++	 * addend = (2^32)/freq_div_ratio;
++	 * where, freq_div_ratio = 1e9ns/sec_inc
++	 */
++	temp = (u64)(temp << 32);
++	priv->default_addend = div_u64(temp, priv->plat->clk_ptp_rate);
++	stmmac_config_addend(priv, priv->ptpaddr, priv->default_addend);
++}
++
+ /**
+  *  stmmac_hwtstamp_set - control hardware timestamping.
+  *  @dev: device pointer.
+@@ -696,10 +723,7 @@ static int stmmac_hwtstamp_get(struct net_device *dev,
+ static int stmmac_init_tstamp_counter(struct stmmac_priv *priv,
+ 				      u32 systime_flags)
+ {
+-	bool xmac = priv->plat->has_gmac4 || priv->plat->has_xgmac;
+ 	struct timespec64 now;
+-	u32 sec_inc = 0;
+-	u64 temp = 0;
+ 
+ 	if (!priv->plat->clk_ptp_rate) {
+ 		netdev_err(priv->dev, "Invalid PTP clock rate");
+@@ -709,23 +733,7 @@ static int stmmac_init_tstamp_counter(struct stmmac_priv *priv,
+ 	stmmac_config_hw_tstamping(priv, priv->ptpaddr, systime_flags);
+ 	priv->systime_flags = systime_flags;
+ 
+-	/* program Sub Second Increment reg */
+-	stmmac_config_sub_second_increment(priv, priv->ptpaddr,
+-					   priv->plat->clk_ptp_rate,
+-					   xmac, &sec_inc);
+-	temp = div_u64(1000000000ULL, sec_inc);
+-
+-	/* Store sub second increment for later use */
+-	priv->sub_second_inc = sec_inc;
+-
+-	/* calculate default added value:
+-	 * formula is :
+-	 * addend = (2^32)/freq_div_ratio;
+-	 * where, freq_div_ratio = 1e9ns/sec_inc
+-	 */
+-	temp = (u64)(temp << 32);
+-	priv->default_addend = div_u64(temp, priv->plat->clk_ptp_rate);
+-	stmmac_config_addend(priv, priv->ptpaddr, priv->default_addend);
++	stmmac_update_subsecond_increment(priv);
+ 
+ 	/* initialize system time */
+ 	ktime_get_real_ts64(&now);
 -- 
 2.49.0
 
