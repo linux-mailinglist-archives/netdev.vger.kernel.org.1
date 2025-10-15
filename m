@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-229786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47295BE0C33
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 23:11:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30258BE0CFD
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 23:26:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 068494ECBBE
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:11:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E2B819A59A3
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:26:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90DF2EBB81;
-	Wed, 15 Oct 2025 21:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484FE29D279;
+	Wed, 15 Oct 2025 21:26:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="II9+KuIH"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QdVmQ4Q0"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B4212D7DDD;
-	Wed, 15 Oct 2025 21:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8039E2F7457;
+	Wed, 15 Oct 2025 21:26:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760562704; cv=none; b=EO/vME3yA98cgnEnEYik0Ds0Lyf+WhJ0DOg83PZl/icCJWPzTNfiFUBtHEIVXaalczT1FTgr9YDh+3Po64bcRHkV2o1hVMAWKjA5AAAAZsQge9/hdXPTEpM0h/qRq8/Ze0f7kt9C9kKyDrspJVQDOL9STNacXOy39iyvc67U1Bc=
+	t=1760563588; cv=none; b=BdLtduO4TJVNw5fEJHcYrbrM/yOWo3MaphNwpyfhnvYbQdG2zKjLqTPqu1a8xL1ixCftrJwpKC2zAfwqEk1jZzkrPGb3YBNQYzADx5BJpl9aMckP45ViIidDva0/wVITEnDqZudCjMEecW9hqqJD92Aw7burVU9gztUmXfJg6vY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760562704; c=relaxed/simple;
-	bh=qBLSwv+yCCOqYdSP/9odJfd9AbbK2v4pcqe6JTmq4eI=;
+	s=arc-20240116; t=1760563588; c=relaxed/simple;
+	bh=F6cUyKMLj0q3edvV+mwaSLr+fw0MVeExFvqpD8LUu/Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YpDpjw0xc3MYUW3dWNEvmf9vCfvXk94FmWO7sjiZ6PR+z4XyzNp7Bm3q2zd8cBF33eQatkW5kR1/NQLRmn+qVr/Qa5C6wxqzTYAEjrJvubygTmxDc+8djTzpIxsOQw1gG6u0n0HA/lCUD8lkSVCox4Gk5Z9irzJBz92OyD6xIac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=II9+KuIH; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=U04gi8M1WDZWHmIHZDZtuUiuJM/jo0amOT+Ru/HUBhNXk7BAVkp9y22zwLu2kqqioSlkpzQuZLXFJ2t5YCuaZVKyVqTWo91x/HWu1N99ZJRt/mMqDlFzBAbb6Zm5XENJeE0FBC5QkQtC33mgm/Ss8HW7D9SMOiCLPEPW1ksYvG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QdVmQ4Q0; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lU7P2fdQo33lU9CWhezw41R+YVngVYZZxsfcPjczaD8=; b=II9+KuIHljJ6JNDxMUJKU01/u3
-	uxihvz7A22UHG+HrN8nFhiN08qiIE2YtWRxywh6a75ozBXd4Vw3LIgxhASL1ia9K6gG/GS+vhow8h
-	RK362b8jZiT2G1M5x86ohZlL4jW0+caGkcN9BbcCHHUEZIAzIc5392OGlZ1ytEfoTDJo=;
+	bh=AeSpn5dmCh2ZrJI87Q98dccP35CokF88J3n3w+4pfgg=; b=QdVmQ4Q0A4e4xTXnZnZp/kE7Vc
+	N9Zc8qsSt9FhFe6cc3yhjViA8VtT+K5XsIpAYnKUA2JQU52vv6Y4ltuivAVb1QAoaldEe1ignSyHL
+	rW+3zg/WtbPedbXhPxqdoxL+qjna+quTcM07UF3yNH5mFy6Bf3COJZlBCtR9IsoyApEQ=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1v98mI-00B4sb-D1; Wed, 15 Oct 2025 23:11:22 +0200
-Date: Wed, 15 Oct 2025 23:11:22 +0200
+	id 1v990V-00B4vR-ES; Wed, 15 Oct 2025 23:26:03 +0200
+Date: Wed, 15 Oct 2025 23:26:03 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -83,11 +83,11 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Vladimir Oltean <olteanv@gmail.com>,
 	Vladimir Oltean <vladimir.oltean@nxp.com>,
 	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH net-next 13/14] net: stmmac: provide PCS initialisation
- hook
-Message-ID: <96842284-8d92-46b8-8b28-2b20755c3523@lunn.ch>
+Subject: Re: [PATCH net-next 11/14] net: stmmac: do not require snps,ps-speed
+ for SGMII
+Message-ID: <15ea57e0-d127-4722-b752-4989d5a443c0@lunn.ch>
 References: <aO-tbQCVu47R3izM@shell.armlinux.org.uk>
- <E1v92NE-0000000AmHd-15fv@rmk-PC.armlinux.org.uk>
+ <E1v92N3-0000000AmHQ-4Bm2@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,30 +96,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1v92NE-0000000AmHd-15fv@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1v92N3-0000000AmHQ-4Bm2@rmk-PC.armlinux.org.uk>
 
-> +	/* Unimplemented PCS init (as indicated by stmmac_do_callback()
-> +	 * perversely returning -EINVAL) is non-fatal.
-> +	 */
-> +	ret = stmmac_mac_pcs_init(priv);
-> +	if (ret != -EINVAL)
-> +		return ret;
+On Wed, Oct 15, 2025 at 03:20:53PM +0100, Russell King (Oracle) wrote:
+> SGMII mode does not require port-speed to be specified; this only
+> switches SGMII to use the MAC configuration register speed settings
+> and the actual value is irrelevant when the link comes up.
+> 
+> As it seems the intention was to support "reverse SGMII" with this
+> setting, but the code didn't actually configure that due to a typo,
+> the warning and bad DT binding documentation has led people to
+> specify snps,ps-speed in their DT files inappropriately.
 
-Oh, that's ugly.
+I know you hit the patch limit. Do you have a patch in the next series
+which updates the binding?
 
-Looking back at
-
-commit 42de047d60bc5d87e369c36115058b9dacc5683c
-Author: Jose Abreu <Jose.Abreu@synopsys.com>
-Date:   Mon Apr 16 16:08:12 2018 +0100
-
-    net: stmmac: Switch stmmac_desc_ops to generic HW Interface Helpers
-
-which added this, i don't actually see a user of the returned EINVAL.
-EOPNOTSUPP would of been better. But changing it now will need quite a
-bit of review work :-(
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+      Andrew
 
