@@ -1,129 +1,124 @@
-Return-Path: <netdev+bounces-229529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13E75BDD96D
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 11:02:30 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4F15BDD9AC
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 11:07:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B554C353C7C
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 09:02:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ED2E24FD2B0
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 09:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0610C30AAD6;
-	Wed, 15 Oct 2025 09:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDB030648C;
+	Wed, 15 Oct 2025 09:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PIwyO76T"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="KCbe4+6a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54619307AEC
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 09:02:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8279C30B51C;
+	Wed, 15 Oct 2025 09:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760518942; cv=none; b=mu4JqwCIDTcBnOVCk0d3LJTgOzWYEXNnG5d9CvZ7oYCv2jVUfHhcIPDeQVZrKjuq047lDRqBYKpMMgERsxcPylL2d5YMuhQIdKTwOELwCobbIHP8Ou3kmfCYrifhrTU3RY1USwXkd7u3ixy6w8Lw46WhxHa/SulSrCFO+PYSYJc=
+	t=1760519236; cv=none; b=m4aA8isODFeCsn6kwXRgEnK/ZG9AxTFT12RyMUbyt4uXHlRr60vqgd++RJ4OJXVV3aw6WB+tt9bet1dU0k2PYgSfS6hHHkANfFFbbbseBiima5cRgUrprU9E3UHdt9aRf2Lls+PtjXPH+/pYy9lAg6mveJjko5amBoENPi4EQwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760518942; c=relaxed/simple;
-	bh=b/PKC4yK0a4x5vf2zpz2TWgJjUR+SxyTzU1jKnoUD2w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cfUjfET4KM9EGh44HOd9g1rPLua6JMzkBlbUvDF2MFUM4Y15YHz4TIzcC5nys5CceWDNvDPVUL8UoYZ4RJ+e8jiM3mD7otlsZ5ClVryeNDNREjVqRM6Fl12kdzT2+dEpj6Bad5Fns90Maefh/eQfAV/az49ENHJ706VLjjnpHzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PIwyO76T; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-862cbf9e0c0so796751685a.0
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 02:02:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760518940; x=1761123740; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Jbs2y26oKdHy+MMdOrQWvg1qB8gmvSLdQ2iIuvZktFk=;
-        b=PIwyO76Tq3+mX2wdWbD9NHFb0oQwDkmpJraZLkJNhe6Zv3cEwiZ6PY9WLIgBshlZgp
-         K7x2vYJqZ5601d1aR5nNDBzBYAfKRNQOFq6U5QAE2vHOqXJBSM5U4QNTYS8hvPanacUu
-         K600AoKJr6mrel2cCm/uW5v3cO2fg6BiJ3z6SJXlnywUDmKSy+BLpP/p9t2tnCplkIe5
-         NxE+gdVNS3kclZtKrgU17kxSUS/88p9zLqIRjeJeLHFzuiU3MiKDFaPALr7yP9qJPaxx
-         4fbGHyIYg3neY7PC70CW5TINeVr6OcM0cFaAw7zoFEkPKLL8ywF7PcSl1KFOqkMlTh1h
-         3qoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760518940; x=1761123740;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Jbs2y26oKdHy+MMdOrQWvg1qB8gmvSLdQ2iIuvZktFk=;
-        b=I1nURI+qHzE9xRrSqBUh6ETc5BvHoxgwpWiW/8vuW/nYuP8pl+wG1jRdun6M02RfPs
-         K6TVqUnf558yQWXF/BK08D4aMiHQ7qm6Jevxd5XR5ov4cmShYJOQ0QcYxrI4CG+5g4wA
-         7anLbVoBOm5lnGFeb29M2ts9wC0xlnOvoKvbbMa5PpR3sbA48R/48+Kt2CrBmCbfi+xU
-         XbTQLDiFw/Wttg/8ECDjPWttpiUHq4B8n1jeH441aIYBVBBsY8+X342amb/59X2vuAzM
-         Wxcm9EmIzGtuOr+TKF+l6GPPaRodaxdJ6BTVq7W3YWNoYNkdhU+MRwNGeklk/8Cgp906
-         kRmA==
-X-Forwarded-Encrypted: i=1; AJvYcCW5Sth9cVpeICwPqxB/N6E7KzAIWPlBqps9zKCwTohLpJK7WKtZFn/TnijV0JqVokaFkzapEr0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyqjx4IYHn0ObtiGRC+BREGAftNulMl1Y4F6S1RIwJr/ePYQXsb
-	FkRmvTuaTTe4p95h6YrKIVW/fi2/WP1gFsCDG6NeEQ3sX65rWj7LQX7e0Afea3tG/yeqdiuqFC5
-	JSbv3zkZl47CIBT2sY5bxL+cvPekgnX7bI91T/Tf8
-X-Gm-Gg: ASbGnct1ohHQTO9Z3lVArMCrC+ULsIpaB8quy1m/tq2y/UL9EoYJwf0sR97KIpmSTIE
-	TxoHHX8MvG39T5Tj6lz/cVNfqXkeH6Psw2AECDznADS0tXMpR996QAZZFWJQz9KVAqrUW6lBsY0
-	IlvzY3ddpWEvhWO+yrOV9KmtUfWDtILLWrVmXTViU0pEXJcvnv1/3tF3/MpynMoEUqb2CHR+PeL
-	j+/OZ9+uhllBjKHn38kZVOuCnmbrCsDPw==
-X-Google-Smtp-Source: AGHT+IG5nbpHK2kkLKQZDx7uXUf1dW8noyRFrN9p+JOB5yKBrBTZCMEeHE2xEDU+ieEt2LshZHhgdej9Xt268wXpqWE=
-X-Received: by 2002:a05:622a:350:b0:4d1:2fe4:1ba9 with SMTP id
- d75a77b69052e-4e6ead4a6bcmr340726131cf.43.1760518939710; Wed, 15 Oct 2025
- 02:02:19 -0700 (PDT)
+	s=arc-20240116; t=1760519236; c=relaxed/simple;
+	bh=NCFnMBWLauQR2xMYWWI8vdjV+DkNXQXZjIrUpco/y0o=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E275eTj50bIZNqqeyifBWozDSO5u/HRFyiBclIK0o8UVuV581GrtO634YjtUfJ7TlHZimlQYTL3vqR2lBg2nMR5Zl2GUnHs9+MDaSa19JoKn6od1jOsZVMghpS5VU47Meje/rf1B7O+Zuvc8T8SyoldtTjepvnVr2NLCrrp2ixE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=KCbe4+6a; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 39693A06F3;
+	Wed, 15 Oct 2025 11:07:04 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-type:content-type:date:from:from:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=mail; bh=jAfNhsVyf6LpNsHnnq4sFD4oX2T6dYNqq0rI5BbRCk8=; b=
+	KCbe4+6arJ03OkeQdd2gfGVKCpViPJBzGDDW+WlSLKRJJmRO8GXeOJUrh5CZkKNh
+	dQap9RdG4o4R/VPsnrWUbhwtJvarnbAoGR9cnuW1VBYX2KDxQECT0ITAi/iGRdEy
+	SUtd9ZcfFdfBS5uLv8IiJNxQuxI8NQo9mTEw9dADk8KfQeyUw/aSS8xb7vWfHUdp
+	rwIDHdLaKFa7O6TixjRBo/yMWvAMuwXe/l/S6vRgwUM4+aNLC935HkbyxdC8iqsZ
+	zzmKKFEAgWyw8hpA5gIuYnx4MtF3BQuD6pzpk4aX3tVLunwxCLclUJhDzPA8G9n4
+	IGLSyNVYI8HjIk2oaiB5EntLqJ8hvlIPn36pHrxKllyWNUMNlQGuEXPFP4jAMMuZ
+	NLz5VGxIWIWIlEJviQnynzjFeLBkrLf299ROlzZmFQ/29b77DjQbxpmkzNiT2qeV
+	DwU446NtcfzSViZoBJZymcvhaftbjG8egF0WXardE5ILIgm3ziU3KjOgx8O/Mb1Q
+	kQ1p10R9F6MtsWrb7J/0dBY6vXxae7fa3IrExiI4kf5gZzSnsfPIpBm7M7EqquJ0
+	/DAIrmj9cGb6IuY9DZ/2vpHZegW+32OsOxoCgz1i1LbhJsKJCn0C3PAW2kCizn/L
+	BxfE+1d5UIgboJ0/jYqp5BNJ7+uRQeEOU1UUKjjVcT8=
+Date: Wed, 15 Oct 2025 11:07:03 +0200
+From: Buday Csaba <buday.csaba@prolan.hu>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+CC: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 2/2] net: mdio: reset PHY before attempting to access
+ registers in fwnode_mdiobus_register_phy
+Message-ID: <aO9kN_UgU6RpOYn2@debianbuilder>
+References: <20251013135557.62949-1-buday.csaba@prolan.hu>
+ <20251013135557.62949-2-buday.csaba@prolan.hu>
+ <e4dbb9e0-4447-485a-8b64-911c6a3d0a29@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251015020236.431822-1-xuanqiang.luo@linux.dev> <20251015020236.431822-4-xuanqiang.luo@linux.dev>
-In-Reply-To: <20251015020236.431822-4-xuanqiang.luo@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 15 Oct 2025 02:02:08 -0700
-X-Gm-Features: AS18NWCu_MHbJeNbbT_nkNrBdLE1O7ipXh6nIwD1yVrORkpLpRb0wyGiFcOEDEE
-Message-ID: <CANn89iKjBJ_GUKk0+k5AHbhtp_cmN4e-PYU6j9_+XEVBspRUaA@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 3/3] inet: Avoid ehash lookup race in inet_twsk_hashdance_schedule()
-To: xuanqiang.luo@linux.dev
-Cc: kuniyu@google.com, pabeni@redhat.com, kerneljasonxing@gmail.com, 
-	davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org, 
-	horms@kernel.org, jiayuan.chen@linux.dev, ncardwell@google.com, 
-	dsahern@kernel.org, Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <e4dbb9e0-4447-485a-8b64-911c6a3d0a29@bootlin.com>
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1760519223;VERSION=8000;MC=2749234066;ID=552009;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A296767155F647566
 
-On Tue, Oct 14, 2025 at 7:04=E2=80=AFPM <xuanqiang.luo@linux.dev> wrote:
->
-> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
->
-> Since ehash lookups are lockless, if another CPU is converting sk to tw
-> concurrently, fetching the newly inserted tw with tw->tw_refcnt =3D=3D 0 =
-cause
-> lookup failure.
->
-> The call trace map is drawn as follows:
->    CPU 0                                CPU 1
->    -----                                -----
->                                      inet_twsk_hashdance_schedule()
->                                      spin_lock()
->                                      inet_twsk_add_node_rcu(tw, ...)
-> __inet_lookup_established()
-> (find tw, failure due to tw_refcnt =3D 0)
->                                      __sk_nulls_del_node_init_rcu(sk)
->                                      refcount_set(&tw->tw_refcnt, 3)
->                                      spin_unlock()
->
-> By replacing sk with tw atomically via hlist_nulls_replace_init_rcu() aft=
-er
-> setting tw_refcnt, we ensure that tw is either fully initialized or not
-> visible to other CPUs, eliminating the race.
->
-> It's worth noting that we held lock_sock() before the replacement, so
-> there's no need to check if sk is hashed. Thanks to Kuniyuki Iwashima!
->
-> Fixes: 3ab5aee7fe84 ("net: Convert TCP & DCCP hash tables to use RCU / hl=
-ist_nulls")
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-> Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+On Mon, Oct 13, 2025 at 04:31:10PM +0200, Maxime Chevallier wrote:
+> Hi,
+> 
+> On 13/10/2025 15:55, Buday Csaba wrote:
+> > When the ID of an ethernet PHY is not provided by the 'compatible'
+> > string in the device tree, its actual ID is read via the MDIO bus.
+> > For some PHYs this could be unsafe, since a hard reset may be
+> > necessary to safely access the MDIO registers.
+> > This patch makes it possible to hard-reset an ethernet PHY before
+> > attempting to read the ID, via a new device tree property, called:
+> > `reset-phy-before-probe`.
+> > 
+> > There were previous attempts to implement such functionality, I
+> > tried to collect a few of these (see links).
+> > 
+> > Link: https://lore.kernel.org/lkml/1499346330-12166-2-git-send-email-richard.leitner@skidata.com/
+> > Link: https://lore.kernel.org/all/20230405-net-next-topic-net-phy-reset-v1-0-7e5329f08002@pengutronix.de/
+> > Link: https://lore.kernel.org/netdev/20250709133222.48802-4-buday.csaba@prolan.hu/
+> > Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
+> 
+> This should probably be accompanied by a DT binding update,
+> with some justification that this is indeed HW description
+> and not OS confguration.
+> 
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+I have the corresponding patch ready, I just wanted this to be accepted
+first. My description was to be:
+  "When the PHY ID is not provided with the 'compatible' string,
+   reset the PHY before attempting to read its ID over MDIO."
+
+> At least the use of the term "probe" in the property makes this
+> sound like OS configuration, maybe something like :
+>  "phy-id-needs-reset" ?
+> 
+> Maxime
+> 
+> 
+
+Okay, I will change that accordingly. Maybe "phy-id-read-needs-reset"?
+A bit longer, but more self-explaining.
+
+Best regards,
+Csaba
+
 
