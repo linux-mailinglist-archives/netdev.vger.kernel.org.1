@@ -1,125 +1,131 @@
-Return-Path: <netdev+bounces-229519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D30BEBDD729
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 10:36:37 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3AADBDD737
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 10:37:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0FB114E2D71
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 08:36:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4565E4E164E
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 08:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8365E306487;
-	Wed, 15 Oct 2025 08:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9267D2DCF44;
+	Wed, 15 Oct 2025 08:36:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eaFkkTkh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zge8wSFb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546C62D5419;
-	Wed, 15 Oct 2025 08:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC342D7DE4
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 08:36:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760517393; cv=none; b=oo65LF19JIGaCb+Xnb7QNWANwEhQXHsrdBpKjeyujbAhYCqbUIOW55mea68nzGOj3qWEZIBuSJxoVo8WghO7rfB1MNV6eOTCpiGSZlcl96+KoijAaOQSWCGvFpGJ1ZJLG189Lm+xWyGY+TQ6eJtJxjOM29TlqLBVY0VnLVEARuM=
+	t=1760517419; cv=none; b=ja8Zt7vVoHpIeuQxlXzxAjSb0a0WllV8JtYpdbAm1OQ1rbt5UuH6ulAKc7DvCnboU32kBwqQmFaVe7GjyEGAOynwlhqCQ+sxwpxLRyUWlR+NoMTEkyZCjwsKweuQ4yzaqSt8feLL//WcJoNdjEN+4yuFnDs24BlEycN2pUNCdJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760517393; c=relaxed/simple;
-	bh=sOQyGjCqvYO/zzApnSRjFBnx7hjLIIizKGWS/lzHaFU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ELxkOZRtT0AmaV627B+JG7uPa4UMqzQ2hjkujVkL9phKzP512MDIbypxjnU7X0hMmshY0YpiWMbYdQwdbzGgzOrmSbjDJi+HjsIbL08Bat5W0LdzAn6YehV5OcFMRYjyzo5HBBrz9JWg3BkbrdRCxFZp4KxYu/7pUwcVE0/ioyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eaFkkTkh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72514C4CEF8;
-	Wed, 15 Oct 2025 08:36:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760517391;
-	bh=sOQyGjCqvYO/zzApnSRjFBnx7hjLIIizKGWS/lzHaFU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eaFkkTkhdK9MKeBGqReNQv8acZU1mWF3MHshYB9C4WFFdEy7Jt+llNIlrbm+4NweR
-	 cmFG2tolIw2xPWNCihXg1lWTQN+qiyYfAVXcJKDc/SfJSUpY7lldaw85SRW0jBe/w7
-	 b6bTy9lZnxSyt8NqHtvThq+YnL0hcobWP52MRpLIJ3ZtP/mCz6SSO99mZ366TAohFP
-	 nDuT3LpJc+Xely+EzlcAEx/3eFI6GQIlai+XYMeAPeMiD8AHFzts5zSbcMu99SDedz
-	 YhvB9vIuKSDRSKb0BUVPsA992lA9FnI1bdiGkTnBIZD+GRHoq7DmvSZ+QifcpRzfMq
-	 wMoER1hDC3D/Q==
-Date: Wed, 15 Oct 2025 09:36:26 +0100
-From: Simon Horman <horms@kernel.org>
-To: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-Cc: Sunil Goutham <sgoutham@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
+	s=arc-20240116; t=1760517419; c=relaxed/simple;
+	bh=5NLI4zsp1SBd4gOuOIKIYNZhIQLrzLg9SuY97NLQhDA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qZu6YUMajLHzsX5co7cXAYefFP2lfbiAUOINK5FzArXxvkOtn+MAb8rGYQEI9SxHVuc75AgD22pL8CUdQudts27Na7SbP+Sm+sqlpFGadou9oJlWbrPLTLrQtbyrWUAxdr9lSK5objIgBEAzHgWI8P4QMyxDHcFoKDxoU5u3F6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zge8wSFb; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-782e93932ffso5597481b3a.3
+        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 01:36:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760517417; x=1761122217; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WQEmu+bNGaiI4ph/ihH+xulFUxvjHHAKj8u1RiEsGpA=;
+        b=Zge8wSFbjwm61sGT+XRVskayrotCRJlgFRYnYJoCAj7qq1aBGSY05djGzbIDdd62De
+         N1XL+Cy/K0d5ddNkit6V0+6avdkQL3kTiG7Y0bSjTUN7KH1VigZqzikIpVXUURhhof/6
+         onl+9+ExJl76pUAE8rcJUnGMybHh6R4c6U7q/4Oh1IdjYu2BgTp7Fb7Gp+WyyljaUtem
+         cDsaWBlxuV0TPXi8Zt0gYhj0KZ8zhjzYadJlBUxZFoUpfMMMFrgM2c/uitG/4a+uFpI7
+         3IqCuTfHNRLmS8TWtGfCTBUICh+/HVas4vm6GXrRHB9DbeVjmm+x34QK+GfPscsV/FkX
+         020g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760517417; x=1761122217;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WQEmu+bNGaiI4ph/ihH+xulFUxvjHHAKj8u1RiEsGpA=;
+        b=PCS/yy5tR9AUl/ccAe55BWaZ5akI73WDziwQL+Ht9yK6RGahhEECaXXwHkcXx3+6Oa
+         Wi4DIg2yuK3NoMYtE2PWehoqOBLR2hWu8ZE06YVbaOd4Z63OkLlnRIIQXw6L3/yrZ09j
+         5fevtItkbgMQhSiXTDRkp8vi528xZ5Y1V6KRsyVEYvQTU2W++dsIcWR6mwI31kfjMRSJ
+         nQxxqHHi69Nc0C3EBCjZbK89ovZb0tumLyZHMkWtwdlBi9NZBCTkQQskHBy1ZERGqtF1
+         Chjrl6G27da1c2MJJa7FM+C0XIwGdKVLPZ39FHsAzcpwZuZ0Kmkw5f8LsbA98QQf5TAv
+         cSDg==
+X-Gm-Message-State: AOJu0Yyy2tBFyFDBQlvoGa9ypcFDwSJKYiV1WPSa/1rkoJAZaw8PWwXZ
+	NkFUcGkIlLhor3wfS0g+9u+lqRhQjaNpPxToBU4Ym+fjj5wiCSfmp6UpnQ5XcX/bLrk=
+X-Gm-Gg: ASbGncuhFVbrSubibM2Dj13u4HFC8lRmae9UZPGmlMEEcBqRLYg5CkRY5WWofi+RESv
+	ECCLt/cM95ti9yH3MDpNm1DM+z2eSYuscodRhvuE0eoaI6WS7tkwj1HcxhVoUOTUc9WZiCtL2oE
+	yTSG7nQqcYA9Am8UBbN0SGdxsBCZbLO1WFpk65qzo+lBCGriS1PGgV3ToO0zHnbRr1F5pw2vAjM
+	gHgNe8ukvM/fi+CW+mEJkOk3R05nEu4ONa67NOdCrGLScMNytpVujQKGLBSD9mpKfprMQgqg8mv
+	8Mph8p/953HZNiw4nylL0u4JvqOXlrgQ9Sp63VY8iVIBjjBDAhXloky/J0YyllFPSx2ySBSM+pD
+	7vzsS5bpeqbLv+ysI1cBi8p8ffgjqiodwtFEe7KOpVvBha6ekzOpvpf9Z
+X-Google-Smtp-Source: AGHT+IH4uRC/LwL4VguDjyrCqgeVwmaAxPM2fBN14NSAtfh0MRz3lfPwgrQAHOYcJn6D5c+3iWyLSA==
+X-Received: by 2002:a05:6a00:ccd:b0:781:1562:1f92 with SMTP id d2e1a72fcca58-79387a287dbmr31259981b3a.26.1760517417062;
+        Wed, 15 Oct 2025 01:36:57 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992bb18e28sm17879570b3a.29.2025.10.15.01.36.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Oct 2025 01:36:56 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nithya Mani <nmani@marvell.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dan.carpenter@linaro.org,
-	kernel-janitors@vger.kernel.org, error27@gmail.com
-Subject: Re: [PATCH] Octeontx2-af: Fix pci_alloc_irq_vectors() return value
- check
-Message-ID: <aO9dClea18rk9Kdx@horms.kernel.org>
-References: <20251014101442.1111734-1-harshit.m.mogalapalli@oracle.com>
- <ec88f0a0-12ee-4c16-bb0a-fb572d6e020b@oracle.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>
+Subject: [PATCH net-next] netdevsim: add ipsec hw_features
+Date: Wed, 15 Oct 2025 08:36:49 +0000
+Message-ID: <20251015083649.54744-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ec88f0a0-12ee-4c16-bb0a-fb572d6e020b@oracle.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 14, 2025 at 03:50:47PM +0530, Harshit Mogalapalli wrote:
-> Hi,
-> 
-> On 14/10/25 15:44, Harshit Mogalapalli wrote:
-> > In cgx_probe() when pci_alloc_irq_vectors() fails the error value will
-> > be negative and that check is sufficient.
-> > 
-> > 	err = pci_alloc_irq_vectors(pdev, nvec, nvec, PCI_IRQ_MSIX);
-> >          if (err < 0 || err != nvec) {
-> >          	...
-> > 	}
-> > 
-> > Remove the check which compares err with nvec.
-> > 
-> > Fixes: 1463f382f58d ("octeontx2-af: Add support for CGX link management")
-> > Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> > Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-> > ---
-> > Only compile tested.
-> > ---
-> >   drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> > index d374a4454836..f4d5a3c05fa4 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> > @@ -1993,7 +1993,7 @@ static int cgx_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> >   	nvec = pci_msix_vec_count(cgx->pdev);
-> >   	err = pci_alloc_irq_vectors(pdev, nvec, nvec, PCI_IRQ_MSIX);
-> > -	if (err < 0 || err != nvec) {
-> > +	if (err < 0) {
-> >   		dev_err(dev, "Request for %d msix vectors failed, err %d\n",
-> >   			nvec, err);
-> 
-> 
-> Now that I think about it more, maybe we want to error out when err != nvec
-> as well ? In that case maybe the right thing to do is leave the check as is
-> and set err = -EXYZ before goto ?
-> 
-> Thanks,
-> Harshit>   		goto err_release_regions;
+Currently, netdevsim only sets dev->features, which makes the ESP features
+fixed. For example:
 
-Hi Harshit,
+  # ethtool -k eni0np1 | grep esp
+  tx-esp-segmentation: on [fixed]
+  esp-hw-offload: on [fixed]
+  esp-tx-csum-hw-offload: on [fixed]
 
-My reading of the documentation of pci_alloc_irq_vectors() is that
-Because nvec is passed as both the min and max desired vectors,
-either nvecs will be allocated, or -ENOSPC will be returned.
+This patch adds the ESP features to hw_features, allowing them to be
+changed manually. For example:
 
-Maybe it is worth adding a comment about that to patch description
-or the code. But I think the code in this patch is correct.
+  # ethtool -k eni0np1 | grep esp
+  tx-esp-segmentation: on
+  esp-hw-offload: on
+  esp-tx-csum-hw-offload: on
+
+Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ drivers/net/netdevsim/ipsec.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/netdevsim/ipsec.c b/drivers/net/netdevsim/ipsec.c
+index 47cdee5577d4..36a1be4923d6 100644
+--- a/drivers/net/netdevsim/ipsec.c
++++ b/drivers/net/netdevsim/ipsec.c
+@@ -277,6 +277,7 @@ void nsim_ipsec_init(struct netdevsim *ns)
+ 				 NETIF_F_GSO_ESP)
+ 
+ 	ns->netdev->features |= NSIM_ESP_FEATURES;
++	ns->netdev->hw_features |= NSIM_ESP_FEATURES;
+ 	ns->netdev->hw_enc_features |= NSIM_ESP_FEATURES;
+ 
+ 	ns->ipsec.pfile = debugfs_create_file("ipsec", 0400,
+-- 
+2.50.1
+
 
