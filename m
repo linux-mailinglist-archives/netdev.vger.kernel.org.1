@@ -1,123 +1,109 @@
-Return-Path: <netdev+bounces-229435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0345BDC1D6
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 04:09:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BDC4BDC1BE
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 04:06:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23C2A19A2D6D
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 02:10:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF6903B52E5
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 02:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D652A3090D0;
-	Wed, 15 Oct 2025 02:09:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96FCA2F9D98;
+	Wed, 15 Oct 2025 02:06:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pOFfHOG/"
 X-Original-To: netdev@vger.kernel.org
-Received: from baidu.com (mx21.baidu.com [220.181.3.85])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9FE325C711;
-	Wed, 15 Oct 2025 02:09:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.181.3.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2246C25C711
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 02:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760494193; cv=none; b=WWBogJKuiUVlX0Z3AM5qSDPjXEoPThOFoHUBTnIybggjvb+WzUARMdyytTlytknhNxdXNb+6b4XR7CuuQzGR1mBdBVVH8Mq4caKLcmsJUFf7WjUgqaAStQ0mZ9SOW215uwS5eE7N9OyZCOmbsZ0gSdSOlE1UFS+pralcU49XhJs=
+	t=1760494006; cv=none; b=Ab4xCVk5cYvMTgsIiITsOMo6h/mZcPOaeOlakv1Se83rdYNnAKerfJQCLARmWVrmtzQHnLQjFVNMVrrFG3/2sv4jdoD/k6pptbFZD0jv5N+dYU6aDtVNNUzVa74pgOVtu6sHJKafhB4lZxSJtfPBqT5ytTnerKOGlzsigOme1YQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760494193; c=relaxed/simple;
-	bh=bc54xO84RzzB202e+ZMmbdyvlYyAFS2WR/CfmHyOe5o=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=HqaAkoj/tKwH1Edu9hEisGw9tWM576pBSFt/mC7SUB6KM+GW82pUXuTl0NI85HTKz2ki/b8Ml36wcSW09XWJO02YRZcn4k2U/wN/0g4JNDZRnS2ZArVSnW4yUuSJDVhQKsm4AfaC/00+M1qxshCwwP1Ivqa4lSg6ETaQWVbF9gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=220.181.3.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: "Li,Rongqing" <lirongqing@baidu.com>
-To: Petr Mladek <pmladek@suse.com>
-CC: Lance Yang <lance.yang@linux.dev>, "wireguard@lists.zx2c4.com"
-	<wireguard@lists.zx2c4.com>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "Liam R . Howlett"
-	<Liam.Howlett@oracle.com>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, David Hildenbrand <david@redhat.com>, "Randy
- Dunlap" <rdunlap@infradead.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	"linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>, "Andrew
- Jeffery" <andrew@codeconstruct.com.au>, Joel Stanley <joel@jms.id.au>,
-	"Russell King" <linux@armlinux.org.uk>, Lorenzo Stoakes
-	<lorenzo.stoakes@oracle.com>, Shuah Khan <shuah@kernel.org>, Steven Rostedt
-	<rostedt@goodmis.org>, "Jonathan Corbet" <corbet@lwn.net>, Joel Granados
-	<joel.granados@kernel.org>, "Andrew Morton" <akpm@linux-foundation.org>, Phil
- Auld <pauld@redhat.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "Masami Hiramatsu" <mhiramat@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, "Pawan Gupta"
-	<pawan.kumar.gupta@linux.intel.com>, Simon Horman <horms@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>, Florian Westphal
-	<fw@strlen.de>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Kees Cook
-	<kees@kernel.org>, Arnd Bergmann <arnd@arndb.de>, "Paul E . McKenney"
-	<paulmck@kernel.org>, Feng Tang <feng.tang@linux.alibaba.com>, "Jason A .
- Donenfeld" <Jason@zx2c4.com>
-Subject: RE: [????] Re: [????] Re: [PATCH][v3] hung_task: Panic after fixed
- number of hung tasks
-Thread-Topic: [????] Re: [????] Re: [PATCH][v3] hung_task: Panic after fixed
- number of hung tasks
-Thread-Index: AQHcPO9h0grxiWd7ak27/owdD96L07TBdJLA//+i6ACAAVy0QA==
-Date: Wed, 15 Oct 2025 02:04:21 +0000
-Message-ID: <b7937a55047b44c687e11e219a62009e@baidu.com>
-References: <20251012115035.2169-1-lirongqing@baidu.com>
- <588c1935-835f-4cab-9679-f31c1e903a9a@linux.dev>
- <aO4boXFaIb0_Wiif@pathway.suse.cz>
- <e3f7ddf68c2e42d7abf8643f34d84a18@baidu.com>
- <aO5Ldv4U8QSGgfog@pathway.suse.cz>
-In-Reply-To: <aO5Ldv4U8QSGgfog@pathway.suse.cz>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1760494006; c=relaxed/simple;
+	bh=WK14FIORj96xH40drvBlojMi5RAPdVR4haPtDwAaIaw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uHZaDfACuhpVDJM2oY/UU16oeFWiwQ9TsnUaGMc6WharZHW85Pn8Br2NL4jUOx2rKujnFKee416CgyFf9FqjtZrbLSy41taV3pUPQmHwrTFLWSWqhZb6M+awkVMVoBESMin7PELnW9UOT9RtTBTaJxrZIQ4MERwUz8MnR3TfTqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pOFfHOG/; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-27ee41e0798so95569505ad.1
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 19:06:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760494004; x=1761098804; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WK14FIORj96xH40drvBlojMi5RAPdVR4haPtDwAaIaw=;
+        b=pOFfHOG/kMZe4bKVKv4Skq55zdhbRtJiMrF9nuu1s+iWFj2dZRMIS6nIBaLGaKVSYm
+         qQkRqicJ5QTTRxDdoTK+S7kjj4DjSZxiwIZr/fkuHH8Gm7Q2JMUOOLZrtkQNmZAYH9aT
+         BP18ye3soGvUzXIgv1is23eXMuCF5mtwiYSWTqwkTuCBFhfz4KTVOnXbixicnrF/YyLN
+         D5Z16hDAv9hlrNfNL6E/cqA+aJLH4FmTjdDb/I5O58h5DPYmsDvzpyI9pI95HnhNdqGu
+         Xm1Ry7KTYTjWs2lExwimlOq5trFbdc0sha/eT7ad6AoVTTKo3cSjOeO6OyyBZiqM1cYp
+         JcNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760494004; x=1761098804;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WK14FIORj96xH40drvBlojMi5RAPdVR4haPtDwAaIaw=;
+        b=IP3ytdwEJqzphrp9Z3bF3jGuonhPyuAcdO2JSZFZ/haBAZ0rkJr6q3yflvk9TXnn6k
+         rDaq2JQ1tnlDjP8Q8NO4gmWyFxreLTWm1hYf3brkEAdg++L4zgFcH3LZDU7/tHaYidpk
+         CQ648m1Cye3t7bM0UlsUAslnUBioSWvH7SjTH38IH1AkJAyjOb/Sox/fQMXPZwCaSwP1
+         87CzC35aBzxu8VXuSS6/RjLaqkYR0j/JJ0xsgW6PRDuNC0Qk/QzyHxg2tuJs8rElO4nC
+         5xz7X2Gtci4ON+TWYALqSJcSkrTPIa7NLvR/X0yL9NI4M5keuTSSzaKJMgggb/ASPpra
+         zBhg==
+X-Forwarded-Encrypted: i=1; AJvYcCXG8yGQZtr6DAJCI1SLDbju/hdg99gknq5H392sebnyq+1itdTgF0SO2ezY0P4T64V5Jxxwgac=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDk7YU1hpmm75+Siz0UePHULKpYgmky32U3bpivnlI+788T+I/
+	5IiIz5o6h7nlcFWHrSqCVPMIoC6UYev1boTAbSZNy8n1RItUMhhURzWaL4o3i1KBTjoMERolOD1
+	dKBYUmsl5ltaSEtyazEJyj9mNSOqbJ2Ldc0IGxqwp
+X-Gm-Gg: ASbGncvsbqkPQRFDN9+JpMCys9AmrXqnTng5QfsdXwySvJWCYcXrgWSp8Eg/7eed7qZ
+	pEaHtM4k0AEDqcnfWTpifKSniH9v5FJMwOk/kma77roQ6vmt6xuJYaXiu+O8oNu6wW67ZjDtgWC
+	IDqWp6Vb6Yt64kgTnjyhpGpHPrEqGtMaSso+zzzIPEUqjcXevcDZkKeEBIuLFotw28LEw64S2YD
+	iA1HZ5mq5XAuJbziyKR12M3DyRvberOi8JdAR4gkKIq4x1W8L8EiREYXu/4xYxmigTqyD7k1Uc=
+X-Google-Smtp-Source: AGHT+IE+6xoTU5MkWj/sHFLyhIBmLNIIb/miQp3rwgY8IcgZYwbb6VMBbVj8iz0to3PmSJIk8XQOERtbEhug4WNeTLY=
+X-Received: by 2002:a17:902:e785:b0:288:e46d:b32b with SMTP id
+ d9443c01a7336-290273748d3mr362575005ad.17.1760494004090; Tue, 14 Oct 2025
+ 19:06:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-FEAS-Client-IP: 172.31.50.46
-X-FE-Policy-ID: 52:10:53:SYSTEM
+References: <20251014140605.2982703-1-edumazet@google.com>
+In-Reply-To: <20251014140605.2982703-1-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 14 Oct 2025 19:06:32 -0700
+X-Gm-Features: AS18NWDQCPY9TkLsO9LhTxHRoAIQ93p7CGMcYNKUFNdDjnHRN-YoDW13snzI22k
+Message-ID: <CAAVpQUCUYCA4_EchpaaZ8SafmtYkYAMKCmS9oDM3bCxzeo5Ebw@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: remove obsolete WARN_ON(refcount_read(&sk->sk_refcnt)
+ == 1)
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> I would also update the subject to something like:
->=20
->     hung_task: Panic when there are more than N hung tasks at the same
-> time
->=20
+On Tue, Oct 14, 2025 at 7:06=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> sk->sk_refcnt has been converted to refcount_t in 2017.
+>
+> __sock_put(sk) being refcount_dec(&sk->sk_refcnt), it will complain
+> loudly if the current refcnt is 1 (or less) in a non racy way.
+>
+> We can remove four WARN_ON() in favor of the generic refcount_dec()
+> check.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Ok, I will update=20
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
->=20
->=20
-> That said, I think that both approaches make sense.
->=20
-> Your approach would trigger the panic when many processes are stuck.
-> Note that it still might be a transient state. But I agree that the more =
-stuck
-> processes exist the more serious the problem likely is for the heath of t=
-he
-> system.
->=20
-> My approach would trigger panic when a single process hangs for a long
-> time. It will trigger more likely only when the problem is persistent. Th=
-e
-> seriousness depends on which particular process get stuck.
->=20
-Yes, both are reasonable requirement, and I will leave it to you or anyone =
-else interested to implement it
-
-Thanks
-
--Li.
-
-
-> I am fine with your approach. Just please, make more clear that the numbe=
-r
-> means the number of hung tasks at the same time.
-> And mention the problems to login, ...
->=20
-> Best Regards,
-> Petr
+Thanks for catching this!
 
