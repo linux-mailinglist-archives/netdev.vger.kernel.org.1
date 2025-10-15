@@ -1,116 +1,260 @@
-Return-Path: <netdev+bounces-229690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E5C2BDFCE0
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:04:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E92A1BDFCEC
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:06:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 701FB1A213AF
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:05:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C19673B3E84
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:06:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B48F338F3C;
-	Wed, 15 Oct 2025 17:04:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58BE338F2F;
+	Wed, 15 Oct 2025 17:06:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WndUeiBb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MA9u4T8A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C37032E75F;
-	Wed, 15 Oct 2025 17:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B014832E74F
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 17:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760547889; cv=none; b=QnhKApVWFdgMFLOwkSH3EKLezZdnjvLEjaIZF2qc5LSzftf7QtVBEjhy/8OFbtaNXfUf52QAD3vJ9OCsngAlGZ2nzswOzNgSIWk9OeoKbyYN7crLSZytbJdH9vya6KtAb4CszeqDtzQjJPHgbTSPAaJVX9Tn339P6yLDVeZ4xi4=
+	t=1760547964; cv=none; b=hBvrFL0BMAbCr0fllZbKVLp0nn8E3jY82g1Xx+n6z43ReVVjj2io+r3MuOfiMWbitDPtkjLytqH+MRPjSNAGc3E6dGcFClvPFSfR0x0RNpDS+k66dh8w7KoSYqRGTM6YgnIBhzvBp19NgPGrdUHpsBaACTkFZ5QTXEhE9xGJKjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760547889; c=relaxed/simple;
-	bh=qY8fH23M7LXRmtaxUiEL5LBNYRnxpYUSwqiou9zh4+M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CxmufHmBS084R6dO7lIHNuhYiQ+oCRqJLLYlY1bBGWcK4VPFZiz/m5Zj9aBgvKPRdDY2mybwSv48pzrtWRZhf1WQix1QFYnl9uayG2Fqm0apx2lOGh4sof0bRP/a0gK8c2R+Nr4SrDLBE2dLjRh4pFS+m/NleRn7JDVgz6BN6TA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WndUeiBb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 085EBC4CEF8;
-	Wed, 15 Oct 2025 17:04:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760547887;
-	bh=qY8fH23M7LXRmtaxUiEL5LBNYRnxpYUSwqiou9zh4+M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WndUeiBbh0EI7cO8+k/x+DFKzHS38lpu53rFmyQPkGykg4Z99cQlQBu4e0GkV3yun
-	 A+pbK+zgukl/0TfvPB4llhP6fEkLp87976u/7iKVDI3BE+U9UCoXhRd2MOKo6q8sf/
-	 VMfEhD8+5c/bsDRm9fED3g6aABoqjx5jnUTtvyP/m9DjCU/eDvVqUTxs3T/L7Cr9gQ
-	 nAz74chBSv4fPPwgf2HEpuODBIclRimS5+O36VIRsf3dnBS6cOArwa85ve8F+VR0uk
-	 BpHKrV5uApk6HSwCgg204yjTr9UCvWqpIYJLiDrBauONGchw2mNub62mWqVFAWde7Q
-	 1NZdP5mNlkr7w==
-Date: Wed, 15 Oct 2025 18:04:42 +0100
-From: Simon Horman <horms@kernel.org>
-To: Buday Csaba <buday.csaba@prolan.hu>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] net: mdio: reset PHY before attempting to access
- registers in fwnode_mdiobus_register_phy
-Message-ID: <aO_UKlH-Zxl1tq3W@horms.kernel.org>
-References: <20251015134503.107925-1-buday.csaba@prolan.hu>
- <20251015134503.107925-4-buday.csaba@prolan.hu>
+	s=arc-20240116; t=1760547964; c=relaxed/simple;
+	bh=ZRj4yj/dKCCw4SWLghqAcuiSwYLPhJ4yuDL64uAxDnU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Vk4/K43iXJkBMuDFHH0+AYutB8mOLj9svaxJMfyhoZuzb4GmMXXOOBNHupk+lOcF+2IcTAs6mNUP/OzB0/t68cwb53Z3BeKe32ul99X0QkrH2kUyCiN16+NaCau3Od/lb4nBD2YV+QhfKACCGBNrjqclYO25LR3KahHMFBqqd0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MA9u4T8A; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-471076f819bso6022435e9.3
+        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 10:06:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760547961; x=1761152761; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lAkTMQSX/DJUiILggSnm+16NO/7qs2Cgt/X+vx3kuHk=;
+        b=MA9u4T8ALuAdvYyQht5t0Onkqed/vNRwbUida/LZuV0X6ZKq10kKkA+qw4kCOpHJTB
+         CQx3OZJwYkmmOQ9fbfPwuaa6WrLyusvCKrR4GFUVguaLGLMTX3EtvtAoqiwyVuCpPcv8
+         HNRgoLxdO7bTylTis/KTTtH1ojqCylndEXCoDQlpnuzhhdOm/iZtpAVZzp9xYNByNAE1
+         2WYHeknJSNkbijMxNOvSTw6cB0o6mbh9p7LwHguMGrrxeWkZ+kevkZgfssd4vrAfeQ7+
+         2aRyekDSXSjIxAlaIKdkrZTbY+NqbMJzdWrjYWOeFVKnAKzfFpT3MhrRDtpwNjzPFaH+
+         jBow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760547961; x=1761152761;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lAkTMQSX/DJUiILggSnm+16NO/7qs2Cgt/X+vx3kuHk=;
+        b=Jr7srEwwAsrmWQNmrMNW3QbIeNgidlo5uerMHrpNwjiSVcot+erBoWOflaeG1Zm9lz
+         g7WYRrsPHWgPL0dXDYScX6bF4xIW7Fj5DcFJHd2sYweX/NLyIO0iWIOcWS2/huwemD8t
+         Xtm9V/soyw9d14BohgM6rofIRa8nPf0+NpmQwN0OA+r1yYQ0WxADrI2oZriKb1qMFVsF
+         I9kL8a3vC2Ucp6V1lRVZ5Ipbz/jXZfaS0VZmotBWAb/j1WgGelaI50JuxVPHl83qZMV9
+         BM2tPFoU0iqcOq49ZIaYM0BZQp04GJs9k5AhpUR9hZXfRiZOq+JAr36pZcUDk0KViM9n
+         Smng==
+X-Forwarded-Encrypted: i=1; AJvYcCVku/cHQdYZJrNfypDKD3knokgPet5Qg34YFw0nmUG+sUXBlxvrrLj1pNX52plgiHoXuTxExlQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySRf7ZFKINbH7cw36robqeJS3y9YSXxSFahun5tKZtC3Le01HE
+	A22jPnOw0asl/Et/1uGt5nhFJx7x33JA1fiJkZ7PdiB2hQVktTrY7n9McIdJAyST0xdn2OCbRyX
+	hWSyiy2YQht3gLIV53TWdi93T9fIRIeY=
+X-Gm-Gg: ASbGncvIVPlSeIcbHnDY+5Wm7f8o+pCP85VCzlff45V4I6w+rNOhLRLyC+v7tGmoufY
+	y87KciU4h/ed5DXbgnu19pKFmH3eKnSzgndtwJthgzd40hmiG3cGtUzpfeIYOnTZQi0osj/bc8D
+	Hrzp4lZz7/eI5Inhrr3qjMNhfxWbegir8RH2HvntJGp12vz3+gZVYIO+hy7/db5XrqCvFMrGyn+
+	PtcTNJBUPZjFLwrrBLXHVQF2smLggu+jiqLqVuMLwFKOnjd9pG9p9WFDueIw2oiRV3Wx3U=
+X-Google-Smtp-Source: AGHT+IHI7wNHnTiwaqUhiPR8CydFMYL65NRKSxFd39pyvhc1Mu/mg/YS2k0xCuKgzJyECEHhLkPG2NPYmawpE45EPMs=
+X-Received: by 2002:a05:600c:529a:b0:46e:3e25:1626 with SMTP id
+ 5b1f17b1804b1-46fa9aefe15mr218668285e9.19.1760547960573; Wed, 15 Oct 2025
+ 10:06:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251015134503.107925-4-buday.csaba@prolan.hu>
+References: <20251015150026.117587-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251015150026.117587-2-prabhakar.mahadev-lad.rj@bp.renesas.com> <20251015153556.GC439570@ragnatech.se>
+In-Reply-To: <20251015153556.GC439570@ragnatech.se>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Wed, 15 Oct 2025 18:05:34 +0100
+X-Gm-Features: AS18NWCeZXObMFBnMoScyXIU84ZFuSWIQLCEr-5cctebOmvYCISJdgFwzckySGU
+Message-ID: <CA+V-a8vRXN+2CDQu=FkN_teTDLywzGPn_=8obvKC+3tmwYo4hA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] net: ravb: Make DBAT entry count configurable per-SoC
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
+Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>, netdev@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 15, 2025 at 03:45:03PM +0200, Buday Csaba wrote:
+Hi Niklas,
 
-...
+Thank you for the review.
 
->  drivers/net/mdio/fwnode_mdio.c | 37 +++++++++++++++++++++++++++++++++-
->  1 file changed, 36 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
-> index ba7091518..6987b1a51 100644
-> --- a/drivers/net/mdio/fwnode_mdio.c
-> +++ b/drivers/net/mdio/fwnode_mdio.c
-> @@ -114,6 +114,38 @@ int fwnode_mdiobus_phy_device_register(struct mii_bus *mdio,
->  }
->  EXPORT_SYMBOL(fwnode_mdiobus_phy_device_register);
->  
-> +/**
-> + * fwnode_reset_phy() - Hard-reset a PHY before registration
+On Wed, Oct 15, 2025 at 4:36=E2=80=AFPM Niklas S=C3=B6derlund
+<niklas.soderlund@ragnatech.se> wrote:
+>
+> Hi Prabhakar,
+>
+> Thanks for your work.
+>
+> On 2025-10-15 16:00:24 +0100, Prabhakar wrote:
+> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> >
+> > The number of CDARq (Current Descriptor Address Register) registers is =
+not
+> > fixed to 22 across all SoC variants. For example, the GBETH implementat=
+ion
+> > uses only two entries. Hardcoding the value leads to incorrect resource
+> > allocation on such platforms.
+> >
+> > Pass the DBAT entry count through the per-SoC hardware info struct and =
+use
+> > it during probe instead of relying on a fixed constant. This ensures
+> > correct descriptor table sizing and initialization across different SoC=
+s.
+> >
+> > Fixes: feab85c7ccea ("ravb: Add support for RZ/G2L SoC")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>
+> I have not verified with documentation the setting of 2 for
+> gbeth_hw_info. But the change itself is good.
+>
+> > ---
+> >  drivers/net/ethernet/renesas/ravb.h      | 2 +-
+> >  drivers/net/ethernet/renesas/ravb_main.c | 9 +++++++--
+> >  2 files changed, 8 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet=
+/renesas/ravb.h
+> > index 7b48060c250b..d65cd83ddd16 100644
+> > --- a/drivers/net/ethernet/renesas/ravb.h
+> > +++ b/drivers/net/ethernet/renesas/ravb.h
+> > @@ -1017,7 +1017,6 @@ enum CSR2_BIT {
+> >  #define CSR2_CSUM_ENABLE (CSR2_RTCP4 | CSR2_RUDP4 | CSR2_RICMP4 | \
+> >                         CSR2_RTCP6 | CSR2_RUDP6 | CSR2_RICMP6)
+> >
+> > -#define DBAT_ENTRY_NUM       22
+> >  #define RX_QUEUE_OFFSET      4
+> >  #define NUM_RX_QUEUE 2
+> >  #define NUM_TX_QUEUE 2
+> > @@ -1062,6 +1061,7 @@ struct ravb_hw_info {
+> >       u32 rx_max_frame_size;
+> >       u32 rx_buffer_size;
+> >       u32 rx_desc_size;
+> > +     u32 dbat_entry_num;
+>
+> I have been wondering for some time if we shall not start to document
+> these fields as they always take so much time to get back to what each
+> of them represent. How do you feel about starting a header?
+>
+> /**
+>  * dbat_entry_num: Describe me here.
+>  */
+>
+I agree, let's take this separately into a different patch as it will
+make things easier to backport. What do you think?
 
-Hi Buday,
+Cheers,
+Prabhakar
 
-This is not a full review. But as this is a Kernel doc (a comment in Kernel
-doc format), it should also document:
-
-1. The function arguments:
-
-  * @bus: ...
-  * @addr: ...
-  * @phy_node: ...
-
-2. The return value:
-
-  * Returns: ...
-
-Flagged by ./scripts/kernel-doc -none -Wall
-
-Thanks!
-
-> + */
-> +static int fwnode_reset_phy(struct mii_bus *bus, u32 addr,
-
-...
-
--- 
-pw-bot: cr
+> Without, but preferably with, this added.
+>
+> Reviewed-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatech.se=
+>
+>
+> >       unsigned aligned_tx: 1;
+> >       unsigned coalesce_irqs:1;       /* Needs software IRQ coalescing =
+*/
+> >
+> > diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/eth=
+ernet/renesas/ravb_main.c
+> > index 9d3bd65b85ff..69d382e8757d 100644
+> > --- a/drivers/net/ethernet/renesas/ravb_main.c
+> > +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> > @@ -2694,6 +2694,7 @@ static const struct ravb_hw_info ravb_gen2_hw_inf=
+o =3D {
+> >       .rx_buffer_size =3D SZ_2K +
+> >                         SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
+> >       .rx_desc_size =3D sizeof(struct ravb_ex_rx_desc),
+> > +     .dbat_entry_num =3D 22,
+> >       .aligned_tx =3D 1,
+> >       .gptp =3D 1,
+> >       .nc_queues =3D 1,
+> > @@ -2717,6 +2718,7 @@ static const struct ravb_hw_info ravb_gen3_hw_inf=
+o =3D {
+> >       .rx_buffer_size =3D SZ_2K +
+> >                         SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
+> >       .rx_desc_size =3D sizeof(struct ravb_ex_rx_desc),
+> > +     .dbat_entry_num =3D 22,
+> >       .internal_delay =3D 1,
+> >       .tx_counters =3D 1,
+> >       .multi_irqs =3D 1,
+> > @@ -2743,6 +2745,7 @@ static const struct ravb_hw_info ravb_gen4_hw_inf=
+o =3D {
+> >       .rx_buffer_size =3D SZ_2K +
+> >                         SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
+> >       .rx_desc_size =3D sizeof(struct ravb_ex_rx_desc),
+> > +     .dbat_entry_num =3D 22,
+> >       .internal_delay =3D 1,
+> >       .tx_counters =3D 1,
+> >       .multi_irqs =3D 1,
+> > @@ -2769,6 +2772,7 @@ static const struct ravb_hw_info ravb_rzv2m_hw_in=
+fo =3D {
+> >       .rx_buffer_size =3D SZ_2K +
+> >                         SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
+> >       .rx_desc_size =3D sizeof(struct ravb_ex_rx_desc),
+> > +     .dbat_entry_num =3D 22,
+> >       .multi_irqs =3D 1,
+> >       .err_mgmt_irqs =3D 1,
+> >       .gptp =3D 1,
+> > @@ -2794,6 +2798,7 @@ static const struct ravb_hw_info gbeth_hw_info =
+=3D {
+> >       .rx_max_frame_size =3D SZ_8K,
+> >       .rx_buffer_size =3D SZ_2K,
+> >       .rx_desc_size =3D sizeof(struct ravb_rx_desc),
+> > +     .dbat_entry_num =3D 2,
+> >       .aligned_tx =3D 1,
+> >       .coalesce_irqs =3D 1,
+> >       .tx_counters =3D 1,
+> > @@ -3025,7 +3030,7 @@ static int ravb_probe(struct platform_device *pde=
+v)
+> >       ravb_parse_delay_mode(np, ndev);
+> >
+> >       /* Allocate descriptor base address table */
+> > -     priv->desc_bat_size =3D sizeof(struct ravb_desc) * DBAT_ENTRY_NUM=
+;
+> > +     priv->desc_bat_size =3D sizeof(struct ravb_desc) * info->dbat_ent=
+ry_num;
+> >       priv->desc_bat =3D dma_alloc_coherent(ndev->dev.parent, priv->des=
+c_bat_size,
+> >                                           &priv->desc_bat_dma, GFP_KERN=
+EL);
+> >       if (!priv->desc_bat) {
+> > @@ -3035,7 +3040,7 @@ static int ravb_probe(struct platform_device *pde=
+v)
+> >               error =3D -ENOMEM;
+> >               goto out_rpm_put;
+> >       }
+> > -     for (q =3D RAVB_BE; q < DBAT_ENTRY_NUM; q++)
+> > +     for (q =3D RAVB_BE; q < info->dbat_entry_num; q++)
+> >               priv->desc_bat[q].die_dt =3D DT_EOS;
+> >
+> >       /* Initialise HW timestamp list */
+> > --
+> > 2.43.0
+> >
+>
+> --
+> Kind Regards,
+> Niklas S=C3=B6derlund
 
