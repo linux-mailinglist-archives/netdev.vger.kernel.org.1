@@ -1,173 +1,190 @@
-Return-Path: <netdev+bounces-229681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A78FBDFA9A
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 18:32:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98E44BDFB45
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 18:40:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9DBC74E547E
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 16:32:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EFE604E412F
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 16:39:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E282B2F7AAC;
-	Wed, 15 Oct 2025 16:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB37338F21;
+	Wed, 15 Oct 2025 16:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MyQfhI81"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AjrJX9q5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4560205AB6;
-	Wed, 15 Oct 2025 16:31:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C3D2F3C31
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 16:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760545918; cv=none; b=RhgGGzicslwt0u18fYk6jCc/j0Oae5Z1rGnH0PhzO6edMEmhex2EangBKy6/xREUTZgYA/HtLsXM6tjcHDwXi9ePnuueHGvZYPCEuhYSZpeqxYCO7GuBXOYZe7PxrJVP9WCJiHpEg/NMVdocbCQ9xleCAWU4KaL4iKem0XEQ0qo=
+	t=1760546361; cv=none; b=Mt/Fx6gvVjgKMLQxdUiC4+rnPZedU3oRnx13fT3x8SSWn4ayRZn2Wbr4nKEfxG7ojK4RuMBCVjaA/XYQhO9HH323pLbybk0zals5f7uR/avX9ukD1vHI6NRCgqcWILae7BmShHy7rDN7RFpv/XXUZ9rKUw1I1o5wRWmpwd4SCqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760545918; c=relaxed/simple;
-	bh=BDBgHqGKg8kxASakOnsE9eu2W0NBeHR9L7btp+ec49k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UTVGKqxHb46MhKlbhtaA6C8FcgnKfJqHnJQo8ewImhBHn9c4rvbQ1XPyV2KLXkPil2V7p/295c3+6D350X/dJFRpggN0Hw2oDvZ8gHWGh5qtqa1Oj0hUMXssukxdpYPqGI70NquuBe4cwD0ROmVkSn2YWZwgoYWbiD4K4ApMb1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MyQfhI81; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEF2CC4CEF8;
-	Wed, 15 Oct 2025 16:31:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760545918;
-	bh=BDBgHqGKg8kxASakOnsE9eu2W0NBeHR9L7btp+ec49k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MyQfhI81TQhBnjopIRKsT6OpIuahtU9FssuD/WqoqsswyzKW6JnWA+xQc757bJQeW
-	 e2brIY6CGQ5WYCVpyLd2XMQoXcU3RTDWB2MP282SIip/+mUz1ZPQvubWMKfhRmc0rX
-	 Fi8MrcjB7zgmmki2Qs5Df8WywUwqUoFk8vRbRXRgutVC1OoAZw4bNu59UMyRN/Nf+9
-	 e9pAznvqX6zMoE0ZS7jo5Y7ehmbyqoadfzcXkI11Y0OmUJymVtaoCNImp9T2HdDsK6
-	 +9ksMjXgzkz9nX/Q/TtT/wvQdaZfdojKymCaEUaYQjn7ZIZAqcpOWFZmi1Kv9z2GyZ
-	 No774+bwlAO6Q==
-Date: Wed, 15 Oct 2025 17:31:53 +0100
-From: Simon Horman <horms@kernel.org>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>,
-	Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sharath Chandra Vurukala <quic_sharathv@quicinc.com>
-Subject: Re: [PATCH net] net: rmnet: Fix checksum offload header v5 and
- aggregation packet formatting
-Message-ID: <aO_MefPIlQQrCU3j@horms.kernel.org>
-References: <20251015092540.32282-2-bagasdotme@gmail.com>
+	s=arc-20240116; t=1760546361; c=relaxed/simple;
+	bh=XqB6na94/mJ0K/OgZi4TZF9h11JKDuGh6I2jheNoFF8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=C9Gfcap5e1OrqlyvChBsGo0nXEO6xlh4PPLe0T/h9OOXEEpGggZ/f7/eZo6vsmhSJ0vGROdolf6al/wbnMfzJXz2S8OFyvDmtkmL1GPz854hKn3GaZtvKjFafKgafUP4WGVK4j31wqpYYXrxRhLQ11RYouQxPHDVwwOw48UKM0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AjrJX9q5; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-62fa84c6916so235a12.0
+        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 09:39:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760546357; x=1761151157; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nzhM5CGB+RoDFW8y/0jUZz7oHPU/o/zMoGAuCJ5t4mg=;
+        b=AjrJX9q56DrwDqINUhv9JXvl0DG4lhaE87MOvGDP3UBT4PWbbytMdKEVFxdHRMxzfX
+         vwDiHPY/NS2QGIdAfl0jntd0bDacMId8coqk8o3jy4bS68VAGnEx9v//dNCAVtFL7YJG
+         QJ4jOxGqnV84ZZa16IPB1n8mZNQwNDn9uilABWbrgxnUFKa6UOoOdvKh9bbW6dcNg+Q5
+         FSOSx1X8ehgEDA12EsZ0DsHZQ7m7taIm9dxCkck1NHZFxIqhiq+CtPDoFKIEejTXvTvs
+         tlkRRl1nBxys3Th9hWpiGKVauoMghPpOZybJ4Tl/sE1zlwUcgpU+VgXj095NEPS7T1gd
+         mqzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760546357; x=1761151157;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nzhM5CGB+RoDFW8y/0jUZz7oHPU/o/zMoGAuCJ5t4mg=;
+        b=Doohrlb1AFKbLE8Wxo3GAa+4d0V96NK+eHvhsbbgmhozel+MAb2nGkzuv08/Tqs5oH
+         ycAkky/r2SUGVUyhgijrq247daJQVPv4u6uTO+wzPaAL4YEJ39cacShPVkLBtiaS1h6h
+         01koAKQqAdG0phsSNEN9DA5A/yMtndXZrAN9gaJl1FkMlRfVCMlzuGDmOjIAa/r7uNyd
+         3PlFGJHqUoYQOVzaB7dUEGHhTRvdyGDFHEaWm40eq8NSp+MECvEII0XK2e+T+xxPMZ9C
+         f6tWL+fUOCyWgGooWElnFZmPMuqHiJ8I4lHabAPaQ0Y4lIve6vSEQDIsJdKQKHPoP3gp
+         3Hjg==
+X-Forwarded-Encrypted: i=1; AJvYcCUk+u5QnTimi4XgK6t7+NXAfAQ8didSnfe3EMUSapZBMBjGYq5ABHNLLGctqRPN7CJsQHY2M08=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysMwdr1FeZIYa2PX7G/g6Ij6RqgfDn8AaEaBuUvTLVAptHzHkY
+	hOSGEHxqnLQhu9ptzN0uWB8VyxcckubgyBymJS3XdPrfyHICvkRnoU5awXlgE+A/sPa3juQyR6k
+	DdpmHnOcCYsUkTfkJlpm31bIaNtLYLbBZW4fz1b5D
+X-Gm-Gg: ASbGnctktUvbjU3fDVeuBaH5ncSdC0oRMzYskTD+VIo8LLv+WHimrCZyqxB9yjld6p6
+	TnA5mbyMORSmif0i0a0R2BCIKk08eKOU6+mRTc6FRAklOrvXP9ZPohoE2zoT72u2SF2Idpg29KX
+	jlUy0JkwQ5UE7OUhnDMtvAK1dcE/z1qEhQCTQleM+8hcPPAXRUwFyLo2fRraidcdhhC+/hKkKBc
+	xb89WLnpUeBkN2oWi215KKLmIDJPVU3mi/FStCoXfeD5seBHNRXCOUMRYn4H8Q=
+X-Google-Smtp-Source: AGHT+IFiVuLYivP034AwNyXAkpK0U9cc8NbdifZyjw09pfdEvHJuVDozucJsWtjEL9bmQH3yJFcdpbpk6wFGjPz12kI=
+X-Received: by 2002:a05:6402:3246:20b0:634:38d4:410a with SMTP id
+ 4fb4d7f45d1cf-63bebfa2921mr142406a12.2.1760546357234; Wed, 15 Oct 2025
+ 09:39:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251015092540.32282-2-bagasdotme@gmail.com>
+References: <20251013101636.69220-1-21cnbao@gmail.com> <aO11jqD6jgNs5h8K@casper.infradead.org>
+ <CAGsJ_4x9=Be2Prbjia8-p97zAsoqjsPHkZOfXwz74Z_T=RjKAA@mail.gmail.com>
+ <CANn89iJpNqZJwA0qKMNB41gKDrWBCaS+CashB9=v1omhJncGBw@mail.gmail.com>
+ <CAGsJ_4xGSrfori6RvC9qYEgRhVe3bJKYfgUM6fZ0bX3cjfe74Q@mail.gmail.com>
+ <CANn89iKSW-kk-h-B0f1oijwYiCWYOAO0jDrf+Z+fbOfAMJMUbA@mail.gmail.com>
+ <CAGsJ_4wJHpD10ECtWJtEWHkEyP67sNxHeivkWoA5k5++BCfccA@mail.gmail.com>
+ <CANn89iKC_y6Fae9E5ETOE46y-RCqD6cLHnp=7GynL_=sh3noKg@mail.gmail.com>
+ <CAGsJ_4x5v=M0=jYGOqy1rHL9aVg-76OgiE0qQMdEu70FhZcmUg@mail.gmail.com>
+ <CANn89iJYaNZ+fkKosRVx+8i17HJAB4th645ySMWQEAo6WoCg3w@mail.gmail.com> <CAGsJ_4wYrQuhGY6FuZJzQJjQfx6udRAbP4XZvEevknrpqnkv8g@mail.gmail.com>
+In-Reply-To: <CAGsJ_4wYrQuhGY6FuZJzQJjQfx6udRAbP4XZvEevknrpqnkv8g@mail.gmail.com>
+From: Suren Baghdasaryan <surenb@google.com>
+Date: Wed, 15 Oct 2025 09:39:03 -0700
+X-Gm-Features: AS18NWDCakq1h-mH7wphh8y1dVf2NhsytSCg4Cqtn1Pb9vJqQi_9SQu-IJteMNE
+Message-ID: <CAJuCfpGf8Hj1QAgNtbRwsBwTOZTidt9sGLwX8PYhiHWYyE9Z1A@mail.gmail.com>
+Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network buffer allocation
+To: Barry Song <21cnbao@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org, 
+	linux-mm@kvack.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Barry Song <v-songbaohua@oppo.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, 
+	Michal Hocko <mhocko@suse.com>, Brendan Jackman <jackmanb@google.com>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Huacai Zhou <zhouhuacai@oppo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 15, 2025 at 04:25:41PM +0700, Bagas Sanjaya wrote:
-> Packet format for checksum offload header v5 and aggregation, and header
-> type table for the former, are shown in normal paragraphs instead.
-> 
-> Use appropriate markup.
-> 
-> Fixes: 710b797cf61b ("docs: networking: Add documentation for MAPv5")
-> Fixes: ceed73a2cf4a ("drivers: net: ethernet: qualcomm: rmnet: Initial implementation")
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+On Wed, Oct 15, 2025 at 12:35=E2=80=AFAM Barry Song <21cnbao@gmail.com> wro=
+te:
+>
+> On Wed, Oct 15, 2025 at 2:39=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+>
+> > > >
+> > > > Tell them they are wrong.
+> > >
+> > > Well, we checked Qualcomm and MTK, and it seems both set these values
+> > > relatively high. In other words, all the AOSP products we examined al=
+so
+> > > use high values for these settings. Nobody is using tcp_wmem[0]=3D409=
+6.
+> > >
+> >
+> > The (fine and safe) default should be PAGE_SIZE.
+> >
+> > Perhaps they are dealing with systems with PAGE_SIZE=3D65536, but then
+> > the skb_page_frag_refill() would be a non issue there, because it would
+> > only allocate order-0 pages.
+>
+> I am 100% sure that all of them handle PAGE_SIZE=3D4096. Google is workin=
+g on
+> 16KB page size for Android, but it is not ready yet(Please correct me
+> if 16KB has been
+> ready, Suren).
 
-Thanks Bagas,
+It is ready but it is new, so it will take some time before we see it
+in production devices.
 
-I agree these are all good improvements.
-
-I would like to add the following, which I noticed during review, for your
-consideration.
-
-diff --git a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
-index 6877a3260582..b532128ee709 100644
---- a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
-+++ b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
-@@ -27,7 +27,8 @@ these MAP frames and send them to appropriate PDN's.
- 2. Packet format
- ================
-
--a. MAP packet v1 (data / control)
-+A. MAP packet v1 (data / control)
-+---------------------------------
-
- MAP header fields are in big endian format.
-
-@@ -53,7 +54,8 @@ Multiplexer ID is to indicate the PDN on which data has to be sent.
- Payload length includes the padding length but does not include MAP header
- length.
-
--b. Map packet v4 (data / control)
-+B. Map packet v4 (data / control)
-+---------------------------------
-
- MAP header fields are in big endian format.
-
-@@ -80,7 +82,7 @@ Payload length includes the padding length but does not include MAP header
- length.
-
- Checksum offload header, has the information about the checksum processing done
--by the hardware.Checksum offload header fields are in big endian format.
-+by the hardware. Checksum offload header fields are in big endian format.
-
- Packet format::
-
-@@ -106,7 +108,8 @@ over which checksum is computed.
-
- Checksum value, indicates the checksum computed.
-
--c. MAP packet v5 (data / control)
-+C. MAP packet v5 (data / control)
-+---------------------------------
-
- MAP header fields are in big endian format.
-
-@@ -133,7 +136,8 @@ Multiplexer ID is to indicate the PDN on which data has to be sent.
- Payload length includes the padding length but does not include MAP header
- length.
-
--d. Checksum offload header v5
-+D. Checksum offload header v5
-+-----------------------------
-
- Checksum offload header fields are in big endian format.
-
-@@ -158,7 +162,10 @@ indicates that the calculated packet checksum is invalid.
-
- Reserved bits must be zero when sent and ignored when received.
-
--e. MAP packet v1/v5 (command specific)::
-+E. MAP packet v1/v5 (command specific)
-+--------------------------------------
-+
-+Packet format::
-
-     Bit             0             1         2-7      8 - 15           16 - 31
-     Function   Command         Reserved     Pad   Multiplexer ID    Payload length
-@@ -169,7 +176,7 @@ e. MAP packet v1/v5 (command specific)::
-     Bit          96 - 127
-     Function   Command data
-
--Command 1 indicates disabling flow while 2 is enabling flow
-+Command 1 indicates disabling flow while 2 enables flow.
-
- Command types
-
-@@ -180,7 +187,8 @@ Command types
- 3 is for error during processing of commands
- = ==========================================
-
--f. Aggregation
-+F. Aggregation
-+--------------
-
- Aggregation is multiple MAP packets (can be data or command) delivered to
- rmnet in a single linear skb. rmnet will process the individual
-
+>
+> >
+> > > We=E2=80=99ll need some time to understand why these are configured t=
+his way in
+> > > AOSP hardware.
+> > >
+> > > >
+> > > > >
+> > > > > It might be worth exploring these settings further, but I can=E2=
+=80=99t quite see
+> > > > > their connection to high-order allocations, since high-order allo=
+cations are
+> > > > > kernel macros.
+> > > > >
+> > > > > #define SKB_FRAG_PAGE_ORDER     get_order(32768)
+> > > > > #define PAGE_FRAG_CACHE_MAX_SIZE        __ALIGN_MASK(32768, ~PAGE=
+_MASK)
+> > > > > #define PAGE_FRAG_CACHE_MAX_ORDER       get_order(PAGE_FRAG_CACHE=
+_MAX_SIZE)
+> > > > >
+> > > > > Is there anything I=E2=80=99m missing?
+> > > >
+> > > > What is your question exactly ? You read these macros just fine. Wh=
+at
+> > > > is your point ?
+> > >
+> > > My question is whether these settings influence how often high-order
+> > > allocations occur. In other words, would lowering these values make
+> > > high-order allocations less frequent? If so, why?
+> >
+> > Because almost all of the buffers stored in TCP write queues are using
+> > order-3 pages
+> > on arches with 4K pages.
+> >
+> > I am a bit confused because you posted a patch changing skb_page_frag_r=
+efill()
+> > without realizing its first user is TCP.
+> >
+> > Look for sk_page_frag_refill() in tcp_sendmsg_locked()
+>
+> Sure. Let me review the code further. The problem was observed on the MM
+> side, causing over-reclamation and phone heating, while the source of the
+> allocations lies in network activity. I am not a network expert and may b=
+e
+> missing many network details, so I am raising this RFC to both lists to s=
+ee
+> if the network and MM folks can discuss together to find a solution.
+>
+> As you can see, the discussion has absolutely forked into two branches. :=
+-)
+>
+> Thanks
+> Barry
 
