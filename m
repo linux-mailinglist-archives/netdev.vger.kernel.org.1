@@ -1,108 +1,294 @@
-Return-Path: <netdev+bounces-229464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 625A8BDCA52
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 07:54:55 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0B03BDCA68
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 08:03:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C0093AC4F7
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 05:54:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7C52E4E162E
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 06:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E55B2FFDD3;
-	Wed, 15 Oct 2025 05:54:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 202712C11D1;
+	Wed, 15 Oct 2025 06:03:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V1uH0Avq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U1whw52b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26FC25392A
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 05:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D10225D1E9
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 06:03:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760507691; cv=none; b=sKbV9epONsWk/YaPAWB7HoXfXuGcGgcCIdak4nVEoqGxcYZkgOtBDsqbX0vbkzBTX0LqkmYb35VTLw1P2nLzX5B/ZrYhYjvWFrhR3QPNKPKB+j/LUk1/7BdMdvnmRygh28Kjal7T4q3B0WLiyLlY0aUrDpu3gNhD9XoElfdWeXA=
+	t=1760508211; cv=none; b=CYznMjYj7oPXC5h7zGeieYsAipVzX4o/PTztJkdwe5O8LP4FORCprDT8OpKgbQ32HGbC5V1abD+Z6DB7V607z1rpnDyQdD9VSRItUSd2ox1VLDIrIU3W3SbabOkSXlaXJR+V/cpa1zHDAVLR3hQ/QWE6oekA2gf1ikBe2t4/F/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760507691; c=relaxed/simple;
-	bh=Tpm5yCdYiNDT6L7HYf2Jq91WJo7kaaSCQiNhCVLSw/Q=;
+	s=arc-20240116; t=1760508211; c=relaxed/simple;
+	bh=jNoDGwfpzpVVSjrYNRU4l9Z3f0423H9BvWzg1OZsMN4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZmXKiNbA0OaF3FSFmelEFAEQIwF4QB4Hzth9M09q1Jw+Ei9aGUX4KZBvSUUMfMuW/FFhHsjEQSriRzMeWhB6RHZt1dSERoNQtMNA5+rMyn003YaVAj/pTzmXoJIzGSWHahQZ1gWztKFjqm02LU5UiqSIXrAmvlZlIa1m4+rV7KI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V1uH0Avq; arc=none smtp.client-ip=209.85.214.178
+	 To:Cc:Content-Type; b=sniyRYGxajrcGb0XhcyUMbA41V7E6sGiH99sMfxtQO9eONyQc5RH4MESOzmA/8ecityTnhLz8o2o2jkvciyLR6Lvoiiu30axAg57wgZU+al4ZgTkaSFsTqjCJ4QhkC7PxoFhr5f0WPNq1WOMK1NcDiJWvJdukLXYrGWSDaovUL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U1whw52b; arc=none smtp.client-ip=209.85.222.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-26d0fbe238bso44840795ad.3
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 22:54:49 -0700 (PDT)
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7f04816589bso802914785a.3
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 23:03:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760507689; x=1761112489; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760508208; x=1761113008; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Tpm5yCdYiNDT6L7HYf2Jq91WJo7kaaSCQiNhCVLSw/Q=;
-        b=V1uH0AvqYMyB+6Srpi25ILupk1aHODTrU6bIwE/ih2sCyQ6LvJTd4dKMVtB5KImMOB
-         7zXeuUStNxceE2C+7G+PfoFtKl4NzJugpGGQP7/wrSF8/jBj2ZDUn5F3PrDU/JH2jiwg
-         ciczWYDlqbrF2Vh58Zv3SUjkwDlQMptRW3T99ZY+JDDqPmAM1LAeyM7enBZ+/DOdWKT2
-         lCuA8lHNnxtQXH1TTbXnbgZqwbgUSwA7Vm/RYMoAgoqSXiBq92EGWRSkpCB+J6GaVjrT
-         1fDN1K1JZqD3neHtGKBfRznLo15p0HuzkvguwiWF5hYnQWDDh9UyVYymTKmhT7xs/vfX
-         O2qQ==
+        bh=pie7fZGvPev2eUvrmRxtLn5uwIJ2jK2TyEzOvGquVLE=;
+        b=U1whw52bPjCPWEDZwv9dXqgK5sgZZ0oPYtxNdZ2U6uJXGusJmaXCy7Rz9pEPdYv5Wu
+         AnxD89BYWUpTZnA+jNg9BJxs6Ou6/nYxxvumMbqXk719U1UhO+dmln8emMO7PZq1T7pc
+         WhS3YiAWKQxMjl3O6rkn1Pl/QxGFylXI+L1Jl0HxLOyr6wrOr9C9MrnC7LpP3DS24U0Z
+         3r+YtPhUFVvnUl7bydVWL6kXoZu29n8VAYMkfOCLY3Rpk+zFL+0dyiD6l3XzVJMhn7ch
+         Lkr6FzNfCo8BcLWUTWZXME2B2KEG2QcQUXLes1fPs1wAC0DWjtzCBGAdsK6kpMfsZ9VR
+         /Gsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760507689; x=1761112489;
+        d=1e100.net; s=20230601; t=1760508208; x=1761113008;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Tpm5yCdYiNDT6L7HYf2Jq91WJo7kaaSCQiNhCVLSw/Q=;
-        b=NKH8HKeqo/XL4U+7RjqGfTbR3x7Kh+9Lje8tzVR8sQoaiShEqJhLnL0pq4LaUHUi+b
-         A7Gp8Q+zlbl8EAmk081U2GSs2FEVATRHDeL/vHP38O8A/xcgEWDQ5Oq11Niz2wbMAsyx
-         AZwgAjrzWEoZALEu6DkIluVMu+kaD1HaSPj4GRE6Qji+LycGL2WOaSqu9zSS4kfTc0Z4
-         FB0IRfL6oLRJhfoC1XVq6lX3Yc/DQg9JSQ3luoN8w1F9vP1Mw+GBVFCdK3ffwdGOG4sV
-         MwHV5+B1MV/d27zP0Kv9QgwslltFpac7ja16KaKmZPvKEC+Cluf8ynjtuBSW79yrgmUu
-         +69w==
-X-Forwarded-Encrypted: i=1; AJvYcCWDgR8rN8adx2d81QPCtjD8WZYMfh+yoMgQAQ8JFLgI3CMwk5u3CBIfx5AIHwV+xXnBSx3cbgQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtLNQDXiVgJXobIpu9pMBuFkArjpkCCS7C3DpAM/O/XXoya4lE
-	05lU2gEA70sg4LSfcS+633tZ9P1NSInAxZAJgNm3BYKvn9eD5JusdkFzxKZXM13ow4SFKDnZCaD
-	kBwrZn/46ZThwf/LFlhJT7MiJ9m1ncnNAyF+Q9ymq
-X-Gm-Gg: ASbGncsPKxPDrhgz2I3hEILopgDRGDHOT1e/MrokuFvjlOKokNTkzxtqiOn4n4pmT72
-	j/lvqWpD61RbFRmeh6piAE/dKzU+bicd0aJmmbYW8CartNlIBoPe6mhG5oYlrq5iRJcbNGt9Qm5
-	dHlpeZff0UzaG7NA82HMf0Wb6+CPCPCAZw8neBQKDoWvMMXOG1SZQKpsyNAvGolqBRGgUyeiArF
-	c1c9Tqf8CUjHwb+388m8dzqLX4RmIJ2lRtjrwaNBuvB8paX6f22XlD+fZ+7CLpPyaHI0/C0pic=
-X-Google-Smtp-Source: AGHT+IHOqIjWjc1eJbL5smQncvTqW9LAJIwfakqfRl2JSe/zFA+li+TBDDBtxF8k8uoDbbS0TflLeQpyzgCcQI+la28=
-X-Received: by 2002:a17:902:d54b:b0:288:e46d:b318 with SMTP id
- d9443c01a7336-290274008ddmr385200185ad.40.1760507689086; Tue, 14 Oct 2025
- 22:54:49 -0700 (PDT)
+        bh=pie7fZGvPev2eUvrmRxtLn5uwIJ2jK2TyEzOvGquVLE=;
+        b=X9NFm3kdGgHbND88XIRvOVp+T3Y+GaPDmkGZ/7Qap2r0VV/tvnAlXI4Hvz9UHhm5WV
+         nrBEY+lpvy04pHU3oJLSCTn8CxxqJTr/SGFAmLtGUekqoy2fV1qTzkYcbj57c2pvoHTZ
+         Mm/RxXBgHGlaDQpDto2TrM7XYHKy8XbRFJiW8vipxdGUKvogi0LE4tP6rmCga9yJ1lDN
+         Tqb0NbAcsG3h/61JriZTEM3tg6DqaziIGeJuEEFhD6mqYXIQfSsqGr5YZifH/9cglt4J
+         SP65+irFIbRx1YXoxbs00Ov27Pi6os0mRWJBk+egPd7kLvoskADPi6jQ/wS7Bm5N83PW
+         lS3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWdyFuuBMEdqLJAKsQZOslSYcbWERXT6IxJHjINynSNG2Ui0FiHxqTMLidnq7KVrqj1mqg4h4o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCYa0/ZrjvH12yg37Glyn2czbfUnZpUg8TTPkeRB9Tv6e8fbIN
+	P+hshWBKj9b5BqJ/ce3wjCBortdAMqwwaOW0DOFZDUHRi7lkcG8JBW3M5wPxqHKRrYe4PWuNGNc
+	FD3c5enmmgVhhRA0rso/3nCSY7DcqadGETOrQo6YZ
+X-Gm-Gg: ASbGncv6TEl+hvl2A4Zeo+ATP9IMh2sbXuLV1ztkdi+5ZUEnlvsj6IS354o02SXdw+D
+	AF3hrL4PJps+0y67Q0tw5L2cjeNSN6OmtmaEWhURNbB9zW+CDRI0WuuGODxmcHxn46k2pSV69ue
+	im/iBmXc7FvXy7MEXZAKPhSivVm/BSKvYxuJlIUkKDW7ru6s++p1rrovCibkbYdMzdgka6AOIlw
+	pc0qTgndkl9FQEC09Q3OozSTOgyzULdBnXTiZQrUGcM
+X-Google-Smtp-Source: AGHT+IH/PBuLyrEz5zQBYstCyOs7b50lPePZzd4TRKBU1/agPRdvbwqqn+6fzrnRarP8b13J3kggFAC8KtZoey/NOCU=
+X-Received: by 2002:a05:622a:50a:b0:4e8:8a5e:6dc5 with SMTP id
+ d75a77b69052e-4e88a5e70dfmr2436531cf.71.1760508207596; Tue, 14 Oct 2025
+ 23:03:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251014171907.3554413-1-edumazet@google.com> <20251014171907.3554413-2-edumazet@google.com>
-In-Reply-To: <20251014171907.3554413-2-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 14 Oct 2025 22:54:37 -0700
-X-Gm-Features: AS18NWCsEBhpvvqZKA4u_VHEyEQVeX2ntklrqJRuY3kriqq5SXxdlDzMYHLxuHI
-Message-ID: <CAAVpQUA-_c13xjh9g011ToVAvBh1XVC_QkFkMgsbWHuTXhifbg@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 1/6] selftests/net: packetdrill: unflake tcp_user_timeout_user-timeout-probe.pkt
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Soham Chakradeo <sohamch@google.com>
+References: <20251014004740.2775957-1-hramamurthy@google.com>
+ <CANn89iKOK9GyjQ_s_eo5XNugHARSRoeeu2c1muhBj8oxYL6UEQ@mail.gmail.com> <willemdebruijn.kernel.37111d2d67443@gmail.com>
+In-Reply-To: <willemdebruijn.kernel.37111d2d67443@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Oct 2025 23:03:15 -0700
+X-Gm-Features: AS18NWDTQW4OvyuIYtm_vhiZuEvGwqArdUo3fhxdKCr-TBZKo8ZaexqzJu8EykU
+Message-ID: <CANn89i+e8w0cA8+uE5QEUFY0fkQuwM7C5=8ULvRNaY2vh0YT4w@mail.gmail.com>
+Subject: Re: [PATCH net] gve: Check valid ts bit on RX descriptor before hw timestamping
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Harshitha Ramamurthy <hramamurthy@google.com>, netdev@vger.kernel.org, joshwash@google.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, willemb@google.com, pkaligineedi@google.com, 
+	jfraker@google.com, ziweixiao@google.com, thostet@google.com, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 14, 2025 at 10:19=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
+On Tue, Oct 14, 2025 at 1:19=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
 >
-> This test fails the first time I am running it after a fresh virtme-ng bo=
-ot.
+> Eric Dumazet wrote:
+> > On Mon, Oct 13, 2025 at 5:47=E2=80=AFPM Harshitha Ramamurthy
+> > <hramamurthy@google.com> wrote:
+> > >
+> > > From: Tim Hostetler <thostet@google.com>
+> > >
+> > > The device returns a valid bit in the LSB of the low timestamp byte i=
+n
+> > > the completion descriptor that the driver should check before
+> > > setting the SKB's hardware timestamp. If the timestamp is not valid, =
+do not
+> > > hardware timestamp the SKB.
+> > >
+> > > Cc: stable@vger.kernel.org
+> > > Fixes: b2c7aeb49056 ("gve: Implement ndo_hwtstamp_get/set for RX time=
+stamping")
+> > > Reviewed-by: Joshua Washington <joshwash@google.com>
+> > > Signed-off-by: Tim Hostetler <thostet@google.com>
+> > > Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> > > ---
+> > >  drivers/net/ethernet/google/gve/gve.h          |  2 ++
+> > >  drivers/net/ethernet/google/gve/gve_desc_dqo.h |  3 ++-
+> > >  drivers/net/ethernet/google/gve/gve_rx_dqo.c   | 18 ++++++++++++----=
+--
+> > >  3 files changed, 16 insertions(+), 7 deletions(-)
+> > >
+> > > diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethe=
+rnet/google/gve/gve.h
+> > > index bceaf9b05cb4..4cc6dcbfd367 100644
+> > > --- a/drivers/net/ethernet/google/gve/gve.h
+> > > +++ b/drivers/net/ethernet/google/gve/gve.h
+> > > @@ -100,6 +100,8 @@
+> > >   */
+> > >  #define GVE_DQO_QPL_ONDEMAND_ALLOC_THRESHOLD 96
+> > >
+> > > +#define GVE_DQO_RX_HWTSTAMP_VALID 0x1
+> > > +
+> > >  /* Each slot in the desc ring has a 1:1 mapping to a slot in the dat=
+a ring */
+> > >  struct gve_rx_desc_queue {
+> > >         struct gve_rx_desc *desc_ring; /* the descriptor ring */
+> > > diff --git a/drivers/net/ethernet/google/gve/gve_desc_dqo.h b/drivers=
+/net/ethernet/google/gve/gve_desc_dqo.h
+> > > index d17da841b5a0..f7786b03c744 100644
+> > > --- a/drivers/net/ethernet/google/gve/gve_desc_dqo.h
+> > > +++ b/drivers/net/ethernet/google/gve/gve_desc_dqo.h
+> > > @@ -236,7 +236,8 @@ struct gve_rx_compl_desc_dqo {
+> > >
+> > >         u8 status_error1;
+> > >
+> > > -       __le16 reserved5;
+> > > +       u8 reserved5;
+> > > +       u8 ts_sub_nsecs_low;
+> > >         __le16 buf_id; /* Buffer ID which was sent on the buffer queu=
+e. */
+> > >
+> > >         union {
+> > > diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/n=
+et/ethernet/google/gve/gve_rx_dqo.c
+> > > index 7380c2b7a2d8..02e25be8a50d 100644
+> > > --- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+> > > +++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+> > > @@ -456,14 +456,20 @@ static void gve_rx_skb_hash(struct sk_buff *skb=
+,
+> > >   * Note that this means if the time delta between packet reception a=
+nd the last
+> > >   * clock read is greater than ~2 seconds, this will provide invalid =
+results.
+> > >   */
+> > > -static void gve_rx_skb_hwtstamp(struct gve_rx_ring *rx, u32 hwts)
+> > > +static void gve_rx_skb_hwtstamp(struct gve_rx_ring *rx,
+> > > +                               const struct gve_rx_compl_desc_dqo *d=
+esc)
+> > >  {
+> > >         u64 last_read =3D READ_ONCE(rx->gve->last_sync_nic_counter);
+> > >         struct sk_buff *skb =3D rx->ctx.skb_head;
+> > > -       u32 low =3D (u32)last_read;
+> > > -       s32 diff =3D hwts - low;
+> > > -
+> > > -       skb_hwtstamps(skb)->hwtstamp =3D ns_to_ktime(last_read + diff=
+);
+> > > +       u32 ts, low;
+> > > +       s32 diff;
+> > > +
+> > > +       if (desc->ts_sub_nsecs_low & GVE_DQO_RX_HWTSTAMP_VALID) {
+> > > +               ts =3D le32_to_cpu(desc->ts);
+> > > +               low =3D (u32)last_read;
+> > > +               diff =3D ts - low;
+> > > +               skb_hwtstamps(skb)->hwtstamp =3D ns_to_ktime(last_rea=
+d + diff);
+> > > +       }
+> >
+> > If (desc->ts_sub_nsecs_low & GVE_DQO_RX_HWTSTAMP_VALID) can vary among
+> > all packets received on this queue,
+> > I will suggest you add an
+> >
+> >         else {
+> >                  skb_hwtstamps(skb)->hwtstamp =3D 0;
+> >         }
+> >
+> > This is because napi_reuse_skb() does not currently clear this field.
+> >
+> > So if a prior skb had hwtstamp set to a timestamp, then merged in GRO,
+> > and recycled, we have the risk of reusing an old timestamp
+> > if GVE_DQO_RX_HWTSTAMP_VALID is unset.
+> >
+> > We could also handle this generically, at the cost of one extra
+> > instruction in the fast path.
 >
-> tcp_user_timeout_user-timeout-probe.pkt:33: runtime error in write call: =
-Expected result -1 but got 24 with errno 2 (No such file or directory)
->
-> Tweaks the timings a bit, to reduce flakiness.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> That would be safest. This may not be limited to GVE.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Yes, I started counting the bugs yesterday.
+
+But considering this is going to be a patch that is separate and could
+be missed in various old kernels,
+I think a belt and suspender mode is safer :
+
+Make sure each individual driver does not assume the field is zero
+(or add a check about this assertion, which is going to be more
+expensive anyway)
+
+>
+> NICs supporting line rate timestamping is not universal. Older devices
+> predominantly aim to support low rate PTP messages AFAIK.
+>
+> On the Tx path there are known rate limits to the number of packets
+> that some can timestamp, e.g., because of using PHY registers.
+>
+> On the Rx path packets are selected by filters such as
+> HWTSTAMP_FILTER_PTP_V2_L2_SYNC. But its not guaranteed that these can
+> be matched and timestamped at any rate? Essentially trusting that no
+> more PTP packets arrive than the device can timestamp.
+>
+> e1000e_rx_hwtstamp is a good example. It has a descriptor bit whether
+> a packet was timestamped, similar to GVE. And only supports a single
+> outstanding request:
+>
+>         /* The Rx time stamp registers contain the time stamp.  No other
+>          * received packet will be time stamped until the Rx time stamp
+>          * registers are read.  Because only one packet can be time stamp=
+ed
+>          * at a time, the register values must belong to this packet and
+>          * therefore none of the other additional attributes need to be
+>          * compared.
+>          */
+>
+> Perhaps not the best example as it does not use napi_reuse_skb. I
+> thought of too late ;) But there are quite likely more.
+>
+
+I took a look at various uses in RX path in drivers/net/ethernet, I
+found many bugs
+
+drivers/net/ethernet/amd/xgbe/xgbe-drv.c:2374
+drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c:1098
+drivers/net/ethernet/broadcom/tg3.c:6898
+drivers/net/ethernet/cavium/liquidio/lio_core.c
+drivers/net/ethernet/freescale/enetc/enetc.c
+drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+drivers/net/ethernet/meta/fbnic/fbnic_txrx.c...
+
+Then I stopped chasing.
+
+I will send a fix in napi_reuse_skb()
+
+diff --git a/net/core/gro.c b/net/core/gro.c
+index 5ba4504cfd28ec26f487bfb96645e25c4845d720..76f9c3712422109ad00f15f6804=
+abf6a8b00db43
+100644
+--- a/net/core/gro.c
++++ b/net/core/gro.c
+@@ -639,6 +639,8 @@ EXPORT_SYMBOL(gro_receive_skb);
+
+ static void napi_reuse_skb(struct napi_struct *napi, struct sk_buff *skb)
+ {
++       struct skb_shared_info *shinfo;
++
+        if (unlikely(skb->pfmemalloc)) {
+                consume_skb(skb);
+                return;
+@@ -655,8 +657,12 @@ static void napi_reuse_skb(struct napi_struct
+*napi, struct sk_buff *skb)
+
+        skb->encapsulation =3D 0;
+        skb->ip_summed =3D CHECKSUM_NONE;
+-       skb_shinfo(skb)->gso_type =3D 0;
+-       skb_shinfo(skb)->gso_size =3D 0;
++
++       shinfo =3D skb_shinfo(skb);
++       shinfo->gso_type =3D 0;
++       shinfo->gso_size =3D 0;
++       shinfo->hwtstamps.hwtstamp =3D 0;
++
+        if (unlikely(skb->slow_gro)) {
+                skb_orphan(skb);
+                skb_ext_reset(skb);
 
