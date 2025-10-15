@@ -1,118 +1,266 @@
-Return-Path: <netdev+bounces-229595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB301BDEC98
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:42:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2F5EBDECF9
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 15:45:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 87DE735017B
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 13:42:11 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3A33E34AA49
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 13:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C942622B8A6;
-	Wed, 15 Oct 2025 13:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 040DF23BD1D;
+	Wed, 15 Oct 2025 13:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="PpEwZzlg"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="uVfAl0mJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB0C229B2E;
-	Wed, 15 Oct 2025 13:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6891F2264B1;
+	Wed, 15 Oct 2025 13:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760535715; cv=none; b=OW0EA2g1gJFT6suLIpVb/4BZSD1lUuPEv70X9gYXzZZJfmu11nn3lS3btnNiapy2B8Dm4rpGS41LwQO+dae1WioF/m9j8x7Yqld+rEBxab72V7OH17ZcBGn6n5MwPfKOraS2fsxp01fWAc40YOwX+oEKgZu3EjRq96GyhfAoS88=
+	t=1760535912; cv=none; b=Jk73fj8Dx5FBm3suioOe+QfwQulb7Z8zwD6f6siRLNGYnlteDatUWLCJ1FEs2Lg7cpKAXO97fj04xuj68eim6BERreV3LHPzBzPwErd6+K9b6uWIRLRKhWtfus2WcuBFsxEux1YpmhS+qp3x3mHq/2z7LQ7DIq4B/9dSTKs2D3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760535715; c=relaxed/simple;
-	bh=0+udvwqXk3pMUuV5a3E5/kGYHpUynWhFjTBJiTghSno=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T5cDAx/lZpoMmApceU9d17RR+Y3oxksDaKKOrXkf61GtXBEGG9FQV8zrTJ225Ph/V6LsvXQ1vBFt93kkQMv6ArvVW91qWHkIyVQswAtiBW/MoDpjvORpbL4FShdQ3MpmQ2NF5aBQbmF3ogDRzwQ4vT//Z/yhZWUKQyqoHbGQalA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=PpEwZzlg; arc=none smtp.client-ip=178.21.23.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
-Received: from mail01.disroot.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id 1448F22F40;
-	Wed, 15 Oct 2025 15:41:51 +0200 (CEST)
-X-Virus-Scanned: SPAM Filter at disroot.org
-Received: from layka.disroot.org ([127.0.0.1])
- by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id E3_5OJxubVeS; Wed, 15 Oct 2025 15:41:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1760535710; bh=0+udvwqXk3pMUuV5a3E5/kGYHpUynWhFjTBJiTghSno=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=PpEwZzlg/BI/Hcu/apLLJ3kweCff9EOMZxnrgY5bOpuzbDqccQExq6wYKeuQofRO+
-	 mY7lXrUNGF6VJohT/qGVoBSByDuCt7XqQZoS/G95emBvViDaROxbUstGqse9DFF0wx
-	 gkDAzng9Hkg0NeGGKv4hlxSefXYKUELcj3TRDXKy5CWM0HUX4e7wqHK0UFYwOAWhld
-	 mdSap61d8i/zp692PPtqoXeoNro/rpY5iH2fUGGdNIM8qSkknwFNqsu6EYaw3px6bH
-	 IhuY9wrfZPwiyy8e9fSJ0I4oTMBvOHMRRyBOoPfrgSX/0u8ZPsUsshUKEU6lXAZ+bk
-	 ki+5cpE/qh6gA==
-Date: Wed, 15 Oct 2025 13:41:31 +0000
-From: Yao Zi <ziyao@disroot.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Frank <Frank.Sae@motor-comm.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
-	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH net-next 2/4] net: phy: motorcomm: Support YT8531S PHY in
- YT6801 Ethernet controller
-Message-ID: <aO-kH5-CVt5Gbd3C@pie>
-References: <20251014164746.50696-2-ziyao@disroot.org>
- <20251014164746.50696-4-ziyao@disroot.org>
- <aO6Dk0rK0nobGClc@shell.armlinux.org.uk>
+	s=arc-20240116; t=1760535912; c=relaxed/simple;
+	bh=tHzPQ914X8TTctWSiJ8ibXYvAhbpT+ZVP3DQyksWNu8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MMdDnVktga2dnGziaXJLoZaDU7LzPU0FvPxEEc25Cnszqnv5v73ooRAqsY1vPbm9A9ffgODqqZBpD7RJhqozCRrPI3tctkYs8HRYk+0du3NDhDRM8RolYp/L+52/h3ZfW7CahYY0FhpJzNY0PxV94XAZyT5phN9nC2b6oDweNgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=uVfAl0mJ; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 0F926A1AA5;
+	Wed, 15 Oct 2025 15:45:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=MXJdM8cTqS9HrIPjdoxajauisYtWpOglBHWBj9fWUgY=; b=
+	uVfAl0mJSJymLIaqRfd6r5ZrcYfN+wIm33oBZ/XJ4PK1Xt+lT0mE16jALlt30GIx
+	j3PBii489uHLQSRCqxXkrnQFN/BohytnWKaGTotoz7dd4nfdiC9dBtupqs34dWql
+	Jd+Cy43Wn/PnSpelW/ke/5XfzCAIPJYxlkqBkLMWwwb1uqSSBDZ2WbA8XX1F+AMj
+	wx2G6AiLjlBnE2mJ5bfwE9fH9ZqzK6JmqZPDCdJk25lPiggK1P3zCfPCgdiaEv93
+	u/P4Ny+sPIZnuV6LosMXuM+20FaYJTf1Yas5e2Aaw09e7LcVpUTJyacpz0zZr1I4
+	B/gR53EQXTk6QzEBLBVr/FxiXgBeTo0ZGg+UrBpxkL4TCtmVGwA3O/wKjFogmT5M
+	wRBx7gkqIcwTuW1YpfvQrHI6kXxBud8bMe5d2pd5hQvt70QaSRrHS21fREmE1xpx
+	nZtYj0GQtYPRIht1Ab4BMHzv2vA7UpG0s32N5WnHOSYlKptQbG+Cj7ucB6rv/wxw
+	gjIdG3xMidKO2xCCatAfT/BRfOqQf5SrTKJpLZe3ryaqhH8JidpJKavsrzlbMyTL
+	bSw1+kIwO6uMcuNTHvZ0xacPjxlQgC61e3QYYVlugdym5c1vnbmUAe9li89ttD8O
+	om36nlHfqX1+N8LhwsqodRC2yHHgBsFKYekgASHluuE=
+From: Buday Csaba <buday.csaba@prolan.hu>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
+	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: Buday Csaba <buday.csaba@prolan.hu>
+Subject: [PATCH v2 1/4] net: mdio: common handling of phy reset properties
+Date: Wed, 15 Oct 2025 15:45:00 +0200
+Message-ID: <20251015134503.107925-1-buday.csaba@prolan.hu>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aO6Dk0rK0nobGClc@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1760535906;VERSION=8000;MC=1304816191;ID=558032;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A296767155F64756A
 
-On Tue, Oct 14, 2025 at 06:08:35PM +0100, Russell King (Oracle) wrote:
-> On Tue, Oct 14, 2025 at 04:47:45PM +0000, Yao Zi wrote:
-> > YT6801's internal PHY is confirmed as a GMII-capable variant of YT8531S
-> > by a previous series[1] and reading PHY ID. Add support for
-> > PHY_INTERFACE_MODE_INTERNAL for YT8531S to allow the Ethernet driver to
-> > reuse the PHY code for its internal PHY.
-> 
-> If it's known to be connected via a GMII interface, even if it's on the
-> SoC, please use PHY_INTERFACE_MODE_GMII in preference to
-> PHY_INTERFACE_MODE_INTERNAL. PHY_INTERFACE_MODE_INTERNAL is really for
-> "we don't know what the internal interface is".
+Reset properties of an `mdio_device` are initialized in multiple
+source files and multiple functions:
+  - `reset_assert_delay` and `reset_deassert_delay` are in
+    fwnode_mdio.c
+  - `reset_gpio` and `reset_ctrl` are in mdio_bus.c, but handled by
+    different functions
 
-I use PHY_INTERFACE_MODE_INTERNAL for the driver based on Andrew's
-feedback[1] on the series submitted by Motorcomm people,
+This patch unifies the handling of all these properties into two
+functions.
+mdiobus_register_gpiod() and mdiobus_register_reset() are removed,
+while mdio_device_register_reset() and mdio_device_unregister_reset()
+are introduced instead.
+These functions handle both reset-controllers and reset-gpios, and
+also read the corresponding properties from the device tree.
+These changes should make tracking the reset properties easier.
 
-> Is it really GMII? If so, add GMII to the yt8531 driver.
->
-> Often this is described as PHY_INTERFACE_MODE_INTERNAL, meaning it
-> does not matter what is being used between the MAC and the PHY, it is
-> internal to the SoC. You might want to add that to the PHY driver.
+The reset logic is unaltered, and should work as it did before.
 
-Does PHY_INTERFACE_MODE_INTERNAL mean "unknown interface" or "interface
-that doesn't matter"? I think this could lead to different choices for
-the mode in YT6801's case.
+Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
+---
+V1 -> V2: the return value of mdio_device_unregister_reset() is made void
+---
+ drivers/net/mdio/fwnode_mdio.c |  5 ----
+ drivers/net/phy/mdio_bus.c     | 39 ++------------------------
+ drivers/net/phy/mdio_device.c  | 50 ++++++++++++++++++++++++++++++++++
+ include/linux/mdio.h           |  2 ++
+ 4 files changed, 54 insertions(+), 42 deletions(-)
 
-Thanks for your answer,
+diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
+index 9b41d4697..ba7091518 100644
+--- a/drivers/net/mdio/fwnode_mdio.c
++++ b/drivers/net/mdio/fwnode_mdio.c
+@@ -92,11 +92,6 @@ int fwnode_mdiobus_phy_device_register(struct mii_bus *mdio,
+ 	if (fwnode_property_read_bool(child, "broken-turn-around"))
+ 		mdio->phy_ignore_ta_mask |= 1 << addr;
+ 
+-	fwnode_property_read_u32(child, "reset-assert-us",
+-				 &phy->mdio.reset_assert_delay);
+-	fwnode_property_read_u32(child, "reset-deassert-us",
+-				 &phy->mdio.reset_deassert_delay);
+-
+ 	/* Associate the fwnode with the device structure so it
+ 	 * can be looked up later
+ 	 */
+diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+index cad6ed3aa..cc3f9cfb1 100644
+--- a/drivers/net/phy/mdio_bus.c
++++ b/drivers/net/phy/mdio_bus.c
+@@ -33,33 +33,6 @@
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/mdio.h>
+ 
+-static int mdiobus_register_gpiod(struct mdio_device *mdiodev)
+-{
+-	/* Deassert the optional reset signal */
+-	mdiodev->reset_gpio = gpiod_get_optional(&mdiodev->dev,
+-						 "reset", GPIOD_OUT_LOW);
+-	if (IS_ERR(mdiodev->reset_gpio))
+-		return PTR_ERR(mdiodev->reset_gpio);
+-
+-	if (mdiodev->reset_gpio)
+-		gpiod_set_consumer_name(mdiodev->reset_gpio, "PHY reset");
+-
+-	return 0;
+-}
+-
+-static int mdiobus_register_reset(struct mdio_device *mdiodev)
+-{
+-	struct reset_control *reset;
+-
+-	reset = reset_control_get_optional_exclusive(&mdiodev->dev, "phy");
+-	if (IS_ERR(reset))
+-		return PTR_ERR(reset);
+-
+-	mdiodev->reset_ctrl = reset;
+-
+-	return 0;
+-}
+-
+ int mdiobus_register_device(struct mdio_device *mdiodev)
+ {
+ 	int err;
+@@ -68,16 +41,9 @@ int mdiobus_register_device(struct mdio_device *mdiodev)
+ 		return -EBUSY;
+ 
+ 	if (mdiodev->flags & MDIO_DEVICE_FLAG_PHY) {
+-		err = mdiobus_register_gpiod(mdiodev);
++		err = mdio_device_register_reset(mdiodev);
+ 		if (err)
+ 			return err;
+-
+-		err = mdiobus_register_reset(mdiodev);
+-		if (err)
+-			return err;
+-
+-		/* Assert the reset signal */
+-		mdio_device_reset(mdiodev, 1);
+ 	}
+ 
+ 	mdiodev->bus->mdio_map[mdiodev->addr] = mdiodev;
+@@ -91,8 +57,7 @@ int mdiobus_unregister_device(struct mdio_device *mdiodev)
+ 	if (mdiodev->bus->mdio_map[mdiodev->addr] != mdiodev)
+ 		return -EINVAL;
+ 
+-	gpiod_put(mdiodev->reset_gpio);
+-	reset_control_put(mdiodev->reset_ctrl);
++	mdio_device_unregister_reset(mdiodev);
+ 
+ 	mdiodev->bus->mdio_map[mdiodev->addr] = NULL;
+ 
+diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
+index f64176e0e..eb8237095 100644
+--- a/drivers/net/phy/mdio_device.c
++++ b/drivers/net/phy/mdio_device.c
+@@ -74,6 +74,56 @@ struct mdio_device *mdio_device_create(struct mii_bus *bus, int addr)
+ }
+ EXPORT_SYMBOL(mdio_device_create);
+ 
++/**
++ * mdio_device_register_reset - Read and initialize the reset properties of
++ *				an mdio device
++ * @mdiodev: mdio_device structure
++ */
++int mdio_device_register_reset(struct mdio_device *mdiodev)
++{
++	struct reset_control *reset;
++
++	/* Read optional firmware properties */
++	fwnode_property_read_u32(dev_fwnode(&mdiodev->dev), "reset-assert-us",
++				 &mdiodev->reset_assert_delay);
++	fwnode_property_read_u32(dev_fwnode(&mdiodev->dev), "reset-deassert-us",
++				 &mdiodev->reset_deassert_delay);
++
++	/* reset-gpio, bring up deasserted */
++	mdiodev->reset_gpio = gpiod_get_optional(&mdiodev->dev, "reset",
++						 GPIOD_OUT_LOW);
++
++	if (IS_ERR(mdiodev->reset_gpio))
++		return PTR_ERR(mdiodev->reset_gpio);
++
++	if (mdiodev->reset_gpio)
++		gpiod_set_consumer_name(mdiodev->reset_gpio, "PHY reset");
++
++	reset = reset_control_get_optional_exclusive(&mdiodev->dev, "phy");
++	if (IS_ERR(reset))
++		return PTR_ERR(reset);
++
++	mdiodev->reset_ctrl = reset;
++
++	/* Assert the reset signal */
++	mdio_device_reset(mdiodev, 1);
++
++	return 0;
++}
++EXPORT_SYMBOL(mdio_device_register_reset);
++
++/**
++ * mdio_device_unregister_reset - uninitialize the reset properties of
++ *				  an mdio device
++ * @mdiodev: mdio_device structure
++ */
++void mdio_device_unregister_reset(struct mdio_device *mdiodev)
++{
++	gpiod_put(mdiodev->reset_gpio);
++	reset_control_put(mdiodev->reset_ctrl);
++}
++EXPORT_SYMBOL(mdio_device_unregister_reset);
++
+ /**
+  * mdio_device_register - Register the mdio device on the MDIO bus
+  * @mdiodev: mdio_device structure to be added to the MDIO bus
+diff --git a/include/linux/mdio.h b/include/linux/mdio.h
+index c640ba44d..4cedcae08 100644
+--- a/include/linux/mdio.h
++++ b/include/linux/mdio.h
+@@ -90,6 +90,8 @@ static inline void *mdiodev_get_drvdata(struct mdio_device *mdio)
+ 
+ void mdio_device_free(struct mdio_device *mdiodev);
+ struct mdio_device *mdio_device_create(struct mii_bus *bus, int addr);
++int mdio_device_register_reset(struct mdio_device *mdiodev);
++void mdio_device_unregister_reset(struct mdio_device *mdiodev);
+ int mdio_device_register(struct mdio_device *mdiodev);
+ void mdio_device_remove(struct mdio_device *mdiodev);
+ void mdio_device_reset(struct mdio_device *mdiodev, int value);
+-- 
+2.39.5
 
-Best regards,
-Yao Zi
 
-> Thanks.
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-
-[1]: https://lore.kernel.org/all/fde04f06-df39-41a8-8f74-036e315e9a8b@lunn.ch/
 
