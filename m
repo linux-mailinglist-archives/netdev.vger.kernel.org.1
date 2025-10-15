@@ -1,131 +1,160 @@
-Return-Path: <netdev+bounces-229520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3AADBDD737
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 10:37:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FA25BDD764
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 10:41:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4565E4E164E
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 08:37:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E2FF3B13F3
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 08:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9267D2DCF44;
-	Wed, 15 Oct 2025 08:36:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D0C3064AB;
+	Wed, 15 Oct 2025 08:41:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zge8wSFb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lactOngR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC342D7DE4
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 08:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C33B30649F
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 08:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760517419; cv=none; b=ja8Zt7vVoHpIeuQxlXzxAjSb0a0WllV8JtYpdbAm1OQ1rbt5UuH6ulAKc7DvCnboU32kBwqQmFaVe7GjyEGAOynwlhqCQ+sxwpxLRyUWlR+NoMTEkyZCjwsKweuQ4yzaqSt8feLL//WcJoNdjEN+4yuFnDs24BlEycN2pUNCdJg=
+	t=1760517672; cv=none; b=t1bd5XjnSr/lCuRmViFBcxdkkedNPeZdkijSNBBPqLnw6A0Qo5zzowWuxu58Rlt3fKA/kBmZ3k08R0J55FpzP4Rq7/+M93rorBR9iiytPmDQ96TzRShi/lTPmHjj7+dvonjTo5rW4wpm812Skk/Om4gl6llWG8BRKkENUgl/QmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760517419; c=relaxed/simple;
-	bh=5NLI4zsp1SBd4gOuOIKIYNZhIQLrzLg9SuY97NLQhDA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qZu6YUMajLHzsX5co7cXAYefFP2lfbiAUOINK5FzArXxvkOtn+MAb8rGYQEI9SxHVuc75AgD22pL8CUdQudts27Na7SbP+Sm+sqlpFGadou9oJlWbrPLTLrQtbyrWUAxdr9lSK5objIgBEAzHgWI8P4QMyxDHcFoKDxoU5u3F6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zge8wSFb; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-782e93932ffso5597481b3a.3
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 01:36:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760517417; x=1761122217; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WQEmu+bNGaiI4ph/ihH+xulFUxvjHHAKj8u1RiEsGpA=;
-        b=Zge8wSFbjwm61sGT+XRVskayrotCRJlgFRYnYJoCAj7qq1aBGSY05djGzbIDdd62De
-         N1XL+Cy/K0d5ddNkit6V0+6avdkQL3kTiG7Y0bSjTUN7KH1VigZqzikIpVXUURhhof/6
-         onl+9+ExJl76pUAE8rcJUnGMybHh6R4c6U7q/4Oh1IdjYu2BgTp7Fb7Gp+WyyljaUtem
-         cDsaWBlxuV0TPXi8Zt0gYhj0KZ8zhjzYadJlBUxZFoUpfMMMFrgM2c/uitG/4a+uFpI7
-         3IqCuTfHNRLmS8TWtGfCTBUICh+/HVas4vm6GXrRHB9DbeVjmm+x34QK+GfPscsV/FkX
-         020g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760517417; x=1761122217;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WQEmu+bNGaiI4ph/ihH+xulFUxvjHHAKj8u1RiEsGpA=;
-        b=PCS/yy5tR9AUl/ccAe55BWaZ5akI73WDziwQL+Ht9yK6RGahhEECaXXwHkcXx3+6Oa
-         Wi4DIg2yuK3NoMYtE2PWehoqOBLR2hWu8ZE06YVbaOd4Z63OkLlnRIIQXw6L3/yrZ09j
-         5fevtItkbgMQhSiXTDRkp8vi528xZ5Y1V6KRsyVEYvQTU2W++dsIcWR6mwI31kfjMRSJ
-         nQxxqHHi69Nc0C3EBCjZbK89ovZb0tumLyZHMkWtwdlBi9NZBCTkQQskHBy1ZERGqtF1
-         Chjrl6G27da1c2MJJa7FM+C0XIwGdKVLPZ39FHsAzcpwZuZ0Kmkw5f8LsbA98QQf5TAv
-         cSDg==
-X-Gm-Message-State: AOJu0Yyy2tBFyFDBQlvoGa9ypcFDwSJKYiV1WPSa/1rkoJAZaw8PWwXZ
-	NkFUcGkIlLhor3wfS0g+9u+lqRhQjaNpPxToBU4Ym+fjj5wiCSfmp6UpnQ5XcX/bLrk=
-X-Gm-Gg: ASbGncuhFVbrSubibM2Dj13u4HFC8lRmae9UZPGmlMEEcBqRLYg5CkRY5WWofi+RESv
-	ECCLt/cM95ti9yH3MDpNm1DM+z2eSYuscodRhvuE0eoaI6WS7tkwj1HcxhVoUOTUc9WZiCtL2oE
-	yTSG7nQqcYA9Am8UBbN0SGdxsBCZbLO1WFpk65qzo+lBCGriS1PGgV3ToO0zHnbRr1F5pw2vAjM
-	gHgNe8ukvM/fi+CW+mEJkOk3R05nEu4ONa67NOdCrGLScMNytpVujQKGLBSD9mpKfprMQgqg8mv
-	8Mph8p/953HZNiw4nylL0u4JvqOXlrgQ9Sp63VY8iVIBjjBDAhXloky/J0YyllFPSx2ySBSM+pD
-	7vzsS5bpeqbLv+ysI1cBi8p8ffgjqiodwtFEe7KOpVvBha6ekzOpvpf9Z
-X-Google-Smtp-Source: AGHT+IH4uRC/LwL4VguDjyrCqgeVwmaAxPM2fBN14NSAtfh0MRz3lfPwgrQAHOYcJn6D5c+3iWyLSA==
-X-Received: by 2002:a05:6a00:ccd:b0:781:1562:1f92 with SMTP id d2e1a72fcca58-79387a287dbmr31259981b3a.26.1760517417062;
-        Wed, 15 Oct 2025 01:36:57 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992bb18e28sm17879570b3a.29.2025.10.15.01.36.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Oct 2025 01:36:56 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH net-next] netdevsim: add ipsec hw_features
-Date: Wed, 15 Oct 2025 08:36:49 +0000
-Message-ID: <20251015083649.54744-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1760517672; c=relaxed/simple;
+	bh=f6hvt/NkFdxn6Xx1792HgfmUP0Dn5MOAPtACW0y82Ic=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dXOQ2BeNnv8oSa3ie/inkH8zhaahD6vptcpXACYeuLYVCBiAYqirYlo8HvemlfLncNi5Txnlr/qhm0pGNIjpWtA3AWPKpRxI9LvjK/+OXYJ0OZTSuEzOmPl82Ef1PqGZ+gGfnH8Mu03MTMKOwuntqfEgvnIN4php1O0dXUbUE8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lactOngR; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760517665;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0VSjbHQDh1+KgRk8wHE69Ht5wW5omcZP6fXsOpT7LvU=;
+	b=lactOngR0mxUFc31b0rRqonkdWF9lUr/ALYGH20EDawQY1vG2NicmD4EN1klJa/rpZHl9h
+	sGEHIf29iB3GfkwFz7RyP9Jru6Lls81qN6qefJSGBzCIpHvbGsGS/YarYMzg+ylIC1qYrT
+	IEvX/Pss8uE2T7X6SqgH5PjbHmI1Qvg=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Menglong Dong <menglong8.dong@gmail.com>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Jakub Sitnicki <jakub@cloudflare.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, jiang.biao@linux.dev,
+ bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>
+Subject:
+ Re: [PATCH bpf-next 1/4] rcu: factor out migrate_enable_rcu and
+ migrate_disable_rcu
+Date: Wed, 15 Oct 2025 16:40:43 +0800
+Message-ID: <2239372.irdbgypaU6@7950hx>
+In-Reply-To:
+ <CAADnVQJygR6Pb1SQq=tJUpHVx7wwnSX1A78mXGha+bQArowtHQ@mail.gmail.com>
+References:
+ <20251014112640.261770-1-dongml2@chinatelecom.cn>
+ <20251014112640.261770-2-dongml2@chinatelecom.cn>
+ <CAADnVQJygR6Pb1SQq=tJUpHVx7wwnSX1A78mXGha+bQArowtHQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 
-Currently, netdevsim only sets dev->features, which makes the ESP features
-fixed. For example:
+On 2025/10/14 22:59, Alexei Starovoitov wrote:
+> On Tue, Oct 14, 2025 at 4:27=E2=80=AFAM Menglong Dong <menglong8.dong@gma=
+il.com> wrote:
+> >
+> > Factor out migrate_enable_rcu/migrate_disable_rcu from
+> > rcu_read_lock_dont_migrate/rcu_read_unlock_migrate.
+> >
+> > These functions will be used in the following patches.
+> >
+> > It's a little weird to define them in rcupdate.h. Maybe we should move
+> > them to sched.h?
+> >
+> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> > ---
+> >  include/linux/rcupdate.h | 20 +++++++++++++++++---
+> >  1 file changed, 17 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/include/linux/rcupdate.h b/include/linux/rcupdate.h
+> > index c5b30054cd01..43626ccc07e2 100644
+> > --- a/include/linux/rcupdate.h
+> > +++ b/include/linux/rcupdate.h
+> > @@ -988,18 +988,32 @@ static inline notrace void rcu_read_unlock_sched_=
+notrace(void)
+> >         preempt_enable_notrace();
+> >  }
+> >
+> > -static __always_inline void rcu_read_lock_dont_migrate(void)
+> > +/* This can only be used with rcu_read_lock held */
+> > +static inline void migrate_enable_rcu(void)
+> > +{
+> > +       WARN_ON_ONCE(!rcu_read_lock_held());
+> > +       if (IS_ENABLED(CONFIG_PREEMPT_RCU))
+> > +               migrate_enable();
+> > +}
+> > +
+> > +/* This can only be used with rcu_read_lock held */
+> > +static inline void migrate_disable_rcu(void)
+> >  {
+> > +       WARN_ON_ONCE(!rcu_read_lock_held());
+> >         if (IS_ENABLED(CONFIG_PREEMPT_RCU))
+> >                 migrate_disable();
+> > +}
+> > +
+> > +static __always_inline void rcu_read_lock_dont_migrate(void)
+> > +{
+> >         rcu_read_lock();
+> > +       migrate_disable_rcu();
+> >  }
+> >
+> >  static inline void rcu_read_unlock_migrate(void)
+> >  {
+> > +       migrate_enable_rcu();
+> >         rcu_read_unlock();
+> > -       if (IS_ENABLED(CONFIG_PREEMPT_RCU))
+> > -               migrate_enable();
+> >  }
+>=20
+> Sorry. I don't like any of it. It obfuscates the code
+> without adding any benefits.
 
-  # ethtool -k eni0np1 | grep esp
-  tx-esp-segmentation: on [fixed]
-  esp-hw-offload: on [fixed]
-  esp-tx-csum-hw-offload: on [fixed]
+It has a slight performance improving for some BPF type, such as
+SK_SKB, SK_MSG.
 
-This patch adds the ESP features to hw_features, allowing them to be
-changed manually. For example:
+Hmm, after we make migrate_disable() inline, the performance
+improving here is extremely slight. And you are right, it do obfuscate
+the code :/
 
-  # ethtool -k eni0np1 | grep esp
-  tx-esp-segmentation: on
-  esp-hw-offload: on
-  esp-tx-csum-hw-offload: on
+Thanks!
+Menglong Dong
 
-Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- drivers/net/netdevsim/ipsec.c | 1 +
- 1 file changed, 1 insertion(+)
+>=20
+> pw-bot: cr
+>=20
+>=20
 
-diff --git a/drivers/net/netdevsim/ipsec.c b/drivers/net/netdevsim/ipsec.c
-index 47cdee5577d4..36a1be4923d6 100644
---- a/drivers/net/netdevsim/ipsec.c
-+++ b/drivers/net/netdevsim/ipsec.c
-@@ -277,6 +277,7 @@ void nsim_ipsec_init(struct netdevsim *ns)
- 				 NETIF_F_GSO_ESP)
- 
- 	ns->netdev->features |= NSIM_ESP_FEATURES;
-+	ns->netdev->hw_features |= NSIM_ESP_FEATURES;
- 	ns->netdev->hw_enc_features |= NSIM_ESP_FEATURES;
- 
- 	ns->ipsec.pfile = debugfs_create_file("ipsec", 0400,
--- 
-2.50.1
+
+
 
 
