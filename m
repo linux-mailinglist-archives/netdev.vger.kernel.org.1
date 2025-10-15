@@ -1,88 +1,93 @@
-Return-Path: <netdev+bounces-229420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2F5FBDBD8B
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 01:57:22 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 556FFBDBF29
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 03:03:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6317C1927705
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 23:57:32 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B2698345B17
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 01:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866AF2EB87F;
-	Tue, 14 Oct 2025 23:56:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 626FB1A9F90;
+	Wed, 15 Oct 2025 01:03:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nrlP+Eu6"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="jSl1MXQ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5178427E056;
-	Tue, 14 Oct 2025 23:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F91186294
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 01:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760486205; cv=none; b=pzoCyZoBVfJ0in36SskNMgEuf/6FVoYtGhpYjSOWmdZwS2mBgiNtemO2zr0OMTOogw9fpP5BiRjgfWT2j6LISKUGatZ0SM9i34XCpn8iu0Wb3YGFc4TEXD+Lu8poUI4iaZ66OGqDJvRWDhlmApcLEp47D/4Afhdjzjj8aEmWRUA=
+	t=1760490207; cv=none; b=r3Ryo7OTRjpFXB1kDuR5yuRoOZ5h7s2cfPh4XOoCFTb1sNoQmiChSq9niWF54YwuSzIpAaPtylPrdL8rAQekp3j50Fr1VxkxV/pLbo6HpAmrr/cYYGHVtHLVAUH+HuAIpBvgh0dsBpONhdicQwE81RmibA7CG6JiWBEqOzkTPrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760486205; c=relaxed/simple;
-	bh=VRx2aw2zM7OKLvT1+4Nmf2vysG0y9faUtuRX2ydOGQI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DxYxE05xHETNYoO22Nacdm3RUAboqv+b5L5zK4181WMO0iRNwe5TJulYAF3JHI5Z4FMQlpIgWZOinqci8AItjKpjuWMk/91V0miUi6gYsNIiuGJdMM/QgL4VNdmIA64US3q4Iye1AvsXsV3ecOrYmWMy4/lcmibue1awXo7jPg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nrlP+Eu6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC586C4CEE7;
-	Tue, 14 Oct 2025 23:56:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760486204;
-	bh=VRx2aw2zM7OKLvT1+4Nmf2vysG0y9faUtuRX2ydOGQI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nrlP+Eu6w6mc0re5WVocRicbDQXvJOb6dAF0bdsKuF/UHDK/pNRDJJPF4ZoiS83Oh
-	 zvoUldv916VMPzyUePhCrE4e2rWjTv6mYjtScGAbB1d3wtsTAdzQxdZcH/I/EyI7Hl
-	 evj8MI63ZzeFh3ZFTtAvMIEdu0TPMV1yeTWprOhsrxbgr1zsm9N9X4lSFzpK8tQA0M
-	 Vt/s7tG5q/Smn/RGdJfx3GX+OT5MK+KDqwloGqKSWaTbGxHzw6G6ScGu1qHOjdL+eU
-	 EaxQS0sRhphQBaz9JByk9JR0S20SgBxymSHWpamb6AkNnSlOfVJehWBn/0lnqMnoJA
-	 f9E2Uz/WqhTMg==
-Date: Tue, 14 Oct 2025 16:56:44 -0700
-From: Kees Cook <kees@kernel.org>
-To: bot+bpf-ci@kernel.org
-Cc: kernel-ci@meta.com, andrii@kernel.org, daniel@iogearbox.net,
-	martin.lau@linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 00/10] net: Introduce struct sockaddr_unspec
-Message-ID: <202510141649.D0DDA6A57@keescook>
-References: <20251014223349.it.173-kees@kernel.org>
- <2095031a79fdd5a7765b9e7a0a052fb2b48895c8794a170e567273d2614da9fd@mail.kernel.org>
+	s=arc-20240116; t=1760490207; c=relaxed/simple;
+	bh=hrCTI/HHe4IFxP2VQsZiuqQ5NMTLIl8DkzgLHOg3l6w=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=oeCG8PV/5RU8Zkgm38BIjsCCfpY/goOLj0CsBX41M9FhclBhMhwfyhnFhSc6r8VbQmLLkfKsJncTiRPQJgMMYvjlsKP6WaY7fK3h64Qg9m79V1ynFLLgp4gVcR0aK8axgXMUi9tJkhfZQz2aoYOSAQdkngeVzhHoTof3PHa3dJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=jSl1MXQ+; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1760490196; h=Message-ID:Subject:Date:From:To;
+	bh=hrCTI/HHe4IFxP2VQsZiuqQ5NMTLIl8DkzgLHOg3l6w=;
+	b=jSl1MXQ+ziXToj/jSfpLkKFO04hO+ofBSixjq3MYroAppg2zNvQLh64/GbygCsZig6KT8qD6rxW16yKIX+NPX43nwUgzwk+/PGiETHrzhAnqNW1nMLmw8+RDPMt0lo3pq1GQderWd7Of3OQrkMUqVzRNtEumOvRa+6Ubl+TzW7c=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WqE3gHW_1760489875 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 15 Oct 2025 08:57:56 +0800
+Message-ID: <1760489853.539487-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v5] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
+Date: Wed, 15 Oct 2025 08:57:33 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Wen Gu <guwen@linux.alibaba.com>,
+ Philo Lu <lulie@linux.alibaba.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Vivian Wang <wangruikang@iscas.ac.cn>,
+ Troy Mitchell <troy.mitchell@linux.spacemit.com>,
+ Dust Li <dust.li@linux.alibaba.com>,
+ alok.a.tiwari@oracle.com,
+ kalesh-anakkur.purayil@broadcom.com
+References: <20251013021833.100459-1-xuanzhuo@linux.alibaba.com>
+ <jhvl3gx63kt3xcgx3o4ppsqftgzupjojf3ygblnrapcneuks5w@cgfydxsalyii>
+In-Reply-To: <jhvl3gx63kt3xcgx3o4ppsqftgzupjojf3ygblnrapcneuks5w@cgfydxsalyii>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2095031a79fdd5a7765b9e7a0a052fb2b48895c8794a170e567273d2614da9fd@mail.kernel.org>
 
-On Tue, Oct 14, 2025 at 11:06:58PM +0000, bot+bpf-ci@kernel.org wrote:
-> Dear patch submitter,
-> 
-> CI has tested the following submission:
-> Status:     FAILURE
-> Name:       [v2,00/10] net: Introduce struct sockaddr_unspec
-> Patchwork:  https://patchwork.kernel.org/project/netdevbpf/list/?series=1011557&state=*
-> Matrix:     https://github.com/kernel-patches/bpf/actions/runs/18512305054
+On Tue, 14 Oct 2025 14:19:29 +0200, Jiri Pirko <jiri@resnulli.us> wrote:
+> Mon, Oct 13, 2025 at 04:18:33AM +0200, xuanzhuo@linux.alibaba.com wrote:
+> >Add a driver framework for EEA that will be available in the future.
+> >
+> >This driver is currently quite minimal, implementing only fundamental
+> >core functionalities. Key features include: I/O queue management via
+> >adminq, basic PCI-layer operations, and essential RX/TX data
+> >communication capabilities. It also supports the creation,
+> >initialization, and management of network devices (netdev). Furthermore,
+> >the ring structures for both I/O queues and adminq have been abstracted
+> >into a simple, unified, and reusable library implementation,
+> >facilitating future extension and maintenance.
+>
+> Is this another fbnic-like internally used hw which no-one outside
+> Alibaba will ever get hands on, do I understand that correctly?
 
-Hrm, there's something in here that wasn't caught with my "allmodconfig"
-tests. I'll take a closer look...
 
-Ah, yes. I missed these:
+This device is included on Alibaba Cloud's publicly offered cloud servers. This
+setup is more similar to Google's gVNIC (gve) and AWS's ENA devices.
 
-tools/testing/selftests/bpf/prog_tests/sock_addr.c:static int kernel_bind(int fd, struct sockaddr *addr, socklen_t addrlen)
-tools/testing/selftests/bpf/prog_tests/sock_addr.c:     if (kernel_bind(0, (struct sockaddr *)&addr, addrlen) < 0)
-tools/testing/selftests/bpf/test_kmods/bpf_testmod.c:   err = kernel_bind(sock, (struct sockaddr *)&args->addr, args->addrlen);
-etc...
-
-I will get those fixed.
-
--- 
-Kees Cook
+Thanks.
 
