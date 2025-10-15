@@ -1,380 +1,161 @@
-Return-Path: <netdev+bounces-229793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47BF6BE0D84
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 23:42:12 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3031BE0DDB
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 23:48:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 28C8A4E1C11
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:42:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 927CE4E68DC
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:48:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8AC33002BD;
-	Wed, 15 Oct 2025 21:42:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EADF30274E;
+	Wed, 15 Oct 2025 21:48:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fIHoHGkq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YuylOvSu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26E22D24AC;
-	Wed, 15 Oct 2025 21:42:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27331E51E1;
+	Wed, 15 Oct 2025 21:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760564528; cv=none; b=BQZZeCjKU+2NNKtvJwrlzIhEyGXqbCxK8L7DobfcfjYMWwB5ewmdDmvb1LxTCEylaJ1p7xLZ/UUtIF3YOLbGRuaJAQbWC4bSIP/Yt33Zm5u3zs3WYPES/pvnOItM9qdnf0Q1DncEkq/H87LLmQfomMh17t8tnSSn1E0N651bQ6M=
+	t=1760564936; cv=none; b=nsllUdQP43067TjEA0ZAvh9uixou1p36/jkRpvHpDtT3m+BcQKECPMaAdgmY9nENrhGsgO7XYQ9gi5WBBIPgpRyy7NYKcCy9kEAFamh9u0+ATSWPTjMTyoDf2vwfoVfmO3SH9TbVLX1gIm2Ai3bBv4vDhqpLzB/YjjVQhe7nOQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760564528; c=relaxed/simple;
-	bh=qfxkjojbnOlKxoE9ZeK4jTDYrWsSjnjfW0LsKes6m0Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NvsNT7CMOJ1By9hUtpZ7IZbAspjQnf9dmbBeKrmLYZabJgLs4WHiE4MBfhbtr1fjpKhANh8wJpwk6URLmGSXHMBLHeMiCBUQhvj4s7CC8gtK0m0V/16i2gWTWVvSlWleFP8v1QkCYf6eCsi2x/N78NiZiSoVyG1t/95h74aCtpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fIHoHGkq; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760564526; x=1792100526;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=qfxkjojbnOlKxoE9ZeK4jTDYrWsSjnjfW0LsKes6m0Q=;
-  b=fIHoHGkqSfM/ZgiwgyvmhQop0GstHSpMdXOS7q79g+VpkwRE76tUEOgu
-   0098BsSozeOvFIAiz77Zg6wvinpJlowWMrG1l2GSChH/xIrJXgxheVtsn
-   mRWAnEqU/O02QWgQ6Q2X4iEjOl+P+TF8V/dKwG3qFlMpURjn7IyesqpqR
-   0s8GW1bzkj8Otr69cVfanBv7zH/Rq1BIUBtIQU0SpUGEZfLqWYL9ZtZMw
-   X6r3qh1eOlBdvOBQvSNLmF983biF8EFGpY5VRkxYhieT8HQ3rruHrP4Et
-   yQbQlJIhG//lPIrd4W6GrKRupnUu2CvrmrmLKxCSudxdKZ7hO/Sa19uiV
-   Q==;
-X-CSE-ConnectionGUID: daR/CbOwSzu8A3p8MV8R9g==
-X-CSE-MsgGUID: pXpqIvY/SM+AVyuiudaoZQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="62680673"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="62680673"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 14:42:06 -0700
-X-CSE-ConnectionGUID: SoTxdG7CT1OMlEGVBjtzlQ==
-X-CSE-MsgGUID: 6v6Ly5oKRwOMTLcFfFauDg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
-   d="scan'208";a="183071417"
-Received: from cmdeoliv-mobl4.amr.corp.intel.com (HELO [10.125.111.221]) ([10.125.111.221])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 14:42:05 -0700
-Message-ID: <aa942655-d740-4052-8ddc-13540b06ef14@intel.com>
-Date: Wed, 15 Oct 2025 14:42:03 -0700
+	s=arc-20240116; t=1760564936; c=relaxed/simple;
+	bh=lGh4aWLHX59TIOJDOl60FMg8mwZEfvTCoAPa6IWqX6k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mgbArTLpB0mcdSo0t0pr3ItHD1ss/MAO+srwjJzEclZHCwwu/h0VjjoNP1OhKVljdQZbr3ZANTwVEa41aLr5SkcSUUb5fpcIugRIVr4cvF5rAZ4XYSYlv1eDr/k7tdu+yJ9kwtF/fy99Kpz+1ruG3FFGo/xElJ/ITS1s/c8kMUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YuylOvSu; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ZTSdOvDlbsuQj/667Lv/041NU1iVeaPF8hOZogCvbXQ=; b=YuylOvSujLmb3kYb3oa3KZhd1o
+	wcivn+oEGR5jMG+fLOcoNiGMQFOKlJReF4ZhQCgW6UNgwmkI7KBv/Rwe7BlB8vQBvcxbkJM/FS25R
+	nbkiY2chbvHiaGiXJbu3uf20ojRKMuT53zFf1J2Vf4jui+7wXJdVEhEPIEYB3on4i4Z/ijLr3qM2t
+	5pMpZA4Bg/QIYfx62+RbxJ00uIQTNyetpbTjGOrPLJvbE8pLkT9GtmaUtTSoyx3s3qK8bSjc+uYNQ
+	aJ4+ULCk2sB3TksqCuRGzjct29p90b4FiKHUhV0wbNIgFvMGQR+yHmUjhLcpll5Gzf3Tl7vYPHTBd
+	Oxs7DzZQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50176)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v99MA-000000005Ut-17h0;
+	Wed, 15 Oct 2025 22:48:26 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v99M1-000000002dZ-0S6N;
+	Wed, 15 Oct 2025 22:48:17 +0100
+Date: Wed, 15 Oct 2025 22:48:16 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Abhishek Chauhan <quic_abchauha@quicinc.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexis Lothore <alexis.lothore@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Drew Fustini <dfustini@tenstorrent.com>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
+	Furong Xu <0x1207@gmail.com>, Inochi Amaoto <inochiama@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+	Jisheng Zhang <jszhang@kernel.org>, Kees Cook <kees@kernel.org>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthew Gerlach <matthew.gerlach@altera.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rohan G Thomas <rohan.g.thomas@altera.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Simon Horman <horms@kernel.org>,
+	Song Yoong Siang <yoong.siang.song@intel.com>,
+	Swathi K S <swathi.ks@samsung.com>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>, Vinod Koul <vkoul@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH net-next 11/14] net: stmmac: do not require snps,ps-speed
+ for SGMII
+Message-ID: <aPAWoDGVgeRFV95b@shell.armlinux.org.uk>
+References: <aO-tbQCVu47R3izM@shell.armlinux.org.uk>
+ <E1v92N3-0000000AmHQ-4Bm2@rmk-PC.armlinux.org.uk>
+ <15ea57e0-d127-4722-b752-4989d5a443c0@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 18/22] cxl: Allow region creation by type2 drivers
-To: "Cheatham, Benjamin" <benjamin.cheatham@amd.com>,
- alejandro.lucero-palau@amd.com
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com
-References: <20251006100130.2623388-1-alejandro.lucero-palau@amd.com>
- <20251006100130.2623388-19-alejandro.lucero-palau@amd.com>
- <c42081c1-09e6-45be-8f9e-e4eea0eb1296@amd.com>
-From: Dave Jiang <dave.jiang@intel.com>
-Content-Language: en-US
-In-Reply-To: <c42081c1-09e6-45be-8f9e-e4eea0eb1296@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <15ea57e0-d127-4722-b752-4989d5a443c0@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Wed, Oct 15, 2025 at 11:26:03PM +0200, Andrew Lunn wrote:
+> On Wed, Oct 15, 2025 at 03:20:53PM +0100, Russell King (Oracle) wrote:
+> > SGMII mode does not require port-speed to be specified; this only
+> > switches SGMII to use the MAC configuration register speed settings
+> > and the actual value is irrelevant when the link comes up.
+> > 
+> > As it seems the intention was to support "reverse SGMII" with this
+> > setting, but the code didn't actually configure that due to a typo,
+> > the warning and bad DT binding documentation has led people to
+> > specify snps,ps-speed in their DT files inappropriately.
+> 
+> I know you hit the patch limit. Do you have a patch in the next series
+> which updates the binding?
 
+I don't at present, and I'm not sure what the point of updating it
+would actually be, because this is another thing that's just broken.
 
-On 10/9/25 1:56 PM, Cheatham, Benjamin wrote:
-> On 10/6/2025 5:01 AM, alejandro.lucero-palau@amd.com wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> Creating a CXL region requires userspace intervention through the cxl
->> sysfs files. Type2 support should allow accelerator drivers to create
->> such cxl region from kernel code.
->>
->> Adding that functionality and integrating it with current support for
->> memory expanders.
->>
->> Support an action by the type2 driver to be linked to the created region
->> for unwinding the resources allocated properly.
->>
->> Based on https://lore.kernel.org/linux-cxl/168592159835.1948938.1647215579839222774.stgit@dwillia2-xfh.jf.intel.com/
->>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
->> ---
-> 
-> Fix for this one should be split between 13/22 and this patch, but the majority of it is in this one. The idea is
-> if we don't find a free decoder we check for pre-programmed decoders and use that instead. Unfortunately, this
-> invalidates some of the assumptions made by __construct_new_region().
+The purpose of this property is to allow DT to specify the operating
+speed of the link when acting as if it were a PHY on the end of a
+SGMII (or RGMII) link using in-band signalling. However, because the
+code mixes up GMAC_CONTROL_TE instead of GMAC_CONTROL_TC, when this
+is set, the _transmit enable_ is set, rather than the _transmit
+configuration_ bit, meaning the core doesn't actually send the
+inband status as if it were a PHY.
 
-Wouldn't you look for a pre-programmed decoder first and construct the auto region before you try to manually create one? Also for a type 2 device, would the driver know what it wants and what the region configuration should look like? Would it be a single region either it's auto or manual, or would there be a configuration of multiple regions possible? To me a type 2 region is more intentional where the driver would know exactly what it needs and thus trying to get that from the cxl core. 
+So, the whole thing is pointless, it's never worked from what I can
+see, and lastly... this property should not even be specifying a
+speed at all, because that's what we have the fixed-link stuff for.
+At best, this should have triggered a discussion about PHY
+interface modes such as reverse-SGMII and reverse-RGMII that we've
+recently had where the MAC is acting as if it were a PHY.
 
-DJ
+We can't get rid of it because doing so would break existing DTS
+files. We can't fix it to work, because given the vagueness of the
+current definition, people have added this property even when they
+do not want to be operating in reverse mode.
 
+Hence, I would like this property a slow and painful^h^h^hfree death.
+Maybe mark the property deprecated, and remove all explanation of it
+apart from stating that it's obsolete after this patch series has
+been merged and we've proven that it's never been useful.
 
-> 
-> __construct_new_region() assumes that 1) the underlying HPA is unallocated and 2) the HDM decoders aren't programmed. Neither
-> of those are true for a decoder that's programmed by BIOS. The HPA is allocated as part of endpoint_port_probe()
-> (see devm_cxl_enumerate_decoders() in cxl/core/hdm.c specifically) and the HDM decoders are enabled and committed by BIOS before
-> we ever see them. So the idea here is to split the second half of __construct_new_region() into the 2 cases: un-programmed decoders
-> (__setup_new_region()) and pre-programmed decoders (__setup_new_auto_region()). The main differences between the two is we don't
-> allocate the HPA region or commit the HDM decoders and just insert the region resource below the CXL window instead in the auto case.
-> 
-> I'm not sure if I've done everything correctly, but I don't see any errors and get the following iomem tree:
-> 	1050000000-144fffffff : CXL Window 0
->   	  1050000000-144fffffff : region0
->     	    1050000000-144fffffff : Soft Reserved
-> 
-> ---
-> 
-> diff --git a/drivers/cxl/core/core.h b/drivers/cxl/core/core.h
-> index 4af5de5e0a44..a5fa8dd0e63f 100644
-> --- a/drivers/cxl/core/core.h
-> +++ b/drivers/cxl/core/core.h
-> @@ -137,6 +137,8 @@ int cxl_hdm_decode_init(struct cxl_dev_state *cxlds, struct cxl_hdm *cxlhdm,
->                         struct cxl_endpoint_dvsec_info *info);
->  int cxl_port_get_possible_dports(struct cxl_port *port);
-> 
-> +bool is_auto_decoder(struct cxl_endpoint_decoder *cxled);
-> +
->  #ifdef CONFIG_CXL_FEATURES
->  struct cxl_feat_entry *
->  cxl_feature_info(struct cxl_features_state *cxlfs, const uuid_t *uuid);
-> diff --git a/drivers/cxl/core/hdm.c b/drivers/cxl/core/hdm.c
-> index 1f7aa79c1541..8f6236a88c0b 100644
-> --- a/drivers/cxl/core/hdm.c
-> +++ b/drivers/cxl/core/hdm.c
-> @@ -712,16 +712,33 @@ static int find_free_decoder(struct device *dev, const void *data)
->         return 1;
->  }
-> 
-> +bool is_auto_decoder(struct cxl_endpoint_decoder *cxled)
-> +{
-> +       return cxled->state == CXL_DECODER_STATE_AUTO && cxled->pos < 0 &&
-> +              (cxled->cxld.flags & CXL_DECODER_F_ENABLE);
-> +}
-> +
-> +static int find_auto_decoder(struct device *dev, const void *data)
-> +{
-> +       if (!is_endpoint_decoder(dev))
-> +               return 0;
-> +
-> +       return is_auto_decoder(to_cxl_endpoint_decoder(dev));
-> +}
-> +
->  static struct cxl_endpoint_decoder *
->  cxl_find_free_decoder(struct cxl_memdev *cxlmd)
->  {
->         struct cxl_port *endpoint = cxlmd->endpoint;
->         struct device *dev;
-> 
-> -       scoped_guard(rwsem_read, &cxl_rwsem.dpa) {
-> -               dev = device_find_child(&endpoint->dev, NULL,
-> -                                       find_free_decoder);
-> -       }
-> +       guard(rwsem_read)(&cxl_rwsem.dpa);
-> +       dev = device_find_child(&endpoint->dev, NULL,
-> +                               find_free_decoder);
-> +       if (dev)
-> +               return to_cxl_endpoint_decoder(dev);
-> +
-> +       dev = device_find_child(&endpoint->dev, NULL, find_auto_decoder);
->         if (dev)
->                 return to_cxl_endpoint_decoder(dev);
-> 
-> @@ -761,6 +778,9 @@ struct cxl_endpoint_decoder *cxl_request_dpa(struct cxl_memdev *cxlmd,
->         if (!cxled)
->                 return ERR_PTR(-ENODEV);
-> 
-> +       if (is_auto_decoder(cxled))
-> +               return_ptr(cxled);
-> +
->         rc = cxl_dpa_set_part(cxled, mode);
->         if (rc)
->                 return ERR_PTR(rc);
-> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-> index 2d60131edff3..004e01ad0e5f 100644
-> --- a/drivers/cxl/core/region.c
-> +++ b/drivers/cxl/core/region.c
-> @@ -3699,48 +3699,74 @@ cxl_find_region_by_range(struct cxl_root_decoder *cxlrd, struct range *hpa)
->  }
-> 
->  static struct cxl_region *
-> -__construct_new_region(struct cxl_root_decoder *cxlrd,
-> -                      struct cxl_endpoint_decoder **cxled, int ways)
-> +__setup_new_auto_region(struct cxl_region *cxlr, struct cxl_root_decoder *cxlrd,
-> +                       struct cxl_endpoint_decoder **cxled, int ways)
->  {
-> -       struct cxl_memdev *cxlmd = cxled_to_memdev(cxled[0]);
-> -       struct cxl_decoder *cxld = &cxlrd->cxlsd.cxld;
-> -       struct cxl_region_params *p;
-> +       struct range *hpa = &cxled[0]->cxld.hpa_range;
-> +       struct cxl_region_params *p = &cxlr->params;
->         resource_size_t size = 0;
-> -       struct cxl_region *cxlr;
-> -       int rc, i;
-> +       struct resource *res;
-> +       int rc = -EINVAL, i = 0;
-> 
-> -       cxlr = construct_region_begin(cxlrd, cxled[0]);
-> -       if (IS_ERR(cxlr))
-> -               return cxlr;
-> +       scoped_guard(rwsem_read, &cxl_rwsem.dpa)
-> +       {
-> +               for (i = 0; i < ways; i++) {
-> +                       if (!cxled[i]->dpa_res)
-> +                               goto err;
-> 
-> -       guard(rwsem_write)(&cxl_rwsem.region);
-> +                       if (!is_auto_decoder(cxled[i]))
-> +                               goto err;
-> 
-> -       /*
-> -        * Sanity check. This should not happen with an accel driver handling
-> -        * the region creation.
-> -        */
-> -       p = &cxlr->params;
-> -       if (p->state >= CXL_CONFIG_INTERLEAVE_ACTIVE) {
-> -               dev_err(cxlmd->dev.parent,
-> -                       "%s:%s: %s  unexpected region state\n",
-> -                       dev_name(&cxlmd->dev), dev_name(&cxled[0]->cxld.dev),
-> -                       __func__);
-> -               rc = -EBUSY;
-> -               goto err;
-> +                       size += resource_size(cxled[i]->dpa_res);
-> +               }
->         }
-> 
-> -       rc = set_interleave_ways(cxlr, ways);
-> -       if (rc)
-> +       set_bit(CXL_REGION_F_AUTO, &cxlr->flags);
-> +
-> +       p->res = kmalloc(sizeof(*res), GFP_KERNEL);
-> +       if (!p->res) {
-> +               rc = -ENOMEM;
->                 goto err;
-> +       }
-> 
-> -       rc = set_interleave_granularity(cxlr, cxld->interleave_granularity);
-> +       *p->res = DEFINE_RES_MEM_NAMED(hpa->start, range_len(hpa),
-> +                                      dev_name(&cxlr->dev));
-> +
-> +       rc = insert_resource(cxlrd->res, p->res);
->         if (rc)
-> -               goto err;
-> +               dev_warn(&cxlr->dev, "Could not insert resource\n");
-> +
-> +       p->state = CXL_CONFIG_INTERLEAVE_ACTIVE;
-> +       scoped_guard(rwsem_read, &cxl_rwsem.dpa)
-> +       {
-> +               for (i = 0; i < ways; i++) {
-> +                       rc = cxl_region_attach(cxlr, cxled[i], -1);
-> +                       if (rc)
-> +                               goto err;
-> +               }
-> +       }
-> +
-> +       return cxlr;
-> +
-> +err:
-> +       drop_region(cxlr);
-> +       return ERR_PTR(rc);
-> +}
-> +
-> +static struct cxl_region *
-> +__setup_new_region(struct cxl_region *cxlr, struct cxl_root_decoder *cxlrd,
-> +                  struct cxl_endpoint_decoder **cxled, int ways)
-> +{
-> +       struct cxl_region_params *p = &cxlr->params;
-> +       resource_size_t size = 0;
-> +       int rc = -EINVAL, i = 0;
-> 
-> -       scoped_guard(rwsem_read, &cxl_rwsem.dpa) {
-> +       scoped_guard(rwsem_read, &cxl_rwsem.dpa)
-> +       {
->                 for (i = 0; i < ways; i++) {
->                         if (!cxled[i]->dpa_res)
->                                 break;
-> +
->                         size += resource_size(cxled[i]->dpa_res);
->                 }
->         }
-> @@ -3752,7 +3778,8 @@ __construct_new_region(struct cxl_root_decoder *cxlrd,
->         if (rc)
->                 goto err;
-> 
-> -       scoped_guard(rwsem_read, &cxl_rwsem.dpa) {
-> +       scoped_guard(rwsem_read, &cxl_rwsem.dpa)
-> +       {
->                 for (i = 0; i < ways; i++) {
->                         rc = cxl_region_attach(cxlr, cxled[i], 0);
->                         if (rc)
-> @@ -3760,16 +3787,61 @@ __construct_new_region(struct cxl_root_decoder *cxlrd,
->                 }
->         }
-> 
-> +       rc = cxl_region_decode_commit(cxlr);
->         if (rc)
->                 goto err;
-> 
-> -       rc = cxl_region_decode_commit(cxlr);
-> +       p->state = CXL_CONFIG_COMMIT;
-> +       return cxlr;
-> +
-> +err:
-> +       drop_region(cxlr);
-> +       return ERR_PTR(rc);
-> +}
-> +
-> +static struct cxl_region *
-> +__construct_new_region(struct cxl_root_decoder *cxlrd,
-> +                      struct cxl_endpoint_decoder **cxled, int ways)
-> +{
-> +       struct cxl_memdev *cxlmd = cxled_to_memdev(cxled[0]);
-> +       struct cxl_decoder *cxld = &cxlrd->cxlsd.cxld;
-> +       struct cxl_region_params *p;
-> +       struct cxl_region *cxlr;
-> +       int rc;
-> +
-> +       cxlr = construct_region_begin(cxlrd, cxled[0]);
-> +       if (IS_ERR(cxlr))
-> +               return cxlr;
-> +
-> +       guard(rwsem_write)(&cxl_rwsem.region);
-> +
-> +       /*
-> +        * Sanity check. This should not happen with an accel driver handling
-> +        * the region creation.
-> +        */
-> +       p = &cxlr->params;
-> +       if (p->state >= CXL_CONFIG_INTERLEAVE_ACTIVE) {
-> +               dev_err(cxlmd->dev.parent,
-> +                       "%s:%s: %s  unexpected region state\n",
-> +                       dev_name(&cxlmd->dev), dev_name(&cxled[0]->cxld.dev),
-> +                       __func__);
-> +               rc = -EBUSY;
-> +               goto err;
-> +       }
-> +
-> +       rc = set_interleave_ways(cxlr, ways);
->         if (rc)
->                 goto err;
-> 
-> -       p->state = CXL_CONFIG_COMMIT;
-> +       rc = set_interleave_granularity(cxlr, cxld->interleave_granularity);
-> +       if (rc)
-> +               goto err;
-> +
-> +       if (is_auto_decoder(cxled[0]))
-> +               return __setup_new_auto_region(cxlr, cxlrd, cxled, ways);
-> +       else
-> +               return __setup_new_region(cxlr, cxlrd, cxled, ways);
-> 
-> -       return cxlr;
->  err:
->         drop_region(cxlr);
->         return ERR_PTR(rc);
+IMHO, it's a property that should never have existed.
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
