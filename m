@@ -1,125 +1,110 @@
-Return-Path: <netdev+bounces-229579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF38ABDE7FD
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 14:37:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8E98BDE87E
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 14:46:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8B5A23532A6
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 12:37:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DF0A19C4C5D
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 12:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40FD323875D;
-	Wed, 15 Oct 2025 12:37:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E1B757EA;
+	Wed, 15 Oct 2025 12:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GDzhOzdo"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="uf5OI0MG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C86520C48A
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 12:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58FD017BA6
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 12:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760531851; cv=none; b=k6QkLvT6EwXfeK0J+HszwinNvJ8n2yAJTQilrF7oRkHB61Q/b8TvziJ0ph/wn/E5jA99hDo3drswZs91X8Lf/nCVJ+FyS1Jb3W7ubyM9HMF+KneDXAVBV2sMEbHmC8xjz/48iAAsAO8Ps/vNuYb8uXYOF8dcAofAfVn6bme7wPM=
+	t=1760532362; cv=none; b=QbpHM9+j1k140bknGDfa1iaL/VCIJWJDIODCMGd0VGE7bud5t2maAL3AehdIF95xs1F2tF6YfMWzgn7S42Dh2GvP8zXfNWEvqiMpR1OGh337p+uzeXPy4gAo1z1bv46t72vkq/XH+FUxo+F+whI/+j1knz/T6GIsLlKG3mMopfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760531851; c=relaxed/simple;
-	bh=vAeHPZo/SbvwiHBbvBbMicDqv0CobCOFq5F15mnA5dc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qJALycrc7uBA2UsPTjJb+qSNsVsPfiOST2owW9M4b+9IgjmZH6vWvh6LVEVMWW1eg/t/IxCzDXXGs0gZJfOSPWcRnl2J0OsObHdxsO31Yv43nkvoEYjwuIx5KOmEZY4qFRB5/bmafT9jGpagBRPCL63a7oSArzMwXHhtI3DnXpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GDzhOzdo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9593CC4CEF8;
-	Wed, 15 Oct 2025 12:37:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760531850;
-	bh=vAeHPZo/SbvwiHBbvBbMicDqv0CobCOFq5F15mnA5dc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GDzhOzdo2WG4GLuK6PyqXilZcSZpazJ7zHOhSIlPK/qFvZbcmRU68PkHplJsL/o/X
-	 6WkNU2NH5E5Wj0qzZFZ6iVEvkL6403LzjI/u4j0XBkyRD7PS1EuQX/AQcTjxEJI8IB
-	 IgIxXu34U0+VCQ5R6vdOfRSePglHrnEMqrNqjMIz9GxnDQfK2QRFBMBQV7pwscoBep
-	 YesVv0Nz91vMsS4GOdU5fG3KPG5QwtaJd7J2bPyc4jhk1C/9XZ0qk7fkP3Q0IKOBHH
-	 ++1038yioX1Gcwii4iX/MveUY1NoMeS33rHs1x15pY6zx+Q+3nCuYMA4aGKERTmF0X
-	 OdPRQg68b1LQg==
-Date: Wed, 15 Oct 2025 13:37:25 +0100
-From: Simon Horman <horms@kernel.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Vivian Wang <wangruikang@iscas.ac.cn>,
-	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
-	Dust Li <dust.li@linux.alibaba.com>
-Subject: Re: [PATCH net-next v6 1/5] eea: introduce PCI framework
-Message-ID: <aO-VhWosxJ8OnG_K@horms.kernel.org>
-References: <20251015071145.63774-1-xuanzhuo@linux.alibaba.com>
- <20251015071145.63774-2-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1760532362; c=relaxed/simple;
+	bh=oyluTmVOjpA44Vi8KdA6vKtr2fcyRpaqShI7dHAkNZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FvNdjl2Ja334v44vh12mxgK/2+yzoUK3R4jvtAnTDXrumf7EOjGVYg2HjDgUv9D9LRjcRXFaS8HjtNxpbYXLWfKMKSTOhiWGic7erC/r/sS8kUMKjS9UrAy5vRHS/yt7c9GwMrA0TCptDOHxDNl1izCQw91HV5RJk0Q/Z/JHAno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=uf5OI0MG; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 7814A1A13D8;
+	Wed, 15 Oct 2025 12:45:53 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 4ADC3606F9;
+	Wed, 15 Oct 2025 12:45:53 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 88507102F2252;
+	Wed, 15 Oct 2025 14:45:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1760532352; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=oyluTmVOjpA44Vi8KdA6vKtr2fcyRpaqShI7dHAkNZ0=;
+	b=uf5OI0MGetOb0yLq/o0Hrj9if0UYaWuuRvl/XfHi7z1c/2zzDnOBk161QDUw362+f9uT3J
+	8NmyDeF5b4hVyS0bEFjYgXbtki537VbDNz9tD8WqLTK8K7lpuI4AK7+4dCC7dWCoz+XV4R
+	vi0/hrCBJsgUd3SnIEfqrFmcoh0UKLBHNxoxneuSHJCb/mNZmHeJUsKaIZ6boTu/93U6NQ
+	zRQP1Dt6jYhRCY1jYZu26T3dAb34DNrYR1gfsTKuYarTxG9CaOqp2zYU9PU6BT9lSvsf4j
+	6/kcn6hDYQ3BOd0xEDwlwYFGIjgv3SQenJi3iboJomEX65QA9lNjhfIJM7lSbA==
+Date: Wed, 15 Oct 2025 14:45:26 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Alexis =?UTF-8?B?TG90aG9yw6k=?=
+ <alexis.lothore@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 3/3] net: ethtool: tsconfig: Re-configure
+ hwtstamp upon provider change
+Message-ID: <20251015144526.23e55ee0@kmaincent-XPS-13-7390>
+In-Reply-To: <20251015102725.1297985-4-maxime.chevallier@bootlin.com>
+References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
+	<20251015102725.1297985-4-maxime.chevallier@bootlin.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251015071145.63774-2-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Wed, Oct 15, 2025 at 03:11:41PM +0800, Xuan Zhuo wrote:
+On Wed, 15 Oct 2025 12:27:23 +0200
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-...
+> When a hwprov timestamping source is changed, but without updating the
+> timestamping parameters, we may want to reconfigure the timestamping
+> source to enable the new provider.
+>=20
+> This is especially important if the same HW unit implements 2 providers,
+> a precise and an approx one. In this case, we need to make sure we call
+> the hwtstamp_set operation for the newly selected provider.
 
-> diff --git a/drivers/net/ethernet/alibaba/eea/eea_pci.c b/drivers/net/ethernet/alibaba/eea/eea_pci.c
+This is a design choice.
+Do we want to preserve the hwtstamp config if only the hwtstamp source is
+changed from ethtool?
+If we want to configure the new source to the old source config we will also
+need to remove this condition:
+https://elixir.bootlin.com/linux/v6.17.1/source/net/ethtool/tsconfig.c#L339=
+=20
 
-...
+I do not really have a strong opinion on this, let's discuss which behavior=
+ we
+prefer.
 
-Hi,
-
-This isn't a full review, but in this function edev is initialised
-but otherwise unused. I suggest either using it or removing it.
-
-Likewise in eea_pci_remove().
-
-Flagged by W=1 builds.
-
-> +
-> +	err = eea_pci_setup(pci_dev, ep_dev);
-> +	if (err)
-> +		goto err_setup;
-> +
-> +	err = eea_init_device(&ep_dev->edev);
-> +	if (err)
-> +		goto err_register;
-> +
-> +	return 0;
-> +
-> +err_register:
-> +	eea_pci_release_resource(ep_dev);
-> +
-> +err_setup:
-> +	kfree(ep_dev);
-> +	return err;
-> +}
-
-...
-
-> +static void eea_pci_remove(struct pci_dev *pci_dev)
-> +{
-> +	struct eea_pci_device *ep_dev = pci_get_drvdata(pci_dev);
-> +	struct eea_device *edev;
-> +
-> +	edev = &ep_dev->edev;
-> +
-> +	__eea_pci_remove(pci_dev, true);
-> +
-> +	kfree(ep_dev);
-> +}
-
-...
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
