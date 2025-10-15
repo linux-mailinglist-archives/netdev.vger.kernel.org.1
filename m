@@ -1,141 +1,142 @@
-Return-Path: <netdev+bounces-229763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2BC9BE09A3
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:16:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A049ABE09BF
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 22:17:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EC9340237D
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 20:16:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D39019A6779
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 20:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086F74502F;
-	Wed, 15 Oct 2025 20:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F11829AAFD;
+	Wed, 15 Oct 2025 20:17:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gs/Dxnwc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r5NurIyW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30956129E6E;
-	Wed, 15 Oct 2025 20:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCDF28A3F2;
+	Wed, 15 Oct 2025 20:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760559363; cv=none; b=biGQh9tbfdnpY8/e8ZeZGfLffhSrpdB0ozqMUMeJOitsDdx3AjXK8ImWqi1D+Wmoz2h9Q6n1S0UQw2dreKuZXj5Gjy4CsWt5kDusZQZcwrMFWCahTJ8p33oMXgRwE7GfnJ2FSE2WAxJWs2dgXAw3X3tLaRTaBzzmtdNU+ArWnrY=
+	t=1760559471; cv=none; b=jLsCD6U49GYbd/JpIj92P1alqCnSOR0PadOXa4UGYW6b65CqOD1rFNqTuD8tq18RccTQZjXLzLgEM6N+zfhTFVHW+dTJUoA5hdlZ1mtOCoGEd/wIHqv2saJ5kI0CcuM5vJ6kr4OLupDwbxQqMzMHLqiKL72KEPzW7CWCPhFVS98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760559363; c=relaxed/simple;
-	bh=SJuYFA7t3MoPd2JTYwP1ftkXvqPvC2BSeJpQL6cOtDM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E8i6T/1OCnwKfvkLkixOdTzmetwvsuYnofjgLClbJBgAx//eQ0GuBrjOrwwCqZMP+mqayZA3IUCd5olsG4PJ4HBI6EEdOjaS+Vt9ydxvoF1m6Ed/5xqIugN7rAdQ1BYy0ms4fV1rWfQgu/g8oetFgghucv2w6Ggr/ePW57B+wro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gs/Dxnwc; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760559363; x=1792095363;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=SJuYFA7t3MoPd2JTYwP1ftkXvqPvC2BSeJpQL6cOtDM=;
-  b=gs/DxnwcT245KAKnzvYD4C6Pwng2zNAqajC2CYmOpTGJCM1Gu/9BbZaB
-   rRmEU/pcXGhiD+NV/eUEttmIwdrkO10d5srsAepJupkkyt2WWed0h2tDX
-   7Z5YL4MulQgK+s2cQBr7Cl37gItoN8Y4eOZyoaGJYb0547tgqv9LP0vam
-   F+2ju+5fgfchOaVhBeoeKP/+SbveHfeTAASbpoIs9431t9jAUdbU1Fe+f
-   LOLBQqJgxPCG0jiGBdSp3uX50yfMN5aIaSKMmrf/P4vHv+IWRctqC5D2K
-   td7GWvt2ItqMETMrLXewV+tai41Vb4yL7Vyn7oMOopqbjzmBWEf6ekQ27
-   g==;
-X-CSE-ConnectionGUID: nDUJlqXjR82gLlqHqdIGpg==
-X-CSE-MsgGUID: Fp5ouZWCRlaLaYH+Sw1LZA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="62674280"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="62674280"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 13:16:01 -0700
-X-CSE-ConnectionGUID: 1NTcdTD8QfadgH6b0RZuqA==
-X-CSE-MsgGUID: +LbqJNOERqes6D0AjN2diw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
-   d="scan'208";a="182052360"
-Received: from cmdeoliv-mobl4.amr.corp.intel.com (HELO [10.125.111.221]) ([10.125.111.221])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 13:16:00 -0700
-Message-ID: <c9941eeb-045c-439a-ad1b-d0d6820eb7bc@intel.com>
-Date: Wed, 15 Oct 2025 13:15:59 -0700
+	s=arc-20240116; t=1760559471; c=relaxed/simple;
+	bh=AuLkftPTLJewXmjuYq/pzFJKexCaUt81R4Qe53LhJss=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=c4pJcDja7gYsgV49Ovx8D0oplxGu5N9uwSxgWLAsg7cqqVYNjz5Fd1x2iRKd9xCkxNfZNbiwKTDre0IH+9it4Hhc87DaNAWinydxwcVY31VUQnGG6gb74+7i8ei+DgmrCiz0EokuLVPLefENZCJxiE/CrNntMP4SR2Z3w5Gypqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r5NurIyW; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760559467;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AuLkftPTLJewXmjuYq/pzFJKexCaUt81R4Qe53LhJss=;
+	b=r5NurIyW2RIqeEEVAE7BbOgH4HGJpRaAU2V0Wa3BgTTIyBwiZNQ7kIIxqvLqZQu55aTfC1
+	TSKyn1N1LR6f9uybzu/QC5UZAbVVciFtrS22W8NXdlMy3kAVc0oiPzSwpZyvvEPbbHhpSY
+	qBD0JvnDagVDf/nKfUd6umK087STJ4Q=
+From: Roman Gushchin <roman.gushchin@linux.dev>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Shakeel Butt <shakeel.butt@linux.dev>,  Daniel Sedlak
+ <daniel.sedlak@cdn77.com>,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,  Jonathan
+ Corbet <corbet@lwn.net>,  Neal Cardwell <ncardwell@google.com>,  David
+ Ahern <dsahern@kernel.org>,  Andrew Morton <akpm@linux-foundation.org>,
+  Yosry Ahmed <yosry.ahmed@linux.dev>,  linux-mm@kvack.org,
+  netdev@vger.kernel.org,  Johannes Weiner <hannes@cmpxchg.org>,  Michal
+ Hocko <mhocko@kernel.org>,  Muchun Song <muchun.song@linux.dev>,
+  cgroups@vger.kernel.org,  Tejun Heo <tj@kernel.org>,  Michal =?utf-8?Q?K?=
+ =?utf-8?Q?outn=C3=BD?=
+ <mkoutny@suse.com>,  Matyas Hurtik <matyas.hurtik@cdn77.com>
+Subject: Re: [PATCH v5] memcg: expose socket memory pressure in a cgroup
+In-Reply-To: <CAAVpQUCNV96vOReAeVHpwbUg9XJDLRTkHmcABh9dhm=f8p5O+g@mail.gmail.com>
+	(Kuniyuki Iwashima's message of "Wed, 15 Oct 2025 11:58:23 -0700")
+References: <87qzvdqkyh.fsf@linux.dev>
+	<13b5aeb6-ee0a-4b5b-a33a-e1d1d6f7f60e@cdn77.com>
+	<87o6qgnl9w.fsf@linux.dev>
+	<tr7hsmxqqwpwconofyr2a6czorimltte5zp34sp6tasept3t4j@ij7acnr6dpjp>
+	<87a5205544.fsf@linux.dev>
+	<qdblzbalf3xqohvw2az3iogevzvgn3c3k64nsmyv2hsxyhw7r4@oo7yrgsume2h>
+	<875xcn526v.fsf@linux.dev>
+	<89618dcb-7fe3-4f15-931b-17929287c323@cdn77.com>
+	<6ras4hgv32qkkbh6e6btnnwfh2xnpmoftanw4xlbfrekhskpkk@frz4uyuh64eq>
+	<CAAVpQUDWKaB6jH3Ouyx35z5eUb9GKfgHS0H7ngcPEFeBdtPjRw@mail.gmail.com>
+	<cfoc35cqn7sa63w6kufwvq7rs6s7xiivfbmr752h4rmur4demz@d7joq6oho6qc>
+	<CAAVpQUCNV96vOReAeVHpwbUg9XJDLRTkHmcABh9dhm=f8p5O+g@mail.gmail.com>
+Date: Wed, 15 Oct 2025 13:17:36 -0700
+Message-ID: <87a51rapi7.fsf@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 14/22] sfc: get endpoint decoder
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: Alejandro Lucero <alucerop@amd.com>,
- Martin Habets <habetsm.xilinx@gmail.com>,
- Edward Cree <ecree.xilinx@gmail.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Ben Cheatham <benjamin.cheatham@amd.com>
-References: <20251006100130.2623388-1-alejandro.lucero-palau@amd.com>
- <20251006100130.2623388-15-alejandro.lucero-palau@amd.com>
-From: Dave Jiang <dave.jiang@intel.com>
-Content-Language: en-US
-In-Reply-To: <20251006100130.2623388-15-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Migadu-Flow: FLOW_OUT
 
+Kuniyuki Iwashima <kuniyu@google.com> writes:
 
+> On Wed, Oct 15, 2025 at 11:39=E2=80=AFAM Shakeel Butt <shakeel.butt@linux=
+.dev> wrote:
+>>
+>> On Wed, Oct 15, 2025 at 11:21:17AM -0700, Kuniyuki Iwashima wrote:
+>> > On Tue, Oct 14, 2025 at 1:33=E2=80=AFPM Shakeel Butt <shakeel.butt@lin=
+ux.dev> wrote:
+>> > >
+>> > > On Mon, Oct 13, 2025 at 04:30:53PM +0200, Daniel Sedlak wrote:
+>> > > [...]
+>> > > > > > > > How about we track the actions taken by the callers of
+>> > > > > > > > mem_cgroup_sk_under_memory_pressure()? Basically if networ=
+k stack
+>> > > > > > > > reduces the buffer size or whatever the other actions it m=
+ay take when
+>> > > > > > > > mem_cgroup_sk_under_memory_pressure() returns, tracking th=
+ose actions
+>> > > > > > > > is what I think is needed here, at least for the debugging=
+ use-case.
+>> > > >
+>> > > > I am not against it, but I feel that conveying those tracked actio=
+ns (or how
+>> > > > to represent them) to the user will be much harder. Are there alre=
+ady
+>> > > > existing APIs to push this information to the user?
+>> > > >
+>> > >
+>> > > I discussed with Wei Wang and she suggested we should start tracking=
+ the
+>> > > calls to tcp_adjust_rcv_ssthresh() first. So, something like the
+>> > > following. I would like feedback frm networking folks as well:
+>> >
+>> > I think we could simply put memcg_memory_event() in
+>> > mem_cgroup_sk_under_memory_pressure() when it returns
+>> > true.
+>> >
+>> > Other than tcp_adjust_rcv_ssthresh(), if tcp_under_memory_pressure()
+>> > returns true, it indicates something bad will happen, failure to expand
+>> > rcvbuf and sndbuf, need to prune out-of-order queue more aggressively,
+>> > FIN deferred to a retransmitted packet.
+>> >
+>> > Also, we could cover mptcp and sctp too.
+>> >
+>>
+>> I wanted to start simple and focus on one specific action but I am open
+>> to other actins as well. Do we want a generic network throttled metric
+>> or do we want different metric for different action? At the moment I
+>> think for memcg, a single metric would be sufficient and then we can
+>> have tracepoints for more fine grained debugging.
+>
+> I agree that a single metric would be enough if it can signal
+> something bad is happening as a first step, then we can take
+> further action with tracepoint, bpftrace, whatever.
 
-On 10/6/25 3:01 AM, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Use cxl api for getting DPA (Device Physical Address) to use through an
-> endpoint decoder.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
-> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
-> ---
->  drivers/net/ethernet/sfc/efx_cxl.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> index d7c34c978434..1a50bb2c0913 100644
-> --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> @@ -108,6 +108,14 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  		return -ENOSPC;
->  	}
->  
-> +	cxl->cxled = cxl_request_dpa(cxl->cxlmd, CXL_PARTMODE_RAM,
-> +				     EFX_CTPIO_BUFFER_SIZE);
-> +	if (IS_ERR(cxl->cxled)) {
-> +		pci_err(pci_dev, "CXL accel request DPA failed");
-> +		cxl_put_root_decoder(cxl->cxlrd);
-
-Might be good to create a __free() macro for freeing the root decoder instead of having to do this for every error path in this function.
-
-DJ
-
-> +		return PTR_ERR(cxl->cxled);
-> +	}
-> +
->  	probe_data->cxl = cxl;
->  
->  	return 0;
-> @@ -115,8 +123,10 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  
->  void efx_cxl_exit(struct efx_probe_data *probe_data)
->  {
-> -	if (probe_data->cxl)
-> +	if (probe_data->cxl) {
-> +		cxl_dpa_free(probe_data->cxl->cxled);
->  		cxl_put_root_decoder(probe_data->cxl->cxlrd);
-> +	}
->  }
->  
->  MODULE_IMPORT_NS("CXL");
-
++1 to a single metric
 
