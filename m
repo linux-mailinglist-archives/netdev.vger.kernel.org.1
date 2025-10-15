@@ -1,273 +1,160 @@
-Return-Path: <netdev+bounces-229469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B5FFBDCB14
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 08:20:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4424BBDCB2B
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 08:21:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACADD19A65A0
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 06:21:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72BA1423591
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 06:21:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D2630FF02;
-	Wed, 15 Oct 2025 06:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04CF9310620;
+	Wed, 15 Oct 2025 06:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LZAwUJ3S"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="W9wD8I0S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2219030F555
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 06:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E3C3101A0
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 06:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760509242; cv=none; b=hNwzWXlSV1jOs+jUlZvd2Pwlylny5J5QmxLjcZL/SsSOhIr5ZdT47QqurkJxFfxQExFgM+Gdhy7WUtOz5wiyBmB6cix72Ygl3gb33pQrEzdbM3KgvlEBuQ7R9Cpbo6IqQVJKgdjsyye+AJRrkkCmUCKea/CUCyDyC9DKcZqPEVo=
+	t=1760509292; cv=none; b=Hf4GloG8QmSXfzde9XEOqOZXpTb5zRL3IKQnfpUkz+ZUb6JQyYuEXBPKGYyYC8wCwmAQILw3QNVK31Oh7FLh9GZ3ZJqIu0WsGPuRlfpfQWbfZPk0jDJwvaB1IgEnyoxpRrTp3yohZlN0iMZ8Cghq9ohfJmk99jY1UhB44YzpHhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760509242; c=relaxed/simple;
-	bh=1lKaQqUZjUzDbHS8PmbxS7OqmbyDLWnmkwvvT60TcTQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nyhsYHIivLQis39ZCubhlJJWoeznfDLLoxZt7GH+55ipcKXVbEKNX4DLmIvz3EGUJCsiQja+PwqSDJxqCuleeZKQ78KlfRe5UmqpW/g1YvMeCl7HvRYIQaNKJoHqzq7RaOlsbkhZ/NeuayAg2sE/yLfavBAfkELHVXd/Gg/zt5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LZAwUJ3S; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b4755f37c3eso5403629a12.3
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 23:20:35 -0700 (PDT)
+	s=arc-20240116; t=1760509292; c=relaxed/simple;
+	bh=K+PHF4WAM2ycA1aZTNdIhMu/j5k4OgimgvuS0a4OP2E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mAeOnzd41472zKtozEoO+u/9GDSMUsgbuIfQvY5BISfOUeHo6hqdJhAZZVM29T2lZAh8xqzz6LKoMjGgW4zxg1c+8mv7rWitawygit4lTqoQt8eOEcLG6A556FpW+UwLz54wUABAF2UGiudFqObzGkXPTA0Bo5FBbDZXgVU8yRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=W9wD8I0S; arc=none smtp.client-ip=209.85.128.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-46e52279279so43761665e9.3
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 23:21:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760509233; x=1761114033; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MzrwS8ryiuJVtyzXXWbsrpdz1CnybRNV797vv2uBqVE=;
-        b=LZAwUJ3Scms6/E1DMQ9eOfabAyTcQYMQnVpS2o5tQeosnpBXorUVQSN59VKV8n4Qao
-         ipjm0RmJB77Hde1b7UQvlNjAjTcNoWt2E9N0DnbiU9n+A64pF/OWgBKUMdMenj5yHr2B
-         zQalx0AJ5xRWw1NpfA6dCn1q4kcVpZH+h3oFODObH1bbRamiwECAkIep66yc8nTmzOVr
-         56WfD23Mo4MQhPz+0y8b5zK19wTAiYOM03XHwcf36v521PwB0DK4VkXMwiOdsRu/mXUg
-         cM0LSUFXCjKZ9M1H641zFwmQCYxrVFZJnIL+V2FFQU/H9HtRqO5PzBAMCAvl4NcWXXEm
-         B25A==
+        d=suse.com; s=google; t=1760509283; x=1761114083; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=L3PV9C1telyfCjlpsA7EV6fPruE8tbKt63BPSU3FM4M=;
+        b=W9wD8I0SB6umE7UJDUWbEUUD7Yxa3gqCMXWiL0S2Mj2ES9vqkPGuvoMmbGbdntAAVQ
+         9glktcDA1lkVhA/ZtjKipFsLFHpPNnWPoqON/3Hu5GPl5ayHt6Zx8Mg5tOQSY/CcVOhL
+         JDfogEU+cXq411rjuEDJxyOmu1C6FPlKMuxG7Y1F+fdIBAo/6H1LJjiR0MJ562KvTCsS
+         W9MNNIZM6iR2M+AvAfSiZWnowwzhOpXvfbsQFwv78P/r3gmY+ig5QO69ZWV7CkW0kkpN
+         dHoMNr5Fom2lZyJBzyYI3hN8GAyERHl98i30SAfbbM2rCeeNrU58slSsKO2+sQhcXpGC
+         OTSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760509233; x=1761114033;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MzrwS8ryiuJVtyzXXWbsrpdz1CnybRNV797vv2uBqVE=;
-        b=gQ411md/0W1kCE3Y9pqgCm8/h7ueY6IUpRiTppd9Brbinku8djwNq9fJc73VOdqGt/
-         4F3D3S/4259yTDog3KZyZ8nrWtxyfW2erNFTRH2zQQ4HPS6zIJfYZZKACPE6M58WcBif
-         rh+jQwwva4kcVD/fku0gzOFuIBjI/JidJtHmM/6K+Q1yHgOvFNq5NBjK/7kcHLY649Xa
-         84V+L1XM4fb7nrqYVT65eXU1FHP4I+vFPpxCQ/331TvZbmxGe/JDFl9oJwPSXBbCXPAu
-         XktIZjdTSd64n34QtJlcPbUanXTdocwnkTcu5ibtl1M1qVNa95k6UId10LnWxDfpitMu
-         QGqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX8sMjVrGI6HCaKmpc0o4vn2Q1WWuvJ6lLo8H4znO+QJcehnt5SuEcyi33WWqpkZDA5xdsvXh0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDV3u7tST/YE7o1PvldZz9MrHkHG2vajSmIrU2seU8i3MeZT3J
-	A+ra3uD9ubmGj3njLMrpQGCFu0QB5EpksuWCniIu4ZWI84Tial8YJInwnP/9WpoGw17Bnl/fTVr
-	sf7sM9UtxeXXlMUHZpYZYMxx5j40+6/vM/O7VqkUa
-X-Gm-Gg: ASbGncsGWxYPWqdwQX0BS4BY4JdpCOq/E/muCGISiDI88JEYSwbaxQKcdE38yfuplUa
-	o3JLbYb+DS673yy6csAIGQDky7MIjUUD1XrAR9iktykgb2CWJTIWGrPbCUKTbaRoz4GsbF1tTyo
-	15MZnuPwU4vMFu92S0sUwjf4bfcQpl4KSXS9Cfkr/ecMyVRX7EXncz+PRxcD3r8z3xTMYbyoaeY
-	NHh27a00GYL9qlEhJqF98tSzX7XfE0SqhPfj9gPcd2x2c10hJScR91CLTjogJamX/KbpDW/gAg=
-X-Google-Smtp-Source: AGHT+IE0lMOaO8VGl+LKQcQ9BRVeGylaxQ//a7TH5TqyAFWnw7YaAFVUrwb3Y8pkSrwaOeXlLTWXoTvoHb6rDFdIg7c=
-X-Received: by 2002:a17:903:2c05:b0:24e:95bb:88b1 with SMTP id
- d9443c01a7336-290273ede89mr364080145ad.34.1760509233124; Tue, 14 Oct 2025
- 23:20:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760509283; x=1761114083;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L3PV9C1telyfCjlpsA7EV6fPruE8tbKt63BPSU3FM4M=;
+        b=shzsPsZlhDvpakzT7mY9Dm9GtHItBvgPhedF1W487OVHL4JoYT6rVlMr4XSS2uvpvK
+         PD4b2XJCKXbFwOlu8o69NwxSbWJlTAeHHwubG1lSkm3lPnf/3lNOQEzAYWLmSaTY3mVf
+         eBcF+a25p6NcEzOw8MkDsB/omD2WrqTZolqh6ovDmXMuql8DliP+Czz2ZcvJzsYO6Idz
+         ncb9vfnyPMApqXfE3URttJKtVx9TTS7ftQWtrrFwfF6YHK6Eu1CuKzq0svA1fS6W0/Gd
+         UK8OvQVaHt/LqhS/prHOcuqdDAnhpB+Eikkzqzi6AHiL2OEiN9zP46/n1Symn+QmUXHV
+         PahQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUe4d1SqyCtMIKJazzLZttZgyhsBv++WA5Wp0AKG+H5cPk2KN1c6RBu8CwoU4N4Ej3HC95D+Ew=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxscaYqkqGKflu2njiljI4bzSHpofTFhBu4pjcs5ySGJNocTm54
+	uYETulbZc3gCJNgf3Rgb398/btGuU09Dzk90VzZQrook7uGk2WHAfGxWERDNr5VnRo8=
+X-Gm-Gg: ASbGncuWoI72l3O1nLoRjkTu9XltcoYKnbRJHUyq7zwm3shqmSXIp2vRZsNh2rvQQcH
+	WussYVtL/trv3pNgxbefF3m3KwtpIp4I4eD212TM1M/9+jWdDVR8G3wXsn7wbIXU2KM/OxDbbVv
+	1OtCbqZ6Ydo6K7qBXkqggdD8Ydj6qBn0oN2Z+mbJY5vWbXWRemFxbQJ/2v6tQIARY284RdXKDfS
+	/zv42lwwpAmtcbpF27w972jB7Vwvqef/2wU4XQoZY+9HKULX5rlB3L0sUxjr27qsgiy56TqU0GE
+	vjNEEUT4PaBB4YRzkqUPEOaW3NGKUrmyVYGxpkf9Z/oO77U6ZK9+sBBWyWnNMn+qHjnH6CApN0X
+	7O6KLnwU7F4wYROG1BsKZS31bITMhIKoDYnwC1GBRFS3I+NbfmS1MJDCj/91UTfY=
+X-Google-Smtp-Source: AGHT+IGxun/Yco6mevgEGwKjaOT0R/pW6Puo6dQ1aSXUtNSS99XdqPVFdMPH7X0OcIpuodI7EV7NzQ==
+X-Received: by 2002:a05:600c:6383:b0:45d:d353:a491 with SMTP id 5b1f17b1804b1-46fa9a8c425mr178418635e9.1.1760509282825;
+        Tue, 14 Oct 2025 23:21:22 -0700 (PDT)
+Received: from localhost (109-81-16-57.rct.o2.cz. [109.81.16.57])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-426e50ef821sm12670523f8f.38.2025.10.14.23.21.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Oct 2025 23:21:22 -0700 (PDT)
+Date: Wed, 15 Oct 2025 08:21:21 +0200
+From: Michal Hocko <mhocko@suse.com>
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Vlastimil Babka <vbabka@suse.cz>, Barry Song <21cnbao@gmail.com>,
+	netdev@vger.kernel.org, linux-mm@kvack.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Barry Song <v-songbaohua@oppo.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Brendan Jackman <jackmanb@google.com>,
+	Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Huacai Zhou <zhouhuacai@oppo.com>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Harry Yoo <harry.yoo@oracle.com>,
+	David Hildenbrand <david@redhat.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>
+Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network
+ buffer allocation
+Message-ID: <aO89YYhEJ-GDPWFg@tiehlicka>
+References: <20251013101636.69220-1-21cnbao@gmail.com>
+ <927bcdf7-1283-4ddd-bd5e-d2e399b26f7d@suse.cz>
+ <aO37Od0VxOGmWCjm@tiehlicka>
+ <qztimgoebp5ecdmvvgro6sdsng6r7t3pnddg7ddlxagaom73ge@a5wta5ym7enu>
+ <aO5o548uQAuBcw0P@tiehlicka>
+ <itljl2e4rwbblmnhe2vucmsvxzbu42x5foszf4y5b63evbitpj@qsxj3amwhts3>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251014171907.3554413-1-edumazet@google.com> <20251014171907.3554413-7-edumazet@google.com>
-In-Reply-To: <20251014171907.3554413-7-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 14 Oct 2025 23:20:21 -0700
-X-Gm-Features: AS18NWAbg9zWj1ag8Egld2lX2wgF4s8p3jXSIcta1Tex-iKfLH4aAhN1IqfJnEw
-Message-ID: <CAAVpQUCp3W6J29LV0xkvYBvUV-Uys_RVt843D2TU6jqiF5f3zg@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 6/6] net: dev_queue_xmit() llist adoption
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <itljl2e4rwbblmnhe2vucmsvxzbu42x5foszf4y5b63evbitpj@qsxj3amwhts3>
 
-On Tue, Oct 14, 2025 at 10:19=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> Remove busylock spinlock and use a lockless list (llist)
-> to reduce spinlock contention to the minimum.
->
-> Idea is that only one cpu might spin on the qdisc spinlock,
-> while others simply add their skb in the llist.
->
-> After this patch, we get a 300 % improvement on heavy TX workloads.
-> - Sending twice the number of packets per second.
-> - While consuming 50 % less cycles.
->
-> Note that this also allows in the future to submit batches
-> to various qdisc->enqueue() methods.
->
-> Tested:
->
-> - Dual Intel(R) Xeon(R) 6985P-C  (480 hyper threads).
-> - 100Gbit NIC, 30 TX queues with FQ packet scheduler.
-> - echo 64 >/sys/kernel/slab/skbuff_small_head/cpu_partial (avoid contenti=
-on in mm)
-> - 240 concurrent "netperf -t UDP_STREAM -- -m 120 -n"
->
-> Before:
->
-> 16 Mpps (41 Mpps if each thread is pinned to a different cpu)
->
-> vmstat 2 5
-> procs -----------memory---------- ---swap-- -----io---- -system-- ------c=
-pu-----
->  r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy i=
-d wa st
-> 243  0      0 2368988672  51036 1100852    0    0   146     1  242   60  =
-0  9 91  0  0
-> 244  0      0 2368988672  51036 1100852    0    0   536    10 487745 1471=
-8  0 52 48  0  0
-> 244  0      0 2368988672  51036 1100852    0    0   512     0 503067 4603=
-3  0 52 48  0  0
-> 244  0      0 2368988672  51036 1100852    0    0   512     0 494807 1210=
-7  0 52 48  0  0
-> 244  0      0 2368988672  51036 1100852    0    0   702    26 492845 1011=
-0  0 52 48  0  0
->
-> Lock contention (1 second sample taken on 8 cores)
-> perf lock record -C0-7 sleep 1; perf lock contention
->  contended   total wait     max wait     avg wait         type   caller
->
->     442111      6.79 s     162.47 ms     15.35 us     spinlock   dev_hard=
-_start_xmit+0xcd
->       5961      9.57 ms      8.12 us      1.60 us     spinlock   __dev_qu=
-eue_xmit+0x3a0
->        244    560.63 us      7.63 us      2.30 us     spinlock   do_softi=
-rq+0x5b
->         13     25.09 us      3.21 us      1.93 us     spinlock   net_tx_a=
-ction+0xf8
->
-> If netperf threads are pinned, spinlock stress is very high.
-> perf lock record -C0-7 sleep 1; perf lock contention
->  contended   total wait     max wait     avg wait         type   caller
->
->     964508      7.10 s     147.25 ms      7.36 us     spinlock   dev_hard=
-_start_xmit+0xcd
->        201    268.05 us      4.65 us      1.33 us     spinlock   __dev_qu=
-eue_xmit+0x3a0
->         12     26.05 us      3.84 us      2.17 us     spinlock   do_softi=
-rq+0x5b
->
-> @__dev_queue_xmit_ns:
-> [256, 512)            21 |                                               =
-     |
-> [512, 1K)            631 |                                               =
-     |
-> [1K, 2K)           27328 |@                                              =
-     |
-> [2K, 4K)          265392 |@@@@@@@@@@@@@@@@                               =
-     |
-> [4K, 8K)          417543 |@@@@@@@@@@@@@@@@@@@@@@@@@@                     =
-     |
-> [8K, 16K)         826292 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@|
-> [16K, 32K)        733822 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ =
-     |
-> [32K, 64K)         19055 |@                                              =
-     |
-> [64K, 128K)        17240 |@                                              =
-     |
-> [128K, 256K)       25633 |@                                              =
-     |
-> [256K, 512K)           4 |                                               =
-     |
->
-> After:
->
-> 29 Mpps (57 Mpps if each thread is pinned to a different cpu)
->
-> vmstat 2 5
-> procs -----------memory---------- ---swap-- -----io---- -system-- ------c=
-pu-----
->  r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy i=
-d wa st
-> 78  0      0 2369573632  32896 1350988    0    0    22     0  331  254  0=
-  8 92  0  0
-> 75  0      0 2369573632  32896 1350988    0    0    22    50 425713 28019=
-9  0 23 76  0  0
-> 104  0      0 2369573632  32896 1350988    0    0   290     0 430238 2982=
-47  0 23 76  0  0
-> 86  0      0 2369573632  32896 1350988    0    0   132     0 428019 29186=
-5  0 24 76  0  0
-> 90  0      0 2369573632  32896 1350988    0    0   502     0 422498 27867=
-2  0 23 76  0  0
->
-> perf lock record -C0-7 sleep 1; perf lock contention
->  contended   total wait     max wait     avg wait         type   caller
->
->       2524    116.15 ms    486.61 us     46.02 us     spinlock   __dev_qu=
-eue_xmit+0x55b
->       5821    107.18 ms    371.67 us     18.41 us     spinlock   dev_hard=
-_start_xmit+0xcd
->       2377      9.73 ms     35.86 us      4.09 us     spinlock   ___slab_=
-alloc+0x4e0
->        923      5.74 ms     20.91 us      6.22 us     spinlock   ___slab_=
-alloc+0x5c9
->        121      3.42 ms    193.05 us     28.24 us     spinlock   net_tx_a=
-ction+0xf8
->          6    564.33 us    167.60 us     94.05 us     spinlock   do_softi=
-rq+0x5b
->
-> If netperf threads are pinned (~54 Mpps)
-> perf lock record -C0-7 sleep 1; perf lock contention
->      32907    316.98 ms    195.98 us      9.63 us     spinlock   dev_hard=
-_start_xmit+0xcd
->       4507     61.83 ms    212.73 us     13.72 us     spinlock   __dev_qu=
-eue_xmit+0x554
->       2781     23.53 ms     40.03 us      8.46 us     spinlock   ___slab_=
-alloc+0x5c9
->       3554     18.94 ms     34.69 us      5.33 us     spinlock   ___slab_=
-alloc+0x4e0
->        233      9.09 ms    215.70 us     38.99 us     spinlock   do_softi=
-rq+0x5b
->        153    930.66 us     48.67 us      6.08 us     spinlock   net_tx_a=
-ction+0xfd
->         84    331.10 us     14.22 us      3.94 us     spinlock   ___slab_=
-alloc+0x5c9
->        140    323.71 us      9.94 us      2.31 us     spinlock   ___slab_=
-alloc+0x4e0
->
-> @__dev_queue_xmit_ns:
-> [128, 256)       1539830 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@             =
-     |
-> [256, 512)       2299558 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@|
-> [512, 1K)         483936 |@@@@@@@@@@                                     =
-     |
-> [1K, 2K)          265345 |@@@@@@                                         =
-     |
-> [2K, 4K)          145463 |@@@                                            =
-     |
-> [4K, 8K)           54571 |@                                              =
-     |
-> [8K, 16K)          10270 |                                               =
-     |
-> [16K, 32K)          9385 |                                               =
-     |
-> [32K, 64K)          7749 |                                               =
-     |
-> [64K, 128K)        26799 |                                               =
-     |
-> [128K, 256K)        2665 |                                               =
-     |
-> [256K, 512K)         665 |                                               =
-     |
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+On Tue 14-10-25 10:22:03, Shakeel Butt wrote:
+> On Tue, Oct 14, 2025 at 05:14:47PM +0200, Michal Hocko wrote:
+> > On Tue 14-10-25 07:27:06, Shakeel Butt wrote:
+> > > On Tue, Oct 14, 2025 at 09:26:49AM +0200, Michal Hocko wrote:
+> > > > On Mon 13-10-25 20:30:13, Vlastimil Babka wrote:
+> > > > > On 10/13/25 12:16, Barry Song wrote:
+> > > > > > From: Barry Song <v-songbaohua@oppo.com>
+> > > > [...]
+> > > > > I wonder if we should either:
+> > > > > 
+> > > > > 1) sacrifice a new __GFP flag specifically for "!allow_spin" case to
+> > > > > determine it precisely.
+> > > > 
+> > > > As said in other reply I do not think this is a good fit for this
+> > > > specific case as it is all or nothing approach. Soon enough we discover
+> > > > that "no effort to reclaim/compact" hurts other usecases. So I do not
+> > > > think we need a dedicated flag for this specific case. We need a way to
+> > > > tell kswapd/kcompactd how much to try instead.
+> > > 
+> > > To me this new floag is to decouple two orthogonal requests i.e. no lock
+> > > semantic and don't wakeup kswapd. At the moment the lack of kswapd gfp
+> > > flag convey the semantics of no lock. This can lead to unintended usage
+> > > of no lock semantics by users which for whatever reason don't want to
+> > > wakeup kswapd.
+> > 
+> > I would argue that callers should have no business into saying whether
+> > the MM should wake up kswapd or not. The flag name currently suggests
+> > that but that is mostly for historic reasons. A random page allocator
+> > user shouldn't really care about this low level detail, really.
+> 
+> I agree but unless we somehow enforce/warn for such cases, there will be
+> users doing this. A simple grep shows kmsan is doing this. I worry there
+> might be users who are manually setting up gfp flags for their
+> allocations and not providing kswapd flag explicitly. Finding such cases
+> with grep is not easy.
 
-Thanks for big improvement!
+You are right but this is inherent problem of our gfp interface. It is
+too late to have a defensive interface I am afraid.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+-- 
+Michal Hocko
+SUSE Labs
 
