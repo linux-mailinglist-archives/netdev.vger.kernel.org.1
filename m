@@ -1,260 +1,185 @@
-Return-Path: <netdev+bounces-229691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E92A1BDFCEC
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:06:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3634BDFD54
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:21:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C19673B3E84
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:06:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84B5918958BC
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 17:21:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58BE338F2F;
-	Wed, 15 Oct 2025 17:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29852DFF18;
+	Wed, 15 Oct 2025 17:21:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MA9u4T8A"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ESET1QWN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B014832E74F
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 17:06:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15AAA21B9F5;
+	Wed, 15 Oct 2025 17:21:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760547964; cv=none; b=hBvrFL0BMAbCr0fllZbKVLp0nn8E3jY82g1Xx+n6z43ReVVjj2io+r3MuOfiMWbitDPtkjLytqH+MRPjSNAGc3E6dGcFClvPFSfR0x0RNpDS+k66dh8w7KoSYqRGTM6YgnIBhzvBp19NgPGrdUHpsBaACTkFZ5QTXEhE9xGJKjI=
+	t=1760548867; cv=none; b=g4o8SQVzKf6HUDxS/B+WWg4HrB/qKnZWyG7yM1WkfWZB+ax1vx0FAdziIZKEG+x90hZfodDiq6LbSsTDMqcboij+dfBdVu091m9OAsza4FMOu/4OfUNWu/6gtyWusRXhz4ONxbdo3E5PN2UWrHAtQ1Lezn2u++tqicj3U/w7uBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760547964; c=relaxed/simple;
-	bh=ZRj4yj/dKCCw4SWLghqAcuiSwYLPhJ4yuDL64uAxDnU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vk4/K43iXJkBMuDFHH0+AYutB8mOLj9svaxJMfyhoZuzb4GmMXXOOBNHupk+lOcF+2IcTAs6mNUP/OzB0/t68cwb53Z3BeKe32ul99X0QkrH2kUyCiN16+NaCau3Od/lb4nBD2YV+QhfKACCGBNrjqclYO25LR3KahHMFBqqd0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MA9u4T8A; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-471076f819bso6022435e9.3
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 10:06:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760547961; x=1761152761; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lAkTMQSX/DJUiILggSnm+16NO/7qs2Cgt/X+vx3kuHk=;
-        b=MA9u4T8ALuAdvYyQht5t0Onkqed/vNRwbUida/LZuV0X6ZKq10kKkA+qw4kCOpHJTB
-         CQx3OZJwYkmmOQ9fbfPwuaa6WrLyusvCKrR4GFUVguaLGLMTX3EtvtAoqiwyVuCpPcv8
-         HNRgoLxdO7bTylTis/KTTtH1ojqCylndEXCoDQlpnuzhhdOm/iZtpAVZzp9xYNByNAE1
-         2WYHeknJSNkbijMxNOvSTw6cB0o6mbh9p7LwHguMGrrxeWkZ+kevkZgfssd4vrAfeQ7+
-         2aRyekDSXSjIxAlaIKdkrZTbY+NqbMJzdWrjYWOeFVKnAKzfFpT3MhrRDtpwNjzPFaH+
-         jBow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760547961; x=1761152761;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lAkTMQSX/DJUiILggSnm+16NO/7qs2Cgt/X+vx3kuHk=;
-        b=Jr7srEwwAsrmWQNmrMNW3QbIeNgidlo5uerMHrpNwjiSVcot+erBoWOflaeG1Zm9lz
-         g7WYRrsPHWgPL0dXDYScX6bF4xIW7Fj5DcFJHd2sYweX/NLyIO0iWIOcWS2/huwemD8t
-         Xtm9V/soyw9d14BohgM6rofIRa8nPf0+NpmQwN0OA+r1yYQ0WxADrI2oZriKb1qMFVsF
-         I9kL8a3vC2Ucp6V1lRVZ5Ipbz/jXZfaS0VZmotBWAb/j1WgGelaI50JuxVPHl83qZMV9
-         BM2tPFoU0iqcOq49ZIaYM0BZQp04GJs9k5AhpUR9hZXfRiZOq+JAr36pZcUDk0KViM9n
-         Smng==
-X-Forwarded-Encrypted: i=1; AJvYcCVku/cHQdYZJrNfypDKD3knokgPet5Qg34YFw0nmUG+sUXBlxvrrLj1pNX52plgiHoXuTxExlQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySRf7ZFKINbH7cw36robqeJS3y9YSXxSFahun5tKZtC3Le01HE
-	A22jPnOw0asl/Et/1uGt5nhFJx7x33JA1fiJkZ7PdiB2hQVktTrY7n9McIdJAyST0xdn2OCbRyX
-	hWSyiy2YQht3gLIV53TWdi93T9fIRIeY=
-X-Gm-Gg: ASbGncvIVPlSeIcbHnDY+5Wm7f8o+pCP85VCzlff45V4I6w+rNOhLRLyC+v7tGmoufY
-	y87KciU4h/ed5DXbgnu19pKFmH3eKnSzgndtwJthgzd40hmiG3cGtUzpfeIYOnTZQi0osj/bc8D
-	Hrzp4lZz7/eI5Inhrr3qjMNhfxWbegir8RH2HvntJGp12vz3+gZVYIO+hy7/db5XrqCvFMrGyn+
-	PtcTNJBUPZjFLwrrBLXHVQF2smLggu+jiqLqVuMLwFKOnjd9pG9p9WFDueIw2oiRV3Wx3U=
-X-Google-Smtp-Source: AGHT+IHI7wNHnTiwaqUhiPR8CydFMYL65NRKSxFd39pyvhc1Mu/mg/YS2k0xCuKgzJyECEHhLkPG2NPYmawpE45EPMs=
-X-Received: by 2002:a05:600c:529a:b0:46e:3e25:1626 with SMTP id
- 5b1f17b1804b1-46fa9aefe15mr218668285e9.19.1760547960573; Wed, 15 Oct 2025
- 10:06:00 -0700 (PDT)
+	s=arc-20240116; t=1760548867; c=relaxed/simple;
+	bh=6yQ2mN4Lteo3bR5j0fbnB+JIR14pL0OnjYwcg0ikrso=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N8TS1CcrEHBqFlum78df4+EP9ztdg7CmHCUR/r9Wn23R/3IwwLwIs9CA0Q4Rm6WeQtLOHea08knYwsDve6Lw4K6FnfkHJcOeU0i7HFrJNurK2wR76aaSHzLNzAp+t7NoyIk2apmrSk5psHUj33kPJGgwKEozM/uQsbyoZLTmAAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ESET1QWN; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=N6aNZCIcI2zN3R1/BCJoGwM/7sTPHIJJPl1PJ4HpJBE=; b=ESET1QWNsqJm/GD1mJtk4L3OD+
+	OXmTrnMQv+PAWuxEh9Ta/Wij7meIB2/sHARKmpQq3g9Kyj5C29OuLWc9niG5RrzQDnlsru6vMVECW
+	X2wNF+Ds/0F4bn1vTpVjApZu7e8vEpesWB3e2subPPAFivrKyA2mA7KNcUPleqCl9B7sS7IFRu2C/
+	kNaGX59mFWpcqwzYs1XmRjzfucorGGk61pSh9tcapwwY4pmbHvF7US7TwWRrG5wfU35PWTO/thLNf
+	iI0AggyCB4fbWGSJAb5HxTvQNz/O0p0GM2+nqTZheEr2O+LzU6YzL7ogAuKmt8S1ki5v5Fd+of3Io
+	K5dLpsEg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47568)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v95B7-000000005Fe-34CR;
+	Wed, 15 Oct 2025 18:20:45 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v95B2-000000002RJ-3ZAm;
+	Wed, 15 Oct 2025 18:20:40 +0100
+Date: Wed, 15 Oct 2025 18:20:40 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] net: stmmac: Move subsecond increment
+ configuration in dedicated helper
+Message-ID: <aO_X6Hv2R_mgpOXR@shell.armlinux.org.uk>
+References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
+ <20251015102725.1297985-2-maxime.chevallier@bootlin.com>
+ <aO-4hnUINpQ0JORE@shell.armlinux.org.uk>
+ <27800f8c-eb0d-41c2-9e45-b45cf1767c23@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251015150026.117587-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251015150026.117587-2-prabhakar.mahadev-lad.rj@bp.renesas.com> <20251015153556.GC439570@ragnatech.se>
-In-Reply-To: <20251015153556.GC439570@ragnatech.se>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Wed, 15 Oct 2025 18:05:34 +0100
-X-Gm-Features: AS18NWCeZXObMFBnMoScyXIU84ZFuSWIQLCEr-5cctebOmvYCISJdgFwzckySGU
-Message-ID: <CA+V-a8vRXN+2CDQu=FkN_teTDLywzGPn_=8obvKC+3tmwYo4hA@mail.gmail.com>
-Subject: Re: [PATCH 1/3] net: ravb: Make DBAT entry count configurable per-SoC
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
-Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <27800f8c-eb0d-41c2-9e45-b45cf1767c23@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Niklas,
+On Wed, Oct 15, 2025 at 06:20:03PM +0200, Maxime Chevallier wrote:
+> Hi Russell,
+> 
+> On 15/10/2025 17:06, Russell King (Oracle) wrote:
+> > On Wed, Oct 15, 2025 at 12:27:21PM +0200, Maxime Chevallier wrote:
+> >> +static void stmmac_update_subsecond_increment(struct stmmac_priv *priv)
+> >> +{
+> >> +	bool xmac = priv->plat->has_gmac4 || priv->plat->has_xgmac;
+> > 
+> > Just to say that I have patches that get rid of these has_xxx flags for
+> > the cores, and these changes (and the additional platform glue patches
+> > that have been posted) will conflict with them.
+> 
+> Fair, I was in your position not so long ago :)
+> 
+> For this particular series, it should be straightforward to fix the
+> conflict, but for the pending new glue divers we'll have to
+> find the sweet spot for these changes.
+> 
+> Maybe send it as an RFC so that people can see what to expect ?
 
-Thank you for the review.
+My experience of sending RFCs is the engagement is sadly low to non-
+existent, leading to the question of whether sending RFCs has any
+use at all. I'm pretty fed up with the whole mainline kernel process,
+trying to get engagement from people, that I question why I bother
+most of the time.
 
-On Wed, Oct 15, 2025 at 4:36=E2=80=AFPM Niklas S=C3=B6derlund
-<niklas.soderlund@ragnatech.se> wrote:
->
-> Hi Prabhakar,
->
-> Thanks for your work.
->
-> On 2025-10-15 16:00:24 +0100, Prabhakar wrote:
-> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> >
-> > The number of CDARq (Current Descriptor Address Register) registers is =
-not
-> > fixed to 22 across all SoC variants. For example, the GBETH implementat=
-ion
-> > uses only two entries. Hardcoding the value leads to incorrect resource
-> > allocation on such platforms.
-> >
-> > Pass the DBAT entry count through the per-SoC hardware info struct and =
-use
-> > it during probe instead of relying on a fixed constant. This ensures
-> > correct descriptor table sizing and initialization across different SoC=
-s.
-> >
-> > Fixes: feab85c7ccea ("ravb: Add support for RZ/G2L SoC")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
->
-> I have not verified with documentation the setting of 2 for
-> gbeth_hw_info. But the change itself is good.
->
-> > ---
-> >  drivers/net/ethernet/renesas/ravb.h      | 2 +-
-> >  drivers/net/ethernet/renesas/ravb_main.c | 9 +++++++--
-> >  2 files changed, 8 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet=
-/renesas/ravb.h
-> > index 7b48060c250b..d65cd83ddd16 100644
-> > --- a/drivers/net/ethernet/renesas/ravb.h
-> > +++ b/drivers/net/ethernet/renesas/ravb.h
-> > @@ -1017,7 +1017,6 @@ enum CSR2_BIT {
-> >  #define CSR2_CSUM_ENABLE (CSR2_RTCP4 | CSR2_RUDP4 | CSR2_RICMP4 | \
-> >                         CSR2_RTCP6 | CSR2_RUDP6 | CSR2_RICMP6)
-> >
-> > -#define DBAT_ENTRY_NUM       22
-> >  #define RX_QUEUE_OFFSET      4
-> >  #define NUM_RX_QUEUE 2
-> >  #define NUM_TX_QUEUE 2
-> > @@ -1062,6 +1061,7 @@ struct ravb_hw_info {
-> >       u32 rx_max_frame_size;
-> >       u32 rx_buffer_size;
-> >       u32 rx_desc_size;
-> > +     u32 dbat_entry_num;
->
-> I have been wondering for some time if we shall not start to document
-> these fields as they always take so much time to get back to what each
-> of them represent. How do you feel about starting a header?
->
-> /**
->  * dbat_entry_num: Describe me here.
->  */
->
-I agree, let's take this separately into a different patch as it will
-make things easier to backport. What do you think?
+> > Given the rate of change in stmmac, at some point we're going to have
+> > to work out some way of stopping stmmac development to get such an
+> > invasive cleanup change merged
+> 
+> Agreed.
+> 
+>  - but with my variability and pressures
+> > on the time I can spend even submitting patches, I've no idea how that
+> > will work... I was going to send them right at the start of this
+> > cycle, but various appointments on Monday and Tuesday this week plus
+> > work pressures prevented that happening.
+> 
+> To give your more visibility, that's the only work I plan to do on
+> stmmac for that cycle, the rest is going to be phy_port,
+> and probably some netdevsim-phy.
 
-Cheers,
-Prabhakar
+I'd prefer that my five patch series I've just sent out is merged
+(the patches I'm talking about w.r.t. has_xxx follow immediately
+after these in my queue.) However, I don't think there's any
+conflicts between the five I've sent out and these changes looking
+at their overall diffs. That said, pushing out loads of patches in
+one day isn't helpful to the already overworked reviewers.
 
-> Without, but preferably with, this added.
->
-> Reviewed-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatech.se=
->
->
-> >       unsigned aligned_tx: 1;
-> >       unsigned coalesce_irqs:1;       /* Needs software IRQ coalescing =
-*/
-> >
-> > diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/eth=
-ernet/renesas/ravb_main.c
-> > index 9d3bd65b85ff..69d382e8757d 100644
-> > --- a/drivers/net/ethernet/renesas/ravb_main.c
-> > +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> > @@ -2694,6 +2694,7 @@ static const struct ravb_hw_info ravb_gen2_hw_inf=
-o =3D {
-> >       .rx_buffer_size =3D SZ_2K +
-> >                         SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
-> >       .rx_desc_size =3D sizeof(struct ravb_ex_rx_desc),
-> > +     .dbat_entry_num =3D 22,
-> >       .aligned_tx =3D 1,
-> >       .gptp =3D 1,
-> >       .nc_queues =3D 1,
-> > @@ -2717,6 +2718,7 @@ static const struct ravb_hw_info ravb_gen3_hw_inf=
-o =3D {
-> >       .rx_buffer_size =3D SZ_2K +
-> >                         SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
-> >       .rx_desc_size =3D sizeof(struct ravb_ex_rx_desc),
-> > +     .dbat_entry_num =3D 22,
-> >       .internal_delay =3D 1,
-> >       .tx_counters =3D 1,
-> >       .multi_irqs =3D 1,
-> > @@ -2743,6 +2745,7 @@ static const struct ravb_hw_info ravb_gen4_hw_inf=
-o =3D {
-> >       .rx_buffer_size =3D SZ_2K +
-> >                         SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
-> >       .rx_desc_size =3D sizeof(struct ravb_ex_rx_desc),
-> > +     .dbat_entry_num =3D 22,
-> >       .internal_delay =3D 1,
-> >       .tx_counters =3D 1,
-> >       .multi_irqs =3D 1,
-> > @@ -2769,6 +2772,7 @@ static const struct ravb_hw_info ravb_rzv2m_hw_in=
-fo =3D {
-> >       .rx_buffer_size =3D SZ_2K +
-> >                         SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
-> >       .rx_desc_size =3D sizeof(struct ravb_ex_rx_desc),
-> > +     .dbat_entry_num =3D 22,
-> >       .multi_irqs =3D 1,
-> >       .err_mgmt_irqs =3D 1,
-> >       .gptp =3D 1,
-> > @@ -2794,6 +2798,7 @@ static const struct ravb_hw_info gbeth_hw_info =
-=3D {
-> >       .rx_max_frame_size =3D SZ_8K,
-> >       .rx_buffer_size =3D SZ_2K,
-> >       .rx_desc_size =3D sizeof(struct ravb_rx_desc),
-> > +     .dbat_entry_num =3D 2,
-> >       .aligned_tx =3D 1,
-> >       .coalesce_irqs =3D 1,
-> >       .tx_counters =3D 1,
-> > @@ -3025,7 +3030,7 @@ static int ravb_probe(struct platform_device *pde=
-v)
-> >       ravb_parse_delay_mode(np, ndev);
-> >
-> >       /* Allocate descriptor base address table */
-> > -     priv->desc_bat_size =3D sizeof(struct ravb_desc) * DBAT_ENTRY_NUM=
-;
-> > +     priv->desc_bat_size =3D sizeof(struct ravb_desc) * info->dbat_ent=
-ry_num;
-> >       priv->desc_bat =3D dma_alloc_coherent(ndev->dev.parent, priv->des=
-c_bat_size,
-> >                                           &priv->desc_bat_dma, GFP_KERN=
-EL);
-> >       if (!priv->desc_bat) {
-> > @@ -3035,7 +3040,7 @@ static int ravb_probe(struct platform_device *pde=
-v)
-> >               error =3D -ENOMEM;
-> >               goto out_rpm_put;
-> >       }
-> > -     for (q =3D RAVB_BE; q < DBAT_ENTRY_NUM; q++)
-> > +     for (q =3D RAVB_BE; q < info->dbat_entry_num; q++)
-> >               priv->desc_bat[q].die_dt =3D DT_EOS;
-> >
-> >       /* Initialise HW timestamp list */
-> > --
-> > 2.43.0
-> >
->
-> --
-> Kind Regards,
-> Niklas S=C3=B6derlund
+> Do you plan to send the next round of PCS stuff next, or the cleanups
+> for the has_xxx flags you were mentioning ?
+
+It depends whether there's any conflicting changes. I have such a
+backlog that I'm trying to send out as many non-conflicting netdev
+related topics as I can to get the maximum merged when I have the
+opportunity, even if the topics end up touching the same files.
+I just totalled up the backlog - it's around 120 stmmac related
+patches (including adding the phylink core WoL support), plus about
+20 for marvell PTP. Eek! :/
+
+When one has so many patches, "what to send out next" becomes a major
+decision, and really depends on previous patch set progress.
+
+As you explicitly ask about the PCS stuff and cleanups, I've sent
+the first batch (which is the bulk) of PCS stuff today, and non-
+overlapping cleanup changes.  If the cleanup changes go in, then
+the next tranch of cleanups will have the has_xxx change in.
+
+If the PCS changes go in, then I'll send out the next two patches
+which move the PCS interrupt control over to phylink. After that
+comes the potentially regression inducing change - making stmmac's
+PCS follow what phylink requests of it. I'm expecting that to cause
+trouble, but I have no confidence that it'll get enough testing to
+uncover issues before being merged. This change really needs testing
+on those platforms that use the DWMAC integrated PCS (not xpcs).
+
+If all goes well with the patches I've sent today, then I'm expecting
+them to be merged over this coming weekend. That means the next patches
+will be sent early next week.
+
+So... if your changes can be merged before or around the time that my
+5-patch cleanup gets merged, I can rebase my changes on top, but if
+your patch set needs re-posting, I suggest we have another discussion
+how we proceed.
+
+As mentioned, I'm aware that there are other patches that have already
+been submitted that add platform glue that reference the has_xxx stuff,
+so if these get merged, a rebase is going to be required. (annoyingly,
+this will be high-risk because of getting the compile coverage to
+catch every reference.. unless I remember to grep for them after
+rebasing.)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
