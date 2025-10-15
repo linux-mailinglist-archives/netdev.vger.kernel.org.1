@@ -1,66 +1,67 @@
-Return-Path: <netdev+bounces-229747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C03FCBE07A7
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:39:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27A83BE07B3
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:39:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0F037505E1C
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:36:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5D075545E63
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66494335BA3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A27993376B4;
 	Wed, 15 Oct 2025 19:33:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jvdzeECy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nThxSG8Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522B13126B8;
-	Wed, 15 Oct 2025 19:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A273312809;
+	Wed, 15 Oct 2025 19:33:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760556811; cv=none; b=cJY0VUrXHFZEXNdqcxwj9MiKE6CF4WcpbblU6B08EulZfq1KDq0LPdhVWtFuaR0MRq1xJ6sEM/mpaBIaKrmwAOqQ3TFkAgQvuB3s/6ly5b6BO78JufXCzXhMTy0DQG+MRkV3HIKsIvsdq8L7eiBDD2vVriErru/92ZauD0cMEAs=
+	t=1760556811; cv=none; b=AK4H3wKzgpyPlwf34wg/mTd5g1525pYqIhVDOojq76Vb8+i7hiZlek0UJJzThbj57vAnXfeT16p694z8cnvWtrVSa8V7WAB1jVZ/S1ywV3oynSusd6l8oI8CayoycC1AnnDaEuIutaJ42ufUiMwBZVe398eGiW6Y738XcO20Q6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1760556811; c=relaxed/simple;
-	bh=i5/ucOwu1S9mJBIFEc4XKytuGaxXVd/BACgawuvRGqs=;
+	bh=zSroYSUnwMmJ2WxRuOZRTYq2z9Ldx+vfAWWCN8ZmOeU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LMPkpBhEzQpJUPcXPBkEKl2Bs2JF/9kOh6IkfkFML5MMjSUdUhwoD2JTNhqHD4Z0FpU2oDBBQZnuISI1KwJtDVtnVUvf0jrqKiEGTgg+J/gpZ3r32pw29qAcIxx3hSk86gKIxHAGlAEix0jQKCulUH/Prv0uwoM60Xo9T0xxSHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jvdzeECy; arc=none smtp.client-ip=192.198.163.10
+	 In-Reply-To:To:Cc; b=a5k+AhJzJEqEYJAV2YRGvABYRsjFqKVHR8UksH/JMCylvzAekyQbvQwUD8wHWMhN/UwFJMcx2LgpTuK2HQGHx3hhu3I/KXFw2amtDCwMl0gxEme5GYqxOaO5Oz93HtOM2s4p7M5A/JR65Jruex09GcKA1r8cFZYuEoekv8tARZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nThxSG8Z; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760556808; x=1792092808;
+  t=1760556809; x=1792092809;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=i5/ucOwu1S9mJBIFEc4XKytuGaxXVd/BACgawuvRGqs=;
-  b=jvdzeECyBqRUOy6pypctKEb6M/bbh2bgz9pDSR8vuCzan4hc1e/3VnfH
-   Dupxn918AHlkvYtC1YrGxePjytfO8vamnWBCGGzi27dJk7BzL6JaRxb2q
-   0VHupjeaXc0XP2w94JdGK+XlIB59QykggcoB1gE3807LRcuU/UOaqRM+E
-   2uNHgKwY80w3yO9JZcGOMpc7Pf6hSnf/CWR6WclbvdD9opM86c6gZKoZi
-   HVXUmmWgk0O2XLDDLPVFfw3v3AjlDI+E/GHytpT8WYt/PNJhX8BjN2chq
-   G25Y/JvvEyn+7Ilp2giEo5gfnAeqXJHipew+dhJ2g2GMdc4o/b5oE4clQ
-   Q==;
-X-CSE-ConnectionGUID: fAFmjv7PTxOew626ZboTug==
-X-CSE-MsgGUID: dZcGEvW2QmeaRRFLjbajTQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="74083571"
+  bh=zSroYSUnwMmJ2WxRuOZRTYq2z9Ldx+vfAWWCN8ZmOeU=;
+  b=nThxSG8Z4+2tVE1wg/qd6DVZbd73ag5x7HiK+Wfb2FppQS+ht+Vk+M31
+   qWcubO64Hcw+nGKekZDSsPDkbtBR6JACEUy5y0gLQbJAMPH8q8E9QL8/A
+   WcQWbDC4XJke3mYQ3J4j/jRSoq1iDhtOW7uy7RY4+B0EYmyK9O0kP/SsZ
+   KSee4Jv9tXFjWEKZH7oLQ5EUGq/Jlzii1Dk78VNxIbfMEx6W2crCMMRRu
+   mhTIPA21Dnex42DkEU97u2L955XNu7WZIHB0gM01Rma5CWAmPbCf0tWf+
+   krcmQG8Ido7Y/MAsw1lLwQIsVz3oOhMctHw3L6JPe6bErJ6WdkbN/lHJy
+   A==;
+X-CSE-ConnectionGUID: oK4oBQrnRgmCdz3EIaWvrQ==
+X-CSE-MsgGUID: 3z4FiIDHQr+7wAWHhFUxwg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="74083578"
 X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
-   d="scan'208";a="74083571"
+   d="scan'208";a="74083578"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 12:33:15 -0700
-X-CSE-ConnectionGUID: WVZrTzNTSnCZQ1xrbkZeag==
-X-CSE-MsgGUID: wM466B8+TLyKbHXX4UcRYA==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 12:33:16 -0700
+X-CSE-ConnectionGUID: V4VNng4wT1iR1g+MXbf9Pw==
+X-CSE-MsgGUID: xkgYXqkqRLqVn/zoJARwJg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
-   d="scan'208";a="182044907"
+   d="scan'208";a="182044911"
 Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
   by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 12:33:15 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Wed, 15 Oct 2025 12:32:08 -0700
-Subject: [PATCH net-next 12/14] ice: refactor to use helpers
+Date: Wed, 15 Oct 2025 12:32:09 -0700
+Subject: [PATCH net-next 13/14] ixgbe: preserve RSS indirection table
+ across admin down/up
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251015-jk-iwl-next-2025-10-15-v1-12-79c70b9ddab8@intel.com>
+Message-Id: <20251015-jk-iwl-next-2025-10-15-v1-13-79c70b9ddab8@intel.com>
 References: <20251015-jk-iwl-next-2025-10-15-v1-0-79c70b9ddab8@intel.com>
 In-Reply-To: <20251015-jk-iwl-next-2025-10-15-v1-0-79c70b9ddab8@intel.com>
 To: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
@@ -81,306 +82,168 @@ To: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
  Alexander Lobakin <aleksander.lobakin@intel.com>
 Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
- Rinitha S <sx.rinitha@intel.com>, jbrandeburg@cloudflare.com
+ Kohei Enju <enjuk@amazon.com>, Rinitha S <sx.rinitha@intel.com>
 X-Mailer: b4 0.15-dev-96507
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11520;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5694;
  i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=obWj7WMq6DJfzklFg5peXZGTPhwkwvPx4yucp6fUTjs=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhoz3337U8qVMTFqwmnuixuYAyXj+OTaBTcraH4uubdhx6
- xXr4kfSHaUsDGJcDLJiiiwKDiErrxtPCNN64ywHM4eVCWQIAxenAEzEw5mR4cAOrsbdM94aNko4
- hwVfiJjEdqBqvtpehtwTCRvZ5xfM1mD4X5+66t6LgsdvnRatSNuWEz1j4qnuvi8Nj722TZutf2u
- aBhMA
+ bh=8F2To28QstNuyAlt+B7GRD08I9GLaGQUGAXTdXn2irk=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhoz3336I38xJ67jC77vXr/DlqtLOaqmFOl9t5dU+vU1yq
+ Cpbk/Wuo5SFQYyLQVZMkUXBIWTldeMJYVpvnOVg5rAygQxh4OIUgIl41DEyPD95/67uHgY5hq7l
+ 5rMeLpzKPvli+OuUP8s897isThVT3MTIMP93BaPajKq5/DzRElt+LpPT2Lyjp0bxsKeq1dL1a/P
+ E2AA=
 X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
  fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+From: Kohei Enju <enjuk@amazon.com>
 
-Use the ice_netdev_to_pf() helper in more places and remove a bunch of
-boilerplate code. Not every instance could be replaced due to use of the
-netdev_priv() output or the vsi variable within a bunch of functions.
+Currently, the RSS indirection table configured by user via ethtool is
+reinitialized to default values during interface resets (e.g., admin
+down/up, MTU change). As for RSS hash key, commit 3dfbfc7ebb95 ("ixgbe:
+Check for RSS key before setting value") made it persistent across
+interface resets.
 
-Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Adopt the same approach used in igc and igb drivers which reinitializes
+the RSS indirection table only when the queue count changes. Since the
+number of RETA entries can also change in ixgbe, let's make user
+configuration persistent as long as both queue count and the number of
+RETA entries remain unchanged.
+
+Tested on Intel Corporation 82599ES 10-Gigabit SFI/SFP+ Network
+Connection.
+
+Test:
+Set custom indirection table and check the value after interface down/up
+
+  # ethtool --set-rxfh-indir ens5 equal 2
+  # ethtool --show-rxfh-indir ens5 | head -5
+
+  RX flow hash indirection table for ens5 with 12 RX ring(s):
+      0:      0     1     0     1     0     1     0     1
+      8:      0     1     0     1     0     1     0     1
+     16:      0     1     0     1     0     1     0     1
+  # ip link set dev ens5 down && ip link set dev ens5 up
+
+Without patch:
+  # ethtool --show-rxfh-indir ens5 | head -5
+
+  RX flow hash indirection table for ens5 with 12 RX ring(s):
+      0:      0     1     2     3     4     5     6     7
+      8:      8     9    10    11     0     1     2     3
+     16:      4     5     6     7     8     9    10    11
+
+With patch:
+  # ethtool --show-rxfh-indir ens5 | head -5
+
+  RX flow hash indirection table for ens5 with 12 RX ring(s):
+      0:      0     1     0     1     0     1     0     1
+      8:      0     1     0     1     0     1     0     1
+     16:      0     1     0     1     0     1     0     1
+
+Signed-off-by: Kohei Enju <enjuk@amazon.com>
 Tested-by: Rinitha S <sx.rinitha@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ethtool.c   | 48 ++++++++------------------
- drivers/net/ethernet/intel/ice/ice_flex_pipe.c |  8 ++---
- drivers/net/ethernet/intel/ice/ice_lag.c       |  3 +-
- drivers/net/ethernet/intel/ice/ice_main.c      | 10 ++----
- drivers/net/ethernet/intel/ice/ice_ptp.c       |  6 ++--
- drivers/net/ethernet/intel/ice/ice_sriov.c     |  3 +-
- 6 files changed, 24 insertions(+), 54 deletions(-)
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  2 ++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 45 ++++++++++++++++++---------
+ 2 files changed, 33 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 75492a720c68..cb34d4675a78 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -794,8 +794,7 @@ static int ice_get_extended_regs(struct net_device *netdev, void *p)
- static void
- ice_get_regs(struct net_device *netdev, struct ethtool_regs *regs, void *p)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	struct ice_hw *hw = &pf->hw;
- 	u32 *regs_buf = (u32 *)p;
- 	unsigned int i;
-@@ -810,8 +809,7 @@ ice_get_regs(struct net_device *netdev, struct ethtool_regs *regs, void *p)
- 
- static u32 ice_get_msglevel(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- #ifndef CONFIG_DYNAMIC_DEBUG
- 	if (pf->hw.debug_mask)
-@@ -824,8 +822,7 @@ static u32 ice_get_msglevel(struct net_device *netdev)
- 
- static void ice_set_msglevel(struct net_device *netdev, u32 data)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- #ifndef CONFIG_DYNAMIC_DEBUG
- 	if (ICE_DBG_USER & data)
-@@ -840,16 +837,14 @@ static void ice_set_msglevel(struct net_device *netdev, u32 data)
- static void ice_get_link_ext_stats(struct net_device *netdev,
- 				   struct ethtool_link_ext_stats *stats)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- 	stats->link_down_events = pf->link_down_events;
- }
- 
- static int ice_get_eeprom_len(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- 	return (int)pf->hw.flash.flash_size;
- }
-@@ -858,9 +853,7 @@ static int
- ice_get_eeprom(struct net_device *netdev, struct ethtool_eeprom *eeprom,
- 	       u8 *bytes)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	struct ice_hw *hw = &pf->hw;
- 	struct device *dev;
- 	int ret;
-@@ -959,8 +952,7 @@ static u64 ice_link_test(struct net_device *netdev)
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+index 14d275270123..3553bf659d42 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+@@ -838,6 +838,8 @@ struct ixgbe_adapter {
   */
- static u64 ice_eeprom_test(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
+ #define IXGBE_MAX_RETA_ENTRIES 512
+ 	u8 rss_indir_tbl[IXGBE_MAX_RETA_ENTRIES];
++	u32 last_reta_entries;
++	u16 last_rss_indices;
  
- 	netdev_info(netdev, "EEPROM test\n");
- 	return !!(ice_nvm_validate_checksum(&pf->hw));
-@@ -1274,9 +1266,8 @@ static int ice_lbtest_receive_frames(struct ice_rx_ring *rx_ring)
-  */
- static u64 ice_loopback_test(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *orig_vsi = np->vsi, *test_vsi;
--	struct ice_pf *pf = orig_vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
-+	struct ice_vsi *test_vsi;
- 	u8 *tx_frame __free(kfree) = NULL;
- 	u8 broadcast[ETH_ALEN], ret = 0;
- 	int num_frames, valid_frames;
-@@ -1365,8 +1356,7 @@ static u64 ice_loopback_test(struct net_device *netdev)
-  */
- static u64 ice_intr_test(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	u16 swic_old = pf->sw_int_count;
+ #define IXGBE_RSS_KEY_SIZE     40  /* size of RSS Hash Key in bytes */
+ 	u32 *rss_key;
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index 90d4e57b1c93..00810fc22ba9 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -4309,9 +4309,9 @@ static void ixgbe_store_vfreta(struct ixgbe_adapter *adapter)
  
- 	netdev_info(netdev, "interrupt test\n");
-@@ -1394,9 +1384,8 @@ static void
- ice_self_test(struct net_device *netdev, struct ethtool_test *eth_test,
- 	      u64 *data)
+ static void ixgbe_setup_reta(struct ixgbe_adapter *adapter)
  {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	bool if_running = netif_running(netdev);
--	struct ice_pf *pf = np->vsi->back;
- 	struct device *dev;
+-	u32 i, j;
+ 	u32 reta_entries = ixgbe_rss_indir_tbl_entries(adapter);
+ 	u16 rss_i = adapter->ring_feature[RING_F_RSS].indices;
++	u32 i;
  
- 	dev = ice_pf_to_dev(pf);
-@@ -1720,9 +1709,7 @@ static int ice_nway_reset(struct net_device *netdev)
-  */
- static u32 ice_get_priv_flags(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	u32 i, ret_flags = 0;
+ 	/* Program table for at least 4 queues w/ SR-IOV so that VFs can
+ 	 * make full use of any rings they may have.  We will use the
+@@ -4323,14 +4323,21 @@ static void ixgbe_setup_reta(struct ixgbe_adapter *adapter)
+ 	/* Fill out hash function seeds */
+ 	ixgbe_store_key(adapter);
  
- 	for (i = 0; i < ICE_PRIV_FLAG_ARRAY_SIZE; i++) {
-@@ -4417,9 +4404,7 @@ static int
- ice_get_module_info(struct net_device *netdev,
- 		    struct ethtool_modinfo *modinfo)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	struct ice_hw *hw = &pf->hw;
- 	u8 sff8472_comp = 0;
- 	u8 sff8472_swap = 0;
-@@ -4491,12 +4476,10 @@ static int
- ice_get_module_eeprom(struct net_device *netdev,
- 		      struct ethtool_eeprom *ee, u8 *data)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- #define SFF_READ_BLOCK_SIZE 8
- 	u8 value[SFF_READ_BLOCK_SIZE] = { 0 };
- 	u8 addr = ICE_I2C_EEPROM_DEV_ADDR;
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
- 	struct ice_hw *hw = &pf->hw;
- 	bool is_sfp = false;
- 	unsigned int i, j;
-@@ -4774,8 +4757,7 @@ static void ice_get_ts_stats(struct net_device *netdev,
-  */
- static int ice_ethtool_reset(struct net_device *dev, u32 *flags)
- {
--	struct ice_netdev_priv *np = netdev_priv(dev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(dev);
- 	enum ice_reset_req reset;
+-	/* Fill out redirection table */
+-	memset(adapter->rss_indir_tbl, 0, sizeof(adapter->rss_indir_tbl));
++	/* Ensure rss_i is non-zero to avoid division by zero */
++	if (!rss_i)
++		rss_i = 1;
  
- 	switch (*flags) {
-diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-index fc94e189e52e..c2caee083ca7 100644
---- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-+++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-@@ -574,9 +574,7 @@ ice_destroy_tunnel(struct ice_hw *hw, u16 index, enum ice_tunnel_type type,
- int ice_udp_tunnel_set_port(struct net_device *netdev, unsigned int table,
- 			    unsigned int idx, struct udp_tunnel_info *ti)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	enum ice_tunnel_type tnl_type;
- 	int status;
- 	u16 index;
-@@ -598,9 +596,7 @@ int ice_udp_tunnel_set_port(struct net_device *netdev, unsigned int table,
- int ice_udp_tunnel_unset_port(struct net_device *netdev, unsigned int table,
- 			      unsigned int idx, struct udp_tunnel_info *ti)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	enum ice_tunnel_type tnl_type;
- 	int status;
+-	for (i = 0, j = 0; i < reta_entries; i++, j++) {
+-		if (j == rss_i)
+-			j = 0;
++	/* Update redirection table in memory on first init, queue count change,
++	 * or reta entries change, otherwise preserve user configurations. Then
++	 * always write to hardware.
++	 */
++	if (adapter->last_rss_indices != rss_i ||
++	    adapter->last_reta_entries != reta_entries) {
++		for (i = 0; i < reta_entries; i++)
++			adapter->rss_indir_tbl[i] = i % rss_i;
  
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
-index aebf8e08a297..d2576d606e10 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.c
-@@ -2177,8 +2177,7 @@ static void ice_lag_chk_disabled_bond(struct ice_lag *lag, void *ptr)
-  */
- static void ice_lag_disable_sriov_bond(struct ice_lag *lag)
- {
--	struct ice_netdev_priv *np = netdev_priv(lag->netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(lag->netdev);
+-		adapter->rss_indir_tbl[i] = j;
++		adapter->last_rss_indices = rss_i;
++		adapter->last_reta_entries = reta_entries;
+ 	}
  
- 	ice_clear_feature_support(pf, ICE_F_SRIOV_LAG);
- 	ice_clear_feature_support(pf, ICE_F_SRIOV_AA_LAG);
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 3d5615caf6d1..ca95b8800bb3 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -8074,9 +8074,7 @@ static int
- ice_bridge_getlink(struct sk_buff *skb, u32 pid, u32 seq,
- 		   struct net_device *dev, u32 filter_mask, int nlflags)
- {
--	struct ice_netdev_priv *np = netdev_priv(dev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(dev);
- 	u16 bmode;
+ 	ixgbe_store_reta(adapter);
+@@ -4338,9 +4345,10 @@ static void ixgbe_setup_reta(struct ixgbe_adapter *adapter)
  
- 	bmode = pf->first_sw->bridge_mode;
-@@ -8146,8 +8144,7 @@ ice_bridge_setlink(struct net_device *dev, struct nlmsghdr *nlh,
- 		   u16 __always_unused flags,
- 		   struct netlink_ext_ack __always_unused *extack)
+ static void ixgbe_setup_vfreta(struct ixgbe_adapter *adapter)
  {
--	struct ice_netdev_priv *np = netdev_priv(dev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(dev);
- 	struct nlattr *attr, *br_spec;
- 	struct ice_hw *hw = &pf->hw;
- 	struct ice_sw *pf_sw;
-@@ -9581,8 +9578,7 @@ ice_indr_setup_tc_cb(struct net_device *netdev, struct Qdisc *sch,
-  */
- int ice_open(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
+-	struct ixgbe_hw *hw = &adapter->hw;
++	u32 reta_entries = ixgbe_rss_indir_tbl_entries(adapter);
+ 	u16 rss_i = adapter->ring_feature[RING_F_RSS].indices;
+-	int i, j;
++	struct ixgbe_hw *hw = &adapter->hw;
++	int i;
  
- 	if (ice_is_reset_in_progress(pf->state)) {
- 		netdev_err(netdev, "can't open net device while reset is in progress");
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 4f50e952bfb5..985b3e79b312 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2215,8 +2215,7 @@ static int ice_ptp_getcrosststamp(struct ptp_clock_info *info,
- int ice_ptp_hwtstamp_get(struct net_device *netdev,
- 			 struct kernel_hwtstamp_config *config)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
+ 	/* Fill out hash function seeds */
+ 	for (i = 0; i < 10; i++) {
+@@ -4352,12 +4360,21 @@ static void ixgbe_setup_vfreta(struct ixgbe_adapter *adapter)
+ 					*(adapter->rss_key + i));
+ 	}
  
- 	if (pf->ptp.state != ICE_PTP_READY)
- 		return -EIO;
-@@ -2287,8 +2286,7 @@ int ice_ptp_hwtstamp_set(struct net_device *netdev,
- 			 struct kernel_hwtstamp_config *config,
- 			 struct netlink_ext_ack *extack)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	int err;
+-	/* Fill out the redirection table */
+-	for (i = 0, j = 0; i < 64; i++, j++) {
+-		if (j == rss_i)
+-			j = 0;
++	/* Ensure rss_i is non-zero to avoid division by zero */
++	if (!rss_i)
++		rss_i = 1;
  
- 	if (pf->ptp.state != ICE_PTP_READY)
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index 843e82fd3bf9..6b1126ddb561 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -1190,8 +1190,7 @@ ice_vf_lan_overflow_event(struct ice_pf *pf, struct ice_rq_event_info *event)
-  */
- int ice_set_vf_spoofchk(struct net_device *netdev, int vf_id, bool ena)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	struct ice_vsi *vf_vsi;
- 	struct device *dev;
- 	struct ice_vf *vf;
+-		adapter->rss_indir_tbl[i] = j;
++	/* Update redirection table in memory on first init, queue count change,
++	 * or reta entries change, otherwise preserve user configurations. Then
++	 * always write to hardware.
++	 */
++	if (adapter->last_rss_indices != rss_i ||
++	    adapter->last_reta_entries != reta_entries) {
++		for (i = 0; i < reta_entries; i++)
++			adapter->rss_indir_tbl[i] = i % rss_i;
++
++		adapter->last_rss_indices = rss_i;
++		adapter->last_reta_entries = reta_entries;
+ 	}
+ 
+ 	ixgbe_store_vfreta(adapter);
 
 -- 
 2.51.0.rc1.197.g6d975e95c9d7
