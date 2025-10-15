@@ -1,111 +1,162 @@
-Return-Path: <netdev+bounces-229457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85536BDC983
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 07:24:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74698BDC992
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 07:27:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E4673B98D5
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 05:24:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F422F407C84
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 05:26:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF8730214D;
-	Wed, 15 Oct 2025 05:24:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D44BD302CC2;
+	Wed, 15 Oct 2025 05:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GpmNLQMm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YyFcMZs2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F324438B
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 05:24:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F62302153
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 05:26:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760505873; cv=none; b=EzTqxZuQI0hgGAs9uD1bceH0Mp/p6P6OyhentCOCapSlF/OkTTEiBX2kkxOyvz0fU0kKCTh7qdXz+J5OIG2fzEG/NPQpafNH68JZhRnKOrxBwO9NmmTZkfnwUyFf0jTa6KVzVYGU7SRWK0VX6PIzq1fVopBWIP2o1CQ0TGfz6Os=
+	t=1760505992; cv=none; b=kxVPVimCILMdgxusTYar150y66Iv0jQeBBcOnwIvcXP/e9oEUkAyGJkimJJgu2vJP8uy2vfyoiCWa+bWIGAdtng2yV23d8By7whXmMHTjgPrIoANYsSByzT6MaPkitK0l3euCnqO7l7e40YzW21EaNB+5oRraeUatZakbtNQbyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760505873; c=relaxed/simple;
-	bh=KiIczi1SpiBWlFL/Rfu9Nh+QFskj5juUmbFcPASbzI4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mIwsERGSNhdebdwiFGbUR89pIQQADK/LqPHtYW3g6j6QfFQp++6fdPKHAT1pD45TzgnNNpc5arl48kZHo+uc2vtIrLMwVHwTmRBAYXeAIt5hWkOUOa6xz1hWhJCFB7NvcrEgC+1baeubk+RVSWgA7TiitqRoSh0Utj4uYTwXW1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GpmNLQMm; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b550eff972eso4090670a12.3
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 22:24:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760505871; x=1761110671; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KiIczi1SpiBWlFL/Rfu9Nh+QFskj5juUmbFcPASbzI4=;
-        b=GpmNLQMmumhfTRGO2kmJRM3NMPZaloancDyni9qwo1wjfkBh+AvSG+8V+2s/UilG2Q
-         GhYOG3y/XXIIVsj93RpxY+CO/F9LREzsSKEh+cinS8JzRYHVQO7HoDpg9YvmcJHtHvjp
-         Z/Li55sAXtbIto1RBAcrIVJhrcvoB2P5lmJ9+ERzXk3fvc3oh0k5AXz723SfB/QCEXbI
-         22qQ+zgu5YTQsrM+/Lyc7ek+pgn0mfTB2AIVB3tuL0ke+3UIsaTEJezWG9bENgh6eeDU
-         1vnDEflJASiUVtp9SVIA+3NFu+6+I+BQASWaTdu4L/Uu+mfTxA0ri0JwBuMXGf0cqfEY
-         GvQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760505871; x=1761110671;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KiIczi1SpiBWlFL/Rfu9Nh+QFskj5juUmbFcPASbzI4=;
-        b=lBG6rpX4n3Oei0Z9n/GVD0yOhRXNRkXWD+g48hDR4Bm7+D7tyLDXX3vdDQMyMRKKhK
-         OnfTCPG7sYw0DLDXFXV7Smh/379brXFALAXVOK/MkNZsBbZWo7+urk2W3mJ7JmtuzFY+
-         D44W6MOU69fzSuNRvUajzL16mpEwfomJ/F6hMlejlWQjtg2+4JlIG5PfwIt0yYX1+YwS
-         0Zr8Nq7csnolUggygtiFOkDe3b7O0KCQcNRrf33IeEr5/uxCDveQAFuFq5SWhEZfQ4Dm
-         Qm16YKvXgOQgh4uFIVfGYlMvwYRKYaIgbhtJJ8zJrwt6bNT4qqWyk5aBKChUMzMvM8LT
-         /14Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXRb82EO9urMbrjPvPC1WKCyZSy59BeK6hc+P79JbmErYto3AdzMAnW7q7GAUvudXbyBdPlzHg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYHbG4t6qHq06By2JlTya307GdU/Bl8+3H90EqeXGZZrO+u8QB
-	a+0zesDGlegyM1VPGT03Xywv9YD2xZtz8mfx69KCGyC7WQ4lA5faq5hcnkLl8bCvsdF5ta7p3x8
-	Wfh8+tLsXhbYyuT2KpjJKhatNnaCumU93mJIyE4Rx
-X-Gm-Gg: ASbGncujYznTKBjrhRT2efOKAlP0YQliNGMcqaKmrTfkJHGQf6EJXnklXH6NUCXgRD9
-	vGoNhYv2BcILNfu5WMvFyUUxwzi0Z/rngGtQJ67O3NfSs8mT0VHYYlCWCzco+p8vNQ1PIh4fkIj
-	I2/ql2+zckWP7XQKYR+6OKvftIAmsiMuvhlfgoJC40JUxtaksD0IhbrBBmyWXKMtm5QQSYBX3nB
-	Xb4arFaQQQ+RtTqaSQjYcWZS4FX3nQSTSEH3WlxFnxrXEWAiXt5KynYoHPpAjl2
-X-Google-Smtp-Source: AGHT+IGvkAxpinatKAt/wsOpd9LQIpLbYj+tiJBcH+kIDLEGEASgBxldzY/TA1P/4J19ghmmAGPVWwx8Ij+QTFndnJ0=
-X-Received: by 2002:a17:902:f612:b0:269:8072:5be7 with SMTP id
- d9443c01a7336-29027303931mr347109785ad.56.1760505871123; Tue, 14 Oct 2025
- 22:24:31 -0700 (PDT)
+	s=arc-20240116; t=1760505992; c=relaxed/simple;
+	bh=hrl3vFnKAOqCCVFG9AbVN3NMQWug1hhBxWaMMxlGFJI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fOZ/10LWXbLCN5r3h6aIWH29JKINRg4pk8wqmhyd3bK31ba/DXuAC1Lx14yZsR9txmf7iI8YYqZWIYQcyapC2m4CcFkbA/XDC52+6ksmss+dqOP4bQHy+OX/doUkoDMznKU4pBIUsYz3kGZOIWFGiog5ZZYM//VsTrasrFhH1dE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YyFcMZs2; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760505991; x=1792041991;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=hrl3vFnKAOqCCVFG9AbVN3NMQWug1hhBxWaMMxlGFJI=;
+  b=YyFcMZs2ax1FEEFlOxbYuPAjJbWrsBtdZG/WxSyilZn8mwx7jjybblkT
+   pkLnpm1r+LlSmhWvEjaWcakdJA2La71Y89yryrdzoMqLhVkQu+iTGZa8Z
+   VjSq0aESdnHVWFhdNjitw4K2r5kiyNM75qepVbN9YJPSKwvYNCYbsKAu7
+   1zFNW6Z3dMfcDBkPN5QXvKi4lWSKxfJn1ZGHcC9DdpM3hDXutzppdkygD
+   zWtmQBbmqOqwPo7JVEHWpvdHOVdFchBckHVhgrTgjhjX2cmQEJP9eCRk4
+   jujnuOsN606xQ2O4S1nv3mOU2bfAVb09/MBtSU2OxDqXk8XHWlyEuuJf5
+   Q==;
+X-CSE-ConnectionGUID: nxvRxY+ERrC951qQTFsT6w==
+X-CSE-MsgGUID: ojPfmGo/QR+GozBiRDFkOQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11582"; a="62568944"
+X-IronPort-AV: E=Sophos;i="6.19,230,1754982000"; 
+   d="scan'208";a="62568944"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2025 22:26:30 -0700
+X-CSE-ConnectionGUID: Gm74usyYTzy8Qm24W+ta6Q==
+X-CSE-MsgGUID: 0YHKjawzQ5eRor79W+kOCQ==
+X-ExtLoop1: 1
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2025 22:26:28 -0700
+Date: Wed, 15 Oct 2025 07:24:30 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Guenter Roeck <linux@roeck-us.net>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] ixgbe: guard fwlog code by
+ CONFIG_DEBUG_FS
+Message-ID: <aO8wDmPWWEV6+tkZ@mev-dev.igk.intel.com>
+References: <20251014141110.751104-1-michal.swiatkowski@linux.intel.com>
+ <11eac3d4-d81c-42e2-b9e3-d6f715a946b2@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251014171907.3554413-1-edumazet@google.com> <20251014171907.3554413-4-edumazet@google.com>
-In-Reply-To: <20251014171907.3554413-4-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 14 Oct 2025 22:24:19 -0700
-X-Gm-Features: AS18NWAHoUBmZ46w5FWpmWg52K5wMjDu0Nfe3q5aikfvI4KIhm56WnDzUrwMI-Y
-Message-ID: <CAAVpQUCmQWBUM6xNhz_oznOUXJOKV8Q8h_w-oLTZnsN6OaBnXA@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 3/6] net/sched: act_mirred: add loop detection
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <11eac3d4-d81c-42e2-b9e3-d6f715a946b2@intel.com>
 
-On Tue, Oct 14, 2025 at 10:19=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> Commit 0f022d32c3ec ("net/sched: Fix mirred deadlock on device recursion"=
-)
-> added code in the fast path, even when act_mirred is not used.
->
-> Prepare its revert by implementing loop detection in act_mirred.
->
-> Adds an array of device pointers in struct netdev_xmit.
->
-> tcf_mirred_is_act_redirect() can detect if the array
-> already contains the target device.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On Tue, Oct 14, 2025 at 04:41:43PM -0700, Jacob Keller wrote:
+> 
+> 
+> On 10/14/2025 7:11 AM, Michal Swiatkowski wrote:
+> > Building the ixgbe without CONFIG_DEBUG_FS leads to a build error. Fix
+> > that by guarding fwlog code.
+> > 
+> > Fixes: 641585bc978e ("ixgbe: fwlog support for e610")
+> > Reported-by: Guenter Roeck <linux@roeck-us.net>
+> > Closes: https://lore.kernel.org/lkml/f594c621-f9e1-49f2-af31-23fbcb176058@roeck-us.net/
+> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> > ---
+> 
+> Hm. It probably is best to make this optional and not require debugfs
+> via kconfig.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Make sense
+
+> 
+> >  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 2 ++
+> >  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h | 8 ++++++++
+> >  2 files changed, 10 insertions(+)
+> > 
+> > diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> > index c2f8189a0738..c5d76222df18 100644
+> > --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> > +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> > @@ -3921,6 +3921,7 @@ static int ixgbe_read_pba_string_e610(struct ixgbe_hw *hw, u8 *pba_num,
+> >  	return err;
+> >  }
+> >  
+> > +#ifdef CONFIG_DEBUG_FS
+> >  static int __fwlog_send_cmd(void *priv, struct libie_aq_desc *desc, void *buf,
+> >  			    u16 size)
+> >  {
+> > @@ -3952,6 +3953,7 @@ void ixgbe_fwlog_deinit(struct ixgbe_hw *hw)
+> >  
+> >  	libie_fwlog_deinit(&hw->fwlog);
+> >  }
+> > +#endif /* CONFIG_DEBUG_FS */
+> >  
+> 
+> What does the fwlog module from libie do? Seems likely that it won't
+> compile without CONFIG_DEBUG_FS either...
+
+Right, it shouldn't, because there is a dependency on fs/debugfs.
+It is building on my env, but maybe I don't have it fully cleaned.
+I wonder, because in ice there wasn't a check (or select) for
+CONFIG_DEBUG_FS for fwlog code.
+
+Looks like LIBIE_FWLOG should select DEBUG_FS, right?
+I will send v2 with that, if it is fine.
+
+Thanks
+
+> 
+> >  static const struct ixgbe_mac_operations mac_ops_e610 = {
+> >  	.init_hw			= ixgbe_init_hw_generic,
+> > diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+> > index 11916b979d28..5317798b3263 100644
+> > --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+> > +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+> > @@ -96,7 +96,15 @@ int ixgbe_aci_update_nvm(struct ixgbe_hw *hw, u16 module_typeid,
+> >  			 bool last_command, u8 command_flags);
+> >  int ixgbe_nvm_write_activate(struct ixgbe_hw *hw, u16 cmd_flags,
+> >  			     u8 *response_flags);
+> > +#ifdef CONFIG_DEBUG_FS
+> >  int ixgbe_fwlog_init(struct ixgbe_hw *hw);
+> >  void ixgbe_fwlog_deinit(struct ixgbe_hw *hw);
+> > +#else
+> > +static inline int ixgbe_fwlog_init(struct ixgbe_hw *hw)
+> > +{
+> > +	return -EOPNOTSUPP;
+> > +}
+> > +static inline void ixgbe_fwlog_deinit(struct ixgbe_hw *hw) {}
+> > +#endif /* CONFIG_DEBUG_FS */
+> >  
+> >  #endif /* _IXGBE_E610_H_ */
+> 
+
+
+
 
