@@ -1,120 +1,119 @@
-Return-Path: <netdev+bounces-229674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BA84BDF985
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 18:13:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 507A5BDF997
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 18:14:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89424405579
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 16:11:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B7A254272E
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 16:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9A9A2DCBF1;
-	Wed, 15 Oct 2025 16:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ED463375A1;
+	Wed, 15 Oct 2025 16:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HMbUq3eI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VFfzR8W8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5AC32ED2E
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 16:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23978335BCB;
+	Wed, 15 Oct 2025 16:12:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760544677; cv=none; b=AJPm+Q+GYj5dYXFBph5aEKPwkvHiMjRIv7YA30VM1ttACWFbelljR+5aEDAzTiUy9tXZ8rKV+GZkrslR09Kl13/TkIgdAtnqEwgaVoR7iamSOnlSkz6sJYVUba0bqzKX2rx+i+BBzd5/eT6apnEvS5hVjKA3KDjT3hsh2cyAn7k=
+	t=1760544752; cv=none; b=l6DjilU8PyyxRAfLI8QktDAh6LVVyaKXelUgBC1v/bqjv5ZpooKadpv18lXkM2+Seaf+kwCqbO22vX7dxl7jkcJtUyGt0CqcrJ59ByX625OSo/p/q6x3UTFNkIrlnEVqNW6JXWhvjz57SJMf9WxABsvDw2Xg30lOnjejFsrIxX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760544677; c=relaxed/simple;
-	bh=YBpfKHUXhgUhb2xBPiZKaY7khnnPifMbCzeAT05btls=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=Kb2p6QSdVtrRa9l5oX0htrorAbjmwswBJhnYfCv/qZZrtkUmakbsceKlGVFWx02uN9Lbzp4pEgOfZ29nmWQUlJJ5rgWXXLogwU/s/4w0bZk8h77d/zHtJJ3+oN8R5hihZvocNMVp0ErdaTgbPu6AXncEOAylSOXuBUnnQWECIgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HMbUq3eI; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=eplxvysfx85LPhdZ5hWcUUD0i0J3w274wHdDz18TaWo=; b=HMbUq3eIlPgCK522VNy2nopUYq
-	bQGaUVC9JCVn8ftCRCvjxzbPLuQVr0BInbCKKAINI9eipgUEdzA1LAJ4Ak9GXzR4Gvc5YGjufyWIT
-	WuSyNHpllPjvr9KXB4GDd/rQOpVNDYr75tlRHAc1YPiajIzKp7IcrzsDRAVtUAzBIDUZkcwd6KLo0
-	UR/ghtOA18pTwvk0u/0zSO6cxDIJBbPwqaNp1VN00Usvt0kbsloAe4HPQG4BM27zjSzDyopkcYcNj
-	JWcpXCi3QT0vw19qmqOp+R2ivohoAbvoNgn1tSVfu2v3AiX5ynLyg4EtXfQUX8NyCh/wu/PKgYbod
-	BCXzzslg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42348 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1v945g-000000005Ar-3gCO;
-	Wed, 15 Oct 2025 17:11:05 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1v945d-0000000Ameh-3Bs7;
-	Wed, 15 Oct 2025 17:11:01 +0100
-In-Reply-To: <aO_HIwT_YvxkDS8D@shell.armlinux.org.uk>
-References: <aO_HIwT_YvxkDS8D@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1760544752; c=relaxed/simple;
+	bh=u6Wkdm2r1xLEd5GhkWdDZmkppsZyOO81BxcM2sb1/a8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DrcNFowe9QQduZtblz2NB08xzW8TmU77+264m4vbtJDLh8DsCFWfhMN/ckxKM6+g7zsX+pwikFo5qAebAfOY0nk7ZLiudziJOWewMBZib6Hl+WHWUIuQiUqYFkH81phNbc69kiSumziMmSRDGU2ZCx5j2+tsrnSTRZxMrdb6J9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VFfzR8W8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA719C4CEF8;
+	Wed, 15 Oct 2025 16:12:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760544751;
+	bh=u6Wkdm2r1xLEd5GhkWdDZmkppsZyOO81BxcM2sb1/a8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VFfzR8W80gEabOYattjVBWykE/ZZNiKDxm59H7O5UW5MwH45Jd8UxxnNcLG50ADo+
+	 SxVhb3ZwJcRRcYCmhBuA68sEIYxZ5kkpE/zWZLrfHEZ33aYYi38Mv/vtcsRFIZAWb9
+	 XzM3+676ZmlTDSHAZS/EclV2MgMOg2KcPRYgv75jfwdxs0o78IJwkaO7MDAyU7FPEq
+	 eatDEmOLmYvaQM/w5exPl+tza72zUUy//DvrCDvXMFFUKFIXKOSQbxW8ImEZds+z33
+	 qOYc6O1aZ4ik/7pANt6GaXz+vK3VeuLPAUBEFVFAEbIEnMQAvNJbUpivo5a623miWV
+	 iluUJYaaQSpjw==
+Date: Wed, 15 Oct 2025 17:12:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 5/5] net: stmmac: rename stmmac_phy_setup() to
- include phylink
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	=?utf-8?B?w4FsdmFybyBGZXJuw6FuZGV6?= Rojas <noltari@gmail.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: dsa: tag_brcm: legacy: fix untagged rx on
+ unbridged ports for bcm63xx
+Message-ID: <aO_H6187Oahh24IX@horms.kernel.org>
+References: <20251015070854.36281-1-jonas.gorski@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1v945d-0000000Ameh-3Bs7@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 15 Oct 2025 17:11:01 +0100
+In-Reply-To: <20251015070854.36281-1-jonas.gorski@gmail.com>
 
-stmmac_phy_setup() does not set up any PHY, but does setup phylink.
-Rename this function to stmmac_phylink_setup() to reflect more what
-it is doing.
+On Wed, Oct 15, 2025 at 09:08:54AM +0200, Jonas Gorski wrote:
+> The internal switch on BCM63XX SoCs will unconditionally add 802.1Q VLAN
+> tags on egress to CPU when 802.1Q mode is enabled. We do this
+> unconditionally since commit ed409f3bbaa5 ("net: dsa: b53: Configure
+> VLANs while not filtering").
+> 
+> This is fine for VLAN aware bridges, but for standalone ports and vlan
+> unaware bridges this means all packets are tagged with the default VID,
+> which is 0.
+> 
+> While the kernel will treat that like untagged, this can break userspace
+> applications processing raw packets, expecting untagged traffic, like
+> STP daemons.
+> 
+> This also breaks several bridge tests, where the tcpdump output then
+> does not match the expected output anymore.
+> 
+> Since 0 isn't a valid VID, just strip out the VLAN tag if we encounter
+> it, unless the priority field is set, since that would be a valid tag
+> again.
+> 
+> Fixes: 964dbf186eaa ("net: dsa: tag_brcm: add support for legacy tags")
+> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+...
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 500cfd19e6b5..c9fa965c8566 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1185,7 +1185,7 @@ static int stmmac_init_phy(struct net_device *dev)
- 	return 0;
- }
- 
--static int stmmac_phy_setup(struct stmmac_priv *priv)
-+static int stmmac_phylink_setup(struct stmmac_priv *priv)
- {
- 	struct stmmac_mdio_bus_data *mdio_bus_data;
- 	struct phylink_config *config;
-@@ -7642,7 +7642,7 @@ int stmmac_dvr_probe(struct device *device,
- 	if (ret)
- 		goto error_pcs_setup;
- 
--	ret = stmmac_phy_setup(priv);
-+	ret = stmmac_phylink_setup(priv);
- 	if (ret) {
- 		netdev_err(ndev, "failed to setup phy (%d)\n", ret);
- 		goto error_phy_setup;
--- 
-2.47.3
+> @@ -237,8 +239,14 @@ static struct sk_buff *brcm_leg_tag_rcv(struct sk_buff *skb,
+>  	if (!skb->dev)
+>  		return NULL;
+>  
+> -	/* VLAN tag is added by BCM63xx internal switch */
+> -	if (netdev_uses_dsa(skb->dev))
+> +	/* The internal switch in BCM63XX SoCs will add a 802.1Q VLAN tag on
+> +	 * egress to the CPU port for all packets, regardless of the untag bit
+> +	 * in the VLAN table.  VID 0 is used for untagged traffic on unbridged
+> +	 * ports and vlan unaware bridges. If we encounter a VID 0 tagged
+> +	 * packet, we know it is supposed to be untagged, so strip the VLAN
+> +	 * tag as well in that case.
 
+Maybe it isn't important, but here it is a TCI 0 that is being checked:
+VID 0, PCP 0, and DEI 0.
+
+> +	 */
+> +	if (proto[0] == htons(ETH_P_8021Q) && proto[1] == 0)
+>  		len += VLAN_HLEN;
+>  
+>  	/* Remove Broadcom tag and update checksum */
+> 
+> base-commit: 7f0fddd817ba6daebea1445ae9fab4b6d2294fa8
+> -- 
+> 2.43.0
+> 
 
