@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-229486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACFCBBDCDBA
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 09:16:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51135BDCDAE
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 09:16:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0CE63AD434
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 07:15:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 998FD19A4FC9
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 07:16:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595F831353C;
-	Wed, 15 Oct 2025 07:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF9B31281E;
+	Wed, 15 Oct 2025 07:15:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q0dNwlcb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CQ3+j/rL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324ED2153E7;
-	Wed, 15 Oct 2025 07:15:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2E32153E7;
+	Wed, 15 Oct 2025 07:15:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760512533; cv=none; b=l3sb+EYef3i2OE1PiQGKSJzfMcd2hlK8H0vCIR6Ch8Iz6R8q5GMWzHEjta/A8yVZbUp8uwTwDbFjKELwzATkuxkPsBy++9Xqv0fF+ASlr4m6WEkqadTyxfw+KaIGl+txlyamLte6lZnRC2Ga7JNoCgzCasws5DHbMIw8cGZ5dzg=
+	t=1760512537; cv=none; b=fdVaE1oNYFbhENCDN777WfS/DXmCma8Zo5l0lQeDANnqhspbFkJraPJ5wjStYUuW2fxw2HBHSGkgCeqGS5fsv1bbXFUop0Z3PZjBV1SiZgpG4fpz1Ii5KamYHu4/WsBJWAyo4wUuyzqIEgzMGpw+Xre1gzMIwlnpEQIoVv4O1PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760512533; c=relaxed/simple;
-	bh=m9aUxWoOvf6KxhNOwsEC/YLVISuan8Zpc3IMwKpcPLg=;
+	s=arc-20240116; t=1760512537; c=relaxed/simple;
+	bh=Evnl21vrZtWSZfim1BEaHg8W/MkovgamjiTZHLmL3Ac=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=sI1xbSkdUwLxqQnJvkAHpK4km+ZXeMZkXLKsNNTE3sfN0yKgwVNlLGt5lgJXnTLK5wpwoesqAdzKi5+BM8PKPVK/l8kpTOYgclUVbWmu8rnaJIlWDhy5e3KXWuXBEvAjVtIzETYT78hhrq/cx05H6JVSN5ziXvoREtDUcan4/Zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q0dNwlcb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A4D8C4CEF8;
-	Wed, 15 Oct 2025 07:15:32 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=oiE2CvoJiHdMd0j/Sj38Ht1aRSGLf7l1nZXIzt6I1RjPS+rX1ELRk3HhYNoM39vLlrqKQst4ibcQySV2Nn4YTs8uhJiq61DymbZyWjaoH6boQKl8sSL3AAYLp87frzdgD+QA+o76fmeUzySSwxEZZ06U8pZ1ovSKNOWb8DkQcGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CQ3+j/rL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9356C4CEFE;
+	Wed, 15 Oct 2025 07:15:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760512532;
-	bh=m9aUxWoOvf6KxhNOwsEC/YLVISuan8Zpc3IMwKpcPLg=;
+	s=k20201202; t=1760512536;
+	bh=Evnl21vrZtWSZfim1BEaHg8W/MkovgamjiTZHLmL3Ac=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=q0dNwlcbwLeRfQbHmwNUQuOVIEz0SSc3fW19SV0NNPH2zBaRq3+zOXcQK7UfMvyCK
-	 cKObj1tMVXU1k9bk7EpcS1C30UFPDW8lsKuMt9B7rQiCnwA+eizME5MCpMRnEh1Fda
-	 rxXuk+Hqi2pYnb2l5UUI8g/hG8rZiMRUvkr/XHLzsNMSyoK4G2E0ktd/D5PqgcgaRD
-	 E6Ye0jn79yMVYMkZIyjiTiMWQMNPCBvdBFNNvJzcFjT9gxgl9kNxqA9NkaOtmLfPzD
-	 i77Jsz7KYi8ASHaCp4GtPDgtMZ2k+s/fpNzkB6o+ZVTaeP8/LSqVEqVAX8F0bs/TbQ
-	 yf5jQNQx5Rhcg==
+	b=CQ3+j/rLKZX6EdUpqOj0pJ8BZJu0ds7t+t4UYbbfuVYfoCrGpBHFcFP1j0y+RN/xI
+	 93GiMblJhmoDqMoo8HuF33pi/hZv0opHnzE2G3EmXcudD+gW/nPtKX8HGajNZY2VB6
+	 yd0ad6zK5orMrBRn6paDPl9bquQ3NqBt6e4TRpTXfCMBPl7zrB8S1tFPJ0lYx2LZFa
+	 +hupH/gRbNgdU6qlGoGlzrtYgawSoiv8hGYu0Onb2FtdU61Oolz+A7Cuk3/AYpMgCF
+	 Y8bF54HUn3AdHrExyHMDko8Zj3BXV6m9wv6zhRYHtnkross5n1CrW6EJMGFlvRSUAJ
+	 0OCR+yHVirPTg==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Wed, 15 Oct 2025 09:15:01 +0200
-Subject: [PATCH net-next 01/12] dt-bindings: net: airoha: Add AN7583
- support
+Date: Wed, 15 Oct 2025 09:15:02 +0200
+Subject: [PATCH net-next 02/12] net: airoha: ppe: Dynamically allocate
+ foe_check_time array in airoha_ppe struct
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251015-an7583-eth-support-v1-1-064855f05923@kernel.org>
+Message-Id: <20251015-an7583-eth-support-v1-2-064855f05923@kernel.org>
 References: <20251015-an7583-eth-support-v1-0-064855f05923@kernel.org>
 In-Reply-To: <20251015-an7583-eth-support-v1-0-064855f05923@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -67,104 +67,44 @@ Cc: linux-arm-kernel@lists.infradead.org,
  devicetree@vger.kernel.org
 X-Mailer: b4 0.14.2
 
-Introduce AN7583 ethernet controller support to Airoha EN7581
-device-tree bindings. The main difference between EN7581 and AN7583 is
-the number of reset lines required by the controller (AN7583 does not
-require hsi-mac).
+This is a preliminary patch to properly enable PPE support for AN7583
+SoC.
 
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- .../devicetree/bindings/net/airoha,en7581-eth.yaml | 60 ++++++++++++++++++----
- 1 file changed, 51 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/airoha/airoha_eth.h | 2 +-
+ drivers/net/ethernet/airoha/airoha_ppe.c | 5 +++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-index 6d22131ac2f9e28390b9e785ce33e8d983eafd0f..7b258949a76d5c603a8e66e181895c4a4ae95db8 100644
---- a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-+++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-@@ -17,6 +17,7 @@ properties:
-   compatible:
-     enum:
-       - airoha,en7581-eth
-+      - airoha,an7583-eth
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index cd13c1c1224f64b63d455b24ce722c33c2fa7125..4330b672d99e1e190efa5ad75d13fb35e77d070e 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -554,7 +554,7 @@ struct airoha_ppe {
+ 	struct rhashtable l2_flows;
  
-   reg:
-     items:
-@@ -44,18 +45,12 @@ properties:
-       - description: PDMA irq
+ 	struct hlist_head *foe_flow;
+-	u16 foe_check_time[PPE_NUM_ENTRIES];
++	u16 *foe_check_time;
  
-   resets:
-+    minItems: 7
-     maxItems: 8
+ 	struct airoha_foe_stats *foe_stats;
+ 	dma_addr_t foe_stats_dma;
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+index 691361b254075555549ee80a4ed358c52e8e00b2..8d1dceadce0becb2b1ce656d64ab77bd3c2f914a 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+@@ -1440,6 +1440,11 @@ int airoha_ppe_init(struct airoha_eth *eth)
+ 			return -ENOMEM;
+ 	}
  
-   reset-names:
--    items:
--      - const: fe
--      - const: pdma
--      - const: qdma
--      - const: xsi-mac
--      - const: hsi0-mac
--      - const: hsi1-mac
--      - const: hsi-mac
--      - const: xfp-mac
-+    minItems: 7
-+    maxItems: 8
- 
-   memory-region:
-     items:
-@@ -81,6 +76,53 @@ properties:
-       interface to implement hardware flow offloading programming Packet
-       Processor Engine (PPE) flow table.
- 
-+allOf:
-+  - $ref: ethernet-controller.yaml#
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - airoha,en7581-eth
-+    then:
-+      properties:
-+        resets:
-+          minItems: 8
-+          maxItems: 8
++	ppe->foe_check_time = devm_kzalloc(eth->dev, PPE_NUM_ENTRIES,
++					   GFP_KERNEL);
++	if (!ppe->foe_check_time)
++		return -ENOMEM;
 +
-+        reset-names:
-+          items:
-+            - const: fe
-+            - const: pdma
-+            - const: qdma
-+            - const: xsi-mac
-+            - const: hsi0-mac
-+            - const: hsi1-mac
-+            - const: hsi-mac
-+            - const: xfp-mac
-+
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - airoha,an7583-eth
-+    then:
-+      properties:
-+        resets:
-+          minItems: 7
-+          maxItems: 7
-+
-+        reset-names:
-+          items:
-+            - const: fe
-+            - const: pdma
-+            - const: qdma
-+            - const: xsi-mac
-+            - const: hsi0-mac
-+            - const: hsi1-mac
-+            - const: xfp-mac
-+
- patternProperties:
-   "^ethernet@[1-4]$":
-     type: object
+ 	err = rhashtable_init(&eth->flow_table, &airoha_flow_table_params);
+ 	if (err)
+ 		return err;
 
 -- 
 2.51.0
