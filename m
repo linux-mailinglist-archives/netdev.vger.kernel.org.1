@@ -1,188 +1,138 @@
-Return-Path: <netdev+bounces-229732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF19FBE04E4
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:08:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2B94BE0544
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 21:13:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 31C3434DD5A
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:08:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4483428360
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 19:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2BE2FFFA9;
-	Wed, 15 Oct 2025 19:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2F6C303A02;
+	Wed, 15 Oct 2025 19:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="R5+qCEZN"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="nmA9wUyY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A44530147D
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 19:07:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D444325480;
+	Wed, 15 Oct 2025 19:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760555281; cv=none; b=SyT6HghXkGu9Y5/xb3JseVqxCoKueZqZonXt7sEIXAjQOpJVKzFs05VDST0aviRKsam/g4KP8vs5pWPEVaU23rRvcva0c/v+BiTTaAZjR1DECvIGpWaSjSFeHrAiZ9ku5bwabHHQiLaviPRDU9/dBIqvPKqIKmKguUUgX6hZ6UQ=
+	t=1760555623; cv=none; b=gY10llcy/+D8p0HgW7RYgr2bipP1wWf4Ddy/UamhP0enskIcN7aiOlBP8Bg8KrjNkZ702WLM+syBAKmwtQGH6f4z7dGVjreQSNwOfIGxKW+Xppia69S+BR2oUfAd79WhJ+NOD8vmxElRvBRmeethZ0aNkTLY4VgIpBODzq67U6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760555281; c=relaxed/simple;
-	bh=V5o7oTzOVcQJ/Gas3z9lx3yHQO2sMAoJQxu+rRpX9VQ=;
+	s=arc-20240116; t=1760555623; c=relaxed/simple;
+	bh=vSb4mrhFemKGqe3wwEhmxVv3m7IlnmCRLSwmub2K9+g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tJyEcRHN+/6DscMfEFuQtKG+eNw05NC3HnGKP22Mr+rzfGsybD2rqmpg1syzxUXobJBoxlngUg7FAFjXwYzX8oxJoRtmS8VVKVqQVBzCYbqZmuHa38GUaT6ekkgsgrw4A1z4SfAHsPjoc++rkWhgVBNzuOwuseJgC2nim2loywc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=R5+qCEZN; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <fa80d5a7-790d-4f10-bef3-f5c708218f83@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760555267;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0TI4ZvsdGzDFEn+JWtlN+CHhtrYWknXZWp4+S+IvRVA=;
-	b=R5+qCEZNax7d7nBIspj7fyDmCarIU2s/nhVV5lZs4tYs9yHs1uk+F0fFCub1DIksxaqrRl
-	XTZatvuEE5CIG5YcXULxbXtq6MwyMa/IJ8ky9s+tGEaAu+ehdf73Lq0LoXAY0EpHV0FvZ6
-	AtSaAEiQGUPM8KhfJG9vVMJg/vq6Fes=
-Date: Wed, 15 Oct 2025 12:07:38 -0700
+	 In-Reply-To:Content-Type; b=LUC9Eop+kqb/wyZojPA4GgNyz/dwBUgqx21FXM/mjojqVSUZLlMUtx4A3hABksneDiUbDfCrPPfkN1FKqeBZ5flGexkiA8HM/9BNxQn8cqThOmLFIF4EREl62GwZaK5ghfx7lk9E6Zhg9GwM5yBF7PxmLhxi6JjCv1AmQr5UVM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=nmA9wUyY; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=XG6SLsUlqGKped8qznvDiJBkM1uZY8YiRJu4fS2D3rs=; b=nmA9wUyYRUbdz8ASRiRlXirT4A
+	PomfmYDjTJNuz1tKbGZTCRUINIAQ+3LNjGwcGaMBrn+0voFeOePQ5ltSe+ywqNeAt/U1UjfopH2WQ
+	ozVEIHNztLNCEipRanG3voLhimH5tFVDgD0P4Qt1MBpZ9dR9d19F7FECntBkCrTrCvTRN+j7Km/0g
+	sGl4gpCphsgaN17t5KdNdEByzVuQ9LC5cXYj2iM2tCnXxrJCtKOkpks+hB2/Krl2gs4AOuRH6JOz1
+	vN6hDuwVOZETHYIpbfcwMtDtQTNuTjpN2sa45NsKSwUy9p7Q5wE8q+qyewWNQ8qDV6rQmTSPUCEe2
+	VZ/6TBeg==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1v96wC-0009kC-1y;
+	Wed, 15 Oct 2025 21:13:28 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1v96wB-0007So-1e;
+	Wed, 15 Oct 2025 21:13:27 +0200
+Message-ID: <90793a62-83c2-4a49-adbb-ab45dced76fc@iogearbox.net>
+Date: Wed, 15 Oct 2025 21:13:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 bpf-next/net 6/6] selftest: bpf: Add test for
- sk->sk_bypass_prot_mem.
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
- Mina Almasry <almasrymina@google.com>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20251014235604.3057003-1-kuniyu@google.com>
- <20251014235604.3057003-7-kuniyu@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot ci] Re: netkit: Support for io_uring zero-copy and AF_XDP
+To: syzbot ci <syzbot+ci7c73a60f40f79ce2@syzkaller.appspotmail.com>,
+ bpf@vger.kernel.org, davem@davemloft.net, dw@davidwei.uk,
+ john.fastabend@gmail.com, jordan@jrife.io, kuba@kernel.org,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
+ martin.lau@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ razor@blackwall.org, sdf@fomichev.me, toke@redhat.com,
+ wangdongdong.6@bytedance.com, willemb@google.com, yangzhenze@bytedance.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+References: <68efec17.050a0220.91a22.02ca.GAE@google.com>
 Content-Language: en-US
-In-Reply-To: <20251014235604.3057003-7-kuniyu@google.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <68efec17.050a0220.91a22.02ca.GAE@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Virus-Scanned: Clear (ClamAV 1.0.9/27793/Wed Oct 15 11:29:40 2025)
 
-On 10/14/25 4:54 PM, Kuniyuki Iwashima wrote:
-> +static int tcp_create_sockets(struct test_case *test_case, int sk[], int len)
-> +{
-> +	int server, i, err = 0;
-> +
-> +	server = start_server(test_case->family, test_case->type, NULL, 0, 0);
-> +	if (!ASSERT_GE(server, 0, "start_server_str"))
-> +		return server;
-> +
-> +	/* Keep for-loop so we can change NR_SOCKETS easily. */
-> +	for (i = 0; i < len; i += 2) {
-> +		sk[i] = connect_to_fd(server, 0);
-> +		if (sk[i] < 0) {
-> +			ASSERT_GE(sk[i], 0, "connect_to_fd");
-> +			err = sk[i];
-> +			break;
-> +		}
-> +
-> +		sk[i + 1] = accept(server, NULL, NULL);
-> +		if (sk[i + 1] < 0) {
-> +			ASSERT_GE(sk[i + 1], 0, "accept");
-> +			err = sk[i + 1];
-> +			break;
-> +		}
-> +	}
-> +
-> +	close(server);
-> +
-> +	return err;
-> +}
-> +
+On 10/15/25 8:46 PM, syzbot ci wrote:
+> syzbot ci has tested the following series
+[...]
+> WARNING: CPU: 1 PID: 5959 at ./include/net/netdev_lock.h:17 netdev_assert_locked include/net/netdev_lock.h:17 [inline]
+> WARNING: CPU: 1 PID: 5959 at ./include/net/netdev_lock.h:17 netif_get_rx_queue_peer_locked+0x2f1/0x3a0 net/core/netdev_rx_queue.c:71
+[...]
+>   <TASK>
+>   xsk_reg_pool_at_qid+0x20b/0x630 net/xdp/xsk.c:159
 
-> +static int check_bypass(struct test_case *test_case,
-> +			struct sk_bypass_prot_mem *skel, bool bypass)
-> +{
-> +	char buf[BUF_SINGLE] = {};
-> +	long memory_allocated[2];
-> +	int sk[NR_SOCKETS] = {};
-> +	int err, i, j;
-> +
-> +	err = test_case->create_sockets(test_case, sk, ARRAY_SIZE(sk));
-> +	if (err)
-> +		goto close;
-> +
-> +	memory_allocated[0] = test_case->get_memory_allocated(test_case, skel);
-> +
-> +	/* allocate pages >= NR_PAGES */
-> +	for (i = 0; i < ARRAY_SIZE(sk); i++) {
-> +		for (j = 0; j < NR_SEND; j++) {
-> +			int bytes = send(sk[i], buf, sizeof(buf), 0);
-> +
-> +			/* Avoid too noisy logs when something failed. */
-> +			if (bytes != sizeof(buf)) {
-> +				ASSERT_EQ(bytes, sizeof(buf), "send");
-> +				if (bytes < 0) {
-> +					err = bytes;
-> +					goto drain;
-> +				}
-> +			}
-> +		}
-> +	}
-> +
-> +	memory_allocated[1] = test_case->get_memory_allocated(test_case, skel);
-> +
-> +	if (bypass)
-> +		ASSERT_LE(memory_allocated[1], memory_allocated[0] + 10, "bypass");
-> +	else
-> +		ASSERT_GT(memory_allocated[1], memory_allocated[0] + NR_PAGES, "no bypass");
-> +
-> +drain:
-> +	if (test_case->type == SOCK_DGRAM) {
-> +		/* UDP starts purging sk->sk_receive_queue after one RCU
-> +		 * grace period, then udp_memory_allocated goes down,
-> +		 * so drain the queue before close().
-> +		 */
-> +		for (i = 0; i < ARRAY_SIZE(sk); i++) {
-> +			for (j = 0; j < NR_SEND; j++) {
-> +				int bytes = recv(sk[i], buf, 1, MSG_DONTWAIT | MSG_TRUNC);
-> +
-> +				if (bytes == sizeof(buf))
-> +					continue;
-> +				if (bytes != -1 || errno != EAGAIN)
-> +					PRINT_FAIL("bytes: %d, errno: %s\n", bytes, strerror(errno));
-> +				break;
-> +			}
-> +		}
-> +	}
-> +
-> +close:
-> +	for (i = 0; i < ARRAY_SIZE(sk); i++) {
-> +		if (sk[i] <= 0)
-
-Theoretically, 0 is a legit fd. The tcp_create_sockets above is also testing 
-ASSERT_GE(sk[i], 0, ...). I changed to test "< 0" here and initialize all sk[] 
-to -1 at the beginning of this function.
-
-> +			break;
-> +
-> +		close(sk[i]);
-> +	}
-> +
-> +	return err;
-> +}
-> +
-
-
-> +struct test_case test_cases[] = {
-
-Added static.
-
-Applied. Thanks.
-
+Hmm, looks like syzkaller tried using batman_adv interface. The lock in the
+xsk path uses netdev_lock_ops() which is why the assert hits. I'll change
+netif_get_rx_queue_peer_locked() to check for netdev_need_ops_lock() in v3.
 
