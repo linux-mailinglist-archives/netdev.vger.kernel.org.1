@@ -1,166 +1,156 @@
-Return-Path: <netdev+bounces-229557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E9FEBDE0D2
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 12:38:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92190BDE101
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 12:40:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EE10424564
-	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 10:38:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A5173A2509
+	for <lists+netdev@lfdr.de>; Wed, 15 Oct 2025 10:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23C89315D59;
-	Wed, 15 Oct 2025 10:38:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C329531BC99;
+	Wed, 15 Oct 2025 10:40:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hIDXSBE+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1pEoY+yP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0710330CD97
-	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 10:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0648231B11C
+	for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 10:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760524725; cv=none; b=fuIy3+EB4RoDk7SiH9yE+BqKupVj1Dy66An+fC1PqusvdA5jchYQAXUdvI+QbGdYlFoc0Agw85UJs5BmZ73MAJayX3sjI6YXEN7CUkFrVjKzFFxvH6iI/opqdqs7lXM56+2t6DXUjPiKZ812Tg55nMzaRKjnA87a7Ytj3fjvyH8=
+	t=1760524847; cv=none; b=eq5pQxRsqBFa9ByE7ydEERpG2e77qGFnFIlT9Dm/HZ3RaV7dQeEKEXT12Gej9s67ICMZqX9PPM8tDO2Dy7BLWEpALaGrnCbgtOiA78LFAYmGRoUssWlC9g4QrKeQIS6BXPS8w35sE4iZp1Hd1GqgTLOaRYPNzlPc5ips0DmILTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760524725; c=relaxed/simple;
-	bh=2qJmSFWgOw4h6lyZBlQuw0qo+KUbnt4yk4wDPEPqL5w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lz9/YCcRI7kJO2/WQgfK1rXrM+FeS81D2Emha5oslcHfV48FszO9Qq4W7GfNPzub+vhmo9L2HtJuV/himFdC88A8zmmEJfmdDOeuuxx859HrI7gSe5uQ/SxabBrvVDDNFo1vN92nr4Ah3kDwk+Mqzq3wIH0QW9VUuEsFJBVfueg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hIDXSBE+; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d160e924-dee1-46b9-8d24-71c3d9c00ea1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760524721;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jSy/yOO1QQAxVNmZJpZIeg62gLnzCPSUzpyphy2PrfA=;
-	b=hIDXSBE+aK6/SPy48QH2BnznUkIpPPQL1XDMDLuIIN7FslzO9FZnABnlVXldTPm7F4kXCp
-	XozGshCIbr/z90NMZSFPvZBrvlhXzeZA//SamRZbgVqpPqCJkBjA1IJDoUmoEhvnn7dqro
-	F45EI1TILKHDs9bmWnR5WPCPE56CDf8=
-Date: Wed, 15 Oct 2025 11:38:34 +0100
+	s=arc-20240116; t=1760524847; c=relaxed/simple;
+	bh=J3keoaIKR6jiGAqY3loIQe49C02ju3/VcU8EQo5I3NY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N++odzmfchsiKNZryoaFHYRrBM9yTo0osE6KY4LaPyzsHPw7uz62jVr4kultW3lmw82vyaxSz6+JQu1Wau7iomojP4zbY4WhGEU9uhQ7o3DUY+wcQKZ9uC98NH9rSE1rkVwpc715RVkVG4W6mf+xSp5MLPZuEMoeE8EB0oYGIEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1pEoY+yP; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-862cbf9e0c0so807018385a.0
+        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 03:40:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760524845; x=1761129645; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n0C67Rez8jNbQi/FTuBuwdBEEDVIvW5Ga9c16aQCFpE=;
+        b=1pEoY+yPXy2R5ejKFaa1w/qbhpgbe900Igr9BkcdfIoLK1ScO/DHf56dUnevi1KNSw
+         9/JCsnhBpSGI39Aws+YPMr5ha2Z4GJYBMPbxdKOcvfmb85EradyYa1ZFVXxYy1CpIXIX
+         +ijFoE5XZEpQZMjs4MYtp1vSriDThOcaA4jND7vLkI9Lo7e3JUUY9winf64cZ5foM+bx
+         8UF1wLnt1BZ6lO6gfqVNKNFlDDJ1ca3RbzKGZrbU3Hnsm/2D4F6SZJpRvBVnZMC6PYjN
+         C5Si/IHajsMbly3APskzLHf4HMWx3RVsI9xLSFFBZVG1oFAmhM3wByXi+FacbqwfnEnp
+         Ae+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760524845; x=1761129645;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=n0C67Rez8jNbQi/FTuBuwdBEEDVIvW5Ga9c16aQCFpE=;
+        b=BmhqM0LFWbOpBIFOh2YZMRkYUo2tiSTZFAAVNvm5lpNcGRj54xxk0/3TeKTwFAdvGR
+         tb/ezaloIkjPZOw2PG3PI+uADzBPcmPvHn/JG8OD6MOp+Uq2adsHERFaEi+iQ/K9Ofen
+         XiMZcOG3XBnZgL1q2meTxl2HdxBPuRZi3mLobbdIS9QXko5bdQOtQQKbLBkObuB/msZC
+         pGGkNbMOHudyJyFEdAgXuglpPckm4IWrg4uk66bvaX3Iic85sqVuWWhWtsaO+tlfCkNV
+         RCDUGaRz3plkIdq+LVh1gI0/xDweVtQzs1ppm0z9qY1Ubj2Miln+T5YxhchNdz+Khkxx
+         cG5g==
+X-Forwarded-Encrypted: i=1; AJvYcCWZmUu220k+Wi61WmCesspLGyPPg6yTFsxhD7+GH0WR5+5wtn39HsxnU78Mths9NPgyIUchyd8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVtFBbLQZ1ljc7MffXxK/X7Q6S/PmXAi0AVQcDKs4rEMkZHJYQ
+	bBIYZPXZE9Ih8agRP690a+u9m1bEhwwUBsBuci/lij8cHvljlej1DM619P8KxkvUy+jGeBh18rf
+	0LeyD/rmeN2Pxy9UZHgW5M2giY9GDVYRVKSSYGex0
+X-Gm-Gg: ASbGncvXN4N3qhBww94WA7qiZncQ7O/khqgnJYVSDcNtfV9xQsX3Yn6/wi1kyULiuuq
+	CHpjj2vglx2QH89fymC9dWfcsFhREAs5ybrRFJFemctit3v3a0fg8znQNcOpOulI9SdmrKBWFTz
+	BcWCNclwFny8EgKD+IqkQEnyEn9ZatJrl/fCAQBZwNjVzzQZxwbHrDSdZRB0p2SfucOVgohD661
+	uXy4AJxZszKD3fAZE9Bf1/X3xi+ta/M9A==
+X-Google-Smtp-Source: AGHT+IFpKiB8l5sJXgqXrxFIDHsEAdxSp5hBT8fr88c6BsttKayM9LMDHyRVDEWhht18AqHem6pvE5WJNEYxAaTUh4Y=
+X-Received: by 2002:ac8:5a0a:0:b0:4e8:8a5e:6dbf with SMTP id
+ d75a77b69052e-4e88a5e712dmr10420031cf.83.1760524844485; Wed, 15 Oct 2025
+ 03:40:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 6/7] tsnep: convert to ndo_hwtstatmp API
-To: Simon Horman <horms@kernel.org>
-Cc: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Egor Pomozov <epomozov@marvell.com>, Potnuri Bharat Teja
- <bharat@chelsio.com>, Dimitris Michailidis <dmichail@fungible.com>,
- MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
-References: <20251014224216.8163-1-vadim.fedorenko@linux.dev>
- <20251014224216.8163-7-vadim.fedorenko@linux.dev>
- <aO9xf0gW9F0qsaCz@horms.kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <aO9xf0gW9F0qsaCz@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20251015101417.1511732-1-wangliang74@huawei.com>
+In-Reply-To: <20251015101417.1511732-1-wangliang74@huawei.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 15 Oct 2025 03:40:33 -0700
+X-Gm-Features: AS18NWD7kex-EyZWDoaEndbSnHbz2_cerLFXLa6_UQRwZL16Wzh9UttwcoHnbxI
+Message-ID: <CANn89iLZBMWpU7kMjd8akT+L8FbsnO+wqgjCaXF2KOCFz9Hiag@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next] net: drop_monitor: Add debugfs support
+To: Wang Liang <wangliang74@huawei.com>
+Cc: nhorman@tuxdriver.com, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, yuehaibing@huawei.com, 
+	zhangchangzhong@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 15/10/2025 11:03, Simon Horman wrote:
-> On Tue, Oct 14, 2025 at 10:42:15PM +0000, Vadim Fedorenko wrote:
->> Convert to .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
->> After conversions the rest of tsnep_netdev_ioctl() becomes pure
->> phy_do_ioctl_running(), so remove tsnep_netdev_ioctl() and replace
->> it with phy_do_ioctl_running() in .ndo_eth_ioctl.
->>
->> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> 
-> ...
-> 
->> diff --git a/drivers/net/ethernet/engleder/tsnep_ptp.c b/drivers/net/ethernet/engleder/tsnep_ptp.c
->> index 54fbf0126815..ae1308eb813d 100644
->> --- a/drivers/net/ethernet/engleder/tsnep_ptp.c
->> +++ b/drivers/net/ethernet/engleder/tsnep_ptp.c
->> @@ -19,57 +19,53 @@ void tsnep_get_system_time(struct tsnep_adapter *adapter, u64 *time)
->>   	*time = (((u64)high) << 32) | ((u64)low);
->>   }
->>   
->> -int tsnep_ptp_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
->> +int tsnep_ptp_hwtstamp_get(struct net_device *netdev,
->> +			   struct kernel_hwtstamp_config *config)
->>   {
->>   	struct tsnep_adapter *adapter = netdev_priv(netdev);
->> -	struct hwtstamp_config config;
->> -
->> -	if (!ifr)
->> -		return -EINVAL;
->> -
->> -	if (cmd == SIOCSHWTSTAMP) {
->> -		if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
->> -			return -EFAULT;
->> -
->> -		switch (config.tx_type) {
->> -		case HWTSTAMP_TX_OFF:
->> -		case HWTSTAMP_TX_ON:
->> -			break;
->> -		default:
->> -			return -ERANGE;
->> -		}
->> -
->> -		switch (config.rx_filter) {
->> -		case HWTSTAMP_FILTER_NONE:
->> -			break;
->> -		case HWTSTAMP_FILTER_ALL:
->> -		case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
->> -		case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
->> -		case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
->> -		case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
->> -		case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
->> -		case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
->> -		case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
->> -		case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
->> -		case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
->> -		case HWTSTAMP_FILTER_PTP_V2_EVENT:
->> -		case HWTSTAMP_FILTER_PTP_V2_SYNC:
->> -		case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
->> -		case HWTSTAMP_FILTER_NTP_ALL:
->> -			config.rx_filter = HWTSTAMP_FILTER_ALL;
->> -			break;
->> -		default:
->> -			return -ERANGE;
->> -		}
-> 
-> Hi Vadim,
-> 
-> I'm probably missing something obvious, but it's not clear to me why
-> removing the inner switch statements above is ok. Or, perhaps more to the
-> point, it seems inconsistent with other patches in this series.
-> 
-> OTOH, I do see why dropping the outer if conditions makes sense.
+On Wed, Oct 15, 2025 at 2:51=E2=80=AFAM Wang Liang <wangliang74@huawei.com>=
+ wrote:
+>
+> This patch add debugfs interfaces for drop monitor. Similar to kmemleak, =
+we
+> can use the monitor by below commands:
+>
+>   echo clear > /sys/kernel/debug/drop_monitor/trace
+>   echo start > /sys/kernel/debug/drop_monitor/trace
+>   echo stop  > /sys/kernel/debug/drop_monitor/trace
+>   cat /sys/kernel/debug/drop_monitor/trace
+>
+> The trace skb number limit can be set dynamically:
+>
+>   cat /sys/kernel/debug/drop_monitor/trace_limit
+>   echo 200 > /sys/kernel/debug/drop_monitor/trace_limit
+>
+> Compare to original netlink method, the callstack dump is supported. Ther=
+e
+> is a example for received udp packet with error checksum:
+>
+>   reason   : UDP_CSUM (11)
+>   pc       : udp_queue_rcv_one_skb+0x14b/0x350
+>   len      : 12
+>   protocol : 0x0800
+>   stack    :
+>     sk_skb_reason_drop+0x8f/0x120
+>     udp_queue_rcv_one_skb+0x14b/0x350
+>     udp_unicast_rcv_skb+0x71/0x90
+>     ip_protocol_deliver_rcu+0xa6/0x160
+>     ip_local_deliver_finish+0x90/0x100
+>     ip_sublist_rcv_finish+0x65/0x80
+>     ip_sublist_rcv+0x130/0x1c0
+>     ip_list_rcv+0xf7/0x130
+>     __netif_receive_skb_list_core+0x21d/0x240
+>     netif_receive_skb_list_internal+0x186/0x2b0
+>     napi_complete_done+0x78/0x190
+>     e1000_clean+0x27f/0x860
+>     __napi_poll+0x25/0x1e0
+>     net_rx_action+0x2ca/0x330
+>     handle_softirqs+0xbc/0x290
+>     irq_exit_rcu+0x90/0xb0
+>
+> It's more friendly to use and not need user application to cooperate.
+> Furthermore, it is easier to add new feature. We can add reason/ip/port
+> filter by debugfs parameters, like ftrace, rather than netlink msg.
 
-I believe it's just a question for git diff. It replaces original
-tsnep_ptp_ioctl() function with get() callback. The only thing that new 
-function does is copying actual config into reply.
+I do not understand the fascination with net/core/drop_monitor.c,
+which looks very old school to me,
+and misses all the features,  flexibility, scalability  that 'perf',
+eBPF tracing, bpftrace, .... have today.
 
-The switch statement goes to set() callback where the logic is kept as
-is. Original tsnep_ptp_ioctl() was serving both get and set operations,
-but the logic was applied to set operation only.
+Adding  /sys/kernel/debug/drop_monitor/* is even more old school.
 
-> 
->> -
->> -		memcpy(&adapter->hwtstamp_config, &config,
->> -		       sizeof(adapter->hwtstamp_config));
->> +
->> +	*config = adapter->hwtstamp_config;
->> +	return 0;
->> +}
-> 
-> ...
+Not mentioning the maintenance burden.
 
+For me the choice is easy :
+
+# CONFIG_NET_DROP_MONITOR is not set
+
+perf record -ag -e skb:kfree_skb sleep 1
+
+perf script # or perf report
 
