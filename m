@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-229974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EDA2BE2C69
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:28:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F604BE2D54
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:37:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 146EB19C7DCB
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:29:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2F4E485BFB
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F94299948;
-	Thu, 16 Oct 2025 10:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04AF2DF6FF;
+	Thu, 16 Oct 2025 10:28:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ikJcBWLv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EvuCcK+t"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6855328607;
-	Thu, 16 Oct 2025 10:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87ECD328607;
+	Thu, 16 Oct 2025 10:28:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760610520; cv=none; b=HGi2w7tEvkhMOFtSh5uy0um7vV89P2QJx8+ZggG1ewG8eCC9kLJ8cdag0cYBMdK6MkP8zcCGlyKZEOQH7HohlM2vQTTlgrohH6Y87r6yMJXeAh/gc1hSQ2SIumrjh4QIHLRw7C+hnUDEGg0SMCBAlYd6nICk1wW6ARXfOq0R/A0=
+	t=1760610523; cv=none; b=ECk+eJjxUulfDJFa+o+9nq/Ij/7o3oZvc/btssTWK3TdchjsuAjnRgw9GCGYwiOyxuEMcvDLLGWUcrH04gHOIC/WeLsxEqIw1k2qB+hrEqjaunyzz3ZeMFNfSdDE1bzsLmZqeg+7Qy2ScIWdkU21MDbdFjzK9LG6BNAB0RVopL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760610520; c=relaxed/simple;
-	bh=m9aUxWoOvf6KxhNOwsEC/YLVISuan8Zpc3IMwKpcPLg=;
+	s=arc-20240116; t=1760610523; c=relaxed/simple;
+	bh=NITHiO1A/cRdExkggxIIRs5P2A4dim+V/Z/R+2/59Zw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=SokZRquLKJhmTBzQbGbbN1odDk/1iQZz0/ygVlK2eqqA9jSLX70cY5PusBzahjL1upQiH/uZu3yvIcqtBJgkMFiygSCNdccI45Ii91oSFEE8uGX6w9iRyY+cOHtUWjKo9Wdcycm15JJJSxUSa5IO2Yizn+OQDleptuaAIZQy7es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ikJcBWLv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9DFDC113D0;
-	Thu, 16 Oct 2025 10:28:39 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Ohsy0e7tKT7ALOVwO7BBgmnZQUgslnJ8lDoJhhTX+fL5Qkj1MipAdV1o8EbFHNg/88C5zZxAMba5oTJFDwQtvfJ+RR9RyBObY7OpCvqYP3hrJUQD1pNwXomYXOxGFGTIXEBmXb/91omgzxYGY5BTAQdnRWB/XjQJiJ4J88Wgevs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EvuCcK+t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D65EC4CEF9;
+	Thu, 16 Oct 2025 10:28:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760610520;
-	bh=m9aUxWoOvf6KxhNOwsEC/YLVISuan8Zpc3IMwKpcPLg=;
+	s=k20201202; t=1760610523;
+	bh=NITHiO1A/cRdExkggxIIRs5P2A4dim+V/Z/R+2/59Zw=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ikJcBWLvDvcIZzbgK5g2pRk8QrztkorF6iYeFB4oLNBIEDRBFANuBsZMdhd8nr90K
-	 Vot59Wg1qkjzOvbRy0XrpLMR9Kxm8QzITFyvqj5wH/ZAORSC9zot3qTNShiAxAOnGH
-	 PIG3l4EA8cAZbxs9sdCl9M1CAEa9XdU47pWABugviZqTXZKyozOfZaL9brqb+dsfqh
-	 GLeUz93U8aYH48qfGcloL8TDaOlseTujhI0yKvj4SngCj4uXnrN52HYC3tdqded07c
-	 DjPGd98KJc22uBtlO/4Dk3DIy7ux82iErEK+IucQzg0VWCA+yV5bGrsaWkDocnvaGa
-	 7TDD3RDAJN6mQ==
+	b=EvuCcK+thh+q6J697mqQ3qV8NAWGloUvDIoH2VYDjy2Dj0fk992/pKEnB6NCma3/P
+	 6ou3zWisUYZIUNUchob7MRBQnbCc8RG488q9zRJJxEJYjO4bQbeUDp7DZ5JumnItYt
+	 dLN7KinqqWUI0ZFsS5icgW/NVHyf5xY+TdNoFD5D/hz5t01UH+AY5UK+u1NS66AchQ
+	 3jqfZZkvDv0MeAl8ZOaElQ3IWw6PC0Opl+wSl/oafrLMATlBDe+SoUmMKgYTFrYWT5
+	 AczAD+B77ttJdwLV/n3QWQoU68fqoPcNxCrPpf+GVNWRCoIybzG6zu3tkOqGVyeE66
+	 HUphycyRazyCg==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Thu, 16 Oct 2025 12:28:15 +0200
-Subject: [PATCH net-next v2 01/13] dt-bindings: net: airoha: Add AN7583
- support
+Date: Thu, 16 Oct 2025 12:28:16 +0200
+Subject: [PATCH net-next v2 02/13] net: airoha: ppe: Dynamically allocate
+ foe_check_time array in airoha_ppe struct
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251016-an7583-eth-support-v2-1-ea6e7e9acbdb@kernel.org>
+Message-Id: <20251016-an7583-eth-support-v2-2-ea6e7e9acbdb@kernel.org>
 References: <20251016-an7583-eth-support-v2-0-ea6e7e9acbdb@kernel.org>
 In-Reply-To: <20251016-an7583-eth-support-v2-0-ea6e7e9acbdb@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -64,107 +64,48 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
  Lorenzo Bianconi <lorenzo@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org, 
  linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org
+ devicetree@vger.kernel.org, Simon Horman <horms@kernel.org>
 X-Mailer: b4 0.14.2
 
-Introduce AN7583 ethernet controller support to Airoha EN7581
-device-tree bindings. The main difference between EN7581 and AN7583 is
-the number of reset lines required by the controller (AN7583 does not
-require hsi-mac).
+This is a preliminary patch to properly enable PPE support for AN7583
+SoC.
 
+Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- .../devicetree/bindings/net/airoha,en7581-eth.yaml | 60 ++++++++++++++++++----
- 1 file changed, 51 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/airoha/airoha_eth.h | 2 +-
+ drivers/net/ethernet/airoha/airoha_ppe.c | 5 +++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-index 6d22131ac2f9e28390b9e785ce33e8d983eafd0f..7b258949a76d5c603a8e66e181895c4a4ae95db8 100644
---- a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-+++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-@@ -17,6 +17,7 @@ properties:
-   compatible:
-     enum:
-       - airoha,en7581-eth
-+      - airoha,an7583-eth
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index cd13c1c1224f64b63d455b24ce722c33c2fa7125..4330b672d99e1e190efa5ad75d13fb35e77d070e 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -554,7 +554,7 @@ struct airoha_ppe {
+ 	struct rhashtable l2_flows;
  
-   reg:
-     items:
-@@ -44,18 +45,12 @@ properties:
-       - description: PDMA irq
+ 	struct hlist_head *foe_flow;
+-	u16 foe_check_time[PPE_NUM_ENTRIES];
++	u16 *foe_check_time;
  
-   resets:
-+    minItems: 7
-     maxItems: 8
+ 	struct airoha_foe_stats *foe_stats;
+ 	dma_addr_t foe_stats_dma;
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+index 691361b254075555549ee80a4ed358c52e8e00b2..8d1dceadce0becb2b1ce656d64ab77bd3c2f914a 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+@@ -1440,6 +1440,11 @@ int airoha_ppe_init(struct airoha_eth *eth)
+ 			return -ENOMEM;
+ 	}
  
-   reset-names:
--    items:
--      - const: fe
--      - const: pdma
--      - const: qdma
--      - const: xsi-mac
--      - const: hsi0-mac
--      - const: hsi1-mac
--      - const: hsi-mac
--      - const: xfp-mac
-+    minItems: 7
-+    maxItems: 8
- 
-   memory-region:
-     items:
-@@ -81,6 +76,53 @@ properties:
-       interface to implement hardware flow offloading programming Packet
-       Processor Engine (PPE) flow table.
- 
-+allOf:
-+  - $ref: ethernet-controller.yaml#
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - airoha,en7581-eth
-+    then:
-+      properties:
-+        resets:
-+          minItems: 8
-+          maxItems: 8
++	ppe->foe_check_time = devm_kzalloc(eth->dev, PPE_NUM_ENTRIES,
++					   GFP_KERNEL);
++	if (!ppe->foe_check_time)
++		return -ENOMEM;
 +
-+        reset-names:
-+          items:
-+            - const: fe
-+            - const: pdma
-+            - const: qdma
-+            - const: xsi-mac
-+            - const: hsi0-mac
-+            - const: hsi1-mac
-+            - const: hsi-mac
-+            - const: xfp-mac
-+
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - airoha,an7583-eth
-+    then:
-+      properties:
-+        resets:
-+          minItems: 7
-+          maxItems: 7
-+
-+        reset-names:
-+          items:
-+            - const: fe
-+            - const: pdma
-+            - const: qdma
-+            - const: xsi-mac
-+            - const: hsi0-mac
-+            - const: hsi1-mac
-+            - const: xfp-mac
-+
- patternProperties:
-   "^ethernet@[1-4]$":
-     type: object
+ 	err = rhashtable_init(&eth->flow_table, &airoha_flow_table_params);
+ 	if (err)
+ 		return err;
 
 -- 
 2.51.0
