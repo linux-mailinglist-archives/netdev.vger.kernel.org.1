@@ -1,113 +1,154 @@
-Return-Path: <netdev+bounces-229952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62ED6BE2C04
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:24:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E18D2BE2C39
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:26:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E626D545D57
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:10:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B162E5E0A37
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89DC32862B;
-	Thu, 16 Oct 2025 10:08:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC532DFF3F;
+	Thu, 16 Oct 2025 10:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="W0MCR+wf"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="h6+kTrqJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD8E328620
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 10:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3DDF32861E;
+	Thu, 16 Oct 2025 10:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760609311; cv=none; b=Umj+r+k0OpuxFCw1SfSg5f1VT+d4EbGPnzBOWm3wIv0tVr46UY7SzQQjJjanx13GUkeAVR+Lv8u7t7NTiSbLdkQgW/otbEdyTcfkrZLehqVA5NDqrJfp2S2gck6IL3hpfn+wcCPvNeONZ3yyvKiblqV3cfu830Cj2CV9tyz4010=
+	t=1760609338; cv=none; b=n1buq1ZbVteXJjzsIERPY2i5Vv00KOgjUo+S7lW15uULU/CU5sWGcWZu7umWMPs+2yDFWFgmgFjdZHfzjxJit5/nfYPGs5KhERhsYS2msNMf2t4WqmAb5SWWU9k0M1inDp17fTdzbsFxFd0jlFJmQ+7T/1Irvxznd1saoWn3uS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760609311; c=relaxed/simple;
-	bh=iAG+Qsr3wjzsEn7xPqBjjdvU8mNrEK01RZVMASCmXJQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=k+KqVJFq3yXR38YD+QNwsn03pXkYW2ewCl8826bGPnZRpGh47RUifNR27042BmqDB7AmXcL6aWs7mEXwbAEdM8JlV6wS6Ml+r2JwvEoiBa4679mcZEZs3TEr3qVXLIYhaiLlF+J6MLyoSQjrn7aGuMPm84UcxbtCaeRY3Ik7dZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=W0MCR+wf; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b472842981fso70738766b.1
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 03:08:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1760609308; x=1761214108; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iAG+Qsr3wjzsEn7xPqBjjdvU8mNrEK01RZVMASCmXJQ=;
-        b=W0MCR+wfDbMXdyyRrMKTp1cyLb/OBvi58u0nN3mGGm3x1GsjgovaaeHohmH2fe674L
-         suOJEuM/oEB9t/cakVEC66cRGxVwJ+ewZ2Ccoch5BiQUXe1xXdPXGmDTfJZaK1VvFsDX
-         tFyXidXglcCFOS3M85JwbUzAeb8MOdm6c3bFauV76tVsI3yhD3mHVIX6GiaFyxaYja37
-         6b8ig5ZP2iNRYRhZjArjhMTq6hADzsGnLUx2k+mZrC43gFhj2AklD3w3nd1s7bvjivda
-         9ZJP+fYDylEwa7dDYLnGtGNJx7mLO4hBdpMicRjzD3ClnGFwQDfr0vngUg5z5PgMaDAp
-         0Jrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760609308; x=1761214108;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iAG+Qsr3wjzsEn7xPqBjjdvU8mNrEK01RZVMASCmXJQ=;
-        b=oOvck5zVSR3IA7WyxZrjjl/pb3JNMvmPHsixrweeE9N8nXR2qoGbsL4VFX1LR3qsy7
-         5g/sFrG1i0QRqb+RdkmIrsZ6b9GV+I8K6PcWenX1HB2/D2vGLZ95gQfgPtO1bJv7uJcp
-         4ylghDWL0aqxsdL7zOiRY7j1nDHf1HJ4mhFVxKejPBPMLOFyrx8qcxvGOvG08EJ3ccNc
-         5UnAlAobEAk/SN9sOxubqkWVcVtghim1vHa+MedIlh0MNF2nyB5wpgpvMmf1sUGW9K/C
-         p0hLSzJk0JJ/gro4lFbP/4b+VIvTtA4FY1+zkru270hYg4ks8Y5lf/zwBZs0971Z0CAC
-         wAbg==
-X-Forwarded-Encrypted: i=1; AJvYcCXzUHMV9hl/JvCew476G/+lMc5lmtMfQvxYBv8v3szvlMf5Y8AxoA4CveL1ylJ2WnsT+YjmZw8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6Xg66+LZqAYwYnMcVshgz1pHbOdAIUFBIeDbtoXYegJwGVkmL
-	YZidopoDOGVFwL6zITxpVfUFgf6BJcOiIT/q1WgJbexec3mQbzUhoJLEE0EQbBdWC8E=
-X-Gm-Gg: ASbGncu5NddbAyIIRY4b9oHnoDY3fCsdKVYxgGjrGxqvwSYwZ1NKySNatjYtbl2EaVW
-	pamw389WbzhRuIxUZIdpY7n+Idww8bJ07QcW2m7igNGCcUvWZBo7m/ZW6BLnDpDSKTgvKTIU8cQ
-	tNMYbYY2F8ScnWzhAQ35Coz4w0otj0mBd8wXYVkZB4deVL3C/h30eM5xts9GxrCS/DS1vWHSNvd
-	Jqd6utGAR8hPXwtPXKJ9QHazDMUn850C6rbclJlF3uhtMDSoq8oDV4JzJ7xH11L6f+O9Hvb61QG
-	ximfVYAeh+zXK9//2YHwJKEwmHVtJN1gGQ8eZ0s6UjybppTMoQCxvq0CGh5CEqAwJqxGGHY2hye
-	QDyiABaUAgj6QPE8w1B3EFOEzN109GxEOxrhwpEKnif3EMcxMdeJ/OLRgR/krtEloZxgMKDAd41
-	WM/0s=
-X-Google-Smtp-Source: AGHT+IGVd98H8dpafuklugEXTVi3BFcPl1nZR56txXlgYEVW9BZqLRUhorikH3U8n7kBYnhkg7YyKw==
-X-Received: by 2002:a17:907:7b99:b0:b3e:c7d5:4cb5 with SMTP id a640c23a62f3a-b50ac2cf67cmr3476075966b.31.1760609308113;
-        Thu, 16 Oct 2025 03:08:28 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:295f::41f:32])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b5ca4ec65f9sm471635366b.0.2025.10.16.03.08.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Oct 2025 03:08:27 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: pabeni@redhat.com,  edumazet@google.com,  linux-doc@vger.kernel.org,
-  corbet@lwn.net,  horms@kernel.org,  dsahern@kernel.org,
-  kuniyu@amazon.com,  bpf@vger.kernel.org,  netdev@vger.kernel.org,
-  dave.taht@gmail.com,  jhs@mojatatu.com,  kuba@kernel.org,
-  stephen@networkplumber.org,  xiyou.wangcong@gmail.com,  jiri@resnulli.us,
-  davem@davemloft.net,  andrew+netdev@lunn.ch,  donald.hunter@gmail.com,
-  ast@fiberby.net,  liuhangbin@gmail.com,  shuah@kernel.org,
-  linux-kselftest@vger.kernel.org,  ij@kernel.org,  ncardwell@google.com,
-  koen.de_schepper@nokia-bell-labs.com,  g.white@cablelabs.com,
-  ingemar.s.johansson@ericsson.com,  mirja.kuehlewind@ericsson.com,
-  cheshire@apple.com,  rs.ietf@gmx.at,  Jason_Livingood@comcast.com,
-  vidhi_goel@apple.com
-Subject: Re: [PATCH v4 net-next 00/13] AccECN protocol case handling series
-In-Reply-To: <20251013170331.63539-1-chia-yu.chang@nokia-bell-labs.com>
-	(chia-yu chang's message of "Mon, 13 Oct 2025 19:03:18 +0200")
-References: <20251013170331.63539-1-chia-yu.chang@nokia-bell-labs.com>
-Date: Thu, 16 Oct 2025 12:08:26 +0200
-Message-ID: <87ldlbw44l.fsf@cloudflare.com>
+	s=arc-20240116; t=1760609338; c=relaxed/simple;
+	bh=Dcshxnk+HHcxt2JmE3zv3oNCpRgnSrlJo9TAu9xvBkk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mMzZpDGJxOdf5TZaFqhgN1tKKyYvoMk5f9AczJmErROToXHTVwqnKvnzgVMaToxBKeld9zrDfQaYGgGGFPq+2Dh3ASBIrP88QfnzzMkE/6UysQJbf74nMqLCYR9xEauOac+qa3SxMKawv7vVumYTODrcJkemZt2ZVfeLZQGewcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=h6+kTrqJ; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1760609334;
+	bh=Dcshxnk+HHcxt2JmE3zv3oNCpRgnSrlJo9TAu9xvBkk=;
+	h=From:Subject:Date:To:Cc:From;
+	b=h6+kTrqJJ10AjrmI1ibLweGmZL6wrs4HbdElHedN+s5t4nz42RHrJWLTc2GcPrtA4
+	 OsVvaKEcvqtPAB7HfF7XMtGsfZeuS1TR7Qe8jW3k33ToKQkPsp7PkCu2kAGLBOqL7C
+	 FIUQJPIv+f8rlXhod9BenfBX6QQkG2mEZBxGNCaGg6UKRSGkoqRk6YuHsXafKbrPnj
+	 nTzmYveT72H81UPHOYeIuviupl3EExjY5ZGFzL12AIFpUpAKyi42TUkyXX+um7pzC4
+	 bLp9EDZzdLYW/+R61jOmZPzAjSo89Si/7ujs3DHx2URr6/jpvpgJJkEtnAdsIIKcA6
+	 5Y6KGcq77Ys7Q==
+Received: from beast.luon.net (unknown [IPv6:2a10:3781:2531::8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: sjoerd)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id DE3A417E1271;
+	Thu, 16 Oct 2025 12:08:53 +0200 (CEST)
+Received: by beast.luon.net (Postfix, from userid 1000)
+	id 8322F10C9C780; Thu, 16 Oct 2025 12:08:53 +0200 (CEST)
+From: Sjoerd Simons <sjoerd@collabora.com>
+Subject: [PATCH 00/15] arm64: dts: mediatek: Add Openwrt One AP
+ functionality
+Date: Thu, 16 Oct 2025 12:08:36 +0200
+Message-Id: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACXE8GgC/x3MMQqAMAxA0atIZgNtUUGvIg5aowYhlVSsIN7d4
+ viG/x+IpEwRuuIBpYsjB8mwZQF+G2Ul5DkbnHG1NbbBcJAkPTEIodCZgu5Ymcm3o7eTqz3k8lB
+ a+P6v/fC+HxWOhSBlAAAA
+X-Change-ID: 20251016-openwrt-one-network-40bc9ac1b25c
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Ryder Lee <ryder.lee@mediatek.com>, 
+ Jianjun Wang <jianjun.wang@mediatek.com>, 
+ Bjorn Helgaas <bhelgaas@google.com>, 
+ Lorenzo Pieralisi <lpieralisi@kernel.org>, 
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+ Manivannan Sadhasivam <mani@kernel.org>, 
+ Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>, 
+ Kishon Vijay Abraham I <kishon@kernel.org>, Lee Jones <lee@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>
+Cc: kernel@collabora.com, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org, 
+ linux-phy@lists.infradead.org, netdev@vger.kernel.org, 
+ Daniel Golle <daniel@makrotopia.org>, Bryan Hinton <bryan@bryanhinton.com>, 
+ Sjoerd Simons <sjoerd@collabora.com>
+X-Mailer: b4 0.14.3
 
-On Mon, Oct 13, 2025 at 07:03 PM +02, chia-yu.chang@nokia-bell-labs.com wrote:
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> Plesae find the v4 AccECN case handling patch series, which covers
-> several excpetional case handling of Accurate ECN spec (RFC9768),
-> adds new identifiers to be used by CC modules, adds ecn_delta into
-> rate_sample, and keeps the ACE counter for computation, etc.
+This series add various peripherals to the Openwrt One, to make it
+actually useful an access point:
 
-The latest draft is here, if anyone else is looking for it:
+* Pcie express (tested with nvme storage)
+* Wired network interfaces
+* Wireless network interfaces (2.4g, 5ghz wifi)
+* Status leds
+* SPI NOR for factory data
 
-https://datatracker.ietf.org/doc/draft-ietf-tcpm-accurate-ecn/
+Unsurprisingly the series is a mix of dt binding updates, extensions of
+the mt7981b and the openwrt one dtb. All driver support required is
+already available.
+
+Sadly during testing i've found various quirks requiring kernel
+arguments. Documenting those here both as note to self and making it
+easier for others to test :)
+
+* fw_devlink=permissive: the nvmem fixed-layout doesn't create a layout
+  device, so doesn't trigger fw_devlink
+* clk_ignore_unused: Needed when building CONFIG_NET_MEDIATEK_SOC as a
+  module. If the ethernet related clocks (gp1/gp2) get disabled the
+  mac ends up in a weird state causing it not to function correctly.
+* pcie_aspm: ASPM is forced to enabled in 6.18-rc1, unfortunately
+  enabling ASPM L1.1 ends up triggering unrecoverable AERs.
+
+Patches are against the mediatek trees for-next branch
+
+Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
+---
+Sjoerd Simons (15):
+      arm64: dts: mediatek: mt7981b: Add labels to commonly referenced nodes
+      arm64: dts: mediatek: mt7981b-openwrt-one: Configure UART0 pinmux
+      arm64: dts: mediatek: mt7981b: Add reserved memory for TF-A
+      dt-bindings: mfd: syscon: Add mt7981-topmisc
+      dt-bindings: pci: mediatek-pcie-gen3: Add MT7981 PCIe compatible
+      dt-bindings: phy: mediatek,tphy: Add support for MT7981
+      arm64: dts: mediatek: mt7981b: Add PCIe and USB support
+      arm64: dts: mediatek: mt7981b-openwrt-one: Enable PCIe and USB
+      dt-bindings: net: mediatek,net: Correct bindings for MT7981
+      arm64: dts: mediatek: mt7981b: Add Ethernet and WiFi offload support
+      arm64: dts: mediatek: mt7981b-openwrt-one: Enable SPI NOR
+      arm64: dts: mediatek: mt7981b-openwrt-one: Enable Ethernet
+      arm64: dts: mediatek: mt7981b: Add wifi memory region
+      arm64: dts: mediatek: mt7981b-openwrt-one: Enable wifi
+      arm64: dts: mediatek: mt7981b-openwrt-one: Enable leds
+
+ Documentation/devicetree/bindings/mfd/syscon.yaml  |   1 +
+ .../devicetree/bindings/net/mediatek,net.yaml      |  16 +-
+ .../bindings/pci/mediatek-pcie-gen3.yaml           |   1 +
+ .../devicetree/bindings/phy/mediatek,tphy.yaml     |   1 +
+ .../boot/dts/mediatek/mt7981b-openwrt-one.dts      | 276 +++++++++++++++++++++
+ arch/arm64/boot/dts/mediatek/mt7981b.dtsi          | 258 ++++++++++++++++++-
+ 6 files changed, 538 insertions(+), 15 deletions(-)
+---
+base-commit: de8df7a4c881bd0df691458680ab1e22d63d60f4
+change-id: 20251016-openwrt-one-network-40bc9ac1b25c
+
+Best regards,
+-- 
+Sjoerd Simons <sjoerd@collabora.com>
+
 
