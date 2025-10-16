@@ -1,310 +1,290 @@
-Return-Path: <netdev+bounces-229861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D45D1BE1718
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 06:39:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 227AEBE177A
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 07:01:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 788A24E1DCB
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 04:39:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB220403950
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 05:01:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B1D18872A;
-	Thu, 16 Oct 2025 04:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCDE22127E;
+	Thu, 16 Oct 2025 05:01:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z8VX/eUT"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QFSgjQGi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011051.outbound.protection.outlook.com [40.93.194.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEADDDD2
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 04:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7012521FF33
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 05:01:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760589592; cv=fail; b=JVOmdzcrowG0rpbS1ubqFaRNehSho1LueAOraicRDJ8BQlHNul6SGqdO07XDFni2cSI75hn3phBZOkhMVw1q8jNGQl9OTUfjBB/DzpyGsf7FqIcFk4I5tKlDezVstGjkVLrieQVZ4EcFrbmIt63igFXtCU7va3TUyPZ5Sj/rX3U=
+	t=1760590884; cv=fail; b=GAzxyaPJ9QexsGsjKqJSiZcAMFNi6LTKoip0P7WTAbIgUI6nSqCealIjuU+OUSFYSljmgk7KfYqLcnpMvxXqhIE5br6PfsFCPykcE2JAZPNEPaO96LXw3KjxPtalhOehd9zq/DniodOyOreTi4b4Uxk20h6gz02CH8yaw+Le5DU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760589592; c=relaxed/simple;
-	bh=G2HbhorJbMLVsMWgX+DyTeesG95SbjVgSb4JEXnUxhg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KgTTfP+aEi3uO7jf+2L2bzDaWyanAl/wsMsS8zt0s70WM1u+kcgxK6LfbBxXlCtSrBLyPGAqAs7C8ppLbobn8L10fWGDK/aBHGLVN0PPlH6bfhsp6MBVgwHgEIjIXH0wLCQ4JaUrGkygiO6pbHw0kEYBDIHkGht90GhniRHoEHk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z8VX/eUT; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760589591; x=1792125591;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=G2HbhorJbMLVsMWgX+DyTeesG95SbjVgSb4JEXnUxhg=;
-  b=Z8VX/eUTWOeBduT6YavI4qRl5FcaSEbpAXnlxkWvp4+8rTF7fTolHbfr
-   hIu7vcoeT+TZo8prpwaQtwBrUSB64cSwQJBuXmstwoUUjzLJxvkYMiIfV
-   zgAOGFyb9j+wqWFjROmrH68w8xf4fh4xnNqwQzyMZrigFcTMDWhd75vOs
-   fn5czC9hTH6mD9YhbnxKcjf3NdVOJFyhTZxC4IG1H+2eqdNlcVg88Bmcx
-   Wg3enLWd3X4PxZ6aW+xmjcSB/Hlce+RsKR6qDw7VizD3ORXH8ceaer1Up
-   qqvD22pxTMhCLAM9a8YBk/syPFjHx/isk8PUD74MZdES1At498Qry1SEo
-   Q==;
-X-CSE-ConnectionGUID: FVLI21F7RruvrToFxOnhiQ==
-X-CSE-MsgGUID: qNobpX2oS/Kjs+xPu8IjEA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="62922606"
-X-IronPort-AV: E=Sophos;i="6.19,233,1754982000"; 
-   d="scan'208";a="62922606"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 21:39:50 -0700
-X-CSE-ConnectionGUID: R22OdpJLSKywul8jAm+wiA==
-X-CSE-MsgGUID: e/4bK+xDS6ujgqkC0iFkxg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,233,1754982000"; 
-   d="scan'208";a="182143127"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 21:39:49 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 15 Oct 2025 21:39:49 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Wed, 15 Oct 2025 21:39:49 -0700
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.26)
- by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 15 Oct 2025 21:39:49 -0700
+	s=arc-20240116; t=1760590884; c=relaxed/simple;
+	bh=lJpSAKNchMavMdhzm0r9BZwmaN+lDTtF+LRXFrmMmR4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tMk+vpG6GrCAtMndpkGFwP8tpSF+fgB79zK8MKdkBVhGx7v0ihLF37sVC8W2qzkuf/gN9MNBDazFNCsYoR24zbt/2x8HogGUGfE9SbLPE8uEWvKI8zf4a4eyg7Le6x7NnKouW5J5lCPneMNWZTPsHYdvkSustkd1eNaacmTp2QE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QFSgjQGi; arc=fail smtp.client-ip=40.93.194.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LcYA6Y/JsC0iXh6JX+HqoM3g47mhTS4UKax+kyQXVg3eTKgtX6R3WUIJgjEC5RQgNUc8x/w7B3ut4Xs5e7ccnyjAPvSKVLkHx+DlinDQ9y82CZWDoKGR1jeJQMkWR/6ixny29iRoxHnO/IiPGtlD3FO+OxEQg5fxIR5U6jJ6ZCzFqn+S4S150BiwOJDzHBXpd44Om9NyqufYAQGdZVAjvAIxaz/B90Zd6QneUXNTdVhklzGJ3th0h1rYi84S/OJ6R3VXEzIbiiH1jhYOIvisXbUND1pm9xrD6eBDLTp7YWNMkL07MLCLoGgI1VanL4V7ZMd/5bnXLsxmedBrPbAsXQ==
+ b=OPRIItaTei2rdO8StE76NuRmU88iJcykXGq6czCllzuY/RW5po7v4XBgmaM9/keD/nH/lV1kmlgIPkRg6S3Q3O8pmQb1Ubao886ts2GbG9q3RklLPtL4i8LqIiv6ka0aofPPrix8GqARGGnfqVxVONfrd+5opr2znV30aaOTBUmMc1XP1flP3jz9HulkzRHkGI6Q0T8Qd3ELZl4LVhCgz4wgMOHdIHh9Qlw/hGDHU/wLiZrPe3qBwcermvcsMvpYABHs57bjGh0G+/H+n7CgTNEo89HX4BrfBc/7ECp9qf9Rc5AkYYqSeVWJOvZ2iDYVinB/vMn8NxITLHTKYHEvmg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Q7TSEDGC4+NZ/babxZJRaZx6Dk7KsNqYdmCSsf7bMOA=;
- b=Oro++ufSRSlaooV2k9vzxyHSzJSmdBQUypxVdkWZvjGLKACsitjKu4tA41mpaERmI+Wa+rUdXq1e559Jp1494d5afteNAVVuIcPmHsAQXOt/Zr0jYqpRZZRRzF/iJxjtdviv0Sgod8nbDzhxlCQv+gHo89/MK2GeUae+9oo6oXtkWxhwXIJQr/7uIAcSTmkEhJO9+GeLLgs2U4f+efCHyiAn2Stzns8MIcaKZJRM8wFu7grdhLdFmrzmw1wlSV/rUgywVGUhhunP9SmcRl3r7ymoyW2hRyPJu5TnRjK3vX2RENpB2yEjHY74fu24Cc8DnwskNsyPHDWbsWrRPJSjhA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
- by SN7PR11MB6898.namprd11.prod.outlook.com (2603:10b6:806:2a6::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.11; Thu, 16 Oct
- 2025 04:39:47 +0000
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919%4]) with mapi id 15.20.9228.012; Thu, 16 Oct 2025
- 04:39:46 +0000
-From: "Rinitha, SX" <sx.rinitha@intel.com>
-To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kubalewski, Arkadiusz"
-	<arkadiusz.kubalewski@intel.com>, "pmenzel@molgen.mpg.de"
-	<pmenzel@molgen.mpg.de>
-Subject: RE: [Intel-wired-lan] [PATCH v3 iwl-next] ice: add TS PLL control for
- E825 devices
-Thread-Topic: [Intel-wired-lan] [PATCH v3 iwl-next] ice: add TS PLL control
- for E825 devices
-Thread-Index: AQHcLsM7M2nTVH0OVUW555exfYMeY7TEQ+CA
-Date: Thu, 16 Oct 2025 04:39:46 +0000
-Message-ID: <IA1PR11MB6241F6AD266AB7063CAE0AA98BE9A@IA1PR11MB6241.namprd11.prod.outlook.com>
-References: <20250926085215.2413595-1-grzegorz.nitka@intel.com>
-In-Reply-To: <20250926085215.2413595-1-grzegorz.nitka@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|SN7PR11MB6898:EE_
-x-ms-office365-filtering-correlation-id: 255eadff-3f2c-483e-9ffc-08de0c6e08ea
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700021|7053199007;
-x-microsoft-antispam-message-info: =?us-ascii?Q?U4EIKVIi88hlq1u+EZK1+IYErIhSgLyhUui3NilpKvyjNrZTGUd36jmOpUKP?=
- =?us-ascii?Q?2z9GU6s7nTiIt0ts6hPKObfAV0CQXmY4keTcLS+CVol9hoHhiU40GvykMRSR?=
- =?us-ascii?Q?czul5wqXOO9xHZHVqk7ozsZ7a8myD2blzC+0e3sgjYo/pR3FDTIi3C3yXvsQ?=
- =?us-ascii?Q?ZSmlFkX3jRK5byHlKQ/UnAMZO+3NLZIXRHrQykfBPeciI/lCHcvoUAtCi8UO?=
- =?us-ascii?Q?q6Fj6R0FZjS2Yg4RN1JBd4Pvp753w2bBPgtAmQeaYqFzoQFfhWn73uVMMxcT?=
- =?us-ascii?Q?reidBl5p4ISSmkXWxDJPTELGCVmTQzxq1JgXUzc9KvhmZg5Y4n1hchhgMD5s?=
- =?us-ascii?Q?yzY3k6TAhhnG3LBQHWDK2m2iIVcdnxUnPJWUvG9pyvBwMu7LtG6CEE9ae4pZ?=
- =?us-ascii?Q?GFxtR3efTVD/g74mxXcUEbkFHIkKpBqZC9fYacc+Fihb5pkALalQx/dSdyLO?=
- =?us-ascii?Q?QWlcMNCHDmtsS9nToyZkVmZwchy0Qo7um9DA9E9Xi6bHO7xZ1aPMz7dkMEK0?=
- =?us-ascii?Q?tvhqrMb5AF7383V8cP7s4FbpdcWPcMVt5mDQ3A+c1HVX3WamIjPqceW3V9D1?=
- =?us-ascii?Q?EcuxOv33u4pnYYb8RxTGse2J6hu3VvFzgAk8CpprLW1jgjVRSjASEtkKFXZb?=
- =?us-ascii?Q?f2EbpsJ9QDktBksdn74dVUGCEePKzH1e8RVUYAvK0zj/SeZ8ihyPuotXERdP?=
- =?us-ascii?Q?+h5uvqvRAduWEVRwycJCP/NlJVrjmZzf29cngXrTGppUrWLP1FkoyfwpUFma?=
- =?us-ascii?Q?LqrLiR8hWWpsXpIW+ec9uFpPYRjZVhxon+WhvgPyz+dgJwLLicA20Pmsh6T9?=
- =?us-ascii?Q?aHc96Z47DhWouLxLHtqrb7t5s1kn6gmlf+WIUlfVDc5JSnDfDrq8p6VyEtz2?=
- =?us-ascii?Q?lHvjeQi9sLmDsxkVdCjDWjB/gLG7/56iqIMVl82husoDMQWiLeIyoDSsRJdL?=
- =?us-ascii?Q?IyjvnbFmUJ/mn+OUWFFYDJHhupDL9G7WarWQyO2RtwwXV7VqPhsdQREv79Ez?=
- =?us-ascii?Q?/i+9jywoqC2dfOX6V9VpYx40c7WlSyjRjZimo/OaXoTnG0iwkW3jXUmcO8vq?=
- =?us-ascii?Q?r8gYIo3730Q7oKhiyg9biksu1Vzymu9qZSgjlHvCx5k7zoBMQfJuScfgrZ3C?=
- =?us-ascii?Q?pPCq0s5WQNn6c7Vzx1Y9QgLZ9PMgFdVVc1p8HlPyd3Plb8CxHnH2G20YqlKx?=
- =?us-ascii?Q?TjvUXvA2zgQCWaqk5L27nQ3yBwCV/Jv0UfuLBnXltpDaa08hu/g++bNnNMxA?=
- =?us-ascii?Q?2UMWn36CBb4fL+Pkpcmv5F4g5Oll48O0tzSHddPKiGUSyIpFffGXj8EmPdic?=
- =?us-ascii?Q?KTBuQ0TNT/bW8lZC4sDb4W0Guy3HN41M6l+spxBexwLRihvSkR+S9EnuxSh7?=
- =?us-ascii?Q?0v2g6KnHD1I5KWW5iEw5YhmxMJ28g1Z2reiaityFF9brjih2y6lV/QbwGXTB?=
- =?us-ascii?Q?XhoZQX/2hCiPQbYZUemz8tSbGDSw78wSGt8nZHjpSKxii/dFdjw7G012Rf+C?=
- =?us-ascii?Q?sQQIQ2FB2qBst6yTugp3QFDHDTAwi4ajLSjW?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?y6ZJDH3AFlorPgSRhXeLQ0m1rDNRI43w9rd/COt3aLQO2OE9SHrHJoKa/emL?=
- =?us-ascii?Q?eaVUgyvvs1hJZwUlUQEaIw5MPWmOMpknrGctZN8ItP+GFocunYmSL+MMHspK?=
- =?us-ascii?Q?bu+0g/1X416yOpRQB8D50qpOKa1we/mihoEEk14T8kDn8wzMr48QHkVAExVS?=
- =?us-ascii?Q?+qP3Oi1Jf2Zhjyy1ofkx81DWZ+xmq+Q1wn/fYt50hKwdXSBKt88eZh9Gj82W?=
- =?us-ascii?Q?aTmNKMu7CJNfenj4fWQYRsJj4EWAa+NXgvvR57LBO5+QdmbCpTqSvndoYlZN?=
- =?us-ascii?Q?dJL4gEVh1XAM1JuL3mM7e2xH2X/rwg1Hbfzf1RaAa9anp+ctiAYgqwKCaDaV?=
- =?us-ascii?Q?HIzi6MwmN4TH5JRuIyYnR/UfhthxvIl2cdza/T1N6LC3Pt7fL+XQHdicIADp?=
- =?us-ascii?Q?n5Qotbc6VHU7XZrx/TeJtGYSoJs1p/nYJUB5diLLsq/0/pdS+//0ZD9XC/T8?=
- =?us-ascii?Q?zlPy/qz12Pn2mvnDPjjfO0n/9Cz9NjRbDr81H2ZeYUPgaT+xFejyXOb+OBn5?=
- =?us-ascii?Q?N6CflG9hej4TeZPRy92Vw41TPwYHyc/1v8UVCPQYesdlxAwpkH5z44Sqby6T?=
- =?us-ascii?Q?a1yxuuNcrAmegxxaQvko8AO10KNT5aEaiXozf7T74e34p3UmJ4z7nIIFaTVG?=
- =?us-ascii?Q?P3rx2iTKxVVtfKtVqZv7LfXmy1Abd0XBHmrxv9gKujN5tGKTiXvRuztV509S?=
- =?us-ascii?Q?fFDPKY3AE3AlbVgJeF+g2uKftsTqKF3tWNeSAfprXBHGo+qI65PZPhiM1unz?=
- =?us-ascii?Q?nZyA6IZt9QH0mo+KFCMHXFZGe4H47IV/E6WEBqfr5RH2QJJlvuhoTvZbLQD8?=
- =?us-ascii?Q?gfGa32RV4X959pJEqJmNlzNsnYFMG95CIt+ZYGRIaOrm2EF8ppYYdA5b8p7Z?=
- =?us-ascii?Q?jt8i9UhpL+Ss7xKzaDgVymDdplj7jBRlF6OsNJyDCHHGRPchbAn5Sc3Xm03F?=
- =?us-ascii?Q?7086KR+jrbgCtZazAIUqq1/NSfQldW/ok7/qsqCle75S3x9Su8uFcVnCE1Qo?=
- =?us-ascii?Q?559YvVhDrfMjc0CnAWozkXzMDnUXiuHcrcwFmIjo3b8tOGfImz5tsip/AYwK?=
- =?us-ascii?Q?WXu0ImcU4CoUep+kkvmghU85aFn4KM5D48E+aDLW/AoXOlm0lz2QuVhGYwX6?=
- =?us-ascii?Q?bv6H9aSScWgPiiCy3YJhb6tmz+n65NqPLh8oW8sP8oT858/f3JRvJ5AT876o?=
- =?us-ascii?Q?aHWN14Wk7ExcAm1lvyM+HlsFOnQPqlOlWP+3wt/67YVtEbRfhs6GqjtNHgKu?=
- =?us-ascii?Q?CTiu+tY2ZkEAUXHzQjBSEnQYKuEXonlZK3JnhKhdanVml64C/uy320AFs8MU?=
- =?us-ascii?Q?giiqgHxcFdgSYLYpfuNE9J1sOkmmzACy+2Hs15Xi1A97A2cIHHHINKUNZAlv?=
- =?us-ascii?Q?yK0DHSHwNVaaRYZu183iRAwZ4rX/jsA5uwZDDFRVOmOuyaEbOgrPCKX3wmtV?=
- =?us-ascii?Q?FxoN01x0wxNVptogElFRQ+LwZcypH11t4YAO5S+TUSd+W6AlIgHzexZb00Tt?=
- =?us-ascii?Q?/ziPIelF3kfTputsYYPtXmsgq7/YjEfVdQyNktUjV/MpYFoZFxoPnjMZCjl3?=
- =?us-ascii?Q?5X8D5Qq9Q728KYP1RD8BXFwWLfJwrlzHvimS/ld1?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ bh=blnZNQqlyMCWgH22SvK9IoVT5LRhIrOnqYRJmCRKI4I=;
+ b=BIA1kHnojs9YdrmSfYc6X5on6UTw5wyecDkMIvSA8MoO89SQnaoBtXOFU6pFYHudatChHcLvOwEZ7emhDzMbzoYKSydEsm4bnbtB2DXruVMi/360DKEw823FzNM3xe8vdofCd/qHx1bEW1INzYW4dpX9rfVcFuxg6SaanPIePs4021VfF0cn3dzX3jYi6z9iiZ+FphI6SDXaChV90ehzY7oW/1OZ3pH2yC5f4SSI1K/HykyiDWINxez4xhuiDiLGOxXBY6p3UfCU7ECGpDJpOUVvMTZ9wFr2XWjisI4bS4P1VrNVKLMfOUzn/jaO8xo3J9I6EwFB5NXCRAzmlXwjfQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=blnZNQqlyMCWgH22SvK9IoVT5LRhIrOnqYRJmCRKI4I=;
+ b=QFSgjQGiy38XRDnEgCUU+oan4jS98ZyIm9zIeY6ugm2SkMlA6z41D31/Vd6KLxZHpKx106oq7FPQboQ/kaj1bj9NM7ZrQEovcxfP3WhXPRb3zs6w0bnukncWgexQSELV/yPR/L/KGewqX+Xjrnj1EoQzwTW1KpzvLE46VQus2Gd4P/XVXWS2fRKXRjtr2t2DW6cKAmqq7P9/87O9XdkNNqwR/VFdyWyaixfUXkBLfmZLNGRvJuBkVB/AykcBJwN1q+EC1Us5KmOt3B7Xd2BD/e0bIZbjNwtzUMyw2o9ZdYhXstalFnuL+7Trf3tw0Kl118v2ystdFOomChl0atrfcg==
+Received: from BL1P223CA0026.NAMP223.PROD.OUTLOOK.COM (2603:10b6:208:2c4::31)
+ by DM4PR12MB6469.namprd12.prod.outlook.com (2603:10b6:8:b6::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9228.12; Thu, 16 Oct 2025 05:01:19 +0000
+Received: from BL6PEPF00020E60.namprd04.prod.outlook.com
+ (2603:10b6:208:2c4:cafe::69) by BL1P223CA0026.outlook.office365.com
+ (2603:10b6:208:2c4::31) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9228.10 via Frontend Transport; Thu,
+ 16 Oct 2025 05:01:19 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ BL6PEPF00020E60.mail.protection.outlook.com (10.167.249.21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9228.7 via Frontend Transport; Thu, 16 Oct 2025 05:01:19 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 15 Oct
+ 2025 22:01:04 -0700
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Wed, 15 Oct 2025 22:01:04 -0700
+Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Wed, 15 Oct 2025 22:01:02 -0700
+From: Daniel Jurgens <danielj@nvidia.com>
+To: <netdev@vger.kernel.org>, <mst@redhat.com>, <jasowang@redhat.com>,
+	<alex.williamson@redhat.com>, <pabeni@redhat.com>
+CC: <virtualization@lists.linux.dev>, <parav@nvidia.com>,
+	<shshitrit@nvidia.com>, <yohadt@nvidia.com>, <xuanzhuo@linux.alibaba.com>,
+	<eperezma@redhat.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<jgg@ziepe.ca>, <kevin.tian@intel.com>, <kuba@kernel.org>,
+	<andrew+netdev@lunn.ch>, <edumazet@google.com>, Daniel Jurgens
+	<danielj@nvidia.com>
+Subject: [PATCH net-next v5 00/12] virtio_net: Add ethtool flow rules support
+Date: Thu, 16 Oct 2025 00:00:43 -0500
+Message-ID: <20251016050055.2301-1-danielj@nvidia.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 255eadff-3f2c-483e-9ffc-08de0c6e08ea
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Oct 2025 04:39:46.8146
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF00020E60:EE_|DM4PR12MB6469:EE_
+X-MS-Office365-Filtering-Correlation-Id: ca268bb8-a559-49b6-ee2f-08de0c710b5d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?+tS3HHBWPOUQ5XMi4Y5WLw0gk9Mu/YuYHvPLyFJMM5cdsOdBrrgW1KxyIaG5?=
+ =?us-ascii?Q?gE4x/ImIVIWiGYGa/ImxjRjI1r2+Xj2X2qHJWiupQHs6FeWL074BQ8Y7/XLJ?=
+ =?us-ascii?Q?Xa0hsMZbuE6Of2aH8DRmmoQlqn9bLD/MeqhPuIwNpOpf0uutetIYBcd29kg6?=
+ =?us-ascii?Q?OrI7gLZL1eackmDJfyCEIdwZi/DNyXDnbrhcPZ5oxntgQibAofunMOzPK5Ms?=
+ =?us-ascii?Q?/J2+/ErVjHMG5BlVDw1EQZjku8/bL/lwg+UglhPWbRoJ3txMcbDrBfij1EHn?=
+ =?us-ascii?Q?TTnFi0RzXzabe7PtvKPT6LyiOV5Rdm+B44E0Xemn46f6rDXw9XNv5DGpCLzY?=
+ =?us-ascii?Q?RZzUNX0nPRoTUg+BGe2qvbd0omJLpN4ugFVV3NK47uXgmOMIlRYEwVYoT4L8?=
+ =?us-ascii?Q?sXu3si03yBW186UvLwTypfa6fryDp+ryZ3UiSG/h+PqnCdA6jMUQs2Uohb4D?=
+ =?us-ascii?Q?dn/8UvHW9+RCML63x68iQLcGSR9SNBqx80YCpYWDYpTUOLnpx7PIKtKPm4Ur?=
+ =?us-ascii?Q?bHjjBrTXLGc1HjqiIM2jEJhnPodwR15L8t2j0lexBJNzW1W+QXCq0eOaT8DT?=
+ =?us-ascii?Q?74kIYFBd23bR83r5auDTbmdve96vxoPwe06syyTedDHEcwbj8rbbJ5itkG6W?=
+ =?us-ascii?Q?XDn5VyGPeQYM53f2BUqVZxgaU0sq0OHstPhQm0KMZL4xIIy8vs2jkRfg5zwz?=
+ =?us-ascii?Q?eXqI2N9o1cPvaHepPbOEgkdeaRqk6wi07WoeqfdLETGEFHvnNSgC/8hXmo17?=
+ =?us-ascii?Q?WvXzwlz416VL9NGDLDWuI1tdNpVDlJGqW1RU1aI+TrxV1/J++3qhm72MaaRD?=
+ =?us-ascii?Q?qQn4mRbNMVpHOKGTJX8XUQIFM2GVZ8CcitqWJFsKQzmJQlO/IwYsyqvutuEf?=
+ =?us-ascii?Q?l6MFXZjz5867gQWAoCzVX7qWrzi0wWDiz0GYsWwq6AccFHm6eDGpjPeZYvqn?=
+ =?us-ascii?Q?26tfyr00uZMqO1BRqlw30uWu9kSKmb/YWzX8+FKG9u5MSGtFUejEChJWS4qY?=
+ =?us-ascii?Q?ZHAdibr6obcQWUWVLZKefvrB0dxeJTK27HnywYHIeEbWcZTwPIwPDE4G0HE2?=
+ =?us-ascii?Q?ZpI0x2CE4Kzwq0Y4HvySN0hmOd/1Vq0OsoTc1OoBkOU2ikdWUyMLUYX/Ew4E?=
+ =?us-ascii?Q?cj/EeuJKMvX0QzWjQBRecquFX0O4liP3oIqEiginU/pgDQVHN9A90/OxTC+z?=
+ =?us-ascii?Q?O4F9KMtN76Vmx4dLZnxMgdcKa0mABTNHtynC2xm6l+GDUaC4cCSBpl0kIhz+?=
+ =?us-ascii?Q?WZ8lGAE1sqyB9CVCd47mxte+iFzTS+ubEn8+rTx0a8LUTFDM1Vm7JQehJ6MF?=
+ =?us-ascii?Q?/QogQbA3xzJ+HMKLhjF7M5fS59UtBZn2XCn9im9MpS5E0rKc6CAb+aR0Q7yi?=
+ =?us-ascii?Q?gP31wsnyYyipJAH/4oBF84USe6xYn11i59ycuEq5TjBr7rswbM2iH0ofE50L?=
+ =?us-ascii?Q?5fO+1Kj4oTRm1q+8Yyxhi5bMRAtYY1qdIVGFVzWpe3kw2Hgudh5ER/Q7gHLq?=
+ =?us-ascii?Q?nFgp0T6cjDasNgkSIDT37Ikw/EoLGqNYIb5ny5+9dXjB10eAMXbWuVVYqKqY?=
+ =?us-ascii?Q?DlbcpUhx87LNyloK6mhhs8jahiuFy8lFd2PwSm4c?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2025 05:01:19.2910
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Y3PXYBoTEM/mn0ITTIChLkCBn98XDPln62eLmXNl0aDH8MJWflLgzZr/EODVWadE4n4sR3edKUPIQ72ueD4LdQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6898
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca268bb8-a559-49b6-ee2f-08de0c710b5d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF00020E60.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6469
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of G=
-rzegorz Nitka
-> Sent: 26 September 2025 14:22
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Kubalewski, Arkadiusz <arkadiusz.kubalewski@i=
-ntel.com>; pmenzel@molgen.mpg.de
-> Subject: [Intel-wired-lan] [PATCH v3 iwl-next] ice: add TS PLL control fo=
-r E825 devices
->
-> Add ability to control CGU (Clock Generation Unit) 1588 Clock Reference m=
-ux selection for E825 devices. There are two clock sources available which =
-might serve as input source to TSPLL block:
-> - internal cristal oscillator (TXCO)
-> - signal from external DPLL
->
-> E825 does not provide control over platform level DPLL but it provides co=
-ntrol over TIME_REF output from platform level DPLL.
-> Introduce a software controlled layer of abstraction:
-> - create a DPLL (referred as TSPLL DPLL) of PPS type for E825c,
-> - define input pin for that DPLL to mock TIME_REF pin
-> - define output pin for that DPLL to mock TIME_SYNC pin which supplies a
->  signal for master timer
->
-> Note:
-> - There is only one frequency supported (156.25 MHz) for TIME_REF
->  signal for E825 devices.
-> - TIME_SYNC pin is always connected, as it supplies either internal TXCO
->  signal or a signal from external DPLL always
->
-> Add kworker thread to track E825 TSPLL DPLL lock status. In case of lock =
-status change, notify the user about the change, and try to lock it back (i=
-f lost). Lock status is checked every 500ms by default. The timer is decrea=
-sed to 10ms in case of errors while accessing CGU registers.
-> If error counter exceeds the threshold (50), the kworker thread is stoppe=
-d and appropriate error message is displayed in dmesg log.
-> Refactor the code by adding 'periodic_work' callback within ice_dplls str=
-ucture to make the solution more generic and allow different type of device=
-s to register their own callback.
->
-> Usage example (ynl is a part of kernel's tools located under tools/net/yn=
-l path):
-> - to get TSPLL DPLL info
-> $ ynl --family dpll --dump device-get
-> ...
-> {'clock-id': 0,
->  'id': 9,
->  'lock-status': 'locked',
->  'mode': 'manual',
->  'mode-supported': ['manual'],
->  'module-name': 'ice',
->  'type': 'pps'}]
-> ...
->
-> - to get TIMER_REF and TIME_SYNC pin info $ ynl --family dpll --dump pin-=
-get ...
-> {'board-label': 'TIME_REF',
->  'capabilities': {'state-can-change'},
->  'clock-id': 0,
->  'frequency': 156250000,
->  'frequency-supported': [{'frequency-max': 156250000,
->                           'frequency-min': 156250000}],
->  'id': 38,
->  'module-name': 'ice',
->  'parent-device': [{'direction': 'input',
->                     'parent-id': 9,
->                     'state': 'connected'}],
->  'phase-adjust-max': 0,
->  'phase-adjust-min': 0,
->  'type': 'ext'},
-> {'board-label': 'TIME_SYNC',
->  'capabilities': set(),
->  'clock-id': 0,
->  'id': 39,
->  'module-name': 'ice',
->  'parent-device': [{'direction': 'output',
->                     'parent-id': 9,
->                     'state': 'connected'}],
->  'phase-adjust-max': 0,
->  'phase-adjust-min': 0,
->  'type': 'int-oscillator'},
-> ...
->
-> - to enable TIME_REF output
-> $ ynl --family dpll --do pin-set --json '{"id":38,"parent-device":\ {"par=
-ent-id":9, "state":"connected"}}'
->
-> - to disable TIME_REF output (TXCO is enabled) $ ynl --family dpll --do p=
-in-set --json '{"id":38,"parent-device":\ {"parent-id":9, "state":"disconne=
-cted"}}'
->
-> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> ---
-> v2->v3:
-> - replaced pf with hw struct as argument in ice_tspll_set_cfg
-> - improved worker for TSPLL control (reworded dmesg log, use already
->  exist cgu state error counter to limit dmesg spamming, disable the
->  thread after error threshold is exceeded)
-> - doc strings updateds (missing newly added pins description)
-> - addresses comments from v2: use ternanry when applicable, commit
->  message typos
-> - rebased
-> v1->v2:
-> - updated pin_type_name array with the names for newly added pin
->  types
-> - added TS PLL lock status monitor
-> ---
-> drivers/net/ethernet/intel/ice/ice_dpll.c  | 384 +++++++++++++++++++--  d=
-rivers/net/ethernet/intel/ice/ice_dpll.h  |  12 +-  drivers/net/ethernet/in=
-tel/ice/ice_tspll.c | 122 +++++++
-> drivers/net/ethernet/intel/ice/ice_tspll.h |   5 +
-> 4 files changed, 499 insertions(+), 24 deletions(-)
->
+This series implements ethtool flow rules support for virtio_net using the
+virtio flow filter (FF) specification. The implementation allows users to
+configure packet filtering rules through ethtool commands, directing
+packets to specific receive queues, or dropping them based on various
+header fields.
 
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+The series starts with infrastructure changes to expose virtio PCI admin
+capabilities and object management APIs. It then creates the virtio_net
+directory structure and implements the flow filter functionality with support
+for:
+
+- Layer 2 (Ethernet) flow rules
+- IPv4 and IPv6 flow rules  
+- TCP and UDP flow rules (both IPv4 and IPv6)
+- Rule querying and management operations
+
+Setting, deleting and viewing flow filters, -1 action is drop, positive
+integers steer to that RQ:
+
+$ ethtool -u ens9
+4 RX rings available
+Total 0 rules
+
+$ ethtool -U ens9 flow-type ether src 1c:34:da:4a:33:dd action 0
+Added rule with ID 0
+$ ethtool -U ens9 flow-type udp4 dst-port 5001 action 3
+Added rule with ID 1
+$ ethtool -U ens9 flow-type tcp6 src-ip fc00::2 dst-port 5001 action 2
+Added rule with ID 2
+$ ethtool -U ens9 flow-type ip4 src-ip 192.168.51.101 action 1
+Added rule with ID 3
+$ ethtool -U ens9 flow-type ip6 dst-ip fc00::1 action -1
+Added rule with ID 4
+$ ethtool -U ens9 flow-type ip6 src-ip fc00::2 action -1
+Added rule with ID 5
+$ ethtool -U ens9 delete 4
+$ ethtool -u ens9
+4 RX rings available
+Total 5 rules
+
+Filter: 0
+        Flow Type: Raw Ethernet
+        Src MAC addr: 1C:34:DA:4A:33:DD mask: 00:00:00:00:00:00
+        Dest MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
+        Ethertype: 0x0 mask: 0xFFFF
+        Action: Direct to queue 0
+
+Filter: 1
+        Rule Type: UDP over IPv4
+        Src IP addr: 0.0.0.0 mask: 255.255.255.255
+        Dest IP addr: 0.0.0.0 mask: 255.255.255.255
+        TOS: 0x0 mask: 0xff
+        Src port: 0 mask: 0xffff
+        Dest port: 5001 mask: 0x0
+        Action: Direct to queue 3
+
+Filter: 2
+        Rule Type: TCP over IPv6
+        Src IP addr: fc00::2 mask: ::
+        Dest IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+        Traffic Class: 0x0 mask: 0xff
+        Src port: 0 mask: 0xffff
+        Dest port: 5001 mask: 0x0
+        Action: Direct to queue 2
+
+Filter: 3
+        Rule Type: Raw IPv4
+        Src IP addr: 192.168.51.101 mask: 0.0.0.0
+        Dest IP addr: 0.0.0.0 mask: 255.255.255.255
+        TOS: 0x0 mask: 0xff
+        Protocol: 0 mask: 0xff
+        L4 bytes: 0x0 mask: 0xffffffff
+        Action: Direct to queue 1
+
+Filter: 5
+        Rule Type: Raw IPv6
+        Src IP addr: fc00::2 mask: ::
+        Dest IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+        Traffic Class: 0x0 mask: 0xff
+        Protocol: 0 mask: 0xff
+        L4 bytes: 0x0 mask: 0xffffffff
+        Action: Drop
+
+---
+v2: https://lore.kernel.org/netdev/20250908164046.25051-1-danielj@nvidia.com/
+  - Fix sparse warnings
+  - Fix memory leak on subsequent failure to allocate
+  - Fix some Typos
+
+v3: https://lore.kernel.org/netdev/20250923141920.283862-1-danielj@nvidia.com/
+  - Added admin_ops to virtio_device kdoc.
+
+v4:
+  - Fixed double free bug inserting flows
+  - Fixed incorrect protocol field check parsing ip4 headers.
+  - (u8 *) changed to (void *)
+  - Added kdoc comments to UAPI changes.
+  - No longer split up virtio_net.c
+  - Added config op to execute admin commands.
+      - virtio_pci assigns vp_modern_admin_cmd_exec to this callback.
+  - Moved admin command API to new core file virtio_admin_commands.c
+
+v5: 
+  - Fixed compile error
+  - Fixed static analysis warning on () after macro
+  - Added missing fields to kdoc comments
+  - Aligned parameter name between prototype and kdoc
+
+Daniel Jurgens (12):
+  virtio_pci: Remove supported_cap size build assert
+  virtio: Add config_op for admin commands
+  virtio: Expose generic device capability operations
+  virtio: Expose object create and destroy API
+  virtio_net: Query and set flow filter caps
+  virtio_net: Create a FF group for ethtool steering
+  virtio_net: Implement layer 2 ethtool flow rules
+  virtio_net: Use existing classifier if possible
+  virtio_net: Implement IPv4 ethtool flow rules
+  virtio_net: Add support for IPv6 ethtool steering
+  virtio_net: Add support for TCP and UDP ethtool rules
+  virtio_net: Add get ethtool flow rules ops
+
+ drivers/net/virtio_net.c               | 1119 ++++++++++++++++++++++++
+ drivers/virtio/Makefile                |    2 +-
+ drivers/virtio/virtio_admin_commands.c |  165 ++++
+ drivers/virtio/virtio_pci_common.h     |    1 -
+ drivers/virtio/virtio_pci_modern.c     |   10 +-
+ include/linux/virtio_admin.h           |  125 +++
+ include/linux/virtio_config.h          |    6 +
+ include/uapi/linux/virtio_net_ff.h     |  156 ++++
+ include/uapi/linux/virtio_pci.h        |    7 +-
+ 9 files changed, 1580 insertions(+), 11 deletions(-)
+ create mode 100644 drivers/virtio/virtio_admin_commands.c
+ create mode 100644 include/linux/virtio_admin.h
+ create mode 100644 include/uapi/linux/virtio_net_ff.h
+
+-- 
+2.50.1
+
 
