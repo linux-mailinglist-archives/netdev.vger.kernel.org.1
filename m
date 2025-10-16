@@ -1,93 +1,86 @@
-Return-Path: <netdev+bounces-230149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D1C6BE478D
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 18:10:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FE97BE47AC
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 18:11:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0EBA04F9A6F
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 16:07:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0106054143E
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 16:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC4E32D0CC;
-	Thu, 16 Oct 2025 16:07:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC29B32D0D9;
+	Thu, 16 Oct 2025 16:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="EUBa4sU+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C3XXkATF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D2632D0D7
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 16:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7F2432D0D4
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 16:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760630868; cv=none; b=rdnkGxzZvmeVUZVgiSqdpHzDWmSTsULMS/CtN8bZvYR01aTxwI52Kq84siODaYLNVky5UbqDSBN/5b9mCxzmtx0F08jdXZXhO9jNf+kqbqCwcz4/+iJ3g/+NCNWiP8r8uZYmz/K+JQPO9fkoxzJZwS5zuxRt4a71pTujD8uO7ZM=
+	t=1760630935; cv=none; b=l6p+5PfnBttgslGzWPM8VK9Y03vFd+/rUzhGPVI7pl/p36QZNRLjhLRtM+4nuB9QpYiCYktjTcN/7aug+wHocLFH2qqjmmP++segmgp7NYr8SImMvYY4KeMMpK0qklx8vsEdf2uqgnTAzswsadlg1OuS4vYrOmE/uHl98gR2CLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760630868; c=relaxed/simple;
-	bh=zfeKjgA6iJPt3E2LkiwulJK/Ai9g8+9EALGPZe47a1g=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=u0tj5i058JaPOWpOC/9OIIuX5NUSje31r2UId2f8VIg7V9mvgXS/w+rrFPkNybrG/fcJ/z9LvQ2NwfKjYPMVYfQl+TBInDWp+mQB6yimeRSjRzH/UshgEF1hRbHBlOcKVTDiKXv051a0J+os4XrcFztkyorHv84tOGVHVOP9ir4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=EUBa4sU+; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:To:
-	Subject:Message-ID:Date:From:MIME-Version:Sender:Reply-To:Cc:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=zfeKjgA6iJPt3E2LkiwulJK/Ai9g8+9EALGPZe47a1g=; t=1760630866; x=1761494866; 
-	b=EUBa4sU+hPDY1zauEknkV1ynrBa58N0/3fCIQI8gj9nUI4qV2jJQMiVRCZZHESbLE2jTH1CQ4tv
-	t1CJEXLy5SmWw9X5JWUYn+xHYISr0Fo7dW9+jXj99Nto/vtKsUfIrUGX7X2iFYS4SY1R6of9RfUfa
-	PPA7jRVmoLAE6LBO40ct1NfRycGxsLq0JJUICCi2XJXqF550eD3KsIV1fs+0QBC8/fTYLKY/cMJZB
-	ufoUa3rHwVqA/jbXqTF1ae4cVhh7dJNBYN7obZ1SqDc+pM18Jh9GmknfxobhRR6ksFb2S1lYoNIN5
-	KqXF3PrUsKgStIYTlPzB03gVsKJIF1ONNj6Q==;
-Received: from mail-oa1-f49.google.com ([209.85.160.49]:46193)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1v9QW1-0006Ji-0Q
-	for netdev@vger.kernel.org; Thu, 16 Oct 2025 09:07:45 -0700
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-3c9662c5fb1so344830fac.0
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 09:07:44 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yx2NsJs/LDB4H0AsEMzNX5WNtPU4cG23wdUFP6Hl5PK9oYpmSKW
-	JgsGGBArOhLoSL4pBL2fFu+uUWvtewiRf6CbBCIbZmD2Z0Dl7npdjc391CWTRoPgJTPFJeot2W2
-	bh5/Bh8HbWT08q/S8Cs2Qup/wgOFdqXo=
-X-Google-Smtp-Source: AGHT+IEQxXjybBRheDRtSCSWwdpq7oleQCZ0nxgFzZmzopnIUMIf+ILNfjpzj0rUYekINdtqlLUVAmYJf8WC0DOjJQ8=
-X-Received: by 2002:a05:6871:81f:b0:37e:b2e3:dae4 with SMTP id
- 586e51a60fabf-3c98cfa81d3mr140051fac.13.1760630864398; Thu, 16 Oct 2025
- 09:07:44 -0700 (PDT)
+	s=arc-20240116; t=1760630935; c=relaxed/simple;
+	bh=rtOobu5Sj6URXeJFQHEPI/LcvnF98Vvo3jMsGLFw7Ks=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KXQUgHguD/B87YClrgRwG2kt02/dDUEKwW0ug5WU5D6LkBS2pPKImyRFcbEOSmJaaX2z3+4BJDcppVTi7Y1/ujdCbcTXiJ92p0bwLIgiJllaGi1K9LXwDVUhnJ5R4aNR7ZAzvR/1V16bDUxzl23IvNV6ajPABu4XXMyiHpmaIB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C3XXkATF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AEFFC4CEF1;
+	Thu, 16 Oct 2025 16:08:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760630935;
+	bh=rtOobu5Sj6URXeJFQHEPI/LcvnF98Vvo3jMsGLFw7Ks=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C3XXkATFhO5SOAHnGnmt8eM6n+IU9UCidNpwdgWJEenZXPHAHIL6/Y9ll9yObg4WD
+	 T1pmhh4oq/A4vdiOWjGttIzMf+Rk3xT8i5gmgKBjtIxGkvtUsCwheZ9RZBPXZrh5FW
+	 /ppwyyVyKZ4OoM1fG3nYPIukS1MMgGsn6vkIbhhpzWdU2RUktF24e3Guf/LenXF0FC
+	 hAej+ZwS5gxV4SD9aX86GrpnYZgQAmleIDL6uaMu4MeTcVGgU2w3FGgD38/qLF71gM
+	 ncks9ZZHYPJncjsBhyz2nJOyAbg3qJuh9KFNeUi7TnFaouZO2qWrNwjYKsJpBCiPB1
+	 xC0XRDeOM8Hfw==
+Date: Thu, 16 Oct 2025 17:08:52 +0100
+From: Simon Horman <horms@kernel.org>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	jacob.e.keller@intel.com, Guenter Roeck <linux@roeck-us.net>
+Subject: Re: [PATCH iwl-net v2] libie: depend on DEBUG_FS when building
+ LIBIE_FWLOG
+Message-ID: <aPEYlAph8tID7pdh@horms.kernel.org>
+References: <20251016072940.1661485-1-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Thu, 16 Oct 2025 09:07:09 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmwrPr46Ju-ZiLa7prnNFAcGr7Hu-vpk1B6-Q9Ks8fu8wQ@mail.gmail.com>
-X-Gm-Features: AS18NWCP3rJXwvvBWrvwvHmzkGRhz3UR1veKXsYpgFHB2AE65Ia8Xra4qrKOquY
-Message-ID: <CAGXJAmwrPr46Ju-ZiLa7prnNFAcGr7Hu-vpk1B6-Q9Ks8fu8wQ@mail.gmail.com>
-Subject: Build commit for Patchwork?
-To: Netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: 0.8
-X-Scan-Signature: c34b9e52c8715c7e60548704bd659ba6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251016072940.1661485-1-michal.swiatkowski@linux.intel.com>
 
-Is there a way to tell which commit Patchwork uses for its builds?
+On Thu, Oct 16, 2025 at 09:29:40AM +0200, Michal Swiatkowski wrote:
+> LIBIE_FWLOG is unusable without DEBUG_FS. Mark it in Kconfig.
+> 
+> Fix build error on ixgbe when DEBUG_FS is not set. To not add another
+> layer of #if IS_ENABLED(LIBIE_FWLOG) in ixgbe fwlog code define debugfs
+> dentry even when DEBUG_FS isn't enabled. In this case the dummy
+> functions of LIBIE_FWLOG will be used, so not initialized dentry isn't a
+> problem.
+> 
+> Fixes: 641585bc978e ("ixgbe: fwlog support for e610")
+> Reported-by: Guenter Roeck <linux@roeck-us.net>
+> Closes: https://lore.kernel.org/lkml/f594c621-f9e1-49f2-af31-23fbcb176058@roeck-us.net/
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> ---
+> v1 --> v2 [1]:
+>  * add DEBUG_FS dependency in LIBIE_FWLOG
+> 
+> [1] https://lore.kernel.org/netdev/20251014141110.751104-1-michal.swiatkowski@linux.intel.com/
 
-Patchwork builds are generating this error:
+I lightly compile-tested this and overall it looks good to me.
 
-=E2=80=98struct flowi_common=E2=80=99 has no member named =E2=80=98flowic_t=
-os=E2=80=99; did you mean
-=E2=80=98flowic_oif=E2=80=99?
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-(https://netdev.bots.linux.dev/static/nipa/1012035/14269094/build_32bit/std=
-err)
-
-but the member flowic_tos seems to be present in all recent commits
-that I can find.
-
--John-
 
