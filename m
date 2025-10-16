@@ -1,171 +1,154 @@
-Return-Path: <netdev+bounces-230195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51C22BE539D
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 21:25:15 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1535BE53A9
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 21:26:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 068E43B7E8B
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 19:25:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 83AF74E24C0
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 19:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F6C2882DE;
-	Thu, 16 Oct 2025 19:25:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4292D9EE1;
+	Thu, 16 Oct 2025 19:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PkFRHul4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VVoz1Ozg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E1B3346AF
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 19:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288BA2D94BB
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 19:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760642711; cv=none; b=Ln56+5ImEYUkmXX6gBSFI+yCHC81uJzjH6L5J01t169My+a/bA3D/09p/A5DmE8zEP2Mv3Yaw64I1Om6o5agQcDLQXEaFxSrQzcb6yb2mNuM8/U65j6ZzkVHbypaDKTR4nZGa9gwkssiKgfk+JdLo/ypWZ9NQelz9u61GDF1O1A=
+	t=1760642781; cv=none; b=j+fTvV1f/SGZnJ5PsyBclL31U+agcxVVJbrZW88k4D6eKxZ+2bBFdRtP43v0UPcXXpwp0L0fob4JBTJUqPc5+Lz0iX5Ul30U+wPylubJtmC0XB+e+3Kpp6l1XUZFU+F5AYN2K70VxbbhVk4tqTu3N4iAmveQPFM/U9D0zv+9K1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760642711; c=relaxed/simple;
-	bh=5hClzf2cuptCLwFlmdyEJrsgjkK4Wm6UaINvDimZ4+g=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=LfVTmRFc0aMlmVLb8RD+lXcvP3tzTJCQoVQa9Mj/O/F33gEK4qvvaIXQ6vYk2+21DKK9qpKEXTVhZxg+FRh9kr7W8bl1alU35aowpocaK9kLu/TJhbvziE4qV0KiFjBpDifIILbPURAo5qcPUByMFjo0wZiF+GCBx818Y1r0XLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PkFRHul4; arc=none smtp.client-ip=209.85.218.54
+	s=arc-20240116; t=1760642781; c=relaxed/simple;
+	bh=dEdNWeS2Gl2d+o5mW29vrd0DAG/c+gnVlrDIH6uDqEc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UaKOshdrz7N2A8En+5f2HOLQIs0hSqrgPlvGlbx8rya0wrrBZfJthvqL3WmfodrCkXb2B1I5yVvdMvk/UCyAme50dhXkd85fW6xeSOx9DFvuzxpn8HP0vWi0qx1kqUTrpH6knRv9MGbJi5csjjdXZrzJ1bjD1murxODn28v6VzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VVoz1Ozg; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b5c18993b73so187484566b.0
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 12:25:09 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4710683a644so10873635e9.0
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 12:26:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760642708; x=1761247508; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=emhKWl0KIKo781lc5mknm2iJGpKmRFgygW/E9mzChfw=;
-        b=PkFRHul4TjRmBa95P1Rn3BlJvUHMcL8T8CuY/fA5/D4rzGAQ5RYQ59uMZx/ZTaqnbT
-         vqpCtzppvclHd44LtT9hxJDtPvlLs8ssuFLOGhBIlPn2BwQ3fxiVHnX9ftZcxV/DrYLs
-         8nU/dT3mzd2+IZ0bWrYwO+uHwKiP3pney3FZz+lpqXpUqUsSca2PrZjYXEaPEWvfhV5s
-         FFaqFCUkyzWNcbgK5mE4S4syOj1vOKuD4nUcj4lJJEqcV4N9KPNszLGNWhSJl+mXT+RP
-         TgdFvSTUNuBhljahCHa2ITXqTtSCUhGdumSbIBfDXdUIcSxBJZddlnxcget5/hnhz0Lp
-         MjrA==
+        d=gmail.com; s=20230601; t=1760642778; x=1761247578; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qNxIenbZ/7hzw57JYZtengUf/MrdPiNanFMm+UB+8O8=;
+        b=VVoz1Ozg5rTDc2PDRxNG2Lir69VI5GsMI5FI/bJbNWyBc1uqtzP+4ugJrWtqiAGUJN
+         cnovsNQ2WMkhhRag155OATpDbqA0V9UFAwmRwMNulitl/87QfzFCTRNMl8T9XtF+v2A9
+         C+8f1oazoY1F+nL9VQneSzqLnlDmaQgLFJYOVwo5p0b6qI4zIDnTwCbIGPc5vBOFpXyx
+         b5/8Ab44hYV+F9GiGXESyzJNkpSyI3Rqo95NRcT2okecMJWRsgWQgtsI2HKY2PB5Jgub
+         fF6MpUIkoQJQk0DmxppOCwuTK8+SIjh52isBkBFejzeRjm94k9e2p8w6zW6oPUYEp5ZQ
+         5fuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760642708; x=1761247508;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=emhKWl0KIKo781lc5mknm2iJGpKmRFgygW/E9mzChfw=;
-        b=hlkzbNkX4Dk+pm+rEIZ5aYozXEKSgKd2oouHqdVEyzdWaP6v6uIJlDNJYM0yipKoN+
-         XH0iHPdNKhYRyQzBVuxxpi5r2vtdCkHr03Q7tzoGIxCZP9Jrd9ACOO5uOla7MWeuQ4Dq
-         BPEA3Ha0YBUG1wYs2sd5Mis50FRQA7CYGl4xB5FpgpvMhwiAjcUlwlYzFQneeI4VoVkx
-         PehJgkSq4Od4U+5CkuhE4/63FIV+IgKD4kTgTwVAMUxGx2uQikYjocWwahCZmcXxZNPu
-         K0aG1Vq4xG18b7MJUooNSdC3/N7HaMYBUL/1/DrqV4LUJBRSXRU8AmFj7OTfbkFoXrGC
-         XeSw==
-X-Gm-Message-State: AOJu0YzhqCSs3fzo33JMcA+ZgFGUeRNzqjT1i0aGj7QTDNLwwKdQMBvM
-	ZR5DVb1RUSQUdjS3p1vt2TeZF5kHoRxFJ2vNsXhHERRpkVi2Kb7LaQBW
-X-Gm-Gg: ASbGnctOmftwNxPUZq7r8Z22hTZ/tONmuugV73rFk9Y3gyyylVSnrnq7gbQWfQOcKFR
-	Q2aeewZx9d0PrBdimuBQl7OpuykjFsqwcHpmta3riXfBTTSOKRh3etgynZfuzBj4qMdeQQxdJBY
-	oz5oKXro0oG55QaBWABmqleHKS9eFNgkm0AXsUB1PSGfYTRn9bY4yNjKSvwxdxMWDp4ZMGPiZaF
-	7wO2VbjiafmyvQpS5kGgmD0Kjz/neCLjXYO6v2pjKl6H2S0VbI2003V/zfXJaaT5JvEeo3bPNQR
-	MhZqh5+4bJj511C3LUO1BQFMo+Kh81LE2ukJmq57+2W00A1OVBczoAS8Vknho6jmFlkIOudcHcr
-	XB1tGY5yuBgO5cLcAOuyvmmUZw2gU4u/YsRouNRCtPBOmWuH1TfkzeD2FUPga32Bx919Ljli+ow
-	MI9IR/f6Tx8BH1HtpH47cPJiRBWqfW8APwbzqm1dg2XRjRFU8iqIZW1PRx+gNTmId2d8Bhj6LX9
-	KmbXRnmHnr8t6J6PJV7MjENtlK6FsMjsGzpRoz0Pdo=
-X-Google-Smtp-Source: AGHT+IFvA2aNkVEVR/ppVS5KpNcbUWteRT9s/4DAHcnTHSu42ZxxiFC2SHgHHeqr9dfWUqhcYdbKnw==
-X-Received: by 2002:a17:907:3e96:b0:b46:cc3b:65f8 with SMTP id a640c23a62f3a-b6475220c06mr119549566b.45.1760642708189;
-        Thu, 16 Oct 2025 12:25:08 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f27:2100:21e7:7c7d:15e0:869f? (p200300ea8f27210021e77c7d15e0869f.dip0.t-ipconnect.de. [2003:ea:8f27:2100:21e7:7c7d:15e0:869f])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b5cb965cecesm591177166b.3.2025.10.16.12.25.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Oct 2025 12:25:07 -0700 (PDT)
-Message-ID: <a5c2e2d2-226f-4896-b8f6-45e2d91f0e24@gmail.com>
-Date: Thu, 16 Oct 2025 21:25:28 +0200
+        d=1e100.net; s=20230601; t=1760642778; x=1761247578;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qNxIenbZ/7hzw57JYZtengUf/MrdPiNanFMm+UB+8O8=;
+        b=N1GlrLwX/Expw7+UmNpo02FHl1+OIp1QGK6FOJWFCosZtmR4RbRkIfFW9Fm8M/lppK
+         cHcN7ythMcFqwn0hPrKT4zjAhRq5Wqf6wElu3XfrMAmClytKGA+MXWT8F4bquxxwbQp9
+         L++XptRZLsM82OSI8/jTCfouhrf8zSE12p9pZ4cXQJI+sYsizvV4Fy+H3zGMYhNkTRPF
+         kpeb7nOixpNSu2Hf/Bwynlz8En2Dx86101CBaKwVUxqT11JcNZzBVgCZ2pGJIYEcq2Tp
+         5rYpKbl0OJaeZyBo6T4lLi9iHEmSJ39r8/QOcchXlmcIx00t3RVE2K9OscieBL4yDpsP
+         0kVg==
+X-Forwarded-Encrypted: i=1; AJvYcCXIHsJ7EocXdXvZVHhNAAbIhpB3e6NXUH2k0CZGC4g+fNiIL/MkdgL1AmvFB7Bv3PJP0K0CeD0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzK1cfQHnesNl3FcMRCp5o/saBYNrqp4t7Oog79bEDLkV2GtScq
+	RC0vqijxcA3GtyaQGynwSrQq92WjLhe3iYhNlmidSOIniC2s0PUwqBTwjYRXSWzOZV+VBr3677f
+	tyqLa0RbVf/a5LnVN/5NUP5Pqu+af+6o=
+X-Gm-Gg: ASbGnctnF5ldqBz6etFv87aSuWM7k2ge+t4hNFXXgPC5/zgZzGESvuPNh+JMIVTdcUL
+	qc2sryava484ggfF3DYVFj3ntmZ8lmIra03SM6yU+Ag+bweTNPHKeaPm/TCLw8D2UfUvZkrDzbG
+	jpPS1PyXWSb8NNDlvKOV+RqJN8+0JqlUd1qCG71SOJYfVq2RopeBojrJzQ4TNbYBBdcH1sa2I9E
+	MDGLP0hy6qee3uOggVgajfs+SnH0MQns/ZjhEd0wQ7FleXHac1h5Gp1q6152MQ=
+X-Google-Smtp-Source: AGHT+IHkan6OSTsij5o2t2wdP7ZlC/6va0mR/d/Jvu+zXEN5PoMH3NcxLC3JAOwzBotWh9eaPBygA5v21SyF/7JVxYM=
+X-Received: by 2002:a05:600c:820e:b0:45c:b6d3:a11d with SMTP id
+ 5b1f17b1804b1-47117227aafmr11596675e9.1.1760642778305; Thu, 16 Oct 2025
+ 12:26:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH RESUBMIT net-next] r8169: reconfigure rx unconditionally
- before chip reset when resuming
-To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
- sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
- MVE4yNwdS+UsPeCF/6CQQTzHc+n7DomE7fjJD5J1hOJjqz2XWe71fTvYXzxCFLwXXbBiqDC9
- dNqOe5odPsa4TsWZ09T33g5n2nzTJs4Zw8fCy8rLqix/raVsqr8fw5qM66MVtdmEljFaJ9N8
- /W56qGCp+H8Igk/F7CjlbWXiOlKHA25mPTmbVp7VlFsvsmMokr/imQr+0nXtmvYVaKEUwY2g
- 86IU6RAOuA8E0J5bD/BeyZdMyVEtX1kT404UJZekFytJZrDZetwxM/cAH+1fMx4z751WJmxQ
- J7mIXSPuDfeJhRDt9sGM6aRVfXbZt+wBogxyXepmnlv9K4A13z9DVLdKLrYUiu9/5QEl6fgI
- kPaXlAZmJsQfoKbmPqCHVRYj1lpQtDM/2/BO6gHASflWUHzwmBVZbS/XRs64uJO8CB3+V3fa
- cIivllReueGCMsHh6/8wgPAyopXOWOxbLsZ291fmZqIR0L5Y6b2HvdFN1Xhc+YrQ8TKK+Z4R
- mJRDh0wNQ8Gm89g92/YkHji4jIWlp2fwzCcx5+lZCQ1XdqAiHQARAQABzSZIZWluZXIgS2Fs
- bHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPsLBjgQTAQgAOBYhBGxfqY/yOyXjyjJehXLe
- ig9U8DoMBQJf9GRVAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEHLeig9U8DoMSycQ
- AJbfg8HZEK0ljV4M8nvdaiNixWAufrcZ+SD8zhbxl8GispK4F3Yo+20Y3UoZ7FcIidJWUUJL
- axAOkpI/70YNhlqAPMsuudlAieeYZKjIv1WV5ucNZ3VJ7dC+dlVqQdAr1iD869FZXvy91KhJ
- wYulyCf+s4T9YgmLC6jLMBZghKIf1uhSd0NzjyCqYWbk2ZxByZHgunEShOhHPHswu3Am0ftt
- ePaYIHgZs+Vzwfjs8I7EuW/5/f5G9w1vibXxtGY/GXwgGGHRDjFM7RSprGOv4F5eMGh+NFUJ
- TU9N96PQYMwXVxnQfRXl8O6ffSVmFx4H9rovxWPKobLmqQL0WKLLVvA/aOHCcMKgfyKRcLah
- 57vGC50Ga8oT2K1g0AhKGkyJo7lGXkMu5yEs0m9O+btqAB261/E3DRxfI1P/tvDZpLJKtq35
- dXsj6sjvhgX7VxXhY1wE54uqLLHY3UZQlmH3QF5t80MS7/KhxB1pO1Cpcmkt9hgyzH8+5org
- +9wWxGUtJWNP7CppY+qvv3SZtKJMKsxqk5coBGwNkMms56z4qfJm2PUtJQGjA65XWdzQACib
- 2iaDQoBqGZfXRdPT0tC1H5kUJuOX4ll1hI/HBMEFCcO8++Bl2wcrUsAxLzGvhINVJX2DAQaF
- aNetToazkCnzubKfBOyiTqFJ0b63c5dqziAgzsFNBF/0ZFUBEADF8UEZmKDl1w/UxvjeyAeX
- kghYkY3bkK6gcIYXdLRfJw12GbvMioSguvVzASVHG8h7NbNjk1yur6AONfbUpXKSNZ0skV8V
- fG+ppbaY+zQofsSMoj5gP0amwbwvPzVqZCYJai81VobefTX2MZM2Mg/ThBVtGyzV3NeCpnBa
- 8AX3s9rrX2XUoCibYotbbxx9afZYUFyflOc7kEpc9uJXIdaxS2Z6MnYLHsyVjiU6tzKCiVOU
- KJevqvzPXJmy0xaOVf7mhFSNQyJTrZpLa+tvB1DQRS08CqYtIMxRrVtC0t0LFeQGly6bOngr
- ircurWJiJKbSXVstLHgWYiq3/GmCSx/82ObeLO3PftklpRj8d+kFbrvrqBgjWtMH4WtK5uN5
- 1WJ71hWJfNchKRlaJ3GWy8KolCAoGsQMovn/ZEXxrGs1ndafu47yXOpuDAozoHTBGvuSXSZo
- ythk/0EAuz5IkwkhYBT1MGIAvNSn9ivE5aRnBazugy0rTRkVggHvt3/7flFHlGVGpBHxFUwb
- /a4UjJBPtIwa4tWR8B1Ma36S8Jk456k2n1id7M0LQ+eqstmp6Y+UB+pt9NX6t0Slw1NCdYTW
- gJezWTVKF7pmTdXszXGxlc9kTrVUz04PqPjnYbv5UWuDd2eyzGjrrFOsJEi8OK2d2j4FfF++
- AzOMdW09JVqejQARAQABwsF2BBgBCAAgFiEEbF+pj/I7JePKMl6Fct6KD1TwOgwFAl/0ZFUC
- GwwACgkQct6KD1TwOgxUfg//eAoYc0Vm4NrxymfcY30UjHVD0LgSvU8kUmXxil3qhFPS7KA+
- y7tgcKLHOkZkXMX5MLFcS9+SmrAjSBBV8omKoHNo+kfFx/dUAtz0lot8wNGmWb+NcHeKM1eb
- nwUMOEa1uDdfZeKef/U/2uHBceY7Gc6zPZPWgXghEyQMTH2UhLgeam8yglyO+A6RXCh+s6ak
- Wje7Vo1wGK4eYxp6pwMPJXLMsI0ii/2k3YPEJPv+yJf90MbYyQSbkTwZhrsokjQEaIfjrIk3
- rQRjTve/J62WIO28IbY/mENuGgWehRlTAbhC4BLTZ5uYS0YMQCR7v9UGMWdNWXFyrOB6PjSu
- Trn9MsPoUc8qI72mVpxEXQDLlrd2ijEWm7Nrf52YMD7hL6rXXuis7R6zY8WnnBhW0uCfhajx
- q+KuARXC0sDLztcjaS3ayXonpoCPZep2Bd5xqE4Ln8/COCslP7E92W1uf1EcdXXIrx1acg21
- H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
- lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
- OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20210601005155.27997-1-kabel@kernel.org> <CA+V-a8tW9tWw=-fFHXSvYPeipd8+ADUuQj7DGuKP-xwDrdAbyQ@mail.gmail.com>
+ <7d510f5f-959c-49b7-afca-c02009898ef2@lunn.ch> <CA+V-a8ve0eKmBWuxGgVd_8uzy0mkBm=qDq2U8V7DpXhvHTFFww@mail.gmail.com>
+ <87875554-1747-4b0e-9805-aed1a4c69a82@lunn.ch>
+In-Reply-To: <87875554-1747-4b0e-9805-aed1a4c69a82@lunn.ch>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Thu, 16 Oct 2025 20:25:49 +0100
+X-Gm-Features: AS18NWBmO2Md7kkd9r8UiisL0OcfM-UKSJHnmxYYZMqkpd6ApOTIMYWYDieIuBk
+Message-ID: <CA+V-a8vv=5yRDD-fRMohTiJ=8j-1Nq-Q7iU16Opoe0PywFb6Zg@mail.gmail.com>
+Subject: Re: [PATCH leds v2 00/10] Add support for offloading netdev trigger
+ to HW + example implementation for Turris Omnia
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: =?UTF-8?B?TWFyZWsgQmVow7pu?= <kabel@kernel.org>, 
+	linux-leds@vger.kernel.org, netdev@vger.kernel.org, 
+	Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>, Russell King <linux@armlinux.org.uk>, 
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, 
+	Jacek Anaszewski <jacek.anaszewski@gmail.com>, 
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There's a good chance that more chip versions suffer from the same
-hw issue. So let's reconfigure rx unconditionally before the chip reset
-when resuming. This shouldn't have any side effect on unaffected chip
-versions.
+Hi Andrew,
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/realtek/r8169_main.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+On Thu, Oct 16, 2025 at 8:11=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Thu, Oct 16, 2025 at 07:53:17PM +0100, Lad, Prabhakar wrote:
+> > Hi Andrew,
+> >
+> > On Thu, Oct 16, 2025 at 2:14=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wr=
+ote:
+> > >
+> > > > > Marek Beh=C3=BAn (10):
+> > > > >   leds: trigger: netdev: don't explicitly zero kzalloced data
+> > > > >   leds: trigger: add API for HW offloading of triggers
+> > > > >   leds: trigger: netdev: move trigger data structure to global in=
+clude
+> > > > >     dir
+> > > > >   leds: trigger: netdev: support HW offloading
+> > > > >   leds: trigger: netdev: change spinlock to mutex
+> > > > >   leds: core: inform trigger that it's deactivation is due to LED
+> > > > >     removal
+> > > > >   leds: turris-omnia: refactor sw mode setting code into separate
+> > > > >     function
+> > > > >   leds: turris-omnia: refactor brightness setting function
+> > > > >   leds: turris-omnia: initialize each multicolor LED to white col=
+or
+> > > > >   leds: turris-omnia: support offloading netdev trigger for WAN L=
+ED
+> > > > >
+> > > > Do you plan to progress with the above series anytime soon? If not =
+I
+> > > > want to give this patch [0] again a respin.
+> > >
+> > > What features are you missing from the current kernel code, which thi=
+s
+> > > series adds?
+> > >
+> > I=E2=80=99m working on a platform that uses the VSC8541 PHY. On this pl=
+atform,
+> > LED0 and LED1 are connected to the external connector, and LED1 is
+> > also connected to the Ethernet switch to indicate the PHY link status.
+> > As a result, whenever there is link activity, the PHY link status
+> > signal to the switch toggles, causing the switch to incorrectly detect
+> > the link as going up and down.
+>
+> So you think the current /sys/class/leds code is not sufficient. You
+> can use it from udev etc, to make the LED indicate link, but then
+> userspace could change it to something else. I _think_ only root can
+> use /sys/class/leds to change the function of the LED, so it is not
+> too bad as is? Or do you really want to make the configuration read
+> only?
+>
+I haven't explored the current leds code tbh. Can you please point me
+to any PHY which uses leds if any.
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index d18734fe1..2a4d9b548 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -4995,9 +4995,7 @@ static int rtl8169_resume(struct device *device)
- 		clk_prepare_enable(tp->clk);
- 
- 	/* Some chip versions may truncate packets without this initialization */
--	if (tp->mac_version == RTL_GIGA_MAC_VER_37 ||
--	    tp->mac_version == RTL_GIGA_MAC_VER_46)
--		rtl_init_rxcfg(tp);
-+	rtl_init_rxcfg(tp);
- 
- 	return rtl8169_runtime_resume(device);
- }
--- 
-2.51.0
-
-
-
+Cheers,
+Prabhakar
 
