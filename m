@@ -1,132 +1,121 @@
-Return-Path: <netdev+bounces-229920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C06F9BE2115
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:00:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C2AEBE2142
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:02:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CF4A405973
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:00:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C5C3423EA8
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:02:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24238301715;
-	Thu, 16 Oct 2025 07:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F012FFFA0;
+	Thu, 16 Oct 2025 08:02:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="yRfFkKU5"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="R86uQbSw"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4702FFF9F;
-	Thu, 16 Oct 2025 07:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9BD2D46C0;
+	Thu, 16 Oct 2025 08:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760601592; cv=none; b=LR466AtCFkAh1EmdE2fe6E3oAi8aPqwGhZAWZ0Abtl2v8LltQFmuSV/z7BI3V95m38TuBmleaOno6el96rOMjCunTvTpi9JpeSfuYEh3Jo7eL5Vyvm3xnmL89PnNRPoLGXvHXX7SfA+t27+JYyofo9wSbHTk3gwU+eGneFhNlQw=
+	t=1760601741; cv=none; b=JcpjzgykqVIZ6s7GhR/+22JFTt/DKK9v7qnC9dwllbVrg0ZJUsxoccMp2+ekXSrXgw3MVWWy7EFDDSrTRaIGRt8Fgy8pmeGqq0fqSczatkX3BOeD0hb0PFf0HmB8gF4OGkdmuV4hFYFh+Sr3S4kb7KOnfRhXgRG4fg3uMEwi4iI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760601592; c=relaxed/simple;
-	bh=+vKJQP1mIQMNYZf++4ZYhUdYx+YT07eIKK3wxNp2eZM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ocrswmy3Mu5aM+w0c7P6FTonu2IMR6DuzlktXxg4muYOn6D17UbIFSPLx6qi+sDKsQY1oV6qMnmdF7ZsI2EjvljYhzV9rLSd5BrfHpWO0EA2Ptf54j70tMV+V7S8KeTeLX6ThL0Vlf1sCJK4rOX2tlxApjxSKpGEt3aRPYg04LY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=yRfFkKU5; arc=none smtp.client-ip=202.12.124.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
-	by mailfout.stl.internal (Postfix) with ESMTP id DCD021D0015C;
-	Thu, 16 Oct 2025 03:59:47 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Thu, 16 Oct 2025 03:59:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760601587; x=
-	1760687987; bh=wVqgocYI0n8kgCp0cVXx1uCWfFzvoA7KTcrmb8YK+08=; b=y
-	RfFkKU5JijraOUbNjh6inSU1k8sULCj/OmFqlTRWEsD4YwZ3zfaBJzDmTONprw6o
-	RLHA0mtymgHdULBY/DYJoMfIe9p+iLYMgmXZ1PxZDt0dkJLYcwZGC+gDRNrDfwN/
-	RB3vQg2Py9kYwr4NKX/AZLnPTa2Olw7p522GbXBB6YgH/Jtdv1/cMejjXMh+TVMT
-	rTtsH6Q3oYmUcB+AOWuA00gLaguw96TCu6LaOrgWVEyZ/sdmglDyUz6u+7d6uUQY
-	3iR12WnjZhJ/FQmv9G7I6UtjIQxl5jy5AAr+s3oz8w/ICeJLcJ3n6TCYL9s4DY16
-	2pDMbn5CYP5Er9v8XTGIQ==
-X-ME-Sender: <xms:8qXwaJJTany_uT-PPHttB2bzj8N06UwExF4vztgfrdyCvPdqP_I_ew>
-    <xme:8qXwaBGAN3D4jGhMKRgUKILb8hti7z_DFASEP0kxcny0SrrQrq9PKvPe6bIbwhSzS
-    Gb7oC50CG-L4vRLmFjRhC4sn1H_I4F_sgaC71qilVOE8i4Jwked>
-X-ME-Received: <xmr:8qXwaH1pPjV93IhbQ4ykNlMQogY5EGB8OQxbY2FIbpL-hs7CJAV21fQB>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdehjeehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttddunecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpeegheekuddvueejvddtvdfgtddvgfevudektddtteevuddvkeetveeftdevueej
-    veenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
-    hoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopedujedpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtohepjhhohhgrnhhnvghsrdifihgvshgsohgvtghksegrih
-    hsvggtrdhfrhgruhhnhhhofhgvrhdruggvpdhrtghpthhtohepuggrvhgvmhesuggrvhgv
-    mhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtoh
-    hmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggs
-    vghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtohepkhhunhhihihusehgohhoghhlvgdrtghomhdprhgtphhtthho
-    pehsughfsehfohhmihgthhgvvhdrmhgvpdhrtghpthhtohepshhhrgifrdhlvghonhesgh
-    hmrghilhdrtghomh
-X-ME-Proxy: <xmx:8qXwaAwRO4YW0r5nsoQD3wdrEmq6JCOt_XvzGQLNZ69s7LgdwwE2JQ>
-    <xmx:8qXwaOi8RmTOEArw2qwbL7INBsjnSaiDLSJVO0uTZe0mWzjNZT69-Q>
-    <xmx:8qXwaHx63zLDd6loTzk3AfcjGLpdwQIqbznXyllp8enyGkr2I_qePg>
-    <xmx:8qXwaEyuIS7cCsySSbdPaosOFHkgLg-zA39tp_UhfwyzyQhGhOLnfg>
-    <xmx:86XwaMJ0BtddSqnTgfvTDAFdYWsFZvptt0bXxhJoouzZ4sRUsscCFUpq>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 16 Oct 2025 03:59:46 -0400 (EDT)
-Date: Thu, 16 Oct 2025 10:59:44 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Johannes =?iso-8859-1?Q?Wiesb=F6ck?= <johannes.wiesboeck@aisec.fraunhofer.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Xiao Liang <shaw.leon@gmail.com>,
-	Vlad Yasevich <vyasevic@redhat.com>,
-	Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	gyroidos@aisec.fraunhofer.de, sw@simonwunderlich.de,
-	Michael =?iso-8859-1?Q?Wei=DF?= <michael.weiss@aisec.fraunhofer.de>,
-	Harshal Gohel <hg@simonwunderlich.de>
-Subject: Re: [PATCH net v2] rtnetlink: Allow deleting FDB entries in user
- namespace
-Message-ID: <aPCl8EO8xkRVzaQi@shredder>
-References: <20251015201548.319871-1-johannes.wiesboeck@aisec.fraunhofer.de>
+	s=arc-20240116; t=1760601741; c=relaxed/simple;
+	bh=ig/+FDU+0q9A28w5jFSM4PSXgbhgNaEIsEKVfBxrRHk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YP0l18pPHXudN5FPfsiEb8JzGT6pV9wibL55ea9t8tzyL8Z+3xlC8vYVW0mu3gYfD9qu1pKO94VZpCSGElIV8fX4hQ9jKjty0+OElbJTBc9mIv1HaBisdtoBKN9qoHi/KfDtx1z3Dh0rP1/Y9xLtyjCbBNUQEZg9tx6fda9ZA/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=R86uQbSw; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 75C80C03B71;
+	Thu, 16 Oct 2025 08:01:50 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 94D946062C;
+	Thu, 16 Oct 2025 08:02:09 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id ADF8C102F22F8;
+	Thu, 16 Oct 2025 10:01:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1760601724; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=epg/CJTop2yMwEwTNQzhdUDQRTPIOstndBbKQiZycUs=;
+	b=R86uQbSwPtfWBGs3P9qIkZwbYZIxEbHPKPfBOUcKnU4E91PDHpMmVcCdfUM39MUUox04kQ
+	G1R/ikQ+nU9LU6nWtmUTpv4+0kCjgzQSITC3ZJteHpc3136OMXJz8TxYWYczhU5h3UoXzW
+	BJEud93vn7k6MKpWQYYfI+XBV9MNEioT9ansLB4lAk8o/g8NOBN5JMBmK1eoSfBQJDtfFE
+	FMqRKBsa/avl4sAJxydw/fS9LGMQUqKMHF/RHU52F2e7G6wcOmVUfpvFOigddgk3DCjz+A
+	HZVtwoZl1uyNj06dWK+wvEu1SCwYeGfgKYXxzcjzxABs+bbtI8WcH7GuXguVvA==
+Message-ID: <731e8fa7-465b-4470-9036-c59fea602c07@bootlin.com>
+Date: Thu, 16 Oct 2025 10:01:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/3] net: ethtool: tsconfig: Re-configure
+ hwtstamp upon provider change
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
+ <20251015102725.1297985-4-maxime.chevallier@bootlin.com>
+ <20251015144526.23e55ee0@kmaincent-XPS-13-7390>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251015144526.23e55ee0@kmaincent-XPS-13-7390>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251015201548.319871-1-johannes.wiesboeck@aisec.fraunhofer.de>
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Wed, Oct 15, 2025 at 10:15:43PM +0200, Johannes Wiesböck wrote:
-> Creating FDB entries is possible from a non-initial user namespace when
-> having CAP_NET_ADMIN, yet, when deleting FDB entries, processes receive
-> an EPERM because the capability is always checked against the initial
-> user namespace. This restricts the FDB management from unprivileged
-> containers.
-> 
-> Drop the netlink_capable check in rtnl_fdb_del as it was originally
-> dropped in c5c351088ae7 and reintroduced in 1690be63a27b without
-> intention.
-> 
-> This patch was tested using a container on GyroidOS, where it was
-> possible to delete FDB entries from an unprivileged user namespace and
-> private network namespace.
-> 
-> Fixes: 1690be63a27b ("bridge: Add vlan support to static neighbors")
-> Reviewed-by: Michael Weiß <michael.weiss@aisec.fraunhofer.de>
-> Tested-by: Harshal Gohel <hg@simonwunderlich.de>
-> Signed-off-by: Johannes Wiesböck <johannes.wiesboeck@aisec.fraunhofer.de>
+Hi KÃ¶ry,
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+On 15/10/2025 14:45, Kory Maincent wrote:
+> On Wed, 15 Oct 2025 12:27:23 +0200
+> Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+> 
+>> When a hwprov timestamping source is changed, but without updating the
+>> timestamping parameters, we may want to reconfigure the timestamping
+>> source to enable the new provider.
+>>
+>> This is especially important if the same HW unit implements 2 providers,
+>> a precise and an approx one. In this case, we need to make sure we call
+>> the hwtstamp_set operation for the newly selected provider.
+> 
+> This is a design choice.
+> Do we want to preserve the hwtstamp config if only the hwtstamp source is
+> changed from ethtool?
+> If we want to configure the new source to the old source config we will also
+> need to remove this condition:
+> https://elixir.bootlin.com/linux/v6.17.1/source/net/ethtool/tsconfig.c#L339
+
+What I get from the ethtool output is that the ts config is per-source.
+Re-applying the old config to the new source may not work if the new one
+doesn't have the same capabilities.
+
+> 
+> I do not really have a strong opinion on this, let's discuss which behavior we
+> prefer.
+
+Well if we want to support different timestamp providers provided by the same
+HW block (same MAC or even same PHY), then we need a way to notify the provider
+when the timestamp provider gets selected and unselected.
+
+Otherwise there's no way for the provider to know it has been re-enabled, unless
+we perform a config change at the same time.
+
+Maxime
 
