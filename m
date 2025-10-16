@@ -1,113 +1,93 @@
-Return-Path: <netdev+bounces-230148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DA44BE479F
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 18:10:38 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D1C6BE478D
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 18:10:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03C2558664A
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 16:07:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0EBA04F9A6F
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 16:07:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97249195FE8;
-	Thu, 16 Oct 2025 16:07:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC4E32D0CC;
+	Thu, 16 Oct 2025 16:07:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gjyQeO98"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="EUBa4sU+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A6632D0F9
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 16:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D2632D0D7
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 16:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760630832; cv=none; b=U1Yhol6cqqaD3Cf7EnZsg+3mnkniUgnBm0Z56WDHzMSnAJHJn/0B931GP5I9akgnYzq1EKqNAfVyt5e9/AShji/44UJL3dSoSMnPLvOFPpHSNPEJ2+yOhVmPQQFktQD32W4oCCZynwy+t2KhmrBTMilBjCyYPTfV7+mbKnvxzRM=
+	t=1760630868; cv=none; b=rdnkGxzZvmeVUZVgiSqdpHzDWmSTsULMS/CtN8bZvYR01aTxwI52Kq84siODaYLNVky5UbqDSBN/5b9mCxzmtx0F08jdXZXhO9jNf+kqbqCwcz4/+iJ3g/+NCNWiP8r8uZYmz/K+JQPO9fkoxzJZwS5zuxRt4a71pTujD8uO7ZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760630832; c=relaxed/simple;
-	bh=Vjr9YRqSTqtgmJiKQ524agy+ATb2FxOdcZqgwssjAqI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RK7LZ7O9LGw2D/R+7TRid7VSMVykPaMkasrSPBEt0jiVWAF6yj6vk/9kxCCvtnwi+Tm5SnjMhF7r9osOjGs0yoGM1HyZjadmqmCvP8p6OGpnzV/KrI1cQGdVXGhRYcx7gbTpUtVp8+6A0kH1NbuM3ZTlxjVaRc7/FHZNf0SK2Sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gjyQeO98; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DA3DC19424
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 16:07:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760630832;
-	bh=Vjr9YRqSTqtgmJiKQ524agy+ATb2FxOdcZqgwssjAqI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=gjyQeO98N1+v0/URF99aBx/z8ZAnq3UKJU6NpkHELvJ36uYHKt4lmPSs2QAE7FwK+
-	 sewCJPl1cr7l5be78bRAxqri000zxK/EScX2JQ4xjThRc2kWtT0iBOS8j7tNAtA1b4
-	 AWxXUOSPYz+mlUwXNsp+ICUAZ0QVoFFE+0Gc8jKJViSdnewsKNdgQrc+FUoI8KRhh1
-	 sZEMf3sD4TloKq3mUdm/gFjbgzvkP0kNKv+5VnwJF9aValAdVhO3KchYbLuFfnnZ/+
-	 4K1T+NoBtsRDAT4pT6/Y6moRm2OCwGopIWsb8cSXjpwfjEFu1CAoJX2UfvPbIkz69R
-	 nrLQqyrkx090g==
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b5e19810703so131956466b.2
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 09:07:11 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVM8h3bXioI7Oz6JMfiSsCQX4w5X8RTU8pufkqvk4qUJYCX9EkWnQ+9zdGAu2jfwu+JMQfMsbk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8bsF9Lu26tHSic3MIZPvu8H2n+kOjx2/2E5oVvdHBnVxaPUYM
-	OjBadok7rYar9P0HdMBc+FZI7ndGhTbooyzWEao2LZ2dqv0IPJpaF4oAZZy2tNy1kiU96GTqueI
-	iFcztWII7KtSQtBcdPY5tj0kfT8Cibw==
-X-Google-Smtp-Source: AGHT+IEwUNFtjfemC+H8YbxetDx+/1UO/8iQ2gyCTnZPC0wHrc6i2JvE1D+ajYJoJm5ZfKz4z3qtGvXJ7TTBCQJq2aU=
-X-Received: by 2002:a17:907:1c85:b0:b3e:5f20:888d with SMTP id
- a640c23a62f3a-b647304516amr61378866b.27.1760630830062; Thu, 16 Oct 2025
- 09:07:10 -0700 (PDT)
+	s=arc-20240116; t=1760630868; c=relaxed/simple;
+	bh=zfeKjgA6iJPt3E2LkiwulJK/Ai9g8+9EALGPZe47a1g=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=u0tj5i058JaPOWpOC/9OIIuX5NUSje31r2UId2f8VIg7V9mvgXS/w+rrFPkNybrG/fcJ/z9LvQ2NwfKjYPMVYfQl+TBInDWp+mQB6yimeRSjRzH/UshgEF1hRbHBlOcKVTDiKXv051a0J+os4XrcFztkyorHv84tOGVHVOP9ir4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=EUBa4sU+; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:To:
+	Subject:Message-ID:Date:From:MIME-Version:Sender:Reply-To:Cc:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=zfeKjgA6iJPt3E2LkiwulJK/Ai9g8+9EALGPZe47a1g=; t=1760630866; x=1761494866; 
+	b=EUBa4sU+hPDY1zauEknkV1ynrBa58N0/3fCIQI8gj9nUI4qV2jJQMiVRCZZHESbLE2jTH1CQ4tv
+	t1CJEXLy5SmWw9X5JWUYn+xHYISr0Fo7dW9+jXj99Nto/vtKsUfIrUGX7X2iFYS4SY1R6of9RfUfa
+	PPA7jRVmoLAE6LBO40ct1NfRycGxsLq0JJUICCi2XJXqF550eD3KsIV1fs+0QBC8/fTYLKY/cMJZB
+	ufoUa3rHwVqA/jbXqTF1ae4cVhh7dJNBYN7obZ1SqDc+pM18Jh9GmknfxobhRR6ksFb2S1lYoNIN5
+	KqXF3PrUsKgStIYTlPzB03gVsKJIF1ONNj6Q==;
+Received: from mail-oa1-f49.google.com ([209.85.160.49]:46193)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1v9QW1-0006Ji-0Q
+	for netdev@vger.kernel.org; Thu, 16 Oct 2025 09:07:45 -0700
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-3c9662c5fb1so344830fac.0
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 09:07:44 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yx2NsJs/LDB4H0AsEMzNX5WNtPU4cG23wdUFP6Hl5PK9oYpmSKW
+	JgsGGBArOhLoSL4pBL2fFu+uUWvtewiRf6CbBCIbZmD2Z0Dl7npdjc391CWTRoPgJTPFJeot2W2
+	bh5/Bh8HbWT08q/S8Cs2Qup/wgOFdqXo=
+X-Google-Smtp-Source: AGHT+IEQxXjybBRheDRtSCSWwdpq7oleQCZ0nxgFzZmzopnIUMIf+ILNfjpzj0rUYekINdtqlLUVAmYJf8WC0DOjJQ8=
+X-Received: by 2002:a05:6871:81f:b0:37e:b2e3:dae4 with SMTP id
+ 586e51a60fabf-3c98cfa81d3mr140051fac.13.1760630864398; Thu, 16 Oct 2025
+ 09:07:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251015232015.846282-1-robh@kernel.org> <aPERZ/IpjAhD2sen@lizhi-Precision-Tower-5810>
-In-Reply-To: <aPERZ/IpjAhD2sen@lizhi-Precision-Tower-5810>
-From: Rob Herring <robh@kernel.org>
-Date: Thu, 16 Oct 2025 11:06:58 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqJCCBHp6vMvXdh39hpdiMg-3Kr3uB7KMFauCfYM7rYSWQ@mail.gmail.com>
-X-Gm-Features: AS18NWCmaqStDDMgrLFaOkte03G1gDmgUst_qjRWdTXsAn_QVmilmfjOPWrs-c4
-Message-ID: <CAL_JsqJCCBHp6vMvXdh39hpdiMg-3Kr3uB7KMFauCfYM7rYSWQ@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: Fix inconsistent quoting
-To: Frank Li <Frank.li@nxp.com>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Stephen Boyd <sboyd@kernel.org>, Thierry Reding <thierry.reding@gmail.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	Shawn Guo <shawnguo@kernel.org>, Fabio Estevam <festevam@gmail.com>, 
-	=?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
-	Lars-Peter Clausen <lars@metafoo.de>, Michael Hennerich <Michael.Hennerich@analog.com>, 
-	Jonathan Cameron <jic23@kernel.org>, Andy Shevchenko <andy@kernel.org>, 
-	Jassi Brar <jassisinghbrar@gmail.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
-	Lee Jones <lee@kernel.org>, Joel Stanley <joel@jms.id.au>, 
-	Andrew Jeffery <andrew@codeconstruct.com.au>, Andrew Lunn <andrew@lunn.ch>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Daire McNamara <daire.mcnamara@microchip.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Vinod Koul <vkoul@kernel.org>, 
-	Kishon Vijay Abraham I <kishon@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Tony Lindgren <tony@atomide.com>, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-iio@vger.kernel.org, linux-media@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-phy@lists.infradead.org
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Thu, 16 Oct 2025 09:07:09 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmwrPr46Ju-ZiLa7prnNFAcGr7Hu-vpk1B6-Q9Ks8fu8wQ@mail.gmail.com>
+X-Gm-Features: AS18NWCP3rJXwvvBWrvwvHmzkGRhz3UR1veKXsYpgFHB2AE65Ia8Xra4qrKOquY
+Message-ID: <CAGXJAmwrPr46Ju-ZiLa7prnNFAcGr7Hu-vpk1B6-Q9Ks8fu8wQ@mail.gmail.com>
+Subject: Build commit for Patchwork?
+To: Netdev <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: 0.8
+X-Scan-Signature: c34b9e52c8715c7e60548704bd659ba6
 
-On Thu, Oct 16, 2025 at 10:38=E2=80=AFAM Frank Li <Frank.li@nxp.com> wrote:
->
-> On Wed, Oct 15, 2025 at 06:16:24PM -0500, Rob Herring (Arm) wrote:
-> > yamllint has gained a new check which checks for inconsistent quoting
-> > (mixed " and ' quotes within a file). Fix all the cases yamllint found
-> > so we can enable the check (once the check is in a release). Use
-> > whichever quoting is dominate in the file.
->
-> Can we simple require only use one of " or ' to let everyone follow easil=
-y?
-> support both " or ' is unneccessary options.
+Is there a way to tell which commit Patchwork uses for its builds?
 
-I don't really care to fix 915 files. And don't send 100s of patches
-for me to review either. Given we've got 5200 total, it's a good
-chance folks will copy the preferred style.
+Patchwork builds are generating this error:
 
-Rob
+=E2=80=98struct flowi_common=E2=80=99 has no member named =E2=80=98flowic_t=
+os=E2=80=99; did you mean
+=E2=80=98flowic_oif=E2=80=99?
+
+(https://netdev.bots.linux.dev/static/nipa/1012035/14269094/build_32bit/std=
+err)
+
+but the member flowic_tos seems to be present in all recent commits
+that I can find.
+
+-John-
 
