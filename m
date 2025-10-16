@@ -1,151 +1,123 @@
-Return-Path: <netdev+bounces-230131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 760B7BE4405
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 17:32:41 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DC0FBE443E
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 17:34:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4C97C506E8E
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:31:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ED459562213
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EDCB34BA50;
-	Thu, 16 Oct 2025 15:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7347234166C;
+	Thu, 16 Oct 2025 15:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kosmx.dev header.i=@kosmx.dev header.b="l8O1INcr";
-	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="VCVsSmbs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ep95c049"
 X-Original-To: netdev@vger.kernel.org
-Received: from b224-2.smtp-out.eu-central-1.amazonses.com (b224-2.smtp-out.eu-central-1.amazonses.com [69.169.224.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA30A346A1B;
-	Thu, 16 Oct 2025 15:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=69.169.224.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A0F3451B0
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 15:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760628668; cv=none; b=c37EieMN6doT7zLCHAMixtV396ZOIQX0Rq7U16/T778bRvjttz1696ctFs/BHuVJpkuKvtTTWrzLtDK4RIcuIhtec+BQIbhxEae6B3uONO+JMnxeElXusBmC38NHK8g5rfaKiSXXnV0Awk+HQMcPxF43dxNdzxNgQ5ElxK7+5Xo=
+	t=1760628750; cv=none; b=F1T17WBn+B/Jo7/HDdR08rc3L0anBRGSnFjoHAOIXSvvRYy6T+70FUX8qWBHeUhWBaBRXvmvbDgxk0gRwzjdQVvnYrpcLHh/ZPjStIYQmXM6VQJKss3K0hN+zQMw32VXapsi88RoVxQz63e2jL0E8ZW6KKJbLzBjr1Bp8CKqPRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760628668; c=relaxed/simple;
-	bh=4V+eiDbJeS2/Lkmw7GXs1heP2kr5DjpdCX+SmScCzco=;
+	s=arc-20240116; t=1760628750; c=relaxed/simple;
+	bh=Gf6CdowgcJaW13930Iudunk15ESM+xfAqwobszcKePw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Rb4BgKm5z2SZDDTFglg9uMFPUbqSFCpYJ0WgUgMLEgQvxgkcenz+GL1a/bU1+5hQdW1EF/43l9Kah3FPLdKd57PQzZ68Lo9gNpUiBRJMUo2s03WfPtzRckeYg/IgK8mObCGx3iBMZ6AtlIcST8X63wM3djwvLLGLGr1ZuJmG2GA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kosmx.dev; spf=pass smtp.mailfrom=eu-central-1.amazonses.com; dkim=pass (2048-bit key) header.d=kosmx.dev header.i=@kosmx.dev header.b=l8O1INcr; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=VCVsSmbs; arc=none smtp.client-ip=69.169.224.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kosmx.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eu-central-1.amazonses.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=2d6evbf27r2lzynqz2duzea56jayutws; d=kosmx.dev; t=1760628662;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=4V+eiDbJeS2/Lkmw7GXs1heP2kr5DjpdCX+SmScCzco=;
-	b=l8O1INcrEZVAyTskRDCz1jSdZjAI7LQJEswDzEqxHAXzfc+6sxq6en6VV1Efo6X7
-	KXkhePqB+3Fsg+wwMUdZCea5BeTltdQaAFODFc6TRcObGsf6TChdbbmQ5eR5C+6LR1O
-	zzB68saGPWBBNhB4Tr6EAE6Xg0ePKAhXc/fJOap0c9myOiFoHphSsfCL0JWlb4497Zq
-	5l8Z8YL4hQRKRM/VZ4pg8C6wMjabCETMbhn+yUC/HMwjeyffnb31cA6/kd1+U92C2LP
-	CyrahYfh5khic7qS13gL+srSOoys0v999JjbLECNXnAogv+in0Nxwspi1XUHTqpzkgc
-	aWUPGT2a9Q==
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=sokbgaaqhfgd6qjht2wmdajpuuanpimv; d=amazonses.com; t=1760628662;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Feedback-ID;
-	bh=4V+eiDbJeS2/Lkmw7GXs1heP2kr5DjpdCX+SmScCzco=;
-	b=VCVsSmbsXZJ2WUv4RWow/8JmxdP0JC5Kh1ftrvf909tFqIh9lm9ttMAvyE4CSzOy
-	TRiVlzAsi99aUXynnjo2gAIJgGbbO+3xYinvqEohI0qZUuy5r3dVXYGI/z61Br//z46
-	dzK3ZDfmSNyi80uuEB6zxJ1E8JllfLZcG/Ez0eA4=
-Message-ID: <01070199eda55d65-1e43d600-4eb4-4caf-98f0-4414b449cb07-000000@eu-central-1.amazonses.com>
-Date: Thu, 16 Oct 2025 15:31:01 +0000
+	 In-Reply-To:Content-Type; b=nZIG3kQdAlEjAfUb3s7FQnKUd8CLGObIyhwHIyhjAHqcRCzznCjM9GxhdNh5wuA3Orrb3MB3wI/dfLYRoN+Ug2FywSukzd4wX8sfu9JYa4poPLARQptM70eElMQQpVKjvmG0Heez7t/vi8YFd31Yp6cN0YNT4t3NMvdJ5E+A7s0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ep95c049; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-42f9f5a9992so7863545ab.2
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 08:32:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760628748; x=1761233548; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xg1jqEZ8SLRtVB/wwQT4BUuBiWGbY24yKgIhLLceEsE=;
+        b=Ep95c049ZBg3vSweDVPbHVJWMfQMuG6IFOPhbcskA5d54Dm8fOWGinp+QToC6I0VYB
+         wQ2qScy6qbrWq86FtqKTKqg6N6k4sAjDHpwEbrBOP89wxlc5w9sBDoCc/ByMAW1B776k
+         o872BoJGqEFIviiT2meA9jbMp72tNZb10O2mS631HpUBAF3p4ECA2wXblE1KvYfRdwF2
+         aQBuB/P1yQfO4VJzrbGpxQsgp0Rm+QoKHOkPw+uASE4SMXkI2CHp8zc694FECPF2zTli
+         QQdI++x0k+yGnHCtw+DnyPWzG3jp14Ax9b1iOcJV9HWcSNqVuX2Eb1CoAp8S1NBV2/Eu
+         bUQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760628748; x=1761233548;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xg1jqEZ8SLRtVB/wwQT4BUuBiWGbY24yKgIhLLceEsE=;
+        b=WeypsWdsMqvREKpCMCdhmi48gsJ5v8LIG638GBU4/LLEPRoPRluFo4kea25TfRyfH/
+         GfIT5wIESKOOcXrhQcP8ScO9l4FYczSzmbyVBfwFpHuRrYD/xcSCwXYEbs0stkwLuHU5
+         L+ONh5WtdU5qeHfkaZc7bMBuT+QISpLdqkri8JyaEk2m7+Q3tuC4Yw8ER6WONxvpg7mA
+         I5bP4w6JcWkxEStwr4YtLR1egOR7Z8ql3w7aArPUPQl0aaGICDDkqBWTSoVv5bXnTSNl
+         Rifu8HvP5fH/DOvIugngbNyhaxgJ7y5Zh0gYBIwzWyfqXRb5LGzUwQfphVIjvNj9rJg8
+         +pmA==
+X-Forwarded-Encrypted: i=1; AJvYcCVUnTWawoXe+ynWpP2Saq2XPdhhlwN4ttPeodpgUvNcp2mUI9e6RiufxJrahOGIJ2To1tYcoEo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGIdOepmP7xdADCDpa5yaj0bzl5r0a2OCD9YsFT/phk9XS3PEl
+	6lQvxvdnhoG81bq1ayNmWplLHgXSvVy6vvyxkqW5IS8xwztM8PAKmESqBCvrbQ==
+X-Gm-Gg: ASbGncuIuadz8W6Pl2kdNIec42Qwx/idC+4Gf+mZOZdSG8CPTbUvh2s2fC9OMXDTr5j
+	UrTL0gZMPZdZ/Sm42jkf0HF0lshxY5g8GH2IxPQjP59m5tI1Qu7eHbYKw2Lo0xHP9VkyoacetHV
+	g7WeI9JPOlZ/9sW5741poDXFhvKUkQG21/YfXUy6tyO2BTXg3uWvRWy+PBXZk3RBL7ASkAs8Rhr
+	KYS8kj70eENFxmYJdlitzQKC73XTsYH+vdRoMJXm/Suqr0O7JT36pQoLaA0XkagMiwavJ5BdoR5
+	Rp+8S48Gio04gL8gRMDbdYUutZ2lUhZrdi8QZeVkLbCpVo1exUFYWzXBzK8YHNQuv/mXvNNv/j4
+	KHaiVF4C5Qb1AU2X5cYd9fPFD0qFz8Qnq2i/C6emBG5KqveRYqtcQTjyNU5amgsqG8/rA2AT/AL
+	jHihVVsgwRKeokjYiLXPnTWwLYNV6ogb6+cKxDosidc9axliAs9c+RiVObXbxpSlUOKP4=
+X-Google-Smtp-Source: AGHT+IFaJcDyYzcIAs6W9GlcRP7pTItVAi//1Dq5hM0J3sZVcmeXnYAd1N7zNnUNY1XfH9PO1LzQEA==
+X-Received: by 2002:a05:6e02:3e06:b0:430:9f96:23c7 with SMTP id e9e14a558f8ab-430c524fcd9mr8067245ab.4.1760628747528;
+        Thu, 16 Oct 2025 08:32:27 -0700 (PDT)
+Received: from ?IPV6:2601:282:1e02:1040:780f:d7a9:7dd0:9e2a? ([2601:282:1e02:1040:780f:d7a9:7dd0:9e2a])
+        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-58f6c499743sm6973030173.10.2025.10.16.08.32.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Oct 2025 08:32:27 -0700 (PDT)
+Message-ID: <743c0e51-77ea-4ecb-af1b-9558a084fa63@gmail.com>
+Date: Thu, 16 Oct 2025 09:32:25 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] sysfs: check visibility before changing group attribute
- ownership
-To: Greg KH <gregkh@linuxfoundation.org>, 
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org, 
-	rafael@kernel.org, dakr@kernel.org, christian.brauner@ubuntu.com, 
-	edumazet@google.com, pabeni@redhat.com, davem@davemloft.net, 
-	horms@kernel.org
-References: <20251016101456.4087-1-fmancera@suse.de>
- <2025101604-filing-plenty-ec86@gregkh>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next v7 1/1] iproute: Extend bonding's
+ "arp_ip_target" parameter to add vlan tags.
 Content-Language: en-US
-From: Cynthia <cynthia@kosmx.dev>
-In-Reply-To: <2025101604-filing-plenty-ec86@gregkh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: David Wilder <wilder@us.ibm.com>, netdev@vger.kernel.org
+Cc: jv@jvosburgh.net, pradeep@us.ibm.com, i.maximets@ovn.org,
+ amorenoz@redhat.com, haliu@redhat.com, stephen@networkplumber.org
+References: <20251013235827.1291202-1-wilder@us.ibm.com>
+ <20251013235827.1291202-2-wilder@us.ibm.com>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20251013235827.1291202-2-wilder@us.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Feedback-ID: ::1.eu-central-1.7BiZt5Lnf19vB746CR+JKfpU6eIRDUAYyv2UoOsIVTE=:AmazonSES
-X-SES-Outgoing: 2025.10.16-69.169.224.2
 
+On 10/13/25 5:57 PM, David Wilder wrote:
+> +static struct bond_vlan_tag *bond_vlan_tags_parse(char *vlan_list, int level, int *size)
 
-On 10/16/25 16:46, Greg KH wrote:
-> On Thu, Oct 16, 2025 at 12:14:56PM +0200, Fernando Fernandez Mancera wrote:
->> Since commit 0c17270f9b92 ("net: sysfs: Implement is_visible for
->> phys_(port_id, port_name, switch_id)"), __dev_change_net_namespace() can
->> hit WARN_ON() when trying to change owner of a file that isn't visible.
->> See the trace below:
->>
->>   WARNING: CPU: 6 PID: 2938 at net/core/dev.c:12410 __dev_change_net_namespace+0xb89/0xc30
->>   CPU: 6 UID: 0 PID: 2938 Comm: incusd Not tainted 6.17.1-1-mainline #1 PREEMPT(full)  4b783b4a638669fb644857f484487d17cb45ed1f
->>   Hardware name: Framework Laptop 13 (AMD Ryzen 7040Series)/FRANMDCP07, BIOS 03.07 02/19/2025
->>   RIP: 0010:__dev_change_net_namespace+0xb89/0xc30
->>   [...]
->>   Call Trace:
->>    <TASK>
->>    ? if6_seq_show+0x30/0x50
->>    do_setlink.isra.0+0xc7/0x1270
->>    ? __nla_validate_parse+0x5c/0xcc0
->>    ? security_capable+0x94/0x1a0
->>    rtnl_newlink+0x858/0xc20
->>    ? update_curr+0x8e/0x1c0
->>    ? update_entity_lag+0x71/0x80
->>    ? sched_balance_newidle+0x358/0x450
->>    ? psi_task_switch+0x113/0x2a0
->>    ? __pfx_rtnl_newlink+0x10/0x10
->>    rtnetlink_rcv_msg+0x346/0x3e0
->>    ? sched_clock+0x10/0x30
->>    ? __pfx_rtnetlink_rcv_msg+0x10/0x10
->>    netlink_rcv_skb+0x59/0x110
->>    netlink_unicast+0x285/0x3c0
->>    ? __alloc_skb+0xdb/0x1a0
->>    netlink_sendmsg+0x20d/0x430
->>    ____sys_sendmsg+0x39f/0x3d0
->>    ? import_iovec+0x2f/0x40
->>    ___sys_sendmsg+0x99/0xe0
->>    __sys_sendmsg+0x8a/0xf0
->>    do_syscall_64+0x81/0x970
->>    ? __sys_bind+0xe3/0x110
->>    ? syscall_exit_work+0x143/0x1b0
->>    ? do_syscall_64+0x244/0x970
->>    ? sock_alloc_file+0x63/0xc0
->>    ? syscall_exit_work+0x143/0x1b0
->>    ? do_syscall_64+0x244/0x970
->>    ? alloc_fd+0x12e/0x190
->>    ? put_unused_fd+0x2a/0x70
->>    ? do_sys_openat2+0xa2/0xe0
->>    ? syscall_exit_work+0x143/0x1b0
->>    ? do_syscall_64+0x244/0x970
->>    ? exc_page_fault+0x7e/0x1a0
->>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
->>   [...]
->>    </TASK>
->>
->> Fix this by checking is_visible() before trying to touch the attribute.
->>
->> Fixes: 303a42769c4c ("sysfs: add sysfs_group{s}_change_owner()")
->> Reported-by: Cynthia <cynthia@kosmx.dev>
->> Closes: https://lore.kernel.org/netdev/01070199e22de7f8-28f711ab-d3f1-46d9-b9a0-048ab05eb09b-000000@eu-central-1.amazonses.com/
->> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
->> ---
->>   fs/sysfs/group.c | 26 +++++++++++++++++++++-----
->>   1 file changed, 21 insertions(+), 5 deletions(-)
-> Nice, thanks!  This has been tested, right?
->
-> thanks,
->
-> greg k-h
+iproute2 follows netdev wrt coding standards. Please run checkpatch and
+fixup long lines -- max ~80 columns. Column width in the low 80s is fine
+if it improves readability versus splitting the line.
 
-I did a quick test just now, it works in the VM (no warn and the 
-container is running).
+Applying: iproute: Extend bonding's "arp_ip_target" parameter to add
+vlan tags.
+WARNING: line length of 88 exceeds 80 columns
+#18: FILE: ip/iplink_bond.c:188:
++static struct bond_vlan_tag *bond_vlan_tags_parse(char *vlan_list, int
+level, int *size)
 
-kosmx
+WARNING: line length of 88 exceeds 80 columns
+#25: FILE: ip/iplink_bond.c:195:
++		fprintf(stderr, "Error: Too many vlan tags specified, maximum is %d.\n",
 
+WARNING: line length of 96 exceeds 80 columns
+#46: FILE: ip/iplink_bond.c:216:
++		if (n != 1 || tags[level].vlan_id < 1 || tags[level].vlan_id >=
+VLAN_VID_MASK) {
+
+...
 
