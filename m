@@ -1,154 +1,172 @@
-Return-Path: <netdev+bounces-229878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 518F0BE18F2
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 07:47:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 319F7BE1920
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 07:50:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BB6484EF21E
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 05:47:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 07B4C4EA1D6
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 05:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07DB23D7F0;
-	Thu, 16 Oct 2025 05:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7C425333F;
+	Thu, 16 Oct 2025 05:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G+AVgcfK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qtkv23eT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D25D239E63
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 05:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B2725291B;
+	Thu, 16 Oct 2025 05:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760593632; cv=none; b=Ia3phGZ+MkPUhnBif8l10HjX9LjIKnA3vt0YNwGPL0eSHXx72b0U76uDyQSGoDEqzXdyEyH2pxex/o4TjfiGgYKWkTfQDBOqCg8tCMyYPJodpJjH37Vna5mgYYP9tirQvTg84TlJYfcRswKAm6s9+gRCqByxejAnVJ4ABnu8/j4=
+	t=1760593785; cv=none; b=do2Rq+BAyXZ6os7XhlM+TLxiBEk6LJpzIHwhPJ8x2G+fMZMWUl2t2kWQHbR3ejkRg2THwyMOgs9K1eGGR5IMUjJOITL7FafC63bLYY1CCdUmm+EthSKUfNADIiSz/LF5E9+6fAwknOgnA0rYDWkxKomZCW/JUyJCznhb48A2+M4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760593632; c=relaxed/simple;
-	bh=g71KTR4TKAoXFFydAPJnfgt3hIZ/mMbBfnbeCy5SzDM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d9SxI9MpvAE5K9f4rJmBfEtb6E0Wk0d9oLyS+O1c8V69dWD6yQ9svReIVBlWCSzdfma8Va8L7ULILAQt/h3gCPvWyy2emC/BYXOzKKpzRqD3M8P5zGMhnSgg71y4DV6uwZ86z4dpv8NC8yiC1a9jrx/SAVLKtjaUJBSOfwA2brY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G+AVgcfK; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-63994113841so533381a12.3
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 22:47:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760593629; x=1761198429; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MA6mhhqCrmj7IiS/atA26gzsL8vdKi8INK9aHEVZuHc=;
-        b=G+AVgcfKSGxI7K7KGNHxv4qMB6oUQ9s7t7ABYzTf2P+R9Nr2jEAnEQ3q4sE78LesW2
-         SIF9pVd1VUnJC30hY3DgCIxipjeonFrN9IDrKAqDuyBuPj41ud4196AYwRQ1KcaGeTw5
-         0GXbiRwx4TUVj91k/s5TuVyRqTQMyvqEvai1d0y76IqyYEnB3Hsq/vs3hP6wqttQIu6t
-         cq953B9Q+ua6HL4LX0rdI9z7Pe3Nj8JAY3gx5la8mVo5iRU0HguPZV0SC4bZ3HVCeisO
-         sXnkSMKe5d7Xk/uwys29/lB3600HvMYQB/V+okOxFnqDrzrqyDl0bIfZoz7LzKBChA3L
-         U+0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760593629; x=1761198429;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MA6mhhqCrmj7IiS/atA26gzsL8vdKi8INK9aHEVZuHc=;
-        b=tuWRPGYviSWP0e6RtS3cBn3skk/fqHwVYNm+VNfn13W7PgCbB2F/unV2Z/EacFBzAv
-         qcHYArFUxEzXn6b6fuSiKuE5vizlMEry5/uGl5JLDgOboT5lfqWXo3r4Fy2r026QH6tM
-         PGmo20NLXWxxOmum/5f+2+cKdZ0edzCsS+wumNmN0n4mI2QXapUFbnQDZOTUVV0ByNrZ
-         x9Sq36Pf1VTFOYEhyV5dcEEw0VaaUjFRZwhefkcma30gurrRsoX5u78NAdHAnNx1JCle
-         7vtFdmSbUttqvNx2AEMJ13FyVSNLTl3GXnMVT7ogj+scCrNtVMH55it5u9+W8OBbGowG
-         QC4A==
-X-Forwarded-Encrypted: i=1; AJvYcCVwHR6MXqCbrAoCIkJ6SEHVuX1r5a2iYzVmUHYyiKwNi2a27DKwxOv0Ds8k51oxVwRVBFjVpIo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPb29PnL7Zm3hbPiklJYXSdBUWu3SAFyWkdk77bbuaZFHzPTQ8
-	rPBwF1BJsK7Exwvl+b2Y2Z+V8MqU/9//SmiWz9LkoewjazIDobpxpxxwxVMqoCaymevBAJ2J8mn
-	PtGPVcaE5jXnVwA1uwRyNrMkvKbKKuTC4xnclsyWu
-X-Gm-Gg: ASbGncvbxpjYM1U5KRUV64S3xHW+mIbcis6e3St4xgAYYjf3qUhdOlY+qbfAyp3BzTg
-	mvycKwY3az1FKjEHKkGy+FJDQpSeMx0TZzSC2suMvOHWUalXF5JUkSXlZRbjkUKw0Ubkz/9lnuS
-	mACMJyTKAa0fwRMsCMjeR8rGKAUOmN/3w8MQwtxD41BzUtsRvZrQ0zZ6l1OlhowXxrsunTdmh4n
-	IB9TeakH3lsENhLWVOhhZoMHVB8kGyRuF31ta23WHMwARByYQxhlTbtrJs9ixXWsEYrtXVeIIxS
-	5Cd1Lc26o5vn/rmZ5I0/T05KiWokbyzHeSI=
-X-Google-Smtp-Source: AGHT+IFzw+sm9kmi/FXeFTMQBBNhRcBK3NKNkQBYJXmvg92GJWyWk0z/4dzc7vdtFnEF/yXk7jod/id/D4o55kM/p14=
-X-Received: by 2002:a05:6402:354b:b0:63c:1171:b8d2 with SMTP id
- 4fb4d7f45d1cf-63c1171c22fmr260689a12.32.1760593628477; Wed, 15 Oct 2025
- 22:47:08 -0700 (PDT)
+	s=arc-20240116; t=1760593785; c=relaxed/simple;
+	bh=Rmrqvw7NrnyDDpN1m4zo15God7PSm2bfmiF8pQlVl7U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lR9SSJqm7FdIdQbU+t7r75KCLdhqhi2TOt+6GI5uX2ev2pqgg3UJKRfrRC0l2/kG4xdyxaUToN1hDqbbEQv1VQuTB55j0j4s3OqgvAQYDofzMml5bPlZMDXAJUaa4C8p5srOtZ/xT6kQ2mCxbvgY6cvYRsKptOUykpdUmpOqlNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qtkv23eT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 222B4C16AAE;
+	Thu, 16 Oct 2025 05:49:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760593784;
+	bh=Rmrqvw7NrnyDDpN1m4zo15God7PSm2bfmiF8pQlVl7U=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qtkv23eTKpqmGD575UwcZW1XVGjK6yRuUawe4eYI6M8c6eK08wP6cxCJfs6GWcne3
+	 xnqbEzDoqcUVb0j9uXm4QDdNMkPh+ZEOh4MCx7kCFuvh/eFKXiQvvYK4V9RCIJUqPk
+	 FiYpvq6hF6vVsBbeuYZw5vqL0hG9UJa5586qfZOUtBY+03ACgsnMFliFvL4BfAqK+0
+	 9A0beeU0OxG9QwIB2RAThDHCLw2yBLADpZgkpGWee7xwzsTpOyEMH9sNU+45aX3Hwy
+	 wPnv1yonR/BfhcRFOpw24/qKuMVsxtMIKVGzOWHiGoKnzddPScHLid8My4GMf3305T
+	 uIs9MukrJk1dQ==
+Message-ID: <05ce58d0-6b12-4f0a-b5f2-8ed3e326ca20@kernel.org>
+Date: Thu, 16 Oct 2025 07:49:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251016013116.3093530-1-shakeel.butt@linux.dev> <87o6q77hfn.fsf@linux.dev>
-In-Reply-To: <87o6q77hfn.fsf@linux.dev>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 15 Oct 2025 22:46:54 -0700
-X-Gm-Features: AS18NWA5RQWYnfsEWfydqaWHIyqqFuKRjGF0eqaH-MLEpN4EhdsHRHE5mpgYePI
-Message-ID: <CAAVpQUBXzBKfbH_iqn78k6d7ys9DNrXTVbnYSD4ecuKwgCwk8A@mail.gmail.com>
-Subject: Re: [PATCH] memcg: net: track network throttling due to memcg memory pressure
-To: Roman Gushchin <roman.gushchin@linux.dev>
-Cc: Shakeel Butt <shakeel.butt@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Muchun Song <muchun.song@linux.dev>, Tejun Heo <tj@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, Matyas Hurtik <matyas.hurtik@cdn77.com>, 
-	Daniel Sedlak <daniel.sedlak@cdn77.com>, Simon Horman <horms@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Wei Wang <weibunny@meta.com>, netdev@vger.kernel.org, 
-	linux-mm@kvack.org, cgroups@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Meta kernel team <kernel-team@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: bonding: update the slave array for broadcast mode
+To: Tonghao Zhang <tonghao@bamaicloud.com>, netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Hangbin Liu
+ <liuhangbin@gmail.com>, stable@vger.kernel.org
+References: <20251015125808.53728-1-tonghao@bamaicloud.com>
+Content-Language: en-US
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <20251015125808.53728-1-tonghao@bamaicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 15, 2025 at 6:40=E2=80=AFPM Roman Gushchin <roman.gushchin@linu=
-x.dev> wrote:
->
-> Shakeel Butt <shakeel.butt@linux.dev> writes:
->
-> > The kernel can throttle network sockets if the memory cgroup associated
-> > with the corresponding socket is under memory pressure. The throttling
-> > actions include clamping the transmit window, failing to expand receive
-> > or send buffers, aggressively prune out-of-order receive queue, FIN
-> > deferred to a retransmitted packet and more. Let's add memcg metric to
-> > indicate track such throttling actions.
-> >
-> > At the moment memcg memory pressure is defined through vmpressure and i=
-n
-> > future it may be defined using PSI or we may add more flexible way for
-> > the users to define memory pressure, maybe through ebpf. However the
-> > potential throttling actions will remain the same, so this newly
-> > introduced metric will continue to track throttling actions irrespectiv=
-e
-> > of how memcg memory pressure is defined.
-> >
-> > Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
-> > ---
-> >  Documentation/admin-guide/cgroup-v2.rst | 4 ++++
-> >  include/linux/memcontrol.h              | 1 +
-> >  include/net/sock.h                      | 6 +++++-
-> >  kernel/cgroup/cgroup.c                  | 1 +
-> >  mm/memcontrol.c                         | 3 +++
-> >  5 files changed, 14 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/ad=
-min-guide/cgroup-v2.rst
-> > index 0e6c67ac585a..057ee95e43ef 100644
-> > --- a/Documentation/admin-guide/cgroup-v2.rst
-> > +++ b/Documentation/admin-guide/cgroup-v2.rst
-> > @@ -1515,6 +1515,10 @@ The following nested keys are defined.
-> >            oom_group_kill
-> >                  The number of times a group OOM has occurred.
-> >
-> > +          socks_throttled
-> > +                The number of times network sockets associated with
-> > +                this cgroup are throttled.
->
-> I'd prefer sockets_throttled or sock_throttled. And same for the
-> constant name.
->
-> Otherwise,
-> Acked-by: Roman Gushchin <roman.gushchin@linux.dev>
+On 15. 10. 25, 14:58, Tonghao Zhang wrote:
+> This patch fixes ce7a381697cb ("net: bonding: add broadcast_neighbor option for 802.3ad").
+> Before this commit, on the broadcast mode, all devices were traversed using the
+> bond_for_each_slave_rcu. This patch supports traversing devices by using all_slaves.
+> Therefore, we need to update the slave array when enslave or release salve.
+> 
+> Fixes: ce7a381697cb ("net: bonding: add broadcast_neighbor option for 802.3ad")
+> Cc: Jay Vosburgh <jv@jvosburgh.net>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+> Cc: Hangbin Liu <liuhangbin@gmail.com>
+> Cc: Jiri Slaby <jirislaby@kernel.org>
 
-+1 for sock_ like "sock" in memory.stat and its MEMCG_SOCK.
+Reported-by: Jiri Slaby <jirislaby@kernel.org>
+Tested-by: Jiri Slaby <jirislaby@kernel.org>
+Link: 
+https://lore.kernel.org/all/a97e6e1e-81bc-4a79-8352-9e4794b0d2ca@kernel.org/
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Thanks.
 
-Thanks!
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+> ---
+>   drivers/net/bonding/bond_main.c | 7 +++++--
+>   1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index 17c7542be6a5..2d6883296e32 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -2384,7 +2384,9 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+>   		unblock_netpoll_tx();
+>   	}
+>   
+> -	if (bond_mode_can_use_xmit_hash(bond))
+> +	/* broadcast mode uses the all_slaves to loop through slaves. */
+> +	if (bond_mode_can_use_xmit_hash(bond) ||
+> +	    BOND_MODE(bond) == BOND_MODE_BROADCAST)
+>   		bond_update_slave_arr(bond, NULL);
+>   
+>   	if (!slave_dev->netdev_ops->ndo_bpf ||
+> @@ -2560,7 +2562,8 @@ static int __bond_release_one(struct net_device *bond_dev,
+>   
+>   	bond_upper_dev_unlink(bond, slave);
+>   
+> -	if (bond_mode_can_use_xmit_hash(bond))
+> +	if (bond_mode_can_use_xmit_hash(bond) ||
+> +	    BOND_MODE(bond) == BOND_MODE_BROADCAST)
+>   		bond_update_slave_arr(bond, slave);
+>   
+>   	slave_info(bond_dev, slave_dev, "Releasing %s interface\n",
+
+
+-- 
+js
+suse labs
 
