@@ -1,138 +1,107 @@
-Return-Path: <netdev+bounces-230008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09457BE2F3D
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:53:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF9B4BE2FA6
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:57:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 308B1540B69
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:50:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C8E45507D93
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E69343D6D;
-	Thu, 16 Oct 2025 10:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vyos.io header.i=@vyos.io header.b="cvE60C3D"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 721842DECBC;
+	Thu, 16 Oct 2025 10:53:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A21E343D60
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 10:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F72328613;
+	Thu, 16 Oct 2025 10:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760611692; cv=none; b=S2yCO+EVewucXK8tYsk5vJDiMFkUyC0c0lI7E5WZaZyo3dJ19PfFDZTKy4TNiX+L6hQ0eic/HYliZniGxIUQZZ83JhpMQ+jgU/Gw4Kh5an4GfuQsYwdzEM4I65tcMbBi9HpG3UOf4QpgHCFIysi9mBXgmtEcK31y4/3Jf4erPao=
+	t=1760612033; cv=none; b=heUKVMsXD0bFI8+aTzm+Hh89JjDbL0Nd0AIXFSkNE/euIpW11hNUm4773iPAZayKMeq9LY9ZZe+7Kq9L5MMq6ElyHj4DUSm3Oa0gAasvRY/Shyrd8vWALwvum7dnI5cpQxgOue8Np8uUXR+JW1k9HOGgM76zX8CMIh0XbpR76Z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760611692; c=relaxed/simple;
-	bh=Vai3/5mXUk3m0FpPR7C5HtKBEkwbvUE6m2tIfTpywf4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TxRzGuWuFoempGbjk8BPmxs4rvbfgWMN1ghsclgoF36oi4a9SQJaiN+pzl8fH4MpW8JfsVdERpDIhEQWV5bN1dJbyZXbS1oKdVRD7KQOth32gklpx/1WW/knwZin61luSvANC9cEdvnh4Y8adJ5BB2+NcmL5uyMFr+bz8TSJe14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vyos.io; spf=pass smtp.mailfrom=vyos.io; dkim=pass (2048-bit key) header.d=vyos.io header.i=@vyos.io header.b=cvE60C3D; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vyos.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vyos.io
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-46e42fa08e4so5221755e9.3
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 03:48:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vyos.io; s=google; t=1760611688; x=1761216488; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GSPV9AzBq9pw4Fv1WhOpeCc+InkklHxwfYwRGxtUKjs=;
-        b=cvE60C3DFX4y7L9IC3YnW3PHe0dKXP2BmldViINck+3iqtEKFUGZx4dYKGyh3wT+Qe
-         lCDMh48KaO1P1NMM3Jp1eoR+8pILH5eT6w0TUWaADBPP8QArL1dpqLHrcs+5BunfRIFP
-         4Lpg9GZi8ocsK4M4YM4Csap5Gaa+Uis0gj5hKsOdu4JuNZVxP5Z/Ni9rmlAXfuBqf6jp
-         DsK7ZxFIbX4FcjvI4VZUHChiUBaG7WidRJjtrkGqxLkacpm7a0bLqtythGvsIzEJ2+Te
-         aKacVT4fXjco4HzBZ3nd3bG/yPc6wDZb8IjPcTOFRrt+0cfk5Ywa7ACKcsZRQW3QrCMG
-         I2qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760611688; x=1761216488;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GSPV9AzBq9pw4Fv1WhOpeCc+InkklHxwfYwRGxtUKjs=;
-        b=xM/BXe2k9dlyvciucmPOiLWTMmm41BXFgQaQ5+aaDGOHEpRLfj1MD/UP1sMHPbj3ov
-         TKKzfKT3y0/0S5hWjqrkme+SEOyLtT/kXK7l3PcwZetZeo/Xb1frBNzEdcm+SYpFviP/
-         6vJhcCMrhGyuxeFB7Cia9WKzg79NJdjAUeGDOVVpProeIho7ydvaAFRxkjys0jkppZ9V
-         84EqPLmqeNm4WOx3DFkiJTi3aAo9WfZckUew7mGzm22dMpNhB931XUP64Q6hin5Gu6m3
-         wVu8Le497vPCAEA2lasFyP6pcPGeVQz+gNOY40bVUM30GSkAhZbaRIglLU6EyGlnWOWw
-         7QKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV18gMMIoTudTpwJt9S8EL7gOuWuvThV/GYDsqZt0IIo8cenpYAWOfmjEhPxmkLV/2LjFORmg4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxuo0EJ2qNSKnuw0FQnCbQ9gk0+aoi/5ayPwGvma4xIIfHJNv7x
-	PvvVaDsR5DkHaQeV3QFEJn6ESJEY9fT/ltnl/T5hJnY95VLlbDu5nrgzK8FHHibE7bk=
-X-Gm-Gg: ASbGncvAejcsnS3/Zo3ZJAuEh5hWvRcmSixrBfOi73HwBzQvRRXQgXbAoIOF6iAvoTR
-	FO9M4awUoZSeaxP6C8CrlrtbnGkU5er08MY0xMBzszjDCdj4wGbjlBOTqPnycJZa4xiQ+Vg7f0L
-	sHBie9npOMkTEpx6aA9Vouh8gwYcmdz7j/rEb3xdgvSfEUH4yvlCveaUxWgBtw6i4fTBNaka1Kg
-	OjTeb2Yd7ag+j1pNAgyzgFY99JRGjCsdjex4WfbkdX9aw2YaevBBc6YHFsjOHoNkVPmo4qkLWZs
-	GsDTVdtSWJeJbnb9HVLPRgmNbEZHSSPLFrAI/tOLuKk9qugY7gVVdC731hDzHePoy97p2cNg6ec
-	Gy4hEXCop2Az4FoSmDp0CrHB78Su5F6pUkvcPZlimznqXmyjns1cK/yKjEc1vSv37D/FansnqTF
-	QKCrYrjgQlpkwzVV6WlxSNoYRmFjCPW9k9URbQEj2jMwChuVrd
-X-Google-Smtp-Source: AGHT+IFqjy8uQiCs0gAcUHUVVI+lGBAyvoChddSQYZFbSWwhwHhgv7ATDM7DOPjRfdHKUNXdqdAqVg==
-X-Received: by 2002:a05:600c:3e87:b0:46e:3d41:6001 with SMTP id 5b1f17b1804b1-46fa9b17df1mr270864595e9.34.1760611687717;
-        Thu, 16 Oct 2025 03:48:07 -0700 (PDT)
-Received: from VyOS.. (089144196114.atnat0005.highway.a1.net. [89.144.196.114])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ff84cbb7sm2729374f8f.23.2025.10.16.03.48.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Oct 2025 03:48:07 -0700 (PDT)
-From: Andrii Melnychenko <a.melnychenko@vyos.io>
-To: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	fw@strlen.de,
-	phil@nwl.cc
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/1] nf_conntrack_ftp: Added nfct_seqadj_ext_add() for ftp's conntrack.
-Date: Thu, 16 Oct 2025 12:48:01 +0200
-Message-ID: <20251016104802.567812-2-a.melnychenko@vyos.io>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251016104802.567812-1-a.melnychenko@vyos.io>
-References: <20251016104802.567812-1-a.melnychenko@vyos.io>
+	s=arc-20240116; t=1760612033; c=relaxed/simple;
+	bh=tvLe7oqK/Vj/59PdAQQug6bKhT8NZJUWW0AetLUgCqs=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lGtwgs2QSkFEWse1Gb6LcLVk//8sauyFROQjbrPfUAh7MgAW7zSDkuJvhdfDaElW+CGv8spsTFZvlw/KoOsrFjHnWAJmTsZtjir1RlvUlhI+cdIcUir/wpzos81CNn1Nf/vSL7LV6rGIoAKHDQF8CKGlqambyDweU7pkECVMzkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cnPtG3GQNz6L4xg;
+	Thu, 16 Oct 2025 18:52:38 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0C2D81402A5;
+	Thu, 16 Oct 2025 18:53:43 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 16 Oct
+ 2025 11:53:40 +0100
+Date: Thu, 16 Oct 2025 11:53:39 +0100
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+CC: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Thierry Reding
+	<thierry.reding@gmail.com>, Linus Walleij <linus.walleij@linaro.org>, Bartosz
+ Golaszewski <brgl@bgdev.pl>, Shawn Guo <shawnguo@kernel.org>, "Fabio Estevam"
+	<festevam@gmail.com>, Nuno =?UTF-8?Q?S=C3=A1?= <nuno.sa@analog.com>,
+	Lars-Peter Clausen <lars@metafoo.de>, "Michael Hennerich"
+	<Michael.Hennerich@analog.com>, Jonathan Cameron <jic23@kernel.org>, Andy
+ Shevchenko <andy@kernel.org>, Jassi Brar <jassisinghbrar@gmail.com>, Mauro
+ Carvalho Chehab <mchehab@kernel.org>, "Lee Jones" <lee@kernel.org>, Joel
+ Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>,
+	Andrew Lunn <andrew@lunn.ch>, "Vladimir Oltean" <olteanv@gmail.com>, "David
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, Daire McNamara
+	<daire.mcnamara@microchip.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?UTF-8?Q?Wilczy?= =?UTF-8?Q?=C5=84ski?= <kwilczynski@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
+	"Bjorn Andersson" <andersson@kernel.org>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea
+	<claudiu.beznea@tuxon.dev>, Florian Fainelli <f.fainelli@gmail.com>, "Tony
+ Lindgren" <tony@atomide.com>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+	<linux-gpio@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-iio@vger.kernel.org>, <linux-media@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+	<linux-phy@lists.infradead.org>
+Subject: Re: [PATCH] dt-bindings: Fix inconsistent quoting
+Message-ID: <20251016115339.000047f7@huawei.com>
+In-Reply-To: <20251015232015.846282-1-robh@kernel.org>
+References: <20251015232015.846282-1-robh@kernel.org>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-There was an issue with NAT'ed ftp and replaced messages
-for PASV/EPSV mode. "New" IP in the message may have a
-different length that would require sequence adjustment.
+On Wed, 15 Oct 2025 18:16:24 -0500
+"Rob Herring (Arm)" <robh@kernel.org> wrote:
 
-Signed-off-by: Andrii Melnychenko <a.melnychenko@vyos.io>
----
- net/netfilter/nf_conntrack_ftp.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/netfilter/nf_conntrack_ftp.c b/net/netfilter/nf_conntrack_ftp.c
-index 617f744a2..0216bc099 100644
---- a/net/netfilter/nf_conntrack_ftp.c
-+++ b/net/netfilter/nf_conntrack_ftp.c
-@@ -25,6 +25,7 @@
- #include <net/netfilter/nf_conntrack_ecache.h>
- #include <net/netfilter/nf_conntrack_helper.h>
- #include <linux/netfilter/nf_conntrack_ftp.h>
-+#include <net/netfilter/nf_conntrack_seqadj.h>
- 
- #define HELPER_NAME "ftp"
- 
-@@ -390,6 +391,8 @@ static int help(struct sk_buff *skb,
- 	/* Until there's been traffic both ways, don't look in packets. */
- 	if (ctinfo != IP_CT_ESTABLISHED &&
- 	    ctinfo != IP_CT_ESTABLISHED_REPLY) {
-+		if (!nf_ct_is_confirmed(ct))
-+			nfct_seqadj_ext_add(ct);
- 		pr_debug("ftp: Conntrackinfo = %u\n", ctinfo);
- 		return NF_ACCEPT;
- 	}
--- 
-2.43.0
+> yamllint has gained a new check which checks for inconsistent quoting
+> (mixed " and ' quotes within a file). Fix all the cases yamllint found
+> so we can enable the check (once the check is in a release). Use
+> whichever quoting is dominate in the file.
+> 
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>  .../arm/altera/socfpga-clk-manager.yaml       |  4 ++--
+>  .../bindings/clock/nvidia,tegra124-car.yaml   |  8 ++++----
+>  .../bindings/clock/nvidia,tegra20-car.yaml    |  6 +++---
+>  .../devicetree/bindings/gpio/gpio-mxs.yaml    |  9 +++++----
+>  .../bindings/gpio/snps,dw-apb-gpio.yaml       |  4 ++--
+>  .../bindings/iio/temperature/adi,ltc2983.yaml | 20 +++++++++----------
+For this one
+Acked-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 
 
