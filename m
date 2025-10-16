@@ -1,266 +1,310 @@
-Return-Path: <netdev+bounces-229860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8AB8BE167D
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 06:02:40 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D45D1BE1718
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 06:39:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5712F19C686A
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 04:02:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 788A24E1DCB
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 04:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 538CF1FDA61;
-	Thu, 16 Oct 2025 04:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B1D18872A;
+	Thu, 16 Oct 2025 04:39:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lVfCvppx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z8VX/eUT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A9821CC6A
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 04:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760587332; cv=none; b=XX6VG16NTkS597VSg+G77mwMy2Xwt3TePk/+0znaNWT2nke0UKoHIwzkBC6rBjoUZDJ3jc4w88/kfXFVxRBR9Mcsow1klO4c115lrjU0mEsnaMEZPNJPtGncdvoaAwt1R9xAGVDBzR/J3buEoXGIbKehz5pl0Vd2Um1cdHKTPKg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760587332; c=relaxed/simple;
-	bh=cQHu2uKEznVI53JwEbK9j2mWNtN5lVx7UMwEaqCpUbI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=r/sFbZrBhfABgaMteI2RpOb5lHrHITAMr6PghcEprTYVDrmEgJ40JVidWUnqHDPZj29F+mINwITJbaps8Ye+Im2k0CSgFYB87cxrhZqqJkUbvu1n4IzdA62BDpGbJnkmzzscLSiVQ5OLRtiLQDVPEqNryBPTx7m2bSw9oxr4x/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lVfCvppx; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33ba91f1660so429616a91.1
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 21:02:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760587329; x=1761192129; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bj2PUkPwYaTz4TTrmSwCOVbRogttt0dyUykkoHqUMp4=;
-        b=lVfCvppx3XGjHpagmL2fEv64uwebDozDCleepsLvq3B2E1Zk/ITR0YzD2I2WOdNyg8
-         cNOtlFcnqabRSHvZcxzsUPopL6Bx86fFCmGHxbmP5UhXJZTekG25AzXV8jkdDi8eOCmP
-         g4+WNQc+Wo+YByWJKrnVUJwCsjlXNKVsGHeNGAUo9XLD13gXwBw8hUNAMl+TCSCQYf+h
-         DHTAYicePSGVa85KON6E6ZmQoFNACvu7FMXzHXj1cFf7EjnBMUzE8grX+hqqQe4E8A8l
-         2c9O61lwCKgFwv7Tos6bpwdH9iPnpqfPmg+DCCdWC0rz45qYcHi8xpLrOKPyFS5od07i
-         SIlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760587329; x=1761192129;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bj2PUkPwYaTz4TTrmSwCOVbRogttt0dyUykkoHqUMp4=;
-        b=tOaFBq74nB5F4j/aU31buxRQNGHKDay7WnV3VhK6RqlG517jBM+RQ7X0pyb3sszw30
-         oqeCZ3uXNP/sCcmKOZVMW70/x2UN1m8KnFyZ8zCwpl2O/y1BRkosRUImqPWHl67NzcU0
-         r3Ld3Juea+npJykdQmyaybq4G4edVInNytxrxvqHyhLPptCfk+xdXKDLgdi4nFdEfUUh
-         A+VrqWPiAymp4jSDvFMhhL1BR4+HoV0nfl7AnPBT7h7mBkWnQqq0ktSxhm4gzCcxRIvk
-         gGshRqdpdtzBaXmgnuyWC7TLcfjNJ8KOMt/FiKyjqRjBttrTBfWcLU25DDe7Q4qSpqe2
-         sYbg==
-X-Forwarded-Encrypted: i=1; AJvYcCUDQui9SjAfQfYpfWhSOL5aUWxlT4mdTVyf6aD1Rs4njPFsE5WyDZu7e+3uhauZQs73qP9e8FU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiVvRpWpDG1oT1wFMGKf6KxI1OiO2IbUGxdzpgYxtCkDFYbZMd
-	lnENiVhbUN+1DPlj1GaZyvEVSq1wJslyIshOkzvLfmzghm7OvgBIl01HCo792sWUkFViEGRlQ9f
-	dx0jhIw==
-X-Google-Smtp-Source: AGHT+IGpE0rIqRwd6wGFAovBlKPeoh5XfJ/Zk6NHUEi+xTcNJB2wwYM4NVlhQNI1sdJ+UNEDq07t5ZYDhdQ=
-X-Received: from pjtf14.prod.google.com ([2002:a17:90a:c28e:b0:32b:ae4c:196c])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:17cb:b0:32e:9a24:2dd9
- with SMTP id 98e67ed59e1d1-33b51124ffdmr39836479a91.1.1760587328653; Wed, 15
- Oct 2025 21:02:08 -0700 (PDT)
-Date: Thu, 16 Oct 2025 04:00:36 +0000
-In-Reply-To: <20251016040159.3534435-1-kuniyu@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEADDDD2
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 04:39:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760589592; cv=fail; b=JVOmdzcrowG0rpbS1ubqFaRNehSho1LueAOraicRDJ8BQlHNul6SGqdO07XDFni2cSI75hn3phBZOkhMVw1q8jNGQl9OTUfjBB/DzpyGsf7FqIcFk4I5tKlDezVstGjkVLrieQVZ4EcFrbmIt63igFXtCU7va3TUyPZ5Sj/rX3U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760589592; c=relaxed/simple;
+	bh=G2HbhorJbMLVsMWgX+DyTeesG95SbjVgSb4JEXnUxhg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=KgTTfP+aEi3uO7jf+2L2bzDaWyanAl/wsMsS8zt0s70WM1u+kcgxK6LfbBxXlCtSrBLyPGAqAs7C8ppLbobn8L10fWGDK/aBHGLVN0PPlH6bfhsp6MBVgwHgEIjIXH0wLCQ4JaUrGkygiO6pbHw0kEYBDIHkGht90GhniRHoEHk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z8VX/eUT; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760589591; x=1792125591;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=G2HbhorJbMLVsMWgX+DyTeesG95SbjVgSb4JEXnUxhg=;
+  b=Z8VX/eUTWOeBduT6YavI4qRl5FcaSEbpAXnlxkWvp4+8rTF7fTolHbfr
+   hIu7vcoeT+TZo8prpwaQtwBrUSB64cSwQJBuXmstwoUUjzLJxvkYMiIfV
+   zgAOGFyb9j+wqWFjROmrH68w8xf4fh4xnNqwQzyMZrigFcTMDWhd75vOs
+   fn5czC9hTH6mD9YhbnxKcjf3NdVOJFyhTZxC4IG1H+2eqdNlcVg88Bmcx
+   Wg3enLWd3X4PxZ6aW+xmjcSB/Hlce+RsKR6qDw7VizD3ORXH8ceaer1Up
+   qqvD22pxTMhCLAM9a8YBk/syPFjHx/isk8PUD74MZdES1At498Qry1SEo
+   Q==;
+X-CSE-ConnectionGUID: FVLI21F7RruvrToFxOnhiQ==
+X-CSE-MsgGUID: qNobpX2oS/Kjs+xPu8IjEA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="62922606"
+X-IronPort-AV: E=Sophos;i="6.19,233,1754982000"; 
+   d="scan'208";a="62922606"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 21:39:50 -0700
+X-CSE-ConnectionGUID: R22OdpJLSKywul8jAm+wiA==
+X-CSE-MsgGUID: e/4bK+xDS6ujgqkC0iFkxg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,233,1754982000"; 
+   d="scan'208";a="182143127"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 21:39:49 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 15 Oct 2025 21:39:49 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Wed, 15 Oct 2025 21:39:49 -0700
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.26)
+ by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 15 Oct 2025 21:39:49 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LcYA6Y/JsC0iXh6JX+HqoM3g47mhTS4UKax+kyQXVg3eTKgtX6R3WUIJgjEC5RQgNUc8x/w7B3ut4Xs5e7ccnyjAPvSKVLkHx+DlinDQ9y82CZWDoKGR1jeJQMkWR/6ixny29iRoxHnO/IiPGtlD3FO+OxEQg5fxIR5U6jJ6ZCzFqn+S4S150BiwOJDzHBXpd44Om9NyqufYAQGdZVAjvAIxaz/B90Zd6QneUXNTdVhklzGJ3th0h1rYi84S/OJ6R3VXEzIbiiH1jhYOIvisXbUND1pm9xrD6eBDLTp7YWNMkL07MLCLoGgI1VanL4V7ZMd/5bnXLsxmedBrPbAsXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Q7TSEDGC4+NZ/babxZJRaZx6Dk7KsNqYdmCSsf7bMOA=;
+ b=Oro++ufSRSlaooV2k9vzxyHSzJSmdBQUypxVdkWZvjGLKACsitjKu4tA41mpaERmI+Wa+rUdXq1e559Jp1494d5afteNAVVuIcPmHsAQXOt/Zr0jYqpRZZRRzF/iJxjtdviv0Sgod8nbDzhxlCQv+gHo89/MK2GeUae+9oo6oXtkWxhwXIJQr/7uIAcSTmkEhJO9+GeLLgs2U4f+efCHyiAn2Stzns8MIcaKZJRM8wFu7grdhLdFmrzmw1wlSV/rUgywVGUhhunP9SmcRl3r7ymoyW2hRyPJu5TnRjK3vX2RENpB2yEjHY74fu24Cc8DnwskNsyPHDWbsWrRPJSjhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by SN7PR11MB6898.namprd11.prod.outlook.com (2603:10b6:806:2a6::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.11; Thu, 16 Oct
+ 2025 04:39:47 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919%4]) with mapi id 15.20.9228.012; Thu, 16 Oct 2025
+ 04:39:46 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "pmenzel@molgen.mpg.de"
+	<pmenzel@molgen.mpg.de>
+Subject: RE: [Intel-wired-lan] [PATCH v3 iwl-next] ice: add TS PLL control for
+ E825 devices
+Thread-Topic: [Intel-wired-lan] [PATCH v3 iwl-next] ice: add TS PLL control
+ for E825 devices
+Thread-Index: AQHcLsM7M2nTVH0OVUW555exfYMeY7TEQ+CA
+Date: Thu, 16 Oct 2025 04:39:46 +0000
+Message-ID: <IA1PR11MB6241F6AD266AB7063CAE0AA98BE9A@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20250926085215.2413595-1-grzegorz.nitka@intel.com>
+In-Reply-To: <20250926085215.2413595-1-grzegorz.nitka@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|SN7PR11MB6898:EE_
+x-ms-office365-filtering-correlation-id: 255eadff-3f2c-483e-9ffc-08de0c6e08ea
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700021|7053199007;
+x-microsoft-antispam-message-info: =?us-ascii?Q?U4EIKVIi88hlq1u+EZK1+IYErIhSgLyhUui3NilpKvyjNrZTGUd36jmOpUKP?=
+ =?us-ascii?Q?2z9GU6s7nTiIt0ts6hPKObfAV0CQXmY4keTcLS+CVol9hoHhiU40GvykMRSR?=
+ =?us-ascii?Q?czul5wqXOO9xHZHVqk7ozsZ7a8myD2blzC+0e3sgjYo/pR3FDTIi3C3yXvsQ?=
+ =?us-ascii?Q?ZSmlFkX3jRK5byHlKQ/UnAMZO+3NLZIXRHrQykfBPeciI/lCHcvoUAtCi8UO?=
+ =?us-ascii?Q?q6Fj6R0FZjS2Yg4RN1JBd4Pvp753w2bBPgtAmQeaYqFzoQFfhWn73uVMMxcT?=
+ =?us-ascii?Q?reidBl5p4ISSmkXWxDJPTELGCVmTQzxq1JgXUzc9KvhmZg5Y4n1hchhgMD5s?=
+ =?us-ascii?Q?yzY3k6TAhhnG3LBQHWDK2m2iIVcdnxUnPJWUvG9pyvBwMu7LtG6CEE9ae4pZ?=
+ =?us-ascii?Q?GFxtR3efTVD/g74mxXcUEbkFHIkKpBqZC9fYacc+Fihb5pkALalQx/dSdyLO?=
+ =?us-ascii?Q?QWlcMNCHDmtsS9nToyZkVmZwchy0Qo7um9DA9E9Xi6bHO7xZ1aPMz7dkMEK0?=
+ =?us-ascii?Q?tvhqrMb5AF7383V8cP7s4FbpdcWPcMVt5mDQ3A+c1HVX3WamIjPqceW3V9D1?=
+ =?us-ascii?Q?EcuxOv33u4pnYYb8RxTGse2J6hu3VvFzgAk8CpprLW1jgjVRSjASEtkKFXZb?=
+ =?us-ascii?Q?f2EbpsJ9QDktBksdn74dVUGCEePKzH1e8RVUYAvK0zj/SeZ8ihyPuotXERdP?=
+ =?us-ascii?Q?+h5uvqvRAduWEVRwycJCP/NlJVrjmZzf29cngXrTGppUrWLP1FkoyfwpUFma?=
+ =?us-ascii?Q?LqrLiR8hWWpsXpIW+ec9uFpPYRjZVhxon+WhvgPyz+dgJwLLicA20Pmsh6T9?=
+ =?us-ascii?Q?aHc96Z47DhWouLxLHtqrb7t5s1kn6gmlf+WIUlfVDc5JSnDfDrq8p6VyEtz2?=
+ =?us-ascii?Q?lHvjeQi9sLmDsxkVdCjDWjB/gLG7/56iqIMVl82husoDMQWiLeIyoDSsRJdL?=
+ =?us-ascii?Q?IyjvnbFmUJ/mn+OUWFFYDJHhupDL9G7WarWQyO2RtwwXV7VqPhsdQREv79Ez?=
+ =?us-ascii?Q?/i+9jywoqC2dfOX6V9VpYx40c7WlSyjRjZimo/OaXoTnG0iwkW3jXUmcO8vq?=
+ =?us-ascii?Q?r8gYIo3730Q7oKhiyg9biksu1Vzymu9qZSgjlHvCx5k7zoBMQfJuScfgrZ3C?=
+ =?us-ascii?Q?pPCq0s5WQNn6c7Vzx1Y9QgLZ9PMgFdVVc1p8HlPyd3Plb8CxHnH2G20YqlKx?=
+ =?us-ascii?Q?TjvUXvA2zgQCWaqk5L27nQ3yBwCV/Jv0UfuLBnXltpDaa08hu/g++bNnNMxA?=
+ =?us-ascii?Q?2UMWn36CBb4fL+Pkpcmv5F4g5Oll48O0tzSHddPKiGUSyIpFffGXj8EmPdic?=
+ =?us-ascii?Q?KTBuQ0TNT/bW8lZC4sDb4W0Guy3HN41M6l+spxBexwLRihvSkR+S9EnuxSh7?=
+ =?us-ascii?Q?0v2g6KnHD1I5KWW5iEw5YhmxMJ28g1Z2reiaityFF9brjih2y6lV/QbwGXTB?=
+ =?us-ascii?Q?XhoZQX/2hCiPQbYZUemz8tSbGDSw78wSGt8nZHjpSKxii/dFdjw7G012Rf+C?=
+ =?us-ascii?Q?sQQIQ2FB2qBst6yTugp3QFDHDTAwi4ajLSjW?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?y6ZJDH3AFlorPgSRhXeLQ0m1rDNRI43w9rd/COt3aLQO2OE9SHrHJoKa/emL?=
+ =?us-ascii?Q?eaVUgyvvs1hJZwUlUQEaIw5MPWmOMpknrGctZN8ItP+GFocunYmSL+MMHspK?=
+ =?us-ascii?Q?bu+0g/1X416yOpRQB8D50qpOKa1we/mihoEEk14T8kDn8wzMr48QHkVAExVS?=
+ =?us-ascii?Q?+qP3Oi1Jf2Zhjyy1ofkx81DWZ+xmq+Q1wn/fYt50hKwdXSBKt88eZh9Gj82W?=
+ =?us-ascii?Q?aTmNKMu7CJNfenj4fWQYRsJj4EWAa+NXgvvR57LBO5+QdmbCpTqSvndoYlZN?=
+ =?us-ascii?Q?dJL4gEVh1XAM1JuL3mM7e2xH2X/rwg1Hbfzf1RaAa9anp+ctiAYgqwKCaDaV?=
+ =?us-ascii?Q?HIzi6MwmN4TH5JRuIyYnR/UfhthxvIl2cdza/T1N6LC3Pt7fL+XQHdicIADp?=
+ =?us-ascii?Q?n5Qotbc6VHU7XZrx/TeJtGYSoJs1p/nYJUB5diLLsq/0/pdS+//0ZD9XC/T8?=
+ =?us-ascii?Q?zlPy/qz12Pn2mvnDPjjfO0n/9Cz9NjRbDr81H2ZeYUPgaT+xFejyXOb+OBn5?=
+ =?us-ascii?Q?N6CflG9hej4TeZPRy92Vw41TPwYHyc/1v8UVCPQYesdlxAwpkH5z44Sqby6T?=
+ =?us-ascii?Q?a1yxuuNcrAmegxxaQvko8AO10KNT5aEaiXozf7T74e34p3UmJ4z7nIIFaTVG?=
+ =?us-ascii?Q?P3rx2iTKxVVtfKtVqZv7LfXmy1Abd0XBHmrxv9gKujN5tGKTiXvRuztV509S?=
+ =?us-ascii?Q?fFDPKY3AE3AlbVgJeF+g2uKftsTqKF3tWNeSAfprXBHGo+qI65PZPhiM1unz?=
+ =?us-ascii?Q?nZyA6IZt9QH0mo+KFCMHXFZGe4H47IV/E6WEBqfr5RH2QJJlvuhoTvZbLQD8?=
+ =?us-ascii?Q?gfGa32RV4X959pJEqJmNlzNsnYFMG95CIt+ZYGRIaOrm2EF8ppYYdA5b8p7Z?=
+ =?us-ascii?Q?jt8i9UhpL+Ss7xKzaDgVymDdplj7jBRlF6OsNJyDCHHGRPchbAn5Sc3Xm03F?=
+ =?us-ascii?Q?7086KR+jrbgCtZazAIUqq1/NSfQldW/ok7/qsqCle75S3x9Su8uFcVnCE1Qo?=
+ =?us-ascii?Q?559YvVhDrfMjc0CnAWozkXzMDnUXiuHcrcwFmIjo3b8tOGfImz5tsip/AYwK?=
+ =?us-ascii?Q?WXu0ImcU4CoUep+kkvmghU85aFn4KM5D48E+aDLW/AoXOlm0lz2QuVhGYwX6?=
+ =?us-ascii?Q?bv6H9aSScWgPiiCy3YJhb6tmz+n65NqPLh8oW8sP8oT858/f3JRvJ5AT876o?=
+ =?us-ascii?Q?aHWN14Wk7ExcAm1lvyM+HlsFOnQPqlOlWP+3wt/67YVtEbRfhs6GqjtNHgKu?=
+ =?us-ascii?Q?CTiu+tY2ZkEAUXHzQjBSEnQYKuEXonlZK3JnhKhdanVml64C/uy320AFs8MU?=
+ =?us-ascii?Q?giiqgHxcFdgSYLYpfuNE9J1sOkmmzACy+2Hs15Xi1A97A2cIHHHINKUNZAlv?=
+ =?us-ascii?Q?yK0DHSHwNVaaRYZu183iRAwZ4rX/jsA5uwZDDFRVOmOuyaEbOgrPCKX3wmtV?=
+ =?us-ascii?Q?FxoN01x0wxNVptogElFRQ+LwZcypH11t4YAO5S+TUSd+W6AlIgHzexZb00Tt?=
+ =?us-ascii?Q?/ziPIelF3kfTputsYYPtXmsgq7/YjEfVdQyNktUjV/MpYFoZFxoPnjMZCjl3?=
+ =?us-ascii?Q?5X8D5Qq9Q728KYP1RD8BXFwWLfJwrlzHvimS/ld1?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251016040159.3534435-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.51.0.788.g6d19910ace-goog
-Message-ID: <20251016040159.3534435-5-kuniyu@google.com>
-Subject: [PATCH v1 net-next 4/4] selftest: packetdrill: Import client_synack-data.pkt.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Yuchung Cheng <ycheng@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 255eadff-3f2c-483e-9ffc-08de0c6e08ea
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Oct 2025 04:39:46.8146
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Y3PXYBoTEM/mn0ITTIChLkCBn98XDPln62eLmXNl0aDH8MJWflLgzZr/EODVWadE4n4sR3edKUPIQ72ueD4LdQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6898
+X-OriginatorOrg: intel.com
 
-client_synack-data.pkt tests various TFO client scenarios for
-SYN+ACK payload processing, which never happen with Linux server.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of G=
+rzegorz Nitka
+> Sent: 26 September 2025 14:22
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Kubalewski, Arkadiusz <arkadiusz.kubalewski@i=
+ntel.com>; pmenzel@molgen.mpg.de
+> Subject: [Intel-wired-lan] [PATCH v3 iwl-next] ice: add TS PLL control fo=
+r E825 devices
+>
+> Add ability to control CGU (Clock Generation Unit) 1588 Clock Reference m=
+ux selection for E825 devices. There are two clock sources available which =
+might serve as input source to TSPLL block:
+> - internal cristal oscillator (TXCO)
+> - signal from external DPLL
+>
+> E825 does not provide control over platform level DPLL but it provides co=
+ntrol over TIME_REF output from platform level DPLL.
+> Introduce a software controlled layer of abstraction:
+> - create a DPLL (referred as TSPLL DPLL) of PPS type for E825c,
+> - define input pin for that DPLL to mock TIME_REF pin
+> - define output pin for that DPLL to mock TIME_SYNC pin which supplies a
+>  signal for master timer
+>
+> Note:
+> - There is only one frequency supported (156.25 MHz) for TIME_REF
+>  signal for E825 devices.
+> - TIME_SYNC pin is always connected, as it supplies either internal TXCO
+>  signal or a signal from external DPLL always
+>
+> Add kworker thread to track E825 TSPLL DPLL lock status. In case of lock =
+status change, notify the user about the change, and try to lock it back (i=
+f lost). Lock status is checked every 500ms by default. The timer is decrea=
+sed to 10ms in case of errors while accessing CGU registers.
+> If error counter exceeds the threshold (50), the kworker thread is stoppe=
+d and appropriate error message is displayed in dmesg log.
+> Refactor the code by adding 'periodic_work' callback within ice_dplls str=
+ucture to make the solution more generic and allow different type of device=
+s to register their own callback.
+>
+> Usage example (ynl is a part of kernel's tools located under tools/net/yn=
+l path):
+> - to get TSPLL DPLL info
+> $ ynl --family dpll --dump device-get
+> ...
+> {'clock-id': 0,
+>  'id': 9,
+>  'lock-status': 'locked',
+>  'mode': 'manual',
+>  'mode-supported': ['manual'],
+>  'module-name': 'ice',
+>  'type': 'pps'}]
+> ...
+>
+> - to get TIMER_REF and TIME_SYNC pin info $ ynl --family dpll --dump pin-=
+get ...
+> {'board-label': 'TIME_REF',
+>  'capabilities': {'state-can-change'},
+>  'clock-id': 0,
+>  'frequency': 156250000,
+>  'frequency-supported': [{'frequency-max': 156250000,
+>                           'frequency-min': 156250000}],
+>  'id': 38,
+>  'module-name': 'ice',
+>  'parent-device': [{'direction': 'input',
+>                     'parent-id': 9,
+>                     'state': 'connected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'ext'},
+> {'board-label': 'TIME_SYNC',
+>  'capabilities': set(),
+>  'clock-id': 0,
+>  'id': 39,
+>  'module-name': 'ice',
+>  'parent-device': [{'direction': 'output',
+>                     'parent-id': 9,
+>                     'state': 'connected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'int-oscillator'},
+> ...
+>
+> - to enable TIME_REF output
+> $ ynl --family dpll --do pin-set --json '{"id":38,"parent-device":\ {"par=
+ent-id":9, "state":"connected"}}'
+>
+> - to disable TIME_REF output (TXCO is enabled) $ ynl --family dpll --do p=
+in-set --json '{"id":38,"parent-device":\ {"parent-id":9, "state":"disconne=
+cted"}}'
+>
+> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> ---
+> v2->v3:
+> - replaced pf with hw struct as argument in ice_tspll_set_cfg
+> - improved worker for TSPLL control (reworded dmesg log, use already
+>  exist cgu state error counter to limit dmesg spamming, disable the
+>  thread after error threshold is exceeded)
+> - doc strings updateds (missing newly added pins description)
+> - addresses comments from v2: use ternanry when applicable, commit
+>  message typos
+> - rebased
+> v1->v2:
+> - updated pin_type_name array with the names for newly added pin
+>  types
+> - added TS PLL lock status monitor
+> ---
+> drivers/net/ethernet/intel/ice/ice_dpll.c  | 384 +++++++++++++++++++--  d=
+rivers/net/ethernet/intel/ice/ice_dpll.h  |  12 +-  drivers/net/ethernet/in=
+tel/ice/ice_tspll.c | 122 +++++++
+> drivers/net/ethernet/intel/ice/ice_tspll.h |   5 +
+> 4 files changed, 499 insertions(+), 24 deletions(-)
+>
 
-In addition to the common changes mentioned in the cover letter,
-the following changes are added to the original script:
-
-  1. Add payload to SYN+ACK for TFO fallback client to cover
-     the previous patch
-
-  2. Add TCPI_OPT_SYN_DATA assertion in each test case
-
-  3. Add TcpExtPAWSActive check in the last test case
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- .../tcp_fastopen_client_synack-data.pkt       | 150 ++++++++++++++++++
- 1 file changed, 150 insertions(+)
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_client_synack-data.pkt
-
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_fastopen_client_synack-data.pkt b/tools/testing/selftests/net/packetdrill/tcp_fastopen_client_synack-data.pkt
-new file mode 100644
-index 0000000000000..c49cfd3d491e5
---- /dev/null
-+++ b/tools/testing/selftests/net/packetdrill/tcp_fastopen_client_synack-data.pkt
-@@ -0,0 +1,150 @@
-+// SPDX-License-Identifier: GPL-2.0
-+//
-+// Test server sending SYNACK with data
-+//
-+--tcp_ts_ecr_scaled // used in TEST 5
-+
-+`./defaults.sh
-+ ./set_sysctls.py /proc/sys/net/ipv4/tcp_timestamps=0`
-+
-+
-+//
-+// Cache warmup: send a Fast Open cookie request
-+// SYN-ACK payload must not be ACKed
-+//
-+    0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_TCP) = 3
-+   +0 sendto(3, ..., 0, MSG_FASTOPEN, ..., ...) = -1 EINPROGRESS (Operation is now in progress)
-+   +0 > S 0:0(0) <mss 1460,nop,nop,sackOK,nop,wscale 8,FO,nop,nop>
-+   +0 < S. 123:133(10) ack 1 win 5840 <mss 1040,nop,nop,sackOK,nop,wscale 6,FO abcd1234,nop,nop>
-+// SYN+ACK data cannot be ACKed for TFO fallback client
-+   +0 > . 1:1(0) ack 1
-+
-+   +0 %{ assert (tcpi_options & TCPI_OPT_SYN_DATA) == 0, tcpi_options }%
-+   +0 read(3, ..., 1000) = -1 EAGAIN (Resource temporarily unavailable)
-+   +0 close(3) = 0
-+   +0 > F. 1:1(0) ack 1
-+ +.01 < F. 1:1(0) ack 2 win 92
-+   +0 > .  2:2(0) ack 2
-+
-+
-+//
-+// TEST1: Servers sends SYN-ACK with data and another two data packets
-+//
-+   +0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_TCP) = 4
-+   +0 sendto(4, ..., 1000, MSG_FASTOPEN, ..., ...) = 1000
-+   +0 > S 0:1000(1000) <mss 1460,nop,nop,sackOK,nop,wscale 8,FO abcd1234,nop,nop>
-+   +0 < S. 1000000:1001400(1400) ack 1001 win 5840 <mss 1040,nop,nop,sackOK,nop,wscale 6>
-+   +0 < . 1401:2801(1400) ack 1001 win 257
-+   +0 < P. 2801:3001(200) ack 1001 win 257
-+   +0 > . 1001:1001(0) ack 1401
-+   +0 > . 1001:1001(0) ack 2801
-+   +0 > . 1001:1001(0) ack 3001
-+
-+   +0 %{ assert (tcpi_options & TCPI_OPT_SYN_DATA) != 0, tcpi_options }%
-+   +0 read(4, ..., 100000) = 3000
-+   +0 close(4) = 0
-+   +0 > F. 1001:1001(0) ack 3001
-+ +.01 < F. 3001:3001(0) ack 1002 win 257
-+   +0 > . 1002:1002(0) ack 3002
-+
-+
-+//
-+// TEST2: SYN-ACK-DATA-FIN is accepted. state SYN_SENT -> CLOSE_WAIT.
-+//        poll() functions correctly.
-+//
-+   +0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_TCP) = 4
-+   +0 sendto(4, ..., 1000, MSG_FASTOPEN, ..., ...) = 1000
-+   +0...0.010 poll([{fd=4,
-+                     events=POLLIN|POLLOUT|POLLERR|POLLRDHUP,
-+                     revents=POLLIN|POLLOUT|POLLRDHUP}], 1, 100) = 1
-+   +0 > S 0:1000(1000) <mss 1460,nop,nop,sackOK,nop,wscale 8,FO abcd1234,nop,nop>
-+ +.01 < SF. 1000000:1001400(1400) ack 1001 win 5840 <mss 1040,nop,nop,sackOK,nop,wscale 6>
-+
-+   +0 %{ assert tcpi_state == TCP_CLOSE_WAIT, tcpi_state }%
-+   +0 %{ assert (tcpi_options & TCPI_OPT_SYN_DATA) != 0, tcpi_options }%
-+   +0 read(4, ..., 100000) = 1400
-+   +0 read(4, ..., 100000) = 0
-+   +0 > . 1001:1001(0) ack 1402
-+   +0 close(4) = 0
-+   +0 > F. 1001:1001(0) ack 1402
-+ +.01 < . 1402:1402(0) ack 1002 win 257
-+
-+
-+//
-+// TEST3: Servers sends SYN-ACK with data and another two data packets. SYN-ACK
-+//        is lost and the two data packets are ignored. Client timed out and
-+//        retransmitted SYN.
-+//
-+   +0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_TCP) = 4
-+   +0 sendto(4, ..., 1000, MSG_FASTOPEN, ..., ...) = 1000
-+   +0 > S 0:1000(1000) <mss 1460,nop,nop,sackOK,nop,wscale 8,FO abcd1234,nop,nop>
-+ +.01 < . 1401:2801(1400) ack 1001 win 257
-+   +0 < P. 2801:3001(200) ack 1001 win 257
-+
-+// SYN timeout
-+ +.99~+1.1 > S 0:0(0) <mss 1460,nop,nop,sackOK,nop,wscale 8>
-+ +.01 < S. 1000000:1001400(1400) ack 1001 win 5840 <mss 1040,nop,nop,sackOK,nop,wscale 6>
-+   +0 > . 1001:1001(0) ack 1401
-+ +.01 < . 1401:2801(1400) ack 1001 win 257
-+   +0 > . 1001:1001(0) ack 2801
-+   +0 < P. 2801:3001(200) ack 1001 win 257
-+   +0 > . 1001:1001(0) ack 3001
-+
-+   +0 %{ assert (tcpi_options & TCPI_OPT_SYN_DATA) != 0, tcpi_options }%
-+   +0 read(4, ..., 100000) = 3000
-+   +0 close(4) = 0
-+   +0 > F. 1001:1001(0) ack 3001
-+  +.1 < F. 3001:3001(0) ack 1002 win 257
-+   +0 > . 1002:1002(0) ack 3002
-+
-+
-+//
-+// TEST4: SYN-ACK-DATA with TS opt. Also test poll()
-+//
-+   +0 `sysctl -q net.ipv4.tcp_timestamps=1`
-+
-+   +0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_TCP) = 4
-+   +0 sendto(4, ..., 1000, MSG_FASTOPEN, ..., ...) = 1000
-+   +0...0.010 poll([{fd=4,
-+                     events=POLLIN|POLLOUT|POLLERR,
-+                     revents=POLLIN|POLLOUT}], 1, 100) = 1
-+   +0 > S 0:1000(1000) <mss 1460,sackOK,TS val 1 ecr 0,nop,wscale 8,FO abcd1234,nop,nop>
-+ +.01 < S. 1000000:1001400(1400) ack 1001 win 5840 <mss 1040,TS val 1000000 ecr 1,sackOK,nop,wscale 6>
-+   +0 > . 1001:1001(0) ack 1401 <nop,nop,TS val 101 ecr 1000000>
-+   +0 < . 1401:2801(1400) ack 1001 win 257 <nop,nop,TS val 1000000 ecr 1>
-+   +0 > . 1001:1001(0) ack 2801 <nop,nop,TS val 101 ecr 1000000>
-+   +0 < P. 2801:3001(200) ack 1001 win 257 <nop,nop,TS val 1000000 ecr 1>
-+   +0 > . 1001:1001(0) ack 3001 <nop,nop,TS val 101 ecr 1000000>
-+
-+   +0 %{ assert (tcpi_options & TCPI_OPT_SYN_DATA) != 0, tcpi_options }%
-+   +0 read(4, ..., 100000) = 3000
-+   +0 close(4) = 0
-+   +0 > F. 1001:1001(0) ack 3001 <nop,nop,TS val 301 ecr 1000000>
-+ +.01 < F. 3001:3001(0) ack 1002 win 257 <nop,nop,TS val 1000300 ecr 301>
-+   +0 > . 1002:1002(0) ack 3002 <nop,nop,TS val 401 ecr 1000300>
-+
-+
-+//
-+// TEST5: SYN-ACK-DATA with bad TS opt is repelled with an RST.
-+//
-+   +0 `nstat > /dev/null`
-+   +0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_TCP) = 4
-+   +0 sendto(4, ..., 1000, MSG_FASTOPEN, ..., ...) = 1000
-+   +0 > S 0:1000(1000) <mss 1460,sackOK,TS val 1 ecr 0,nop,wscale 8,FO abcd1234,nop,nop>
-+
-+// bad ECR value is rejected as LINUX_MIB_PAWSACTIVEREJECTED
-+ +.01 < S. 1000000:1001400(1400) ack 1001 win 5840 <mss 1040,TS val 1000000 ecr 9999,sackOK,nop,wscale 6>
-+   +0 > R 1001:1001(0)
-+
-+// A later valid SYN establishes the connection
-+ +.01 < S. 1000000:1000100(100) ack 1001 win 5840 <mss 1040,TS val 1000000 ecr 1,sackOK,nop,wscale 6>
-+   +0 > . 1001:1001(0) ack 101 <nop,nop,TS val 21 ecr 1000000>
-+
-+// Make sure the RST above incremented LINUX_MIB_PAWSACTIVEREJECTED
-+   +0 `nstat | grep -q TcpExtPAWSActive`
-+
-+   +0 %{ assert (tcpi_options & TCPI_OPT_SYN_DATA) != 0, tcpi_options }%
-+   +0 read(4, ..., 100000) = 100
-+   +0 %{ assert tcpi_state == TCP_ESTABLISHED, tcpi_state }%
-+
-+`/tmp/sysctl_restore_${PPID}.sh`
-\ No newline at end of file
--- 
-2.51.0.788.g6d19910ace-goog
-
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
