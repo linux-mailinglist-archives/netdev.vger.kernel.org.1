@@ -1,101 +1,94 @@
-Return-Path: <netdev+bounces-230222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4C07BE56F3
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 22:46:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E9EABE573B
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 22:50:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24EE454619B
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 20:46:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6DBE3A66E1
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 20:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19BA42E229E;
-	Thu, 16 Oct 2025 20:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1A02DF71F;
+	Thu, 16 Oct 2025 20:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SwtH2XYz"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="k+Lz5rZB"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4371A2DE1E6
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 20:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B0E2580FF;
+	Thu, 16 Oct 2025 20:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760647558; cv=none; b=TZKrUaaMUxTdd+yWxNWamcJau3sXvMacWgk+9LrS8F3Hq4Mvl9Qha8dGRUR9efOEBrAOqHehiYpTRX9BOY9lTOKUKhXwbSYxfw74YX14z2/oh36dZM11UplCEYpBniYUvINjKXN70fnjE/5p0KaQ1j5ReEYpZWxwOyFWQTC7PBw=
+	t=1760647830; cv=none; b=hhnngqZf0WOKNhlJoV1C4jHKQHIT1pvOQXIKin/Zf0vYrC618pUaEn8WzBFKNhWpVY0GW9KK5+oBnxhQ9WiNl3PS3LTpZj/6z0tV3jUokJe4jo43uqIeSAm2uia0mcSdqYdZy+KcLL2oH6uzQ5GNmSVlwLV3xbnis/3G0kAiUEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760647558; c=relaxed/simple;
-	bh=ZieYExJ/Oj8QxmXz8/4mIiRF7Gv5EAYzRAE0qNr7sJc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B8qeLJAbIuprV70fXWcmrapjFCg7imqTMp1nC745N+auUmlIEKoPF0r2CoDNounp6B+Loy7oIia+RdtWpXuuMIU8hRDgBtQFdqaw0piF4MFptJV1ZwcZ+zQr8dRVWq38XsYvJuYLrnusPE4yOQLnfFlsu8P1A1sj9qw4akUN21I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SwtH2XYz; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=LkfuaH31ia/KSOz4kEtnYol5VLG46wUi+LyNJD2+4Qk=; b=Sw
-	tH2XYzAQ9gE5NRIxdn1S2YVPs1Tg6nzs0LLvRQiK6QWOUcoF6sQPwdQV0prpHy+Myw5YkQEAff9u1
-	ACYgdZziIe/XOPwbJFq7JdTIypJqnMjmcagLCNdorJFXJHjrpfTGcWFSRjwCc5OMhBoAatH2IBfoL
-	g1f+DeFi7QRgKJE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1v9UrC-00BCnt-29; Thu, 16 Oct 2025 22:45:54 +0200
-Date: Thu, 16 Oct 2025 22:45:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: Netdev <netdev@vger.kernel.org>
-Subject: Re: Build commit for Patchwork?
-Message-ID: <36bdcfd5-3388-4a6e-80fc-f05bfe0d6a03@lunn.ch>
-References: <CAGXJAmwrPr46Ju-ZiLa7prnNFAcGr7Hu-vpk1B6-Q9Ks8fu8wQ@mail.gmail.com>
+	s=arc-20240116; t=1760647830; c=relaxed/simple;
+	bh=ITlIzUAUo5pssT1lw+5f7WFRnL9FQktvSQ7YkS/Swf4=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=BO0JUPNAxEmmpdcV5QvnPbWfkm9nFsvHp1IR+6qZP5LrJ0/tj2ddfRR9YNke+Kq3teUt0KdpyvZvjXcnfTAy9hllZqjfpFLx3mAUjSCeFqLIEk3iOmzdvHFRUhu4dP+ZwZ0l6KGvQ5WVpMxUs93YRvUM0tEuz2XRfnMy6Y9MdwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=k+Lz5rZB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBA14C4CEF1;
+	Thu, 16 Oct 2025 20:50:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1760647829;
+	bh=ITlIzUAUo5pssT1lw+5f7WFRnL9FQktvSQ7YkS/Swf4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=k+Lz5rZBobuGND9FUYtJH8NH5vh9PWxwRUoTE04ieCY9L1ZYOEv6KSowX27XvzdvQ
+	 Z3RDm/K4iKRxg0IJDOOqW0Ghs7z6YfksWl1db3oe8w7t5je78shZgX1cFiARrxlpS/
+	 ANZCwotNwcmuyftujQphlq2yleXvWJEdvZcSQEcI=
+Date: Thu, 16 Oct 2025 13:50:28 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: "Li,Rongqing" <lirongqing@baidu.com>
+Cc: Lance Yang <lance.yang@linux.dev>, "linux-doc@vger.kernel.org"
+ <linux-doc@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "linux-aspeed@lists.ozlabs.org"
+ <linux-aspeed@lists.ozlabs.org>, "wireguard@lists.zx2c4.com"
+ <wireguard@lists.zx2c4.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
+ <linux-kselftest@vger.kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Andrew Jeffery <andrew@codeconstruct.com.au>, Anshuman Khandual
+ <anshuman.khandual@arm.com>, Arnd Bergmann <arnd@arndb.de>, David
+ Hildenbrand <david@redhat.com>, Florian Wesphal <fw@strlen.de>, Jakub
+ Kacinski <kuba@kernel.org>, "Jason A . Donenfeld" <jason@zx2c4.com>, Joel
+ Granados <joel.granados@kernel.org>, Joel Stanley <joel@jms.id.au>,
+ Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>, Liam Howlett
+ <liam.howlett@oracle.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Paul E . McKenney" <paulmck@kernel.org>, Pawan Gupta
+ <pawan.kumar.gupta@linux.intel.com>, Petr Mladek <pmladek@suse.com>,
+ "Phil Auld" <pauld@redhat.com>, Randy Dunlap <rdunlap@infradead.org>,
+ Russell King <linux@armlinux.org.uk>, Shuah Khan <shuah@kernel.org>, Simon
+ Horman <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Steven
+ Rostedt <rostedt@goodmis.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
+Subject: Re: =?UTF-8?Q?[=E5=A4=96=E9=83=A8=E9=82=AE=E4=BB=B6]?= Re:
+ [PATCH][v4] hung_task: Panic when there are more than N hung tasks at the
+ same time
+Message-Id: <20251016135028.aea65e20b0bc7efee11572f1@linux-foundation.org>
+In-Reply-To: <bb443552b6db40548a4fae98d1f63c80@baidu.com>
+References: <20251015063615.2632-1-lirongqing@baidu.com>
+	<4db3bd26-1f74-4096-84fd-f652ec9a4d27@linux.dev>
+	<bb443552b6db40548a4fae98d1f63c80@baidu.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAGXJAmwrPr46Ju-ZiLa7prnNFAcGr7Hu-vpk1B6-Q9Ks8fu8wQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 16, 2025 at 09:07:09AM -0700, John Ousterhout wrote:
-> Is there a way to tell which commit Patchwork uses for its builds?
+On Thu, 16 Oct 2025 05:57:34 +0000 "Li,Rongqing" <lirongqing@baidu.com> wrote:
+
+> > If you agree, likely no need to resend - Andrew could pick it up directly when
+> > applying :)
+> > 
 > 
-> Patchwork builds are generating this error:
+> This is better;
 > 
-> ‘struct flowi_common’ has no member named ‘flowic_tos’; did you mean
-> ‘flowic_oif’?
+> Andrew, could you pick it up directly
 
-commit 1bec9d0c0046fe4e2bfb6a1c5aadcb5d56cdb0fb
-Author: Guillaume Nault <gnault@redhat.com>
-Date:   Mon Aug 25 15:37:43 2025 +0200
-
-    ipv4: Convert ->flowi4_tos to dscp_t.
-
-diff --git a/include/net/flow.h b/include/net/flow.h
-index a1839c278d87..ae9481c40063 100644
---- a/include/net/flow.h
-+++ b/include/net/flow.h
-@@ -12,6 +12,7 @@
- #include <linux/atomic.h>
- #include <linux/container_of.h>
- #include <linux/uidgid.h>
-+#include <net/inet_dscp.h>
- 
- struct flow_keys;
- 
-@@ -32,7 +33,7 @@ struct flowi_common {
-        int     flowic_iif;
-        int     flowic_l3mdev;
-        __u32   flowic_mark;
--       __u8    flowic_tos;
-+       dscp_t  flowic_dscp;
-        __u8    flowic_scope;
-        __u8    flowic_proto;
-        __u8    flowic_flags;
-
-Andrew
+No problems, thanks.
 
