@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-229980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF05BBE2C8A
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:29:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F019BE2D5D
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:38:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4ABBF4E5C13
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:29:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8DDE581D5C
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2742E0413;
-	Thu, 16 Oct 2025 10:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F1A131961B;
+	Thu, 16 Oct 2025 10:29:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A833XUST"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gGjDf2Gv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98BF2DFF3F;
-	Thu, 16 Oct 2025 10:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0702C2DFF3F;
+	Thu, 16 Oct 2025 10:29:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760610537; cv=none; b=XKNFgVFYaoGGtHzpu/PXGuAT3jPVmuDmFnsa/EJ/hWLu5ox8rknop+nkouEEAYpFxtE+9WXjWznxrvtOVbpDg+gon7fhruhuFD87KD2ox7vNmXI0yhjYN/5cNXRTZgNLlysZDGvUD6eSBU1N8NpJoomnIrET7MZiUnE0va8jlO8=
+	t=1760610540; cv=none; b=rPdHotL8/gmlC1yXSnF77UVcxhY2NZva+0A8H+kGobI/uhKiI/LFnJA3b+PfgWTeYtiZwh3PuMOsXdBjmM/RnlmVLhZAjqSM4B9w088yV8y/xYMD29HjvopbtKh9Fy4TpkSXVokFm3kORG5jnv9cpa1STJQfrUIzcrVSBqOwARw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760610537; c=relaxed/simple;
-	bh=hNrhTz9RivBvwoNye3uuIuxIHUqtKrAbVtiIQ+QL17g=;
+	s=arc-20240116; t=1760610540; c=relaxed/simple;
+	bh=nEifpoyi2uHHtXE2HCxJFum2zuqlAdUcNjUSB5XTpZM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bC2PU2MO3hlo9A+FdAbSsLNfz1E0MGck6eQo3rz1ypETq+W92ZjLd/LWXU2CvA3xSfFJs2hyM0Dzrk+4hBHB+uRCh+UcnBUAZonCFql9blHT9HpCz6xsTEUZ8Jl46RalPQIuc5FyTpfTATnjo+/LkkybicD60NHIvf3veU2QMw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A833XUST; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBE57C4CEF1;
-	Thu, 16 Oct 2025 10:28:56 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=aRFayXXSp0QdNgto1axlFYAwsnWTLU5VXyadtyyfkoW+NEf0tZBvg71dkmtyE0NiPv6nRCo3tgY4nXA/B5dSRdJlalWF54QYwZbduVp67O4pgLM4wC0IXwAJKiQFy9Z9T4mwoOxYfCZZQvavEvONc4Nc5c3C0MDKTb0hmT1vD4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gGjDf2Gv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D33BC113D0;
+	Thu, 16 Oct 2025 10:28:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760610537;
-	bh=hNrhTz9RivBvwoNye3uuIuxIHUqtKrAbVtiIQ+QL17g=;
+	s=k20201202; t=1760610539;
+	bh=nEifpoyi2uHHtXE2HCxJFum2zuqlAdUcNjUSB5XTpZM=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=A833XUSTIfX/w8ReVQF3dXFLU5+uOsK0vb8gGbPuJh3J/2CFhI20s8AeI+7+9TVKf
-	 vELhmz8fP8ADwgFQ3PGjEY5uyePxTB9aerjf0jScAEJjEeidUIXwKci3UyU0A9PScp
-	 zAVK/eyTZeJRjBtYkrzgu4JQD9yO9fnC3ebO+U3BD5QQqKHmlXOMwTssBCL/ggCfXJ
-	 q07H6XCGAf/DgR25Y0VAhnDcrRXlmDMCBYM6IqVnIys4ysS6QSIYTX8gkyzGGqKx8x
-	 fQkHtkrUCYi/EZs5IBak+x3yOMyoMLRAjVuzn8z0nPyvaf9Gy3wHRgkFpy22nDyEFj
-	 QTaHqRVckYChw==
+	b=gGjDf2GvRztXochV/PNVJP0BVS8A9Irq8cdj6W5aaSXAFJjBqF37wJPhZlKg5lxwI
+	 zGKjMJJHxRhMBuilDWy7bj/BGXGx2hbPrOaeZaubAh1v7zUC69UMdgWPfMSKuOXq7M
+	 1acL5lWx2nVTUn1AwPtJszGcERj9OFszImPuhL7a5z+VY0zRIy8pYlEQsOmp91NobH
+	 dSYSwx78QZ6kBifx1ntYFskfadpLkZAxT99QBExCXFhs6Rpl6AXOi///Q+KH5AetPU
+	 ZtorNjJ5FJ7ak84kGfRkSJi+h1WUT7qSdhBDaV0YiyXi5MgBwTHDqjLkWte+ySXnML
+	 jr7g3OXmzD2ZQ==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Thu, 16 Oct 2025 12:28:21 +0200
-Subject: [PATCH net-next v2 07/13] net: airoha: ppe: Remove
- airoha_ppe_is_enabled() where not necessary
+Date: Thu, 16 Oct 2025 12:28:22 +0200
+Subject: [PATCH net-next v2 08/13] net: airoha: ppe: Configure SRAM PPE
+ entries via the cpu
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251016-an7583-eth-support-v2-7-ea6e7e9acbdb@kernel.org>
+Message-Id: <20251016-an7583-eth-support-v2-8-ea6e7e9acbdb@kernel.org>
 References: <20251016-an7583-eth-support-v2-0-ea6e7e9acbdb@kernel.org>
 In-Reply-To: <20251016-an7583-eth-support-v2-0-ea6e7e9acbdb@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -64,61 +64,67 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
  Lorenzo Bianconi <lorenzo@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org, 
  linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, Simon Horman <horms@kernel.org>
+ devicetree@vger.kernel.org
 X-Mailer: b4 0.14.2
 
-Now each PPE has always PPE_STATS_NUM_ENTRIES entries so we do not need
-to run airoha_ppe_is_enabled routine to check if the hash refers to
-PPE1 or PPE2.
+Introduce airoha_ppe_foe_commit_sram_entry routine in order to configure
+the SRAM PPE entries directly via the CPU instead of using the NPU APIs.
+This is a preliminary patch to enable netfilter flowtable hw offload for
+AN7583 SoC.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_ppe.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/airoha/airoha_ppe.c | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index d142660e7910425c14ea2f867f8238156419833b..195d97e61197e5c393f2e79f33f685c334612a83 100644
+index 195d97e61197e5c393f2e79f33f685c334612a83..46755bc60a8e822b296e188c061c45eae0b88cb5 100644
 --- a/drivers/net/ethernet/airoha/airoha_ppe.c
 +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -514,10 +514,8 @@ static int airoha_ppe_foe_get_flow_stats_index(struct airoha_ppe *ppe,
- 	if (ppe_num_stats_entries < 0)
- 		return ppe_num_stats_entries;
- 
--	*index = hash;
--	if (airoha_ppe_is_enabled(ppe->eth, 1) &&
--	    hash >= ppe_num_stats_entries)
--		*index = *index - PPE_STATS_NUM_ENTRIES;
-+	*index = hash >= ppe_num_stats_entries ? hash - PPE_STATS_NUM_ENTRIES
-+					       : hash;
- 
- 	return 0;
+@@ -656,6 +656,27 @@ static bool airoha_ppe_foe_compare_entry(struct airoha_flow_table_entry *e,
+ 	return !memcmp(&e->data.d, &hwe->d, len - sizeof(hwe->ib1));
  }
-@@ -607,13 +605,11 @@ airoha_ppe_foe_get_entry_locked(struct airoha_ppe *ppe, u32 hash)
  
- 	if (hash < sram_num_entries) {
- 		u32 *hwe = ppe->foe + hash * sizeof(struct airoha_foe_entry);
-+		bool ppe2 = hash >= PPE_SRAM_NUM_ENTRIES;
- 		struct airoha_eth *eth = ppe->eth;
--		bool ppe2;
- 		u32 val;
- 		int i;
++static int airoha_ppe_foe_commit_sram_entry(struct airoha_ppe *ppe, u32 hash)
++{
++	struct airoha_foe_entry *hwe = ppe->foe + hash * sizeof(*hwe);
++	bool ppe2 = hash >= PPE_SRAM_NUM_ENTRIES;
++	u32 *ptr = (u32 *)hwe, val;
++	int i;
++
++	for (i = 0; i < sizeof(*hwe) / sizeof(*ptr); i++)
++		airoha_fe_wr(ppe->eth, REG_PPE_RAM_ENTRY(ppe2, i), ptr[i]);
++
++	wmb();
++	airoha_fe_wr(ppe->eth, REG_PPE_RAM_CTRL(ppe2),
++		     FIELD_PREP(PPE_SRAM_CTRL_ENTRY_MASK, hash) |
++		     PPE_SRAM_CTRL_WR_MASK | PPE_SRAM_CTRL_REQ_MASK);
++
++	return read_poll_timeout_atomic(airoha_fe_rr, val,
++					val & PPE_SRAM_CTRL_ACK_MASK,
++					10, 100, false, ppe->eth,
++					REG_PPE_RAM_CTRL(ppe2));
++}
++
+ static int airoha_ppe_foe_commit_entry(struct airoha_ppe *ppe,
+ 				       struct airoha_foe_entry *e,
+ 				       u32 hash, bool rx_wlan)
+@@ -685,13 +706,8 @@ static int airoha_ppe_foe_commit_entry(struct airoha_ppe *ppe,
+ 	if (!rx_wlan)
+ 		airoha_ppe_foe_flow_stats_update(ppe, npu, hwe, hash);
  
--		ppe2 = airoha_ppe_is_enabled(ppe->eth, 1) &&
--		       hash >= PPE_SRAM_NUM_ENTRIES;
- 		airoha_fe_wr(ppe->eth, REG_PPE_RAM_CTRL(ppe2),
- 			     FIELD_PREP(PPE_SRAM_CTRL_ENTRY_MASK, hash) |
- 			     PPE_SRAM_CTRL_REQ_MASK);
-@@ -691,8 +687,7 @@ static int airoha_ppe_foe_commit_entry(struct airoha_ppe *ppe,
+-	if (hash < sram_num_entries) {
+-		dma_addr_t addr = ppe->foe_dma + hash * sizeof(*hwe);
+-		bool ppe2 = hash >= PPE_SRAM_NUM_ENTRIES;
+-
+-		err = npu->ops.ppe_foe_commit_entry(npu, addr, sizeof(*hwe),
+-						    hash, ppe2);
+-	}
++	if (hash < sram_num_entries)
++		err = airoha_ppe_foe_commit_sram_entry(ppe, hash);
+ unlock:
+ 	rcu_read_unlock();
  
- 	if (hash < sram_num_entries) {
- 		dma_addr_t addr = ppe->foe_dma + hash * sizeof(*hwe);
--		bool ppe2 = airoha_ppe_is_enabled(eth, 1) &&
--			    hash >= PPE_SRAM_NUM_ENTRIES;
-+		bool ppe2 = hash >= PPE_SRAM_NUM_ENTRIES;
- 
- 		err = npu->ops.ppe_foe_commit_entry(npu, addr, sizeof(*hwe),
- 						    hash, ppe2);
 
 -- 
 2.51.0
