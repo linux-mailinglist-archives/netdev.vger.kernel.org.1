@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-229838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8152BBE125D
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 03:00:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23B2FBE1286
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 03:20:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3513C19A6E19
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 01:01:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEF263AED75
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 01:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D94207A09;
-	Thu, 16 Oct 2025 01:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35032126C05;
+	Thu, 16 Oct 2025 01:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NZ7ZSfXT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FkinQU7y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10A5202C30;
-	Thu, 16 Oct 2025 01:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0318B442C;
+	Thu, 16 Oct 2025 01:20:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760576433; cv=none; b=ArnmODuG/O6QyhYIMDetWmsKtMd+galLDfp7Tv8hfFA5dxhZY5a0xLelQ71jO5YAmd24oasVl9T1Mw0aJ8GByajNvmz8f7ckueHeXqUqEzywIjUV3LGPyWsrNVtVyle6OuyR9G+uqLaQ4vVsa+wESEtKBhlYBm6NJIpRwf2nEQc=
+	t=1760577636; cv=none; b=RaWUoiZQ8Y2dl+3/NF+73SHcPk6eMKdgTJXV8QYUXhPmlUPTub9JKaw2RBy2ZkRtRU20NAU8FWGvcGI4591D+ijkzHn1sCh1GySM52Y4gYgsahyEppUBYGE/u53H81NRa3Q8NWA7odagIuCccZm9qUPDWonEUG0G/NzIyZfboCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760576433; c=relaxed/simple;
-	bh=1nSU2VJutd8xKbFho8sBZm+rC9jYH3ub9ZnyfZw4e3M=;
+	s=arc-20240116; t=1760577636; c=relaxed/simple;
+	bh=43aNLpaRPMveoFouYsYDj85SLDeKtvsSv7RDL5fKxbY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aWn+Fp7j1pDJTiSyz97O6sU3Uwsf7aEKG/+Oc9uK9aC5ewquk0bq2HDa3yTZg0oHsiuBtfufcZ+3QTp7o95exddMYFoY+uvSvrTNphmllMndqidxWMjNbuZqrQ4BwiWNbbJrr9SqGrSnkhjx4px/uQdP6WfSuFYZ8kYAOxSd/xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NZ7ZSfXT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 627D6C4CEFE;
-	Thu, 16 Oct 2025 01:00:31 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=p1oLBXGLeNwPeNVkG7NoOJmr9nKZmG1Kpa4QBpgzRAKEocPAZYEfnoyzPJnXzzEicVSGQdXvH5P8zi9qjGmg8tIeHKpDy2CgrsUgqxd51FgtnYllJvR/X27Wl6DOd5R31+rXzob4UpmlY+5+ZHlTpb8oT7NQ7S2a3rdWQSFlICY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FkinQU7y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E636C4CEF8;
+	Thu, 16 Oct 2025 01:20:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760576431;
-	bh=1nSU2VJutd8xKbFho8sBZm+rC9jYH3ub9ZnyfZw4e3M=;
+	s=k20201202; t=1760577635;
+	bh=43aNLpaRPMveoFouYsYDj85SLDeKtvsSv7RDL5fKxbY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NZ7ZSfXT159Oh4mT3hyQ8+8r0zjNcrrGjnsPwQMskbShORCV1koAxkq5Plp2IhEdt
-	 mcHaSiW2eReTQyQAwqORRhBGd4DPK8f/eirXg4JeRNncwBQRqHUk9157NZWXbzIn3Q
-	 q2NRN4DN1LH1eP9KZobP8W5+/MRNsY84lcxgcvJafci/7+3tApyxmRAFWUePPY9hPX
-	 +vu2SC5lNBV1G/UAxGMnTMzi1NzciArco/8r8P3U5CvHBBV6EVHf625mAn9rXwK5np
-	 0hGeWBHqmUtRZw0UV09+4/l96UpmjDXtkupKeVr3dPoLkQAIPGHNVffMmuxckNw4SM
-	 T3xSVntgFpRaw==
+	b=FkinQU7yl2MZv9P1P85CpLRRNka9W4yLFVx/h5VJsT10hpLtc3U92V7jAfXiqqldn
+	 DByWYPs5xWMiFi55IM9ZxC0OdTs8iIWqPiG1YfNwMbITJ/Clt0ULP1GCWE+Sqw1kVj
+	 l30Q7wzLIdlJ1+yxyPLcEFEt1YlnzcC3G89VBj/ip6qK5hThqwXtFdrLorfCZse3+Q
+	 JFK1d7EaF443IO1c69/vqV8Uxx/sS9XAhhqWRj5R0gFbOvWNkC0pzD/1ra5xRb2UbD
+	 GPClgxxL6xkY2NyqQ9zDqhB1BGvHahzAjh41Skya0sht4lINpBUQIhJmPHVJtad5VB
+	 5cpzsukTwCR3A==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E26380DBE9;
-	Thu, 16 Oct 2025 01:00:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34187380DBE9;
+	Thu, 16 Oct 2025 01:20:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/3] net: airoha: npu: Introduce support for
- Airoha 7583 NPU
+Subject: Re: [PATCH net 01/10] can: gs_usb: increase max interface to U8_MAX
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176057641599.1117105.16062969451575878802.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Oct 2025 01:00:15 +0000
-References: <20251013-airoha-npu-7583-v3-0-00f748b5a0c7@kernel.org>
-In-Reply-To: <20251013-airoha-npu-7583-v3-0-00f748b5a0c7@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+ <176057762001.1121485.1835557132409188926.git-patchwork-notify@kernel.org>
+Date: Thu, 16 Oct 2025 01:20:20 +0000
+References: <20251014122140.990472-2-mkl@pengutronix.de>
+In-Reply-To: <20251014122140.990472-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, uwu@coelacanthus.name,
+ runcheng.lu@hpmicro.com, stable@vger.kernel.org, mailhol@kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-On Mon, 13 Oct 2025 15:58:48 +0200 you wrote:
-> Introduce support for Airoha 7583 SoC NPU.
+On Tue, 14 Oct 2025 14:17:48 +0200 you wrote:
+> From: Celeste Liu <uwu@coelacanthus.name>
 > 
-> ---
-> Changes in v3:
-> - Rebase on top of net-next
-> - Link to v2: https://lore.kernel.org/r/20250927-airoha-npu-7583-v2-0-e12fac5cce1f@kernel.org
+> This issue was found by Runcheng Lu when develop HSCanT USB to CAN FD
+> converter[1]. The original developers may have only 3 interfaces
+> device to test so they write 3 here and wait for future change.
+> 
+> During the HSCanT development, we actually used 4 interfaces, so the
+> limitation of 3 is not enough now. But just increase one is not
+> future-proofed. Since the channel index type in gs_host_frame is u8,
+> just make canch[] become a flexible array with a u8 index, so it
+> naturally constraint by U8_MAX and avoid statically allocate 256
+> pointer for every gs_usb device.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/3] dt-bindings: net: airoha: npu: Add AN7583 support
-    https://git.kernel.org/netdev/net-next/c/9fbafbfa5b99
-  - [net-next,v3,2/3] net: airoha: npu: Add airoha_npu_soc_data struct
-    https://git.kernel.org/netdev/net-next/c/0850ae496d53
-  - [net-next,v3,3/3] net: airoha: npu: Add 7583 SoC support
-    https://git.kernel.org/netdev/net-next/c/4478596f71d9
+  - [net,01/10] can: gs_usb: increase max interface to U8_MAX
+    https://git.kernel.org/netdev/net/c/2a27f6a8fb57
+  - [net,02/10] can: gs_usb: gs_make_candev(): populate net_device->dev_port
+    https://git.kernel.org/netdev/net/c/a12f0bc764da
+  - [net,03/10] can: m_can: m_can_plat_remove(): add missing pm_runtime_disable()
+    https://git.kernel.org/netdev/net/c/ba569fb07a7e
+  - [net,04/10] can: m_can: m_can_handle_state_errors(): fix CAN state transition to Error Active
+    https://git.kernel.org/netdev/net/c/3d9db29b45f9
+  - [net,05/10] can: m_can: m_can_chip_config(): bring up interface in correct state
+    https://git.kernel.org/netdev/net/c/4942c42fe184
+  - [net,06/10] can: m_can: fix CAN state in system PM
+    https://git.kernel.org/netdev/net/c/a9e30a22d6f2
+  - [net,07/10] can: m_can: replace Dong Aisheng's old email address
+    https://git.kernel.org/netdev/net/c/49836ff2f37d
+  - [net,08/10] can: remove false statement about 1:1 mapping between DLC and length
+    https://git.kernel.org/netdev/net/c/c282993ccd97
+  - [net,09/10] can: add Transmitter Delay Compensation (TDC) documentation
+    https://git.kernel.org/netdev/net/c/b5746b3e8ea4
+  - [net,10/10] can: j1939: add missing calls in NETDEV_UNREGISTER notification handler
+    https://git.kernel.org/netdev/net/c/93a27b5891b8
 
 You are awesome, thank you!
 -- 
