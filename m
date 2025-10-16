@@ -1,139 +1,136 @@
-Return-Path: <netdev+bounces-229943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5F55BE252F
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:16:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEB9CBE2539
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:17:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 840374251E5
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:16:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69C6D189CD01
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:17:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45246235BE2;
-	Thu, 16 Oct 2025 09:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D5112FF669;
+	Thu, 16 Oct 2025 09:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="AraXTbuz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YjC3i+Nk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBB63254BC
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 09:16:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09BFE235BE2
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 09:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760606216; cv=none; b=RBTY6zT/MraQwk/FndWCej+sDE53GU1VlLgecZ/l79jfDNTQsxouHN9vOoioemXoOa+5tIYj2RR8g3WEX5z8wHy6WXRDdWeluQWrRVcahWUGC/zUOfqlWanVy1ygp2unVm3hNXL2ZlrQEmmFal5vPeLhKV83GD/Fok1O4rxh4dA=
+	t=1760606236; cv=none; b=MMx7Ta08juwsC6tY+eJ6yPyj+7ME5isVCyFLZJZTrUv38vJj25yFyKibmfmMqt8Dm9bDlH5GpU/bJOBwkL9Lh4qlRox6IIK7chhEakgBvT8NwaVCKkXgNt53MM4PUx0ZCkNoy5DuJLPUYho2FQdRBmmZylvTfj3NjEbT0UZNynQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760606216; c=relaxed/simple;
-	bh=CXV1oo6crqea4tYT7OPZhTATlmitji7rLfQtzBOyCeQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OUMCgyYJIXQZaKNgNhYdOEHqa3LRdbvDiI5eq+9q+SBQpYfL3RoltZrnEq6KtTyBm92pKjacwnyV8iMtkDIPuf7J/7HeciVdVQUaNBBtKrQcagM9KXqJmNG2snr8Au8MI1FuN6p81dIznCvcytAZOcavGg4DREu+wFKw2xNAC9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=AraXTbuz; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-46e33b260b9so5248955e9.2
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 02:16:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1760606212; x=1761211012; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HOQm7CalEqLSZ8sLsEYQvVVuablwwCJXJ39S/7as4zI=;
-        b=AraXTbuz0I0yk4YQiBMGCCUcgR2GSQRn2+tMexHI7SqMGbm7c36Nt2Fe/m1jYkv7CV
-         KgxxNwT6vfj7ybQRguz0r5blgCsaFarmKnTxU+RdGssVWcVzl+7MFgjNEQT0W8Mjl7mX
-         2YgPp0/OHs2CI4PMYjfd4FUHm2eW/qaOAIpRBuw8ozT5qql8cFlwyfcCe2C+/lPatVp1
-         TBPvkn1YcmK64BW4MXEtrDwW43HSBC5sxlzkWQGFCpw7JnmT/CEP3eMTQXUipDqPAd6w
-         iYFbghXphSEwzASN4cNW7nbxfws/CDwCKvRrDORAnthRDE47rEZuhwR8n02bA4vyxBZT
-         fgJA==
+	s=arc-20240116; t=1760606236; c=relaxed/simple;
+	bh=gfUY6k3Za1yX/HAAk7zG4178blXNgWT89fTHHoWhQPY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=aExhcM0GzNlD4Bk8G6QJAu6c5nEOWS5/lAckdIj39elLuCArSa1/rf/XCqjd40X/3IxEGSraZgDkdT0vp6wKx2vTjbvbhWnC5C78pKGemKNlxiwxVqpilhgoCeRqalx0WEFmW16t7kx4s1GfbQS5eW4AvXr9yLDrRWb2ufC/iVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YjC3i+Nk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760606234;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UPLteLwS/Ol+pKkRNcrWyR6iIyl0F/A5LRNN9NP4s6k=;
+	b=YjC3i+NkPHTayS3b759srOGUNUUPkDH10L5CbHKTy3Y2AegOJtawVzD7JXPOUFAOIIsbAX
+	NhiMUwp0wcux9NsSDYij6AJTKxQfkdX/MwiTTGMlelSPHclEDV5q5zohjyTYZMG/tkJuut
+	GoUuIPLz0ovSA5uU/zNr6sXsPL2bL+E=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-251-L_QOYC_-OWyVKLJyHNi-BQ-1; Thu, 16 Oct 2025 05:17:12 -0400
+X-MC-Unique: L_QOYC_-OWyVKLJyHNi-BQ-1
+X-Mimecast-MFC-AGG-ID: L_QOYC_-OWyVKLJyHNi-BQ_1760606231
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-46b303f6c9cso5093995e9.2
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 02:17:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760606212; x=1761211012;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HOQm7CalEqLSZ8sLsEYQvVVuablwwCJXJ39S/7as4zI=;
-        b=UYedo6PRLixYAG511p1IqjLqfktyPzaPOAq6apXknaPOTT9z6JjNsmKa7MAjtFo8SS
-         hi0MxyUoce3twLxrxCGpUW2qPz3G8gkYoATNsezCtz+7+G/yds3q17ecZPBoPGjInXnT
-         g0gZt9257+lQUq22nmG/UuuwySt0RhV+spQui5kZN/xNNcjmdXvDfmHwXYPPt4Ngghwx
-         Jk49/GBg/tgonnyIg/ubDnmUTsuAZV+s/ppa4twCoRrtxn3HyARDW/L5PnNkaqcplzPD
-         KO6k9u1xnuVnc/uzIDV1YREbPoy+qP0jscJ3zrT0edKFpe8/OcKRJkryq6qWrHQnJ4yt
-         Ow8A==
-X-Forwarded-Encrypted: i=1; AJvYcCU6zHpo48KO7o0E2SxR5ktRq69QU16jJyaMjHhVIcjmpOgR7LLkIafwjmx/jhfEW5eV44lJNik=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6wMACDv7rfx+yahFbz9aK13fuJ/W4yVrhZAHj1rO2nnsP2xFN
-	3THB49POGImxfTW1AiGlF1cn+C9pFyzWJgrI3/hx7ysuEXllytFKXQvdZo4zEvEszMq7NgVqGte
-	LbBU5XpV+ZA==
-X-Gm-Gg: ASbGnctqNaZj+mvStNAoPuwVNTVQtx5mmfoHoCAXR3CTFRHplNfeiDra+3sWwg0j6Oo
-	/oJrtpE78m39AJ5JLWMfECiM9KEG9PKB8o7LrAxSHGiAC6dUNnGdQ/4STz2l1YQLTQICbTzpX0E
-	L5VeNddYw35R8NMstxqI6/pFcFliqagGDGvK+lT88W9YNxSi5l99oek65uxw2KBpby/MYmPtV2r
-	ZxB/05dsioQM4rWLcnd62T70uup+Yd9xTKUuxmNdTxozTi8/Z2ip/HUgilxdGRdEmWB2XI31zUe
-	nqK5DgTayhKopTalGJYtpXUcEXWB+yEiEP705hUKPuFW8EIR3Sfm54hRKYT8Qu+B1t3QZB2TnwK
-	qdtcXsX2WlX+zpAGm+VmnRnhGvNSeNdNmG9P6TgUJO4Pb56eREsrZbMVXo/OwiQ0Zd3me2A15El
-	YoT2bmDfqiEt+/DB2nDQS5C2aX2hc=
-X-Google-Smtp-Source: AGHT+IHNbK3Ki89HwpE87g85l9ngMPvW1ZgOuAXmQgBeq+a/VnNNfoTGlzyHQvi3Z32vF2/pvxhiPg==
-X-Received: by 2002:a05:6000:26c2:b0:3e1:9b75:f0b8 with SMTP id ffacd0b85a97d-4266e8dc01amr21360118f8f.47.1760606211546;
-        Thu, 16 Oct 2025 02:16:51 -0700 (PDT)
-Received: from jiri-mlt.client.nvidia.com ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426fc54b32dsm3879000f8f.30.2025.10.16.02.16.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Oct 2025 02:16:51 -0700 (PDT)
-Date: Thu, 16 Oct 2025 11:16:49 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org, 
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
-	Leon Romanovsky <leonro@nvidia.com>, mbloch@nvidia.com, Parav Pandit <parav@nvidia.com>, 
-	Adithya Jayachandran <ajayachandra@nvidia.com>
-Subject: Re: [PATCH net-next 1/3] devlink: Introduce devlink eswitch state
-Message-ID: <6uzvaczuh6vpflpwnyknmq32ogcw52u35djzab7yd7jlgwasdc@paq2c2yznfti>
-References: <20251016013618.2030940-1-saeed@kernel.org>
- <20251016013618.2030940-2-saeed@kernel.org>
+        d=1e100.net; s=20230601; t=1760606231; x=1761211031;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UPLteLwS/Ol+pKkRNcrWyR6iIyl0F/A5LRNN9NP4s6k=;
+        b=j/l83KPgCCTZfSBCiyyBzH0DzHse2lnOIrVi3d5Jexrp8pJs+dmke70MFHLTyqUlnk
+         5tX24aA2G2Sx5RRwF1brZ4y1G/lZukjHfGLhgklQek2IMU6kPOrB1sh0mei3+nTN9fLB
+         TRtk3lDdbeLwGcIiaa67bJlckFXYMvuIJCnQxEwR0P080IqqlIqo5plsn7FVg7tGDTxQ
+         6PWPO2qj5vdgprMKFUsz4VPyNvzIMVSt/B7+Ul25OYz2zmAUwnszSBLCrY+zkGTKIxBf
+         zdX97059ntDclPHfA2VS5A2Vo2h+SIS9tS6n39/tETEhgwIiO9aYNNNRQ5W4fHoxEkW6
+         IzeA==
+X-Forwarded-Encrypted: i=1; AJvYcCVmwZhj3hdKAe5BA27+KYfKY6TL2/7U4LTo/mi+NSBduncxlvdGe3AyEKpJjgS4Jz66cjEmIZo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfjdcfJivT0vRd8tTPdT8Y3N2k0XmBMqDj2oqsUGaJyVOeADa5
+	S0yraKXxBV0S5blbtxtjnfIIMiQ6GhA+akrndzF1LXkpql0yvYB1YdAiSVYio40TfEQwuRYLDZY
+	zvugQKUn3w9E0y/24hvj2RKisUeF5D7+tefEufeiftZB5oWYUW1Tb2+vREg==
+X-Gm-Gg: ASbGncuxWpeSgAziApvzUbP/KfmKnPdv9Ggb4X1HUt/L/oTK3C/lm2fV4tQNIBOjTr1
+	6glYYcMmr4BdhySqSSUdkyIiYPQFTAWcaqrV47abcU+zc1DYxu4mQXuBrQcjTGyEceEo/mMM4W4
+	Kgq3wOonx2+m1JK17CLLlQpFHxo2Abax9wNUxo1yai2e3MatqI0YLyXK3FRlF9r7Jbrs+YSS1Ip
+	M90HCNZ663rwd6v2NKwhb573nxJgYne3XyUu3i0kuyvGlGYQnaHm38wJDBaRiVT3q5sDR2a7qcv
+	GnHGKaYbZx1vFMo/rZl/Wz3VC6Q/0JA9w5p5uFOKX0+azuctnAW+O2TUSQBOmYqnJtcjw8WkJ44
+	kqw51SI3KJihmFZ5bKI7rbW7gKH5OvKEMlhE5Q5Oe8Oe/Fcw=
+X-Received: by 2002:a05:600c:138a:b0:45f:2ed1:d1c5 with SMTP id 5b1f17b1804b1-46fa9b171f2mr222149155e9.36.1760606231066;
+        Thu, 16 Oct 2025 02:17:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEtQayMfbwHyZG1M7ESHO0HokLA6DuGP71NEXIAOvlVT9W48cYSOggIbCg6sBW0bsUEfsGNsg==
+X-Received: by 2002:a05:600c:138a:b0:45f:2ed1:d1c5 with SMTP id 5b1f17b1804b1-46fa9b171f2mr222148895e9.36.1760606230619;
+        Thu, 16 Oct 2025 02:17:10 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47114428dbfsm14301785e9.5.2025.10.16.02.17.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Oct 2025 02:17:09 -0700 (PDT)
+Message-ID: <98342f21-08c8-46de-9309-d58dfc44d0a0@redhat.com>
+Date: Thu, 16 Oct 2025 11:17:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251016013618.2030940-2-saeed@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 net-next 02/13] gro: flushing when CWR is set
+ negatively affects AccECN
+To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com,
+ linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
+ dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
+ kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+References: <20251013170331.63539-1-chia-yu.chang@nokia-bell-labs.com>
+ <20251013170331.63539-3-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251013170331.63539-3-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Thu, Oct 16, 2025 at 03:36:16AM +0200, saeed@kernel.org wrote:
->From: Parav Pandit <parav@nvidia.com>
-
-[...]
-
-
->@@ -722,6 +734,24 @@ int devlink_nl_eswitch_set_doit(struct sk_buff *skb, struct genl_info *info)
-> 			return err;
-> 	}
+On 10/13/25 7:03 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Ilpo Järvinen <ij@kernel.org>
 > 
->+	state = DEVLINK_ESWITCH_STATE_ACTIVE;
->+	if (info->attrs[DEVLINK_ATTR_ESWITCH_STATE]) {
->+		if (!ops->eswitch_state_set)
->+			return -EOPNOTSUPP;
->+		state = nla_get_u8(info->attrs[DEVLINK_ATTR_ESWITCH_STATE]);
->+	}
->+	/* If user did not supply the state attribute, the default is
->+	 * active state. If the state was not explicitly set, set the default
->+	 * state for drivers that support eswitch state.
->+	 * Keep this after mode-set as state handling can be dependent on
->+	 * the eswitch mode.
->+	 */
->+	if (ops->eswitch_state_set) {
->+		err = ops->eswitch_state_set(devlink, state, info->extack);
+> As AccECN may keep CWR bit asserted due to different
+> interpretation of the bit, flushing with GRO because of
+> CWR may effectively disable GRO until AccECN counter
+> field changes such that CWR-bit becomes 0.
+> 
+> There is no harm done from not immediately forwarding the
+> CWR'ed segment with RFC3168 ECN.
 
-Calling state_set() upon every DEVLINK_CMD_ESWITCH_SET call,
-even if STATE attr is not present, is plain wrong. Don't do it.
-I don't really understand why you do so.
+I guess this change could introduce additional latency for RFC3168
+notification, which sounds not good. On the flip side adding too much
+AccECN logic to GRO (i.e. to allow aggregation only for AccECN enabled
+flows) looks overkill.
 
+@Eric: WDYT?
 
->+		if (err)
->+			return err;
->+	}
->+
-> 	if (info->attrs[DEVLINK_ATTR_ESWITCH_INLINE_MODE]) {
-> 		if (!ops->eswitch_inline_mode_set)
-> 			return -EOPNOTSUPP;
+Thanks,
 
-[...]
+Paolo
+
 
