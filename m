@@ -1,149 +1,193 @@
-Return-Path: <netdev+bounces-229892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAC8EBE1DD0
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:06:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BA47BE1E38
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:21:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5D09D4EF876
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 07:06:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 36EF04EB0E1
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 07:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5B32F7AAA;
-	Thu, 16 Oct 2025 07:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SnN1ms9Y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48AB1246BB7;
+	Thu, 16 Oct 2025 07:21:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B6A2F5A0F
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 07:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452251EE019;
+	Thu, 16 Oct 2025 07:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760598393; cv=none; b=Jwm8BBrs5Wyoq9+nSxFdt/ObOTlyp5e+O7UIKv66BZQudysnbOsQWnKYKPg8IhCMTnw48GBeMKgtF9TZGi4GdDvsB4PHp5M8LZVcddASDyq1WwunA+4IJJczFR1e5O0rkB509tf/pIPyU7sVbQRSe9DVBvsL/OlzRVnxqKEPuHw=
+	t=1760599307; cv=none; b=EviiXTo1cFeHk7ybsCO5DkQyUl6rEYCo8JPX+ggkUbL6UyT2+p5oi9Tnn5sHo87eQ9iEf0LYhj5/4lYGE42xKe7q+idXsFW6E57yH0JnNaNo9Hv10RFMMrxREPlY76jmud6Aq63MisOGRdNhs4HVxZv8FzanTG8cXbMfKL0x6lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760598393; c=relaxed/simple;
-	bh=guF/joi80UwvkP8nWPVm/K4T9BS1X9P7hJTAOpIJhsk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aYqJ4NWqaYNXMHQCzCNr0Gjl8j6YGD9gtqyhzBQB4WJlybqIe+fOvHge6uIv60+dauF0qjcGtakJuGg7b7npm+rX4r9/WupyAWKX4LpaUY+CRdZKwTYMGRlOaQeTZr62myMCuvc5/CmsN/feaE3kfINmAe9AiHz0V8jcuQgWJdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SnN1ms9Y; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id CD0FBC03B71;
-	Thu, 16 Oct 2025 07:06:09 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 010036062C;
-	Thu, 16 Oct 2025 07:06:29 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E3250102F229A;
-	Thu, 16 Oct 2025 09:06:21 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760598388; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=ON2SCtQiP5UISY9OlG9TMamQzrttCF5L3Gqd7rBZXq4=;
-	b=SnN1ms9YDbQxlYIHv0+nQCh4k1vRIopL+ldN2EOvNg/qox1nb7+h8HSS1A/qQJGk9/ygQ7
-	VIAM1M9BjOm2tYnGe82+HmTAOnsecvqmvkOFC5Fm0VNbUXMiyN4nWH6DDCi2FlqsKZIlIF
-	4JCentfpIvDeohQY5cW0gn3jTanCLLpXXCtJfdwiFNecEdnkxv8bxHH86d6NymNsjSuGJN
-	hXlrRr9j6NGkSTkJiB0ORYAYGE9jWqEjGbFRHd4WW9OTM45GDe9JdihKqo6GfEIHU4wJPC
-	y+gyzNJVoABux5QGy8DNSTHGrJWsVwFact7d9h6WsDkIODhNEErsjM5Oigp+Vg==
-Message-ID: <ae07b0b6-f5d2-416d-b861-412888fda229@bootlin.com>
-Date: Thu, 16 Oct 2025 09:06:20 +0200
+	s=arc-20240116; t=1760599307; c=relaxed/simple;
+	bh=EJXNHgEM/c6BAiZKCxEAAJsXGxgydll/3KwHHRXA9qQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AwVzwaVFIw4pS3SwIbxV/1uDhjqrq2RGJXTC5Xznkcq5blIZBzJwMvB4XVbwaiQt7wtpZX2L5cHoqJokhFgqfB4IOqX7xZU30PF8ATmJ8hVRSV3JHt6hRDcasamhZkW2yTQxWCFPd6Hi7bJHVQZOtbIHrz7mxKChOPMUECO56pQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c45ff70000001609-70-68f09d01a5d2
+Date: Thu, 16 Oct 2025 16:21:32 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: axboe@kernel.dk, kuba@kernel.org, pabeni@redhat.com,
+	almasrymina@google.com, asml.silence@gmail.com
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	hawk@kernel.org, ilias.apalodimas@linaro.org, sdf@fomichev.me,
+	dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com,
+	toke@redhat.com, io-uring@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	kernel_team@skhynix.com, max.byungchul.park@gmail.com
+Subject: Re: [PATCH net-next] page_pool: check if nmdesc->pp is !NULL to
+ confirm its usage as pp for net_iov
+Message-ID: <20251016072132.GA19434@system.software.com>
+References: <20251016063657.81064-1-byungchul@sk.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/5] net: stmmac: place .mac_finish() method more
- appropriately
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-References: <aO_HIwT_YvxkDS8D@shell.armlinux.org.uk>
- <E1v945O-0000000AmeP-1k0t@rmk-PC.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <E1v945O-0000000AmeP-1k0t@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251016063657.81064-1-byungchul@sk.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrFIsWRmVeSWpSXmKPExsXC9ZZnkS7T3A8ZBns2c1is/lFh8XPNcyaL
+	Oau2MVqsvtvPZjHnfAuLxc5dzxktXs1Yy2bx9Ngjdos97duZLR71n2Cz6G35zWzxrvUci8WF
+	bX2sFpd3zWGzuDCxl9Xi2AIxi2+n3zBaXJ25i8ni0uFHLA7CHltW3mTyuDZjIovHjX2nmDx2
+	zrrL7rFgU6nH5bOlHptWdbJ53Lm2h82jt/kdm8f7fVfZPD5vkgvgjuKySUnNySxLLdK3S+DK
+	eHp4BXPBUoWKlZOnMjYwNkp1MXJwSAiYSLzf4t/FyAlm7l39jxHEZhFQlejoe8QOYrMJqEvc
+	uPGTGcQWEciU6Jp8Hcjm4mAWuMEkMfvrFtYuRnYOYYE8iWfGICW8AhYSR4/9AysXEjCVeHv+
+	AzNEXFDi5MwnLCA2s4CWxI1/L5lALmAWkJZY/o8DJMwpYCbxfd47VhBbVEBZ4sC240wgmyQE
+	NrFLzL74nxHiTEmJgytusExgFJiFZOwsJGNnIYxdwMi8ilEoM68sNzEzx0QvozIvs0IvOT93
+	EyMwBpfV/onewfjpQvAhRgEORiUe3gcr3mcIsSaWFVfmHmKU4GBWEuFlKPiQIcSbklhZlVqU
+	H19UmpNafIhRmoNFSZzX6Ft5ipBAemJJanZqakFqEUyWiYNTqoGxurxw0j8Wi/cPP/SyWKyQ
+	WZxz/bjiwjU1xn8r9U6sDF//t+S11/rm+bv9s20fLrmlvu1tW7W3cEPyPsazeUbeAoHVleL8
+	tXFLzL/ZK8Q2b5w2Zc21Cd9vdf0OZdBS3jnj9lTubfN732y5e9jvjfHaUzemtH/tWFK6MXZp
+	3eaVM9cvW1Zx9svscCWW4oxEQy3mouJEAFZ2F+e9AgAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprEIsWRmVeSWpSXmKPExsXC5WfdrMs490OGwbnZpharf1RY/FzznMli
+	zqptjBar7/azWcw538JisXPXc0aLVzPWslk8PfaI3WJP+3Zmi0f9J9gselt+M1u8az3HYnF4
+	7klWiwvb+lgtLu+aw2ZxYWIvq8WxBWIW306/YbS4OnMXk8Wlw49YHEQ8tqy8yeRxbcZEFo8b
+	+04xeeycdZfdY8GmUo/LZ0s9Nq3qZPO4c20Pm0dv8zs2j/f7rrJ5LH7xgcnj8ya5AJ4oLpuU
+	1JzMstQifbsEroynh1cwFyxVqFg5eSpjA2OjVBcjJ4eEgInE3tX/GEFsFgFViY6+R+wgNpuA
+	usSNGz+ZQWwRgUyJrsnXgWwuDmaBG0wSs79uYe1iZOcQFsiTeGYMUsIrYCFx9Ng/sHIhAVOJ
+	t+c/MEPEBSVOznzCAmIzC2hJ3Pj3kqmLkQPIlpZY/o8DJMwpYCbxfd47VhBbVEBZ4sC240wT
+	GHlnIemehaR7FkL3AkbmVYwimXlluYmZOaZ6xdkZlXmZFXrJ+bmbGIExtaz2z8QdjF8uux9i
+	FOBgVOLhfbDifYYQa2JZcWXuIUYJDmYlEV6Ggg8ZQrwpiZVVqUX58UWlOanFhxilOViUxHm9
+	wlMThATSE0tSs1NTC1KLYLJMHJxSDYyH/Q+/jPUq3unscvvsj49y4YGJt6sqb88KfH66OP78
+	jtXvZ645HBnbIWWwZGfKuZ+M1bWrs26HS8mq2vofF19o/v2jKO/0alONF0vS9p5cs7R1n/0z
+	7wiF+9mmUakJyw58NBP8mf7h4rZ1Z3XneonULP3q5CUnxb900bG76tuEdxxxvfL39kQRJZbi
+	jERDLeai4kQABs+akaUCAAA=
+X-CFilter-Loop: Reflected
 
-
-
-On 15/10/2025 18:10, Russell King (Oracle) wrote:
-> Place the .mac_finish() initialiser and implementation after the
-> .mac_config() initialiser and method which reflects the order that
-> they appear in struct phylink_mac_ops, and the order in which they
-> are called. This keeps logically similar code together.
+On Thu, Oct 16, 2025 at 03:36:57PM +0900, Byungchul Park wrote:
+> ->pp_magic field in struct page is current used to identify if a page
+> belongs to a page pool.  However, ->pp_magic will be removed and page
+> type bit in struct page e.g. PGTY_netpp should be used for that purpose.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> As a preparation, the check for net_iov, that is not page-backed, should
+> avoid using ->pp_magic since net_iov doens't have to do with page type.
+> Instead, nmdesc->pp can be used if a net_iov or its nmdesc belongs to a
+> page pool, by making sure nmdesc->pp is NULL otherwise.
+> 
+> For page-backed netmem, just leave unchanged as is, while for net_iov,
+> make sure nmdesc->pp is initialized to NULL and use nmdesc->pp for the
+> check.
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+IIRC,
 
+Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
+
+	Byungchul
+
+> Signed-off-by: Byungchul Park <byungchul@sk.com>
 > ---
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 26 +++++++++----------
->  1 file changed, 13 insertions(+), 13 deletions(-)
+>  io_uring/zcrx.c        |  4 ++++
+>  net/core/devmem.c      |  1 +
+>  net/core/netmem_priv.h |  6 ++++++
+>  net/core/page_pool.c   | 16 ++++++++++++++--
+>  4 files changed, 25 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 650d75b73e0b..3728afa701c6 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -859,6 +859,18 @@ static void stmmac_mac_config(struct phylink_config *config, unsigned int mode,
->  	/* Nothing to do, xpcs_config() handles everything */
->  }
+> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+> index 723e4266b91f..cf78227c0ca6 100644
+> --- a/io_uring/zcrx.c
+> +++ b/io_uring/zcrx.c
+> @@ -450,6 +450,10 @@ static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
+>  		area->freelist[i] = i;
+>  		atomic_set(&area->user_refs[i], 0);
+>  		niov->type = NET_IOV_IOURING;
+> +
+> +		/* niov->desc.pp is already initialized to NULL by
+> +		 * kvmalloc_array(__GFP_ZERO).
+> +		 */
+>  	}
 >  
-> +static int stmmac_mac_finish(struct phylink_config *config, unsigned int mode,
-> +			     phy_interface_t interface)
-> +{
-> +	struct net_device *ndev = to_net_dev(config->dev);
-> +	struct stmmac_priv *priv = netdev_priv(ndev);
-> +
-> +	if (priv->plat->mac_finish)
-> +		priv->plat->mac_finish(ndev, priv->plat->bsp_priv, mode, interface);
-> +
-> +	return 0;
-> +}
-> +
->  static void stmmac_mac_link_down(struct phylink_config *config,
->  				 unsigned int mode, phy_interface_t interface)
+>  	area->free_count = nr_iovs;
+> diff --git a/net/core/devmem.c b/net/core/devmem.c
+> index d9de31a6cc7f..f81b700f1fd1 100644
+> --- a/net/core/devmem.c
+> +++ b/net/core/devmem.c
+> @@ -291,6 +291,7 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+>  			niov = &owner->area.niovs[i];
+>  			niov->type = NET_IOV_DMABUF;
+>  			niov->owner = &owner->area;
+> +			niov->desc.pp = NULL;
+>  			page_pool_set_dma_addr_netmem(net_iov_to_netmem(niov),
+>  						      net_devmem_get_dma_addr(niov));
+>  			if (direction == DMA_TO_DEVICE)
+> diff --git a/net/core/netmem_priv.h b/net/core/netmem_priv.h
+> index 23175cb2bd86..fb21cc19176b 100644
+> --- a/net/core/netmem_priv.h
+> +++ b/net/core/netmem_priv.h
+> @@ -22,6 +22,12 @@ static inline void netmem_clear_pp_magic(netmem_ref netmem)
+>  
+>  static inline bool netmem_is_pp(netmem_ref netmem)
 >  {
-> @@ -1053,27 +1065,15 @@ static int stmmac_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
->  	return 0;
+> +	/* Use ->pp for net_iov to identify if it's pp, which requires
+> +	 * that non-pp net_iov should have ->pp NULL'd.
+> +	 */
+> +	if (netmem_is_net_iov(netmem))
+> +		return !!netmem_to_nmdesc(netmem)->pp;
+> +
+>  	return (netmem_get_pp_magic(netmem) & PP_MAGIC_MASK) == PP_SIGNATURE;
 >  }
 >  
-> -static int stmmac_mac_finish(struct phylink_config *config, unsigned int mode,
-> -			     phy_interface_t interface)
-> -{
-> -	struct net_device *ndev = to_net_dev(config->dev);
-> -	struct stmmac_priv *priv = netdev_priv(ndev);
-> -
-> -	if (priv->plat->mac_finish)
-> -		priv->plat->mac_finish(ndev, priv->plat->bsp_priv, mode, interface);
-> -
-> -	return 0;
-> -}
-> -
->  static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
->  	.mac_get_caps = stmmac_mac_get_caps,
->  	.mac_select_pcs = stmmac_mac_select_pcs,
->  	.mac_config = stmmac_mac_config,
-> +	.mac_finish = stmmac_mac_finish,
->  	.mac_link_down = stmmac_mac_link_down,
->  	.mac_link_up = stmmac_mac_link_up,
->  	.mac_disable_tx_lpi = stmmac_mac_disable_tx_lpi,
->  	.mac_enable_tx_lpi = stmmac_mac_enable_tx_lpi,
-> -	.mac_finish = stmmac_mac_finish,
->  };
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 1a5edec485f1..2756b78754b0 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -699,7 +699,13 @@ s32 page_pool_inflight(const struct page_pool *pool, bool strict)
+>  void page_pool_set_pp_info(struct page_pool *pool, netmem_ref netmem)
+>  {
+>  	netmem_set_pp(netmem, pool);
+> -	netmem_or_pp_magic(netmem, PP_SIGNATURE);
+> +
+> +	/* For page-backed, pp_magic is used to identify if it's pp.
+> +	 * For net_iov, it's ensured nmdesc->pp is non-NULL if it's pp
+> +	 * and nmdesc->pp is NULL if it's not.
+> +	 */
+> +	if (!netmem_is_net_iov(netmem))
+> +		netmem_or_pp_magic(netmem, PP_SIGNATURE);
 >  
->  /**
-
+>  	/* Ensuring all pages have been split into one fragment initially:
+>  	 * page_pool_set_pp_info() is only called once for every page when it
+> @@ -714,7 +720,13 @@ void page_pool_set_pp_info(struct page_pool *pool, netmem_ref netmem)
+>  
+>  void page_pool_clear_pp_info(netmem_ref netmem)
+>  {
+> -	netmem_clear_pp_magic(netmem);
+> +	/* For page-backed, pp_magic is used to identify if it's pp.
+> +	 * For net_iov, it's ensured nmdesc->pp is non-NULL if it's pp
+> +	 * and nmdesc->pp is NULL if it's not.
+> +	 */
+> +	if (!netmem_is_net_iov(netmem))
+> +		netmem_clear_pp_magic(netmem);
+> +
+>  	netmem_set_pp(netmem, NULL);
+>  }
+>  
+> 
+> base-commit: e1f5bb196f0b0eee197e06d361f8ac5f091c2963
+> -- 
+> 2.17.1
 
