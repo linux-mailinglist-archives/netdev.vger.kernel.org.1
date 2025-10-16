@@ -1,141 +1,116 @@
-Return-Path: <netdev+bounces-230191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64FEFBE529B
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 21:03:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A870ABE531B
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 21:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DEA51AA0436
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 19:03:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C2C919A46F7
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 19:11:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1E4D23D7D9;
-	Thu, 16 Oct 2025 19:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D9C2882DE;
+	Thu, 16 Oct 2025 19:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D217VmIn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="F6MxgT1P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8630923C516;
-	Thu, 16 Oct 2025 19:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E2F2882CF;
+	Thu, 16 Oct 2025 19:11:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760641394; cv=none; b=jsDgidVci49kGN/FOQqlDj8lOuCi5UiRnaTXENkFwm0n/Sk/Qo7ApUsxu3gDEULsso+QANGk9NPAifHPXssBfHv1rI/gn5kKItPni+0tYxgWibuFJah+YIy59+opTC48w5u6B7fVE1Ol9iDEwlT0/WmMogYnPBtC8fWBMJ5pivk=
+	t=1760641882; cv=none; b=BscDaDM5ESc2SARWk0MAQ/FKuGUcbXFI74AKwtM/YnDUs0Bu69k8yGIHCs87AHqSHNITUuMdEqrZGoWuOlkWnT3tY+XXX/1OeE9uOSH3TQJbPfbw0OaLtcKLrHAUT3jhwumkGmTUdGOJPi75yN/VlVsRBQZ66yzl4H4uDWy7i6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760641394; c=relaxed/simple;
-	bh=/svoWHeXOS5kyJXHlew/DzxM7PeeoVPP4zawYSZ0BBc=;
+	s=arc-20240116; t=1760641882; c=relaxed/simple;
+	bh=Kpmyv3Tv62MdWYPZiBCYni86OvTfWF0aCytZpAdko0w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bzD4V7ijFbwr6Wqjkv3U45XnKkWm56gHvKgOYkRiiRWUtqyZGC4NOkbim2eBLfe5PG1zu2UF724WjbAXQxErSd0YNUFWfNEusehf5mjhLxods4Q1JBJnjVFio+Q3tzy5eNVX7xx4DG+aDZpacvwFUI4CPLYdBc36P/s9im7Erfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D217VmIn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B287C4CEF1;
-	Thu, 16 Oct 2025 19:03:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760641394;
-	bh=/svoWHeXOS5kyJXHlew/DzxM7PeeoVPP4zawYSZ0BBc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D217VmIns/z5GA+fv8iF5JXLetra8+kbwzk/1qKgHsww226jfwCLdSRKYCHa2zkQc
-	 Gja7iIsZ13AIs0GduApLg2/IunDfD9KXqhPwGGEjicdzyWMYh7kOk0MJQVDmJhFqI6
-	 lLi100fx2DeAwJu8U/soLf1xfZjzbOY79+k3oG6tbMz00Z3lDOEFlYZk3DX/qzOXP6
-	 w2QFy/bA+xPTP1jr2SYF6EdNEbA7+aRIbPf8lhEob59XRqr7JfxLOZfOvvRSsCZdF3
-	 id4BqbkPJMAFTEt2/q8UjQ9OFv0sTZZ7yNPEUg2tOJCBxA72rNfGZBGWzgMTDpMSFp
-	 fZ0AoJEThsvng==
-Date: Thu, 16 Oct 2025 20:03:07 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Dan Nowlin <dan.nowlin@intel.com>,
-	Qi Zhang <qi.z.zhang@intel.com>, Jie Wang <jie1x.wang@intel.com>,
-	Junfeng Guo <junfeng.guo@intel.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: Re: [PATCH net-next 06/14] ice: Extend PTYPE bitmap coverage for GTP
- encapsulated flows
-Message-ID: <aPFBazc43ZYNvrz7@horms.kernel.org>
-References: <20251015-jk-iwl-next-2025-10-15-v1-0-79c70b9ddab8@intel.com>
- <20251015-jk-iwl-next-2025-10-15-v1-6-79c70b9ddab8@intel.com>
- <aPDjUeXzS1lA2owf@horms.kernel.org>
- <64d3e25a-c9d6-4a43-84dd-cffe60ac9848@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=owjhiwccTuXw1oLEcUG19+JFopFfJTXivLTP8lJSnd+MeHhgG7Mr7Dslhzo8ZxpmrrYoWdcpiNzXF7Zv6Ww4OX/bCiXKJXpCL81o2Zzcjmchs8fnehs4++PtJskqHuYltl7+4WGK5SGzeo/8P27/tDAPL/Da1ZZXK+bH6phNx2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=F6MxgT1P; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=oVHJo5eFnWVELSPqB/MrO2ee7+O6J+manXe99W9VUME=; b=F6
+	MxgT1PfjkrFXENmfT6Hqia08MbAxRN7GjzE/P4+Yexg4VM+pOv1OVA8HG2LyoAD+WQO5i4eggcAE3
+	CEM4/xwhPzg88aedaB0IANeNisN0Hm03QDYsRXsOzH5WvuHpx7kaDXhln3cz+Mmoxo+0CEgzMDWfE
+	VITKQKEYDf1z4eA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v9TNV-00BCM5-Ov; Thu, 16 Oct 2025 21:11:09 +0200
+Date: Thu, 16 Oct 2025 21:11:09 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	linux-leds@vger.kernel.org, netdev@vger.kernel.org,
+	Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Subject: Re: [PATCH leds v2 00/10] Add support for offloading netdev trigger
+ to HW + example implementation for Turris Omnia
+Message-ID: <87875554-1747-4b0e-9805-aed1a4c69a82@lunn.ch>
+References: <20210601005155.27997-1-kabel@kernel.org>
+ <CA+V-a8tW9tWw=-fFHXSvYPeipd8+ADUuQj7DGuKP-xwDrdAbyQ@mail.gmail.com>
+ <7d510f5f-959c-49b7-afca-c02009898ef2@lunn.ch>
+ <CA+V-a8ve0eKmBWuxGgVd_8uzy0mkBm=qDq2U8V7DpXhvHTFFww@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <64d3e25a-c9d6-4a43-84dd-cffe60ac9848@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+V-a8ve0eKmBWuxGgVd_8uzy0mkBm=qDq2U8V7DpXhvHTFFww@mail.gmail.com>
 
-On Thu, Oct 16, 2025 at 10:20:25AM -0700, Jacob Keller wrote:
+On Thu, Oct 16, 2025 at 07:53:17PM +0100, Lad, Prabhakar wrote:
+> Hi Andrew,
 > 
-> 
-> On 10/16/2025 5:21 AM, Simon Horman wrote:
-> > On Wed, Oct 15, 2025 at 12:32:02PM -0700, Jacob Keller wrote:
-> >> From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> >>
-> >> Consolidate updates to the Protocol Type (PTYPE) bitmap definitions
-> >> across multiple flow types in the Intel ICE driver to support GTP
-> >> (GPRS Tunneling Protocol) encapsulated traffic.
-> >>
-> >> Enable improved Receive Side Scaling (RSS) configuration for both user
-> >> and control plane GTP flows.
-> >>
-> >> Cover a wide range of protocol and encapsulation scenarios, including:
-> >>  - MAC OFOS and IL
-> >>  - IPv4 and IPv6 (OFOS, IL, ALL, no-L4)
-> >>  - TCP, SCTP, ICMP
-> >>  - GRE OF
-> >>  - GTPC (control plane)
-> >>
-> >> Expand the PTYPE bitmap entries to improve classification and
-> >> distribution of GTP traffic across multiple queues, enhancing
-> >> performance and scalability in mobile network environments.
-> >>
-> >> --
-> > 
-> > Hi Jacob,
-> > 
-> > Perhaps surprisingly, git truncates the commit message at
-> > the ('--') line above. So, importantly, the tags below are absent.
-> > 
-> 
-> Its somewhat surprising, since I thought you had to use '---' for that.
-> Regardless, this shouldn't be in the commit message at all.
-> > Also, the two lines below seem out of place.
-> > 
-> >>  ice_flow.c |   54 +++++++++++++++++++++++++++---------------------------
-> >>  1 file changed, 26 insertions(+), 26 deletions(-)
-> >>
-> 
-> Yep these shouldn't have been here at all. I checked, and for some
-> reason it was included in the original message id of the patch. b4
-> happily picked it up when using b4 shazam.
-> 
-> See:
-> https://lore.kernel.org/intel-wired-lan/20250915133928.3308335-5-aleksandr.loktionov@intel.com/
-> 
-> I am not sure if this is the fault of b4, though it has different
-> behavior than other git tooling here.
+> On Thu, Oct 16, 2025 at 2:14 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > > > Marek Behún (10):
+> > > >   leds: trigger: netdev: don't explicitly zero kzalloced data
+> > > >   leds: trigger: add API for HW offloading of triggers
+> > > >   leds: trigger: netdev: move trigger data structure to global include
+> > > >     dir
+> > > >   leds: trigger: netdev: support HW offloading
+> > > >   leds: trigger: netdev: change spinlock to mutex
+> > > >   leds: core: inform trigger that it's deactivation is due to LED
+> > > >     removal
+> > > >   leds: turris-omnia: refactor sw mode setting code into separate
+> > > >     function
+> > > >   leds: turris-omnia: refactor brightness setting function
+> > > >   leds: turris-omnia: initialize each multicolor LED to white color
+> > > >   leds: turris-omnia: support offloading netdev trigger for WAN LED
+> > > >
+> > > Do you plan to progress with the above series anytime soon? If not I
+> > > want to give this patch [0] again a respin.
+> >
+> > What features are you missing from the current kernel code, which this
+> > series adds?
+> >
+> I’m working on a platform that uses the VSC8541 PHY. On this platform,
+> LED0 and LED1 are connected to the external connector, and LED1 is
+> also connected to the Ethernet switch to indicate the PHY link status.
+> As a result, whenever there is link activity, the PHY link status
+> signal to the switch toggles, causing the switch to incorrectly detect
+> the link as going up and down.
 
-TBH, I am also surprised that git truncates at '--'. I also thought
-'---'. And as this is the second time it's come up recently,
-while I don't recall seeing it before, perhaps due to some tooling change
-somewhere: e.g. interaction between git and b4.
+So you think the current /sys/class/leds code is not sufficient. You
+can use it from udev etc, to make the LED indicate link, but then
+userspace could change it to something else. I _think_ only root can
+use /sys/class/leds to change the function of the LED, so it is not
+too bad as is? Or do you really want to make the configuration read
+only?
 
-> I fixed this on my end, and can resubmit after the 24hr period if needed.
-
-FWIIW, I'd lean towards reposting after 24h if you don't hear from one of
-the maintainers.
-
+	Andrew
 
 
