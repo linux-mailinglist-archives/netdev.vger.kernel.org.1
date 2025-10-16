@@ -1,155 +1,143 @@
-Return-Path: <netdev+bounces-229933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7B84BE2307
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:40:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CF13BE235B
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:44:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CA5534FA742
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:40:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 649843A94C5
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E574308F0E;
-	Thu, 16 Oct 2025 08:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7AB30505F;
+	Thu, 16 Oct 2025 08:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="blksfxaI"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HQmM4ypr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81063054F6;
-	Thu, 16 Oct 2025 08:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2776E2FF65D
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 08:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760604021; cv=none; b=GJUYJZE1p4zynBBm92MXmCq+NUogfG37PuS0V4pbdrXIQf6FQD4hCNoJ01QuE0A9yeBkodPVCWlq8vvq2J3Vec3Q+7v8FfbHlEjGIP1vpRs7qJD9C8kpNlkZontH7tZdn5p4t5h8Nk5u4gRHlBizYbps5VG8ySDrn2vuB5WFeXQ=
+	t=1760604286; cv=none; b=CvQzV4S6798mTwR4lew1OxJJeS6RhZdMf9chQgE28sP+JYY4RgVCW539PvClVK+EB7OX/SJyABrz2+l07Dtuyh7pNOYGzDJay2FaMhKilSvKQBLyVkKc2+F1/R9DtypWJTVRclCMWFCNduZXiznVufTEOoI0+RXne3h2HiVO6cU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760604021; c=relaxed/simple;
-	bh=3AWrDtmV1JGxPTVWPOgARlJPPLjkXwSKEbROH0L2i+Q=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gflWBAlTZLKQP/UHPWcL+IM8Y7yvz3vF91PXLE1wTcRL9j6R/9s83fPTZnsd/orAF5NX1Uqhifq9c8Bc6kmeJ1Eonwd8Tx3TDS+yOtuNomNqm1IIOiEBJisMBSb1ZAqrnenS9bkQS0scAc5Rmm5DmWzOwSr+VgdLR5y40vZUaOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=blksfxaI; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59G6Vtst023503;
-	Thu, 16 Oct 2025 08:40:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=3AWrDt
-	mV1JGxPTVWPOgARlJPPLjkXwSKEbROH0L2i+Q=; b=blksfxaInlRDg2OhbPedPA
-	zj4DZT4v/nHljm4QgW+sLzkpPMA8jnDs5K4/B31TCEH4BYOPDMljxZ7jyc4IK22d
-	x3dL10KHGHlDdp++SBGxw0/rBSKDUc80FG560jcHgGMP+8/fDM+Y4WHmN1fic3QH
-	bU/4fNuczwo7cOMmcgpXAGifgpZhu7neU4DjjoG5V1VsNGrwcVlPLgW2ps3FR2ul
-	mDVMWxcLQPM++Vng//nIkIVDv+toIzUNA0MQlbhEwfleGM1iMfhw6gPKJUjlJcFS
-	LNmat/E7WsxLebN3dWq5Iq+c/6CtX4GJX3dIiZ09QeQwGmrkLC1k2oIVA2aiAs3Q
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49tfxpk95y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Oct 2025 08:40:14 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59G649MZ003663;
-	Thu, 16 Oct 2025 08:40:13 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49r1xy4v4k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Oct 2025 08:40:13 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59G8e7uq55116284
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 16 Oct 2025 08:40:07 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BC21020140;
-	Thu, 16 Oct 2025 08:40:07 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4DBD420146;
-	Thu, 16 Oct 2025 08:40:07 +0000 (GMT)
-Received: from [9.155.208.229] (unknown [9.155.208.229])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 16 Oct 2025 08:40:07 +0000 (GMT)
-Message-ID: <ba6bf792162213fd4a1085b1c157e3c5e4996133.camel@linux.ibm.com>
-Subject: Re: [PATCH v2] s390/pci: Avoid deadlock between PCI error recovery
- and mlx5 crdump
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Niklas Schnelle <schnelle@linux.ibm.com>,
-        Gerald Schaefer	
- <gerald.schaefer@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily
- Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Shay Drori	 <shayd@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky	 <leon@kernel.org>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Pierre
- Morel <pmorel@linux.ibm.com>,
-        Matthew Rosato	 <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org
-Date: Thu, 16 Oct 2025 10:40:07 +0200
-In-Reply-To: <358e3a7a1e735d5b1e761cf159db8ae735a9578d.camel@linux.ibm.com>
-References: <20251015-fix_pcirecov_master-v2-1-e07962fe9558@linux.ibm.com>
-	 <358e3a7a1e735d5b1e761cf159db8ae735a9578d.camel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	s=arc-20240116; t=1760604286; c=relaxed/simple;
+	bh=vRX2tojo3/tm9805sxEoYBXfaRPegPiWe9oFIjqdDOU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DkEWRfnxl0cyyspWShUQZb3NX1VxC9Tk0XA+4dmVPx+drwHa340qtavX7XwPYcoE8dtkJV0iFVYynTW27pVlKDRpkBys9o2/drJwiYIn8Uhymy8S3CIHfGY6XCgeuHvhX6D0s6BLMK5jXAIcKn66VNrqTWCqeHxf+PUI8fOHKlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HQmM4ypr; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 51EEE1A140D;
+	Thu, 16 Oct 2025 08:44:42 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 24AAB6062C;
+	Thu, 16 Oct 2025 08:44:42 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 56753102F22F1;
+	Thu, 16 Oct 2025 10:44:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1760604281; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=N1rZiVWM7zYa7/iOhEFyo6sQl/kIYT8q4flK3hRKByc=;
+	b=HQmM4yprZlilGcaiSB4/XWd0S51BJtvXC4417lCtZL2fcCLWXoIicfoDQFC7COdyPP0d8U
+	sGUm6edEWmgUf3OBpeISB1P1kDAcotG5N0Jnq++reD2L0FyKrqycTTjt7b6aq6DJZRCcC4
+	MYkWwgL8NAqOE61PQINi3sOG5Jx56yvzF2AXr0go6QOjuzk3OANIeriItOuNTML1TK13Za
+	48NEqBqW1wlUbAloKzagYwDULgmqA4Urj/6Uv7VdtM+yoH7C0DSsGkKrZJsfOhog3uYzRV
+	Kolrc5ZfmqkyT8TOXZll5Fe9p88LnOa+7QdJNsG69DX1P3mVF/jiMY1id8+JJw==
+Date: Thu, 16 Oct 2025 10:44:34 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Alexis =?UTF-8?B?TG90aG9yw6k=?=
+ <alexis.lothore@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 3/3] net: ethtool: tsconfig: Re-configure
+ hwtstamp upon provider change
+Message-ID: <20251016104338.6677e807@kmaincent-XPS-13-7390>
+In-Reply-To: <731e8fa7-465b-4470-9036-c59fea602c07@bootlin.com>
+References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
+	<20251015102725.1297985-4-maxime.chevallier@bootlin.com>
+	<20251015144526.23e55ee0@kmaincent-XPS-13-7390>
+	<731e8fa7-465b-4470-9036-c59fea602c07@bootlin.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: QDsrJC5RMRKIqG9CaXi5okcG_yOi1Vcy
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE1MDEyNSBTYWx0ZWRfX4ltVL7ge9Vu6
- iyOzSkTXhUzBNEJ2+AzNnZ5F4ekwsIQPhMliNTQCX/1AzL+ar6ivA8bzC9AT7Hh0GnY4ayeFXCu
- 0GcxjTamNUqfImLXtpjRpafCzBc5NvEBJ9e3ayzL8MnWqwcO/1pWpNN4yrx7FS9BCZhdOhwBSUg
- Qpi2H4wyVzlhBgpWbnCvYxdkPElncrSPEPJvPjUfpotNjx4FO8agTumdjZsshLuonQPfvrnXyH5
- hLxpVYchlN8t2tSs4IBLfJTewBC7NJGtgwEISX2zT3ODYxcUjiAeEvdyVIAI7UADDB9TYqj/UVT
- SZSONB9bYtHtiZUvYR7v3hpBrXlhh2qpWOHPWCh9v0HlOBUuTzWAbv9TqHwQUyAODj1yHvlVXov
- vMNqbjz1ZlsB44v7n4Xv01UKL6F5LA==
-X-Authority-Analysis: v=2.4 cv=R+wO2NRX c=1 sm=1 tr=0 ts=68f0af6e cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=97ZeUEOCl0Sx5TDpsusA:9 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-ORIG-GUID: QDsrJC5RMRKIqG9CaXi5okcG_yOi1Vcy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-16_01,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 suspectscore=0 bulkscore=0 clxscore=1015
- priorityscore=1501 adultscore=0 spamscore=0 impostorscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510150125
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Wed, 2025-10-15 at 16:10 +0200, Niklas Schnelle wrote:
-> On Wed, 2025-10-15 at 13:05 +0200, Gerd Bayer wrote:
-> > Do not block PCI config accesses through pci_cfg_access_lock() when
-> > executing the s390 variant of PCI error recovery: Acquire just
-> > device_lock() instead of pci_dev_lock() as powerpc's EEH and
-> > generig PCI AER processing do.
+On Thu, 16 Oct 2025 10:01:53 +0200
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+
+> Hi K=C3=B6ry,
+>=20
+> On 15/10/2025 14:45, Kory Maincent wrote:
+> > On Wed, 15 Oct 2025 12:27:23 +0200
+> > Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+> >  =20
+> >> When a hwprov timestamping source is changed, but without updating the
+> >> timestamping parameters, we may want to reconfigure the timestamping
+> >> source to enable the new provider.
+> >>
+> >> This is especially important if the same HW unit implements 2 provider=
+s,
+> >> a precise and an approx one. In this case, we need to make sure we call
+> >> the hwtstamp_set operation for the newly selected provider. =20
 > >=20
-
-[... snip ...]
-
+> > This is a design choice.
+> > Do we want to preserve the hwtstamp config if only the hwtstamp source =
+is
+> > changed from ethtool?
+> > If we want to configure the new source to the old source config we will=
+ also
+> > need to remove this condition:
+> > https://elixir.bootlin.com/linux/v6.17.1/source/net/ethtool/tsconfig.c#=
+L339
+> > =20
 >=20
-> Code-wise this looks good to me and I've confirmed that EEH and AER
-> indeed only use the device_lock() and I don't see a reason why that
-> shouldn't be enough for us too if it is enough for them. I think I
-> just
-> picked pci_dev_lock() because it seemed fitting but it probably was
-> too
-> big a hammer.
+> What I get from the ethtool output is that the ts config is per-source.
+> Re-applying the old config to the new source may not work if the new one
+> doesn't have the same capabilities.
 >=20
-> Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> >=20
+> > I do not really have a strong opinion on this, let's discuss which beha=
+vior
+> > we prefer. =20
+>=20
+> Well if we want to support different timestamp providers provided by the =
+same
+> HW block (same MAC or even same PHY), then we need a way to notify the
+> provider when the timestamp provider gets selected and unselected.
+>=20
+> Otherwise there's no way for the provider to know it has been re-enabled,
+> unless we perform a config change at the same time.
 
-I'll send around a v3 with your suggested changes to the commit message
-included.
+Oh right, indeed, we need a call to ndo_hwtstamp_set to tell the provider to
+change the qualifier configured. I missed that.
+This could even be a fix but as it is used nowhere it won't fix anything.
 
-Thanks for the review,
-Gerd
+Acked-by: Kory Maincent <kory.maincent@bootlin.com>
+
+Thank you!
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
