@@ -1,121 +1,336 @@
-Return-Path: <netdev+bounces-229923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C2AEBE2142
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:02:51 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D152BE2139
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:02:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C5C3423EA8
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:02:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2B3B84E2D36
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F012FFFA0;
-	Thu, 16 Oct 2025 08:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD1D2FBE1C;
+	Thu, 16 Oct 2025 08:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="R86uQbSw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ty129H83"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9BD2D46C0;
-	Thu, 16 Oct 2025 08:02:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CB52641D8;
+	Thu, 16 Oct 2025 08:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760601741; cv=none; b=JcpjzgykqVIZ6s7GhR/+22JFTt/DKK9v7qnC9dwllbVrg0ZJUsxoccMp2+ekXSrXgw3MVWWy7EFDDSrTRaIGRt8Fgy8pmeGqq0fqSczatkX3BOeD0hb0PFf0HmB8gF4OGkdmuV4hFYFh+Sr3S4kb7KOnfRhXgRG4fg3uMEwi4iI=
+	t=1760601738; cv=none; b=O7jm9Fq/6DGvwvGwhihNUG6BP7eslBwZbHk5hM558HqjPtTsoTfmTb422eA9g6qRvNAEZRxHY2DuGQGtYILw0FZMWmUyt9jZ+pr0sQB4Px+By2uZKB9gVavOqsg57T6cMLNoWR67z7tH179gJlatHklQmjgGulmfgmUqJU8mNOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760601741; c=relaxed/simple;
-	bh=ig/+FDU+0q9A28w5jFSM4PSXgbhgNaEIsEKVfBxrRHk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YP0l18pPHXudN5FPfsiEb8JzGT6pV9wibL55ea9t8tzyL8Z+3xlC8vYVW0mu3gYfD9qu1pKO94VZpCSGElIV8fX4hQ9jKjty0+OElbJTBc9mIv1HaBisdtoBKN9qoHi/KfDtx1z3Dh0rP1/Y9xLtyjCbBNUQEZg9tx6fda9ZA/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=R86uQbSw; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 75C80C03B71;
-	Thu, 16 Oct 2025 08:01:50 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 94D946062C;
-	Thu, 16 Oct 2025 08:02:09 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id ADF8C102F22F8;
-	Thu, 16 Oct 2025 10:01:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760601724; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=epg/CJTop2yMwEwTNQzhdUDQRTPIOstndBbKQiZycUs=;
-	b=R86uQbSwPtfWBGs3P9qIkZwbYZIxEbHPKPfBOUcKnU4E91PDHpMmVcCdfUM39MUUox04kQ
-	G1R/ikQ+nU9LU6nWtmUTpv4+0kCjgzQSITC3ZJteHpc3136OMXJz8TxYWYczhU5h3UoXzW
-	BJEud93vn7k6MKpWQYYfI+XBV9MNEioT9ansLB4lAk8o/g8NOBN5JMBmK1eoSfBQJDtfFE
-	FMqRKBsa/avl4sAJxydw/fS9LGMQUqKMHF/RHU52F2e7G6wcOmVUfpvFOigddgk3DCjz+A
-	HZVtwoZl1uyNj06dWK+wvEu1SCwYeGfgKYXxzcjzxABs+bbtI8WcH7GuXguVvA==
-Message-ID: <731e8fa7-465b-4470-9036-c59fea602c07@bootlin.com>
-Date: Thu, 16 Oct 2025 10:01:53 +0200
+	s=arc-20240116; t=1760601738; c=relaxed/simple;
+	bh=T/QAZeUOl1WroCJzhqOuuzeJ0heu4oxs6E+NuNYSyJ4=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=IyOHDrtAByExjNezsOkmnKIuxdyGc2YcEv7wpWsOMXG9EXkZEb4Vm8G4PZryfhOLZo/S3e1t12+lGHNBHR1W3r1Zkw5d7gt31kIcTKpAYMFKpS2R16o3F+mekCeHSJh1jI65s0L1ND7xS+hQPjdE+qkPTeKEnATWr/eaago/tKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ty129H83; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F2A4C4CEF1;
+	Thu, 16 Oct 2025 08:02:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760601738;
+	bh=T/QAZeUOl1WroCJzhqOuuzeJ0heu4oxs6E+NuNYSyJ4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ty129H83xsriYCQCtEDyF8wzp/ar6C6Ib5FFd7wTqimz3iGENAWUYHmSTehnbC/wq
+	 LhCNUhxKGJXjVYxCa7i6nOT4pEH8CEVCGAVqFog7+Typi8flSNFXoUy51tp74l++uj
+	 6wQp/KUN7qeqLH/Q6jwnhV6hyUy34r2AIUOLlMpW856vtyVHcMVpDbso6A/gsWbBJs
+	 LN+SOz1tIlXv/oL2m7BK+KtQgW/0U/xlFhC3udqi+oc+vTTq9gslKu6vFmby17qyju
+	 S/iGBjXRBFrmVX/MnCnb2PLlSVjKSF4i9PdMmAx31JM6c9b1GRf735QldRy8nPQz7X
+	 T5PK50pcnMZtQ==
+Date: Thu, 16 Oct 2025 17:02:12 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: lirongqing <lirongqing@baidu.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Lance Yang
+ <lance.yang@linux.dev>, <linux-kernel@vger.kernel.org>,
+ <linux-doc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <linux-aspeed@lists.ozlabs.org>, <wireguard@lists.zx2c4.com>,
+ <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>, Andrew Jeffery
+ <andrew@codeconstruct.com.au>, Anshuman Khandual
+ <anshuman.khandual@arm.com>, Arnd Bergmann <arnd@arndb.de>, David
+ Hildenbrand <david@redhat.com>, Florian Wesphal <fw@strlen.de>, Jakub
+ Kacinski <kuba@kernel.org>, "Jason A . Donenfeld" <jason@zx2c4.com>, Joel
+ Granados <joel.granados@kernel.org>, Joel Stanley <joel@jms.id.au>,
+ Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>, Liam Howlett
+ <liam.howlett@oracle.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Paul E . McKenney" <paulmck@kernel.org>, Pawan Gupta
+ <pawan.kumar.gupta@linux.intel.com>, Petr Mladek <pmladek@suse.com>, Phil
+ Auld <pauld@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Russell King
+ <linux@armlinux.org.uk>, Shuah Khan <shuah@kernel.org>, Simon Horman
+ <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Steven Rostedt
+ <rostedt@goodmis.org>
+Subject: Re: [PATCH][v4] hung_task: Panic when there are more than N hung
+ tasks at the same time
+Message-Id: <20251016170212.65e2ad95b80cdeeb6f7d7ce3@kernel.org>
+In-Reply-To: <20251015063615.2632-1-lirongqing@baidu.com>
+References: <20251015063615.2632-1-lirongqing@baidu.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] net: ethtool: tsconfig: Re-configure
- hwtstamp upon provider change
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>,
- =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
- <20251015102725.1297985-4-maxime.chevallier@bootlin.com>
- <20251015144526.23e55ee0@kmaincent-XPS-13-7390>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20251015144526.23e55ee0@kmaincent-XPS-13-7390>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Köry,
+On Wed, 15 Oct 2025 14:36:15 +0800
+lirongqing <lirongqing@baidu.com> wrote:
 
-On 15/10/2025 14:45, Kory Maincent wrote:
-> On Wed, 15 Oct 2025 12:27:23 +0200
-> Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+> From: Li RongQing <lirongqing@baidu.com>
 > 
->> When a hwprov timestamping source is changed, but without updating the
->> timestamping parameters, we may want to reconfigure the timestamping
->> source to enable the new provider.
->>
->> This is especially important if the same HW unit implements 2 providers,
->> a precise and an approx one. In this case, we need to make sure we call
->> the hwtstamp_set operation for the newly selected provider.
+> Currently, when 'hung_task_panic' is enabled, the kernel panics
+> immediately upon detecting the first hung task. However, some hung
+> tasks are transient and allow system recovery, while persistent hangs
+> should trigger a panic when accumulating beyond a threshold.
 > 
-> This is a design choice.
-> Do we want to preserve the hwtstamp config if only the hwtstamp source is
-> changed from ethtool?
-> If we want to configure the new source to the old source config we will also
-> need to remove this condition:
-> https://elixir.bootlin.com/linux/v6.17.1/source/net/ethtool/tsconfig.c#L339
+> Extend the 'hung_task_panic' sysctl to accept a threshold value
+> specifying the number of hung tasks that must be detected before
+> triggering a kernel panic. This provides finer control for environments
+> where transient hangs may occur but persistent hangs should be fatal.
+> 
+> The sysctl now accepts:
+> - 0: don't panic (maintains original behavior)
+> - 1: panic on first hung task (maintains original behavior)
+> - N > 1: panic after N hung tasks are detected in a single scan
+> 
+> This maintains backward compatibility while providing flexibility for
+> different hang scenarios.
 
-What I get from the ethtool output is that the ts config is per-source.
-Re-applying the old config to the new source may not work if the new one
-doesn't have the same capabilities.
+Looks good to me.
+
+Reviewed-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+
+Thank you,
 
 > 
-> I do not really have a strong opinion on this, let's discuss which behavior we
-> prefer.
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> Cc: Andrew Jeffery <andrew@codeconstruct.com.au>
+> Cc: Anshuman Khandual <anshuman.khandual@arm.com>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Florian Wesphal <fw@strlen.de>
+> Cc: Jakub Kacinski <kuba@kernel.org>
+> Cc: Jason A. Donenfeld <jason@zx2c4.com>
+> Cc: Joel Granados <joel.granados@kernel.org>
+> Cc: Joel Stanley <joel@jms.id.au>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Kees Cook <kees@kernel.org>
+> Cc: Lance Yang <lance.yang@linux.dev>
+> Cc: Liam Howlett <liam.howlett@oracle.com>
+> Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+> Cc: "Masami Hiramatsu (Google)" <mhiramat@kernel.org>
+> Cc: "Paul E . McKenney" <paulmck@kernel.org>
+> Cc: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> Cc: Petr Mladek <pmladek@suse.com>
+> Cc: Phil Auld <pauld@redhat.com>
+> Cc: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Russell King <linux@armlinux.org.uk>
+> Cc: Shuah Khan <shuah@kernel.org>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: Stanislav Fomichev <sdf@fomichev.me>
+> Cc: Steven Rostedt <rostedt@goodmis.org>
+> ---
+> diff with v3: comments modification, suggested by Lance, Masami, Randy and Petr
+> diff with v2: do not add a new sysctl, extend hung_task_panic, suggested by Kees Cook
+> 
+>  Documentation/admin-guide/kernel-parameters.txt      | 20 +++++++++++++-------
+>  Documentation/admin-guide/sysctl/kernel.rst          |  9 +++++----
+>  arch/arm/configs/aspeed_g5_defconfig                 |  2 +-
+>  kernel/configs/debug.config                          |  2 +-
+>  kernel/hung_task.c                                   | 15 ++++++++++-----
+>  lib/Kconfig.debug                                    |  9 +++++----
+>  tools/testing/selftests/wireguard/qemu/kernel.config |  2 +-
+>  7 files changed, 36 insertions(+), 23 deletions(-)
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index a51ab46..492f0bc 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -1992,14 +1992,20 @@
+>  			the added memory block itself do not be affected.
+>  
+>  	hung_task_panic=
+> -			[KNL] Should the hung task detector generate panics.
+> -			Format: 0 | 1
+> +			[KNL] Number of hung tasks to trigger kernel panic.
+> +			Format: <int>
+> +
+> +			When set to a non-zero value, a kernel panic will be triggered if
+> +			the number of detected hung tasks reaches this value.
+> +
+> +			0: don't panic
+> +			1: panic immediately on first hung task
+> +			N: panic after N hung tasks are detected in a single scan
+>  
+> -			A value of 1 instructs the kernel to panic when a
+> -			hung task is detected. The default value is controlled
+> -			by the CONFIG_BOOTPARAM_HUNG_TASK_PANIC build-time
+> -			option. The value selected by this boot parameter can
+> -			be changed later by the kernel.hung_task_panic sysctl.
+> +			The default value is controlled by the
+> +			CONFIG_BOOTPARAM_HUNG_TASK_PANIC build-time option. The value
+> +			selected by this boot parameter can be changed later by the
+> +			kernel.hung_task_panic sysctl.
+>  
+>  	hvc_iucv=	[S390]	Number of z/VM IUCV hypervisor console (HVC)
+>  				terminal devices. Valid values: 0..8
+> diff --git a/Documentation/admin-guide/sysctl/kernel.rst b/Documentation/admin-guide/sysctl/kernel.rst
+> index f3ee807..0065a55 100644
+> --- a/Documentation/admin-guide/sysctl/kernel.rst
+> +++ b/Documentation/admin-guide/sysctl/kernel.rst
+> @@ -397,13 +397,14 @@ a hung task is detected.
+>  hung_task_panic
+>  ===============
+>  
+> -Controls the kernel's behavior when a hung task is detected.
+> +When set to a non-zero value, a kernel panic will be triggered if the
+> +number of hung tasks found during a single scan reaches this value.
+>  This file shows up if ``CONFIG_DETECT_HUNG_TASK`` is enabled.
+>  
+> -= =================================================
+> += =======================================================
+>  0 Continue operation. This is the default behavior.
+> -1 Panic immediately.
+> -= =================================================
+> +N Panic when N hung tasks are found during a single scan.
+> += =======================================================
+>  
+>  
+>  hung_task_check_count
+> diff --git a/arch/arm/configs/aspeed_g5_defconfig b/arch/arm/configs/aspeed_g5_defconfig
+> index 61cee1e..c3b0d5f 100644
+> --- a/arch/arm/configs/aspeed_g5_defconfig
+> +++ b/arch/arm/configs/aspeed_g5_defconfig
+> @@ -308,7 +308,7 @@ CONFIG_PANIC_ON_OOPS=y
+>  CONFIG_PANIC_TIMEOUT=-1
+>  CONFIG_SOFTLOCKUP_DETECTOR=y
+>  CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC=y
+> -CONFIG_BOOTPARAM_HUNG_TASK_PANIC=y
+> +CONFIG_BOOTPARAM_HUNG_TASK_PANIC=1
+>  CONFIG_WQ_WATCHDOG=y
+>  # CONFIG_SCHED_DEBUG is not set
+>  CONFIG_FUNCTION_TRACER=y
+> diff --git a/kernel/configs/debug.config b/kernel/configs/debug.config
+> index e81327d..9f6ab7d 100644
+> --- a/kernel/configs/debug.config
+> +++ b/kernel/configs/debug.config
+> @@ -83,7 +83,7 @@ CONFIG_SLUB_DEBUG_ON=y
+>  #
+>  # Debug Oops, Lockups and Hangs
+>  #
+> -# CONFIG_BOOTPARAM_HUNG_TASK_PANIC is not set
+> +CONFIG_BOOTPARAM_HUNG_TASK_PANIC=0
+>  # CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC is not set
+>  CONFIG_DEBUG_ATOMIC_SLEEP=y
+>  CONFIG_DETECT_HUNG_TASK=y
+> diff --git a/kernel/hung_task.c b/kernel/hung_task.c
+> index b2c1f14..84b4b04 100644
+> --- a/kernel/hung_task.c
+> +++ b/kernel/hung_task.c
+> @@ -81,7 +81,7 @@ static unsigned int __read_mostly sysctl_hung_task_all_cpu_backtrace;
+>   * hung task is detected:
+>   */
+>  static unsigned int __read_mostly sysctl_hung_task_panic =
+> -	IS_ENABLED(CONFIG_BOOTPARAM_HUNG_TASK_PANIC);
+> +	CONFIG_BOOTPARAM_HUNG_TASK_PANIC;
+>  
+>  static int
+>  hung_task_panic(struct notifier_block *this, unsigned long event, void *ptr)
+> @@ -218,8 +218,11 @@ static inline void debug_show_blocker(struct task_struct *task, unsigned long ti
+>  }
+>  #endif
+>  
+> -static void check_hung_task(struct task_struct *t, unsigned long timeout)
+> +static void check_hung_task(struct task_struct *t, unsigned long timeout,
+> +		unsigned long prev_detect_count)
+>  {
+> +	unsigned long total_hung_task;
+> +
+>  	if (!task_is_hung(t, timeout))
+>  		return;
+>  
+> @@ -229,9 +232,10 @@ static void check_hung_task(struct task_struct *t, unsigned long timeout)
+>  	 */
+>  	sysctl_hung_task_detect_count++;
+>  
+> +	total_hung_task = sysctl_hung_task_detect_count - prev_detect_count;
+>  	trace_sched_process_hang(t);
+>  
+> -	if (sysctl_hung_task_panic) {
+> +	if (sysctl_hung_task_panic && total_hung_task >= sysctl_hung_task_panic) {
+>  		console_verbose();
+>  		hung_task_show_lock = true;
+>  		hung_task_call_panic = true;
+> @@ -300,6 +304,7 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
+>  	int max_count = sysctl_hung_task_check_count;
+>  	unsigned long last_break = jiffies;
+>  	struct task_struct *g, *t;
+> +	unsigned long prev_detect_count = sysctl_hung_task_detect_count;
+>  
+>  	/*
+>  	 * If the system crashed already then all bets are off,
+> @@ -320,7 +325,7 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
+>  			last_break = jiffies;
+>  		}
+>  
+> -		check_hung_task(t, timeout);
+> +		check_hung_task(t, timeout, prev_detect_count);
+>  	}
+>   unlock:
+>  	rcu_read_unlock();
+> @@ -389,7 +394,7 @@ static const struct ctl_table hung_task_sysctls[] = {
+>  		.mode		= 0644,
+>  		.proc_handler	= proc_dointvec_minmax,
+>  		.extra1		= SYSCTL_ZERO,
+> -		.extra2		= SYSCTL_ONE,
+> +		.extra2		= SYSCTL_INT_MAX,
+>  	},
+>  	{
+>  		.procname	= "hung_task_check_count",
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index 3034e294..3976c90 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -1258,12 +1258,13 @@ config DEFAULT_HUNG_TASK_TIMEOUT
+>  	  Keeping the default should be fine in most cases.
+>  
+>  config BOOTPARAM_HUNG_TASK_PANIC
+> -	bool "Panic (Reboot) On Hung Tasks"
+> +	int "Number of hung tasks to trigger kernel panic"
+>  	depends on DETECT_HUNG_TASK
+> +	default 0
+>  	help
+> -	  Say Y here to enable the kernel to panic on "hung tasks",
+> -	  which are bugs that cause the kernel to leave a task stuck
+> -	  in uninterruptible "D" state.
+> +	  When set to a non-zero value, a kernel panic will be triggered
+> +	  if the number of hung tasks found during a single scan reaches
+> +	  this value.
+>  
+>  	  The panic can be used in combination with panic_timeout,
+>  	  to cause the system to reboot automatically after a
+> diff --git a/tools/testing/selftests/wireguard/qemu/kernel.config b/tools/testing/selftests/wireguard/qemu/kernel.config
+> index 936b18b..0504c11 100644
+> --- a/tools/testing/selftests/wireguard/qemu/kernel.config
+> +++ b/tools/testing/selftests/wireguard/qemu/kernel.config
+> @@ -81,7 +81,7 @@ CONFIG_WQ_WATCHDOG=y
+>  CONFIG_DETECT_HUNG_TASK=y
+>  CONFIG_BOOTPARAM_HARDLOCKUP_PANIC=y
+>  CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC=y
+> -CONFIG_BOOTPARAM_HUNG_TASK_PANIC=y
+> +CONFIG_BOOTPARAM_HUNG_TASK_PANIC=1
+>  CONFIG_PANIC_TIMEOUT=-1
+>  CONFIG_STACKTRACE=y
+>  CONFIG_EARLY_PRINTK=y
+> -- 
+> 2.9.4
+> 
 
-Well if we want to support different timestamp providers provided by the same
-HW block (same MAC or even same PHY), then we need a way to notify the provider
-when the timestamp provider gets selected and unselected.
 
-Otherwise there's no way for the provider to know it has been re-enabled, unless
-we perform a config change at the same time.
-
-Maxime
+-- 
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
 
