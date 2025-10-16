@@ -1,150 +1,146 @@
-Return-Path: <netdev+bounces-230064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D366BE37B8
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 14:50:56 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08769BE3803
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 14:52:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86C5819C65BC
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:51:19 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EC2654EB524
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF5B3314A1;
-	Thu, 16 Oct 2025 12:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FF493314D7;
+	Thu, 16 Oct 2025 12:52:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 169252E6106;
-	Thu, 16 Oct 2025 12:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265BF2DF6F7;
+	Thu, 16 Oct 2025 12:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760619053; cv=none; b=Ge5LluXuNZsLM+DJvzEzib6HOTTJK+gRhWizXEFbeqIhuW8CWEo8jlDtpsStzSk7H4HXTRQTC2IFWonXXzLCtamx94d8vqj9JJYOgZTapxiHpZVUQ5pN4K1jqb9mZLKa9hqNp/1MUsHfPkdgBrxEO6fb6RKONlNGhDXgAVaottY=
+	t=1760619141; cv=none; b=BDrFqrH9f4r2FA6pGvToerVQcPoCoB8ypK4Wrg93l+obAQqRECktZZGv4ABYNDzC78G4zJtQbobuLd/1iWGGVtbbUrI3qh0bBDGFYniq+8G1IZtMj8mRgpIQoi9h4+RAEaq5SAbiyHzu+uNOsOJ7SCefGHq3ZlcKotSDXP8MnGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760619053; c=relaxed/simple;
-	bh=RbKXxJipkxv3szJ7ubKMKmJKkxHW5F5FH0QrFfAjvq0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YoP28UwQpmzRTB2ltlAHYrNwpIvMGCsBPgAjG/LFX6bM8FwLClvRElJYlOqjXGGkeFk8Obllay+X92mktYMYOEtu23yunw7FWXyPWYyRTO3ne8yFMOS2vYt+K3w4paqPFSn70DnPgIy5qxzNidtCwn8p2++MsfZpwP87e0yQAPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 343CE1688;
-	Thu, 16 Oct 2025 05:50:42 -0700 (PDT)
-Received: from bogus (e133711.arm.com [10.1.196.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 19DB33F738;
-	Thu, 16 Oct 2025 05:50:48 -0700 (PDT)
-Date: Thu, 16 Oct 2025 13:50:46 +0100
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Jassi Brar <jassisinghbrar@gmail.com>,
-	Adam Young <admiyo@os.amperecomputing.com>
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	Sudeep Holla <sudeep.holla@arm.com>
-Subject: Re: [PATCH] Revert "mailbox/pcc: support mailbox management of the
- shared buffer"
-Message-ID: <20251016-swift-of-unmatched-luck-dfdebe@sudeepholla>
-References: <20250926153311.2202648-1-sudeep.holla@arm.com>
+	s=arc-20240116; t=1760619141; c=relaxed/simple;
+	bh=kQ4x1U8G0JsGuwfwK4p2noaesz1dLIeBRot9BtlLoTA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uNC/KX9KdPHTZYn1JeCz48uh9CjqD8Hag/6W6/TCi6bZlrIxPhlophSZHqtBGD9UuiD8xn7Rfi6G/k+Iy9d65U1R9fIJ98kmhkuPUlvQuDD1A/r6dBFfc392hldt8lDE9TOBazRkelPdEpptLbVOxrubU0nwQKbOSGavuC+lMDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=18.194.254.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
+X-QQ-mid: zesmtpsz9t1760619118t01132058
+X-QQ-Originating-IP: kVZ9Lj83PbQOP9p2AFTPJx70wQN3RFwQFKLygcEUn94=
+Received: from localhost.localdomain ( [111.204.182.100])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 16 Oct 2025 20:51:55 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 15411286175632521263
+EX-QQ-RecipientCnt: 14
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+To: netdev@vger.kernel.org
+Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] net: bonding: update the slave array for broadcast mode
+Date: Thu, 16 Oct 2025 20:51:36 +0800
+Message-Id: <20251016125136.16568-1-tonghao@bamaicloud.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250926153311.2202648-1-sudeep.holla@arm.com>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: OBDSLDo3By90iZECQCQ8f/ptmzBKsM7gkxdOTFVq52klque64ddcW4DQ
+	V77zcsvlt/y3PESKw+2eK53o/b5omlhkn7HlCy+DrMsQm+j8zi4MdQ+FS04k6HAYxO81N/y
+	JjFc2J2wOd2WRHDG3cj7lp5vwhf1VSTsMKPifwHYqjpRUNWUnmsB5NL88eOW06WYB3xbOYV
+	7zB82pAOHLOr8YDidEVa1qGcneoBv5qGEHD5ttzRKK83CeZ/IJLUItSPInng89FlN3Iv7oQ
+	fiBApK6WRqlCtSGJj7farjmIQQQebB1oQfThxxxIKRM85R1JBNxIarc8b8pgPzATCQ9+B0j
+	IOHvdHm8pbScBh9TmZJzwePwFKSW1f00j1uzCSv/EmlkhhE/4zxrLwv4nNaRU771StlW0Ys
+	FQHo+u4VMjBhXmKXAFAl2oYXqG11oivD4RKHBAIwoixED9eoLnmIwHQja4NtzWa00PfVv6g
+	1zjysqWxZgjPWdM2WuroFqiML3Fa3GMiEMgtIdSv14vpO8PqNsTacaLwwlCROLsa4yzCcVZ
+	8KRCAkzSS0+Zf2Yvoug+aIHc/ZLqzFPyDOt4DcsNpP6MYzin7U/baJF5/KTErNAnBMSutZN
+	3wT4mOB1dLS5Cgk6syslxxiDFAYFmlPoh/aiZgmdaziFHtnn6m+B5gim3l7/wfZRMfjpluw
+	veQYjdCT9a85rQrLQnZAfC3oygRf6HLGY+7wCjFKCIuANgbbO52yAjvPOFb4vjXBqOlAJ8Y
+	9sDv+YG9lmbflFPu5mPcG1YsVt2F6wkKbFfcWt1oiacdXasHrYQoHK5S0ZMgt4lP1ZgrfgA
+	+6dVLFxw2XmZLMb2iZfcce+wMW6cEvkEaUdetUM3vAgln+m/qTYRkUQZ0eG4FIJ0kh/jqeG
+	+Q5TpdjuWBW/NA4/Tx64yUf6IzYGOmlU1nunBSHkHaIfLyduFukcJIWnRRVkBLz4oXdztFp
+	h6epbs3v1p5gdbf91YPSRd233yV8+6hYAt/5/POg1G9j5pGQqgMjPxl+p8MEunjypVoFP0O
+	pq2gF0MT3a+L1l2dWU
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-RECHKSPAM: 0
 
-On Fri, Sep 26, 2025 at 04:33:11PM +0100, Sudeep Holla wrote:
-> This reverts commit 5378bdf6a611a32500fccf13d14156f219bb0c85.
-> 
-> Commit 5378bdf6a611 ("mailbox/pcc: support mailbox management of the shared buffer")
-> attempted to introduce generic helpers for managing the PCC shared memory,
-> but it largely duplicates functionality already provided by the mailbox
-> core and leaves gaps:
-> 
-> 1. TX preparation: The mailbox framework already supports this via
->   ->tx_prepare callback for mailbox clients. The patch adds
->   pcc_write_to_buffer() and expects clients to toggle pchan->chan.manage_writes,
->   but no drivers set manage_writes, so pcc_write_to_buffer() has no users.
-> 
-> 2. RX handling: Data reception is already delivered through
->    mbox_chan_received_data() and client ->rx_callback. The patch adds an
->    optional pchan->chan.rx_alloc, which again has no users and duplicates
->    the existing path.
-> 
-> 3. Completion handling: While adding last_tx_done is directionally useful,
->    the implementation only covers Type 3/4 and fails to handle the absence
->    of a command_complete register, so it is incomplete for other types.
-> 
-> Given the duplication and incomplete coverage, revert this change. Any new
-> requirements should be addressed in focused follow-ups rather than bundling
-> multiple behavioral changes together.
-> 
+This patch fixes ce7a381697cb ("net: bonding: add broadcast_neighbor option for 802.3ad").
+Before this commit, on the broadcast mode, all devices were traversed using the
+bond_for_each_slave_rcu. This patch supports traversing devices by using all_slaves.
+Therefore, we need to update the slave array when enslave or release slave.
 
-The discussion on this revert stopped and I am not sure if we agreed to
-revert it or not.
+Fixes: ce7a381697cb ("net: bonding: add broadcast_neighbor option for 802.3ad")
+Cc: Jay Vosburgh <jv@jvosburgh.net>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Hangbin Liu <liuhangbin@gmail.com>
+Cc: Jiri Slaby <jirislaby@kernel.org>
+Cc: <stable@vger.kernel.org>
+Reported-by: Jiri Slaby <jirislaby@kernel.org>
+Tested-by: Jiri Slaby <jirislaby@kernel.org>
+Link: https://lore.kernel.org/all/a97e6e1e-81bc-4a79-8352-9e4794b0d2ca@kernel.org/
+Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+v2:
+- fix the typo in the comments, salve -> slave
+- add the target repo in the subject
+---
+ drivers/net/bonding/bond_main.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-> ---
->  drivers/mailbox/pcc.c | 102 ++----------------------------------------
->  include/acpi/pcc.h    |  29 ------------
->  2 files changed, 4 insertions(+), 127 deletions(-)
-> 
-> diff --git a/drivers/mailbox/pcc.c b/drivers/mailbox/pcc.c
-> index 0a00719b2482..f6714c233f5a 100644
-> --- a/drivers/mailbox/pcc.c
-> +++ b/drivers/mailbox/pcc.c
-> @@ -306,22 +306,6 @@ static void pcc_chan_acknowledge(struct pcc_chan_info *pchan)
->  		pcc_chan_reg_read_modify_write(&pchan->db);
->  }
->  
-> -static void *write_response(struct pcc_chan_info *pchan)
-> -{
-> -	struct pcc_header pcc_header;
-> -	void *buffer;
-> -	int data_len;
-> -
-> -	memcpy_fromio(&pcc_header, pchan->chan.shmem,
-> -		      sizeof(pcc_header));
-> -	data_len = pcc_header.length - sizeof(u32) + sizeof(struct pcc_header);
-> -
-> -	buffer = pchan->chan.rx_alloc(pchan->chan.mchan->cl, data_len);
-> -	if (buffer != NULL)
-> -		memcpy_fromio(buffer, pchan->chan.shmem, data_len);
-> -	return buffer;
-> -}
-> -
->  /**
->   * pcc_mbox_irq - PCC mailbox interrupt handler
->   * @irq:	interrupt number
-> @@ -333,8 +317,6 @@ static irqreturn_t pcc_mbox_irq(int irq, void *p)
->  {
->  	struct pcc_chan_info *pchan;
->  	struct mbox_chan *chan = p;
-> -	struct pcc_header *pcc_header = chan->active_req;
-> -	void *handle = NULL;
->  
->  	pchan = chan->con_priv;
->  
-> @@ -358,17 +340,7 @@ static irqreturn_t pcc_mbox_irq(int irq, void *p)
->  	 * required to avoid any possible race in updatation of this flag.
->  	 */
->  	pchan->chan_in_use = false;
-> -
-> -	if (pchan->chan.rx_alloc)
-> -		handle = write_response(pchan);
-> -
-> -	if (chan->active_req) {
-> -		pcc_header = chan->active_req;
-> -		if (pcc_header->flags & PCC_CMD_COMPLETION_NOTIFY)
-> -			mbox_chan_txdone(chan, 0);
-
-The above change in the original patch has introduced race on my platform
-where the mbox_chan_txdone() kicks the Tx while the response to the
-command is read in the below mbox_chan_received_data().
-
-So I am going to repost/resend this revert as a fix now.
-
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 17c7542be6a5..2d6883296e32 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2384,7 +2384,9 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+ 		unblock_netpoll_tx();
+ 	}
+ 
+-	if (bond_mode_can_use_xmit_hash(bond))
++	/* broadcast mode uses the all_slaves to loop through slaves. */
++	if (bond_mode_can_use_xmit_hash(bond) ||
++	    BOND_MODE(bond) == BOND_MODE_BROADCAST)
+ 		bond_update_slave_arr(bond, NULL);
+ 
+ 	if (!slave_dev->netdev_ops->ndo_bpf ||
+@@ -2560,7 +2562,8 @@ static int __bond_release_one(struct net_device *bond_dev,
+ 
+ 	bond_upper_dev_unlink(bond, slave);
+ 
+-	if (bond_mode_can_use_xmit_hash(bond))
++	if (bond_mode_can_use_xmit_hash(bond) ||
++	    BOND_MODE(bond) == BOND_MODE_BROADCAST)
+ 		bond_update_slave_arr(bond, slave);
+ 
+ 	slave_info(bond_dev, slave_dev, "Releasing %s interface\n",
 -- 
-Regards,
-Sudeep
+2.34.1
+
 
