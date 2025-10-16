@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-229992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD8DDBE2D83
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:40:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5046ABE2D7E
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:39:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EA9464FD33E
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:39:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D7141A6345F
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F8E12E54BE;
-	Thu, 16 Oct 2025 10:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB642E0934;
+	Thu, 16 Oct 2025 10:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="ScnjOPfC";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="yj8fSAM3"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="AEPwFv19";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="rVAY7OVs"
 X-Original-To: netdev@vger.kernel.org
 Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818C52D97A8
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 10:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BBED305E1B
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 10:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760611176; cv=none; b=ZEYDOKZ4oBWZT4ZLLc5g4PttGoIs6MHRBOJrsenGauGurY70VS8t6pE9MzPygF+B+NUFKhu34dsEf+kygK+Cj+fThw8VoVSEg+IzUhdn4Qws88ojv2jtor5KGtxRDNOcQGWWOMPXJ94bzD38v6UCKdquVke7mecVs2BOEQ3jLhg=
+	t=1760611178; cv=none; b=KPbg4X7JVfKQ2t81zEibNscA5bKlNR1yGgcVIsatl8o8hICY2gOxHFwgiqhImJWfpDl8vhJOwkkSwy4DP+I1YRmmaHbZFNPxJb+A4Qh5L9h7WtE0lHDsS4lxPvJCVRJjMyqpE7/I3j+LPLD3JLMLsPENpwHSphhuY3cD11T8AnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760611176; c=relaxed/simple;
-	bh=cBCzkFqWsp+AiFQiLMNesy1RaSzXa4jRHcYGCHGN1Jc=;
+	s=arc-20240116; t=1760611178; c=relaxed/simple;
+	bh=fh/h7MAuWs7TKeM7dkBAFFRfeGvg9G9OCwCvRAajwh4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oloA4VxfZuCUNyRP0WJyvwqr4VLGrR0AfOEBqKCY+T3v2zlkpWY+AmISl4WoCOmiyn7TMG0GcDVRWTfl8nHB8Yep1wXNBoLFsL+ycTyD+wCKgEeq/01hOmVy/yYI+Ra7p4tw4WIGbtV3k5a5h2YvMYvkTaa8FMcslATGF6E75ZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=ScnjOPfC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=yj8fSAM3; arc=none smtp.client-ip=202.12.124.147
+	 MIME-Version; b=LDsf1+wFWV96FaA/9p6gZ2FxbO9iXuANN6ZccXdknoDFKkeu2QtXy6GOzbdBrNHoy3VC48GIkDb2+/8zfnHW/9PUmHzCH20EhYn/6p/ko7gBab6AulbeeLuqK3PgTMWGxpPhZUXakVKfY44tvl2Yx+vl1G2DmTjPtrnNRARPy+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=AEPwFv19; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=rVAY7OVs; arc=none smtp.client-ip=202.12.124.147
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfout.stl.internal (Postfix) with ESMTP id A0E1E1D00132;
-	Thu, 16 Oct 2025 06:39:33 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Thu, 16 Oct 2025 06:39:33 -0400
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id 505351D000B6;
+	Thu, 16 Oct 2025 06:39:36 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Thu, 16 Oct 2025 06:39:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
 	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
 	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1760611173; x=
-	1760697573; bh=umXH41TgMlYn+S3uAcpVWDp6Dt5YIx/xoelbKDVcr3I=; b=S
-	cnjOPfCM4JTSKTfumizKd7ys8mNcRTnCCzFC4VSnbxo8IG4VfGu0gXNEs7yyvrmp
-	24np/YdoliMZr0+bap/gMixHm0PQANBaC+Ax/wzxRV1vjSrHrLF/BaAUq8hfDUlK
-	kevuZI0JSR5Ha2xbRn/VHh0btGDVaczNZvANrMr8mib4Es/q3geWPglr8uMM+WpS
-	D6HKIooV1QbpRm3W+4TzbI/VNtLOfFkX3uJMOUHkIliuRL4UdNy96sWWkcA1OUf2
-	qLr/aF1Qqva97Ywwix8GmlavwQV6ydmWaM7WEPfj3lirFyobq4OQeAcze84Vyatl
-	Nlipftp5E2/hpgxvScExg==
+	:reply-to:subject:subject:to:to; s=fm3; t=1760611176; x=
+	1760697576; bh=MpIoBpCq06CAi+QoJ905xIELPJe03AF6CLwkA6C9mVg=; b=A
+	EPwFv19VAWgZcv2i4N/2Z4yxMale5aUhe18YqrXHDkeNCcRyrH7yLkIkiAV4MEr1
+	yj3PXEXraOuykmkALKaJ7VuqnXXA1mvFv3Pb9Z8IqkmfyXS2wFXQvNkQCHdMZHp/
+	fXS1AmB4e5t+bPKiTIzVRtth4S+Q3MkkYPS55Yg+43m/GHxgICjh4+CXbYCFIX8D
+	qN+0f/8S8NkUJrbiaVqYFRBim4E3pJN2yFErVyYEJmYJookvJclJDVjiD+UJtGq6
+	ZcbWEN/Y2EB6orgQF7W9T0Fx6SMOad1iJAt2OmG+XOFQGkn6k3S3TAQ590nMhGMy
+	QpL2Pe9XClFpHhaYIMCSw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm2; t=1760611173; x=1760697573; bh=u
-	mXH41TgMlYn+S3uAcpVWDp6Dt5YIx/xoelbKDVcr3I=; b=yj8fSAM33wGArh2kr
-	qDs/GO7fuzq5xx/DXvIVxx3/HVGZaQiwNTbY6oroNv5mLvZmkBzsMfadgXg+Yvpc
-	ThKwHinWN5a9yyN1n3eKzhQIh/BfAJBgSOGn4xuUu2PKTzfHxjeKCN5NvkEdL7cf
-	XC60OoRtzMlIsWlQ6pfryR8WuCBM1wQrDGacmXf72z1P8Dpz1JYiDk2IR8lRWqX8
-	6L8cm8heHCWMha3RGbB+w6zi1jnmmYoKJaXmN3rJh9qRvc9NjnW17Hln9rorTv4Y
-	/h7Gk66jEwxV4a9zjhFrFApeo5WexVRSFTby7UwRuTINeJ/09qQKszESNqkYQp7w
-	jrpAw==
-X-ME-Sender: <xms:ZcvwaNpEIr01TflQeMGwRSmPfmHPdnnYKJDdbmUci0Wmpyh8MyNUvA>
-    <xme:ZcvwaGgTmPHUpqaFoxLX9KjJjzdfZSPAyvaZx5hkAHF5_bWU_gZRQvTfVeDx4oqKg
-    tSY1GMg1_tvy_7dMfZR11dy_tDj5gsD3YtitKI39wN8PGxlu1Q16Z8>
-X-ME-Received: <xmr:ZcvwaChGIjZq7h2VxxzWfsgz6DQHXDroc6nPgKF3u07pyl2fqOG5MFN5Qipa>
+	:x-me-sender:x-sasl-enc; s=fm2; t=1760611176; x=1760697576; bh=M
+	pIoBpCq06CAi+QoJ905xIELPJe03AF6CLwkA6C9mVg=; b=rVAY7OVsV2pYRz+Cr
+	i2Vei/eYgR2u0nsBYMKIIaVsY8HXIxF3wnp4/kXoD9KUHD2DoUMkWSPKfJtt0JFb
+	wEvP5iJGiZNWMJN1WrjxIku/gBGGOItRoJAttvG1jkz45VgLbpDDLCoooH09PB0j
+	R3FNluI4aw3q8TjyrIYMSLfTx3sb+17BJM3LXoa5SAnURVnTDgSdhe7agLy1X6qq
+	WGeuZzAS8brXvymbpFILGJwiNj7PhrnfzB0JI4BWbNV0lreyGQ/bCSQ+YVrgwVkK
+	N5SBA/tbeyK8uAeg4SxwEdWKcTdCLO89fD6CgDG8vClTNttMeDbd9BJGXfuI2/GP
+	+0oWA==
+X-ME-Sender: <xms:Z8vwaGpozycZlhhsNH-mlB6-nZJfQkCXPe27qdSv93_kr7sinEpO2A>
+    <xme:Z8vwaLiXA5TyZqDO-TzwjqS-wDu7hhOJYPfRCjyCkV8Fkc4X9pLDkA0mKy-8xDoB5
+    7oBjG4tDpNpuybXHnc558_CXBvyAJxDmBN8Nw6qF66XWPw2fRImOnU>
+X-ME-Received: <xmr:Z8vwaDh8iVAJoZHEyF_cSME-LnF0T0j_Ddfw-l4tYkU8B88xYWv2LJRWS30N>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdeitdejucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
@@ -76,25 +76,25 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdeitdejucetufdote
     vgepshhmthhpohhuthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlh
     drohhrghdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgv
     thdrtghomhdprhgtphhtthhopehsugesqhhuvggrshihshhnrghilhdrnhgvthdprhgtph
-    htthhopegthhhirggthhgrnhhgfigrnhhgsehgohhoghhlvgdrtghomhdprhgtphhtthho
-    pehlvghonhhrohesnhhvihguihgrrdgtohhm
-X-ME-Proxy: <xmx:ZcvwaEj5ILrB2E4tAjuFxri48x-nJ-ahdYA0iemUUX08FoWLMyozCw>
-    <xmx:ZcvwaKKQdlOtnNsSASKZGjVMSSHo7ekhlfgCfHMxWRPyJRJrSr498w>
-    <xmx:ZcvwaLF6weTtrvweJiWqGEwK_CS542r_yp0HpWMTM1ouwrKPrlPbpA>
-    <xmx:ZcvwaGSLASpC26Wrsr7If3LMteRFISuY6zlMc5zU_Jarw9viGNr3jg>
-    <xmx:ZcvwaN1QjA_xVK6aAW2JZPaDrQi2MsowmCc_rhkWATG49RwDhqOPtutt>
+    htthhopegrnhhtohhnhidrrghnthhonhihsehsvggtuhhnvghtrdgtohhmpdhrtghpthht
+    ohepthhosghirghssehsthhrohhnghhsfigrnhdrohhrgh
+X-ME-Proxy: <xmx:Z8vwaBheZWlHMGuV0LiUxrxJqvccp0w7nDQ0g4Sm18yevBgOmE2rOQ>
+    <xmx:Z8vwaDJd6LXARIzxq0KD7RXnf8w34WGhlYEfVp3YoGh3GHNqOoLD3w>
+    <xmx:Z8vwaAH0voEc1fiINuwlbSbtEaJjoBl4vJLEdFhMw459_X42A3gaeg>
+    <xmx:Z8vwaHQSrPIXUaWs6SvoA8tGdVVK1SGQj0TzL3J6RP1WbbNVwqIUBg>
+    <xmx:aMvwaA98hreoKyBOC2RlgRyDPsazRj4qDGL1PO0P9HyvKDB8H661mDda>
 Feedback-ID: i934648bf:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 16 Oct 2025 06:39:32 -0400 (EDT)
+ 16 Oct 2025 06:39:35 -0400 (EDT)
 From: Sabrina Dubroca <sd@queasysnail.net>
 To: netdev@vger.kernel.org
 Cc: steffen.klassert@secunet.com,
 	Sabrina Dubroca <sd@queasysnail.net>,
-	Chiachang Wang <chiachangwang@google.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: [PATCH ipsec 4/6] xfrm: call xfrm_dev_state_delete when xfrm_state_migrate fails to add the state
-Date: Thu, 16 Oct 2025 12:39:15 +0200
-Message-ID: <6e1c4b4505fa3d822e2e33b681ac4a44bae959ed.1760610268.git.sd@queasysnail.net>
+	Antony Antony <antony.antony@secunet.com>,
+	Tobias Brunner <tobias@strongswan.org>
+Subject: [PATCH ipsec 5/6] xfrm: set err and extack on failure to create pcpu SA
+Date: Thu, 16 Oct 2025 12:39:16 +0200
+Message-ID: <f4a269dc8a130b18dc6fc8897f76d302465ccb79.1760610268.git.sd@queasysnail.net>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <cover.1760610268.git.sd@queasysnail.net>
 References: <cover.1760610268.git.sd@queasysnail.net>
@@ -106,40 +106,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In case xfrm_state_migrate fails after calling xfrm_dev_state_add, we
-directly release the last reference and destroy the new state, without
-calling xfrm_dev_state_delete (this only happens in
-__xfrm_state_delete, which we're not calling on this path, since the
-state was never added).
+xfrm_state_construct can fail without setting an error if the
+requested pcpu_num value is too big. Set err and add an extack message
+to avoid confusing userspace.
 
-Call xfrm_dev_state_delete on error when an offload configuration was
-provided.
-
-Fixes: ab244a394c7f ("xfrm: Migrate offload configuration")
+Fixes: 1ddf9916ac09 ("xfrm: Add support for per cpu xfrm state handling.")
 Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 ---
- net/xfrm/xfrm_state.c | 5 ++++-
+ net/xfrm/xfrm_user.c | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 1ab19ca007de..c3518d1498cd 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -2159,10 +2159,13 @@ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
- 		xfrm_state_insert(xc);
- 	} else {
- 		if (xfrm_state_add(xc) < 0)
--			goto error;
-+			goto error_add;
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 010c9e6638c0..9d98cc9daa37 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -947,8 +947,11 @@ static struct xfrm_state *xfrm_state_construct(struct net *net,
+ 
+ 	if (attrs[XFRMA_SA_PCPU]) {
+ 		x->pcpu_num = nla_get_u32(attrs[XFRMA_SA_PCPU]);
+-		if (x->pcpu_num >= num_possible_cpus())
++		if (x->pcpu_num >= num_possible_cpus()) {
++			err = -ERANGE;
++			NL_SET_ERR_MSG(extack, "pCPU number too big");
+ 			goto error;
++		}
  	}
  
- 	return xc;
-+error_add:
-+	if (xuo)
-+		xfrm_dev_state_delete(xc);
- error:
- 	xc->km.state = XFRM_STATE_DEAD;
- 	xfrm_state_put(xc);
+ 	err = __xfrm_init_state(x, extack);
 -- 
 2.51.0
 
