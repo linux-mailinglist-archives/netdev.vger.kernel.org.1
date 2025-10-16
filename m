@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-230208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85271BE5548
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 22:11:35 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61816BE5581
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 22:14:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 31E44359A9F
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 20:11:35 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0CCB3359CB0
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 20:14:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5943C2DC79A;
-	Thu, 16 Oct 2025 20:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59EE22DF3CC;
+	Thu, 16 Oct 2025 20:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Kg5T7JMw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FcdARd/q"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE962D46B2;
-	Thu, 16 Oct 2025 20:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E892DF718
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 20:13:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760645489; cv=none; b=tDc7p+z0wZECHVJqocy/titrsjsVca3HknIWGDszuvILnmRiItpaoPhV67unfVZNyAXheYi0u2qMq7IF9xBhfzd0guydPhygdL5bZcZYWiI8SVvR0X7HQVnsjyV7XWdWDb/ImHnC8PQSTpsTNLbB7pKFR2qCzww+B9977tHf130=
+	t=1760645621; cv=none; b=MrvcQzH5uaZPa+er8XwBO//iwrGXrzVXUqf2XYBkQCFm9ZSUpYzqnO8IU2HOEKmLmLODawHQQmbfkJMK+zBZNfNCPD4n7GIBHR0sJSkfhUqD+qMr/KzA3sGzLOsmEXoLcZGfHnk1E7ls5lIuaTWxXT63i0lfUVTuFmnqRmXWJTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760645489; c=relaxed/simple;
-	bh=08kr2l/UWyG32Kp/2Umrbh3yZs0+clQ80REy2fHQfC4=;
+	s=arc-20240116; t=1760645621; c=relaxed/simple;
+	bh=yyVXUjSKousEWfXgiNH6TQvb8GTz46lD+gq6KXOHxwc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j2E7aO3Et8x2r7kg7X6Av2JBBXyE1n1J1f3xksV8n77XJpmvD1vCLS2G3IcRmJ8vsHvYqBACX9K/Fw/dkUck1XIWyvL/x6HbBwp2LM+2SXWfcFt8Bzc5Bon+HtHu+tdgK69M2uGAT9Jv17Su/1qmYzn6Ag6P/osYqPBD6E+qya0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Kg5T7JMw; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=AXAxxVpmAtaMB3/sUTA9mfQjTWAt+3q9puQgdkUhNW2jI0YZA3zjaoLZlX3VO0VyvJhJ+JI3Te3NnDQTXf2ievAmRGdkFUcjCpdkLR4inNP78T0kiL9B8KVTTzJ6Dji9aAMGUsfVuafm2HHkwEAPuDtk7+58fygXaYxGcv3OCUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FcdARd/q; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,34 +36,30 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fH3uOL5pAcLj4w5mtMBuA/UvzktBnN4zub1YlfQY7TY=; b=Kg5T7JMwo1EPZEU182K+GycJh0
-	VA6ynNMfzDNQL0AS5Sz2UpaWtCZl6K6mYSteM9uPB+2qbzu3BLVF1sIIsOt31EXEYRZqKCMFbILEV
-	tZ6X3Lp6uMi4YP4abHshLoAi7WOOnW3df4uoJkQzk5mZoXV3nE1O671BY9wEr1UjTSIM=;
+	bh=jQY0mCXvtYTrJxEuQoUAjjjSvUJckp3Y//KHMiRxipg=; b=FcdARd/qcEg5Md7LoKhVTRTkVR
+	TwgC4AbMC+jNXUbgMQTU2LM+CXYbk2aigYixI2hfe6VsO7lo1Q3V70T8OTuyLhhjNBOWUljV4V6G5
+	Ulwz1sDZMBtH6dedyA4uyPNMlEoXIQBCEBB54gmOXFLSxJ/Vkhmo75zBFObsD82F83B8=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1v9UJS-00BCbc-Pl; Thu, 16 Oct 2025 22:11:02 +0200
-Date: Thu, 16 Oct 2025 22:11:02 +0200
+	id 1v9ULo-00BCdX-G1; Thu, 16 Oct 2025 22:13:28 +0200
+Date: Thu, 16 Oct 2025 22:13:28 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Yao Zi <ziyao@disroot.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Frank <Frank.Sae@motor-comm.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
-	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH net-next 3/4] net: stmmac: Add glue driver for Motorcomm
- YT6801 ethernet controller
-Message-ID: <f1de6600-4de9-4914-95e6-8cdb3481e364@lunn.ch>
-References: <20251014164746.50696-2-ziyao@disroot.org>
- <20251014164746.50696-5-ziyao@disroot.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 1/5] net: stmmac: dwc-qos-eth: move MDIO bus
+ locking into stmmac_mdio
+Message-ID: <186fe8ba-9dfe-4509-970f-f7e51bc33db8@lunn.ch>
+References: <aO_HIwT_YvxkDS8D@shell.armlinux.org.uk>
+ <E1v945J-0000000AmeJ-1GOb@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,88 +68,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251014164746.50696-5-ziyao@disroot.org>
+In-Reply-To: <E1v945J-0000000AmeJ-1GOb@rmk-PC.armlinux.org.uk>
 
-> +static int motorcomm_efuse_read_byte(struct dwmac_motorcomm_priv *priv,
-> +				     u8 offset, u8 *byte)
-> +{
-> +	u32 reg;
-> +	int ret;
-> +
-> +	writel(FIELD_PREP(EFUSE_OP_MODE, EFUSE_OP_ROW_READ)	|
-> +	       FIELD_PREP(EFUSE_OP_ADDR, offset)		|
-> +	       EFUSE_OP_START, priv->base + EFUSE_OP_CTRL_0);
-> +
-> +	ret = readl_poll_timeout(priv->base + EFUSE_OP_CTRL_1,
-> +				 reg, reg & EFUSE_OP_DONE, 2000,
-> +				 EFUSE_READ_TIMEOUT_US);
-> +
-> +	reg = readl(priv->base + EFUSE_OP_CTRL_1);
+On Wed, Oct 15, 2025 at 05:10:41PM +0100, Russell King (Oracle) wrote:
+> Rather than dwc-qos-eth manipulating the MDIO bus lock directly, add
+> helpers to the stmmac MDIO layer and use them in dwc-qos-eth. This
+> improves my commit 87f43e6f06a2 ("net: stmmac: dwc-qos: calibrate tegra
+> with mdio bus idle").
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Do you actually need this read? The documentation says:
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
- * Returns: 0 on success and -ETIMEDOUT upon a timeout. In either
- * case, the last read value at @addr is stored in @val.
-
-> +	*byte = FIELD_GET(EFUSE_OP_RD_DATA, reg);
-> +
-> +	return ret;
-> +}
-
-> +static void motorcomm_reset_phy(struct dwmac_motorcomm_priv *priv)
-> +{
-> +	u32 reg = readl(priv->base + EPHY_CTRL);
-> +
-> +	reg &= ~EPHY_RESET;
-> +	writel(reg, priv->base + EPHY_CTRL);
-> +
-> +	reg |= EPHY_RESET;
-> +	writel(reg, priv->base + EPHY_CTRL);
-> +}
-
-How does this differ to the PHY doing its own reset via BMCR?
-
-We need to be careful of lifetimes here. It would be better if the PHY
-controlled its own reset. We don't want phylib to configure the PHY
-and then the MAC driver reset it etc.
-
-> +static int motorcomm_resume(struct device *dev, void *bsp_priv)
-> +{
-> +	struct dwmac_motorcomm_priv *priv = bsp_priv;
-> +	struct pci_dev *pdev = to_pci_dev(dev);
-> +	int ret;
-> +
-> +	pci_restore_state(pdev);
-> +	pci_set_power_state(pdev, PCI_D0);
-> +
-> +	ret = pcim_enable_device(pdev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	pci_set_master(pdev);
-> +
-> +	motorcomm_reset_phy(priv);
-
-Does the PHY support WoL? You probably should not be touching it if it
-can wake the system.
-
-> +		return NULL;
-> +
-> +	plat->mdio_bus_data = devm_kzalloc(dev, sizeof(*plat->mdio_bus_data),
-> +					   GFP_KERNEL);
-> +	if (!plat->mdio_bus_data)
-> +		return NULL;
-
-Is this required? If you look at other glue drivers which allocate
-such a structure, they set members in it:
-
-dwmac-intel.c:	plat->mdio_bus_data->needs_reset = true;
-dwmac-loongson.c:		plat->mdio_bus_data->needs_reset = true;
-dwmac-tegra.c:	plat->mdio_bus_data->needs_reset = true;
-stmmac_pci.c:	plat->mdio_bus_data->needs_reset = true;
-stmmac_platform.c:		plat->mdio_bus_data->needs_reset = true;
-
-You don't set anything.
-
-	Andrew
+    Andrew
 
