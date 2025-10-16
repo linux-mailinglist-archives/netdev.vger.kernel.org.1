@@ -1,55 +1,43 @@
-Return-Path: <netdev+bounces-229900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CB72BE1F99
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:45:28 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FBBFBE1F96
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:45:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D3F5E4F16C1
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 07:45:23 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F24AA4E5B01
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 07:45:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74DEB2FD7DA;
-	Thu, 16 Oct 2025 07:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nfuFh5AH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 526E32D6E72;
+	Thu, 16 Oct 2025 07:45:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8576123AB95
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 07:45:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2492FCBF0
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 07:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760600715; cv=none; b=FYVMsz13TaUdeFSov+F+opt0bERyyX0p76Qypz6UedKCPfqWuMt7GeSJIdFYm+0XjVe3aAnjAlDWpOwjhxB/RcDgsfNj9CkWv+jlwjGS6xhFrxt7RFux/1j2KRMBnPRr9IY+zBXmDShp2WbauY+DPfpuVkRqEtgd+6MCOQH5H6A=
+	t=1760600714; cv=none; b=AspsXqe1JtnIC5/8dGSe8K9i/OVG9ll4owLKhNf67oag4hRFHkZqxc7DbdkHNzrz+yd9yk/lOQ28W6Gtgn4BXCLbWDzcNaZ0Wcb9PYlday8u7T+phEYCeMC/JFVxclK4zekbQMYr8UTIou4JRwZh6LaJiqGcmd4RuI8yiI0054M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760600715; c=relaxed/simple;
-	bh=39D5Sil96gvLms1//zOCjbIiT96hh7B0Yr94Qfs2TMY=;
+	s=arc-20240116; t=1760600714; c=relaxed/simple;
+	bh=7Rq/cFGzAixSyJpF73D7NqwQWxpESCN2Fo1RUPNHJS8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CzA4VgRPHzLWwhfwnaIsYU1yv7e6p0d8VX0SnBQoLkOZAeNUJ8T2ciqdnlmRcJCEjxjQgD5SlExGDFRNQHKGIUrnXBZe93fKdFA0jAkIXRaCntDwH83in1gL1jYAW+wkDD313RcsXyLnVcLTw/2UuLHvVdULEQMdM8vX+J6XZtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nfuFh5AH; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 78042C03B71;
-	Thu, 16 Oct 2025 07:44:52 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id A0B066062C;
-	Thu, 16 Oct 2025 07:45:11 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 97CFF102F22F8;
-	Thu, 16 Oct 2025 09:44:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760600710; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=I0v577q1BsABPUxTz1xRiLHueg9d5rceOxAUtuerf34=;
-	b=nfuFh5AHbkXF3rWr3y6jX3fbtDy+caY15+qyME3fkfKk8vMoSZE0F7wBVUB6+AlW5Rn0oC
-	JQ4BLlcUNFD7Ij4kWS4VxeXkEAAkxYSrDbPShUnhbAG0qH1cI4R9a/letuXmQOfatIN3AT
-	520yznS0ic5zJTEAafuU+Zk84MEQ78cwP+v2vVANcbidvCn9nkcGxehZLRGcK9Y3Iu/6NJ
-	CQ1JaLdOvzTlVXiOLn8PR2jID7PBiv4ul8+d86+R6j/2QfZcSwgUH1iDzMVZQVNDwRKgzu
-	KFJQz+8PLdwAT084rrDEaf2vZtHezNZj4k7fSVvKvTHlc0TlD5dTaQdc64WgJA==
-Message-ID: <f8bf183c-964c-4e97-b7f0-f2cb0560f784@bootlin.com>
-Date: Thu, 16 Oct 2025 09:44:38 +0200
+	 In-Reply-To:Content-Type; b=kvClQ34MT8iJFfVBnPChX6KKVP3ulFuqXmKb0tEUIOUHm2jdToqCvlLec2PtgbZ8xIKFRPAFtVIob1+5Rth3T3jyaB1604YGRpQYJ42INbG1Ud47SvzcH1Vw1HMtgROMLigT8TcGt5ACrzfpnzDAf8DmpnyE2cYPPLVyfICNP6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.212] (p5dc5567b.dip0.t-ipconnect.de [93.197.86.123])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A22AC6028F36A;
+	Thu, 16 Oct 2025 09:44:44 +0200 (CEST)
+Message-ID: <d6a90d0d-55f9-467a-b414-5ced78d12c54@molgen.mpg.de>
+Date: Thu, 16 Oct 2025 09:44:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,88 +45,145 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 00/14] net: stmmac: phylink PCS conversion
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Abhishek Chauhan <quic_abchauha@quicinc.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Alexis Lothore <alexis.lothore@bootlin.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Boon Khai Ng <boon.khai.ng@altera.com>,
- Choong Yong Liang <yong.liang.choong@linux.intel.com>,
- Daniel Machon <daniel.machon@microchip.com>,
- "David S. Miller" <davem@davemloft.net>,
- Drew Fustini <dfustini@tenstorrent.com>,
- Emil Renner Berthing <emil.renner.berthing@canonical.com>,
- Eric Dumazet <edumazet@google.com>,
- Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
- Furong Xu <0x1207@gmail.com>, Inochi Amaoto <inochiama@gmail.com>,
- Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
- "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
- Jisheng Zhang <jszhang@kernel.org>, Kees Cook <kees@kernel.org>,
- Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
- Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
- Ley Foon Tan <leyfoon.tan@starfivetech.com>,
- linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Matthew Gerlach <matthew.gerlach@altera.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
- Paolo Abeni <pabeni@redhat.com>, Rohan G Thomas <rohan.g.thomas@altera.com>,
- Shenwei Wang <shenwei.wang@nxp.com>, Simon Horman <horms@kernel.org>,
- Song Yoong Siang <yoong.siang.song@intel.com>,
- Swathi K S <swathi.ks@samsung.com>, Tiezhu Yang <yangtiezhu@loongson.cn>,
- Vinod Koul <vkoul@kernel.org>, Vladimir Oltean <olteanv@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Yu-Chun Lin <eleanor15x@gmail.com>
-References: <aO-tbQCVu47R3izM@shell.armlinux.org.uk>
- <aO-5gVqBV-2Nl7lr@shell.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1] ice: lower default
+ irq/queue counts on high-core systems
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ Jacob Keller <jacob.e.keller@intel.com>
+References: <20251016062250.1461903-1-michal.swiatkowski@linux.intel.com>
 Content-Language: en-US
-In-Reply-To: <aO-5gVqBV-2Nl7lr@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251016062250.1461903-1-michal.swiatkowski@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Russell,
+Dear Michal,
 
-On 15/10/2025 17:10, Russell King (Oracle) wrote:
-> On Wed, Oct 15, 2025 at 03:19:25PM +0100, Russell King (Oracle) wrote:
->> Changes since RFC:
->> - new patch (7) to remove RGMII "pcs" mode
->> - new patch (8) to move reverse "pcs" mode to stmmac_check_pcs_mode()
->> - new patch (9) to simplify the code moved in the previous patch
->> - new patch (10) to rename the confusing hw->ps to something more
->>   understandable.
->> - new patch (11) to shut up inappropriate complaints about
->>   "snps,ps-speed" being invalid.
->> - new patch (13) to add a MAC .pcs_init method, which will only be
->>   called when core has PCS present.
->> - modify patch 14 to use this new pcs_init method.
+
+Thank you for the patch. I’d mention the 64 in the summary:
+
+ > ice: lower default irq/queue counts to 64 on > 64 core systems
+
+
+Am 16.10.25 um 08:22 schrieb Michal Swiatkowski:
+> On some high-core systems loading ice driver with default values can
+> lead to queue/irq exhaustion. It will result in no additional resources
+> for SR-IOV.
 > 
-> I've just noticed I sent out RFC v2.. completely forgot about that,
-> sorry
-
-:( I don't know if you saw my reply to it then...
-
-To quote :
-"
-  I tested that series on socfpga with :
-
-    - 1 instance using RGMII, w/ a ksz9031 PHY, and it works well,
-      traffic flows, ethtool seems to report correct data
-
-    - 1 instance that has the Lynx PCS (DMA_HW_FEATURE[30:28] == 0)
-
-  This also works perfectly, switching between SGMII/1000BaseX dynamically
-  by hotswapping SFP modules works well, no regression found at a first glance.
-"
-
-All the boards I have that have a flavour of stmmac don't seem to have the
-internal PCS, are you still interested in some testing , just
-for non-regression ?
-
- This is a subset of RFC v2, but with patches 13 and 14
-> reversed.
+> In most cases there is no performance reason for more than 64 queues.
+> Limit the default value to 64. Still, using ethtool the number of
+> queues can be changed up to num_online_cpus().
 > 
-Maxime
+> This change affects only the default queue amount on systems with more
+> than 64 cores.
+
+Please document a specific system and steps to reproduce the issue.
+
+Please also document how to override the value.
+
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> ---
+>   drivers/net/ethernet/intel/ice/ice.h     | 20 ++++++++++++++++++++
+>   drivers/net/ethernet/intel/ice/ice_irq.c |  6 ++++--
+>   drivers/net/ethernet/intel/ice/ice_lib.c |  8 ++++----
+>   3 files changed, 28 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+> index 3d4d8b88631b..354ec2950ff3 100644
+> --- a/drivers/net/ethernet/intel/ice/ice.h
+> +++ b/drivers/net/ethernet/intel/ice/ice.h
+> @@ -1133,4 +1133,24 @@ static inline struct ice_hw *ice_get_primary_hw(struct ice_pf *pf)
+>   	else
+>   		return &pf->adapter->ctrl_pf->hw;
+>   }
+> +
+> +/**
+> + * ice_capped_num_cpus - normalize the number of CPUs to a reasonable limit
+> + *
+> + * This function returns the number of online CPUs, but caps it at suitable
+> + * default to prevent excessive resource allocation on systems with very high
+> + * CPU counts.
+> + *
+> + * Note: suitable default is currently at 64, which is reflected in default_cpus
+> + * constant. In most cases there is no much benefit for more than 64 and it is a
+
+no*t* much
+
+> + * power of 2 number.
+> + *
+> + * Return: number of online CPUs, capped at suitable default.
+> + */
+> +static inline u16 ice_capped_num_cpus(void)
+
+Why not return `unsigned int` or `size_t`?
+
+> +{
+> +	const int default_cpus = 64;
+> +
+> +	return min(num_online_cpus(), default_cpus);
+> +}
+>   #endif /* _ICE_H_ */
+> diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
+> index 30801fd375f0..df4d847ca858 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_irq.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_irq.c
+> @@ -106,9 +106,11 @@ static struct ice_irq_entry *ice_get_irq_res(struct ice_pf *pf,
+>   #define ICE_RDMA_AEQ_MSIX 1
+>   static int ice_get_default_msix_amount(struct ice_pf *pf)
+>   {
+> -	return ICE_MIN_LAN_OICR_MSIX + num_online_cpus() +
+> +	u16 cpus = ice_capped_num_cpus();
+> +
+> +	return ICE_MIN_LAN_OICR_MSIX + cpus +
+>   	       (test_bit(ICE_FLAG_FD_ENA, pf->flags) ? ICE_FDIR_MSIX : 0) +
+> -	       (ice_is_rdma_ena(pf) ? num_online_cpus() + ICE_RDMA_AEQ_MSIX : 0);
+> +	       (ice_is_rdma_ena(pf) ? cpus + ICE_RDMA_AEQ_MSIX : 0);
+>   }
+>   
+>   /**
+> diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+> index bac481e8140d..3c5f8a4b6c6d 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+> @@ -159,12 +159,12 @@ static void ice_vsi_set_num_desc(struct ice_vsi *vsi)
+>   
+>   static u16 ice_get_rxq_count(struct ice_pf *pf)
+>   {
+> -	return min(ice_get_avail_rxq_count(pf), num_online_cpus());
+> +	return min(ice_get_avail_rxq_count(pf), ice_capped_num_cpus());
+>   }
+>   
+>   static u16 ice_get_txq_count(struct ice_pf *pf)
+>   {
+> -	return min(ice_get_avail_txq_count(pf), num_online_cpus());
+> +	return min(ice_get_avail_txq_count(pf), ice_capped_num_cpus());
+>   }
+>   
+>   /**
+> @@ -907,13 +907,13 @@ static void ice_vsi_set_rss_params(struct ice_vsi *vsi)
+>   		if (vsi->type == ICE_VSI_CHNL)
+>   			vsi->rss_size = min_t(u16, vsi->num_rxq, max_rss_size);
+>   		else
+> -			vsi->rss_size = min_t(u16, num_online_cpus(),
+> +			vsi->rss_size = min_t(u16, ice_capped_num_cpus(),
+>   					      max_rss_size);
+>   		vsi->rss_lut_type = ICE_LUT_PF;
+>   		break;
+>   	case ICE_VSI_SF:
+>   		vsi->rss_table_size = ICE_LUT_VSI_SIZE;
+> -		vsi->rss_size = min_t(u16, num_online_cpus(), max_rss_size);
+> +		vsi->rss_size = min_t(u16, ice_capped_num_cpus(), max_rss_size);
+>   		vsi->rss_lut_type = ICE_LUT_VSI;
+>   		break;
+>   	case ICE_VSI_VF:
+
+With the changes addressed, feel free to add:
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
