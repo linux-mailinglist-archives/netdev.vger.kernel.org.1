@@ -1,116 +1,145 @@
-Return-Path: <netdev+bounces-230192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A870ABE531B
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 21:11:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85748BE5394
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 21:23:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C2C919A46F7
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 19:11:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D10F31898B33
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 19:24:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D9C2882DE;
-	Thu, 16 Oct 2025 19:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD982D97B9;
+	Thu, 16 Oct 2025 19:23:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="F6MxgT1P"
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="1rRVZjcJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E2F2882CF;
-	Thu, 16 Oct 2025 19:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE18225415
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 19:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760641882; cv=none; b=BscDaDM5ESc2SARWk0MAQ/FKuGUcbXFI74AKwtM/YnDUs0Bu69k8yGIHCs87AHqSHNITUuMdEqrZGoWuOlkWnT3tY+XXX/1OeE9uOSH3TQJbPfbw0OaLtcKLrHAUT3jhwumkGmTUdGOJPi75yN/VlVsRBQZ66yzl4H4uDWy7i6I=
+	t=1760642616; cv=none; b=Hra0xQLN/UzjnrfSEg/DrWpIRsmVxVFbOwOMfW6q57cdtZhroZo8wZUh38cWo2GopoS3NMQyuR760wZ5SiCOm58ZkqFW/qyfE1OjoVyVEaqJ7N6fuL3BQICYTLToyeOiBSEFOCStnHbsacpxtMavPGoFB5O2CIqqyphDFr4XBCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760641882; c=relaxed/simple;
-	bh=Kpmyv3Tv62MdWYPZiBCYni86OvTfWF0aCytZpAdko0w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=owjhiwccTuXw1oLEcUG19+JFopFfJTXivLTP8lJSnd+MeHhgG7Mr7Dslhzo8ZxpmrrYoWdcpiNzXF7Zv6Ww4OX/bCiXKJXpCL81o2Zzcjmchs8fnehs4++PtJskqHuYltl7+4WGK5SGzeo/8P27/tDAPL/Da1ZZXK+bH6phNx2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=F6MxgT1P; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=oVHJo5eFnWVELSPqB/MrO2ee7+O6J+manXe99W9VUME=; b=F6
-	MxgT1PfjkrFXENmfT6Hqia08MbAxRN7GjzE/P4+Yexg4VM+pOv1OVA8HG2LyoAD+WQO5i4eggcAE3
-	CEM4/xwhPzg88aedaB0IANeNisN0Hm03QDYsRXsOzH5WvuHpx7kaDXhln3cz+Mmoxo+0CEgzMDWfE
-	VITKQKEYDf1z4eA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1v9TNV-00BCM5-Ov; Thu, 16 Oct 2025 21:11:09 +0200
-Date: Thu, 16 Oct 2025 21:11:09 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Cc: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	linux-leds@vger.kernel.org, netdev@vger.kernel.org,
-	Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Subject: Re: [PATCH leds v2 00/10] Add support for offloading netdev trigger
- to HW + example implementation for Turris Omnia
-Message-ID: <87875554-1747-4b0e-9805-aed1a4c69a82@lunn.ch>
-References: <20210601005155.27997-1-kabel@kernel.org>
- <CA+V-a8tW9tWw=-fFHXSvYPeipd8+ADUuQj7DGuKP-xwDrdAbyQ@mail.gmail.com>
- <7d510f5f-959c-49b7-afca-c02009898ef2@lunn.ch>
- <CA+V-a8ve0eKmBWuxGgVd_8uzy0mkBm=qDq2U8V7DpXhvHTFFww@mail.gmail.com>
+	s=arc-20240116; t=1760642616; c=relaxed/simple;
+	bh=qPZyqqlDuxupwy3hqSnQfIURpZPS/AwJNmqI4HhPNE0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=LBt6lR3f+ykyKw4isVOT09EIc33ZvYntJFpRDFM4cBsFEmULIHXpY5uSKgj3J1GZsZJptgP0T/IHWO1HLkOfnaOv9liLBU3aPEnArfMLg0nbBRHZufY2bwUX9Jc1wcAJrQOsAzVAjhRVDDz5VgnlWxH88zseJ2Tg6HYMosn7m+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=1rRVZjcJ; arc=none smtp.client-ip=212.77.101.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+Received: (wp-smtpd smtp.wp.pl 33255 invoked from network); 16 Oct 2025 21:23:31 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
+          t=1760642611; bh=e7IBYjNUi7Lb06DrRP+uQ7pq93oWoPw2ibUwX8GbUDM=;
+          h=From:To:Subject;
+          b=1rRVZjcJdFsJ3pBmLZjhnq27q7b064x90Oz5jsTAO+6acwCOKkArbV/FwBWE43PhK
+           f0MajVzIYuBNFnmbsoAnEt4bQ+tIHhBFRkc06cwYenR6d1t2fKtgCu7dvWEILi/qnh
+           shJN3KR796CjlABz+EQTXms/MXlhufeI6CwQUjjygPl/rISE8k8DZ4OKGD1dxhqliA
+           MvWN1HSMY7KHLC+CffVKWmIT6GmJ6oQza3SMDiEAgRi9amJ/BYmXjSwOgE4vGyjYCe
+           MfBC+qT+RKjLzW39HQ74RHDm98GR2/DX7408Wp/Zp3Z8DF/P42cjExjJo1XltW8k03
+           hsGWWKfDRVFGg==
+Received: from 83.24.133.17.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.24.133.17])
+          (envelope-sender <olek2@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
+          for <andrew@lunn.ch>; 16 Oct 2025 21:23:31 +0200
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	michael@fossekall.de,
+	daniel@makrotopia.org,
+	olek2@wp.pl,
+	rmk+kernel@armlinux.org.uk,
+	kabel@kernel.org,
+	ericwouds@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: phy: realtek: fix rtl8221b-vm-cg name
+Date: Thu, 16 Oct 2025 21:22:52 +0200
+Message-ID: <20251016192325.2306757-1-olek2@wp.pl>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+V-a8ve0eKmBWuxGgVd_8uzy0mkBm=qDq2U8V7DpXhvHTFFww@mail.gmail.com>
+X-WP-MailID: 0f1545edf1641a304771a642558411d5
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 000000A [QXOk]                               
 
-On Thu, Oct 16, 2025 at 07:53:17PM +0100, Lad, Prabhakar wrote:
-> Hi Andrew,
-> 
-> On Thu, Oct 16, 2025 at 2:14 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > > > Marek Behún (10):
-> > > >   leds: trigger: netdev: don't explicitly zero kzalloced data
-> > > >   leds: trigger: add API for HW offloading of triggers
-> > > >   leds: trigger: netdev: move trigger data structure to global include
-> > > >     dir
-> > > >   leds: trigger: netdev: support HW offloading
-> > > >   leds: trigger: netdev: change spinlock to mutex
-> > > >   leds: core: inform trigger that it's deactivation is due to LED
-> > > >     removal
-> > > >   leds: turris-omnia: refactor sw mode setting code into separate
-> > > >     function
-> > > >   leds: turris-omnia: refactor brightness setting function
-> > > >   leds: turris-omnia: initialize each multicolor LED to white color
-> > > >   leds: turris-omnia: support offloading netdev trigger for WAN LED
-> > > >
-> > > Do you plan to progress with the above series anytime soon? If not I
-> > > want to give this patch [0] again a respin.
-> >
-> > What features are you missing from the current kernel code, which this
-> > series adds?
-> >
-> I’m working on a platform that uses the VSC8541 PHY. On this platform,
-> LED0 and LED1 are connected to the external connector, and LED1 is
-> also connected to the Ethernet switch to indicate the PHY link status.
-> As a result, whenever there is link activity, the PHY link status
-> signal to the switch toggles, causing the switch to incorrectly detect
-> the link as going up and down.
+When splitting the RTL8221B-VM-CG into C22 and C45 variants, the name was
+accidentally changed to RTL8221B-VN-CG. This patch brings back the previous
+part number.
 
-So you think the current /sys/class/leds code is not sufficient. You
-can use it from udev etc, to make the LED indicate link, but then
-userspace could change it to something else. I _think_ only root can
-use /sys/class/leds to change the function of the LED, so it is not
-too bad as is? Or do you really want to make the configuration read
-only?
+Fixes: ad5ce743a6b0 ("net: phy: realtek: Add driver instances for rtl8221b via Clause 45")
+Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+---
+ drivers/net/phy/realtek/realtek_main.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-	Andrew
+diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+index a724b21b4fe7..16a347084293 100644
+--- a/drivers/net/phy/realtek/realtek_main.c
++++ b/drivers/net/phy/realtek/realtek_main.c
+@@ -154,7 +154,7 @@
+ #define RTL_8211FVD_PHYID			0x001cc878
+ #define RTL_8221B				0x001cc840
+ #define RTL_8221B_VB_CG				0x001cc849
+-#define RTL_8221B_VN_CG				0x001cc84a
++#define RTL_8221B_VM_CG				0x001cc84a
+ #define RTL_8251B				0x001cc862
+ #define RTL_8261C				0x001cc890
+ 
+@@ -1523,16 +1523,16 @@ static int rtl8221b_vb_cg_c45_match_phy_device(struct phy_device *phydev,
+ 	return rtlgen_is_c45_match(phydev, RTL_8221B_VB_CG, true);
+ }
+ 
+-static int rtl8221b_vn_cg_c22_match_phy_device(struct phy_device *phydev,
++static int rtl8221b_vm_cg_c22_match_phy_device(struct phy_device *phydev,
+ 					       const struct phy_driver *phydrv)
+ {
+-	return rtlgen_is_c45_match(phydev, RTL_8221B_VN_CG, false);
++	return rtlgen_is_c45_match(phydev, RTL_8221B_VM_CG, false);
+ }
+ 
+-static int rtl8221b_vn_cg_c45_match_phy_device(struct phy_device *phydev,
++static int rtl8221b_vm_cg_c45_match_phy_device(struct phy_device *phydev,
+ 					       const struct phy_driver *phydrv)
+ {
+-	return rtlgen_is_c45_match(phydev, RTL_8221B_VN_CG, true);
++	return rtlgen_is_c45_match(phydev, RTL_8221B_VM_CG, true);
+ }
+ 
+ static int rtl_internal_nbaset_match_phy_device(struct phy_device *phydev,
+@@ -1879,7 +1879,7 @@ static struct phy_driver realtek_drvs[] = {
+ 		.suspend        = genphy_c45_pma_suspend,
+ 		.resume         = rtlgen_c45_resume,
+ 	}, {
+-		.match_phy_device = rtl8221b_vn_cg_c22_match_phy_device,
++		.match_phy_device = rtl8221b_vm_cg_c22_match_phy_device,
+ 		.name           = "RTL8221B-VM-CG 2.5Gbps PHY (C22)",
+ 		.probe		= rtl822x_probe,
+ 		.get_features   = rtl822x_get_features,
+@@ -1892,8 +1892,8 @@ static struct phy_driver realtek_drvs[] = {
+ 		.read_page      = rtl821x_read_page,
+ 		.write_page     = rtl821x_write_page,
+ 	}, {
+-		.match_phy_device = rtl8221b_vn_cg_c45_match_phy_device,
+-		.name           = "RTL8221B-VN-CG 2.5Gbps PHY (C45)",
++		.match_phy_device = rtl8221b_vm_cg_c45_match_phy_device,
++		.name           = "RTL8221B-VM-CG 2.5Gbps PHY (C45)",
+ 		.probe		= rtl822x_probe,
+ 		.config_init    = rtl822xb_config_init,
+ 		.get_rate_matching = rtl822xb_get_rate_matching,
+-- 
+2.47.3
 
 
