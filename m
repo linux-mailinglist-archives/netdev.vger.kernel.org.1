@@ -1,152 +1,143 @@
-Return-Path: <netdev+bounces-230037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28C7FBE3242
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:45:50 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7971EBE3251
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:46:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D63EA5863C8
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:45:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5516E4EFAD0
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:46:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67A827F01E;
-	Thu, 16 Oct 2025 11:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5911C31AF34;
+	Thu, 16 Oct 2025 11:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="Zn1ppHKH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eVASFOd8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81E06F06B
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AB22E7F06
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760615146; cv=none; b=pXRJBfDWN+sdYtLcXPbs6ndi+3ikzTA0pP6AxQWUAF7nrAkiZnqgcU+HpSyoVvshkgITZ7UqtgzDK72Lhs2ETlygRG2LJR8NZaeueQ+kLYYDPpuj4eZYIKz7yaC4KUXPr5xw9YW+5P2o5mH7o3KK2gWg8sC3lj0JtwOyjZ8SMUM=
+	t=1760615177; cv=none; b=VbPiV4INpSvTvTcyr14ZRxkBUYOxvD9LnhD3oKC5x1CaHbvqos0RGA3z1CajSa6cpSbH+g0ZII4cEa3lXoUoK9eszxGvtH0weQGIc6pHD2R4ifN5/Oo/JSSjgu9dxHlEbrxirstpJSIqp0BjHwpC3UYuEzgM0/V2h36Gtjon/o0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760615146; c=relaxed/simple;
-	bh=KhvEm4XFWGxbCXqhwXamgxBv8272sn5H3qSFc0nk0nk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JNKncAKJgT4hB0ozR+PrkHgeMUtBk8zwt4oJQq+/y4nQ4Xu5WE5Y8I+zj+0LtaEmXSHhA53FMS1J0iAgJ0a4/1nfugj4BOqEOfcDiESgeroSpStJVdPbpARx+uXQnVtw28Ie+9ZkgGFGjRrUCTy63TDVQGuYBC27xLDez2/4w/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=Zn1ppHKH; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b3d80891c6cso333230666b.1
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 04:45:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1760615143; x=1761219943; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=V9ogow/MCxwC6xQPq5tlB+OoZn7KTGO1gzWJixSspeA=;
-        b=Zn1ppHKHZ+o4XR5K+7kYdLB3khls5GqDiEahqZK8grKGdv3DLCkLRGyyp1xJIBefvM
-         bYhTWoW6RDpbEBTBnqUHe7yFx8h9j6VZ70F3irb6YU1YjGLv2aeV9pdyAyGBF3d+E/pE
-         D6fTy4C9Pu6mfFGvGC08c64P+5ly6b0BwXoAKK5JMaCvoMeWNvnvtT4atVoYMIghoCPl
-         xuzJVZq3gchXOuXfbFGMFJIJIW/jT57wyHoKN1hwO7xeWVlzWPr3/Ae7IsMDqSXvug6H
-         m+d8zNjpjhRQCg9HiHh/XCJJtpqIhthpsAuKatRzvhuuhp/fIYWiGuyXprlaYaxl7usa
-         yNGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760615143; x=1761219943;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V9ogow/MCxwC6xQPq5tlB+OoZn7KTGO1gzWJixSspeA=;
-        b=uhZHoVKYu10VhdnSiBvcbN+Q1bkGWlXidWzKK7qkFYqtS0x6LUhKPrO5ZgUbit0D07
-         JUSLGsyOm5esveps2HREuEsfdYVfl3ctML5qh77fc1iupxjTlkjNpKwJ/Rm6Mw6mVKzj
-         2heRAZCgvhc8E7jV3v8JRN0lXp2gXE+Figmuro0JY3o2SFDy/xTzZDBMUEXpuA9El+hq
-         pqBwmoSIlezwZcHHUzV/QgoMejUlG87ftArIMn1FItkc0/elq/cPMGWcQBjkEZkeWJOd
-         zHG4XaPd3rFChJxDz+7NgDNVMUSdL80uwT/Wz64h90i/C4aIBqU3ljBxp6unQ1308J/0
-         HOKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXFBpODUWPyMmaZh56sZyYuEMPluwDDmpC+GkC/uSNY5sWwD4tdf8n5ZRbzlBb7JPqXJWSWYc4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwY/ZW3MrIngZuWnohuGuzy67nRH8wstuqIpBfrl1biW7izTomp
-	k+OSUQxLZy3RUBk1oXsaHm5ZXr76oBVPj5HIBNTgcZz3FODXWZAYPFwQFAIQn1HAe30=
-X-Gm-Gg: ASbGncs+YTXeM/1aaJBoj4E9lbxZfMBl8mD8XynAmpjEUAnnmO5jKCW//FYKZU+6p3D
-	73XOq3Z1pD1WjzBSfrbwtOmm4HhvywUOLQK3bahRu1WL2jVd1MjiQiT7bLwy/tCCeRZsuow1Q1d
-	Gje2TqhrofmUrGQxwMTF3YOr5hVmRR0NeKBn6zbfkL2nxhEdulcRR1CNOzYoClG6YaJ5G4s4jpY
-	Iyi5Uef3+eWBnMfjwjsgZZgx3R63OH04STTGKb0+thjZrMyzJtfILiKQVduLwsoOUdi3r1Yyq+w
-	FnWFSkGZTLxEEU1bKXojzfojGF8pcYBqhkYUxW4ajT/wc9lmZNoZUZBMZ9LGEx1qJqPR+KP/reU
-	5bWRX0+9CqvhGWhK00pB0+GvJpQ1elwfVNbCV3T23KhqPtSvgq9BZi7jb0dD3qgRwZwvkaNCchx
-	mGJoUwpXRtGEJYHwlGKiFXqUtgt0JosZMRohRE51p6wlg=
-X-Google-Smtp-Source: AGHT+IFfgI0RzU2YIEloFmDatyMK/vukia6tq364+UTKGou0F1vugc7gBfyEZ6gk3pRfF4mh6gIVJQ==
-X-Received: by 2002:a17:907:60c9:b0:b4a:e7c9:84c1 with SMTP id a640c23a62f3a-b60521b11d1mr435792766b.7.1760615142901;
-        Thu, 16 Oct 2025 04:45:42 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b5cccdacd88sm488482666b.43.2025.10.16.04.45.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Oct 2025 04:45:42 -0700 (PDT)
-Message-ID: <bd16ced2-32b2-4f94-aedf-cfa8a955fa7e@blackwall.org>
-Date: Thu, 16 Oct 2025 14:45:41 +0300
+	s=arc-20240116; t=1760615177; c=relaxed/simple;
+	bh=PZizulifq2HVUabPYk3xuoVBwllBTb+3Td/PKhrD1JE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ioj2mpk/CYgjomRiMXbRtUToRv5LMaIOI0XG2TrRpuNI2plOqWXl+jKTT9H5nG216kZmODGNsM1Vbgqo8T4PDtBLUwYy7Ym4MvZexua7lu5u/j/tikBGLBVrq0wudxeR2qHU/2V1qakueKKQh4+uMEJqalZG5Hg7b6CQpxLAGAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eVASFOd8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC11CC2BC86
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:46:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760615176;
+	bh=PZizulifq2HVUabPYk3xuoVBwllBTb+3Td/PKhrD1JE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=eVASFOd8Ywqe6KQNNwIc5W99wHDhxMRKImkDDotqZhGfqTqo7WZv7EpFgufnGXg98
+	 JH71O97kUeMbKxS8dK8TarWgbulGDPG/N2osi7PB/ojtJuHmlrHJipQhJK1fGQIqx8
+	 op6BUxlQydtozthCzk1GkU+Z3xEyU2pJ07NmKzV3wJgQe358X8/mJd5VrRKTvZKzl+
+	 +9FQpN9xIDocbbmTswT52JCnNKVhQThGt3s6bdIntcRH2MwGnePaTwIuWYel9QlktR
+	 HIEBISbSt0jVuOZKcib3uQCDBxbXZ82Ji+VD8qp8E1NGjRdxSMw+Et1p/mpAswLeL7
+	 3l+fyNXce0nKg==
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-63bad3cd668so1158819a12.3
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 04:46:16 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUFrqRbHK0fWBi9DoMJCa4K71YnAiVROWyk2XphF1QwXWSNuuuirHYgdTyYjd9aGwbX0jQsMtY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxL7xu71z57NS+FGDWoL8G7r3cP3UejWD3wLusDKvUx7Aeo4YfH
+	iKhSDcSljgYBuD4PzRmcYq/Z2zRgJqEHhxpTRWrMAHaO13gKfm4QlUn6XQA5pfDriFczIb6/qBa
+	/ZbueylzhLNGUoD4AmdJ61c4Q7J3Drg==
+X-Google-Smtp-Source: AGHT+IG/cukXQVGNzPUMXsg5+RoCAkU44f3RdQmcvQZOd/ZrFBQ7UEz32fqOhzDQMAOYnE1PB3ZCi0DPIcgQtV+P3zk=
+X-Received: by 2002:a17:907:7e96:b0:b3d:d6be:4cbe with SMTP id
+ a640c23a62f3a-b50aa8a9063mr3962097166b.18.1760615174961; Thu, 16 Oct 2025
+ 04:46:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] rtnetlink: Allow deleting FDB entries in user
- namespace
-To: =?UTF-8?Q?Johannes_Wiesb=C3=B6ck?=
- <johannes.wiesboeck@aisec.fraunhofer.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Xiao Liang <shaw.leon@gmail.com>,
- Vlad Yasevich <vyasevic@redhat.com>,
- Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: gyroidos@aisec.fraunhofer.de, sw@simonwunderlich.de,
- =?UTF-8?Q?Michael_Wei=C3=9F?= <michael.weiss@aisec.fraunhofer.de>,
- Harshal Gohel <hg@simonwunderlich.de>
-References: <20251015201548.319871-1-johannes.wiesboeck@aisec.fraunhofer.de>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20251015201548.319871-1-johannes.wiesboeck@aisec.fraunhofer.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20251015232015.846282-1-robh@kernel.org> <CAMuHMdVBDN8-gWVs1f=1E2NgD6Dp4=ZFUnyzqHaQj9JWPpZepw@mail.gmail.com>
+In-Reply-To: <CAMuHMdVBDN8-gWVs1f=1E2NgD6Dp4=ZFUnyzqHaQj9JWPpZepw@mail.gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Thu, 16 Oct 2025 06:46:02 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqL1KL4CvnxF5eQG2kN2VOxJ2Fh1yBx9=tqJEWOeg0DdzQ@mail.gmail.com>
+X-Gm-Features: AS18NWBW0tx10CGZVgmCxHc_hmn_UbUIH_yG162ZfRbVO05hKCLDAYOsOpbWm_A
+Message-ID: <CAL_JsqL1KL4CvnxF5eQG2kN2VOxJ2Fh1yBx9=tqJEWOeg0DdzQ@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: Fix inconsistent quoting
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Stephen Boyd <sboyd@kernel.org>, Thierry Reding <thierry.reding@gmail.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
+	Shawn Guo <shawnguo@kernel.org>, Fabio Estevam <festevam@gmail.com>, 
+	=?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
+	Lars-Peter Clausen <lars@metafoo.de>, Michael Hennerich <Michael.Hennerich@analog.com>, 
+	Jonathan Cameron <jic23@kernel.org>, Andy Shevchenko <andy@kernel.org>, 
+	Jassi Brar <jassisinghbrar@gmail.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
+	Lee Jones <lee@kernel.org>, Joel Stanley <joel@jms.id.au>, 
+	Andrew Jeffery <andrew@codeconstruct.com.au>, Andrew Lunn <andrew@lunn.ch>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Daire McNamara <daire.mcnamara@microchip.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Vinod Koul <vkoul@kernel.org>, 
+	Kishon Vijay Abraham I <kishon@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Tony Lindgren <tony@atomide.com>, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-iio@vger.kernel.org, linux-media@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
+	linux-phy@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/15/25 23:15, Johannes Wiesböck wrote:
-> Creating FDB entries is possible from a non-initial user namespace when
-> having CAP_NET_ADMIN, yet, when deleting FDB entries, processes receive
-> an EPERM because the capability is always checked against the initial
-> user namespace. This restricts the FDB management from unprivileged
-> containers.
-> 
-> Drop the netlink_capable check in rtnl_fdb_del as it was originally
-> dropped in c5c351088ae7 and reintroduced in 1690be63a27b without
-> intention.
-> 
-> This patch was tested using a container on GyroidOS, where it was
-> possible to delete FDB entries from an unprivileged user namespace and
-> private network namespace.
-> 
-> Fixes: 1690be63a27b ("bridge: Add vlan support to static neighbors")
-> Reviewed-by: Michael Weiß <michael.weiss@aisec.fraunhofer.de>
-> Tested-by: Harshal Gohel <hg@simonwunderlich.de>
-> Signed-off-by: Johannes Wiesböck <johannes.wiesboeck@aisec.fraunhofer.de>
-> ---
-> v2:
->   - completely drop the capability check in favor of changing to
->     netlink_net_capable
->   - describe intended behavior already possible for adding FDB entries
-> v1: https://lore.kernel.org/all/20250923082153.60030-1-johannes.wiesboeck@aisec.fraunhofer.de/
-> ---
->  net/core/rtnetlink.c | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-> index 8040ff7c356e4..576d5ec3bb364 100644
-> --- a/net/core/rtnetlink.c
-> +++ b/net/core/rtnetlink.c
-> @@ -4715,9 +4715,6 @@ static int rtnl_fdb_del(struct sk_buff *skb, struct nlmsghdr *nlh,
->  	int err;
->  	u16 vid;
->  
-> -	if (!netlink_capable(skb, CAP_NET_ADMIN))
-> -		return -EPERM;
-> -
->  	if (!del_bulk) {
->  		err = nlmsg_parse_deprecated(nlh, sizeof(*ndm), tb, NDA_MAX,
->  					     NULL, extack);
- 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+On Thu, Oct 16, 2025 at 2:57=E2=80=AFAM Geert Uytterhoeven <geert@linux-m68=
+k.org> wrote:
+>
+> Hi Rob,
+>
+> On Thu, 16 Oct 2025 at 01:20, Rob Herring (Arm) <robh@kernel.org> wrote:
+> > yamllint has gained a new check which checks for inconsistent quoting
+> > (mixed " and ' quotes within a file). Fix all the cases yamllint found
+> > so we can enable the check (once the check is in a release). Use
+> > whichever quoting is dominate in the file.
+> >
+> > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+>
+> Thanks for your patch!
+>
+> Since you are mentioning mixed quotes, is one or the other preferred?
+
+I have a slight preference for single quotes.
+
+> Shouldn't we try to be consistent across all files?
+
+I don't particularly care to change 915 files. And if the tools don't
+enforce it, I'm not going to do so in reviews.
+
+> > --- a/Documentation/devicetree/bindings/pinctrl/renesas,pfc.yaml
+> > +++ b/Documentation/devicetree/bindings/pinctrl/renesas,pfc.yaml
+> > @@ -129,7 +129,7 @@ additionalProperties:
+> >
+> >      - type: object
+> >        additionalProperties:
+> > -        $ref: "#/additionalProperties/anyOf/0"
+> > +        $ref: '#/additionalProperties/anyOf/0'
+> >
+> >  examples:
+> >    - |
+> > @@ -190,7 +190,7 @@ examples:
+> >
+> >              sdhi0_pins: sd0 {
+> >                      groups =3D "sdhi0_data4", "sdhi0_ctrl";
+> > -                    function =3D "sdhi0";
+> > +                    function =3D "sdhi0';
+>
+> Huh?
+
+One too many search and replace. Fixed.
+
+Rob
 
