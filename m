@@ -1,145 +1,138 @@
-Return-Path: <netdev+bounces-229940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00389BE2466
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:01:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13BE9BE248D
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:02:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A1BCC3535FE
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:01:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A16C544DDD
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC132C15A8;
-	Thu, 16 Oct 2025 09:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229372C3244;
+	Thu, 16 Oct 2025 09:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LYP5srU3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aNUMwv3z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF665253B5C
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 09:01:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C162253B5C
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 09:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760605313; cv=none; b=IXXVjkmnXTYggoxPRBP3mjYLB1xdpS8J0nSCFV06i6eMfg484H+CeQF/GKHgcML0DIN9QKzic+2A/3YjQEkExA2sYh9ZoMXhBORlAjNbh26y8SYbbJYCxrtAfhxm3iAzBIHYRxMf7aQVzllf6qjuKH2m19jUF/4RCZCbsIhZyuQ=
+	t=1760605353; cv=none; b=a58Nz5dfK2aJkEs0D7YK+twSBH9uSia0px0Rv2zLyBCc3yt9xNuKl+/c6iaiNnx1Wa3oLmkWSKDeRFCqEmXfHvr43rn3lbRF4OnPZ56NToMFIbG0cL4qO5e9tty1k2OywlPqQHdzDoxk2N31cDkPpkJwcdFx8UhAX87GKLq9KQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760605313; c=relaxed/simple;
-	bh=suc4JnIRIUGOcWs/9qR0Bix6Z/KdKrVm+w6n80ouM2w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c3QFL5/sech71B8rQedVEfsWXSRSTCqptoK0fNZI/KC1DAdXNrV9u4/EiHsC14FWsZ9VNvpxxwCtMl9/vGeukEE04nhWRrBA6dumNpPWUbtgnLg0v66VuwNgvaFu2gryqPfVR+QI/e9R8OGwJHLw5YBBf9IPnM2dGrsNVSsWymo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LYP5srU3; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b6329b6e3b0so1306027a12.1
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 02:01:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760605311; x=1761210111; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=suc4JnIRIUGOcWs/9qR0Bix6Z/KdKrVm+w6n80ouM2w=;
-        b=LYP5srU36HSTMU0+jbS3BCNJM0Cay+HD5d70VSyE34c31C4gZS9kkkyPF6C/Dh0Ahs
-         aPXMxUlCe+HyJ0150QrTSztoGfrJ9lKgOnXco1S/kk2Twa2pYV+sF60MSxSQbGcn2cg1
-         hHaqG28WBKpcl6PdlOfZq38I4VWqCUSQ8OraTRIoX8vUHj5cJE4hj7Nj54nt4uTN1V0C
-         Yx5BNa3pFSLxjNf5Fk4I89tKOukhg5iyo41ypWxFIRBpELO9M1Y7OZfzUBi8A1g8zEUv
-         46rlyXz3Hrz41qQTGldrsPJF6xtFDzycWMriO4ARZabr7ZqLKAmPLOTxcfBg+uDWp7CB
-         EcRg==
+	s=arc-20240116; t=1760605353; c=relaxed/simple;
+	bh=+AtvyGqwUgALdVZc2SXcYDz/237PjQqovYd5Z7PxSbA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=RBIy2ReXZGMxhHoNXuKqy8IydaL39qJGhPWWEhE6nUO3RxVRn79qlR60p46gtEdiJ6v7VOXyFtgCuVLVH+MzPo2KfXlGOnQLVJ8qYW9doN903/gowEWgxDX29fX/ZyIQS2kYdRkYehYTYupDr6+MEFwvlCW7pKqQUu+4QkX0ItE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aNUMwv3z; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760605350;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5GQfxStX9qdjnF8aD6SOVhJPa/g/zUO8yOqhMVk2ON4=;
+	b=aNUMwv3zp4/Vi9b6p02yAGuucYNzZt5nohfETo/eSAtJZi41sYpZkKyvmXXWlbEEUWvJDF
+	EOFhhdgtuVujtKMft8Ut72fBuhcNTHHzBsG4VWXlTlm/UCxZentH04KxxOUhX2l1E9PD0E
+	Cr8SYgalPQRgIhgfisUmq3OH/sArDE0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-208-K1bbVEIePM2WrnOnExPRtw-1; Thu, 16 Oct 2025 05:02:29 -0400
+X-MC-Unique: K1bbVEIePM2WrnOnExPRtw-1
+X-Mimecast-MFC-AGG-ID: K1bbVEIePM2WrnOnExPRtw_1760605348
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-471001b980eso2921555e9.1
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 02:02:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760605311; x=1761210111;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=suc4JnIRIUGOcWs/9qR0Bix6Z/KdKrVm+w6n80ouM2w=;
-        b=JffUfkz7bGr7iTveJMk7Z0fvXWdjydQE0MTcU1/ObVT3WFryCF8f85qaaotJy8Wi+5
-         gEkvd6LugvF17BPxUXHASzBzKbM8lEoWqXfWjpJUuay3krXvQBMlKb2IdH2RMvwmO3mA
-         AWJZHF2t20482jG3kebM/LdxbUUaKfpVxTJiRZhyplJHjH/AkCVXOZ7z2IL5zA9vS8xQ
-         gFHvbthNVvOTc+ZXEruQRia9IYXZBvFIYOqRgRQlVpp/4PDYFxIhwU0LP2N+yIDu+5IA
-         xixBAPJfQodc0HpSqDCPgeeqYlJm1edhRWToHEe8vtKKhHtG4rQwZ3uti2/lkMGtS4fG
-         n/lA==
-X-Forwarded-Encrypted: i=1; AJvYcCW8MFAWghC61D1gERTgDN4I/vErag3+5xFDy7jpxBoQm3ZTga8WhbAjACa9oldByeMvWCRL4js=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjhRv4/2HmAKwKaxlct23M+X8n0B4Cl0kfZDn7yhcCEC2bl8Ch
-	i/ocf0y1sw9o2BD74BWP2CSF9F2vcqUQkR6mqFcB8Dj3C1iQPUfTFjC7
-X-Gm-Gg: ASbGncvEvpStLGmci5HXZEJYU3Z8a17zeTGUOHKOuDOqNDidpZDNiFaMjmOhz+0OAri
-	nY0YjdlHdYmO95VhVo4LCxyaFuz4QjGd67CZ3WNlAJEOCO2y5ymB5o97iyr4mRYWjmAsPMbE9DQ
-	j27tlss9y4OUYrN8S5Xqp3hMGj66nAiqj/lRNR3mwuIdQkNpAbnqeuai+W+GCDv6P8PkWlaBt57
-	e4h1tNOR1MrqMfglyQA831e3uzdVSMAr7ZLqRuvmhPngKMUkvHF+r2Kpd4n9JUaJ7c73HehwuIQ
-	nBfRuEvsJzNbVorlTaSlD901YII4vyCgyAcRx38vKwhhKjY3ge2V2riQFUaK0AoBRJdcvhWPfEt
-	zZCbWKQDju7ri9UdazEFujYE4q14NyS+MSzJm+qyao1CPXyQwwg9rI5+2ecVW08GksOc7dfy4Qg
-	YAhrEpl91o21IawA==
-X-Google-Smtp-Source: AGHT+IE57WvRWVQwP15WqnNytPnJ0vJwjIIRthPOsa4cpEi8X8CD2FPyQJMr+7uqN7uOBtFrHDlVOw==
-X-Received: by 2002:a17:903:1a23:b0:271:9b0e:54c7 with SMTP id d9443c01a7336-29091af3a9cmr42613085ad.11.1760605310973;
-        Thu, 16 Oct 2025 02:01:50 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33bb66403f4sm1073355a91.23.2025.10.16.02.01.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Oct 2025 02:01:49 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 098DA40C0938; Thu, 16 Oct 2025 16:01:46 +0700 (WIB)
-Date: Thu, 16 Oct 2025 16:01:46 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>,
-	Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sharath Chandra Vurukala <quic_sharathv@quicinc.com>
-Subject: Re: [PATCH net] net: rmnet: Fix checksum offload header v5 and
- aggregation packet formatting
-Message-ID: <aPC0et6rtTOKyDR6@archie.me>
-References: <20251015092540.32282-2-bagasdotme@gmail.com>
- <aO_MefPIlQQrCU3j@horms.kernel.org>
- <aPA1BzY88pULdWJ9@archie.me>
- <aPCo2f3lybfRJvP0@horms.kernel.org>
+        d=1e100.net; s=20230601; t=1760605348; x=1761210148;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5GQfxStX9qdjnF8aD6SOVhJPa/g/zUO8yOqhMVk2ON4=;
+        b=lIgzOCwY9sTB84F+BSdxwcgH+7WhwdjmTHUudTCdctR799vBY2mcKqC0xCezZNVVg6
+         4Dhxu1yn+BcrulHz1lAoBufBjRW0MPpl7MH42ln1iUENAcGdZBsmwpZwwjlvGirUWTQt
+         ZIJB4lwn6vcbaZ3J6DNz0iCi5IUyeQl3dUscpn0+lRmQKRp+igoe99DbD5anRRcsktWY
+         PAN8Msc0Egc58s9X3L5xQ4efAT+TZ0gFyS/5kk/B629tf9TL8bBq0e972/CA4n9gI3Tg
+         n8mjg38MxirG2Z2wNFRn2ClvRv5ywzdzCvwqC3QObYFOjut51ZdnAbV2AFAtpzki7zd0
+         zivA==
+X-Forwarded-Encrypted: i=1; AJvYcCU7Daj5SzMv4IMD1U2++/m19zEmJRQsDPfVvUZv+yj+1hF5FnqZDTBAxDtnqapyvkwe3mkE49E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKvQOkAAHVoNjO328XUCcsspkPaEPMg5LbY3FHBT+NJhNEQaku
+	Hyure6uBlQ1xy68w4hgD4185thuG+hFJdGP08ScZXZr8sz6q3tCXbuyEsN/UWSDUXjX+tXsWWfL
+	r1zPShqwycgd4j1XpTAi/LnRxZCknvISjTPmw9oHBbWUHpRSotwOH02gHZg==
+X-Gm-Gg: ASbGncu1QL9Po2YwV6oJ03kN+tVE45FIv4PVIkzv49A/xNWqkC3WfDP0b5ePyO+SzF9
+	a9kVwGnl2LS5V3v1Pfc/E/auyn7gBNT73LXeJB3+8f06EiazqBNx/LYGvoNqJvFdyvOSiE1mCRR
+	3qEFfA7Rf0fjK8QXwZiLQjAus1SiwPwK3UJmL2QOWrljsLMKagRZe5J32p0T+vsSgV7pLJwK8tW
+	pfpKT2ODv1UFV3PV5K6xsw5bGiSlDScdLtcy9n1b9EdrpgR9D9BgaM5eVRG/a/Qea0fCb3UEYe3
+	7PwSiTHlqqOyrMjAdducwVGbMWHor2ObgdUKrxyyOnk3Ji81Dcmv3gKUfZnN0TRSRbYZwltQKLf
+	qaJfYjElp4adFxrKDJrTw5P2qvo7hwmXOABCuQ+UN4EX69nU=
+X-Received: by 2002:a05:600c:3b08:b0:456:1b6f:c888 with SMTP id 5b1f17b1804b1-46fa9af364bmr194084385e9.23.1760605348013;
+        Thu, 16 Oct 2025 02:02:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHBKaKCixlap2LGsrCQoy/ztjbrbjTMc5FWNVc5/WkapPDjvhhGgdyb9Tum59RrTjzgqDuQQw==
+X-Received: by 2002:a05:600c:3b08:b0:456:1b6f:c888 with SMTP id 5b1f17b1804b1-46fa9af364bmr194083915e9.23.1760605347524;
+        Thu, 16 Oct 2025 02:02:27 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4711444e3fesm14977005e9.15.2025.10.16.02.02.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Oct 2025 02:02:26 -0700 (PDT)
+Message-ID: <4042d1da-a7aa-46c4-87c5-736d74d280a2@redhat.com>
+Date: Thu, 16 Oct 2025 11:02:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="V/bGbS2sUY816rHU"
-Content-Disposition: inline
-In-Reply-To: <aPCo2f3lybfRJvP0@horms.kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 net-next 05/13] tcp: accecn: handle unexpected AccECN
+ negotiation feedback
+To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com,
+ linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
+ dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
+ kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+References: <20251013170331.63539-1-chia-yu.chang@nokia-bell-labs.com>
+ <20251013170331.63539-6-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251013170331.63539-6-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
---V/bGbS2sUY816rHU
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 16, 2025 at 09:12:09AM +0100, Simon Horman wrote:
-> On Thu, Oct 16, 2025 at 06:57:59AM +0700, Bagas Sanjaya wrote:
->=20
-> ...
->=20
-> > I think that can go on separate net-next patch.
->=20
-> Yes, sure.
->=20
-> Would you like to send that patch or should I?
+On 10/13/25 7:03 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> 
+> According to Section 3.1.2 of AccECN spec (RFC9768), if a TCP Client
+> has sent a SYN requesting AccECN feedback with (AE,CWR,ECE) = (1,1,1)
+> then receives a SYN/ACK with the currently reserved combination
+> (AE,CWR,ECE) = (1,0,1) but it does not have logic specific to such a
+> combination, the Client MUST enable AccECN mode as if the SYN/ACK
+> confirmed that the Server supported AccECN and as if it fed back that
+> the IP-ECN field on the SYN had arrived unchanged.
+> 
+> This patch fix an incorrect AccECN negoation of commit 3cae34274c79
+> ("tcp: accecn: AccECN negotiation").
 
-I'll do it myself.
+Minor nit: with my previous feedback I asked a formal fixes tag here.
 
-Thanks.
+Yes, we can have fixes tag on net-next.
 
---=20
-An old man doll... just what I always wanted! - Clara
+No need to re-submit just for this.
 
---V/bGbS2sUY816rHU
-Content-Type: application/pgp-signature; name=signature.asc
+/P
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaPC0dgAKCRD2uYlJVVFO
-o1RbAQDBHNO/O//8dreUmgf0Lc9dgz9gsgk+/PRYBouO4ont9AEAlEQdl9VwuHJJ
-7cOjWsWj/n4O6weq7V/0N67jnElupwU=
-=JFh8
------END PGP SIGNATURE-----
-
---V/bGbS2sUY816rHU--
 
