@@ -1,177 +1,222 @@
-Return-Path: <netdev+bounces-230081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04E12BE3BC3
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:37:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ADD6BE3C44
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:42:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B37443B120E
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:37:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15B785882BC
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:42:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8A81527B4;
-	Thu, 16 Oct 2025 13:37:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CAcKDf88"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB4AC33A00A;
+	Thu, 16 Oct 2025 13:42:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91E1CA6F
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 13:37:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E38339B20
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 13:42:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760621831; cv=none; b=Kde23g+iGO6NPuigd8W4gqy/gI9PC8YuS/XNKrNUVZxp5mjtQhNiy8OKiYVrO5qAfk20zH3jDdnVbQqK9fmn7lqt5nbGMoZNGUuiznaGp6v3uFZUQ5TWu87Ckxxw4XSpxLCy3LRKPZO+PgdCRCBmkgYtJwLNuILQ1UYsowNYkCA=
+	t=1760622154; cv=none; b=vFCPkEdQfnIPw7iYAOz0udLSWlVxE79B6U9bAMHOqfH5rz0FjItDPT97vohEfTwPtSmbNk2aWv42Cfhma2lCnEM3cfP9vs7Mo2b1/TTUStTRCspYxS3K/cnB0FQ4ku2Z1NA8f9rcSqzaAej3vf5gbMqu9EsV+n5CowbCc3ML1Dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760621831; c=relaxed/simple;
-	bh=N4F8FRAqLTwTh+GkfGRyW0rjmoUD8mBDEsVpYXMrW1k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iEKbOg8g5VjMbVE8utOL/4SSlm9mRY4LVa12MF/Uher/QqrUl4/RGrxpTHGpe1IsMmdPuOyAj/aiZRvW2TROhwlrhJSQwtGrhqs9aoJP8BlKM5ARszGA1ZqCCbgAMYcreINtDyidP3yfXiMdzi2BK7YcB42q31rR354qvdvDSbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CAcKDf88; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-7e3148a8928so10358886d6.2
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 06:37:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760621828; x=1761226628; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tAZcdeK/xU+S/VhcXVMo554urSW0WUUc1ISGU3vEFIY=;
-        b=CAcKDf88jE1Cdw5GwMUHq/yHB0+WktTyvaeOr0t4J2M9A28vGNGrisbKBlREVqTHsY
-         +lsiY1s9G9fIOnE9wdAjocCQ0lT+4FS/UzLde5RWMea1C7H/Il5KjWLYiGuUoL0o65VA
-         O8/JiL8fVq6r+bUFOO7+ezsW9g4BMSxAk5WpCsv+zkqsRJG6iSQTaiGPFI632XjGslR8
-         k0+3zXS0CrKHegXBsm3MC9yC++wXoJauomFQRzNYid2Pe1RD24sQKjlGPJV9P1/pt46X
-         DYKybfNuVULusdMhyeTIItFjZvAVoeIw+JpnRwLaf459mSzBIU/kBdkf0rvT3QbwFVlb
-         YcGg==
+	s=arc-20240116; t=1760622154; c=relaxed/simple;
+	bh=syBv9aUWt6fTD0PgmuZNZhyjnIaJyirxDywJ86Rl2To=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=SXuZI224SExNrKRy/E7fWx7gZS9g+mT/xFDh4IFUwz46PzdXoRcxeuIbacQcA9wM50+QH/0MZQv/sj2pENVecnaZcpQrjuLIwd/wFKa5RTzI4fOZeuovn/qMVDihyE+vkR4NGyXD8NGcoCac6EBLx75MO5CbrIxAANJwn4ZxKdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-42a076e4f9eso8778945ab.1
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 06:42:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760621828; x=1761226628;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tAZcdeK/xU+S/VhcXVMo554urSW0WUUc1ISGU3vEFIY=;
-        b=cj3zY5xZyDRwIeLTEVguB3DWDXPgvIU80YJYjvoLechi5691UB5QMFFIlIVJlKzygm
-         Tb0v8fk5aGpelAA7vlaKc8tx/kUDWNB4WRz+CRiVJZkCMICHNj/OPStGll7BQXW/+Vd1
-         1gT4TpIDPpv/8X+dqArF04PHHVCutIyjHqfVaABiCq/kjYH4KQwG+8ODnutNR0yjT0Cz
-         5lB4NTMknWBnvhEAPKI9MBvQDaD7RO3xET8PX/MVGV2JaGRoLtDTWIxM9O4VamDsFZmi
-         KGjlloLTWdXYZ8sNAvtPeQu5h+rSsqSnEotYiV6qgRW6Ni0H4O6NSh1w0r5STXsefvA0
-         nSYw==
-X-Forwarded-Encrypted: i=1; AJvYcCX/SAdx3e/fQ3yQs3Iw/kZUik5UJSEKToJo5X0ZDIRy5Reu3lfsiMw0x2sAbP/gaAzxfRxM22I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyayHwQf7rjVpptmapisS/6y1npASIqPhnpojIxSw/SuhR/uw0S
-	oRz2rUbD2vWv56dS63yyyaABoT/x0i/Sv9Yt4n6VHVrqaOeNnGAV3MDEpCvqZnfITMR8BjJ3HWW
-	HRvBq6AqZa4ZY3Gro/vRT+Ra2yG81YLMzeZrLX4uv
-X-Gm-Gg: ASbGncti2mDpVTUk7GFqZcjWrsDmoOOQtAnvsOA1amgw7zwCcDip2GyVAIrTsFgagnc
-	4OJEmPwDgDJkx0Do3XXtNYqqBijiHD6yinTvmExsArNJhlPM0XfqvBWkNhDx4AUDmLCDTlABiUs
-	wqsXFYudAHCfrhsOLPUDlSAjvorb/J1aa9wAjfAJK2Y/sXFsE6EynpJGDf37xZRA/jFx7d6AUhs
-	oFhUj2QRkZAR7QwfKN5Mq5qGrTpmbQV/KgwUINvwObaSGPMdhRjbiePqXwVlK1CQO9dShmzPnRZ
-	TL8=
-X-Google-Smtp-Source: AGHT+IFzD5eIw2s5D6MVnUdNdA0OsGxbsZRPNWq+ZjDDp3TolyfEK8CxB6JGiMgyQ4SGjbL8m25dgDcXoNuPMvW7Kgg=
-X-Received: by 2002:ac8:5953:0:b0:4e8:944a:5e4d with SMTP id
- d75a77b69052e-4e89d3de4bfmr1873591cf.63.1760621827124; Thu, 16 Oct 2025
- 06:37:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760622151; x=1761226951;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=y2DHqrwsD+9Fr2vMh115bEQ2Fp4/zXqmJxFksIglg0g=;
+        b=dWRxuCRMszLN5MnHAMWjlSsdbsddedT7MnG6m3QDJrU49U5p6mx/9n5QYOqBf4eyt8
+         9paQdg3mTZrBwDYtwrFHIdP5r30LVisZt1wNqi/ZLaOtTpjjV/qFmLTtAvOWUBnlpD94
+         Iwnwfat3XifaQqHspjqnz/jKKEVyPHN/p1eDaN0EXKSBXLDKOVj+gwlY7fGUMdbyxXyz
+         Enm8ZLB59I9ulDVyF0KUfVcWj0MfA/GflV5s8KIkZZ2wxYSlpmn9wO/dgcrkaLNy0TT6
+         jaMBNnv4d3v27JSH7ZZ7HlPv4O0ueQpXhJPk4/oncQ1pDKIWoqoMNUAFK7dDdH4zkyDc
+         NbQA==
+X-Forwarded-Encrypted: i=1; AJvYcCVEtxw3WpkLENCH7lkd4UhKFy4+tK2v5iYPY0u3JS0+6Y/fTjycnX33IA901u0iROhUQ/iRsLQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3rHl1CsV7jFOpIdkWmK+VNbQqxDEaO9eSaf16G/kjPclGI19K
+	2FL+t3VxMKUEF7vTLH6A41/MoUiDVr3DtTkn1Ex9FM+Jtg7OZi1s6jZ+I/8jRTMl3leURyCpoNU
+	0UAwZCSS36cXCNqjXZYgmHHTinKJmTQ3NCHF8hRV0Dw6Tya8CT0JAulFSYm0=
+X-Google-Smtp-Source: AGHT+IHLxXuOYYPNOTXfd70oIaGzDB0tfb7mCH8Eh9uoQMswgM/rxufC99K6Uo6S2OPHU1x4uYwnVaJOWWElpmssxJ/4eiW3KUSQ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251015233801.2977044-1-edumazet@google.com> <e3ecac24-c216-47ac-92a6-657595031bee@intel.com>
- <CANn89i+birOC7FA9sVtGQNxqQvOGgrY3ychNns7g-uEdOu5p5w@mail.gmail.com>
- <73aeafc5-75eb-42dc-8f26-ca54dc7506da@intel.com> <CANn89i+mnGg9WRCJG82fTRMtit+HWC0e7FrVmmC-JqNQEuDArw@mail.gmail.com>
- <CANn89iKBYdc6r5fYi-tCqgjD99T=YXcrUiuuPQA9K1nXbtGnBA@mail.gmail.com>
-In-Reply-To: <CANn89iKBYdc6r5fYi-tCqgjD99T=YXcrUiuuPQA9K1nXbtGnBA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 16 Oct 2025 06:36:55 -0700
-X-Gm-Features: AS18NWA2qAUC9_l_rGaVjpNFnMzotPZbNbm3A2XtOQ2697y7ALlbiNFLW0dEkpU
-Message-ID: <CANn89iJo-b=B7jUtbazcCtgKJrnbgdEXJ-OPvOwFziP_OSLaYA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: shrink napi_skb_cache_put()
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+X-Received: by 2002:a05:6e02:3cc8:b0:424:8c15:888a with SMTP id
+ e9e14a558f8ab-430c532c218mr3825055ab.32.1760622151556; Thu, 16 Oct 2025
+ 06:42:31 -0700 (PDT)
+Date: Thu, 16 Oct 2025 06:42:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68f0f647.050a0220.91a22.040c.GAE@google.com>
+Subject: [syzbot] [sctp?] WARNING: refcount bug in sctp_generate_timeout_event (2)
+From: syzbot <syzbot+b86c971dee837a7f5993@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	lucien.xin@gmail.com, marcelo.leitner@gmail.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 16, 2025 at 6:29=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, Oct 16, 2025 at 5:56=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Thu, Oct 16, 2025 at 4:08=E2=80=AFAM Alexander Lobakin
-> > <aleksander.lobakin@intel.com> wrote:
-> > >
-> > > From: Eric Dumazet <edumazet@google.com>
-> > >
-> > > BTW doesn't napi_skb_cache_get() (inc. get_bulk()) suffer the same wa=
-y?
-> >
-> > Probably, like other calls to napi_skb_cache_put(()
-> >
-> > No loop there, so I guess there is no big deal.
-> >
-> > I was looking at napi_skb_cache_put() because there is a lack of NUMA a=
-wareness,
-> > and was curious to experiment with some strategies there.
->
-> If we cache kmem_cache_size() in net_hotdata, the compiler is able to
-> eliminate dead code
-> for CONFIG_KASAN=3Dn
->
-> Maybe this looks better ?
+Hello,
 
-No need to put this in net_hotdata, I was distracted by a 4byte hole
-there, we can keep this hole for something  hot later.
+syzbot found the following issue on:
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index bc12790017b0b5c0be99f8fb9d362b3730fa4eb0..f3b9356bebc06548a055355c5d1=
-eb04c480f813f
-100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -274,6 +274,8 @@ void *__netdev_alloc_frag_align(unsigned int
-fragsz, unsigned int align_mask)
- }
- EXPORT_SYMBOL(__netdev_alloc_frag_align);
+HEAD commit:    0db4941d9dae bpf: Use rcu_read_lock_dont_migrate in bpf_sk..
+git tree:       bpf-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=172af92f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1e0e0bf7e51565cd
+dashboard link: https://syzkaller.appspot.com/bug?extid=b86c971dee837a7f5993
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
 
-+u32 skbuff_cache_size __read_mostly;
-+
- static struct sk_buff *napi_skb_cache_get(void)
- {
-        struct napi_alloc_cache *nc =3D this_cpu_ptr(&napi_alloc_cache);
-@@ -293,7 +295,7 @@ static struct sk_buff *napi_skb_cache_get(void)
+Unfortunately, I don't have any reproducer for this issue yet.
 
-        skb =3D nc->skb_cache[--nc->skb_count];
-        local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
--       kasan_mempool_unpoison_object(skb,
-kmem_cache_size(net_hotdata.skbuff_cache));
-+       kasan_mempool_unpoison_object(skb, skbuff_cache_size);
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/692372caac28/disk-0db4941d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/5518b9303204/vmlinux-0db4941d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/606bc80ec5b8/bzImage-0db4941d.xz
 
-        return skb;
- }
-@@ -1428,7 +1430,7 @@ static void napi_skb_cache_put(struct sk_buff *skb)
-        if (unlikely(nc->skb_count =3D=3D NAPI_SKB_CACHE_SIZE)) {
-                for (i =3D NAPI_SKB_CACHE_HALF; i < NAPI_SKB_CACHE_SIZE; i+=
-+)
-                        kasan_mempool_unpoison_object(nc->skb_cache[i],
--
-kmem_cache_size(net_hotdata.skbuff_cache));
-+                                               skbuff_cache_size);
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b86c971dee837a7f5993@syzkaller.appspotmail.com
 
-                kmem_cache_free_bulk(net_hotdata.skbuff_cache,
-NAPI_SKB_CACHE_HALF,
-                                     nc->skb_cache + NAPI_SKB_CACHE_HALF);
-@@ -5116,6 +5118,8 @@ void __init skb_init(void)
-                                              offsetof(struct sk_buff, cb),
-                                              sizeof_field(struct sk_buff, =
-cb),
-                                              NULL);
-+       skbuff_cache_size =3D kmem_cache_size(net_hotdata.skbuff_cache);
-+
-        net_hotdata.skbuff_fclone_cache =3D
-kmem_cache_create("skbuff_fclone_cache",
-                                                sizeof(struct sk_buff_fclon=
-es),
-                                                0,
+------------[ cut here ]------------
+refcount_t: addition on 0; use-after-free.
+WARNING: CPU: 1 PID: 7563 at lib/refcount.c:25 refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:25
+Modules linked in:
+CPU: 1 UID: 0 PID: 7563 Comm: syz.3.521 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+RIP: 0010:refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:25
+Code: 00 00 e8 c9 fb 2f fd 5b 41 5e e9 11 dc ba 06 cc e8 bb fb 2f fd c6 05 87 a1 f8 0a 01 90 48 c7 c7 00 b2 bf 8b e8 f7 19 f3 fc 90 <0f> 0b 90 90 eb d7 e8 9b fb 2f fd c6 05 68 a1 f8 0a 01 90 48 c7 c7
+RSP: 0018:ffffc90000a08b48 EFLAGS: 00010246
+RAX: 7c4c1f86041de100 RBX: 0000000000000002 RCX: ffff88802da23c80
+RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000002
+RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffffbfff1bfa244 R12: dffffc0000000000
+R13: 0000000000000001 R14: ffff888054308004 R15: ffff8880543083c0
+FS:  00007f399e4b86c0(0000) GS:ffff888125e27000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f399e497d58 CR3: 0000000032fde000 CR4: 00000000003526f0
+Call Trace:
+ <IRQ>
+ sctp_generate_timeout_event+0x1c8/0x360 net/sctp/sm_sideeffect.c:284
+ call_timer_fn+0x17b/0x5f0 kernel/time/timer.c:1747
+ expire_timers kernel/time/timer.c:1798 [inline]
+ __run_timers kernel/time/timer.c:2372 [inline]
+ __run_timer_base+0x61a/0x860 kernel/time/timer.c:2384
+ run_timer_base kernel/time/timer.c:2393 [inline]
+ run_timer_softirq+0xb7/0x180 kernel/time/timer.c:2403
+ handle_softirqs+0x283/0x870 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ invoke_softirq kernel/softirq.c:496 [inline]
+ __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:723
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:739
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1052 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1052
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:schedule_debug kernel/sched/core.c:5885 [inline]
+RIP: 0010:__schedule+0x1b3/0x4cc0 kernel/sched/core.c:6806
+Code: f6 48 8b 1b 48 89 d8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df 80 3c 08 00 74 08 48 89 df e8 24 ce dc f6 48 81 3b 9d 6e ac 57 <0f> 85 b7 18 00 00 45 85 ed 7f 54 49 8d 5e 18 48 89 d8 48 c1 e8 03
+RSP: 0018:ffffc90005536be0 EFLAGS: 00000246
+RAX: 1ffff92000aa6000 RBX: ffffc90005530000 RCX: dffffc0000000000
+RDX: 0000000000000000 RSI: ffffffff8bc060c0 RDI: ffffffff8bc06080
+RBP: ffffc90005536df0 R08: ffffffff8f9db437 R09: 1ffffffff1f3b686
+R10: dffffc0000000000 R11: fffffbfff1f3b687 R12: ffff888125e27000
+R13: 0000000000000001 R14: ffff88802da23c80 R15: 1ffff110170e7568
+ preempt_schedule_irq+0xb5/0x150 kernel/sched/core.c:7256
+ irqentry_exit+0x6f/0x90 kernel/entry/common.c:211
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:lock_acquire+0x175/0x360 kernel/locking/lockdep.c:5872
+Code: 00 00 00 00 9c 8f 44 24 30 f7 44 24 30 00 02 00 00 0f 85 cd 00 00 00 f7 44 24 08 00 02 00 00 74 01 fb 65 48 8b 05 5b 1b f3 10 <48> 3b 44 24 58 0f 85 f2 00 00 00 48 83 c4 60 5b 41 5c 41 5d 41 5e
+RSP: 0018:ffffc90005536f78 EFLAGS: 00000206
+RAX: 7c4c1f86041de100 RBX: 0000000000000000 RCX: 7c4c1f86041de100
+RDX: 0000000000000000 RSI: ffffffff8d9cc7dc RDI: ffffffff8bc060e0
+RBP: ffffffff8216d87d R08: 0000000000000000 R09: ffffffff8216d87d
+R10: ffffc90005536c08 R11: fffff52000aa6d83 R12: 0000000000000000
+R13: ffffffff8e255de0 R14: 0000000000000001 R15: 0000000000000246
+ fs_reclaim_acquire+0x99/0x100 mm/page_alloc.c:4286
+ might_alloc include/linux/sched/mm.h:318 [inline]
+ slab_pre_alloc_hook mm/slub.c:4897 [inline]
+ slab_alloc_node mm/slub.c:5221 [inline]
+ kmem_cache_alloc_node_noprof+0x48/0x710 mm/slub.c:5297
+ kmalloc_reserve+0xbd/0x290 net/core/skbuff.c:579
+ __alloc_skb+0x142/0x2d0 net/core/skbuff.c:670
+ alloc_skb include/linux/skbuff.h:1383 [inline]
+ nlmsg_new include/net/netlink.h:1055 [inline]
+ netlink_ack+0x146/0xa50 net/netlink/af_netlink.c:2489
+ netlink_rcv_skb+0x28c/0x470 net/netlink/af_netlink.c:2558
+ nfnetlink_rcv+0x282/0x2590 net/netfilter/nfnetlink.c:669
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x82c/0x9e0 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x219/0x270 net/socket.c:742
+ ____sys_sendmsg+0x505/0x830 net/socket.c:2630
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
+ __sys_sendmsg net/socket.c:2716 [inline]
+ __do_sys_sendmsg net/socket.c:2721 [inline]
+ __se_sys_sendmsg net/socket.c:2719 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2719
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f399d58eec9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f399e4b8038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f399d7e5fa0 RCX: 00007f399d58eec9
+RDX: 0000000000000000 RSI: 0000200000000000 RDI: 000000000000000c
+RBP: 00007f399d611f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f399d7e6038 R14: 00007f399d7e5fa0 R15: 00007fff5f9ffbb8
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	f6 48 8b 1b          	testb  $0x1b,-0x75(%rax)
+   4:	48 89 d8             	mov    %rbx,%rax
+   7:	48 c1 e8 03          	shr    $0x3,%rax
+   b:	48 b9 00 00 00 00 00 	movabs $0xdffffc0000000000,%rcx
+  12:	fc ff df
+  15:	80 3c 08 00          	cmpb   $0x0,(%rax,%rcx,1)
+  19:	74 08                	je     0x23
+  1b:	48 89 df             	mov    %rbx,%rdi
+  1e:	e8 24 ce dc f6       	call   0xf6dcce47
+  23:	48 81 3b 9d 6e ac 57 	cmpq   $0x57ac6e9d,(%rbx)
+* 2a:	0f 85 b7 18 00 00    	jne    0x18e7 <-- trapping instruction
+  30:	45 85 ed             	test   %r13d,%r13d
+  33:	7f 54                	jg     0x89
+  35:	49 8d 5e 18          	lea    0x18(%r14),%rbx
+  39:	48 89 d8             	mov    %rbx,%rax
+  3c:	48 c1 e8 03          	shr    $0x3,%rax
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
