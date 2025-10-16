@@ -1,103 +1,133 @@
-Return-Path: <netdev+bounces-230258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6EDEBE5D06
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 01:50:38 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01331BE5D15
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 01:52:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68AE519A71A6
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 23:51:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E2A5C4E2160
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 23:52:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3318E2E6CC9;
-	Thu, 16 Oct 2025 23:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28BC42E1C61;
+	Thu, 16 Oct 2025 23:52:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gmg9BTY2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dtN8AumE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF33D2E6CB4;
-	Thu, 16 Oct 2025 23:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5E4273D75
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 23:52:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760658633; cv=none; b=PlQpODF5w6l6pq/7RQ4yqph9K1tGFJtIORDCpbq5fcKnEc1NHRVhvaZb4kRfHxW5WrGmIdDqWFKSqNzajgMrNjcQ/kK0z1/Z0PPN+bLF0vlgPygaTuWp4TLEDt3EtuPweGcxH1fNes2AZm49Tco6RgXJ45NkFFfUHk3yoIAyiMM=
+	t=1760658732; cv=none; b=otEwIFFfP0PtVCjZNm6AePR0vCrFYLjCygmk7wj9VGXju4ssudm0grURLEPczVNgm8I5DFVftBPk2pub7jAj3YcG5fVUxnH2kATrCa0T/PjYEHmOW7ubyyx7eImmBNXyQaEkwyJDRy8zpdOxMlJtU/kA+y2E65zf8R5pLtVCycI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760658633; c=relaxed/simple;
-	bh=Mdc6wXMCPl76s/kPCzZCo8+4ezzldNR6VvB/1WdYWSI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Pgy2Lskkl6m1ncVMw1b6EfBN7ylImGq9BhoGnCTeIeo8GoO1HW++W8koi3i/NnqZVR05Ru+vfZmPGrm62ItL1YoY6YhASGtGLUQfh/hOupxcRHIxPfoD21KTlGXM2uXo9lEaGHZwsLqBeVANrolp2ku/p6g2NE27FV6VpkCLAyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gmg9BTY2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FD27C4CEF1;
-	Thu, 16 Oct 2025 23:50:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760658632;
-	bh=Mdc6wXMCPl76s/kPCzZCo8+4ezzldNR6VvB/1WdYWSI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Gmg9BTY2rpUCPCx7zwL3K5TDcHjcbj2Dax5DvphzB2wJLVbUKsKozV/rZOTZA8wkH
-	 WnSuNHBRPFpzrg/AW2ZDxZ82UwD9J9Oa3pKHvH8zEPkb0X71Dmj0iY0mbn2Ue5bVK7
-	 aGgVxFo/PTyvcQyVTc3cMvrPPenH/VqPqbYJmRrqBaT80cXr2WP3+hFhDfzYCY+Vlq
-	 mculaor+ewjoOqzi+g/txtT3j5tEtn+tZmRvliGBaECAT8Im44jB5et/3sLJLR8OUf
-	 ZBdYcQXmAx7WojtxT76C/io6qQ+eqFqBfOBSGNRQRjsm1uey8ruZyRqgaYItj9djQj
-	 /wKk8VLeA/MqA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD0839D0C36;
-	Thu, 16 Oct 2025 23:50:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1760658732; c=relaxed/simple;
+	bh=tAvhMX5aztr0Z9DAri+fzHHncZlsyVexnJ57AL6jcqI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OikWxtIsFVxr+gE+i5N+LYn/Md9SCl9hqiP/wiSTskeLG+u9Z4g4+EqZqYrngfTpPaBbNgyI7ZMIEd9a4EFA5U5Xi+RQ0IBEkth5Jv51wvexoUEhZ+ZcE3u7mIM9nLXQgkXra8FA6OT8PaePMbTzlhMs34nZuyWnoaa47Sv5C7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dtN8AumE; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <f5bf014d-46d7-44da-8a63-1982cd45d9ba@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760658718;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zMkN1P35QJXcNpqEISntYLu4gs0QGz5ABpRC4dfIYEE=;
+	b=dtN8AumE+YYpYEMFyNeM565Hg/X1VuYn0CtEWYGZ09O2iJUPGsx0wxyczvhRTmztv/VHbH
+	QfAytOz0yXqyBX/Cwu8ExdxsqErrRHkbuuSY6q8dHvB5OWoI09pn5HWtmlxazE5cLCIB6C
+	FZ8i2poFwteXMF+M+GjDK4KtqG1oRDA=
+Date: Thu, 16 Oct 2025 16:51:46 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5] dt-bindings: net: qcom: ethernet: Add
- interconnect properties
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176065861625.1949661.11017826698339546563.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Oct 2025 23:50:16 +0000
-References: 
- <20251015-topic-qc_stmmac_icc_bindings-v5-1-da39126cff28@oss.qualcomm.com>
-In-Reply-To: 
- <20251015-topic-qc_stmmac_icc_bindings-v5-1-da39126cff28@oss.qualcomm.com>
-To: Konrad Dybcio <konradybcio@kernel.org>
-Cc: vkoul@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, andersson@kernel.org,
- linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- quic_scheluve@quicinc.com, ahalaney@redhat.com, andrew@lunn.ch,
- krzysztof.kozlowski@linaro.org, konrad.dybcio@oss.qualcomm.com
+Subject: Re: [PATCH v2 bpf-next 2/4] bpf: Support associating BPF program with
+ struct_ops
+To: Amery Hung <ameryhung@gmail.com>
+Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
+ daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org,
+ bpf@vger.kernel.org, kernel-team@meta.com
+References: <20251016204503.3203690-1-ameryhung@gmail.com>
+ <20251016204503.3203690-3-ameryhung@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20251016204503.3203690-3-ameryhung@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+On 10/16/25 1:45 PM, Amery Hung wrote:
+> diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+> index a41e6730edcf..e060d9823e4a 100644
+> --- a/kernel/bpf/bpf_struct_ops.c
+> +++ b/kernel/bpf/bpf_struct_ops.c
+> @@ -528,6 +528,7 @@ static void bpf_struct_ops_map_put_progs(struct bpf_struct_ops_map *st_map)
+>   	for (i = 0; i < st_map->funcs_cnt; i++) {
+>   		if (!st_map->links[i])
+>   			break;
+> +		bpf_prog_disassoc_struct_ops(st_map->links[i]->prog);
 
-On Wed, 15 Oct 2025 18:26:12 +0200 you wrote:
-> From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-> 
-> Add documentation for the interconnect and interconnect-names
-> properties required when voting for AHB and AXI buses.
-> 
-> Suggested-by: Andrew Halaney <ahalaney@redhat.com>
-> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-> 
-> [...]
+It took me some time to understand why it needs to specifically call 
+bpf_prog_disassoc_struct_ops here for struct_ops programs. bpf_prog_put 
+has not been done yet. The BPF_PTR_POISON could be set back to NULL. My 
+understanding is the BPF_PTR_POISON should stay with the prog's lifetime?
+>   		bpf_link_put(st_map->links[i]);
+>   		st_map->links[i] = NULL;
+>   	}
+> @@ -801,6 +802,9 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+>   			goto reset_unlock;
+>   		}
+>   
+> +		/* If the program is reused, prog->aux->st_ops_assoc will be poisoned */
+> +		bpf_prog_assoc_struct_ops(prog, &st_map->map);
+> +
+>   		link = kzalloc(sizeof(*link), GFP_USER);
+>   		if (!link) {
+>   			bpf_prog_put(prog);
+> @@ -1394,6 +1398,46 @@ int bpf_struct_ops_link_create(union bpf_attr *attr)
+>   	return err;
+>   }
+>   
+> +int bpf_prog_assoc_struct_ops(struct bpf_prog *prog, struct bpf_map *map)
+> +{
+> +	struct bpf_struct_ops_map *st_map = (struct bpf_struct_ops_map *)map;
+> +	void *kdata = &st_map->kvalue.data;
+> +	int ret = 0;
+> +
+> +	mutex_lock(&prog->aux->st_ops_assoc_mutex);
+> +
+> +	if (prog->aux->st_ops_assoc && prog->aux->st_ops_assoc != kdata) {
+> +		if (prog->type == BPF_PROG_TYPE_STRUCT_OPS)
+> +			WRITE_ONCE(prog->aux->st_ops_assoc, BPF_PTR_POISON);
+> +
+> +		ret = -EBUSY;
+> +		goto out;
+> +	}
+> +
+> +	WRITE_ONCE(prog->aux->st_ops_assoc, kdata);
+> +out:
+> +	mutex_unlock(&prog->aux->st_ops_assoc_mutex);
+> +	return ret;
+> +}
+> +
+> +void bpf_prog_disassoc_struct_ops(struct bpf_prog *prog)
+> +{
+> +	mutex_lock(&prog->aux->st_ops_assoc_mutex);
 
-Here is the summary with links:
-  - [net-next,v5] dt-bindings: net: qcom: ethernet: Add interconnect properties
-    https://git.kernel.org/netdev/net-next/c/01b6aca22bb9
+Can it check the prog type here and decide if bpf_struct_ops_put needs 
+to be called?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> +	WRITE_ONCE(prog->aux->st_ops_assoc, NULL);
 
 
 
