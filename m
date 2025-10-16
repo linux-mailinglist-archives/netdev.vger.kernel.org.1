@@ -1,99 +1,100 @@
-Return-Path: <netdev+bounces-229991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2331ABE2D7D
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:39:57 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD8DDBE2D83
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:40:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EF1B74F7944
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:39:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EA9464FD33E
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:39:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DFF430507B;
-	Thu, 16 Oct 2025 10:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F8E12E54BE;
+	Thu, 16 Oct 2025 10:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="c7w3RjH+";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AODYqdWl"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="ScnjOPfC";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="yj8fSAM3"
 X-Original-To: netdev@vger.kernel.org
 Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5492E54BE
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 10:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818C52D97A8
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 10:39:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760611173; cv=none; b=i+TmHlDt+Zmeu+fFxZlZryOdc3q01bLEyuj1/DgE9m8w1LfuTqYQAjU0LJFotr60Bm2Y6bZMmDahkqD2+anVSRdyz9BxhBsVtOT6TRtjiJWzkKqw9hjzURVqpwNBodbhM/ydMM8wVUI4vOwZDT4POi7NZE+vf09tqQWluvcf5T0=
+	t=1760611176; cv=none; b=ZEYDOKZ4oBWZT4ZLLc5g4PttGoIs6MHRBOJrsenGauGurY70VS8t6pE9MzPygF+B+NUFKhu34dsEf+kygK+Cj+fThw8VoVSEg+IzUhdn4Qws88ojv2jtor5KGtxRDNOcQGWWOMPXJ94bzD38v6UCKdquVke7mecVs2BOEQ3jLhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760611173; c=relaxed/simple;
-	bh=elZAJSKQYkHZ/u5huzCuSYtkLm8ftQN9WUka2fuBsUQ=;
+	s=arc-20240116; t=1760611176; c=relaxed/simple;
+	bh=cBCzkFqWsp+AiFQiLMNesy1RaSzXa4jRHcYGCHGN1Jc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nfG5ckLhKevF1SRzMyNCrA1q06oDaQFPsiSxS7J1eWZuLE229k3dBeSrhWVebnUOx7FC3lO6T8hlkUyo0Qke4AsC+hHKzAhaBjH5xmAixFY9Ovp9ZPryi+mAnBuDrVgup9rmZxldoiJy5jmaoJsTRPlYx/HbwgRtnyfiw2qFlAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=c7w3RjH+; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AODYqdWl; arc=none smtp.client-ip=202.12.124.147
+	 MIME-Version; b=oloA4VxfZuCUNyRP0WJyvwqr4VLGrR0AfOEBqKCY+T3v2zlkpWY+AmISl4WoCOmiyn7TMG0GcDVRWTfl8nHB8Yep1wXNBoLFsL+ycTyD+wCKgEeq/01hOmVy/yYI+Ra7p4tw4WIGbtV3k5a5h2YvMYvkTaa8FMcslATGF6E75ZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=ScnjOPfC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=yj8fSAM3; arc=none smtp.client-ip=202.12.124.147
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
-	by mailfout.stl.internal (Postfix) with ESMTP id 446461D0012F;
-	Thu, 16 Oct 2025 06:39:31 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Thu, 16 Oct 2025 06:39:31 -0400
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.stl.internal (Postfix) with ESMTP id A0E1E1D00132;
+	Thu, 16 Oct 2025 06:39:33 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Thu, 16 Oct 2025 06:39:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
 	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
 	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1760611171; x=
-	1760697571; bh=KLy3rGIHXva/Tnf+qRUOwFOsqfBwRLKxQ2oNEwIHKiM=; b=c
-	7w3RjH+qrummGDzuDa0Jia+pnFk863dSsQt3BV1TMaa3LAhbtqGqEFwZQV7e4tXi
-	x754MIjcooH7YQwSCKndBLx/t2n7ypHogPNvKkES4/cnnlgNhntx99x6wQxHrq/z
-	MuStntmKdgZJgufmcC5iWbAzm1Sv/46QmzDaFX79tR1WP2lu6cMBy0NEmOTjX7E3
-	NHTv2yifE/bPhHJXWSfur6XzmEkEbLVmYuxIjvm/4oXUV4vrQGg6YvyKPKCkDmL2
-	mpUeDC14jO/tD0yPWhEOECJMhLR36piL+ZUcBdvj/lXaUei3V9gAWTJfYRZ3ivb6
-	0c7C6xdepZ32URHAAAi6Q==
+	:reply-to:subject:subject:to:to; s=fm3; t=1760611173; x=
+	1760697573; bh=umXH41TgMlYn+S3uAcpVWDp6Dt5YIx/xoelbKDVcr3I=; b=S
+	cnjOPfCM4JTSKTfumizKd7ys8mNcRTnCCzFC4VSnbxo8IG4VfGu0gXNEs7yyvrmp
+	24np/YdoliMZr0+bap/gMixHm0PQANBaC+Ax/wzxRV1vjSrHrLF/BaAUq8hfDUlK
+	kevuZI0JSR5Ha2xbRn/VHh0btGDVaczNZvANrMr8mib4Es/q3geWPglr8uMM+WpS
+	D6HKIooV1QbpRm3W+4TzbI/VNtLOfFkX3uJMOUHkIliuRL4UdNy96sWWkcA1OUf2
+	qLr/aF1Qqva97Ywwix8GmlavwQV6ydmWaM7WEPfj3lirFyobq4OQeAcze84Vyatl
+	Nlipftp5E2/hpgxvScExg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm2; t=1760611171; x=1760697571; bh=K
-	Ly3rGIHXva/Tnf+qRUOwFOsqfBwRLKxQ2oNEwIHKiM=; b=AODYqdWlC3/MKAFpz
-	qYFwzf1mMO2wpbKNJuArUXmySaqYYgfb/lHdJDDBomNPTkWiWoaKA+bCDC2CFurD
-	tdySE4ELzObD1PCutdcc1YZQeKfFPkfVp3jzWNeuhjBkUpfkw2A6qK5Lz9Oy4nc1
-	mxhDPvyOvnj9Xn/9HFk7Z24TeLMBs3IUXTs9cVlQON8LuwcRy+pkbTyKgViQnX9y
-	XKb7Uet9FhXzwEVoypaKViVXtKwlZmJobNaFJXpk+5vaJBUYildOyn3ZP4PjLo9o
-	CLdlEQTYEkzUo3EcPDNQdyYW0AeQPhpTGJpZgZzg3eyf2TFcTXO366eT23b7njXU
-	ad+ZA==
-X-ME-Sender: <xms:YsvwaDWiTRZn4BOFbG3V3CAXA-4wYmP9FqMuZ-TnIiZYX6G0Nz0aCA>
-    <xme:YsvwaJa8xZZ_AIQIJqU68kMyBYYhU3HdYuWoTplH5Pssq_32OQ9Qur2z-BwkPhG6a
-    mPiuRsLBJeJ1VgKqohxy4e0l2LX1bWLvmFBIYB2ApcO0kc6SazGwo3U>
-X-ME-Received: <xmr:YsvwaJ1FKXUDBZquwkp5sjg1kbOKchHhzjkyM11uRjsjm8mOt_QWmQu-IaXW>
+	:x-me-sender:x-sasl-enc; s=fm2; t=1760611173; x=1760697573; bh=u
+	mXH41TgMlYn+S3uAcpVWDp6Dt5YIx/xoelbKDVcr3I=; b=yj8fSAM33wGArh2kr
+	qDs/GO7fuzq5xx/DXvIVxx3/HVGZaQiwNTbY6oroNv5mLvZmkBzsMfadgXg+Yvpc
+	ThKwHinWN5a9yyN1n3eKzhQIh/BfAJBgSOGn4xuUu2PKTzfHxjeKCN5NvkEdL7cf
+	XC60OoRtzMlIsWlQ6pfryR8WuCBM1wQrDGacmXf72z1P8Dpz1JYiDk2IR8lRWqX8
+	6L8cm8heHCWMha3RGbB+w6zi1jnmmYoKJaXmN3rJh9qRvc9NjnW17Hln9rorTv4Y
+	/h7Gk66jEwxV4a9zjhFrFApeo5WexVRSFTby7UwRuTINeJ/09qQKszESNqkYQp7w
+	jrpAw==
+X-ME-Sender: <xms:ZcvwaNpEIr01TflQeMGwRSmPfmHPdnnYKJDdbmUci0Wmpyh8MyNUvA>
+    <xme:ZcvwaGgTmPHUpqaFoxLX9KjJjzdfZSPAyvaZx5hkAHF5_bWU_gZRQvTfVeDx4oqKg
+    tSY1GMg1_tvy_7dMfZR11dy_tDj5gsD3YtitKI39wN8PGxlu1Q16Z8>
+X-ME-Received: <xmr:ZcvwaChGIjZq7h2VxxzWfsgz6DQHXDroc6nPgKF3u07pyl2fqOG5MFN5Qipa>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdeitdejucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffojghfggfgsedtkeertd
-    ertddtnecuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghs
-    hihsnhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeekheettdetffdufeegjedvve
-    ekudefjeejueevkeethedvhfejgfeiveelieehvdenucffohhmrghinhepshihiihkrghl
-    lhgvrhdrrghpphhsphhothdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepgedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepnhgvthguvghvse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghs
-    shgvrhhtsehsvggtuhhnvghtrdgtohhmpdhrtghpthhtohepshgusehquhgvrghshihsnh
-    grihhlrdhnvghtpdhrtghpthhtohepshihiigsohhtodehtgguiedvleelvgguvgegugeg
-    fhejtdelkeejsgesshihiihkrghllhgvrhdrrghpphhsphhothhmrghilhdrtghomh
-X-ME-Proxy: <xmx:YsvwaLj_b5hKA1B2RnIKxv4Cn-dexzvfo55AeVWbIfUPJuPbojaJXg>
-    <xmx:YsvwaNZE-lz1vRllCcy6adtDQEfYH4GypXnRgqxwj4gG1GUp0I0-iA>
-    <xmx:YsvwaLR53JSsp96y1qVk7IyxBcCe4ZHM4OhtMIw08ga6nqlQCHS9Lw>
-    <xmx:YsvwaIQcOmRaLvgoxAONRZRcImXFUurZa0Ta6ogFmOHT6j1dIxm1HA>
-    <xmx:Y8vwaNkUNUIj9TINEPoBYzZ_12UCj4444E67EHpx1_kFKAPD9-5bLSyN>
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepieeiueeiteehtdefheekhffhgeevuefhteevueeljeeijeeiveehgfeh
+    udfghefgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeehpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgv
+    thdrtghomhdprhgtphhtthhopehsugesqhhuvggrshihshhnrghilhdrnhgvthdprhgtph
+    htthhopegthhhirggthhgrnhhgfigrnhhgsehgohhoghhlvgdrtghomhdprhgtphhtthho
+    pehlvghonhhrohesnhhvihguihgrrdgtohhm
+X-ME-Proxy: <xmx:ZcvwaEj5ILrB2E4tAjuFxri48x-nJ-ahdYA0iemUUX08FoWLMyozCw>
+    <xmx:ZcvwaKKQdlOtnNsSASKZGjVMSSHo7ekhlfgCfHMxWRPyJRJrSr498w>
+    <xmx:ZcvwaLF6weTtrvweJiWqGEwK_CS542r_yp0HpWMTM1ouwrKPrlPbpA>
+    <xmx:ZcvwaGSLASpC26Wrsr7If3LMteRFISuY6zlMc5zU_Jarw9viGNr3jg>
+    <xmx:ZcvwaN1QjA_xVK6aAW2JZPaDrQi2MsowmCc_rhkWATG49RwDhqOPtutt>
 Feedback-ID: i934648bf:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 16 Oct 2025 06:39:30 -0400 (EDT)
+ 16 Oct 2025 06:39:32 -0400 (EDT)
 From: Sabrina Dubroca <sd@queasysnail.net>
 To: netdev@vger.kernel.org
 Cc: steffen.klassert@secunet.com,
 	Sabrina Dubroca <sd@queasysnail.net>,
-	syzbot+5cd6299ede4d4f70987b@syzkaller.appspotmail.com
-Subject: [PATCH ipsec 3/6] xfrm: make state as DEAD before final put when migrate fails
-Date: Thu, 16 Oct 2025 12:39:14 +0200
-Message-ID: <2fdfa244565952f0937b64b3a5822e548e1aad66.1760610268.git.sd@queasysnail.net>
+	Chiachang Wang <chiachangwang@google.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: [PATCH ipsec 4/6] xfrm: call xfrm_dev_state_delete when xfrm_state_migrate fails to add the state
+Date: Thu, 16 Oct 2025 12:39:15 +0200
+Message-ID: <6e1c4b4505fa3d822e2e33b681ac4a44bae959ed.1760610268.git.sd@queasysnail.net>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <cover.1760610268.git.sd@queasysnail.net>
 References: <cover.1760610268.git.sd@queasysnail.net>
@@ -105,39 +106,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-xfrm_state_migrate/xfrm_state_clone_and_setup create a new state, and
-call xfrm_state_put to destroy it in case of
-failure. __xfrm_state_destroy expects the state to be in
-XFRM_STATE_DEAD, but we currently don't do that.
+In case xfrm_state_migrate fails after calling xfrm_dev_state_add, we
+directly release the last reference and destroy the new state, without
+calling xfrm_dev_state_delete (this only happens in
+__xfrm_state_delete, which we're not calling on this path, since the
+state was never added).
 
-Reported-by: syzbot+5cd6299ede4d4f70987b@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=5cd6299ede4d4f70987b
-Fixes: 78347c8c6b2d ("xfrm: Fix xfrm_state_migrate leak")
+Call xfrm_dev_state_delete on error when an offload configuration was
+provided.
+
+Fixes: ab244a394c7f ("xfrm: Migrate offload configuration")
 Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 ---
- net/xfrm/xfrm_state.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/xfrm/xfrm_state.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 721ef0f409b5..1ab19ca007de 100644
+index 1ab19ca007de..c3518d1498cd 100644
 --- a/net/xfrm/xfrm_state.c
 +++ b/net/xfrm/xfrm_state.c
-@@ -2074,6 +2074,7 @@ static struct xfrm_state *xfrm_state_clone_and_setup(struct xfrm_state *orig,
- 	return x;
- 
-  error:
-+	x->km.state = XFRM_STATE_DEAD;
- 	xfrm_state_put(x);
- out:
- 	return NULL;
-@@ -2163,6 +2164,7 @@ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
+@@ -2159,10 +2159,13 @@ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
+ 		xfrm_state_insert(xc);
+ 	} else {
+ 		if (xfrm_state_add(xc) < 0)
+-			goto error;
++			goto error_add;
+ 	}
  
  	return xc;
++error_add:
++	if (xuo)
++		xfrm_dev_state_delete(xc);
  error:
-+	xc->km.state = XFRM_STATE_DEAD;
+ 	xc->km.state = XFRM_STATE_DEAD;
  	xfrm_state_put(xc);
- 	return NULL;
- }
 -- 
 2.51.0
 
