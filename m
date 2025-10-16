@@ -1,193 +1,151 @@
-Return-Path: <netdev+bounces-229893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BA47BE1E38
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:21:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 640C9BE1E5F
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:23:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 36EF04EB0E1
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 07:21:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DBED483657
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 07:23:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48AB1246BB7;
-	Thu, 16 Oct 2025 07:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ACA3216E24;
+	Thu, 16 Oct 2025 07:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="vpGWNdRO"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452251EE019;
-	Thu, 16 Oct 2025 07:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629D42E36FB
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 07:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760599307; cv=none; b=EviiXTo1cFeHk7ybsCO5DkQyUl6rEYCo8JPX+ggkUbL6UyT2+p5oi9Tnn5sHo87eQ9iEf0LYhj5/4lYGE42xKe7q+idXsFW6E57yH0JnNaNo9Hv10RFMMrxREPlY76jmud6Aq63MisOGRdNhs4HVxZv8FzanTG8cXbMfKL0x6lk=
+	t=1760599380; cv=none; b=kCBnbAkIR/BBjlhrkQy31DTTlm5dCMxBHshTHdnQ1xPKH381yI2xjtGqk8YvcKmXvcY8YkmTq946y+i9cwADzQPm5+l8tfII/GikZ8/tN60lPFROxME2niRUFMGWHfnXusaA+9LMTtJaQhD/lLbkD8GNujMVsEhtEl0woej1t6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760599307; c=relaxed/simple;
-	bh=EJXNHgEM/c6BAiZKCxEAAJsXGxgydll/3KwHHRXA9qQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AwVzwaVFIw4pS3SwIbxV/1uDhjqrq2RGJXTC5Xznkcq5blIZBzJwMvB4XVbwaiQt7wtpZX2L5cHoqJokhFgqfB4IOqX7xZU30PF8ATmJ8hVRSV3JHt6hRDcasamhZkW2yTQxWCFPd6Hi7bJHVQZOtbIHrz7mxKChOPMUECO56pQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-70-68f09d01a5d2
-Date: Thu, 16 Oct 2025 16:21:32 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: axboe@kernel.dk, kuba@kernel.org, pabeni@redhat.com,
-	almasrymina@google.com, asml.silence@gmail.com
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	hawk@kernel.org, ilias.apalodimas@linaro.org, sdf@fomichev.me,
-	dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com,
-	toke@redhat.com, io-uring@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	kernel_team@skhynix.com, max.byungchul.park@gmail.com
-Subject: Re: [PATCH net-next] page_pool: check if nmdesc->pp is !NULL to
- confirm its usage as pp for net_iov
-Message-ID: <20251016072132.GA19434@system.software.com>
-References: <20251016063657.81064-1-byungchul@sk.com>
+	s=arc-20240116; t=1760599380; c=relaxed/simple;
+	bh=s2bt3R2WATElEQ8XO27KLN9GMH7psIC8qm9QHtFPgcM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O4/8niOKeputzZJgkx17fbLfgZGRUJd/p9PlL0lDtY6NXh6NV8s8cef0cmklwZFexn7qSKHaguAf9io6zdaq/U58Izoz83Pw/plnWM61P+FHltepGv7XBM9zShdW0Xj1GiMrDz1DItIdtLOFs16qrsng5qonirq4fB/59+uSFic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=vpGWNdRO; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 740D11A1410;
+	Thu, 16 Oct 2025 07:22:54 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 3F1A56062C;
+	Thu, 16 Oct 2025 07:22:54 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 90A44102F22EB;
+	Thu, 16 Oct 2025 09:22:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1760599373; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=7zOUzik5MyvROjRAqeUBJc8fQpkR6r5Z9zOCmYjzSrI=;
+	b=vpGWNdROx4mJa+kYUKCWf/ZKPABe5NrTWaC34G6w96sxkDyFCDXq6sg5uKoVPB7Djx8+Bv
+	eZgWrS6i7SEr26izkqJKdZEgm6kJ7yeGzl07WTlAlhYdB/GpuvNWdURxhefN2t2s8pEG/U
+	vhSdK+mePRkg12GEg3pgX/Iywy1BQhOW1wF3atE8/Lr51xWIRTsnyWksUrRaUbNJufoP1x
+	9ixcsKgT/u6qgRmcmAHAxNIrdDTdsWkW1usH+Od3ORZMb2lvl7nh68Jy3F1s/SAcjW999C
+	bTO3HzVg9oK0na+KnHrtjsH9Zk4UOzRnGYAimcwJ+mR2esioHsRLRKgq5YAY+Q==
+Message-ID: <c1b019e6-1463-400f-b421-91ae8fa63c3b@bootlin.com>
+Date: Thu, 16 Oct 2025 09:22:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251016063657.81064-1-byungchul@sk.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrFIsWRmVeSWpSXmKPExsXC9ZZnkS7T3A8ZBns2c1is/lFh8XPNcyaL
-	Oau2MVqsvtvPZjHnfAuLxc5dzxktXs1Yy2bx9Ngjdos97duZLR71n2Cz6G35zWzxrvUci8WF
-	bX2sFpd3zWGzuDCxl9Xi2AIxi2+n3zBaXJ25i8ni0uFHLA7CHltW3mTyuDZjIovHjX2nmDx2
-	zrrL7rFgU6nH5bOlHptWdbJ53Lm2h82jt/kdm8f7fVfZPD5vkgvgjuKySUnNySxLLdK3S+DK
-	eHp4BXPBUoWKlZOnMjYwNkp1MXJwSAiYSLzf4t/FyAlm7l39jxHEZhFQlejoe8QOYrMJqEvc
-	uPGTGcQWEciU6Jp8Hcjm4mAWuMEkMfvrFtYuRnYOYYE8iWfGICW8AhYSR4/9AysXEjCVeHv+
-	AzNEXFDi5MwnLCA2s4CWxI1/L5lALmAWkJZY/o8DJMwpYCbxfd47VhBbVEBZ4sC240wgmyQE
-	NrFLzL74nxHiTEmJgytusExgFJiFZOwsJGNnIYxdwMi8ilEoM68sNzEzx0QvozIvs0IvOT93
-	EyMwBpfV/onewfjpQvAhRgEORiUe3gcr3mcIsSaWFVfmHmKU4GBWEuFlKPiQIcSbklhZlVqU
-	H19UmpNafIhRmoNFSZzX6Ft5ipBAemJJanZqakFqEUyWiYNTqoGxurxw0j8Wi/cPP/SyWKyQ
-	WZxz/bjiwjU1xn8r9U6sDF//t+S11/rm+bv9s20fLrmlvu1tW7W3cEPyPsazeUbeAoHVleL8
-	tXFLzL/ZK8Q2b5w2Zc21Cd9vdf0OZdBS3jnj9lTubfN732y5e9jvjfHaUzemtH/tWFK6MXZp
-	3eaVM9cvW1Zx9svscCWW4oxEQy3mouJEAFZ2F+e9AgAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprEIsWRmVeSWpSXmKPExsXC5WfdrMs490OGwbnZpharf1RY/FzznMli
-	zqptjBar7/azWcw538JisXPXc0aLVzPWslk8PfaI3WJP+3Zmi0f9J9gselt+M1u8az3HYnF4
-	7klWiwvb+lgtLu+aw2ZxYWIvq8WxBWIW306/YbS4OnMXk8Wlw49YHEQ8tqy8yeRxbcZEFo8b
-	+04xeeycdZfdY8GmUo/LZ0s9Nq3qZPO4c20Pm0dv8zs2j/f7rrJ5LH7xgcnj8ya5AJ4oLpuU
-	1JzMstQifbsEroynh1cwFyxVqFg5eSpjA2OjVBcjJ4eEgInE3tX/GEFsFgFViY6+R+wgNpuA
-	usSNGz+ZQWwRgUyJrsnXgWwuDmaBG0wSs79uYe1iZOcQFsiTeGYMUsIrYCFx9Ng/sHIhAVOJ
-	t+c/MEPEBSVOznzCAmIzC2hJ3Pj3kqmLkQPIlpZY/o8DJMwpYCbxfd47VhBbVEBZ4sC240wT
-	GHlnIemehaR7FkL3AkbmVYwimXlluYmZOaZ6xdkZlXmZFXrJ+bmbGIExtaz2z8QdjF8uux9i
-	FOBgVOLhfbDifYYQa2JZcWXuIUYJDmYlEV6Ggg8ZQrwpiZVVqUX58UWlOanFhxilOViUxHm9
-	wlMThATSE0tSs1NTC1KLYLJMHJxSDYyH/Q+/jPUq3unscvvsj49y4YGJt6sqb88KfH66OP78
-	jtXvZ645HBnbIWWwZGfKuZ+M1bWrs26HS8mq2vofF19o/v2jKO/0alONF0vS9p5cs7R1n/0z
-	7wiF+9mmUakJyw58NBP8mf7h4rZ1Z3XneonULP3q5CUnxb900bG76tuEdxxxvfL39kQRJZbi
-	jERDLeai4kQABs+akaUCAAA=
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/5] net: stmmac: avoid PHY speed change when
+ configuring MTU
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>
+References: <aO_HIwT_YvxkDS8D@shell.armlinux.org.uk>
+ <E1v945T-0000000AmeV-2BvU@rmk-PC.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <E1v945T-0000000AmeV-2BvU@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Thu, Oct 16, 2025 at 03:36:57PM +0900, Byungchul Park wrote:
-> ->pp_magic field in struct page is current used to identify if a page
-> belongs to a page pool.  However, ->pp_magic will be removed and page
-> type bit in struct page e.g. PGTY_netpp should be used for that purpose.
+
+On 15/10/2025 18:10, Russell King (Oracle) wrote:
+> There is no need to do the speed-down, speed-up dance when changing
+> the MTU as there is little power saving that can be gained from such
+> a brief interval between these, and the autonegotiation they cause
+> takes much longer.
 > 
-> As a preparation, the check for net_iov, that is not page-backed, should
-> avoid using ->pp_magic since net_iov doens't have to do with page type.
-> Instead, nmdesc->pp can be used if a net_iov or its nmdesc belongs to a
-> page pool, by making sure nmdesc->pp is NULL otherwise.
+> Move the calls to phylink_speed_up() and phylink_speed_down() into
+> stmmac_open() and stmmac_release() respectively, reducing the work
+> done in the __-variants of these functions.
 > 
-> For page-backed netmem, just leave unchanged as is, while for net_iov,
-> make sure nmdesc->pp is initialized to NULL and use nmdesc->pp for the
-> check.
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-IIRC,
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
-
-	Byungchul
-
-> Signed-off-by: Byungchul Park <byungchul@sk.com>
 > ---
->  io_uring/zcrx.c        |  4 ++++
->  net/core/devmem.c      |  1 +
->  net/core/netmem_priv.h |  6 ++++++
->  net/core/page_pool.c   | 16 ++++++++++++++--
->  4 files changed, 25 insertions(+), 2 deletions(-)
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 19 ++++++++++---------
+>  1 file changed, 10 insertions(+), 9 deletions(-)
 > 
-> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-> index 723e4266b91f..cf78227c0ca6 100644
-> --- a/io_uring/zcrx.c
-> +++ b/io_uring/zcrx.c
-> @@ -450,6 +450,10 @@ static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
->  		area->freelist[i] = i;
->  		atomic_set(&area->user_refs[i], 0);
->  		niov->type = NET_IOV_IOURING;
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 3728afa701c6..500cfd19e6b5 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -3963,8 +3963,6 @@ static int __stmmac_open(struct net_device *dev,
+>  	stmmac_init_coalesce(priv);
+>  
+>  	phylink_start(priv->phylink);
+> -	/* We may have called phylink_speed_down before */
+> -	phylink_speed_up(priv->phylink);
+>  
+>  	ret = stmmac_request_irq(dev);
+>  	if (ret)
+> @@ -4015,6 +4013,9 @@ static int stmmac_open(struct net_device *dev)
+>  
+>  	kfree(dma_conf);
+>  
+> +	/* We may have called phylink_speed_down before */
+> +	phylink_speed_up(priv->phylink);
 > +
-> +		/* niov->desc.pp is already initialized to NULL by
-> +		 * kvmalloc_array(__GFP_ZERO).
-> +		 */
->  	}
+>  	return ret;
 >  
->  	area->free_count = nr_iovs;
-> diff --git a/net/core/devmem.c b/net/core/devmem.c
-> index d9de31a6cc7f..f81b700f1fd1 100644
-> --- a/net/core/devmem.c
-> +++ b/net/core/devmem.c
-> @@ -291,6 +291,7 @@ net_devmem_bind_dmabuf(struct net_device *dev,
->  			niov = &owner->area.niovs[i];
->  			niov->type = NET_IOV_DMABUF;
->  			niov->owner = &owner->area;
-> +			niov->desc.pp = NULL;
->  			page_pool_set_dma_addr_netmem(net_iov_to_netmem(niov),
->  						      net_devmem_get_dma_addr(niov));
->  			if (direction == DMA_TO_DEVICE)
-> diff --git a/net/core/netmem_priv.h b/net/core/netmem_priv.h
-> index 23175cb2bd86..fb21cc19176b 100644
-> --- a/net/core/netmem_priv.h
-> +++ b/net/core/netmem_priv.h
-> @@ -22,6 +22,12 @@ static inline void netmem_clear_pp_magic(netmem_ref netmem)
+>  err_disconnect_phy:
+> @@ -4032,13 +4033,6 @@ static void __stmmac_release(struct net_device *dev)
+>  	struct stmmac_priv *priv = netdev_priv(dev);
+>  	u32 chan;
 >  
->  static inline bool netmem_is_pp(netmem_ref netmem)
+> -	/* If the PHY or MAC has WoL enabled, then the PHY will not be
+> -	 * suspended when phylink_stop() is called below. Set the PHY
+> -	 * to its slowest speed to save power.
+> -	 */
+> -	if (device_may_wakeup(priv->device))
+> -		phylink_speed_down(priv->phylink, false);
+> -
+>  	/* Stop and disconnect the PHY */
+>  	phylink_stop(priv->phylink);
+>  
+> @@ -4078,6 +4072,13 @@ static int stmmac_release(struct net_device *dev)
 >  {
-> +	/* Use ->pp for net_iov to identify if it's pp, which requires
-> +	 * that non-pp net_iov should have ->pp NULL'd.
+>  	struct stmmac_priv *priv = netdev_priv(dev);
+>  
+> +	/* If the PHY or MAC has WoL enabled, then the PHY will not be
+> +	 * suspended when phylink_stop() is called below. Set the PHY
+> +	 * to its slowest speed to save power.
 > +	 */
-> +	if (netmem_is_net_iov(netmem))
-> +		return !!netmem_to_nmdesc(netmem)->pp;
+> +	if (device_may_wakeup(priv->device))
+> +		phylink_speed_down(priv->phylink, false);
 > +
->  	return (netmem_get_pp_magic(netmem) & PP_MAGIC_MASK) == PP_SIGNATURE;
->  }
+>  	__stmmac_release(dev);
 >  
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 1a5edec485f1..2756b78754b0 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -699,7 +699,13 @@ s32 page_pool_inflight(const struct page_pool *pool, bool strict)
->  void page_pool_set_pp_info(struct page_pool *pool, netmem_ref netmem)
->  {
->  	netmem_set_pp(netmem, pool);
-> -	netmem_or_pp_magic(netmem, PP_SIGNATURE);
-> +
-> +	/* For page-backed, pp_magic is used to identify if it's pp.
-> +	 * For net_iov, it's ensured nmdesc->pp is non-NULL if it's pp
-> +	 * and nmdesc->pp is NULL if it's not.
-> +	 */
-> +	if (!netmem_is_net_iov(netmem))
-> +		netmem_or_pp_magic(netmem, PP_SIGNATURE);
->  
->  	/* Ensuring all pages have been split into one fragment initially:
->  	 * page_pool_set_pp_info() is only called once for every page when it
-> @@ -714,7 +720,13 @@ void page_pool_set_pp_info(struct page_pool *pool, netmem_ref netmem)
->  
->  void page_pool_clear_pp_info(netmem_ref netmem)
->  {
-> -	netmem_clear_pp_magic(netmem);
-> +	/* For page-backed, pp_magic is used to identify if it's pp.
-> +	 * For net_iov, it's ensured nmdesc->pp is non-NULL if it's pp
-> +	 * and nmdesc->pp is NULL if it's not.
-> +	 */
-> +	if (!netmem_is_net_iov(netmem))
-> +		netmem_clear_pp_magic(netmem);
-> +
->  	netmem_set_pp(netmem, NULL);
->  }
->  
-> 
-> base-commit: e1f5bb196f0b0eee197e06d361f8ac5f091c2963
-> -- 
-> 2.17.1
+>  	phylink_disconnect_phy(priv->phylink);
+
 
