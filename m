@@ -1,138 +1,133 @@
-Return-Path: <netdev+bounces-229927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36D01BE21A1
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:13:30 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FA94BE21BC
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:15:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1B4C3A6EC2
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:13:28 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A521F3510A2
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6812B2EF65F;
-	Thu, 16 Oct 2025 08:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BD263002C4;
+	Thu, 16 Oct 2025 08:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pfwktXLk"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="pBEULoiR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD7819067C;
-	Thu, 16 Oct 2025 08:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA10248F7D;
+	Thu, 16 Oct 2025 08:15:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760602406; cv=none; b=tKKHRVvF1LRXBEj01UwE1M39/MeMMkvPjBon80BTOyEPgVmQVhnq7RA0r8JnQqDPIQUP9b5bEDXk4/m1mqcbV1cuOVmN+lgyfkp0IMhfN1dAohp4fn2iXPNGv9s1B8L/MUG+eJBKxMlKKS9JXH2/7Pk79h6SZHPwHIWMqrIj+G0=
+	t=1760602518; cv=none; b=dHB23W9qwf7uCJn8pjyveM1QCC3uG/ciYkAEWDwPpyY3saEwK0aPQWQcl7yoavGi11OqgTwH4FZph+WfMZXV+h/ATpEPnEKDx4GHU0532Uc/AU+kO5WGCMKFq1UGMFRbMkrwh4fBaSaThShuZjlYOzre7bwI1uXZBxIWxvLBJtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760602406; c=relaxed/simple;
-	bh=JRPlKX+eOfHCbEao1Pk+DQKZrPhLJMjawB7Jmn0nkuo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GXqxRV0FxcIhZPxXvpSSsS6fsmQSJdAOztF2D3EiupVf4SGQvNtZ2QqDGrTyBPqTRl+v62iSb+dZwSPmNjvcOzdULgNQ/qCtCERRgrMR6aKcCrzaBLztaCA72vPoPCWSa+WuF9Yg2tnQ8NK0/O2wzoUvQknuFON14m9QrBRuqbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pfwktXLk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14B94C4CEF1;
-	Thu, 16 Oct 2025 08:13:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760602404;
-	bh=JRPlKX+eOfHCbEao1Pk+DQKZrPhLJMjawB7Jmn0nkuo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pfwktXLkYCPsutEN4IMLIXWbPx1m+L2Pl1atPbDyhlQX9pB1k+ZnjDZ/wA/P3xM8R
-	 kZCQCiHgfvBb9xDNz7Prt6yHDUWZvQspwERNPPZEiS3CgAM0FHMlp2lXY79JBWFJA8
-	 5YYTSXrTlx2OqiDhBZrneODysIG/64H2YrLHdpAySXZi4zllPE3BFuaDJTOW20/QOb
-	 fb1tZNXuB6Qa2Hmwv3Bz5ikljnsPGEYX8irH4mli3cV1TPoKfhMUKgKUBpsaXOmuK3
-	 R80BM53DWbzjr7BrqJPj2xsGT+r9PeGnzl0BhJtWXl5aP6KbKA0kmNpVemnXHlwwQj
-	 yw7AhCajfDWVg==
-Date: Thu, 16 Oct 2025 10:13:21 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 08/12] net: airoha: ppe: Configure SRAM PPE
- entries via the cpu
-Message-ID: <aPCpIS1Hd4hIb20q@lore-desk>
-References: <20251015-an7583-eth-support-v1-0-064855f05923@kernel.org>
- <20251015-an7583-eth-support-v1-8-064855f05923@kernel.org>
- <aO_CFRYy6vXCQIS2@horms.kernel.org>
+	s=arc-20240116; t=1760602518; c=relaxed/simple;
+	bh=qsr1nVJV6SCeROqWZZrDkXqfhgt8sdr2zuj6CMu9BbI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cueMQ79VV6s900ZOXqRrtEJf+XBfTKROqXROlBtwCyGuD82F/nBHi1dIFpy8mqiTU7cngepADGaIwX9VpHO92We/6l26HKTzhYepJQ7CcBmc6F2cdxwP4K2WG1P8ipmkt0cZRyo2KBvOS3XmuYMSd5Aa+iZQcH8TsO9ZXF4xTxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=pBEULoiR; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 0847F4E410F3;
+	Thu, 16 Oct 2025 08:15:13 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id D17616062C;
+	Thu, 16 Oct 2025 08:15:12 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id ACE2B102F22B9;
+	Thu, 16 Oct 2025 10:14:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1760602512; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=dXsurt/UB6adbtX7xqXZLThjuVgu/eCgnHbY5gWKelw=;
+	b=pBEULoiRmAouS3SHUlKOJyrqWJ1t2pWZMEbbaVEaGbDYSH8OzKzPbTtL5dRUoMhvF95Czb
+	2A5X4dM7SfrhDOhll7Qjw/V3SmjgkR3m0USf630ew4Kns4/6FGHU/Sy527JAvABxPeBc53
+	tEqrPxK2eGLRHIF2YDaF0FGQTOdf5Jp+vf1PKMPgca8yso8uIL3nlUP7lQ7jhH3f6k/IU3
+	GtTcWvhzBu8exiUKbVHyINlfRkh8a/F7HLdPego1MiE4fuabbF4MyWu2ZkNz0FFkCPLrRJ
+	KOizvsmFFq+vZVxJOQxaPLAAiy0mCHeWPQulGTJZGpUL73FZIkidBmQbw32sJw==
+Message-ID: <328d5953-aec3-4a1e-b2e3-268155793996@bootlin.com>
+Date: Thu, 16 Oct 2025 10:14:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vAW4T/rTlIVRq6th"
-Content-Disposition: inline
-In-Reply-To: <aO_CFRYy6vXCQIS2@horms.kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/3] net: stmmac: Add support for coarse
+ timestamping
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
+ <20251015145519.280b6263@kmaincent-XPS-13-7390>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251015145519.280b6263@kmaincent-XPS-13-7390>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
+Hi,
 
---vAW4T/rTlIVRq6th
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 15/10/2025 14:55, Kory Maincent wrote:
+> On Wed, 15 Oct 2025 12:27:20 +0200
+> Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+> 
+>> Hello everyone,
+>>
+>> This is another attempt to support the fine vs coarse timestamping modes
+>> in stmmac.
+>>
+>> This mode allows trading off PTP clock frequency adjustment precision
+>> versus timestamping precision.
+>>
+>> In coarse mode, we lose the ability to fine-tune the PTP clock
+>> frequency, but get better timestamping precision instead. This is
+>> especially useful when acting as a PTP Grand Master, where the PTP clock
+>> in sync'd to a high-precision GPS clock through PPS inputs.
+>>
+>> This has been submitted before as a dedicated ioctl() back in 2020 [1].
+>> Since then, we now have a better representation of timestamp providers
+>> with a dedicated qualifier (approx vs precise).
+>>
+>> This series attempts to map these new qualifiers to stmmac's
+>> timestamping modes, see patch 2 for details.
+>>
+>> The main drawback IMO is that the qualifiers don't map very well to our
+>> timestamping modes, as the "approx" qualifier actually maps to stmmac's
+>> "coars" mode, but we actually gain in timestamping precision (while
+>> losing frequency precision).
+> 
+> https://elixir.bootlin.com/linux/v6.17.1/source/include/uapi/linux/net_tstamp.h#L16
+> "approx" was initially added for DMA timestamp point.
+> Maybe we should add a new enum value here with a more suitable name.
 
-> On Wed, Oct 15, 2025 at 09:15:08AM +0200, Lorenzo Bianconi wrote:
-> > Introduce airoha_ppe_foe_commit_sram_entry routine in order to configure
-> > the SRAM PPE entries directly via the CPU instead of using the NPU APIs.
-> > This is a preliminary patch to enable netfilter flowtable hw offload for
-> > AN7583 SoC.
-> >=20
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> >  drivers/net/ethernet/airoha/airoha_ppe.c | 30 +++++++++++++++++++++++-=
-------
-> >  1 file changed, 23 insertions(+), 7 deletions(-)
-> >=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/eth=
-ernet/airoha/airoha_ppe.c
-> > index fcfd2d8826a9c2f8f94f1962c2b2a69f67f7f598..0ee2e41489aaa9de9c1e99d=
-242ee0bec11549750 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_ppe.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-> > @@ -662,6 +662,27 @@ static bool airoha_ppe_foe_compare_entry(struct ai=
-roha_flow_table_entry *e,
-> >  	return !memcmp(&e->data.d, &hwe->d, len - sizeof(hwe->ib1));
-> >  }
-> > =20
-> > +static int airoha_ppe_foe_commit_sram_entry(struct airoha_ppe *ppe, u3=
-2 hash)
-> > +{
-> > +	struct airoha_foe_entry *hwe =3D ppe->foe + hash * sizeof(*hwe);
-> > +	bool ppe2 =3D hash >=3D PPE_SRAM_NUM_ENTRIES;
-> > +	u32 *ptr =3D (u32 *)hwe, val;
-> > +	int i;
-> > +
-> > +	for (i =3D 0; i < sizeof(*hwe) / 4; i++)
-> > +		airoha_fe_wr(ppe->eth, REG_PPE_RAM_ENTRY(ppe2, i), ptr[i]);
->=20
-> I realise that a similar pattern it is already used elsewhere,
-> but '4' seems somewhat magic here.
+Yeah, the terminology in stmmac of "coarse/fine" refers to frequency adjustment, while
+the "fine/approx" qualifiers refer to timestamping.
 
-ack, I will fix it in v2.
+I'm OK to add a new value, with the usual risk of seeing the number of qualifiers
+explode if different hardware to that in different ways.
 
-Regards,
-Lorenzo
+I suggest keeping "precise" for the default mode, and maybe use "enhanced" or
+a similar term that would imply that the improved precision is done at the expense
+of some some other aspect of the system (and therefore probably not
+suitable as a default).
 
->=20
-> ...
+Maybe Richard can shed some light on that ?
 
---vAW4T/rTlIVRq6th
-Content-Type: application/pgp-signature; name=signature.asc
+> Regards,
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaPCpIQAKCRA6cBh0uS2t
-rKdgAPsH0ww4Hrlelb1QuqnLD1TGZZFr8UF1MNUoTOTwV+4gHgD/UrxDeNf2dARc
-ohcbUBc9rlkS5/IM2e7+vMYWUg5PBgA=
-=J4PD
------END PGP SIGNATURE-----
-
---vAW4T/rTlIVRq6th--
 
