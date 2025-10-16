@@ -1,148 +1,109 @@
-Return-Path: <netdev+bounces-229883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BBE9BE1B74
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:26:54 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AC8BBE1C2F
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:36:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2DC5D4E7AEE
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 06:26:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 52DEA4F98EC
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 06:34:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FBD42D3A60;
-	Thu, 16 Oct 2025 06:26:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8192E11DD;
+	Thu, 16 Oct 2025 06:34:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="NEU+OE59"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Uh0P1Cr/"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F902D3EDC;
-	Thu, 16 Oct 2025 06:26:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F164F2DF131
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 06:34:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760596008; cv=none; b=AsvObmaGvx1FuzEVsiELobf18A3ntoZe0kayXX+FgTMJJ3qZ1djLNHFF74rrtcU936xZ8gOvHTEgyX01LnQ3YFPyKdsnqTDaWaVQnUV6G5SPkXuc6AgZpgV+Z68FpQWKn0MCBlDJT73j7nQzZQYZOpXqtoVhHtBThZchtRQQ/VE=
+	t=1760596448; cv=none; b=LuTob7YtembD37uV/emIPl8Vxw2aZ8cCwphTpsFOMeiS3m37mWKpoZPYwY7HtqGRssANtqDxSGlDiSTypYwjE/bo9k5bfZlVbG+sH80pAoZzxuDRIdj+2Zv3omP7ixipVPQs96dAWWBMOyNT3e22Q3OC56oLsZAKkgKMTUDXesE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760596008; c=relaxed/simple;
-	bh=kVgWRoBfU0SLiUylqnXf18m5/a7RY8bkCfvlPxEzIDg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=lMXnYDNNxzXZGND1Aqui5BXKYCFoQ7vq902m44wMeR9pSTwiTeMAGTLZgwDrRAcstRHLtr2zQHP3lj0QFmouAaXWGb+s3054hdP/3lo32o20AIY8zpZe8Yd7A5qbImYKZzVdW6DhWR7x92Vs/As88G0muC3yes01xjfKcRTSLGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=NEU+OE59; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=OVT+nSnFu6sG2HJ2rpfjozyiBbIZjchaX39jShXiZSQ=;
-	b=NEU+OE59kLCV3ynrfXIGLvqEpCZmndqu0gWuAOma5gCQDUoSQBGpAFovtepfu2DFRRZdDdLIK
-	cWbFkl19fnKzyF69YCjH2zSOiWNsADPQ+fHhW2WyR175gz5AAc9xyIekvSdH+0YTZnTru3qzkqn
-	alPb9LI51FxlG/TV5BO6ssY=
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4cnHyR2rhGz12LDs;
-	Thu, 16 Oct 2025 14:25:51 +0800 (CST)
-Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0CE67140258;
-	Thu, 16 Oct 2025 14:26:36 +0800 (CST)
-Received: from [10.174.177.19] (10.174.177.19) by
- dggpemf500016.china.huawei.com (7.185.36.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 16 Oct 2025 14:26:35 +0800
-Message-ID: <bcb84f88-4bdd-4095-b5ea-e806e7733a54@huawei.com>
-Date: Thu, 16 Oct 2025 14:26:33 +0800
+	s=arc-20240116; t=1760596448; c=relaxed/simple;
+	bh=VEy4lKjwzIklg0qO6uNzy16XTRzQMSVrKqJuhusF6jw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OMbqnlyy80c91sAeS97xpUu0dDT0Biyp4ASYEA7O+CCZjWcK7D+Z3zJkXueIadDZAe9jQlOamFH+XGP9bbNAzyMwLICMaqZqvdDiIE5R4T4Kw0pfmBjV8dJT4/mAp/kTJh33xnZdlxjJ8jTX22gaXP6ULRMyncJMtelRwboC29U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Uh0P1Cr/; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 8ACD521244DF; Wed, 15 Oct 2025 23:34:06 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8ACD521244DF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1760596446;
+	bh=fzHMrBYmZnPHoKv8/rgGHN9a8qxUkkSk3cn/JACTU78=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Uh0P1Cr/vCUEZW42UCCGfG8KOHxfXEXoIEC7IlQ9jfGJCSFwBj0Fk0hs2vKoDVrV8
+	 pVRCJT67vq08DLCqrWLlPBeMFib1Hd0iB7AFpNrfEl5p7jZeh4ScPmVEaSSurxvL/Z
+	 1Gg2IdqS4ScOlNXuFxi8XFXkMtI0rSJrbCUhTsuc=
+Date: Wed, 15 Oct 2025 23:34:06 -0700
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: stephen@networkplumber.org, dsahern@gmail.com, netdev@vger.kernel.org
+Cc: haiyangz@microsoft.com, shradhagupta@linux.microsoft.com,
+	ssengar@microsoft.com, dipayanroy@microsoft.com,
+	ernis@microsoft.com
+Subject: Re: [PATCH iproute2-next v4] netshaper: Add netshaper command
+Message-ID: <20251016063406.GA17762@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1759835174-5981-1-git-send-email-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next] net: drop_monitor: Add debugfs support
-To: Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>, Simon
- Horman <horms@kernel.org>
-CC: <nhorman@tuxdriver.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
-	<zhangchangzhong@huawei.com>
-References: <20251015101417.1511732-1-wangliang74@huawei.com>
- <CANn89iLZBMWpU7kMjd8akT+L8FbsnO+wqgjCaXF2KOCFz9Hiag@mail.gmail.com>
-From: Wang Liang <wangliang74@huawei.com>
-In-Reply-To: <CANn89iLZBMWpU7kMjd8akT+L8FbsnO+wqgjCaXF2KOCFz9Hiag@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- dggpemf500016.china.huawei.com (7.185.36.197)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1759835174-5981-1-git-send-email-ernis@linux.microsoft.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
+On Tue, Oct 07, 2025 at 04:06:14AM -0700, Erni Sri Satya Vennela wrote:
+> Add support for the netshaper Generic Netlink family to
+> iproute2. Introduce a new command for configuring netshaper
+> parameters directly from userspace.
+> 
+> This interface allows users to set shaping attributes which
+> are passed to the kernel to perform the corresponding netshaper
+> operation.
+> 
+> Example usage:
+> $netshaper { set | show | delete } dev DEV \
+>            handle scope SCOPE [id ID] \
+>            [ bw-max BW_MAX ]
+> 
+> Internally, this triggers a kernel call to apply the shaping
+> configuration to the specified network device.
+> 
+> Currently, the tool supports the following functionalities:
+> - Setting bandwidth in Mbps, enabling bandwidth clamping for
+>   a network device that support netshaper operations.
+> - Deleting the current configuration.
+> - Querying the existing configuration.
+> 
+> Additional netshaper operations will be integrated into the tool
+> as per requirement.
+> 
+> This change enables easy and scriptable configuration of bandwidth
+> shaping for devices that use the netshaper Netlink family.
+> 
+> Corresponding net-next patches:
+> 1) https://lore.kernel.org/all/cover.1728460186.git.pabeni@redhat.com/
+> 2) https://lore.kernel.org/lkml/1750144656-2021-1-git-send-email-ernis@linux.microsoft.com/
+> 
+> Install pkg-config and libmnl* packages to print kernel extack
+> errors to stdout.
+> 
+> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
 
-在 2025/10/15 18:40, Eric Dumazet 写道:
-> On Wed, Oct 15, 2025 at 2:51 AM Wang Liang <wangliang74@huawei.com> wrote:
->> This patch add debugfs interfaces for drop monitor. Similar to kmemleak, we
->> can use the monitor by below commands:
->>
->>    echo clear > /sys/kernel/debug/drop_monitor/trace
->>    echo start > /sys/kernel/debug/drop_monitor/trace
->>    echo stop  > /sys/kernel/debug/drop_monitor/trace
->>    cat /sys/kernel/debug/drop_monitor/trace
->>
->> The trace skb number limit can be set dynamically:
->>
->>    cat /sys/kernel/debug/drop_monitor/trace_limit
->>    echo 200 > /sys/kernel/debug/drop_monitor/trace_limit
->>
->> Compare to original netlink method, the callstack dump is supported. There
->> is a example for received udp packet with error checksum:
->>
->>    reason   : UDP_CSUM (11)
->>    pc       : udp_queue_rcv_one_skb+0x14b/0x350
->>    len      : 12
->>    protocol : 0x0800
->>    stack    :
->>      sk_skb_reason_drop+0x8f/0x120
->>      udp_queue_rcv_one_skb+0x14b/0x350
->>      udp_unicast_rcv_skb+0x71/0x90
->>      ip_protocol_deliver_rcu+0xa6/0x160
->>      ip_local_deliver_finish+0x90/0x100
->>      ip_sublist_rcv_finish+0x65/0x80
->>      ip_sublist_rcv+0x130/0x1c0
->>      ip_list_rcv+0xf7/0x130
->>      __netif_receive_skb_list_core+0x21d/0x240
->>      netif_receive_skb_list_internal+0x186/0x2b0
->>      napi_complete_done+0x78/0x190
->>      e1000_clean+0x27f/0x860
->>      __napi_poll+0x25/0x1e0
->>      net_rx_action+0x2ca/0x330
->>      handle_softirqs+0xbc/0x290
->>      irq_exit_rcu+0x90/0xb0
->>
->> It's more friendly to use and not need user application to cooperate.
->> Furthermore, it is easier to add new feature. We can add reason/ip/port
->> filter by debugfs parameters, like ftrace, rather than netlink msg.
-> I do not understand the fascination with net/core/drop_monitor.c,
-> which looks very old school to me,
-> and misses all the features,  flexibility, scalability  that 'perf',
-> eBPF tracing, bpftrace, .... have today.
->
-> Adding  /sys/kernel/debug/drop_monitor/* is even more old school.
->
-> Not mentioning the maintenance burden.
->
-> For me the choice is easy :
->
-> # CONFIG_NET_DROP_MONITOR is not set
->
-> perf record -ag -e skb:kfree_skb sleep 1
->
-> perf script # or perf report
+Hi,
 
+Just following up on the patch I sent last week. I wanted to check
+if you have had a chance to look at it. Please let me know if any
+changes are needed or if I should resend it. I appreciate your time and
+feedback.
 
-Thank you for taking time to review this patch!
-
-My initially thought was that the drop_monitor may cover more drop
-positions (not just kfree_skb), show more skb info, filter skb by ip/port
-debugfs parameter (not support now), and not need userspace tools.
-
-Currently perf is indeed a better choice, adding debugfs is not necessary.
-
-Thanks!
-
+Thanks,
+Vennela
 
