@@ -1,174 +1,177 @@
-Return-Path: <netdev+bounces-230080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98FA0BE3BB3
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:35:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 04E12BE3BC3
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:37:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4484C3AD5C8
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:35:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B37443B120E
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C1F3002C9;
-	Thu, 16 Oct 2025 13:35:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8A81527B4;
+	Thu, 16 Oct 2025 13:37:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bQVVlQgx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CAcKDf88"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81061A9FB8;
-	Thu, 16 Oct 2025 13:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91E1CA6F
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 13:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760621744; cv=none; b=ZOtpHvebjfU4ZBbS6OentjMPSydcOvjOXr/ayFmJ29FsgTfASnLcJYPDV6+D/MJrrMbCeKUGhvCaKDAaqqw0pnhVyEl9aGEMLwnHr9KBMcNFd6vhGDdOq5Hzhpc80XYhm2jmUomOXTMS84FW9JGvPUqCyk+Uo/QoVDGDwDvdajo=
+	t=1760621831; cv=none; b=Kde23g+iGO6NPuigd8W4gqy/gI9PC8YuS/XNKrNUVZxp5mjtQhNiy8OKiYVrO5qAfk20zH3jDdnVbQqK9fmn7lqt5nbGMoZNGUuiznaGp6v3uFZUQ5TWu87Ckxxw4XSpxLCy3LRKPZO+PgdCRCBmkgYtJwLNuILQ1UYsowNYkCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760621744; c=relaxed/simple;
-	bh=uVLfA/RBOmQsVeqL02JYX9sISssQUPD4hxqKMzdK9M8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X68BIBZ70t6qgELKLkz5WAcB7MPtmlLgHP4EEv0u2kRHDkFj5kOrfrm3kVoh8YZXXQdLeK1yxJfaiiMjMU7mZz5GQeUNJFVahHOsnGj9ymFZjZdKUZ7Gr5dgA/QJpRMvIq146TP8dyB/YQOHp4g3kfoYxpIVN8oUS+EYFG9t2XA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bQVVlQgx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0288C4CEF1;
-	Thu, 16 Oct 2025 13:35:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760621744;
-	bh=uVLfA/RBOmQsVeqL02JYX9sISssQUPD4hxqKMzdK9M8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bQVVlQgxUIPx3WLdYZ5giKoSRi26akxuVGXZdZBq/Axa0qzIttqHh2a4h1ikKPn9S
-	 5W2Bn6eRg2IslmGJmignqA7IoN9S1kkAazagPN1A8W9WYlPwYqEjx51NUT98AjK4KC
-	 YWi/5WDvGOdd1V0jpHSk/T9TrYMJ/QbCC8HTXGBOgtFAvOqoeT3zJzXJITri/8aXZA
-	 xO4WWmfALpoZRdif3yNael94cPvuDx3rCt8BZwL3WbS1cGVb00irkAPgU1LNtkGL3W
-	 LS1tBXTYhtL+njctSeml5LnukOE5mjNE25DYr77Gjq7nWgf/12KspdCNg9svNW5MQ1
-	 Zjv9dcmJ5ccog==
-Date: Thu, 16 Oct 2025 14:35:39 +0100
-From: Simon Horman <horms@kernel.org>
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: mjambigi@linux.ibm.com, wenjia@linux.ibm.com, wintera@linux.ibm.com,
-	dust.li@linux.alibaba.com, tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com, kuba@kernel.org, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
-	sidraya@linux.ibm.com, jaka@linux.ibm.com
-Subject: Re: [PATCH net-next] net/smc: add full IPv6 support for SMC
-Message-ID: <aPD0qwDoYNoTTaur@horms.kernel.org>
-References: <20251016054541.692-1-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1760621831; c=relaxed/simple;
+	bh=N4F8FRAqLTwTh+GkfGRyW0rjmoUD8mBDEsVpYXMrW1k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iEKbOg8g5VjMbVE8utOL/4SSlm9mRY4LVa12MF/Uher/QqrUl4/RGrxpTHGpe1IsMmdPuOyAj/aiZRvW2TROhwlrhJSQwtGrhqs9aoJP8BlKM5ARszGA1ZqCCbgAMYcreINtDyidP3yfXiMdzi2BK7YcB42q31rR354qvdvDSbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CAcKDf88; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-7e3148a8928so10358886d6.2
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 06:37:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760621828; x=1761226628; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tAZcdeK/xU+S/VhcXVMo554urSW0WUUc1ISGU3vEFIY=;
+        b=CAcKDf88jE1Cdw5GwMUHq/yHB0+WktTyvaeOr0t4J2M9A28vGNGrisbKBlREVqTHsY
+         +lsiY1s9G9fIOnE9wdAjocCQ0lT+4FS/UzLde5RWMea1C7H/Il5KjWLYiGuUoL0o65VA
+         O8/JiL8fVq6r+bUFOO7+ezsW9g4BMSxAk5WpCsv+zkqsRJG6iSQTaiGPFI632XjGslR8
+         k0+3zXS0CrKHegXBsm3MC9yC++wXoJauomFQRzNYid2Pe1RD24sQKjlGPJV9P1/pt46X
+         DYKybfNuVULusdMhyeTIItFjZvAVoeIw+JpnRwLaf459mSzBIU/kBdkf0rvT3QbwFVlb
+         YcGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760621828; x=1761226628;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tAZcdeK/xU+S/VhcXVMo554urSW0WUUc1ISGU3vEFIY=;
+        b=cj3zY5xZyDRwIeLTEVguB3DWDXPgvIU80YJYjvoLechi5691UB5QMFFIlIVJlKzygm
+         Tb0v8fk5aGpelAA7vlaKc8tx/kUDWNB4WRz+CRiVJZkCMICHNj/OPStGll7BQXW/+Vd1
+         1gT4TpIDPpv/8X+dqArF04PHHVCutIyjHqfVaABiCq/kjYH4KQwG+8ODnutNR0yjT0Cz
+         5lB4NTMknWBnvhEAPKI9MBvQDaD7RO3xET8PX/MVGV2JaGRoLtDTWIxM9O4VamDsFZmi
+         KGjlloLTWdXYZ8sNAvtPeQu5h+rSsqSnEotYiV6qgRW6Ni0H4O6NSh1w0r5STXsefvA0
+         nSYw==
+X-Forwarded-Encrypted: i=1; AJvYcCX/SAdx3e/fQ3yQs3Iw/kZUik5UJSEKToJo5X0ZDIRy5Reu3lfsiMw0x2sAbP/gaAzxfRxM22I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyayHwQf7rjVpptmapisS/6y1npASIqPhnpojIxSw/SuhR/uw0S
+	oRz2rUbD2vWv56dS63yyyaABoT/x0i/Sv9Yt4n6VHVrqaOeNnGAV3MDEpCvqZnfITMR8BjJ3HWW
+	HRvBq6AqZa4ZY3Gro/vRT+Ra2yG81YLMzeZrLX4uv
+X-Gm-Gg: ASbGncti2mDpVTUk7GFqZcjWrsDmoOOQtAnvsOA1amgw7zwCcDip2GyVAIrTsFgagnc
+	4OJEmPwDgDJkx0Do3XXtNYqqBijiHD6yinTvmExsArNJhlPM0XfqvBWkNhDx4AUDmLCDTlABiUs
+	wqsXFYudAHCfrhsOLPUDlSAjvorb/J1aa9wAjfAJK2Y/sXFsE6EynpJGDf37xZRA/jFx7d6AUhs
+	oFhUj2QRkZAR7QwfKN5Mq5qGrTpmbQV/KgwUINvwObaSGPMdhRjbiePqXwVlK1CQO9dShmzPnRZ
+	TL8=
+X-Google-Smtp-Source: AGHT+IFzD5eIw2s5D6MVnUdNdA0OsGxbsZRPNWq+ZjDDp3TolyfEK8CxB6JGiMgyQ4SGjbL8m25dgDcXoNuPMvW7Kgg=
+X-Received: by 2002:ac8:5953:0:b0:4e8:944a:5e4d with SMTP id
+ d75a77b69052e-4e89d3de4bfmr1873591cf.63.1760621827124; Thu, 16 Oct 2025
+ 06:37:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251016054541.692-1-alibuda@linux.alibaba.com>
+References: <20251015233801.2977044-1-edumazet@google.com> <e3ecac24-c216-47ac-92a6-657595031bee@intel.com>
+ <CANn89i+birOC7FA9sVtGQNxqQvOGgrY3ychNns7g-uEdOu5p5w@mail.gmail.com>
+ <73aeafc5-75eb-42dc-8f26-ca54dc7506da@intel.com> <CANn89i+mnGg9WRCJG82fTRMtit+HWC0e7FrVmmC-JqNQEuDArw@mail.gmail.com>
+ <CANn89iKBYdc6r5fYi-tCqgjD99T=YXcrUiuuPQA9K1nXbtGnBA@mail.gmail.com>
+In-Reply-To: <CANn89iKBYdc6r5fYi-tCqgjD99T=YXcrUiuuPQA9K1nXbtGnBA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 16 Oct 2025 06:36:55 -0700
+X-Gm-Features: AS18NWA2qAUC9_l_rGaVjpNFnMzotPZbNbm3A2XtOQ2697y7ALlbiNFLW0dEkpU
+Message-ID: <CANn89iJo-b=B7jUtbazcCtgKJrnbgdEXJ-OPvOwFziP_OSLaYA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: shrink napi_skb_cache_put()
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 16, 2025 at 01:45:41PM +0800, D. Wythe wrote:
-> The current SMC implementation is IPv4-centric. While it contains a
-> workaround for IPv4-mapped IPv6 addresses, it lacks a functional path
-> for native IPv6, preventing its use in modern dual-stack or IPv6-only
-> networks.
-> 
-> This patch introduces full, native IPv6 support by refactoring the
-> address handling mechanism to be IP-version agnostic, which is
-> achieved by:
-> 
-> - Introducing a generic `struct smc_ipaddr` to abstract IP addresses.
-> - Implementing an IPv6-specific route lookup function.
-> - Extend GID matching logic for both IPv4 and IPv6 addresses
-> 
-> With these changes, SMC can now discover RDMA devices and establish
-> connections over both native IPv4 and IPv6 networks.
-> 
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> ---
->  net/smc/af_smc.c   |  35 +++++++----
->  net/smc/smc_core.h |  40 ++++++++++++-
->  net/smc/smc_ib.c   | 143 ++++++++++++++++++++++++++++++++++++++-------
->  net/smc/smc_ib.h   |   9 +++
->  net/smc/smc_llc.c  |   6 +-
->  5 files changed, 193 insertions(+), 40 deletions(-)
-> 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 77b99e8ef35a..cbff0b29ad5b 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -1132,12 +1132,9 @@ static int smc_find_proposal_devices(struct smc_sock *smc,
->  
->  	/* check if there is an rdma v2 device available */
->  	ini->check_smcrv2 = true;
-> -	ini->smcrv2.saddr = smc->clcsock->sk->sk_rcv_saddr;
-> +
-> +	smc_ipaddr_from(&ini->smcrv2.saddr, smc->clcsock->sk, sk_rcv_saddr, sk_v6_rcv_saddr);
+On Thu, Oct 16, 2025 at 6:29=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Thu, Oct 16, 2025 at 5:56=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Thu, Oct 16, 2025 at 4:08=E2=80=AFAM Alexander Lobakin
+> > <aleksander.lobakin@intel.com> wrote:
+> > >
+> > > From: Eric Dumazet <edumazet@google.com>
+> > >
+> > > BTW doesn't napi_skb_cache_get() (inc. get_bulk()) suffer the same wa=
+y?
+> >
+> > Probably, like other calls to napi_skb_cache_put(()
+> >
+> > No loop there, so I guess there is no big deal.
+> >
+> > I was looking at napi_skb_cache_put() because there is a lack of NUMA a=
+wareness,
+> > and was curious to experiment with some strategies there.
+>
+> If we cache kmem_cache_size() in net_hotdata, the compiler is able to
+> eliminate dead code
+> for CONFIG_KASAN=3Dn
+>
+> Maybe this looks better ?
 
-Hi,
+No need to put this in net_hotdata, I was distracted by a 4byte hole
+there, we can keep this hole for something  hot later.
 
-Unfortunately this introduces a compilation error when CONFIG_IPV6=n.
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index bc12790017b0b5c0be99f8fb9d362b3730fa4eb0..f3b9356bebc06548a055355c5d1=
+eb04c480f813f
+100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -274,6 +274,8 @@ void *__netdev_alloc_frag_align(unsigned int
+fragsz, unsigned int align_mask)
+ }
+ EXPORT_SYMBOL(__netdev_alloc_frag_align);
 
-In file included from smc_wr.h:20,
-                 from smc_llc.h:16,
-                 from af_smc.c:47:
-af_smc.c: In function ‘smc_find_proposal_devices’:
-/home/horms/projects/linux/linux/include/net/sock.h:388:37: error: ‘struct sock_common’ has no member named ‘skc_v6_rcv_saddr’; did you mean ‘skc_rcv_saddr’?
-  388 | #define sk_v6_rcv_saddr __sk_common.skc_v6_rcv_saddr
-      |                                     ^~~~~~~~~~~~~~~~
-smc_core.h:639:51: note: in definition of macro ‘smc_ipaddr_from’
-  639 |                         __ipaddr->addr_v6 = __sk->_v6_member;   \
-      |                                                   ^~~~~~~~~~
-af_smc.c:1136:77: note: in expansion of macro ‘sk_v6_rcv_saddr’
- 1136 |         smc_ipaddr_from(&ini->smcrv2.saddr, smc->clcsock->sk, sk_rcv_saddr, sk_v6_rcv_saddr);
-      |                                                                             ^~~~~~~~~~~~~~~
++u32 skbuff_cache_size __read_mostly;
++
+ static struct sk_buff *napi_skb_cache_get(void)
+ {
+        struct napi_alloc_cache *nc =3D this_cpu_ptr(&napi_alloc_cache);
+@@ -293,7 +295,7 @@ static struct sk_buff *napi_skb_cache_get(void)
 
->  	if (!(ini->smcr_version & SMC_V2) ||
-> -#if IS_ENABLED(CONFIG_IPV6)
-> -	    (smc->clcsock->sk->sk_family == AF_INET6 &&
-> -	     !ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)) ||
-> -#endif
->  	    !smc_clc_ueid_count() ||
->  	    smc_find_rdma_device(smc, ini))
->  		ini->smcr_version &= ~SMC_V2;
+        skb =3D nc->skb_cache[--nc->skb_count];
+        local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
+-       kasan_mempool_unpoison_object(skb,
+kmem_cache_size(net_hotdata.skbuff_cache));
++       kasan_mempool_unpoison_object(skb, skbuff_cache_size);
 
-...
+        return skb;
+ }
+@@ -1428,7 +1430,7 @@ static void napi_skb_cache_put(struct sk_buff *skb)
+        if (unlikely(nc->skb_count =3D=3D NAPI_SKB_CACHE_SIZE)) {
+                for (i =3D NAPI_SKB_CACHE_HALF; i < NAPI_SKB_CACHE_SIZE; i+=
++)
+                        kasan_mempool_unpoison_object(nc->skb_cache[i],
+-
+kmem_cache_size(net_hotdata.skbuff_cache));
++                                               skbuff_cache_size);
 
-> @@ -2307,8 +2316,10 @@ static void smc_find_rdma_v2_device_serv(struct smc_sock *new_smc,
->  	memcpy(ini->peer_mac, pclc->lcl.mac, ETH_ALEN);
->  	ini->check_smcrv2 = true;
->  	ini->smcrv2.clc_sk = new_smc->clcsock->sk;
-> -	ini->smcrv2.saddr = new_smc->clcsock->sk->sk_rcv_saddr;
-> -	ini->smcrv2.daddr = smc_ib_gid_to_ipv4(smc_v2_ext->roce);
-> +
-> +	smc_ipaddr_from(&ini->smcrv2.saddr, new_smc->clcsock->sk, sk_rcv_saddr, sk_v6_rcv_saddr);
-> +	smc_ipaddr_from_gid(&ini->smcrv2.daddr, smc_v2_ext->roce);
-> +
->  	rc = smc_find_rdma_device(new_smc, ini);
->  	if (rc) {
->  		smc_find_ism_store_rc(rc, ini);
-
-> diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
-
-...
-
-> @@ -618,4 +626,30 @@ static inline struct smc_link_group *smc_get_lgr(struct smc_link *link)
->  {
->  	return link->lgr;
->  }
-> +
-> +#define smc_ipaddr_from(_ipaddr, _sk, _v4_member, _v6_member)	\
-> +	do {							\
-> +		struct smc_ipaddr *__ipaddr = (_ipaddr);	\
-> +		struct sock *__sk = (_sk);			\
-> +		int __family = __sk->sk_family;			\
-> +		__ipaddr->family = __family;			\
-> +		if (__family == AF_INET)			\
-> +			__ipaddr->addr = __sk->_v4_member;	\
-> +		else						\
-> +			__ipaddr->addr_v6 = __sk->_v6_member;	\
-> +	} while (0)
-> +
-
-...
-
--- 
-pw-bot: changes-requested
+                kmem_cache_free_bulk(net_hotdata.skbuff_cache,
+NAPI_SKB_CACHE_HALF,
+                                     nc->skb_cache + NAPI_SKB_CACHE_HALF);
+@@ -5116,6 +5118,8 @@ void __init skb_init(void)
+                                              offsetof(struct sk_buff, cb),
+                                              sizeof_field(struct sk_buff, =
+cb),
+                                              NULL);
++       skbuff_cache_size =3D kmem_cache_size(net_hotdata.skbuff_cache);
++
+        net_hotdata.skbuff_fclone_cache =3D
+kmem_cache_create("skbuff_fclone_cache",
+                                                sizeof(struct sk_buff_fclon=
+es),
+                                                0,
 
