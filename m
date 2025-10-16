@@ -1,159 +1,135 @@
-Return-Path: <netdev+bounces-230084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 572AEBE3CF0
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:52:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAA12BE3CF9
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:53:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D064D19A7565
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:52:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 903F25E00E4
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25DF2E1742;
-	Thu, 16 Oct 2025 13:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF23339B2D;
+	Thu, 16 Oct 2025 13:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0+dTZXBd"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="mg/vQ8BW";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="G23nErzP"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86242DF141;
-	Thu, 16 Oct 2025 13:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509E032861F
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 13:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760622742; cv=none; b=r0DFwYrCPn9XZ60FzhNC+HHakHV1KjcVkN5aAriiVGH5R2BU2mUmK0M4SonFN+U4wC5+75YSDHXjvQouDHP1oAfSLVLXHgSFMTYefYfNMzQ46l5fln2AsXGB/ZenAUEOObhBZCR/ngfuTdnXSCvBRiWYcOpbTOMD0abr4oDWLz0=
+	t=1760622792; cv=none; b=WN+25wQmczsstWT/mK1NQHRGSMnSgQI9bzZffpf22y8Ihu7nralAu9CvYqcAodUBrCvPyAYkPCHGS5bOdN8y5H1v34ejhdfXUDGA7cveZGY+AMk0+zLEevQ0+VftTQy71Niji4NSgZTg8KvCjpw+GiVUgXSHg7r9TnPs4WYd5JI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760622742; c=relaxed/simple;
-	bh=ULeaJJUMe/wC90ReLYUVCqTHShIiS1YZvkS1YfAkp5s=;
+	s=arc-20240116; t=1760622792; c=relaxed/simple;
+	bh=jyB3XOIgKME9GMRVN/IyZUE8KD/u+jyMQFbsp8NIwAU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fl5rsVGGz4GXijoowVxjxUFNxl7MyOg9GVASRKXOgxr9aPnJa+aCI9lJej+9BUANUPZ6bwWAWyhKiUhEdzz0zTZOGjTLGlcPmTsrSxm3reAJXnI/2502pYIb7E3XJZMtxSgcSt5ALh8kh2lICCR8SEsMamUSXIi9zAv/mDMnqAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0+dTZXBd; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=UmCdG/YPwALyDLpBb5siWg/i3BOrWdjDOVrZPQUGrZ8=; b=0+dTZXBd5lApnHs2iQaBbz/W/V
-	Q7bJFJnGIA2uG8tjS5UsEsS5Zf8UZNrrq2xOtoMqAw1ePzjfdRuqYhMDAbHp9IA6SKikFFdvxfcwL
-	dzr4TP20v7Ikpb4eFepO6AgDnISJvNmQnXw09aUuufpFMWhnQxXRnGKqTiGPvjrCQbdma4YuvvwtH
-	YVPgtZbE5K1ZsOHDzJG50RAIpAUra2yfNcA0krjXV1cBF/ch9+Buy3F6o2btiNcTXkFL0ICrSNJZY
-	pxEOMeHRoS1NJFq8P6hRm8ihzKlijAE+794qKuQIu2Wqr0T2GPcn5xYNKe/fQcEoCLoRgAVrs5uRJ
-	eOda1ZYw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38764)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1v9OON-000000006M1-0eca;
-	Thu, 16 Oct 2025 14:51:43 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1v9OO9-000000003K9-3HzO;
-	Thu, 16 Oct 2025 14:51:29 +0100
-Date: Thu, 16 Oct 2025 14:51:29 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Abhishek Chauhan <quic_abchauha@quicinc.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexis Lothore <alexis.lothore@bootlin.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=sMh7D8P20DDJ1KW4TIHeYAF0ljdOy4m3nvsb8LN8yRw229mRPqoOtgf5GGTVb6NhXzgh+BCx7L+kpMSv5dH6LDJMB1U5ajrFTFtqOMGPyI493D0Y7ouMcD6xuVmaA5WybxYO0/dg5+TQikWq+UA1iAhJOHyHzr5eLHHnXPLV1Nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=mg/vQ8BW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=G23nErzP; arc=none smtp.client-ip=202.12.124.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 34FD87A0227;
+	Thu, 16 Oct 2025 09:53:08 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Thu, 16 Oct 2025 09:53:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1760622788; x=
+	1760709188; bh=zLaMnltvr2muruRr11feAX2YFnYP6Ko3AidG6xfSepE=; b=m
+	g/vQ8BWcRI6/6l+TvhOSz0zPmbww51J+TLVjx0oAm9Q4auztk0kuTHmuhMRjyrbr
+	DQ4zQLqBTnSJG8W62K7P/Im52+E41f8vYCInvaqt57qy4obrwDnQ04VzmT/ALGwl
+	Ych5Ew1frQcV8EWuVXQVvBxj+IqtjIg6ty7yshLXQIL1tYNLsRBbnq2VEpv0vUb6
+	TO4NO2um9gjRkOzQTq3twz95UAktpQOlXY99LBWnReM8fL/K34g/I4mlUbcWSjw5
+	Nmehe3ed0qJA+Y3T2IkYVis0sEF2V/cjzarcQDoMs/OdyiI27FukYXbAlsH/Ud9j
+	PVADv0GyqlfCcFg5aCtig==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1760622788; x=1760709188; bh=zLaMnltvr2muruRr11feAX2YFnYP6Ko3Aid
+	G6xfSepE=; b=G23nErzPAZU9e8KGxqE1e/SHBWP3oHA11MVeBnlIaNpQJZND531
+	Zi+od0Gld5oyC9StkLGKoDq5hu1HqJDZp21nxtgcyXDcsakSeWD5YiSG22sYYhz1
+	8ZscynPdkgNE+eIuocU44io88lOtGPqTykrEo3FfmTCNOZY+wfumg7CtaamCGMRB
+	mix/87j9rnnJbgmrqfX1UID8/NFlxT10r/mGXRijlrNc3hUz5++Icf6CpjOkHRnU
+	ZGggPv8ZL757/K1KP0XzYLbXTBA4tOnfxxlaModHT22eF9ajfdlrAzFixlmXrgLD
+	Ri1stuaWTM5Q9vq+BF53biJPYnomTATeOTQ==
+X-ME-Sender: <xms:w_jwaGYA4rPIFnIbJ-TeZSW2OBWblmFhiz7_XsuLMeBmQde5nJ1-mQ>
+    <xme:w_jwaLrTa3Tj_zygyIbbmUnTEYLBwopWLLvTuTz-JpKLLPm2VN100NqYg9wDcD_zz
+    HD3vifOaMlKJp3q6CRDiYTxLzN3difGYZ4LxB2UBQAInwq7FVw6Jcc>
+X-ME-Received: <xmr:w_jwaDMe3tg-6hoRyuuBIyefYVCaVgZUAoHxab100S2CQ117E4z8_-zxzt9L>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdeigeeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeejpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhmrghilhdrtg
+    homhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifod
+    hnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhho
+    fhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprh
+    gtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
+X-ME-Proxy: <xmx:w_jwaOobaIXDnLYUT47nS7dEZ2IJ_Xlo6xRnS2JT_cCUFYatTsefiA>
+    <xmx:w_jwaAfz1EW013GJklRbajAlQAm5--K9uyyBwESjNjIxoJsNAItmbw>
+    <xmx:w_jwaMQjxXxevOZYif1UIbtTx57VynkLaOy3Mx3rdfjk4OBpfJEaiQ>
+    <xmx:w_jwaBaunKJkVdQ5590IdhEWJV7EPslU16ydPAbMyC34XqAmrK9BCQ>
+    <xmx:xPjwaNNtpy4m9mcrcgx9-bFiVPzCBriPvSgJHdo2RNu-9pmvskAvBwSm>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 16 Oct 2025 09:53:07 -0400 (EDT)
+Date: Thu, 16 Oct 2025 15:53:05 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Boon Khai Ng <boon.khai.ng@altera.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Drew Fustini <dfustini@tenstorrent.com>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Furong Xu <0x1207@gmail.com>, Inochi Amaoto <inochiama@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
-	Jisheng Zhang <jszhang@kernel.org>, Kees Cook <kees@kernel.org>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Matthew Gerlach <matthew.gerlach@altera.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rohan G Thomas <rohan.g.thomas@altera.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Simon Horman <horms@kernel.org>,
-	Song Yoong Siang <yoong.siang.song@intel.com>,
-	Swathi K S <swathi.ks@samsung.com>,
-	Tiezhu Yang <yangtiezhu@loongson.cn>, Vinod Koul <vkoul@kernel.org>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH net-next 11/14] net: stmmac: do not require snps,ps-speed
- for SGMII
-Message-ID: <aPD4YRH6ih93jQXH@shell.armlinux.org.uk>
-References: <aO-tbQCVu47R3izM@shell.armlinux.org.uk>
- <E1v92N3-0000000AmHQ-4Bm2@rmk-PC.armlinux.org.uk>
- <15ea57e0-d127-4722-b752-4989d5a443c0@lunn.ch>
- <aPAWoDGVgeRFV95b@shell.armlinux.org.uk>
- <6545b453-e99e-4f44-a206-ef14deb7f96a@lunn.ch>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] netdevsim: add ipsec hw_features
+Message-ID: <aPD4wax60CXXgwF_@krikkit>
+References: <20251015083649.54744-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <6545b453-e99e-4f44-a206-ef14deb7f96a@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20251015083649.54744-1-liuhangbin@gmail.com>
 
-On Thu, Oct 16, 2025 at 03:03:34PM +0200, Andrew Lunn wrote:
-> > I don't at present, and I'm not sure what the point of updating it
-> > would actually be, because this is another thing that's just broken.
+2025-10-15, 08:36:49 +0000, Hangbin Liu wrote:
+> Currently, netdevsim only sets dev->features, which makes the ESP features
+> fixed. For example:
 > 
-> > Hence, I would like this property a slow and painful^h^h^hfree death.
-> > Maybe mark the property deprecated, and remove all explanation of it
-> > apart from stating that it's obsolete after this patch series has
-> > been merged and we've proven that it's never been useful.
+>   # ethtool -k eni0np1 | grep esp
+>   tx-esp-segmentation: on [fixed]
+>   esp-hw-offload: on [fixed]
+>   esp-tx-csum-hw-offload: on [fixed]
 > 
-> And this is what i was thinking. At least mark it deprecated. If you
-> want to remove the documentation late, i'm fine with that as well.
+> This patch adds the ESP features to hw_features, allowing them to be
+> changed manually. For example:
+> 
+>   # ethtool -k eni0np1 | grep esp
+>   tx-esp-segmentation: on
+>   esp-hw-offload: on
+>   esp-tx-csum-hw-offload: on
+> 
+> Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-It's rather premature to do this - this series doesn't change anything
-in the way that snps,ps-speed behaves.
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-Setting this still:
-1. sets the SGMII rate adapter to take its speed configuration from the
-   MAC control register rather than the in-band config.
-2. enables the exchange of the SGMII in-band config.
-
-What it doesn't do, and has never done, is to ensure that the in-band
-config that is sent contains the speed and duplex information for the
-SGMII link partner due to a repeated typo in the individual core sub-
-drivers.
-
-I'm not intending removing this until we have a different way to
-specify it, e.g. PHY_INTERFACE_MODE_REVSGMII, but that is currently
-looking unlikely. However, with PHY_INTERFACE_MODE_REVSGMII, we would
-need to make the change (fix the typo bug) to publish the correct
-in-band config.
-
-I think a bit more thought is needed before going down that path,
-because if we're publishing the config, is it a fixed-link. That's
-something that we need to sort out in the PHY_INTERFACE_MODE_REVSGMII
-discussions... if we're still going with it.
-
-So, right now what happens here entirely depends on stuff we have
-yet to make decisions on, and so marking it deprecated now is too
-early.
+Thanks Hangbin.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Sabrina
 
