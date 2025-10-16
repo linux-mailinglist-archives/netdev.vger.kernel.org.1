@@ -1,162 +1,108 @@
-Return-Path: <netdev+bounces-230068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD0F1BE383F
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 14:55:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D6FFBE3882
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 14:57:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 772E858456A
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:55:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49E33585D5A
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB0C334386;
-	Thu, 16 Oct 2025 12:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C5733438B;
+	Thu, 16 Oct 2025 12:56:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="W1l0wR4T"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="csgUewUt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56BD2330D4D
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 12:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACD2334381
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 12:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760619304; cv=none; b=BHNtt4OSpy/+caSO8PPg6Wf2iLmy5gmlRqW1OLBnsKYCBm5bXq7emhUYwnKP9EJMsR8czm2AH5gpi7oY3cQ91J0Nz0wiuyg1HK1RROrn+XFNcLKqwbeGHLSBsPHyCU/FvLgK++xDwFoqgze0FIl1vp/U6KDfAXu9hs0RtmKzRJM=
+	t=1760619389; cv=none; b=PG0XQxMji5SHe07GqolXjM+P6WR10jo8FB1J4HP3aETBstbwOPCNSjZZGrt3IoIhZ7L6oDJw5FMhUIb7PRKGQ/rKidany/j+x9k4nQF5dB9BIGuI5j6A3QFUlyNx5tqgK1ngPg9sIML7XNHBjJTsnaNod9qaAFBxWvidvRG4MTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760619304; c=relaxed/simple;
-	bh=ZUUjOUmPi99YByQi2GU9o7fH4nLtDooMLe4/nsf+y+o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pwGNZUdhpyaJjJi/YoXKzaPpNKoZRBbrT5V2YA1/FFP0IK3QhIN3FhttUaf3XQ2zznjhCUvdMu4VgtCY1+rLJoErSv2mU1LPxIfrdrxxQ56f5fVNPxmHYPXXQEMPIFEQOt/8eiJcmZZnr3B4CcSjtmdDtfUMyQiGS+0FDZabA/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=W1l0wR4T; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b3d5088259eso99551766b.1
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 05:54:59 -0700 (PDT)
+	s=arc-20240116; t=1760619389; c=relaxed/simple;
+	bh=AQFACMSOZqDLF5yVgb772SY0kn8MNC0ek9D3kdz//oQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UtqKGWNchwslVaTUvrh193LSztQU0ps8zjwF2bI8rc2lkOc7TOEwG+aMCEhbuT5sauOsMftbkAV2alZVQH0FOtf9+bclZYHOaP1Jyo7b/Xat0kxp2NuOzDwrMvzhdstA7rzhIPYWByOo/FYSXCiTJkYSFeN6C7/6QHzTx1IKLCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=csgUewUt; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-7946137e7a2so13250756d6.0
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 05:56:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1760619298; x=1761224098; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lwkOC946NVK5Ay5tT6TcDur2LlBPpaKMS7PptjXrqlg=;
-        b=W1l0wR4TaWGwBUbq/ab/6ckr2AdByPJ71vqOIKY5WaIGOkZ7dJLMrgWUE0eteg2YDd
-         xPKM2NoOTyX7xQSk8k3tCcamfreRMtHLKSrNdQQOMcyXkwIroCVWB9irJAGp6jnHKIbC
-         OXO123h3ayv05YZtJRW/Xf4ssw/1CikxVumz8ci4Mw4xTkRzbrZFi0yXRYtm53VHhiIC
-         CsLH+OrAbcDyhJkkMS335Bnu9YfdpGXu112WhauXmPoEjay5juvpp0xGNUgReHWqJLzs
-         yrnJlsqrzUYtzcM1yU1vA66x0YNGmtWNUDw6CbGIscErnjkdiCouil3CdEJOzlljLP/v
-         YFsg==
+        d=google.com; s=20230601; t=1760619386; x=1761224186; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AQFACMSOZqDLF5yVgb772SY0kn8MNC0ek9D3kdz//oQ=;
+        b=csgUewUttbwc9Fi2VZ9+spNf43Avs60iKmpxmpIiJkaHb/4LDFai1y+LE4icLocL03
+         Dl+d+7RUmQJdn+K1rPNWNkPkvpn+JmTYUiKtKOMnptm3rb988oh8SqZOdSDEg8B6hEEF
+         6Ks00RQ+bKnTNIjW1yXXcC6Wcvd++yKY3xsqk1ZCQJ1DlQGqBbQxNBcnHsryp9plI6xj
+         UgQ4TIT0N5/wZKmm0TrpKhQ3CWDAjKzEtVNlWSUUrEiupeee015zUyFIduNYLVYqU2Oi
+         bKBBYt0i2keC5ccTc4y7NH97QCJKAQwYTCLOWDmFsKirzn5cZ1+elRz6Spp2mN8Xnnuw
+         dKFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760619298; x=1761224098;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lwkOC946NVK5Ay5tT6TcDur2LlBPpaKMS7PptjXrqlg=;
-        b=nTk2joMve51JTtJC0hGbuioVw4vO8flXeeSUZc0OimOe+iYpqwz0scHXx55jg1ZrF1
-         ltaLpjWk4/A7fRNlZMMl7xDChLp2O1210vMOARh3U1BduQXGkDBLON/Uh7ad7wnv2Y9Q
-         2BKDkQn/WuWWHqlAjOKCl2tyID1NfXAvJWVdLfXnwZFuQqgGUhin/z4O7zjPzQLvqQzb
-         kVmfkzT83CNDlygSHIPg868l9zg51LNYnmishECPb/lAoxKNf9nRosg3lWJY508+Y11C
-         AsZRhG5BVB7h8NDCLtusK3Awcrcmh5xz/dt30HSMmTlcZwndl/feTBKoacvBCf+5VM97
-         yeLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXhDqz1M7GPQ5V/5vZvGoRyfOx7bT1rR/ARuzWihpCcQLCnrwxREhXcKTiEteDiatkQfSOIRos=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynXwBfLVxEU0J9lKOXic98MQ+U3vrG7/3qQw5Ev7AyYieQtugH
-	PI9ZEXNRucBb9OfTQKJ4K8BKiTNjNpyTw7W6qRnTWDGwuKGB4nN9QdV1XImQC9EDI2w=
-X-Gm-Gg: ASbGncuKUlDQiH8rUycTGHZfQhqsYrZcq9MfiA3Vb3r85QyNUdTMpByHmRoLFNuSwfk
-	eNC9ez58Hb3HrVxSNdexsYuCvRTtPw8eraCBKu8MoxGdUcehMjPmW3wJbStN+y4ahUiLyBwmyBL
-	zIoSNuNQTh3O24q9oyc15eac+e1AIbSvELtOvVr5nmEM0r+z5lD05ZmqmWAIlYP8k2VzrvCwWdj
-	PEpw94t+fs8l07qt7kzHlO65NuoDJFW3PLjIlategtyV1U+0dB5mwuW4ScLA46adSVRu7Dp7ds8
-	M7agwT5C1g1sbCG9en4PbbQpgosKoHGnd5n/AUZiXhv6hRoi0MyttqIqQiTPNViPWW6D/sdRswx
-	OVBn2M91jpIOW3KlXEnyEOcNIHnoOqwY4hgzwYkEfSRvgr6AFzAWsrfBh5dELgmcPEC5/nLTztj
-	tWE/u8AAGUNgN5pnOfn9d4nrE3TQSM8GnDaRyWDadhIZw=
-X-Google-Smtp-Source: AGHT+IFVF436vNsuSyK1BdMzDZ4sJZPhS32XY4Fq1N1PXqLrCDq/cqw04QJpxvzdr76ooTNaiQ5xzg==
-X-Received: by 2002:a17:907:3f13:b0:b40:5752:169a with SMTP id a640c23a62f3a-b50acc1a94amr3374920566b.58.1760619298216;
-        Thu, 16 Oct 2025 05:54:58 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b5ccd1af87bsm511915766b.63.2025.10.16.05.54.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Oct 2025 05:54:57 -0700 (PDT)
-Message-ID: <d6473e8b-903c-4116-a059-50814bceec75@blackwall.org>
-Date: Thu, 16 Oct 2025 15:54:56 +0300
+        d=1e100.net; s=20230601; t=1760619386; x=1761224186;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AQFACMSOZqDLF5yVgb772SY0kn8MNC0ek9D3kdz//oQ=;
+        b=u2ZxoKfZNPdCT82Z4Q1aVqDyQqeeQkzoJK9CG/z/Zp1fSvdDtV+LF6ykm2QDdT0ByM
+         daNUkBOlVHnhMc83OMWx0r6UjG2em2YHzDHY4KN7yWi7XY/iYMQCev3NUDXlwayIceXu
+         89EGngI/gKgxB3+C74f6UHZEf+dkQvfyWbGULPYEjeXPyi/qTQ513N8AUZuC1Zziin+a
+         9o0W2wCVs8pgMcBz3JJVs8fEBjcVCItYwnTlMxAvpf5nz5bqMc+1k3m5cYjEer+q3BVi
+         Lyd4X4OvoHq20C08UCaRKuw6iEoKl9KJ/5J8wIfBJzSyDv0dblNcPYLI4pyFK5ASw0/m
+         obDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXvrsxXoYjskbik1T29nmbCcl8qzhBzOwpSOUsgrgx1WPyesnBNOS2PWoyjZaWxeH2JL0mTqpE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzn9fVzRV74nMtUK5KM0U+8c0m5Q82C263OZa0M+MZYBiu5iJyO
+	aRPhZKaDfn3Cz8Y5Eh9R7Y1dAg/6QaAj6ERDcDZeeVrz7fZ+H60o1/pDfUEbBfl3tsjlDbWqQ1+
+	exE2fE4Vj4Tcb7qPeiaGxUr6+7F9o9RY/3jX3HkI8
+X-Gm-Gg: ASbGncsYU3aD0J28FGuN8qpxVXaNBtSi8CXxBVO01oVGU/lgxUlki98zBuzF6o5KAp4
+	ssijCbnAp3Ocm19AnPA4ZWBG3Mr9qwzftbCV+OURTIylzVdUQaTaDq4RGAhOfS+OyfxIUcB/c/T
+	/TtseQkeaS0vMHHIvPz2gbufY0hRqxbA6xj+gfrb9FLd7AMJR+zWdDrdFlPD0pS6V6oUuuFk2rQ
+	Y7pfByHpOUn4ryR9TysgV86R2EOZ9wy9usJTVCclhEDXOsa5MaYYa2mfYDnH42UxWKEHSCOPBkn
+	pRA=
+X-Google-Smtp-Source: AGHT+IEIf96fIc0v82VOpajJsrRm/aaohs2E405khgkK1OaYq2OzYAXmH8Z6URhSxZZggj/WlBUz/sG/4VM6nA1pdHY=
+X-Received: by 2002:a05:6214:5006:b0:795:7af3:6ffb with SMTP id
+ 6a1803df08f44-87b2f032de4mr478029846d6.63.1760619385685; Thu, 16 Oct 2025
+ 05:56:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: bonding: update the slave array for broadcast
- mode
-To: Tonghao Zhang <tonghao@bamaicloud.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Hangbin Liu <liuhangbin@gmail.com>, Jiri Slaby <jirislaby@kernel.org>,
- stable@vger.kernel.org
-References: <20251016125136.16568-1-tonghao@bamaicloud.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20251016125136.16568-1-tonghao@bamaicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251015233801.2977044-1-edumazet@google.com> <e3ecac24-c216-47ac-92a6-657595031bee@intel.com>
+ <CANn89i+birOC7FA9sVtGQNxqQvOGgrY3ychNns7g-uEdOu5p5w@mail.gmail.com> <73aeafc5-75eb-42dc-8f26-ca54dc7506da@intel.com>
+In-Reply-To: <73aeafc5-75eb-42dc-8f26-ca54dc7506da@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 16 Oct 2025 05:56:14 -0700
+X-Gm-Features: AS18NWDechlNadLa1aY2_jBhV1uOiNfO-T24cWCqgFgsq9sLynvUEwKziheiigA
+Message-ID: <CANn89i+mnGg9WRCJG82fTRMtit+HWC0e7FrVmmC-JqNQEuDArw@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: shrink napi_skb_cache_put()
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/16/25 15:51, Tonghao Zhang wrote:
-> This patch fixes ce7a381697cb ("net: bonding: add broadcast_neighbor option for 802.3ad").
-> Before this commit, on the broadcast mode, all devices were traversed using the
-> bond_for_each_slave_rcu. This patch supports traversing devices by using all_slaves.
-> Therefore, we need to update the slave array when enslave or release slave.
-> 
-> Fixes: ce7a381697cb ("net: bonding: add broadcast_neighbor option for 802.3ad")
-> Cc: Jay Vosburgh <jv@jvosburgh.net>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Simon Horman <horms@kernel.org>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> Cc: Nikolay Aleksandrov <razor@blackwall.org>
-> Cc: Hangbin Liu <liuhangbin@gmail.com>
-> Cc: Jiri Slaby <jirislaby@kernel.org>
-> Cc: <stable@vger.kernel.org>
-> Reported-by: Jiri Slaby <jirislaby@kernel.org>
-> Tested-by: Jiri Slaby <jirislaby@kernel.org>
-> Link: https://lore.kernel.org/all/a97e6e1e-81bc-4a79-8352-9e4794b0d2ca@kernel.org/
-> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
-> Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
-> v2:
-> - fix the typo in the comments, salve -> slave
-> - add the target repo in the subject
-> ---
->  drivers/net/bonding/bond_main.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index 17c7542be6a5..2d6883296e32 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -2384,7 +2384,9 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
->  		unblock_netpoll_tx();
->  	}
->  
-> -	if (bond_mode_can_use_xmit_hash(bond))
-> +	/* broadcast mode uses the all_slaves to loop through slaves. */
-> +	if (bond_mode_can_use_xmit_hash(bond) ||
-> +	    BOND_MODE(bond) == BOND_MODE_BROADCAST)
->  		bond_update_slave_arr(bond, NULL);
->  
->  	if (!slave_dev->netdev_ops->ndo_bpf ||
-> @@ -2560,7 +2562,8 @@ static int __bond_release_one(struct net_device *bond_dev,
->  
->  	bond_upper_dev_unlink(bond, slave);
->  
-> -	if (bond_mode_can_use_xmit_hash(bond))
-> +	if (bond_mode_can_use_xmit_hash(bond) ||
-> +	    BOND_MODE(bond) == BOND_MODE_BROADCAST)
->  		bond_update_slave_arr(bond, slave);
->  
->  	slave_info(bond_dev, slave_dev, "Releasing %s interface\n",
+On Thu, Oct 16, 2025 at 4:08=E2=80=AFAM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> From: Eric Dumazet <edumazet@google.com>
+>
+> BTW doesn't napi_skb_cache_get() (inc. get_bulk()) suffer the same way?
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Probably, like other calls to napi_skb_cache_put(()
 
+No loop there, so I guess there is no big deal.
+
+I was looking at napi_skb_cache_put() because there is a lack of NUMA aware=
+ness,
+and was curious to experiment with some strategies there.
 
