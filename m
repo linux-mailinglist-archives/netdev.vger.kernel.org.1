@@ -1,231 +1,79 @@
-Return-Path: <netdev+bounces-230160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 124E4BE4C91
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 19:07:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36DC1BE4CE9
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 19:17:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7FD754EF6C3
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 17:06:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA21B19C1252
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 17:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67BD933468B;
-	Thu, 16 Oct 2025 17:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38A47216605;
+	Thu, 16 Oct 2025 17:17:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="StUZULop"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uPCvG9oi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D60334684;
-	Thu, 16 Oct 2025 17:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015D93346BA;
+	Thu, 16 Oct 2025 17:17:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760634368; cv=none; b=eAZqslSws5cQffG+acNyfdwpA1VrxCVZFDBR+QCVA0wI/tk4MMrDz1EIngGLYLg+1uyCPNiWjK/nuyAdqZdoCblqwtnffRIATLOkjhMtRvIMjNQVv9BpIoAvmpJr3nmUkAl2jxmBpDnLJVZinYWQOqzBWHN0wENUvcZhrk1b4Yw=
+	t=1760635057; cv=none; b=EDvHs5u1qOebGiRE9bXp5Jt7c7Hahrj0MumpL8NFinUIgD+4OQVqTnCXqoiQvaWYXjRFTbjIWLe3sD9l3lpJD4beDqE5kZ/nG1ITbZpt/FfM4KdTMLS9Q645Rc02WpbR+CcD05WqTwB1cWOWsUce7qhFt2k+TT8AGrBLwaodSEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760634368; c=relaxed/simple;
-	bh=eskJgEswuM2KIOvIt6RczPdi3+e/Gu7TEutaJgkQaNs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Du5eMpzYNWDf+oi2E4H44+t+ALmCeGzRCGYJPvbIRCGi8xiLgpiFEwG688QyXOjU/yHpfRV8KeFmQBV0viuepM1PSFoxpVu7MsKuGcV79WzJRNmrnzdZ3ct3PqO4j58AEu+6+nv1hqI1rgLnm4qmJ9WtDnMVLiyQUSWvTIt33cY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=StUZULop; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D44AFC4CEF1;
-	Thu, 16 Oct 2025 17:06:04 +0000 (UTC)
+	s=arc-20240116; t=1760635057; c=relaxed/simple;
+	bh=bAw5Vwi1O/L5gr53AGhPFekj4RxGYL/VkVy01Lhm5yQ=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=DhvhKCOXxG3ygRAGbot61qhiL9x17U6CejALujJn4cVrwtVGitaJKOh/+QSV+C03v4H193DTjHWvItqGlVajfDID6heEFWED4grECdVOcLvLYpN1W2LnoTHvH+VIdeJXl1SJ2rqUDhRAvb5lFAQjEwZHDgK/YhqsqO6hw2ZfAeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uPCvG9oi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8248EC4CEF1;
+	Thu, 16 Oct 2025 17:17:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760634367;
-	bh=eskJgEswuM2KIOvIt6RczPdi3+e/Gu7TEutaJgkQaNs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=StUZULop3yfuwZFzcgU07+8rl7AoDfRwDxWR3fVzNsMYuJICsLtbGlFjtpIiEOOok
-	 30mfl50ly7MNR/gJg/ejoZob8b2r5MH7ITg7BKQQs+CEKcJ6ogATPsK0mQPRK03yZW
-	 vsuUhrCV/HAEDcZiZhQL82KEas1KB4yPtifk7O7bhgi7OKc2ipDr/w8jw/D5ySOlDg
-	 eblw3vtIX5gF4pTjTdZZ2/PNXcsXhHMaZxY+8btMw4AO3tE2JTIFHiNbdFZOT6mQEn
-	 bhwweXE/4/mvIV6UZ2QEfol6YddUhfs44cydLebviPgifWzeQMuPNd9dRdEuRlL5iO
-	 W+qgskq36+qZg==
-Date: Thu, 16 Oct 2025 18:06:02 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>,
-	g@spud.smtp.subspace.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v2 01/13] dt-bindings: net: airoha: Add AN7583
- support
-Message-ID: <20251016-hypnoses-caucasian-5d08812740a6@spud>
-References: <20251016-an7583-eth-support-v2-0-ea6e7e9acbdb@kernel.org>
- <20251016-an7583-eth-support-v2-1-ea6e7e9acbdb@kernel.org>
+	s=k20201202; t=1760635056;
+	bh=bAw5Vwi1O/L5gr53AGhPFekj4RxGYL/VkVy01Lhm5yQ=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=uPCvG9oiMq3az4xSrov+9rmwNURfoiI0NnBQGb846NIEbu/WrDn3fsEYWaMlUHsWT
+	 XZO/6xa8DlY4NiXrY8pLzwXxcYHgABhDOCLtgWdaolcY3yRk7ctBXZd4Gm3vyY1M/J
+	 FwhTeXr2AVCv0GSr/NEzdU1p/mS5xYTY32SXVo64qf7iGfZ1Pv664ulAn4yILCjn2z
+	 2C7fU0zKjzBkwxzW9h33oMda8cBse+KhFduw4ImonzdPd44W3fmX17p2c2mU22/0S1
+	 GNgnsqrY5ZYOto5/dUToPO85txRcHVZvOe2RsKcOOlwzz0ni/P2dBZhWtRWMTCJmLJ
+	 M/b8dTcEWqU7Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB0D9383BF62;
+	Thu, 16 Oct 2025 17:17:21 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.18-rc2
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20251016150328.32601-1-pabeni@redhat.com>
+References: <20251016150328.32601-1-pabeni@redhat.com>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20251016150328.32601-1-pabeni@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.18-rc2
+X-PR-Tracked-Commit-Id: 6de1dec1c166c7f7324ce52ccfdf43e2fa743b19
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 634ec1fc7982efeeeeed4a7688b0004827b43a21
+Message-Id: <176063504046.1828004.6913652083427884732.pr-tracker-bot@kernel.org>
+Date: Thu, 16 Oct 2025 17:17:20 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="9mL+XRXQMatgZUrQ"
-Content-Disposition: inline
-In-Reply-To: <20251016-an7583-eth-support-v2-1-ea6e7e9acbdb@kernel.org>
 
+The pull request you sent on Thu, 16 Oct 2025 17:03:28 +0200:
 
---9mL+XRXQMatgZUrQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.18-rc2
 
-On Thu, Oct 16, 2025 at 12:28:15PM +0200, Lorenzo Bianconi wrote:
-> Introduce AN7583 ethernet controller support to Airoha EN7581
-> device-tree bindings. The main difference between EN7581 and AN7583 is
-> the number of reset lines required by the controller (AN7583 does not
-> require hsi-mac).
->=20
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  .../devicetree/bindings/net/airoha,en7581-eth.yaml | 60 ++++++++++++++++=
-++----
->  1 file changed, 51 insertions(+), 9 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml=
- b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> index 6d22131ac2f9e28390b9e785ce33e8d983eafd0f..7b258949a76d5c603a8e66e18=
-1895c4a4ae95db8 100644
-> --- a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> +++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> @@ -17,6 +17,7 @@ properties:
->    compatible:
->      enum:
->        - airoha,en7581-eth
-> +      - airoha,an7583-eth
-> =20
->    reg:
->      items:
-> @@ -44,18 +45,12 @@ properties:
->        - description: PDMA irq
-> =20
->    resets:
-> +    minItems: 7
->      maxItems: 8
-> =20
->    reset-names:
-> -    items:
-> -      - const: fe
-> -      - const: pdma
-> -      - const: qdma
-> -      - const: xsi-mac
-> -      - const: hsi0-mac
-> -      - const: hsi1-mac
-> -      - const: hsi-mac
-> -      - const: xfp-mac
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/634ec1fc7982efeeeeed4a7688b0004827b43a21
 
-Pretty sure most of this diff can just be avoided by changing this list
-to be
-  reset-names:
-    items:
-      - const: fe
-      - const: pdma
-      - const: qdma
-      - const: xsi-mac
-      - const: hsi0-mac
-      - const: hsi1-mac
-      - enum: [ hsi-mac, xfp-mac ]
-      - const: xfp-mac
-    minItems: 7
+Thank you!
 
-All of these -names properties IIRC are arrays of unique strings, so doing
-8 with xfp-mac twice would not pass. Your conditional portion of the
-binding then need only set min to 8 for the old device and max to 7 for
-the new one.
-
-> =20
->    memory-region:
->      items:
-> @@ -81,6 +76,53 @@ properties:
->        interface to implement hardware flow offloading programming Packet
->        Processor Engine (PPE) flow table.
-> =20
-> +allOf:
-> +  - $ref: ethernet-controller.yaml#
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            enum:
-> +              - airoha,en7581-eth
-> +    then:
-> +      properties:
-> +        resets:
-> +          minItems: 8
-> +          maxItems: 8
-
-Same here fwiw, just need to set the min for this, and...
-
-> +
-> +        reset-names:
-> +          items:
-> +            - const: fe
-> +            - const: pdma
-> +            - const: qdma
-> +            - const: xsi-mac
-> +            - const: hsi0-mac
-> +            - const: hsi1-mac
-> +            - const: hsi-mac
-> +            - const: xfp-mac
-> +
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            enum:
-> +              - airoha,an7583-eth
-> +    then:
-> +      properties:
-> +        resets:
-> +          minItems: 7
-> +          maxItems: 7
-
-=2E..max to 7 here. Re-setting min here is redudant, since it matches the
-outermost/widest constraint that you set when defining the property
-outside the conditional.
-
-pw-bot: changes-requested
-
-Cheers,
-Conor.
-
-> +
-> +        reset-names:
-> +          items:
-> +            - const: fe
-> +            - const: pdma
-> +            - const: qdma
-> +            - const: xsi-mac
-> +            - const: hsi0-mac
-> +            - const: hsi1-mac
-> +            - const: xfp-mac
-> +
->  patternProperties:
->    "^ethernet@[1-4]$":
->      type: object
->=20
-> --=20
-> 2.51.0
->=20
-
---9mL+XRXQMatgZUrQ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaPEl+gAKCRB4tDGHoIJi
-0on2AQCsGgDtbOnKMfcJ3xtmRPlJ8e6bbOl2Ha5gG8JXUfO1CgD/QxseQkLse1bg
-s5COTpsvRS3yGcjqbh/LziflXULgVgc=
-=rwvg
------END PGP SIGNATURE-----
-
---9mL+XRXQMatgZUrQ--
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
