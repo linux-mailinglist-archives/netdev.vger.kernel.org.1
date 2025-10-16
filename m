@@ -1,123 +1,137 @@
-Return-Path: <netdev+bounces-230020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB7E6BE30CE
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:27:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8F83BE30C5
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:27:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D88B34E5C11
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:27:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B17DC4E0F27
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9813191B0;
-	Thu, 16 Oct 2025 11:27:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88AC03164C1;
+	Thu, 16 Oct 2025 11:27:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TpMHlhi6"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NjbsrNeS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2514B3164B6
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02CC2E172E
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760614029; cv=none; b=X3P4GfMOsn0RmdUo29nxdtww5efsJc+2k2pG+lKb+E5aPRw7ZeP4xIOCP4OWaagVG0nF9ux5ny/wAftQeAqfFPx/Wa9vJqzzklhr+hiTtoBfpr/IULnw38G9DR9frpSc+EkfEaE9JA9My/SPIshgXWpjN9Af4Cs7DC5w6LSeonw=
+	t=1760614028; cv=none; b=Z+Iz5n89xkgyjeYG9hJ4wKDEaCw0mL0onc5s5SPBujYzf30M2FX6PMoXupmTshkJYCEtj+0daUSd3uM/kYggbAa3aVW899ztOkUUSbgRaSLzCW2+7GGZ2xfPnnhBgpeFKtKxPk7nXbZEc6tZ+nu0OKLOmDAi2uOHlPKiuLfMYvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760614029; c=relaxed/simple;
-	bh=FffjNNCkguOw2FRNdvBljUzb26+3JDqT9d6/ywiOk9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZaP22RglvhoO83uasrqBcxiPgilIoVcZv4Se+ljqq2n+tC5a3V3nRBST7GfH3bcnI6gMvxQc6+Qah0HEGOOSCKbUr1g7PY7UVqqr69mNu7Itr80LMKggj779iRqonUU/IFEnrzBYfqS7UhHLQnyszXcrbNWRWhMgN0KIzBpxtXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TpMHlhi6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760614026;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IZDH+eDwmsfKGFwr6xj6Evf3+8bmcwOZMXU0RyYvhDM=;
-	b=TpMHlhi6s9OnJdWZCbwfYIagDqWZ8apuV7hjY/08UK87+ryUxYxgdCUYwzyhbmUpp17uVF
-	K22P5nAn2WecZtK1b4ddGSbCMjHt2X97cWbDyRYCcsDVA+LWuuIrDhdycW0Ai7Sygujvq0
-	5JN9WYQin/bxAD8j7XG+bmItxZzgIRo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-395-rMCl6utHP2mihU5qFY_-gw-1; Thu, 16 Oct 2025 07:27:02 -0400
-X-MC-Unique: rMCl6utHP2mihU5qFY_-gw-1
-X-Mimecast-MFC-AGG-ID: rMCl6utHP2mihU5qFY_-gw_1760614022
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-47113dcc1e0so3127855e9.3
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 04:27:02 -0700 (PDT)
+	s=arc-20240116; t=1760614028; c=relaxed/simple;
+	bh=rOYcDSrhRWLgtnzpoeHuge7O06Ip2GR7UW51Bh01bCo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OWQPSMP+33xmgobIJBj8me3XIf5TUdjvFNlpJG6MLtBdNiEePC2Jn/9Vki6SOHiwPAC35mUBjdmR895rpRhZEf982YLRbPjjn6YWa1/ZWeFw3FyzWL0FFKAqwMULPs5dkujBO9D61CbvAitTUtwAvAFouY2dnLhFkh1q0NPhfp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=NjbsrNeS; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-471066cfc2aso5676175e9.0
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 04:27:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1760614024; x=1761218824; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S9hYzjpUktnCETUL8826o3/CkmCIwf0/rTKQ/FR1f+M=;
+        b=NjbsrNeSpJ1RJxnSHSXWFZR16nyPfWuxIv2onWfekEwqQamNRboNFm6T0D3/k+X0ts
+         9b8VPZkdNOYvMVp5bq93V1xWcQjQ/t16kKPNKSYuutTtLcISzQgg6ofIMq6ZzMUeB43F
+         CacM0/EW/sS8Rhb68TO0pGVF0CsqmFcXioQS23QLIvJhcGqIpidlWcSx3cOC/358CgyO
+         +tMbD0f8qXSoj4jnDBOfJSHHq/lxW5oPa5wXi7d2xO0oqJN3eel7M6dwjw7P3Ajy0vOf
+         wkegVFKuZO7mHt3cVD9byoaXgYG73UCqZm9cl0dQizCRDQ5DfTbi8m4QFm2mXIuPGXlF
+         gfvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760614022; x=1761218822;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IZDH+eDwmsfKGFwr6xj6Evf3+8bmcwOZMXU0RyYvhDM=;
-        b=Mj0cY55b817QXNvn65srGZdzzvQNNfB/ffE6Sl5CRfdiYEEWL+8a4aesO5vIHMK+hp
-         Y+78FC5kEUJBYi10ebDcbaEdxxMesrMewP/gX0MyoyXPwpOwQnyzARagVeD6mMznwjT1
-         zF2B7q9DBYOtxEGu8jbl5j7oQSifJX0wGWV+dQB4z6CY9/vHkb22NetnWle8VmZfbH/T
-         EIbSjYvswxGEDQnla6mxoGf5nUmyeXaBOW0z2SqO435j1insLzikSoRceN7VfIXOSUUQ
-         qwUHAyX325dO1K6FzjZg+54xVkH4tn25iLfYS740th4Iafxrnga92Jv+wnrFSAfHv7bR
-         HMwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVgFjjGPgo84G6VeVn3vDsukVSeo+J+80w0QEA/RWwPmf0n+80poHYhAEy3OleIb6ucFRefvKg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoQyhRaG5KPBMy+1JoALxQILxrRnWzxICDOPm9O6ML0ihDzNfw
-	trpDoSfCsoz0vzS9hPTVMin0OzMqYg3Kvgk0gpsbodeRX8hfsRw7VJObeH6xEpqGNXkQOuo3T3q
-	sl7jWfhLCPPaM1YCrz8RH5EmT0aKiOiyPLK5NJVeoRV0aDQ0LkxKeAJBC7A==
-X-Gm-Gg: ASbGncvgbrA/2KwujO7xyK2w8Rq1C91QpbajOipY2jIPRaybHMzLgwlnA9wMC+r/8yY
-	l6ILaE51YdTXCNVg0TRzSV2vKM9/dHQkyGTCjyfJ4inIX0+kfzilTik4IAcJbsA+Zifr3ji18aq
-	PhUIy5uKK5tbnehdHN331us4K0KwwYALeHZa5zzndu7xoVjEc0DgpTE9JHwiFZJNx/OJskx0q3f
-	z2bg4j6XkZRvP3JDIvCexaaekTRlvv2DfwxHLFGFIKhbWjW47Vwfg+YHI7cCLT3ONFuMKWqAKZC
-	t9m9DvzybqV2l0jEWBDj1hHVlPAfsp5+kFDbQNMgguxMhO4GkyG1LUBvQHlH+W1nvqWguvImCMY
-	krCJXlpGExHQrkOAWveEmASAzdl7lMCSLY+LHaZxa0jGOoUw=
-X-Received: by 2002:a05:600c:35cf:b0:46f:b42e:e360 with SMTP id 5b1f17b1804b1-46fb42ee424mr161362905e9.40.1760614021695;
-        Thu, 16 Oct 2025 04:27:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGbWYrIdZv9kihyLOsaEPvalF++07/I7Q7vKsLu+WtlVetPElRxA/yPiPiUjyNLh4C6OqC6Mw==
-X-Received: by 2002:a05:600c:35cf:b0:46f:b42e:e360 with SMTP id 5b1f17b1804b1-46fb42ee424mr161362665e9.40.1760614021249;
-        Thu, 16 Oct 2025 04:27:01 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47114461debsm24194045e9.18.2025.10.16.04.26.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Oct 2025 04:27:00 -0700 (PDT)
-Message-ID: <34dc4a3b-51b5-400d-90e7-680c2f1dd585@redhat.com>
-Date: Thu, 16 Oct 2025 13:26:59 +0200
+        d=1e100.net; s=20230601; t=1760614024; x=1761218824;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S9hYzjpUktnCETUL8826o3/CkmCIwf0/rTKQ/FR1f+M=;
+        b=ZxTCyW8rc4LlsQcRvy0S4kaX9rTW+4ZunS1jc3DdGigQSIev5zPyFH9ZIx5te/T1B8
+         66fcdLx4iIViqfOnkdvN2RboZ9GXuyl7/WbQHyOIe/zZGcj0Q/FyjbHA/63sst7442a9
+         FkFDyjgImN91p4PwJjvAcFwUvtgPOEOySzBWDRGlseS92iODilfCWUcUVIVnRerRdFBr
+         dHFUE+HOcsWauzNc3yN/0tS0MZU6csvaW6+12DgzvSQHmGG4Qc8DwcXlu6JtiwN+q3FZ
+         cY60eAFcoHDYRvlpGQOH+To/U1+A2unIo4HtQ6eSb+48mhEXnOTgr2yvEvYqpUd8KRyF
+         uRmw==
+X-Gm-Message-State: AOJu0YyUt6dp6ruMMGhKyX1Ks6AalQVfJxwKLWZ39GznWZ2IHRMKHw62
+	yvbEYgxa9A6ZESrF5i8aOFBB3FlQO0zi3z9o7xSyrgC7E6j8SF+mwNfkE516k/Ix2ZU=
+X-Gm-Gg: ASbGncvE+oHIlHLnguf/g7BHkPHtxX8ZNBERiWTsZMzLmM59Osg0Rg1kll6YbCtqeqd
+	/K3aUVDpaAcQjyyMNSswaTZDTd90cRyOo3DHmQboUYwTueDV0o2hfstrBKnC+JlhljAmerUP5BP
+	0P52JjSJcuBpdCLF8rRCs8L+6FxIuIeDlBz2e9xLF42ntkU67d+d8/Hzl3ShJKyY6kgWXiM5F1R
+	FdabM7kewOeBwp7sUrhJzrVobXxVccr1rUxQF/d1gVABYCuOImc/681gvLchJyDZA5xj8P+wvk6
+	gQyrZ+tL7JmsjhF0TNHQ2mG/Csfyr4m6JlpuKtWG7AiGGOwm21wpisQzt9lQrnLSxGuf3RMMj/m
+	CqIkAQYRedRf1veT3JXVuuTkYzpRqeqNDFDTXN5ujwai61d4iYiGP8DBzfvGkNTUnSrQsJFoyFp
+	1Y53xIoXk7ZRy7nsghAbPXHYgy9RLsYlmNARHirw==
+X-Google-Smtp-Source: AGHT+IFb112ZtZLsO+hoNYz2HxlsdyYfC7JZQ7Gax5FlERbPuY4E7182eA14h+MSwUZXQUmyS7FO8A==
+X-Received: by 2002:a05:600c:8719:b0:45d:d97c:235e with SMTP id 5b1f17b1804b1-46fa9aa0edfmr226344305e9.12.1760614023765;
+        Thu, 16 Oct 2025 04:27:03 -0700 (PDT)
+Received: from jiri-mlt.client.nvidia.com ([140.209.217.211])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-471144d17cdsm20097575e9.18.2025.10.16.04.27.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Oct 2025 04:27:03 -0700 (PDT)
+Date: Thu, 16 Oct 2025 13:27:00 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Sabrina Dubroca <sdubroca@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, Shuah Khan <shuah@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Stanislav Fomichev <stfomichev@gmail.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	bridge@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv4 net-next 1/4] net: add a common function to compute
+ features from lowers devices
+Message-ID: <to4zjjo5wfd5suootcy2v7n7kuc6rym3ld4jov26nunnarji2u@2hr7jyiq36pj>
+References: <20251014080217.47988-1-liuhangbin@gmail.com>
+ <20251014080217.47988-2-liuhangbin@gmail.com>
+ <sfjjkeub7fmvsktzrx6mmv6zvilno3un665tbqe2punw4azefo@jwuhk23763gc>
+ <aO74J20k16L7jS15@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 4/7] bonding: Processing extended
- arp_ip_target from user space.
-To: David Wilder <wilder@us.ibm.com>, netdev@vger.kernel.org
-Cc: jv@jvosburgh.net, pradeep@us.ibm.com, i.maximets@ovn.org,
- amorenoz@redhat.com, haliu@redhat.com, stephen@networkplumber.org,
- horms@kernel.org, kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
-References: <20251013235328.1289410-1-wilder@us.ibm.com>
- <20251013235328.1289410-5-wilder@us.ibm.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251013235328.1289410-5-wilder@us.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aO74J20k16L7jS15@fedora>
 
-On 10/14/25 1:52 AM, David Wilder wrote:
-> @@ -31,8 +32,10 @@ static int bond_option_use_carrier_set(struct bonding *bond,
->  				       const struct bond_opt_value *newval);
->  static int bond_option_arp_interval_set(struct bonding *bond,
->  					const struct bond_opt_value *newval);
-> -static int bond_option_arp_ip_target_add(struct bonding *bond, __be32 target);
-> -static int bond_option_arp_ip_target_rem(struct bonding *bond, __be32 target);
-> +static int bond_option_arp_ip_target_add(struct bonding *bond,
-> +					 struct bond_arp_target target);
+Wed, Oct 15, 2025 at 03:25:59AM +0200, liuhangbin@gmail.com wrote:
+>Hi Jiri,
+>On Tue, Oct 14, 2025 at 11:40:12AM +0200, Jiri Pirko wrote:
+>> >+#define VIRTUAL_DEV_VLAN_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+>> 
+>> I don't like the "virtual" naming. In the past, we always tried to avoid
+>> that for lower-upper devices like bond/team/bridge/others. Soft-device
+>> was the used term. Please let the "virtual" term for vitrualization,
+>> would that be possible?
+>
+>Sure
+>> 
+>> How about "master_upper"? This is already widely used to refer to
+>> bond/team/bridge/other master soft devices.
+>> 
+>> MASTER_UPPER_DEV_VLAN_FEATURES?
+>
+>I'm not sure if we should avoid using "master" now. Maybe just UPPER_DEV_VLAN_FEATURES?
 
-I guess you passed the 'target' by value instead of using a 'const
-struct bond_arp_target *' argument to reduce the code delta?
+Why? We have "master_upper" to point exactly at this kind of device.
 
-I think it would be clear the other option, it will make the intent clear.
 
-/P
-
+>
+>> [..]
+>> 
+>> 
+>> >+void netdev_compute_features_from_lowers(struct net_device *dev, bool update_header)
+>> 
+>> netdev_compute_master_upper_features?
+>
+>netdev_compute_upper_features?
+>
+>Thanks
+>Hangbin
 
