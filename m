@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-229839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23B2FBE1286
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 03:20:40 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BA38BE12AE
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 03:30:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEF263AED75
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 01:20:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 270744EB490
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 01:30:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35032126C05;
-	Thu, 16 Oct 2025 01:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1AC44C8F;
+	Thu, 16 Oct 2025 01:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FkinQU7y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fKLKWuRq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0318B442C;
-	Thu, 16 Oct 2025 01:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283C9134BD;
+	Thu, 16 Oct 2025 01:30:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760577636; cv=none; b=RaWUoiZQ8Y2dl+3/NF+73SHcPk6eMKdgTJXV8QYUXhPmlUPTub9JKaw2RBy2ZkRtRU20NAU8FWGvcGI4591D+ijkzHn1sCh1GySM52Y4gYgsahyEppUBYGE/u53H81NRa3Q8NWA7odagIuCccZm9qUPDWonEUG0G/NzIyZfboCw=
+	t=1760578222; cv=none; b=HwhX55uankCzUbKHuoKLuXfIa5fIDPsLsPz7aGqZFG2wd8iRBTKcG60Eah/aPA3JN5D+ikjNyqr6OofHBfY0VrJO9WJvBY4uo2cAFuA4m8tbg12q+eLBuH6HBgt9l1Wk0yeiNTZk8vedVmT9MGaFUQ8ijavDA0vrmLTyBYogjdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760577636; c=relaxed/simple;
-	bh=43aNLpaRPMveoFouYsYDj85SLDeKtvsSv7RDL5fKxbY=;
+	s=arc-20240116; t=1760578222; c=relaxed/simple;
+	bh=qPAF4tCa5lAk3X9LnjPJR3cSn3nx/PwYPEI7ZMhNI2Q=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=p1oLBXGLeNwPeNVkG7NoOJmr9nKZmG1Kpa4QBpgzRAKEocPAZYEfnoyzPJnXzzEicVSGQdXvH5P8zi9qjGmg8tIeHKpDy2CgrsUgqxd51FgtnYllJvR/X27Wl6DOd5R31+rXzob4UpmlY+5+ZHlTpb8oT7NQ7S2a3rdWQSFlICY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FkinQU7y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E636C4CEF8;
-	Thu, 16 Oct 2025 01:20:35 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=LD6H+axcm53Y0eL7YGICsRwGSiQK35ayyt9RqTTCnoQx1tRKGNE5jfhlQuzL1Bi+8w7uok/GOJlxQ2JxBP3adIOGLO7OekMTEbfp48WFboDHvoGy8Ie0dbEuHe8gOhj6QBLxEyrK+jXiN9XP6GgWPSnE2ORO6WYOAHvaVkWAgYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fKLKWuRq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D456C4CEF8;
+	Thu, 16 Oct 2025 01:30:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760577635;
-	bh=43aNLpaRPMveoFouYsYDj85SLDeKtvsSv7RDL5fKxbY=;
+	s=k20201202; t=1760578221;
+	bh=qPAF4tCa5lAk3X9LnjPJR3cSn3nx/PwYPEI7ZMhNI2Q=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FkinQU7yl2MZv9P1P85CpLRRNka9W4yLFVx/h5VJsT10hpLtc3U92V7jAfXiqqldn
-	 DByWYPs5xWMiFi55IM9ZxC0OdTs8iIWqPiG1YfNwMbITJ/Clt0ULP1GCWE+Sqw1kVj
-	 l30Q7wzLIdlJ1+yxyPLcEFEt1YlnzcC3G89VBj/ip6qK5hThqwXtFdrLorfCZse3+Q
-	 JFK1d7EaF443IO1c69/vqV8Uxx/sS9XAhhqWRj5R0gFbOvWNkC0pzD/1ra5xRb2UbD
-	 GPClgxxL6xkY2NyqQ9zDqhB1BGvHahzAjh41Skya0sht4lINpBUQIhJmPHVJtad5VB
-	 5cpzsukTwCR3A==
+	b=fKLKWuRqhj2j39QB7g253OTrriaQvD33qAZnw9Sk67p1648+deWaX7XyonwYPwo4g
+	 WxyhgeT9X3sM48LeGfKp/sZYZ342AF73fPYFWBKfnhS0JsCJCq9zyarzHXq/AVWOFq
+	 rvvpPORWU6D2xy29ZJBSsief7W8RYoO7ph+IIe8uPll0hYlOy4aiq3zACT9tYDqzc4
+	 wxmA3/d7OlXBnAuvOTbqtRalM6lOkARsaqa1NoP05gaGd/8YIr/9LRPmQUW5AXscwI
+	 yvgufp1dB3fGIZ+MzkAuO+qLp2kMbPs2b2cFQwDanRgrZH56jcExur/APrToHa0UTg
+	 03YNFKy7J4RmQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34187380DBE9;
-	Thu, 16 Oct 2025 01:20:21 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DF8380DBE9;
+	Thu, 16 Oct 2025 01:30:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,60 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 01/10] can: gs_usb: increase max interface to U8_MAX
+Subject: Re: [PATCH net v2] net: usb: lan78xx: fix use of improperly
+ initialized
+ dev->chipid in lan78xx_reset
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176057762001.1121485.1835557132409188926.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Oct 2025 01:20:20 +0000
-References: <20251014122140.990472-2-mkl@pengutronix.de>
-In-Reply-To: <20251014122140.990472-2-mkl@pengutronix.de>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- linux-can@vger.kernel.org, kernel@pengutronix.de, uwu@coelacanthus.name,
- runcheng.lu@hpmicro.com, stable@vger.kernel.org, mailhol@kernel.org
+ <176057820601.1123450.11047692270273394800.git-patchwork-notify@kernel.org>
+Date: Thu, 16 Oct 2025 01:30:06 +0000
+References: <20251013181648.35153-1-viswanathiyyappan@gmail.com>
+In-Reply-To: <20251013181648.35153-1-viswanathiyyappan@gmail.com>
+To: I Viswanath <viswanathiyyappan@gmail.com>
+Cc: Thangaraj.S@microchip.com, Rengarajan.S@microchip.com,
+ UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+ linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com,
+ khalid@kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Marc Kleine-Budde <mkl@pengutronix.de>:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 14 Oct 2025 14:17:48 +0200 you wrote:
-> From: Celeste Liu <uwu@coelacanthus.name>
+On Mon, 13 Oct 2025 23:46:48 +0530 you wrote:
+> dev->chipid is used in lan78xx_init_mac_address before it's initialized:
 > 
-> This issue was found by Runcheng Lu when develop HSCanT USB to CAN FD
-> converter[1]. The original developers may have only 3 interfaces
-> device to test so they write 3 here and wait for future change.
-> 
-> During the HSCanT development, we actually used 4 interfaces, so the
-> limitation of 3 is not enough now. But just increase one is not
-> future-proofed. Since the channel index type in gs_host_frame is u8,
-> just make canch[] become a flexible array with a u8 index, so it
-> naturally constraint by U8_MAX and avoid statically allocate 256
-> pointer for every gs_usb device.
+> lan78xx_reset() {
+>     lan78xx_init_mac_address()
+>         lan78xx_read_eeprom()
+>             lan78xx_read_raw_eeprom() <- dev->chipid is used here
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,01/10] can: gs_usb: increase max interface to U8_MAX
-    https://git.kernel.org/netdev/net/c/2a27f6a8fb57
-  - [net,02/10] can: gs_usb: gs_make_candev(): populate net_device->dev_port
-    https://git.kernel.org/netdev/net/c/a12f0bc764da
-  - [net,03/10] can: m_can: m_can_plat_remove(): add missing pm_runtime_disable()
-    https://git.kernel.org/netdev/net/c/ba569fb07a7e
-  - [net,04/10] can: m_can: m_can_handle_state_errors(): fix CAN state transition to Error Active
-    https://git.kernel.org/netdev/net/c/3d9db29b45f9
-  - [net,05/10] can: m_can: m_can_chip_config(): bring up interface in correct state
-    https://git.kernel.org/netdev/net/c/4942c42fe184
-  - [net,06/10] can: m_can: fix CAN state in system PM
-    https://git.kernel.org/netdev/net/c/a9e30a22d6f2
-  - [net,07/10] can: m_can: replace Dong Aisheng's old email address
-    https://git.kernel.org/netdev/net/c/49836ff2f37d
-  - [net,08/10] can: remove false statement about 1:1 mapping between DLC and length
-    https://git.kernel.org/netdev/net/c/c282993ccd97
-  - [net,09/10] can: add Transmitter Delay Compensation (TDC) documentation
-    https://git.kernel.org/netdev/net/c/b5746b3e8ea4
-  - [net,10/10] can: j1939: add missing calls in NETDEV_UNREGISTER notification handler
-    https://git.kernel.org/netdev/net/c/93a27b5891b8
+  - [net,v2] net: usb: lan78xx: fix use of improperly initialized dev->chipid in lan78xx_reset
+    https://git.kernel.org/netdev/net/c/8d93ff40d49d
 
 You are awesome, thank you!
 -- 
