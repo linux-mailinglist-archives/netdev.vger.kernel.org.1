@@ -1,109 +1,191 @@
-Return-Path: <netdev+bounces-229884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AC8BBE1C2F
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:36:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40D0EBE1C41
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:37:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 52DEA4F98EC
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 06:34:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B53C0189F352
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 06:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8192E11DD;
-	Thu, 16 Oct 2025 06:34:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Uh0P1Cr/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 567382DEA87;
+	Thu, 16 Oct 2025 06:37:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F164F2DF131
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 06:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B829A2DE6F8;
+	Thu, 16 Oct 2025 06:37:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760596448; cv=none; b=LuTob7YtembD37uV/emIPl8Vxw2aZ8cCwphTpsFOMeiS3m37mWKpoZPYwY7HtqGRssANtqDxSGlDiSTypYwjE/bo9k5bfZlVbG+sH80pAoZzxuDRIdj+2Zv3omP7ixipVPQs96dAWWBMOyNT3e22Q3OC56oLsZAKkgKMTUDXesE=
+	t=1760596636; cv=none; b=KQd0dhFjfFtgiMhtT11SZN/0GjhSYiDRCugV+qej7v0lhgnNSw3tFhZuQfA3ncPdfabzw3Z38ucr9EH5a7/xXn05rZYTw4x0nDCvoWaAbmncjsKBsBUjGAPqljcHGA7GRI8k1ub7Ek9/xXp3Zw+r/xnAf70twzdjQeSZG/CNrTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760596448; c=relaxed/simple;
-	bh=VEy4lKjwzIklg0qO6uNzy16XTRzQMSVrKqJuhusF6jw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OMbqnlyy80c91sAeS97xpUu0dDT0Biyp4ASYEA7O+CCZjWcK7D+Z3zJkXueIadDZAe9jQlOamFH+XGP9bbNAzyMwLICMaqZqvdDiIE5R4T4Kw0pfmBjV8dJT4/mAp/kTJh33xnZdlxjJ8jTX22gaXP6ULRMyncJMtelRwboC29U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Uh0P1Cr/; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id 8ACD521244DF; Wed, 15 Oct 2025 23:34:06 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8ACD521244DF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1760596446;
-	bh=fzHMrBYmZnPHoKv8/rgGHN9a8qxUkkSk3cn/JACTU78=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Uh0P1Cr/vCUEZW42UCCGfG8KOHxfXEXoIEC7IlQ9jfGJCSFwBj0Fk0hs2vKoDVrV8
-	 pVRCJT67vq08DLCqrWLlPBeMFib1Hd0iB7AFpNrfEl5p7jZeh4ScPmVEaSSurxvL/Z
-	 1Gg2IdqS4ScOlNXuFxi8XFXkMtI0rSJrbCUhTsuc=
-Date: Wed, 15 Oct 2025 23:34:06 -0700
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: stephen@networkplumber.org, dsahern@gmail.com, netdev@vger.kernel.org
-Cc: haiyangz@microsoft.com, shradhagupta@linux.microsoft.com,
-	ssengar@microsoft.com, dipayanroy@microsoft.com,
-	ernis@microsoft.com
-Subject: Re: [PATCH iproute2-next v4] netshaper: Add netshaper command
-Message-ID: <20251016063406.GA17762@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1759835174-5981-1-git-send-email-ernis@linux.microsoft.com>
+	s=arc-20240116; t=1760596636; c=relaxed/simple;
+	bh=K34ehr8RNb8WkyEDgQ2XhDAjvJhbuEBHYZnegCjBiwo=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=ecJGTYEMhVy3qZ2tSbLE8fo3ghe37XMNNviKtoYIjj0oEmjHvwhx55swCk18egBXgk6VFuWpZY6V9WNIF2ct+WoLaieF+vkT1LRvqr6aq0YCu8dsMW6EfLCSilKgUxbpuG6OaDhz5PrChD1vaZNGZDppru6L5FNVcyQkB09rMrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c45ff70000001609-31-68f092937ca6
+From: Byungchul Park <byungchul@sk.com>
+To: axboe@kernel.dk,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	almasrymina@google.com,
+	asml.silence@gmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	sdf@fomichev.me,
+	dw@davidwei.uk,
+	ap420073@gmail.com,
+	dtatulea@nvidia.com,
+	byungchul@sk.com,
+	toke@redhat.com,
+	io-uring@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	kernel_team@skhynix.com,
+	max.byungchul.park@gmail.com
+Subject: [PATCH net-next] page_pool: check if nmdesc->pp is !NULL to confirm its usage as pp for net_iov
+Date: Thu, 16 Oct 2025 15:36:57 +0900
+Message-Id: <20251016063657.81064-1-byungchul@sk.com>
+X-Mailer: git-send-email 2.17.1
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrPLMWRmVeSWpSXmKPExsXC9ZZnoe7kSR8yDDqfWlis/lFh8XPNcyaL
+	Oau2MVqsvtvPZjHnfAuLxc5dzxktXs1Yy2bx9Ngjdos97duZLR71n2Cz6G35zWzxrvUci8WF
+	bX2sFpd3zWGzuDCxl9Xi2AIxi2+n3zBaXJ25i8ni0uFHLA7CHltW3mTyuDZjIovHjX2nmDx2
+	zrrL7rFgU6nH5bOlHptWdbJ53Lm2h82jt/kdm8f7fVfZPD5vkgvgjuKySUnNySxLLdK3S+DK
+	6Hi/gaXglGzFjPdXGBsYl0l0MXJySAiYSMw81MQOY0/8eoEZxGYTUJe4ceMnmC0ikC9xaMdW
+	pi5GLg5mgX9MEnMX9LGCJIQFMiR2vmwDa2YRUJU4d+YRI4jNK2AqMf/tX2aIofISqzccYAZp
+	lhB4zybxZcZ/FoiEpMTBFTdYJjByL2BkWMUolJlXlpuYmWOil1GZl1mhl5yfu4kRGMzLav9E
+	72D8dCH4EKMAB6MSD++DFe8zhFgTy4orcw8xSnAwK4nwMhR8yBDiTUmsrEotyo8vKs1JLT7E
+	KM3BoiTOa/StPEVIID2xJDU7NbUgtQgmy8TBKdXAaJ+2PEhQ8WX/5lC597Ki8w+lszDfUi/2
+	ydioxmfwuPrukjT1dVME2A+zbWk++677d/5Dpn4fl9u3E17KlXz6c+wq86xtUnMPL86/3Cyz
+	VEymsmtTfHyO8hGGx2HJVXlrQxzi/Ngiq9tnSElcDDx9mGn2opLLa/Rvv5ji4j9lmvcOnyaN
+	LPZmJZbijERDLeai4kQAlyq2smICAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAwFSAq39CAMSvwMaCGludGVybmFsIgYKBApOO4Mtk5LwaDCpyys4q/h4OPms
+	5wI4nKq2ATir3Y8GOM6UmwY4nM+EBDi5uucBOOqYrQY45cbiBzi8h7cDOOKPyAY4jYT7Azju
+	hc4EOMOdyQU40LaOBTjTupwGONCRjQU4xqAWOPbL7AE41Zm6AjjSw+IEQBVItKnZAkjWmJEE
+	SNi+ygJIuZrdB0igsnVI0811SLKqiQZI3Na8BkiNg+4GSO++1QZI9ttISKPo8AJI87IeUA1a
+	CjxkZWxpdmVyLz5gCmiI77AEcModeJjv1AGAAaYYigEJCBgQNBiR9dADigEJCAYQJxjY2PkD
+	igEJCBQQbxjCuLUCigEKCAMQ/gIYnaCOBYoBCQgTEGgYuemGB4oBCQgEECUYzsziAYoBCQgN
+	EDUYn+39A4oBCQgYEB8Yq7DAA5ABCKABAKoBFGludm1haWw1LnNraHluaXguY29tsgEGCgSm
+	ffyRuAH000fCARAIASIMDeCo72gSBWF2c3ltwgEYCAMiFA0AcPBoEg1kYXl6ZXJvX3J1bGVz
+	wgEbCAQiFw1KV2VgEhBnYXRla2VlcGVyX3J1bGVzwgECCAkagAEcoB1FfvYRkChl5zqcwYZN
+	zHZD4qtyrTXlnd0IhKxlQwlmxl0dTsgDEJMgBUZoFoegYmLTfcizDeoELaPIelMI35Fe9c5/
+	CcUgcc+Hw9CgKzgoM8SGz8W7cZHptyuoSM1r+r9npqGbJzPLum90AhvFyLLNIDfyr8kdppRN
+	d4in5yIEc2hhMSoDcnNheM0lv1ICAAA=
+X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1759835174-5981-1-git-send-email-ernis@linux.microsoft.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Tue, Oct 07, 2025 at 04:06:14AM -0700, Erni Sri Satya Vennela wrote:
-> Add support for the netshaper Generic Netlink family to
-> iproute2. Introduce a new command for configuring netshaper
-> parameters directly from userspace.
-> 
-> This interface allows users to set shaping attributes which
-> are passed to the kernel to perform the corresponding netshaper
-> operation.
-> 
-> Example usage:
-> $netshaper { set | show | delete } dev DEV \
->            handle scope SCOPE [id ID] \
->            [ bw-max BW_MAX ]
-> 
-> Internally, this triggers a kernel call to apply the shaping
-> configuration to the specified network device.
-> 
-> Currently, the tool supports the following functionalities:
-> - Setting bandwidth in Mbps, enabling bandwidth clamping for
->   a network device that support netshaper operations.
-> - Deleting the current configuration.
-> - Querying the existing configuration.
-> 
-> Additional netshaper operations will be integrated into the tool
-> as per requirement.
-> 
-> This change enables easy and scriptable configuration of bandwidth
-> shaping for devices that use the netshaper Netlink family.
-> 
-> Corresponding net-next patches:
-> 1) https://lore.kernel.org/all/cover.1728460186.git.pabeni@redhat.com/
-> 2) https://lore.kernel.org/lkml/1750144656-2021-1-git-send-email-ernis@linux.microsoft.com/
-> 
-> Install pkg-config and libmnl* packages to print kernel extack
-> errors to stdout.
-> 
-> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+->pp_magic field in struct page is current used to identify if a page
+belongs to a page pool.  However, ->pp_magic will be removed and page
+type bit in struct page e.g. PGTY_netpp should be used for that purpose.
 
-Hi,
+As a preparation, the check for net_iov, that is not page-backed, should
+avoid using ->pp_magic since net_iov doens't have to do with page type.
+Instead, nmdesc->pp can be used if a net_iov or its nmdesc belongs to a
+page pool, by making sure nmdesc->pp is NULL otherwise.
 
-Just following up on the patch I sent last week. I wanted to check
-if you have had a chance to look at it. Please let me know if any
-changes are needed or if I should resend it. I appreciate your time and
-feedback.
+For page-backed netmem, just leave unchanged as is, while for net_iov,
+make sure nmdesc->pp is initialized to NULL and use nmdesc->pp for the
+check.
 
-Thanks,
-Vennela
+Signed-off-by: Byungchul Park <byungchul@sk.com>
+---
+ io_uring/zcrx.c        |  4 ++++
+ net/core/devmem.c      |  1 +
+ net/core/netmem_priv.h |  6 ++++++
+ net/core/page_pool.c   | 16 ++++++++++++++--
+ 4 files changed, 25 insertions(+), 2 deletions(-)
+
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index 723e4266b91f..cf78227c0ca6 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -450,6 +450,10 @@ static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
+ 		area->freelist[i] = i;
+ 		atomic_set(&area->user_refs[i], 0);
+ 		niov->type = NET_IOV_IOURING;
++
++		/* niov->desc.pp is already initialized to NULL by
++		 * kvmalloc_array(__GFP_ZERO).
++		 */
+ 	}
+ 
+ 	area->free_count = nr_iovs;
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index d9de31a6cc7f..f81b700f1fd1 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -291,6 +291,7 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+ 			niov = &owner->area.niovs[i];
+ 			niov->type = NET_IOV_DMABUF;
+ 			niov->owner = &owner->area;
++			niov->desc.pp = NULL;
+ 			page_pool_set_dma_addr_netmem(net_iov_to_netmem(niov),
+ 						      net_devmem_get_dma_addr(niov));
+ 			if (direction == DMA_TO_DEVICE)
+diff --git a/net/core/netmem_priv.h b/net/core/netmem_priv.h
+index 23175cb2bd86..fb21cc19176b 100644
+--- a/net/core/netmem_priv.h
++++ b/net/core/netmem_priv.h
+@@ -22,6 +22,12 @@ static inline void netmem_clear_pp_magic(netmem_ref netmem)
+ 
+ static inline bool netmem_is_pp(netmem_ref netmem)
+ {
++	/* Use ->pp for net_iov to identify if it's pp, which requires
++	 * that non-pp net_iov should have ->pp NULL'd.
++	 */
++	if (netmem_is_net_iov(netmem))
++		return !!netmem_to_nmdesc(netmem)->pp;
++
+ 	return (netmem_get_pp_magic(netmem) & PP_MAGIC_MASK) == PP_SIGNATURE;
+ }
+ 
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 1a5edec485f1..2756b78754b0 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -699,7 +699,13 @@ s32 page_pool_inflight(const struct page_pool *pool, bool strict)
+ void page_pool_set_pp_info(struct page_pool *pool, netmem_ref netmem)
+ {
+ 	netmem_set_pp(netmem, pool);
+-	netmem_or_pp_magic(netmem, PP_SIGNATURE);
++
++	/* For page-backed, pp_magic is used to identify if it's pp.
++	 * For net_iov, it's ensured nmdesc->pp is non-NULL if it's pp
++	 * and nmdesc->pp is NULL if it's not.
++	 */
++	if (!netmem_is_net_iov(netmem))
++		netmem_or_pp_magic(netmem, PP_SIGNATURE);
+ 
+ 	/* Ensuring all pages have been split into one fragment initially:
+ 	 * page_pool_set_pp_info() is only called once for every page when it
+@@ -714,7 +720,13 @@ void page_pool_set_pp_info(struct page_pool *pool, netmem_ref netmem)
+ 
+ void page_pool_clear_pp_info(netmem_ref netmem)
+ {
+-	netmem_clear_pp_magic(netmem);
++	/* For page-backed, pp_magic is used to identify if it's pp.
++	 * For net_iov, it's ensured nmdesc->pp is non-NULL if it's pp
++	 * and nmdesc->pp is NULL if it's not.
++	 */
++	if (!netmem_is_net_iov(netmem))
++		netmem_clear_pp_magic(netmem);
++
+ 	netmem_set_pp(netmem, NULL);
+ }
+ 
+
+base-commit: e1f5bb196f0b0eee197e06d361f8ac5f091c2963
+-- 
+2.17.1
+
 
