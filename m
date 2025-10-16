@@ -1,109 +1,150 @@
-Return-Path: <netdev+bounces-229888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E4C2BE1CEF
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:50:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2F59BE1D4F
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:57:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F1C93A3790
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 06:50:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35A4219C0E47
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 06:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 777D52E9EB2;
-	Thu, 16 Oct 2025 06:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C1632F60C9;
+	Thu, 16 Oct 2025 06:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P8yMnM5E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g9VRK7cJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6AC239E63;
-	Thu, 16 Oct 2025 06:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C9A72622;
+	Thu, 16 Oct 2025 06:57:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760597429; cv=none; b=tX5gFL9q1Z+S4Krpj5355hK0x4i9Mlj2vKgTsA4Op4P51fPPK/5p+PcU55z9X+6SzjQA7b/qXC2e+6vrsExwJlwiogCwyl2KO1+nAi40n6XpSTGHPhFgsgtDv2Q1Hz4FVxVqZZ+LEbzOQ5o/wZJaidCsD6ftv7tLyvlfn4MkAFA=
+	t=1760597871; cv=none; b=JXtPyge0yFYM3OhXon6GVDePCaXD2j+i4iHhXtoU/GWtwaWcbB+PdQfUeCMVmLVtNjzQKLfVSpek47uk77H9JX7xu+Tg2PqE4fhcHN4vo2sP2tnE+fAmIZv0qjJBYTx1citEX2uTIpQ0c0eN9YymlMdFhuGWE6t9pSzQFEaX8DI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760597429; c=relaxed/simple;
-	bh=5nAl/JapwFNY3OyQHlzk+hzxps0TpN4jCMXVZiiK2hg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=taNIU07/OHlYeDISvcjf1cx/2r+hSojx6ODNgrKO2Xd9X3/W34CdDYz5MIJhyUo27WE7axLh0vwxD/kV9jUHTulD9H60iZvDKDkKxlrSx7YUUGCY7YOWZIpUwgwlb1FMTcE+XRwsyDEJAYJEqO38m93/solFxcUfgtRUt7y9tqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P8yMnM5E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5521C4CEF1;
-	Thu, 16 Oct 2025 06:50:28 +0000 (UTC)
+	s=arc-20240116; t=1760597871; c=relaxed/simple;
+	bh=PVIGP3Mk4x0juJB1vGos8zMhjY0qV8iKWIM/SK3yIuU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=azCmxPvzf53lsbAtk8wFR+puSlbUOsZPzAMUVOyvDj8oWGqoAUg8EeFqVYSGNi9t8sWtJujI9TtwUZDI3nvNvGodd64aIyA2UT4HlB1i9i9cXNMlycrt4Nyytelqd5ABpivZNglkehPrFePS4FepX76Nc/MTU+C3aJaligh03/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g9VRK7cJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E808C4CEFB;
+	Thu, 16 Oct 2025 06:57:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760597428;
-	bh=5nAl/JapwFNY3OyQHlzk+hzxps0TpN4jCMXVZiiK2hg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=P8yMnM5EAoAsDgEHOM9S8eJ3SeCAoFGEum+vS0rKYeqXBBwPUQNeTFJZZ3R+nVepb
-	 B94nwKqrcmwoUR3md3StGUsQat6okBKa5re2gwXe/aU0LUAndmNJUpQqfYMWUPt4Pp
-	 csE5DqKKitFgE7RPYOBwAVek7uFMRvOINhF432nZN9v56CYyjFpDaTlEFN3/HJ/YqK
-	 1qUR4eD+fljqjAn50lPFHUbwCDmfYExBGqZWVX0DFCds4GdmDzV3X8hsQaKP6FwTAO
-	 HIAKMpKIWdno7OnxLUD4P9CjUdJUzCCu+ULJsnKZQQz00wdqI/UP9J8BgFSFZyQtlC
-	 Vhb0RdFxnSULg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DCE38111E3;
-	Thu, 16 Oct 2025 06:50:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1760597870;
+	bh=PVIGP3Mk4x0juJB1vGos8zMhjY0qV8iKWIM/SK3yIuU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=g9VRK7cJPnLoUtostILIrziJBq3RCLYCfeXbGrYQGxKTB5jmb0yB7ihlFWw6HdcDG
+	 dwyYLGl3uobdbICzJuwaO4AbS1Sx4aV35LuiuMTXPJA8eKnHZUqr+rp1y+qPP7gsr3
+	 OUaLXPb7JfdPiIMtwH/x71sAde2yScjjs/Uc17UpeD0cZx8nkO5SQdaRHBwwSxmCbz
+	 wBIb5f9zBhdWGcLNjdW8IFfRqH3XRewvQoVyJQUIE6HA5MafWWUZf2OSb4OgG384Dz
+	 K7rLB9jY0ijTCmVrXFq+5iL2iGlV6IgbDzCVzBcYG/pv7kLyxsWsTx6kF0bmQmCGIJ
+	 yC2R65Az7VGwg==
+Message-ID: <de3bab41-0ea6-4c1d-9350-2c73ba464b10@kernel.org>
+Date: Thu, 16 Oct 2025 08:57:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 bpf-next/net 0/6] bpf: Allow opt-out from
- sk->sk_prot->memory_allocated.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176059741325.1205767.12458760043676255932.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Oct 2025 06:50:13 +0000
-References: <20251014235604.3057003-1-kuniyu@google.com>
-In-Reply-To: <20251014235604.3057003-1-kuniyu@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
- martin.lau@linux.dev, john.fastabend@gmail.com, sdf@fomichev.me,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- ncardwell@google.com, willemb@google.com, almasrymina@google.com,
- roman.gushchin@linux.dev, shakeel.butt@linux.dev, kuni1840@gmail.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dt-bindings: Fix inconsistent quoting
+To: "Rob Herring (Arm)" <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Stephen Boyd <sboyd@kernel.org>,
+ Thierry Reding <thierry.reding@gmail.com>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, Shawn Guo <shawnguo@kernel.org>,
+ Fabio Estevam <festevam@gmail.com>, =?UTF-8?Q?Nuno_S=C3=A1?=
+ <nuno.sa@analog.com>, Lars-Peter Clausen <lars@metafoo.de>,
+ Michael Hennerich <Michael.Hennerich@analog.com>,
+ Jonathan Cameron <jic23@kernel.org>, Andy Shevchenko <andy@kernel.org>,
+ Jassi Brar <jassisinghbrar@gmail.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>, Lee Jones <lee@kernel.org>,
+ Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Daire McNamara <daire.mcnamara@microchip.com>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ Manivannan Sadhasivam <mani@kernel.org>, Bjorn Helgaas
+ <bhelgaas@google.com>, Vinod Koul <vkoul@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Florian Fainelli <f.fainelli@gmail.com>, Tony Lindgren <tony@atomide.com>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-iio@vger.kernel.org,
+ linux-media@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-phy@lists.infradead.org
+References: <20251015232015.846282-1-robh@kernel.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20251015232015.846282-1-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to bpf/bpf-next.git (net)
-by Martin KaFai Lau <martin.lau@kernel.org>:
-
-On Tue, 14 Oct 2025 23:54:53 +0000 you wrote:
-> This series allows opting out of the global per-protocol memory
-> accounting if socket is configured as such by sysctl or BPF prog.
+On 16/10/2025 01:16, Rob Herring (Arm) wrote:
+> yamllint has gained a new check which checks for inconsistent quoting
+> (mixed " and ' quotes within a file). Fix all the cases yamllint found
+> so we can enable the check (once the check is in a release). Use
+> whichever quoting is dominate in the file.
 > 
-> This series is the successor of the series below [0], but the changes
-> now fall in net and bpf subsystems only.
-> 
-> I discussed with Roman Gushchin offlist, and he suggested not mixing
-> two independent subsystems and it would be cleaner not to depend on
-> memcg.
-> 
-> [...]
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
 
-Here is the summary with links:
-  - [v2,bpf-next/net,1/6] tcp: Save lock_sock() for memcg in inet_csk_accept().
-    https://git.kernel.org/bpf/bpf-next/c/8c52ab2e9b34
-  - [v2,bpf-next/net,2/6] net: Allow opt-out from global protocol memory accounting.
-    https://git.kernel.org/bpf/bpf-next/c/d5728fed86f6
-  - [v2,bpf-next/net,3/6] net: Introduce net.core.bypass_prot_mem sysctl.
-    https://git.kernel.org/bpf/bpf-next/c/543cf9b90ce5
-  - [v2,bpf-next/net,4/6] bpf: Support bpf_setsockopt() for BPF_CGROUP_INET_SOCK_CREATE.
-    https://git.kernel.org/bpf/bpf-next/c/13b77b283f2b
-  - [v2,bpf-next/net,5/6] bpf: Introduce SK_BPF_BYPASS_PROT_MEM.
-    https://git.kernel.org/bpf/bpf-next/c/58e1d04e5e34
-  - [v2,bpf-next/net,6/6] selftest: bpf: Add test for sk->sk_bypass_prot_mem.
-    https://git.kernel.org/bpf/bpf-next/c/71295ac94281
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Best regards,
+Krzysztof
 
