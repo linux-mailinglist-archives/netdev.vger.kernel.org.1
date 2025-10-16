@@ -1,205 +1,83 @@
-Return-Path: <netdev+bounces-230139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93B4CBE45DC
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 17:54:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9027BE45E2
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 17:54:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27CBE1A64500
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:54:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59C394263E2
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:54:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D678A34DCD2;
-	Thu, 16 Oct 2025 15:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15EC234F47A;
+	Thu, 16 Oct 2025 15:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ICMMHz+r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FE61FC110
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 15:54:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD2A34F46B;
+	Thu, 16 Oct 2025 15:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760630048; cv=none; b=Ewlu8HetEZN+wkxu8TvdmyM4WOBFWGrcssFcVB9YKERkNtBTGIExyYvjww06NQkBS3SAh9ZEqLGjOp2e9ipRjj+KB9Vlr2qh7Cwe9vzkSFDVXoyPTy9s9rYuX4GIEMJi3oHl6CPqpsKFgsZrzGDuswVggceMtUMCV+mHzANeD4Y=
+	t=1760630049; cv=none; b=B0VfmUA75EurDp2Jay7w9giKPtaozqL+HsD+/iXpmOEsdBJrWfuvj4k9vBVCktAlXSJMIEhIDzxhENsk4OUQhVvuBHa/YeNd5oZhr8g5ASXVSPKcJ5ufNcvE9+8980T4eSffP17234j3lDxOMaqnGFo8XNUIvl5j0y1439hOmQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760630048; c=relaxed/simple;
-	bh=8KwkF23fR9dolqVszLQ8s43SpYzIeQUasFjQJE9ELdg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fJxkYk3TnzuU67+THJYpvPiY29iFHD6pujRdM3/U5ftdC7hCtZLjJuGK5SyZUW0MT0T5mB+eeeuNuldhU6Y5kujuGlrabRnmfHifbT6wjfmwLvhHvXIXzhXbx0XVi7wIxxE4wxFNxy4QyAmNSBDeofTXTJeSc+qg3oH/0Gvk/II=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 94D706020FEFF;
-	Thu, 16 Oct 2025 17:53:45 +0200 (CEST)
-Message-ID: <834ff332-b41e-4418-a496-7ea51a2bcecf@molgen.mpg.de>
-Date: Thu, 16 Oct 2025 17:53:45 +0200
+	s=arc-20240116; t=1760630049; c=relaxed/simple;
+	bh=MzbQ2BY+xkSQDjQHaiNk2TeebhTVZYDmnm7F8+q9KHo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ap157Glm0gzkJ1rT+BBmJeucX1svnpv1I0P6yFSq3UvqgcU2M93ad+VYB4h9E+1YHoUT9PrUcdwwOhp3lbMon8VnzDFB2CH+SFWEobOk001bl4rZNaBMKgWldRvgEucHdvjStyHeyWPWhCH6unneK7phwutFe6VpZeDz551mtPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ICMMHz+r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAD18C4CEFB;
+	Thu, 16 Oct 2025 15:54:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760630048;
+	bh=MzbQ2BY+xkSQDjQHaiNk2TeebhTVZYDmnm7F8+q9KHo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ICMMHz+rh+Oy/eceOUktsQjXuWuXOPJuWINTXnkn0zPWMs8d4XlCQF5zPTIwunhfv
+	 suUTNdZdTUg7ztTsPIjyCA/jegFv+M9IJHkb/O0DXAY3kWNIOy+1n1ejALSvWuFZFO
+	 vT1VKA+TjXeh2fkX2EJBTcTFC3NwA+Qwvpjr41Tt2cVY4lH5QCQaIywSn/K2v4vK29
+	 dD1D5MfPVQPUc8VHj5+ahgdXuvzIcPcHLEWyIMKg8A059HUMEjH81sVx690GnTkiFy
+	 ZlKY1arAUEms2HW4jzQYJ5t+WB73ghVMr7A9BWaUMth9kdJ41Z5aaAcUMNJ/35kvWw
+	 zCfhKIeRZ1mMg==
+Date: Thu, 16 Oct 2025 16:54:03 +0100
+From: Simon Horman <horms@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v2 08/13] net: airoha: ppe: Configure SRAM PPE
+ entries via the cpu
+Message-ID: <aPEVG0smO9lUek4W@horms.kernel.org>
+References: <20251016-an7583-eth-support-v2-0-ea6e7e9acbdb@kernel.org>
+ <20251016-an7583-eth-support-v2-8-ea6e7e9acbdb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: unify PHY FW loading
- status handler for E800 devices
-To: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Cc: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-References: <20251014084618.2746755-1-grzegorz.nitka@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20251014084618.2746755-1-grzegorz.nitka@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251016-an7583-eth-support-v2-8-ea6e7e9acbdb@kernel.org>
 
-Dear Grzegorz,
-
-
-Thank you for your patch.
-
-Am 14.10.25 um 10:46 schrieb Grzegorz Nitka:
-> Unify handling of PHY firmware load delays across all E800 family
-> devices. There is an existing mechanism to poll GL_MNG_FWSM_FW_LOADING_M
-> bit of GL_MNG_FWSM register in order to verify whether PHY FW loading
-> completed or not. Previously, this logic was limited to E827 variants
-> only.
+On Thu, Oct 16, 2025 at 12:28:22PM +0200, Lorenzo Bianconi wrote:
+> Introduce airoha_ppe_foe_commit_sram_entry routine in order to configure
+> the SRAM PPE entries directly via the CPU instead of using the NPU APIs.
+> This is a preliminary patch to enable netfilter flowtable hw offload for
+> AN7583 SoC.
 > 
-> Also, inform a user of possible delay in initialization process, by
-> dumping informational message in dmesg log.
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-Paste the message here?
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice_common.c | 81 ++++++---------------
->   1 file changed, 24 insertions(+), 57 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-> index 8e56354332ad..d05d371a9944 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> @@ -203,42 +203,6 @@ bool ice_is_generic_mac(struct ice_hw *hw)
->   		hw->mac_type == ICE_MAC_GENERIC_3K_E825);
->   }
->   
-> -/**
-> - * ice_is_pf_c827 - check if pf contains c827 phy
-> - * @hw: pointer to the hw struct
-> - *
-> - * Return: true if the device has c827 phy.
-> - */
-> -static bool ice_is_pf_c827(struct ice_hw *hw)
-> -{
-> -	struct ice_aqc_get_link_topo cmd = {};
-> -	u8 node_part_number;
-> -	u16 node_handle;
-> -	int status;
-> -
-> -	if (hw->mac_type != ICE_MAC_E810)
-> -		return false;
-> -
-> -	if (hw->device_id != ICE_DEV_ID_E810C_QSFP)
-> -		return true;
-> -
-> -	cmd.addr.topo_params.node_type_ctx =
-> -		FIELD_PREP(ICE_AQC_LINK_TOPO_NODE_TYPE_M, ICE_AQC_LINK_TOPO_NODE_TYPE_PHY) |
-> -		FIELD_PREP(ICE_AQC_LINK_TOPO_NODE_CTX_M, ICE_AQC_LINK_TOPO_NODE_CTX_PORT);
-> -	cmd.addr.topo_params.index = 0;
-> -
-> -	status = ice_aq_get_netlist_node(hw, &cmd, &node_part_number,
-> -					 &node_handle);
-> -
-> -	if (status || node_part_number != ICE_AQC_GET_LINK_TOPO_NODE_NR_C827)
-> -		return false;
-> -
-> -	if (node_handle == E810C_QSFP_C827_0_HANDLE || node_handle == E810C_QSFP_C827_1_HANDLE)
-> -		return true;
-> -
-> -	return false;
-> -}
-> -
->   /**
->    * ice_clear_pf_cfg - Clear PF configuration
->    * @hw: pointer to the hardware structure
-> @@ -958,30 +922,35 @@ static void ice_get_itr_intrl_gran(struct ice_hw *hw)
->   }
->   
->   /**
-> - * ice_wait_for_fw - wait for full FW readiness
-> + * ice_wait_fw_load - wait for PHY firmware loading to complete
->    * @hw: pointer to the hardware structure
->    * @timeout: milliseconds that can elapse before timing out
->    *
-> - * Return: 0 on success, -ETIMEDOUT on timeout.
-> + * On some cards, FW can load longer than usual,
-> + * and could still not be ready before link is turned on.
-> + * In these cases, we should wait until all's loaded.
-> + *
-> + * Return:
-> + * * 0 on success (FW load is completed)
-> + * * negative - on timeout
->    */
-> -static int ice_wait_for_fw(struct ice_hw *hw, u32 timeout)
-> +static int ice_wait_fw_load(struct ice_hw *hw, u32 timeout)
->   {
-> -	int fw_loading;
-> -	u32 elapsed = 0;
-> +	int fw_loading_reg;
->   
-> -	while (elapsed <= timeout) {
-> -		fw_loading = rd32(hw, GL_MNG_FWSM) & GL_MNG_FWSM_FW_LOADING_M;
-> +	if (!timeout)
-> +		return 0;
->   
-> -		/* firmware was not yet loaded, we have to wait more */
-> -		if (fw_loading) {
-> -			elapsed += 100;
-> -			msleep(100);
-> -			continue;
-> -		}
-> +	fw_loading_reg = rd32(hw, GL_MNG_FWSM) & GL_MNG_FWSM_FW_LOADING_M;
-> +	/* notify the user only once if PHY FW is still loading */
-> +	if (fw_loading_reg)
-> +		dev_info(ice_hw_to_dev(hw), "Link initialization is blocked by PHY FW initialization. Link initialization will continue after PHY FW initialization completes.\n");
-> +	else
->   		return 0;
-> -	}
->   
-> -	return -ETIMEDOUT;
-> +	return rd32_poll_timeout(hw, GL_MNG_FWSM, fw_loading_reg,
-> +				 !(fw_loading_reg & GL_MNG_FWSM_FW_LOADING_M),
-> +				 10000, timeout * 1000);
->   }
->   
->   static int __fwlog_send_cmd(void *priv, struct libie_aq_desc *desc, void *buf,
-> @@ -1171,12 +1140,10 @@ int ice_init_hw(struct ice_hw *hw)
->   	 * due to necessity of loading FW from an external source.
->   	 * This can take even half a minute.
->   	 */
-> -	if (ice_is_pf_c827(hw)) {
-> -		status = ice_wait_for_fw(hw, 30000);
-> -		if (status) {
-> -			dev_err(ice_hw_to_dev(hw), "ice_wait_for_fw timed out");
-> -			goto err_unroll_fltr_mgmt_struct;
-> -		}
-> +	status = ice_wait_fw_load(hw, 30000);
-> +	if (status) {
-> +		dev_err(ice_hw_to_dev(hw), "ice_wait_fw_load timed out");
-> +		goto err_unroll_fltr_mgmt_struct;
->   	}
->   
->   	hw->lane_num = ice_get_phy_lane_number(hw);
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
 
