@@ -1,137 +1,189 @@
-Return-Path: <netdev+bounces-230019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8F83BE30C5
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:27:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32C75BE30DA
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:29:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B17DC4E0F27
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:27:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDB83586B6A
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:28:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88AC03164C1;
-	Thu, 16 Oct 2025 11:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AFB4316903;
+	Thu, 16 Oct 2025 11:28:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NjbsrNeS"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="DRqiCVfG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02CC2E172E
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E439316193;
+	Thu, 16 Oct 2025 11:28:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760614028; cv=none; b=Z+Iz5n89xkgyjeYG9hJ4wKDEaCw0mL0onc5s5SPBujYzf30M2FX6PMoXupmTshkJYCEtj+0daUSd3uM/kYggbAa3aVW899ztOkUUSbgRaSLzCW2+7GGZ2xfPnnhBgpeFKtKxPk7nXbZEc6tZ+nu0OKLOmDAi2uOHlPKiuLfMYvs=
+	t=1760614135; cv=none; b=REr7wd2LvkiGuPZVxMVs7pPxMGOdceTq2Nfwq/WsKxBwwW9jw8Ay1PROM1JnU8XamLZMihn0zBnaKyZ2KEsKiqKDiBC0FYSMxVlmN8fXKZ/C8/Yn/93YOXrIeK2/tDWmARSwwfsB6hYJHqffBYsoFIk1WTlr3lnjBf1WxY1pryU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760614028; c=relaxed/simple;
-	bh=rOYcDSrhRWLgtnzpoeHuge7O06Ip2GR7UW51Bh01bCo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OWQPSMP+33xmgobIJBj8me3XIf5TUdjvFNlpJG6MLtBdNiEePC2Jn/9Vki6SOHiwPAC35mUBjdmR895rpRhZEf982YLRbPjjn6YWa1/ZWeFw3FyzWL0FFKAqwMULPs5dkujBO9D61CbvAitTUtwAvAFouY2dnLhFkh1q0NPhfp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=NjbsrNeS; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-471066cfc2aso5676175e9.0
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 04:27:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1760614024; x=1761218824; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S9hYzjpUktnCETUL8826o3/CkmCIwf0/rTKQ/FR1f+M=;
-        b=NjbsrNeSpJ1RJxnSHSXWFZR16nyPfWuxIv2onWfekEwqQamNRboNFm6T0D3/k+X0ts
-         9b8VPZkdNOYvMVp5bq93V1xWcQjQ/t16kKPNKSYuutTtLcISzQgg6ofIMq6ZzMUeB43F
-         CacM0/EW/sS8Rhb68TO0pGVF0CsqmFcXioQS23QLIvJhcGqIpidlWcSx3cOC/358CgyO
-         +tMbD0f8qXSoj4jnDBOfJSHHq/lxW5oPa5wXi7d2xO0oqJN3eel7M6dwjw7P3Ajy0vOf
-         wkegVFKuZO7mHt3cVD9byoaXgYG73UCqZm9cl0dQizCRDQ5DfTbi8m4QFm2mXIuPGXlF
-         gfvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760614024; x=1761218824;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S9hYzjpUktnCETUL8826o3/CkmCIwf0/rTKQ/FR1f+M=;
-        b=ZxTCyW8rc4LlsQcRvy0S4kaX9rTW+4ZunS1jc3DdGigQSIev5zPyFH9ZIx5te/T1B8
-         66fcdLx4iIViqfOnkdvN2RboZ9GXuyl7/WbQHyOIe/zZGcj0Q/FyjbHA/63sst7442a9
-         FkFDyjgImN91p4PwJjvAcFwUvtgPOEOySzBWDRGlseS92iODilfCWUcUVIVnRerRdFBr
-         dHFUE+HOcsWauzNc3yN/0tS0MZU6csvaW6+12DgzvSQHmGG4Qc8DwcXlu6JtiwN+q3FZ
-         cY60eAFcoHDYRvlpGQOH+To/U1+A2unIo4HtQ6eSb+48mhEXnOTgr2yvEvYqpUd8KRyF
-         uRmw==
-X-Gm-Message-State: AOJu0YyUt6dp6ruMMGhKyX1Ks6AalQVfJxwKLWZ39GznWZ2IHRMKHw62
-	yvbEYgxa9A6ZESrF5i8aOFBB3FlQO0zi3z9o7xSyrgC7E6j8SF+mwNfkE516k/Ix2ZU=
-X-Gm-Gg: ASbGncvE+oHIlHLnguf/g7BHkPHtxX8ZNBERiWTsZMzLmM59Osg0Rg1kll6YbCtqeqd
-	/K3aUVDpaAcQjyyMNSswaTZDTd90cRyOo3DHmQboUYwTueDV0o2hfstrBKnC+JlhljAmerUP5BP
-	0P52JjSJcuBpdCLF8rRCs8L+6FxIuIeDlBz2e9xLF42ntkU67d+d8/Hzl3ShJKyY6kgWXiM5F1R
-	FdabM7kewOeBwp7sUrhJzrVobXxVccr1rUxQF/d1gVABYCuOImc/681gvLchJyDZA5xj8P+wvk6
-	gQyrZ+tL7JmsjhF0TNHQ2mG/Csfyr4m6JlpuKtWG7AiGGOwm21wpisQzt9lQrnLSxGuf3RMMj/m
-	CqIkAQYRedRf1veT3JXVuuTkYzpRqeqNDFDTXN5ujwai61d4iYiGP8DBzfvGkNTUnSrQsJFoyFp
-	1Y53xIoXk7ZRy7nsghAbPXHYgy9RLsYlmNARHirw==
-X-Google-Smtp-Source: AGHT+IFb112ZtZLsO+hoNYz2HxlsdyYfC7JZQ7Gax5FlERbPuY4E7182eA14h+MSwUZXQUmyS7FO8A==
-X-Received: by 2002:a05:600c:8719:b0:45d:d97c:235e with SMTP id 5b1f17b1804b1-46fa9aa0edfmr226344305e9.12.1760614023765;
-        Thu, 16 Oct 2025 04:27:03 -0700 (PDT)
-Received: from jiri-mlt.client.nvidia.com ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-471144d17cdsm20097575e9.18.2025.10.16.04.27.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Oct 2025 04:27:03 -0700 (PDT)
-Date: Thu, 16 Oct 2025 13:27:00 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Sabrina Dubroca <sdubroca@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, Shuah Khan <shuah@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Stanislav Fomichev <stfomichev@gmail.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	bridge@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCHv4 net-next 1/4] net: add a common function to compute
- features from lowers devices
-Message-ID: <to4zjjo5wfd5suootcy2v7n7kuc6rym3ld4jov26nunnarji2u@2hr7jyiq36pj>
-References: <20251014080217.47988-1-liuhangbin@gmail.com>
- <20251014080217.47988-2-liuhangbin@gmail.com>
- <sfjjkeub7fmvsktzrx6mmv6zvilno3un665tbqe2punw4azefo@jwuhk23763gc>
- <aO74J20k16L7jS15@fedora>
+	s=arc-20240116; t=1760614135; c=relaxed/simple;
+	bh=+wVRuiQnZqQTQ83N4gc5pdZaUVwxqdGkvElu0H8WEmQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A8MsWxmoaCpjpQSorjR2eXbSO5n+tRpbfGNIqUH/umjL7lh/rl+2Nj0hLuYMiqSLlm5pqWq91qYPJBKLW+vvj8z6oanGBellC7NWkbkblH3xWjM9+zXeC/RUdlpVKsN0BDwJ31GBtTAIN6vTtY69PikUTntELg3p4eEE+w3xrDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=DRqiCVfG; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1760614131;
+	bh=+wVRuiQnZqQTQ83N4gc5pdZaUVwxqdGkvElu0H8WEmQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=DRqiCVfGvV57D50LE8su2GRqaZLq3rrABrFVgonzCYXAgI/VwlNkQ/zATG7M7A9p+
+	 OfBTDu2enhUjXetbR+bDKGwhTMXFe5LrnNN/lO7lOjrQQEDT09nb5gU6WMmlgliWNE
+	 K63Q50Mz2OLlil5SmFgu88kZuUqYKJtCTQKPOoI8qzoC6PHm5b7JIrWsiChKes2yvG
+	 VcKcmzDmtRqTsxRAKW4PGntbW2jRn6W7QzKLBNiP3cSDm2Zv6BPI/lV0DuvDP5N09k
+	 qRm/xBKDUb7UFXvLgZBdvF4zQ+904CjlQCwmHcZkS8H+QfLJHFXUYy+5QSN4DCY/Gb
+	 DjyeePEguMP7w==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5184A17E05FE;
+	Thu, 16 Oct 2025 13:28:50 +0200 (CEST)
+Message-ID: <7333fc2b-bc30-41bf-be09-2b9ff7c3599f@collabora.com>
+Date: Thu, 16 Oct 2025 13:28:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aO74J20k16L7jS15@fedora>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 15/15] arm64: dts: mediatek: mt7981b-openwrt-one: Enable
+ leds
+To: Sjoerd Simons <sjoerd@collabora.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ Ryder Lee <ryder.lee@mediatek.com>, Jianjun Wang
+ <jianjun.wang@mediatek.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ Manivannan Sadhasivam <mani@kernel.org>,
+ Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>, Lee Jones <lee@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>
+Cc: kernel@collabora.com, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
+ linux-phy@lists.infradead.org, netdev@vger.kernel.org,
+ Daniel Golle <daniel@makrotopia.org>, Bryan Hinton <bryan@bryanhinton.com>
+References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
+ <20251016-openwrt-one-network-v1-15-de259719b6f2@collabora.com>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <20251016-openwrt-one-network-v1-15-de259719b6f2@collabora.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Wed, Oct 15, 2025 at 03:25:59AM +0200, liuhangbin@gmail.com wrote:
->Hi Jiri,
->On Tue, Oct 14, 2025 at 11:40:12AM +0200, Jiri Pirko wrote:
->> >+#define VIRTUAL_DEV_VLAN_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
->> 
->> I don't like the "virtual" naming. In the past, we always tried to avoid
->> that for lower-upper devices like bond/team/bridge/others. Soft-device
->> was the used term. Please let the "virtual" term for vitrualization,
->> would that be possible?
->
->Sure
->> 
->> How about "master_upper"? This is already widely used to refer to
->> bond/team/bridge/other master soft devices.
->> 
->> MASTER_UPPER_DEV_VLAN_FEATURES?
->
->I'm not sure if we should avoid using "master" now. Maybe just UPPER_DEV_VLAN_FEATURES?
+Il 16/10/25 12:08, Sjoerd Simons ha scritto:
+> The Openwrt One has 3 status leds at the front (red, white, green) as
+> well as 2 software controlled leds for the LAN jack (amber, green).
+> 
+> Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
+> ---
+>   .../boot/dts/mediatek/mt7981b-openwrt-one.dts      | 57 ++++++++++++++++++++++
+>   1 file changed, 57 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
+> index 4d1653c336e71..0c0878488ae98 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
+> +++ b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
+> @@ -43,6 +43,50 @@ reg_5v: regulator-5v {
+>   		regulator-boot-on;
+>   		regulator-always-on;
+>   	};
+> +
+> +	pwm-leds {
 
-Why? We have "master_upper" to point exactly at this kind of device.
+Please keep the nodes ordered by name.
+
+Cheers,
+Angelo
+
+> +		compatible = "pwm-leds";
+> +
+> +		led-0 {
+> +			color = <LED_COLOR_ID_WHITE>;
+> +			default-brightness = <0>;
+> +			function = LED_FUNCTION_STATUS;
+> +			max-brightness = <255>;
+> +			pwms = <&pwm 0 10000>;
+> +		};
+> +
+> +		led-1 {
+> +			color = <LED_COLOR_ID_GREEN>;
+> +			default-brightness = <0>;
+> +			function = LED_FUNCTION_STATUS;
+> +			max-brightness = <255>;
+> +			pwms = <&pwm 1 10000>;
+> +		};
+> +	};
+> +
+> +	gpio-leds {
+> +		compatible = "gpio-leds";
+> +
+> +		led-0 {
+> +			color = <LED_COLOR_ID_RED>;
+> +			function = LED_FUNCTION_STATUS;
+> +			gpios = <&pio 9 GPIO_ACTIVE_HIGH>;
+> +		};
+> +
+> +		led-1 {
+> +			color = <LED_COLOR_ID_AMBER>;
+> +			function = LED_FUNCTION_LAN;
+> +			gpios = <&pio 34 GPIO_ACTIVE_LOW>;
+> +			linux,default-trigger = "netdev";
+> +		};
+> +
+> +		led-2 {
+> +			color = <LED_COLOR_ID_GREEN>;
+> +			function = LED_FUNCTION_LAN;
+> +			gpios = <&pio 35 GPIO_ACTIVE_LOW>;
+> +			linux,default-trigger = "netdev";
+> +		};
+> +	};
+>   };
+>   
+>   &eth {
+> @@ -109,6 +153,13 @@ mux {
+>   		};
+>   	};
+>   
+> +	pwm_pins: pwm-pins {
+> +		mux {
+> +			function = "pwm";
+> +			groups = "pwm0_0", "pwm1_1";
+> +		};
+> +	};
+> +
+>   	spi2_flash_pins: spi2-pins {
+>   		mux {
+>   			function = "spi";
+> @@ -152,6 +203,12 @@ conf {
+>   	};
+>   };
+>   
+> +&pwm {
+> +	pinctrl-names = "default";
+> +	pinctrl-0 = <&pwm_pins>;
+> +	status = "okay";
+> +};
+> +
+>   &spi2 {
+>   	pinctrl-names = "default";
+>   	pinctrl-0 = <&spi2_flash_pins>;
+> 
 
 
->
->> [..]
->> 
->> 
->> >+void netdev_compute_features_from_lowers(struct net_device *dev, bool update_header)
->> 
->> netdev_compute_master_upper_features?
->
->netdev_compute_upper_features?
->
->Thanks
->Hangbin
 
