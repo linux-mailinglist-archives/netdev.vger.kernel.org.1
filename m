@@ -1,108 +1,169 @@
-Return-Path: <netdev+bounces-230069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D6FFBE3882
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 14:57:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E036BE38A2
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 14:58:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49E33585D5A
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:56:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5066E481770
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:57:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C5733438B;
-	Thu, 16 Oct 2025 12:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="csgUewUt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FA2633438C;
+	Thu, 16 Oct 2025 12:56:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACD2334381
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 12:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1AFB334388;
+	Thu, 16 Oct 2025 12:56:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760619389; cv=none; b=PG0XQxMji5SHe07GqolXjM+P6WR10jo8FB1J4HP3aETBstbwOPCNSjZZGrt3IoIhZ7L6oDJw5FMhUIb7PRKGQ/rKidany/j+x9k4nQF5dB9BIGuI5j6A3QFUlyNx5tqgK1ngPg9sIML7XNHBjJTsnaNod9qaAFBxWvidvRG4MTc=
+	t=1760619415; cv=none; b=Bhj1yrjqna3a0c/Y5odEQrlZRlWg+6HOU05wlo+77ZbbDAfKixoXELfQjlKNf5GIuJHLKq3FHTX6SaRe7HBk4WzexCVRoI+PasrDC9TLbZ31xJ3NM+3LDIo2Kaq6PVJk4FG8fYI9XyUSTZrBN46ipEr8AaQXd/Z9hdWr5W0l5q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760619389; c=relaxed/simple;
-	bh=AQFACMSOZqDLF5yVgb772SY0kn8MNC0ek9D3kdz//oQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UtqKGWNchwslVaTUvrh193LSztQU0ps8zjwF2bI8rc2lkOc7TOEwG+aMCEhbuT5sauOsMftbkAV2alZVQH0FOtf9+bclZYHOaP1Jyo7b/Xat0kxp2NuOzDwrMvzhdstA7rzhIPYWByOo/FYSXCiTJkYSFeN6C7/6QHzTx1IKLCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=csgUewUt; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-7946137e7a2so13250756d6.0
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 05:56:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760619386; x=1761224186; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AQFACMSOZqDLF5yVgb772SY0kn8MNC0ek9D3kdz//oQ=;
-        b=csgUewUttbwc9Fi2VZ9+spNf43Avs60iKmpxmpIiJkaHb/4LDFai1y+LE4icLocL03
-         Dl+d+7RUmQJdn+K1rPNWNkPkvpn+JmTYUiKtKOMnptm3rb988oh8SqZOdSDEg8B6hEEF
-         6Ks00RQ+bKnTNIjW1yXXcC6Wcvd++yKY3xsqk1ZCQJ1DlQGqBbQxNBcnHsryp9plI6xj
-         UgQ4TIT0N5/wZKmm0TrpKhQ3CWDAjKzEtVNlWSUUrEiupeee015zUyFIduNYLVYqU2Oi
-         bKBBYt0i2keC5ccTc4y7NH97QCJKAQwYTCLOWDmFsKirzn5cZ1+elRz6Spp2mN8Xnnuw
-         dKFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760619386; x=1761224186;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AQFACMSOZqDLF5yVgb772SY0kn8MNC0ek9D3kdz//oQ=;
-        b=u2ZxoKfZNPdCT82Z4Q1aVqDyQqeeQkzoJK9CG/z/Zp1fSvdDtV+LF6ykm2QDdT0ByM
-         daNUkBOlVHnhMc83OMWx0r6UjG2em2YHzDHY4KN7yWi7XY/iYMQCev3NUDXlwayIceXu
-         89EGngI/gKgxB3+C74f6UHZEf+dkQvfyWbGULPYEjeXPyi/qTQ513N8AUZuC1Zziin+a
-         9o0W2wCVs8pgMcBz3JJVs8fEBjcVCItYwnTlMxAvpf5nz5bqMc+1k3m5cYjEer+q3BVi
-         Lyd4X4OvoHq20C08UCaRKuw6iEoKl9KJ/5J8wIfBJzSyDv0dblNcPYLI4pyFK5ASw0/m
-         obDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXvrsxXoYjskbik1T29nmbCcl8qzhBzOwpSOUsgrgx1WPyesnBNOS2PWoyjZaWxeH2JL0mTqpE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzn9fVzRV74nMtUK5KM0U+8c0m5Q82C263OZa0M+MZYBiu5iJyO
-	aRPhZKaDfn3Cz8Y5Eh9R7Y1dAg/6QaAj6ERDcDZeeVrz7fZ+H60o1/pDfUEbBfl3tsjlDbWqQ1+
-	exE2fE4Vj4Tcb7qPeiaGxUr6+7F9o9RY/3jX3HkI8
-X-Gm-Gg: ASbGncsYU3aD0J28FGuN8qpxVXaNBtSi8CXxBVO01oVGU/lgxUlki98zBuzF6o5KAp4
-	ssijCbnAp3Ocm19AnPA4ZWBG3Mr9qwzftbCV+OURTIylzVdUQaTaDq4RGAhOfS+OyfxIUcB/c/T
-	/TtseQkeaS0vMHHIvPz2gbufY0hRqxbA6xj+gfrb9FLd7AMJR+zWdDrdFlPD0pS6V6oUuuFk2rQ
-	Y7pfByHpOUn4ryR9TysgV86R2EOZ9wy9usJTVCclhEDXOsa5MaYYa2mfYDnH42UxWKEHSCOPBkn
-	pRA=
-X-Google-Smtp-Source: AGHT+IEIf96fIc0v82VOpajJsrRm/aaohs2E405khgkK1OaYq2OzYAXmH8Z6URhSxZZggj/WlBUz/sG/4VM6nA1pdHY=
-X-Received: by 2002:a05:6214:5006:b0:795:7af3:6ffb with SMTP id
- 6a1803df08f44-87b2f032de4mr478029846d6.63.1760619385685; Thu, 16 Oct 2025
- 05:56:25 -0700 (PDT)
+	s=arc-20240116; t=1760619415; c=relaxed/simple;
+	bh=QCOyN6KuJ4hFzNjqlg0JXPAekV06BTnAMfsrHKk/wtQ=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=asucOHyt90e27Uj8vl+H9RHfakpenZz9adYw5yRiV7d1000ipzguaAGTtVg0BrW8YKUd7QkpwFGEvHXbt2sRfZUN+D4Px3BEmD5KLQT27TVEtEI/Mx/4PID9skpDqzPQ2nRjUaVaK81WzvxMG42fAwNAs0aPEzrYudRJuuy1Qk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=none smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=15.184.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bamaicloud.com
+X-QQ-mid: zesmtpsz7t1760619392tc3c82dbd
+X-QQ-Originating-IP: cnEtqtuHWAKijmXNbJTnEQzRBjJEfjMOSEzmfw9hv30=
+Received: from smtpclient.apple ( [111.204.182.100])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 16 Oct 2025 20:56:29 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 3397144977975772074
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251015233801.2977044-1-edumazet@google.com> <e3ecac24-c216-47ac-92a6-657595031bee@intel.com>
- <CANn89i+birOC7FA9sVtGQNxqQvOGgrY3ychNns7g-uEdOu5p5w@mail.gmail.com> <73aeafc5-75eb-42dc-8f26-ca54dc7506da@intel.com>
-In-Reply-To: <73aeafc5-75eb-42dc-8f26-ca54dc7506da@intel.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 16 Oct 2025 05:56:14 -0700
-X-Gm-Features: AS18NWDechlNadLa1aY2_jBhV1uOiNfO-T24cWCqgFgsq9sLynvUEwKziheiigA
-Message-ID: <CANn89i+mnGg9WRCJG82fTRMtit+HWC0e7FrVmmC-JqNQEuDArw@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: shrink napi_skb_cache_put()
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH] net: bonding: update the slave array for broadcast mode
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+In-Reply-To: <aPCH0vHFqHmBQY_i@fedora>
+Date: Thu, 16 Oct 2025 20:56:19 +0800
+Cc: netdev@vger.kernel.org,
+ Jay Vosburgh <jv@jvosburgh.net>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Jiri Slaby <jirislaby@kernel.org>,
+ stable@vger.kernel.org
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <18630C3F-88B0-4A28-BFE7-D53BCDD8F255@bamaicloud.com>
+References: <20251015125808.53728-1-tonghao@bamaicloud.com>
+ <aPCH0vHFqHmBQY_i@fedora>
+To: Hangbin Liu <liuhangbin@gmail.com>
+X-Mailer: Apple Mail (2.3826.700.81)
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: N4WhQbLQyIqS/FP5P+ed85p1fKz5BQaT0di49oWcjstCUJEU8mpZQT/2
+	CBt1sjyPjX4HIf5qTKZ3uxKwbW8V9k66O+pUiI0apsMVcNBnKoCVYMkBXZIbQnhlcWdM14P
+	/fVBO8Ag5R1Z5qEhNkZzLuIuCnR908JqteFfL9xL/7PQvHWYw5oP6hA+hyXnQikAi3yp/6n
+	m8gSD6zNAwVy7uC/Q5LYhvOSiDsEFY9bQM9RWv9mecSVT6h1YmdbtENpASywO9vJhhM8lik
+	JcwwW49HnCXTRvL9L59KwFjXZGCNuopIk2HMZ23ZhPKYVMAtQWj5yN2G+kr9hySG4OalJI8
+	FTbiwOLWk51SsGg1Hi+TlLO8nUDi3qdCosW7etVPbXGaJTIOWjey0EjmRQYNQgDxxNk1Sxf
+	A2/bqGTlC+umJOizjCfTRYRlKxzI2EqbgRK0aYsZTE2wBygoNo90SdtDNK1dIHV2/OfOfG0
+	TTvLBiqNr/xEurTqfAyA5EBRah/2cI0XYXXPMwFALA4iOiUB0Ey7ah/4wJjL/ODXmiTsCau
+	//ri9ty4nzAZzetX2ByhDUJdfa6e57WXnoGanF8mOJE9JFCKyXYMqXOzKBJYB2x/uiJZ+u3
+	3PK7ln8Nl0EMBVuOy6O4Z8PHc4TxzBjTl+KvSVpZmVz0Ns+dPT1uX5bPhwCzVllJfkL/kT3
+	PAdam/9XorMhvIOrwNSaCLGKhJRE17ka5WSA+Nvt+9F/at42GQID1WlvAZGvfqoz0gj4ELU
+	e2w7jIzn1Aztxtjr6K3kiNzKdNotEIvosfvpBSg6Mwi0PVSM1qObqe2zh9VBMM55GIG2INj
+	RMjmC8/DnlT2vauRdHIuFNAzuoziMl5tXFFnozVYpflR/liwBc2aNT+PZfr+u/vz1gYBVNo
+	EtFscbPukxO572seiPxLUY+kfTAFH9svY3+uVCwUMCUuPkyvQ3lBOB5uyu2tUU5deBXsFZ8
+	XWhOUYu+K7ZYa7sZxdBGmxULtlzZRard0ShpzSWbossDU9XSJn9LCW38nBFTtZ1NWduOzm6
+	lzypkKVQ==
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-RECHKSPAM: 0
 
-On Thu, Oct 16, 2025 at 4:08=E2=80=AFAM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> From: Eric Dumazet <edumazet@google.com>
->
-> BTW doesn't napi_skb_cache_get() (inc. get_bulk()) suffer the same way?
 
-Probably, like other calls to napi_skb_cache_put(()
 
-No loop there, so I guess there is no big deal.
+> On Oct 16, 2025, at 13:51, Hangbin Liu <liuhangbin@gmail.com> wrote:
+>=20
+> Hi Tonghao,
+>=20
+> Please add the target repo in the subject. e.g.
+>=20
+> [PATCH net] net: bonding: update the slave array for broadcast mode
+V2 is post with target repo and fix typo in comment.
+Thanks.
+>=20
+> The patch looks good to me.
+>=20
+> On Wed, Oct 15, 2025 at 08:58:08PM +0800, Tonghao Zhang wrote:
+>> This patch fixes ce7a381697cb ("net: bonding: add broadcast_neighbor =
+option for 802.3ad").
+>> Before this commit, on the broadcast mode, all devices were traversed =
+using the
+>> bond_for_each_slave_rcu. This patch supports traversing devices by =
+using all_slaves.
+>> Therefore, we need to update the slave array when enslave or release =
+salve.
+>>=20
+>> Fixes: ce7a381697cb ("net: bonding: add broadcast_neighbor option for =
+802.3ad")
+>> Cc: Jay Vosburgh <jv@jvosburgh.net>
+>> Cc: "David S. Miller" <davem@davemloft.net>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: Simon Horman <horms@kernel.org>
+>> Cc: Jonathan Corbet <corbet@lwn.net>
+>> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+>> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+>> Cc: Hangbin Liu <liuhangbin@gmail.com>
+>> Cc: Jiri Slaby <jirislaby@kernel.org>
+>> Cc: <stable@vger.kernel.org>
+>> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+>> ---
+>> drivers/net/bonding/bond_main.c | 7 +++++--
+>> 1 file changed, 5 insertions(+), 2 deletions(-)
+>>=20
+>> diff --git a/drivers/net/bonding/bond_main.c =
+b/drivers/net/bonding/bond_main.c
+>> index 17c7542be6a5..2d6883296e32 100644
+>> --- a/drivers/net/bonding/bond_main.c
+>> +++ b/drivers/net/bonding/bond_main.c
+>> @@ -2384,7 +2384,9 @@ int bond_enslave(struct net_device *bond_dev, =
+struct net_device *slave_dev,
+>> unblock_netpoll_tx();
+>> }
+>>=20
+>> - if (bond_mode_can_use_xmit_hash(bond))
+>> + /* broadcast mode uses the all_slaves to loop through slaves. */
+>> + if (bond_mode_can_use_xmit_hash(bond) ||
+>> +    BOND_MODE(bond) =3D=3D BOND_MODE_BROADCAST)
+>> bond_update_slave_arr(bond, NULL);
+>>=20
+>> if (!slave_dev->netdev_ops->ndo_bpf ||
+>> @@ -2560,7 +2562,8 @@ static int __bond_release_one(struct net_device =
+*bond_dev,
+>>=20
+>> bond_upper_dev_unlink(bond, slave);
+>>=20
+>> - if (bond_mode_can_use_xmit_hash(bond))
+>> + if (bond_mode_can_use_xmit_hash(bond) ||
+>> +    BOND_MODE(bond) =3D=3D BOND_MODE_BROADCAST)
+>> bond_update_slave_arr(bond, slave);
+>>=20
+>> slave_info(bond_dev, slave_dev, "Releasing %s interface\n",
+>> --=20
+>> 2.34.1
+>>=20
+>=20
+> Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+>=20
 
-I was looking at napi_skb_cache_put() because there is a lack of NUMA aware=
-ness,
-and was curious to experiment with some strategies there.
 
