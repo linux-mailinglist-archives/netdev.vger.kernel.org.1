@@ -1,88 +1,89 @@
-Return-Path: <netdev+bounces-230187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32E8ABE5101
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 20:30:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D971BE5111
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 20:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70CA83AF3F2
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 18:30:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06BEF3AF3F2
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 18:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C3822424E;
-	Thu, 16 Oct 2025 18:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B5AA229B12;
+	Thu, 16 Oct 2025 18:32:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iG+67SFR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ya4K4XWY"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70808149C6F
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 18:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9857422424E
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 18:32:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760639431; cv=none; b=VNrzGi58saKq53ZnGSyt1znlZk3R2qLJOopsSaJri0oJoEQkK2xazMsLw+M9MIXpDhmJpouiIwsCsfU+NKNIm48jkmnZ4bi/JD7Di/qux/KudOLfPpe8TOt+oW3c7yhgXNlXNrtnRp8oyBCg+tQhAsy68oLjJuwyclxuNmQBTuQ=
+	t=1760639540; cv=none; b=m/sb74R4Jykc0CF01/MtT0Fy3Y6eZX747v7If6zrST9ngJS8AYoapM+lytZCfWZmAV200wUvIfqB5Dvv1mBB9he0U3QGYD/EZrRDj3WGO9cl4bk1obWXiqkkXcV+2InWTx3HRoADPELS2x4eDl9tTWfEXzcjjQev6bbMJcdn7og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760639431; c=relaxed/simple;
-	bh=o2z1ArA9Kxpub+/twKzioolnjDc5hsW3+fNM+hfXWrI=;
+	s=arc-20240116; t=1760639540; c=relaxed/simple;
+	bh=MKSdRnBqJwdMO7zJ6/UsEKuD0cigdsWFoUtwS5oSvUM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Oa+VlhsMjxvDuMWzZ/3kTR/XyUIR5x2JarGEFRvrlE2zoRhuM8JGFHJSs1DfTOG7YmE8oPk+mp9L2uOQ8dYpsBpjnoNuJGob8xVYtJFOF+hEBZ+VjymySQclbR/ZdCCRuamLP6fxMPPVjgIzq/+3m1Ejq0QQWomBK36JwvG/PfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iG+67SFR; arc=none smtp.client-ip=209.85.128.175
+	 To:Cc:Content-Type; b=oVehlb0/pEffPdHw0fUEznx90pVr8rJPClC5jytIZ7edtg08C7t4L9bRqsYiZtb0iO/57TAvbJ9qzQBEv3t44vM6AsB+QVQ0IDD87rmojMhMAPHKS+XGo3Fl0rU4YRYCLCgOc9JmMhLDUFI8nD37qZjmvCbpBKK/AzcbcXntXE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ya4K4XWY; arc=none smtp.client-ip=209.85.128.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-781421f5bf5so11707927b3.3
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:30:29 -0700 (PDT)
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7814273415cso10029827b3.1
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:32:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760639428; x=1761244228; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760639538; x=1761244338; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1iYTsLnDfIngNG7GSv1C6wHFacu5SKsdDKjK/W6U1to=;
-        b=iG+67SFRq1T3G7MuNdcMOdnqoF0K90Qxo6BGDfB93tiRCKm6I6D20/fmrCASEcVGFz
-         aD0wlG/Qu4g2BSeyBt4jdOP33gPAkqyItWCon2XRKO3mjbIvxxtyipLwch5FZ58ZqpyN
-         yg+9dWzKwpCTzTKL+uKVZ+EwgV7EFwSUtKT4UV9CrMr9C25lK0ns/CedAkgSW2KyZgrG
-         MgRE1+kyyfSPsW7MRKkq2WqwNXUU2MZvTrmquofaPn55ZavGWBUpWfH0LsFQGXfAv0xU
-         Q3panwO0xnCmvCxq1Rm26wB/XFZH8gq3+NgYKfQqvxeT9fGW29CXpPkR+vY4OptPdkoO
-         yEig==
+        bh=acBxxK74tPPhNWwsTEIja+sU470IYlwvL6xkl/qOZio=;
+        b=Ya4K4XWY0xHWVyPwyHMNdcfts7sxIqwUbPp0By/08ejf3Bnlvphgi37oKvheX4gi6r
+         p7GWqkNOfIrm0Ehtq9d/GN2KpdqExnlF8atBOowhWPeqUevtfObGwMmE6fsKjZP8PuMT
+         RBOS2TyqGGMp0AUzGOUr1qeU6yK21MCH/8aoLf2kRrzZvj4wjjw7P9+gGo3jYm4DYZuM
+         yF9t9XpYIa1b7xhiPrTpt4oJfOcqEiCIOMU0OVWZyshMvJX7gl8ZnsdpCRri6L5031eM
+         oj7Q7Rg2sMTiifXXjmgQTNHkdxddMDuGMwKCCPD+UUsE9OKsBtT9ViodIHwq0xtBCgC4
+         hS3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760639428; x=1761244228;
+        d=1e100.net; s=20230601; t=1760639538; x=1761244338;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1iYTsLnDfIngNG7GSv1C6wHFacu5SKsdDKjK/W6U1to=;
-        b=Q2gRFtrSqPEzrNaIzvYgdCbxrW1qjzR32+n/2InHzUwg2/mmaLA1ayw6FaVA6vyTEo
-         EUQSdM701WIDUpB7qdEuCfVhN2vdm6gwIm4IQzaQNO0oTsfxUVieD8GX+cnotrHdqMyg
-         Tf+cdilKLd1Xw8TLINvWJ1lymrfX5MlXwguC1tQ7MN7MPVGxZMoW9qJzoVOy1Odt6WMC
-         3iVSPjTALjUHwOEqraWVc5WduwiH0BcFuAOUZyXx8223K/ch2YyoRZ/Hi18kCrRBHPD5
-         PfUV/yUCh/qN60KGg6WfGfECXssxPMpXW3W5inT0hyOIy7Y5LID1ix/O2d8T2YsB9JnS
-         h7lg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjFGtAgFhk4Wn6rKiU2mVTFIlZn5cd35nS+lZadKPjeivUDFiC/Rzsnn34bozO5h4KjmxzGOI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0u5f//rtMle3Et5wncLEsibQhwb+XYv+IyhuAgn6HO+rqBn1r
-	Eqg8dRC+IpvxDb16OmA5S6gVLLR3f7xinLOHVFTuLa4MuIwlSMGkL/q6p/0jg57pNgukWWo4/AZ
-	P5qv2Lg3zMSC5oHkiHeKYhicJ37VINTlrVA==
-X-Gm-Gg: ASbGncu2T3MkPgY4mKyg5EEObqYiSskpBJ2U/iffxhSQogpH45XF9kisnAANYYsIao5
-	mUdYsDbxs0oZjqT22ouAX/MhC9URW6bU+PtQHPBuzAF3W8QQMdk+lqjBT2JeR/LbbZ44qK/rQpI
-	EHWdDk0XHWV5vxwEd4ke9bKDIzDxbcNgPCQtTuRG8S4US61GSiLsxhxHF33TJ7TuJq+mitxm69q
-	Ane60/BhrKgK90NSXwQZkFqs2+hjw3/58t5y3GLi/fCz0gnFkSZYzWxZXUtyBC2mxseuwUbgnr1
-	p3Qnu/IdGCQ=
-X-Google-Smtp-Source: AGHT+IGeN+k6JtxfaVsjKsQjPZ3o2DNPY6XeuC0XCOYJJK23ij6GMk/HJTa/jWfufuqRZ25CYPykiYQ46nFkOIL1SbM=
-X-Received: by 2002:a05:690c:6f09:b0:717:ca51:d781 with SMTP id
- 00721157ae682-7836d1c4bdcmr17813637b3.17.1760639427922; Thu, 16 Oct 2025
- 11:30:27 -0700 (PDT)
+        bh=acBxxK74tPPhNWwsTEIja+sU470IYlwvL6xkl/qOZio=;
+        b=h2jClkgH8OYSEA9E9IZLnKCWYdXkWakOmp3SHexJJC242jpplAuyi6esPxWWVpxrT5
+         PLLug6eYREkv2Hvk+7swmdxK8YC8mQmZhQJzj+zZJg+qf/sKK9LvYtd1D0hw5nPlVtP6
+         lvX41GZQ0DCHi19XiuRwGgUB9UJeWFuB7hUKqwO3O8yP4ycErGkQFQ2qcoOqZo8AMwWT
+         7v09AkQ7FHCz64UiLPb/r50T3amxGwClM1l6i5gStlnqUDM9LcDQdGJmld6XBPwNNc7S
+         Knoo4Cd8bO9QrN3ImIbfrhSidHl3vpgifc9PK6W6UQ7dBkmNgrgZ+c5VidnL0ZlMrCsp
+         XWKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVEx3P8YOk/qaX/LY7OrsEkjiPTLTbd+0v/wW0e+RS8R2ipuTsvVof0HO1IgF6ktrfHdBcoyyY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUQxtU0DU4wBu/RiFLXyMRQBb5r5q2ROQQtwbHdJApV6+bCC6R
+	9Sbz9Ek4HpJN3xFEmVAbGDvgBg/n2RgmXRDVMeXmvS1TOSJrDKYjTJdjIQtZFBfeBjU40vfBvrR
+	H2IzBdopbBbB46S8loFSy+bdC1YmUlCc=
+X-Gm-Gg: ASbGncsk5F/OFXxuE6AbPwB3ETyewD8mVmT+W7hym/SI4hvoXBrz51W7EeRSgTDH6vB
+	Tfnzwk3ofzY0SN2ofJ4auCx6gF6zCADc6/K1b5rp5mpdTLeHFCk0jSLAhjWmDKj0cfytT8hgrfC
+	dJV6Q7LyQVK5txM+bf2UEDqfXVROI9d79hr/Gen5prQrbwvgz/U95h+U7G+lYVoooDpwrYKLyrS
+	0ZHSdgQPqmK/96gdOD8WOsa8OqeG0Qcs/P8Nm+TupUPkVLw7rPX511QbuwvGqchA/oS/H4BUBON
+X-Google-Smtp-Source: AGHT+IFAtPPL+YAcDMa18gA92cHxrb6w0UrtbYIzo572pNcb5+PVb4Uwk98FWeCR+j1twci3L2Nf8wGY1O8rc7VeiK0=
+X-Received: by 2002:a05:690e:150b:b0:63c:f70d:900 with SMTP id
+ 956f58d0204a3-63e1613dfe5mr1253403d50.28.1760639537533; Thu, 16 Oct 2025
+ 11:32:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251010174953.2884682-1-ameryhung@gmail.com> <CAEf4BzZhRtswXo_x0Oks-VvcmCLHUdKPKGtELPSECDtxyAEoKg@mail.gmail.com>
-In-Reply-To: <CAEf4BzZhRtswXo_x0Oks-VvcmCLHUdKPKGtELPSECDtxyAEoKg@mail.gmail.com>
+References: <20251010174953.2884682-1-ameryhung@gmail.com> <20251010174953.2884682-5-ameryhung@gmail.com>
+ <CAEf4BzYVn=TQnF-Wfum=eQG0PsKwzySow+WFjon8D_1624ZnDA@mail.gmail.com>
+In-Reply-To: <CAEf4BzYVn=TQnF-Wfum=eQG0PsKwzySow+WFjon8D_1624ZnDA@mail.gmail.com>
 From: Amery Hung <ameryhung@gmail.com>
-Date: Thu, 16 Oct 2025 11:30:16 -0700
-X-Gm-Features: AS18NWBt_RnLOdiSczBeofdSZLLQ4YBeRQJx9H1rOSADbrevfmtbStqMiCb197Q
-Message-ID: <CAMB2axPuO-6iVatRp6-0GfcGubcspL_6zFeqE0scSjeCtPWejA@mail.gmail.com>
-Subject: Re: [RFC PATCH v1 bpf-next 0/4] Support associating BPF programs with struct_ops
+Date: Thu, 16 Oct 2025 11:32:05 -0700
+X-Gm-Features: AS18NWCvO1zkh2AOpN4UkP8SaQs3ZFmLeKYHgwj2eBZDb36QE349J-AFzbNldY4
+Message-ID: <CAMB2axN-4TH7+BDg7J9NhPWOw61qe43tYFRamhD4stdp9ZOyHw@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 bpf-next 4/4] selftests/bpf: Test
+ BPF_STRUCT_OPS_ASSOCIATE_PROG command
 To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
 Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
 	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
@@ -90,88 +91,94 @@ Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 13, 2025 at 5:11=E2=80=AFPM Andrii Nakryiko
+On Mon, Oct 13, 2025 at 5:10=E2=80=AFPM Andrii Nakryiko
 <andrii.nakryiko@gmail.com> wrote:
 >
-> On Fri, Oct 10, 2025 at 10:49=E2=80=AFAM Amery Hung <ameryhung@gmail.com>=
+> On Fri, Oct 10, 2025 at 10:50=E2=80=AFAM Amery Hung <ameryhung@gmail.com>=
  wrote:
 > >
-> > This patchset adds a new BPF command BPF_STRUCT_OPS_ASSOCIATE_PROG to
-> > the bpf() syscall to allow associating a BPF program with a struct_ops.
-> > The command is introduced to address a emerging need from struct_ops
-> > users. As the number of subsystems adopting struct_ops grows, more
-> > users are building their struct_ops-based solution with some help from
-> > other BPF programs. For exmample, scx_layer uses a syscall program as
-> > a user space trigger to refresh layers [0]. It also uses tracing progra=
+> > Test BPF_STRUCT_OPS_ASSOCIATE_PROG command that associates a BPF progra=
 m
-> > to infer whether a task is using GPU and needs to be prioritized [1]. I=
-n
-> > these use cases, when there are multiple struct_ops instances, the
-> > struct_ops kfuncs called from different BPF programs, whether struct_op=
-s
-> > or not needs to be able to refer to a specific one, which currently is
-> > not possible.
+> > with a struct_ops. The test follows the same logic in commit
+> > ba7000f1c360 ("selftests/bpf: Test multi_st_ops and calling kfuncs from
+> > different programs"), but instead of using map id to identify a specifi=
+c
+> > struct_ops this test uses the new BPF command to associate a struct_ops
+> > with a program.
 > >
-> > The new BPF command will allow users to explicitly associate a BPF
-> > program with a struct_ops map. The libbpf wrapper can be called after
-> > loading programs and before attaching programs and struct_ops.
+> > The test consists of two set of almost identical struct_ops maps and BP=
+F
+> > programs associated with the map. Their only difference is a unique val=
+ue
+> > returned by bpf_testmod_multi_st_ops::test_1().
 > >
-> > Internally, it will set prog->aux->st_ops_assoc to the struct_ops
-> > struct (i.e., kdata). struct_ops kfuncs can then get the associated
-> > struct_ops by adding a "__prog" argument. The value of the speical
-> > argument will be fixed up by the verifier during verification.
+> > The test first loads the programs and associates them with struct_ops
+> > maps. Then, the test exercises the BPF programs. They will in turn call
+> > kfunc bpf_kfunc_multi_st_ops_test_1_prog_arg() to trigger test_1()
+> > of the associated struct_ops map, and then check if the right unique
+> > value is returned.
 > >
-> > The command conceptually associates the implementation of BPF programs
-> > with struct_ops map, not the attachment. A program associated with the
-> > map will take a refcount of it so that st_ops_assoc always points to a
-> > valid struct_ops struct. However, the struct_ops can be in an
-> > uninitialized or unattached state. The struct_ops implementer will be
-> > responsible to maintain and check the state of the associated
-> > struct_ops before accessing it.
-> >
-> > We can also consider support associating struct_ops link with BPF
-> > programs, which on one hand make struct_ops implementer's job easier,
-> > but might complicate libbpf workflow and does not apply to legacy
-> > struct_ops attachment.
-> >
-> > [0] https://github.com/sched-ext/scx/blob/main/scheds/rust/scx_layered/=
-src/bpf/main.bpf.c#L557
-> > [1] https://github.com/sched-ext/scx/blob/main/scheds/rust/scx_layered/=
-src/bpf/main.bpf.c#L754
-> >
-> > Amery Hung (4):
-> >   bpf: Allow verifier to fixup kernel module kfuncs
-> >   bpf: Support associating BPF program with struct_ops
-> >   libbpf: Add bpf_struct_ops_associate_prog() API
-> >   selftests/bpf: Test BPF_STRUCT_OPS_ASSOCIATE_PROG command
-> >
->
-> please also drop RFC from the next revision
-
-Thanks for the review. I will drop the RFC tag in the next respin.
-
-
->
-> >  include/linux/bpf.h                           |  11 ++
-> >  include/uapi/linux/bpf.h                      |  16 +++
-> >  kernel/bpf/bpf_struct_ops.c                   |  32 ++++++
-> >  kernel/bpf/core.c                             |   6 +
-> >  kernel/bpf/syscall.c                          |  38 +++++++
-> >  kernel/bpf/verifier.c                         |   3 +-
-> >  tools/include/uapi/linux/bpf.h                |  16 +++
-> >  tools/lib/bpf/bpf.c                           |  18 +++
-> >  tools/lib/bpf/bpf.h                           |  19 ++++
-> >  tools/lib/bpf/libbpf.map                      |   1 +
+> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > ---
 > >  .../bpf/prog_tests/test_struct_ops_assoc.c    |  76 +++++++++++++
 > >  .../selftests/bpf/progs/struct_ops_assoc.c    | 105 ++++++++++++++++++
 > >  .../selftests/bpf/test_kmods/bpf_testmod.c    |  17 +++
 > >  .../bpf/test_kmods/bpf_testmod_kfunc.h        |   1 +
-> >  14 files changed, 357 insertions(+), 2 deletions(-)
+> >  4 files changed, 199 insertions(+)
 > >  create mode 100644 tools/testing/selftests/bpf/prog_tests/test_struct_=
 ops_assoc.c
 > >  create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_assoc.=
 c
 > >
+>
+> [...]
+>
+> > +/* Call test_1() of the associated struct_ops map */
+> > +int bpf_kfunc_multi_st_ops_test_1_prog_arg(struct st_ops_args *args, v=
+oid *aux__prog)
+> > +{
+> > +       struct bpf_prog_aux *prog_aux =3D (struct bpf_prog_aux *)aux__p=
+rog;
+> > +       struct bpf_testmod_multi_st_ops *st_ops;
+> > +       int ret =3D -1;
+> > +
+> > +       st_ops =3D (struct bpf_testmod_multi_st_ops *)prog_aux->st_ops_=
+assoc;
+>
+> let's have internal helper API to fetch struct_ops association, this
+> will give us a bit more freedom in handling various edge cases (like
+> the poisoning I mentioned)
+
+I will poison st_ops_assoc when struct_ops programs get reused and add
+an API to access this field.
+
+
+>
+>
+> > +       if (st_ops)
+> > +               ret =3D st_ops->test_1(args);
+> > +
+> > +       return ret;
+> > +}
+> > +
+> >  static int multi_st_ops_reg(void *kdata, struct bpf_link *link)
+> >  {
+> >         struct bpf_testmod_multi_st_ops *st_ops =3D
+> > diff --git a/tools/testing/selftests/bpf/test_kmods/bpf_testmod_kfunc.h=
+ b/tools/testing/selftests/bpf/test_kmods/bpf_testmod_kfunc.h
+> > index 4df6fa6a92cb..d40f4cddbd1e 100644
+> > --- a/tools/testing/selftests/bpf/test_kmods/bpf_testmod_kfunc.h
+> > +++ b/tools/testing/selftests/bpf/test_kmods/bpf_testmod_kfunc.h
+> > @@ -162,5 +162,6 @@ struct task_struct *bpf_kfunc_ret_rcu_test(void) __=
+ksym;
+> >  int *bpf_kfunc_ret_rcu_test_nostruct(int rdonly_buf_size) __ksym;
+> >
+> >  int bpf_kfunc_multi_st_ops_test_1(struct st_ops_args *args, u32 id) __=
+ksym;
+> > +int bpf_kfunc_multi_st_ops_test_1_prog_arg(struct st_ops_args *args, v=
+oid *aux__prog) __ksym;
+> >
+> >  #endif /* _BPF_TESTMOD_KFUNC_H */
 > > --
 > > 2.47.3
 > >
