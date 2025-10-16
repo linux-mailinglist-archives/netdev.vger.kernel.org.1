@@ -1,142 +1,91 @@
-Return-Path: <netdev+bounces-229824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBC4DBE114C
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 02:14:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 590C8BE116B
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 02:20:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 966C94E5577
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 00:14:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C230E188ED37
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 00:20:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D6F3FC7;
-	Thu, 16 Oct 2025 00:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C95E35963;
+	Thu, 16 Oct 2025 00:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KHRWcHCz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UttoW3+v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA4C610D
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 00:14:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186331C69D
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 00:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760573678; cv=none; b=WTSj44NuPnU+y11uq19F1iHPE+T5OQlySQhR4v4kVxKLT2ygnP9tN6PYMtxyL3wa7jDO5d6Klzv+eP/oN01fEfpMZaLUB57c5AjIYmBdatw1GmCDeyVgrLk/CJvyFQOv0yWw5uZBNE1BE+ihJILwGIix74Zd7+lKhmSflf2qGBk=
+	t=1760574023; cv=none; b=mCstWq1dyEkCVLkhvidVJo24no7Y2f3baAIgf5SFexESiaKDTbVKQ26xezfzTB2RqeMw3CdVQj1ucJYz1TfBdTl15taf99XzJel5If3plRX9HBf9AnqYyLB1eoCItwVGUigE+a1WzXddAI7renixAHfaV15sd6hcz9zJHn3fGes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760573678; c=relaxed/simple;
-	bh=IXl+OEhS64sQ2ZK2+Q0IM9wz4tp8MMKhZ9emgeUNqfQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RVsTaltBJ9PwSA9G8Rm3MGuTUv+5iuERJ6/LrdWeTZHHGy64V8T3pxtLwfO9A9xGLD4CtE3kum3kM7SJMYoHRppWC+nxCMURGQdhI8r1sWJaarmy2FNCI6+Hs4P47UnfU8FbGozpF6evKVYNGJ2g36agLaXrhUMOJjisCgLLABk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KHRWcHCz; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-63befe5f379so141452a12.1
-        for <netdev@vger.kernel.org>; Wed, 15 Oct 2025 17:14:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760573675; x=1761178475; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gEQ3NRFfhuWbR8QwlzPhUPkCn4cpDdbL+zo8DqY2eTk=;
-        b=KHRWcHCz+PQfgxpK5vLMblnmDJ2oPapGLN9h/eWALeU7k8YR9mxiaXusnu/U+AssHT
-         qjMVF20ycvbfMF1QnZz1WK3rNWwmdAbAzjEz9qIFq8TPL+VCnf8pZn4o2J9neFSRpwHM
-         B1jWCHBIWIJSs9yzuw7WMuqC/3MMaCnZfKibKVBr9kxWXwo4YRBhda0g3OdaCbNAflJe
-         zAd4GhjQzSw7W1IIxAFKbC4q8QS6F0vMLjSSPWxoDyqo/yuSKRwIsfoigt2M4lzI68El
-         HosaqbdiudsKTK2vdw0UMrSOGb0x6NaoDGymaxvskJNgJzVFBDuZvu0SIqlcnAsan325
-         JfKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760573675; x=1761178475;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gEQ3NRFfhuWbR8QwlzPhUPkCn4cpDdbL+zo8DqY2eTk=;
-        b=AKQLEu9t7pKK5aDh/y4hingFeWoGdko/1FJdN1rWIDnGwVhHP+7d69ywLWX7GHqR/v
-         a4//F2Qfub/lmcWE08toIW/YXbmGTFz9QGMAdvsos2EUnEUHh74MGkDVdAgInuROFcGg
-         rBQt3XiZzPjO3sUsGadYvnHIYHdVEuNv58TGlCeuv1wHh41z+oUSGj2dP1q4VM7Z1KXj
-         TZ+h/Umynus06LuZi9o979/Y25t5Cs7JViQUL1gF++NCf3FVQtL9gDUng23SE+Yjlmrt
-         HoqdY201YRtNMPJBnhg+d7oDIAI7t8/cQn/5lwDMWRu/0Cu6zLdEKotPP3iN7zjhGYeg
-         jfSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWmWk4sV4C36hBGisvu8XSQPFZsXm4eATLSn4YS/yxgWe9lObRF9CfcABvnJnUuX8omZ31CrGw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQs7ms84K5+4Sb5f/06DyJFSWubs34MU/Lp6MzkxLRLaliIKET
-	gzfCITAVoo0T8fnTlOqh6GYuWw3TeSArIKrbEXN1WnRGkTlzID8VNTt/NItbpVc7jgSVpnCuMHR
-	oc28uq5BUpce1AxGkIK95qdIMVwwn2grJ3f5NNvUx
-X-Gm-Gg: ASbGncsxwmUSQJ5ccv6/Oo7VA5rj8hwdMvMvQS1ykrki8UqV5XnsIvCLuhCIC4pfudw
-	47WddQ9wrdFxmnn7aqEeYlc3Yybgc3Sf4zfBlL3rDQmeUKv0fvPjAGC6e/smgKjI5X8klXPtGRk
-	ECFA1ozZmZzj0Ybu2EWYeuii2eZyrvicNhrcI2AN5b60+9Hl7Qbz6CfRT3yMaVmK2t1ztihCZjE
-	vRkqG/tWVf7eE8bjZOnt3PZRICtdLouGa9NKzKv3IlIcIDYkxJUbm2wMg7/pccUMLvGnDyVhW0L
-	e8egeTvpyxyl2kgO4eX6gljEYw3Nlw+ArM1YJJhaTwI=
-X-Google-Smtp-Source: AGHT+IGA0gDPAGV4X0oXE9Ikkd6WtJDIUlnaxjVZDTFOHP22H+NHmHUxM+X3FALIXk8QzG9kXEZoblRa1VChAhSzB1k=
-X-Received: by 2002:a05:6402:3552:b0:63b:ea10:a0d with SMTP id
- 4fb4d7f45d1cf-63bea100c82mr5183823a12.15.1760573674695; Wed, 15 Oct 2025
- 17:14:34 -0700 (PDT)
+	s=arc-20240116; t=1760574023; c=relaxed/simple;
+	bh=HPrFIhKsSlN3OYAlTariYStgZXKXq9CcfaSSL5cQLPY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Tllkvp6k0hop+gboCNH+IPEpI22oYXUm9jxO+sDf+xdWZNvGYaPlmf/AVEAvZQ+nRfjof8kZi2NG0UcD1EPFh6DKoPH6giEAr/0szLSJdi7VMSHF3AavNBAGogvQGuBwpNqZhwhRBkNMUfvXAhLFhI0KJWyjlzzcYyGP0iSdle0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UttoW3+v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0454C4CEF8;
+	Thu, 16 Oct 2025 00:20:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760574022;
+	bh=HPrFIhKsSlN3OYAlTariYStgZXKXq9CcfaSSL5cQLPY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UttoW3+vriCuG4eDd4sCIkrfjpy6/7Edrj6ky3w/EDVP0amxlWMGZYWEM1QuTc7rC
+	 ool7UBqoFqzsb4UK25T4GQGUdg1A6lUEHP4Jn9yQUhx2r0F01rfhhiYffyveZgmgrM
+	 GVuts/T24Cyy3wbLNHEr2wgiqAVp6RY61yUTZMhbv3/UdxJE1NRuPhdlZ42XiDOxh7
+	 yrlr4+R6mSSpEd9kKa60qpmxj/36HYPK+fW5QeFwMyHyVvPiwR/0cyXLtcIc662o/H
+	 GOHyrx5spMsX8Q9YaSeGd7yE9KxMY1ZeHJmulYNm1eovT2HVvSWd3yRlnJdz/UevKA
+	 qv5ekpKizEjlA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0EC380DBE9;
+	Thu, 16 Oct 2025 00:20:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251015233801.2977044-1-edumazet@google.com>
-In-Reply-To: <20251015233801.2977044-1-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 15 Oct 2025 17:14:21 -0700
-X-Gm-Features: AS18NWBjlTgqjuqQXigZaL4XOWB7Ycf72ruEtEgwBgMg_to3USm7I4XBPPhcqD4
-Message-ID: <CAAVpQUCsYsvZG76xvR9iCdd_4bjo0iLCRXPmHMidGOAJQc0Jhg@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: shrink napi_skb_cache_put()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] MAINTAINERS: new entry for IPv6 IOAM
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176057400750.1105273.8956164739252488577.git-patchwork-notify@kernel.org>
+Date: Thu, 16 Oct 2025 00:20:07 +0000
+References: <20251014170650.27679-1-justin.iurman@uliege.be>
+In-Reply-To: <20251014170650.27679-1-justin.iurman@uliege.be>
+To: Justin Iurman <justin.iurman@uliege.be>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
 
-On Wed, Oct 15, 2025 at 4:38=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> Following loop in napi_skb_cache_put() is unrolled by the compiler
-> even if CONFIG_KASAN is not enabled:
->
-> for (i =3D NAPI_SKB_CACHE_HALF; i < NAPI_SKB_CACHE_SIZE; i++)
->         kasan_mempool_unpoison_object(nc->skb_cache[i],
->                                 kmem_cache_size(net_hotdata.skbuff_cache)=
-);
->
-> We have 32 times this sequence, for a total of 384 bytes.
->
->         48 8b 3d 00 00 00 00    net_hotdata.skbuff_cache,%rdi
->         e8 00 00 00 00          call   kmem_cache_size
->
-> This is because kmem_cache_size() is an extern function,
-> and kasan_unpoison_object_data() is an inline function.
->
-> Cache kmem_cache_size() result in a temporary variable, and
-> make the loop conditional to CONFIG_KASAN.
->
-> After this patch, napi_skb_cache_put() is inlined in its callers.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+Hello:
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Oh exactly, it's interesting that the compiler cannot optimise out
-unused retval even though kmem_cache_size() is a single load :o
+On Tue, 14 Oct 2025 19:06:50 +0200 you wrote:
+> Create a maintainer entry for IPv6 IOAM. Add myself as I authored most
+> if not all of the IPv6 IOAM code in the kernel and actively participate
+> in the related IETF groups.
+> 
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+> 
+> [...]
 
-$ grep KASAN .config
-CONFIG_HAVE_ARCH_KASAN=3Dy
-CONFIG_HAVE_ARCH_KASAN_VMALLOC=3Dy
-CONFIG_CC_HAS_KASAN_GENERIC=3Dy
-CONFIG_CC_HAS_KASAN_SW_TAGS=3Dy
-# CONFIG_KASAN is not set
+Here is the summary with links:
+  - [net-next] MAINTAINERS: new entry for IPv6 IOAM
+    https://git.kernel.org/netdev/net/c/bc384963bc18
 
-$ objdump --disassemble=3Dnapi_skb_cache_put vmlinux
-...
-ffffffff81e9fe10 <napi_skb_cache_put>:
-...
-ffffffff81e9fe40: 48 8b 3d 89 bd d6 00 mov    0xd6bd89(%rip),%rdi
-  # ffffffff82c0bbd0 <net_hotdata+0x150>
-ffffffff81e9fe47: e8 a4 79 60 ff       call   ffffffff814a77f0 <kmem_cache_=
-size>
-ffffffff81e9fe4c: 83 eb 01             sub    $0x1,%ebx
-ffffffff81e9fe4f: 75 ef                jne    ffffffff81e9fe40
-<napi_skb_cache_put+0x30>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
