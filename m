@@ -1,172 +1,152 @@
-Return-Path: <netdev+bounces-229947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E9F4BE270D
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:39:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A1E6DBE271D
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:40:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 107D8501E6A
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:37:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 92D184FAE74
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:39:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F11D32A3C1;
-	Thu, 16 Oct 2025 09:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34F1B3168F1;
+	Thu, 16 Oct 2025 09:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=traverse.com.au header.i=@traverse.com.au header.b="GNB6Z2in";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AI79jTS8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UtbPb91F"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B72B324B25;
-	Thu, 16 Oct 2025 09:33:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21A5192D97
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 09:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760607234; cv=none; b=I/9yjPTZ5+40sBcQIAMc4R/oPVUGDBTKhai3HO/uqntxWwmmgRqn+1m0zzriqySvBhuj/WS/LL37nXFK/vlbCe0srevw+YnW20YyvZVhB1l6Q6DMbkzyIZOUXdr9NzRZUQfZQVR/K5oxKqelrD2M7sEdItel0YUWabKYdUk9PQo=
+	t=1760607597; cv=none; b=HLC+Xa4Yfm1xTqTPy4xHIb/qiTL8TC7YjC/9Lae2HPBJQHzIjdpiRnoeLZC2AdIAg3xiXLIlmvnX2xOpff30ekHId85PlZCwYDW9u2MeCx+KdPGFdTjjoRh+q3fADZtM8pUMt6Wqk1wodOfnKncQg4Cy3molBD9+XzvUtGst398=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760607234; c=relaxed/simple;
-	bh=uNbN9TRSDsOqkVANM3w7ZLCcBXSqXKUui5X70JcRE8I=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=mwSG9KgOAsNWXQo+kqJF0DxyEkvnAzR2qB2Mp/edU6YjjH6MTT5UkoQ/zuHdjjG88H0ILXA1M4lTjfIpsFu6/vyhWHCz9k4PyRwRDFoKKXzCxd5GwqoUKj8GUxYPYPpzgMyD1fOJEFVx9MN3gustgDRF43mKZosiYwbdbub8vMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=traverse.com.au; spf=pass smtp.mailfrom=traverse.com.au; dkim=pass (2048-bit key) header.d=traverse.com.au header.i=@traverse.com.au header.b=GNB6Z2in; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AI79jTS8; arc=none smtp.client-ip=103.168.172.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=traverse.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=traverse.com.au
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 7EDAB14000B4;
-	Thu, 16 Oct 2025 05:33:49 -0400 (EDT)
-Received: from phl-imap-18 ([10.202.2.89])
-  by phl-compute-01.internal (MEProxy); Thu, 16 Oct 2025 05:33:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=traverse.com.au;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
-	 t=1760607229; x=1760693629; bh=HKIIP7EMa3kiCvEdSloRcVMbxBGUsM0L
-	jZHG22p7+5s=; b=GNB6Z2inBvCzWxDteewxYt06bg4h2IAodNA+MggooFmUvljl
-	44mmI2SUWp6W8xBqy5v7wfx7X49yMxC0Vap2m7o3d+Ujm5HSwimRGqFSRFR9wW2S
-	8/Z/PbxOw92cKkO/zyEK9oYGncpJFraPqo7P4+FkBcc9zcBmsS9vyHnZcnLrONWr
-	wVoBkt62EfPkfjD5tWTB1VKINCZmoXkujheTYYJlDCSAVXP6unnwpA/ratNU62Qf
-	2ZPVzhF+HqxNil0nhlI12+h+5Q42eP0VObueCrrAaOVm3+zUQK79qbPBnurzEVSs
-	HAVkBhakhZw+D5Vh1PNQZb6edB2hj1JBtkTyTg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760607229; x=
-	1760693629; bh=HKIIP7EMa3kiCvEdSloRcVMbxBGUsM0LjZHG22p7+5s=; b=A
-	I79jTS89kqLtqQbv9J6qEpY3McgAC7NkEVgzUW+eRV84lEUuR1ZM5i1HC3tEM61G
-	tAfC+1rhlvCBK8b7892/ICXEN/u1UFBvceD47YJKUH84Bl3QbEOscT+MYRlMBilM
-	Jg/4rb2768lC9JhrIZf2apjc13I6cp81nBnxnKctGn8aPNvyeo1QRjROnNgWB22c
-	9IdmcJ5OKuXYqnWaH7ZcazzhkyJlic0pf15GbLkQUjSmMTVcmKyvjBwK7sfUqLXV
-	aguWXsR+nbnyMS3WBkQ7wi/Sn3oGexsjYOYJK5L5GufE+Rtbko7tf2JUoDdIMdxS
-	lSczRAAkFspL1FOHB29Lw==
-X-ME-Sender: <xms:_LvwaHuX0Gi0fWP0GPJ3CH3JkaegiJ_aIYW89ld5NAQZQ_rotuBiIA>
-    <xme:_LvwaDTV2zPLT7VaYiDHioSDWJq4WULFECQu1XuJ8T75GvDk9NaqwiMrj9j3J8tcb
-    iJ0RdtlFpiC1T7VWi-tCWkkXk--Nd0hDREp-tY3eE3Vt8bN_0J_60I>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdehleegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfofgrthhh
-    vgifucfotgeurhhiuggvfdcuoehmrghtthesthhrrghvvghrshgvrdgtohhmrdgruheqne
-    cuggftrfgrthhtvghrnhepvdeitdeufeffheeltddutddtuddugfdtveffffekvdffvdfh
-    gfejuedtgeeluddtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
-    hfrhhomhepmhgrthhtsehtrhgrvhgvrhhsvgdrtghomhdrrghupdhnsggprhgtphhtthho
-    peekpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlh
-    hofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdp
-    rhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvg
-    ifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopehiohgrnhgrrdgtihhorhhn
-    vghisehngihprdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-    dprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:_LvwaLNf_YQT1Tb90jrjQgOqF0S_W0diemqevOrpv9gVUCf6cH05Pw>
-    <xmx:_LvwaB-PmJekHfN-yFVaRAFlLkFcRn_qa2a7DAKf6Uo1-ignwpK6Gg>
-    <xmx:_LvwaMca4vFcQTmztkQ_ptLGadunuZUGhkhTg4Ot7bE98G0sshKB2w>
-    <xmx:_LvwaAwRfJUqULkd5WfWHplduMxWh-7yGNNjAynsl2OXTYa6kxE5UA>
-    <xmx:_bvwaCr-aG5YcPj6hb-UMmf69lLIBr3Bfwpc_fGDgbkvawhcdotvR_aX>
-Feedback-ID: i426947f3:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id B08C415C0053; Thu, 16 Oct 2025 05:33:48 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1760607597; c=relaxed/simple;
+	bh=q8o2NQ6L6LFGbktB7GVrgV59ZquhP2NAXmS5kWpAIwo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c5QXYvqq6RlS7jzNmqw2a6e896Py3X7JlmxThuwVevb861gm4ISEtGCzxX8Il5+UirgRYeS+wsSLEMObXe5av8ogDHRmIvH+18XLxaXsjiFEXZdmym0o8zwoCgRFjF1nLTm3yLcbzk4DPtR56Y+UuDsgFf7InaOMND+PjLO8A7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UtbPb91F; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-27ee41e0798so8610595ad.1
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 02:39:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760607595; x=1761212395; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=++wbAo7zmbNRe4mjezio8SQcxYljBZGJ4IngYV8TGHU=;
+        b=UtbPb91FtdAPVaz5Sgg6m36fx1IY4vjfL95TkB6br/YBoD38piNZ10ido5L+1u124S
+         7nWL1ApeL9W9rnHC1SCqRIgV14sv2X+hf5yNw2FIjP+dZZfxYGpi/1mZPf4CW/zK5Wsb
+         aquMtpLIWurcR1i7WTI8LyQbXXRRNgEb+rp3RVK2Rc27k9cuc3oOEzos2oZihxxJmGJw
+         AX1jLjv5yhm3PZgBQOpqmwwLGFuMK7Q+GPhHmNx8iiv5cKfjRJcJzkBMu7IRbTQvH9VZ
+         0g/Dsxmt7xZoGXG0LeIF5QYPas9kLb6908h0gQOnHOrNPiM/cSMcCnO7X/fRvdguEQvb
+         b2hQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760607595; x=1761212395;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=++wbAo7zmbNRe4mjezio8SQcxYljBZGJ4IngYV8TGHU=;
+        b=g1sXKCT8FVNZDz2zG4JmvGhD5cx2XHnK1y5c9u4vqTwQWnDFLYkd2GssptEnMEDPYR
+         /0bZl/vAfG8738pbqGv1Srl+AiCB0DxeQR31T1Mn1V2yZaFwkCnR5c4NSTJ3JasyDdqt
+         WNCqcftaig2tgPaHUC2rfbv4lkmoJXQn8fgSY0GcyD4wfR88gkyn8wng7+D35KZRH/9K
+         dzs1HnforR66yhi3Lap5cNG+PSgW8AoZSU7RwlTXPATs9udgkIlR8Y6pbX4Ow8HIsT53
+         OLmw0WC4lo4cuKzJXfw5kI0rqu7ZGjbndXRbqGqZVgjXzKU5ViWr3EOIhi/l9A8kwcD8
+         9SDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWoht1Adkbo0AjFz7d7Mo3OJEh9yeF2xQboP5D1+JpWWVT4juL8DssBe2ICa/3Sao0/yEr8BDo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIcZiTGkZGOR5ClS/tcbJa/AHQFRClPlFWaiZL1sdtcJXAiTCT
+	GISDs+tTkukiJiiOWg4Zlv0U+czPuAAuXcQfVu81J99fjjLFUcwatkOc
+X-Gm-Gg: ASbGnctemFgB4RhlOiMGq+wu1J0MncbvWAxayqllufQoFn3KxhcEWXKABNPy57xx+Aa
+	WUSMX6O+VTM29V3woiSLC/Bv+UquIpKOezxeU2GsCeyskvZ+so83MrHMEBd3zGJ+sLu5kQqjwGm
+	x3GM9RISP8omFBM3YZGZUCoICi1Uc9nN9YNu3QNuMpGKGxOXXRtecu6wSJxiIFOpozCi7VOYViv
+	euAfBc36cQHJdKI3sAD44VQqxyKbGFuTA2L4Su9NMxGAIpofbSy41jHs18QNFoCJpSBhOGYDmAe
+	zfL86XxoQxKvW9612WUl1qaW2wWSMpZaXBayt4HpUAvZDwLnS9jlxKLGQlhpVhSEGBFSEQY3UdK
+	6bao0EtDyYqUQGjIbQ7Qc2oxszk/ytvDfyCJsRy9zYe+OjWSOyGRA1pYcyfTCvpJfYRnSV9BwaA
+	UtgBsryte+LFc0+g==
+X-Google-Smtp-Source: AGHT+IFS9M80syPYksgqDJ9tQreitknkpLZF7Qn/IO4egCYd5QwU4i8pmScawukphLNSoU9cfWZVbw==
+X-Received: by 2002:a17:903:fa6:b0:28e:cb51:1232 with SMTP id d9443c01a7336-2902735656dmr418798465ad.3.1760607594899;
+        Thu, 16 Oct 2025 02:39:54 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29099a7b068sm23648445ad.53.2025.10.16.02.39.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Oct 2025 02:39:54 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id C21B640C0938; Thu, 16 Oct 2025 16:39:51 +0700 (WIB)
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>
+Cc: Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Krishna Kumar <krikku@gmail.com>,
+	Vasudev Kamath <vasudev@copyninja.info>,
+	Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: [PATCH net v2] Documentation: net: net_failover: Separate cloud-ifupdown-helper and reattach-vf.sh code blocks marker
+Date: Thu, 16 Oct 2025 16:39:37 +0700
+Message-ID: <20251016093936.29442-2-bagasdotme@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A_WGycAshL9F
-Date: Thu, 16 Oct 2025 20:33:27 +1100
-From: "Mathew McBride" <matt@traverse.com.au>
-To: "Ioana Ciornei" <ioana.ciornei@nxp.com>
-Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Message-Id: <9beeb68d-2973-4d40-b48b-ee9cc984b9db@app.fastmail.com>
-In-Reply-To: 
- <xl3227oc7kfa6swgaxoew7g2jzgy2ksgnpqo4qvz2nzbuludnh@ti6h25vfp4ft>
-References: <20251015-fix-dpaa2-vhost-net-v1-1-26ea2d33e5c3@traverse.com.au>
- <xl3227oc7kfa6swgaxoew7g2jzgy2ksgnpqo4qvz2nzbuludnh@ti6h25vfp4ft>
-Subject: Re: [PATCH] dpaa2-eth: treat skb with exact headroom as scatter/gather frames
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1687; i=bagasdotme@gmail.com; h=from:subject; bh=q8o2NQ6L6LFGbktB7GVrgV59ZquhP2NAXmS5kWpAIwo=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDBkf9uy3WLhuyaq1HtsLPD0S5BTeHpR563FPYGKS+g5J9 afcm4697ShlYRDjYpAVU2SZlMjXdHqXkciF9rWOMHNYmUCGMHBxCsBEbLUYGXb7L1v9myunTaJd Y245e1rqQV1Th7TFzlZBB74r7t160o/hn84SxeJ2roD+cAvh17H5fTOefklL2nRi+ZZi/uB+574 JLAA=
+X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
+Content-Transfer-Encoding: 8bit
 
+cloud-ifupdown-helper patch and reattach-vf.sh script are rendered in
+htmldocs output as normal paragraphs instead of literal code blocks
+due to missing separator from respective code block marker. Add it.
 
+Fixes: 738baea4970b ("Documentation: networking: net_failover: Fix documentation")
+Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+---
+Changes since v1 [1]:
 
-On Wed, Oct 15, 2025, at 9:18 PM, Ioana Ciornei wrote:
-> On Wed, Oct 15, 2025 at 03:01:24PM +1100, Mathew McBride wrote:
-[snip]
-> Hi Mathew,
-> 
-> First of all, sorry for missing your initial message.
-> 
-No problem. I had a revert patch in my tree and mostly forgot about the problem until a customer of ours reminded me recently. The S/G "solution" looked easy enough to try.
+  - Place code block marker at the end of previous paragraph (Simon)
 
-> While I was trying to understand how the 'aligned_start >= skb->head'
-> check ends up failing while you have the necessary 128bytes of headroom,
-> I think I discovered that this is not some kind of off-by-one issue.
-> 
-> The below snippet is from your original message.
-> fsl_dpaa2_eth dpni.9: dpaa2_eth_build_single_fd alignment issue, aligned_start=ffff008002e09140 skb->head=ffff008002e09180
-> fsl_dpaa2_eth dpni.9: dpaa2_eth_build_single_fd data=ffff008002e09200
-> fsl_dpaa2_eth dpni.9: dpaa2_eth_build_single_fd is cloned=0
-> dpaa2_eth_build_single_fdskb len=150 headroom=128 headlen=150 tailroom=42
-> 
-> If my understanding is correct skb->data=ffff008002e09200.
-> Following the dpaa2_eth_build_single_fd() logic, this means that
-> buffer_start = 0xffff008002e09200 - 0x80
-> buffer_start = 0xFFFF008002E09180
-> 
-> Now buffer_start is already pointing to the start of the skb's memory
-> and I don't think the extra 'buffer_start - DPAA2_ETH_TX_BUF_ALIGN'
-> adjustment is correct.
-> 
-> What I think happened is that I did not take into consideration that by
-> adding the DPAA2_ETH_TX_BUF_ALIGN inside the dpaa2_eth_needed_headroom()
-> function I also need to remove it from the manual adjustment.
-> 
-> Could you please try with the following diff and let me know how it does
-> in your setup?
-> 
+[1]: https://lore.kernel.org/linux-doc/20251015094502.35854-2-bagasdotme@gmail.com/
 
-It looks good to me! I've tested across two different kernel series (6.6 and 6.18) with two different host userlands (Debian and OpenWrt). Both VM (vhost-net) and normal system traffic are OK.
+ Documentation/networking/net_failover.rst | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Many thanks,
-Matt
+diff --git a/Documentation/networking/net_failover.rst b/Documentation/networking/net_failover.rst
+index f4e1b4e07adc8d..2f776e90d3183e 100644
+--- a/Documentation/networking/net_failover.rst
++++ b/Documentation/networking/net_failover.rst
+@@ -96,9 +96,8 @@ needed to these network configuration daemons to make sure that an IP is
+ received only on the 'failover' device.
+ 
+ Below is the patch snippet used with 'cloud-ifupdown-helper' script found on
+-Debian cloud images:
++Debian cloud images::
+ 
+-::
+   @@ -27,6 +27,8 @@ do_setup() {
+        local working="$cfgdir/.$INTERFACE"
+        local final="$cfgdir/$INTERFACE"
+@@ -172,9 +171,8 @@ appropriate FDB entry is added.
+ 
+ The following script is executed on the destination hypervisor once migration
+ completes, and it reattaches the VF to the VM and brings down the virtio-net
+-interface.
++interface::
+ 
+-::
+   # reattach-vf.sh
+   #!/bin/bash
+ 
 
-> --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-> +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-> @@ -1077,7 +1077,7 @@ static int dpaa2_eth_build_single_fd(struct dpaa2_eth_priv *priv,
->         dma_addr_t addr;
-> 
->         buffer_start = skb->data - dpaa2_eth_needed_headroom(skb);
-> -       aligned_start = PTR_ALIGN(buffer_start - DPAA2_ETH_TX_BUF_ALIGN,
-> +       aligned_start = PTR_ALIGN(buffer_start,
->                                   DPAA2_ETH_TX_BUF_ALIGN);
->         if (aligned_start >= skb->head)
->                 buffer_start = aligned_start;
-> 
-> Ioana
-> 
+base-commit: 8d93ff40d49d70e05c82a74beae31f883fe0eaf8
+-- 
+An old man doll... just what I always wanted! - Clara
+
 
