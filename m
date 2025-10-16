@@ -1,81 +1,83 @@
-Return-Path: <netdev+bounces-229863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 227AEBE177A
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 07:01:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 824E0BE1774
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 07:01:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB220403950
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 05:01:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF75119A6116
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 05:01:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCDE22127E;
-	Thu, 16 Oct 2025 05:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5312045B5;
+	Thu, 16 Oct 2025 05:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QFSgjQGi"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FJODPViR"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011051.outbound.protection.outlook.com [40.93.194.51])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010058.outbound.protection.outlook.com [52.101.85.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7012521FF33
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 05:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC68524F
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 05:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.58
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760590884; cv=fail; b=GAzxyaPJ9QexsGsjKqJSiZcAMFNi6LTKoip0P7WTAbIgUI6nSqCealIjuU+OUSFYSljmgk7KfYqLcnpMvxXqhIE5br6PfsFCPykcE2JAZPNEPaO96LXw3KjxPtalhOehd9zq/DniodOyOreTi4b4Uxk20h6gz02CH8yaw+Le5DU=
+	t=1760590881; cv=fail; b=PKD7IMNfJv9H7Ef42Sh7paqH/mtAr+IqMjxjXpc4W7+UiUnwxlXbQTW9cvY/fAmOgSLtfJLHUFYfUq8hPZJ8E82LFWEBmpEM7LQ+p0aA3h9lLQvhC1yPqtOe/QrMq1LGHyaEaMdSdAHgs7IiNcb391JIt5ZyAHNU5gekogcjLyo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760590884; c=relaxed/simple;
-	bh=lJpSAKNchMavMdhzm0r9BZwmaN+lDTtF+LRXFrmMmR4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tMk+vpG6GrCAtMndpkGFwP8tpSF+fgB79zK8MKdkBVhGx7v0ihLF37sVC8W2qzkuf/gN9MNBDazFNCsYoR24zbt/2x8HogGUGfE9SbLPE8uEWvKI8zf4a4eyg7Le6x7NnKouW5J5lCPneMNWZTPsHYdvkSustkd1eNaacmTp2QE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QFSgjQGi; arc=fail smtp.client-ip=40.93.194.51
+	s=arc-20240116; t=1760590881; c=relaxed/simple;
+	bh=1mIcvDPVO9nCDb+6T2VRbZXLCptICuyljMqPLfQ4pV4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZpzfZL2LcZGfkjd5sr67j0mCcOzP6tVGOVwM2piseB5iYTstHzpdOH2qnRuTyVdBtMUYpIfzW860fNWBNEMU58SMysgloZDFLuXv0arPIHkVJ5t6eWasyiGmT3aoTje8olzdy2+HTBel1rYFWLFpsw7wJiaPjGzWW+6s4DsxjWQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FJODPViR; arc=fail smtp.client-ip=52.101.85.58
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OPRIItaTei2rdO8StE76NuRmU88iJcykXGq6czCllzuY/RW5po7v4XBgmaM9/keD/nH/lV1kmlgIPkRg6S3Q3O8pmQb1Ubao886ts2GbG9q3RklLPtL4i8LqIiv6ka0aofPPrix8GqARGGnfqVxVONfrd+5opr2znV30aaOTBUmMc1XP1flP3jz9HulkzRHkGI6Q0T8Qd3ELZl4LVhCgz4wgMOHdIHh9Qlw/hGDHU/wLiZrPe3qBwcermvcsMvpYABHs57bjGh0G+/H+n7CgTNEo89HX4BrfBc/7ECp9qf9Rc5AkYYqSeVWJOvZ2iDYVinB/vMn8NxITLHTKYHEvmg==
+ b=QW0iBXOCbsUhq0DuQ60isf87MaERlaxmOXX7y7ZNXTdJiH7Mz4fyH9NoIWGUvXEksS61omphAbjMMCV7G7Rx3+iztBGwDj4sdJwYDO4Zwss3fyCLL/3OB9pwsgadvp4oowB8MElUATN/1z/Icp1U385MrvXkKpcZOGVe6mWihyB8a6tKhw8o7RfxschwbwBEQhHvsASZ8cvPh9QPHUbjZe+JymVID46YIJsrtkxbklVtvWuSW7MPkMVQb6dQsReQAXQKcf8Clcb1m2bQ+wQFF105hejovGXM3jX+vJ3UGceVSAvksrSugRDFZLnPmz0eTPkM0/FSSlFhLH77i2RjpA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=blnZNQqlyMCWgH22SvK9IoVT5LRhIrOnqYRJmCRKI4I=;
- b=BIA1kHnojs9YdrmSfYc6X5on6UTw5wyecDkMIvSA8MoO89SQnaoBtXOFU6pFYHudatChHcLvOwEZ7emhDzMbzoYKSydEsm4bnbtB2DXruVMi/360DKEw823FzNM3xe8vdofCd/qHx1bEW1INzYW4dpX9rfVcFuxg6SaanPIePs4021VfF0cn3dzX3jYi6z9iiZ+FphI6SDXaChV90ehzY7oW/1OZ3pH2yC5f4SSI1K/HykyiDWINxez4xhuiDiLGOxXBY6p3UfCU7ECGpDJpOUVvMTZ9wFr2XWjisI4bS4P1VrNVKLMfOUzn/jaO8xo3J9I6EwFB5NXCRAzmlXwjfQ==
+ bh=ReFK+T1og78D/4ekxSobvz0vZ9cr+0l4HOS7+uN0zeM=;
+ b=U5E2u67aF9Ba4i8ERG0TBMqOvBvREqDGtmsD2b3Tv7btyBqkHOLUeS7VSRrj0jP/miT4UYaJH/SaWTa7AWnZGk+0yx/gmVDFkrGotPRFCDWWw8TsvjsL4TxWuU7y2czKBeyg5ZPLEes8f9g/ctArOhdNwdpNjS5YokucWVifJCxASLfVjg11ZQff2xbOA8h0KnCp/jstS1ykhjZGGAOLIIgFwxEjEGB3BXBWN0Cjw2fZnNucruKz1ILS11KSYaEkll+TM8SBU/LfpqvYElYOXP/eoYTmz3lJot+qo73Lx5WyTSswvdCcazrOaTIiil5G77wB9KroPvE6SZPfw25iTA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=blnZNQqlyMCWgH22SvK9IoVT5LRhIrOnqYRJmCRKI4I=;
- b=QFSgjQGiy38XRDnEgCUU+oan4jS98ZyIm9zIeY6ugm2SkMlA6z41D31/Vd6KLxZHpKx106oq7FPQboQ/kaj1bj9NM7ZrQEovcxfP3WhXPRb3zs6w0bnukncWgexQSELV/yPR/L/KGewqX+Xjrnj1EoQzwTW1KpzvLE46VQus2Gd4P/XVXWS2fRKXRjtr2t2DW6cKAmqq7P9/87O9XdkNNqwR/VFdyWyaixfUXkBLfmZLNGRvJuBkVB/AykcBJwN1q+EC1Us5KmOt3B7Xd2BD/e0bIZbjNwtzUMyw2o9ZdYhXstalFnuL+7Trf3tw0Kl118v2ystdFOomChl0atrfcg==
-Received: from BL1P223CA0026.NAMP223.PROD.OUTLOOK.COM (2603:10b6:208:2c4::31)
- by DM4PR12MB6469.namprd12.prod.outlook.com (2603:10b6:8:b6::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9228.12; Thu, 16 Oct 2025 05:01:19 +0000
-Received: from BL6PEPF00020E60.namprd04.prod.outlook.com
- (2603:10b6:208:2c4:cafe::69) by BL1P223CA0026.outlook.office365.com
- (2603:10b6:208:2c4::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9228.10 via Frontend Transport; Thu,
- 16 Oct 2025 05:01:19 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ bh=ReFK+T1og78D/4ekxSobvz0vZ9cr+0l4HOS7+uN0zeM=;
+ b=FJODPViR87i0B20xjvOt8qUB/HalqTLozzDRTaYG7OLyF1mNClmKfhTv9+elM/p0jFsHKUoWpfWGLsYgDKPhDb8hZa5JpEWa9vD2h2FzUdqzd7qotW4eY8bfokTm6III7bU+sbEViM8xxnOAnFFG098js9sfS4DkEwrCdDxXXV466V1iwTL/SbdvO/bARNJPUTHX1nuOPzIsO9qLum3AOZ/h1j2gD3ym0yhi8oOEn2Y8YA02qE/CGAU4CDPY8H708iKi2VCM9ZgIpRufp96a+6CmdKvhRTpsJdSP/62C+F5xs+ys6GUe4i32laU+zbwjGpULM++Rh6uUOK5rDcnaDg==
+Received: from CH2PR20CA0013.namprd20.prod.outlook.com (2603:10b6:610:58::23)
+ by MN2PR12MB4255.namprd12.prod.outlook.com (2603:10b6:208:198::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.11; Thu, 16 Oct
+ 2025 05:01:16 +0000
+Received: from DS2PEPF00003447.namprd04.prod.outlook.com
+ (2603:10b6:610:58:cafe::9) by CH2PR20CA0013.outlook.office365.com
+ (2603:10b6:610:58::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9228.12 via Frontend Transport; Thu,
+ 16 Oct 2025 05:01:16 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BL6PEPF00020E60.mail.protection.outlook.com (10.167.249.21) with Microsoft
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ DS2PEPF00003447.mail.protection.outlook.com (10.167.17.74) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9228.7 via Frontend Transport; Thu, 16 Oct 2025 05:01:19 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.9228.7 via Frontend Transport; Thu, 16 Oct 2025 05:01:15 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 15 Oct
- 2025 22:01:04 -0700
+ 2025 22:01:06 -0700
 Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Wed, 15 Oct 2025 22:01:04 -0700
+ 15.2.2562.20; Wed, 15 Oct 2025 22:01:05 -0700
 Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com
  (10.126.190.181) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
- Transport; Wed, 15 Oct 2025 22:01:02 -0700
+ Transport; Wed, 15 Oct 2025 22:01:04 -0700
 From: Daniel Jurgens <danielj@nvidia.com>
 To: <netdev@vger.kernel.org>, <mst@redhat.com>, <jasowang@redhat.com>,
 	<alex.williamson@redhat.com>, <pabeni@redhat.com>
@@ -85,10 +87,12 @@ CC: <virtualization@lists.linux.dev>, <parav@nvidia.com>,
 	<jgg@ziepe.ca>, <kevin.tian@intel.com>, <kuba@kernel.org>,
 	<andrew+netdev@lunn.ch>, <edumazet@google.com>, Daniel Jurgens
 	<danielj@nvidia.com>
-Subject: [PATCH net-next v5 00/12] virtio_net: Add ethtool flow rules support
-Date: Thu, 16 Oct 2025 00:00:43 -0500
-Message-ID: <20251016050055.2301-1-danielj@nvidia.com>
+Subject: [PATCH net-next v5 01/12] virtio_pci: Remove supported_cap size build assert
+Date: Thu, 16 Oct 2025 00:00:44 -0500
+Message-ID: <20251016050055.2301-2-danielj@nvidia.com>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20251016050055.2301-1-danielj@nvidia.com>
+References: <20251016050055.2301-1-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,190 +104,108 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF00020E60:EE_|DM4PR12MB6469:EE_
-X-MS-Office365-Filtering-Correlation-Id: ca268bb8-a559-49b6-ee2f-08de0c710b5d
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003447:EE_|MN2PR12MB4255:EE_
+X-MS-Office365-Filtering-Correlation-Id: a033a6fb-cf9f-434a-0a6c-08de0c71094e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014|7416014;
+	BCL:0;ARA:13230040|82310400026|36860700013|7416014|1800799024|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?+tS3HHBWPOUQ5XMi4Y5WLw0gk9Mu/YuYHvPLyFJMM5cdsOdBrrgW1KxyIaG5?=
- =?us-ascii?Q?gE4x/ImIVIWiGYGa/ImxjRjI1r2+Xj2X2qHJWiupQHs6FeWL074BQ8Y7/XLJ?=
- =?us-ascii?Q?Xa0hsMZbuE6Of2aH8DRmmoQlqn9bLD/MeqhPuIwNpOpf0uutetIYBcd29kg6?=
- =?us-ascii?Q?OrI7gLZL1eackmDJfyCEIdwZi/DNyXDnbrhcPZ5oxntgQibAofunMOzPK5Ms?=
- =?us-ascii?Q?/J2+/ErVjHMG5BlVDw1EQZjku8/bL/lwg+UglhPWbRoJ3txMcbDrBfij1EHn?=
- =?us-ascii?Q?TTnFi0RzXzabe7PtvKPT6LyiOV5Rdm+B44E0Xemn46f6rDXw9XNv5DGpCLzY?=
- =?us-ascii?Q?RZzUNX0nPRoTUg+BGe2qvbd0omJLpN4ugFVV3NK47uXgmOMIlRYEwVYoT4L8?=
- =?us-ascii?Q?sXu3si03yBW186UvLwTypfa6fryDp+ryZ3UiSG/h+PqnCdA6jMUQs2Uohb4D?=
- =?us-ascii?Q?dn/8UvHW9+RCML63x68iQLcGSR9SNBqx80YCpYWDYpTUOLnpx7PIKtKPm4Ur?=
- =?us-ascii?Q?bHjjBrTXLGc1HjqiIM2jEJhnPodwR15L8t2j0lexBJNzW1W+QXCq0eOaT8DT?=
- =?us-ascii?Q?74kIYFBd23bR83r5auDTbmdve96vxoPwe06syyTedDHEcwbj8rbbJ5itkG6W?=
- =?us-ascii?Q?XDn5VyGPeQYM53f2BUqVZxgaU0sq0OHstPhQm0KMZL4xIIy8vs2jkRfg5zwz?=
- =?us-ascii?Q?eXqI2N9o1cPvaHepPbOEgkdeaRqk6wi07WoeqfdLETGEFHvnNSgC/8hXmo17?=
- =?us-ascii?Q?WvXzwlz416VL9NGDLDWuI1tdNpVDlJGqW1RU1aI+TrxV1/J++3qhm72MaaRD?=
- =?us-ascii?Q?qQn4mRbNMVpHOKGTJX8XUQIFM2GVZ8CcitqWJFsKQzmJQlO/IwYsyqvutuEf?=
- =?us-ascii?Q?l6MFXZjz5867gQWAoCzVX7qWrzi0wWDiz0GYsWwq6AccFHm6eDGpjPeZYvqn?=
- =?us-ascii?Q?26tfyr00uZMqO1BRqlw30uWu9kSKmb/YWzX8+FKG9u5MSGtFUejEChJWS4qY?=
- =?us-ascii?Q?ZHAdibr6obcQWUWVLZKefvrB0dxeJTK27HnywYHIeEbWcZTwPIwPDE4G0HE2?=
- =?us-ascii?Q?ZpI0x2CE4Kzwq0Y4HvySN0hmOd/1Vq0OsoTc1OoBkOU2ikdWUyMLUYX/Ew4E?=
- =?us-ascii?Q?cj/EeuJKMvX0QzWjQBRecquFX0O4liP3oIqEiginU/pgDQVHN9A90/OxTC+z?=
- =?us-ascii?Q?O4F9KMtN76Vmx4dLZnxMgdcKa0mABTNHtynC2xm6l+GDUaC4cCSBpl0kIhz+?=
- =?us-ascii?Q?WZ8lGAE1sqyB9CVCd47mxte+iFzTS+ubEn8+rTx0a8LUTFDM1Vm7JQehJ6MF?=
- =?us-ascii?Q?/QogQbA3xzJ+HMKLhjF7M5fS59UtBZn2XCn9im9MpS5E0rKc6CAb+aR0Q7yi?=
- =?us-ascii?Q?gP31wsnyYyipJAH/4oBF84USe6xYn11i59ycuEq5TjBr7rswbM2iH0ofE50L?=
- =?us-ascii?Q?5fO+1Kj4oTRm1q+8Yyxhi5bMRAtYY1qdIVGFVzWpe3kw2Hgudh5ER/Q7gHLq?=
- =?us-ascii?Q?nFgp0T6cjDasNgkSIDT37Ikw/EoLGqNYIb5ny5+9dXjB10eAMXbWuVVYqKqY?=
- =?us-ascii?Q?DlbcpUhx87LNyloK6mhhs8jahiuFy8lFd2PwSm4c?=
+	=?us-ascii?Q?d9Gh0XnmAT/ZRKWLNFKzJ3LRZBO/e+SCmZskduG8MMFExzW3VOImK2Ihtvux?=
+ =?us-ascii?Q?YjrlJB+SdBGMNlzyDWd9iRDXWOPF+CqV+8CbDZ7uukmOUmnqem/lmu1vcN+x?=
+ =?us-ascii?Q?7/CgvOHmnAYPuGLUthrpzGJqGZkA5qVseDC7vY6lz0d8q1eZ6r5lsvgZq/EI?=
+ =?us-ascii?Q?qVWU+UzWB/va22jRHsqw+yWsjsfsNZirX2Lt9ivsFXMpl1dC1BjzDI26pmPz?=
+ =?us-ascii?Q?NgMWE9i4WJFNdrN01e7HvPqLXj2X1LqlVHcy/B8aAdlNzBZvYU0pJfs3gynY?=
+ =?us-ascii?Q?1EddSuIT8Hhbip8k8ISBCVGx4ytZdqZOnbcLXjXcDqA2G72d/RKJ16Dzvee6?=
+ =?us-ascii?Q?xBl5hsqjZrbj04gyNMf/hWbZcS7GEcVtkUtMNer0j7xkOG4UOC5dBb0o0sUu?=
+ =?us-ascii?Q?1SOyyBLIOuXcxAJSA2r7o+S5wwnJQtCkimKUXVA+eMHIVBRv4GYAlgj+ITIr?=
+ =?us-ascii?Q?qhpxv2XQ4CmhjNKtQXIZ8K3Fp0PGG3rmkvRG83xey4c0NaPcSi55YdKljkgY?=
+ =?us-ascii?Q?+qRNU1oRAXtzeZdfqgyp9+giNBZaHWTfhD69a+HWbcGyvkdRcn3RtGPUQRXy?=
+ =?us-ascii?Q?EsRxwqgSFVJjhDEVJBnaKCTK12NmPVo4Dij/7cBi9ZBsXlmU2te9oRt1PB1f?=
+ =?us-ascii?Q?Vc0plnulB22/xVKu10UdNMRXD5MtdjUUnvVo6rtNkWPgRHPe7cA0oy8zrOIx?=
+ =?us-ascii?Q?WUzVn5f9tYLcQDLFB3BpGGTF6BKMu0bQq9hsNJlATGTX7qjZFmGfbLCtYUaF?=
+ =?us-ascii?Q?84pxcYTk7lejoMwKa7oCV0YoZEU1jeXxlAisSs8ZbyINbwQI2CEcCWmfSAUT?=
+ =?us-ascii?Q?ishaFcBeYflrqQc1aU75/s2XbP3nJ7wzUBJNUTaSTpl1rDbxL7qo0BzVGm8X?=
+ =?us-ascii?Q?1XkFUxX3aMoB+qAQspFuzE/+Duv3z6mJupfBk7NJ/YAVmAfm0K6+gP+ne7Kk?=
+ =?us-ascii?Q?mC7qqDr9U4xV8t1YRRHEihMXccLTx1J9McF3Qlqza4OZoOGa4jzvpyzgO5gr?=
+ =?us-ascii?Q?QG+10iQHjpMZL+iJH7RSbE21sC6OufOPMYXOC7l58+qjovchOXnEBaQLB6eo?=
+ =?us-ascii?Q?H4+n9jTOdWrhVQojAacOrBs4NhRQWDenvCiMGXA1ZWZTJd6jpNTSPCCQDmPb?=
+ =?us-ascii?Q?gnsW9m+BT6DEdkmYUK2RIRwjwLoQEpVQZheKq1mHDQS8wRmhtxLNncmUaIdv?=
+ =?us-ascii?Q?1ur8W5XyJVd01P1uL8jxvIR4J1SgV3LQZL6DpBt9OkZ7rKWbqHs78pKOToKA?=
+ =?us-ascii?Q?WT0wwJNhi+4RDRvAHuemcoC502q2DSk7sgvpLumMBfaSfUzzql6tu1EkW8R6?=
+ =?us-ascii?Q?zrcgCxTMXs06CuaFsiGbTQxRX2i3QD2BkSFJt0zFcJRTxftY0trJp1i3KjkN?=
+ =?us-ascii?Q?XcfRy8FzoztaUut2nBM+WGbvzFUYMjP6cyaoz+rAVSiw85xAUL4BuW+hY6HK?=
+ =?us-ascii?Q?9RcMlbHcwfB0xf7hskvyzGOLmABBPr2lU4oUcvDndsOeQikEd2gdSwJYURJn?=
+ =?us-ascii?Q?tE+Rv5JA4bt+rY+1TgHt2gbIIhNJEvlrpdA3gz1rjVzLbmtAwmYfL3/qYbi2?=
+ =?us-ascii?Q?HIvwgN1iPqW3P9S/U7k=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(7416014)(1800799024)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2025 05:01:19.2910
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2025 05:01:15.8855
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca268bb8-a559-49b6-ee2f-08de0c710b5d
+X-MS-Exchange-CrossTenant-Network-Message-Id: a033a6fb-cf9f-434a-0a6c-08de0c71094e
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF00020E60.namprd04.prod.outlook.com
+	DS2PEPF00003447.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6469
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4255
 
-This series implements ethtool flow rules support for virtio_net using the
-virtio flow filter (FF) specification. The implementation allows users to
-configure packet filtering rules through ethtool commands, directing
-packets to specific receive queues, or dropping them based on various
-header fields.
+The cap ID list can be more than 64 bits. Remove the build assert. Also
+remove caching of the supported caps, it wasn't used.
 
-The series starts with infrastructure changes to expose virtio PCI admin
-capabilities and object management APIs. It then creates the virtio_net
-directory structure and implements the flow filter functionality with support
-for:
-
-- Layer 2 (Ethernet) flow rules
-- IPv4 and IPv6 flow rules  
-- TCP and UDP flow rules (both IPv4 and IPv6)
-- Rule querying and management operations
-
-Setting, deleting and viewing flow filters, -1 action is drop, positive
-integers steer to that RQ:
-
-$ ethtool -u ens9
-4 RX rings available
-Total 0 rules
-
-$ ethtool -U ens9 flow-type ether src 1c:34:da:4a:33:dd action 0
-Added rule with ID 0
-$ ethtool -U ens9 flow-type udp4 dst-port 5001 action 3
-Added rule with ID 1
-$ ethtool -U ens9 flow-type tcp6 src-ip fc00::2 dst-port 5001 action 2
-Added rule with ID 2
-$ ethtool -U ens9 flow-type ip4 src-ip 192.168.51.101 action 1
-Added rule with ID 3
-$ ethtool -U ens9 flow-type ip6 dst-ip fc00::1 action -1
-Added rule with ID 4
-$ ethtool -U ens9 flow-type ip6 src-ip fc00::2 action -1
-Added rule with ID 5
-$ ethtool -U ens9 delete 4
-$ ethtool -u ens9
-4 RX rings available
-Total 5 rules
-
-Filter: 0
-        Flow Type: Raw Ethernet
-        Src MAC addr: 1C:34:DA:4A:33:DD mask: 00:00:00:00:00:00
-        Dest MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
-        Ethertype: 0x0 mask: 0xFFFF
-        Action: Direct to queue 0
-
-Filter: 1
-        Rule Type: UDP over IPv4
-        Src IP addr: 0.0.0.0 mask: 255.255.255.255
-        Dest IP addr: 0.0.0.0 mask: 255.255.255.255
-        TOS: 0x0 mask: 0xff
-        Src port: 0 mask: 0xffff
-        Dest port: 5001 mask: 0x0
-        Action: Direct to queue 3
-
-Filter: 2
-        Rule Type: TCP over IPv6
-        Src IP addr: fc00::2 mask: ::
-        Dest IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
-        Traffic Class: 0x0 mask: 0xff
-        Src port: 0 mask: 0xffff
-        Dest port: 5001 mask: 0x0
-        Action: Direct to queue 2
-
-Filter: 3
-        Rule Type: Raw IPv4
-        Src IP addr: 192.168.51.101 mask: 0.0.0.0
-        Dest IP addr: 0.0.0.0 mask: 255.255.255.255
-        TOS: 0x0 mask: 0xff
-        Protocol: 0 mask: 0xff
-        L4 bytes: 0x0 mask: 0xffffffff
-        Action: Direct to queue 1
-
-Filter: 5
-        Rule Type: Raw IPv6
-        Src IP addr: fc00::2 mask: ::
-        Dest IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
-        Traffic Class: 0x0 mask: 0xff
-        Protocol: 0 mask: 0xff
-        L4 bytes: 0x0 mask: 0xffffffff
-        Action: Drop
+Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+Reviewed-by: Parav Pandit <parav@nvidia.com>
 
 ---
-v2: https://lore.kernel.org/netdev/20250908164046.25051-1-danielj@nvidia.com/
-  - Fix sparse warnings
-  - Fix memory leak on subsequent failure to allocate
-  - Fix some Typos
+v4: New patch for V4
+v5:
+   - support_caps -> supported_caps (Alok Tiwari)
+   - removed unused variable (test robot)
+---
+ drivers/virtio/virtio_pci_common.h | 1 -
+ drivers/virtio/virtio_pci_modern.c | 8 +-------
+ 2 files changed, 1 insertion(+), 8 deletions(-)
 
-v3: https://lore.kernel.org/netdev/20250923141920.283862-1-danielj@nvidia.com/
-  - Added admin_ops to virtio_device kdoc.
-
-v4:
-  - Fixed double free bug inserting flows
-  - Fixed incorrect protocol field check parsing ip4 headers.
-  - (u8 *) changed to (void *)
-  - Added kdoc comments to UAPI changes.
-  - No longer split up virtio_net.c
-  - Added config op to execute admin commands.
-      - virtio_pci assigns vp_modern_admin_cmd_exec to this callback.
-  - Moved admin command API to new core file virtio_admin_commands.c
-
-v5: 
-  - Fixed compile error
-  - Fixed static analysis warning on () after macro
-  - Added missing fields to kdoc comments
-  - Aligned parameter name between prototype and kdoc
-
-Daniel Jurgens (12):
-  virtio_pci: Remove supported_cap size build assert
-  virtio: Add config_op for admin commands
-  virtio: Expose generic device capability operations
-  virtio: Expose object create and destroy API
-  virtio_net: Query and set flow filter caps
-  virtio_net: Create a FF group for ethtool steering
-  virtio_net: Implement layer 2 ethtool flow rules
-  virtio_net: Use existing classifier if possible
-  virtio_net: Implement IPv4 ethtool flow rules
-  virtio_net: Add support for IPv6 ethtool steering
-  virtio_net: Add support for TCP and UDP ethtool rules
-  virtio_net: Add get ethtool flow rules ops
-
- drivers/net/virtio_net.c               | 1119 ++++++++++++++++++++++++
- drivers/virtio/Makefile                |    2 +-
- drivers/virtio/virtio_admin_commands.c |  165 ++++
- drivers/virtio/virtio_pci_common.h     |    1 -
- drivers/virtio/virtio_pci_modern.c     |   10 +-
- include/linux/virtio_admin.h           |  125 +++
- include/linux/virtio_config.h          |    6 +
- include/uapi/linux/virtio_net_ff.h     |  156 ++++
- include/uapi/linux/virtio_pci.h        |    7 +-
- 9 files changed, 1580 insertions(+), 11 deletions(-)
- create mode 100644 drivers/virtio/virtio_admin_commands.c
- create mode 100644 include/linux/virtio_admin.h
- create mode 100644 include/uapi/linux/virtio_net_ff.h
-
+diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
+index 8cd01de27baf..fc26e035e7a6 100644
+--- a/drivers/virtio/virtio_pci_common.h
++++ b/drivers/virtio/virtio_pci_common.h
+@@ -48,7 +48,6 @@ struct virtio_pci_admin_vq {
+ 	/* Protects virtqueue access. */
+ 	spinlock_t lock;
+ 	u64 supported_cmds;
+-	u64 supported_caps;
+ 	u8 max_dev_parts_objects;
+ 	struct ida dev_parts_ida;
+ 	/* Name of the admin queue: avq.$vq_index. */
+diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+index dd0e65f71d41..ff11de5b3d69 100644
+--- a/drivers/virtio/virtio_pci_modern.c
++++ b/drivers/virtio/virtio_pci_modern.c
+@@ -304,7 +304,6 @@ virtio_pci_admin_cmd_dev_parts_objects_enable(struct virtio_device *virtio_dev)
+ 
+ static void virtio_pci_admin_cmd_cap_init(struct virtio_device *virtio_dev)
+ {
+-	struct virtio_pci_device *vp_dev = to_vp_device(virtio_dev);
+ 	struct virtio_admin_cmd_query_cap_id_result *data;
+ 	struct virtio_admin_cmd cmd = {};
+ 	struct scatterlist result_sg;
+@@ -323,12 +322,7 @@ static void virtio_pci_admin_cmd_cap_init(struct virtio_device *virtio_dev)
+ 	if (ret)
+ 		goto end;
+ 
+-	/* Max number of caps fits into a single u64 */
+-	BUILD_BUG_ON(sizeof(data->supported_caps) > sizeof(u64));
+-
+-	vp_dev->admin_vq.supported_caps = le64_to_cpu(data->supported_caps[0]);
+-
+-	if (!(vp_dev->admin_vq.supported_caps & (1 << VIRTIO_DEV_PARTS_CAP)))
++	if (!(le64_to_cpu(data->supported_caps[0]) & (1 << VIRTIO_DEV_PARTS_CAP)))
+ 		goto end;
+ 
+ 	virtio_pci_admin_cmd_dev_parts_objects_enable(virtio_dev);
 -- 
 2.50.1
 
