@@ -1,97 +1,162 @@
-Return-Path: <netdev+bounces-230067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB8BEBE3827
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 14:54:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD0F1BE383F
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 14:55:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7905B358849
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:54:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 772E858456A
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B47334386;
-	Thu, 16 Oct 2025 12:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB0C334386;
+	Thu, 16 Oct 2025 12:55:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n6X3R08q"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="W1l0wR4T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C0B334380;
-	Thu, 16 Oct 2025 12:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56BD2330D4D
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 12:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760619237; cv=none; b=Zf1BZoJPo59oxEougx5Ww9VPc4Ybk/ZJWrYcbrfMpr7TfO3zlPNu3xyAWMQACMzOTckcxhGg7h3lVvytcA0VMOrOXQmGVR86m9IB5kJzlckXwrxc975X06wk7AGbatWrTUZp7k+MTno36zKgzG7Wo9gEHyvWAQh8hPu0iK3ubAc=
+	t=1760619304; cv=none; b=BHNtt4OSpy/+caSO8PPg6Wf2iLmy5gmlRqW1OLBnsKYCBm5bXq7emhUYwnKP9EJMsR8czm2AH5gpi7oY3cQ91J0Nz0wiuyg1HK1RROrn+XFNcLKqwbeGHLSBsPHyCU/FvLgK++xDwFoqgze0FIl1vp/U6KDfAXu9hs0RtmKzRJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760619237; c=relaxed/simple;
-	bh=2jg4Av+zM7tjDY5Z5S63NnnEZORlkA02wuvFoD/B2pQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qh9SRSddqZOdJ2qg7mKiP2+cj0UjIpPHbxmRRypYz5KQQDLStMFk97ktEylo5kMy+0wFguoYPPY6NKzYgYBILodtnCtP+vapRf0+nZ4nJs0cpOQzC0MQ6bC4tcofN1sIFR3YgNggLQyS2TVOeP92BOz1C+4xVky/iBdQU0kU2yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n6X3R08q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DC13C4CEF1;
-	Thu, 16 Oct 2025 12:53:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760619237;
-	bh=2jg4Av+zM7tjDY5Z5S63NnnEZORlkA02wuvFoD/B2pQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n6X3R08q28qXx/1Nd+oOpcO9AQZ3bc4cBO8iLWxP1QRpWvSHYmdrXXBjim3cMlPAZ
-	 0La41EQ5ANylxrlxlZ5RRpzr8gIy6/pQm6XaD0WfE1PnevOnxHHVvyL4C5gt1OYpzZ
-	 dgH1Q+H5Wba7DFHNx4vXox8Csq5AZ/ly5EKnqwnzbvw9vQLk8f3Copc28Dgr+4dpMi
-	 +aSN6pB3UU6IdwoFqn8HP/AfjkhBtjn3M023hTHD5i2qHW23y5EFd2xQjACLDNijH6
-	 lK+Io7R0Y/uur7Unl7VDGGb7jiVzb91EFZ9uS7h2C1GQqSip7M2y1TQk0W6n3herOW
-	 Za4/QZ/xQJVww==
-Date: Thu, 16 Oct 2025 13:53:52 +0100
-From: Simon Horman <horms@kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	linux-wpan@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] nl802154: fix some kernel-doc warnings
-Message-ID: <aPDq4BJnxji5mTxc@horms.kernel.org>
-References: <20251016035917.1148012-1-rdunlap@infradead.org>
+	s=arc-20240116; t=1760619304; c=relaxed/simple;
+	bh=ZUUjOUmPi99YByQi2GU9o7fH4nLtDooMLe4/nsf+y+o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pwGNZUdhpyaJjJi/YoXKzaPpNKoZRBbrT5V2YA1/FFP0IK3QhIN3FhttUaf3XQ2zznjhCUvdMu4VgtCY1+rLJoErSv2mU1LPxIfrdrxxQ56f5fVNPxmHYPXXQEMPIFEQOt/8eiJcmZZnr3B4CcSjtmdDtfUMyQiGS+0FDZabA/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=W1l0wR4T; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b3d5088259eso99551766b.1
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 05:54:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1760619298; x=1761224098; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lwkOC946NVK5Ay5tT6TcDur2LlBPpaKMS7PptjXrqlg=;
+        b=W1l0wR4TaWGwBUbq/ab/6ckr2AdByPJ71vqOIKY5WaIGOkZ7dJLMrgWUE0eteg2YDd
+         xPKM2NoOTyX7xQSk8k3tCcamfreRMtHLKSrNdQQOMcyXkwIroCVWB9irJAGp6jnHKIbC
+         OXO123h3ayv05YZtJRW/Xf4ssw/1CikxVumz8ci4Mw4xTkRzbrZFi0yXRYtm53VHhiIC
+         CsLH+OrAbcDyhJkkMS335Bnu9YfdpGXu112WhauXmPoEjay5juvpp0xGNUgReHWqJLzs
+         yrnJlsqrzUYtzcM1yU1vA66x0YNGmtWNUDw6CbGIscErnjkdiCouil3CdEJOzlljLP/v
+         YFsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760619298; x=1761224098;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lwkOC946NVK5Ay5tT6TcDur2LlBPpaKMS7PptjXrqlg=;
+        b=nTk2joMve51JTtJC0hGbuioVw4vO8flXeeSUZc0OimOe+iYpqwz0scHXx55jg1ZrF1
+         ltaLpjWk4/A7fRNlZMMl7xDChLp2O1210vMOARh3U1BduQXGkDBLON/Uh7ad7wnv2Y9Q
+         2BKDkQn/WuWWHqlAjOKCl2tyID1NfXAvJWVdLfXnwZFuQqgGUhin/z4O7zjPzQLvqQzb
+         kVmfkzT83CNDlygSHIPg868l9zg51LNYnmishECPb/lAoxKNf9nRosg3lWJY508+Y11C
+         AsZRhG5BVB7h8NDCLtusK3Awcrcmh5xz/dt30HSMmTlcZwndl/feTBKoacvBCf+5VM97
+         yeLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXhDqz1M7GPQ5V/5vZvGoRyfOx7bT1rR/ARuzWihpCcQLCnrwxREhXcKTiEteDiatkQfSOIRos=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynXwBfLVxEU0J9lKOXic98MQ+U3vrG7/3qQw5Ev7AyYieQtugH
+	PI9ZEXNRucBb9OfTQKJ4K8BKiTNjNpyTw7W6qRnTWDGwuKGB4nN9QdV1XImQC9EDI2w=
+X-Gm-Gg: ASbGncuKUlDQiH8rUycTGHZfQhqsYrZcq9MfiA3Vb3r85QyNUdTMpByHmRoLFNuSwfk
+	eNC9ez58Hb3HrVxSNdexsYuCvRTtPw8eraCBKu8MoxGdUcehMjPmW3wJbStN+y4ahUiLyBwmyBL
+	zIoSNuNQTh3O24q9oyc15eac+e1AIbSvELtOvVr5nmEM0r+z5lD05ZmqmWAIlYP8k2VzrvCwWdj
+	PEpw94t+fs8l07qt7kzHlO65NuoDJFW3PLjIlategtyV1U+0dB5mwuW4ScLA46adSVRu7Dp7ds8
+	M7agwT5C1g1sbCG9en4PbbQpgosKoHGnd5n/AUZiXhv6hRoi0MyttqIqQiTPNViPWW6D/sdRswx
+	OVBn2M91jpIOW3KlXEnyEOcNIHnoOqwY4hgzwYkEfSRvgr6AFzAWsrfBh5dELgmcPEC5/nLTztj
+	tWE/u8AAGUNgN5pnOfn9d4nrE3TQSM8GnDaRyWDadhIZw=
+X-Google-Smtp-Source: AGHT+IFVF436vNsuSyK1BdMzDZ4sJZPhS32XY4Fq1N1PXqLrCDq/cqw04QJpxvzdr76ooTNaiQ5xzg==
+X-Received: by 2002:a17:907:3f13:b0:b40:5752:169a with SMTP id a640c23a62f3a-b50acc1a94amr3374920566b.58.1760619298216;
+        Thu, 16 Oct 2025 05:54:58 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b5ccd1af87bsm511915766b.63.2025.10.16.05.54.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Oct 2025 05:54:57 -0700 (PDT)
+Message-ID: <d6473e8b-903c-4116-a059-50814bceec75@blackwall.org>
+Date: Thu, 16 Oct 2025 15:54:56 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251016035917.1148012-1-rdunlap@infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net: bonding: update the slave array for broadcast
+ mode
+To: Tonghao Zhang <tonghao@bamaicloud.com>, netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Hangbin Liu <liuhangbin@gmail.com>, Jiri Slaby <jirislaby@kernel.org>,
+ stable@vger.kernel.org
+References: <20251016125136.16568-1-tonghao@bamaicloud.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20251016125136.16568-1-tonghao@bamaicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thanks Randy,
-
-On Wed, Oct 15, 2025 at 08:59:17PM -0700, Randy Dunlap wrote:
-> Correct multiple kernel-doc warnings in nl802154.h:
+On 10/16/25 15:51, Tonghao Zhang wrote:
+> This patch fixes ce7a381697cb ("net: bonding: add broadcast_neighbor option for 802.3ad").
+> Before this commit, on the broadcast mode, all devices were traversed using the
+> bond_for_each_slave_rcu. This patch supports traversing devices by using all_slaves.
+> Therefore, we need to update the slave array when enslave or release slave.
 > 
-> - Fix a typo on one enum name to avoid a kernel-doc warning.
-> - Drop 2 enum descriptions that are no longer needed.
-
-According to my brief dig into git history,
-it seems those were added but never used.
-
-> - Mark 2 internal enums as "private:" so that kernel-doc is not needed
->   for them.
+> Fixes: ce7a381697cb ("net: bonding: add broadcast_neighbor option for 802.3ad")
+> Cc: Jay Vosburgh <jv@jvosburgh.net>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+> Cc: Hangbin Liu <liuhangbin@gmail.com>
+> Cc: Jiri Slaby <jirislaby@kernel.org>
+> Cc: <stable@vger.kernel.org>
+> Reported-by: Jiri Slaby <jirislaby@kernel.org>
+> Tested-by: Jiri Slaby <jirislaby@kernel.org>
+> Link: https://lore.kernel.org/all/a97e6e1e-81bc-4a79-8352-9e4794b0d2ca@kernel.org/
+> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+> Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+> v2:
+> - fix the typo in the comments, salve -> slave
+> - add the target repo in the subject
+> ---
+>  drivers/net/bonding/bond_main.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 > 
-> Warning: nl802154.h:239 Enum value 'NL802154_CAP_ATTR_MAX_MAXBE' not described in enum 'nl802154_wpan_phy_capability_attr'
-> Warning: nl802154.h:239 Excess enum value '%NL802154_CAP_ATTR_MIN_CCA_ED_LEVEL' description in 'nl802154_wpan_phy_capability_attr'
-> Warning: nl802154.h:239 Excess enum value '%NL802154_CAP_ATTR_MAX_CCA_ED_LEVEL' description in 'nl802154_wpan_phy_capability_attr'
-> Warning: nl802154.h:369 Enum value '__NL802154_CCA_OPT_ATTR_AFTER_LAST' not described in enum 'nl802154_cca_opts'
-> Warning: nl802154.h:369 Enum value 'NL802154_CCA_OPT_ATTR_MAX' not described in enum 'nl802154_cca_opts'
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index 17c7542be6a5..2d6883296e32 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -2384,7 +2384,9 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+>  		unblock_netpoll_tx();
+>  	}
+>  
+> -	if (bond_mode_can_use_xmit_hash(bond))
+> +	/* broadcast mode uses the all_slaves to loop through slaves. */
+> +	if (bond_mode_can_use_xmit_hash(bond) ||
+> +	    BOND_MODE(bond) == BOND_MODE_BROADCAST)
+>  		bond_update_slave_arr(bond, NULL);
+>  
+>  	if (!slave_dev->netdev_ops->ndo_bpf ||
+> @@ -2560,7 +2562,8 @@ static int __bond_release_one(struct net_device *bond_dev,
+>  
+>  	bond_upper_dev_unlink(bond, slave);
+>  
+> -	if (bond_mode_can_use_xmit_hash(bond))
+> +	if (bond_mode_can_use_xmit_hash(bond) ||
+> +	    BOND_MODE(bond) == BOND_MODE_BROADCAST)
+>  		bond_update_slave_arr(bond, slave);
+>  
+>  	slave_info(bond_dev, slave_dev, "Releasing %s interface\n",
 
-I do still see:
-Warning: include/net/nl802154.h:237 Enum value 'NL802154_CAP_ATTR_CCA_ED_LEVELS' not described in enum 'nl802154_wpan_phy_capability_attr'
-
-And that enum does seem to be used. So it would be nice to address this
-by documenting it. But I think that can be left as a separate task.
-
-> 
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
