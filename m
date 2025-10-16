@@ -1,64 +1,69 @@
-Return-Path: <netdev+bounces-230207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4D89BE54C6
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 21:58:00 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85271BE5548
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 22:11:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 69AA74E10A3
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 19:57:59 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 31E44359A9F
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 20:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3536F28E571;
-	Thu, 16 Oct 2025 19:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5943C2DC79A;
+	Thu, 16 Oct 2025 20:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cavN09Bs"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Kg5T7JMw"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300B52DC791
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 19:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE962D46B2;
+	Thu, 16 Oct 2025 20:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760644677; cv=none; b=B3gIJZzWtH+NFkgviJyEtMYBGuzyxNGGZ9gKxGalkZLK/90HqrrsH5CsC900XJ2DHUgkeR08vzq2Fyk0FPgGk1sAHFfp3G4LnueTBo8UP1wUafWL8y0H4UzYF2tvoo9U0E8CpWIOQTRNeP3JFaOdTmr0K0M9oHLvOY5r9moB5Iw=
+	t=1760645489; cv=none; b=tDc7p+z0wZECHVJqocy/titrsjsVca3HknIWGDszuvILnmRiItpaoPhV67unfVZNyAXheYi0u2qMq7IF9xBhfzd0guydPhygdL5bZcZYWiI8SVvR0X7HQVnsjyV7XWdWDb/ImHnC8PQSTpsTNLbB7pKFR2qCzww+B9977tHf130=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760644677; c=relaxed/simple;
-	bh=VOTlOzJ0HPYw5d7WJPmbWEHOA2OmD4JtKDS7yjUv5Gs=;
+	s=arc-20240116; t=1760645489; c=relaxed/simple;
+	bh=08kr2l/UWyG32Kp/2Umrbh3yZs0+clQ80REy2fHQfC4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s2HIb8jnch7UrqDATzhOg7JpdgwNezglcTJN/SS5QmCc/i7ZkrAUJBnv0Qd8hWNKu4PgPu/k4wBIwLwwOBr4w4gm+Jq+qqTqQwtTrHEV3fmHCYhkeUR4ahVPk8mkCcy6uOJXU2AkizncxpBBy5VAyekDydPUrJMqej59s6clBG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cavN09Bs; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 16 Oct 2025 12:57:32 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760644663;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A6QNM0LEjMhDM1AhzKkrXtK0wDpQlcn/3jFNh89PFW4=;
-	b=cavN09Bsrq20N4KdKPWHM3D4vp7y79G96geueuYvCN/GClE8DD+V9Zb9uYlORCxcKV8RBo
-	wCw6LqJx7EjOCW508calrRTToHHshth4/lAEfrtzLAAibUS8iH2yfGak6KWNIKmsjMiFuQ
-	HDZhnN3zBftFsukEePJ+mHPWn7HnDWo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, Tejun Heo <tj@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Matyas Hurtik <matyas.hurtik@cdn77.com>, Daniel Sedlak <daniel.sedlak@cdn77.com>, 
-	Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Wei Wang <weibunny@meta.com>, netdev@vger.kernel.org, linux-mm@kvack.org, 
-	cgroups@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Meta kernel team <kernel-team@meta.com>
-Subject: Re: [PATCH v2] memcg: net: track network throttling due to memcg
- memory pressure
-Message-ID: <sntikxyoeveee3tkrxwr5rrztzr26sqzpn63r5nrel6vdyb7as@6mpya3n4mxju>
-References: <20251016161035.86161-1-shakeel.butt@linux.dev>
- <20251016124610.0fcf17313c649795881db43c@linux-foundation.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=j2E7aO3Et8x2r7kg7X6Av2JBBXyE1n1J1f3xksV8n77XJpmvD1vCLS2G3IcRmJ8vsHvYqBACX9K/Fw/dkUck1XIWyvL/x6HbBwp2LM+2SXWfcFt8Bzc5Bon+HtHu+tdgK69M2uGAT9Jv17Su/1qmYzn6Ag6P/osYqPBD6E+qya0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Kg5T7JMw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=fH3uOL5pAcLj4w5mtMBuA/UvzktBnN4zub1YlfQY7TY=; b=Kg5T7JMwo1EPZEU182K+GycJh0
+	VA6ynNMfzDNQL0AS5Sz2UpaWtCZl6K6mYSteM9uPB+2qbzu3BLVF1sIIsOt31EXEYRZqKCMFbILEV
+	tZ6X3Lp6uMi4YP4abHshLoAi7WOOnW3df4uoJkQzk5mZoXV3nE1O671BY9wEr1UjTSIM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v9UJS-00BCbc-Pl; Thu, 16 Oct 2025 22:11:02 +0200
+Date: Thu, 16 Oct 2025 22:11:02 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yao Zi <ziyao@disroot.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Frank <Frank.Sae@motor-comm.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
+	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH net-next 3/4] net: stmmac: Add glue driver for Motorcomm
+ YT6801 ethernet controller
+Message-ID: <f1de6600-4de9-4914-95e6-8cdb3481e364@lunn.ch>
+References: <20251014164746.50696-2-ziyao@disroot.org>
+ <20251014164746.50696-5-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,57 +72,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251016124610.0fcf17313c649795881db43c@linux-foundation.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20251014164746.50696-5-ziyao@disroot.org>
 
-On Thu, Oct 16, 2025 at 12:46:10PM -0700, Andrew Morton wrote:
-> On Thu, 16 Oct 2025 09:10:35 -0700 Shakeel Butt <shakeel.butt@linux.dev> wrote:
-> 
-> > The kernel can throttle network sockets if the memory cgroup associated
-> > with the corresponding socket is under memory pressure. The throttling
-> > actions include clamping the transmit window, failing to expand receive
-> > or send buffers, aggressively prune out-of-order receive queue, FIN
-> > deferred to a retransmitted packet and more. Let's add memcg metric to
-> > indicate track such throttling actions.
-> > 
-> > At the moment memcg memory pressure is defined through vmpressure and in
-> > future it may be defined using PSI or we may add more flexible way for
-> > the users to define memory pressure, maybe through ebpf. However the
-> > potential throttling actions will remain the same, so this newly
-> > introduced metric will continue to track throttling actions irrespective
-> > of how memcg memory pressure is defined.
-> > 
-> > ...
-> >
-> > --- a/include/net/sock.h
-> > +++ b/include/net/sock.h
-> > @@ -2635,8 +2635,12 @@ static inline bool mem_cgroup_sk_under_memory_pressure(const struct sock *sk)
-> >  #endif /* CONFIG_MEMCG_V1 */
-> >  
-> >  	do {
-> > -		if (time_before64(get_jiffies_64(), mem_cgroup_get_socket_pressure(memcg)))
-> > +		if (time_before64(get_jiffies_64(),
-> > +				  mem_cgroup_get_socket_pressure(memcg))) {
-> > +			memcg_memory_event(mem_cgroup_from_sk(sk),
-> > +					   MEMCG_SOCK_THROTTLED);
-> >  			return true;
-> > +		}
-> >  	} while ((memcg = parent_mem_cgroup(memcg)));
-> >  
-> 
-> Totally OT, but that's one bigass inlined function.  A quick test
-> indicates that uninlining just this function reduces the size of
-> tcp_input.o and tcp_output.o nicely.  x86_64 defconfig:
-> 
->    text	   data	    bss	    dec	    hex	filename
->   52130	   1686	      0	  53816	   d238	net/ipv4/tcp_input.o
->   32335	   1221	      0	  33556	   8314	net/ipv4/tcp_output.o
-> 
->    text	   data	    bss	    dec	    hex	filename
->   51346	   1494	      0	  52840	   ce68	net/ipv4/tcp_input.o
->   31911	   1125	      0	  33036	   810c	net/ipv4/tcp_output.o
-> 
+> +static int motorcomm_efuse_read_byte(struct dwmac_motorcomm_priv *priv,
+> +				     u8 offset, u8 *byte)
+> +{
+> +	u32 reg;
+> +	int ret;
+> +
+> +	writel(FIELD_PREP(EFUSE_OP_MODE, EFUSE_OP_ROW_READ)	|
+> +	       FIELD_PREP(EFUSE_OP_ADDR, offset)		|
+> +	       EFUSE_OP_START, priv->base + EFUSE_OP_CTRL_0);
+> +
+> +	ret = readl_poll_timeout(priv->base + EFUSE_OP_CTRL_1,
+> +				 reg, reg & EFUSE_OP_DONE, 2000,
+> +				 EFUSE_READ_TIMEOUT_US);
+> +
+> +	reg = readl(priv->base + EFUSE_OP_CTRL_1);
 
-Nice find and this inlining might be hurting instead of helping. I will
-look into it if no one else comes to it before me.
+Do you actually need this read? The documentation says:
+
+ * Returns: 0 on success and -ETIMEDOUT upon a timeout. In either
+ * case, the last read value at @addr is stored in @val.
+
+> +	*byte = FIELD_GET(EFUSE_OP_RD_DATA, reg);
+> +
+> +	return ret;
+> +}
+
+> +static void motorcomm_reset_phy(struct dwmac_motorcomm_priv *priv)
+> +{
+> +	u32 reg = readl(priv->base + EPHY_CTRL);
+> +
+> +	reg &= ~EPHY_RESET;
+> +	writel(reg, priv->base + EPHY_CTRL);
+> +
+> +	reg |= EPHY_RESET;
+> +	writel(reg, priv->base + EPHY_CTRL);
+> +}
+
+How does this differ to the PHY doing its own reset via BMCR?
+
+We need to be careful of lifetimes here. It would be better if the PHY
+controlled its own reset. We don't want phylib to configure the PHY
+and then the MAC driver reset it etc.
+
+> +static int motorcomm_resume(struct device *dev, void *bsp_priv)
+> +{
+> +	struct dwmac_motorcomm_priv *priv = bsp_priv;
+> +	struct pci_dev *pdev = to_pci_dev(dev);
+> +	int ret;
+> +
+> +	pci_restore_state(pdev);
+> +	pci_set_power_state(pdev, PCI_D0);
+> +
+> +	ret = pcim_enable_device(pdev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	pci_set_master(pdev);
+> +
+> +	motorcomm_reset_phy(priv);
+
+Does the PHY support WoL? You probably should not be touching it if it
+can wake the system.
+
+> +		return NULL;
+> +
+> +	plat->mdio_bus_data = devm_kzalloc(dev, sizeof(*plat->mdio_bus_data),
+> +					   GFP_KERNEL);
+> +	if (!plat->mdio_bus_data)
+> +		return NULL;
+
+Is this required? If you look at other glue drivers which allocate
+such a structure, they set members in it:
+
+dwmac-intel.c:	plat->mdio_bus_data->needs_reset = true;
+dwmac-loongson.c:		plat->mdio_bus_data->needs_reset = true;
+dwmac-tegra.c:	plat->mdio_bus_data->needs_reset = true;
+stmmac_pci.c:	plat->mdio_bus_data->needs_reset = true;
+stmmac_platform.c:		plat->mdio_bus_data->needs_reset = true;
+
+You don't set anything.
+
+	Andrew
 
