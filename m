@@ -1,55 +1,87 @@
-Return-Path: <netdev+bounces-230033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90E2ABE3176
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:34:59 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC265BE31D0
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:38:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AF4458722C
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:32:15 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8884C356C72
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75C2532D7F1;
-	Thu, 16 Oct 2025 11:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAC753164B0;
+	Thu, 16 Oct 2025 11:38:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="jYTunffu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JozoOCie"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B555D31D732;
-	Thu, 16 Oct 2025 11:29:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F25C21C9F9
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:38:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760614176; cv=none; b=toOEII9SlRv2yjeUBFzT04rnq2PH5+RrfiJbQxLrIYep0LKUXWlPYvEprwJsA7IYzKA79shrBZVZ0pDBKxS1Tgi1Ph+HyttPo/gua06ICMeJctWgRUyLUUUA0xrolp/BPnbvUaOnZs9gGhcPhyZDglqsvTh5nnFC8DM4ukDCXQU=
+	t=1760614696; cv=none; b=aIJJvbOgv4dS9VxsFxgq34OBC+2nTuwVt3GOqIQQTkZQGdblu9A9Zz0UK4vcaHGI/D5jVIfWhm2x2UW79n1BZEBiboAk9/CIqcEdzN9UW+ZXMewiVrFY/Ryj4zdeA8D5O8KZa/UwnAP8BYiQFsKZkSbXEel7c9YN3zss+ZH6AFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760614176; c=relaxed/simple;
-	bh=6X8f+TKvlFE7+7iIebOd6vOulDFaK7Hq5QdhSQt2pOk=;
+	s=arc-20240116; t=1760614696; c=relaxed/simple;
+	bh=mMns2NLuKvFzapDVIPj9BjrjeM9df/lrxjTiKmiHdzE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PtJmp6wXYnmeGanZDl5Qra4oXm52Q/WePEK81WleuoA/r++FP6tqqyAGnOJi7sb9mz1Vq7JHwRDOKWTIZQTFW3Ueso/ue6aETLhHRSgCqAYNBrffHZfHeza5sOg/lm/kApQLyxBXBsl9EDm23QoheI2ql97rtDTNokbohYV610E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=jYTunffu; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1760614173;
-	bh=6X8f+TKvlFE7+7iIebOd6vOulDFaK7Hq5QdhSQt2pOk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=jYTunffuBN8ebxn+J0J1kc1YN1sbssCSZYgjcGOrNO2n1UMVW6LfsKWkyyq0RAUrB
-	 GLJG4OrIr0Sfcy+LmV8GJUk+PcEFSp6AampSQ6c+uHyH+elNjyePFNXn+Mm7b5AcAN
-	 wbVAiuGYfqYf5GRwhTm50x8bOtwU9u2SmHglYu+GhS/FvCvcs8w52zzO/kmqiYjQWQ
-	 bv+YPb7X7S8N40trUe/UrYbdaoXnYgx0qcGCa4bMI7nKyahcDO5gXlLousMhu/oYIl
-	 OWhJyIBRJSz948YcvSasAukvogji8BA5b5tGCcq0T02oOZYVIyNy1r5QStgmaeMuFt
-	 htkyu7PlpsOwA==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id C413D17E3673;
-	Thu, 16 Oct 2025 13:29:31 +0200 (CEST)
-Message-ID: <ce2edd72-f9fe-4c27-b873-f06dc28e348b@collabora.com>
-Date: Thu, 16 Oct 2025 13:29:31 +0200
+	 In-Reply-To:Content-Type; b=Is6LqlYykKEa+fgcqz74lOGMu5vpLJ5ZceXgY05zhPhnHZfRIQtC5XT0qrvnFvzkGAwqIxwLv1fUfQhQ9gR1KT5b1jud60MlovE3x9YORBpOIyjBDxCTMhrhU5B8PyWj5Vd8BVmPVmTUllg1rjF1o3IIO5ueFsKod/4JQd57eZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JozoOCie; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760614694;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nxlH62rmLXxD25B6COVDNzPmfmbwucOAmPDOFM8kKCs=;
+	b=JozoOCievUag3TPh771pQ/rX/gJEug7BaaeDbHMJqFZViOvcnF9p1j1BufHCIRnHUAOBIR
+	PPsSSktnJKDYCQHqO25kul9CHzcyurPO5FZNEjV3eR+u/ZvuIN8TZiP541p3DpHqbvwcRL
+	haJP2QisJViI1dcaEJ0PsUDlm3mAcbA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-301-TjBvz7RaMG-WR87_HvKNfg-1; Thu, 16 Oct 2025 07:38:12 -0400
+X-MC-Unique: TjBvz7RaMG-WR87_HvKNfg-1
+X-Mimecast-MFC-AGG-ID: TjBvz7RaMG-WR87_HvKNfg_1760614691
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4256fae4b46so429943f8f.0
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 04:38:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760614691; x=1761219491;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nxlH62rmLXxD25B6COVDNzPmfmbwucOAmPDOFM8kKCs=;
+        b=gj3wfcX8WVJZ49XwQKPmA05RIRqEGmfr/0IYU7q8ySZxewOqbDzg176FMFugt4uFnR
+         EFypVWWvXr9mSPa0ZDan4/Sj8enSATZ0CeD9YPZTOLmZAQBL7qYH627F0+bwcDXrHOjb
+         aK+tTteUVZw/JKc5QV+oQXWKPD+mqiYqpBMQqbiPtdQ2QcfzTBL0qRmAxbZMQBCF2jHd
+         cGpVJcjkoW5p2AMZctcuKcZO99uFvIGjAfG7WIF6pxmEjzXpW8klRCWtq47O0tHx2YCX
+         WslChYyy/T9qrIyMGJGFP+15qO69ianN4EN+1W2nILxHe/Qv0fwM9pqWE/RfN82m8NEE
+         MVYg==
+X-Forwarded-Encrypted: i=1; AJvYcCVSMZyi4kxls/BIUKiPKSSRsmMaaiY/mGf/y8Kmrh6rJWsXkMSBw+zqTN8TbGen8myqsKKZBhE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnVJ3Bv6L0t+LFChTDZbECAUQrtDuZ4iR4kjFlQU7alyVkofZ2
+	AP1tmNKNWZdjwntpeyTEJ0ZD8VjFWwwTXk2OzLx//97ErCIF9RVmyfI4s86TCN7uCW5xm7MfQcR
+	2DcrYpL1mmvbBqxDVnBL/q37OY2DLMVG7EPERpq42oiXpi0EesL6OIdD6uQ==
+X-Gm-Gg: ASbGncvjKX6N6TymtioA9MEWqYi5//fmkw7iPs5oBZzNYYpv4lM4aYoAm9XnnNYp9T7
+	P4zVzl3g38rkS4hQ7JacrOtjm0elEKysP5VUIZdJuyOLIk3CmqisccbhgOWCE+RC+QnfRSa6uzh
+	6VNJWHkkwv3UeXSAV3dAG7L5xVD0QJoBrCZz2cCFXE/X7dWeit9pxkAIbT4+hJxvPlG/vQ1NQVn
+	vBdDvssUtKsIQPCNeL7A7+qvQde9ZiowLFOeUewhiaZtGNEymAhBqS8Y4IN8+KjnH1xuTgIAHhM
+	c+w7H5xiSjKHi6I6/5IM/v/11dvwcdQRLl/G7fCDTI6oAZVemoS9CDaQUUGHhPWm4gOKt2e7Wwk
+	C1kXeP7onpz1orGm51LO61ExXZk8E38pFurB5I9Eq7hhbO6c=
+X-Received: by 2002:a05:6000:26cc:b0:425:8134:706 with SMTP id ffacd0b85a97d-42667177f6emr22365162f8f.16.1760614691317;
+        Thu, 16 Oct 2025 04:38:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHlbzfdodGlxEMQUBXyg95AbgC7ZM5TUhTD/KeOn7lRcc2boXF79zLjNFY0/GsL7i1rm/K/sQ==
+X-Received: by 2002:a05:6000:26cc:b0:425:8134:706 with SMTP id ffacd0b85a97d-42667177f6emr22365139f8f.16.1760614690911;
+        Thu, 16 Oct 2025 04:38:10 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426dac8691fsm25592121f8f.50.2025.10.16.04.38.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Oct 2025 04:38:10 -0700 (PDT)
+Message-ID: <b2526050-acf6-451a-8f0a-17ce1a8261a0@redhat.com>
+Date: Thu, 16 Oct 2025 13:38:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,41 +89,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 04/15] dt-bindings: mfd: syscon: Add mt7981-topmisc
-To: Sjoerd Simons <sjoerd@collabora.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- Ryder Lee <ryder.lee@mediatek.com>, Jianjun Wang
- <jianjun.wang@mediatek.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>,
- Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>, Lee Jones <lee@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>
-Cc: kernel@collabora.com, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
- linux-phy@lists.infradead.org, netdev@vger.kernel.org,
- Daniel Golle <daniel@makrotopia.org>, Bryan Hinton <bryan@bryanhinton.com>
-References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
- <20251016-openwrt-one-network-v1-4-de259719b6f2@collabora.com>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Subject: Re: [PATCH net-next v13 5/7] bonding: Update to bond_arp_send_all()
+ to use supplied vlan tags
+To: David Wilder <wilder@us.ibm.com>, netdev@vger.kernel.org
+Cc: jv@jvosburgh.net, pradeep@us.ibm.com, i.maximets@ovn.org,
+ amorenoz@redhat.com, haliu@redhat.com, stephen@networkplumber.org,
+ horms@kernel.org, kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
+References: <20251013235328.1289410-1-wilder@us.ibm.com>
+ <20251013235328.1289410-6-wilder@us.ibm.com>
 Content-Language: en-US
-In-Reply-To: <20251016-openwrt-one-network-v1-4-de259719b6f2@collabora.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251013235328.1289410-6-wilder@us.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Il 16/10/25 12:08, Sjoerd Simons ha scritto:
-> This hardware block amongst other things includes a multiplexer for a
-> high-speed Combo-Phy. This binding allows exposing the multiplexer
-> 
-> Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
+On 10/14/25 1:52 AM, David Wilder wrote:
+> @@ -3097,9 +3100,11 @@ static void bond_arp_send_all(struct bonding *bond, struct slave *slave)
+>  		if (rt->dst.dev == bond->dev)
+>  			goto found;
+>  
+> -		rcu_read_lock();
+> -		tags = bond_verify_device_path(bond->dev, rt->dst.dev, 0);
+> -		rcu_read_unlock();
+> +		if (!tags) {
+> +			rcu_read_lock();
+> +			tags = bond_verify_device_path(bond->dev, rt->dst.dev, 0);
+> +			rcu_read_unlock();
+> +		}
+>  
+>  		if (!IS_ERR_OR_NULL(tags))
+>  			goto found;
+> @@ -3115,7 +3120,8 @@ static void bond_arp_send_all(struct bonding *bond, struct slave *slave)
+>  		addr = bond_confirm_addr(rt->dst.dev, target_ip, 0);
+>  		ip_rt_put(rt);
+>  		bond_arp_send(slave, ARPOP_REQUEST, target_ip, addr, tags);
+> -		kfree(tags);
+> +		if  (!(flags & BOND_TARGET_USERTAGS))
+> +			kfree(tags);
 
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+It's IMHO not obvious from the above code that `tags` is allocated (by
+bond_verify_device_path() if and only if !(flags & BOND_TARGET_USERTAGS)
 
+I think it would be more clear if you use the same condition for both
+the allocation and the free calls.
+
+/P
 
 
