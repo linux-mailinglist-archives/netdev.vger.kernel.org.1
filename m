@@ -1,181 +1,112 @@
-Return-Path: <netdev+bounces-229889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13BE0BE1D28
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:54:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E1DCBE1B6B
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B49B6351EED
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 06:54:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 620E519C7B5D
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 06:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29FD82F1FE8;
-	Thu, 16 Oct 2025 06:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC59A2D2491;
+	Thu, 16 Oct 2025 06:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PQEqKfXR"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="DlyR1g5J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1AA2F1FDB
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 06:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F1DE21CC44
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 06:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760597651; cv=none; b=ok8GWNuhpBuRcqo9I5q9fswSX4hq5ogCv929IIiCiqTK4hLc4EG65Ed7uZMiCERW0OB80C1GGScoTKoS39UHyiKgIzOBA1eD9fqfwMqQp7dVbW69cLdHeY28on0OJzdtcONA25+0Rinp/kDAb5Ao0huJFGrbz6u/UFPes2k0mV0=
+	t=1760595945; cv=none; b=QFH4HPiCd8hOSgV+qko3haevmcoifP0vCzFMLaIygWOO5Jyo6Evda0669z7AVG/ic2KUnD0M4sNmxjwkODS63xoMe18VN7fV3rDo4KJRm3OnTCC2DwmGCegYkC9d0chYCVp62PHJLv4mBqDg8mhAZukqGucjJZcNoM72zNkQemE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760597651; c=relaxed/simple;
-	bh=y9g7++ThMeSMQPh1ylrPaNSSi2JtgH52izVD4ZWgxXk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WxRAPDVbDLh8wb8TKtH3okCyvMSru+atxOqJu/8NqD4gRVc7ONUeub97rl0f4M8/Dmll8p7IL+7mee1lOlf5lHMIbCy+laJcf3Lj3fXo7yO4Uz6FbtcO4HwD5meMJLZAk9SBZYtSCnVfWf/UH8I8J4rJt2wMo/EXjduUbzGweNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PQEqKfXR; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760597649; x=1792133649;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=y9g7++ThMeSMQPh1ylrPaNSSi2JtgH52izVD4ZWgxXk=;
-  b=PQEqKfXRu3hGcUI3YUYnCaLte8mD36rTsUyff9Y4lePB/rBpkbBa4p7u
-   YubSLyumijUxY13eE018wp+gpHCIaP1HyPnGJi72THAMT0+4iOIgh/Xsj
-   r2gF7bnhqhhe9TIy7ifUQ0xe/uZNDDZ6NSLRaeYesPnVKhUSfLV5PbMSz
-   x7QcCP6V9C6Q3E7Kz/wmYjYNtyJLDpnOlyaa2DN3rJqV+PoRzIgOPyote
-   HZut19xdwntnOxBXq4BWjMtkiwyerQNED3unM400jXeZrnj1200huTAN5
-   E5rq7jP4E3Y1XkEAH8B4hqOcLKCXiuwYXPTS80lFdgD+Q7P8I9/tCA2u7
-   Q==;
-X-CSE-ConnectionGUID: ZCSr+9XaTcuW+wy4c7q2GQ==
-X-CSE-MsgGUID: WffLNjaqQTyRtRlb7ozSMA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="62492419"
-X-IronPort-AV: E=Sophos;i="6.19,233,1754982000"; 
-   d="scan'208";a="62492419"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 23:54:06 -0700
-X-CSE-ConnectionGUID: I6iY64mQTWC/a991+Jt4HQ==
-X-CSE-MsgGUID: 8onTWFUhRnez5NMIY1Nqsw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,233,1754982000"; 
-   d="scan'208";a="181582344"
-Received: from os-delivery.igk.intel.com ([10.102.21.165])
-  by orviesa010.jf.intel.com with ESMTP; 15 Oct 2025 23:54:05 -0700
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH iwl-next v1] ice: lower default irq/queue counts on high-core systems
-Date: Thu, 16 Oct 2025 08:22:50 +0200
-Message-ID: <20251016062250.1461903-1-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1760595945; c=relaxed/simple;
+	bh=1m4Hk7EVBiUQT3fUtyJl5ICcWL7F5BpX7wQLf6O0c1A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NG786nQA9VO+TA5tczBuxlnWox+sv80bRzUGpE13EPd3VdH72duG1HUzR1FvzfiY0HpPiJ30za/dGVLZumYq7EINNHt0RgP32YcVTYKL0Zz1GYJ/lModQKRDOnac3xzppPmbmNZHzpwQAG8ellh6ziaJ/Dt2k63oujvhMvX6Ye0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=DlyR1g5J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB926C4CEF1;
+	Thu, 16 Oct 2025 06:25:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1760595945;
+	bh=1m4Hk7EVBiUQT3fUtyJl5ICcWL7F5BpX7wQLf6O0c1A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DlyR1g5JOem+OB3HHV2dIHVpxfapSN3mz5BsdAj0k6H32Xn+4fgiYwZSF6z8MXYjx
+	 KD7Z6Y/E5bpvE6ftdw804nUxlQsyfDqxlmyreVhWyChQjZVFxXqMbHEMaJGN7nUGnG
+	 3dkXCnMdAdptBnvL27tcQMz6/RSBC/GsBC61+LsU=
+Date: Thu, 16 Oct 2025 08:25:41 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Cynthia <cynthia@kosmx.dev>, "Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [REGRESSION] in 6.17, failing
+ __dev_change_net_namespace+0xb89/0xc30
+Message-ID: <2025101649-lid-cancel-4a69@gregkh>
+References: <01070199e22de7f8-28f711ab-d3f1-46d9-b9a0-048ab05eb09b-000000@eu-central-1.amazonses.com>
+ <20251015133120.7ef53b20@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251015133120.7ef53b20@kernel.org>
 
-On some high-core systems loading ice driver with default values can
-lead to queue/irq exhaustion. It will result in no additional resources
-for SR-IOV.
+On Wed, Oct 15, 2025 at 01:31:20PM -0700, Jakub Kicinski wrote:
+> On Tue, 14 Oct 2025 10:04:43 +0000 Cynthia wrote:
+> > When I updated my machine to the newest kernel, a bug started to appear. 
+> > The system does not panic, but an error kept happening in dmesg.
+> > 
+> > The bug happens with LXC/Incus when it tries to start a new container. 
+> > (but probably other things are affected too)
+> > 
+> > 
+> > Steps to Reproduce: the bug can be reproduced in a libvirt VM, no need 
+> > for a specific system. Also I suspect the bug is also 
+> > architecture-independent, but I cannot verify that.
+> > 1) Install ArchLinux (all dependencies are available). I was testing 
+> > with vanilla kernel, so any linux distro should be affected.
+> > https://aur.archlinux.org/packages/linux-mainline can be installed, this 
+> > is the vanilla kernel with a generally good kernel config for most PCs.
+> > 2) Install LXC/Incus (pacman -S incus)
+> > 3) configure incus and start a container:
+> > usermod -v 1000000-1000999999 -w 1000000-1000999999 root &&
+> > incus admin init &&
+> > incus launch images:debian/12 first # start a container
+> > 4) Previous step should trigger incus to do namespaces. I'm not sure 
+> > what syscall is causing the bug, I do not have a mini C program. These 
+> > steps should be enough to see the log in the dmesg.
+> > 
+> > I also did a git bisect, the first commit to have this bug is this:
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0c17270f9b920e4e1777488f1911bbfdaf2af3be
+> > 
+> > I initially reported this bug on Bugzilla, but after seeing 6 year old 
+> > bugs there, I'm not sure if that platform is still in use.
+> > https://bugzilla.kernel.org/show_bug.cgi?id=220649
+> > 
+> > Since my initial report, 6.17.2 was released, the bug is still happening.
+> > 
+> > I'm attaching 2 files:
+> > dmesg_slice: the slice of dmesg containing the problematic frame (on a 
+> > bare-metal linux with AMD srso mitigation disabled)
+> > bisect_log: a log of the git bisect process
+> 
+> Thanks a lot for bisecting! Looking at the code my guess is that sysfs
+> gives us ENOENT when we try to change owner of a file that isn't
+> visible. Adding sysfs maintainers - should sysfs_group_attrs_change_owner() 
+> call is_visible before trying to touch the attr?
 
-In most cases there is no performance reason for more than 64 queues.
-Limit the default value to 64. Still, using ethtool the number of
-queues can be changed up to num_online_cpus().
+Oh, I never considered that call-path, and given that I haven't seen a
+bug report about this yet, it's pretty rare :)
 
-This change affects only the default queue amount on systems with more
-than 64 cores.
+So yes, that should be checked.  Can anyone knock up a patch for this?
+I'm busy all today with other stuff, sorry.
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice.h     | 20 ++++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_irq.c |  6 ++++--
- drivers/net/ethernet/intel/ice/ice_lib.c |  8 ++++----
- 3 files changed, 28 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 3d4d8b88631b..354ec2950ff3 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -1133,4 +1133,24 @@ static inline struct ice_hw *ice_get_primary_hw(struct ice_pf *pf)
- 	else
- 		return &pf->adapter->ctrl_pf->hw;
- }
-+
-+/**
-+ * ice_capped_num_cpus - normalize the number of CPUs to a reasonable limit
-+ *
-+ * This function returns the number of online CPUs, but caps it at suitable
-+ * default to prevent excessive resource allocation on systems with very high
-+ * CPU counts.
-+ *
-+ * Note: suitable default is currently at 64, which is reflected in default_cpus
-+ * constant. In most cases there is no much benefit for more than 64 and it is a
-+ * power of 2 number.
-+ *
-+ * Return: number of online CPUs, capped at suitable default.
-+ */
-+static inline u16 ice_capped_num_cpus(void)
-+{
-+	const int default_cpus = 64;
-+
-+	return min(num_online_cpus(), default_cpus);
-+}
- #endif /* _ICE_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
-index 30801fd375f0..df4d847ca858 100644
---- a/drivers/net/ethernet/intel/ice/ice_irq.c
-+++ b/drivers/net/ethernet/intel/ice/ice_irq.c
-@@ -106,9 +106,11 @@ static struct ice_irq_entry *ice_get_irq_res(struct ice_pf *pf,
- #define ICE_RDMA_AEQ_MSIX 1
- static int ice_get_default_msix_amount(struct ice_pf *pf)
- {
--	return ICE_MIN_LAN_OICR_MSIX + num_online_cpus() +
-+	u16 cpus = ice_capped_num_cpus();
-+
-+	return ICE_MIN_LAN_OICR_MSIX + cpus +
- 	       (test_bit(ICE_FLAG_FD_ENA, pf->flags) ? ICE_FDIR_MSIX : 0) +
--	       (ice_is_rdma_ena(pf) ? num_online_cpus() + ICE_RDMA_AEQ_MSIX : 0);
-+	       (ice_is_rdma_ena(pf) ? cpus + ICE_RDMA_AEQ_MSIX : 0);
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index bac481e8140d..3c5f8a4b6c6d 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -159,12 +159,12 @@ static void ice_vsi_set_num_desc(struct ice_vsi *vsi)
- 
- static u16 ice_get_rxq_count(struct ice_pf *pf)
- {
--	return min(ice_get_avail_rxq_count(pf), num_online_cpus());
-+	return min(ice_get_avail_rxq_count(pf), ice_capped_num_cpus());
- }
- 
- static u16 ice_get_txq_count(struct ice_pf *pf)
- {
--	return min(ice_get_avail_txq_count(pf), num_online_cpus());
-+	return min(ice_get_avail_txq_count(pf), ice_capped_num_cpus());
- }
- 
- /**
-@@ -907,13 +907,13 @@ static void ice_vsi_set_rss_params(struct ice_vsi *vsi)
- 		if (vsi->type == ICE_VSI_CHNL)
- 			vsi->rss_size = min_t(u16, vsi->num_rxq, max_rss_size);
- 		else
--			vsi->rss_size = min_t(u16, num_online_cpus(),
-+			vsi->rss_size = min_t(u16, ice_capped_num_cpus(),
- 					      max_rss_size);
- 		vsi->rss_lut_type = ICE_LUT_PF;
- 		break;
- 	case ICE_VSI_SF:
- 		vsi->rss_table_size = ICE_LUT_VSI_SIZE;
--		vsi->rss_size = min_t(u16, num_online_cpus(), max_rss_size);
-+		vsi->rss_size = min_t(u16, ice_capped_num_cpus(), max_rss_size);
- 		vsi->rss_lut_type = ICE_LUT_VSI;
- 		break;
- 	case ICE_VSI_VF:
--- 
-2.49.0
-
+greg k-h
 
