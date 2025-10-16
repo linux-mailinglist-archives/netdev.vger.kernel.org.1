@@ -1,106 +1,96 @@
-Return-Path: <netdev+bounces-230128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B61CABE43DE
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 17:30:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E0EDBE440C
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 17:32:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 394FA3A52D4
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:29:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 254803A61A0
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05DA6346A1B;
-	Thu, 16 Oct 2025 15:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7937834AAE4;
+	Thu, 16 Oct 2025 15:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FQneNmV3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mM2kYG/c"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9A11E1C22;
-	Thu, 16 Oct 2025 15:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B503146593;
+	Thu, 16 Oct 2025 15:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760628588; cv=none; b=q+u1CUCPHfJCODH3Zqia2Qr6CPO99Jl5JsnKy28ley6I8MC9GV73G7e2hn2wGbwZ0HX7Tgjzem1PxYCuT/LnDMOEkXyIxCeZon7isdzLKQLOEeR8GXFpYNKEqGligsVneYpk5hYwjh+D30JrljVU7kb45cvu7Eha0wTNfJ7l5PI=
+	t=1760628637; cv=none; b=dIs+/QBSM2oVeScyz9jM5YgFKaMzdxtcZOSX4tgyhrjsk4MF6kFqj7oV5/XS7F/wC8mOU3iJcFkuZ12j5/2aP8YIkVcknmJR5lUXsUbbZJPr95I3eyvyiJFgENRkrPp+YdLpqwV/fWuiBprCO2Q+M+Zn88AMkTrLJTecuYZFeT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760628588; c=relaxed/simple;
-	bh=5zk1p7uXJyG52PlTiJ7jqUnfX5vE/Lrp7UbPQeEvOJM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jsV6dBthZQSa0ik/KHTOud9+vvBH4R27O3BixFVFCVYqh+cJkx0R/lLfKUlQMc0Y/4J+9sSYJVxR80JLFqWJsr7bX8ZXMvhIPsapdrxXTu1vD0Q1UAX2r8PdCJoYvJC9vNCeAUp5gigTphrgn8Onh0w/g/sORorHay29OGtMGFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FQneNmV3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E988C4CEF1;
-	Thu, 16 Oct 2025 15:29:42 +0000 (UTC)
+	s=arc-20240116; t=1760628637; c=relaxed/simple;
+	bh=Lhmv6rdY0inxISSKl3n5Ag3krRvAQwi8tYbRqPlFiRw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=EtuzRTLEP1unBIhqD6gjetOlfiMCQrSPWll18kPQZVB3vzWOWmrPKaidLYLyWMAN6Ji7Ay+aPhIw/5VyrQhDmtVEpLWXNr1TmdQPpAfyqxdabxyXrvPrhzsLYMX528nwXLPyGyqxba8F7cCbnosqGBD6B3JifmqJzE8epTtCA1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mM2kYG/c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C135AC4CEF1;
+	Thu, 16 Oct 2025 15:30:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760628588;
-	bh=5zk1p7uXJyG52PlTiJ7jqUnfX5vE/Lrp7UbPQeEvOJM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FQneNmV3fhnPk6gQ3KzkiuR6069UmCX3IsMiH2yV1uc64GIREVNxD8GqCuiqG7bio
-	 5muhMwudzSKyN6C7D1PT5JKk8gK/7ZuusIDrooi9VlwIRctSC5n5CLd3SOzdIzHu1K
-	 +5ZpI5+caDru2iwMUIeW9y7TC3G3fb2JYdwgAoxAfTlpwyCTQJ2sBZDgctDGAXTk/k
-	 H/ZJsknAWP7DS9JqRd6w6rK0YFXgAsSXnCGUy5hrtRTE8FQty6go27xad5eGL73mKf
-	 xAyFB00JW4JZWPtYMMQPUpPq0cPq+OmrWO+5Xc/+H27GeonxjVJsGaV64b16ehpn2J
-	 Yj1+MNOa0JZjQ==
-Date: Thu, 16 Oct 2025 16:29:40 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Sjoerd Simons <sjoerd@collabora.com>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Ryder Lee <ryder.lee@mediatek.com>,
-	Jianjun Wang <jianjun.wang@mediatek.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	kernel@collabora.com, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
-	linux-phy@lists.infradead.org, netdev@vger.kernel.org,
-	Daniel Golle <daniel@makrotopia.org>,
-	Bryan Hinton <bryan@bryanhinton.com>
-Subject: Re: [PATCH 04/15] dt-bindings: mfd: syscon: Add mt7981-topmisc
-Message-ID: <20251016-pellet-speckled-fab8e8690051@spud>
-References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
- <20251016-openwrt-one-network-v1-4-de259719b6f2@collabora.com>
+	s=k20201202; t=1760628636;
+	bh=Lhmv6rdY0inxISSKl3n5Ag3krRvAQwi8tYbRqPlFiRw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=mM2kYG/ctYhaif1cG5SztUq0dXFHL2ttCIEZm4W/LWT3W5lCF95ZHhCkv+pFP5Y+1
+	 7CH8akgP3jalnoyWkdpeUe2PaVfTiyA0YC3t6VgMgB1T6c6MR7898gVXLl7CrkH9Bq
+	 atlKUZhtgDpM1zC35NyCwlIGb0UdmF7a2A5jVFD4CWwQopBfWIATfzPZwXFg2v23Id
+	 bFaurgEnXhtetT2U9//oEoOMOD+GMLzE5LlmuX+1XEF4cql1kb+g5d8Nbk7lr7dZDW
+	 BFW7tIXN+8SiC0pM7bEdNFdLxjKqLgIt+4xJMbMlZ1eB7y+j+YRcVc+G2yhNim+pOc
+	 /mFLnEeeLywgw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E0A383BA32;
+	Thu, 16 Oct 2025 15:30:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="It0qxNZczVw/gaKL"
-Content-Disposition: inline
-In-Reply-To: <20251016-openwrt-one-network-v1-4-de259719b6f2@collabora.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2-next] devlink: Introduce burst period for health
+ reporter
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176062862101.1781559.6540317333890628904.git-patchwork-notify@kernel.org>
+Date: Thu, 16 Oct 2025 15:30:21 +0000
+References: <1759906638-867747-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1759906638-867747-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: stephen@networkplumber.org, dsahern@gmail.com, jiri@resnulli.us,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
+ moshe@nvidia.com, jiri@nvidia.com, cjubran@nvidia.com, shshitrit@nvidia.com
+
+Hello:
+
+This patch was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
+
+On Wed, 8 Oct 2025 09:57:18 +0300 you wrote:
+> From: Shahar Shitrit <shshitrit@nvidia.com>
+> 
+> Add a new devlink health set option to configure the health
+> reporter’s burst period. The burst period defines a time window
+> during which recovery attempts for reported errors are allowed.
+> Once this period expires, the configured grace period begins.
+> 
+> [...]
+
+Here is the summary with links:
+  - [iproute2-next] devlink: Introduce burst period for health reporter
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=56d3c9965850
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---It0qxNZczVw/gaKL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-pw-bot: not-applicable
-
---It0qxNZczVw/gaKL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaPEPZAAKCRB4tDGHoIJi
-0i02AQCtlo1PhEBtOSpa9tHFh/btZnLURhGuXrndCwW9sNu9YAEAgh9CEJPYY+RU
-n/3HO7MCmrIAjvCB4YbZBXt04Uzn6Qw=
-=0tqc
------END PGP SIGNATURE-----
-
---It0qxNZczVw/gaKL--
 
