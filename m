@@ -1,172 +1,142 @@
-Return-Path: <netdev+bounces-230185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B857DBE50F5
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 20:29:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68FF7BE50F8
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 20:30:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CBB942034A
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 18:29:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAE2C19A79E1
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 18:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B5622D4D3;
-	Thu, 16 Oct 2025 18:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97F1229B12;
+	Thu, 16 Oct 2025 18:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aPBHzjG1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sit5thjS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3081122DFA4
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 18:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F046920C00A
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 18:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760639360; cv=none; b=mJRlVz9o5lOCrE5++Pmwv5t9lQm5DM8DlSRPK2D27pHvuWnqks3nz6DS5U5JxKGD6Aw6cWVDCpPmc8e6fKZ6hhIJPnS+Go2we1F/EiaTIr2LC8AO7FWo7hbQo2xGWGyllee8rK2hB7rydcTsT+amM8yY6zjdu5k6D83YHXESyVE=
+	t=1760639411; cv=none; b=emfbkoI1wSXrWtWIlING4yKAYf3nRAzYOouNLWWv6V2Q7TSQeasBIgfGBHQEjrcHD7/QI/lWFzKK+vVv2Ermh4DQfV6eruKGPzvEO6F+iv0KJ96RkMF3rBY5YI6bV6MIzVofi2PwzEYCjbX6ayiZ4HFwmiHDv6z85DSLxeObW7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760639360; c=relaxed/simple;
-	bh=x5Jaq+JBpq38mlqi7Gg+Gf05Q932HBORuzTUpeVtz3o=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LnyQtTiSbx8IooD6Icc9T5MbmeuvwGoZVLorUFMS0UMeyZz9qWsMaZFzfwELe5kconeooI3VMonijRT7KZKsEI77Bnzwkoj6KyOx+scGWJbOjjiQQ0vg2bYt8O9CbBe+RziHVFzCtRQEDLcVinT+og4hx0KAgVAkf3S2e/uQeBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aPBHzjG1; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8635d47553dso311464585a.0
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:29:18 -0700 (PDT)
+	s=arc-20240116; t=1760639411; c=relaxed/simple;
+	bh=aoax4UC32EpDmJkajFIfdAiZfcABPRqs395Ltiscm7A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gOIXSb1sE1YEglsosykFZDsr375UGbAh+Wok9ut6CweZeUN0BNV+Nlz4SasjVHAoJLB82jBH3RL/nX4WCilTxzHVpCrGEtQTNByhnoskkx+kGaW7XBrXAKE2ZShoOoAwEFgGV5V59voc8q9nXUKx1W9eyvzA9VoEkm7qy0EpiYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sit5thjS; arc=none smtp.client-ip=74.125.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-63e19642764so83732d50.1
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:30:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760639358; x=1761244158; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4l8SQ4OOK172Q3dBpkpKC++uxZPZsG2CboZhjDRqWsI=;
-        b=aPBHzjG1wzCY4fk9NkiXovn1sswrhjc1cd80NLWyVvszDXcCYX57a3HkAhzcmtEKn+
-         ih4nWMo3PtkFXPIZWPpP8ojWHzprBY3v4Tf+JTwMOT2unMkZ8e0D51gbeWoZyRHeaOlQ
-         HMhtiI5AC9DlcqoYSdia+kf2EKivemU1S5JG6BOj7WQYWJPQwCjDHvYKsrs2BefYICX/
-         PA4RA9ggXsOizX8Cq0sL5P3xEPeXxD7JO0pQyBjPBYF0/KiZGFOr+xutjN5/Q3UB6hR3
-         oz+mvIApI9zx6odVyWs5sllLSO/VPsP6/qlB27Vmal88hqR1qq47ANbQ1AnXzawoON6p
-         5XAg==
+        d=gmail.com; s=20230601; t=1760639409; x=1761244209; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dzhvXWtbCkYpovjzVNvs150bS4n9HsGkgAH9hJSW7LQ=;
+        b=Sit5thjSmO1U4bJ10xzluPT41EwCXW3FGifmljjWGCvwmO8d20N1LxvilKkjzKvsxV
+         ahCL+BT7ckaN2izuF6n0dEM38VUgm4cJofMQ3cJL8jXD9jaX5B8zOpIZXlMzGARQM7y1
+         iN0skvz3KSm2VGyV6xptwZxfcmABYMjHYNN9IH13OWQuXQ2zs/US6Qz/zo/0b66A7oEk
+         gNgETjz+fSjcrbU5Fsa7gBYY8NzsLp/6k2Zf5YpJSiXLmCtbMQqS1RKVUn9xEXIZu1TF
+         2X3dHrU+OBv8eYGID3kUBUA8v24HE3pLLWbNYDWWyPKaWHPcePAZKrcfSeElA3avNSdT
+         57sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760639358; x=1761244158;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4l8SQ4OOK172Q3dBpkpKC++uxZPZsG2CboZhjDRqWsI=;
-        b=Sd6mzou8FB0WrxaIWJmuMUa5zuRr3fWTlLOmUIaYZVYM/wPjfr8OO2kLWbnd9Ttxz8
-         dYgg7EgR4lpWNel4ZkAH+kr6HH7Bjal9cmWlVPtyehEhEra+1oqRYFylt8J3t/1ZCEfZ
-         eB0Gen1fYAX91qPVRdhDB8qBbRaJ9gZe6sayVDMa7w69IrIJOMHQdnbfT4BYA7vpG56w
-         SvBdFNAC/DDSwahAkrH+ooDNVIq5sRPUAAyfADrZd5LKmp5/x+1F6VHEEjyzMoXZilQk
-         8qYtrkG8m5+BTVJb+AAiEOWu1vP/5Z0wsL6w1QTRzu4D+VSDKI7YStUQX0hfsiO8QwXi
-         Jcxg==
-X-Forwarded-Encrypted: i=1; AJvYcCWR+i0axRn3vTIMl+f7Bg/Pe1hC9bDH6Q4AIkpVTTmZtElGvpJWkEV20RG/FF7/yndOfI4W0KY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0Iq6PRyf5Xi6SFIsvTgL/8wlBG08ihKdp1HAu9piHgVhizgzA
-	zOr+KIP2ijBGXo4T/Amyb+aK3ExYUupBi40xgM44zyLpAD0QCI2VnGBwkeJ/aad+sr+hX5FUOwg
-	x+armnbego+N7Ig==
-X-Google-Smtp-Source: AGHT+IFDP5LQL4KwcSL67L1COA1D2rc2jC5gopfag37kf44Qh8PyNevZw0CfOifBN3bRSojw4bv5W2ZulOiJbg==
-X-Received: from qknwj8.prod.google.com ([2002:a05:620a:5748:b0:84b:6051:b4f])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:4725:b0:890:e3e:a64 with SMTP id af79cd13be357-8906e9a44cfmr151925385a.35.1760639357959;
- Thu, 16 Oct 2025 11:29:17 -0700 (PDT)
-Date: Thu, 16 Oct 2025 18:29:11 +0000
+        d=1e100.net; s=20230601; t=1760639409; x=1761244209;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dzhvXWtbCkYpovjzVNvs150bS4n9HsGkgAH9hJSW7LQ=;
+        b=MT5Maubwf7LqI+9UhTi0pYzl/7PHBm1kqxdVV+QdLjChKAzJIjZhb8kdHV6fGrj2if
+         5TiXN+u542MsiC+kwhYq3lgM2e/TM774s9j/S4Bh2hIru2ZUlk1e10u30Rjana9wHJnw
+         /iC08pElHbgltYVsYXl2//0TqBPQHVAQgi3AE/eDBf5W2o4CztO7uOwHpSagWZAQOOS1
+         H3i6WJ30KqRk1g0+1cNJPIpa0ogUgVt/Z1P82vJ4fuj37uoPzwEBUX0Hwu7y/vJE9eGB
+         nrPSF7ot4TwcUJGaQ5ozBpZo9sHwa5raZmVzv6zvTrN7Yb1BIQlVVXAol3yFg+ISGIkC
+         AYmg==
+X-Forwarded-Encrypted: i=1; AJvYcCW8Th9LHgRd/U79qYdLjXban54oEVoPjvffTELTey32JSE5ogbBtsD4Cm8JyV2Y2fH90B4tBGM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQ3iWCNZyBbYO7T11yZHnJ3vPWlfV9S3DKYi6dxPPXbSGIHfOu
+	3ohZO04wnkSyDNmfXBKWeTGYBJQfD5sD7ytmGt313JbWVClp52ziIOxK0LgSfN0iyKVLEQGLm8x
+	ncjRSsjbUG180Qcf+twHgqv6jSZ5B8kc=
+X-Gm-Gg: ASbGncvskduzrLI2BOHc/bTQb7/AMzE+VDvGVlfeWCk+zUVuUX8NjJO1Q9tUCbOijBP
+	7HziKH91Ysrdp5VNGJpUosRWwtn5TQoMEPUpaYk97E+KNl7VObwrQNyGRakaLfTDNYQYpEzzoPN
+	QeH6UUyX9uKolxLCblB6D8XeMDXHgbE316qROfiOCim5U8K+nnIAHf+Bxdrb3LneHXxyc5FfCWo
+	iiVqVwGhPtaHLF+tskJRncbqUWWGefy7r9CWkeGY87rdsNettGEVzSA957It0hrIv0QTkrB9+Nr
+X-Google-Smtp-Source: AGHT+IH5oYT7ZLsH92Av5P9LlyrU53o8Cq9r2MjhjHiVkdNYfVY0oTjYKYqTmPtuvjEP+G86Xw9uVl7UKdVpAB7E6/4=
+X-Received: by 2002:a53:5009:0:b0:63c:f5a7:3cc with SMTP id
+ 956f58d0204a3-63e161c6038mr864495d50.56.1760639408856; Thu, 16 Oct 2025
+ 11:30:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
-Message-ID: <20251016182911.1132792-1-edumazet@google.com>
-Subject: [PATCH v2 net-next] net: shrink napi_skb_cache_{put,get}() and napi_skb_cache_get_bulk()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>
+MIME-Version: 1.0
+References: <20251010174953.2884682-1-ameryhung@gmail.com> <20251010174953.2884682-2-ameryhung@gmail.com>
+ <CAEf4Bzaqw2N58jCiApr6awfpub_8W6cTJMWuY75VpCCLMLjQBw@mail.gmail.com>
+In-Reply-To: <CAEf4Bzaqw2N58jCiApr6awfpub_8W6cTJMWuY75VpCCLMLjQBw@mail.gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Thu, 16 Oct 2025 11:29:57 -0700
+X-Gm-Features: AS18NWCyZNZY1peWt4dmB31LMm4bdohA-ZAwwaH9Ng3BNMDyLMDDRgFLI7uyxQI
+Message-ID: <CAMB2axOQqgpiUTb-33uOgYar48PM=DTeOFAZY3P3FYk16Dy33Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 bpf-next 1/4] bpf: Allow verifier to fixup kernel
+ module kfuncs
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
+	kernel-team@meta.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Following loop in napi_skb_cache_put() is unrolled by the compiler
-even if CONFIG_KASAN is not enabled:
+On Mon, Oct 13, 2025 at 5:11=E2=80=AFPM Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+>
+> On Fri, Oct 10, 2025 at 10:49=E2=80=AFAM Amery Hung <ameryhung@gmail.com>=
+ wrote:
+> >
+> > Allow verifier to fixup kfuncs in kernel module to support kfuncs with
+> > __prog arguments. Currently, special kfuncs and kfuncs with __prog
+> > arguments are kernel kfuncs. As there is no safety reason that prevents
+> > a kernel module kfunc from accessing prog->aux, allow it by removing th=
+e
+> > kernel BTF check.
+>
+> I'd just clarify that this should be fine and shouldn't confuse all
+> those desc->func_id comparisons because BTF IDs in module BTF are
+> always greater than any of vmlinux BTF ID due to split BTF setup.
 
-for (i = NAPI_SKB_CACHE_HALF; i < NAPI_SKB_CACHE_SIZE; i++)
-	kasan_mempool_unpoison_object(nc->skb_cache[i],
-				kmem_cache_size(net_hotdata.skbuff_cache));
+Got it. I will make the commit message less confusing.
 
-We have 32 times this sequence, for a total of 384 bytes.
-
-	48 8b 3d 00 00 00 00 	net_hotdata.skbuff_cache,%rdi
-	e8 00 00 00 00       	call   kmem_cache_size
-
-This is because kmem_cache_size() is not an inline and not const,
-and kasan_unpoison_object_data() is an inline function.
-
-Cache kmem_cache_size() result in a variable, so that
-the compiler can remove dead code (and variable) when/if
-CONFIG_KASAN is unset.
-
-After this patch, napi_skb_cache_put() is inlined in its callers,
-and we avoid one kmem_cache_size() call in napi_skb_cache_get()
-and napi_skb_cache_get_bulk().
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- net/core/skbuff.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
-
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index bc12790017b0b5c0be99f8fb9d362b3730fa4eb0..143a2ddf0d56ed8037bd46bddc1d7aeac296085c 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -274,6 +274,11 @@ void *__netdev_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
- }
- EXPORT_SYMBOL(__netdev_alloc_frag_align);
- 
-+/* Cache kmem_cache_size(net_hotdata.skbuff_cache) to help the compiler
-+ * remove dead code (and skbuff_cache_size) when CONFIG_KASAN is unset.
-+ */
-+static u32 skbuff_cache_size __read_mostly;
-+
- static struct sk_buff *napi_skb_cache_get(void)
- {
- 	struct napi_alloc_cache *nc = this_cpu_ptr(&napi_alloc_cache);
-@@ -293,7 +298,7 @@ static struct sk_buff *napi_skb_cache_get(void)
- 
- 	skb = nc->skb_cache[--nc->skb_count];
- 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
--	kasan_mempool_unpoison_object(skb, kmem_cache_size(net_hotdata.skbuff_cache));
-+	kasan_mempool_unpoison_object(skb, skbuff_cache_size);
- 
- 	return skb;
- }
-@@ -345,11 +350,9 @@ u32 napi_skb_cache_get_bulk(void **skbs, u32 n)
- 
- get:
- 	for (u32 base = nc->skb_count - n, i = 0; i < n; i++) {
--		u32 cache_size = kmem_cache_size(net_hotdata.skbuff_cache);
--
- 		skbs[i] = nc->skb_cache[base + i];
- 
--		kasan_mempool_unpoison_object(skbs[i], cache_size);
-+		kasan_mempool_unpoison_object(skbs[i], skbuff_cache_size);
- 		memset(skbs[i], 0, offsetof(struct sk_buff, tail));
- 	}
- 
-@@ -1428,7 +1431,7 @@ static void napi_skb_cache_put(struct sk_buff *skb)
- 	if (unlikely(nc->skb_count == NAPI_SKB_CACHE_SIZE)) {
- 		for (i = NAPI_SKB_CACHE_HALF; i < NAPI_SKB_CACHE_SIZE; i++)
- 			kasan_mempool_unpoison_object(nc->skb_cache[i],
--						kmem_cache_size(net_hotdata.skbuff_cache));
-+						skbuff_cache_size);
- 
- 		kmem_cache_free_bulk(net_hotdata.skbuff_cache, NAPI_SKB_CACHE_HALF,
- 				     nc->skb_cache + NAPI_SKB_CACHE_HALF);
-@@ -5116,6 +5119,8 @@ void __init skb_init(void)
- 					      offsetof(struct sk_buff, cb),
- 					      sizeof_field(struct sk_buff, cb),
- 					      NULL);
-+	skbuff_cache_size = kmem_cache_size(net_hotdata.skbuff_cache);
-+
- 	net_hotdata.skbuff_fclone_cache = kmem_cache_create("skbuff_fclone_cache",
- 						sizeof(struct sk_buff_fclones),
- 						0,
--- 
-2.51.0.858.gf9c4a03a3a-goog
-
+>
+>
+> >
+> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > ---
+> >  kernel/bpf/verifier.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> >
+> > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> > index e892df386eed..d5f1046d08b7 100644
+> > --- a/kernel/bpf/verifier.c
+> > +++ b/kernel/bpf/verifier.c
+> > @@ -21889,8 +21889,7 @@ static int fixup_kfunc_call(struct bpf_verifier=
+_env *env, struct bpf_insn *insn,
+> >
+> >         if (!bpf_jit_supports_far_kfunc_call())
+> >                 insn->imm =3D BPF_CALL_IMM(desc->addr);
+> > -       if (insn->off)
+> > -               return 0;
+> > +
+> >         if (desc->func_id =3D=3D special_kfunc_list[KF_bpf_obj_new_impl=
+] ||
+> >             desc->func_id =3D=3D special_kfunc_list[KF_bpf_percpu_obj_n=
+ew_impl]) {
+> >                 struct btf_struct_meta *kptr_struct_meta =3D env->insn_=
+aux_data[insn_idx].kptr_struct_meta;
+> > --
+> > 2.47.3
+> >
 
