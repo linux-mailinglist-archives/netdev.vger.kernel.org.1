@@ -1,107 +1,140 @@
-Return-Path: <netdev+bounces-230009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF9B4BE2FA6
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 12:57:43 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71866BE300F
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:06:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C8E45507D93
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:53:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2B4DF4E651B
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 721842DECBC;
-	Thu, 16 Oct 2025 10:53:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2486A2FF658;
+	Thu, 16 Oct 2025 11:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="cFm1D1c+"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F72328613;
-	Thu, 16 Oct 2025 10:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397C62FE56A
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760612033; cv=none; b=heUKVMsXD0bFI8+aTzm+Hh89JjDbL0Nd0AIXFSkNE/euIpW11hNUm4773iPAZayKMeq9LY9ZZe+7Kq9L5MMq6ElyHj4DUSm3Oa0gAasvRY/Shyrd8vWALwvum7dnI5cpQxgOue8Np8uUXR+JW1k9HOGgM76zX8CMIh0XbpR76Z4=
+	t=1760612791; cv=none; b=W20dgdqbAf8IO64+XNfFixGjxRm8OWLkDJtT6+U9tDBX+8CAs+Al2FyW8Y+9MKfscI5lIw/62l4dpEtzC2PdgUK/Zdo6Ck8iCIaPr+m9a0sSeViEvJqw8+gvH0oIbGEhjcRRdX86tSwVj7Sn5ZjTlJDs9bw7npcDPPFBX6LpI2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760612033; c=relaxed/simple;
-	bh=tvLe7oqK/Vj/59PdAQQug6bKhT8NZJUWW0AetLUgCqs=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lGtwgs2QSkFEWse1Gb6LcLVk//8sauyFROQjbrPfUAh7MgAW7zSDkuJvhdfDaElW+CGv8spsTFZvlw/KoOsrFjHnWAJmTsZtjir1RlvUlhI+cdIcUir/wpzos81CNn1Nf/vSL7LV6rGIoAKHDQF8CKGlqambyDweU7pkECVMzkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cnPtG3GQNz6L4xg;
-	Thu, 16 Oct 2025 18:52:38 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0C2D81402A5;
-	Thu, 16 Oct 2025 18:53:43 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 16 Oct
- 2025 11:53:40 +0100
-Date: Thu, 16 Oct 2025 11:53:39 +0100
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-CC: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Thierry Reding
-	<thierry.reding@gmail.com>, Linus Walleij <linus.walleij@linaro.org>, Bartosz
- Golaszewski <brgl@bgdev.pl>, Shawn Guo <shawnguo@kernel.org>, "Fabio Estevam"
-	<festevam@gmail.com>, Nuno =?UTF-8?Q?S=C3=A1?= <nuno.sa@analog.com>,
-	Lars-Peter Clausen <lars@metafoo.de>, "Michael Hennerich"
-	<Michael.Hennerich@analog.com>, Jonathan Cameron <jic23@kernel.org>, Andy
- Shevchenko <andy@kernel.org>, Jassi Brar <jassisinghbrar@gmail.com>, Mauro
- Carvalho Chehab <mchehab@kernel.org>, "Lee Jones" <lee@kernel.org>, Joel
- Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Andrew Lunn <andrew@lunn.ch>, "Vladimir Oltean" <olteanv@gmail.com>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, Daire McNamara
-	<daire.mcnamara@microchip.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?UTF-8?Q?Wilczy?= =?UTF-8?Q?=C5=84ski?= <kwilczynski@kernel.org>,
-	Manivannan Sadhasivam <mani@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
-	"Bjorn Andersson" <andersson@kernel.org>, Geert Uytterhoeven
-	<geert+renesas@glider.be>, Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea
-	<claudiu.beznea@tuxon.dev>, Florian Fainelli <f.fainelli@gmail.com>, "Tony
- Lindgren" <tony@atomide.com>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-	<linux-gpio@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-iio@vger.kernel.org>, <linux-media@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-	<linux-phy@lists.infradead.org>
-Subject: Re: [PATCH] dt-bindings: Fix inconsistent quoting
-Message-ID: <20251016115339.000047f7@huawei.com>
-In-Reply-To: <20251015232015.846282-1-robh@kernel.org>
-References: <20251015232015.846282-1-robh@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1760612791; c=relaxed/simple;
+	bh=QlJhi2MigAA7wYftcWxhycEF+KbrxltzOvd1nvoaWfc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uOXXlydYLBKskOOTAAkDdiHOcONL4cfoF/J23V6HTJIbwzU1v+kjd1VVKPQm9SKXZjtr+SsI3XOD2+jDd/MiOz1Ws8WL7Mx2aSPQzve3q4SwSC2txpD3wlyi+Roxx1LgyzWOJ5bDYcS21MQeU+sthlR2Yljp1XGiHosNesVjcpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=cFm1D1c+; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1760612779; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=8hFna+DDVwUN9g4Wvmirv1lQHsN+inmEM8DX9sO0POg=;
+	b=cFm1D1c+oonPXX/rmR8EHgLxVhMVWNzrkmtp0Nx/kJaIhqEIrIu/pv631Heg2JG37LEsfhyqnJ//bxTheddeZj6h/bhp/AEx+EkVfU69qQxWfqZLZKCMo508UWku+ap/9W7XUhJEBB7mywRK6LiCh/SE3ATNu3mNs6ghITRqagw=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WqKE.o4_1760612777 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 16 Oct 2025 19:06:17 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Vivian Wang <wangruikang@iscas.ac.cn>,
+	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: [PATCH net-next v7 0/5] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
+Date: Thu, 16 Oct 2025 19:06:12 +0800
+Message-Id: <20251016110617.35767-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+X-Git-Hash: 4a8099129dd3
+Content-Transfer-Encoding: 8bit
 
-On Wed, 15 Oct 2025 18:16:24 -0500
-"Rob Herring (Arm)" <robh@kernel.org> wrote:
+Add a driver framework for EEA that will be available in the future.
 
-> yamllint has gained a new check which checks for inconsistent quoting
-> (mixed " and ' quotes within a file). Fix all the cases yamllint found
-> so we can enable the check (once the check is in a release). Use
-> whichever quoting is dominate in the file.
-> 
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
->  .../arm/altera/socfpga-clk-manager.yaml       |  4 ++--
->  .../bindings/clock/nvidia,tegra124-car.yaml   |  8 ++++----
->  .../bindings/clock/nvidia,tegra20-car.yaml    |  6 +++---
->  .../devicetree/bindings/gpio/gpio-mxs.yaml    |  9 +++++----
->  .../bindings/gpio/snps,dw-apb-gpio.yaml       |  4 ++--
->  .../bindings/iio/temperature/adi,ltc2983.yaml | 20 +++++++++----------
-For this one
-Acked-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+This driver is currently quite minimal, implementing only fundamental
+core functionalities. Key features include: I/O queue management via
+adminq, basic PCI-layer operations, and essential RX/TX data
+communication capabilities. It also supports the creation,
+initialization, and management of network devices (netdev). Furthermore,
+the ring structures for both I/O queues and adminq have been abstracted
+into a simple, unified, and reusable library implementation,
+facilitating future extension and maintenance.
+
+
+v7: 1. remove the irrelative code from ethtool commit
+    2. build every commits with W12
+v6: Split the big one commit to five commits
+v5: Thanks for the comments from Kalesh Anakkur Purayil, ALOK TIWARI
+v4: Thanks for the comments from Troy Mitchell, Przemek Kitszel, Andrew Lunn, Kalesh Anakkur Purayil
+v3: Thanks for the comments from Paolo Abenchi
+v2: Thanks for the comments from Simon Horman and Andrew Lunn
+v1: Thanks for the comments from Simon Horman and Andrew Lunn
+
+
+Xuan Zhuo (5):
+  eea: introduce PCI framework
+  eea: introduce ring and descriptor structures
+  eea: probe the netdevice and create adminq
+  eea: create/destroy rx,tx queues for netdevice open and stop
+  eea: introduce ethtool support
+
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/alibaba/Kconfig          |  29 +
+ drivers/net/ethernet/alibaba/Makefile         |   5 +
+ drivers/net/ethernet/alibaba/eea/Makefile     |   9 +
+ drivers/net/ethernet/alibaba/eea/eea_adminq.c | 444 ++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_adminq.h |  70 ++
+ drivers/net/ethernet/alibaba/eea/eea_desc.h   | 156 ++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.c    | 311 +++++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.h    |  51 ++
+ drivers/net/ethernet/alibaba/eea/eea_net.c    | 575 +++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_net.h    | 196 +++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.c    | 575 +++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.h    |  68 ++
+ drivers/net/ethernet/alibaba/eea/eea_ring.c   | 260 ++++++
+ drivers/net/ethernet/alibaba/eea/eea_ring.h   |  91 ++
+ drivers/net/ethernet/alibaba/eea/eea_rx.c     | 782 ++++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_tx.c     | 406 +++++++++
+ 19 files changed, 4038 insertions(+)
+ create mode 100644 drivers/net/ethernet/alibaba/Kconfig
+ create mode 100644 drivers/net/ethernet/alibaba/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_desc.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_rx.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_tx.c
+
+--
+2.32.0.3.g01195cf9f
 
 
