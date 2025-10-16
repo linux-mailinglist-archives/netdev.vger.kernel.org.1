@@ -1,133 +1,232 @@
-Return-Path: <netdev+bounces-230092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7CC5BE3E87
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 16:29:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21632BE3EE1
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 16:36:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BF3254F79FD
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 14:29:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B50B53AFF22
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 14:36:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5410433EB10;
-	Thu, 16 Oct 2025 14:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA02932D7FB;
+	Thu, 16 Oct 2025 14:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="SXqJvaEe"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Mk3o5Xnu"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4872832D7F4;
-	Thu, 16 Oct 2025 14:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074E332863A;
+	Thu, 16 Oct 2025 14:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760624960; cv=none; b=XirD+fjXI8XeXRgyk7XLoL04pFJ93Cl4r8N2x2rGjJuxGby2qFnwFYUcIRJ0Y3ctAze1gDsRjmxBc5PpU3l8giCGB+HgzP7LlFJWfEF/jX98kSDBV1ke86B7cT/OiPB+PY4h37tutj/kTAit9TtzkTUuG5mAVVErvAv9qpLr5eE=
+	t=1760625370; cv=none; b=gCyMpRD134RRfzFhrla4esd6YYEyoSLDgWRCE8bRzT0jlgRqtkn6ZDEwUbikYGf6bEcOp8BV1kqZc4FLy1AaDu/vHJ4z/7OJ8gba9+JVnX12GrPzOWdeVlv394ChguJU120DDgNr507ywSdaxum2DPGc2lHlczyNaMm2gezw1DM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760624960; c=relaxed/simple;
-	bh=/ogrshpBMHpUYx7hds/fD1WgLsoTS+62iSlrqAObxms=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IKFcc4QZ5LXiy4ZYQkFPct0/JCdj6IMCzoIAC0Z6AZbEqyEkDzkPNwQ+a0VHTbp1MSa0vO+1+9qxQUPlayi2ftVXvjNMr+hYcJj0tsqb7dvnRe21G10lDzQtVfPG5QTVGGxavf1haCqygK8t/nsUJRWfZUv0xWRVr/xS7f8Oxn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=SXqJvaEe; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1760624956;
-	bh=/ogrshpBMHpUYx7hds/fD1WgLsoTS+62iSlrqAObxms=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SXqJvaEeN6DpDXxKAJ2nZHAdiOodqfTfzvKAlonZfsIL8ee+R2Jj9dwe4gQG1/8UT
-	 ikbDgKu56YCB82nhg8NnwreSXKB/uSxqzstktVanLw+HYEWmpyhhF4IN5iJR8XYk7q
-	 yw+2zrYQbGhkyneR7LvmjtU/tXFnjTlororY9q8M0Bnt7ufMdcclUwHujGfpx52hEX
-	 Jt/CYp4aWZeHLgd04du5mXg9WrqSRzEky39IAlZ8Zffdf33kq3S347zBoJBlQKrzo4
-	 6MeTDZnuykjPgjSBXEN37VJblWROrGp7oN5suST7x0Ikj708rJ923s8OEOFXcyAWpE
-	 4XY5LVyF0CVtg==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id D939117E0125;
-	Thu, 16 Oct 2025 16:29:14 +0200 (CEST)
-Message-ID: <5f430ff9-d701-426a-bf93-5290e6912eb4@collabora.com>
-Date: Thu, 16 Oct 2025 16:29:14 +0200
+	s=arc-20240116; t=1760625370; c=relaxed/simple;
+	bh=DpjPCLxNfNpR3lMgXRE47D+DeYyu88HQtG1FWtJyeRA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=iwuQyh8mTpyvsdVC3SXEAR5hb6AN/94C3hXc83yn5CD7mSvdb1Xhe6RE5tDe8wWeF+gowVQNdsShUmaqj0qQD83eVOlISJq6MEhRgaYo3eJPaEmc48eO7nFMgc0uZyvPKtv6aW7D4Kit9RelbW+wOBRkF0T5mIhEOoWluL5/tGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Mk3o5Xnu; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=fPJtDEet4RE6KaO4E+4C8FkxyWVGuKa6Vq/LffNt8Ik=; b=Mk3o5Xnu0mfRYLBKtACPEes6a+
+	3VEONcD3uGAgNcGuHxPUkokzCoRNJwBQjum9MbMk/RaO9G408ufGkWyq/dY4qtsvlko5X6rIYxygR
+	UJ+vsvGoiyMBMJi1YZkQO9aj07bhYwUpqLtuGP9WFzPfYwOirgrcjpiayEH5UmhBPG4wQav10R9jd
+	25iZmbaQ0dIHkpGlbRpSLbCbPnBjIhQmx97XVSDu047cpAFKzFdG/J71Uxw/7JsKJMjZT8pROJZI+
+	QIIWmdtkTUmSO+Pw6nuJ4AUrguR+GNyKBDEsv7pxW5sRNOyI8PiIgaS96cNv/Mc0UunOPlLT+n5fZ
+	PHWMshLQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33188)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v9P4o-000000006PA-1sUg;
+	Thu, 16 Oct 2025 15:35:34 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v9P4c-000000003LK-0iHI;
+	Thu, 16 Oct 2025 15:35:22 +0100
+Date: Thu, 16 Oct 2025 15:35:22 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Abhishek Chauhan <quic_abchauha@quicinc.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexis Lothore <alexis.lothore@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Drew Fustini <dfustini@tenstorrent.com>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
+	Furong Xu <0x1207@gmail.com>, Inochi Amaoto <inochiama@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+	Jisheng Zhang <jszhang@kernel.org>, Kees Cook <kees@kernel.org>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthew Gerlach <matthew.gerlach@altera.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rohan G Thomas <rohan.g.thomas@altera.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Simon Horman <horms@kernel.org>,
+	Song Yoong Siang <yoong.siang.song@intel.com>,
+	Swathi K S <swathi.ks@samsung.com>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>, Vinod Koul <vkoul@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: [PATCH net-next v2 00/14] net: stmmac: phylink PCS conversion
+Message-ID: <aPECqg0vZGnBFCbh@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/15] arm64: dts: mediatek: mt7981b-openwrt-one:
- Configure UART0 pinmux
-To: Daniel Golle <daniel@makrotopia.org>, Sjoerd Simons <sjoerd@collabora.com>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>, Ryder Lee <ryder.lee@mediatek.com>,
- Jianjun Wang <jianjun.wang@mediatek.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>,
- Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>, Lee Jones <lee@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- kernel@collabora.com, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
- linux-phy@lists.infradead.org, netdev@vger.kernel.org,
- Bryan Hinton <bryan@bryanhinton.com>
-References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
- <20251016-openwrt-one-network-v1-2-de259719b6f2@collabora.com>
- <aPDnT4tuSzNDzyAE@makrotopia.org>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <aPDnT4tuSzNDzyAE@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Il 16/10/25 14:38, Daniel Golle ha scritto:
-> On Thu, Oct 16, 2025 at 12:08:38PM +0200, Sjoerd Simons wrote:
->> Add explicit pinctrl configuration for UART0 on the OpenWrt One board,
->>
->> Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
->> ---
->>   arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts | 11 +++++++++++
->>   1 file changed, 11 insertions(+)
->>
->> diff --git a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
->> index 968b91f55bb27..f836059d7f475 100644
->> --- a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
->> +++ b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
->> @@ -22,6 +22,17 @@ memory@40000000 {
->>   	};
->>   };
->>   
->> +&pio {
->> +	uart0_pins: uart0-pins {
->> +		mux {
->> +			function = "uart";
->> +			groups = "uart0";
->> +		};
->> +	};
->> +};
->> +
->>   &uart0 {
->> +	pinctrl-names = "default";
->> +	pinctrl-0 = <&uart0_pins>;
->>   	status = "okay";
->>   };
-> 
-> As there is only a single possible pinctrl configuration for uart0,
-> both the pinmux definition as well as the pinctrl properties should go
-> into mt7981b.dtsi rather than in the board's dts.
+This series is radical - it takes the brave step of ripping out much of
+the existing PCS support code and throwing it all away.
 
-If there's really one single possible pin configuration for the UART0 pins,
-as in, those pins *do not* have a GPIO mode, then yes I agree.
+I have discussed the introduction of the STMMAC_FLAG_HAS_INTEGRATED_PCS
+flag with Bartosz Golaszewski, and the conclusion I came to is that
+this is to workaround the breakage that I've been going on about
+concerning the phylink conversion for the last five or six years.
 
-If those pins can be as well configured as GPIOs, this goes to board DTS.
+The problem is that the stmmac PCS code manipulates the netif carrier
+state, which confuses phylink.
 
-Cheers,
-Angelo
+There is a way of testing this out on the Jetson Xavier NX platform as
+the "PCS" code paths can be exercised while in RGMII mode - because
+RGMII also has in-band status and the status register is shared with
+SGMII. Testing this out confirms my long held theory: the interrupt
+handler manipulates the netif carrier state before phylink gets a
+look-in, which means that the mac_link_up() and mac_link_down() methods
+are never called, resulting in the device being non-functional.
+
+Moreover, on dwmac4 cores, ethtool reports incorrect information -
+despite having a full-duplex link, ethtool reports that it is
+half-dupex.
+
+Thus, this code is completely broken - anyone using it will not have
+a functional platform, and thus it doesn't deserve to live any longer,
+especially as it's a thorn in phylink.
+
+Rip all this out, leaving just the bare bones initialisation in place.
+
+However, this is not the last of what's broken. We have this hw->ps
+integer which is really not descriptive, and the DT property from
+which it comes from does little to help understand what's going on.
+Putting all the clues together:
+
+- early configuration of the GMAC configuration register for the
+  speed.
+- setting the SGMII rate adapter layer to take its speed from the
+  GMAC configuration register.
+
+Lastly, setting the transmit enable (TE) bit, which is a typo that puts
+the nail in the coffin of this code. It should be the transmit
+configuration (TC) bit. Given that when the link comes up, phylink
+will call mac_link_up() which will overwrite the speed in the GMAC
+configuration register, the only part of this that is functional is
+changing where the SGMII rate adapter layer gets its speed from,
+which is a boolean.
+
+From what I've found so far, everyone who sets the snps,ps-speed
+property which configures this mode also configures a fixed link,
+so the pre-configuration is unnecessary - the link will come up
+anyway.
+
+So, this series rips that out the preconfiguration as well, and
+replaces hw->ps with a boolean hw->reverse_sgmii_enable flag.
+
+We then move the sole PCS configuration into a phylink_pcs instance,
+which configures the PCS control register in the same way as is done
+during the probe function.
+
+Thus, we end up with much easier and simpler conversion to phylink PCS
+than previous attempts.
+
+Even so, this still results in inband mode always being enabled at the
+moment in the new .pcs_config() method to reflect what the probe
+function was doing. The next stage will be to change that to allow
+phylink to correctly configure the PCS. This needs fixing to allow
+platform glue maintainers who are currently blocked to progress.
+
+Please note, however, that this has not been tested with any SGMII
+platform.
+
+I've tried to get as many people into the Cc list with get_maintainers,
+I hope that's sufficient to get enough eyeballs on this.
+
+Changes since RFC:
+- new patch (7) to remove RGMII "pcs" mode
+- new patch (8) to move reverse "pcs" mode to stmmac_check_pcs_mode()
+- new patch (9) to simplify the code moved in the previous patch
+- new patch (10) to rename the confusing hw->ps to something more
+  understandable.
+- new patch (11) to shut up inappropriate complaints about
+  "snps,ps-speed" being invalid.
+- new patch (13) to add a MAC .pcs_init method, which will only be
+  called when core has PCS present.
+- modify patch 14 to use this new pcs_init method.
+
+Despite getting a couple of responses to the RFC series posted in
+September, I have had nothing testing this on hardware. I have tested
+this on the Jetson Xavier NX, which included trial runs with enabling
+the RGMII "pcs" mode, hence the new patches that rip out this mode. I
+have come to the conclusion that the only way to get stmmac changes
+tested is to get them merged into net-next, thereby forcing people to
+have to run with them... and we'll deal with any fallout later.
+
+Changes since v1:
+- added Andrew's reviewed-bys
+- added additional comments to patch 3, 11 and 14.
+No code changes.
+
+ drivers/net/ethernet/stmicro/stmmac/Makefile       |  2 +-
+ drivers/net/ethernet/stmicro/stmmac/common.h       |  5 +-
+ .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    |  6 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac1000.h    |  6 +-
+ .../net/ethernet/stmicro/stmmac/dwmac1000_core.c   | 65 ++-------------------
+ drivers/net/ethernet/stmicro/stmmac/dwmac4.h       |  3 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  | 66 ++-------------------
+ .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    | 25 +-------
+ drivers/net/ethernet/stmicro/stmmac/hwif.h         |  4 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h       |  4 ++
+ .../net/ethernet/stmicro/stmmac/stmmac_ethtool.c   | 68 +---------------------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 24 ++++----
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c   | 47 +++++++++++++++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h   | 23 ++++++--
+ include/linux/stmmac.h                             |  1 -
+ 15 files changed, 104 insertions(+), 245 deletions(-)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
