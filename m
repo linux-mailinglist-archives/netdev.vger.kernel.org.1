@@ -1,225 +1,172 @@
-Return-Path: <netdev+bounces-229935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC7BBBE236D
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:47:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55681BE2382
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:48:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FAD919C0279
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:47:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9EC654055E
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C0BB212FAA;
-	Thu, 16 Oct 2025 08:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C9222C158F;
+	Thu, 16 Oct 2025 08:48:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zi4/jLJp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O03AjARc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBBE218599
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 08:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DB93254B3
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 08:48:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760604439; cv=none; b=KLQnOVYPSKPqMlSpKf4CLUBhXT1E2OoTtZge2+qX47/oMKwx2Yzq9sPeWyR8t5EKikUhhxt+faS1Cuhb0x0wu5DQTikkjGvCKSuvbR6doh4VD8ATRDXaXngC0inXBoRtbexxK3PjTNgnpXVSVpGKS7OF9xOdJdsOJF3X5KDOWcc=
+	t=1760604517; cv=none; b=SVvqftoHiiU4e0K2g3EwthM59wa+KoGXsvxNUTTdL2gG/YED6A9qekWaDHnoHxPSCC7C2kTa0nZXH7GIJZqzxhkyOXA/2wLXxbB6JE/5HpbYQuDQTZ90OBVk7wJao1GfQO4GMyaWhLe2opB6NGFgetKzXrocPnXHzcu8ZVJKKok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760604439; c=relaxed/simple;
-	bh=lxdA3Rgx7Td+RdMxZKNp62JHMDC6fzh4XBD0nugmcMM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=or7hzbo+C/Ki50JqTtIRsR55ZXNCuw0IiRLlFm/6o3e+/WtYHu0K3AcJSxcDEtq/Hvn7rFQiNW2G9aimOfGMLN8Wj2oy5kNvKYDt9I5yOCf1i6moqLHgUkgCHEdeQM4GdhSXnZ3vQYjtqlGTi6pEuWNfuCNYIF1mrxn7sXBxN84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Zi4/jLJp; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760604437; x=1792140437;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=lxdA3Rgx7Td+RdMxZKNp62JHMDC6fzh4XBD0nugmcMM=;
-  b=Zi4/jLJpeC5fiCvnJI9WmFwsTtb64fTcZEEMrDr8EWJfTDhfMIQBovDy
-   b47OMf/QQd+1kRLKJ3Mf9O5XHT0vTXzQbijDSg96K4PMUaMep+M5J2WSP
-   0ijew0TDJc2kgMJawi2fDCk49GoNnabDVDxJH64xaeDv5tGCzxz9sGVl8
-   Nun9cr4UlYfOHF3n/swYB/fCItZvHc/dTrGWnob8e8AeiiqH1RaTLnimS
-   X3AtjWXDGcM0pVJIzivyA9drDbbhAydyERSHXcKLoszl/yTKqzPQ8J5nq
-   XOGPTme9zV2jYFH789mCWEIbYO7WR2kRU7LluOvgqKm5Slz2Byyd1fq0c
-   w==;
-X-CSE-ConnectionGUID: 9cfN/VWESlS0a3xOh0wiPQ==
-X-CSE-MsgGUID: +gJlzxBNSym1/4PoqqqsrQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="62830856"
-X-IronPort-AV: E=Sophos;i="6.19,233,1754982000"; 
-   d="scan'208";a="62830856"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2025 01:47:16 -0700
-X-CSE-ConnectionGUID: REPZIiNWSpyxMa0BM5z8hw==
-X-CSE-MsgGUID: ufQTNyFPQyiqgYO2hlfmTg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,233,1754982000"; 
-   d="scan'208";a="186669244"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2025 01:47:15 -0700
-Date: Thu, 16 Oct 2025 10:45:19 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1] ice: lower default
- irq/queue counts on high-core systems
-Message-ID: <aPCwn1jZDl+7+F1i@mev-dev.igk.intel.com>
-References: <20251016062250.1461903-1-michal.swiatkowski@linux.intel.com>
- <d6a90d0d-55f9-467a-b414-5ced78d12c54@molgen.mpg.de>
+	s=arc-20240116; t=1760604517; c=relaxed/simple;
+	bh=kkrnDxMYNrznAE3Hee5XF8MX8bDoYkPgWg1IrtAOtqc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jCg7S9+YFP/Qt8IFMNCmK9hMZ87W90fF5qtHEpD7nzBaNufyVZ7q1PMjo1hgvdViWJg0b5G3pqR9oWyF4iklF5FY1PaE7xpjMoxSB6G/ISa0ItY4Pzh6Jfmy+TRgwhswlIzDjz1H8f7oCi/HIbSvXeELAZls1kQBxWTvHixXHHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O03AjARc; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3ee64bc6b90so317614f8f.0
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 01:48:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760604513; x=1761209313; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AVEUrQi9cWOpaDRyBLGip7wyDUSKU6wiRqunzh1l3BU=;
+        b=O03AjARc9R27ZMZrKE8djRKA3KxAYGJsRMNyCcIfOfm0XJVskqFMYGOvH2ejD0qYws
+         JERlaM6Qo/06NIrHKXPky1XbjwK0LbcJIZjVPLl9pJ/ZmUsajnZ3Lh/yfelonwkORXyC
+         8KmD/hOAf+M+KxL+C1SliHXXqCrh5npK9Gl6GtcDDYIaW7+VUZ5D//PTM2jQHh6XxKNQ
+         ftzWrbmwf1yf6h7OPgy4nmu4VSrefeSEZisvv/aFYR7L9Z9+UWdrtRSaLpY5vnANO9qG
+         uj9/DeVr1uzDySUvtszyuixQt5nwHZTfvRt3Q9qzYrI98cXhP2Do67uUrpD8mKKcOCqr
+         MSJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760604513; x=1761209313;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AVEUrQi9cWOpaDRyBLGip7wyDUSKU6wiRqunzh1l3BU=;
+        b=HnnMBi5QyO5T3TZdB3bPinrfCWY79F9SXKzNIB4XuermsLb1Nl27IigKa9QwtfM4hR
+         yX2x1FWAlEzpLgqCbCZcNmbNavPKp9PM64lSySLvLGryp3tQem7KNAzVQWFZ99lNlGL3
+         /2ZE5dPloZC+a7kN81NC4Cce+egcsujUHhwCDuCWo3gqLrccxcyubTeA5bWoUz96aeW1
+         IBhtKB+yxArRc4k3gA3NVr/ppcS9s6FMTySieqL/hoZr98uKpfWhtThRKQWFOm8cuQ/x
+         6jLa0KVgZHiox0NG47j8LKM7bhdxQe/CEmZ3AFR6AKDAExPqnr2A4xzn5PoQ2HYHUF1U
+         Re6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUsT8+0H5DiIT3zMyZkax/Is9h/IbP7r2CWBxTc8jzJwEYSZLsRuh8NKh0nDPyr7iNJQqwDD68=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/kHtUeuiGQ9cHBd4s5uMQFkjPiqw6lN/TUMJwOlKPxAAKVg9v
+	bJKg8jaztgGASPTvDk5k9QKaauAdt20fS1HCo2b/MY2OM71VHrruXyCI
+X-Gm-Gg: ASbGncvyCRZn2po01g60B47kTKi2+WsEzCpRW9JjCh4K/fy82ZBiXeWYYCZz0zXCKE0
+	wX6jATvcEUuFHft+RfTwkRVWg2wSYLT4A+4PR48MyB9S4auFH1AG0V313tMGi5WamPSf3bhn7MZ
+	Nv5oCMxnkpUmF4u9yJ6eQ9364onaiFlGhIBe/UEwNWBVjbW2YnU38qsQRf997rV/sKCVz3tgLRT
+	KvuOt8GnO0JLcJf+pqmC1Jd1rwXv+zshFHXqD7DVvgg9NWEAViwAOWj3d4700j/wKClOhRzmSQ7
+	YwtJM+GzeQc5jcJXrK7PWtg98QAldAKlKtGvlctEne17PV1rP3nx8RMcwiOOx0uuy/PRJMZtUvK
+	h6jowy1r/BnFh8BCX2GPH101oANoTnRxzH2tPqcNAgxy4QNhUTF4aOHfp71QoSLdCZn0M0VN52h
+	zUP5XytpwY3bdUhP4sbjkdVvWBLolRkLCszD4=
+X-Google-Smtp-Source: AGHT+IFcjkeuZRpv+IRzVM4XciTTJue0s3dCI3MiZ144Kh9FyQmKyef1x1llDDTMWlEp/vC66d5XcA==
+X-Received: by 2002:a05:6000:2010:b0:402:4142:c7a7 with SMTP id ffacd0b85a97d-42666ac6f35mr23068224f8f.16.1760604512220;
+        Thu, 16 Oct 2025 01:48:32 -0700 (PDT)
+Received: from [10.221.203.215] ([165.85.126.96])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42704141cdfsm42311f8f.4.2025.10.16.01.48.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Oct 2025 01:48:31 -0700 (PDT)
+Message-ID: <abe2f4c3-086e-4023-911d-f2ecbdff24cd@gmail.com>
+Date: Thu, 16 Oct 2025 11:48:30 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d6a90d0d-55f9-467a-b414-5ced78d12c54@molgen.mpg.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5e: Return 1 instead of 0 in invalid case in
+ mlx5e_mpwrq_umr_entry_size()
+To: Nathan Chancellor <nathan@kernel.org>, Saeed Mahameed
+ <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org, patches@lists.linux.dev,
+ llvm@lists.linux.dev
+References: <20251014-mlx5e-avoid-zero-div-from-mlx5e_mpwrq_umr_entry_size-v1-1-dc186b8819ef@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20251014-mlx5e-avoid-zero-div-from-mlx5e_mpwrq_umr_entry_size-v1-1-dc186b8819ef@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 16, 2025 at 09:44:43AM +0200, Paul Menzel wrote:
-> Dear Michal,
-> 
-> 
-> Thank you for the patch. I’d mention the 64 in the summary:
-> 
 
-Sure, I will add it.
 
-> > ice: lower default irq/queue counts to 64 on > 64 core systems
+On 14/10/2025 23:46, Nathan Chancellor wrote:
+> When building with Clang 20 or newer, there are some objtool warnings
+> from unexpected fallthroughs to other functions:
 > 
+>    vmlinux.o: warning: objtool: mlx5e_mpwrq_mtts_per_wqe() falls through to next function mlx5e_mpwrq_max_num_entries()
+>    vmlinux.o: warning: objtool: mlx5e_mpwrq_max_log_rq_size() falls through to next function mlx5e_get_linear_rq_headroom()
 > 
-> Am 16.10.25 um 08:22 schrieb Michal Swiatkowski:
-> > On some high-core systems loading ice driver with default values can
-> > lead to queue/irq exhaustion. It will result in no additional resources
-> > for SR-IOV.
-> > 
-> > In most cases there is no performance reason for more than 64 queues.
-> > Limit the default value to 64. Still, using ethtool the number of
-> > queues can be changed up to num_online_cpus().
-> > 
-> > This change affects only the default queue amount on systems with more
-> > than 64 cores.
+> LLVM 20 contains an (admittedly problematic [1]) optimization [2] to
+> convert divide by zero into the equivalent of __builtin_unreachable(),
+> which invokes undefined behavior and destroys code generation when it is
+> encountered in a control flow graph.
 > 
-> Please document a specific system and steps to reproduce the issue.
+> mlx5e_mpwrq_umr_entry_size() returns 0 in the default case of an
+> unrecognized mlx5e_mpwrq_umr_mode value. mlx5e_mpwrq_mtts_per_wqe(),
+> which is inlined into mlx5e_mpwrq_max_log_rq_size(), uses the result of
+> mlx5e_mpwrq_umr_entry_size() in a divide operation without checking for
+> zero, so LLVM is able to infer there will be a divide by zero in this
+> case and invokes undefined behavior. While there is some proposed work
+> to isolate this undefined behavior and avoid the destructive code
+> generation that results in these objtool warnings, code should still be
+> defensive against divide by zero.
 > 
-> Please also document how to override the value.
-
-Ok, will add.
-
+> As the WARN_ONCE() implies that an invalid value should be handled
+> gracefully, return 1 instead of 0 in the default case so that the
+> results of this division operation is always valid.
 > 
-> > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> > ---
-> >   drivers/net/ethernet/intel/ice/ice.h     | 20 ++++++++++++++++++++
-> >   drivers/net/ethernet/intel/ice/ice_irq.c |  6 ++++--
-> >   drivers/net/ethernet/intel/ice/ice_lib.c |  8 ++++----
-> >   3 files changed, 28 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-> > index 3d4d8b88631b..354ec2950ff3 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice.h
-> > +++ b/drivers/net/ethernet/intel/ice/ice.h
-> > @@ -1133,4 +1133,24 @@ static inline struct ice_hw *ice_get_primary_hw(struct ice_pf *pf)
-> >   	else
-> >   		return &pf->adapter->ctrl_pf->hw;
-> >   }
-> > +
-> > +/**
-> > + * ice_capped_num_cpus - normalize the number of CPUs to a reasonable limit
-> > + *
-> > + * This function returns the number of online CPUs, but caps it at suitable
-> > + * default to prevent excessive resource allocation on systems with very high
-> > + * CPU counts.
-> > + *
-> > + * Note: suitable default is currently at 64, which is reflected in default_cpus
-> > + * constant. In most cases there is no much benefit for more than 64 and it is a
+> Fixes: 168723c1f8d6 ("net/mlx5e: xsk: Use umr_mode to calculate striding RQ parameters")
+> Link: https://lore.kernel.org/CAGG=3QUk8-Ak7YKnRziO4=0z=1C_7+4jF+6ZeDQ9yF+kuTOHOQ@mail.gmail.com/ [1]
+> Link: https://github.com/llvm/llvm-project/commit/37932643abab699e8bb1def08b7eb4eae7ff1448 [2]
+> Closes: https://github.com/ClangBuiltLinux/linux/issues/2131
+> Closes: https://github.com/ClangBuiltLinux/linux/issues/2132
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/en/params.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> no*t* much
->
-
-Will fix
-
-> > + * power of 2 number.
-> > + *
-> > + * Return: number of online CPUs, capped at suitable default.
-> > + */
-> > +static inline u16 ice_capped_num_cpus(void)
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
+> index 3692298e10f2..c9bdee9a8b30 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
+> @@ -100,7 +100,7 @@ u8 mlx5e_mpwrq_umr_entry_size(enum mlx5e_mpwrq_umr_mode mode)
+>   		return sizeof(struct mlx5_ksm) * 4;
+>   	}
+>   	WARN_ONCE(1, "MPWRQ UMR mode %d is not known\n", mode);
+> -	return 0;
+> +	return 1;
+>   }
+>   
+>   u8 mlx5e_mpwrq_log_wqe_sz(struct mlx5_core_dev *mdev, u8 page_shift,
 > 
-> Why not return `unsigned int` or `size_t`?
->
-
-Just because u16 is used for queue counts, but I can go with unsigned
-int, makes more sense as num_online_cpus() is returning unsigned int.
-
-> > +{
-> > +	const int default_cpus = 64;
-> > +
-> > +	return min(num_online_cpus(), default_cpus);
-> > +}
-> >   #endif /* _ICE_H_ */
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
-> > index 30801fd375f0..df4d847ca858 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_irq.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_irq.c
-> > @@ -106,9 +106,11 @@ static struct ice_irq_entry *ice_get_irq_res(struct ice_pf *pf,
-> >   #define ICE_RDMA_AEQ_MSIX 1
-> >   static int ice_get_default_msix_amount(struct ice_pf *pf)
-> >   {
-> > -	return ICE_MIN_LAN_OICR_MSIX + num_online_cpus() +
-> > +	u16 cpus = ice_capped_num_cpus();
-> > +
-> > +	return ICE_MIN_LAN_OICR_MSIX + cpus +
-> >   	       (test_bit(ICE_FLAG_FD_ENA, pf->flags) ? ICE_FDIR_MSIX : 0) +
-> > -	       (ice_is_rdma_ena(pf) ? num_online_cpus() + ICE_RDMA_AEQ_MSIX : 0);
-> > +	       (ice_is_rdma_ena(pf) ? cpus + ICE_RDMA_AEQ_MSIX : 0);
-> >   }
-> >   /**
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-> > index bac481e8140d..3c5f8a4b6c6d 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_lib.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-> > @@ -159,12 +159,12 @@ static void ice_vsi_set_num_desc(struct ice_vsi *vsi)
-> >   static u16 ice_get_rxq_count(struct ice_pf *pf)
-> >   {
-> > -	return min(ice_get_avail_rxq_count(pf), num_online_cpus());
-> > +	return min(ice_get_avail_rxq_count(pf), ice_capped_num_cpus());
-> >   }
-> >   static u16 ice_get_txq_count(struct ice_pf *pf)
-> >   {
-> > -	return min(ice_get_avail_txq_count(pf), num_online_cpus());
-> > +	return min(ice_get_avail_txq_count(pf), ice_capped_num_cpus());
-> >   }
-> >   /**
-> > @@ -907,13 +907,13 @@ static void ice_vsi_set_rss_params(struct ice_vsi *vsi)
-> >   		if (vsi->type == ICE_VSI_CHNL)
-> >   			vsi->rss_size = min_t(u16, vsi->num_rxq, max_rss_size);
-> >   		else
-> > -			vsi->rss_size = min_t(u16, num_online_cpus(),
-> > +			vsi->rss_size = min_t(u16, ice_capped_num_cpus(),
-> >   					      max_rss_size);
-> >   		vsi->rss_lut_type = ICE_LUT_PF;
-> >   		break;
-> >   	case ICE_VSI_SF:
-> >   		vsi->rss_table_size = ICE_LUT_VSI_SIZE;
-> > -		vsi->rss_size = min_t(u16, num_online_cpus(), max_rss_size);
-> > +		vsi->rss_size = min_t(u16, ice_capped_num_cpus(), max_rss_size);
-> >   		vsi->rss_lut_type = ICE_LUT_VSI;
-> >   		break;
-> >   	case ICE_VSI_VF:
+> ---
+> base-commit: 4f86eb0a38bc719ba966f155071a6f0594327f34
+> change-id: 20251014-mlx5e-avoid-zero-div-from-mlx5e_mpwrq_umr_entry_size-e6d49c18a43f
 > 
-> With the changes addressed, feel free to add:
+> Best regards,
+> --
+> Nathan Chancellor <nathan@kernel.org>
 > 
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 > 
 
-Thanks
+Thanks for your patch.
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 
-> 
-> Kind regards,
-> 
-> Paul
+
+
 
