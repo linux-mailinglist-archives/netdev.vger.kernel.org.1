@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-230154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79EBEBE4A05
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 18:38:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0672BE4A9E
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 18:47:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 79BB04F96DC
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 16:38:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01A9E583756
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 16:47:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E9434164D;
-	Thu, 16 Oct 2025 16:38:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B2814B950;
+	Thu, 16 Oct 2025 16:47:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F8932AAC3;
-	Thu, 16 Oct 2025 16:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5D123EA94;
+	Thu, 16 Oct 2025 16:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760632688; cv=none; b=e0Eh+IC71BjI38YfUZsD9syNnHzuiYLfhYufnbTLkG6Aqn6zlxB/liG/3K1K5vP483IuavW/q3lbssH6wTcbMMOWtgLKakAdKXaqY2Ig3gKs+4COiBd/3BRsU0V0NB1VdG1ncJkmaNtg+g7mMKtKou3NZqOU1O3PLzdd3NpQ/HQ=
+	t=1760633241; cv=none; b=BJFwuFyLgDVVOW6Gu4KtjP/T5d7xcwbgxhqsjoTF4+CcYerxnnJ04g1FOYOKYtZGMFJ0eQMPVi9B07fQnaQkUVcbq1E8DwK8HUkD7iglgWJjWi6PSmmN316ZP47e8W22QMjzQCdn1T3xryduK6LUe44fRuElLbkSw7VhnOuj630=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760632688; c=relaxed/simple;
-	bh=YxBKu+zIUX8CGJj4jbQUYQMuxHt2FoP59bIPuC+yGWA=;
+	s=arc-20240116; t=1760633241; c=relaxed/simple;
+	bh=DlAyQQmVrHCjqtbaYRqt228DCsKpBQ6VDXNZ3FPON2k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q2VVpwWnhfAKEujn45Ap5KTrjohUbkjzQlLn/OcIESwXATi0CS22cjECqQJnrSwsuK9qcH8RM6i2Tk8JlXTGwbN8SxTrf7Fo0hGUXvJmNRDmj3apkutmHAotrBLFACpj1U8xoU5dWErPGK5fEWxHtbUYURWMu1JoOXdptOr5jCk=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ESWE65KR83STA6Yg8kSLZTb2s3DDXGg2vYE8nitlFwIexjD9531artjr9cdz9X2LOvvw4AZrdSYj7AAafxkbQzT0bhPZcJ18ZIWsyGrgky2gBieeuXMQ+1Wj6ELsx8gQRvX8e256qwt71IJeZYuRGs3D8jf1RZ+bbRmgUFwSsPQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,15 +33,15 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1v9Qz1-000000002mr-31Oo;
-	Thu, 16 Oct 2025 16:37:43 +0000
-Date: Thu, 16 Oct 2025 17:37:36 +0100
+	id 1v9R89-000000002py-116l;
+	Thu, 16 Oct 2025 16:47:09 +0000
+Date: Thu, 16 Oct 2025 17:47:05 +0100
 From: Daniel Golle <daniel@makrotopia.org>
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Sjoerd Simons <sjoerd@collabora.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+To: Sjoerd Simons <sjoerd@collabora.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
 	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
 	Ryder Lee <ryder.lee@mediatek.com>,
 	Jianjun Wang <jianjun.wang@mediatek.com>,
 	Bjorn Helgaas <bhelgaas@google.com>,
@@ -61,13 +61,11 @@ Cc: Sjoerd Simons <sjoerd@collabora.com>, Rob Herring <robh@kernel.org>,
 	linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
 	linux-phy@lists.infradead.org, netdev@vger.kernel.org,
 	Bryan Hinton <bryan@bryanhinton.com>
-Subject: Re: [PATCH 02/15] arm64: dts: mediatek: mt7981b-openwrt-one:
- Configure UART0 pinmux
-Message-ID: <aPEfUBl6fMe6QYdY@makrotopia.org>
+Subject: Re: [PATCH 10/15] arm64: dts: mediatek: mt7981b: Add Ethernet and
+ WiFi offload support
+Message-ID: <aPEhiVdgkVLvF9Et@makrotopia.org>
 References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
- <20251016-openwrt-one-network-v1-2-de259719b6f2@collabora.com>
- <aPDnT4tuSzNDzyAE@makrotopia.org>
- <5f430ff9-d701-426a-bf93-5290e6912eb4@collabora.com>
+ <20251016-openwrt-one-network-v1-10-de259719b6f2@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,74 +74,206 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5f430ff9-d701-426a-bf93-5290e6912eb4@collabora.com>
+In-Reply-To: <20251016-openwrt-one-network-v1-10-de259719b6f2@collabora.com>
 
-On Thu, Oct 16, 2025 at 04:29:14PM +0200, AngeloGioacchino Del Regno wrote:
-> Il 16/10/25 14:38, Daniel Golle ha scritto:
-> > On Thu, Oct 16, 2025 at 12:08:38PM +0200, Sjoerd Simons wrote:
-> > > Add explicit pinctrl configuration for UART0 on the OpenWrt One board,
-> > > 
-> > > Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
-> > > ---
-> > >   arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts | 11 +++++++++++
-> > >   1 file changed, 11 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
-> > > index 968b91f55bb27..f836059d7f475 100644
-> > > --- a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
-> > > +++ b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
-> > > @@ -22,6 +22,17 @@ memory@40000000 {
-> > >   	};
-> > >   };
-> > > +&pio {
-> > > +	uart0_pins: uart0-pins {
-> > > +		mux {
-> > > +			function = "uart";
-> > > +			groups = "uart0";
-> > > +		};
-> > > +	};
-> > > +};
-> > > +
-> > >   &uart0 {
-> > > +	pinctrl-names = "default";
-> > > +	pinctrl-0 = <&uart0_pins>;
-> > >   	status = "okay";
-> > >   };
-> > 
-> > As there is only a single possible pinctrl configuration for uart0,
-> > both the pinmux definition as well as the pinctrl properties should go
-> > into mt7981b.dtsi rather than in the board's dts.
+On Thu, Oct 16, 2025 at 12:08:46PM +0200, Sjoerd Simons wrote:
+> Add device tree nodes for the Ethernet subsystem on MT7981B SoC,
+> including:
+> - Ethernet MAC controller with dual GMAC support
+> - Wireless Ethernet Dispatch (WED)
+> - SGMII PHY controllers for high-speed Ethernet interfaces
+> - Reserved memory regions for WiFi offload processor
 > 
-> If there's really one single possible pin configuration for the UART0 pins,
-> as in, those pins *do not* have a GPIO mode, then yes I agree.
+> Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
+> ---
+>  arch/arm64/boot/dts/mediatek/mt7981b.dtsi | 133 ++++++++++++++++++++++++++++++
+>  1 file changed, 133 insertions(+)
 > 
-> If those pins can be as well configured as GPIOs, this goes to board DTS.
+> diff --git a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi b/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
+> index 13950fe6e8766..c85fa0ddf2da8 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
+> @@ -2,6 +2,7 @@
+>  
+>  #include <dt-bindings/clock/mediatek,mt7981-clk.h>
+>  #include <dt-bindings/interrupt-controller/arm-gic.h>
+> +#include <dt-bindings/leds/common.h>
+>  #include <dt-bindings/phy/phy.h>
+>  #include <dt-bindings/reset/mt7986-resets.h>
+>  
+> @@ -47,11 +48,36 @@ reserved-memory {
+>  		#size-cells = <2>;
+>  		ranges;
+>  
+> +		wo_boot: wo-boot@15194000 {
+> +			reg = <0 0x15194000 0 0x1000>;
+> +			no-map;
+> +		};
+> +
+> +		wo_ilm0: wo-ilm@151e0000 {
+> +			reg = <0 0x151e0000 0 0x8000>;
+> +			no-map;
+> +		};
+> +
+> +		wo_dlm0: wo-dlm@151e8000 {
+> +			reg = <0 0x151e8000 0 0x2000>;
+> +			no-map;
+> +		};
+> +
+>  		/* 192 KiB reserved for ARM Trusted Firmware (BL31) */
+>  		secmon_reserved: secmon@43000000 {
+>  			reg = <0 0x43000000 0 0x30000>;
+>  			no-map;
+>  		};
+> +
+> +		wo_emi0: wo-emi@47d80000 {
+> +			reg = <0 0x47d80000 0 0x40000>;
+> +			no-map;
+> +		};
+> +
+> +		wo_data: wo-data@47dc0000 {
+> +			reg = <0 0x47dc0000 0 0x240000>;
+> +			no-map;
+> +		};
+>  	};
+>  
+>  	soc {
+> @@ -107,6 +133,18 @@ pwm: pwm@10048000 {
+>  			#pwm-cells = <2>;
+>  		};
+>  
+> +		sgmiisys0: syscon@10060000 {
+> +			compatible = "mediatek,mt7981-sgmiisys_0", "syscon";
+> +			reg = <0 0x10060000 0 0x1000>;
+> +			#clock-cells = <1>;
+> +		};
+> +
+> +		sgmiisys1: syscon@10070000 {
+> +			compatible = "mediatek,mt7981-sgmiisys_1", "syscon";
+> +			reg = <0 0x10070000 0 0x1000>;
+> +			#clock-cells = <1>;
+> +		};
+> +
+>  		uart0: serial@11002000 {
+>  			compatible = "mediatek,mt7981-uart", "mediatek,mt6577-uart";
+>  			reg = <0 0x11002000 0 0x100>;
+> @@ -338,6 +376,10 @@ soc-uuid@140 {
+>  			thermal_calibration: thermal-calib@274 {
+>  				reg = <0x274 0xc>;
+>  			};
+> +
+> +			phy_calibration: phy-calib@8dc {
+> +				reg = <0x8dc 0x10>;
+> +			};
+>  		};
+>  
+>  		ethsys: clock-controller@15000000 {
+> @@ -347,6 +389,97 @@ ethsys: clock-controller@15000000 {
+>  			#reset-cells = <1>;
+>  		};
+>  
+> +		wed: wed@15010000 {
+> +			compatible = "mediatek,mt7981-wed",
+> +				     "syscon";
+> +			reg = <0 0x15010000 0 0x1000>;
+> +			interrupt-parent = <&gic>;
+> +			interrupts = <GIC_SPI 205 IRQ_TYPE_LEVEL_HIGH>;
+> +			memory-region = <&wo_emi0>, <&wo_ilm0>, <&wo_dlm0>,
+> +					<&wo_data>, <&wo_boot>;
+> +			memory-region-names = "wo-emi", "wo-ilm", "wo-dlm",
+> +					      "wo-data", "wo-boot";
+> +			mediatek,wo-ccif = <&wo_ccif0>;
+> +		};
+> +
+> +		eth: ethernet@15100000 {
+> +			compatible = "mediatek,mt7981-eth";
+> +			reg = <0 0x15100000 0 0x40000>;
+> +			assigned-clocks = <&topckgen CLK_TOP_NETSYS_2X_SEL>,
+> +					  <&topckgen CLK_TOP_SGM_325M_SEL>;
+> +			assigned-clock-parents = <&topckgen CLK_TOP_CB_NET2_800M>,
+> +						 <&topckgen CLK_TOP_CB_SGM_325M>;
+> +			clocks = <&ethsys CLK_ETH_FE_EN>,
+> +				 <&ethsys CLK_ETH_GP2_EN>,
+> +				 <&ethsys CLK_ETH_GP1_EN>,
+> +				 <&ethsys CLK_ETH_WOCPU0_EN>,
+> +				 <&topckgen CLK_TOP_SGM_REG>,
+> +				 <&sgmiisys0 CLK_SGM0_TX_EN>,
+> +				 <&sgmiisys0 CLK_SGM0_RX_EN>,
+> +				 <&sgmiisys0 CLK_SGM0_CK0_EN>,
+> +				 <&sgmiisys0 CLK_SGM0_CDR_CK0_EN>,
+> +				 <&sgmiisys1 CLK_SGM1_TX_EN>,
+> +				 <&sgmiisys1 CLK_SGM1_RX_EN>,
+> +				 <&sgmiisys1 CLK_SGM1_CK1_EN>,
+> +				 <&sgmiisys1 CLK_SGM1_CDR_CK1_EN>,
+> +				 <&topckgen CLK_TOP_NETSYS_SEL>,
+> +				 <&topckgen CLK_TOP_NETSYS_500M_SEL>;
+> +			clock-names = "fe", "gp2", "gp1", "wocpu0",
+> +				      "sgmii_ck",
+> +				      "sgmii_tx250m", "sgmii_rx250m",
+> +				      "sgmii_cdr_ref", "sgmii_cdr_fb",
+> +				      "sgmii2_tx250m", "sgmii2_rx250m",
+> +				      "sgmii2_cdr_ref", "sgmii2_cdr_fb",
+> +				      "netsys0", "netsys1";
+> +			interrupts = <GIC_SPI 196 IRQ_TYPE_LEVEL_HIGH>,
+> +				     <GIC_SPI 197 IRQ_TYPE_LEVEL_HIGH>,
+> +				     <GIC_SPI 198 IRQ_TYPE_LEVEL_HIGH>,
+> +				     <GIC_SPI 199 IRQ_TYPE_LEVEL_HIGH>,
+> +				     <GIC_SPI 189 IRQ_TYPE_LEVEL_HIGH>,
+> +				     <GIC_SPI 190 IRQ_TYPE_LEVEL_HIGH>,
+> +				     <GIC_SPI 191 IRQ_TYPE_LEVEL_HIGH>,
+> +				     <GIC_SPI 192 IRQ_TYPE_LEVEL_HIGH>;
+> +			interrupt-names = "fe0", "fe1", "fe2", "fe3", "pdma0",
+> +					  "pdma1", "pdma2", "pdma3";
+> +			sram = <&eth_sram>;
+> +			#address-cells = <1>;
+> +			#size-cells = <0>;
+> +			mediatek,ethsys = <&ethsys>;
+> +			mediatek,sgmiisys = <&sgmiisys0>, <&sgmiisys1>;
+> +			mediatek,infracfg = <&topmisc>;
+> +			mediatek,wed = <&wed>;
+> +			status = "disabled";
+> +
+> +			mdio_bus: mdio-bus {
+> +				#address-cells = <1>;
+> +				#size-cells = <0>;
+> +
+> +				int_gbe_phy: ethernet-phy@0 {
+> +					compatible = "ethernet-phy-ieee802.3-c22";
+> +					reg = <0>;
+> +					phy-mode = "gmii";
+> +					phy-is-integrated;
+> +					nvmem-cells = <&phy_calibration>;
+> +					nvmem-cell-names = "phy-cal-data";
 
-I respectfully disagree and will explain below.
+Please also define the two LEDs here with their corresponding (only)
+pinctrl options for each of them, with 'status = "disabled";'. This
+makes it easier for boards to make use of the Ethernet PHY leds by just
+referencing the LED and setting the status to 'okay'.
 
-All pinmux pins on the MediaTek platform also allow being configured as
-GPIOs. However, if you configure those as GPIOs the consequence is that
-you cannot use UART0 any more at all. So using UART0 at all always
-implies using exactly those pins, there is no alternative to that.
-
-Hence every board with every possible uses of pins 32 and 33 (there is
-only RX and TX for UART0, RTS/CTS flow-control is not possible) can be
-represented without needing to configure the pinctrl for uart0 on the
-board level. There isn't going to be any variation on the board-level
-when it comes to uart0. Either it is enabled (status = "okay";), and
-that will always imply using the 'uart0' group in mode 'uart', or, in
-case any of the two pins of uart0 is used for something else that means
-uart0 cannot be enabled. Simple as that.
-
-Hence there is no need to duplicate that pinctrl settings on each and
-every board, as controlling the 'status' property on the board-level
-already gives 100% freedom.
-
-(Sidenote: As even the BootROM already uses those two pins as UART for
-debug output, it is very unlikely that anyone would actually use them
-for anything else in production. Apart from being used as GPIOs you can
-also use pins 32 and 33 as an I2C target for external debug access to the
-registers of either the sgmii0_phy, sgmii1_phy or u3_phy. However, that
-doesn't matter in terms of the debate above, as the crucial point there
-is that using uart0 always implies using group 'uart0' in 'uart' mode.)
+> +				};
+> +			};
+> +		};
+> +
+> +		eth_sram: sram@15140000 {
+> +			compatible = "mmio-sram";
+> +			reg = <0 0x15140000 0 0x40000>;
+> +			ranges = <0 0x15140000 0 0x40000>;
+> +			#address-cells = <1>;
+> +			#size-cells = <1>;
+> +		};
+> +
+> +		wo_ccif0: syscon@151a5000 {
+> +			compatible = "mediatek,mt7986-wo-ccif", "syscon";
+> +			reg = <0 0x151a5000 0 0x1000>;
+> +			interrupt-parent = <&gic>;
+> +			interrupts = <GIC_SPI 211 IRQ_TYPE_LEVEL_HIGH>;
+> +		};
+> +
+>  		wifi: wifi@18000000 {
+>  			compatible = "mediatek,mt7981-wmac";
+>  			reg = <0 0x18000000 0 0x1000000>,
+> 
+> -- 
+> 2.51.0
+> 
 
