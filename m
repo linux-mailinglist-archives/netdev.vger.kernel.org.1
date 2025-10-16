@@ -1,143 +1,225 @@
-Return-Path: <netdev+bounces-229934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CF13BE235B
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:44:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC7BBBE236D
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 10:47:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 649843A94C5
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:44:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FAD919C0279
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 08:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7AB30505F;
-	Thu, 16 Oct 2025 08:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C0BB212FAA;
+	Thu, 16 Oct 2025 08:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HQmM4ypr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zi4/jLJp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2776E2FF65D
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 08:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBBE218599
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 08:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760604286; cv=none; b=CvQzV4S6798mTwR4lew1OxJJeS6RhZdMf9chQgE28sP+JYY4RgVCW539PvClVK+EB7OX/SJyABrz2+l07Dtuyh7pNOYGzDJay2FaMhKilSvKQBLyVkKc2+F1/R9DtypWJTVRclCMWFCNduZXiznVufTEOoI0+RXne3h2HiVO6cU=
+	t=1760604439; cv=none; b=KLQnOVYPSKPqMlSpKf4CLUBhXT1E2OoTtZge2+qX47/oMKwx2Yzq9sPeWyR8t5EKikUhhxt+faS1Cuhb0x0wu5DQTikkjGvCKSuvbR6doh4VD8ATRDXaXngC0inXBoRtbexxK3PjTNgnpXVSVpGKS7OF9xOdJdsOJF3X5KDOWcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760604286; c=relaxed/simple;
-	bh=vRX2tojo3/tm9805sxEoYBXfaRPegPiWe9oFIjqdDOU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DkEWRfnxl0cyyspWShUQZb3NX1VxC9Tk0XA+4dmVPx+drwHa340qtavX7XwPYcoE8dtkJV0iFVYynTW27pVlKDRpkBys9o2/drJwiYIn8Uhymy8S3CIHfGY6XCgeuHvhX6D0s6BLMK5jXAIcKn66VNrqTWCqeHxf+PUI8fOHKlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HQmM4ypr; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 51EEE1A140D;
-	Thu, 16 Oct 2025 08:44:42 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 24AAB6062C;
-	Thu, 16 Oct 2025 08:44:42 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 56753102F22F1;
-	Thu, 16 Oct 2025 10:44:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760604281; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=N1rZiVWM7zYa7/iOhEFyo6sQl/kIYT8q4flK3hRKByc=;
-	b=HQmM4yprZlilGcaiSB4/XWd0S51BJtvXC4417lCtZL2fcCLWXoIicfoDQFC7COdyPP0d8U
-	sGUm6edEWmgUf3OBpeISB1P1kDAcotG5N0Jnq++reD2L0FyKrqycTTjt7b6aq6DJZRCcC4
-	MYkWwgL8NAqOE61PQINi3sOG5Jx56yvzF2AXr0go6QOjuzk3OANIeriItOuNTML1TK13Za
-	48NEqBqW1wlUbAloKzagYwDULgmqA4Urj/6Uv7VdtM+yoH7C0DSsGkKrZJsfOhog3uYzRV
-	Kolrc5ZfmqkyT8TOXZll5Fe9p88LnOa+7QdJNsG69DX1P3mVF/jiMY1id8+JJw==
-Date: Thu, 16 Oct 2025 10:44:34 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
- <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Alexis =?UTF-8?B?TG90aG9yw6k=?=
- <alexis.lothore@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/3] net: ethtool: tsconfig: Re-configure
- hwtstamp upon provider change
-Message-ID: <20251016104338.6677e807@kmaincent-XPS-13-7390>
-In-Reply-To: <731e8fa7-465b-4470-9036-c59fea602c07@bootlin.com>
-References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
-	<20251015102725.1297985-4-maxime.chevallier@bootlin.com>
-	<20251015144526.23e55ee0@kmaincent-XPS-13-7390>
-	<731e8fa7-465b-4470-9036-c59fea602c07@bootlin.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1760604439; c=relaxed/simple;
+	bh=lxdA3Rgx7Td+RdMxZKNp62JHMDC6fzh4XBD0nugmcMM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=or7hzbo+C/Ki50JqTtIRsR55ZXNCuw0IiRLlFm/6o3e+/WtYHu0K3AcJSxcDEtq/Hvn7rFQiNW2G9aimOfGMLN8Wj2oy5kNvKYDt9I5yOCf1i6moqLHgUkgCHEdeQM4GdhSXnZ3vQYjtqlGTi6pEuWNfuCNYIF1mrxn7sXBxN84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Zi4/jLJp; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760604437; x=1792140437;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=lxdA3Rgx7Td+RdMxZKNp62JHMDC6fzh4XBD0nugmcMM=;
+  b=Zi4/jLJpeC5fiCvnJI9WmFwsTtb64fTcZEEMrDr8EWJfTDhfMIQBovDy
+   b47OMf/QQd+1kRLKJ3Mf9O5XHT0vTXzQbijDSg96K4PMUaMep+M5J2WSP
+   0ijew0TDJc2kgMJawi2fDCk49GoNnabDVDxJH64xaeDv5tGCzxz9sGVl8
+   Nun9cr4UlYfOHF3n/swYB/fCItZvHc/dTrGWnob8e8AeiiqH1RaTLnimS
+   X3AtjWXDGcM0pVJIzivyA9drDbbhAydyERSHXcKLoszl/yTKqzPQ8J5nq
+   XOGPTme9zV2jYFH789mCWEIbYO7WR2kRU7LluOvgqKm5Slz2Byyd1fq0c
+   w==;
+X-CSE-ConnectionGUID: 9cfN/VWESlS0a3xOh0wiPQ==
+X-CSE-MsgGUID: +gJlzxBNSym1/4PoqqqsrQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="62830856"
+X-IronPort-AV: E=Sophos;i="6.19,233,1754982000"; 
+   d="scan'208";a="62830856"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2025 01:47:16 -0700
+X-CSE-ConnectionGUID: REPZIiNWSpyxMa0BM5z8hw==
+X-CSE-MsgGUID: ufQTNyFPQyiqgYO2hlfmTg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,233,1754982000"; 
+   d="scan'208";a="186669244"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2025 01:47:15 -0700
+Date: Thu, 16 Oct 2025 10:45:19 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1] ice: lower default
+ irq/queue counts on high-core systems
+Message-ID: <aPCwn1jZDl+7+F1i@mev-dev.igk.intel.com>
+References: <20251016062250.1461903-1-michal.swiatkowski@linux.intel.com>
+ <d6a90d0d-55f9-467a-b414-5ced78d12c54@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d6a90d0d-55f9-467a-b414-5ced78d12c54@molgen.mpg.de>
 
-On Thu, 16 Oct 2025 10:01:53 +0200
-Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+On Thu, Oct 16, 2025 at 09:44:43AM +0200, Paul Menzel wrote:
+> Dear Michal,
+> 
+> 
+> Thank you for the patch. I’d mention the 64 in the summary:
+> 
 
-> Hi K=C3=B6ry,
->=20
-> On 15/10/2025 14:45, Kory Maincent wrote:
-> > On Wed, 15 Oct 2025 12:27:23 +0200
-> > Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
-> >  =20
-> >> When a hwprov timestamping source is changed, but without updating the
-> >> timestamping parameters, we may want to reconfigure the timestamping
-> >> source to enable the new provider.
-> >>
-> >> This is especially important if the same HW unit implements 2 provider=
-s,
-> >> a precise and an approx one. In this case, we need to make sure we call
-> >> the hwtstamp_set operation for the newly selected provider. =20
-> >=20
-> > This is a design choice.
-> > Do we want to preserve the hwtstamp config if only the hwtstamp source =
-is
-> > changed from ethtool?
-> > If we want to configure the new source to the old source config we will=
- also
-> > need to remove this condition:
-> > https://elixir.bootlin.com/linux/v6.17.1/source/net/ethtool/tsconfig.c#=
-L339
-> > =20
->=20
-> What I get from the ethtool output is that the ts config is per-source.
-> Re-applying the old config to the new source may not work if the new one
-> doesn't have the same capabilities.
->=20
-> >=20
-> > I do not really have a strong opinion on this, let's discuss which beha=
-vior
-> > we prefer. =20
->=20
-> Well if we want to support different timestamp providers provided by the =
-same
-> HW block (same MAC or even same PHY), then we need a way to notify the
-> provider when the timestamp provider gets selected and unselected.
->=20
-> Otherwise there's no way for the provider to know it has been re-enabled,
-> unless we perform a config change at the same time.
+Sure, I will add it.
 
-Oh right, indeed, we need a call to ndo_hwtstamp_set to tell the provider to
-change the qualifier configured. I missed that.
-This could even be a fix but as it is used nowhere it won't fix anything.
+> > ice: lower default irq/queue counts to 64 on > 64 core systems
+> 
+> 
+> Am 16.10.25 um 08:22 schrieb Michal Swiatkowski:
+> > On some high-core systems loading ice driver with default values can
+> > lead to queue/irq exhaustion. It will result in no additional resources
+> > for SR-IOV.
+> > 
+> > In most cases there is no performance reason for more than 64 queues.
+> > Limit the default value to 64. Still, using ethtool the number of
+> > queues can be changed up to num_online_cpus().
+> > 
+> > This change affects only the default queue amount on systems with more
+> > than 64 cores.
+> 
+> Please document a specific system and steps to reproduce the issue.
+> 
+> Please also document how to override the value.
 
-Acked-by: Kory Maincent <kory.maincent@bootlin.com>
+Ok, will add.
 
-Thank you!
+> 
+> > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> > ---
+> >   drivers/net/ethernet/intel/ice/ice.h     | 20 ++++++++++++++++++++
+> >   drivers/net/ethernet/intel/ice/ice_irq.c |  6 ++++--
+> >   drivers/net/ethernet/intel/ice/ice_lib.c |  8 ++++----
+> >   3 files changed, 28 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+> > index 3d4d8b88631b..354ec2950ff3 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice.h
+> > +++ b/drivers/net/ethernet/intel/ice/ice.h
+> > @@ -1133,4 +1133,24 @@ static inline struct ice_hw *ice_get_primary_hw(struct ice_pf *pf)
+> >   	else
+> >   		return &pf->adapter->ctrl_pf->hw;
+> >   }
+> > +
+> > +/**
+> > + * ice_capped_num_cpus - normalize the number of CPUs to a reasonable limit
+> > + *
+> > + * This function returns the number of online CPUs, but caps it at suitable
+> > + * default to prevent excessive resource allocation on systems with very high
+> > + * CPU counts.
+> > + *
+> > + * Note: suitable default is currently at 64, which is reflected in default_cpus
+> > + * constant. In most cases there is no much benefit for more than 64 and it is a
+> 
+> no*t* much
+>
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Will fix
+
+> > + * power of 2 number.
+> > + *
+> > + * Return: number of online CPUs, capped at suitable default.
+> > + */
+> > +static inline u16 ice_capped_num_cpus(void)
+> 
+> Why not return `unsigned int` or `size_t`?
+>
+
+Just because u16 is used for queue counts, but I can go with unsigned
+int, makes more sense as num_online_cpus() is returning unsigned int.
+
+> > +{
+> > +	const int default_cpus = 64;
+> > +
+> > +	return min(num_online_cpus(), default_cpus);
+> > +}
+> >   #endif /* _ICE_H_ */
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
+> > index 30801fd375f0..df4d847ca858 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_irq.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_irq.c
+> > @@ -106,9 +106,11 @@ static struct ice_irq_entry *ice_get_irq_res(struct ice_pf *pf,
+> >   #define ICE_RDMA_AEQ_MSIX 1
+> >   static int ice_get_default_msix_amount(struct ice_pf *pf)
+> >   {
+> > -	return ICE_MIN_LAN_OICR_MSIX + num_online_cpus() +
+> > +	u16 cpus = ice_capped_num_cpus();
+> > +
+> > +	return ICE_MIN_LAN_OICR_MSIX + cpus +
+> >   	       (test_bit(ICE_FLAG_FD_ENA, pf->flags) ? ICE_FDIR_MSIX : 0) +
+> > -	       (ice_is_rdma_ena(pf) ? num_online_cpus() + ICE_RDMA_AEQ_MSIX : 0);
+> > +	       (ice_is_rdma_ena(pf) ? cpus + ICE_RDMA_AEQ_MSIX : 0);
+> >   }
+> >   /**
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+> > index bac481e8140d..3c5f8a4b6c6d 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_lib.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+> > @@ -159,12 +159,12 @@ static void ice_vsi_set_num_desc(struct ice_vsi *vsi)
+> >   static u16 ice_get_rxq_count(struct ice_pf *pf)
+> >   {
+> > -	return min(ice_get_avail_rxq_count(pf), num_online_cpus());
+> > +	return min(ice_get_avail_rxq_count(pf), ice_capped_num_cpus());
+> >   }
+> >   static u16 ice_get_txq_count(struct ice_pf *pf)
+> >   {
+> > -	return min(ice_get_avail_txq_count(pf), num_online_cpus());
+> > +	return min(ice_get_avail_txq_count(pf), ice_capped_num_cpus());
+> >   }
+> >   /**
+> > @@ -907,13 +907,13 @@ static void ice_vsi_set_rss_params(struct ice_vsi *vsi)
+> >   		if (vsi->type == ICE_VSI_CHNL)
+> >   			vsi->rss_size = min_t(u16, vsi->num_rxq, max_rss_size);
+> >   		else
+> > -			vsi->rss_size = min_t(u16, num_online_cpus(),
+> > +			vsi->rss_size = min_t(u16, ice_capped_num_cpus(),
+> >   					      max_rss_size);
+> >   		vsi->rss_lut_type = ICE_LUT_PF;
+> >   		break;
+> >   	case ICE_VSI_SF:
+> >   		vsi->rss_table_size = ICE_LUT_VSI_SIZE;
+> > -		vsi->rss_size = min_t(u16, num_online_cpus(), max_rss_size);
+> > +		vsi->rss_size = min_t(u16, ice_capped_num_cpus(), max_rss_size);
+> >   		vsi->rss_lut_type = ICE_LUT_VSI;
+> >   		break;
+> >   	case ICE_VSI_VF:
+> 
+> With the changes addressed, feel free to add:
+> 
+> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> 
+
+Thanks
+
+> 
+> Kind regards,
+> 
+> Paul
 
