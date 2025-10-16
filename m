@@ -1,93 +1,76 @@
-Return-Path: <netdev+bounces-230243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC37BE5B8D
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 00:51:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8489FBE5B99
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 00:52:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 469D4188374C
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 22:51:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E61640093A
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 22:51:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 668DF2E8DF4;
-	Thu, 16 Oct 2025 22:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C0642E36E1;
+	Thu, 16 Oct 2025 22:51:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FWZtRiwc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ou5GOCLj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425D02E8DE5
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 22:50:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D798834;
+	Thu, 16 Oct 2025 22:51:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760655038; cv=none; b=b3QgeOjbAz0rKYxGcwfo89uqX1Mu6bZxKSNOHwzjDICg8D6BzPnqwb/G3aESG1e8Vwo8kqxlCPvsvWDR7wNOv+MmdM1z5ZIjHJ/neXrZrOctLcdUFyzUtb5a7733WQgh/FIqWMjtA4FBpl98uzbmG7zvtU1wYa6tIPHmiqiSYyE=
+	t=1760655112; cv=none; b=GWFXbX2xGgLbLl1ZvSrygej0fgnLUor9kTxQ5RNsoTbPfMr24tw173b8Kw6GBaknL4DA4FCxvHtQOAz549U5ZVWFQKDyLr/kWAxpilS7D71I2fLGghwlXYQ/1QvMjWiBbTksnQAhK4CF5qVDhV786N4QoN/zusBC7z+/OB3cUXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760655038; c=relaxed/simple;
-	bh=N7OTCWj0j2gzufZF89WLD79cP37N22sZyinYxRQamV0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nuj8WT5GMAqIYu+PUKra2yl2GF61Bu67aFEth5VIsQ2thJWRXDgubOrsRHVuL5+8XFyGDVfpcMlIWWCepFXYCgfPLrEuFZmCp/h3PbhUGBVxUdGsZPsaz10K8mFmkrmA74TU1KpcvIstevxlmfOoUmOWvD+LIF4SImXCrhskgUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FWZtRiwc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D63FAC4CEF1;
-	Thu, 16 Oct 2025 22:50:36 +0000 (UTC)
+	s=arc-20240116; t=1760655112; c=relaxed/simple;
+	bh=czlyT27p1N4zgXNRMyPM6mkYeIe0/ofkhpebLmY81Yc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Pu+DWWEf6143bi9qSGkn0peo14/l3V/rNy6MS+QYRuizbJ5XDJmM7eB1lzr4kU7V5qHkJ2GJFNVikES4H1zhRlIa88fXcy3qogskXVpPa5VM95hODnZYTjK7ehfTU18gcV+rov9EcTCP8x74Bo6NkwhPOQuj7p/Mx5sQFFHxWyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ou5GOCLj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4564DC4CEF1;
+	Thu, 16 Oct 2025 22:51:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760655036;
-	bh=N7OTCWj0j2gzufZF89WLD79cP37N22sZyinYxRQamV0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FWZtRiwcHWDRBDNZmvp8H/54mOkAqu0pKosaUd1xOPGn3KyDPDNzk/eHLhXDK359t
-	 +QGnKeXUrwb05n/N8eNGfRuil+PBJVJAliI+J7DDwcGgZfhFj27PJ/adGPT5DjaoLb
-	 xhHmAUKb0k/TkFWaVp0XJolWBLt/pYm/NVAfnRe4J7l4DfySJILSt0Rh7K9ev7X6h3
-	 IaPeWAUIl6t+mEaWu58WrpnuQKhGE7IaCYTBAeO/hDbnrSt/BHoqthRFOA5wnnDe11
-	 IoSvpf3z8cu9qjhgxDTTC5bRPLmmteA+VqoVvqlUjw8+FHugeNOX8r+Pu5eDLQ+8zN
-	 UuSilLT3VAing==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E7C39D0C23;
-	Thu, 16 Oct 2025 22:50:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1760655111;
+	bh=czlyT27p1N4zgXNRMyPM6mkYeIe0/ofkhpebLmY81Yc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ou5GOCLjNvny7NfsUYQB98oU/oZoszL9irMyTizhziPIrfgmb4AiA1DNAlS2kTfBl
+	 RC8a1yJOM5uG9XtHnOY/Ks5RrkgWT4UvYH6ZnPK3RpJ6nmHLBD9QcdOP82dzXT1MGE
+	 lRdswwEFhRc328eVGolbJPHGGZNz3IJXRpgxkRV6QuSeJPOB5YvbIqsrOuvEjsWN/t
+	 mQtp+7KNEfNMWAEOz8KAvtaQmXvNY9Q7jiGt50lNdcXhNYalgdvheZruypa1xG1beA
+	 cbqrFL57qljspALnjXKVKQD6R8LmppEvQeSMBXTYinWiVGNsOqBhSMAWkbO3UZqzJF
+	 3npQTXFQnuqeQ==
+Date: Thu, 16 Oct 2025 15:51:50 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux
+ Documentation <linux-doc@vger.kernel.org>, Linux Networking
+ <netdev@vger.kernel.org>, Subash Abhinov Kasiviswanathan
+ <subash.a.kasiviswanathan@oss.qualcomm.com>, Sean Tranchetti
+ <sean.tranchetti@oss.qualcomm.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Sharath Chandra Vurukala <quic_sharathv@quicinc.com>
+Subject: Re: [PATCH net] net: rmnet: Fix checksum offload header v5 and
+ aggregation packet formatting
+Message-ID: <20251016155150.3bc5e351@kernel.org>
+In-Reply-To: <20251015092540.32282-2-bagasdotme@gmail.com>
+References: <20251015092540.32282-2-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] netdevsim: add ipsec hw_features
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176065502075.1934842.8405691575194373905.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Oct 2025 22:50:20 +0000
-References: <20251015083649.54744-1-liuhangbin@gmail.com>
-In-Reply-To: <20251015083649.54744-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- sd@queasysnail.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 15 Oct 2025 16:25:41 +0700 Bagas Sanjaya wrote:
+> Fixes: 710b797cf61b ("docs: networking: Add documentation for MAPv5")
+> Fixes: ceed73a2cf4a ("drivers: net: ethernet: qualcomm: rmnet: Initial implementation")
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 15 Oct 2025 08:36:49 +0000 you wrote:
-> Currently, netdevsim only sets dev->features, which makes the ESP features
-> fixed. For example:
-> 
->   # ethtool -k eni0np1 | grep esp
->   tx-esp-segmentation: on [fixed]
->   esp-hw-offload: on [fixed]
->   esp-tx-csum-hw-offload: on [fixed]
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] netdevsim: add ipsec hw_features
-    https://git.kernel.org/netdev/net-next/c/38c31c2620de
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Please don't add Fixes tags to markup improvements.
+The patch is probably fine for net but there's no need for the extra
+tags.
 
