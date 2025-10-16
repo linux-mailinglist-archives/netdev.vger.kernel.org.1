@@ -1,139 +1,101 @@
-Return-Path: <netdev+bounces-230221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 498C4BE56EA
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 22:46:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4C07BE56F3
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 22:46:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6B5694E7849
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 20:46:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24EE454619B
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 20:46:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95652E1C7E;
-	Thu, 16 Oct 2025 20:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19BA42E229E;
+	Thu, 16 Oct 2025 20:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dto6BePv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SwtH2XYz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E062E093E
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 20:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4371A2DE1E6
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 20:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760647551; cv=none; b=sE6faJwhlXwpUABHTDya7AP6KwS6QXDLR9EMeQ1l/ZFWcfi7Y61mAdg8KSZlJIh/7F0S8B8dteB4tzkR6AycgnJ2wy377i4oPDOjELRUHbnFP61YmAc38TogmQ0A3YPMm8CA8y0Wfi9ltGtcB9aLEKh6pqam2BBDcOr7FvKuQ5s=
+	t=1760647558; cv=none; b=TZKrUaaMUxTdd+yWxNWamcJau3sXvMacWgk+9LrS8F3Hq4Mvl9Qha8dGRUR9efOEBrAOqHehiYpTRX9BOY9lTOKUKhXwbSYxfw74YX14z2/oh36dZM11UplCEYpBniYUvINjKXN70fnjE/5p0KaQ1j5ReEYpZWxwOyFWQTC7PBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760647551; c=relaxed/simple;
-	bh=uPiRufTru4Cw/BXb7fyHHt8/LdAZGFCJrYCPL6AZsdw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Cn0Okyqy/sR6VuN/YpUs9vClMYIjOE+boGWkJSGEhsuv6TYFVTaGIBK5UvovOuN6zzsDzCmLO6HvuYws87ustyNlrVcur5N7vq5HIu5LHhshOgom2JFnpXkMyPn0w3PRe4fb8CcJ3T7TK52qptPi2TcP57rhKA+T/Bq015CJbqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dto6BePv; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760647547;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=yfSLM4BxLDXSTtvggk83X6KgpFlWpsImSmzLOrT8U4Y=;
-	b=dto6BePvR8fqsRREiZ5Qa05uSFWN0dxq7OkFTV9b+Dfyz0r5aFW1LwBiZg11mgYK8f5J4/
-	MEkhj7cFnJyoH/tDEwDZYwnLhFP5JXJJBwWEnniHQ9K5gT9Kcp4v2e2jF8uhhwwQav8s+r
-	w4CmC7FUw9CxsofiJnvZsuhQbHGGXqA=
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf-next 2025-10-16
-Date: Thu, 16 Oct 2025 13:45:39 -0700
-Message-ID: <20251016204539.773707-1-martin.lau@linux.dev>
+	s=arc-20240116; t=1760647558; c=relaxed/simple;
+	bh=ZieYExJ/Oj8QxmXz8/4mIiRF7Gv5EAYzRAE0qNr7sJc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B8qeLJAbIuprV70fXWcmrapjFCg7imqTMp1nC745N+auUmlIEKoPF0r2CoDNounp6B+Loy7oIia+RdtWpXuuMIU8hRDgBtQFdqaw0piF4MFptJV1ZwcZ+zQr8dRVWq38XsYvJuYLrnusPE4yOQLnfFlsu8P1A1sj9qw4akUN21I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SwtH2XYz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=LkfuaH31ia/KSOz4kEtnYol5VLG46wUi+LyNJD2+4Qk=; b=Sw
+	tH2XYzAQ9gE5NRIxdn1S2YVPs1Tg6nzs0LLvRQiK6QWOUcoF6sQPwdQV0prpHy+Myw5YkQEAff9u1
+	ACYgdZziIe/XOPwbJFq7JdTIypJqnMjmcagLCNdorJFXJHjrpfTGcWFSRjwCc5OMhBoAatH2IBfoL
+	g1f+DeFi7QRgKJE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v9UrC-00BCnt-29; Thu, 16 Oct 2025 22:45:54 +0200
+Date: Thu, 16 Oct 2025 22:45:54 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: Netdev <netdev@vger.kernel.org>
+Subject: Re: Build commit for Patchwork?
+Message-ID: <36bdcfd5-3388-4a6e-80fc-f05bfe0d6a03@lunn.ch>
+References: <CAGXJAmwrPr46Ju-ZiLa7prnNFAcGr7Hu-vpk1B6-Q9Ks8fu8wQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <CAGXJAmwrPr46Ju-ZiLa7prnNFAcGr7Hu-vpk1B6-Q9Ks8fu8wQ@mail.gmail.com>
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+On Thu, Oct 16, 2025 at 09:07:09AM -0700, John Ousterhout wrote:
+> Is there a way to tell which commit Patchwork uses for its builds?
+> 
+> Patchwork builds are generating this error:
+> 
+> ‘struct flowi_common’ has no member named ‘flowic_tos’; did you mean
+> ‘flowic_oif’?
 
-The following pull-request contains BPF updates for your *net-next* tree.
+commit 1bec9d0c0046fe4e2bfb6a1c5aadcb5d56cdb0fb
+Author: Guillaume Nault <gnault@redhat.com>
+Date:   Mon Aug 25 15:37:43 2025 +0200
 
-We've added 6 non-merge commits during the last 1 day(s) which contain
-a total of 18 files changed, 577 insertions(+), 38 deletions(-).
+    ipv4: Convert ->flowi4_tos to dscp_t.
 
-The main changes are:
+diff --git a/include/net/flow.h b/include/net/flow.h
+index a1839c278d87..ae9481c40063 100644
+--- a/include/net/flow.h
++++ b/include/net/flow.h
+@@ -12,6 +12,7 @@
+ #include <linux/atomic.h>
+ #include <linux/container_of.h>
+ #include <linux/uidgid.h>
++#include <net/inet_dscp.h>
+ 
+ struct flow_keys;
+ 
+@@ -32,7 +33,7 @@ struct flowi_common {
+        int     flowic_iif;
+        int     flowic_l3mdev;
+        __u32   flowic_mark;
+-       __u8    flowic_tos;
++       dscp_t  flowic_dscp;
+        __u8    flowic_scope;
+        __u8    flowic_proto;
+        __u8    flowic_flags;
 
-1) Bypass the global per-protocol memory accounting either by setting
-   a netns sysctl or using bpf_setsockopt in a bpf program,
-   from Kuniyuki Iwashima.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Eric Dumazet, Roman Gushchin, Shakeel Butt
-
-----------------------------------------------------------------
-
-The following changes since commit 55db64ddd6a12c5157a61419a11a18fc727e8286:
-
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-10-16 11:06:28 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-for you to fetch changes up to 03de843bd0806184505f1e8099ff4ca9a8665dbb:
-
-  Merge branch 'bpf-allow-opt-out-from-sk-sk_prot-memory_allocated' (2025-10-16 12:15:10 -0700)
-
-----------------------------------------------------------------
-bpf-next-for-netdev
-
-----------------------------------------------------------------
-Kuniyuki Iwashima (6):
-      tcp: Save lock_sock() for memcg in inet_csk_accept().
-      net: Allow opt-out from global protocol memory accounting.
-      net: Introduce net.core.bypass_prot_mem sysctl.
-      bpf: Support bpf_setsockopt() for BPF_CGROUP_INET_SOCK_CREATE.
-      bpf: Introduce SK_BPF_BYPASS_PROT_MEM.
-      selftests/bpf: Add test for sk->sk_bypass_prot_mem.
-
-Martin KaFai Lau (1):
-      Merge branch 'bpf-allow-opt-out-from-sk-sk_prot-memory_allocated'
-
- Documentation/admin-guide/sysctl/net.rst           |   8 +
- include/net/netns/core.h                           |   1 +
- include/net/proto_memory.h                         |   3 +
- include/net/sock.h                                 |   3 +
- include/net/tcp.h                                  |   3 +
- include/uapi/linux/bpf.h                           |   2 +
- net/core/filter.c                                  |  85 ++++++
- net/core/sock.c                                    |  37 ++-
- net/core/sysctl_net_core.c                         |   9 +
- net/ipv4/af_inet.c                                 |  22 ++
- net/ipv4/inet_connection_sock.c                    |  25 --
- net/ipv4/tcp.c                                     |   3 +-
- net/ipv4/tcp_output.c                              |   7 +-
- net/mptcp/protocol.c                               |   7 +-
- net/tls/tls_device.c                               |   3 +-
- tools/include/uapi/linux/bpf.h                     |   1 +
- .../selftests/bpf/prog_tests/sk_bypass_prot_mem.c  | 292 +++++++++++++++++++++
- .../selftests/bpf/progs/sk_bypass_prot_mem.c       | 104 ++++++++
- 18 files changed, 577 insertions(+), 38 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_bypass_prot_mem.c
- create mode 100644 tools/testing/selftests/bpf/progs/sk_bypass_prot_mem.c
+Andrew
 
