@@ -1,169 +1,223 @@
-Return-Path: <netdev+bounces-230045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C6E1BE3323
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:55:38 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35FBCBE3329
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:56:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB18C1A6240F
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:56:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7BEE04FD998
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58DF831B800;
-	Thu, 16 Oct 2025 11:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C84D031AF00;
+	Thu, 16 Oct 2025 11:55:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="CxFPCAnE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W5+IHYbB"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D65C63161B9;
-	Thu, 16 Oct 2025 11:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FEE31D750
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:55:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760615734; cv=none; b=k4YA9tsRZCe47ZALce6Louu/VZHdoW2eIPtHK1MKYGfE1LHZXD4ZdSPRcz1jhbYt5a7Qt7d9OETx0CMrcI3+JUIpCxoxYzEfBRcb0DCaP89BfOLAcU8kunT9C4g7wXEZ+6bff8lwRcG1Kduz/ewXDi6CtYLTX886Dc5GiS8yKEA=
+	t=1760615737; cv=none; b=RhaM+jKDvGyZO9kebMCkwRHm+Zm94hleBAYQ9uNSvVVBUjYMlycEa8mT5wsVNyFvVW27lbDdaZh8yiZ+IifBiJxtrANn6yKX3NrCni8DALf7Yoz5Jil3v0FSoBZHIOKA73Pn40aao9MRr4lQmGQ+XNgIFCbPJKrhwQ5BqwGIAWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760615734; c=relaxed/simple;
-	bh=xTGD7ktb+E68vu2taqUt2m9ubpD6pFOo3Uxps+bU6ME=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=oPQDJ6DZvjCYWOeX7YFnCxYUjiQARkDTxCPVmDetQBBW249ce6xndzbzfi2EDa3BqjF2ofXLTfLwfu9bZ0qI/emuVCCBBZhbFjGbkTZHqVKZ8IcfrZLEnQW46tgzfAXZWTDeT5Npfs8Gqk0vQB1x9mZQNN8pCTtIhtQovc1SxPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=CxFPCAnE; arc=none smtp.client-ip=162.240.164.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=JdJWyTw5grIca2C49Gc8SShAY81xl1ZxjBDpB/TgceY=; b=CxFPCAnEfus2DAQGC/F0bO5d4C
-	kLTklHkcWcVnvjybleV9p64RbrYZdQFzdDopV8SWnlFMURdQ+kLJVkG3CCo88/fmPtKYEJCRetPP2
-	x3D291Gwuuy+wO6MzV/rFM8lrn+cR8xXn+rWp5dy9ib7ltgJFjD9ojLF3xGnA0H5Vnd2xx9NgfAzN
-	1CRiAstPPcaL5okfp9H4Zc1Gm+LmQx/a0frpnREyqRJ+sdIKSJZfTuUFYze9n8lGWCf23frw1SAEX
-	9HLigBvQkTAhbvLbYJtz9Hkn09mLzS6sYr+oQNAq/9zualqofN/BAq3JyLtqIMr5qfQtr0PI/0HGd
-	6h1M1VXQ==;
-Received: from [122.175.9.182] (port=2029 helo=zimbra.couthit.local)
-	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1v9MZu-000000079dC-1oBn;
-	Thu, 16 Oct 2025 07:55:30 -0400
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id C240E1783FF9;
-	Thu, 16 Oct 2025 17:25:26 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id B466E1783FF4;
-	Thu, 16 Oct 2025 17:25:26 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id uJODz3yCZt52; Thu, 16 Oct 2025 17:25:26 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 8BA601781E1F;
-	Thu, 16 Oct 2025 17:25:26 +0530 (IST)
-Date: Thu, 16 Oct 2025 17:25:26 +0530 (IST)
-From: Parvathi Pudi <parvathi@couthit.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: parvathi <parvathi@couthit.com>, andrew+netdev <andrew+netdev@lunn.ch>, 
-	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
-	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
-	danishanwar <danishanwar@ti.com>, rogerq <rogerq@kernel.org>, 
-	pmohan <pmohan@couthit.com>, basharath <basharath@couthit.com>, 
-	afd <afd@ti.com>, linux-kernel <linux-kernel@vger.kernel.org>, 
-	netdev <netdev@vger.kernel.org>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, mohan <mohan@couthit.com>
-Message-ID: <179725937.1046.1760615726437.JavaMail.zimbra@couthit.local>
-In-Reply-To: <ce87a72f-09b3-4615-aab9-2be8648300f8@lunn.ch>
-References: <20251014124018.1596900-1-parvathi@couthit.com> <20251014124018.1596900-3-parvathi@couthit.com> <ce87a72f-09b3-4615-aab9-2be8648300f8@lunn.ch>
-Subject: Re: [PATCH net-next v3 2/3] net: ti: icssm-prueth: Adds switchdev
- support for icssm_prueth driver
+	s=arc-20240116; t=1760615737; c=relaxed/simple;
+	bh=hrzBevGI2V8cXk5mM1ZATfIXbjxQDSWKksrIj5K6CpQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k3qJHL8odPAG41aUHnbEhCkctDuzmqHRWeKDKdhQS6m+7DaJZLGvh1rClPBc4yiTvAy+KuX2Yg2nrpR38JnG3h9F9KK66U26P0iGMH5LKabHY0BMA/a7JB6/KPKNlSDY6xilm2CfOB1d09Q1oNvk6qv8wq+/7aZz24x9cYmD8h8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W5+IHYbB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760615734;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VSDUFbM8yXxNZBt3wDoru1ZHsWQiovuW9TQzy7dwzjc=;
+	b=W5+IHYbBz7qabjuJ9HWrrQyuedmW0cS6NGZS2im1DacAwM0hTYY6j0n8CRvVtk16Gkcdpf
+	Hin6gs3tg1KZBdpyxgrZuEcddrg0ksaTLKX+eoZNuq7lawPRlE1JnJ5dh7p4dzJ5FbWpju
+	qjdGDJAoOOZMCpK5w3pPYpfmXCFs8EM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-418-aH4QSmLmOpSjDjz_555w4A-1; Thu, 16 Oct 2025 07:55:33 -0400
+X-MC-Unique: aH4QSmLmOpSjDjz_555w4A-1
+X-Mimecast-MFC-AGG-ID: aH4QSmLmOpSjDjz_555w4A_1760615732
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47113dfdd20so2045625e9.1
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 04:55:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760615732; x=1761220532;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VSDUFbM8yXxNZBt3wDoru1ZHsWQiovuW9TQzy7dwzjc=;
+        b=qC6e3r1Lx+jGaycU36TFPo9+aR1wl8f8Xmj69DYlIQ6SsYkpEsLqJPdeUzB/sqApl7
+         ViaXY7AmzrSyz0ctiVfTp2kV62F2aOBhVeAsN8/I6Z7WtpGqdanhNPZif+HQvg2W+qHn
+         r7xMRhwNckveAkxng16bUw9BWAN7U41x20cC85QVllM2k/ZgBvvcRQFwpyCPat60fI5N
+         ZjJM5KllrvXmto+YrF2f9SKbWZUybPEYVnn6U7hiZV6w7DlsbqIoFUr/SzxFf+rTEltU
+         o3Nj2Vei9Z0o9+gedY3KlKN73xg6Dv4DP5ojzP7WDLr6Nl36UpEFcYrAEkGKfQ1pnLGz
+         xjbA==
+X-Forwarded-Encrypted: i=1; AJvYcCW6daT8mb+DXCSIb7Wxj7TOnQLlJrUaFOG0AeZzj2yypmfMf7OumLoJNNf0m83xfZ/EzsviL0I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgbFIQLaTnfQMdDeUUyN6Ve0qw2OE4uHhJ/bALM+j6M5oWcGGA
+	oFQCYurVDS8xwAuJ5lSB8APSErR3XFeQWUvvPZFra9/z5tMX+vBAHMWG060uvxa0cngECvNLIDi
+	Cx8yq/9MUM1kLrwhsq4gJb5TXSNO08Wakx7YAZ2ifc2iruOOUYm1lnFBWJA==
+X-Gm-Gg: ASbGncvq9ItGQrMIORvH4Um6XkmPdeEqrHUiENymohB9rWeXA1FujGde+rJA6BHUyPw
+	779O8blj1GelMhMKC7J1Og8bWijR1uRBqDTpI4hileT6K9oNc26t8F3r9IcY8EgP1p3G/viaZB7
+	c4tEb2mDXgeLtTQVsqP7I8uujqE6L7s+nxsAPCWD6hGKIUjqbVz2oovkKkCSzySrkAnXXsGXlhK
+	lPme3yAw/PFjdidoN69km15HXqneUJxCrsmrZUvA8su2eCyV3yogdlIUNqHn8jFQsCZpACiWGp6
+	j0xDHmct3XxnmqQpYCXx3ckcargqtAZ5oFXPS2LUCMNIljuASzV8gbSP66XpgUJn52k/oyVXw4Q
+	+ABcvCem5BagZ6kcefPfLDSgxhcMpKY2C17oaMkLOoDEtVtw=
+X-Received: by 2002:a05:600c:83c4:b0:471:115e:9605 with SMTP id 5b1f17b1804b1-471115e97femr15548825e9.35.1760615732124;
+        Thu, 16 Oct 2025 04:55:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFYQS+Wuzfm2CCDR+is3NYQRs4ImSIzDC37O6I1x1Ld7NV4rpbiuCks0ldhl7YWwsyGtFl19g==
+X-Received: by 2002:a05:600c:83c4:b0:471:115e:9605 with SMTP id 5b1f17b1804b1-471115e97femr15548625e9.35.1760615731679;
+        Thu, 16 Oct 2025 04:55:31 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4710cb36e7csm21235405e9.2.2025.10.16.04.55.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Oct 2025 04:55:31 -0700 (PDT)
+Message-ID: <f439b8c4-8f2c-49eb-b670-2b2344d3d6ad@redhat.com>
+Date: Thu, 16 Oct 2025 13:55:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v13 7/7] bonding: Selftest and documentation for
+ the arp_ip_target parameter.
+To: David Wilder <wilder@us.ibm.com>, netdev@vger.kernel.org
+Cc: jv@jvosburgh.net, pradeep@us.ibm.com, i.maximets@ovn.org,
+ amorenoz@redhat.com, haliu@redhat.com, stephen@networkplumber.org,
+ horms@kernel.org, kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
+References: <20251013235328.1289410-1-wilder@us.ibm.com>
+ <20251013235328.1289410-8-wilder@us.ibm.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251013235328.1289410-8-wilder@us.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - GC138 (Linux)/8.8.15_GA_3968)
-Thread-Topic: icssm-prueth: Adds switchdev support for icssm_prueth driver
-Thread-Index: wPaVLJ+dDJYcM1dgRjkmeX50UJ4mnA==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.couthit.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
 
-Hi,
+On 10/14/25 1:52 AM, David Wilder wrote:
+> +# Build stacked vlans on top of an interface.
+> +stack_vlans()
+> +{
+> +    RET=0
+> +    local interface="$1"
+> +    local ns=$2
+> +    local last="$interface"
+> +    local tags="10 20"
+> +
+> +    if ! ip -n "${ns}" link show "${interface}" > /dev/null; then
+> +        RET=1
+> +        msg="Failed to create ${interface}"
+> +        return 1
+> +    fi
+> +
+> +    if [ "$ns" == "${s_ns}" ]; then host=1; else host=10;fi
+> +
+> +    for tag in $tags; do
+> +        ip -n "${ns}" link add link "$last" name "$last"."$tag" type vlan id "$tag"
+> +        ip -n "${ns}" address add 192."$tag".2."$host"/24 dev "$last"."$tag"
+> +        ip -n "${ns}" link set up dev "$last"."$tag"
+> +        last=$last.$tag
+> +    done
+> +}
+> +
+> +wait_for_arp_request()
+> +{
+> +	local target=$1
 
->> +static struct prueth_fw_offsets fw_offsets_v2_1;
->> +
->> +static void icssm_prueth_set_fw_offsets(struct prueth *prueth)
->> +{
->> +	/* Set VLAN/Multicast filter control and table offsets */
->> +	if (PRUETH_IS_EMAC(prueth)) {
->> +		prueth->fw_offsets->mc_ctrl_byte  =
->> +			ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_OFFSET;
->> +		prueth->fw_offsets->mc_filter_mask =
->> +			ICSS_EMAC_FW_MULTICAST_FILTER_MASK_OFFSET;
->> +		prueth->fw_offsets->mc_filter_tbl =
->> +			ICSS_EMAC_FW_MULTICAST_FILTER_TABLE;
-> 
-> I know for some of these SoCs, there can be multiple instances of the
-> hardware blocks. It looks like that will go wrong here, because there
-> is only one fw_offsets_v2_1 ?
-> 
-> Humm, actually, if this are constant, why have fw_offsets_v2_1? Just
-> use ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_OFFSET directly?
-> 
+The indentation is inconsistent. Please always use a single tab.
 
-Sure we will evaluate this and address in the next version.
+> +	local ip
+> +	local interface
+> +
+> +	ip=$(echo "${target}" | awk -F "[" '{print $1}')
+> +	interface="$(ip -n "${c_ns}" -br addr show | grep "${ip}" | awk -F @ '{print $1}')"
+> +
+> +	tc -n "${c_ns}" qdisc add dev "${interface}" clsact
+> +	tc -n "${c_ns}" filter add dev "${interface}" ingress protocol arp \
+> +                handle 101 flower skip_hw arp_op request arp_tip "${ip}" action pass
+> +
+> +	slowwait_for_counter 5 5 tc_rule_handle_stats_get \
+> +                "dev ${interface} ingress" 101 ".packets" "-n ${c_ns}" &> /dev/null || RET=1
+> +
+> +	tc -n "${c_ns}" filter del dev "${interface}" ingress
+> +	tc -n "${c_ns}" qdisc del dev "${interface}" clsact
+> +
+> +	if [ "$RET" -ne 0 ]; then
+> +		msg="Arp probe not received by ${interface}"
+> +		return 1
+> +	fi
+> +}
+> +
+> +# Check for link flapping.
+> +# First verify the arp requests are being received
+> +# by the target.  Then verify that the Link Failure
+> +# Counts are not increasing over time.
+> +# Arp probes are sent every 100ms, two probes must
+> +# be missed to trigger a slave failure. A one second
+> +# wait should be sufficient.
+> +check_failure_count()
+> +{
+> +    local bond=$1
+> +    local target=$2
+> +    local proc_file=/proc/net/bonding/${bond}
+> +
+> +    wait_for_arp_request "${target}" || return 1
+> +
+> +    LinkFailureCount1=$(ip netns exec "${s_ns}" grep -F "Link Failure Count" "${proc_file}" \
+> +            | awk -F: '{ sum += $2 } END { print sum }')
+> +    sleep 1
+> +    LinkFailureCount2=$(ip netns exec "${s_ns}" grep -F "Link Failure Count" "${proc_file}" \
+> +            | awk -F: '{ sum += $2 } END { print sum }')
+> +
+> +    [ "$LinkFailureCount1" != "$LinkFailureCount2" ] && RET=1
+> +}
+> +
+> +setup_bond_topo()
+> +{
+> +    setup_prepare
+> +    setup_wait
+> +    stack_vlans bond0 "${s_ns}"
+> +    stack_vlans eth0 "${c_ns}"
+> +}
+> +
+> +skip_with_vlan_hints()
+> +{
+> +    # check if iproute supports arp_ip_target with vlans option.
+> +    if ! ip -n "${s_ns}" link add bond2 type bond arp_ip_target 10.0.0.1[10]; then
+> +        ip -n "${s_ns}" link del bond2 2> /dev/null
+> +        return 0
+> +    fi
+> +    return 1
+> +}
+> +
+> +no_vlan_hints()
+> +{
+> +        RET=0
+> +        local targets="${c_ip4} ${c_ip4v10} ${c_ip4v20}"
+> +        local target
+> +        msg=""
+> +
+> +        for target in $targets; do
+> +                bond_reset "mode $mode arp_interval 100 arp_ip_target ${target}"
+> +		stack_vlans bond0 "${s_ns}"
+> +                if [ "$RET" -ne 0 ]; then
+> +                    log_test "no_vlan_hints" "${msg}"
+> +                    return
+> +                fi
+> +                check_failure_count bond0 "${target}"
+> +		log_test "arp_ip_target=${target} ${msg}"
 
->> +static void icssm_emac_mc_filter_ctrl(struct prueth_emac *emac, bool enable)
->> +{
->> +	struct prueth *prueth = emac->prueth;
->> +	void __iomem *mc_filter_ctrl;
->> +	void __iomem *ram;
->> +	u32 mc_ctrl_byte;
->> +	u32 reg;
->> +
->> +	ram = prueth->mem[emac->dram].va;
->> +	mc_ctrl_byte = prueth->fw_offsets->mc_ctrl_byte;
->> +	mc_filter_ctrl = ram + mc_ctrl_byte;
-> 
-> mc_filter_ctrl = ram + ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_OFFSET; ???
-> 
+Please fix the alignment above.
 
-Sure we will evaluate this and address in the next version.
+/P
 
->> +static void icssm_prueth_sw_fdb_work(struct work_struct *work)
->> +{
->> +	struct icssm_prueth_sw_fdb_work *fdb_work =
->> +		container_of(work, struct icssm_prueth_sw_fdb_work, work);
->> +	struct prueth_emac *emac = fdb_work->emac;
->> +
->> +	rtnl_lock();
->> +
->> +	/* Interface is not up */
->> +	if (!emac->prueth->fdb_tbl) {
->> +		rtnl_unlock();
->> +		goto free;
->> +	}
-> 
-> I would probably put the rtnl_unlock() after free: label.
-> 
-
-We will address this in the next version.
-
-Thanks and Regards,
-Parvathi.
 
