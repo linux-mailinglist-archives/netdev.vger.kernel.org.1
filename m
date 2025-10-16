@@ -1,156 +1,139 @@
-Return-Path: <netdev+bounces-229942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF562BE2520
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:14:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5F55BE252F
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 11:16:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA2E9422926
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:14:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 840374251E5
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:16:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35693164DC;
-	Thu, 16 Oct 2025 09:14:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45246235BE2;
+	Thu, 16 Oct 2025 09:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CAC6uWx5"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="AraXTbuz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271D629C323
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 09:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBB63254BC
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 09:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760606053; cv=none; b=TNGVa4zfJP8T5i7AzAsdjHpaBS447rvp0MNwH2r/Y/fkrQwkwzKmUCJEVVg+yBjsMrS0H1NJHdZpxgBHnb3r764tjJQqwrfZOmdxtsoeo5euF1jEPcsEWiFIb1C6o/OK2F5GJgcwS9W22c1G+XtPDkbBo9Wgj6GlMub7IgMSG6A=
+	t=1760606216; cv=none; b=RBTY6zT/MraQwk/FndWCej+sDE53GU1VlLgecZ/l79jfDNTQsxouHN9vOoioemXoOa+5tIYj2RR8g3WEX5z8wHy6WXRDdWeluQWrRVcahWUGC/zUOfqlWanVy1ygp2unVm3hNXL2ZlrQEmmFal5vPeLhKV83GD/Fok1O4rxh4dA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760606053; c=relaxed/simple;
-	bh=ELmS2iqx46fL7UasEsDCyMyL+buB0jyC61nw+TSeRsk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=SM1rUAPhlSMgJx7e4UB2GYtjf0FqiwH27Rkaz88tLPWnBhS4THUz6VH2P/d+KoTHjNI22Rx9II3d3TAqWGH3gvf2BZm6s4jHJopX+bxUjIYIZ75VMmIjlKXr09W5s0kZMP2srl8W5e0ozhiPi2LVXVh41jrNaSbe8PmUAoQjHBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CAC6uWx5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760606049;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cQC/nox2pPgKzpW6LX7hPXAhl0xagSfw6/n0g49FETc=;
-	b=CAC6uWx5no+nLLg/vjsn2aae9L174c9xDZK5OuuAhfC4TJRWH/v5wAZnWq2dn5S1rU+Cm9
-	GvFdfS+dEphSMo+wcmavFlxZC24Oj5wGlZvdsM29tEDNGFP8126IXI/kASgItlaiGQwMe0
-	AIBm3wlkNgXgZolLn42arv4HHuMjCF0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-529-pL0XvJpbOhC5y6ObGEGJjg-1; Thu, 16 Oct 2025 05:14:05 -0400
-X-MC-Unique: pL0XvJpbOhC5y6ObGEGJjg-1
-X-Mimecast-MFC-AGG-ID: pL0XvJpbOhC5y6ObGEGJjg_1760606044
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3ecdb10a612so1101752f8f.2
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 02:14:05 -0700 (PDT)
+	s=arc-20240116; t=1760606216; c=relaxed/simple;
+	bh=CXV1oo6crqea4tYT7OPZhTATlmitji7rLfQtzBOyCeQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OUMCgyYJIXQZaKNgNhYdOEHqa3LRdbvDiI5eq+9q+SBQpYfL3RoltZrnEq6KtTyBm92pKjacwnyV8iMtkDIPuf7J/7HeciVdVQUaNBBtKrQcagM9KXqJmNG2snr8Au8MI1FuN6p81dIznCvcytAZOcavGg4DREu+wFKw2xNAC9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=AraXTbuz; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-46e33b260b9so5248955e9.2
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 02:16:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1760606212; x=1761211012; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HOQm7CalEqLSZ8sLsEYQvVVuablwwCJXJ39S/7as4zI=;
+        b=AraXTbuz0I0yk4YQiBMGCCUcgR2GSQRn2+tMexHI7SqMGbm7c36Nt2Fe/m1jYkv7CV
+         KgxxNwT6vfj7ybQRguz0r5blgCsaFarmKnTxU+RdGssVWcVzl+7MFgjNEQT0W8Mjl7mX
+         2YgPp0/OHs2CI4PMYjfd4FUHm2eW/qaOAIpRBuw8ozT5qql8cFlwyfcCe2C+/lPatVp1
+         TBPvkn1YcmK64BW4MXEtrDwW43HSBC5sxlzkWQGFCpw7JnmT/CEP3eMTQXUipDqPAd6w
+         iYFbghXphSEwzASN4cNW7nbxfws/CDwCKvRrDORAnthRDE47rEZuhwR8n02bA4vyxBZT
+         fgJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760606044; x=1761210844;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cQC/nox2pPgKzpW6LX7hPXAhl0xagSfw6/n0g49FETc=;
-        b=jFApqpyR03vfkKpLpMPCFW0GAkBkVQN2KxHpxDNUHQ2d+0SROUHTFx5hmMtIuOvfJz
-         z9qjGcrpGX2H25mPaqGvFvK8Bq6H5kstPEsiuYmJy2jqlhke24crnDOALwrrvvtTe8kc
-         8ALEiPIt8q4d810aiWWAOaP34TFUM+lVn/lIhPkVbPRqCNyWLsCuj5xBBqcvPWa4kAEu
-         mXtHo3OD/H8vFLkYf4eUBYtGDvU3QXd5FETtf6MxfQ10XcOlqBRbrNGYuen65nI1OV7h
-         vSktegrP3gBjaeidn82uecUvfrhOBr2LZWENRqR24oDSXafPiHaiNDMcrbQTYmuAd8uX
-         iV0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVbAWHfasfUWfnc/DIDcJO3a+4qc/p5ySYLRmYIAe/N20oVEQ92gqLtocoZFsbY+QKYeDb1pqo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/6aXYB+gOOX8753xbrNllFoR+3yf7Fo2NCR3xLx27YInMwusu
-	pyPfkBJvTF7tiqg+hX0PzvxIbNExPKa4oDaQf8R5cUy7WDxJ6TPkQWxYRaDuOcsSFAkB93djUYI
-	TfZW78apddmOU97ImeiLK2k0Cm5cXM1T8ekr7osLNwfL5hPfDakAo8y1ylQ==
-X-Gm-Gg: ASbGncuGRiUr/nppwiB7tpGnjZtawt0UHYicclIBBqbXMebKPa5h0ZkNeaSXqrs4uQy
-	f8oTLfDrjGd+DIh/2KWW5ybsw4bC1O4eg9rb4A5jvk2e4GW+FyNezsMX61Pw7uARH4jsS6CEQjO
-	hqkbZhDt+QLpfj090UyvVIesybtmWucStfXJEXhR2jt9ASuXkbOUwoUgQKexRZX8h/pFqjYdhDL
-	4wjt23HGdFTBZQDHzPxzwdv1QrUjfyI4MFjHGTEV4s+QqjFzmBRE1Q+xTrkG5uMJerS7rMQclTG
-	xawKBl3iwaRLSmsaIBV2DS9sIdAToKaQUuIyVIEpCfW1Oop8X+dInQwErcdPBXByQC2FPz4lhBD
-	WWmkOLs62He8VJmhy/ayARLL75GID6lpLkExD9JyEcHyp/Zc=
-X-Received: by 2002:a05:600c:4743:b0:46e:1fb7:a1b3 with SMTP id 5b1f17b1804b1-46fa9af1814mr216099005e9.23.1760606043958;
-        Thu, 16 Oct 2025 02:14:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEuLIFjtnAoI+JjoLtnLBFFwkqEMXB7AsH8mFt1MS1ibyoib4YpL7DpeFE1kmI6fKT2Oau5gw==
-X-Received: by 2002:a05:600c:4743:b0:46e:1fb7:a1b3 with SMTP id 5b1f17b1804b1-46fa9af1814mr216098695e9.23.1760606043472;
-        Thu, 16 Oct 2025 02:14:03 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47114461debsm15463165e9.18.2025.10.16.02.13.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Oct 2025 02:14:00 -0700 (PDT)
-Message-ID: <705f02b2-44c6-4012-a1f3-0040652acc36@redhat.com>
-Date: Thu, 16 Oct 2025 11:13:58 +0200
+        d=1e100.net; s=20230601; t=1760606212; x=1761211012;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HOQm7CalEqLSZ8sLsEYQvVVuablwwCJXJ39S/7as4zI=;
+        b=UYedo6PRLixYAG511p1IqjLqfktyPzaPOAq6apXknaPOTT9z6JjNsmKa7MAjtFo8SS
+         hi0MxyUoce3twLxrxCGpUW2qPz3G8gkYoATNsezCtz+7+G/yds3q17ecZPBoPGjInXnT
+         g0gZt9257+lQUq22nmG/UuuwySt0RhV+spQui5kZN/xNNcjmdXvDfmHwXYPPt4Ngghwx
+         Jk49/GBg/tgonnyIg/ubDnmUTsuAZV+s/ppa4twCoRrtxn3HyARDW/L5PnNkaqcplzPD
+         KO6k9u1xnuVnc/uzIDV1YREbPoy+qP0jscJ3zrT0edKFpe8/OcKRJkryq6qWrHQnJ4yt
+         Ow8A==
+X-Forwarded-Encrypted: i=1; AJvYcCU6zHpo48KO7o0E2SxR5ktRq69QU16jJyaMjHhVIcjmpOgR7LLkIafwjmx/jhfEW5eV44lJNik=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6wMACDv7rfx+yahFbz9aK13fuJ/W4yVrhZAHj1rO2nnsP2xFN
+	3THB49POGImxfTW1AiGlF1cn+C9pFyzWJgrI3/hx7ysuEXllytFKXQvdZo4zEvEszMq7NgVqGte
+	LbBU5XpV+ZA==
+X-Gm-Gg: ASbGnctqNaZj+mvStNAoPuwVNTVQtx5mmfoHoCAXR3CTFRHplNfeiDra+3sWwg0j6Oo
+	/oJrtpE78m39AJ5JLWMfECiM9KEG9PKB8o7LrAxSHGiAC6dUNnGdQ/4STz2l1YQLTQICbTzpX0E
+	L5VeNddYw35R8NMstxqI6/pFcFliqagGDGvK+lT88W9YNxSi5l99oek65uxw2KBpby/MYmPtV2r
+	ZxB/05dsioQM4rWLcnd62T70uup+Yd9xTKUuxmNdTxozTi8/Z2ip/HUgilxdGRdEmWB2XI31zUe
+	nqK5DgTayhKopTalGJYtpXUcEXWB+yEiEP705hUKPuFW8EIR3Sfm54hRKYT8Qu+B1t3QZB2TnwK
+	qdtcXsX2WlX+zpAGm+VmnRnhGvNSeNdNmG9P6TgUJO4Pb56eREsrZbMVXo/OwiQ0Zd3me2A15El
+	YoT2bmDfqiEt+/DB2nDQS5C2aX2hc=
+X-Google-Smtp-Source: AGHT+IHNbK3Ki89HwpE87g85l9ngMPvW1ZgOuAXmQgBeq+a/VnNNfoTGlzyHQvi3Z32vF2/pvxhiPg==
+X-Received: by 2002:a05:6000:26c2:b0:3e1:9b75:f0b8 with SMTP id ffacd0b85a97d-4266e8dc01amr21360118f8f.47.1760606211546;
+        Thu, 16 Oct 2025 02:16:51 -0700 (PDT)
+Received: from jiri-mlt.client.nvidia.com ([140.209.217.211])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426fc54b32dsm3879000f8f.30.2025.10.16.02.16.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Oct 2025 02:16:51 -0700 (PDT)
+Date: Thu, 16 Oct 2025 11:16:49 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org, 
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, mbloch@nvidia.com, Parav Pandit <parav@nvidia.com>, 
+	Adithya Jayachandran <ajayachandra@nvidia.com>
+Subject: Re: [PATCH net-next 1/3] devlink: Introduce devlink eswitch state
+Message-ID: <6uzvaczuh6vpflpwnyknmq32ogcw52u35djzab7yd7jlgwasdc@paq2c2yznfti>
+References: <20251016013618.2030940-1-saeed@kernel.org>
+ <20251016013618.2030940-2-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 08/13] tcp: accecn: retransmit SYN/ACK without
- AccECN option or non-AccECN SYN/ACK
-To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com,
- linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
- dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
- kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-References: <20251013170331.63539-1-chia-yu.chang@nokia-bell-labs.com>
- <20251013170331.63539-9-chia-yu.chang@nokia-bell-labs.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251013170331.63539-9-chia-yu.chang@nokia-bell-labs.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251016013618.2030940-2-saeed@kernel.org>
 
-On 10/13/25 7:03 PM, chia-yu.chang@nokia-bell-labs.com wrote:
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> 
-> If the TCP Server has not received an ACK to acknowledge its SYN/ACK
-> after the normal TCP timeout or it receives a second SYN with a
-> request for AccECN support, then either the SYN/ACK might just have
-> been lost, e.g. due to congestion, or a middlebox might be blocking
-> AccECN Options. To expedite connection setup in deployment scenarios
-> where AccECN path traversal might be problematic, the TCP Server SHOULD
-> retransmit the SYN/ACK, but with no AccECN Option.
-> 
-> If this retransmission times out, to expedite connection setup, the TCP
-> Server SHOULD retransmit the SYN/ACK with (AE,CWR,ECE) = (0,0,0)
-> and no AccECN Option, but it remains in AccECN feedback mode.
-> 
-> This follows Section 3.2.3.2.2 of AccECN spec (RFC9768).
-> 
-> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> ---
->  include/net/tcp_ecn.h | 14 ++++++++++----
->  net/ipv4/tcp_output.c |  2 +-
->  2 files changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/net/tcp_ecn.h b/include/net/tcp_ecn.h
-> index c66f0d944e1c..97a3a7f36aff 100644
-> --- a/include/net/tcp_ecn.h
-> +++ b/include/net/tcp_ecn.h
-> @@ -651,10 +651,16 @@ static inline void tcp_ecn_clear_syn(struct sock *sk, struct sk_buff *skb)
->  static inline void
->  tcp_ecn_make_synack(const struct request_sock *req, struct tcphdr *th)
->  {
-> -	if (tcp_rsk(req)->accecn_ok)
-> -		tcp_accecn_echo_syn_ect(th, tcp_rsk(req)->syn_ect_rcv);
-> -	else if (inet_rsk(req)->ecn_ok)
-> -		th->ece = 1;
-> +	if (req->num_retrans < 1 || req->num_timeout < 1) {
+Thu, Oct 16, 2025 at 03:36:16AM +0200, saeed@kernel.org wrote:
+>From: Parav Pandit <parav@nvidia.com>
 
-I think the above condition does not match the commit message. Should be:
-	if (!req->num_retrans && !req->num_timeout) {
+[...]
 
-/P
 
+>@@ -722,6 +734,24 @@ int devlink_nl_eswitch_set_doit(struct sk_buff *skb, struct genl_info *info)
+> 			return err;
+> 	}
+> 
+>+	state = DEVLINK_ESWITCH_STATE_ACTIVE;
+>+	if (info->attrs[DEVLINK_ATTR_ESWITCH_STATE]) {
+>+		if (!ops->eswitch_state_set)
+>+			return -EOPNOTSUPP;
+>+		state = nla_get_u8(info->attrs[DEVLINK_ATTR_ESWITCH_STATE]);
+>+	}
+>+	/* If user did not supply the state attribute, the default is
+>+	 * active state. If the state was not explicitly set, set the default
+>+	 * state for drivers that support eswitch state.
+>+	 * Keep this after mode-set as state handling can be dependent on
+>+	 * the eswitch mode.
+>+	 */
+>+	if (ops->eswitch_state_set) {
+>+		err = ops->eswitch_state_set(devlink, state, info->extack);
+
+Calling state_set() upon every DEVLINK_CMD_ESWITCH_SET call,
+even if STATE attr is not present, is plain wrong. Don't do it.
+I don't really understand why you do so.
+
+
+>+		if (err)
+>+			return err;
+>+	}
+>+
+> 	if (info->attrs[DEVLINK_ATTR_ESWITCH_INLINE_MODE]) {
+> 		if (!ops->eswitch_inline_mode_set)
+> 			return -EOPNOTSUPP;
+
+[...]
 
