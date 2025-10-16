@@ -1,345 +1,205 @@
-Return-Path: <netdev+bounces-229916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9F1DBE203F
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:51:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11092BE2069
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 09:52:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2FC613524F4
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 07:51:02 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 893B735299D
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 07:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A69F31A061;
-	Thu, 16 Oct 2025 07:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A5A52FFF9B;
+	Thu, 16 Oct 2025 07:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="iNfMiG2A"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GLMuqSN7";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="o5FTWD0P";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nk+EEeH9";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="JeGyijXh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E853195E2;
-	Thu, 16 Oct 2025 07:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7861F2FF676
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 07:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760600791; cv=none; b=EewmrZPxH7d7bCGSfbbUGYRacLcMYRSWkqSTE2RPxR5UrtjrpQHBCzKdOT4USA6zQV/gxpP1/mxdhI8MvOIf/YigMrym1RwREaAhBYE/gTePJqzpj4liInr03Wl0Q4ghMm0J4qhhKCdrJ/JIIL8jU8AklMtfWJIRgf7SvCvfIP8=
+	t=1760601010; cv=none; b=hDKJGAhuOyOg+4YbKSzrkUWYRP1qHwOweFG3MzZIRAWNRt+Yu8tnceZ/kGAIcWbViZf4gAE5eLhqIlJOfUQ60Ks9uekRMuqre2R4+9Feu+7+JefLdpzPkpNIw4wO+U3UMJh4hngwymJi5MdlSeDsWaSFdzUcsntNfiZ0e7ukxa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760600791; c=relaxed/simple;
-	bh=h604/0gPdQgeIgxXDAkaljJ0Od0j2JsTghTy+N+3pX4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=adyyT5O9qrXB+9tifR1Ye7DUGE4bJV5pHD3D2gWJQJvze17WeOxals9y4bBl8HfJycdUe76cvyHADqKNHS0fPT1V2O0ZYFGS1HJoAQY/Wzf3BmGZ1nuJud+gxBOqd9K/OgtOQYb+5e0dsZMKWRfxhYt1aqPU+s/lhlTikjImi4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=iNfMiG2A; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 83A2F4E410F5;
-	Thu, 16 Oct 2025 07:46:26 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 533E16062C;
-	Thu, 16 Oct 2025 07:46:26 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 28F07102F22AA;
-	Thu, 16 Oct 2025 09:46:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760600785; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=h+bGwFdB2RinX88+7xXz9AJVRdq645xgVOTya+QXTIM=;
-	b=iNfMiG2Ac4ClCjJoAdTBmoKFtOHoT3OP8r0RkqQSlsA5V6ydkNGXB4j8cBHDqdM+Otau8d
-	8M+2c1Vw5BLpRQs7xs7MlA0Zvx74tIguVPrtr3ffbI93Pali3dVj/T5xBsFjx8dNxOJF2v
-	1kYzy1M05CU6mWHHWWd2cwrLYZNhcmx87xjzgd5i1Ra8JHUrgs6m/rUdWNKLX4XP1ZM3AT
-	IC9n+hjjLOnOTnWeEp8L4mI8UCMe7O62bV+YfzcrzSvQ6/8+O/dXqOqnodkKDheph1RMGS
-	dXADsQPipypKxyvoM0T8rftK9o0YNjoMFAq2cmZTNXKLOfHQe04wV0TP4328IA==
-From: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
-Date: Thu, 16 Oct 2025 09:45:44 +0200
-Subject: [PATCH bpf-next v5 15/15] selftests/bpf: test_xsk: Integrate
- test_xsk.c to test_progs framework
+	s=arc-20240116; t=1760601010; c=relaxed/simple;
+	bh=aXuv3tSyiJV8KNlKZ+KkmgKFZtNyre+/2pL61RBDtoI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D98avkBfgx/j2rOi2nB0GmQ1lKceSyBh8n/02D2CiVdR687Q7DeHCqGjR2Hf9nW/cjCyBJJtdGwoCtg0+nsV/RrK4TkVBxvNipyFVf7Yn5+g3MFZ4v/vnxpzLy2UX3zIXi6+i7IqrhX4GJGH9+/lJSOxI0F4saJYr5kLZnZqzFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GLMuqSN7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=o5FTWD0P; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nk+EEeH9; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=JeGyijXh; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id DABE61F7D5;
+	Thu, 16 Oct 2025 07:49:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1760601001; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4w5N+d5fWi0pVM9o1+XRD2Qyvji/NhqmrKPiLBf0XTA=;
+	b=GLMuqSN7XN6TvH/IKYXy2D+FdOneIsCWMi9lasB0wj/6MRJbe8d/1hE+Wp08udr1EZ7rC1
+	Npq68/rscsaB+SOhzP2QICJoYBFXP/Tf0pukmB/TwvFg6Nqc3wNKqjPqVmpGqonoUJctOG
+	MQtl3s4gXP0Amc1ciKkl+LfqgWd4R94=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1760601001;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4w5N+d5fWi0pVM9o1+XRD2Qyvji/NhqmrKPiLBf0XTA=;
+	b=o5FTWD0P/ddukrqGwBrIzzLulSigTnaIuL3TMkdS0UcBZTpndrqnPcEhb1FC88Pvf+qamq
+	BlozbvJW7W4PRpDA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=nk+EEeH9;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=JeGyijXh
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1760600999; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4w5N+d5fWi0pVM9o1+XRD2Qyvji/NhqmrKPiLBf0XTA=;
+	b=nk+EEeH90NqX87UuX5rea7POfv0ubt5wdwzUsZD21jRXQVHT+UVCntO5ys8F/Eh/vg8cqR
+	u7YqL9fHnPoT0zcATcBwF6Uz1NmzTQFmzRTsflneuyMAry3RyUBM43nCmgPoIiDbgYhq3R
+	sd6aqBx6RCZrkJgxyX2ggU7BRjlVA38=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1760600999;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4w5N+d5fWi0pVM9o1+XRD2Qyvji/NhqmrKPiLBf0XTA=;
+	b=JeGyijXh1f08gmx5jTqyS3vDtrAC4UjeHX16WytNbySeKzlGJwExkIdthT3fKWCWmThQ++
+	SwkzotnXnVNxoCAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7ADCF1340C;
+	Thu, 16 Oct 2025 07:49:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id OrLUGqej8GjFbwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Thu, 16 Oct 2025 07:49:59 +0000
+Message-ID: <5bedb16f-af89-490f-80ef-e1eebe237b07@suse.de>
+Date: Thu, 16 Oct 2025 09:49:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] in 6.17, failing
+ __dev_change_net_namespace+0xb89/0xc30
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Cynthia <cynthia@kosmx.dev>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Danilo Krummrich <dakr@kernel.org>, netdev@vger.kernel.org
+References: <01070199e22de7f8-28f711ab-d3f1-46d9-b9a0-048ab05eb09b-000000@eu-central-1.amazonses.com>
+ <20251015133120.7ef53b20@kernel.org> <2025101649-lid-cancel-4a69@gregkh>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <2025101649-lid-cancel-4a69@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251016-xsk-v5-15-662c95eb8005@bootlin.com>
-References: <20251016-xsk-v5-0-662c95eb8005@bootlin.com>
-In-Reply-To: <20251016-xsk-v5-0-662c95eb8005@bootlin.com>
-To: =?utf-8?q?Bj=C3=B6rn_T=C3=B6pel?= <bjorn@kernel.org>, 
- Magnus Karlsson <magnus.karlsson@intel.com>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- Jonathan Lemon <jonathan.lemon@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Alexis Lothore <alexis.lothore@bootlin.com>, netdev@vger.kernel.org, 
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
-X-Mailer: b4 0.14.2
-X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: DABE61F7D5
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:mid,suse.de:dkim]
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
 
-test_xsk.c isn't part of the test_progs framework.
 
-Integrate the tests defined by test_xsk.c into the test_progs framework
-through a new file : prog_tests/xsk.c. ZeroCopy mode isn't tested in it
-as veth peers don't support it.
 
-Move test_xsk{.c/.h} to prog_tests/.
+On 10/16/25 8:25 AM, Greg Kroah-Hartman wrote:
+> On Wed, Oct 15, 2025 at 01:31:20PM -0700, Jakub Kicinski wrote:
+>> On Tue, 14 Oct 2025 10:04:43 +0000 Cynthia wrote:
+>>> When I updated my machine to the newest kernel, a bug started to appear.
+>>> The system does not panic, but an error kept happening in dmesg.
+>>>
+>>> The bug happens with LXC/Incus when it tries to start a new container.
+>>> (but probably other things are affected too)
+>>>
+>>>
+>>> Steps to Reproduce: the bug can be reproduced in a libvirt VM, no need
+>>> for a specific system. Also I suspect the bug is also
+>>> architecture-independent, but I cannot verify that.
+>>> 1) Install ArchLinux (all dependencies are available). I was testing
+>>> with vanilla kernel, so any linux distro should be affected.
+>>> https://aur.archlinux.org/packages/linux-mainline can be installed, this
+>>> is the vanilla kernel with a generally good kernel config for most PCs.
+>>> 2) Install LXC/Incus (pacman -S incus)
+>>> 3) configure incus and start a container:
+>>> usermod -v 1000000-1000999999 -w 1000000-1000999999 root &&
+>>> incus admin init &&
+>>> incus launch images:debian/12 first # start a container
+>>> 4) Previous step should trigger incus to do namespaces. I'm not sure
+>>> what syscall is causing the bug, I do not have a mini C program. These
+>>> steps should be enough to see the log in the dmesg.
+>>>
+>>> I also did a git bisect, the first commit to have this bug is this:
+>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0c17270f9b920e4e1777488f1911bbfdaf2af3be
+>>>
+>>> I initially reported this bug on Bugzilla, but after seeing 6 year old
+>>> bugs there, I'm not sure if that platform is still in use.
+>>> https://bugzilla.kernel.org/show_bug.cgi?id=220649
+>>>
+>>> Since my initial report, 6.17.2 was released, the bug is still happening.
+>>>
+>>> I'm attaching 2 files:
+>>> dmesg_slice: the slice of dmesg containing the problematic frame (on a
+>>> bare-metal linux with AMD srso mitigation disabled)
+>>> bisect_log: a log of the git bisect process
+>>
+>> Thanks a lot for bisecting! Looking at the code my guess is that sysfs
+>> gives us ENOENT when we try to change owner of a file that isn't
+>> visible. Adding sysfs maintainers - should sysfs_group_attrs_change_owner()
+>> call is_visible before trying to touch the attr?
+> 
+> Oh, I never considered that call-path, and given that I haven't seen a
+> bug report about this yet, it's pretty rare :)
+> 
+> So yes, that should be checked.  Can anyone knock up a patch for this?
+> I'm busy all today with other stuff, sorry.
+> 
+> greg k-h
+> 
 
-Add the find_bit library to test_progs sources in the Makefile as it is
-is used by test_xsk.c
+I can send a patch, I hit this yesterday too.
 
-Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Signed-off-by: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
----
- tools/testing/selftests/bpf/Makefile               |  13 +-
- .../selftests/bpf/{ => prog_tests}/test_xsk.c      |   0
- .../selftests/bpf/{ => prog_tests}/test_xsk.h      |   0
- tools/testing/selftests/bpf/prog_tests/xsk.c       | 146 +++++++++++++++++++++
- tools/testing/selftests/bpf/xskxceiver.c           |   2 +-
- 5 files changed, 158 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-index f7369ab5b1dc33585aa84268620885547c802ab0..160faa2f1cb42b76f83bfd34f9b3c43f3605792d 100644
---- a/tools/testing/selftests/bpf/Makefile
-+++ b/tools/testing/selftests/bpf/Makefile
-@@ -543,6 +543,8 @@ TRUNNER_TEST_OBJS := $$(patsubst %.c,$$(TRUNNER_OUTPUT)/%.test.o,	\
- 				 $$(notdir $$(wildcard $(TRUNNER_TESTS_DIR)/*.c)))
- TRUNNER_EXTRA_OBJS := $$(patsubst %.c,$$(TRUNNER_OUTPUT)/%.o,		\
- 				 $$(filter %.c,$(TRUNNER_EXTRA_SOURCES)))
-+TRUNNER_LIB_OBJS := $$(patsubst %.c,$$(TRUNNER_OUTPUT)/%.o,		\
-+				 $$(filter %.c,$(TRUNNER_LIB_SOURCES)))
- TRUNNER_EXTRA_HDRS := $$(filter %.h,$(TRUNNER_EXTRA_SOURCES))
- TRUNNER_TESTS_HDR := $(TRUNNER_TESTS_DIR)/tests.h
- TRUNNER_BPF_SRCS := $$(notdir $$(wildcard $(TRUNNER_BPF_PROGS_DIR)/*.c))
-@@ -686,6 +688,10 @@ $(TRUNNER_EXTRA_OBJS): $(TRUNNER_OUTPUT)/%.o:				\
- 	$$(call msg,EXT-OBJ,$(TRUNNER_BINARY),$$@)
- 	$(Q)$$(CC) $$(CFLAGS) -c $$< $$(LDLIBS) -o $$@
- 
-+$(TRUNNER_LIB_OBJS): $(TRUNNER_OUTPUT)/%.o:$(TOOLSDIR)/lib/%.c
-+	$$(call msg,LIB-OBJ,$(TRUNNER_BINARY),$$@)
-+	$(Q)$$(CC) $$(CFLAGS) -c $$< $$(LDLIBS) -o $$@
-+
- # non-flavored in-srctree builds receive special treatment, in particular, we
- # do not need to copy extra resources (see e.g. test_btf_dump_case())
- $(TRUNNER_BINARY)-extras: $(TRUNNER_EXTRA_FILES) | $(TRUNNER_OUTPUT)
-@@ -699,6 +705,7 @@ $(OUTPUT)/$(TRUNNER_BINARY): | $(TRUNNER_BPF_OBJS)
- 
- $(OUTPUT)/$(TRUNNER_BINARY): $(TRUNNER_TEST_OBJS)			\
- 			     $(TRUNNER_EXTRA_OBJS) $$(BPFOBJ)		\
-+			     $(TRUNNER_LIB_OBJS)			\
- 			     $(RESOLVE_BTFIDS)				\
- 			     $(TRUNNER_BPFTOOL)				\
- 			     $(OUTPUT)/veristat				\
-@@ -745,6 +752,7 @@ TRUNNER_EXTRA_SOURCES := test_progs.c		\
- 			 $(VERIFY_SIG_HDR)		\
- 			 flow_dissector_load.h	\
- 			 ip_check_defrag_frags.h
-+TRUNNER_LIB_SOURCES := find_bit.c
- TRUNNER_EXTRA_FILES := $(OUTPUT)/urandom_read				\
- 		       $(OUTPUT)/liburandom_read.so			\
- 		       $(OUTPUT)/xdp_synproxy				\
-@@ -782,6 +790,7 @@ endif
- TRUNNER_TESTS_DIR := map_tests
- TRUNNER_BPF_PROGS_DIR := progs
- TRUNNER_EXTRA_SOURCES := test_maps.c
-+TRUNNER_LIB_SOURCES :=
- TRUNNER_EXTRA_FILES :=
- TRUNNER_BPF_BUILD_RULE := $$(error no BPF objects should be built)
- TRUNNER_BPF_CFLAGS :=
-@@ -803,8 +812,8 @@ $(OUTPUT)/test_verifier: test_verifier.c verifier/tests.h $(BPFOBJ) | $(OUTPUT)
- 	$(Q)$(CC) $(CFLAGS) $(filter %.a %.o %.c,$^) $(LDLIBS) -o $@
- 
- # Include find_bit.c to compile xskxceiver.
--EXTRA_SRC := $(TOOLSDIR)/lib/find_bit.c
--$(OUTPUT)/xskxceiver: $(EXTRA_SRC) test_xsk.c test_xsk.h xskxceiver.c xskxceiver.h $(OUTPUT)/network_helpers.o $(OUTPUT)/xsk.o $(OUTPUT)/xsk_xdp_progs.skel.h $(BPFOBJ) | $(OUTPUT)
-+EXTRA_SRC := $(TOOLSDIR)/lib/find_bit.c prog_tests/test_xsk.c prog_tests/test_xsk.h
-+$(OUTPUT)/xskxceiver: $(EXTRA_SRC) xskxceiver.c xskxceiver.h $(OUTPUT)/network_helpers.o $(OUTPUT)/xsk.o $(OUTPUT)/xsk_xdp_progs.skel.h $(BPFOBJ) | $(OUTPUT)
- 	$(call msg,BINARY,,$@)
- 	$(Q)$(CC) $(CFLAGS) $(filter %.a %.o %.c,$^) $(LDLIBS) -o $@
- 
-diff --git a/tools/testing/selftests/bpf/test_xsk.c b/tools/testing/selftests/bpf/prog_tests/test_xsk.c
-similarity index 100%
-rename from tools/testing/selftests/bpf/test_xsk.c
-rename to tools/testing/selftests/bpf/prog_tests/test_xsk.c
-diff --git a/tools/testing/selftests/bpf/test_xsk.h b/tools/testing/selftests/bpf/prog_tests/test_xsk.h
-similarity index 100%
-rename from tools/testing/selftests/bpf/test_xsk.h
-rename to tools/testing/selftests/bpf/prog_tests/test_xsk.h
-diff --git a/tools/testing/selftests/bpf/prog_tests/xsk.c b/tools/testing/selftests/bpf/prog_tests/xsk.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..7ce5ddd7d3fc848df27534f00a6a9f82fbc797c5
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/xsk.c
-@@ -0,0 +1,146 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <net/if.h>
-+#include <stdarg.h>
-+
-+#include "network_helpers.h"
-+#include "test_progs.h"
-+#include "test_xsk.h"
-+#include "xsk_xdp_progs.skel.h"
-+
-+#define VETH_RX "veth0"
-+#define VETH_TX "veth1"
-+#define MTU	1500
-+
-+int setup_veth(bool busy_poll)
-+{
-+	SYS(fail,
-+	"ip link add %s numtxqueues 4 numrxqueues 4 type veth peer name %s numtxqueues 4 numrxqueues 4",
-+	VETH_RX, VETH_TX);
-+	SYS(fail, "sysctl -wq net.ipv6.conf.%s.disable_ipv6=1", VETH_RX);
-+	SYS(fail, "sysctl -wq net.ipv6.conf.%s.disable_ipv6=1", VETH_TX);
-+
-+	if (busy_poll) {
-+		SYS(fail, "echo 2 > /sys/class/net/%s/napi_defer_hard_irqs", VETH_RX);
-+		SYS(fail, "echo 200000 > /sys/class/net/%s/gro_flush_timeout", VETH_RX);
-+		SYS(fail, "echo 2 > /sys/class/net/%s/napi_defer_hard_irqs", VETH_TX);
-+		SYS(fail, "echo 200000 > /sys/class/net/%s/gro_flush_timeout", VETH_TX);
-+	}
-+
-+	SYS(fail, "ip link set %s mtu %d", VETH_RX, MTU);
-+	SYS(fail, "ip link set %s mtu %d", VETH_TX, MTU);
-+	SYS(fail, "ip link set %s up", VETH_RX);
-+	SYS(fail, "ip link set %s up", VETH_TX);
-+
-+	return 0;
-+
-+fail:
-+	return -1;
-+}
-+
-+void delete_veth(void)
-+{
-+	SYS_NOFAIL("ip link del %s", VETH_RX);
-+	SYS_NOFAIL("ip link del %s", VETH_TX);
-+}
-+
-+int configure_ifobj(struct ifobject *tx, struct ifobject *rx)
-+{
-+	rx->ifindex = if_nametoindex(VETH_RX);
-+	if (!ASSERT_OK_FD(rx->ifindex, "get RX ifindex"))
-+		return -1;
-+
-+	tx->ifindex = if_nametoindex(VETH_TX);
-+	if (!ASSERT_OK_FD(tx->ifindex, "get TX ifindex"))
-+		return -1;
-+
-+	tx->shared_umem = false;
-+	rx->shared_umem = false;
-+
-+
-+	return 0;
-+}
-+
-+static void test_xsk(const struct test_spec *test_to_run, enum test_mode mode)
-+{
-+	struct ifobject *ifobj_tx, *ifobj_rx;
-+	struct test_spec test;
-+	int ret;
-+
-+	ifobj_tx = ifobject_create();
-+	if (!ASSERT_OK_PTR(ifobj_tx, "create ifobj_tx"))
-+		return;
-+
-+	ifobj_rx = ifobject_create();
-+	if (!ASSERT_OK_PTR(ifobj_rx, "create ifobj_rx"))
-+		goto delete_tx;
-+
-+	if (!ASSERT_OK(setup_veth(false), "setup veth"))
-+		goto delete_rx;
-+
-+	if (!ASSERT_OK(configure_ifobj(ifobj_tx, ifobj_rx), "conigure ifobj"))
-+		goto delete_veth;
-+
-+	ret = get_hw_ring_size(ifobj_tx->ifname, &ifobj_tx->ring);
-+	if (!ret) {
-+		ifobj_tx->hw_ring_size_supp = true;
-+		ifobj_tx->set_ring.default_tx = ifobj_tx->ring.tx_pending;
-+		ifobj_tx->set_ring.default_rx = ifobj_tx->ring.rx_pending;
-+	}
-+
-+	if (!ASSERT_OK(init_iface(ifobj_rx, worker_testapp_validate_rx), "init RX"))
-+		goto delete_veth;
-+	if (!ASSERT_OK(init_iface(ifobj_tx, worker_testapp_validate_tx), "init TX"))
-+		goto delete_veth;
-+
-+	test_init(&test, ifobj_tx, ifobj_rx, 0, &tests[0]);
-+
-+	test.tx_pkt_stream_default = pkt_stream_generate(DEFAULT_PKT_CNT, MIN_PKT_SIZE);
-+	if (!ASSERT_OK_PTR(test.tx_pkt_stream_default, "TX pkt generation"))
-+		goto delete_veth;
-+	test.rx_pkt_stream_default = pkt_stream_generate(DEFAULT_PKT_CNT, MIN_PKT_SIZE);
-+	if (!ASSERT_OK_PTR(test.rx_pkt_stream_default, "RX pkt generation"))
-+		goto delete_veth;
-+
-+
-+	test_init(&test, ifobj_tx, ifobj_rx, mode, test_to_run);
-+	ret = test.test_func(&test);
-+	if (ret != TEST_SKIP)
-+		ASSERT_OK(ret, "Run test");
-+	pkt_stream_restore_default(&test);
-+
-+	if (ifobj_tx->hw_ring_size_supp)
-+		hw_ring_size_reset(ifobj_tx);
-+
-+	pkt_stream_delete(test.tx_pkt_stream_default);
-+	pkt_stream_delete(test.rx_pkt_stream_default);
-+	xsk_xdp_progs__destroy(ifobj_tx->xdp_progs);
-+	xsk_xdp_progs__destroy(ifobj_rx->xdp_progs);
-+
-+delete_veth:
-+	delete_veth();
-+delete_rx:
-+	ifobject_delete(ifobj_rx);
-+delete_tx:
-+	ifobject_delete(ifobj_tx);
-+}
-+
-+void test_ns_xsk_skb(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(tests); i++) {
-+		if (test__start_subtest(tests[i].name))
-+			test_xsk(&tests[i], TEST_MODE_SKB);
-+	}
-+}
-+
-+void test_ns_xsk_drv(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(tests); i++) {
-+		if (test__start_subtest(tests[i].name))
-+			test_xsk(&tests[i], TEST_MODE_DRV);
-+	}
-+}
-+
-diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
-index 8707f4a0fac64e1ebb6a4241edf8e874a1eb67c3..a54904783c757d282e3b99194aaed5f74d510763 100644
---- a/tools/testing/selftests/bpf/xskxceiver.c
-+++ b/tools/testing/selftests/bpf/xskxceiver.c
-@@ -90,7 +90,7 @@
- #include <sys/mman.h>
- #include <sys/types.h>
- 
--#include "test_xsk.h"
-+#include "prog_tests/test_xsk.h"
- #include "xsk_xdp_progs.skel.h"
- #include "xsk.h"
- #include "xskxceiver.h"
-
--- 
-2.51.0
-
+Thanks,
+Fernando.
 
