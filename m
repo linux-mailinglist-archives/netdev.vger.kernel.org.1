@@ -1,126 +1,151 @@
-Return-Path: <netdev+bounces-230129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38CACBE43E4
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 17:31:07 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 760B7BE4405
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 17:32:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C2A154FD0F8
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:30:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4C97C506E8E
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C23F2345743;
-	Thu, 16 Oct 2025 15:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EDCB34BA50;
+	Thu, 16 Oct 2025 15:31:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lo5InIkx"
+	dkim=pass (2048-bit key) header.d=kosmx.dev header.i=@kosmx.dev header.b="l8O1INcr";
+	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="VCVsSmbs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from b224-2.smtp-out.eu-central-1.amazonses.com (b224-2.smtp-out.eu-central-1.amazonses.com [69.169.224.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E342E62D4
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 15:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA30A346A1B;
+	Thu, 16 Oct 2025 15:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=69.169.224.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760628629; cv=none; b=s9Q7zvp8/m5BFBjDUPJ7IbDyTokiCUB8qXQ6qt5LdmyWtTRkyFNwkU2xeSrg5FAqa3sM4YLfmWrlQMUrYJd8fPCy4h5jUmLO6zaGJSIAo3T05Ndsnd+AEDNuPOsAuweV8lR+ju0NwX4KyirEE0GvsVXb3MaBOuG50L4jO5BO6qw=
+	t=1760628668; cv=none; b=c37EieMN6doT7zLCHAMixtV396ZOIQX0Rq7U16/T778bRvjttz1696ctFs/BHuVJpkuKvtTTWrzLtDK4RIcuIhtec+BQIbhxEae6B3uONO+JMnxeElXusBmC38NHK8g5rfaKiSXXnV0Awk+HQMcPxF43dxNdzxNgQ5ElxK7+5Xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760628629; c=relaxed/simple;
-	bh=JR0IPU7PxFXpfgWYzXY12lPBiLM1O9zhJ5yP9OtWp3U=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E+PuUnKbbjsWT5Wesh56RWDsauKfkSQQByjcRB50EeH5x9CTYsIPC+CFzj0gkaEPTdgp1Kfw+P5efTLIwHvGDHN50PRfFlYl8qIDv4m2eT7+oOHppwqT1+Cdn4gmzw+TeCyGun8QUBQsxCz9pvihU7i/PN7cnCewMNGfLngUn64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lo5InIkx; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47100eae3e5so8885515e9.1
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 08:30:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760628626; x=1761233426; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ietOkeWTDnClykDeSgCRmDi1+eHw6qsXZBfGYbeOrE8=;
-        b=Lo5InIkx0iWn8NLs4ifoap7z/6chVScpDsrnX8aTw7wZRA6q0rKmnYaxqCDSX/FGeP
-         BHPevq0P2K1FfFaodTdfgGbEWlNNP+bP3oioNY4frzUk9mtqGtXdtu+cJZQba/CfmoaK
-         4zP0in8F9eUqeCHS4P15r3gFuxbc9pReIWaYGNg9kAQxD7FArQFrF/DlXTXH3TJFxkAc
-         27TCuzpUqldZkWZXdwT0zwxRGJp8a05d2YK2qydYrB+pr3xCuRlGC4ESz8PgNdgANEdt
-         WdLihxXtPdQAIDabPMV6jQAOHnBuVVq6BFuc/VJp6gr1uxFwkg3rG2JW7MUQtgcg4WpN
-         TJeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760628626; x=1761233426;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ietOkeWTDnClykDeSgCRmDi1+eHw6qsXZBfGYbeOrE8=;
-        b=jSLPe3B6Boz/YpYWolDik48AGX8STQseyesrHYZyu7dVM+Qb90yh7KhDZCtwBHLTdH
-         OW4j18Kk2n0HUBbjrrJ54aSNEZ5h+sUNMpG9r2LYC0hKeCMz2qPrfmY4CKJQQkepZKrj
-         CmNCqHjbWdDCcK7ACAc6O0nmtObDBn69lyeaRFv0x9u/clHm08WwbpUvr6MoYyAouIKY
-         NnG8fMjrMy+C/iE+lfBE5dkAsUOorv/aGTN0l7QAMrN5g++bbKDGP1a2c64BDi/TyIjV
-         ezwFAoEfmrNem95vuNfTpE8bY+gmh8q848m1XhtjUZ2dZxfUBbRX3C6CQjyfY3QN4MRr
-         U24A==
-X-Forwarded-Encrypted: i=1; AJvYcCW8rllM3nKqMp624kknCigS1+JqkstvAwMD+7fxZXnXKn7HtHKz/XmY1iQtzV9mvF/ro1DTo2I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMhaezGXeqfvelt/eGvY/DQe/UTUJDTgTqZr6CuVZ85dXGbzFP
-	S6eBylIuNyJKwkUq5EnxtAH7l6UCuCxmOjbtBB9h3UvJnlxIc8ZMjNbx
-X-Gm-Gg: ASbGncvvi7HWyVtqVjGKlhn/JEDQfe+90pTShVZkwSPgkSkIIQPzXcjUQpH76yNFYBq
-	vcLBisEcDEdrFgPbvDU35hD/fBpUQu5duDOv7nJ1+na09lZTeBZRZKmOaRR0Al55jDIGXWlYSHl
-	RI/u4R+MN3Q76pXr8fveycCtGyW/P1YIgAOZESX9G0DghaD0+8tXi5sKcZaq0YavbpJEf50bt/R
-	K4b5ECIwclMTkWFw0jxzj4AtGX9jQBZ3YyacHpEhykjuQxTPNevvcCBY27r/gbT69gGGd+rztBF
-	VabzEq1WV8RBtwIYfSxEvTAZps1bnhWCmkbMQyat+9cVvGIFCMXgTtaDVTjOLRttoWO28xXPxrS
-	bw/n6Bd+r3zw5vKw6MyJS2SGGhC8e1DOc2cBgyAdz/Qv+eSY9tt5X6s87xmPV9YPe8PRexcS/FS
-	5uXjCE3+xHN4nvLYAvUgmvuinjP8ym5KubF3r21AJ5/g==
-X-Google-Smtp-Source: AGHT+IE83L633qvtvU9yjysbdYdlIQn21EV/wagnBNKOZgnU2CqBGKS2iMtK+HobtWHJlzyFyVaiQQ==
-X-Received: by 2002:a05:600c:45c9:b0:46e:4b79:551 with SMTP id 5b1f17b1804b1-47117913764mr3709145e9.31.1760628626015;
-        Thu, 16 Oct 2025 08:30:26 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-92-177.ip49.fastwebnet.it. [93.34.92.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-471144c82b8sm31899495e9.15.2025.10.16.08.30.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Oct 2025 08:30:25 -0700 (PDT)
-Message-ID: <68f10f91.050a0220.3778ad.a4b3@mx.google.com>
-X-Google-Original-Message-ID: <aPEPj0R2k64GH7kW@Ansuel-XPS.>
-Date: Thu, 16 Oct 2025 17:30:23 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frank-w@public-files.de>
-Subject: Re: [net-next PATCH] net: phy: as21xxx: fill in inband caps and
- better handle inband
-References: <20251016152013.4004-1-ansuelsmth@gmail.com>
- <aPEOBRytURg6vKqN@shell.armlinux.org.uk>
+	s=arc-20240116; t=1760628668; c=relaxed/simple;
+	bh=4V+eiDbJeS2/Lkmw7GXs1heP2kr5DjpdCX+SmScCzco=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rb4BgKm5z2SZDDTFglg9uMFPUbqSFCpYJ0WgUgMLEgQvxgkcenz+GL1a/bU1+5hQdW1EF/43l9Kah3FPLdKd57PQzZ68Lo9gNpUiBRJMUo2s03WfPtzRckeYg/IgK8mObCGx3iBMZ6AtlIcST8X63wM3djwvLLGLGr1ZuJmG2GA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kosmx.dev; spf=pass smtp.mailfrom=eu-central-1.amazonses.com; dkim=pass (2048-bit key) header.d=kosmx.dev header.i=@kosmx.dev header.b=l8O1INcr; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=VCVsSmbs; arc=none smtp.client-ip=69.169.224.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kosmx.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eu-central-1.amazonses.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=2d6evbf27r2lzynqz2duzea56jayutws; d=kosmx.dev; t=1760628662;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=4V+eiDbJeS2/Lkmw7GXs1heP2kr5DjpdCX+SmScCzco=;
+	b=l8O1INcrEZVAyTskRDCz1jSdZjAI7LQJEswDzEqxHAXzfc+6sxq6en6VV1Efo6X7
+	KXkhePqB+3Fsg+wwMUdZCea5BeTltdQaAFODFc6TRcObGsf6TChdbbmQ5eR5C+6LR1O
+	zzB68saGPWBBNhB4Tr6EAE6Xg0ePKAhXc/fJOap0c9myOiFoHphSsfCL0JWlb4497Zq
+	5l8Z8YL4hQRKRM/VZ4pg8C6wMjabCETMbhn+yUC/HMwjeyffnb31cA6/kd1+U92C2LP
+	CyrahYfh5khic7qS13gL+srSOoys0v999JjbLECNXnAogv+in0Nxwspi1XUHTqpzkgc
+	aWUPGT2a9Q==
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=sokbgaaqhfgd6qjht2wmdajpuuanpimv; d=amazonses.com; t=1760628662;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Feedback-ID;
+	bh=4V+eiDbJeS2/Lkmw7GXs1heP2kr5DjpdCX+SmScCzco=;
+	b=VCVsSmbsXZJ2WUv4RWow/8JmxdP0JC5Kh1ftrvf909tFqIh9lm9ttMAvyE4CSzOy
+	TRiVlzAsi99aUXynnjo2gAIJgGbbO+3xYinvqEohI0qZUuy5r3dVXYGI/z61Br//z46
+	dzK3ZDfmSNyi80uuEB6zxJ1E8JllfLZcG/Ez0eA4=
+Message-ID: <01070199eda55d65-1e43d600-4eb4-4caf-98f0-4414b449cb07-000000@eu-central-1.amazonses.com>
+Date: Thu, 16 Oct 2025 15:31:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aPEOBRytURg6vKqN@shell.armlinux.org.uk>
+Subject: Re: [PATCH] sysfs: check visibility before changing group attribute
+ ownership
+To: Greg KH <gregkh@linuxfoundation.org>, 
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org, 
+	rafael@kernel.org, dakr@kernel.org, christian.brauner@ubuntu.com, 
+	edumazet@google.com, pabeni@redhat.com, davem@davemloft.net, 
+	horms@kernel.org
+References: <20251016101456.4087-1-fmancera@suse.de>
+ <2025101604-filing-plenty-ec86@gregkh>
+Content-Language: en-US
+From: Cynthia <cynthia@kosmx.dev>
+In-Reply-To: <2025101604-filing-plenty-ec86@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Feedback-ID: ::1.eu-central-1.7BiZt5Lnf19vB746CR+JKfpU6eIRDUAYyv2UoOsIVTE=:AmazonSES
+X-SES-Outgoing: 2025.10.16-69.169.224.2
 
-On Thu, Oct 16, 2025 at 04:23:49PM +0100, Russell King (Oracle) wrote:
-> On Thu, Oct 16, 2025 at 05:20:07PM +0200, Christian Marangi wrote:
-> > +static int as21xxx_config_inband(struct phy_device *phydev,
-> > +				 unsigned int modes)
-> > +{
-> > +	if (modes == LINK_INBAND_ENABLE)
-> > +		return aeon_dpc_ra_enable(phydev);
-> 
-> So what happens when phylink requests inband to be disabled?
-> 
-> I really don't like implementations that enable something but then
-> provide no way to disable it.
+
+On 10/16/25 16:46, Greg KH wrote:
+> On Thu, Oct 16, 2025 at 12:14:56PM +0200, Fernando Fernandez Mancera wrote:
+>> Since commit 0c17270f9b92 ("net: sysfs: Implement is_visible for
+>> phys_(port_id, port_name, switch_id)"), __dev_change_net_namespace() can
+>> hit WARN_ON() when trying to change owner of a file that isn't visible.
+>> See the trace below:
+>>
+>>   WARNING: CPU: 6 PID: 2938 at net/core/dev.c:12410 __dev_change_net_namespace+0xb89/0xc30
+>>   CPU: 6 UID: 0 PID: 2938 Comm: incusd Not tainted 6.17.1-1-mainline #1 PREEMPT(full)  4b783b4a638669fb644857f484487d17cb45ed1f
+>>   Hardware name: Framework Laptop 13 (AMD Ryzen 7040Series)/FRANMDCP07, BIOS 03.07 02/19/2025
+>>   RIP: 0010:__dev_change_net_namespace+0xb89/0xc30
+>>   [...]
+>>   Call Trace:
+>>    <TASK>
+>>    ? if6_seq_show+0x30/0x50
+>>    do_setlink.isra.0+0xc7/0x1270
+>>    ? __nla_validate_parse+0x5c/0xcc0
+>>    ? security_capable+0x94/0x1a0
+>>    rtnl_newlink+0x858/0xc20
+>>    ? update_curr+0x8e/0x1c0
+>>    ? update_entity_lag+0x71/0x80
+>>    ? sched_balance_newidle+0x358/0x450
+>>    ? psi_task_switch+0x113/0x2a0
+>>    ? __pfx_rtnl_newlink+0x10/0x10
+>>    rtnetlink_rcv_msg+0x346/0x3e0
+>>    ? sched_clock+0x10/0x30
+>>    ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+>>    netlink_rcv_skb+0x59/0x110
+>>    netlink_unicast+0x285/0x3c0
+>>    ? __alloc_skb+0xdb/0x1a0
+>>    netlink_sendmsg+0x20d/0x430
+>>    ____sys_sendmsg+0x39f/0x3d0
+>>    ? import_iovec+0x2f/0x40
+>>    ___sys_sendmsg+0x99/0xe0
+>>    __sys_sendmsg+0x8a/0xf0
+>>    do_syscall_64+0x81/0x970
+>>    ? __sys_bind+0xe3/0x110
+>>    ? syscall_exit_work+0x143/0x1b0
+>>    ? do_syscall_64+0x244/0x970
+>>    ? sock_alloc_file+0x63/0xc0
+>>    ? syscall_exit_work+0x143/0x1b0
+>>    ? do_syscall_64+0x244/0x970
+>>    ? alloc_fd+0x12e/0x190
+>>    ? put_unused_fd+0x2a/0x70
+>>    ? do_sys_openat2+0xa2/0xe0
+>>    ? syscall_exit_work+0x143/0x1b0
+>>    ? do_syscall_64+0x244/0x970
+>>    ? exc_page_fault+0x7e/0x1a0
+>>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>>   [...]
+>>    </TASK>
+>>
+>> Fix this by checking is_visible() before trying to touch the attribute.
+>>
+>> Fixes: 303a42769c4c ("sysfs: add sysfs_group{s}_change_owner()")
+>> Reported-by: Cynthia <cynthia@kosmx.dev>
+>> Closes: https://lore.kernel.org/netdev/01070199e22de7f8-28f711ab-d3f1-46d9-b9a0-048ab05eb09b-000000@eu-central-1.amazonses.com/
+>> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+>> ---
+>>   fs/sysfs/group.c | 26 +++++++++++++++++++++-----
+>>   1 file changed, 21 insertions(+), 5 deletions(-)
+> Nice, thanks!  This has been tested, right?
 >
+> thanks,
+>
+> greg k-h
 
-On firmware load it's disabled by default. Can phylink ask to disable
-inband at runtime?
+I did a quick test just now, it works in the VM (no warn and the 
+container is running).
 
-I will try to check if there is a way to disable it.
+kosmx
 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-
--- 
-	Ansuel
 
