@@ -1,134 +1,141 @@
-Return-Path: <netdev+bounces-230190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E078BE51DE
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 20:53:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64FEFBE529B
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 21:03:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 118A64EF67C
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 18:53:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DEA51AA0436
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 19:03:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C6522424E;
-	Thu, 16 Oct 2025 18:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1E4D23D7D9;
+	Thu, 16 Oct 2025 19:03:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ob8y+cQ3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D217VmIn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1E223C516
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 18:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8630923C516;
+	Thu, 16 Oct 2025 19:03:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760640827; cv=none; b=AfSOPpZQoeqI7dne4eLzO6PNlkO2uHAOi6zrVNCIP7JQ11rEEH7Op+NrjUBu+yeHIcTJhAbVwfzIwfVREMCEdQU0dFloZBzW6rEoyqvT55HVEy5DrOkQraGyzzYw/CuqXtnzc/cyjxZtj1ObaR9pTYoefmEk0S2+O1N8eDCw9Fo=
+	t=1760641394; cv=none; b=jsDgidVci49kGN/FOQqlDj8lOuCi5UiRnaTXENkFwm0n/Sk/Qo7ApUsxu3gDEULsso+QANGk9NPAifHPXssBfHv1rI/gn5kKItPni+0tYxgWibuFJah+YIy59+opTC48w5u6B7fVE1Ol9iDEwlT0/WmMogYnPBtC8fWBMJ5pivk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760640827; c=relaxed/simple;
-	bh=MJ04rX3XkSBkvTok/bJnoouZLIdDfY2CseOfTojI+2k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CC8LT5SotG+y0qZiSwNVOCm5bwmWcO0LI7rmF9JNPMxJfHppQ0gudUjv1IX6s7X9SsfgUuna6FPXfXXWjF+TJvrLzmbGCZW5gOE0/FsiVSoUMyhnOd2Ald5qCVLhB4Okx9ov3ykaYP560qPiQuchCy/c14eo8CRTZfvwyATYCNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ob8y+cQ3; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3ece1102998so889716f8f.2
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 11:53:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760640824; x=1761245624; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/mqzXmAQ50Rc5bcmH208zXLpg7zAZdmyFj4xDWg5G6o=;
-        b=Ob8y+cQ30H8b+jWYxzJTpgnB/qP0OHDtMWhYkaVWjKQX44L3Z6Mfusc7+L9bMU0P0/
-         IvmblgLi9/w2fZlx9t5OiFnNxiaHn0fK/N/csZtnNWOuTsOa94DoTimLIPZWQSUeFvks
-         +1wWhZSH4OZEireqBt/8+Vgznbo5nK8+L3Hvdz7zwslvlZWx4o09gAOJobTUvhFRD0S7
-         0EHIcYhU50LctxLw4Lj8zgtoV4DsiiEfwBAkb1TJSC3MhReu0uztF0EdW8mdG9HG2na2
-         0jNfp9NDIOa3L4X5nvOgPmcou/ceYfODWpvJL0hNb5xiOm2i+5rTZmk22u3gOEHZ1Y08
-         PxZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760640824; x=1761245624;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/mqzXmAQ50Rc5bcmH208zXLpg7zAZdmyFj4xDWg5G6o=;
-        b=Wf0OgN0nOZtxjpbdaphnNcD6Tu3PGJtn1vlTW9U+Gz0fz1zMeVxgNd0fuD9OD0MTjB
-         f6YfxUR/Z/ux4yxOxLQZpwRsdGF4UaYgxtTrXXOac+xC0a8La1yZIOV2zQ9Zvr1VvGJR
-         ebxpGW11LRd2ZbGSOqq/hA293x/53tlV0VpqQkeaZhJG1WECG2TC32srTL5TlTX3PtcB
-         JlXh2G7n/ozymtsn/lRnHvdmkM70XdPCt7MyQYawqsvh8rejl7kGB0yEPFNCxJx6QmVL
-         hLrtOTKtGdsKxGvQa/xFu/uqGoxo0uQT6tqE8JUXwGKyJPVw5gx9pts1SaeeWORrDvuN
-         uUGw==
-X-Forwarded-Encrypted: i=1; AJvYcCWzPLBT9E2taYx1lCYHd5p/EwHnoHeHW60b3K3sQAz1UroXQCU4VzEhiGNnLckkktBP69DxuU0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUsYRJwQSlpE5XSdPZuXv91qPjlu0/AuNJEjioP/kWdcBROigV
-	o8luMeAyO5ubXudfNmHMxAsLqdpvoN+PvRip0wBUl2ngD0Eg9uO3/uJB97vzP3CaxBM2+WRb80y
-	+91rQ5p68Nuc3OzTyR/0TcZHHJn1oU/o=
-X-Gm-Gg: ASbGncsa3GtLsk3VQQ1jlbcDycm16MNmymPKVQxgwXAYnb3KRYzEuL2SxWFh1rlizWG
-	lg4RYHH4aIbE0Vj6SlkPiPeMFzS/67zMFYVzPn0R4Tg2i7gO34kNbhQNxNoXEfjZZ0JZJxBcynb
-	+G+P5Edjs2ZakCKafZIX8VtmKq98R3n4kDbOucGStaNR6Dv/m0as3qVoirtC7U5Cwori+NIH2pn
-	VkELO1XlHrlTCbdO9QT6wht7Q6C25sYtwSEcPUPpIH+FuItmntImWP6GHDFm2BOgwWnTu4dsvOK
-	HF6R//NAANZYkKCPEVVUJIWQ0AzVGw==
-X-Google-Smtp-Source: AGHT+IHhdgclFdo/jd6bons/G8sScySn6wGDuS6vqOFInfkOckOnahc3Uha5R92s3rwwgaWDN2XM43s6dNdaIy1xYhY=
-X-Received: by 2002:a05:6000:2309:b0:426:d301:a501 with SMTP id
- ffacd0b85a97d-42704ded9d8mr719367f8f.62.1760640823754; Thu, 16 Oct 2025
- 11:53:43 -0700 (PDT)
+	s=arc-20240116; t=1760641394; c=relaxed/simple;
+	bh=/svoWHeXOS5kyJXHlew/DzxM7PeeoVPP4zawYSZ0BBc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bzD4V7ijFbwr6Wqjkv3U45XnKkWm56gHvKgOYkRiiRWUtqyZGC4NOkbim2eBLfe5PG1zu2UF724WjbAXQxErSd0YNUFWfNEusehf5mjhLxods4Q1JBJnjVFio+Q3tzy5eNVX7xx4DG+aDZpacvwFUI4CPLYdBc36P/s9im7Erfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D217VmIn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B287C4CEF1;
+	Thu, 16 Oct 2025 19:03:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760641394;
+	bh=/svoWHeXOS5kyJXHlew/DzxM7PeeoVPP4zawYSZ0BBc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=D217VmIns/z5GA+fv8iF5JXLetra8+kbwzk/1qKgHsww226jfwCLdSRKYCHa2zkQc
+	 Gja7iIsZ13AIs0GduApLg2/IunDfD9KXqhPwGGEjicdzyWMYh7kOk0MJQVDmJhFqI6
+	 lLi100fx2DeAwJu8U/soLf1xfZjzbOY79+k3oG6tbMz00Z3lDOEFlYZk3DX/qzOXP6
+	 w2QFy/bA+xPTP1jr2SYF6EdNEbA7+aRIbPf8lhEob59XRqr7JfxLOZfOvvRSsCZdF3
+	 id4BqbkPJMAFTEt2/q8UjQ9OFv0sTZZ7yNPEUg2tOJCBxA72rNfGZBGWzgMTDpMSFp
+	 fZ0AoJEThsvng==
+Date: Thu, 16 Oct 2025 20:03:07 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Dan Nowlin <dan.nowlin@intel.com>,
+	Qi Zhang <qi.z.zhang@intel.com>, Jie Wang <jie1x.wang@intel.com>,
+	Junfeng Guo <junfeng.guo@intel.com>,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Rafal Romanowski <rafal.romanowski@intel.com>
+Subject: Re: [PATCH net-next 06/14] ice: Extend PTYPE bitmap coverage for GTP
+ encapsulated flows
+Message-ID: <aPFBazc43ZYNvrz7@horms.kernel.org>
+References: <20251015-jk-iwl-next-2025-10-15-v1-0-79c70b9ddab8@intel.com>
+ <20251015-jk-iwl-next-2025-10-15-v1-6-79c70b9ddab8@intel.com>
+ <aPDjUeXzS1lA2owf@horms.kernel.org>
+ <64d3e25a-c9d6-4a43-84dd-cffe60ac9848@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20210601005155.27997-1-kabel@kernel.org> <CA+V-a8tW9tWw=-fFHXSvYPeipd8+ADUuQj7DGuKP-xwDrdAbyQ@mail.gmail.com>
- <7d510f5f-959c-49b7-afca-c02009898ef2@lunn.ch>
-In-Reply-To: <7d510f5f-959c-49b7-afca-c02009898ef2@lunn.ch>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Thu, 16 Oct 2025 19:53:17 +0100
-X-Gm-Features: AS18NWBfdkOYg0lWdUnzcKi5SK2B8n5vdgUohorTtHmKCqbaebeIlifqCtH2bR0
-Message-ID: <CA+V-a8ve0eKmBWuxGgVd_8uzy0mkBm=qDq2U8V7DpXhvHTFFww@mail.gmail.com>
-Subject: Re: [PATCH leds v2 00/10] Add support for offloading netdev trigger
- to HW + example implementation for Turris Omnia
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: =?UTF-8?B?TWFyZWsgQmVow7pu?= <kabel@kernel.org>, 
-	linux-leds@vger.kernel.org, netdev@vger.kernel.org, 
-	Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>, Russell King <linux@armlinux.org.uk>, 
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, 
-	Jacek Anaszewski <jacek.anaszewski@gmail.com>, 
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <64d3e25a-c9d6-4a43-84dd-cffe60ac9848@intel.com>
 
-Hi Andrew,
+On Thu, Oct 16, 2025 at 10:20:25AM -0700, Jacob Keller wrote:
+> 
+> 
+> On 10/16/2025 5:21 AM, Simon Horman wrote:
+> > On Wed, Oct 15, 2025 at 12:32:02PM -0700, Jacob Keller wrote:
+> >> From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> >>
+> >> Consolidate updates to the Protocol Type (PTYPE) bitmap definitions
+> >> across multiple flow types in the Intel ICE driver to support GTP
+> >> (GPRS Tunneling Protocol) encapsulated traffic.
+> >>
+> >> Enable improved Receive Side Scaling (RSS) configuration for both user
+> >> and control plane GTP flows.
+> >>
+> >> Cover a wide range of protocol and encapsulation scenarios, including:
+> >>  - MAC OFOS and IL
+> >>  - IPv4 and IPv6 (OFOS, IL, ALL, no-L4)
+> >>  - TCP, SCTP, ICMP
+> >>  - GRE OF
+> >>  - GTPC (control plane)
+> >>
+> >> Expand the PTYPE bitmap entries to improve classification and
+> >> distribution of GTP traffic across multiple queues, enhancing
+> >> performance and scalability in mobile network environments.
+> >>
+> >> --
+> > 
+> > Hi Jacob,
+> > 
+> > Perhaps surprisingly, git truncates the commit message at
+> > the ('--') line above. So, importantly, the tags below are absent.
+> > 
+> 
+> Its somewhat surprising, since I thought you had to use '---' for that.
+> Regardless, this shouldn't be in the commit message at all.
+> > Also, the two lines below seem out of place.
+> > 
+> >>  ice_flow.c |   54 +++++++++++++++++++++++++++---------------------------
+> >>  1 file changed, 26 insertions(+), 26 deletions(-)
+> >>
+> 
+> Yep these shouldn't have been here at all. I checked, and for some
+> reason it was included in the original message id of the patch. b4
+> happily picked it up when using b4 shazam.
+> 
+> See:
+> https://lore.kernel.org/intel-wired-lan/20250915133928.3308335-5-aleksandr.loktionov@intel.com/
+> 
+> I am not sure if this is the fault of b4, though it has different
+> behavior than other git tooling here.
 
-On Thu, Oct 16, 2025 at 2:14=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > > Marek Beh=C3=BAn (10):
-> > >   leds: trigger: netdev: don't explicitly zero kzalloced data
-> > >   leds: trigger: add API for HW offloading of triggers
-> > >   leds: trigger: netdev: move trigger data structure to global includ=
-e
-> > >     dir
-> > >   leds: trigger: netdev: support HW offloading
-> > >   leds: trigger: netdev: change spinlock to mutex
-> > >   leds: core: inform trigger that it's deactivation is due to LED
-> > >     removal
-> > >   leds: turris-omnia: refactor sw mode setting code into separate
-> > >     function
-> > >   leds: turris-omnia: refactor brightness setting function
-> > >   leds: turris-omnia: initialize each multicolor LED to white color
-> > >   leds: turris-omnia: support offloading netdev trigger for WAN LED
-> > >
-> > Do you plan to progress with the above series anytime soon? If not I
-> > want to give this patch [0] again a respin.
->
-> What features are you missing from the current kernel code, which this
-> series adds?
->
-I=E2=80=99m working on a platform that uses the VSC8541 PHY. On this platfo=
-rm,
-LED0 and LED1 are connected to the external connector, and LED1 is
-also connected to the Ethernet switch to indicate the PHY link status.
-As a result, whenever there is link activity, the PHY link status
-signal to the switch toggles, causing the switch to incorrectly detect
-the link as going up and down.
+TBH, I am also surprised that git truncates at '--'. I also thought
+'---'. And as this is the second time it's come up recently,
+while I don't recall seeing it before, perhaps due to some tooling change
+somewhere: e.g. interaction between git and b4.
 
-Cheers,
-Prabhakar
+> I fixed this on my end, and can resubmit after the 24hr period if needed.
+
+FWIIW, I'd lean towards reposting after 24h if you don't hear from one of
+the maintainers.
+
+
 
