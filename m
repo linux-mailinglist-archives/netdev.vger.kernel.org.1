@@ -1,96 +1,159 @@
-Return-Path: <netdev+bounces-230083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72C1CBE3CE4
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:50:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 572AEBE3CF0
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 15:52:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E30A81884988
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:50:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D064D19A7565
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 13:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99E52E6135;
-	Thu, 16 Oct 2025 13:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25DF2E1742;
+	Thu, 16 Oct 2025 13:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QueDoo6Q"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0+dTZXBd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A504D1D5CD9
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 13:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86242DF141;
+	Thu, 16 Oct 2025 13:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760622626; cv=none; b=tuas/MhC8WEpqq3xMZwbnuLJkOqvugcpXY3xQSoMBDj4RqG/PkB47S0oAYj9HnQi+A5ed5dfkcLjg1lh37cs9z8Qf3k/8krGuQ/bGrWi5bKhr66nU8gz1OQgZGuA6YtZF+7JtrJv3JjihFxJo046SLoGOg5ZAwYx34A85jpkemg=
+	t=1760622742; cv=none; b=r0DFwYrCPn9XZ60FzhNC+HHakHV1KjcVkN5aAriiVGH5R2BU2mUmK0M4SonFN+U4wC5+75YSDHXjvQouDHP1oAfSLVLXHgSFMTYefYfNMzQ46l5fln2AsXGB/ZenAUEOObhBZCR/ngfuTdnXSCvBRiWYcOpbTOMD0abr4oDWLz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760622626; c=relaxed/simple;
-	bh=tgWyjDN8idpl+H0MCL3Bs9cXjUjwJgxwgtu6S0PJp+s=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uaV3+f2w+Qslup4Fj+wtBQhu+dVfO9f1r0ooPdJVytA9VHhS7t1TQIhYmOxHyRbYJNJR2NyyWf5uy8u3cdcCWWvth2ViCfuKJ4BvPAjJ/KNKaV0bthyYzru6XfNo/bjkugoZ3lEYppmRlOYdhfcYlG/6fqEqpeYT5MJIL/isaAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QueDoo6Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 389E8C4CEF1;
-	Thu, 16 Oct 2025 13:50:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760622626;
-	bh=tgWyjDN8idpl+H0MCL3Bs9cXjUjwJgxwgtu6S0PJp+s=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QueDoo6QSddBdw+PaekYs/I1FQVEGit77r+BX8wGyuOX0t4can3h6yBJrJcdKDrvF
-	 +dXzaTXMs3uvWvkm07cCYKnnIgcpSirqioy/TVp06s7ujlvzakXi1/bKKhzbthKx+U
-	 HloirsEzpKOj2jhwIkjyRig68tL0inyShzTI0f9wQLDyJHKGAqxboG3QCi2dO5RZ8q
-	 XfGQqBs7h/weGw1HwAygBwHItSsGvapirifHbvX/eQK3nVcd4zkknIG9rJ8XlYmKqf
-	 hAdTJnpmk+QQPyWLNkWE1RKVDGM5WM47RUCk5EDEA/Kb1Zto8+ww5QPNkNWQGoRdh8
-	 +8DX4+w8wUjkw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC17383BA08;
-	Thu, 16 Oct 2025 13:50:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1760622742; c=relaxed/simple;
+	bh=ULeaJJUMe/wC90ReLYUVCqTHShIiS1YZvkS1YfAkp5s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fl5rsVGGz4GXijoowVxjxUFNxl7MyOg9GVASRKXOgxr9aPnJa+aCI9lJej+9BUANUPZ6bwWAWyhKiUhEdzz0zTZOGjTLGlcPmTsrSxm3reAJXnI/2502pYIb7E3XJZMtxSgcSt5ALh8kh2lICCR8SEsMamUSXIi9zAv/mDMnqAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0+dTZXBd; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=UmCdG/YPwALyDLpBb5siWg/i3BOrWdjDOVrZPQUGrZ8=; b=0+dTZXBd5lApnHs2iQaBbz/W/V
+	Q7bJFJnGIA2uG8tjS5UsEsS5Zf8UZNrrq2xOtoMqAw1ePzjfdRuqYhMDAbHp9IA6SKikFFdvxfcwL
+	dzr4TP20v7Ikpb4eFepO6AgDnISJvNmQnXw09aUuufpFMWhnQxXRnGKqTiGPvjrCQbdma4YuvvwtH
+	YVPgtZbE5K1ZsOHDzJG50RAIpAUra2yfNcA0krjXV1cBF/ch9+Buy3F6o2btiNcTXkFL0ICrSNJZY
+	pxEOMeHRoS1NJFq8P6hRm8ihzKlijAE+794qKuQIu2Wqr0T2GPcn5xYNKe/fQcEoCLoRgAVrs5uRJ
+	eOda1ZYw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38764)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v9OON-000000006M1-0eca;
+	Thu, 16 Oct 2025 14:51:43 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v9OO9-000000003K9-3HzO;
+	Thu, 16 Oct 2025 14:51:29 +0100
+Date: Thu, 16 Oct 2025 14:51:29 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Abhishek Chauhan <quic_abchauha@quicinc.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexis Lothore <alexis.lothore@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Drew Fustini <dfustini@tenstorrent.com>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
+	Furong Xu <0x1207@gmail.com>, Inochi Amaoto <inochiama@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+	Jisheng Zhang <jszhang@kernel.org>, Kees Cook <kees@kernel.org>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthew Gerlach <matthew.gerlach@altera.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rohan G Thomas <rohan.g.thomas@altera.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Simon Horman <horms@kernel.org>,
+	Song Yoong Siang <yoong.siang.song@intel.com>,
+	Swathi K S <swathi.ks@samsung.com>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>, Vinod Koul <vkoul@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH net-next 11/14] net: stmmac: do not require snps,ps-speed
+ for SGMII
+Message-ID: <aPD4YRH6ih93jQXH@shell.armlinux.org.uk>
+References: <aO-tbQCVu47R3izM@shell.armlinux.org.uk>
+ <E1v92N3-0000000AmHQ-4Bm2@rmk-PC.armlinux.org.uk>
+ <15ea57e0-d127-4722-b752-4989d5a443c0@lunn.ch>
+ <aPAWoDGVgeRFV95b@shell.armlinux.org.uk>
+ <6545b453-e99e-4f44-a206-ef14deb7f96a@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/3] TXGBE feat new AML firmware
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176062261050.1361509.17000287492387086672.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Oct 2025 13:50:10 +0000
-References: <20251014061726.36660-1-jiawenwu@trustnetic.com>
-In-Reply-To: <20251014061726.36660-1-jiawenwu@trustnetic.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- rmk+kernel@armlinux.org.uk, mengyuanlou@net-swift.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6545b453-e99e-4f44-a206-ef14deb7f96a@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 14 Oct 2025 14:17:23 +0800 you wrote:
-> The firmware of AML devices are redesigned to adapt to more PHY
-> interfaces. Optimize the driver to be compatible with the new firmware.
+On Thu, Oct 16, 2025 at 03:03:34PM +0200, Andrew Lunn wrote:
+> > I don't at present, and I'm not sure what the point of updating it
+> > would actually be, because this is another thing that's just broken.
 > 
-> ---
-> v2:
-> - Detail the commit logs.
+> > Hence, I would like this property a slow and painful^h^h^hfree death.
+> > Maybe mark the property deprecated, and remove all explanation of it
+> > apart from stating that it's obsolete after this patch series has
+> > been merged and we've proven that it's never been useful.
 > 
-> [...]
+> And this is what i was thinking. At least mark it deprecated. If you
+> want to remove the documentation late, i'm fine with that as well.
 
-Here is the summary with links:
-  - [net-next,v2,1/3] net: txgbe: expend SW-FW mailbox buffer size to identify QSFP module
-    https://git.kernel.org/netdev/net-next/c/af3fce9f1bb4
-  - [net-next,v2,2/3] net: txgbe: optimize the flow to setup PHY for AML devices
-    https://git.kernel.org/netdev/net-next/c/1f863ce5c712
-  - [net-next,v2,3/3] net: txgbe: rename txgbe_get_phy_link()
-    https://git.kernel.org/netdev/net-next/c/a058de9262f4
+It's rather premature to do this - this series doesn't change anything
+in the way that snps,ps-speed behaves.
 
-You are awesome, thank you!
+Setting this still:
+1. sets the SGMII rate adapter to take its speed configuration from the
+   MAC control register rather than the in-band config.
+2. enables the exchange of the SGMII in-band config.
+
+What it doesn't do, and has never done, is to ensure that the in-band
+config that is sent contains the speed and duplex information for the
+SGMII link partner due to a repeated typo in the individual core sub-
+drivers.
+
+I'm not intending removing this until we have a different way to
+specify it, e.g. PHY_INTERFACE_MODE_REVSGMII, but that is currently
+looking unlikely. However, with PHY_INTERFACE_MODE_REVSGMII, we would
+need to make the change (fix the typo bug) to publish the correct
+in-band config.
+
+I think a bit more thought is needed before going down that path,
+because if we're publishing the config, is it a fixed-link. That's
+something that we need to sort out in the PHY_INTERFACE_MODE_REVSGMII
+discussions... if we're still going with it.
+
+So, right now what happens here entirely depends on stuff we have
+yet to make decisions on, and so marking it deprecated now is too
+early.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
