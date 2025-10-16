@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-230240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B25ABE5B79
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 00:50:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 79871BE5B84
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 00:51:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B7E63A8A84
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 22:50:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EF023B1579
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 22:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59EA72E62B9;
-	Thu, 16 Oct 2025 22:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCEE2E36E1;
+	Thu, 16 Oct 2025 22:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ADnXDFgU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J7QsAFwm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BCAD2E54DB;
-	Thu, 16 Oct 2025 22:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99F72E1F08
+	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 22:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760655028; cv=none; b=tw4n/+60ZXxmNbBWhIxHnPLKICVetBH6GrycrnykW5UrzyItINj8tFuczbfN2upqfiW+9AFwV79ImejdGHDpf6WlBEFSQsZMk91rTgNfroaDRc/DUChTTvS/B+6xd4oZzb1O48vyPQhGwRGtedkUQmDjctJ6+DiOANN7v1BSsI0=
+	t=1760655034; cv=none; b=UiRhBnB+yva/9QIUisVFBT9yncY/walH3GK6qjcmmHrtHafZMgAPIndByitZTr1Sxg9d2ns2SPV3gJvT1LRCx+MH6NOTJZJVj/exr/c8Ix8xIw6ekjz/Q1knSog1HB3lgBeO+miczceusIyCQJJJoraWqDvY1gtZRFzZ7lxmFVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760655028; c=relaxed/simple;
-	bh=LEyjDqt+KSXqFAGgDm/vrhUy0sgGU+mTGvsIjUu/j+w=;
+	s=arc-20240116; t=1760655034; c=relaxed/simple;
+	bh=P4fIB79QWtiJzWsVTyfxNg0TWh1a+Px9Hwm3g9ikyww=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Hz845oMoW7ukLF0ZmBu0u26LUwNp3FGDw32upM7SHUzPIb3/S5I+AL3bhOJPdYOnwT3BIpv7Da66ZbKWbxoi1GX/l3WnhA62UyllsKJhXbJuhMcAmwSaMbAqIWTG3nBqhv75icebKSCv60tr/Adr+cjP2NwicBwJQ2kOEzmJ3YA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ADnXDFgU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0F73C4CEF1;
-	Thu, 16 Oct 2025 22:50:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JPokJF0cUT9ExsvKh0wyQuhajIVpvC+2SdgvHiTIcCKkxbpEQDSKbCIaxfn/x/o2sIB4rrHxKApbvtpicjpsa0xoYjJGlbOM+tTpSNjUwtwk6ctGWZ7lYRXHG89vWx45sOwL+3m1lQcYZDrOKDC1f0aslb/3YKv4z+qTHuOnuCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J7QsAFwm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25B99C4CEF1;
+	Thu, 16 Oct 2025 22:50:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760655027;
-	bh=LEyjDqt+KSXqFAGgDm/vrhUy0sgGU+mTGvsIjUu/j+w=;
+	s=k20201202; t=1760655034;
+	bh=P4fIB79QWtiJzWsVTyfxNg0TWh1a+Px9Hwm3g9ikyww=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ADnXDFgUDvMeJXHX+EGj3/UImc0MkM4/HJLoV7bcjT8vvKRZ/7AoRQMaCeHLWoImp
-	 QREZv+HpilkhdhEpxzNoOk/4KktSqe6bcaM7lRe+NgDKfMLUvkEOP7cXdN9dD5ZSuF
-	 tSHG9FOAbE0J+Z6x6GxBt37ekt5g05s4dPYSmTJTK1+To6jmuDWzgAv0U9L8qSSbuw
-	 9MnHNuurYIaGhKrXERd2tArFwIUEGgzVd+1e5AH+Iyk/I1xmOIzJtCAntMzd2OmsMR
-	 yup261zVpyAvLkwdfeYMAVa2IAOES0FmoMa4xXX6atuQnUbM/VXSfRYe7CwSIehOuc
-	 xHIFrEih+j9jg==
+	b=J7QsAFwmGb9PQ3DcuJsTptlnxfD3KiXKkvDx68VEDbp69m3BvR8rw7Sxl5gFe6EMv
+	 CRYqud4Dc9Tfk+cssye0DFuJkfs3+VjPCdXoZ/ZgBQpzkoniZPNxzUM8g9WFSLaaSm
+	 mnEHjAcxTbzGqWPAiiJ5aRNln76LA4Awwa8KYuGmafoKDXlhdSTAiMuq+D5UoE/f9F
+	 RojXgE/z7Z+FJghwkxD9iEwcBysiaWWcUQZCfR30MrfrYMemiA9ZPICss/10AAjBKx
+	 1FndLSbMC9S9WEEl7LtUELr++3Ugd7OYsx3MU1pfjuOC3A0YaBYuLC9JJq0zuYpOGZ
+	 tIvXHcAQY4h2Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEC139D0C23;
-	Thu, 16 Oct 2025 22:50:12 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 712F939D0C23;
+	Thu, 16 Oct 2025 22:50:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/mlx5e: psp,
- avoid 'accel' NULL pointer dereference
+Subject: Re: [PATCH net-next v2] net: amd-xgbe: use EOPNOTSUPP instead of
+ ENOTSUPP
+ in xgbe_phy_mii_read_c45
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176065501149.1934842.14113114853264935323.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Oct 2025 22:50:11 +0000
-References: <1760511923-890650-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1760511923-890650-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- mbloch@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
- moshe@nvidia.com, dtatulea@nvidia.com, cratiu@nvidia.com
+ <176065501805.1934842.8525814840904618022.git-patchwork-notify@kernel.org>
+Date: Thu, 16 Oct 2025 22:50:18 +0000
+References: <20251015025751.1532149-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20251015025751.1532149-1-alok.a.tiwari@oracle.com>
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+Cc: Shyam-sundar.S-k@amd.com, kuba@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 15 Oct 2025 10:05:23 +0300 you wrote:
-> From: Cosmin Ratiu <cratiu@nvidia.com>
+On Tue, 14 Oct 2025 19:57:43 -0700 you wrote:
+> The MDIO read callback xgbe_phy_mii_read_c45() can propagate its return
+> value up through phylink_mii_ioctl() to user space via netdev ioctls such
+> as SIOCGMIIREG. Returning ENOTSUPP results in user space seeing
+> "Unknown error", since ENOTSUPP is not a standard errno value.
 > 
-> The 'accel' parameter of mlx5e_txwqe_build_eseg_csum() and the similar
-> 'state' parameter of mlx5e_accel_tx_ids_len() were NULL when called
-> from mlx5i_sq_xmit() and were causing kernel panics from that context.
-> 
-> Fix that by passing in a local empty mlx5e_accel_tx_state variable, thus
-> guaranteeing that 'accel' is never NULL. Also remove an unnecessary
-> check from mlx5e_tx_wqe_inline_mode().
+> Replace ENOTSUPP with EOPNOTSUPP to align with the MDIO core’s
+> usage and ensure user space receives a proper "Operation not supported"
+> error instead of an unknown code.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net/mlx5e: psp, avoid 'accel' NULL pointer dereference
-    https://git.kernel.org/netdev/net/c/5348d6312446
+  - [net-next,v2] net: amd-xgbe: use EOPNOTSUPP instead of ENOTSUPP in xgbe_phy_mii_read_c45
+    https://git.kernel.org/netdev/net-next/c/bd853a59a87e
 
 You are awesome, thank you!
 -- 
