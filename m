@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-230241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79871BE5B84
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 00:51:15 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20E52BE5B81
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 00:51:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EF023B1579
-	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 22:50:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1E5AD4F3B01
+	for <lists+netdev@lfdr.de>; Thu, 16 Oct 2025 22:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCEE2E36E1;
-	Thu, 16 Oct 2025 22:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD5E2E7BAE;
+	Thu, 16 Oct 2025 22:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J7QsAFwm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G8aKYWoq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99F72E1F08
-	for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 22:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868092E5B11;
+	Thu, 16 Oct 2025 22:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760655034; cv=none; b=UiRhBnB+yva/9QIUisVFBT9yncY/walH3GK6qjcmmHrtHafZMgAPIndByitZTr1Sxg9d2ns2SPV3gJvT1LRCx+MH6NOTJZJVj/exr/c8Ix8xIw6ekjz/Q1knSog1HB3lgBeO+miczceusIyCQJJJoraWqDvY1gtZRFzZ7lxmFVQ=
+	t=1760655035; cv=none; b=cI8fo1ZVBV/glSZuomlZqr+BC8x28YiKgC+Yh9LZeg2z5zzuGGJJCetPetIs8yMI20hqI/BGqLZ89il14tJ7IdDjkFUwawUGLQFSqSyVZGQ1kNIkvyu0ZYNajlkrSvwSb50XH4g12yx2P5qtiOm1N10UxfudX/cmxW69yTvX3FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760655034; c=relaxed/simple;
-	bh=P4fIB79QWtiJzWsVTyfxNg0TWh1a+Px9Hwm3g9ikyww=;
+	s=arc-20240116; t=1760655035; c=relaxed/simple;
+	bh=vP3gId2KhmEatsBRHSFXOI6Zu3QBC3IFITCWJbmO2IE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JPokJF0cUT9ExsvKh0wyQuhajIVpvC+2SdgvHiTIcCKkxbpEQDSKbCIaxfn/x/o2sIB4rrHxKApbvtpicjpsa0xoYjJGlbOM+tTpSNjUwtwk6ctGWZ7lYRXHG89vWx45sOwL+3m1lQcYZDrOKDC1f0aslb/3YKv4z+qTHuOnuCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J7QsAFwm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25B99C4CEF1;
-	Thu, 16 Oct 2025 22:50:34 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JKjacDxxRzwCkFFcDITNxHfbnOA7SErRkXb+Wxc1YUz5xHciw/PPJHVkGRPyZsPczqozpmtj8nXmETvYekNL9ZHH5t1BNkhDR3YCh+oP4GoruzH6WIdmJDQtQL+bDfxjzIdjYzlLPDEDV7ZzeTkEaa6Ri69TrWgmyG76Re0G134=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G8aKYWoq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AFE0C4CEF1;
+	Thu, 16 Oct 2025 22:50:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760655034;
-	bh=P4fIB79QWtiJzWsVTyfxNg0TWh1a+Px9Hwm3g9ikyww=;
+	s=k20201202; t=1760655035;
+	bh=vP3gId2KhmEatsBRHSFXOI6Zu3QBC3IFITCWJbmO2IE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=J7QsAFwmGb9PQ3DcuJsTptlnxfD3KiXKkvDx68VEDbp69m3BvR8rw7Sxl5gFe6EMv
-	 CRYqud4Dc9Tfk+cssye0DFuJkfs3+VjPCdXoZ/ZgBQpzkoniZPNxzUM8g9WFSLaaSm
-	 mnEHjAcxTbzGqWPAiiJ5aRNln76LA4Awwa8KYuGmafoKDXlhdSTAiMuq+D5UoE/f9F
-	 RojXgE/z7Z+FJghwkxD9iEwcBysiaWWcUQZCfR30MrfrYMemiA9ZPICss/10AAjBKx
-	 1FndLSbMC9S9WEEl7LtUELr++3Ugd7OYsx3MU1pfjuOC3A0YaBYuLC9JJq0zuYpOGZ
-	 tIvXHcAQY4h2Q==
+	b=G8aKYWoq+Y/Pwtblr3++AsR+8V4P54Ckwch9/ongQoxaJg5h/2lU1q7jYOqBKtZ6n
+	 9d5IE9u8BvIQEe9/ygFQKwvplACP+qt9uF3CXbT2Rn8WhHofbq0L6+12wMFlHty/qb
+	 rWyS8XzXkBtm/OM1y8PLhK5Mjb+mJLcILk+0FIr3GFYmZfdrWrzcRQGSRA0ff8ssSj
+	 A3l0YJ9s7tMLcI8IrA0ghXN+6m8DMGDlJa/U0zRXqktZ2buIj4H1Bxw7+MH9I1WS8q
+	 zJlVRXTPuAcLgtbod87Dg6LSs5fjbYDOlmpHjqslUxLtVcIrSotiHMgqsuPZH7Jxr0
+	 G57Z1hLw0AWBg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 712F939D0C23;
-	Thu, 16 Oct 2025 22:50:19 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE02A39D0C23;
+	Thu, 16 Oct 2025 22:50:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: amd-xgbe: use EOPNOTSUPP instead of
- ENOTSUPP
- in xgbe_phy_mii_read_c45
+Subject: Re: [PATCH v2] Octeontx2-af: Fix pci_alloc_irq_vectors() return value
+ check
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176065501805.1934842.8525814840904618022.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Oct 2025 22:50:18 +0000
-References: <20251015025751.1532149-1-alok.a.tiwari@oracle.com>
-In-Reply-To: <20251015025751.1532149-1-alok.a.tiwari@oracle.com>
-To: ALOK TIWARI <alok.a.tiwari@oracle.com>
-Cc: Shyam-sundar.S-k@amd.com, kuba@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org
+ <176065501949.1934842.16850687793023920091.git-patchwork-notify@kernel.org>
+Date: Thu, 16 Oct 2025 22:50:19 +0000
+References: <20251015090117.1557870-1-harshit.m.mogalapalli@oracle.com>
+In-Reply-To: <20251015090117.1557870-1-harshit.m.mogalapalli@oracle.com>
+To: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+Cc: sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+ jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, nmani@marvell.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dan.carpenter@linaro.org, kernel-janitors@vger.kernel.org, error27@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 14 Oct 2025 19:57:43 -0700 you wrote:
-> The MDIO read callback xgbe_phy_mii_read_c45() can propagate its return
-> value up through phylink_mii_ioctl() to user space via netdev ioctls such
-> as SIOCGMIIREG. Returning ENOTSUPP results in user space seeing
-> "Unknown error", since ENOTSUPP is not a standard errno value.
+On Wed, 15 Oct 2025 02:01:17 -0700 you wrote:
+> In cgx_probe() when pci_alloc_irq_vectors() fails the error value will
+> be negative and that check is sufficient.
 > 
-> Replace ENOTSUPP with EOPNOTSUPP to align with the MDIO core’s
-> usage and ensure user space receives a proper "Operation not supported"
-> error instead of an unknown code.
+> 	err = pci_alloc_irq_vectors(pdev, nvec, nvec, PCI_IRQ_MSIX);
+>         if (err < 0 || err != nvec) {
+>         	...
+> 	}
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] net: amd-xgbe: use EOPNOTSUPP instead of ENOTSUPP in xgbe_phy_mii_read_c45
-    https://git.kernel.org/netdev/net-next/c/bd853a59a87e
+  - [v2] Octeontx2-af: Fix pci_alloc_irq_vectors() return value check
+    https://git.kernel.org/netdev/net-next/c/e1048520750d
 
 You are awesome, thank you!
 -- 
