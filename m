@@ -1,107 +1,103 @@
-Return-Path: <netdev+bounces-230620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39E41BEBF8D
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 01:05:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 806C9BEBFF1
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 01:30:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0A61A4E14B6
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 23:05:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A9493BC7D6
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 23:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59C52DAFA3;
-	Fri, 17 Oct 2025 23:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41CD318DB26;
+	Fri, 17 Oct 2025 23:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GBOVIDui"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pb1OVnQb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA73261595;
-	Fri, 17 Oct 2025 23:05:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1344F354AC3;
+	Fri, 17 Oct 2025 23:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760742345; cv=none; b=VzYKjYojZNlHAklOeaO0lWz8Mm+EYEsrKx501Kf722I6cFf0XX26qVHIVO3GpOpDBh0dv4hmzWUytyelL73WzT6vv2a4sRMOpvg9XLxCgzroIXjKwXrcfnp8SnoY+4edwd2fZ01CDdAxlAc236N/t6aB3WpP77NkzOo0hVH9HfQ=
+	t=1760743824; cv=none; b=Byxt3+2s3ex9FlzD4FMR2+tvZ73x3VuFR3iRNBK3hCK8qbiWKNYwt32Z3IzAidTPCiQW0+nUQCSJQjsSiRUKMzFrM72fD1//PIrq+TH3PocVPTFsOz5m+tyA/lYvQReXYmsMeNy5dTBvud3FWZyWQ7yrWHG7vlYRa7MLxwkaHbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760742345; c=relaxed/simple;
-	bh=0T6PCrIx5PIrUnv+CWLbaIONL9/XwpaNQYrJ1zpHK3g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OpaTu3M7c5T81c3BfPvdKFyHr9Ew7A7OvImgD7Knb4zw7h5sTFK5tJb0YcxsT7SUCRQWxnvJPkmqEZqKJfb9kdnhxfGiDgNKeQQPorB/YGgH/bn67iphfxBTq24fTKHan8EmXb3rutqMbk4uw9Hy1oPonME1uvLXtB0jwhvkbx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GBOVIDui; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B356C4CEE7;
-	Fri, 17 Oct 2025 23:05:41 +0000 (UTC)
+	s=arc-20240116; t=1760743824; c=relaxed/simple;
+	bh=O43bnzlHzYWF3tohh8BdhIl4bku7eCG5WrTgzFJ6OQ0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fTpH4N/Bay4DXQI+AUVkBjm3Vri4cCf2fOFC/JDDhlmzHlVf3c2cOHvHXXHvuAolAd5dvMpG6MpCFZ8k+GKzXJq+Gdwzt1X4abKy3baiyeRPu25RAaUC2h7RDSE8Xn4mrmZddC03wIGx98ogedyAbialoaR/ndiIfLW01rVyX5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pb1OVnQb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79501C4CEE7;
+	Fri, 17 Oct 2025 23:30:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760742342;
-	bh=0T6PCrIx5PIrUnv+CWLbaIONL9/XwpaNQYrJ1zpHK3g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GBOVIDui/5oz0HR2hPGD7sWPRgH9MBWBhKkCAbokw/BJJfde7PeG1x7F+hEIJrJqc
-	 YJVrAZ9Y8vQDusCxDEVCWR9Gz2KySre0yP3XMFhmhEKVquAOhb5GBuK20GCQksLYxe
-	 jmANiM2yU7LT48mCY99N+duEnayPGB52GKOPNeDclow0pfVG7cNuBZzbI6auBSdk7W
-	 IZucgr/M4DLBhUOT8ShN+jf83gGQ7Ggt7XUJ3f1cXSKkbtVPtgQOWter15UcIo3rwk
-	 m9X1I9PXNuuZy1IX6I7oys0wPCFiXv60bP5BSCWwaZLj9wEkNe9iEHTIBqrH4T8p0+
-	 0ZVT2ni2SMrKA==
-Date: Fri, 17 Oct 2025 16:05:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Haiyang Zhang <haiyangz@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- haiyangz@microsoft.com, paulros@microsoft.com, decui@microsoft.com,
- kys@microsoft.com, wei.liu@kernel.org, edumazet@google.com,
- davem@davemloft.net, pabeni@redhat.com, longli@microsoft.com,
- ssengar@linux.microsoft.com, ernis@linux.microsoft.com,
- dipayanroy@linux.microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
- shradhagupta@linux.microsoft.com, leon@kernel.org, mlevitsk@redhat.com,
- yury.norov@gmail.com, shirazsaleem@microsoft.com, andrew+netdev@lunn.ch,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next,v2] net: mana: Support HW link state events
-Message-ID: <20251017160541.4ce65ede@kernel.org>
-In-Reply-To: <1760477209-9026-1-git-send-email-haiyangz@linux.microsoft.com>
-References: <1760477209-9026-1-git-send-email-haiyangz@linux.microsoft.com>
+	s=k20201202; t=1760743823;
+	bh=O43bnzlHzYWF3tohh8BdhIl4bku7eCG5WrTgzFJ6OQ0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Pb1OVnQbUFYdrBvUhhnGQWX+KiAMzNE7WQEaZeNxlqLbIgqQKIRRVhoD/oknE5+at
+	 /GSEs3/KKeVHhH3OosMBCoWH3enT5XgxODaD+6h0oOfFGTryPQ+4/eFQ7Q6SHmqVCE
+	 xiK/BLpyNqn3qY77/eGZksFSAAkjFYudcnZm9et3QtGxi59fxpSH316lZHNr5BKglc
+	 0SoulIJEncLPxLUNYyLl7KNAe76TULCn0N3wfxvYkVncRPU0I+4dH0SnTep87MuRGY
+	 VWK1yOdzPlgLn6l4oY26FmgY4uNoKIo2OaM+mRkHWKgxfOvtJCfEqUuHI/PmRA7/8h
+	 I3vRMezMKuTFw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34B0D39EFA5D;
+	Fri, 17 Oct 2025 23:30:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [v4 PATCH net] net: enetc: fix the deadlock of enetc_mdio_lock
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176074380701.2822953.14692637268674439157.git-patchwork-notify@kernel.org>
+Date: Fri, 17 Oct 2025 23:30:07 +0000
+References: <20251015021427.180757-1-jianpeng.chang.cn@windriver.com>
+In-Reply-To: <20251015021427.180757-1-jianpeng.chang.cn@windriver.com>
+To: Jianpeng Chang <jianpeng.chang.cn@windriver.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, wei.fang@nxp.com,
+ xiaoning.wang@nxp.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ alexandru.marginean@nxp.com, imx@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Tue, 14 Oct 2025 14:26:49 -0700 Haiyang Zhang wrote:
-> From: Haiyang Zhang <haiyangz@microsoft.com>
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 15 Oct 2025 10:14:27 +0800 you wrote:
+> After applying the workaround for err050089, the LS1028A platform
+> experiences RCU stalls on RT kernel. This issue is caused by the
+> recursive acquisition of the read lock enetc_mdio_lock. Here list some
+> of the call stacks identified under the enetc_poll path that may lead to
+> a deadlock:
 > 
-> Handle the HW link state events received from HW channel, and
-> set the proper link state, also stop/wake queues accordingly.
+> enetc_poll
+>   -> enetc_lock_mdio
+>   -> enetc_clean_rx_ring OR napi_complete_done
+>      -> napi_gro_receive
+>         -> enetc_start_xmit
+>            -> enetc_lock_mdio
+>            -> enetc_map_tx_buffs
+>            -> enetc_unlock_mdio
+>   -> enetc_unlock_mdio
+> 
+> [...]
 
-Why do you have to stop / start the queues? I think it's unusual.
-Let the packets get dropped, sending out potentially old packets
-when link comes back is not going to make anyone happier.
+Here is the summary with links:
+  - [v4,net] net: enetc: fix the deadlock of enetc_mdio_lock
+    https://git.kernel.org/netdev/net/c/50bd33f6b392
 
-> +static void mana_link_state_handle(struct work_struct *w)
-> +{
-> +	struct mana_port_context *apc;
-> +	struct mana_context *ac;
-> +	struct net_device *ndev;
-> +	bool link_up;
-> +	int i;
-> +
-> +	ac = container_of(w, struct mana_context, link_change_work);
-> +
-> +	if (ac->mana_removing)
-> +		return;
-> +
-> +	rtnl_lock();
-> +
-
-> @@ -3500,6 +3556,10 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
->  	int err;
->  	int i;
->  
-> +	ac->mana_removing = true;
-> +
-> +	cancel_work_sync(&ac->link_change_work);
-
-Looks racy, the work needs @ac to check the ->mana_removing but
-mana_remove() frees @ac. Just use disable_work_sync() please.
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
