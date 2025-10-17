@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-230584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23A3EBEB75A
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 22:12:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8228DBEB9F5
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 22:25:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D23814EBEBB
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 20:12:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C76BB3BB704
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 20:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F88331A5B;
-	Fri, 17 Oct 2025 20:12:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DB234C9B9;
+	Fri, 17 Oct 2025 20:13:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P0YUY2eB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bIaXFVrp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03D23009E2
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 20:12:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9FC34EEE3
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 20:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760731947; cv=none; b=IQ5yKtd0/tCkuNDlUcUKLh7aEiflewZXIl7/aVLw3HM5wrD8EdtcsXZAg73Ijn6HF88rSF8t5xIv+nC2TiuyhHIKJFhTzSXlJOGX+UuwRb6Q2UwEIhuBio+Q64PKo2ZR99YNTDUlcsP4aziN96V0fT9P1Bf2ZCtTm+HQNtZzbro=
+	t=1760732025; cv=none; b=ufF30SOgEstjGh+FgeBO/5KUArAPK1rChm6uE/s6EJaBWsDQ1vitJJSKDMlMM7pikxyyJX3P2rDBzLsTYme675oCRiWNlxp7keJTT1QTt/tOYL47fWA0DN2G7HD6L3uIftGwxw5r3/cPX3z6qN2U0C6j9JtupQ8xqR+WCsB/b/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760731947; c=relaxed/simple;
-	bh=7d8xA+Rb85QvktFR5r1RPpwcMEHV/NHrEtNUyIl35Oo=;
+	s=arc-20240116; t=1760732025; c=relaxed/simple;
+	bh=kjUOqtKdnyFkRakQLGh9uZuHxWqClH1OIdbEJi3SndA=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=cN04q39LOfGjnV798zl0ppq4CTAQvNfCMNsNGRRQdj9gN1njYEoAAs9vspjtA3xRUI05y3yfO5y6biwR+fyhaXvMOgFOiEy8Cakfe5o6IwqDSC3/r+Vm9soFfZ4QTQ/mGnCbK7pRoupApdYMPsCq1V6VoaZqxe5Nlt3QB60F+Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P0YUY2eB; arc=none smtp.client-ip=209.85.128.49
+	 In-Reply-To:Content-Type; b=BGIobUZ3CDFwdmLtuJQqRT5qu7UywGs0guFFboGzEql8qNozRESZECGZ7ZbNMtyaLNqSvTTqFeJlVz8JMPo9sz5k2i33sZLdS3iAAkQUqMFtKxkvfoRecom5M50oGjulXYKrL2uw8g/fAYODX+TxJ+CmIfnknmYb/F8/j42nyjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bIaXFVrp; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-471076f819bso19325255e9.3
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 13:12:25 -0700 (PDT)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3f2cf786abeso1992718f8f.3
+        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 13:13:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760731944; x=1761336744; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760732020; x=1761336820; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wkopBqf8XYWQn7yIXs19Ca/y5CuHRi1wdlBHb18vbzs=;
-        b=P0YUY2eBEgHNgEK3sbefDQ0UaYs/93A66t1tHchN3qVoT7GJj4zVRRxB3LHN1XqBbm
-         LA7+UJCmlw4X7ZVBL7rFESn2SRIFe0mNvQXqpKu6x6Gs09X0cgTVJAO0VDtG0i/OqAbP
-         nh9sV+pqFCKC8NPMy5KDjNBPJM52cIoOZjsQWhcR2DKQ0Q2q5+QrB2zlM7TssHOzFoS8
-         wNB4GsNFgKb2Sr1BQ41qbGyJiLYAd6EluE8Fk2/dSelBFk6TLeKuUACi8fIfAbfFXOYp
-         mAHDNNB5wnt6KnTd90VzhgVT2wGCOtiIkT7wO78LoSe3OgbN4AziwRVIblUpX/Um1jx1
-         yorw==
+        bh=aJ9dtamMQ4aPqgu1Co18zyi1ZgClELgB0wWAsbVasCo=;
+        b=bIaXFVrppkLCNROMeH18+Y7uuS2IhJOgm3iVKIzq7+43Od4hvyhvDz2HrQZjLJ8B8H
+         wJsB80d/i4mdIBhM96/Bh1xQXxieHLh2Sl6T2lCTUdp+pdTF61zK4tgTDADySy9rH9Zs
+         JzxxWsFSZL+63+0nvp7LniFyLw+LQLzGEGemyFmnCRBoOmOylob+d6zuG6IlUi+zUmKd
+         XPcuo5/LZcNjbSa8pCE+XAXT/85ENABQgf3tFXWfAVpjdxBWxfXUTlPedoVlwRk39Q1G
+         aP/KIp2C8cJvk8mvXSxEHZ8Y8W4aVNeIpVA4IEoRuOicwRLYXtU4S4oNfRJvl5IQg/Bf
+         TaNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760731944; x=1761336744;
+        d=1e100.net; s=20230601; t=1760732020; x=1761336820;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wkopBqf8XYWQn7yIXs19Ca/y5CuHRi1wdlBHb18vbzs=;
-        b=lKTpO6gVrkKYixvpnRsi196K7XkqrScUGXxMKdS6xmkU3cwg1v4EqgUF6h8lj2U0gY
-         DkO4x0UppKYnZ4ouqHVV4U7vh1imuCOz51GQKAUZ9FDXxRiCO7jbuGdww8in5tWjt3OC
-         P+nc9dklLBrcA7Ng6i/QMlvG8SvRoqk/1V9vEl08+4f2IB4CrNxuWYlLGsEVZlZ/4LWs
-         V/l9Jr6lmXnfLOXL+vAcTKAEAcTD78tlIHulWprUJGFmI5Sxf0138Z/IrrZqC3W6Hb6H
-         WcZMhfbB15Xb54nhHm3hig7G5RmSRlCkWXtIyK2uPw5Iz+ZHtbgNKxiYwV27sjPmvufu
-         1k6A==
-X-Gm-Message-State: AOJu0YxoMA+2PedhW7+HIPjdf6Rb+0ST5vi17dJDGrbjuoIRGxI15dnt
-	G+nTfnK5J7ojUYETBCncuEjdm1UhWTtQSgsTAcY/PyfkvFtTUqIeYl9b
-X-Gm-Gg: ASbGncuaMDt9kR8i8OVr951l73NnYLENsJ64wqNrAhWxG9l+GhWVlcQ6RoReqXE4aBJ
-	KCrfQJ+489l/oOT56FIy4yy6Errr+Qws8t2g4SxJcW2NlARVcmU6yxINZHnWT6KI56RLGluuSX6
-	4UXedWlvObzPzwXTTc1MFJg7QKh7GtWacTkSEg0hSmG1h5E+2Acqa4Q3+sZQqBkditqatLDZYel
-	3WvIMRry2LQbw51m1iD20hWATWgt5P27dUgBZWDeM2MQXO5r6T1TpgEaKkhHgV61KYnV7kIWhDB
-	2TTY0zsfGVtkamszW+TtQ3RlsG+5Gn5OtjYMUecCzkZs9L+6sxZeAF+mbRisS//U23FM/JrrafC
-	0G4s3L6qz5iP/ImKM5MP9tJxsFau9m5l2Dliq0G0nHo8fyTdTEDGSvdnuow1YPxCWVCyu9DBAZW
-	iHGpCpXmHtT23GTtI97o2UMAwZJfIaEGESNkifXQ5aTep6gz1Vz3AtcHth1TYgWhN1HNZh73+JF
-	ysm0Dvishov0BBTEJhX3BDNsd23Q5t1c9d1kTws
-X-Google-Smtp-Source: AGHT+IG6aRCAIZQZqDFNbIj5t62pONwesKDekQizlBgJeej9B01o66f7rj1Ku5gjZ9P3gfkSkV4dHw==
-X-Received: by 2002:a05:600c:4507:b0:45d:d88b:cca with SMTP id 5b1f17b1804b1-47117874afbmr34006555e9.1.1760731943786;
-        Fri, 17 Oct 2025 13:12:23 -0700 (PDT)
+        bh=aJ9dtamMQ4aPqgu1Co18zyi1ZgClELgB0wWAsbVasCo=;
+        b=gj7/JbbsrXwRBTKlZs2W1w0NcqDrWDicAU4wnLQSu7wrilKyj7FWuYG+TLm+N5T/Tr
+         J+aqMPF0M3O+d35P3i27u0llseYi4/A+cT9TJbsW61rcXrMJDgufjjfkKGFC2ni9tB8n
+         FXydndMN/TI4c6QOGsP8VZWcLlGwjVnjcVtSVCdrM4rKz3SL0gC2X76u38P6fDws+FRP
+         rXsBpq6glTS00dHBRJF/X8by0DjfOZnqRBtjzVPNjgpn6qJSjyjqNXWYgRiEmTPhWpAm
+         SsqAZrjlobEhj8E+NNyEKUgFXY1Mr66OaGmCkWc1hd7z2vtPOflu0LfaGGg9T6MpKyyw
+         xz8w==
+X-Gm-Message-State: AOJu0Yy42duLCyp0wxiaFXDmZvYseTBpQRRUJK3ektL5oEJHFOB7VNwl
+	Ti8x9WlDVxaqC9VKjP40B+MfL5X7AiCMTcELpjTzAKI/JNzD13BIphvK
+X-Gm-Gg: ASbGncvEr9+Q/4uXif8cJOJzr4HL1AMvlaeFsZ7SuyirCAaW5lrD+E2LgC7xhqZSROH
+	It1LcHMhpLI21NjvDVFsV/S8Pq9JFqwKiUlUHfyZS3/njcHf/gzuIXLlpWs2OdRAiC3nlGr/sum
+	A9OAQrE95jFQVXJEgCk6IScTvmWPKxG0R3IHT+C1xYIbiOiFLgHlvD+Tw7u5tF6b7WBE5y2EIrA
+	rLsCcqtLQN5rvoItx+co74YcgJW4za1CIoq5bDpn24Y9EwXfJzyDFP6Sh5HbmCfhSucB68/j06o
+	Im0QIjDgiBgo4Vd2txj2bGlIBggA8KQEf4SjpNXqfop2JWqKm9QCaw8NIGRjKsZKaByutaUqfO0
+	2ZhKIalBCVv0ZlCFtYCNOfZrcJKYwSzKVz8BBkYSLYuVA6oeWr8bmY8/Z7EImrRVAF9O3XhZU8K
+	+PKj2ZssaxjeoVEYQ1pnCiITvDY1hdauUd7Z8+02sZy5NuL1prbB3egBcoJc+Nex//Z6Rea2myy
+	ePusmru2IVEEwlaTmrblGlKe7RQyafZVcgZNL2A81xrb4lX0bY=
+X-Google-Smtp-Source: AGHT+IFc8nBqsUKJqpzPKB/n3wnyAQhHJiC9eXu9nER7wJsMSRRxsBT9KJuxrcNqux+HN/tiJqbu8w==
+X-Received: by 2002:a05:6000:4285:b0:405:8ef9:ee6e with SMTP id ffacd0b85a97d-42704d76412mr3721842f8f.25.1760732019627;
+        Fri, 17 Oct 2025 13:13:39 -0700 (PDT)
 Received: from ?IPV6:2003:ea:8f33:9c00:f581:27c5:5f61:b9b? (p200300ea8f339c00f58127c55f610b9b.dip0.t-ipconnect.de. [2003:ea:8f33:9c00:f581:27c5:5f61:b9b])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4715257d972sm11095325e9.1.2025.10.17.13.12.23
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4715257d972sm11134035e9.1.2025.10.17.13.13.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Oct 2025 13:12:23 -0700 (PDT)
-Message-ID: <e920afc9-ec29-4bc8-850b-0a35042fea12@gmail.com>
-Date: Fri, 17 Oct 2025 22:12:46 +0200
+        Fri, 17 Oct 2025 13:13:39 -0700 (PDT)
+Message-ID: <7fbb5ab7-f77c-4e13-8607-fe4572f1d302@gmail.com>
+Date: Fri, 17 Oct 2025 22:14:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,7 +84,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 1/2] net: phy: fixed_phy: add helper
+Subject: [PATCH net-next 2/2] net: dsa: loop: use new helper
  fixed_phy_register_100fd
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -142,62 +142,38 @@ In-Reply-To: <d6598983-83b1-4e1c-b621-8976520869c7@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-In few places a 100FD fixed PHY is used. Create a helper so that users
-don't have to define the struct fixed_phy_status.
+Use new helper fixed_phy_register_100fd() to simplify the code.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/fixed_phy.c | 12 ++++++++++++
- include/linux/phy_fixed.h   |  6 ++++++
- 2 files changed, 18 insertions(+)
+ drivers/net/dsa/dsa_loop.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/drivers/net/phy/fixed_phy.c b/drivers/net/phy/fixed_phy.c
-index 0e1b28f06..bdc3a4bff 100644
---- a/drivers/net/phy/fixed_phy.c
-+++ b/drivers/net/phy/fixed_phy.c
-@@ -227,6 +227,18 @@ struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
- }
- EXPORT_SYMBOL_GPL(fixed_phy_register);
+diff --git a/drivers/net/dsa/dsa_loop.c b/drivers/net/dsa/dsa_loop.c
+index 650d93226..4a416f271 100644
+--- a/drivers/net/dsa/dsa_loop.c
++++ b/drivers/net/dsa/dsa_loop.c
+@@ -441,11 +441,6 @@ static int __init dsa_loop_create_switch_mdiodev(void)
  
-+struct phy_device *fixed_phy_register_100fd(void)
-+{
-+	static const struct fixed_phy_status status = {
-+		.link	= 1,
-+		.speed	= SPEED_100,
-+		.duplex	= DUPLEX_FULL,
-+	};
-+
-+	return fixed_phy_register(&status, NULL);
-+}
-+EXPORT_SYMBOL_GPL(fixed_phy_register_100fd);
-+
- void fixed_phy_unregister(struct phy_device *phy)
+ static int __init dsa_loop_init(void)
  {
- 	phy_device_remove(phy);
-diff --git a/include/linux/phy_fixed.h b/include/linux/phy_fixed.h
-index d17ff750c..08275ef64 100644
---- a/include/linux/phy_fixed.h
-+++ b/include/linux/phy_fixed.h
-@@ -20,6 +20,7 @@ extern int fixed_phy_change_carrier(struct net_device *dev, bool new_carrier);
- void fixed_phy_add(const struct fixed_phy_status *status);
- struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
- 				      struct device_node *np);
-+struct phy_device *fixed_phy_register_100fd(void);
+-	struct fixed_phy_status status = {
+-		.link = 1,
+-		.speed = SPEED_100,
+-		.duplex = DUPLEX_FULL,
+-	};
+ 	unsigned int i;
+ 	int ret;
  
- extern void fixed_phy_unregister(struct phy_device *phydev);
- extern int fixed_phy_set_link_update(struct phy_device *phydev,
-@@ -34,6 +35,11 @@ fixed_phy_register(const struct fixed_phy_status *status,
- 	return ERR_PTR(-ENODEV);
- }
+@@ -454,7 +449,7 @@ static int __init dsa_loop_init(void)
+ 		return ret;
  
-+static inline struct phy_device *fixed_phy_register_100fd(void)
-+{
-+	return ERR_PTR(-ENODEV);
-+}
-+
- static inline void fixed_phy_unregister(struct phy_device *phydev)
- {
- }
+ 	for (i = 0; i < NUM_FIXED_PHYS; i++)
+-		phydevs[i] = fixed_phy_register(&status, NULL);
++		phydevs[i] = fixed_phy_register_100fd();
+ 
+ 	ret = mdio_driver_register(&dsa_loop_drv);
+ 	if (ret) {
 -- 
 2.51.1.dirty
 
