@@ -1,86 +1,117 @@
-Return-Path: <netdev+bounces-230570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1569BEB2BB
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 20:16:46 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A9FDBEB310
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 20:22:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55D49744C6B
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 18:16:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4CE464ECFAE
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 18:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9873730505E;
-	Fri, 17 Oct 2025 18:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7C1831BCAB;
+	Fri, 17 Oct 2025 18:21:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SKKZAasN"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KAvP7j6T"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D202561D1;
-	Fri, 17 Oct 2025 18:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD782561D1
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 18:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760725002; cv=none; b=KVuosJuxkijDBq2qCxvd6ftgEQOSmPIm/HfcgXOqDaBfxdYy18PKQio4q7Pplkm3evKcXuraS2wP9HF1kfkRoMrPdaHZE3ydEohNxZuXWxCsQ4Dum5vQvhvpzPB4fOdNcEtlkkNziga39c7mi6qDFxSzm004YsKZ4JJiNt4+h0U=
+	t=1760725315; cv=none; b=WeX5B92/mvLhfjE1Oj3xkodSzvDQOwlKFLt1BmNwXqZnmv/lTNgzd6Awd55sQ7gGOXS519alEhrMaTsye8WnSQTpITCQm310DDz+RarDR1f1wIFkhFAJyHumooP2J+1yKOH31ldyB7w7EVU7vPunsHpPBqeQ5sdNfWTqrOAkuyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760725002; c=relaxed/simple;
-	bh=PzKxQGwu2lsRdLqcmha5dsUh0TOLFixGPNBu88zqJRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VrtjqaVcqbQsMm5eeQ2yB7DEGd7ReL5hcwVL4Ivb0zlonKr3fRYGYMODFMWaXhahQV/6t9GsCyWlxV8LoMc19BIV780WeKOS19EE6/X6gHu6NEZAi2q32DRDIhhl+dNj8+K9U4GVZ/M1gh639QgmvIz5eo+BMaKoNdxdm3iwq1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SKKZAasN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fO2f6mURH8bQZYGfr1Lrr+16q3HGGYwVpFWAgRU4ZMA=; b=SKKZAasNBz3jruAECyAjMqftbi
-	YjSr/IHx0LNgu/gwWoBxRT9vJ672lGqiMf9jY4kjA2Qn9D08oJdRzxsGxmGq2xqatPMRanlpA+wgR
-	jNN83D9izslqFUcUA/TJVo0ZhHqZtGG6cosMyVpjp4nEEG+kA60sYEKM5tVJTPmiKPrM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1v9ozx-00BJbN-Qd; Fri, 17 Oct 2025 20:16:17 +0200
-Date: Fri, 17 Oct 2025 20:16:17 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1760725315; c=relaxed/simple;
+	bh=OvBfAz//MCbSBSFwz2xWepM7aqCupZGBk0P2IATZSYM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b/FYBlg4zNo2bzqOvibbq3D1BuBP+Ig6qbDmbrPNAGrvRDu1Dm6VAXdfC7BPmN7nWtVQIL8M84XAHQdeIy4cyDz4wFUjM9pa8zCOZv+CqBv2ZSLahXJRY6eyoVeUvkPOngcEAPvcFuFWTR8HWdB3x5frc9lgb0dF7Bw/mCGr7cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KAvP7j6T; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760725311;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mrPIpmJ6AK4mUuQYiaKYnEdxAsrvIfLi9Hq8csrJlP8=;
+	b=KAvP7j6TUVrJPnooxgW/IxPguRGgktTou30ejmjHXLJIL9uFuHYN5VNuj2W7gBk7Ops89O
+	Ee6gnf2kHwjwsb2aVBNw1O+CQ2kSl4AgyUP+ueV8TYCjvqm9M7DyXNZbvIBBCd62zfxYZu
+	uDBu1q8Et03O/gLl6peiIjky35GPhD0=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Jian Shen <shenjian15@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chen Wang <unicorn_wang@outlook.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Han Gao <rabenda.cn@gmail.com>, Icenowy Zheng <uwu@icenowy.me>,
-	Vivian Wang <wangruikang@iscas.ac.cn>, Yao Zi <ziyao@disroot.org>,
-	netdev@vger.kernel.org, sophgo@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH] net: stmmac: dwmac-sophgo: Add phy interface filter
-Message-ID: <34fcc4cd-cd3d-418a-8d06-7426d2514dee@lunn.ch>
-References: <20251017011802.523140-1-inochiama@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+	Paul Barker <paul@pbarker.dev>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc: linux-renesas-soc@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	netdev@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next v2 0/6] convert net drivers to ndo_hwtstamp API part 2
+Date: Fri, 17 Oct 2025 18:21:22 +0000
+Message-ID: <20251017182128.895687-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251017011802.523140-1-inochiama@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Oct 17, 2025 at 09:18:01AM +0800, Inochi Amaoto wrote:
-> As the SG2042 has an internal rx delay, the delay should be remove
-> when init the mac, otherwise the phy will be misconfigurated.
+This is part 2 of patchset to convert drivers which support HW 
+timestamping to use .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
+The new API uses netlink to communicate with user-space and have some
+test coverage.
 
-Are there any in tree DT blobs using invalid phy-modes? In theory,
-they should not work, but sometimes there is other magic going on. I
-just want to make sure this is not going to cause a regression.
+v1 -> v2: 
+ hns3: actually set up new ndo callbacks
+ ionic: remove _lif_ portion from name to align with other ndo callbacks
 
-Also, does the DT binding document list the valid phy-modes?
+Vadim Fedorenko (6):
+  octeontx2: convert to ndo_hwtstamp API
+  mlx4: convert to ndo_hwtstamp API
+  ionic: convert to ndo_hwtstamp API
+  net: ravb: convert to ndo_hwtstamp API
+  net: renesas: rswitch: convert to ndo_hwtstamp API
+  net: hns3: add hwtstamp_get/hwtstamp_set ops
 
-      Andrew
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  5 ++
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 31 ++++++++++
+ .../hisilicon/hns3/hns3pf/hclge_main.c        | 13 ++--
+ .../hisilicon/hns3/hns3pf/hclge_ptp.c         | 32 +++++-----
+ .../hisilicon/hns3/hns3pf/hclge_ptp.h         |  9 ++-
+ .../marvell/octeontx2/nic/otx2_common.h       |  9 ++-
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 56 ++++++++---------
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  3 +-
+ .../net/ethernet/mellanox/mlx4/en_netdev.c    | 61 ++++++++-----------
+ drivers/net/ethernet/mellanox/mlx4/mlx4_en.h  |  6 +-
+ .../net/ethernet/pensando/ionic/ionic_lif.c   | 17 +-----
+ .../net/ethernet/pensando/ionic/ionic_lif.h   | 11 ++--
+ .../net/ethernet/pensando/ionic/ionic_phc.c   | 59 +++++++++++-------
+ drivers/net/ethernet/renesas/ravb_main.c      | 61 ++++++-------------
+ drivers/net/ethernet/renesas/rswitch_main.c   | 53 ++++++----------
+ 15 files changed, 208 insertions(+), 218 deletions(-)
+
+-- 
+2.47.3
 
