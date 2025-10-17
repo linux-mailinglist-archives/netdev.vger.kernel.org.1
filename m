@@ -1,171 +1,190 @@
-Return-Path: <netdev+bounces-230361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B26BE6FDD
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 09:46:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A9DBE701D
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 09:51:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4937335B3CD
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 07:46:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 840494261F5
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 07:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802CB259C98;
-	Fri, 17 Oct 2025 07:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FC8257826;
+	Fri, 17 Oct 2025 07:51:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="P9FNiTIH"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="HSTeB7CI"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6653D2550D5;
-	Fri, 17 Oct 2025 07:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C4B2550D0;
+	Fri, 17 Oct 2025 07:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760687149; cv=none; b=h/0jkkbCHuCQNPTI1z98WT9OnMLz0fUrriGOWc3UbdwS/ZCadYfgvicOEevLEk0H1ATs0ZxqGUnRJ0MeTVImQkzLQk0zP3ccIn8sLSvttriWT/+LzrRGJwngUQ50ey1m49cjTNSej6fhRxmoHkrSjmb9YpN1Tmow3mamKVyKmA0=
+	t=1760687472; cv=none; b=OHSz7vKabzvKdvRDgC6UQcicbPiGr5Ml8HyBl0S7wq7Tf7QokydvfKWoggYWtnnx6EN4rKfxQPb5DZzC5nPj5hmCNTvqnAQNEs9hJ3LsY6Y0LQMssPa80ONpfF+Bq6lqS+uWGd1z96sBR55wJbEJ1FjfKOZSfQjl29kEA62uTlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760687149; c=relaxed/simple;
-	bh=Xy8tQ6z9q1+b8QlGnXUAhw4J1Hdss29/peYK3Rr/gWs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=KnP7AiHzsENFWL2rqRKLDrU9L40GRPZNWDPYZ4EC8B/0ObaEHm5snphIKGwrZrDrQAi0rgBKmzFRSpqAptO2LG4FskuRIGOlcW2XXE1ZHBkotYvYCkSf79sx755kuvzTnmAY6uq+E5I8PFXCWZupM7sNBwKIvwA7TsV1V6K6c7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=P9FNiTIH; arc=none smtp.client-ip=113.46.200.222
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=NYSt968XvTx34dKez/5OXfwcS9OE8mZYevsTppAeHLE=;
-	b=P9FNiTIH+9BnY/d+q/cBGWYFxm+qmm+QWc34kaTtLlFB0lgg7rjxI1gt4wIVlERd9sYNeCxq6
-	A7NLU79HKAKZjb5kNLFEUHCCvsYPri3N9jKItNY8eCNaaXbOU7bZkoP2DAlKj4S16c69+HZPFF5
-	bYmRwZJYd0DGflIMPFgxhRY=
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4cnxgk1xtBzLlVc;
-	Fri, 17 Oct 2025 15:45:22 +0800 (CST)
-Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id BB2D4180042;
-	Fri, 17 Oct 2025 15:45:43 +0800 (CST)
-Received: from [10.174.177.19] (10.174.177.19) by
- dggpemf500016.china.huawei.com (7.185.36.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 17 Oct 2025 15:45:42 +0800
-Message-ID: <ecd158c4-5af7-415c-9d29-d5ec8fec49a2@huawei.com>
-Date: Fri, 17 Oct 2025 15:45:41 +0800
+	s=arc-20240116; t=1760687472; c=relaxed/simple;
+	bh=Ohdir8G4bdKRBk8kXLJE4lAc2L8SEMcavSSoYnRb65U=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hbD8m9fScAqjXMkydDj43PHMVrCizF7WC4v1mOX1x0ciImyd+sTrq1cVsD55BnleNKlRmqZE7dNXhEoMByGsp2WlfB5VrMeaFoAH3H9RO4MKpF2TJOfPeeMqZpj0OCjk+xIeEjkcHYWPk21Y/8ByTYS6jemS6sgmLLccc1hj7dA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=HSTeB7CI; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1760687468; x=1792223468;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Ohdir8G4bdKRBk8kXLJE4lAc2L8SEMcavSSoYnRb65U=;
+  b=HSTeB7CIP/fu1K51iCp3n2s8enoMAbk1j/UegCTA7yj7Np346gz2vNnN
+   0OwvLBRk4gGlPlBhIk6gg73l3L4U0l2JBvifLWP3DLgHwyZNo7BFR/H0H
+   RFIapC/ziCuftpK1uJwp4AP06t8C3FX6X+nQ1rGwyQKczQlGCB2d68pmH
+   nXa9t4do56wdaLJUlRz2noIlhArqGWwXP1VqtSTwOBwd0RTmkvlOAx0jF
+   2ezfu3UoeagYbM6R7rNzJzS+ZeIg+XtZXlAlnEhBb/3gB3rgRzBMZlpQZ
+   szeNvZ6Rn546OyrCT3tv1w4Dc4wEbt6xqdpfAI9lpJXptosAX4WaKIsJP
+   g==;
+X-CSE-ConnectionGUID: Tj/HYMSTS3Ky+Q2iytSAMA==
+X-CSE-MsgGUID: ZyQTjCbkSoiKO0VDtrwvBA==
+X-IronPort-AV: E=Sophos;i="6.19,234,1754982000"; 
+   d="scan'208";a="54080002"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Oct 2025 00:51:03 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Fri, 17 Oct 2025 00:50:32 -0700
+Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Fri, 17 Oct 2025 00:50:30 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net-next] net: phy: micrel: Add support for non PTP SKUs for lan8814
+Date: Fri, 17 Oct 2025 09:47:30 +0200
+Message-ID: <20251017074730.3057012-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net/smc: fix general protection fault in
- __smc_diag_dump
-To: Kuniyuki Iwashima <kuniyu@google.com>
-CC: <alibuda@linux.alibaba.com>, <davem@davemloft.net>,
-	<dust.li@linux.alibaba.com>, <edumazet@google.com>,
-	<guwen@linux.alibaba.com>, <horms@kernel.org>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-s390@vger.kernel.org>, <mjambigi@linux.ibm.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sidraya@linux.ibm.com>,
-	<tonylu@linux.alibaba.com>, <wenjia@linux.ibm.com>, <yuehaibing@huawei.com>,
-	<zhangchangzhong@huawei.com>
-References: <20251017024827.3137512-1-wangliang74@huawei.com>
- <20251017055106.3603987-1-kuniyu@google.com>
-From: Wang Liang <wangliang74@huawei.com>
-In-Reply-To: <20251017055106.3603987-1-kuniyu@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500016.china.huawei.com (7.185.36.197)
+Content-Type: text/plain
 
+The lan8814 has 4 different SKUs and for 2 of these SKUs the PTP is
+disabled. All these SKUs have the same value in the register 2 and 3
+meaning we can't differentiate them based on device id therefore check
+the SKU register and based on this allow or not to create a PTP device.
 
-在 2025/10/17 13:48, Kuniyuki Iwashima 写道:
-> From: Wang Liang <wangliang74@huawei.com>
-> Date: Fri, 17 Oct 2025 10:48:27 +0800
->> The syzbot report a crash:
->>
->>    Oops: general protection fault, probably for non-canonical address 0xfbd5a5d5a0000003: 0000 [#1] SMP KASAN NOPTI
->>    KASAN: maybe wild-memory-access in range [0xdead4ead00000018-0xdead4ead0000001f]
->>    CPU: 1 UID: 0 PID: 6949 Comm: syz.0.335 Not tainted syzkaller #0 PREEMPT(full)
->>    Hardware name: Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
->>    RIP: 0010:smc_diag_msg_common_fill net/smc/smc_diag.c:44 [inline]
->>    RIP: 0010:__smc_diag_dump.constprop.0+0x3ca/0x2550 net/smc/smc_diag.c:89
->>    Call Trace:
->>     <TASK>
->>     smc_diag_dump_proto+0x26d/0x420 net/smc/smc_diag.c:217
->>     smc_diag_dump+0x27/0x90 net/smc/smc_diag.c:234
->>     netlink_dump+0x539/0xd30 net/netlink/af_netlink.c:2327
->>     __netlink_dump_start+0x6d6/0x990 net/netlink/af_netlink.c:2442
->>     netlink_dump_start include/linux/netlink.h:341 [inline]
->>     smc_diag_handler_dump+0x1f9/0x240 net/smc/smc_diag.c:251
->>     __sock_diag_cmd net/core/sock_diag.c:249 [inline]
->>     sock_diag_rcv_msg+0x438/0x790 net/core/sock_diag.c:285
->>     netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2552
->>     netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
->>     netlink_unicast+0x5a7/0x870 net/netlink/af_netlink.c:1346
->>     netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1896
->>     sock_sendmsg_nosec net/socket.c:714 [inline]
->>     __sock_sendmsg net/socket.c:729 [inline]
->>     ____sys_sendmsg+0xa95/0xc70 net/socket.c:2614
->>     ___sys_sendmsg+0x134/0x1d0 net/socket.c:2668
->>     __sys_sendmsg+0x16d/0x220 net/socket.c:2700
->>     do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->>     do_syscall_64+0xcd/0x4e0 arch/x86/entry/syscall_64.c:94
->>     entry_SYSCALL_64_after_hwframe+0x77/0x7f
->>     </TASK>
->>
->> The process like this:
->>
->>                 (CPU1)              |             (CPU2)
->>    ---------------------------------|-------------------------------
->>    inet_create()                    |
->>      // init clcsock to NULL        |
->>      sk = sk_alloc()                |
->>                                     |
->>      // unexpectedly change clcsock |
->>      inet_init_csk_locks()          |
->>                                     |
->>      // add sk to hash table        |
->>      smc_inet_init_sock()           |
->>        smc_sk_init()                |
->>          smc_hash_sk()              |
->>                                     | // traverse the hash table
->>                                     | smc_diag_dump_proto
->>                                     |   __smc_diag_dump()
->>                                     |     // visit wrong clcsock
->>                                     |     smc_diag_msg_common_fill()
->>      // alloc clcsock               |
->>      smc_create_clcsk               |
->>        sock_create_kern             |
->>
->> With CONFIG_DEBUG_LOCK_ALLOC=y, the smc->clcsock is unexpectedly changed
->> in inet_init_csk_locks(). The INET_PROTOSW_ICSK flag is no need by smc,
->> just remove it.
->>
->> After removing the INET_PROTOSW_ICSK flag, this patch alse revert
->> commit 6fd27ea183c2 ("net/smc: fix lacks of icsk_syn_mss with IPPROTO_SMC")
->> to avoid casting smc_sock to inet_connection_sock.
->>
->> Reported-by: syzbot+f775be4458668f7d220e@syzkaller.appspotmail.com
->> Closes: https://syzkaller.appspot.com/bug?extid=f775be4458668f7d220e
->> Tested-by: syzbot+f775be4458668f7d220e@syzkaller.appspotmail.com
-> nit: looks like this diff is not tested by syzbot, you may
-> want to send diff to syzbot.
->
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+ drivers/net/phy/micrel.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-Thank you for the reminder!
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 79ce3eb6752b6..16855bf8c3916 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -101,6 +101,8 @@
+ #define LAN8814_CABLE_DIAG_VCT_DATA_MASK	GENMASK(7, 0)
+ #define LAN8814_PAIR_BIT_SHIFT			12
+ 
++#define LAN8814_SKUS				0xB
++
+ #define LAN8814_WIRE_PAIR_MASK			0xF
+ 
+ /* Lan8814 general Interrupt control/status reg in GPHY specific block. */
+@@ -367,6 +369,9 @@
+ 
+ #define LAN8842_REV_8832			0x8832
+ 
++#define LAN8814_REV_LAN8814			0x8814
++#define LAN8814_REV_LAN8818			0x8818
++
+ struct kszphy_hw_stat {
+ 	const char *string;
+ 	u8 reg;
+@@ -449,6 +454,7 @@ struct kszphy_priv {
+ 	bool rmii_ref_clk_sel;
+ 	bool rmii_ref_clk_sel_val;
+ 	bool clk_enable;
++	bool is_ptp_available;
+ 	u64 stats[ARRAY_SIZE(kszphy_hw_stats)];
+ 	struct kszphy_phy_stats phy_stats;
+ };
+@@ -4130,6 +4136,17 @@ static int lan8804_config_intr(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++/* Check if the PHY has 1588 support. There are multiple skus of the PHY and
++ * some of them support PTP while others don't support it. This function will
++ * return true is the sku supports it, otherwise will return false.
++ */
++static bool lan8814_has_ptp(struct phy_device *phydev)
++{
++	struct kszphy_priv *priv = phydev->priv;
++
++	return priv->is_ptp_available;
++}
++
+ static irqreturn_t lan8814_handle_interrupt(struct phy_device *phydev)
+ {
+ 	int ret = IRQ_NONE;
+@@ -4146,6 +4163,9 @@ static irqreturn_t lan8814_handle_interrupt(struct phy_device *phydev)
+ 		ret = IRQ_HANDLED;
+ 	}
+ 
++	if (!lan8814_has_ptp(phydev))
++		return ret;
++
+ 	while (true) {
+ 		irq_status = lanphy_read_page_reg(phydev, LAN8814_PAGE_PORT_REGS,
+ 						  PTP_TSU_INT_STS);
+@@ -4207,6 +4227,9 @@ static void lan8814_ptp_init(struct phy_device *phydev)
+ 	    !IS_ENABLED(CONFIG_NETWORK_PHY_TIMESTAMPING))
+ 		return;
+ 
++	if (!lan8814_has_ptp(phydev))
++		return;
++
+ 	lanphy_write_page_reg(phydev, LAN8814_PAGE_PORT_REGS,
+ 			      TSU_HARD_RESET, TSU_HARD_RESET_);
+ 
+@@ -4336,6 +4359,9 @@ static int __lan8814_ptp_probe_once(struct phy_device *phydev, char *pin_name,
+ 
+ static int lan8814_ptp_probe_once(struct phy_device *phydev)
+ {
++	if (!lan8814_has_ptp(phydev))
++		return 0;
++
+ 	return __lan8814_ptp_probe_once(phydev, "lan8814_ptp_pin",
+ 					LAN8814_PTP_GPIO_NUM);
+ }
+@@ -4450,6 +4476,18 @@ static int lan8814_probe(struct phy_device *phydev)
+ 	devm_phy_package_join(&phydev->mdio.dev, phydev,
+ 			      addr, sizeof(struct lan8814_shared_priv));
+ 
++	/* There are lan8814 SKUs that don't support PTP. Make sure that for
++	 * those skus no PTP device is created. Here we check if the SKU
++	 * supports PTP.
++	 */
++	err = lanphy_read_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
++				   LAN8814_SKUS);
++	if (err < 0)
++		return err;
++
++	priv->is_ptp_available = err == LAN8814_REV_LAN8814 ||
++				 err == LAN8814_REV_LAN8818;
++
+ 	if (phy_package_init_once(phydev)) {
+ 		err = lan8814_release_coma_mode(phydev);
+ 		if (err)
+-- 
+2.34.1
 
-I just sent this diff to syzbot, and the test return OK:
-https://lore.kernel.org/netdev/b76f348d-61d3-404b-81c6-57621a14046b@huawei.com/T/#t
-
-------
-Best regards
-Wang Liang
-
->> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
->> Signed-off-by: Wang Liang <wangliang74@huawei.com>
-> Change itself looks good.
->
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
->
-> Thanks!
 
