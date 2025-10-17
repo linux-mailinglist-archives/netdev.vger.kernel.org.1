@@ -1,96 +1,97 @@
-Return-Path: <netdev+bounces-230454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD484BE83D8
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 13:06:18 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AF9DBE846C
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 13:19:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D94D34E2FBB
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 11:06:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1EDE14E78B6
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 11:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A5D3321A1;
-	Fri, 17 Oct 2025 11:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21F9C343212;
+	Fri, 17 Oct 2025 11:19:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ICzucdh2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="itt0bQ4p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A152DA77E
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 11:06:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE1731986F;
+	Fri, 17 Oct 2025 11:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760699170; cv=none; b=Uw79/jlFJzTdP7dBKcYYtdZESp8v6VJH3vZBFH88fP8fWbTLinwJ/WTEHI2LWgvm/eG6QHUKaRLwWnufmds9IsO/JqFxnKXOI0xipvlR/2dEG4Ty5R+5M5PTkti8u6fyK3puFRGIHOugL45mR7+kWBwiPW2tkn3ti285zqQFE7A=
+	t=1760699974; cv=none; b=a4X1+WvHyf2jeNdyO9sXXqeFrak+D2S+xvt5BRMbkcBfKRuo1dEFyYzOv28BQbHOyt3HOLhdq4b4ZENPesrFdoKlsEeOhUGNT5fpj25Xu+9JsejTiTsNrssWNGk4x0xhlyP/Rzj+S+ykSRL+nTsLoNb/IZf67np9denMmFlk3GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760699170; c=relaxed/simple;
-	bh=xzQfCkUEgadYLpzqT93CHRmbHNjxwXb4AN0nnSfXYBI=;
+	s=arc-20240116; t=1760699974; c=relaxed/simple;
+	bh=8MsOM03pXc7Ax5q0mCwysYrX9pm4sTnoctwX/A8aheI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VF2EDkYBRNt+blOv9vYgNkKkn+QbG9C4DpWVs2zR8ayBQEm27K7/4spWicGl6x2wyDkk6X4qrtNrXtsvw4VRTnNdv/qGfcHGAaXx31xKZDN9zTNXmDqbn/oEjyerIYx7qDajgbJ5d0bOqp8k9SYycbKWxcKHTWHEkw7hUhzWT5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ICzucdh2; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-290a3a4c7ecso19441235ad.0
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 04:06:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760699168; x=1761303968; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=67IESv2a/v8Pf8yKPhY3ug7MsqHojZ5k4tSpnUKX3+0=;
-        b=ICzucdh2DQJSWZ9+ktmrxaPKba9vTeNvo7pxjkT1e4rMY34oz+7ONT9ZJQGY1UBy3h
-         cF/fWGZlgdn112mWA9DXCUP+a3ze8RDFUJqR89Kx1f8srGI8Ymm64DK2/grWBdjI4ej3
-         wua8AttLgQwcj6zlRJekJqtOWsJz0l5195VX0VoSPW1sx4WIFIT2NEJXaIwdMAutAlmU
-         qn0V05lom72ZuUTg5TpeOlkd62XnvXLH41BIOd8ffjxrL52kpFW19MfR/ZawXkXRwJSk
-         BJIRnljszL1phtwO0BPVim8j915Y/VZ8lq163Kzp4bEJRXUIVXM+BYg3OjiH8OX3GNFV
-         lO8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760699168; x=1761303968;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=67IESv2a/v8Pf8yKPhY3ug7MsqHojZ5k4tSpnUKX3+0=;
-        b=WoXOxki9J1t76mDINsWiqRf6gqqpmZuzMwu+vjk6U7LcGdToQGgXn0cp+FAOQGsERX
-         X+5zDec+ztzC+jqDjTEBeVFqWzx54spbfqK40+jGfT9IIt+rwh6fIFECUrjKNF+tztGi
-         jBeckWj86irMspbXYI/CXowx8dY01ZzZGa37Tp7LuYIyht7y1Bk45pTp9H+w41ChSqH2
-         Kg8si7+jJ7XOAUM6jKCLQT95Af1ObjwY957hAJRI4VHgiCGDyaP3FaSpZ0PXRZHiO7kP
-         GtFr30Dopu32zJlTzRv3bdKsukvWl6vn5AojGOkzlok63OgAG8Ey0/OChn11yc0nVjut
-         fwZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWF9XatG8yv8wsBzubMpB3/Qj3rplG6ShJ17YrMjDI6ce81vkiVBoApVLoTZ/iD40Ok0uK40qY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzt9MyPIRrNGoeXyq/OQOEK1RuqwmEgiPkuTzIj0ToMTGIDFGEH
-	rjqvXyMb44rx01r9B8UX5A8/b/3NTu55KKRyLWiOiOefJIAqZRpM9ixf
-X-Gm-Gg: ASbGncvQopYV19zG+9CB+WgLMWCuckGqtIs5sR1gs/DgwFjf/UB5N4inmOpnhCnhrlw
-	3ZWQDRqq6xsVTEvCLQ3uzq9Z04VSoKGTgVliuYmWtflWim+QWwHWOJkcaBZy2EaRbyc12iDGcBo
-	zOzNlZxU0b8hNr/I/9IlAelQHNUfuXBy9NwHddbbhmTPDeH2Wix9yjQhfSPOkNiip8yBFVVKLes
-	LGkzLKHGxkhGKqMYXwvpNoPonjhTShPYumgHSZJsf4ytvohRCuBq/kI/eFbkTBzWpdVsNhc4nCx
-	WMTxpN+pTslVDIWstPTLpUEIiHk7fTEBiHXLpVUu4xJRwU1fUEcn2xUcczztHl9y0dVl+/6VMX7
-	Xsqtxy6T8/gLf2zET3aSBXT4Xud2CsKceqVEmKYh1FYctZOOO6bu7T8hzMMvH8ZEfHrnZhB5lMf
-	zewh1/zyyPTjGb5eTREXOegAUS
-X-Google-Smtp-Source: AGHT+IHzhvlggPHZaUtm7049vZphaYLbBwyOQ68yKmFVwhS+ouCLslfd4ghVDEV6+hTwf8xect5v6g==
-X-Received: by 2002:a17:903:2884:b0:266:3098:666 with SMTP id d9443c01a7336-290ca121a21mr28881865ad.32.1760699168235;
-        Fri, 17 Oct 2025 04:06:08 -0700 (PDT)
-Received: from t14s.localdomain ([177.37.143.35])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-290993466absm61409965ad.35.2025.10.17.04.06.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Oct 2025 04:06:07 -0700 (PDT)
-Received: by t14s.localdomain (Postfix, from userid 1000)
-	id 47AE211C1FCF; Fri, 17 Oct 2025 08:06:05 -0300 (-03)
-Date: Fri, 17 Oct 2025 08:06:05 -0300
-From: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-To: Alexey Simakov <bigalex934@gmail.com>
-Cc: Xin Long <lucien.xin@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gm1lxSBLBMSvEkSUsOUBSuuT8Y612tA5BCfiHMu3PHV0u2q/oAg8/H3PgVBxIdD0Ovc50XYIjtyL6/ejnsiGPQ7Eo9mE/Pw0pKLleYN/rPVYoqwXt0Xgkns+J/S+2uebpMVDPZv+cGyFPswcylkuooAcw/7+vJHFo2qqp9uAb7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=itt0bQ4p; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760699973; x=1792235973;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8MsOM03pXc7Ax5q0mCwysYrX9pm4sTnoctwX/A8aheI=;
+  b=itt0bQ4py/aJ97eQaMy3f9PLloM2yb7JMqNV3rnIlCdt8YRi3bl95bey
+   kX6oD7u9I1k0EEdUt5qYyIyWAA4kolM7emW27+SkeMA9LLh69rux1ndmD
+   0TxBMmGmUpKzzOeXdun1BSvcVZPCkaynb+EWA+aUC+nSLCW0hrWsh0YW8
+   R8RjvW2K44QqRFrxniUFToSrpDXdPZA17LXH9uOKLOhWgbyqszThN+zFC
+   FTmVHVo8Z0jzBJPhCjaOlprqjTcKElBZXb0IDf9JW7mf9B37ZiIwyssHs
+   kbjKvWQLOicNZqG82sP8ExG6rjfpN+9rylgi0VJvpcmho/PvQr5LwipLK
+   Q==;
+X-CSE-ConnectionGUID: SU4O98oyQs2c3DL9PbjiUA==
+X-CSE-MsgGUID: k/jp+p4VQOa1JDjJDvwmjw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11584"; a="66555803"
+X-IronPort-AV: E=Sophos;i="6.19,236,1754982000"; 
+   d="scan'208";a="66555803"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2025 04:19:31 -0700
+X-CSE-ConnectionGUID: fWzu1B5mRIW0L/ehNOHJdw==
+X-CSE-MsgGUID: HgYRS2rJToewAFu3pfjVbQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,236,1754982000"; 
+   d="scan'208";a="213679277"
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by fmviesa001.fm.intel.com with ESMTP; 17 Oct 2025 04:19:25 -0700
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1v9iUV-0005uF-0R;
+	Fri, 17 Oct 2025 11:19:23 +0000
+Date: Fri, 17 Oct 2025 19:19:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jian Shen <shenjian15@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: Re: [PATCH net] sctp: avoid NULL dereference when chunk data buffer
- is missing
-Message-ID: <aPIjHd4jkx__LFTR@t14s.localdomain>
-References: <20251015184510.6547-1-bigalex934@gmail.com>
- <aO_67_pJD71FBLmd@t14s.localdomain>
- <20251017071550.q7qg2a5e7xu6yvlr@home-server>
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
+	Paul Barker <paul@pbarker.dev>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH net-next 6/6] net: hns3: add hwtstamp_get/hwtstamp_set ops
+Message-ID: <202510171940.xIqxEaCD-lkp@intel.com>
+References: <20251016180727.3511399-7-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,134 +100,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251017071550.q7qg2a5e7xu6yvlr@home-server>
+In-Reply-To: <20251016180727.3511399-7-vadim.fedorenko@linux.dev>
 
-On Fri, Oct 17, 2025 at 10:15:50AM +0300, Alexey Simakov wrote:
-> On Wed, Oct 15, 2025 at 04:50:07PM -0300, Marcelo Ricardo Leitner wrote:
-> > On Wed, Oct 15, 2025 at 09:45:10PM +0300, Alexey Simakov wrote:
-> > > chunk->skb pointer is dereferenced in the if-block where it's supposed
-> > > to be NULL only.
-> > 
-> > The issue is well spotted. More below.
-> > 
-> > > 
-> > > Use the chunk header instead, which should be available at this point
-> > > in execution.
-> > > 
-> > > Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> > > 
-> > > Fixes: 90017accff61 ("sctp: Add GSO support")
-> > > Signed-off-by: Alexey Simakov <bigalex934@gmail.com>
-> > > ---
-> > >  net/sctp/inqueue.c | 3 ++-
-> > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/net/sctp/inqueue.c b/net/sctp/inqueue.c
-> > > index 5c1652181805..f1830c21953f 100644
-> > > --- a/net/sctp/inqueue.c
-> > > +++ b/net/sctp/inqueue.c
-> > > @@ -173,7 +173,8 @@ struct sctp_chunk *sctp_inq_pop(struct sctp_inq *queue)
-> > 
-> > With more context here:
-> > 
-> >                if ((skb_shinfo(chunk->skb)->gso_type & SKB_GSO_SCTP) == SKB_GSO_SCTP) {
-> >                        /* GSO-marked skbs but without frags, handle
-> >                         * them normally
-> >                         */
-> > 
-> >                        if (skb_shinfo(chunk->skb)->frag_list)
-> >                                chunk->head_skb = chunk->skb;
-> > 
-> >                        /* skbs with "cover letter" */
-> >                        if (chunk->head_skb && chunk->skb->data_len == chunk->skb->len)
-> > 		           ^^^^^^^^^^^^^^^^^^
-> > 
-> > chunk->head_skb would also not be guaranteed.
-> > 
-> > >  				chunk->skb = skb_shinfo(chunk->skb)->frag_list;
-> > 
-> > But chunk->skb can only be NULL if chunk->head_skb is not, then.
-> > 
-> > Thing is, we cannot replace chunk->skb here then, because otherwise
-> > when freeing this chunk in sctp_chunk_free below it will not reference
-> > chunk->head_skb and will cause a leak.
-> > 
-> > With that, the check below should be done just before replacing
-> > chunk->skb right above, inside the if() block. We're sure that
-> > otherwise chunk->skb is non-NULL because of outer if() condition.
-> > 
-> > Thanks,
-> > Marcelo
-> > 
-> > >  
-> > >  			if (WARN_ON(!chunk->skb)) {
-> > > -				__SCTP_INC_STATS(dev_net(chunk->skb->dev), SCTP_MIB_IN_PKT_DISCARDS);
-> > > +				__SCTP_INC_STATS(dev_net(chunk->head_skb->dev),
-> > > +						 SCTP_MIB_IN_PKT_DISCARDS);
-> > >  				sctp_chunk_free(chunk);
-> > >  				goto next_chunk;
-> > >  			}
-> I'm not sure, that correctly understand the new location of updated check.
-> There a few assumtions below.
-> > > -- 
-> > > 2.34.1
-> > > 
-> 		/* Is the queue empty?  */
-> 		entry = sctp_list_dequeue(&queue->in_chunk_list);
-> 		if (!entry)
-> 			return NULL;
-> 
-> 		chunk = list_entry(entry, struct sctp_chunk, list);
-> 
-> 		if (skb_is_gso(chunk->skb) && skb_is_gso_sctp(chunk->skb)) {
-> 			/* GSO-marked skbs but without frags, handle
-> 			 * them normally
-> 			 */
-> 			if (skb_shinfo(chunk->skb)->frag_list)
-> 				chunk->head_skb = chunk->skb;
-> 
-> 			/* skbs with "cover letter" */
-> 			if (chunk->head_skb && chunk->skb->data_len == chunk->skb->len)
-> Adding this check here will not fix problem, since chunk->skb always true here because it dereferencing in
-> checks above.
+Hi Vadim,
 
-Exactly.
+kernel test robot noticed the following build warnings:
 
-> 				chunk->skb = skb_shinfo(chunk->skb)->frag_list;
-> Adding here could make sense, chunk->skb changed => do something if it became null.
+[auto build test WARNING on net-next/main]
 
-Yes. But then it needs to restore chunk->skb somehow. So instead it's better
-to do the WARN_ON(!skb_shinfo(chunk->skb)->frag_list).
+url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/octeontx2-convert-to-ndo_hwtstamp-API/20251017-021210
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20251016180727.3511399-7-vadim.fedorenko%40linux.dev
+patch subject: [PATCH net-next 6/6] net: hns3: add hwtstamp_get/hwtstamp_set ops
+config: arm64-defconfig (https://download.01.org/0day-ci/archive/20251017/202510171940.xIqxEaCD-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251017/202510171940.xIqxEaCD-lkp@intel.com/reproduce)
 
-if (skb_is_gso(chunk->skb) && skb_is_gso_sctp(chunk->skb)) {
-	/* GSO-marked skbs but without frags, handle
-	 * them normally
-	 */
-	if (skb_shinfo(chunk->skb)->frag_list)
-		chunk->head_skb = chunk->skb;
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202510171940.xIqxEaCD-lkp@intel.com/
 
-	/* skbs with "cover letter" */
-	if (chunk->head_skb && chunk->skb->data_len == chunk->skb->len) {
-		if (WARN_ON(!skb_shinfo(chunk->skb)->frag_list)) {
-			__SCTP_INC_STATS(dev_net(chunk->skb->dev),
-			                                 ^-- can be skb again
-					 SCTP_MIB_IN_PKT_DISCARDS);
-			sctp_chunk_free(chunk);
-			   ^---- so this can actually free chunk->skb
-			goto next_chunk;
-		}
-		chunk->skb = skb_shinfo(chunk->skb)->frag_list;
-	}
-}
+All warnings (new ones prefixed by >>):
 
-Makes sense?
+>> drivers/net/ethernet/hisilicon/hns3/hns3_enet.c:2436:12: warning: 'hns3_nic_hwtstamp_set' defined but not used [-Wunused-function]
+    2436 | static int hns3_nic_hwtstamp_set(struct net_device *netdev,
+         |            ^~~~~~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/hisilicon/hns3/hns3_enet.c:2422:12: warning: 'hns3_nic_hwtstamp_get' defined but not used [-Wunused-function]
+    2422 | static int hns3_nic_hwtstamp_get(struct net_device *netdev,
+         |            ^~~~~~~~~~~~~~~~~~~~~
 
-> 
-> 			if (WARN_ON(!chunk->skb)) {
-> 				__SCTP_INC_STATS(dev_net(chunk->head_skb->dev),
-> 						 SCTP_MIB_IN_PKT_DISCARDS);
-> 				sctp_chunk_free(chunk);
-> 				goto next_chunk;
-> 			}
-> 		}
+
+vim +/hns3_nic_hwtstamp_set +2436 drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+
+  2421	
+> 2422	static int hns3_nic_hwtstamp_get(struct net_device *netdev,
+  2423					 struct kernel_hwtstamp_config *config)
+  2424	{
+  2425		struct hnae3_handle *h = hns3_get_handle(netdev);
+  2426	
+  2427		if (!netif_running(netdev))
+  2428			return -EINVAL;
+  2429	
+  2430		if (!h->ae_algo->ops->hwtstamp_get)
+  2431			return -EOPNOTSUPP;
+  2432	
+  2433		return h->ae_algo->ops->hwtstamp_get(h, config);
+  2434	}
+  2435	
+> 2436	static int hns3_nic_hwtstamp_set(struct net_device *netdev,
+  2437					 struct kernel_hwtstamp_config *config,
+  2438					 struct netlink_ext_ack *extack)
+  2439	{
+  2440		struct hnae3_handle *h = hns3_get_handle(netdev);
+  2441	
+  2442		if (!netif_running(netdev))
+  2443			return -EINVAL;
+  2444	
+  2445		if (!h->ae_algo->ops->hwtstamp_set)
+  2446			return -EOPNOTSUPP;
+  2447	
+  2448		return h->ae_algo->ops->hwtstamp_set(h, config, extack);
+  2449	}
+  2450	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
