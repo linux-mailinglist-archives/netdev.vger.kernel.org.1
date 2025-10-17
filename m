@@ -1,283 +1,185 @@
-Return-Path: <netdev+bounces-230467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94F47BE8685
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 13:37:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 927BEBE874E
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 13:52:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 42BD2565528
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 11:37:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D88A719A0B89
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 11:52:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ADF0331A6E;
-	Fri, 17 Oct 2025 11:33:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8CA227B34D;
+	Fri, 17 Oct 2025 11:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W16aB5Ac"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="vFjIM6/x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.15.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0042B331A66;
-	Fri, 17 Oct 2025 11:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6AC2192D97;
+	Fri, 17 Oct 2025 11:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760700780; cv=none; b=ImPOsq8BHpWb2hgypCtycBGeVhjjLZJUzlBLLzEZOEUN97PYUAT2E8qTjjKCFmWmJ/C7b12TaMF0sQUYTeBZ9OoOTPyCJf0Rj3H8xlCRR8Dx0X8Aw4jcr4UbDU8mfS3YhuhMfc70nXe80CXK2kxG0pr5IUsnaQzejh/9h2/vZ48=
+	t=1760701927; cv=none; b=l/oqPl9158i/KFtYnKXI3YpwHyOQyQHVmQX5Edk7JwBwSAt/oTVYX81k9wcrlMVaxc28NUKj78D1FhSRPD44niu4RmyMO3Xff3sgBK4Bu/X/X+SlvMNxrEwPqk98D5mpl3ahe4MDtigLvIGpXKIYLcXbMgc6YEWHTG4ojs9GXC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760700780; c=relaxed/simple;
-	bh=8yVl2NH8wCRWT0BWB4xJxse7JadeLBTgspo6OepmR18=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=J3Xkq9jw7Av4ShijT7rJ02wlnYlGF5pR3SJxnCDIIPGi1/9kUBRzF20BdNZRHJcB/ozEjmEOMyK3wl98hlHlhjIy2XexL2RKfEKOQ0BuU2TxDjYaYSaJwh5rHP7bLmIrH6QKTs0HpS3Sd40P/bQoCRyBVjLNqPMkQ6nbSBCHkSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W16aB5Ac; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA284C4CEFB;
-	Fri, 17 Oct 2025 11:32:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760700779;
-	bh=8yVl2NH8wCRWT0BWB4xJxse7JadeLBTgspo6OepmR18=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=W16aB5AchRRIDFkXWh+tG5tlaQdVC1I34WsnKRmiAAJAWSmro3WLSZmQJse1q4OCj
-	 +aZNpXcLflrNtR0mCD36w96dlD4PZUDDMqhNxDoALx9q1i5CTP6ESbJCpuzkXqWNmU
-	 L5/JFM5WTwtg4Q5N2sVlbZvu986nCzrY8XWnP1Y+lDtNYQYyHS0qb2zFQQDA1Ply5B
-	 sO4pLudramXjUFoh37oPEH0lA3uHBbSJyWTjfE0c8Cuoj91WUTkugWUXADQe96AfMA
-	 eHaFNitHGpSoHvJrQr9vwfo/qrGD6nwLD8uFIqM96xSIPEi6YzY1g5ynHCKqdJbW9D
-	 jI8BfyxirEgeA==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Fri, 17 Oct 2025 07:32:03 -0400
-Subject: [PATCH v2 11/11] nfsd: wire up GET_DIR_DELEGATION handling
+	s=arc-20240116; t=1760701927; c=relaxed/simple;
+	bh=npN2sTmrdA84Qttr4PuvN1djQIP/axEMHf/joC/gBq4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mdIUyWh9XJSOTpzjr7cgZdb2WT/TWn4+f5aagHM4DYmUQgKc5DHWYn7pyWbEV1AdXwdNQUQTe3JKUF/nDs6xdQ2hRJSsqfrn6KnmDiUL1CcoLIV6Vz6+49a7rJEXrqzDfUATmXnbLqpbpx2r+uNrpHXWRHi1ClKXjoeguwoblQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=vFjIM6/x; arc=none smtp.client-ip=212.227.15.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1760701870; x=1761306670; i=markus.elfring@web.de;
+	bh=7rn+7qH9YNbNWqTOkr3IRROK3XrCxy78RXXFl+DKfCk=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=vFjIM6/xJSP2iCkVi5wZSSBkqaey7xM1rU/IkkpLD6zCsx8IxA/7lvYgljAcxJHF
+	 D4EDmRqs1LOkWtemanXX4p4z1UxAKjz+uPCFYcxGVcfT5SJIlPkngHJhkpA247DBp
+	 lfpgKyGim/2v2kjHpASxuKUmUVngHBGfGetyo3VEDNbyYwpOcpzZk+LsSUMgbBCl1
+	 ppjKFRAliEkGF5eRCiWhKVpBajs8wyofoiMXJO3IeOOLzKwHLiugM0fyEAREyPTFi
+	 QcQUAG2zm/N2aRz8i4XEi33BlQV4bCnWexJgLuPDlFqKsfaBd2mJDN0t/xZlEztj6
+	 svhIE3+/SLkX1yBAHw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.69.195]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1M76bb-1v8M4n0S2p-008KXZ; Fri, 17
+ Oct 2025 13:51:10 +0200
+Message-ID: <e8b52cf3-9f77-445c-8ba6-d8ac402841b7@web.de>
+Date: Fri, 17 Oct 2025 13:51:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251017-dir-deleg-ro-v2-11-8c8f6dd23c8b@kernel.org>
-References: <20251017-dir-deleg-ro-v2-0-8c8f6dd23c8b@kernel.org>
-In-Reply-To: <20251017-dir-deleg-ro-v2-0-8c8f6dd23c8b@kernel.org>
-To: Miklos Szeredi <miklos@szeredi.hu>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
- Chuck Lever <chuck.lever@oracle.com>, 
- Alexander Aring <alex.aring@gmail.com>, 
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
- Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
- Bharath SM <bharathsm@microsoft.com>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
- David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, 
- NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
- Dai Ngo <Dai.Ngo@oracle.com>, Amir Goldstein <amir73il@gmail.com>, 
- Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
- Sergey Senozhatsky <senozhatsky@chromium.org>, 
- Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
- samba-technical@lists.samba.org, netfs@lists.linux.dev, 
- ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
- linux-xfs@vger.kernel.org, netdev@vger.kernel.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5443; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=8yVl2NH8wCRWT0BWB4xJxse7JadeLBTgspo6OepmR18=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBo8ilCIHz7Y0CKC7YnK6gfkIqnxpWome0thgPpR
- +g2yqAYRpCJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaPIpQgAKCRAADmhBGVaC
- FTAaEAC+dHlJR18HGmzM64QSsr15Nzgmjhjn3B4u34VdeVcki8Z0M1Ia7NY+zBx2Mk+BlcfuhGh
- Du2a9DTnQHF+2TtGb71pGXempYuWufDsfnjvgtez9bbdvWgi2+owN3X1s9x55akZ83ymiItyl6y
- EthK4NbcNEaPSo0QQ3gEmkT3ZdS3ZTlg56NgRAkvLbVGAu6wNLHXMxMxPqht583P5mwLLcNoAHL
- 6WSQQjaxSg2K/tOOe/daEzD+Ip7I7QzrTTmqhYReiFc2r4qfv8/ZFlR7KHDYifTwKqOVJRJqbbL
- QZLjAvFOd01wTr/avX5rzPmDSlRrzlb107pBBh4VVVhdZgnFhg5fnM1P42OkpfcBYmrCDZgL/xo
- +70YWd7yaitvOg1ZTSQKqslBYMJ6hr/8xlOcNvuHXvhZ8ZR+LjFPP7X7Qhy7Z1z1jqrU7m3E09b
- GnT9b11qbWeu9a6Abuml6pf65yauM6Md2eQTfuaext5+hYSlc0qlwn5Wpp0dvxKjwjdyx5YsyFA
- RdZQzWOqkEgv0UwB5/P9ypSeSdMmi4FDDAMOT56+mJNBnkTHUFrcF+XYks+xlyUZVHwTh/Gi8F4
- vRdvqGFLDThioSiuu1KtPF111VJG5853+p2RXcd3rvh/q5WS/CX12iya21b+CcLZvToFG6lIuy2
- bsS1IsMN5vPKs0g==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v02 4/6] hinic3: Add mac filter ops
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
+ netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ Gur Stavi <gur.stavi@huawei.com>, luosifu@huawei.com,
+ Luo Yang <luoyang82@h-partners.com>, Meny Yossefi <meny.yossefi@huawei.com>,
+ Shen Chenyang <shenchenyang1@hisilicon.com>, Shi Jing
+ <shijing34@huawei.com>, Wu Like <wulike1@huawei.com>,
+ Xin Guo <guoxin09@huawei.com>, Zhou Shuai <zhoushuai28@huawei.com>
+References: <cover.1760685059.git.zhuyikai1@h-partners.com>
+ <dccaa516308f83aed2058175fdb4b752b6cbf4ae.1760685059.git.zhuyikai1@h-partners.com>
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <dccaa516308f83aed2058175fdb4b752b6cbf4ae.1760685059.git.zhuyikai1@h-partners.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:exNDUQUaDYXGKgkdCRGIVwXzj/G3jScmhEVC2XTAPYg6wOjZJ23
+ ZoWVwlZdTOW/tvflJdfVZY+Z1ET3uo/gRsLzldvMtjOEtgeF0zTyP+MmhdefgkPikqkfGkm
+ 8peYMi64jMXIQNxkz3VlBgLXU//+85SzDaaZYD1963pMYqqrht6MddmHkj/HeFuBMLPumpj
+ CL1hx9BuAVCW6B6d2W45A==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:09fI+3qVlno=;6vIopFBdm/viI7iYqBoe+7tFCi7
+ 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
+ KONt6PvctI27GIklo2rR4hvA8D+Zb81ERdU=
 
-Add a new routine for acquiring a read delegation on a directory. These
-are recallable-only delegations with no support for CB_NOTIFY. That will
-be added in a later phase.
+=E2=80=A6> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_filter.c
+> @@ -0,0 +1,413 @@
+=E2=80=A6> +static int hinic3_mac_filter_sync(struct net_device *netdev,
+> +				  struct list_head *mac_filter_list, bool uc)
+> +{
+=E2=80=A6
+> +		hinic3_cleanup_filter_list(&tmp_add_list);> +		hinic3_mac_filter_sync=
+_hw(netdev, &tmp_del_list, &tmp_add_list);
+> +
+> +		/* need to enter promiscuous/allmulti mode */
+> +		err =3D -ENOMEM;
+> +		goto err_out;
+> +	}
+> +
+> +	return add_count;
+> +
+> +err_out:
+> +	return err;
+> +}
 
-Since the same CB_RECALL/DELEGRETURN infrastrure is used for regular and
-directory delegations, a normal nfs4_delegation is used to represent a
-directory delegation.
+Is there a need to move any resource cleanup actions behind a more appropr=
+iate label?
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/coding-style.rst?h=3Dv6.17#n532
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- fs/nfsd/nfs4proc.c  |  21 ++++++++++-
- fs/nfsd/nfs4state.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/nfsd/state.h     |   5 +++
- 3 files changed, 125 insertions(+), 1 deletion(-)
 
-diff --git a/fs/nfsd/nfs4proc.c b/fs/nfsd/nfs4proc.c
-index 7f7e6bb23a90d9a1cafd154c0f09e236df75b083..527f8dc52159803770964700170473509ec328ed 100644
---- a/fs/nfsd/nfs4proc.c
-+++ b/fs/nfsd/nfs4proc.c
-@@ -2342,6 +2342,13 @@ nfsd4_get_dir_delegation(struct svc_rqst *rqstp,
- 			 union nfsd4_op_u *u)
- {
- 	struct nfsd4_get_dir_delegation *gdd = &u->get_dir_delegation;
-+	struct nfs4_delegation *dd;
-+	struct nfsd_file *nf;
-+	__be32 status;
-+
-+	status = nfsd_file_acquire_dir(rqstp, &cstate->current_fh, &nf);
-+	if (status != nfs_ok)
-+		return status;
- 
- 	/*
- 	 * RFC 8881, section 18.39.3 says:
-@@ -2355,7 +2362,19 @@ nfsd4_get_dir_delegation(struct svc_rqst *rqstp,
- 	 * return NFS4_OK with a non-fatal status of GDD4_UNAVAIL in this
- 	 * situation.
- 	 */
--	gdd->gddrnf_status = GDD4_UNAVAIL;
-+	dd = nfsd_get_dir_deleg(cstate, gdd, nf);
-+	if (IS_ERR(dd)) {
-+		int err = PTR_ERR(dd);
-+
-+		if (err != -EAGAIN)
-+			return nfserrno(err);
-+		gdd->gddrnf_status = GDD4_UNAVAIL;
-+		return nfs_ok;
-+	}
-+
-+	gdd->gddrnf_status = GDD4_OK;
-+	memcpy(&gdd->gddr_stateid, &dd->dl_stid.sc_stateid, sizeof(gdd->gddr_stateid));
-+	nfs4_put_stid(&dd->dl_stid);
- 	return nfs_ok;
- }
- 
-diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-index b06591f154aa372db710e071c69260f4639956d7..a63e8c885291fc377163f3255f26f5f693704437 100644
---- a/fs/nfsd/nfs4state.c
-+++ b/fs/nfsd/nfs4state.c
-@@ -9359,3 +9359,103 @@ nfsd4_deleg_getattr_conflict(struct svc_rqst *rqstp, struct dentry *dentry,
- 	nfs4_put_stid(&dp->dl_stid);
- 	return status;
- }
-+
-+/**
-+ * nfsd_get_dir_deleg - attempt to get a directory delegation
-+ * @cstate: compound state
-+ * @gdd: GET_DIR_DELEGATION arg/resp structure
-+ * @nf: nfsd_file opened on the directory
-+ *
-+ * Given a GET_DIR_DELEGATION request @gdd, attempt to acquire a delegation
-+ * on the directory to which @nf refers. Note that this does not set up any
-+ * sort of async notifications for the delegation.
-+ */
-+struct nfs4_delegation *
-+nfsd_get_dir_deleg(struct nfsd4_compound_state *cstate,
-+		   struct nfsd4_get_dir_delegation *gdd,
-+		   struct nfsd_file *nf)
-+{
-+	struct nfs4_client *clp = cstate->clp;
-+	struct nfs4_delegation *dp;
-+	struct file_lease *fl;
-+	struct nfs4_file *fp, *rfp;
-+	int status = 0;
-+
-+	fp = nfsd4_alloc_file();
-+	if (!fp)
-+		return ERR_PTR(-ENOMEM);
-+
-+	nfsd4_file_init(&cstate->current_fh, fp);
-+
-+	rfp = nfsd4_file_hash_insert(fp, &cstate->current_fh);
-+	if (unlikely(!rfp)) {
-+		put_nfs4_file(fp);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	if (rfp != fp) {
-+		put_nfs4_file(fp);
-+		fp = rfp;
-+	}
-+
-+	/* if this client already has one, return that it's unavailable */
-+	spin_lock(&state_lock);
-+	spin_lock(&fp->fi_lock);
-+	/* existing delegation? */
-+	if (nfs4_delegation_exists(clp, fp)) {
-+		status = -EAGAIN;
-+	} else if (!fp->fi_deleg_file) {
-+		fp->fi_deleg_file = nf;
-+		fp->fi_delegees = 1;
-+	} else {
-+		++fp->fi_delegees;
-+	}
-+	spin_unlock(&fp->fi_lock);
-+	spin_unlock(&state_lock);
-+
-+	if (status) {
-+		put_nfs4_file(fp);
-+		return ERR_PTR(status);
-+	}
-+
-+	/* Try to set up the lease */
-+	status = -ENOMEM;
-+	dp = alloc_init_deleg(clp, fp, NULL, NFS4_OPEN_DELEGATE_READ);
-+	if (!dp)
-+		goto out_delegees;
-+
-+	fl = nfs4_alloc_init_lease(dp);
-+	if (!fl)
-+		goto out_put_stid;
-+
-+	status = kernel_setlease(nf->nf_file,
-+				 fl->c.flc_type, &fl, NULL);
-+	if (fl)
-+		locks_free_lease(fl);
-+	if (status)
-+		goto out_put_stid;
-+
-+	/*
-+	 * Now, try to hash it. This can fail if we race another nfsd task
-+	 * trying to set a delegation on the same file. If that happens,
-+	 * then just say UNAVAIL.
-+	 */
-+	spin_lock(&state_lock);
-+	spin_lock(&clp->cl_lock);
-+	spin_lock(&fp->fi_lock);
-+	status = hash_delegation_locked(dp, fp);
-+	spin_unlock(&fp->fi_lock);
-+	spin_unlock(&clp->cl_lock);
-+	spin_unlock(&state_lock);
-+
-+	if (!status)
-+		return dp;
-+
-+	/* Something failed. Drop the lease and clean up the stid */
-+	kernel_setlease(fp->fi_deleg_file->nf_file, F_UNLCK, NULL, (void **)&dp);
-+out_put_stid:
-+	nfs4_put_stid(&dp->dl_stid);
-+out_delegees:
-+	put_deleg_file(fp);
-+	return ERR_PTR(status);
-+}
-diff --git a/fs/nfsd/state.h b/fs/nfsd/state.h
-index 1e736f4024263ffa9c93bcc9ec48f44566a8cc77..b052c1effdc5356487c610db9728df8ecfe851d4 100644
---- a/fs/nfsd/state.h
-+++ b/fs/nfsd/state.h
-@@ -867,4 +867,9 @@ static inline bool try_to_expire_client(struct nfs4_client *clp)
- 
- extern __be32 nfsd4_deleg_getattr_conflict(struct svc_rqst *rqstp,
- 		struct dentry *dentry, struct nfs4_delegation **pdp);
-+
-+struct nfsd4_get_dir_delegation;
-+struct nfs4_delegation *nfsd_get_dir_deleg(struct nfsd4_compound_state *cstate,
-+						struct nfsd4_get_dir_delegation *gdd,
-+						struct nfsd_file *nf);
- #endif   /* NFSD4_STATE_H */
-
--- 
-2.51.0
-
+Regards,
+Markus
 
