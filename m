@@ -1,161 +1,147 @@
-Return-Path: <netdev+bounces-230429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98648BE7EBF
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 11:58:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25532BE7FD2
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 12:12:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 744654E068C
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 09:58:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 861971A62875
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 10:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFA32D6E71;
-	Fri, 17 Oct 2025 09:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1263126A4;
+	Fri, 17 Oct 2025 10:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="qYPmCzhb"
+	dkim=pass (2048-bit key) header.d=rootcommit.com header.i=@rootcommit.com header.b="dquGaOQJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sienna.cherry.relay.mailchannels.net (sienna.cherry.relay.mailchannels.net [23.83.223.165])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79612DA774
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 09:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760695107; cv=none; b=FS8+ateeiKBq6081ZOSuwWmq/angBpxraSIhO+ogSa0lgzCwpI7ed5daOpRulJfyRvU/yh/B7TfjoLczjoSQb/r/io3p4e7G2YqGB+sMPVOcGktcbVfIvTe/sqZ+LGf+SmFNc1KCczg00IcnKiscmOFZsH2NFzGiNc7w1nxpnQo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760695107; c=relaxed/simple;
-	bh=uPh/ii+rgmvbCP0wm67KTw3FbLTpuetEo2DXOFYd9RY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vn6UuORLy76pL82slh+WDvKCjgP+p1db8LDXmri6PHQcl+Lv+PvDitMZAA8ibMeUA/QGHl6qXpjKmFZkS3q3E/mYXI9VEXZPqhZZMv5KIO1pOB6DrZVmzhN6s7ZNZpOblj3Sdf3jM3JvSW1G2EN1HlaDCe/WX8lEyGPjBeqmL2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=qYPmCzhb; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-4270491e9easo741955f8f.2
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 02:58:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1760695104; x=1761299904; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zGr3XDWHjHOJAcUpC5wF1xjA8pPevM01/q+Ros0ANMo=;
-        b=qYPmCzhbzSYZrdIRVqWX0Tjm2tc5SC3AEn9oUGXJgKfeIgDQYdvgV7hF12GqF+n7P9
-         VGPhm7sq+HR8byr8quuyx8zJ0NkC1Mq7yQJ9lCQ62Zw/AdM6Cv76+XPpsojFduywUE12
-         VvfcBBLC9YbQOtbYssnSrsjqe3B5IjyhyWPj8DxmTKsFq/Qg49eVBFsnNMlk5QatC0HH
-         EjMZyR7HO8moGzLseEbX1A7qyGvO7VaA0MM4GSMMM6iznjNWF9l8+GbxA312nfGpTrZp
-         2g/Dk+/cIijaSajVib0VuZiIyj4WR+RHOotWEZBC1bWXfdgWAn+oSNoW0ruIuQSsi7bF
-         2Y7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760695104; x=1761299904;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zGr3XDWHjHOJAcUpC5wF1xjA8pPevM01/q+Ros0ANMo=;
-        b=WzSrrsMDiLkhdnTu0Z3Cx5llHsETJngkaSzO9ROnZbSi0DHj9A47lpT8f1xeexlM5K
-         xHVaPORkPpbia31ui9uRKwOUTK1k5BVMsV1rRRBPM66xpnFXxPWmV+ezu3AOg5icqCsk
-         UCx06j+7PZztjO1U84oVPG3UHpqsCKU9AjgaFPMZ1OQXBOEtbu9nbI3YZf6k6sbNdQo+
-         SWa7uAcG6gzglaUczq4NSQfEjvyTVIhJ6xX9xKQ8wa6nr1to2AxEzLZ4xEG6/0HYOKP/
-         y9ChtbaLEewHX2JsjF/QgdHXb2bpdoUbcEcQU0UUYzkjFKrxjig7Kbm254BuGJfDWfPp
-         r3/g==
-X-Gm-Message-State: AOJu0Yz18TpSRwx2F1JyYJEMjYCFPDNUVf5Udlp8ei68nGIvYISFtJx0
-	Aesq3xEHkuQzkUWrfkH9Rt7lHz4QdDPMRc7WMFkvI00mFKNsO719FvBxl6T9FG3MngdNyXuW6Y3
-	Esk8B00g=
-X-Gm-Gg: ASbGncuSpPLCK1JHEii5s9GDwnKkSDFlVDdQbLOAmUOjNLSjHibnMN9ooKpHZTugsBK
-	FJVS88GyHbzf3umOIf5iVDOvKh/vfsrBW3sRwoufRw7qTVPqlaLVVGv0Xfo0BxMFlzsqZmgJp/g
-	tp929rjqVl2BQbPyBhjnx8SM4nxNdUdGxDlOU3ITMQUfQpkMR+ANkC1yOAX8pTDB553B2RMCmQ9
-	bpj2yi60zAGMy4xBp3beghVDXtG28HqunNRSErADvok4ORmQ5LjPtRoPzCPBlRLdNtPOe+ITc9X
-	U+mUyO6EELkVDN4qeG61fezw4gGs1IP6lv6dyHB7crHBmzf2V3mD3RLg4BvvXW/6EWrCt4gVEJv
-	kX0eShNRhfppZfGEkDU4eM6m1W1yitK2T7wxSJFQtS91tcdwHlR7oG580gBzXZpkv11zgQ4EqF1
-	DK1Jl+jgqm00/Smjq6La7OsVrIToaQr/+HwqHavw==
-X-Google-Smtp-Source: AGHT+IGGJNKEyEbaEv1ZDoXrARqgE/0dnSH8bQ2YC5QoAeNPQSjV6b1dU/j/crVsbpev8hT0qvinUw==
-X-Received: by 2002:a05:6000:2887:b0:427:9a9:4604 with SMTP id ffacd0b85a97d-42709a9465fmr370577f8f.45.1760695104131;
-        Fri, 17 Oct 2025 02:58:24 -0700 (PDT)
-Received: from jiri-mlt.client.nvidia.com ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce5d0006sm39944499f8f.34.2025.10.17.02.58.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Oct 2025 02:58:23 -0700 (PDT)
-Date: Fri, 17 Oct 2025 11:58:22 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Sabrina Dubroca <sdubroca@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, Shuah Khan <shuah@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Stanislav Fomichev <stfomichev@gmail.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	bridge@lists.linux.dev
-Subject: Re: [PATCHv6 net-next 0/4] net: common feature compute for upper
- interface
-Message-ID: <gstrsf76zi5twyohlimenl3zli67k7l52vu27qwt5csrevrqoa@th2fqrhss2zi>
-References: <20251017034155.61990-1-liuhangbin@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87840322C97;
+	Fri, 17 Oct 2025 10:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.223.165
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760695768; cv=pass; b=Jm63g1IYlnUKbX7Gfb2JEaCYVXZGH4WijD4owroOOPTVEoGYdAn7uAB6FAly48XSwG9rV4m6qOqmEuwpIvjqj1ZX+HGukzLUUG7ZvkG11VztBWihvl1Rln+jUuMypS6S73gtqezgSJ0vHH01RJOswFPAWplMveEhZ8puea7AL6I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760695768; c=relaxed/simple;
+	bh=JCf9+BIVt/3dAPNMzv6qmO3EfmD/eUtnNliLYOf6oI4=;
+	h=From:To:Cc:Subject:Message-ID:In-Reply-To:References:MIME-Version:
+	 Date; b=XYMT+swBz3lOoSBElKJZVnKOY1oa72g+21zcB8GJNHZnip3qvkuXZNAxU0B2eKg5SavXev5xo++8sEmNGADMQqvVwoDEAcEfw3kCF/5+nf0B10YYgjumbaLAeURmNRWAjhpvzeO9key5RyobY+o4Bv4EUekTT6bhOiOF/nNqnqo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rootcommit.com; spf=pass smtp.mailfrom=rootcommit.com; dkim=pass (2048-bit key) header.d=rootcommit.com header.i=@rootcommit.com header.b=dquGaOQJ; arc=pass smtp.client-ip=23.83.223.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rootcommit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rootcommit.com
+X-Sender-Id: hostingeremail|x-authuser|michael.opdenacker@rootcommit.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 266F06C1FA2;
+	Fri, 17 Oct 2025 10:02:34 +0000 (UTC)
+Received: from fr-int-smtpout18.hostinger.io (trex-green-5.trex.outbound.svc.cluster.local [100.116.100.136])
+	(Authenticated sender: hostingeremail)
+	by relay.mailchannels.net (Postfix) with ESMTPA id 18B856C2079;
+	Fri, 17 Oct 2025 10:02:31 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1760695353; a=rsa-sha256;
+	cv=none;
+	b=47EyyEKQnI0TgEXkP+KaoKBRVN3THrt1Hw2+4i/c9A0be8OOMacShCS5IcJRnwo3gO1SEy
+	j5wxGjhpufJZ0EzzphVR0rFL/NHwHBTPr68nkEk3TLiHjIwIGyqAP0Y5wTdx+wgfbJ6+mW
+	poMNQa7KQMKmL022lvxvpf8U8sfB9fj1mZAmVzRw0wL0YmeUBDS/nW7Kleo0z3T/FDmtlJ
+	25kaTH/vlTvk/Ns30IwNFKTD3XtOkgHCep2cJSQMiv7L5p8DBghKwwBnUtr3FrSagHEkSF
+	cEIENGwLh7Z9xhjhuJFTfKj45H9KdlMGFw2jMfnFRw1Dw1/z/aHv6OG0I1KflQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1760695353;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=INLfLanNrxPT8zZfl4wJScpkqHE8+TQnHHl9RjngRPU=;
+	b=pcqnvVptgS4/Pat+gdc00QGJR2YyQk3kS4DnaufmLm05GSJQ+upSdE04buWQxnM06y2x6l
+	jf6b8Qa/k7x5G6mtiqQoFgT5n8CNXQ5paiFUkBmmp449AseRu4BZ9MHe86M0AnEG8ouBdw
+	XsytIsJh+pEdoRR53+OBlitXSPwd/oYkOCMrBIviuAW4gBULTWbrGBa+q15aRlVcjVjuth
+	qEvpNS0DmUZw+NnrSH1/ef0yKwbULo9eRnjCPI8WpooPUZ5AasHJb0MXEkjuMLUAcHSfRY
+	HVqzQVh76LfDC93EJBAHkxrqPDt55/exZxspMjxcAoSat59dMBOW/RJSKH4vpg==
+ARC-Authentication-Results: i=1;
+	rspamd-645b74df65-b2gqj;
+	auth=pass smtp.auth=hostingeremail
+ smtp.mailfrom=michael.opdenacker@rootcommit.com
+X-Sender-Id: hostingeremail|x-authuser|michael.opdenacker@rootcommit.com
+X-MC-Relay: Neutral
+X-MailChannels-SenderId:
+ hostingeremail|x-authuser|michael.opdenacker@rootcommit.com
+X-MailChannels-Auth-Id: hostingeremail
+X-Thoughtful-Zesty: 4925f2f243cb1525_1760695353949_1738770027
+X-MC-Loop-Signature: 1760695353948:450799911
+X-MC-Ingress-Time: 1760695353948
+Received: from fr-int-smtpout18.hostinger.io (fr-int-smtpout18.hostinger.io
+ [148.222.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.116.100.136 (trex/7.1.3);
+	Fri, 17 Oct 2025 10:02:33 +0000
+Received: from localhost.localdomain (unknown [IPv6:2001:861:4450:d360:2f55:e31:2877:ead4])
+	(Authenticated sender: michael.opdenacker@rootcommit.com)
+	by smtp.hostinger.com (smtp.hostinger.com) with ESMTPSA id 4cp0jt6bm4z1yVn;
+	Fri, 17 Oct 2025 10:02:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rootcommit.com;
+	s=hostingermail-a; t=1760695347;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=INLfLanNrxPT8zZfl4wJScpkqHE8+TQnHHl9RjngRPU=;
+	b=dquGaOQJ50FuM7nM1sHO4ZKdjfqy1yDixC7SDNjV6UsVxpz11jxtBIYTccQGNTzanQ6jQg
+	BGjF4WVVOIbCSjETaOXvEvnwsBFU+Ob5gISMMpgEHxtQBmXgJRc29M2Mu9/tdu3P3q+d+J
+	79WJ1Rkd56ApYmlmwMSUbfpLwDL2xANQrgqvA3hMKu2ubY7dR5Od0Fi/jhV8MqM+Z4NqDa
+	JA7cBUwHePhqsm7OtGJg3Wibk4HTbKdCcTygPnA+Xla52qQ5caHaNLQFbgh8yRvFOX9PTb
+	SJp3CDvrZ6W0ZgbEGMD3ZnrcEc9wj382BSfTP3WNMldys70E0hvJpKO0k/6w9g==
+From: michael.opdenacker@rootcommit.com
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Yixun Lan <dlan@gentoo.org>
+Cc: Michael Opdenacker <michael.opdenacker@rootcommit.com>,
+	netdev@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	spacemit@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] net: spacemit: compile k1_emac driver as built-in by default
+Message-ID: <20251017100106.3180482-3-michael.opdenacker@rootcommit.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251017100106.3180482-1-michael.opdenacker@rootcommit.com>
+References: <20251017100106.3180482-1-michael.opdenacker@rootcommit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251017034155.61990-1-liuhangbin@gmail.com>
+Content-Transfer-Encoding: 8bit
+Date: Fri, 17 Oct 2025 10:02:26 +0000 (UTC)
+X-CM-Envelope: MS4xfE6wcYjsPboHb55vSh1fH6aAWNprdRcSXrdFEIWCopkxczg0fg2oi4JZPXzc17U5fumSNVpTQ8GaIZON2ODWTprzV/SxzxeWxfEWpBdLQlVustMLg1B4 2E0aVkcpL22tFkCW+q4brCQZgjglw8+hW8ijuQ3LjCEHFFNj/MLKvibvf12FqDvdjs7+hGGLstgVYb7ndMW6Tc4U5/PK6tOv8tFM/vEDLVETlLQXgGPIY0qS tMULin+Mbyl2H0Ew/sba+/10YOYSa11413QPUJbvsZIW75r4f1a1fv5ybKbR0maxYoVPICqBcLbM32/WeTXJ1dApTQ6m7VGpvkYrPg+c1Kn9lo0Bt79/7jlM jcteHgroEZ5+ATgAnxmL0a4qDakovt8sGmr0Elzn3WPwqbNX8O8iKaA3o1zltND/hHL0db6jBCiIKTlwCsVwtNnpI11j6eLz3Phb4D9O7AVnWd4pGoHUxDv8 zwPKO2q1g0VD8zjs1aFIIiAWCXNGMbhNTdVvftsqS04neH4yUtvS516o93DY8YSmd+kWiVoq1mBTLcSXCXaoTMS9Af/DwfBv7Bt53WGVj1Kc3D9aUosUiFBr V83j3WnUctOYwGQah0sySMk0lM0ZuqxUSb2OOOVH7j2LYw==
+X-CM-Analysis: v=2.4 cv=Lflu6Sfi c=1 sm=1 tr=0 ts=68f21433 a=/5xBaVTRis1tCxhfvtIJdg==:617 a=xqWC_Br6kY4A:10 a=d70CFdQeAAAA:8 a=WyZDyWQnYPSBde5YxlwA:9 a=NcxpMcIZDGm-g932nG_k:22
+X-AuthUser: michael.opdenacker@rootcommit.com
 
-Fri, Oct 17, 2025 at 05:41:51AM +0200, liuhangbin@gmail.com wrote:
->Some high-level virtual drivers need to compute features from their
->lower devices, but each currently has its own implementation and may
->miss some feature computations. This patch set introduces a common function
->to compute features for such devices.
->
->Currently, bonding, team, and bridge have been updated to use the new
->helper.
+From: Michael Opdenacker <michael.opdenacker@rootcommit.com>
 
-Looks good to me.
+Supports booting boards on NFS filesystems, without going
+through an initramfs.
 
-set-
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Signed-off-by: Michael Opdenacker <michael.opdenacker@rootcommit.com>
+---
+ drivers/net/ethernet/spacemit/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
->
->v6:
->  * no update, only rename UPPER_DEV_* to MASTER_UPPER_DEV_* (Jiri Pirko)
->
->v5:
->  * rename VIRTUAL_DEV_* to UPPER_DEV_* (Jiri Pirko)
->  * use IS_ENABLED() instead of ifdef (Simon Horman)
->  * init max_headroom/tailroom (Simon Horman)
->  * link: https://lore.kernel.org/netdev/20251016033828.59324-1-liuhangbin@gmail.com
->
->v4:
->  * update needed_{headroom, tailroom} in the common helper (Ido Schimmel)
->  * remove unneeded err in team (Stanislav Fomichev)
->  * remove selftest as `ethtool -k` does not test the dev->*_features. We
->    can add back the selftest when there is a good way to test. (Sabrina Dubroca)
->  * link: https://lore.kernel.org/netdev/20251014080217.47988-1-liuhangbin@gmail.com
->
->v3:
->  a) fix hw_enc_features assign order (Sabrina Dubroca)
->  b) set virtual dev feature definition in netdev_features.h (Jakub Kicinski)
->  c) remove unneeded err in team_del_slave (Stanislav Fomichev)
->  d) remove NETIF_F_HW_ESP test as it needs to be test with GSO pkts (Sabrina Dubroca)
->
->v2:
->  a) remove hard_header_len setting. I will set needed_headroom for bond/team
->     in a separate patch as bridge has it's own ways. (Ido Schimmel)
->  b) Add test file to Makefile, set RET=0 to a proper location. (Ido Schimmel)
->
->Hangbin Liu (4):
->  net: add a common function to compute features for upper devices
->  bonding: use common function to compute the features
->  team: use common function to compute the features
->  net: bridge: use common function to compute the features
->
-> drivers/net/bonding/bond_main.c | 99 ++-------------------------------
-> drivers/net/team/team_core.c    | 83 ++-------------------------
-> include/linux/netdev_features.h | 18 ++++++
-> include/linux/netdevice.h       |  1 +
-> net/bridge/br_if.c              | 22 +-------
-> net/core/dev.c                  | 88 +++++++++++++++++++++++++++++
-> 6 files changed, 120 insertions(+), 191 deletions(-)
->
->-- 
->2.50.1
->
+diff --git a/drivers/net/ethernet/spacemit/Kconfig b/drivers/net/ethernet/spacemit/Kconfig
+index 85ef61a9b4ef..7fe1b2a308d1 100644
+--- a/drivers/net/ethernet/spacemit/Kconfig
++++ b/drivers/net/ethernet/spacemit/Kconfig
+@@ -18,7 +18,7 @@ config SPACEMIT_K1_EMAC
+ 	depends on ARCH_SPACEMIT || COMPILE_TEST
+ 	depends on MFD_SYSCON
+ 	depends on OF
+-	default m if ARCH_SPACEMIT
++	default y if ARCH_SPACEMIT
+ 	select PHYLIB
+ 	help
+ 	  This driver supports the Ethernet MAC in the SpacemiT K1 SoC.
 
