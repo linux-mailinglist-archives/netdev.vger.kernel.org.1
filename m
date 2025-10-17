@@ -1,148 +1,136 @@
-Return-Path: <netdev+bounces-230542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFCE5BEAD76
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 18:45:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3656BEADD3
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 18:49:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8FDA435F154
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 16:45:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 224C81AE1D91
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 16:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BADEE2E1EEC;
-	Fri, 17 Oct 2025 16:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B952E5B2E;
+	Fri, 17 Oct 2025 16:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XtF4GmSK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bJ1JEkwC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E103F2DF6F7
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 16:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B152BEFF1
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 16:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760719534; cv=none; b=VADbcSOl7hx76ARDKk1stps5wlHNOORoCpf41cCcegmCUsb+CNFh2ztmLN/ZSRMB/i8OufBUSv7w3A5OwKot0xQinhR35KqbYlX9vbbdLJhhwS0dGuDTZMJK1UFSAbIAJnHmAuqDumTGT97rO/Ex+O7PDEBENx/zeifql23waIU=
+	t=1760719756; cv=none; b=nD+lLbNwY/8zeAkv9NQ4orZwIvAcY5/7N7c9ldNYedqI5MbEFX/65EFpIhv9+3SCeCl6sA6EvhVYS/M4sAlU427WAj179w/Hf6++9tVcG/XgUmg05+I4zc0Kw7XLdIPGanZZ36Aji9/tPANvFGGzVO0YeVDxWg3Q0Jy6r7k/2nE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760719534; c=relaxed/simple;
-	bh=AbqV4MOKnTV9h2J9aQMq2DtsM+47tbkdQ5UeEZ1ahRM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=QqE3mZUhXxHf8cB+YwU0TkBkrGx+giTpRrLajUqvHSRfVU87s3KSnPkUgbsikWNzUu/cQvYIya3fmYwVvAlHa0tpXAcM16mfIt8Ivlh51dPztU2slMuHPriURZZVuzpo+FeKHUdfWTAffaF3cRxcevU49RLna6MkFKsQcaW0O94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XtF4GmSK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760719532;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AbqV4MOKnTV9h2J9aQMq2DtsM+47tbkdQ5UeEZ1ahRM=;
-	b=XtF4GmSKzLOzqQcbz8dZGFfhfCNHKQXXtlJAam0Y7JyWEMZqYPBHwJBwsqHq64l9lQBr5H
-	6h/su9Rw+VmMM/A5LnO0nPtCmygYEr4rUFXkvDwLKcmYGh9obVNyJMgO7uy982ez3wEqvJ
-	m3YH2RSCP5LzkZDK19iQrmSZAI60Y7c=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-113-CkWOzRNrN5mVqQYsFl5vWw-1; Fri, 17 Oct 2025 12:45:30 -0400
-X-MC-Unique: CkWOzRNrN5mVqQYsFl5vWw-1
-X-Mimecast-MFC-AGG-ID: CkWOzRNrN5mVqQYsFl5vWw_1760719529
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-b548c516b79so272022966b.3
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 09:45:30 -0700 (PDT)
+	s=arc-20240116; t=1760719756; c=relaxed/simple;
+	bh=f7LeaCgpkpv/0cKz2fOxN7nq7fxaeGm/IHO/bAgYlKk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FH12Z44Ila+9Ub+s7rqLzyYxu6nBIb+RvWRiu2k0FsTNB4/kaVOoN4dAWezsd91UO9gptVTqBnpngJI8ioqK/R7LBTcqJ3uk9HWaSmkAMbe9iU6fG6DjFKZa/u1pcMqSoJaDXQmMDyK1UK58XJLODqIUgi8Kx2w8eXgMp/sELto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bJ1JEkwC; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-7814273415cso19263887b3.1
+        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 09:49:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760719753; x=1761324553; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f7LeaCgpkpv/0cKz2fOxN7nq7fxaeGm/IHO/bAgYlKk=;
+        b=bJ1JEkwC7NByXKq6dy11aptUFxntDH84unl5OVEp5R2dkoTjsid1AOJURc8OOkhU0T
+         i54bTevcV06/x1VHdMvHvgBlbXJgsA8crUMf7aL/x8IDPJhsdF7BRuJwhPklnjm4QuC0
+         EvqNHPyqqbR179Ysm0DfJfBIFmATSNc1yVjD7rZqH54CSfvxI0EVbi9S7G2+cvSQyP17
+         0NSAX1v8FacDo4m0berWoPudfiiLD9iD5jOVhTydiGbmTvQxh1BuE1dj4sg6UbLrydXI
+         Ozgj2A5ui/w4BqrZw57XXHC27w72qJLu88CJGH9ASEhj47NQa7GkxkeU1I1C+fUVuifF
+         9ltQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760719529; x=1761324329;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1760719753; x=1761324553;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AbqV4MOKnTV9h2J9aQMq2DtsM+47tbkdQ5UeEZ1ahRM=;
-        b=CCAPDEgmGSeUqTcQX6WelzKYoiym0k3VV5qvb0nQX+YoTGANCiOAKqd4BAKR2FzvdQ
-         GlygflzdbtTGWM4arv3bjLDs2tYTa3ibcrDNRmNbOmd6XAee3qSkyXbY8BiZeqefSVX3
-         NqDo+5/zdQ16IlLinaGzDXWP/Et0YAwfPRvuj+HM8yhSARjWT5WW6c9GpMHjczMxpweM
-         xvzamDsOtWNHyd8cn5f3MsKcCHf0m/UiDrm8pvFijhByc0TRxNIXmhpLrCScrfGxlQoP
-         /RR+HXaoOhm1XnIoKYbC7qwbzAvBl9pYXDbgLQZOuxqRjBlC6+FmWt11ldTDtCN/HjVd
-         zrIQ==
-X-Gm-Message-State: AOJu0YxI4zI6JNDsM5xQ6emv1CiEzYlrz0UNYtn0lE+MfPA3aisn67rb
-	DPq2HgA58dqTJOAEaCqbtUwl7nt52LzE87kjN/1D+/hl4h8bfFY084PIeWHG7OyDRFvEAYlGeIg
-	TxTncuayc9V9DHV4nmSlMG5MGUTxbY4MghktBjyyAy93EzH88tRyY7hEErg==
-X-Gm-Gg: ASbGnctGhQ54kO/TCYz0ogKihI3KLaC+hTYWjEZChdiynoYlBGk8dn6JV7vl/K5J97a
-	luT6Xwblu+Q2Pqm4tzQzJ+NT6ipZPPCFtRvnsKQaAWgLffAF7bsblVNFxXXSJIdYEb8Q8SGk34t
-	c/jmGcIPAwdJ7PLaLNeJ6DYwPjZ9EGQWtlcxydwIh0obUfmWopsASCj+SeVAktu35YOdagdPejT
-	ogzQhTYDPScT3be2W2UJCaurxruxGTV9y4Elv8jwYzIy9zpLq/VAxdsCtu3ko8gckXtG2AAvErB
-	dozZCq97MPZP+vT4V5y7uwiX7cYTgiSNh69CbHjCNI9KfYKeFDAmjb0zZIVUCE8GoxNcgWcyqLj
-	IqQggfx/+dKA/KT8a0yi3T0Y=
-X-Received: by 2002:a17:907:7e99:b0:b3c:a161:683b with SMTP id a640c23a62f3a-b647570ad28mr460572666b.60.1760719529090;
-        Fri, 17 Oct 2025 09:45:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGpSLAaT/919pl3FWbNozPx+BdCBNSjS+97fA0qey9ry3dwzkhQOHKnWfeAeDRBMUwtGkbT6A==
-X-Received: by 2002:a17:907:7e99:b0:b3c:a161:683b with SMTP id a640c23a62f3a-b647570ad28mr460568766b.60.1760719528567;
-        Fri, 17 Oct 2025 09:45:28 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63c49430272sm124745a12.23.2025.10.17.09.45.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Oct 2025 09:45:28 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 32BEF2E9D23; Fri, 17 Oct 2025 18:45:27 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- ilias.apalodimas@linaro.org, lorenzo@kernel.org, kuba@kernel.org
-Cc: netdev@vger.kernel.org, magnus.karlsson@intel.com, andrii@kernel.org,
- stfomichev@gmail.com, aleksander.lobakin@intel.com, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>,
- syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com, Ihor Solodrai
- <ihor.solodrai@linux.dev>, Octavian Purdila <tavip@google.com>
-Subject: Re: [PATCH v2 bpf 1/2] xdp: update xdp_rxq_info's mem type in XDP
- generic hook
-In-Reply-To: <20251017143103.2620164-2-maciej.fijalkowski@intel.com>
-References: <20251017143103.2620164-1-maciej.fijalkowski@intel.com>
- <20251017143103.2620164-2-maciej.fijalkowski@intel.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 17 Oct 2025 18:45:27 +0200
-Message-ID: <875xcdiijc.fsf@toke.dk>
+        bh=f7LeaCgpkpv/0cKz2fOxN7nq7fxaeGm/IHO/bAgYlKk=;
+        b=HH1grTpfJ9hQX9woh6gVVgd2h0r6EUsyI4qrYG+eQ+egECv5gOJ+yhzlsbCh7CakYK
+         FYwT0Cu4pIF/A4UEEoZzQHAoZkWJAnkOXEflbh3bQui4z0uZuBiIBwpqHk23R5dUoKh9
+         URpNMbXjC1njqhuxisFLqXY2pUVS84w4SrAj89807um4U67bWJYXYzJC1WWcSfBlAk/a
+         YBGvLMFctjkbKc9YV5AhxCORHjjUC9zKhNNhZUzTOCxeliE/2Q0v2yOovbub9pxvjlOU
+         5b+yvuVacYfhGeJ2jZTwz33OHCgISwjhZEZt++TsLp8hWnz1PKhw9UytYX5HfjNeRiX0
+         3HAQ==
+X-Gm-Message-State: AOJu0YwfFfHtfbKk3cKbqC3DkyUFRkqLOZQY/mgBpO4U0b6SeBos0Dov
+	fFFZvypQvUp4lCcc/GR1v00QH+Ovn2vYV2i6cD6ISqRyJa0PamFXwwpZaB4ZM2ddP/2Lq7GhuhV
+	6yyBxQIo/tukPSjE7MY+nSYOwHgN2phY=
+X-Gm-Gg: ASbGncuPqE4jZcoEh6LoHEnxm1yX38MnYAUeEYIoHCTXUxh/JFAj//yy6IUz1WOQPeS
+	YSfRPCNFIxtSDvrZNUuG+m38BrtPMV31E8JeUPxi9IRn0EltOn5Ii7sxJjBEvKRahKCA+HXxNYy
+	X/9jPBFgupdAT+EnpOvzAfFZWmyUolYfksmJ4hB+U/sL1i2VhAAZ71tzUPyzxrUQyaktivZUzoo
+	f2yqRMZS3kjMBijTDDYEaL0uszFB1APG7o9BsoCPCZn1GZV/zxjFLrriyGJO0FaKVRc3fc=
+X-Google-Smtp-Source: AGHT+IHFbQbxlxK7FSTPuj1BO+alMVxSt0ml/8VBdjoMgkxZPLITTYvd3gbOYdpc/sSfjuHAODkTjL5FEpC7MabQXUY=
+X-Received: by 2002:a53:c050:0:10b0:632:ed6b:754 with SMTP id
+ 956f58d0204a3-63e160e7c37mr3564373d50.9.1760719752582; Fri, 17 Oct 2025
+ 09:49:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20251016204503.3203690-1-ameryhung@gmail.com> <20251016204503.3203690-3-ameryhung@gmail.com>
+ <285ba391-1d23-41be-8cc4-e2874fbcb1af@linux.dev> <CAMB2axO9GN=EMK2uLxqDLFkNk-V8sA7Rdb9LH3u6xx7fpCTyRA@mail.gmail.com>
+In-Reply-To: <CAMB2axO9GN=EMK2uLxqDLFkNk-V8sA7Rdb9LH3u6xx7fpCTyRA@mail.gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Fri, 17 Oct 2025 09:49:01 -0700
+X-Gm-Features: AS18NWC8POPlCZpJlI32QBv7z9tfYzxCClQbkuYPGVUyOeqiGA4bbSrWJ-paX4E
+Message-ID: <CAMB2axMitKK6yvSKkyApMaoD2+W973N+7X2sDKj1yCVAMvakmw@mail.gmail.com>
+Subject: Re: [PATCH v2 bpf-next 2/4] bpf: Support associating BPF program with struct_ops
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org, 
+	daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
+	kernel-team@meta.com, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
+On Fri, Oct 17, 2025 at 9:38=E2=80=AFAM Amery Hung <ameryhung@gmail.com> wr=
+ote:
+>
+> On Thu, Oct 16, 2025 at 5:19=E2=80=AFPM Martin KaFai Lau <martin.lau@linu=
+x.dev> wrote:
+> >
+> >
+> >
+> > On 10/16/25 1:45 PM, Amery Hung wrote:
+> > > Each associated programs except struct_ops programs of the map will t=
+ake
+> > > a refcount on the map to pin it so that prog->aux->st_ops_assoc, if s=
+et,
+> > > is always valid. However, it is not guaranteed whether the map member=
+s
+> > > are fully updated nor is it attached or not. For example, a BPF progr=
+am
+> > > can be associated with a struct_ops map before map_update. The
+> >
+> > Forgot to ask this, should it at least ensure the map is fully updated
+> > or it does not help in the use case?
+>
+> It makes sense and is necessary. Originally, I thought we don't need
+> to make any promise about the state of the map since the struct_ops
+> implementers have to track the state of the struct_ops themselves
+> anyways. However, checking the state stored in kdata that may be
+> incomplete does not look right.
+>
+> I will only return kdata from bpf_prog_get_assoc_struct_ops () when
+> kvalue->common.state =3D=3D READY or INUSE.
 
-> Currently, generic XDP hook uses xdp_rxq_info from netstack Rx queues
-> which do not have its XDP memory model registered. There is a case when
-> XDP program calls bpf_xdp_adjust_tail() BPF helper, which in turn
-> releases underlying memory. This happens when it consumes enough amount
-> of bytes and when XDP buffer has fragments. For this action the memory
-> model knowledge passed to XDP program is crucial so that core can call
-> suitable function for freeing/recycling the page.
->
-> For netstack queues it defaults to MEM_TYPE_PAGE_SHARED (0) due to lack
-> of mem model registration. The problem we're fixing here is when kernel
-> copied the skb to new buffer backed by system's page_pool and XDP buffer
-> is built around it. Then when bpf_xdp_adjust_tail() calls
-> __xdp_return(), it acts incorrectly due to mem type not being set to
-> MEM_TYPE_PAGE_POOL and causes a page leak.
->
-> Pull out the existing code from bpf_prog_run_generic_xdp() that
-> init/prepares xdp_buff onto new helper xdp_convert_skb_to_buff() and
-> embed there rxq's mem_type initialization that is assigned to xdp_buff.
->
-> This problem was triggered by syzbot as well as AF_XDP test suite which
-> is about to be integrated to BPF CI.
->
-> Reported-by: syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/6756c37b.050a0220.a30f1.019a.GAE@g=
-oogle.com/
-> Fixes: e6d5dbdd20aa ("xdp: add multi-buff support for xdp running in gene=
-ric mode")
-> Tested-by: Ihor Solodrai <ihor.solodrai@linux.dev>
-> Co-developed-by: Octavian Purdila <tavip@google.com>
-> Signed-off-by: Octavian Purdila <tavip@google.com> # whole analysis, test=
-ing, initiating a fix
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com> # commit=
- msg and proposed more robust fix
+should be kvalue->common.state !=3D INIT to make it consistent across
+legacy and link-based attachment.
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-
+>
+> If tracking the state in struct_ops kdata is overly complicated for
+> struct_ops implementers, then we might need to consider changing the
+> associated struct_ops from map to link.
+>
+> >
+> > > struct_ops implementer will be responsible for maintaining and checki=
+ng
+> > > the state of the associated struct_ops map before accessing it.
+> >
 
