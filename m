@@ -1,180 +1,188 @@
-Return-Path: <netdev+bounces-230608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4861BEBDC1
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 23:55:05 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70CB5BEBDC4
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 23:56:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 908904E052D
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 21:55:04 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 257624E148D
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 21:56:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8062566DD;
-	Fri, 17 Oct 2025 21:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369A42DF136;
+	Fri, 17 Oct 2025 21:56:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hSDCAnIq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CQwf/HkJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A0F24C68B
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 21:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADCA29BDA5
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 21:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760738101; cv=none; b=eQx7DSii0JkTWvVMux2locn7XDmwTHVrl76pCQIzU1SqXvEFlJBwzooMkRVmYYWWsGC2VDvqO+bIINvINUMmpEIG3Me34mliyP4x8cNdwnYp1zwmmkqIAcHYxVLNq2WhR7SjPCYFf291i80T7Glsetr5RoHLajm/QiALoZmbd2M=
+	t=1760738191; cv=none; b=hRlFGWsWdY+ECO2gpxEIlvzvPlAJij96u5jolrACNdI1xisd43Ww9i2YSyBsmXC2AY1AiYhsIfiZ4BDQBSELrMQhoh8mmgLuHE+vNbbRillJ6B6/gMdC6CXaIHcGmgh3QEBqPEAaGcqKUY43Fi3EUPVQg+RCQqHfLIQQR6Xr1dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760738101; c=relaxed/simple;
-	bh=OnHnf/SE03ZIAEuAcNsCOostR4f7d5g2jg8OSHPzjlk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=fDXr5FqddDW/hEu0tRbv6+gLgRC9Ml+A7t4TagE7WhFfWxlzPP9TdCpQca2CK+eMvsL/PtSK18cDxPkK8TYebz2UUix9quwSY9hw/LSS48pXgU8BODlQc8e0sE34Wz/mJW31Us2mGCr9MfroiXY6nVInVmlXDhV34HrwajIipGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hSDCAnIq; arc=none smtp.client-ip=209.85.219.43
+	s=arc-20240116; t=1760738191; c=relaxed/simple;
+	bh=CwdBOHbnfQp54yp83Iesr/EkQSpVDG5TMVeKPc6Kg4I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mJgOgoGIJIWDPgj3Y8anrNYzlkmvdM41IxPLeMZga2/y+CmEySKFrNO4476zAgGVRVrkWoxYx1MIk6QIfiVDsq4rKKQNVlCYwSIzr5h7vRiJZ67QnvXSMekPYWh3tN1gpMyraF3x4xX+oIdrJ3DUJ2vC9u0QPSBOEYnfp0oeKAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CQwf/HkJ; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-87c11268b97so38028216d6.3
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 14:54:59 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-781001e3846so2286897b3a.2
+        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 14:56:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760738098; x=1761342898; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dUPS8Z30XK0CCVS2tlyRS+oCft5fZ2cws6OiUH8Mxrc=;
-        b=hSDCAnIqzClanNDOy/i8QHj1lep9vqqqe4GlvIWUU4eXUA6EIP+yrlGPMR3g4aaDMY
-         bjTuJHJlNgbQzYB7f+aaI+FOyC5IUXGJLDsHhGRfRer3o6yHkrfJvvVLvtZH5r7mcQx9
-         IdhQDP2Pv0tihNP2CyUOe9X3Oyo1ETuUmLBBM7PXgjrMUEjjOHXf2PWsysvSz4Xow1JQ
-         iI3MoRLSDoit/Yo2Y44D0bVyKQyIeIFZ/nw3jtHrzeEEEctDVrrQG7lSdJeejPQUYcqC
-         TRxO5ERv+8XvyYitUORvN9U4tqC930+G0K8ewSNqu2Hf6/pJlV945dcPSaZ63ucQU4T/
-         S7rQ==
+        d=gmail.com; s=20230601; t=1760738189; x=1761342989; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=j4XzmmP5uMUtzltCj1EVDEYlv3Qmwi6jWCsmvSAFdsc=;
+        b=CQwf/HkJsl87FmH6InbPp0FjE6+tsFDoKoFMcIwDdHYHdGZ6cia3Q7WfYvqsYofN7n
+         GEu97JZJ6ETmwHx0jGnUKS8+RN1e7Rtiyef3CMVwpEaNjkdF4EUEdjhq301mA7GMx46Q
+         Il4z9XaV8AbQ7Ul2mawGhcQwhXKyFLdKtFyAwjG03MS++hKcu/N7NxJyNxsgigCe/htn
+         qjdaz3xxwl9TVpZmG6QYjwI5xXw1DxqClrPQXdS+CwrpO+B9+K5SIMN4mQP/RX2ixwei
+         GFrP12uRZLgdrFK0Kna4L1Z6Vkmllkzh+9dFSiOm9FN9z7tBxRupaUNbWSC6Es+Zqn9d
+         vv7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760738098; x=1761342898;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dUPS8Z30XK0CCVS2tlyRS+oCft5fZ2cws6OiUH8Mxrc=;
-        b=jusN5gMQ5xni5B1qSk0cufsy1JnVQeGXd7ZbcGiqmNFtG1JnVV8tzH5TKU2NHmYhsa
-         7ohDg+y2069ZZuZ9uG/UHmlO2+bmPpDLCfiB6hNUJsWwO00RgWRrFMPyPO9djsATrYa+
-         UNLNlT/dBmw6diVOzu874VxNamqYppqDvuDVANmdBQzjSW1dnbfoCAt5O/0mbJoAb3Jl
-         xuQ9z299o11oWYgYOIkyd0wNV2VKZH+4JP5Mpe4kuMw2RRZGgTag8W5FmL4QeJoNvRns
-         pOdb9hOgWtxFR9xUhWk57rsNeLo+qAG//WVPMWDmqZgQkrSwbUKIjTzvRHbidPEN05xr
-         Q+uQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUSBb2uuRHA57nM2FWUIism7k2ioR2V4iJy0EWOV7kdP/OJutVUdaQCoNqCVcqh2zfuwjyt2nk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2FOR4+sQqrThcJRVA7iaivJM6HfeRen5JV8QUKPuQ5XH164LW
-	espS10lPToI81dbG3Ij2/toFmWFkRDiSYb6ieLYd9wWxNXRJ6yfErkXR
-X-Gm-Gg: ASbGnctpyfU3zwvXNpu685ngMVD/YqEoLp+lfaWs1AxgKfcB6dPwEAPFTn5rjkClebd
-	u+v5POj9xlb+9YUY5gLvS3cg1cbHDRuVVP5ISpTTOm7ICx/BP+LwFoKLmIvWHS1+pGmXJdptQ5k
-	XoNkDwfU9u2wKVskMwWYBLg6ieCMPq3ooo5DpdwISN/DboiufzV6jTZMXJQBKJmFbPJeSEkhnT7
-	cd6i1vc2pB9anhXfIc1CBtvYvK0Sbx98bS0yRcUbWJfcooHsEDu/M2dxbAvU+jOfrJl69dyMrMp
-	Ft0o67NPx+LnB+dGQcWJ+PjBucHddWk6EjbfGqIl7TF036toGbHPtx/YoGPL9/t12F5qD2XpYK8
-	h0B6sKKNDa2+O1ZNCH70yAK3mJmHRE2HdE/IV7EW79CSdIEFJjqBS4Jn2bwrwkyJF6i340aMAoO
-	9+TcW6hu8sp7Nab6gdwt26+RbZVQ==
-X-Google-Smtp-Source: AGHT+IEFMSLSDcXAG2GKQPZLpXc13Jiy3xTPiyofgE8mYwnQfvLXap68aWpy5stghROdtue8SdPdpw==
-X-Received: by 2002:a05:6214:1c48:b0:72a:2cf6:76df with SMTP id 6a1803df08f44-87c207f22f4mr76744336d6.45.1760738098489;
-        Fri, 17 Oct 2025 14:54:58 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c0a8:11c9::10a9? ([2620:10d:c091:400::5:6f38])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-87cf5235863sm5793816d6.29.2025.10.17.14.54.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Oct 2025 14:54:58 -0700 (PDT)
-Message-ID: <d4ee68d6-7f57-4b24-970f-41a944a22481@gmail.com>
-Date: Fri, 17 Oct 2025 17:54:57 -0400
+        d=1e100.net; s=20230601; t=1760738189; x=1761342989;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j4XzmmP5uMUtzltCj1EVDEYlv3Qmwi6jWCsmvSAFdsc=;
+        b=O/XXZNVkFK4PzAeaMsxousUrAl49se6Dd5Lc3PEvpzmah0dxKR17WBj96UE2KJ8Elb
+         uDp7emFbAlio2iDq6KDO7pawiaHjg+WUFGi8+C+y0uPDeXdsGeK5YfMGliq462cy3OkY
+         EfIH8s1IBipgY837ifAkTWhYaylqXwjDEKovC6wakKCPTXXyiRtnnLC6zPJ5cGR2T6Su
+         dwLUxCx3phudmmvWVi6g21HbAra3zcq5KpRrPed7KPiIqZy8Gx/cadpp2iihLQgIB0we
+         9DM7AMui4WPZ1UMCOFSOjtuim+zNakBqyr9cjvMCkeMx5WCxaTuvV5RJS1PeF78IvNwA
+         AsnA==
+X-Gm-Message-State: AOJu0YyqOUp5lOzsWs/JSRvVjKV9FIQG2kNfh30EAJUFhwOw7V9QCePJ
+	PK8Lj9/9MiVIE9xGW4+9//CwBwUEjDYD0aInfbeknu8FoEd69VNMtpoHy/F8vg==
+X-Gm-Gg: ASbGnctS89yu1TVIHBSlmLw+IsHWXtOAncH3QbNNSRDe2I+7szEhOjBhMlzjCz39FQQ
+	7+UWX+4O9ZrBGyEP73pI+r1LYUEsfuL3jfQY9/H1kvn+F3XeZ0fvAZT9AQN5+GbSPywiFMPr1Zr
+	9oX7oeGbxRC8nBhayKhhMr7Xm32mkU5Llos2d6WRJ5ljdt9qTm53WizU44zU/gBawx7o+PgrRf5
+	+k1bnOEVfrgrI75NW3H3PTPXzLujg5xdKKI5uVE3aP1H+E//ypT48+3CDUjBZadyVT7JIIPpSR4
+	jkyid0rwGojFKcoac7CrkfSmiiN+Nm+lkCs7wfurj+z84hEtSSAS0SQg/cFzHyI7yZSkmBPtfg0
+	3XsEGCXMI76MhjnmxJCiWQb3ueVuL0/rSVRlq8tNjN3WAelBUhfx8lKeu8ozfpiQE6tE=
+X-Google-Smtp-Source: AGHT+IE4NZqMADAnyuoGjyQj6J3b9zaUy12Wyelj+CeVqumNvPm9sY9/PIZU+Yw7ddHh3ds6GjADJQ==
+X-Received: by 2002:a05:6a20:7351:b0:334:a72c:806a with SMTP id adf61e73a8af0-334a8616f0bmr7112232637.34.1760738188907;
+        Fri, 17 Oct 2025 14:56:28 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:52::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b6a76673e8asm759559a12.11.2025.10.17.14.56.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Oct 2025 14:56:28 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	tj@kernel.org,
+	martin.lau@kernel.org,
+	ameryhung@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v3 0/4] Support associating BPF programs with struct_ops
+Date: Fri, 17 Oct 2025 14:56:23 -0700
+Message-ID: <20251017215627.722338-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V7 net-next 02/11] net/mlx5: Implement cqe_compress_type
- via devlink params
-From: Daniel Zahka <daniel.zahka@gmail.com>
-To: Saeed Mahameed <saeed@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
- Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
- Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
- Jacob Keller <jacob.e.keller@intel.com>, Simon Horman <horms@kernel.org>
-References: <20250907012953.301746-1-saeed@kernel.org>
- <20250907012953.301746-3-saeed@kernel.org>
- <ec51df17-260e-4ec9-a44a-9f0c3d3a2766@gmail.com>
-Content-Language: en-US
-In-Reply-To: <ec51df17-260e-4ec9-a44a-9f0c3d3a2766@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+v2 -> v3
+   - Change the type of st_ops_assoc from void* (i.e., kdata) to bpf_map
+     (Andrii)
+   - Fix a bug that clears BPF_PTR_POISON when a struct_ops map is freed
+     (Andrii)
+   - Return NULL if the map is not fully initialized (Martin)
+   - Move struct_ops map refcount inc/dec into internal helpers (Martin)
+   - Add libbpf API, bpf_program__assoc_struct_ops (Andrii)
+   Link: https://lore.kernel.org/bpf/20251016204503.3203690-1-ameryhung@gmail.com/
 
+v1 -> v2
+   - Poison st_ops_assoc when reusing the program in more than one
+     struct_ops maps and add a helper to access the pointer (Andrii)
+   - Minor style and naming changes (Andrii)
+   Link: https://lore.kernel.org/bpf/20251010174953.2884682-1-ameryhung@gmail.com/
 
-On 10/17/25 5:51 PM, Daniel Zahka wrote:
->
->
-> On 9/6/25 9:29 PM, Saeed Mahameed wrote:
->> From: Saeed Mahameed <saeedm@nvidia.com>
->>
->> Selects which algorithm should be used by the NIC in order to decide 
->> rate of
->> CQE compression dependeng on PCIe bus conditions.
->>
->> Supported values:
->>
->> 1) balanced, merges fewer CQEs, resulting in a moderate compression 
->> ratio
->>     but maintaining a balance between bandwidth savings and performance
->> 2) aggressive, merges more CQEs into a single entry, achieving a higher
->>     compression rate and maximizing performance, particularly under high
->>     traffic loads.
->>
->
-> Hello,
->
-> I'm facing some issues when trying to use the devlink param introduced 
-> in this patch. I have a multihost system with two hosts per CX7.
->
-> My NIC is:
-> $ lshw -C net
->   *-network
->        description: Ethernet interface
->        product: MT2910 Family [ConnectX-7]
->        vendor: Mellanox Technologies
->
-> My fw version is: 28.43.1014
->
-> To reproduce the problem I simply read the current cqe_compress_type 
-> setting and then change it:
->
-> $ devlink dev param show pci/0000:56:00.0 name cqe_compress_type
-> pci/0000:56:00.0:
->   name cqe_compress_type type driver-specific
->     values:
->       cmode permanent value balanced
->
-> $ devlink dev param set pci/0000:56:00.0 name cqe_compress_type value 
-> "aggressive" cmode permanent
-> kernel answers: Connection timed out
->
-> from dmesg:
-> [  257.111349] mlx5_core 0000:56:00.0: 
-> wait_func_handle_exec_timeout:1159:(pid 72061): cmd[0]: 
-> ACCESS_REG(0x805) No done completion
-> [  257.137072] mlx5_core 0000:56:00.0: wait_func:1189:(pid 72061): 
-> ACCESS_REG(0x805) timeout. Will cause a leak of a command resource
-> [  270.871521] mlx5_core 0000:56:00.0: mlx5_cmd_comp_handler:1709:(pid 
-> 0): Command completion arrived after timeout (entry idx = 0).
->
->
-> subsequent attempts to use mstfwreset hang:
->
-> $ ./mstfwreset -y -d 56:00.0 reset
-> -E- Failed to send Register MFRL: Timed out trying to take the ICMD 
-> semaphore (520).
->
-> I can toggle the parameter ok using the mstconfig binary built from 
-> the mstflint github repo.
->
-> Let me know if I can provide any more information.
->
-> Daniel
+---
 
-Sorry, I should have mentioned my kernel version. It is a vanilla 
-net-next kernel from:
-1c51450f1aff ("tcp: better handle TCP_TX_DELAY on established flows")
+Hi,
+
+This patchset adds a new BPF command BPF_PROG_ASSOC_STRUCT_OPS to
+the bpf() syscall to allow associating a BPF program with a struct_ops.
+The command is introduced to address a emerging need from struct_ops
+users. As the number of subsystems adopting struct_ops grows, more
+users are building their struct_ops-based solution with some help from
+other BPF programs. For exmample, scx_layer uses a syscall program as
+a user space trigger to refresh layers [0]. It also uses tracing program
+to infer whether a task is using GPU and needs to be prioritized [1]. In
+these use cases, when there are multiple struct_ops instances, the
+struct_ops kfuncs called from different BPF programs, whether struct_ops
+or not needs to be able to refer to a specific one, which currently is
+not possible.
+
+The new BPF command will allow users to explicitly associate a BPF
+program with a struct_ops map. The libbpf wrapper can be called after
+loading programs and before attaching programs and struct_ops.
+
+Internally, it will set prog->aux->st_ops_assoc to the struct_ops
+map. struct_ops kfuncs can then get the associated struct_ops struct
+by calling bpf_prog_get_assoc_struct_ops() with prog->aux, which can
+be acquired from a "__prog" argument. The value of the speical
+argument will be fixed up by the verifier during verification.
+
+The command conceptually associates the implementation of BPF programs
+with struct_ops map, not the attachment. A program associated with the
+map will take a refcount of it so that st_ops_assoc always points to a
+valid struct_ops struct. struct_ops implementers can use the helper,
+bpf_prog_get_assoc_struct_ops to get the pointer. The returned
+struct_ops if not NULL is guaranteed to be valid and initialized.
+However, it is not guarantted that the struct_ops is attached. The
+struct_ops implementer still need to take stepis to track and check the
+state of the struct_ops in kdata, if the use case demand the struct_ops
+to be attached.
+
+We can also consider support associating struct_ops link with BPF
+programs, which on one hand make struct_ops implementer's job easier,
+but might complicate libbpf workflow and does not apply to legacy
+struct_ops attachment.
+
+[0] https://github.com/sched-ext/scx/blob/main/scheds/rust/scx_layered/src/bpf/main.bpf.c#L557
+[1] https://github.com/sched-ext/scx/blob/main/scheds/rust/scx_layered/src/bpf/main.bpf.c#L754
+
+---
+
+Amery Hung (4):
+  bpf: Allow verifier to fixup kernel module kfuncs
+  bpf: Support associating BPF program with struct_ops
+  libbpf: Add support for associating BPF program with struct_ops
+  selftests/bpf: Test BPF_PROG_ASSOC_STRUCT_OPS command
+
+ include/linux/bpf.h                           |  16 +++
+ include/uapi/linux/bpf.h                      |  17 +++
+ kernel/bpf/bpf_struct_ops.c                   |  70 ++++++++++++
+ kernel/bpf/core.c                             |   3 +
+ kernel/bpf/syscall.c                          |  46 ++++++++
+ kernel/bpf/verifier.c                         |   3 +-
+ tools/include/uapi/linux/bpf.h                |  17 +++
+ tools/lib/bpf/bpf.c                           |  19 ++++
+ tools/lib/bpf/bpf.h                           |  21 ++++
+ tools/lib/bpf/libbpf.c                        |  30 +++++
+ tools/lib/bpf/libbpf.h                        |  16 +++
+ tools/lib/bpf/libbpf.map                      |   2 +
+ .../bpf/prog_tests/test_struct_ops_assoc.c    |  72 ++++++++++++
+ .../selftests/bpf/progs/struct_ops_assoc.c    | 105 ++++++++++++++++++
+ .../selftests/bpf/test_kmods/bpf_testmod.c    |  17 +++
+ .../bpf/test_kmods/bpf_testmod_kfunc.h        |   1 +
+ 16 files changed, 453 insertions(+), 2 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_assoc.c
+
+-- 
+2.47.3
 
 
