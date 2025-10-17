@@ -1,112 +1,121 @@
-Return-Path: <netdev+bounces-230494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C60BBE9302
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 16:29:25 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F610BE936E
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 16:33:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B87E66E0F71
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 14:27:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0C2634E3066
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 14:31:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE53D339717;
-	Fri, 17 Oct 2025 14:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377F1339715;
+	Fri, 17 Oct 2025 14:31:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ul8m4Qee"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="brwLrjGc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3F5339706;
-	Fri, 17 Oct 2025 14:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22248339705;
+	Fri, 17 Oct 2025 14:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760711275; cv=none; b=OcnUXcqGoXe+1r5l9Ni7qVamtljBvCXenBdiljiqzkfyWpM6Gnm7QdhDmJt/bnzKqzjyCUGSgJvkRI4tdbvNQdxSoZpSJldDS55hpvdrhqluFpe+h00+e6lgQKwPnSHRZJCQ7dNJuJWnfezpki69FT9osbE1bA8zTPNMJm4tiDs=
+	t=1760711488; cv=none; b=mlmMge4DKoZeCu7dexkmDSm2sOqkVMkBHhkAK+B20JaxtwdpSRImZPlzBk2eYfxl4Qjt0tj1EOKnP9l4eBIebsdOOpdljghzZG8DlJ130A2bX1LY3SuqH9z+ZkSHdHoCwsbbXVOPDL5GcwPDuP831jv9xrzvfkjOr8bo0Zy3QwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760711275; c=relaxed/simple;
-	bh=JWUuXmlNo3cMzbCVbs4PnRfFt/SmdSLZ7lxH4CFw8Hg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iWuFa/MF48po90K6BlkgzAH4UORxAxbQiNkLlrOsvQWNtNxmjhHXHJ3rRVSG+JM/YJIQownRQ99Pa+iMZf6o5qGABX7Mp3U+b5lXUXzK5M/Zt+gZjSHzMOT5nzrFn35cDxc7wCSeP6+rdOWh/1zFwounbt7dpxBehzc0sUhQ+LI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ul8m4Qee; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id B1F154E41145;
-	Fri, 17 Oct 2025 14:27:51 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 82057606DB;
-	Fri, 17 Oct 2025 14:27:51 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 862A0102F235A;
-	Fri, 17 Oct 2025 16:27:43 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760711270; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=ZexStoA/TzhtuUYik1P+asxrImB9WQ4M1cxs+bOxqkE=;
-	b=ul8m4QeepyRKKZLrig8GA0T6QD7QIivEoNKhBSdBT6OeMAS9nAfQwfey44BTg0vA/sKDJ5
-	fbI0ajli7HF1jBm8w4BOeFzo0Frvp9klkd0gdLYisZ91hHCHS9axhBw1vBfSlyRDEX6W1H
-	Iub1MoxU1OlgEHdOMXWzUsvDyY3Un9ru5poEUBYEDFF2C5rmyVkanBylhyZ6tIyqhxlLCi
-	7h87PIuwKcYHhGAAjjHfUfKKTi59lm7duW3djPaLsSWznLfzoL2xFYnIZ3zImYzF9Ga9tf
-	OHfx/C0hnhi/21CHS4htcjhkQra6ld6bKH5HtG6ApyjJ7kOW6juRz1B/5qcJRw==
-Message-ID: <ebc5327f-49b6-4135-bdbf-c5007f3f97ac@bootlin.com>
-Date: Fri, 17 Oct 2025 16:27:42 +0200
+	s=arc-20240116; t=1760711488; c=relaxed/simple;
+	bh=3ujP/aAg+GR/CqWn1/PNYm4mr5+9jnCHoL2066ZgRnk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gSkXkwvvextaq6RFGPJzcDSmLzp4tNvIJ9EvHGViFbHQguBQ8ryAK1xAGD/K/MMII5qknxfvw8cyeN2enuby6yqw+kDSjKsJO9//UO6dtsepdiMuG6YFXRJYavXhX6g2asHvdr3XLw1yvH7Y6GjtUJXapVX2u3Ycc1GyeIB++Ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=brwLrjGc; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760711486; x=1792247486;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3ujP/aAg+GR/CqWn1/PNYm4mr5+9jnCHoL2066ZgRnk=;
+  b=brwLrjGcbx+5eyUAN/ugsY6cu8K5DS5v66tK9c7OpsJeu43AxTiGL44O
+   6vN/j1X98XcpnFKgMi+EI5kOSZ72UvpPwMbVqiL//CmA9wgL1KvvKspDa
+   FJgams4CjN4mrhqHLsIhALxhFc5BB7ej/1eul+ddKoBAnQYsgKqMIWHz3
+   FARWT1dD6MmuDJIt5psl2KNx7bzlX2cXpR3k+F1erVUEAABIriUHU0ep2
+   SXxuMiFQEtHB1+xnlzRtwSK4sGEwngUFb2b+NFU5NyrzeQ6RjmWgn51fb
+   DeferjJF4MRU/+EHlw2/R5iWbtCEDmweQm3tfrNYXko3QRo8qfQHKCI+H
+   Q==;
+X-CSE-ConnectionGUID: B518TE0SQ/agsxf9Coy7Dw==
+X-CSE-MsgGUID: 9Rz+s4ayRR2JuCE2kTs3Wg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11585"; a="73208017"
+X-IronPort-AV: E=Sophos;i="6.19,236,1754982000"; 
+   d="scan'208";a="73208017"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2025 07:31:25 -0700
+X-CSE-ConnectionGUID: J/ZEkhP0T8KjIYrfXBmhIQ==
+X-CSE-MsgGUID: uHcy8rQzTR+UYhXdSzuEEw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,236,1754982000"; 
+   d="scan'208";a="213717388"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by fmviesa001.fm.intel.com with ESMTP; 17 Oct 2025 07:31:21 -0700
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: bpf@vger.kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	toke@redhat.com,
+	lorenzo@kernel.org,
+	kuba@kernel.org
+Cc: netdev@vger.kernel.org,
+	magnus.karlsson@intel.com,
+	andrii@kernel.org,
+	stfomichev@gmail.com,
+	aleksander.lobakin@intel.com,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: [PATCH v2 bpf 0/2] xdp: fix page_pool leaks
+Date: Fri, 17 Oct 2025 16:31:01 +0200
+Message-Id: <20251017143103.2620164-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 4/5] net: phy: micrel: add MSE interface
- support for KSZ9477 family
-To: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>,
- Kory Maincent <kory.maincent@bootlin.com>, Nishanth Menon <nm@ti.com>
-Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
- linux-doc@vger.kernel.org, Michal Kubecek <mkubecek@suse.cz>,
- Roan van Dijk <roan@protonic.nl>
-References: <20251017104732.3575484-1-o.rempel@pengutronix.de>
- <20251017104732.3575484-5-o.rempel@pengutronix.de>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20251017104732.3575484-5-o.rempel@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Oleksij,
+v1:
+https://lore.kernel.org/bpf/20251003140243.2534865-1-maciej.fijalkowski@intel.com/
+v1->v2:
+- add skb to xdp_buff converter (Jakub)
+- postpone restoration of veth's xdp_rxq_info mem model (AI)
 
-On 17/10/2025 12:47, Oleksij Rempel wrote:
-> Implement the get_mse_capability() and get_mse_snapshot() PHY driver ops
-> for KSZ9477-series integrated PHYs to demonstrate the new PHY MSE
-> UAPI.
-> 
-> These PHYs do not expose a documented direct MSE register, but the
-> Signal Quality Indicator (SQI) registers are derived from the
-> internal MSE computation. This hook maps SQI readings into the MSE
-> interface so that tooling can retrieve the raw value together with
-> metadata for correct interpretation in userspace.
-> 
-> Behaviour:
->   - For 1000BASE-T, report per-channel (A–D) values and support a
->     WORST channel selector.
->   - For 100BASE-TX, only LINK-wide measurements are available.
->   - Report average MSE only, with a max scale based on
->     KSZ9477_MMD_SQI_MASK and a fixed refresh rate of 2 µs.
-> 
-> This mapping differs from the OPEN Alliance SQI definition, which
-> assigns thresholds such as pre-fail indices; the MSE interface
-> instead provides the raw measurement, leaving interpretation to
-> userspace.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Hi,
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+here we fix page_pool leaks which happen when fragment is released
+within XDP program and memory type is set incorrectly. The reports come
+from syzbot and AF_XDP test suite.
 
-Maxime
+Most of the changes are about pulling out the common code for
+init/prepare xdp_buff based on existing skb and supplying it with
+correct xdp_rxq_info's mem_type that is assigned to xdp_buff. A bit more
+stuff, page_pool related, had to be done on veth side.
+
+Originally, this work was started by Octavian Purdila.
+
+Thanks!
+
+
+Maciej Fijalkowski (2):
+  xdp: update xdp_rxq_info's mem type in XDP generic hook
+  veth: update mem type in xdp_buff
+
+ drivers/net/veth.c | 43 +++++++++++++++++++++++++++----------------
+ include/net/xdp.h  | 31 +++++++++++++++++++++++++++++++
+ net/core/dev.c     | 25 ++++---------------------
+ 3 files changed, 62 insertions(+), 37 deletions(-)
+
+-- 
+2.43.0
+
 
