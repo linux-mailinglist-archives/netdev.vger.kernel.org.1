@@ -1,172 +1,168 @@
-Return-Path: <netdev+bounces-230546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F045CBEAFDF
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 19:08:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63251BEB060
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 19:12:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F425747D31
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:03:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65861745473
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:06:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 429E02F9DA4;
-	Fri, 17 Oct 2025 17:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 690562FD7A0;
+	Fri, 17 Oct 2025 17:06:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="giYRHGJv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BBm78Jyg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 373852F8BFF
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 17:02:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A615C2FC890;
+	Fri, 17 Oct 2025 17:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760720578; cv=none; b=cz4kHy+GMLYDQbg1Df+idvSFOU7gGjOClRt+IxIBo1tMaPM4gEvtLMx4yNN9BqbUVttX1zaOEofeRPa9lR01zNrWCjIIVcDP9qwbAy/UphE+xJIBwlytLCEhaeR9DlAq9QCxy2l9yIzysgNXjo4gdg8FZ1uvi1cnuhWCqiqmco8=
+	t=1760720810; cv=none; b=tjG/JlnXd8jepj3qxL83Z1lIGTfcNHkqggTNUWGnj6LPnjlGccm0cu/8mO6NE2J9hXXIeB/tfvLfuibrJ8YJ50YiJwEOYW8gnwuyJKEpEq8S0Li19KiLMbfhIxi4sfK+7+2XnXPhW4c98SXGjo801QB7E08BvYj+zRg+cgR2Nng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760720578; c=relaxed/simple;
-	bh=OWbgDvUz4T6vNlRyFNq0DUT4KMA1TciihvdC9rOTHfw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Jz86MGCM1QRCImWnmSVYN77LeSizE94AANTLGJikpOqZW7Aa6Ts087mpSU8K0Ukc7djhKnqhgSkdbTMBLAgGtFSMxaf8QbRBiwhRJjYNsXaZBt1Lr1jld8J/Y1j5mM9x5hEcjMH/4m4V4QJOeO4M9H0NOgb0hMhdhTSQjG2oTUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=giYRHGJv; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-427007b1fe5so1287735f8f.1
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 10:02:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760720574; x=1761325374; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=55RDAqJOlsF7cspILuwSRpcdchDKHFWIMFN0rshDS00=;
-        b=giYRHGJvcA7VgoXMS6OBsAa1CeGdfo02zF1G2+BU9CHH4FM+U2EHeFEN/2cgGURlP1
-         ya0AOeIiRZPoMzPlh+mvY6xBbFpnMF2TuRp8taFgBrMiVI3/7P2E+VxywqNxzjrZjfrz
-         lSMIYih5c55faGBRUy0CL8tlaoSirhx1qSLYqqgMqfZPboFJ/W1u7xcF2hAJQJdEcb+M
-         k4YD4RRlelSSwiVqLYnyASI5c++1a0KHLnuACMRFR2xiOqcQwgXXEPO+fHNpsfzRTrtA
-         gfJBI3Vc9w0ct94Amg2IWsG2naVi/MFENKP1xSWDaCjV5pQRncTV3YndwjCkSKAx01cP
-         qcOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760720574; x=1761325374;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=55RDAqJOlsF7cspILuwSRpcdchDKHFWIMFN0rshDS00=;
-        b=UPBJbcal2HwlfEgMj8eJ3ytpdLX6oD280aUqtPAFNbG1+XiMyZADja3ya/y9Zkv84q
-         +89g+4Du+VLsNyItPovGINjO1smgh6+5FmbB3uD96I9OkheV6bL0ACqI1uuLVFsiGG/p
-         HgBHQ2ZRlAZebpsEUSwKBR1KJI7dvxB3KTnNKHk+Ue7sB1XDo5PqMbgabop/4iIwGi3Q
-         KRZ7EjTmGhswsSDRpb1Fn43u+z2lBC5jM2U5Lp6C9j9sbQMQutKie+TKFdm3l/JDgcXD
-         QOGQlUXjAJNCPhlHt2L7t3Omf2LgkFSu5g1pTVSSTyE+rXhltQDDkHtgLMGDBy3NZ+lR
-         nTdw==
-X-Forwarded-Encrypted: i=1; AJvYcCXw3ubOXkF19jMZG5F6q700H3pI0lZM7lRO06lWT1kdvqk83PLt8hGsCpIEY4u47PapOB5q6Vk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwF1i7MtI0YE/rXphyI80r3hDh8Zn4bcKG4W1qTZVxuSTJCaBp
-	HTh9KrE2B8hLoz6orcdWB+ZVKbqjYYkwHTR3F7O7ZpzXJ1vayHxUOQW9JO0eosXmGV1Pi+m/5eH
-	tfS8rQdwVxtaM3Y3rCeQwBKE0eL56ORI=
-X-Gm-Gg: ASbGncu6RuLjX/QKQ4THRnXT3gKrSkMLt9I1/01RAHf4X4DFxwSIhGbFTy0NnuwFpEb
-	aclDLOcHNUKB7RYiqUXx6i6tgpSepkZo3/qC6MiCuR6+ZKbwcGAVW1d5puLJUEl1MadqFfbiI/K
-	3q+doMIK4W7ptlTlk1QKS1xkKppSDAcniFMPQzMLLAGAYn5NVoYY61zpWInRCYAcCEh9JDhP7ly
-	9viEYdjgtTH0T9sEeibiFmAQeYMjZiLy3CIv+lVzDEdf1MMiAx+UeI38RqhNA==
-X-Google-Smtp-Source: AGHT+IFVuLjo+i5c3IPWvna7TnCjd/xxCKMaX2xPnsJedsSIowSo9qclvYxNvzwvo+hSZ3qc4RHxZPFW9pF6/iHQQLk=
-X-Received: by 2002:a5d:5888:0:b0:426:f38a:a51 with SMTP id
- ffacd0b85a97d-42704d8d684mr3719155f8f.22.1760720574362; Fri, 17 Oct 2025
- 10:02:54 -0700 (PDT)
+	s=arc-20240116; t=1760720810; c=relaxed/simple;
+	bh=fFTymjUFx5j8W2Wiv8exfJyD4zu50oIn71leJwSPxTY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iuVNtDI23XUabajt2Ovi1J1S24n20653pEi09oPwIDxMKS8aJX3KXseyidpNuQepo60koD/LTebgEKXNccQza7gmdFozbU9l3OPTUe8rDoqVM+dTwbpkmuxA0yOyECaAKy5F193nLfAqbyGlBj24wnZDdqJSBCizNL7bwq9YNtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BBm78Jyg; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760720808; x=1792256808;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=fFTymjUFx5j8W2Wiv8exfJyD4zu50oIn71leJwSPxTY=;
+  b=BBm78JygNIjw6OMt12wqhhf1Y/r+hfzRTbfKvRV88ZP6VNmtyMlFBc6G
+   ldqNKF23EXe1qVVHqVpgMSPpPX+oRbnP1WiDrxX5LPUO0p2u2cL/X2WQr
+   Eopm5jkLe0m6znC7JEtU/aWQcgqWJ30nCUKFzB50pgG6bonVLY7KcMHNn
+   400GI+PsPefZUXFazSlfakpd5mKEgnqhm9lK8bTCdVyy2kBSEwsO5ETXT
+   fgR9n3ZdwlhdiYCaX0t7+DjqVqRFiRgvfzQccpOCKJIlcF5CB8PozygLQ
+   RVLzls9jCqY9w0NqkjIGUKyF5kToCCtQaF4Qhk7WYlakEsRYYWi7lHbjA
+   A==;
+X-CSE-ConnectionGUID: b8qGTA1sRbCH3lmQy/MXHw==
+X-CSE-MsgGUID: xgOUn7tnQo6xh7o1zBr8Ig==
+X-IronPort-AV: E=McAfee;i="6800,10657,11585"; a="65551802"
+X-IronPort-AV: E=Sophos;i="6.19,237,1754982000"; 
+   d="scan'208";a="65551802"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2025 10:06:48 -0700
+X-CSE-ConnectionGUID: 7lUylGYQSMmk17hPrBNpQQ==
+X-CSE-MsgGUID: wRr33J/eQrGkUQc/7IrXwg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,237,1754982000"; 
+   d="scan'208";a="182478698"
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by fmviesa007.fm.intel.com with ESMTP; 17 Oct 2025 10:06:45 -0700
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1v9nud-0007at-1U;
+	Fri, 17 Oct 2025 17:06:43 +0000
+Date: Sat, 18 Oct 2025 01:05:23 +0800
+From: kernel test robot <lkp@intel.com>
+To: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, alexei.starovoitov@gmail.com,
+	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org,
+	martin.lau@kernel.org, ameryhung@gmail.com, kernel-team@meta.com
+Subject: Re: [PATCH v2 bpf-next 2/4] bpf: Support associating BPF program
+ with struct_ops
+Message-ID: <202510180007.IYugtu6G-lkp@intel.com>
+References: <20251016204503.3203690-3-ameryhung@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <YfEhaK7VtJ4oru03@shell.armlinux.org.uk> <CA+V-a8taTL1aQ5L1uYfJ405X38953z1FO=X5S54QBqGxLsF5ow@mail.gmail.com>
-In-Reply-To: <CA+V-a8taTL1aQ5L1uYfJ405X38953z1FO=X5S54QBqGxLsF5ow@mail.gmail.com>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Fri, 17 Oct 2025 18:02:28 +0100
-X-Gm-Features: AS18NWA6rZbliLLfxCHoG6LQgOdssCxpGbGI-5dUFG30WqziM0nwOAV2pUiLnc8
-Message-ID: <CA+V-a8ve+6XPgWAQDJNwzG9ox-BSNqOBrO6JU7dL=yfQPgP0Ag@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 0/7] net: stmmac/xpcs: modernise PCS support
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <Jose.Abreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>, 
-	linux-arm-kernel@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251016204503.3203690-3-ameryhung@gmail.com>
 
-On Fri, Oct 17, 2025 at 6:00=E2=80=AFPM Lad, Prabhakar
-<prabhakar.csengg@gmail.com> wrote:
->
-> Hi,
->
-> On Wed, Jan 26, 2022 at 10:32=E2=80=AFAM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> >
-> > Hi,
-> >
-> > This series updates xpcs and stmmac for the recent changes to phylink
-> > to better support split PCS and to get rid of private MAC validation
-> > functions.
-> >
-> > This series is slightly more involved than other conversions as stmmac
-> > has already had optional proper split PCS support.
-> >
-> > The first six patches of this series were originally posted on 16th
-> > December for CFT, and Wong Vee Khee reported his Intel Elkhart Lake
-> > setup was fine the first six these. However, no tested-by was given.
-> >
-> > The patches:
-> >
-> > 1) Provide a function to query the xpcs for the interface modes that
-> >    are supported.
-> >
-> > 2) Populates the MAC capabilities and switches stmmac_validate() to use
-> >    phylink_get_linkmodes(). We do not use phylink_generic_validate() ye=
-t
-> >    as (a) we do not always have the supported interfaces populated, and
-> >    (b) the existing code does not restrict based on interface. There
-> >    should be no functional effect from this patch.
-> >
-> > 3) Populates phylink's supported interfaces from the xpcs when the xpcs
-> >    is configured by firmware and also the firmware configured interface
-> >    mode. Note: this will restrict stmmac to only supporting these
-> >    interfaces modes - stmmac maintainers need to verify that this
-> >    behaviour is acceptable.
-> >
-> > 4) stmmac_validate() tail-calls xpcs_validate(), but we don't need it t=
-o
-> >    now that PCS have their own validation method. Convert stmmac and
-> >    xpcs to use this method instead.
-> >
-> > 5) xpcs sets the poll field of phylink_pcs to true, meaning xpcs
-> >    requires its status to be polled. There is no need to also set the
-> >    phylink_config.pcs_poll. Remove this.
-> >
-> > 6) Switch to phylink_generic_validate(). This is probably the most
-> >    contravertial change in this patch set as this will cause the MAC to
-> >    restrict link modes based on the interface mode. From an inspection
-> >    of the xpcs driver, this should be safe, as XPCS only further
-> >    restricts the link modes to a subset of these (whether that is
-> >    correct or not is not an issue I am addressing here.) For
-> >    implementations that do not use xpcs, this is a more open question
-> >    and needs feedback from stmmac maintainers.
-> >
-> > 7) Convert to use mac_select_pcs() rather than phylink_set_pcs() to set
-> >    the PCS - the intention is to eventually remove phylink_set_pcs()
-> >    once there are no more users of this.
-> >
-> > v2: fix signoff and temporary warning in patch 4
-> >
-> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 147 +++++++-------=
---------
-> >  drivers/net/pcs/pcs-xpcs.c                        |  41 +++---
-> >  include/linux/pcs/pcs-xpcs.h                      |   3 +-
-> >  3 files changed, 73 insertions(+), 118 deletions(-)
-> >
-> Although RZ/V2H doesn't have PCS, it tested this on Renesas RZ/V2H EVK
-> and found no regressions.
->
-Ouch wrong series, retracting the Tested-by.
+Hi Amery,
 
-Cheers,
-Prabhakar
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on bpf-next/master]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Amery-Hung/bpf-Allow-verifier-to-fixup-kernel-module-kfuncs/20251017-044703
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20251016204503.3203690-3-ameryhung%40gmail.com
+patch subject: [PATCH v2 bpf-next 2/4] bpf: Support associating BPF program with struct_ops
+config: x86_64-kexec (https://download.01.org/0day-ci/archive/20251018/202510180007.IYugtu6G-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251018/202510180007.IYugtu6G-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202510180007.IYugtu6G-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> kernel/bpf/core.c:2881:3: error: call to undeclared function 'bpf_struct_ops_put'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+    2881 |                 bpf_struct_ops_put(aux->st_ops_assoc);
+         |                 ^
+   kernel/bpf/core.c:2881:3: note: did you mean 'bpf_struct_ops_find'?
+   include/linux/btf.h:538:49: note: 'bpf_struct_ops_find' declared here
+     538 | static inline const struct bpf_struct_ops_desc *bpf_struct_ops_find(struct btf *btf, u32 type_id)
+         |                                                 ^
+   1 error generated.
+
+
+vim +/bpf_struct_ops_put +2881 kernel/bpf/core.c
+
+  2863	
+  2864	static void bpf_prog_free_deferred(struct work_struct *work)
+  2865	{
+  2866		struct bpf_prog_aux *aux;
+  2867		int i;
+  2868	
+  2869		aux = container_of(work, struct bpf_prog_aux, work);
+  2870	#ifdef CONFIG_BPF_SYSCALL
+  2871		bpf_free_kfunc_btf_tab(aux->kfunc_btf_tab);
+  2872		bpf_prog_stream_free(aux->prog);
+  2873	#endif
+  2874	#ifdef CONFIG_CGROUP_BPF
+  2875		if (aux->cgroup_atype != CGROUP_BPF_ATTACH_TYPE_INVALID)
+  2876			bpf_cgroup_atype_put(aux->cgroup_atype);
+  2877	#endif
+  2878		bpf_free_used_maps(aux);
+  2879		bpf_free_used_btfs(aux);
+  2880		if (aux->st_ops_assoc) {
+> 2881			bpf_struct_ops_put(aux->st_ops_assoc);
+  2882			bpf_prog_disassoc_struct_ops(aux->prog);
+  2883		}
+  2884		if (bpf_prog_is_dev_bound(aux))
+  2885			bpf_prog_dev_bound_destroy(aux->prog);
+  2886	#ifdef CONFIG_PERF_EVENTS
+  2887		if (aux->prog->has_callchain_buf)
+  2888			put_callchain_buffers();
+  2889	#endif
+  2890		if (aux->dst_trampoline)
+  2891			bpf_trampoline_put(aux->dst_trampoline);
+  2892		for (i = 0; i < aux->real_func_cnt; i++) {
+  2893			/* We can just unlink the subprog poke descriptor table as
+  2894			 * it was originally linked to the main program and is also
+  2895			 * released along with it.
+  2896			 */
+  2897			aux->func[i]->aux->poke_tab = NULL;
+  2898			bpf_jit_free(aux->func[i]);
+  2899		}
+  2900		if (aux->real_func_cnt) {
+  2901			kfree(aux->func);
+  2902			bpf_prog_unlock_free(aux->prog);
+  2903		} else {
+  2904			bpf_jit_free(aux->prog);
+  2905		}
+  2906	}
+  2907	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
