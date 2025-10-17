@@ -1,209 +1,133 @@
-Return-Path: <netdev+bounces-230274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09B36BE61F1
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 04:43:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A3181BE6284
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 04:51:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6474919C2FF7
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 02:43:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37F151A64D0D
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 02:51:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C392459D9;
-	Fri, 17 Oct 2025 02:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6D525228C;
+	Fri, 17 Oct 2025 02:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="dsNo1SoO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OtIrTB7M"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93832253EE;
-	Fri, 17 Oct 2025 02:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C9A24E4B4
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 02:49:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760669004; cv=none; b=cRvxm4LMs81P+H/ZwK+HDoSjm8jxY3jf8EtluJNVjwmTBNMLT4gaea97kaiuYwqEpCLRsHmOpmXULX8d2C/5Hv0ed10wjzvl3dHoC+fVpHX8hNqv4aYVfcgxwpMWqxj7qgI8hEncBRed3YLUiVBCmBIzXgNpNNo6DVJrScXqinw=
+	t=1760669347; cv=none; b=HcKCGmxl9LpuToiBEu99R+EcMD2YDJW842VQreo+AYeMYnU26E59Cs7VHlSKRnm6jMi6V6GMCgprdpv9Aoc2/LsFHZmTycvS8Rj7UPVp9WnBHgHeuSGALaxC9dFJJ1Hlo6dMryjX9BlpVNOfj7DM/YI4Ff2RMHEJHW/CbJnk+28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760669004; c=relaxed/simple;
-	bh=N0SPoREcfjToVSvpDpuB20UkPpIAnS92ECS0wYXYfYM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ld1B/1tU3g7lYePj7YtqgFT5wqn+NUhD30zvVr94PijwFZrfHDdJYLzYaS6sPO/pRXnWb8DrPd8NrBzT5NH6e6xp9+cW0DhQVCn8+sIuvhZHtUyMF3fEllx3WucQFUBJliJ6TbPFEbwyOZWmbjw6J7jWRhHwReCWeZlfkoforh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=dsNo1SoO; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=/k
-	Q7yMmRbRhx6uqfPluLv3tH08pPgFdiUcBwhpyhBNM=; b=dsNo1SoOBz2KaiOs7T
-	RVHmDw0UIN+VRYqWFE5b7vPv+wKZazpvMzfWaxdNM9CW0eteBLerlhh4Ssvjbe73
-	Wlxacl5yd+45wrCVmarIzWlmpm9B0Iy/s4JqUc/1grU7kARaqMY5Ogs1il3GSVdf
-	qS5mKudZhzsPxA+lOwqDIjjLU=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wCHc4sVrfFonJv9Ag--.1829S2;
-	Fri, 17 Oct 2025 10:42:31 +0800 (CST)
-From: yicongsrfy@163.com
-To: michal.pecio@gmail.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	oliver@neukum.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net v5 2/3] net: usb: ax88179_178a: add USB device driver for config selection
-Date: Fri, 17 Oct 2025 10:42:29 +0800
-Message-Id: <20251017024229.1959295-1-yicongsrfy@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20251013110753.0f640774.michal.pecio@gmail.com>
-References: <20251013110753.0f640774.michal.pecio@gmail.com>
+	s=arc-20240116; t=1760669347; c=relaxed/simple;
+	bh=WD99PenCbzrrdBMQst12wTBmtrxm7bzCsWLZa4lreN8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ne2fLJG3ogYM8hNm4BmR/eZlpt/zcXonm2xYMU7gDE7PDpvdO8ktN6b+uydfB+ieyg4ZXrj2N0FjuGa97LwOgVrnvtNNDqeoXWSQPExdIrwzE63feqBIqe0bvz4Aiy0KCDkmkDyf7Zg6Wjnp4iTkLkYUO2RU6ZfXlC8xyLwJ4qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OtIrTB7M; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760669345; x=1792205345;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WD99PenCbzrrdBMQst12wTBmtrxm7bzCsWLZa4lreN8=;
+  b=OtIrTB7MxzaA+cSlEkZPxiHUgXxUKdJRELo5IEBlDVwpoDUKeEpkpM0n
+   nd94VRMbSECUewxEZygiDUcG/ZXiuVl0C0Kv1LiRSIkLHFqeLZavIS05a
+   t3h45wPh+UatGTYOQR11p5nqhaIYG6WWxMuv24m3STQN5w3B8aQHL7Qnb
+   7wM/j4xeHm78E4IGNkJsodcrcwHUsnq2/NESolkguO2k3BDNROzUv31wT
+   rFAz7aOJd4OpQw8uzDZNcI4E4ObnDrfKBNeNoE5V6gm5z2lj10zghst7I
+   D1/edryTY9RYVLpcIkQhRn690kZwoNUFX75FEpscM7CiiwaMVxuApUCyd
+   A==;
+X-CSE-ConnectionGUID: NaYZkDimS22wuteKm50iUg==
+X-CSE-MsgGUID: 0esOcQmFTGGWFFkzCEWG1g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11584"; a="73990657"
+X-IronPort-AV: E=Sophos;i="6.19,234,1754982000"; 
+   d="scan'208";a="73990657"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2025 19:49:04 -0700
+X-CSE-ConnectionGUID: Zks3OUlQRCWlhyDxg9fuAw==
+X-CSE-MsgGUID: yEhwY69UT/aiJNc1yol2GA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,234,1754982000"; 
+   d="scan'208";a="186877105"
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by orviesa004.jf.intel.com with ESMTP; 16 Oct 2025 19:49:02 -0700
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1v9aWU-0005T5-0A;
+	Fri, 17 Oct 2025 02:48:55 +0000
+Date: Fri, 17 Oct 2025 10:48:21 +0800
+From: kernel test robot <lkp@intel.com>
+To: Shi Hao <i.shihao.999@gmail.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, Shi Hao <i.shihao.999@gmail.com>
+Subject: Re: [PATCH] net :ethernet : replace cleanup_module with __exit()
+Message-ID: <202510171007.xaD8Yz39-lkp@intel.com>
+References: <20251016115113.43986-1-i.shihao.999@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wCHc4sVrfFonJv9Ag--.1829S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxJFWkAFyrGr1kXF4DuFy5XFb_yoWrtw1DpF
-	WUKa1YyrWUXFWfGr4fXrW8XFyY9ws2krW2kr1fJ3W3ur95ur97tF48K345uFy8CrW8GF12
-	vw4UKF43uws8CrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Uca9-UUUUU=
-X-CM-SenderInfo: p1lf00xjvuw5i6rwjhhfrp/1tbixwHp22jxpfnf7gAAsA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251016115113.43986-1-i.shihao.999@gmail.com>
 
-On Mon, 13 Oct 2025 11:07:53 +0200, Michal Pecio <michal.pecio@gmail.com> wrote:
->
-> On Sat, 11 Oct 2025 15:53:13 +0800, yicongsrfy@163.com wrote:
-> > From: Yi Cong <yicong@kylinos.cn>
-> >
-> > A similar reason was raised in commit ec51fbd1b8a2 ("r8152: add USB
-> > device driver for config selection"):
-> > Linux prioritizes probing non-vendor-specific configurations.
-> >
-> > Referring to the implementation of this patch, cfgselect is also
-> > used for ax88179 to override the default configuration selection.
-> >
-> > Signed-off-by: Yi Cong <yicong@kylinos.cn>
-> >
-> > ---
-> > v2: fix warning from checkpatch.
-> > v5: 1. use KBUILD_MODNAME to obtain the module name.
-> >     2. add error handling when usb_register fail.
-> >     3. use .choose_configuration instead of .probe.
-> >     4. reorder deregister logic.
-> > ---
-> >  drivers/net/usb/ax88179_178a.c | 68 ++++++++++++++++++++++++++++++++--
-> >  1 file changed, 65 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
-> > index b034ef8a73ea..b6432d414a38 100644
-> > --- a/drivers/net/usb/ax88179_178a.c
-> > +++ b/drivers/net/usb/ax88179_178a.c
-> > @@ -1713,6 +1713,14 @@ static int ax88179_stop(struct usbnet *dev)
-> >  	return 0;
-> >  }
-> >
-> > +static int ax88179_probe(struct usb_interface *intf, const struct usb_device_id *i)
-> > +{
-> > +	if (intf->cur_altsetting->desc.bInterfaceClass != USB_CLASS_VENDOR_SPEC)
-> > +		return -ENODEV;
-> > +
-> > +	return usbnet_probe(intf, i);
-> > +}
->
-> This isn't part of the cfgselector driver being added by this commit
-> nor is it documented in the changelog, so why is it here?
+Hi Shi,
 
-> It doesn't seem to be necessary, because USB_DEVICE_AND_INTERFACE_INFO
-> matches used by this driver ensure that probe() will only be called on
-> interfaces of the correct class 0xff.
+kernel test robot noticed the following build errors:
 
-I've retested this logic, and indeed, there's no need to add this extra check.
-It's already planned to remove this modification in the next patch version.
+[auto build test ERROR on linus/master]
+[also build test ERROR on horms-ipvs/master v6.18-rc1 next-20251016]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> > +
-> >  static const struct driver_info ax88179_info = {
-> >  	.description = "ASIX AX88179 USB 3.0 Gigabit Ethernet",
-> >  	.bind = ax88179_bind,
-> > @@ -1941,9 +1949,9 @@ static const struct usb_device_id products[] = {
-> >  MODULE_DEVICE_TABLE(usb, products);
-> >
-> >  static struct usb_driver ax88179_178a_driver = {
-> > -	.name =		"ax88179_178a",
-> > +	.name =		KBUILD_MODNAME,
-> >  	.id_table =	products,
-> > -	.probe =	usbnet_probe,
-> > +	.probe =	ax88179_probe,
-> >  	.suspend =	ax88179_suspend,
-> >  	.resume =	ax88179_resume,
-> >  	.reset_resume =	ax88179_resume,
-> > @@ -1952,7 +1960,61 @@ static struct usb_driver ax88179_178a_driver = {
-> >  	.disable_hub_initiated_lpm = 1,
-> >  };
-> >
-> > -module_usb_driver(ax88179_178a_driver);
-> > +static int ax88179_cfgselector_choose_configuration(struct usb_device *udev)
-> > +{
-> > +	struct usb_host_config *c;
-> > +	int i, num_configs;
-> > +
-> > +	/* The vendor mode is not always config #1, so to find it out. */
-> > +	c = udev->config;
-> > +	num_configs = udev->descriptor.bNumConfigurations;
-> > +	for (i = 0; i < num_configs; (i++, c++)) {
-> > +		struct usb_interface_descriptor	*desc = NULL;
-> > +
-> > +		if (!c->desc.bNumInterfaces)
-> > +			continue;
-> > +		desc = &c->intf_cache[0]->altsetting->desc;
-> > +		if (desc->bInterfaceClass == USB_CLASS_VENDOR_SPEC)
-> > +			break;
-> > +	}
-> > +
-> > +	if (i == num_configs)
-> > +		return -ENODEV;
-> > +
-> > +	return c->desc.bConfigurationValue;
-> > +}
->
-> I wonder how many copies of this code would justify making it some
-> sort of library in usbnet or usbcore?
+url:    https://github.com/intel-lab-lkp/linux/commits/Shi-Hao/net-ethernet-replace-cleanup_module-with-__exit/20251016-195352
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20251016115113.43986-1-i.shihao.999%40gmail.com
+patch subject: [PATCH] net :ethernet : replace cleanup_module with __exit()
+config: i386-randconfig-002-20251017 (https://download.01.org/0day-ci/archive/20251017/202510171007.xaD8Yz39-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251017/202510171007.xaD8Yz39-lkp@intel.com/reproduce)
 
-Yes, there are many similar code instances in the USB subsystem.
-However, I'm primarily focused on the networking subsystem,
-so my abstraction work here might not be thorough enough.
-Hopefully, an experienced USB developer may can optimize this issue.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202510171007.xaD8Yz39-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/3com/3c515.c:478:13: warning: variable 'pnp_cards' set but not used [-Wunused-but-set-variable]
+     478 |         static int pnp_cards;
+         |                    ^
+>> drivers/net/ethernet/3com/3c515.c:1552:22: error: use of undeclared identifier 'root_corkscrew_dev'
+    1552 |         while (!list_empty(&root_corkscrew_dev)) {
+         |                             ^
+   drivers/net/ethernet/3com/3c515.c:1556:19: error: use of undeclared identifier 'root_corkscrew_dev'
+    1556 |                 vp = list_entry(root_corkscrew_dev.next,
+         |                                 ^
+   drivers/net/ethernet/3com/3c515.c:1556:19: error: use of undeclared identifier 'root_corkscrew_dev'
+   drivers/net/ethernet/3com/3c515.c:1556:19: error: use of undeclared identifier 'root_corkscrew_dev'
+   1 warning and 4 errors generated.
 
 
-> > +static struct usb_device_driver ax88179_cfgselector_driver = {
-> > +	.name =	KBUILD_MODNAME "-cfgselector",
-> > +	.choose_configuration =	ax88179_cfgselector_choose_configuration,
-> > +	.id_table = products,
-> > +	.generic_subclass = 1,
-> > +	.supports_autosuspend = 1,
-> > +};
-> > +
-> > +static int __init ax88179_driver_init(void)
-> > +{
-> > +	int ret;
-> > +
-> > +	ret = usb_register_device_driver(&ax88179_cfgselector_driver, THIS_MODULE);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = usb_register(&ax88179_178a_driver);
-> > +	if (ret)
-> > +		usb_deregister_device_driver(&ax88179_cfgselector_driver);
->
-> Any problems if the order of registration is reversed, to ensure that
-> the interface driver always exists if the device driver exists?
+vim +/root_corkscrew_dev +1552 drivers/net/ethernet/3com/3c515.c
 
-After swapping the registration order, testing confirms there are no problems.
+^1da177e4c3f415 drivers/net/3c515.c               Linus Torvalds 2005-04-16  1549  
+c244e2488b92ba8 drivers/net/ethernet/3com/3c515.c Shi Hao        2025-10-16  1550  static void __exit corkscrew_exit_module(void)
+^1da177e4c3f415 drivers/net/3c515.c               Linus Torvalds 2005-04-16  1551  {
+^1da177e4c3f415 drivers/net/3c515.c               Linus Torvalds 2005-04-16 @1552  	while (!list_empty(&root_corkscrew_dev)) {
 
-> > +
-> > +	return 0;
->
-> return ret perhaps?
-
-Will be fixed in the next version.
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
