@@ -1,88 +1,93 @@
-Return-Path: <netdev+bounces-230617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D2EBBEBEBE
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 00:27:39 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E07FABEBF2A
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 00:50:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB7B1407AD2
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 22:27:37 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 865FA4EF6AF
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 22:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80702D661E;
-	Fri, 17 Oct 2025 22:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 346C02DC322;
+	Fri, 17 Oct 2025 22:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jG/zH9Td"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pi0nOEam"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF72223710;
-	Fri, 17 Oct 2025 22:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE302D7803;
+	Fri, 17 Oct 2025 22:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760740054; cv=none; b=XEIHHhJ3Dnr9PLLd1krWQdq3b037SP/VMcoSrmxjSnKI7FUZFIQ3DzS0PuxeP/3HlglALkaV4cNXFQePSHEQM4x/DldQ9X3tUuV1zM6N2c6+bPwqDj1PUGvD4RU8+GxKtCLN5xzjYB4WPQQL/8x61QveVP0h2HRk2obov2+Nuxo=
+	t=1760741423; cv=none; b=VNbljBm+1997wnQ53P/XNyJPL+1pJYsgzzMMROAEHBHtOr1RG0kjSfYXabihKxUeQIbIaHUSrxdDzRMgVlsHonZ8QYWd5frtB/7jg+jO7q4IGikk1SuaD9tCPRS+20xKzulH5lR5VQgDKGROd3P8jwnG9/N82pOTTtnK4xLdkBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760740054; c=relaxed/simple;
-	bh=p0l4lq0bjml/HIPy65VCiSl+37cdkkZIB4pXwea07Ik=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JOMxfEM+RFTs4lVaXhscCKEKRSObiiWH8KIkIDgXhnVWItFAvtRdKtbWqrWIvXbCIlymBlkipQSt0XlgjbI7Ggy8WQKwwV74LFY1bszSol3MMOxWsv7ItpxqrJuBSXriUKLJhLQ16EAuFmOpW1UlMwXjVKYOVkq23cCvQTzf9GA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jG/zH9Td; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AD7FC4CEE7;
-	Fri, 17 Oct 2025 22:27:32 +0000 (UTC)
+	s=arc-20240116; t=1760741423; c=relaxed/simple;
+	bh=GPQmksuK2+DVq7N6Av/crui8RyWbd0z+p5E8e3rCPEY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fX9rDS14XE/GxU4m5FgTx+igto3ADPayKfTeOaJIv+jpogMeeoo/PGSe92t2/eLCyuYuZoYaDAfQkBZtA1EBjugexXirVLmSj0OfLPhls9ilI/8l9INhwTU0aEuEy1ahx5Ab8MB7dof44QElXkLz4rM9kOf88Z3PCzcGmKLC2Yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pi0nOEam; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79C9CC4CEE7;
+	Fri, 17 Oct 2025 22:50:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760740053;
-	bh=p0l4lq0bjml/HIPy65VCiSl+37cdkkZIB4pXwea07Ik=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jG/zH9TdQnrlPxC/KU/+AzRE9NScNHjasLFcx5E0L4RN5V+3uPohg4OPawlCF2++R
-	 6rWVkQZHtpT8lNB5wnbDRZPSEe4br2Av03TNE9XBvWd4D2YDK2uQl5YVue0ZjbzGqb
-	 76G1pV8CozbfZHWWYXhx62nW1sfqBBxn85NXrPtLDXX9BpE52Bj4gaHPU/ZDpPyLqF
-	 qH/Ccqg0yHwOMoDDWyHvA+iZ8lVCVIDw/hM6gql5EUg3jq8fXqAhzMmmRFrU3WtVn9
-	 NKKnDAf/iwqKeWDc0uFqH24YKRPjjVlJI84aiM6RrcBIHfHGoeBd1UJDUGwyLKnbET
-	 nWXMnnP9zzabQ==
-Date: Fri, 17 Oct 2025 15:27:31 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lizhi Xu <lizhi.xu@windriver.com>
-Cc: <ahmed.zaki@intel.com>, <aleksander.lobakin@intel.com>,
- <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
- <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <pabeni@redhat.com>, <samsun1006219@gmail.com>,
- <sdf@fomichev.me>, <syzkaller-bugs@googlegroups.com>,
- <syzkaller@googlegroups.com>
-Subject: Re: [PATCH V2] usbnet: Prevents free active kevent
-Message-ID: <20251017152731.4bb7f1f9@kernel.org>
-In-Reply-To: <20251017090541.3705538-1-lizhi.xu@windriver.com>
-References: <20251017084918.3637324-1-lizhi.xu@windriver.com>
-	<20251017090541.3705538-1-lizhi.xu@windriver.com>
+	s=k20201202; t=1760741422;
+	bh=GPQmksuK2+DVq7N6Av/crui8RyWbd0z+p5E8e3rCPEY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Pi0nOEamyDDf7yVlfIPAL2n6W3tbMm9m0S13GtEE7qKXWY2rqBzFLL6pqjrw9TxCc
+	 JpidkhrFzfDU2aBzvSIv75YcwBetyvgYf1j1P5927dEVnewwMWsVNk0qVTsThPVufa
+	 nzpbdS3mx54Ni+R+7i1SJp0YvF1j7x2kb5aiMN6XkHr3Ivcc6K28jVLfQnuB/WuYxd
+	 eD1HiAmfHLFk31IPxomIN8Qo43hoj5btVPBGVSV3ZwkDzh6uufpJzSYBxd46qFGsf2
+	 sIjXxERObxTiHY4dtq6KObiT7ZRSXp1SmsxJWqAlUV5B5J7vGqzmLpi6WVQrSMOydg
+	 bwc6k7boANLZg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33ECE39EFA5D;
+	Fri, 17 Oct 2025 22:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: hibmcge: support pci_driver.shutdown()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176074140600.2812574.7675764447909082136.git-patchwork-notify@kernel.org>
+Date: Fri, 17 Oct 2025 22:50:06 +0000
+References: <20251014134018.1178385-1-shaojijie@huawei.com>
+In-Reply-To: <20251014134018.1178385-1-shaojijie@huawei.com>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ shenjian15@huawei.com, liuyonglong@huawei.com, chenhao418@huawei.com,
+ lantao5@huawei.com, huangdonghua3@h-partners.com,
+ yangshuaisong@h-partners.com, jonathan.cameron@huawei.com,
+ salil.mehta@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, 17 Oct 2025 17:05:41 +0800 Lizhi Xu wrote:
-> The root cause of this issue are:
-> 1. When probing the usbnet device, executing usbnet_link_change(dev, 0, 0);
-> put the kevent work in global workqueue. However, the kevent has not yet
-> been scheduled when the usbnet device is unregistered. Therefore, executing
-> free_netdev() results in the "free active object (kevent)" error reported
-> here.
-> 
-> 2. Another factor is that when calling usbnet_disconnect()->unregister_netdev(),
-> if the usbnet device is up, ndo_stop() is executed to cancel the kevent.
-> However, because the device is not up, ndo_stop() is not executed.
-> 
-> The solution to this problem is to cancel the kevent before executing
-> free_netdev(), which also deletes the delay timer.
+Hello:
 
-Please add a fixes tag, and repost.
-Please don't send new versions in reply to previous / existing threads.
-Please read at least the tl;dr of:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 14 Oct 2025 21:40:18 +0800 you wrote:
+> support pci_driver.shutdown() for hibmcge driver.
+> 
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> ---
+>  .../net/ethernet/hisilicon/hibmcge/hbg_main.c   | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+
+Here is the summary with links:
+  - [net-next] net: hibmcge: support pci_driver.shutdown()
+    https://git.kernel.org/netdev/net-next/c/0746da01767e
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
