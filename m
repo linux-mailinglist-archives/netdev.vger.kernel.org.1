@@ -1,162 +1,178 @@
-Return-Path: <netdev+bounces-230432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B87D2BE808F
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 12:21:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F520BE8315
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 12:59:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 848C45676E1
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 10:17:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 469A26E22F6
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 10:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 156F330F80F;
-	Fri, 17 Oct 2025 10:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ayCSq4Eg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/JU05BQm";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ayCSq4Eg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/JU05BQm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D7532A3CC;
+	Fri, 17 Oct 2025 10:50:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691A02D543A
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 10:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65EC5320A3B;
+	Fri, 17 Oct 2025 10:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760696253; cv=none; b=upKWGWNXyQ/01C+Mu3PEH/YBtP10h1v/5kfJyWFBOTaXdMM9M5RnuTl73PjTE+SxVld10Exf5VAD/gkp3l89roDxjpcjFYuIh2dryq9eI5FgI2RvejA/3kPUWD3HeSL3ouwQKAlhj89pJGP5+Cn67jr/PgGWvpDgTxpMZA/3Pes=
+	t=1760698253; cv=none; b=QF0pjfCMfsMJMQtwFjKhklzhB4/Kcad8a9PjY5FjuDD9waARCheqedRSdTQsVa08KcX1X2TdpkxBpinrCtR1AXVD0qI+CR4q6+4Kyv0i43Ude0qPcj3ef+wlEatczqoWFkyE+o98aARnfC2qQ0G47I4gJaOzFxssALM2qeA4a+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760696253; c=relaxed/simple;
-	bh=1QLU/gVVgYDO8JWw4ge7c5jK05jF3XWennbUt0+E7Eo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dR2aKjuOxmDh1mZQk+UiVrmeM/CxD+Dlsmkw8ZOLh06u9za8koQJQjG2WEuZEHvTxTIzX2IHzcEE7C6RuCFiwvVkgy1p/e4naGqqZPPC9m1JZjkOiJR3loD4YUQp2e4UpTNyf+9g86lM9aDf+QIr6fIv3KdeoTqnFHf9fBWapBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ayCSq4Eg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/JU05BQm; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ayCSq4Eg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/JU05BQm; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 7EA8921CDB;
-	Fri, 17 Oct 2025 10:17:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760696249; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x28IZ01xRWN9EmhKGWtiepea9Jiz+TrC/Yq2xTTPlMw=;
-	b=ayCSq4EgWGymcuLjQ4RxcaFdHokUyxFH1/bOmjo0xX2QGbLSxEi5qOj0hEc216aKFPrh8P
-	ExrZuMWzGr860NG/imznoc9VdMcpp7hp5BTaqrSxikkNftTzgmyL2arA7nDk8pioo5qalV
-	Ub/UNT14/yeWJ3YfhEJVKU8dYRnrJAs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760696249;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x28IZ01xRWN9EmhKGWtiepea9Jiz+TrC/Yq2xTTPlMw=;
-	b=/JU05BQmGHctXQTf2OaJ/0oMnAlx1suG7kwEOvReciVa2VobXC9aFMiRIxc2VrBeBE/8IO
-	xltPIncwP+uXgYCg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760696249; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x28IZ01xRWN9EmhKGWtiepea9Jiz+TrC/Yq2xTTPlMw=;
-	b=ayCSq4EgWGymcuLjQ4RxcaFdHokUyxFH1/bOmjo0xX2QGbLSxEi5qOj0hEc216aKFPrh8P
-	ExrZuMWzGr860NG/imznoc9VdMcpp7hp5BTaqrSxikkNftTzgmyL2arA7nDk8pioo5qalV
-	Ub/UNT14/yeWJ3YfhEJVKU8dYRnrJAs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760696249;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x28IZ01xRWN9EmhKGWtiepea9Jiz+TrC/Yq2xTTPlMw=;
-	b=/JU05BQmGHctXQTf2OaJ/0oMnAlx1suG7kwEOvReciVa2VobXC9aFMiRIxc2VrBeBE/8IO
-	xltPIncwP+uXgYCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 116C4136C6;
-	Fri, 17 Oct 2025 10:17:29 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id nVwhAbkX8mhYXwAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Fri, 17 Oct 2025 10:17:29 +0000
-Message-ID: <6f9742f5-8889-449d-8354-572d2f8a711b@suse.de>
-Date: Fri, 17 Oct 2025 12:17:21 +0200
+	s=arc-20240116; t=1760698253; c=relaxed/simple;
+	bh=NGpRihvRGLmZxaUb7q6Kyg1zoqkKk067tACLVGmS4Z0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SZm2LbVRh57nyjRXmeQd7cFy10GtVgB3IOwuvirXxexTxOp8uwQHuThu6niuM+WJDFAOZkiKgBW51EAm9Zg8puBbXMaKKNWahvjD7xA+hACF3XsBukPVgzEbgSkhjmHJVFJe+LgpKMygRlaiM56FiNOFgdtc31td37AXW8KCckk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4cp17m0sBZz9sSC;
+	Fri, 17 Oct 2025 12:21:24 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id Ma1A-_kW4Zjq; Fri, 17 Oct 2025 12:21:24 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4cp17l6vfqz9sS7;
+	Fri, 17 Oct 2025 12:21:23 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id D03878B786;
+	Fri, 17 Oct 2025 12:21:23 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id UGiDsfLHLJ0I; Fri, 17 Oct 2025 12:21:23 +0200 (CEST)
+Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id A28178B776;
+	Fri, 17 Oct 2025 12:21:22 +0200 (CEST)
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Darren Hart <dvhart@infradead.org>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	"Andre Almeida" <andrealmeid@igalia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v3 00/10] powerpc: Implement masked user access
+Date: Fri, 17 Oct 2025 12:20:56 +0200
+Message-ID: <cover.1760529207.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/hsr: add interlink to fill_info output
-To: Jakub Kicinski <kuba@kernel.org>, Jan Vaclav <jvaclav@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20251015101001.25670-2-jvaclav@redhat.com>
- <20251016155731.47569d75@kernel.org>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20251016155731.47569d75@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4010; i=christophe.leroy@csgroup.eu; h=from:subject:message-id; bh=NGpRihvRGLmZxaUb7q6Kyg1zoqkKk067tACLVGmS4Z0=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWR8kuhat/+o4e3tgp5tNjx394ivT+xa9eDbmm+PUyqZn IUta/dYdpSyMIhxMciKKbIc/8+9a0bXl9T8qbv0YeawMoEMYeDiFICJaM5lZJjpeWpinm69h/uD SOaEmFJVg/NP3//+LLx0a+I3V8WXt18xMsxzqhEpyjOV21GwfsPh5xfF7zzLP22mMnXRZv2nxeu azDkB
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=openpgp; fpr=10FFE6F8B390DE17ACC2632368A92FEB01B8DD78
+Content-Transfer-Encoding: 8bit
 
+Masked user access avoids the address/size verification by access_ok().
+Allthough its main purpose is to skip the speculation in the
+verification of user address and size hence avoid the need of spec
+mitigation, it also has the advantage to reduce the amount of
+instructions needed so it also benefits to platforms that don't
+need speculation mitigation, especially when the size of the copy is
+not know at build time.
 
+Patches 1,2,4 are cleaning up some redundant barrier_nospec()
+introduced by commit 74e19ef0ff80 ("uaccess: Add speculation barrier
+to copy_from_user()"). To do that, a speculation barrier is added to
+copy_from_user_iter() so that the barrier in powerpc raw_copy_from_user()
+which is redundant with the one in copy_from_user() can be removed. To
+avoid impacting x86, copy_from_user_iter() is first converted to using
+masked user access.
 
-On 10/17/25 12:57 AM, Jakub Kicinski wrote:
-> On Wed, 15 Oct 2025 12:10:02 +0200 Jan Vaclav wrote:
->> Currently, it is possible to configure the interlink port, but no
->> way to read it back from userspace.
->> 
->> Add it to the output of hsr_fill_info(), so it can be read from
->> userspace, for example:
->> 
->> $ ip -d link show hsr0 12: hsr0: <BROADCAST,MULTICAST> mtu ... ... 
->> hsr slave1 veth0 slave2 veth1 interlink veth2 ...
-> 
-> Not entirely cleat at a glance how this driver deals with the slaves
-> or interlink being in a different netns, but I guess that's a pre-
-> existing problem..
-> 
+Patch 3 adds masked_user_read_access_begin() and
+masked_user_write_access_begin() to match with user_read_access_end()
+and user_write_access_end().
 
-FTR, I just did a quick round of testing and it handles it correctly. 
-When moving a port to a different netns it notifies NETDEV_UNREGISTER - 
-net/hsr/hsr_main.c handles the notification removing the port from the 
-list. If the port list is empty, removes the hsr link.
+Patches 5,6,7 are cleaning up powerpc uaccess functions.
 
-All good or at least as I would expect.
+Patches 8 and 9 prepare powerpc/32 for the necessary gap at the top
+of userspace.
 
-Thanks,
-Fernando.
+Last patch implements masked user access.
+
+Changes in v3:
+- Rebased on top of v6.18-rc1
+- Patch 3: Impact on recently modified net/core/scm.c
+- Patch 10: Rewrite mask_user_address_simple() for a smaller result on powerpc64, suggested by Gabriel
+
+Changes in v2:
+- Converted copy_from_user_iter() to using masked user access.
+- Cleaned up powerpc uaccess function to minimise code duplication
+when adding masked user access
+- Automated TASK_SIZE calculation to minimise use of BUILD_BUG_ON()
+- Tried to make some commit messages more clean based on feedback from
+version 1 of the series.
+
+Christophe Leroy (10):
+  iter: Avoid barrier_nospec() in copy_from_user_iter()
+  uaccess: Add speculation barrier to copy_from_user_iter()
+  uaccess: Add masked_user_{read/write}_access_begin
+  powerpc/uaccess: Move barrier_nospec() out of
+    allow_read_{from/write}_user()
+  powerpc/uaccess: Remove unused size and from parameters from
+    allow_access_user()
+  powerpc/uaccess: Remove
+    {allow/prevent}_{read/write/read_write}_{from/to/}_user()
+  powerpc/uaccess: Refactor user_{read/write/}_access_begin()
+  powerpc/32s: Fix segments setup when TASK_SIZE is not a multiple of
+    256M
+  powerpc/32: Automatically adapt TASK_SIZE based on constraints
+  powerpc/uaccess: Implement masked user access
+
+ arch/powerpc/Kconfig                          |   3 +-
+ arch/powerpc/include/asm/barrier.h            |   2 +-
+ arch/powerpc/include/asm/book3s/32/kup.h      |   3 +-
+ arch/powerpc/include/asm/book3s/32/mmu-hash.h |   5 +-
+ arch/powerpc/include/asm/book3s/32/pgtable.h  |   4 -
+ arch/powerpc/include/asm/book3s/64/kup.h      |   6 +-
+ arch/powerpc/include/asm/kup.h                |  52 +------
+ arch/powerpc/include/asm/nohash/32/kup-8xx.h  |   3 +-
+ arch/powerpc/include/asm/nohash/32/mmu-8xx.h  |   4 -
+ arch/powerpc/include/asm/nohash/kup-booke.h   |   3 +-
+ arch/powerpc/include/asm/task_size_32.h       |  28 +++-
+ arch/powerpc/include/asm/uaccess.h            | 135 +++++++++++++-----
+ arch/powerpc/kernel/asm-offsets.c             |   2 +-
+ arch/powerpc/kernel/head_book3s_32.S          |   6 +-
+ arch/powerpc/mm/book3s32/mmu.c                |   4 +-
+ arch/powerpc/mm/mem.c                         |   2 -
+ arch/powerpc/mm/nohash/8xx.c                  |   2 -
+ arch/powerpc/mm/ptdump/segment_regs.c         |   2 +-
+ fs/select.c                                   |   2 +-
+ include/linux/uaccess.h                       |   7 +
+ kernel/futex/futex.h                          |   4 +-
+ lib/iov_iter.c                                |  22 ++-
+ lib/strncpy_from_user.c                       |   2 +-
+ lib/strnlen_user.c                            |   2 +-
+ net/core/scm.c                                |   2 +-
+ 25 files changed, 174 insertions(+), 133 deletions(-)
+
+-- 
+2.49.0
+
 
