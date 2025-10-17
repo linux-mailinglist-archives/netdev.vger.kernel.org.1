@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-230358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80FC8BE6F7A
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 09:40:23 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5875BE6FA4
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 09:42:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 417B56251B1
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 07:40:22 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D43E3545FA9
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 07:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6096923A98E;
-	Fri, 17 Oct 2025 07:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0757823BD06;
+	Fri, 17 Oct 2025 07:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="U9rPqERF"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kmC517HF"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C571A316C;
-	Fri, 17 Oct 2025 07:40:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C8D323AB98;
+	Fri, 17 Oct 2025 07:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760686819; cv=none; b=e+F2UEX1+unyzJ6e+y6NEypfkoRArfg8k+iJ4UPm4ehaHhvRsBdfCIRjyAOIkVa+gHYqOTCORnL37NKmA3WgI5KdFSiF0sZAxkPFHlowA8LvCarzXgdn/RIhnK9rzx0v5h+6c8A84vwF9E0Dio0prSgOUUEWvGImK2Yl3Oyk4T8=
+	t=1760686883; cv=none; b=LgS6qoklrQQ8tzul+D76xnPlGXKrvqFB2HQTTar9O+IUwZzWMNtbN+qhxzXFwumFrW7j7XI1ObSsHXYyA022OXfQ29YBslD9El9zsPzhrazjdwOOrtX5jE8WUxiPh0LazxLYuU3pCPGrDQ9aeUaqtsJH/otOzz7nl0Cd1UNHzGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760686819; c=relaxed/simple;
-	bh=OI/9YTWRPQ3D3kcnzcU/QsYUJbdBXCeyMSiNZugxufs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=pU+pRzRC24Owxo2JYTWBe32TGRHlNRBsCrID5sTiNxe1Vty0QDXe/vsSb0w2Hru3VDeWOvoyTjf0uKLfts3rNP+E6r8MRtaBDXML/pOuziGntm4O3Vb6EurHswS1lFsjcIN28DgDLRlNpeBk65YMe/ggt9NX2X4RM15/Uyf4z8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=U9rPqERF; arc=none smtp.client-ip=113.46.200.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=P9+/eI7A+ZVCFlg1SNVuoMx6QePw0f4EAfUQmVzNBw8=;
-	b=U9rPqERFM1DhDFePmNOed35hSJKuImZ0VhOHWQI3JcBmv0TDKxo0XaX2+/SsO6HC3fP030Bu0
-	Lpj4z/U4Ub22EESn0Yi6L0ValRQ+UoSnf1x6uZ+h6Biu74ygsAwQbXIjfcToVYg8k4X3l60pbyw
-	+QqUQvS7V5vIbjK8ePEdz4o=
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cnxXw250bznTVF;
-	Fri, 17 Oct 2025 15:39:28 +0800 (CST)
-Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id 51F7C140120;
-	Fri, 17 Oct 2025 15:40:12 +0800 (CST)
-Received: from [10.174.177.19] (10.174.177.19) by
- dggpemf500016.china.huawei.com (7.185.36.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 17 Oct 2025 15:40:11 +0800
-Message-ID: <b76f348d-61d3-404b-81c6-57621a14046b@huawei.com>
-Date: Fri, 17 Oct 2025 15:40:10 +0800
+	s=arc-20240116; t=1760686883; c=relaxed/simple;
+	bh=k28j/cY0o1c6CApdJrdkT4hyekVTeYH1pZD3ZM9FMIs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=axZF2Yjt8MOBWS4hws+VXAs/rMe96/TgL/QYESOnIPYFz07PA1bVhzMsSqsvKC2CfEU57LhU0UP7Lh3y3iR1KjA1zcCJ3XRc0TSvSTMNjln6hECQ51n2I/+lgu9R0wTZwhRRMOA8X7CPlm2HHOmpCg6PjfepIW4u3HO+H5DmPR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kmC517HF; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 8BBEF4E40B36;
+	Fri, 17 Oct 2025 07:41:20 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 5957F606DB;
+	Fri, 17 Oct 2025 07:41:20 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 803E4102F2334;
+	Fri, 17 Oct 2025 09:41:03 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1760686879; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=VX7GP8oohyF3dyuDoiAgWrPjx6bOSi6RJBB6J06GFiM=;
+	b=kmC517HFbZScjlehfud3oDP6g69BdC06DjtToA75prfaAXeD7Xq3ruUWPChEEVj69xkJrU
+	YrNFh8qGDLHLmVvvE1+pBv8RlwORovJxDINA92uG8LHtpjAaapa9JM5v2IghkCihLGS2f6
+	lLYG8j/RBKOcXHShHwwvz2hrm9RdQhLeGaViG1mP6kQ7Eh5on4JwTll8QnNYlLu4GkRkjO
+	Y8ywR2LBeBg4KETkN838vRz2s4cQTbC3qmELbTq5WD+bhx1oFkRmiv43JmzlBlwHVXYUS2
+	Kq79u8ah2ozEIeDRcV8lSdEpEN6G9eeUA8GKx8RA8OIL0eYR6w/41Dqboxcojg==
+Message-ID: <0adaf9b2-2cfa-4d32-a8fd-1aef53bb2a78@bootlin.com>
+Date: Fri, 17 Oct 2025 09:41:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,61 +57,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [smc?] general protection fault in __smc_diag_dump (4)
-From: Wang Liang <wangliang74@huawei.com>
-To: <syzbot+f775be4458668f7d220e@syzkaller.appspotmail.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <syzkaller-bugs@googlegroups.com>
-References: <20251017064823.1639083-1-wangliang74@huawei.com>
-In-Reply-To: <20251017064823.1639083-1-wangliang74@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500016.china.huawei.com (7.185.36.197)
+Subject: Re: [PATCH net v4 2/2] phy: mscc: Fix PTP for VSC8574 and VSC8572
+To: Horatiu Vultur <horatiu.vultur@microchip.com>, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, vladimir.oltean@nxp.com,
+ vadim.fedorenko@linux.dev, rmk+kernel@armlinux.org.uk,
+ christophe.jaillet@wanadoo.fr, rosenp@gmail.com, steen.hegelund@microchip.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251017064819.3048793-1-horatiu.vultur@microchip.com>
+ <20251017064819.3048793-3-horatiu.vultur@microchip.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251017064819.3048793-3-horatiu.vultur@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
+Hi Horatiu,
 
-Sorry, this is an incorrect email, please ignore it.
+On 17/10/2025 08:48, Horatiu Vultur wrote:
+> The PTP initialization is two-step. First part are the function
+> vsc8584_ptp_probe_once() and vsc8584_ptp_probe() at probe time which
+> initialize the locks, queues, creates the PTP device. The second part is
+> the function vsc8584_ptp_init() at config_init() time which initialize
+> PTP in the HW.
+> 
+> For VSC8574 and VSC8572, the PTP initialization is incomplete. It is
+> missing the first part but it makes the second part. Meaning that the
+> ptp_clock_register() is never called.
+> 
+> There is no crash without the first part when enabling PTP but this is
+> unexpected because some PHys have PTP functionality exposed by the
+> driver and some don't even though they share the same PTP clock PTP.
+> 
+> Fixes: 774626fa440e ("net: phy: mscc: Add PTP support for 2 more VSC PHYs")
+> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-在 2025/10/17 14:48, Wang Liang 写道:
-> diff --git a/net/smc/smc_inet.c b/net/smc/smc_inet.c
-> index a944e7dcb8b9..a94084b4a498 100644
-> --- a/net/smc/smc_inet.c
-> +++ b/net/smc/smc_inet.c
-> @@ -56,7 +56,6 @@ static struct inet_protosw smc_inet_protosw = {
->   	.protocol	= IPPROTO_SMC,
->   	.prot		= &smc_inet_prot,
->   	.ops		= &smc_inet_stream_ops,
-> -	.flags		= INET_PROTOSW_ICSK,
->   };
->   
->   #if IS_ENABLED(CONFIG_IPV6)
-> @@ -104,27 +103,15 @@ static struct inet_protosw smc_inet6_protosw = {
->   	.protocol	= IPPROTO_SMC,
->   	.prot		= &smc_inet6_prot,
->   	.ops		= &smc_inet6_stream_ops,
-> -	.flags		= INET_PROTOSW_ICSK,
->   };
->   #endif /* CONFIG_IPV6 */
->   
-> -static unsigned int smc_sync_mss(struct sock *sk, u32 pmtu)
-> -{
-> -	/* No need pass it through to clcsock, mss can always be set by
-> -	 * sock_create_kern or smc_setsockopt.
-> -	 */
-> -	return 0;
-> -}
-> -
->   static int smc_inet_init_sock(struct sock *sk)
->   {
->   	struct net *net = sock_net(sk);
->   
->   	/* init common smc sock */
->   	smc_sk_init(net, sk, IPPROTO_SMC);
-> -
-> -	inet_csk(sk)->icsk_sync_mss = smc_sync_mss;
-> -
->   	/* create clcsock */
->   	return smc_create_clcsk(net, sk, sk->sk_family);
->   }
 
