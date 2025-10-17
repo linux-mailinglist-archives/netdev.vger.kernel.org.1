@@ -1,315 +1,147 @@
-Return-Path: <netdev+bounces-230577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FE7ABEB340
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 20:23:15 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E685FBEB37D
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 20:27:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B4C2D344389
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 18:23:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2B2204EAA25
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 18:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38C29336EC8;
-	Fri, 17 Oct 2025 18:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D147A30DEBB;
+	Fri, 17 Oct 2025 18:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IA8jcD/c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lRl2jWvR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FCD03314BF
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 18:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E36A30505E
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 18:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760725338; cv=none; b=EnKXtFmqpu6LhIU2jav5GBehkoAJfjHgTBkQt28hn8l4ONz0N/7eZycNo3IIVtib4xCv0fE5Y2quyBYoxXet5PtJ6ihKvw5UX4OOeHOgBZXU6i/dL/CzvCh1z3dM1ihJS6I5vDjIMAlQ2MjLLutU/NyJWgZqZys5ugmGAzoYZqc=
+	t=1760725661; cv=none; b=cuqQXBEnZjMSElo4Mou5r4N4bggfFrjwBtHAMZp3F0BYO9j1fTU9iUt8D/PwZkmppk+LjGyqZoo7mLq7DfdGwkUYOWQvdZV7N82wb3J7FoZgJ4uV5rzzJ4V7UDNaa+RHn54xZ+mo7F+sc5Xdd5pXEPxXVoQCqs8DlZMi1ZEkbcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760725338; c=relaxed/simple;
-	bh=9UsS6mIuNGUybn+55H6XYwiWL/c9WxvcoUx8g1fiI2o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PX/WrQkhtLl03G6P6LzxlKPjvV9ss9cV84jByJvFuN6xWwqhK67bTf+BBTvZQUdkSwitq/i/+UN9MPQhUpzm7TxbiKOK0z0+FhL2h64YRPpii4nqSkwStIkOBm/8r72Qa+ETC3I9+JRe9uuUNZ5oQrL035OfLqoE5X8VEZiOBQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IA8jcD/c; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760725334;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6wo3nj/zxzvVrb9F1mL7tiVrPghBLGsa5J5UbXQ5UdE=;
-	b=IA8jcD/ce2RsVkrbq0IkY+uYei55f01ts4mm0bTn9VkbTfbcl357lbAgq3SamYdNb0gOby
-	Oi4SuAjFG/+T5e4nlhdBBZMiSp9Hs7FMpk4UtxB/efsApHZmESHgGvUql2f/Zgf4Qquejg
-	4pxU/gbpr940oa9PDPpZwu4PYnqNNH8=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: Jian Shen <shenjian15@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-	Paul Barker <paul@pbarker.dev>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc: linux-renesas-soc@vger.kernel.org,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	netdev@vger.kernel.org,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [PATCH net-next v2 6/6] net: hns3: add hwtstamp_get/hwtstamp_set ops
-Date: Fri, 17 Oct 2025 18:21:28 +0000
-Message-ID: <20251017182128.895687-7-vadim.fedorenko@linux.dev>
-In-Reply-To: <20251017182128.895687-1-vadim.fedorenko@linux.dev>
-References: <20251017182128.895687-1-vadim.fedorenko@linux.dev>
+	s=arc-20240116; t=1760725661; c=relaxed/simple;
+	bh=apyeGrhT2B4cjSomRBMirnJK1iCiphU7E8kwZ4eFRPI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eJ2hDTPF/R6UUQZj76Vwnks5G3Wr1PKOyA40uFEE2yKhRl7T4xx+ypCEClAVoOhoF+qz8378cXk3n83HdPeka7tCEgZI42u0uHLzx+bcxxUUeX/ipVSpoHCN5yXLqW1crRB4g966O7zN6skq1zooC2SolX+IaOR3WcxdpTBw57g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lRl2jWvR; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4270491e9easo1100935f8f.2
+        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 11:27:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760725658; x=1761330458; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zNOsTI510GPBzBmWLlky+fzOisjB58DBhaGG4R2nBM8=;
+        b=lRl2jWvRw+n/iLhCD3xpKuP83ZE3tpzetVsSBAj0bBXyQezXVf3unacJZRJ0WQnmSA
+         XgpciaMSHuvupkgV+rXJiKWyQRYNUOppzy/wKOKooClafXZxfeLhbNKLjhZT0ihWp+tI
+         ueZBdU4waox/w5i9wVV9+rm77LqtZLquUy3vhUcO0+MfGWX9Cm406yvju6wtKW2S9RHm
+         WWvSK1GmecZ1eTnrKTSCpGfCbrmHM1hejSylO2gZ/x7Ec02RYt1lh4nJViYKmVKuGsrg
+         amGoHeV9E8508I62WGhJCwSOvmIWbK4HCynxoEVJ14RP4/HzaOAqt4uQOj5ZNXdiWCOr
+         7p4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760725658; x=1761330458;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zNOsTI510GPBzBmWLlky+fzOisjB58DBhaGG4R2nBM8=;
+        b=tK5QlHVxbgZnR6Bag75+RQpj1kjv2nPMJ8oz3LgaZAhw5wO6v7JzGgFrsiO1eKYn5D
+         B4QbRNFnMochu+0kJfxOgO2FDkU0CEhiENPARBKft7wmn0IrweWSlT9gVSaM3BIG2itv
+         b5odmbCOZgEuRFee1+INUooS6Mo7jieKh+2FcLAxpYjM5n5j2rePav0T00t3ypX2Jj/D
+         4PRI0ldamsFyW/dG+iCXgNQT9DugMgM9yMNR56y6b4B52FtAO2Yfz/hd9xqN6EJmWE04
+         yDJDmoU8m7i8xHEcKfPjan+vVP/anQgKGgUNH7f0lvd0tD7cJ7hfIB4To3NjGBgp0jFp
+         qXuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUaNx4foBoM5lCrk5jGB4uL/OAL8K+QmKgGffANRoSMRoaubZqSO8ex6YkFIpQ0rrS31kqD3Bs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoGBHEDa/K7G4F3mUI3Vbex6HhuLb7u+YX6fKHGnillVukkvZK
+	9ZGiNW/zZgNQ24frOdBnbh1DT8XoW1zzPR8CtXIpi8OnBwOkAqBx6nKEl+M8//J6eYxAu/kO4Tv
+	L5iMgnRWBHuS6Z3u57S1eHmNBZ8FxU9g=
+X-Gm-Gg: ASbGncsK7HJnmyaChhL5JKvTX3Kp8cGc7lTZJv13QANBXrfewm+lb9ZfHC/APvE/2Ur
+	XQIGhwMoChC84/8tz6mMi/kD/PWwimxCIA3bjM52CU0V1Aqnelp+eMvuJm0rMYFKzTp9IUUlVvl
+	H1bqcYsacfBBeWDRiukbTnIsr3PoaKskCRFJgu6Z0z6dwi7m4s+9avRbJhA1r5hofFStozWxaWJ
+	OVngZwYwGALHO+PTvH0SW8iC5BD06lipW/iVDE40/P7F7zAxWnrrbyPBDWqv9wdc+hiEyq6gCvl
+	tPcL3XDNUY5yEaDePg8WM+2GNT5H
+X-Google-Smtp-Source: AGHT+IHrzD3MV8piW/3R5bZbNm50DZwa+/IsxY+cp8lTiOj949EZXhc7lXjq+S0IuHDeamFjuoLV5tVj/VL0xY2uTU4=
+X-Received: by 2002:a05:6000:2387:b0:3e9:b7a5:5dc9 with SMTP id
+ ffacd0b85a97d-42704d6d12fmr3503910f8f.23.1760725658228; Fri, 17 Oct 2025
+ 11:27:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20251016-xsk-v5-0-662c95eb8005@bootlin.com>
+In-Reply-To: <20251016-xsk-v5-0-662c95eb8005@bootlin.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 17 Oct 2025 11:27:26 -0700
+X-Gm-Features: AS18NWCyoIqaofAQbkOXYwS9xLsYBlc0BUliOKOZEhJe6-LQzeQc4XxtZWuyB4E
+Message-ID: <CAADnVQLLBrawW6N4BcPvhYD2Cg_qaxSZDRU53Jq31QxR3mPDkw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v5 00/15] selftests/bpf: Integrate test_xsk.c to
+ test_progs framework
+To: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
+Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Magnus Karlsson <magnus.karlsson@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+	Alexis Lothore <alexis.lothore@bootlin.com>, Network Development <netdev@vger.kernel.org>, 
+	bpf <bpf@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-And .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks to HNS3 framework
-to support HW timestamp configuration via netlink and adopt hns3pf to
-use .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
+On Thu, Oct 16, 2025 at 12:45=E2=80=AFAM Bastien Curutchet (eBPF Foundation=
+)
+<bastien.curutchet@bootlin.com> wrote:
+>
+> Hi all,
+>
+> Now that the merge window is over, here's a respin of the previous
+> iteration rebased on the latest bpf-next_base. The bug triggering the
+> XDP_ADJUST_TAIL_SHRINK_MULTI_BUFF failure when CONFIG_DEBUG_VM is
+> enabled hasn't been fixed yet so I've moved the test to the flaky
+> table.
+>
+> The test_xsk.sh script covers many AF_XDP use cases. The tests it runs
+> are defined in xksxceiver.c. Since this script is used to test real
+> hardware, the goal here is to leave it as it is, and only integrate the
+> tests that run on veth peers into the test_progs framework.
+>
+> Some tests are flaky so they can't be integrated in the CI as they are.
+> I think that fixing their flakyness would require a significant amount of
+> work. So, as first step, I've excluded them from the list of tests
+> migrated to the CI (cf PATCH 14). If these tests get fixed at some
+> point, integrating them into the CI will be straightforward.
+>
+> PATCH 1 extracts test_xsk[.c/.h] from xskxceiver[.c/.h] to make the
+> tests available to test_progs.
+> PATCH 2 to 7 fix small issues in the current test
+> PATCH 8 to 13 handle all errors to release resources instead of calling
+> exit() when any error occurs.
+> PATCH 14 isolates some flaky tests
+> PATCH 15 integrate the non-flaky tests to the test_progs framework
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
----
-v1 -> v2:
-- actually assign ndo_tstamp callbacks
----
- drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  5 +++
- .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 31 ++++++++++++++++++
- .../hisilicon/hns3/hns3pf/hclge_main.c        | 13 +++-----
- .../hisilicon/hns3/hns3pf/hclge_ptp.c         | 32 +++++++++++--------
- .../hisilicon/hns3/hns3pf/hclge_ptp.h         |  9 ++++--
- 5 files changed, 64 insertions(+), 26 deletions(-)
+Looks good, but why does it take so long to run?
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-index 3b548f71fa8a..d7c3df1958f3 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-@@ -804,6 +804,11 @@ struct hnae3_ae_ops {
- 	int (*dbg_get_read_func)(struct hnae3_handle *handle,
- 				 enum hnae3_dbg_cmd cmd,
- 				 read_func *func);
-+	int (*hwtstamp_get)(struct hnae3_handle *handle,
-+			    struct kernel_hwtstamp_config *config);
-+	int (*hwtstamp_set)(struct hnae3_handle *handle,
-+			    struct kernel_hwtstamp_config *config,
-+			    struct netlink_ext_ack *extack);
- };
- 
- struct hnae3_dcb_ops {
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index bfa5568baa92..7a0654e2d3dd 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -2419,6 +2419,35 @@ static int hns3_nic_do_ioctl(struct net_device *netdev,
- 	return h->ae_algo->ops->do_ioctl(h, ifr, cmd);
- }
- 
-+static int hns3_nic_hwtstamp_get(struct net_device *netdev,
-+				 struct kernel_hwtstamp_config *config)
-+{
-+	struct hnae3_handle *h = hns3_get_handle(netdev);
-+
-+	if (!netif_running(netdev))
-+		return -EINVAL;
-+
-+	if (!h->ae_algo->ops->hwtstamp_get)
-+		return -EOPNOTSUPP;
-+
-+	return h->ae_algo->ops->hwtstamp_get(h, config);
-+}
-+
-+static int hns3_nic_hwtstamp_set(struct net_device *netdev,
-+				 struct kernel_hwtstamp_config *config,
-+				 struct netlink_ext_ack *extack)
-+{
-+	struct hnae3_handle *h = hns3_get_handle(netdev);
-+
-+	if (!netif_running(netdev))
-+		return -EINVAL;
-+
-+	if (!h->ae_algo->ops->hwtstamp_set)
-+		return -EOPNOTSUPP;
-+
-+	return h->ae_algo->ops->hwtstamp_set(h, config, extack);
-+}
-+
- static int hns3_nic_set_features(struct net_device *netdev,
- 				 netdev_features_t features)
- {
-@@ -3048,6 +3077,8 @@ static const struct net_device_ops hns3_nic_netdev_ops = {
- 	.ndo_set_vf_rate	= hns3_nic_set_vf_rate,
- 	.ndo_set_vf_mac		= hns3_nic_set_vf_mac,
- 	.ndo_select_queue	= hns3_nic_select_queue,
-+	.ndo_hwtstamp_get	= hns3_nic_hwtstamp_get,
-+	.ndo_hwtstamp_set	= hns3_nic_hwtstamp_set,
- };
- 
- bool hns3_is_phys_func(struct pci_dev *pdev)
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index 9d34d28ff168..81d3bdc098e6 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -9445,15 +9445,8 @@ static int hclge_do_ioctl(struct hnae3_handle *handle, struct ifreq *ifr,
- 	struct hclge_vport *vport = hclge_get_vport(handle);
- 	struct hclge_dev *hdev = vport->back;
- 
--	switch (cmd) {
--	case SIOCGHWTSTAMP:
--		return hclge_ptp_get_cfg(hdev, ifr);
--	case SIOCSHWTSTAMP:
--		return hclge_ptp_set_cfg(hdev, ifr);
--	default:
--		if (!hdev->hw.mac.phydev)
--			return hclge_mii_ioctl(hdev, ifr, cmd);
--	}
-+	if (!hdev->hw.mac.phydev)
-+		return hclge_mii_ioctl(hdev, ifr, cmd);
- 
- 	return phy_mii_ioctl(hdev->hw.mac.phydev, ifr, cmd);
- }
-@@ -12901,6 +12894,8 @@ static const struct hnae3_ae_ops hclge_ops = {
- 	.get_dscp_prio = hclge_get_dscp_prio,
- 	.get_wol = hclge_get_wol,
- 	.set_wol = hclge_set_wol,
-+	.hwtstamp_get = hclge_ptp_get_cfg,
-+	.hwtstamp_set = hclge_ptp_set_cfg,
- };
- 
- static struct hnae3_ae_algo ae_algo = {
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-index 4bd52eab3914..0081c5281455 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-@@ -204,13 +204,17 @@ static int hclge_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
- 	return 0;
- }
- 
--int hclge_ptp_get_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
-+int hclge_ptp_get_cfg(struct hnae3_handle *handle,
-+		      struct kernel_hwtstamp_config *config)
- {
-+	struct hclge_vport *vport = hclge_get_vport(handle);
-+	struct hclge_dev *hdev = vport->back;
-+
- 	if (!test_bit(HCLGE_STATE_PTP_EN, &hdev->state))
- 		return -EOPNOTSUPP;
- 
--	return copy_to_user(ifr->ifr_data, &hdev->ptp->ts_cfg,
--		sizeof(struct hwtstamp_config)) ? -EFAULT : 0;
-+	*config = hdev->ptp->ts_cfg;
-+	return 0;
- }
- 
- static int hclge_ptp_int_en(struct hclge_dev *hdev, bool en)
-@@ -269,7 +273,7 @@ static int hclge_ptp_cfg(struct hclge_dev *hdev, u32 cfg)
- 	return ret;
- }
- 
--static int hclge_ptp_set_tx_mode(struct hwtstamp_config *cfg,
-+static int hclge_ptp_set_tx_mode(struct kernel_hwtstamp_config *cfg,
- 				 unsigned long *flags, u32 *ptp_cfg)
- {
- 	switch (cfg->tx_type) {
-@@ -287,7 +291,7 @@ static int hclge_ptp_set_tx_mode(struct hwtstamp_config *cfg,
- 	return 0;
- }
- 
--static int hclge_ptp_set_rx_mode(struct hwtstamp_config *cfg,
-+static int hclge_ptp_set_rx_mode(struct kernel_hwtstamp_config *cfg,
- 				 unsigned long *flags, u32 *ptp_cfg)
- {
- 	int rx_filter = cfg->rx_filter;
-@@ -332,7 +336,7 @@ static int hclge_ptp_set_rx_mode(struct hwtstamp_config *cfg,
- }
- 
- static int hclge_ptp_set_ts_mode(struct hclge_dev *hdev,
--				 struct hwtstamp_config *cfg)
-+				 struct kernel_hwtstamp_config *cfg)
- {
- 	unsigned long flags = hdev->ptp->flags;
- 	u32 ptp_cfg = 0;
-@@ -359,9 +363,12 @@ static int hclge_ptp_set_ts_mode(struct hclge_dev *hdev,
- 	return 0;
- }
- 
--int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
-+int hclge_ptp_set_cfg(struct hnae3_handle *handle,
-+		      struct kernel_hwtstamp_config *config,
-+		      struct netlink_ext_ack *extack)
- {
--	struct hwtstamp_config cfg;
-+	struct hclge_vport *vport = hclge_get_vport(handle);
-+	struct hclge_dev *hdev = vport->back;
- 	int ret;
- 
- 	if (!test_bit(HCLGE_STATE_PTP_EN, &hdev->state)) {
-@@ -369,16 +376,13 @@ int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
- 		return -EOPNOTSUPP;
- 	}
- 
--	if (copy_from_user(&cfg, ifr->ifr_data, sizeof(cfg)))
--		return -EFAULT;
--
--	ret = hclge_ptp_set_ts_mode(hdev, &cfg);
-+	ret = hclge_ptp_set_ts_mode(hdev, config);
- 	if (ret)
- 		return ret;
- 
--	hdev->ptp->ts_cfg = cfg;
-+	hdev->ptp->ts_cfg = *config;
- 
--	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
-+	return 0;
- }
- 
- int hclge_ptp_get_ts_info(struct hnae3_handle *handle,
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-index 61faddcc3dd0..0162fa5ac146 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-@@ -62,7 +62,7 @@ struct hclge_ptp {
- 	unsigned long flags;
- 	void __iomem *io_base;
- 	struct ptp_clock_info info;
--	struct hwtstamp_config ts_cfg;
-+	struct kernel_hwtstamp_config ts_cfg;
- 	spinlock_t lock;	/* protects ptp registers */
- 	u32 ptp_cfg;
- 	u32 last_tx_seqid;
-@@ -133,8 +133,11 @@ bool hclge_ptp_set_tx_info(struct hnae3_handle *handle, struct sk_buff *skb);
- void hclge_ptp_clean_tx_hwts(struct hclge_dev *hdev);
- void hclge_ptp_get_rx_hwts(struct hnae3_handle *handle, struct sk_buff *skb,
- 			   u32 nsec, u32 sec);
--int hclge_ptp_get_cfg(struct hclge_dev *hdev, struct ifreq *ifr);
--int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr);
-+int hclge_ptp_get_cfg(struct hnae3_handle *handle,
-+		      struct kernel_hwtstamp_config *config);
-+int hclge_ptp_set_cfg(struct hnae3_handle *handle,
-+		      struct kernel_hwtstamp_config *config,
-+		      struct netlink_ext_ack *extack);
- int hclge_ptp_init(struct hclge_dev *hdev);
- void hclge_ptp_uninit(struct hclge_dev *hdev);
- int hclge_ptp_get_ts_info(struct hnae3_handle *handle,
--- 
-2.47.3
+time ./test_progs -t xsk
+Summary: 2/66 PASSED, 0 SKIPPED, 0 FAILED
 
+real    0m29.031s
+user    0m4.414s
+sys     0m20.893s
+
+That's a big addition to overall test_progs time.
+Could you reduce it to a couple seconds?
 
