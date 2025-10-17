@@ -1,55 +1,43 @@
-Return-Path: <netdev+bounces-230490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38949BE91F3
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 16:14:36 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D428BE9223
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 16:16:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 380D21AA2009
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 14:14:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6C31A4F629A
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 14:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4565232C928;
-	Fri, 17 Oct 2025 14:14:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E56632C95B;
+	Fri, 17 Oct 2025 14:15:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Arpm9A9O"
+	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="tdvhWsDN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F88A32C924;
-	Fri, 17 Oct 2025 14:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF2132C946;
+	Fri, 17 Oct 2025 14:15:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760710456; cv=none; b=dcXNXUp04YIlueYkiEbKeYIms+FF6e/ltAYNa6C1UGcItXviEGHpfnqFmh2LpOEBONPRy2WhFRrkU6Er/SHny0aUSw7EGKJwSBj0cxR+CXyE+CQxPfuL7uwNMmsIUwPIQmNKj8NwKUfG5MZoaBg+hthhucBGEX6WTGsif90PHq0=
+	t=1760710535; cv=none; b=c7UGeH/bY21tC+Sw/o18e7CAI5nkRW7bHi7CY2r602wE2hhvfdShykDdr81+OEMAM2prftV1Sl+5+hk7ac9twESvOdZ2M7sX8E1NF41gq0IGBqS5/0sQQBl4cZ71GPXXZ+S4Z5onWVG9EgiktwTkHXRLllLL1yncVe9RLcBQRsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760710456; c=relaxed/simple;
-	bh=QYQqRTcp8A/geB7A9/E0yxzmXaEU4W1lxA8D4eW1+oA=;
+	s=arc-20240116; t=1760710535; c=relaxed/simple;
+	bh=th2Qlh3fS77eQJ9bDXg4SvSNkkzZckDQ2+t5qOAP2rA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QfhVNCcDxhEGfsnExW+8oY+3epCzQT6yZ3XCHJQl2dGyn03Hb2mTQyHX3PktkCrmHvQG0Of+HPNmK4h/TbIsOeRfDW8ZVqqDZN92feeGhYjKQgR007MxfzMGePqStiJg88ARyJDR9g4udHdSO8IYcrxpMRBc5bDxR8iWJZXRCX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Arpm9A9O; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 800384E41144;
-	Fri, 17 Oct 2025 14:14:06 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 4CBB6606DB;
-	Fri, 17 Oct 2025 14:14:06 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B6758102F235A;
-	Fri, 17 Oct 2025 16:13:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760710445; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=MuAoz+V2YdChsKDB39UbimB2KEWOPHvxJjC4UXDWnig=;
-	b=Arpm9A9OBvgEKac+NiV1ZGQn15/YYbia7KI4e1jFMpKpOU0TTJdEpbNdI2hnjdUJVhT7yb
-	PvsJv9qGJn5HA4Ehfp7rW7Q1wuse5EcZSRA9e1Lvci6rPhqkJ8kVH14PmNNdhjmGIFZH8n
-	WidX9RUsOVCBymMSMx7+GQgq/OTQPbDIvzhDN+U9xFIwkiE55WOxYmRajK/LiygrEyTRhh
-	5I8n0StC23Z5eQ47cw6OEqmKsZ+0lcxW3pXxbGCHR0EEIT6xtJnskYuVbbERq9CgddhxIu
-	aqnRPdydrgnPjN2mGcPwHOSaDeJQ864Aq0AWwetufhuOmzgViXxiqIsNv/xAWQ==
-Message-ID: <3e268abd-620c-470b-ba3b-222a0c39cac5@bootlin.com>
-Date: Fri, 17 Oct 2025 16:13:34 +0200
+	 In-Reply-To:Content-Type; b=FsPH7ngDxZe9T9skBtAjnj/TxXtVbOmRlsCIzfJcE283gK4K14/7p6I+E1l2Lm5iSCneKYrHcA9e4/urDFrat/dr5SjVRyu8z7ZAQBzpLGo1DaKHpD7fjI0mt0AfTXz6F/BSPgM2uE1X2m1o2Kf6huCAMcZJVTrTwn61Firni5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=tdvhWsDN; arc=none smtp.client-ip=95.168.196.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cdn77.com
+DKIM-Signature: a=rsa-sha256; t=1760710521; x=1761315321; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=hXKmsIldz9QqYvJfYTeLTtnXwnXEkz/LZjkPfMe+5tU=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:In-Reply-To:References;
+   b=tdvhWsDNZNEBUQVAGiA636NnpXjvHTM0mSiKJ7hu0tD0wLe+t5u4QDuvcZwAoljucA7Bs2X79ohRhxiyDhYXzpNV4YUowA5rVY1X0FCI9c7RK7esjmL+/vtgzzzcejrku8m9ovqqTZpd0AFTCvDuVi6kBmisQnv4io5unuFgn8Y=
+Received: from [192.168.88.20] ([188.75.189.151])
+        by mail.sh.cz (14.2.0 build 9 ) with ASMTP (SSL) id 202510171615201074;
+        Fri, 17 Oct 2025 16:15:20 +0200
+Message-ID: <209038ea-e4fa-423c-a488-a86194cd5b04@cdn77.com>
+Date: Fri, 17 Oct 2025 16:15:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,97 +45,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 1/5] ethtool: introduce core UAPI and driver
- API for PHY MSE diagnostics
-To: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>,
- Kory Maincent <kory.maincent@bootlin.com>, Nishanth Menon <nm@ti.com>
-Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
- linux-doc@vger.kernel.org, Michal Kubecek <mkubecek@suse.cz>,
- Roan van Dijk <roan@protonic.nl>
-References: <20251017104732.3575484-1-o.rempel@pengutronix.de>
- <20251017104732.3575484-2-o.rempel@pengutronix.de>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH] memcg: net: track network throttling due to memcg memory
+ pressure
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Muchun Song <muchun.song@linux.dev>, Tejun Heo <tj@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+ Matyas Hurtik <matyas.hurtik@cdn77.com>, Simon Horman <horms@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Wei Wang <weibunny@meta.com>,
+ netdev@vger.kernel.org, linux-mm@kvack.org, cgroups@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Meta kernel team <kernel-team@meta.com>
+References: <20251016013116.3093530-1-shakeel.butt@linux.dev>
+ <59163049-5487-45b4-a7aa-521b160fdebd@cdn77.com>
+ <pwy7qfx3afnadkjtemftqyrufhhexpw26srxfeilel5uhbywtt@cjvaean56txc>
 Content-Language: en-US
-In-Reply-To: <20251017104732.3575484-2-o.rempel@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
+From: Daniel Sedlak <daniel.sedlak@cdn77.com>
+In-Reply-To: <pwy7qfx3afnadkjtemftqyrufhhexpw26srxfeilel5uhbywtt@cjvaean56txc>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-CTCH: RefID="str=0001.0A2D0333.68F24F79.0006,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
 
-Hi Oleksij,
+On 10/16/25 6:02 PM, Shakeel Butt wrote:
+> On Thu, Oct 16, 2025 at 12:42:19PM +0200, Daniel Sedlak wrote:
+>> On 10/16/25 3:31 AM, Shakeel Butt wrote:
+>> I am curious how the future work will unfold. If you need help with future
+>> developments I can help you, we have hundreds of servers where this
+>> throttling is happening.
+> 
+> I think first thing I would like to know if this patch is a good start
+> for your use-case of observability and debugging.What else do you need
+> for sufficient support for your use-case?
 
-On 17/10/2025 12:47, Oleksij Rempel wrote:
-> Add the base infrastructure for Mean Square Error (MSE) diagnostics,
-> as proposed by the OPEN Alliance "Advanced diagnostic features for
-> 100BASE-T1 automotive Ethernet PHYs" [1] specification.
-> 
-> The OPEN Alliance spec defines only average MSE and average peak MSE
-> over a fixed number of symbols. However, other PHYs, such as the
-> KSZ9131, additionally expose a worst-peak MSE value latched since the
-> last channel capture. This API accounts for such vendor extensions by
-> adding a distinct capability bit and snapshot field.
-> 
-> Channel-to-pair mapping is normally straightforward, but in some cases
-> (e.g. 100BASE-TX with MDI-X resolution unknown) the mapping is ambiguous.
-> If hardware does not expose MDI-X status, the exact pair cannot be
-> determined. To avoid returning misleading per-channel data in this case,
-> a LINK selector is defined for aggregate MSE measurements.
-> 
-> All investigated devices differ in MSE capabilities, such
-> as sample rate, number of analyzed symbols, and scaling factors.
-> For example, the KSZ9131 uses different scaling for MSE and pMSE.
-> To make this visible to userspace, scale limits and timing information
-> are returned via get_mse_capability().
-> 
-> Some PHYs sample very few symbols at high frequency (e.g. 2 us update
-> rate). To cover such cases and allow for future high-speed PHYs with
-> even shorter intervals, the refresh rate is reported as u64 in
-> picoseconds.
-> 
-> This patch defines new UAPI enums for MSE capability flags and channel
-> selectors in ethtool_netlink (generated from YAML), kernel-side
-> `struct phy_mse_capability` and `struct phy_mse_snapshot`, and new
-> phy_driver ops:
-> 
->   - get_mse_capability(): report supported capabilities, scaling, and
->     sampling parameters for the current link mode
->   - get_mse_snapshot(): retrieve a correlated set of MSE values from
->     the latest measurement window
-> 
-> These definitions form the core API; no driver implements them yet.
-> 
-> Standardization notes:
-> OPEN Alliance defines presence and interpretation of some metrics but does
-> not fix numeric scales or sampling internals:
-> 
-> - SQI (3-bit, 0..7) is mandatory; correlation to SNR/BER is informative
->   (OA 100BASE-T1 v1.0 6.1.2; OA 1000BASE-T1 v2.2 6.1.2).
-> - MSE is optional; OA recommends 2^16 symbols and scaling to 0..511,
->   with a worst-case latch since last read (OA 100BASE-T1 v1.0 6.1.1; OA
->   1000BASE-T1 v2.2 6.1.1). Refresh is recommended (~0.8-2.0 ms for
->   100BASE-T1; ~80-200 us for 1000BASE-T1). Exact scaling/time windows
->   are vendor-specific.
-> - Peak MSE (pMSE) is defined only for 100BASE-T1 as optional, e.g.
->   128-symbol sliding window with 8-bit range and worst-case latch (OA
->   100BASE-T1 v1.0 6.1.3).
-> 
-> Therefore this UAPI exposes which measures and selectors a PHY supports,
-> and documents where behavior is standard-referenced vs vendor-specific.
-> 
-> [1] <https://opensig.org/wp-content/uploads/2024/01/
->      Advanced_PHY_features_for_automotive_Ethernet_V1.0.pdf>
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Yes, it is a good start, we can now hook this easily into our monitoring 
+system and detect affected servers more easily.
 
-This looks good to me,
+> I imagine that would be
+> tracepoints to extract more information on the source of the throttling.
+> If you don't mind, can you take a stab at that?
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+We have some tracepoints that we have used for debugging this. We would 
+like to upstream them, if that makes sense to you?
 
-Maxime
+Thanks!
+Daniel
 
 
