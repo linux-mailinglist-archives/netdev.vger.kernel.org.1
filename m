@@ -1,205 +1,149 @@
-Return-Path: <netdev+bounces-230551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A80BEB093
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 19:15:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BBBBBEB09E
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 19:15:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF40A1AE4429
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:15:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB15E1AE4447
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:15:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8FAD2FFFAC;
-	Fri, 17 Oct 2025 17:15:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BE8301480;
+	Fri, 17 Oct 2025 17:15:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="EyJ3Ritd";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="G5OJjiMU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ik8IJV+r"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07C32F7AA4;
-	Fri, 17 Oct 2025 17:15:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148972F12C6
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 17:15:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760721303; cv=none; b=T/YAj7WrxQHzimeYYISRaM5+uZE21blDsGHsXQq0ZQylCXi656rlpwWfSPdJD6A9qD3YAkrDTyiFZyjTP92sSBHhlgzzGGpLsMtUx0svTEVXSBVa7vD5koXUdCZmUDrJTt/prCUGiLqAOqNdwHgL8Enr7zlO/pNwEVzXaQ8wR0M=
+	t=1760721324; cv=none; b=HPjw+t5C/wOhlMRRTAyJPMH5HOqNkkzoE505xVhAV1TLvTgo1VNQurDTIXTyM6eWRPycJOTQ21RTQXeBIw08jeOhfH2yHc4x8TYgbQE8xJEVvsDvPECEakqzPAOnCSVv6CDWeKn3bQm/nRpBs03CE1n51Z6/2ArK66+yDol4BGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760721303; c=relaxed/simple;
-	bh=4bICVGavWChlDZg37T7ku/ExiWs07y59S0fSQ/6DfP0=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=L8SwjhNrmXh4hG4ipW1EhK93+zRBFHEU9AdHYrMF+DVzER1hcXof/usnNnNAF4R9F3EivOp/1fPUwoY599IJNBLh4hkHQpRPsWNmU9GRb5AfoTpi9ky9CkL4MabfayqFKershyEg9mZORsnMYeDmBaCjDh+Lqqgrd9F0BVFtI1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=EyJ3Ritd; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=G5OJjiMU; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id D84741400129;
-	Fri, 17 Oct 2025 13:14:59 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Fri, 17 Oct 2025 13:14:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm1; t=1760721299; x=1760807699; bh=yJmVJ+OLzQYoiPZM+TzxD
-	SB3PlWcNp/ysew4LoWAjMU=; b=EyJ3Ritd1m1hm/Jct7eksIJi/QPhkY+1QcdW2
-	XkgluYjULgkHvpds3XDQJUwZ94HjMqs+aLhUlGLt7XZ/uKsy3axuR0qojvAXgtn3
-	zQ3DNI2oSBcD9w/u+JpRlKW6jSi3d3eVDWPdAdpr6OCsZxNy3edotDEo3eszSW0O
-	DqEXRcNlmN14szwqOCudH5XlH030BX139C5GFohLbfOsQ+AXRlUP67o155PcvRCU
-	Yx2J3vN+XQtO4nNZFDuMQLFXY7VzSYDfY+rbR54z/4i0kCiVSqu4wPpGI1LoDFUt
-	b7wq7ZPgUEr9G775+5g+JobeqbyZrDDasmlL3n+Yt6WHOdNnw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1760721299; x=1760807699; bh=yJmVJ+OLzQYoiPZM+TzxDSB3PlWcNp/ysew
-	4LoWAjMU=; b=G5OJjiMUjtQgrwNAKyIunjRPCBnMygCTUvVrcH2ovMpt+ZR7Q0a
-	n++O4+zvs7wT9VwynfhBp9hhvPfXTAgspaJaDdbO9WAnPQvawC6WODz9f/vaFyvC
-	FQ10CJdhCyb05aAxCTftFpT81LqYvXwGJKvryCyvFl1E7P0D6iztSMbp6OMzvdyQ
-	Jp5OgM+rT33g2rK3XzPlYLSHtn7FTlZ3olVTXTSd1pzspvrlE9JB4j367FgbFmQZ
-	VZr/NyY5ej2i+2uwwo6+SvosO/JuQRkIpslNoRI/qRLzsd4BrX0uySyaFNJLZhT2
-	L/OjSFNWkg/6eMiQXQ8+dG+J9U38VVLsetA==
-X-ME-Sender: <xms:knnyaIe9MW-PLxnGK7cMRamfDjYk5I2BnGszxrzw9dBY_FrsmVSjXA>
-    <xme:knnyaAucVjjUJS2Hyf1YVB37cyUBmwaAaHfUthZkpXBMSVqJS390h5bCziND9212M
-    8Zn7nS3FRGfqKiAHXEZ5tzqx3DCI0i2KNJhWoiqT56YoDuZrZ1eA3w>
-X-ME-Received: <xmr:knnyaHhdIMqL0JGqXWeQwyqonkO5oH6Jc48DM1M5Pm6vXwOP8WgiGpLT4wPG856NfN8wqg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdeljeegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefujghfofggtgfgfffksehtqhertdertddvnecuhfhrohhmpeflrgihucgg
-    ohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvg
-    hrnhepueffvedvvdefudejfeeuudfgtdfgudettdevfeeileffhffghfdtjeekhfeitdek
-    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjhhvohhssghurhhghhdrnhgvthdpnhgs
-    pghrtghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehtohhngh
-    hhrghosegsrghmrghitghlohhuugdrtghomhdprhgtphhtthhopehrrgiiohhrsegslhgr
-    tghkfigrlhhlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnh
-    gvthdprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhmrghilhdrtghomhdprhgtphht
-    thhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmsh
-    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhhirhhishhlrggshieskhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    grnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
-X-ME-Proxy: <xmx:knnyaAvoC2yhvEoSPw0yjbkHcevpaasXFGmpGg7nCw1YyJiokrI5UA>
-    <xmx:knnyaK-RnaGu3tKA2k2XUhz89VEgu8gieD_NQpW_cPgwvVxTxvn6yQ>
-    <xmx:knnyaOY0FA5_K8IbP_Wq036NoQpq_5fuwCV3gyHecOjV41q2Vxky2w>
-    <xmx:knnyaIp3oCXJO5Sz9tv9BQ9gfXPeXClsbNwDBfwb-lVQNCu5jT_7oQ>
-    <xmx:k3nyaFmESaXLd_7o-_HMmkfrO_EKmB5avrTyXO4a6XEgKLwBwR65yEMm>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 17 Oct 2025 13:14:58 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id F0FCA9FC61; Fri, 17 Oct 2025 10:14:56 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id EDCDD9FB78;
-	Fri, 17 Oct 2025 10:14:56 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Tonghao Zhang <tonghao@bamaicloud.com>
-cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-    Jonathan Corbet <corbet@lwn.net>,
-    Andrew Lunn <andrew+netdev@lunn.ch>,
-    Nikolay Aleksandrov <razor@blackwall.org>,
-    Hangbin Liu <liuhangbin@gmail.com>,
-    Jiri Slaby <jirislaby@kernel.org>, stable@vger.kernel.org
-Subject: Re: [PATCH net v2] net: bonding: update the slave array for broadcast
- mode
-In-reply-to: <20251016125136.16568-1-tonghao@bamaicloud.com>
-References: <20251016125136.16568-1-tonghao@bamaicloud.com>
-Comments: In-reply-to Tonghao Zhang <tonghao@bamaicloud.com>
-   message dated "Thu, 16 Oct 2025 20:51:36 +0800."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1760721324; c=relaxed/simple;
+	bh=PTe+dRMjjEdRz7HMYRB8/b977V5NY2J45HmjgRVliVE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=agDu1/PyGXNj1Z9R4ZRV6KV/PM7JzhkeaL5P/EpYjeccjnQ5s7KHg9RCusv5C3eVajaUzRw1R7WyWU2GYtmyjHNDfV6eTLFAuK1gAlt+TYAXh7V28KANQ8bMukHGWM6IQdoVh8YnzPfM/aAGwuSPQOhG8xOCX1vR18+SQopALis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ik8IJV+r; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-63c2d72582cso1478815a12.1
+        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 10:15:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760721320; x=1761326120; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=erzvErFOuLAlu2WyRngTfkGBQrXV/AI4uNuvvvLtDAM=;
+        b=Ik8IJV+rCGPxvPfFc0ax/4m7CQRXfq1I/YZNlTlReNsZbdbsgMYSbBTHU877jI7bV3
+         mi8/OPAJp59VlTQ9FnXTmt14tUsZCemSOV2UPLJXnFoJ31WggpfcByJ2lXpdKRVtS8Ml
+         S7nj/spySATy7dEgZTVNgm3QlHF9V0xAhoX6kso5gzjvbOWHw+ATSPIL2LDEtKW0/Vh4
+         2ZM9hBcwgbaGacWANnhmp3/GWf4aUDN6pG6ai3OqmWj8j1MzX7W5E8DBk0Sfy8viTuct
+         mzZYnan8Hz0UlxMuGBh3OEkH2ntJ5Yf/XWorag8UAWs8M2yYp8tRc8DIvou/Mwowv/0k
+         0Akg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760721320; x=1761326120;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=erzvErFOuLAlu2WyRngTfkGBQrXV/AI4uNuvvvLtDAM=;
+        b=UgHYuBXVidqvYdFq2RVwNR2olroSRU35TVyuzyK1j6+p1TvdLT/Tv3tBb5mXnCKRT0
+         QUjzM50YO44aLM6l3a0h2wL2LZWadzOwH469xTAffsHPKsxobkFzCozqE4LZsRUewkPu
+         ep7XCNe0fRmVebWfBbB3ywKky5/I+1gvMYlOZ73xet4PlL8DwhiibEG+/orYKSzq41WT
+         2ZrexjSzNHAWmxHVuDXM/bXDyp88XUkzYTXwOII2Och29+h4jQMFfODNdpbU0o5mKMwW
+         xg8Hpy7DFi2aGhKcR8H8yBXZSG4gj4rskJAr/qG69HBC7aoS3ciR3n67RiI0EIJOTC+/
+         ky8A==
+X-Forwarded-Encrypted: i=1; AJvYcCXZC8DsD8BfVnZvhUup1ZnISG/Z05qw0XioF40+eDFDbddInfpX5otseCD5HAmo2W2+aw7uazg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxz+uQ/IwadOMmnQ58WvdN1R47+0YqiwbCeS9HUcaY3+cCGqEgx
+	Fod5FT98z20bmVVDaJo9sCrt5ujd60Ko7PHCSJVAOWzxVUNEtDwGBVx0
+X-Gm-Gg: ASbGnctqYqLzMRQJrqO9w5qdZmONWQGAFnGrkiLQxoj+5GICGXTFpfZKDH3dcHF5d0r
+	W1JBzo4Gi2DcxTwxT6e1nANFzB+pqzMuoo7M76IFlnZxkYjLC5jWbCGel5VIKUM6hj6psOUQ+WQ
+	QYN6Ro+1vRFQZKn7mNI+Q8TmqtpFb+1ye5npeauEScrHRZ7DfIWTB7x7a5PknUlcdk2TiNTeA+l
+	VRM1krg7FhpfiW1V/+f6jxlMEpHNb9deugtI4ePzZ4SukgHtVrcUmJ/qQeYJSZC1d6PWlKo1mE0
+	NH3gBYtaR5jEZZlKdEYFOPRoVldBHb6jEI4EVbERjf66vkRnKvXO2eGRq5e+5KQo4QV6C94LP3H
+	mBbk1WeJLiF0IvAL1/UtJNZy5+9a+RnlpGC/w3ZqUW6+oWcM1a3eUeCgj8ilVBTAgMErVzX4cv2
+	WZPLL0lOn6st732Z2E77WVZP/7j40=
+X-Google-Smtp-Source: AGHT+IE5Zw3rQxm/Y37fbi6ptZgeE5aH3alHgFtNRGifq3aMvpVdl0YWLVe15T9b0wrPXZ7jYbyBTQ==
+X-Received: by 2002:aa7:cb0f:0:b0:639:720d:72d with SMTP id 4fb4d7f45d1cf-63c1f6d5bc3mr2793191a12.29.1760721320098;
+        Fri, 17 Oct 2025 10:15:20 -0700 (PDT)
+Received: from foxbook (bey128.neoplus.adsl.tpnet.pl. [83.28.36.128])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63c48a928dasm203300a12.2.2025.10.17.10.15.18
+        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
+        Fri, 17 Oct 2025 10:15:19 -0700 (PDT)
+Date: Fri, 17 Oct 2025 19:15:11 +0200
+From: Michal Pecio <michal.pecio@gmail.com>
+To: Alan Stern <stern@rowland.harvard.edu>
+Cc: yicongsrfy@163.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, oliver@neukum.org, pabeni@redhat.com
+Subject: Re: [PATCH net v5 2/3] net: usb: ax88179_178a: add USB device
+ driver for config selection
+Message-ID: <20251017191511.6dd841e9.michal.pecio@gmail.com>
+In-Reply-To: <db3db4c6-d019-49d0-92ad-96427341589c@rowland.harvard.edu>
+References: <20251013110753.0f640774.michal.pecio@gmail.com>
+	<20251017024229.1959295-1-yicongsrfy@163.com>
+	<db3db4c6-d019-49d0-92ad-96427341589c@rowland.harvard.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <775229.1760721296.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Oct 2025 10:14:56 -0700
-Message-ID: <775230.1760721296@famine>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Tonghao Zhang <tonghao@bamaicloud.com> wrote:
+On Fri, 17 Oct 2025 09:10:22 -0400, Alan Stern wrote:
+> On Fri, Oct 17, 2025 at 10:42:29AM +0800, yicongsrfy@163.com wrote:
+> > > > +	/* The vendor mode is not always config #1, so to find it out. */
+> > > > +	c = udev->config;
+> > > > +	num_configs = udev->descriptor.bNumConfigurations;
+> > > > +	for (i = 0; i < num_configs; (i++, c++)) {
+> > > > +		struct usb_interface_descriptor	*desc = NULL;
+> > > > +
+> > > > +		if (!c->desc.bNumInterfaces)
+> > > > +			continue;
+> > > > +		desc = &c->intf_cache[0]->altsetting->desc;
+> > > > +		if (desc->bInterfaceClass == USB_CLASS_VENDOR_SPEC)
+> > > > +			break;
+> > > > +	}
+> > > > +
+> > > > +	if (i == num_configs)
+> > > > +		return -ENODEV;
+> > > > +
+> > > > +	return c->desc.bConfigurationValue;
+> > > > +}  
+> > >
+> > > I wonder how many copies of this code would justify making it some
+> > > sort of library in usbnet or usbcore?  
+> > 
+> > Yes, there are many similar code instances in the USB subsystem.
+> > However, I'm primarily focused on the networking subsystem,
+> > so my abstraction work here might not be thorough enough.
+> > Hopefully, an experienced USB developer may can optimize this issue.  
+> 
+> Would it help to have a USB quirks flag that tells the core to prefer 
+> configurations with a USB_CLASS_VENDOR_SPEC interface class when we 
+> choose the device's configuration?  Or something similar to that (I'm 
+> not sure exactly what you are looking for)?
 
->This patch fixes ce7a381697cb ("net: bonding: add broadcast_neighbor opti=
-on for 802.3ad").
->Before this commit, on the broadcast mode, all devices were traversed usi=
-ng the
->bond_for_each_slave_rcu. This patch supports traversing devices by using =
-all_slaves.
->Therefore, we need to update the slave array when enslave or release slav=
-e.
->
->Fixes: ce7a381697cb ("net: bonding: add broadcast_neighbor option for 802=
-.3ad")
->Cc: Jay Vosburgh <jv@jvosburgh.net>
->Cc: "David S. Miller" <davem@davemloft.net>
->Cc: Eric Dumazet <edumazet@google.com>
->Cc: Jakub Kicinski <kuba@kernel.org>
->Cc: Paolo Abeni <pabeni@redhat.com>
->Cc: Simon Horman <horms@kernel.org>
->Cc: Jonathan Corbet <corbet@lwn.net>
->Cc: Andrew Lunn <andrew+netdev@lunn.ch>
->Cc: Nikolay Aleksandrov <razor@blackwall.org>
->Cc: Hangbin Liu <liuhangbin@gmail.com>
->Cc: Jiri Slaby <jirislaby@kernel.org>
->Cc: <stable@vger.kernel.org>
->Reported-by: Jiri Slaby <jirislaby@kernel.org>
->Tested-by: Jiri Slaby <jirislaby@kernel.org>
->Link: https://lore.kernel.org/all/a97e6e1e-81bc-4a79-8352-9e4794b0d2ca@ke=
-rnel.org/
->Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
->Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+Either that or just patch usb_choose_configuration() to prefer vendor
+config *if* an interface driver is available. But not 100% sure if that
+couldn't backfire, so maybe only if the driver asked for it, indeed.
 
-Acked-by: Jay Vosburgh <jv@jvosburgh.net>
+I was looking into making a PoC of that (I have r8152 with two configs)
+but there is a snag: r8152-cfgselector bails out if a vendor-specific
+check indicates the chip isn't a supported HW revision.
 
->---
->v2:
->- fix the typo in the comments, salve -> slave
->- add the target repo in the subject
->---
-> drivers/net/bonding/bond_main.c | 7 +++++--
-> 1 file changed, 5 insertions(+), 2 deletions(-)
->
->diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
-ain.c
->index 17c7542be6a5..2d6883296e32 100644
->--- a/drivers/net/bonding/bond_main.c
->+++ b/drivers/net/bonding/bond_main.c
->@@ -2384,7 +2384,9 @@ int bond_enslave(struct net_device *bond_dev, struc=
-t net_device *slave_dev,
-> 		unblock_netpoll_tx();
-> 	}
-> =
+So to to fully replicate r8152-cfgselector, core would neet to get new
+"pre_probe" callback in the interface driver. It gets complicated.
 
->-	if (bond_mode_can_use_xmit_hash(bond))
->+	/* broadcast mode uses the all_slaves to loop through slaves. */
->+	if (bond_mode_can_use_xmit_hash(bond) ||
->+	    BOND_MODE(bond) =3D=3D BOND_MODE_BROADCAST)
-> 		bond_update_slave_arr(bond, NULL);
-> =
+A less complicated improvement could be moving the common part of all
+cfgselectors into usbnet. Not sure if it's worth it yet for only two?
 
-> 	if (!slave_dev->netdev_ops->ndo_bpf ||
->@@ -2560,7 +2562,8 @@ static int __bond_release_one(struct net_device *bo=
-nd_dev,
-> =
-
-> 	bond_upper_dev_unlink(bond, slave);
-> =
-
->-	if (bond_mode_can_use_xmit_hash(bond))
->+	if (bond_mode_can_use_xmit_hash(bond) ||
->+	    BOND_MODE(bond) =3D=3D BOND_MODE_BROADCAST)
-> 		bond_update_slave_arr(bond, slave);
-> =
-
-> 	slave_info(bond_dev, slave_dev, "Releasing %s interface\n",
->-- =
-
->2.34.1
->
+Regards,
+Michal 
 
