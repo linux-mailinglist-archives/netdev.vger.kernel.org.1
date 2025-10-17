@@ -1,378 +1,185 @@
-Return-Path: <netdev+bounces-230613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBA73BEBDE5
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 23:57:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18CB2BEBE14
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 00:05:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4485A4FD389
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 21:56:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6AFE402A81
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 22:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC6C4332EA9;
-	Fri, 17 Oct 2025 21:56:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385A3261B91;
+	Fri, 17 Oct 2025 22:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lDAxqkRt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b/XLr+sK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D058732ED59
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 21:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97FC823BD06
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 22:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760738195; cv=none; b=m3K8pxNTCWl7Yz2dew0V39dc1I+sk3r2QODHtK+g+p+ixhMe9KfUtS00vVC9keb3oJcYcSWIpnhcKmxjE+OvQZ2yEk3Oe+Db+RvdyULDwqC9dDMedYbKYHNLTVrJCxaVfUwIaLmQoa2XqDbbtxScQ9uFR5txTgE6Caj6BS0GgWw=
+	t=1760738708; cv=none; b=Thp10+QKSXqaEY9+TDq9w0Rg4cpFdFUN4HKFQtIWdyzVzWQnk+Iy/evV3+yAEb31Vrr0fxfm+eewhyTLWzrCY51XEz7qKP+SEiHcij2JM3KS+kYHlZlv8jkgOjlrdm8crsT057h37N58kj41JHckWYHc0dKQBRR7P9D57vwrGy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760738195; c=relaxed/simple;
-	bh=ke/nIytaKFzLHKB2rcdj5OjFMh0y4TieMmEtP2B34VU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QyH+8e5JkkkwPK4dtiCOQcBvBBpzjPdThgeEE0VAqF4K85sMVVRWaR//XnNLWddqgIfF/kt8o3uLNDQagtxrsyx3zsHTxqIWm3i/OH3DXg8NIdUkU6wFLsuQFyyfhK6tWGCwtMHmTn4Tgy+UcwsMKGyaAUMu2CmJoR4cdTIsNww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lDAxqkRt; arc=none smtp.client-ip=209.85.210.179
+	s=arc-20240116; t=1760738708; c=relaxed/simple;
+	bh=L/v3CTudYliQuwWtD7vEW8OqVQUXTzmYJnx6dWikryU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PPyy8HYNN6wCcmfNwmrA7uXPnHYt6S2GhPiVnkbcDPPMg2a+wXSp3SA9nj3QgqPeXLZnT+XPyDf0YgL1Miil7LXV/G9ZKLY1+s7SVnKekivkiCppHfceLSH4GEypQfCJ0jhBfLJ/DzaU1qg9MNIOxSNqkhqTsZ1x5onLCvUH0Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b/XLr+sK; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7811fa91774so2214163b3a.0
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 14:56:33 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-76e2ea933b7so2342689b3a.1
+        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 15:05:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760738193; x=1761342993; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1760738706; x=1761343506; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=axJAoxdtPTp0CVbeRD9RIHfj3kPMwawid7xhixQA1zs=;
-        b=lDAxqkRtvuz1nrkr8BC3vqNXwKERYeVc5KKJIBbuZTv73iLHjvhKYfMNUDQ1I+CZov
-         osIy6VMSxSbDFzCDazVPN2PDcTBQYoXCnT73CZWX11e1v5BoHB5vpdsMKmEtByXgR2ni
-         3c2lqyu245jmJoZ/r6sOLeJPqZ/NimN1zU/6cKmG0auBfN8p/lmu/yVBCfbWPmWp5iS2
-         qecPW4JgB5erloSfP8APkd9zR4oEawqGhIHLV4i1R0GUfAnzdhw/ER+KB2HlO0LVAUiV
-         2SnZY5IM7yYxTL0FigctNwPUgAx0JIZkiee0NlrHnVTETva+xRbiGl63l5UfdWS033jD
-         daeQ==
+        bh=X5N25k40+HpXv+7dIs8x9peeiwcAwgumjCpa41Pq1oE=;
+        b=b/XLr+sKvgAEsaabP93Hu0ShkOdwW/zoryuJvoSQEw26qKVAKwJuva++deMXP5oj8A
+         hAEUwDVAgN6ToQQATVdZMJ/cPKaWSXwJuj+USki0L6mjAks7iI+CNiJf2dRFEFm5gXLx
+         R25lplaipT3Vw1ZhiKB79aowz/IN5nyY/RJ+o01BUfo74pKPhDHSie8oP20m9lSnf6uo
+         /F1WPT1FPCnZM7N6ZxBS7WxASql8l8T8x6z9E4WWzgHw12pCX4AfB/sBSbPNi+U+UEAo
+         9LvZRyREPVLXFK58e9O0JAYSNz5kthLLCKUxVMEb/SVRAO8DwGzrRFLq/B8FW1NT/MBu
+         CCxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760738193; x=1761342993;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1760738706; x=1761343506;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=axJAoxdtPTp0CVbeRD9RIHfj3kPMwawid7xhixQA1zs=;
-        b=mKY0jhoZWkpDWc/G/5xydhyHtOicg9yjDX4WbNuO6j5e54rNA1a7jRRbmmiFj+KbTl
-         HPOQcXLjuGywluAD4mol5pJXvuYFY3W3kmvBNVrlncQ38RIO21x/8sY04XROOKuhlEF2
-         xRN6znASV6l99IT07Rw6eVUu6uugrLXX0M8cCixlRcpCX9Vh+BPZeTxitbAY8i036QlY
-         oUc2z+sglg+QiyrBRFJ1/5LJ+xmpow3YOkDrrCcY08QARDLxwp0Ntm/+vs84r89RxPvb
-         fJgnb66TcLZt56DNRrslCDtzeYVLvziu+tgDaKH2POZE8oHM6wepqyO0J6hODJlz8AsN
-         szsg==
-X-Gm-Message-State: AOJu0YzHUuL/K7+GFImqPek189RarCJdpYYvY9bRE7PJehlmd23tzLrP
-	jRsay37hHIMye1km6LUNiAaK2a08afmySEJvtAX6T6ufiFHHv+3Nm0pJWuX73A==
-X-Gm-Gg: ASbGnctbGtMnPM+Q8j9vOKNYXfXOfPIc1ag7NLcS6EXhlUpWpDrTAaHmhMhAx3gssKE
-	C5GBOxkMVuztl6BYh0rirS3OB3/e25ka3ezD7sH6sc6UpL3MK/KgN4ay0pNBjSJwyfWwSkkn9+7
-	j65IzcCv5Z9Pk4zVZZLCSkmHMfshmGRw/TVfwFBdLmZNVhOMALCRg9NWGcwAj3FSX0dXDiJ1HNX
-	/XVxCGE3LinOGJweNMfQXvfDjL43mhpYKqZMsVHF9ACagZRVTeaplSvr0g7VsPk44L2NKB6Lw1K
-	mIBo8+9Wyfppfhxflgyu0FRmr9CMKAkyufwgclmUoVcYRtO0SAZoLkVd8hAKYHB1mfuweVekHwR
-	73YbVZBCGgwLWcOLN5UkYeYbnSDDPJfuycTIaOg2mmam+O8LkCm6u/+mtUsYrm26jbA==
-X-Google-Smtp-Source: AGHT+IH2B5wNINI3lMc0wTDaSuiJJ59iSl/DK1gpXKcM9DpFStSWmcNi6aw1o06pp8b7Wkc7BFKUsg==
-X-Received: by 2002:a05:6a20:4323:b0:2f4:a8f:7279 with SMTP id adf61e73a8af0-334a862e040mr7707477637.54.1760738193166;
-        Fri, 17 Oct 2025 14:56:33 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:e::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a22ff39442sm626805b3a.20.2025.10.17.14.56.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Oct 2025 14:56:32 -0700 (PDT)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	tj@kernel.org,
-	martin.lau@kernel.org,
-	ameryhung@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next v3 4/4] selftests/bpf: Test BPF_PROG_ASSOC_STRUCT_OPS command
-Date: Fri, 17 Oct 2025 14:56:27 -0700
-Message-ID: <20251017215627.722338-5-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251017215627.722338-1-ameryhung@gmail.com>
-References: <20251017215627.722338-1-ameryhung@gmail.com>
+        bh=X5N25k40+HpXv+7dIs8x9peeiwcAwgumjCpa41Pq1oE=;
+        b=c7dMzXJ8cwQeIypNgDVW8lCfFxNwk09x39j5FZMYpvxAOWjR/n0PzLlNCCZDOhgT/C
+         dLklKUhlmvnkpfK7qPX+DWBkZOmv2pm7DRMzzhjBUbLKjh04nEd7m836jis85jay423h
+         6k8WagB1s6lGw/AZrLzp4KaAyB4loAHoe4U4ASJR/RAYPVnqPiPkVqjWdTcEHRPEuotA
+         UB5qr4dKlq7ySvvSQ8p4sRSKY+rfPx6kR/smKNfESFrQogXu4iv6jyy+sn75vHPUHwHb
+         bt5zNO9YC2kc5yqnzYv9ZOQZb9szEsFWzYp3zK/lTKEUQfe59AI94WTD+ziB7HEGgayx
+         1pkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXOIMNhplAoM4wXcrXMGNyHZZsWA39U05wZKnY0NVF1KZdGEcO+AY9ReIjj/iFHexnYZ0Ih+Mk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJmQZ62hpHHXwawIxStR874OEDyX23U+Lm+xi2HEssmxvo2FU5
+	7oJXrLBBVlHRpnMg3aDjL/O6xwNom8AXoi4RkdA60ljqUuBk/IxtBCwrvbOSICnrr9Nmb3bBdGn
+	+AoTf1ICC/aoFtEYels/lmMerp1p1If8=
+X-Gm-Gg: ASbGncshH67z1v1JYsF9AzwKd12/4PKbMBTX+o51ES2Uvq4cIynoWHaHREQj3UXEFOx
+	6tLu8LbsD7T1V0QvDGl1QyTDTVbWT8p2NRzGgXf1M4nzsX58PSLBT+9+Kg0IAsHJyMLfCorgfM0
+	MJu9nK0ByaoTdRAalVILWIBZO0jTEpb740UPlKJjmIIawLS3kZW7Wn4XXpjymEg8WoPbf1g87Km
+	rRDSFlyGr0L2wpT1OyQqgHMoFTO+Fd0BadrFF5NXFFH8DTuaNwD3yUVcs0uWnJLPsCy
+X-Google-Smtp-Source: AGHT+IFiuXNUTpXYxfdpvqV+gLBa2YeIV2vx00ctFQ7hYpKwEysWT8im2YJgk8k3lQmmp9gMaqJes3Gfdh21dO/ZiDM=
+X-Received: by 2002:a05:6a20:549d:b0:32d:a6c0:15bb with SMTP id
+ adf61e73a8af0-334a7a5fed0mr6484069637.31.1760738705834; Fri, 17 Oct 2025
+ 15:05:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251017215627.722338-1-ameryhung@gmail.com> <20251017215627.722338-3-ameryhung@gmail.com>
+In-Reply-To: <20251017215627.722338-3-ameryhung@gmail.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 17 Oct 2025 15:04:52 -0700
+X-Gm-Features: AS18NWCAT-OoCMOJRJGYTJr1PPe2I6Y44OtQD5sgdSoMYhQcOAV5Pm1z1pkiGuA
+Message-ID: <CAEf4BzaRxpR5XLJmFopwq-asBUv0vJ2RZtcx2f=+XbfcCgBeFA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 2/4] bpf: Support associating BPF program with struct_ops
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
+	kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Test BPF_PROG_ASSOC_STRUCT_OPS command that associates a BPF program
-with a struct_ops. The test follows the same logic in commit
-ba7000f1c360 ("selftests/bpf: Test multi_st_ops and calling kfuncs from
-different programs"), but instead of using map id to identify a specific
-struct_ops, this test uses the new BPF command to associate a struct_ops
-with a program.
+On Fri, Oct 17, 2025 at 2:56=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wr=
+ote:
+>
+> Add a new BPF command BPF_PROG_ASSOC_STRUCT_OPS to allow associating
+> a BPF program with a struct_ops map. This command takes a file
+> descriptor of a struct_ops map and a BPF program and set
+> prog->aux->st_ops_assoc to the kdata of the struct_ops map.
+>
+> The command does not accept a struct_ops program or a non-struct_ops
+> map. Programs of a struct_ops map is automatically associated with the
+> map during map update. If a program is shared between two struct_ops
+> maps, prog->aux->st_ops_assoc will be poisoned to indicate that the
+> associated struct_ops is ambiguous. The pointer, once poisoned, cannot
+> be reset since we have lost track of associated struct_ops. For other
+> program types, the associated struct_ops map, once set, cannot be
+> changed later. This restriction may be lifted in the future if there is
+> a use case.
+>
+> A kernel helper bpf_prog_get_assoc_struct_ops() can be used to retrieve
+> the associated struct_ops pointer. The pointer returned, if not NULL, is
+> guaranteed to be valid and point to a fully updated struct_ops struct.
+> This is done by increasing the refcount of the map for every associated
+> non-struct_ops programs. For struct_ops program reused in multiple
+> struct_ops map, the return will be NULL. struct_ops implementers should
+> note that the struct_ops returned may or may not be attached. The
+> struct_ops implementer will be responsible for tracking and checking the
+> state of the associated struct_ops map if the use case requires an
+> attached struct_ops.
+>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
+>  include/linux/bpf.h            | 16 ++++++++
+>  include/uapi/linux/bpf.h       | 17 +++++++++
+>  kernel/bpf/bpf_struct_ops.c    | 70 ++++++++++++++++++++++++++++++++++
+>  kernel/bpf/core.c              |  3 ++
+>  kernel/bpf/syscall.c           | 46 ++++++++++++++++++++++
+>  tools/include/uapi/linux/bpf.h | 17 +++++++++
+>  6 files changed, 169 insertions(+)
+>
 
-The test consists of two sets of almost identical struct_ops maps and BPF
-programs associated with the map. Their only difference is the unique
-value returned by bpf_testmod_multi_st_ops::test_1().
+[...]
 
-The test first loads the programs and associates them with struct_ops
-maps. Then, it exercises the BPF programs. They will in turn call kfunc
-bpf_kfunc_multi_st_ops_test_1_prog_arg() to trigger test_1() of the
-associated struct_ops map, and then check if the right unique value is
-returned.
+> @@ -1394,6 +1401,69 @@ int bpf_struct_ops_link_create(union bpf_attr *att=
+r)
+>         return err;
+>  }
+>
+> +int bpf_prog_assoc_struct_ops(struct bpf_prog *prog, struct bpf_map *map=
+)
+> +{
+> +       guard(mutex)(&prog->aux->st_ops_assoc_mutex);
+> +
+> +       if (prog->aux->st_ops_assoc && prog->aux->st_ops_assoc !=3D map) =
+{
+> +               if (prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS) {
+> +                       WRITE_ONCE(prog->aux->st_ops_assoc, BPF_PTR_POISO=
+N);
+> +                       return 0;
+> +               }
+> +
+> +               return -EBUSY;
+> +       }
+> +
+> +       if (prog->type !=3D BPF_PROG_TYPE_STRUCT_OPS)
+> +               bpf_map_inc(map);
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
----
- .../bpf/prog_tests/test_struct_ops_assoc.c    |  72 ++++++++++++
- .../selftests/bpf/progs/struct_ops_assoc.c    | 105 ++++++++++++++++++
- .../selftests/bpf/test_kmods/bpf_testmod.c    |  17 +++
- .../bpf/test_kmods/bpf_testmod_kfunc.h        |   1 +
- 4 files changed, 195 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c
- create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_assoc.c
+if st_ops_assoc was already set to map before, we will bump refcount
+one more time here, but we'll bpf_map_put() only once in
+bpf_prog_disassoc_struct_ops(), no?
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c b/tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c
-new file mode 100644
-index 000000000000..29e8b58a14fa
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c
-@@ -0,0 +1,72 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <test_progs.h>
-+#include "struct_ops_assoc.skel.h"
-+
-+static void test_st_ops_assoc(void)
-+{
-+	struct struct_ops_assoc *skel = NULL;
-+	int err, pid;
-+
-+	skel = struct_ops_assoc__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "struct_ops_assoc__open"))
-+		goto out;
-+
-+	/* cannot explicitly associate struct_ops program */
-+	err = bpf_program__assoc_struct_ops(skel->progs.test_1_a,
-+					    skel->maps.st_ops_map_a, NULL);
-+	ASSERT_ERR(err, "bpf_program__assoc_struct_ops");
-+
-+	err = bpf_program__assoc_struct_ops(skel->progs.syscall_prog_a,
-+					    skel->maps.st_ops_map_a, NULL);
-+	ASSERT_OK(err, "bpf_program__assoc_struct_ops");
-+
-+	err = bpf_program__assoc_struct_ops(skel->progs.sys_enter_prog_a,
-+					    skel->maps.st_ops_map_a, NULL);
-+	ASSERT_OK(err, "bpf_program__assoc_struct_ops");
-+
-+	err = bpf_program__assoc_struct_ops(skel->progs.syscall_prog_b,
-+					    skel->maps.st_ops_map_b, NULL);
-+	ASSERT_OK(err, "bpf_program__assoc_struct_ops");
-+
-+	err = bpf_program__assoc_struct_ops(skel->progs.sys_enter_prog_b,
-+					    skel->maps.st_ops_map_b, NULL);
-+	ASSERT_OK(err, "bpf_program__assoc_struct_ops");
-+
-+	/* sys_enter_prog_a already associated with map_a */
-+	err = bpf_program__assoc_struct_ops(skel->progs.sys_enter_prog_a,
-+					    skel->maps.st_ops_map_b, NULL);
-+	ASSERT_ERR(err, "bpf_program__assoc_struct_ops");
-+
-+	err = struct_ops_assoc__attach(skel);
-+	if (!ASSERT_OK(err, "struct_ops_assoc__attach"))
-+		goto out;
-+
-+	/* run tracing prog that calls .test_1 and checks return */
-+	pid = getpid();
-+	skel->bss->test_pid = pid;
-+	sys_gettid();
-+	skel->bss->test_pid = 0;
-+
-+	ASSERT_EQ(skel->bss->test_err_a, 0, "skel->bss->test_err_a");
-+	ASSERT_EQ(skel->bss->test_err_b, 0, "skel->bss->test_err_b");
-+
-+	/* run syscall_prog that calls .test_1 and checks return */
-+	err = bpf_prog_test_run_opts(bpf_program__fd(skel->progs.syscall_prog_a), NULL);
-+	ASSERT_OK(err, "bpf_prog_test_run_opts");
-+
-+	err = bpf_prog_test_run_opts(bpf_program__fd(skel->progs.syscall_prog_b), NULL);
-+	ASSERT_OK(err, "bpf_prog_test_run_opts");
-+
-+	ASSERT_EQ(skel->bss->test_err_a, 0, "skel->bss->test_err_a");
-+	ASSERT_EQ(skel->bss->test_err_b, 0, "skel->bss->test_err_b");
-+
-+out:
-+	struct_ops_assoc__destroy(skel);
-+}
-+
-+void test_struct_ops_assoc(void)
-+{
-+	if (test__start_subtest("st_ops_assoc"))
-+		test_st_ops_assoc();
-+}
-diff --git a/tools/testing/selftests/bpf/progs/struct_ops_assoc.c b/tools/testing/selftests/bpf/progs/struct_ops_assoc.c
-new file mode 100644
-index 000000000000..fe47287a49f0
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/struct_ops_assoc.c
-@@ -0,0 +1,105 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <vmlinux.h>
-+#include <bpf/bpf_tracing.h>
-+#include "bpf_misc.h"
-+#include "../test_kmods/bpf_testmod.h"
-+#include "../test_kmods/bpf_testmod_kfunc.h"
-+
-+char _license[] SEC("license") = "GPL";
-+
-+int test_pid;
-+
-+/* Programs associated with st_ops_map_a */
-+
-+#define MAP_A_MAGIC 1234
-+int test_err_a;
-+
-+SEC("struct_ops")
-+int BPF_PROG(test_1_a, struct st_ops_args *args)
-+{
-+	return MAP_A_MAGIC;
-+}
-+
-+SEC("tp_btf/sys_enter")
-+int BPF_PROG(sys_enter_prog_a, struct pt_regs *regs, long id)
-+{
-+	struct st_ops_args args = {};
-+	struct task_struct *task;
-+	int ret;
-+
-+	task = bpf_get_current_task_btf();
-+	if (!test_pid || task->pid != test_pid)
-+		return 0;
-+
-+	ret = bpf_kfunc_multi_st_ops_test_1_prog_arg(&args, NULL);
-+	if (ret != MAP_A_MAGIC)
-+		test_err_a++;
-+
-+	return 0;
-+}
-+
-+SEC("syscall")
-+int syscall_prog_a(void *ctx)
-+{
-+	struct st_ops_args args = {};
-+	int ret;
-+
-+	ret = bpf_kfunc_multi_st_ops_test_1_prog_arg(&args, NULL);
-+	if (ret != MAP_A_MAGIC)
-+		test_err_a++;
-+
-+	return 0;
-+}
-+
-+SEC(".struct_ops.link")
-+struct bpf_testmod_multi_st_ops st_ops_map_a = {
-+	.test_1 = (void *)test_1_a,
-+};
-+
-+/* Programs associated with st_ops_map_b */
-+
-+#define MAP_B_MAGIC 5678
-+int test_err_b;
-+
-+SEC("struct_ops")
-+int BPF_PROG(test_1_b, struct st_ops_args *args)
-+{
-+	return MAP_B_MAGIC;
-+}
-+
-+SEC("tp_btf/sys_enter")
-+int BPF_PROG(sys_enter_prog_b, struct pt_regs *regs, long id)
-+{
-+	struct st_ops_args args = {};
-+	struct task_struct *task;
-+	int ret;
-+
-+	task = bpf_get_current_task_btf();
-+	if (!test_pid || task->pid != test_pid)
-+		return 0;
-+
-+	ret = bpf_kfunc_multi_st_ops_test_1_prog_arg(&args, NULL);
-+	if (ret != MAP_B_MAGIC)
-+		test_err_b++;
-+
-+	return 0;
-+}
-+
-+SEC("syscall")
-+int syscall_prog_b(void *ctx)
-+{
-+	struct st_ops_args args = {};
-+	int ret;
-+
-+	ret = bpf_kfunc_multi_st_ops_test_1_prog_arg(&args, NULL);
-+	if (ret != MAP_B_MAGIC)
-+		test_err_b++;
-+
-+	return 0;
-+}
-+
-+SEC(".struct_ops.link")
-+struct bpf_testmod_multi_st_ops st_ops_map_b = {
-+	.test_1 = (void *)test_1_b,
-+};
-diff --git a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-index 6df6475f5dbc..d3c3a8f1e63b 100644
---- a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-+++ b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-@@ -1101,6 +1101,7 @@ __bpf_kfunc int bpf_kfunc_st_ops_inc10(struct st_ops_args *args)
- }
- 
- __bpf_kfunc int bpf_kfunc_multi_st_ops_test_1(struct st_ops_args *args, u32 id);
-+__bpf_kfunc int bpf_kfunc_multi_st_ops_test_1_prog_arg(struct st_ops_args *args, void *aux_prog);
- 
- BTF_KFUNCS_START(bpf_testmod_check_kfunc_ids)
- BTF_ID_FLAGS(func, bpf_testmod_test_mod_kfunc)
-@@ -1143,6 +1144,7 @@ BTF_ID_FLAGS(func, bpf_kfunc_st_ops_test_epilogue, KF_TRUSTED_ARGS | KF_SLEEPABL
- BTF_ID_FLAGS(func, bpf_kfunc_st_ops_test_pro_epilogue, KF_TRUSTED_ARGS | KF_SLEEPABLE)
- BTF_ID_FLAGS(func, bpf_kfunc_st_ops_inc10, KF_TRUSTED_ARGS)
- BTF_ID_FLAGS(func, bpf_kfunc_multi_st_ops_test_1, KF_TRUSTED_ARGS)
-+BTF_ID_FLAGS(func, bpf_kfunc_multi_st_ops_test_1_prog_arg, KF_TRUSTED_ARGS)
- BTF_KFUNCS_END(bpf_testmod_check_kfunc_ids)
- 
- static int bpf_testmod_ops_init(struct btf *btf)
-@@ -1604,6 +1606,7 @@ static struct bpf_testmod_multi_st_ops *multi_st_ops_find_nolock(u32 id)
- 	return NULL;
- }
- 
-+/* Call test_1() of the struct_ops map identified by the id */
- int bpf_kfunc_multi_st_ops_test_1(struct st_ops_args *args, u32 id)
- {
- 	struct bpf_testmod_multi_st_ops *st_ops;
-@@ -1619,6 +1622,20 @@ int bpf_kfunc_multi_st_ops_test_1(struct st_ops_args *args, u32 id)
- 	return ret;
- }
- 
-+/* Call test_1() of the associated struct_ops map */
-+int bpf_kfunc_multi_st_ops_test_1_prog_arg(struct st_ops_args *args, void *aux__prog)
-+{
-+	struct bpf_prog_aux *prog_aux = (struct bpf_prog_aux *)aux__prog;
-+	struct bpf_testmod_multi_st_ops *st_ops;
-+	int ret = -1;
-+
-+	st_ops = (struct bpf_testmod_multi_st_ops *)bpf_prog_get_assoc_struct_ops(prog_aux);
-+	if (st_ops)
-+		ret = st_ops->test_1(args);
-+
-+	return ret;
-+}
-+
- static int multi_st_ops_reg(void *kdata, struct bpf_link *link)
- {
- 	struct bpf_testmod_multi_st_ops *st_ops =
-diff --git a/tools/testing/selftests/bpf/test_kmods/bpf_testmod_kfunc.h b/tools/testing/selftests/bpf/test_kmods/bpf_testmod_kfunc.h
-index 4df6fa6a92cb..d40f4cddbd1e 100644
---- a/tools/testing/selftests/bpf/test_kmods/bpf_testmod_kfunc.h
-+++ b/tools/testing/selftests/bpf/test_kmods/bpf_testmod_kfunc.h
-@@ -162,5 +162,6 @@ struct task_struct *bpf_kfunc_ret_rcu_test(void) __ksym;
- int *bpf_kfunc_ret_rcu_test_nostruct(int rdonly_buf_size) __ksym;
- 
- int bpf_kfunc_multi_st_ops_test_1(struct st_ops_args *args, u32 id) __ksym;
-+int bpf_kfunc_multi_st_ops_test_1_prog_arg(struct st_ops_args *args, void *aux__prog) __ksym;
- 
- #endif /* _BPF_TESTMOD_KFUNC_H */
--- 
-2.47.3
+> +
+> +       WRITE_ONCE(prog->aux->st_ops_assoc, map);
+> +       return 0;
+> +}
+> +
+> +void bpf_prog_disassoc_struct_ops(struct bpf_prog *prog)
+> +{
+> +       struct bpf_map *map;
+> +
+> +       guard(mutex)(&prog->aux->st_ops_assoc_mutex);
+> +
+> +       map =3D READ_ONCE(prog->aux->st_ops_assoc);
+> +       if (!map || map =3D=3D BPF_PTR_POISON)
+> +               return;
+> +
+> +       if (prog->type !=3D BPF_PROG_TYPE_STRUCT_OPS)
+> +               bpf_map_put(map);
+> +
+> +       WRITE_ONCE(prog->aux->st_ops_assoc, NULL);
+> +}
+> +
 
+[...]
 
