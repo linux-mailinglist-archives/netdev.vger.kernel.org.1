@@ -1,217 +1,154 @@
-Return-Path: <netdev+bounces-230528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18105BEAB59
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 18:29:45 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FFECBEB07B
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 19:13:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F6949618DF
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 15:58:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A2A334E259B
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:12:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6357F2F12A0;
-	Fri, 17 Oct 2025 15:58:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213112FE59F;
+	Fri, 17 Oct 2025 17:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="FLtxIBv7"
+	dkim=pass (2048-bit key) header.d=rootcommit.com header.i=@rootcommit.com header.b="M02/l1LY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from buffalo.ash.relay.mailchannels.net (buffalo.ash.relay.mailchannels.net [23.83.222.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62B0330B20;
-	Fri, 17 Oct 2025 15:58:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760716714; cv=none; b=VItbilOda1UscBT9bfkNO8zeUTLr59sm6QtsXniJjsjh/4kfLW6C8cltA3hTumIiyu+l1FZXbw6Qp6hbJj5T5gNWTICOi8akwTyq8JIbZ9oEqNV+42Pr1CJG5zqFOWvwtHfepVRQk1gUBQ03czqQH701SJrC9qkRjw5LHWidl5g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760716714; c=relaxed/simple;
-	bh=20X28MMOWSoptgGAWTUrviJnQniEpl6Ktq66BRGKH/M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EZAofDs6tjmANaLbJ9W+e6KCrPnM+TOawvwYARgHuRjq6MrABoWQprJt+xBPk+g9pQAVbzGKMgSufSvLt+VwFee82XIfw0Abkz0K/FGDEoTvyyN4f8fsiwBKHt0Nfvh9eD+d46+gmniEvkiJAhbA4WSYn3D8E3wNnx3oynGIZxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=FLtxIBv7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 687B5C4CEE7;
-	Fri, 17 Oct 2025 15:58:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1760716713;
-	bh=20X28MMOWSoptgGAWTUrviJnQniEpl6Ktq66BRGKH/M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FLtxIBv7SZeCQWvR3ANCLmaMyydymZnc8EmPjl/1wQ2ZU6GZiD2nKCaUbGU/mGLlp
-	 fTOdia6A6ekGANEzH++1tbYBhBm/NR7Jy2B8blUuCuIxDXrSTaYf19VuAHrRtgTE73
-	 ZyIsy6hsoafgxjCLHqBFDNZjVm7M30+2G2ZqFt0Y=
-Date: Fri, 17 Oct 2025 17:03:02 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Eliav Farber <farbere@amazon.com>
-Cc: stable@vger.kernel.org, linux@armlinux.org.uk, jdike@addtoit.com,
-	richard@nod.at, anton.ivanov@cambridgegreys.com,
-	dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-	hpa@zytor.com, tony.luck@intel.com, qiuxu.zhuo@intel.com,
-	mchehab@kernel.org, james.morse@arm.com, rric@kernel.org,
-	harry.wentland@amd.com, sunpeng.li@amd.com,
-	alexander.deucher@amd.com, christian.koenig@amd.com,
-	airlied@linux.ie, daniel@ffwll.ch, evan.quan@amd.com,
-	james.qian.wang@arm.com, liviu.dudau@arm.com,
-	mihail.atanassov@arm.com, brian.starkey@arm.com,
-	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-	tzimmermann@suse.de, robdclark@gmail.com, sean@poorly.run,
-	jdelvare@suse.com, linux@roeck-us.net, fery@cypress.com,
-	dmitry.torokhov@gmail.com, agk@redhat.com, snitzer@redhat.com,
-	dm-devel@redhat.com, rajur@chelsio.com, davem@davemloft.net,
-	kuba@kernel.org, peppe.cavallaro@st.com, alexandre.torgue@st.com,
-	joabreu@synopsys.com, mcoquelin.stm32@gmail.com, malattia@linux.it,
-	hdegoede@redhat.com, mgross@linux.intel.com,
-	intel-linux-scu@intel.com, artur.paszkiewicz@intel.com,
-	jejb@linux.ibm.com, martin.petersen@oracle.com,
-	sakari.ailus@linux.intel.com, clm@fb.com, josef@toxicpanda.com,
-	dsterba@suse.com, xiang@kernel.org, chao@kernel.org, jack@suse.com,
-	tytso@mit.edu, adilger.kernel@dilger.ca, dushistov@mail.ru,
-	luc.vanoostenryck@gmail.com, rostedt@goodmis.org, pmladek@suse.com,
-	sergey.senozhatsky@gmail.com, andriy.shevchenko@linux.intel.com,
-	linux@rasmusvillemoes.dk, minchan@kernel.org, ngupta@vflare.org,
-	akpm@linux-foundation.org, kuznet@ms2.inr.ac.ru,
-	yoshfuji@linux-ipv6.org, pablo@netfilter.org, kadlec@netfilter.org,
-	fw@strlen.de, jmaloy@redhat.com, ying.xue@windriver.com,
-	willy@infradead.org, sashal@kernel.org, ruanjinjie@huawei.com,
-	David.Laight@aculab.com, herve.codina@bootlin.com, Jason@zx2c4.com,
-	keescook@chromium.org, kbusch@kernel.org, nathan@kernel.org,
-	bvanassche@acm.org, ndesaulniers@google.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-um@lists.infradead.org, linux-edac@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
-	linux-hwmon@vger.kernel.org, linux-input@vger.kernel.org,
-	linux-media@vger.kernel.org, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	platform-driver-x86@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-staging@lists.linux.dev, linux-btrfs@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-	linux-sparse@vger.kernel.org, linux-mm@kvack.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	tipc-discussion@lists.sourceforge.net
-Subject: Re: [PATCH v2 00/27 5.10.y] Backport minmax.h updates from v6.17-rc7
-Message-ID: <2025101704-rumble-chatroom-60b5@gregkh>
-References: <20251017090519.46992-1-farbere@amazon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5222FD1AD;
+	Fri, 17 Oct 2025 17:12:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.222.24
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760721170; cv=pass; b=FNIQVJM3emIL2kkZpoZ8+lC/+hXCVtYl+a63N57g1rjjc47G/wxRdaNTtJ0O/tUrrBsaqCXiGGicSpxp4vSfbQ2Wyc9lf0hDt2sQTA288ORbnqNUvCucyLy5rBDnb44MZ7FFI1UcuTtO0pxtlvMf0tjbnoyVcoZ6sZD8be2erIU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760721170; c=relaxed/simple;
+	bh=1fP5zpgcHZFicOOflVjB2iFN8P1HFOo4SPs3CO19kQQ=;
+	h=Message-ID:MIME-Version:Cc:Subject:To:References:From:In-Reply-To:
+	 Content-Type:Date; b=iTA/H7/KeYfokv3bsBJVl/LV7h6UhI/hYHBWhLcjCqxltiysY71vWnQXwBQ8HmEWaQh1ksXNENoaHxXOINQ85eSxhbsA6dkjjOdhyR+5e6fDOsQxuIc3P5F87Ki+6l1r9wtfByqoU6HPCS9EJVtutu4VYIeLyfYxMUhJhtGD0C8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rootcommit.com; spf=pass smtp.mailfrom=rootcommit.com; dkim=pass (2048-bit key) header.d=rootcommit.com header.i=@rootcommit.com header.b=M02/l1LY; arc=pass smtp.client-ip=23.83.222.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rootcommit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rootcommit.com
+X-Sender-Id: hostingeremail|x-authuser|michael.opdenacker@rootcommit.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id CFFCB701A01;
+	Fri, 17 Oct 2025 15:54:07 +0000 (UTC)
+Received: from fr-int-smtpout25.hostinger.io (100-117-132-18.trex-nlb.outbound.svc.cluster.local [100.117.132.18])
+	(Authenticated sender: hostingeremail)
+	by relay.mailchannels.net (Postfix) with ESMTPA id 602B2701AEE;
+	Fri, 17 Oct 2025 15:54:01 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1760716443; a=rsa-sha256;
+	cv=none;
+	b=qsbdjJATkXL3pVbVt/nMJLo5Bik+gXYtmu8SG5torvU5Tu6ofvZlAEbLTQVm/ZAPJihpg/
+	Kh1MAJNzfUVOr9EF8kPOutx7SZhy6lYppkxmnTtZrIiV4+bYK4/8CTVsxSnLPnrZmn85Kg
+	fc06Cs2ZWSzBQ3/tKfcTp/EhtaVa1o+3w6dk8vS+OvninEBCmu7GaQ5/pFpDSpyLpYR9id
+	gwJ8fu4L7sz2zvx4WI/VDi3E/qOZ1YBMTURVorMV/vYgjZUx9Dj78YB5ItXVyIlHMP2JmL
+	9HYQEjlirZIpGb+wIqnZ2er0gNW002stlHtcritUDc3nRV48a/qQan6AVmd0ew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1760716443;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=F1FFVJG2rkiUWHHF25ZM11yfG5to6mYY/Am7bSXow1w=;
+	b=g4gw5xwKjwzE6nyJqxtt98VD+XSdfMX7m/AsaUhBACTkHpYj8rO73kL7pTTlLm/sIMAfUu
+	haDL87tDSS4JdTaHg8W0DL8uNQaIqhCAw+KsE0gA+N659ADCbK/5MBHu03lZR7QK13XjGG
+	Imj+q82dRNCureS635wjDw3XaL5/vzM/zO+QTBk7jK/NkJqfJee/7RCMrZFHafwOtIl+Yv
+	I9NxOU+wJcV6Y0iEWW6EE1GcCgG67qX3z4qLRgee1qoxGK0ACL49RO2JMxW9mYknvZNKTl
+	/fMcPq9zTeu8YXfhS4tV6LxV6AGfC5XU4fg71EPAcyYDKXoSDGzJ1W7mj/tkKQ==
+ARC-Authentication-Results: i=1;
+	rspamd-fbfbcbd77-nmt89;
+	auth=pass smtp.auth=hostingeremail
+ smtp.mailfrom=michael.opdenacker@rootcommit.com
+X-Sender-Id: hostingeremail|x-authuser|michael.opdenacker@rootcommit.com
+X-MC-Relay: Neutral
+X-MailChannels-SenderId:
+ hostingeremail|x-authuser|michael.opdenacker@rootcommit.com
+X-MailChannels-Auth-Id: hostingeremail
+X-Interest-Invention: 3d5ae642033bbe25_1760716447513_1362389868
+X-MC-Loop-Signature: 1760716447513:724433826
+X-MC-Ingress-Time: 1760716447513
+Received: from fr-int-smtpout25.hostinger.io (fr-int-smtpout25.hostinger.io
+ [148.222.54.38])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.117.132.18 (trex/7.1.3);
+	Fri, 17 Oct 2025 15:54:07 +0000
+Received: from [IPV6:2a04:cec0:1210:4d12:deca:bae:eaaa:c8e1] (unknown [IPv6:2a04:cec0:1210:4d12:deca:bae:eaaa:c8e1])
+	(Authenticated sender: michael.opdenacker@rootcommit.com)
+	by smtp.hostinger.com (smtp.hostinger.com) with ESMTPSA id 4cp8WD3ntHz1y05;
+	Fri, 17 Oct 2025 15:53:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rootcommit.com;
+	s=hostingermail-a; t=1760716436;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F1FFVJG2rkiUWHHF25ZM11yfG5to6mYY/Am7bSXow1w=;
+	b=M02/l1LY/12rIEeTpPcENXTumRGFuqsL03PFKuftuURXv6DClseDI47zTy3+8tKFYpqX76
+	0VQ+9rEgw9PJ80bZ6PXcrTECo7oheathXmj/GV5FNt1UdrXei+fwZyOGqP7trZEtz5UtPg
+	+MEvXjkixRqTRa8juNpu1Uj1/6ZTgGToTH6xRG3B+nEyor5laOstctdf9zuGndOFyWZ9zI
+	nBv/jGpMxCHcw/A0nw0cwpSVSJeklLbd+XGM4tvdOGrnWBvO7aVjuprKWyvdZ3QXicsfqZ
+	1cDKdlfl8i77exoN6n3JgzRQQynSb0za7ZTrTpe99LVXbTRZ08WIq1I3M2WDHA==
+Message-ID: <63b2056f-3d5a-4fca-8600-526619c33647@rootcommit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251017090519.46992-1-farbere@amazon.com>
+User-Agent: Mozilla Thunderbird
+Cc: michael.opdenacker@rootcommit.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Yixun Lan <dlan@gentoo.org>, netdev@vger.kernel.org,
+ linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] net: spacemit: compile k1_emac driver as built-in by
+ default
+To: Emil Renner Berthing <emil.renner.berthing@gmail.com>
+References: <20251017100106.3180482-1-michael.opdenacker@rootcommit.com>
+ <20251017100106.3180482-3-michael.opdenacker@rootcommit.com>
+ <CANBLGcykz77U_V4CqE7PHvtgmeXiKFo0FXy-sHHiAoZ11HnCjw@mail.gmail.com>
+Content-Language: en-US
+From: Michael Opdenacker <michael.opdenacker@rootcommit.com>
+Organization: Root Commit
+In-Reply-To: <CANBLGcykz77U_V4CqE7PHvtgmeXiKFo0FXy-sHHiAoZ11HnCjw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Fri, 17 Oct 2025 15:53:44 +0000 (UTC)
+X-CM-Envelope: MS4xfJ9c+Oq6a3xe99yK0EZhAMCEV7n/+Vax87LhLieg7XqJbgnwD5VAarvVM6KCvSMEmHfg5nOc41whlY3NxSYXoCQkRdIalh/pIn9x4gRAnk2Vd/w3J8BV 8+BlmotPVSRFAlCM3amjVpsZDKN8a23XE54m+J0PIowDjfBLXfR3OqPUGpYZ22o82HoMUyBKYEHM7VrcD71CbfiI6NOfPwSjECGCMKOJuX9clYXphkEndH1Z eoGXu3YZ3bxT2XtWKFqBEs98FkRZJ06rdzLtGRjr4gm+JGc5RiDmXaoXlB3MEz8YGpHITKjDURU2tmd0ItVXr6X8MUmf+5nE79861gwIB+T3EiJaqZOUudJK seV2l5MgJbNyPQct/KpUFvoXH1Sl8E9QNpvv5FONjRUe2eRU5UwVlyVCs4FvEWhLkDRpt+qeFz/7h+EkakPaY+VXyOaw88ZKQrvsYPJqGLK8YAtfqTbVC1Ib vjwDhNt1oy05D7dSd6ATeNJq+J4ZkjhuTQ/X39dTk/RBULT9vp2Sd1LLEqUq5s9HgNe9m9V3f6HoKCbLjjTnKIbYMIvNl2x/zlo0Lx9bh6LfBIM1Xr6YBcbl sHL3rf5OblNYUUzdBgPjA00wJPod2kKc1EtqH75mcsrGHnxOLsN5rVnyqi8XlABvjXynwRIjg3GatUnAFHqF8TPyi6U6lAuZBhG12SDE6I/zdjECvGr3ONjI KEdcxt7c/TM=
+X-CM-Analysis: v=2.4 cv=GbNFnhXL c=1 sm=1 tr=0 ts=68f26694 a=HZifvgWxdiUQ9LBJ2kG+mw==:617 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=d70CFdQeAAAA:8 a=6my-HHL3l342PdgWGDoA:9 a=QEXdDO2ut3YA:10 a=NcxpMcIZDGm-g932nG_k:22
+X-AuthUser: michael.opdenacker@rootcommit.com
 
-On Fri, Oct 17, 2025 at 09:04:52AM +0000, Eliav Farber wrote:
-> This series backports 27 patches to update minmax.h in the 5.10.y
-> branch, aligning it with v6.17-rc7.
-> 
-> The ultimate goal is to synchronize all long-term branches so that they
-> include the full set of minmax.h changes.
-> 
-> - 6.12.y has already been backported; the changes are included in
->   v6.12.49.
-> - 6.6.y has already been backported; the changes are included in
->   v6.6.109.
-> - 6.1.y has already been backported; the changes are currently in the
->   6.1-stable tree.
-> - 5.15.y has already been backported; the changes are currently in the
->   5.15-stable tree.
+Hi Emil
 
-With this series applied, on an arm64 server, building 'allmodconfig', I
-get the following build error.
+Thanks for the review!
 
-Oddly I don't see it on my x86 server, perhaps due to different compiler
-versions?
+On 10/17/25 17:33, Emil Renner Berthing wrote:
+> On Fri, 17 Oct 2025 at 12:03, <michael.opdenacker@rootcommit.com> wrote:
+>> From: Michael Opdenacker <michael.opdenacker@rootcommit.com>
+>>
+>> Supports booting boards on NFS filesystems, without going
+>> through an initramfs.
+> Please don't do this. If we build in every ethernet driver that might
+> be used to boot from NFS we'll end up with almost every driver
+> built-in and huge kernels. If you need this there is nothing
+> preventing you from building the driver in, but please don't bloat
+> defconfig kernels for everyone else.
 
-Any ideas?
+Understood. You have a point. It's not really a problem to customize 
+kernel configuration for each board as you said.
+So, please forget this particular patch :)
+Cheers
+Michael.
 
-thanks,
+-- 
+Michael Opdenacker
+Root Commit
+Embedded Linux Training and Consulting
+https://rootcommit.com
 
-greg k-h
-
-------------------------
-
-In function ‘rt2800_txpower_to_dev’,
-    inlined from ‘rt2800_config_channel’ at ../drivers/net/wireless/ralink/rt2x00/rt2800lib.c:4022:25:
-./../include/linux/compiler_types.h:309:45: error: call to ‘__compiletime_assert_1168’ declared with attribute error: clamp() low limit -7 greater than high limit 15
-  309 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-      |                                             ^
-./../include/linux/compiler_types.h:290:25: note: in definition of macro ‘__compiletime_assert’
-  290 |                         prefix ## suffix();                             \
-      |                         ^~~~~~
-./../include/linux/compiler_types.h:309:9: note: in expansion of macro ‘_compiletime_assert’
-  309 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-      |         ^~~~~~~~~~~~~~~~~~~
-../include/linux/build_bug.h:39:37: note: in expansion of macro ‘compiletime_assert’
-   39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-      |                                     ^~~~~~~~~~~~~~~~~~
-../include/linux/minmax.h:188:9: note: in expansion of macro ‘BUILD_BUG_ON_MSG’
-  188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),                            \
-      |         ^~~~~~~~~~~~~~~~
-../include/linux/minmax.h:195:9: note: in expansion of macro ‘__clamp_once’
-  195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_), __UNIQUE_ID(l_), __UNIQUE_ID(h_))
-      |         ^~~~~~~~~~~~
-../include/linux/minmax.h:218:36: note: in expansion of macro ‘__careful_clamp’
-  218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
-      |                                    ^~~~~~~~~~~~~~~
-../drivers/net/wireless/ralink/rt2x00/rt2800lib.c:3980:24: note: in expansion of macro ‘clamp_t’
- 3980 |                 return clamp_t(char, txpower, MIN_A_TXPOWER, MAX_A_TXPOWER);
-      |                        ^~~~~~~
-In function ‘rt2800_txpower_to_dev’,
-    inlined from ‘rt2800_config_channel’ at ../drivers/net/wireless/ralink/rt2x00/rt2800lib.c:4024:25:
-./../include/linux/compiler_types.h:309:45: error: call to ‘__compiletime_assert_1168’ declared with attribute error: clamp() low limit -7 greater than high limit 15
-  309 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-      |                                             ^
-./../include/linux/compiler_types.h:290:25: note: in definition of macro ‘__compiletime_assert’
-  290 |                         prefix ## suffix();                             \
-      |                         ^~~~~~
-./../include/linux/compiler_types.h:309:9: note: in expansion of macro ‘_compiletime_assert’
-  309 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-      |         ^~~~~~~~~~~~~~~~~~~
-../include/linux/build_bug.h:39:37: note: in expansion of macro ‘compiletime_assert’
-   39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-      |                                     ^~~~~~~~~~~~~~~~~~
-../include/linux/minmax.h:188:9: note: in expansion of macro ‘BUILD_BUG_ON_MSG’
-  188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),                            \
-      |         ^~~~~~~~~~~~~~~~
-../include/linux/minmax.h:195:9: note: in expansion of macro ‘__clamp_once’
-  195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_), __UNIQUE_ID(l_), __UNIQUE_ID(h_))
-      |         ^~~~~~~~~~~~
-../include/linux/minmax.h:218:36: note: in expansion of macro ‘__careful_clamp’
-  218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
-      |                                    ^~~~~~~~~~~~~~~
-../drivers/net/wireless/ralink/rt2x00/rt2800lib.c:3980:24: note: in expansion of macro ‘clamp_t’
- 3980 |                 return clamp_t(char, txpower, MIN_A_TXPOWER, MAX_A_TXPOWER);
-      |                        ^~~~~~~
-In function ‘rt2800_txpower_to_dev’,
-    inlined from ‘rt2800_config_channel’ at ../drivers/net/wireless/ralink/rt2x00/rt2800lib.c:4028:4:
-./../include/linux/compiler_types.h:309:45: error: call to ‘__compiletime_assert_1168’ declared with attribute error: clamp() low limit -7 greater than high limit 15
-  309 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-      |                                             ^
-./../include/linux/compiler_types.h:290:25: note: in definition of macro ‘__compiletime_assert’
-  290 |                         prefix ## suffix();                             \
-      |                         ^~~~~~
-./../include/linux/compiler_types.h:309:9: note: in expansion of macro ‘_compiletime_assert’
-  309 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-      |         ^~~~~~~~~~~~~~~~~~~
-../include/linux/build_bug.h:39:37: note: in expansion of macro ‘compiletime_assert’
-   39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-      |                                     ^~~~~~~~~~~~~~~~~~
-../include/linux/minmax.h:188:9: note: in expansion of macro ‘BUILD_BUG_ON_MSG’
-  188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),                            \
-      |         ^~~~~~~~~~~~~~~~
-../include/linux/minmax.h:195:9: note: in expansion of macro ‘__clamp_once’
-  195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_), __UNIQUE_ID(l_), __UNIQUE_ID(h_))
-      |         ^~~~~~~~~~~~
-../include/linux/minmax.h:218:36: note: in expansion of macro ‘__careful_clamp’
-  218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
-      |                                    ^~~~~~~~~~~~~~~
-../drivers/net/wireless/ralink/rt2x00/rt2800lib.c:3980:24: note: in expansion of macro ‘clamp_t’
- 3980 |                 return clamp_t(char, txpower, MIN_A_TXPOWER, MAX_A_TXPOWER);
-      |                        ^~~~~~~
-make[6]: *** [../scripts/Makefile.build:286: drivers/net/wireless/ralink/rt2x00/rt2800lib.o] Error 1
-make[5]: *** [../scripts/Makefile.build:503: drivers/net/wireless/ralink/rt2x00] Error 2
-make[4]: *** [../scripts/Makefile.build:503: drivers/net/wireless/ralink] Error 2
-make[4]: *** Waiting for unfinished jobs....
 
