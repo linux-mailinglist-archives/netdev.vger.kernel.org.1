@@ -1,241 +1,198 @@
-Return-Path: <netdev+bounces-230349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C66E8BE6E10
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 09:06:48 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4889BE6E73
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 09:16:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C94C1A61F1D
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 07:07:12 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2D85735A73F
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 07:16:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8873130C623;
-	Fri, 17 Oct 2025 07:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE7D1EFFB2;
+	Fri, 17 Oct 2025 07:15:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yyp7GYLd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fJzyX/Lg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB3133F9
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 07:06:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760684804; cv=fail; b=cg/NO7wRIOoDMCQ7Ow+1mFUK7nhYmERGVvxnfu5M95A9QDyf8UxGNpc/AyY26SKoMIu8qpRxX8GFZh7553hW8tyECOp2Ufyx0eRY8dxkYErKjh5dnFvesv8SiPfE/7/48g13MfU+M+qyw+iktOnGwsb56WNYJ1d68Dc3yMvmqHw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760684804; c=relaxed/simple;
-	bh=cxwzVnXI9bFSzAcQVlhGf8NYWf5Mnu1KsvhFyFUzvuY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=qfl1eUXcMvponSdnBVSQ/Pk/QcNkMMheB6wJ3QGCMuPy3mD09eEj6GUI5fIHme5DlfkPcHh0MpHrQNJ0bRQKbTPSCFo2mMsF74R2ILZe3bG3MHF3ZnUQ7heYtUA1x7iJpqRC3zivuQwTW5X9Hoc1e2DNZ7gTMFDT8Zcn3eVJslc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Yyp7GYLd; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760684802; x=1792220802;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=cxwzVnXI9bFSzAcQVlhGf8NYWf5Mnu1KsvhFyFUzvuY=;
-  b=Yyp7GYLd2YIY6TeY7TOGwQvm680r68NVz8RiwkSCA28+U+ZsSbGI9seH
-   qVYcdueiHSjC86j9bhBp64hf6OwZMybAUwyYhpUgZ9BI86EZy9NB8ZwsX
-   KfoakkhBZUeSZIZky/n+qMmsr9bCDjvpvMdkGA520/Lnm2DYUJoF/oxVe
-   mE6q1NzUOh+ANzzUU3DuwqAwAdR1IZTua+ux0lIlmVIVe7PZehzr7mObx
-   bAG+GOVcbgQE4m3yAwAJfwjwkJ7eeiIBy6tZ7rEFte+rLiqD9lmUprQW6
-   RSlFSHeglWhMvw5DdFWmqBnZ2k5TwzlOxNi1c74kdxzV5ohe/8mtnEEgC
-   A==;
-X-CSE-ConnectionGUID: Kk+M+YRESJWO+Y7s+uNKCQ==
-X-CSE-MsgGUID: swmBTuRZT0iISs7QPl9cXg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11584"; a="80522144"
-X-IronPort-AV: E=Sophos;i="6.19,234,1754982000"; 
-   d="scan'208";a="80522144"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2025 00:06:39 -0700
-X-CSE-ConnectionGUID: /FBqNOUxRTqjHHhv2wYM9g==
-X-CSE-MsgGUID: 6HJq4dnFSeKap2pi9+2Ljw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,234,1754982000"; 
-   d="scan'208";a="182652806"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2025 00:06:39 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 17 Oct 2025 00:06:38 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Fri, 17 Oct 2025 00:06:38 -0700
-Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.44) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 17 Oct 2025 00:06:38 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qy+I9o+0DjA9iT/J0PKMqy9aMliJERA9QVAsDM1rkSZj6vLty1Poy2GsEgQ6N0G3VR4Q5DUuua1JyeWuQFkFJHl0ywWUrPDl7ur3ZrC0xSu869tA27v3Ctc7hip7gDE2KNRbZRp6/bB4w5oRVr6Y54WgabHIapMz3L3fB17H0nZ0E31Z7aFk5F40umfidF88r29/0xvfwPCoCYUvNUyYYmSLu6rrfAFVUWaM4VPnUpE4CEC7/XFRkRbky1+cZoqIH23k3mtNsI/I+rMf4A5di7XTLefcuCqfy6n4m2fi3YkxeWZFky/A0+jhYahrRoJ5lcgVc7pOREjiGCe/QNgwiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bXk3FDySRKWLaf4lbtb40pzzTmel/mvwhxP+iu7VeAw=;
- b=y9bhPoxccBvv9cgK2s3/OQrdbfova8pkgQ1ieL/4czOA3YvXUXZMtRR3nC+Am7EVuuo6vUoamJw95zdlaR9AWOjMDpd3Kw0kVA5XvrlWlYGaIM/yJrB9+oNNuzhvHpicfCpYZPA8IB2KzdGhD7Ys87itxq9BUAcfJTQF0zn7x47NJpuGdVNwfg5cezIINsDp61LHw8SoQwGQ+nqlpK6k/m5kqlRuNukIiRjVpA38cCVLFUvKybTVpJ45jx/m3q4l939xxTKcVOuDLAa6A7wCUmdfi/BhLoELTshNWLdkT9amFHeUK9a9kKR4h/49BUr5KpXcJf6taH0cy5ZKX2ifcA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
- by PH0PR11MB4840.namprd11.prod.outlook.com (2603:10b6:510:43::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.13; Fri, 17 Oct
- 2025 07:06:36 +0000
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919%4]) with mapi id 15.20.9228.012; Fri, 17 Oct 2025
- 07:06:36 +0000
-From: "Rinitha, SX" <sx.rinitha@intel.com>
-To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kubalewski, Arkadiusz"
-	<arkadiusz.kubalewski@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH v2 iwl-net] ice: fix destination CGU for
- dual complex E825
-Thread-Topic: [Intel-wired-lan] [PATCH v2 iwl-net] ice: fix destination CGU
- for dual complex E825
-Thread-Index: AQHcMVYlRF6ERzFrEECf3GUceInOCrTF6QJA
-Date: Fri, 17 Oct 2025 07:06:36 +0000
-Message-ID: <IA1PR11MB6241614E3A5F34358696F99F8BF6A@IA1PR11MB6241.namprd11.prod.outlook.com>
-References: <20250929152905.2947520-1-grzegorz.nitka@intel.com>
-In-Reply-To: <20250929152905.2947520-1-grzegorz.nitka@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|PH0PR11MB4840:EE_
-x-ms-office365-filtering-correlation-id: 75a903ea-5cab-4eeb-35a8-08de0d4bb620
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|10070799003|1800799024|366016|376014|38070700021|7053199007;
-x-microsoft-antispam-message-info: =?us-ascii?Q?sAIi08XnBwX0uCaUuPdctMr/MNFa04upU9KKbZs18GZpNmdetjaJTfst0mbV?=
- =?us-ascii?Q?FdCGu9F9wVEJAa/NEdOa+QSdP7AaSO6+2eBwhCfW8KQrl12nXT46gjrDT3aG?=
- =?us-ascii?Q?3j66q6n/pFvYxVuiJ5kGAdvH1GLhLydsBDcP+8PeCra5/y0hAY1H+Pl14YDC?=
- =?us-ascii?Q?/EYEaAh1PzSk7XWdZyPh3GATQg3UK8KCdaIj3w5PbufYmkbvDcRxfXZNv9AL?=
- =?us-ascii?Q?mt6D9ssd353T6Lz5OD1JFteS/qkMOYePdo/1cK3ac3dwkvNPDNLQLHdUAaqM?=
- =?us-ascii?Q?66E0FxS5sLxaaXzGI+981jDnMivmsXHTmsAA1BceG5ntPfwdJTCdKVjZNLDQ?=
- =?us-ascii?Q?faBLxdvwB8wpbwOtoRi23ImGki9SiuVoa//KqwcNpuiWhbexwv6QDgpT/M3D?=
- =?us-ascii?Q?wdLQkXl6bFuZVrPLfxfMcmXIJonLG9IfHPj9iyE0YuukYvEXa5qxMu7W9gXj?=
- =?us-ascii?Q?dfyh9FYzvAuS70MpR6hgxw3+2he1C3nIww+WoZtzN/us/7o4siEk6Uzlfmak?=
- =?us-ascii?Q?9LjNMhA8B2czZj/smKB0x5mPHYkS4GvzuFv+Ii4EJZhXtzrVFi9dIgzioI4v?=
- =?us-ascii?Q?kDBROtQMJZA60foB5sHGMHVnWGZok0QhHnFSXiUOOxpS9inIBbcwrdpVrLyp?=
- =?us-ascii?Q?EQ56yirlqYKwx1rmKfMy8ibK9yGkvAblz+HXCuTpbBppiR40S37nroxKH8kb?=
- =?us-ascii?Q?RZZfMEbel+ACEDmjWnI1zJxlwYfn64XkB/sWGUClWxCjLg69l/ZtO7J7Munr?=
- =?us-ascii?Q?AD+N3QiBd1SzJtu8kxo9W9SaO76EL2Lkiq12zBjQathPQi97K2Nq7Dy508wJ?=
- =?us-ascii?Q?sqQ98xLKqxI5IyylnM8r1+VvjhIWP76t0njakmXkiZrVqde4Odhl41B3lEl6?=
- =?us-ascii?Q?b3iw+rh5bzRPhPp6b5NCDLfsqqF4/6BROpyAsnhWZYtblOZujs7GqesctbDJ?=
- =?us-ascii?Q?MlC8utPfFU2s5GuO/rBtj2S6nt/H41t7VEXPVbX51MWwB0bf2dtl0wdwgOGY?=
- =?us-ascii?Q?HcNd8UOkODeNTzhs6+7b0P2f3ZFM1vt/zuHdW7q+LVOnLtVpt9CHQH1P/UB/?=
- =?us-ascii?Q?b3271zkhxIKHwncGK9C7AIsyidwn6z4HsqWufyciVA2ELr9sp1vtvU5EUw4o?=
- =?us-ascii?Q?6O6AKvO5jpXpdlayzczuUaY9H5V+mIE9Dj9fIdP4fbhzipVHslVMHNcZExdU?=
- =?us-ascii?Q?THld2L6EkoAI9xgf99uuD6RIY55pqfM7FCjQb4adxWJCUieFX2ncEjbT4qid?=
- =?us-ascii?Q?b0xXwxkd+7w20QsJK+Fzg0SCSQuQGNXmGFs5ofyQxEPSOpwL1So/SCZ1AKTE?=
- =?us-ascii?Q?zizN5kr8THzm9MnocuI0g+jFd7h2wRyY9ZHOPWjZPfnyUUZs96s5I0FvZptu?=
- =?us-ascii?Q?CDDjwVO71FzGflvepYb80nSgZHurLuApfzu2QzZ9LXLsZ0QPpS+neNPQlvvE?=
- =?us-ascii?Q?Oqu7pgeZVZ8rvk1UFSYtXkAmNLIC5asZk9z85a63O7uzS84U2Mc+Xg=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(366016)(376014)(38070700021)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?OkYcFgeOL2N6fi8zkJQ5eiZUOHDZ6Kg7BaICj8M3miFVGEJ3FGXmoZILRThM?=
- =?us-ascii?Q?fWohqkVBodD1HtgRwTUVCBhkUscKwOLnzfM5/ng7nFx7IKqqihVARq/xKeWj?=
- =?us-ascii?Q?GKmXVxM4ZshonDQhRdJlKsx6CkLUwfAyT3/uD1RQP3P7nCv3/21WKOk928F8?=
- =?us-ascii?Q?YYF/MeBGFxQTqX/RYQIpfi3bzsg13cOM0w9yd1HtgKDme4HQT+iVJ90hDYf3?=
- =?us-ascii?Q?RfsSQeTL2Yn9Hz6NqUoI850Gl7Y++v7tDBwT+0c0QPFpt8IVf5jgNp0cbPYt?=
- =?us-ascii?Q?GksJNgxZb+nYzDgGZgBSa1f7qj5IWzmvk/otDc8GbpC5l1DfMkALHy3FSJPe?=
- =?us-ascii?Q?9iNwaP1irnnEdsjAogoFO1qey0/a2Kp5zjKIgYT4z9ll6umL+20skVDXmCW1?=
- =?us-ascii?Q?WsJSlpvAI/ZTwWNDDIG6TRy2Xof8xgYc5euy/5nBCk5+/I0q3wE/DNl46wtJ?=
- =?us-ascii?Q?Q4lvpXS/qOua1yfMfnKkMkCHBEKLOy7kN3N3Z77sAlrX8Z5+7Q+q6K/RNOdD?=
- =?us-ascii?Q?YTLD9L6v2rwvRn+MmrJIO/AKtaGkPav+9/KBuezMiVQ3Rz/6GC+VPe14B9EJ?=
- =?us-ascii?Q?OJOBm5U6bQyAwFlhvhTChRzkjlfzJY2fKjgukgECFmH/N3bhu/8iln/gLE4m?=
- =?us-ascii?Q?2Yf+tb4wQBNNVBqM3FxPmJ40XQVU6XPkV7nk3Fl5frKx3LBTVpmW/4W3iO34?=
- =?us-ascii?Q?UyZzs5Tg4oBdt4txkG/KFHLDvsWIE6CgT9iKYbdA0EyNYcyjCAGaROi6235B?=
- =?us-ascii?Q?MnxmuTZsd8FeWtL9HZINjrUbGumaF/CRT+5PHY2QIjHyljTXKLn9Qn/mok1l?=
- =?us-ascii?Q?eQQ0XaGgnaUI3cqs+oIojaaTlvTL61VwJMKOd0vIYLFlDvtCWf+J8hQc6meA?=
- =?us-ascii?Q?hcjAVZq/ac5HsawBZyrAWKYJVIjX4heMqv4/4LewymVQ7U6wzNYFGHGdE2ql?=
- =?us-ascii?Q?sV9KmZVWVeeIweLPI9gs9bavdCvs6MO0Q1khi/VhxUuBVIA9S2NFMeN9AXY+?=
- =?us-ascii?Q?UdUIg7gy8rsudgqvfcMv4VpmChUqAt3MScM/n/imvydGBxZInDLVR0qiIlXR?=
- =?us-ascii?Q?VQdQDoTFmLmsRp9Gw93Gg2iHxSzcP7r6jsZKBJA7DoGOS4Uu+TeGXhM8Zc6y?=
- =?us-ascii?Q?4D5G38QtCVPmeoq/St9rfkDnaSoZwY/SjxmicPQy8PDXAz4747C6L+Eb/2zC?=
- =?us-ascii?Q?dj/pNo4mCaQ0cOOVGHH1jSQhuI+PtEysstcw+oVsqHMKKMjn2HDPPCCo4L5+?=
- =?us-ascii?Q?V1DvtiVqVR5iPyGbyWxws0FCZinzFsoWB9UUfoWwI01Bt1eRZqt8kICpZOpF?=
- =?us-ascii?Q?4zX5kxRJ57Z2omKIcWmfqKkltwi1jAK1kFkcDs2zR4U+UaehlehgPYjVpZTy?=
- =?us-ascii?Q?B6FqPsbU7j6DislnHPmHVWaeeagQzfNF8LHNbSPvWUGtTlDTG8ODKDltF/Qi?=
- =?us-ascii?Q?RBintLaR9rpgUaKw7akozkNytdnUDFemKBA8v1W9CKDsVWtdsH09SJra0XYp?=
- =?us-ascii?Q?a/Mx7JYlJL0Y8iMhVRlAeyKdc85act4Z4vyWte6sy5e0T8kWMtxB4JoH0q/Y?=
- =?us-ascii?Q?BuzYy4BlMi15odI/kbzjDn1p4WHxfpEzpwPZTt3O9hLNlrq81ct288qzZ9uM?=
- =?us-ascii?Q?Y3bZbb8K5ABj7SYQ0spuR1q81AwKlHx5NBhWccIsNELR?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC1214F125
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 07:15:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760685357; cv=none; b=OMlnbUdJhgkSOgO5P14GmPiQw0PgCKza3egsdgY4Pze5DckfqHCBtsT9ziqUpyvvcQsTTR4DxbPDW/wPvxB9cpP7fSev4D6LxUPd+VkJCd/q7BGELv6lyA5O0c7ZtNpEu1rmcBWSttLe0aYCxdJXdCK8VJEcBFb1lXI9QRydpLw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760685357; c=relaxed/simple;
+	bh=1dL9wTlycAsLzX2y4MTzrrBzSQsmTrPVywYZGm5zJ1I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dWDdHRgg/JwkAnRVoKQJSqvkMlIkHj6R5KPdhb33+VznRbDQP1t17ZousPAv/JWy7WFtttL9dWiZTBAirPbLQj0Iq9GQQpFC3cJMt/qmEeeVYTYCPOeQQg5qmR5iKxR+apK+faH1FMlTiWCYPW7hzNRAekXc6FfSrRZnS1LUE28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fJzyX/Lg; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-57e03279bfeso1825576e87.0
+        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 00:15:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760685353; x=1761290153; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=148Eb17gJ8RxWdKQ2rnESJNbo/VxcgJDRGCnUFv20jM=;
+        b=fJzyX/LgmkDUdYEEdotiJst0i7hDjJxIE5IxWhiXN1wq9C/3xiS1hnV034AB1FL/k7
+         hri77aTXsOhmQ+FsEFGoa+sonlAo9Sjvq4S3LtVL4lYpRwOGPIba8TQ/XCeMqtAjrvTg
+         jSncYyDcRwYZ3OC2cKNB2IOM99zjCyJnwdNL9AtCY+Q+IQEUVXgkBnVM0DdL0kbyABmH
+         YIWUQG+4Wn2bpNFnxBdLXhsYy4mibyu80rsLCfM55pc1vAB6lm5qukgtJMhJaZSfKWTI
+         Q8/U7UewEYRU7ZkMGMVJCaY7Ke+XBXEzXtx3zGeYvRrCURnaUtqtcPfhtqXkXmd+5y8H
+         tjWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760685353; x=1761290153;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=148Eb17gJ8RxWdKQ2rnESJNbo/VxcgJDRGCnUFv20jM=;
+        b=qIBYpqQV8qQa+clylg9YqUy9OFvvJdtuCTtCrfKUoYbXFZLE/CQR/vU8Ognw9d9oaU
+         ZVWl/tiU7dvcFahAD7iLWzFTvnv5RfglkD7UGHcYwmPSE8b2HCTLqmfTJ3zN57wiCQne
+         xVJNNbCohh0Q5PoH5o4zGOJ2Mo8xRu4KM7Jmj2cVjQrg3ePylW4WibwTWBfZuU3fTYhW
+         LFuWLBYpLJZSE0a+dXC5YvWahzoPDyXMcwnbFny7jcJ+XswSFX8oSSwb+rR3I2X4Z/4N
+         pclsdUh4gAfwDwRtprg44uBUtGvvaoQUE+SDPBAtqDoHv2ZrW9+cGHiFDa1uMq/opYEX
+         ru+w==
+X-Forwarded-Encrypted: i=1; AJvYcCU+VI1/9aQHALtWEjz6+M3qw6XwGXeU83U9bcUFvLXEbRyY4l3yJ66xORDED1X8aLFL/DcQcas=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9RGDIlkl3OVy1QCA8WpPLICEcMDw6la8S0uTK0PFA3YmMSQDM
+	F0emFWaHrZNaA05YcAExU0tLTP8gLrECVzJFly4/e7cdhL2CjZoMIcpSfXLaLyR/LQQ=
+X-Gm-Gg: ASbGncsLnmOJSFRE00F6nzmV3mKvxT8cWptvuMDW6Cq4kJgt9NPIi0kawDXaB1PE5E/
+	wlVnRUbl8SFZfj6WfZEZzIWqLKIRxTyMjFYIXwdPDBPN8a/nI7WhAX3gre1NRRd+dIc4mmw9CFe
+	43eQTaQY2QpVMV/cH88FEXOgFIPOzj/6wrjWDTa1iAfcDvY+n1zPZUEtcApTnlI1PjbxSpXKDDX
+	n6DISuJV3j236TmMQTxX43QqNnUJLIVHaQy8Ec/69DtZRBcQ/Dr8Wm28ol5QsKguH07iE6pEa7Z
+	wZlrBXzsMEK6rR+YO5SE22pOaSDCriyxCp/8gh9TYt79vojnCwVa9qgR0fAC6+JEAQQxYu6AQby
+	iRmrIBlPDz1G+Pt3ZcEvuNw0yQxFuklNrbBP9DZCcTaIrxno0nAlEIGpHxg/MSo5YLwVpFjta8F
+	jYlZCf4/ELR6g=
+X-Google-Smtp-Source: AGHT+IFRf1ySNbsYYj5o+dwvR7Hy0y8DnWvFwza///P/Rp2kadGpW46H/2fJTcVA47GU9k2AX6PYYA==
+X-Received: by 2002:a05:6512:2348:b0:585:1a9b:8b9a with SMTP id 2adb3069b0e04-591d083ec9amr2137907e87.9.1760685352985;
+        Fri, 17 Oct 2025 00:15:52 -0700 (PDT)
+Received: from home-server ([82.208.126.183])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59088563c13sm7648665e87.78.2025.10.17.00.15.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Oct 2025 00:15:52 -0700 (PDT)
+Date: Fri, 17 Oct 2025 10:15:50 +0300
+From: Alexey Simakov <bigalex934@gmail.com>
+To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Cc: Xin Long <lucien.xin@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-sctp@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org
+Subject: Re: [PATCH net] sctp: avoid NULL dereference when chunk data buffer
+ is missing
+Message-ID: <20251017071550.q7qg2a5e7xu6yvlr@home-server>
+References: <20251015184510.6547-1-bigalex934@gmail.com>
+ <aO_67_pJD71FBLmd@t14s.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 75a903ea-5cab-4eeb-35a8-08de0d4bb620
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Oct 2025 07:06:36.1854
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: AZtKMj2KUzhMdK3tNRxsN1H1CpnQuDEwCzm48dEHlqEI+aU1GQBvyx7ypElGLVvREivw1HAfXsjRMCXqLS4UUg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4840
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aO_67_pJD71FBLmd@t14s.localdomain>
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of G=
-rzegorz Nitka
-> Sent: 29 September 2025 20:59
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>; netdev@vger.ker=
-nel.org; Kubalewski, Arkadiusz <arkadiusz.kubalewski@intel.com>
-> Subject: [Intel-wired-lan] [PATCH v2 iwl-net] ice: fix destination CGU fo=
-r dual complex E825
->
-> On dual complex E825, only complex 0 has functional CGU (Clock Generation=
- Unit), powering all the PHYs.
-> SBQ (Side Band Queue) destination device 'cgu' in current implementation =
-points to CGU on current complex and, in order to access primary CGU from t=
-he secondary complex, the driver should use 'cgu_peer' as a destination dev=
-ice in read/write CGU registers operations.
->
-> Define new 'cgu_peer' (15) as RDA (Remote Device Access) client over SB-I=
-OSF interface and use it as device target when accessing CGU from secondary=
- complex.
->
-> This problem has been identified when working on recovery clock enablemen=
-t [1]. In existing implementation for E825 devices, only PF0, which is cloc=
-k owner, is involved in CGU configuration, thus the problem was not exposed=
- to the user.
->
-> [1] https://patchwork.ozlabs.org/project/intel-wired-lan/patch/2025090515=
-0947.871566-1-grzegorz.nitka@intel.com/
->
-> Fixes: e2193f9f9ec9 ("ice: enable timesync operation on 2xNAC E825 device=
-s")
-> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> Reviewed-by: Arkadiusz Kubalewski <Arkadiusz.kubalewski@intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> ---
-> v1->v2:
-> - rebased
-> - fixed code style coomments (skipped redundant 'else', improved
->  'Return'
->  description in function doc-string)
-> ---
-> drivers/net/ethernet/intel/ice/ice_common.c  | 26 ++++++++++++++++++--  d=
-rivers/net/ethernet/intel/ice/ice_sbq_cmd.h |  1 +
-> 2 files changed, 25 insertions(+), 2 deletions(-)
->
+On Wed, Oct 15, 2025 at 04:50:07PM -0300, Marcelo Ricardo Leitner wrote:
+> On Wed, Oct 15, 2025 at 09:45:10PM +0300, Alexey Simakov wrote:
+> > chunk->skb pointer is dereferenced in the if-block where it's supposed
+> > to be NULL only.
+> 
+> The issue is well spotted. More below.
+> 
+> > 
+> > Use the chunk header instead, which should be available at this point
+> > in execution.
+> > 
+> > Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> > 
+> > Fixes: 90017accff61 ("sctp: Add GSO support")
+> > Signed-off-by: Alexey Simakov <bigalex934@gmail.com>
+> > ---
+> >  net/sctp/inqueue.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/net/sctp/inqueue.c b/net/sctp/inqueue.c
+> > index 5c1652181805..f1830c21953f 100644
+> > --- a/net/sctp/inqueue.c
+> > +++ b/net/sctp/inqueue.c
+> > @@ -173,7 +173,8 @@ struct sctp_chunk *sctp_inq_pop(struct sctp_inq *queue)
+> 
+> With more context here:
+> 
+>                if ((skb_shinfo(chunk->skb)->gso_type & SKB_GSO_SCTP) == SKB_GSO_SCTP) {
+>                        /* GSO-marked skbs but without frags, handle
+>                         * them normally
+>                         */
+> 
+>                        if (skb_shinfo(chunk->skb)->frag_list)
+>                                chunk->head_skb = chunk->skb;
+> 
+>                        /* skbs with "cover letter" */
+>                        if (chunk->head_skb && chunk->skb->data_len == chunk->skb->len)
+> 		           ^^^^^^^^^^^^^^^^^^
+> 
+> chunk->head_skb would also not be guaranteed.
+> 
+> >  				chunk->skb = skb_shinfo(chunk->skb)->frag_list;
+> 
+> But chunk->skb can only be NULL if chunk->head_skb is not, then.
+> 
+> Thing is, we cannot replace chunk->skb here then, because otherwise
+> when freeing this chunk in sctp_chunk_free below it will not reference
+> chunk->head_skb and will cause a leak.
+> 
+> With that, the check below should be done just before replacing
+> chunk->skb right above, inside the if() block. We're sure that
+> otherwise chunk->skb is non-NULL because of outer if() condition.
+> 
+> Thanks,
+> Marcelo
+> 
+> >  
+> >  			if (WARN_ON(!chunk->skb)) {
+> > -				__SCTP_INC_STATS(dev_net(chunk->skb->dev), SCTP_MIB_IN_PKT_DISCARDS);
+> > +				__SCTP_INC_STATS(dev_net(chunk->head_skb->dev),
+> > +						 SCTP_MIB_IN_PKT_DISCARDS);
+> >  				sctp_chunk_free(chunk);
+> >  				goto next_chunk;
+> >  			}
+I'm not sure, that correctly understand the new location of updated check.
+There a few assumtions below.
+> > -- 
+> > 2.34.1
+> > 
+		/* Is the queue empty?  */
+		entry = sctp_list_dequeue(&queue->in_chunk_list);
+		if (!entry)
+			return NULL;
 
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+		chunk = list_entry(entry, struct sctp_chunk, list);
+
+		if (skb_is_gso(chunk->skb) && skb_is_gso_sctp(chunk->skb)) {
+			/* GSO-marked skbs but without frags, handle
+			 * them normally
+			 */
+			if (skb_shinfo(chunk->skb)->frag_list)
+				chunk->head_skb = chunk->skb;
+
+			/* skbs with "cover letter" */
+			if (chunk->head_skb && chunk->skb->data_len == chunk->skb->len)
+Adding this check here will not fix problem, since chunk->skb always true here because it dereferencing in
+checks above.
+				chunk->skb = skb_shinfo(chunk->skb)->frag_list;
+Adding here could make sense, chunk->skb changed => do something if it became null.
+
+			if (WARN_ON(!chunk->skb)) {
+				__SCTP_INC_STATS(dev_net(chunk->head_skb->dev),
+						 SCTP_MIB_IN_PKT_DISCARDS);
+				sctp_chunk_free(chunk);
+				goto next_chunk;
+			}
+		}
 
