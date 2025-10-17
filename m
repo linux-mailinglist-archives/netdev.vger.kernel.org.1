@@ -1,179 +1,74 @@
-Return-Path: <netdev+bounces-230556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0B76BEB1A5
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 19:41:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0632BEB1AE
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 19:42:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F8676E10F8
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:41:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 837516E189E
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:42:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC6513081D5;
-	Fri, 17 Oct 2025 17:41:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="mcZxpF2N"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01AF63081B8;
+	Fri, 17 Oct 2025 17:42:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18A81307AD0;
-	Fri, 17 Oct 2025 17:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72562EA493;
+	Fri, 17 Oct 2025 17:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760722883; cv=none; b=UB/1RbfStKHCGcIlv91fk/aZUfgu5NLMDlB7DgOFe545bpFk+NaPi27aliBBe5eBBNLRvTtceel9Gi4cKOiU8Ty3E1hx/klxK9jz2KVZjyGuFmCIgqErJbgOEDvvz0dKNpV7xjylfVd8wNL5XbuHCxaQgByrm8kFHdvgxNjKUw4=
+	t=1760722937; cv=none; b=Xdj1fIHIAAjanWHRxtgYmNZrZI1IjCUdVcKaNp3SXBYEEHbUhT4n+rxwKTL5pl72/kAR91WJ6fRKVq38QhJP0ypMzfXpcluV8EK50uOsMO21n0l+TGVOVmfVyCp3qB5wcxxqXyc/NXiPrNp/EEnnXYzt/Kzhn1GMrC5RUqIJLRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760722883; c=relaxed/simple;
-	bh=PRfVQxJjy6Vjp+xyCypyGyhNOHUhx/dYPG4ShHWopEk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ht1N+pMWLEZTGq0CwFFqBRgLSwkOQUXENLiFRtB/Iyq6BwPQXtb+PqfxOh7RVLvu9TnZnSwCHLFfDXi3b0CR73c9izQKMtgEAXBRcQAlo+gC/O/i+RyMjsMig5VtGvPSbdnYjXCfCmss51Rg4FCiY3EKU/zlDZPqhzfxY/DVnCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=mcZxpF2N; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [192.168.1.19] (unknown [103.212.145.76])
-	by linux.microsoft.com (Postfix) with ESMTPSA id A03B9201724E;
-	Fri, 17 Oct 2025 10:41:14 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A03B9201724E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1760722881;
-	bh=Vj1gk3aMFO+P9nUqeopKE4AuncD7z4KeVlwI818/kuQ=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=mcZxpF2N174Av/F08Hahi5sOnNi4wbANuLMTrs8jeuc7aGqKcDFhDpjSjqKb/Cuta
-	 K8Oi1Yc9cgeAM45PzaA1ouFsjnbdCIc/eG2aVfLh1CKIvY71FNf3rxs6E+1OiGQ+pA
-	 Jx9qOYEy9pHXZKqfKMxFYpTW8gYTkP4Vp5G49D+w=
-Message-ID: <1d3ac973-7bc7-4abe-9fe2-6b17dbba223b@linux.microsoft.com>
-Date: Fri, 17 Oct 2025 23:11:11 +0530
+	s=arc-20240116; t=1760722937; c=relaxed/simple;
+	bh=7aBNyH1hs2A8WMcKkuyOjp5fNna7UKZ5GH7Ej+Gjhbk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tXDDJxTBlPkywQV/FZdtKV3y/FhRafZaWV2vmtVwhiFuvi6i6KotG3hS84QWfPoKkj+/D/5hyZTKas2ImpUVHgprxWwCCnK7sqhWinkwnNbe0YwBB3WGM1QJNsOPDB2U1MILTafdZgrxmxV+9Clio0TqsqPtET8W2Q14Rq4pm7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 01BEE1595;
+	Fri, 17 Oct 2025 10:42:07 -0700 (PDT)
+Received: from bogus (unknown [10.57.37.36])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 223933F66E;
+	Fri, 17 Oct 2025 10:42:11 -0700 (PDT)
+Date: Fri, 17 Oct 2025 18:42:09 +0100
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Adam Young <admiyo@amperemail.onmicrosoft.com>
+Cc: Adam Young <admiyo@os.amperecomputing.com>,
+	Jassi Brar <jassisinghbrar@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Huisong Li <lihuisong@huawei.com>
+Subject: Re: [PATCH v30 1/3] mailbox: pcc: Type3 Buffer handles ACK IRQ
+Message-ID: <aPJ_8XJyse50Tgfx@bogus>
+References: <20251016210225.612639-1-admiyo@os.amperecomputing.com>
+ <20251016210225.612639-2-admiyo@os.amperecomputing.com>
+ <99aa7b2a-e772-4a93-a724-708e8e0a21ed@amperemail.onmicrosoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: mana: Linearize SKB if TX SGEs exceeds
- hardware limit
-From: Aditya Garg <gargaditya@linux.microsoft.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
- kotaranov@microsoft.com, horms@kernel.org, shradhagupta@linux.microsoft.com,
- ernis@linux.microsoft.com, dipayanroy@linux.microsoft.com,
- shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, gargaditya@microsoft.com,
- ssengar@linux.microsoft.com
-References: <20251003154724.GA15670@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <CANn89iJwkbxC5HvSKmk807K-3HY+YR1kt-LhcYwnoFLAaeVVow@mail.gmail.com>
- <9d886861-2e1f-4ea8-9f2c-604243bd751b@linux.microsoft.com>
- <CANn89iKwHWdUaeAsdSuZUXG-W8XwyM2oppQL9spKkex0p9-Azw@mail.gmail.com>
- <7bc327ba-0050-4d9e-86b6-1b7427a96f53@linux.microsoft.com>
-Content-Language: en-US
-In-Reply-To: <7bc327ba-0050-4d9e-86b6-1b7427a96f53@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <99aa7b2a-e772-4a93-a724-708e8e0a21ed@amperemail.onmicrosoft.com>
 
-On 08-10-2025 20:58, Aditya Garg wrote:
-> On 08-10-2025 20:51, Eric Dumazet wrote:
->> On Wed, Oct 8, 2025 at 8:16 AM Aditya Garg
->> <gargaditya@linux.microsoft.com> wrote:
->>>
->>> On 03-10-2025 21:45, Eric Dumazet wrote:
->>>> On Fri, Oct 3, 2025 at 8:47 AM Aditya Garg
->>>> <gargaditya@linux.microsoft.com> wrote:
->>>>>
->>>>> The MANA hardware supports a maximum of 30 scatter-gather entries 
->>>>> (SGEs)
->>>>> per TX WQE. In rare configurations where MAX_SKB_FRAGS + 2 exceeds 
->>>>> this
->>>>> limit, the driver drops the skb. Add a check in mana_start_xmit() to
->>>>> detect such cases and linearize the SKB before transmission.
->>>>>
->>>>> Return NETDEV_TX_BUSY only for -ENOSPC from 
->>>>> mana_gd_post_work_request(),
->>>>> send other errors to free_sgl_ptr to free resources and record the tx
->>>>> drop.
->>>>>
->>>>> Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
->>>>> Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
->>>>> ---
->>>>>    drivers/net/ethernet/microsoft/mana/mana_en.c | 26 +++++++++++++ 
->>>>> ++----
->>>>>    include/net/mana/gdma.h                       |  8 +++++-
->>>>>    include/net/mana/mana.h                       |  1 +
->>>>>    3 files changed, 29 insertions(+), 6 deletions(-)
->>>>>
->>>>> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/ 
->>>>> drivers/net/ethernet/microsoft/mana/mana_en.c
->>>>> index f4fc86f20213..22605753ca84 100644
->>>>> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
->>>>> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
->>>>> @@ -20,6 +20,7 @@
->>>>>
->>>>>    #include <net/mana/mana.h>
->>>>>    #include <net/mana/mana_auxiliary.h>
->>>>> +#include <linux/skbuff.h>
->>>>>
->>>>>    static DEFINE_IDA(mana_adev_ida);
->>>>>
->>>>> @@ -289,6 +290,19 @@ netdev_tx_t mana_start_xmit(struct sk_buff 
->>>>> *skb, struct net_device *ndev)
->>>>>           cq = &apc->tx_qp[txq_idx].tx_cq;
->>>>>           tx_stats = &txq->stats;
->>>>>
->>>>> +       BUILD_BUG_ON(MAX_TX_WQE_SGL_ENTRIES != 
->>>>> MANA_MAX_TX_WQE_SGL_ENTRIES);
->>>>> +       #if (MAX_SKB_FRAGS + 2 > MANA_MAX_TX_WQE_SGL_ENTRIES)
->>>>> +               if (skb_shinfo(skb)->nr_frags + 2 > 
->>>>> MANA_MAX_TX_WQE_SGL_ENTRIES) {
->>>>> +                       netdev_info_once(ndev,
->>>>> +                                        "nr_frags %d exceeds max 
->>>>> supported sge limit. Attempting skb_linearize\n",
->>>>> +                                        skb_shinfo(skb)->nr_frags);
->>>>> +                       if (skb_linearize(skb)) {
->>>>
->>>> This will fail in many cases.
->>>>
->>>> This sort of check is better done in ndo_features_check()
->>>>
->>>> Most probably this would occur for GSO packets, so can ask a software
->>>> segmentation
->>>> to avoid this big and risky kmalloc() by all means.
->>>>
->>>> Look at idpf_features_check()  which has something similar.
->>>
->>> Hi Eric,
->>> Thank you for your review. I understand your concerns regarding the use
->>> of skb_linearize() in the xmit path, as it can fail under memory
->>> pressure and introduces additional overhead in the transmit path. Based
->>> on your input, I will work on a v2 that will move the SGE limit check to
->>> the ndo_features_check() path and for GSO skbs exceding the hw limit
->>> will disable the NETIF_F_GSO_MASK to enforce software segmentation in
->>> kernel before the call to xmit.
->>> Also for non GSO skb exceeding the SGE hw limit should we go for using
->>> skb_linearize only then or would you suggest some other approach here?
->>
->> I think that for non GSO, the linearization attempt is fine.
->>
->> Note that this is extremely unlikely for non malicious users,
->> and MTU being usually small (9K or less),
->> the allocation will be much smaller than a GSO packet.
+On Fri, Oct 17, 2025 at 12:08:07PM -0400, Adam Young wrote:
+> This is obsoleted/duplicated by Sudeep's patch.� I am going to rebase on his
+> patch series.
 > 
-> Okay. Will send a v2
-Hi Eric,
-I tested the code by disabling GSO in ndo_features_check when the number 
-of SGEs exceeds the hardware limit, using iperf for a single TCP 
-connection with zerocopy enabled. I noticed a significant difference in 
-throughput compared to when we linearize the skbs.
-For reference, the throughput is 35.6 Gbits/sec when using 
-skb_linearize, but drops to 6.75 Gbits/sec when disabling GSO per skb.
 
-Hence, We propose to  linearizing skbs until the first failure occurs. 
-After that, we switch to a fail-safe mode by disabling GSO for SKBs with 
-  sge > hw limit using the ndo_feature_check implementation, while 
-continuing to apply  skb_linearize() for non-GSO packets that exceed the 
-hardware limit. This ensures we remain on the optimal performance path 
-initially, and only transition to the fail-safe path after encountering 
-a failure.
+Thanks for looking at them. Sorry we just cross posted each other last night.
+
+-- 
 Regards,
-Aditya
+Sudeep
 
