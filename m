@@ -1,78 +1,89 @@
-Return-Path: <netdev+bounces-230481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A19D6BE8A29
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 14:45:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E044BE8C18
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 15:10:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D1135E13D4
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 12:44:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6E461AA4C5D
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 13:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6BEE32D0EA;
-	Fri, 17 Oct 2025 12:44:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5A5345738;
+	Fri, 17 Oct 2025 13:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="eaCyIulF"
+	dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b="BaSxQt/e"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D340732ABFF;
-	Fri, 17 Oct 2025 12:44:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FAB3451AB
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 13:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760705087; cv=none; b=Il2+NdpVXKUce4hPCLy3okGZmZWHbba4FyrJ5Pe0DNOgLuzxcwdM81w2J53eekgf4ELuE5v2fT77/gmBzcNCEXdpLf3uNbgcy7UX05Qx9drBrl6umkIn6e9nyWGLxYdE0RO/k+XU/zt1gZgiZgR4KhmiMdAnnUkOttHJFZ2BsuE=
+	t=1760706630; cv=none; b=GEZipSfyBHXM21Ihg/GztKRw/vGVXjSUo9+/VTkA8leF7L1O9P3BERUr3lpwIMyePz/04dl8p2Cn4zMxCbHcZ0FQGr2dqJO9gUKNASDjRDmiO2YqtyLnSPufj5efxvln1H8DPP5PRuacZq/Yf9qHtJnGsMZATSfF/nfFicBNZwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760705087; c=relaxed/simple;
-	bh=0QgbZU9irSNV/N076JQZk6AJrYALmk3Md2UhCibShyQ=;
+	s=arc-20240116; t=1760706630; c=relaxed/simple;
+	bh=439D4x4RewosLmOifKb8w/D7qCnx3Fln5kuNMbO8pxE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P4tZmfq+9WV8YH0qwKEHcqthW1sSFbafY0hVBTXzZCyYccAO2U/fzXguRV28wUjVaio29hO49u9HP4qwLkb28YDRNzOPLUCDeRcn3zBNyYpX/dgTE9H6Bwiy+FYyqp0XOKxjL3gNPUWh2TFdhVsdR/wwRI0NWFgZD+6EiXznhUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=eaCyIulF; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=iMaunYaTiHBvajS7Akr5txw8OUSAxQkTAc82E7olhqA=; b=eaCyIulFQ6xXo3jsBkivsFl4D/
-	eX2T8893dgSWPXh0cB9jACnVhOKEftIlnkvKdgnTBqdyc5p81MVz6fbyELEM3BxWyq6MkccMQBaRe
-	u58byjoq7OPLCF3H5LTWYkPJx7qu0a/yUatYpBiWM7NoDtVEbCzIHayP22SbhtnHvdkeeG1g8cro3
-	eYu93lp8g+6CLI6mvoLnmagZtbsA2h+fpTOa//ygkATewPSSWzSHBwzR0ObROGZPTRZxXX1WaqMQf
-	zfbONHfMmySV7TT5o21EKlk6UP0k9p2He0SK4PXGt7oPhbylRTUmdNUQLofl/7pJ1c7MRzntD6eHk
-	SOcZZeEg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34722)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1v9jox-000000007tY-2bB3;
-	Fri, 17 Oct 2025 13:44:35 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1v9jov-000000004Jy-0MNd;
-	Fri, 17 Oct 2025 13:44:33 +0100
-Date: Fri, 17 Oct 2025 13:44:32 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: rohan.g.thomas@altera.com
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	Rohan G Thomas <rohan.g.thomas@intel.com>,
-	Boon Khai Ng <boon.khai.ng@altera.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Matthew Gerlach <matthew.gerlach@altera.com>
-Subject: Re: [PATCH net v3 2/3] net: stmmac: Consider Tx VLAN offload tag
- length for maxSDU
-Message-ID: <aPI6MEVp9WBR3nRo@shell.armlinux.org.uk>
-References: <20251017-qbv-fixes-v3-0-d3a42e32646a@altera.com>
- <20251017-qbv-fixes-v3-2-d3a42e32646a@altera.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=p+EDLguGVu5oITYgmaHG+OkrW72wmI5nJ6wRFHEcn6oOTkuJghmh3mfa5Od9BiLMEZNs7h5jcGdTKbjDNV1rqIrEGWkQ61v05AdoWHum+oWw61P9nEDe+UBIcsho1911DKv+5NRY/kiDKTPbAjJf8PeYxhuDsrPBUSlYCUGWqLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu; spf=fail smtp.mailfrom=g.harvard.edu; dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b=BaSxQt/e; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=g.harvard.edu
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-88e68c0a7bfso373326285a.0
+        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 06:10:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rowland.harvard.edu; s=google; t=1760706627; x=1761311427; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3n12fDi8NT3PL5BkJsb+zATv8iKj3oJFPgatJxL6saw=;
+        b=BaSxQt/eNed5m0chPoCyNucSmmD28R59Si2dbjx+PwIRE8Dihx8tqS+RARYRwXKBWh
+         TC5cC9ho/sVLB8s9EOPsplmCR3VweeGI1mvHgIiF1hv5VJxEVyabyIDTcVBdoFgkICDF
+         09vYVtKNqSdPualE2oXS9GrCRgFn91KhW37muojt7+xfBH7uFYFKHrqE7jlUL/nN5Gvi
+         /oCkop+zjJ8UxaAkaM2CYEAFlD3mdLQO1ZkuIjeuIw7+ZMhPvUeNAdA+0PXRLr1Sh97S
+         yXqt0zvy7hYRuYEC0bwmRzcnsfM8DhGIfIcaR5V5ai/ZVweqY4pXSkbhkDnGMT0IBv58
+         bXPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760706627; x=1761311427;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3n12fDi8NT3PL5BkJsb+zATv8iKj3oJFPgatJxL6saw=;
+        b=Aq8mzGQnJz+IKmrdUEIX0nIbcpf0+u7Qef5BUiT3q6fMZv0kHj/KKym8zu3JPIAVrg
+         XQwLahBgAiHw0i3LPMeUSro8yf4UreR8qmKc+J7ppCyHPWaXgF+rXXhqKmalnltDtffV
+         i+Ys8oTuTD8qHu3gGFzjdHkUzEV5AUj6RW8drpuCE7CZEM1PHP9kavjWtB+6LxTG/h5L
+         unTxVrzNXttBuTRzFxJ16Y6B4633dFw+BLaq4vuVoAyqXzxlSkeQOLTy/JXUR4ilydop
+         /tTiVbdpU2IT95N0hp07pyvQug7NvEprb+wSVTb1tAUXztpE2iCkMRiajIE1ejATmGx0
+         oKRg==
+X-Forwarded-Encrypted: i=1; AJvYcCVy7Iff0ImLhKNTVnwoI2pJTytGEcT6xzn41GnENilr28u3tTVqP60wYKYuyCRs3KRbtX/Tblc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy86ZIpX1XRHzRnlNTX7GQGSMgrdY6INTsL8Hk0dUkI8Y6aevbE
+	vHjWoDuSntdvLtl5PIWSdTXBRxGIXhLawEtt61Ur5hUDdL3zislxgPW0NN8iOG4wBQ==
+X-Gm-Gg: ASbGncuBdv13dwoVE9w1CS6+zr5ne9ZIK7hfiMTbBINokjE7t+lRc3Q5GQW4Iwap89Z
+	K1zR5AUk7DSuaYn5VkOqVRcSNGwobEAKUq+KXFHPxQm49scq7dxfjqv2RHHQHD/LSBzxMtk///o
+	mje95OSpuI3uNuVSLgjpPpqcjmXx5Sc0Rg4b4mAXeQAIyPA9V9MTMgSBY4OH0WXAQCZZ/R4HXeM
+	n6UPvfJwfxQDp2dKeN82B3oF47i0sXaIwVt0SNv8AVtXP4ZeUUoorkoqphsjNtxxGcpCbhB3gW+
+	7z4dw2GAzL2gyu+A66AIJnIUG7dyj5U1G7s/Kf2L/6hbXqGYjlK8Esus+ETQ4Pmk5KUSvDqfTlp
+	ZhZR46eNmiPN+VISkWVl88+AFjhJdgOI1a7Nbk51BMlkavRiorRSil1QUZzkV5uyHroZDz1yzmV
+	nxEeFBfWQD+yKuwuPtY7fryUA=
+X-Google-Smtp-Source: AGHT+IEpkGgt8qwkxX2G4nNg9sTqQYAmhd3dwwQtJvwgWPzzvMXMssW2nEo8a9VhAs8cB00VbditYw==
+X-Received: by 2002:a05:620a:1a2a:b0:85c:dda4:1cc8 with SMTP id af79cd13be357-8906fd18369mr434075485a.45.1760706627085;
+        Fri, 17 Oct 2025 06:10:27 -0700 (PDT)
+Received: from rowland.harvard.edu ([2601:19b:d03:1700::ba76])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-88f37f45129sm415854285a.38.2025.10.17.06.10.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Oct 2025 06:10:26 -0700 (PDT)
+Date: Fri, 17 Oct 2025 09:10:22 -0400
+From: Alan Stern <stern@rowland.harvard.edu>
+To: yicongsrfy@163.com
+Cc: michal.pecio@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, oliver@neukum.org, pabeni@redhat.com
+Subject: Re: [PATCH net v5 2/3] net: usb: ax88179_178a: add USB device driver
+ for config selection
+Message-ID: <db3db4c6-d019-49d0-92ad-96427341589c@rowland.harvard.edu>
+References: <20251013110753.0f640774.michal.pecio@gmail.com>
+ <20251017024229.1959295-1-yicongsrfy@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,23 +92,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251017-qbv-fixes-v3-2-d3a42e32646a@altera.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20251017024229.1959295-1-yicongsrfy@163.com>
 
-On Fri, Oct 17, 2025 at 02:11:20PM +0800, Rohan G Thomas via B4 Relay wrote:
-> From: Rohan G Thomas <rohan.g.thomas@altera.com>
+On Fri, Oct 17, 2025 at 10:42:29AM +0800, yicongsrfy@163.com wrote:
+> > > +	/* The vendor mode is not always config #1, so to find it out. */
+> > > +	c = udev->config;
+> > > +	num_configs = udev->descriptor.bNumConfigurations;
+> > > +	for (i = 0; i < num_configs; (i++, c++)) {
+> > > +		struct usb_interface_descriptor	*desc = NULL;
+> > > +
+> > > +		if (!c->desc.bNumInterfaces)
+> > > +			continue;
+> > > +		desc = &c->intf_cache[0]->altsetting->desc;
+> > > +		if (desc->bInterfaceClass == USB_CLASS_VENDOR_SPEC)
+> > > +			break;
+> > > +	}
+> > > +
+> > > +	if (i == num_configs)
+> > > +		return -ENODEV;
+> > > +
+> > > +	return c->desc.bConfigurationValue;
+> > > +}
+> >
+> > I wonder how many copies of this code would justify making it some
+> > sort of library in usbnet or usbcore?
 > 
-> On hardware with Tx VLAN offload enabled, add the VLAN tag length to
-> the skb length before checking the Qbv maxSDU if Tx VLAN offload is
-> requested for the packet. Add 4 bytes for 802.1Q tag.
+> Yes, there are many similar code instances in the USB subsystem.
+> However, I'm primarily focused on the networking subsystem,
+> so my abstraction work here might not be thorough enough.
+> Hopefully, an experienced USB developer may can optimize this issue.
 
-This needs to say _why_. Please describe the problem that the current
-code suffers from. (e.g. the packet becomes too long for the queue to
-handle, which causes it to be dropped - which is my guess.)
+Would it help to have a USB quirks flag that tells the core to prefer 
+configurations with a USB_CLASS_VENDOR_SPEC interface class when we 
+choose the device's configuration?  Or something similar to that (I'm 
+not sure exactly what you are looking for)?
 
-We shouldn't be guessing the reasons behind changes.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Alan Stern
 
