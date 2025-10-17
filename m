@@ -1,207 +1,175 @@
-Return-Path: <netdev+bounces-230484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F41FBBE8CC7
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 15:21:30 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F153BE8F1F
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 15:37:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E36E41899CA2
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 13:21:53 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 829C335CD32
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 13:37:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CE17350D40;
-	Fri, 17 Oct 2025 13:21:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 172B72F6936;
+	Fri, 17 Oct 2025 13:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="WO0rcs1L"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rPQ2rgH9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB83934F46B;
-	Fri, 17 Oct 2025 13:21:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D672F6931
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 13:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760707283; cv=none; b=l0DiRWROyC2ScmHyeTVAtQ9CvoonrJY9AykH3wAFpWho0KLYluwZbCjfB5m50x6xqg75/iSEJR+h+/ztNLb17RcxMRWo9Zltof8yC1ijvNAxc6vzbHwycGY3DJpKdk9rfTjyCEv4+/+nR5Mhy0zHeMHNQmQYRV4StTIMJmppsPM=
+	t=1760708237; cv=none; b=emnm5OzRyoXH7R4h/aMS6qrMidL6NE6R82B6/V7kL59aPFZ+I306jvC5lvL4B5HkTRAv57a1uhRSNSrIKDosOj2M176HYnRvgazMrP0Tkqrz8AahTlbUedlsdaz6fjqkq1YaquV4HYBrbf2CAx7oWInNBKO0o7ipFc6pFv46GJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760707283; c=relaxed/simple;
-	bh=TsK5Tt2ouVurdxip4F9N9xRTQrAAUe+nydbZDh4kkR4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jXovPer1XGE9i0oWcEKkKPE9H45oERvcGMttqIX3lysyrlYiLhCgjvj94GlHc9Z9HLMtsocHGpP6+x3pCDjfLMQcfu1CZVYUF/LXetWft0/CdKTRT4Sbl3PM/WYzgNf3YpCSPP8mRcDi1U0sSw3KI4y8BcxTPxbCIwyywRP0Azo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=WO0rcs1L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FD3EC4CEE7;
-	Fri, 17 Oct 2025 13:21:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1760707282;
-	bh=TsK5Tt2ouVurdxip4F9N9xRTQrAAUe+nydbZDh4kkR4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WO0rcs1LB08EtrlI4UYOZp3vA2LU4PF6GUqMUMIpmEXqmoXG3Qcm749CWSEMtRx21
-	 yd1cGcnjGwOdTi+mZWhyxu/7KjiFh8ulKGdwL02YJnjsySVFFQu9HMse0CT5qdfDbQ
-	 MZ11xTjtf2Wz3cpg9lhgccKHoyKXK7QAQW5csdhc=
-Date: Fri, 17 Oct 2025 15:21:18 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: "Farber, Eliav" <farbere@amazon.com>
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"jdike@addtoit.com" <jdike@addtoit.com>,
-	"richard@nod.at" <richard@nod.at>,
-	"anton.ivanov@cambridgegreys.com" <anton.ivanov@cambridgegreys.com>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"luto@kernel.org" <luto@kernel.org>,
-	"peterz@infradead.org" <peterz@infradead.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
-	"hpa@zytor.com" <hpa@zytor.com>,
-	"tony.luck@intel.com" <tony.luck@intel.com>,
-	"qiuxu.zhuo@intel.com" <qiuxu.zhuo@intel.com>,
-	"mchehab@kernel.org" <mchehab@kernel.org>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"rric@kernel.org" <rric@kernel.org>,
-	"harry.wentland@amd.com" <harry.wentland@amd.com>,
-	"sunpeng.li@amd.com" <sunpeng.li@amd.com>,
-	"alexander.deucher@amd.com" <alexander.deucher@amd.com>,
-	"christian.koenig@amd.com" <christian.koenig@amd.com>,
-	"airlied@linux.ie" <airlied@linux.ie>,
-	"daniel@ffwll.ch" <daniel@ffwll.ch>,
-	"evan.quan@amd.com" <evan.quan@amd.com>,
-	"james.qian.wang@arm.com" <james.qian.wang@arm.com>,
-	"liviu.dudau@arm.com" <liviu.dudau@arm.com>,
-	"mihail.atanassov@arm.com" <mihail.atanassov@arm.com>,
-	"brian.starkey@arm.com" <brian.starkey@arm.com>,
-	"maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
-	"mripard@kernel.org" <mripard@kernel.org>,
-	"tzimmermann@suse.de" <tzimmermann@suse.de>,
-	"robdclark@gmail.com" <robdclark@gmail.com>,
-	"sean@poorly.run" <sean@poorly.run>,
-	"jdelvare@suse.com" <jdelvare@suse.com>,
-	"linux@roeck-us.net" <linux@roeck-us.net>,
-	"fery@cypress.com" <fery@cypress.com>,
-	"dmitry.torokhov@gmail.com" <dmitry.torokhov@gmail.com>,
-	"agk@redhat.com" <agk@redhat.com>,
-	"snitzer@redhat.com" <snitzer@redhat.com>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"rajur@chelsio.com" <rajur@chelsio.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"peppe.cavallaro@st.com" <peppe.cavallaro@st.com>,
-	"alexandre.torgue@st.com" <alexandre.torgue@st.com>,
-	"joabreu@synopsys.com" <joabreu@synopsys.com>,
-	"mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
-	"malattia@linux.it" <malattia@linux.it>,
-	"hdegoede@redhat.com" <hdegoede@redhat.com>,
-	"mgross@linux.intel.com" <mgross@linux.intel.com>,
-	"intel-linux-scu@intel.com" <intel-linux-scu@intel.com>,
-	"artur.paszkiewicz@intel.com" <artur.paszkiewicz@intel.com>,
-	"jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"sakari.ailus@linux.intel.com" <sakari.ailus@linux.intel.com>,
-	"clm@fb.com" <clm@fb.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"dsterba@suse.com" <dsterba@suse.com>,
-	"xiang@kernel.org" <xiang@kernel.org>,
-	"chao@kernel.org" <chao@kernel.org>,
-	"jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
-	"adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
-	"dushistov@mail.ru" <dushistov@mail.ru>,
-	"luc.vanoostenryck@gmail.com" <luc.vanoostenryck@gmail.com>,
-	"rostedt@goodmis.org" <rostedt@goodmis.org>,
-	"pmladek@suse.com" <pmladek@suse.com>,
-	"sergey.senozhatsky@gmail.com" <sergey.senozhatsky@gmail.com>,
-	"andriy.shevchenko@linux.intel.com" <andriy.shevchenko@linux.intel.com>,
-	"linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>,
-	"minchan@kernel.org" <minchan@kernel.org>,
-	"ngupta@vflare.org" <ngupta@vflare.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"kuznet@ms2.inr.ac.ru" <kuznet@ms2.inr.ac.ru>,
-	"yoshfuji@linux-ipv6.org" <yoshfuji@linux-ipv6.org>,
-	"pablo@netfilter.org" <pablo@netfilter.org>,
-	"kadlec@netfilter.org" <kadlec@netfilter.org>,
-	"fw@strlen.de" <fw@strlen.de>,
-	"jmaloy@redhat.com" <jmaloy@redhat.com>,
-	"ying.xue@windriver.com" <ying.xue@windriver.com>,
-	"willy@infradead.org" <willy@infradead.org>,
-	"sashal@kernel.org" <sashal@kernel.org>,
-	"ruanjinjie@huawei.com" <ruanjinjie@huawei.com>,
-	"David.Laight@aculab.com" <David.Laight@aculab.com>,
-	"herve.codina@bootlin.com" <herve.codina@bootlin.com>,
-	"Jason@zx2c4.com" <Jason@zx2c4.com>,
-	"keescook@chromium.org" <keescook@chromium.org>,
-	"kbusch@kernel.org" <kbusch@kernel.org>,
-	"nathan@kernel.org" <nathan@kernel.org>,
-	"bvanassche@acm.org" <bvanassche@acm.org>,
-	"ndesaulniers@google.com" <ndesaulniers@google.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-um@lists.infradead.org" <linux-um@lists.infradead.org>,
-	"linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>,
-	"amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-	"freedreno@lists.freedesktop.org" <freedreno@lists.freedesktop.org>,
-	"linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>,
-	"linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
-	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"platform-driver-x86@vger.kernel.org" <platform-driver-x86@vger.kernel.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-	"linux-erofs@lists.ozlabs.org" <linux-erofs@lists.ozlabs.org>,
-	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-	"linux-sparse@vger.kernel.org" <linux-sparse@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
-	"coreteam@netfilter.org" <coreteam@netfilter.org>,
-	"tipc-discussion@lists.sourceforge.net" <tipc-discussion@lists.sourceforge.net>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Isabella Basso <isabbasso@riseup.net>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Sander Vanheule <sander@svanheule.net>,
-	Vlastimil Babka <vbabka@suse.cz>, Yury Norov <yury.norov@gmail.com>
-Subject: Re: [PATCH v2 01/27 5.10.y] overflow, tracing: Define the
- is_signed_type() macro once
-Message-ID: <2025101740-scion-flavoring-3a21@gregkh>
-References: <20251017090519.46992-1-farbere@amazon.com>
- <20251017090519.46992-2-farbere@amazon.com>
- <2025101708-obtuse-ellipse-e355@gregkh>
- <CH0PR18MB54337BD648C23CBE40C1060CC6F6A@CH0PR18MB5433.namprd18.prod.outlook.com>
+	s=arc-20240116; t=1760708237; c=relaxed/simple;
+	bh=OBU/VQLNWAjO0jz3aAQCIrhwvwrAj6kYYsDzTR4Oobw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Zfekk+LCO8NUcuJoEddglOebdNbcyMYVZ0M9mKAUJP2BSI5Sq7W1iJHoidKy+Zr81tk1PNwGstryBs8Nw5WmW3hw/fSE0H1wBFcp9lTfdea4Etmi0Xdl9Bopdt9XVtsm0cWtDzqhPBXuSBuJRy26mFDnK6YZAixnxprX/PkDnbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rPQ2rgH9; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-88e2656b196so2050285a.2
+        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 06:37:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760708234; x=1761313034; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=RgupyzykSctqh7Wr2atIqDtxk7+1x3xo0PwLw0IrMJ0=;
+        b=rPQ2rgH9W69O+NDK2KsG0HpTjBEDm3gZlALHYR1DMQINWKsDBFQKADqPNyiEH8U61U
+         Jix7JZKG/mILSDVYqLqQLxJ8VFrhW8uM5LC+fjsELAA2R6MCfk9xYV/I9AVzLIGJ7FUJ
+         MMfSydtW+aIZU0XmvCZRO3FsNVeHSc/f+UTSi4Qm0HpUCdKWTEcx0yPzvTASpO73f35h
+         7Hv/h/cVjBEDgkjy/Ud/yfEEWMoAnUdK/opZs4QbA2817/pKYNIZLodLFgVVCzHODmUS
+         XxO/5nchJUi7SUAeuLQyD+frjBYNd3xfy+Byx/e1cQq60Q7nskBUwg3XpyrPlUeI22P3
+         0Q+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760708234; x=1761313034;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RgupyzykSctqh7Wr2atIqDtxk7+1x3xo0PwLw0IrMJ0=;
+        b=LjawvP7azDT993jkWPajknYnXgycwXC9dG0xyh7+PZhrdKj+aGz0P3KC9dbfwV1kwM
+         Las7mW6GaKZa7LE5+HCZg5yeTJHB9kTVWeTsO0Rj4zjjBq8WnFQ4C7rgiq9CrFnSzC/q
+         cYPi4JP9Wu6P5K7/KTO7rQkY89myLBokxpQ2Veih8lsLa8ROeDHZhanlPmKiLQ21GSsL
+         ggNYRocAaKQN7ZMSkZpSsRcHYerxxtwMAvLKyuFk29FI8fj8ws0wXm0DKwUUMuLhr22C
+         YrKDSlyIhu7YJlxZab/K3hzC4rFr3qxyXr4aozURBzjpW1KJhIGsUKzNunH6UAKRhTjl
+         l0fg==
+X-Forwarded-Encrypted: i=1; AJvYcCXrlrC9Vd0kZXbQCIaPUp6cgJHCdH9GVEJOJDBrNUdBCueVGUNb/2n40i9XFq3DRhb5PsgQUpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPcn5jQIosCA7ihN5y/U36PnABLNMA08pHp0UBewOw6cuHE9kA
+	UMySdufILoBdtTdeyXQ3q9Yz6j8ZCSfQcu+WyItZvAA082m5WKSNKq0kltEM5LHP238pAeqX6/J
+	dYIANwvY5GSEsTg==
+X-Google-Smtp-Source: AGHT+IFglZmax5yyeu1g8/89BIOmL4rdWHYYLT+JR6NIlnOoBgVJuu5kyU0x1j5SSS6GNOO4f9vBQlhiJIKuhg==
+X-Received: from qvab28.prod.google.com ([2002:a05:6214:611c:b0:87b:eaab:61d6])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ac8:5993:0:b0:4e8:a6ca:8cc4 with SMTP id d75a77b69052e-4e8a6ca8ea4mr13471141cf.36.1760708234242;
+ Fri, 17 Oct 2025 06:37:14 -0700 (PDT)
+Date: Fri, 17 Oct 2025 13:37:12 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CH0PR18MB54337BD648C23CBE40C1060CC6F6A@CH0PR18MB5433.namprd18.prod.outlook.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
+Message-ID: <20251017133712.2842665-1-edumazet@google.com>
+Subject: [PATCH net-next] net: avoid extra acces to sk->sk_wmem_alloc in sock_wfree()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Oct 17, 2025 at 12:16:27PM +0000, Farber, Eliav wrote:
-> > On Fri, Oct 17, 2025 at 09:04:53AM +0000, Eliav Farber wrote:
-> > > From: Bart Van Assche <bvanassche@acm.org>
-> > >
-> > > [ Upstream commit 92d23c6e94157739b997cacce151586a0d07bb8a ]
-> >
-> > This isn't in 5.15.y, why is it needed in 5.10.y?
-> 
-> This is the mainline commit:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/include/linux/overflow.h?h=v6.18-rc1&id=92d23c6e94157739b997cacce151586a0d07bb8a
-> 
-> The commit hash is 92d23c6e94157739b997cacce151586a0d07bb8a, which is
-> the one I used for the backport.
-> 
-> And here is the corresponding commit in the 5.15.y branch:
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/include/linux/overflow.h?h=v5.15.194&id=ed6e37e30826b12572636c6bbfe6319233690c90
-> However, the commit message there references a different hash:
-> a49a64b5bf195381c09202c524f0f84b5f3e816f.
+UDP TX packets destructor is sock_wfree().
 
-Ugh, that hash is invalid, I missed that :(
+It suffers from a cache line bouncing in sock_def_write_space_wfree().
 
-Thanks for the info, I'll go work on queueing these up.
+Instead of reading sk->sk_wmem_alloc after we just did an atomic RMW
+on it, use __refcount_sub_and_test() to get the old value for free,
+and pass the new value to sock_def_write_space_wfree().
 
-greg k-h
+Add __sock_writeable() helper.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/sock.h |  6 +++++-
+ net/core/sock.c    | 14 ++++++++------
+ 2 files changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 30ac2eb4ef9bf73743e3dc9e66c6c3059f34964e..7d9bfaaff913d3bce8d0a12df8987db96ee2bad6 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2591,12 +2591,16 @@ static inline struct page_frag *sk_page_frag(struct sock *sk)
+ 
+ bool sk_page_frag_refill(struct sock *sk, struct page_frag *pfrag);
+ 
++static inline bool __sock_writeable(const struct sock *sk, int wmem_alloc)
++{
++	return wmem_alloc < (READ_ONCE(sk->sk_sndbuf) >> 1);
++}
+ /*
+  *	Default write policy as shown to user space via poll/select/SIGIO
+  */
+ static inline bool sock_writeable(const struct sock *sk)
+ {
+-	return refcount_read(&sk->sk_wmem_alloc) < (READ_ONCE(sk->sk_sndbuf) >> 1);
++	return __sock_writeable(sk, refcount_read(&sk->sk_wmem_alloc));
+ }
+ 
+ static inline gfp_t gfp_any(void)
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 08ae20069b6d287745800710192396f76c8781b4..0ca3566cff83a8e6ee37e60a37a5a6f533203d0f 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -155,7 +155,7 @@
+ static DEFINE_MUTEX(proto_list_mutex);
+ static LIST_HEAD(proto_list);
+ 
+-static void sock_def_write_space_wfree(struct sock *sk);
++static void sock_def_write_space_wfree(struct sock *sk, int wmem_alloc);
+ static void sock_def_write_space(struct sock *sk);
+ 
+ /**
+@@ -2648,16 +2648,18 @@ EXPORT_SYMBOL_GPL(sk_setup_caps);
+  */
+ void sock_wfree(struct sk_buff *skb)
+ {
+-	struct sock *sk = skb->sk;
+ 	unsigned int len = skb->truesize;
++	struct sock *sk = skb->sk;
+ 	bool free;
++	int old;
+ 
+ 	if (!sock_flag(sk, SOCK_USE_WRITE_QUEUE)) {
+ 		if (sock_flag(sk, SOCK_RCU_FREE) &&
+ 		    sk->sk_write_space == sock_def_write_space) {
+ 			rcu_read_lock();
+-			free = refcount_sub_and_test(len, &sk->sk_wmem_alloc);
+-			sock_def_write_space_wfree(sk);
++			free = __refcount_sub_and_test(len, &sk->sk_wmem_alloc,
++						       &old);
++			sock_def_write_space_wfree(sk, old - len);
+ 			rcu_read_unlock();
+ 			if (unlikely(free))
+ 				__sk_free(sk);
+@@ -3589,12 +3591,12 @@ static void sock_def_write_space(struct sock *sk)
+  * for SOCK_RCU_FREE sockets under RCU read section and after putting
+  * ->sk_wmem_alloc.
+  */
+-static void sock_def_write_space_wfree(struct sock *sk)
++static void sock_def_write_space_wfree(struct sock *sk, int wmem_alloc)
+ {
+ 	/* Do not wake up a writer until he can make "significant"
+ 	 * progress.  --DaveM
+ 	 */
+-	if (sock_writeable(sk)) {
++	if (__sock_writeable(sk, wmem_alloc)) {
+ 		struct socket_wq *wq = rcu_dereference(sk->sk_wq);
+ 
+ 		/* rely on refcount_sub from sock_wfree() */
+-- 
+2.51.0.858.gf9c4a03a3a-goog
+
 
