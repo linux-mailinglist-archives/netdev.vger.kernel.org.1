@@ -1,177 +1,293 @@
-Return-Path: <netdev+bounces-230266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E5F3BE6070
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 03:18:57 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 973C5BE6085
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 03:26:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 04BF34E1294
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 01:18:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EBFBF4E957D
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 01:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0A721767A;
-	Fri, 17 Oct 2025 01:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175F021D59C;
+	Fri, 17 Oct 2025 01:26:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kjJuMRmF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zUFAXwOb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D72334691
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 01:18:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A45A21CFEF
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 01:26:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760663934; cv=none; b=VINBDvRrg4RaOxtUnHZClhf9WnBqLrl3fNmv4P5eHHon4mk5zyFwv7yTfIrJYgoLO7FBySNFBUWk6WQsatBVl+mZ4KpThmm+z6Smt9MTPoPJ8H+AkS6BZLEk/umYfFNKXCB8neSA0T2Nb2zCgJUiDvOreNhkyOYJJTEWud+F7HU=
+	t=1760664398; cv=none; b=CYSDenYQd+asuJnmWUtezfLt9qdCjVfIohkQT5CoDGoY3APs7XeP8oJvCGlzl9qEp5STyhzkC2JWGdcOdmakq4phOtXZFWG5NyQuT1WbaxWaUYmo8e0WrniZ7Zu4LxUBkFl1vr/GcjHVpyeVw0fbqGBKEAbH4dNj5Efr9Z1dOew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760663934; c=relaxed/simple;
-	bh=MItE3VZ9nrWY6YAL83Q4LvoAoVU5qLe8wux5tVVpriA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kV1Mjxib3zZnQqT3QvIVdJcu5NeZwrFxZZTKJxxu95z5HX1PXOZ5VqYgLOmTqTjP3Ge3JgzOfeh7ChXrqzmnogifg6ERP2+H9kL+ccd3EQG5wQBe0y+rwjy0H/PIGZTfZHS9a3dkR/IBMSiqjwKHd/StvdOnl0r1yUELz+/6RMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kjJuMRmF; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-290dc630a07so825325ad.1
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 18:18:52 -0700 (PDT)
+	s=arc-20240116; t=1760664398; c=relaxed/simple;
+	bh=L8goSy0mCfbNYD9NH8iLoywsSWGUd85reHgk72ACCb0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=O2hPcZJNHyclz8BjdEqLiLqd8K3x1zRVRgmku7q8c4ZUCtcHoftZYKpzopTVKGLkf1yl9cibVfmqwT+Weh0WAT7IPO69ny4fT5IPAFYNQLAV2YH2kkQJYFJOs0CqQ/RPFki7pYmJ2lhd9efHc00jGB1cWbcBRi2xr8KgIoDWZN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zUFAXwOb; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-77f2466eeb5so1683390b3a.2
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 18:26:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760663932; x=1761268732; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2WufNMZZ/3kF+kxCtpxLWUmoQMaWHtLSOKhsUHckblc=;
-        b=kjJuMRmF0Ygv2+s4C90BIJg/yNnQi2Z/5O30gbiYVjTAfiGVOqUfYsJRhec5CtAm7p
-         GwDIH723kCtcQ0si/UC7e384wSu/mNf3O/fgSzvI3XjfhYe1hmQeScFblx86zLVC412K
-         7hC2tFcmQ+sa7yYMqBE4/tRua9AQ9B58S54Ux2sTv4wm71yiuY8/Kl/ZVqObAyBslEam
-         PZpAV+7c6RQlID4yTSTdzjRLX/jGnDUEb027e4S5M0ouGNuU/F1P6mnFqdTkG21aqO7W
-         GAQ6RA8I9EUEAbA1BSL60pzs/GoYCuRCbkGNyYB0pEsdinu0VwrMG7XeT12xuZCkYdZA
-         KvZQ==
+        d=google.com; s=20230601; t=1760664395; x=1761269195; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+j1Q9uHuP/v3a0srhPD8Cb5JpHL5lf27N6y4qanBqGY=;
+        b=zUFAXwOb+m6LeeR8XHIZ0wXkqRwEW8953AtrQbWsvy5S8JXal04KDxCtj12PuvVGAN
+         20vwdzGr7NCBOOqXkNVy1WjgY7DrMwVJjROHSSTY3+08mtMUVqcX1OfTjeSYKPdqPRTN
+         nQfGVAfA/XqVvrl7BYF1GrRuMYFxxJjrkjk2RhaP+sQa6n9MH30u995fBnxVaOcRzECr
+         Kun7hFDG63B3YuYgMZ8sAL/5m4vm7Qe+M/MqX7utS4kv+rPILh6IUoklIcmr7jE4TLcp
+         w48PQVcbF5e71MFd875JngbvI74ux9NnsSqfaPPYKN8yOPWRj3owOfwRhekwqXN+XJV1
+         r0cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760663932; x=1761268732;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2WufNMZZ/3kF+kxCtpxLWUmoQMaWHtLSOKhsUHckblc=;
-        b=P2IYO+ghEVHi7pvb/oJzEUHsOzFqB3SU1jdxAw4+9llG4yy00giW7rceJEhjmdD5sk
-         E9DmySp5yL52+GXntWq78AW2WbuB1jSR6LDDtQkTFrxpuS8KlDGfViTdQbQukVE6LqCr
-         Qc1lFG/t8/c4/GCujH7YLtpT/o2x46sBDK0QFlXUaM7CJ1s5RRAcYEys1V1IaN1NIAcd
-         eKp3E/gg0nCYFSuKjOX5U/OnV8f4hT7ewl38qi7JxYqIhXZxWjt21Dxz+WQrx8yBy+3j
-         /LbRdSl2Iv9bpBcJsuYyN1vlTVgh8hnvhiyubbSZ7OClcIrBejyVC92OYMo0GgR3Nnsh
-         VxRw==
-X-Gm-Message-State: AOJu0Yy1/MagF47Yw+g3AiiFOn+JN9lNfL0vPfR9IxuJYr14+BuR9x03
-	P69iY/2IFe+qvkxb1fCi9Gki4k78h6RefmpwJ8LJuJVD8MymxbQzXK1s
-X-Gm-Gg: ASbGncsw5muMh+994UoW2uRK6/A+J19/DpaZB6lS1xLNecuSKRbKAZujMuTkrle+UYG
-	2BrlKDUHCbTU8GbzetkzIjmDVHpOYs+1SqTxHswq3FcZ3YwpU/kVcJKpQcm4L0kf+ywzYkxH63H
-	28NgmsTYJHkHQaoB55qRRYXMIrhrkonaqus8O82zDM76iXG7RBVjr6V3tz31r3LeDdp/fEFRONH
-	xsUVSGzMzltn96xL3yFIzBle+VeQsn9wpPDTBfm3v4EFdw5pTfiwoK1h57eKI7X71NuQaupyIgA
-	EvIfPD/30fgQsjAWyZYu7TYtu3fLKtUCAWy84DuZOnX75v7OwnQ9tzJAqNwrb0kHgIzyKatCQFQ
-	iiZ+hVSOiooygS7GKHCu+5ePYjKOrkCAbNvmXsuIZi6/UIcxGH/JTnz6Gs54UAGlDL/REU3bJhT
-	E=
-X-Google-Smtp-Source: AGHT+IGCscuN23O1/GUCRY7mt5g8A0uy7Km3DMtv6zREsA54udw0SWdK9cRyXK5d1lQXl3K9mp81rA==
-X-Received: by 2002:a17:902:ce0f:b0:269:8d1b:40c3 with SMTP id d9443c01a7336-290c9cf344bmr22801155ad.12.1760663931864;
-        Thu, 16 Oct 2025 18:18:51 -0700 (PDT)
-Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29099a7b032sm44355765ad.63.2025.10.16.18.18.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Oct 2025 18:18:51 -0700 (PDT)
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Chen Wang <unicorn_wang@outlook.com>,
-	Inochi Amaoto <inochiama@gmail.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Han Gao <rabenda.cn@gmail.com>,
-	Icenowy Zheng <uwu@icenowy.me>,
-	Vivian Wang <wangruikang@iscas.ac.cn>,
-	Yao Zi <ziyao@disroot.org>
-Cc: netdev@vger.kernel.org,
-	sophgo@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Yixun Lan <dlan@gentoo.org>,
-	Longbin Li <looong.bin@gmail.com>
-Subject: [PATCH] net: stmmac: dwmac-sophgo: Add phy interface filter
-Date: Fri, 17 Oct 2025 09:18:01 +0800
-Message-ID: <20251017011802.523140-1-inochiama@gmail.com>
-X-Mailer: git-send-email 2.51.0
+        d=1e100.net; s=20230601; t=1760664395; x=1761269195;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+j1Q9uHuP/v3a0srhPD8Cb5JpHL5lf27N6y4qanBqGY=;
+        b=V7qDsfGRLK/nfMF0zEFxhaoUZEcE6NIF61QJXm/l0FN6LJeZMHxYZ7tQZSVcem90ng
+         TR2H1cH2tO/AP3jy8o81I8nMANAVEwKZ5B60KLADMZdljokR8gzz48SJP21JGsHPzg+U
+         9yZl4pA5NDlmJsxf/Zxg12YVbnadD/xz5TjRPB6R6x80Uwf3Hsay6jquHb8YKwcQfw7I
+         VPjEnhuExFO4G4Hc5BHkUyuNX6XiJJkI1jDXoGf6xWBZBTr/vufytAJwlDktK1cGGsMS
+         I4mAQmkydXeCk+PtyRW67WDKMGYV3lIrDdpZmuJjjeApeKVo/E9GnWwc1FBYdp8N7inl
+         bndg==
+X-Gm-Message-State: AOJu0YxL8SkoI4fSRo7KfxqS9gYMyB2LffGvOwEQC+HhCBaqePyrjUa4
+	iIQ32W664LqPy6Fja5QGqFnjQHXWGqubmv042ML1aq5zZcjidMb1eHpVT5BYHnrHFDJg1SW1wbj
+	TRxR0p24KBtANKLFjQQbOqAkiRktCuksJ8TLuWVFj1pxcz27hhpRH2VmYobcS24JRNqO2MtuTwO
+	Y7713kh6n6OXATIlDh7w18n6OkMRxBvQYuA56WeylBuEOY8dU=
+X-Google-Smtp-Source: AGHT+IF9WKhakeHmEI55UHHxr4qLhlFzl6C0HLU83cEAqNCYxeOqqWtaEkS+pQ4DOXaLCFMH7w0wH1iIPJjZIA==
+X-Received: from pfgt20.prod.google.com ([2002:a05:6a00:1394:b0:792:f698:fda2])
+ (user=joshwash job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:1410:b0:77f:2b7d:edf1 with SMTP id d2e1a72fcca58-7a220a98d14mr2299469b3a.16.1760664395281;
+ Thu, 16 Oct 2025 18:26:35 -0700 (PDT)
+Date: Thu, 16 Oct 2025 18:25:42 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
+Message-ID: <20251017012614.3631351-1-joshwash@google.com>
+Subject: [PATCH net-next] gve: Consolidate and persist ethtool ring changes
+From: Joshua Washington <joshwash@google.com>
+To: netdev@vger.kernel.org
+Cc: Ankit Garg <nktgrg@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Jordan Rhee <jordanrhee@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Joshua Washington <joshwash@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Ziwei Xiao <ziweixiao@google.com>, 
+	open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-As the SG2042 has an internal rx delay, the delay should be remove
-when init the mac, otherwise the phy will be misconfigurated.
+From: Ankit Garg <nktgrg@google.com>
 
-Fixes: 543009e2d4cd ("net: stmmac: dwmac-sophgo: Add support for Sophgo SG2042 SoC")
-Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-Tested-by: Han Gao <rabenda.cn@gmail.com>
+Refactor the ethtool ring parameter configuration logic to address two
+issues: unnecessary queue resets and lost configuration changes when
+the interface is down.
+
+Previously, `gve_set_ringparam` could trigger multiple queue
+destructions and recreations for a single command, as different settings
+(e.g., header split, ring sizes) were applied one by one. Furthermore,
+if the interface was down, any changes made via ethtool were discarded
+instead of being saved for the next time the interface was brought up.
+
+This patch centralizes the configuration logic. Individual functions
+like `gve_set_hsplit_config` are modified to only validate and stage
+changes in a temporary config struct.
+
+The main `gve_set_ringparam` function now gathers all staged changes
+and applies them as a single, combined configuration:
+1.  If the interface is up, it calls `gve_adjust_config` once.
+2.  If the interface is down, it saves the settings directly to the
+    driver's private struct, ensuring they persist and are used when
+    the interface is brought back up.
+
+Signed-off-by: Ankit Garg <nktgrg@google.com>
+Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Reviewed-by: Jordan Rhee <jordanrhee@google.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Signed-off-by: Joshua Washington <joshwash@google.com>
 ---
- .../ethernet/stmicro/stmmac/dwmac-sophgo.c    | 25 ++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/google/gve/gve.h         |  3 +-
+ drivers/net/ethernet/google/gve/gve_ethtool.c | 86 +++++++++----------
+ drivers/net/ethernet/google/gve/gve_main.c    | 17 ++--
+ 3 files changed, 51 insertions(+), 55 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
-index 3b7947a7a7ba..b2dee1399eb0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
-@@ -7,6 +7,7 @@
-
- #include <linux/clk.h>
- #include <linux/module.h>
-+#include <linux/property.h>
- #include <linux/mod_devicetable.h>
- #include <linux/platform_device.h>
-
-@@ -29,8 +30,23 @@ static int sophgo_sg2044_dwmac_init(struct platform_device *pdev,
+diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
+index bceaf9b05cb4..ac325ab0f5c0 100644
+--- a/drivers/net/ethernet/google/gve/gve.h
++++ b/drivers/net/ethernet/google/gve/gve.h
+@@ -1249,7 +1249,8 @@ void gve_rx_start_ring_gqi(struct gve_priv *priv, int idx);
+ void gve_rx_stop_ring_gqi(struct gve_priv *priv, int idx);
+ u16 gve_get_pkt_buf_size(const struct gve_priv *priv, bool enable_hplit);
+ bool gve_header_split_supported(const struct gve_priv *priv);
+-int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split);
++int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split,
++			  struct gve_rx_alloc_rings_cfg *rx_alloc_cfg);
+ /* rx buffer handling */
+ int gve_buf_ref_cnt(struct gve_rx_buf_state_dqo *bs);
+ void gve_free_page_dqo(struct gve_priv *priv, struct gve_rx_buf_state_dqo *bs,
+diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
+index d0a223250845..b030a84b678c 100644
+--- a/drivers/net/ethernet/google/gve/gve_ethtool.c
++++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
+@@ -537,34 +537,6 @@ static void gve_get_ringparam(struct net_device *netdev,
+ 		kernel_cmd->tcp_data_split = ETHTOOL_TCP_DATA_SPLIT_DISABLED;
+ }
+ 
+-static int gve_adjust_ring_sizes(struct gve_priv *priv,
+-				 u16 new_tx_desc_cnt,
+-				 u16 new_rx_desc_cnt)
+-{
+-	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
+-	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
+-	int err;
+-
+-	/* get current queue configuration */
+-	gve_get_curr_alloc_cfgs(priv, &tx_alloc_cfg, &rx_alloc_cfg);
+-
+-	/* copy over the new ring_size from ethtool */
+-	tx_alloc_cfg.ring_size = new_tx_desc_cnt;
+-	rx_alloc_cfg.ring_size = new_rx_desc_cnt;
+-
+-	if (netif_running(priv->dev)) {
+-		err = gve_adjust_config(priv, &tx_alloc_cfg, &rx_alloc_cfg);
+-		if (err)
+-			return err;
+-	}
+-
+-	/* Set new ring_size for the next up */
+-	priv->tx_desc_cnt = new_tx_desc_cnt;
+-	priv->rx_desc_cnt = new_rx_desc_cnt;
+-
+-	return 0;
+-}
+-
+ static int gve_validate_req_ring_size(struct gve_priv *priv, u16 new_tx_desc_cnt,
+ 				      u16 new_rx_desc_cnt)
+ {
+@@ -584,34 +556,62 @@ static int gve_validate_req_ring_size(struct gve_priv *priv, u16 new_tx_desc_cnt
  	return 0;
  }
-
-+static int sophgo_sg2042_set_mode(struct plat_stmmacenet_data *plat_dat)
+ 
++static int gve_set_ring_sizes_config(struct gve_priv *priv, u16 new_tx_desc_cnt,
++				     u16 new_rx_desc_cnt,
++				     struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
++				     struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
 +{
-+	switch (plat_dat->phy_interface) {
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+		plat_dat->phy_interface = PHY_INTERFACE_MODE_RGMII_TXID;
++	if (new_tx_desc_cnt == priv->tx_desc_cnt &&
++	    new_rx_desc_cnt == priv->rx_desc_cnt)
 +		return 0;
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+		plat_dat->phy_interface = PHY_INTERFACE_MODE_RGMII;
-+		return 0;
-+	default:
-+		return -EINVAL;
++
++	if (!priv->modify_ring_size_enabled) {
++		dev_err(&priv->pdev->dev, "Modify ring size is not supported.\n");
++		return -EOPNOTSUPP;
 +	}
++
++	if (gve_validate_req_ring_size(priv, new_tx_desc_cnt, new_rx_desc_cnt))
++		return -EINVAL;
++
++	tx_alloc_cfg->ring_size = new_tx_desc_cnt;
++	rx_alloc_cfg->ring_size = new_rx_desc_cnt;
++	return 0;
 +}
 +
- static int sophgo_dwmac_probe(struct platform_device *pdev)
+ static int gve_set_ringparam(struct net_device *netdev,
+ 			     struct ethtool_ringparam *cmd,
+ 			     struct kernel_ethtool_ringparam *kernel_cmd,
+ 			     struct netlink_ext_ack *extack)
  {
-+	int (*plat_set_mode)(struct plat_stmmacenet_data *plat_dat);
- 	struct plat_stmmacenet_data *plat_dat;
- 	struct stmmac_resources stmmac_res;
- 	struct device *dev = &pdev->dev;
-@@ -50,11 +66,18 @@ static int sophgo_dwmac_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
-
-+	plat_set_mode = device_get_match_data(&pdev->dev);
-+	if (plat_set_mode) {
-+		ret = plat_set_mode(plat_dat);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	return stmmac_dvr_probe(dev, plat_dat, &stmmac_res);
++	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
++	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
+ 	struct gve_priv *priv = netdev_priv(netdev);
+-	u16 new_tx_cnt, new_rx_cnt;
+ 	int err;
+ 
+-	err = gve_set_hsplit_config(priv, kernel_cmd->tcp_data_split);
++	gve_get_curr_alloc_cfgs(priv, &tx_alloc_cfg, &rx_alloc_cfg);
++	err = gve_set_hsplit_config(priv, kernel_cmd->tcp_data_split,
++				    &rx_alloc_cfg);
+ 	if (err)
+ 		return err;
+ 
+-	if (cmd->tx_pending == priv->tx_desc_cnt && cmd->rx_pending == priv->rx_desc_cnt)
+-		return 0;
++	err = gve_set_ring_sizes_config(priv, cmd->tx_pending, cmd->rx_pending,
++					&tx_alloc_cfg, &rx_alloc_cfg);
++	if (err)
++		return err;
+ 
+-	if (!priv->modify_ring_size_enabled) {
+-		dev_err(&priv->pdev->dev, "Modify ring size is not supported.\n");
+-		return -EOPNOTSUPP;
++	if (netif_running(priv->dev)) {
++		err = gve_adjust_config(priv, &tx_alloc_cfg, &rx_alloc_cfg);
++		if (err)
++			return err;
++	} else {
++		/* Set ring params for the next up */
++		priv->header_split_enabled = rx_alloc_cfg.enable_header_split;
++		priv->rx_cfg.packet_buffer_size =
++			rx_alloc_cfg.packet_buffer_size;
++		priv->tx_desc_cnt = tx_alloc_cfg.ring_size;
++		priv->rx_desc_cnt = rx_alloc_cfg.ring_size;
+ 	}
+-
+-	new_tx_cnt = cmd->tx_pending;
+-	new_rx_cnt = cmd->rx_pending;
+-
+-	if (gve_validate_req_ring_size(priv, new_tx_cnt, new_rx_cnt))
+-		return -EINVAL;
+-
+-	return gve_adjust_ring_sizes(priv, new_tx_cnt, new_rx_cnt);
++	return 0;
  }
-
- static const struct of_device_id sophgo_dwmac_match[] = {
--	{ .compatible = "sophgo,sg2042-dwmac" },
-+	{ .compatible = "sophgo,sg2042-dwmac", .data = sophgo_sg2042_set_mode },
- 	{ .compatible = "sophgo,sg2044-dwmac" },
- 	{ /* sentinel */ }
- };
---
-2.51.0
+ 
+ static int gve_user_reset(struct net_device *netdev, u32 *flags)
+diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+index 1be1b1ef31ee..29845e8f3c0d 100644
+--- a/drivers/net/ethernet/google/gve/gve_main.c
++++ b/drivers/net/ethernet/google/gve/gve_main.c
+@@ -2058,12 +2058,10 @@ bool gve_header_split_supported(const struct gve_priv *priv)
+ 		priv->queue_format == GVE_DQO_RDA_FORMAT && !priv->xdp_prog;
+ }
+ 
+-int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split)
++int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split,
++			  struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
+ {
+-	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
+-	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
+ 	bool enable_hdr_split;
+-	int err = 0;
+ 
+ 	if (tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_UNKNOWN)
+ 		return 0;
+@@ -2081,14 +2079,11 @@ int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split)
+ 	if (enable_hdr_split == priv->header_split_enabled)
+ 		return 0;
+ 
+-	gve_get_curr_alloc_cfgs(priv, &tx_alloc_cfg, &rx_alloc_cfg);
+-
+-	rx_alloc_cfg.enable_header_split = enable_hdr_split;
+-	rx_alloc_cfg.packet_buffer_size = gve_get_pkt_buf_size(priv, enable_hdr_split);
++	rx_alloc_cfg->enable_header_split = enable_hdr_split;
++	rx_alloc_cfg->packet_buffer_size =
++		gve_get_pkt_buf_size(priv, enable_hdr_split);
+ 
+-	if (netif_running(priv->dev))
+-		err = gve_adjust_config(priv, &tx_alloc_cfg, &rx_alloc_cfg);
+-	return err;
++	return 0;
+ }
+ 
+ static int gve_set_features(struct net_device *netdev,
+-- 
+2.51.0.858.gf9c4a03a3a-goog
 
 
