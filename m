@@ -1,293 +1,231 @@
-Return-Path: <netdev+bounces-230267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 973C5BE6085
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 03:26:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73D03BE60CB
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 03:40:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EBFBF4E957D
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 01:26:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B42F0542E8C
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 01:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175F021D59C;
-	Fri, 17 Oct 2025 01:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088351DE3C0;
+	Fri, 17 Oct 2025 01:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zUFAXwOb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mTzar67k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A45A21CFEF
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 01:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD21DC120;
+	Fri, 17 Oct 2025 01:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760664398; cv=none; b=CYSDenYQd+asuJnmWUtezfLt9qdCjVfIohkQT5CoDGoY3APs7XeP8oJvCGlzl9qEp5STyhzkC2JWGdcOdmakq4phOtXZFWG5NyQuT1WbaxWaUYmo8e0WrniZ7Zu4LxUBkFl1vr/GcjHVpyeVw0fbqGBKEAbH4dNj5Efr9Z1dOew=
+	t=1760665234; cv=none; b=q+qL+k78qzhsB5NfNali0P3u1lEeIWQQNJ9jsQaEX8zatJ5lsQ9AyWXGss+TkTmzrkVLnbNmsYh3OqvJ8KphA8DH1dm4IV/ZCf3n1LGBhrCXJ9T0ab0ZY5Hu5eUbF32dP/b9MmCe2xorQcs/jkjkmZlBkrIHjBTBknCSVrs7K6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760664398; c=relaxed/simple;
-	bh=L8goSy0mCfbNYD9NH8iLoywsSWGUd85reHgk72ACCb0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=O2hPcZJNHyclz8BjdEqLiLqd8K3x1zRVRgmku7q8c4ZUCtcHoftZYKpzopTVKGLkf1yl9cibVfmqwT+Weh0WAT7IPO69ny4fT5IPAFYNQLAV2YH2kkQJYFJOs0CqQ/RPFki7pYmJ2lhd9efHc00jGB1cWbcBRi2xr8KgIoDWZN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zUFAXwOb; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-77f2466eeb5so1683390b3a.2
-        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 18:26:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760664395; x=1761269195; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+j1Q9uHuP/v3a0srhPD8Cb5JpHL5lf27N6y4qanBqGY=;
-        b=zUFAXwOb+m6LeeR8XHIZ0wXkqRwEW8953AtrQbWsvy5S8JXal04KDxCtj12PuvVGAN
-         20vwdzGr7NCBOOqXkNVy1WjgY7DrMwVJjROHSSTY3+08mtMUVqcX1OfTjeSYKPdqPRTN
-         nQfGVAfA/XqVvrl7BYF1GrRuMYFxxJjrkjk2RhaP+sQa6n9MH30u995fBnxVaOcRzECr
-         Kun7hFDG63B3YuYgMZ8sAL/5m4vm7Qe+M/MqX7utS4kv+rPILh6IUoklIcmr7jE4TLcp
-         w48PQVcbF5e71MFd875JngbvI74ux9NnsSqfaPPYKN8yOPWRj3owOfwRhekwqXN+XJV1
-         r0cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760664395; x=1761269195;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+j1Q9uHuP/v3a0srhPD8Cb5JpHL5lf27N6y4qanBqGY=;
-        b=V7qDsfGRLK/nfMF0zEFxhaoUZEcE6NIF61QJXm/l0FN6LJeZMHxYZ7tQZSVcem90ng
-         TR2H1cH2tO/AP3jy8o81I8nMANAVEwKZ5B60KLADMZdljokR8gzz48SJP21JGsHPzg+U
-         9yZl4pA5NDlmJsxf/Zxg12YVbnadD/xz5TjRPB6R6x80Uwf3Hsay6jquHb8YKwcQfw7I
-         VPjEnhuExFO4G4Hc5BHkUyuNX6XiJJkI1jDXoGf6xWBZBTr/vufytAJwlDktK1cGGsMS
-         I4mAQmkydXeCk+PtyRW67WDKMGYV3lIrDdpZmuJjjeApeKVo/E9GnWwc1FBYdp8N7inl
-         bndg==
-X-Gm-Message-State: AOJu0YxL8SkoI4fSRo7KfxqS9gYMyB2LffGvOwEQC+HhCBaqePyrjUa4
-	iIQ32W664LqPy6Fja5QGqFnjQHXWGqubmv042ML1aq5zZcjidMb1eHpVT5BYHnrHFDJg1SW1wbj
-	TRxR0p24KBtANKLFjQQbOqAkiRktCuksJ8TLuWVFj1pxcz27hhpRH2VmYobcS24JRNqO2MtuTwO
-	Y7713kh6n6OXATIlDh7w18n6OkMRxBvQYuA56WeylBuEOY8dU=
-X-Google-Smtp-Source: AGHT+IF9WKhakeHmEI55UHHxr4qLhlFzl6C0HLU83cEAqNCYxeOqqWtaEkS+pQ4DOXaLCFMH7w0wH1iIPJjZIA==
-X-Received: from pfgt20.prod.google.com ([2002:a05:6a00:1394:b0:792:f698:fda2])
- (user=joshwash job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:1410:b0:77f:2b7d:edf1 with SMTP id d2e1a72fcca58-7a220a98d14mr2299469b3a.16.1760664395281;
- Thu, 16 Oct 2025 18:26:35 -0700 (PDT)
-Date: Thu, 16 Oct 2025 18:25:42 -0700
+	s=arc-20240116; t=1760665234; c=relaxed/simple;
+	bh=INxxigTmqp4oaXvINkHMLTxCH3tFQVLxHePuh/Meru0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QaY6wBrOe9j0/cWVrbyCGSoG5kui/yWIHNIO5Y2Kq5r0Wp8UGYtQv8BGo2e1F5F6W0tI8QpRIr2E4DNnHOVvZV2Mw83WQILEcdDIQRDUIkRnwJwemWjvCZ7+50N3h5vLTqt9Dybik9UEYBGr19N360Qn10NqeQxVK8Nkjh5841Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mTzar67k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8D0CC4CEF1;
+	Fri, 17 Oct 2025 01:40:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760665234;
+	bh=INxxigTmqp4oaXvINkHMLTxCH3tFQVLxHePuh/Meru0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mTzar67ka8O3EQTMoLik8RNVXY+Zqikw5XwtyeqQng5k3dYfYwwVvENSJHMXSs0Mi
+	 bDQv7v0lBLM/VAJiqD8WNsbAxOTRBoPOhSR8b0nqZmtEBUFtHCzN8NgNe3oGR4bj/N
+	 mXK8FryoMv4/ldaaVCKRdYDf6PCRfrDHI2ABcCJcIrz/eHQVwCh3ZEBIm2SW16YtaO
+	 38QcEmQIf+kH94G/ONe+ajjQWsamwL/dH7uuLncoAbxRwQwsAyDmOsfNNRiMhzmswE
+	 VajOi/RMGlPgbowKqCGXxbXi6k9sPhc2w/qEboTBvRVuj+J8iBK7oH37agf9haTBr4
+	 fsmQCNNQG11dg==
+Date: Thu, 16 Oct 2025 18:40:31 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org, Andrew
+ Lunn <andrew@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, Michael Chan
+ <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Joshua
+ Washington <joshwash@google.com>, Harshitha Ramamurthy
+ <hramamurthy@google.com>, Jian Shen <shenjian15@huawei.com>, Salil Mehta
+ <salil.mehta@huawei.com>, Jijie Shao <shaojijie@huawei.com>, Sunil Goutham
+ <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Subbaraya
+ Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Bharat
+ Bhushan <bbhushan2@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, Tariq
+ Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Alexander Duyck
+ <alexanderduyck@fb.com>, kernel-team@meta.com, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Joe Damato <joe@dama.to>, David Wei
+ <dw@davidwei.uk>, Willem de Bruijn <willemb@google.com>, Breno Leitao
+ <leitao@debian.org>, Dragos Tatulea <dtatulea@nvidia.com>,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Jonathan Corbet
+ <corbet@lwn.net>
+Subject: Re: [PATCH net-next v4 00/24][pull request] Queue configs and large
+ buffer providers
+Message-ID: <20251016184031.66c92962@kernel.org>
+In-Reply-To: <CAHS8izOnzxbSuW5=aiTAUja7D2ARgtR13qYWr-bXNYSCvm5Bbg@mail.gmail.com>
+References: <cover.1760364551.git.asml.silence@gmail.com>
+	<20251013105446.3efcb1b3@kernel.org>
+	<CAHS8izOupVhkaZXNDmZo8KzR42M+rxvvmmLW=9r3oPoNOC6pkQ@mail.gmail.com>
+	<20251014184119.3ba2dd70@kernel.org>
+	<CAHS8izOnzxbSuW5=aiTAUja7D2ARgtR13qYWr-bXNYSCvm5Bbg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
-Message-ID: <20251017012614.3631351-1-joshwash@google.com>
-Subject: [PATCH net-next] gve: Consolidate and persist ethtool ring changes
-From: Joshua Washington <joshwash@google.com>
-To: netdev@vger.kernel.org
-Cc: Ankit Garg <nktgrg@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Jordan Rhee <jordanrhee@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Joshua Washington <joshwash@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Ziwei Xiao <ziweixiao@google.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-From: Ankit Garg <nktgrg@google.com>
+On Wed, 15 Oct 2025 10:44:19 -0700 Mina Almasry wrote:
+> I think what you're saying is what I was trying to say, but you said
+> it more eloquently and genetically correct. I'm not familiar with the
+> GRO packing you're referring to so. I just assumed the 'buffer sizes
+> actually posted to the NIC' are the 'buffer sizes we end up seeing in
+> the skb frags'.
 
-Refactor the ethtool ring parameter configuration logic to address two
-issues: unnecessary queue resets and lost configuration changes when
-the interface is down.
+I don't think that code path exists today, buffers posted are frags
+in the skb. But that's easily fixable.
 
-Previously, `gve_set_ringparam` could trigger multiple queue
-destructions and recreations for a single command, as different settings
-(e.g., header split, ring sizes) were applied one by one. Furthermore,
-if the interface was down, any changes made via ethtool were discarded
-instead of being saved for the next time the interface was brought up.
+> I guess what I'm trying to say in a different way, is: there are lots
+> of buffer sizes in the rx path, AFAICT, at least:
+>=20
+> 1. The size of the allocated netmems from the pp.
+> 2. The size of the buffers posted to the NIC (which will be different
+> from #1 if the page_pool_fragment_netmem or some other trick like
+> hns3).
+> 3. The size of the frags that end up in the skb (which will be
+> different from #2 for GRO/other things I don't fully understand).
+>=20
+> ...and I'm not sure what rx-buf-len should actually configure. My
+> thinking is that it probably should configure #3, since that is what
+> the user cares about, I agree with that.
+>=20
+> IIRC when I last looked at this a few weeks ago, I think as written
+> this patch series makes rx-buf-len actually configure #1.
 
-This patch centralizes the configuration logic. Individual functions
-like `gve_set_hsplit_config` are modified to only validate and stage
-changes in a temporary config struct.
+#1 or #2. #1 for otx2. For the RFC bnxt implementation they were
+equivalent. But hns3's reading would be that it's #2.
 
-The main `gve_set_ringparam` function now gathers all staged changes
-and applies them as a single, combined configuration:
-1.  If the interface is up, it calls `gve_adjust_config` once.
-2.  If the interface is down, it saves the settings directly to the
-    driver's private struct, ensuring they persist and are used when
-    the interface is brought back up.
+=46rom user PoV neither #1 nor #2 is particularly meaningful.
+Assuming driver can fragment - #1 only configures memory accounting
+blocks. #2 configures buffers passed to the HW, but some HW can pack
+payloads into a single buf to save memory. Which means that if previous
+frame was small and ate some of a page, subsequent large frame of
+size M may not fit into a single buf of size X, even if M < X.
 
-Signed-off-by: Ankit Garg <nktgrg@google.com>
-Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
-Reviewed-by: Jordan Rhee <jordanrhee@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Joshua Washington <joshwash@google.com>
----
- drivers/net/ethernet/google/gve/gve.h         |  3 +-
- drivers/net/ethernet/google/gve/gve_ethtool.c | 86 +++++++++----------
- drivers/net/ethernet/google/gve/gve_main.c    | 17 ++--
- 3 files changed, 51 insertions(+), 55 deletions(-)
+So I think the full set of parameters we should define would be
+what you defined as #1 and #2. And on top of that we need some kind of
+min alignment enforcement. David Wei mentioned that one of his main use
+cases is ZC of a buffer which is then sent to storage, which has strict
+alignment requirements. And some NICs will internally fragment the
+page.. Maybe let's define the expected device behavior..
 
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index bceaf9b05cb4..ac325ab0f5c0 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -1249,7 +1249,8 @@ void gve_rx_start_ring_gqi(struct gve_priv *priv, int idx);
- void gve_rx_stop_ring_gqi(struct gve_priv *priv, int idx);
- u16 gve_get_pkt_buf_size(const struct gve_priv *priv, bool enable_hplit);
- bool gve_header_split_supported(const struct gve_priv *priv);
--int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split);
-+int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split,
-+			  struct gve_rx_alloc_rings_cfg *rx_alloc_cfg);
- /* rx buffer handling */
- int gve_buf_ref_cnt(struct gve_rx_buf_state_dqo *bs);
- void gve_free_page_dqo(struct gve_priv *priv, struct gve_rx_buf_state_dqo *bs,
-diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-index d0a223250845..b030a84b678c 100644
---- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-+++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-@@ -537,34 +537,6 @@ static void gve_get_ringparam(struct net_device *netdev,
- 		kernel_cmd->tcp_data_split = ETHTOOL_TCP_DATA_SPLIT_DISABLED;
- }
- 
--static int gve_adjust_ring_sizes(struct gve_priv *priv,
--				 u16 new_tx_desc_cnt,
--				 u16 new_rx_desc_cnt)
--{
--	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
--	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
--	int err;
--
--	/* get current queue configuration */
--	gve_get_curr_alloc_cfgs(priv, &tx_alloc_cfg, &rx_alloc_cfg);
--
--	/* copy over the new ring_size from ethtool */
--	tx_alloc_cfg.ring_size = new_tx_desc_cnt;
--	rx_alloc_cfg.ring_size = new_rx_desc_cnt;
--
--	if (netif_running(priv->dev)) {
--		err = gve_adjust_config(priv, &tx_alloc_cfg, &rx_alloc_cfg);
--		if (err)
--			return err;
--	}
--
--	/* Set new ring_size for the next up */
--	priv->tx_desc_cnt = new_tx_desc_cnt;
--	priv->rx_desc_cnt = new_rx_desc_cnt;
--
--	return 0;
--}
--
- static int gve_validate_req_ring_size(struct gve_priv *priv, u16 new_tx_desc_cnt,
- 				      u16 new_rx_desc_cnt)
- {
-@@ -584,34 +556,62 @@ static int gve_validate_req_ring_size(struct gve_priv *priv, u16 new_tx_desc_cnt
- 	return 0;
- }
- 
-+static int gve_set_ring_sizes_config(struct gve_priv *priv, u16 new_tx_desc_cnt,
-+				     u16 new_rx_desc_cnt,
-+				     struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
-+				     struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
-+{
-+	if (new_tx_desc_cnt == priv->tx_desc_cnt &&
-+	    new_rx_desc_cnt == priv->rx_desc_cnt)
-+		return 0;
-+
-+	if (!priv->modify_ring_size_enabled) {
-+		dev_err(&priv->pdev->dev, "Modify ring size is not supported.\n");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (gve_validate_req_ring_size(priv, new_tx_desc_cnt, new_rx_desc_cnt))
-+		return -EINVAL;
-+
-+	tx_alloc_cfg->ring_size = new_tx_desc_cnt;
-+	rx_alloc_cfg->ring_size = new_rx_desc_cnt;
-+	return 0;
-+}
-+
- static int gve_set_ringparam(struct net_device *netdev,
- 			     struct ethtool_ringparam *cmd,
- 			     struct kernel_ethtool_ringparam *kernel_cmd,
- 			     struct netlink_ext_ack *extack)
- {
-+	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
-+	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
- 	struct gve_priv *priv = netdev_priv(netdev);
--	u16 new_tx_cnt, new_rx_cnt;
- 	int err;
- 
--	err = gve_set_hsplit_config(priv, kernel_cmd->tcp_data_split);
-+	gve_get_curr_alloc_cfgs(priv, &tx_alloc_cfg, &rx_alloc_cfg);
-+	err = gve_set_hsplit_config(priv, kernel_cmd->tcp_data_split,
-+				    &rx_alloc_cfg);
- 	if (err)
- 		return err;
- 
--	if (cmd->tx_pending == priv->tx_desc_cnt && cmd->rx_pending == priv->rx_desc_cnt)
--		return 0;
-+	err = gve_set_ring_sizes_config(priv, cmd->tx_pending, cmd->rx_pending,
-+					&tx_alloc_cfg, &rx_alloc_cfg);
-+	if (err)
-+		return err;
- 
--	if (!priv->modify_ring_size_enabled) {
--		dev_err(&priv->pdev->dev, "Modify ring size is not supported.\n");
--		return -EOPNOTSUPP;
-+	if (netif_running(priv->dev)) {
-+		err = gve_adjust_config(priv, &tx_alloc_cfg, &rx_alloc_cfg);
-+		if (err)
-+			return err;
-+	} else {
-+		/* Set ring params for the next up */
-+		priv->header_split_enabled = rx_alloc_cfg.enable_header_split;
-+		priv->rx_cfg.packet_buffer_size =
-+			rx_alloc_cfg.packet_buffer_size;
-+		priv->tx_desc_cnt = tx_alloc_cfg.ring_size;
-+		priv->rx_desc_cnt = rx_alloc_cfg.ring_size;
- 	}
--
--	new_tx_cnt = cmd->tx_pending;
--	new_rx_cnt = cmd->rx_pending;
--
--	if (gve_validate_req_ring_size(priv, new_tx_cnt, new_rx_cnt))
--		return -EINVAL;
--
--	return gve_adjust_ring_sizes(priv, new_tx_cnt, new_rx_cnt);
-+	return 0;
- }
- 
- static int gve_user_reset(struct net_device *netdev, u32 *flags)
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 1be1b1ef31ee..29845e8f3c0d 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -2058,12 +2058,10 @@ bool gve_header_split_supported(const struct gve_priv *priv)
- 		priv->queue_format == GVE_DQO_RDA_FORMAT && !priv->xdp_prog;
- }
- 
--int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split)
-+int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split,
-+			  struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
- {
--	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
--	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
- 	bool enable_hdr_split;
--	int err = 0;
- 
- 	if (tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_UNKNOWN)
- 		return 0;
-@@ -2081,14 +2079,11 @@ int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split)
- 	if (enable_hdr_split == priv->header_split_enabled)
- 		return 0;
- 
--	gve_get_curr_alloc_cfgs(priv, &tx_alloc_cfg, &rx_alloc_cfg);
--
--	rx_alloc_cfg.enable_header_split = enable_hdr_split;
--	rx_alloc_cfg.packet_buffer_size = gve_get_pkt_buf_size(priv, enable_hdr_split);
-+	rx_alloc_cfg->enable_header_split = enable_hdr_split;
-+	rx_alloc_cfg->packet_buffer_size =
-+		gve_get_pkt_buf_size(priv, enable_hdr_split);
- 
--	if (netif_running(priv->dev))
--		err = gve_adjust_config(priv, &tx_alloc_cfg, &rx_alloc_cfg);
--	return err;
-+	return 0;
- }
- 
- static int gve_set_features(struct net_device *netdev,
--- 
-2.51.0.858.gf9c4a03a3a-goog
+Device models
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Assume we receive 2 5kB packets, "x" means bytes from first packet,
+"y" means bytes from the second packet.
 
+A. Basic-scatter
+----------------
+Packet uses one or more buffers, so 1:n mapping between packets and
+buffers.
+                       unused space
+                      v
+ 1kB      [xx] [xx] [x ] [yy] [yy] [y ]
+16kB      [xxxxx            ] [yyyyy             ]
+
+B. Multi-packet
+---------------
+The configurations above are still possible, but we can configure=20
+the device to place multiple packets in a large page:
+=20
+                 unused space
+                v
+16kB, 2kB [xxxxx |yyyyy |...] [..................]
+      ^
+      alignment / stride
+
+We can probably assume that this model always comes with alignment
+cause DMA'ing frames at odd offsets is a bad idea. And also note
+that packets smaller that alignment can get scattered to multiple
+bufs.
+
+C. Multi-packet HW-GRO
+----------------------
+For completeness, I guess. We need a third packet here. Assume x-packet
+and z-packet are from the same flow and GRO session, y-packet is not.
+(Good?) HW-GRO gives us out of order placement and hopefully in this
+case we do want to pack:
+
+16kB, 2kB [xxxxxzzzzz |.......] [xxxxx.............]
+                     ^
+      alignment / stride
+
+
+End of sidebar. I think / hope these are all practical buffer layouts
+we need to care about.
+
+
+What does user care about? Presumably three things:
+ a) efficiency of memory use (larger pages =3D=3D more chance of low fill)
+ b) max size of a buffer (larger buffer =3D fewer iovecs to pass around)
+ c) alignment
+I don't think we can make these map 1:1 to any of the knobs we discussed
+at the start. (b) is really neither #1 (if driver fragments) nor #2 (if
+SW GRO can glue back together).
+
+We could simply let the user control #1 - basically user control
+overrides the places where driver would previously use PAGE_SIZE.
+I think this is what Stan suggested long ago as well.
+
+But I wonder if user still needs to know #2 (rx-buf-len) because
+practically speaking, setting page size >4x the size of rx-buf-len
+is likely a lot more fragmentation for little extra aggregation.. ?
+Tho, admittedly I think user only needs to know max-rx-buf-len
+not necessarily set it.
+
+The last knob is alignment / reuse. For allowing multiple packets in
+one buffer we probably need to distinguish these cases to cater to
+sufficiently clever adapters:
+ - previous and next packets are from the same flow and
+   - within one GRO session
+   - previous had PSH set (or closed the GRO for another reason,
+     this is to allow realigning the buffer on GRO session close)
+  or
+   - the device doesn't know further distinctions / HW-GRO
+ - previous and next are from different flows
+And the actions (for each case separately) are one of:
+ - no reuse allowed (release buffer =3D -1?)
+ - reuse but must align (align to =3D N)
+ - reuse don't align (pack =3D 0)
+
+So to restate do we need:
+ - "page order" control
+ - max-rx-buf-len
+ - 4 alignment knobs?
+
+Corner cases
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+I. Non-power of 2 buffer sizes
+------------------------------
+Looks like multiple devices are limited by width of length fields,
+making max buffer size something like 32kB - 1 or 64kB - 1.
+Should we allow applications to configure the buffer to=20
+
+    power of 2 - alignment=20
+
+? It will probably annoy the page pool code a bit. I guess for now
+we should just make sure that uAPI doesn't bake in the idea that
+buffers are always power of 2.
+
+II. Fractional page sizes
+-------------------------
+If the HW has max-rx-buf-len of 16k or 32k, and PAGE_SIZE is 64k
+should we support hunking devmem/iouring into less than a PAGE_SIZE?
 
