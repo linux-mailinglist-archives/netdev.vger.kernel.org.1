@@ -1,191 +1,81 @@
-Return-Path: <netdev+bounces-230591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6C3CBEBB60
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 22:42:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C435BEBB66
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 22:43:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 04BF14E424E
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 20:42:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8B871AE2251
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 20:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA6128369D;
-	Fri, 17 Oct 2025 20:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CE46233155;
+	Fri, 17 Oct 2025 20:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J/m7AFbu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NFA9eQCf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42C3354ADB
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 20:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55AD354AC1
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 20:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760733748; cv=none; b=GhFFO+1LSAeaPrmYHnj5Ag3XEkAaXpkwJDKWX9OBqfWwaEYC37OzuqS3IK8A/n3/GZqJxTe+MOJc7qQH5b1rnh1CyF15PdsXPScNQ+cprZNbLF/6+1ppNk9idkkyTmcPKuMxbYudwrFo7Rs04BnyvdRQfKg7xWrrSCuufTiUVYU=
+	t=1760733801; cv=none; b=ZImjVEHfFaYD1DvZkwcCJYw8eZPPudjURygwk0NiMz3Sg5LTdfWF1QVutANSt7PTkUrT6l6EMgBxIRWNTJ5FZv7QBexPk2cFAIkQyrPJ1HatVpValaH5DW3EuoGKxTp9XWlsJ5zpBRSZI6U+ZBUA99iRiK6K165VOwRWbZsZQGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760733748; c=relaxed/simple;
-	bh=GNbYkbPL792EGmOZRY7pg+sIboyxZAVprviE/2tGcWI=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=XsQFYotvqemERmCi5Ct+2I7cldGmo2ddBf5/Fi3BU9MABEd84IwTOsVo+IkCoowB3XUx9sVSwWG1tSKEa3Rep4gvSEk7pa6TzCc20neMJe0ESAsPZy8e7/UysRRiZgIaVHNLoMsyHNnWVnB6RiZGLZq8h+iiLQW4mPWJpg+1ZVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J/m7AFbu; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3ece1102998so1786541f8f.2
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 13:42:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760733745; x=1761338545; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ualtxB2O28jzudNoRoOE1P84pY1sc3kAjYIjYso2m58=;
-        b=J/m7AFbu5cJe/N/c0bX22iRG7vBXL5U4lefYffLrnMMjgAjUtD2ME9eB0ABPuS0E4G
-         Y8mjCvEBE2wB2bKbZuNiceeFOx1TuEKZHDGDl9h/XA4FNOUOEeQDAdrktCikorZKguOD
-         ZbQRj1oMYGb8pFzv9yYWF3gFrTPQy02jcdnRxX62noAYJHCwV5z3P79mqtHhwtnzt6CT
-         89+cmbOZizzOckL3Op01Rd54NrdSpFOhhk1u+IGpUww1NWekiwuqbUf6lP/BH1FPjZNf
-         UkmeO5Q+I+2XkYCUG/90tSuHhci4NWa1W2WNlVjn9/RWgi0HlZW0Ztf1qrYnuHxONGQB
-         G28w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760733745; x=1761338545;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ualtxB2O28jzudNoRoOE1P84pY1sc3kAjYIjYso2m58=;
-        b=RUeUd5sJYIiGDTryKZO+/5MNuzfK+CsNrXziPY1chyg5XNqrc5B2uL6vJUh8gsKqAe
-         dwOmpwYoneOQR1GKUoc/2rK8ds753fZn135AC0Mx41uoMZ6y4t0QrAnxzRl0hyWL3MXt
-         GeBzKUN6BqvGG9dGWjmIflnWehlL0V3GbrnqiwxECRcsFlylr3BF95iUFxXKdelWo44h
-         wTizQ4sAFoOdmDNd36xRBwVaCy2q9SU4L+j00O/kObgqCCCAZJNUNvWDq+nlTj8qMXSc
-         lb/CSL/sbpEqYiwh1bR8McSymQSyuweOg4pdyju0fJQ2jwrVUzGtApxzRfsvjjthT2D3
-         6oFA==
-X-Gm-Message-State: AOJu0YyMnky5BFSIgTsy6nP6qMFOpmEdIhvjhPdj7JbKgqzCPCJGakYF
-	TiuFbGbfNcn5ZkbmkV9Xg8zCdjzE/420rTcSH6SEVS7uQU/KhrHAcJnJ
-X-Gm-Gg: ASbGncv/bk4xXU7oNRMqIhMY9XUFEnDfGFNGD1Om0WPkyHmvNz6CE8cwyGE87Jsh+cL
-	Dzu3W7j1Pkfwr/MlwvKiWwgu0g4Ic2fcRjBeDoBe6R6qlMR2TddJu8g+Jz0ePvVEm68qTOa/DHj
-	hWzHpwctf7Lh/XarTLTL5Yv/NQlxBOfc9qrPZhxEqfMXFBKX5yupV7aJtev58w/fARCNAvM8C0U
-	U+EFyHMSef4gxpTv/GHLgf4T4yTmbA+ITzZ42g3CTJMIwaXH7Xx1Jzh/tx8DcjGj/wdeszeQW4S
-	QIC/gN6jwAu/XaSkdwtk7HDCceBN02ES6SM9zU6WadNTuRLRo/kLZM978S818N0GBlefTAKhLJ+
-	dYnNb6L6HcxliY0BTO9q1gjQGC8aHutibZJQoM8AaQt2mBQjM0NMhHggUJv0lQpeV8RZgQnb4yb
-	KogXIYfxMu4v4V6WSjTOwJtklMM3dNWN8f5HfX0fOEu2VdcCrYI17ubPZGbikHAdGakce3N/pKu
-	2fIbTOYtZl0sPBYYH6bQHoszFpD5Q0+x4gxDK4BAePgE9eueZO1L8wGU0+djQ==
-X-Google-Smtp-Source: AGHT+IFvlc1ShJsWqbJ1BtdB6Ir+Wa8EBfL0X4sqLWutJC0rfRNM8Fz6yTk6lbjD3YJeDaC3tC8sUg==
-X-Received: by 2002:a05:600c:3513:b0:46f:b340:75e7 with SMTP id 5b1f17b1804b1-471178748a9mr39583095e9.8.1760733744752;
-        Fri, 17 Oct 2025 13:42:24 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f33:9c00:f581:27c5:5f61:b9b? (p200300ea8f339c00f58127c55f610b9b.dip0.t-ipconnect.de. [2003:ea:8f33:9c00:f581:27c5:5f61:b9b])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-427f00cdf6csm1064834f8f.43.2025.10.17.13.42.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Oct 2025 13:42:23 -0700 (PDT)
-Message-ID: <73ee007f-ba94-47c4-8d78-698cffcbacc2@gmail.com>
-Date: Fri, 17 Oct 2025 22:42:44 +0200
+	s=arc-20240116; t=1760733801; c=relaxed/simple;
+	bh=ZGieWUKEoPrg5JVOSIEF3tMHlOUM+hodV9Ycu5Aa/mo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QoE0a9n1uEV4+33N9/oHs4mbt7+uLBb2VQ6DelEnByGfT1BBseQA5KccNNmtsbY0S6Iaga8CWTSPpdde6rLZEbC1O7wBvMJjt6VD8Y68VDYc5DkOxdn4C/P5ZLuWfBCIhEOmVLgmXPrvCww5kM/lq0iWZeWnQi0pWMONecfYQy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NFA9eQCf; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=g7ZTpipc2oIw0ciZ3NBuRFR6Z+WK+DS1IXgceIEhbD8=; b=NFA9eQCfEsPhlQIrKncBfr1Wrx
+	aOfnRDzU4ud2wcK/mmV9J8303HMd58FJscrGXGYO99jSLXbcIwi2B3N3lM01tiS/Wp4qtI6FC+gSf
+	6X+v8IbZWyOFTfq7AKu0Dz74F3vffD/gXNUX2wq7ZwZ3GtNvX3xRQIGbcqbZ0HVEzlRg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v9rI6-00BKKx-HN; Fri, 17 Oct 2025 22:43:10 +0200
+Date: Fri, 17 Oct 2025 22:43:10 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alok Tiwari <alok.a.tiwari@oracle.com>
+Cc: hkallweit1@gmail.com, kuba@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	horms@kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org,
+	alok.a.tiwarilinux@gmail.com
+Subject: Re: [PATCH net-next 2/2] net: phy: micrel: fix typos in comments
+Message-ID: <71d62125-6ad6-4df5-8bcc-cbde86da8549@lunn.ch>
+References: <20251017193525.1457064-1-alok.a.tiwari@oracle.com>
+ <20251017193525.1457064-2-alok.a.tiwari@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 3/4] net: davinci_mdio: use new iterator phy_for_each
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
- Clark Wang <xiaoning.wang@nxp.com>, Siddharth Vadapalli
- <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, imx@lists.linux.dev,
- linux-omap@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>
-References: <68a7779c-acc2-45fc-b262-14d52e929b01@gmail.com>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <68a7779c-acc2-45fc-b262-14d52e929b01@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251017193525.1457064-2-alok.a.tiwari@oracle.com>
 
-Use new iterator phy_for_each() to simplify the code.
+On Fri, Oct 17, 2025 at 12:35:21PM -0700, Alok Tiwari wrote:
+> Fix several spelling and grammatical errors in comments across
+> micrel PHY drivers. Corrections include:
+> - "dealy" -> "delay"
+> - "autonegotation" -> "autonegotiation"
+> - "recheas" -> "reaches"
+> - "one" -> "on"
+> - "improvenent" -> "improvement"
+> - "intput" -> "input"
+> 
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/ti/davinci_mdio.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-diff --git a/drivers/net/ethernet/ti/davinci_mdio.c b/drivers/net/ethernet/ti/davinci_mdio.c
-index 68507126b..5a7ed5ebf 100644
---- a/drivers/net/ethernet/ti/davinci_mdio.c
-+++ b/drivers/net/ethernet/ti/davinci_mdio.c
-@@ -548,8 +548,8 @@ static int davinci_mdio_probe(struct platform_device *pdev)
- 	struct davinci_mdio_data *data;
- 	struct resource *res;
- 	struct phy_device *phy;
--	int ret, addr;
- 	int autosuspend_delay_ms = -1;
-+	int ret;
- 
- 	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
- 	if (!data)
-@@ -652,14 +652,10 @@ static int davinci_mdio_probe(struct platform_device *pdev)
- 		goto bail_out;
- 
- 	/* scan and dump the bus */
--	for (addr = 0; addr < PHY_MAX_ADDR; addr++) {
--		phy = mdiobus_get_phy(data->bus, addr);
--		if (phy) {
--			dev_info(dev, "phy[%d]: device %s, driver %s\n",
--				 phy->mdio.addr, phydev_name(phy),
--				 phy->drv ? phy->drv->name : "unknown");
--		}
--	}
-+	phy_for_each(data->bus, phy)
-+		dev_info(dev, "phy[%d]: device %s, driver %s\n",
-+			 phy->mdio.addr, phydev_name(phy),
-+			 phy->drv ? phy->drv->name : "unknown");
- 
- 	return 0;
- 
--- 
-2.51.1.dirty
-
-
+    Andrew
 
