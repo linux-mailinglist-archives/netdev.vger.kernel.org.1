@@ -1,153 +1,165 @@
-Return-Path: <netdev+bounces-230520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DF0FBE9E16
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:30:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E08EBE9BAA
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:22:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7C00C582F50
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 15:14:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 653CF1890DF0
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 15:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB70832E150;
-	Fri, 17 Oct 2025 15:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A322F12D4;
+	Fri, 17 Oct 2025 15:18:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="foes8srf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IQihjODK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9092F6932
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 15:13:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63C42F12BE
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 15:18:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760714011; cv=none; b=PSG7xzwFwmvK2u69SYWSrAJdYbTjanlbDBGsHBC/ndDX1TFsM4sRFAyTgK0YsdK/Z53dy0Ro/eueQlUk2cSgih5qX58E2VBdnQGqPJaiFl1KKDbWLSrzlZ2N/Qwg7aJlNjo1P51RRji8gnZgE83VBI941VXeXd/hKhK1oTw05cg=
+	t=1760714336; cv=none; b=DcYPUA+dAKxTT8PM4meRcQGDw5M1XoJ46zRAQNRi7YWqZhFp5VZfDPWHyeWpjqj5tmTgW61ZoBAVv60O12PB5KH8bA3IaHJuI3TnquQUaM7AUB1lTnc6AejpDzgvTv6X1NR+dfTdYFONddWgS7ubKeAmFAE5S+GLF8iFZh98OxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760714011; c=relaxed/simple;
-	bh=h1vSaeMkrN6H8hwYfVzjt+o4IKkESrHOBhkN1Xl16MM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lPDtbl3Q1yC65xaWtubSUTrtF+vdB5tD7iRGax21vP0C2oevtoWzMMxCM8+HPHRyHPEmse2cYYkC0XM9aOEShIkOPdS/TV3xMw+gJFbWkQMektgfgiTlLTkEQpk7AXUqKos1KqUP3Us/zWVJr1qnlRabEczZcVOCC2xWLT2OP/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=foes8srf; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-587bdad8919so8812e87.0
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 08:13:29 -0700 (PDT)
+	s=arc-20240116; t=1760714336; c=relaxed/simple;
+	bh=CZLi+sXLLQWJ1szeixL4fKYphUAlCf2Ajj9YbKRav30=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u4/iK8LcyS91C5EH8SO4d2q9tQff6Q7eaybTLCLKn4OrPcQ5giVK3XLKfFwJOIKqmrmFd98IRAi0jVTr7dZ5fceH5dAgV6c1buwwMjQcaVYzTUe3x3ph8dMb48MdtPxqR1a7QyMAMelnUN359ey3MC0nZvOgigWiJv1tM0oDD9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IQihjODK; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-27d3540a43fso21998675ad.3
+        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 08:18:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760714008; x=1761318808; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rSsE1dDRHw3HK9cZwjvWv+2rdYfMTeH9WPkRsLkpr8c=;
-        b=foes8srf5tsDu+qKgdbD8IqSRYpCOcycJQDQyWj/JzSgxF8J1QHriMY7U3ahktkx/j
-         0kMihX5EX1U7b+4iYrnqREvvascY4nuww1RQ8JsA+uIRqaVZceSUOuBRHwaOJ1xapA0G
-         u2pARSrhx+3GhdXvB7itizzpYkbrNQ4iC9uGNW1JMNj+LPpcyDayXj6GqjfhC1D+f4JI
-         tOKZNa0eG/UiPp5qZjkTdZyBv5HXRB6RGwJs81LgXBuG4xq/hQrVo5a8JrB8yBwey6gp
-         wp+IlooHtZW+FrHMdWhz2mRT6VdEegVus4KTGP7y1rMa+pHRReWS4wzc1z1iUtYzuOrs
-         +bnA==
+        d=gmail.com; s=20230601; t=1760714333; x=1761319133; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aky7O16wp7MCKRn7P+HfqmW9xe7HTb5Qd8ARsCmuj+Y=;
+        b=IQihjODKFDhO4uKpBjb8YYadD7C3UXztk0gWiXd9tErycbns//00PuTNCpryz6fcRi
+         xpszTuHsU56UZy76t5fqLOr+scnOQUvN3EjM/bX6dotEkKrNpXOqb3R6jnqHHNBxn6cr
+         tKVW1p80jRdppKubYJFwXUWxt5ENHdn60h0HXlWfZZzKe1XjAPd80yUUr3FXyWF5fEeg
+         Rq+qIcj0skdnc4Aj/8CS1wwkTi8fxOCZ1HVqr8EvbWpvxnsG+JTqxiLpLNKWJTL1AkPo
+         MoKpgt7E1nrFBy8wgvc/xV2eMdBPTPdkfIv9N8VAMhIHFID8yiYVEumfaqVVGAM71ltS
+         TDAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760714008; x=1761318808;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rSsE1dDRHw3HK9cZwjvWv+2rdYfMTeH9WPkRsLkpr8c=;
-        b=gVDdnLvmD2jJxYHQUZUwJExJsGQFnumgUgBiQFRjzsFKNBHgsA6ZSLbJZhL185EcZe
-         x3UQYSjevl58TR2M7VGmEFg5qJcRNSshIUukZhGrBLuxONXMHlSJMdXtCOCFFtJ1by7f
-         F7WIBIvvb1zhoOKyK49kQWKxHfcGbUnyV7iXc9nVlwjBvkZnHi5Ag/5uQfhubrToHeiM
-         qNT/ToRnzXeOnrpcBwPUSMJc1KZSR1h+2mP/srX/uOLTgxUg/kqlO5F+ajwmQzz+Bhap
-         axbxNtGu2Vow9pvdOlRT/aDi+Zb4v99SJbQeKjxI23YEvGCunXvlsakhW7c8qfFmyVSU
-         5m9g==
-X-Forwarded-Encrypted: i=1; AJvYcCXHdzJwyFzAQ3flVgmniJ10Y/O/o21QimB7U4d10RD6upnzMLmnwzrd8j10oBjHCLrgMFiEYX8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6PGBoKkRZsMrKCWk24KrXdH17mCEWTF/NqpiVMZdwbMPKNFEE
-	013AHbUYiLslgK3/bpvl9I4nNCcB6hkozurKI5f/LlarRZk8uftSlLdizOXrr9m1OEEDyWZRr6B
-	vM/fihLT8CP4oclfvxMOfxym6j7OSm3XJLFf+XzuL
-X-Gm-Gg: ASbGncs/tG1MNMphkcj1F+Qgn8464AkyUv+LSYMz0PAfKMBFXyM0ZmVy9BfhJ4hakrT
-	cXI3HhX5iUwLjHNA8flswn4NFHxPAlhJqAo+1PgL07YK1kT6tXMFBd7K+3F1LWmyk+kGNENPt2c
-	H9MwK05VH6SPDk7f4erubLPZgnybmUTSRAmUBeJ1mcObM2Y6GpjGt9qPNSgXUPsTWkshq/itQUI
-	UY3ppb2Sw8QRbJ5IQssc0Hpbsd2CM/QMT9FmgZWaTKPX1ZIr7i/uxAWwV/vpw==
-X-Google-Smtp-Source: AGHT+IG2yYV1soOtTVbTodBl20gDiFrFLFitvWrizx0r35BbLhSYj1Ej+lir5/F2pMqQChZwo3lfBx+k+TttDJiVSEc=
-X-Received: by 2002:ac2:5617:0:b0:591:c7a5:2d1f with SMTP id
- 2adb3069b0e04-591c9ff1e5fmr900210e87.5.1760714007654; Fri, 17 Oct 2025
- 08:13:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760714333; x=1761319133;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aky7O16wp7MCKRn7P+HfqmW9xe7HTb5Qd8ARsCmuj+Y=;
+        b=Khs2iIzVdeLh7Yof/CuzRLIctTmXvETvXIvzPgwL9QQ7tEJRTDO/DBlxS7ncJRBqwk
+         duA4Tt+lO9fcuaZ8+tjW6Y7+KGovMMO9iRSgk8mNNrygbDJfYD+UeHYrfx4BGdUsaN09
+         BTFKmQvk+s0e6GXgb9V3hAlvpyvjY8g/Z70hWheyphEYDxFItTrui9lr41LbDw/igf+j
+         wBU73fiif+sbCVgfE3H/TWz7Ai27DwtvG5VvXcCjczCPB8UfdhlHeoIJe2GR9zSfRYab
+         1RDEvZdCK9eqCxtDzBjwd2/peBvNShhfeIGEa7mRz2aSRcjH2gcPFWaFOcdHpWPyR3Cp
+         8LQQ==
+X-Gm-Message-State: AOJu0Yyki8c/tX1ZO0ksKnhbFqWR7Hr33MkbqsWBp1NiyeB7DGBqy6/p
+	FWoYaeHl6RU2EKE4DDEuCkfbtH0UmX+Z/mm7bgakL8o4z7JkWEdVFf4M
+X-Gm-Gg: ASbGncvQpeISwRXXJ3diw2Br+JS2gFtlAUHWbDeOdHoNKaPlQDGnbYExVsoWUXU16If
+	lwN2gOmEWpTONKxX01AFGfhQ4UZhbvqKclAaov8IufDaGVtbUttlwmsodff7jeRKr3Q6jIMHlQh
+	fOoJtN86G2A047ofyGBliVHKxJSaIyDrhif6BT4eBswnK1+2QPuXvfLcVOK4VqusB71goa/eo3f
+	HMd+sACIF3xuP7A/L9+w4bG19NaQhlbiXH0xJd9GGwwDd32XjIAs7jVUM0Rz0FtuDQcz1Dkc8cP
+	mmpWPT8LqTSiVZ4gGgkcrjrKUvxt/Bf8ccyO7smWTUbPmYQk8nSPkNz/9UMIfieY1Wjsf1BCu7O
+	WFxrqsOhxiy5EVcSMsELZw6wUnaFq7zMQO3tX+0wTJmpl2mstGqmJY1gIn5+kILq+BEsDBiBkwY
+	ofJ4v8SCmNu/ZEx7hjPanDR3/plMmjF64ZJA3lxjyQLbM=
+X-Google-Smtp-Source: AGHT+IErUrkf0E6Co1oQ9IYvwro69w/l75nuO5GilwN7XkDgpAP+XCdmvjp8T0T5H471WqUuqlgsOg==
+X-Received: by 2002:a17:903:32c9:b0:249:3efa:3c99 with SMTP id d9443c01a7336-290cba4e6cdmr51489385ad.61.1760714332790;
+        Fri, 17 Oct 2025 08:18:52 -0700 (PDT)
+Received: from iku.. ([2401:4900:1c07:c7d3:fdc9:5e8f:28db:7f80])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2909930a756sm67193955ad.14.2025.10.17.08.18.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Oct 2025 08:18:52 -0700 (PDT)
+From: Prabhakar <prabhakar.csengg@gmail.com>
+X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+To: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+	Paul Barker <paul@pbarker.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Mitsuhiro Kimura <mitsuhiro.kimura.kc@renesas.com>
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Prabhakar <prabhakar.csengg@gmail.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: [PATCH v2 0/4] net: ravb: Fix SoC-specific configuration and descriptor handling issues
+Date: Fri, 17 Oct 2025 16:18:26 +0100
+Message-ID: <20251017151830.171062-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251016063657.81064-1-byungchul@sk.com> <20251016072132.GA19434@system.software.com>
- <8d833a3f-ae18-4ea6-9092-ddaa48290a63@gmail.com>
-In-Reply-To: <8d833a3f-ae18-4ea6-9092-ddaa48290a63@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 17 Oct 2025 08:13:14 -0700
-X-Gm-Features: AS18NWDrNTee2iN7Yt-3RFBdnvbfwlm0owIMUwyA6-MIhPexgaRgEJJMm-KEnqI
-Message-ID: <CAHS8izMdwiijk_15NgecSOi_VD3M7cx5M0XLAWxQqWnZgJksjg@mail.gmail.com>
-Subject: Re: [PATCH net-next] page_pool: check if nmdesc->pp is !NULL to
- confirm its usage as pp for net_iov
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Byungchul Park <byungchul@sk.com>, axboe@kernel.dk, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org, hawk@kernel.org, 
-	ilias.apalodimas@linaro.org, sdf@fomichev.me, dw@davidwei.uk, 
-	ap420073@gmail.com, dtatulea@nvidia.com, toke@redhat.com, 
-	io-uring@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, kernel_team@skhynix.com, max.byungchul.park@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 17, 2025 at 5:32=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> On 10/16/25 08:21, Byungchul Park wrote:
-> > On Thu, Oct 16, 2025 at 03:36:57PM +0900, Byungchul Park wrote:
-> >> ->pp_magic field in struct page is current used to identify if a page
-> >> belongs to a page pool.  However, ->pp_magic will be removed and page
-> >> type bit in struct page e.g. PGTY_netpp should be used for that purpos=
-e.
-> >>
-> >> As a preparation, the check for net_iov, that is not page-backed, shou=
-ld
-> >> avoid using ->pp_magic since net_iov doens't have to do with page type=
-.
-> >> Instead, nmdesc->pp can be used if a net_iov or its nmdesc belongs to =
-a
-> >> page pool, by making sure nmdesc->pp is NULL otherwise.
-> >>
-> >> For page-backed netmem, just leave unchanged as is, while for net_iov,
-> >> make sure nmdesc->pp is initialized to NULL and use nmdesc->pp for the
-> >> check.
-> >
-> > IIRC,
-> >
-> > Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
->
-> Pointing out a problem in a patch with a fix doesn't qualify to
-> me as "suggested-by", you don't need to worry about that.
->
-> Did you get the PGTY bits merged? There is some uneasiness about
-> this patch as it does nothing good by itself, it'd be much better
-> to have it in a series finalising the page_pool conversion. And
-> I don't think it simplify merging anyhow, hmm?
->
+From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-+1 honestly.
+Hi all,
 
-If you want to 'extract the networking bits' into its own patch,  let
-it be a patch series where this is a patch doing pre-work, and the
-next patches in the series are adding the page_flag.
+This series addresses several issues in the Renesas Ethernet AVB (ravb)
+driver related to SoC-specific resource configuration and descriptor
+ordering.
 
-I don't want added netmem_is_net_iov checks unnecessarily tbh. These
-checks are bad and only used when absolutely necessary, so let the
-patch series that adds them also do something useful (i.e. add the
-page flag), if possible. But I honestly think this patch was almost
-good as-is:
+Different Renesas SoCs implement varying numbers of descriptor entries and
+queue capabilities, which were previously hardcoded or misconfigured.
+Additionally, a potential ordering hazard in descriptor setup could cause
+the DMA engine to start prematurely, leading to TX stalls on some
+platforms.
 
-https://lore.kernel.org/all/20250729110210.48313-1-byungchul@sk.com/
+The series includes the following changes:
 
-You just need to address Jakub's review comments and resubmit? Not
-sure why we want to split, but if you want let it be a patch series
-that does something useful.
+Make DBAT entry count configurable per SoC
+The number of descriptor base address table (DBAT) entries is not uniform
+across all SoCs. Pass this information via the hardware info structure and
+allocate resources accordingly.
 
---=20
-Thanks,
-Mina
+Allocate correct number of queues based on SoC support
+Use the per-SoC configuration to determine whether a network control queue
+is available, and allocate queues dynamically to match the SoC's
+capability.
+
+Enforce descriptor type ordering to prevent early DMA start
+Ensure proper write ordering of TX descriptor type fields to prevent the
+DMA engine from observing an incomplete descriptor chain. This fixes
+observed TX stalls on RZ/G2L platforms running RT kernels.
+
+All four patches include Fixes tags and should be considered for stable
+backporting.
+
+Tested on R/G1x Gen2, RZ/G2x Gen3 and RZ/G2L family hardware.
+
+Note, I've not added net-next in the subject as these are bug fixes for
+existing functionality.
+
+v1->v2:
+- Split up patch 3/3 from v1 into two separate patches for clarity
+  of using dma_wmb() for enforcing ordering.
+- Updated commit message for patch 3/4
+- Added Reviewed-by tag from Niklas for patches 1 and 2.
+Cheers,
+Prabhakar
+
+Lad Prabhakar (4):
+  net: ravb: Make DBAT entry count configurable per-SoC
+  net: ravb: Allocate correct number of queues based on SoC support
+  net: ravb: Enforce descriptor type ordering
+  net: ravb: Ensure memory write completes before ringing TX doorbell
+
+ drivers/net/ethernet/renesas/ravb.h      |  2 +-
+ drivers/net/ethernet/renesas/ravb_main.c | 40 +++++++++++++++++++-----
+ 2 files changed, 34 insertions(+), 8 deletions(-)
+
+-- 
+2.43.0
+
 
