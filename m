@@ -1,147 +1,137 @@
-Return-Path: <netdev+bounces-230578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E685FBEB37D
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 20:27:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35037BEB644
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 21:35:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2B2204EAA25
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 18:27:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E990C3BA5A0
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 19:35:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D147A30DEBB;
-	Fri, 17 Oct 2025 18:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6E72FC01B;
+	Fri, 17 Oct 2025 19:35:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lRl2jWvR"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="I5W26Oty"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E36A30505E
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 18:27:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61BED2FFDC8
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 19:35:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760725661; cv=none; b=cuqQXBEnZjMSElo4Mou5r4N4bggfFrjwBtHAMZp3F0BYO9j1fTU9iUt8D/PwZkmppk+LjGyqZoo7mLq7DfdGwkUYOWQvdZV7N82wb3J7FoZgJ4uV5rzzJ4V7UDNaa+RHn54xZ+mo7F+sc5Xdd5pXEPxXVoQCqs8DlZMi1ZEkbcI=
+	t=1760729750; cv=none; b=UZfsEmMViGSQnoHTT5Y4L85zsucq+wO0yAVvfaCpGmIfos6nVo6iWdH+L4kwtd24biwyp4zmWn9DugslKLjIAd4LIrvZjHTy9W7VImyOE+DVH41WK6iP+l2ozEryGxYqzW9Jsf8bykPhwJoT/EWQhDoG06Nerobffx5p25PoSJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760725661; c=relaxed/simple;
-	bh=apyeGrhT2B4cjSomRBMirnJK1iCiphU7E8kwZ4eFRPI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eJ2hDTPF/R6UUQZj76Vwnks5G3Wr1PKOyA40uFEE2yKhRl7T4xx+ypCEClAVoOhoF+qz8378cXk3n83HdPeka7tCEgZI42u0uHLzx+bcxxUUeX/ipVSpoHCN5yXLqW1crRB4g966O7zN6skq1zooC2SolX+IaOR3WcxdpTBw57g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lRl2jWvR; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4270491e9easo1100935f8f.2
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 11:27:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760725658; x=1761330458; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zNOsTI510GPBzBmWLlky+fzOisjB58DBhaGG4R2nBM8=;
-        b=lRl2jWvRw+n/iLhCD3xpKuP83ZE3tpzetVsSBAj0bBXyQezXVf3unacJZRJ0WQnmSA
-         XgpciaMSHuvupkgV+rXJiKWyQRYNUOppzy/wKOKooClafXZxfeLhbNKLjhZT0ihWp+tI
-         ueZBdU4waox/w5i9wVV9+rm77LqtZLquUy3vhUcO0+MfGWX9Cm406yvju6wtKW2S9RHm
-         WWvSK1GmecZ1eTnrKTSCpGfCbrmHM1hejSylO2gZ/x7Ec02RYt1lh4nJViYKmVKuGsrg
-         amGoHeV9E8508I62WGhJCwSOvmIWbK4HCynxoEVJ14RP4/HzaOAqt4uQOj5ZNXdiWCOr
-         7p4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760725658; x=1761330458;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zNOsTI510GPBzBmWLlky+fzOisjB58DBhaGG4R2nBM8=;
-        b=tK5QlHVxbgZnR6Bag75+RQpj1kjv2nPMJ8oz3LgaZAhw5wO6v7JzGgFrsiO1eKYn5D
-         B4QbRNFnMochu+0kJfxOgO2FDkU0CEhiENPARBKft7wmn0IrweWSlT9gVSaM3BIG2itv
-         b5odmbCOZgEuRFee1+INUooS6Mo7jieKh+2FcLAxpYjM5n5j2rePav0T00t3ypX2Jj/D
-         4PRI0ldamsFyW/dG+iCXgNQT9DugMgM9yMNR56y6b4B52FtAO2Yfz/hd9xqN6EJmWE04
-         yDJDmoU8m7i8xHEcKfPjan+vVP/anQgKGgUNH7f0lvd0tD7cJ7hfIB4To3NjGBgp0jFp
-         qXuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUaNx4foBoM5lCrk5jGB4uL/OAL8K+QmKgGffANRoSMRoaubZqSO8ex6YkFIpQ0rrS31kqD3Bs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoGBHEDa/K7G4F3mUI3Vbex6HhuLb7u+YX6fKHGnillVukkvZK
-	9ZGiNW/zZgNQ24frOdBnbh1DT8XoW1zzPR8CtXIpi8OnBwOkAqBx6nKEl+M8//J6eYxAu/kO4Tv
-	L5iMgnRWBHuS6Z3u57S1eHmNBZ8FxU9g=
-X-Gm-Gg: ASbGncsK7HJnmyaChhL5JKvTX3Kp8cGc7lTZJv13QANBXrfewm+lb9ZfHC/APvE/2Ur
-	XQIGhwMoChC84/8tz6mMi/kD/PWwimxCIA3bjM52CU0V1Aqnelp+eMvuJm0rMYFKzTp9IUUlVvl
-	H1bqcYsacfBBeWDRiukbTnIsr3PoaKskCRFJgu6Z0z6dwi7m4s+9avRbJhA1r5hofFStozWxaWJ
-	OVngZwYwGALHO+PTvH0SW8iC5BD06lipW/iVDE40/P7F7zAxWnrrbyPBDWqv9wdc+hiEyq6gCvl
-	tPcL3XDNUY5yEaDePg8WM+2GNT5H
-X-Google-Smtp-Source: AGHT+IHrzD3MV8piW/3R5bZbNm50DZwa+/IsxY+cp8lTiOj949EZXhc7lXjq+S0IuHDeamFjuoLV5tVj/VL0xY2uTU4=
-X-Received: by 2002:a05:6000:2387:b0:3e9:b7a5:5dc9 with SMTP id
- ffacd0b85a97d-42704d6d12fmr3503910f8f.23.1760725658228; Fri, 17 Oct 2025
- 11:27:38 -0700 (PDT)
+	s=arc-20240116; t=1760729750; c=relaxed/simple;
+	bh=lHUS07uIm8oGOlrzclYnfRMC2yOVwBFSChAU3anPmDw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PkRjlIDKlXIGYF1K4o0SScyrPRM87bR9akhdN2z8TNIZLkYXCRQVRVF/yafCQd66C6Y5QKnVUYod3qY33sNpUQ1lVzaBufG2mNPW01UdDn2LE4jEcIShOmhV3tBmYjjiXwypV1fw+WxlykMUThxFiePmj3dSvaXREXz/l9xLumo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=I5W26Oty; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59HCdbW6014080;
+	Fri, 17 Oct 2025 19:35:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=VDofITKn4jBZUHN5FlZGELEg2U44C
+	gPmOTJfRGvDkz0=; b=I5W26Oty/CXAlzyjGW3lIzJi+TD3CQ69ktJiZ+/UF6Ac/
+	lrQIMF/7tOghunZWAjUpdeQBNkOsTjPE+ilT4rJrxNPWWBXk327m9q2VTRInjaN7
+	662BMbKeO1RDvrAFllwrgFyF55IazQrv5zhO4QKS6z1Sg84jx/UVp+l8Ugx1HYyr
+	nsI/wrfbgH5OkgTsdPKZnDfS3iGbmlBiqXRkyRGkYvBQkdH7uLEsqfrCwBqq986t
+	m5/EVHseYRhM1TtE7mnTXfgJQlksBQi6+Rc0W8qpZfLYtrceMmKerwZ0bNUg5rb/
+	CJQZ3cF8onxWtKXKxKGm2ccRNwIouwRRXtxVl2zEw==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49qf9c3qgs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 Oct 2025 19:35:31 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59HJNESj002326;
+	Fri, 17 Oct 2025 19:35:30 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 49qdpkg5tr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 Oct 2025 19:35:30 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 59HJZUVN017300;
+	Fri, 17 Oct 2025 19:35:30 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 49qdpkg5t3-1;
+	Fri, 17 Oct 2025 19:35:29 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: hkallweit1@gmail.com, andrew@lunn.ch, kuba@kernel.org,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        pabeni@redhat.com, horms@kernel.org, linux@armlinux.org.uk,
+        netdev@vger.kernel.org, alok.a.tiwari@oracle.com
+Cc: alok.a.tiwarilinux@gmail.com
+Subject: [PATCH net-next 1/2] net: phy: micrel: simplify return in ksz9477_phy_errata()
+Date: Fri, 17 Oct 2025 12:35:20 -0700
+Message-ID: <20251017193525.1457064-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251016-xsk-v5-0-662c95eb8005@bootlin.com>
-In-Reply-To: <20251016-xsk-v5-0-662c95eb8005@bootlin.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 17 Oct 2025 11:27:26 -0700
-X-Gm-Features: AS18NWCyoIqaofAQbkOXYwS9xLsYBlc0BUliOKOZEhJe6-LQzeQc4XxtZWuyB4E
-Message-ID: <CAADnVQLLBrawW6N4BcPvhYD2Cg_qaxSZDRU53Jq31QxR3mPDkw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 00/15] selftests/bpf: Integrate test_xsk.c to
- test_progs framework
-To: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	Magnus Karlsson <magnus.karlsson@intel.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
-	Alexis Lothore <alexis.lothore@bootlin.com>, Network Development <netdev@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-17_07,2025-10-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 suspectscore=0 phishscore=0
+ adultscore=0 malwarescore=0 mlxscore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510020000
+ definitions=main-2510170149
+X-Proofpoint-GUID: uico2pkeUbnPgVypnGePExTFayZNV8hQ
+X-Proofpoint-ORIG-GUID: uico2pkeUbnPgVypnGePExTFayZNV8hQ
+X-Authority-Analysis: v=2.4 cv=QfNrf8bv c=1 sm=1 tr=0 ts=68f29a83 b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
+ a=fxyIGaWVqRnF3hTsbVAA:9 cc=ntf awl=host:12092
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDExMDAxNyBTYWx0ZWRfX2LzC2C7IQMtG
+ 6VEhKRMVoS4o1IrUQ7sbTsm/hMrdnXj+uMgKTjINVQ/cSI3owNTe37FyhzXJuVGz43fH0Un4vZD
+ yrBwbDMBHiA/jWvm5JRi03VjYW1sPorFFAEC6gK+q4ZmrCG/TUeP/YTXeoGm3/bQY738FktDwN6
+ T6HJv+mt6UqiLhAmN0tI1phy/fVYFAyQyKim0nV7Maz2tTR2/a2M+sXFoEtKceF37VhgViR2KLi
+ 6PqDVFjPcVSiRn3TdeYgbgLp0orriKP0hJ7oOawHx/k5yVmsc2mhwroR1HcQN1pdWU9g9pB44mD
+ Y2jjYNBqLPZMfYlQFivPdmrRD/tkh00BR1rdj65cYbDGPnnJwRg38ad/dKc6Tr+WL6d1PBxx56z
+ vUyU7LlcnTYhsQXXJqC7Wo4xLbXVnVhqOB0hyKYQX05XtkiPwMg=
 
-On Thu, Oct 16, 2025 at 12:45=E2=80=AFAM Bastien Curutchet (eBPF Foundation=
-)
-<bastien.curutchet@bootlin.com> wrote:
->
-> Hi all,
->
-> Now that the merge window is over, here's a respin of the previous
-> iteration rebased on the latest bpf-next_base. The bug triggering the
-> XDP_ADJUST_TAIL_SHRINK_MULTI_BUFF failure when CONFIG_DEBUG_VM is
-> enabled hasn't been fixed yet so I've moved the test to the flaky
-> table.
->
-> The test_xsk.sh script covers many AF_XDP use cases. The tests it runs
-> are defined in xksxceiver.c. Since this script is used to test real
-> hardware, the goal here is to leave it as it is, and only integrate the
-> tests that run on veth peers into the test_progs framework.
->
-> Some tests are flaky so they can't be integrated in the CI as they are.
-> I think that fixing their flakyness would require a significant amount of
-> work. So, as first step, I've excluded them from the list of tests
-> migrated to the CI (cf PATCH 14). If these tests get fixed at some
-> point, integrating them into the CI will be straightforward.
->
-> PATCH 1 extracts test_xsk[.c/.h] from xskxceiver[.c/.h] to make the
-> tests available to test_progs.
-> PATCH 2 to 7 fix small issues in the current test
-> PATCH 8 to 13 handle all errors to release resources instead of calling
-> exit() when any error occurs.
-> PATCH 14 isolates some flaky tests
-> PATCH 15 integrate the non-flaky tests to the test_progs framework
+ksz9477_phy_errata function currently assigns the return value of
+genphy_restart_aneg() to a variable and then immediately returns it
 
-Looks good, but why does it take so long to run?
+    err = genphy_restart_aneg(phydev);
+    if (err)
+        return err;
 
-time ./test_progs -t xsk
-Summary: 2/66 PASSED, 0 SKIPPED, 0 FAILED
+    return err;
 
-real    0m29.031s
-user    0m4.414s
-sys     0m20.893s
+This can be simplified by directly returning the function call
+result, as the intermediate variable and conditional are redundant.
 
-That's a big addition to overall test_progs time.
-Could you reduce it to a couple seconds?
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ drivers/net/phy/micrel.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 79ce3eb6752b..65994d97c403 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -2095,11 +2095,7 @@ static int ksz9477_phy_errata(struct phy_device *phydev)
+ 			return err;
+ 	}
+ 
+-	err = genphy_restart_aneg(phydev);
+-	if (err)
+-		return err;
+-
+-	return err;
++	return genphy_restart_aneg(phydev);
+ }
+ 
+ static int ksz9477_config_init(struct phy_device *phydev)
+-- 
+2.50.1
+
 
