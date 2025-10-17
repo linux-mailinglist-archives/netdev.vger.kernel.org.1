@@ -1,300 +1,102 @@
-Return-Path: <netdev+bounces-230560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EA69BEB1ED
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 19:52:10 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91B96BEB1F9
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 19:53:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 12F5B4E1242
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:52:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 601BB4E3C80
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:53:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E083054F2;
-	Fri, 17 Oct 2025 17:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5138932C949;
+	Fri, 17 Oct 2025 17:52:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qci1Ew9K"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GrQYhuD/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E492C3770
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 17:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B803732B98D;
+	Fri, 17 Oct 2025 17:52:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760723525; cv=none; b=l3BoWM2TRGNEQu/lUDbouXVsmzrXfMeMa185wOObNZRnGG7ZBU3RP/1kf2G0EjAEGUPE/t+jMjHI4x13Mk5UsWn3lpMUzaPyPihJKnOsYu+jQF3QRsqJmOBYJt2PxQkPy5CecHMX8A5FHOM7oh6RM829zKNLf0W2zYdAFa0WsdY=
+	t=1760723575; cv=none; b=N+nF0vakuyfJl4GP8dGCnZ3/v0tHql4/ZoTiglwYcqw+kEdMQg5dE7t4YD0WOqxzvTsZs5yOQmyJiV2EDzjxieKJG07A1XrLnO3sc2gU59J2r0MKrgSCDPzHKWtV7TqZJO8uCJQDHWMF09wISxpubA9Pd+0ziGh1HzJnJyMf/M4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760723525; c=relaxed/simple;
-	bh=dXT0iXfRVPHvfidqKdfkzXW+fTOyMzN41RLUPxx3MuY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=KllugSKlGN8Qot3am1biFIcpnU+wxX7BaCndREocSDV1rJNVYaIYj/+svUj8hQWBg6x2iocZDrqtNrn0EFzH4QqH4zDvHnARiqPoLdjxLfeuE1ORCONoAsr5DoINB77TeXuvElofRBfWRgkeQTiBN1xfeiivlflFMJi1Get0AqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qci1Ew9K; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760723523;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/H4CXDFjmdSfJh9MIG/jOrNJbAl5bAflLfgiJZYlR50=;
-	b=Qci1Ew9KhA8ncK45NV5uyBdIZq7FdSipFK5JxzmkzrNpBa7F2CpLbYvcfr9ZsKZr5lQL1L
-	UerT7xzpZPOhbpgx1nIhRphuGbdFFXvv8scY2weqDaohU4cgqh31xUWzch4EAUzz56p3j/
-	/tz50+VlKSI1kyjGh1Ic9/LkYWV0qCQ=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-345--4m_q54TOouU8vJTWlR2pQ-1; Fri, 17 Oct 2025 13:52:01 -0400
-X-MC-Unique: -4m_q54TOouU8vJTWlR2pQ-1
-X-Mimecast-MFC-AGG-ID: -4m_q54TOouU8vJTWlR2pQ_1760723521
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-b3afaf5defdso271127966b.0
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 10:52:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760723520; x=1761328320;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/H4CXDFjmdSfJh9MIG/jOrNJbAl5bAflLfgiJZYlR50=;
-        b=mJyJYdiQoD6x3SrxFbHi8/I06UoheHGA9thtTgWRgxt2bB4BUOk9e3/bSJpQPrOwqN
-         WUY3U6BRGK4yUqt7fHy7nTu2iIrHLCZ2fMqqfUdWkGW2A96ujOQGxiEH0usVLiQPTDuN
-         EzJ3ToBmQfI78nuz54Tx6O06t8lqb2tvxc3jU/zF2UJCI0+pnVrvpGE/qXHtOfPThcSt
-         20/ZLF/C/Xu3nzJ3LHjY0RjNywocfC4fwLcg0JjpxgwlspFLT4apfmXOmLVqoSvscarc
-         CD/4NRHZtfOReIJkLh+GJld5Ceu8CZT3iqh8QuR+hl+VkxlHvzybjv+JwHGzGOfF/iem
-         C/RQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUgxRWyrFZsmhPznh4xDI/dRRWFCKJzlr/2W7bEGDc9QMJ35BB+YAwnMwgTiil0EBgkCUnlqgg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2Z0pGMNLe0kJVe6FgUA2s3gOlo9bsLnjelnOvuaogk1aTcBej
-	O4l/967lzy/3MJiEp183y0BxVsxEHMSNxahcovtozWvi/7Zf6K+FVPk1W9YlReod6+RINetM+ep
-	aUlZnS109I7IUGwJQ1sonBW6GSvdsR2qzJX244akoOwZuCH1fQDQWL95I0Q==
-X-Gm-Gg: ASbGnctVlrEhFzgX1HTYzBlVrOujhMpItdUZmMMvpnocTLV7lrxbnr+6EEg5F2vwCmp
-	zvpTO4zEbzYsAopccqAXARgWFicy3a5iBVaElu3eCVq10evDd8CPZkTmRy/dEWHqFo8XESN/fiG
-	rTz3N6+AR+VXPDPhb7bFoKlUM23jFaWP3kFmnoe1T9FDvUug8B+2Q0pl68O8fIIH8TdFKZM5PMH
-	zsVI7Dy7aWRCWFppBodBa/8YknlK0Nkuvjnsu0Dm/Tw6RmPc1JQzq9MWIHljRgJqkP8MxPJ21OU
-	y6++CKSpKkuG6gVj+GH6OWCP+4I+VHaYdlCSBakjzjQ/rLg7vhmbDbk0POUmVfD3hmtP4p40LlD
-	frifThOLkff2HuKbaNZ4w6TI=
-X-Received: by 2002:a17:907:3f04:b0:b3f:a960:e057 with SMTP id a640c23a62f3a-b64749411b1mr560266266b.31.1760723520554;
-        Fri, 17 Oct 2025 10:52:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHkijthzj0Q/TyM9UrRkccVJhW3e2AjCisrN8s5J8rWS+/7upU0njEVv3isPSWP4K4EIXb+Tg==
-X-Received: by 2002:a17:907:3f04:b0:b3f:a960:e057 with SMTP id a640c23a62f3a-b64749411b1mr560262966b.31.1760723520029;
-        Fri, 17 Oct 2025 10:52:00 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b65e83914d0sm30996566b.21.2025.10.17.10.51.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Oct 2025 10:51:59 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 4ADE62E9D4D; Fri, 17 Oct 2025 19:51:58 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, ilias.apalodimas@linaro.org, lorenzo@kernel.org,
- kuba@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com,
- andrii@kernel.org, stfomichev@gmail.com, aleksander.lobakin@intel.com
-Subject: Re: [PATCH v2 bpf 2/2] veth: update mem type in xdp_buff
-In-Reply-To: <aPJ0YqfH+pdSIbVS@boxer>
-References: <20251017143103.2620164-1-maciej.fijalkowski@intel.com>
- <20251017143103.2620164-3-maciej.fijalkowski@intel.com>
- <87a51pij2l.fsf@toke.dk> <aPJ0YqfH+pdSIbVS@boxer>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 17 Oct 2025 19:51:58 +0200
-Message-ID: <87347hifgh.fsf@toke.dk>
+	s=arc-20240116; t=1760723575; c=relaxed/simple;
+	bh=/AAtJbZIzife83BhcEdb7e3iAJ1phzVX1WWoC7hBd/g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uiPCboHZaDJIXXI4RCKIfNnTtdTjzOAEWYSY5vcF+KxjW1tiFroB0OZww8GGRPwnIRFC7tqgRKI+uicjOiie/c7Yqt+XnFJ2nSppxw4+Wn+dXeJgGPbBNG/zruzZ0nDf2ACDqC1Kt92y7eXPSvuWQLChj+KuKb0I5Tf7Z1HDJ+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GrQYhuD/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=KmfJCjmokZLUjt62bEkcRDY2jCPPtEcJwREx2XHeVas=; b=Gr
+	QYhuD/nT4iVGP4S1XuHaN+Xuln7kybBwVq+1wYr30kz2IRnK8o+yLRrvov5qXncw9fpQNTowY3vP5
+	qNBfanGF/QX0ILq912ezOoNzLztz6ujF82jf1pDnsLHcqXZFECarNJ6qwdKTi05HCazcX2Vr1ILs1
+	DGBLgOk0e9mI2ic=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v9od9-00BJP1-M1; Fri, 17 Oct 2025 19:52:43 +0200
+Date: Fri, 17 Oct 2025 19:52:43 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Th=E9o?= Lebrun <theo.lebrun@bootlin.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>,
+	Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	=?iso-8859-1?Q?Gr=E9gory?= Clement <gregory.clement@bootlin.com>,
+	=?iso-8859-1?Q?Beno=EEt?= Monin <benoit.monin@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next 03/15] net: macb: remove gap in MACB_CAPS_* flags
+Message-ID: <26db9699-f71a-4e98-8f07-286e333bbeb6@lunn.ch>
+References: <20251014-macb-cleanup-v1-0-31cd266e22cd@bootlin.com>
+ <20251014-macb-cleanup-v1-3-31cd266e22cd@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251014-macb-cleanup-v1-3-31cd266e22cd@bootlin.com>
 
-Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
+On Tue, Oct 14, 2025 at 05:25:04PM +0200, Théo Lebrun wrote:
+> MACB_CAPS_* are bit constants that get used in bp->caps. They occupy
+> bits 0..12 + 24..31. Remove 11..23 gap by moving bits 24..31 to 13..20.
+> 
+> Occupation bitfields:
+> 
+>    31  29  27  25  23  21  19  17  15  13  11  09  07  05  03  01
+>      30  28  26  24  22  20  18  16  14  12  10  08  06  04  02  00
+>    -- Before ------------------------------------------------------
+>     1 1 1 1 1 1 1 1                       1 1 1 1 1 1 1 1 1 1 1 1 1
+>                     0 0 0 0 0 0 0 0 0 0 0
+>    -- After -------------------------------------------------------
+>                           1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+>     0 0 0 0 0 0 0 0 0 0 0
+> 
+> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 
-> On Fri, Oct 17, 2025 at 06:33:54PM +0200, Toke H=C3=B8iland-J=C3=B8rgense=
-n wrote:
->> Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
->>=20
->> > Veth calls skb_pp_cow_data() which makes the underlying memory to
->> > originate from system page_pool. For CONFIG_DEBUG_VM=3Dy and XDP progr=
-am
->> > that uses bpf_xdp_adjust_tail(), following splat was observed:
->> >
->> > [   32.204881] BUG: Bad page state in process test_progs  pfn:11c98b
->> > [   32.207167] page: refcount:0 mapcount:0 mapping:0000000000000000 in=
-dex:0x0 pfn:0x11c98b
->> > [   32.210084] flags: 0x1fffe0000000000(node=3D0|zone=3D1|lastcpupid=
-=3D0x7fff)
->> > [   32.212493] raw: 01fffe0000000000 dead000000000040 ff11000123c9b000=
- 0000000000000000
->> > [   32.218056] raw: 0000000000000000 0000000000000001 00000000ffffffff=
- 0000000000000000
->> > [   32.220900] page dumped because: page_pool leak
->> > [   32.222636] Modules linked in: bpf_testmod(O) bpf_preload
->> > [   32.224632] CPU: 6 UID: 0 PID: 3612 Comm: test_progs Tainted: G O  =
-      6.17.0-rc5-gfec474d29325 #6969 PREEMPT
->> > [   32.224638] Tainted: [O]=3DOOT_MODULE
->> > [   32.224639] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), =
-BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
->> > [   32.224641] Call Trace:
->> > [   32.224644]  <IRQ>
->> > [   32.224646]  dump_stack_lvl+0x4b/0x70
->> > [   32.224653]  bad_page.cold+0xbd/0xe0
->> > [   32.224657]  __free_frozen_pages+0x838/0x10b0
->> > [   32.224660]  ? skb_pp_cow_data+0x782/0xc30
->> > [   32.224665]  bpf_xdp_shrink_data+0x221/0x530
->> > [   32.224668]  ? skb_pp_cow_data+0x6d1/0xc30
->> > [   32.224671]  bpf_xdp_adjust_tail+0x598/0x810
->> > [   32.224673]  ? xsk_destruct_skb+0x321/0x800
->> > [   32.224678]  bpf_prog_004ac6bb21de57a7_xsk_xdp_adjust_tail+0x52/0xd6
->> > [   32.224681]  veth_xdp_rcv_skb+0x45d/0x15a0
->> > [   32.224684]  ? get_stack_info_noinstr+0x16/0xe0
->> > [   32.224688]  ? veth_set_channels+0x920/0x920
->> > [   32.224691]  ? get_stack_info+0x2f/0x80
->> > [   32.224693]  ? unwind_next_frame+0x3af/0x1df0
->> > [   32.224697]  veth_xdp_rcv.constprop.0+0x38a/0xbe0
->> > [   32.224700]  ? common_startup_64+0x13e/0x148
->> > [   32.224703]  ? veth_xdp_rcv_one+0xcd0/0xcd0
->> > [   32.224706]  ? stack_trace_save+0x84/0xa0
->> > [   32.224709]  ? stack_depot_save_flags+0x28/0x820
->> > [   32.224713]  ? __resched_curr.constprop.0+0x332/0x3b0
->> > [   32.224716]  ? timerqueue_add+0x217/0x320
->> > [   32.224719]  veth_poll+0x115/0x5e0
->> > [   32.224722]  ? veth_xdp_rcv.constprop.0+0xbe0/0xbe0
->> > [   32.224726]  ? update_load_avg+0x1cb/0x12d0
->> > [   32.224730]  ? update_cfs_group+0x121/0x2c0
->> > [   32.224733]  __napi_poll+0xa0/0x420
->> > [   32.224736]  net_rx_action+0x901/0xe90
->> > [   32.224740]  ? run_backlog_napi+0x50/0x50
->> > [   32.224743]  ? clockevents_program_event+0x1cc/0x280
->> > [   32.224746]  ? hrtimer_interrupt+0x31e/0x7c0
->> > [   32.224749]  handle_softirqs+0x151/0x430
->> > [   32.224752]  do_softirq+0x3f/0x60
->> > [   32.224755]  </IRQ>
->> >
->> > It's because xdp_rxq with mem model set to MEM_TYPE_PAGE_SHARED was us=
-ed
->> > when initializing xdp_buff.
->> >
->> > Fix this by using new helper xdp_convert_skb_to_buff() that, besides
->> > init/prepare xdp_buff, will check if page used for linear part of
->> > xdp_buff comes from page_pool. We assume that linear data and frags wi=
-ll
->> > have same memory provider as currently XDP API does not provide us a w=
-ay
->> > to distinguish it (the mem model is registered for *whole* Rx queue and
->> > here we speak about single buffer granularity).
->> >
->> > In order to meet expected skb layout by new helper, pull the mac header
->> > before conversion from skb to xdp_buff.
->> >
->> > However, that is not enough as before releasing xdp_buff out of veth v=
-ia
->> > XDP_{TX,REDIRECT}, mem type on xdp_rxq associated with xdp_buff is
->> > restored to its original model. We need to respect previous setting at
->> > least until buff is converted to frame, as frame carries the mem_type.
->> > Add a page_pool variant of veth_xdp_get() so that we avoid refcount
->> > underflow when draining page frag.
->> >
->> > Fixes: 0ebab78cbcbf ("net: veth: add page_pool for page recycling")
->> > Reported-by: Alexei Starovoitov <ast@kernel.org>
->> > Closes: https://lore.kernel.org/bpf/CAADnVQ+bBofJDfieyOYzSmSujSfJwDTQh=
-iz3aJw7hE+4E2_iPA@mail.gmail.com/
->> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
->> > ---
->> >  drivers/net/veth.c | 43 +++++++++++++++++++++++++++----------------
->> >  1 file changed, 27 insertions(+), 16 deletions(-)
->> >
->> > diff --git a/drivers/net/veth.c b/drivers/net/veth.c
->> > index a3046142cb8e..eeeee7bba685 100644
->> > --- a/drivers/net/veth.c
->> > +++ b/drivers/net/veth.c
->> > @@ -733,7 +733,7 @@ static void veth_xdp_rcv_bulk_skb(struct veth_rq *=
-rq, void **frames,
->> >  	}
->> >  }
->> >=20=20
->> > -static void veth_xdp_get(struct xdp_buff *xdp)
->> > +static void veth_xdp_get_shared(struct xdp_buff *xdp)
->> >  {
->> >  	struct skb_shared_info *sinfo =3D xdp_get_shared_info_from_buff(xdp);
->> >  	int i;
->> > @@ -746,12 +746,33 @@ static void veth_xdp_get(struct xdp_buff *xdp)
->> >  		__skb_frag_ref(&sinfo->frags[i]);
->> >  }
->> >=20=20
->> > +static void veth_xdp_get_pp(struct xdp_buff *xdp)
->> > +{
->> > +	struct skb_shared_info *sinfo =3D xdp_get_shared_info_from_buff(xdp);
->> > +	int i;
->> > +
->> > +	page_pool_ref_page(virt_to_page(xdp->data));
->> > +	if (likely(!xdp_buff_has_frags(xdp)))
->> > +		return;
->> > +
->> > +	for (i =3D 0; i < sinfo->nr_frags; i++) {
->> > +		skb_frag_t *frag =3D &sinfo->frags[i];
->> > +
->> > +		page_pool_ref_page(netmem_to_page(frag->netmem));
->> > +	}
->> > +}
->> > +
->> > +static void veth_xdp_get(struct xdp_buff *xdp)
->> > +{
->> > +	xdp->rxq->mem.type =3D=3D MEM_TYPE_PAGE_POOL ?
->> > +		veth_xdp_get_pp(xdp) : veth_xdp_get_shared(xdp);
->> > +}
->> > +
->> >  static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
->> >  					struct xdp_buff *xdp,
->> >  					struct sk_buff **pskb)
->> >  {
->> >  	struct sk_buff *skb =3D *pskb;
->> > -	u32 frame_sz;
->> >=20=20
->> >  	if (skb_shared(skb) || skb_head_is_locked(skb) ||
->> >  	    skb_shinfo(skb)->nr_frags ||
->> > @@ -762,19 +783,9 @@ static int veth_convert_skb_to_xdp_buff(struct ve=
-th_rq *rq,
->> >  		skb =3D *pskb;
->> >  	}
->> >=20=20
->> > -	/* SKB "head" area always have tailroom for skb_shared_info */
->> > -	frame_sz =3D skb_end_pointer(skb) - skb->head;
->> > -	frame_sz +=3D SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
->> > -	xdp_init_buff(xdp, frame_sz, &rq->xdp_rxq);
->> > -	xdp_prepare_buff(xdp, skb->head, skb_headroom(skb),
->> > -			 skb_headlen(skb), true);
->> > +	__skb_pull(*pskb, skb->data - skb_mac_header(skb));
->>=20
->> veth_xdp_rcv_skb() does:
->>=20
->> 	__skb_push(skb, skb->data - skb_mac_header(skb));
->> 	if (veth_convert_skb_to_xdp_buff(rq, xdp, &skb))
->>=20
->> so how about just getting rid of that push instead of doing the opposite
->> pull straight after? :)
->
-> Hi Toke,
->
-> I believe this is done so we get a proper headroom representation which is
-> needed for XDP_PACKET_HEADROOM comparison. Maybe we could be smarter here
-> and for example subtract mac header length? However I wanted to preserve
-> old behavior.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Yeah, basically what we want is to check if the mac_header offset is
-larger than the headroom. So the check could just be:
-
-    skb->mac_header < XDP_PACKET_HEADROOM
-
-however, it may be better to use the helper? Since that makes sure we
-keep hitting the DEBUG_NET_WARN_ON_ONCE inside the helper... So:
-
-    skb_mac_header(skb) - skb->head < XDP_PACKET_HEADROOM
-
-or, equivalently:
-
-    skb_headroom(skb) - skb_mac_offset(skb) < XDP_PACKET_HEADROOM
-
-I think the first one is probably more readable, since skb_mac_offset()
-is negative here, so the calculation looks off...
-
--Toke
-
+    Andrew
 
