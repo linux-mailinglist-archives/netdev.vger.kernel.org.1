@@ -1,126 +1,137 @@
-Return-Path: <netdev+bounces-230540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97E0BBEADD0
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 18:49:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40DDABEACDA
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 18:40:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E21724FBC40
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 16:39:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D692D1AE009E
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 16:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BEC32BEFFF;
-	Fri, 17 Oct 2025 16:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3339E29B77E;
+	Fri, 17 Oct 2025 16:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LHxhV5TA"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vS0rhs+A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C567B2BE7CC
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 16:39:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED83F2417F0
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 16:40:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760719148; cv=none; b=R6fjJHqvjbrxRnjvISeY5dmfwZh+hgqYjJRN/XAZf1ZBRA9EoPehlB0szArBpGiEfMo5TJvedVQUEl8Y6fY9E/n0AM6XmjzVHbXRDn/3rhTAKmX7DGb4tdgPd2GjkeVdebWL7YPHqf9BAXgPQhUH6gQTGZZXpDjnzUk05fAzmiU=
+	t=1760719233; cv=none; b=t0rKWN0GzXHt3tpzTUgbtV2XxlYYQ4XKLFcCYVr9oUEbnuq7dwlnVYNnduhR1fiX98HknE/saotmQKqjaBNCe+VsrV1/Rf2bFaNjgJhlhSc2lYSxePS7v+8c+YU0d74FSSbpfS1ofcRmKVs6wXfyTPYHwzq7hsrzcQfsTs5LR3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760719148; c=relaxed/simple;
-	bh=97XYlrfPPPA7pnAqGbv+sCxS9B2VLhK7sUi4Yt5EBjQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dvn09qpE8aUw7ijSXeIAfb9aUOceDlvimrNI+UgeYLjWbkDztjskXk4f9yw+xtdDJFuVhmigQbo9S2FDa9Vwm3taDbhScD+fdKeBD9k6b99fpwyzaxukhM1/b0wMY+6YdWNkVEN2bZ25C5Vsr6mze+o9QleQzUpxNhEn5x9pf+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LHxhV5TA; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-7814273415aso23789117b3.1
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 09:39:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760719145; x=1761323945; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=97XYlrfPPPA7pnAqGbv+sCxS9B2VLhK7sUi4Yt5EBjQ=;
-        b=LHxhV5TAP2kVXGJs4GlrbJT7AoDoQ0dVd9kHOHEP3pEc3tRujHq1cmBArDtcFsz1SO
-         J3kOUYr3e6Ccu0fIhZewO+8bHZ2rP9byOK6wvC4RpuaJ3zFsL1ALZguHh86m2lyuTeOb
-         Wt9y7etXQ7ym6zjJfhy4ZiuCVruS3rOuc2vwFKAoNMtHZJNCZ68D5sv17xo/gwbB28WW
-         cC3ItkBUlNI4OfoNbHy8+DgEkUPV6VFknwjHmxT0wsKfqXw1rO5mkIshm5sn6qitTXrI
-         kBuPrCblU5VpgNnI1Sn9OirgSpt94Bc2F7Xjdmx/QO7h8jsNBUz+UFWaf6+/wGd0W9mg
-         n3uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760719145; x=1761323945;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=97XYlrfPPPA7pnAqGbv+sCxS9B2VLhK7sUi4Yt5EBjQ=;
-        b=VL1K+CT67mrBws2PvB4bDLneYMgFu2TeBtMHh/jWerMVKumCwgOD3obzBuplsASbKK
-         fnLdQXnq0z+vCmIPNhe/EMHdwnOhcGD3L4nFBi164OGobd983fs+J4uB7UNrQ4ScXjVw
-         tGzf0Fct5Bw5hJn52GtIroi/sV2zSgMgTHq7yKxhdjUJFwG3KmajrQ8Onk936b14zyJv
-         s0BG+IF5jFpl61k6mKFYZTSpC/cy+MIDxOQOBTIVQQGrj3MHiKYhWc0VgwR+x3nl9spO
-         NkxllqMuVFZ2L6POmKZ9I0c91i3FrbxUaH2vDRW/zUcaWXcGBYWDYZLcxY2AAIBnym2q
-         RltA==
-X-Gm-Message-State: AOJu0YxMmf1wGkxwXiicFyJbS4dTq5vp5q1NgFFXEeb+NaygNK/OAB22
-	Wrq1mXjunFec1yZibypRqOcFjDHmTpZTkmt4sPYalMhsVz6zreqUHMxL4o6VwTuRdThAdI+xTWI
-	bOcmYnysPB2l/u1q6GgoRbKyCjno5cfY=
-X-Gm-Gg: ASbGnctrBBzeJKhLXvFHNSuNOXhH6N6CqQB1NhSQtsRJeJNqJGCukoIdyjK895T5nB+
-	8q23KT/M4QFcUDOGrItxZlrrDmU5QpiEpdAOyPxPHWQYjkrF2L7kXCVeR0DLxYsuK71A7RNPyQB
-	+cD9MqOScCJIIZaWr1NwR9kJbwbag/VjEGgzXuvL15vl692H9bSRu40+WwBvN2J2lHm6kVtBivM
-	MDV/RIpXktNykyaNxcKYuwmIG7q8YgmT2bQ0JftJBfTJuFOXkgTPTYx0ShD
-X-Google-Smtp-Source: AGHT+IGbF6Or7zlWoTGIZ3h/T94KL+7kZLzqMPfqm7CoucFcvNehwFJ6VWsVmkFUfXKEHkC2JdQO2xKHcy1NPY44Rw8=
-X-Received: by 2002:a05:690e:d50:b0:636:1fd9:d64c with SMTP id
- 956f58d0204a3-63e161763ffmr3546513d50.8.1760719144583; Fri, 17 Oct 2025
- 09:39:04 -0700 (PDT)
+	s=arc-20240116; t=1760719233; c=relaxed/simple;
+	bh=VejBTcIpMQ+YvMAbEqPgmeUV1iVvXTggt3BZUGQJQUA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m9X9rju/77KRnb3l9OT8aWKsuro4ih18OPRq5STocRq3OIn4UyRgHrCneMtCjAqDgWZYuDRlQk7auZHoB6dY+WTnf6MExOweZ8cXkdSGuurszDUNce6hxmRFrBaAkle3kvZBuX1SAp7+bYArps5sBauXFeRQY76tEsgx0fAHHqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vS0rhs+A; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <59fb5dff-9a4c-447c-95b8-27982a53cc7b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760719229;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VejBTcIpMQ+YvMAbEqPgmeUV1iVvXTggt3BZUGQJQUA=;
+	b=vS0rhs+Ayf7E2j/4MIdoKz5wbnKc/pEi0/sWX5QYWLiJ3Eg2TS3/BjOJrvav9sBB5DIaUL
+	z+u4+mM0ZNvyIdBnbxsuqHubq93aEBoVMNWyp5y+o5+YEurGNFbeZqe4RunkmWU525bHUC
+	FKFwzMwRz3jxHNx2jMXpX2uoGUDigCc=
+Date: Fri, 17 Oct 2025 17:39:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251016204503.3203690-1-ameryhung@gmail.com> <20251016204503.3203690-3-ameryhung@gmail.com>
- <285ba391-1d23-41be-8cc4-e2874fbcb1af@linux.dev>
-In-Reply-To: <285ba391-1d23-41be-8cc4-e2874fbcb1af@linux.dev>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Fri, 17 Oct 2025 09:38:53 -0700
-X-Gm-Features: AS18NWAw3Wa9xG7OOim-ssXyDjv46PnkgVJRXa0CnpA0NmMXrefKEagBOxvLPI0
-Message-ID: <CAMB2axO9GN=EMK2uLxqDLFkNk-V8sA7Rdb9LH3u6xx7fpCTyRA@mail.gmail.com>
-Subject: Re: [PATCH v2 bpf-next 2/4] bpf: Support associating BPF program with struct_ops
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org, 
-	daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
-	kernel-team@meta.com, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next] bnxt_en: support PPS in/out on all pins
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: Michael Chan <michael.chan@broadcom.com>, Jakub Kicinski
+ <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ netdev@vger.kernel.org
+References: <20251016222317.3512207-1-vadim.fedorenko@linux.dev>
+ <CALs4sv2gcHTpGRhZOPQqd+JrNnL05xLFYWB3uaznNbcGt=x03A@mail.gmail.com>
+ <20f633b9-8a49-4240-8cb8-00309081ab73@linux.dev>
+ <CALs4sv0ehFVMMB2HPqUkGnv5iRW-VYKpeFf3QtRDgThVH=XQYQ@mail.gmail.com>
+ <f1c42ecd-57c0-4cea-906e-aebcd583944a@linux.dev>
+ <CALs4sv3OV-VVYS7oy1akiZdQncsmqY+hqds7NLeiy3oh3Awz8w@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <CALs4sv3OV-VVYS7oy1akiZdQncsmqY+hqds7NLeiy3oh3Awz8w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Oct 16, 2025 at 5:19=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
->
->
-> On 10/16/25 1:45 PM, Amery Hung wrote:
-> > Each associated programs except struct_ops programs of the map will tak=
-e
-> > a refcount on the map to pin it so that prog->aux->st_ops_assoc, if set=
-,
-> > is always valid. However, it is not guaranteed whether the map members
-> > are fully updated nor is it attached or not. For example, a BPF program
-> > can be associated with a struct_ops map before map_update. The
->
-> Forgot to ask this, should it at least ensure the map is fully updated
-> or it does not help in the use case?
+On 17/10/2025 15:08, Pavan Chebbi wrote:
+> On Fri, Oct 17, 2025 at 4:10 PM Vadim Fedorenko
+> <vadim.fedorenko@linux.dev> wrote:
+>>
+>> On 17/10/2025 10:15, Pavan Chebbi wrote:
+>>> On Fri, Oct 17, 2025 at 2:21 PM Vadim Fedorenko
+>>> <vadim.fedorenko@linux.dev> wrote:
+>>>>
+>>>> On 17.10.2025 04:45, Pavan Chebbi wrote:
+>>>>> On Fri, Oct 17, 2025 at 3:54 AM Vadim Fedorenko
+>>>>> <vadim.fedorenko@linux.dev> wrote:
+>>>>>>
+>>>>>> n_ext_ts and n_per_out from ptp_clock_caps are checked as a max number
+>>>>>> of pins rather than max number of active pins.
+>>>>>
+>>>>> I am not 100pc sure. How is n_pins going to be different then?
+>>>>> https://elixir.bootlin.com/linux/v6.17/source/include/linux/ptp_clock_kernel.h#L69
+>>>>
+>>>> So in general it's more for the case where HW has pins connected through mux to
+>>>> the DPLL channels. According to the bnxt_ptp_cfg_pin() bnxt HW has pins
+>>>> hardwired to channels and NVM has pre-defined configuration of pins' functions.
+>>>>
+>>>> [host ~]# ./testptp -d /dev/ptp2 -l
+>>>> name bnxt_pps0 index 0 func 0 chan 0
+>>>> name bnxt_pps1 index 1 func 0 chan 1
+>>>> name bnxt_pps2 index 2 func 0 chan 2
+>>>> name bnxt_pps3 index 3 func 0 chan 3
+>>>>
+>>>> without the change user cannot configure EXTTS or PEROUT function on pins
+>>>> 1-3 preserving channels 1-3 on them.
+>>>>
+>>>> The user can actually use channel 0 on every pin because bnxt driver doesn't
+>>>> care about channels at all, but it's a bit confusing that it sets up different
+>>>> channels during init phase.
+>>>
+>>> You are right that we don't care about the channels. So I think
+>>> ideally it should have been set to 0 for all the pins.
+>>> Does that not make a better fix? Meaning to say, we don't care about
+>>> the channel but/therefore please use 0 for all pins.
+>>> What I am not sure about the proposed change in your patch is that it
+>>> may be overriding the definition of the n_ext_ts and n_per_out in
+>>> order to provide flexibility to users to change channels, no?
+>>
+>> Well, yeah, the overriding exists, but that's mostly the artifact of not
+>> so flexible API. But I agree, we can improve init part to make it clear.
+>> But one more thing has just come to my mind - is it
+>> really possible to configure PPS-in/PPS-out on pins 0-1?
+>> AFAIU, there are functions assigned to each pin, which can only be
+>> enabled or disabled by the user-space app, and in this case
+>> bnxt_ptp_verify() should be improved to validate function per pin,
+>> right?
+>>
+> The pin config was really flexible because we implemented it first for
+> 575xx chipsets. We could remap the functions on Thor1.
+> With 576xx, what you are saying is true. The pin functions are fixed.
+> If the user is aware of the functions, then it's not a problem.
+> But yes, because there is verify() available, we can always validate.
+> So we can improve the bnxt_ptp_verify()
 
-It makes sense and is necessary. Originally, I thought we don't need
-to make any promise about the state of the map since the struct_ops
-implementers have to track the state of the struct_ops themselves
-anyways. However, checking the state stored in kdata that may be
-incomplete does not look right.
+Ok, I'm going to send v2 with supported_flags provided and changing
+initialization to set channels to 0 based on CHIP generation.
 
-I will only return kdata from bpf_prog_get_assoc_struct_ops () when
-kvalue->common.state =3D=3D READY or INUSE.
-
-If tracking the state in struct_ops kdata is overly complicated for
-struct_ops implementers, then we might need to consider changing the
-associated struct_ops from map to link.
-
->
-> > struct_ops implementer will be responsible for maintaining and checking
-> > the state of the associated struct_ops map before accessing it.
->
+I'll let you do the improvements to bnxt_ptp_verify() as you have more
+insights on the HW itself.
 
