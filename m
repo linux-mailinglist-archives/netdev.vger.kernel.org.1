@@ -1,120 +1,176 @@
-Return-Path: <netdev+bounces-230504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D55FEBE97A2
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:06:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A664ABE9E52
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:31:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E16B91A67C85
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 15:06:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA5D86E2CBD
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 15:09:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E4B32E156;
-	Fri, 17 Oct 2025 15:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="E8IaqNfI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E513370FB;
+	Fri, 17 Oct 2025 15:08:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3031A332917;
-	Fri, 17 Oct 2025 15:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943DB3370FE
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 15:08:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760713471; cv=none; b=sy3JG0+v0m0abRMgeUzfZqc191cwz34YzGlGaD1tRPT8Q90ob/zlEeEEYV2ufmrks8vnhptKK+urgcA/IXiqlfqCz+MyM2W5nN3P+jD1rgPs1Xr584Z4U7xcI0tupJM27oPrM19ymegKQ+lZJSO87UyKEFfM5ali18Huam3bfJQ=
+	t=1760713716; cv=none; b=qw5mf3V+RstxJ96127CG5TC+SnSqcIeBG5NNA5Ml3+hw1cRz0kmMKxWUJoLqUm7t0x1/iY1u5RQvgPtmqBkUrRMgD97hNcfFhnXqqq1Vlr8WDEi02mS/3t7omB585kc/HMGJi6ZHgqSRX0x6tH2dzm2JbtMmdfq5XLnWK2cGJdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760713471; c=relaxed/simple;
-	bh=h+cFtCNZjm5oVOld1YdQrQM9D2eUkV7N5lgtdPUuNcg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jApvZo/WK0Tt+HLnrvLo+TBtE+Vk0kWAJ9E5/DfkJlXM2w5dAwl5vebU8oZ7K+wUjpOma5VShjnEWDSXJ7miOkerWp3vBTifOfAyxcHAQpoaY02tmY72+qX3L87ae8ScI3iDMgs023etQYkIaFBCHlv5fifTfgPV37cOk3m8KYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=E8IaqNfI; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=/w51uT33nvziBRi/h4QPWG8nuY0Qq+uvl5/Q7nsmkwY=; b=E8IaqNfIzoEoDLp3v5yNSsTVAY
-	lfEkHP8X+CO8QjHl/FV+ttq2CTNvfuoIh6giq0CAhKk+mEJ4whYlSViXc6W35wb7kl4x5emmuISWV
-	82XSzMhnLhSm+LiINFhXwDTZeztF3HCn9R0QdTaU7loz8NDfIL30tKM7bIRcvhR1R56SiKOnbep7k
-	B12rALuM1IBZ96pmidIrqabdjHA42qLDK9nCKQ1957f6Et15vlU/PbSEoUGbRhsX2zgidUKQ9W3zV
-	44NqPPcc09mwPbaC/50ur8ljPobEUmjKNeRbXlLmSVRiwU8fyAOuotx3fsdR0/GhhDPfuBszVB1xE
-	XRNHqp+w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38494)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1v9m04-0000000082h-33VO;
-	Fri, 17 Oct 2025 16:04:12 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1v9lzu-000000004O7-1HP8;
-	Fri, 17 Oct 2025 16:04:02 +0100
-Date: Fri, 17 Oct 2025 16:04:02 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Yao Zi <ziyao@disroot.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Frank <Frank.Sae@motor-comm.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
-	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH net-next 3/4] net: stmmac: Add glue driver for Motorcomm
- YT6801 ethernet controller
-Message-ID: <aPJa4u2OWhVGs58k@shell.armlinux.org.uk>
-References: <20251014164746.50696-2-ziyao@disroot.org>
- <20251014164746.50696-5-ziyao@disroot.org>
- <f1de6600-4de9-4914-95e6-8cdb3481e364@lunn.ch>
- <aPJMsNKwBYyrr-W-@pie>
- <81124574-48ab-4297-9a74-bba7df68b973@lunn.ch>
+	s=arc-20240116; t=1760713716; c=relaxed/simple;
+	bh=usb4dRiFLvjbM3q6c6DenTpAsRJFcg4O5Ag2iVo/emo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nuIz/KBEUPtqAjfa516+vYyT8mVmCH2GNjYFGkHF4TvBniHwOAG0K3KxXLA/aUDF/D8UIO92Eg/pgqIExbo7OJmSDY9R0n01c1IF8gOXbiLPFT9S5QkeZBsT7z8idt+hk5vCqU/ikH67EF1svakoAw+IsAq9GFGfkh4cJXt35sY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v9m4E-0003Mv-2Q; Fri, 17 Oct 2025 17:08:30 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v9m4D-00450U-0o;
+	Fri, 17 Oct 2025 17:08:29 +0200
+Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id E97A94892B1;
+	Fri, 17 Oct 2025 15:08:28 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net-next 0/13] pull-request: can-next 2025-10-17
+Date: Fri, 17 Oct 2025 17:04:08 +0200
+Message-ID: <20251017150819.1415685-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <81124574-48ab-4297-9a74-bba7df68b973@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Fri, Oct 17, 2025 at 04:56:23PM +0200, Andrew Lunn wrote:
-> > Though it's still unclear the exact effect of the bit on the PHY since
-> > there's no public documentation, it's essential to deassert it in MAC
-> > code before registering and scanning the MDIO bus, or we could even not
-> > probe the PHY correctly.
-> > 
-> > For the motorcomm_reset_phy() performed in probe function, it happens
-> > before the registration of MDIO bus, and the PHY isn't probed yet, thus
-> > I think it should be okay.
-> 
-> Since it resets more than the PHY, it probably should have a different
-> name, and maybe a comment describing what is actually resets.
+Hello netdev-team,
 
-I want to back Andrew's comment here up very strongly.
+this is a pull request of 13 patches for net-next/main.
 
-You will not be the only one looking at this code. There are other
-people (e.g. me) who are looking at e.g. the core stmmac code, making
-changes to it, which impact the platform glue as well.
+The first patch is by me and adds support for an optional reset to the
+m_can drivers.
 
-The platform glue needs to be understandable to those of us who don't
-have knowledge of your platform, so that we can make sense of it and
-know what it's actually doing, and thus be able to adapt it when we
-push out changes to the core that affect platform glue.
+Vincent Mailhol's patch targets all drivers and removes the
+can_change_mtu() function, since the netdev's min and max MTU are
+populated.
 
-Sadly, it seems 99.9% of platform glue is "dump it into the kernel
-and run away".
+Markus Schneider-Pargmann contributes 4 patches to the m_can driver to
+add am62 wakeup support.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+The last 7 patches are by me and provide various cleanups to the m_can
+driver.
+
+regards,
+Marc
+
+---
+
+The following changes since commit 7e0d4c111369ed385ec4aaa6c9c78c46efda54d0:
+
+  Merge branch 'net-macb-various-cleanups' (2025-10-16 16:59:32 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.19-20251017
+
+for you to fetch changes up to e41287a079224dcb49da5c8f710e9cb88763a71c:
+
+  Merge patch series "can: m_can: various cleanups" (2025-10-17 15:18:25 +0200)
+
+----------------------------------------------------------------
+linux-can-next-for-6.19-20251017
+
+----------------------------------------------------------------
+Marc Kleine-Budde (10):
+      can: m_can: add support for optional reset
+      Merge patch series "can: m_can: Add am62 wakeup support"
+      can: m_can: m_can_init_ram(): make static
+      can: m_can: hrtimer_callback(): rename to m_can_polling_timer()
+      net: m_can: convert dev_{dbg,info,err} -> netdev_{dbg,info,err}
+      can: m_can: m_can_interrupt_enable(): use m_can_write() instead of open coding it
+      can: m_can: m_can_class_register(): remove error message in case devm_kzalloc() fails
+      can: m_can: m_can_tx_submit(): remove unneeded sanity checks
+      can: m_can: m_can_get_berr_counter(): don't wake up controller if interface is down
+      Merge patch series "can: m_can: various cleanups"
+
+Markus Schneider-Pargmann (TI.com) (4):
+      dt-bindings: can: m_can: Add wakeup properties
+      can: m_can: Map WoL to device_set_wakeup_enable
+      can: m_can: Return ERR_PTR on error in allocation
+      can: m_can: Support pinctrl wakeup state
+
+Vincent Mailhol (1):
+      can: treewide: remove can_change_mtu()
+
+ .../devicetree/bindings/net/can/bosch,m_can.yaml   |  25 ++
+ drivers/net/can/at91_can.c                         |   1 -
+ drivers/net/can/bxcan.c                            |   1 -
+ drivers/net/can/c_can/c_can_main.c                 |   1 -
+ drivers/net/can/can327.c                           |   1 -
+ drivers/net/can/cc770/cc770.c                      |   1 -
+ drivers/net/can/ctucanfd/ctucanfd_base.c           |   1 -
+ drivers/net/can/dev/dev.c                          |  38 ---
+ drivers/net/can/esd/esd_402_pci-core.c             |   1 -
+ drivers/net/can/flexcan/flexcan-core.c             |   1 -
+ drivers/net/can/grcan.c                            |   1 -
+ drivers/net/can/ifi_canfd/ifi_canfd.c              |   1 -
+ drivers/net/can/janz-ican3.c                       |   1 -
+ drivers/net/can/kvaser_pciefd/kvaser_pciefd_core.c |   1 -
+ drivers/net/can/m_can/m_can.c                      | 256 +++++++++++++++------
+ drivers/net/can/m_can/m_can.h                      |   5 +-
+ drivers/net/can/m_can/m_can_pci.c                  |   4 +-
+ drivers/net/can/m_can/m_can_platform.c             |   4 +-
+ drivers/net/can/m_can/tcan4x5x-core.c              |   4 +-
+ drivers/net/can/mscan/mscan.c                      |   1 -
+ drivers/net/can/peak_canfd/peak_canfd.c            |   1 -
+ drivers/net/can/rcar/rcar_can.c                    |   1 -
+ drivers/net/can/rcar/rcar_canfd.c                  |   1 -
+ drivers/net/can/rockchip/rockchip_canfd-core.c     |   1 -
+ drivers/net/can/sja1000/sja1000.c                  |   1 -
+ drivers/net/can/slcan/slcan-core.c                 |   1 -
+ drivers/net/can/softing/softing_main.c             |   1 -
+ drivers/net/can/spi/hi311x.c                       |   1 -
+ drivers/net/can/spi/mcp251x.c                      |   1 -
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c     |   1 -
+ drivers/net/can/sun4i_can.c                        |   1 -
+ drivers/net/can/ti_hecc.c                          |   1 -
+ drivers/net/can/usb/ems_usb.c                      |   1 -
+ drivers/net/can/usb/esd_usb.c                      |   1 -
+ drivers/net/can/usb/etas_es58x/es58x_core.c        |   1 -
+ drivers/net/can/usb/f81604.c                       |   1 -
+ drivers/net/can/usb/gs_usb.c                       |   1 -
+ drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c   |   1 -
+ drivers/net/can/usb/mcba_usb.c                     |   1 -
+ drivers/net/can/usb/nct6694_canfd.c                |   1 -
+ drivers/net/can/usb/peak_usb/pcan_usb_core.c       |   1 -
+ drivers/net/can/usb/ucan.c                         |   1 -
+ drivers/net/can/usb/usb_8dev.c                     |   1 -
+ drivers/net/can/xilinx_can.c                       |   1 -
+ include/linux/can/dev.h                            |   1 -
+ 45 files changed, 222 insertions(+), 152 deletions(-)
 
