@@ -1,96 +1,179 @@
-Return-Path: <netdev+bounces-230555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DC38BEB166
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 19:35:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0B76BEB1A5
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 19:41:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 93AEB4E0808
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:35:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F8676E10F8
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 17:41:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C492306D5F;
-	Fri, 17 Oct 2025 17:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC6513081D5;
+	Fri, 17 Oct 2025 17:41:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uQmAPklV"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="mcZxpF2N"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6B7221726;
-	Fri, 17 Oct 2025 17:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18A81307AD0;
+	Fri, 17 Oct 2025 17:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760722554; cv=none; b=OH0JRFnS7z6UGC2+pfO2aGBtlyyvHClqJX5/ZOYRSJYIZq9NWKPLYTgiM23cqNWkrw5VDUJZmqdA7vC9vfbRwTjDSH9i2fo2SlYyo+7+cb3uj1FSg5N9Hf3XaITyz33uQEIpcDSv8UpkadpkWf7CPArHsvB03tC+SZfsPJCFZPE=
+	t=1760722883; cv=none; b=UB/1RbfStKHCGcIlv91fk/aZUfgu5NLMDlB7DgOFe545bpFk+NaPi27aliBBe5eBBNLRvTtceel9Gi4cKOiU8Ty3E1hx/klxK9jz2KVZjyGuFmCIgqErJbgOEDvvz0dKNpV7xjylfVd8wNL5XbuHCxaQgByrm8kFHdvgxNjKUw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760722554; c=relaxed/simple;
-	bh=oN3Nk6GyQZZ2a4n149tSMNVi5RDsuDxgy5r8apmlYPs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RhZhp6WZ1kXPzUN4ZN96YEvjSsLdm21vLyLU2lvhDK7qtImX5IZY4u6PeUEtCIx5WSCwUNBhxk4eXoh0ilaERFx4GbPoknv1GRCnUiwnyRFJ/pCmzxSRRGbBXrJGeFKYVpAM3zhYeu7rRmwp5taMWdeIhorZDOUhUoNe/x75MgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uQmAPklV; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8/pstC99AuKmc19eb4Wrx5n8QPnh5xLZ2cMst7KsoT0=; b=uQmAPklVxBpsgQfThy4UX975y6
-	a+tJoLr4DWssYmS4PqHFzHLnS0ry5snHLjp6tvzZsOBbEGehR+8WNNQyORmARUvpwDcyxf0iUSAvi
-	Ew5N9kbHELIEjAY25aV5OrrN3Fb+U7QaLc4Z5qolf0q7GhBvIAVoLDThDy2BSoVjE5O8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1v9oMb-00BJIY-B0; Fri, 17 Oct 2025 19:35:37 +0200
-Date: Fri, 17 Oct 2025 19:35:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sjoerd Simons <sjoerd@collabora.com>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Ryder Lee <ryder.lee@mediatek.com>,
-	Jianjun Wang <jianjun.wang@mediatek.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	kernel@collabora.com, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
-	linux-phy@lists.infradead.org, netdev@vger.kernel.org,
-	Daniel Golle <daniel@makrotopia.org>,
-	Bryan Hinton <bryan@bryanhinton.com>
-Subject: Re: [PATCH 15/15] arm64: dts: mediatek: mt7981b-openwrt-one: Enable
- leds
-Message-ID: <d8077ee4-21c2-43c5-b130-7ff270b09791@lunn.ch>
-References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
- <20251016-openwrt-one-network-v1-15-de259719b6f2@collabora.com>
+	s=arc-20240116; t=1760722883; c=relaxed/simple;
+	bh=PRfVQxJjy6Vjp+xyCypyGyhNOHUhx/dYPG4ShHWopEk=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ht1N+pMWLEZTGq0CwFFqBRgLSwkOQUXENLiFRtB/Iyq6BwPQXtb+PqfxOh7RVLvu9TnZnSwCHLFfDXi3b0CR73c9izQKMtgEAXBRcQAlo+gC/O/i+RyMjsMig5VtGvPSbdnYjXCfCmss51Rg4FCiY3EKU/zlDZPqhzfxY/DVnCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=mcZxpF2N; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [192.168.1.19] (unknown [103.212.145.76])
+	by linux.microsoft.com (Postfix) with ESMTPSA id A03B9201724E;
+	Fri, 17 Oct 2025 10:41:14 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A03B9201724E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1760722881;
+	bh=Vj1gk3aMFO+P9nUqeopKE4AuncD7z4KeVlwI818/kuQ=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=mcZxpF2N174Av/F08Hahi5sOnNi4wbANuLMTrs8jeuc7aGqKcDFhDpjSjqKb/Cuta
+	 K8Oi1Yc9cgeAM45PzaA1ouFsjnbdCIc/eG2aVfLh1CKIvY71FNf3rxs6E+1OiGQ+pA
+	 Jx9qOYEy9pHXZKqfKMxFYpTW8gYTkP4Vp5G49D+w=
+Message-ID: <1d3ac973-7bc7-4abe-9fe2-6b17dbba223b@linux.microsoft.com>
+Date: Fri, 17 Oct 2025 23:11:11 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251016-openwrt-one-network-v1-15-de259719b6f2@collabora.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: mana: Linearize SKB if TX SGEs exceeds
+ hardware limit
+From: Aditya Garg <gargaditya@linux.microsoft.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+ kotaranov@microsoft.com, horms@kernel.org, shradhagupta@linux.microsoft.com,
+ ernis@linux.microsoft.com, dipayanroy@linux.microsoft.com,
+ shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, gargaditya@microsoft.com,
+ ssengar@linux.microsoft.com
+References: <20251003154724.GA15670@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <CANn89iJwkbxC5HvSKmk807K-3HY+YR1kt-LhcYwnoFLAaeVVow@mail.gmail.com>
+ <9d886861-2e1f-4ea8-9f2c-604243bd751b@linux.microsoft.com>
+ <CANn89iKwHWdUaeAsdSuZUXG-W8XwyM2oppQL9spKkex0p9-Azw@mail.gmail.com>
+ <7bc327ba-0050-4d9e-86b6-1b7427a96f53@linux.microsoft.com>
+Content-Language: en-US
+In-Reply-To: <7bc327ba-0050-4d9e-86b6-1b7427a96f53@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 16, 2025 at 12:08:51PM +0200, Sjoerd Simons wrote:
-> The Openwrt One has 3 status leds at the front (red, white, green) as
-> well as 2 software controlled leds for the LAN jack (amber, green).
+On 08-10-2025 20:58, Aditya Garg wrote:
+> On 08-10-2025 20:51, Eric Dumazet wrote:
+>> On Wed, Oct 8, 2025 at 8:16 AM Aditya Garg
+>> <gargaditya@linux.microsoft.com> wrote:
+>>>
+>>> On 03-10-2025 21:45, Eric Dumazet wrote:
+>>>> On Fri, Oct 3, 2025 at 8:47 AM Aditya Garg
+>>>> <gargaditya@linux.microsoft.com> wrote:
+>>>>>
+>>>>> The MANA hardware supports a maximum of 30 scatter-gather entries 
+>>>>> (SGEs)
+>>>>> per TX WQE. In rare configurations where MAX_SKB_FRAGS + 2 exceeds 
+>>>>> this
+>>>>> limit, the driver drops the skb. Add a check in mana_start_xmit() to
+>>>>> detect such cases and linearize the SKB before transmission.
+>>>>>
+>>>>> Return NETDEV_TX_BUSY only for -ENOSPC from 
+>>>>> mana_gd_post_work_request(),
+>>>>> send other errors to free_sgl_ptr to free resources and record the tx
+>>>>> drop.
+>>>>>
+>>>>> Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
+>>>>> Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+>>>>> ---
+>>>>>    drivers/net/ethernet/microsoft/mana/mana_en.c | 26 +++++++++++++ 
+>>>>> ++----
+>>>>>    include/net/mana/gdma.h                       |  8 +++++-
+>>>>>    include/net/mana/mana.h                       |  1 +
+>>>>>    3 files changed, 29 insertions(+), 6 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/ 
+>>>>> drivers/net/ethernet/microsoft/mana/mana_en.c
+>>>>> index f4fc86f20213..22605753ca84 100644
+>>>>> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+>>>>> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+>>>>> @@ -20,6 +20,7 @@
+>>>>>
+>>>>>    #include <net/mana/mana.h>
+>>>>>    #include <net/mana/mana_auxiliary.h>
+>>>>> +#include <linux/skbuff.h>
+>>>>>
+>>>>>    static DEFINE_IDA(mana_adev_ida);
+>>>>>
+>>>>> @@ -289,6 +290,19 @@ netdev_tx_t mana_start_xmit(struct sk_buff 
+>>>>> *skb, struct net_device *ndev)
+>>>>>           cq = &apc->tx_qp[txq_idx].tx_cq;
+>>>>>           tx_stats = &txq->stats;
+>>>>>
+>>>>> +       BUILD_BUG_ON(MAX_TX_WQE_SGL_ENTRIES != 
+>>>>> MANA_MAX_TX_WQE_SGL_ENTRIES);
+>>>>> +       #if (MAX_SKB_FRAGS + 2 > MANA_MAX_TX_WQE_SGL_ENTRIES)
+>>>>> +               if (skb_shinfo(skb)->nr_frags + 2 > 
+>>>>> MANA_MAX_TX_WQE_SGL_ENTRIES) {
+>>>>> +                       netdev_info_once(ndev,
+>>>>> +                                        "nr_frags %d exceeds max 
+>>>>> supported sge limit. Attempting skb_linearize\n",
+>>>>> +                                        skb_shinfo(skb)->nr_frags);
+>>>>> +                       if (skb_linearize(skb)) {
+>>>>
+>>>> This will fail in many cases.
+>>>>
+>>>> This sort of check is better done in ndo_features_check()
+>>>>
+>>>> Most probably this would occur for GSO packets, so can ask a software
+>>>> segmentation
+>>>> to avoid this big and risky kmalloc() by all means.
+>>>>
+>>>> Look at idpf_features_check()  which has something similar.
+>>>
+>>> Hi Eric,
+>>> Thank you for your review. I understand your concerns regarding the use
+>>> of skb_linearize() in the xmit path, as it can fail under memory
+>>> pressure and introduces additional overhead in the transmit path. Based
+>>> on your input, I will work on a v2 that will move the SGE limit check to
+>>> the ndo_features_check() path and for GSO skbs exceding the hw limit
+>>> will disable the NETIF_F_GSO_MASK to enforce software segmentation in
+>>> kernel before the call to xmit.
+>>> Also for non GSO skb exceeding the SGE hw limit should we go for using
+>>> skb_linearize only then or would you suggest some other approach here?
+>>
+>> I think that for non GSO, the linearization attempt is fine.
+>>
+>> Note that this is extremely unlikely for non malicious users,
+>> and MTU being usually small (9K or less),
+>> the allocation will be much smaller than a GSO packet.
+> 
+> Okay. Will send a v2
+Hi Eric,
+I tested the code by disabling GSO in ndo_features_check when the number 
+of SGEs exceeds the hardware limit, using iperf for a single TCP 
+connection with zerocopy enabled. I noticed a significant difference in 
+throughput compared to when we linearize the skbs.
+For reference, the throughput is 35.6 Gbits/sec when using 
+skb_linearize, but drops to 6.75 Gbits/sec when disabling GSO per skb.
 
-A previous patch in this series added 2 PHY LEDs. Are they connected
-to a LAN jack? Are there multiple RJ45 connectors? Is it clear from
-/sys/class/leds what LED is what?
-
-	Andrew
+Hence, We propose to  linearizing skbs until the first failure occurs. 
+After that, we switch to a fail-safe mode by disabling GSO for SKBs with 
+  sge > hw limit using the ndo_feature_check implementation, while 
+continuing to apply  skb_linearize() for non-GSO packets that exceed the 
+hardware limit. This ensures we remain on the optimal performance path 
+initially, and only transition to the fail-safe path after encountering 
+a failure.
+Regards,
+Aditya
 
