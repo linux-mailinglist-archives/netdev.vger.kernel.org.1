@@ -1,141 +1,210 @@
-Return-Path: <netdev+bounces-230357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDDA1BE6F50
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 09:37:49 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76E07BE6DFB
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 09:05:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF15A625393
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 07:37:42 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A206C35A55C
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 07:05:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27ACB23507B;
-	Fri, 17 Oct 2025 07:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FB730C623;
+	Fri, 17 Oct 2025 07:05:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aol.com header.i=@aol.com header.b="Z2Ynal9v"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="sjVqtIm4"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic305-19.consmr.mail.gq1.yahoo.com (sonic305-19.consmr.mail.gq1.yahoo.com [98.137.64.82])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682051FE45D
-	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 07:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=98.137.64.82
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A446B33F9
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 07:05:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760686660; cv=none; b=BPKc/qg911KVZBL2z9mrG1tcUrhqjCYlWSWXz+I7Sg/P5W0PbVEJ0yrCAXLpaqicL0xiRN4UQ0MHS6h+HHjqX6K3g86MMoWOFexq+j318LYnER4IA4o5a1ZY20Q2bEdZBdRbjwOgFPQL+woQhHFN4CLDbD16vLFRspm8XIgcpZg=
+	t=1760684741; cv=none; b=P0J+eKhwUB28JiJxRkUu6VOk55OOI+e+eAr6T7ly94XIseVj3ySvm6if64ocWH2jjsMicQwJRLk1UK4rGNmDj3cdZ3av3dLrzJLycY5mDz+lJwS9eJkDAhHN03PNu51fh4qWYzfYpa+GUhgqmPgbPPQKREX7lYkqcCnXWb+o5dA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760686660; c=relaxed/simple;
-	bh=eGJ2lbEygjb3vDu/kdCzOwnlN6UAw57ABUXeozoNoVk=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=MZBPdG3mUYicKQE6o9qoEGyhAYdFqEKgM8/e7cX/t9Mb7GlNEY76ovfh5XX/oaCKVfolwPJwZtlMGqOEDKQY1U10ySYmhFFeEGvWxkaGoVf6iMHAHUYAh9f5g6pV+TPsMXWYgTJ2rbrPMqq5vZDck7pb8oOIRGDf2sprBmmMfBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=aol.com; spf=pass smtp.mailfrom=aol.com; dkim=pass (2048-bit key) header.d=aol.com header.i=@aol.com header.b=Z2Ynal9v; arc=none smtp.client-ip=98.137.64.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=aol.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aol.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aol.com; s=a2048; t=1760686657; bh=eGJ2lbEygjb3vDu/kdCzOwnlN6UAw57ABUXeozoNoVk=; h=Date:From:To:Cc:In-Reply-To:References:Subject:From:Subject:Reply-To; b=Z2Ynal9vZdmbFKoAN4mY1qnbLexXpnnEHrHd+0iooD8ftPPsy2wFcjftk+nMYVVNz51dLp9CR8CcOXm/cPIxwdBTn4j85/euNlxlwyWb52Nmm5Ytqd7TNSQGXXoNHFvlD+1YJSt7Ir1UZrwdqiJJsSRPRruy85EEM7/VAcQWbqpQ2BQ4QVI7HXoJb1g4c2lJxLOH3YO2qtFz4P1BrHHvrb6U4HOywM7Js7Ni7+NblAvZRIUZWPQKVhe7vzon8eVwZvQAQQKSKTmEdhnBAuQ4UYm4GpX1aKh9bSIMU2cGI42f185rxvXAOmBNVObJBt3bMuJSoZsDGjG8l9xU4kmZrA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1760686657; bh=BZEQSyrKkJpUwqAswWXjmyqxnmfwEF8MSSoDYh7KX8X=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=quiJpMpyKUkFATMFxDX9MR+e+tiCny6WY/D/gCC58Fj3luxWJOYxvB2v+QUU4wVfzOySTQgsJZYNHILLQpn4Qq9jm6FxB2aciH1AwdNP+CSLK19tMPdeXtuHZ+Hz12pSDCDKfapsF9fZHuLa3u03NS41DEHHBjzKAES0oVvywzMSm/yyCWW+GHBUqqOAidOx6JEfLcisFQAMSXIi7VktpYa/Kp7WKXUc3N80T9Y4KFRE2bnAZ+oQxl5vU8bvILJ247bpR7GQasKcFh1aFpEmrvnTA0GpNL8i1IyvMqQzOi+Fe8fjwgbkCzYjmcZ11IVm9tcRTqoFGnCWAMtGKuCdKQ==
-X-YMail-OSG: kCHrmywVM1lVOwVRPKwXesa894dbosY42nDZC7BKdQgsW8s4aohoZqugntn_Ms6
- y3yGH_LZl3UjoEMMTuzFdjFBcNfQdXmlH9NIX2q679mCSl8Sis59YDVHnM5OmuPeWobh4fK8hkdE
- _ST0DYJaAHxViEvOrgMP5a5f_FLgFM61lRKvNCiHvrF9.nWpwVat0AJ..rv32IfYVKICwaM2pQX2
- _FkOW10Ttn4U73dC4oDBtphAq0qrkUQt1OdKz_5R.9g0mMS7_0hPKmxRBpYRYNdWZlBiOm0rqLO_
- MO5BmJxHc6lYIw93Jez0jiydB95hvNyNaHprxvlUULQptvp7fdvh94drkvfjlqls04__3hI3NKSE
- s0K1xJXVqzKLkHXPPgxvR5lyFuFsNqmmZN11ahR7EoQkXDz0Qg74QJDbnwA6B23miSQ2xtEFnTuh
- GeBvSA_taqObKBbFeWHHWKZaJIP7ZKyFiD2r.MI5F4clv32OrQ85rpTqH_JAXVZcXVO.9B8Gp6ZS
- TWGFD38FFZJYz8pw8cr.yeAf2qGQJ6snhvTs_4e1STbVsITTVHSgxl_pdSTxdrHV2z__mbDsu6Lc
- rorHAu6ul1u17wr2Zr7S08szh6vZ6Rq.gpAFqeIdwxawsUQCRtdaxjbBUGgGwWiRrn4pp3_Nxb52
- OcRV0WdLGW4.fR9O18k1ncVyTcbdI4iNxEqleDjn44YcseahmBPN9Bs0DpF0lgQhJoRFXcbiqjc1
- 11ba4AvTNoe9G9l_euHOuscekKj9m2LtlVFrOjZElAP_OrYCmUKg3Tglj4J9hxF9Tph9Mzc1yaSA
- rIWErsgWFMy9RAOrrp6T5w2ZafR3_rnyRu6KZKyU_yW7bOJaHlkUNYe_B753PRMo2vks_W69fcSP
- vIfqEXmt47AQJNzzh3Y.705zG7d_moJmqyALrG2vz_R9pM0npu_cK630TQxTCw8ACvWgrA3g1.hL
- 02GvtCylp9QwcrAIcL_zozbYxgwXUOuMSlfX1oB.o7C87i7_6jtTlpqUOo0M932pdrAWShVNfvlV
- ZGaNU9CAz73RuIiND08jkVVhdgkin8Dw51hXpU0VU8_0AZYwr4Zz8.il9O9xraT9Cd6WvLPmsDbd
- xr2LWTNOuCNkLMOHDi6zwY4vOMXy0BEQmxP5Z8ntZboSBZFzrPXsso4.y0mLeHUa2VAAkmnHJnWh
- emN5NVrzgC9xCzMaaJ6V5mJp0ctbO98jW7wFhxjLdhYSDc.T04B1AyXw2WNvQhgwqvSuJE_y4vOt
- ascxQfBODisy.tF0R1clep04_0Ub.TiWVQStMwWohboTothn0a8yj3_FC7Ga6ydIWfmXzoXfLgXD
- oTX7uW_itnGfXByzG3GItMrVrO26Zj_44z3snHeXgm43_JJocLeE3ZKp2oakvIxk6Rz5RsNZo_7U
- PIIu0xU1TNWELSy3h3.Hg_ZFFtDUm3BO9GEWYFPd73ENyXPzs4H5DQTKe7xaov8GawlUPPOXCSE5
- i17P8FenQ3dI7Aw3mUNfSauQ4LQm28v0bjCqNGQu1AwwJZfVD50rWiKxPl_ubU.H9Locq3430TFG
- vH6rr5B8nQd_n8FL_h2zg4hFURmXSNFvZ8F.9E64pO5QDt09ylkUEup93Xe2tpgzuOaPV.h9xqc1
- KP76wS1bucMNXp1cVXlVCPjxB.cOgTL4PNXnhGbIm.gwymo9WZyOpFzdf7IadI_9742E_1TXEvYn
- iqvuNx3.wfZJrkyrN1XUsKVvPTKRjKdUfXxl02Ui55UZ0wExaoIL84zH6BF2L62YZRyAxW0zBmLy
- zvDZyBe7.GbCY.iR5_7URB.qfKdXmUYL3cOtMyd6TMgUtNtndFz5TLJVB7hxtpjV07bf7QMEdNdX
- R3.eyItFcaHx9MlnVU11B4OQuuRZ0bBD9jbeJt0sXuIEIlJp6mkbEF2aTPxt9pYjpOvjShoV4ICI
- DVKSQcfbMW7sFHy.waYq4SnhQgMxajAfMUshlTCgN1iOT.J_4u8dEiC3jOTcyHnSOKRTjqqtgjyS
- nUE6AdkG1dR4Lrz3RcwpHEpbzBsI9o7ehdTl0XpWdMR3rPha0qlBVSVR9D9LefVxHaW0bugeuTKj
- h78cVTeVFZqfxufJBG6GoI9DqwqtycfDGVOL5r31YKSTZxNI0IwICN6NpWIurEam.2sXmhPOR_8A
- 6ToYdzStz2u_N8gmzn24_tlbBKalGnTbD6M8meSqaAv1LwnPmYq43TnUfUu4WuWfihL6HyKb_
-X-Sonic-MF: <canghousehold@aol.com>
-X-Sonic-ID: f7e434a4-8690-403c-9d7c-042bedea88de
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic305.consmr.mail.gq1.yahoo.com with HTTP; Fri, 17 Oct 2025 07:37:37 +0000
-Date: Fri, 17 Oct 2025 06:56:16 +0000 (UTC)
-From: Household Cang <canghousehold@aol.com>
-To: Vladimir Oltean <olteanv@gmail.com>, Lucas Pereira <lucasvp@gmail.com>, 
-	Romain Gantois <romain.gantois@bootlin.com>, 
-	"David S. Miller" <davem@davemloft.net>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	Sylvain Girard <sylvain.girard@se.com>, 
-	Pascal EBERHARD <pascal.eberhard@se.com>, 
-	Richard Tresidder <rtresidd@electromag.com.au>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Message-ID: <21658780.3286902.1760684176107@mail.yahoo.com>
-In-Reply-To: <SJ2PR22MB45547404DA1CA10A201B2BE0A294A@SJ2PR22MB4554.namprd22.prod.outlook.com>
-References: <20231218162326.173127-1-romain.gantois@bootlin.com> <0351C5C2-FEE2-4AED-84C8-9DCACCE4ED0A@aol.com> <20231222123023.voxoxfcckxsz2vce@skbuf> <SJ2PR22MB45547404DA1CA10A201B2BE0A294A@SJ2PR22MB4554.namprd22.prod.outlook.com>
-Subject: Proxy ARP NetNS Awareness
+	s=arc-20240116; t=1760684741; c=relaxed/simple;
+	bh=l9RIq9pv47w7bEV5KWrnvIb9LJMvjqefg4292JUfx3g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PccKkDpCbtjnTdG8VELqSg3OPiefiM88cNUSs2Clk0N5nKSP0q+jrI2RD1Y7wEVEOKAxkqVH5ufCeA6J6nPyYKZgkCS2jF8c+JG/5E5P0Cw+uqp8sl1RbRYlF80b9U8lC3tDBRc3WV2lZ5relXk8Or+qB/EGk4PZxz4DjEcZBJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=sjVqtIm4; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 36315C041DD;
+	Fri, 17 Oct 2025 07:05:16 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 651C9606DB;
+	Fri, 17 Oct 2025 07:05:35 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 00B0D102F22FF;
+	Fri, 17 Oct 2025 09:04:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1760684733; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=8Txvygtf95T8nvPnqElNFv3jlBIUlCRN1Ha31LP6OZM=;
+	b=sjVqtIm4RJwQ4q/9IDLKMSW6riYcV/yNt+HFk6E2Z9iRJ7mcel14odvS1qcyV6Zojb2ZL/
+	UjK86X1GZjeFt8l4tTWqqX5GMkhp2tz//ZFswJJxaec0tbucR/wHOUZPsTXsOTWqF6Hkcy
+	PsT3RCGuLuL3pIzCuxEBS19909xxzsZzs/iU/so1N2Ny/VakwLErGxdMdFvoTDEZfIGP7c
+	1q7q03jcaA/Jdyzq66uIb9IX6f6YcMZtfsL6xNXl25uo1acubbem9B/PXBj+xHKuu2fXEd
+	CJGlJW9d8NPHglu7w1OISAR7MVpEiXJ497Z1xlPBUvJt0TtWvMd4li2EVhgW5g==
+Message-ID: <1f9d856f-4cfb-472c-abec-96ce55f4db81@bootlin.com>
+Date: Fri, 17 Oct 2025 09:04:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 00/14] net: stmmac: phylink PCS conversion
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Abhishek Chauhan <quic_abchauha@quicinc.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Alexis Lothore <alexis.lothore@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Boon Khai Ng <boon.khai.ng@altera.com>,
+ Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+ Daniel Machon <daniel.machon@microchip.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Drew Fustini <dfustini@tenstorrent.com>,
+ Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+ Eric Dumazet <edumazet@google.com>,
+ Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
+ Furong Xu <0x1207@gmail.com>, Inochi Amaoto <inochiama@gmail.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
+ "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+ Jisheng Zhang <jszhang@kernel.org>, Kees Cook <kees@kernel.org>,
+ Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+ Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+ Ley Foon Tan <leyfoon.tan@starfivetech.com>,
+ linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Matthew Gerlach <matthew.gerlach@altera.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Paolo Abeni <pabeni@redhat.com>, Rohan G Thomas <rohan.g.thomas@altera.com>,
+ Shenwei Wang <shenwei.wang@nxp.com>, Simon Horman <horms@kernel.org>,
+ Song Yoong Siang <yoong.siang.song@intel.com>,
+ Swathi K S <swathi.ks@samsung.com>, Tiezhu Yang <yangtiezhu@loongson.cn>,
+ Vinod Koul <vkoul@kernel.org>, Vladimir Oltean <olteanv@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Yu-Chun Lin <eleanor15x@gmail.com>
+References: <aPECqg0vZGnBFCbh@shell.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <aPECqg0vZGnBFCbh@shell.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: WebService/1.1.24562 AolMailNorrin
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Last light the Linux Librechat was focused on digging the kernel code surro=
-unding /net/ipv4/arp.c and /net/core/net_namespace.c to answer whether the =
-proxy_arp feature enabled by sysctl is namespace aware.
+Hello,
 
-After many hours of tracing from namespace-generating unshare --net command=
- all the way to the kernel net_namespace.c gave us some clues that the main=
- ns and new ns converged at=C2=A0arp_net_init() in arp.c. And I am currentl=
-y stuck on this line 1497
+On 16/10/2025 16:35, Russell King (Oracle) wrote:
+> This series is radical - it takes the brave step of ripping out much of
+> the existing PCS support code and throwing it all away.
+> 
+> I have discussed the introduction of the STMMAC_FLAG_HAS_INTEGRATED_PCS
+> flag with Bartosz Golaszewski, and the conclusion I came to is that
+> this is to workaround the breakage that I've been going on about
+> concerning the phylink conversion for the last five or six years.
+> 
+> The problem is that the stmmac PCS code manipulates the netif carrier
+> state, which confuses phylink.
+> 
+> There is a way of testing this out on the Jetson Xavier NX platform as
+> the "PCS" code paths can be exercised while in RGMII mode - because
+> RGMII also has in-band status and the status register is shared with
+> SGMII. Testing this out confirms my long held theory: the interrupt
+> handler manipulates the netif carrier state before phylink gets a
+> look-in, which means that the mac_link_up() and mac_link_down() methods
+> are never called, resulting in the device being non-functional.
+> 
+> Moreover, on dwmac4 cores, ethtool reports incorrect information -
+> despite having a full-duplex link, ethtool reports that it is
+> half-dupex.
+> 
+> Thus, this code is completely broken - anyone using it will not have
+> a functional platform, and thus it doesn't deserve to live any longer,
+> especially as it's a thorn in phylink.
+> 
+> Rip all this out, leaving just the bare bones initialisation in place.
+> 
+> However, this is not the last of what's broken. We have this hw->ps
+> integer which is really not descriptive, and the DT property from
+> which it comes from does little to help understand what's going on.
+> Putting all the clues together:
+> 
+> - early configuration of the GMAC configuration register for the
+>   speed.
+> - setting the SGMII rate adapter layer to take its speed from the
+>   GMAC configuration register.
+> 
+> Lastly, setting the transmit enable (TE) bit, which is a typo that puts
+> the nail in the coffin of this code. It should be the transmit
+> configuration (TC) bit. Given that when the link comes up, phylink
+> will call mac_link_up() which will overwrite the speed in the GMAC
+> configuration register, the only part of this that is functional is
+> changing where the SGMII rate adapter layer gets its speed from,
+> which is a boolean.
+> 
+> From what I've found so far, everyone who sets the snps,ps-speed
+> property which configures this mode also configures a fixed link,
+> so the pre-configuration is unnecessary - the link will come up
+> anyway.
+> 
+> So, this series rips that out the preconfiguration as well, and
+> replaces hw->ps with a boolean hw->reverse_sgmii_enable flag.
+> 
+> We then move the sole PCS configuration into a phylink_pcs instance,
+> which configures the PCS control register in the same way as is done
+> during the probe function.
+> 
+> Thus, we end up with much easier and simpler conversion to phylink PCS
+> than previous attempts.
+> 
+> Even so, this still results in inband mode always being enabled at the
+> moment in the new .pcs_config() method to reflect what the probe
+> function was doing. The next stage will be to change that to allow
+> phylink to correctly configure the PCS. This needs fixing to allow
+> platform glue maintainers who are currently blocked to progress.
+> 
+> Please note, however, that this has not been tested with any SGMII
+> platform.
+> 
+> I've tried to get as many people into the Cc list with get_maintainers,
+> I hope that's sufficient to get enough eyeballs on this.
+> 
+> Changes since RFC:
+> - new patch (7) to remove RGMII "pcs" mode
+> - new patch (8) to move reverse "pcs" mode to stmmac_check_pcs_mode()
+> - new patch (9) to simplify the code moved in the previous patch
+> - new patch (10) to rename the confusing hw->ps to something more
+>   understandable.
+> - new patch (11) to shut up inappropriate complaints about
+>   "snps,ps-speed" being invalid.
+> - new patch (13) to add a MAC .pcs_init method, which will only be
+>   called when core has PCS present.
+> - modify patch 14 to use this new pcs_init method.
+> 
+> Despite getting a couple of responses to the RFC series posted in
+> September, I have had nothing testing this on hardware. I have tested
+> this on the Jetson Xavier NX, which included trial runs with enabling
+> the RGMII "pcs" mode, hence the new patches that rip out this mode. I
+> have come to the conclusion that the only way to get stmmac changes
+> tested is to get them merged into net-next, thereby forcing people to
+> have to run with them... and we'll deal with any fallout later.
 
-proc_create_net("arp", 0444, net->proc_net, &arp_seq_ops,
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0siz=
-eof(struct neigh_seq_state))
+I have tested this on :
+ - dwmac-socfpga w/ Lynx, SGMII and 1000BaseX mode
+ - dwmac-socfpga w/ RGMII mode
+ - stm32-dwmac (on stm32mp157a), w/ RGMII mode
 
-It is unknown whether this function creates a "view" to the ARP neighbor ta=
-ble such that each netns has a different view to the neighbor table, OR eac=
-h netns maintains its own neighbor table. Either way, the implication is wh=
-ether proxy_arp enabled by sysctl is restricted to the current netns.
+I don't have any device available with stmmac using the internal PCS
+implementation, but at least the 2 platforms above don't regress with
+this series.
 
-If proxy_arp is retricted to the current netns, then the Debian documentati=
-on on wireless bridge-less pseudo-bridge=C2=A0https://wiki.debian.org/Bridg=
-eNetworkConnections may be wrong in insinuating that the proxy_arp feature =
-in the modern kernel can replace parprouted userspace program.
+Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-The current documentation with sysctl net-related options are really vague =
-in terms of netns interaction. arp_ignore, arp_announce, arp_filter did not=
- do a good job of disambiguating whether any of these arp features can or c=
-annot work across namespaces, or the reasons for the behavior.
-
-From the arp_filter option description, this line "IP addresses are owned b=
-y the complete host on Linux, not by=C2=A0particular interfaces." is a sing=
-le-netns statement, but highly suggests that arp operations are per namespa=
-ce.
-
-When a virtual ethernet pair is created between two netns, parprouted users=
-pace program can relay arps across namespaces, but the kernel proxy_arp can=
-not.
-
-Thank you for any insights and feel free to forward to subject matter exper=
-ts.
-I really want to get to the bottom of this.
-
-Lucas
+Maxime
 
