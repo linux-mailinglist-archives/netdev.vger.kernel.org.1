@@ -1,343 +1,192 @@
-Return-Path: <netdev+bounces-230327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F7DABE6969
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 08:15:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29C8BBE6904
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 08:12:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 61FB03597E0
-	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 06:14:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5401062100B
+	for <lists+netdev@lfdr.de>; Fri, 17 Oct 2025 06:11:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3364D31DD91;
-	Fri, 17 Oct 2025 06:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11A5330F7E4;
+	Fri, 17 Oct 2025 06:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EMHr4521"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8f+KnU/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D303168FB;
-	Fri, 17 Oct 2025 06:11:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F54930E844
+	for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 06:10:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760681471; cv=none; b=l+DLMjRZoNvxpzKEpZdc9loUmkGnvmKyhNQGCMtRRmHgdRtQG/RllC5d8Vkwhj1B1T0gYeL9ryTjzV8FOqhC8TdVLfhRT1a+Lw9nMm6QhUwvGS6Z8DuoS6re3Fkvr5BTTObNquC9w5U8688fngwBl/nTFY+olZRJ+vQkVF/UnGY=
+	t=1760681449; cv=none; b=svdzsnJZyim0y3HLc7kDXLo1JPtJEoaG4Pidjpl+n/Jo6TadkzOPZ/aFSk65Te46mg8rhqFJRaXCZvI5+kgfAig9pT4LQtw8yzaebYS+5lpl1W/4s+m6XfD8NQdEENJnK9vt8rAsMwtxoUM+s72q9dcb4Dfysju5YEbO1UvJCrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760681471; c=relaxed/simple;
-	bh=0YPZ8kN0xDFzPx4eOmBQGeoHeFzYLj3kTyvDZYdZ/K0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=gZtRC28kN3W86zVsXIPw9EhWys3Fi7lquDF0a/R4xNSiuVQmcJOwqbORLzR3EmY5lvZGypz7jirwCbijUplEXFSQ3U8yJwtr274r/oP0DAyvA/otN2UPju9OIjn21jXI5wys7JkCScCaKixA7+ZjRdJyBO2rHtNOgmlmPmtwHtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EMHr4521; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760681467; x=1792217467;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=0YPZ8kN0xDFzPx4eOmBQGeoHeFzYLj3kTyvDZYdZ/K0=;
-  b=EMHr4521fcgDJhQvbd4fIDDLif+N67CD5c7A/z4iLIhE4WzB8ecT+yX4
-   GTeP6MtBoc4tjwrmJtOeyuVtoFHxiAW0XnAeQMe9s5X6U8UWD61r0CMZD
-   II8LfKNSZPeVQ10O90Py5KXVmxPLy6geguYGTYysH2W+u4JZbX/WGvVPR
-   S9srAOAPCX95YumN/uJTA/xkdn1m4cziKXRhoXRdA+m45EnAgbb42+jYJ
-   H+j1LbPaYtRVHAg4bJ33vQ37g0jyosTrdx+ExEKC2b8TFCqIS8CDEOiCQ
-   TU6nwzk0AbyuhTqd2qhj9b1sOexGezbmF2+664rMcdDIlF/foHHGmj+YT
-   g==;
-X-CSE-ConnectionGUID: 2/U/htO7SQqxCsW5YpWung==
-X-CSE-MsgGUID: YsIM1F1OSWi96JilCmbrVg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11584"; a="50454035"
-X-IronPort-AV: E=Sophos;i="6.19,234,1754982000"; 
-   d="scan'208";a="50454035"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2025 23:10:56 -0700
-X-CSE-ConnectionGUID: NCqBHw+0RWyJadntaNXpIQ==
-X-CSE-MsgGUID: GzI3N+57Tqy6phIHVQMtNw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,234,1754982000"; 
-   d="scan'208";a="183059520"
-Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2025 23:10:56 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Thu, 16 Oct 2025 23:08:43 -0700
-Subject: [PATCH net-next v2 14/14] e1000e: Introduce private flag to
- disable K1
+	s=arc-20240116; t=1760681449; c=relaxed/simple;
+	bh=T8u+Ml55+qwIbig4DN7RlHYBf0qyK8VRu5BOjZlWgsA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eJ7RvKWGXj5IEkW9mbhJmWXEYAxUR9H+Qad79Pc/5yCwYIuFZKVs1eGoSyp50WpAKPTBi3l5AR9uKeHqE3rVakZ1yFUQClp/123od2c/wrvMJzomtaC+WzimfOlcBABBefeRk36s9VeHvIWLa38/xAsaytKmxIBEl+4Hy7AkQ4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h8f+KnU/; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-27eceb38eb1so17777935ad.3
+        for <netdev@vger.kernel.org>; Thu, 16 Oct 2025 23:10:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760681447; x=1761286247; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uWguY1LIvlZhe7LRkQwjcGn5XsNbYEwGR54WSIWyzPM=;
+        b=h8f+KnU/qbSrHjMMeLNemml/mvqYwSqhhjlWPZJAjMuE0xVEN1f+e+Hfw/IdWdiRRZ
+         +gy+rBDoRPmIb0wM2KJbNwsrwxyBirXH5q3p6ti7vzGZh80RuXWTLZVHI9w+H3jnmh5j
+         Ok4yG662IeZ1dtg6D9h9FPt13mPSkbBY6AZzAMhoxk7kaI8oLOKXqYdfc7qHghndg+J0
+         6vqYy95+ddHnGS6eYC+75R8fdjvA3JZpNFsySnR6PjJigLYRaDtifE02eMe4dCUBo2t3
+         kHE8xzzbzl7tfAqzdZj6Uw+rhHK4qsz3c9wCUiSlAD/+hGSQ2ZTOlVi+iMTq4Xcy2I+A
+         a3OQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760681447; x=1761286247;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uWguY1LIvlZhe7LRkQwjcGn5XsNbYEwGR54WSIWyzPM=;
+        b=ohajAWv5rKHRjCSNvDtT7tyI/I+R2ah5TJLZLUP6tb4OGHLoHqLEG0BpkHcUTeJv6D
+         0LwtZh7ItCTF69HpVDPRapcbjTZ85GBZA+haw9v9fkVQ/RBB/uxgKIXPMcqEJfDRtxro
+         rl1B+pnnZreAHHg/wIYfNQCxqNgswoM+mlQd3BS7HjNqNJDyIlh+CKZKjTyRFtLEp1RY
+         RvYq7wzgG9AWI9pF/5CqhT3VrXrv20Cg8IKGYmKVuKCdRPQqjoS/yTLzfSSowUEkvAZ6
+         EEzGLPKABTg54i0SewYe+qJB/A/1fwV+JvlCRiMs3zQT3ihwS1aVuf4aTojD/kAYSW8z
+         Uuow==
+X-Gm-Message-State: AOJu0YzzspeuNUN4h3dudBA7Ex4PsvesbgJFc9DVvIZkSSTWpozGWJlF
+	+lkSsWB7OQWty2aor2fN4JJK02BjKNStySMo83eSbULsRlRIe6uS2+3m1I2wE4OB7bMY4Q==
+X-Gm-Gg: ASbGncvgUgSvoyrSL3CwDO7EIdBAfv2SG5eoCTrsgRNfOjUKWpgsjN8VcJzKFVSi5oF
+	5HGpB86SHVNmPHzSDFWt/PhUBy//CKD4j7sx3lEHzq+I+tzRZUJOrBz4IG6meNg/6il6MJZADA7
+	UG01AzoeFK4HOTT+CExJa4HoCQ+KscgyNxSLoUnM0v/GwmarbJGyXCWANsfev/xjaJs29IqcLp5
+	mkANZf2Is4IgyZs2As9zqJB9LHrYa3w5jyZ1fcv7RAVeu651iAULicNM34Fkg2XNopSC2HXbjw1
+	CppBWw29s5F2v0+3Gm3JfQhKbltcvkQCvUiN1dZJh1wcM6/lv7+/LpIQrEe7fK0XXkDCj9FQadu
+	A6UmR6yVezP5g452O53BGNmFXDmIcr1Cj8zcWJrfqa4wRORbQnzv6JZ/arVVlE+EWsiXzyWjy9w
+	hT9VDdLY1qkjWdirh4aA==
+X-Google-Smtp-Source: AGHT+IEROJ+/juvtMdqHps0kqBfRNcV92IZtPB3YXFiFn9l93YwMk6VoR62L85/PTG/tOTEYXhQKmQ==
+X-Received: by 2002:a17:902:d544:b0:261:6d61:f28d with SMTP id d9443c01a7336-290cc9bf243mr31500725ad.50.1760681446593;
+        Thu, 16 Oct 2025 23:10:46 -0700 (PDT)
+Received: from d.home.yangfl.dn42 ([45.32.227.231])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2909938759dsm51315475ad.49.2025.10.16.23.10.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Oct 2025 23:10:46 -0700 (PDT)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v14 0/4] net: dsa: yt921x: Add support for Motorcomm YT921x
+Date: Fri, 17 Oct 2025 14:08:52 +0800
+Message-ID: <20251017060859.326450-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20251016-jk-iwl-next-2025-10-15-v2-14-ff3a390d9fc6@intel.com>
-References: <20251016-jk-iwl-next-2025-10-15-v2-0-ff3a390d9fc6@intel.com>
-In-Reply-To: <20251016-jk-iwl-next-2025-10-15-v2-0-ff3a390d9fc6@intel.com>
-To: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
- Vitaly Lifshits <vitaly.lifshits@intel.com>, 
- =?utf-8?q?Timo_Ter=C3=A4s?= <timo.teras@iki.fi>, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
- Dima Ruinskiy <dima.ruinskiy@intel.com>, 
- Avraham Koren <Avrahamx.koren@intel.com>
-X-Mailer: b4 0.15-dev-f4b34
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8780;
- i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=oAY1c4dYNUs/VsyRZ8VffpRmz9QaW5ieBWzoumsBvf0=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhoyPd18pLvljahr380Ld1Ltz1TfwfI6supNnHfPr/G/D/
- d9vB09Y1VHKwiDGxSArpsii4BCy8rrxhDCtN85yMHNYmUCGMHBxCsBE9k1i+GdgFHnvw6IdB43W
- V1jVrl8Rz75AzUthaoSVSsSB7j8CFw0ZGXoNyqb3J4hN61uTEH31bM3Uc5t/dzi8u7/r1plz1zb
- q3OUHAA==
-X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
- fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
-From: Vitaly Lifshits <vitaly.lifshits@intel.com>
+Motorcomm YT921x is a series of ethernet switches developed by Shanghai
+Motorcomm Electronic Technology, including:
 
-The K1 state reduces power consumption on ICH family network controllers
-during idle periods, similarly to L1 state on PCI Express NICs. Therefore,
-it is recommended and enabled by default.
-However, on some systems it has been observed to have adverse side
-effects, such as packet loss. It has been established through debug that
-the problem may be due to firmware misconfiguration of specific systems,
-interoperability with certain link partners, or marginal electrical
-conditions of specific units.
+  - YT9215S / YT9215RB / YT9215SC: 5 GbE phys
+  - YT9213NB / YT9214NB: 2 GbE phys
+  - YT9218N / YT9218MB: 8 GbE phys
 
-These problems typically cannot be fixed in the field, and generic
-workarounds to resolve the side effects on all systems, while keeping K1
-enabled, were found infeasible.
-Therefore, add the option for users to globally disable K1 idle state on
-the adapter.
+and up to 2 serdes interfaces.
 
-Additionally, disable K1 by default for MTL and later platforms, due to
-issues reported with the current configuration.
+This patch adds basic support for a working DSA switch.
 
-Link: https://lore.kernel.org/intel-wired-lan/CAMqyJG3LVqfgqMcTxeaPur_Jq0oQH7GgdxRuVtRX_6TTH2mX5Q@mail.gmail.com/
-Link: https://lore.kernel.org/intel-wired-lan/20250626153544.1853d106@onyx.my.domain/
-Link: https://lore.kernel.org/intel-wired-lan/Z_z9EjcKtwHCQcZR@mail-itl/
-Link: https://github.com/QubesOS/qubes-issues/issues/9896
-Link: https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2115393
+v13: https://lore.kernel.org/r/20251014033551.200692-1-mmyangfl@gmail.com
+  - add MAINTAINERS entry
+  - remove wrong memory barrier
+  - suggested code style changes
+v12: https://lore.kernel.org/r/20250926135057.2323738-1-mmyangfl@gmail.com
+  - do not introduce PHY_INTERFACE_MODE_REVSGMII for the moment
+v11: https://lore.kernel.org/r/20250922131148.1917856-1-mmyangfl@gmail.com
+  - make MIB_DESC cleaner
+  - use disable_delayed_work at teardown
+v10: https://lore.kernel.org/r/20250919094234.1491638-1-mmyangfl@gmail.com
+  - fix warnings related to PHY_INTERFACE_MODE_REVSGMII
+v9: https://lore.kernel.org/r/20250913044404.63641-1-mmyangfl@gmail.com
+  - add PHY_INTERFACE_MODE_REVSGMII
+  - remove mdio_verify()
+  - remove uncessary fdb flush opeartions
+  - rework mib reading
+  - set port pvid by port_set_pvid()
+v8: https://lore.kernel.org/r/20250912024620.4032846-1-mmyangfl@gmail.com
+  - rework register polling
+  - rework mib reading
+  - other suggested code style changes
+v7: https://lore.kernel.org/r/20250905181728.3169479-1-mmyangfl@gmail.com
+  - simplify locking scheme
+v6: https://lore.kernel.org/r/20250824005116.2434998-1-mmyangfl@gmail.com
+  - handle unforwarded packets in tag driver
+  - move register and struct definitions to header file
+  - rework register abstraction and implement a driver lock
+  - implement *_stats and use a periodic work to fetch MIB
+  - remove EEPROM dump
+  - remove sysfs attr and other debug leftovers
+  - remove ds->user_mii_bus assignment
+  - run selftests and fix any errors found
+v5: https://lore.kernel.org/r/20250820075420.1601068-1-mmyangfl@gmail.com
+  - use enum for reg in dt binding
+  - fix phylink_mac_ops in the driver
+  - fix coding style
+v4: https://lore.kernel.org/r/20250818162445.1317670-1-mmyangfl@gmail.com
+  - remove switchid from dt binding
+  - remove hsr from tag driver
+  - use ratelimited log in tag driver
+v3: https://lore.kernel.org/r/20250816052323.360788-1-mmyangfl@gmail.com
+  - fix words and warnings in dt binding
+  - remove unnecessary dev_warn_ratelimited and u64_from_u32
+  - remove lag and mst
+  - check for mdio results and fix a unlocked write in conduit_state_change
+v2: https://lore.kernel.org/r/20250814065032.3766988-1-mmyangfl@gmail.com
+  - fix words in dt binding
+  - add support for lag and mst
+v1: https://lore.kernel.org/r/20250808173808.273774-1-mmyangfl@gmail.com
+  - fix coding style
+  - add dt binding
+  - add support for fdb, vlan and bridge
 
-Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Reviewed-by: Timo Teräs <timo.teras@iki.fi>
-Tested-by: Timo Teräs <timo.teras@iki.fi>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Dima Ruinskiy <dima.ruinskiy@intel.com>
-Tested-by: Avraham Koren <Avrahamx.koren@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/e1000e/e1000.h   |  1 +
- drivers/net/ethernet/intel/e1000e/ethtool.c | 45 +++++++++++++++++++++++++----
- drivers/net/ethernet/intel/e1000e/ich8lan.c | 41 ++++++++++++++------------
- drivers/net/ethernet/intel/e1000e/netdev.c  |  3 ++
- 4 files changed, 67 insertions(+), 23 deletions(-)
+David Yang (4):
+  dt-bindings: net: dsa: yt921x: Add Motorcomm YT921x switch support
+  net: dsa: tag_yt921x: add support for Motorcomm YT921x tags
+  net: dsa: yt921x: Add support for Motorcomm YT921x
+  MAINTAINERS: add entry for Motorcomm YT921x ethernet switch driver
 
-diff --git a/drivers/net/ethernet/intel/e1000e/e1000.h b/drivers/net/ethernet/intel/e1000e/e1000.h
-index 018e61aea787..aa08f397988e 100644
---- a/drivers/net/ethernet/intel/e1000e/e1000.h
-+++ b/drivers/net/ethernet/intel/e1000e/e1000.h
-@@ -461,6 +461,7 @@ s32 e1000e_get_base_timinca(struct e1000_adapter *adapter, u32 *timinca);
- #define FLAG2_CHECK_RX_HWTSTAMP           BIT(13)
- #define FLAG2_CHECK_SYSTIM_OVERFLOW       BIT(14)
- #define FLAG2_ENABLE_S0IX_FLOWS           BIT(15)
-+#define FLAG2_DISABLE_K1		   BIT(16)
- 
- #define E1000_RX_DESC_PS(R, i)	    \
- 	(&(((union e1000_rx_desc_packet_split *)((R).desc))[i]))
-diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
-index 8e40bb50a01e..cee57a2149ab 100644
---- a/drivers/net/ethernet/intel/e1000e/ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
-@@ -26,6 +26,8 @@ struct e1000_stats {
- static const char e1000e_priv_flags_strings[][ETH_GSTRING_LEN] = {
- #define E1000E_PRIV_FLAGS_S0IX_ENABLED	BIT(0)
- 	"s0ix-enabled",
-+#define E1000E_PRIV_FLAGS_DISABLE_K1	BIT(1)
-+	"disable-k1",
- };
- 
- #define E1000E_PRIV_FLAGS_STR_LEN ARRAY_SIZE(e1000e_priv_flags_strings)
-@@ -2301,26 +2303,59 @@ static u32 e1000e_get_priv_flags(struct net_device *netdev)
- 	if (adapter->flags2 & FLAG2_ENABLE_S0IX_FLOWS)
- 		priv_flags |= E1000E_PRIV_FLAGS_S0IX_ENABLED;
- 
-+	if (adapter->flags2 & FLAG2_DISABLE_K1)
-+		priv_flags |= E1000E_PRIV_FLAGS_DISABLE_K1;
-+
- 	return priv_flags;
- }
- 
- static int e1000e_set_priv_flags(struct net_device *netdev, u32 priv_flags)
- {
- 	struct e1000_adapter *adapter = netdev_priv(netdev);
-+	struct e1000_hw *hw = &adapter->hw;
- 	unsigned int flags2 = adapter->flags2;
-+	unsigned int changed;
-+
-+	flags2 &= ~(FLAG2_ENABLE_S0IX_FLOWS | FLAG2_DISABLE_K1);
- 
--	flags2 &= ~FLAG2_ENABLE_S0IX_FLOWS;
- 	if (priv_flags & E1000E_PRIV_FLAGS_S0IX_ENABLED) {
--		struct e1000_hw *hw = &adapter->hw;
--
--		if (hw->mac.type < e1000_pch_cnp)
-+		if (hw->mac.type < e1000_pch_cnp) {
-+			e_err("S0ix is not supported on this device\n");
- 			return -EINVAL;
-+		}
-+
- 		flags2 |= FLAG2_ENABLE_S0IX_FLOWS;
- 	}
- 
--	if (flags2 != adapter->flags2)
-+	if (priv_flags & E1000E_PRIV_FLAGS_DISABLE_K1) {
-+		if (hw->mac.type < e1000_ich8lan) {
-+			e_err("Disabling K1 is not supported on this device\n");
-+			return -EINVAL;
-+		}
-+
-+		flags2 |= FLAG2_DISABLE_K1;
-+	}
-+
-+	changed = adapter->flags2 ^ flags2;
-+	if (changed)
- 		adapter->flags2 = flags2;
- 
-+	if (changed & FLAG2_DISABLE_K1) {
-+		/* reset the hardware to apply the changes */
-+		while (test_and_set_bit(__E1000_RESETTING,
-+					&adapter->state))
-+			usleep_range(1000, 2000);
-+
-+		if (netif_running(adapter->netdev)) {
-+			e1000e_down(adapter, true);
-+			e1000e_up(adapter);
-+		} else {
-+			e1000e_reset(adapter);
-+		}
-+
-+		clear_bit(__E1000_RESETTING, &adapter->state);
-+	}
-+
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-index df4e7d781cb1..0ff8688ac3b8 100644
---- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
-+++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-@@ -286,21 +286,26 @@ static void e1000_toggle_lanphypc_pch_lpt(struct e1000_hw *hw)
- }
- 
- /**
-- * e1000_reconfigure_k1_exit_timeout - reconfigure K1 exit timeout to
-- * align to MTP and later platform requirements.
-+ * e1000_reconfigure_k1_params - reconfigure Kumeran K1 parameters.
-  * @hw: pointer to the HW structure
-  *
-+ * By default K1 is enabled after MAC reset, so this function only
-+ * disables it.
-+ *
-  * Context: PHY semaphore must be held by caller.
-  * Return: 0 on success, negative on failure
-  */
--static s32 e1000_reconfigure_k1_exit_timeout(struct e1000_hw *hw)
-+static s32 e1000_reconfigure_k1_params(struct e1000_hw *hw)
- {
- 	u16 phy_timeout;
- 	u32 fextnvm12;
- 	s32 ret_val;
- 
--	if (hw->mac.type < e1000_pch_mtp)
-+	if (hw->mac.type < e1000_pch_mtp) {
-+		if (hw->adapter->flags2 & FLAG2_DISABLE_K1)
-+			return e1000_configure_k1_ich8lan(hw, false);
- 		return 0;
-+	}
- 
- 	/* Change Kumeran K1 power down state from P0s to P1 */
- 	fextnvm12 = er32(FEXTNVM12);
-@@ -310,6 +315,8 @@ static s32 e1000_reconfigure_k1_exit_timeout(struct e1000_hw *hw)
- 
- 	/* Wait for the interface the settle */
- 	usleep_range(1000, 1100);
-+	if (hw->adapter->flags2 & FLAG2_DISABLE_K1)
-+		return e1000_configure_k1_ich8lan(hw, false);
- 
- 	/* Change K1 exit timeout */
- 	ret_val = e1e_rphy_locked(hw, I217_PHY_TIMEOUTS_REG,
-@@ -373,8 +380,8 @@ static s32 e1000_init_phy_workarounds_pchlan(struct e1000_hw *hw)
- 		/* At this point the PHY might be inaccessible so don't
- 		 * propagate the failure
- 		 */
--		if (e1000_reconfigure_k1_exit_timeout(hw))
--			e_dbg("Failed to reconfigure K1 exit timeout\n");
-+		if (e1000_reconfigure_k1_params(hw))
-+			e_dbg("Failed to reconfigure K1 parameters\n");
- 
- 		fallthrough;
- 	case e1000_pch_lpt:
-@@ -473,10 +480,10 @@ static s32 e1000_init_phy_workarounds_pchlan(struct e1000_hw *hw)
- 		if (hw->mac.type >= e1000_pch_mtp) {
- 			ret_val = hw->phy.ops.acquire(hw);
- 			if (ret_val) {
--				e_err("Failed to reconfigure K1 exit timeout\n");
-+				e_err("Failed to reconfigure K1 parameters\n");
- 				goto out;
- 			}
--			ret_val = e1000_reconfigure_k1_exit_timeout(hw);
-+			ret_val = e1000_reconfigure_k1_params(hw);
- 			hw->phy.ops.release(hw);
- 		}
- 	}
-@@ -4948,17 +4955,15 @@ static s32 e1000_init_hw_ich8lan(struct e1000_hw *hw)
- 	u16 i;
- 
- 	e1000_initialize_hw_bits_ich8lan(hw);
--	if (hw->mac.type >= e1000_pch_mtp) {
--		ret_val = hw->phy.ops.acquire(hw);
--		if (ret_val)
--			return ret_val;
-+	ret_val = hw->phy.ops.acquire(hw);
-+	if (ret_val)
-+		return ret_val;
- 
--		ret_val = e1000_reconfigure_k1_exit_timeout(hw);
--		hw->phy.ops.release(hw);
--		if (ret_val) {
--			e_dbg("Error failed to reconfigure K1 exit timeout\n");
--			return ret_val;
--		}
-+	ret_val = e1000_reconfigure_k1_params(hw);
-+	hw->phy.ops.release(hw);
-+	if (ret_val) {
-+		e_dbg("Error failed to reconfigure K1 parameters\n");
-+		return ret_val;
- 	}
- 
- 	/* Initialize identification LED */
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index 201322dac233..116f3c92b5bc 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -7675,6 +7675,9 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	/* init PTP hardware clock */
- 	e1000e_ptp_init(adapter);
- 
-+	if (hw->mac.type >= e1000_pch_mtp)
-+		adapter->flags2 |= FLAG2_DISABLE_K1;
-+
- 	/* reset the hardware with the new settings */
- 	e1000e_reset(adapter);
- 
+ .../bindings/net/dsa/motorcomm,yt921x.yaml    |  167 +
+ MAINTAINERS                                   |    8 +
+ drivers/net/dsa/Kconfig                       |    7 +
+ drivers/net/dsa/Makefile                      |    1 +
+ drivers/net/dsa/yt921x.c                      | 2891 +++++++++++++++++
+ drivers/net/dsa/yt921x.h                      |  504 +++
+ include/net/dsa.h                             |    2 +
+ include/uapi/linux/if_ether.h                 |    1 +
+ net/dsa/Kconfig                               |    6 +
+ net/dsa/Makefile                              |    1 +
+ net/dsa/tag_yt921x.c                          |  141 +
+ 11 files changed, 3729 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+ create mode 100644 drivers/net/dsa/yt921x.c
+ create mode 100644 drivers/net/dsa/yt921x.h
+ create mode 100644 net/dsa/tag_yt921x.c
 
--- 
-2.51.0.rc1.197.g6d975e95c9d7
+--
+2.51.0
 
 
