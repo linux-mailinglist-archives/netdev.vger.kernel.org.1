@@ -1,126 +1,135 @@
-Return-Path: <netdev+bounces-230658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0067BEC63C
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 04:56:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55903BEC687
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 05:34:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A7C119A7630
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 02:56:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 062E06E3375
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 03:34:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80048273D9A;
-	Sat, 18 Oct 2025 02:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7FC2459E1;
+	Sat, 18 Oct 2025 03:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="V0iUx5sS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YC1shBOk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A9724EA81;
-	Sat, 18 Oct 2025 02:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC9D15ECD7
+	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 03:34:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760756168; cv=none; b=O9jeYE8epibqhrExnObBriXY7BAukvgTyCdd9CCKPfu+LDpuz244fVwDHaletXVhgExOmipx7tSNXRqsEBDSFnLCac0GozoqaDms/80h/dhL5QKts8IxUZ3Nh9mSgR+0kfgtPZOVlNxyuPD2t4n3DR55cE3uPkO1C4iQj/0X5X0=
+	t=1760758449; cv=none; b=l9Gqx7MmEpLCNyUqNtJoppm+vDMSEROW7NIMNBnNO3hBwdxdnemHIeOOnO9glQjcMQ0Taw9t97CkJ6366HnmaJJvDYWiu2kM/pP6+jyoUMRS+SxTk4ZRub1Kz01D66I9qh98PQl6rGwgOwJMWSLWPSfZ7VkXDqNJSkeT8uJDOQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760756168; c=relaxed/simple;
-	bh=+5oOPNDj4k5rECDdfajDXY5qRVPcA2BuFlWfjZRZrVQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E5DXsstFY398l7Wpjc/EMU1b9whkydJte9AiuTmVvuX0ReMXgY1CUED7PkXJcNILI2Af+99XgvuL9zL6Ff8PYdO6KQgnPicCiUXhQE1OOsyasY/IcDo78rF1mhnqCtwm4WzhABmgeN3O/UlYTMxI4P186Sw8yEO012mv/mYpbPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=V0iUx5sS; arc=none smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59I2A9Y3521369;
-	Sat, 18 Oct 2025 02:54:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	PPS06212021; bh=S2JR8vo2XxD0vTBK5qKMOyko11Mj16QiJ5O4zIN0A4U=; b=
-	V0iUx5sSWcmUl4EP7JeVV0AraWC5mKYPr1hdg+9JxWEJxbIGjyGTA+V0yv7Rr8WK
-	pYQv/p7ReL7pK38NGMFYh0g8xbzWJ4rNyQmZoVFqkfcRKcNEJroTgg5VcU/Fhod0
-	BO4m4bBofjnKV0gO4eGEcqm3kOMI4IwVdeepvfn1U+wuCoP8c+Bnq80r+oi17XDS
-	Z3FPCa9MSs1k4BrprC1IWEMLVqo17zoT624+CKR02CiZRVjxQIgEkgJlg/koOGe/
-	/5Lrk/ZjgqFAyDo6si1C8gvb7R+9VrHKD05FrsSM/JcZK0zZNV6yjhjOPsnbOi5k
-	F/AWEPGcagKv0QMJnNIMuQ==
-Received: from ala-exchng02.corp.ad.wrs.com ([128.224.246.37])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 49v1v580r2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Sat, 18 Oct 2025 02:54:40 +0000 (GMT)
-Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
- ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.59; Fri, 17 Oct 2025 19:54:37 -0700
-Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
- ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
- 15.1.2507.59 via Frontend Transport; Fri, 17 Oct 2025 19:54:33 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <kuba@kernel.org>
-CC: <ahmed.zaki@intel.com>, <aleksander.lobakin@intel.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-        <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-        <lizhi.xu@windriver.com>, <netdev@vger.kernel.org>,
-        <pabeni@redhat.com>, <samsun1006219@gmail.com>, <sdf@fomichev.me>,
-        <syzkaller-bugs@googlegroups.com>, <syzkaller@googlegroups.com>
-Subject: Re: [PATCH V2] usbnet: Prevents free active kevent
-Date: Sat, 18 Oct 2025 10:54:32 +0800
-Message-ID: <20251018025432.3076176-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251017152731.4bb7f1f9@kernel.org>
-References: <20251017152731.4bb7f1f9@kernel.org>
+	s=arc-20240116; t=1760758449; c=relaxed/simple;
+	bh=gYmdi6JiwWVpQ6TBq+3bLWOKPe4TLx5SGGvSpAVDKtw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n+1RWKuOymQwbEOhBwsDiX84vwRQYvSNu1rlw3Q09bY5W8YNzX2IeW7UUzTvT0RGk8fS3b/Baurw2Wf4QZeeKJOpPZfHPALCvwj8HF1LHinmXJCoYXgVO2KWXyu9UhtAL/bGZEpPG696JoEplUX/kZmKdMSw0k69Zzvdm/2R3Kw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YC1shBOk; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760758448; x=1792294448;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gYmdi6JiwWVpQ6TBq+3bLWOKPe4TLx5SGGvSpAVDKtw=;
+  b=YC1shBOkWnoAzlyKWvD350QrYr2it6c3lLLRRp41vX30N+s79UfU/hf+
+   yNJdKvp1RdDJFvpBaH0kydGdN97To3Zm1izKPWpUuGs3tMAzEVOUeNB7H
+   6+Pp9fvk0PtDKKlPCcphw3JwrQAbhmK0wLZqfqHpowXuGjn09uzloT02k
+   iY4mz6ZxCItlEZuIcLuUUYwHINg842saIsxGKK9O/kTbyrQWJNblj1ob3
+   g6YRRfTOcspxdl70OtKNvCxrAytUzJgQmx9v4QIzljzms8bGEYas3L69/
+   347dhUjRw8FrT6FgzG3+Lc4wMvKA7qrPar8QK5wtlyPV64AwSTCHLBpTD
+   A==;
+X-CSE-ConnectionGUID: QYk9najGT7GTdqDafC4Y+Q==
+X-CSE-MsgGUID: J3ux5zBDTHmUNeYmdGr6Ww==
+X-IronPort-AV: E=McAfee;i="6800,10657,11585"; a="80603289"
+X-IronPort-AV: E=Sophos;i="6.19,238,1754982000"; 
+   d="scan'208";a="80603289"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2025 20:34:06 -0700
+X-CSE-ConnectionGUID: dd69f0azSbSAVVL/9C0exA==
+X-CSE-MsgGUID: gZZK3RFBT0yEZJ7ZRqWNzA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,238,1754982000"; 
+   d="scan'208";a="183647805"
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by fmviesa010.fm.intel.com with ESMTP; 17 Oct 2025 20:34:04 -0700
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1v9xha-00081j-12;
+	Sat, 18 Oct 2025 03:33:57 +0000
+Date: Sat, 18 Oct 2025 11:33:20 +0800
+From: kernel test robot <lkp@intel.com>
+To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
+	Shyam-sundar.S-k@amd.com, Raju Rangoju <Raju.Rangoju@amd.com>
+Subject: Re: [PATCH net-next v2 2/4] amd-xgbe: add ethtool phy selftest
+Message-ID: <202510181124.5LDfdemg-lkp@intel.com>
+References: <20251017064704.3911798-3-Raju.Rangoju@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMCBTYWx0ZWRfX4P1ly4xdIDYD
- KG4hKN+7+A8HcH73q6O0pvLN8RoqH3ehcLYFWSYLzhBEJry3f5PbLUtm9AiZwzoD6bLeIEkkCBA
- vxWHAzBm+rEd7ppQr97rv11UL5cEHvrzMnzo5zIf+xBS7ePq/VDfkTAvbBKB7Xtr4bKVq/XAn0B
- RbeHF1DPFsLQa9+UgrpvVvSmtxjA3368nm/l9zetKLbJDYsVV4ZBeGf8+FqukgMXzhaPsROshoH
- Zy1pryU+ngf2eQgl33RaMJd58IV6/orcnfsTq9MFTYyxSthX2DyAKx7uZYbp5o7CRD89MlhquYd
- iaelqR2zOSmbRE8FMipYP8pqYBjdKuMEN5Tt8+iP+A5Hc4u7YvQ2Tzdlv0TuXHYO3LHd1qXJQvc
- 1obzYQs26CzVRZMcdCIGs4iV4CTs8w==
-X-Proofpoint-GUID: 1OUIEQobEWcvt5hrPTv8sKcXsRbE6xc1
-X-Proofpoint-ORIG-GUID: 1OUIEQobEWcvt5hrPTv8sKcXsRbE6xc1
-X-Authority-Analysis: v=2.4 cv=ANdmIO46 c=1 sm=1 tr=0 ts=68f30170 cx=c_pps
- a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=KThm-CiCeT3EGkx5rsgA:9
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-18_01,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 priorityscore=1501 phishscore=0 malwarescore=0 bulkscore=0
- impostorscore=0 clxscore=1015 suspectscore=0 lowpriorityscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510180020
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251017064704.3911798-3-Raju.Rangoju@amd.com>
 
-On Fri, 17 Oct 2025 15:27:31 -0700, Jakub Kicinski wrote:
-> On Fri, 17 Oct 2025 17:05:41 +0800 Lizhi Xu wrote:
-> > The root cause of this issue are:
-> > 1. When probing the usbnet device, executing usbnet_link_change(dev, 0, 0);
-> > put the kevent work in global workqueue. However, the kevent has not yet
-> > been scheduled when the usbnet device is unregistered. Therefore, executing
-> > free_netdev() results in the "free active object (kevent)" error reported
-> > here.
-> >
-> > 2. Another factor is that when calling usbnet_disconnect()->unregister_netdev(),
-> > if the usbnet device is up, ndo_stop() is executed to cancel the kevent.
-> > However, because the device is not up, ndo_stop() is not executed.
-> >
-> > The solution to this problem is to cancel the kevent before executing
-> > free_netdev(), which also deletes the delay timer.
-> 
-> Please add a fixes tag, and repost.
-Fixes: a69e617e533e ("usbnet: Fix linkwatch use-after-free on disconnect")
+Hi Raju,
 
-Later, I will repost new version patch in a new thread
-and at the correct time.
+kernel test robot noticed the following build warnings:
 
-BR,
-Lizhi
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Raju-Rangoju/amd-xgbe-introduce-support-ethtool-selftest/20251017-151230
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20251017064704.3911798-3-Raju.Rangoju%40amd.com
+patch subject: [PATCH net-next v2 2/4] amd-xgbe: add ethtool phy selftest
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20251018/202510181124.5LDfdemg-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251018/202510181124.5LDfdemg-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202510181124.5LDfdemg-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/amd/xgbe/xgbe-selftest.c: In function 'xgbe_selftest_get_strings':
+>> drivers/net/ethernet/amd/xgbe/xgbe-selftest.c:427:52: warning: '%s' directive output may be truncated writing up to 95 bytes into a region of size 28 [-Wformat-truncation=]
+     427 |                 snprintf(p, ETH_GSTRING_LEN, "%2d. %s", i + 1,
+         |                                                    ^~
+   drivers/net/ethernet/amd/xgbe/xgbe-selftest.c:427:17: note: 'snprintf' output between 5 and 100 bytes into a destination of size 32
+     427 |                 snprintf(p, ETH_GSTRING_LEN, "%2d. %s", i + 1,
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     428 |                          xgbe_selftests[i].name);
+         |                          ~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +427 drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
+
+066e40696db52b Raju Rangoju 2025-10-17  420  
+066e40696db52b Raju Rangoju 2025-10-17  421  void xgbe_selftest_get_strings(struct xgbe_prv_data *pdata, u8 *data)
+066e40696db52b Raju Rangoju 2025-10-17  422  {
+066e40696db52b Raju Rangoju 2025-10-17  423  	u8 *p = data;
+066e40696db52b Raju Rangoju 2025-10-17  424  	int i;
+066e40696db52b Raju Rangoju 2025-10-17  425  
+066e40696db52b Raju Rangoju 2025-10-17  426  	for (i = 0; i < xgbe_selftest_get_count(pdata); i++) {
+066e40696db52b Raju Rangoju 2025-10-17 @427  		snprintf(p, ETH_GSTRING_LEN, "%2d. %s", i + 1,
+066e40696db52b Raju Rangoju 2025-10-17  428  			 xgbe_selftests[i].name);
+066e40696db52b Raju Rangoju 2025-10-17  429  		p += ETH_GSTRING_LEN;
+066e40696db52b Raju Rangoju 2025-10-17  430  	}
+066e40696db52b Raju Rangoju 2025-10-17  431  }
+066e40696db52b Raju Rangoju 2025-10-17  432  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
