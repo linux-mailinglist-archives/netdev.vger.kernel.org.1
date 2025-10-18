@@ -1,447 +1,586 @@
-Return-Path: <netdev+bounces-230693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB33ABEDAF5
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 21:47:17 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C49ABEDB23
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 22:00:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 40D9034BF11
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 19:47:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C2D414E409E
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 20:00:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C20284693;
-	Sat, 18 Oct 2025 19:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C082728507E;
+	Sat, 18 Oct 2025 19:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NvrN7AkV";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="PAVbJfJ8"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ejlQvqtC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.34.181.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CEFB1B87C0;
-	Sat, 18 Oct 2025 19:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760816831; cv=fail; b=mahxPe5aiEXSCRhsXLrOKn7xv9MFW7x7BF35OPX77lV0k7gkOQXlfIGQuZ16SWODPQwk4f7Esnuht+l9feiZHUeIIMb9SJD0VM0fz432vfWhx5oz+YZGTiwnfELhlcKGLDH4r2K+T+qt6GlaesjIUFTzeuHr6mMy4KeOS3G+hj8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760816831; c=relaxed/simple;
-	bh=mqdiMEm/CTX+V6Yd/xKlQuxsCouPjel0wWQQolZdrQ8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=kStImwhbq/+ZhcpFWZ5SIHkjXqm2bNsuv5TeaxZJzzw9mTFw1xgQDx1rwMQ0zYq+NEXPD0uuFRwBnRHnKPLzuZCfm5YtjiBHfoIGQE+khqZ8akjtmFtCKmykP9fMi0+WoTu7lGY1gO5I1PRTr8c3umoX2+3HfVuMFBfXjCBVW2Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=NvrN7AkV; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=PAVbJfJ8; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59IHqDek017267;
-	Sat, 18 Oct 2025 19:46:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=Ce4KW7bUCOnMucv+X2Gr6kEJJ47iQ5oVVlsXu5pgKyI=; b=
-	NvrN7AkV9Yf+8lOAHpvk52Sr9r/AyJuhGqvyPP49W15yPqLWdRStkNsMb2oBtpVQ
-	LdxAfYi93coGDvK/ceM2MCVMlROhwbU+PZeX++ep4HLxNiHodovaVbVYG3JLgWrz
-	4v775JE99CE/IpBvUZ63MFpATze63lcyTaErr/ja/HW/9qa9PXjCYDNCApzBJw0I
-	nsHWGtTaZh2+jhFYIPyPS1drX2LNXKGWmM6t3hPaFGdb92itlvhcZckBUMXjA9Uu
-	SsrwJ+/tDb6GXHbLSHfCZ4DkFmNTXhq7OTa3KNPWH2PXjJTda4sqNIpz18fjO7VK
-	l0wMcMIcmfZFgnJi3Hyqcw==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49v2yprg3h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 18 Oct 2025 19:46:28 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59IDYAUx025420;
-	Sat, 18 Oct 2025 19:46:27 GMT
-Received: from bl0pr03cu003.outbound.protection.outlook.com (mail-eastusazon11012030.outbound.protection.outlook.com [52.101.53.30])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 49v1b9fycf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 18 Oct 2025 19:46:27 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wrHtsg1dZtscxT0wJgNDfxlzpmlu4e+EXMPIs1hAGWAnUQtNAQ2fYuCQuYthucGJf0qjKgHWa5R2sItUPO22H3m+MKCFQTc4tRxI9KeZYySI8KwiMkt6bfxMIYuCU+QYcXnd85VAlfo+LjDdW4X8DIVQt6a97sYGJ+w0mPJdb4KxSXaW5Hnukf44CdCWLeSHz5l87fCAkFtT66xgPwCJrL7pglwhSThwn7fJE/G1IYH6mf8KVimN4cM5S8XMoMRl9pIo7vpwTEVSQbD7vfB2tM6Gwkyn2liM8XvB/pu9aI1eY1MoqPgLVV8JflflDIdpykQghrWkkxUGm5JbGraGgQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ce4KW7bUCOnMucv+X2Gr6kEJJ47iQ5oVVlsXu5pgKyI=;
- b=u7WQzw2sVU0xD8ZJfsLFRgTDwZvR7AtIe/csNTN1Yzny1oEu1kH5SEqTAOZ8L9VPFSof3G7DRyj0QP41uyPWj3tf/bti04GtcSYbRez31WPNdKuo35jzCsOAjFXpwKPpSdsfDaBXshR30O2UuoAzfHLbeE/JAm3Cv6q2IfM7HlBUazmROCJxTUOp3WzSVFdWb19z8JIMtLnZoO8yVh9BKvCx9K95Zw2H0CfLo6CqXSC0aQJFiM13P2ffLZhkjBq1w9pHqjD9kPzZ8OhQs2l0XuvxSe5D2sowxf173imUwFxnsuwJjf40NGF0XXpjEeX2mmC5AerKIpooULfkQvxuiA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823D5277C9A;
+	Sat, 18 Oct 2025 19:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.34.181.151
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760817598; cv=none; b=ggCOsRf39KYsROOPLeloZODi6tWjcTd9R3iJmPSYGGhV71y+Dl4tHeySXFVhNueWM0NU2HSUZPhSNdxG8BsyizcE/ufNmsfT5X4hMeVra1jvVPZnG+WwULTsOoyAJb4+iV3Z670hZ+DCLTJfedsfW+o9ZdXdyr27+HW3LyPHtPw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760817598; c=relaxed/simple;
+	bh=bMV20D65SQY2T5+vRg8Qz5xebhjMdjI0P1Ep0l7Sirg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=loW/iLZ8BVZwl7fAXMDcabYPQI219rIBbrduIYBes8hnIQ5bySt+pV/qAyoduJ0afcCMK3JMeRGOPKD5AWg2sMekJkZ5cC/wtKzEBePb65Zamru6McfTrDuCbSiRhYp3yttuy6D0S03bemtZLsNL31CP9jYLUykpCZR3M1RKYwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ejlQvqtC; arc=none smtp.client-ip=52.34.181.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ce4KW7bUCOnMucv+X2Gr6kEJJ47iQ5oVVlsXu5pgKyI=;
- b=PAVbJfJ8rFaHLPEfGMUbz5A48QerO106qzBJ1awx7n8Jnr3q1Re4ItSxkke21GWDBAilt+QlwPqp0W911nkBsp2huzaPuwECArCNiyOCBQhA84VFfeUn1uajHUdVmF5w8t0j3LuVI0uBmG8rLW7QJXtzKRDM1ALGvyjXG3gbXEw=
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
- by DS0PR10MB7454.namprd10.prod.outlook.com (2603:10b6:8:163::11) with
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1760817596; x=1792353596;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=sEYdbCmseZgzNgUq/qO65kcsC90lv2jjfE41BXg79O0=;
+  b=ejlQvqtClOX7gRWZ2jDp9jQiPWKlWWAyxfwONJe/fZGCPRE9WJqU9WUK
+   6pGeGvhrmMS+TxYf69wLWUtcLN80p6wJOVHeuEjDBZmXhM7saNrogbhCY
+   mOSOzlEjQ2ThlYrB6b9cqqAsbMx8vtTiQk91xghu/Jqebo7jhExt+1vyq
+   vgy8RdXtvlXYuZegfYPH4xoVIxKv4vCedPsr2qIGfvW3zNT7EJEz7M5XF
+   xiNI5fFMYaqdM1TXkV/hZzpW+0QaF4sAbEfozmMeAbVgpfUtnEtcwcY88
+   3RJIW+Fy8VUSuQeQph5ButI9ix5DJp/6NaCBsS5pjI9xexz7hsL7ForiZ
+   Q==;
+X-CSE-ConnectionGUID: B8e9Z53URZGiJYgR/wmpLw==
+X-CSE-MsgGUID: sNPGVj6HR/uPqsJ6gHt1xg==
+X-IronPort-AV: E=Sophos;i="6.18,263,1751241600"; 
+   d="scan'208";a="5144657"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2025 19:59:54 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:10134]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.56.234:2525] with esmtp (Farcaster)
+ id 3afe7262-b5b9-4d6d-8904-b41b36d4b890; Sat, 18 Oct 2025 19:59:54 +0000 (UTC)
+X-Farcaster-Flow-ID: 3afe7262-b5b9-4d6d-8904-b41b36d4b890
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Sat, 18 Oct 2025 19:59:53 +0000
+Received: from dev-dsk-farbere-1a-46ecabed.eu-west-1.amazon.com
+ (172.19.116.181) by EX19D001UWA001.ant.amazon.com (10.13.138.214) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.13; Sat, 18 Oct
- 2025 19:46:21 +0000
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::743a:3154:40da:cf90]) by BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::743a:3154:40da:cf90%4]) with mapi id 15.20.9228.012; Sat, 18 Oct 2025
- 19:46:21 +0000
-Message-ID: <cc8a624b-6747-4566-b812-e27caf7861a9@oracle.com>
-Date: Sat, 18 Oct 2025 15:46:17 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 11/11] nfsd: wire up GET_DIR_DELEGATION handling
-To: Jeff Layton <jlayton@kernel.org>, Miklos Szeredi <miklos@szeredi.hu>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Trond Myklebust
- <trondmy@kernel.org>,
-        Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>,
-        Paulo Alcantara <pc@manguebit.org>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-        Bharath SM <bharathsm@microsoft.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Danilo Krummrich <dakr@kernel.org>,
-        David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>,
-        NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>,
-        Dai Ngo <Dai.Ngo@oracle.com>, Amir Goldstein <amir73il@gmail.com>,
-        Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Carlos Maiolino <cem@kernel.org>,
-        Kuniyuki Iwashima <kuniyu@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, netfs@lists.linux.dev,
-        ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
-        linux-xfs@vger.kernel.org, netdev@vger.kernel.org
-References: <20251017-dir-deleg-ro-v2-0-8c8f6dd23c8b@kernel.org>
- <20251017-dir-deleg-ro-v2-11-8c8f6dd23c8b@kernel.org>
-Content-Language: en-US
-From: Chuck Lever <chuck.lever@oracle.com>
-In-Reply-To: <20251017-dir-deleg-ro-v2-11-8c8f6dd23c8b@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH0PR13CA0010.namprd13.prod.outlook.com
- (2603:10b6:610:b1::15) To BN0PR10MB5128.namprd10.prod.outlook.com
- (2603:10b6:408:117::24)
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20; Sat, 18 Oct 2025
+ 19:59:51 +0000
+From: Eliav Farber <farbere@amazon.com>
+To: <stf_xl@wp.pl>, <helmut.schaa@googlemail.com>, <kvalo@codeaurora.org>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <linux-wireless@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<gregkh@linuxfoundation.org>, <stable@vger.kernel.org>, <nathan@kernel.org>,
+	<farbere@amazon.com>
+CC: "Jason A. Donenfeld" <Jason@zx2c4.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Andy Shevchenko
+	<andriy.shevchenko@linux.intel.com>, Kalle Valo <kvalo@kernel.org>, "Naresh
+ Kamboju" <naresh.kamboju@linaro.org>
+Subject: [PATCH 5.10.y] wifi: rt2x00: use explicitly signed or unsigned types
+Date: Sat, 18 Oct 2025 19:59:35 +0000
+Message-ID: <20251018195945.18825-1-farbere@amazon.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN0PR10MB5128:EE_|DS0PR10MB7454:EE_
-X-MS-Office365-Filtering-Correlation-Id: 023c69b2-4033-40d2-52f2-08de0e7f032b
-X-LD-Processed: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
- BCL:0;ARA:13230040|1800799024|376014|7416014|366016|921020|7053199007;
-X-Microsoft-Antispam-Message-Info:
- =?utf-8?B?ZXNsRTB4SWpacWRmdUFULzVRbnB5czNkeW8rdklLTVhaaDUxM1g5WXhTL25a?=
- =?utf-8?B?clc5eEd6V3d3MkhmdEROOGFUczFLM2s3WGFPSmhxdmdJbmxLaDE0RTFtYk5F?=
- =?utf-8?B?QTBkUENNUHpTVU1ZL2Fnd0RHbGVIdFFwMGpJQzBPYjM0TURTckgyOUhEU004?=
- =?utf-8?B?azVLVXA0V1pKai9iMC96TVRyZUthZjJCdXpEZEMxcklrY1krU2tJby9STndV?=
- =?utf-8?B?bTQ2SmVRTlFWekU4S1J5NGtpbGd2ZXFqM2dqdm9KY1ExWDRySHJMdUFCcVNr?=
- =?utf-8?B?SGRPTzBjaDN4RnpDY3RUa2ErczMxVnBHajFZSExPbkFZUTdkNkNuSk5sZ3ZZ?=
- =?utf-8?B?VnQ1T0NBb0M2T0JMT01IdjRmU2NZMXA4cG9SMVZaVmVUZFJXSUhaN0RCNXlZ?=
- =?utf-8?B?YTZDMHdRZlBGaHNOUTcvcnJLOXVIQ3czVFljQjZQUm9OT1RHZ3dnM1pLb2kr?=
- =?utf-8?B?TlZucWtGZDNpcTlSdFhVaGphVGswZmVuUkN2VmZkK2MvM3UwNkF2Q01jSGFD?=
- =?utf-8?B?QUtkOS9oSGtlb0wwOGRzR3lvb3dVMVhrSVVZZ2hrOHNzVjZ6dHFOajllVkxz?=
- =?utf-8?B?WmJ5ZEtZM1FUN3hCazJOazJpUG1ocm11Si9rQzU3YU5jcUUrNUZZaDUwZ2dB?=
- =?utf-8?B?dkZ4clJCeStSWUkrUDZ0ZmoxektDcTl4V3h4dTJvZll5TW15VVJ0ajlJZHNl?=
- =?utf-8?B?WmpTUmc0YjRKS2xRM09oN2tjM2ZMMHBMOUJzcjVuQTFCY1poZi8reW92dXV6?=
- =?utf-8?B?M3RYanZOR3JUUkxWN0xiOHlSdjBYeHczOFgvZUd6ZVhaRFZpTnVEWE00dmJE?=
- =?utf-8?B?VkMvTXdLUE1zeWpFRG00L0lKcGJtaEczeWc5Tm9ZTmplRW0zQ0ZzUXNHZDc2?=
- =?utf-8?B?RlU0TzFHUnIxaWwzd2xaQnRjRC85K0VLdmxybkgwbFB0Rk5xVVNlcVNIUkFx?=
- =?utf-8?B?MkNabnpWZmZWTXJFbTlTMldRQkp0UW5uQUFiNFdIdEp3RHRIbW1odzROSDdj?=
- =?utf-8?B?cWFoNHdpY3llTjBXWnFVVktXamZyUEZudjlmZmRqQkhFOWVaaWRPSjN1NVV0?=
- =?utf-8?B?aW9TeDdvVEhDT2R6QUE1VVIwT00vMG1aRGF0V0NxQWpZM1RTV0VBSUxJSjdQ?=
- =?utf-8?B?bkFXUWJBOWZBcnpKNjZlUVU2cXJ5U3BjbkcwMEptUHErSWNyS0dHU2xEZElU?=
- =?utf-8?B?b21kb2xBclhWTGIrUGYvbERTSjZBZUp2SUZsNzBHNnljQ1pOeXpBVzBzNHJp?=
- =?utf-8?B?eTkyUnpUS29MUjg3K1VIaG5BRVdhMmNGQ3l0SHkvK2hKUHo2Z0MwK01FMHVO?=
- =?utf-8?B?SzRqWFViTW9xWlhjMGZ0RG5CMWlmbFhDZ28yWkFQb2lxZU9MNUY2NG1CTmY2?=
- =?utf-8?B?VThUR3VjZDExOWxycE9CaTFwRlhIVFMyNVF6b29LRVhpaTBBTU5mWkxtVWQy?=
- =?utf-8?B?dzJLem9zQjdiU2thdHd4TDJQUysyQ1I2Nk5xM0NTNVBVRHkzNzFCZm1OMzBr?=
- =?utf-8?B?RXdRY3kwQjN6OENySzkzUWpzRkJKQ1llaXRIQURueVZId3UwcHVPbVJwRTQx?=
- =?utf-8?B?L2ZpeDRuRDMwa2dVRllTUk53L1hRMDkzaWY1NU12THNyam9HcFZMMElGMWZZ?=
- =?utf-8?B?SHlsbGtyZ0dsb20vVUc2S2dXNGRXZ2pxZWRWWjNrM3RUOWJwRFp5aW9vODRX?=
- =?utf-8?B?czNuVmMxT3pneTZ6TUZzcXVPWnVKaU95MlY5UkFuMUwrUDZ0dDNRdUU3aTlX?=
- =?utf-8?B?K3hxVGJaZjZSMUwzMFRNb3pIbk9yMGNzQzE0WHk5SDVKSmlNdmVmeWZpUXlO?=
- =?utf-8?B?cTFWMmVvTllMN28rdmJnaVlrMUNkY09nVkFOQ2pIMVY5UzNmZG9QZmh5ajg2?=
- =?utf-8?B?S2RoMDhPYlVmYWtNMCtRUVBkUlp2OHVIdkVuQ1JyTnZUN0NrUnNCdHp6VmhD?=
- =?utf-8?B?YW93MnNnM2VpbVZya3g1VGU2ZjBRZDNRL1pPaW42QzhWYVF5a3lmaVNFZTVq?=
- =?utf-8?Q?gIILlO4Z00gZnkHQ1iqdnTkuIXjdHs=3D?=
-X-Forefront-Antispam-Report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(921020)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
- =?utf-8?B?ZFpYZHFUcDcrRGN6NEIzUVg1SVpVQ3ZVUjRHV1REOUZoTGZXdUl5aDZ6OFJt?=
- =?utf-8?B?TGNNdGg4aC9RNGVyeDluS0Z4MUowd2N1YW9iVEhZSzdBakhwNS9JOFNodHpN?=
- =?utf-8?B?QkEyaHFtb3I0aGkydHlqL2toSEh6QlpYcm9GWWU4Ymx0Z2xoVnJBQkQraEtP?=
- =?utf-8?B?S0lyMWNtaUdHblZuRE5qckFjNitua3QzMDRmck1jUlZiWktDQ2ZoYitXQ0RV?=
- =?utf-8?B?MUdoWlFIb3EzK0lHdDZxRUttcFUxR21Ob01qOXVjUG01SWhrRUloNGZiZTBl?=
- =?utf-8?B?L0RNbUIxZDZQalFPOHVvbU43RlhQeVRZMkxMa3RXNmw2RklYejVQdTlBenVr?=
- =?utf-8?B?NFJVUmEwM2twazRBVTJkZ2VBY3BGTlJKa2hTRG44cGtJT2pyWW42RmxiaDBo?=
- =?utf-8?B?YWVybGUydDZwbUQ4cWxNQzJnd3VKMjdNWHNEZzl1UllyOFJ3b1VMVUFmNUFQ?=
- =?utf-8?B?cmdRVDRXV1k3NnpoWUxpWjZHclUzVktHbFRPT3ZwR0ZZMjk5R3VmWkRZL1JE?=
- =?utf-8?B?RkMvcndKbWxhNzlIUncyZFliSlBCYXNVV2hVdEZIbTY3R2ZWMkZsaHcxZmxV?=
- =?utf-8?B?QWUxdmpZVExjQXJiVkxaeldvSWlSQjZBTjl6bkFESlBFTUQyNnMrdlJUSFlO?=
- =?utf-8?B?OUtMYzJLQmlUdWI2clAzMTJWYmUrSUt3VXMwd09tVjVnRHFXeUMyZ2xwQmpB?=
- =?utf-8?B?UUdHOTBVTXZrcS8zS1d4clR0NEhMbytMU0xEWUkzMXkxOEN3eUJJbXYxSUxi?=
- =?utf-8?B?bkUwT1E4VTRXMzdnMzBLendoTUVHT05nQlJCV3pBTUU3aHVxYkNubDhPWFBv?=
- =?utf-8?B?bEE4ZWNTWmxYR0x1a2ZHb2ZENUwrY0xoY2xNeHNBM1hnNEdUWjZXb2lXbXBq?=
- =?utf-8?B?cExxb1hwYlVPSzRNZnJ2b0tQcjdNSFhic2xTWUt5NlFKOEJYZFVKc3h0WUlZ?=
- =?utf-8?B?OW1NbGRGTDF6c01DK3FKSVAzUDNMS0d4cUErWEhnSldxaWlXOFEvb1N5d1Rp?=
- =?utf-8?B?N1Brd2JjRlIzYW1TbkNqNG5ISzIrT3NldDM3ZjFUczYzZktteCtpVkhJT0x4?=
- =?utf-8?B?VUIyRTh0WWFRb241SUgydm41anpZMUtJNnZlT2NJc25yVHErbkpuQlBtZ013?=
- =?utf-8?B?N3JFM3BXb3V2d3BkZjZQN1FNclRyMXE1RXA2aGt3UkEyYzUwdkUvVEQyWEhv?=
- =?utf-8?B?MFRqVzl1VWtiS1h1M0ZaRVZTZGxlQmtlRm5nVFBncTFZSmtES3Rtc3BaUUFs?=
- =?utf-8?B?S1V5bDZTSUpFdTFydnFiNU05SndCYXVEMjBLUzZHZ3llR2d6Tlp3NVg0N1NZ?=
- =?utf-8?B?aXN6RGFwODJnTW1DNG02VWIrQ2EyNlk4QlhMYVlDOG9maXNMZ2JLYWo1Z0dJ?=
- =?utf-8?B?RzM4K0xIQzc1UTVqMkJoczQrUDJoVHdlMmNIRkZHa2NoS2RNWEMxekgwS2ZS?=
- =?utf-8?B?V2NrNm1wb3FCS1k4RCtiY1dYUWhJMEw0QjZDYnN5MWU2bnI1Y1NlOS9FREx4?=
- =?utf-8?B?SWI3TFJSdnNwcVllZC9oRlhXSTFEOWpySjBzWFB0QUc0cEFBMVo0UUhyU2Jw?=
- =?utf-8?B?QTN4WTh3OFoyUWJMYjJOQmorUlV1OWdUTDh5dFJQK2NXUStCcmM4bEpOaTZw?=
- =?utf-8?B?NThXT3R3a1pmWDRRQUQ1T1BsbTFOTEN5RWYvSEkrZm9DWVBjaTArdnlaZ09N?=
- =?utf-8?B?T0VjZmhxNW91YTMvUVI1Z3N1ajVlVFcyYjZ4Q0hFVitIOENQN3Ryd2tKWjZm?=
- =?utf-8?B?UWtNTGM2am5kaXpSaGZkWW9hTWdOcmVFZ3g0ZEh3UHBhV0h5QUNpS28yK1pj?=
- =?utf-8?B?NHEyeHF3YU4zNXE2OE1yRlkrOXpvS0VPNFg0UVA3ODRKVkVwcFpRMVVCYVZ2?=
- =?utf-8?B?aXd4aG5TV3BKNnRONHk1OTZXY1FubjZYUG9OM0xXNlZLQlpGcFJWRVZLSUpJ?=
- =?utf-8?B?TitlcEhocmR1SzR0ZFByZVdCYUd1SDdtU0ZHa0YwdTF1dGhUSHcyYjVBRG10?=
- =?utf-8?B?MW5XclZlSmMrNmovZTJSVGVyUExKeFNjMkdlQno4Q0NEMWxYcVhYR041Y0tq?=
- =?utf-8?B?N3ZHZDd1MW52OTJUWHh1d0srNWIyQ1NpTmd6ZWNsYzZCREZoSmVabGNnWDdG?=
- =?utf-8?B?TlRDajBPOUd0OTJhMHQ5d3g2bGtMell6ZGpWSnFJVUptY2dXdlMxY2hQNnZx?=
- =?utf-8?B?cVE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	/3uCIboQZ+0pFbSY9dXX+ToFrusHzwRkLY6WqXAoK4XmHt9HqSEdIv6T/H911HUE/6RVetVtSI5QSaQK15gXbaTD/wE7RviHz9uYg2oZxgoaVLbJQ3JGuY040wkI9rvzW4qPFbPHqD192+WyHFc7pMYGyEsc8wOxv2iE4ECI+n7An7stvBhzqJOJ46Zl7lqrCoW1QM0HZgtFFdKlOm2aVea5wLIEz+I37cWQMNHGbwRS/Elks1+dEdlibFJcGbQx/Srr1CnSxpRUutjcFjoeKgykqJFELHTEHrzVZumJ5NLGKw7cnD9PkohEPa7tJeiBQo+taSW4XrM6C0Rq7gh3dw17zgYukdambTxJXPmAz2skx/kPg+8kQtFuz1sDGffrnjfq60vZb5di8SdcyPt69lKh9OuqCiwFcl7ZbIxvEe31BqlR/CmmQqv0+L1hIQ019Ws1cwkMWLQoO7vc3DapYJEPLFv58Pi3InsJpLNkVuBEOa5oVLzvZ7LYsB6o35pHXesQRva1MTTiKwZmEN0r42V/2y6pHaS9bwcWDp530JY+VG1KHbcmn9nd8VFMfmV+HEvz8viGMeonJw7X29miwddi/RYMDZ7DN/bqVAq/OkU=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 023c69b2-4033-40d2-52f2-08de0e7f032b
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2025 19:46:21.2285
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AGp5v3vcrXvtN2FArulQCY1aBPtO8XqdI71m1+mmUNe1n6zRf+tnxnMgWUS2coFGiY3PbXg3xxFS3XrxurFEYg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB7454
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-18_07,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 spamscore=0
- adultscore=0 suspectscore=0 malwarescore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510020000
- definitions=main-2510180143
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMyBTYWx0ZWRfX7YZY4aaS1kBq
- WZ6h3Ckg1+yap4ReXErsudhHCaWg9VklKJS4a4AdRTmUf2xyAI/02JmXEg+kPVugPkqX05xm/gL
- SOdUyf+rQpAW1o7br1gEbtCgLILGux2MO1KUQyP8oiuw9auEo0fABk3H3f4HRmQrG/vxRs8KZ2H
- aGqocQUDlYhbAmO4mgw4Fh9f4dbEeHI71xR3fq+s1recbvwfxbJbWyk66D3ykMsBJmPDYf+mgVt
- Oz4Z6b0JKhTNSOfV1DaVDStAWoTVgfV/4rovYL1YKm5qe5LksYet9JED0QSTqpME1PEfj2eMmBJ
- OxqjN357zfg0ziWbuK16lpqhu+Pg9OVKHq39R9gX5wRqQDFkJg4ONlfLkvcsX8J5hryvAAA15mi
- w8MbMGmjVyOQhR+6jb847zlr4raEwA==
-X-Proofpoint-GUID: v34Tvpu2blxQG8BPyJay3k8j0NUmvsDY
-X-Authority-Analysis: v=2.4 cv=Db8aa/tW c=1 sm=1 tr=0 ts=68f3ee94 cx=c_pps
- a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=x6icFKpwvdMA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=_f52hmyKKtPQ7mZJ_noA:9 a=QEXdDO2ut3YA:10
- a=UhEZJTgQB8St2RibIkdl:22 a=Z5ABNNGmrOfJ6cZ5bIyy:22 a=QOGEsqRv6VhmHaoFNykA:22
-X-Proofpoint-ORIG-GUID: v34Tvpu2blxQG8BPyJay3k8j0NUmvsDY
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D037UWC001.ant.amazon.com (10.13.139.197) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On 10/17/25 7:32 AM, Jeff Layton wrote:
-> Add a new routine for acquiring a read delegation on a directory. These
-> are recallable-only delegations with no support for CB_NOTIFY. That will
-> be added in a later phase.
-> 
-> Since the same CB_RECALL/DELEGRETURN infrastrure is used for regular and
-> directory delegations, a normal nfs4_delegation is used to represent a
-> directory delegation.
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 
-s/infrastrure/infrastructure/
+commit 66063033f77e10b985258126a97573f84bb8d3b4 upstream.
+
+On some platforms, `char` is unsigned, but this driver, for the most
+part, assumed it was signed. In other places, it uses `char` to mean an
+unsigned number, but only in cases when the values are small. And in
+still other places, `char` is used as a boolean. Put an end to this
+confusion by declaring explicit types, depending on the context.
+
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Stanislaw Gruszka <stf_xl@wp.pl>
+Cc: Helmut Schaa <helmut.schaa@googlemail.com>
+Cc: Kalle Valo <kvalo@kernel.org>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Acked-by: Stanislaw Gruszka <stf_xl@wp.pl>
+Signed-off-by: Kalle Valo <kvalo@kernel.org>
+Link: https://lore.kernel.org/r/20221019155541.3410813-1-Jason@zx2c4.com
+Cc: Naresh Kamboju <naresh.kamboju@linaro.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Eliav Farber <farbere@amazon.com>
+---
+This backport is required to fix build errors on an arm64 server when building with allmodconfig.
+The build failures were introduced after backporting:
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/commit/queue-5.10?id=37c71b96ff37b6a069569841b1baa51be72299b2
+
+The original commit in the mainline branch is:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/net/wireless/ralink/rt2x00/rt2800lib.c?h=v6.18-rc1&id=66063033f77e10b985258126a97573f84bb8d3b4
+
+This fix already exists in 5.15.y:
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/drivers/net/wireless/ralink/rt2x00/rt2800lib.c?h=v5.15.194&id=2d3cef3d7a5df260a14a6679c4aca0c97e570ee5
+…but is missing in 5.10.y.
 
 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  fs/nfsd/nfs4proc.c  |  21 ++++++++++-
->  fs/nfsd/nfs4state.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  fs/nfsd/state.h     |   5 +++
->  3 files changed, 125 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/nfsd/nfs4proc.c b/fs/nfsd/nfs4proc.c
-> index 7f7e6bb23a90d9a1cafd154c0f09e236df75b083..527f8dc52159803770964700170473509ec328ed 100644
-> --- a/fs/nfsd/nfs4proc.c
-> +++ b/fs/nfsd/nfs4proc.c
-> @@ -2342,6 +2342,13 @@ nfsd4_get_dir_delegation(struct svc_rqst *rqstp,
->  			 union nfsd4_op_u *u)
->  {
->  	struct nfsd4_get_dir_delegation *gdd = &u->get_dir_delegation;
-> +	struct nfs4_delegation *dd;
-> +	struct nfsd_file *nf;
-> +	__be32 status;
-> +
-> +	status = nfsd_file_acquire_dir(rqstp, &cstate->current_fh, &nf);
-> +	if (status != nfs_ok)
-> +		return status;
->  
->  	/*
->  	 * RFC 8881, section 18.39.3 says:
-> @@ -2355,7 +2362,19 @@ nfsd4_get_dir_delegation(struct svc_rqst *rqstp,
->  	 * return NFS4_OK with a non-fatal status of GDD4_UNAVAIL in this
->  	 * situation.
->  	 */
-> -	gdd->gddrnf_status = GDD4_UNAVAIL;
-> +	dd = nfsd_get_dir_deleg(cstate, gdd, nf);
-> +	if (IS_ERR(dd)) {
-> +		int err = PTR_ERR(dd);
-> +
-> +		if (err != -EAGAIN)
-> +			return nfserrno(err);
-> +		gdd->gddrnf_status = GDD4_UNAVAIL;
-> +		return nfs_ok;
-> +	}
+The error encountered during the build:
 
-These error flows might leak the nf acquired just above.
-
-
-> +
-> +	gdd->gddrnf_status = GDD4_OK;
-> +	memcpy(&gdd->gddr_stateid, &dd->dl_stid.sc_stateid, sizeof(gdd->gddr_stateid));
-> +	nfs4_put_stid(&dd->dl_stid);
->  	return nfs_ok;
->  }
->  
-> diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-> index b06591f154aa372db710e071c69260f4639956d7..a63e8c885291fc377163f3255f26f5f693704437 100644
-> --- a/fs/nfsd/nfs4state.c
-> +++ b/fs/nfsd/nfs4state.c
-> @@ -9359,3 +9359,103 @@ nfsd4_deleg_getattr_conflict(struct svc_rqst *rqstp, struct dentry *dentry,
->  	nfs4_put_stid(&dp->dl_stid);
->  	return status;
->  }
-> +
-> +/**
-> + * nfsd_get_dir_deleg - attempt to get a directory delegation
-> + * @cstate: compound state
-> + * @gdd: GET_DIR_DELEGATION arg/resp structure
-> + * @nf: nfsd_file opened on the directory
-> + *
-> + * Given a GET_DIR_DELEGATION request @gdd, attempt to acquire a delegation
-> + * on the directory to which @nf refers. Note that this does not set up any
-> + * sort of async notifications for the delegation.
-> + */
-> +struct nfs4_delegation *
-> +nfsd_get_dir_deleg(struct nfsd4_compound_state *cstate,
-> +		   struct nfsd4_get_dir_delegation *gdd,
-> +		   struct nfsd_file *nf)
-> +{
-> +	struct nfs4_client *clp = cstate->clp;
-> +	struct nfs4_delegation *dp;
-> +	struct file_lease *fl;
-> +	struct nfs4_file *fp, *rfp;
-> +	int status = 0;
-> +
-> +	fp = nfsd4_alloc_file();
-> +	if (!fp)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	nfsd4_file_init(&cstate->current_fh, fp);
-> +
-> +	rfp = nfsd4_file_hash_insert(fp, &cstate->current_fh);
-> +	if (unlikely(!rfp)) {
-> +		put_nfs4_file(fp);
-> +		return ERR_PTR(-ENOMEM);
-> +	}
-> +
-> +	if (rfp != fp) {
-> +		put_nfs4_file(fp);
-> +		fp = rfp;
-> +	}
-> +
-> +	/* if this client already has one, return that it's unavailable */
-> +	spin_lock(&state_lock);
-> +	spin_lock(&fp->fi_lock);
-> +	/* existing delegation? */
-> +	if (nfs4_delegation_exists(clp, fp)) {
-> +		status = -EAGAIN;
-> +	} else if (!fp->fi_deleg_file) {
-> +		fp->fi_deleg_file = nf;
-> +		fp->fi_delegees = 1;
-> +	} else {
-> +		++fp->fi_delegees;
-
-The new nf is unused in this arm. Does it need to be released?
+In file included from <command-line>:
+In function ‘rt2800_txpower_to_dev’,
+    inlined from ‘rt2800_config_channel’ at drivers/net/wireless/ralink/rt2x00/rt2800lib.c:4022:25:
+././include/linux/compiler_types.h:309:45: error: call to ‘__compiletime_assert_1168’ declared with attribute error: clamp() low limit -7 greater than high limit 15
+  309 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+      |                                             ^
+././include/linux/compiler_types.h:290:25: note: in definition of macro ‘__compiletime_assert’
+  290 |                         prefix ## suffix();                             \
+      |                         ^~~~~~
+././include/linux/compiler_types.h:309:9: note: in expansion of macro ‘_compiletime_assert’
+  309 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+      |         ^~~~~~~~~~~~~~~~~~~
+./include/linux/build_bug.h:39:37: note: in expansion of macro ‘compiletime_assert’
+   39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+      |                                     ^~~~~~~~~~~~~~~~~~
+./include/linux/minmax.h:188:9: note: in expansion of macro ‘BUILD_BUG_ON_MSG’
+  188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),                            \
+      |         ^~~~~~~~~~~~~~~~
+./include/linux/minmax.h:195:9: note: in expansion of macro ‘__clamp_once’
+  195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_), __UNIQUE_ID(l_), __UNIQUE_ID(h_))
+      |         ^~~~~~~~~~~~
+./include/linux/minmax.h:218:36: note: in expansion of macro ‘__careful_clamp’
+  218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
+      |                                    ^~~~~~~~~~~~~~~
+drivers/net/wireless/ralink/rt2x00/rt2800lib.c:3980:24: note: in expansion of macro ‘clamp_t’
+ 3980 |                 return clamp_t(char, txpower, MIN_A_TXPOWER, MAX_A_TXPOWER);
+      |                        ^~~~~~~
+In function ‘rt2800_txpower_to_dev’,
+    inlined from ‘rt2800_config_channel’ at drivers/net/wireless/ralink/rt2x00/rt2800lib.c:4024:25:
+././include/linux/compiler_types.h:309:45: error: call to ‘__compiletime_assert_1168’ declared with attribute error: clamp() low limit -7 greater than high limit 15
+  309 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+      |                                             ^
+././include/linux/compiler_types.h:290:25: note: in definition of macro ‘__compiletime_assert’
+  290 |                         prefix ## suffix();                             \
+      |                         ^~~~~~
+././include/linux/compiler_types.h:309:9: note: in expansion of macro ‘_compiletime_assert’
+  309 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+      |         ^~~~~~~~~~~~~~~~~~~
+./include/linux/build_bug.h:39:37: note: in expansion of macro ‘compiletime_assert’
+   39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+      |                                     ^~~~~~~~~~~~~~~~~~
+./include/linux/minmax.h:188:9: note: in expansion of macro ‘BUILD_BUG_ON_MSG’
+  188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),                            \
+      |         ^~~~~~~~~~~~~~~~
+./include/linux/minmax.h:195:9: note: in expansion of macro ‘__clamp_once’
+  195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_), __UNIQUE_ID(l_), __UNIQUE_ID(h_))
+      |         ^~~~~~~~~~~~
+./include/linux/minmax.h:218:36: note: in expansion of macro ‘__careful_clamp’
+  218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
+      |                                    ^~~~~~~~~~~~~~~
+drivers/net/wireless/ralink/rt2x00/rt2800lib.c:3980:24: note: in expansion of macro ‘clamp_t’
+ 3980 |                 return clamp_t(char, txpower, MIN_A_TXPOWER, MAX_A_TXPOWER);
+      |                        ^~~~~~~
+In function ‘rt2800_txpower_to_dev’,
+    inlined from ‘rt2800_config_channel’ at drivers/net/wireless/ralink/rt2x00/rt2800lib.c:4028:4:
+././include/linux/compiler_types.h:309:45: error: call to ‘__compiletime_assert_1168’ declared with attribute error: clamp() low limit -7 greater than high limit 15
+  309 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+      |                                             ^
+././include/linux/compiler_types.h:290:25: note: in definition of macro ‘__compiletime_assert’
+  290 |                         prefix ## suffix();                             \
+      |                         ^~~~~~
+././include/linux/compiler_types.h:309:9: note: in expansion of macro ‘_compiletime_assert’
+  309 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+      |         ^~~~~~~~~~~~~~~~~~~
+./include/linux/build_bug.h:39:37: note: in expansion of macro ‘compiletime_assert’
+   39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+      |                                     ^~~~~~~~~~~~~~~~~~
+./include/linux/minmax.h:188:9: note: in expansion of macro ‘BUILD_BUG_ON_MSG’
+  188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),                            \
+      |         ^~~~~~~~~~~~~~~~
+./include/linux/minmax.h:195:9: note: in expansion of macro ‘__clamp_once’
+  195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_), __UNIQUE_ID(l_), __UNIQUE_ID(h_))
+      |         ^~~~~~~~~~~~
+./include/linux/minmax.h:218:36: note: in expansion of macro ‘__careful_clamp’
+  218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
+      |                                    ^~~~~~~~~~~~~~~
+drivers/net/wireless/ralink/rt2x00/rt2800lib.c:3980:24: note: in expansion of macro ‘clamp_t’
+ 3980 |                 return clamp_t(char, txpower, MIN_A_TXPOWER, MAX_A_TXPOWER);
+      |                        ^~~~~~~
+make[5]: *** [scripts/Makefile.build:286: drivers/net/wireless/ralink/rt2x00/rt2800lib.o] Error 1
+make[4]: *** [scripts/Makefile.build:503: drivers/net/wireless/ralink/rt2x00] Error 2
+make[3]: *** [scripts/Makefile.build:503: drivers/net/wireless/ralink] Error 2
+make[2]: *** [scripts/Makefile.build:503: drivers/net/wireless] Error 2
+make[1]: *** [scripts/Makefile.build:503: drivers/net] Error 2
+make[1]: *** Waiting for unfinished jobs....
+make: *** [Makefile:1851: drivers] Error 2
+make: *** Waiting for unfinished jobs....
+  CC [M]  kernel/kheaders.o
 
 
-> +	}
-> +	spin_unlock(&fp->fi_lock);
-> +	spin_unlock(&state_lock);
-> +
-> +	if (status) {
-> +		put_nfs4_file(fp);
-> +		return ERR_PTR(status);
-> +	}
-> +
-> +	/* Try to set up the lease */
-> +	status = -ENOMEM;
-> +	dp = alloc_init_deleg(clp, fp, NULL, NFS4_OPEN_DELEGATE_READ);
-> +	if (!dp)
-> +		goto out_delegees;
-> +
-> +	fl = nfs4_alloc_init_lease(dp);
-> +	if (!fl)
-> +		goto out_put_stid;
-> +
-> +	status = kernel_setlease(nf->nf_file,
-> +				 fl->c.flc_type, &fl, NULL);
-> +	if (fl)
-> +		locks_free_lease(fl);
-> +	if (status)
-> +		goto out_put_stid;
-> +
-> +	/*
-> +	 * Now, try to hash it. This can fail if we race another nfsd task
-> +	 * trying to set a delegation on the same file. If that happens,
-> +	 * then just say UNAVAIL.
-> +	 */
-> +	spin_lock(&state_lock);
-> +	spin_lock(&clp->cl_lock);
-> +	spin_lock(&fp->fi_lock);
-> +	status = hash_delegation_locked(dp, fp);
-> +	spin_unlock(&fp->fi_lock);
-> +	spin_unlock(&clp->cl_lock);
-> +	spin_unlock(&state_lock);
-> +
-> +	if (!status)
-> +		return dp;
-> +
-> +	/* Something failed. Drop the lease and clean up the stid */
-> +	kernel_setlease(fp->fi_deleg_file->nf_file, F_UNLCK, NULL, (void **)&dp);
-> +out_put_stid:
-> +	nfs4_put_stid(&dp->dl_stid);
-> +out_delegees:
-> +	put_deleg_file(fp);
-> +	return ERR_PTR(status);
-> +}
-> diff --git a/fs/nfsd/state.h b/fs/nfsd/state.h
-> index 1e736f4024263ffa9c93bcc9ec48f44566a8cc77..b052c1effdc5356487c610db9728df8ecfe851d4 100644
-> --- a/fs/nfsd/state.h
-> +++ b/fs/nfsd/state.h
-> @@ -867,4 +867,9 @@ static inline bool try_to_expire_client(struct nfs4_client *clp)
->  
->  extern __be32 nfsd4_deleg_getattr_conflict(struct svc_rqst *rqstp,
->  		struct dentry *dentry, struct nfs4_delegation **pdp);
-> +
-> +struct nfsd4_get_dir_delegation;
-> +struct nfs4_delegation *nfsd_get_dir_deleg(struct nfsd4_compound_state *cstate,
-> +						struct nfsd4_get_dir_delegation *gdd,
-> +						struct nfsd_file *nf);
->  #endif   /* NFSD4_STATE_H */
-> 
+ .../net/wireless/ralink/rt2x00/rt2400pci.c    |  8 ++---
+ .../net/wireless/ralink/rt2x00/rt2400pci.h    |  2 +-
+ .../net/wireless/ralink/rt2x00/rt2500pci.c    |  8 ++---
+ .../net/wireless/ralink/rt2x00/rt2500pci.h    |  2 +-
+ .../net/wireless/ralink/rt2x00/rt2500usb.c    |  8 ++---
+ .../net/wireless/ralink/rt2x00/rt2500usb.h    |  2 +-
+ .../net/wireless/ralink/rt2x00/rt2800lib.c    | 36 +++++++++----------
+ .../net/wireless/ralink/rt2x00/rt2800lib.h    |  8 ++---
+ .../net/wireless/ralink/rt2x00/rt2x00usb.c    |  6 ++--
+ drivers/net/wireless/ralink/rt2x00/rt61pci.c  |  4 +--
+ drivers/net/wireless/ralink/rt2x00/rt61pci.h  |  2 +-
+ drivers/net/wireless/ralink/rt2x00/rt73usb.c  |  4 +--
+ drivers/net/wireless/ralink/rt2x00/rt73usb.h  |  2 +-
+ 13 files changed, 46 insertions(+), 46 deletions(-)
 
-
+diff --git a/drivers/net/wireless/ralink/rt2x00/rt2400pci.c b/drivers/net/wireless/ralink/rt2x00/rt2400pci.c
+index 8f860c14da58..1520785c3ddb 100644
+--- a/drivers/net/wireless/ralink/rt2x00/rt2400pci.c
++++ b/drivers/net/wireless/ralink/rt2x00/rt2400pci.c
+@@ -1023,9 +1023,9 @@ static int rt2400pci_set_state(struct rt2x00_dev *rt2x00dev,
+ {
+ 	u32 reg, reg2;
+ 	unsigned int i;
+-	char put_to_sleep;
+-	char bbp_state;
+-	char rf_state;
++	bool put_to_sleep;
++	u8 bbp_state;
++	u8 rf_state;
+ 
+ 	put_to_sleep = (state != STATE_AWAKE);
+ 
+@@ -1561,7 +1561,7 @@ static int rt2400pci_probe_hw_mode(struct rt2x00_dev *rt2x00dev)
+ {
+ 	struct hw_mode_spec *spec = &rt2x00dev->spec;
+ 	struct channel_info *info;
+-	char *tx_power;
++	u8 *tx_power;
+ 	unsigned int i;
+ 
+ 	/*
+diff --git a/drivers/net/wireless/ralink/rt2x00/rt2400pci.h b/drivers/net/wireless/ralink/rt2x00/rt2400pci.h
+index b8187b6de143..979d5fd8babf 100644
+--- a/drivers/net/wireless/ralink/rt2x00/rt2400pci.h
++++ b/drivers/net/wireless/ralink/rt2x00/rt2400pci.h
+@@ -939,7 +939,7 @@
+ #define DEFAULT_TXPOWER	39
+ 
+ #define __CLAMP_TX(__txpower) \
+-	clamp_t(char, (__txpower), MIN_TXPOWER, MAX_TXPOWER)
++	clamp_t(u8, (__txpower), MIN_TXPOWER, MAX_TXPOWER)
+ 
+ #define TXPOWER_FROM_DEV(__txpower) \
+ 	((__CLAMP_TX(__txpower) - MAX_TXPOWER) + MIN_TXPOWER)
+diff --git a/drivers/net/wireless/ralink/rt2x00/rt2500pci.c b/drivers/net/wireless/ralink/rt2x00/rt2500pci.c
+index e940443c52ad..1be535c74917 100644
+--- a/drivers/net/wireless/ralink/rt2x00/rt2500pci.c
++++ b/drivers/net/wireless/ralink/rt2x00/rt2500pci.c
+@@ -1176,9 +1176,9 @@ static int rt2500pci_set_state(struct rt2x00_dev *rt2x00dev,
+ {
+ 	u32 reg, reg2;
+ 	unsigned int i;
+-	char put_to_sleep;
+-	char bbp_state;
+-	char rf_state;
++	bool put_to_sleep;
++	u8 bbp_state;
++	u8 rf_state;
+ 
+ 	put_to_sleep = (state != STATE_AWAKE);
+ 
+@@ -1856,7 +1856,7 @@ static int rt2500pci_probe_hw_mode(struct rt2x00_dev *rt2x00dev)
+ {
+ 	struct hw_mode_spec *spec = &rt2x00dev->spec;
+ 	struct channel_info *info;
+-	char *tx_power;
++	u8 *tx_power;
+ 	unsigned int i;
+ 
+ 	/*
+diff --git a/drivers/net/wireless/ralink/rt2x00/rt2500pci.h b/drivers/net/wireless/ralink/rt2x00/rt2500pci.h
+index 7e64aee2a172..ba362675c52c 100644
+--- a/drivers/net/wireless/ralink/rt2x00/rt2500pci.h
++++ b/drivers/net/wireless/ralink/rt2x00/rt2500pci.h
+@@ -1219,6 +1219,6 @@
+ 	(((u8)(__txpower)) > MAX_TXPOWER) ? DEFAULT_TXPOWER : (__txpower)
+ 
+ #define TXPOWER_TO_DEV(__txpower) \
+-	clamp_t(char, __txpower, MIN_TXPOWER, MAX_TXPOWER)
++	clamp_t(u8, __txpower, MIN_TXPOWER, MAX_TXPOWER)
+ 
+ #endif /* RT2500PCI_H */
+diff --git a/drivers/net/wireless/ralink/rt2x00/rt2500usb.c b/drivers/net/wireless/ralink/rt2x00/rt2500usb.c
+index fce05fc88aaf..6d12e3879a90 100644
+--- a/drivers/net/wireless/ralink/rt2x00/rt2500usb.c
++++ b/drivers/net/wireless/ralink/rt2x00/rt2500usb.c
+@@ -984,9 +984,9 @@ static int rt2500usb_set_state(struct rt2x00_dev *rt2x00dev,
+ 	u16 reg;
+ 	u16 reg2;
+ 	unsigned int i;
+-	char put_to_sleep;
+-	char bbp_state;
+-	char rf_state;
++	bool put_to_sleep;
++	u8 bbp_state;
++	u8 rf_state;
+ 
+ 	put_to_sleep = (state != STATE_AWAKE);
+ 
+@@ -1663,7 +1663,7 @@ static int rt2500usb_probe_hw_mode(struct rt2x00_dev *rt2x00dev)
+ {
+ 	struct hw_mode_spec *spec = &rt2x00dev->spec;
+ 	struct channel_info *info;
+-	char *tx_power;
++	u8 *tx_power;
+ 	unsigned int i;
+ 
+ 	/*
+diff --git a/drivers/net/wireless/ralink/rt2x00/rt2500usb.h b/drivers/net/wireless/ralink/rt2x00/rt2500usb.h
+index 0c070288a140..746f0e950b76 100644
+--- a/drivers/net/wireless/ralink/rt2x00/rt2500usb.h
++++ b/drivers/net/wireless/ralink/rt2x00/rt2500usb.h
+@@ -839,6 +839,6 @@
+ 	(((u8)(__txpower)) > MAX_TXPOWER) ? DEFAULT_TXPOWER : (__txpower)
+ 
+ #define TXPOWER_TO_DEV(__txpower) \
+-	clamp_t(char, __txpower, MIN_TXPOWER, MAX_TXPOWER)
++	clamp_t(u8, __txpower, MIN_TXPOWER, MAX_TXPOWER)
+ 
+ #endif /* RT2500USB_H */
+diff --git a/drivers/net/wireless/ralink/rt2x00/rt2800lib.c b/drivers/net/wireless/ralink/rt2x00/rt2800lib.c
+index 4bdd3a95f2d2..adea793c6a76 100644
+--- a/drivers/net/wireless/ralink/rt2x00/rt2800lib.c
++++ b/drivers/net/wireless/ralink/rt2x00/rt2800lib.c
+@@ -3297,10 +3297,10 @@ static void rt2800_config_channel_rf53xx(struct rt2x00_dev *rt2x00dev,
+ 	if (rt2x00_has_cap_bt_coexist(rt2x00dev)) {
+ 		if (rt2x00_rt_rev_gte(rt2x00dev, RT5390, REV_RT5390F)) {
+ 			/* r55/r59 value array of channel 1~14 */
+-			static const char r55_bt_rev[] = {0x83, 0x83,
++			static const u8 r55_bt_rev[] = {0x83, 0x83,
+ 				0x83, 0x73, 0x73, 0x63, 0x53, 0x53,
+ 				0x53, 0x43, 0x43, 0x43, 0x43, 0x43};
+-			static const char r59_bt_rev[] = {0x0e, 0x0e,
++			static const u8 r59_bt_rev[] = {0x0e, 0x0e,
+ 				0x0e, 0x0e, 0x0e, 0x0b, 0x0a, 0x09,
+ 				0x07, 0x07, 0x07, 0x07, 0x07, 0x07};
+ 
+@@ -3309,7 +3309,7 @@ static void rt2800_config_channel_rf53xx(struct rt2x00_dev *rt2x00dev,
+ 			rt2800_rfcsr_write(rt2x00dev, 59,
+ 					   r59_bt_rev[idx]);
+ 		} else {
+-			static const char r59_bt[] = {0x8b, 0x8b, 0x8b,
++			static const u8 r59_bt[] = {0x8b, 0x8b, 0x8b,
+ 				0x8b, 0x8b, 0x8b, 0x8b, 0x8a, 0x89,
+ 				0x88, 0x88, 0x86, 0x85, 0x84};
+ 
+@@ -3317,10 +3317,10 @@ static void rt2800_config_channel_rf53xx(struct rt2x00_dev *rt2x00dev,
+ 		}
+ 	} else {
+ 		if (rt2x00_rt_rev_gte(rt2x00dev, RT5390, REV_RT5390F)) {
+-			static const char r55_nonbt_rev[] = {0x23, 0x23,
++			static const u8 r55_nonbt_rev[] = {0x23, 0x23,
+ 				0x23, 0x23, 0x13, 0x13, 0x03, 0x03,
+ 				0x03, 0x03, 0x03, 0x03, 0x03, 0x03};
+-			static const char r59_nonbt_rev[] = {0x07, 0x07,
++			static const u8 r59_nonbt_rev[] = {0x07, 0x07,
+ 				0x07, 0x07, 0x07, 0x07, 0x07, 0x07,
+ 				0x07, 0x07, 0x06, 0x05, 0x04, 0x04};
+ 
+@@ -3331,14 +3331,14 @@ static void rt2800_config_channel_rf53xx(struct rt2x00_dev *rt2x00dev,
+ 		} else if (rt2x00_rt(rt2x00dev, RT5390) ||
+ 			   rt2x00_rt(rt2x00dev, RT5392) ||
+ 			   rt2x00_rt(rt2x00dev, RT6352)) {
+-			static const char r59_non_bt[] = {0x8f, 0x8f,
++			static const u8 r59_non_bt[] = {0x8f, 0x8f,
+ 				0x8f, 0x8f, 0x8f, 0x8f, 0x8f, 0x8d,
+ 				0x8a, 0x88, 0x88, 0x87, 0x87, 0x86};
+ 
+ 			rt2800_rfcsr_write(rt2x00dev, 59,
+ 					   r59_non_bt[idx]);
+ 		} else if (rt2x00_rt(rt2x00dev, RT5350)) {
+-			static const char r59_non_bt[] = {0x0b, 0x0b,
++			static const u8 r59_non_bt[] = {0x0b, 0x0b,
+ 				0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0a,
+ 				0x0a, 0x09, 0x08, 0x07, 0x07, 0x06};
+ 
+@@ -3961,23 +3961,23 @@ static void rt2800_iq_calibrate(struct rt2x00_dev *rt2x00dev, int channel)
+ 	rt2800_bbp_write(rt2x00dev, 159, cal != 0xff ? cal : 0);
+ }
+ 
+-static char rt2800_txpower_to_dev(struct rt2x00_dev *rt2x00dev,
++static s8 rt2800_txpower_to_dev(struct rt2x00_dev *rt2x00dev,
+ 				  unsigned int channel,
+-				  char txpower)
++				  s8 txpower)
+ {
+ 	if (rt2x00_rt(rt2x00dev, RT3593) ||
+ 	    rt2x00_rt(rt2x00dev, RT3883))
+ 		txpower = rt2x00_get_field8(txpower, EEPROM_TXPOWER_ALC);
+ 
+ 	if (channel <= 14)
+-		return clamp_t(char, txpower, MIN_G_TXPOWER, MAX_G_TXPOWER);
++		return clamp_t(s8, txpower, MIN_G_TXPOWER, MAX_G_TXPOWER);
+ 
+ 	if (rt2x00_rt(rt2x00dev, RT3593) ||
+ 	    rt2x00_rt(rt2x00dev, RT3883))
+-		return clamp_t(char, txpower, MIN_A_TXPOWER_3593,
++		return clamp_t(s8, txpower, MIN_A_TXPOWER_3593,
+ 			       MAX_A_TXPOWER_3593);
+ 	else
+-		return clamp_t(char, txpower, MIN_A_TXPOWER, MAX_A_TXPOWER);
++		return clamp_t(s8, txpower, MIN_A_TXPOWER, MAX_A_TXPOWER);
+ }
+ 
+ static void rt3883_bbp_adjust(struct rt2x00_dev *rt2x00dev,
+@@ -8473,11 +8473,11 @@ static int rt2800_rf_lp_config(struct rt2x00_dev *rt2x00dev, bool btxcal)
+ 	return 0;
+ }
+ 
+-static char rt2800_lp_tx_filter_bw_cal(struct rt2x00_dev *rt2x00dev)
++static s8 rt2800_lp_tx_filter_bw_cal(struct rt2x00_dev *rt2x00dev)
+ {
+ 	unsigned int cnt;
+ 	u8 bbp_val;
+-	char cal_val;
++	s8 cal_val;
+ 
+ 	rt2800_bbp_dcoc_write(rt2x00dev, 0, 0x82);
+ 
+@@ -8509,7 +8509,7 @@ static void rt2800_bw_filter_calibration(struct rt2x00_dev *rt2x00dev,
+ 	u8 rx_filter_target_20m = 0x27, rx_filter_target_40m = 0x31;
+ 	int loop = 0, is_ht40, cnt;
+ 	u8 bbp_val, rf_val;
+-	char cal_r32_init, cal_r32_val, cal_diff;
++	s8 cal_r32_init, cal_r32_val, cal_diff;
+ 	u8 saverfb5r00, saverfb5r01, saverfb5r03, saverfb5r04, saverfb5r05;
+ 	u8 saverfb5r06, saverfb5r07;
+ 	u8 saverfb5r08, saverfb5r17, saverfb5r18, saverfb5r19, saverfb5r20;
+@@ -9960,9 +9960,9 @@ static int rt2800_probe_hw_mode(struct rt2x00_dev *rt2x00dev)
+ {
+ 	struct hw_mode_spec *spec = &rt2x00dev->spec;
+ 	struct channel_info *info;
+-	char *default_power1;
+-	char *default_power2;
+-	char *default_power3;
++	s8 *default_power1;
++	s8 *default_power2;
++	s8 *default_power3;
+ 	unsigned int i, tx_chains, rx_chains;
+ 	u32 reg;
+ 
+diff --git a/drivers/net/wireless/ralink/rt2x00/rt2800lib.h b/drivers/net/wireless/ralink/rt2x00/rt2800lib.h
+index 1139405c0ebb..6928f352f631 100644
+--- a/drivers/net/wireless/ralink/rt2x00/rt2800lib.h
++++ b/drivers/net/wireless/ralink/rt2x00/rt2800lib.h
+@@ -22,10 +22,10 @@
+ struct rt2800_drv_data {
+ 	u8 calibration_bw20;
+ 	u8 calibration_bw40;
+-	char rx_calibration_bw20;
+-	char rx_calibration_bw40;
+-	char tx_calibration_bw20;
+-	char tx_calibration_bw40;
++	s8 rx_calibration_bw20;
++	s8 rx_calibration_bw40;
++	s8 tx_calibration_bw20;
++	s8 tx_calibration_bw40;
+ 	u8 bbp25;
+ 	u8 bbp26;
+ 	u8 txmixer_gain_24g;
+diff --git a/drivers/net/wireless/ralink/rt2x00/rt2x00usb.c b/drivers/net/wireless/ralink/rt2x00/rt2x00usb.c
+index 74c3d8cb3100..8b3c90231110 100644
+--- a/drivers/net/wireless/ralink/rt2x00/rt2x00usb.c
++++ b/drivers/net/wireless/ralink/rt2x00/rt2x00usb.c
+@@ -117,12 +117,12 @@ int rt2x00usb_vendor_request_buff(struct rt2x00_dev *rt2x00dev,
+ 				  const u16 buffer_length)
+ {
+ 	int status = 0;
+-	unsigned char *tb;
++	u8 *tb;
+ 	u16 off, len, bsize;
+ 
+ 	mutex_lock(&rt2x00dev->csr_mutex);
+ 
+-	tb  = (char *)buffer;
++	tb  = (u8 *)buffer;
+ 	off = offset;
+ 	len = buffer_length;
+ 	while (len && !status) {
+@@ -215,7 +215,7 @@ void rt2x00usb_register_read_async(struct rt2x00_dev *rt2x00dev,
+ 	rd->cr.wLength = cpu_to_le16(sizeof(u32));
+ 
+ 	usb_fill_control_urb(urb, usb_dev, usb_rcvctrlpipe(usb_dev, 0),
+-			     (unsigned char *)(&rd->cr), &rd->reg, sizeof(rd->reg),
++			     (u8 *)(&rd->cr), &rd->reg, sizeof(rd->reg),
+ 			     rt2x00usb_register_read_async_cb, rd);
+ 	usb_anchor_urb(urb, rt2x00dev->anchor);
+ 	if (usb_submit_urb(urb, GFP_ATOMIC) < 0) {
+diff --git a/drivers/net/wireless/ralink/rt2x00/rt61pci.c b/drivers/net/wireless/ralink/rt2x00/rt61pci.c
+index 02da5dd37ddd..d04761c32a5d 100644
+--- a/drivers/net/wireless/ralink/rt2x00/rt61pci.c
++++ b/drivers/net/wireless/ralink/rt2x00/rt61pci.c
+@@ -1709,7 +1709,7 @@ static int rt61pci_set_state(struct rt2x00_dev *rt2x00dev, enum dev_state state)
+ {
+ 	u32 reg, reg2;
+ 	unsigned int i;
+-	char put_to_sleep;
++	bool put_to_sleep;
+ 
+ 	put_to_sleep = (state != STATE_AWAKE);
+ 
+@@ -2656,7 +2656,7 @@ static int rt61pci_probe_hw_mode(struct rt2x00_dev *rt2x00dev)
+ {
+ 	struct hw_mode_spec *spec = &rt2x00dev->spec;
+ 	struct channel_info *info;
+-	char *tx_power;
++	u8 *tx_power;
+ 	unsigned int i;
+ 
+ 	/*
+diff --git a/drivers/net/wireless/ralink/rt2x00/rt61pci.h b/drivers/net/wireless/ralink/rt2x00/rt61pci.h
+index 5f208ad509bd..d72d0ffd1127 100644
+--- a/drivers/net/wireless/ralink/rt2x00/rt61pci.h
++++ b/drivers/net/wireless/ralink/rt2x00/rt61pci.h
+@@ -1484,6 +1484,6 @@ struct hw_pairwise_ta_entry {
+ 	(((u8)(__txpower)) > MAX_TXPOWER) ? DEFAULT_TXPOWER : (__txpower)
+ 
+ #define TXPOWER_TO_DEV(__txpower) \
+-	clamp_t(char, __txpower, MIN_TXPOWER, MAX_TXPOWER)
++	clamp_t(u8, __txpower, MIN_TXPOWER, MAX_TXPOWER)
+ 
+ #endif /* RT61PCI_H */
+diff --git a/drivers/net/wireless/ralink/rt2x00/rt73usb.c b/drivers/net/wireless/ralink/rt2x00/rt73usb.c
+index e69793773d87..32f6d689bd36 100644
+--- a/drivers/net/wireless/ralink/rt2x00/rt73usb.c
++++ b/drivers/net/wireless/ralink/rt2x00/rt73usb.c
+@@ -1378,7 +1378,7 @@ static int rt73usb_set_state(struct rt2x00_dev *rt2x00dev, enum dev_state state)
+ {
+ 	u32 reg, reg2;
+ 	unsigned int i;
+-	char put_to_sleep;
++	bool put_to_sleep;
+ 
+ 	put_to_sleep = (state != STATE_AWAKE);
+ 
+@@ -2090,7 +2090,7 @@ static int rt73usb_probe_hw_mode(struct rt2x00_dev *rt2x00dev)
+ {
+ 	struct hw_mode_spec *spec = &rt2x00dev->spec;
+ 	struct channel_info *info;
+-	char *tx_power;
++	u8 *tx_power;
+ 	unsigned int i;
+ 
+ 	/*
+diff --git a/drivers/net/wireless/ralink/rt2x00/rt73usb.h b/drivers/net/wireless/ralink/rt2x00/rt73usb.h
+index 1b56d285c34b..bb0a68516c08 100644
+--- a/drivers/net/wireless/ralink/rt2x00/rt73usb.h
++++ b/drivers/net/wireless/ralink/rt2x00/rt73usb.h
+@@ -1063,6 +1063,6 @@ struct hw_pairwise_ta_entry {
+ 	(((u8)(__txpower)) > MAX_TXPOWER) ? DEFAULT_TXPOWER : (__txpower)
+ 
+ #define TXPOWER_TO_DEV(__txpower) \
+-	clamp_t(char, __txpower, MIN_TXPOWER, MAX_TXPOWER)
++	clamp_t(u8, __txpower, MIN_TXPOWER, MAX_TXPOWER)
+ 
+ #endif /* RT73USB_H */
 -- 
-Chuck Lever
+2.47.3
+
 
