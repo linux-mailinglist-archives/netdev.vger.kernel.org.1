@@ -1,162 +1,238 @@
-Return-Path: <netdev+bounces-230664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27BF4BEC98D
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 09:43:28 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21BCFBEC9C4
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 10:16:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D59F85E6860
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 07:43:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BA71D4E3762
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 08:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4632E284B2E;
-	Sat, 18 Oct 2025 07:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D42244694;
+	Sat, 18 Oct 2025 08:16:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Rf0OR0T+"
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="N8fOkXt/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2956F9443
-	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 07:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1B723EA8A;
+	Sat, 18 Oct 2025 08:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760773405; cv=none; b=Qq0BrXfTx+0LGoG0YRBXedxU+MyOEMFPfxeTw91EL0cXA6aBcCWpfNu7s5nqnI12NpsiS+3994X1sZ4yUiA9+wcXd+VN3A7a2c8F+KvkInqOU3DbThWONuTZHXkp3184+xZ+Qpjic42mcEXcgatBisPeT9+md5VXfUt1a6jeK/A=
+	t=1760775406; cv=none; b=MdZA0j3X8nq44M9tePb9twRnWjiRfy9+zHdNbbp60J2DT0xGw27ST4XIELSPEYHQr6v2RwpcVzC3JH0v60x3N1YKincPNANz0Rjc5ys+P5fr7hbmhibDHf/9oUy7qnSfnDwZEH94aMy/25MnkiKzjKGDHTJ7v3+iXwlgkDtL8Lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760773405; c=relaxed/simple;
-	bh=F6o5xuD/rEaG0v6EJNW/4wJ09DXvQktJ9h7IiFVRojI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mW0vEP9gtSrv7Eg58FbY4qm8thtWeTgzLNUquaQna3S+RrPV5uorjalKdS7wkOmIsVSWRNvppeVqa8WzidcFGRqBXbdZPZAqrPxL0/Ku0nK3aar27l83jFiJjUU2NF0IUWYXZkkP3EAlPyEV7Jrn1nB4FkijmX5cdx8BlIXNhI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Rf0OR0T+; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id CE09BC09A07;
-	Sat, 18 Oct 2025 07:43:00 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 20D6B6069D;
-	Sat, 18 Oct 2025 07:43:20 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id F3132102F2343;
-	Sat, 18 Oct 2025 09:42:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760773399; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=BrMMsk9VBVt4yUp2jMiSJe8MPMPTFyVYedP9FgMnb7c=;
-	b=Rf0OR0T+dhtzVXq5CsJLvyo9tJp01jc+xfMcYMVyaVUy1ovb41EuvzSdNJh3q8MwMYLLOg
-	eRH6oNPSnc/lvTnpjLdcSYqrpAO+I/eulSqZ5TBSJosUm+bjArDm4Mqvfa9JsYFSNs+pOn
-	WDZuotNyTSJV+ODF9R7bMIzK0NCJAN8xQvsL+DN3ZsDaTZebx0kpWuwIwqVy13ITQnjBvX
-	P85z/GtqPJ3bw7jVNB0JKdHwWKerNHfBrN3AuduHhy4UocMx1H5pddfrOScVGCaEskhLmD
-	WvLtSpoOdsIK3Zwz0lDnx+kDriDemgk08RCAQWo4AmjSlApxCsxWE0hzsoFuJw==
-Message-ID: <d40cbc17-22fa-4829-8eb0-e9fd26fc54b1@bootlin.com>
-Date: Sat, 18 Oct 2025 09:42:57 +0200
+	s=arc-20240116; t=1760775406; c=relaxed/simple;
+	bh=EQ6AUTFBznxRaDva/ec65uweQZOgsX7ncqbOh2GxYhM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U2jJlsdzqgU0PyeBcfHm29cRflMUptFTseknOgzvxAuCFaCs0c8MulbSF//VTQHYzL3AamyfCFuyYiZFqvNOWeyfJvUxl4xzFlWLpO2Gq2CoamVYpYUR5kIFsqJKdxwwuEBQQeAvcvVhdOwnLyCBwzVQN9AiVDz23OEY1wPsaFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=N8fOkXt/; arc=none smtp.client-ip=178.21.23.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
+Received: from mail01.disroot.lan (localhost [127.0.0.1])
+	by disroot.org (Postfix) with ESMTP id A9D9025E08;
+	Sat, 18 Oct 2025 10:16:40 +0200 (CEST)
+X-Virus-Scanned: SPAM Filter at disroot.org
+Received: from layka.disroot.org ([127.0.0.1])
+ by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id flIiLKxwqYeY; Sat, 18 Oct 2025 10:16:39 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
+	t=1760775399; bh=EQ6AUTFBznxRaDva/ec65uweQZOgsX7ncqbOh2GxYhM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=N8fOkXt/r412ShWMUDG7u5JbyYznuNyKedG0VyLlq0hTYcbmg8Mr2TWjo7juWJ+J8
+	 SVSvAtoNypJKvrHFlTG9WREXe2mIkWGGT7xxBn+rfcmFFX+Xz42dg5dR2iBtkOsGeB
+	 vdlBpTqm1kzZLjSp8eMVFdkWRezg3Y4yibtXYgpxEwulDL87lMkQnSVmU8aZsKiJfM
+	 WqODy4DcOyR+tV9zdSq+Jlk9rXVXTcnQLzMr5dLhN1pIfHO0L09cXIYg1xyonjOEG+
+	 Mb+b0vo2X+D57GlK5CJTs9dO4uQNmVw/PkP5LsVQ2p6RPyFG6++3HEuy8JKmMq4dGC
+	 3T+YO8IBhPOYQ==
+Date: Sat, 18 Oct 2025 08:16:22 +0000
+From: Yao Zi <ziyao@disroot.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Frank <Frank.Sae@motor-comm.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
+	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH net-next 3/4] net: stmmac: Add glue driver for Motorcomm
+ YT6801 ethernet controller
+Message-ID: <aPNM1jeKfMPNsO4N@pie>
+References: <20251014164746.50696-2-ziyao@disroot.org>
+ <20251014164746.50696-5-ziyao@disroot.org>
+ <f1de6600-4de9-4914-95e6-8cdb3481e364@lunn.ch>
+ <aPJMsNKwBYyrr-W-@pie>
+ <81124574-48ab-4297-9a74-bba7df68b973@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] net: stmmac: Allow supporting coarse
- adjustment mode
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
- <20251015102725.1297985-3-maxime.chevallier@bootlin.com>
- <20251017182358.42f76387@kernel.org>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20251017182358.42f76387@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <81124574-48ab-4297-9a74-bba7df68b973@lunn.ch>
 
-Hi Jakub,
-
-On 18/10/2025 03:23, Jakub Kicinski wrote:
-> On Wed, 15 Oct 2025 12:27:22 +0200 Maxime Chevallier wrote:
->> The DWMAC1000 supports 2 timestamping configurations to configure how
->> frequency adjustments are made to the ptp_clock, as well as the reported
->> timestamp values.
->>
->> There was a previous attempt at upstreaming support for configuring this
->> mode by Olivier Dautricourt and Julien Beraud a few years back [1]
->>
->> In a nutshell, the timestamping can be either set in fine mode or in
->> coarse mode.
->>
->> In fine mode, which is the default, we use the overflow of an accumulator to
->> trigger frequency adjustments, but by doing so we lose precision on the
->> timetamps that are produced by the timestamping unit. The main drawback
->> is that the sub-second increment value, used to generate timestamps, can't be
->> set to lower than (2 / ptp_clock_freq).
->>
->> The "fine" qualification comes from the frequent frequency adjustments we are
->> able to do, which is perfect for a PTP follower usecase.
->>
->> In Coarse mode, we don't do frequency adjustments based on an
->> accumulator overflow. We can therefore have very fine subsecond
->> increment values, allowing for better timestamping precision. However
->> this mode works best when the ptp clock frequency is adjusted based on
->> an external signal, such as a PPS input produced by a GPS clock. This
->> mode is therefore perfect for a Grand-master usecase.
->>
->> We therefore attempt to map these 2 modes with the newly introduced
->> hwtimestamp qualifiers (precise and approx).
->>
->> Precise mode is mapped to stmmac fine mode, and is the expected default,
->> suitable for all cases and perfect for follower mode
->>
->> Approx mode is mapped to coarse mode, suitable for Grand-master.
+On Fri, Oct 17, 2025 at 04:56:23PM +0200, Andrew Lunn wrote:
+> > > > +static void motorcomm_reset_phy(struct dwmac_motorcomm_priv *priv)
+> > > > +{
+> > > > +	u32 reg = readl(priv->base + EPHY_CTRL);
+> > > > +
+> > > > +	reg &= ~EPHY_RESET;
+> > > > +	writel(reg, priv->base + EPHY_CTRL);
+> > > > +
+> > > > +	reg |= EPHY_RESET;
+> > > > +	writel(reg, priv->base + EPHY_CTRL);
+> > > > +}
+> > > 
+> > > How does this differ to the PHY doing its own reset via BMCR?
+> > 
+> > It's named as EPHY_RESET according to the vendor driver, but with my
+> > testing, it seems to reset at least the internal MDIO bus as well: with
+> > this reset asserted (which is the default state after power on or
+> > resumption from D3hot), mdiobus_scan() considers each possible MDIO
+> > address corresponds to a PHY, while no one could be connected
+> > successfully.
+> > 
+> > > We need to be careful of lifetimes here. It would be better if the PHY
+> > > controlled its own reset. We don't want phylib to configure the PHY
+> > > and then the MAC driver reset it etc.
+> > 
+> > Though it's still unclear the exact effect of the bit on the PHY since
+> > there's no public documentation, it's essential to deassert it in MAC
+> > code before registering and scanning the MDIO bus, or we could even not
+> > probe the PHY correctly.
+> > 
+> > For the motorcomm_reset_phy() performed in probe function, it happens
+> > before the registration of MDIO bus, and the PHY isn't probed yet, thus
+> > I think it should be okay.
 > 
-> I failed to understand what this device does and what the problem is :(
+> Since it resets more than the PHY, it probably should have a different
+> name, and maybe a comment describing what is actually resets.
+
+Okay, it's reasonable and I'll do in v2.
+
+> And maybe rather than asserting and then deasserting reset, maybe just
+> deassert the reset? That makes it less dangerous in terms of
+> lifetimes.
+
+It's okay to only deassert the bit before MDIO bus scan and after
+resuming from D3hot, and I'll change to so it in v2.
+
+> > > > +static int motorcomm_resume(struct device *dev, void *bsp_priv)
+> > > > +{
+> > > > +	struct dwmac_motorcomm_priv *priv = bsp_priv;
+> > > > +	struct pci_dev *pdev = to_pci_dev(dev);
+> > > > +	int ret;
+> > > > +
+> > > > +	pci_restore_state(pdev);
+> > > > +	pci_set_power_state(pdev, PCI_D0);
+> > > > +
+> > > > +	ret = pcim_enable_device(pdev);
+> > > > +	if (ret)
+> > > > +		return ret;
+> > > > +
+> > > > +	pci_set_master(pdev);
+> > > > +
+> > > > +	motorcomm_reset_phy(priv);
+> > > 
+> > > Does the PHY support WoL? You probably should not be touching it if it
+> > > can wake the system.
+> > 
+> > Yes, it supports WoL, though the functionality isn't implemented in this
+> > series.
+> >
+> > As I mentioned before, it's necesasry to at least deassert EPHY_RESET
+> > after resuming from D3hot state, or phy_check_link_status() will always
+> > fail with -EBUSY for the PHY and it cannot be correctly resumed.
 > 
-> What is your ptp_clock_freq? Isn't it around 50MHz typically? 
-> So 2 / ptp_freq is 40nsec (?), not too bad?
+> When WoL is implemented, what state will the MAC and the PHY be in? Is
+> it possible to put the MAC into a deeper suspend state than the PHY,
+> since the MAC is probably not needed?
 
-That's not too bad indeed, but it makes a difference when acting as
-Grand Master, especially in this case because you don't need to
-perform clock adjustments (it's sync'd through PPS in), so we might
-as well take this opportunity to improve the TS.
+Honestly saying, I don't have an accurate answer. Vendor driver's WoL
+functionality doesn't work for me, thus I don't have the environment to
+test the hardware behavior.
 
+The vendor driver requires both the PHY and MAC to be online for WoL,
+and configures the remote wake-up packet filter integrated in MAC. The
+standalone YT8531S PHY does have a dedeciated interrupt line and could
+be configured to detect magic packets as well, but I'm not sure whether
+interrupt of the one integrated in YT6801 is correctly routed.
+
+> The PHY obviously needs to keep
+> working, so it cannot be put into a reset state. So resume should not
+> need to take it out of reset. Also, i _think_ the phylib core will
+> assume a PHY used for WoL is kept alive and configured, so it will not
+> reconfigure it on resume.
+
+Agree, and the WoL scheme implemented in vendor driver does require the
+PHY to keep working during suspension. A possible explanation for the
+automatically-asserted reset is that it's asserted when the controller
+is brought out of suspended D3hot state, but not when entering it, so
+the PHY just keeps working until the system is resumed. Still I don't
+have a working WoL environment to confirm the guess.
+
+> So it seems like this code will need some changes when WoL is
+> implemented. So leave it as is for the moment.
+
+Thanks, I could work on WoL support later when I have more time to dig
+the controller further.
+
+> > > Is this required? If you look at other glue drivers which allocate
+> > > such a structure, they set members in it:
+> > > 
+> > > dwmac-intel.c:	plat->mdio_bus_data->needs_reset = true;
+> > > dwmac-loongson.c:		plat->mdio_bus_data->needs_reset = true;
+> > > dwmac-tegra.c:	plat->mdio_bus_data->needs_reset = true;
+> > > stmmac_pci.c:	plat->mdio_bus_data->needs_reset = true;
+> > > stmmac_platform.c:		plat->mdio_bus_data->needs_reset = true;
+> > > 
+> > > You don't set anything.
+> > 
+> > Yes, it's required, since stmmac_mdio.c won't register a MDIO bus if
+> > plat_stmmacenet_data.mdio_bus_data is NULL.
 > 
-> My recollection of the idea behind that timestamping providers
-> was that you can configure different filters for different providers.
-> IOW that you'd be able to say:
->  - [precise] Rx stamp PTP packets 
->  -  [approx] Rx stamp all packets
-> not that you'd configure precision of one piece of HW..
+> Why? Maybe zoom out, look at the big picture for this driver, and
+> figure out if that is the correct behaviour for stmmac_mdio to
+> implement. Is it possible to synthesizer this IP without MDIO?
 
-So far it looks like only one provider is enabled at a given time, my
-understanding was that the qualifier would be used in case there
-are multiple timestampers on the data path, to select the better one
-(e.g. a PHY that supports TS, a MAC that supports TS, we use the 
-best out of the two).
+Yes, I think it should be possible, as described in the datasheet of
+DesignWare Ethernet Quality-of-Service Controller IP[1],
 
-However I agree with your comments, that's exactly the kind of feedback
-I was looking for. This work has been tried several times now each
-time with a different uAPI path, I'm OK to consider that this is out
-of the scope of the hwprov feature.
+> Optional MDIO (Clause 22 and Clause 45) master interface for PHY
+> device configuration and management
 
-> If the HW really needs it, just lob a devlink param at it?
+The MDIO interface is described as "optional". I don't have access to
+the IP's userbook or code, so couldn't confirm it.
 
-I'm totally OK with that. I'm not well versed into devlink, working mostly with
-embedded devices with simple-ish NICs, most of them don't use devlink. Let me
-give it a try then :)
+> I was also wondering about all the other parameters you set. Why have
+> i not seen any other glue driver with similar code? What makes this
+> glue driver different?
 
-Thanks for taking a look at this,
+Most glue drivers are for SoC-integrated IPs, for which
+stmmac_pltfr_probe() helper could be used to retrieve configuration
+arguments from devicetree to fill plat_stmmacenet_data. However, YT6801
+is a PCIe-based controller, and we couldn't rely on devicetree to carry
+these parameters.
 
-Maxime
+You could find similar parameter setup code in stmmac_pltfr_probe(), and
+also other glue drivers for PCIe-based controllers, like dwmac-intel.c
+(intel_mgbe_common_data) and dwmac-loongson.c (loongson_default_data).
 
+> 	   Andrew
 
+Thanks,
+Yao Zi
+
+[1]: https://www.synopsys.com/dw/doc.php/ds/c/dwc_ether_qos.pdf
 
