@@ -1,172 +1,125 @@
-Return-Path: <netdev+bounces-230670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE865BECD0B
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 12:11:14 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CAB7BECDAB
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 12:48:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2381419A711F
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 10:11:38 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E195B34E114
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 10:48:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74881283FC5;
-	Sat, 18 Oct 2025 10:11:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yG5/9uuw";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BbWJ9btR";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yG5/9uuw";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BbWJ9btR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 084042EBB86;
+	Sat, 18 Oct 2025 10:48:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1FBB354ADC
-	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 10:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D0E7483
+	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 10:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760782271; cv=none; b=GHdM/j/MCOJlO/zy3znck2IkG8Ek9H69WQ0PlVxQU6Ie6sHVseY5PZrrT1bPZBwC8MQBo++BDdAo/11JxyPTL/2NTBnWB3LbPU7EfhBNF2ludyXf4M80TktpjH7JzmEsM8qGxrQNjL+BW0utKuYlFn1IguBsR2eyYRi5V5haI50=
+	t=1760784510; cv=none; b=Ipmjq5KSqWE2SDTVWTivespwKEOT6mEr3nOsx0Wg8Qm5pgNTdlWhwe4u6Np1z0V0hKXOdy+7chFcqTk8LegH32+3cfIyA49mVHoYtNjomCw6sX7RXhh9iNshAcs4/emmm4AtSW1WRWBqDvlxdntl/9Ps7rnuZZfUslI9L3gz6G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760782271; c=relaxed/simple;
-	bh=wRisja7exUNghd9MfnAongKFRiA2fBBj04LCvjD42Lw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=asP80opvOr4e3880MVDD82jxt7K/ClK0xnrKD/OC4BJQWailQVK2m/aUU3kQvnS7ciwPhHcFpiZXDpV6pfB60MQ4iW8+Qvj62EwMdWDXmyduPGQUIxxNn/EO+7iLmCzIULjBqfM0QFCLLxOBhdtirefUeFPfv3IqgubusxHjU0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yG5/9uuw; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BbWJ9btR; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yG5/9uuw; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BbWJ9btR; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 315C421D76;
-	Sat, 18 Oct 2025 10:11:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760782265; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0WXY1l/cPJMx9BuYODo4AfCJmueQbYYaLeJ7r5bzFjc=;
-	b=yG5/9uuwSuhbQZnk18IYsOEl29jBe3u3Pv9a+SUf0OAApr70rcnwXgt+3GC2cX6E3A/zfj
-	mVMlgctxo6WJbOjlxdpNCqZke7bMhv/d+DXIrjox+hq9OKwGbYxQSJ0ZTM4XF9XgsTy+bp
-	cXqsuv8doge6uEmZ31cWsVe4oCJv7Sc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760782265;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0WXY1l/cPJMx9BuYODo4AfCJmueQbYYaLeJ7r5bzFjc=;
-	b=BbWJ9btRhYZmrBPeKY6G85MfMaEp8lM7H9PtEXcHRuGchftSPnIDMzBtH+l2DWNSPmtKnx
-	Jys+9w/18h7nZkDA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760782265; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0WXY1l/cPJMx9BuYODo4AfCJmueQbYYaLeJ7r5bzFjc=;
-	b=yG5/9uuwSuhbQZnk18IYsOEl29jBe3u3Pv9a+SUf0OAApr70rcnwXgt+3GC2cX6E3A/zfj
-	mVMlgctxo6WJbOjlxdpNCqZke7bMhv/d+DXIrjox+hq9OKwGbYxQSJ0ZTM4XF9XgsTy+bp
-	cXqsuv8doge6uEmZ31cWsVe4oCJv7Sc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760782265;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0WXY1l/cPJMx9BuYODo4AfCJmueQbYYaLeJ7r5bzFjc=;
-	b=BbWJ9btRhYZmrBPeKY6G85MfMaEp8lM7H9PtEXcHRuGchftSPnIDMzBtH+l2DWNSPmtKnx
-	Jys+9w/18h7nZkDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B8A4F1386E;
-	Sat, 18 Oct 2025 10:11:04 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 3bTcKLhn82h6LwAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Sat, 18 Oct 2025 10:11:04 +0000
-Message-ID: <6d67143b-533d-450b-abb1-2db0857f563f@suse.de>
-Date: Sat, 18 Oct 2025 12:10:59 +0200
+	s=arc-20240116; t=1760784510; c=relaxed/simple;
+	bh=iPrE54t1CALNjGXhCE/EQwFxJKmStxK75hrCa8luASY=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=XbZA/SD54daysCY53WFyYfYVI+qfesyWfWLB/BZvtJ/z9lqL+WIGBhQDZg5DnRWLrn5ASj12dD4IKTujfdqbHcEcaAv10hUgbSd91uHrLFaChaIvqBPtZRRVuDJd6r0EmAnKQhakuU21msnGhiSRW6IU6XQI+bmBTw+F5q7HpzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-430c6b6ce73so54246495ab.0
+        for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 03:48:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760784508; x=1761389308;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Z8Z7wpUESyU9qTjYOdzliE7Gf4wtyzwNh9GC9p20fc=;
+        b=xPBR9Cfn3JGWvHBiMkyft+59Nw/wEPfg7a5nsL2Ozsr7X9gnbuaGcSL8eBUWJyYmkV
+         OGlqBq8Fi+QK+M7ogo5L9nmkGWm1J1kKqt5fEcMema8U92IpIHBlhKSKouv3aUwc0DM6
+         TgZz1ETm3PvqFmThWpfdrSNUvJYbJDaPQWAFr7eLxKt1jh2nXJXUuzDq5bjYMqJ4oay/
+         tN2+20WHyqhM8NhkOASaJfixxnI9FwdAMrFIn5Xl6q4Qj1J5bOwqdblJcZRCoHnhUCS4
+         fElGBSx41TOdtXEI8IK7j1i3BoHC0llXydQZFLIDikbagbW3HWKzuTUAmQX/gUCJFytr
+         gCqA==
+X-Forwarded-Encrypted: i=1; AJvYcCV2ZXL9SH/iVUhcBu+sMefWQUQpFugc9TdNFYmayKvy/QU29zfgsDjq6RAROeDV4ChCypg4FTg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5A9oREd2P0wtIDjJz52zD1rTugFtRzSNH5GNGbDzmmWA+vm/R
+	vRudXnC7wZgeELsodrrk8fXLJpP++uHd2JY6L1PxPoHGCNPUggHt4GtXw9wAErZ8mOrR/Xp7x1I
+	vJXeqW4d6jLyDBvIlBIf3gcGyTR+cy2FUsb8wiYwWfymtLLpDI3AwPb6Ls5g=
+X-Google-Smtp-Source: AGHT+IHaEenMDW07VDHQBXqbPDTCMwDWNfTxHkOeWoGcu0uIlQa2XedpuI2L4t3P0IkVQLQER5qCRZM7eXY+38yZ4e34eSTjRS+c
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/hsr: add interlink to fill_info output
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jan Vaclav <jvaclav@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20251015101001.25670-2-jvaclav@redhat.com>
- <20251016155731.47569d75@kernel.org>
- <6f9742f5-8889-449d-8354-572d2f8a711b@suse.de>
- <20251017151733.785c138a@kernel.org>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20251017151733.785c138a@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
+X-Received: by 2002:a05:6e02:16c5:b0:430:b7c4:6617 with SMTP id
+ e9e14a558f8ab-430c527bc80mr107915955ab.15.1760784508525; Sat, 18 Oct 2025
+ 03:48:28 -0700 (PDT)
+Date: Sat, 18 Oct 2025 03:48:28 -0700
+In-Reply-To: <68ec1f21.050a0220.ac43.0010.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68f3707c.050a0220.1186a4.051f.GAE@google.com>
+Subject: Re: [syzbot] [net?] WARNING in xfrm6_tunnel_net_exit (4)
+From: syzbot <syzbot+3df59a64502c71cab3d5@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	herbert@gondor.apana.org.au, horms@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	steffen.klassert@secunet.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+syzbot has found a reproducer for the following issue on:
+
+HEAD commit:    cf1ea8854e4f Merge tag 'mmc-v6.18-rc1' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14b96492580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=af9170887d81dea1
+dashboard link: https://syzkaller.appspot.com/bug?extid=3df59a64502c71cab3d5
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=162c3de2580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a6a5b37662b9/disk-cf1ea885.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4b4d732ae480/vmlinux-cf1ea885.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/acd7feec5537/bzImage-cf1ea885.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3df59a64502c71cab3d5@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 12 at net/ipv6/xfrm6_tunnel.c:341 xfrm6_tunnel_net_exit+0x7e/0x100 net/ipv6/xfrm6_tunnel.c:341
+Modules linked in:
+CPU: 0 UID: 0 PID: 12 Comm: kworker/u8:0 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
+Workqueue: netns cleanup_net
+RIP: 0010:xfrm6_tunnel_net_exit+0x7e/0x100 net/ipv6/xfrm6_tunnel.c:341
+Code: e8 66 90 f8 4b 83 3c 2c 00 75 19 e8 dc b4 2e f8 49 81 fd f8 07 00 00 74 1d e8 ce b4 2e f8 49 83 c5 08 eb c9 e8 c3 b4 2e f8 90 <0f> 0b 90 49 81 fd f8 07 00 00 75 e3 48 81 c3 00 08 00 00 45 31 f6
+RSP: 0018:ffffc90000117890 EFLAGS: 00010293
+RAX: ffffffff8990486d RBX: ffff888030f5c000 RCX: ffff88801ba9da00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc90000117990 R08: 0000000000000000 R09: 0000000000000000
+R10: dffffc0000000000 R11: fffffbfff1deee6f R12: ffff888030f5c000
+R13: 00000000000003f0 R14: ffff888038a38000 R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff888126bc6000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd8ab2e0890 CR3: 00000000338be000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ ops_exit_list net/core/net_namespace.c:199 [inline]
+ ops_undo_list+0x49a/0x990 net/core/net_namespace.c:252
+ cleanup_net+0x4de/0x820 net/core/net_namespace.c:695
+ process_one_work kernel/workqueue.c:3263 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
 
-
-On 10/18/25 12:17 AM, Jakub Kicinski wrote:
-> On Fri, 17 Oct 2025 12:17:21 +0200 Fernando Fernandez Mancera wrote:
->> On 10/17/25 12:57 AM, Jakub Kicinski wrote:
->>> On Wed, 15 Oct 2025 12:10:02 +0200 Jan Vaclav wrote:
->>>> Currently, it is possible to configure the interlink port, but no
->>>> way to read it back from userspace.
->>>>
->>>> Add it to the output of hsr_fill_info(), so it can be read from
->>>> userspace, for example:
->>>>
->>>> $ ip -d link show hsr0 12: hsr0: <BROADCAST,MULTICAST> mtu ... ...
->>>> hsr slave1 veth0 slave2 veth1 interlink veth2 ...
->>>
->>> Not entirely cleat at a glance how this driver deals with the slaves
->>> or interlink being in a different netns, but I guess that's a pre-
->>> existing problem..
->>>    
->>
->> FTR, I just did a quick round of testing and it handles it correctly.
->> When moving a port to a different netns it notifies NETDEV_UNREGISTER -
->> net/hsr/hsr_main.c handles the notification removing the port from the
->> list. If the port list is empty, removes the hsr link.
->>
->> All good or at least as I would expect.
-> 
-> Did you try to make the slave/interlink be in a different namespace
-> when HSR interface is created? It should be possible with the right
-> combination of NEWLINK attributes, and that's the config I was
-> particularly concerned about..
-> 
-
-Ugh, right. It is completely messed up indeed. I am handling this in a 
-patch series. Thanks you Jakub.
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
