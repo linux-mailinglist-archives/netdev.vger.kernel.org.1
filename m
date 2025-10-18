@@ -1,152 +1,145 @@
-Return-Path: <netdev+bounces-230660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87C31BEC7BF
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 06:47:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 66F16BEC80E
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 07:28:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 203761AA5132
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 04:47:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E874919A84E0
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 05:28:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F172D2550CC;
-	Sat, 18 Oct 2025 04:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A439F223DFB;
+	Sat, 18 Oct 2025 05:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eAFljKAP"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5874D1F584C;
-	Sat, 18 Oct 2025 04:47:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2AF9443
+	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 05:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760762828; cv=none; b=dJ9KOIChX/fkQdUrb1iqpXNgkhYZ1WexAGBbF0MfEjvoBXlVFvj0VXrPTySFO/MIfgz1Tn/DdYGe4gXmWQUp6V6YK38R9TFR+WRP49+5pSCZlkIsP88lidXsFlcHNZnOPUg0+8E6CeaR9szXpmvWMFv24aP/FN4ShJOMNm26cvY=
+	t=1760765277; cv=none; b=LVhyHcXVZh1xn3DqVeFJMbOVEhEROJspJ9I7OlvDk/Ju8U3qVtSfn0yLYinqytYOgtZ+W08ZPmpYijxRZw/EsYwELo90BzqwglCMa/5vI6AulGkoDJEtvbCyE/O7vjMEEEWMXM240IsMfHRA4V7iMTUXGrbaQ1g+c/PWhlueTh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760762828; c=relaxed/simple;
-	bh=y2x9f3aQVzHRpfAEf9bRNga9mO3Bh7q0jzvdlTL+hA4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kSSebBlZqnF2JeMGVcpeJrkXRk/xy2PfGtOpGjYs08kxvTNtZUcDGeWnUZraRBm3PSWtMPDRt11XD+Ecb/lvBLV0BDRK6n6+/UsS7aKbzTmT20Kohp+rblxQ9SwseG+vl0wd06oVrvsIIdPcC0XaCiLtFCaUJvZDloPdIVPGt10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-11-68f31bc3fadd
-Date: Sat, 18 Oct 2025 13:46:53 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, axboe@kernel.dk,
-	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, horms@kernel.org, hawk@kernel.org,
-	ilias.apalodimas@linaro.org, sdf@fomichev.me, dw@davidwei.uk,
-	ap420073@gmail.com, dtatulea@nvidia.com, toke@redhat.com,
-	io-uring@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, kernel_team@skhynix.com,
-	max.byungchul.park@gmail.com
-Subject: Re: [PATCH net-next] page_pool: check if nmdesc->pp is !NULL to
- confirm its usage as pp for net_iov
-Message-ID: <20251018044653.GA66683@system.software.com>
-References: <20251016063657.81064-1-byungchul@sk.com>
- <20251016072132.GA19434@system.software.com>
- <8d833a3f-ae18-4ea6-9092-ddaa48290a63@gmail.com>
- <CAHS8izMdwiijk_15NgecSOi_VD3M7cx5M0XLAWxQqWnZgJksjg@mail.gmail.com>
+	s=arc-20240116; t=1760765277; c=relaxed/simple;
+	bh=qEX4ZRyADdtMHHuQSPQXlzifu4jiBpegoYGgV4Kwd8g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VJ+t/5N95k1nX6FDU8Ikx2lL4hf/hNlTcG07abCT2yDicDxKCFXsxpgQ3l38O9Z/23eafP9xqiD4BlEWozuPDaWuR2OrYsyl7zRfuu6G8OKpHiF6CJUkdbRLQo/YlxW/WIwoioROVMRFdm9liiZ0hkmdhB97tR/fr8zgH6r0Pbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eAFljKAP; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-33bc2178d6aso1585439a91.0
+        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 22:27:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760765275; x=1761370075; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VLm5DAG9fXkl0zixt19/6W0LNVYzxfSWdxnFtQHdyc4=;
+        b=eAFljKAPIJn1uL6DGW8NtFyZnPN7RZWpx0Fx9bVs4Kker7uvzki90VaCmyVKgrekO8
+         hl1zZaJ9I2+AayBZ5aiCr8Dzxt1BJr98BHxEcBgQo1VoBfjOT5Er0cgWlINWP/TNOm7b
+         jhv9qPzLXay5vAapC1oTY5Ze5Bi4DYEFguPD8Al8MWNMy22DVqisiPLsSCyTab9forcz
+         rM+8Ku6N2h6BF4w4nMroVZdRzMLlQPTfjDU/iWdhbuovhUfNJuvIjM6jpK7U6PvxzTd5
+         P9RzB9jxaQJM5AF+jDUA56KxdHQrc7qHvm0CdKxfq5SkHdIlNEVvhjaITSlkDbOOar/4
+         AVqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760765275; x=1761370075;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VLm5DAG9fXkl0zixt19/6W0LNVYzxfSWdxnFtQHdyc4=;
+        b=J7crVG7KpDyo7wp4/n1dWzUitMN9qj9wBmZXjicV+aibcjmyiZYKQKee8i9bAVub1Y
+         UHbgr+z1gIj0CwVQQb1+c0cF5UcFTrxw0pBCWd818HAeaAN51oV85X2QPAfKwIuuxv1A
+         pj4hQXBKaaC49xpAEWVtzxWrTAEIMLfm9MMPFKugpwF5V1lQ0gNFTEOrIh6ezNMUKVIN
+         a2RtKxRiWrQSMSx9jjpMVgwz4xdyv08KIOCIfklHWsD3XIBsxWir5bVAWZEN+MAC7bcg
+         obA45mTJbz7w/zxUDp9vcVKSi/oSYE7L4V6UDLb8H0xY6usAneba2T7f9KYNbwImNbhp
+         XAVw==
+X-Forwarded-Encrypted: i=1; AJvYcCXV1iq5U8ZWkeXfnhOEkn/GHJLjIgS8LkuxZvEbVmFf32MSDjFC8ceeysuQljBj69P+wdu7nLw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywm+WMqPj3l4UNmgxVtAtVU4nGPlZd75va8z0tgaBvt5/T4LsjR
+	fgEGL2k+6CT7kVS60gswc3NpNvXCiMCMSMzrVF7rThKxIgTzAjv4XNiU
+X-Gm-Gg: ASbGncvVa/iNQV58mnHBHIncSLGIRG1y9DikNXvS136khnWnDV3u6RmwboHPuFj9Om4
+	e8OmCV0sai0/pInkg5+QKuqhLzQM0EnvBPiaL7rP892oLBcETw5E1YImEXrxaMtau4eFt6i8fVt
+	QOxRgh1Dvz/lPldtk78QY0Sumw0fxxAgfhVw2Z+lePv8T/UFlPkkWXAs9X3VWYVAXnCRuVf52Mf
+	ilViTtQ6X4ADjW9cM2eluuXZzT7yva+ahIlgNy+yXPVXdNo/eDZaaIQmfbf0BMB77mL0e02rvlI
+	4+B4KUmpbdQ7+LA3vQ8FZByAukjbQVejXQ/d+vij0/kwhkLsK37d7UnDL8HYA9YFh+0y/XjXCc+
+	Jet8lhxGDJu8QFBCIU96iPeUbmGqqhRU/OXuftyDFei8zw4vBPDqpeUmRba01Kwx88L/HgeTDxz
+	rVBtKdttA=
+X-Google-Smtp-Source: AGHT+IHogwMOGocmpixntoYw7rwI5KNqsmnHI3NmlBhSuqqzwCNh1cN6EApDN5X0d3rxS2SowaGvIw==
+X-Received: by 2002:a17:90b:3ec6:b0:339:ef05:3575 with SMTP id 98e67ed59e1d1-33bcf8f94c3mr9100489a91.26.1760765275018;
+        Fri, 17 Oct 2025 22:27:55 -0700 (PDT)
+Received: from fedora ([122.173.29.39])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33baac8b4dbsm3268832a91.5.2025.10.17.22.27.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Oct 2025 22:27:54 -0700 (PDT)
+From: Shi Hao <i.shihao.999@gmail.com>
+To: horms@kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	i.shihao.999@gmail.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH  net-next v2]: 3c515 : replace cleanup_module with __exit
+Date: Sat, 18 Oct 2025 10:55:41 +0530
+Message-ID: <20251018052541.124365-1-i.shihao.999@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izMdwiijk_15NgecSOi_VD3M7cx5M0XLAWxQqWnZgJksjg@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrAIsWRmVeSWpSXmKPExsXC9ZZnke5h6c8ZBvMf81qs/lFh8XPNcyaL
-	Oau2MVqsvtvPZjHnfAuLxc5dzxktXs1Yy2bx9Ngjdos97duZLR71n2Cz6G35zWzxrvUci8WF
-	bX2sFpd3zWGzuDCxl9Xi2AIxi2+n3zBaXJ25i8ni0uFHLA7CHltW3mTyuDZjIovHjX2nmDx2
-	zrrL7rFgU6nH5bOlHptWdbJ53Lm2h82jt/kdm8f7fVfZPD5vkgvgjuKySUnNySxLLdK3S+DK
-	WPFcteCBaMXCK1PYGhhbBLsYOTgkBEwk3i5k72LkBDNffLnDChJmEVCVWHa1ECTMJqAucePG
-	T2YQW0RAU2LJvolAJVwczAK7mCX6rl1h7GJk5xAWyJN4ZgzSyStgIbHotSJIhZDAPUaJbzev
-	gbXyCghKnJz5hAXEZgYa+WfeJWaQemYBaYnl/zggwvISzVtng5VzCgRKrNg7hRHEFhVQljiw
-	7TgTyEwJgUPsEnvmL2SFuFhS4uCKGywTGAVnIVkxC8mKWQgrZiFZsYCRZRWjUGZeWW5iZo6J
-	XkZlXmaFXnJ+7iZGYLwuq/0TvYPx04XgQ4wCHIxKPLwWMz9lCLEmlhVX5h5ilOBgVhLhZSj4
-	kCHEm5JYWZValB9fVJqTWnyIUZqDRUmc1+hbeYqQQHpiSWp2ampBahFMlomDU6qBMfJns19/
-	8uRlB9pMfp5mSfsWJlWRFD3XUiHz1ffJ3JkWOQbNZ3Se+B3ewBzIsWXa4Qzp60e3Rhbt2Pqv
-	V6/ui3Zrg6Fa/FvrV8Hix1aUiUifebvg4J/dAmHdk541Op1n+bhLZ/KaGr+HvW//nYk4eceO
-	7/lu2QffHqY2B2+UXF+n+a310p97CUosxRmJhlrMRcWJAEKmOxrTAgAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrBIsWRmVeSWpSXmKPExsXC5WfdrHtI+nOGwcRrVharf1RY/FzznMli
-	zqptjBar7/azWcw538JisXPXc0aLVzPWslk8PfaI3WJP+3Zmi0f9J9gselt+M1u8az3HYnF4
-	7klWiwvb+lgtLu+aw2ZxYWIvq8WxBWIW306/YbS4OnMXk8Wlw49YHEQ8tqy8yeRxbcZEFo8b
-	+04xeeycdZfdY8GmUo/LZ0s9Nq3qZPO4c20Pm0dv8zs2j/f7rrJ5LH7xgcnj8ya5AJ4oLpuU
-	1JzMstQifbsErowVz1ULHohWLLwyha2BsUWwi5GTQ0LAROLFlzusXYwcHCwCqhLLrhaChNkE
-	1CVu3PjJDGKLCGhKLNk3EaiEi4NZYBezRN+1K4xdjOwcwgJ5Es+MQTp5BSwkFr1WBKkQErjH
-	KPHt5jWwVl4BQYmTM5+wgNjMQCP/zLvEDFLPLCAtsfwfB0RYXqJ562ywck6BQIkVe6cwgtii
-	AsoSB7YdZ5rAyDcLyaRZSCbNQpg0C8mkBYwsqxhFMvPKchMzc0z1irMzKvMyK/SS83M3MQLj
-	b1ntn4k7GL9cdj/EKMDBqMTDu0PjU4YQa2JZcWXuIUYJDmYlEV6Ggg8ZQrwpiZVVqUX58UWl
-	OanFhxilOViUxHm9wlMThATSE0tSs1NTC1KLYLJMHJxSDYy3r75I3x514BHbf3GO/Zxx0V7J
-	//8fV22fVft3lRA714/vWt1yipfZdr/WrHCKXMuw4elL3X9z7k2/ccXi/L1rghcFgyVEJUxf
-	sx3mPTbzmbjX2Xmm329fC3r+qd/CuVXFi8kvd+PXrV/caydab1x2J+r31ZjgwB7RfPHya4Es
-	7Z45mRdmr96kxFKckWioxVxUnAgAhTkI7bsCAAA=
-X-CFilter-Loop: Reflected
 
-On Fri, Oct 17, 2025 at 08:13:14AM -0700, Mina Almasry wrote:
-> On Fri, Oct 17, 2025 at 5:32 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
-> >
-> > On 10/16/25 08:21, Byungchul Park wrote:
-> > > On Thu, Oct 16, 2025 at 03:36:57PM +0900, Byungchul Park wrote:
-> > >> ->pp_magic field in struct page is current used to identify if a page
-> > >> belongs to a page pool.  However, ->pp_magic will be removed and page
-> > >> type bit in struct page e.g. PGTY_netpp should be used for that purpose.
-> > >>
-> > >> As a preparation, the check for net_iov, that is not page-backed, should
-> > >> avoid using ->pp_magic since net_iov doens't have to do with page type.
-> > >> Instead, nmdesc->pp can be used if a net_iov or its nmdesc belongs to a
-> > >> page pool, by making sure nmdesc->pp is NULL otherwise.
-> > >>
-> > >> For page-backed netmem, just leave unchanged as is, while for net_iov,
-> > >> make sure nmdesc->pp is initialized to NULL and use nmdesc->pp for the
-> > >> check.
-> > >
-> > > IIRC,
-> > >
-> > > Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
-> >
-> > Pointing out a problem in a patch with a fix doesn't qualify to
-> > me as "suggested-by", you don't need to worry about that.
-> >
-> > Did you get the PGTY bits merged? There is some uneasiness about
-> > this patch as it does nothing good by itself, it'd be much better
-> > to have it in a series finalising the page_pool conversion. And
-> > I don't think it simplify merging anyhow, hmm?
-> >
-> 
-> +1 honestly.
-> 
-> If you want to 'extract the networking bits' into its own patch,  let
-> it be a patch series where this is a patch doing pre-work, and the
-> next patches in the series are adding the page_flag.
+update old legacy cleanup_module from the file with __exit
+module as per kernel code practices and restore the #ifdef
+MODULE condition to allow successful compilation as a built
+-in driver.
 
-Okay.  Then is it possible that one for mm tree and the other for
-net-next in the same patch series?  I've never tried patches that way.
+The file had an old cleanup_module still in use which could
+be updated with __exit module function although its init_module
+is indeed newer however the cleanup_module was still
+using the older version of exit.
 
-> I don't want added netmem_is_net_iov checks unnecessarily tbh. These
-> checks are bad and only used when absolutely necessary, so let the
-> patch series that adds them also do something useful (i.e. add the
-> page flag), if possible. But I honestly think this patch was almost
-> good as-is:
+To set proper exit module function replace cleanup_module
+with __exit corkscrew_exit_module to align it to the
+kernel code consistency.
 
-Hm.. but the following patch includes both networking changes and mm
-changes.  Jakub thinks it should go to mm and I don't know how Andrew
-thinks it should be.  It's not clear even to me.
+Signed-off-by: Shi Hao <i.shihao.999@gmail.com>
 
-That's why I splitted it into two, and this is the networking part, and
-I will post the mm part to mm folks later.  Any suggestions?
+---
 
-	Byungchul
+changes v2:
+- Restore ifdef module condition to compile as built in module
+- Adjust subject prefix from "net:ethernet" to "3c515"
 
-> https://lore.kernel.org/all/20250729110210.48313-1-byungchul@sk.com/
-> 
-> You just need to address Jakub's review comments and resubmit? Not
-> sure why we want to split, but if you want let it be a patch series
-> that does something useful.
-> 
-> --
-> Thanks,
-> Mina
+---
+ drivers/net/ethernet/3com/3c515.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/3com/3c515.c b/drivers/net/ethernet/3com/3c515.c
+index ecdea58e6a21..2227c83a4862 100644
+--- a/drivers/net/ethernet/3com/3c515.c
++++ b/drivers/net/ethernet/3com/3c515.c
+@@ -1547,9 +1547,8 @@ static const struct ethtool_ops netdev_ethtool_ops = {
+ 	.set_msglevel		= netdev_set_msglevel,
+ };
+
+-
+ #ifdef MODULE
+-void cleanup_module(void)
++static void __exit corkscrew_exit_module(void)
+ {
+ 	while (!list_empty(&root_corkscrew_dev)) {
+ 		struct net_device *dev;
+@@ -1563,4 +1562,5 @@ void cleanup_module(void)
+ 		free_netdev(dev);
+ 	}
+ }
++module_exit(corkscrew_exit_module);
+ #endif				/* MODULE */
+--
+2.51.0
+
 
