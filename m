@@ -1,135 +1,152 @@
-Return-Path: <netdev+bounces-230659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55903BEC687
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 05:34:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87C31BEC7BF
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 06:47:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 062E06E3375
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 03:34:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 203761AA5132
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 04:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7FC2459E1;
-	Sat, 18 Oct 2025 03:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YC1shBOk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F172D2550CC;
+	Sat, 18 Oct 2025 04:47:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC9D15ECD7
-	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 03:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5874D1F584C;
+	Sat, 18 Oct 2025 04:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760758449; cv=none; b=l9Gqx7MmEpLCNyUqNtJoppm+vDMSEROW7NIMNBnNO3hBwdxdnemHIeOOnO9glQjcMQ0Taw9t97CkJ6366HnmaJJvDYWiu2kM/pP6+jyoUMRS+SxTk4ZRub1Kz01D66I9qh98PQl6rGwgOwJMWSLWPSfZ7VkXDqNJSkeT8uJDOQQ=
+	t=1760762828; cv=none; b=dJ9KOIChX/fkQdUrb1iqpXNgkhYZ1WexAGBbF0MfEjvoBXlVFvj0VXrPTySFO/MIfgz1Tn/DdYGe4gXmWQUp6V6YK38R9TFR+WRP49+5pSCZlkIsP88lidXsFlcHNZnOPUg0+8E6CeaR9szXpmvWMFv24aP/FN4ShJOMNm26cvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760758449; c=relaxed/simple;
-	bh=gYmdi6JiwWVpQ6TBq+3bLWOKPe4TLx5SGGvSpAVDKtw=;
+	s=arc-20240116; t=1760762828; c=relaxed/simple;
+	bh=y2x9f3aQVzHRpfAEf9bRNga9mO3Bh7q0jzvdlTL+hA4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n+1RWKuOymQwbEOhBwsDiX84vwRQYvSNu1rlw3Q09bY5W8YNzX2IeW7UUzTvT0RGk8fS3b/Baurw2Wf4QZeeKJOpPZfHPALCvwj8HF1LHinmXJCoYXgVO2KWXyu9UhtAL/bGZEpPG696JoEplUX/kZmKdMSw0k69Zzvdm/2R3Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YC1shBOk; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760758448; x=1792294448;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=gYmdi6JiwWVpQ6TBq+3bLWOKPe4TLx5SGGvSpAVDKtw=;
-  b=YC1shBOkWnoAzlyKWvD350QrYr2it6c3lLLRRp41vX30N+s79UfU/hf+
-   yNJdKvp1RdDJFvpBaH0kydGdN97To3Zm1izKPWpUuGs3tMAzEVOUeNB7H
-   6+Pp9fvk0PtDKKlPCcphw3JwrQAbhmK0wLZqfqHpowXuGjn09uzloT02k
-   iY4mz6ZxCItlEZuIcLuUUYwHINg842saIsxGKK9O/kTbyrQWJNblj1ob3
-   g6YRRfTOcspxdl70OtKNvCxrAytUzJgQmx9v4QIzljzms8bGEYas3L69/
-   347dhUjRw8FrT6FgzG3+Lc4wMvKA7qrPar8QK5wtlyPV64AwSTCHLBpTD
-   A==;
-X-CSE-ConnectionGUID: QYk9najGT7GTdqDafC4Y+Q==
-X-CSE-MsgGUID: J3ux5zBDTHmUNeYmdGr6Ww==
-X-IronPort-AV: E=McAfee;i="6800,10657,11585"; a="80603289"
-X-IronPort-AV: E=Sophos;i="6.19,238,1754982000"; 
-   d="scan'208";a="80603289"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2025 20:34:06 -0700
-X-CSE-ConnectionGUID: dd69f0azSbSAVVL/9C0exA==
-X-CSE-MsgGUID: gZZK3RFBT0yEZJ7ZRqWNzA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,238,1754982000"; 
-   d="scan'208";a="183647805"
-Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
-  by fmviesa010.fm.intel.com with ESMTP; 17 Oct 2025 20:34:04 -0700
-Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1v9xha-00081j-12;
-	Sat, 18 Oct 2025 03:33:57 +0000
-Date: Sat, 18 Oct 2025 11:33:20 +0800
-From: kernel test robot <lkp@intel.com>
-To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, pabeni@redhat.com, kuba@kernel.org,
-	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
-	Shyam-sundar.S-k@amd.com, Raju Rangoju <Raju.Rangoju@amd.com>
-Subject: Re: [PATCH net-next v2 2/4] amd-xgbe: add ethtool phy selftest
-Message-ID: <202510181124.5LDfdemg-lkp@intel.com>
-References: <20251017064704.3911798-3-Raju.Rangoju@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kSSebBlZqnF2JeMGVcpeJrkXRk/xy2PfGtOpGjYs08kxvTNtZUcDGeWnUZraRBm3PSWtMPDRt11XD+Ecb/lvBLV0BDRK6n6+/UsS7aKbzTmT20Kohp+rblxQ9SwseG+vl0wd06oVrvsIIdPcC0XaCiLtFCaUJvZDloPdIVPGt10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c45ff70000001609-11-68f31bc3fadd
+Date: Sat, 18 Oct 2025 13:46:53 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, axboe@kernel.dk,
+	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, horms@kernel.org, hawk@kernel.org,
+	ilias.apalodimas@linaro.org, sdf@fomichev.me, dw@davidwei.uk,
+	ap420073@gmail.com, dtatulea@nvidia.com, toke@redhat.com,
+	io-uring@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, kernel_team@skhynix.com,
+	max.byungchul.park@gmail.com
+Subject: Re: [PATCH net-next] page_pool: check if nmdesc->pp is !NULL to
+ confirm its usage as pp for net_iov
+Message-ID: <20251018044653.GA66683@system.software.com>
+References: <20251016063657.81064-1-byungchul@sk.com>
+ <20251016072132.GA19434@system.software.com>
+ <8d833a3f-ae18-4ea6-9092-ddaa48290a63@gmail.com>
+ <CAHS8izMdwiijk_15NgecSOi_VD3M7cx5M0XLAWxQqWnZgJksjg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251017064704.3911798-3-Raju.Rangoju@amd.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izMdwiijk_15NgecSOi_VD3M7cx5M0XLAWxQqWnZgJksjg@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrAIsWRmVeSWpSXmKPExsXC9ZZnke5h6c8ZBvMf81qs/lFh8XPNcyaL
+	Oau2MVqsvtvPZjHnfAuLxc5dzxktXs1Yy2bx9Ngjdos97duZLR71n2Cz6G35zWzxrvUci8WF
+	bX2sFpd3zWGzuDCxl9Xi2AIxi2+n3zBaXJ25i8ni0uFHLA7CHltW3mTyuDZjIovHjX2nmDx2
+	zrrL7rFgU6nH5bOlHptWdbJ53Lm2h82jt/kdm8f7fVfZPD5vkgvgjuKySUnNySxLLdK3S+DK
+	WPFcteCBaMXCK1PYGhhbBLsYOTgkBEwk3i5k72LkBDNffLnDChJmEVCVWHa1ECTMJqAucePG
+	T2YQW0RAU2LJvolAJVwczAK7mCX6rl1h7GJk5xAWyJN4ZgzSyStgIbHotSJIhZDAPUaJbzev
+	gbXyCghKnJz5hAXEZgYa+WfeJWaQemYBaYnl/zggwvISzVtng5VzCgRKrNg7hRHEFhVQljiw
+	7TgTyEwJgUPsEnvmL2SFuFhS4uCKGywTGAVnIVkxC8mKWQgrZiFZsYCRZRWjUGZeWW5iZo6J
+	XkZlXmaFXnJ+7iZGYLwuq/0TvYPx04XgQ4wCHIxKPLwWMz9lCLEmlhVX5h5ilOBgVhLhZSj4
+	kCHEm5JYWZValB9fVJqTWnyIUZqDRUmc1+hbeYqQQHpiSWp2ampBahFMlomDU6qBMfJns19/
+	8uRlB9pMfp5mSfsWJlWRFD3XUiHz1ffJ3JkWOQbNZ3Se+B3ewBzIsWXa4Qzp60e3Rhbt2Pqv
+	V6/ui3Zrg6Fa/FvrV8Hix1aUiUifebvg4J/dAmHdk541Op1n+bhLZ/KaGr+HvW//nYk4eceO
+	7/lu2QffHqY2B2+UXF+n+a310p97CUosxRmJhlrMRcWJAEKmOxrTAgAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrBIsWRmVeSWpSXmKPExsXC5WfdrHtI+nOGwcRrVharf1RY/FzznMli
+	zqptjBar7/azWcw538JisXPXc0aLVzPWslk8PfaI3WJP+3Zmi0f9J9gselt+M1u8az3HYnF4
+	7klWiwvb+lgtLu+aw2ZxYWIvq8WxBWIW306/YbS4OnMXk8Wlw49YHEQ8tqy8yeRxbcZEFo8b
+	+04xeeycdZfdY8GmUo/LZ0s9Nq3qZPO4c20Pm0dv8zs2j/f7rrJ5LH7xgcnj8ya5AJ4oLpuU
+	1JzMstQifbsErowVz1ULHohWLLwyha2BsUWwi5GTQ0LAROLFlzusXYwcHCwCqhLLrhaChNkE
+	1CVu3PjJDGKLCGhKLNk3EaiEi4NZYBezRN+1K4xdjOwcwgJ5Es+MQTp5BSwkFr1WBKkQErjH
+	KPHt5jWwVl4BQYmTM5+wgNjMQCP/zLvEDFLPLCAtsfwfB0RYXqJ562ywck6BQIkVe6cwgtii
+	AsoSB7YdZ5rAyDcLyaRZSCbNQpg0C8mkBYwsqxhFMvPKchMzc0z1irMzKvMyK/SS83M3MQLj
+	b1ntn4k7GL9cdj/EKMDBqMTDu0PjU4YQa2JZcWXuIUYJDmYlEV6Ggg8ZQrwpiZVVqUX58UWl
+	OanFhxilOViUxHm9wlMThATSE0tSs1NTC1KLYLJMHJxSDYy3r75I3x514BHbf3GO/Zxx0V7J
+	//8fV22fVft3lRA714/vWt1yipfZdr/WrHCKXMuw4elL3X9z7k2/ccXi/L1rghcFgyVEJUxf
+	sx3mPTbzmbjX2Xmm329fC3r+qd/CuVXFi8kvd+PXrV/caydab1x2J+r31ZjgwB7RfPHya4Es
+	7Z45mRdmr96kxFKckWioxVxUnAgAhTkI7bsCAAA=
+X-CFilter-Loop: Reflected
 
-Hi Raju,
+On Fri, Oct 17, 2025 at 08:13:14AM -0700, Mina Almasry wrote:
+> On Fri, Oct 17, 2025 at 5:32 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+> >
+> > On 10/16/25 08:21, Byungchul Park wrote:
+> > > On Thu, Oct 16, 2025 at 03:36:57PM +0900, Byungchul Park wrote:
+> > >> ->pp_magic field in struct page is current used to identify if a page
+> > >> belongs to a page pool.  However, ->pp_magic will be removed and page
+> > >> type bit in struct page e.g. PGTY_netpp should be used for that purpose.
+> > >>
+> > >> As a preparation, the check for net_iov, that is not page-backed, should
+> > >> avoid using ->pp_magic since net_iov doens't have to do with page type.
+> > >> Instead, nmdesc->pp can be used if a net_iov or its nmdesc belongs to a
+> > >> page pool, by making sure nmdesc->pp is NULL otherwise.
+> > >>
+> > >> For page-backed netmem, just leave unchanged as is, while for net_iov,
+> > >> make sure nmdesc->pp is initialized to NULL and use nmdesc->pp for the
+> > >> check.
+> > >
+> > > IIRC,
+> > >
+> > > Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
+> >
+> > Pointing out a problem in a patch with a fix doesn't qualify to
+> > me as "suggested-by", you don't need to worry about that.
+> >
+> > Did you get the PGTY bits merged? There is some uneasiness about
+> > this patch as it does nothing good by itself, it'd be much better
+> > to have it in a series finalising the page_pool conversion. And
+> > I don't think it simplify merging anyhow, hmm?
+> >
+> 
+> +1 honestly.
+> 
+> If you want to 'extract the networking bits' into its own patch,  let
+> it be a patch series where this is a patch doing pre-work, and the
+> next patches in the series are adding the page_flag.
 
-kernel test robot noticed the following build warnings:
+Okay.  Then is it possible that one for mm tree and the other for
+net-next in the same patch series?  I've never tried patches that way.
 
-[auto build test WARNING on net-next/main]
+> I don't want added netmem_is_net_iov checks unnecessarily tbh. These
+> checks are bad and only used when absolutely necessary, so let the
+> patch series that adds them also do something useful (i.e. add the
+> page flag), if possible. But I honestly think this patch was almost
+> good as-is:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Raju-Rangoju/amd-xgbe-introduce-support-ethtool-selftest/20251017-151230
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20251017064704.3911798-3-Raju.Rangoju%40amd.com
-patch subject: [PATCH net-next v2 2/4] amd-xgbe: add ethtool phy selftest
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20251018/202510181124.5LDfdemg-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251018/202510181124.5LDfdemg-lkp@intel.com/reproduce)
+Hm.. but the following patch includes both networking changes and mm
+changes.  Jakub thinks it should go to mm and I don't know how Andrew
+thinks it should be.  It's not clear even to me.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202510181124.5LDfdemg-lkp@intel.com/
+That's why I splitted it into two, and this is the networking part, and
+I will post the mm part to mm folks later.  Any suggestions?
 
-All warnings (new ones prefixed by >>):
+	Byungchul
 
-   drivers/net/ethernet/amd/xgbe/xgbe-selftest.c: In function 'xgbe_selftest_get_strings':
->> drivers/net/ethernet/amd/xgbe/xgbe-selftest.c:427:52: warning: '%s' directive output may be truncated writing up to 95 bytes into a region of size 28 [-Wformat-truncation=]
-     427 |                 snprintf(p, ETH_GSTRING_LEN, "%2d. %s", i + 1,
-         |                                                    ^~
-   drivers/net/ethernet/amd/xgbe/xgbe-selftest.c:427:17: note: 'snprintf' output between 5 and 100 bytes into a destination of size 32
-     427 |                 snprintf(p, ETH_GSTRING_LEN, "%2d. %s", i + 1,
-         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     428 |                          xgbe_selftests[i].name);
-         |                          ~~~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +427 drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
-
-066e40696db52b Raju Rangoju 2025-10-17  420  
-066e40696db52b Raju Rangoju 2025-10-17  421  void xgbe_selftest_get_strings(struct xgbe_prv_data *pdata, u8 *data)
-066e40696db52b Raju Rangoju 2025-10-17  422  {
-066e40696db52b Raju Rangoju 2025-10-17  423  	u8 *p = data;
-066e40696db52b Raju Rangoju 2025-10-17  424  	int i;
-066e40696db52b Raju Rangoju 2025-10-17  425  
-066e40696db52b Raju Rangoju 2025-10-17  426  	for (i = 0; i < xgbe_selftest_get_count(pdata); i++) {
-066e40696db52b Raju Rangoju 2025-10-17 @427  		snprintf(p, ETH_GSTRING_LEN, "%2d. %s", i + 1,
-066e40696db52b Raju Rangoju 2025-10-17  428  			 xgbe_selftests[i].name);
-066e40696db52b Raju Rangoju 2025-10-17  429  		p += ETH_GSTRING_LEN;
-066e40696db52b Raju Rangoju 2025-10-17  430  	}
-066e40696db52b Raju Rangoju 2025-10-17  431  }
-066e40696db52b Raju Rangoju 2025-10-17  432  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> https://lore.kernel.org/all/20250729110210.48313-1-byungchul@sk.com/
+> 
+> You just need to address Jakub's review comments and resubmit? Not
+> sure why we want to split, but if you want let it be a patch series
+> that does something useful.
+> 
+> --
+> Thanks,
+> Mina
 
