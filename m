@@ -1,271 +1,268 @@
-Return-Path: <netdev+bounces-230686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C404BBED36C
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 18:07:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03601BED4B7
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 19:19:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A14704E849F
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 16:07:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71C3719A620D
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 17:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6796235C01;
-	Sat, 18 Oct 2025 16:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06DB12580F3;
+	Sat, 18 Oct 2025 17:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="JNBpkUef"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NLagoKNM"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013064.outbound.protection.outlook.com [40.107.159.64])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4319ACA52;
-	Sat, 18 Oct 2025 16:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760803624; cv=fail; b=NL7VVahVqQ+Kz+V/qGUKgAwfJ0ybDNsDYZe0aLm3ffQHxVkSff5TnuoLvTQEG3+Xd8ZM5mcA0X2g+bD5r8Rd+Zex3tt9cxgGrY0XZiLZZrqsIPISDsOovrasW9dxgoU0xWIrEBREm7j7//+6I8H7G+dhTU9eHcf7Xojb7/R3gLY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760803624; c=relaxed/simple;
-	bh=fCa9CxqHhlkqCC/1FW1LJr3lbCz6DVbCzzkaylNBRPI=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=M+Xu1AWf7b20CEi7FqM4OLCrE9IsXsoRjJLbhsuuHzlm/yE9EraT+A0VR43llmU0VK081Td19ew7/SnatIGYZ4KFYIHzYW517+5H0qv2svyWx4rhcJ40PiIz/MR97ihjdz4EnIgGTZljaUtbacAQy3ZpljV07iSeQ3zjyuVUhr8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=JNBpkUef; arc=fail smtp.client-ip=40.107.159.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=n8yExcGl9vYmmwJr+Amsyrjv3Anf4EsffgXQAOFUKXTgXyIX4EN+9dB+/guVBBsDGtgMMAu1IB39//eGHUvAJ3bcAf+GiqIYv/u0BgB2pzBXTdP++mzcsc6mGmTy7pxVzXzlo45sanuJgd/QPnvntcBXo6Qbqyp87ASK6xFIGLdVZ2aP/2XQNZ6uQjfKUymwtC2Yz7bvuzEN6OTWBoqeGpOP8aeEZYmWd5xEPbYHecZtBc5+LQ2m8MfIJFE+A/KogmaTLEjYDvuUrL6oiGrbqIMPc29DJka80znLRXflkBPUrDd2R37mdj+Gv+aKEE8sKr2LwkqvOSjyK9y3bEQyBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fCa9CxqHhlkqCC/1FW1LJr3lbCz6DVbCzzkaylNBRPI=;
- b=WbLYPrXlDxDu9V4pZSL9wI4xL+R4G7PiFmD6shiTDlcnqlqos7uStvGL7hlCwa+AVVjhZLg4wrWZYy9DZ33L+lS78Ghz5UrCsMLPIByu7sJDU8W9Am/xP20Hu1/SDk6+9micJc6jOmfdbJ1pqDfaFRUtHyCe3zOTBmWmcDzGQlagzB+wZJWJfpPbgT2pZf90UNUcm1MBAygwmwsJtSdu7YzpdKNMm2wdEkoQHdoNTDrqatpRv6WW24PBBqkAZfmZksn42RnU5jgJjjy8nUMDcGannf7dW61qOGktF8NEiHxaRW61PbmSEqi+0OLiuAAdMSjacNe1TxgQ8Krm1b82Vw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nokia-bell-labs.com; dmarc=pass action=none
- header.from=nokia-bell-labs.com; dkim=pass header.d=nokia-bell-labs.com;
- arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fCa9CxqHhlkqCC/1FW1LJr3lbCz6DVbCzzkaylNBRPI=;
- b=JNBpkUefwS9IPwRyHnXJZf+Xgmk4RBABZxfSBLGoy9/lWfb6LYtLDwd2Hy8M+4RcbMajhmk5QnAjAyAABU9OtbFL/GrYUAMmcc9Y877s+meiLNxF/tHktT0F6M340hDsgP882xdLTd0vgDGLIOCFKIWCHj7QWwJx875uW/iecMi3x5LYrbx4hOihPTAM7wVtB4M77D0B9W8y0t/RoMSZ0Lr6sqPGQlGzuBfIMykA5R4RxNuAGvSmtHgSh4qX2HaTibg3XXj3WlZZy/z/ZtQag/vdJg7hlvzGpCKsrKUZx37P2geKRO5nvDb7vmHnk0aqFytfsem9Rvhkr0nU9DnhDg==
-Received: from PAXPR07MB7984.eurprd07.prod.outlook.com (2603:10a6:102:133::12)
- by VI1PR07MB9422.eurprd07.prod.outlook.com (2603:10a6:800:1c1::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.14; Sat, 18 Oct
- 2025 16:06:58 +0000
-Received: from PAXPR07MB7984.eurprd07.prod.outlook.com
- ([fe80::b7f8:dc0a:7e8d:56]) by PAXPR07MB7984.eurprd07.prod.outlook.com
- ([fe80::b7f8:dc0a:7e8d:56%2]) with mapi id 15.20.9228.014; Sat, 18 Oct 2025
- 16:06:58 +0000
-From: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
-To: Paolo Abeni <pabeni@redhat.com>, "edumazet@google.com"
-	<edumazet@google.com>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
-	"horms@kernel.org" <horms@kernel.org>, "dsahern@kernel.org"
-	<dsahern@kernel.org>, "kuniyu@amazon.com" <kuniyu@amazon.com>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "dave.taht@gmail.com" <dave.taht@gmail.com>,
-	"jhs@mojatatu.com" <jhs@mojatatu.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"stephen@networkplumber.org" <stephen@networkplumber.org>,
-	"xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>, "jiri@resnulli.us"
-	<jiri@resnulli.us>, "davem@davemloft.net" <davem@davemloft.net>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "donald.hunter@gmail.com"
-	<donald.hunter@gmail.com>, "ast@fiberby.net" <ast@fiberby.net>,
-	"liuhangbin@gmail.com" <liuhangbin@gmail.com>, "shuah@kernel.org"
-	<shuah@kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "ij@kernel.org" <ij@kernel.org>,
-	"ncardwell@google.com" <ncardwell@google.com>, "Koen De Schepper (Nokia)"
-	<koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
-	<g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
-	<ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
-	<mirja.kuehlewind@ericsson.com>, cheshire <cheshire@apple.com>,
-	"rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
-	<Jason_Livingood@comcast.com>, Vidhi Goel <vidhi_goel@apple.com>
-Subject: RE: [PATCH v4 net-next 08/13] tcp: accecn: retransmit SYN/ACK without
- AccECN option or non-AccECN SYN/ACK
-Thread-Topic: [PATCH v4 net-next 08/13] tcp: accecn: retransmit SYN/ACK
- without AccECN option or non-AccECN SYN/ACK
-Thread-Index: AQHcPGNeRToEcMsOS02zUrddw3q5grTEgaEAgAOUmgA=
-Date: Sat, 18 Oct 2025 16:06:58 +0000
-Message-ID:
- <PAXPR07MB7984E7A69169F81508384928A3F7A@PAXPR07MB7984.eurprd07.prod.outlook.com>
-References: <20251013170331.63539-1-chia-yu.chang@nokia-bell-labs.com>
- <20251013170331.63539-9-chia-yu.chang@nokia-bell-labs.com>
- <705f02b2-44c6-4012-a1f3-0040652acc36@redhat.com>
-In-Reply-To: <705f02b2-44c6-4012-a1f3-0040652acc36@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nokia-bell-labs.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR07MB7984:EE_|VI1PR07MB9422:EE_
-x-ms-office365-filtering-correlation-id: 8eddda4a-0b8d-4d10-11c0-08de0e605da3
-x-ld-processed: 5d471751-9675-428d-917b-70f44f9630b0,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020|38070700021;
-x-microsoft-antispam-message-info:
- =?utf-8?B?NzZCVTVsSHBvbXliNllYZXBBWS9jTFNabnExQlZrMnBRRXorc1NpRzZrQkY2?=
- =?utf-8?B?d0JPSzI1UGoyaUhsM1U2V2FtT3J5cG5HcldZbnFnTmVBVitBNjhTcmUxR2RF?=
- =?utf-8?B?K0s1elpXUUJQdVk2b3NZMzNJcmw3OEJIN1BaaWx3UWM3YmJhK1pia0U2NVJC?=
- =?utf-8?B?Q1ZxMXlOcW9tMWMyUnhoejRvU282VGVkQndZQUt2VDVNMXYxNENPVzlxSzlE?=
- =?utf-8?B?YkVUbU1HNEQzVmNhOGxlL0RpRzJwR3V0YmRrV1ZBRlRlVDBVM2dscENhMmho?=
- =?utf-8?B?cU5VVHFNNXc1NGZKNkE1LzRETy8xdSt6QzBJWmQxQVRZYXQ1dUJkb2tqR3pq?=
- =?utf-8?B?WmdiVzhmVjlFOU94U1dCSHBYZkFQQ3lOUll5M3NqRm1sa0s4Tlhqd1dQMkJU?=
- =?utf-8?B?YXo1eFduK0xCcjUxOGtjZ0drODFycWp3OUhRbmxDQ3krQjVSbjRaVWI1TDNo?=
- =?utf-8?B?Rnp0RWNHZlhSZUJYRzJuSmNyTGMxeE40UzdkbzFqR3Nia2xDcThJSGVmTXlP?=
- =?utf-8?B?SHBiMjJBQ1ZFRXRMN1d5MzFUb0Q4M0IyOFhMWkxWa3VDT0g3YWlwL0NuNEt3?=
- =?utf-8?B?SHBXQzNQVnQ1cCtTWFYzMXFkc2NlQVlLeG1ZZDFEL01FRjA3VmZJYXdNVmVp?=
- =?utf-8?B?V0NrV3g2eWxkWjNhdVRjS2RlOXdxOXQ4eXBqTDdJWHVaK0J2N0ExcUlNVit0?=
- =?utf-8?B?TlkrV1NPRkZBQktEcWlMeVFoYzNjZUtCbStjUTBWVUZ5MDhLekRDQU15NmMr?=
- =?utf-8?B?OWtmVm51azBnMEtxVUp3V2RscUU2R1VpbFpkVER6ZER5TXFGTTlxQnk0OWFy?=
- =?utf-8?B?YjdMdjg1SXg5MlNwcDdyeXJKK2VraFpMaVExVzZTRzlmNzk2RFU4WnVoLytN?=
- =?utf-8?B?THNNcHpXcUJlRDZhNHIxYkJoQmVlMTdoNi80cDU5b2J5RDg4NWRnNGY4eXgr?=
- =?utf-8?B?eE1VVHdzaTFicXpRTUtZWU5Hcm56blByOW1LYVQ0WnJ6OXh4aXV0NG9RSnZ0?=
- =?utf-8?B?d3h0SlRCVDlqYS9Xc3phZjEzcU5uUVczTGJST1JZc0FYR2IwN25rb2dkeVd6?=
- =?utf-8?B?VTBuUGJhRlFXVzAzOUV3VURhNFBiRzcwODBWR0NzazN5WUR2M1JwNkZzaVBZ?=
- =?utf-8?B?RmFQSmM4MWtWZ0x3ZHNjcU9ZdnR3TUV2SkRZa3VDSzlCZGUwaHBNY1dOKzhY?=
- =?utf-8?B?Tkw4THVJbFVrS0RzNWhhWjI5R1dFdnQ5bGE5dFg1RFNjTkhlbGM1MURHanhU?=
- =?utf-8?B?bGJCeWhoQ3pHWVlOblhCS2NHTXdJQkMyRTZsUmdZZzF1N1c4N1JpbnZld2d4?=
- =?utf-8?B?TkhzS1h3Tk4vZFFFZU85eGlpb3NBUG9IVCt4MlgxVDU0dXpKeFBIazdWczl4?=
- =?utf-8?B?bHVjSk9TM1d6RGxGWERhZTdTemFITXR4dFBnTmR6TSswMlYxMjhma0dVaFVJ?=
- =?utf-8?B?NUlkRDh6NmRuZFJzMEFFVDdQdkFNZWtaOW4ydkYyeDJESFR2OUh5dDRXY2RI?=
- =?utf-8?B?aVNVdUZ5V0tja1pUZmwwN2NId0M4SjN6bGFGWVEybWRzZ05NdHl2VkhFN0k5?=
- =?utf-8?B?RU96Q0x6QVEwcmFZcmVNY0g1U3VoNnVFVUtwMjF3OWtBdXYvRE5sMmRFWFp0?=
- =?utf-8?B?c0dNWWljb3BBYytXVjlET2Q5c1c4ZUUyN3dLbWd3ZGFmZDFlekpqVzMzQlo3?=
- =?utf-8?B?RHozZ25HV01sb3JxQ3g4eVVLSnR3QkwzNmljSTJJSWRTQXZSS2lJOUpSRHZi?=
- =?utf-8?B?U3QrbElLbWRZQy94eVpEUStkcUFJR3JXdFlheERhUUIxT1FTcmtlKys0TENH?=
- =?utf-8?B?MVd0QTN4U2tyS0w5cFpOSjZrSjVKWGltWUFRVUpia1hFMEdDM3JSS0RVaXFQ?=
- =?utf-8?B?UmN2dzYrNjRnWG9MUWZLcGtXZXlxS3BCaFBOMVFTa3d4Ry8rd1hqMytkK29I?=
- =?utf-8?B?SzU1alJRSEhNL2oyQmpva3pCRG9tUWx2Z2ZZWVF6WElKSjcrL1ZNSEd2LzdT?=
- =?utf-8?B?SnkxTHhXdGxlUjQzUXpwejVrbFMySVBVQzY1SGdBZGZ2UkpxMnBiNy95VU9m?=
- =?utf-8?B?OGFYYkcraG9BRWFDZWlPY3dYa0UvVk1zM1lWdz09?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR07MB7984.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?dnYveUQ2MTZ4RG9YYjhLM2tpRXd2bmxkWkdGeUVTT29TMUI2elBFQXIxVkw3?=
- =?utf-8?B?Uno1V1pESCtzZVlvY09aU05DOURDa1p2ZEYrNzhBVnFoSEVUa0VOeC9Pem1F?=
- =?utf-8?B?SmxGcXVmdzBKOHNhZytuQmNhREtjWERHdmVwUmxTWDhvbVJITmI5Z1BzN2Fu?=
- =?utf-8?B?S3BjeXBBMjk4cmVFUGx5Ny9FeWNQdGlmM21mVEd4WVBZZThsWnI0TEc2SWtT?=
- =?utf-8?B?bGJCaVJmV2drOGNybnpHa3MvemVIdVR6NCtvalM1bEdEazVqanliVjBpbC9B?=
- =?utf-8?B?cmc2NHdTdXRDSHp6YkpKWVlxOTNGSXQwNVpTbEtzYlVJZ0RIeTZBcFF0Y3Rl?=
- =?utf-8?B?RmxNcXhhT2JVeDhja2hnazM1Tkx1bnBOOGljV01GSk1YYm9BeURvaWtLSFpO?=
- =?utf-8?B?VGh2a0JQYVdUV1U4NVJEL3A5aStGK3Zkei9pdjF4ZTJQZTJzQ3JETFJZNjQr?=
- =?utf-8?B?b0FCczRzWEdTNThXOUd4Z0FuK3ptL1h3bkR1RWZjSU9MZ3MwMHNPRDMrTjJB?=
- =?utf-8?B?VTVGK1FjdnFqclZLWE5NU1gweFljVGpmV2RpemViMXVtZFRad2xUd1htUGdr?=
- =?utf-8?B?STQ5bUNHZUxDcEQ0dVB3azBRU3Z2d1B6TU9CYS9xUlRZSTF3MmVBcWVRK2RS?=
- =?utf-8?B?TDU2UktiYjM4cTd0NFRCTncwWGdTU0VRSUMyYVByUGs0TkZTVTBieWpnNEhG?=
- =?utf-8?B?R3plODVrOVBYTllPUHRyYmt5QmljV1Y1aW1uLzdteHplaXIrdDVSQTVQUXdl?=
- =?utf-8?B?TDZmL3kxUDJMakRoMUdlU3VGMC9CVGl6L3Nxc3lzN1RaMkFmMk5xUnRha0U5?=
- =?utf-8?B?ejNPNHpIK1dhVkR4VitGTjBTaTBaWWcrdWFNbEhXMVZhdFhYdDJVMy82VkYz?=
- =?utf-8?B?NEZoR2NaOWVJREdiRktLREhSbWgrbVQwZEliaXJZSWZEMjIyaUZ4VlRmWmNq?=
- =?utf-8?B?MkRZOEhIS0NMQ3FNQWhKdW10RmIreUJZeXh0Q3FaL20zckFkeUZaSnBqcVE3?=
- =?utf-8?B?L1RxK2lYRmo4Z0JxQUJCdjRJMlVKRGJrYWgrYVpQSUN5SWZzOU8xbkExK0J1?=
- =?utf-8?B?b0ZXTHNCSGpCZG44K2RORVZYd2s0QmlPWG5VL0FiWVpPbkprSFI1SGdZUXZp?=
- =?utf-8?B?L01jaXZ5RmdGcVVzMzNQSThQU2NuczJCei9LQWhjVEVyQWVRaEdqQ0N2eXc0?=
- =?utf-8?B?azNTRkFMWG5BNU51bFkrNzg5SW9ZNzlKYzFpRGJoSUpUY1lMaFkrOGVwSHRm?=
- =?utf-8?B?NHA1VHlZTVoxb2N1REpWTXpEaE8yZE9adjRMcnVmWUhBcy91K25MWWFOZ0RP?=
- =?utf-8?B?TWd5eE1aeGZiTVJkWVhyVGNyZ1czRnVLWTdJZmtSSk5KTEdDUE9HTGxPcjUw?=
- =?utf-8?B?K3JDUUgvQ3JyOXlqeWhJemFxaXlnV3hrZGZPbW5WYjRmeXJXdUx2cGdGcDdI?=
- =?utf-8?B?TzYxVDIxYmpVcnBiUUFrK1N3YUJFNGgwYzVFbW5yN3dDaWJzR3dqWmplSFg2?=
- =?utf-8?B?dXc5Um5vbTIxVE1hUDk3eithNjBOYnowc3YvNjhBSWFVaUhtSU1sdGoxMWtM?=
- =?utf-8?B?WSs3VzUxakduQlY3bnU2MERyam1TQk84czRWRVAxbTVXcXloMFlLNTM4WDlw?=
- =?utf-8?B?bGpvWmltZUwzRmRxdGJDcmVjY0JraXIyWlZEaGZFREpRL29EdEFTd0JDTThh?=
- =?utf-8?B?VW9ZN1ZUWmJCMEs5RWx5TVlpek5IYjRWTVV6QWQ1Q3hzalQzRFcyVFl6Rmht?=
- =?utf-8?B?T3Myb3hWU1VOaFRoRzhZYmR1aSt5UTYyNk5ZRFFVOGxDWjR5Q2kxM0NvclBr?=
- =?utf-8?B?RkxZZWpVVE95OGMwQXFZaTZKRUtPRlNLTmdoZVM2OGtmaGcwbit1V1FxWDMr?=
- =?utf-8?B?WTZ1TStxbGlUYzlGcmRpQXZVTlR0OGRSRGQwWmdZVGZhdmExcnBZbFlWNkhT?=
- =?utf-8?B?dkFGbDg4WWIzbHk1UitIR2M2b2haWVMwU3dTZjY2SFhnTEcwZHhpeldqVlpI?=
- =?utf-8?B?TWdrSnVSQ1lWWDNzcmZDUGw5cjQrT1N5a2Vqa2d2MFhlYkI4c3B6aFFwVWFT?=
- =?utf-8?B?aXRiRVcrNmtsSDRoYzh4Y05vMUtJYi9WbC9qRXdKS3p3bGx4ZFhaQWNmQyts?=
- =?utf-8?B?dEhobjl2VThwUk9GSEEzUHJsMWhXSTdBRlAzWXQ5YVdqbTg1WUZEelVRR1ls?=
- =?utf-8?B?aUE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E331245008
+	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 17:19:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760807976; cv=none; b=q+klno3XzNTpvxvuK+g40Xg5GCbsNzCzH8Ekhi+XcxOnqEgi+s4IAoemjgMPGkFEedcaGZDoP4Qm3BBTRQljNSiypETRxGKSLH3qjmeFOmEKVsr7KLoR8dSpPM5Fnj5dyj6R3P9+pOsL/I20zc1iVDrnNaOktNtYsiohndkkSMA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760807976; c=relaxed/simple;
+	bh=+QKkOCD8HiGgcE3dcF0ky6v8p1BN/QvwbYBrPT7m4qU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=acNpEXWOb/cBZEtx6tZHh8KelR9xT4YT5Xyiek7Ctw7bbhzi7N9WqPkMwlpev+4cMDsJE6IwrbbnqJDPa4ZM4ayMdSahB+wjlnbA1EW1hxeeo/uPTPgkLuMhU/U0hat8DBcfk5UEhVczXtTqC7ul1wN/V138EP/LfWSI+akg0uU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NLagoKNM; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760807973; x=1792343973;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+QKkOCD8HiGgcE3dcF0ky6v8p1BN/QvwbYBrPT7m4qU=;
+  b=NLagoKNMRwyIcTG+FW3UnPhRV7nKYPcK9lbAnKphnh47IGgCXYJyKqqn
+   cvjxqM+uWREpVhtsh0qI7NJ/GGuKWbj8+oPGm4BGbO7rmDjiY5Ts9iuxs
+   JNnGwhb8xlRKjNoEMVtifIagA4Dcjc7zEP5wfV3dZopkLb74JCqnuoI2S
+   7TUp894PkA4jN1/wDl2pTWbkSWgthwAOY9gWpNp84cB1PRoFEDyOavdah
+   d/70aJxwhEsNRMmjB7YAPH09B1Y8SuX1tuljkn3t8zHaxgcIVdu5E5+cZ
+   aDqE1bCgICVIceyTeH4yacA+guPWg1/Q97VodpCxIiXuCHIYcCGNIrk4f
+   Q==;
+X-CSE-ConnectionGUID: j99d6eEUS4iYqXATT5RjlA==
+X-CSE-MsgGUID: YJbQ2ZavQxy8M1m6Ku8EAQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63086351"
+X-IronPort-AV: E=Sophos;i="6.19,239,1754982000"; 
+   d="scan'208";a="63086351"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2025 10:19:32 -0700
+X-CSE-ConnectionGUID: z0UrEBYGROGKrIj5CQNsiw==
+X-CSE-MsgGUID: qB8UpDwBTjavC3poo+c9lQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,239,1754982000"; 
+   d="scan'208";a="188286438"
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by fmviesa004.fm.intel.com with ESMTP; 18 Oct 2025 10:19:29 -0700
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vAAaV-0008Rx-1M;
+	Sat, 18 Oct 2025 17:19:27 +0000
+Date: Sun, 19 Oct 2025 01:19:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH net-next] net: stmmac: mdio: use phy_find_first to
+ simplify stmmac_mdio_register
+Message-ID: <202510190044.J5cuIzfz-lkp@intel.com>
+References: <2a4a4138-fe61-48c7-8907-6414f0b471e7@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR07MB7984.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8eddda4a-0b8d-4d10-11c0-08de0e605da3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Oct 2025 16:06:58.3543
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5N3lEdEM0f4f9iWhL1nqXmTQn+0OH6SZziSlQLe5O9D3cjTjOKpwT8EzuQpR58l/29m59Q5th95goUj2RiRjLim9UFIIiQOs0/GL9aZTgRyATyezicPUqgvrIRGxfZkC
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR07MB9422
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2a4a4138-fe61-48c7-8907-6414f0b471e7@gmail.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBBYmVuaSA8cGFiZW5p
-QHJlZGhhdC5jb20+IA0KPiBTZW50OiBUaHVyc2RheSwgT2N0b2JlciAxNiwgMjAyNSAxMToxNCBB
-TQ0KPiBUbzogQ2hpYS1ZdSBDaGFuZyAoTm9raWEpIDxjaGlhLXl1LmNoYW5nQG5va2lhLWJlbGwt
-bGFicy5jb20+OyBlZHVtYXpldEBnb29nbGUuY29tOyBsaW51eC1kb2NAdmdlci5rZXJuZWwub3Jn
-OyBjb3JiZXRAbHduLm5ldDsgaG9ybXNAa2VybmVsLm9yZzsgZHNhaGVybkBrZXJuZWwub3JnOyBr
-dW5peXVAYW1hem9uLmNvbTsgYnBmQHZnZXIua2VybmVsLm9yZzsgbmV0ZGV2QHZnZXIua2VybmVs
-Lm9yZzsgZGF2ZS50YWh0QGdtYWlsLmNvbTsgamhzQG1vamF0YXR1LmNvbTsga3ViYUBrZXJuZWwu
-b3JnOyBzdGVwaGVuQG5ldHdvcmtwbHVtYmVyLm9yZzsgeGl5b3Uud2FuZ2NvbmdAZ21haWwuY29t
-OyBqaXJpQHJlc251bGxpLnVzOyBkYXZlbUBkYXZlbWxvZnQubmV0OyBhbmRyZXcrbmV0ZGV2QGx1
-bm4uY2g7IGRvbmFsZC5odW50ZXJAZ21haWwuY29tOyBhc3RAZmliZXJieS5uZXQ7IGxpdWhhbmdi
-aW5AZ21haWwuY29tOyBzaHVhaEBrZXJuZWwub3JnOyBsaW51eC1rc2VsZnRlc3RAdmdlci5rZXJu
-ZWwub3JnOyBpakBrZXJuZWwub3JnOyBuY2FyZHdlbGxAZ29vZ2xlLmNvbTsgS29lbiBEZSBTY2hl
-cHBlciAoTm9raWEpIDxrb2VuLmRlX3NjaGVwcGVyQG5va2lhLWJlbGwtbGFicy5jb20+OyBnLndo
-aXRlQGNhYmxlbGFicy5jb207IGluZ2VtYXIucy5qb2hhbnNzb25AZXJpY3Nzb24uY29tOyBtaXJq
-YS5rdWVobGV3aW5kQGVyaWNzc29uLmNvbTsgY2hlc2hpcmUgPGNoZXNoaXJlQGFwcGxlLmNvbT47
-IHJzLmlldGZAZ214LmF0OyBKYXNvbl9MaXZpbmdvb2RAY29tY2FzdC5jb207IFZpZGhpIEdvZWwg
-PHZpZGhpX2dvZWxAYXBwbGUuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHY0IG5ldC1uZXh0
-IDA4LzEzXSB0Y3A6IGFjY2VjbjogcmV0cmFuc21pdCBTWU4vQUNLIHdpdGhvdXQgQWNjRUNOIG9w
-dGlvbiBvciBub24tQWNjRUNOIFNZTi9BQ0sNCj4gDQo+IA0KPiBDQVVUSU9OOiBUaGlzIGlzIGFu
-IGV4dGVybmFsIGVtYWlsLiBQbGVhc2UgYmUgdmVyeSBjYXJlZnVsIHdoZW4gY2xpY2tpbmcgbGlu
-a3Mgb3Igb3BlbmluZyBhdHRhY2htZW50cy4gU2VlIHRoZSBVUkwgbm9rLml0L2V4dCBmb3IgYWRk
-aXRpb25hbCBpbmZvcm1hdGlvbi4NCj4gDQo+IA0KPiANCj4gT24gMTAvMTMvMjUgNzowMyBQTSwg
-Y2hpYS15dS5jaGFuZ0Bub2tpYS1iZWxsLWxhYnMuY29tIHdyb3RlOg0KPiA+IEZyb206IENoaWEt
-WXUgQ2hhbmcgPGNoaWEteXUuY2hhbmdAbm9raWEtYmVsbC1sYWJzLmNvbT4NCj4gPg0KPiA+IElm
-IHRoZSBUQ1AgU2VydmVyIGhhcyBub3QgcmVjZWl2ZWQgYW4gQUNLIHRvIGFja25vd2xlZGdlIGl0
-cyBTWU4vQUNLIA0KPiA+IGFmdGVyIHRoZSBub3JtYWwgVENQIHRpbWVvdXQgb3IgaXQgcmVjZWl2
-ZXMgYSBzZWNvbmQgU1lOIHdpdGggYSANCj4gPiByZXF1ZXN0IGZvciBBY2NFQ04gc3VwcG9ydCwg
-dGhlbiBlaXRoZXIgdGhlIFNZTi9BQ0sgbWlnaHQganVzdCBoYXZlIA0KPiA+IGJlZW4gbG9zdCwg
-ZS5nLiBkdWUgdG8gY29uZ2VzdGlvbiwgb3IgYSBtaWRkbGVib3ggbWlnaHQgYmUgYmxvY2tpbmcg
-DQo+ID4gQWNjRUNOIE9wdGlvbnMuIFRvIGV4cGVkaXRlIGNvbm5lY3Rpb24gc2V0dXAgaW4gZGVw
-bG95bWVudCBzY2VuYXJpb3MgDQo+ID4gd2hlcmUgQWNjRUNOIHBhdGggdHJhdmVyc2FsIG1pZ2h0
-IGJlIHByb2JsZW1hdGljLCB0aGUgVENQIFNlcnZlciANCj4gPiBTSE9VTEQgcmV0cmFuc21pdCB0
-aGUgU1lOL0FDSywgYnV0IHdpdGggbm8gQWNjRUNOIE9wdGlvbi4NCj4gPg0KPiA+IElmIHRoaXMg
-cmV0cmFuc21pc3Npb24gdGltZXMgb3V0LCB0byBleHBlZGl0ZSBjb25uZWN0aW9uIHNldHVwLCB0
-aGUgDQo+ID4gVENQIFNlcnZlciBTSE9VTEQgcmV0cmFuc21pdCB0aGUgU1lOL0FDSyB3aXRoIChB
-RSxDV1IsRUNFKSA9ICgwLDAsMCkgDQo+ID4gYW5kIG5vIEFjY0VDTiBPcHRpb24sIGJ1dCBpdCBy
-ZW1haW5zIGluIEFjY0VDTiBmZWVkYmFjayBtb2RlLg0KPiA+DQo+ID4gVGhpcyBmb2xsb3dzIFNl
-Y3Rpb24gMy4yLjMuMi4yIG9mIEFjY0VDTiBzcGVjIChSRkM5NzY4KS4NCj4gPg0KPiA+IFNpZ25l
-ZC1vZmYtYnk6IENoaWEtWXUgQ2hhbmcgPGNoaWEteXUuY2hhbmdAbm9raWEtYmVsbC1sYWJzLmNv
-bT4NCj4gPiAtLS0NCj4gPiAgaW5jbHVkZS9uZXQvdGNwX2Vjbi5oIHwgMTQgKysrKysrKysrKy0t
-LS0gIG5ldC9pcHY0L3RjcF9vdXRwdXQuYyB8ICAyIA0KPiA+ICstDQo+ID4gIDIgZmlsZXMgY2hh
-bmdlZCwgMTEgaW5zZXJ0aW9ucygrKSwgNSBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1n
-aXQgYS9pbmNsdWRlL25ldC90Y3BfZWNuLmggYi9pbmNsdWRlL25ldC90Y3BfZWNuLmggaW5kZXgg
-DQo+ID4gYzY2ZjBkOTQ0ZTFjLi45N2EzYTdmMzZhZmYgMTAwNjQ0DQo+ID4gLS0tIGEvaW5jbHVk
-ZS9uZXQvdGNwX2Vjbi5oDQo+ID4gKysrIGIvaW5jbHVkZS9uZXQvdGNwX2Vjbi5oDQo+ID4gQEAg
-LTY1MSwxMCArNjUxLDE2IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCB0Y3BfZWNuX2NsZWFyX3N5bihz
-dHJ1Y3Qgc29jayANCj4gPiAqc2ssIHN0cnVjdCBza19idWZmICpza2IpICBzdGF0aWMgaW5saW5l
-IHZvaWQgIA0KPiA+IHRjcF9lY25fbWFrZV9zeW5hY2soY29uc3Qgc3RydWN0IHJlcXVlc3Rfc29j
-ayAqcmVxLCBzdHJ1Y3QgdGNwaGRyICp0aCkgIA0KPiA+IHsNCj4gPiAtICAgICBpZiAodGNwX3Jz
-ayhyZXEpLT5hY2NlY25fb2spDQo+ID4gLSAgICAgICAgICAgICB0Y3BfYWNjZWNuX2VjaG9fc3lu
-X2VjdCh0aCwgdGNwX3JzayhyZXEpLT5zeW5fZWN0X3Jjdik7DQo+ID4gLSAgICAgZWxzZSBpZiAo
-aW5ldF9yc2socmVxKS0+ZWNuX29rKQ0KPiA+IC0gICAgICAgICAgICAgdGgtPmVjZSA9IDE7DQo+
-ID4gKyAgICAgaWYgKHJlcS0+bnVtX3JldHJhbnMgPCAxIHx8IHJlcS0+bnVtX3RpbWVvdXQgPCAx
-KSB7DQo+IA0KPiBJIHRoaW5rIHRoZSBhYm92ZSBjb25kaXRpb24gZG9lcyBub3QgbWF0Y2ggdGhl
-IGNvbW1pdCBtZXNzYWdlLiBTaG91bGQgYmU6DQo+ICAgICAgICAgaWYgKCFyZXEtPm51bV9yZXRy
-YW5zICYmICFyZXEtPm51bV90aW1lb3V0KSB7DQo+DQo+IC9QDQoNCkhpIFBhb2xvLA0KDQpUaGlz
-IHBhdGNoIGluY2x1ZGVzIHR3byBkaWZmZXJldG4gU1lOL0FDSyByZXRyYW5zbWlzc2lvbnM6DQpJ
-biB0aGUgZmlyc3QgcmV0cmFuc21pdGVkIFNZTi9BQ0ssIHRoZSByZXRyYW5zbWl0dGVkIFNZTi9B
-Q0sgd2lsbCBub3QgaW5jbHVkZSBBY2NFQ04gb3B0aW9uLg0KVGhpcyB1c2VzIHRoZSBjb25kaXRp
-b24gb2YgInJlcS0+bnVtX3JldHJhbnMgPjEiIGluIHRjcF9zeW5hY2tfb3B0aW9ucygpLg0KDQpJ
-biB0aGUgc2Vjb25kIHJldHJhbnNtaXR0ZWQgU1lOL0FDSywgdGhlIHJldHJhbnNtaXR0ZWQgU1lO
-L0FDSyB3aWxsIGZ1cnRoZXIgc2V0IEFDRT0wLg0KVGhpcyB1c2VzIHRoZSBjb25kaXRpb24gb2Yg
-InJlcS0+bnVtX3JldHJhbnM+MSAmJiByZXEtPm51bV90aW1lb3V0PjEiIGluIHRjcF9lY25fbWFr
-ZV9zeW5hY2soKS4NCg0KSSB3YXMgdGhpbmtpbmcsIGluIHRoZSBuZXh0IHZlcnNpb24sIEkgY291
-bGQgdXBkYXRlIHRoZSBjb21taXQgbWVzc2FnZSB0byBjbGFyaWZ5IGl0Lg0KDQpDaGlhLVl1DQo=
+Hi Heiner,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Heiner-Kallweit/net-stmmac-mdio-use-phy_find_first-to-simplify-stmmac_mdio_register/20251018-094132
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/2a4a4138-fe61-48c7-8907-6414f0b471e7%40gmail.com
+patch subject: [PATCH net-next] net: stmmac: mdio: use phy_find_first to simplify stmmac_mdio_register
+config: x86_64-kexec (https://download.01.org/0day-ci/archive/20251019/202510190044.J5cuIzfz-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251019/202510190044.J5cuIzfz-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202510190044.J5cuIzfz-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c:684:16: warning: variable 'addr' is uninitialized when used here [-Wuninitialized]
+     684 |                 new_bus->irq[addr] = mdio_bus_data->probed_phy_irq;
+         |                              ^~~~
+   drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c:588:10: note: initialize the variable 'addr' to silence this warning
+     588 |         int addr, max_addr;
+         |                 ^
+         |                  = 0
+   1 warning generated.
+
+
+vim +/addr +684 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
+
+6717746f33abcd drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Russell King (Oracle  2025-09-04  571) 
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  572  /**
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  573   * stmmac_mdio_register
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  574   * @ndev: net device structure
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  575   * Description: it registers the MII bus
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  576   */
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  577  int stmmac_mdio_register(struct net_device *ndev)
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  578  {
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  579  	int err = 0;
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  580  	struct mii_bus *new_bus;
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  581  	struct stmmac_priv *priv = netdev_priv(ndev);
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  582  	struct stmmac_mdio_bus_data *mdio_bus_data = priv->plat->mdio_bus_data;
+a7657f128c279a drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Giuseppe CAVALLARO    2016-04-01  583  	struct device_node *mdio_node = priv->plat->mdio_node;
+fbca164776e438 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Romain Perier         2017-08-10  584  	struct device *dev = ndev->dev.parent;
+ab21cf920928a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Ong Boon Leong        2022-06-15  585  	struct fwnode_handle *fixed_node;
+e80af2acdef73d drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Russell King (Oracle  2023-08-24  586) 	struct fwnode_handle *fwnode;
+e08dc713606b32 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Heiner Kallweit       2025-10-17  587  	struct phy_device *phydev;
+e08dc713606b32 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Heiner Kallweit       2025-10-17  588  	int addr, max_addr;
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  589  
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  590  	if (!mdio_bus_data)
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  591  		return 0;
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  592  
+661a868937a1cf drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Russell King (Oracle  2025-09-04  593) 	stmmac_mdio_bus_config(priv);
+6717746f33abcd drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Russell King (Oracle  2025-09-04  594) 
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  595  	new_bus = mdiobus_alloc();
+efd89b60a35d6a drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c LABBE Corentin        2017-02-08  596  	if (!new_bus)
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  597  		return -ENOMEM;
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  598  
+e7f4dc3536a400 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Lunn           2016-01-06  599  	if (mdio_bus_data->irqs)
+643d60bf575daa drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Marek Vasut           2016-05-26  600  		memcpy(new_bus->irq, mdio_bus_data->irqs, sizeof(new_bus->irq));
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  601  
+90b9a5454fd2e6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Alessandro Rubini     2012-01-23  602  	new_bus->name = "stmmac";
+6fc21117b791b6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2018-08-08  603  
+6fc21117b791b6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2018-08-08  604  	if (priv->plat->has_xgmac) {
+5b0a447efff5a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Lunn           2023-01-12  605  		new_bus->read = &stmmac_xgmac2_mdio_read_c22;
+5b0a447efff5a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Lunn           2023-01-12  606  		new_bus->write = &stmmac_xgmac2_mdio_write_c22;
+5b0a447efff5a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Lunn           2023-01-12  607  		new_bus->read_c45 = &stmmac_xgmac2_mdio_read_c45;
+5b0a447efff5a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Lunn           2023-01-12  608  		new_bus->write_c45 = &stmmac_xgmac2_mdio_write_c45;
+6fc21117b791b6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2018-08-08  609  
+10857e6779054f drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Rohan G Thomas        2023-07-31  610  		if (priv->synopsys_id < DWXGMAC_CORE_2_20) {
+6fc21117b791b6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2018-08-08  611  			/* Right now only C22 phys are supported */
+6fc21117b791b6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2018-08-08  612  			max_addr = MII_XGMAC_MAX_C22ADDR + 1;
+6fc21117b791b6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2018-08-08  613  
+6fc21117b791b6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2018-08-08  614  			/* Check if DT specified an unsupported phy addr */
+6fc21117b791b6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2018-08-08  615  			if (priv->plat->phy_addr > MII_XGMAC_MAX_C22ADDR)
+6fc21117b791b6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2018-08-08  616  				dev_err(dev, "Unsupported phy_addr (max=%d)\n",
+6fc21117b791b6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2018-08-08  617  					MII_XGMAC_MAX_C22ADDR);
+10857e6779054f drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Rohan G Thomas        2023-07-31  618  		} else {
+10857e6779054f drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Rohan G Thomas        2023-07-31  619  			/* XGMAC version 2.20 onwards support 32 phy addr */
+10857e6779054f drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Rohan G Thomas        2023-07-31  620  			max_addr = PHY_MAX_ADDR;
+10857e6779054f drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Rohan G Thomas        2023-07-31  621  		}
+6fc21117b791b6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2018-08-08  622  	} else {
+3c7826d0b1066b drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Lunn           2023-01-12  623  		new_bus->read = &stmmac_mdio_read_c22;
+3c7826d0b1066b drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Lunn           2023-01-12  624  		new_bus->write = &stmmac_mdio_write_c22;
+3c7826d0b1066b drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Lunn           2023-01-12  625  		if (priv->plat->has_gmac4) {
+3c7826d0b1066b drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Lunn           2023-01-12  626  			new_bus->read_c45 = &stmmac_mdio_read_c45;
+3c7826d0b1066b drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Lunn           2023-01-12  627  			new_bus->write_c45 = &stmmac_mdio_write_c45;
+3c7826d0b1066b drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Lunn           2023-01-12  628  		}
+3c7826d0b1066b drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Lunn           2023-01-12  629  
+6fc21117b791b6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2018-08-08  630  		max_addr = PHY_MAX_ADDR;
+6fc21117b791b6 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2018-08-08  631  	}
+ac1f74a7fc1976 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Alexandre TORGUE      2016-04-28  632  
+1a981c0586c038 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Thierry Reding        2019-07-26  633  	if (mdio_bus_data->needs_reset)
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  634  		new_bus->reset = &stmmac_mdio_reset;
+1a981c0586c038 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Thierry Reding        2019-07-26  635  
+db8857bf5bd888 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Florian Fainelli      2012-01-09  636  	snprintf(new_bus->id, MII_BUS_ID_SIZE, "%s-%x",
+d56631a66c0d0c drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Srinivas Kandagatla   2012-08-30  637  		 new_bus->name, priv->plat->bus_id);
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  638  	new_bus->priv = ndev;
+351066bad6ade5 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Serge Semin           2024-07-01  639  	new_bus->phy_mask = mdio_bus_data->phy_mask | mdio_bus_data->pcs_mask;
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  640  	new_bus->parent = priv->device;
+e34d65696d2ef1 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Phil Reid             2015-12-14  641  
+e34d65696d2ef1 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Phil Reid             2015-12-14  642  	err = of_mdiobus_register(new_bus, mdio_node);
+e23c0d21ce9234 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Halaney        2023-12-12  643  	if (err == -ENODEV) {
+e23c0d21ce9234 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Halaney        2023-12-12  644  		err = 0;
+e23c0d21ce9234 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Halaney        2023-12-12  645  		dev_info(dev, "MDIO bus is disabled\n");
+e23c0d21ce9234 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Halaney        2023-12-12  646  		goto bus_register_fail;
+e23c0d21ce9234 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Halaney        2023-12-12  647  	} else if (err) {
+839612d23ffd93 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Rasmus Villemoes      2022-06-02  648  		dev_err_probe(dev, err, "Cannot register the MDIO bus\n");
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  649  		goto bus_register_fail;
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  650  	}
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  651  
+04d1190aca7747 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2019-11-11  652  	/* Looks like we need a dummy read for XGMAC only and C45 PHYs */
+04d1190aca7747 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2019-11-11  653  	if (priv->plat->has_xgmac)
+5b0a447efff5a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Andrew Lunn           2023-01-12  654  		stmmac_xgmac2_mdio_read_c45(new_bus, 0, 0, 0);
+04d1190aca7747 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Jose Abreu            2019-11-11  655  
+ab21cf920928a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Ong Boon Leong        2022-06-15  656  	/* If fixed-link is set, skip PHY scanning */
+e80af2acdef73d drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Russell King (Oracle  2023-08-24  657) 	fwnode = priv->plat->port_node;
+ab21cf920928a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Ong Boon Leong        2022-06-15  658  	if (!fwnode)
+ab21cf920928a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Ong Boon Leong        2022-06-15  659  		fwnode = dev_fwnode(priv->device);
+ab21cf920928a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Ong Boon Leong        2022-06-15  660  
+ab21cf920928a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Ong Boon Leong        2022-06-15  661  	if (fwnode) {
+ab21cf920928a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Ong Boon Leong        2022-06-15  662  		fixed_node = fwnode_get_named_child_node(fwnode, "fixed-link");
+ab21cf920928a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Ong Boon Leong        2022-06-15  663  		if (fixed_node) {
+ab21cf920928a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Ong Boon Leong        2022-06-15  664  			fwnode_handle_put(fixed_node);
+ab21cf920928a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Ong Boon Leong        2022-06-15  665  			goto bus_register_done;
+ab21cf920928a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Ong Boon Leong        2022-06-15  666  		}
+ab21cf920928a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Ong Boon Leong        2022-06-15  667  	}
+ab21cf920928a7 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Ong Boon Leong        2022-06-15  668  
+cc2fa619a738a0 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Phil Reid             2016-03-15  669  	if (priv->plat->phy_node || mdio_node)
+cc2fa619a738a0 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Phil Reid             2016-03-15  670  		goto bus_register_done;
+cc2fa619a738a0 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Phil Reid             2016-03-15  671  
+e08dc713606b32 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Heiner Kallweit       2025-10-17  672  	phydev = phy_find_first(new_bus);
+e08dc713606b32 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Heiner Kallweit       2025-10-17  673  	if (!phydev || phydev->mdio.addr >= max_addr) {
+e08dc713606b32 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Heiner Kallweit       2025-10-17  674  		dev_warn(dev, "No PHY found\n");
+e08dc713606b32 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Heiner Kallweit       2025-10-17  675  		err = -ENODEV;
+e08dc713606b32 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Heiner Kallweit       2025-10-17  676  		goto no_phy_found;
+e08dc713606b32 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Heiner Kallweit       2025-10-17  677  	}
+cc26dc67b69a73 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c LABBE Corentin        2017-02-15  678  
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  679  	/*
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  680  	 * If an IRQ was provided to be assigned after
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  681  	 * the bus probe, do it here.
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  682  	 */
+e08dc713606b32 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Heiner Kallweit       2025-10-17  683  	if (!mdio_bus_data->irqs && mdio_bus_data->probed_phy_irq > 0) {
+cc26dc67b69a73 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c LABBE Corentin        2017-02-15 @684  		new_bus->irq[addr] = mdio_bus_data->probed_phy_irq;
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  685  		phydev->irq = mdio_bus_data->probed_phy_irq;
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  686  	}
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  687  
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  688  	/*
+e08dc713606b32 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Heiner Kallweit       2025-10-17  689  	 * If we're going to bind the MAC to this PHY bus, and no PHY number
+e08dc713606b32 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Heiner Kallweit       2025-10-17  690  	 * was provided to the MAC, use the one probed here.
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  691  	 */
+d56631a66c0d0c drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Srinivas Kandagatla   2012-08-30  692  	if (priv->plat->phy_addr == -1)
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  693  		priv->plat->phy_addr = addr;
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  694  
+fbca164776e438 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Romain Perier         2017-08-10  695  	phy_attached_info(phydev);
+4751d2aa321f28 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Vladimir Oltean       2021-05-27  696  
+cc2fa619a738a0 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Phil Reid             2016-03-15  697  bus_register_done:
+3955b22b9798ae drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Giuseppe CAVALLARO    2013-02-06  698  	priv->mii = new_bus;
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  699  
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  700  	return 0;
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  701  
+4751d2aa321f28 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Vladimir Oltean       2021-05-27  702  no_phy_found:
+4751d2aa321f28 drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c Vladimir Oltean       2021-05-27  703  	mdiobus_unregister(new_bus);
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  704  bus_register_fail:
+36bcfe7d74782c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe CAVALLARO    2011-07-20  705  	mdiobus_free(new_bus);
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  706  	return err;
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  707  }
+47dd7a540b8a0c drivers/net/stmmac/stmmac_mdio.c                  Giuseppe Cavallaro    2009-10-14  708  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
