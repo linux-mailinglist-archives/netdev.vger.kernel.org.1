@@ -1,155 +1,162 @@
-Return-Path: <netdev+bounces-230663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91911BEC97B
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 09:42:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27BF4BEC98D
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 09:43:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2E3674E2D0A
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 07:42:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D59F85E6860
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 07:43:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB2E284669;
-	Sat, 18 Oct 2025 07:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4632E284B2E;
+	Sat, 18 Oct 2025 07:43:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VO+qNQc9"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Rf0OR0T+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A821C6A3
-	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 07:42:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2956F9443
+	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 07:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760773355; cv=none; b=SCbCYKOdnk6aM1lejLmwe21OJIcpJTFYRoedVinPPxppubBZUopbziYwunAYHylWovfs2FoP86rXMedXow0sxG4VJpbL/J5BoWQTggp6GfTfHI2jYCqU1lSA7mGwEXRj+Op1TMq/n7F8QNXhqYGxp/ZvCgTArs62wj5YRfxWdNw=
+	t=1760773405; cv=none; b=Qq0BrXfTx+0LGoG0YRBXedxU+MyOEMFPfxeTw91EL0cXA6aBcCWpfNu7s5nqnI12NpsiS+3994X1sZ4yUiA9+wcXd+VN3A7a2c8F+KvkInqOU3DbThWONuTZHXkp3184+xZ+Qpjic42mcEXcgatBisPeT9+md5VXfUt1a6jeK/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760773355; c=relaxed/simple;
-	bh=xOpTd5jO+0NrF41257k6j4GF9gYFVtKH/e12dm4NH6Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZDPC1pIsHHDIy8GRU+dlB0BP38Wlwm0W7N0J8qq892kWAvsZS0MxnoSwx7ipOA6snsZ/K0qUV9hDOmfpogoTS4yZKQLfiZbKaf7fJtm+WXBlPvnGlCb+fbifoG20peRhYhiYN7NfDhavU3QA/0hgQHvd0wrqGslLMQDzoqL3Pqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VO+qNQc9; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760773354; x=1792309354;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xOpTd5jO+0NrF41257k6j4GF9gYFVtKH/e12dm4NH6Y=;
-  b=VO+qNQc9Ff9f5Xp97idHV3B9JvC6tC3kA+vD2eK8J5rg16irXzpSo5lz
-   fPH9TgBQVwCGLmrPqerzDUFjbf2qKmJXDghKjd+5AGQgDd2Dt2EKkwu6S
-   OQOX6ReIpqg7CYxGDHVn+aLttWVu3A+KCod0J7ugOF5XqEvHhzZO0kkSf
-   gZxFFyjFtjkto5dijdcaucGsXM/S//uepPmOuXads7Mdsh8ESbOY4AgKV
-   BP/hbBXFoCQWfMWgsoO9//NJpe8f2cZTwFNUaBrVmXSuqUfyAdLcm6uET
-   vMlFpxfiY6Xa8RkS3QcBBeqWz/0uNi/+X+d7drGnnJUPKCEd0zXwpbooK
-   w==;
-X-CSE-ConnectionGUID: PsOyyNu9TYa+jym+V7nM4w==
-X-CSE-MsgGUID: QPHtAtwTQlChC5NHLHJxJQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="66814519"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="66814519"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2025 00:42:33 -0700
-X-CSE-ConnectionGUID: T+eAZmiBSBiHBRx2tLFw8g==
-X-CSE-MsgGUID: kL5icr7USp+7ev58pbJpRA==
-X-ExtLoop1: 1
-Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
-  by fmviesa003.fm.intel.com with ESMTP; 18 Oct 2025 00:42:30 -0700
-Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vA1Zw-000895-36;
-	Sat, 18 Oct 2025 07:42:21 +0000
-Date: Sat, 18 Oct 2025 15:42:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Saeed Mahameed <saeed@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, mbloch@nvidia.com,
-	Adithya Jayachandran <ajayachandra@nvidia.com>
-Subject: Re: [PATCH net-next 2/3] net/mlx5: MPFS, add support for dynamic
- enable/disable
-Message-ID: <202510181424.S8zAzGjf-lkp@intel.com>
-References: <20251016013618.2030940-3-saeed@kernel.org>
+	s=arc-20240116; t=1760773405; c=relaxed/simple;
+	bh=F6o5xuD/rEaG0v6EJNW/4wJ09DXvQktJ9h7IiFVRojI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mW0vEP9gtSrv7Eg58FbY4qm8thtWeTgzLNUquaQna3S+RrPV5uorjalKdS7wkOmIsVSWRNvppeVqa8WzidcFGRqBXbdZPZAqrPxL0/Ku0nK3aar27l83jFiJjUU2NF0IUWYXZkkP3EAlPyEV7Jrn1nB4FkijmX5cdx8BlIXNhI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Rf0OR0T+; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id CE09BC09A07;
+	Sat, 18 Oct 2025 07:43:00 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 20D6B6069D;
+	Sat, 18 Oct 2025 07:43:20 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id F3132102F2343;
+	Sat, 18 Oct 2025 09:42:58 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1760773399; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=BrMMsk9VBVt4yUp2jMiSJe8MPMPTFyVYedP9FgMnb7c=;
+	b=Rf0OR0T+dhtzVXq5CsJLvyo9tJp01jc+xfMcYMVyaVUy1ovb41EuvzSdNJh3q8MwMYLLOg
+	eRH6oNPSnc/lvTnpjLdcSYqrpAO+I/eulSqZ5TBSJosUm+bjArDm4Mqvfa9JsYFSNs+pOn
+	WDZuotNyTSJV+ODF9R7bMIzK0NCJAN8xQvsL+DN3ZsDaTZebx0kpWuwIwqVy13ITQnjBvX
+	P85z/GtqPJ3bw7jVNB0JKdHwWKerNHfBrN3AuduHhy4UocMx1H5pddfrOScVGCaEskhLmD
+	WvLtSpoOdsIK3Zwz0lDnx+kDriDemgk08RCAQWo4AmjSlApxCsxWE0hzsoFuJw==
+Message-ID: <d40cbc17-22fa-4829-8eb0-e9fd26fc54b1@bootlin.com>
+Date: Sat, 18 Oct 2025 09:42:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251016013618.2030940-3-saeed@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/3] net: stmmac: Allow supporting coarse
+ adjustment mode
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
+ <20251015102725.1297985-3-maxime.chevallier@bootlin.com>
+ <20251017182358.42f76387@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251017182358.42f76387@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Saeed,
+Hi Jakub,
 
-kernel test robot noticed the following build errors:
+On 18/10/2025 03:23, Jakub Kicinski wrote:
+> On Wed, 15 Oct 2025 12:27:22 +0200 Maxime Chevallier wrote:
+>> The DWMAC1000 supports 2 timestamping configurations to configure how
+>> frequency adjustments are made to the ptp_clock, as well as the reported
+>> timestamp values.
+>>
+>> There was a previous attempt at upstreaming support for configuring this
+>> mode by Olivier Dautricourt and Julien Beraud a few years back [1]
+>>
+>> In a nutshell, the timestamping can be either set in fine mode or in
+>> coarse mode.
+>>
+>> In fine mode, which is the default, we use the overflow of an accumulator to
+>> trigger frequency adjustments, but by doing so we lose precision on the
+>> timetamps that are produced by the timestamping unit. The main drawback
+>> is that the sub-second increment value, used to generate timestamps, can't be
+>> set to lower than (2 / ptp_clock_freq).
+>>
+>> The "fine" qualification comes from the frequent frequency adjustments we are
+>> able to do, which is perfect for a PTP follower usecase.
+>>
+>> In Coarse mode, we don't do frequency adjustments based on an
+>> accumulator overflow. We can therefore have very fine subsecond
+>> increment values, allowing for better timestamping precision. However
+>> this mode works best when the ptp clock frequency is adjusted based on
+>> an external signal, such as a PPS input produced by a GPS clock. This
+>> mode is therefore perfect for a Grand-master usecase.
+>>
+>> We therefore attempt to map these 2 modes with the newly introduced
+>> hwtimestamp qualifiers (precise and approx).
+>>
+>> Precise mode is mapped to stmmac fine mode, and is the expected default,
+>> suitable for all cases and perfect for follower mode
+>>
+>> Approx mode is mapped to coarse mode, suitable for Grand-master.
+> 
+> I failed to understand what this device does and what the problem is :(
+> 
+> What is your ptp_clock_freq? Isn't it around 50MHz typically? 
+> So 2 / ptp_freq is 40nsec (?), not too bad?
 
-[auto build test ERROR on net-next/main]
+That's not too bad indeed, but it makes a difference when acting as
+Grand Master, especially in this case because you don't need to
+perform clock adjustments (it's sync'd through PPS in), so we might
+as well take this opportunity to improve the TS.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Saeed-Mahameed/devlink-Introduce-devlink-eswitch-state/20251016-094245
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20251016013618.2030940-3-saeed%40kernel.org
-patch subject: [PATCH net-next 2/3] net/mlx5: MPFS, add support for dynamic enable/disable
-config: i386-buildonly-randconfig-001-20251018 (https://download.01.org/0day-ci/archive/20251018/202510181424.S8zAzGjf-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251018/202510181424.S8zAzGjf-lkp@intel.com/reproduce)
+> 
+> My recollection of the idea behind that timestamping providers
+> was that you can configure different filters for different providers.
+> IOW that you'd be able to say:
+>  - [precise] Rx stamp PTP packets 
+>  -  [approx] Rx stamp all packets
+> not that you'd configure precision of one piece of HW..
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202510181424.S8zAzGjf-lkp@intel.com/
+So far it looks like only one provider is enabled at a given time, my
+understanding was that the qualifier would be used in case there
+are multiple timestampers on the data path, to select the better one
+(e.g. a PHY that supports TS, a MAC that supports TS, we use the 
+best out of the two).
 
-All errors (new ones prefixed by >>):
+However I agree with your comments, that's exactly the kind of feedback
+I was looking for. This work has been tried several times now each
+time with a different uAPI path, I'm OK to consider that this is out
+of the scope of the hwprov feature.
 
-   ld: drivers/net/ethernet/mellanox/mlx5/core/eq.o: in function `mlx5_mpfs_enable':
->> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: multiple definition of `mlx5_mpfs_enable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: first defined here
-   ld: drivers/net/ethernet/mellanox/mlx5/core/eq.o: in function `mlx5_mpfs_disable':
->> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: multiple definition of `mlx5_mpfs_disable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: first defined here
-   ld: drivers/net/ethernet/mellanox/mlx5/core/vport.o: in function `mlx5_mpfs_enable':
->> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: multiple definition of `mlx5_mpfs_enable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: first defined here
-   ld: drivers/net/ethernet/mellanox/mlx5/core/vport.o: in function `mlx5_mpfs_disable':
->> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: multiple definition of `mlx5_mpfs_disable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: first defined here
-   ld: drivers/net/ethernet/mellanox/mlx5/core/sriov.o: in function `mlx5_mpfs_enable':
->> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: multiple definition of `mlx5_mpfs_enable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: first defined here
-   ld: drivers/net/ethernet/mellanox/mlx5/core/sriov.o: in function `mlx5_mpfs_disable':
->> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: multiple definition of `mlx5_mpfs_disable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: first defined here
-   ld: drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.o: in function `mlx5_mpfs_enable':
->> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: multiple definition of `mlx5_mpfs_enable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: first defined here
-   ld: drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.o: in function `mlx5_mpfs_disable':
->> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: multiple definition of `mlx5_mpfs_disable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: first defined here
-   ld: drivers/net/ethernet/mellanox/mlx5/core/lag/lag.o: in function `mlx5_mpfs_enable':
->> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: multiple definition of `mlx5_mpfs_enable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: first defined here
-   ld: drivers/net/ethernet/mellanox/mlx5/core/lag/lag.o: in function `mlx5_mpfs_disable':
->> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: multiple definition of `mlx5_mpfs_disable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: first defined here
-   ld: drivers/net/ethernet/mellanox/mlx5/core/devlink.o: in function `mlx5_mpfs_enable':
->> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: multiple definition of `mlx5_mpfs_enable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: first defined here
-   ld: drivers/net/ethernet/mellanox/mlx5/core/devlink.o: in function `mlx5_mpfs_disable':
->> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: multiple definition of `mlx5_mpfs_disable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: first defined here
+> If the HW really needs it, just lob a devlink param at it?
+
+I'm totally OK with that. I'm not well versed into devlink, working mostly with
+embedded devices with simple-ish NICs, most of them don't use devlink. Let me
+give it a try then :)
+
+Thanks for taking a look at this,
+
+Maxime
 
 
-vim +97 drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h
-
-    87	
-    88	#ifdef CONFIG_MLX5_MPFS
-    89	struct mlx5_core_dev;
-    90	int  mlx5_mpfs_init(struct mlx5_core_dev *dev);
-    91	void mlx5_mpfs_cleanup(struct mlx5_core_dev *dev);
-    92	int mlx5_mpfs_enable(struct mlx5_core_dev *dev);
-    93	void mlx5_mpfs_disable(struct mlx5_core_dev *dev);
-    94	#else /* #ifndef CONFIG_MLX5_MPFS */
-    95	static inline int  mlx5_mpfs_init(struct mlx5_core_dev *dev) { return 0; }
-    96	static inline void mlx5_mpfs_cleanup(struct mlx5_core_dev *dev) {}
-  > 97	int mlx5_mpfs_enable(struct mlx5_core_dev *dev) { return 0; }
-  > 98	void mlx5_mpfs_disable(struct mlx5_core_dev *dev) {}
-    99	#endif
-   100	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
