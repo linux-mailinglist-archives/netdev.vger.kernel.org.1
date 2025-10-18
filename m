@@ -1,94 +1,157 @@
-Return-Path: <netdev+bounces-230633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDB54BEC117
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 02:01:58 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E8A8BEC130
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 02:06:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C205189713C
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 00:01:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2FD534E2312
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 00:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87E88314D00;
-	Sat, 18 Oct 2025 00:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R92QS/qi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC1E1397;
+	Sat, 18 Oct 2025 00:06:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B4A31355F
-	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 00:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A49354AF8;
+	Sat, 18 Oct 2025 00:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760745641; cv=none; b=QmEWx29Ya9ueXIYzEt3f9pno4SGAiExfnqtQpd1PfBn2GJ/v5iTdW5PsL9bmUTTChVcQR3T7T6OiZWcoaNFNnEMZPZsyrSJbM0H2NwDiKftdMTZ0a2vCdc9qV4qDWYWKJcgh7+rCaZW26Fh7oGLbzZi2FRvSROE6gSyU1+KHImY=
+	t=1760745961; cv=none; b=dFKANRRzbhjtX+pd9Sydr1TJf8ZpDtxhcuHoh2eqXpMHCNGul+ixxs4lopmdSTH6SykDlCeChBaQzTEc/nYCx69jhAtHuR319qo9hW1/g/AmUiwHBbbQLRyC18laO1kgsQSOs+OOxF7VmpmUgmqHMBavo8RPnF7mNaeFm0NX5Bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760745641; c=relaxed/simple;
-	bh=l1EmHOZc02jeaixE1d/XV8c7ezZ6rmS0jX7hj/Gn/GE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jG9ZnjYFd5xwu46d08fzcEsMF3Ba9wK0W17uG276iMwaByQByMHEbDuIzNvaFXmBwbsmCatWknu25PhIbPru2cfejYm44SH3GH9IFqvrpNHLGvBsIvu6Xm0zpDOviomMabt4kwmVD8s8JpQwbWnjcmojff8xlLlxNrl2Zdf7otU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R92QS/qi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E35FEC116C6;
-	Sat, 18 Oct 2025 00:00:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760745640;
-	bh=l1EmHOZc02jeaixE1d/XV8c7ezZ6rmS0jX7hj/Gn/GE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=R92QS/qiNPCaYDpF+2NnNCZ6dcsb3yvRE7yz4oVth47nWCJBQfHvj0aznAt719/EV
-	 /FoeD/R4ruco2JQ9I91q4H8TqOnFOWgpQrrIK/SQL3td3HbcORYhOy5TU/0pZ2vWut
-	 KDlFmeB4C1gEWk3ZP91yp2Q/3i2f2LeafPo1/9Mal4cunuOE5opm/xqj28GGzpVvpT
-	 UkVLHWWZUJCrSD+PMQmH+7cJbHv85c0aECvhI+NIMS+uGFmEVJAB+JXmdwR8xa7bN5
-	 voVtK3ZQQKtPrOkhfEcwK9rAlV0A5PmhcqEl3qmkO35F+tzYUbQlNiKGJ90000LKdt
-	 yNFmNgpiRD5kw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE9639EFA61;
-	Sat, 18 Oct 2025 00:00:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1760745961; c=relaxed/simple;
+	bh=cvYny5yQsHJFubeXGJElbL68TJTK+OiH5rxfRGrAUuo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k12Erfzxrw+Ub314sdm3cPp6VmV34JPeUkDaltW5pjhl6SFRAxZdWKlKhEjgHJcZgSQQ0uUXMv2Jnm1DDTk3o9ifyIYyRH/2u6A8K1i4dphtTaaWewCygi2ItU58FUuVxqAUyAEBg0zHrsUxTCWdM3Dfb+2Cuy3AT1X+qKSDWgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
+Received: from localhost (unknown [116.232.147.23])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: dlan)
+	by smtp.gentoo.org (Postfix) with ESMTPSA id C82DD341FD5;
+	Sat, 18 Oct 2025 00:05:58 +0000 (UTC)
+Date: Sat, 18 Oct 2025 08:05:48 +0800
+From: Yixun Lan <dlan@gentoo.org>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Han Gao <rabenda.cn@gmail.com>, Icenowy Zheng <uwu@icenowy.me>,
+	Vivian Wang <wangruikang@iscas.ac.cn>, Yao Zi <ziyao@disroot.org>,
+	netdev@vger.kernel.org, sophgo@lists.linux.dev,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH] net: stmmac: dwmac-sophgo: Add phy interface filter
+Message-ID: <20251018000548-GYA1481334@gentoo.org>
+References: <20251017011802.523140-1-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESUBMIT net-next] r8169: reconfigure rx unconditionally
- before chip reset when resuming
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176074562431.2830883.4987568665374178537.git-patchwork-notify@kernel.org>
-Date: Sat, 18 Oct 2025 00:00:24 +0000
-References: <a5c2e2d2-226f-4896-b8f6-45e2d91f0e24@gmail.com>
-In-Reply-To: <a5c2e2d2-226f-4896-b8f6-45e2d91f0e24@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: nic_swsd@realtek.com, andrew+netdev@lunn.ch, pabeni@redhat.com,
- kuba@kernel.org, davem@davemloft.net, edumazet@google.com, horms@kernel.org,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251017011802.523140-1-inochiama@gmail.com>
 
-Hello:
+Hi Inochi,
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 16 Oct 2025 21:25:28 +0200 you wrote:
-> There's a good chance that more chip versions suffer from the same
-> hw issue. So let's reconfigure rx unconditionally before the chip reset
-> when resuming. This shouldn't have any side effect on unaffected chip
-> versions.
+On 09:18 Fri 17 Oct     , Inochi Amaoto wrote:
+> As the SG2042 has an internal rx delay, the delay should be remove
+                                                     s/remove/removed/
+> when init the mac, otherwise the phy will be misconfigurated.
+s/init/initialize/
 > 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> Fixes: 543009e2d4cd ("net: stmmac: dwmac-sophgo: Add support for Sophgo SG2042 SoC")
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> Tested-by: Han Gao <rabenda.cn@gmail.com>
+> ---
+>  .../ethernet/stmicro/stmmac/dwmac-sophgo.c    | 25 ++++++++++++++++++-
+>  1 file changed, 24 insertions(+), 1 deletion(-)
 > 
-> [...]
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+> index 3b7947a7a7ba..b2dee1399eb0 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+> @@ -7,6 +7,7 @@
+> 
+>  #include <linux/clk.h>
+>  #include <linux/module.h>
+> +#include <linux/property.h>
+>  #include <linux/mod_devicetable.h>
+>  #include <linux/platform_device.h>
+> 
+> @@ -29,8 +30,23 @@ static int sophgo_sg2044_dwmac_init(struct platform_device *pdev,
+>  	return 0;
+>  }
+> 
+> +static int sophgo_sg2042_set_mode(struct plat_stmmacenet_data *plat_dat)
+> +{
+> +	switch (plat_dat->phy_interface) {
+> +	case PHY_INTERFACE_MODE_RGMII_ID:
+> +		plat_dat->phy_interface = PHY_INTERFACE_MODE_RGMII_TXID;
+> +		return 0;
+> +	case PHY_INTERFACE_MODE_RGMII_RXID:
+> +		plat_dat->phy_interface = PHY_INTERFACE_MODE_RGMII;
+> +		return 0;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +}
+> +
+>  static int sophgo_dwmac_probe(struct platform_device *pdev)
+>  {
+> +	int (*plat_set_mode)(struct plat_stmmacenet_data *plat_dat);
+>  	struct plat_stmmacenet_data *plat_dat;
+>  	struct stmmac_resources stmmac_res;
+>  	struct device *dev = &pdev->dev;
+> @@ -50,11 +66,18 @@ static int sophgo_dwmac_probe(struct platform_device *pdev)
+>  	if (ret)
+>  		return ret;
+> 
+> +	plat_set_mode = device_get_match_data(&pdev->dev);
+> +	if (plat_set_mode) {
+> +		ret = plat_set_mode(plat_dat);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>  	return stmmac_dvr_probe(dev, plat_dat, &stmmac_res);
+>  }
+> 
+>  static const struct of_device_id sophgo_dwmac_match[] = {
+> -	{ .compatible = "sophgo,sg2042-dwmac" },
+> +	{ .compatible = "sophgo,sg2042-dwmac", .data = sophgo_sg2042_set_mode },
+I'd personally prefer to introduce a flag for this, it would be more readable and
+maintainable, something like
+struct sophgo_dwmac_compitable_data {
+	bool has_internal_rx_delay;
+}
 
-Here is the summary with links:
-  - [RESUBMIT,net-next] r8169: reconfigure rx unconditionally before chip reset when resuming
-    https://git.kernel.org/netdev/net-next/c/3dc2a17efc5f
+then.
+	if (data->has_internal_rx_delay)
+		sophgo_sg2042_set_mode(..)
 
-You are awesome, thank you!
+
+>  	{ .compatible = "sophgo,sg2044-dwmac" },
+>  	{ /* sentinel */ }
+>  };
+> --
+> 2.51.0
+> 
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Yixun Lan (dlan)
 
