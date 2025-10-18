@@ -1,213 +1,155 @@
-Return-Path: <netdev+bounces-230662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DED2CBEC85F
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 07:53:39 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91911BEC97B
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 09:42:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 955456E0E73
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 05:53:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2E3674E2D0A
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 07:42:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C81265CDD;
-	Sat, 18 Oct 2025 05:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB2E284669;
+	Sat, 18 Oct 2025 07:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VO+qNQc9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FF21E5714
-	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 05:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A821C6A3
+	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 07:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760766816; cv=none; b=lQBmELc/N0BQYXE4eJMK6e08A6kAqNWYbQ65aGKyJR4P5IR22niAC0fSm/eehI3LKsAV/IkIRUEtEBDgcHiS3g/aaq8MUqaP5sFkVjknviiss9ovB+lmA95ifpDFTBE0hQrc0Pc2NytNGn5IOo7lTYAMWernYPGAOdaxVzh3vVs=
+	t=1760773355; cv=none; b=SCbCYKOdnk6aM1lejLmwe21OJIcpJTFYRoedVinPPxppubBZUopbziYwunAYHylWovfs2FoP86rXMedXow0sxG4VJpbL/J5BoWQTggp6GfTfHI2jYCqU1lSA7mGwEXRj+Op1TMq/n7F8QNXhqYGxp/ZvCgTArs62wj5YRfxWdNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760766816; c=relaxed/simple;
-	bh=xzFoZbgpgYfmGrOx265Ju2hE1aOLkx8E4Nv8qZPo2zE=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=gl96I5nyRjBd2obGLBvjbimM2Ummo0kVaNlaKQGyYXBqrI/mJb9VPtBn6Zo9A9yKaOtWZar5OL2C3KH+g6DkZ761gh+uuBCYPG5QW0FbL9HScJ8WN56Fl0ELA50DJ+yF55tpfFACdmYAEongENruBd/BsSpuN9ud6Yp2gp/Bark=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-930db3a16c9so251971639f.0
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 22:53:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760766814; x=1761371614;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z/GRj617Cfvkfsc2fvmNusGhnDVIoFOb4MtIivd7Oy8=;
-        b=jWVbrrp+pZlgXs0HqxKWlBRsJav14zv6xdqXOg4Gj8LWi9zK2tRReewrcktNkMRtiu
-         gkqjIs5NVdIO+JhcqM5R5MNU2i49wAA9zzhg+HzrAM7dunkf3ZKQCHpGixo+DqysdEGP
-         bhhA9eNhnnsAvoL9UvjPC6hpgnD9QvoD0RSNyG4gpMRoTEdUnLeL6bk2VIDBB4w34ZcE
-         gti90cG9jUJJaQQccw1UoIzA82y0yxAL0EHYKdAHWnMVVeFtSa+py9Jsfzg/ExrqVcbf
-         IjI91VdkjEd09xJ+P9P67gPt9Q3IN0XzqMvbLk1C2nTkGyQ2yvnGgEfAgVlpIxF2K+n8
-         TNzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW27Bnj29Z6v7dpG+5otAChxQd6ysHwYw7w/0mCCo91tbt+aevYNw46QnLCFgeBlUdSBVqOTXs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTaQ6p9hWPEqS33lqHakXAtgcf8+BmJrZCdSWV+kEidf/gGjck
-	hZKw6pbmoIWsKN1QK8GlNMMeItkrclcPPGPPtd9SdqW5yhIh2ZPf27peyu91jZX+Jq8f5xKJnz0
-	D34USuspYJk+S6YZFBYJbvYJvmSgeRangBP78cGHe+tQ9bJd+JdEPctlv3+o=
-X-Google-Smtp-Source: AGHT+IElhltGiLsko8opmZStyEUHbYRepMEk8ZMccaPq7VeXFIuIUakGpUrNkGUrNbHb+mrWW4GUYQ6kYJkcvQEbYH1Ccp4mqfsl
+	s=arc-20240116; t=1760773355; c=relaxed/simple;
+	bh=xOpTd5jO+0NrF41257k6j4GF9gYFVtKH/e12dm4NH6Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZDPC1pIsHHDIy8GRU+dlB0BP38Wlwm0W7N0J8qq892kWAvsZS0MxnoSwx7ipOA6snsZ/K0qUV9hDOmfpogoTS4yZKQLfiZbKaf7fJtm+WXBlPvnGlCb+fbifoG20peRhYhiYN7NfDhavU3QA/0hgQHvd0wrqGslLMQDzoqL3Pqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VO+qNQc9; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760773354; x=1792309354;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xOpTd5jO+0NrF41257k6j4GF9gYFVtKH/e12dm4NH6Y=;
+  b=VO+qNQc9Ff9f5Xp97idHV3B9JvC6tC3kA+vD2eK8J5rg16irXzpSo5lz
+   fPH9TgBQVwCGLmrPqerzDUFjbf2qKmJXDghKjd+5AGQgDd2Dt2EKkwu6S
+   OQOX6ReIpqg7CYxGDHVn+aLttWVu3A+KCod0J7ugOF5XqEvHhzZO0kkSf
+   gZxFFyjFtjkto5dijdcaucGsXM/S//uepPmOuXads7Mdsh8ESbOY4AgKV
+   BP/hbBXFoCQWfMWgsoO9//NJpe8f2cZTwFNUaBrVmXSuqUfyAdLcm6uET
+   vMlFpxfiY6Xa8RkS3QcBBeqWz/0uNi/+X+d7drGnnJUPKCEd0zXwpbooK
+   w==;
+X-CSE-ConnectionGUID: PsOyyNu9TYa+jym+V7nM4w==
+X-CSE-MsgGUID: QPHtAtwTQlChC5NHLHJxJQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="66814519"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="66814519"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2025 00:42:33 -0700
+X-CSE-ConnectionGUID: T+eAZmiBSBiHBRx2tLFw8g==
+X-CSE-MsgGUID: kL5icr7USp+7ev58pbJpRA==
+X-ExtLoop1: 1
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by fmviesa003.fm.intel.com with ESMTP; 18 Oct 2025 00:42:30 -0700
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vA1Zw-000895-36;
+	Sat, 18 Oct 2025 07:42:21 +0000
+Date: Sat, 18 Oct 2025 15:42:07 +0800
+From: kernel test robot <lkp@intel.com>
+To: Saeed Mahameed <saeed@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, mbloch@nvidia.com,
+	Adithya Jayachandran <ajayachandra@nvidia.com>
+Subject: Re: [PATCH net-next 2/3] net/mlx5: MPFS, add support for dynamic
+ enable/disable
+Message-ID: <202510181424.S8zAzGjf-lkp@intel.com>
+References: <20251016013618.2030940-3-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:29b3:b0:915:f0:58a3 with SMTP id
- ca18e2360f4ac-93e76437f51mr751969839f.15.1760766813811; Fri, 17 Oct 2025
- 22:53:33 -0700 (PDT)
-Date: Fri, 17 Oct 2025 22:53:33 -0700
-In-Reply-To: <6840fdc4.a00a0220.68b4a.000d.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68f32b5d.050a0220.1186a4.051d.GAE@google.com>
-Subject: Re: [syzbot] [net?] BUG: soft lockup in sys_sendmsg (2)
-From: syzbot <syzbot+4032319a6a907f69e985@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, davem@davemloft.net, dvyukov@google.com, 
-	edumazet@google.com, hdanton@sina.com, horms@kernel.org, jmaloy@redhat.com, 
-	kuba@kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-scsi@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, paulmck@kernel.org, peterz@infradead.org, 
-	syzkaller-bugs@googlegroups.com, tipc-discussion@lists.sourceforge.net
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251016013618.2030940-3-saeed@kernel.org>
 
-syzbot has found a reproducer for the following issue on:
+Hi Saeed,
 
-HEAD commit:    bf45a62baffc Merge branch 'for-next/core' into for-kernelci
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=15941de2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bd2356106f507975
-dashboard link: https://syzkaller.appspot.com/bug?extid=4032319a6a907f69e985
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1494767c580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=126fdde2580000
+kernel test robot noticed the following build errors:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f0d4874557e9/disk-bf45a62b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/0bf44a13b5b2/vmlinux-bf45a62b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/18db8bc9907c/Image-bf45a62b.gz.xz
+[auto build test ERROR on net-next/main]
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4032319a6a907f69e985@syzkaller.appspotmail.com
+url:    https://github.com/intel-lab-lkp/linux/commits/Saeed-Mahameed/devlink-Introduce-devlink-eswitch-state/20251016-094245
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20251016013618.2030940-3-saeed%40kernel.org
+patch subject: [PATCH net-next 2/3] net/mlx5: MPFS, add support for dynamic enable/disable
+config: i386-buildonly-randconfig-001-20251018 (https://download.01.org/0day-ci/archive/20251018/202510181424.S8zAzGjf-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251018/202510181424.S8zAzGjf-lkp@intel.com/reproduce)
 
-watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [syz.0.76:6894]
-Modules linked in:
-irq event stamp: 5181
-hardirqs last  enabled at (5180): [<ffff80008b064a14>] irqentry_exit+0xd8/0x108 kernel/entry/common.c:214
-hardirqs last disabled at (5181): [<ffff80008b062af0>] __enter_from_kernel_mode arch/arm64/kernel/entry-common.c:43 [inline]
-hardirqs last disabled at (5181): [<ffff80008b062af0>] enter_from_kernel_mode+0x14/0x34 arch/arm64/kernel/entry-common.c:50
-softirqs last  enabled at (522): [<ffff8000892e0188>] spin_unlock_bh include/linux/spinlock.h:396 [inline]
-softirqs last  enabled at (522): [<ffff8000892e0188>] release_sock+0x14c/0x1ac net/core/sock.c:3735
-softirqs last disabled at (528): [<ffff8000892f4c84>] spin_lock_bh include/linux/spinlock.h:356 [inline]
-softirqs last disabled at (528): [<ffff8000892f4c84>] lock_sock_nested+0x70/0x118 net/core/sock.c:3714
-CPU: 0 UID: 0 PID: 6894 Comm: syz.0.76 Not tainted syzkaller #0 PREEMPT 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/30/2025
-pstate: 03400005 (nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-pc : queued_spin_lock_slowpath+0x138/0xaec kernel/locking/qspinlock.c:197
-lr : queued_spin_lock_slowpath+0x144/0xaec kernel/locking/qspinlock.c:197
-sp : ffff8000a1a17600
-x29: ffff8000a1a176a0 x28: 1fffe0001b9124c1 x27: 1fffe000196c6002
-x26: ffff0000cb630000 x25: dfff800000000000 x24: ffff700014342ec4
-x23: 0000000000000001 x22: ffff0000cb630010 x21: ffff0000dc892608
-x20: ffff0000dc892610 x19: ffff0000dc892600 x18: 0000000000000000
-x17: 0000000000000000 x16: ffff800080537d14 x15: 0000000000000001
-x14: 1fffe0001b9124c0 x13: 0000000000000000 x12: 0000000000000000
-x11: ffff60001b9124c1 x10: dfff800000000000 x9 : 0000000000000000
-x8 : 0000000000000001 x7 : ffff8000892f4c84 x6 : 0000000000000000
-x5 : 0000000000000000 x4 : 0000000000000001 x3 : ffff80008b0885f8
-x2 : 0000000000000000 x1 : 0000000000000001 x0 : 0000000000000001
-Call trace:
- __cmpwait_case_8 arch/arm64/include/asm/cmpxchg.h:229 [inline] (P)
- __cmpwait arch/arm64/include/asm/cmpxchg.h:257 [inline] (P)
- queued_spin_lock_slowpath+0x138/0xaec kernel/locking/qspinlock.c:197 (P)
- queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
- do_raw_spin_lock+0x2a8/0x2cc kernel/locking/spinlock_debug.c:116
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:127 [inline]
- _raw_spin_lock_bh+0x50/0x60 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- lock_sock_nested+0x70/0x118 net/core/sock.c:3714
- lock_sock include/net/sock.h:1669 [inline]
- tipc_sendstream+0x50/0x84 net/tipc/socket.c:1545
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg net/socket.c:729 [inline]
- ____sys_sendmsg+0x490/0x7b8 net/socket.c:2614
- ___sys_sendmsg+0x204/0x278 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __arm64_sys_sendmsg+0x184/0x238 net/socket.c:2703
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x254 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
- el0_svc+0x5c/0x254 arch/arm64/kernel/entry-common.c:744
- el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:763
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 6895 Comm: syz.0.76 Not tainted syzkaller #0 PREEMPT 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/30/2025
-pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-pc : should_resched arch/arm64/include/asm/preempt.h:78 [inline]
-pc : __local_bh_enable_ip+0x1f0/0x35c kernel/softirq.c:414
-lr : __local_bh_enable_ip+0x1ec/0x35c kernel/softirq.c:412
-sp : ffff8000a1806210
-x29: ffff8000a1806220 x28: 0000000040613361 x27: ffff8000a18063e0
-x26: ffff0000f25e3b60 x25: dfff800000000000 x24: 0000000000000001
-x23: dfff800000000000 x22: 1fffe000196c63d1 x21: ffff80008ab3e7b8
-x20: 0000000000000201 x19: ffff0000cb631e88 x18: 00000000ffffffff
-x17: ffff800093605000 x16: ffff80008052bc24 x15: 0000000000000001
-x14: 1fffe0001b9124c0 x13: 0000000000000000 x12: 0000000000000000
-x11: ffff800093404c28 x10: 0000000000000003 x9 : 0000000000000000
-x8 : 000000000382547a x7 : ffff80008ab4aee0 x6 : 0000000000000000
-x5 : 0000000000000000 x4 : 0000000000000000 x3 : 0000000000000010
-x2 : 0000000000000002 x1 : ffff80008ee54d8e x0 : ffff80010c40c000
-Call trace:
- __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:26 [inline] (P)
- arch_local_irq_enable arch/arm64/include/asm/irqflags.h:48 [inline] (P)
- __local_bh_enable_ip+0x1f0/0x35c kernel/softirq.c:412 (P)
- __raw_spin_trylock_bh include/linux/spinlock_api_smp.h:177 [inline]
- _raw_spin_trylock_bh+0x68/0x80 kernel/locking/spinlock.c:146
- spin_trylock_bh include/linux/spinlock.h:411 [inline]
- tipc_sk_rcv+0x2f4/0x2294 net/tipc/socket.c:2494
- tipc_node_xmit+0x18c/0xc9c net/tipc/node.c:1701
- tipc_node_xmit_skb net/tipc/node.c:1766 [inline]
- tipc_node_distr_xmit+0x248/0x33c net/tipc/node.c:1781
- tipc_sk_rcv+0x1df0/0x2294 net/tipc/socket.c:2499
- tipc_node_xmit+0x18c/0xc9c net/tipc/node.c:1701
- tipc_sk_push_backlog+0x398/0x744 net/tipc/socket.c:1312
- tipc_sk_conn_proto_rcv net/tipc/socket.c:1366 [inline]
- tipc_sk_proto_rcv+0x704/0x12ec net/tipc/socket.c:2156
- tipc_sk_filter_rcv+0x2524/0x277c net/tipc/socket.c:2350
- tipc_sk_enqueue net/tipc/socket.c:2443 [inline]
- tipc_sk_rcv+0x628/0x2294 net/tipc/socket.c:2495
- tipc_node_xmit+0x18c/0xc9c net/tipc/node.c:1701
- tipc_node_xmit_skb net/tipc/node.c:1766 [inline]
- tipc_node_distr_xmit+0x248/0x33c net/tipc/node.c:1781
- tipc_sk_backlog_rcv+0x164/0x214 net/tipc/socket.c:2410
- sk_backlog_rcv include/net/sock.h:1150 [inline]
- __release_sock+0x19c/0x39c net/core/sock.c:3172
- release_sock+0x60/0x1ac net/core/sock.c:3726
- sockopt_release_sock net/core/sock.c:1155 [inline]
- sk_setsockopt+0x2354/0x28ec net/core/sock.c:1668
- sock_setsockopt+0x68/0x80 net/core/sock.c:1675
- do_sock_setsockopt+0x19c/0x328 net/socket.c:2340
- __sys_setsockopt net/socket.c:2369 [inline]
- __do_sys_setsockopt net/socket.c:2375 [inline]
- __se_sys_setsockopt net/socket.c:2372 [inline]
- __arm64_sys_setsockopt+0x170/0x1e0 net/socket.c:2372
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x254 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
- el0_svc+0x5c/0x254 arch/arm64/kernel/entry-common.c:744
- el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:763
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202510181424.S8zAzGjf-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   ld: drivers/net/ethernet/mellanox/mlx5/core/eq.o: in function `mlx5_mpfs_enable':
+>> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: multiple definition of `mlx5_mpfs_enable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: first defined here
+   ld: drivers/net/ethernet/mellanox/mlx5/core/eq.o: in function `mlx5_mpfs_disable':
+>> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: multiple definition of `mlx5_mpfs_disable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: first defined here
+   ld: drivers/net/ethernet/mellanox/mlx5/core/vport.o: in function `mlx5_mpfs_enable':
+>> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: multiple definition of `mlx5_mpfs_enable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: first defined here
+   ld: drivers/net/ethernet/mellanox/mlx5/core/vport.o: in function `mlx5_mpfs_disable':
+>> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: multiple definition of `mlx5_mpfs_disable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: first defined here
+   ld: drivers/net/ethernet/mellanox/mlx5/core/sriov.o: in function `mlx5_mpfs_enable':
+>> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: multiple definition of `mlx5_mpfs_enable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: first defined here
+   ld: drivers/net/ethernet/mellanox/mlx5/core/sriov.o: in function `mlx5_mpfs_disable':
+>> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: multiple definition of `mlx5_mpfs_disable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: first defined here
+   ld: drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.o: in function `mlx5_mpfs_enable':
+>> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: multiple definition of `mlx5_mpfs_enable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: first defined here
+   ld: drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.o: in function `mlx5_mpfs_disable':
+>> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: multiple definition of `mlx5_mpfs_disable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: first defined here
+   ld: drivers/net/ethernet/mellanox/mlx5/core/lag/lag.o: in function `mlx5_mpfs_enable':
+>> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: multiple definition of `mlx5_mpfs_enable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: first defined here
+   ld: drivers/net/ethernet/mellanox/mlx5/core/lag/lag.o: in function `mlx5_mpfs_disable':
+>> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: multiple definition of `mlx5_mpfs_disable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: first defined here
+   ld: drivers/net/ethernet/mellanox/mlx5/core/devlink.o: in function `mlx5_mpfs_enable':
+>> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: multiple definition of `mlx5_mpfs_enable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:97: first defined here
+   ld: drivers/net/ethernet/mellanox/mlx5/core/devlink.o: in function `mlx5_mpfs_disable':
+>> drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: multiple definition of `mlx5_mpfs_disable'; drivers/net/ethernet/mellanox/mlx5/core/main.o:drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h:98: first defined here
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+vim +97 drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h
+
+    87	
+    88	#ifdef CONFIG_MLX5_MPFS
+    89	struct mlx5_core_dev;
+    90	int  mlx5_mpfs_init(struct mlx5_core_dev *dev);
+    91	void mlx5_mpfs_cleanup(struct mlx5_core_dev *dev);
+    92	int mlx5_mpfs_enable(struct mlx5_core_dev *dev);
+    93	void mlx5_mpfs_disable(struct mlx5_core_dev *dev);
+    94	#else /* #ifndef CONFIG_MLX5_MPFS */
+    95	static inline int  mlx5_mpfs_init(struct mlx5_core_dev *dev) { return 0; }
+    96	static inline void mlx5_mpfs_cleanup(struct mlx5_core_dev *dev) {}
+  > 97	int mlx5_mpfs_enable(struct mlx5_core_dev *dev) { return 0; }
+  > 98	void mlx5_mpfs_disable(struct mlx5_core_dev *dev) {}
+    99	#endif
+   100	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
