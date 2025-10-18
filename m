@@ -1,285 +1,415 @@
-Return-Path: <netdev+bounces-230667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD69DBECA67
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 10:39:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F526BECC5D
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 11:22:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62128587A5B
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 08:39:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C10F61A65369
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 09:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 585F12D876A;
-	Sat, 18 Oct 2025 08:39:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0DB287253;
+	Sat, 18 Oct 2025 09:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="F0CUNsP+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sVsRlwoo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1AC92D47E0
-	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 08:39:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952C6285CB9
+	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 09:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760776760; cv=none; b=sLDmRHGjUh69t/HPtbTqhx3gHwmI9LdHrwGbEasJjpYkBw8uukoGGsRWDnPGqn6vj7HxrcC+vwkKYgwdWp7S6qHcsT+69LYvGgz3PXRhzND+TBTyxEPW4WP0XqJRmDMJjfxc272ECYq/jIdcawdbLEyqs5CogCBHnejPc6dDpRY=
+	t=1760779325; cv=none; b=oodI6BhUkR+TY5NSFJqDYMRNmKFHM0Fuq5WPzOcT6TnocyLRlEvnpGUAqQYV9grbrGydNXoMKmdMOy7m/Gg8puBEB3w8zrIEmYCP0vgAa0iFllWf6ERJ/ULqC/ScgMgQJd8PMAljiKT07MpoqjAislc2vmVUtNKqmgNQY5P4Ab4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760776760; c=relaxed/simple;
-	bh=a6yt1sYHO7l+2ZazczYgE+U9g3OwKpv0qcoao/VU/Us=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bqBiiC9RD2uSoafOf1o71NqvJzHm/VlmDuqAqVZb4jSdFluxH3H+g6aMs79qU1+087uerCde5OnFOFQRrLUyXmdoPCf7NQTwihjq9uE3J2IiozEK9DGGDf8lpRtPfhkoY8NqTlOvILg1rFStyIntvOUaIZ55G2cToSLcZJTIDdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=F0CUNsP+; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 4575EC09A08;
-	Sat, 18 Oct 2025 08:38:53 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 77B976069D;
-	Sat, 18 Oct 2025 08:39:12 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BD248102F2381;
-	Sat, 18 Oct 2025 10:38:49 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760776751; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=8S3Aw7T2SB9A7fRoHuqc65RzNYJ3PgdKFOvKJcYpYTI=;
-	b=F0CUNsP+knRQ2UXE8tq1L2AV80AjADHWTSIojOOI2xe+QHdG44FUdTlNnFK/vdZwoLRw7A
-	rWIO1cweAfRFp+VUKts/rcKRCvaaO6Jl9uEBHhCMwVDYPanDTI/g4Rk5K5O/OrakL2dtTc
-	ffv23e4KMA4WuKv8JQr/DtjCkM1qqFu1Bafuy6tMW5gkg1e4Mr7xpA+keZ9Hxy5EYs1b52
-	WNkWAF/3NKUlVzIlBRQRZQT64jATLbsHw/zTyl9/54fJeGjXMBza6aepec33CRxpIzao50
-	oUH4JOSw8ctzjaRrbR/1cHSkKQ5hE7W0+YfeJH4k+iDU/w8S10X0K25iz874jQ==
-Message-ID: <86845e2f-92a8-4d1f-aa78-11ad0545a32c@bootlin.com>
-Date: Sat, 18 Oct 2025 10:38:48 +0200
+	s=arc-20240116; t=1760779325; c=relaxed/simple;
+	bh=QQSf2fBH1I4j49Rjfw8dWqqBHqMePF2agU/OEK725YA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=SMfOs/rz+1qOrwbaHXBSG/DMCyrFxtGDu8//iITG/xwh+eyQ8qr1y3Z2MdhPnYGHLAH6KyOR9oQT9C4uwE0tJuoponFszcp4EgbWLkyDZF0BtPRYZn3HjA8JlPtA7WGjiIE63UZWRolauR7WiqG3hJtIcYG4HulM+4+HOibHSAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sVsRlwoo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3DD9C4CEF8;
+	Sat, 18 Oct 2025 09:22:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760779325;
+	bh=QQSf2fBH1I4j49Rjfw8dWqqBHqMePF2agU/OEK725YA=;
+	h=From:Date:Subject:To:Cc:From;
+	b=sVsRlwoo0wkMDAUzAZQgO5UNCIihquJ2tR3nf0sUHU/JR6lZtjiQ69TceRLnogk6D
+	 LCL01WbnwqqBu502Bug4WLc+kFFyagg2PcS+OYzhHpI6vWlqW41jdD6zNbXRjSSx37
+	 tg2vdN1NrQYSmJwjONIZcwdp/05wMpdPmBZ0ORgle+SHEOc0cVTXx07rqLNAqrgKsh
+	 HZGhKe/d/4EU3L0Cl8p+TYOH2wJaXLK8uZoCc2gKZ4TGmTXdcLSJx1OLjzumPdS6zG
+	 zVf7TT9feFcPtP0Px0gDD0j+EkObEU5RXMjBVo1C9WqLtUxcQQ0LwjrLnBsH70CB/b
+	 BVxT6lvZkggqg==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Sat, 18 Oct 2025 11:21:47 +0200
+Subject: [PATCH net-next] net: airoha: Remove code duplication in
+ airoha_regs.h
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-net v2 2/7] net: dsa: lantiq_gswip: convert accessors
- to use regmap
-To: Daniel Golle <daniel@makrotopia.org>, Hauke Mehrtens <hauke@hauke-m.de>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Andreas Schirm <andreas.schirm@siemens.com>,
- Lukas Stockmann <lukas.stockmann@siemens.com>,
- Alexander Sverdlin <alexander.sverdlin@siemens.com>,
- Peter Christen <peter.christen@siemens.com>,
- Avinash Jayaraman <ajayaraman@maxlinear.com>, Bing tao Xu
- <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
- Juraj Povazanec <jpovazanec@maxlinear.com>,
- "Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
- "Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
- "Livia M. Rosu" <lrosu@maxlinear.com>, John Crispin <john@phrozen.org>
-References: <cover.1760753833.git.daniel@makrotopia.org>
- <a9138cef298126eeecf2536d55e0670068217332.1760753833.git.daniel@makrotopia.org>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <a9138cef298126eeecf2536d55e0670068217332.1760753833.git.daniel@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Message-Id: <20251018-airoha-regs-cosmetics-v1-1-bbf6295c45fd@kernel.org>
+X-B4-Tracking: v=1; b=H4sIACpc82gC/x3MQQqDMBBG4avIrB1IpKnVq0gXIf7VWdTIjIggu
+ XtDl9/ivZsMKjAam5sUp5jkrcK3DaU1bgtY5mrqXBe88z1H0bxGVizGKdsXhyTj8MDgXEAfXk+
+ q7a74yPX/Tu9SfmxsqmdnAAAA
+X-Change-ID: 20251017-airoha-regs-cosmetics-54e9005e7586
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.2
 
-Hi Daniel,
+This patch does not introduce any logical change, it just removes
+duplicated code in airoha_regs.h.
+Fix naming conventions in airoha_regs.h.
 
-On 18/10/2025 04:31, Daniel Golle wrote:
-> Use regmap for register access in preparation for supporting the MaxLinear
-> GSW1xx family of switches connected via MDIO or SPI.
-> Rewrite the existing accessor read-poll-timeout functions to use calls to
-> the regmap API for now.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/airoha/airoha_eth.c  | 102 ++++++++++++++--------------
+ drivers/net/ethernet/airoha/airoha_regs.h | 109 ++++++++++++++----------------
+ 2 files changed, 100 insertions(+), 111 deletions(-)
 
-Looks like the typo in the target tree (net-net instead of net-next)
-confuses patchwork :)
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 5825f6f29a92e8fff0596d7883a4c2648432a6ef..b06cab4ef25abb1f61915f84142835f30c15ce8f 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -137,11 +137,11 @@ static void airoha_fe_maccr_init(struct airoha_eth *eth)
+ 
+ 	for (p = 1; p <= ARRAY_SIZE(eth->ports); p++)
+ 		airoha_fe_set(eth, REG_GDM_FWD_CFG(p),
+-			      GDM_TCP_CKSUM | GDM_UDP_CKSUM | GDM_IP4_CKSUM |
+-			      GDM_DROP_CRC_ERR);
++			      GDM_TCP_CKSUM_MASK | GDM_UDP_CKSUM_MASK |
++			      GDM_IP4_CKSUM_MASK | GDM_DROP_CRC_ERR_MASK);
+ 
+-	airoha_fe_rmw(eth, REG_CDM1_VLAN_CTRL, CDM1_VLAN_MASK,
+-		      FIELD_PREP(CDM1_VLAN_MASK, 0x8100));
++	airoha_fe_rmw(eth, REG_CDM_VLAN_CTRL(1), CDM_VLAN_MASK,
++		      FIELD_PREP(CDM_VLAN_MASK, 0x8100));
+ 
+ 	airoha_fe_set(eth, REG_FE_CPORT_CFG, FE_CPORT_PAD);
+ }
+@@ -396,46 +396,46 @@ static int airoha_fe_mc_vlan_clear(struct airoha_eth *eth)
+ static void airoha_fe_crsn_qsel_init(struct airoha_eth *eth)
+ {
+ 	/* CDM1_CRSN_QSEL */
+-	airoha_fe_rmw(eth, REG_CDM1_CRSN_QSEL(CRSN_22 >> 2),
+-		      CDM1_CRSN_QSEL_REASON_MASK(CRSN_22),
+-		      FIELD_PREP(CDM1_CRSN_QSEL_REASON_MASK(CRSN_22),
++	airoha_fe_rmw(eth, REG_CDM_CRSN_QSEL(1, CRSN_22 >> 2),
++		      CDM_CRSN_QSEL_REASON_MASK(CRSN_22),
++		      FIELD_PREP(CDM_CRSN_QSEL_REASON_MASK(CRSN_22),
+ 				 CDM_CRSN_QSEL_Q1));
+-	airoha_fe_rmw(eth, REG_CDM1_CRSN_QSEL(CRSN_08 >> 2),
+-		      CDM1_CRSN_QSEL_REASON_MASK(CRSN_08),
+-		      FIELD_PREP(CDM1_CRSN_QSEL_REASON_MASK(CRSN_08),
++	airoha_fe_rmw(eth, REG_CDM_CRSN_QSEL(1, CRSN_08 >> 2),
++		      CDM_CRSN_QSEL_REASON_MASK(CRSN_08),
++		      FIELD_PREP(CDM_CRSN_QSEL_REASON_MASK(CRSN_08),
+ 				 CDM_CRSN_QSEL_Q1));
+-	airoha_fe_rmw(eth, REG_CDM1_CRSN_QSEL(CRSN_21 >> 2),
+-		      CDM1_CRSN_QSEL_REASON_MASK(CRSN_21),
+-		      FIELD_PREP(CDM1_CRSN_QSEL_REASON_MASK(CRSN_21),
++	airoha_fe_rmw(eth, REG_CDM_CRSN_QSEL(1, CRSN_21 >> 2),
++		      CDM_CRSN_QSEL_REASON_MASK(CRSN_21),
++		      FIELD_PREP(CDM_CRSN_QSEL_REASON_MASK(CRSN_21),
+ 				 CDM_CRSN_QSEL_Q1));
+-	airoha_fe_rmw(eth, REG_CDM1_CRSN_QSEL(CRSN_24 >> 2),
+-		      CDM1_CRSN_QSEL_REASON_MASK(CRSN_24),
+-		      FIELD_PREP(CDM1_CRSN_QSEL_REASON_MASK(CRSN_24),
++	airoha_fe_rmw(eth, REG_CDM_CRSN_QSEL(1, CRSN_24 >> 2),
++		      CDM_CRSN_QSEL_REASON_MASK(CRSN_24),
++		      FIELD_PREP(CDM_CRSN_QSEL_REASON_MASK(CRSN_24),
+ 				 CDM_CRSN_QSEL_Q6));
+-	airoha_fe_rmw(eth, REG_CDM1_CRSN_QSEL(CRSN_25 >> 2),
+-		      CDM1_CRSN_QSEL_REASON_MASK(CRSN_25),
+-		      FIELD_PREP(CDM1_CRSN_QSEL_REASON_MASK(CRSN_25),
++	airoha_fe_rmw(eth, REG_CDM_CRSN_QSEL(1, CRSN_25 >> 2),
++		      CDM_CRSN_QSEL_REASON_MASK(CRSN_25),
++		      FIELD_PREP(CDM_CRSN_QSEL_REASON_MASK(CRSN_25),
+ 				 CDM_CRSN_QSEL_Q1));
+ 	/* CDM2_CRSN_QSEL */
+-	airoha_fe_rmw(eth, REG_CDM2_CRSN_QSEL(CRSN_08 >> 2),
+-		      CDM2_CRSN_QSEL_REASON_MASK(CRSN_08),
+-		      FIELD_PREP(CDM2_CRSN_QSEL_REASON_MASK(CRSN_08),
++	airoha_fe_rmw(eth, REG_CDM_CRSN_QSEL(2, CRSN_08 >> 2),
++		      CDM_CRSN_QSEL_REASON_MASK(CRSN_08),
++		      FIELD_PREP(CDM_CRSN_QSEL_REASON_MASK(CRSN_08),
+ 				 CDM_CRSN_QSEL_Q1));
+-	airoha_fe_rmw(eth, REG_CDM2_CRSN_QSEL(CRSN_21 >> 2),
+-		      CDM2_CRSN_QSEL_REASON_MASK(CRSN_21),
+-		      FIELD_PREP(CDM2_CRSN_QSEL_REASON_MASK(CRSN_21),
++	airoha_fe_rmw(eth, REG_CDM_CRSN_QSEL(2, CRSN_21 >> 2),
++		      CDM_CRSN_QSEL_REASON_MASK(CRSN_21),
++		      FIELD_PREP(CDM_CRSN_QSEL_REASON_MASK(CRSN_21),
+ 				 CDM_CRSN_QSEL_Q1));
+-	airoha_fe_rmw(eth, REG_CDM2_CRSN_QSEL(CRSN_22 >> 2),
+-		      CDM2_CRSN_QSEL_REASON_MASK(CRSN_22),
+-		      FIELD_PREP(CDM2_CRSN_QSEL_REASON_MASK(CRSN_22),
++	airoha_fe_rmw(eth, REG_CDM_CRSN_QSEL(2, CRSN_22 >> 2),
++		      CDM_CRSN_QSEL_REASON_MASK(CRSN_22),
++		      FIELD_PREP(CDM_CRSN_QSEL_REASON_MASK(CRSN_22),
+ 				 CDM_CRSN_QSEL_Q1));
+-	airoha_fe_rmw(eth, REG_CDM2_CRSN_QSEL(CRSN_24 >> 2),
+-		      CDM2_CRSN_QSEL_REASON_MASK(CRSN_24),
+-		      FIELD_PREP(CDM2_CRSN_QSEL_REASON_MASK(CRSN_24),
++	airoha_fe_rmw(eth, REG_CDM_CRSN_QSEL(2, CRSN_24 >> 2),
++		      CDM_CRSN_QSEL_REASON_MASK(CRSN_24),
++		      FIELD_PREP(CDM_CRSN_QSEL_REASON_MASK(CRSN_24),
+ 				 CDM_CRSN_QSEL_Q6));
+-	airoha_fe_rmw(eth, REG_CDM2_CRSN_QSEL(CRSN_25 >> 2),
+-		      CDM2_CRSN_QSEL_REASON_MASK(CRSN_25),
+-		      FIELD_PREP(CDM2_CRSN_QSEL_REASON_MASK(CRSN_25),
++	airoha_fe_rmw(eth, REG_CDM_CRSN_QSEL(2, CRSN_25 >> 2),
++		      CDM_CRSN_QSEL_REASON_MASK(CRSN_25),
++		      FIELD_PREP(CDM_CRSN_QSEL_REASON_MASK(CRSN_25),
+ 				 CDM_CRSN_QSEL_Q1));
+ }
+ 
+@@ -455,18 +455,18 @@ static int airoha_fe_init(struct airoha_eth *eth)
+ 	airoha_fe_wr(eth, REG_FE_PCE_CFG,
+ 		     PCE_DPI_EN_MASK | PCE_KA_EN_MASK | PCE_MC_EN_MASK);
+ 	/* set vip queue selection to ring 1 */
+-	airoha_fe_rmw(eth, REG_CDM1_FWD_CFG, CDM1_VIP_QSEL_MASK,
+-		      FIELD_PREP(CDM1_VIP_QSEL_MASK, 0x4));
+-	airoha_fe_rmw(eth, REG_CDM2_FWD_CFG, CDM2_VIP_QSEL_MASK,
+-		      FIELD_PREP(CDM2_VIP_QSEL_MASK, 0x4));
++	airoha_fe_rmw(eth, REG_CDM_FWD_CFG(1), CDM_VIP_QSEL_MASK,
++		      FIELD_PREP(CDM_VIP_QSEL_MASK, 0x4));
++	airoha_fe_rmw(eth, REG_CDM_FWD_CFG(2), CDM_VIP_QSEL_MASK,
++		      FIELD_PREP(CDM_VIP_QSEL_MASK, 0x4));
+ 	/* set GDM4 source interface offset to 8 */
+-	airoha_fe_rmw(eth, REG_GDM4_SRC_PORT_SET,
+-		      GDM4_SPORT_OFF2_MASK |
+-		      GDM4_SPORT_OFF1_MASK |
+-		      GDM4_SPORT_OFF0_MASK,
+-		      FIELD_PREP(GDM4_SPORT_OFF2_MASK, 8) |
+-		      FIELD_PREP(GDM4_SPORT_OFF1_MASK, 8) |
+-		      FIELD_PREP(GDM4_SPORT_OFF0_MASK, 8));
++	airoha_fe_rmw(eth, REG_GDM_SRC_PORT_SET(4),
++		      GDM_SPORT_OFF2_MASK |
++		      GDM_SPORT_OFF1_MASK |
++		      GDM_SPORT_OFF0_MASK,
++		      FIELD_PREP(GDM_SPORT_OFF2_MASK, 8) |
++		      FIELD_PREP(GDM_SPORT_OFF1_MASK, 8) |
++		      FIELD_PREP(GDM_SPORT_OFF0_MASK, 8));
+ 
+ 	/* set PSE Page as 128B */
+ 	airoha_fe_rmw(eth, REG_FE_DMA_GLO_CFG,
+@@ -492,8 +492,8 @@ static int airoha_fe_init(struct airoha_eth *eth)
+ 	airoha_fe_set(eth, REG_GDM_MISC_CFG,
+ 		      GDM2_RDM_ACK_WAIT_PREF_MASK |
+ 		      GDM2_CHN_VLD_MODE_MASK);
+-	airoha_fe_rmw(eth, REG_CDM2_FWD_CFG, CDM2_OAM_QSEL_MASK,
+-		      FIELD_PREP(CDM2_OAM_QSEL_MASK, 15));
++	airoha_fe_rmw(eth, REG_CDM_FWD_CFG(2), CDM_OAM_QSEL_MASK,
++		      FIELD_PREP(CDM_OAM_QSEL_MASK, 15));
+ 
+ 	/* init fragment and assemble Force Port */
+ 	/* NPU Core-3, NPU Bridge Channel-3 */
+@@ -507,8 +507,8 @@ static int airoha_fe_init(struct airoha_eth *eth)
+ 		      FIELD_PREP(IP_ASSEMBLE_PORT_MASK, 0) |
+ 		      FIELD_PREP(IP_ASSEMBLE_NBQ_MASK, 22));
+ 
+-	airoha_fe_set(eth, REG_GDM3_FWD_CFG, GDM3_PAD_EN_MASK);
+-	airoha_fe_set(eth, REG_GDM4_FWD_CFG, GDM4_PAD_EN_MASK);
++	airoha_fe_set(eth, REG_GDM_FWD_CFG(3), GDM_PAD_EN_MASK);
++	airoha_fe_set(eth, REG_GDM_FWD_CFG(4), GDM_PAD_EN_MASK);
+ 
+ 	airoha_fe_crsn_qsel_init(eth);
+ 
+@@ -516,7 +516,7 @@ static int airoha_fe_init(struct airoha_eth *eth)
+ 	airoha_fe_set(eth, REG_FE_CPORT_CFG, FE_CPORT_PORT_XFC_MASK);
+ 
+ 	/* default aging mode for mbi unlock issue */
+-	airoha_fe_rmw(eth, REG_GDM2_CHN_RLS,
++	airoha_fe_rmw(eth, REG_GDM_CHN_RLS(2),
+ 		      MBI_RX_AGE_SEL_MASK | MBI_TX_AGE_SEL_MASK,
+ 		      FIELD_PREP(MBI_RX_AGE_SEL_MASK, 3) |
+ 		      FIELD_PREP(MBI_TX_AGE_SEL_MASK, 3));
+@@ -1703,7 +1703,7 @@ static void airhoha_set_gdm2_loopback(struct airoha_gdm_port *port)
+ 
+ 	/* Forward the traffic to the proper GDM port */
+ 	airoha_set_gdm_port_fwd_cfg(eth, REG_GDM_FWD_CFG(2), pse_port);
+-	airoha_fe_clear(eth, REG_GDM_FWD_CFG(2), GDM_STRIP_CRC);
++	airoha_fe_clear(eth, REG_GDM_FWD_CFG(2), GDM_STRIP_CRC_MASK);
+ 
+ 	/* Enable GDM2 loopback */
+ 	airoha_fe_wr(eth, REG_GDM_TXCHN_EN(2), 0xffffffff);
+diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
+index 69c5a143db8c079be0a6ecf41081cd3f5048c090..4b714b59740d5035fff0cdd1a405172d66f114b7 100644
+--- a/drivers/net/ethernet/airoha/airoha_regs.h
++++ b/drivers/net/ethernet/airoha/airoha_regs.h
+@@ -23,6 +23,8 @@
+ #define GDM3_BASE			0x1100
+ #define GDM4_BASE			0x2500
+ 
++#define CDM_BASE(_n)			\
++	((_n) == 2 ? CDM2_BASE : CDM1_BASE)
+ #define GDM_BASE(_n)			\
+ 	((_n) == 4 ? GDM4_BASE :	\
+ 	 (_n) == 3 ? GDM3_BASE :	\
+@@ -109,30 +111,24 @@
+ #define PATN_DP_MASK			GENMASK(31, 16)
+ #define PATN_SP_MASK			GENMASK(15, 0)
+ 
+-#define REG_CDM1_VLAN_CTRL		CDM1_BASE
+-#define CDM1_VLAN_MASK			GENMASK(31, 16)
++#define REG_CDM_VLAN_CTRL(_n)		CDM_BASE(_n)
++#define CDM_VLAN_MASK			GENMASK(31, 16)
+ 
+-#define REG_CDM1_FWD_CFG		(CDM1_BASE + 0x08)
+-#define CDM1_VIP_QSEL_MASK		GENMASK(24, 20)
++#define REG_CDM_FWD_CFG(_n)		(CDM_BASE(_n) + 0x08)
++#define CDM_OAM_QSEL_MASK		GENMASK(31, 27)
++#define CDM_VIP_QSEL_MASK		GENMASK(24, 20)
+ 
+-#define REG_CDM1_CRSN_QSEL(_n)		(CDM1_BASE + 0x10 + ((_n) << 2))
+-#define CDM1_CRSN_QSEL_REASON_MASK(_n)	\
+-	GENMASK(4 + (((_n) % 4) << 3),	(((_n) % 4) << 3))
+-
+-#define REG_CDM2_FWD_CFG		(CDM2_BASE + 0x08)
+-#define CDM2_OAM_QSEL_MASK		GENMASK(31, 27)
+-#define CDM2_VIP_QSEL_MASK		GENMASK(24, 20)
+-
+-#define REG_CDM2_CRSN_QSEL(_n)		(CDM2_BASE + 0x10 + ((_n) << 2))
+-#define CDM2_CRSN_QSEL_REASON_MASK(_n)	\
++#define REG_CDM_CRSN_QSEL(_n, _m)	(CDM_BASE(_n) + 0x10 + ((_m) << 2))
++#define CDM_CRSN_QSEL_REASON_MASK(_n)	\
+ 	GENMASK(4 + (((_n) % 4) << 3),	(((_n) % 4) << 3))
+ 
+ #define REG_GDM_FWD_CFG(_n)		GDM_BASE(_n)
+-#define GDM_DROP_CRC_ERR		BIT(23)
+-#define GDM_IP4_CKSUM			BIT(22)
+-#define GDM_TCP_CKSUM			BIT(21)
+-#define GDM_UDP_CKSUM			BIT(20)
+-#define GDM_STRIP_CRC			BIT(16)
++#define GDM_PAD_EN_MASK			BIT(28)
++#define GDM_DROP_CRC_ERR_MASK		BIT(23)
++#define GDM_IP4_CKSUM_MASK		BIT(22)
++#define GDM_TCP_CKSUM_MASK		BIT(21)
++#define GDM_UDP_CKSUM_MASK		BIT(20)
++#define GDM_STRIP_CRC_MASK		BIT(16)
+ #define GDM_UCFQ_MASK			GENMASK(15, 12)
+ #define GDM_BCFQ_MASK			GENMASK(11, 8)
+ #define GDM_MCFQ_MASK			GENMASK(7, 4)
+@@ -156,6 +152,10 @@
+ #define LBK_CHAN_MODE_MASK		BIT(1)
+ #define LPBK_EN_MASK			BIT(0)
+ 
++#define REG_GDM_CHN_RLS(_n)		(GDM_BASE(_n) + 0x20)
++#define MBI_RX_AGE_SEL_MASK		GENMASK(26, 25)
++#define MBI_TX_AGE_SEL_MASK		GENMASK(18, 17)
++
+ #define REG_GDM_TXCHN_EN(_n)		(GDM_BASE(_n) + 0x24)
+ #define REG_GDM_RXCHN_EN(_n)		(GDM_BASE(_n) + 0x28)
+ 
+@@ -168,10 +168,10 @@
+ #define FE_GDM_MIB_RX_CLEAR_MASK	BIT(1)
+ #define FE_GDM_MIB_TX_CLEAR_MASK	BIT(0)
+ 
+-#define REG_FE_GDM1_MIB_CFG		(GDM1_BASE + 0xf4)
++#define REG_FE_GDM_MIB_CFG(_n)		(GDM_BASE(_n) + 0xf4)
+ #define FE_STRICT_RFC2819_MODE_MASK	BIT(31)
+-#define FE_GDM1_TX_MIB_SPLIT_EN_MASK	BIT(17)
+-#define FE_GDM1_RX_MIB_SPLIT_EN_MASK	BIT(16)
++#define FE_GDM_TX_MIB_SPLIT_EN_MASK	BIT(17)
++#define FE_GDM_RX_MIB_SPLIT_EN_MASK	BIT(16)
+ #define FE_TX_MIB_ID_MASK		GENMASK(15, 8)
+ #define FE_RX_MIB_ID_MASK		GENMASK(7, 0)
+ 
+@@ -214,6 +214,33 @@
+ #define REG_FE_GDM_RX_ETH_L511_CNT_L(_n)	(GDM_BASE(_n) + 0x198)
+ #define REG_FE_GDM_RX_ETH_L1023_CNT_L(_n)	(GDM_BASE(_n) + 0x19c)
+ 
++#define REG_GDM_SRC_PORT_SET(_n)		(GDM_BASE(_n) + 0x23c)
++#define GDM_SPORT_OFF2_MASK			GENMASK(19, 16)
++#define GDM_SPORT_OFF1_MASK			GENMASK(15, 12)
++#define GDM_SPORT_OFF0_MASK			GENMASK(11, 8)
++
++#define REG_FE_GDM_TX_OK_PKT_CNT_H(_n)		(GDM_BASE(_n) + 0x280)
++#define REG_FE_GDM_TX_OK_BYTE_CNT_H(_n)		(GDM_BASE(_n) + 0x284)
++#define REG_FE_GDM_TX_ETH_PKT_CNT_H(_n)		(GDM_BASE(_n) + 0x288)
++#define REG_FE_GDM_TX_ETH_BYTE_CNT_H(_n)	(GDM_BASE(_n) + 0x28c)
++
++#define REG_FE_GDM_RX_OK_PKT_CNT_H(_n)		(GDM_BASE(_n) + 0x290)
++#define REG_FE_GDM_RX_OK_BYTE_CNT_H(_n)		(GDM_BASE(_n) + 0x294)
++#define REG_FE_GDM_RX_ETH_PKT_CNT_H(_n)		(GDM_BASE(_n) + 0x298)
++#define REG_FE_GDM_RX_ETH_BYTE_CNT_H(_n)	(GDM_BASE(_n) + 0x29c)
++#define REG_FE_GDM_TX_ETH_E64_CNT_H(_n)		(GDM_BASE(_n) + 0x2b8)
++#define REG_FE_GDM_TX_ETH_L64_CNT_H(_n)		(GDM_BASE(_n) + 0x2bc)
++#define REG_FE_GDM_TX_ETH_L127_CNT_H(_n)	(GDM_BASE(_n) + 0x2c0)
++#define REG_FE_GDM_TX_ETH_L255_CNT_H(_n)	(GDM_BASE(_n) + 0x2c4)
++#define REG_FE_GDM_TX_ETH_L511_CNT_H(_n)	(GDM_BASE(_n) + 0x2c8)
++#define REG_FE_GDM_TX_ETH_L1023_CNT_H(_n)	(GDM_BASE(_n) + 0x2cc)
++#define REG_FE_GDM_RX_ETH_E64_CNT_H(_n)		(GDM_BASE(_n) + 0x2e8)
++#define REG_FE_GDM_RX_ETH_L64_CNT_H(_n)		(GDM_BASE(_n) + 0x2ec)
++#define REG_FE_GDM_RX_ETH_L127_CNT_H(_n)	(GDM_BASE(_n) + 0x2f0)
++#define REG_FE_GDM_RX_ETH_L255_CNT_H(_n)	(GDM_BASE(_n) + 0x2f4)
++#define REG_FE_GDM_RX_ETH_L511_CNT_H(_n)	(GDM_BASE(_n) + 0x2f8)
++#define REG_FE_GDM_RX_ETH_L1023_CNT_H(_n)	(GDM_BASE(_n) + 0x2fc)
++
+ #define REG_PPE_GLO_CFG(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x200)
+ #define PPE_GLO_CFG_BUSY_MASK			BIT(31)
+ #define PPE_GLO_CFG_FLOW_DROP_UPDATE_MASK	BIT(9)
+@@ -326,44 +353,6 @@
+ 
+ #define REG_UPDMEM_DATA(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x374)
+ 
+-#define REG_FE_GDM_TX_OK_PKT_CNT_H(_n)		(GDM_BASE(_n) + 0x280)
+-#define REG_FE_GDM_TX_OK_BYTE_CNT_H(_n)		(GDM_BASE(_n) + 0x284)
+-#define REG_FE_GDM_TX_ETH_PKT_CNT_H(_n)		(GDM_BASE(_n) + 0x288)
+-#define REG_FE_GDM_TX_ETH_BYTE_CNT_H(_n)	(GDM_BASE(_n) + 0x28c)
+-
+-#define REG_FE_GDM_RX_OK_PKT_CNT_H(_n)		(GDM_BASE(_n) + 0x290)
+-#define REG_FE_GDM_RX_OK_BYTE_CNT_H(_n)		(GDM_BASE(_n) + 0x294)
+-#define REG_FE_GDM_RX_ETH_PKT_CNT_H(_n)		(GDM_BASE(_n) + 0x298)
+-#define REG_FE_GDM_RX_ETH_BYTE_CNT_H(_n)	(GDM_BASE(_n) + 0x29c)
+-#define REG_FE_GDM_TX_ETH_E64_CNT_H(_n)		(GDM_BASE(_n) + 0x2b8)
+-#define REG_FE_GDM_TX_ETH_L64_CNT_H(_n)		(GDM_BASE(_n) + 0x2bc)
+-#define REG_FE_GDM_TX_ETH_L127_CNT_H(_n)	(GDM_BASE(_n) + 0x2c0)
+-#define REG_FE_GDM_TX_ETH_L255_CNT_H(_n)	(GDM_BASE(_n) + 0x2c4)
+-#define REG_FE_GDM_TX_ETH_L511_CNT_H(_n)	(GDM_BASE(_n) + 0x2c8)
+-#define REG_FE_GDM_TX_ETH_L1023_CNT_H(_n)	(GDM_BASE(_n) + 0x2cc)
+-#define REG_FE_GDM_RX_ETH_E64_CNT_H(_n)		(GDM_BASE(_n) + 0x2e8)
+-#define REG_FE_GDM_RX_ETH_L64_CNT_H(_n)		(GDM_BASE(_n) + 0x2ec)
+-#define REG_FE_GDM_RX_ETH_L127_CNT_H(_n)	(GDM_BASE(_n) + 0x2f0)
+-#define REG_FE_GDM_RX_ETH_L255_CNT_H(_n)	(GDM_BASE(_n) + 0x2f4)
+-#define REG_FE_GDM_RX_ETH_L511_CNT_H(_n)	(GDM_BASE(_n) + 0x2f8)
+-#define REG_FE_GDM_RX_ETH_L1023_CNT_H(_n)	(GDM_BASE(_n) + 0x2fc)
+-
+-#define REG_GDM2_CHN_RLS		(GDM2_BASE + 0x20)
+-#define MBI_RX_AGE_SEL_MASK		GENMASK(26, 25)
+-#define MBI_TX_AGE_SEL_MASK		GENMASK(18, 17)
+-
+-#define REG_GDM3_FWD_CFG		GDM3_BASE
+-#define GDM3_PAD_EN_MASK		BIT(28)
+-
+-#define REG_GDM4_FWD_CFG		GDM4_BASE
+-#define GDM4_PAD_EN_MASK		BIT(28)
+-#define GDM4_SPORT_OFFSET0_MASK		GENMASK(11, 8)
+-
+-#define REG_GDM4_SRC_PORT_SET		(GDM4_BASE + 0x23c)
+-#define GDM4_SPORT_OFF2_MASK		GENMASK(19, 16)
+-#define GDM4_SPORT_OFF1_MASK		GENMASK(15, 12)
+-#define GDM4_SPORT_OFF0_MASK		GENMASK(11, 8)
+-
+ #define REG_IP_FRAG_FP			0x2010
+ #define IP_ASSEMBLE_PORT_MASK		GENMASK(24, 21)
+ #define IP_ASSEMBLE_NBQ_MASK		GENMASK(20, 16)
 
-Maxime
+---
+base-commit: 1f89ed0ebf2696d1d8fa7625e26c692aa153774a
+change-id: 20251017-airoha-regs-cosmetics-54e9005e7586
 
-> ---
-> v2: drop error handling, it wasn't there before and it would anyway be
->     removed again by a follow-up change
-> 
->  drivers/net/dsa/lantiq/Kconfig        |   1 +
->  drivers/net/dsa/lantiq/lantiq_gswip.c | 109 +++++++++++++++-----------
->  drivers/net/dsa/lantiq/lantiq_gswip.h |   6 +-
->  3 files changed, 69 insertions(+), 47 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/lantiq/Kconfig b/drivers/net/dsa/lantiq/Kconfig
-> index 1cb053c823f7..3cfa16840cf5 100644
-> --- a/drivers/net/dsa/lantiq/Kconfig
-> +++ b/drivers/net/dsa/lantiq/Kconfig
-> @@ -2,6 +2,7 @@ config NET_DSA_LANTIQ_GSWIP
->  	tristate "Lantiq / Intel GSWIP"
->  	depends on HAS_IOMEM
->  	select NET_DSA_TAG_GSWIP
-> +	select REGMAP
->  	help
->  	  This enables support for the Lantiq / Intel GSWIP 2.1 found in
->  	  the xrx200 / VR9 SoC.
-> diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-> index 86b410a40d32..3727cce92708 100644
-> --- a/drivers/net/dsa/lantiq/lantiq_gswip.c
-> +++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
-> @@ -113,22 +113,22 @@ static const struct gswip_rmon_cnt_desc gswip_rmon_cnt[] = {
->  
->  static u32 gswip_switch_r(struct gswip_priv *priv, u32 offset)
->  {
-> -	return __raw_readl(priv->gswip + (offset * 4));
-> +	u32 val;
-> +
-> +	regmap_read(priv->gswip, offset, &val);
-> +
-> +	return val;
->  }
->  
->  static void gswip_switch_w(struct gswip_priv *priv, u32 val, u32 offset)
->  {
-> -	__raw_writel(val, priv->gswip + (offset * 4));
-> +	regmap_write(priv->gswip, offset, val);
->  }
->  
->  static void gswip_switch_mask(struct gswip_priv *priv, u32 clear, u32 set,
->  			      u32 offset)
->  {
-> -	u32 val = gswip_switch_r(priv, offset);
-> -
-> -	val &= ~(clear);
-> -	val |= set;
-> -	gswip_switch_w(priv, val, offset);
-> +	regmap_write_bits(priv->gswip, offset, clear | set, set);
->  }
->  
->  static u32 gswip_switch_r_timeout(struct gswip_priv *priv, u32 offset,
-> @@ -136,48 +136,36 @@ static u32 gswip_switch_r_timeout(struct gswip_priv *priv, u32 offset,
->  {
->  	u32 val;
->  
-> -	return readx_poll_timeout(__raw_readl, priv->gswip + (offset * 4), val,
-> -				  (val & cleared) == 0, 20, 50000);
-> +	return regmap_read_poll_timeout(priv->gswip, offset, val,
-> +					!(val & cleared), 20, 50000);
->  }
->  
->  static u32 gswip_mdio_r(struct gswip_priv *priv, u32 offset)
->  {
-> -	return __raw_readl(priv->mdio + (offset * 4));
-> +	u32 val;
-> +
-> +	regmap_read(priv->mdio, offset, &val);
-> +
-> +	return val;
->  }
->  
->  static void gswip_mdio_w(struct gswip_priv *priv, u32 val, u32 offset)
->  {
-> -	__raw_writel(val, priv->mdio + (offset * 4));
-> +	int ret;
-> +
-> +	regmap_write(priv->mdio, offset, val);
->  }
->  
->  static void gswip_mdio_mask(struct gswip_priv *priv, u32 clear, u32 set,
->  			    u32 offset)
->  {
-> -	u32 val = gswip_mdio_r(priv, offset);
-> -
-> -	val &= ~(clear);
-> -	val |= set;
-> -	gswip_mdio_w(priv, val, offset);
-> -}
-> -
-> -static u32 gswip_mii_r(struct gswip_priv *priv, u32 offset)
-> -{
-> -	return __raw_readl(priv->mii + (offset * 4));
-> -}
-> -
-> -static void gswip_mii_w(struct gswip_priv *priv, u32 val, u32 offset)
-> -{
-> -	__raw_writel(val, priv->mii + (offset * 4));
-> +	regmap_write_bits(priv->mdio, offset, clear | set, set);
->  }
->  
->  static void gswip_mii_mask(struct gswip_priv *priv, u32 clear, u32 set,
->  			   u32 offset)
->  {
-> -	u32 val = gswip_mii_r(priv, offset);
-> -
-> -	val &= ~(clear);
-> -	val |= set;
-> -	gswip_mii_w(priv, val, offset);
-> +	regmap_write_bits(priv->mii, offset, clear | set, set);
->  }
->  
->  static void gswip_mii_mask_cfg(struct gswip_priv *priv, u32 clear, u32 set,
-> @@ -220,17 +208,10 @@ static void gswip_mii_mask_pcdu(struct gswip_priv *priv, u32 clear, u32 set,
->  
->  static int gswip_mdio_poll(struct gswip_priv *priv)
->  {
-> -	int cnt = 100;
-> +	u32 ctrl;
->  
-> -	while (likely(cnt--)) {
-> -		u32 ctrl = gswip_mdio_r(priv, GSWIP_MDIO_CTRL);
-> -
-> -		if ((ctrl & GSWIP_MDIO_CTRL_BUSY) == 0)
-> -			return 0;
-> -		usleep_range(20, 40);
-> -	}
-> -
-> -	return -ETIMEDOUT;
-> +	return regmap_read_poll_timeout(priv->mdio, GSWIP_MDIO_CTRL, ctrl,
-> +					!(ctrl & GSWIP_MDIO_CTRL_BUSY), 40, 4000);
->  }
->  
->  static int gswip_mdio_wr(struct mii_bus *bus, int addr, int reg, u16 val)
-> @@ -1893,9 +1874,37 @@ static int gswip_validate_cpu_port(struct dsa_switch *ds)
->  	return 0;
->  }
->  
-> +static const struct regmap_config sw_regmap_config = {
-> +	.name = "switch",
-> +	.reg_bits = 32,
-> +	.val_bits = 32,
-> +	.reg_shift = -2,
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
-For clarity, it would be better to use the dedicated macro :
-
-  .reg_shift = REGMAP_UPSHIFT(2),
-
-> +	.val_format_endian = REGMAP_ENDIAN_NATIVE,
-> +	.max_register = GSWIP_SDMA_PCTRLp(6),
-> +};
-> +
-> +static const struct regmap_config mdio_regmap_config = {
-> +	.name = "mdio",
-> +	.reg_bits = 32,
-> +	.val_bits = 32,
-> +	.reg_shift = -2,
-
-same here
-
-> +	.val_format_endian = REGMAP_ENDIAN_NATIVE,
-> +	.max_register = GSWIP_MDIO_PHYp(0),
-> +};
-> +
-> +static const struct regmap_config mii_regmap_config = {
-> +	.name = "mii",
-> +	.reg_bits = 32,
-> +	.val_bits = 32,
-> +	.reg_shift = -2,
-
-same here
-
-> +	.val_format_endian = REGMAP_ENDIAN_NATIVE,
-> +	.max_register = GSWIP_MII_CFGp(6),
-> +};
-> +
-
-Thanks,
-
-Maxime
 
