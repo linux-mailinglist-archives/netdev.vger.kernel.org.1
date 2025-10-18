@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-230630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F699BEC107
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 02:01:11 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5A46BEC115
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 02:01:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC5F41AE00D0
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 00:01:23 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A52974FAACE
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 00:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79D622E7167;
-	Sat, 18 Oct 2025 00:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D3942A1CF;
+	Sat, 18 Oct 2025 00:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wte1Cr0y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uWCSq/ig"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B5D2D94B7;
-	Sat, 18 Oct 2025 00:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 559EF30BF68;
+	Sat, 18 Oct 2025 00:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760745633; cv=none; b=Ooj9Jyy9KIubvE7Lp4G8wTnisuF2t4iJPsER6ZcuUq/noArtKp0hUtrRd/RxTj+vbbDP+zlsBbUW2X3qOnScBi67KRJxt9mUZLtrsK88uAHtI976yRcH5qC5V53lCWrO96M8egVqDchVjWQjxBmLprmde6BTe4lSJ4T23XBclqs=
+	t=1760745634; cv=none; b=EjVr7CaMLY//UEEMVtuNLII5iKhAZCdaYP11Nq2+CWn8lXbG7u2dPHvyafLqpjSyBFFxQw01tfLGMS3b8YqO8eny+F4iTRG/tJzXOTE/NecvVQzYPMGZHNO3t6LnoV9wmqKGHIhABm4ITsEew8C+hWFmoce8vgsN7vrn2O6Oq40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760745633; c=relaxed/simple;
-	bh=ouH4rZmdVYwMhtQGqtITuPCWUWfpP9mThtcLVXhUp6c=;
+	s=arc-20240116; t=1760745634; c=relaxed/simple;
+	bh=SX2waLHCJsjUlJYLVqz+0/2jdzLvDmSy0u8o++hWC6Q=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iuTfU+NjfS4wdXi8vRb2MInAUAC/YPFkJJTsKbRoOasW/Lu0sXlFUKz6f7IN5lxQs9f45tf4aHwVHSWOPsWWQpoDUco7aJ9JikzuuhqCRyPzAIWtPj5pUaBSYIsdpTGzQyuJ+OZgmxs6K+QlIjGAS1NCVmxAWZw0Z+JlGkqhqfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wte1Cr0y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD23CC4CEE7;
-	Sat, 18 Oct 2025 00:00:32 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=cWvMiHltyY2J6LvAqfbO344FxnnX4d/f+hDaoFG1tRuBGuKAlJvhBsgWN1XTas3nE/OQOfKe5RTYoMh3+A4iwevDHK+E00ZdWZ9sg2Kn2+SChB3CjbkvtO2SrXt5oJQIWncAVKEpMdN0ThVdytByQde5ObsYOlGk+nYxkeJlNqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uWCSq/ig; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34797C4CEF9;
+	Sat, 18 Oct 2025 00:00:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760745632;
-	bh=ouH4rZmdVYwMhtQGqtITuPCWUWfpP9mThtcLVXhUp6c=;
+	s=k20201202; t=1760745634;
+	bh=SX2waLHCJsjUlJYLVqz+0/2jdzLvDmSy0u8o++hWC6Q=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Wte1Cr0yZMaHmC5sJ46be4OkqAd7SPOcaOaCLXFMGnUsVlZoRsFUvjBh3rKQtH0Dz
-	 ua2zXeB2N2dVgj3xqYmDBe7fwxsiyXv0z9ik2wXmyyNO09e5MgoGTyx05PrKPDvjgT
-	 bhgTUT3sJQSyHf9uNUa26OFp57ShVWg91X8d4HHPcmBVg5PlTZZQ7q1ycZn7OcYOl7
-	 2uXSQd6WEuuIfU3qZUwJl1eREzhtLAQcYvVigdHK4eOExFgQw6i3HmO5WD6yjOswJP
-	 7TQieb+kwo8mQ14AZUYPb8bmkK+Eeg4ZfDXIB8y45OY0mjODE/P/24qKjdcusP8Ylt
-	 +M2W2Xmfmbsjw==
+	b=uWCSq/ig9odTOtUoM0V4ftPfeqkPoQqxCSWNv0/SGgnIlAPrEAImH0iWMDHI7GxHw
+	 Vzwh+IsEw+sLaRTZVF1iJ8Y10EfzXTWiF3gLV3JKx9rQooI33DLIP15+MS8UeqjXTq
+	 b1nfW2eaOBpH54Q9D/aMvG1Kqqm+MEAJG5UOESEp5qw6U88DZ6MPFIX+9VZQ9bt2AL
+	 pkVDattXs5cukAvwzxWHKRj1sxf6Y1CxUsUMWFImSQJxIpDkcTDRUlV3HJ6feQCJ8W
+	 mviIL2Nx+AOZAGU4M2ZLeWCmIwM09FCZXpIOyG2uV+g8W2s/g5i3WLtXyy9rXHNlrX
+	 Vi1/A49MJsyPQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7105D39EFA61;
-	Sat, 18 Oct 2025 00:00:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB10D39EFA61;
+	Sat, 18 Oct 2025 00:00:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] dpaa2-eth: fix the pointer passed to PTR_ALIGN on Tx
- path
+Subject: Re: [PATCH net] net: phy: realtek: fix rtl8221b-vm-cg name
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176074561600.2830883.6132558086043890627.git-patchwork-notify@kernel.org>
-Date: Sat, 18 Oct 2025 00:00:16 +0000
-References: <20251016135807.360978-1-ioana.ciornei@nxp.com>
-In-Reply-To: <20251016135807.360978-1-ioana.ciornei@nxp.com>
-To: Ioana Ciornei <ioana.ciornei@nxp.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- matt@traverse.com.au
+ <176074561750.2830883.15942603292071819937.git-patchwork-notify@kernel.org>
+Date: Sat, 18 Oct 2025 00:00:17 +0000
+References: <20251016192325.2306757-1-olek2@wp.pl>
+In-Reply-To: <20251016192325.2306757-1-olek2@wp.pl>
+To: Aleksander Jan Bajkowski <olek2@wp.pl>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ michael@fossekall.de, daniel@makrotopia.org, rmk+kernel@armlinux.org.uk,
+ kabel@kernel.org, ericwouds@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 16 Oct 2025 16:58:07 +0300 you wrote:
-> The blamed commit increased the needed headroom to account for
-> alignment. This means that the size required to always align a Tx buffer
-> was added inside the dpaa2_eth_needed_headroom() function. By doing
-> that, a manual adjustment of the pointer passed to PTR_ALIGN() was no
-> longer correct since the 'buffer_start' variable was already pointing
-> to the start of the skb's memory.
+On Thu, 16 Oct 2025 21:22:52 +0200 you wrote:
+> When splitting the RTL8221B-VM-CG into C22 and C45 variants, the name was
+> accidentally changed to RTL8221B-VN-CG. This patch brings back the previous
+> part number.
+> 
+> Fixes: ad5ce743a6b0 ("net: phy: realtek: Add driver instances for rtl8221b via Clause 45")
+> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] dpaa2-eth: fix the pointer passed to PTR_ALIGN on Tx path
-    https://git.kernel.org/netdev/net/c/902e81e679d8
+  - [net] net: phy: realtek: fix rtl8221b-vm-cg name
+    https://git.kernel.org/netdev/net/c/ffff5c8fc2af
 
 You are awesome, thank you!
 -- 
