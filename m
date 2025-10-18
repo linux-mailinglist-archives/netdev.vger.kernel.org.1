@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-230638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4489EBEC2F0
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 02:43:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1205BEC2F9
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 02:44:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7D2D1AA59E1
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 00:43:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66807620B9D
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 00:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24F7C19995E;
-	Sat, 18 Oct 2025 00:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F61B1632DD;
+	Sat, 18 Oct 2025 00:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WQxJ6I25"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fUdt9f5i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DAC7082D
-	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 00:42:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A77F178372
+	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 00:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760748180; cv=none; b=nQHb4Bx1vY0lSbJx9w3VMzYWv+iFk2Q+iPIJ0gaXLHPKlwcx86PfVpuq8Lr3eRLKmaoI8bk5FSUplm8NX6pfMbMwgxGkpSWPkbgpcp+93M586Y7Xwa98dhlJdZ1w8kLVi/+ooUNf29dWUU5JRvKVRF6MTMIYkaZQjOl3ftRlffc=
+	t=1760748281; cv=none; b=czmcH31+A17R5sjvDAVo9cKs3yG60uICz3410Ac5tWPVsYeAqKTFypnSNSJriDPUlpa9kLSfZi2ukQO/TxkHpUHXDpjMzqbYrge8J7Z396hJAF/EYWu4CAApZBvAOfpuuWu0l9HlcEm0Ef3mkH63Qpo7trYHJpDK3a809qIXso0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760748180; c=relaxed/simple;
-	bh=s243szStB9pBK3RcKWUDI2cHVqPoJDVQfeeUTlKRVJI=;
+	s=arc-20240116; t=1760748281; c=relaxed/simple;
+	bh=sHF2/XPZw6H0+JGNQbRl7shSpw7MIUsqz9Xi23Hix74=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d4pze+jFYB1i9I/gKPAc2e9VyiDDFd6FOErFFSA0sR/JPg2EkaNUeaif19GhpQZ3UoDb2xaAD0QFr4RESRaAI/WmJhHwO0KdCcjEtWSVsl1WMzZDiSlQg6Y5ALxM4Fes9jOGxMYLkgM9sZQB/OW2PQMTKk4u/CrMYMp3FLc8PqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WQxJ6I25; arc=none smtp.client-ip=209.85.214.181
+	 Content-Type:Content-Disposition:In-Reply-To; b=bmulLrYOoSe5h10+1P9gFdg9y9jEaxLOFmwlPy065pIRG9gsQYK5e+sAeu0amls3I1p10HsJGXgMhDXLewmw+7VYnbEZdbXnwHAFjgg6DtB9x63nAFzhMXj8nn/LSDM6up6EBPEBd1xV9rLQgmHMLFu81muXWnlw73G12MbcKA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fUdt9f5i; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-269639879c3so23420975ad.2
-        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 17:42:58 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-290b48e09a7so27318615ad.0
+        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 17:44:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760748178; x=1761352978; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760748279; x=1761353079; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1PWNtFrwP/oSzLfkwsnt+/gfiH1RiWv5c2UepBm6CR8=;
-        b=WQxJ6I25DGOUh4V+b3IPhLQX6bTDH3fpPiasJd58lEW8xM8Jk34p24qEKeMFoV9h/e
-         3pgXqTSUKAWaMX69fAMhIk+g3yGfTAQI1VZCwnjUmXbmWAMnTpTbk9Kb7wNrYEFRCXLa
-         6kcobJX25r4NJOEh14MUCpViMUOJd1tWpCEDxHoCoCUhN79swf5ylKWOkEzhkXCNsPfP
-         J4lYWoF1v1AnqpDZT0rIqHZRt2ZWcM4L/PLtTTKJyG9pA02dbO6J8sIUXv8XxlRGFHbJ
-         R/mZKkE37mLMxx7U99z/D5BQsO11pkUCUMp9plBUD6FHnHGIHfxbe2VXyCRndKwU7/Tx
-         3Cjg==
+        bh=3QafKpBA9ev9tZ8RtBiTe7ilN8YrDWJs4uzq+MACIIs=;
+        b=fUdt9f5iwA4BDe8irbzVPi1woSuKvNnIqgt3/bItl4hrmKX8YKqg8iqpef24Zd24t4
+         3++L/qYWHutF9xvXPYB5kxgAVa+acix6h1n9CgVzDisN0qa6WWZxwdTddtIqCk/7BZEU
+         L+oxzQqH/E0d79Mmu+6VJSbPUeqUiSPreDs/sUY6XnVkkX3JkAEVl83F2PsNmp0cPlh6
+         ssECQgv4Jj8m5EXR6PLsUGGlCDD+aAQwOJHtufreJjie6RCtuemqhpeiiu1yjk4ICp+h
+         cUTZgfjypzzF8DOxJwrnzmTLBz2sOXYC5ausIHMo7rvfAr/CKAftaoSKhhAu3KZcvV+t
+         /ROA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760748178; x=1761352978;
+        d=1e100.net; s=20230601; t=1760748279; x=1761353079;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1PWNtFrwP/oSzLfkwsnt+/gfiH1RiWv5c2UepBm6CR8=;
-        b=YhUyT+qW4hHiLA2wCsMGkSE2Yi63MCraG/fYaO+EG2LyfQhGVAKcjiw4M4SGKdDHFU
-         /5Kc7R3Tg2ZC77eEtibvXyLWS4CgIRB5G1Ot3QuLiF6bOqLzYWbCorcq7/mF8zK5qri5
-         Kj3a7i0wgXLvM/qEUrGCYbBwnHIs+MlZJXAESR9Iwkmht63YGGxdnpT2C+Qhu4QAUuRO
-         OQ/o49YmZjdFr6OSMV/NvOsYJCUqCwoN8t9xFkY6blwfT7aw5jORIomWrufLJWNOSz8N
-         jTKHq5pDsKWtD8RbEBBgdBjVHwsYwlO7jOfnO0KsNIegF7DhYqwYb2dLMbzWuXq6icnx
-         ZXGA==
-X-Forwarded-Encrypted: i=1; AJvYcCXn5gDbafOX6WXIWEvlJeEb58iuncQzBr465sFK85tOHzH/AsMwBUcZ6IDdyCB/xLtvRj1A0CY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBA5Kd8yPA3s9cO6uxoP0zH0D3dWhl/2Bsrc5Xefm+3AoarguT
-	2KRkJ9jIFdPRoVgR0LJfQAmU5azMy4Iu6VWLHpqJa20acEgCA7fGP4Pc
-X-Gm-Gg: ASbGncs3dXNsAeZztv0thklUahIgffPvh3l9eeWv8foSLLUB0lww7ueRFpt2gt8PMLL
-	eAGsif7MoTBb7aWPQMqvrEnjaiFlIFQ2aH4F8+yXjaRCo5CcXTjiJmIhi2kwMaVKqns5GLzyGpW
-	2PtxzAWk+ZRVjXS78RTIp5hs7d5OOX+wevls7CUoA05JLANJzReiiUZPLpxyK69QZOe27lUydip
-	c47Ko6iZejW44BPjBkGPymycGC43q3onSZze0oS19ab9qMYOet3/r/yw6HhwLAevZCpCUsxU9et
-	4uAv5g8dd3oUYseUH86dwUAKMhT6e8lp/UOCR6MVaNGRGuMSIbXjcxDOA+OW9jhx2eaehTvh4AI
-	hwHv20yRDJS6bQyyUG3npEFGFOK+LCc8pwzaO4g8FJ3Uc5ijMf5pDbSUnCf2ccnLOmm2O/oMUFm
-	A=
-X-Google-Smtp-Source: AGHT+IHk6GRhreHj//S6E+ILpNLEY2kapbyNg9O/WZnXJ0JV/NPB8zjD9Ghulw354rOmUlzfDrJAcA==
-X-Received: by 2002:a17:903:1746:b0:269:a4ed:13c9 with SMTP id d9443c01a7336-290caf85146mr63860745ad.30.1760748177829;
-        Fri, 17 Oct 2025 17:42:57 -0700 (PDT)
+        bh=3QafKpBA9ev9tZ8RtBiTe7ilN8YrDWJs4uzq+MACIIs=;
+        b=J6wOcsk7rC6bT0KSfYg6phRNVrNbqRgXFMt+TAbSr9+YSMF8szTAIP6btwCQ9qyDSZ
+         bUyDCqYCLEW5OCHnuqWojgBnFzikspm2vMXBHGvUZEAWRkacGWfuRNf4HFugS9EjxBrv
+         5rBRuPzN/hqZGpkNvg3+A4OMMlx5GQkrXwtj5zujiqMGq/F2BnvZZYS/0q3ZUhDGtknf
+         /iu7HlPHSi2eEBsbm1PrOAmFrJr8QcMVJpfbBXQJ93oxvFplUH4vCLJ8DKLQOu9oTIyj
+         VmQwbqWvODNFZcn2LNF3WZnHYji6OSyqhnLzkxMgpgtMKzixqwnU2NcgyhL064FDeAgz
+         l+cA==
+X-Forwarded-Encrypted: i=1; AJvYcCULF4FdlwBwJGf75eWqABALZ5sJVHAtVa94IZgaHkWXgfR2u6mjSJSDav7HOpTtBIMs3pOaUWs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxR8n9kDhpzBnNeCehRlTv9tZpK9c69+ZmLJRzZKz3BgeXOwJPv
+	G+8MulzuiR0c/dMSB2eWYvK8Y4SLd3xfFO451nacUam3CMHQyGpwkQym
+X-Gm-Gg: ASbGncu4o3fl7EQ4EydmPl1cGLiqzKbmElyCLIkqRcA0YqKXfMbuaA+fnOFWecQl4fQ
+	vYGcx9Jv3BsA3tQaBOnJRD1gbVjcMOhhOywu9CKjoHW7BDfdl8YLvjA+BM14c0R1yMoTHXF2Udh
+	Zr096b7BIu5pAqsKV/RegU4PKXMg2qv5bN96BjU30NT6iejTkyeU3R9RZzc9YccgFyQpOJsrM/A
+	Wwm3aqIha4AKF9izypG0bZGmMTi71OUj2k8JCpqR0Git5HsCFhZwxP+sTm9KuOZSkM+VfyarQfS
+	uzuInVmrFNwEELbqHzAqT9kMivaJbHvzL8OGDEYpwRSXBShyjrwN+cHvPpGRkoGyeq1SyhVnS09
+	cgBDuv9wCAhmAsh6LkPZzFkrUkYc7iPuJp06cK9le8IOaN04NS/1b52cGX9X0J1NQKn90na3bim
+	0=
+X-Google-Smtp-Source: AGHT+IEJHzKpBZuNZNa18WS/ADFtdVavA7SE/dNX1ygVUM8SyYneHAxGCurSyYxg3cW6a8KtgONCXg==
+X-Received: by 2002:a17:902:ea01:b0:267:d2f9:2327 with SMTP id d9443c01a7336-290c9cf2d88mr81827755ad.27.1760748278692;
+        Fri, 17 Oct 2025 17:44:38 -0700 (PDT)
 Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-292471d5874sm7975275ad.54.2025.10.17.17.42.56
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2924721b6fdsm7874395ad.118.2025.10.17.17.44.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Oct 2025 17:42:57 -0700 (PDT)
-Date: Sat, 18 Oct 2025 08:42:07 +0800
+        Fri, 17 Oct 2025 17:44:38 -0700 (PDT)
+Date: Sat, 18 Oct 2025 08:43:47 +0800
 From: Inochi Amaoto <inochiama@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>, Inochi Amaoto <inochiama@gmail.com>
+To: Yixun Lan <dlan@gentoo.org>, Inochi Amaoto <inochiama@gmail.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -84,12 +84,11 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Han Gao <rabenda.cn@gmail.com>, Icenowy Zheng <uwu@icenowy.me>, 
 	Vivian Wang <wangruikang@iscas.ac.cn>, Yao Zi <ziyao@disroot.org>, netdev@vger.kernel.org, 
 	sophgo@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Yixun Lan <dlan@gentoo.org>, 
-	Longbin Li <looong.bin@gmail.com>
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Longbin Li <looong.bin@gmail.com>
 Subject: Re: [PATCH] net: stmmac: dwmac-sophgo: Add phy interface filter
-Message-ID: <i5prc7y4fxt3krghgvs7buyfkwwulxnsc2oagbwdjx4tbqjqls@fx4nkkyz6tdt>
+Message-ID: <hmch7csqotxt42snddksce2mpnjeglbgvoxs6r5qlu7v2ayxyk@zctj7xhugeln>
 References: <20251017011802.523140-1-inochiama@gmail.com>
- <34fcc4cd-cd3d-418a-8d06-7426d2514dee@lunn.ch>
+ <20251018000548-GYA1481334@gentoo.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,26 +97,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <34fcc4cd-cd3d-418a-8d06-7426d2514dee@lunn.ch>
+In-Reply-To: <20251018000548-GYA1481334@gentoo.org>
 
-On Fri, Oct 17, 2025 at 08:16:17PM +0200, Andrew Lunn wrote:
-> On Fri, Oct 17, 2025 at 09:18:01AM +0800, Inochi Amaoto wrote:
+On Sat, Oct 18, 2025 at 08:05:48AM +0800, Yixun Lan wrote:
+> Hi Inochi,
+> 
+> On 09:18 Fri 17 Oct     , Inochi Amaoto wrote:
 > > As the SG2042 has an internal rx delay, the delay should be remove
+>                                                      s/remove/removed/
 > > when init the mac, otherwise the phy will be misconfigurated.
-> 
-> Are there any in tree DT blobs using invalid phy-modes? In theory,
-> they should not work, but sometimes there is other magic going on. I
-> just want to make sure this is not going to cause a regression.
-> 
+> s/init/initialize/
+> > 
+> > Fixes: 543009e2d4cd ("net: stmmac: dwmac-sophgo: Add support for Sophgo SG2042 SoC")
+> > Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> > Tested-by: Han Gao <rabenda.cn@gmail.com>
+> > ---
+> >  .../ethernet/stmicro/stmmac/dwmac-sophgo.c    | 25 ++++++++++++++++++-
+> >  1 file changed, 24 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+> > index 3b7947a7a7ba..b2dee1399eb0 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+> > @@ -7,6 +7,7 @@
+> > 
+> >  #include <linux/clk.h>
+> >  #include <linux/module.h>
+> > +#include <linux/property.h>
+> >  #include <linux/mod_devicetable.h>
+> >  #include <linux/platform_device.h>
+> > 
+> > @@ -29,8 +30,23 @@ static int sophgo_sg2044_dwmac_init(struct platform_device *pdev,
+> >  	return 0;
+> >  }
+> > 
+> > +static int sophgo_sg2042_set_mode(struct plat_stmmacenet_data *plat_dat)
+> > +{
+> > +	switch (plat_dat->phy_interface) {
+> > +	case PHY_INTERFACE_MODE_RGMII_ID:
+> > +		plat_dat->phy_interface = PHY_INTERFACE_MODE_RGMII_TXID;
+> > +		return 0;
+> > +	case PHY_INTERFACE_MODE_RGMII_RXID:
+> > +		plat_dat->phy_interface = PHY_INTERFACE_MODE_RGMII;
+> > +		return 0;
+> > +	default:
+> > +		return -EINVAL;
+> > +	}
+> > +}
+> > +
+> >  static int sophgo_dwmac_probe(struct platform_device *pdev)
+> >  {
+> > +	int (*plat_set_mode)(struct plat_stmmacenet_data *plat_dat);
+> >  	struct plat_stmmacenet_data *plat_dat;
+> >  	struct stmmac_resources stmmac_res;
+> >  	struct device *dev = &pdev->dev;
+> > @@ -50,11 +66,18 @@ static int sophgo_dwmac_probe(struct platform_device *pdev)
+> >  	if (ret)
+> >  		return ret;
+> > 
+> > +	plat_set_mode = device_get_match_data(&pdev->dev);
+> > +	if (plat_set_mode) {
+> > +		ret = plat_set_mode(plat_dat);
+> > +		if (ret)
+> > +			return ret;
+> > +	}
+> > +
+> >  	return stmmac_dvr_probe(dev, plat_dat, &stmmac_res);
+> >  }
+> > 
 
-I see no SG2042 board using invalid phy-modes. Only rgmii-id is used,
-which is vaild.
-
-> Also, does the DT binding document list the valid phy-modes?
+> >  static const struct of_device_id sophgo_dwmac_match[] = {
+> > -	{ .compatible = "sophgo,sg2042-dwmac" },
+> > +	{ .compatible = "sophgo,sg2042-dwmac", .data = sophgo_sg2042_set_mode },
+> I'd personally prefer to introduce a flag for this, it would be more readable and
+> maintainable, something like
+> struct sophgo_dwmac_compitable_data {
+> 	bool has_internal_rx_delay;
+> }
 > 
+> then.
+> 	if (data->has_internal_rx_delay)
+> 		sophgo_sg2042_set_mode(..)
+> 
+> 
+> >  	{ .compatible = "sophgo,sg2044-dwmac" },
+> >  	{ /* sentinel */ }
+> >  };
 
-It does not list. Is it better for me to add a list for it?
+Yeah, I think this is a good idea, thanks.
 
 Regards,
 Inochi
+
 
