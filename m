@@ -1,257 +1,298 @@
-Return-Path: <netdev+bounces-230682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 025D1BED26F
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 17:18:57 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60556BED284
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 17:22:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8CCE04E9E64
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 15:18:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 90C0B4E72FF
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 15:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69287230BFD;
-	Sat, 18 Oct 2025 15:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158F6226CF0;
+	Sat, 18 Oct 2025 15:22:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="c/U2VCaE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XUcHPUlb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C82224B1E
-	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 15:18:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1537227EB9
+	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 15:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760800692; cv=none; b=gOpaTYBo4yPFhtNifthI/3rw9IHomFbE1e0KdXtkLVjp4LmlM7j+UptYZSdTGxh2VC902+oGKjruyYyEwubt2dlwECGoR69p7gKCEy3yPlu5+O/k/C225dzlatEiTXopD1lGAYBHOxlAvBnK5QdJeWFFjOkXblBuAH3Xl6ID0zo=
+	t=1760800926; cv=none; b=TSiid+Y8XANnZrSOsuNp6DxiyY4nEpQ1pj7U5BrAObX2uT+DgzQYKFGSexhRwNYonABWoJFhlOtgduI7VZTh9D/DifwXeGgUvbzy9VgbeOujj1Osuhn4YLtDBjWhnI9Yu7Axz3zhEbpb5fE+wVhEa/SyHAdnhv5kBAJnLRlrQc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760800692; c=relaxed/simple;
-	bh=qzqeSszSGyaiszISR/czBnXkGhO6/26SHNNlkpAcUt8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dyoL3yqpfqdbJ5ZeZX6E882/HZXnm/OPEuP9Y3jAncpeHuJcHNnZiHX/UNCqskGujCVxdTzFrkKq26q20tq/v0uZmuYZgw1YqROKBohgs9dJGLF/CXSmoyYEZP9+Yy92mvTQLVN94txfvFXcRol7IAasw0loyECXnLz8zn1XDqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=c/U2VCaE; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b64cdbb949cso382737566b.1
-        for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 08:18:07 -0700 (PDT)
+	s=arc-20240116; t=1760800926; c=relaxed/simple;
+	bh=nzR01ZPksVG5TQ75xILFz5dk7YmAqDiwHTk56jUV8xA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JQ5KI5+RQBZIXv462cZr2e/PGpEbBsW9DqG72Zh7o0m0r+U0a91j1O0eO3hBNp0jvvdlxDN7oLmmON6nJANz+XjuPg3PVXPq3ByNc/ZMA+z+w2ZdNpbz3CPyegPBT4XN7U/loiGadEsxwbLc8qeXkcgqHU7y8/1YAgu+L9kdFn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XUcHPUlb; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b457d93c155so422016766b.1
+        for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 08:22:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20230601; t=1760800685; x=1761405485; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760800921; x=1761405721; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=f6ph45DuTn4gKNCYi+keao8MWtW71hOag0yh3hz/4co=;
-        b=c/U2VCaEB6ndaedTInB0zdhVqGa3dEKg60chIXK/eWHosMuxErYuaa0fPrJFXXnWLE
-         Tz/Cz1Q8agXVzVlofRPE+6Ol/Srxg2Rn8kiQ4/ioOqrx5ric3VHna99uxQEDTk9kRzJ6
-         wO+bSw9/PlU6mOYVeWO+ZD1XMwSToD4Q9KJKhtbhxWtCN1+fG7oVvK3IQswfW9kbayeT
-         7aWIq256mwCoyE+HZcy5ieD/IPZ9Iqbh5t/eAX3rBthSq1WOyKRX/WVoeMk5mba4EoSC
-         WbZn7hEx13MsWpnWmxVfx+ls5rEKmt82qOjjA67KNgehoSOsjTfFQwt0F1qUqP1tsC0F
-         PmNA==
+        bh=494+LdB+/vJI0VWXES/E84qAHGDNRCCpp6TfBFduueY=;
+        b=XUcHPUlbD3mdSQgn4Blo3QlO03X3vd1PMP76898oGUyI/GHcw1uUUqPit9DETwiv0l
+         qucKIFFLDjO+BtWdihyegCU05w9/dC6Yt5SLkrvCpdoWhbA/j7aH6oLvlRHs0NOlvySg
+         XeqJUKyCkbVZN4xGSVBiC/sYFwMXYgvayPmPSfHdf8haikz0ycUj7Z901mXUnFGms6E5
+         omp86qBaCRAshmvBsTi9b78zgMgndQzmRD388Jicz5ssIuW5gTiPwwjDmlGibSM/Wr8a
+         Rip2mR+yvxfz0CpAiLnzC8K1lMjXWBOggSDT/8+4Tv1WtSluRcRGr14TNWmp0EtNFSSg
+         ZaAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760800685; x=1761405485;
+        d=1e100.net; s=20230601; t=1760800921; x=1761405721;
         h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=f6ph45DuTn4gKNCYi+keao8MWtW71hOag0yh3hz/4co=;
-        b=EoZ+tWPXX8Kt2cNnpm75tOLvjoWqw7iPXbbQD+yl4bSxl6mSm+5acZ/D93u8tVdpMn
-         /+GSrM64Gs33RbxxPyRmWkWL8iIDlfFItpiBTESwDCjAFXdsdtiwPs+28m7/j2vGGNhk
-         hepndFyHe0YLVaKidrYkgYZrE+TMyNilk3+g/0NRoQuUIBjHFnoUVzCXe8b7FHDRku3m
-         D9St9+RofJhNBJEOb9cZmpH0U/b5CDwyzeRfR7rbkCYsgvHQ71N8rrkGrkAogJmtVPBe
-         SzNowotbhj7c14PAclahtZUERv5gUAxi7C/r8GtimiNgXlqb/OZAnyjnHonbD1X+4JlG
-         3a6w==
-X-Forwarded-Encrypted: i=1; AJvYcCVg3vrfyp0k27hAoAXThZI+5hidQHdMJo2OmQBDyT1Q1ZTmu3OLkSKWyXE5pLNtIk0gf58geDM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxosZdP2h9TkISOowHPCZU3VJ04oCardi1pq29vwpdZCnYmt9B2
-	JcgUJo29GOJhuh4PVm5GrR062zzfoPiuh4x6eFmGmVu+/5N4bBOzhFSs
-X-Gm-Gg: ASbGnct2YszfSAGwcz5rp2fDTAqtGzrI1o6ttJ5a0Dai+G/UbB4929xHaNqngrVG1dO
-	TFPlRD9v+lJNNgfJ9U6l4EAyYkWZSMLb0MmMQQGHn5VMFBKtAMTbj3ngcM9dn4KuAojjKC+nDmy
-	r/N9mvBDXTn14lbZAZrXCytjBAdbZjrdDyVfD896ycFfNUFpYeUeEn7gAAIPFChrFplrYnqkx4A
-	EINiukLLT07dulQG9H4f7yRT+PgUsWbf39GsHDHjPXU6JKLops7fZpAkV47Ukat3exfYVRlQf3q
-	rK/exNOjxXnrBLzDxDiSJpPnWXjoWgmR3b0aVPrAb/ybGY/sRM6U8rKEGJgJaTbGAs3hy5iU33R
-	Se3f3sv90x61ahZX6pytd9oG1SsKcN2TWCRvHu4hpPyxzn78HISdwW4MkQbh2QOTADVWNDuXeNY
-	11ZlE69bxUtwmHr8ldpEZ5sEgizldvl6+Sp1R+KLbWYvxBLvQTGSDjk7e135H3I1V/QXhQ3DOco
-	W/OC8UoKFyZ
-X-Google-Smtp-Source: AGHT+IEaxfddzIsW7EfJsH4hq5Kgg3RQ2/rfz47KNABoXSBEYYMg0uwV1ertYdf1YmLz+K9fDfpnSQ==
-X-Received: by 2002:a17:907:7ea5:b0:b54:185f:359c with SMTP id a640c23a62f3a-b6473149643mr898256366b.16.1760800685477;
-        Sat, 18 Oct 2025 08:18:05 -0700 (PDT)
-Received: from tycho (p200300c1c7311b00ba8584fffebf2b17.dip0.t-ipconnect.de. [2003:c1:c731:1b00:ba85:84ff:febf:2b17])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b65eb036846sm259983366b.54.2025.10.18.08.18.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Oct 2025 08:18:05 -0700 (PDT)
-Sender: Zahari Doychev <zahari.doychev@googlemail.com>
-From: Zahari Doychev <zahari.doychev@linux.com>
-To: donald.hunter@gmail.com,
-	kuba@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	jacob.e.keller@intel.com,
-	ast@fiberby.net,
-	matttbe@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	johannes@sipsolutions.net,
-	zahari.doychev@linux.com
-Subject: [PATCH 4/4] tools: ynl: add start-index property for indexed arrays
-Date: Sat, 18 Oct 2025 17:17:37 +0200
-Message-ID: <20251018151737.365485-5-zahari.doychev@linux.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251018151737.365485-1-zahari.doychev@linux.com>
-References: <20251018151737.365485-1-zahari.doychev@linux.com>
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=494+LdB+/vJI0VWXES/E84qAHGDNRCCpp6TfBFduueY=;
+        b=CHdJCJyfWPUBlaG3PGg3Kp8i8+FR6YWERZXLVInB4dngaiPSjBcBuzGIN8yqHVPm3W
+         iwcBv8f+b+6ZYErVq6SyYTeqmjVMffhAlL0lQyvYRShLo4rKokgxuQzD03+fGK78EkaE
+         VcoTBmj4O6Du+wDk92C8XOG1KDhWDBOb88m9Yc4nakcRfsqYwanDQwuzbK58HFFtgdPX
+         8L1rTCnhUnWrZOe067jsJY0gkgCcLayb1bXmKmWO2ypvGe9+Y7t4aej+7bs7RIsR+Kij
+         zlpnGeNiCmx8p5ziSkP4VWpq1sN+RqQhEpbIRRoCjWmrFlkthwtndpq4ky1qU+D9BSG0
+         Tbqg==
+X-Forwarded-Encrypted: i=1; AJvYcCW+7aHEB+OtA1ijeZ/wGJ3OYbwclO3mHYmBiFhajuBzgHm5xiDEIGbFGq86dnWOhmJvOI9ibhk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzM0piGEHzwI2up1ovNbzz5iKgJPr5X9yXLTNyvMqnd8FW4a5tu
+	4+bopjIJ/5GAcF1bwHr84wA5fgrd7P/g3gdNOGxqA9V23C/osrJRztHQ
+X-Gm-Gg: ASbGncvPfFvzy48Wqg6UB39Pt0gb5khSzJzAt33ZFu1JCUOjgBMYk0+oIQxT+1j8s4B
+	+TWWhKIejGht1EF69D8+VbdtCCsUr5fmQpdtsvtZ/zaCfRWoGjmAQGK0Hi10wQ56xvFHMWbKaOo
+	WuYS83lwncNrLy6B4rMa63Uc+QYKRCtF0tyNKM5rAcONmrxanewGTtW6hKvNmkFpZHPX32dsg2d
+	VUQu5kCpwViUB3qlJ2iR+bMBKCU+uf2Y8uf5N3AWYuisjiDajNXTD6xYNfKeDtCsUpendh/xCrq
+	pCWQ+7zyX+M/ReG03ZtanlqZH6eenrMNMKbXK6U2QODx8QI4eqfaOQHJ0ld2pRaqilGKYp9J/3F
+	uYbrg560g1vXcU+CDDcHD3T8Xqyqlivm7M3C2qOEz+Hf5jUM91mf31okW0PjjZ9tU/hvzQa46NR
+	1G6Bu1m3qNUJsJBtss
+X-Google-Smtp-Source: AGHT+IFp6+ydXSgicmckei67zciPSd8OF9UxvzlzqRFOwWZKZyk/PUfrsSkmtiGEm/J3CEOfMuPmBA==
+X-Received: by 2002:a17:906:1408:b0:b65:f49a:7b92 with SMTP id a640c23a62f3a-b65f49a7b9cmr250885166b.24.1760800921148;
+        Sat, 18 Oct 2025 08:22:01 -0700 (PDT)
+Received: from foxbook (bey128.neoplus.adsl.tpnet.pl. [83.28.36.128])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b65eb526175sm266480266b.56.2025.10.18.08.21.59
+        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
+        Sat, 18 Oct 2025 08:22:00 -0700 (PDT)
+Date: Sat, 18 Oct 2025 17:21:56 +0200
+From: Michal Pecio <michal.pecio@gmail.com>
+To: Alan Stern <stern@rowland.harvard.edu>
+Cc: yicongsrfy@163.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, oliver@neukum.org, pabeni@redhat.com
+Subject: Re: [PATCH net v5 2/3] net: usb: ax88179_178a: add USB device
+ driver for config selection
+Message-ID: <20251018172156.69e93897.michal.pecio@gmail.com>
+In-Reply-To: <bda50568-a05d-4241-adbe-18efb2251d6e@rowland.harvard.edu>
+References: <20251013110753.0f640774.michal.pecio@gmail.com>
+	<20251017024229.1959295-1-yicongsrfy@163.com>
+	<db3db4c6-d019-49d0-92ad-96427341589c@rowland.harvard.edu>
+	<20251017191511.6dd841e9.michal.pecio@gmail.com>
+	<bda50568-a05d-4241-adbe-18efb2251d6e@rowland.harvard.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The Linux tc actions expect that the action order starts from index
-one. To accommodate this, add a start-index property to the ynl spec
-for indexed arrays. This property allows the starting index to be
-specified, ensuring compatibility with consumers that require a
-non-zero-based index.
+On Fri, 17 Oct 2025 22:27:35 -0400, Alan Stern wrote:
+> Without a reasonable clear and quick criterion for deciding when to 
+> favor vendor-specific configs in the USB core, there's little I can do.  
+> Having a quirks flag should help remove some of the indecision, since 
+> such flags are set by hand rather than by an automated procedure.  But 
+> I'd still want to have a better idea of exactly what to do when the 
+> quirk flag is set.
 
-For example if we have "start_index = 1" then we get the following
-diff.
+Existing r8152-cfgselector and the planned ax88179-cfgselector
+implement the following logic:
 
- 		ynl_attr_put_str(nlh, TCA_FLOWER_INDEV, obj->indev);
- 	array = ynl_attr_nest_start(nlh, TCA_FLOWER_ACT);
- 	for (i = 0; i < obj->_count.act; i++)
--		tc_act_attrs_put(nlh, i, &obj->act[i]);
-+		tc_act_attrs_put(nlh, i + 1, &obj->act[i]);
- 	ynl_attr_nest_end(nlh, array);
+IF a device has particular IDs
+   (same id_table as in the vendor interface driver)
 
-Signed-off-by: Zahari Doychev <zahari.doychev@linux.com>
+IF the vendor interface driver is loaded
+   (ensured by loading it together with cfgselector)
+
+IF the vendor driver supports this device
+   (calls internal vendor driver code)
+
+THEN select the vendor configuration
+
+
+It was a PITA, but I have a working proof of concept for r8152.
+
+Still missing is automatic reevaluation of configuration choice when
+the vendor driver is loaded after device connection (e.g. by udev).
+Those cfgselectors can do it because it seems that registering a new
+device (but not interface) driver forces reevaluation.
+
 ---
- Documentation/netlink/netlink-raw.yaml | 13 +++++++++++++
- Documentation/netlink/specs/tc.yaml    |  7 +++++++
- tools/net/ynl/pyynl/lib/nlspec.py      |  1 +
- tools/net/ynl/pyynl/ynl_gen_c.py       |  6 +++++-
- 4 files changed, 26 insertions(+), 1 deletion(-)
+ drivers/net/usb/r8152.c    | 13 ++++++-------
+ drivers/usb/core/driver.c  | 23 +++++++++++++++++++++++
+ drivers/usb/core/generic.c | 17 +++++++++++++++--
+ include/linux/usb.h        |  6 ++++++
+ 4 files changed, 50 insertions(+), 9 deletions(-)
 
-diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
-index 246fa07bccf6..aafb7cb16beb 100644
---- a/Documentation/netlink/netlink-raw.yaml
-+++ b/Documentation/netlink/netlink-raw.yaml
-@@ -260,6 +260,9 @@ properties:
-                   Sometimes, however, both forms are necessary, in which case header contains the enum
-                   form while specific attributes may request to convert the values into a bitfield.
-                 type: boolean
-+              start-index:
-+                description: For indexed arrays the first index value.
-+                type: integer
-               checks:
-                 description: Kernel input validation.
-                 type: object
-@@ -308,6 +311,16 @@ properties:
-                 type: string
-               # End netlink-raw
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index a22d4bb2cf3b..1b016dd81949 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -10020,6 +10020,11 @@ static void rtl8152_disconnect(struct usb_interface *intf)
+ 	}
+ }
  
-+            # allow start index only for indexed arrays
-+            if:
-+              properties:
-+                type:
-+                  const: indexed-array
-+            then: {}
-+            else:
-+              not:
-+                required: [ start-index ]
++static bool rtl8152_preferred(struct usb_device *udev)
++{
++	return __rtl_get_hw_ver(udev) != RTL_VER_UNKNOWN;
++}
 +
-       # Make sure name-prefix does not appear in subsets (subsets inherit naming)
-       dependencies:
-         name-prefix:
-diff --git a/Documentation/netlink/specs/tc.yaml b/Documentation/netlink/specs/tc.yaml
-index b398f7a46dae..459aa51059ec 100644
---- a/Documentation/netlink/specs/tc.yaml
-+++ b/Documentation/netlink/specs/tc.yaml
-@@ -2044,6 +2044,7 @@ attribute-sets:
-         type: indexed-array
-         sub-type: nest
-         nested-attributes: act-attrs
-+        start-index: 1
-       -
-         name: police
-         type: nest
-@@ -2303,6 +2304,7 @@ attribute-sets:
-         type: indexed-array
-         sub-type: nest
-         nested-attributes: act-attrs
-+        start-index: 1
-       -
-         name: police
-         type: nest
-@@ -2493,6 +2495,7 @@ attribute-sets:
-         type: indexed-array
-         sub-type: nest
-         nested-attributes: act-attrs
-+        start-index: 1
-       -
-         name: key-eth-dst
-         type: binary
-@@ -3020,6 +3023,7 @@ attribute-sets:
-         type: indexed-array
-         sub-type: nest
-         nested-attributes: act-attrs
-+        start-index: 1
-       -
-         name: mask
-         type: u32
-@@ -3180,6 +3184,7 @@ attribute-sets:
-         type: indexed-array
-         sub-type: nest
-         nested-attributes: act-attrs
-+        start-index: 1
-       -
-         name: flags
-         type: u32
-@@ -3566,6 +3571,7 @@ attribute-sets:
-         type: indexed-array
-         sub-type: nest
-         nested-attributes: act-attrs
-+        start-index: 1
-   -
-     name: taprio-attrs
-     name-prefix: tca-taprio-attr-
-@@ -3798,6 +3804,7 @@ attribute-sets:
-         type: indexed-array
-         sub-type: nest
-         nested-attributes: act-attrs
-+        start-index: 1
-       -
-         name: indev
-         type: string
-diff --git a/tools/net/ynl/pyynl/lib/nlspec.py b/tools/net/ynl/pyynl/lib/nlspec.py
-index 85c17fe01e35..08660602da9d 100644
---- a/tools/net/ynl/pyynl/lib/nlspec.py
-+++ b/tools/net/ynl/pyynl/lib/nlspec.py
-@@ -181,6 +181,7 @@ class SpecAttr(SpecElement):
-         self.display_hint = yaml.get('display-hint')
-         self.sub_message = yaml.get('sub-message')
-         self.selector = yaml.get('selector')
-+        self.start_index = yaml.get('start-index', 0)
+ /* table of devices that work with this driver */
+ static const struct usb_device_id rtl8152_table[] = {
+ 	/* Realtek */
+@@ -10067,6 +10072,7 @@ static struct usb_driver rtl8152_driver = {
+ 	.name =		MODULENAME,
+ 	.id_table =	rtl8152_table,
+ 	.probe =	rtl8152_probe,
++	.preferred =	rtl8152_preferred,
+ 	.disconnect =	rtl8152_disconnect,
+ 	.suspend =	rtl8152_suspend,
+ 	.resume =	rtl8152_resume,
+@@ -10119,13 +10125,7 @@ static int __init rtl8152_driver_init(void)
+ {
+ 	int ret;
  
-         self.is_auto_scalar = self.type == "sint" or self.type == "uint"
+-	ret = usb_register_device_driver(&rtl8152_cfgselector_driver, THIS_MODULE);
+-	if (ret)
+-		return ret;
+-
+ 	ret = usb_register(&rtl8152_driver);
+-	if (ret)
+-		usb_deregister_device_driver(&rtl8152_cfgselector_driver);
  
-diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index aadeb3abcad8..698d6089a856 100755
---- a/tools/net/ynl/pyynl/ynl_gen_c.py
-+++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -852,7 +852,11 @@ class TypeIndexedArray(Type):
-             ri.cw.p(f"ynl_attr_put(nlh, i, {var}->{self.c_name}[i], {self.checks['exact-len']});")
-         elif self.sub_type == 'nest':
-             ri.cw.p(f'for (i = 0; i < {var}->_count.{self.c_name}; i++)')
--            ri.cw.p(f"{self.nested_render_name}_put(nlh, i, &{var}->{self.c_name}[i]);")
-+            ri.cw.p(
-+                f"{self.nested_render_name}_put(nlh, "
-+                f"i{f' + {self.start_index}' if self.start_index > 0 else ''}, "
-+                f"&{var}->{self.c_name}[i]);"
-+            )
-         else:
-             raise Exception(f"Put for IndexedArray sub-type {self.attr['sub-type']} not supported, yet")
-         ri.cw.p('ynl_attr_nest_end(nlh, array);')
+ 	return ret;
+ }
+@@ -10133,7 +10133,6 @@ static int __init rtl8152_driver_init(void)
+ static void __exit rtl8152_driver_exit(void)
+ {
+ 	usb_deregister(&rtl8152_driver);
+-	usb_deregister_device_driver(&rtl8152_cfgselector_driver);
+ }
+ 
+ module_init(rtl8152_driver_init);
+diff --git a/drivers/usb/core/driver.c b/drivers/usb/core/driver.c
+index d29edc7c616a..eaf21c30eac1 100644
+--- a/drivers/usb/core/driver.c
++++ b/drivers/usb/core/driver.c
+@@ -1119,6 +1119,29 @@ void usb_deregister(struct usb_driver *driver)
+ }
+ EXPORT_SYMBOL_GPL(usb_deregister);
+ 
++/**
++ * usb_driver_preferred - check if this is a preferred interface driver
++ * @drv: interface driver to check (device drivers are ignored)
++ * @udev: the device we are looking up a driver for
++ * Context: must be able to sleep
++ *
++ * TODO locking?
++ */
++bool usb_driver_preferred(struct device_driver *drv, struct usb_device *udev)
++{
++	struct usb_driver *usb_drv;
++
++	if (is_usb_device_driver(drv))
++		return false;
++
++	usb_drv = to_usb_driver(drv);
++
++	return usb_drv->preferred &&
++		usb_device_match_id(udev, usb_drv->id_table) &&
++		usb_drv->preferred(udev);
++}
++EXPORT_SYMBOL_GPL(usb_driver_preferred);
++
+ /* Forced unbinding of a USB interface driver, either because
+  * it doesn't support pre_reset/post_reset/reset_resume or
+  * because it doesn't support suspend/resume.
+diff --git a/drivers/usb/core/generic.c b/drivers/usb/core/generic.c
+index a48994e11ef3..1923e6f4923b 100644
+--- a/drivers/usb/core/generic.c
++++ b/drivers/usb/core/generic.c
+@@ -49,11 +49,17 @@ static bool is_uac3_config(struct usb_interface_descriptor *desc)
+ 	return desc->bInterfaceProtocol == UAC_VERSION_3;
+ }
+ 
++static int prefer_vendor(struct device_driver *drv, void *data)
++{
++	return usb_driver_preferred(drv, data);
++}
++
+ int usb_choose_configuration(struct usb_device *udev)
+ {
+ 	int i;
+ 	int num_configs;
+ 	int insufficient_power = 0;
++	bool class_found = false;
+ 	struct usb_host_config *c, *best;
+ 	struct usb_device_driver *udriver;
+ 
+@@ -169,6 +175,12 @@ int usb_choose_configuration(struct usb_device *udev)
+ #endif
+ 		}
+ 
++		/* Check if we have a preferred vendor driver for this config */
++		else if (bus_for_each_drv(&usb_bus_type, NULL, (void *) udev, prefer_vendor)) {
++			best = c;
++			break;
++		}
++
+ 		/* From the remaining configs, choose the first one whose
+ 		 * first interface is for a non-vendor-specific class.
+ 		 * Reason: Linux is more likely to have a class driver
+@@ -177,8 +189,9 @@ int usb_choose_configuration(struct usb_device *udev)
+ 						USB_CLASS_VENDOR_SPEC &&
+ 				(desc && desc->bInterfaceClass !=
+ 						USB_CLASS_VENDOR_SPEC)) {
+-			best = c;
+-			break;
++			if (!class_found)
++				best = c;
++			class_found = true;
+ 		}
+ 
+ 		/* If all the remaining configs are vendor-specific,
+diff --git a/include/linux/usb.h b/include/linux/usb.h
+index e85105939af8..1d2c5ebc81ab 100644
+--- a/include/linux/usb.h
++++ b/include/linux/usb.h
+@@ -1202,6 +1202,8 @@ extern ssize_t usb_show_dynids(struct usb_dynids *dynids, char *buf);
+  * @post_reset: Called by usb_reset_device() after the device
+  *	has been reset
+  * @shutdown: Called at shut-down time to quiesce the device.
++ * @preferred: Check if this driver is preferred over generic class drivers
++ *	applicable to the device. May probe device with control transfers.
+  * @id_table: USB drivers use ID table to support hotplugging.
+  *	Export this with MODULE_DEVICE_TABLE(usb,...).  This must be set
+  *	or your driver's probe function will never get called.
+@@ -1255,6 +1257,8 @@ struct usb_driver {
+ 
+ 	void (*shutdown)(struct usb_interface *intf);
+ 
++	bool (*preferred)(struct usb_device *udev);
++
+ 	const struct usb_device_id *id_table;
+ 	const struct attribute_group **dev_groups;
+ 
+@@ -1267,6 +1271,8 @@ struct usb_driver {
+ };
+ #define	to_usb_driver(d) container_of_const(d, struct usb_driver, driver)
+ 
++extern bool usb_driver_preferred(struct device_driver *drv, struct usb_device *udev);
++
+ /**
+  * struct usb_device_driver - identifies USB device driver to usbcore
+  * @name: The driver name should be unique among USB drivers,
 -- 
-2.51.0
-
+2.48.1
 
