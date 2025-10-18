@@ -1,92 +1,120 @@
-Return-Path: <netdev+bounces-230641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E278BEC32F
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 03:00:36 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F9F1BEC37D
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 03:24:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 193B619C4147
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 01:01:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0D5424EB86E
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 01:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A367822F01;
-	Sat, 18 Oct 2025 01:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321FE1A00CE;
+	Sat, 18 Oct 2025 01:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="le4CN7tm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SuH8G0SF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797163C38;
-	Sat, 18 Oct 2025 01:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A02C14B08A;
+	Sat, 18 Oct 2025 01:24:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760749230; cv=none; b=gonIjeCJ9W6bH/xe+4pSsAPWUYFCJggAmU+r/PMJnlOnZ7RrrKBiedW4k/iXBs+n4WTtvVQpKaovXv/OAenSuA4UaJSUR7MZNNn5CnoBv7H/XNVBDoDEyDA9XkvMCMiKarR9dlB0PWPpndOJVOuQaIyBT8Mwc0G9NQMpSkVTFcE=
+	t=1760750644; cv=none; b=b9u7nb6LEKgEIbJIP3JUeY07rhe/XcVBFvEGswMjQONLUD/I0jnLddbydEY/p+e7E/gUEFEK7BA/ODHs2t1it5kYr2tnvf4XegHnYl0viNj49/Gwwxw27z9oPxo2xTgVbb7pEKNw2Ux4sEkUEqp8rGFGd2e2SDqR5DgJnZ6Smbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760749230; c=relaxed/simple;
-	bh=Nxli6EbCMmDF/eXQaRvw6FrQifLvhVBDhZmL7Fm0QL0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=e6DHdIdC398QaNFQTL5cm9h7EZby+YOHdqejevHyLji86VspsA7Yfv9B4BDSQx75SZOH0ZjzLlfngQ7gw3CMJJFofgIr0w1DVAmy4e60bGlzNmzRCINY8bZcBP9fmEG/72pM7jbZ2pkPrzkYF/zdRV/rWWMO9lf0M0YQ+1S7REs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=le4CN7tm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C39C3C4CEE7;
-	Sat, 18 Oct 2025 01:00:29 +0000 (UTC)
+	s=arc-20240116; t=1760750644; c=relaxed/simple;
+	bh=VZ+0PK7Xowje368lQGozH1qMIaGZqErCNscmB4ue3mY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R9goqx6sm2wsTFvJXkfjqe9qfFlSk/Y3KZT0coM1/pcTUREbbRC8o0VSR2SgeH2BJ89dDOBjIsBAHw+jmZ7x9Ij0LGFSBQqAgmClsrOxl24G5ZgMxIQNpnRhI9QXWNHbxi8aJqka88+CBob86hs3rdcmAGyXo5XHysK0e3GMFgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SuH8G0SF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7EB2C4CEFE;
+	Sat, 18 Oct 2025 01:23:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760749229;
-	bh=Nxli6EbCMmDF/eXQaRvw6FrQifLvhVBDhZmL7Fm0QL0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=le4CN7tmd+NWgHbejaYm2XSTPsONXUtdpYES1kyC/DYxYczs0aoaSNDM/R26gDvj2
-	 xRCeaV9cbPKUeKtduwFiGHYq5pdBNTNnfz/xwto6dCVg/iR9s4MZcnfTQXn/mAQb3s
-	 QEfzCwOn3MU1cRI/idelx3BF3+OM/D3XRj/47GRO8GdPlg1CQS8i456BNrLhmiAY4o
-	 idH/j7VAKo+oFLXbSmIzpTEXP07w4ZERLCWh27zw8qieaxoHYGONXT1iZ0hpVO0P15
-	 OIlqYRe5yHVJGTmATQgvDtMzUm9JdOlBizM54AgQWWruwFgOxLx5kv+UCwHYa57cVA
-	 ANtxzegXiPZ2A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DAD39EFA60;
-	Sat, 18 Oct 2025 01:00:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1760750640;
+	bh=VZ+0PK7Xowje368lQGozH1qMIaGZqErCNscmB4ue3mY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SuH8G0SFf8tnTa5DujFZD38xFGUFaxQuFoKV51uK4JH1z7LFyPmflJHVuSnJ8FrWC
+	 AO3b/oG0nZu8YZG2uxVcRtARPIAN0jBNn7tZOoeymv06i36LKIxB3Lfpcfoss8KqxN
+	 erm/41d9xXprtVZePAzU9m8ygIk8Xi/qlI3JJqYBa4Xg0JTip9jUrADT/srN4SlXZ9
+	 qMv4A+Py4QrSFDUBy436rj9bXzEpBOfm87/3JqL9mg0vhOhXePQuc0QXAADLQMSZQH
+	 HHg5++uP8wvG24Ume/bZ3TaZyHvVVc0lIGSNyVLq656h5A28f+S46Y9g1Mdy/SYcrH
+	 Kbztuc1thO0qg==
+Date: Fri, 17 Oct 2025 18:23:58 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Richard
+ Cochran <richardcochran@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Alexis
+ =?UTF-8?B?TG90aG9yw6k=?= <alexis.lothore@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/3] net: stmmac: Allow supporting coarse
+ adjustment mode
+Message-ID: <20251017182358.42f76387@kernel.org>
+In-Reply-To: <20251015102725.1297985-3-maxime.chevallier@bootlin.com>
+References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
+	<20251015102725.1297985-3-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf-next 2025-10-16
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176074921325.2843953.9798029355647006124.git-patchwork-notify@kernel.org>
-Date: Sat, 18 Oct 2025 01:00:13 +0000
-References: <20251016204539.773707-1-martin.lau@linux.dev>
-In-Reply-To: <20251016204539.773707-1-martin.lau@linux.dev>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
- martin.lau@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 16 Oct 2025 13:45:39 -0700 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
+On Wed, 15 Oct 2025 12:27:22 +0200 Maxime Chevallier wrote:
+> The DWMAC1000 supports 2 timestamping configurations to configure how
+> frequency adjustments are made to the ptp_clock, as well as the reported
+> timestamp values.
 > 
-> The following pull-request contains BPF updates for your *net-next* tree.
+> There was a previous attempt at upstreaming support for configuring this
+> mode by Olivier Dautricourt and Julien Beraud a few years back [1]
 > 
-> We've added 6 non-merge commits during the last 1 day(s) which contain
-> a total of 18 files changed, 577 insertions(+), 38 deletions(-).
+> In a nutshell, the timestamping can be either set in fine mode or in
+> coarse mode.
 > 
-> [...]
+> In fine mode, which is the default, we use the overflow of an accumulator to
+> trigger frequency adjustments, but by doing so we lose precision on the
+> timetamps that are produced by the timestamping unit. The main drawback
+> is that the sub-second increment value, used to generate timestamps, can't be
+> set to lower than (2 / ptp_clock_freq).
+> 
+> The "fine" qualification comes from the frequent frequency adjustments we are
+> able to do, which is perfect for a PTP follower usecase.
+> 
+> In Coarse mode, we don't do frequency adjustments based on an
+> accumulator overflow. We can therefore have very fine subsecond
+> increment values, allowing for better timestamping precision. However
+> this mode works best when the ptp clock frequency is adjusted based on
+> an external signal, such as a PPS input produced by a GPS clock. This
+> mode is therefore perfect for a Grand-master usecase.
+> 
+> We therefore attempt to map these 2 modes with the newly introduced
+> hwtimestamp qualifiers (precise and approx).
+> 
+> Precise mode is mapped to stmmac fine mode, and is the expected default,
+> suitable for all cases and perfect for follower mode
+> 
+> Approx mode is mapped to coarse mode, suitable for Grand-master.
 
-Here is the summary with links:
-  - pull-request: bpf-next 2025-10-16
-    https://git.kernel.org/netdev/net-next/c/e90576829ce4
+I failed to understand what this device does and what the problem is :(
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+What is your ptp_clock_freq? Isn't it around 50MHz typically? 
+So 2 / ptp_freq is 40nsec (?), not too bad?
 
+My recollection of the idea behind that timestamping providers
+was that you can configure different filters for different providers.
+IOW that you'd be able to say:
+ - [precise] Rx stamp PTP packets 
+ -  [approx] Rx stamp all packets
+not that you'd configure precision of one piece of HW..
 
+If the HW really needs it, just lob a devlink param at it?
 
