@@ -1,223 +1,134 @@
-Return-Path: <netdev+bounces-230647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91E24BEC501
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 04:07:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF7ABEC52D
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 04:27:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C1B06E0F6B
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 02:07:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 762CA6E4630
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 02:27:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43DDB1D61A3;
-	Sat, 18 Oct 2025 02:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54801212554;
+	Sat, 18 Oct 2025 02:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="pY5WQLq8"
+	dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b="efTrg/eo"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012046.outbound.protection.outlook.com [40.93.195.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8641E521A;
-	Sat, 18 Oct 2025 02:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760753201; cv=fail; b=egcSGFPtbw3QTxCeVd31JGIL082TaEXqRAZxW6Nkb76yKEJqq8ovWmZBb5E0VZ5/ax8fcCTLfmO4hVw1v9I03I/yRfS28B2Jy77mShlvR2bhTGB61ncIi3cNiBQtfI0K4VSfruttDGYJSYTrODPDZXToyHDS1/s+P58HiCSPVeU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760753201; c=relaxed/simple;
-	bh=PDuwJ7wbp8xrmPf25oVP8HQ5mgN5RFY3Qb6A1wmhVsg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=WSoC8/8jGfXD1ehDxZi1YQsMC+qvt/ZXWBcOHfzfV6+FDF/Rz5Tilzg7IuuxhTo5DSNa/c78Kder2OssBLwl/sXqES7WQY1MgsXWigZb1Uq/cGsiTJTNZGLIOuJw6fOyW+YCwVOZhLQ/iLK5FfaShPqeym7cHnECm6yRwFVYzrc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=pY5WQLq8; arc=fail smtp.client-ip=40.93.195.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Axd8+1MCwSZHc9Ypkhq8pnSl4z4qhbiOJbWIbQcuRNlIrm15c06X+hQ07XEdGdqSyyhRH54AEz4mco0GhYjXUMqWfZlUWkIaIGm4zdechOFoADBiRaS5IUXbu4tkJjZQDa35osvzOdn8BcMX2r5y/OwOqWDWAcwZWPqhT3TzGkpOtEmZyTn2ROpBmflWFYrxzSAAA9tkHmcA0cdBdKzw55bYFNt3AUDWlS0uV5ttZZMR3y+lOwIzoQlnCRxIOPtA6vVGzx4q8v35dtTG38YOLh+Eyl457SoH0IO/O1ojzBrLxROwMgI2k7GOrJVcYPcLaW4VEYM6Az1N4PloQDCW3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7EZKYZayK3Cka8MXHsK6Ec+v03K4IglaV8vPI9vwoTM=;
- b=Qf+OJJOdOOJ3al8XLHwH8XB7VX+HtuYpKTJXhZiFLweiikRAqErPtLQEKa/VuSBcsU7Gvf3YZjgdv6Q0EhSsqgMseJsuaUIGjrAxRf4+ThBcV2WnmYWiqaNKOAMdiPqLKXVW7h/YVz7b4vv5TtvPXOjdJAGBOHDDaVjgkA1DqME7wojRgsU87ndU/uSN7jRc7+V4w00k6PftcmwWXaTw6ui8FGYkOriHT9CJ2cElX4KM3Tixxdb5KRgg5nKKggnYBVv8/COXLDDkLUgKQFgfDGqJx6vlhj96hyEDtYTN3rvBKMQa8UPUG6P+BoIU3jtiPDrfZ5TUQMC3jaJbHV2VHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
- dkim=pass header.d=altera.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7EZKYZayK3Cka8MXHsK6Ec+v03K4IglaV8vPI9vwoTM=;
- b=pY5WQLq82/5jkaLrTGcs2JccpA9EXNlwk46cXMJJTcNaOWNKV2PSXSajcxggMULL5rKhRmQ/1eyMMozlswN4PAKA5PsYMqkF9nSbfBmB99ajIEXJYpo/S4N8aQUELqTwqOweqBmsPj9k/E7XBIWbXeoaY0CEBJl4t8nrjZ9tOiZ8YcunpshQXWfJChdkhJmh5uQZMfXFMWpsMORqOGzBfdvJ5uWxOVKuprbScrSqnSw0nG9qW+ZC8Zy2dB1iLUzT30q9ax4dGAZ+UX7A0704OnFVPiYTXOoOb1izv9AsHwi+RYPY1wfycJBpCbPH9J2oREKdlGynRv3JL7dMlzj0CA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=altera.com;
-Received: from DM6PR03MB5371.namprd03.prod.outlook.com (2603:10b6:5:24c::21)
- by SA1PR03MB6513.namprd03.prod.outlook.com (2603:10b6:806:1c4::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.13; Sat, 18 Oct
- 2025 02:06:36 +0000
-Received: from DM6PR03MB5371.namprd03.prod.outlook.com
- ([fe80::8d3c:c90d:40c:7076]) by DM6PR03MB5371.namprd03.prod.outlook.com
- ([fe80::8d3c:c90d:40c:7076%4]) with mapi id 15.20.9228.009; Sat, 18 Oct 2025
- 02:06:36 +0000
-Message-ID: <ac0a8cd8-b1bc-4cdb-a199-cc92c748b84b@altera.com>
-Date: Sat, 18 Oct 2025 07:36:26 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 2/3] net: stmmac: Consider Tx VLAN offload tag
- length for maxSDU
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <Jose.Abreu@synopsys.com>,
- Rohan G Thomas <rohan.g.thomas@intel.com>,
- Boon Khai Ng <boon.khai.ng@altera.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Matthew Gerlach <matthew.gerlach@altera.com>
-References: <20251017-qbv-fixes-v3-0-d3a42e32646a@altera.com>
- <20251017-qbv-fixes-v3-2-d3a42e32646a@altera.com>
- <aPI6MEVp9WBR3nRo@shell.armlinux.org.uk>
-Content-Language: en-US
-From: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
-In-Reply-To: <aPI6MEVp9WBR3nRo@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA1P287CA0003.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a00:35::16) To DM6PR03MB5371.namprd03.prod.outlook.com
- (2603:10b6:5:24c::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE4A202960
+	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 02:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760754462; cv=none; b=uvav6+NgeOw8D/thdjamUykQBqWkn8aDovgWNXz1APNC+/zaGtaus3bO6Q7wtT0SBJm79OtPo0svNO0II5LZLTyyfFjcoryfw73ti7SbelHefouZzk8cBnBf4fRj3zDCoANBqDY0D/pzrQPdmwKb0axZgJfIzhXKw+MZX4L39Ro=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760754462; c=relaxed/simple;
+	bh=e8SgYXC/sRUXWsOgya55vEos5aeigH8Z+OuvF9YZYi0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=urW0Y/fLKpeGgxCqNk371YatYId8FnIwW5pilToXcPJcPku7n0J7y67oluewLGFQZNepStvY+AcyPt6rPEYcemVwHR4xpu3Sm+5k6YqYp5eAk4a5Bk9lCHEbI1hjHEzlx6LxVfDxRMO8T9QQDAkDfqpzQzOY6Bkbs3pFlYdqlKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu; spf=fail smtp.mailfrom=g.harvard.edu; dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b=efTrg/eo; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=g.harvard.edu
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-87c237eca60so21078266d6.1
+        for <netdev@vger.kernel.org>; Fri, 17 Oct 2025 19:27:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rowland.harvard.edu; s=google; t=1760754459; x=1761359259; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yOEczZhXwd8xkJnA7P0xSygINsaZHa1ESl1NQSCsz30=;
+        b=efTrg/eoznjl4xqA5pO28PB3R9BVLa9EJb5+I4zGQA2XrDg4TxUKofSa4fymUWyWV9
+         lefDtkWMU1P/RFvz2aqvFVOZEBfiQchPOFW6IqAzKYrNOK7l4ZK/Ty5jzCkX66tiJHR4
+         FVdMedMmyJLj61fR9eW+85l7ts94n2rvUcEVylbw09W2WvFCgMSw7QqGhE1pyxFF1oaS
+         RJN3fZYeuinoaXTBwKeSdfJ6Dwu0gz0G3a7FejEBZ3rcMRE/rBIdQgfrNpLmp4hTOF0t
+         7tl9a0crf/1dHD4vHFfAxsFyfGufGlu1CVRaKZBldZmEYHnNDaEtcIgZoIKC17KpzJiz
+         3xYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760754459; x=1761359259;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yOEczZhXwd8xkJnA7P0xSygINsaZHa1ESl1NQSCsz30=;
+        b=imVtAz42UJX7D8TzxQ8dv03wlLIzjz7mvY8rMf93dSUb0G7tnB35L5IK1qzm8SRY6M
+         WisCwJScddQ5A1bgneQEg5H51i7r7A2hThYmuSEWPbyPIPPxV4thrnjtwpx3Lk0pCpGr
+         /RHHYcHPgWdtipu86h4FDNw/ClbqZt4HMdjljJ5Qk3DiMhoScJJJ/RPKPFU46hMat/MB
+         Ahq/EvyH0kCJUuvcQs45fXjmZxoAwLdHQb05mypBFVclwUxP5Lc3G/3KmQI8I6oPhiqy
+         XeH3JcDt316KtrFbXRl8GpRJS8o71lPAa7eEOR3ZjMuOpPx2VhU795M9gCjsc84A3xy9
+         USVw==
+X-Forwarded-Encrypted: i=1; AJvYcCVKXQcjq3Xk63uBh4EQzVXMyhBDStCMZB/idvKajBZG2YNSq07PxZHkmEpOzGmWo4yp1p/w2DY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSrdAJHzSP1GbqHQQwa0RvOa9r0DBCuq3RmpVuLAU8F+i0n9XY
+	27cPywS6kohHFQw42irDXS7oEnX1gUK70yO886SvJ+SuoeEtosMuCIX2D4k4t24nzw==
+X-Gm-Gg: ASbGncscCV/Hx6fNZ4Lj6epiofV/aWerstB+882ekSSbVlnuhDkL8Lea/9nla9ZzUZo
+	fR9XWFc1BuHpReGRLsgfbwQzNu9N0p8a+neuPQkZJa/Yoxu6gyf8gl6YTJ32dpeolU0W5/oplSc
+	ltDF/eERzvfGZvXR3m5IeP3+m4kCkUQQKq1CTALa07FMrXNnMai8FYPgYyOYz/qnSBsbS2uHd/W
+	y7tX//OjFrl9qzJrLcE5QoNcOIeGgkdymDUDSyhc3EjB4TM059YTuU2g5xB8wYuWjRDxlHgWrQf
+	s5GoVscuYZ9p3Hr140WaFtF0SsFP0CcrVQEGMxDWWGS5LJc7QHH7vjzT7yqrhWdw7KCtxRjSpHY
+	dG6nNkvon9QtG85WN8O0VTmGKhyAlxJRgM5mNUqH/ptRYf6onYwPr/BhhaOTPRLG32c3yiXeM7S
+	WaL4pSYvQycSlk
+X-Google-Smtp-Source: AGHT+IGNnqcR5l/hkRy88RGvYT440C+wDUVsXK7V+zRv6jwKTSry7Du049+ZAGn0/5kzXNZANG5/KA==
+X-Received: by 2002:ad4:5be2:0:b0:81a:236c:c846 with SMTP id 6a1803df08f44-87c207df6d3mr75886946d6.33.1760754459431;
+        Fri, 17 Oct 2025 19:27:39 -0700 (PDT)
+Received: from rowland.harvard.edu ([2601:19b:d03:1700::a165])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-87d02d8ce5bsm9015696d6.57.2025.10.17.19.27.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Oct 2025 19:27:39 -0700 (PDT)
+Date: Fri, 17 Oct 2025 22:27:35 -0400
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Michal Pecio <michal.pecio@gmail.com>
+Cc: yicongsrfy@163.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, oliver@neukum.org, pabeni@redhat.com
+Subject: Re: [PATCH net v5 2/3] net: usb: ax88179_178a: add USB device driver
+ for config selection
+Message-ID: <bda50568-a05d-4241-adbe-18efb2251d6e@rowland.harvard.edu>
+References: <20251013110753.0f640774.michal.pecio@gmail.com>
+ <20251017024229.1959295-1-yicongsrfy@163.com>
+ <db3db4c6-d019-49d0-92ad-96427341589c@rowland.harvard.edu>
+ <20251017191511.6dd841e9.michal.pecio@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR03MB5371:EE_|SA1PR03MB6513:EE_
-X-MS-Office365-Filtering-Correlation-Id: a6c6ca0a-d843-4e2a-2c09-08de0deaf7c1
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?NDdFR1FsTjZmaWJnOXJiUlIzOHNUeE9UMC9OYnpZOXRFKzhTdU9RcnVMb1py?=
- =?utf-8?B?djNHbVN2WDVQUjliMVRTRmEvaVp2T1Z4Y1QyYTVZNjB4SEdkcUlONmxnNWc5?=
- =?utf-8?B?SHZrSUZUTTJ1RXlwZVRMS1FmWjhHSkZvTkZqLy9FdnRNVEM0aGlmV3d5aW13?=
- =?utf-8?B?U2tDZVFsc1BXZTQ5cEt2RHZuRzJFak5rQXBqR2h3VDl3SkJtcEtUTHk5QTBU?=
- =?utf-8?B?ampETFdtRHorcllNN0c5R1REbVdiRnRXdGZpaWNmcW0yRnJieUYwZ1h6Sm1y?=
- =?utf-8?B?UWZ1ZVY0WUg1ckRKNEhGT0dzdzJqZmVkazJMWmNQak9WSWJqNEF5NWcydTVv?=
- =?utf-8?B?aXNjeGdKVy9wNHFFRFBHYXBuK1V4cnpWeExZMU9Waml2eTFFUmo3dGR0Szhj?=
- =?utf-8?B?NUtpRXFBV1A2ekJvMFFidCtZMmk4aHE2WmxwMDhMZmNEMU1BMU5WKzUxenNG?=
- =?utf-8?B?RGZVOERzYzNXYTBKbVMyVHVOZVE0a1NOVUhlV0JDSzd5Zll6bUlMMWhKb3BH?=
- =?utf-8?B?ZU9VSlZJakFNeEN4bFFKbU1QM2dOOEFhcTdTRWZxdGxwdDRqaVNWYWMrYldu?=
- =?utf-8?B?dTFVN1NuMWhza2RTUk9ldjVKWE1mUms0RlNPUlBrYU9ldjJMaTZBaHEzTWMy?=
- =?utf-8?B?V1NGL3Rub0FOU1dWemkwdU84TC9sZTZnbS9aM0Z1WkR1cEdTYW5sODQrNEsx?=
- =?utf-8?B?REdnZGw3UTVNejZTcGl4QzdscHA5dWsrc2kxR0Y0TFBsODlZNTdpTzRlbG5Y?=
- =?utf-8?B?d3k0d1BYTlM1N2hES0ErbGMwUWdtKzFYbW5pL0VUNERLRDJiREtzVHUxR3hQ?=
- =?utf-8?B?UkM1djEwVCtmT0R1OUxpckYzaEhBS1doR3RrWXVac1lMRGF0TWZ6Q0diaGR4?=
- =?utf-8?B?c2ZzLzhQemY5VEp3TlE2NVJoRXEwZWJ3QlFPcmZFS2pXQkJudW1HWjZnQVlv?=
- =?utf-8?B?TFlibWkwdS9ITkg1MGxSSFVVQlpmSGNvWWxvb3F1M1Y0emZ3eU4xTlp4ZWcz?=
- =?utf-8?B?OE1DeEZrNDdWYUNFUGd4V2t2VjJVbk56SHdWWkloTnp3eVVlZ0Y0eXQ2QnRn?=
- =?utf-8?B?ZTlrT0s3NWVON2JxeGZxMHR4ajdaR1BlNWcvWUdUL1d4QjZxUTk0SmRlMWlx?=
- =?utf-8?B?M3laVFpPcndRcVlsV0hiU2FGZHJBb1JuenJwaVFpUVFBOS9UMGl4TDV1UkpZ?=
- =?utf-8?B?Z2RwcEtSUmNVYktoNlJrT01JMDZ4VEt0ZGVPaUI1eGptd0NTeWpielhzWCt2?=
- =?utf-8?B?a1Z2VnRaeStJQTF3b3h1dHgyTEpSVU55QWRyczNzdS81UzlzaXdScEdVZVUy?=
- =?utf-8?B?MWNRQmYwVXRiUFlUNUJpekh2RUQ5R3o5THNXMlpnNHpjS2tiVGNQMlpDZTlu?=
- =?utf-8?B?RDRrVmorV1doMzZ1alRtRFNvQ1k5UDFHSC83Ym1YRHlJcm9ZTW9wOXd6RWhl?=
- =?utf-8?B?dElkaXZJbXRGcS9qUkZoK25uNW1NWktyd0l1NzNrdnA0SnpKVUZvTXFraHZw?=
- =?utf-8?B?SWhQRk9kaGJCamtVS1lEdEJYSDAyQ09QcStsUG5zNlVLbnp4REloSDdxdEp0?=
- =?utf-8?B?SVh5TmRkVjQ1Qi95YnNYQkxGd0pXR0h5Q3ZQTHk1bkJUY214OUNEUjJ2djEz?=
- =?utf-8?B?QnZQOVhDdzdxeGxKNWt5RTFSSm9yQTM4UEgrK1RTYkpuamticWlBRHpLdUx2?=
- =?utf-8?B?cjdIYTNRV0UrdUpoZzhyL05sUjdKY29UWTVXemVEOHo0ZjhiYWFhVUtSSlIw?=
- =?utf-8?B?YmdzN2RpNktOVGpkSFZQazJnSEtkU3dPaXBJL1pLalA5M0p0NlhTOHZhZ0Vj?=
- =?utf-8?B?Vk1STy9uV3JYSHJpWjJWZ0hXQVJleXVmZXZSbmZ3OGhYd0ZtZVdFOFNhdHFT?=
- =?utf-8?B?czNIYWYrUzZQK25uZkhDZjRCT3dQYlpGN3NxVEwxZmp0N0llREg0TFRoTldV?=
- =?utf-8?Q?i0b1Ypw/2bc2RArzAdLW4yTEdummRv7S?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR03MB5371.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VkxsdUVmZTQzVjNHYmsyNnQ1Ukw4OExwSVMxOERPSVQ0bnhJMEZFeUNkZm1K?=
- =?utf-8?B?Vlcxc2NUOVVENzhNMHhIWCtsQ0J3UHFoWXFRaEN3ZGlxVEVIcCtjdjJlWG5p?=
- =?utf-8?B?Ym10M2J0UG4rZng1WkliQmJOZ0tSOGkvUWU3cml5VVpsejY2TCtQSGg4aHRD?=
- =?utf-8?B?WDdlaG1ZQWFNcjNRU0lzZ3NLY1M1ejNQSFJ2YzJsZktjZ09iTHR1RTJITmds?=
- =?utf-8?B?TUNMV1dQYTZyWkdEMHhLRnlWcXhzWVVzd0dWT2N2dUw0SWVod2p3T2p3RWxk?=
- =?utf-8?B?c1orZm9aYk9NeGlpSmM4cGVWeGxqa1FPQ1d3WGpiSkZIc3V3bFBXMTBMRTZJ?=
- =?utf-8?B?YUZCYkI1OEpjR21XaDRXZElvRCtRSjVtMDU3eWtoZ3RnZTJsSU8xUWpON1h5?=
- =?utf-8?B?bVMzZ2R5NU9lb0RRazF6VmhrNnZRZW5vb3NkWnR3NzFHNURlYTlKeWI4THJD?=
- =?utf-8?B?d3NtSGk0SG5JUVZ5eFlwZUh6VkFQZ3VSRXdzOVpmYVJ6alArdG1YcElzdHl3?=
- =?utf-8?B?dC9DRU1kK1FrbjlMRG9NTVVrbjhhS0k1dmNUTFl6eVNpK1hUVFg5QXYyS1pS?=
- =?utf-8?B?WVZLcWsxc1V5SUwrOGI0WElGUW1UNUR6M0htVVAvQmR4aytMTjlyc2YrT0xM?=
- =?utf-8?B?K0xiUEpmRWJrMTNDWUQrZXk2VGd0SFJSZUNhS3R1YmhtU01COWZPaTRmZytF?=
- =?utf-8?B?YVBlTkdjNjU2bzFkWVBDanlUTEZrOUwweU9xN0wwM1dCMWozMURac3c4bnFl?=
- =?utf-8?B?MXI4S0xQZ0R2U2F1ZEpSSVkzWDJQTnBEbGp3d0gvakh3TkE0bmVXb2RpZ3Ex?=
- =?utf-8?B?NW04MjZ0cjk4ck1zVlFZTkxtaklNZWpKdmpWQW81d1htV2hOR25sVUFMR0pV?=
- =?utf-8?B?N2Y3VEtGSEhZUHZuQjhQdVZQZFplUlVTVXdNZVFzTHNlTkxub2h2TGQ4L0R4?=
- =?utf-8?B?MG5hTUIycDZjaUIwT3pJU3lYYUJ2dlNaYlNqMjRPVzIrcnVTUGMxSytidkth?=
- =?utf-8?B?QjdhTHk2czlXOFhUb2JoTHBYQzZGVG5Id0hhV3RpVEZUVG4wa0JkcDZNOHFj?=
- =?utf-8?B?SVJ6eWwwY3Y5Z2ZBWTlRYjUzQ2drbGxEMjZKNnFkSUY2M1A1M21UbUFGYUlj?=
- =?utf-8?B?aUNpaXMvK3JZMWM1MzNMWmhocEFhVHREcDY3OFZjaE1TRDhXamY4ajcyb0o1?=
- =?utf-8?B?OVJmMGZiTWJaSEZoRnZUZVBlaEh5b1JuU3R0SUFCTU11TnBiWElPMjJucFF5?=
- =?utf-8?B?cnBjODYrVWZRMVR5bG8vdnlJNzV2QVVJMDNMZHNOeE9pckIrdzNJNFN4YmVF?=
- =?utf-8?B?YVdtTzlKWm9Wd3V2a1RPdUhQQmRuM05wWWUvWXdRbUh2c3diNyt3YlRVZUFL?=
- =?utf-8?B?Ym5GR1hUbEIyOTg5Y2J6VU4xN21QMXR6WUM1NFhQRkhNdnFBOWF6RkF2OXJK?=
- =?utf-8?B?b2UxSU5rdXBaNTVkdGdwbDg1VE5VOTBCUWdscVROS2dHNUFMN0FUUG10bmtV?=
- =?utf-8?B?citmVVZvZ2FqeG54TkN1WUZUNTZ0QWJjQXpNREVmUy9yNkZmb3hkSzlYOFFa?=
- =?utf-8?B?eUJqdExkYU1LTzBaRWtLMGRWY0pIbXZOTGJKMHpGdy9JTDBiaHdVbDJTWmc1?=
- =?utf-8?B?MVZ5OWRydXR2WnAvTFpmeE92dTUwWXJuN0ZzclRNZnZBUmNoOHhBZkJpVTMz?=
- =?utf-8?B?V0dDdVBOZFVGRTI3S1BBT0xLYkRIREV1UEdGNUhnUExvdWpzem0yaElRckFk?=
- =?utf-8?B?NVk1TXJZYTMvcmFvTC9Ba0RnKzJFZGJmYUg0TUM4ek9UUWt1YTNzMlBOM1Fs?=
- =?utf-8?B?K0w1QkVpdXU0YkwySmxiSU1TcUswR05zRjF4NlJ3NEhYdG1ucEVBWmpTZDhZ?=
- =?utf-8?B?YzJma2p4OW45bzRBUENCckZReUdVcEFac0ZrVTVLMDVOWjJXc0F1bGhpc0lH?=
- =?utf-8?B?OFVIQ1BFWGozUkNmWkpxcXdhQXJ0bkJ5VUdjdnFQeS80dDdtQmFkUWQ1RG1v?=
- =?utf-8?B?UDBvOTNKd2hyTFd4R2RsbEtqcktRNCtuMUNWd2lCOEtqY0JaNU43WEdwRmw0?=
- =?utf-8?B?V2hkMm5JcThTRHMxdEFHMzlDSDV6aDd6U0IzWFlmbldDb1p5Qk1zZW9pLy9I?=
- =?utf-8?B?U01WM2dnSmhjUCt4dFJhbUNETjl6OUV6bjdybi9KUElCejh0L0lxRHJMb1lE?=
- =?utf-8?B?WHc9PQ==?=
-X-OriginatorOrg: altera.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a6c6ca0a-d843-4e2a-2c09-08de0deaf7c1
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR03MB5371.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2025 02:06:36.6742
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lpFNb26TZKmnPbdMNmavzgTVDPRF8TPILPJQoWS5mN+4P+Tqrhl+2WlF55tCi/Ctn80CkdBfXPwmKMTJ6SP7Fv56x4TcGGgnb7Xz9Oy1hhU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR03MB6513
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251017191511.6dd841e9.michal.pecio@gmail.com>
 
-Hi Russell,
-
-Thanks, I'll update the commit message.
-
-On 10/17/2025 6:14 PM, Russell King (Oracle) wrote:
-> On Fri, Oct 17, 2025 at 02:11:20PM +0800, Rohan G Thomas via B4 Relay wrote:
->> From: Rohan G Thomas <rohan.g.thomas@altera.com>
->>
->> On hardware with Tx VLAN offload enabled, add the VLAN tag length to
->> the skb length before checking the Qbv maxSDU if Tx VLAN offload is
->> requested for the packet. Add 4 bytes for 802.1Q tag.
+On Fri, Oct 17, 2025 at 07:15:11PM +0200, Michal Pecio wrote:
+> On Fri, 17 Oct 2025 09:10:22 -0400, Alan Stern wrote:
+> > On Fri, Oct 17, 2025 at 10:42:29AM +0800, yicongsrfy@163.com wrote:
+> > > Yes, there are many similar code instances in the USB subsystem.
+> > > However, I'm primarily focused on the networking subsystem,
+> > > so my abstraction work here might not be thorough enough.
+> > > Hopefully, an experienced USB developer may can optimize this issue.  
+> > 
+> > Would it help to have a USB quirks flag that tells the core to prefer 
+> > configurations with a USB_CLASS_VENDOR_SPEC interface class when we 
+> > choose the device's configuration?  Or something similar to that (I'm 
+> > not sure exactly what you are looking for)?
 > 
-> This needs to say _why_. Please describe the problem that the current
-> code suffers from. (e.g. the packet becomes too long for the queue to
-> handle, which causes it to be dropped - which is my guess.)
+> Either that or just patch usb_choose_configuration() to prefer vendor
+> config *if* an interface driver is available. But not 100% sure if that
+> couldn't backfire, so maybe only if the driver asked for it, indeed.
 > 
-> We shouldn't be guessing the reasons behind changes.
+> I was looking into making a PoC of that (I have r8152 with two configs)
+> but there is a snag: r8152-cfgselector bails out if a vendor-specific
+> check indicates the chip isn't a supported HW revision.
 > 
+> So to to fully replicate r8152-cfgselector, core would neet to get new
+> "pre_probe" callback in the interface driver. It gets complicated.
+> 
+> A less complicated improvement could be moving the common part of all
+> cfgselectors into usbnet. Not sure if it's worth it yet for only two?
 
-Queue maxSDU requirement of 802.1 Qbv standard requires mac to drop
-packets that exceeds maxSDU length and maxSDU doesn't include preamble,
-destination and source address, or FCS but includes ethernet type and 
-VLAN header.
+Without a reasonable clear and quick criterion for deciding when to 
+favor vendor-specific configs in the USB core, there's little I can do.  
+Having a quirks flag should help remove some of the indecision, since 
+such flags are set by hand rather than by an automated procedure.  But 
+I'd still want to have a better idea of exactly what to do when the 
+quirk flag is set.
 
-On hardware with Tx VLAN offload enabled, VLAN header length is not
-included in the skb->len, when Tx VLAN offload is requested. This leads
-to incorrect length checks and allows transmission of oversized packets.
-Add the VLAN_HLEN to the skb->len before checking the Qbv maxSDU if Tx
-VLAN offload is requested for the packet.
-
-This patch ensures that the VLAN header length (`VLAN_HLEN`) is
-accounted for in the SDU length check when VLAN offload is requested.
-
-Best Regards,
-Rohan
+Alan Stern
 
