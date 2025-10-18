@@ -1,106 +1,143 @@
-Return-Path: <netdev+bounces-230673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB95BBED0C1
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 15:52:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B1F6BED1A0
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 16:42:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E29019C0CA6
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 13:52:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A85A65834B2
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 14:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FAAA1DED57;
-	Sat, 18 Oct 2025 13:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eR/7eJ6g"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 538B527E05A;
+	Sat, 18 Oct 2025 14:42:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050CA76026
-	for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 13:52:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738E91C28E;
+	Sat, 18 Oct 2025 14:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760795534; cv=none; b=MPGegEf3RZ+fkvFCVqlU+xTtZdJECfqdvst34/2or+fDhsT0lHoZqAGP5FdrrtrdVnii5GFfz/ANQgLzZ+1ep/wR7in4+6Vf79H+PHlF+zcyOZ6gzL5FGu3xDfqeeyF78h1Ko/UXp8fg5Gdq2EUkXIOToeLPU5+u5nIFd3Bk+Xw=
+	t=1760798570; cv=none; b=DWFLgLSTPMnnCVQDejABNj2DZ/0I37Sx4s5HHJxpq7T+c5/i9KFGeJ58EcJ2ojhZ3nXrwXcgDTC4t1hqoDbV96nS2m8RMgru0z3avBxIRpxEXCr5g2ZvQY9wceWW/GoDvtRX7it3izlKS/li2mruJoae/ZF4fMr5XMNfj0mBpRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760795534; c=relaxed/simple;
-	bh=rT76/HeKoCiPJNIM87b1fnkohuL6do2cs6pkSNtqkow=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b00AXXQgeKV30lliUOdd8lPOA8u9gk9sgd/vdCyhbjWCP26BvynV4KWCuJPcQDuUHHNHLAHJ+j65kEJ7QDI8R0rJrfU/8owRpzBz16m9JoUH4ZVoQ2LCodlFkVgslT+AWlVucOrNt+9BVINkxd3I0oWgvfrD1WGTIVfeLkBFxBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eR/7eJ6g; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <eff0d886-ff55-4771-9c97-d7535081dfc0@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760795519;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ah5E5pE2rrp07qf+X9HdubOtTWT1FIdVXucOT8I550c=;
-	b=eR/7eJ6gHdysSobPZaTw1HgiA8ifFvrD1yryusB0LaboqhIY9d36YI4Do4eZAgeLDu1krr
-	BptH8xluJtjbtBlHSyciqnvc1jSiKWD0nwVJz2rxNXmZyfpOCrOYa87AF1GiAYxy7bXdiN
-	YUH32B3bw8xDo99HQ/oSKuV/z+4SV3w=
-Date: Sat, 18 Oct 2025 14:51:54 +0100
+	s=arc-20240116; t=1760798570; c=relaxed/simple;
+	bh=Yiokp8AOA5MBIRRXxZYT3h+Zvsu/4zjHnYtyy0zJE7M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K/UDq4gk9/kVO1jTJ4FjNUp6aymyA4AFAB8WIq9iK75ZKY5Mrq05D0jfVsD/QYyBVskyER+SMF0xPOuVjyjAmTYChwe99R0NkwgWMYlQH8PY1WCkgbTcyfcbSPByO2zR8+YcNtYFw5vjcW5LuyRoecWQukVpbki2D3Oej33a20w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: esmtpsz19t1760798552t654e3757
+X-QQ-Originating-IP: hsCyHceUJdBsC2HmerHfDa/gauk7WW3wy8RM1wqSyZI=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sat, 18 Oct 2025 22:42:30 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 16127192191837545862
+Date: Sat, 18 Oct 2025 22:42:30 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	horms@kernel.org, corbet@lwn.net, andrew+netdev@lunn.ch,
+	danishanwar@ti.com, vadim.fedorenko@linux.dev,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v14 3/5] net: rnpgbe: Add basic mbx ops support
+Message-ID: <F5F360A04D1E1CAA+20251018144230.GA4362@nic-Precision-5820-Tower>
+References: <20251014072711.13448-1-dong100@mucse.com>
+ <20251014072711.13448-4-dong100@mucse.com>
+ <20251017170703.3c2dba37@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 10/14] ionic: convert to ndo_hwtstamp API
-To: Brett Creeley <bcreeley@amd.com>,
- Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Igor Russkikh <irusskikh@marvell.com>, Egor Pomozov <epomozov@marvell.com>,
- Potnuri Bharat Teja <bharat@chelsio.com>,
- Dimitris Michailidis <dmichail@fungible.com>,
- Jian Shen <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
- Jijie Shao <shaojijie@huawei.com>, Sunil Goutham <sgoutham@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
- <sbhatta@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>,
- Tariq Toukan <tariqt@nvidia.com>, Brett Creeley <brett.creeley@amd.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
- Paul Barker <paul@pbarker.dev>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org
-References: <20251013163749.5047-1-vadim.fedorenko@linux.dev>
- <20251013163749.5047-5-vadim.fedorenko@linux.dev>
- <6641d925-b953-46b3-9e45-2284d5e2e8ad@amd.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <6641d925-b953-46b3-9e45-2284d5e2e8ad@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251017170703.3c2dba37@kernel.org>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz3a-1
+X-QQ-XMAILINFO: Ob047hH1itO57d3RtzjpdoVn7PaYRVnU9L3cRxvoQtYJhUC5rlAPJ8xH
+	xyJIP1/dZsahx5E3zgFoV54KT/gp9UE8FfnfhDB0F3OYgGQh++nPgC3KwQOUJx8YSZk53EQ
+	l4j7xcUXj6jbcwpw5x6x07HW6cLbj/YqvxvPoEzxKtWzszUyHtCGfoFgTn/WPt6SIEqUpAF
+	saAjUrAA9tf3aMnPqxACKTLm6ZFVBCkXSZJz7EbYa46D6aKf+NF/RNGZkhSgnGBM0T9ybsv
+	h31ck7GXkFHCuk9RhtIvePNXLJnkskMWu7huUsCLEiinozLj1ja6SWiRaOZhjbBSXERTxym
+	jhGmYdMQZ2gNSUwM5o3x45ByU5p/W/STzk2yEPGGhUAm2hUFan8wQ+GqAUHnn/DeALyrYxS
+	hRM3QLavRofzmN0EJ+Iptuaa3C6yiCXg2FJJZ8/KYgwim1Q7dkc2bhMB33olmvNKlQBou2H
+	h2FZ1smWqft1BOFFSTt9LaS8R+nZpSeUPNz/C9wPSTsZUmWWozQzLs/n+48t+tFGD66CJj/
+	jpjyd9SJFA5BbnRKmzRY2MebPlSgktod38qqS08cXFgixDxskdMAqIF0/hMTmyv8pu6pnei
+	xpoiWeo5fjplC+Ql6oVZxPgV1IDe5hXlMhDnLVTpg3ZRPwxGRku9J5FR3Vsk/aTItsTE8X8
+	U/tgU1bJW8K+mQ9brO0eyfEm7sa2jYIIcWXvlTp/C8zA8UYxvbSrk27V+lhtu4+KxEyuYNe
+	O8M1c65yYtsOY1Q/XZNF6bN6+xsznYNRdJOLKybLzqqgTcnzFGElCAPdT8rgm2ZhwI5Y/Um
+	mDxsLm6bTBwTQF7yMf+Tt6Ka57d3Z+Sw65KZ/eoNMynJQjTtNmZcmTsOQjaiq4LMiGEs6N6
+	Pp9CjhUPEq4tOSTb1vbPcmfpE5ifwGQMX9Jcj0wb5T7fagjwW4zCZOmGG9c2LOkeQG5UZ/C
+	ywcxLOXk9Z0NTgJjbRc8FcVnnky57M6PcJoXChF5TfXLBrd8qVAp47at4tQga4fmBypD742
+	9f94Ki19OYiYtXWuMc
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-RECHKSPAM: 0
 
-On 17/10/2025 18:11, Brett Creeley wrote:
->> ionic_netdev_ops = {
->>          .ndo_get_vf_config      = ionic_get_vf_config,
->>          .ndo_set_vf_link_state  = ionic_set_vf_link_state,
->>          .ndo_get_vf_stats       = ionic_get_vf_stats,
->> +       .ndo_hwtstamp_get       = ionic_lif_hwstamp_get,
->> +       .ndo_hwtstamp_set       = ionic_lif_hwstamp_set,
-> 
-> Nit, but if you are changing this and you have to re-spin the series it 
-> would align with the other ndo callbacks to rename these by removing the 
-> "_lif_" portion of the name:
-> 
->    ionic_hwstamp_get
->    ionic_hwstamp_set
-> 
-> Other than that LGTM.
-> 
-> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+Hi, Jakub:
 
-Thanks Brett, I took your suggestion before sending out v2.
+On Fri, Oct 17, 2025 at 05:07:03PM -0700, Jakub Kicinski wrote:
+> On Tue, 14 Oct 2025 15:27:09 +0800 Dong Yibo wrote:
+> > +struct mucse_mbx_stats {
+> > +	u32 msgs_tx; /* Number of messages sent from PF to fw */
+> > +	u32 msgs_rx; /* Number of messages received from fw to PF */
+> > +	u32 acks; /* Number of ACKs received from firmware */
+> > +	u32 reqs; /* Number of requests sent to firmware */
+> > +};
+> 
+> Probably no point adding these stats until you can expose them to the
+> user..
+> 
+
+Ok, I will remove this for this patch.
+
+By the way, I think there is a similar situation in patch5 (about
+tx_dropped), just bellow:
+
++ * rnpgbe_xmit_frame - Send a skb to driver
++ * @skb: skb structure to be sent
++ * @netdev: network interface device structure
++ *
++ * Return: NETDEV_TX_OK
++ **/
++static netdev_tx_t rnpgbe_xmit_frame(struct sk_buff *skb,
++				     struct net_device *netdev)
++{
++	struct mucse *mucse = netdev_priv(netdev);
++
++	dev_kfree_skb_any(skb);
++	mucse->stats.tx_dropped++;
++
++	return NETDEV_TX_OK;
++}
+
+tx_dropped stats is sugguested by MD Danish Anwar <danishanwar@ti.com> here:
+https://lore.kernel.org/netdev/94eeae65-0e4b-45ef-a9c0-6bc8d37ae789@ti.com/
+----
+> +static netdev_tx_t rnpgbe_xmit_frame(struct sk_buff *skb,
+> +				     struct net_device *netdev)
+> +{
+> +		dev_kfree_skb_any(skb);
+> +		return NETDEV_TX_OK;
+> +}
+
+Extra indentation on these two lines. Also, the function just drops all
+packets without any actual transmission. This should at least increment
+the drop counter statistics.
+----
+
+And update to my own stats here:
+https://lore.kernel.org/netdev/20250923181639.6755cca4@kernel.org/
+
+And I am not sure how to deal with it since 'mucse->stats.tx_dropped' is
+not exposed to the user just like mbx_stats.
+Please give me some sugguestion, thanks.
+
 
 
