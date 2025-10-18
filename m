@@ -1,157 +1,83 @@
-Return-Path: <netdev+bounces-230634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E8A8BEC130
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 02:06:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44D59BEC145
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 02:06:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2FD534E2312
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 00:06:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D22D44277F7
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 00:06:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC1E1397;
-	Sat, 18 Oct 2025 00:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C27D4A1A;
+	Sat, 18 Oct 2025 00:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MEtf1gVd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A49354AF8;
-	Sat, 18 Oct 2025 00:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F383C38;
+	Sat, 18 Oct 2025 00:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760745961; cv=none; b=dFKANRRzbhjtX+pd9Sydr1TJf8ZpDtxhcuHoh2eqXpMHCNGul+ixxs4lopmdSTH6SykDlCeChBaQzTEc/nYCx69jhAtHuR319qo9hW1/g/AmUiwHBbbQLRyC18laO1kgsQSOs+OOxF7VmpmUgmqHMBavo8RPnF7mNaeFm0NX5Bg=
+	t=1760745973; cv=none; b=UA/ksyC2yz+K8x1hJo58alndBpKO/OZTvFP6Wkl6sd/+hLDXO3A6lLFsZ1YmFRejB9glAmNvC+LYESOrxF51hZXMNNHPQpJ9o+v0UWere12Y5kONRA2HOhrgRE3p6M6KbURuilgOjLaJ1H94AfeGp5c8uLgZTBkJV6PdladOOZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760745961; c=relaxed/simple;
-	bh=cvYny5yQsHJFubeXGJElbL68TJTK+OiH5rxfRGrAUuo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k12Erfzxrw+Ub314sdm3cPp6VmV34JPeUkDaltW5pjhl6SFRAxZdWKlKhEjgHJcZgSQQ0uUXMv2Jnm1DDTk3o9ifyIYyRH/2u6A8K1i4dphtTaaWewCygi2ItU58FUuVxqAUyAEBg0zHrsUxTCWdM3Dfb+2Cuy3AT1X+qKSDWgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-Received: from localhost (unknown [116.232.147.23])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dlan)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id C82DD341FD5;
-	Sat, 18 Oct 2025 00:05:58 +0000 (UTC)
-Date: Sat, 18 Oct 2025 08:05:48 +0800
-From: Yixun Lan <dlan@gentoo.org>
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chen Wang <unicorn_wang@outlook.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Han Gao <rabenda.cn@gmail.com>, Icenowy Zheng <uwu@icenowy.me>,
-	Vivian Wang <wangruikang@iscas.ac.cn>, Yao Zi <ziyao@disroot.org>,
-	netdev@vger.kernel.org, sophgo@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH] net: stmmac: dwmac-sophgo: Add phy interface filter
-Message-ID: <20251018000548-GYA1481334@gentoo.org>
-References: <20251017011802.523140-1-inochiama@gmail.com>
+	s=arc-20240116; t=1760745973; c=relaxed/simple;
+	bh=jV4Zs/tV6yikwVmrBHnbe2SYjnv2Ls8kBLOfNJx5X14=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JAeaE7bAjyxMM3iKjfq8nIeVhNir0n6hyFITDNBO6zX9YQoI1K8nOl5hDmef6sqeDuiaf8Yk2imQ1E/lx1Zyjhe4oxUY6c9eV1TcIJWHxnFLO5fOYIkYHp2NjDgik7udCCdX/bdiY7zdvbVaWr9801lcw5pFnIIJylmMBtJgeHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MEtf1gVd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D0FBC4CEE7;
+	Sat, 18 Oct 2025 00:06:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760745971;
+	bh=jV4Zs/tV6yikwVmrBHnbe2SYjnv2Ls8kBLOfNJx5X14=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MEtf1gVd6B59SsEa06Pl0mRRmUC0PFo5X0vLALcL1xEgSh3gf8q0taZAPgD6PMla1
+	 uLEgICYiFCKKttS7E1N1pCbbc6qDXtQJzPsoHzK/OKImcKdfaMqX4UyQju9tqSbh9+
+	 kIVHtCgGtg/qUaxP/e8cw9gqFb9A7m0eDMtv0QYyF3OPqskBDHh8kv7nqw1KWEtj+c
+	 bteswHGDfrx8rCPx1l2ZwD1WPlRb1z+38lJ8Qb3aRs+v6m26XiXGqquKxzRHRbdh5O
+	 /cXY0iaBHxP1CS4LPjKv1OkjLbJs7uc1AR96Hf9NVE+mhNg2mD8n0PvAYlXQ3AXpqR
+	 LFzm4t7OsTj1g==
+Date: Fri, 17 Oct 2025 17:06:10 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dong Yibo <dong100@mucse.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, corbet@lwn.net, andrew+netdev@lunn.ch,
+ danishanwar@ti.com, vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v14 4/5] net: rnpgbe: Add basic mbx_fw support
+Message-ID: <20251017170610.4f5c3f22@kernel.org>
+In-Reply-To: <20251014072711.13448-5-dong100@mucse.com>
+References: <20251014072711.13448-1-dong100@mucse.com>
+	<20251014072711.13448-5-dong100@mucse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251017011802.523140-1-inochiama@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Inochi,
-
-On 09:18 Fri 17 Oct     , Inochi Amaoto wrote:
-> As the SG2042 has an internal rx delay, the delay should be remove
-                                                     s/remove/removed/
-> when init the mac, otherwise the phy will be misconfigurated.
-s/init/initialize/
-> 
-> Fixes: 543009e2d4cd ("net: stmmac: dwmac-sophgo: Add support for Sophgo SG2042 SoC")
-> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-> Tested-by: Han Gao <rabenda.cn@gmail.com>
-> ---
->  .../ethernet/stmicro/stmmac/dwmac-sophgo.c    | 25 ++++++++++++++++++-
->  1 file changed, 24 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
-> index 3b7947a7a7ba..b2dee1399eb0 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
-> @@ -7,6 +7,7 @@
-> 
->  #include <linux/clk.h>
->  #include <linux/module.h>
-> +#include <linux/property.h>
->  #include <linux/mod_devicetable.h>
->  #include <linux/platform_device.h>
-> 
-> @@ -29,8 +30,23 @@ static int sophgo_sg2044_dwmac_init(struct platform_device *pdev,
->  	return 0;
->  }
-> 
-> +static int sophgo_sg2042_set_mode(struct plat_stmmacenet_data *plat_dat)
+On Tue, 14 Oct 2025 15:27:10 +0800 Dong Yibo wrote:
+> +/* FW stores extended information in 'ext_info' as a 32-bit
+> + * little-endian value. To make these flags easily accessible in the
+> + * kernel (via named 'bitfields' instead of raw bitmask operations),
+> + * we use the union's 'e_host' struct, which provides named bits
+> + * (e.g., 'wol_en', 'smbus_en')
+> + */
+> +static inline void mucse_hw_info_update_host_endian(struct mucse_hw_info *info)
 > +{
-> +	switch (plat_dat->phy_interface) {
-> +	case PHY_INTERFACE_MODE_RGMII_ID:
-> +		plat_dat->phy_interface = PHY_INTERFACE_MODE_RGMII_TXID;
-> +		return 0;
-> +	case PHY_INTERFACE_MODE_RGMII_RXID:
-> +		plat_dat->phy_interface = PHY_INTERFACE_MODE_RGMII;
-> +		return 0;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +}
+> +	u32 host_val = le32_to_cpu(info->ext_info);
 > +
->  static int sophgo_dwmac_probe(struct platform_device *pdev)
->  {
-> +	int (*plat_set_mode)(struct plat_stmmacenet_data *plat_dat);
->  	struct plat_stmmacenet_data *plat_dat;
->  	struct stmmac_resources stmmac_res;
->  	struct device *dev = &pdev->dev;
-> @@ -50,11 +66,18 @@ static int sophgo_dwmac_probe(struct platform_device *pdev)
->  	if (ret)
->  		return ret;
-> 
-> +	plat_set_mode = device_get_match_data(&pdev->dev);
-> +	if (plat_set_mode) {
-> +		ret = plat_set_mode(plat_dat);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
->  	return stmmac_dvr_probe(dev, plat_dat, &stmmac_res);
->  }
-> 
->  static const struct of_device_id sophgo_dwmac_match[] = {
-> -	{ .compatible = "sophgo,sg2042-dwmac" },
-> +	{ .compatible = "sophgo,sg2042-dwmac", .data = sophgo_sg2042_set_mode },
-I'd personally prefer to introduce a flag for this, it would be more readable and
-maintainable, something like
-struct sophgo_dwmac_compitable_data {
-	bool has_internal_rx_delay;
-}
+> +	memcpy(&info->e_host, &host_val, sizeof(info->e_host));
 
-then.
-	if (data->has_internal_rx_delay)
-		sophgo_sg2042_set_mode(..)
-
-
->  	{ .compatible = "sophgo,sg2044-dwmac" },
->  	{ /* sentinel */ }
->  };
-> --
-> 2.51.0
-> 
-
+This is not going to be enough. C bitfields are also affected by endian.
+The best practice in the kernel is to define the fields as #defines
+and user FIELD_GET() or direct & / | operations with the constants.
 -- 
-Yixun Lan (dlan)
+pw-bot: cr
 
