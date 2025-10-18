@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-230649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEC16BEC54B
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 04:31:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 610DCBEC54E
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 04:31:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B4E784E2C17
-	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 02:31:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 115D26E5983
+	for <lists+netdev@lfdr.de>; Sat, 18 Oct 2025 02:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EFC51F1518;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CF321A449;
 	Sat, 18 Oct 2025 02:31:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A120B134CB;
-	Sat, 18 Oct 2025 02:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CBA2A1CA;
+	Sat, 18 Oct 2025 02:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760754660; cv=none; b=NJUYGwLabcW7kgtvEwpyT09pmiUYn466xFj3J+Z3AwZwa80ql2XlgTKA9fhl7ykktVGYHkS+E6HxTOhvHmDzcEscZ7fxRVEbey4x7LVbZxh1t+ISOfXEmtaSa+NHULar7S2rh4yeZyFhxHuXmA9i6a357LhW9ByqvbhnFNaS6Sg=
+	t=1760754660; cv=none; b=L2oVvfphilFC5XnbnX5dZ6JarBi0kDZK2iABVn4uoK1cdMx1mykoJcnFF4+Nbu1CcvIYSa69Qdi1J7azojs84XB+07ow5L0mL+hE2Kchpq5Ma5ZQJQtvCE0uuSd1I6gOyCIBqzF4zIutW2tMPv/J4zekKE+OUqip43S98zKLivU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1760754660; c=relaxed/simple;
-	bh=NUuJDkq9VTgm83WPiJrnoxF74r2wklcTX3i9wtRw4rc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Eajz0DhO5XBQks9TFCBFxx2r48cYjUxaic3rucsjYWXtgiVix7uOV+iQVNjFI7nqql+YEW/98LegTB8/FYFqStuEpEnbvwsQc/Gy2fDubx3wT3DSLbjYx9PDwhuIRciKrnvopw/tuPuK/usFeEy1Sq93L3QJO+3cp++lTWEBIw8=
+	bh=dGLHpnOfSrFGVk1o2I1ecKIPDlTcUNmVZyhAjpteRe8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R3/Z7a6EaGVE1V6ohaOUM8tArGxiqx0ZOTfSi2/ib2DdTOH9gs88zqlIx6C6aGt+t5tCTLlkaEoN2lj+qGtTv8RYj8i7sWNHXK09KoExvOPVwyyrR53dLAUhugwYRR9nwbPyDU4pkCMDd1pSEltJcGKWHitkkB2jHDF3ag8FB90=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1v9wiJ-000000002D1-2hPE;
-	Sat, 18 Oct 2025 02:30:35 +0000
-Date: Sat, 18 Oct 2025 03:30:27 +0100
+	id 1v9wiS-000000002DF-09rA;
+	Sat, 18 Oct 2025 02:30:44 +0000
+Date: Sat, 18 Oct 2025 03:30:40 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -55,9 +55,10 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-net v2 0/7] net: dsa: lantiq_gswip: use regmap for
- register access
-Message-ID: <cover.1760753833.git.daniel@makrotopia.org>
+Subject: [PATCH net-net v2 1/7] net: dsa: lantiq_gswip: clarify GSWIP 2.2
+ VLAN mode in comment
+Message-ID: <7135c0bd3df9f81e6d1124a822e765735fd77201.1760753833.git.daniel@makrotopia.org>
+References: <cover.1760753833.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,44 +67,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1760753833.git.daniel@makrotopia.org>
 
-This series refactors the lantiq_gswip driver to utilize the regmap API
-for register access, replacing the previous approach of open-coding
-register operations.
+The comment above writing the default PVID incorrectly states that
+"GSWIP 2.2 (GRX300) and later program here the VID directly."
+The truth is that even GSWIP 2.2 and newer maintain the behavior of
+GSWIP 2.1 unless the VLANMD bit in PCE Global Control Register 1 is
+set ("GSWIP2.2 VLAN Mode").
+Fix the misleading comment accordingly.
 
-Using regmap paves the way for supporting different busses to access the
-switch registers, for example it makes it easier to use an MDIO-based
-method required to access the registers of the MaxLinear GSW1xx series
-of dedicated switch ICs.
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ drivers/net/dsa/lantiq/lantiq_gswip.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Apart from that, the use of regmap improves readability and
-maintainability of the driver by standardizing register access.
-
-When ever possible changes were made using Coccinelle semantic patches,
-sometimes adjusting white space and adding line breaks when needed.
-The remaining changes which were not done using semantic patches are
-small and should be easy to review and verify.
-
-The series was previously posted as RFC[1], changes since the RFC/v1
-version are documented in each changed patch.
-
-[1]: https://patchwork.kernel.org/project/netdevbpf/list/?series=998183&state=*
-
-Daniel Golle (7):
-  net: dsa: lantiq_gswip: clarify GSWIP 2.2 VLAN mode in comment
-  net: dsa: lantiq_gswip: convert accessors to use regmap
-  net: dsa: lantiq_gswip: convert trivial accessor uses to regmap
-  net: dsa: lantiq_gswip: manually convert remaining uses of read
-    accessors
-  net: dsa: lantiq_gswip: replace *_mask() functions with regmap API
-  net: dsa: lantiq_gswip: optimize regmap_write_bits() statements
-  net: dsa: lantiq_gswip: harmonize gswip_mii_mask_*() parameters
-
- drivers/net/dsa/lantiq/Kconfig        |   1 +
- drivers/net/dsa/lantiq/lantiq_gswip.c | 458 +++++++++++++-------------
- drivers/net/dsa/lantiq/lantiq_gswip.h |   6 +-
- 3 files changed, 239 insertions(+), 226 deletions(-)
-
+diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
+index 25f6b46957a0..86b410a40d32 100644
+--- a/drivers/net/dsa/lantiq/lantiq_gswip.c
++++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
+@@ -588,7 +588,11 @@ static void gswip_port_commit_pvid(struct gswip_priv *priv, int port)
+ 			  FIELD_PREP(GSWIP_PCE_VCTRL_VINR, vinr),
+ 			  GSWIP_PCE_VCTRL(port));
+ 
+-	/* GSWIP 2.2 (GRX300) and later program here the VID directly. */
++	/* Note that in GSWIP 2.2 VLAN mode the VID needs to be programmed
++	 * directly instead of referencing the index in the Active VLAN Tablet.
++	 * However, without the VLANMD bit (9) in PCE_GCTRL_1 (0x457) even
++	 * GSWIP 2.2 and newer hardware maintain the GSWIP 2.1 behavior.
++	 */
+ 	gswip_switch_w(priv, idx, GSWIP_PCE_DEFPVID(port));
+ }
+ 
 -- 
 2.51.1.dirty
 
