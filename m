@@ -1,106 +1,109 @@
-Return-Path: <netdev+bounces-230752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F970BEEB31
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 20:14:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B40BBEEB50
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 20:29:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11CE91896BC8
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 18:15:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91191189702E
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 18:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30A5223DE8;
-	Sun, 19 Oct 2025 18:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F188A221545;
+	Sun, 19 Oct 2025 18:29:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b="OWs4dy4Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WmZqZqar"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411A61E260A
-	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 18:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3B525A328
+	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 18:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760897675; cv=none; b=K4BITmIkL2fkKJ4yGQmZ8i21UqwmD4EaS2fUpzC1Jas9xaN0c9z7VV2v27ZF6calxm3HcMfNSIVQBSOSL+Ntg+U3KffKOM97oglAsMoQRWWN1NZLEqP8BsrXTgIL8xtAuPqUD023fXKwx/PXJrvb+JhQogMcuS/RUr0/RvNHYlI=
+	t=1760898581; cv=none; b=r4DhQdCNA4JJiwswoUvrKVjR1z2rJgGw44bG+t8N0GDqJEM7+qMp3gPcYxGQgzVqJhu0MJ5PVBm3JdCIPLr8eJOR4ULc9mI6LkZ/7y+2lbi/V4NXfc17yUvrenfIxEvb/X3bVDFdY9ZzkEoQktbG9M8y+pJkIENs4bWdqM9siXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760897675; c=relaxed/simple;
-	bh=OWtMsh2PHY7TNTIpoc9gwrfTC7Jvnu9TYnZe5lQxTZk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EeUYcr30e0xZd8y+cscX92AD8xADJyg/jzV8BZeKIfdrrILuKxsicFAJySdOTQA7Nw/dMqKSxC/cjJEexjKCz3FXJMrveoDt9iYvOuM4+LEedjESZWWsJ9pdVevhtUVfxURM5Ew5+N9O47x0pkLtmm/c4ONXih7rDWW5CuJm/C4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in; spf=none smtp.mailfrom=ee.vjti.ac.in; dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b=OWs4dy4Q; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ee.vjti.ac.in
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7811fa91774so3128778b3a.0
-        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 11:14:33 -0700 (PDT)
+	s=arc-20240116; t=1760898581; c=relaxed/simple;
+	bh=59XmYm+EO88Dl2kDsRxEUIhQrtftD0EGVhi/zb8n6VI=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=Guq0tE78sOXI3uqEVMl0QCmqge10d+nH8XyJ/WFdxj0Y5snT+or9Vx/FY/qUrA2JPIBRHSIL6ZcbjNy3rA5pMztjVQHVPWHwdbfQFTGEvUSv2YP5ZAJlt82qVs+4lsWPisQxJBdBz4aN92B/k7MIZ3WMM4/uvSSCrmcFu5tHowk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WmZqZqar; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-781010ff051so2724989b3a.0
+        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 11:29:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vjti.ac.in; s=google; t=1760897673; x=1761502473; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IaENTQgKFPGammTZmywdQK3pf3FhrMcENBDsOJC4YvY=;
-        b=OWs4dy4QeR6XTePSvJuyrmM80uiOBPdwNIpFx/EeF2TRi7o+yJ42pF1DQO8+ARyKsq
-         ip5ZYsD0gNonRq/QA2qfGH6i6uXJI8HOHgoqzStpICpbM4KP+N3tVLLfE+NfnmEYkXj/
-         75q184H2FNnZVaDHKnesyMN9+qmZGU2zyeMD8=
+        d=gmail.com; s=20230601; t=1760898580; x=1761503380; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language:subject
+         :references:cc:to:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bAz1Xrjkzd6ULry6VIZLlce2IMxVc3+Yynj8Z/hkgEw=;
+        b=WmZqZqar0t6luIx91JGUNnkSgkvwipbQucbAezyDMWymetCi2EdGZPx+wb828rzm1g
+         O4M7mmfvJ7WV5CBKPUgYo1kldw7q4rR0ANr0Z8drNncc2UgziY6MsvZbspEG/8Wtok5L
+         SgwBTet+VdLrx07bTsfzoxwgnWPSKdcE0v9nuEeD9hhi4OK6so0fUcoNpGQIuPDBsCep
+         f9zub6gR4RdMpSlNFfgOAxDgcVFmlbVBwqcX2TsYEg1Ut9JPdBwhsh217eFSJNR1TCUu
+         U0AA+wp1vq0oEtM2fHZP41bpwGZkHUaQLqsVZplLIJ7AlOY8VHhsz8vyF9y3xrz3QqKl
+         2wEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760897673; x=1761502473;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IaENTQgKFPGammTZmywdQK3pf3FhrMcENBDsOJC4YvY=;
-        b=w2HHr5AsNPVYma/HyaYYPYbPCrpuaWdD33kqEChNMKk7w5WxBtgeaybQIxpgUqSctM
-         4YJsoXEmKiPyhR9jAo3PEWx+bhrtbzrjnGYYZOapujM7Su+6lIdIn3rqvQVFfNmuQAHm
-         hxWIFzY1Zd0Ib2OG4554hPGCYAsQBIV4BvAGcUhZzUEMhJNWNXXhyJ9Daif+OSOjleXG
-         FS/31qXeDp9pcemGOLo6o68fSfsjB1zVeNhMkWWUE7S/8u2FhmUFJTmVwRwOTXG36fTR
-         zTYWhmoiOK4E0hAFwAw+NIpxwHxKGrvc9uJNGg6vltn4KT3yYwxhoYqDbX1O+KcUzjuG
-         ULRw==
-X-Gm-Message-State: AOJu0Yxs9E2OzGlIDjVTAbPKG0GWdVThfzzuceXBYO11Ztv0jI84p66w
-	KiAMrxseByYVze6Hy0nvz1bG5IDfGqMRxkbCjg90UDFUpKEc9x6sq5tEQ4PlC2uk2CubvNFqk2N
-	jdFKhQFeZCA==
-X-Gm-Gg: ASbGncs0C4fsrkQok1fk56q3HbtvooyjZK9z/Dv6cCT7wZ/J78FlMooUM72EFjQw/jF
-	3YdyA3lq2ugIfq2DlBlMQYVpcCiCeNb43hiFSOpzSigYJP8UsXiF5eLMvLcVCynYwrndtDHS40Q
-	LzwpdOp2NdxRdZz3KgH3JaZoz5ZvfaCXkkdpXa01yId5WhECO0riUs/TudSt0Xo4NRca60/NnIa
-	Adfr8b9l3mV5DYmLy+oeA3hKUnrLGfdUBFhCCPjjmESvXcZ0M8Z/hXEFfVW8x5E9/Udd7nDneWz
-	FcdOkAECqA97G3mP0dFPzaC1tCmSXLuZjccy3g+k7auPmf0TxBwcFUnKeWja0Z27vWX+052E/QF
-	JVp/eX3diLbFaYwt2dhr6UxdCvd5wqUQXP1eZmHR1rgJ0vPsRJptWzg3oZNbclLbUmWh1qW3tTe
-	mmrMBIvnm59H+VBNqvQwuw6j8XoSiPitFW2qSMaPV4OAuTHg==
-X-Google-Smtp-Source: AGHT+IHzvUrSCJm2EvmnIvQwP7xjuydc12UxhQNsagqenju0dOYpSJfg4ontGV6/TgRQJcjd0gFp9Q==
-X-Received: by 2002:a17:90b:3d8a:b0:32b:6820:6509 with SMTP id 98e67ed59e1d1-33bcf8748b5mr13820446a91.9.1760897673018;
-        Sun, 19 Oct 2025 11:14:33 -0700 (PDT)
-Received: from ranegod-HP-ENVY-x360-Convertible-13-bd0xxx.. ([110.226.181.49])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33d5de2f94esm5882328a91.13.2025.10.19.11.14.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Oct 2025 11:14:32 -0700 (PDT)
-From: ssrane_b23@ee.vjti.ac.in
-X-Google-Original-From: ssranevjti@gmail.com
-To: netdev@vger.kernel.org
-Cc: david.hunter.linux@gmail.com,
-	linux-kernel-mentees@lists.add,
-	shuah@kernel.org,
-	steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shinta.sugimoto@ericsson.com,
-	yoshfuji@linux-ipv6.org,
-	nakam@linux-ipv6.org,
-	linux-kernel@vger.kernel.org,
-	Shaurya Rane <ssrane_b23@ee.vjti.ac.in>,
-	syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com
-Subject: [PATCH] net: key: Validate address family in set_ipsecrequest()
-Date: Sun, 19 Oct 2025 23:44:21 +0530
-Message-Id: <20251019181421.107668-1-ssranevjti@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1760898580; x=1761503380;
+        h=content-transfer-encoding:in-reply-to:from:content-language:subject
+         :references:cc:to:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bAz1Xrjkzd6ULry6VIZLlce2IMxVc3+Yynj8Z/hkgEw=;
+        b=Zcqj1gyQ9YuyMldyoas8KVWsR3RDIeVQn5u45Np+JThOom8vzNnYNBJPc1wz9DF/kC
+         2bbtbfUFX/o2LDmSDSwiY5lqa0i0aN+FXOrKPAYPqETnW6JNtYqMVOSWLnU2tyj8EUPb
+         hM4TbjkA9OCia3/kYXyypFN28n5dl5Q0vkIgcKHP4XBlWh4fHA1BP1YtV4iEN2rrBUQ1
+         yheuc4NRav5FZqHQ6Q2BbfUYilPfp+Zg++yY/zELYKePkukj1RMFXOUJYPjvlwrvxTy9
+         Wp/AsZgTs2d+IBp+ZPzZ+5ls1T4YweQMoQQHRL7hq24DenJ1VXNK3wdV12qjpb6G06/N
+         S+RQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWcK0k9DX5ZNtCpEq3Xq4uIlDhytPSkOsuioDemP3DZYycoVALuzHV0fMqxP5jxAL1T5vlFys8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMFg1USDMYyqCe+G4rDLWLO7HH0ZoVGjSmg/3KDEVh2KBZ5Mjc
+	BLsnX8bYLazRBM5dqq1UmVkasL49nCO6J86n8GOl8FySQ4Dag+mPKe/o
+X-Gm-Gg: ASbGncu4Kxk2bMS6sH7uBdiqmSm5nbcDtx8YiRLV77XF01o11CnW1H8Ro0xZnTI/Gke
+	3G1Q980yGxkxWFA86TOo5yP4BG87SnYvK1jL6C+nBrSn3UooOwkwO8ULIxemK1YXYGp6SrhK5bb
+	zYgN7Upi5+8+Ld1aeo2Z5CrGd6nad4K3URSzHUmN7F78nCbJpv3pABAy26O0m807bN07zQSdkeB
+	aM93ZXhJPv2a9E8aqtFtorDZRdHfGAB+H22W883FBMe+YmulbRtNW1iZ9FVh7sMlQ0ZRTTIgRr6
+	VAChEmQJBuUgYmlnU3NnAKjAuEw1O18xKvxJ6iI0nUCJNYtp/FqEMu81uumm+rJCnrteyHjl5n8
+	0Kinz00aqHt71x5tYGoGGeO3A6CR6hVLMi//r7QUgl8XeoKHmjwrJqiZ4tWBHnbELWP0yX6VTUK
+	b4DdiaLA==
+X-Google-Smtp-Source: AGHT+IHYBsBIyQhofVEIUqLK4ufZTXWodxz/p8RD+UfHYw+jNsprvNHmxEIT7mMHJPaXaI2v/Og3Pw==
+X-Received: by 2002:a05:6a00:3cce:b0:781:be:277e with SMTP id d2e1a72fcca58-7a220a584c6mr12962221b3a.4.1760898579683;
+        Sun, 19 Oct 2025 11:29:39 -0700 (PDT)
+Received: from [192.168.1.13] ([110.226.181.49])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a22ff15985sm6218413b3a.5.2025.10.19.11.29.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 19 Oct 2025 11:29:39 -0700 (PDT)
+Message-ID: <1b4aeb68-bf9a-40a1-ab86-a52ef91eb3a4@gmail.com>
+Date: Sun, 19 Oct 2025 23:59:34 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com
+Cc: davem@davemloft.net, edumazet@google.com, herbert@gondor.apana.org.au,
+ horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, steffen.klassert@secunet.com,
+ syzkaller-bugs@googlegroups.com
+References: <68f1d9d6.050a0220.91a22.0419.GAE@google.com>
+Subject: Re: [syzbot] [net?] kernel BUG in set_ipsecrequest
+Content-Language: en-US
+From: shaurya <ssranevjti@gmail.com>
+In-Reply-To: <68f1d9d6.050a0220.91a22.0419.GAE@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+#syz test: 
+git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+
+
+ From 123c5ac9ba261681b58a6217409c94722fde4249 Mon Sep 17 00:00:00 2001
 From: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+Date: Sun, 19 Oct 2025 23:18:30 +0530
+Subject: [PATCH] net: key: Validate address family in set_ipsecrequest()
 
 syzbot reported a kernel BUG in set_ipsecrequest() due to an
 skb_over_panic when processing XFRM_MSG_MIGRATE messages.
@@ -120,8 +123,8 @@ with 16 bytes each time.
 
 This causes the tail pointer to exceed the end pointer of the skb,
 triggering skb_over_panic:
-  tail: 0x188 (392 bytes)
-  end:  0x180 (384 bytes)
+   tail: 0x188 (392 bytes)
+   end:  0x180 (384 bytes)
 
 Fix this by validating that pfkey_sockaddr_len() returns a non-zero
 value before proceeding with buffer operations. This ensures proper
@@ -131,29 +134,31 @@ unsupported address families.
 
 Reported-by: syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com
 Closes: https://syzkaller.appspot.com/bug?extid=be97dd4da14ae88b6ba4
-Fixes: 08de61beab8a ("[PFKEYV2]: Extension for dynamic update of endpoint address(es)")
+Fixes: 08de61beab8a ("[PFKEYV2]: Extension for dynamic update of 
+endpoint address(es)")
 
 Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
 ---
- net/key/af_key.c | 4 ++++
- 1 file changed, 4 insertions(+)
+  net/key/af_key.c | 4 ++++
+  1 file changed, 4 insertions(+)
 
 diff --git a/net/key/af_key.c b/net/key/af_key.c
 index 2ebde0352245..713344c594d4 100644
 --- a/net/key/af_key.c
 +++ b/net/key/af_key.c
 @@ -3526,6 +3526,10 @@ static int set_ipsecrequest(struct sk_buff *skb,
- 	int socklen = pfkey_sockaddr_len(family);
- 	int size_req;
- 
-+	/* Reject invalid/unsupported address families */
-+	if (!socklen)
-+		return -EINVAL;
+      int socklen = pfkey_sockaddr_len(family);
+      int size_req;
+
++    /* Reject invalid/unsupported address families */
++    if (!socklen)
++        return -EINVAL;
 +
- 	size_req = sizeof(struct sadb_x_ipsecrequest) +
- 		   pfkey_sockaddr_pair_size(family);
- 
+      size_req = sizeof(struct sadb_x_ipsecrequest) +
+             pfkey_sockaddr_pair_size(family);
+
 -- 
 2.34.1
+
 
 
