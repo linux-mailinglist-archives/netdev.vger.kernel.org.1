@@ -1,73 +1,89 @@
-Return-Path: <netdev+bounces-230748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F555BEE9B6
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 18:17:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C345BEEA60
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 19:00:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E877189B552
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 16:18:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0EB53B5EAF
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 17:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B635726B761;
-	Sun, 19 Oct 2025 16:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652841A9F8C;
+	Sun, 19 Oct 2025 17:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DlL3/XRt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XR4ermD3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B22C4964F
-	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 16:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE20535966
+	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 17:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760890667; cv=none; b=OOgWuJUdKdh0FWB6ClT33/R7lTgEXeSSp9tTPU1qukANgHiF0ieOybjwOa+JposaDSB7fIgRwdGEyShplRGqJUR7BxHvOvUfvzvyejMw0kUN6XR9uZ7NYBl4aPFnBtU2Rwz++LZfm9mjqhxaiptEid3sKfAkEFo60uD8DEtzejM=
+	t=1760893243; cv=none; b=VhdwvfbFJCh0eU0camRqSDlxwGAElp0LjrSDoDn9+wKGcsYjj8V0a4Fl0mLb7MjraxeMEEXVmteUu54/yHr5zYIp+MzoegNBmmqHxIsilbwlfSAMKOloIl2GQ0dYYPYRkD4W/zrgd68s5xNTBT+ucwAKGgYxj7YsGFZR/51Rl+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760890667; c=relaxed/simple;
-	bh=vqXb80mOFAjPoe3h2l/igwhqT43nocCzsWtKUywquJY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hTgo4Ijag66HHJ2W/ZCT4RT+PM8UTYTyhSW1p4jmkIl1hrX/wSufCX2S0k4AnivFKBU7b7g747PyZ2TgPfvFpoz392KAlaeBHUiVcDOtg0tzXUREFpHYDECt/J0ClUHxV/UhIGoDJGprRTJMSkxvZ+XS/PmUGosoCURMKmzKsrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=DlL3/XRt; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59JBH6AL020815;
-	Sun, 19 Oct 2025 16:17:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=/Yy3hMpT5NgnQi27t/+XNoOdUuFEN
-	JEKglgNvRF+wdQ=; b=DlL3/XRtxvo0xW1A23ci1Qhg4ARibRhJq42A6qYg9z2M6
-	kosFXwrX2khKiRmPUKrMhNswhZZfkUPlSBd4gFUNiaWA4ZH+EgrQ1LHYuAdXlEr2
-	jky0bWfNNnaVxX4vEtV18yXLjYvREr4HCbeA8wDu6fYf61xqhf4rDKtZGM1pARQq
-	0/E6OPVzbfrsGS0RkU2hscv8D7kYWmViFaIQ1SIuRAf8VMVhIw8GV+oRhVS/zsLO
-	Z82rUT68O55H48MawhmxQ1lgGiPKqK/8VLGqUYZikUn+ytJgMA8Tm9Kx35opM9yE
-	i4fIKmRw24glS+pf/uh8/UpbLJjHGabhC77xcbeXA==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49v30713me-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 19 Oct 2025 16:17:37 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59JF0BN0013649;
-	Sun, 19 Oct 2025 16:17:37 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 49v1b9ye5h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 19 Oct 2025 16:17:37 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 59JGHaeT005168;
-	Sun, 19 Oct 2025 16:17:36 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 49v1b9ye56-1;
-	Sun, 19 Oct 2025 16:17:36 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: jiri@resnulli.us, kuba@kernel.org, davem@davemloft.net,
-        edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
-        netdev@vger.kernel.org, alok.a.tiwari@oracle.com
-Cc: alok.a.tiwarilinux@gmail.com
-Subject: [PATCH net-next] devlink: region: correct port region lookup to use port_ops
-Date: Sun, 19 Oct 2025 09:17:27 -0700
-Message-ID: <20251019161731.1553423-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1760893243; c=relaxed/simple;
+	bh=PjDgNxlVxpxvR/toQXufEhgWxKZPOIL82AgrEwXPxEw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PKy1TzviFJIXTeytj4mpMc6QCNPJQFCjvS6/zI20Fbi/EgGsRjHIOdcLZ79ECGv3rqDvmaSjfWQ1WKrjxWHMnSj7AhJ9gkOUYYb9TLg/DWFJc41e0hVtmy8oSI7eAbT9KPNcmw1lhiRDDYl6N94IxIV/VcKkHczZv8yg10J2XKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XR4ermD3; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-88e4704a626so557464385a.0
+        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 10:00:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760893240; x=1761498040; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=L1WbXALuGbpcuO9t7Qwi5yHTQM+NY8K1Dfz/3nuG1pE=;
+        b=XR4ermD3fHK61ZGdIi6YEf7r0voAQtO13H6y17xAT3uYM7LMw6rvDylJMe1AONK2q8
+         kg6OIFClDNJqNW4/3RNFqpG3tovbqpuu7LcRpwwi3s3C8W4JoH3eCP0W9oyZv5IHESGh
+         sWUdiwgDGL7hNpN4VZvl6sMG8HGMMiDIXtwPgiQ7St3jnt0u1Pc/Vr+08o9fjPoma17c
+         INFc+TS3RQ/XAgN1iCqvH0ehhi311/TIpyUWFNP4QmmAJ26IUsYfdBWEzcC93YUAQHUH
+         llGxPxN9DpsinJ/6iII16BMObVvaSuch74vDYW72V/HgeBvrgwxyeBlQbm5LfePpN3/E
+         dXLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760893240; x=1761498040;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=L1WbXALuGbpcuO9t7Qwi5yHTQM+NY8K1Dfz/3nuG1pE=;
+        b=HVdIZYf2I/bOcfzCbzNpFDfRJOGbBRgiGS0cOOXsKGwvaagCAG+4l2nOaWJ2qo/WwR
+         zjPrhuPyuT1QKUOT7FC6RHzRJJ2zuUqwCExtpxj5JnNnxPZ0MP9vI2oNOKn+7W0WEViy
+         qyaPL2MsgGEjW1X7dTWAjpPQsnTqaCanC3iVQ63Rev3sLl5hC/FSe8JtXdbqfNWzM4Sc
+         wOiznOuMZ/9pB/iOEuJUjBrt5BUhHCp4W/nJ45CWId+2UiTY9eoCErayCkGVLHakei7K
+         OnXXt/XwjL8azk8Cicl96KJ4dgFsKWAnfIQED/x4z7RX6HB3f+o0Q1JwIl1tFjl7ICKD
+         F8lw==
+X-Forwarded-Encrypted: i=1; AJvYcCXQce+F1jfB+gUcO++3V669pS/ydBGExUNxc9JAjALTnYH9PvSDBZu2pGNPOSmnsGYQiO2qF9g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzsg1g6yprP+ereZ/HmV/LWGTbKTdDLJDQaCRo5rLNFJy+ujjzw
+	lBc34hlpvtfHxWK/4q/6GmRpCIXTOyPnL8NMg83Iueh+0XnWNFq8O/pN
+X-Gm-Gg: ASbGnctnaCzMUMb3zfGvNLhtYTTD8Sj5pKuRiOOcPOtr7cYbd1sqlrEm1VyTt+B8WiI
+	bhECEle8gHNTM4rb73gc+5MM42D8rY7PqdePsIWcKIf7wGfeQswpD64BYet1YSIWBDKSvlvXvt7
+	dBWx96m+EVQflrBeCe9WGBXwr3RhYDHTWDG5bCBJbyeUuUycPZ3PQDvKcwAPcK+dRsDCENearLN
+	wsZgF9OTueZDvBmSYULR3w0+6cSaDe26WZ5spOJMPomM0yb9a6a7axA1zVBsxs9pqWY0gxka5Br
+	Xd2GU5B8L6zTaZFQKagY4a1ou8PUcYapyo1NVndNEgJ+fe2XXVof/2CWsPlbOt9vyewda3FV8Ow
+	fsf5UDFhvCQBBlsZflDFhlcNPJ7II5hdm1RL5Jy9l2i0eBLcZOoVCA0wo3SD1M+eIgP3vK61WIl
+	/3CsS6noQSVOOL1Q==
+X-Google-Smtp-Source: AGHT+IF4pq4PxQqmtKO4E4OsIVb1+IunUUBbkT5Zf3jvPepuTm4doaYmgj46bpXYCtJDfNkY/xDyDQ==
+X-Received: by 2002:a05:620a:46a9:b0:891:9b1b:2792 with SMTP id af79cd13be357-8919b1b283emr942055785a.81.1760893240464;
+        Sun, 19 Oct 2025 10:00:40 -0700 (PDT)
+Received: from localhost.localdomain ([47.85.44.99])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-891cefba740sm384446285a.29.2025.10.19.10.00.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 19 Oct 2025 10:00:39 -0700 (PDT)
+From: Peng Yu <yupeng0921@gmail.com>
+X-Google-Original-From: Peng Yu <peng.yu@alibaba-inc.com>
+To: edumazet@google.com,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Peng Yu <peng.yu@alibaba-inc.com>
+Subject: [PATCH] net: set is_cwnd_limited when the small queue check fails
+Date: Mon, 20 Oct 2025 01:00:16 +0800
+Message-ID: <20251019170016.138561-1-peng.yu@alibaba-inc.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,56 +91,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-19_05,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=871 malwarescore=0
- suspectscore=0 spamscore=0 adultscore=0 bulkscore=0 phishscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2510020000 definitions=main-2510190117
-X-Proofpoint-ORIG-GUID: aqHc3ywiqsIyzhwT2jPu0rHKD_YSmaqe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMyBTYWx0ZWRfXzWsdHM0svVCf
- 6b2+mbLqqR//FXWPQ/t0S+URvsDaraL6xOcQBPrLCs7UeNGD+BIVCincbtc6Z35YSZV+eoi/Ty0
- OMoFaRbjD0xwr//9iwlNBais8hCJjndLaeaEZMDhsr+yAMouSpVu/WmADwOVSyrhnfJUM8Dnr5t
- RnW56JGLrfOswc8PnbNGgJGiedUReoakTZxeQJlCVzIbRDbGsyyHXXi0N6+VuEypLJHkQo3WFk6
- J6kxu+pcib25anJX+6ACdwHLwYGkKS+ERxN1CBJWpUsy/W64GnLEG5Q27VNJHs5Sgn09JzoQvnd
- rU7XXJCR8CMvpD2XeWUHKpRjOLsWv7+3JbF2JsRYOlBN5zeyslg5rChTNEMI3ZG6PHSFCYX9ETH
- O2FLzqEJ8M1An4zWHwEdvkoY82ADTA==
-X-Proofpoint-GUID: aqHc3ywiqsIyzhwT2jPu0rHKD_YSmaqe
-X-Authority-Analysis: v=2.4 cv=csaWUl4i c=1 sm=1 tr=0 ts=68f50f21 b=1 cx=c_pps
- a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
- a=UfRTzp-lEnWZV1Yto5EA:9
 
-The function devlink_port_region_get_by_name() incorrectly uses
-region->ops->name to compare the region name. as it is not any critical
-imapce as ops and port_pos define as union for devlink_region but as per
-code logica it should refer port_ops here.
+The limit of the small queue check is calculated from the pacing rate,
+the pacing rate is calculated from the cwnd. If the cwnd is small,
+the small queue check may fail.
+When the samll queue check fails, the tcp layer will send less
+packages, then the tcp_is_cwnd_limited would alreays return false,
+then the cwnd would have no chance to get updated.
+The cwnd has no chance to get updated, it keeps small, then the pacing
+rate keeps small, and the limit of the small queue check keeps small,
+then the small queue check would always fail.
+It is a kind of dead lock, when a tcp flow comes into this situation,
+it's throughput would be very small, obviously less then the correct
+throughput it should have.
+We set is_cwnd_limited to true when the small queue check fails, then
+the cwnd would have a chance to get updated, then we can break this
+deadlock.
 
-no functional impact as ops and port_ops are part of same union.
+Below ss output shows this issue:
 
-Update it to use region->port_ops->name to properly reference
-the name of the devlink port region.
+skmem:(r0,rb131072,
+t7712, <------------------------------ wmem_alloc = 7712
+tb243712,f2128,w219056,o0,bl0,d0)
+ts sack cubic wscale:7,10 rto:224 rtt:23.364/0.019 ato:40 mss:1448
+pmtu:8500 rcvmss:536 advmss:8448
+cwnd:28 <------------------------------ cwnd=28
+bytes_sent:2166208 bytes_acked:2148832 bytes_received:37
+segs_out:1497 segs_in:751 data_segs_out:1496 data_segs_in:1
+send 13882554bps lastsnd:7 lastrcv:2992 lastack:7
+pacing_rate 27764216bps <--------------------- pacing_rate=27764216bps
+delivery_rate 5786688bps delivered:1485 busy:2991ms unacked:12
+rcv_space:57088 rcv_ssthresh:57088 notsent:188240
+minrtt:23.319 snd_wnd:57088
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+limit=(27764216 / 8) / 1024 = 3389 < 7712
+So the samll queue check fails. When it happens, the throughput is
+obviously less than the normal situation.
+
+By setting the tcp_is_cwnd_limited to true when the small queue check
+failed, we can avoid this issue, the cwnd could increase to a reasonalbe
+size, in my test environment, it is about 4000. Then the small queue
+check won't fail.
+
+Signed-off-by: Peng Yu <peng.yu@alibaba-inc.com>
 ---
- net/devlink/region.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/ipv4/tcp_output.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/devlink/region.c b/net/devlink/region.c
-index 63fb297f6d67..d6e5805cf3a0 100644
---- a/net/devlink/region.c
-+++ b/net/devlink/region.c
-@@ -50,7 +50,7 @@ devlink_port_region_get_by_name(struct devlink_port *port,
- 	struct devlink_region *region;
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index b94efb3050d2..8c70acf3a060 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -2985,8 +2985,10 @@ static bool tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
+ 		    unlikely(tso_fragment(sk, skb, limit, mss_now, gfp)))
+ 			break;
  
- 	list_for_each_entry(region, &port->region_list, list)
--		if (!strcmp(region->ops->name, region_name))
-+		if (!strcmp(region->port_ops->name, region_name))
- 			return region;
+-		if (tcp_small_queue_check(sk, skb, 0))
++		if (tcp_small_queue_check(sk, skb, 0)) {
++			is_cwnd_limited = true;
+ 			break;
++		}
  
- 	return NULL;
+ 		/* Argh, we hit an empty skb(), presumably a thread
+ 		 * is sleeping in sendmsg()/sk_stream_wait_memory().
 -- 
-2.50.1
+2.47.3
 
 
