@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-230730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF71DBEE58D
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 14:49:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA40FBEE590
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 14:49:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76CAD421346
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 12:47:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13812421963
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 12:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C322E974C;
-	Sun, 19 Oct 2025 12:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD4E12EAB72;
+	Sun, 19 Oct 2025 12:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="QNyhKnzP"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="OE3Gki4S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4072E8B78
-	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 12:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111E72E973C
+	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 12:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760877973; cv=none; b=Xnw8lkwNJ6VhAPpQs9+HjCY5u1/ydBxGpQqKAmUIShOG5gQcQoizmQXW4mHbPCSgYaE9LstcvISv+E/K771/aWhWi8tnlbfadxe/NdSmxlqpRufujQjCZSXoUcLtbAs9DB0JLzJEw9O0/QO0THM+aAz6AzdvRw8i1kzkBIc10HY=
+	t=1760877974; cv=none; b=umanXIjCL2Q2iU6g9K/nURdaMI0jBGFFapEqRu4IQI9mQ6Ieh071z9VcIIzvHdDVOu1L0iIzN2stlf7wc7iwNGS5pt3E8aTPfBUSOt4zCVqumevu3KaapDFgzu4zd2VHhNAWwXzA7IJjodaZJD4CftI3XgcRE8MHM4Y+LUPideU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760877973; c=relaxed/simple;
-	bh=Z6Acauiw5VNlWtHv7oF3ZXGpUNutQOAURn9JnzG5E6w=;
+	s=arc-20240116; t=1760877974; c=relaxed/simple;
+	bh=YHy9xHMIb4yPr7wULSwsiYknsP7ln6RhfLiqyDd6n6E=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BbJG1vCKLauE69RKV+V8xi+6IVcGGd2Dwr3mnCUeWmisxqvhT2dHjTJ8vnkWBKSfJ0/8MqOPPzd7t/+8oMbFgyESuI72AkvY1eTW3ZbuPGIDHxfgH817jbGsWJ94iPbFIPcCfL6J4b2rABzVd90GbxhvKIssaWXwLlUijSGMr8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=QNyhKnzP; arc=none smtp.client-ip=209.85.208.45
+	 In-Reply-To:To:Cc; b=HyOKvIySUkCAd5jYs3yW0x3hxIz4cQ5WiAKzfOAloWr2LnWg55SBSFhLMwf8Ch6O9hoofMCHbsEmZvCot2hUCGLrD1Ff8o7nn3t7E14dPVPcqJC2xLvy0gLuspPAxe032ixR0RyOvCjBsIiw/CdNoLFacrXZxI1IIIjJbx8Cnso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=OE3Gki4S; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-63c3429bb88so3329547a12.2
-        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 05:46:10 -0700 (PDT)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-63c4b41b38cso3167476a12.3
+        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 05:46:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1760877969; x=1761482769; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1760877971; x=1761482771; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=HGNOtq6edfpdoKT7aMe3lnq3YZWKA20XmMp9oC/vqAc=;
-        b=QNyhKnzP3O0khSHBNiLjbDWxgSQN7KiYP3T/lcBvlbDrAod+zbTTMEH1Sya0Runhhv
-         TJlEUhkwE8jfXytJOJdWgdGVZPbcCkBEQpRQhWZm3zN8vA6ePPcnKdPk1Uint+8jDwRM
-         QdfWz3Q5gxaj9T6SCTuGul0+oy8qy3VJEI5lxtyfFUx5waL+N1NrC/pMQs1XM1fwZgFr
-         ajbv1W0P28EQ5C5ACff/ZyiC/vuBjKVvB03I84NYMs6/fPBr7eKIhU9N6wfufnmZlR8i
-         TrXbfSfR3bVbaOdi7iZFXSphKywayh5w3r7rl8Wh9wQpuJ442jrqEWaCiQfhj81bhsWu
-         nzUQ==
+        bh=HmhrtKbFOuYR/bZCr0kTJtzEL+ndRJ/n7qpkLkm0d34=;
+        b=OE3Gki4SRzL4h4IkAc0nlnF+xris8u5W+k6RkFYckNuy87GGNYZvFg+NUeYtm1B41F
+         xgWKn5veO7y7aM94NsrhXhuTYzTkHhvwuEBYOCDtnqxr6RA4SNdJTPGQg3SNkLH2rMBK
+         9PjVBGExhaovRYxTAdNvfkmewuEsvDaR3rvN8TehQMag2n1XQC3h8tSqvzdCG1edLaj8
+         S+rZbEzn4KYd2HhUYmabeJY7vtvhqhHMaU6TwC7M7mhEK4KEfpN6V2vF/Ss1TG69Gd0M
+         t0o1256TPrjkH4UspnqsdLE8m0GGiXMgma/qR21VVrO4v6RbX0N73yW04zACApLnrTHN
+         ZsyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760877969; x=1761482769;
+        d=1e100.net; s=20230601; t=1760877971; x=1761482771;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HGNOtq6edfpdoKT7aMe3lnq3YZWKA20XmMp9oC/vqAc=;
-        b=e4Q+Doua5A1P5FCGSJA+hJKfSPZfDsms286Hb+azzACdjdAT6MO/3foXY38nDU5++4
-         eRYl7BX1BFCqrAmPduj9QoKp21JsqM4lT2dicvCedbU4mFx7xh94BMneQYtm2H+fhzc7
-         tRwlpCZ9BTpO4vN2FWWeOkqAS4PhKwRV/CiWu7XSeTCCk8IW+rIa3jhgGU7k+SAb2FzS
-         VaNo3S+zCelYQ862F40WjKd4YEEBAxZNgLPifcx4KMRLI6GWksosdJAeKFDwWih2UWaJ
-         orVtZO4Ic65lOQk1/isNpiirRNxg8+BBvdCYLGCwrMSsrg1TuvMvpgbu8dgzobGYassf
-         EosA==
-X-Forwarded-Encrypted: i=1; AJvYcCVtHKqZljJGQRJUZt07PkhtowTK7Mhg+j+lAZCxjTRl25mCjqOu0D5TgH0Et2cuaNs4YwDQFmI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOVoFFrYm0yGUqEibbR24ifGVYqRkDxvvj6eLNkxoYeYmnZhs0
-	tfPVCK+Ju8laC+V4RrfQqibi98GnG8SgX4ILhULut2oMP8Hn81j8uljmEq0ppZqbynKJqtHjvlj
-	2ItDe
-X-Gm-Gg: ASbGncskwj+JrwKhbT5wQPckAr8x30N3xHT4ovZyBlAAmWJVtuJZ0NHj7gEw87xa5nw
-	GPp9Jrn0nst845aZiIzHTrybiZmLaQVq5rla+FUcyXJ/WgAREuMJKB09uJSKJnsMSgv63puvb7c
-	5BmRpM1AAUQqoMOTYSZuvC6mkUBPOSsPCJSUk+7ib1/tSYx4ShfRGIp+UTpJA8w4L1EaFOgVEM7
-	A9drsgNHpa+VgHC0WBaUwkDm0GOXqj9XdlnA2uzNHJCVYDU7uX8YFPgkepBCCKVGqaTj2V7r9Wp
-	fAZKM6o2IncX0efkp/DY2Kuy93dsUEq/p/euHh7+Qr/fkk1nSEro8FtNIBeQGuqYeUn1UL3W1OH
-	Oy+z+ZX8Vq3ebqfr0IqSVaTAialaAdBoKAFjrYQB86W9SwLqk+sGbNxyV71ajwuXoDL9yZw8g9A
-	zs61t77Bj6iXbgSs88lvfW7BldgoLlIqYCJSG2rhfT4bJo1YeeXatKdi1lT6I=
-X-Google-Smtp-Source: AGHT+IEm9hlIkjPauXzag3/GcymgnYK9h2G9gzy4CDlrsD27on+NLDcY/a9PAN+OwENFrdNhuuyg5w==
-X-Received: by 2002:a05:6402:2742:b0:63c:4bc9:569c with SMTP id 4fb4d7f45d1cf-63c4bc95907mr5230680a12.19.1760877969144;
-        Sun, 19 Oct 2025 05:46:09 -0700 (PDT)
+        bh=HmhrtKbFOuYR/bZCr0kTJtzEL+ndRJ/n7qpkLkm0d34=;
+        b=hHAtDL43fd0oeDLCJuD6arfJwWCilIPke0K7C8iY0eBEjxnG56Lv+wffEw82H+rf0c
+         NPQiJ+/UmRV2g/aFFiL+q72chcjN/zDPleokYaIW0d7p7FdsB8Sm7ewm/a2IHgX5icV4
+         GbOLXVqd6DFkJ554FA8/y9FEQMsGZ8xYFJbDjOgRoCc5gCPUQVapGtvDIGbYVaah4ds6
+         4XLeBGP4nQJpNnUO1vYA79+Y4O080bHYdtmVZ8xBHnMeUez2MmcHWtcL9K64tAO1cIRp
+         wI19msIN/nmNlpDUkmRMWKYtvEK4dF3CwFKlUVyK3kOUcfYLzoYpL2Gc4uI9Ntv4yD5Q
+         /gsA==
+X-Forwarded-Encrypted: i=1; AJvYcCW46lHGyJG1Ff3JrnrNz4DDYpJ1VS9CFdbnX1aPFASzurXRr7Vr4evd7iFNIes6peLx2eUitvw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzX+2YyBvZEJ8eoSgPM5gJvP4y1pTsonhNsqjyOZn+BA/J130CG
+	i5v157p80tqjh11sLwmDut03/lV/ZvO/0+LLahO5AzNGlxaPe0GFCZOi/ha0NoLlyDK+HRcTVun
+	JK9C1
+X-Gm-Gg: ASbGnctJ3JTvd8dXqnSxCbTZ5nREHyixBMTjIPVXlmb1Ngx6DI62idKY/v7TgrR7HCt
+	DE8/Kit4S/csa0yrJ3XWL/j1KnlYGmIL0yeNu2cFO0VlpUgYh499BwuHOHqix68gcvkASPUhB/a
+	AxwYdChS1qkiCm381BHYYrXEyy3JKHXfHvAdXbgRmkaH25/ZKSf9fityjtBenmWOoN6pbqw7d6L
+	7ctXusJPFOjyrSXeVvMVtA78XDpGNeToz757+Q72q2BE90vSQX0VLeqNJw5UNw+4LTAD7eV/WHK
+	qPkFGFkyxd432g3l7huurq3lcNMrl4hqpVytFd4D2huJqXqk/UWLcUfhRuZl4fEHlIkzpg1g8m4
+	LB24vmYZEWC/G+Ea4MeiQb9LnCLtwFoMjPDbLM+dWiHlf+OfamcEdlNOmJy+XLlbKmUJM3eYa2F
+	A+4XZSXRsNVzGYJ88f0Xj1fn7ZUjrSQ3J8u1eo3H65HclXrT5/
+X-Google-Smtp-Source: AGHT+IEVT1XLwp7GU591cSJDVF20RqDyC+AqhaMHKO08eKKyCbozzhN9a7ZNM8oCKN0SRLEhux4Uzg==
+X-Received: by 2002:a05:6402:518b:b0:63b:6b46:a494 with SMTP id 4fb4d7f45d1cf-63c1f645584mr9302179a12.14.1760877970780;
+        Sun, 19 Oct 2025 05:46:10 -0700 (PDT)
 Received: from cloudflare.com (79.184.180.133.ipv4.supernova.orange.pl. [79.184.180.133])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63c48a93998sm4091285a12.4.2025.10.19.05.46.04
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b65eb526175sm498321866b.56.2025.10.19.05.46.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Oct 2025 05:46:07 -0700 (PDT)
+        Sun, 19 Oct 2025 05:46:10 -0700 (PDT)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Sun, 19 Oct 2025 14:45:38 +0200
-Subject: [PATCH bpf-next v2 14/15] selftests/bpf: Cover skb metadata access
- after change_head/tail helper
+Date: Sun, 19 Oct 2025 14:45:39 +0200
+Subject: [PATCH bpf-next v2 15/15] selftests/bpf: Cover skb metadata access
+ after bpf_skb_change_proto
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,7 +87,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251019-skb-meta-rx-path-v2-14-f9a58f3eb6d6@cloudflare.com>
+Message-Id: <20251019-skb-meta-rx-path-v2-15-f9a58f3eb6d6@cloudflare.com>
 References: <20251019-skb-meta-rx-path-v2-0-f9a58f3eb6d6@cloudflare.com>
 In-Reply-To: <20251019-skb-meta-rx-path-v2-0-f9a58f3eb6d6@cloudflare.com>
 To: bpf@vger.kernel.org
@@ -106,62 +106,60 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 X-Mailer: b4 0.15-dev-07fe9
 
 Add a test to verify that skb metadata remains accessible after calling
-bpf_skb_change_head() and bpf_skb_change_tail(), which modify packet
-headroom/tailroom and can trigger head reallocation.
+bpf_skb_change_proto(), which modifies packet headroom to accommodate
+different IP header sizes.
 
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- .../bpf/prog_tests/xdp_context_test_run.c          |  5 ++++
- tools/testing/selftests/bpf/progs/test_xdp_meta.c  | 34 ++++++++++++++++++++++
- 2 files changed, 39 insertions(+)
+ .../bpf/prog_tests/xdp_context_test_run.c          |  5 +++++
+ tools/testing/selftests/bpf/progs/test_xdp_meta.c  | 25 ++++++++++++++++++++++
+ 2 files changed, 30 insertions(+)
 
 diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-index 05d862e460b5..8880feb84cbf 100644
+index 8880feb84cbf..6272d0451d23 100644
 --- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
 +++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-@@ -501,6 +501,11 @@ void test_xdp_context_tuntap(void)
- 			    skel->progs.helper_skb_adjust_room,
+@@ -506,6 +506,11 @@ void test_xdp_context_tuntap(void)
+ 			    skel->progs.helper_skb_change_head_tail,
  			    NULL, /* tc prio 2 */
  			    &skel->bss->test_pass);
-+	if (test__start_subtest("helper_skb_change_head_tail"))
++	if (test__start_subtest("helper_skb_change_proto"))
 +		test_tuntap(skel->progs.ing_xdp,
-+			    skel->progs.helper_skb_change_head_tail,
++			    skel->progs.helper_skb_change_proto,
 +			    NULL, /* tc prio 2 */
 +			    &skel->bss->test_pass);
  
  	test_xdp_meta__destroy(skel);
  }
 diff --git a/tools/testing/selftests/bpf/progs/test_xdp_meta.c b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
-index e29df7f82a89..30ad4b1d00d5 100644
+index 30ad4b1d00d5..6e4abac63e68 100644
 --- a/tools/testing/selftests/bpf/progs/test_xdp_meta.c
 +++ b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
-@@ -611,4 +611,38 @@ int helper_skb_adjust_room(struct __sk_buff *ctx)
+@@ -4,6 +4,7 @@
+ #include <linux/if_ether.h>
+ #include <linux/pkt_cls.h>
+ 
++#include <bpf/bpf_endian.h>
+ #include <bpf/bpf_helpers.h>
+ #include "bpf_kfuncs.h"
+ 
+@@ -645,4 +646,28 @@ int helper_skb_change_head_tail(struct __sk_buff *ctx)
  	return TC_ACT_SHOT;
  }
  
 +SEC("tc")
-+int helper_skb_change_head_tail(struct __sk_buff *ctx)
++int helper_skb_change_proto(struct __sk_buff *ctx)
 +{
 +	int err;
 +
-+	/* Reserve 1 extra in the front for packet data */
-+	err = bpf_skb_change_head(ctx, 1, 0);
++	err = bpf_skb_change_proto(ctx, bpf_htons(ETH_P_IPV6), 0);
 +	if (err)
 +		goto out;
 +
 +	if (!check_skb_metadata(ctx))
 +		goto out;
 +
-+	/* Reserve 256 extra bytes in the front to trigger head reallocation */
-+	err = bpf_skb_change_head(ctx, 256, 0);
-+	if (err)
-+		goto out;
-+
-+	if (!check_skb_metadata(ctx))
-+		goto out;
-+
-+	/* Reserve 4k extra bytes in the back to trigger head reallocation */
-+	err = bpf_skb_change_tail(ctx, ctx->len + 4096, 0);
++	err = bpf_skb_change_proto(ctx, bpf_htons(ETH_P_IP), 0);
 +	if (err)
 +		goto out;
 +
