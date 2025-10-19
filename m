@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-230733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BDADBEE599
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 14:50:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 980FBBEE59F
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 14:51:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A54AE3AC850
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 12:47:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A635424160
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 12:47:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8552E7BBC;
-	Sun, 19 Oct 2025 12:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86823223323;
+	Sun, 19 Oct 2025 12:47:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3811221726;
-	Sun, 19 Oct 2025 12:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F5D2248A3;
+	Sun, 19 Oct 2025 12:47:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760878024; cv=none; b=FlHkhNdfumBBqbE/BrvU0GTPOy5QddlL/1w7p7A39O64dimUK3T/K80+y9LthNHGJf3jDuwSFAHNyv7GLudSEOrlfWwK2Q2uSk1nnx0qi9R0VUJWOmPB9zi+zKilbhhLSD2a+NS1IC8onaDo49+sACK+tVQcbt+lfAACKJoucsQ=
+	t=1760878074; cv=none; b=WT6usv0DCsVV+Rh+5ksah+Gn3ZBKOPnpAWsiSWN7li7rC+THrJPfWVqvCacZEJpdTRvqg5NyxsYv9wlgInJPKLuwRX6HnIQZRo1RtEAdBKmmLpV4VNlA3b16pvYiOkC4AI6oCiYAu0rVf/MM4KVz5Zfnca00gtRmvpEJ2VP7jp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760878024; c=relaxed/simple;
-	bh=dGLHpnOfSrFGVk1o2I1ecKIPDlTcUNmVZyhAjpteRe8=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lWidKDHv7Jt17ahDK3+NfEHqSIcLLC9pW9DvZEKZuwRfG61Mm8QJ0oMtgKJRHBHa0+e05yqjzW5WLCvwrcoh8BAYXIaQV2jPAOHVB0TSORMsGMsNo8YBbpGgs0DTyKeIPL9H/27vxy47Oso0QiIna10koWW9vN7/+KuwvWJiU9g=
+	s=arc-20240116; t=1760878074; c=relaxed/simple;
+	bh=O68hJ9Z2ikYFgNHHzagB34RZbWx16MRuwQ3ClkpwvlU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cNKueYMPxLZymCHBSF6mDZlsdLeLUJLUvITvT9YDvtV4P4D6jZQPciAzr2ZOIXrpEXzkDfdIIFMfKICr3gjVw5XmgmP8oNv53WcNdzIqvwrj/8j4aEfohTdzK/41XllfZH2mYfskCC2MimNDsHMAmUo0f1RHo5UqAmn919Nnvio=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vASoK-000000006pd-3Vdd;
-	Sun, 19 Oct 2025 12:46:56 +0000
-Date: Sun, 19 Oct 2025 13:46:54 +0100
+	id 1vASp7-000000006qY-34zc;
+	Sun, 19 Oct 2025 12:47:45 +0000
+Date: Sun, 19 Oct 2025 13:47:42 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -44,9 +44,20 @@ To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 1/7] net: dsa: lantiq_gswip: clarify GSWIP 2.2
- VLAN mode in comment
-Message-ID: <58f05c68362388083cda32805a31bc6b0fcb4bd0.1760877626.git.daniel@makrotopia.org>
+Cc: Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [PATCH net-next v3 2/7] net: dsa: lantiq_gswip: convert accessors to
+ use regmap
+Message-ID: <baf5cc2487823210ac648726c56d6f4ebb35d323.1760877626.git.daniel@makrotopia.org>
 References: <cover.1760877626.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -58,35 +69,233 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1760877626.git.daniel@makrotopia.org>
 
-The comment above writing the default PVID incorrectly states that
-"GSWIP 2.2 (GRX300) and later program here the VID directly."
-The truth is that even GSWIP 2.2 and newer maintain the behavior of
-GSWIP 2.1 unless the VLANMD bit in PCE Global Control Register 1 is
-set ("GSWIP2.2 VLAN Mode").
-Fix the misleading comment accordingly.
+Use regmap for register access in preparation for supporting the MaxLinear
+GSW1xx family of switches connected via MDIO or SPI.
+Rewrite the existing accessor read-poll-timeout functions to use calls to
+the regmap API for now.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/net/dsa/lantiq/lantiq_gswip.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+v2: drop error handling, it wasn't there before and it would anyway be
+    removed again by a follow-up change
 
+ drivers/net/dsa/lantiq/Kconfig        |   1 +
+ drivers/net/dsa/lantiq/lantiq_gswip.c | 109 +++++++++++++++-----------
+ drivers/net/dsa/lantiq/lantiq_gswip.h |   6 +-
+ 3 files changed, 69 insertions(+), 47 deletions(-)
+
+diff --git a/drivers/net/dsa/lantiq/Kconfig b/drivers/net/dsa/lantiq/Kconfig
+index 1cb053c823f7..3cfa16840cf5 100644
+--- a/drivers/net/dsa/lantiq/Kconfig
++++ b/drivers/net/dsa/lantiq/Kconfig
+@@ -2,6 +2,7 @@ config NET_DSA_LANTIQ_GSWIP
+ 	tristate "Lantiq / Intel GSWIP"
+ 	depends on HAS_IOMEM
+ 	select NET_DSA_TAG_GSWIP
++	select REGMAP
+ 	help
+ 	  This enables support for the Lantiq / Intel GSWIP 2.1 found in
+ 	  the xrx200 / VR9 SoC.
 diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-index 25f6b46957a0..86b410a40d32 100644
+index 86b410a40d32..7ca1767cd60e 100644
 --- a/drivers/net/dsa/lantiq/lantiq_gswip.c
 +++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
-@@ -588,7 +588,11 @@ static void gswip_port_commit_pvid(struct gswip_priv *priv, int port)
- 			  FIELD_PREP(GSWIP_PCE_VCTRL_VINR, vinr),
- 			  GSWIP_PCE_VCTRL(port));
+@@ -113,22 +113,22 @@ static const struct gswip_rmon_cnt_desc gswip_rmon_cnt[] = {
  
--	/* GSWIP 2.2 (GRX300) and later program here the VID directly. */
-+	/* Note that in GSWIP 2.2 VLAN mode the VID needs to be programmed
-+	 * directly instead of referencing the index in the Active VLAN Tablet.
-+	 * However, without the VLANMD bit (9) in PCE_GCTRL_1 (0x457) even
-+	 * GSWIP 2.2 and newer hardware maintain the GSWIP 2.1 behavior.
-+	 */
- 	gswip_switch_w(priv, idx, GSWIP_PCE_DEFPVID(port));
+ static u32 gswip_switch_r(struct gswip_priv *priv, u32 offset)
+ {
+-	return __raw_readl(priv->gswip + (offset * 4));
++	u32 val;
++
++	regmap_read(priv->gswip, offset, &val);
++
++	return val;
  }
  
+ static void gswip_switch_w(struct gswip_priv *priv, u32 val, u32 offset)
+ {
+-	__raw_writel(val, priv->gswip + (offset * 4));
++	regmap_write(priv->gswip, offset, val);
+ }
+ 
+ static void gswip_switch_mask(struct gswip_priv *priv, u32 clear, u32 set,
+ 			      u32 offset)
+ {
+-	u32 val = gswip_switch_r(priv, offset);
+-
+-	val &= ~(clear);
+-	val |= set;
+-	gswip_switch_w(priv, val, offset);
++	regmap_write_bits(priv->gswip, offset, clear | set, set);
+ }
+ 
+ static u32 gswip_switch_r_timeout(struct gswip_priv *priv, u32 offset,
+@@ -136,48 +136,34 @@ static u32 gswip_switch_r_timeout(struct gswip_priv *priv, u32 offset,
+ {
+ 	u32 val;
+ 
+-	return readx_poll_timeout(__raw_readl, priv->gswip + (offset * 4), val,
+-				  (val & cleared) == 0, 20, 50000);
++	return regmap_read_poll_timeout(priv->gswip, offset, val,
++					!(val & cleared), 20, 50000);
+ }
+ 
+ static u32 gswip_mdio_r(struct gswip_priv *priv, u32 offset)
+ {
+-	return __raw_readl(priv->mdio + (offset * 4));
++	u32 val;
++
++	regmap_read(priv->mdio, offset, &val);
++
++	return val;
+ }
+ 
+ static void gswip_mdio_w(struct gswip_priv *priv, u32 val, u32 offset)
+ {
+-	__raw_writel(val, priv->mdio + (offset * 4));
++	regmap_write(priv->mdio, offset, val);
+ }
+ 
+ static void gswip_mdio_mask(struct gswip_priv *priv, u32 clear, u32 set,
+ 			    u32 offset)
+ {
+-	u32 val = gswip_mdio_r(priv, offset);
+-
+-	val &= ~(clear);
+-	val |= set;
+-	gswip_mdio_w(priv, val, offset);
+-}
+-
+-static u32 gswip_mii_r(struct gswip_priv *priv, u32 offset)
+-{
+-	return __raw_readl(priv->mii + (offset * 4));
+-}
+-
+-static void gswip_mii_w(struct gswip_priv *priv, u32 val, u32 offset)
+-{
+-	__raw_writel(val, priv->mii + (offset * 4));
++	regmap_write_bits(priv->mdio, offset, clear | set, set);
+ }
+ 
+ static void gswip_mii_mask(struct gswip_priv *priv, u32 clear, u32 set,
+ 			   u32 offset)
+ {
+-	u32 val = gswip_mii_r(priv, offset);
+-
+-	val &= ~(clear);
+-	val |= set;
+-	gswip_mii_w(priv, val, offset);
++	regmap_write_bits(priv->mii, offset, clear | set, set);
+ }
+ 
+ static void gswip_mii_mask_cfg(struct gswip_priv *priv, u32 clear, u32 set,
+@@ -220,17 +208,10 @@ static void gswip_mii_mask_pcdu(struct gswip_priv *priv, u32 clear, u32 set,
+ 
+ static int gswip_mdio_poll(struct gswip_priv *priv)
+ {
+-	int cnt = 100;
++	u32 ctrl;
+ 
+-	while (likely(cnt--)) {
+-		u32 ctrl = gswip_mdio_r(priv, GSWIP_MDIO_CTRL);
+-
+-		if ((ctrl & GSWIP_MDIO_CTRL_BUSY) == 0)
+-			return 0;
+-		usleep_range(20, 40);
+-	}
+-
+-	return -ETIMEDOUT;
++	return regmap_read_poll_timeout(priv->mdio, GSWIP_MDIO_CTRL, ctrl,
++					!(ctrl & GSWIP_MDIO_CTRL_BUSY), 40, 4000);
+ }
+ 
+ static int gswip_mdio_wr(struct mii_bus *bus, int addr, int reg, u16 val)
+@@ -1893,9 +1874,37 @@ static int gswip_validate_cpu_port(struct dsa_switch *ds)
+ 	return 0;
+ }
+ 
++static const struct regmap_config sw_regmap_config = {
++	.name = "switch",
++	.reg_bits = 32,
++	.val_bits = 32,
++	.reg_shift = -2,
++	.val_format_endian = REGMAP_ENDIAN_NATIVE,
++	.max_register = GSWIP_SDMA_PCTRLp(6),
++};
++
++static const struct regmap_config mdio_regmap_config = {
++	.name = "mdio",
++	.reg_bits = 32,
++	.val_bits = 32,
++	.reg_shift = -2,
++	.val_format_endian = REGMAP_ENDIAN_NATIVE,
++	.max_register = GSWIP_MDIO_PHYp(0),
++};
++
++static const struct regmap_config mii_regmap_config = {
++	.name = "mii",
++	.reg_bits = 32,
++	.val_bits = 32,
++	.reg_shift = -2,
++	.val_format_endian = REGMAP_ENDIAN_NATIVE,
++	.max_register = GSWIP_MII_CFGp(6),
++};
++
+ static int gswip_probe(struct platform_device *pdev)
+ {
+ 	struct device_node *np, *gphy_fw_np;
++	__iomem void *gswip, *mdio, *mii;
+ 	struct device *dev = &pdev->dev;
+ 	struct gswip_priv *priv;
+ 	int err;
+@@ -1906,15 +1915,27 @@ static int gswip_probe(struct platform_device *pdev)
+ 	if (!priv)
+ 		return -ENOMEM;
+ 
+-	priv->gswip = devm_platform_ioremap_resource(pdev, 0);
++	gswip = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(gswip))
++		return PTR_ERR(gswip);
++
++	mdio = devm_platform_ioremap_resource(pdev, 1);
++	if (IS_ERR(mdio))
++		return PTR_ERR(mdio);
++
++	mii = devm_platform_ioremap_resource(pdev, 2);
++	if (IS_ERR(mii))
++		return PTR_ERR(mii);
++
++	priv->gswip = devm_regmap_init_mmio(dev, gswip, &sw_regmap_config);
+ 	if (IS_ERR(priv->gswip))
+ 		return PTR_ERR(priv->gswip);
+ 
+-	priv->mdio = devm_platform_ioremap_resource(pdev, 1);
++	priv->mdio = devm_regmap_init_mmio(dev, mdio, &mdio_regmap_config);
+ 	if (IS_ERR(priv->mdio))
+ 		return PTR_ERR(priv->mdio);
+ 
+-	priv->mii = devm_platform_ioremap_resource(pdev, 2);
++	priv->mii = devm_regmap_init_mmio(dev, mii, &mii_regmap_config);
+ 	if (IS_ERR(priv->mii))
+ 		return PTR_ERR(priv->mii);
+ 
+diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
+index 69c8d2deff2d..24d759e06e15 100644
+--- a/drivers/net/dsa/lantiq/lantiq_gswip.h
++++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
+@@ -263,9 +263,9 @@ struct gswip_vlan {
+ };
+ 
+ struct gswip_priv {
+-	__iomem void *gswip;
+-	__iomem void *mdio;
+-	__iomem void *mii;
++	struct regmap *gswip;
++	struct regmap *mdio;
++	struct regmap *mii;
+ 	const struct gswip_hw_info *hw_info;
+ 	const struct xway_gphy_match_data *gphy_fw_name_cfg;
+ 	struct dsa_switch *ds;
 -- 
 2.51.1.dirty
 
