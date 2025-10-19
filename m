@@ -1,219 +1,118 @@
-Return-Path: <netdev+bounces-230711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D216BEDE69
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 07:21:11 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3631CBEDE8A
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 07:42:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5AC4A4E22DC
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 05:21:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 043F24E1AAA
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 05:42:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC86E21CFE0;
-	Sun, 19 Oct 2025 05:21:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF0421A434;
+	Sun, 19 Oct 2025 05:42:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZnEb356I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F2921A444
-	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 05:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65427139D
+	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 05:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760851265; cv=none; b=YnG+Rz/1IECeUQ4hyk69Z0s31w9WoaBhNF5Xj1YQ+UNDOOO05iMeSND/7LfEKm25hMIXjQJ8grtv2tCvqHZInhbJLdUYJR8mSgTJH/vbW7p0sky8pntbTEiDfGt7KpaT37Jb8+Qytc2+es/5E20dNgIaAFHY1qEH4lBbFFaUNPE=
+	t=1760852559; cv=none; b=girmk7nNnF5oio59NYwdNntKD2dvOWZ7nJuTlZqU1Q32TMhUQZt+VV36ptf6a8bTh3nrcvhaU9D26lFwRXaFRkbepngv2lqCR8GQUdmBEf43zVaalqK/elDLnwLt5nWHnwGcDkDy+MQwWRlq46ExliDljSNJNzM4UyrsI95Lz08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760851265; c=relaxed/simple;
-	bh=hQaHikWcVr2i7ZAH1RrJiLpW9x6EFM0CftXG8wfoV3w=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=ERVe+A0HhVA5toztqdvYbGIQogB+rNKNQyNSoqELEyZuFx02RKv0mUYYiJwwxBtyLU7OQ9MJon9+jFzRFOeBwNqVVqYoPfxUS65bd3W+7KRyfs7m97XVp7ajh5fCOzzVDWECjPD1a72XYPGA2HRWlfJBufXNiqmpLN0FAC4JyXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-93e809242d0so441621739f.0
-        for <netdev@vger.kernel.org>; Sat, 18 Oct 2025 22:21:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760851263; x=1761456063;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uhzhcHUwo4ZyompuCoZqx2j3/YltPabeKiRa2l7zjes=;
-        b=KaLjKojiY9MnLZydvshmYvh3XENK5YMnHIjS+GxQNqnLVsf5oTeUXz+5GNWPI/WETs
-         m3RsHG/2Xeq5mzE6tRVclGV+IkWs58za5FIF9ZF/Krn8qMBoKjvExR6qN5+akMKUT8UL
-         Dr/yYMDFmozj7nAdg8xj/htOa9UKbmdIZ85SGij76vK2UUjL8raFAmQP+cZv/tJtNJX8
-         sZ28G4utSAsHuoWyUwuRwDv7wFY96sKcIfomkchuik2t+eXPwZwaGXO1HEENxCU4BZ3J
-         Bfb/dqh4cq1QOiW5yT9/zeCjYdJMFnEhAarMtkYJPXoWDWRAUL7AuMuwrMaCvAqE/KVa
-         80BA==
-X-Forwarded-Encrypted: i=1; AJvYcCWIugn+ORcADRKKCAOrntt9/7H+yE0f8nFjdkXclpQk8XZQJYIs9qgndK8A7XjcZTImc3srO3Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxt7yZbqXFQ8S5DaL08JDL6R8IUbjUoFnPa1AFcld2iwTCo0nP1
-	7ZSGHYBTB9HsMcj3sbTh/coRVGMGH1Mj5PEk5Sx+Rd7JvZExvgBQx2gNOCYYfHGir7SEZxShXdh
-	4yb1CSR1IV1foiDGbnGsuCNBE7Gz/U8VfGZ7cUlKff1Ax2kBnKqIjxs6CYL8=
-X-Google-Smtp-Source: AGHT+IFuKYukxdLm/ppJg+C4mWBSwZpcLCiKXhLDI9Rn/aF9zGghOTi/S4VNihhWa9fjAeCDcj97w7AsKQUnxIbU5WruXjlyHZ07
+	s=arc-20240116; t=1760852559; c=relaxed/simple;
+	bh=JwvyXEk5u7W/dNhcRhuFNYkPJTG9KPcmeDQEyLfTKwM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QK2hFeuLM0C8tNT/+3sE2ugzB3fBwylRCahomZ+gRiDdzBCHgxhn5WoNHGsFlX05E/1tjPhYoGBB+3RC4pOQx14EsEHD8Q7cj5sbYiLsQe0EEapwWpRnrrYsyChrGJ6UB7PomJyGmJkinPeNHVbro2VyCOMFRx6cmWhSnowgfZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZnEb356I; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760852558; x=1792388558;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=JwvyXEk5u7W/dNhcRhuFNYkPJTG9KPcmeDQEyLfTKwM=;
+  b=ZnEb356IwaAYfQEp1mWoHj++8ICz4QHMsKIdxZsOlZXa6Z0O69r3RoTY
+   XEf7K9Qa/Qvucc1HVAmUrQoxM0jpsGZje5WDurs2mqDTEXHn0CaWSq4FQ
+   nphCu0UjNKS4GLAMq8EfAGn8nu5q7hG6cJfMe/c0giI1X2KLT1rvmJpLE
+   AMqN4L5Imfi95PZefAP0j3kU6De2HHLu3WdPmTGlSw5mYDJEALO5o09Py
+   aAD9+ZskiEBkpGtP3Duq6mS7ZMi8HQa+Iw/bpAsGfkOHv833rORjPxln7
+   uSwFzZvOUeOzHKBa2JZrIFgg7zgpVGh/ap6wKJFNyMNNAeGo4OY91ObBX
+   A==;
+X-CSE-ConnectionGUID: etD/LFUHRHCkBGrZd5WBYw==
+X-CSE-MsgGUID: tDvLF/3XRSa67nfaSzgdrA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="66844700"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="66844700"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2025 22:42:37 -0700
+X-CSE-ConnectionGUID: Cr2lA1C4S4ukm6k8N8sLbQ==
+X-CSE-MsgGUID: fFsTQQWeSlyZep3EjYx+nw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,239,1754982000"; 
+   d="scan'208";a="188159912"
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by orviesa005.jf.intel.com with ESMTP; 18 Oct 2025 22:42:35 -0700
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vAMBc-0008sT-1e;
+	Sun, 19 Oct 2025 05:42:32 +0000
+Date: Sun, 19 Oct 2025 13:42:21 +0800
+From: kernel test robot <lkp@intel.com>
+To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
+	Shyam-sundar.S-k@amd.com, Raju Rangoju <Raju.Rangoju@amd.com>
+Subject: Re: [PATCH net-next v2 1/4] amd-xgbe: introduce support ethtool
+ selftest
+Message-ID: <202510191317.AG2Qwfkm-lkp@intel.com>
+References: <20251017064704.3911798-2-Raju.Rangoju@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:489:b0:93e:2f4c:97be with SMTP id
- ca18e2360f4ac-93e7642f8e7mr1520982939f.15.1760851263078; Sat, 18 Oct 2025
- 22:21:03 -0700 (PDT)
-Date: Sat, 18 Oct 2025 22:21:03 -0700
-In-Reply-To: <u5ck7lywwa3aa54w2wnfftzqfch3pr6eguayue5ljvsneefd5x@swt7jxbxaeur>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68f4753f.a70a0220.205af.0011.GAE@google.com>
-Subject: Re: [syzbot] [hams?] KASAN: slab-use-after-free Read in nr_add_node
-From: syzbot <syzbot+2860e75836a08b172755@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	listout@listout.xyz, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251017064704.3911798-2-Raju.Rangoju@amd.com>
 
-Hello,
+Hi Raju,
 
-syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-KASAN: slab-use-after-free Read in nr_add_node
+kernel test robot noticed the following build errors:
 
-==================================================================
-BUG: KASAN: slab-use-after-free in nr_add_node+0x25e5/0x2c10 net/netrom/nr_route.c:249
-Read of size 4 at addr ffff88805466ddb0 by task syz.1.4225/15237
+[auto build test ERROR on net-next/main]
 
-CPU: 2 UID: 0 PID: 15237 Comm: syz.1.4225 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xcd/0x630 mm/kasan/report.c:482
- kasan_report+0xe0/0x110 mm/kasan/report.c:595
- nr_add_node+0x25e5/0x2c10 net/netrom/nr_route.c:249
- nr_rt_ioctl+0x11b7/0x29b0 net/netrom/nr_route.c:653
- nr_ioctl+0x19a/0x2d0 net/netrom/af_netrom.c:1254
- sock_do_ioctl+0x118/0x280 net/socket.c:1254
- sock_ioctl+0x227/0x6b0 net/socket.c:1375
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl fs/ioctl.c:583 [inline]
- __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f4229d8efc9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f422ac41038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f4229fe5fa0 RCX: 00007f4229d8efc9
-RDX: 0000200000000280 RSI: 000000000000890b RDI: 0000000000000004
-RBP: 00007f4229e11f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f4229fe6038 R14: 00007f4229fe5fa0 R15: 00007ffe9d4efb98
- </TASK>
+url:    https://github.com/intel-lab-lkp/linux/commits/Raju-Rangoju/amd-xgbe-introduce-support-ethtool-selftest/20251017-151230
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20251017064704.3911798-2-Raju.Rangoju%40amd.com
+patch subject: [PATCH net-next v2 1/4] amd-xgbe: introduce support ethtool selftest
+config: xtensa-randconfig-002-20251019 (https://download.01.org/0day-ci/archive/20251019/202510191317.AG2Qwfkm-lkp@intel.com/config)
+compiler: xtensa-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251019/202510191317.AG2Qwfkm-lkp@intel.com/reproduce)
 
-Allocated by task 15224:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:56
- kasan_save_track+0x14/0x30 mm/kasan/common.c:77
- poison_kmalloc_redzone mm/kasan/common.c:400 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:417
- kmalloc_noprof include/linux/slab.h:957 [inline]
- nr_add_node+0xe4e/0x2c10 net/netrom/nr_route.c:146
- nr_rt_ioctl+0x11b7/0x29b0 net/netrom/nr_route.c:653
- nr_ioctl+0x19a/0x2d0 net/netrom/af_netrom.c:1254
- sock_do_ioctl+0x118/0x280 net/socket.c:1254
- sock_ioctl+0x227/0x6b0 net/socket.c:1375
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl fs/ioctl.c:583 [inline]
- __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202510191317.AG2Qwfkm-lkp@intel.com/
 
-Freed by task 15237:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:56
- kasan_save_track+0x14/0x30 mm/kasan/common.c:77
- __kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:587
- kasan_save_free_info mm/kasan/kasan.h:406 [inline]
- poison_slab_object mm/kasan/common.c:252 [inline]
- __kasan_slab_free+0x5f/0x80 mm/kasan/common.c:284
- kasan_slab_free include/linux/kasan.h:234 [inline]
- slab_free_hook mm/slub.c:2530 [inline]
- slab_free mm/slub.c:6619 [inline]
- kfree+0x2b8/0x6d0 mm/slub.c:6826
- nr_neigh_put include/net/netrom.h:143 [inline]
- nr_neigh_put include/net/netrom.h:137 [inline]
- nr_add_node+0x23c3/0x2c10 net/netrom/nr_route.c:246
- nr_rt_ioctl+0x11b7/0x29b0 net/netrom/nr_route.c:653
- nr_ioctl+0x19a/0x2d0 net/netrom/af_netrom.c:1254
- sock_do_ioctl+0x118/0x280 net/socket.c:1254
- sock_ioctl+0x227/0x6b0 net/socket.c:1375
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl fs/ioctl.c:583 [inline]
- __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+All errors (new ones prefixed by >>):
 
-The buggy address belongs to the object at ffff88805466dd80
- which belongs to the cache kmalloc-64 of size 64
-The buggy address is located 48 bytes inside of
- freed 64-byte region [ffff88805466dd80, ffff88805466ddc0)
+   xtensa-linux-ld: drivers/net/ethernet/amd/xgbe/xgbe-selftest.o: in function `xgbe_test_loopback_validate':
+>> xgbe-selftest.c:(.text+0x250): undefined reference to `ip_send_check'
+   xtensa-linux-ld: drivers/net/ethernet/amd/xgbe/xgbe-selftest.o: in function `xgbe_test_mac_loopback':
+   xgbe-selftest.c:(.text+0x4c2): undefined reference to `ip_send_check'
+   xtensa-linux-ld: drivers/net/ethernet/amd/xgbe/xgbe-selftest.o: in function `xgbe_test_loopback_validate':
+>> xgbe-selftest.c:(.text+0x260): undefined reference to `udp4_hwcsum'
+   xtensa-linux-ld: drivers/net/ethernet/amd/xgbe/xgbe-selftest.o: in function `xgbe_test_mac_loopback':
+   xgbe-selftest.c:(.text+0x5b2): undefined reference to `udp4_hwcsum'
 
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x5466d
-flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000000 ffff88801b4428c0 ffffea0000867b00 dead000000000004
-raw: 0000000000000000 0000000000200020 00000000f5000000 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52c40(GFP_NOFS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 5345, tgid 5345 (udevd), ts 58557594470, free_ts 0
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1c0/0x230 mm/page_alloc.c:1850
- prep_new_page mm/page_alloc.c:1858 [inline]
- get_page_from_freelist+0x10a3/0x3a30 mm/page_alloc.c:3884
- __alloc_frozen_pages_noprof+0x25f/0x2470 mm/page_alloc.c:5183
- alloc_pages_mpol+0x1fb/0x550 mm/mempolicy.c:2416
- alloc_slab_page mm/slub.c:3046 [inline]
- allocate_slab mm/slub.c:3219 [inline]
- new_slab+0x24a/0x360 mm/slub.c:3273
- ___slab_alloc+0xdc4/0x1ae0 mm/slub.c:4643
- __slab_alloc.constprop.0+0x63/0x110 mm/slub.c:4762
- __slab_alloc_node mm/slub.c:4838 [inline]
- slab_alloc_node mm/slub.c:5260 [inline]
- __do_kmalloc_node mm/slub.c:5633 [inline]
- __kmalloc_noprof+0x501/0x880 mm/slub.c:5646
- kmalloc_noprof include/linux/slab.h:961 [inline]
- kzalloc_noprof include/linux/slab.h:1094 [inline]
- tomoyo_encode2+0x100/0x3e0 security/tomoyo/realpath.c:45
- tomoyo_encode+0x29/0x50 security/tomoyo/realpath.c:80
- tomoyo_realpath_from_path+0x18f/0x6e0 security/tomoyo/realpath.c:283
- tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
- tomoyo_check_open_permission+0x2ab/0x3c0 security/tomoyo/file.c:771
- tomoyo_file_open+0x6b/0x90 security/tomoyo/tomoyo.c:334
- security_file_open+0x84/0x1e0 security/security.c:3183
- do_dentry_open+0x596/0x1530 fs/open.c:942
- vfs_open+0x82/0x3f0 fs/open.c:1097
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffff88805466dc80: 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc fc
- ffff88805466dd00: 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc fc
->ffff88805466dd80: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-                                     ^
- ffff88805466de00: 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc fc
- ffff88805466de80: 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc fc
-==================================================================
-
-
-Tested on:
-
-commit:         1c64efcb Merge tag 'rust-rustfmt' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12a8bde2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f3e7b5a3627a90dd
-dashboard link: https://syzkaller.appspot.com/bug?extid=2860e75836a08b172755
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=13e20de2580000
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
