@@ -1,172 +1,173 @@
-Return-Path: <netdev+bounces-230762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09419BEEE5B
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 01:00:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF46ABEEE6D
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 01:01:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 817D2189764A
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 23:00:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15E9E3AA749
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 23:00:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC6E25EF9C;
-	Sun, 19 Oct 2025 23:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C46E24729C;
+	Sun, 19 Oct 2025 23:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=alibaba-inc.com header.i=@alibaba-inc.com header.b="Y2WERlrf"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="4nuaGIy/";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QhDFAL4k"
 X-Original-To: netdev@vger.kernel.org
-Received: from out0-208.mail.aliyun.com (out0-208.mail.aliyun.com [140.205.0.208])
+Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C652261B92;
-	Sun, 19 Oct 2025 23:00:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.205.0.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8749202976
+	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 23:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760914814; cv=none; b=X0YRA6fvUQcJr+LgZjgMTpNW8D74fq9PEiHxKl5oxViEGdCBfZCZtzm7lFYwvSdsUFMdZavNPiQWZamU5JFQ8NuBrg7A9VthEmuu976lik/IdQq2j/2o61sTLAtWnWODXlATDZP8cwMb4HN4ksYkIbYBSJDieWlIpgrZkjg0xdI=
+	t=1760914850; cv=none; b=Zq208squ37Kf7sLsyk2z+i0ntqFgWqUW9NKsE/D3DCUxwb81CIRItSi8rXIbOym4MNp5HmHpvKXEJr/s+gdPCOJGsfGR9oyVOA61mTAbOuHICwuMup1B5X1sOfEebha7KvQ4G44quCv/Mh40TOr+RAYA4IyU1k4yI8C0dAzMtTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760914814; c=relaxed/simple;
-	bh=2Rc+WjMFgglehJ3tiZmcIoep0JXsYpE2ZGazherNKT0=;
-	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:References:
-	 In-Reply-To:Content-Type; b=YFtLmaLUFhGSMaIfYxjiYtMlhxnyG0c7GJh+pgqkQuS9ck5a4n+2+5JVrgyfqzCKixv5eZXjXKnc6aEa237qHZgGLhiFg4K1Ku2baAfAhkNBTn7eUXnHPxko+r65p8XSHFFUFDpDQWzdb4GxbMey+KRur4/4kYa6x4ZnA2enD3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alibaba-inc.com; spf=pass smtp.mailfrom=alibaba-inc.com; dkim=pass (1024-bit key) header.d=alibaba-inc.com header.i=@alibaba-inc.com header.b=Y2WERlrf; arc=none smtp.client-ip=140.205.0.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alibaba-inc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alibaba-inc.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=alibaba-inc.com; s=default;
-	t=1760914807; h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type;
-	bh=2Rc+WjMFgglehJ3tiZmcIoep0JXsYpE2ZGazherNKT0=;
-	b=Y2WERlrfSOVf6KBAoKJ49bqtaowiki18K5sZPDDO6lquiKPVkS752Kfna4KQqNJU8W0uPn3OZGArZgdFJnG5Sfm29nqX5jqczxaxE7ejWkuYtNbGiEcQk9e7UmUMHQ62TGH3tNvK1T1BId+E7GjjxOQGlQZd9z2rM6AZGHRfxI0=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045128091;MF=peng.yu@alibaba-inc.com;NM=1;PH=DW;RN=6;SR=0;TI=W4_0.2.3_21250D26_1760913373001_o7001c147d;
-Received: from WS-web (peng.yu@alibaba-inc.com[W4_0.2.3_21250D26_1760913373001_o7001c147d] cluster:ay29) at Mon, 20 Oct 2025 07:00:07 +0800
-Date: Mon, 20 Oct 2025 07:00:07 +0800
-From: "=?UTF-8?B?WVUsIFBlbmc=?=" <peng.yu@alibaba-inc.com>
-To: "Eric Dumazet" <edumazet@google.com>,
-  "Peng Yu" <yupeng0921@gmail.com>
-Cc: "ncardwell" <ncardwell@google.com>,
-  "kuniyu" <kuniyu@google.com>,
-  "netdev" <netdev@vger.kernel.org>,
-  "linux-kernel" <linux-kernel@vger.kernel.org>
-Reply-To: "=?UTF-8?B?WVUsIFBlbmc=?=" <peng.yu@alibaba-inc.com>
-Message-ID: <befd947e-8725-4637-8fac-6a364b0b4df0.peng.yu@alibaba-inc.com>
-Subject: =?UTF-8?B?UmU6IFtQQVRDSF0gbmV0OiBzZXQgaXNfY3duZF9saW1pdGVkIHdoZW4gdGhlIHNtYWxsIHF1?=
-  =?UTF-8?B?ZXVlIGNoZWNrIGZhaWxz?=
-X-Mailer: [Alimail-Mailagent revision 560][W4_0.2.3][null][Chrome]
+	s=arc-20240116; t=1760914850; c=relaxed/simple;
+	bh=vDSwGwbdYtsn7LQdKYHvWAIvfQA1/egDi0A2fjbkEuA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mHGXscAfy7HlQ6UEHETQTZwzhY8muvw6eV/aY3Y72VYNepYhBHBK5N1VJAJeJGrXvjfAJqKC7IhVPtuNFZSKkNc1CT/mQaJ5Smnvo40GxzbLsogYZZjSdMAfrphdivX3dCJEYsyU+CGaOF3/kID8Ej49q/UY8LHQdLVDQL4ggNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=4nuaGIy/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QhDFAL4k; arc=none smtp.client-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.phl.internal (Postfix) with ESMTP id CC16EEC0122;
+	Sun, 19 Oct 2025 19:00:45 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Sun, 19 Oct 2025 19:00:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1760914845; x=
+	1761001245; bh=29TPynyEp1oN42nw9gedUTkz9DI5eNHDBplK4IjE9YQ=; b=4
+	nuaGIy/83sbxawN39TsBQQhjsOiAT+oPtOKIhWWZgkNHdeJZzcg5L95vBbxdNQ1n
+	ihWEVwOrWJoDODxvmsFcUyzQO8autsuLbe+D4ze3vRZA+Lh7y78AHg9Yuu1q9X2U
+	ibqGZ0Vf7KzDxqj4owsMe+uOKAsNFL1urUSbFS1W40CGh63aNyyufv+5EZpcl5I1
+	4jfa7PuQEYj+bu+oc6mX+SE0rVHTq3D3jYa9xE7/wyagVqXs1A3qQ9kJy6++M5qf
+	Lz6WjjNRXRSh/hHbN1aJui9/5PY6eiw2XgfqNII5JD7SMStf0yqOeLLI4mcSpXDL
+	59SF1mcbazT3snIvExQCA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1760914845; x=1761001245; bh=29TPynyEp1oN42nw9gedUTkz9DI5eNHDBpl
+	K4IjE9YQ=; b=QhDFAL4k5TSJ3JCM6xfHsPVvyQWBLAlmoBbeiYik6aFQq9WL98v
+	1/+0OVLJ09WcPXfpLBq4Zw1+qVdEgHlgEILang0wzMAlelqcCeGmXFdoiIMLEDox
+	Ia1gVelrenJIrZPtQ8biL1Xl7B/euJvWO4dQTGzjEGjdfnkdERue0hKJ7wLveAw9
+	kjKJpecnLc9yKLClWw69QkRDlwVtRz8dzbqYs5JY3k031lh0LB/JFHDmiy5YaYmm
+	eSfc4XEn5tv/KF7kH3Pik9NOrFbpFWgh6XjDf1KQqL0bbPNQP8sOoDKpp+Nzxm4M
+	ddfSTeZLyvCWgiDlFkkkBj5mmBkwsR2pHUw==
+X-ME-Sender: <xms:nG31aHnknRrm674WvE-ajArqsWxiFE6-0swwNyme_rip8i4JVT1D3Q>
+    <xme:nG31aMUnrEO3x1G12IkzptbFNjpD8HxX0s0FDzRFWYtgadaJNH30VriqkQmC4k16D
+    Y9XjggNKpt17ar9aAK8t106wpwuKtF8pSK3PE3lWxLW4sX-1e0EPg>
+X-ME-Received: <xmr:nG31aNupuTBjf8heh7x7k2RO02FZJxJafVaP3EoYiDutFktSpExfOT5yr5hn>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddufeeivdduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepueejjeeivdejvddtgffgfeelvedvvdfgjeffudfhgefhudekkefhffef
+    heduieeunecuffhomhgrihhnpehgihhtqdhstghmrdgtohhmpdhgihhthhhusgdrtghomh
+    dpkhgvrhhnvghlrdhorhhgpddtuddrohhrghenucevlhhushhtvghrufhiiigvpedtnecu
+    rfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnh
+    gspghrtghpthhtohephedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepshhtvghf
+    fhgvnhdrkhhlrghsshgvrhhtsehsvggtuhhnvghtrdgtohhmpdhrtghpthhtohepnhgvth
+    guvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohgvqdhksghuihhl
+    ugdqrghllheslhhishhtshdrlhhinhhugidruggvvhdprhgtphhtthhopehlkhhpsehinh
+    htvghlrdgtohhmpdhrtghpthhtoheprgguohgsrhhihigrnhesghhmrghilhdrtghomh
+X-ME-Proxy: <xmx:nW31aPZtiBE8qkt4xqWUb9j5UtBcMC5whh2X0fyJu79dD_9mP9HY5A>
+    <xmx:nW31aMUd4xK-Fnh-vK1kOkpBAhISodgDt5sb52NTdawoZIZxT43BrQ>
+    <xmx:nW31aETsf1bkqq3xW7U3s6PxoCHZdwxkgrLLhGtXMt_BXwUYnTFTVQ>
+    <xmx:nW31aKMLMNLVGJbp6gA3JUkGqIatisQPFvj75-u3re7ksjJs0x_qfQ>
+    <xmx:nW31aOTsDrisoF49dyF6deIW7Oiq9IGIAFpeV7DV2I_CF7QTmaAnyn_V>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 19 Oct 2025 19:00:44 -0400 (EDT)
+Date: Mon, 20 Oct 2025 01:00:42 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: steffen.klassert@secunet.com
+Cc: netdev@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
+	kernel test robot <lkp@intel.com>,
+	Alexey Dobriyan <adobriyan@gmail.com>
+Subject: Re: [PATCH ipsec 6/6] xfrm: check all hash buckets for leftover
+ states during netns deletion
+Message-ID: <aPVtmloGOCQi_7ue@krikkit>
+References: <2a743a05bbad7ebdc36c2c86a5fcbb9e99071c7b.1760610268.git.sd@queasysnail.net>
+ <202510172159.iLR9bfcc-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-x-aliyun-im-through: {"version":"v1.0"}
-References: <20251019170016.138561-1-peng.yu@alibaba-inc.com>,<CANn89iLsDDQuuQF2i73_-HaHMUwd80Q_ePcoQRy_8GxY2N4eMQ@mail.gmail.com>
-x-aliyun-mail-creator: W4_0.2.3_null_Ny4TW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwOC4wLjUzNTkuMTI1IFNhZmFyaS81MzcuMzYgZGluZ3RhbGstd2luLzEuMC4wIG53KDAuMTQuNykgRGluZ1RhbGsoNy44LjEwLVJlbGVhc2UuODAwMTUpIE1vam8vMS4wLjAgTmF0aXZlIEFwcFR5cGUocmVsZWFzZSkgQ2hhbm5lbC8xNjI4NDg3OTcwNzAwIDJuZFR5cGUvZXhjbHVzaXZlIEFyY2hpdGVjdHVyZS94ODZfNjQgT3JnYW5pemF0aW9uL2V4Y2x1c2l2ZV9kaW5ndGFsa18yMTAwMQ==Gs
-In-Reply-To: <CANn89iLsDDQuuQF2i73_-HaHMUwd80Q_ePcoQRy_8GxY2N4eMQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <202510172159.iLR9bfcc-lkp@intel.com>
 
-SSB0aGluayB3ZSBrbm93IHRoZSByb290IGNhdXNlIGluIHRoZSBkcml2ZXIuIFdlIGFyZSB1c2lu
-ZyB0aGUKdmlydGlvX25ldCBkcml2ZXIuIFdlIGZvdW5kIHRoYXQgdGhlIGlzc3VlIGhhcHBlbnMg
-YWZ0ZXIgdGhpcyBkcml2ZXIKY29tbWl0OgoKYjkyZjFlNjc1MWE2IHZpcnRpby1uZXQ6IHRyYW5z
-bWl0IG5hcGkKCkFjY29yZGluZyB0byBvdXIgdGVzdCwgdGhlIGlzc3VlIHdpbGwgaGFwcGVuIGlm
-IHdlIGFwcGx5IGJlbG93IGNoYW5nZToKCgogc3RhdGljIGludCB4bWl0X3NrYihzdHJ1Y3Qgc2Vu
-ZF9xdWV1ZSAqc3EsIHN0cnVjdCBza19idWZmICpza2IpCiB7CiAgICAgICAgc3RydWN0IHZpcnRp
-b19uZXRfaGRyX21yZ19yeGJ1ZiAqaGRyOwpAQCAtMTEzMCw2ICsxMTc0LDcgQEAgc3RhdGljIG5l
-dGRldl90eF90IHN0YXJ0X3htaXQoc3RydWN0IHNrX2J1ZmYgKnNrYiwgc3RydWN0IG5ldF9kZXZp
-Y2UgKmRldikKICAgICAgICBpbnQgZXJyOwogICAgICAgIHN0cnVjdCBuZXRkZXZfcXVldWUgKnR4
-cSA9IG5ldGRldl9nZXRfdHhfcXVldWUoZGV2LCBxbnVtKTsKICAgICAgICBib29sIGtpY2sgPSAh
-c2tiLT54bWl0X21vcmU7CisgICAgICAgYm9vbCB1c2VfbmFwaSA9IHNxLT5uYXBpLndlaWdodDsK
-CiAgICAgICAgLyogRnJlZSB1cCBhbnkgcGVuZGluZyBvbGQgYnVmZmVycyBiZWZvcmUgcXVldWVp
-bmcgbmV3IG9uZXMuICovCiAgICAgICAgZnJlZV9vbGRfeG1pdF9za2JzKHNxKTsKQEAgLTExNTIs
-OCArMTE5NywxMCBAQCBzdGF0aWMgbmV0ZGV2X3R4X3Qgc3RhcnRfeG1pdChzdHJ1Y3Qgc2tfYnVm
-ZiAqc2tiLCBzdHJ1Y3QgbmV0X2RldmljZSAqZGV2KQogICAgICAgIH0KCiAgICAgICAgLyogRG9u
-J3Qgd2FpdCB1cCBmb3IgdHJhbnNtaXR0ZWQgc2ticyB0byBiZSBmcmVlZC4gKi8KLSAgICAgICBz
-a2Jfb3JwaGFuKHNrYik7Ci0gICAgICAgbmZfcmVzZXQoc2tiKTsKKyAgICAgICBpZiAoIXVzZV9u
-YXBpKSB7CisgICAgICAgICAgICAgICBza2Jfb3JwaGFuKHNrYik7CisgICAgICAgICAgICAgICBu
-Zl9yZXNldChza2IpOworICAgICAgIH0KCgpCZWZvcmUgdGhpcyBjaGFuZ2UsIHRoZSBkcml2ZXIg
-d2lsbCBpbnZva2Ugc2tiX29ycGhhbiBpbW1lZGlhdGVseSB3aGVuCml0IHJlY2VpdmVzIGEgc2ti
-LCB0aGVuIHRoZSB0Y3AgbGF5ZXIgd2lsbCBkZWNyZWFzZSB0aGUgd21lbV9hbGxvYy4KVGh1cyB0
-aGUgc21hbGwgcXVldWUgY2hlY2sgd29uJ3QgZmFpbC4gQWZ0ZXIgYXBwbHlpbmcgdGhpcyBjaGFu
-Z2UsIHRoZQp2aXJ0aW9fbmV0IGRyaXZlciB3aWxsIHRlbGwgdGNwIGxheWVyIHRvIGRlY3JlYXNl
-IHRoZSB3bWVtX2FsbG9jIHdoZW4KdGhlIHNrcCBpcyByZWFsbHkgc2VudCBvdXQuCklmIHdlIHNl
-dCB1c2VfbmFwaSB0byBmYWxzZSwgdGhlIHZpcnRpb19uZXQgZHJpdmVyIHdpbGwgaW52b2tlCnNr
-Yl9vcnBoYW4gaW1tZWRpYXRlbHkgYXMgYmVmb3JlLCB0aGVuIHRoZSBpc3N1ZSB3b24ndCBoYXBw
-ZW4uCkJ1dCBpbnZva2luZyBza2Jfb3JwaGFuIGluIHN0YXJ0X3htaXQgbG9va3MgbGlrZSBhIHdv
-cmthcm91bmQgdG8gbWUsCkknbSBub3Qgc3VyZSBpZiB3ZSBzaG91bGQgcm9sbGJhY2sgdGhpcyBj
-aGFuZ2UuICBUaGUgc21hbGwgcXVldWUgY2hlY2sKYW5kIGN3bmQgd2luZG93IHdvdWxkIGNvbWUg
-aW50byBhIGtpbmQgb2YgImRlYWQgbG9jayIgc2l0dWF0aW9uIHRvIG1lLApzbyBJIHN1cHBvc2Ug
-d2Ugc2hvdWxkIGZpeCB0aGF0ICJkZWFkIGxvY2siLiAgSWYgeW91IGJlbGlldmUgd2UKc2hvdWxk
-bid0IGNoYW5nZSBUQ1AgbGF5ZXIgZm9yIHRoaXMgaXNzdWUsIG1heSBJIGtub3cgdGhlIGNvcnJl
-Y3QKZGlyZWN0aW9uIHRvIHJlc29sdmUgdGhpcyBpc3N1ZT8gU2hvdWxkIHdlIG1vZGlmeSB0aGUg
-dmlydGlvX25ldApkcml2ZXIsIGxldCBpdCBhbHdheXMgaW52b2tlIHNrYl9vcnBoYW4gYXMgYmVm
-b3JlPwpBcyBhIHdvcmthcm91bmQsIHdlIHNldCB0aGUgdmlydGlvX25ldCBtb2R1bGUgcGFyYW1l
-dGVyIG5hcGlfdHggdG8KZmFsc2UsIHRoZW4gdGhlIHVzZV9uYXBpIHdvdWxkIGJlIGZhbHNlIHRv
-by4gVGh1cyB0aGUgaXNzdWUgd29uJ3QKaGFwcGVuLiBCdXQgd2UgaW5kZWVkIHdhbnQgdG8gZW5h
-YmxlIG5hcGlfdHgsIHNvIG1heSBJIGtub3cgd2hhdCdzCnlvdXIgc3VnZ2VzdGlvbiBhYm91dCB0
-aGlzIGlzc3VlPwoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpGcm9tOkVyaWMgRHVtYXpldCA8ZWR1bWF6ZXRAZ29vZ2xl
-LmNvbT4KU2VuZCBUaW1lOjIwMjUgT2N0LiAyMCAoTW9uLikgMDE6NDMKVG86UGVuZyBZdTx5dXBl
-bmcwOTIxQGdtYWlsLmNvbT4KQ0M6bmNhcmR3ZWxsPG5jYXJkd2VsbEBnb29nbGUuY29tPjsga3Vu
-aXl1PGt1bml5dUBnb29nbGUuY29tPjsgbmV0ZGV2PG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc+OyAi
-bGludXgta2VybmVsIjxsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnPjsgUGVuZyBZVTxwZW5n
-Lnl1QGFsaWJhYmEtaW5jLmNvbT4KU3ViamVjdDpSZTogW1BBVENIXSBuZXQ6IHNldCBpc19jd25k
-X2xpbWl0ZWQgd2hlbiB0aGUgc21hbGwgcXVldWUgY2hlY2sgZmFpbHMKCgpPbiBTdW4sIE9jdCAx
-OSwgMjAyNSBhdCAxMDowMCBBTSBQZW5nIFl1IDx5dXBlbmcwOTIxQGdtYWlsLmNvbT4gd3JvdGU6
-Cj4KPiBUaGUgbGltaXQgb2YgdGhlIHNtYWxsIHF1ZXVlIGNoZWNrIGlzIGNhbGN1bGF0ZWQgZnJv
-bSB0aGUgcGFjaW5nIHJhdGUsCj4gdGhlIHBhY2luZyByYXRlIGlzIGNhbGN1bGF0ZWQgZnJvbSB0
-aGUgY3duZC4gSWYgdGhlIGN3bmQgaXMgc21hbGwsCj4gdGhlIHNtYWxsIHF1ZXVlIGNoZWNrIG1h
-eSBmYWlsLgo+IFdoZW4gdGhlIHNhbWxsIHF1ZXVlIGNoZWNrIGZhaWxzLCB0aGUgdGNwIGxheWVy
-IHdpbGwgc2VuZCBsZXNzCj4gcGFja2FnZXMsIHRoZW4gdGhlIHRjcF9pc19jd25kX2xpbWl0ZWQg
-d291bGQgYWxyZWF5cyByZXR1cm4gZmFsc2UsCj4gdGhlbiB0aGUgY3duZCB3b3VsZCBoYXZlIG5v
-IGNoYW5jZSB0byBnZXQgdXBkYXRlZC4KPiBUaGUgY3duZCBoYXMgbm8gY2hhbmNlIHRvIGdldCB1
-cGRhdGVkLCBpdCBrZWVwcyBzbWFsbCwgdGhlbiB0aGUgcGFjaW5nCj4gcmF0ZSBrZWVwcyBzbWFs
-bCwgYW5kIHRoZSBsaW1pdCBvZiB0aGUgc21hbGwgcXVldWUgY2hlY2sga2VlcHMgc21hbGwsCj4g
-dGhlbiB0aGUgc21hbGwgcXVldWUgY2hlY2sgd291bGQgYWx3YXlzIGZhaWwuCj4gSXQgaXMgYSBr
-aW5kIG9mIGRlYWQgbG9jaywgd2hlbiBhIHRjcCBmbG93IGNvbWVzIGludG8gdGhpcyBzaXR1YXRp
-b24sCj4gaXQncyB0aHJvdWdocHV0IHdvdWxkIGJlIHZlcnkgc21hbGwsIG9idmlvdXNseSBsZXNz
-IHRoZW4gdGhlIGNvcnJlY3QKPiB0aHJvdWdocHV0IGl0IHNob3VsZCBoYXZlLgo+IFdlIHNldCBp
-c19jd25kX2xpbWl0ZWQgdG8gdHJ1ZSB3aGVuIHRoZSBzbWFsbCBxdWV1ZSBjaGVjayBmYWlscywg
-dGhlbgo+IHRoZSBjd25kIHdvdWxkIGhhdmUgYSBjaGFuY2UgdG8gZ2V0IHVwZGF0ZWQsIHRoZW4g
-d2UgY2FuIGJyZWFrIHRoaXMKPiBkZWFkbG9jay4KPgo+IEJlbG93IHNzIG91dHB1dCBzaG93cyB0
-aGlzIGlzc3VlOgo+Cj4gc2ttZW06KHIwLHJiMTMxMDcyLAo+IHQ3NzEyLCA8LS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tIHdtZW1fYWxsb2MgPSA3NzEyCj4gdGIyNDM3MTIsZjIxMjgsdzIx
-OTA1NixvMCxibDAsZDApCj4gdHMgc2FjayBjdWJpYyB3c2NhbGU6NywxMCBydG86MjI0IHJ0dDoy
-My4zNjQvMC4wMTkgYXRvOjQwIG1zczoxNDQ4Cj4gcG10dTo4NTAwIHJjdm1zczo1MzYgYWR2bXNz
-Ojg0NDgKPiBjd25kOjI4IDwtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gY3duZD0yOAo+
-IGJ5dGVzX3NlbnQ6MjE2NjIwOCBieXRlc19hY2tlZDoyMTQ4ODMyIGJ5dGVzX3JlY2VpdmVkOjM3
-Cj4gc2Vnc19vdXQ6MTQ5NyBzZWdzX2luOjc1MSBkYXRhX3NlZ3Nfb3V0OjE0OTYgZGF0YV9zZWdz
-X2luOjEKPiBzZW5kIDEzODgyNTU0YnBzIGxhc3RzbmQ6NyBsYXN0cmN2OjI5OTIgbGFzdGFjazo3
-Cj4gcGFjaW5nX3JhdGUgMjc3NjQyMTZicHMgPC0tLS0tLS0tLS0tLS0tLS0tLS0tLSBwYWNpbmdf
-cmF0ZT0yNzc2NDIxNmJwcwo+IGRlbGl2ZXJ5X3JhdGUgNTc4NjY4OGJwcyBkZWxpdmVyZWQ6MTQ4
-NSBidXN5OjI5OTFtcyB1bmFja2VkOjEyCj4gcmN2X3NwYWNlOjU3MDg4IHJjdl9zc3RocmVzaDo1
-NzA4OCBub3RzZW50OjE4ODI0MAo+IG1pbnJ0dDoyMy4zMTkgc25kX3duZDo1NzA4OAo+Cj4gbGlt
-aXQ9KDI3NzY0MjE2IC8gOCkgLyAxMDI0ID0gMzM4OSA8IDc3MTIKPiBTbyB0aGUgc2FtbGwgcXVl
-dWUgY2hlY2sgZmFpbHMuIFdoZW4gaXQgaGFwcGVucywgdGhlIHRocm91Z2hwdXQgaXMKPiBvYnZp
-b3VzbHkgbGVzcyB0aGFuIHRoZSBub3JtYWwgc2l0dWF0aW9uLgo+Cj4gQnkgc2V0dGluZyB0aGUg
-dGNwX2lzX2N3bmRfbGltaXRlZCB0byB0cnVlIHdoZW4gdGhlIHNtYWxsIHF1ZXVlIGNoZWNrCj4g
-ZmFpbGVkLCB3ZSBjYW4gYXZvaWQgdGhpcyBpc3N1ZSwgdGhlIGN3bmQgY291bGQgaW5jcmVhc2Ug
-dG8gYSByZWFzb25hbGJlCj4gc2l6ZSwgaW4gbXkgdGVzdCBlbnZpcm9ubWVudCwgaXQgaXMgYWJv
-dXQgNDAwMC4gVGhlbiB0aGUgc21hbGwgcXVldWUKPiBjaGVjayB3b24ndCBmYWlsLgoKCj4KPiBT
-aWduZWQtb2ZmLWJ5OiBQZW5nIFl1IDxwZW5nLnl1QGFsaWJhYmEtaW5jLmNvbT4KPiAtLS0KPsKg
-IG5ldC9pcHY0L3RjcF9vdXRwdXQuYyB8IDQgKysrLQo+wqAgMSBmaWxlIGNoYW5nZWQsIDMgaW5z
-ZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQo+Cj4gZGlmZiAtLWdpdCBhL25ldC9pcHY0L3RjcF9v
-dXRwdXQuYyBiL25ldC9pcHY0L3RjcF9vdXRwdXQuYwo+IGluZGV4IGI5NGVmYjMwNTBkMi4uOGM3
-MGFjZjNhMDYwIDEwMDY0NAo+IC0tLSBhL25ldC9pcHY0L3RjcF9vdXRwdXQuYwo+ICsrKyBiL25l
-dC9pcHY0L3RjcF9vdXRwdXQuYwo+IEBAIC0yOTg1LDggKzI5ODUsMTAgQEAgc3RhdGljIGJvb2wg
-dGNwX3dyaXRlX3htaXQoc3RydWN0IHNvY2sgKnNrLCB1bnNpZ25lZCBpbnQgbXNzX25vdywgaW50
-IG5vbmFnbGUsCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgdW5saWtlbHkodHNvX2Zy
-YWdtZW50KHNrLCBza2IsIGxpbWl0LCBtc3Nfbm93LCBnZnApKSkKPiDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCBicmVhazsKPgo+IC0gwqAgwqAgwqAgwqAgwqAgwqAgwqAgaWYg
-KHRjcF9zbWFsbF9xdWV1ZV9jaGVjayhzaywgc2tiLCAwKSkKPiArIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIGlmICh0Y3Bfc21hbGxfcXVldWVfY2hlY2soc2ssIHNrYiwgMCkpIHsKPiArIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGlzX2N3bmRfbGltaXRlZCA9IHRydWU7Cj4gwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgYnJlYWs7Cj4gKyDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCB9Cj4KPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCAvKiBBcmdoLCB3ZSBoaXQgYW4gZW1w
-dHkgc2tiKCksIHByZXN1bWFibHkgYSB0aHJlYWQKPsKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-ICogaXMgc2xlZXBpbmcgaW4gc2VuZG1zZygpL3NrX3N0cmVhbV93YWl0X21lbW9yeSgpLgo+IC0t
-Cj4gMi40Ny4zCgpTb3JyeSB0aGlzIG1ha2VzIG5vIHNlbnNlIHRvIG1lLsKgIENXTkRfTElNSVRF
-RCBzaG91bGQgbm90IGJlIGhpamFja2VkLgoKU29tZXRoaW5nIGVsc2UgaXMgcHJldmVudGluZyB5
-b3VyIGZsb3dzIHRvIGdldCB0byBub21pbmFsIHNwZWVkLApiZWNhdXNlIHdlIGhhdmUgbm90IHNl
-ZW4gYW55dGhpbmcgbGlrZSB0aGF0LgoKSXQgaXMgcHJvYmFibHkgYSBkcml2ZXIgaXNzdWUgb3Ig
-YSByZWNlaXZlIHNpZGUgaXNzdWUgOiBJbnN0ZWFkIG9mCnRyeWluZyB0byB3b3JrIGFyb3VuZCB0
-aGUgaXNzdWUsIHBsZWFzZSByb290IGNhdXNlIGl0Lgo=
+Hi Steffen,
+
+2025-10-17, 23:10:36 +0800, kernel test robot wrote:
+> Hi Sabrina,
+> 
+> kernel test robot noticed the following build warnings:
+> 
+> [auto build test WARNING on klassert-ipsec-next/master]
+> [also build test WARNING on klassert-ipsec/master net/main net-next/main linus/master v6.18-rc1 next-20251016]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Sabrina-Dubroca/xfrm-drop-SA-reference-in-xfrm_state_update-if-dir-doesn-t-match/20251016-184507
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git master
+> patch link:    https://lore.kernel.org/r/2a743a05bbad7ebdc36c2c86a5fcbb9e99071c7b.1760610268.git.sd%40queasysnail.net
+> patch subject: [PATCH ipsec 6/6] xfrm: check all hash buckets for leftover states during netns deletion
+> config: x86_64-randconfig-r123-20251017 (https://download.01.org/0day-ci/archive/20251017/202510172159.iLR9bfcc-lkp@intel.com/config)
+> compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251017/202510172159.iLR9bfcc-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202510172159.iLR9bfcc-lkp@intel.com/
+> 
+> sparse warnings: (new ones prefixed by >>)
+[...]
+>   3308	void xfrm_state_fini(struct net *net)
+>   3309	{
+>   3310		unsigned int sz;
+>   3311		int i;
+>   3312	
+>   3313		flush_work(&net->xfrm.state_hash_work);
+>   3314		xfrm_state_flush(net, 0, false);
+>   3315		flush_work(&xfrm_state_gc_work);
+>   3316	
+>   3317		WARN_ON(!list_empty(&net->xfrm.state_all));
+>   3318	
+>   3319		for (i = 0; i <= net->xfrm.state_hmask; i++) {
+> > 3320			WARN_ON(!hlist_empty(net->xfrm.state_byseq + i));
+
+So, before my patch there was a sparse waraning on the
+
+	WARN_ON(!hlist_empty(net->xfrm.state_by*));
+
+lines, and now there's a sparse warning on the loop.
+(and plenty on other lines in net/xfrm/xfrm_state.c)
+
+This bot message gave me the push to finally take a look at all the
+sparse warnings in net/xfrm/xfrm_state.c, I have solutions for a big
+chunk of them (and a few in other files).
+
+If you want to drop this patch from the set, I'll re-send it later, on
+top of the sparse stuff. The rest of the series works without it. If
+you want to take it as is, it doesn't change the sparse situation in
+this file (a few warnings moved around) and I'll do the sparse
+cleanups on top of it.
+
+Thanks,
+
+-- 
+Sabrina
 
