@@ -1,64 +1,60 @@
-Return-Path: <netdev+bounces-230739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB935BEE5B4
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 14:53:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B30EBBEE5B7
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 14:54:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA0EC4251DB
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 12:49:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CD223A4ACA
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 12:52:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B002E8B8A;
-	Sun, 19 Oct 2025 12:49:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F472E8E04;
+	Sun, 19 Oct 2025 12:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWazlU26"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B3C21FF4A;
-	Sun, 19 Oct 2025 12:49:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E106824A3
+	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 12:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760878152; cv=none; b=sCqtc2SPn4I1jMnf+VzNJAiAVCCx9XB6+lUEq7VC7KsOhoQmapNWEM7xQUozzLVcPT1NKgFsL2LW8jNUwe8jeYyGbmkN7twPLG6negdjqPQ/ruyyjLi7Wqs05XX+o+136pHHrGGV8XglJqOSINIOEd2s73D/WTcfHy4MOgySX4U=
+	t=1760878359; cv=none; b=STJrMaW9+/hX0gkiQzlRy+Q2+o8gATL6jZhFPo+Ww/8/Evbd3VN8x6mGv5pYsWdWklWyx46VTpj5xE2J4QnT5j3d/9ztLKKHsfws6eL4ByziwqMJCzZNMGb4MtnxNDw7HX5yN+hW294AcKPuG+vYB9kkiRP4KkH2m8Waq+hm/js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760878152; c=relaxed/simple;
-	bh=dnXAqdpQ5Ch9fRBeYmVZUMLZzGxs9wgLsU/wx8f6Etw=;
+	s=arc-20240116; t=1760878359; c=relaxed/simple;
+	bh=UbE88YWWAc8XyAp+MVFqgTRLPmVHI+mEJKw5PV4xPJU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=boItajHjhtbEOG604V7Jrmaxwu3vpEmg11eRAGAnpTNLXxzKHAwqnBd1DCJO3sV95QBG8Pv/dGZb9Z2P80JJZpQgDANIaOmX+4Ot8U+V8kVCKga5xDduIh7z3TrobTqApQXoq57e1XM3ZRRGjAuuwvtmc6OoVwgWwzeZe1pmumo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vASqM-000000006t0-2otU;
-	Sun, 19 Oct 2025 12:49:02 +0000
-Date: Sun, 19 Oct 2025 13:48:59 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v3 7/7] net: dsa: lantiq_gswip: harmonize
- gswip_mii_mask_*() parameters
-Message-ID: <5a11a554c563ed7b45a55565247d8b7a502435b4.1760877626.git.daniel@makrotopia.org>
-References: <cover.1760877626.git.daniel@makrotopia.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tQYweHkTiGlPhQkvhnuFSEEC5UOr5QxExxW/bxEle8lD4gT6Vgy4gD6Us4Ro5jNBlQgchS4EcBGEl2ijV7Pm695BtPhyja1lhAaTscmYCRUZBS3IrKL/ZoH2Hh+a1En+Yv8rTgI2FyhbFdXPDShykM1oy/M6yB2WDiDvuxmcqRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWazlU26; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D965C4CEE7;
+	Sun, 19 Oct 2025 12:52:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760878356;
+	bh=UbE88YWWAc8XyAp+MVFqgTRLPmVHI+mEJKw5PV4xPJU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZWazlU26UIP2r3/7nSHClCUDd2fljjKVS3U2S3MijghV90B8txa7lRdERwqka3BBO
+	 sp6o+TgAxQUHtq7+EIartjPYsQDdYWLWpek2zi2pMvx9dp4Fzl0DvvIwodFJqTslPq
+	 IEQ+7FFsUIWJ6YWoqekPoitKNB8wTg0oFtbWgIOA+WfBL0fVZ8StI1ZFrtkfWp39K5
+	 ri//sl9wukt79NZZ4/10t5CGxsOVwgR6uzD62G34z0ddIillr0Zlspj7jQx5fN3kZz
+	 rRD+jj+uW0wXKYe00Sqv++ZshgpTI4QPtVnfMNQZjXUvvCm+foXjCYZkie+vXnhMth
+	 QjH88B9wjgUtg==
+Date: Sun, 19 Oct 2025 15:52:31 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: jgg@ziepe.ca, michael.chan@broadcom.com, dave.jiang@intel.com,
+	saeedm@nvidia.com, Jonathan.Cameron@huawei.com, davem@davemloft.net,
+	corbet@lwn.net, edumazet@google.com, gospo@broadcom.com,
+	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, selvin.xavier@broadcom.com,
+	kalesh-anakkur.purayil@broadcom.com
+Subject: Re: [PATCH net-next v5 2/5] bnxt_en: Refactor aux bus functions to
+ be more generic
+Message-ID: <20251019125231.GH6199@unreal>
+References: <20251014081033.1175053-1-pavan.chebbi@broadcom.com>
+ <20251014081033.1175053-3-pavan.chebbi@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,75 +63,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1760877626.git.daniel@makrotopia.org>
+In-Reply-To: <20251014081033.1175053-3-pavan.chebbi@broadcom.com>
 
-The 'clear' parameter of gswip_mii_mask_cfg() and gswip_mii_mask_pcdu()
-is inconsistent with the semantics of regmap_write_bits() which also
-applies the mask to the value to be written.
-Change the semantic mask/set of the functions gswip_mii_mask_cfg() and
-gswip_mii_mask_pcdu() to follow the regmap_write_bits() pattern.
+On Tue, Oct 14, 2025 at 01:10:30AM -0700, Pavan Chebbi wrote:
+> Up until now there was only one auxiliary device that bnxt
+> created and that was for RoCE driver. bnxt fwctl is also
+> going to use an aux bus device that bnxt should create.
+> This requires some nomenclature changes and refactoring of
+> the existing bnxt aux dev functions.
+> 
+> Convert 'aux_priv' and 'edev' members of struct bnxt into
+> arrays where each element contains supported auxbus device's
+> data. Move struct bnxt_aux_priv from bnxt.h to ulp.h because
+> that is where it belongs. Make aux bus init/uninit/add/del
+> functions more generic which will accept aux device type as
+> a parameter. Make bnxt_ulp_start/stop functions (the only
+> other common functions applicable to any aux device) loop
+> through the aux devices to update their config and states.
+> 
+> Also, as an improvement in code, bnxt_register_dev() can skip
+> unnecessary dereferencing of edev from bp, instead use the
+> edev pointer from the function parameter.
+> 
+> Future patches will reuse these functions to add an aux bus
+> device for fwctl.
+> 
+> Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
+> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  29 ++-
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  13 +-
+>  .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   2 +-
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 238 ++++++++++--------
+>  include/linux/bnxt/ulp.h                      |  23 +-
+>  5 files changed, 181 insertions(+), 124 deletions(-)
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/dsa/lantiq/lantiq_gswip.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+<...>
 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-index f54fbd0e48f8..44c6f7c8953c 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
-@@ -120,7 +120,7 @@ static u32 gswip_switch_r_timeout(struct gswip_priv *priv, u32 offset,
- 					!(val & cleared), 20, 50000);
- }
- 
--static void gswip_mii_mask_cfg(struct gswip_priv *priv, u32 clear, u32 set,
-+static void gswip_mii_mask_cfg(struct gswip_priv *priv, u32 mask, u32 set,
- 			       int port)
- {
- 	int reg_port;
-@@ -131,11 +131,11 @@ static void gswip_mii_mask_cfg(struct gswip_priv *priv, u32 clear, u32 set,
- 
- 	reg_port = port + priv->hw_info->mii_port_reg_offset;
- 
--	regmap_write_bits(priv->mii, GSWIP_MII_CFGp(reg_port), clear | set,
-+	regmap_write_bits(priv->mii, GSWIP_MII_CFGp(reg_port), mask,
- 			  set);
- }
- 
--static void gswip_mii_mask_pcdu(struct gswip_priv *priv, u32 clear, u32 set,
-+static void gswip_mii_mask_pcdu(struct gswip_priv *priv, u32 mask, u32 set,
- 				int port)
- {
- 	int reg_port;
-@@ -148,16 +148,13 @@ static void gswip_mii_mask_pcdu(struct gswip_priv *priv, u32 clear, u32 set,
- 
- 	switch (reg_port) {
- 	case 0:
--		regmap_write_bits(priv->mii, GSWIP_MII_PCDU0, clear | set,
--				  set);
-+		regmap_write_bits(priv->mii, GSWIP_MII_PCDU0, mask, set);
- 		break;
- 	case 1:
--		regmap_write_bits(priv->mii, GSWIP_MII_PCDU1, clear | set,
--				  set);
-+		regmap_write_bits(priv->mii, GSWIP_MII_PCDU1, mask, set);
- 		break;
- 	case 5:
--		regmap_write_bits(priv->mii, GSWIP_MII_PCDU5, clear | set,
--				  set);
-+		regmap_write_bits(priv->mii, GSWIP_MII_PCDU5, mask, set);
- 		break;
- 	}
- }
-@@ -1506,7 +1503,7 @@ static void gswip_phylink_mac_link_up(struct phylink_config *config,
- 		gswip_port_set_pause(priv, port, tx_pause, rx_pause);
- 	}
- 
--	gswip_mii_mask_cfg(priv, 0, GSWIP_MII_CFG_EN, port);
-+	gswip_mii_mask_cfg(priv, GSWIP_MII_CFG_EN, GSWIP_MII_CFG_EN, port);
- }
- 
- static void gswip_get_strings(struct dsa_switch *ds, int port, u32 stringset,
--- 
-2.51.1.dirty
+> -void bnxt_rdma_aux_device_uninit(struct bnxt *bp)
+> +void bnxt_aux_device_uninit(struct bnxt *bp, enum bnxt_auxdev_type idx)
+>  {
+>  	struct bnxt_aux_priv *aux_priv;
+>  	struct auxiliary_device *adev;
+>  
+>  	/* Skip if no auxiliary device init was done. */
+> -	if (!bp->aux_priv)
+> +	if (!bp->aux_priv[idx])
+>  		return;
+
+<...>
+
+> -void bnxt_rdma_aux_device_del(struct bnxt *bp)
+> +void bnxt_aux_device_del(struct bnxt *bp, enum bnxt_auxdev_type idx)
+>  {
+> -	if (!bp->edev)
+> +	if (!bp->edev[idx])
+>  		return;
+
+You are not supposed to call these functions if you didn't initialize
+auxdev for this idx first. Please don't use defensive programming style
+for in-kernel API.
+
+Thanks
 
