@@ -1,104 +1,73 @@
-Return-Path: <netdev+bounces-230747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8447BEE912
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 17:59:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F555BEE9B6
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 18:17:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 840954E1A60
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 15:59:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E877189B552
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 16:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E86712EBBB0;
-	Sun, 19 Oct 2025 15:59:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B635726B761;
+	Sun, 19 Oct 2025 16:17:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JqiB9if1"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DlL3/XRt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B1C2EBB84
-	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 15:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B22C4964F
+	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 16:17:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760889577; cv=none; b=lKwu1x7epaqBZ3x/d8RoOa9a/g1upw0sWRF5Sz6CTaPHRqDvHOW1vaGqtLuI2tslTTRtBIZixQPE4L68aIGESq0+5+xWKIW6WxWZaVcgGEUY/US3wI+/SbOVvYYrZHDzpxs0eqAUhkx1gH7pUp7eVBDuUUgw/qR6QQcZpd9sXfI=
+	t=1760890667; cv=none; b=OOgWuJUdKdh0FWB6ClT33/R7lTgEXeSSp9tTPU1qukANgHiF0ieOybjwOa+JposaDSB7fIgRwdGEyShplRGqJUR7BxHvOvUfvzvyejMw0kUN6XR9uZ7NYBl4aPFnBtU2Rwz++LZfm9mjqhxaiptEid3sKfAkEFo60uD8DEtzejM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760889577; c=relaxed/simple;
-	bh=iUiqK81uM8PaPVQxTA7XtGIXzW7e9qwdKERuYe+D6p0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WcBFWV6RQSiS7A9c8A9Ahxs5m+LbVgBMmRDFpOMVK1P+F/UKfo/M/g4mlcdE0HVpeu0199WuyiM2JyPCK4hRoQMlPVKgKkG6dK6u20jkUz9u1d+SVBAUyNNaoXdehpz28NQ67yyP4xkQV9Thv9VuA0zgUpI+1S+l1OmFaKqUFw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JqiB9if1; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b47a5a17303so61096766b.3
-        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 08:59:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760889574; x=1761494374; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vTFzpahmqTTHRcTI1T2SzZtl71JkvLUoqnEeOyK8S18=;
-        b=JqiB9if1ZGaYuENOBR81msvQE0BQRO9cMhJ3+vGJ1yxN7kzSCEYwssWYlw+QuHVE2+
-         YcRctv71CJxh2Gj05eXxsZ9TEEVWdy7JAeSsZ438d3lg/dDdhMtd5rv0I/qHt3z9EiGD
-         mnKMp+iqBQaMzl4M5AJUm4ZKoQ1opHa3WhGUKVrECZ3M6nwf57zgVmr7yQhRD6d4YSyW
-         tnKvmp5+EyZ+cGm2LNdnACl6on21Qlu5Bvqg3P2SDLU1tHsc4eb82eTkV6KXS7RjgPj7
-         c4G42SOyRudkk2jH6V0SPeSZ/Ys/j/1lN13KrvXsJudGDeTPxRWfeVWbIyf4v5i/Ckzd
-         tIpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760889574; x=1761494374;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vTFzpahmqTTHRcTI1T2SzZtl71JkvLUoqnEeOyK8S18=;
-        b=aMQX5SoZQl0lMoYZPmWS6V3g5c5em3FH6X2ohvL9UQbQEcm2xtv+rz5Ze/bNOFGR8g
-         fAiogxSOM7plPcLKDd3hoqzOJhFuAhf2U1mAObpcsHsYHPaIp6i+QUjz/ie0C4MTQWuQ
-         +Pi4mYN/2Q9o5P5xB8NhXFZ42rYZXdVIOl7vMnD0RMWIlGNC1HDkQEWBBh6ShYgvpVEY
-         EvW0956PY2wQT2vbdaHGd2l5FTkgZNGS0vQi14BRb7tB3FruBpPS9/ubQMcOkIqKBpiU
-         cJLw2ceDc/Y3JfG8ljeqPsq0qbIsbpEzdMS4vMiUnTBk+Ar9XrWgGm2D+Bh87bnINHnw
-         T5ag==
-X-Gm-Message-State: AOJu0YzjaQ7N7ecKl3Hq+d+4zkhIbHlfb44W5jRWZoq917HUYAkBk4Br
-	mxt0aijMVbYTeRXpOANjyCnbGj135/6wV5Q5jqPGa94dZvH2EIVyp+Ng
-X-Gm-Gg: ASbGncut71OatBsL8uSlAUtlu7jgjHg1ueQzYk+pfZwNamKtZYU9QfBSfFEKX4nbR2+
-	gRWKIWsqnYOn5K8UE6kuDUg24rRkVAR46RMoeSuHI4yLYRDXG9+4oRIA0BDmVLRaBwUc1M7nj2t
-	0AFbNJuYRMCyg665W9iEIsVyehNGAQ/zMfyUIQ1DO+I1n8NnXeLwJIMBVrD0uDh3VzpRZPRke1Q
-	H7M2Rvs7FnN00rTEY6zJzAKCzbl5cQTwtqGtrMdBJSu2pJAWV4UPr6CoboiNldz1Bt8H+y42XA3
-	HtNhN4D5JB+0XmCrKLsGOpHA469vAg6M4XHTI/FdyLqNbrymsxtUnJHW9sswwVIeWheqgdIeXfv
-	dHPk00cxXpxVwZmyHLuk36c7EMWpnM69/4SGpcS0KVZewzeD8jRgISo/68S9HYn6FruoBp+ozJW
-	jy/wlLrQ6fRWgYzgI=
-X-Google-Smtp-Source: AGHT+IEHxFRE2pa0L8rXNH1hFC+5I0ryoeM29tlY7gH4lN9MekBBWKyrE79bZEqtF6jDZEgGQtZo1g==
-X-Received: by 2002:a17:907:3da9:b0:b2b:c145:ab8a with SMTP id a640c23a62f3a-b6472352847mr655876866b.3.1760889574232;
-        Sun, 19 Oct 2025 08:59:34 -0700 (PDT)
-Received: from bhk ([165.50.121.102])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b65eb036307sm531554766b.45.2025.10.19.08.59.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Oct 2025 08:59:33 -0700 (PDT)
-From: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
-To: ast@kernel.org,
-	daniel@iogearbox.net,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	kpsingh@kernel.org,
-	haoluo@google.com,
-	jolsa@kernel.org
-Cc: netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	david.hunter.linux@gmail.com,
-	khalid@kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
-Subject: [PATCH bpf-next] bpf/cpumap.c: Remove unnecessary TODO comment
-Date: Sun, 19 Oct 2025 17:58:55 +0100
-Message-ID: <20251019165923.199247-1-mehdi.benhadjkhelifa@gmail.com>
-X-Mailer: git-send-email 2.51.1.dirty
+	s=arc-20240116; t=1760890667; c=relaxed/simple;
+	bh=vqXb80mOFAjPoe3h2l/igwhqT43nocCzsWtKUywquJY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hTgo4Ijag66HHJ2W/ZCT4RT+PM8UTYTyhSW1p4jmkIl1hrX/wSufCX2S0k4AnivFKBU7b7g747PyZ2TgPfvFpoz392KAlaeBHUiVcDOtg0tzXUREFpHYDECt/J0ClUHxV/UhIGoDJGprRTJMSkxvZ+XS/PmUGosoCURMKmzKsrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=DlL3/XRt; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59JBH6AL020815;
+	Sun, 19 Oct 2025 16:17:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=/Yy3hMpT5NgnQi27t/+XNoOdUuFEN
+	JEKglgNvRF+wdQ=; b=DlL3/XRtxvo0xW1A23ci1Qhg4ARibRhJq42A6qYg9z2M6
+	kosFXwrX2khKiRmPUKrMhNswhZZfkUPlSBd4gFUNiaWA4ZH+EgrQ1LHYuAdXlEr2
+	jky0bWfNNnaVxX4vEtV18yXLjYvREr4HCbeA8wDu6fYf61xqhf4rDKtZGM1pARQq
+	0/E6OPVzbfrsGS0RkU2hscv8D7kYWmViFaIQ1SIuRAf8VMVhIw8GV+oRhVS/zsLO
+	Z82rUT68O55H48MawhmxQ1lgGiPKqK/8VLGqUYZikUn+ytJgMA8Tm9Kx35opM9yE
+	i4fIKmRw24glS+pf/uh8/UpbLJjHGabhC77xcbeXA==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49v30713me-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 19 Oct 2025 16:17:37 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59JF0BN0013649;
+	Sun, 19 Oct 2025 16:17:37 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 49v1b9ye5h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 19 Oct 2025 16:17:37 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 59JGHaeT005168;
+	Sun, 19 Oct 2025 16:17:36 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 49v1b9ye56-1;
+	Sun, 19 Oct 2025 16:17:36 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: jiri@resnulli.us, kuba@kernel.org, davem@davemloft.net,
+        edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+        netdev@vger.kernel.org, alok.a.tiwari@oracle.com
+Cc: alok.a.tiwarilinux@gmail.com
+Subject: [PATCH net-next] devlink: region: correct port region lookup to use port_ops
+Date: Sun, 19 Oct 2025 09:17:27 -0700
+Message-ID: <20251019161731.1553423-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,32 +75,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-19_05,2025-10-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=871 malwarescore=0
+ suspectscore=0 spamscore=0 adultscore=0 bulkscore=0 phishscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2510020000 definitions=main-2510190117
+X-Proofpoint-ORIG-GUID: aqHc3ywiqsIyzhwT2jPu0rHKD_YSmaqe
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMyBTYWx0ZWRfXzWsdHM0svVCf
+ 6b2+mbLqqR//FXWPQ/t0S+URvsDaraL6xOcQBPrLCs7UeNGD+BIVCincbtc6Z35YSZV+eoi/Ty0
+ OMoFaRbjD0xwr//9iwlNBais8hCJjndLaeaEZMDhsr+yAMouSpVu/WmADwOVSyrhnfJUM8Dnr5t
+ RnW56JGLrfOswc8PnbNGgJGiedUReoakTZxeQJlCVzIbRDbGsyyHXXi0N6+VuEypLJHkQo3WFk6
+ J6kxu+pcib25anJX+6ACdwHLwYGkKS+ERxN1CBJWpUsy/W64GnLEG5Q27VNJHs5Sgn09JzoQvnd
+ rU7XXJCR8CMvpD2XeWUHKpRjOLsWv7+3JbF2JsRYOlBN5zeyslg5rChTNEMI3ZG6PHSFCYX9ETH
+ O2FLzqEJ8M1An4zWHwEdvkoY82ADTA==
+X-Proofpoint-GUID: aqHc3ywiqsIyzhwT2jPu0rHKD_YSmaqe
+X-Authority-Analysis: v=2.4 cv=csaWUl4i c=1 sm=1 tr=0 ts=68f50f21 b=1 cx=c_pps
+ a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
+ a=UfRTzp-lEnWZV1Yto5EA:9
 
-After discussion with bpf maintainers[1], queue_index could
-be propagated to the remote XDP program by the xdp_md struct[2]
-which makes this todo a misguide for future effort.
+The function devlink_port_region_get_by_name() incorrectly uses
+region->ops->name to compare the region name. as it is not any critical
+imapce as ops and port_pos define as union for devlink_region but as per
+code logica it should refer port_ops here.
 
-[1]:https://lore.kernel.org/all/87y0q23j2w.fsf@cloudflare.com/
-[2]:https://docs.ebpf.io/linux/helper-function/bpf_xdp_adjust_meta/
+no functional impact as ops and port_ops are part of same union.
 
-Signed-off-by: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
+Update it to use region->port_ops->name to properly reference
+the name of the devlink port region.
+
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 ---
- kernel/bpf/cpumap.c | 1 -
- 1 file changed, 1 deletion(-)
+ net/devlink/region.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-index 703e5df1f4ef..3c05e96b7d2c 100644
---- a/kernel/bpf/cpumap.c
-+++ b/kernel/bpf/cpumap.c
-@@ -195,7 +195,6 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
+diff --git a/net/devlink/region.c b/net/devlink/region.c
+index 63fb297f6d67..d6e5805cf3a0 100644
+--- a/net/devlink/region.c
++++ b/net/devlink/region.c
+@@ -50,7 +50,7 @@ devlink_port_region_get_by_name(struct devlink_port *port,
+ 	struct devlink_region *region;
  
- 		rxq.dev = xdpf->dev_rx;
- 		rxq.mem.type = xdpf->mem_type;
--		/* TODO: report queue_index to xdp_rxq_info */
+ 	list_for_each_entry(region, &port->region_list, list)
+-		if (!strcmp(region->ops->name, region_name))
++		if (!strcmp(region->port_ops->name, region_name))
+ 			return region;
  
- 		xdp_convert_frame_to_buff(xdpf, &xdp);
- 
+ 	return NULL;
 -- 
-2.51.1.dirty
+2.50.1
 
 
