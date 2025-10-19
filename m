@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-230740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B30EBBEE5B7
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 14:54:30 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE83BBEE5C0
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 14:59:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CD223A4ACA
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 12:52:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 88B3A4E1B8F
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 12:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F472E8E04;
-	Sun, 19 Oct 2025 12:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A4E2E92C3;
+	Sun, 19 Oct 2025 12:59:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWazlU26"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SLGo3Znb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E106824A3
-	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 12:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349C2354AC9;
+	Sun, 19 Oct 2025 12:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760878359; cv=none; b=STJrMaW9+/hX0gkiQzlRy+Q2+o8gATL6jZhFPo+Ww/8/Evbd3VN8x6mGv5pYsWdWklWyx46VTpj5xE2J4QnT5j3d/9ztLKKHsfws6eL4ByziwqMJCzZNMGb4MtnxNDw7HX5yN+hW294AcKPuG+vYB9kkiRP4KkH2m8Waq+hm/js=
+	t=1760878769; cv=none; b=Ry+eOeLivhfGI1ibAbapEMp2DcmCNviY+5pMJ38bto7Vpw+R3ZD0HWvO7OYLffyTrshZKoGgLp6pnxcUZjXOyBuSIUfaOVHSTT75WvqtkTJ4YdsQA+YnOTHiMDrI0kUAWNZ++FZm2Y1fMBUMukW6BabHD2OKy9B4+wmwYAXbNEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760878359; c=relaxed/simple;
-	bh=UbE88YWWAc8XyAp+MVFqgTRLPmVHI+mEJKw5PV4xPJU=;
+	s=arc-20240116; t=1760878769; c=relaxed/simple;
+	bh=lhydb80HhVBVgkSnReVAUtolbHDZHGSSKYBAS5qfncU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tQYweHkTiGlPhQkvhnuFSEEC5UOr5QxExxW/bxEle8lD4gT6Vgy4gD6Us4Ro5jNBlQgchS4EcBGEl2ijV7Pm695BtPhyja1lhAaTscmYCRUZBS3IrKL/ZoH2Hh+a1En+Yv8rTgI2FyhbFdXPDShykM1oy/M6yB2WDiDvuxmcqRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWazlU26; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D965C4CEE7;
-	Sun, 19 Oct 2025 12:52:35 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=gCD7DdibIxcyJBTnb2/yt23myHH8STyuYpH12y4lGRIgKdas7tzms9/p3QM8ifbi1GyfemxyVaNsSPObAb9M9Dnzabnh1UA7jiVVaLxZ85IhHlVuBANULK/749IdNRUEPj4Wo9OU8SbLaQ8glMdRkjWHM01tSE9aw+UJDQFo4Xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SLGo3Znb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05AB1C4CEE7;
+	Sun, 19 Oct 2025 12:59:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760878356;
-	bh=UbE88YWWAc8XyAp+MVFqgTRLPmVHI+mEJKw5PV4xPJU=;
+	s=k20201202; t=1760878768;
+	bh=lhydb80HhVBVgkSnReVAUtolbHDZHGSSKYBAS5qfncU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZWazlU26UIP2r3/7nSHClCUDd2fljjKVS3U2S3MijghV90B8txa7lRdERwqka3BBO
-	 sp6o+TgAxQUHtq7+EIartjPYsQDdYWLWpek2zi2pMvx9dp4Fzl0DvvIwodFJqTslPq
-	 IEQ+7FFsUIWJ6YWoqekPoitKNB8wTg0oFtbWgIOA+WfBL0fVZ8StI1ZFrtkfWp39K5
-	 ri//sl9wukt79NZZ4/10t5CGxsOVwgR6uzD62G34z0ddIillr0Zlspj7jQx5fN3kZz
-	 rRD+jj+uW0wXKYe00Sqv++ZshgpTI4QPtVnfMNQZjXUvvCm+foXjCYZkie+vXnhMth
-	 QjH88B9wjgUtg==
-Date: Sun, 19 Oct 2025 15:52:31 +0300
+	b=SLGo3Znb71BCOzWVnH7Sf9NsuQvyG4VppjygRg84GX2O3bPEvDOYQpQz82tlox48K
+	 BEt8hMCGun9/vbbIbnmoaAUWmhkgslc6WOaMta4TH/WZ9i3NSKVJpaEnHdxQ9pSbSI
+	 jRu7Z9QqYCAa4DdTRbPNtcSSIjpXhiPqdNe7WPPt7vWWJ6CVQHlLYPG43rt5eH80YL
+	 Qp0YPd7etuo4l538P0D+QbI6FvHGCsLD+DpBe5nyBYEekNd8kn1QsUy0EYO63EUgM0
+	 0d4xpFxpLzcXfDoBZE7r5hAjHF6OaqoF9EmoobF2nU1RXaiSqoqAEtzBOc9tEM42wz
+	 wn4vAkg+AObNg==
+Date: Sun, 19 Oct 2025 15:59:23 +0300
 From: Leon Romanovsky <leon@kernel.org>
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: jgg@ziepe.ca, michael.chan@broadcom.com, dave.jiang@intel.com,
-	saeedm@nvidia.com, Jonathan.Cameron@huawei.com, davem@davemloft.net,
-	corbet@lwn.net, edumazet@google.com, gospo@broadcom.com,
-	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, selvin.xavier@broadcom.com,
-	kalesh-anakkur.purayil@broadcom.com
-Subject: Re: [PATCH net-next v5 2/5] bnxt_en: Refactor aux bus functions to
- be more generic
-Message-ID: <20251019125231.GH6199@unreal>
-References: <20251014081033.1175053-1-pavan.chebbi@broadcom.com>
- <20251014081033.1175053-3-pavan.chebbi@broadcom.com>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Adithya Jayachandran <ajayachandra@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>
+Subject: Re: [PATCH mlx5-next] {rdma,net}/mlx5: Query vports mac address from
+ device
+Message-ID: <20251019125923.GI6199@unreal>
+References: <20251016014055.2040934-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,66 +61,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251014081033.1175053-3-pavan.chebbi@broadcom.com>
+In-Reply-To: <20251016014055.2040934-1-saeed@kernel.org>
 
-On Tue, Oct 14, 2025 at 01:10:30AM -0700, Pavan Chebbi wrote:
-> Up until now there was only one auxiliary device that bnxt
-> created and that was for RoCE driver. bnxt fwctl is also
-> going to use an aux bus device that bnxt should create.
-> This requires some nomenclature changes and refactoring of
-> the existing bnxt aux dev functions.
+On Wed, Oct 15, 2025 at 06:40:55PM -0700, Saeed Mahameed wrote:
+> From: Adithya Jayachandran <ajayachandra@nvidia.com>
 > 
-> Convert 'aux_priv' and 'edev' members of struct bnxt into
-> arrays where each element contains supported auxbus device's
-> data. Move struct bnxt_aux_priv from bnxt.h to ulp.h because
-> that is where it belongs. Make aux bus init/uninit/add/del
-> functions more generic which will accept aux device type as
-> a parameter. Make bnxt_ulp_start/stop functions (the only
-> other common functions applicable to any aux device) loop
-> through the aux devices to update their config and states.
+> Before this patch during either switchdev or legacy mode enablement we
+> cleared the mac address of vports between changes. This change allows us
+> to preserve the vports mac address between eswitch mode changes.
 > 
-> Also, as an improvement in code, bnxt_register_dev() can skip
-> unnecessary dereferencing of edev from bp, instead use the
-> edev pointer from the function parameter.
-> 
-> Future patches will reuse these functions to add an aux bus
-> device for fwctl.
-> 
-> Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
-> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> Signed-off-by: Adithya Jayachandran <ajayachandra@nvidia.com>
+> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+> Reviewed-by: Mark Bloch <mbloch@nvidia.com>
 > ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  29 ++-
->  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  13 +-
->  .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   2 +-
->  drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 238 ++++++++++--------
->  include/linux/bnxt/ulp.h                      |  23 +-
->  5 files changed, 181 insertions(+), 124 deletions(-)
-
-<...>
-
-> -void bnxt_rdma_aux_device_uninit(struct bnxt *bp)
-> +void bnxt_aux_device_uninit(struct bnxt *bp, enum bnxt_auxdev_type idx)
->  {
->  	struct bnxt_aux_priv *aux_priv;
->  	struct auxiliary_device *adev;
+>  drivers/infiniband/hw/mlx5/main.c             |  2 +-
+>  .../net/ethernet/mellanox/mlx5/core/eswitch.c | 20 ++++++----------
+>  .../mellanox/mlx5/core/eswitch_offloads.c     |  3 +++
+>  .../net/ethernet/mellanox/mlx5/core/vport.c   | 24 +++++++++----------
+>  include/linux/mlx5/vport.h                    |  3 ++-
+>  5 files changed, 25 insertions(+), 27 deletions(-)
+> 
+> diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/mlx5/main.c
+> index fc1e86f6c409..90daa58126f4 100644
+> --- a/drivers/infiniband/hw/mlx5/main.c
+> +++ b/drivers/infiniband/hw/mlx5/main.c
+> @@ -842,7 +842,7 @@ static int mlx5_query_node_guid(struct mlx5_ib_dev *dev,
+>  		break;
 >  
->  	/* Skip if no auxiliary device init was done. */
-> -	if (!bp->aux_priv)
-> +	if (!bp->aux_priv[idx])
->  		return;
+>  	case MLX5_VPORT_ACCESS_METHOD_NIC:
+> -		err = mlx5_query_nic_vport_node_guid(dev->mdev, &tmp);
+> +		err = mlx5_query_nic_vport_node_guid(dev->mdev, 0, false, &tmp);
+>  		break;
 
-<...>
+IB changes are pretty straightforward.
 
-> -void bnxt_rdma_aux_device_del(struct bnxt *bp)
-> +void bnxt_aux_device_del(struct bnxt *bp, enum bnxt_auxdev_type idx)
->  {
-> -	if (!bp->edev)
-> +	if (!bp->edev[idx])
->  		return;
-
-You are not supposed to call these functions if you didn't initialize
-auxdev for this idx first. Please don't use defensive programming style
-for in-kernel API.
-
-Thanks
+Thanks,
+Acked-by: Leon Romanovsky <leon@kernel.org> # RDMA
 
