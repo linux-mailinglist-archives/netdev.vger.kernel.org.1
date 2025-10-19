@@ -1,166 +1,212 @@
-Return-Path: <netdev+bounces-230713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A3E1BEDFE2
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 09:56:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCF10BEE4DD
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 14:37:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3801189E4D6
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 07:56:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84225420A24
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 12:37:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D612B22836C;
-	Sun, 19 Oct 2025 07:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC9D2E7BAD;
+	Sun, 19 Oct 2025 12:37:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eBECEz4w"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="mr7tZ637"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6198D7483
-	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 07:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50394A41;
+	Sun, 19 Oct 2025 12:37:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760860565; cv=none; b=jxCGOjFWR5So8dDX9sUPBxNcw55TgR0AhH4DXaBhFWfys/bt3RwOhGKPe/3VGS9c5YglOI4vEurZx6Kzu5u91cH4w0ECT8STzRZm3Elb8n+uJL5gJfqi33kdxwDgbAFVPapwOJemHt6ndy9YemGIuecuI3a5nK7qD/qf5rs3OkI=
+	t=1760877464; cv=none; b=feJOt1BBmQqr2VY8wbDIPztP47tXjDLCWkWHS7/NMB3pmNCBvT658W3J/QGk1dPzseCInMqyQNp0Xysq1AQNg3Cr2WSRZEafVP3zPkMbG6pmG2k4BfvzER7LhLCVrcxaS8oAa+Q3YBPqLZMwikSUA3ap4ju1hh37vYLJOeP0iXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760860565; c=relaxed/simple;
-	bh=mVLXF4lEwtvDzcwn7LlkjBNH+v+CCXpaS5jhlxOHKcA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NKE8fYjyjMKtnd0V8gbV97CeEOA6BxQSg19J6cCuqaZoakAEGc3T3h8AKt5vEEhitxWzz3dVgJZjzrlIOdOSXwz61bqHx8VIAOQmIDASPS8j1sydLnRMdZ15kPpyfX4GyO+J8B1N8on/cztSZKkPzIk0P73uSNd3OmNDqfqgOmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eBECEz4w; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-269af38418aso38732525ad.1
-        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 00:56:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760860563; x=1761465363; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3F6oM9Agr2FPxSXT/W3lN8s7vDqk89rfSGq18riZTFo=;
-        b=eBECEz4w9T+cIjgDerVnQBr0k5C4LzWj99rHH8Z+hKBm5ABca75K4ZKBOKrAHpVn1L
-         pom4hQ1+JfK8i/HNaEz6KwtKjVUj50BO+ljUVd1EtZO5aO9e7Zo8au1wnZgDnEkSA7yx
-         c+xLE/9z43IJaebBweYQJMyw7H0i5iPEnFfOGFsS9QM6Mk0aBum5gnsN2eXxOmoy8nNu
-         3OE+/rOEBu1vBg/cMJIGObNJ4fYcsW1Vh86S3e6kSLAxPeVk9dd5xzpl3lLnon3fScgg
-         S2RsfYJVQCaBgblTMluiHld5jeCQhh4u5gk+ZEhXla8Oa75b+L5/ASLWlpOXSlAckkcf
-         ps8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760860563; x=1761465363;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3F6oM9Agr2FPxSXT/W3lN8s7vDqk89rfSGq18riZTFo=;
-        b=ngDO5Dy7LPgESyAl2XfsgcncBtwhKV6IUA253raSOKwEBRNjGq22xjWAq83d1Oz/0M
-         l2lJ0Tc/i3KDwcmEA2xLGENGIsKBs8DJc9ZrQEx+qfd5H6+yA97CJtDQKpMC7bgDgYTm
-         d3kOPYZ1r3p+5tQKjUxgggWW9ptOyyXHW1R76DQIDfaADFwlXUnbGlGeFVUkJ69O4rgg
-         o6uymW5wa/GS39a9jWpEtMu+w7rqW9ODUgq92jZi27j7es14pKJhje9Lb7ppMJIFEeC4
-         7m1rjgbZkQTdHUnTE1TMr3RGbqnO0Rznk4fStjX2ygpoL0n1MhsQilm4Pjv26qPj5bo3
-         S8Wg==
-X-Gm-Message-State: AOJu0YwbEZ6DxNanoEG5/3a9DqcHbpkDqbczAU/K9yVxnbnBpj0w0Bnz
-	oipLJWqF4W/QvDi20uJm6eK8P6+2VFZMI8Ycp2vfPRxlsMJ5y6nCJmoV
-X-Gm-Gg: ASbGncuzsRe0MRcyKt1YpcIwSDvsVP9ZvcgLtgvq8TMBcZqZrXkEVM5FW1vSWuNSWUi
-	kpwcjOkh7ZPQ/qvTkC8VXMbuEccn0NWGogTHFBXKIz2t4CHGk2AyH/xHdPKNd5McncLjJ5hWCCz
-	HBA43Ua6iQsK82no7vrTcc7Vd0RE3TNbeskfBWVd5nqLF5mfexeC9/QGByqnhgcKfUn5a1Fa54S
-	5LbBVrb/ynf2TbE5G5NzmnVl7ht8gqLfZfLMX8p9hooDRUWqB5gYhAzfouZAdjACTlOkcAcLOB+
-	XKYmWlFKQDf8HcskvISbNpzSwShi/7dFdDn4mPMdVWqhfjRx8ulRlrVnoci2SnKWXY2I3IEzIDb
-	Z+cHHpWrSXv58iH0frdXJMhb7Y0FzJvVsD6iVgAKQUtEKs1lx+q9mrYA1MnPKxJRwELEzWcWi5n
-	OQQ3E3oU3uJz8PHGUM9ZTlw/A=
-X-Google-Smtp-Source: AGHT+IHp7GBC91IZMRt5+CX0l2Khc9Tjxa3JtCmaKfz/d0LS6e0hmTCYCeXlwhSz8nZBUUiCPbUPuw==
-X-Received: by 2002:a17:902:ea04:b0:269:74bf:f19a with SMTP id d9443c01a7336-290c9c89fc5mr123658105ad.11.1760860563331;
-        Sun, 19 Oct 2025 00:56:03 -0700 (PDT)
-Received: from mythos-cloud ([125.138.202.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29246ffeec3sm46200955ad.52.2025.10.19.00.56.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Oct 2025 00:56:03 -0700 (PDT)
-From: Yeounsu Moon <yyyynoom@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yeounsu Moon <yyyynoom@gmail.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net v2] net: dlink: use dev_kfree_skb_any instead of dev_kfree_skb
-Date: Sun, 19 Oct 2025 16:55:40 +0900
-Message-ID: <20251019075540.55697-1-yyyynoom@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1760877464; c=relaxed/simple;
+	bh=dgzA9LsGuiP/mYejoGwFkpon4M45cMihfvBvR4qrSRg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GZR6F4dTdA5UvN2irZqmWrvNZu7D5STaimlzgp1izDXP/XYymavfECXsTK5d+c3uL88e/OPlv1nvlBZVB2x/wF46J5qKJ5tPsgBPhbHumb7E8pA+kbkWa/cIQLot0G0lfF5TP72aSc++lJ5kEFm4/eMMi19Dhck2Uq02n/DFKfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=mr7tZ637; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54864C4CEE7;
+	Sun, 19 Oct 2025 12:37:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1760877463;
+	bh=dgzA9LsGuiP/mYejoGwFkpon4M45cMihfvBvR4qrSRg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mr7tZ637v1WDh2Nr8sg19/xoeGzZL3RvlnXfYUykPJk+G6zQteton6Oo+u5wVdnxN
+	 ZBC8QPSBVC5hJfXNWgutJHN6QRJ4bxeGe2+hYWxIp2brHCNu/KXcKMeG5P43CM4Fjg
+	 vDPDOANq6idL2020QoIIUuWRPKXTuhm7Nf2n5Cxw=
+Date: Sun, 19 Oct 2025 14:37:40 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: "Farber, Eliav" <farbere@amazon.com>
+Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"jdike@addtoit.com" <jdike@addtoit.com>,
+	"richard@nod.at" <richard@nod.at>,
+	"anton.ivanov@cambridgegreys.com" <anton.ivanov@cambridgegreys.com>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+	"luto@kernel.org" <luto@kernel.org>,
+	"peterz@infradead.org" <peterz@infradead.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"mingo@redhat.com" <mingo@redhat.com>,
+	"bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+	"hpa@zytor.com" <hpa@zytor.com>,
+	"tony.luck@intel.com" <tony.luck@intel.com>,
+	"qiuxu.zhuo@intel.com" <qiuxu.zhuo@intel.com>,
+	"mchehab@kernel.org" <mchehab@kernel.org>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"rric@kernel.org" <rric@kernel.org>,
+	"harry.wentland@amd.com" <harry.wentland@amd.com>,
+	"sunpeng.li@amd.com" <sunpeng.li@amd.com>,
+	"alexander.deucher@amd.com" <alexander.deucher@amd.com>,
+	"christian.koenig@amd.com" <christian.koenig@amd.com>,
+	"airlied@linux.ie" <airlied@linux.ie>,
+	"daniel@ffwll.ch" <daniel@ffwll.ch>,
+	"evan.quan@amd.com" <evan.quan@amd.com>,
+	"james.qian.wang@arm.com" <james.qian.wang@arm.com>,
+	"liviu.dudau@arm.com" <liviu.dudau@arm.com>,
+	"mihail.atanassov@arm.com" <mihail.atanassov@arm.com>,
+	"brian.starkey@arm.com" <brian.starkey@arm.com>,
+	"maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
+	"mripard@kernel.org" <mripard@kernel.org>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>,
+	"robdclark@gmail.com" <robdclark@gmail.com>,
+	"sean@poorly.run" <sean@poorly.run>,
+	"jdelvare@suse.com" <jdelvare@suse.com>,
+	"linux@roeck-us.net" <linux@roeck-us.net>,
+	"fery@cypress.com" <fery@cypress.com>,
+	"dmitry.torokhov@gmail.com" <dmitry.torokhov@gmail.com>,
+	"agk@redhat.com" <agk@redhat.com>,
+	"snitzer@redhat.com" <snitzer@redhat.com>,
+	"dm-devel@redhat.com" <dm-devel@redhat.com>,
+	"rajur@chelsio.com" <rajur@chelsio.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"peppe.cavallaro@st.com" <peppe.cavallaro@st.com>,
+	"alexandre.torgue@st.com" <alexandre.torgue@st.com>,
+	"joabreu@synopsys.com" <joabreu@synopsys.com>,
+	"mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
+	"malattia@linux.it" <malattia@linux.it>,
+	"hdegoede@redhat.com" <hdegoede@redhat.com>,
+	"mgross@linux.intel.com" <mgross@linux.intel.com>,
+	"intel-linux-scu@intel.com" <intel-linux-scu@intel.com>,
+	"artur.paszkiewicz@intel.com" <artur.paszkiewicz@intel.com>,
+	"jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"sakari.ailus@linux.intel.com" <sakari.ailus@linux.intel.com>,
+	"clm@fb.com" <clm@fb.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"dsterba@suse.com" <dsterba@suse.com>,
+	"xiang@kernel.org" <xiang@kernel.org>,
+	"chao@kernel.org" <chao@kernel.org>,
+	"jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
+	"adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
+	"dushistov@mail.ru" <dushistov@mail.ru>,
+	"luc.vanoostenryck@gmail.com" <luc.vanoostenryck@gmail.com>,
+	"rostedt@goodmis.org" <rostedt@goodmis.org>,
+	"pmladek@suse.com" <pmladek@suse.com>,
+	"sergey.senozhatsky@gmail.com" <sergey.senozhatsky@gmail.com>,
+	"andriy.shevchenko@linux.intel.com" <andriy.shevchenko@linux.intel.com>,
+	"linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>,
+	"minchan@kernel.org" <minchan@kernel.org>,
+	"ngupta@vflare.org" <ngupta@vflare.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"kuznet@ms2.inr.ac.ru" <kuznet@ms2.inr.ac.ru>,
+	"yoshfuji@linux-ipv6.org" <yoshfuji@linux-ipv6.org>,
+	"pablo@netfilter.org" <pablo@netfilter.org>,
+	"kadlec@netfilter.org" <kadlec@netfilter.org>,
+	"fw@strlen.de" <fw@strlen.de>,
+	"jmaloy@redhat.com" <jmaloy@redhat.com>,
+	"ying.xue@windriver.com" <ying.xue@windriver.com>,
+	"willy@infradead.org" <willy@infradead.org>,
+	"sashal@kernel.org" <sashal@kernel.org>,
+	"ruanjinjie@huawei.com" <ruanjinjie@huawei.com>,
+	"David.Laight@aculab.com" <David.Laight@aculab.com>,
+	"herve.codina@bootlin.com" <herve.codina@bootlin.com>,
+	"Jason@zx2c4.com" <Jason@zx2c4.com>,
+	"keescook@chromium.org" <keescook@chromium.org>,
+	"kbusch@kernel.org" <kbusch@kernel.org>,
+	"nathan@kernel.org" <nathan@kernel.org>,
+	"bvanassche@acm.org" <bvanassche@acm.org>,
+	"ndesaulniers@google.com" <ndesaulniers@google.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-um@lists.infradead.org" <linux-um@lists.infradead.org>,
+	"linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>,
+	"amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+	"freedreno@lists.freedesktop.org" <freedreno@lists.freedesktop.org>,
+	"linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>,
+	"linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
+	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
+	"platform-driver-x86@vger.kernel.org" <platform-driver-x86@vger.kernel.org>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
+	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+	"linux-erofs@lists.ozlabs.org" <linux-erofs@lists.ozlabs.org>,
+	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+	"linux-sparse@vger.kernel.org" <linux-sparse@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+	"coreteam@netfilter.org" <coreteam@netfilter.org>,
+	"tipc-discussion@lists.sourceforge.net" <tipc-discussion@lists.sourceforge.net>
+Subject: Re: [PATCH v2 00/27 5.10.y] Backport minmax.h updates from v6.17-rc7
+Message-ID: <2025101929-curator-poplar-7460@gregkh>
+References: <20251017090519.46992-1-farbere@amazon.com>
+ <2025101704-rumble-chatroom-60b5@gregkh>
+ <CH0PR18MB5433BB2E99395D2AC8B0E0FBC6F7A@CH0PR18MB5433.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CH0PR18MB5433BB2E99395D2AC8B0E0FBC6F7A@CH0PR18MB5433.namprd18.prod.outlook.com>
 
-Replace `dev_kfree_skb()` with `dev_kfree_skb_any()` in `start_xmit()`
-which can be called from netpoll (hard IRQ) and from other contexts.
+On Sat, Oct 18, 2025 at 08:07:32PM +0000, Farber, Eliav wrote:
+> > On Fri, Oct 17, 2025 at 09:04:52AM +0000, Eliav Farber wrote:
+> > > This series backports 27 patches to update minmax.h in the 5.10.y
+> > > branch, aligning it with v6.17-rc7.
+> > >
+> > > The ultimate goal is to synchronize all long-term branches so that they
+> > > include the full set of minmax.h changes.
+> > >
+> > > - 6.12.y has already been backported; the changes are included in
+> > >   v6.12.49.
+> > > - 6.6.y has already been backported; the changes are included in
+> > >   v6.6.109.
+> > > - 6.1.y has already been backported; the changes are currently in the
+> > >   6.1-stable tree.
+> > > - 5.15.y has already been backported; the changes are currently in the
+> > >   5.15-stable tree.
+> >
+> > With this series applied, on an arm64 server, building 'allmodconfig', I
+> > get the following build error.
+> >
+> > Oddly I don't see it on my x86 server, perhaps due to different compiler
+> > versions?
+> >
+> > Any ideas?
+> 
+> This mainline commit is missing:
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/net/wireless/ralink/rt2x00/rt2800lib.c?h=v6.18-rc1&id=66063033f77e10b985258126a97573f84bb8d3b4
+> 
+> This fix already exists in 5.15.y:
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/drivers/net/wireless/ralink/rt2x00/rt2800lib.c?h=v5.15.194&id=2d3cef3d7a5df260a14a6679c4aca0c97e570ee5
+> …but is missing in 5.10.y.
+> 
+> I now backported it to 5.10.y here:
+> https://lore.kernel.org/stable/20251018195945.18825-1-farbere@amazon.com/T/#u
 
-Also, `np->link_status` can be changed at any time by interrupt handler.
+Thanks,I've queued that up now.
 
-  <idle>-0       [011] dNh4.  4541.754603: start_xmit <-netpoll_start_xmit
-  <idle>-0       [011] dNh4.  4541.754622: <stack trace>
- => [FTRACE TRAMPOLINE]
- => start_xmit
- => netpoll_start_xmit
- => netpoll_send_skb
- => write_msg
- => console_flush_all
- => console_unlock
- => vprintk_emit
- => _printk
- => rio_interrupt
- => __handle_irq_event_percpu
- => handle_irq_event
- => handle_fasteoi_irq
- => __common_interrupt
- => common_interrupt
- => asm_common_interrupt
- => mwait_idle
- => default_idle_call
- => do_idle
- => cpu_startup_entry
- => start_secondary
- => common_startup_64
-
-This issue can occur when the link state changes from off to on
-(e.g., plugging or unplugging the LAN cable) while transmitting a
-packet. If the skb has a destructor, a warning message may be
-printed in this situation.
-
--> consume_skb (dev_kfree_skb())
-  -> __kfree_skb()
-    -> skb_release_all()
-      -> skb_release_head_state(skb)
-	 if (skb->destructor) {
-	         DEBUG_NET_WARN_ON_ONCE(in_hardirq());
-		 skb->destructor(skb);
-	 }
-
-Found by inspection.
-
-Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Tested-on: D-Link DGE-550T Rev-A3
-Reviewed-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/dlink/dl2k.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-index 7077d705e471..6e4f17142519 100644
---- a/drivers/net/ethernet/dlink/dl2k.c
-+++ b/drivers/net/ethernet/dlink/dl2k.c
-@@ -733,7 +733,7 @@ start_xmit (struct sk_buff *skb, struct net_device *dev)
- 	u64 tfc_vlan_tag = 0;
- 
- 	if (np->link_status == 0) {	/* Link Down */
--		dev_kfree_skb(skb);
-+		dev_kfree_skb_any(skb);
- 		return NETDEV_TX_OK;
- 	}
- 	entry = np->cur_tx % TX_RING_SIZE;
--- 
-2.51.0
-
+greg k-h
 
