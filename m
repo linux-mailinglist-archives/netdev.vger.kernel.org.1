@@ -1,98 +1,130 @@
-Return-Path: <netdev+bounces-230705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D24DBEDD15
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 02:04:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 50507BEDDDD
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 04:39:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1D54E4E2047
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 00:04:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CD6214E12AC
+	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 02:39:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 693EBA41;
-	Sun, 19 Oct 2025 00:04:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A0511DEFE8;
+	Sun, 19 Oct 2025 02:39:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AcN5Xqb1"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="jVh0cqPA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out203-205-221-153.mail.qq.com (out203-205-221-153.mail.qq.com [203.205.221.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882BE1373;
-	Sun, 19 Oct 2025 00:04:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22481C6FE8;
+	Sun, 19 Oct 2025 02:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760832292; cv=none; b=H4YfrTCq9HkHScBz52/KtK+xXtgjUBFBWvb5vU/VeZLEmrOSl1xA09umYg0sGwHmWobsQhUGkl5Y+ESFILH1iLNWCC3rRVNqY/TB3zpRxVTf72mRRv5FdUdxYuLzY2/l7rB6qkF5OWY+qHzxhZExeUkQWsiFIJFz0QURj+ptUiE=
+	t=1760841566; cv=none; b=PsqHTcaT8JYy09lS0Jr3RCB1wHHGMiNYmNYDyTRR77thikkkZ4FS5pTyGKPuw5la+ELbqX16TwZZALN7eVrMWxT1kMOZXYEF/zymATzcJp3w5O8urRskvjZWKnal7MRmZkSJmIvycVQV4X+dKtcNCpP/RzOnPqYAfdMxs069WxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760832292; c=relaxed/simple;
-	bh=NIlHXsTrn95hUwIwQiqLjVMv/ZLorBcbB6zrOrzvKRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=azlLtUvIldOUCNdMWB+Oarka9+d9b0tA9s4MGjCLArulDOHl6wnYz+nChXHlBIvapq/sg/2GUSAKEYWmCD1zBfYF/YGiCZnN6r399oUkorQwuReLX2MYdgqR3IE929Zt3nLutYYwb6WM4cWSO03ZyvsZq82z2VDlekfHDvetnNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AcN5Xqb1; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=rz0DjI9FG3R+Vf1dNEL5GbVU6jXA/C1j8hwA+dUf/6I=; b=AcN5Xqb1JNtWQtEk5ZUe7Vs44j
-	z6+QascX8RZXSMzyNmZzlFs0g6XLvpMzTZ0U8eTgVmWGTWkCOapk0xir30PnWmjZ3UOLRQTKoWVuS
-	ukLu99pJOm6qI3+yfv+f7nNyf4DISn160d2zMZr8VTYh9aVfCTZXUGhortzxREz4zatY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vAGu2-00BP9M-KF; Sun, 19 Oct 2025 02:04:02 +0200
-Date: Sun, 19 Oct 2025 02:04:02 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Inochi Amaoto <inochiama@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chen Wang <unicorn_wang@outlook.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Han Gao <rabenda.cn@gmail.com>, Icenowy Zheng <uwu@icenowy.me>,
-	Vivian Wang <wangruikang@iscas.ac.cn>, Yao Zi <ziyao@disroot.org>,
-	netdev@vger.kernel.org, sophgo@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH] net: stmmac: dwmac-sophgo: Add phy interface filter
-Message-ID: <370d13b7-bba8-449d-9050-e0719d20b57c@lunn.ch>
-References: <20251017011802.523140-1-inochiama@gmail.com>
- <34fcc4cd-cd3d-418a-8d06-7426d2514dee@lunn.ch>
- <i5prc7y4fxt3krghgvs7buyfkwwulxnsc2oagbwdjx4tbqjqls@fx4nkkyz6tdt>
- <c16e53f9-f506-41e8-b3c6-cc3bdb1843e1@lunn.ch>
- <aPP9cjzwihca-h6C@shell.armlinux.org.uk>
+	s=arc-20240116; t=1760841566; c=relaxed/simple;
+	bh=sCtsbj6s9oWOlzyh+nVvunK7ciprDxlQlO5meosER2g=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=aPzJ4+AgE3ssqrfuLMDu/ijRJ4gV2BbBxSTV0Umha15lY6r4PUJetuoH7brokc4gOQj+KM+bZsvkOQ0Z4Q146nGS4stQtcXMKJhMcpyJkLkvpNGmYBKIUgODfF2m1CUh09Iv8jThhjB3ZFDmbfF8NXdVfY2vFgAC9QkhiiJjZyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=jVh0cqPA; arc=none smtp.client-ip=203.205.221.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1760841253; bh=gfJdpZg6Mj7jnPrEFI526WVKOg9mgU+VkBgk5IUIq98=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=jVh0cqPATNBEAWRQ98psdQ9aEZ7S8+pcVMqIbMjUytle0Huo1TPEG/lQaN1yD1ort
+	 BctcRQi+IuHJNbLuCk/93KeOwjUGRVVAJNq0TnRX28giQJGghkLBRMXfAEKbPdBGjN
+	 AoOQAMGykuRkhFExeL5OkAF5wltuhf0A6wOmb14w=
+Received: from pek-lxu-l1.corp.ad.wrs.com ([111.198.230.220])
+	by newxmesmtplogicsvrszc41-0.qq.com (NewEsmtp) with SMTP
+	id 88B06417; Sun, 19 Oct 2025 10:34:11 +0800
+X-QQ-mid: xmsmtpt1760841251t29lg3kol
+Message-ID: <tencent_57525DE2DDF41911CFDB8DF525A08D9D9207@qq.com>
+X-QQ-XMAILINFO: MrK54zaStYC/mP5UifaMTcP2S/rcYU8ZKdmkuw0SyrrjBp0Mljn4X0BD9pjcdZ
+	 V364lhPTMJOJ8WcE7hnLRf+KCVtRM9Z7eYC/+FP5yh9ILVn6Gf0BVoV/KoQOe3hcN4ss0H2ub+0/
+	 VzxbYa8anVhr8MDthz4eXcr3iWahklvlWYzFWtNF3pcaQ8+s67b3u/jd5PImBmPd4UpA6lB+IYKC
+	 xqLQdxNg7at/28NtH9+pFQOjh7uVAJQIO/oyhcnPPCB49wPWiakyHQFkeOezSypDoqfsp8rd+Exw
+	 tAnFgucY6exr8w+Ngex5NKBBNo2GF1F9R1hy2xE9h6WAV40p+EO54b+bJBZ+Y804xdWXz1Ljr+CR
+	 VPsNN7NEQtjEbnxbzdBeqlwsB3hGrrlPoJeTbMlCY/2rsW50HxuKnvc8SsqAy2em7wMB+RqTdZM6
+	 Yck568bCYiS3sBKSC6eGmRe+uWnSaNo+P98Rr41Mn0xzYaUae4lTyuBidT6o1hJGduK9aiFMDJoO
+	 ylqUnMcofhYUMvnHeMh3mvtyAQHVvXragcJNiXKvCxEbIjF8Qre7NeK7tCXreKGBRmKWcD9+K2Fe
+	 6iip3GyJEEhKBXRXLr6xWXcGhsD6RaJqHG2IpdrY2nwvmzMRx7yIX/Nn3ov6PpUFgwG080Y6EfsT
+	 PJEPhDFoD2o/QYwQDIxxrKU1djE227JwOF8UcnZ/Q5S/cM+YrlXaEcypN+ai2MiBp92NJgAF0zvq
+	 0WWqn7wp9VuqZf5uF6Glrbm87OG3qisMwo6NrFYB7zHy7WAfTRJeQ1r9+eO7hHiPyG0PIh1ujAXR
+	 UniNiv3IGTOoYRh1fzxVbPyuX2GsTFoDiLKTihx2ad8b0logZbY4Oj4cCLxdnfOGwrkiH30ON67U
+	 MOSprYV58WHbw6p9f4lqdFmi0Nnmoq0tmkoPU6gGOr/AyJ+v2a0Ve9NHWhJjjO6T+39V7PCooMAU
+	 tzq/gUBsmHe67geXG+bJMaG9DblDrATkHZkFkFE2tKcg0BfV5nFUkqB28bNCKW
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	herbert@gondor.apana.org.au,
+	horms@kernel.org,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	steffen.klassert@secunet.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH] key: No support for family zero
+Date: Sun, 19 Oct 2025 10:34:11 +0800
+X-OQ-MSGID: <20251019023410.2613678-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <68f1d9d6.050a0220.91a22.0419.GAE@google.com>
+References: <68f1d9d6.050a0220.91a22.0419.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aPP9cjzwihca-h6C@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-> "rgmii-id" doesn't mean "there is a delay _somewhere_ in the system".
-> It's supposed to mean that the PHY should add delays on both tx and
-> rx paths.
+When setting the extended skb data for sadb_x_ipsecrequest, the requested
+extended data size exceeds the allocated skb data length, triggering the
+reported bug.
 
-When passed to the PHY it means that.
+Because family only supports AF_INET and AF_INET6, other values will cause
+pfkey_sockaddr_fill() to fail, which in turn causes set_ipsecrequest() to
+fail.
 
-However, DT describes the hardware, the PCB. "rgmii-id" means the PCB
-does not provide the delays. So the MAC/PHY combination needs to add
-the delays. We normally have the PHY provide the delays, so the
-phy-mode is normally passed straight to the PHY. However, if the MAC
-is adding a delay, which it is in this case, in one direction and
-cannot be turned off, the value passed to the PHY needs to reflect
-this, to avoid double delays.
+Therefore, a workaround is available here: using a family value of 0 to
+resolve the issue of excessively large extended data length.
 
-And because the MAC delay cannot be turned off, it means there are PCB
-designs which don't work, double delays. So it would be nice not to
-list them in the binding.
+syzbot reported:
+kernel BUG at net/core/skbuff.c:212!
+Call Trace:
+ skb_over_panic net/core/skbuff.c:217 [inline]
+ skb_put+0x159/0x210 net/core/skbuff.c:2583
+ skb_put_zero include/linux/skbuff.h:2788 [inline]
+ set_ipsecrequest+0x73/0x680 net/key/af_key.c:3532
 
-	Andrew
+Fixes: 08de61beab8a ("[PFKEYV2]: Extension for dynamic update of endpoint address(es)")
+Reported-by: syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=be97dd4da14ae88b6ba4
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ net/key/af_key.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/key/af_key.c b/net/key/af_key.c
+index 2ebde0352245..e658c129b38f 100644
+--- a/net/key/af_key.c
++++ b/net/key/af_key.c
+@@ -3526,6 +3526,9 @@ static int set_ipsecrequest(struct sk_buff *skb,
+ 	int socklen = pfkey_sockaddr_len(family);
+ 	int size_req;
+ 
++	if (!family)
++		return -EINVAL;
++
+ 	size_req = sizeof(struct sadb_x_ipsecrequest) +
+ 		   pfkey_sockaddr_pair_size(family);
+ 
+-- 
+2.43.0
+
 
