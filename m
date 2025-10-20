@@ -1,74 +1,96 @@
-Return-Path: <netdev+bounces-230914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F320DBF1A27
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 15:50:53 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4CBEBF1B0C
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:01:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2BE542380F
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 13:49:51 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EAF674F7BE9
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 13:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5078320CCC;
-	Mon, 20 Oct 2025 13:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324F331AF21;
+	Mon, 20 Oct 2025 13:56:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="d7WJy0tw"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lSPBhfZr";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ShTbOYO4";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="050ruSX8";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sYbl2EOP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B5E320CA3;
-	Mon, 20 Oct 2025 13:49:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0AB2F658A
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 13:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760968171; cv=none; b=SH6DCTebaHG0PU8i2CakZjWY6w4OIEhHNxgt5CwHSeR9UeIXuhuBl6GmXsMaOfEAEdDQPXU/GqgKxtTaNKEsMO3h7JZNViDVCLDSWbt/XN9NDxoA5y6MPlObwwTArx/pr+VXT7xPZhXvecH8Hk3bWUywFp7ddm7KBb9HRQz3a44=
+	t=1760968579; cv=none; b=YyGs9tnauHR7AffHtqq/U1SDSKHkgCs0BJsKKYxRwEVzYw9ZFGSkbI19PT4yDJMcMnNavwwK4OHzCYUl+A4vXMozZx3Ym4D2m2Yr5rirbM/Rb+HLOMMyH6tW+W533JPbwDnT7FistpeVkzA7GftX4FNXC1fc2xdvNtyUYcnVCMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760968171; c=relaxed/simple;
-	bh=WkMLqOwstPD9tXIY7sft1TgQTEA0umE5RoSS7mjxWhg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YAaGWpKAOLARMtRKJPhhBH3KfvID3LiMOIhm0wJV+W5srV/OSOIbeUhySlCN+XaWErqveDa49ItzNEGQiaH/wXus4fnLYChse+QBE72bb170oZU6Hxfkd3jxBiWJiWgIVUhD47Iu+nZy0aWs3BongzUpzFcbSipeadhXn4nqyLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=d7WJy0tw; arc=none smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59KAS08m2597786;
-	Mon, 20 Oct 2025 13:49:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	PPS06212021; bh=GAiApnCePN3gY4cReH/aSGdisGPxC90q498GRB0bBv4=; b=
-	d7WJy0twAlSjFuzpuUQKkoSNSBqqj5GsIr2Rr8baPeWOIOxht9UTFrU1sNBnxpew
-	DUdPq8DqOQzgPu/3+z6FxxT9juBPSsRQj8e4O2FzzgP2oJYBCAG6VBtXvXJ036a9
-	X1AuTSTlm5wA1RhdxWzwGb3ValNX+mB4D9KSbKDQJBnH+Somm+mizaIzc27mzUY3
-	t08Sptq7g8gpu2To5F6X1hMmjdrgdS8yg9hg5W7YsH1R7cuS/heTSddlKICP+5m0
-	TDjUOn0+FODrLUN2vpnAKUE/ospTxDI6gShIT2hJlZBBFOi18GufzvasKGpRKvXd
-	LmdTBRZN21VsN51mhLtFDA==
-Received: from ala-exchng01.corp.ad.wrs.com ([128.224.246.36])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 49v03y1xx4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Mon, 20 Oct 2025 13:49:17 +0000 (GMT)
-Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
- ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.59; Mon, 20 Oct 2025 06:49:16 -0700
-Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
- ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
- 15.1.2507.59 via Frontend Transport; Mon, 20 Oct 2025 06:49:13 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <lizhi.xu@windriver.com>
-CC: <dan.carpenter@linaro.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <horms@kernel.org>, <kuba@kernel.org>, <linux-hams@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <pabeni@redhat.com>,
-        <syzbot+2860e75836a08b172755@syzkaller.appspotmail.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH V2] netrom: Prevent race conditions between multiple add route
-Date: Mon, 20 Oct 2025 21:49:12 +0800
-Message-ID: <20251020134912.3593047-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251020133456.3564833-1-lizhi.xu@windriver.com>
-References: <20251020133456.3564833-1-lizhi.xu@windriver.com>
+	s=arc-20240116; t=1760968579; c=relaxed/simple;
+	bh=1/xorSSVQM5S+DUjeNfIdpcxxqZNnoFSnufDcDvnfTg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J+f7L6+pc42NnDc+Ua7xmYXwKT7G4NaHGX+mOtJcR5j2t/hiQh4M7N9FuQl920wiEl16VmUGl7vtE3LeS4MQuXcPzjUcGtDl+imFkE//r3ndzPqHFm0tVaT5SAUjEfu6g3E2f3M3SOJmQFXqp1Pi3shrw5d4dpBIygskeJ0w7Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lSPBhfZr; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ShTbOYO4; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=050ruSX8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sYbl2EOP; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4C9561F385;
+	Mon, 20 Oct 2025 13:56:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1760968571; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ryn9uE0Mex1ifN/E8rKvDRw394lk6uAn1WuQSF1m7Ig=;
+	b=lSPBhfZrl4s2v+fbN7/0xbMGxdu2UyotNDaPmTDj8n0GxHrGajHFCYNKaIHmvIQ6qlCx0+
+	oNR25NOVB5GgEGCH/YilpC+Kg2OR2WUgkQ3z8oC78nJdg5F6pPX8eLU7aVU4q8lH9dBsh0
+	b+wVsua67z+R0E0ZN6lXHcOk67ktdPs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1760968571;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ryn9uE0Mex1ifN/E8rKvDRw394lk6uAn1WuQSF1m7Ig=;
+	b=ShTbOYO44pgA4UDGAP0uEIoq8oJYMf9Q6366CsCHz/2e9L/QezG7ltpyeIjigyxmO6bHwq
+	scbNePfrIfdt/OCQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1760968567; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ryn9uE0Mex1ifN/E8rKvDRw394lk6uAn1WuQSF1m7Ig=;
+	b=050ruSX87O7LRPjXfR16NY3uMSUY1PM3NNOKCu0oSb3gtWrHxCgtmt8LXO1Eysr+O7L3YB
+	N3jve166QdqlJU6HhPk2F+F6ZJ5RUoxOGQKjLEacCwLE1ABrR6RAE6zAAJEGYoBStYIbbl
+	jYvbjZNUPdHU3A8uFpXJFmCmin/OCP4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1760968567;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ryn9uE0Mex1ifN/E8rKvDRw394lk6uAn1WuQSF1m7Ig=;
+	b=sYbl2EOP7yM2nlY2T/8H/igFhLD/OHhMWGlncIAlcVoKQaGg8+rtqvi864WwKosJV/NG+z
+	xlkHdx/geN2QldBg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C7F9413AAC;
+	Mon, 20 Oct 2025 13:56:06 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 8da0LXY/9mg3BAAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Mon, 20 Oct 2025 13:56:06 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Subject: [PATCH net] net: hsr: prevent creation of HSR device with slaves from another netns
+Date: Mon, 20 Oct 2025 15:55:33 +0200
+Message-ID: <20251020135533.9373-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,66 +98,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: w8xMF_9x59SaIJwTAMVnW1xbKrrdLeig
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIwMDExNSBTYWx0ZWRfX/6eiZ9BFhaE3
- i0Yn0J93T5IcP5Xca/NXw3SbjHSHonc8rOEfzcYeTrJhC9ypLLFovNaIYghjxrnELsmW7MAz4Sd
- a1JkR6Lmvn3Klkh3zswUeNGLUAIik1l9N+G1V8oidxOpo3KouE1dBAAMqHS1E0bqwAwadm/m7qX
- gMQj+XPSsNku5VViwHehIrh4hTsOd28mIjiihjPYIRJKmE4+BCP1PT7eOhkmpnFKteD3z/kjdR9
- wJhfifIiq2daD4mMAx+qRE8EIAHcVvjsYOLuV+VoF3PVLevT45SElvNI3/eCvE38RfjvIIDPkP7
- lCkIN3B+ywHIDTK4ksVe4hCjDgRJHScvyp5zGQ7IFJ+UVF9WJPLxl1olyfRXYDdHePo5xRe7btb
- pzfydmzOHUsohhB95g1uDEM1vlZ8eQ==
-X-Proofpoint-ORIG-GUID: w8xMF_9x59SaIJwTAMVnW1xbKrrdLeig
-X-Authority-Analysis: v=2.4 cv=Uolu9uwB c=1 sm=1 tr=0 ts=68f63ddd cx=c_pps
- a=AbJuCvi4Y3V6hpbCNWx0WA==:117 a=AbJuCvi4Y3V6hpbCNWx0WA==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=FSjqoRavRfmepf25v4oA:9
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-20_04,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 clxscore=1015 malwarescore=0 adultscore=0 priorityscore=1501
- phishscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510200115
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo];
+	RCVD_TLS_ALL(0.00)[]
+X-Spam-Flag: NO
+X-Spam-Score: -2.80
 
-On Mon, 20 Oct 2025 21:34:56 +0800, Lizhi Xu wrote:
-> > Task0					Task1						Task2
-> > =====					=====						=====
-> > [97] nr_add_node()
-> > [113] nr_neigh_get_dev()		[97] nr_add_node()
-> > 					[214] nr_node_lock()
-> > 					[245] nr_node->routes[2].neighbour->count--
-> > 					[246] nr_neigh_put(nr_node->routes[2].neighbour);
-> > 					[248] nr_remove_neigh(nr_node->routes[2].neighbour)
-> > 					[283] nr_node_unlock()
-> > [214] nr_node_lock()
-> > [253] nr_node->routes[2].neighbour = nr_neigh
-> > [254] nr_neigh_hold(nr_neigh);							[97] nr_add_node()
-> > 											[XXX] nr_neigh_put()
-> >                                                                                         ^^^^^^^^^^^^^^^^^^^^
-> > 
-> > These charts are supposed to be chronological so [XXX] is wrong because the
-> > use after free happens on line [248].  Do we really need three threads to
-> > make this race work?
-> The UAF problem occurs in Task2. Task1 sets the refcount of nr_neigh to 1,
-> then Task0 adds it to routes[2]. Task2 releases routes[2].neighbour after
-> executing [XXX]nr_neigh_put().
-Execution Order:
-1 -> Task0
-[113] nr_neigh_get_dev() // After execution, the refcount value is 3
+HSR/PRP driver does not handle correctly having slaves/interlink devices
+in a different net namespace. Currently, it is possible to create a HSR
+link in a different net namespace than the slaves/interlink with the
+following command:
 
-2 -> Task1
-[246] nr_neigh_put(nr_node->routes[2].neighbour);   // After execution, the refcount value is 2
-[248] nr_remove_neigh(nr_node->routes[2].neighbour) // After execution, the refcount value is 1
+ ip link add hsr0 netns hsr-ns type hsr slave1 eth1 slave2 eth2
 
-3 -> Task0
-[253] nr_node->routes[2].neighbour = nr_neigh       // nr_neigh's refcount value is 1 and add it to routes[2]
+As there is no use-case on supporting this scenario, enforce that HSR
+device link matches netns defined by IFLA_LINK_NETNSID.
 
-4 -> Task2
-[XXX] nr_neigh_put(nr_node->routes[2].neighbour)    // After execution, neighhour is freed
-if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)  // Uaf occurs this line when accessing neighbour->count
+The iproute2 command mentioned above will throw the following error:
 
-BR,
-Lizhi
+ Error: hsr: HSR slaves/interlink must be on the same net namespace than HSR link.
+
+Fixes: f421436a591d ("net/hsr: Add support for the High-availability Seamless Redundancy protocol (HSRv0)")
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+---
+ net/hsr/hsr_netlink.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/net/hsr/hsr_netlink.c b/net/hsr/hsr_netlink.c
+index b120470246cc..c96b63adf96f 100644
+--- a/net/hsr/hsr_netlink.c
++++ b/net/hsr/hsr_netlink.c
+@@ -34,12 +34,18 @@ static int hsr_newlink(struct net_device *dev,
+ 		       struct netlink_ext_ack *extack)
+ {
+ 	struct net *link_net = rtnl_newlink_link_net(params);
++	struct net_device *link[2], *interlink = NULL;
+ 	struct nlattr **data = params->data;
+ 	enum hsr_version proto_version;
+ 	unsigned char multicast_spec;
+ 	u8 proto = HSR_PROTOCOL_HSR;
+ 
+-	struct net_device *link[2], *interlink = NULL;
++	if (!net_eq(link_net, dev_net(dev))) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "HSR slaves/interlink must be on the same net namespace than HSR link");
++		return -EINVAL;
++	}
++
+ 	if (!data) {
+ 		NL_SET_ERR_MSG_MOD(extack, "No slave devices specified");
+ 		return -EINVAL;
+-- 
+2.51.0
+
 
