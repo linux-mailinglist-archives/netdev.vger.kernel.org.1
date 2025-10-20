@@ -1,101 +1,106 @@
-Return-Path: <netdev+bounces-230994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 798A2BF373F
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 22:30:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E942BF38A1
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 22:55:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B4FC3A2E0F
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 20:30:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12603428531
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 20:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A312DCF70;
-	Mon, 20 Oct 2025 20:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0579333732;
+	Mon, 20 Oct 2025 20:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X+ozydVv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tCj9aUeg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC95C2D661E;
-	Mon, 20 Oct 2025 20:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88950333429;
+	Mon, 20 Oct 2025 20:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760992225; cv=none; b=pyIWDqUcYFMtYL6Ae8uFoq566zzrw623RMeORH9YkKKybUa3XqZTDzLVsfORlx5cdgq+Cvkb2ojmSVbiHAgzbaCL5TITvkrZmbz4IBYWEPbFWVyFh90wOSXH8Gq48ctvVTbSKwUNxzJ9ZfZvNrRFVUobvzKWsS5rcwXaV0mW7/M=
+	t=1760993629; cv=none; b=KCXQps4QGK0qXFAUMjuH5g4DA45HzuanqfSSr8omcFhoY2h5/SaRlRf4GzUAaULgVzcIIGPk4D9ZlALbpSTYD7xPTK2yeO8e+NeDaLgFu4HwpQOwAZevEw3H6/vSXj9y0G10jBGo6tWx+3LRByZOVaizMFpEPsqvGVrbht2nfWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760992225; c=relaxed/simple;
-	bh=CxP/ms/tIXigmL02zeCR9egOpoIvu6mO40TBXnTBGe0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NOY1DuaCzgUFOw7f8/pzppzFKVWC972fWMsX+7NJa31swGvMRXdOPnleKD0k7COPwgtLynTHepwf7WnbMQZgOoINxqaGNb/3by92WrWVtr7YeaIpGwd69s5BdHMz9mfUJlAICefep8zoAZ1IHM2K7FrPwMPRsUS0ho7noYLvzFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X+ozydVv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D831C116C6;
-	Mon, 20 Oct 2025 20:30:24 +0000 (UTC)
+	s=arc-20240116; t=1760993629; c=relaxed/simple;
+	bh=S/ifjXOYBDFszUtppvkoFMLw21lm2v86af3/kIW0+2k=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=VhvcxWefkAOzLiZtF6dHnrseobV34O8JZOebfW9MQENX6hq5mrPBU+gx9sbVOm4bdVetNPB2OAHYtS0YtRCFGYbm7jjjZXHrPsWwwHFvPOnfciTU9VDTSIa2MeWoIH4SNdbkWw5P0eYrxqpRBfqgPCZIJIA0oNRhyCh6TBrjXck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tCj9aUeg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4176C2BCB5;
+	Mon, 20 Oct 2025 20:53:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760992225;
-	bh=CxP/ms/tIXigmL02zeCR9egOpoIvu6mO40TBXnTBGe0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=X+ozydVv/SsHLIkZrCRQPTVT0aKi5jlDoZkyxo8F3JTj6ZBzA9uibs4A/lZMdSacq
-	 OkkZXOGIG3KhF4N3+UVQsHaxa+c8+KswvfEUHN7vFBzOk1f6Nq8ZPKeSmoJQ4l7J4B
-	 X5IE5PzBP0Di80M9cqiFGRjjgcjs6vfuMXnKYhVJYoC0QU6GeLcH4eOtP6Y1De3tgu
-	 aBGTrXKDwNkQ4lMI8UowIe5Swuz8iN+W6V823ZGSF2J0/2n99oI7yr1Pbl+lGr8Rt+
-	 ByqH5B2wUuAEzM4QQih4IzbyS6BjSTFXfyQG5BFiKK760KqAYCHkWNSImPA0CQ2t60
-	 u6J09jk/3u7Qw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BA23A4101D;
-	Mon, 20 Oct 2025 20:30:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1760993628;
+	bh=S/ifjXOYBDFszUtppvkoFMLw21lm2v86af3/kIW0+2k=;
+	h=From:Subject:Date:To:Cc:From;
+	b=tCj9aUeg+Za34o3VZ6IBrupw8bPe97jRp6pWjRbRscqn2WLzo9G2+sX0GLFUz2D3S
+	 NTG8D+ETVBIlMedHIO0FINIsUjqMzuueFq1dxVL/t8uCskRFnjIhmbdu+Iyd5KaPiv
+	 H2bumF6bvpdS2FsWcKyJ/vjT7Mx6BIK9b9zRFOS7uuVzyCavY6e+Ssu4+3Jai6Mj2r
+	 0YLkLVv3s1QBRiOQEaOYaJ3jjKhktYsokHAU0U6oC87qnPwlQLHrpxh6x2yTd7wtkG
+	 d04fT7ch3P/tTl8ZxdLPsCaiXygoM/ykUfSHRmMleIUpKKLXCZcmj6mWsfNRjlrxy9
+	 hwPgjIC51P/7A==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/5] mptcp: handle late ADD_ADDR + selftests skip
+Date: Mon, 20 Oct 2025 22:53:25 +0200
+Message-Id: <20251020-net-mptcp-c-flag-late-add-addr-v1-0-8207030cb0e8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf] bpf: Do not let BPF test infra emit invalid GSO types
- to
- stack
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176099220626.401229.10029182117746939973.git-patchwork-notify@kernel.org>
-Date: Mon, 20 Oct 2025 20:30:06 +0000
-References: <20251020075441.127980-1-daniel@iogearbox.net>
-In-Reply-To: <20251020075441.127980-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: martin.lau@linux.dev, kuba@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dddddd@hust.edu.cn, M202472210@hust.edu.cn,
- dzm91@hust.edu.cn, willemb@google.com, sdf@fomichev.me
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEWh9mgC/x2NQQqDMBBFryKzdiBJa0WvIi7SzKgDGkMSpBC8e
+ 9Mu3uIt3v8FEkfhBGNTIPIlSU5fRbcNuM36lVGoOhhlOq2MQs8Zj5BdQIfLblfcbWa0RD8iahq
+ 6J/fv14MM1JEQeZHP/2CC2sJ8318qGzrrdQAAAA==
+X-Change-ID: 20251020-net-mptcp-c-flag-late-add-addr-1d954e7b63d2
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1295; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=S/ifjXOYBDFszUtppvkoFMLw21lm2v86af3/kIW0+2k=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDK+LQyyKp3b7xHvGPVrVV9OvuyzU9+4dnw9+G2yt1UWX
+ 4mkR0tSRykLgxgXg6yYIot0W2T+zOdVvCVefhYwc1iZQIYwcHEKwETm2zIy7NaXmFW91GiS2P6p
+ P5teXjo169DjQ1tNHlsvkpa14Fsaps3wzzJvIlP/6cXO9/RWzuLZzhSynr90wcqD/dlKPxZttzO
+ s4QUA
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Hello:
+Here are a few independent fixes related to MPTCP and its selftests:
 
-This patch was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+- Patch 1: correctly handle ADD_ADDR being received after the switch to
+  'fully-established'. A fix for another recent fix backported up to
+  v5.14.
 
-On Mon, 20 Oct 2025 09:54:41 +0200 you wrote:
-> Yinhao et al. reported that their fuzzer tool was able to trigger a
-> skb_warn_bad_offload() from netif_skb_features() -> gso_features_check().
-> When a BPF program - triggered via BPF test infra - pushes the packet
-> to the loopback device via bpf_clone_redirect() then mentioned offload
-> warning can be seen. GSO-related features are then rightfully disabled.
-> 
-> We get into this situation due to convert___skb_to_skb() setting
-> gso_segs and gso_size but not gso_type. Technically, it makes sense
-> that this warning triggers since the GSO properties are malformed due
-> to the gso_type. Potentially, the gso_type could be marked non-trustworthy
-> through setting it at least to SKB_GSO_DODGY without any other specific
-> assumptions, but that also feels wrong given we should not go further
-> into the GSO engine in the first place.
-> 
-> [...]
+- Patches 2-5: properly mark some MPTCP Join subtests as 'skipped' if
+  the tested kernel doesn't support the feature being validated. Some
+  fixes for up to v5.13, v5.18, v6.11 and v6.18-rc1 respectively.
 
-Here is the summary with links:
-  - [bpf] bpf: Do not let BPF test infra emit invalid GSO types to stack
-    https://git.kernel.org/bpf/bpf-next/c/04a899573fb8
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Matthieu Baerts (NGI0) (5):
+      mptcp: pm: in-kernel: C-flag: handle late ADD_ADDR
+      selftests: mptcp: join: mark 'flush re-add' as skipped if not supported
+      selftests: mptcp: join: mark implicit tests as skipped if not supported
+      selftests: mptcp: join: mark 'delete re-add signal' as skipped if not supported
+      selftests: mptcp: join: mark laminar tests as skipped if not supported
 
-You are awesome, thank you!
+ net/mptcp/pm_kernel.c                           |  6 ++++++
+ tools/testing/selftests/net/mptcp/mptcp_join.sh | 18 +++++++++---------
+ 2 files changed, 15 insertions(+), 9 deletions(-)
+---
+base-commit: ffff5c8fc2af2218a3332b3d5b97654599d50cde
+change-id: 20251020-net-mptcp-c-flag-late-add-addr-1d954e7b63d2
+
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
