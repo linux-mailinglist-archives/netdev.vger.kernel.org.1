@@ -1,89 +1,101 @@
-Return-Path: <netdev+bounces-230993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C036BF35E6
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 22:19:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 798A2BF373F
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 22:30:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 184AC343479
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 20:19:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B4FC3A2E0F
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 20:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E32382BEFF6;
-	Mon, 20 Oct 2025 20:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A312DCF70;
+	Mon, 20 Oct 2025 20:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LoPgIZEq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X+ozydVv"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97B0286D63
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 20:19:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC95C2D661E;
+	Mon, 20 Oct 2025 20:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760991551; cv=none; b=WpMjfM6jUCLe2z7gPvvuX9pYFUEEd09LjGG5ghCVu6qwep+ljDwifUsv2saKXol7cQMjHJa3ao20KTr5MrrUjJMr5EGMsO13+0yHVBmk/n9rpiEABySloIcblooFipU/0Q2+ojDHpGfPKN+eZ1Wa8CCl3rmFuMKsoE/l/QjFS3I=
+	t=1760992225; cv=none; b=pyIWDqUcYFMtYL6Ae8uFoq566zzrw623RMeORH9YkKKybUa3XqZTDzLVsfORlx5cdgq+Cvkb2ojmSVbiHAgzbaCL5TITvkrZmbz4IBYWEPbFWVyFh90wOSXH8Gq48ctvVTbSKwUNxzJ9ZfZvNrRFVUobvzKWsS5rcwXaV0mW7/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760991551; c=relaxed/simple;
-	bh=ECkD/COUdATOLfifOY0DBOlsF5GRmkj1zsRtxkiNMaU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g8AVynfVmQwDsYpzuoLTKFM2EG/MLLODUSuCQki5fvtBdv+9XVAFv0JwYzUXf5B0KCr71AzXabTipBO6WsdGfEhXTSZJvZvwdnYdIFOrkYA9XXaoQ0yKKXRZ/TNOSsGMeukdXhGhsAy5wxwTwnw4j+/d6SRXhe3eLdKiCnnbeZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LoPgIZEq; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Lq33/SB9yszKZ/NnTc+bw3dXwj2tLUhEoeBkhpaRNmM=; b=LoPgIZEqx1mtnnRcOJlR+fysLH
-	U+OrRpMdPla0zCzMQSrHgUH6gudP3khM2DUAIb2PLjWROFJqzWozL3nvNxffSasPywPgQlEVtnFjX
-	pEE+w67DqXXFhlPjuO5lzSCBBsJgksHO3Qszl2iQ5rWCW4+V4hIuZpJts6NdV9GvJ1Sk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vAwL4-00BYTv-Uo; Mon, 20 Oct 2025 22:18:42 +0200
-Date: Mon, 20 Oct 2025 22:18:42 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Furong Xu <0x1207@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH net-next] net: stmmac: remove stmmac_hw_setup() excess
- documentation parameter
-Message-ID: <3356c601-f3e6-474c-81d4-96bea3e86659@lunn.ch>
-References: <E1v38Y7-00000008UCQ-3w27@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1760992225; c=relaxed/simple;
+	bh=CxP/ms/tIXigmL02zeCR9egOpoIvu6mO40TBXnTBGe0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=NOY1DuaCzgUFOw7f8/pzppzFKVWC972fWMsX+7NJa31swGvMRXdOPnleKD0k7COPwgtLynTHepwf7WnbMQZgOoINxqaGNb/3by92WrWVtr7YeaIpGwd69s5BdHMz9mfUJlAICefep8zoAZ1IHM2K7FrPwMPRsUS0ho7noYLvzFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X+ozydVv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D831C116C6;
+	Mon, 20 Oct 2025 20:30:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760992225;
+	bh=CxP/ms/tIXigmL02zeCR9egOpoIvu6mO40TBXnTBGe0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=X+ozydVv/SsHLIkZrCRQPTVT0aKi5jlDoZkyxo8F3JTj6ZBzA9uibs4A/lZMdSacq
+	 OkkZXOGIG3KhF4N3+UVQsHaxa+c8+KswvfEUHN7vFBzOk1f6Nq8ZPKeSmoJQ4l7J4B
+	 X5IE5PzBP0Di80M9cqiFGRjjgcjs6vfuMXnKYhVJYoC0QU6GeLcH4eOtP6Y1De3tgu
+	 aBGTrXKDwNkQ4lMI8UowIe5Swuz8iN+W6V823ZGSF2J0/2n99oI7yr1Pbl+lGr8Rt+
+	 ByqH5B2wUuAEzM4QQih4IzbyS6BjSTFXfyQG5BFiKK760KqAYCHkWNSImPA0CQ2t60
+	 u6J09jk/3u7Qw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BA23A4101D;
+	Mon, 20 Oct 2025 20:30:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1v38Y7-00000008UCQ-3w27@rmk-PC.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf] bpf: Do not let BPF test infra emit invalid GSO types
+ to
+ stack
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176099220626.401229.10029182117746939973.git-patchwork-notify@kernel.org>
+Date: Mon, 20 Oct 2025 20:30:06 +0000
+References: <20251020075441.127980-1-daniel@iogearbox.net>
+In-Reply-To: <20251020075441.127980-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: martin.lau@linux.dev, kuba@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dddddd@hust.edu.cn, M202472210@hust.edu.cn,
+ dzm91@hust.edu.cn, willemb@google.com, sdf@fomichev.me
 
-On Mon, Sep 29, 2025 at 08:43:55AM +0100, Russell King (Oracle) wrote:
-> The kernel build bot reports:
-> 
-> Warning: drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:3438 Excess function parameter 'ptp_register' description in 'stmmac_hw_setup'
-> 
-> Fix it.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Fixes: 98d8ea566b85 ("net: stmmac: move timestamping/ptp init to stmmac_hw_setup() caller")
-> Closes: https://lore.kernel.org/oe-kbuild-all/202509290927.svDd6xuw-lkp@intel.com/
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Hello:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+This patch was applied to bpf/bpf-next.git (master)
+by Martin KaFai Lau <martin.lau@kernel.org>:
 
-    Andrew
+On Mon, 20 Oct 2025 09:54:41 +0200 you wrote:
+> Yinhao et al. reported that their fuzzer tool was able to trigger a
+> skb_warn_bad_offload() from netif_skb_features() -> gso_features_check().
+> When a BPF program - triggered via BPF test infra - pushes the packet
+> to the loopback device via bpf_clone_redirect() then mentioned offload
+> warning can be seen. GSO-related features are then rightfully disabled.
+> 
+> We get into this situation due to convert___skb_to_skb() setting
+> gso_segs and gso_size but not gso_type. Technically, it makes sense
+> that this warning triggers since the GSO properties are malformed due
+> to the gso_type. Potentially, the gso_type could be marked non-trustworthy
+> through setting it at least to SKB_GSO_DODGY without any other specific
+> assumptions, but that also feels wrong given we should not go further
+> into the GSO engine in the first place.
+> 
+> [...]
+
+Here is the summary with links:
+  - [bpf] bpf: Do not let BPF test infra emit invalid GSO types to stack
+    https://git.kernel.org/bpf/bpf-next/c/04a899573fb8
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
