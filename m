@@ -1,103 +1,74 @@
-Return-Path: <netdev+bounces-230915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03D51BF1A39
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 15:51:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F320DBF1A27
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 15:50:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 449AB424E94
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 13:50:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2BE542380F
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 13:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE6D6322DD4;
-	Mon, 20 Oct 2025 13:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5078320CCC;
+	Mon, 20 Oct 2025 13:49:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NyBP06TQ"
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="d7WJy0tw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252D6322A29
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 13:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B5E320CA3;
+	Mon, 20 Oct 2025 13:49:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760968174; cv=none; b=NkLQb1wHTQ3V6ez2FGDoSVOAvHKskZGRUGNVzu0w+6+5toGct7Df24GmQCph+UJubnix4ZWVx2o2yuWH/TqiUCeLAxVomPJGEWLDd5paMqGRXbVRd4TWj81Ixy7VTf65ZesAy8yGWKPgB6wVgvY6z6T/49So9kWvHFG3aFhQsBw=
+	t=1760968171; cv=none; b=SH6DCTebaHG0PU8i2CakZjWY6w4OIEhHNxgt5CwHSeR9UeIXuhuBl6GmXsMaOfEAEdDQPXU/GqgKxtTaNKEsMO3h7JZNViDVCLDSWbt/XN9NDxoA5y6MPlObwwTArx/pr+VXT7xPZhXvecH8Hk3bWUywFp7ddm7KBb9HRQz3a44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760968174; c=relaxed/simple;
-	bh=OdAkGFsVBeypNY8bG/+x2bxmidQpWkTH+22jXc8Cjk0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Sr8o4oL+xQ5VXAoDpxAjw1poXATMCte+Zm4Na0z42wr8937tx68SUCz7p9rhJwDqa10WSoIAZ6XZWKYZTieBGgrr9gVKFdhdcQZxpbLNbFYeferkJiBfzBr/GC6GfICLlcufojpt+1c6LrMz+BXJBmJWW/3zev7L9AXsuItcwrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NyBP06TQ; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b5526b7c54eso2826716a12.0
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 06:49:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760968172; x=1761572972; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eODQs0ub6BtCBcbm30jQFNEO4Utk4CtbjZek/rCcark=;
-        b=NyBP06TQ31cD4hxfY1WJg9sVX4t7jMmTENkQ0PXSPbKToz5tTNfU9Cn3lXG+M4ATk/
-         3le8jww25kt4lzXp93jBrILDFZDqY02WlTiMmcHDFXCB2uZkElBjdK2NOnQnyDAsTo6/
-         tQk0deOYL29lndtH5u8Ey4A3p2oy/5jy+x8qG6ZZ5Y/b88IRvaEyO9oW3J3yytxtnm92
-         4hQbHka/bD63kUtzqYbPndXrMXqNmO1XbvFsBDWQVVaGxdN0MO0z+CVAXngyafXZv/2z
-         ctpX7w8G7fhJF92+41tLTBmE7dwKmyHarUMVyyCIrDVpuufFc1um96+uwFd/BgGtfjph
-         tpiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760968172; x=1761572972;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eODQs0ub6BtCBcbm30jQFNEO4Utk4CtbjZek/rCcark=;
-        b=YBXqr5VVtXctpQoOV2RLZP7WENjerlhmbJ0v0nis0naQvcQSVApsUv5aRwWGdKmIZ3
-         I4BPvVC4G/xILsfz3LsSSng7IP5jYK5gpWBu+bS+jnuHnrvR23wiwgwYdGLtSjDaq6KC
-         nksjAVc12k2XHI7LNMhF5s0WZo6rrFh5FNyJZumOnyYOvTOs7UFTkhl2XmTKSCNOa0nx
-         1TI3xRfS+bLYj2m75CvCoY6GZWdasDdgG0Y804zzyLjDDlVdng0+aqeff4dVGuIrhFBi
-         EMYVeIugLqT3yl/3m167guQLeP0iUo058KtEU9WCwWiRgAYk8GOgBz3+98TYCHtAg8+v
-         KHGg==
-X-Gm-Message-State: AOJu0YwdV+hkA2AvWAqLVqK2aeAaH7DoRFvH062YKf22EdXidhCgddCG
-	P8LtfR/ui8lQjJDHl16LTGE7Bui5T6Lfe4pJUcgo5xAGTo9m5VanMYlQ
-X-Gm-Gg: ASbGncucovTO+bW2fyhrHgjdxth2rBz4CzEr6CACu/tA5s5VO+YrmlNIBZxgzmTd8Sf
-	bKNoKAjvnrYhIL9yuyG4mPQgru/ykn83o0SF8a1NeL7PE2E6EHtubUkkN6+D0ijIw0ShbS0h3qa
-	t1n3rsXQm3IrMJIvnsWOHtTE03tDgw1X3/WcQfDM8oi22VcZ7Bb/KgB4DzhbMt3d0UbnTPuC4sP
-	s94oe+XZAyGGt0aR9qHpvBQ5MkeTN88ic/4ZNUAWJ6AJY0ovTbtdeP2OySzOPoETvSqcAGrul7E
-	K514EFmdF9TtKnXRMMjlb5BrppGP82CMtu8sBGKaf5rI8ita7sK0P7a6y/lBwD4Lts6mZMTDcM6
-	xijR+6roOURCm9jr5e1bN8PVSbOuwliCep1XAMMqnax3dazt7b7Urfdr3bibfE2bo1emoj2HlA2
-	O44V/q6djw9anRqmfS/AVK3zCgH6vkvUzF6vg6U1EEeMJMNrSYsWeMO5ANq0xTDfMBOladh4J4v
-	w==
-X-Google-Smtp-Source: AGHT+IFiKRAll9tcnFwi3rMLldMi2VlZJ+m3l4+IxH5yr0qxsRT3jhyqtjhnAiXqR5sBVn7aaUjVHg==
-X-Received: by 2002:a17:903:2309:b0:262:79a:93fb with SMTP id d9443c01a7336-290ca121803mr178719455ad.32.1760968172002;
-        Mon, 20 Oct 2025 06:49:32 -0700 (PDT)
-Received: from localhost.localdomain ([2401:4900:1cc9:d444:c07a:121f:22da:3f7b])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33bdd02793dsm4507349a91.3.2025.10.20.06.49.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 06:49:31 -0700 (PDT)
-From: I Viswanath <viswanathiyyappan@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	sdf@fomichev.me,
-	kuniyu@google.com,
-	ahmed.zaki@intel.com,
-	aleksander.lobakin@intel.com,
-	andrew+netdev@lunn.ch
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev,
-	david.hunter.linux@gmail.com,
-	khalid@kernel.org,
-	I Viswanath <viswanathiyyappan@gmail.com>
-Subject: [RFC net-next PATCH 2/2] net: ethernet: Implement ndo_write_rx_config callback for the 8139cp driver
-Date: Mon, 20 Oct 2025 19:18:57 +0530
-Message-ID: <20251020134857.5820-3-viswanathiyyappan@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251020134857.5820-1-viswanathiyyappan@gmail.com>
-References: <20251020134857.5820-1-viswanathiyyappan@gmail.com>
+	s=arc-20240116; t=1760968171; c=relaxed/simple;
+	bh=WkMLqOwstPD9tXIY7sft1TgQTEA0umE5RoSS7mjxWhg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YAaGWpKAOLARMtRKJPhhBH3KfvID3LiMOIhm0wJV+W5srV/OSOIbeUhySlCN+XaWErqveDa49ItzNEGQiaH/wXus4fnLYChse+QBE72bb170oZU6Hxfkd3jxBiWJiWgIVUhD47Iu+nZy0aWs3BongzUpzFcbSipeadhXn4nqyLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=d7WJy0tw; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59KAS08m2597786;
+	Mon, 20 Oct 2025 13:49:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	PPS06212021; bh=GAiApnCePN3gY4cReH/aSGdisGPxC90q498GRB0bBv4=; b=
+	d7WJy0twAlSjFuzpuUQKkoSNSBqqj5GsIr2Rr8baPeWOIOxht9UTFrU1sNBnxpew
+	DUdPq8DqOQzgPu/3+z6FxxT9juBPSsRQj8e4O2FzzgP2oJYBCAG6VBtXvXJ036a9
+	X1AuTSTlm5wA1RhdxWzwGb3ValNX+mB4D9KSbKDQJBnH+Somm+mizaIzc27mzUY3
+	t08Sptq7g8gpu2To5F6X1hMmjdrgdS8yg9hg5W7YsH1R7cuS/heTSddlKICP+5m0
+	TDjUOn0+FODrLUN2vpnAKUE/ospTxDI6gShIT2hJlZBBFOi18GufzvasKGpRKvXd
+	LmdTBRZN21VsN51mhLtFDA==
+Received: from ala-exchng01.corp.ad.wrs.com ([128.224.246.36])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 49v03y1xx4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Mon, 20 Oct 2025 13:49:17 +0000 (GMT)
+Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.59; Mon, 20 Oct 2025 06:49:16 -0700
+Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
+ 15.1.2507.59 via Frontend Transport; Mon, 20 Oct 2025 06:49:13 -0700
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <lizhi.xu@windriver.com>
+CC: <dan.carpenter@linaro.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <horms@kernel.org>, <kuba@kernel.org>, <linux-hams@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <pabeni@redhat.com>,
+        <syzbot+2860e75836a08b172755@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>
+Subject: [PATCH V2] netrom: Prevent race conditions between multiple add route
+Date: Mon, 20 Oct 2025 21:49:12 +0800
+Message-ID: <20251020134912.3593047-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251020133456.3564833-1-lizhi.xu@windriver.com>
+References: <20251020133456.3564833-1-lizhi.xu@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,175 +76,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: w8xMF_9x59SaIJwTAMVnW1xbKrrdLeig
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIwMDExNSBTYWx0ZWRfX/6eiZ9BFhaE3
+ i0Yn0J93T5IcP5Xca/NXw3SbjHSHonc8rOEfzcYeTrJhC9ypLLFovNaIYghjxrnELsmW7MAz4Sd
+ a1JkR6Lmvn3Klkh3zswUeNGLUAIik1l9N+G1V8oidxOpo3KouE1dBAAMqHS1E0bqwAwadm/m7qX
+ gMQj+XPSsNku5VViwHehIrh4hTsOd28mIjiihjPYIRJKmE4+BCP1PT7eOhkmpnFKteD3z/kjdR9
+ wJhfifIiq2daD4mMAx+qRE8EIAHcVvjsYOLuV+VoF3PVLevT45SElvNI3/eCvE38RfjvIIDPkP7
+ lCkIN3B+ywHIDTK4ksVe4hCjDgRJHScvyp5zGQ7IFJ+UVF9WJPLxl1olyfRXYDdHePo5xRe7btb
+ pzfydmzOHUsohhB95g1uDEM1vlZ8eQ==
+X-Proofpoint-ORIG-GUID: w8xMF_9x59SaIJwTAMVnW1xbKrrdLeig
+X-Authority-Analysis: v=2.4 cv=Uolu9uwB c=1 sm=1 tr=0 ts=68f63ddd cx=c_pps
+ a=AbJuCvi4Y3V6hpbCNWx0WA==:117 a=AbJuCvi4Y3V6hpbCNWx0WA==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=FSjqoRavRfmepf25v4oA:9
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-20_04,2025-10-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 clxscore=1015 malwarescore=0 adultscore=0 priorityscore=1501
+ phishscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510200115
 
-Implement ndo_write_rx_config for the 8139cp driver
+On Mon, 20 Oct 2025 21:34:56 +0800, Lizhi Xu wrote:
+> > Task0					Task1						Task2
+> > =====					=====						=====
+> > [97] nr_add_node()
+> > [113] nr_neigh_get_dev()		[97] nr_add_node()
+> > 					[214] nr_node_lock()
+> > 					[245] nr_node->routes[2].neighbour->count--
+> > 					[246] nr_neigh_put(nr_node->routes[2].neighbour);
+> > 					[248] nr_remove_neigh(nr_node->routes[2].neighbour)
+> > 					[283] nr_node_unlock()
+> > [214] nr_node_lock()
+> > [253] nr_node->routes[2].neighbour = nr_neigh
+> > [254] nr_neigh_hold(nr_neigh);							[97] nr_add_node()
+> > 											[XXX] nr_neigh_put()
+> >                                                                                         ^^^^^^^^^^^^^^^^^^^^
+> > 
+> > These charts are supposed to be chronological so [XXX] is wrong because the
+> > use after free happens on line [248].  Do we really need three threads to
+> > make this race work?
+> The UAF problem occurs in Task2. Task1 sets the refcount of nr_neigh to 1,
+> then Task0 adds it to routes[2]. Task2 releases routes[2].neighbour after
+> executing [XXX]nr_neigh_put().
+Execution Order:
+1 -> Task0
+[113] nr_neigh_get_dev() // After execution, the refcount value is 3
 
-Signed-off-by: I Viswanath <viswanathiyyappan@gmail.com>
----
- I modified and set ndo_set_rx_mode to be __cp_set_rx_mode as using
- cp_set_rx_mode as ndo_set_rx_mode callback would have led to a deadlock
- in cp_init_hw() 
- 
- drivers/net/ethernet/realtek/8139cp.c | 67 ++++++++++++++++++---------
- 1 file changed, 46 insertions(+), 21 deletions(-)
+2 -> Task1
+[246] nr_neigh_put(nr_node->routes[2].neighbour);   // After execution, the refcount value is 2
+[248] nr_remove_neigh(nr_node->routes[2].neighbour) // After execution, the refcount value is 1
 
-diff --git a/drivers/net/ethernet/realtek/8139cp.c b/drivers/net/ethernet/realtek/8139cp.c
-index 5652da8a178c..ff6195c7f3b6 100644
---- a/drivers/net/ethernet/realtek/8139cp.c
-+++ b/drivers/net/ethernet/realtek/8139cp.c
-@@ -319,6 +319,11 @@ struct cp_extra_stats {
- 	unsigned long		rx_frags;
- };
- 
-+struct cp_rx_config {
-+	int rx_mode;
-+	u32 mc_filter[2];	/* Multicast hash filter */
-+};
-+
- struct cp_private {
- 	void			__iomem *regs;
- 	struct net_device	*dev;
-@@ -328,7 +333,7 @@ struct cp_private {
- 	struct napi_struct	napi;
- 
- 	struct pci_dev		*pdev;
--	u32			rx_config;
-+	struct cp_rx_config	*rx_config;
- 	u16			cpcmd;
- 
- 	struct cp_extra_stats	cp_stats;
-@@ -882,45 +887,53 @@ static netdev_tx_t cp_start_xmit (struct sk_buff *skb,
- 	goto out_unlock;
- }
- 
-+static void cp_write_rx_config(struct net_device *dev)
-+{
-+	struct cp_private *cp = netdev_priv(dev);
-+	struct cp_rx_config snapshot;
-+
-+	read_snapshot((&snapshot), struct cp_private);
-+
-+	/* We can safely update without stopping the chip. */
-+	cpw32_f(RxConfig, snapshot.rx_mode);
-+
-+	cpw32_f(MAR0 + 0, snapshot.mc_filter[0]);
-+	cpw32_f(MAR0 + 4, snapshot.mc_filter[1]);
-+}
-+
- /* Set or clear the multicast filter for this adaptor.
-    This routine is not state sensitive and need not be SMP locked. */
- 
- static void __cp_set_rx_mode (struct net_device *dev)
- {
--	struct cp_private *cp = netdev_priv(dev);
--	u32 mc_filter[2];	/* Multicast hash filter */
--	int rx_mode;
-+	struct cp_rx_config new_config;
- 
- 	/* Note: do not reorder, GCC is clever about common statements. */
- 	if (dev->flags & IFF_PROMISC) {
- 		/* Unconditionally log net taps. */
--		rx_mode =
-+		new_config.rx_mode =
- 		    AcceptBroadcast | AcceptMulticast | AcceptMyPhys |
- 		    AcceptAllPhys;
--		mc_filter[1] = mc_filter[0] = 0xffffffff;
-+		new_config.mc_filter[1] = new_config.mc_filter[0] = 0xffffffff;
- 	} else if ((netdev_mc_count(dev) > multicast_filter_limit) ||
- 		   (dev->flags & IFF_ALLMULTI)) {
- 		/* Too many to filter perfectly -- accept all multicasts. */
--		rx_mode = AcceptBroadcast | AcceptMulticast | AcceptMyPhys;
--		mc_filter[1] = mc_filter[0] = 0xffffffff;
-+		new_config.rx_mode = AcceptBroadcast | AcceptMulticast | AcceptMyPhys;
-+		new_config.mc_filter[1] = new_config.mc_filter[0] = 0xffffffff;
- 	} else {
- 		struct netdev_hw_addr *ha;
--		rx_mode = AcceptBroadcast | AcceptMyPhys;
--		mc_filter[1] = mc_filter[0] = 0;
-+		new_config.rx_mode = AcceptBroadcast | AcceptMyPhys;
-+		new_config.mc_filter[1] = new_config.mc_filter[0] = 0;
- 		netdev_for_each_mc_addr(ha, dev) {
- 			int bit_nr = ether_crc(ETH_ALEN, ha->addr) >> 26;
- 
--			mc_filter[bit_nr >> 5] |= 1 << (bit_nr & 31);
--			rx_mode |= AcceptMulticast;
-+			new_config.mc_filter[bit_nr >> 5] |= 1 << (bit_nr & 31);
-+			new_config.rx_mode |= AcceptMulticast;
- 		}
- 	}
- 
--	/* We can safely update without stopping the chip. */
--	cp->rx_config = cp_rx_config | rx_mode;
--	cpw32_f(RxConfig, cp->rx_config);
--
--	cpw32_f (MAR0 + 0, mc_filter[0]);
--	cpw32_f (MAR0 + 4, mc_filter[1]);
-+	new_config.rx_mode = cp_rx_config | new_config.rx_mode;
-+	update_snapshot(&new_config, struct cp_private);
- }
- 
- static void cp_set_rx_mode (struct net_device *dev)
-@@ -1040,7 +1053,7 @@ static void cp_init_hw (struct cp_private *cp)
- 	cp_start_hw(cp);
- 	cpw8(TxThresh, 0x06); /* XXX convert magic num to a constant */
- 
--	__cp_set_rx_mode(dev);
-+	set_and_schedule_rx_config(dev, true);
- 	cpw32_f (TxConfig, IFG | (TX_DMA_BURST << TxDMAShift));
- 
- 	cpw8(Config1, cpr8(Config1) | DriverLoaded | PMEnable);
-@@ -1188,6 +1201,12 @@ static int cp_open (struct net_device *dev)
- 	if (rc)
- 		return rc;
- 
-+	cp->rx_config = kmalloc(sizeof(*cp->rx_config), GFP_KERNEL);
-+	if (!cp->rx_config) {
-+		rc = -ENOMEM;
-+		goto err_out_rx_config;
-+	}
-+
- 	napi_enable(&cp->napi);
- 
- 	cp_init_hw(cp);
-@@ -1207,6 +1226,9 @@ static int cp_open (struct net_device *dev)
- err_out_hw:
- 	napi_disable(&cp->napi);
- 	cp_stop_hw(cp);
-+	kfree(cp->rx_config);
-+
-+err_out_rx_config:
- 	cp_free_rings(cp);
- 	return rc;
- }
-@@ -1227,6 +1249,8 @@ static int cp_close (struct net_device *dev)
- 
- 	cp_stop_hw(cp);
- 
-+	kfree(cp->rx_config);
-+
- 	spin_unlock_irqrestore(&cp->lock, flags);
- 
- 	free_irq(cp->pdev->irq, dev);
-@@ -1262,7 +1286,7 @@ static void cp_tx_timeout(struct net_device *dev, unsigned int txqueue)
- 	cp_clean_rings(cp);
- 	cp_init_rings(cp);
- 	cp_start_hw(cp);
--	__cp_set_rx_mode(dev);
-+	set_and_schedule_rx_config(dev, false);
- 	cpw16_f(IntrMask, cp_norx_intr_mask);
- 
- 	netif_wake_queue(dev);
-@@ -1869,7 +1893,8 @@ static const struct net_device_ops cp_netdev_ops = {
- 	.ndo_stop		= cp_close,
- 	.ndo_validate_addr	= eth_validate_addr,
- 	.ndo_set_mac_address 	= cp_set_mac_address,
--	.ndo_set_rx_mode	= cp_set_rx_mode,
-+	.ndo_set_rx_mode	= __cp_set_rx_mode,
-+	.ndo_write_rx_config    = cp_write_rx_config,
- 	.ndo_get_stats		= cp_get_stats,
- 	.ndo_eth_ioctl		= cp_ioctl,
- 	.ndo_start_xmit		= cp_start_xmit,
--- 
-2.47.3
+3 -> Task0
+[253] nr_node->routes[2].neighbour = nr_neigh       // nr_neigh's refcount value is 1 and add it to routes[2]
 
+4 -> Task2
+[XXX] nr_neigh_put(nr_node->routes[2].neighbour)    // After execution, neighhour is freed
+if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)  // Uaf occurs this line when accessing neighbour->count
+
+BR,
+Lizhi
 
