@@ -1,124 +1,161 @@
-Return-Path: <netdev+bounces-230982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01662BF2D5E
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 19:59:36 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3425DBF2D67
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 19:59:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8F87934E1F9
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 17:59:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 025FD4EDF93
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 17:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D093321CB;
-	Mon, 20 Oct 2025 17:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCB6D3328E1;
+	Mon, 20 Oct 2025 17:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="VbibNkiQ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ckMa2meL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx17lb.world4you.com (mx17lb.world4you.com [81.19.149.127])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909C53321D7
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 17:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.127
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE21D332EA7
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 17:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760983168; cv=none; b=IEahsuNg2GR2WNxBmWxC4qvTtcKQbdKZmAlMoscQK9VJllHavrLZrGTJBamKlb+CU3HsH5VW7tNM4a4PcPNZdX8hSiFgm0/dzjePqL432U6bC/yepyqglpSwQ5t4Ap9AyyjYf2Ww0PJcVivJ8rFxPvTjwBbXx7eS9PEwPurfQJQ=
+	t=1760983172; cv=none; b=WsYJnvOVwhGdJYrYpodVK0pIy7cFBmmiLaWmIbOamn39zESz5zPbrKnPY9w2njItRNvFu2x8UoXC3x8NaO1YNxzDKO0J76u+UtPGGvE9w4DaAnmcYXsv1bOh9FAXgSIxtpCatplz95mJWQfM/5kLFR9mOUSlmt0mPmgSH+8CwL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760983168; c=relaxed/simple;
-	bh=Vj2Mz+fuzGnAnrlNbMoO4yBT2oo0rsNRmrl0J7/WCaI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cLwaqxI6IFcNQl1gkfOHtsK/Z0Lwu/gIyrz0edXTaNap6Z0VPq3Q7E7PGNWH6G7+mL2IKVA3sJzfnDD9Nsb3sfmdcqbd9GFnPpR3j82sNIJT2uFrtf+cSEazf4Ns6yBGwOqtJg92zm+vD17I3UEN0sYiXZBNRktUGeh+Z29sny0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=VbibNkiQ; arc=none smtp.client-ip=81.19.149.127
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=5AFF899Hha1ANwfMovTDwgk4iIHayO4JUPk3ICORhZQ=; b=VbibNkiQDth+k2R7vCU1gf0eBW
-	BpkJoCG3tEs9n3Ee7gpxb0VpZmw7XkKQz+FW4FRJjBn/xKbxa3smFUSEA7HwB1BJ8IEyxXdxbQqh9
-	avsYhxi1yxrW7GQcHlWlJjcov4Ozm6JMYnvr1KwKGCA1pg1aORvxP9VbMfmw252JhcGw=;
-Received: from [178.191.104.35] (helo=[10.0.0.160])
-	by mx17lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1vAuAG-000000006Af-0cSK;
-	Mon, 20 Oct 2025 19:59:24 +0200
-Message-ID: <b55a017f-ab51-48f9-a852-c0c4ff37cb7f@engleder-embedded.com>
-Date: Mon, 20 Oct 2025 19:59:22 +0200
+	s=arc-20240116; t=1760983172; c=relaxed/simple;
+	bh=KSaItg7owfwMA4E/6gJC21JmHwkSPxOVuYXpwaVH8eM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YdqHinJsUeZsuQeeG2wLR79L0vwlSk84zCwg4fiV4Ib3L0IHsqzUADuM/Uyg4wHwHpGQynOsmNbHzf4rNaJFv4CxeyPZQRslFDEK9zR1ojJjm7yjLU397GQrhzVjENqtPp7knaR9c4gACzaEpJLFgvVzZggBqYqCLJWL4UqwGH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ckMa2meL; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-427091cd4fdso2086332f8f.1
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 10:59:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1760983169; x=1761587969; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BBIpzP5plYQbXfXPYKWyaixauHg0jqN/NWqmZVZnNC0=;
+        b=ckMa2meL3YPvWDcGwBK+YxZErpGCddB46OFWhK2kz//Y7OXWaoplOQkNAUnmuUlwhT
+         UwUO6qTztXkgLnBUOXTeLpklIcjZRjsDO3IEU+AFS+JJqIA+a7HDyMCYG9HvBLEydabR
+         /4o4ZqrEgoLWcIok+8h01A1f9lIWHwlSzU3eTBwV+uSlRlLscuKyMxK5QJ0ybL50ZE1+
+         +gOWFTSqXucUWRMvQP8qZKVsNowus5gAKTCoJlW/pXj56ZH3kR4aqo9AaAS6HdWjr3DJ
+         TOwLL3ppprrSfziX5fJ85idP8N87tMXbhB9xh/CYvHlmiLKf7uFZ8bD4plCSecztaNnJ
+         zCDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760983169; x=1761587969;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BBIpzP5plYQbXfXPYKWyaixauHg0jqN/NWqmZVZnNC0=;
+        b=akJ2HSS2T9AzqTa9Ojf/tknJcCF6C6z8wq8CAFpZyufL6AjQJgHulfNxYm1OQ2uHWE
+         ka9R9E2LOOL7d+Q09xEC1K+i8kB9F8y/VFBPYt5JOE8l5bQRlZIxk95WI9SZF/3gQvh8
+         gxz3k9Ys0I/KgOi8VhNoPPnyKLwpABEKPbQGCQzaMKavlpvZ0PLEHoXkieXPC2LoOc9T
+         IBOtIn9wqtiW30v+obfzlbWXDEvb8tFtoSByRtmYjgu8ySMSr7EsJhv+JPcsrHW1RryZ
+         9US+Sh4eyu/+6Rfqq/IK/QEmN9PLt0gDH0lyBKv9QlJNGddce+KPsfhtjaDbqxUCRk/I
+         Rawg==
+X-Forwarded-Encrypted: i=1; AJvYcCV6B1Xda18VOIuy0Ql3/7/baScnPQ6YL/SWjRmPt1oyEdoPqSSWEB6if5b7NyG2YvqMZ7OybSQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4lklWPeOg+GaWAkGokSE5jTLrM0kO30nBYE9/08maNiTbK9Py
+	ueouUyT2DZx3JFM2QY7mu3xpTshRGybORq6HvjVDaz+AnWOuZpc0irR9/FkmVq/lWzY=
+X-Gm-Gg: ASbGncsd1lBRPLRnJejHCEYTtP0OFaHbvHlgUBfgHeUan9oGMKPZArYxJW8Sbi688rq
+	PoWGVkxfjXH9fwj770cLcXhJ9HeOdNmaHzSxZrizrOXUQgw+NWDD2wpN4jTNIbD2gLpHUaUEDKh
+	pNtlASEz5K68D5NCt/xTqWp3kQNYKBk+mzRToTLTpVpHI+AnAMJwaX13mxWv0+pka522Lz5YjmI
+	qwMqckSXkSB6cr5HSDjZjusdkarGhlUt1bdWIZdeu8w6JD4MdvhaSae92wsmlnoRvkgXk4lByaW
+	XnOSerhu8OueVTtWqX9IrLaH/sdfv1/wIyzo0hK59xXxMno/KyydQOC4RKPCpChyBm38RhnEXc6
+	DM4ZKVr3F3RDZOAZxA455PhDk8PpglsaZmHCummbvCwpr0gY7QSxHCdgicCQ1NDKo/g/Zd1NSWe
+	ix+x2gRZ46GOUWxv4=
+X-Google-Smtp-Source: AGHT+IEve3rptaTxAGdVVvZ3C2zYTFALcxP2rlbTlJDOAnuR0ODFvI8Ya+F1oDNmVuli022ySOULYw==
+X-Received: by 2002:a05:6000:2881:b0:427:1ba4:de9e with SMTP id ffacd0b85a97d-4271ba4dfdemr7326245f8f.63.1760983168883;
+        Mon, 20 Oct 2025 10:59:28 -0700 (PDT)
+Received: from localhost ([41.210.143.179])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-427f00ce06bsm16113493f8f.45.2025.10.20.10.59.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Oct 2025 10:59:28 -0700 (PDT)
+Date: Mon, 20 Oct 2025 20:59:24 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Lizhi Xu <lizhi.xu@windriver.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	kuba@kernel.org, linux-hams@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+2860e75836a08b172755@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH V2] netrom: Prevent race conditions between multiple add
+ route
+Message-ID: <aPZ4fLKBiCCIGr9e@stanley.mountain>
+References: <20251020133456.3564833-1-lizhi.xu@windriver.com>
+ <20251020134912.3593047-1-lizhi.xu@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] tsnep: convert to ndo_hwtstamp_get() and
- ndo_hwtstamp_set()
-To: Simon Horman <horms@kernel.org>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
- Vladimir Oltean <vladimir.oltean@nxp.com>
-References: <20251017203430.64321-1-gerhard@engleder-embedded.com>
- <aPYKDkBaoWuxuNBl@horms.kernel.org>
-Content-Language: en-US
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-In-Reply-To: <aPYKDkBaoWuxuNBl@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AV-Do-Run: Yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251020134912.3593047-1-lizhi.xu@windriver.com>
 
-On 20.10.25 12:08, Simon Horman wrote:
-> + Vadim
+On Mon, Oct 20, 2025 at 09:49:12PM +0800, Lizhi Xu wrote:
+> On Mon, 20 Oct 2025 21:34:56 +0800, Lizhi Xu wrote:
+> > > Task0					Task1						Task2
+> > > =====					=====						=====
+> > > [97] nr_add_node()
+> > > [113] nr_neigh_get_dev()		[97] nr_add_node()
+> > > 					[214] nr_node_lock()
+> > > 					[245] nr_node->routes[2].neighbour->count--
+> > > 					[246] nr_neigh_put(nr_node->routes[2].neighbour);
+> > > 					[248] nr_remove_neigh(nr_node->routes[2].neighbour)
+> > > 					[283] nr_node_unlock()
+> > > [214] nr_node_lock()
+> > > [253] nr_node->routes[2].neighbour = nr_neigh
+> > > [254] nr_neigh_hold(nr_neigh);							[97] nr_add_node()
+> > > 											[XXX] nr_neigh_put()
+> > >                                                                                         ^^^^^^^^^^^^^^^^^^^^
+> > > 
+> > > These charts are supposed to be chronological so [XXX] is wrong because the
+> > > use after free happens on line [248].  Do we really need three threads to
+> > > make this race work?
+> > The UAF problem occurs in Task2. Task1 sets the refcount of nr_neigh to 1,
+> > then Task0 adds it to routes[2]. Task2 releases routes[2].neighbour after
+> > executing [XXX]nr_neigh_put().
+> Execution Order:
+> 1 -> Task0
+> [113] nr_neigh_get_dev() // After execution, the refcount value is 3
 > 
-> On Fri, Oct 17, 2025 at 10:34:30PM +0200, Gerhard Engleder wrote:
->> From: Vladimir Oltean <vladimir.oltean@nxp.com>
->>
->> I took over this patch from Vladimir Oltean. The only change from my
->> side is the adaption of the commit message. I hope I mentioned his work
->> correctly in the tags.
->>
->> New timestamping API was introduced in commit 66f7223039c0 ("net: add
->> NDOs for configuring hardware timestamping") from kernel v6.6.
->>
->> It is time to convert the tsnep driver to the new API, so that
->> timestamping configuration can be removed from the ndo_eth_ioctl()
->> path completely.
->>
->> The driver does not need the interface to be down in order for
->> timestamping to be changed. Thus, the netif_running() restriction in
->> tsnep_netdev_ioctl() is not migrated to the new API. There is no
->> interaction with hardware registers for either operation, just a
->> concurrency with the data path which is fine.
->>
->> After removing the PHY timestamping logic from tsnep_netdev_ioctl(),
->> the rest is almost equivalent to phy_do_ioctl_running(), except for the
->> return code on the !netif_running() condition: -EINVAL vs -ENODEV.
->> Let's make the conversion to phy_do_ioctl_running() anyway, on the
->> premise that a return code standardized tree-wide is less complex.
->>
->> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
->> Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
->> Tested-by: Gerhard Engleder <gerhard@engleder-embedded.com>
+> 2 -> Task1
+> [246] nr_neigh_put(nr_node->routes[2].neighbour);   // After execution, the refcount value is 2
+> [248] nr_remove_neigh(nr_node->routes[2].neighbour) // After execution, the refcount value is 1
 > 
-> Hi Gerhard, Vladimir, Vadim, all,
+> 3 -> Task0
+> [253] nr_node->routes[2].neighbour = nr_neigh       // nr_neigh's refcount value is 1 and add it to routes[2]
 > 
-> Recently Vadim has been working on converting a number of drivers to
-> use ndo_hwtstamp_get() and ndo_hwtstamp_set(). And this includes a
-> patch, rather similar to this one, for the tsnep [1].
-> 
-> I think it would be good to agree on the way forward here.
-> 
-> [1] https://lore.kernel.org/all/20251016152515.3510991-7-vadim.fedorenko@linux.dev/
+> 4 -> Task2
+> [XXX] nr_neigh_put(nr_node->routes[2].neighbour)    // After execution, neighhour is freed
+> if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)  // Uaf occurs this line when accessing neighbour->count
 
-I already replied to Vadim, but on the first patch version, not on V3.
+Let's step back a bit and look at the bigger picture design.  (Which is
+completely undocumented so we're just guessing).
 
-@Vadim: I reviewed your V3. Thanks for your work!
+When we put nr_neigh into nr_node->routes[] we bump the nr_neigh_hold()
+reference count and nr_neigh->count++, then when we remove it from
+->routes[] we drop the reference and do nr_neigh->count--.
 
-So this patch can be stopped.
+If it's the last reference (and we are not holding ->locked) then we
+remove it from the &nr_neigh_list and drop the reference count again and
+free it.  So we drop the reference count twice.  This is a complicated
+design with three variables: nr_neigh_hold(), nr_neigh->count and
+->locked.  Why can it not just be one counter nr_neigh_hold().  So
+instead of setting locked = true we would just take an extra reference?
+The nr_neigh->count++ would be replaced with nr_neigh_hold() as well.
 
-Gerhard
+Because that's fundamentally the problem, right?  We call
+nr_neigh_get_dev() so we think we're holding a reference and we're
+safe, but we don't realize that calling neighbour->count-- can
+result in dropping two references.
+
+regards,
+dan carpenter
+
 
