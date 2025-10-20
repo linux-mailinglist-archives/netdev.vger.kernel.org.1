@@ -1,119 +1,135 @@
-Return-Path: <netdev+bounces-230884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26CCABF0FCC
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:05:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C5D3BF122A
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:23:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14EF23AC102
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:05:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3245B423829
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:19:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4783F2F3C19;
-	Mon, 20 Oct 2025 12:05:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y6d3ZFZQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48EE83164A4;
+	Mon, 20 Oct 2025 12:18:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A83E208D0;
-	Mon, 20 Oct 2025 12:05:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3009A3128AB;
+	Mon, 20 Oct 2025 12:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760961942; cv=none; b=izdAdomigohDJ6fHbQXDd7X+ioY34iJx1x+O9pySKQTjAlsV3ZpH6VbOXLmuroT4BPEn9CMhJpV4w2S3OmQOjs1QljfVpTxl1cGbfc7KOE+4xX4EbNnc7a0Mof8ZXt5Pp2yanguEjLmo1QKy/XyM++Uvt2PQ8coEzDr36A8mnCU=
+	t=1760962703; cv=none; b=tzG4zTt14ppgQCessZK/uQYCH00hfDfILU2qUSXshyN7xTmL8al5wqDlAKVmxg3O7Y2oq8bPW0ETkqhMkgoYle/AGWubtT77UFIub/aw2N6qvlvoFsZjnxs50e6juPySSuKhRDj39pOMd+dRWYqc19hKvH7DZwkeGUrgm2jl9sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760961942; c=relaxed/simple;
-	bh=E4WIZb94VFhTqzi+aDX1vJifr1WIC9U+ZUXLJ7Ld2B4=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=nrF4PcMdVyEHSQocHGLU8OZW/6ZiqnkOqHEX7dVSdo/WBIz/BjgddcAxYRkx22pmb0uuBySGXagoITLqIof6IxKU7mqMvZT9uF9kzI4SJrgdGxa6kscoZpwo9CIB5kAr2NFolBc76rV5JmU3nNoSxqqZtE37HcTnfhUbUm5Q5Js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y6d3ZFZQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69F1BC4CEF9;
-	Mon, 20 Oct 2025 12:05:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760961941;
-	bh=E4WIZb94VFhTqzi+aDX1vJifr1WIC9U+ZUXLJ7Ld2B4=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=Y6d3ZFZQusyCn275mQM8m6fv+vlFbWdyQgK1qBx2RBm2w129gB3UGUUQqJrI1KbGh
-	 dRLa8UTq7a2oN/8opFrWdcm7Tmjms5qQrNAlh/mBdBEN8ROsQ36K5Oirlzl9ZRhf/H
-	 D01z3n2KpP0z+dCVufJVd9WShC1ESdYlxjefVp+CCApYiBlBIg0XnkeLuc+2RT49Gs
-	 I2058kerY79xlKJkPvBYin5SSweaQrZH0AA9JLeoVAwCVOG8BtWcra57gnbQ8KCYFy
-	 QfwFwrGGzqigceRLR+dkPdwH50dkcrl85WIsNpvuH9QfUx3BWm8WDdx+dURU11Roc2
-	 sC9/lMNiMJs/w==
-Date: Mon, 20 Oct 2025 07:05:39 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1760962703; c=relaxed/simple;
+	bh=80FbDkBe1shvB1vnoWDwQhn8pRsa4OW0LHoxQpVfERE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MYBE2vrklGToIXhcTHGqreRkJ+kEpEhLNp8C4I9brv8/3oA1A5W/8JhFSu6nPChDlGxJhJsIVLuGRI/TfgGMWyUlhG5YSFbIYjws2MgEzf39uvz45m6fpkK8IkxFzj1yt+ZQ8u63POFkyUEotQyZRaCRxMbgzkTI4fxARbVroTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vAopx-000000003X8-401e;
+	Mon, 20 Oct 2025 12:18:06 +0000
+Date: Mon, 20 Oct 2025 13:17:57 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Sjoerd Simons <sjoerd@collabora.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Jianjun Wang <jianjun.wang@mediatek.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	kernel@collabora.com, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
+	linux-phy@lists.infradead.org, netdev@vger.kernel.org,
+	Bryan Hinton <bryan@bryanhinton.com>
+Subject: Re: [PATCH 10/15] arm64: dts: mediatek: mt7981b: Add Ethernet and
+ WiFi offload support
+Message-ID: <aPYodR5N89vRUyQp@makrotopia.org>
+References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
+ <20251016-openwrt-one-network-v1-10-de259719b6f2@collabora.com>
+ <aPEhiVdgkVLvF9Et@makrotopia.org>
+ <8a637fc2-7768-4816-bb4f-3af2e32908e4@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Icenowy Zheng <uwu@icenowy.me>, Han Gao <rabenda.cn@gmail.com>, 
- Yao Zi <ziyao@disroot.org>, linux-kernel@vger.kernel.org, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Chen Wang <unicorn_wang@outlook.com>, sophgo@lists.linux.dev, 
- Vivian Wang <wangruikang@iscas.ac.cn>, Conor Dooley <conor+dt@kernel.org>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Eric Dumazet <edumazet@google.com>, Russell King <linux@armlinux.org.uk>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, netdev@vger.kernel.org, 
- Yixun Lan <dlan@gentoo.org>, 
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- linux-stm32@st-md-mailman.stormreply.com, Longbin Li <looong.bin@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>
-To: Inochi Amaoto <inochiama@gmail.com>
-In-Reply-To: <20251020095500.1330057-2-inochiama@gmail.com>
-References: <20251020095500.1330057-1-inochiama@gmail.com>
- <20251020095500.1330057-2-inochiama@gmail.com>
-Message-Id: <176096193973.211044.5323192704803945227.robh@kernel.org>
-Subject: Re: [PATCH v2 1/3] dt-bindings: net: sophgo,sg2044-dwmac: add phy
- mode restriction
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8a637fc2-7768-4816-bb4f-3af2e32908e4@collabora.com>
 
-
-On Mon, 20 Oct 2025 17:54:57 +0800, Inochi Amaoto wrote:
-> As the ethernet controller of SG2044 and SG2042 only supports
-> RGMII phy. Add phy-mode property to restrict the value.
+On Mon, Oct 20, 2025 at 12:27:53PM +0200, AngeloGioacchino Del Regno wrote:
+> Il 16/10/25 18:47, Daniel Golle ha scritto:
+> > On Thu, Oct 16, 2025 at 12:08:46PM +0200, Sjoerd Simons wrote:
+> > > Add device tree nodes for the Ethernet subsystem on MT7981B SoC,
+> > > including:
+> > > - Ethernet MAC controller with dual GMAC support
+> > > - Wireless Ethernet Dispatch (WED)
+> > > - SGMII PHY controllers for high-speed Ethernet interfaces
+> > > - Reserved memory regions for WiFi offload processor
+> > > 
+> > > Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
+> > > ---
+> > >   arch/arm64/boot/dts/mediatek/mt7981b.dtsi | 133 ++++++++++++++++++++++++++++++
+> > >   1 file changed, 133 insertions(+)
+> > > 
+> > > diff --git a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi b/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
+> > > index 13950fe6e8766..c85fa0ddf2da8 100644
+> > > --- a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
+> > > +++ b/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
 > 
-> Also, since SG2042 has internal rx delay in its mac, make
-> only "rgmii-txid" and "rgmii-id" valid for phy-mode.
+> ..snip..
 > 
-> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-> ---
->  .../bindings/net/sophgo,sg2044-dwmac.yaml       | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
+> > > +
+> > > +			mdio_bus: mdio-bus {
+> > > +				#address-cells = <1>;
+> > > +				#size-cells = <0>;
+> > > +
+> > > +				int_gbe_phy: ethernet-phy@0 {
+> > > +					compatible = "ethernet-phy-ieee802.3-c22";
+> > > +					reg = <0>;
+> > > +					phy-mode = "gmii";
+> > > +					phy-is-integrated;
+> > > +					nvmem-cells = <&phy_calibration>;
+> > > +					nvmem-cell-names = "phy-cal-data";
+> > 
+> > Please also define the two LEDs here with their corresponding (only)
+> > pinctrl options for each of them, with 'status = "disabled";'. This
+> > makes it easier for boards to make use of the Ethernet PHY leds by just
+> > referencing the LED and setting the status to 'okay'.
+> > 
 > 
+> Sorry Daniel, definitely no. The LEDs really are board specific.
+> 
+> Try to convince me otherwise, but for this one I really doubt that you can.
 
-My bot found errors running 'make dt_binding_check' on your patch:
+You are right, the LEDs themselves are board-specific and may not even
+be present.
 
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml: allOf:1:then: 'anyOf' conditional failed, one must be fixed:
-	'phy-mode' is not one of ['$ref', 'additionalItems', 'additionalProperties', 'allOf', 'anyOf', 'const', 'contains', 'default', 'dependencies', 'dependentRequired', 'dependentSchemas', 'deprecated', 'description', 'else', 'enum', 'exclusiveMaximum', 'exclusiveMinimum', 'items', 'if', 'minItems', 'minimum', 'maxItems', 'maximum', 'multipleOf', 'not', 'oneOf', 'pattern', 'patternProperties', 'properties', 'required', 'then', 'typeSize', 'unevaluatedProperties', 'uniqueItems']
-	'type' was expected
-	from schema $id: http://devicetree.org/meta-schemas/keywords.yaml#
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20251020095500.1330057-2-inochiama@gmail.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+However, the LED controller is always present because it is part of the
+PHY which is built-into the SoC. And the pinctrl property which I'd like
+to see described on SoC-level is a property of the LED controller rather
+than the LED itself. Sadly the device tree node doesn't make the
+distinction between LED and LED controller, so I understand you your
+argument as well.
 
