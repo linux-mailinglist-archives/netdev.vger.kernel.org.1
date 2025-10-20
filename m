@@ -1,102 +1,190 @@
-Return-Path: <netdev+bounces-230979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72E8DBF2B99
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 19:32:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 296D5BF2CA4
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 19:46:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E10F18A6487
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 17:33:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96D0E18A88C3
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 17:46:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2F62BF01D;
-	Mon, 20 Oct 2025 17:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57111C3C11;
+	Mon, 20 Oct 2025 17:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dxNlxydD"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="X7CIZep0";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qXRrHP9/";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="cFlQUpox";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GvU0/T3L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9186B2561AE;
-	Mon, 20 Oct 2025 17:32:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169AD1D90DD
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 17:46:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760981553; cv=none; b=BdyFxYIgRzUNSBNeM6+w59buBMmO5ShUSKIrsnewjQcLhR2ADNHeW3W8/Nb4rYgnzGwhoGMaYcIdoOlx14IvRQYOKPzf//UXZy0bqOSL6NHRI8A/giP5FSItnFUiwff/WdTLnZ8f43I5Azq70tlI5HFOzF/lHtjt5J4HGF7Qzos=
+	t=1760982389; cv=none; b=hyQgelES/laUlEmKgHgXBci086N/MtOCFKMjVJiOpN9cIutSBiF02Dj0HCMTNMZ4rCb1B0rWCX4gZdEPTIHczUN+kk63QjLb7kCevskc3ebhbJZEOI1r9rOJWDwx62P6XuggZbS0bihg4WZiMTNzHOVVQPRVUtl/A0WVSIa8fZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760981553; c=relaxed/simple;
-	bh=cKso7ybb9iJDanB4qNQL4k5Ww5/ll0Fs6J9dM79RXaA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rdczWlW70drAvm28HLAJV0Dm7PzD9VuFqq9Lc7zVc/lsjzsKLj6ksxjVmiZnfJhE7fkT/tN5ONBN5ipJspYzbti2NAf7TjSgUGs5/PABVEyjwFeg+inaeeRLhDwI+qOvqON0uJnjHUeJVLddnUDqwzWxuDGfUhlpn6QSQxII7uw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dxNlxydD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BAD4C4CEF9;
-	Mon, 20 Oct 2025 17:32:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760981550;
-	bh=cKso7ybb9iJDanB4qNQL4k5Ww5/ll0Fs6J9dM79RXaA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dxNlxydD+pAipulVtdKT1k0HzWG2vQdHfDvfTnx0eEVuwCe9TM3CQtoWtN1QqOc0l
-	 RI7NLPfQxkgkKfh9EPWTrBq+oWWzFXZzakp2ThpB5MlPb/zorCXg1zKTcGSKhk5cmI
-	 a8jlbqQC5rgQmOQ3WyvMW+mElJHzqMEyWP7gZat8dP5U3nc73OBhtBlQ3mCAKLFd70
-	 o010CW37VeeUXx5YIT+56I40L4dq+r9LqEGhBjpE2o/+/QO4FVc9cFB0mD4+hzWVRt
-	 vO8TTHzf0JMdYIDxejH3QPDCVaYZTm+J0f6+x9lajVz9uGkuiHOuCcVyqiaL5jgRDm
-	 s39Aswgovvb6A==
-Date: Mon, 20 Oct 2025 18:32:26 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v3 01/13] dt-bindings: net: airoha: Add AN7583
- support
-Message-ID: <20251020-vision-outspoken-7083858d278c@spud>
-References: <20251017-an7583-eth-support-v3-0-f28319666667@kernel.org>
- <20251017-an7583-eth-support-v3-1-f28319666667@kernel.org>
+	s=arc-20240116; t=1760982389; c=relaxed/simple;
+	bh=N29IVl+IuQAk4lSla/1emfsV/ce30+oUFNIq43T2TT4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QANDhWepD12yfWOxFqTXTpqQHfwMhgIxOh9yW/0+6Fdu/Iq0LXI1gsTpeLK/Hq4+/9kKZ36OAdE28tNXEOt8sEO5sW4Ecu76+u+oL2SVigAoWSystRoTu6KD2eEMFHCIDCScZssejeme5lkyWYUfhoXEp2JecdGJHilEjOUUGiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=X7CIZep0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qXRrHP9/; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=cFlQUpox; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GvU0/T3L; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 1EB91211D5;
+	Mon, 20 Oct 2025 17:46:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1760982382; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/+ReULqjpAVMXEkNnUbtKvkOe8jwFMdF26ovOchyM94=;
+	b=X7CIZep02xnw5H2mr1TMZX2InlPRfMDbyix7t54Tsb8aX6zvTF99w7HscBE0pWXK9Dz8o6
+	3Awek7SwoOLnoSZ+hNTEZXSUKCLwVHPCMTHInMWpiWmHP8S9q8ZF70t5G9NMDB6XJBvfXG
+	vlwIVIs0LU1grHUAt+v6CS7F6/bQcYU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1760982382;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/+ReULqjpAVMXEkNnUbtKvkOe8jwFMdF26ovOchyM94=;
+	b=qXRrHP9/4ljBb9JJXOQ2dIgfPTJuHyKNwgal9jBU2SC8iGaLf9ou68IIz/cagUHlJmHPIU
+	1MVFh8k7DKhzmMDw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=cFlQUpox;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="GvU0/T3L"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1760982378; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/+ReULqjpAVMXEkNnUbtKvkOe8jwFMdF26ovOchyM94=;
+	b=cFlQUpoxARZE1s5rFceWfdhzhzIFdAlC68RDNOc+39F0RDOItBobvY/aYf9LKni773PSrC
+	7pqty0gFrByxtamMC4zF3PZQlrR0hJ/u1IyYAMe/+JxfEKNuKKK5jMBjQo11bpp2GrRe0Q
+	CvU+i6Pu8qnvhHT19w8QJF+FqhnPBFc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1760982378;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/+ReULqjpAVMXEkNnUbtKvkOe8jwFMdF26ovOchyM94=;
+	b=GvU0/T3Lhg3R39M49vOqoruvYcuYCDbPjgAHyHu15GvX+oQYie45hx7DgKH3+8B+uu1/I7
+	/RQCYaN8xheMZ4AA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4B0F213AAC;
+	Mon, 20 Oct 2025 17:46:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id +OxhD2l19mgWXQAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 20 Oct 2025 17:46:17 +0000
+Message-ID: <fe16288e-e3f2-4de3-838e-181bbb0ce3ee@suse.de>
+Date: Mon, 20 Oct 2025 19:46:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ikE/IhHK61RqCyon"
-Content-Disposition: inline
-In-Reply-To: <20251017-an7583-eth-support-v3-1-f28319666667@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/7] nvme-tcp: Support receiving KeyUpdate requests
+To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
+ kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
+Cc: kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
+ kch@nvidia.com, Alistair Francis <alistair.francis@wdc.com>
+References: <20251017042312.1271322-1-alistair.francis@wdc.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20251017042312.1271322-1-alistair.francis@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 1EB91211D5
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FREEMAIL_TO(0.00)[gmail.com,oracle.com,kernel.org,lists.linux.dev,vger.kernel.org,lists.infradead.org];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
 
+On 10/17/25 06:23, alistair23@gmail.com wrote:
+> From: Alistair Francis <alistair.francis@wdc.com>
+> 
+> The TLS 1.3 specification allows the TLS client or server to send a
+> KeyUpdate. This is generally used when the sequence is about to
+> overflow or after a certain amount of bytes have been encrypted.
+> 
+> The TLS spec doesn't mandate the conditions though, so a KeyUpdate
+> can be sent by the TLS client or server at any time. This includes
+> when running NVMe-OF over a TLS 1.3 connection.
+> 
+> As such Linux should be able to handle a KeyUpdate event, as the
+> other NVMe side could initiate a KeyUpdate.
+> 
+> Upcoming WD NVMe-TCP hardware controllers implement TLS support
+> and send KeyUpdate requests.
+> 
+> This series builds on top of the existing TLS EKEYEXPIRED work,
+> which already detects a KeyUpdate request. We can now pass that
+> information up to the NVMe layer (target and host) and then pass
+> it up to userspace.
+> 
+> Userspace (ktls-utils) will need to save the connection state
+> in the keyring during the initial handshake. The kernel then
+> provides the key serial back to userspace when handling a
+> KeyUpdate. Userspace can use this to restore the connection
+> information and then update the keys, this final process
+> is similar to the initial handshake.
+> 
 
---ikE/IhHK61RqCyon
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I am rather sceptical at the current tlshd implementation.
+At which place do you update the sending keys?
+I'm only seeing a call to 'gnutls_handhake_update_receiving_key()'.
 
-On Fri, Oct 17, 2025 at 11:06:10AM +0200, Lorenzo Bianconi wrote:
-> Introduce AN7583 ethernet controller support to Airoha EN7581
-> device-tree bindings. The main difference between EN7581 and AN7583 is
-> the number of reset lines required by the controller (AN7583 does not
-> require hsi-mac).
->=20
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+But I haven't found the matching function 
+'gnutls_handshake_update_sending_key()' in current gnutls.
+So how does updating of the sending keys work?
 
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Cheers,
 
---ikE/IhHK61RqCyon
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaPZyKQAKCRB4tDGHoIJi
-0tFvAP9DJl24eno8NxIX9XQVm4OUQPtBYct3ESOFm89Kv/5TiwEAm7Cnd2e3nASD
-TVa9KnbLfOIk4PROrVEsjg2j99tMHw0=
-=RGLT
------END PGP SIGNATURE-----
-
---ikE/IhHK61RqCyon--
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
