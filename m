@@ -1,131 +1,318 @@
-Return-Path: <netdev+bounces-230769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21A44BEF08D
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 03:52:29 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7027BEF0AC
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 04:01:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7817189887C
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 01:52:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6D8724E36FF
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 02:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805761A840A;
-	Mon, 20 Oct 2025 01:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2951E511;
+	Mon, 20 Oct 2025 02:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="2NHjJnW6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D838B1A239A
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 01:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54BF61B808;
+	Mon, 20 Oct 2025 02:00:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760925147; cv=none; b=e0AHbuDU75sI+OnORIGgOOf+Bo1rv1dlXWN1t8X8qbciGIerFCQ06yasAQLdnKUW7+GnPtOTm7X7/6560eYrhxNgj9dXt19m4l8l2vGnIWB9fsdMRhnHgMv9evmwSBmOGKp6yeESXHwdM5mdHtVrrAW3ZuAlZ+/bCtrEGS5hWWM=
+	t=1760925660; cv=none; b=eiEszn5Up2VZZVWRt5R+J60tT7FhEQQ5UrzU82QZ3eFhkPhSVZFqARc+N9u103JoH9RTb3UWw3EMlAEnrnZ9d9MI1JG4wvHgPiUVqlSmiNeKyNdHSIsYI541OrHEKSKesr/lFSgoIxarSrX+lmdlZLBzoz2UOuTfM9iLcN0Po/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760925147; c=relaxed/simple;
-	bh=7adGGVF9tdW1YJFMPKEmSFylgttva22iP01hwiRYwow=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=XfBTeZ8cfNcFbkTqvxPz2fILIsfqUu/0cU798B96x1GXUjhwajqzsOPG7QY3iq5ie9uDGX4IsLJ4/eI+RHt5+8/JDfx63666zNeQyeM90I7Wq/mDsdK3X8kcsHn38qLbPOq2bF6eFYDe9ZVPcQAk0Ez2LcesKycI9rPIt8SGtfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-93e7b0584c9so217445539f.0
-        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 18:52:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760925145; x=1761529945;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rFUqgO/1X4tGf013zyFKn87MJvA/QpMdKd1TaPnKCjc=;
-        b=vxDLxGNWA3i590/T5wW5tU99NP+65dmJpr5CKOAOWGVTi8hOTluKk1k768cw7N86kF
-         Z4yGhzTPEgrYcUNZWMTrK/klPSPM3dDx9YsFL3avhO0OwJsCV3elA1P8T9MjvpgzT8p/
-         dIPjOMkoBCyY2KNWutHMSs23kpCGSM7LHoiqEMJpRZgNutuSfBtmJfARZDOBiLSwHq6z
-         D9A8qmBFW/6x+q4HNZoObZhX7sQd/c0AM0fFm/JS1wdVBNRHzcwFqUeqUwPcXMWxfXAh
-         X21zLeYN2dGEhwv/mm9CLrvdEdVcKDjXOy+TNuFYVhHuyZeI0mGMCDJ7rj9aoCcEVB6M
-         casA==
-X-Forwarded-Encrypted: i=1; AJvYcCXbroipWt6t5Rjs8Ek/Yefa3U5YPHXSBsY+EkTEaLobKz3iK9IUDhpbRRWguhBv1zSAbD/nWZw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2+McLiAEBidXKVQ/PM8LyEpLD+j1wxbaI3sI/OaHirVLhKJhA
-	ZNXoQFtXbzR6sepBDh+WdgPayZGusT8hwCengY9ThpVQHGaEkBJtPgX2iCN/xHQerJ4wQHDBVP3
-	shZ/bX6adjNv8YjNdCXcL2h7yGDYHRy/C2zJnnzVw8PZ2oKtxvnG/c9828HU=
-X-Google-Smtp-Source: AGHT+IGEOGgAhJ/VqxDKE9fKEFF/jaq3tSnh+we7qLzZ2LAHPDAXshaEsuvm4ccKBJLGxkBNcROv4yDvfOrJP5YcURXXt2nQ2uHU
+	s=arc-20240116; t=1760925660; c=relaxed/simple;
+	bh=J515h2CvnI02QPeAmu7FLgKZtNGW1+YczNFE02JNK6Y=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=CxYo7TqGs9fyWL63JfPpw8dhctUGMjwx7KknzoZHqoX4E+yyCDCRyMZZ5uHFJJobWwQGaMvEyCcb7v3d7QLq8ZKk4900ppryr7LdqF5APV19JGaqWILgdHHgz1VyIPT/ptO+5MgelndgTulWJ7YNn7q9ZjBR5cbUL8vWppX2dpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=2NHjJnW6; arc=none smtp.client-ip=113.46.200.224
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=ISsxNtEVgK67rnsMjqjIOEfhaba9KDZbj+YRWqHr0Mc=;
+	b=2NHjJnW6kRwOwsfFMMMmThAAFdwELZ3dE/VfEL7QqgejD5Kow8dIDVHKYzTXZBrQWcr5sDf5V
+	+GiBHmNwegUKr5mQNcrQMUyTiaV1/MBEU+rwlQ75J1CxKttNqJF9Jo1HbJCuF8vfy8VcWVEXkvB
+	dogBlOUBjzd8LsHfIL0tsho=
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4cqdtJ4cphz1cyVL;
+	Mon, 20 Oct 2025 10:00:24 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id C2BEA140142;
+	Mon, 20 Oct 2025 10:00:47 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 20 Oct 2025 10:00:46 +0800
+Message-ID: <33546397-6078-44c5-b5c6-15c917b18da5@huawei.com>
+Date: Mon, 20 Oct 2025 10:00:46 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:6409:b0:901:3363:e663 with SMTP id
- ca18e2360f4ac-93e76451522mr1784937939f.13.1760925145012; Sun, 19 Oct 2025
- 18:52:25 -0700 (PDT)
-Date: Sun, 19 Oct 2025 18:52:25 -0700
-In-Reply-To: <66f49736.050a0220.211276.0036.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68f595d8.050a0220.91a22.043c.GAE@google.com>
-Subject: Re: [syzbot] [wireguard?] INFO: task hung in wg_netns_pre_exit (5)
-From: syzbot <syzbot+f2fbf7478a35a94c8b7c@syzkaller.appspotmail.com>
-To: Jason@zx2c4.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, jason@zx2c4.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
-Content-Type: text/plain; charset="UTF-8"
-
-syzbot has found a reproducer for the following issue on:
-
-HEAD commit:    88224095b4e5 Merge branch 'net-dsa-lantiq_gswip-clean-up-a..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=17b28de2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=913caf94397d1b8d
-dashboard link: https://syzkaller.appspot.com/bug?extid=f2fbf7478a35a94c8b7c
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10796b04580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f3cb46a2b9fc/disk-88224095.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/0d43ffbc738d/vmlinux-88224095.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9817e4fdd10a/bzImage-88224095.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f2fbf7478a35a94c8b7c@syzkaller.appspotmail.com
-
-INFO: task kworker/u8:8:6081 blocked for more than 143 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u8:8    state:D stack:23424 pid:6081  tgid:6081  ppid:2      task_flags:0x4208060 flags:0x00080000
-Workqueue: netns cleanup_net
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5325 [inline]
- __schedule+0x1798/0x4cc0 kernel/sched/core.c:6929
- __schedule_loop kernel/sched/core.c:7011 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:7026
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:7083
- __mutex_lock_common kernel/locking/mutex.c:676 [inline]
- __mutex_lock+0x7e6/0x1350 kernel/locking/mutex.c:760
- wg_netns_pre_exit+0x1c/0x1d0 drivers/net/wireguard/device.c:419
- ops_pre_exit_list net/core/net_namespace.c:161 [inline]
- ops_undo_list+0x187/0x990 net/core/net_namespace.c:234
- cleanup_net+0x4d8/0x820 net/core/net_namespace.c:696
- process_one_work kernel/workqueue.c:3263 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-INFO: task syz-executor:6161 blocked for more than 147 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:25608 pid:6161  tgid:6161  ppid:1      task_flags:0x400140 flags:0x00080002
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5325 [inline]
- __schedule+0x1798/0x4cc0 kernel/sched/core.c:6929
- __schedule_loop kernel/sched/core.c:7011 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:7026
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <linux-renesas-soc@vger.kernel.org>, Richard
+ Cochran <richardcochran@gmail.com>, Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 6/6] net: hns3: add hwtstamp_get/hwtstamp_set
+ ops
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jian Shen
+	<shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya
+	<gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, Bharat Bhushan
+	<bbhushan2@marvell.com>, Tariq Toukan <tariqt@nvidia.com>, Brett Creeley
+	<brett.creeley@amd.com>, =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+	<niklas.soderlund@ragnatech.se>, Paul Barker <paul@pbarker.dev>, Yoshihiro
+ Shimoda <yoshihiro.shimoda.uh@renesas.com>
+References: <20251017182128.895687-1-vadim.fedorenko@linux.dev>
+ <20251017182128.895687-7-vadim.fedorenko@linux.dev>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20251017182128.895687-7-vadim.fedorenko@linux.dev>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+on 2025/10/18 2:21, Vadim Fedorenko wrote:
+> And .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks to HNS3 framework
+> to support HW timestamp configuration via netlink and adopt hns3pf to
+> use .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
+>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+
+Thanks,
+Reviewed-by: Jijie Shao <shaojijie@huawei.com>
+
+> ---
+> v1 -> v2:
+> - actually assign ndo_tstamp callbacks
+> ---
+>   drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  5 +++
+>   .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 31 ++++++++++++++++++
+>   .../hisilicon/hns3/hns3pf/hclge_main.c        | 13 +++-----
+>   .../hisilicon/hns3/hns3pf/hclge_ptp.c         | 32 +++++++++++--------
+>   .../hisilicon/hns3/hns3pf/hclge_ptp.h         |  9 ++++--
+>   5 files changed, 64 insertions(+), 26 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+> index 3b548f71fa8a..d7c3df1958f3 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+> @@ -804,6 +804,11 @@ struct hnae3_ae_ops {
+>   	int (*dbg_get_read_func)(struct hnae3_handle *handle,
+>   				 enum hnae3_dbg_cmd cmd,
+>   				 read_func *func);
+> +	int (*hwtstamp_get)(struct hnae3_handle *handle,
+> +			    struct kernel_hwtstamp_config *config);
+> +	int (*hwtstamp_set)(struct hnae3_handle *handle,
+> +			    struct kernel_hwtstamp_config *config,
+> +			    struct netlink_ext_ack *extack);
+>   };
+>   
+>   struct hnae3_dcb_ops {
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+> index bfa5568baa92..7a0654e2d3dd 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+> @@ -2419,6 +2419,35 @@ static int hns3_nic_do_ioctl(struct net_device *netdev,
+>   	return h->ae_algo->ops->do_ioctl(h, ifr, cmd);
+>   }
+>   
+> +static int hns3_nic_hwtstamp_get(struct net_device *netdev,
+> +				 struct kernel_hwtstamp_config *config)
+> +{
+> +	struct hnae3_handle *h = hns3_get_handle(netdev);
+> +
+> +	if (!netif_running(netdev))
+> +		return -EINVAL;
+> +
+> +	if (!h->ae_algo->ops->hwtstamp_get)
+> +		return -EOPNOTSUPP;
+> +
+> +	return h->ae_algo->ops->hwtstamp_get(h, config);
+> +}
+> +
+> +static int hns3_nic_hwtstamp_set(struct net_device *netdev,
+> +				 struct kernel_hwtstamp_config *config,
+> +				 struct netlink_ext_ack *extack)
+> +{
+> +	struct hnae3_handle *h = hns3_get_handle(netdev);
+> +
+> +	if (!netif_running(netdev))
+> +		return -EINVAL;
+> +
+> +	if (!h->ae_algo->ops->hwtstamp_set)
+> +		return -EOPNOTSUPP;
+> +
+> +	return h->ae_algo->ops->hwtstamp_set(h, config, extack);
+> +}
+> +
+>   static int hns3_nic_set_features(struct net_device *netdev,
+>   				 netdev_features_t features)
+>   {
+> @@ -3048,6 +3077,8 @@ static const struct net_device_ops hns3_nic_netdev_ops = {
+>   	.ndo_set_vf_rate	= hns3_nic_set_vf_rate,
+>   	.ndo_set_vf_mac		= hns3_nic_set_vf_mac,
+>   	.ndo_select_queue	= hns3_nic_select_queue,
+> +	.ndo_hwtstamp_get	= hns3_nic_hwtstamp_get,
+> +	.ndo_hwtstamp_set	= hns3_nic_hwtstamp_set,
+>   };
+>   
+>   bool hns3_is_phys_func(struct pci_dev *pdev)
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> index 9d34d28ff168..81d3bdc098e6 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> @@ -9445,15 +9445,8 @@ static int hclge_do_ioctl(struct hnae3_handle *handle, struct ifreq *ifr,
+>   	struct hclge_vport *vport = hclge_get_vport(handle);
+>   	struct hclge_dev *hdev = vport->back;
+>   
+> -	switch (cmd) {
+> -	case SIOCGHWTSTAMP:
+> -		return hclge_ptp_get_cfg(hdev, ifr);
+> -	case SIOCSHWTSTAMP:
+> -		return hclge_ptp_set_cfg(hdev, ifr);
+> -	default:
+> -		if (!hdev->hw.mac.phydev)
+> -			return hclge_mii_ioctl(hdev, ifr, cmd);
+> -	}
+> +	if (!hdev->hw.mac.phydev)
+> +		return hclge_mii_ioctl(hdev, ifr, cmd);
+>   
+>   	return phy_mii_ioctl(hdev->hw.mac.phydev, ifr, cmd);
+>   }
+> @@ -12901,6 +12894,8 @@ static const struct hnae3_ae_ops hclge_ops = {
+>   	.get_dscp_prio = hclge_get_dscp_prio,
+>   	.get_wol = hclge_get_wol,
+>   	.set_wol = hclge_set_wol,
+> +	.hwtstamp_get = hclge_ptp_get_cfg,
+> +	.hwtstamp_set = hclge_ptp_set_cfg,
+>   };
+>   
+>   static struct hnae3_ae_algo ae_algo = {
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
+> index 4bd52eab3914..0081c5281455 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
+> @@ -204,13 +204,17 @@ static int hclge_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
+>   	return 0;
+>   }
+>   
+> -int hclge_ptp_get_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
+> +int hclge_ptp_get_cfg(struct hnae3_handle *handle,
+> +		      struct kernel_hwtstamp_config *config)
+>   {
+> +	struct hclge_vport *vport = hclge_get_vport(handle);
+> +	struct hclge_dev *hdev = vport->back;
+> +
+>   	if (!test_bit(HCLGE_STATE_PTP_EN, &hdev->state))
+>   		return -EOPNOTSUPP;
+>   
+> -	return copy_to_user(ifr->ifr_data, &hdev->ptp->ts_cfg,
+> -		sizeof(struct hwtstamp_config)) ? -EFAULT : 0;
+> +	*config = hdev->ptp->ts_cfg;
+> +	return 0;
+>   }
+>   
+>   static int hclge_ptp_int_en(struct hclge_dev *hdev, bool en)
+> @@ -269,7 +273,7 @@ static int hclge_ptp_cfg(struct hclge_dev *hdev, u32 cfg)
+>   	return ret;
+>   }
+>   
+> -static int hclge_ptp_set_tx_mode(struct hwtstamp_config *cfg,
+> +static int hclge_ptp_set_tx_mode(struct kernel_hwtstamp_config *cfg,
+>   				 unsigned long *flags, u32 *ptp_cfg)
+>   {
+>   	switch (cfg->tx_type) {
+> @@ -287,7 +291,7 @@ static int hclge_ptp_set_tx_mode(struct hwtstamp_config *cfg,
+>   	return 0;
+>   }
+>   
+> -static int hclge_ptp_set_rx_mode(struct hwtstamp_config *cfg,
+> +static int hclge_ptp_set_rx_mode(struct kernel_hwtstamp_config *cfg,
+>   				 unsigned long *flags, u32 *ptp_cfg)
+>   {
+>   	int rx_filter = cfg->rx_filter;
+> @@ -332,7 +336,7 @@ static int hclge_ptp_set_rx_mode(struct hwtstamp_config *cfg,
+>   }
+>   
+>   static int hclge_ptp_set_ts_mode(struct hclge_dev *hdev,
+> -				 struct hwtstamp_config *cfg)
+> +				 struct kernel_hwtstamp_config *cfg)
+>   {
+>   	unsigned long flags = hdev->ptp->flags;
+>   	u32 ptp_cfg = 0;
+> @@ -359,9 +363,12 @@ static int hclge_ptp_set_ts_mode(struct hclge_dev *hdev,
+>   	return 0;
+>   }
+>   
+> -int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
+> +int hclge_ptp_set_cfg(struct hnae3_handle *handle,
+> +		      struct kernel_hwtstamp_config *config,
+> +		      struct netlink_ext_ack *extack)
+>   {
+> -	struct hwtstamp_config cfg;
+> +	struct hclge_vport *vport = hclge_get_vport(handle);
+> +	struct hclge_dev *hdev = vport->back;
+>   	int ret;
+>   
+>   	if (!test_bit(HCLGE_STATE_PTP_EN, &hdev->state)) {
+> @@ -369,16 +376,13 @@ int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
+>   		return -EOPNOTSUPP;
+>   	}
+>   
+> -	if (copy_from_user(&cfg, ifr->ifr_data, sizeof(cfg)))
+> -		return -EFAULT;
+> -
+> -	ret = hclge_ptp_set_ts_mode(hdev, &cfg);
+> +	ret = hclge_ptp_set_ts_mode(hdev, config);
+>   	if (ret)
+>   		return ret;
+>   
+> -	hdev->ptp->ts_cfg = cfg;
+> +	hdev->ptp->ts_cfg = *config;
+>   
+> -	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
+> +	return 0;
+>   }
+>   
+>   int hclge_ptp_get_ts_info(struct hnae3_handle *handle,
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
+> index 61faddcc3dd0..0162fa5ac146 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
+> @@ -62,7 +62,7 @@ struct hclge_ptp {
+>   	unsigned long flags;
+>   	void __iomem *io_base;
+>   	struct ptp_clock_info info;
+> -	struct hwtstamp_config ts_cfg;
+> +	struct kernel_hwtstamp_config ts_cfg;
+>   	spinlock_t lock;	/* protects ptp registers */
+>   	u32 ptp_cfg;
+>   	u32 last_tx_seqid;
+> @@ -133,8 +133,11 @@ bool hclge_ptp_set_tx_info(struct hnae3_handle *handle, struct sk_buff *skb);
+>   void hclge_ptp_clean_tx_hwts(struct hclge_dev *hdev);
+>   void hclge_ptp_get_rx_hwts(struct hnae3_handle *handle, struct sk_buff *skb,
+>   			   u32 nsec, u32 sec);
+> -int hclge_ptp_get_cfg(struct hclge_dev *hdev, struct ifreq *ifr);
+> -int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr);
+> +int hclge_ptp_get_cfg(struct hnae3_handle *handle,
+> +		      struct kernel_hwtstamp_config *config);
+> +int hclge_ptp_set_cfg(struct hnae3_handle *handle,
+> +		      struct kernel_hwtstamp_config *config,
+> +		      struct netlink_ext_ack *extack);
+>   int hclge_ptp_init(struct hclge_dev *hdev);
+>   void hclge_ptp_uninit(struct hclge_dev *hdev);
+>   int hclge_ptp_get_ts_info(struct hnae3_handle *handle,
 
