@@ -1,48 +1,55 @@
-Return-Path: <netdev+bounces-230873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16069BF0CC3
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 13:21:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 57ABEBF0CE7
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 13:23:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E02318A0D01
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 11:21:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0799918A29E7
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 11:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9A32561D1;
-	Mon, 20 Oct 2025 11:21:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB07263F54;
+	Mon, 20 Oct 2025 11:23:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pjCUk5Gu"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="K3QH8yK4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25EA7248F66;
-	Mon, 20 Oct 2025 11:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5965E16A956;
+	Mon, 20 Oct 2025 11:23:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760959263; cv=none; b=c7i4QPdKpNsAZL9LXH0rLWCQPg86TK5XmAa/DEGzOPWsHAvykvwpYowZ0DvBILWeMCiObVSFzmarOA5m7qJTP3v9eiYynutZ9K9Co8543A6Ro/fQDuM3h8k4CQbxXMuR2HBp7c8VIeTU1pOkVLXUpR/rfgZuhnpeYtcWIzaN5zo=
+	t=1760959431; cv=none; b=qgLunWMpXcEchItShSj/0pvIFWCIj0yhvExT+2V6e693DgEtS4sQXVwcFT2U3Ktml6tfa8EzuucUHSJeC/iPt8lxiSH/qxxlGE6WAbWpvxNFjdwsNpQOrwPIjDYXliE4CfCF7wx2ISPU85l9qzS772pE+9tXwoMECnvVLVqGVxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760959263; c=relaxed/simple;
-	bh=4euNQMf16389IGt0BW8gnG05rO6cM6yVJ13Vd19t33E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nVlSmalgMvUfC/TyapCCBl8Y2zs0Z+efn7bkKFHcz2OViZTxCG5LoTFrVNayqAOQAGOr9jitbKJd8icMcbR04SkdgBTMVap+tIrmxr61MKPNDOTWqchw4esKEEBVJfv7S2rOMt52tD36CVkhvAKo57x/t6Td3m5/xM3V5x4wfvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pjCUk5Gu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E680C4CEF9;
-	Mon, 20 Oct 2025 11:20:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760959262;
-	bh=4euNQMf16389IGt0BW8gnG05rO6cM6yVJ13Vd19t33E=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pjCUk5GuEmQSRyQL/TCWa5vqqd6yZw8wb8s8sEuOs82yoc8enfUvn3DZBS5xuOUHX
-	 D/u6ncjvYzQs/1DgzZP8pMQTEkOSPBPGy+UfRppfaZZaVaeI3Vb8+QCZat9rOc/9IT
-	 9O0P9MCBluTd42qkwHaoZlqBQ7yfaYRyCb7GmiB4tMdITwJzYDJbXsEiQoX2vuwUfr
-	 4AVCkFwE1i7gOgWLBzRJrchSiT2oCEoMiQu6XdcoucLYyQM5yAwtiEkVwyF2hWBJhf
-	 ov9Q5+ICLUh2qYphrOrpenY8HciPyy6h1JSXHkYspalrzXkmJpbuDNU0iVxjmN6w0n
-	 4rvZ0l83rdDRA==
-Message-ID: <50cbda75-9e0c-4d04-8d01-75dc533b8bb9@kernel.org>
-Date: Mon, 20 Oct 2025 13:20:57 +0200
+	s=arc-20240116; t=1760959431; c=relaxed/simple;
+	bh=w6wBWLki2XIvs2oBWydKFD3OGmGR/riqqF+ZppMwnEk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=dKeDbJas7okydpqT+3GyoQ8AMKlBVgpYvEDMb6pyd6KFycSXyfPOcS98/ZJx9OqIAxfa6WpdGPOM5HMZEzR6akTJ6Of9ia6mGOrrM4K6Wr6LuXZtEC4I4BJMpbNmnkB9dX709/mzz8x4PDdeCRosLQQTvCRmXOKBKmEKnsQcpWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=K3QH8yK4; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1760959427;
+	bh=w6wBWLki2XIvs2oBWydKFD3OGmGR/riqqF+ZppMwnEk=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=K3QH8yK4CEEZ/MSEEGQHJwb6X87Nc/goxw1hXt14U7wNfwqwIdy7XX3iZQzRE7DiY
+	 BH0OxR6/vzSx29X+lGcqkvNblqc4+jJlBPNzPKafTI3MDq+JrmvH7facRLWOqC04OM
+	 RvC/jJmVhrIQP9sNW0/R7TEm2GeWyzymO30QZWcE5tGcGflV+qbMI52t2PEX9KGSRG
+	 uJDRdCqlmcRRzf58j0lQLSx+rnkcF+X91DSYmNYb3zfeUeODZHKi+5wsqwj1sRYmEL
+	 l5L7yE7RXL1xlROPvyLkikA+W8dwkmr0KeCRw+QxGfyMSxYkouciCPHibtHkmJ00Ws
+	 AfncBTEzkDMfw==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 8802A17E04DA;
+	Mon, 20 Oct 2025 13:23:46 +0200 (CEST)
+Message-ID: <98f8d06a-b470-42ca-880f-e0007abb28dc@collabora.com>
+Date: Mon, 20 Oct 2025 13:23:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,163 +57,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 bpf 1/2] xdp: update xdp_rxq_info's mem type in XDP
- generic hook
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
- ast@kernel.org, daniel@iogearbox.net, ilias.apalodimas@linaro.org,
- toke@redhat.com, lorenzo@kernel.org, kuba@kernel.org
-Cc: netdev@vger.kernel.org, magnus.karlsson@intel.com, andrii@kernel.org,
- stfomichev@gmail.com, aleksander.lobakin@intel.com,
- syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com,
- Ihor Solodrai <ihor.solodrai@linux.dev>, Octavian Purdila <tavip@google.com>
-References: <20251017143103.2620164-1-maciej.fijalkowski@intel.com>
- <20251017143103.2620164-2-maciej.fijalkowski@intel.com>
+Subject: Re: [PATCH v6 5/5] PCI: mediatek: Add support for Airoha AN7583 SoC
+To: Christian Marangi <ansuelsmth@gmail.com>,
+ Ryder Lee <ryder.lee@mediatek.com>, Jianjun Wang
+ <jianjun.wang@mediatek.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-pci@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ upstream@airoha.com
+References: <20251020111121.31779-1-ansuelsmth@gmail.com>
+ <20251020111121.31779-6-ansuelsmth@gmail.com>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20251017143103.2620164-2-maciej.fijalkowski@intel.com>
+In-Reply-To: <20251020111121.31779-6-ansuelsmth@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-
-
-On 17/10/2025 16.31, Maciej Fijalkowski wrote:
-> Currently, generic XDP hook uses xdp_rxq_info from netstack Rx queues
-> which do not have its XDP memory model registered. There is a case when
-> XDP program calls bpf_xdp_adjust_tail() BPF helper, which in turn
-> releases underlying memory. This happens when it consumes enough amount
-> of bytes and when XDP buffer has fragments. For this action the memory
-> model knowledge passed to XDP program is crucial so that core can call
-> suitable function for freeing/recycling the page.
+Il 20/10/25 13:11, Christian Marangi ha scritto:
+> Add support for the second PCIe Root Complex present on Airoha AN7583
+> SoC.
 > 
-> For netstack queues it defaults to MEM_TYPE_PAGE_SHARED (0) due to lack
-> of mem model registration. The problem we're fixing here is when kernel
-> copied the skb to new buffer backed by system's page_pool and XDP buffer
-> is built around it. Then when bpf_xdp_adjust_tail() calls
-> __xdp_return(), it acts incorrectly due to mem type not being set to
-> MEM_TYPE_PAGE_POOL and causes a page leak.
+> This is based on the Mediatek Gen1/2 PCIe driver and similar to Gen3
+> also require workaround for the reset signals.
 > 
-
-Does the code not set the skb->pp_recycle ?
-
-> Pull out the existing code from bpf_prog_run_generic_xdp() that
-> init/prepares xdp_buff onto new helper xdp_convert_skb_to_buff() and
-> embed there rxq's mem_type initialization that is assigned to xdp_buff.
+> Introduce a new quirk to skip having to reset signals and also introduce
+> some additional logic to configure the PBUS registers required for
+> Airoha SoC.
 > 
-> This problem was triggered by syzbot as well as AF_XDP test suite which
-> is about to be integrated to BPF CI.
-> 
-> Reported-by: syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/6756c37b.050a0220.a30f1.019a.GAE@google.com/
-> Fixes: e6d5dbdd20aa ("xdp: add multi-buff support for xdp running in generic mode")
-> Tested-by: Ihor Solodrai <ihor.solodrai@linux.dev>
-> Co-developed-by: Octavian Purdila <tavip@google.com>
-> Signed-off-by: Octavian Purdila <tavip@google.com> # whole analysis, testing, initiating a fix
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com> # commit msg and proposed more robust fix
-> ---
->   include/net/xdp.h | 31 +++++++++++++++++++++++++++++++
->   net/core/dev.c    | 25 ++++---------------------
->   2 files changed, 35 insertions(+), 21 deletions(-)
-> 
-> diff --git a/include/net/xdp.h b/include/net/xdp.h
-> index aa742f413c35..51f3321e4f94 100644
-> --- a/include/net/xdp.h
-> +++ b/include/net/xdp.h
-> @@ -384,6 +384,37 @@ struct sk_buff *xdp_build_skb_from_frame(struct xdp_frame *xdpf,
->   					 struct net_device *dev);
->   struct xdp_frame *xdpf_clone(struct xdp_frame *xdpf);
->   
-> +static inline
-> +void xdp_convert_skb_to_buff(struct sk_buff *skb, struct xdp_buff *xdp,
-> +			     struct xdp_rxq_info *xdp_rxq)
-> +{
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 
-I really like that this is getting put into a helper function :-)
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 
-> +	u32 frame_sz, mac_len;
-> +	void *hard_start;
-> +
-> +	/* The XDP program wants to see the packet starting at the MAC
-> +	 * header.
-> +	 */
-> +	mac_len = skb->data - skb_mac_header(skb);
-> +	hard_start = skb->data - skb_headroom(skb);
-> +
-> +	/* SKB "head" area always have tailroom for skb_shared_info */
-> +	frame_sz = skb_end_pointer(skb) - skb->head;
-> +	frame_sz += SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> +	xdp_init_buff(xdp, frame_sz, xdp_rxq);
-> +	xdp_prepare_buff(xdp, hard_start, skb_headroom(skb) - mac_len,
-> +			 skb_headlen(skb) + mac_len, true);
-> +
-> +	if (skb_is_nonlinear(skb)) {
-> +		skb_shinfo(skb)->xdp_frags_size = skb->data_len;
-> +		xdp_buff_set_frags_flag(xdp);
-> +	} else {
-> +		xdp_buff_clear_frags_flag(xdp);
-> +	}
-> +
-
-The SKB should be marked via skb->pp_recycle, but I guess you are trying
-to catch code that doesn't set this correctly?
-(Slightly worried this will "paper-over" some other buggy code?)
-
-> +	xdp->rxq->mem.type = page_pool_page_is_pp(virt_to_page(xdp->data)) ?
-> +				MEM_TYPE_PAGE_POOL : MEM_TYPE_PAGE_SHARED;
-> +}
-
-In the beginning PP_MAGIC / PP_SIGNATURE was primarily used as a
-debugging feature to catch faulty code that released pp pages to the
-real page allocator.  It seems to have evolved into something more
-critical.  Someone also tried to elevate this into a page flag, which
-would make this more reliable.
-
-> +
->   static inline
->   void xdp_convert_frame_to_buff(const struct xdp_frame *frame,
->   			       struct xdp_buff *xdp)
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index a64cef2c537e..3d607dce292b 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -5320,35 +5320,18 @@ static struct netdev_rx_queue *netif_get_rxqueue(struct sk_buff *skb)
->   u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
->   			     const struct bpf_prog *xdp_prog)
->   {
-> -	void *orig_data, *orig_data_end, *hard_start;
-> +	void *orig_data, *orig_data_end;
->   	struct netdev_rx_queue *rxqueue;
->   	bool orig_bcast, orig_host;
-> -	u32 mac_len, frame_sz;
-> +	u32 metalen, act, mac_len;
->   	__be16 orig_eth_type;
->   	struct ethhdr *eth;
-> -	u32 metalen, act;
->   	int off;
->   
-> -	/* The XDP program wants to see the packet starting at the MAC
-> -	 * header.
-> -	 */
-> +	rxqueue = netif_get_rxqueue(skb);
->   	mac_len = skb->data - skb_mac_header(skb);
-> -	hard_start = skb->data - skb_headroom(skb);
-> -
-> -	/* SKB "head" area always have tailroom for skb_shared_info */
-> -	frame_sz = (void *)skb_end_pointer(skb) - hard_start;
-> -	frame_sz += SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
->   
-> -	rxqueue = netif_get_rxqueue(skb);
-> -	xdp_init_buff(xdp, frame_sz, &rxqueue->xdp_rxq);
-> -	xdp_prepare_buff(xdp, hard_start, skb_headroom(skb) - mac_len,
-> -			 skb_headlen(skb) + mac_len, true);
-> -	if (skb_is_nonlinear(skb)) {
-> -		skb_shinfo(skb)->xdp_frags_size = skb->data_len;
-> -		xdp_buff_set_frags_flag(xdp);
-> -	} else {
-> -		xdp_buff_clear_frags_flag(xdp);
-> -	}
-> +	xdp_convert_skb_to_buff(skb, xdp, &rxqueue->xdp_rxq);
->   
->   	orig_data_end = xdp->data_end;
->   	orig_data = xdp->data;
 
 
