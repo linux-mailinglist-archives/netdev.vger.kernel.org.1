@@ -1,264 +1,275 @@
-Return-Path: <netdev+bounces-230893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A726FBF1591
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:52:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEADEBF1577
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:52:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DBB918A598C
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:53:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81E373B53A9
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:52:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809E824DD17;
-	Mon, 20 Oct 2025 12:52:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oNz4QML5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38163126DB;
+	Mon, 20 Oct 2025 12:52:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 796B83FFD;
-	Mon, 20 Oct 2025 12:52:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07307EAF9;
+	Mon, 20 Oct 2025 12:52:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760964773; cv=none; b=AdCpOu4aJ1qFSp8jg1u0rpwryhg1UHbquFAJlwihspMsiC9KigwAWwHJ9zmbD/rMHJ7/9i4eLHRqLtUnqMVGYnH7DtuJGVR5KcSptCDZOZzAsmJd/shuSC+xNx86KWB+i+DxlrGa9SeRDWlaITfpnJrgsBXqft3NajPTwHuIq+A=
+	t=1760964750; cv=none; b=IegvyONC7CnR0NHuLRPtELHXTy8rTc3rpX9LcfSrRcmyjJckvC2bECFAgHlBvLSBZrouxRazooBZQV9NJGvJpa/z+OEZMRW71JUE/urYcrT2MYYVtb9a0iUwuiID8e9a8vhOhqUjkFzCTg1PtZlBXO4LNA8a17t9OZ0vSqddFyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760964773; c=relaxed/simple;
-	bh=J9APxNL5PwC3SXUAS1ytIgcn6UBgz/29jtLEKf2eyWE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MaKxBq1sktZk6KiPeVl+sTxaATjbdB6T6Etvw31pCGk4wcO++38v3uZ4a5QIPBOc8h3FCwT4AJT731jBG5Ncs8T+oxlNe67ALRKuoyCVQ/5Ifdf5cJ2KMg98wX+wSv/T18prtfWDkdHPYi8MJw4GEYh9FtU2/pZCZqak+H9vg2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oNz4QML5; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 192601A150D;
-	Mon, 20 Oct 2025 12:52:46 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D688C606D5;
-	Mon, 20 Oct 2025 12:52:45 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B3CDA102F23B2;
-	Mon, 20 Oct 2025 14:52:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760964764; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=xm/J5aoiPYsZnMiN7LTPgkGX52KGGjizlIB4W3vhsvI=;
-	b=oNz4QML52tT7x/9G0sWyWTxbCrAVkNvTv79vy7Dp5UIupPUNqYDHcEkldl79sy3TOslfCe
-	/k81yvPVrU+6MkZTNFShUBBIspeDJirvh9+NrHDH5AFPfUZLg7gHYSeGFnkL8Aq82o2hfZ
-	LJ7CT8ajJWywOKH7nYFIYQvtLol54IcTYgNeUgl62+YJb0H0dsSalA4yrSAqO7+BOwNCVM
-	fK189keR7wQECoOZneEEzTCMsjbZO70i4AI96+MIQmA9M20NIW0rH47ptuYGHm9uoXifVl
-	CfPl18lfYSdKcKBJyeI+hrd+XtRyjYso2ZTmPosoxLNot3FBGdbRbILiN78CKQ==
-Date: Mon, 20 Oct 2025 14:52:14 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Alexis =?UTF-8?B?TG90aG9yw6k=?=
- <alexis.lothore@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Willem
- de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH net-next 2/3] net: stmmac: Allow supporting coarse
- adjustment mode
-Message-ID: <20251020145214.64186fc9@kmaincent-XPS-13-7390>
-In-Reply-To: <b2c58580-d891-4d10-b3dd-572f7f98c6fe@bootlin.com>
-References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
-	<20251015102725.1297985-3-maxime.chevallier@bootlin.com>
-	<20251017182358.42f76387@kernel.org>
-	<d40cbc17-22fa-4829-8eb0-e9fd26fc54b1@bootlin.com>
-	<20251020110040.18cf60c9@kmaincent-XPS-13-7390>
-	<b2c58580-d891-4d10-b3dd-572f7f98c6fe@bootlin.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1760964750; c=relaxed/simple;
+	bh=lAqAFT4GVUeCpwBeJIgV5QqxXzg23w/OzLcrc2FHEKg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CwoVvcAJuZvAl8FQHDmIF6sxAueIM8v08Wx6jYTwOk8JhrkA4/qyWDQ6oWogU/wXdvoDdokSCpbIDedU6eCoNgogNeD1ZycP2Pzv3Fk8L8+YJ16ryZl9yacDhLDdpQGmbH7Z/RtZyUHKDxjQ1Dk1/JmjKHeyvDCxe4pEvtrR6w4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C8C41007;
+	Mon, 20 Oct 2025 05:52:17 -0700 (PDT)
+Received: from bogus (e133711.arm.com [10.1.196.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D9E4B3F66E;
+	Mon, 20 Oct 2025 05:52:22 -0700 (PDT)
+Date: Mon, 20 Oct 2025 13:52:20 +0100
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Adam Young <admiyo@os.amperecomputing.com>
+Cc: Jassi Brar <jassisinghbrar@gmail.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>, Robert Moore <robert.moore@intel.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Huisong Li <lihuisong@huawei.com>
+Subject: Re: [PATCH  v30 2/3] mailbox: pcc: functions for reading and writing
+ PCC extended data
+Message-ID: <20251020-honored-cat-of-elevation-59b6c4@sudeepholla>
+References: <20251016210225.612639-1-admiyo@os.amperecomputing.com>
+ <20251016210225.612639-3-admiyo@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251016210225.612639-3-admiyo@os.amperecomputing.com>
 
-On Mon, 20 Oct 2025 11:32:37 +0200
-Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+On Thu, Oct 16, 2025 at 05:02:20PM -0400, Adam Young wrote:
+> Adds functions that aid in compliance with the PCC protocol by
+> checking the command complete flag status.
+> 
+> Adds a function that exposes the size of the shared buffer without
+> activating the channel.
+> 
+> Adds a function that allows a client to query the number of bytes
+> avaialbel to read in order to preallocate buffers for reading.
+> 
+> Signed-off-by: Adam Young <admiyo@os.amperecomputing.com>
+> ---
+>  drivers/mailbox/pcc.c | 129 ++++++++++++++++++++++++++++++++++++++++++
+>  include/acpi/pcc.h    |  38 +++++++++++++
+>  2 files changed, 167 insertions(+)
+> 
+> diff --git a/drivers/mailbox/pcc.c b/drivers/mailbox/pcc.c
+> index 978a7b674946..653897d61db5 100644
+> --- a/drivers/mailbox/pcc.c
+> +++ b/drivers/mailbox/pcc.c
+> @@ -367,6 +367,46 @@ static irqreturn_t pcc_mbox_irq(int irq, void *p)
+>  	return IRQ_HANDLED;
+>  }
+>  
+> +static
+> +struct pcc_chan_info *lookup_channel_info(int subspace_id)
+> +{
+> +	struct pcc_chan_info *pchan;
+> +	struct mbox_chan *chan;
+> +
+> +	if (subspace_id < 0 || subspace_id >= pcc_chan_count)
+> +		return ERR_PTR(-ENOENT);
+> +
+> +	pchan = chan_info + subspace_id;
+> +	chan = pchan->chan.mchan;
+> +	if (IS_ERR(chan) || chan->cl) {
+> +		pr_err("Channel not found for idx: %d\n", subspace_id);
+> +		return ERR_PTR(-EBUSY);
+> +	}
+> +	return pchan;
+> +}
+> +
+> +/**
+> + * pcc_mbox_buffer_size - PCC clients call this function to
+> + *		request the size of the shared buffer in cases
+> + *              where requesting the channel would prematurely
+> + *              trigger channel activation and message delivery.
+> + * @subspace_id: The PCC Subspace index as parsed in the PCC client
+> + *		ACPI package. This is used to lookup the array of PCC
+> + *		subspaces as parsed by the PCC Mailbox controller.
+> + *
+> + * Return: The size of the shared buffer.
+> + */
+> +int pcc_mbox_buffer_size(int index)
+> +{
+> +	struct pcc_chan_info *pchan = lookup_channel_info(index);
+> +
+> +	if (IS_ERR(pchan))
+> +		return -1;
+> +	return pchan->chan.shmem_size;
+> +}
+> +EXPORT_SYMBOL_GPL(pcc_mbox_buffer_size);
+> +
 
-> Hi K=C3=B6ry,
->=20
-> On 20/10/2025 11:00, Kory Maincent wrote:
-> > On Sat, 18 Oct 2025 09:42:57 +0200
-> > Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
-> >  =20
-> >> Hi Jakub,
-> >>
-> >> On 18/10/2025 03:23, Jakub Kicinski wrote: =20
-> >>> On Wed, 15 Oct 2025 12:27:22 +0200 Maxime Chevallier wrote:   =20
-> >>>> The DWMAC1000 supports 2 timestamping configurations to configure how
-> >>>> frequency adjustments are made to the ptp_clock, as well as the repo=
-rted
-> >>>> timestamp values.
-> >>>>
-> >>>> There was a previous attempt at upstreaming support for configuring =
-this
-> >>>> mode by Olivier Dautricourt and Julien Beraud a few years back [1]
-> >>>>
-> >>>> In a nutshell, the timestamping can be either set in fine mode or in
-> >>>> coarse mode.
-> >>>>
-> >>>> In fine mode, which is the default, we use the overflow of an accumu=
-lator
-> >>>> to trigger frequency adjustments, but by doing so we lose precision =
-on
-> >>>> the timetamps that are produced by the timestamping unit. The main
-> >>>> drawback is that the sub-second increment value, used to generate
-> >>>> timestamps, can't be set to lower than (2 / ptp_clock_freq).
-> >>>>
-> >>>> The "fine" qualification comes from the frequent frequency adjustmen=
-ts we
-> >>>> are able to do, which is perfect for a PTP follower usecase.
-> >>>>
-> >>>> In Coarse mode, we don't do frequency adjustments based on an
-> >>>> accumulator overflow. We can therefore have very fine subsecond
-> >>>> increment values, allowing for better timestamping precision. However
-> >>>> this mode works best when the ptp clock frequency is adjusted based =
-on
-> >>>> an external signal, such as a PPS input produced by a GPS clock. This
-> >>>> mode is therefore perfect for a Grand-master usecase.
-> >>>>
-> >>>> We therefore attempt to map these 2 modes with the newly introduced
-> >>>> hwtimestamp qualifiers (precise and approx).
-> >>>>
-> >>>> Precise mode is mapped to stmmac fine mode, and is the expected defa=
-ult,
-> >>>> suitable for all cases and perfect for follower mode
-> >>>>
-> >>>> Approx mode is mapped to coarse mode, suitable for Grand-master.   =
-=20
-> >>>
-> >>> I failed to understand what this device does and what the problem is =
-:(
-> >>>
-> >>> What is your ptp_clock_freq? Isn't it around 50MHz typically?=20
-> >>> So 2 / ptp_freq is 40nsec (?), not too bad?   =20
-> >>
-> >> That's not too bad indeed, but it makes a difference when acting as
-> >> Grand Master, especially in this case because you don't need to
-> >> perform clock adjustments (it's sync'd through PPS in), so we might
-> >> as well take this opportunity to improve the TS.
-> >> =20
-> >>>
-> >>> My recollection of the idea behind that timestamping providers
-> >>> was that you can configure different filters for different providers.
-> >>> IOW that you'd be able to say:
-> >>>  - [precise] Rx stamp PTP packets=20
-> >>>  -  [approx] Rx stamp all packets
-> >>> not that you'd configure precision of one piece of HW..   =20
-> >>
-> >> So far it looks like only one provider is enabled at a given time, my
-> >> understanding was that the qualifier would be used in case there
-> >> are multiple timestampers on the data path, to select the better one
-> >> (e.g. a PHY that supports TS, a MAC that supports TS, we use the=20
-> >> best out of the two). =20
-> >=20
-> > No, we do not support multiple timestampers at the same time.
-> > For that IIUC we would have to add a an ID of the source in the packet.=
- I
-> > remember people were talking about modifying cmsg.=20
-> > This qualifier is indeed a first step to walk this path but I don't thi=
-nk
-> > people are currently working on adding this support for now.=20
-> >  =20
-> >> However I agree with your comments, that's exactly the kind of feedback
-> >> I was looking for. This work has been tried several times now each
-> >> time with a different uAPI path, I'm OK to consider that this is out
-> >> of the scope of the hwprov feature.
-> >> =20
-> >>> If the HW really needs it, just lob a devlink param at it?   =20
-> >>
-> >> I'm totally OK with that. I'm not well versed into devlink, working mo=
-stly
-> >> with embedded devices with simple-ish NICs, most of them don't use dev=
-link.
-> >> Let me give it a try then :) =20
-> >=20
-> > meh, I kind of dislike using devlink here. As I said using timestamping
-> > qualifier is a fist step for the multiple timestamping support. If one =
-day
-> > we will add this support, if there is other implementation it will add
-> > burden on the development to track and change all the other implementat=
-ion.
-> > Why don't we always use this qualifier parameter even if it is not real=
-ly
-> > for simultaneous timestamping to avoid any future wrong development cho=
-ice.
-> > =20
->=20
-> On my side I've implemented the devlink-based approach, and I have to say=
- i'm
-> not so unhappy with it :) At least I don't have the feeling this is bendi=
-ng
-> the API to fit one specific case.
+Why do you need to export this when you can grab this from
+struct pcc_mbox_chan which is returned from pcc_mbox_request_channel().
 
-Indeed I don't think so, but my idea was to generalize the selection of
-the timestamp provider source to one API even if it is only one clock for t=
-wo
-different qualifiers.
-=20
-> The thing is that the qualifier model doesn't fully map to the situation =
-we
-> have in stmmac.
->=20
-> The stmmac coarse/fine adjustment doesn't only changes the timestamping
-> behaviour, but also the ptp_clock adjustment mode.=20
->=20
-> So changing the qualifier here will have a side effect on the PTP clock,
-> do we accept that as part of the hwprov timestamping API ?
+Please drop the above 2 functions completely.
 
-Yes, I see the timestamp source as a couple of a qualifier plus a PTP
-clock index therefore if we change the timestamp source it is intended to h=
-ave
-side effect.
+> +
+>  /**
+>   * pcc_mbox_request_channel - PCC clients call this function to
+>   *		request a pointer to their PCC subspace, from which they
+> @@ -437,6 +477,95 @@ void pcc_mbox_free_channel(struct pcc_mbox_chan *pchan)
+>  }
+>  EXPORT_SYMBOL_GPL(pcc_mbox_free_channel);
+>  
+> +/**
+> + * pcc_mbox_query_bytes_available
+> + *
+> + * @pchan pointer to channel associated with buffer
+> + * Return: the number of bytes available to read from the shared buffer
+> + */
+> +int pcc_mbox_query_bytes_available(struct pcc_mbox_chan *pchan)
+> +{
+> +	struct pcc_extended_header pcc_header;
+> +	struct pcc_chan_info *pinfo = pchan->mchan->con_priv;
+> +	int data_len;
+> +	u64 val;
+> +
+> +	pcc_chan_reg_read(&pinfo->cmd_complete, &val);
+> +	if (val) {
+> +		pr_info("%s Buffer not enabled for reading", __func__);
+> +		return -1;
+> +	}
 
-> Should we use this API for coarse/fine stmmac config, I agree with your
-> previous comment of adding a dedicated qualifier that explicitely says
-> that using this qualifier comes with side effects, with the risk of
-> paving the way for lots of modes being added for driver-specific scenario=
-s.
+Why would you call pcc_mbox_query_bytes_available() if the transfer is
+not complete ?
 
-I am not really a PTP in the field user but maybe there is a limited number=
- of
-generic qualifier possible. Here we could have a qualifier for better frequ=
-ency
-precision and one for better timestamping precision. I don't think we will =
-end
-with tons of different qualifiers.
-Maybe PTP maintainers and users like Richard or Willem have pointers on the
-number of possible qualifier?
+> +	memcpy_fromio(&pcc_header, pchan->shmem,
+> +		      sizeof(pcc_header));
+> +	data_len = pcc_header.length - sizeof(u32) + sizeof(pcc_header);
 
-> Another thing with the stmmac implem is that we don't truly have 2
-> timestampers (1 approx and 1 precise), but rather only one whose precision
-> can be adjusted. Does it really make sense here to have the qualifier
-> writeable for the same timestamper ?
+Why are you adding the header size to the length above ?
 
-I do think so.
+> +	return data_len;
+> +}
+> +EXPORT_SYMBOL_GPL(pcc_mbox_query_bytes_available);
+> +
+> +/**
+> + * pcc_mbox_read_from_buffer - Copy bytes from shared buffer into data
+> + *
+> + * @pchan - channel associated with the shared buffer
+> + * @len - number of bytes to read
+> + * @data - pointer to memory in which to write the data from the
+> + *         shared buffer
+> + *
+> + * Return: number of bytes read and written into daa
+> + */
+> +int pcc_mbox_read_from_buffer(struct pcc_mbox_chan *pchan, int len, void *data)
+> +{
+> +	struct pcc_chan_info *pinfo = pchan->mchan->con_priv;
+> +	int data_len;
+> +	u64 val;
+> +
+> +	pcc_chan_reg_read(&pinfo->cmd_complete, &val);
+> +	if (val) {
+> +		pr_info("%s buffer not enabled for reading", __func__);
+> +		return -1;
+> +	}
 
-> Of course the netlink tsinfo/tsconfig is more appealing due to its generic
-> nature, but OTHO I don't want to introduce ill-defined behaviours in that
-> API with this series. The multiple timestamper work still makes a ton of
-> sense for MAC+PHY timestamping setups :)
+Ditto as above, why is this check necessary ?
 
-I think that is where it would be nice to have a review from Richard or
-Willem on this to give us pointers on what is existing in the PTP world and=
- if
-using a qualifier makes sense.
+> +	data_len  = pcc_mbox_query_bytes_available(pchan);
+> +	if (len < data_len)
+> +		data_len = len;
+> +	memcpy_fromio(data, pchan->shmem, len);
+> +	return len;
+> +}
+> +EXPORT_SYMBOL_GPL(pcc_mbox_read_from_buffer);
+> +
+> +/**
+> + * pcc_mbox_write_to_buffer, copy the contents of the data
+> + * pointer to the shared buffer.  Confirms that the command
+> + * flag has been set prior to writing.  Data should be a
+> + * properly formatted extended data buffer.
+> + * pcc_mbox_write_to_buffer
+> + * @pchan: channel
+> + * @len: Length of the overall buffer passed in, including the
+> + *       Entire header. The length value in the shared buffer header
+> + *       Will be calculated from len.
+> + * @data: Client specific data to be written to the shared buffer.
+> + * Return: number of bytes written to the buffer.
+> + */
+> +int pcc_mbox_write_to_buffer(struct pcc_mbox_chan *pchan, int len, void *data)
+> +{
+> +	struct pcc_extended_header *pcc_header = data;
+> +	struct mbox_chan *mbox_chan = pchan->mchan;
+> +
+> +	/*
+> +	 * The PCC header length includes the command field
+> +	 * but not the other values from the header.
+> +	 */
+> +	pcc_header->length = len - sizeof(struct pcc_extended_header) + sizeof(u32);
+> +
+> +	if (!pcc_last_tx_done(mbox_chan)) {
+> +		pr_info("%s pchan->cmd_complete not set.", __func__);
+> +		return 0;
+> +	}
 
+The mailbox moves to next message only if the last tx is done. Why is
+this check necessary ?
+
+> +	memcpy_toio(pchan->shmem,  data, len);
+> +
+> +	return len;
+> +}
+> +EXPORT_SYMBOL_GPL(pcc_mbox_write_to_buffer);
+> +
+> 
+
+I am thinking if reading and writing to shmem can be made inline helper.
+Let me try to hack up something add see how that would look like.
+
+>  /**
+>   * pcc_send_data - Called from Mailbox Controller code. Used
+>   *		here only to ring the channel doorbell. The PCC client
+> diff --git a/include/acpi/pcc.h b/include/acpi/pcc.h
+> index 840bfc95bae3..96a6f85fc1ba 100644
+> --- a/include/acpi/pcc.h
+> +++ b/include/acpi/pcc.h
+> @@ -19,6 +19,13 @@ struct pcc_mbox_chan {
+>  	u16 min_turnaround_time;
+>  };
+>  
+> +struct pcc_extended_header {
+> +	u32 signature;
+> +	u32 flags;
+> +	u32 length;
+> +	u32 command;
+> +};
+> +
+
+This again is a duplicate of struct acpi_pcct_ext_pcc_shared_memory.
+It can be dropped.
+
+-- 
 Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Sudeep
 
