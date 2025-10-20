@@ -1,130 +1,151 @@
-Return-Path: <netdev+bounces-230806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BC84BEFB39
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 09:41:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE5F0BEFBF3
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 09:55:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 499954E271E
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 07:41:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD6F73BFC0A
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 07:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62D7C2BFC73;
-	Mon, 20 Oct 2025 07:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAEE52D7D2E;
+	Mon, 20 Oct 2025 07:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x8NGz1ku"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="BTIkRn1f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE65C2253FC
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 07:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98ED2E1F02;
+	Mon, 20 Oct 2025 07:54:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760946094; cv=none; b=sYWZ2PwuoOvq51HeIjdj3lyyV2wMbf92i6zBREQ1vX1pkW110GoDB/EXaUUqksBucTzSvzpVdWFIZ2FHFcmtm9JPcA9FXXlAULLtapnwG+qXBh7yB6lCGrAzSuP1O7OKkOFYPAekOqlsMlvk0BQjC8/QRGgWDqvtis8vuoUOvfU=
+	t=1760946897; cv=none; b=aF+IbTVG1kmSwMS3JKJUO5mlJUHiYQig7TIDuchkhmyDJM77p27sL9rMQRMWEDOzebeKz7gZaQoF5IriyHYrUocE9FGeiCCeJjOnpIXBYmcSy2hXf4i/t78nJvpocHa39TCcvvPdIgXuWZDc+Qd9scmMXSVy04cj+S5Fszz/4Jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760946094; c=relaxed/simple;
-	bh=rAsG0TIlC/Cw3DIiS7mjauyfgRfnqSmnJzIcnpWRlYA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AtJhliyZlsoMq1aDl5Uoflt/H69xRCUQR8EjwOdZfSyfS8YKj/IwvZnYd1Fcd+2y7vIrS/OvVmJcS8lHCOznMmjAcQYH9w1V+Wr3jCFAxwfJr51e5RZJ1pH/5lhiRo6BGxJXgvPY6bznvDATbZ+8c8mmkI6B95oZ/YAj5tprvQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x8NGz1ku; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-88e525f912fso630271185a.1
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 00:41:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760946091; x=1761550891; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rAsG0TIlC/Cw3DIiS7mjauyfgRfnqSmnJzIcnpWRlYA=;
-        b=x8NGz1kubh1rDcqCUxCQmEmMsvGhlUx4PU+MTvRT495Y3lDJEFoZRRaDXTpUJwMO4Q
-         et9fIOwGDTQS3t2Dv/M0cOvqqVoqfsgysXzdSItSdc9L7w8Sg87InvSfsNZRARli0Y7L
-         S7O3MOIXz0BrLe6M++RBSqw9OWwXcfLh3pLv9kMYjRI5jS5VrV6yp4vqR0vAqmAFT5LG
-         01laeoMuVCjLgtGOK6DT2mRsHkGXjCm4s+ww9y3QsB2jszFgnj819Iya+lE3u19WwuWm
-         OxUl3eM4U7wdy1RVMzldkEpZ4lSgeJNUEm3imAMcDExnKLGwa6wif5JyPJ2VskZaBvFV
-         55nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760946091; x=1761550891;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rAsG0TIlC/Cw3DIiS7mjauyfgRfnqSmnJzIcnpWRlYA=;
-        b=wlMduyNWKWCodRFFizbaCGvl8t35p5Pec7hTSPL3VsouZUCV5dGcfe6V1wrnY32kAv
-         PPISaucp8bbh83PXqXCYl4iTUhTNj13acUO+W+Dy6kq2FTqRqu/vroBvTQ8iY4FTwTzQ
-         7+kvcM1PNEQpRUzd95xyyK0QVJDcbOvS7BkXuO2VjPQloBCEXcdbOI4b7ryTVRZ5C1dB
-         Q6N8wUKA5qKUAreZyQJymVfApBtBxLcBhpDVm6ed9v+cJlULp+AY78NYLNfV7xwT5UVx
-         efjH0ThxhoCzbZp8OOBEQoU5MdojyIEBvHemd+VG3THyFhDqv63vqoQAKy4jSHdEIlfx
-         mnrA==
-X-Forwarded-Encrypted: i=1; AJvYcCXkhZHDS/LuScrKTxYGKLQmhCE4vPbwdCGSDxbrQbNDmos2I02VSahjASFVGS/dpCcpn3LW3nk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAcN+YKBI9+daew4s/eVx+uOHtCM05UzWKJlXc2ULMD+G77Rkj
-	m1p5501d39vLmmzfzXm3eUY8egoXDWjnBkMi47G6gmE3XlyjogKjCt09Bm2gMdDgNsTrldQsU5h
-	tP1+gD06qUiv433UB1tte1X7Jz+boQAjGgjhV0E5y
-X-Gm-Gg: ASbGncumh9K5r6z804gi1pafsyyw5ysfAJbP6GRkvKsbOrqZYWabXpZCRsT+M0o8OAi
-	llzb9LBgeKoONQAUjwelElCZVOCcTSt6CZNB3fm6/CH9h53a7VWVbQUa5OJsZMlVBn6FnyCzSk6
-	mkr9sLSnAiXoVez/Qet8PIJEUNJx1iURN+XZx+mlieCODhOhegW7unHHmOdtpQPQHJ+nCVutI7W
-	d4Zf/RMkX1Zi+0cxOxsjkyOmGpUOTmtYmZU2Al8L5vXx5zeYl3jCu8vFlNY8YUuoUY+Eyc=
-X-Google-Smtp-Source: AGHT+IHLXYmQjijBQ9jj7TosYo5Wf0bYoz0oqH86AbiwYT/ZoC+0per8xvTbzkdU8+PooIsKI35kVmU/QgdOkauDpvs=
-X-Received: by 2002:a05:622a:1101:b0:4e6:eb5b:be85 with SMTP id
- d75a77b69052e-4e89d28b357mr139014811cf.30.1760946091199; Mon, 20 Oct 2025
- 00:41:31 -0700 (PDT)
+	s=arc-20240116; t=1760946897; c=relaxed/simple;
+	bh=I5jCuepJI3vrBvT25Ra6E0AMw9dK+4snMIFbHEyu6Fk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TnO7kfziYC/PrEcH+PPQFk3LM5kwl60Grw5BJekVr6iPw0bAAYCYCEm1ZAqcBezQJpgFV0rWTbfn0+Ha8L3Q3xcJCRjf3cNdDvViZ5TLbKZa5OrJag4rb1oJ0TKiWXmz+s6U2BgnI9FmOX4SaDYr0QNzS/dyjr1ajxOyWOaTBVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=BTIkRn1f; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=1jRErsjafOp2xqxe194vdLdVYDDtMtkVjrDYsKvGIbo=; b=BTIkRn1f0TazF+WECcO+mZejxM
+	YJjEuNo/NtQljql4Dc+cNxegqUDJ1DT4uHBf40n3OAQmd17iDh+qrWP95RGu9E4hObejt9GdBdfgf
+	aqOIHpoqzjG34c3DrLwt1i+n3lpLsXmMx7v20b7hsJc1vH4yjI3RW8a3tRbaNNceAXKy/rZr7nmbo
+	n6OsY4RR3t9nnav2KFp9HzOgv4eByMejGEvI2epGayC49kq8fwZ5+G2XlkwEblRYXbZQPXX44Qwtr
+	601GCQHmWxqe/z9i6IxAU7d7vivd+fo061SDt4OAdE86+QiC1LqdYzyZyAPq4+nZj57/r6I6YMR4q
+	4sw+gCRw==;
+Received: from localhost ([127.0.0.1])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1vAkj4-0005ZV-1Q;
+	Mon, 20 Oct 2025 09:54:42 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: martin.lau@linux.dev
+Cc: kuba@kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Yinhao Hu <dddddd@hust.edu.cn>,
+	Kaiyan Mei <M202472210@hust.edu.cn>,
+	Dongliang Mu <dzm91@hust.edu.cn>,
+	Willem de Bruijn <willemb@google.com>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: [PATCH bpf] bpf: Do not let BPF test infra emit invalid GSO types to stack
+Date: Mon, 20 Oct 2025 09:54:41 +0200
+Message-ID: <20251020075441.127980-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251014171907.3554413-1-edumazet@google.com> <20251014171907.3554413-3-edumazet@google.com>
- <a87bc4d0-9c9c-4437-a1ba-acd9fe5968b2@intel.com> <CANn89i+PnwtgiM4G9Kbrj7kjjpJ5rU07rCyRTpPJpdYHUGhBvg@mail.gmail.com>
- <f51acd3e-dc76-450d-a036-01852fab6aaf@intel.com> <CANn89iLH4VrGyorzPzQU66USsv1UP3XJWQ+MWMTzrceHfUNYVQ@mail.gmail.com>
- <CAL+tcoD6+0gSMS2rOiOOFpnJ=iyYYJuNMg8+mNXBqCOYyeo5uw@mail.gmail.com>
-In-Reply-To: <CAL+tcoD6+0gSMS2rOiOOFpnJ=iyYYJuNMg8+mNXBqCOYyeo5uw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 20 Oct 2025 00:41:20 -0700
-X-Gm-Features: AS18NWD06z0zQhZSs8sWfzVNRUX_ZV7YdmkPxRTYt3_AgXMr0V4PObiqCU1iFIs
-Message-ID: <CANn89i+bLvG0-v9nPF4R53UvFZ7im0=nzC-=K1+QeUDNxYbtNw@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 2/6] net: add add indirect call wrapper in skb_release_head_state()
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.0.9/27797/Sun Oct 19 11:52:26 2025)
 
-On Mon, Oct 20, 2025 at 12:02=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
->
+Yinhao et al. reported that their fuzzer tool was able to trigger a
+skb_warn_bad_offload() from netif_skb_features() -> gso_features_check().
+When a BPF program - triggered via BPF test infra - pushes the packet
+to the loopback device via bpf_clone_redirect() then mentioned offload
+warning can be seen. GSO-related features are then rightfully disabled.
 
->
-> Sorry, I've been away from the keyboard for a few days. I think it's
-> fair to let us (who are currently working on the xsk improvement) post
-> a simple patch based on the series.
->
-> Regarding what you mentioned that 1% is a noisy number, I disagree.
-> The overall numbers are improved, rather than only one or small part
-> of them. I've done a few tests under different servers, so I believe
-> what I've seen. BTW, xdpsock is the test tool that gives a stable
-> number especially when running on the physical machine.
->
-> @ Alexander I think I can post that patch with more test numbers and
-> your 'suggested-by' tag included if you have no objection:) Or if you
-> wish you could do it on your own, please feel free to send one then :)
+We get into this situation due to convert___skb_to_skb() setting
+gso_segs and gso_size but not gso_type. Technically, it makes sense
+that this warning triggers since the GSO properties are malformed due
+to the gso_type. Potentially, the gso_type could be marked non-trustworthy
+through setting it at least to SKB_GSO_DODGY without any other specific
+assumptions, but that also feels wrong given we should not go further
+into the GSO engine in the first place.
 
-The series focus was on something bringing 100% improvement.
-The 1% figure _was_ noise.
+The checks were added in 121d57af308d ("gso: validate gso_type in GSO
+handlers") because there were malicious (syzbot) senders that combine
+a protocol with a non-matching gso_type. If we would want to drop such
+packets, gso_features_check() currently only returns feature flags via
+netif_skb_features(), so one location for potentially dropping such skbs
+could be validate_xmit_unreadable_skb(), but then otoh it would be
+an additional check in the fast-path for a very corner case. Given
+bpf_clone_redirect() is the only place where BPF test infra could emit
+such packets, lets reject them right there.
 
-I think you are mistaken on what a "SIgned-off-by: Eric Dumazet
-<edumazet@google.com>" means.
+Fixes: 850a88cc4096 ("bpf: Expose __sk_buff wire_len/gso_segs to BPF_PROG_TEST_RUN")
+Fixes: cf62089b0edd ("bpf: Add gso_size to __sk_buff")
+Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
+Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
+Reported-by: Dongliang Mu <dzm91@hust.edu.cn>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Willem de Bruijn <willemb@google.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>
+---
+ [ bpf-next would be fine as well imho since its mainly about muting
+   the skb_warn_bad_offload warning. The Fixes tags are mainly for
+   reference / historic context. ]
 
-I am not opposed to a patch that you will support by yourself.
-I am opposed to you trying to let me take responsibility for something
-I have no time/desire to support.
+ net/bpf/test_run.c | 5 +++++
+ net/core/filter.c  | 7 +++++++
+ 2 files changed, 12 insertions(+)
 
-I added the indirect call wrapper mostly at the last moment, so that
-anyone wanting to test my series
-like I described (UDP workload) would not have to mention the sock_wfree co=
-st.
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index 1782e83de2cb..983b9ee1164b 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -950,6 +950,11 @@ static int convert___skb_to_skb(struct sk_buff *skb, struct __sk_buff *__skb)
+ 
+ 	if (__skb->gso_segs > GSO_MAX_SEGS)
+ 		return -EINVAL;
++
++	/* Currently GSO type is zero/unset. If this gets extended with
++	 * a small list of accepted GSO types in future, the filter for
++	 * an unset GSO type in bpf_clone_redirect() can be lifted.
++	 */
+ 	skb_shinfo(skb)->gso_segs = __skb->gso_segs;
+ 	skb_shinfo(skb)->gso_size = __skb->gso_size;
+ 	skb_shinfo(skb)->hwtstamps.hwtstamp = __skb->hwtstamp;
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 76628df1fc82..9d67a34a6650 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2458,6 +2458,13 @@ BPF_CALL_3(bpf_clone_redirect, struct sk_buff *, skb, u32, ifindex, u64, flags)
+ 	if (unlikely(flags & (~(BPF_F_INGRESS) | BPF_F_REDIRECT_INTERNAL)))
+ 		return -EINVAL;
+ 
++	/* BPF test infra's convert___skb_to_skb() can create type-less
++	 * GSO packets. gso_features_check() will detect this as a bad
++	 * offload. However, lets not leak them out in the first place.
++	 */
++	if (unlikely(skb_is_gso(skb) && !skb_shinfo(skb)->gso_type))
++		return -EBADMSG;
++
+ 	dev = dev_get_by_index_rcu(dev_net(skb->dev), ifindex);
+ 	if (unlikely(!dev))
+ 		return -EINVAL;
+-- 
+2.43.0
+
 
