@@ -1,629 +1,384 @@
-Return-Path: <netdev+bounces-230812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B3C1BEFF46
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 10:31:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32E56BF00B5
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 10:55:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D504401B0A
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 08:29:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAFED189DC27
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 08:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BEA42EC080;
-	Mon, 20 Oct 2025 08:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E1432EBDD0;
+	Mon, 20 Oct 2025 08:55:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5ED02EBDCB
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 08:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+Received: from www.nop.hu (www.nop.hu [80.211.201.218])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 7322E2C0261
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 08:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.211.201.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760948849; cv=none; b=gQ9BQZ915mn9fb9hq1aDDtQ7OCWDE/VBPxkWzixPLVFp+urGfuHOgAVw2awjgHsCLJle/X/KH8L0D1YUB34o0h1wHpvPWPR0/RlFP0QwoyIDCz+F3iCaBpKP4+9Ob8EU9xKy+KXrFlrSsDDUCsXVSxIIBMWwf+UK1JOZ4fHiDUY=
+	t=1760950510; cv=none; b=W989KvcrnflLswCcM9qtrN2O3fc+RqiMUy9A/nSJi4qgKnq33LCjj9OboQRJjXpSz8AKDFkMs1yzd8UWPlO0qWlBFpj3DsWXYodviq1x2Avi5egfsrWoF2kCItiUg8Elci1fy87CjPkbL9CvItVPhRCt7xEiDn1s9vIsZjMmeWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760948849; c=relaxed/simple;
-	bh=5UPe9x75GnM7FU6ijjg8ExGYT8ZR2zz6JT7iK+DpHKo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GouKLKxtxdZtICy9m98ekQzITWjbA4xSVAIG6rblH/4k1kn0C46jTcW8jNF98DZ+AWTGqTJDX/6OtA2sLZ0JUBQ7GgTipHCwWItu9096D2hpBqrFzJ/rBEPjWVSkl586dhbQKXS4E1wslvx7HgxQBtBCkQ+1xasJ5NiddHNGv/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=15.184.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: zesmtpgz7t1760948784t7e6fef8d
-X-QQ-Originating-IP: FE3lVDANx8x2rUfWgI7tsUTHx2IfDguNY8iFuIhAxWA=
-Received: from lap-jiawenwu.trustnetic.com ( [60.186.187.129])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 20 Oct 2025 16:26:23 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 9705411741901712925
-EX-QQ-RecipientCnt: 9
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next 3/3] net: txgbe: support RSC offload
-Date: Mon, 20 Oct 2025 16:26:09 +0800
-Message-Id: <20251020082609.6724-4-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20251020082609.6724-1-jiawenwu@trustnetic.com>
-References: <20251020082609.6724-1-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1760950510; c=relaxed/simple;
+	bh=B2XoDy5imgLvEK/09h3ifNLGJGy1izC6R78Ip85z6jo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IjJE0/akOWv6zPOpLGrjhVcDcC3sH+i6mBxrcEEAyE7jHM1IDp2LDQLbvku9H/rYvFsQoKCEgwfvNjPNtPEy5S9aQDIBTx4jXVBUSv3+uWZTYRqcHOO6jkiJZM43owksvT6xz7MpYHly2v6vot5jDRf2tlfg7WZky6KTismn8mI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nop.hu; spf=pass smtp.mailfrom=nop.hu; arc=none smtp.client-ip=80.211.201.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nop.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nop.hu
+Received: from 100.100.5.9 (helo [100.100.5.9])
+    (reverse as null)
+    by 100.100.3.18 (helo www.nop.hu)
+    (envelope-from csmate@nop.hu) with smtp (freeRouter v25.10.20-cur)
+    for kerneljasonxing@gmail.com jonathan.lemon@gmail.com sdf@fomichev.me maciej.fijalkowski@intel.com magnus.karlsson@intel.com bjorn@kernel.org 1118437@bugs.debian.org netdev@vger.kernel.org bpf@vger.kernel.org ; Mon, 20 Oct 2025 10:55:05 +0200
+Message-ID: <643fbe8f-ba76-49b4-9fb7-403535fd5638@nop.hu>
+Date: Mon, 20 Oct 2025 10:55:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: NHGFjaVOIMm2Z+0bTwahR5GN1i5/S9u6WQZGjiFaOyhmKjVvYdwf1AAb
-	4qCaVkmCopa9LOC9mjZ9djN64Ow3IPtRMopEeJ3QCcI6UMRSEg+eTPSkGOqIIhJiz8tVdUh
-	XfpKUxP50/MosW2kasKGug6K+mDYFFXreCSR+oxKzK09gdtgUUlJHpHmKYbGPH+dFJfG5Dj
-	UN2Gg6+OI7cNPIXyyQnwW8b8PyPUXgXMsagM0pgEuFEJiVcbU2SheotO3MZk7dGaa/HcbOd
-	fZALDffiwDt/Q+OSnXq9TAVd41nJwjC3Zqg2KDi7xfvzknp1aG+YQYEbAw7HLkRZy2iyT8B
-	UeQfSvArBURP0BC6fYmOYQrEeeDoqsUfgpXlo+BnZ+gUA15a3by6WLnvNcL2S8e0Yr1LlV1
-	ny2FX43xv7ZPkILHW7y48UVAETEIiivvdAFGHXNRKZxdD81wjW1eY4Q8/6mAOnYtUBMwix6
-	24jJG78BcYzG58L7mvkW5P6yUziubB1SBfHgHZaE66ssB3YmNp4PLGqd6w7xmxWHdhdNHwc
-	O2OGEtxRkoSAmtuYxW1RmpkCjfLHQiYdKMZ6gvLskIAMf5E2yh2MPu+D9GZXG5K2SBoewml
-	en6fsLhSoMTzg1Eyn76XQRE7EGzMurCLj4JsDAyoKHi8rcs/TPHzaeTW//Mohpfy8b11qpE
-	B6RwxCeEH4vDBVFMV7tZI6uFe/XMt7tGw2EbOiYhfdDVD/Zn11LYP6YgyPaj4D0FphK3umV
-	RHa+eeUpthBQBAc5Jr4xZPTRf/nQHzFfX01OPM1j5EHbetW4kSPXVssi8UnUwoEBjxMyLrx
-	RL2/Hcbrd//CgUvu6aaZX9NoZhLeFuPAzfWkn9RvWgXKLy3KGpuAQc4Vj6lYW7C+dRWpbm8
-	1RPSWeg3nRyPzhw9bu+3DlcirzEJUvaHh/NvdWTo/JB0Mywad95W6dmAusiPgcLBRuDzSti
-	HAd2Kys7N6qzBsz3f+yucGwcUpzqmmV63OzKw/GJFth+dnEWK4VthI/OfUostsaKGw0lyLh
-	bwyn16Qkh1PV/06i4VBt4cVz1CrK0wzsbNOzysiYSMH3l575uJr6ffouLv+Jg=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-X-QQ-RECHKSPAM: 0
+User-Agent: Mozilla Thunderbird
+Subject: Re: null pointer dereference in interrupt after receiving an ip
+ packet on veth from xsk from user space
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Magnus Karlsson <magnus.karlsson@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, 1118437@bugs.debian.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu>
+ <CAL+tcoA5qDAcnZpmULsnD=X6aVP-ztRxPv5z1OSP-nvtNEk+-w@mail.gmail.com>
+Content-Language: en-US
+From: mc36 <csmate@nop.hu>
+In-Reply-To: <CAL+tcoA5qDAcnZpmULsnD=X6aVP-ztRxPv5z1OSP-nvtNEk+-w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Support to enable and disable RSC for txgbe devices.
+hi,
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 61 ++++++++++++-
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    | 50 ++++++++++-
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 90 +++++++++++++++++--
- drivers/net/ethernet/wangxun/libwx/wx_sriov.c |  4 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  | 33 +++++--
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  3 +
- 6 files changed, 224 insertions(+), 17 deletions(-)
+On 10/20/25 08:41, Jason Xing wrote:
+> Hi,
+> 
+>> this happens 10/10 on host or in qemu-system-x86_64-kvm running 6.16.12 or 6.17.2...
+> 
+> Thanks for the report.
+> 
+> I'm wondering if you have time to bisect which recent commit has
+> brought this problem. It looks like it never happens before 6.16?
+> 
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index 06f401bd975c..9aa3964187e1 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -51,6 +51,11 @@ static const struct wx_stats wx_gstrings_fdir_stats[] = {
- 	WX_STAT("fdir_miss", stats.fdirmiss),
- };
- 
-+static const struct wx_stats wx_gstrings_rsc_stats[] = {
-+	WX_STAT("rsc_aggregated", rsc_count),
-+	WX_STAT("rsc_flushed", rsc_flush),
-+};
-+
- /* drivers allocates num_tx_queues and num_rx_queues symmetrically so
-  * we set the num_rx_queues to evaluate to num_tx_queues. This is
-  * used because we do not have a good way to get the max number of
-@@ -64,16 +69,21 @@ static const struct wx_stats wx_gstrings_fdir_stats[] = {
- 		(sizeof(struct wx_queue_stats) / sizeof(u64)))
- #define WX_GLOBAL_STATS_LEN  ARRAY_SIZE(wx_gstrings_stats)
- #define WX_FDIR_STATS_LEN  ARRAY_SIZE(wx_gstrings_fdir_stats)
-+#define WX_RSC_STATS_LEN  ARRAY_SIZE(wx_gstrings_rsc_stats)
- #define WX_STATS_LEN (WX_GLOBAL_STATS_LEN + WX_QUEUE_STATS_LEN)
- 
- int wx_get_sset_count(struct net_device *netdev, int sset)
- {
- 	struct wx *wx = netdev_priv(netdev);
-+	int len = WX_STATS_LEN;
- 
- 	switch (sset) {
- 	case ETH_SS_STATS:
--		return (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags)) ?
--			WX_STATS_LEN + WX_FDIR_STATS_LEN : WX_STATS_LEN;
-+		if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags))
-+			len += WX_FDIR_STATS_LEN;
-+		if (test_bit(WX_FLAG_RSC_CAPABLE, wx->flags))
-+			len += WX_RSC_STATS_LEN;
-+		return len;
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -94,6 +104,10 @@ void wx_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
- 			for (i = 0; i < WX_FDIR_STATS_LEN; i++)
- 				ethtool_puts(&p, wx_gstrings_fdir_stats[i].stat_string);
- 		}
-+		if (test_bit(WX_FLAG_RSC_CAPABLE, wx->flags)) {
-+			for (i = 0; i < WX_RSC_STATS_LEN; i++)
-+				ethtool_puts(&p, wx_gstrings_rsc_stats[i].stat_string);
-+		}
- 		for (i = 0; i < netdev->num_tx_queues; i++) {
- 			ethtool_sprintf(&p, "tx_queue_%u_packets", i);
- 			ethtool_sprintf(&p, "tx_queue_%u_bytes", i);
-@@ -131,6 +145,13 @@ void wx_get_ethtool_stats(struct net_device *netdev,
- 		}
- 	}
- 
-+	if (test_bit(WX_FLAG_RSC_CAPABLE, wx->flags)) {
-+		for (k = 0; k < WX_RSC_STATS_LEN; k++) {
-+			p = (char *)wx + wx_gstrings_rsc_stats[k].stat_offset;
-+			data[i++] = *(u64 *)p;
-+		}
-+	}
-+
- 	for (j = 0; j < netdev->num_tx_queues; j++) {
- 		ring = wx->tx_ring[j];
- 		if (!ring) {
-@@ -322,6 +343,40 @@ int wx_get_coalesce(struct net_device *netdev,
- }
- EXPORT_SYMBOL(wx_get_coalesce);
- 
-+static void wx_update_rsc(struct wx *wx)
-+{
-+	struct net_device *netdev = wx->netdev;
-+	bool need_reset = false;
-+
-+	/* nothing to do if LRO or RSC are not enabled */
-+	if (!test_bit(WX_FLAG_RSC_CAPABLE, wx->flags) ||
-+	    !(netdev->features & NETIF_F_LRO))
-+		return;
-+
-+	/* check the feature flag value and enable RSC if necessary */
-+	if (wx->rx_itr_setting == 1 ||
-+	    wx->rx_itr_setting > WX_MIN_RSC_ITR) {
-+		if (!test_bit(WX_FLAG_RSC_ENABLED, wx->flags)) {
-+			set_bit(WX_FLAG_RSC_ENABLED, wx->flags);
-+			dev_info(&wx->pdev->dev,
-+				 "rx-usecs value high enough to re-enable RSC\n");
-+
-+			need_reset = true;
-+		}
-+	/* if interrupt rate is too high then disable RSC */
-+	} else if (test_bit(WX_FLAG_RSC_ENABLED, wx->flags)) {
-+		clear_bit(WX_FLAG_RSC_ENABLED, wx->flags);
-+		dev_info(&wx->pdev->dev,
-+			 "rx-usecs set too low, disabling RSC\n");
-+
-+		need_reset = true;
-+	}
-+
-+	/* reset the device to apply the new RSC setting */
-+	if (need_reset && wx->do_reset)
-+		wx->do_reset(netdev);
-+}
-+
- int wx_set_coalesce(struct net_device *netdev,
- 		    struct ethtool_coalesce *ec,
- 		    struct kernel_ethtool_coalesce *kernel_coal,
-@@ -414,6 +469,8 @@ int wx_set_coalesce(struct net_device *netdev,
- 		wx_write_eitr(q_vector);
- 	}
- 
-+	wx_update_rsc(wx);
-+
- 	return 0;
- }
- EXPORT_SYMBOL(wx_set_coalesce);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index 986bc5acc472..814164459707 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -1779,7 +1779,9 @@ EXPORT_SYMBOL(wx_set_rx_mode);
- static void wx_set_rx_buffer_len(struct wx *wx)
- {
- 	struct net_device *netdev = wx->netdev;
-+	struct wx_ring *rx_ring;
- 	u32 mhadd, max_frame;
-+	int i;
- 
- 	max_frame = netdev->mtu + ETH_HLEN + ETH_FCS_LEN + VLAN_HLEN;
- 	/* adjust max frame to be at least the size of a standard frame */
-@@ -1789,6 +1791,19 @@ static void wx_set_rx_buffer_len(struct wx *wx)
- 	mhadd = rd32(wx, WX_PSR_MAX_SZ);
- 	if (max_frame != mhadd)
- 		wr32(wx, WX_PSR_MAX_SZ, max_frame);
-+
-+	/*
-+	 * Setup the HW Rx Head and Tail Descriptor Pointers and
-+	 * the Base and Length of the Rx Descriptor Ring
-+	 */
-+	for (i = 0; i < wx->num_rx_queues; i++) {
-+		rx_ring = wx->rx_ring[i];
-+		rx_ring->rx_buf_len = WX_RXBUFFER_2K;
-+#if (PAGE_SIZE < 8192)
-+		if (test_bit(WX_FLAG_RSC_ENABLED, wx->flags))
-+			rx_ring->rx_buf_len = WX_RXBUFFER_3K;
-+#endif
-+	}
- }
- 
- /**
-@@ -1865,11 +1880,27 @@ static void wx_configure_srrctl(struct wx *wx,
- 	srrctl |= WX_RXBUFFER_256 << WX_PX_RR_CFG_BHDRSIZE_SHIFT;
- 
- 	/* configure the packet buffer length */
--	srrctl |= WX_RX_BUFSZ >> WX_PX_RR_CFG_BSIZEPKT_SHIFT;
-+	srrctl |= rx_ring->rx_buf_len >> WX_PX_RR_CFG_BSIZEPKT_SHIFT;
- 
- 	wr32(wx, WX_PX_RR_CFG(reg_idx), srrctl);
- }
- 
-+static void wx_configure_rscctl(struct wx *wx,
-+				struct wx_ring *ring)
-+{
-+	u8 reg_idx = ring->reg_idx;
-+	u32 rscctrl;
-+
-+	if (!test_bit(WX_FLAG_RSC_ENABLED, wx->flags))
-+		return;
-+
-+	rscctrl = rd32(wx, WX_PX_RR_CFG(reg_idx));
-+	rscctrl |= WX_PX_RR_CFG_RSC;
-+	rscctrl |= WX_PX_RR_CFG_MAX_RSCBUF_16;
-+
-+	wr32(wx, WX_PX_RR_CFG(reg_idx), rscctrl);
-+}
-+
- static void wx_configure_tx_ring(struct wx *wx,
- 				 struct wx_ring *ring)
- {
-@@ -1956,6 +1987,7 @@ static void wx_configure_rx_ring(struct wx *wx,
- 	ring->tail = wx->hw_addr + WX_PX_RR_WP(reg_idx);
- 
- 	wx_configure_srrctl(wx, ring);
-+	wx_configure_rscctl(wx, ring);
- 
- 	/* initialize rx_buffer_info */
- 	memset(ring->rx_buffer_info, 0,
-@@ -2194,7 +2226,9 @@ void wx_configure_rx(struct wx *wx)
- 		/* RSC Setup */
- 		psrctl = rd32(wx, WX_PSR_CTL);
- 		psrctl |= WX_PSR_CTL_RSC_ACK; /* Disable RSC for ACK packets */
--		psrctl |= WX_PSR_CTL_RSC_DIS;
-+		psrctl &= ~WX_PSR_CTL_RSC_DIS;
-+		if (!test_bit(WX_FLAG_RSC_ENABLED, wx->flags))
-+			psrctl |= WX_PSR_CTL_RSC_DIS;
- 		wr32(wx, WX_PSR_CTL, psrctl);
- 	}
- 
-@@ -2824,6 +2858,18 @@ void wx_update_stats(struct wx *wx)
- 	wx->hw_csum_rx_error = hw_csum_rx_error;
- 	wx->hw_csum_rx_good = hw_csum_rx_good;
- 
-+	if (test_bit(WX_FLAG_RSC_ENABLED, wx->flags)) {
-+		u64 rsc_count = 0;
-+		u64 rsc_flush = 0;
-+
-+		for (i = 0; i < wx->num_rx_queues; i++) {
-+			rsc_count += wx->rx_ring[i]->rx_stats.rsc_count;
-+			rsc_flush += wx->rx_ring[i]->rx_stats.rsc_flush;
-+		}
-+		wx->rsc_count = rsc_count;
-+		wx->rsc_flush = rsc_flush;
-+	}
-+
- 	for (i = 0; i < wx->num_tx_queues; i++) {
- 		struct wx_ring *tx_ring = wx->tx_ring[i];
- 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 5ea83aeb47e0..4c15d377aa5f 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -235,7 +235,7 @@ static struct sk_buff *wx_build_skb(struct wx_ring *rx_ring,
- {
- 	unsigned int size = le16_to_cpu(rx_desc->wb.upper.length);
- #if (PAGE_SIZE < 8192)
--	unsigned int truesize = WX_RX_BUFSZ;
-+	unsigned int truesize = wx_rx_pg_size(rx_ring) / 2;
- #else
- 	unsigned int truesize = ALIGN(size, L1_CACHE_BYTES);
- #endif
-@@ -341,7 +341,7 @@ void wx_alloc_rx_buffers(struct wx_ring *rx_ring, u16 cleaned_count)
- 		/* sync the buffer for use by the device */
- 		dma_sync_single_range_for_device(rx_ring->dev, bi->dma,
- 						 bi->page_offset,
--						 WX_RX_BUFSZ,
-+						 rx_ring->rx_buf_len,
- 						 DMA_FROM_DEVICE);
- 
- 		rx_desc->read.pkt_addr =
-@@ -404,6 +404,7 @@ static bool wx_is_non_eop(struct wx_ring *rx_ring,
- 			  union wx_rx_desc *rx_desc,
- 			  struct sk_buff *skb)
- {
-+	struct wx *wx = rx_ring->q_vector->wx;
- 	u32 ntc = rx_ring->next_to_clean + 1;
- 
- 	/* fetch, update, and store next to clean */
-@@ -412,6 +413,24 @@ static bool wx_is_non_eop(struct wx_ring *rx_ring,
- 
- 	prefetch(WX_RX_DESC(rx_ring, ntc));
- 
-+	/* update RSC append count if present */
-+	if (test_bit(WX_FLAG_RSC_ENABLED, wx->flags)) {
-+		__le32 rsc_enabled = rx_desc->wb.lower.lo_dword.data &
-+				     cpu_to_le32(WX_RXD_RSCCNT_MASK);
-+
-+		if (unlikely(rsc_enabled)) {
-+			u32 rsc_cnt = le32_to_cpu(rsc_enabled);
-+
-+			rsc_cnt >>= WX_RXD_RSCCNT_SHIFT;
-+			WX_CB(skb)->append_cnt += rsc_cnt - 1;
-+
-+			/* update ntc based on RSC value */
-+			ntc = le32_to_cpu(rx_desc->wb.upper.status_error);
-+			ntc &= WX_RXD_NEXTP_MASK;
-+			ntc >>= WX_RXD_NEXTP_SHIFT;
-+		}
-+	}
-+
- 	/* if we are the last buffer then there is nothing else to do */
- 	if (likely(wx_test_staterr(rx_desc, WX_RXD_STAT_EOP)))
- 		return false;
-@@ -582,6 +601,33 @@ static void wx_rx_vlan(struct wx_ring *ring, union wx_rx_desc *rx_desc,
- 	}
- }
- 
-+static void wx_set_rsc_gso_size(struct wx_ring *ring,
-+				struct sk_buff *skb)
-+{
-+	u16 hdr_len = skb_headlen(skb);
-+
-+	/* set gso_size to avoid messing up TCP MSS */
-+	skb_shinfo(skb)->gso_size = DIV_ROUND_UP((skb->len - hdr_len),
-+						 WX_CB(skb)->append_cnt);
-+	skb_shinfo(skb)->gso_type = SKB_GSO_TCPV4;
-+}
-+
-+static void wx_update_rsc_stats(struct wx_ring *rx_ring,
-+				struct sk_buff *skb)
-+{
-+	/* if append_cnt is 0 then frame is not RSC */
-+	if (!WX_CB(skb)->append_cnt)
-+		return;
-+
-+	rx_ring->rx_stats.rsc_count += WX_CB(skb)->append_cnt;
-+	rx_ring->rx_stats.rsc_flush++;
-+
-+	wx_set_rsc_gso_size(rx_ring, skb);
-+
-+	/* gso_size is computed using append_cnt so always clear it last */
-+	WX_CB(skb)->append_cnt = 0;
-+}
-+
- /**
-  * wx_process_skb_fields - Populate skb header fields from Rx descriptor
-  * @rx_ring: rx descriptor ring packet is being transacted on
-@@ -598,6 +644,9 @@ static void wx_process_skb_fields(struct wx_ring *rx_ring,
- {
- 	struct wx *wx = netdev_priv(rx_ring->netdev);
- 
-+	if (test_bit(WX_FLAG_RSC_CAPABLE, wx->flags))
-+		wx_update_rsc_stats(rx_ring, skb);
-+
- 	wx_rx_hash(rx_ring, rx_desc, skb);
- 	wx_rx_checksum(rx_ring, rx_desc, skb);
- 
-@@ -2549,7 +2598,7 @@ static void wx_clean_rx_ring(struct wx_ring *rx_ring)
- 		dma_sync_single_range_for_cpu(rx_ring->dev,
- 					      rx_buffer->dma,
- 					      rx_buffer->page_offset,
--					      WX_RX_BUFSZ,
-+					      rx_ring->rx_buf_len,
- 					      DMA_FROM_DEVICE);
- 
- 		/* free resources associated with mapping */
-@@ -2760,13 +2809,14 @@ static int wx_alloc_page_pool(struct wx_ring *rx_ring)
- 
- 	struct page_pool_params pp_params = {
- 		.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
--		.order = 0,
--		.pool_size = rx_ring->count,
-+		.order = wx_rx_pg_order(rx_ring),
-+		.pool_size = rx_ring->count * rx_ring->rx_buf_len /
-+			     wx_rx_pg_size(rx_ring),
- 		.nid = dev_to_node(rx_ring->dev),
- 		.dev = rx_ring->dev,
- 		.dma_dir = DMA_FROM_DEVICE,
- 		.offset = 0,
--		.max_len = PAGE_SIZE,
-+		.max_len = wx_rx_pg_size(rx_ring),
- 	};
- 
- 	rx_ring->page_pool = page_pool_create(&pp_params);
-@@ -3079,8 +3129,25 @@ int wx_set_features(struct net_device *netdev, netdev_features_t features)
- 	else if (changed & (NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_VLAN_CTAG_FILTER))
- 		wx_set_rx_mode(netdev);
- 
-+	if (test_bit(WX_FLAG_RSC_CAPABLE, wx->flags)) {
-+		if (!(features & NETIF_F_LRO)) {
-+			if (test_bit(WX_FLAG_RSC_ENABLED, wx->flags))
-+				need_reset = true;
-+			clear_bit(WX_FLAG_RSC_ENABLED, wx->flags);
-+		} else if (!(test_bit(WX_FLAG_RSC_ENABLED, wx->flags))) {
-+			if (wx->rx_itr_setting == 1 ||
-+			    wx->rx_itr_setting > WX_MIN_RSC_ITR) {
-+				set_bit(WX_FLAG_RSC_ENABLED, wx->flags);
-+				need_reset = true;
-+			} else if (changed & NETIF_F_LRO) {
-+				dev_info(&wx->pdev->dev,
-+					 "rx-usecs set too low, disable RSC\n");
-+			}
-+		}
-+	}
-+
- 	if (!(test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags)))
--		return 0;
-+		goto out;
- 
- 	/* Check if Flow Director n-tuple support was enabled or disabled.  If
- 	 * the state changed, we need to reset.
-@@ -3106,6 +3173,7 @@ int wx_set_features(struct net_device *netdev, netdev_features_t features)
- 		break;
- 	}
- 
-+out:
- 	if (need_reset && wx->do_reset)
- 		wx->do_reset(netdev);
- 
-@@ -3155,6 +3223,14 @@ netdev_features_t wx_fix_features(struct net_device *netdev,
- 		}
- 	}
- 
-+	/* If Rx checksum is disabled, then RSC/LRO should also be disabled */
-+	if (!(features & NETIF_F_RXCSUM))
-+		features &= ~NETIF_F_LRO;
-+
-+	/* Turn off LRO if not RSC capable */
-+	if (!test_bit(WX_FLAG_RSC_CAPABLE, wx->flags))
-+		features &= ~NETIF_F_LRO;
-+
- 	return features;
- }
- EXPORT_SYMBOL(wx_fix_features);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-index c6d158cd70da..493da5fffdb6 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-@@ -122,6 +122,10 @@ static int __wx_enable_sriov(struct wx *wx, u8 num_vfs)
- 	      WX_CFG_PORT_CTL_NUM_VT_MASK,
- 	      value);
- 
-+	/* Disable RSC when in SR-IOV mode */
-+	clear_bit(WX_FLAG_RSC_CAPABLE, wx->flags);
-+	clear_bit(WX_FLAG_RSC_ENABLED, wx->flags);
-+
- 	return ret;
- }
- 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 8b3c39945c0b..d0cbcded1dd4 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -424,6 +424,7 @@ enum WX_MSCA_CMD_value {
- #define WX_7K_ITR                    595
- #define WX_12K_ITR                   336
- #define WX_20K_ITR                   200
-+#define WX_MIN_RSC_ITR               24
- #define WX_SP_MAX_EITR               0x00000FF8U
- #define WX_AML_MAX_EITR              0x00000FFFU
- #define WX_EM_MAX_EITR               0x00007FFCU
-@@ -454,7 +455,9 @@ enum WX_MSCA_CMD_value {
- /* PX_RR_CFG bit definitions */
- #define WX_PX_RR_CFG_VLAN            BIT(31)
- #define WX_PX_RR_CFG_DROP_EN         BIT(30)
-+#define WX_PX_RR_CFG_RSC             BIT(29)
- #define WX_PX_RR_CFG_SPLIT_MODE      BIT(26)
-+#define WX_PX_RR_CFG_MAX_RSCBUF_16   FIELD_PREP(GENMASK(24, 23), 3)
- #define WX_PX_RR_CFG_DESC_MERGE      BIT(19)
- #define WX_PX_RR_CFG_RR_THER_SHIFT   16
- #define WX_PX_RR_CFG_RR_HDR_SZ       GENMASK(15, 12)
-@@ -551,14 +554,9 @@ enum WX_MSCA_CMD_value {
- /* Supported Rx Buffer Sizes */
- #define WX_RXBUFFER_256      256    /* Used for skb receive header */
- #define WX_RXBUFFER_2K       2048
-+#define WX_RXBUFFER_3K       3072
- #define WX_MAX_RXBUFFER      16384  /* largest size for single descriptor */
- 
--#if MAX_SKB_FRAGS < 8
--#define WX_RX_BUFSZ      ALIGN(WX_MAX_RXBUFFER / MAX_SKB_FRAGS, 1024)
--#else
--#define WX_RX_BUFSZ      WX_RXBUFFER_2K
--#endif
--
- #define WX_RX_BUFFER_WRITE   16      /* Must be power of 2 */
- 
- #define WX_MAX_DATA_PER_TXD  BIT(14)
-@@ -652,6 +650,12 @@ enum wx_l2_ptypes {
- 
- #define WX_RXD_PKTTYPE(_rxd) \
- 	((le32_to_cpu((_rxd)->wb.lower.lo_dword.data) >> 9) & 0xFF)
-+
-+#define WX_RXD_RSCCNT_MASK           GENMASK(20, 17)
-+#define WX_RXD_RSCCNT_SHIFT          17
-+#define WX_RXD_NEXTP_MASK            GENMASK(19, 4)
-+#define WX_RXD_NEXTP_SHIFT           4
-+
- /*********************** Transmit Descriptor Config Masks ****************/
- #define WX_TXD_STAT_DD               BIT(0)  /* Descriptor Done */
- #define WX_TXD_DTYP_DATA             0       /* Adv Data Descriptor */
-@@ -1039,6 +1043,8 @@ struct wx_rx_queue_stats {
- 	u64 csum_good_cnt;
- 	u64 csum_err;
- 	u64 alloc_rx_buff_failed;
-+	u64 rsc_count;
-+	u64 rsc_flush;
- };
- 
- /* iterator for handling rings in ring container */
-@@ -1081,6 +1087,7 @@ struct wx_ring {
- 					 */
- 	u16 next_to_use;
- 	u16 next_to_clean;
-+	u16 rx_buf_len;
- 	union {
- 		u16 next_to_alloc;
- 		struct {
-@@ -1237,6 +1244,7 @@ enum wx_pf_flags {
- 	WX_FLAG_FDIR_HASH,
- 	WX_FLAG_FDIR_PERFECT,
- 	WX_FLAG_RSC_CAPABLE,
-+	WX_FLAG_RSC_ENABLED,
- 	WX_FLAG_RX_HWTSTAMP_ENABLED,
- 	WX_FLAG_RX_HWTSTAMP_IN_REGISTER,
- 	WX_FLAG_PTP_PPS_ENABLED,
-@@ -1352,6 +1360,8 @@ struct wx {
- 	u64 hw_csum_rx_good;
- 	u64 hw_csum_rx_error;
- 	u64 alloc_rx_buff_failed;
-+	u64 rsc_count;
-+	u64 rsc_flush;
- 	unsigned int num_vfs;
- 	struct vf_data_storage *vfinfo;
- 	struct vf_macvlans vf_mvs;
-@@ -1483,4 +1493,15 @@ static inline int wx_set_state_reset(struct wx *wx)
- 	return 0;
- }
- 
-+static inline unsigned int wx_rx_pg_order(struct wx_ring *ring)
-+{
-+#if (PAGE_SIZE < 8192)
-+	if (ring->rx_buf_len == WX_RXBUFFER_3K)
-+		return 1;
-+#endif
-+	return 0;
-+}
-+
-+#define wx_rx_pg_size(_ring) (PAGE_SIZE << wx_rx_pg_order(_ring))
-+
- #endif /* _WX_TYPE_H_ */
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index ff690e9a075a..daa761e48f9d 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -398,6 +398,7 @@ static int txgbe_sw_init(struct wx *wx)
- 	wx->configure_fdir = txgbe_configure_fdir;
- 
- 	set_bit(WX_FLAG_RSC_CAPABLE, wx->flags);
-+	set_bit(WX_FLAG_RSC_ENABLED, wx->flags);
- 	set_bit(WX_FLAG_MULTI_64_FUNC, wx->flags);
- 
- 	/* enable itr by default in dynamic mode */
-@@ -803,6 +804,8 @@ static int txgbe_probe(struct pci_dev *pdev,
- 	netdev->features |= NETIF_F_HIGHDMA;
- 	netdev->hw_features |= NETIF_F_GRO;
- 	netdev->features |= NETIF_F_GRO;
-+	netdev->hw_features |= NETIF_F_LRO;
-+	netdev->features |= NETIF_F_LRO;
- 	netdev->features |= NETIF_F_RX_UDP_TUNNEL_PORT;
- 
- 	netdev->priv_flags |= IFF_UNICAST_FLT;
--- 
-2.48.1
+and now confirming that 6.16.7 survives the reproducer code and 6.16.8 crashes...
+
+below is the decoded and raw 6.17 trace... regarding the exact commit hash, i
+
+would leave the chance for someone with much more resources than i have at hand....
+
+have a nice day,
+
+csaba
+
+
+
+
+mc36@noti:~/Downloads/linux-6.17.2/scripts$ ./decode_stacktrace.sh ../../usr/lib/debug/boot/
+System.map-6.17.2-cloud-amd64  vmlinux-6.17.2-cloud-amd64
+mc36@noti:~/Downloads/linux-6.17.2/scripts$ ./decode_stacktrace.sh ../../usr/lib/debug/boot/vmlinux-6.17.2-cloud-amd64 <  ../../6172.txt
+p4emu login: [  171.272491] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[  171.274678] #PF: supervisor read access in kernel mode
+[  171.276216] #PF: error_code(0x0000) - not-present page
+[  171.277732] PGD 0 P4D 0
+[  171.278531] Oops: Oops: 0000 [#1] SMP NOPTI
+[  171.279806] CPU: 3 UID: 1 PID: 798 Comm: a.out Not tainted 6.17.2-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.17.2-1~exp1
+[  171.282885] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
+[  171.285663] RIP: 0010:xsk_destruct_skb (net/xdp/xsk.c:577 net/xdp/xsk.c:617)
+[ 171.288015] Code: 48 89 df 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 1f a5 d9 ff 48 8b 43 30 4c 8d 4b 30 48 89 c7 49 39 c1 74 bf 4c 8d 60 f8 <48> 8b 00 4c 89 3c 24 4d 89 cf 48 
+89 5c 24 08 89 d3 48 89 74 24 10
+All code
+========
+    0: 48 89 df              mov    %rbx,%rdi
+    3: 48 83 c4 18           add    $0x18,%rsp
+    7: 5b                    pop    %rbx
+    8: 5d                    pop    %rbp
+    9: 41 5c                 pop    %r12
+    b: 41 5d                 pop    %r13
+    d: 41 5e                 pop    %r14
+    f: 41 5f                 pop    %r15
+   11: e9 1f a5 d9 ff        jmp    0xffffffffffd9a535
+   16: 48 8b 43 30           mov    0x30(%rbx),%rax
+   1a: 4c 8d 4b 30           lea    0x30(%rbx),%r9
+   1e: 48 89 c7              mov    %rax,%rdi
+   21: 49 39 c1              cmp    %rax,%r9
+   24: 74 bf                 je     0xffffffffffffffe5
+   26: 4c 8d 60 f8           lea    -0x8(%rax),%r12
+   2a:* 48 8b 00              mov    (%rax),%rax  <-- trapping instruction
+   2d: 4c 89 3c 24           mov    %r15,(%rsp)
+   31: 4d 89 cf              mov    %r9,%r15
+   34: 48 89 5c 24 08        mov    %rbx,0x8(%rsp)
+   39: 89 d3                 mov    %edx,%ebx
+   3b: 48 89 74 24 10        mov    %rsi,0x10(%rsp)
+
+Code starting with the faulting instruction
+===========================================
+    0: 48 8b 00              mov    (%rax),%rax
+    3: 4c 89 3c 24           mov    %r15,(%rsp)
+    7: 4d 89 cf              mov    %r9,%r15
+    a: 48 89 5c 24 08        mov    %rbx,0x8(%rsp)
+    f: 89 d3                 mov    %edx,%ebx
+   11: 48 89 74 24 10        mov    %rsi,0x10(%rsp)
+[  171.293459] RSP: 0018:ffffcb43c0160d48 EFLAGS: 00010086
+[  171.295023] RAX: 0000000000000000 RBX: ffff8a660484e500 RCX: 0000000000000000
+[  171.297112] RDX: 0000000000000000 RSI: 0000000000000246 RDI: 0000000000000000
+[  171.299266] RBP: 0000000000000001 R08: ffff8a66023b4780 R09: ffff8a660484e530
+[  171.301348] R10: 0000000000000000 R11: fffff1384008ed00 R12: fffffffffffffff8
+[  171.303453] R13: ffff8a667ddb2c50 R14: ffff8a6603c59400 R15: ffff8a6603c594e8
+[  171.305609] FS:  00007fd4cdcad740(0000) GS:ffff8a66c87ee000(0000) knlGS:0000000000000000
+[  171.307969] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  171.309663] CR2: 0000000000000000 CR3: 000000000593e003 CR4: 0000000000372ef0
+[  171.311756] Call Trace:
+[  171.313372]  <IRQ>
+[  171.314083] ? napi_complete_done (include/linux/list.h:37 (discriminator 2) include/net/gro.h:533 (discriminator 2) include/net/gro.h:528 (discriminator 2) include/net/gro.h:540 
+(discriminator 2) net/core/dev.c:6593 (discriminator 2))
+[  171.315355] ip_rcv_core (include/linux/skbuff.h:3329 net/ipv4/ip_input.c:545)
+[  171.316400] ip_rcv (net/ipv4/ip_input.c:571)
+[  171.317303] __netif_receive_skb_one_core (net/core/dev.c:5991 (discriminator 6))
+[  171.318720] process_backlog (include/linux/rcupdate.h:873 net/core/dev.c:6457)
+[  171.319804] __napi_poll (net/core/dev.c:7506)
+[  171.320776] net_rx_action (net/core/dev.c:7569 net/core/dev.c:7696)
+[  171.321816] handle_softirqs (kernel/softirq.c:579)
+[  171.322885] do_softirq.part.0 (kernel/softirq.c:480 (discriminator 25))
+[  171.323949]  </IRQ>
+[  171.324510]  <TASK>
+[  171.325070] __local_bh_enable_ip (kernel/softirq.c:482 kernel/softirq.c:407)
+[  171.326122] __dev_direct_xmit (net/core/dev.c:4786)
+[  171.327208] __xsk_generic_xmit (net/xdp/xsk.c:912)
+[  171.328253] ? obj_cgroup_charge_account (mm/memcontrol.c:2939 (discriminator 2) mm/memcontrol.c:3071 (discriminator 2))
+[  171.329506] xsk_sendmsg (net/xdp/xsk.c:953 net/xdp/xsk.c:1007 net/xdp/xsk.c:1017)
+[  171.330424] __sys_sendto (net/socket.c:714 (discriminator 20) net/socket.c:729 (discriminator 20) net/socket.c:2228 (discriminator 20))
+[  171.331380] __x64_sys_sendto (net/socket.c:2235 (discriminator 1) net/socket.c:2231 (discriminator 1) net/socket.c:2231 (discriminator 1))
+[  171.332351] do_syscall_64 (arch/x86/entry/syscall_64.c:66 (discriminator 1) arch/x86/entry/syscall_64.c:97 (discriminator 1))
+[  171.333308] ? ttwu_queue_wakelist (kernel/sched/core.c:3988 kernel/sched/core.c:3983)
+[  171.334449] ? set_task_cpu (kernel/sched/sched.h:2168 kernel/sched/sched.h:2199 kernel/sched/core.c:3372)
+[  171.335449] ? _raw_spin_unlock_irqrestore (arch/x86/include/asm/paravirt.h:562 arch/x86/include/asm/qspinlock.h:57 include/linux/spinlock.h:204 
+include/linux/spinlock_api_smp.h:150 kernel/locking/spinlock.c:194)
+[  171.336685] ? try_to_wake_up (kernel/sched/core.c:4331)
+[  171.337696] ? kick_pool (kernel/workqueue.c:1285)
+[  171.338643] ? __tty_insert_flip_string_flags (drivers/tty/tty_buffer.c:318 (discriminator 25))
+[  171.339978] ? tty_insert_flip_string_and_push_buffer (drivers/tty/tty_buffer.c:565)
+[  171.341477] ? remove_wait_queue (include/linux/list.h:215 (discriminator 1) include/linux/list.h:229 (discriminator 1) include/linux/wait.h:209 (discriminator 1) 
+kernel/sched/wait.c:74 (discriminator 1))
+[  171.342552] ? _raw_spin_unlock_irqrestore (arch/x86/include/asm/paravirt.h:562 arch/x86/include/asm/qspinlock.h:57 include/linux/spinlock.h:204 
+include/linux/spinlock_api_smp.h:150 kernel/locking/spinlock.c:194)
+[  171.343788] ? n_tty_write (drivers/tty/n_tty.c:2428 (discriminator 1))
+[  171.344746] ? _raw_spin_unlock_irqrestore (arch/x86/include/asm/paravirt.h:562 arch/x86/include/asm/qspinlock.h:57 include/linux/spinlock.h:204 
+include/linux/spinlock_api_smp.h:150 kernel/locking/spinlock.c:194)
+[  171.345974] ? __wake_up (kernel/sched/wait.c:129 kernel/sched/wait.c:146)
+[  171.346880] ? file_tty_write.isra.0 (drivers/tty/tty_io.c:1082)
+[  171.348058] ? vfs_write (fs/read_write.c:593 fs/read_write.c:686)
+[  171.348975] ? ksys_write (fs/read_write.c:739)
+[  171.349868] ? do_syscall_64 (arch/x86/include/asm/entry-common.h:65 (discriminator 1) include/linux/irq-entry-common.h:227 (discriminator 1) include/linux/entry-common.h:175 
+(discriminator 1) include/linux/entry-common.h:210 (discriminator 1) arch/x86/entry/syscall_64.c:103 (discriminator 1))
+[  171.350877] ? do_user_addr_fault (arch/x86/mm/fault.c:1337)
+[  171.351993] ? exc_page_fault (arch/x86/include/asm/paravirt.h:666 arch/x86/mm/fault.c:1484 arch/x86/mm/fault.c:1532)
+[  171.353032] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+[  171.354303] RIP: 0033:0x7fd4cdeb6687
+[ 171.355252] Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 
+39 83 fa 08 75 de e8 23 ff ff ff
+All code
+========
+    0: 48 89 fa              mov    %rdi,%rdx
+    3: 4c 89 df              mov    %r11,%rdi
+    6: e8 58 b3 00 00        call   0xb363
+    b: 8b 93 08 03 00 00     mov    0x308(%rbx),%edx
+   11: 59                    pop    %rcx
+   12: 5e                    pop    %rsi
+   13: 48 83 f8 fc           cmp    $0xfffffffffffffffc,%rax
+   17: 74 1a                 je     0x33
+   19: 5b                    pop    %rbx
+   1a: c3                    ret
+   1b: 0f 1f 84 00 00 00 00  nopl   0x0(%rax,%rax,1)
+   22: 00
+   23: 48 8b 44 24 10        mov    0x10(%rsp),%rax
+   28: 0f 05                 syscall
+   2a:* 5b                    pop    %rbx  <-- trapping instruction
+   2b: c3                    ret
+   2c: 0f 1f 80 00 00 00 00  nopl   0x0(%rax)
+   33: 83 e2 39              and    $0x39,%edx
+   36: 83 fa 08              cmp    $0x8,%edx
+   39: 75 de                 jne    0x19
+   3b: e8 23 ff ff ff        call   0xffffffffffffff63
+
+Code starting with the faulting instruction
+===========================================
+    0: 5b                    pop    %rbx
+    1: c3                    ret
+    2: 0f 1f 80 00 00 00 00  nopl   0x0(%rax)
+    9: 83 e2 39              and    $0x39,%edx
+    c: 83 fa 08              cmp    $0x8,%edx
+    f: 75 de                 jne    0xffffffffffffffef
+   11: e8 23 ff ff ff        call   0xffffffffffffff39
+[  171.359811] RSP: 002b:00007ffcfccf4800 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
+[  171.361671] RAX: ffffffffffffffda RBX: 00007fd4cdcad740 RCX: 00007fd4cdeb6687
+[  171.363457] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
+[  171.365232] RBP: 00007ffcfccf4ad0 R08: 0000000000000000 R09: 0000000000000000
+[  171.367016] R10: 0000000000000040 R11: 0000000000000202 R12: 0000000000000000
+[  171.368807] R13: 00007ffcfccf4bf8 R14: 00007fd4ce082000 R15: 00005646beb2adc8
+[  171.370582]  </TASK>
+[  171.371203] Modules linked in: veth intel_rapl_msr intel_rapl_common binfmt_misc iosf_mbi kvm_intel kvm irqbypass ghash_clmulni_intel aesni_intel rapl button evdev sg efi_pstore 
+configfs nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg autofs4 sr_mod sd_mod cdrom ata_generic ata_piix libata 
+virtio_net scsi_mod net_failover serio_raw failover scsi_common
+[  171.380065] CR2: 0000000000000000
+[  171.380992] ---[ end trace 0000000000000000 ]---
+[  171.382231] RIP: 0010:xsk_destruct_skb (net/xdp/xsk.c:577 net/xdp/xsk.c:617)
+[ 171.383454] Code: 48 89 df 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 1f a5 d9 ff 48 8b 43 30 4c 8d 4b 30 48 89 c7 49 39 c1 74 bf 4c 8d 60 f8 <48> 8b 00 4c 89 3c 24 4d 89 cf 48 
+89 5c 24 08 89 d3 48 89 74 24 10
+All code
+========
+    0: 48 89 df              mov    %rbx,%rdi
+    3: 48 83 c4 18           add    $0x18,%rsp
+    7: 5b                    pop    %rbx
+    8: 5d                    pop    %rbp
+    9: 41 5c                 pop    %r12
+    b: 41 5d                 pop    %r13
+    d: 41 5e                 pop    %r14
+    f: 41 5f                 pop    %r15
+   11: e9 1f a5 d9 ff        jmp    0xffffffffffd9a535
+   16: 48 8b 43 30           mov    0x30(%rbx),%rax
+   1a: 4c 8d 4b 30           lea    0x30(%rbx),%r9
+   1e: 48 89 c7              mov    %rax,%rdi
+   21: 49 39 c1              cmp    %rax,%r9
+   24: 74 bf                 je     0xffffffffffffffe5
+   26: 4c 8d 60 f8           lea    -0x8(%rax),%r12
+   2a:* 48 8b 00              mov    (%rax),%rax  <-- trapping instruction
+   2d: 4c 89 3c 24           mov    %r15,(%rsp)
+   31: 4d 89 cf              mov    %r9,%r15
+   34: 48 89 5c 24 08        mov    %rbx,0x8(%rsp)
+   39: 89 d3                 mov    %edx,%ebx
+   3b: 48 89 74 24 10        mov    %rsi,0x10(%rsp)
+
+Code starting with the faulting instruction
+===========================================
+    0: 48 8b 00              mov    (%rax),%rax
+    3: 4c 89 3c 24           mov    %r15,(%rsp)
+    7: 4d 89 cf              mov    %r9,%r15
+    a: 48 89 5c 24 08        mov    %rbx,0x8(%rsp)
+    f: 89 d3                 mov    %edx,%ebx
+   11: 48 89 74 24 10        mov    %rsi,0x10(%rsp)
+[  171.388004] RSP: 0018:ffffcb43c0160d48 EFLAGS: 00010086
+[  171.389300] RAX: 0000000000000000 RBX: ffff8a660484e500 RCX: 0000000000000000
+[  171.391131] RDX: 0000000000000000 RSI: 0000000000000246 RDI: 0000000000000000
+[  171.392879] RBP: 0000000000000001 R08: ffff8a66023b4780 R09: ffff8a660484e530
+[  171.394689] R10: 0000000000000000 R11: fffff1384008ed00 R12: fffffffffffffff8
+[  171.396490] R13: ffff8a667ddb2c50 R14: ffff8a6603c59400 R15: ffff8a6603c594e8
+[  171.398252] FS:  00007fd4cdcad740(0000) GS:ffff8a66c87ee000(0000) knlGS:0000000000000000
+[  171.400259] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  171.401669] CR2: 0000000000000000 CR3: 000000000593e003 CR4: 0000000000372ef0
+[  171.403446] Kernel panic - not syncing: Fatal exception in interrupt
+[  171.405183] Kernel Offset: 0x31c00000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[  171.407880] Rebooting in 10 seconds..
+
+
+
+
+
+
+
+
+
+
+
+
+p4emu login: [  171.272491] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[  171.274678] #PF: supervisor read access in kernel mode
+[  171.276216] #PF: error_code(0x0000) - not-present page
+[  171.277732] PGD 0 P4D 0
+[  171.278531] Oops: Oops: 0000 [#1] SMP NOPTI
+[  171.279806] CPU: 3 UID: 1 PID: 798 Comm: a.out Not tainted 6.17.2-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.17.2-1~exp1
+[  171.282885] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
+[  171.285663] RIP: 0010:xsk_destruct_skb+0xd5/0x180
+[  171.288015] Code: 48 89 df 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 1f a5 d9 ff 48 8b 43 30 4c 8d 4b 30 48 89 c7 49 39 c1 74 bf 4c 8d 60 f8 <48> 8b 00 4c 89 3c 24 4d 89 cf 
+48 89 5c 24 08 89 d3 48 89 74 24 10
+[  171.293459] RSP: 0018:ffffcb43c0160d48 EFLAGS: 00010086
+[  171.295023] RAX: 0000000000000000 RBX: ffff8a660484e500 RCX: 0000000000000000
+[  171.297112] RDX: 0000000000000000 RSI: 0000000000000246 RDI: 0000000000000000
+[  171.299266] RBP: 0000000000000001 R08: ffff8a66023b4780 R09: ffff8a660484e530
+[  171.301348] R10: 0000000000000000 R11: fffff1384008ed00 R12: fffffffffffffff8
+[  171.303453] R13: ffff8a667ddb2c50 R14: ffff8a6603c59400 R15: ffff8a6603c594e8
+[  171.305609] FS:  00007fd4cdcad740(0000) GS:ffff8a66c87ee000(0000) knlGS:0000000000000000
+[  171.307969] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  171.309663] CR2: 0000000000000000 CR3: 000000000593e003 CR4: 0000000000372ef0
+[  171.311756] Call Trace:
+[  171.313372]  <IRQ>
+[  171.314083]  ? napi_complete_done+0x82/0x1c0
+[  171.315355]  ip_rcv_core+0x1bd/0x350
+[  171.316400]  ip_rcv+0x30/0x1f0
+[  171.317303]  __netif_receive_skb_one_core+0x85/0xa0
+[  171.318720]  process_backlog+0x87/0x130
+[  171.319804]  __napi_poll+0x2e/0x1e0
+[  171.320776]  net_rx_action+0x338/0x420
+[  171.321816]  handle_softirqs+0xd4/0x310
+[  171.322885]  do_softirq.part.0+0x3b/0x60
+[  171.323949]  </IRQ>
+[  171.324510]  <TASK>
+[  171.325070]  __local_bh_enable_ip+0x60/0x70
+[  171.326122]  __dev_direct_xmit+0x146/0x1e0
+[  171.327208]  __xsk_generic_xmit+0x4a7/0xba0
+[  171.328253]  ? obj_cgroup_charge_account+0x145/0x420
+[  171.329506]  xsk_sendmsg+0xe3/0x1c0
+[  171.330424]  __sys_sendto+0x1f2/0x200
+[  171.331380]  __x64_sys_sendto+0x24/0x30
+[  171.332351]  do_syscall_64+0x82/0x2f0
+[  171.333308]  ? ttwu_queue_wakelist+0x13d/0x230
+[  171.334449]  ? set_task_cpu+0xc4/0x1d0
+[  171.335449]  ? _raw_spin_unlock_irqrestore+0xe/0x40
+[  171.336685]  ? try_to_wake_up+0x371/0x8b0
+[  171.337696]  ? kick_pool+0x5f/0x180
+[  171.338643]  ? __tty_insert_flip_string_flags+0x93/0x120
+[  171.339978]  ? tty_insert_flip_string_and_push_buffer+0x8d/0xc0
+[  171.341477]  ? remove_wait_queue+0x24/0x60
+[  171.342552]  ? _raw_spin_unlock_irqrestore+0xe/0x40
+[  171.343788]  ? n_tty_write+0x3e1/0x550
+[  171.344746]  ? _raw_spin_unlock_irqrestore+0xe/0x40
+[  171.345974]  ? __wake_up+0x44/0x60
+[  171.346880]  ? file_tty_write.isra.0+0x211/0x2c0
+[  171.348058]  ? vfs_write+0x25a/0x480
+[  171.348975]  ? ksys_write+0x73/0xf0
+[  171.349868]  ? do_syscall_64+0xbb/0x2f0
+[  171.350877]  ? do_user_addr_fault+0x21a/0x690
+[  171.351993]  ? exc_page_fault+0x74/0x180
+[  171.353032]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[  171.354303] RIP: 0033:0x7fd4cdeb6687
+[  171.355252] Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 
+e2 39 83 fa 08 75 de e8 23 ff ff ff
+[  171.359811] RSP: 002b:00007ffcfccf4800 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
+[  171.361671] RAX: ffffffffffffffda RBX: 00007fd4cdcad740 RCX: 00007fd4cdeb6687
+[  171.363457] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
+[  171.365232] RBP: 00007ffcfccf4ad0 R08: 0000000000000000 R09: 0000000000000000
+[  171.367016] R10: 0000000000000040 R11: 0000000000000202 R12: 0000000000000000
+[  171.368807] R13: 00007ffcfccf4bf8 R14: 00007fd4ce082000 R15: 00005646beb2adc8
+[  171.370582]  </TASK>
+[  171.371203] Modules linked in: veth intel_rapl_msr intel_rapl_common binfmt_misc iosf_mbi kvm_intel kvm irqbypass ghash_clmulni_intel aesni_intel rapl button evdev sg efi_pstore 
+configfs nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg autofs4 sr_mod sd_mod cdrom ata_generic ata_piix libata 
+virtio_net scsi_mod net_failover serio_raw failover scsi_common
+[  171.380065] CR2: 0000000000000000
+[  171.380992] ---[ end trace 0000000000000000 ]---
+[  171.382231] RIP: 0010:xsk_destruct_skb+0xd5/0x180
+[  171.383454] Code: 48 89 df 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 1f a5 d9 ff 48 8b 43 30 4c 8d 4b 30 48 89 c7 49 39 c1 74 bf 4c 8d 60 f8 <48> 8b 00 4c 89 3c 24 4d 89 cf 
+48 89 5c 24 08 89 d3 48 89 74 24 10
+[  171.388004] RSP: 0018:ffffcb43c0160d48 EFLAGS: 00010086
+[  171.389300] RAX: 0000000000000000 RBX: ffff8a660484e500 RCX: 0000000000000000
+[  171.391131] RDX: 0000000000000000 RSI: 0000000000000246 RDI: 0000000000000000
+[  171.392879] RBP: 0000000000000001 R08: ffff8a66023b4780 R09: ffff8a660484e530
+[  171.394689] R10: 0000000000000000 R11: fffff1384008ed00 R12: fffffffffffffff8
+[  171.396490] R13: ffff8a667ddb2c50 R14: ffff8a6603c59400 R15: ffff8a6603c594e8
+[  171.398252] FS:  00007fd4cdcad740(0000) GS:ffff8a66c87ee000(0000) knlGS:0000000000000000
+[  171.400259] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  171.401669] CR2: 0000000000000000 CR3: 000000000593e003 CR4: 0000000000372ef0
+[  171.403446] Kernel panic - not syncing: Fatal exception in interrupt
+[  171.405183] Kernel Offset: 0x31c00000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[  171.407880] Rebooting in 10 seconds..
 
 
