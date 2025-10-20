@@ -1,54 +1,55 @@
-Return-Path: <netdev+bounces-230919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4613EBF1B3C
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:03:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFAC6BF1B33
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:03:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BCFDB34CE2D
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:03:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A34718A2B75
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143E12FB0BC;
-	Mon, 20 Oct 2025 14:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3296331DD89;
+	Mon, 20 Oct 2025 14:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="h1PvOpun"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="VDIf1diV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.12])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B30E2FE06D;
-	Mon, 20 Oct 2025 14:03:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1755E1607A4;
+	Mon, 20 Oct 2025 14:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760969014; cv=none; b=CQLd/dZDQQY2mIfUS/gvprHaIc0sQuh1OEbnK2++tgmUNQJ1PvzUAg3O1MIiC3IUyv3cW1Ng7qA5VA5ePVCuqH0Zfkfil2qKNkNCkn81tvWczmtKdwLk3iHnz87N9UIRtpJKtbJ89YUINcOVKGrGmpvN68NDedNnizg1x5NFJl0=
+	t=1760968985; cv=none; b=er6/HhnW2FtAVOdaSTg8QfA5VhAzBPauoBgnaTg8ADX6ehiSR1rMefNa03wYRkFFVZzRTEbdHOOHFqUdQCLuaYJKO9WBvSOKrvq3OYhCm82Vpk+RhQZfp6SVtavCZTKs0ddMpsyK1oIqEK2acvKW5hFqsR7fBR9I4o8OZOolaiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760969014; c=relaxed/simple;
-	bh=uJBzpi8We7uvGJQ8DIRNYzSHo1u7pZ1ai1qJEuzMFls=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=nMTpCDDB+776h3wgod+jT2PIvCbOXigtwG54XWi22Fc0Tp21S8kOWYVvWBqlpnIPBv3O3O9PXdzuTBHBxJKh4wdXAHjCFAo8q34BEKYb+jvArYgGR9/ynJEYUMtzKFm7+U0OeTChSrM3C9KsKJRGRW39waEN+MaISTRrDKrZDGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=h1PvOpun; arc=none smtp.client-ip=212.227.17.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1760968982; x=1761573782; i=markus.elfring@web.de;
-	bh=8gJn2OUvcIkPy6QCSqdpnGjV/FPP6FYgGsXIHiCIgns=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
-	 Subject:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=h1PvOpunp5HksT50QboXl7//gpScppJckiK4FOx7G2VDF4FQKfXyi3EM0rRj8ka1
-	 LVdemtaZTVgQhKyiJwstRCwuCZsb5/WbmbJeWN+H8MNxk7d0kQdjblcASg0C4CwRq
-	 o9fpiuoyykvdmJlPfyIgbOyLioK9E6y+zwa+FRmAeLnq/hu0j5c19RDxtt2//bTCA
-	 L3T1Ewkx4hJApLD1fLvB6Xjpx+sJzPnt9LfaBLPjJekzPyeUskag0dl90OcyJ6ZoH
-	 LzrXqpDgYEBbOR17dVTHH2shf1xcCF1pQe7z8QFwrd7xtxswa97XT6eFtCeoKGCi9
-	 0ONWBXLn2Qz8ueOJQA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.69.235]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MnG2Q-1uRvPt3BZM-00cfOm; Mon, 20
- Oct 2025 16:03:01 +0200
-Message-ID: <71f7daa3-d4f4-4753-aae8-67040fc8297d@web.de>
-Date: Mon, 20 Oct 2025 16:02:56 +0200
+	s=arc-20240116; t=1760968985; c=relaxed/simple;
+	bh=wa/LFx+3nxvEsI8+aKge1iAS1QhaGGNlrbnB3buk7SI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HftYHxLPBzUlqB084iKcrqOIuVmj5d7lNMD2bMxYCZjoDRhMnflXYr2YdZ6XAXPeGU2c4+tUPVuqh4CTM9wl7tci9vBkLUz+Lcq4zfP4WxNirXrVuMAs1V5MuyGdixgQx29K/vXedFxxVJIBJ3sqYVqgj4wpbdpfRuqlmzAgafA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=VDIf1diV; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1760968980;
+	bh=wa/LFx+3nxvEsI8+aKge1iAS1QhaGGNlrbnB3buk7SI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=VDIf1diVrnftwL38ZREdQLDRwHdtKgievZhFbibJhQFutwAztvjM5o0Ofy8B+MuJ1
+	 gbB2fB5zCNc+lFbJoxBbEDZzf1uheBzC+Nlx9sun+NUI/d/KYBq3Ff28STT0H965tq
+	 nnrbsAdRosSrONRkoiNeZgNC8PuvSRPgPpkICA0Q54jAzdpR5hhw1tu2Y1cS27zwJX
+	 FRg9vM1KZf5TCg1umqLDbOg3lDUSE36e1IEZJfrh77+iTevPfFGOU0jL5YfxqKJ1H/
+	 gzueE+BKPyTjIQVERY1kpaRD5P4l5aKwVvJQygCbM/bzM0GDjLk7n4Ja3+QPhI/Axl
+	 9w4l4cXjKqsWA==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 0AF5A17E0456;
+	Mon, 20 Oct 2025 16:02:59 +0200 (CEST)
+Message-ID: <8453efd3-630e-4f2c-950d-88a73927cc54@collabora.com>
+Date: Mon, 20 Oct 2025 16:02:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,153 +57,191 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Andrew Lunn <andrew+netdev@lunn.ch>, Byungchul Park <byungchul@sk.com>,
- "David S. Miller" <davem@davemloft.net>, Diogo Ivo <diogo.ivo@siemens.com>,
- Eric Dumazet <edumazet@google.com>,
- Grygorii Strashko <grygorii.strashko@ti.com>,
- Himanshu Mittal <h-mittal1@ti.com>, Jakub Kicinski <kuba@kernel.org>,
- Jan Kiszka <jan.kiszka@siemens.com>,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- MD Danish Anwar <danishanwar@ti.com>, Meghana Malladi <m-malladi@ti.com>,
- Paolo Abeni <pabeni@redhat.com>, Ravi Gunasekaran <r-gunasekaran@ti.com>,
- Roger Quadros <rogerq@kernel.org>, Simon Horman <horms@kernel.org>,
- Vignesh Raghavendra <vigneshr@ti.com>
-Content-Language: en-GB, de-DE
-Cc: LKML <linux-kernel@vger.kernel.org>, Anand Moon <linux.amoon@gmail.com>,
- Christophe Jaillet <christophe.jaillet@wanadoo.fr>
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH net-next] net: ti: icssg-prueth: Omit a variable reassignment
- in prueth_netdev_init()
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:WT/cfCHxI+zlN2LtSHpfmcDwFenjFLUzvYKS7OIftCBe1WpB3pQ
- KB6688YUKoHg5UVzg8BbNE739r1A4ZbMZf6SkCf+w3GGxdshBR0eMNp6mNDiQoEbTF7jn3O
- 0Tb4LcRHASjI2lQg+JamLiph/qunvjgaQAT2YQ1fzgpEzRwsaJf4o3QYaKDqDdAx0WK7BUX
- Q0+X1sWecfVYzc6nf63HQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:supwJH4Iip8=;jWX/no7EhjVDIe9LF1lBhryCbMs
- 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
- G9l5A==
+Subject: Re: [PATCH 02/15] arm64: dts: mediatek: mt7981b-openwrt-one:
+ Configure UART0 pinmux
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Sjoerd Simons <sjoerd@collabora.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ Ryder Lee <ryder.lee@mediatek.com>, Jianjun Wang
+ <jianjun.wang@mediatek.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ Manivannan Sadhasivam <mani@kernel.org>,
+ Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>, Lee Jones <lee@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ kernel@collabora.com, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
+ linux-phy@lists.infradead.org, netdev@vger.kernel.org,
+ Bryan Hinton <bryan@bryanhinton.com>
+References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
+ <20251016-openwrt-one-network-v1-2-de259719b6f2@collabora.com>
+ <aPDnT4tuSzNDzyAE@makrotopia.org>
+ <5f430ff9-d701-426a-bf93-5290e6912eb4@collabora.com>
+ <aPEfUBl6fMe6QYdY@makrotopia.org>
+ <82594ce7-f093-4753-b808-cd234845aed8@collabora.com>
+ <aPYq4cnaAHu5ags5@makrotopia.org>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <aPYq4cnaAHu5ags5@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Mon, 20 Oct 2025 15:46:11 +0200
+Il 20/10/25 14:28, Daniel Golle ha scritto:
+> On Mon, Oct 20, 2025 at 12:23:14PM +0200, AngeloGioacchino Del Regno wrote:
+>> Il 16/10/25 18:37, Daniel Golle ha scritto:
+>>> On Thu, Oct 16, 2025 at 04:29:14PM +0200, AngeloGioacchino Del Regno wrote:
+>>>> Il 16/10/25 14:38, Daniel Golle ha scritto:
+>>>>> On Thu, Oct 16, 2025 at 12:08:38PM +0200, Sjoerd Simons wrote:
+>>>>>> Add explicit pinctrl configuration for UART0 on the OpenWrt One board,
+>>>>>>
+>>>>>> Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
+>>>>>> ---
+>>>>>>     arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts | 11 +++++++++++
+>>>>>>     1 file changed, 11 insertions(+)
+>>>>>>
+>>>>>> diff --git a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
+>>>>>> index 968b91f55bb27..f836059d7f475 100644
+>>>>>> --- a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
+>>>>>> +++ b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
+>>>>>> @@ -22,6 +22,17 @@ memory@40000000 {
+>>>>>>     	};
+>>>>>>     };
+>>>>>> +&pio {
+>>>>>> +	uart0_pins: uart0-pins {
+>>>>>> +		mux {
+>>>>>> +			function = "uart";
+>>>>>> +			groups = "uart0";
+>>>>>> +		};
+>>>>>> +	};
+>>>>>> +};
+>>>>>> +
+>>>>>>     &uart0 {
+>>>>>> +	pinctrl-names = "default";
+>>>>>> +	pinctrl-0 = <&uart0_pins>;
+>>>>>>     	status = "okay";
+>>>>>>     };
+>>>>>
+>>>>> As there is only a single possible pinctrl configuration for uart0,
+>>>>> both the pinmux definition as well as the pinctrl properties should go
+>>>>> into mt7981b.dtsi rather than in the board's dts.
+>>>>
+>>>> If there's really one single possible pin configuration for the UART0 pins,
+>>>> as in, those pins *do not* have a GPIO mode, then yes I agree.
+>>>>
+>>>> If those pins can be as well configured as GPIOs, this goes to board DTS.
+>>>
+>>> I respectfully disagree and will explain below.
+>>>
+>>
+>> Thanks a lot for taking the time to write all this - explains everything,
+>> and even too much :) :)
+>>
+>> Though, there's something funny here! The following snippet of "main" text
+>> does explain stuff that is interesting, but that I (not other people, so
+>> thanks again for saying all this) know already, but.....
+>>
+>>> All pinmux pins on the MediaTek platform also allow being configured as
+>>> GPIOs. However, if you configure those as GPIOs the consequence is that
+>>> you cannot use UART0 any more at all. So using UART0 at all always
+>>> implies using exactly those pins, there is no alternative to that.
+>>>
+>>> Hence every board with every possible uses of pins 32 and 33 (there is
+>>> only RX and TX for UART0, RTS/CTS flow-control is not possible) can be
+>>> represented without needing to configure the pinctrl for uart0 on the
+>>> board level. There isn't going to be any variation on the board-level
+>>> when it comes to uart0. Either it is enabled (status = "okay";), and
+>>> that will always imply using the 'uart0' group in mode 'uart', or, in
+>>> case any of the two pins of uart0 is used for something else that means
+>>> uart0 cannot be enabled. Simple as that.
+>>>
+>>> Hence there is no need to duplicate that pinctrl settings on each and
+>>> every board, as controlling the 'status' property on the board-level
+>>> already gives 100% freedom.
+>>>
+>>
+>> ...all of this is not justifying your point.
+> 
+> So what is the rule then? I understand the logic of describing the
+> pins eg. for uart1 only on board-level as there are actual alternatives
+> regarding the pins to be used, and if also including RTS/CTS pins.
+> Hence, for uart1, there are several possible pingroups which can be
+> used. What would be the argument to keep a pinctrl description for
+> which the SoC doesn't offer any alternatives to be on the board-level?
+> There is nothing to be decided by the board, literally 0 freedom.
+> 
 
-An error code was assigned to a variable and checked accordingly.
-This value was passed to a dev_err_probe() call in an if branch.
-This function is documented in the way that the same value is returned.
-Thus delete two redundant variable reassignments.
+As you described - the BootROM is using those two pins as UART0.
 
-The source code was transformed by using the Coccinelle software.
+Should you want those pins to be used as GPIOs, you'd at least get HW glitches in
+early boot phases, or you'd render emergency download mode unusable - which is not
+a good idea, not practical, and also, well, almost a stupid thing to do from the
+hardware perspective.
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- drivers/net/ethernet/ti/icssg/icssg_prueth.c     | 3 +--
- drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+This means that it is very, very, very unlikely (to the point that it's practically
+impossible) that those pins can ever be used for anything else that is not *the*
+one of the two functions that are supported for them (which is UART0 in this case).
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/et=
-hernet/ti/icssg/icssg_prueth.c
-index e42d0fdefee1..0bfd761bffc5 100644
-=2D-- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1248,8 +1248,7 @@ static int prueth_netdev_init(struct prueth *prueth,
- 	} else if (of_phy_is_fixed_link(eth_node)) {
- 		ret =3D of_phy_register_fixed_link(eth_node);
- 		if (ret) {
--			ret =3D dev_err_probe(prueth->dev, ret,
--					    "failed to register fixed-link phy\n");
-+			dev_err_probe(prueth->dev, ret, "failed to register fixed-link phy\n")=
-;
- 			goto free;
- 		}
-=20
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c b/drivers/ne=
-t/ethernet/ti/icssg/icssg_prueth_sr1.c
-index 5e225310c9de..bd88877e8e65 100644
-=2D-- a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
-@@ -816,8 +816,7 @@ static int prueth_netdev_init(struct prueth *prueth,
- 	} else if (of_phy_is_fixed_link(eth_node)) {
- 		ret =3D of_phy_register_fixed_link(eth_node);
- 		if (ret) {
--			ret =3D dev_err_probe(prueth->dev, ret,
--					    "failed to register fixed-link phy\n");
-+			dev_err_probe(prueth->dev, ret, "failed to register fixed-link phy\n")=
-;
- 			goto free;
- 		}
-=20
-=2D-=20
-2.51.1
+In this case, adding the pins at the board level would only create unnecessary
+duplication and nothing else, because, well, noone could possibly ever use those
+for anything else, again.
 
+That's the criteria.
+
+If the BootROM didn't use those pins, and those could support both GPIO mode and
+HW function mode (any: uart0, 1, 2...n, spi, i2c, whatever else), even though it
+is likely for boards to use them for one specific function, there is nothing that
+stops a HW engineer to decide to route those elsewhere and use them as a GPIO
+instead, so that's not a SoC configuration, but rather a HW implementation decision
+at the PCB level.
+
+See it like this (although this is an oversimplified view):
+  - SoC DT describes the SoC (the chip) - in this case the MT7981B chip
+  - Board DT describes decisions that were taken by the HW engineer that developed
+    the PCB on which the MT7981B was placed.
+
+Clearly, if there's a board design (usually, a "base project") that has derivatives
+(for example, a device with eMMC, one with UFS, one with both, one with two SFP,
+one with one SFP and one soldered ethernet chip on a non-exposed SFP interface,
+etc) it is ok to have a "board-common" dtsi and specific board variants on top,
+like it is done with some bananapi and some genio boards.
+
+Lots of text here - yet oversimplified. There is much more to say, but I think
+(and hope) that this is enough to make you understand the main point (of course
+feel free to throw more questions if what I wrote doesn't fully satisfy you).
+
+>>
+>>> (Sidenote: As even the BootROM already uses those two pins as UART for
+>>> debug output,
+>>
+>> Funny thing is, your side note is what *fully* justifies your disagreement
+>> and it's also what triggers me to say that you're right, lol :)
+>>
+>> Okay then, I am fine with this commit now and I can renew my
+>>
+>> Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+> 
+> Note that the patch you have just added your Reviewed-by:-tag to does
+> *not* add the uart0 pinctrl on SoC-level but board-level, so different
+> from what I argued for above.
+
+Ewwww I'm doing too may things at once. Pretty crazy days around here :)))
+
+ >> Did you mean to add Reviewed-by: for that
+> (which contraticts what you just wrote) or rather to the to-be-submitted
+> v2 of this series which includes the change to move the uart0 pinctrl
+> to mt7981b.dtsi?
+
+Yeah. Sorry.
+
+I repeat then, so that this is clear: you are right, the pinctrl for UART0 on the
+MT7981B SoC must go to mt7981b.dtsi and *not* to mt7981b-openwrt-one.
+
+Cheers,
+Angelo
 
