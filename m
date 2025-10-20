@@ -1,75 +1,74 @@
-Return-Path: <netdev+bounces-230774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 323EEBEF35C
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 06:00:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D6B8BEF377
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 06:03:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD94F3E21B3
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 04:00:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC9191899E46
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 04:03:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C1FB2BE643;
-	Mon, 20 Oct 2025 04:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97BD4286D53;
+	Mon, 20 Oct 2025 04:03:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lwuhqbbn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZmeX32rg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344972BE639
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 04:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D361A72604
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 04:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760932811; cv=none; b=pmvqSwLQoWRH+sXV+HjTXirxbOCDqBerJx4YI3gPzRc5b8SyvrtvWEbQ7O50Zw+LHiTnJBnd7CH9xyw7WYrYKI2tU2xvRQrkZMh94H22mPrkS0QjthfPfxvrn8W/DNbGIu/mtqUydoEoJuH/j84/Q85LUavcZRKEGUnTMVYF0BM=
+	t=1760933007; cv=none; b=t+fAhrFsdNAmAkbbYaWEupQnJJeF80K6Xn6gF22frL4UM8IJ5V4QfP9mbDWdg3MAbtF3+2ttfTG0Pr5SRcLsZ5QoX3zpv/vLc7BkiDNmPglLE92p7E08sn3LEQB3ta8YrzcCy7pDWoAj3eo9ChskdeUCDT53VKbTk1CCl/yegz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760932811; c=relaxed/simple;
-	bh=dPgG0ZE3Yj/qIHsnysGw2HwgvlzEI7DoOEPYWJ0sbcQ=;
+	s=arc-20240116; t=1760933007; c=relaxed/simple;
+	bh=v2fkTBuesvfSQcf7cdq7b3Skx0ennDQhSr1qQAdg5AE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aqd831rj03WJCsdZnEoteN6Y27qiXNKMpg63h4R9q5nHvWSGG5oq0qtLH3XIF/BHIRUZ5pdSMKIgs9ioMFJd6hdvQZZYW9Gj9jxZGvqTnW/XRdVvZ4qzXasM6HaMAN7SHuuf0Xa/kfqmZMUNiLvzzEh6uzZv1SRumIdQ0ziSAw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lwuhqbbn; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-87be45cba29so56442986d6.2
-        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 21:00:08 -0700 (PDT)
+	 To:Cc:Content-Type; b=WBnguE+7QHIAQNg9UoCinFCoYS2N4Ip8urXo4kQT+zrpkhWs6+ibnRUAY5ZaNx8sgUxVbLjB9ElomeD8ccwU1HiGyJD86p/sdh+w3XqKfTK9XLx2XiL8lOdwKBvQWiVHDCpRYjwUNkwCL8WOkTWw8h2ei7ATO3jD1CTjPvmeIMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZmeX32rg; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-430ab5ee3afso37285375ab.2
+        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 21:03:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760932807; x=1761537607; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760933005; x=1761537805; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EGlyUJ6dWl6nFWnMZlQKvO9MHD3+EqVzrC0LlyJOg7g=;
-        b=LwuhqbbntQSfrcK24vUDgIHCmT2s/PZJipZslZVRZdd9sbwnGablia5bvmocOyoQaD
-         2D3fAtuGknJJIEWIGDORYQ6JhZUes22s3knmQVNr8IBggU/kfV8O/LF10QR4f6i3MaZo
-         Wk28f8uVyd4NZaLrE0FueXlRfGBw4ukj7DSJmVmjsapkFTp4/KYHrFxkBDQ7CQw2mLEJ
-         Pzqyn86sUjoaaynfaBrNBxdArbhv07wqNZaOFYyEobtMEdKSATFgKcFIiNnA+0+WPgGl
-         p5V5P2qz79xfJoj8u2rYp3xDBpXzSemraiZp5/kzDUSFQwqRQDAUaTN+z50tROZJbD2B
-         6AEw==
+        bh=6ZzYPhFtKG8qZ+c0G+Q5SohWqQmN/HP+dWRRz/8yezI=;
+        b=ZmeX32rgFkXtWPOt1/xxf4OAK9EBPu5O4xhtdFqBPFF/GMi0SHItjiHYT7dq+QwO77
+         OTpvwtThgsS4nfLROxOtxv3fTmITfoRAP4W78TCqvWUlbuT/Nj6V00RN4RNwZGNtyTOk
+         A7pkyeUvu5FIixpDCXi6jjTmY9cMN3BLH617z4pgdkJRxbVPWg5WGrFwMgRcT0a9kvcI
+         89vJr6EOBMq8uT4wDAOkcUaK+8RnFnO9FNMitXdsx1O3gRoQhxHwOQz5u8zmraEr1Vvy
+         J5+W3bwEU0WU4tiAy36dqJ9X2TSbk7Mxr3Va1OogmcjWQNB4moILuZgzfoO8qJWN2yxj
+         1jPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760932807; x=1761537607;
+        d=1e100.net; s=20230601; t=1760933005; x=1761537805;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EGlyUJ6dWl6nFWnMZlQKvO9MHD3+EqVzrC0LlyJOg7g=;
-        b=O7Uk4INr3P1/zdxCx9Ny0UTxX2ssvxvpcO220bsWKt4tweg9tY+RCZac9eyFMaLmdr
-         DtjKtK6SaHOSEvnVBQxH58clk2BFWIpM2HJcNgxLs7N8kb6Od5zgX1JyhQ9Ph3DMz0F+
-         gxh1o27Ey3vFPHIQ6fHtKeGpxPYjUGjIGhi4yq/cQPDRq1bmoikVk88kmc0ixUM2teN0
-         yrSBmcGwjH9gerZWk8dR4tEIsnsnbu3cbyi7pneriggDxf/4QISY11d5WdlP2C1ul6Um
-         HNa7LoqxdNKRypAfuUII3kXzhe2vWrADsA/8QQ8iGCLViACEEvWB5IulCP7LDd3C7x2F
-         fC/w==
-X-Forwarded-Encrypted: i=1; AJvYcCWSufjqLf1ZuynwanKCdtuULdQouywMTZqH0PYzqacKHPZm1SxPeSuzPd631AimrB87zbuyBs0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxgS8TIOcfGdVcjP/xgxxUZFFEkMDx/3t/2fbgWWOHI07FX3tH
-	7LrJVpqnn1KIEVt/5bVK1tmxGxpL+XrcR9R+YpIRDbuhgpU1sB7v5NAIRou+iz1JEYLmLQWjk7A
-	PPHevwNgz0kfyagJ8Pgskv0VwQUviTF2qGYJApjXF
-X-Gm-Gg: ASbGncs663SRKIeMwsljM5f1CifRzIFxZS7ChXzQ/xtFN+S6mpjRr/U7alX2LQyEmRx
-	+yAGhOtllg8s8vG5bmvCl2P/Ceq0/Xim977/95QMSUlj7SYr7sbAidX1TGNkwT6mFXNk4WkPI3O
-	08F+V92p7EZ2UuKtyvD7nPIg9oBYNAO6oAqZ6dqpPwsOL34n/BUQEEWccq8GhTTH1zqsTyMUOfM
-	NpqeCX9Z8q1IFbQJqJQAqptFSqjek9uqGeO7ZwNI5plKpfV+5608TqJhM6SLOIKZwf8Yfd6ttR3
-	wrtMpA==
-X-Google-Smtp-Source: AGHT+IEYSIicyADdCPkVkJb9qW9fbgvEYpNmDm5QqCs36TVq0BifkMw6E49Bz9qod7hDZDlRGPtcnNSaTXB1nyV9ejQ=
-X-Received: by 2002:ac8:5883:0:b0:4d0:e037:6bd2 with SMTP id
- d75a77b69052e-4e89d4150a0mr167900401cf.83.1760932806725; Sun, 19 Oct 2025
- 21:00:06 -0700 (PDT)
+        bh=6ZzYPhFtKG8qZ+c0G+Q5SohWqQmN/HP+dWRRz/8yezI=;
+        b=pMF+JL9c8c/kubJfV9bpzQnsgqvkRBgRN0yV5OSFF1OYsZXt3KR5xnAF2cSBbqbOuY
+         8RxRCEbKYCxxEoml/KAh9vHeN1aK7Feq644POfOnZ1dYzU4Yjg3SJwIH+tm2orNpHvEM
+         uZf4m6iqBLpHAqWIDDxQJEDAAo5E8AU4YUaVlvNdeeYtERhAqj/T/1DsDADmgotNocvn
+         gUGi2TjUmzf/zCPZgaF5FUFyNKSUK/bBy2FLBUpOiiOa8L09Ar/uyq9/jatohawkvEsW
+         f4t3B1lMT4rVd+PiQg+2pbMkcQhQF8vRWaXmetYWWL4u/LV3woWzBIWs8Sl1krBySeEE
+         rQIw==
+X-Forwarded-Encrypted: i=1; AJvYcCWExkuDdCMSpZpjfxti7fTPcDzr5CWLJD3gUjwqUUsiXhD8NnFqwcm6Zox6FsGnKGEYZZIn984=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzCTcpGf6D9Gvm9J0LsrcKegtbwCXTCs0jhG4E8kV4zdSLUO8Q
+	djfXKtuANWgkKkHT6mdZrmnh5XiMbn1X7JCu8EBGNgGECIRmERfFUtqXK93rnQneRm0sfZvf6LB
+	DZzoY5epQdZQBdrVFbhfwEeU5WM+uyxc=
+X-Gm-Gg: ASbGnctjb3H1/8AExKEIeqAH9JxFDQwodyByrs7+8EFXpW+Zju+4S2vhpYFMnZTHlgj
+	qdcyqEo2IBgs2LSL905rWz5yUejD0C+ioccPT8FishQ3pZYb6ZuoowUE35ybTrL8Ix0Rs4ufirx
+	uCvNrk2fi78P6+XM1y6c2ezW7So2QxQKwAoZ1KiQnjrBjUAt9+0ZQipsEls2ukh8e00aUmDxPlI
+	aAyq89xu8ZXP5dCdoDkAwY4iqqyz8c9wBzWnFJgDlkEkGVKVSnbSLMzyInp
+X-Google-Smtp-Source: AGHT+IEfj2QHWyrtrUy7ZHTXAJMV22isjYur/l73otCD7Q/nWelGuO1Wbgm8DgSpJvRzfJ5SUrH+PzjuBd0Jr5wKTFU=
+X-Received: by 2002:a05:6e02:2591:b0:430:c312:214c with SMTP id
+ e9e14a558f8ab-430c5234d18mr159034125ab.5.1760933004887; Sun, 19 Oct 2025
+ 21:03:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,19 +78,19 @@ MIME-Version: 1.0
 References: <20251019170016.138561-1-peng.yu@alibaba-inc.com>
  <CANn89iLsDDQuuQF2i73_-HaHMUwd80Q_ePcoQRy_8GxY2N4eMQ@mail.gmail.com> <befd947e-8725-4637-8fac-6a364b0b4df0.peng.yu@alibaba-inc.com>
 In-Reply-To: <befd947e-8725-4637-8fac-6a364b0b4df0.peng.yu@alibaba-inc.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 19 Oct 2025 20:59:54 -0700
-X-Gm-Features: AS18NWC6F1R_I0KBruG0TdOotc8Di3KFGXIV9tbul7OG-wYVpC98nHHzEY6rIio
-Message-ID: <CANn89iJN4V8SeythtQVrSjhztWmCySdAxR8h35i4Ea2ceq9k8w@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 20 Oct 2025 12:02:48 +0800
+X-Gm-Features: AS18NWB6D7M0NE1HreAJyZxZc2KbkCwHvUtgvFfI4jFcRpGnvz6ahYuqHx-nXEs
+Message-ID: <CAL+tcoB3veWSGcsd6Dw=3Z8SsUYyO4Os4fUh7Cy=87JVzeC3sw@mail.gmail.com>
 Subject: Re: [PATCH] net: set is_cwnd_limited when the small queue check fails
 To: "YU, Peng" <peng.yu@alibaba-inc.com>
-Cc: Peng Yu <yupeng0921@gmail.com>, ncardwell <ncardwell@google.com>, 
-	kuniyu <kuniyu@google.com>, netdev <netdev@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Peng Yu <yupeng0921@gmail.com>, 
+	ncardwell <ncardwell@google.com>, kuniyu <kuniyu@google.com>, 
+	netdev <netdev@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Oct 19, 2025 at 4:00=E2=80=AFPM YU, Peng <peng.yu@alibaba-inc.com> =
+On Mon, Oct 20, 2025 at 7:00=E2=80=AFAM YU, Peng <peng.yu@alibaba-inc.com> =
 wrote:
 >
 > I think we know the root cause in the driver. We are using the
@@ -135,6 +134,13 @@ struct net_device *dev)
 > the skp is really sent out.
 > If we set use_napi to false, the virtio_net driver will invoke
 > skb_orphan immediately as before, then the issue won't happen.
+
+Very classic and annoying issues that I believe not few people have
+encountered... We eventually resorted to orphan mode just as you did,
+FYI.
+
+But as to fixing it thoroughly, I agree with Eric's thoughts.
+
 > But invoking skb_orphan in start_xmit looks like a workaround to me,
 > I'm not sure if we should rollback this change.  The small queue check
 > and cwnd window would come into a kind of "dead lock" situation to me,
@@ -142,23 +148,20 @@ struct net_device *dev)
 > shouldn't change TCP layer for this issue, may I know the correct
 > direction to resolve this issue? Should we modify the virtio_net
 > driver, let it always invoke skb_orphan as before?
+
+Have you ever noticed the issue cannot be reliably reproduced? It's
+only randomly happening on some VMs without any reason. Once I suspect
+the policy/logic from the host side might have some problems, like too
+slow frequency of triggering IRQ.
+
+Thanks,
+Jason
+
 > As a workaround, we set the virtio_net module parameter napi_tx to
 > false, then the use_napi would be false too. Thus the issue won't
 > happen. But we indeed want to enable napi_tx, so may I know what's
 > your suggestion about this issue?
 >
-
-I think you should start a conversation with virtio_net experts,
-instead of making TCP
-bufferbloated again.
-
-TX completions dynamics are important, and we are not going to
-penalize all drivers
-just because of one.
-
-You are claiming deadlocks, but the mechanisms in place are proven to
-work damn well.
-
 >
 > ------------------------------------------------------------------
 > From:Eric Dumazet <edumazet@google.com>
