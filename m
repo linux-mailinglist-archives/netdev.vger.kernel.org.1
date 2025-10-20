@@ -1,166 +1,195 @@
-Return-Path: <netdev+bounces-230793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79A76BEF85F
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 08:55:01 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC8D1BEF925
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 09:03:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EA18D3483E1
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 06:55:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BCB054EEBB4
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 07:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139E62C178D;
-	Mon, 20 Oct 2025 06:54:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3094F189F3B;
+	Mon, 20 Oct 2025 07:02:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hEd6g3Td"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BhG5fBrn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C85D14F9FB
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 06:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E72222173F
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 07:02:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760943298; cv=none; b=Sdzl2RLm1v4Ph5to3qTUUgO59tPrtdR8MfeOnyFItUTIUQ30jJgjAfkK98XzXnu7MzQ7urQxrL3wPMcdJ3VZVK1whrfrcvfHI+zpnTPZUi6DHYFwcOl9BA3qo/vgCqMjIMo7IEVyLhWt8BmzVs439lIlYW0rXUR5zX0S/l726uw=
+	t=1760943746; cv=none; b=P0noWNr+EerJe59ouidE6wD6wVjTzUBthJ+1Uam6xkWo7iJeGsJqJbGqDhf5o6MEfirt72k9diQVw3wZKOksJf2R43R9J4q8WbgqUfewPezWo9odbzvVXGNt4snmGnUmR5spIX9xXHeYNX4twdRTrfdW8fAoNAmVVUcnOxSbN3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760943298; c=relaxed/simple;
-	bh=0tqT5oeajt50yKYvNBJOiwBt6ouRde7zOPag2n6MxNU=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=KzfFxHf8cZSNoHyUTa/f7Go7ImtpqI9/MizZ/1giBqVtujZ9Ezcxy9R378qX/RF6B4Hw5QrVcBXcEGuXv4jRa1uhQMBQuA3abLm33kDEJ3juwjLrwFzyXJ4jCN2+EyhnvH7ivVzeqwZmERk5vN7hVixdXTyaBxaSiFSHljD8q0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hEd6g3Td; arc=none smtp.client-ip=209.85.221.43
+	s=arc-20240116; t=1760943746; c=relaxed/simple;
+	bh=PzcCWALgeN9cP5fqbEESC/ispkDazn4fIzXsdseXios=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Vb0uotbVbB52b2/2wF7iz2JKsVNmtXwztSIPje0sjMfHWe1Wlyt+NgVHVi/iOQeKhGZ1stY7Jly9aHBrwcihk0VdxqqwEJntyNEHC5a65DH9V9YG1CMNFuYXYrdP/ddZ1HIVJCop8x1xvKQTh3VGl0s5J4XPaHABR1mNRSUEdOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BhG5fBrn; arc=none smtp.client-ip=209.85.166.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3f2cf786abeso3046796f8f.3
-        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 23:54:56 -0700 (PDT)
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-430d0cad0deso8297475ab.2
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 00:02:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760943294; x=1761548094; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SCOb7kU/lxyPJcAkkEw6fuBmfkV0l8hBRDc6MDcbRJA=;
-        b=hEd6g3Tdkvy/idYUqiDsYx4gSKH9siZ7jJ8Dl+NGtV02vOfxajBxyMz11Ub/Mzn73r
-         Flk4Ye1oe3yJqUCrDKNWcTdiC3xfy+mTc4TIHQUKk8ljjW2NcN/RTkpcKr4xb5WsFHvK
-         dlL+z7k35FwaQ7JT29DgO+VRGNlLEvXBdKKuN/rDvWLWBAviCZ/csBgsFlnotmf7YnsN
-         Z1Ozxo0gHP7auwP9QfrngSHN2pLsBY59nujdoeVdTKaOtgrWQ13FNtRp7A71ySQfjlpz
-         qwoga8IErRuuTHt5mjh8xVZJGag2tMdjAbD/wSg94SbAGFC07a4uD8yh7kQTzBFbsRVP
-         iv8Q==
+        d=gmail.com; s=20230601; t=1760943743; x=1761548543; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A3DLhKzyK3Qvu7YdNftDnNGumEF9nA9T8bRsVdS0bTA=;
+        b=BhG5fBrn1x7XiBSStrw+8fQstleihIwZ2qsi8YSs+hfYAcIm2R0YZJmQioZTfmx4ST
+         cPKS+29uGYWe8E0Khd49omjWjMNZtdQLmOk578iMEapMosGEbkMUHaNdVoIAs44d2kjr
+         9AYJR1k+LCGrAl061KyDW4X9RFGlRkWE4UeuCmPfwKhWe+2yQPg7yunbfHIrbvW86wKV
+         To/hbNdPiQSggHtbH9xwRWspOfSPm9ryrwk/QfSluA/rceEqgZyfvHq4SkfSv8cn2P/I
+         Rm3cGL5Y83zBgt7ysajOkS8QvRm2AV4gtSsw3sigs10NLVoq6QLEAj8yb8toLFQwuQS3
+         bwRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760943294; x=1761548094;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SCOb7kU/lxyPJcAkkEw6fuBmfkV0l8hBRDc6MDcbRJA=;
-        b=NuCWiLcgNrBCL2MPZU92kbMF6tZM+y+g80lPQJ++u2+ZcU21rjtKHbNr0WFdkDakUM
-         OTcepBGr+H62ZFd/cBgFZFAZWnsqBYq/KcfsVBZoJyXfFf7P32U7aijWTC2EB6j6qxh/
-         e5jKpaPviRg8vOS55+B2q7PHK2py+GTme/1X+OsksPXzOqHci3VF+z0GHjZeiCBODj3n
-         4WHcAj1sl8j2BGQt7owvua0Ikopr8Awpd7O+yRvEOXYs0A6L4+IMZzKwh27fvRkULPgz
-         AftwK/BfTCDXU9sheH9+Zm1ix3YQ2nRQSX9yYfNRP9Y2EeMJd5VV64j3iM7zaofwktu6
-         7c/Q==
-X-Gm-Message-State: AOJu0Yz+TRcY2LG4eC9J0ws8whFawfnyINWKC7E9TYgbnjWEKYlDKH3i
-	6cBlMinrfaonfW4cljI4c1G4i362IwqIq2M+KXejE0GaL9LDLwyHqG+yYxuyoQ==
-X-Gm-Gg: ASbGnctD1jDwG2cFC5aJLq8uiM8jZYO1IE6wt0S3gf1r9g/BoRWdu4YVkWiolTU1rH8
-	4CcQADRZ18rojO6fzPZGyGkaP1UjBPiZW7LIwnrpFA2X1DGSHY9fqdv5X+uHx8kTXQqsT+uzbAK
-	/spj7DHkkirvDheh+73hranVJsFBmaop1BMDfC+9TyLeprv33li9Nr+jv5JZ5++q6g4CgCoIBy4
-	Cgi+WdCwQ1VIF8dnCBl3QrCio9+2gvHLYleflz7ojzjEqnWlyOA5lxwydDTJxIpO8KSGxxDGmEH
-	N/d19VNPd3pM6GXLAqeofca4/BhQ/uc7vSkqpN0jCQYfpLkLhhd/EElau8RDhDP2SlbJsd7Dwoc
-	TAyG7fq2Eq9Q0MZgBuYAforuWCPZkEffKAgIZC0nTYXU/TBpNvBSFAyohWXbUAhxXw22kMNrrkV
-	hUSweE9eXjK2+svsRhlWGr1cvkKHxSgjlQOdH4u+WMeQikAPLJIILySpRNKYsxaDKpodqEYgZ/J
-	HydcF6UCsk3j9RJsQ24uIuAcexqwLcGoirTZfJb
-X-Google-Smtp-Source: AGHT+IF4Cr8ENMF9oM2lBaHJ2Z1jCwmlYOqMbPkab6XWNNalMYcfjhGO3vPR+3J2fPbVtBB4N6pqog==
-X-Received: by 2002:a05:6000:2c0c:b0:426:d619:cac7 with SMTP id ffacd0b85a97d-42704d9397amr8504846f8f.36.1760943294418;
-        Sun, 19 Oct 2025 23:54:54 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f33:a300:751b:d37:589a:9c8d? (p200300ea8f33a300751b0d37589a9c8d.dip0.t-ipconnect.de. [2003:ea:8f33:a300:751b:d37:589a:9c8d])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-427ea5bab52sm13580947f8f.22.2025.10.19.23.54.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Oct 2025 23:54:53 -0700 (PDT)
-Message-ID: <c4fc061f-b6d5-418b-a0dc-6b238cdbedce@gmail.com>
-Date: Mon, 20 Oct 2025 08:54:54 +0200
+        d=1e100.net; s=20230601; t=1760943743; x=1761548543;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A3DLhKzyK3Qvu7YdNftDnNGumEF9nA9T8bRsVdS0bTA=;
+        b=LVPbWJqjRRUUOd/BFMycD7GdtIxN+jKW41ZI5zfWu9LE9GwDk/nvs8olx05y06a1cd
+         li4pEi+jyv71TYhGoeKzWFw7ZJ8vsOKN8+gLxeW/DKLd4702WG2/riJWR/lCERUfT1pX
+         0YxCLcPngDiBL3yhaADp+tuVCkyHX9KgIqAnCPzGj/s+dZhvt+2xn7+smoGq2ehiZYlq
+         b2oh7g6CtrSSoNVaF9j1zWrF8MikR2nra2uSJwZ8jZ6tej4U83SYcuotIlM1kQKFdriD
+         xq9Q7cXanS0qzjWMueVExisNapuS7nQerjXpejTzJ+f/8oKfD/USLu/OW6YqEYQcv6H5
+         HgoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWVUNTpGDQ2EspvH3ie2QSXgIRin/Ekduen6zIWvc03BQp4H9E2RlGTRAoZNUkkacut4t7sxhQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkHMSl9piYtr0hml5hiYWRZnlO4WKA8P6X+SvlaUz9QD1c3S2E
+	1kyt+f4we2FayIBJqxWtEbRipRg3OkDKkvD++OeCT5qzWfDMpLafQk1sKYCR10ceqZgc/uw9WKN
+	1tqDyzsVNySmqWH5gLjtw+17a0OAJSEw=
+X-Gm-Gg: ASbGncsUr2yj62up0ONVYzWVc8B6oiKpsYpNhiQd/kluxgKnKKsufD2PagrST5CYage
+	GHOJ4440bTSLoOXs8ScHLv7BNHC23rNWWGL0HKMJVJ2crHfZgdP+99T82AUNQ1FHvcIqZsJCu8V
+	fquKl6skDI0VFFhxeaZgZl9aAsPmJ5+WJqpBQydnShhgpsjedpCrZzgN2Kxz93GuzpW/WCWHMTU
+	2jYWGdbiTDZSVtdW+5RLMJgXJTUeNaJKsC1zGOfBzRItHubJpmh2H6Ikbpk
+X-Google-Smtp-Source: AGHT+IGy3gEa+loIOXHh8F7+H9LA9TygWtWlDgCNyUFBls73j98A6LSxMxicFTkKsi98TCiyN0lL3sTCbblvwYeF/Xo=
+X-Received: by 2002:a05:6e02:3e04:b0:425:8744:de7d with SMTP id
+ e9e14a558f8ab-430c5292336mr180038105ab.30.1760943743166; Mon, 20 Oct 2025
+ 00:02:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Jian Shen <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: hibmcge: select FIXED_PHY
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251014171907.3554413-1-edumazet@google.com> <20251014171907.3554413-3-edumazet@google.com>
+ <a87bc4d0-9c9c-4437-a1ba-acd9fe5968b2@intel.com> <CANn89i+PnwtgiM4G9Kbrj7kjjpJ5rU07rCyRTpPJpdYHUGhBvg@mail.gmail.com>
+ <f51acd3e-dc76-450d-a036-01852fab6aaf@intel.com> <CANn89iLH4VrGyorzPzQU66USsv1UP3XJWQ+MWMTzrceHfUNYVQ@mail.gmail.com>
+In-Reply-To: <CANn89iLH4VrGyorzPzQU66USsv1UP3XJWQ+MWMTzrceHfUNYVQ@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 20 Oct 2025 15:01:46 +0800
+X-Gm-Features: AS18NWD9jU_k0Ed6QKwG7Bm3zPDN4V_D-UWmWcM66gun2HnhvXe4ijMLJzkrqgg
+Message-ID: <CAL+tcoD6+0gSMS2rOiOOFpnJ=iyYYJuNMg8+mNXBqCOYyeo5uw@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 2/6] net: add add indirect call wrapper in skb_release_head_state()
+To: Eric Dumazet <edumazet@google.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-hibmcge uses fixed_phy_register() et al, but doesn't cater for the case
-that hibmcge is built-in and fixed_phy is a module. To solve this
-select FIXED_PHY.
+On Wed, Oct 15, 2025 at 8:46=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Wed, Oct 15, 2025 at 5:30=E2=80=AFAM Alexander Lobakin
+> <aleksander.lobakin@intel.com> wrote:
+> >
+> > From: Eric Dumazet <edumazet@google.com>
+> > Date: Wed, 15 Oct 2025 05:16:05 -0700
+> >
+> > > On Wed, Oct 15, 2025 at 5:02=E2=80=AFAM Alexander Lobakin
+> > > <aleksander.lobakin@intel.com> wrote:
+> > >>
+> > >> From: Eric Dumazet <edumazet@google.com>
+> > >> Date: Tue, 14 Oct 2025 17:19:03 +0000
+> > >>
+> > >>> While stress testing UDP senders on a host with expensive indirect
+> > >>> calls, I found cpus processing TX completions where showing
+> > >>> a very high cost (20%) in sock_wfree() due to
+> > >>> CONFIG_MITIGATION_RETPOLINE=3Dy.
+> > >>>
+> > >>> Take care of TCP and UDP TX destructors and use INDIRECT_CALL_3() m=
+acro.
+> > >>>
+> > >>> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > >>> ---
+> > >>>  net/core/skbuff.c | 11 ++++++++++-
+> > >>>  1 file changed, 10 insertions(+), 1 deletion(-)
+> > >>>
+> > >>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > >>> index bc12790017b0..692e3a70e75e 100644
+> > >>> --- a/net/core/skbuff.c
+> > >>> +++ b/net/core/skbuff.c
+> > >>> @@ -1136,7 +1136,16 @@ void skb_release_head_state(struct sk_buff *=
+skb)
+> > >>>       skb_dst_drop(skb);
+> > >>>       if (skb->destructor) {
+> > >>>               DEBUG_NET_WARN_ON_ONCE(in_hardirq());
+> > >>> -             skb->destructor(skb);
+> > >>> +#ifdef CONFIG_INET
+> > >>> +             INDIRECT_CALL_3(skb->destructor,
+> > >>> +                             tcp_wfree, __sock_wfree, sock_wfree,
+> > >>> +                             skb);
+> > >>> +#else
+> > >>> +             INDIRECT_CALL_1(skb->destructor,
+> > >>> +                             sock_wfree,
+> > >>> +                             skb);
+> > >>> +
+> > >>> +#endif
+> > >>
+> > >> Is it just me or seems like you ignored the suggestion/discussion un=
+der
+> > >> v1 of this patch...
+> > >>
+> > >
+> > > I did not. Please send a patch when you can demonstrate the differenc=
+e.
+> >
+> > You "did not", but you didn't reply there, only sent v2 w/o any mention=
+.
+> >
+> > >
+> > > We are not going to add all the possible destructors unless there is =
+evidence.
+> >
+> > There are numbers in the original discussion, you'd have noticed if you
+> > did read.
+> >
+> > We only ask to add one more destructor which will help certain
+> > perf-critical workloads. Add it to the end of the list, so that it won'=
+t
+> > hurt your optimization.
+> >
+> > "Send a patch" means you're now changing these lines now and then they
+> > would be changed once again, why...
+>
+> I can not test what you propose.
+>
+> I can drop this patch instead, and keep it in Google kernels, (we had
+> TCP support for years)
+>
+> Or... you can send a patch on top of it later.
+>
 
-Note: This could also be treated as a fix, but as no problems are known,
-treat it as an improvement.
+Sorry, I've been away from the keyboard for a few days. I think it's
+fair to let us (who are currently working on the xsk improvement) post
+a simple patch based on the series.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/hisilicon/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+Regarding what you mentioned that 1% is a noisy number, I disagree.
+The overall numbers are improved, rather than only one or small part
+of them. I've done a few tests under different servers, so I believe
+what I've seen. BTW, xdpsock is the test tool that gives a stable
+number especially when running on the physical machine.
 
-diff --git a/drivers/net/ethernet/hisilicon/Kconfig b/drivers/net/ethernet/hisilicon/Kconfig
-index 65302c41b..38875c196 100644
---- a/drivers/net/ethernet/hisilicon/Kconfig
-+++ b/drivers/net/ethernet/hisilicon/Kconfig
-@@ -148,6 +148,7 @@ config HIBMCGE
- 	tristate "Hisilicon BMC Gigabit Ethernet Device Support"
- 	depends on PCI && PCI_MSI
- 	select PHYLIB
-+	select FIXED_PHY
- 	select MOTORCOMM_PHY
- 	select REALTEK_PHY
- 	help
--- 
-2.51.1.dirty
+@ Alexander I think I can post that patch with more test numbers and
+your 'suggested-by' tag included if you have no objection:) Or if you
+wish you could do it on your own, please feel free to send one then :)
 
+Thanks,
+Jason
 
