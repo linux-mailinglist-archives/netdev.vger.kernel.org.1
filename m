@@ -1,107 +1,105 @@
-Return-Path: <netdev+bounces-230780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFA22BEF630
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 08:01:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 110ADBEF633
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 08:03:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0105A3E18F2
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 06:01:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D9DF3E0622
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 06:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE04218827;
-	Mon, 20 Oct 2025 06:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3123329A9C3;
+	Mon, 20 Oct 2025 06:03:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="u0FRH+Lu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73193354AFF
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 06:01:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194301A7264;
+	Mon, 20 Oct 2025 06:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760940081; cv=none; b=nm+XZUjOsL7TT1ZigdrjXsOwAmToeZMeT+Y01jkc5dqga2XyFY9ww1UIMEhibS4CBXpu087kc+ZxgX/zND6uhKfzWkmrkF97rWPjB94K1+R6M+2pnqLM6zhpRYzhQ65m2pfJ1/A2L89j+vFmy/qCjzCZKtZoszVUxSsa7B7m5Z8=
+	t=1760940212; cv=none; b=WtxVwYyR//p0GtVyK8ZN5uTJtIFKrjzOG+1VcmRo0QpRgLfzPeSyLCoS2zmKjHFzazc9b3TOUPg9EVGBllK9IMw4BHjZ/OidExABlooksayq1NTuFojZdx6vha9AvDPeOpFQV5oiSXyFN+E99pSZDJpPMx1JPHfZjUIycxNs1aI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760940081; c=relaxed/simple;
-	bh=zPx/qHajOmP6Qog6UePYyw24VcXnPdZWtnfS4h2h30I=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=nSu27+0Gh+Xapt4fvvZkvygZ1zn2Iqi8PpZWlSyA59YLMkG943SUq9CCl8wnQZ8FxoUEH9M6mzZBkaU6Y9gxvMomydng5Ue0boHjKVqkHvypWb83dq+STMB7JtDe06dD8HtDEg9jPN2yQ6H5BQe6uG3OZRJfb4hK3Ofi+tLlM5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-93e7f4f7bb1so218748339f.3
-        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 23:01:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760940078; x=1761544878;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qDD8Ubc5Av0L90IL8EuqGy3Z2uaxhW47eENinTlYn0s=;
-        b=CoclELkINkWiUGH70LJ3FQg7DYYFB1j5CLLBSsgATnS/bAv0h9uK634Ywo+K+sDJKB
-         Kz6Kp17fe8jK3VmOsj6rlO+CSPfefAhuBn1NFr2bvZPYbXVCTshZ+299w1jTdieQBDCQ
-         nzzdWCUKjCvW924AKKKGpL0XhLLObPZFuies2+ynvlHkyDKyIk9Bi8AmeM4bOMjHK2BA
-         wOxiU28nWgv5LJcc2ulzRJIyclQXwHCsu442VUFt4/IUYwDtnunRA0wBVDGMnwLu5Mcq
-         gUmTusu/6+SuW935i2kvyXAJpP15coNRvy5GnULknzlL4SYwX20+orUMDjIosL7eS/f/
-         bDKg==
-X-Forwarded-Encrypted: i=1; AJvYcCVunLbVu1lhLsn5cWtRoRvfjMNCgzSx16CJF9SwcBOI+boC9SLdvnbXV3hgW+4g+UDuIG90mJ8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPH8CDpeHYuKpU9pXzvxng9ryX7UstoJtrGhgP7LHE/w8V49Th
-	4w4V+wKECjMpO/+2y5eS+Gtt6GOfgVb68WvmGDzFG2LkQm4pKRK+dkmwL4famx6hN2KWyvK0tza
-	CdN9arAsfO6Y3nOJb9EdpweD/Ps5l+BMkoPWpLBnDZUDpcvNuFGrmahNJJTI=
-X-Google-Smtp-Source: AGHT+IEj9qyfg/IroSssxxfUTR6ez8zaAKoPAwc6VRxxAK8shZj0Z9kW2XzlzJS26xBJt3sjwCybZih8L4SBskLHCJKfK1iuLHB0
+	s=arc-20240116; t=1760940212; c=relaxed/simple;
+	bh=Abf/juTFHekFeCdZgzz+/03QcOuFUx77qS6NIgXzclk=;
+	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID; b=n0PuaBlnAwQ04qYsFZFcwZWXqcgoSECYEdgQytUxp+yGwRQOoRtI0qdVuUj3QogXmJJc28fSB8crg2bQdSQQ3lDjZzT/bgzT9CjOrFjsRWhaHguGRlnXuz0ZQUyh/68g6d2dnMrEZkz8dCpMt7viLt50mNRhmufrQljsEDyvYeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=u0FRH+Lu; arc=none smtp.client-ip=43.163.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1760940204; bh=Abf/juTFHekFeCdZgzz+/03QcOuFUx77qS6NIgXzclk=;
+	h=From:To:Cc:Subject:Date;
+	b=u0FRH+Lu9Yq4OU7LEF03Wei96EhA61mVThzgW+DZmWmeiHP2BxkEzdvpFsuiElKEB
+	 0oMpit5MeeRbYiJ24TcwLOFUuE/qaoyAQcPkVXZ6kwLJGYeqPwVk+qq1lNHH8SXltv
+	 nHNzlaGPXYCMzvUo5T1Txdrkw20snqbawH572YpM=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+X-QQ-XMAILINFO: MHyJd5qrf7Bo9Fu1oZ6VJcYHvKX3J0IffFPrtHBqdnufzIpFJ9f07dOgqE/4XS
+	 1ZdZKdUwe13cQ/C25Xc+1isucXp1h/kibjkp7MwjpOmFOvOOL9PJsV9IiyR8nlpj01HJNf9d/Wc73
+	 zU1ilDZDQFWMvH2yNC3efBJ7fvYfZyAkfqiIoNq3cKqfutQSen7aA39YsDQ2bxJs5DxLfJYn9Pysy
+	 CeW2Y3sq5Ma3/LYSeVhKQPglM7sIUFnB80BA2PG/L6hdTZU7wf7HmU82gTRirpHkw++jgkis8V/ll
+	 IN0H70TbLXaT833oGjQ8e2KI7arXjSAkpNTB97Oij7hR4l0Il649FnJ9tIxATGBqWfkypZJdVB8v7
+	 bEWprzfW4jmE5EKqaDgU6vPVZFN661NQpcm/hGW7d9yg+alcGyHQbcbaB6nef/JDrUatr17nLvFWY
+	 qhtlC5GUCb+0VuV0tyB/aVwNS2fnt/gG93YSuIEEAOqgdvQICani4aZMnbfb1avtSxS0DeyAmkWro
+	 UGhM4e2otqnkdG/HR6xgflB/p5ccc6fLB+05xMG9UvvagELDYczDmuQkp9rld2qdXRL612wYSV9/F
+	 sNBz8APRrcTbUwk8xQMcZVGnGGDkiYVxIqB+iAxl7Xpe18xh1D2sM1pg2o4h/dyaxcmxPgggJdxqG
+	 k4BGqImiFU2Xk/35BLZKY7XtAW5v8PGpG6EVNv8LmzHrKIQwavP5Barbc15/FdkxUd1CiM0ze809u
+	 HRwH1QJ6vqod+nxF0qSl7g8HlvhQVOo9RQUcGM+/FndRe5OHuFXpD9kwXiGgn659s+0CopJXzFLq9
+	 Ba+8t55lCys8pmqt6yXe5MlKHGxmHJt4Xt3zOTapYU668lZdFdMlESfGK+ZlF+K2Iz2C+ztciQJAM
+	 UI2GF6qihFqec+NKhd/rd3S7IR288GaUL6PnfVLgBlWWvZqpIUCeAiyYupVviyfZ74JTpL43N+nSX
+	 PvxgAtMjFdmwfzpfeH1ZiCUGx7PuxlMS7zdd9qVLl6n1Ts4SqBKV9HnRqOtxiYaNh4sTMwAaNTIcb
+	 buzhd0uMEx8RZCG4=
+From: "=?utf-8?B?MTU5OTEwMTM4NQ==?=" <1599101385@qq.com>
+To: "=?utf-8?B?c3l6Ym90K2JlOTdkZDRkYTE0YWU4OGI2YmE0QHN5emthbGxlci5hcHBzcG90bWFpbC5jb20=?=" <syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com>
+Cc: "=?utf-8?B?ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldA==?=" <davem@davemloft.net>, "=?utf-8?B?ZWR1bWF6ZXRAZ29vZ2xlLmNvbQ==?=" <edumazet@google.com>, "=?utf-8?B?aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1?=" <herbert@gondor.apana.org.au>, "=?utf-8?B?aG9ybXNAa2VybmVsLm9yZw==?=" <horms@kernel.org>, "=?utf-8?B?a3ViYUBrZXJuZWwub3Jn?=" <kuba@kernel.org>, "=?utf-8?B?bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZw==?=" <linux-kernel@vger.kernel.org>, "=?utf-8?B?bmV0ZGV2QHZnZXIua2VybmVsLm9yZw==?=" <netdev@vger.kernel.org>, "=?utf-8?B?cGFiZW5pQHJlZGhhdC5jb20=?=" <pabeni@redhat.com>, "=?utf-8?B?c3RlZmZlbi5rbGFzc2VydEBzZWN1bmV0LmNvbQ==?=" <steffen.klassert@secunet.com>, "=?utf-8?B?c3l6a2FsbGVyLWJ1Z3NAZ29vZ2xlZ3JvdXBzLmNvbQ==?=" <syzkaller-bugs@googlegroups.com>
+Subject: Re: [syzbot] [net?] kernel BUG in set_ipsecrequest
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6602:640e:b0:940:d700:3a01 with SMTP id
- ca18e2360f4ac-940d7003b01mr409890539f.3.1760940078571; Sun, 19 Oct 2025
- 23:01:18 -0700 (PDT)
-Date: Sun, 19 Oct 2025 23:01:18 -0700
-In-Reply-To: <tencent_03EA78899E616FF00CC749FE8840EA81410A@qq.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68f5d02e.050a0220.91a22.043e.GAE@google.com>
-Subject: Re: [syzbot] [net?] kernel BUG in set_ipsecrequest
-From: syzbot <syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com>
-To: 1599101385@qq.com
-Cc: 1599101385@qq.com, davem@davemloft.net, edumazet@google.com, 
-	herbert@gondor.apana.org.au, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	steffen.klassert@secunet.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+Date: Mon, 20 Oct 2025 14:03:23 +0800
+X-Priority: 3
+Message-ID: <tencent_72742A444FB03378AEE31E7F4C216DC00409@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-QQ-mid: xmsezc37-0t1760940203tkp45n9ve
 
-> #syz test:
+I3N5esKgdGVzdAoKRnJvbcKgMmVkZmM4ODMzZTQzY2RmNWNjZGE4YmQ1YmUzZGE1ZDFiYmRj
+NjljNsKgTW9uwqBTZXDCoDE3wqAwMDowMDowMMKgMjAwMQpGcm9tOsKgY2xpbmdmZWnCoDwx
+NTk5MTAxMzg1QHFxLmNvbT4KRGF0ZTrCoE1vbizCoDIwwqBPY3TCoDIwMjXCoDEzOjQwOjM1
+wqArMDgwMApTdWJqZWN0OsKgW1BBVENIXcKgZml4wqBpbnRlZ2VywqBvdmVyZmxvd8KgaW7C
+oHNldF9pcHNlY3JlcXVlc3QKVGhlwqBtcC0+bmV3X2ZhbWlsecKgYW5kwqBtcC0+b2xkX2Zh
+bWlsecKgaXPCoHUxNizCoHdoaWxlwqBzZXRfaXBzZWNyZXF1ZXN0wqByZWNlaXZlc8KgZmFt
+aWx5wqBhc8KgdWludDhfdCzCoApjYXVzaW5nwqBhwqBpbnRlZ2VywqBvdmVyZmxvd8KgYW5k
+wqB0aGXCoGxhdGVywqBzaXplX3JlccKgY2FsY3VsYXRpb27CoGVycm9yLMKgd2hpY2jCoHVs
+dGltYXRlbHnCoHRyaWdnZXJlZMKgYcKgCmtlcm5lbMKgYnVnwqBpbsKgc2tiX3B1dC4KClJl
+cG9ydGVkLWJ5OsKgc3l6Ym90K2JlOTdkZDRkYTE0YWU4OGI2YmE0QHN5emthbGxlci5hcHBz
+cG90bWFpbC5jb20KQ2xvc2VzOsKgaHR0cHM6Ly9zeXprYWxsZXIuYXBwc3BvdC5jb20vYnVn
+P2V4dGlkPWJlOTdkZDRkYTE0YWU4OGI2YmE0CgotLS0KwqBuZXQva2V5L2FmX2tleS5jwqB8
+wqAywqArLQrCoDHCoGZpbGXCoGNoYW5nZWQswqAxwqBpbnNlcnRpb24oKykswqAxwqBkZWxl
+dGlvbigtKQoKZGlmZsKgLS1naXTCoGEvbmV0L2tleS9hZl9rZXkuY8KgYi9uZXQva2V5L2Fm
+X2tleS5jCmluZGV4wqAyZWJkZTAzNTIyNDUuLjA4ZjRjZGUwMTk5NMKgMTAwNjQ0Ci0tLcKg
+YS9uZXQva2V5L2FmX2tleS5jCisrK8KgYi9uZXQva2V5L2FmX2tleS5jCkBAwqAtMzUxOCw3
+wqArMzUxOCw3wqBAQMKgc3RhdGljwqBpbnTCoHNldF9zYWRiX2ttYWRkcmVzcyhzdHJ1Y3TC
+oHNrX2J1ZmbCoCpza2IswqBjb25zdMKgc3RydWN0wqB4ZnJtX2ttYWRkcmVzc8KgKgoKwqBz
+dGF0aWPCoGludMKgc2V0X2lwc2VjcmVxdWVzdChzdHJ1Y3TCoHNrX2J1ZmbCoCpza2IsCsKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+dWludDhfdMKgcHJvdG8swqB1aW50OF90wqBtb2RlLMKgaW50wqBsZXZlbCwKLcKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHVpbnQzMl90
+wqByZXFpZCzCoHVpbnQ4X3TCoGZhbWlseSwKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHVpbnQzMl90wqByZXFpZCzCoHVpbnQxNl90
+wqBmYW1pbHksCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgY29uc3TCoHhmcm1fYWRkcmVzc190wqAqc3JjLMKgY29uc3TCoHhmcm1f
+YWRkcmVzc190wqAqZHN0KQrCoHsKwqDCoMKgwqDCoMKgwqDCoHN0cnVjdMKgc2FkYl94X2lw
+c2VjcmVxdWVzdMKgKnJxOwotLQoyLjM0LjEKCg==
 
-want either no args or 2 args (repo, branch), got 7
-
-> From 2edfc8833e43cdf5ccda8bd5be3da5d1bbdc69c6 Mon Sep 17 00:00:00 2001
-> From: clingfei <1599101385@qq.com>
-> Date: Mon, 20 Oct 2025 13:40:35 +0800
-> Subject: [PATCH] fix integer overflow in set_ipsecrequest
-> The mp->new_family and mp->old_family is u16, while set_ipsecrequest receives family as uint8_t, 
-> causing a integer overflow and the later size_req calculation error, which ultimately triggered a 
-> kernel bug in skb_put.
->
-> Reported-by: syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=be97dd4da14ae88b6ba4
->
-> ---
->  net/key/af_key.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/key/af_key.c b/net/key/af_key.c
-> index 2ebde0352245..08f4cde01994 100644
-> --- a/net/key/af_key.c
-> +++ b/net/key/af_key.c
-> @@ -3518,7 +3518,7 @@ static int set_sadb_kmaddress(struct sk_buff *skb, const struct xfrm_kmaddress *
->
->  static int set_ipsecrequest(struct sk_buff *skb,
->                             uint8_t proto, uint8_t mode, int level,
-> -                           uint32_t reqid, uint8_t family,
-> +                           uint32_t reqid, uint16_t family,
->                             const xfrm_address_t *src, const xfrm_address_t *dst)
->  {
->         struct sadb_x_ipsecrequest *rq;
-> --
-> 2.34.1
 
