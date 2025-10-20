@@ -1,125 +1,89 @@
-Return-Path: <netdev+bounces-230767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F09BDBEEFF7
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 03:30:07 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FC58BEF07E
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 03:45:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BFC2189696E
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 01:30:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AD2C34E7658
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 01:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785881DB356;
-	Mon, 20 Oct 2025 01:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1048D19B5B1;
+	Mon, 20 Oct 2025 01:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="t7vi6l6k"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fZGPYHTB"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DCD33F6;
-	Mon, 20 Oct 2025 01:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AEB242049;
+	Mon, 20 Oct 2025 01:44:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760923803; cv=none; b=UKmmkYsXwc5hO5GvhygRvC6ttXVdKfyTkKbzIaG+KO6rCNMddpu/KUrvduJSAikKq/StWkUYtWAwbQc6wUpcRzq6McCGvUYx6iW5q8/5MO6yGILZHHhQh4rHmvtThMeti7Q04go+0WGR/dYvzN42RKznkOeOKHTkGdE7PPm7Q7U=
+	t=1760924701; cv=none; b=sT8rlWlI63t3heI6HdU6JEX33XagpnfbG5VvtK85Q7j52rwUjfTuKnFuK4cebUmvzJJIUThY5SUYMneZmtraVo/jWlpFFnA7oJntFe1lTAdsEDa8tUxBwRpACq/AxgMQDVUV5K8jpoe38k2mrg3jU65rdwILHDByedRMOxgX4JY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760923803; c=relaxed/simple;
-	bh=cOOCymlcQ4yXe5flO7dYezoRaz5b3aNPXSz3NYiNa74=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mS582+Mz9PbrIjHb+B6/N0fD8hZ2SfJGS57jo6j5fJ2M0z1zIxZsj4m4otJD+alsm1BWKdkFMwbZJXZSXVvqXJtLfjLEmfeQ4KUlNWyPLpCxZr3pkqQcbt/V+xx/ocD9w241V6vYDiNMg+kYVGH4n1bmuBb6SaDtQZiUXD9bMRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=t7vi6l6k; arc=none smtp.client-ip=113.46.200.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=bbvP9qtrOBpmi4VZWRhATVemHJdm1859xM2/i1HFr6o=;
-	b=t7vi6l6kdAlDwnnIV9+5Fq2cXQ3fu9Ah4U5V60VT135lbd084E8xF5xklLqY+NgtM/6R51/5k
-	/gamrgch+S8LLFH7MAeBMC8AAqNx5FhPn5QY4PFVj/eGIzy/D/h7dQoI5czth3zWRlrYy0pTE/D
-	j1szK7cJxNOH5Gnkhb+wIfE=
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4cqdBc5WTjzmV7q;
-	Mon, 20 Oct 2025 09:29:28 +0800 (CST)
-Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id D996C1A0188;
-	Mon, 20 Oct 2025 09:29:51 +0800 (CST)
-Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.188.120) by
- kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 20 Oct 2025 09:29:50 +0800
-From: Fan Gong <gongfan1@huawei.com>
-To: <markus.elfring@web.de>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<gongfan1@huawei.com>, <guoxin09@huawei.com>, <gur.stavi@huawei.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <luosifu@huawei.com>,
-	<luoyang82@h-partners.com>, <meny.yossefi@huawei.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <pavan.chebbi@broadcom.com>,
-	<shenchenyang1@hisilicon.com>, <shijing34@huawei.com>, <wulike1@huawei.com>,
-	<zhoushuai28@huawei.com>, <zhuyikai1@h-partners.com>
-Subject: Re: [PATCH net-next v02 4/6] hinic3: Add mac filter ops
-Date: Mon, 20 Oct 2025 09:29:44 +0800
-Message-ID: <20251020012947.2033-1-gongfan1@huawei.com>
-X-Mailer: git-send-email 2.51.0.windows.1
-In-Reply-To: <e8b52cf3-9f77-445c-8ba6-d8ac402841b7@web.de>
-References: <e8b52cf3-9f77-445c-8ba6-d8ac402841b7@web.de>
+	s=arc-20240116; t=1760924701; c=relaxed/simple;
+	bh=OVwQpJxh4eukkhyN/hVdjBrC/3d5Yp+K/ztW6WxS/cI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VwSFctx967DgXpakUJ+O2EG9p+HqNogiBhZBcPyLf4pcK7SysOoTqxd56yudxeM3ivav+EBD2IgefBdHDrkzcjbzOA4o+bjdgWPOKnb0IcdgMhzY5YBLwbuTuIbU09hkHPMED9hpInopzScd8aqn6UWBnrF5ed6eWpk6jMoh+h8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fZGPYHTB; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1760924689; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=6xwabBodM9fCJvLt8UUcakCPv5h3/iUrNZfgFKUHoxc=;
+	b=fZGPYHTB4D8qLMdahkywHSSkZ0TcfrVIw9BZIcQ+vt600IFUMb5TWjYER/k67KlRAxfN/vw1Xe3pcsyD0xCSGzPW2qQnFoveNm31X86SdgsHxwgHUP8rqyl6e9D0UIptmm9dn+10T0SgdVz5zjdui4XFIA35BIhoiWA1aIOhfRs=
+Received: from localhost(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0WqVOAId_1760924682 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 20 Oct 2025 09:44:48 +0800
+From: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+To: nicolas.ferre@microchip.com
+Cc: claudiu.beznea@tuxon.dev,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+	Abaci Robot <abaci@linux.alibaba.com>
+Subject: [PATCH -next] net: macb: Remove duplicate linux/inetdevice.h header
+Date: Mon, 20 Oct 2025 09:44:41 +0800
+Message-ID: <20251020014441.2070356-1-jiapeng.chong@linux.alibaba.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemf100013.china.huawei.com (7.202.181.12)
 
-On 10/17/2025 7:51 PM, Markus Elfring wrote:
-> …> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_filter.c
->> @@ -0,0 +1,413 @@
-> …> +static int hinic3_mac_filter_sync(struct net_device *netdev,
->> +				  struct list_head *mac_filter_list, bool uc)
->> +{
-> …
->> +		hinic3_cleanup_filter_list(&tmp_add_list);> +		hinic3_mac_filter_sync_hw(netdev, &tmp_del_list, &tmp_add_list);
->> +
->> +		/* need to enter promiscuous/allmulti mode */
->> +		err = -ENOMEM;
->> +		goto err_out;
->> +	}
->> +
->> +	return add_count;
->> +
->> +err_out:
->> +	return err;
->> +}
->
-> Is there a need to move any resource cleanup actions behind a more appropriate label?
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/coding-style.rst?h=v6.17#n532
->
->
-> Regards,
-> Markus
+./drivers/net/ethernet/cadence/macb_main.c: linux/inetdevice.h is included more than once.
 
-Hi, Markus. Thanks for your comment.
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=26474
+Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+---
+ drivers/net/ethernet/cadence/macb_main.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Your suggestion is great. In "hinic3_mac_filter_sync", there are two places in
-the code that return error values.
-Actually the error handling code you quoted should be refined as a new function
-because its error handling is special and cannot be normalized to function error
-path.
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 214f543af3b8..39673f5c3337 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -14,7 +14,6 @@
+ #include <linux/etherdevice.h>
+ #include <linux/firmware/xlnx-zynqmp.h>
+ #include <linux/inetdevice.h>
+-#include <linux/inetdevice.h>
+ #include <linux/init.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
+-- 
+2.43.5
 
-> +	if (err) {
-> +		hinic3_undo_del_filter_entries(mac_filter_list, &tmp_del_list);
-> +		hinic3_undo_add_filter_entries(mac_filter_list, &tmp_add_list);
-> +		netdev_err(netdev, "Failed to clone mac_filter_entry\n");
-> +
-> +		hinic3_cleanup_filter_list(&tmp_del_list);
-> +		hinic3_cleanup_filter_list(&tmp_add_list);
-> +		goto err_out;
-> +	}
-
-And anther place(only cleanup del_list & add_list) should be moved behind a
-error label in function error path according to linux doc.
 
