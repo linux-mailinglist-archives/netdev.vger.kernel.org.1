@@ -1,269 +1,158 @@
-Return-Path: <netdev+bounces-230971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4874BF2838
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 18:49:49 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C65BBF2707
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 18:32:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32F3C18889A1
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:50:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4E9774F853B
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39DA332F747;
-	Mon, 20 Oct 2025 16:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C67299950;
+	Mon, 20 Oct 2025 16:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="PVIN0ico"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yOKa8aiK"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F8F32ED3E;
-	Mon, 20 Oct 2025 16:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B03828CF49
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 16:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760978986; cv=none; b=C7S+ptVAU+MHOHOrtyKhrHWTlRxg9FqfMQ+dlSz/YEUel6+Nnm/bF/uQcD4NL5C7JcxD9TvsA24Rp/UFimqSwb0IyZBUx+SrCjgiWSrlyOlmY/deqaE0oqEuarY6wKc5b5zXnJulzBFdCfl+4VdK2c5OlBi3pZjDI9TQZTZEtC8=
+	t=1760977872; cv=none; b=c3BREsxsKTJNOUEaZBhM7SvDVq8m+UBApizWuj+jU9447Tn6QPn/8qQ1JUR824FD6n0hRXqZUI2fuTs8FzhPWCfpplt+KMsXzIxuFcNuNinQjNTN/YYlHMEBxBqqvljPkoDSYUSdillaFNeFO25WBIeExI9yVd3cJCfW/dZe6i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760978986; c=relaxed/simple;
-	bh=UxGsfH3mkkGxYO6io+0E+8yvKqYEhJiVmJ7X+FgzsUs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tWMPxjSNTrtn7gzFYZpfM6XYrPw72F8USW96p1zxPywphGwsGRL9NMc8ZreGpv3gIY16vG7NU4Hq3fxmiUBMwHy/zmzYGU0GyWtm/lt/MnqYjt0R/4Jyb3lPd7o16J6TRhICcdFidkQzGzWvYCG6AfbHFTzRucGYizXQFxg8+B4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=PVIN0ico; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=884xqxUtg5jU/T30SRwYu58JWq3FvgLsVIs4zUZceAU=; b=PVIN0ico4nEB6MW0zPT5e7MqhL
-	cFlSm9RZxO9Y+YOl+mpep1t94DEWeLCSEvh1B+Cu8p4osC2aUB9r5p7Ca0DaIytyFxd2IJDOJhsEM
-	9b+Zm7SCsPYEQFPMPxRKfIeyJn/Of8LY6jwEEYEMNtkGGkK4ruubKxcqKk8d4K4SAUmgZY6jTEZDn
-	VPy4Rw5cTP2xyiNDa+2oZ7H8eNgjmmj3oPS1eSxRyxMwij4P99odXLY3TBysW0YgYt+xLH4eTgD4I
-	ge+Fd6OeHAKQIx1dfrjG4acXjNC8/l70tLp7F7EwBuCX0vy0PHv1v0PH2PggwbdNVitWbS7RQu/9N
-	T7Rx0afg==;
-Received: from localhost ([127.0.0.1])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1vAsg9-000Jms-1R;
-	Mon, 20 Oct 2025 18:24:13 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	razor@blackwall.org,
-	pabeni@redhat.com,
-	willemb@google.com,
-	sdf@fomichev.me,
-	john.fastabend@gmail.com,
-	martin.lau@kernel.org,
-	jordan@jrife.io,
-	maciej.fijalkowski@intel.com,
-	magnus.karlsson@intel.com,
-	dw@davidwei.uk,
-	toke@redhat.com,
-	yangzhenze@bytedance.com,
-	wangdongdong.6@bytedance.com
-Subject: [PATCH net-next v3 15/15] netkit: Add xsk support for af_xdp applications
-Date: Mon, 20 Oct 2025 18:23:55 +0200
-Message-ID: <20251020162355.136118-16-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251020162355.136118-1-daniel@iogearbox.net>
-References: <20251020162355.136118-1-daniel@iogearbox.net>
+	s=arc-20240116; t=1760977872; c=relaxed/simple;
+	bh=dPFovmpKdroGd8354LpU5WRnCZYAnDz9cnOhTf5IUnw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FxmVGHH626aQmUMD92jJrgHa+AgWlfsdXk6vsAmCa9SKPeq2GyHLrb4pS+ixiwgAq4h+ynCOx0Loben3WkJ2ykLkVtPaB2qCj/FKC7AiAMbvRy1U/PTRuWy1IuzoZErz8mua9YfqNxZoMKb71OFA4BHyajCD6bVj6C0rHyk6YPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yOKa8aiK; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4712c6d9495so1238825e9.2
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 09:31:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760977862; x=1761582662; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AgGhFAo2eru4JFVMxvySKBBUict2gGij38PNLAiiQLQ=;
+        b=yOKa8aiKBvjk/2NndJ4JVxY7S0In/TeNa/BY8SF1ZovlM17amkmLkGwvItkCBh7ESt
+         z4eR19hk56D8Jw68w+xrEThCjlNsdAvR4nZyf1tKV3dfftJ9fBh59Em6GPBRJayoXa/L
+         7h503RIGbTTDu/XQXdXOe57brxbSLwnKphBBbhmryL7eO6IN9vMc1aLNPIF4DmkPBDZ7
+         00tjrmIvpKihFk/Wcg1KcV7CLlYnicMGajWxHUu1bMX02iIRQ5rHpzxkDMzbuNVhyW2j
+         TGWxoWMBDHk16LfkPRELxTriAJStttc3dY1R4ZAlmQ6BQf/d5kqCo4EO+bypvYn62VaM
+         kfsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760977862; x=1761582662;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AgGhFAo2eru4JFVMxvySKBBUict2gGij38PNLAiiQLQ=;
+        b=ZQOPHNDOnzRY+cRfjt+1JDb7YaD6T7q7hnNO6aAaEqj8YwBKYpnABI4gchVilUGwmw
+         dJGd9qLoWJwhphn64V+F3yytXAfx9Jf8gvgMAfc9VTf+DDYs6bi8Gfl9/o+Y/VpB4Tdp
+         caECFtT/nUd+UdWkzDQHkjA4KSKAv5bCKQ+IAY6Z3yn4HDRg0yNXzNbpxA0qeub3pXCt
+         GWvKgSAyMHWqVNr664r3helOSJ7t2RCAoZYwVaNytehiyBM5f9HNQUcF64YT+yMJ3taR
+         gCnYeoA1G3Oi2iogwd9Kzymc9AaGraPyjNu3Lo2go+zBShoynwChCtu/xS3T/SUHwYjp
+         vFDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUrAZHsL6aCRUi/rA6J1Vrm2NQNWIEkdGbANpBsnldMZWWePbjx1kYz/Wtc7gX024PYWX2q1AI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz06AFLZU+cwfnM8+25hI4FzJyPsZ2gyMPCRzztrB3ywGa6MyaG
+	9s6kSC2E+0Vn2gDxVg88I6kJX6q36QDRDCbcA4+1Ceggp7H6nUUaidQB028pQvOelL8X/rJDp7D
+	NGjVa9jYSZu708DLaLuuIyJSaIJjn8EOdC5hjuaxP
+X-Gm-Gg: ASbGnct6R+cg6s9PQeo38BFG9t/q53jCEolQyTNJAUAvFLK8W4iBYBH4NShJshk4J64
+	qOy7CRTYercduH5VbThyqjuvtBnCH93RMlMFEishDMELECF/uah2u+art/beiZ0AFSaHkxYNK69
+	Q78jKjdIs0Ef9BnmeCaz+pYGF/p/PY/AhtnwrAn45s2z491W7EGeb3lTpswMror6b6JBgQKI/8a
+	IMbYfHI17FRM1WnsUF4hL2Q+6xqZlgNWwbTsdxQAhqDonn4DRhfaah/SIGYMqjd1BxD6YaU336y
+	VLaoDz1j9XoMPP+QM51ei571Ig==
+X-Google-Smtp-Source: AGHT+IEM/TOueMIS9qydvuvtchlFF0wK8cgOc/KXjEJfj7OOC9BHA3+7SvHKRHzkiADi+n6n5wTpWmB5bEJD1IPvStA=
+X-Received: by 2002:a05:600c:8b62:b0:45d:d97c:235e with SMTP id
+ 5b1f17b1804b1-47117876bcdmr95871475e9.12.1760977862456; Mon, 20 Oct 2025
+ 09:31:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.0.9/27798/Mon Oct 20 11:37:28 2025)
+References: <20251016040159.3534435-1-kuniyu@google.com> <20251016040159.3534435-2-kuniyu@google.com>
+ <CANn89iJnQErC8OLoTgnNxU8MURKANbiqXBYaUHsNaTO3m+P54Q@mail.gmail.com>
+ <f93076da-4df7-4e02-9d57-30e9b19b3608@wizmail.org> <CAAVpQUBD5nozg1azwi9tBHXVWgcXBSV+BXSgpt455Y+CweevYw@mail.gmail.com>
+ <80bb29a8-290c-449e-a38d-7d4e47ce882e@wizmail.org>
+In-Reply-To: <80bb29a8-290c-449e-a38d-7d4e47ce882e@wizmail.org>
+From: Yuchung Cheng <ycheng@google.com>
+Date: Mon, 20 Oct 2025 09:30:26 -0700
+X-Gm-Features: AS18NWDudlq-087ieqYbDOL44pGINaeRCWOwXxD-qtT1E7Qh6rGQr_9FQLQyXls
+Message-ID: <CAK6E8=d1GjRLVuB0zmydAepvnZs3M1w+2tCVwdhAzL6rtseJ1g@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 1/4] tcp: Make TFO client fallback behaviour consistent.
+To: Jeremy Harris <jgh@wizmail.org>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Enable support for AF_XDP applications to operate on a netkit device.
-The goal is that AF_XDP applications can natively consume AF_XDP
-from network namespaces. The use-case from Cilium side is to support
-Kubernetes KubeVirt VMs through QEMU's AF_XDP backend. KubeVirt is a
-virtual machine management add-on for Kubernetes which aims to provide
-a common ground for virtualization. KubeVirt spawns the VMs inside
-Kubernetes Pods which reside in their own network namespace just like
-regular Pods.
+On Sat, Oct 18, 2025 at 2:17=E2=80=AFPM Jeremy Harris <jgh@wizmail.org> wro=
+te:
+>
+> On 2025/10/18 9:56 PM, Kuniyuki Iwashima wrote:
+> >> In addition, a client doing this (SYN with cookie but no data) is gran=
+ting
+> >> permission for the server to respond with data on the SYN,ACK (before
+> >> 3rd-ACK).
+> >
+> > As I quoted in patch 2, the server should not respond as such
+> > for SYN without payload.
+> >
+> > https://datatracker.ietf.org/doc/html/rfc7413#section-3
+> > ---8<---
+> >     Performing TCP Fast Open:
+> >
+> >     1. The client sends a SYN with data and the cookie in the Fast Open
+> >        option.
+> >
+> >     2. The server validates the cookie:
+> > ...
+> >     3. If the server accepts the data in the SYN packet, it may send th=
+e
+> >        response data before the handshake finishes.
+> > ---8<---
+>
+> In language lawyer terms, that (item 3 above) is a permission.  It does
+> not restrict from doing other things.  In particular, there are no RFC 21=
+19
+> key words (MUST NOT, SHOULD etc).
+>
+>
+> I argue that once the server has validated a TFO cookie from the client,
+> it is safe to send data to the client; the connection is effectively open=
+.
 
-Raw QEMU AF_XDP backend example with eth0 being a physical device with
-16 queues where netkit is bound to the last queue (for multi-queue RSS
-context can be used if supported by the driver):
+Thanks for the patch. But indeed this was the intentional design (i.e.
+empty MSG_FASTOPEN call triggers server immediate accept and send
+before final ACK in 3WHS). It's allowing more application scenarios
+for TFO. Now some applications may have taken advantage of this design
+so this patch set may break them.
 
-  # ethtool -X eth0 start 0 equal 15
-  # ethtool -X eth0 start 15 equal 1 context new
-  # ethtool --config-ntuple eth0 flow-type ether \
-            src 00:00:00:00:00:00 \
-            src-mask ff:ff:ff:ff:ff:ff \
-            dst $mac dst-mask 00:00:00:00:00:00 \
-            proto 0 proto-mask 0xffff action 15
-  [ ... setup BPF/XDP prog on eth0 to steer into shared xsk map ... ]
-  # ip netns add foo
-  # ip link add numrxqueues 2 nk type netkit single
-  # ./pyynl/cli.py --spec ~/netlink/specs/netdev.yaml \
-                   --do bind-queue \
-                   --json "{"src-ifindex": $(ifindex eth0), "src-queue-id": 15, \
-                            "dst-ifindex": $(ifindex nk), "queue-type": "rx"}"
-  {'dst-queue-id': 1}
-  # ip link set nk netns foo
-  # ip netns exec foo ip link set lo up
-  # ip netns exec foo ip link set nk up
-  # ip netns exec foo qemu-system-x86_64 \
-          -kernel $kernel \
-          -drive file=${image_name},index=0,media=disk,format=raw \
-          -append "root=/dev/sda rw console=ttyS0" \
-          -cpu host \
-          -m $memory \
-          -enable-kvm \
-          -device virtio-net-pci,netdev=net0,mac=$mac \
-          -netdev af-xdp,ifname=nk,id=net0,mode=native,queues=1,start-queue=1,inhibit=on,map-path=$dir/xsks_map \
-          -nographic
+But the RFC could be more specific about this edge case so revising
+the RFC as an errata?
 
-We have tested the above against a dual-port Nvidia ConnectX-6 (mlx5)
-100G NIC with successful network connectivity out of QEMU. An earlier
-iteration of this work was presented at LSF/MM/BPF [0].
-
-For getting to a first starting point to connect all things with
-KubeVirt, bind mounting the xsk map from Cilium into the VM launcher
-Pod which acts as a regular Kubernetes Pod while not perfect, is not
-a big problem given its out of reach from the application sitting
-inside the VM (and some of the control plane aspects are baked in
-the launcher Pod already), so the isolation barrier is still the VM.
-Eventually the goal is to have a XDP/XSK redirect extension where
-there is no need to have the xsk map, and the BPF program can just
-derive the target xsk through the queue where traffic was received
-on.
-
-The exposure through netkit is because Cilium should not act as a
-proxy handing out xsk sockets. Existing applications expect a netdev
-from kernel side and should not need to rewrite just to implement
-against a CNI's protocol. Also, all the memory should not be accounted
-against Cilium but rather the application Pod itself which is consuming
-AF_XDP. Further, on up/downgrades we expect the data plane to being
-completely decoupled from the control plane; if Cilium would own the
-sockets that would be disruptive. Another use-case which opens up and
-is regularly asked from users would be to have DPDK applications on
-top of AF_XDP in regular Kubernetes Pods.
-
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Co-developed-by: David Wei <dw@davidwei.uk>
-Signed-off-by: David Wei <dw@davidwei.uk>
-Link: https://bpfconf.ebpf.io/bpfconf2025/bpfconf2025_material/lsfmmbpf_2025_netkit_borkmann.pdf [0]
----
- drivers/net/netkit.c | 71 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 70 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
-index a281b39a1047..f69abe5ec4cd 100644
---- a/drivers/net/netkit.c
-+++ b/drivers/net/netkit.c
-@@ -12,6 +12,7 @@
- #include <net/netdev_lock.h>
- #include <net/netdev_queues.h>
- #include <net/netdev_rx_queue.h>
-+#include <net/xdp_sock_drv.h>
- #include <net/netkit.h>
- #include <net/dst.h>
- #include <net/tcx.h>
-@@ -235,6 +236,71 @@ static void netkit_get_stats(struct net_device *dev,
- 	stats->tx_dropped = DEV_STATS_READ(dev, tx_dropped);
- }
- 
-+static bool netkit_xsk_supported_at_phys(const struct net_device *dev)
-+{
-+	if (!dev->netdev_ops->ndo_bpf ||
-+	    !dev->netdev_ops->ndo_xdp_xmit ||
-+	    !dev->netdev_ops->ndo_xsk_wakeup)
-+		return false;
-+	if ((dev->xdp_features & NETDEV_XDP_ACT_XSK) != NETDEV_XDP_ACT_XSK)
-+		return false;
-+	return true;
-+}
-+
-+static int netkit_xsk(struct net_device *dev, struct netdev_bpf *xdp)
-+{
-+	struct netkit *nk = netkit_priv(dev);
-+	struct netdev_bpf xdp_lower;
-+	struct netdev_rx_queue *rxq;
-+	struct net_device *phys;
-+
-+	switch (xdp->command) {
-+	case XDP_SETUP_XSK_POOL:
-+		if (nk->pair == NETKIT_DEVICE_PAIR)
-+			return -EOPNOTSUPP;
-+		if (xdp->xsk.queue_id >= dev->real_num_rx_queues)
-+			return -EINVAL;
-+
-+		rxq = __netif_get_rx_queue(dev, xdp->xsk.queue_id);
-+		if (!rxq->peer)
-+			return -EOPNOTSUPP;
-+
-+		phys = rxq->peer->dev;
-+		if (!netkit_xsk_supported_at_phys(phys))
-+			return -EOPNOTSUPP;
-+
-+		memcpy(&xdp_lower, xdp, sizeof(xdp_lower));
-+		xdp_lower.xsk.queue_id = get_netdev_rx_queue_index(rxq->peer);
-+		break;
-+	case XDP_SETUP_PROG:
-+		return -EPERM;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return phys->netdev_ops->ndo_bpf(phys, &xdp_lower);
-+}
-+
-+static int netkit_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags)
-+{
-+	struct netdev_rx_queue *rxq;
-+	struct net_device *phys;
-+
-+	if (queue_id >= dev->real_num_rx_queues)
-+		return -EINVAL;
-+
-+	rxq = __netif_get_rx_queue(dev, queue_id);
-+	if (!rxq->peer)
-+		return -EOPNOTSUPP;
-+
-+	phys = rxq->peer->dev;
-+	if (!netkit_xsk_supported_at_phys(phys))
-+		return -EOPNOTSUPP;
-+
-+	return phys->netdev_ops->ndo_xsk_wakeup(phys,
-+			get_netdev_rx_queue_index(rxq->peer), flags);
-+}
-+
- static int netkit_init(struct net_device *dev)
- {
- 	netdev_lockdep_set_classes(dev);
-@@ -255,6 +321,8 @@ static const struct net_device_ops netkit_netdev_ops = {
- 	.ndo_get_peer_dev	= netkit_peer_dev,
- 	.ndo_get_stats64	= netkit_get_stats,
- 	.ndo_uninit		= netkit_uninit,
-+	.ndo_bpf		= netkit_xsk,
-+	.ndo_xsk_wakeup		= netkit_xsk_wakeup,
- 	.ndo_features_check	= passthru_features_check,
- };
- 
-@@ -409,10 +477,11 @@ static void netkit_setup(struct net_device *dev)
- 	dev->hw_enc_features = netkit_features;
- 	dev->mpls_features = NETIF_F_HW_CSUM | NETIF_F_GSO_SOFTWARE;
- 	dev->vlan_features = dev->features & ~netkit_features_hw_vlan;
--
- 	dev->needs_free_netdev = true;
- 
- 	netif_set_tso_max_size(dev, GSO_MAX_SIZE);
-+
-+	xdp_set_features_flag(dev, NETDEV_XDP_ACT_XSK);
- }
- 
- static struct net *netkit_get_link_net(const struct net_device *dev)
--- 
-2.43.0
-
+>
+> For traditional, non-TFO, connections the wait for the 3rd-ACK is require=
+d
+> to be certain that the IP of the alleged client, given in the SYN packet,
+> was not spoofed by a 3rd-party.  For TFO that certainty is given by the
+> cookie; the server can conclude that it has previously conversed with
+> the source IP of the SYN.
+>
+>
+> Alternately, one could read "the data" in that item 3 as including "zero =
+length data";
+> the important part being accepting it.
+> --
+> Cheers,
+>    Jeremy
 
