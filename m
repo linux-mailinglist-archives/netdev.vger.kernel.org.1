@@ -1,156 +1,264 @@
-Return-Path: <netdev+bounces-230897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 255EDBF160C
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:58:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A726FBF1591
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:52:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCCE718A5FCB
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:58:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DBB918A598C
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5275E314B81;
-	Mon, 20 Oct 2025 12:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809E824DD17;
+	Mon, 20 Oct 2025 12:52:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KdfbC0C2"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oNz4QML5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B00314A74
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 12:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 796B83FFD;
+	Mon, 20 Oct 2025 12:52:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760965067; cv=none; b=jBpHtzl3fYh4zBWWKeFEZ+NbHWXu1yMUMYS4oWC09mRU0flVN8XbnMYu6isdPSmNPhDFGwB4FRiZflbU5jbMc++8tm/p37u1SqMnNZ2zn4Kk6E/VasiRetMDojuQlp21DzXfMmpk4B0u6A4pFRwcWffRtp0nsZPKt/NeTiUYWrQ=
+	t=1760964773; cv=none; b=AdCpOu4aJ1qFSp8jg1u0rpwryhg1UHbquFAJlwihspMsiC9KigwAWwHJ9zmbD/rMHJ7/9i4eLHRqLtUnqMVGYnH7DtuJGVR5KcSptCDZOZzAsmJd/shuSC+xNx86KWB+i+DxlrGa9SeRDWlaITfpnJrgsBXqft3NajPTwHuIq+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760965067; c=relaxed/simple;
-	bh=G6FcO278eXFT1tgC313pIvONzjhfMvpa/sUOSVlAXKo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V40wNEAUPRHNTwiJOYb1Gl31yz7LJlH5r3vPln36G32RGGwteOr9J0INqABPqu/NRMrY8NqC4oMqSRGAbTMSG9IiShYIVl26Pb91ZlDpU1ip21HaAA7KRj6PVt7+qF8cQunlXOyVwCb9l5C5y8KH/jWcvnc6kUphbwjCFD2d00c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KdfbC0C2; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-47100eae3e5so40199665e9.1
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 05:57:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1760965064; x=1761569864; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9ao5LTkpyunEEEJuwR6nh8mnIP8EeLv+acAjQyBGn0U=;
-        b=KdfbC0C2Sce4zHSEmbnnbyWcAGIkJoui8k91GIIXvf9QEwmDeqkzykh3ylXyuwxxlq
-         DP7IKSnC2RpA88JxKrbqc4uA8FF8cFtW9mWngA+dPoriONy1wDUASCsvbzDwxN9TrYZk
-         cbW+dm+U0zWVY7zu5W32u+oVuisiiwvIx304AfzRHVMKHmxP9G12yGdUHCAUMRFsyXHQ
-         5rhidWP7CTHW844P8sgRiljMMBMKLS7MaN/K//oocxYInqH0oWzndPdCQMpk+pdmJ0/N
-         vyx+Xpn8isd6yRxsTOiZVU5s+d8msOYEEWtAf8KAM2GGXi7eff6mhjJJd7UAfWpbjU3E
-         qDeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760965064; x=1761569864;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9ao5LTkpyunEEEJuwR6nh8mnIP8EeLv+acAjQyBGn0U=;
-        b=SBA7gce5NwF9r8f4ZvSrcfg9Lv4uwKL1P4e++JOdYHctbRJy5acwanceUt4a6ySPtx
-         udYggnQw+q6YZKKUsyPvTh862SR56IbdsezL0lQnP+9XIZx5BGK1o+ElwEXkTFwRR2qx
-         Wc9raXK6d/kScWCal193Z38sNeMQRRqoTA7ofMWeJUg1OrlPv0M/U0d6e0hHg34XzHl1
-         tj5FofA7uRgBep/ptcHEAkGhYEOb+XVFqxN5DE3FGs7jVpiC6ifkt7utYSzey0s2fMu1
-         /5ZXF/laxR1Udf5tVWQrkiY32NyHR1RPOle65/GNw5JZIiZalM40JGnrebLAEAh1fwY9
-         Z0Qw==
-X-Forwarded-Encrypted: i=1; AJvYcCUlEpjI1V/smqc8XfdL7CTmXl8xfSORzuXQqL0ZcZdq4kqH+suG8f0YVQ3vlTeFQf2me8guZPY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgtKOQk3Rw21jqlpBv5azMxj/pwxQpkvt3F6yjAofx5h4x6tYp
-	rQsxzb71MoYRw2C6CejcIQqg7j9VGGqgoeb0CCnyPnMz+yxR6vGHXYw6+8O8UKbPxOs=
-X-Gm-Gg: ASbGnctt36abUis5+/6WICaDPRAbG7ybfODB+ARv3JOpcygDPm06XUMBKx4YGeLKiPq
-	BC5IRTCMCE9F+bv4RGMNGvWYw0mbOpUrQ9ab6VuiCrB6xJs9/wJJNsUCrrN1GndXvr3iKzvZaqn
-	Cb+F+WrxK1D9a+bAur3gbFnAs0dLg7Dw7Hj9024RJe08w9WaJR245miPBlRYxQDttBQS21nyV1t
-	LitA9ClWKtjstxQGrM3rBKDYvyZH7ZsQthwP6pInyny6siZeh+xUyBMuf/1I6Qs1MY/Dtm7UrUE
-	DxpblGQJJxWWA1e4f3qEZHEeErihkaBDgAwhnOVsqmc2grPg+BkctP7xh6tb2Da/3knSS5nP6A/
-	qu1LCg5Jj8S0vuzT+U/WruyVtKQtxJLxDPpc6WzmVCSc49bz9UC+9CyLP0N+493oz+f0yh1K3HM
-	xCDNey5c82G/GMO5Q=
-X-Google-Smtp-Source: AGHT+IHAzHSoaXW9FTqisoxwWWJ86QeGPH0Qn2VpgfeKv1K2ScSIldv6hbmEjlnUGO1KIv2vK/3+YA==
-X-Received: by 2002:a05:600c:3e07:b0:46e:450d:e037 with SMTP id 5b1f17b1804b1-4711786c560mr102540425e9.5.1760965063585;
-        Mon, 20 Oct 2025 05:57:43 -0700 (PDT)
-Received: from localhost ([41.210.143.179])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-471556e17afsm140881935e9.17.2025.10.20.05.57.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 05:57:43 -0700 (PDT)
-Date: Mon, 20 Oct 2025 15:33:17 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Lizhi Xu <lizhi.xu@windriver.com>
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	kuba@kernel.org, linux-hams@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+2860e75836a08b172755@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH V2] netrom: Prevent race conditions between multiple add
- route
-Message-ID: <aPYsDVBMUQ0X_ulN@stanley.mountain>
-References: <aPYKgFTIroUhJAJA@stanley.mountain>
- <20251020110244.3200311-1-lizhi.xu@windriver.com>
- <aPYqRJXGhCNws4d3@stanley.mountain>
+	s=arc-20240116; t=1760964773; c=relaxed/simple;
+	bh=J9APxNL5PwC3SXUAS1ytIgcn6UBgz/29jtLEKf2eyWE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MaKxBq1sktZk6KiPeVl+sTxaATjbdB6T6Etvw31pCGk4wcO++38v3uZ4a5QIPBOc8h3FCwT4AJT731jBG5Ncs8T+oxlNe67ALRKuoyCVQ/5Ifdf5cJ2KMg98wX+wSv/T18prtfWDkdHPYi8MJw4GEYh9FtU2/pZCZqak+H9vg2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oNz4QML5; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 192601A150D;
+	Mon, 20 Oct 2025 12:52:46 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id D688C606D5;
+	Mon, 20 Oct 2025 12:52:45 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B3CDA102F23B2;
+	Mon, 20 Oct 2025 14:52:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1760964764; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=xm/J5aoiPYsZnMiN7LTPgkGX52KGGjizlIB4W3vhsvI=;
+	b=oNz4QML52tT7x/9G0sWyWTxbCrAVkNvTv79vy7Dp5UIupPUNqYDHcEkldl79sy3TOslfCe
+	/k81yvPVrU+6MkZTNFShUBBIspeDJirvh9+NrHDH5AFPfUZLg7gHYSeGFnkL8Aq82o2hfZ
+	LJ7CT8ajJWywOKH7nYFIYQvtLol54IcTYgNeUgl62+YJb0H0dsSalA4yrSAqO7+BOwNCVM
+	fK189keR7wQECoOZneEEzTCMsjbZO70i4AI96+MIQmA9M20NIW0rH47ptuYGHm9uoXifVl
+	CfPl18lfYSdKcKBJyeI+hrd+XtRyjYso2ZTmPosoxLNot3FBGdbRbILiN78CKQ==
+Date: Mon, 20 Oct 2025 14:52:14 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Alexis =?UTF-8?B?TG90aG9yw6k=?=
+ <alexis.lothore@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Willem
+ de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH net-next 2/3] net: stmmac: Allow supporting coarse
+ adjustment mode
+Message-ID: <20251020145214.64186fc9@kmaincent-XPS-13-7390>
+In-Reply-To: <b2c58580-d891-4d10-b3dd-572f7f98c6fe@bootlin.com>
+References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
+	<20251015102725.1297985-3-maxime.chevallier@bootlin.com>
+	<20251017182358.42f76387@kernel.org>
+	<d40cbc17-22fa-4829-8eb0-e9fd26fc54b1@bootlin.com>
+	<20251020110040.18cf60c9@kmaincent-XPS-13-7390>
+	<b2c58580-d891-4d10-b3dd-572f7f98c6fe@bootlin.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aPYqRJXGhCNws4d3@stanley.mountain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Mon, Oct 20, 2025 at 03:25:40PM +0300, Dan Carpenter wrote:
-> On Mon, Oct 20, 2025 at 07:02:44PM +0800, Lizhi Xu wrote:
-> > The root cause of the problem is that multiple different tasks initiate
-> > NETROM_NODE commands to add new routes, there is no lock between them to
-> > protect the same nr_neigh.
-> > Task0 may add the nr_neigh.refcount value of 1 on Task1 to routes[2].
-> > 
-> > When Task2 executes nr_neigh_put(nr_node->routes[2].neighbour), it will
-> > release the neighbour because its refcount value is 1.
-> > 
-> > In this case, the following situation causes a UAF:
-> > 
-> > Task0					Task1						Task2
-> > =====					=====						=====
-> > nr_add_node()
-> > nr_neigh_get_dev()			nr_add_node()
-> > 					nr_node_lock()
-> > 					nr_node->routes[2].neighbour->count--
-> > 					nr_neigh_put(nr_node->routes[2].neighbour);
-> > 					nr_remove_neigh(nr_node->routes[2].neighbour)
-> > 					nr_node_unlock()
-> > nr_node_lock()
-> > nr_node->routes[2].neighbour = nr_neigh
-> > nr_neigh_hold(nr_neigh);								nr_add_node()
-> > 											nr_neigh_put()
-> > 
-> > The solution to the problem is to use a lock to synchronize each add a route
-> > to node.
-> 
-> This chart is still not right.  Let me add line numbers to your chart:
-> 
-> netrom/nr_route.c
->    214          nr_node_lock(nr_node);
->    215  
->    216          if (quality != 0)
->    217                  strscpy(nr_node->mnemonic, mnemonic);
->    218  
->    219          for (found = 0, i = 0; i < nr_node->count; i++) {
->    220                  if (nr_node->routes[i].neighbour == nr_neigh) {
->    221                          nr_node->routes[i].quality   = quality;
->    222                          nr_node->routes[i].obs_count = obs_count;
+On Mon, 20 Oct 2025 11:32:37 +0200
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-Should we call nr_neigh->count++ if we found it?  I guess I don't
-really understand what nr_neigh->count is counting...  It would be
-really nice if someone added some comments explaining how the ref
-counting worked.
+> Hi K=C3=B6ry,
+>=20
+> On 20/10/2025 11:00, Kory Maincent wrote:
+> > On Sat, 18 Oct 2025 09:42:57 +0200
+> > Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+> >  =20
+> >> Hi Jakub,
+> >>
+> >> On 18/10/2025 03:23, Jakub Kicinski wrote: =20
+> >>> On Wed, 15 Oct 2025 12:27:22 +0200 Maxime Chevallier wrote:   =20
+> >>>> The DWMAC1000 supports 2 timestamping configurations to configure how
+> >>>> frequency adjustments are made to the ptp_clock, as well as the repo=
+rted
+> >>>> timestamp values.
+> >>>>
+> >>>> There was a previous attempt at upstreaming support for configuring =
+this
+> >>>> mode by Olivier Dautricourt and Julien Beraud a few years back [1]
+> >>>>
+> >>>> In a nutshell, the timestamping can be either set in fine mode or in
+> >>>> coarse mode.
+> >>>>
+> >>>> In fine mode, which is the default, we use the overflow of an accumu=
+lator
+> >>>> to trigger frequency adjustments, but by doing so we lose precision =
+on
+> >>>> the timetamps that are produced by the timestamping unit. The main
+> >>>> drawback is that the sub-second increment value, used to generate
+> >>>> timestamps, can't be set to lower than (2 / ptp_clock_freq).
+> >>>>
+> >>>> The "fine" qualification comes from the frequent frequency adjustmen=
+ts we
+> >>>> are able to do, which is perfect for a PTP follower usecase.
+> >>>>
+> >>>> In Coarse mode, we don't do frequency adjustments based on an
+> >>>> accumulator overflow. We can therefore have very fine subsecond
+> >>>> increment values, allowing for better timestamping precision. However
+> >>>> this mode works best when the ptp clock frequency is adjusted based =
+on
+> >>>> an external signal, such as a PPS input produced by a GPS clock. This
+> >>>> mode is therefore perfect for a Grand-master usecase.
+> >>>>
+> >>>> We therefore attempt to map these 2 modes with the newly introduced
+> >>>> hwtimestamp qualifiers (precise and approx).
+> >>>>
+> >>>> Precise mode is mapped to stmmac fine mode, and is the expected defa=
+ult,
+> >>>> suitable for all cases and perfect for follower mode
+> >>>>
+> >>>> Approx mode is mapped to coarse mode, suitable for Grand-master.   =
+=20
+> >>>
+> >>> I failed to understand what this device does and what the problem is =
+:(
+> >>>
+> >>> What is your ptp_clock_freq? Isn't it around 50MHz typically?=20
+> >>> So 2 / ptp_freq is 40nsec (?), not too bad?   =20
+> >>
+> >> That's not too bad indeed, but it makes a difference when acting as
+> >> Grand Master, especially in this case because you don't need to
+> >> perform clock adjustments (it's sync'd through PPS in), so we might
+> >> as well take this opportunity to improve the TS.
+> >> =20
+> >>>
+> >>> My recollection of the idea behind that timestamping providers
+> >>> was that you can configure different filters for different providers.
+> >>> IOW that you'd be able to say:
+> >>>  - [precise] Rx stamp PTP packets=20
+> >>>  -  [approx] Rx stamp all packets
+> >>> not that you'd configure precision of one piece of HW..   =20
+> >>
+> >> So far it looks like only one provider is enabled at a given time, my
+> >> understanding was that the qualifier would be used in case there
+> >> are multiple timestampers on the data path, to select the better one
+> >> (e.g. a PHY that supports TS, a MAC that supports TS, we use the=20
+> >> best out of the two). =20
+> >=20
+> > No, we do not support multiple timestampers at the same time.
+> > For that IIUC we would have to add a an ID of the source in the packet.=
+ I
+> > remember people were talking about modifying cmsg.=20
+> > This qualifier is indeed a first step to walk this path but I don't thi=
+nk
+> > people are currently working on adding this support for now.=20
+> >  =20
+> >> However I agree with your comments, that's exactly the kind of feedback
+> >> I was looking for. This work has been tried several times now each
+> >> time with a different uAPI path, I'm OK to consider that this is out
+> >> of the scope of the hwprov feature.
+> >> =20
+> >>> If the HW really needs it, just lob a devlink param at it?   =20
+> >>
+> >> I'm totally OK with that. I'm not well versed into devlink, working mo=
+stly
+> >> with embedded devices with simple-ish NICs, most of them don't use dev=
+link.
+> >> Let me give it a try then :) =20
+> >=20
+> > meh, I kind of dislike using devlink here. As I said using timestamping
+> > qualifier is a fist step for the multiple timestamping support. If one =
+day
+> > we will add this support, if there is other implementation it will add
+> > burden on the development to track and change all the other implementat=
+ion.
+> > Why don't we always use this qualifier parameter even if it is not real=
+ly
+> > for simultaneous timestamping to avoid any future wrong development cho=
+ice.
+> > =20
+>=20
+> On my side I've implemented the devlink-based approach, and I have to say=
+ i'm
+> not so unhappy with it :) At least I don't have the feeling this is bendi=
+ng
+> the API to fit one specific case.
 
->    223                          found = 1;
->    224                          break;
->    225                  }
->    226          }
+Indeed I don't think so, but my idea was to generalize the selection of
+the timestamp provider source to one API even if it is only one clock for t=
+wo
+different qualifiers.
+=20
+> The thing is that the qualifier model doesn't fully map to the situation =
+we
+> have in stmmac.
+>=20
+> The stmmac coarse/fine adjustment doesn't only changes the timestamping
+> behaviour, but also the ptp_clock adjustment mode.=20
+>=20
+> So changing the qualifier here will have a side effect on the PTP clock,
+> do we accept that as part of the hwprov timestamping API ?
 
-regards,
-dan carpenter
+Yes, I see the timestamp source as a couple of a qualifier plus a PTP
+clock index therefore if we change the timestamp source it is intended to h=
+ave
+side effect.
 
+> Should we use this API for coarse/fine stmmac config, I agree with your
+> previous comment of adding a dedicated qualifier that explicitely says
+> that using this qualifier comes with side effects, with the risk of
+> paving the way for lots of modes being added for driver-specific scenario=
+s.
+
+I am not really a PTP in the field user but maybe there is a limited number=
+ of
+generic qualifier possible. Here we could have a qualifier for better frequ=
+ency
+precision and one for better timestamping precision. I don't think we will =
+end
+with tons of different qualifiers.
+Maybe PTP maintainers and users like Richard or Willem have pointers on the
+number of possible qualifier?
+
+> Another thing with the stmmac implem is that we don't truly have 2
+> timestampers (1 approx and 1 precise), but rather only one whose precision
+> can be adjusted. Does it really make sense here to have the qualifier
+> writeable for the same timestamper ?
+
+I do think so.
+
+> Of course the netlink tsinfo/tsconfig is more appealing due to its generic
+> nature, but OTHO I don't want to introduce ill-defined behaviours in that
+> API with this series. The multiple timestamper work still makes a ton of
+> sense for MAC+PHY timestamping setups :)
+
+I think that is where it would be nice to have a review from Richard or
+Willem on this to give us pointers on what is existing in the PTP world and=
+ if
+using a qualifier makes sense.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
