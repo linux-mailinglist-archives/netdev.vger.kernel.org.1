@@ -1,117 +1,143 @@
-Return-Path: <netdev+bounces-230786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1908BEF67E
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 08:08:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D03CBEF648
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 08:05:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5819B1883DDE
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 06:08:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B086C188B036
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 06:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E565A2D0C9B;
-	Mon, 20 Oct 2025 06:08:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="UJeTlkdQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F3ED2D0C76;
+	Mon, 20 Oct 2025 06:05:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
+Received: from localhost.localdomain (unknown [147.136.157.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663C31DE4E0;
-	Mon, 20 Oct 2025 06:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF4833F6;
+	Mon, 20 Oct 2025 06:05:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.136.157.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760940489; cv=none; b=Xnia/E8orSHNztxARRhtLttT0ZcvKXSI3bHYQd2WEg4aPlVS10lctBW3bMYC2rx/qLTVK+G7+gM52CN4miN1fg7JYXRvgMWb5BSUYKc8x1NtW7W47Bk47tP61ddC1xmiMyqZcu1gCBTUaosYYRjoWEY4S6PymqdDS2vXGmHxb/s=
+	t=1760940336; cv=none; b=SwVDbzw1C4jw4tqv+zKLZBZXoz8RZ3Yi4kyAkwQHXupBnIpyUARu660gpN8xLII7lZcnz9jCsIdoosyuziOePYZ6VLFNrDSNRFjnyqJMTBNLBTaVe+kXtbG660r9+QbVEDNAUqoLhuIdVo8rTbQIsFLTdJ8pw61NkdMpec1Wg1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760940489; c=relaxed/simple;
-	bh=Dyz1W/f2zxWrT8+4+brAcC8fYyuT2aU3M1t4h4dqptI=;
-	h=Message-ID:From:To:CC:Subject:Date:Content-Type:MIME-Version; b=KxbNvqOdb82xraO6z3OMWgbUtrrSc3OWsZDeQjD47hU70d3t1BpTlGpi2yzls3u0A0JGT0E97xbK8VYxPDdWXMrc00oaCOXUDwRM4QGp98c53QY8HhtsdctyGUlYukrnzSP3H6kKrz8DU74+V3bQaHsnG+q/rXWNXu0rdu5ur2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=UJeTlkdQ; arc=none smtp.client-ip=162.62.58.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1760940173; bh=Dyz1W/f2zxWrT8+4+brAcC8fYyuT2aU3M1t4h4dqptI=;
-	h=From:To:CC:Subject:Date;
-	b=UJeTlkdQvCnDAxRP117WK0WJMyl4nWk6mNYw1HRuzkf9j8CNHw87VYo5ht9JLEhYk
-	 1YnvJB+sIveiW581q13dp4r7KRSiduSM+wNjTlyX7Gy+2xaDufRtz7NybHL9DHDiHO
-	 ZRlUrvvzWLLCt/5gH8xDbl8KwQN/s/LFOyRUEmI0=
-Received: from MN2PR13MB3248.namprd13.prod.outlook.com ([2603:1036:302:4098::5])
-	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
-	id 40B506F; Mon, 20 Oct 2025 14:01:00 +0800
-X-QQ-mid: xmsmtpt1760940060tcv183mbu
-Message-ID: <tencent_03EA78899E616FF00CC749FE8840EA81410A@qq.com>
-X-QQ-XMAILINFO: NnYhxYSyuBnLCtUnA5pHCQQ1KoY191fLEtCUuYq9LdprZJqOKxrrneemYsmA/O
-	 HL7+yPQfPGr7YOZd9jBV5xCAiI+GW7/Usc70Hk3JYr8hh0GYx1GCGpKT+XpPTYNk9FdjyMDDpUqT
-	 9oV47eSrL9os7hq2DhTLLjnnsj0Cj0tSRIdfW1IYjfzxN5+ymwnMXTQnyR7mkNARt9DgrS3UigZp
-	 2IFq6HqkaDE5DupD4LpvmzljOSIBZwSkxinVRmfEX4l6On43tXuyfphDga+ehVCJnrwSg8C0KO8S
-	 Ts6uo15JNxCmxtLdruivf0r1qCX585mcGESYM+qWY2T8crNW3AFszEfoF79o2AiPkZX7mvu/L7+g
-	 Zd3nz0Pf+hVo9n+J9wNghWPvUFiaYtKPtIvXYsQ8rjLQur/O/tjgp0/KirmszOAZTv6v1hStqRbf
-	 68HfoB7yU10EaD/996aBqO89HkX5covQ+SaVASBC+smc+3PSj56Gev44MOo88f9P2C+zS2OcG+Ti
-	 FJmCv3JhHNIW/eh1iDUeZuRKKnzggqN991O/zD2sAI5jZShg1hUvhhLYAp701dF8I7nESNnyZS+L
-	 v5ciCPdEwvKKURf8hK7ywPzibcibDKBLWxQQgafdY0zM4LWhIac1kTNEJPPXwvCc58Iu28JgHulM
-	 WeTRuap36bAXcWfq0X5vTO88rjE8Q4PjPgR5A4/JRAJc2/DMGpq73QX4eKZ31gzNxAUgBYd+m60N
-	 sbvIo8V6yPHikfaNIdbCqVLyF5cDPYiGHRQbM1Lt1+xZ1eIKeznewsX120sScIl2G04wDNjhyfO1
-	 h9BZBlpjuMb2l9Ys7zazstpXT+MgnIZfMLGcxH5E2BTClCUeOJChbkQ1EsmRp9FY/4w1wdpZ6Gsx
-	 LLvSEQqJi13nDa+pnYF7Pp4Is2f5E/hwbITsmFbaULdPAYhrVhRIjCmRWi+NZIuPA84U02uh3yte
-	 dsz3tTwL9eIKCWeM5eTtqwRRjiKrWHJ3W+XZtWRkBox2Y4qLR7TbOFRQMtNBrg
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-From: "1599101385@qq.com" <1599101385@qq.com>
-To: "syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com"
-	<syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "herbert@gondor.apana.org.au"
-	<herbert@gondor.apana.org.au>, "horms@kernel.org" <horms@kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>,
-	"syzkaller-bugs@googlegroups.com" <syzkaller-bugs@googlegroups.com>
-Subject: Re: [syzbot] [net?] kernel BUG in set_ipsecrequest
-Thread-Topic: [syzbot] [net?] kernel BUG in set_ipsecrequest
-Thread-Index: AQHcQYYQgL/uYpVJrEOgPG3hTd8oew==
-X-MS-Exchange-MessageSentRepresentingType: 1
-Date: Mon, 20 Oct 2025 06:00:58 +0000
-X-OQ-MSGID:
-	<MN2PR13MB3248538C05DE846BDF9C368FFBF5A@MN2PR13MB3248.namprd13.prod.outlook.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-Exchange-Organization-SCL: -1
-X-MS-TNEF-Correlator:
-X-MS-Exchange-Organization-RecordReviewCfmType: 0
-msip_labels:
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1760940336; c=relaxed/simple;
+	bh=JN0kAYHKGuMXtTDQCxXntwNjscgj3btMyUd4B5mll5U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NGOu+q2+7acB5REJYqg25x5GKsUyOZat2PcO81m9ZMjMHa+6v4a9ndYy64sVVNHxxz0eSgZX0I8ZraScbmNTLt0JpQJYpqLICMtKKAZkIu9gWJAMY3OOOE75BIT8kwENijV5+9j5nvpvy7wNxtE+GoSv3rWkNBpImnbwSGfFLPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev; spf=none smtp.mailfrom=localhost.localdomain; arc=none smtp.client-ip=147.136.157.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=localhost.localdomain
+Received: by localhost.localdomain (Postfix, from userid 1007)
+	id 132888B2A56; Mon, 20 Oct 2025 14:05:26 +0800 (+08)
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: mptcp@lists.linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Florian Westphal <fw@strlen.de>,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net v2 0/3] mptcp: Fix conflicts between MPTCP and sockmap
+Date: Mon, 20 Oct 2025 14:04:45 +0800
+Message-ID: <20251020060503.325369-1-jiayuan.chen@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-I3N5eiB0ZXN0OgpGcm9tIDJlZGZjODgzM2U0M2NkZjVjY2RhOGJkNWJlM2RhNWQxYmJkYzY5YzYg
-TW9uIFNlcCAxNyAwMDowMDowMCAyMDAxCkZyb206IGNsaW5nZmVpIDwxNTk5MTAxMzg1QHFxLmNv
-bT4KRGF0ZTogTW9uLCAyMCBPY3QgMjAyNSAxMzo0MDozNSArMDgwMApTdWJqZWN0OiBbUEFUQ0hd
-IGZpeCBpbnRlZ2VyIG92ZXJmbG93IGluIHNldF9pcHNlY3JlcXVlc3QKVGhlIG1wLT5uZXdfZmFt
-aWx5IGFuZCBtcC0+b2xkX2ZhbWlseSBpcyB1MTYsIHdoaWxlIHNldF9pcHNlY3JlcXVlc3QgcmVj
-ZWl2ZXMgZmFtaWx5IGFzIHVpbnQ4X3QsIApjYXVzaW5nIGEgaW50ZWdlciBvdmVyZmxvdyBhbmQg
-dGhlIGxhdGVyIHNpemVfcmVxIGNhbGN1bGF0aW9uIGVycm9yLCB3aGljaCB1bHRpbWF0ZWx5IHRy
-aWdnZXJlZCBhIAprZXJuZWwgYnVnIGluIHNrYl9wdXQuCgpSZXBvcnRlZC1ieTogc3l6Ym90K2Jl
-OTdkZDRkYTE0YWU4OGI2YmE0QHN5emthbGxlci5hcHBzcG90bWFpbC5jb20KQ2xvc2VzOiBodHRw
-czovL3N5emthbGxlci5hcHBzcG90LmNvbS9idWc/ZXh0aWQ9YmU5N2RkNGRhMTRhZTg4YjZiYTQK
-Ci0tLQogbmV0L2tleS9hZl9rZXkuYyB8IDIgKy0KIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlv
-bigrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL25ldC9rZXkvYWZfa2V5LmMgYi9uZXQv
-a2V5L2FmX2tleS5jCmluZGV4IDJlYmRlMDM1MjI0NS4uMDhmNGNkZTAxOTk0IDEwMDY0NAotLS0g
-YS9uZXQva2V5L2FmX2tleS5jCisrKyBiL25ldC9rZXkvYWZfa2V5LmMKQEAgLTM1MTgsNyArMzUx
-OCw3IEBAIHN0YXRpYyBpbnQgc2V0X3NhZGJfa21hZGRyZXNzKHN0cnVjdCBza19idWZmICpza2Is
-IGNvbnN0IHN0cnVjdCB4ZnJtX2ttYWRkcmVzcyAqCgogc3RhdGljIGludCBzZXRfaXBzZWNyZXF1
-ZXN0KHN0cnVjdCBza19idWZmICpza2IsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50
-OF90IHByb3RvLCB1aW50OF90IG1vZGUsIGludCBsZXZlbCwKLSAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIHVpbnQzMl90IHJlcWlkLCB1aW50OF90IGZhbWlseSwKKyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIHVpbnQzMl90IHJlcWlkLCB1aW50MTZfdCBmYW1pbHksCiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBjb25zdCB4ZnJtX2FkZHJlc3NfdCAqc3JjLCBjb25zdCB4ZnJtX2FkZHJl
-c3NfdCAqZHN0KQogewogICAgICAgIHN0cnVjdCBzYWRiX3hfaXBzZWNyZXF1ZXN0ICpycTsKLS0K
-Mi4zNC4x
+Overall, we encountered a warning [1] that can be triggered by running the
+selftest I provided.
+
+MPTCP creates subflows for data transmission between two endpoints.
+However, BPF can use sockops to perform additional operations when TCP
+completes the three-way handshake. The issue arose because we used sockmap
+in sockops, which replaces sk->sk_prot and some handlers. Since subflows
+also have their own specialized handlers, this creates a conflict and leads
+to traffic failure. Therefore, we need to reject operations targeting
+subflows.
+
+This patchset simply prevents the combination of subflows and sockmap
+without changing any functionality.
+
+A complete integration of MPTCP and sockmap would require more effort, for
+example, we would need to retrieve the parent socket from subflows in
+sockmap and implement handlers like read_skb.
+
+If maintainers don't object, we can further improve this in subsequent
+work.
+
+v1: https://lore.kernel.org/mptcp/a0a2b87119a06c5ffaa51427a0964a05534fe6f1@linux.dev/T/#t
+
+[1] truncated warning:
+[   18.234652] ------------[ cut here ]------------
+[   18.234664] WARNING: CPU: 1 PID: 388 at net/mptcp/protocol.c:68 mptcp_stream_accept+0x34c/0x380
+[   18.234726] Modules linked in:
+[   18.234755] RIP: 0010:mptcp_stream_accept+0x34c/0x380
+[   18.234762] RSP: 0018:ffffc90000cf3cf8 EFLAGS: 00010202
+[   18.234800] PKRU: 55555554
+[   18.234806] Call Trace:
+[   18.234810]  <TASK>
+[   18.234837]  do_accept+0xeb/0x190
+[   18.234861]  ? __x64_sys_pselect6+0x61/0x80
+[   18.234898]  ? _raw_spin_unlock+0x12/0x30
+[   18.234915]  ? alloc_fd+0x11e/0x190
+[   18.234925]  __sys_accept4+0x8c/0x100
+[   18.234930]  __x64_sys_accept+0x1f/0x30
+[   18.234933]  x64_sys_call+0x202f/0x20f0
+[   18.234966]  do_syscall_64+0x72/0x9a0
+[   18.234979]  ? switch_fpu_return+0x60/0xf0
+[   18.234993]  ? irqentry_exit_to_user_mode+0xdb/0x1e0
+[   18.235002]  ? irqentry_exit+0x3f/0x50
+[   18.235005]  ? clear_bhb_loop+0x50/0xa0
+[   18.235022]  ? clear_bhb_loop+0x50/0xa0
+[   18.235025]  ? clear_bhb_loop+0x50/0xa0
+[   18.235028]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   18.235066]  </TASK>
+[   18.235109] ---[ end trace 0000000000000000 ]---
+[   18.235677] sockmap: MPTCP sockets are not supported
+
+Jiayuan Chen (3):
+  net,mptcp: fix incorrect IPv4/IPv6 fallback detection with BPF Sockmap
+  bpf,sockmap: disallow MPTCP sockets from sockmap updates
+  selftests/bpf: Add mptcp test with sockmap
+
+ net/core/sock_map.c                           |   9 ++
+ net/mptcp/protocol.c                          |   7 +-
+ .../testing/selftests/bpf/prog_tests/mptcp.c  | 136 ++++++++++++++++++
+ .../selftests/bpf/progs/mptcp_sockmap.c       |  43 ++++++
+ 4 files changed, 193 insertions(+), 2 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/mptcp_sockmap.c
+
+-- 
+2.43.0
 
 
