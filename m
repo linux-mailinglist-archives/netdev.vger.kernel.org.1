@@ -1,97 +1,77 @@
-Return-Path: <netdev+bounces-230975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B52EEBF2925
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 18:59:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 528CFBF29A3
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 19:05:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7F4F34F857B
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:59:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3D5D18A37B1
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 17:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA640330301;
-	Mon, 20 Oct 2025 16:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b="S9Y2vtOo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28959330B0A;
+	Mon, 20 Oct 2025 17:05:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D3532AAD6
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 16:59:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891C42882B8;
+	Mon, 20 Oct 2025 17:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760979550; cv=none; b=VWlT29j5/odj6HgWjkhjVQXpJmkO6jpfdiIiaNI+fnQoR4jDFRH41Bqte0WWqBJDfb55yLvHj8pbQ0BCHYlPdbWQonDTLPUyZN6O67jCJQ4XljuPJrIh/cpY2leiaYLB/+Hl6aq3vXRPgWRr3IonGo27aw5Jlszw8e6bjEdSr8Q=
+	t=1760979956; cv=none; b=fpm/NTj5VyFgI6LZpXC77qqWMnew91jH/6HX6W5SSgRV3H+FJKkceP9b/lpmP9gosiTCsbKr4BJN/C0T94eI97FAV8QeNAzq9esDadcLZmoNpXf0gPlZVToQSMq//P/Dn3a25994BaXdSj/9ofU6Yx5e7QkqD3cYKthFNYkOHjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760979550; c=relaxed/simple;
-	bh=G4IIEQsXq1zdqfeiQ67q5+Y4YDGcO2IWhXqVol5xqew=;
+	s=arc-20240116; t=1760979956; c=relaxed/simple;
+	bh=uZtaVriTqVLLo5gfQFnqRnYNj4ib4262oLWhM+jcAa4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LPQrUHQzQasrymUOQXajtNjdWdGpnCDAnkn7M5dMLkYQuKHHTYI5kgyostcpczH2U4KtpvuvewJxsGIiXbz9QnqmhpXIiZh2/00Xxs/PEELMwXYrV5mOLGJszACiUoDtc+JFjYWHRtkvdTr2ab2r5loHE8sfTAvW1I6iROLA0dQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu; spf=fail smtp.mailfrom=g.harvard.edu; dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b=S9Y2vtOo; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=g.harvard.edu
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-893c373500cso181001685a.0
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 09:59:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rowland.harvard.edu; s=google; t=1760979548; x=1761584348; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uB/VZmCKvL9ltY4A0qr8Fdw6HiGHMx/f84IHKJJrOdE=;
-        b=S9Y2vtOoTjRNJJJPwbY7Mrx20Ldi9AUcLWA13B6tx3lP7GP00VIdr3EXeC/0S4DZDQ
-         MR0/SQ+JfitvcY+ok9h8tJIhRW9LTqWGTtsU6d58deYAPenkfMh+cUv2of+os3V+U3E6
-         flGdnSK10ln/nWkIufNPVzqdq/wGqg79AzF11lCVBxBhaaCgPGP4xVnsTVIwCHGF5ugv
-         THeGWLl4D7fPrUtkjPBH6fdVkojkgoTXqGW33MtjtfyAuemmHB7COmvSnCoAiZOGTJ+B
-         73FhLXQMlMO0zfEmWxO5MwkD+IMFdKbTkFM9+dR72CuLk3uYuqgTsZcyGmjSL8Vuixa+
-         88Ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760979548; x=1761584348;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uB/VZmCKvL9ltY4A0qr8Fdw6HiGHMx/f84IHKJJrOdE=;
-        b=tgpu4RgGOkDnGNIr5fj64z79lAxonvcfuD0VnGJARfXvDdxDVzXG+yhhiEVRy34X6j
-         81NMhNFi9xlsfsofGsMpHcQd+y4QhCWjVDIaevH9lyT0h35fvkGxHcC0POfp0eSgUNic
-         yws2+8saoMLMh5fVjam1VoM2q5sn1tRqkCKZ4nm7Oa/x2lEwXJ4lYdGn6JKm/EAd5CEA
-         D4Kxl3FLvWXPO6C3e7EEngbh1siAjW1gr3f0jDZ9Dan5BNsGARyivJ0kJ2Uav/F0Sa1o
-         2xlL1UxffgDTQ74WwDCbfRR2pxWID4iojFOHU+JWEIOetVyIO4dfUfzFVkY3AFlI/VLM
-         voaA==
-X-Forwarded-Encrypted: i=1; AJvYcCWbQWjzu7/K+aVBsXptcMmDjmaZfUk2XqzX5b7Qfh3guuOag8YLnMlqeCOKhoNnlqabpUF0pzI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxL5i5tKdzLYRDbSA5nFYcKdOvPWIEBNdEjfouqtGeWuOhccpq4
-	RdS4Clr5ViteTmrlm12qs7COj4NydlL/GHJ1HcbvBP0omD+zLONwvyEy0KtDoanS4g==
-X-Gm-Gg: ASbGnctDadaLkxW75pYw9TRMx1eLQ1jP7tzNW9P6cdFrETVOIgoh2ZJvH1k719/66Ka
-	xgO46+DDA9e0f32yNDnbQi1v0JCZ3EHEcknfIJ+VgHlTq2ekMY3HTt06QBoWgbJwZasnlc2KBrr
-	sTBUUcV8gkZJwe+xgZRP/d4sFlucuU+/1QUkXqAfoUYMgR2cNz5UeFHIqu7Vsfugl/FLcZEFbAd
-	K2al1vDH+nGXUknSs+1VJiknjOHfxilqBbGOmqeU/YwtBx2b9FyjsMzwGnBZgojC8RrLv1WdO14
-	Nx1bViS31CW3qQlzMgSaJcDBjfnnRydPKB8GUH+TlePK58Fszq5SHMFrt+vucAGtS+DS/NWflel
-	fVW1Mi2HCLaiAtoUnNtFfAaGt+bAtpIZSU2DdR4vks2ep27aMs3tmb97UkFeXC05+y0E4av5gdt
-	cIiMJJOnW3864CytQU+etl5wDoJG3Zz+wPATydSUvpK9r6hgdE2dFp2yH/662tS8tOo4HoMA==
-X-Google-Smtp-Source: AGHT+IGHLtr5/zlm5Vk8aYNdt9qjYP5rvB9gZkc2DEsoKbe86O4g6iczemLL9y9CqHYMB7xXk9uMsg==
-X-Received: by 2002:a05:620a:4410:b0:848:af6f:cb94 with SMTP id af79cd13be357-890569d449cmr2055375485a.43.1760979547552;
-        Mon, 20 Oct 2025 09:59:07 -0700 (PDT)
-Received: from rowland.harvard.edu (nat-65-112-8-19.harvard-secure.wrls.harvard.edu. [65.112.8.19])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-891cf58e7bfsm588289785a.50.2025.10.20.09.59.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 09:59:06 -0700 (PDT)
-Date: Mon, 20 Oct 2025 12:59:04 -0400
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Michal Pecio <michal.pecio@gmail.com>
-Cc: yicongsrfy@163.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org, oliver@neukum.org, pabeni@redhat.com
-Subject: Re: [PATCH net v5 2/3] net: usb: ax88179_178a: add USB device driver
- for config selection
-Message-ID: <3c2a20ef-5388-49bd-ab09-27921ef1a729@rowland.harvard.edu>
-References: <20251013110753.0f640774.michal.pecio@gmail.com>
- <20251017024229.1959295-1-yicongsrfy@163.com>
- <db3db4c6-d019-49d0-92ad-96427341589c@rowland.harvard.edu>
- <20251017191511.6dd841e9.michal.pecio@gmail.com>
- <bda50568-a05d-4241-adbe-18efb2251d6e@rowland.harvard.edu>
- <20251018172156.69e93897.michal.pecio@gmail.com>
- <6640b191-d25b-4c4e-ac67-144357eb5cc3@rowland.harvard.edu>
- <20251018175618.148d4e59.michal.pecio@gmail.com>
- <e4ce396c-0047-4bd1-a5d2-aee3b86315b1@rowland.harvard.edu>
- <20251020182327.0dd8958a.michal.pecio@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=f36DKnfelsDwTZJ8HZyFX27trLeYeHfb11HAmWhLdattRRPq2vZsV55/8ZXQT5k36HR2qQh2sDK4bn9aYynlXdDWiEcurSUP2LY3k8C6B+at8En2keAh1ZjfTAVEJTSnk4UR5VSaujxCBodwoGRTYRzlpaPoPWZStC8Flnkxf9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vAtKD-000000005HU-0nRf;
+	Mon, 20 Oct 2025 17:05:37 +0000
+Date: Mon, 20 Oct 2025 18:05:33 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Sjoerd Simons <sjoerd@collabora.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Jianjun Wang <jianjun.wang@mediatek.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	kernel@collabora.com, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
+	linux-phy@lists.infradead.org, netdev@vger.kernel.org,
+	Bryan Hinton <bryan@bryanhinton.com>
+Subject: Re: [PATCH 02/15] arm64: dts: mediatek: mt7981b-openwrt-one:
+ Configure UART0 pinmux
+Message-ID: <aPZr3WMybjTWnn9E@makrotopia.org>
+References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
+ <20251016-openwrt-one-network-v1-2-de259719b6f2@collabora.com>
+ <aPDnT4tuSzNDzyAE@makrotopia.org>
+ <5f430ff9-d701-426a-bf93-5290e6912eb4@collabora.com>
+ <aPEfUBl6fMe6QYdY@makrotopia.org>
+ <82594ce7-f093-4753-b808-cd234845aed8@collabora.com>
+ <aPYq4cnaAHu5ags5@makrotopia.org>
+ <8453efd3-630e-4f2c-950d-88a73927cc54@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,48 +80,189 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251020182327.0dd8958a.michal.pecio@gmail.com>
+In-Reply-To: <8453efd3-630e-4f2c-950d-88a73927cc54@collabora.com>
 
-On Mon, Oct 20, 2025 at 06:23:27PM +0200, Michal Pecio wrote:
-> On Mon, 20 Oct 2025 11:56:50 -0400, Alan Stern wrote:
-> > Instead of all this preferred() stuff, why not have the ax88179 driver's 
-> > probe routine check for a different configuration with a vendor-specific 
-> > interface?  If that other config is present and the chip is the right 
-> > type then you can call usb_driver_set_configuration() -- this is exactly 
-> > what it's meant for.
+On Mon, Oct 20, 2025 at 04:02:58PM +0200, AngeloGioacchino Del Regno wrote:
+> Il 20/10/25 14:28, Daniel Golle ha scritto:
+> > On Mon, Oct 20, 2025 at 12:23:14PM +0200, AngeloGioacchino Del Regno wrote:
+> > > Il 16/10/25 18:37, Daniel Golle ha scritto:
+> > > > On Thu, Oct 16, 2025 at 04:29:14PM +0200, AngeloGioacchino Del Regno wrote:
+> > > > > Il 16/10/25 14:38, Daniel Golle ha scritto:
+> > > > > > On Thu, Oct 16, 2025 at 12:08:38PM +0200, Sjoerd Simons wrote:
+> > > > > > > Add explicit pinctrl configuration for UART0 on the OpenWrt One board,
+> > > > > > > 
+> > > > > > > Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
+> > > > > > > ---
+> > > > > > >     arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts | 11 +++++++++++
+> > > > > > >     1 file changed, 11 insertions(+)
+> > > > > > > 
+> > > > > > > diff --git a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
+> > > > > > > index 968b91f55bb27..f836059d7f475 100644
+> > > > > > > --- a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
+> > > > > > > +++ b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
+> > > > > > > @@ -22,6 +22,17 @@ memory@40000000 {
+> > > > > > >     	};
+> > > > > > >     };
+> > > > > > > +&pio {
+> > > > > > > +	uart0_pins: uart0-pins {
+> > > > > > > +		mux {
+> > > > > > > +			function = "uart";
+> > > > > > > +			groups = "uart0";
+> > > > > > > +		};
+> > > > > > > +	};
+> > > > > > > +};
+> > > > > > > +
+> > > > > > >     &uart0 {
+> > > > > > > +	pinctrl-names = "default";
+> > > > > > > +	pinctrl-0 = <&uart0_pins>;
+> > > > > > >     	status = "okay";
+> > > > > > >     };
+> > > > > > 
+> > > > > > As there is only a single possible pinctrl configuration for uart0,
+> > > > > > both the pinmux definition as well as the pinctrl properties should go
+> > > > > > into mt7981b.dtsi rather than in the board's dts.
+> > > > > 
+> > > > > If there's really one single possible pin configuration for the UART0 pins,
+> > > > > as in, those pins *do not* have a GPIO mode, then yes I agree.
+> > > > > 
+> > > > > If those pins can be as well configured as GPIOs, this goes to board DTS.
+> > > > 
+> > > > I respectfully disagree and will explain below.
+> > > > 
+> > > 
+> > > Thanks a lot for taking the time to write all this - explains everything,
+> > > and even too much :) :)
+> > > 
+> > > Though, there's something funny here! The following snippet of "main" text
+> > > does explain stuff that is interesting, but that I (not other people, so
+> > > thanks again for saying all this) know already, but.....
+> > > 
+> > > > All pinmux pins on the MediaTek platform also allow being configured as
+> > > > GPIOs. However, if you configure those as GPIOs the consequence is that
+> > > > you cannot use UART0 any more at all. So using UART0 at all always
+> > > > implies using exactly those pins, there is no alternative to that.
+> > > > 
+> > > > Hence every board with every possible uses of pins 32 and 33 (there is
+> > > > only RX and TX for UART0, RTS/CTS flow-control is not possible) can be
+> > > > represented without needing to configure the pinctrl for uart0 on the
+> > > > board level. There isn't going to be any variation on the board-level
+> > > > when it comes to uart0. Either it is enabled (status = "okay";), and
+> > > > that will always imply using the 'uart0' group in mode 'uart', or, in
+> > > > case any of the two pins of uart0 is used for something else that means
+> > > > uart0 cannot be enabled. Simple as that.
+> > > > 
+> > > > Hence there is no need to duplicate that pinctrl settings on each and
+> > > > every board, as controlling the 'status' property on the board-level
+> > > > already gives 100% freedom.
+> > > > 
+> > > 
+> > > ...all of this is not justifying your point.
+> > 
+> > So what is the rule then? I understand the logic of describing the
+> > pins eg. for uart1 only on board-level as there are actual alternatives
+> > regarding the pins to be used, and if also including RTS/CTS pins.
+> > Hence, for uart1, there are several possible pingroups which can be
+> > used. What would be the argument to keep a pinctrl description for
+> > which the SoC doesn't offer any alternatives to be on the board-level?
+> > There is nothing to be decided by the board, literally 0 freedom.
+> > 
 > 
-> That could be doable and some code could be shared I guess, but how to
-> get the probe() routine to run in the first place?
+> As you described - the BootROM is using those two pins as UART0.
 > 
-> The chip may be in other configuration, without this vendor interface.
-> If we remove _AND_INTERFACE_INFO, it's still a problem that cdc_ether
-> may already be bound to the CDC interface in CDC config.
-> 
-> Registering a *device* driver plows through such obstacles, because
-> core allows device drivers to immediately displace existing drivers.
-> 
-> 
-> It seems that this could work, if cdc_ether blacklisting and revert
-> of _AND_INTERFACE_INFO are applied as suggested in this series.
-> (But as part of the main commit, to avoid transient regressions).
-> 
-> I wonder if blacklisting is considered necessary evil? Without it, it's
-> possible that cdc_ether binds for a moment before it's kicked out by
-> the vendor driver. Looks weird in dmesg, at the very least.
-> 
-> FWIW, my RTL8153 is blacklisted in cdc_ether too. So much for the
-> promise that cfgselectors will allow users to choose drivers ;)
+> Should you want those pins to be used as GPIOs, you'd at least get HW glitches in
+> early boot phases, or you'd render emergency download mode unusable - which is not
+> a good idea, not practical, and also, well, almost a stupid thing to do from the
+> hardware perspective.
 
-Another possibility is simply to give up on handling all of this 
-automatically in the kernel.  The usb_modeswitch program certainly 
-should be capable of determining when a USB network device ought to 
-switch to a different configuration; that's very similar to the things 
-it does already.  Maybe userspace is the best place to implement this 
-stuff.
+No, that's not a problem. During reset the pinctrl/gpio controller is always
+reset to the default and no matter how the pins were used in Linux before the
+reset. Hence debug output and also emrgency download mode always works.
+The only disadvantage of use the pins differently is that the bootrom output
+on one of them cannot be prevented -- but in case that's not a problem (eg.
+because the pin is later used as an input rather than output) it can totally
+be done, though it would be stupid as it would render the debug UART unusable.
+Yet, I'd consider it a possible choice of a board designer.
 
-Furthermore, with usb_modeswitch it's not at all uncommon to have some 
-drivers bind momentarily before being kicked off.  People don't care 
-about it very much, as long it all happens reliably and automatically.
+> 
+> This means that it is very, very, very unlikely (to the point that it's practically
+> impossible) that those pins can ever be used for anything else that is not *the*
+> one of the two functions that are supported for them (which is UART0 in this case).
+> 
+> In this case, adding the pins at the board level would only create unnecessary
+> duplication and nothing else, because, well, noone could possibly ever use those
+> for anything else, again.
+> 
+> That's the criteria.
 
-Alan Stern
+So this criteria, avoiding unnecessary duplication, is also what I thought and
+is very true for the argument I presented before which somehow wasn't what has
+convinced you: That using uart0 in any possible way **always** implied using
+the uart0 pingroup in uart mode, because there aren't any other pins which can
+be used for uart0. In this sense, if uart0 is used at all, it is **not** the
+choice of the board designer which pins to use for that -- there simply is only
+that one single option.
+
+> 
+> If the BootROM didn't use those pins, and those could support both GPIO mode and
+> HW function mode (any: uart0, 1, 2...n, spi, i2c, whatever else), even though it
+> is likely for boards to use them for one specific function, there is nothing that
+> stops a HW engineer to decide to route those elsewhere and use them as a GPIO
+> instead, so that's not a SoC configuration, but rather a HW implementation decision
+> at the PCB level.
+
+That's exactly my point: There isn't any other option to route uart0 to. Only
+those two pins. The other alternative functions of those pins (apart from GPIO)
+are rather esoteric debugging features (I2C access to SoC internals).
+
+> 
+> See it like this (although this is an oversimplified view):
+>  - SoC DT describes the SoC (the chip) - in this case the MT7981B chip
+>  - Board DT describes decisions that were taken by the HW engineer that developed
+>    the PCB on which the MT7981B was placed.
+
+So the choice of a HW engineer regarding uart0 is simply whether uart0
+is used or not. If uart0 is used, the HW engineer doesn't have any choice
+regarding which pins they would like to use for the uart0 RX and TX lines,
+the SoC design dictates exactly one option for that.
+
+> 
+> Clearly, if there's a board design (usually, a "base project") that has derivatives
+> (for example, a device with eMMC, one with UFS, one with both, one with two SFP,
+> one with one SFP and one soldered ethernet chip on a non-exposed SFP interface,
+> etc) it is ok to have a "board-common" dtsi and specific board variants on top,
+> like it is done with some bananapi and some genio boards.
+> 
+> Lots of text here - yet oversimplified. There is much more to say, but I think
+> (and hope) that this is enough to make you understand the main point (of course
+> feel free to throw more questions if what I wrote doesn't fully satisfy you).
+> 
+> > > 
+> > > > (Sidenote: As even the BootROM already uses those two pins as UART for
+> > > > debug output,
+> > > 
+> > > Funny thing is, your side note is what *fully* justifies your disagreement
+> > > and it's also what triggers me to say that you're right, lol :)
+> > > 
+> > > Okay then, I am fine with this commit now and I can renew my
+> > > 
+> > > Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+> > 
+> > Note that the patch you have just added your Reviewed-by:-tag to does
+> > *not* add the uart0 pinctrl on SoC-level but board-level, so different
+> > from what I argued for above.
+> 
+> Ewwww I'm doing too may things at once. Pretty crazy days around here :)))
+> 
+> >> Did you mean to add Reviewed-by: for that
+> > (which contraticts what you just wrote) or rather to the to-be-submitted
+> > v2 of this series which includes the change to move the uart0 pinctrl
+> > to mt7981b.dtsi?
+> 
+> Yeah. Sorry.
+> 
+> I repeat then, so that this is clear: you are right, the pinctrl for UART0 on the
+> MT7981B SoC must go to mt7981b.dtsi and *not* to mt7981b-openwrt-one.
+
+Thank you, that should make it clear to Sjoerd as well (who may skip and ignore
+all of our debating :).
 
