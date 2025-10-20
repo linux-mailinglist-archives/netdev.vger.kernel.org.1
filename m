@@ -1,54 +1,62 @@
-Return-Path: <netdev+bounces-230895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5240BF15E5
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:56:23 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41622BF162A
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:59:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 631FB347F1E
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:56:22 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 56BE94F5E74
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6815E312804;
-	Mon, 20 Oct 2025 12:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KSPYIoGd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3383195EC;
+	Mon, 20 Oct 2025 12:57:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E783126D6
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 12:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3B331282C
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 12:57:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760964979; cv=none; b=VIX22WxS6bLiNlPRfw5UtGR5C/QlK9jtOiJ6Ri0ROuolRcT5tRFoLN10DaQ1M66mv4VqJXbXtffjQJXNxgDhqU021QC2rwrTFZPYSd+wEDOBAUWKEqorHDtGasbtiKqmFQ2EXr0G9AERoqHeSAn1LdDuwhTEBraObIEpapj4nl0=
+	t=1760965073; cv=none; b=f4smt4vjiHaJl0z3uYWLhZiNXImEXAHOGnugUfiRupp1pQ+J5nq4ytM1dPpRBwBrJBTEUKD81iui8Ubj7Vl3FDHWVFENdc5gP2W6hUzGd8EUq+OzC8S98iUqMOoXPwYR5xF4iLOtnLkOOGDiFcpugauZ4HQO7l18x2RI/UXufqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760964979; c=relaxed/simple;
-	bh=mB1T463Pue4zMzNYKam8u8i4j2I1kXsp/IO3Nv7JDH0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u64lRbQyl1Yp79nRPqX7ZHTpVeIy1mpHBBUdPiaa8OwMLxg+QEsHWBfqK9LY+dkBe7cgdbr6e9JGnyTikjiV84MYRAre610DcWlhFgrk6HQI7pSiVBybAgah02nH0cjkxbmPPuTUMZUYHzlJjNAgYE3uyFm2/a6ecqYfVIQd9Qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KSPYIoGd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 587CFC4CEF9;
-	Mon, 20 Oct 2025 12:56:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760964978;
-	bh=mB1T463Pue4zMzNYKam8u8i4j2I1kXsp/IO3Nv7JDH0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KSPYIoGdLNRikdmP7hsHUXNTRbalQ+SLHGBSD55fK1vmtXhKYNs6vBWqge7RICBlC
-	 y9f6GBeOwdTe7grraPX1PSOfzkww919I0my+h9gwgFumlfoe3rQtZDNEXg4bZF1YDn
-	 cYTsUpvDlEWPx1zsIBwn8e6uNq+zkrCOv4HGNle+plRTN+7xqJm+HzJtOy4go8oz3H
-	 5VEibPobuxYKaQ1f7snre/Z15ng1oM6PGgaVXBTuGTMAS792rb7O0wIsWtZ1myf0X3
-	 PHPKtVcIIy1vmCrwkCVXBDh/Rj/yxGZicPMwRbiIdOhs5dSx5MX+WOjsbUpWP/OEk5
-	 BcCHRI6p375LA==
-Date: Mon, 20 Oct 2025 13:56:15 +0100
-From: Simon Horman <horms@kernel.org>
-To: Shi Hao <i.shihao.999@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH  net-next v2]: 3c515 : replace cleanup_module with __exit
-Message-ID: <aPYxbwjIlyPHrTY3@horms.kernel.org>
-References: <20251018052541.124365-1-i.shihao.999@gmail.com>
+	s=arc-20240116; t=1760965073; c=relaxed/simple;
+	bh=tOm9no5ulKVW+2cTJIdjV2iovFK4O42NACxJ9KiLRh0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=EODAVApwAZlaaoT6bzkKQTls12g77RmOrZlN9OPR78szW+82H0dk7QVq1pFzpZdDi6I11CcIg3FJ/Lp1lxse7pf1MGYK+W7JP1VvI6FhTwD0VdT6C2R0EKhKdlAVzdUUtfLyknTDmhkwgx5pON3kL8Hx0xctm5GkaI5LzuTrarE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vApS7-000000003qX-0cIa;
+	Mon, 20 Oct 2025 12:57:31 +0000
+Date: Mon, 20 Oct 2025 13:57:27 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org
+Cc: Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [PATCH net-next v4 0/7] net: dsa: lantiq_gswip: use regmap for
+ register access
+Message-ID: <cover.1760964550.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,41 +65,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251018052541.124365-1-i.shihao.999@gmail.com>
 
-On Sat, Oct 18, 2025 at 10:55:41AM +0530, Shi Hao wrote:
-> update old legacy cleanup_module from the file with __exit
-> module as per kernel code practices and restore the #ifdef
-> MODULE condition to allow successful compilation as a built
-> -in driver.
-> 
-> The file had an old cleanup_module still in use which could
-> be updated with __exit module function although its init_module
-> is indeed newer however the cleanup_module was still
-> using the older version of exit.
-> 
-> To set proper exit module function replace cleanup_module
-> with __exit corkscrew_exit_module to align it to the
-> kernel code consistency.
-> 
-> Signed-off-by: Shi Hao <i.shihao.999@gmail.com>
-> 
-> ---
-> 
-> changes v2:
-> - Restore ifdef module condition to compile as built in module
-> - Adjust subject prefix from "net:ethernet" to "3c515"
+This series refactors the lantiq_gswip driver to utilize the regmap API
+for register access, replacing the previous approach of open-coding
+register operations.
 
-Thanks for the update.
-The code changes in this version look good to me.
+Using regmap paves the way for supporting different busses to access the
+switch registers, for example it makes it easier to use an MDIO-based
+method required to access the registers of the MaxLinear GSW1xx series
+of dedicated switch ICs.
 
-One minor nit: the whitespace in the subject look slightly off.
-There is probably no need to repost because of this.
-But I would have gone for:
+Apart from that, the use of regmap improves readability and
+maintainability of the driver by standardizing register access.
 
-Subject: [PATCH net-next v2] 3c515: replace cleanup_module with __exit
+When ever possible changes were made using Coccinelle semantic patches,
+sometimes adjusting white space and adding line breaks when needed.
+The remaining changes which were not done using semantic patches are
+small and should be easy to review and verify.
 
-But overall this looks good to me.
+---
+Changes since v3:
+ * unlock mutex in error path
+ * simplify some of the manually converted register reads by changing
+   the type to u32 instead of using a u32 tmp variable and then assigning
+   the value to the previously used u16 variable.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Changes since v2:
+ * correctly target net-next tree (fix typo in subject)
+
+Changes since RFC:
+ * drop error handling, it wasn't there before and it would anyway be
+   removed again by a follow-up change
+ * optimize more of the regmap_write_bits() calls
+
+
+Daniel Golle (7):
+  net: dsa: lantiq_gswip: clarify GSWIP 2.2 VLAN mode in comment
+  net: dsa: lantiq_gswip: convert accessors to use regmap
+  net: dsa: lantiq_gswip: convert trivial accessor uses to regmap
+  net: dsa: lantiq_gswip: manually convert remaining uses of read
+    accessors
+  net: dsa: lantiq_gswip: replace *_mask() functions with regmap API
+  net: dsa: lantiq_gswip: optimize regmap_write_bits() statements
+  net: dsa: lantiq_gswip: harmonize gswip_mii_mask_*() parameters
+
+ drivers/net/dsa/lantiq/Kconfig        |   1 +
+ drivers/net/dsa/lantiq/lantiq_gswip.c | 471 +++++++++++++-------------
+ drivers/net/dsa/lantiq/lantiq_gswip.h |   6 +-
+ 3 files changed, 243 insertions(+), 235 deletions(-)
+
+-- 
+2.51.1.dirty
 
