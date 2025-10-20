@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-230987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0A07BF3081
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 20:52:25 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E3F7BF309C
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 20:53:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 065C7401FD9
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 18:52:24 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CE883342DD2
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 18:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D352D3A70;
-	Mon, 20 Oct 2025 18:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458162D3732;
+	Mon, 20 Oct 2025 18:53:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Rn166uEX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="e8ozeaC+"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4FF2C327D;
-	Mon, 20 Oct 2025 18:52:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EFD27C178;
+	Mon, 20 Oct 2025 18:53:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760986340; cv=none; b=mj6JDuAFouhukhMd1/2mDftCTZGKmo5HyAGFahWoDTlwRO4/7OP5GRPo9e5+a0hCZOtPKfbECSymODTh7RMoY/eF3CmL6hk/ieDYeCk6SF1yv4TGxOtVHbJNceglOLeZCrb7h5HWMy0ALs1axSiNHUvqpOgwUQEcpnwbHhUob50=
+	t=1760986391; cv=none; b=uWBkj2TiyTuKOTXvdHFcEYTdVROfkhmUhxsvc+3LZstuN3fwaS7YVKu0OGOxN7DjtnYI4myBvXwxGlpFGmNxrVOkFdUKT1zo7hyUF91QxaRtCs/4X/fP0eKc6j9ud5ScQdn9Ac9i/vD5adQwRB9CezYE704+Bc98H7MhzszQmAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760986340; c=relaxed/simple;
-	bh=EQ8t7tB+D4tqgjE5FX3+AxWSSwDJe9Zy/EctcpllNj4=;
+	s=arc-20240116; t=1760986391; c=relaxed/simple;
+	bh=SUABQBDAygzCg8T3H5z6ugGs+gGOkCEsxHL8FvpK/Kw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sub9IwwUn5ECZEIHYhAo1YM1aerpzSpeY2RG23jh1pCNLtulQe9JWUOCm8Cp0lkvsonOGVrhlVAegXgqk0FMg/Z2N+fshbrhkaz38jYsird556697cxt6pCKXcsZAkXuKxl9Hi70K68gxQ3k3YUzNKaT07v3DtI68xe+QtSo12M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Rn166uEX; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=CzbKZ38CDBOdgkgqGiHefV7O4/pipmUjZU5osWagvOjiXGDgg2PANzVKkeaBp6nupozWf7QBeE3BrHx9dGJbWnqvEdKS+eNXd4uHHhzcewL9f6tJ65IK4FmuBpyL+DGFDbawJMBU5EP2bdY4kwM76N3ZTZlZxDL/V/ntklIKA28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=e8ozeaC+; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=tvR/JOCDykbUtNBkJ2YheNXEBp8e8ja99yZKcJe41jk=; b=Rn166uEXHRAoxorCRcipzvbU/Y
-	9LYEOK9yuC6IL2lh2+2j0hi6aIl1fJxE2sNKydc1xihXpchLrcP9i5vDopTNPtE1+PhuYWignc4PL
-	/6YlFTFIs3+FkMKTw723y1lHHMx/rp+8d1Cig0WScb12/aNttg/tNHV2+hjX5GnOcfbo=;
+	bh=nY4Sp4VSEr+tgyiDJpJJY1QovLdkM2vWDgPSyGfuHQQ=; b=e8ozeaC+vmaCILVfrZRYRuCAsr
+	4EfJkbu6kTbeUOQCpButNPaGXKz6vDxyXZGRQFq7oQGXNOHmDobIl8KUNR4tLltzYqYbZsJUeXynk
+	rT8YZKaaldwdysDnSwmKQ60XjoIR0rVgEnbeLI7u6js90ZXkTqpHdhmt8/97Rs5gCuAM=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vAuyu-00BY4z-B8; Mon, 20 Oct 2025 20:51:44 +0200
-Date: Mon, 20 Oct 2025 20:51:44 +0200
+	id 1vAuzs-00BY6J-KL; Mon, 20 Oct 2025 20:52:44 +0200
+Date: Mon, 20 Oct 2025 20:52:44 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Inochi Amaoto <inochiama@gmail.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -65,11 +65,11 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org, Yixun Lan <dlan@gentoo.org>,
 	Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH v2 2/3] net: phy: Add helper for fixing RGMII PHY mode
- based on internal mac delay
-Message-ID: <8da7450f-ef1a-4d8f-9081-a31585e2da19@lunn.ch>
+Subject: Re: [PATCH v2 3/3] net: stmmac: dwmac-sophgo: Add phy interface
+ filter
+Message-ID: <4470b79a-af47-452e-b187-5646884d0cb9@lunn.ch>
 References: <20251020095500.1330057-1-inochiama@gmail.com>
- <20251020095500.1330057-3-inochiama@gmail.com>
+ <20251020095500.1330057-4-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,63 +78,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251020095500.1330057-3-inochiama@gmail.com>
+In-Reply-To: <20251020095500.1330057-4-inochiama@gmail.com>
 
-On Mon, Oct 20, 2025 at 05:54:58PM +0800, Inochi Amaoto wrote:
-> The "phy-mode" property of devicetree indicates whether the PCB has
-> delay now, which means the mac needs to modify the PHY mode based
-> on whether there is an internal delay in the mac.
-> 
-> This modification is similar for many ethernet drivers. To simplify
-> code, define the helper phy_fix_phy_mode_for_mac_delays(speed, mac_txid,
-> mac_rxid) to fix PHY mode based on whether mac adds internal delay.
-> 
-> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-> ---
->  drivers/net/phy/phy-core.c | 43 ++++++++++++++++++++++++++++++++++++++
->  include/linux/phy.h        |  3 +++
->  2 files changed, 46 insertions(+)
-> 
-> diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
-> index 605ca20ae192..4f258fb409da 100644
-> --- a/drivers/net/phy/phy-core.c
-> +++ b/drivers/net/phy/phy-core.c
-> @@ -101,6 +101,49 @@ const char *phy_rate_matching_to_str(int rate_matching)
->  }
->  EXPORT_SYMBOL_GPL(phy_rate_matching_to_str);
-> 
-> +/**
-> + * phy_fix_phy_mode_for_mac_delays - Convenience function for fixing PHY
-> + * mode based on whether mac adds internal delay
-> + *
-> + * @interface: The current interface mode of the port
-> + * @mac_txid: True if the mac adds internal tx delay
-> + * @mac_rxid: True if the mac adds internal rx delay
-> + *
-> + * Return fixed PHY mode, or PHY_INTERFACE_MODE_NA if the interface can
-> + * not apply the internal delay
-> + */
+> +	data = device_get_match_data(&pdev->dev);
+> +	if (data && data->has_internal_rx_delay)
+> +		plat_dat->phy_interface = phy_fix_phy_mode_for_mac_delays(plat_dat->phy_interface,
+> +									  false, true);
 
-I think a helper like this is a good idea. But there are a couple of
-things i don't like about this implementation.
+You should check the return value and if it is _NA, return -EIVAL.
 
-I don't like returning PHY_INTERFACE_MODE_NA on error. I would prefer
--EINVAL.  of_get_phy_mode() passed a phy_interface_t *, and returns an
-errno. The same would be good here.
+    Andrew
 
-I find:
-
-phy_fix_phy_mode_for_mac_delays(interface, true, false)
-
-hard to read. You cannot see what these true/false mean. Which is Rx
-and which is Tx?
-
-Rather than true false, how about passing an
-PHY_INTERFACE_MODE_RGMII_* values?
-
-PHY_INTERFACE_MODE_RGMII_ID would indicate the MAC is doing both
-delays.  PHY_INTERFACE_MODE_RGMII_RXID the MAC is implementing the RX
-delay? I'm open to other ideas here.
-
-	Andrew
+---
+pw-bot: cr
 
