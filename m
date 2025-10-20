@@ -1,150 +1,324 @@
-Return-Path: <netdev+bounces-230844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A427BF0725
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:12:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11683BF074C
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:13:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 909EA18A177A
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 10:10:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B48043A93CE
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 10:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC212F6567;
-	Mon, 20 Oct 2025 10:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 477B62F656A;
+	Mon, 20 Oct 2025 10:11:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IrQEmkuO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gerykyDj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D232F6162
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 10:10:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110A0227EB9
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 10:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760955017; cv=none; b=FcsW8mMp0/l2AzLSP2MSTKOlRoiVNlmo5/43Ic5orl0LJ4b2yeCThJSPdfz3C6m++6b6mkGR8a6BRTMoQnyhSMeMoJa3GLfWbs9H7NnEAEJaXwLyJR2e8eloVPPaYB0tA7kXBdAzlK5XoCBiQl11PBJrOhY9GVfpad4HW3ZMWGo=
+	t=1760955084; cv=none; b=VbbkacuVu7SMO2RUfpHWRyI52rojiU650/abNTcGaAR65DL7J+Bmn4jymxv8mmvsRhPbq587xR9dKMHMZyc0h1EVZx95sXFmArqD6oI2dkWImCaiWvVvuEmZ9YdzmiDVNAIZB7QtlVEZ+xO6Kv4twUJSYwTnuNWQsO2ACUaAhrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760955017; c=relaxed/simple;
-	bh=irwHczt7jTZu429UGLQiqo0bQAQe6oh+iKytPWQdo9I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K1jRDB5pJ2g6ZVBLRzuHhYNSh8OUVplNIDf/LfWyE8KwI6xDd/V5tRWCbS5lr7YMII/6Qie3KcozPCS5kpX85Y0VQfWMJc+cLXe6GTOUruJ6bg8DvLjjHyrHR+m7r5VYjOUvbgwQd8CY/ajAAq8eXoklpMlWPvnXOqL7NKQIK5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IrQEmkuO; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47117f92e32so25218915e9.1
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 03:10:15 -0700 (PDT)
+	s=arc-20240116; t=1760955084; c=relaxed/simple;
+	bh=7pfJkiGmSlPlLHcAFzE7f6VXx75QP4sZ3bCa7ZW9xlo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H3nS2iSq7Usx7LQtK8uU5Q2bG+E64gn/1gy8cUh3mIT51ko1ZKkl6EVc0c9+suxWzdhkBwMEESFIER4zVC31Yibqv4I7DWhqbrbdjpCuOiAEo36ydsmt/ddqCqmag3flGwjpxSR7XKcvfeJvxOHdDJ1Prgf/4G66qG7qQN6eHyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gerykyDj; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4282fba734bso841366f8f.0
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 03:11:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1760955014; x=1761559814; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OIWARefYPtKPfqB0xwmbONWz7j5Ht1YLIPXHwUrFpFA=;
-        b=IrQEmkuOxi/GwkN7WZzPHCV9sexq3E+L96YDx3FnOsl1H0EsWzxBSoBXHYy4+PcOaw
-         bZrx4g24U6Qh6aKxNKiui8iSaSCwilmuB0O/DR9maelpfVLqbrzxpm9evrP5VOZoIzXg
-         imtW3zwYyJYVZQaJaYBBMggL67UuWS1ibg1h7EiCsx6/Sll3IdKHx9YcbL8atDRB/WBO
-         Z5iNhKJLnL7tkjd29dQXkeITTqHHkVle2IWeq4HE89yZ9Zc/YnHyW8sUlfgod3TIfOeA
-         mf1PosV+Jedpeu/Pt2Mkk1FMonZ1oTDKJLz7fqajl5YbGw0356zOjcsJwkBNuAGE9rbW
-         wkVw==
+        d=gmail.com; s=20230601; t=1760955080; x=1761559880; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=d2hQt4FeUy+mdt79tWA4gsLiqmYK4ftLchdR+o5/D3U=;
+        b=gerykyDj0m6qnQjLpPqkYn9aHm6JEh0wmm6NyuoN13qSrUloz1WHPNe7jC6yuYVnD8
+         CjyVUmdW+7ysjKLskeyfIcr82a//t711ljp6rv9KKfCkpA4LCqAcult7XC/Sm+ShZ+CK
+         U08LU4vdqTPN2RBSk6aZaPRiPoPbHznBqoPwV9UFDegrgaZHqPF7XGfcGfEziad361yQ
+         b604xsDmQSVSb19hen6kXEufVG32lowH56/AfhKiykBJRKaM5Ncnx27yrd4rNB/AkYwn
+         QqJkNXF4fYN9Tmf/aTRqWrG5gAIh09qyKUiWhy9/msruRdJnqxZFkrAc5vKUpjloBAmI
+         z2Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760955014; x=1761559814;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OIWARefYPtKPfqB0xwmbONWz7j5Ht1YLIPXHwUrFpFA=;
-        b=TrUSsqJGrYeiervtLqMwLnoo45ImH6bkk0Fa6hAkIjTfDXD10g5YhGHcbUQLCjTOy5
-         r9yboMtGEigdYfd3jbjWVFsV6h/nhGGNmtqQz+KAPS3YtI4w94DTiXBWbLkVIpxhJP+l
-         BLrBXAQhefbkrlRBUV2m32FWfGrfwIDvDJT39daR7PSNG6wzYdXYFqsghgfGzTen6Kh9
-         suhHnHXiUVkzoBH7RqpA16PvM85gK9pPWVtVV8sK4NnDz18MWPYv/MfX2gQTHMMm/41z
-         L42fDJ7mYmAXQ3DelH//LTmkkG+AbhwHvfhGwmw+Ct4k/wSU0tebSwW0Z5X2ZK2gYCrW
-         FZjg==
-X-Forwarded-Encrypted: i=1; AJvYcCVE/ZxY/JJkglDK8AxvFLRpHPnBZShZ+7bGaMbGC5T9DsLsnCMKjFNXfUKvNeQgw2+0FBF3zyI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuDHyZHrfnnxei9vHmyEcaTWGWComOjshwyk160dyD6/9QAhvr
-	pyw5XQcZq8EsULfBgUBI9kOT72FqvoExCWWJLw07+Az5h/9Oy0vvzwIEVGBClUkbeG8=
-X-Gm-Gg: ASbGncsPU2NfkuGy8gH16ILCUH+ZmK+sZrDRIfyKgUfyAcGFpy/UPGy/93V68nMRHjs
-	9+CVhHjbvNkkZEccxJEdnt1z62yKkGuwJjchFsP1TYxNbLl3V5X9+IQgRl70+L1r548AqFhhf3a
-	m25xNMHSNyss/uGueBaduD6RQ+wi+GkrD431PgYhZGXBm1vZTax9jyohNqXSMYRpjsJcIEVq3e2
-	ky3GgnTyCnt7htrAwHzKPStfnZaf1M5XfRYMnVfdr3y+ngz1pfq1bVQXacikAFZuiVWNwM2UMsz
-	kWyuB9PIALC0cJiLe/szl8Ii7oIU74wLO/iOrl3XsE24YQNNRlyNtZhAoD+MYKnq+tT9Q0eQCWZ
-	979yXF8U2stuIMEMtOJ3eCUfz9otVyOcMtsrTy1XRvfCI8VRGEZ+rT//FPTHE8jOCiXLJ3QsubV
-	ioV2DLfouPJJuR4xA=
-X-Google-Smtp-Source: AGHT+IHrrYifEg1gpWKBK0S8ZIgR8Z+8wANqrcE3Fb9jIBMTS+dnOjVa5aHlyOB7K3bTQJksXWDdXA==
-X-Received: by 2002:a05:600c:3b8d:b0:46e:4883:27d with SMTP id 5b1f17b1804b1-4711791c8d3mr99523105e9.30.1760955013820;
-        Mon, 20 Oct 2025 03:10:13 -0700 (PDT)
-Received: from localhost ([41.210.143.179])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-427ea5bab52sm14440788f8f.22.2025.10.20.03.10.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 03:10:13 -0700 (PDT)
-Date: Mon, 20 Oct 2025 13:10:08 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Lizhi Xu <lizhi.xu@windriver.com>
-Cc: syzbot+2860e75836a08b172755@syzkaller.appspotmail.com,
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	kuba@kernel.org, linux-hams@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] netrom: Prevent race conditions between multiple add
- route
-Message-ID: <aPYKgFTIroUhJAJA@stanley.mountain>
-References: <68f3fa8a.050a0220.91a22.0433.GAE@google.com>
- <20251020081359.2711482-1-lizhi.xu@windriver.com>
+        d=1e100.net; s=20230601; t=1760955080; x=1761559880;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d2hQt4FeUy+mdt79tWA4gsLiqmYK4ftLchdR+o5/D3U=;
+        b=EE1alaL4fICaqD9hA3Gr5j0QNsQ8yAlfHffx60A1thFKHZ5BS+wo5/cpfsL79J1lyf
+         kVfnB0Vvk9c6aHS9OFJl7NBgCCBw0gpNVmegcYnb6/MRq1cjOopeFhKKaGJJ4jOGRG1p
+         Dkgq9RCsIBuOmp1kRtySUT0JiKwVxA6fIQUXcXhPtZuGB+iVFk0eJ7bb0vr0IdgCkU/S
+         1y4RcGYD2B47ruVkl3rTj11V5oKzGGnqOhtGnlX03kZiIPXCcqIEwTkdRJG1dZ/5hsWc
+         sd07pHfRVRjuLCMs9CP3K6ehe+QWFWkaegjS1CikPdNLntT8rs7Kn3Y1KqzVirPt5Ape
+         EyPA==
+X-Forwarded-Encrypted: i=1; AJvYcCUvVRz/C//2HxxkzG78jepXjU6ARKITxhxK1KNWbXTeEHfkirJoC5PQ0wNDtXT5Drx2U7OZtaU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSyaqhLX/tltzX0K29tFrmE4kxWjJcOEWc0kdLxvdFm+9hp6O2
+	3VC1BIBHL4aw2lOBU6+DnygdBQHmjXF2eWQbl5jjWi3XzENIPetx+fla
+X-Gm-Gg: ASbGncuFWzzMBHFFxUhJ32Yb6MoZnX32NfN2eK5MMlSSSpf1nzTocv/FmjifLGxcTaK
+	YIYYGbGqCpJmwGgy4ILMnxdmtSwJ9v7tGuDQ8gL9fm0Za+XMttVkEMgORCUNxB2oYyx7kf1tvdt
+	5v7QbfBV4cIL8iUYqaLiqi+P++nQO0V3HgZJUmbA+MoGyt1CqKusYpJUKoL55Z0RA5/ET7CBuGA
+	cs9dUlxy+KknhziYiimj8f+iCLq29pKed9QbmRcQlWLsgWJDh71M2kk+1lCsIpVa+81mtJ80Q02
+	91EaXa/CnHFGrxalsNoDWq1zOuY361UCr9oqqr9bimFhFFY12IkIq4rrnL7H1SHHy6bJWDvs4ae
+	pB+KZJBG+2RtW2Cn4J6WtaHCANIaxTuADwFh/H1+cil6lRO0WNosIiwzHFd6lnEZjjtvArKmmxl
+	/1cPfKRwVsx1s/98S5gGCa8jZ23u8=
+X-Google-Smtp-Source: AGHT+IGVaf+fAM0cUhSVuQnBzC4rVA3fC4GtU67+mN4XifylXplYD5KoGzOBFHfPgxnuFVrl3er2Gg==
+X-Received: by 2002:a05:6000:2f83:b0:3c7:df1d:3d9 with SMTP id ffacd0b85a97d-42704d99325mr9086975f8f.39.1760955079997;
+        Mon, 20 Oct 2025 03:11:19 -0700 (PDT)
+Received: from [10.80.3.86] ([72.25.96.18])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427f00b9fa8sm14713866f8f.38.2025.10.20.03.11.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Oct 2025 03:11:19 -0700 (PDT)
+Message-ID: <75c45f72-a0bf-4b72-8ba2-5b4c8073f21d@gmail.com>
+Date: Mon, 20 Oct 2025 13:11:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251020081359.2711482-1-lizhi.xu@windriver.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/6] mlx4: convert to ndo_hwtstamp API
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Jian Shen <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
+ Jijie Shao <shaojijie@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>,
+ Subbaraya Sundeep <sbhatta@marvell.com>,
+ Bharat Bhushan <bbhushan2@marvell.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Brett Creeley <brett.creeley@amd.com>,
+ =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+ Paul Barker <paul@pbarker.dev>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc: linux-renesas-soc@vger.kernel.org,
+ Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Simon Horman <horms@kernel.org>,
+ Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
+References: <20251017182128.895687-1-vadim.fedorenko@linux.dev>
+ <20251017182128.895687-3-vadim.fedorenko@linux.dev>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20251017182128.895687-3-vadim.fedorenko@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 20, 2025 at 04:13:59PM +0800, Lizhi Xu wrote:
-> The root cause of the problem is that multiple different tasks initiate
-> NETROM_NODE commands to add new routes, there is no lock between them to
-> protect the same nr_neigh.
-> Task0 may add the nr_neigh.refcount value of 1 on Task1 to routes[2].
-> When Task3 executes nr_neigh_put(nr_node->routes[2].neighbour), it will
 
-s/Task3/Task1/
 
-> release the neighbour because its refcount value is 1.
+On 17/10/2025 21:21, Vadim Fedorenko wrote:
+> Convert driver to use .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
+> mlx4_en_ioctl() becomes empty, remove it.
 > 
-
-The refcount would be 2 and then drop to zero.  Both nr_neigh_put() and
-nr_remove_neigh() drop the refcount.
-
-> In this case, the following situation causes a UAF:
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> ---
+>   .../net/ethernet/mellanox/mlx4/en_netdev.c    | 61 ++++++++-----------
+>   drivers/net/ethernet/mellanox/mlx4/mlx4_en.h  |  6 +-
+>   2 files changed, 28 insertions(+), 39 deletions(-)
 > 
-> Task0					Task1
-> =====					=====
-> nr_add_node()
-> nr_neigh_get_dev()			nr_add_node()
-> 					nr_node->routes[2].neighbour->count--
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_netdev.c b/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
+> index 308b4458e0d4..514f29f241c3 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
+> +++ b/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
+> @@ -2420,21 +2420,21 @@ static int mlx4_en_change_mtu(struct net_device *dev, int new_mtu)
+>   	return 0;
+>   }
+>   
+> -static int mlx4_en_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+> +static int mlx4_en_hwtstamp_set(struct net_device *dev,
+> +				struct kernel_hwtstamp_config *config,
+> +				struct netlink_ext_ack *extack)
+>   {
+>   	struct mlx4_en_priv *priv = netdev_priv(dev);
+>   	struct mlx4_en_dev *mdev = priv->mdev;
+> -	struct hwtstamp_config config;
+> -
+> -	if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
+> -		return -EFAULT;
+>   
+>   	/* device doesn't support time stamping */
+> -	if (!(mdev->dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_TS))
+> +	if (!(mdev->dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_TS)) {
+> +		NL_SET_ERR_MSG(extack, "device doesn't support time stamping");
 
-Does this line really matter in terms of the use after free?
+Encouraged to add more extack messages, for error flows below.
+WDYT?
 
-> 					nr_neigh_put(nr_node->routes[2].neighbour);
-> 					nr_remove_neigh(nr_node->routes[2].neighbour)
-> nr_node->routes[2].neighbour = nr_neigh
-> nr_neigh_hold(nr_neigh);
-
-
-This chart is confusing.  It says that that the nr_neigh_hold() is the use
-after free.  But we called nr_remove_neigh(nr_node->routes[2].neighbour)
-before we assigned nr_node->routes[2].neighbour = nr_neigh...
-
-The sysbot report says that the free happens on:
-
-	r_neigh_put(nr_node->routes[2].neighbour);
-
-and the use after free happens on the next line:
-
-	if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)
-
-Which does suggest that somewhere the refcount is 1 when it should be
-at least 2...  It could be that two threads call nr_neigh_put() at
-basically the same time, but that doesn't make sense either because
-we're holding the nr_node_lock(nr_node)...
-
-regards,
-dan carpenter
+>   		return -EINVAL;
+> +	}
+>   
+>   	/* TX HW timestamp */
+> -	switch (config.tx_type) {
+> +	switch (config->tx_type) {
+>   	case HWTSTAMP_TX_OFF:
+>   	case HWTSTAMP_TX_ON:
+>   		break;
+> @@ -2443,7 +2443,7 @@ static int mlx4_en_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+>   	}
+>   
+>   	/* RX HW timestamp */
+> -	switch (config.rx_filter) {
+> +	switch (config->rx_filter) {
+>   	case HWTSTAMP_FILTER_NONE:
+>   		break;
+>   	case HWTSTAMP_FILTER_ALL:
+> @@ -2461,39 +2461,27 @@ static int mlx4_en_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+>   	case HWTSTAMP_FILTER_PTP_V2_SYNC:
+>   	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
+>   	case HWTSTAMP_FILTER_NTP_ALL:
+> -		config.rx_filter = HWTSTAMP_FILTER_ALL;
+> +		config->rx_filter = HWTSTAMP_FILTER_ALL;
+>   		break;
+>   	default:
+>   		return -ERANGE;
+>   	}
+>   
+>   	if (mlx4_en_reset_config(dev, config, dev->features)) {
+> -		config.tx_type = HWTSTAMP_TX_OFF;
+> -		config.rx_filter = HWTSTAMP_FILTER_NONE;
+> +		config->tx_type = HWTSTAMP_TX_OFF;
+> +		config->rx_filter = HWTSTAMP_FILTER_NONE;
+>   	}
+>   
+> -	return copy_to_user(ifr->ifr_data, &config,
+> -			    sizeof(config)) ? -EFAULT : 0;
+> +	return 0;
+>   }
+>   
+> -static int mlx4_en_hwtstamp_get(struct net_device *dev, struct ifreq *ifr)
+> +static int mlx4_en_hwtstamp_get(struct net_device *dev,
+> +				struct kernel_hwtstamp_config *config)
+>   {
+>   	struct mlx4_en_priv *priv = netdev_priv(dev);
+>   
+> -	return copy_to_user(ifr->ifr_data, &priv->hwtstamp_config,
+> -			    sizeof(priv->hwtstamp_config)) ? -EFAULT : 0;
+> -}
+> -
+> -static int mlx4_en_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
+> -{
+> -	switch (cmd) {
+> -	case SIOCSHWTSTAMP:
+> -		return mlx4_en_hwtstamp_set(dev, ifr);
+> -	case SIOCGHWTSTAMP:
+> -		return mlx4_en_hwtstamp_get(dev, ifr);
+> -	default:
+> -		return -EOPNOTSUPP;
+> -	}
+> +	*config = priv->hwtstamp_config;
+> +	return 0;
+>   }
+>   
+>   static netdev_features_t mlx4_en_fix_features(struct net_device *netdev,
+> @@ -2560,7 +2548,7 @@ static int mlx4_en_set_features(struct net_device *netdev,
+>   	}
+>   
+>   	if (reset) {
+> -		ret = mlx4_en_reset_config(netdev, priv->hwtstamp_config,
+> +		ret = mlx4_en_reset_config(netdev, &priv->hwtstamp_config,
+>   					   features);
+>   		if (ret)
+>   			return ret;
+> @@ -2844,7 +2832,6 @@ static const struct net_device_ops mlx4_netdev_ops = {
+>   	.ndo_set_mac_address	= mlx4_en_set_mac,
+>   	.ndo_validate_addr	= eth_validate_addr,
+>   	.ndo_change_mtu		= mlx4_en_change_mtu,
+> -	.ndo_eth_ioctl		= mlx4_en_ioctl,
+>   	.ndo_tx_timeout		= mlx4_en_tx_timeout,
+>   	.ndo_vlan_rx_add_vid	= mlx4_en_vlan_rx_add_vid,
+>   	.ndo_vlan_rx_kill_vid	= mlx4_en_vlan_rx_kill_vid,
+> @@ -2858,6 +2845,8 @@ static const struct net_device_ops mlx4_netdev_ops = {
+>   	.ndo_features_check	= mlx4_en_features_check,
+>   	.ndo_set_tx_maxrate	= mlx4_en_set_tx_maxrate,
+>   	.ndo_bpf		= mlx4_xdp,
+> +	.ndo_hwtstamp_get	= mlx4_en_hwtstamp_get,
+> +	.ndo_hwtstamp_set	= mlx4_en_hwtstamp_set,
+>   };
+>   
+>   static const struct net_device_ops mlx4_netdev_ops_master = {
+> @@ -3512,7 +3501,7 @@ int mlx4_en_init_netdev(struct mlx4_en_dev *mdev, int port,
+>   }
+>   
+>   int mlx4_en_reset_config(struct net_device *dev,
+> -			 struct hwtstamp_config ts_config,
+> +			 struct kernel_hwtstamp_config *ts_config,
+>   			 netdev_features_t features)
+>   {
+>   	struct mlx4_en_priv *priv = netdev_priv(dev);
+> @@ -3522,8 +3511,8 @@ int mlx4_en_reset_config(struct net_device *dev,
+>   	int port_up = 0;
+>   	int err = 0;
+>   
+> -	if (priv->hwtstamp_config.tx_type == ts_config.tx_type &&
+> -	    priv->hwtstamp_config.rx_filter == ts_config.rx_filter &&
+> +	if (priv->hwtstamp_config.tx_type == ts_config->tx_type &&
+> +	    priv->hwtstamp_config.rx_filter == ts_config->rx_filter &&
+>   	    !DEV_FEATURE_CHANGED(dev, features, NETIF_F_HW_VLAN_CTAG_RX) &&
+>   	    !DEV_FEATURE_CHANGED(dev, features, NETIF_F_RXFCS))
+>   		return 0; /* Nothing to change */
+> @@ -3542,7 +3531,7 @@ int mlx4_en_reset_config(struct net_device *dev,
+>   	mutex_lock(&mdev->state_lock);
+>   
+>   	memcpy(&new_prof, priv->prof, sizeof(struct mlx4_en_port_profile));
+> -	memcpy(&new_prof.hwtstamp_config, &ts_config, sizeof(ts_config));
+> +	memcpy(&new_prof.hwtstamp_config, ts_config, sizeof(*ts_config));
+>   
+>   	err = mlx4_en_try_alloc_resources(priv, tmp, &new_prof, true);
+>   	if (err)
+> @@ -3560,7 +3549,7 @@ int mlx4_en_reset_config(struct net_device *dev,
+>   			dev->features |= NETIF_F_HW_VLAN_CTAG_RX;
+>   		else
+>   			dev->features &= ~NETIF_F_HW_VLAN_CTAG_RX;
+> -	} else if (ts_config.rx_filter == HWTSTAMP_FILTER_NONE) {
+> +	} else if (ts_config->rx_filter == HWTSTAMP_FILTER_NONE) {
+>   		/* RX time-stamping is OFF, update the RX vlan offload
+>   		 * to the latest wanted state
+>   		 */
+> @@ -3581,7 +3570,7 @@ int mlx4_en_reset_config(struct net_device *dev,
+>   	 * Regardless of the caller's choice,
+>   	 * Turn Off RX vlan offload in case of time-stamping is ON
+>   	 */
+> -	if (ts_config.rx_filter != HWTSTAMP_FILTER_NONE) {
+> +	if (ts_config->rx_filter != HWTSTAMP_FILTER_NONE) {
+>   		if (dev->features & NETIF_F_HW_VLAN_CTAG_RX)
+>   			en_warn(priv, "Turning off RX vlan offload since RX time-stamping is ON\n");
+>   		dev->features &= ~NETIF_F_HW_VLAN_CTAG_RX;
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+> index ad0d91a75184..aab97694f86b 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+> +++ b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+> @@ -388,7 +388,7 @@ struct mlx4_en_port_profile {
+>   	u8 num_up;
+>   	int rss_rings;
+>   	int inline_thold;
+> -	struct hwtstamp_config hwtstamp_config;
+> +	struct kernel_hwtstamp_config hwtstamp_config;
+>   };
+>   
+>   struct mlx4_en_profile {
+> @@ -612,7 +612,7 @@ struct mlx4_en_priv {
+>   	bool wol;
+>   	struct device *ddev;
+>   	struct hlist_head mac_hash[MLX4_EN_MAC_HASH_SIZE];
+> -	struct hwtstamp_config hwtstamp_config;
+> +	struct kernel_hwtstamp_config hwtstamp_config;
+>   	u32 counter_index;
+>   
+>   #ifdef CONFIG_MLX4_EN_DCB
+> @@ -780,7 +780,7 @@ void mlx4_en_ptp_overflow_check(struct mlx4_en_dev *mdev);
+>   
+>   int mlx4_en_moderation_update(struct mlx4_en_priv *priv);
+>   int mlx4_en_reset_config(struct net_device *dev,
+> -			 struct hwtstamp_config ts_config,
+> +			 struct kernel_hwtstamp_config *ts_config,
+>   			 netdev_features_t new_features);
+>   void mlx4_en_update_pfc_stats_bitmap(struct mlx4_dev *dev,
+>   				     struct mlx4_en_stats_bitmap *stats_bitmap,
 
 
