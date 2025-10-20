@@ -1,212 +1,91 @@
-Return-Path: <netdev+bounces-230889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 802EDBF12CF
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:29:40 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C804BF1260
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:26:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EE7F3B0407
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:25:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A63004F41B6
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C0F13126DE;
-	Mon, 20 Oct 2025 12:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VWPZ8r8n"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B983128C5;
+	Mon, 20 Oct 2025 12:26:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4FEE1FECBA
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 12:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C39430F529
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 12:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760963155; cv=none; b=k/1jNZXT9V44bzf28Ir7PUIphrcli+gZiNqfjMnCWtelEwyx2hmTLp/iD5hJy+EffJEfP2RI2caIkWcljFWGqJ625P/faX00Fmfnx13VBSebdQF8vOFEAcasqFuw+0fIiyxRmVtkTxJaZt09NNACWZAeMSlE/86GQs8soN3L8+s=
+	t=1760963173; cv=none; b=GXrwW0qiDajmPjkGWw62J4sbJjVqLKjd8AHmjkoAumLmvK0MJKN/AXPP3sPhlk+OoTHqN/Mmq0WQZQJQut7gJ2gHS5+8LjcRU9ujvyQUurbqzarDkMNqUEJPu3RR6GCcjaWZusrGf+uWY/DC62apwE9J8FtrYkxpKWX/m7y99xA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760963155; c=relaxed/simple;
-	bh=mYoiBwbnX6tEfhbbdu+UYbka5RnyMvCvRTRvJ7uOd/o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oA+EZcjaI1yFthxfeivgcIzCV+HUfGH4w78Jm4R1RCpeZVrp+GfYv90kr4llU8wPq3l2QwUAnqOcz1e4vjzkRvlQJDja/nyE8JgzwvRXn/MNjK/1ldvaIfU0pX0OLWJb3/IOxbmzpeDSExuXVUnGqJ9QX6JcTmLqr1DxdvYkTss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VWPZ8r8n; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3ece1102998so3865088f8f.2
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 05:25:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1760963146; x=1761567946; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=joBbZlAKq9MKYKqmzAoAqjZljgU+WlqDqzpRmSnyPTc=;
-        b=VWPZ8r8nejjkDbS8xU/vTG2zTf0VmaUIr+/vN/DwiwoSLYd0RLuNe5You57m2mGhTX
-         9jvQSTDula3O2moY0zZGbRqTEcBMDWE6ocsN82ltP5riRLu2rCG5nTschEOEZwrNsZ92
-         Va+BIZaxWRTp2qm4+IGspSwGrmM9huuOkpaoY2H4V9lRtcUoe0Qt1P/8nguq6zMt7ish
-         iLQdsM0RSmX1cNgKTqGER6gRJvKb8Gvaybkr2/iD7Wpw96+f22iLHB+sW79LekjH1zTH
-         E5avlCYBEzXz8bXT57drng1zmKu1Ti0ibiA7xYwBXMqVGqNP41ndNKHL3W7La+OOQ9dn
-         w40g==
+	s=arc-20240116; t=1760963173; c=relaxed/simple;
+	bh=phGJj3RgceRPqvLEhmuHYt6Xs/IlhcLpo7DLHPfSHTU=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=iERWERXLtuvbb7aQpG1LhjAAJtr8aCG0GC8hVa+C2UMgfyajsUny/MJyKJjLL35pCCfEYc+eHbWDGpeaFkV2037ZbBPIBvfa7oGSF8ztiHiFC1ikWCwYNdNm/Ry5ASTv3dc4W8I86JvFeWSdiF0wTNqB4F/cCikmZ2rxjtJfipg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-430d789ee5aso16893535ab.2
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 05:26:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760963146; x=1761567946;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=joBbZlAKq9MKYKqmzAoAqjZljgU+WlqDqzpRmSnyPTc=;
-        b=c+roNObyAQnooPq70vRb2CffFQRUH0XNFuwcViDdI4kHR2mWqr6FhCh29/U9eFnDEV
-         68wyx745rQy4YdMfIIniN4AYJcEJXxIQVeRW9H3CO0hpOVW6MzhYEdP2tku+WBIu7pEE
-         WiMwjvpOOKbqiOHTkvwG8ax9zXSDjm5YnC8vFak96TnZLPfEmEr/FqqXg3lLeKj8kx6k
-         arLZPXrTCQZxfgHl/+3XUDyCIzfJHYb597mOt061a3pRhLh+Lx8lW1z9NsiLkwpCHcNe
-         Vj6JBJ+6icMErPWmk3RWGUiEitG1Wex6C0rBXXeXWHpXNG2X5BrMALB/Aln6NFr4kUmV
-         CGzA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+1v9BLokqNx4NVMXcGsL3l1ABds8CH38dUnbihmB4kZw06hb2zwxxpSUlLqA9qDFzfyO1h9k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8gDQ9VvRDcATTFZ83DNAPl9bu75IlmxL4USM7IPmETHyixZhd
-	Ia9b9AGf+SjyIQoCgUh1XEfX54Qu70NGXSGAztbYMt3jZs9zuSM+PVWN04X/xYLS99E=
-X-Gm-Gg: ASbGncvzbtRtkJStCIRn17tl7PwMoTZTCNCNSJeIfx+incgAGtXjAZO/5c9quvwlvH7
-	1qOSylU34YXKgk7IBLuYSegY/5eiEu2yuJWPm8pI05UVRmGzxeBVGFz+DUe2s03K+Wts2S4SZ4o
-	oPsQM1jLRNYwmolHF5NNcQ7SgGcPGnue9whacZCQv+yJYBbohEpfzcc9SaL9833Xx4kA7C/a38v
-	+3rmau5UlN4hk5poOcvwK5Ig7Qya41ax2OCpjs/uNiJuHQqfWwga8DFjvKxJBHyCcI0Y6YgiIHQ
-	hmxmqNjXwTQY8bTpYnHHGRzFUyn9K0p49a8yf87DDBwj5jEth4PbjILeLgctTGB/Cz3la+o1wAU
-	b+Ik1VQmFHRPRIEI4zS1EhScS38Scb9tMwY++jBRIYIE+FuoRk98roR+jWCpELfZSF7NjSSeOgW
-	uaJa0ZlHS+ofdtZLM=
-X-Google-Smtp-Source: AGHT+IGE/91ndXqrZPeGjmvqLfbZ828jO+fUoAyw/TzeN2763Thm39KbDzwmTzVAkzPrvwfG8tgRPg==
-X-Received: by 2002:a05:6000:2087:b0:427:921:8985 with SMTP id ffacd0b85a97d-42709218a51mr6985887f8f.40.1760963145881;
-        Mon, 20 Oct 2025 05:25:45 -0700 (PDT)
-Received: from localhost ([41.210.143.179])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-427f00b985esm15662696f8f.34.2025.10.20.05.25.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 05:25:45 -0700 (PDT)
-Date: Mon, 20 Oct 2025 15:25:40 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Lizhi Xu <lizhi.xu@windriver.com>
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	kuba@kernel.org, linux-hams@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+2860e75836a08b172755@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH V2] netrom: Prevent race conditions between multiple add
- route
-Message-ID: <aPYqRJXGhCNws4d3@stanley.mountain>
-References: <aPYKgFTIroUhJAJA@stanley.mountain>
- <20251020110244.3200311-1-lizhi.xu@windriver.com>
+        d=1e100.net; s=20230601; t=1760963163; x=1761567963;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2RPwyJ6zNa+Ilffcb2jxcjrBpiDHQo/NJyrIQpPWyVc=;
+        b=jtbgH8ERJ/Ftp9RW+SikJfUWFLZYmXrvbjZqEr4cz/QgQsx7kgP1xyecqxt6nEubpk
+         ON7FV4XduLSUKrIB826sISIyyLLVSG61niCiETvVaeh907sFW/hrcOX7pL7NxgqcUOig
+         cwo4ezYlu2dkb1Hp+flAZq5jnHsjyvrBh0LvIHcIpSKVT/Hc55WC/JYm8EDu+0u4/391
+         DNnVvvs1FNDevi7y6mXk/YUhBRLFQVO3dypoKxk4CLNRMH35Y1ZMOZsv32nimFA10NkP
+         HMs8uYJUxDbwQp7sToO7SgSAsjE2u22b+8zhLXpPKEd6IohRptNLa/7+9c9O6Z6mu3c5
+         s6TA==
+X-Forwarded-Encrypted: i=1; AJvYcCWPHv3e8ajLuEDLepu8BrtabtdCozGcilklSICSiJZrlfzAErfDmV2cIlpWaxSmut9kiQNV9jc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSGnR9yqVIk6vOkjN0pcS20M2U37yLipRqCmCZAA4akSFziVjw
+	/iL9hXY9AL1JYozBSgFqWPvf76RpunxqzrXPG/B0K03BKGAOYEAKMsOifVJ5zwpP6driKcc/7bz
+	CKM0LoXbGJ6EG2RHNWUaftocGIelHKuRyz5R8hKSbS0Rce4e+QPyhGCc0eRY=
+X-Google-Smtp-Source: AGHT+IFhXiAIcAqfy99ebruXdCEa/SBzSACo6L2+82Ibn7dHTxDMg6NCkkB444vB6/ZJc5vtm3ClNG5w24iLSEnx/iS4Vl5BUBSb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251020110244.3200311-1-lizhi.xu@windriver.com>
+X-Received: by 2002:a05:6e02:1c22:b0:430:adcd:37df with SMTP id
+ e9e14a558f8ab-430c52b5b37mr199573665ab.18.1760963163149; Mon, 20 Oct 2025
+ 05:26:03 -0700 (PDT)
+Date: Mon, 20 Oct 2025 05:26:03 -0700
+In-Reply-To: <20251020112553.2345296-1-wangliang74@huawei.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68f62a5b.050a0220.91a22.0447.GAE@google.com>
+Subject: Re: [syzbot] [net?] WARNING in xfrm_state_fini (4)
+From: syzbot <syzbot+999eb23467f83f9bf9bf@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, herbert@gondor.apana.org.au, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, steffen.klassert@secunet.com, 
+	syzkaller-bugs@googlegroups.com, wangliang74@huawei.com, 
+	yuehaibing@huawei.com, zhangchangzhong@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Oct 20, 2025 at 07:02:44PM +0800, Lizhi Xu wrote:
-> The root cause of the problem is that multiple different tasks initiate
-> NETROM_NODE commands to add new routes, there is no lock between them to
-> protect the same nr_neigh.
-> Task0 may add the nr_neigh.refcount value of 1 on Task1 to routes[2].
-> 
-> When Task2 executes nr_neigh_put(nr_node->routes[2].neighbour), it will
-> release the neighbour because its refcount value is 1.
-> 
-> In this case, the following situation causes a UAF:
-> 
-> Task0					Task1						Task2
-> =====					=====						=====
-> nr_add_node()
-> nr_neigh_get_dev()			nr_add_node()
-> 					nr_node_lock()
-> 					nr_node->routes[2].neighbour->count--
-> 					nr_neigh_put(nr_node->routes[2].neighbour);
-> 					nr_remove_neigh(nr_node->routes[2].neighbour)
-> 					nr_node_unlock()
-> nr_node_lock()
-> nr_node->routes[2].neighbour = nr_neigh
-> nr_neigh_hold(nr_neigh);								nr_add_node()
-> 											nr_neigh_put()
-> 
-> The solution to the problem is to use a lock to synchronize each add a route
-> to node.
+Hello,
 
-This chart is still not right.  Let me add line numbers to your chart:
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-netrom/nr_route.c
-   214          nr_node_lock(nr_node);
-   215  
-   216          if (quality != 0)
-   217                  strscpy(nr_node->mnemonic, mnemonic);
-   218  
-   219          for (found = 0, i = 0; i < nr_node->count; i++) {
-   220                  if (nr_node->routes[i].neighbour == nr_neigh) {
-   221                          nr_node->routes[i].quality   = quality;
-   222                          nr_node->routes[i].obs_count = obs_count;
-   223                          found = 1;
-   224                          break;
-   225                  }
-   226          }
-   227  
-   228          if (!found) {
-   229                  /* We have space at the bottom, slot it in */
-   230                  if (nr_node->count < 3) {
-   231                          nr_node->routes[2] = nr_node->routes[1];
-   232                          nr_node->routes[1] = nr_node->routes[0];
-   233  
-   234                          nr_node->routes[0].quality   = quality;
-   235                          nr_node->routes[0].obs_count = obs_count;
-   236                          nr_node->routes[0].neighbour = nr_neigh;
-   237  
-   238                          nr_node->which++;
-   239                          nr_node->count++;
-   240                          nr_neigh_hold(nr_neigh);
-   241                          nr_neigh->count++;
-   242                  } else {
-   243                          /* It must be better than the worst */
-   244                          if (quality > nr_node->routes[2].quality) {
-   245                                  nr_node->routes[2].neighbour->count--;
-   246                                  nr_neigh_put(nr_node->routes[2].neighbour);
-   247  
-   248                                  if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)
-   249                                          nr_remove_neigh(nr_node->routes[2].neighbour);
-   250  
-   251                                  nr_node->routes[2].quality   = quality;
-   252                                  nr_node->routes[2].obs_count = obs_count;
-   253                                  nr_node->routes[2].neighbour = nr_neigh;
-   254  
-   255                                  nr_neigh_hold(nr_neigh);
-   256                                  nr_neigh->count++;
-   257                          }
-   258                  }
-   259          }
+Reported-by: syzbot+999eb23467f83f9bf9bf@syzkaller.appspotmail.com
+Tested-by: syzbot+999eb23467f83f9bf9bf@syzkaller.appspotmail.com
 
+Tested on:
 
-Task0					Task1						Task2
-=====					=====						=====
-[97] nr_add_node()
-[113] nr_neigh_get_dev()		[97] nr_add_node()
-					[214] nr_node_lock()
-					[245] nr_node->routes[2].neighbour->count--
-					[246] nr_neigh_put(nr_node->routes[2].neighbour);
-					[248] nr_remove_neigh(nr_node->routes[2].neighbour)
-					[283] nr_node_unlock()
-[214] nr_node_lock()
-[253] nr_node->routes[2].neighbour = nr_neigh
-[254] nr_neigh_hold(nr_neigh);								[97] nr_add_node()
-											[XXX] nr_neigh_put()
-                                                                                        ^^^^^^^^^^^^^^^^^^^^
+commit:         ffff5c8f net: phy: realtek: fix rtl8221b-vm-cg name
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=11573c58580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9ad7b090a18654a7
+dashboard link: https://syzkaller.appspot.com/bug?extid=999eb23467f83f9bf9bf
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=15159734580000
 
-These charts are supposed to be chronological so [XXX] is wrong because the
-use after free happens on line [248].  Do we really need three threads to
-make this race work?
-
-> 
-> syzbot reported:
-> BUG: KASAN: slab-use-after-free in nr_add_node+0x25db/0x2c00 net/netrom/nr_route.c:248
-                                                                                     ^^^
-
-> Read of size 4 at addr ffff888051e6e9b0 by task syz.1.2539/8741
-
-I'm sure you tested your patch and that it fixes the bug, but I just
-wonder if it's the best possible fix?
-
-regards,
-dan carpenter
-
-
+Note: testing is done by a robot and is best-effort only.
 
