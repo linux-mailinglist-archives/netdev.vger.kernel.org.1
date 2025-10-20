@@ -1,72 +1,56 @@
-Return-Path: <netdev+bounces-230810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E84C2BEFDCE
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 10:15:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1686BEFF53
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 10:31:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 621A54F01F9
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 08:14:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09F4A401B78
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 08:29:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209402E9EC9;
-	Mon, 20 Oct 2025 08:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="ipuNKsAt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55AD22EC56E;
+	Mon, 20 Oct 2025 08:27:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01EE42E9735;
-	Mon, 20 Oct 2025 08:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D050D2EBBA2
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 08:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760948073; cv=none; b=PCu03w4oJYWWNKYiAU8/3Pfehy4Qj2FT1E3/kHuNwfA0VoqlZEJrkiciJUqmgB3t+0h9pa0d1lh6MLK5FfvnY6jnlOWlgwJS3VJi+HGOgUJrh0g0EdTn+POfAW8uPoLd4/78p73pJEYPC2vWXol55G6HdUkFuom8rWKlKBlAjUc=
+	t=1760948850; cv=none; b=FnuALzAtmsoU6Qt/jO9mfqh7AO7bw+dne+KFrVixXV/OyH5DwrWxwcPTnUjbyhe21l3BEozM7y20oOWLY19CwQb1/VFsgFrSAO+6rajleRZFZt0Lfa9TRT1N+I8N8SBwXVRgbxeLQHhLgaBInvWf8q2+FGc0dXblOV7rtcAgbwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760948073; c=relaxed/simple;
-	bh=b7RcGC+rlOoyYyHWy6EpOI4bZ4qo0j1xZf2JnvT1XSQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ij/zcR3kkLuFvQqG8gOWYoNbc9mbIPywLwFFMEUo0VgZK+oDKJL3nW5TiRSTwvsn0PusLBpRPdWhoEJncXXF83+BEUucWJrWr+NMImmLTL2cL/1of05B+SHsen5d9LJliSs9EnnTphQz0R3GSzzvw8XE+vydln+UKW/m13ydzfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=ipuNKsAt; arc=none smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59K5U2Id1267559;
-	Mon, 20 Oct 2025 08:14:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	PPS06212021; bh=0SyO3Eu4R2RtY8+48nADsC4nchute0+HCCVr0S74e6k=; b=
-	ipuNKsAt60mRKZbY/FAF03XSlDEDsUL8jrIUmgoUFphDDj+N4vkdnUz3r5nw1lSg
-	2E26ExM5BIiKyPfcl2v9eMdKMM+OOmpBT7C5KtTcbHG3DzbCnk1U3h3FD0fBQ6mN
-	+6SHLPsKdI9rHm6V4UxAfY9/muh5xWIecFbSzU6COt1O/3ffKrY7lTj/FEaXYvzs
-	PtGtgxVZsK85381+uO5YcKdVu+3NehH35EU5c88T256sOx2mGltbVAgLewytDFuW
-	yfPKOPLLvwjlTS6fKw3v/TXNl4ktpYaScvr3pOjIFZVtisrCb/38ESsW7+Y8Nqtq
-	zRr/DY4DcMyWzrab9RLDSw==
-Received: from ala-exchng02.corp.ad.wrs.com ([128.224.246.37])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 49v1v59kbf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Mon, 20 Oct 2025 08:14:04 +0000 (GMT)
-Received: from ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) by
- ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.59; Mon, 20 Oct 2025 01:14:03 -0700
-Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
- ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server id
- 15.1.2507.59 via Frontend Transport; Mon, 20 Oct 2025 01:14:00 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <syzbot+2860e75836a08b172755@syzkaller.appspotmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <linux-hams@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH] netrom: Prevent race conditions between multiple add route
-Date: Mon, 20 Oct 2025 16:13:59 +0800
-Message-ID: <20251020081359.2711482-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <68f3fa8a.050a0220.91a22.0433.GAE@google.com>
-References: <68f3fa8a.050a0220.91a22.0433.GAE@google.com>
+	s=arc-20240116; t=1760948850; c=relaxed/simple;
+	bh=ZwdRgbqcnFsWN6WfvE1g2b4QFqx9JONqLAPi6/2oWL4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DgusY8CxhvbPZ1P9C83ed7edyDz2+wOOWJD6h/vBXzr5swEgYa6K809Qm7rPCkS1q6Py2LTOm91gvtO5JnkCNvOydg0pV/gBtXsGei/i2oqscwqAzIOsx0X1Iirn1x+BrAroX/SoMxw46sZbHvsYnucuIcmjXYON3DUmTCKurQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: zesmtpgz7t1760948777tce0773a8
+X-QQ-Originating-IP: O86W0xd80Z18zhEVkdoAw9WfNKKjPcQxDpJ/17edr+4=
+Received: from lap-jiawenwu.trustnetic.com ( [60.186.187.129])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 20 Oct 2025 16:26:14 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 9669221615545520294
+EX-QQ-RecipientCnt: 9
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next 0/3] Implement more features for txgbe devices
+Date: Mon, 20 Oct 2025 16:26:06 +0800
+Message-Id: <20251020082609.6724-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,83 +58,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIwMDA2NSBTYWx0ZWRfXzhP8++/29DF1
- 8fFM8v0qi7ohb96j1oFsi5fMiV4l7ZbKgrnqtbsH0zAWC//Kq0f2Rn+EAE1Rfz6RWXYEHWtYRjI
- ol6cb9FGkPKtRHlJ1jmR1SVrQ8h0cIYE/5EGm9x5Dmt5NAsQV+ZwctPLua9d24lIFqHcRGu5VN6
- WNdvSsLMrXsuPOkx7ug926uI+pBBSQ3vxwVx0UfH6DeVUBkFML9PsuEr6zsnA5TYX8PerFqrgXs
- 4Yy5NVwbE6omLPr5A5L0zpI62vM0izhogYxOaLDTXoSBdpghAS3p4a4MYVtFfdZYpXif7JMEnqU
- sL9JMRprtTxiy8qMWwXO3UD+JdIRIsnXzh2C6p8XEM0lYQgMrRI2wOeE8e41y6a5nEwJ8XEux1w
- xyO/13AtZ1fbHJaN9q3HG1+COeqFiA==
-X-Proofpoint-GUID: RDysNcMdUX6tPpqmO3otGQJ6KL4IUTyk
-X-Proofpoint-ORIG-GUID: RDysNcMdUX6tPpqmO3otGQJ6KL4IUTyk
-X-Authority-Analysis: v=2.4 cv=ANdmIO46 c=1 sm=1 tr=0 ts=68f5ef4c cx=c_pps
- a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=edf1wS77AAAA:8 a=hSkVLCK3AAAA:8
- a=t7CeM3EgAAAA:8 a=sx0YzN9DWx7IQLKmKLYA:9 a=DcSpbTIhAlouE1Uv7lRv:22
- a=cQPPKAXgyycSBL8etih5:22 a=FdTzh2GWekK77mhwV6Dw:22 a=cPQSjfK2_nFv0Q5t_7PE:22
- a=poXaRoVlC6wW9_mwW8W4:22 a=Z5ABNNGmrOfJ6cZ5bIyy:22 a=SsAZrZ5W_gNWK9tOzrEV:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-20_02,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 priorityscore=1501 phishscore=0 malwarescore=0 bulkscore=0
- impostorscore=0 clxscore=1011 suspectscore=0 lowpriorityscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510200065
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: M4lPCacZ9YlevvQ98C/2wuMHwpR3av8ZiAMWZthV+I2h9HJZfsnQtC35
+	ymwW8qrZRmLCylOLw9OmYcCSiutfHnxFbpEe85shXE1DTlAS668FLaPBSfA86X4dJyNhIpG
+	IRK+p8PK7758ZRWJR++Lhw8m+Vfb1VcaOKZNcMLpiK0UGfe9PmQvRhqe6P8Ulp6TrEHTXOx
+	VQeunPbEy+HIUcgLcQTYODGBeR0fE4iRXnPESF0ukwFqmRA/yx7vlmnngoj97vcjtJxo2xl
+	qk8KHUkkSpUXCqnWOIrrk7NL2dbYubXBTRuDPI9QYgbWntpF+AR2otF9fjaEUG6LKUGWf/c
+	VmG5LOIC5usn4DhI1S0xfsOhDOYOAK3PmiXKyaBRTDfUI0o2kk+SxvK5+RcfWSUlVtd3tzk
+	K/0KUxGVwTgep5HYisxF+Ae4qLzfjUkUc6NuLbzNDiWRWE/KR7hda6o4WmYu+H61HOFU8rj
+	mOibZ6Vprco9yNXjboKS6or5ETfOtLSdD1ZxGg6qCFiybtE66N175R1CHv6EF/E3coP7PKH
+	yRZZqRkMXStoikAtYZmEIvVMm61FSBiJxOLnb4UjLzZkFgZXDIXAnWOR/cmjgLRFW2xyA8B
+	coS4u9uV1qadYz4EDq+WoOUa9lFOhx86oHUAINLB8a03wQhynSJrMtIZYpqgzIiWM3BA4fA
+	Ylc4II9OXVecfe6h5ycztDZC0DdvhgmVypzN6lATVxpRKgAYU3+1B+/phUMVLoZ0qhUpipv
+	ER2Y8Z2izOylHA5/Q82QZU7FEIryb0JZ7ZpMDF8thiYwXVxPNVHdcCdAF+N5McixDNnrSPQ
+	x4ab/9UrAeVeyHd64tF4DrT+v5HONbEIFWchamOvy0VdR2B45yesZgwxkVLwH0u2p+hSF0F
+	+eB025xCs1ceHIxDkjbm9qIUgTW2LuaYI0T5+OsDprqpfxVyDeLsQ54+MRL4cI+BnHYTuz9
+	j5Bhp77OYKsXGaRK5nJmhtNkoE2QuEf2zkHv5q9gO0FjNBV5bRckv9uNJcodLi6zuBmv7BW
+	MYwnMPZ/ZIzi1FS3HH0TCqFdYmc4NY1aAawBu2oA==
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-RECHKSPAM: 0
 
-The root cause of the problem is that multiple different tasks initiate
-NETROM_NODE commands to add new routes, there is no lock between them to
-protect the same nr_neigh.
-Task0 may add the nr_neigh.refcount value of 1 on Task1 to routes[2].
-When Task3 executes nr_neigh_put(nr_node->routes[2].neighbour), it will
-release the neighbour because its refcount value is 1.
+Based on the features of hardware support, implement RX desc merge and
+TX head write-back for AML devices, support RSC offload for AML and SP
+devices.
 
-In this case, the following situation causes a UAF:
+Jiawen Wu (3):
+  net: txgbe: support RX desc merge mode
+  net: txgbe: support TX head write-back mode
+  net: txgbe: support RSC offload
 
-Task0					Task1
-=====					=====
-nr_add_node()
-nr_neigh_get_dev()			nr_add_node()
-					nr_node->routes[2].neighbour->count--
-					nr_neigh_put(nr_node->routes[2].neighbour);
-					nr_remove_neigh(nr_node->routes[2].neighbour)
-nr_node->routes[2].neighbour = nr_neigh
-nr_neigh_hold(nr_neigh);
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   |  61 +++++++-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  69 +++++++-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 147 ++++++++++++++++--
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.c |   4 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  47 +++++-
+ drivers/net/ethernet/wangxun/libwx/wx_vf.h    |   4 +
+ .../net/ethernet/wangxun/libwx/wx_vf_lib.c    |  12 ++
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   5 +
+ .../ethernet/wangxun/txgbevf/txgbevf_main.c   |  12 ++
+ 9 files changed, 342 insertions(+), 19 deletions(-)
 
-The solution to the problem is to use a lock to synchronize each add a route
-to node.
-
-syzbot reported:
-BUG: KASAN: slab-use-after-free in nr_add_node+0x25db/0x2c00 net/netrom/nr_route.c:248
-Read of size 4 at addr ffff888051e6e9b0 by task syz.1.2539/8741
-
-Call Trace:
- <TASK>
- nr_add_node+0x25db/0x2c00 net/netrom/nr_route.c:248
-
-Reported-by: syzbot+2860e75836a08b172755@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=2860e75836a08b172755
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
----
- net/netrom/nr_route.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/netrom/nr_route.c b/net/netrom/nr_route.c
-index b94cb2ffbaf8..ae1e5ee1f52f 100644
---- a/net/netrom/nr_route.c
-+++ b/net/netrom/nr_route.c
-@@ -102,7 +102,9 @@ static int __must_check nr_add_node(ax25_address *nr, const char *mnemonic,
- 	struct nr_neigh *nr_neigh;
- 	int i, found;
- 	struct net_device *odev;
-+	static DEFINE_MUTEX(add_node_lock);
- 
-+	guard(mutex)(&add_node_lock);
- 	if ((odev=nr_dev_get(nr)) != NULL) {	/* Can't add routes to ourself */
- 		dev_put(odev);
- 		return -EINVAL;
 -- 
-2.43.0
+2.48.1
 
 
