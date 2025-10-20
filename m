@@ -1,38 +1,81 @@
-Return-Path: <netdev+bounces-230777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A581BEF4F8
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 06:50:12 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4DEFBEF59C
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 07:24:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF2D918958F2
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 04:50:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7BFF24E1DD0
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 05:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21BA2BEFFD;
-	Mon, 20 Oct 2025 04:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA7317A2F6;
+	Mon, 20 Oct 2025 05:24:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HatCoujX"
 X-Original-To: netdev@vger.kernel.org
-Received: from www.nop.hu (www.nop.hu [80.211.201.218])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 3672618DB1E
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 04:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.211.201.218
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D671C695
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 05:24:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760935807; cv=none; b=TPgMrjDsYa/WaYWXu1Ph12RZaQrkNmbRzLpvaSH/jKSPR6jQCbvKFgTjX5G+z+nhAhgyHTBefHWcFRauKuwkmK8Bj43qh1Ao0jAk2KKaCLVZSx5n2LDu0CDgg6O3O2nWTqU7Nwn/RdJMFkg3onI6pHf7BXirHFjgoaC7UaDFl7c=
+	t=1760937863; cv=none; b=VwCnfPW0Ky/QswHhpRnF9elwidsob7Z5kenPW7t0VTNIQAFP9BWq1K9oJ1co0XKHquzOgOA8G4/NMWxNmUwjVDazAFuTEWiIEJ5oRTerhfoit2Koweoflqze5G8VjFboEFXSp8VNyLw+2N+9QCTK+8+dxKl1yA3wbxVyVQuEJCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760935807; c=relaxed/simple;
-	bh=FU9ZdJS0YivoZ39SmXxiegSacnUpa+qJT4cJbPWyy30=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=urokePEDtTN3R/s73/YdbYiIMViPRCpQWcTg7U2iHG7JW9gkEBk00uWMJ54CxbmriGRBW67dd7DYDwLEleVFBD4a9N+4MZBKPObUHACviIj4RBk4nRIWrzo74zD2Dine0iIeGcpH0Pb2FH2OvINAsp+7b3PDNNG4hhOSpQbSJWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nop.hu; spf=pass smtp.mailfrom=nop.hu; arc=none smtp.client-ip=80.211.201.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nop.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nop.hu
-Received: from 2001:db8:8319::200:11ff:fe11:2222 (helo [IPV6:2001:db8:8319:0:200:11ff:fe11:2222])
-    (reverse as null)
-    by 2001:db8:1101::18 (helo www.nop.hu)
-    (envelope-from csmate@nop.hu) with smtp (freeRouter v25.10.19-cur)
-    for jonathan.lemon@gmail.com sdf@fomichev.me maciej.fijalkowski@intel.com magnus.karlsson@intel.com bjorn@kernel.org 1118437@bugs.debian.org netdev@vger.kernel.org bpf@vger.kernel.org ; Mon, 20 Oct 2025 06:45:06 +0200
-Message-ID: <0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu>
-Date: Mon, 20 Oct 2025 06:45:05 +0200
+	s=arc-20240116; t=1760937863; c=relaxed/simple;
+	bh=nX8mi5Ma9y2HpsiQWQjrPfy1ttHomJpy197YCiz+NBo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tr3NQacR4ukAkvLFAbU2Zp7wuzC/rCGxje1tquxhV9sKuCVPWQQpfpkgF5u9MhTCiRa9V1tGa7kpP+Qj5X2JxkjJ8LUepLHEAJt7nmG+PFVydTBB+CzSZTH57VgRG/fRGz0XRxac8JMSquswrQZw4tORSFG157mDUg1DocjZhuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HatCoujX; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-47106fc51faso46269925e9.0
+        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 22:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760937860; x=1761542660; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wvB82ytjgT5pgp6OZanBb6VXBXMIIhxN6AeB/yR3+AM=;
+        b=HatCoujX6S5jdE9MdXvjcO8rbHVu27a377lr1H/T78HgpZexSAkXcYL38TE2wfY3BB
+         TsW5AI6mxUc6WvBQ3aTeGmkydA+WBdSiVQYR4viEJ8234R0SM8QdGbmZ6PQTCnSrYN/0
+         je4YGelixchtUBqXvexko46tmbnt3yEyQ5OBwuhe6+/7bD+eGDwbklEWQnEStXDKZjrb
+         +6c0AxcCjqbbmtpFHiSLAGLpv9CP79b11w2r8pVxJ1o6CV+HYneys5qzELxSBpgpZF9y
+         /+BYXQHCqiQWyTWYiMkeMSEAQBdkDLu6vgl4ze5jSP2UYPyd7gR/2ZRtoMArj+UWD1mS
+         VU2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760937860; x=1761542660;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wvB82ytjgT5pgp6OZanBb6VXBXMIIhxN6AeB/yR3+AM=;
+        b=D4R8HTh7U4SQ2+IzfxPv32xvEl6yKu3QurFs2ZERbLgedpy9BEdxV4XZphkne9m9aN
+         V0Z4doMaoUUh4aVaBnzwRPjglmf7t07TpSZEg5KgKWNnRrzL2Vwp5XavlmRrPgD6mpap
+         vlhGRCkteSTKh9XeK7WNbXRei/JkId6EcH1tzi5DhZpRPrWO+ZutLfQZ6d/MGW5ha1uJ
+         JPGch0+YohVvPvQ3YFWvahsY0jsEXIxndNrPW6izt3jbaBzozrsApKHOsyQv5jjdxO39
+         ntG2zSp6MnIC2DH1wVWaJ1HWzTN79/MZedliEY95Mb4XpiDrY/3v2qlg3/RuCvd8LCey
+         ArLw==
+X-Forwarded-Encrypted: i=1; AJvYcCX4Rkpx98diJfd9XtxGFsz73dFfcutSaNuEy+KNbDk/hNl3ZUEviNH32+FZIazzNBlzxCJRnxA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMYNFF4+4EazDtzehC0j0ycG+yxkt7BwQOryks1o3Z6Wlne40/
+	NLSZDl4rF/BF08NmspYJX+vjVgOUS10mDMOjwqnGknBn2T9tdQcpeBDK
+X-Gm-Gg: ASbGncvVq1UUkOXCiarU2zJHRLntQxTUrnjWZDlDxde7PAEodBXwrPh1XPL6RykgoTL
+	prJ1wt8oePqGuuE4QARCNL/wUUnOm5FKqS7ObzCvGWigOFXRFLYkuXeyWMSxllbkzYa02gJiLbz
+	jfJGQLO7abaNtiuB4IBXLyQeS+SWbvAb6diCDywksiCcUPHD2iirBf0PSme+KUErUWpQjXV/Q87
+	62t2eofEkcE070OdEz8meycW+wg2aLrKVdQr0UdRwqVUf5VfgsgF/M6YIbD6lw3c8ydOo0ir6Dv
+	EkqCk0J8PA5ugx2fUpW8Fd0N296R5Zqofcg7JpPN4wt3KpQSQFx3OBrRwA2jlFAugJhNYfTvYYS
+	VUy0MlQKtKvQ3xICmogFZybUO/HUBflhFmqDBJtCDtMrA5tKQ86LqSHEvK1OO8G7v4Swqo1pCEG
+	AKta3x72cX6V52Bj8uH92I0YBIp4g=
+X-Google-Smtp-Source: AGHT+IHMPiPrLhYf2nQuKpjwBNAfFzeLWk8/FSZzrwQyeD2rQ7yFW/E5p9iKyF96R8UCv0mBEC4Lrg==
+X-Received: by 2002:a05:600c:3b8d:b0:46d:27b7:e7e5 with SMTP id 5b1f17b1804b1-47117917572mr104835275e9.32.1760937860191;
+        Sun, 19 Oct 2025 22:24:20 -0700 (PDT)
+Received: from [10.80.3.86] ([72.25.96.18])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-471144d17cdsm208498495e9.18.2025.10.19.22.24.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 19 Oct 2025 22:24:19 -0700 (PDT)
+Message-ID: <4dde7c9e-92ac-43b4-b5c8-a60c92849878@gmail.com>
+Date: Mon, 20 Oct 2025 08:24:19 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -40,220 +83,112 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V7 net-next 02/11] net/mlx5: Implement cqe_compress_type
+ via devlink params
+To: Daniel Zahka <daniel.zahka@gmail.com>, Saeed Mahameed <saeed@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+ Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+ Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, Simon Horman <horms@kernel.org>
+References: <20250907012953.301746-1-saeed@kernel.org>
+ <20250907012953.301746-3-saeed@kernel.org>
+ <ec51df17-260e-4ec9-a44a-9f0c3d3a2766@gmail.com>
+ <d4ee68d6-7f57-4b24-970f-41a944a22481@gmail.com>
 Content-Language: en-US
-To: Jonathan Lemon <jonathan.lemon@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Magnus Karlsson <magnus.karlsson@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>
-Cc: 1118437@bugs.debian.org, netdev@vger.kernel.org, bpf@vger.kernel.org
-From: mc36 <csmate@nop.hu>
-Subject: null pointer dereference in interrupt after receiving an ip packet on
- veth from xsk from user space
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <d4ee68d6-7f57-4b24-970f-41a944a22481@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-hi,
-
-freertr.org xsk dataplane is triggering a null pointer de-reference after sending
-
-a single ip packet from user space to an xsk socket bound to a veth interface.
-
-the same code works fine when using physical interfaces to send packets to...
-
-it does not matter if an ip address is assigned to the veth pair or not...
-
-please find below the reproducer code with some comments on how to use it...
-
-tldr: create a veth pair, bring them up, compile and run the c code...
-
-this happens 10/10 on host or in qemu-system-x86_64-kvm running 6.16.12 or 6.17.2...
-
-if it does not belongs here, just let me know....
-
-have a nice day,
-
-csaba
-
-
-------------------------------------------------------[cut]---------------------------------------------------------
-
-
-p4emu login: [  119.074634] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[  119.076747] #PF: supervisor read access in kernel mode
-[  119.078334] #PF: error_code(0x0000) - not-present page
-[  119.079855] PGD 0 P4D 0
-[  119.080648] Oops: Oops: 0000 [#1] SMP NOPTI
-[  119.081993] CPU: 2 UID: 1 PID: 927 Comm: p4xsk.bin Not tainted 6.16.12+deb14-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.16.12-1
-[  119.085247] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
-[  119.088065] RIP: 0010:xsk_destruct_skb+0xd0/0x180
-[  119.089502] Code: 40 10 48 89 cf 89 28 e8 9e 7e 07 00 48 89 df 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 c8 cc da ff 48 8b 7b 30 4c 8d 5b 30 <48> 8b 07 4c 8d 67 f8 4c 8d 70 
-f8 49 39 fb 74 b7 48 89 5c 24 10 4c
-[  119.094947] RSP: 0018:ffffcd5b4012cd48 EFLAGS: 00010002
-[  119.096499] RAX: ffffcd5b40fcf000 RBX: ffff898e05dfcf00 RCX: ffff898e043cf9e8
-[  119.098612] RDX: ffff898e048ccc80 RSI: 0000000000000246 RDI: 0000000000000000
-[  119.100687] RBP: 0000000000000001 R08: 0000000000000000 R09: ffff898e01d21900
-[  119.102794] R10: 0000000000000000 R11: ffff898e05dfcf30 R12: ffff898e05f95000
-[  119.104880] R13: ffff898e043cf900 R14: ffff898e7dd32bd0 R15: 0000000000000002
-[  119.107000] FS:  00007f0cd9e0a6c0(0000) GS:ffff898ede530000(0000) knlGS:0000000000000000
-[  119.109358] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  119.111080] CR2: 0000000000000000 CR3: 00000000043ba003 CR4: 0000000000372ef0
-[  119.113175] Call Trace:
-[  119.113996]  <IRQ>
-[  119.114662]  ? napi_complete_done+0x7a/0x1a0
-[  119.115952]  ip_rcv_core+0x1bb/0x340
-[  119.117050]  ip_rcv+0x30/0x1f0
-[  119.118014]  __netif_receive_skb_one_core+0x85/0xa0
-[  119.119468]  process_backlog+0x87/0x130
-[  119.120617]  __napi_poll+0x28/0x180
-[  119.121685]  net_rx_action+0x339/0x420
-[  119.122850]  handle_softirqs+0xdc/0x320
-[  119.124003]  ? handle_edge_irq+0x90/0x1e0
-[  119.125218]  do_softirq.part.0+0x3b/0x60
-[  119.126422]  </IRQ>
-[  119.127085]  <TASK>
-[  119.127753]  __local_bh_enable_ip+0x60/0x70
-[  119.128998]  __dev_direct_xmit+0x14e/0x1f0
-[  119.130128]  __xsk_generic_xmit+0x482/0xb70
-[  119.131184]  ? __remove_hrtimer+0x41/0xa0
-[  119.132199]  ? __xsk_generic_xmit+0x51/0xb70
-[  119.133300]  ? _raw_spin_unlock_irqrestore+0xe/0x40
-[  119.134637]  xsk_sendmsg+0xda/0x1c0
-[  119.135580]  __sys_sendto+0x1ee/0x200
-[  119.136509]  __x64_sys_sendto+0x24/0x30
-[  119.137493]  do_syscall_64+0x84/0x2f0
-[  119.138452]  ? __pfx_pollwake+0x10/0x10
-[  119.139454]  ? __rseq_handle_notify_resume+0xad/0x4c0
-[  119.140718]  ? restore_fpregs_from_fpstate+0x3c/0x90
-[  119.141999]  ? switch_fpu_return+0x5b/0xe0
-[  119.143023]  ? do_syscall_64+0x204/0x2f0
-[  119.144007]  ? do_syscall_64+0x204/0x2f0
-[  119.144990]  ? do_syscall_64+0x204/0x2f0
-[  119.146022]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  119.147278] RIP: 0033:0x7f0cde0a49ee
-[  119.148217] Code: 08 0f 85 f5 4b ff ff 49 89 fb 48 89 f0 48 89 d7 48 89 ce 4c 89 c2 4d 89 ca 4c 8b 44 24 08 4c 8b 4c 24 10 4c 89 5c 24 08 0f 05 <c3> 66 2e 0f 1f 84 00 00 00 00 
-00 0f 1f 80 00 00 00 00 48 83 ec 08
-[  119.152877] RSP: 002b:00007f0cd9e09c98 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-[  119.154774] RAX: ffffffffffffffda RBX: 00007f0cd9e0a6c0 RCX: 00007f0cde0a49ee
-[  119.156526] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000029
-[  119.158317] RBP: 0000000000000005 R08: 0000000000000000 R09: 0000000000000000
-[  119.160078] R10: 0000000000000040 R11: 0000000000000246 R12: 0000000000000405
-[  119.161893] R13: 00007f0ccc055ce0 R14: 0000000000000001 R15: 00007f0cde8db900
-[  119.163646]  </TASK>
-[  119.164243] Modules linked in: veth intel_rapl_msr intel_rapl_common iosf_mbi binfmt_misc kvm_intel kvm irqbypass ghash_clmulni_intel sha512_ssse3 sha1_ssse3 aesni_intel rapl 
-button evdev sg efi_pstore configfs nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg ip_tables x_tables autofs4 sd_mod 
-sr_mod cdrom ata_generic ata_piix libata virtio_net scsi_mod net_failover serio_raw failover scsi_common
-[  119.174216] CR2: 0000000000000000
-[  119.175068] ---[ end trace 0000000000000000 ]---
-[  119.176224] RIP: 0010:xsk_destruct_skb+0xd0/0x180
-[  119.177432] Code: 40 10 48 89 cf 89 28 e8 9e 7e 07 00 48 89 df 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 c8 cc da ff 48 8b 7b 30 4c 8d 5b 30 <48> 8b 07 4c 8d 67 f8 4c 8d 70 
-f8 49 39 fb 74 b7 48 89 5c 24 10 4c
-[  119.182155] RSP: 0018:ffffcd5b4012cd48 EFLAGS: 00010002
-[  119.183462] RAX: ffffcd5b40fcf000 RBX: ffff898e05dfcf00 RCX: ffff898e043cf9e8
-[  119.185237] RDX: ffff898e048ccc80 RSI: 0000000000000246 RDI: 0000000000000000
-[  119.187022] RBP: 0000000000000001 R08: 0000000000000000 R09: ffff898e01d21900
-[  119.188872] R10: 0000000000000000 R11: ffff898e05dfcf30 R12: ffff898e05f95000
-[  119.190693] R13: ffff898e043cf900 R14: ffff898e7dd32bd0 R15: 0000000000000002
-[  119.192655] FS:  00007f0cd9e0a6c0(0000) GS:ffff898ede530000(0000) knlGS:0000000000000000
-[  119.194681] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  119.196244] CR2: 0000000000000000 CR3: 00000000043ba003 CR4: 0000000000372ef0
-[  119.198034] Kernel panic - not syncing: Fatal exception in interrupt
-[  119.199761] Kernel Offset: 0x1c000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-[  119.202403] ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
-
-
-------------------------------------------------------[cut]---------------------------------------------------------
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <pthread.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <poll.h>
-#include <linux/if_link.h>
-#include <xdp/xsk.h>
-
-////// gcc xskInt.c -lxdp
-////// sudo ip link add veth1 type veth
-////// sudo ip link set veth0 up
-////// sudo ip link set veth1 up
-////// sudo ./a.out
-
-void err(char*buf) {
-     printf("%s\n", buf);
-     _exit(1);
-}
+Content-Transfer-Encoding: 8bit
 
 
 
+On 18/10/2025 0:54, Daniel Zahka wrote:
+> 
+> 
+> On 10/17/25 5:51 PM, Daniel Zahka wrote:
+>>
+>>
+>> On 9/6/25 9:29 PM, Saeed Mahameed wrote:
+>>> From: Saeed Mahameed <saeedm@nvidia.com>
+>>>
+>>> Selects which algorithm should be used by the NIC in order to decide 
+>>> rate of
+>>> CQE compression dependeng on PCIe bus conditions.
+>>>
+>>> Supported values:
+>>>
+>>> 1) balanced, merges fewer CQEs, resulting in a moderate compression 
+>>> ratio
+>>>     but maintaining a balance between bandwidth savings and performance
+>>> 2) aggressive, merges more CQEs into a single entry, achieving a higher
+>>>     compression rate and maximizing performance, particularly under high
+>>>     traffic loads.
+>>>
+>>
+>> Hello,
+>>
+>> I'm facing some issues when trying to use the devlink param introduced 
+>> in this patch. I have a multihost system with two hosts per CX7.
+>>
+>> My NIC is:
+>> $ lshw -C net
+>>   *-network
+>>        description: Ethernet interface
+>>        product: MT2910 Family [ConnectX-7]
+>>        vendor: Mellanox Technologies
+>>
+>> My fw version is: 28.43.1014
+>>
+>> To reproduce the problem I simply read the current cqe_compress_type 
+>> setting and then change it:
+>>
+>> $ devlink dev param show pci/0000:56:00.0 name cqe_compress_type
+>> pci/0000:56:00.0:
+>>   name cqe_compress_type type driver-specific
+>>     values:
+>>       cmode permanent value balanced
+>>
+>> $ devlink dev param set pci/0000:56:00.0 name cqe_compress_type value 
+>> "aggressive" cmode permanent
+>> kernel answers: Connection timed out
+>>
+>> from dmesg:
+>> [  257.111349] mlx5_core 0000:56:00.0: 
+>> wait_func_handle_exec_timeout:1159:(pid 72061): cmd[0]: 
+>> ACCESS_REG(0x805) No done completion
+>> [  257.137072] mlx5_core 0000:56:00.0: wait_func:1189:(pid 72061): 
+>> ACCESS_REG(0x805) timeout. Will cause a leak of a command resource
+>> [  270.871521] mlx5_core 0000:56:00.0: mlx5_cmd_comp_handler:1709:(pid 
+>> 0): Command completion arrived after timeout (entry idx = 0).
+>>
+>>
+>> subsequent attempts to use mstfwreset hang:
+>>
+>> $ ./mstfwreset -y -d 56:00.0 reset
+>> -E- Failed to send Register MFRL: Timed out trying to take the ICMD 
+>> semaphore (520).
+>>
+>> I can toggle the parameter ok using the mstconfig binary built from 
+>> the mstflint github repo.
+>>
+>> Let me know if I can provide any more information.
+>>
+>> Daniel
+> 
+> Sorry, I should have mentioned my kernel version. It is a vanilla net- 
+> next kernel from:
+> 1c51450f1aff ("tcp: better handle TCP_TX_DELAY on established flows")
+> 
+> 
 
-int main(int argc, char **argv) {
+Hi Daniel,
 
-     int bpf_flag = XDP_FLAGS_SKB_MODE;
+Thanks for your report.
+We'll look into it and reply shortly.
 
-     char ifaceName[] = "veth0";
-     printf("opening interface %s\n", ifaceName);
-
-#define framesNum 1024
-
-struct xsk_umem *ifaceUmem;
-struct xsk_socket *ifaceXsk;
-struct xsk_ring_prod ifaceFq;
-struct xsk_ring_cons ifaceCq;
-struct xsk_ring_cons ifaceRx;
-struct xsk_ring_prod ifaceTx;
-char *ifaceBuf;
-struct pollfd ifacePfd;
-
-     posix_memalign((void**)&ifaceBuf, getpagesize(), XSK_UMEM__DEFAULT_FRAME_SIZE * 2 * framesNum);
-     if (ifaceBuf == NULL) err("error allocating buffer");
-
-     if (xsk_umem__create(&ifaceUmem, ifaceBuf, XSK_UMEM__DEFAULT_FRAME_SIZE * 2 * framesNum, &ifaceFq, &ifaceCq, NULL) != 0) err("error creating umem");
-
-     struct xsk_socket_config cfg;
-     memset(&cfg, 0, sizeof(cfg));
-     cfg.rx_size = XSK_RING_CONS__DEFAULT_NUM_DESCS;
-     cfg.tx_size = XSK_RING_PROD__DEFAULT_NUM_DESCS;
-     cfg.xdp_flags = bpf_flag;
-     if (xsk_socket__create(&ifaceXsk, ifaceName, 0, ifaceUmem, &ifaceRx, &ifaceTx, &cfg) != 0) err("error creating xsk");
-
-     unsigned int i = 0;
-     xsk_ring_prod__reserve(&ifaceFq, framesNum, &i);
-     for (i=0; i < framesNum; i++) *xsk_ring_prod__fill_addr(&ifaceFq, i) = i * XSK_UMEM__DEFAULT_FRAME_SIZE;
-     xsk_ring_prod__submit(&ifaceFq, framesNum);
-
-     memset(&ifacePfd, 0, sizeof (ifacePfd));
-     ifacePfd.fd = xsk_socket__fd(ifaceXsk);
-     ifacePfd.events = POLLIN | POLLERR;
-
-     setgid(1);
-     setuid(1);
-     printf("serving others\n");
-
-
-unsigned char bufD[] = {0x3a, 0x10, 0x5c, 0x53, 0xb3, 0x5c, 0x0, 0x1e, 0x11, 0x4c, 0x7e, 0x66, 0x8, 0x0, 0x45, 0x0, 0x0, 0x40, 0x0, 0x0, 0x0, 0x0, 0xff, 0x1, 0xb7, 0xa0, 0x1, 0x1, 
-0x1, 0xd, 0x1, 0x1, 0x1, 0xe, 0x8, 0x0, 0xa5, 0xfd, 0x16, 0x3b, 0x3b, 0xc7, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
-0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
-int bufS = sizeof(bufD);
-
-         unsigned int idx;
-         idx = xsk_ring_cons__peek(&ifaceCq, 16, &idx);
-         xsk_ring_cons__release(&ifaceCq, idx);
-         if (xsk_ring_prod__reserve(&ifaceTx, 1, &idx) < 1) err("error getting index");
-         struct xdp_desc *dsc = xsk_ring_prod__tx_desc(&ifaceTx, idx);
-         dsc->addr = (framesNum + (idx % framesNum)) * XSK_UMEM__DEFAULT_FRAME_SIZE;
-         dsc->options = 0;
-         dsc->len = bufS;
-         memcpy(ifaceBuf + dsc->addr, bufD, bufS);
-         xsk_ring_prod__submit(&ifaceTx, 1);
-         if (!xsk_ring_prod__needs_wakeup(&ifaceTx)) err("error waking up");
-         sendto(xsk_socket__fd(ifaceXsk), NULL, 0, MSG_DONTWAIT, NULL, 0);
-
-     sleep(10);
-}
+Regards,
+Tariq
 
 
