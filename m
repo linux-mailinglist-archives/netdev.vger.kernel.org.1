@@ -1,58 +1,51 @@
-Return-Path: <netdev+bounces-230921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56549BF1BF0
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:11:27 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70DE8BF1CE7
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:21:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0441B4057E4
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:11:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D09B04E1D25
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:20:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4814730F7EB;
-	Mon, 20 Oct 2025 14:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IgMnt/ya"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299E330595A;
+	Mon, 20 Oct 2025 14:20:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEC3136351;
-	Mon, 20 Oct 2025 14:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057182FD7B2;
+	Mon, 20 Oct 2025 14:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760969482; cv=none; b=C+OkT6NEgXXIUT0pOl4mPODGwpd2UAgfMGKBHbPvlBf60sW9FHt9K5bwFGpOMaKfSRI6/OXCt6WxfcOaqsZtVQtGRf4X+lLLuzS7gWOG01Vg+FJw10C85Pgansgle94fdH9KbIQffEDPA5edf5a+3tS0MFLZ/Kfr+uPkLdAlQdE=
+	t=1760970047; cv=none; b=RUowt71V8KwrvrWkkKBQPji/h+OXsGz7ZQht8CUZ7se+GErFHZA5Pa/jk0drg32HWVXVvxCnsBMVY05uK1fvvb2wZkLq0A3sBL7KUnqx8jppz6VVHA05O5MzMs2NwmPb+P+MMHdfntX3GaBwQsyh/23UI7hidYIHi3SZVo7CsUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760969482; c=relaxed/simple;
-	bh=AWyMZLPpj4ENw762AewDNXUr7Eumkj4BikItwdTH+fE=;
+	s=arc-20240116; t=1760970047; c=relaxed/simple;
+	bh=Svv7NMXFNpj2k34olEOUeJp95lr/GE8kZLjPFyLzbtc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rS17j2r3O74BgvWcydeuGue+Av8mVGaNnbzYNikPcDpYGpCM1daJeHrmIYAsPCxkUGRvuv0S2+voZov5ADfVLrH6pEoPm0tAb6DXd8H+eKHpeylAPcLjyRXDtRW4cWOsqLiuz6gCDhq10UgU3F/SbaWNjtvhC+JcqltRLGxTMv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IgMnt/ya; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B81D3C4CEF9;
-	Mon, 20 Oct 2025 14:11:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760969481;
-	bh=AWyMZLPpj4ENw762AewDNXUr7Eumkj4BikItwdTH+fE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IgMnt/ya+DM5yOX9/Tnv+MzuKsmiHnRLP0fRx83j83IhZR1nmOMuWjCnDS8erEx3S
-	 LMRFhSJWkB+mJh1RJNM4HSJLYQ7r3qo3KLfysl1pWlnVNeMdm1YA1iDteCfmOmKnJ5
-	 h1yjaMg3v+vugGcWDwoeEiIcsKGGByctO23gwo0S6iMxLr9pBN3iLP+lzfLBoakrFM
-	 wuy/8R2lzgCPdnnlN05KaFJ8eDlHaX4pEXVw55I27uvFdeJwZUSxA5v+2RGEl1Z6F4
-	 uI4sa8mBJZsWmT66JTJsf5BPE9MUtK1+hbsshuBc4nSPRgl0msbmox+JMa0siRJzrU
-	 axTFET/5cqglg==
-Date: Mon, 20 Oct 2025 15:11:17 +0100
-From: Simon Horman <horms@kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org, linux-hams@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
-Subject: Re: [PATCH] Documentation: networking: ax25: update the mailing list
- info.
-Message-ID: <aPZDBZ9JXn2bwo9t@horms.kernel.org>
-References: <20251020052716.3136773-1-rdunlap@infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=F7KLuMUu5nZhOvO+ZgqHY1H1/rKMhbTzHzAemJxHJSQUHDMUTmzVg2dbgw16Swdh/w04V2ohFZRKvOvcjLDfr840wTLPOnER724ZGr/wmov+WSXd8IE554LwJ7X4WJQsUUo2GGduSsWsaceTnti9bDxBv8/3Dz2xIttU+OVo7V0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 95C3A618FC; Mon, 20 Oct 2025 16:20:36 +0200 (CEST)
+Date: Mon, 20 Oct 2025 16:20:36 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Andrii Melnychenko <a.melnychenko@vyos.io>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, phil@nwl.cc,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/1] nf_conntrack_ftp: Added nfct_seqadj_ext_add() for
+ ftp's conntrack.
+Message-ID: <aPZFNBNXlyq0Q5dM@strlen.de>
+References: <20251016104802.567812-1-a.melnychenko@vyos.io>
+ <20251016104802.567812-2-a.melnychenko@vyos.io>
+ <aPDU6i1HKhy5v-nh@strlen.de>
+ <CANhDHd-k2Ros8nFo4fNi=-Mu1DxkK4A2MgLYjuDqPwpfJYYfdw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,14 +54,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251020052716.3136773-1-rdunlap@infradead.org>
+In-Reply-To: <CANhDHd-k2Ros8nFo4fNi=-Mu1DxkK4A2MgLYjuDqPwpfJYYfdw@mail.gmail.com>
 
-On Sun, Oct 19, 2025 at 10:27:16PM -0700, Randy Dunlap wrote:
-> Update the mailing list subscription information for the linux-hams
-> mailing list.
-> 
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Andrii Melnychenko <a.melnychenko@vyos.io> wrote:
+> I've researched the issue a bit. Despite the fact that in `nf_nat_ftp()`
+> the helper for the expected connection is installed, it isn't executed in
+> the following functions - `nf_nat_mangle_tcp_packet()`. Also, shouldn't the
+> logic of `nf_nat_follow_master` affect the "upcoming" passive FTP
+> connection?
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Yes, but we need the seqadj extension on the control connection to
+rewrite the announced address to connect to/from.
 
+nf_nat_setup_info() takes care of this but only for template-based
+helper assignment, not for the explicit assign done via
+nft_ct_helper_obj_eval().
+
+> I've also checked the setup of `nfct_seqadj_ext_add()` in the
+> `ft_ct_helper_obj_eval()` routine - it works. However, now the seqadj would
+> be added to all "NATed" conntrack helpers.
+
+Yes.
+
+> Maybe it's better to leave the
+> seqadj setup in `nf_conntrack_ftp`, so it would apply explicitly to FTP
+> traffic, but with an additional `(ct->status & IPS_NAT_MASK)` check?
+
+As-is, almost all the helpers are broken when used with nat and assignment
+via nft objref infra.  We could add some annotation to those that don't
+need seqadj, but afaics thats just the netbios helper.
+
+> I can prepare a new patch with changes in either `nft_ct` or
+> `nf_conntrack_ftp`.
+> Any suggestions?
+
+Thanks, please fix nft_ct infra.  Does the above make sense to you?
 
