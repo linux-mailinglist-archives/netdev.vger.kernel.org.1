@@ -1,132 +1,196 @@
-Return-Path: <netdev+bounces-230841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D292BF059B
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 11:59:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5828BF060E
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:04:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 39B5C34AE6D
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 09:59:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94D2418A089E
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 10:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D932F5A24;
-	Mon, 20 Oct 2025 09:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A1D2F60D8;
+	Mon, 20 Oct 2025 10:04:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="dTu5efRN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iDCEeMvs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC852F549F
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 09:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D3A227EB9
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 10:04:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760954351; cv=none; b=ZrR4r2aPMaPFPjZ63jg5xmCIZrMv0frWcpuWHBPfRO+D/honpq9g7LfavGXkrhCHYpP+ab7HqC6bjQMW83s+6S2nArS8tfCrN/qW68WM5oaOjBiYPbyjqrppfv+zI/5d3RHfyfk92/HM7rnwzsT0zLhiuB5E9h5p7cf599IIkb0=
+	t=1760954658; cv=none; b=bQ0XkXEPwJVcwwjghLKS2SOS6rI5M3kdNhXXLWbmvfsjwQPdlDAE1zpMnA23gYOnYsOU/2lOrbwr+xfU07yDgTzFwdrocqCyhdBwhICmEoKLyYB6nEi2CoCOXsrtavR63CdQGxCN63BYCEIyb0rnZeGo4vQRUXwoE9zvbc7MH2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760954351; c=relaxed/simple;
-	bh=ZSDbv8UlMSHFAFD+gGT2cT7LwU/FgU1QX/eiSXzzvFE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DXUrWqshhpGgd6ZdsFhr6T2ygsw5dimcja5rTf5hJ8S8OsGUlCFWiENWvexGxNQyiX5/SPGEtak51d4BfMklL8bm7a0vVbeGoZT16f+iu5TT06rbVrhzVpXXz+8Q6wT0BwubgUZIm2TOvdDs8Kj52OwDra/CvrrhILR+XOeJr3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=dTu5efRN; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-421851bcb25so2407498f8f.2
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 02:59:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1760954348; x=1761559148; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W5WwbPJy3dr09yj6fDu2QPGisWoiFmbonzsrinPO0AM=;
-        b=dTu5efRNfpOcXQ/wrwncAUVQX3FXQyrn0P4LLY0cz+tI1if+fI4fm/RG/9YMU5dlCO
-         M+7OCYS6fifxFfFmjShEizpIMVPiJhpQ+K1NE31F/kHyiwCMUieImVPKAYaa4ZH+DY98
-         Nqz3FOlonBHSnLk6eKqvDU6aC8Ud6/4Dyp0h7urKcK+TTbElUQ2dtM69MbHBjuGAjwkc
-         ATzLehfkMMl6mjpcugLgVleJm2pF1LteYGj3Vj1qB25t9xf5+9oKxmiYjpqSJDPVPvZr
-         EjC9/FqbZRIjR/sQH/VnWe3ExVvMSrH1tRh3Dk0X84U6yPC00zEx4sLzCevKtLWQopnL
-         AT4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760954348; x=1761559148;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W5WwbPJy3dr09yj6fDu2QPGisWoiFmbonzsrinPO0AM=;
-        b=phkSEdYN0bFnv1O95QMhw1NMgO9aOTqZv+CWA97iJ+trZKrEmp/xMHrSkf9Ozsc8Nx
-         jWBE87ZwchM7ikGVfpYfnY1ssFZWAcNLRaT4Iw9bm/OtUgZ4YYiCn2kHjYSK+Xdi1Co5
-         5vYSGNAXo1bSot5En3zJdknbvK7EcRgklr8yibJN3La01y7eRFtlSWBaZX6KGpMLhwbU
-         KQd/+K8QkVM2XdD3TKXn31hJ01qP6KgGUS3+945kJvJmgjHHYJyUehduF3ZZduh3aM0h
-         fTzvF1Hrx7UTI/ea7dwpyqNfLlm5p1y22bcjRUIHrPOpiA0v7tnsvFcwpjvcIlFIMs8E
-         xn5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWEYHY/ujLejF+YwFwweNiGG8e7mvh3bhtyfd57euiqEzGE1h+C6UEeZ+hNH77MVIZ7X44CsCw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGrecCgj9780ZvoeCx8hlkOpF2v++tLlpC0kfmagI3d4rn1HSi
-	71s/1JaB+W8rBoMommSOYyrZLHOeYdhvj6qM2ve1dWDsYRvCPSdiLPjnmCTmpT+uhfOjTkWso75
-	wx43a
-X-Gm-Gg: ASbGncuzZo2vGPy+hxEcIRmEg9iPoMIsjahxtpJCNcxW4AKXJUFEUATOQraJmr3IX8+
-	H4Ao2Pe3yRq2zz29dSeSdNacOuQL/1QJ176DCgL4FchDXfNIuEvRdq3wUC7ArJxdmavUBCTKkuc
-	ZOJ6ronDBmiu+X8HG8W872+/WgryweNGJ6Yrf/TfvztOeR19Hrc4vKvOyNsIH2Iblk862bJMC3z
-	lPtWQxIwMP0tN+omjxFcBBHGaAIlzgafx3CHi0yN1wBVgyuOjWbbYAM8JdeJVZQQ0mY+XyTqkyJ
-	uJ94Z9buYbffVTbWxMJjB5T3nLuz0Ma5zE+ZlVrHvsYeGeen4bJREBa/03Tb0EvrDLiwu855nrn
-	FEBwfmNbX+1xSFsgpYMLodnfFZcnpmSQ3N0qx1OABPWzYx2TFGi2o6PQAiJDgQI/DHDg4pdYGX6
-	ygMvnf1WWWFnIthdpCwxUVVKAUFoO3U6glRMszPzGeCEF8B9i/o3E9lA==
-X-Google-Smtp-Source: AGHT+IE3ui301egTRkS1EBW9zfJFFPQqZ7wTD2FcKQUH0Z4fvTMGlnxqlMPF1f5QM98LsZBZJDZalw==
-X-Received: by 2002:adf:e18d:0:b0:427:6c6:4e31 with SMTP id ffacd0b85a97d-42706c64e42mr8688313f8f.22.1760954347660;
-        Mon, 20 Oct 2025 02:59:07 -0700 (PDT)
-Received: from ?IPV6:2001:a61:135e:6601:24e0:f40b:1a23:7445? ([2001:a61:135e:6601:24e0:f40b:1a23:7445])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427f00b9fa8sm14659135f8f.38.2025.10.20.02.59.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Oct 2025 02:59:07 -0700 (PDT)
-Message-ID: <2fae9966-5e3a-488b-8ab5-51d46488e097@suse.com>
-Date: Mon, 20 Oct 2025 11:59:06 +0200
+	s=arc-20240116; t=1760954658; c=relaxed/simple;
+	bh=9J53g8OkOar041dBgVIu5tJM5irhNs/KlVbqvUfq4f4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SKxj1Hp9ZlJXt7pqsWQD2nRU3znOwKoCd48eogavt+xD+dbtG3wcW840n+LKgxTcf4F89Llzy2KxBKLeCXLKnYAyEMPUARkYXRuSoVQVahL3T+ZlsDB5itwRTAapwsNv/jBTYv7Zpo9MXwEaSjddHqryZu+cBi69wrJYmu270QY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iDCEeMvs; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760954656; x=1792490656;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9J53g8OkOar041dBgVIu5tJM5irhNs/KlVbqvUfq4f4=;
+  b=iDCEeMvst115oGi2wD0PHXcvvGl4V5QN23zWhDCMJtwGNDW2nnH8fTSu
+   UAEBcGeci0aWV3bzMlvuDuStN3TTLFXipKbxettN/v+RCjcdzklWFYNSC
+   D7khwG+zh41LZIhdEzAYmtFayuKVbjHrhiBTA8Y+b3HX16bx5/2gdB57I
+   tvpakuylFKs4I+39lJGfB4Lb9/mghmmA1E4Gie1AcSvLHck4psK+WALR/
+   cdsEDu4q90suej+3VgbSo11WOTKFaX2G8NdJJsQ0groneoL+UJb7W4Jaa
+   MSfq1wcXg2BjzRE9MdP1BxMigZMNzYtVr9u4toFUbF+DXQ8pgryMfHCud
+   g==;
+X-CSE-ConnectionGUID: vyjDNPcdRn2qM5/1VKapSQ==
+X-CSE-MsgGUID: QDxmWk58SpiKIfBt9EBS4Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="62986203"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="62986203"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2025 03:04:16 -0700
+X-CSE-ConnectionGUID: AIRKNdgyS9Ky68AKUzdH6g==
+X-CSE-MsgGUID: grlaK72RQVW7I3b2gwIHIw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,242,1754982000"; 
+   d="scan'208";a="188390664"
+Received: from gklab-003-001.igk.intel.com ([10.91.173.48])
+  by orviesa005.jf.intel.com with ESMTP; 20 Oct 2025 03:04:15 -0700
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	vadim.fedorenko@linux.dev,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH v2 iwl-net] ice: fix PTP cleanup on driver removal in error path
+Date: Mon, 20 Oct 2025 12:02:16 +0200
+Message-Id: <20251020100216.4144401-1-grzegorz.nitka@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v5 2/3] net: usb: ax88179_178a: add USB device driver
- for config selection
-To: Michal Pecio <michal.pecio@gmail.com>,
- Alan Stern <stern@rowland.harvard.edu>
-Cc: yicongsrfy@163.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, oliver@neukum.org, pabeni@redhat.com
-References: <20251013110753.0f640774.michal.pecio@gmail.com>
- <20251017024229.1959295-1-yicongsrfy@163.com>
- <db3db4c6-d019-49d0-92ad-96427341589c@rowland.harvard.edu>
- <20251017191511.6dd841e9.michal.pecio@gmail.com>
- <bda50568-a05d-4241-adbe-18efb2251d6e@rowland.harvard.edu>
- <20251018172156.69e93897.michal.pecio@gmail.com>
-Content-Language: en-US
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <20251018172156.69e93897.michal.pecio@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 18.10.25 17:21, Michal Pecio wrote:
+Improve the cleanup on releasing PTP resources in error path.
+The error case might happen either at the driver probe and PTP
+feature initialization or on PTP restart (errors in reset handling, NVM
+update etc). In both cases, calls to PF PTP cleanup (ice_ptp_cleanup_pf
+function) and 'ps_lock' mutex deinitialization were missed.
+Additionally, ptp clock was not unregistered in the latter case.
 
-> index e85105939af8..1d2c5ebc81ab 100644
-> --- a/include/linux/usb.h
-> +++ b/include/linux/usb.h
-> @@ -1202,6 +1202,8 @@ extern ssize_t usb_show_dynids(struct usb_dynids *dynids, char *buf);
->    * @post_reset: Called by usb_reset_device() after the device
->    *	has been reset
->    * @shutdown: Called at shut-down time to quiesce the device.
-> + * @preferred: Check if this driver is preferred over generic class drivers
-> + *	applicable to the device. May probe device with control transfers.
->    * @id_table: USB drivers use ID table to support hotplugging.
->    *	Export this with MODULE_DEVICE_TABLE(usb,...).  This must be set
->    *	or your driver's probe function will never get called.
-> @@ -1255,6 +1257,8 @@ struct usb_driver {
->   
->   	void (*shutdown)(struct usb_interface *intf);
->   
-> +	bool (*preferred)(struct usb_device *udev);
+Keep PTP state as 'uninitialized' on init to distinguish between error
+scenarios and to avoid resource release duplication at driver removal.
 
-I am sorry, but this is a bit clunky. If you really want to
-introduce such a method, why not just return the preferred configuration?
+The consequence of missing ice_ptp_cleanup_pf call is the following call
+trace dumped when ice_adapter object is freed (port list is not empty,
+as it is required at this stage):
 
-	Regards
-		Oliver
+[  T93022] ------------[ cut here ]------------
+[  T93022] WARNING: CPU: 10 PID: 93022 at
+ice/ice_adapter.c:67 ice_adapter_put+0xef/0x100 [ice]
+...
+[  T93022] RIP: 0010:ice_adapter_put+0xef/0x100 [ice]
+...
+[  T93022] Call Trace:
+[  T93022]  <TASK>
+[  T93022]  ? ice_adapter_put+0xef/0x100 [ice
+33d2647ad4f6d866d41eefff1806df37c68aef0c]
+[  T93022]  ? __warn.cold+0xb0/0x10e
+[  T93022]  ? ice_adapter_put+0xef/0x100 [ice
+33d2647ad4f6d866d41eefff1806df37c68aef0c]
+[  T93022]  ? report_bug+0xd8/0x150
+[  T93022]  ? handle_bug+0xe9/0x110
+[  T93022]  ? exc_invalid_op+0x17/0x70
+[  T93022]  ? asm_exc_invalid_op+0x1a/0x20
+[  T93022]  ? ice_adapter_put+0xef/0x100 [ice
+33d2647ad4f6d866d41eefff1806df37c68aef0c]
+[  T93022]  pci_device_remove+0x42/0xb0
+[  T93022]  device_release_driver_internal+0x19f/0x200
+[  T93022]  driver_detach+0x48/0x90
+[  T93022]  bus_remove_driver+0x70/0xf0
+[  T93022]  pci_unregister_driver+0x42/0xb0
+[  T93022]  ice_module_exit+0x10/0xdb0 [ice
+33d2647ad4f6d866d41eefff1806df37c68aef0c]
+...
+[  T93022] ---[ end trace 0000000000000000 ]---
+[  T93022] ice: module unloaded
+
+Fixes: e800654e85b5 ("ice: Use ice_adapter for PTP shared data instead of auxdev")
+Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+---
+v1->v2:
+ - rebased
+ - complete full cleanup if failure in PTP intialization path (no need
+   to do a cleanup on PTP release then) and added a comment with clarification
+   why keeping PTP_UNINIT state on failure at init
+ - setting ptp->clock to NULL explicitly in error path
+---
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index fb0f6365a6d6..13b73f835f06 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -3246,7 +3246,7 @@ void ice_ptp_init(struct ice_pf *pf)
+ 
+ 	err = ice_ptp_init_port(pf, &ptp->port);
+ 	if (err)
+-		goto err_exit;
++		goto err_clean_pf;
+ 
+ 	/* Start the PHY timestamping block */
+ 	ice_ptp_reset_phy_timestamping(pf);
+@@ -3263,13 +3263,19 @@ void ice_ptp_init(struct ice_pf *pf)
+ 	dev_info(ice_pf_to_dev(pf), "PTP init successful\n");
+ 	return;
+ 
++err_clean_pf:
++	mutex_destroy(&ptp->port.ps_lock);
++	ice_ptp_cleanup_pf(pf);
+ err_exit:
+ 	/* If we registered a PTP clock, release it */
+ 	if (pf->ptp.clock) {
+ 		ptp_clock_unregister(ptp->clock);
+ 		pf->ptp.clock = NULL;
+ 	}
+-	ptp->state = ICE_PTP_ERROR;
++	/* Keep ICE_PTP_UNINIT state to avoid ambiguity at driver unload
++	 * and to avoid duplicated resources release.
++	 */
++	ptp->state = ICE_PTP_UNINIT;
+ 	dev_err(ice_pf_to_dev(pf), "PTP failed %d\n", err);
+ }
+ 
+@@ -3282,9 +3288,19 @@ void ice_ptp_init(struct ice_pf *pf)
+  */
+ void ice_ptp_release(struct ice_pf *pf)
+ {
+-	if (pf->ptp.state != ICE_PTP_READY)
++	if (pf->ptp.state == ICE_PTP_UNINIT)
+ 		return;
+ 
++	if (pf->ptp.state != ICE_PTP_READY) {
++		ice_ptp_cleanup_pf(pf);
++		mutex_destroy(&pf->ptp.port.ps_lock);
++		if (pf->ptp.clock) {
++			ptp_clock_unregister(pf->ptp.clock);
++			pf->ptp.clock = NULL;
++		}
++		return;
++	}
++
+ 	pf->ptp.state = ICE_PTP_UNINIT;
+ 
+ 	/* Disable timestamping for both Tx and Rx */
+
+base-commit: 978b03527a6c24f908b24c51da32daca02f0fec8
+-- 
+2.39.3
 
 
