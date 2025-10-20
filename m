@@ -1,81 +1,39 @@
-Return-Path: <netdev+bounces-231018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57780BF3BFC
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 23:29:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 728C7BF3C2F
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 23:34:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D0909351617
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 21:29:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF9223A4D97
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 21:31:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1BDA335076;
-	Mon, 20 Oct 2025 21:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c+OO9ICo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE322D9EEF;
+	Mon, 20 Oct 2025 21:31:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F6927C178
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 21:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+Received: from www.nop.hu (www.nop.hu [80.211.201.218])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 9870E22A4F6
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 21:31:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.211.201.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760995649; cv=none; b=P4C1S61j8nUSU4PX060NPLqWz0HX9cG8q21+YR7iath4RgPxkzN5gsKOoA3JzrMrJ9huJ9hZIjm13WsUJmZ0BO2wYMTzzyjMhwNfVSMa+TKk08IxjZcgjqYiZA4H0o77DCs/VgrAM1XDp3FRpFN8uvvcFTa5Gtfw8NCXy+2E8P8=
+	t=1760995901; cv=none; b=s35tSyDNMTkj3Mvl57WaJ5MY9yODRp3ws/Mb3NoVa9XaKsv6HmtSG72jcxGt5h6u8/EJBmyBMQtVG8EpN9wex0yUsYxOMh+clM0v7B36JcCM9hADrt7gZiR6p0obZzWicrRPOariSLUklwUhU17FQk5PBAZX6nGFVsVb4mOzK6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760995649; c=relaxed/simple;
-	bh=U38BcMKGdvW5NErKkLzlCBerNZPRipuaazE3WhsvNz8=;
+	s=arc-20240116; t=1760995901; c=relaxed/simple;
+	bh=VDj0O6rdW6j2j1l/EFV+jKOr5tWdxLisolXoFJWH7Ps=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aCWzCKUHtRd0zfivOZ7zNYrBf9Q9FnMbbdPu0zocZlgng8MlN7Q6D66toWtwFvGNoTiqqA+5wva63/WFF5GusjsgD3h5lBMIZQswMyHNlKmxLhvn9wlT4Omk9iyZ+hhWb2+oc0n1QrBuq4VNuZAi0WrCUA4vkGJ/dTFNKVJPEGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c+OO9ICo; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b48d8deafaeso1084799766b.1
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 14:27:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760995644; x=1761600444; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/kbCS9wiESb1uWqxH5eCNJAW6LbwQTgu2NCgGdWG2Hw=;
-        b=c+OO9ICoVxP4itvStpSm4IDk9ZXnGgJU16geAl5624N79u5QrP7EHFLKcHPQg3noD0
-         sPOwa4WlA18rzOC1NatRY53K04rQO1SUlA+k4tqjoHqmuJeaXAnAmuef/yUWbmKHUsS9
-         i5DQKwt+OERH/UYBmo9ocHCvPR2Csk98GSofmREqXw1gWXJoHAR5V2RgET9EGIT9dcX0
-         raxRCLnXdr26uBRYs7+IfQ/yVRzvVRqSlsvZUNhetl7tzkXDeP7Th2D6yaVxYo4dAk5P
-         vxN88lCsAjcL9u3WGNIm0cada+7mhFg2t+EBjEiR0eBgEjoIjOElOz0+mf8yEez+M88y
-         AM0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760995644; x=1761600444;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/kbCS9wiESb1uWqxH5eCNJAW6LbwQTgu2NCgGdWG2Hw=;
-        b=xJHMUwNdEgq0dA4MhcgMUzyzO3FgHT4VZD8TCBmy+GnaVZWM8nNMeW0tZ4vSiN6quw
-         KNKofeOc2W/3VVd7CLzs5Gxj3CZocn4PSvy5NcADWiOUpbQx4rtVDRv2GVkL3w2a6zs4
-         OGm2Yh3Jfy+S5B+lmdzPD2U1Pek4lZ24FuuphoZGqDKUtFUf2e/CpgfA6YB8Vj+RMwwA
-         fHj75b/imt2kyUxbvKiqoxuLMGclWgd8weoEP6BPKct7SnEAjfNgeGzmdEmBfQTLBLtj
-         4orutxj6W9k/u+1fp3u65a9V9FJrflyZ0xYSzI/Hd0gLHRepEVJg2l+mY+M/0eF3Z5nn
-         jM1g==
-X-Forwarded-Encrypted: i=1; AJvYcCV5t3loqFDp8uOztA586D2v2cNZKZiVXndHyazs4UfCyZ68WT3/HMX8tfPhWKijB3+I43gw0KA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyn6nJMIaLmk8QAEHgRpNykzWzNrIs5EqffVCGgiSCMTmZyHp20
-	WSmzHAiHs+fU49Yem/7y2sHf5HUpa4IrpCthCfbcOPDNVDvX6KS8o+0w4vdbrg==
-X-Gm-Gg: ASbGncvd+GocNT1csEgJXDb2Z0Xptqq/8VlSN02qcmPy+eW71CNVkzOY595vgsXhnu+
-	xMQXDf4ggDf1l3daPD9C5FJzEn4w0sGNtNhWNs4bEHlsIY2/7HZguywDOVK7QRVOGVxuyMLhsJi
-	M/jhdyujuhIPWMCFeRJn0ht2q6iSGlpRAG47hvD95E737y7hbX0ZlUxyOsiaB6SvOTbXO+Hdtj+
-	mxfUI2ejq63KSKd+VQZibpf+QpMO10psCEHLsFpoztI9MAgNErVVeAV0h6852LhRXuNjyNo7MJL
-	kjt9ZCd//DZyGZg4oRyDOLd18X4WPb6B+VMyoKHfHwoJ+Q3lU0x3obGyQ7rInBT8ZzxN/b0fgDt
-	G0AfcA+O7II5GXXwCWMbrOBBkSReUxgDg+cDeu6XRYPit9mulnJ2MCor+eM6jkrQOn0TiCpu/RD
-	iu7lJsPal7J4+0QFzfgJ8=
-X-Google-Smtp-Source: AGHT+IHh8o3UrZL/g02zWsf3+m7Hfwoh/I+h73zVuyKsvu31+cueZtItlmsT2zMgORyvmkAbReInVQ==
-X-Received: by 2002:a17:907:bb49:b0:b04:9ad9:5b29 with SMTP id a640c23a62f3a-b6474241271mr1870656166b.54.1760995643508;
-        Mon, 20 Oct 2025 14:27:23 -0700 (PDT)
-Received: from [192.168.1.50] ([79.119.240.71])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b65eb526490sm889230666b.65.2025.10.20.14.27.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Oct 2025 14:27:23 -0700 (PDT)
-Message-ID: <0d807f54-7579-43a2-99c7-2a19cf715ec3@gmail.com>
-Date: Tue, 21 Oct 2025 00:27:21 +0300
+	 In-Reply-To:Content-Type; b=C8sZnR5Q9+mjyukH5wJtAsEhAJJz6RjlI5J9/A2+Nv4f9ZOO9LqZOHFxIH+VoFx/Juk/1ccoM9YGS7VirasGytUaoDqCBPW6hlUowYSn6lofncXg7PHBaLE354fPMRHRQcBPLmKRmli/N6iR2S1I63c76UBggsTijxS3GuHd3aY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nop.hu; spf=pass smtp.mailfrom=nop.hu; arc=none smtp.client-ip=80.211.201.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nop.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nop.hu
+Received: from 2001:db8:8319::200:11ff:fe11:2222 (helo [IPV6:2001:db8:8319:0:200:11ff:fe11:2222])
+    (reverse as null)
+    by 2001:db8:1101::18 (helo www.nop.hu)
+    (envelope-from csmate@nop.hu) with smtp (freeRouter v25.10.20-cur)
+    for kerneljasonxing@gmail.com alekcejk@googlemail.com jonathan.lemon@gmail.com sdf@fomichev.me maciej.fijalkowski@intel.com magnus.karlsson@intel.com bjorn@kernel.org 1118437@bugs.debian.org netdev@vger.kernel.org bpf@vger.kernel.org ; Mon, 20 Oct 2025 23:31:38 +0200
+Message-ID: <d8808206-0951-4512-91cb-58839ba9b8c4@nop.hu>
+Date: Mon, 20 Oct 2025 23:31:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,349 +41,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 6.14] wireless: aic8800: add support for AIC8800 WiFi
- chipset
-To: "he.zhenang" <he.zhenang@bedmex.com>, johannes@sipsolutions.net
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-References: <20251020092144.25259-1-he.zhenang@bedmex.com>
+Subject: Re: null pointer dereference in interrupt after receiving an ip
+ packet on veth from xsk from user space
+To: Jason Xing <kerneljasonxing@gmail.com>, alekcejk@googlemail.com
+Cc: Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Magnus Karlsson <magnus.karlsson@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, 1118437@bugs.debian.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu>
+ <CAL+tcoA5qDAcnZpmULsnD=X6aVP-ztRxPv5z1OSP-nvtNEk+-w@mail.gmail.com>
+ <643fbe8f-ba76-49b4-9fb7-403535fd5638@nop.hu>
+ <CAL+tcoDqgQbs20xV34RFWDoE5YPXS-ne3FBns2n9t4eggx8LAQ@mail.gmail.com>
 Content-Language: en-US
-From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
-In-Reply-To: <20251020092144.25259-1-he.zhenang@bedmex.com>
-Content-Type: text/plain; charset=UTF-8
+From: mc36 <csmate@nop.hu>
+In-Reply-To: <CAL+tcoDqgQbs20xV34RFWDoE5YPXS-ne3FBns2n9t4eggx8LAQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 20/10/2025 12:21, he.zhenang wrote:
-> Add driver support for the AIC8800 WiFi chipset family.
+hi,
+
+On 10/20/25 11:04, Jason Xing wrote:
 > 
-> Driver features:
-> - Supports 802.11ax (Wi-Fi 6) and backward compatible modes
-> - PCIe/USB/SDIO interface support
-> - Hardware encryption offload (WPA3 support)
-> - Enhanced power management for mobile devices
-> - Integrated Bluetooth coexistence (if applicable)
+> I followed your steps you attached in your code:
+> ////// gcc xskInt.c -lxdp
+> ////// sudo ip link add veth1 type veth
+> ////// sudo ip link set veth0 up
+> ////// sudo ip link set veth1 up
+
+ip link set dev veth1 address 3a:10:5c:53:b3:5c
+
+> ////// sudo ./a.out
 > 
-> Signed-off-by: he.zhenang <he.zhenang@bedmex.com>
+that will do the trick on a recent kerlek....
 
-I have two USB adapters from Brostrend with AIC chips. It's
-nice to see someone try to add support. However, there are some
-problems with this patch.
+its the destination mac in the c code....
 
-1) Where did the source code come from? The driver provided by
-Brostrend doesn't have any license information in it. Only the
-files aic_br_ext.{c,h} have a license header, and that's because
-they were copied from a Realtek driver. Presumably Brostrend got
-the code from AIC. So then I wonder who added the license headers
-we can see in this patch, and did AIC agree to that? They did
-write MODULE_LICENSE("GPL"); but is that enough? Also, a good
-chunk of the code published by Brostrend is actually Copyright
-(C) RivieraWaves, not AIC.
+ps: chaining in the original reporter from the fedora land.....
 
-https://linux.brostrend.com/aic8800-dkms.deb
 
-2) Who will maintain this new driver?
+have a nice day,
 
-3) AIC has several chips. Which ones did you test?
+cs
 
-> ---
->  .../bindings/serial/aic,aic-bt.yaml           |    45 +
->  .../bindings/serial/aic,btlpm-wake-host.yaml  |    37 +
->  .../devicetree/bindings/vendor-prefixes.yaml  |     2 +
->  drivers/net/wireless/Kconfig                  |     1 +
->  drivers/net/wireless/Makefile                 |     1 +
->  drivers/net/wireless/aic/Kconfig              |    17 +
->  drivers/net/wireless/aic/Makefile             |     7 +
->  drivers/net/wireless/aic/aic8800/.gitignore   |     5 +
->  drivers/net/wireless/aic/aic8800/Kconfig      |   176 +
->  drivers/net/wireless/aic/aic8800/Makefile     |    69 +
->  .../aic/aic8800/aic8800_bsp/.gitignore        |    10 +
->  .../wireless/aic/aic8800/aic8800_bsp/Kconfig  |    65 +
->  .../wireless/aic/aic8800/aic8800_bsp/Makefile |    16 +
->  .../aic8800/aic8800_bsp/aic8800d80_compat.c   |   290 +
->  .../aic8800/aic8800_bsp/aic8800d80_compat.h   |    11 +
->  .../aic8800/aic8800_bsp/aic8800dc_compat.c    |  1241 +
->  .../aic8800/aic8800_bsp/aic8800dc_compat.h    |    39 +
->  .../aic/aic8800/aic8800_bsp/aic_bsp_driver.c  |  2123 ++
->  .../aic/aic8800/aic8800_bsp/aic_bsp_driver.h  |   617 +
->  .../aic/aic8800/aic8800_bsp/aic_bsp_export.h  |    70 +
->  .../aic/aic8800/aic8800_bsp/aic_bsp_main.c    |   496 +
->  .../aic/aic8800/aic8800_bsp/aicsdio.c         |  1985 ++
->  .../aic/aic8800/aic8800_bsp/aicsdio.h         |   165 +
->  .../aic/aic8800/aic8800_bsp/aicsdio_txrxif.c  |   470 +
->  .../aic/aic8800/aic8800_bsp/aicsdio_txrxif.h  |   224 +
->  .../aic8800_bsp/aicwf_firmware_array.c        | 26874 ++++++++++++++++
->  .../aic8800_bsp/aicwf_firmware_array.h        |     2 +
->  .../aic8800/aic8800_bsp/aicwf_txq_prealloc.c  |    66 +
->  .../aic8800/aic8800_bsp/aicwf_txq_prealloc.h  |     8 +
->  .../wireless/aic/aic8800/aic8800_bsp/md5.c    |   165 +
->  .../wireless/aic/aic8800/aic8800_bsp/md5.h    |    77 +
->  .../aic8800/aic8800_bsp/rwnx_version_gen.h    |     5 +
->  .../aic/aic8800/aic8800_btlpm/.gitignore      |    10 +
->  .../aic/aic8800/aic8800_btlpm/Kconfig         |    12 +
->  .../aic/aic8800/aic8800_btlpm/Makefile        |     5 +
->  .../aic/aic8800/aic8800_btlpm/aic8800_btlpm.c |   936 +
->  .../aic/aic8800/aic8800_fdrv/.gitignore       |    10 +
->  .../wireless/aic/aic8800/aic8800_fdrv/Kconfig |   404 +
->  .../aic/aic8800/aic8800_fdrv/Makefile         |   137 +
->  .../aic/aic8800/aic8800_fdrv/aic_br_ext.c     |  1598 +
->  .../aic/aic8800/aic8800_fdrv/aic_br_ext.h     |    69 +
->  .../aic/aic8800/aic8800_fdrv/aic_bsp_export.h |    63 +
->  .../aic/aic8800/aic8800_fdrv/aic_btsdio.c     |  1164 +
->  .../aic/aic8800/aic8800_fdrv/aic_btsdio.h     |   472 +
->  .../aic/aic8800/aic8800_fdrv/aic_priv_cmd.c   |  2314 ++
->  .../aic/aic8800/aic8800_fdrv/aic_priv_cmd.h   |   124 +
->  .../aic/aic8800/aic8800_fdrv/aic_vendor.c     |   948 +
->  .../aic/aic8800/aic8800_fdrv/aic_vendor.h     |   370 +
->  .../aic8800_fdrv/aicwf_compat_8800d80.c       |    98 +
->  .../aic8800_fdrv/aicwf_compat_8800d80.h       |    16 +
->  .../aic8800_fdrv/aicwf_compat_8800dc.c        |   505 +
->  .../aic8800_fdrv/aicwf_compat_8800dc.h        |    17 +
->  .../aic/aic8800/aic8800_fdrv/aicwf_debug.h    |    33 +
->  .../aic/aic8800/aic8800_fdrv/aicwf_genl.c     |   819 +
->  .../aic/aic8800/aic8800_fdrv/aicwf_genl.h     |   115 +
->  .../aic8800/aic8800_fdrv/aicwf_rx_prealloc.c  |   102 +
->  .../aic8800/aic8800_fdrv/aicwf_rx_prealloc.h  |    32 +
->  .../aic/aic8800/aic8800_fdrv/aicwf_sdio.c     |  2728 ++
->  .../aic/aic8800/aic8800_fdrv/aicwf_sdio.h     |   264 +
->  .../aic/aic8800/aic8800_fdrv/aicwf_tcp_ack.c  |   568 +
->  .../aic/aic8800/aic8800_fdrv/aicwf_tcp_ack.h  |   104 +
->  .../aic/aic8800/aic8800_fdrv/aicwf_txrxif.c   |   864 +
->  .../aic/aic8800/aic8800_fdrv/aicwf_txrxif.h   |   265 +
->  .../aic/aic8800/aic8800_fdrv/aicwf_usb.c      |   954 +
->  .../aic/aic8800/aic8800_fdrv/aicwf_usb.h      |    92 +
->  .../aic8800/aic8800_fdrv/aicwf_wext_linux.c   |  1138 +
->  .../aic8800/aic8800_fdrv/aicwf_wext_linux.h   |    13 +
->  .../aic/aic8800/aic8800_fdrv/hal_desc.h       |   362 +
->  .../aic/aic8800/aic8800_fdrv/ipc_compat.h     |    25 +
->  .../aic/aic8800/aic8800_fdrv/ipc_host.c       |    42 +
->  .../aic/aic8800/aic8800_fdrv/ipc_host.h       |   169 +
->  .../aic/aic8800/aic8800_fdrv/ipc_shared.h     |   781 +
->  .../aic/aic8800/aic8800_fdrv/lmac_mac.h       |   470 +
->  .../aic/aic8800/aic8800_fdrv/lmac_msg.h       |  3150 ++
->  .../aic/aic8800/aic8800_fdrv/lmac_types.h     |    37 +
->  .../wireless/aic/aic8800/aic8800_fdrv/md5.c   |   175 +
->  .../wireless/aic/aic8800/aic8800_fdrv/md5.h   |    82 +
->  .../aic/aic8800/aic8800_fdrv/reg_access.h     |   146 +
->  .../wireless/aic/aic8800/aic8800_fdrv/regdb.c |  2770 ++
->  .../aic/aic8800/aic8800_fdrv/rwnx_bfmer.c     |    93 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_bfmer.h     |   100 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_cfgfile.c   |   264 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_cfgfile.h   |    33 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_cmds.c      |   506 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_cmds.h      |   123 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_compat.h    |    93 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_debugfs.c   |  2585 ++
->  .../aic/aic8800/aic8800_fdrv/rwnx_debugfs.h   |   136 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_defs.h      |   760 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_dini.c      |   292 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_dini.h      |    14 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_events.h    |   936 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_fw_trace.c  |    50 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_fw_trace.h  |    28 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_gki.c       |   406 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_gki.h       |    47 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_irqs.c      |    44 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_irqs.h      |    12 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_main.c      |  5545 ++++
->  .../aic/aic8800/aic8800_fdrv/rwnx_main.h      |    37 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_mesh.c      |    33 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_mesh.h      |    35 +
->  .../aic8800/aic8800_fdrv/rwnx_mod_params.c    |  1282 +
->  .../aic8800/aic8800_fdrv/rwnx_mod_params.h    |    70 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_msg_rx.c    |  1772 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_msg_rx.h    |    14 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_msg_tx.c    |  3861 +++
->  .../aic/aic8800/aic8800_fdrv/rwnx_msg_tx.h    |   286 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_mu_group.c  |   646 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_mu_group.h  |   159 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_pci.c       |    94 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_pci.h       |     8 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_platform.c  |  3211 ++
->  .../aic/aic8800/aic8800_fdrv/rwnx_platform.h  |   185 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_prof.h      |   142 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_radar.c     |  1965 ++
->  .../aic/aic8800/aic8800_fdrv/rwnx_radar.h     |   278 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_rx.c        |  2447 ++
->  .../aic/aic8800/aic8800_fdrv/rwnx_rx.h        |   358 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_strs.c      |   268 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_strs.h      |    37 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_tdls.c      |   776 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_tdls.h      |    57 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_testmode.c  |   218 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_testmode.h  |    68 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_tx.c        |  1855 ++
->  .../aic/aic8800/aic8800_fdrv/rwnx_tx.h        |   193 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_txq.c       |  1403 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_txq.h       |   372 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_utils.c     |    38 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_utils.h     |   137 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_v7.c        |   182 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_v7.h        |    21 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_version.h   |    14 +
->  .../aic8800/aic8800_fdrv/rwnx_version_gen.h   |     5 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_wakelock.c  |   111 +
->  .../aic/aic8800/aic8800_fdrv/rwnx_wakelock.h  |    24 +
->  .../aic/aic8800/aic8800_fdrv/sdio_host.c      |   132 +
->  .../aic/aic8800/aic8800_fdrv/sdio_host.h      |    39 +
->  .../aic/aic8800/aic8800_fdrv/usb_host.c       |   129 +
->  .../aic/aic8800/aic8800_fdrv/usb_host.h       |    36 +
->  .../wireless/aic/aic8800/hci_aic/.gitignore   |    10 +
->  .../net/wireless/aic/aic8800/hci_aic/Kconfig  |    12 +
->  .../net/wireless/aic/aic8800/hci_aic/Makefile |    36 +
->  .../net/wireless/aic/aic8800/hci_aic/Readme   |    28 +
->  .../net/wireless/aic/aic8800/hci_aic/btaic.h  |    93 +
->  .../aic/aic8800/hci_aic/hci_aic_uart.c        |  1184 +
->  .../net/wireless/aic/aic8800/hci_aic/hci_h4.c |   266 +
->  .../wireless/aic/aic8800/hci_aic/hci_ldisc.c  |   846 +
->  .../wireless/aic/aic8800/hci_aic/hci_serdev.c |   391 +
->  .../wireless/aic/aic8800/hci_aic/hci_uart.h   |   147 +
->  151 files changed, 99029 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/serial/aic,aic-bt.yaml
->  create mode 100644 Documentation/devicetree/bindings/serial/aic,btlpm-wake-host.yaml
->  create mode 100644 drivers/net/wireless/aic/Kconfig
->  create mode 100644 drivers/net/wireless/aic/Makefile
->  create mode 100644 drivers/net/wireless/aic/aic8800/.gitignore
->  create mode 100644 drivers/net/wireless/aic/aic8800/Kconfig
->  create mode 100644 drivers/net/wireless/aic/aic8800/Makefile
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/.gitignore
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/Kconfig
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/Makefile
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aic8800d80_compat.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aic8800d80_compat.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aic8800dc_compat.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aic8800dc_compat.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aic_bsp_driver.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aic_bsp_driver.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aic_bsp_export.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aic_bsp_main.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aicsdio.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aicsdio.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aicsdio_txrxif.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aicsdio_txrxif.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aicwf_firmware_array.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aicwf_firmware_array.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aicwf_txq_prealloc.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/aicwf_txq_prealloc.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/md5.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/md5.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_bsp/rwnx_version_gen.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_btlpm/.gitignore
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_btlpm/Kconfig
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_btlpm/Makefile
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_btlpm/aic8800_btlpm.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/.gitignore
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/Kconfig
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/Makefile
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aic_br_ext.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aic_br_ext.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aic_bsp_export.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aic_btsdio.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aic_btsdio.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aic_priv_cmd.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aic_priv_cmd.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aic_vendor.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aic_vendor.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_compat_8800d80.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_compat_8800d80.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_compat_8800dc.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_compat_8800dc.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_debug.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_genl.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_genl.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_rx_prealloc.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_rx_prealloc.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_sdio.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_sdio.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_tcp_ack.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_tcp_ack.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_txrxif.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_txrxif.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_usb.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_usb.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_wext_linux.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/aicwf_wext_linux.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/hal_desc.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/ipc_compat.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/ipc_host.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/ipc_host.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/ipc_shared.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/lmac_mac.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/lmac_msg.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/lmac_types.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/md5.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/md5.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/reg_access.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/regdb.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_bfmer.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_bfmer.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_cfgfile.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_cfgfile.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_cmds.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_cmds.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_compat.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_debugfs.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_debugfs.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_defs.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_dini.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_dini.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_events.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_fw_trace.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_fw_trace.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_gki.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_gki.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_irqs.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_irqs.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_main.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_main.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_mesh.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_mesh.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_mod_params.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_mod_params.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_msg_rx.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_msg_rx.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_msg_tx.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_msg_tx.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_mu_group.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_mu_group.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_pci.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_pci.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_platform.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_platform.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_prof.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_radar.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_radar.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_rx.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_rx.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_strs.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_strs.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_tdls.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_tdls.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_testmode.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_testmode.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_tx.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_tx.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_txq.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_txq.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_utils.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_utils.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_v7.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_v7.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_version.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_version_gen.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_wakelock.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/rwnx_wakelock.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/sdio_host.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/sdio_host.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/usb_host.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/aic8800_fdrv/usb_host.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/hci_aic/.gitignore
->  create mode 100644 drivers/net/wireless/aic/aic8800/hci_aic/Kconfig
->  create mode 100644 drivers/net/wireless/aic/aic8800/hci_aic/Makefile
->  create mode 100644 drivers/net/wireless/aic/aic8800/hci_aic/Readme
->  create mode 100644 drivers/net/wireless/aic/aic8800/hci_aic/btaic.h
->  create mode 100644 drivers/net/wireless/aic/aic8800/hci_aic/hci_aic_uart.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/hci_aic/hci_h4.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/hci_aic/hci_ldisc.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/hci_aic/hci_serdev.c
->  create mode 100644 drivers/net/wireless/aic/aic8800/hci_aic/hci_uart.h
-> 
 
