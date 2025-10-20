@@ -1,237 +1,224 @@
-Return-Path: <netdev+bounces-230790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A09A8BEF799
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 08:33:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21742BEF802
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 08:41:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55A2F3ACFB8
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 06:33:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B302D1898353
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 06:41:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5AD2D839C;
-	Mon, 20 Oct 2025 06:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 167F42D839F;
+	Mon, 20 Oct 2025 06:41:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="iS3pzhTr";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="oWP6UlMh";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="j5uPdZ5d";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1l9JSvhu"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="oqywBw51"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39FD82D8382
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 06:33:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9992D7DFB;
+	Mon, 20 Oct 2025 06:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760941994; cv=none; b=SfBOzBuX4oOhcRrOEEZeC9O+WIpezoICCbEwEhqXNGJalRGGv1zhZLqXo47fNdoyIlvz8x0OYzh/ePMTT2mKpDyokiL8Ds8xLkTqDqJGYgbvqCYxiwZ6Ve+7a3AbK0x8x4u1JXeeN9RihLU6/cfX3E5qRWxVc4dj+j6jXdJUyp0=
+	t=1760942472; cv=none; b=exE+913164L5+C7ew/g2O8rVxWHDh1mu4qEKeVteO7CwijQLVnYVZBgyQgbzfyKV4e7Dr+2pgSHq1h309Mc8FOB/OlPveOwuKZA4+mw3h3iNDOthvt0EPYWXRk7nX/6ssMQ2uaDg5Vwo+iRZiGubgDyXPfCx+9rtZV1HaQcHXIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760941994; c=relaxed/simple;
-	bh=T1C6KNrRX81hte0ENWczXE4+1vLDwuM65mCFX5Y3Gfc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fLxW+2KoXdBY+j38hnGFXJXHvCbqsAyTSqHGBIxF1MGuPoMliHGCNTseMONtltcFQ5kOyxgPiB7OKPjfqZfi6r/82Gkcw4p328L/TI2QZ5v1S8OhSXINdYMVXgwcTjyCLWIjhIBPVohaoZd9pwVRfxY8zuHGCZSl53+HDP+Jycs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=iS3pzhTr; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=oWP6UlMh; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=j5uPdZ5d; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1l9JSvhu; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 253CB21193;
-	Mon, 20 Oct 2025 06:33:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760941986; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=p0JKnFlzd8UXhp4Y2ahcvueD8mr9lOiIzHpyyABEsqo=;
-	b=iS3pzhTrUiYImuqKrSXLLUgPgcR53nvtlNUyX/6oF6NTbyv0nDmguIYJkh19VjO7XdXgoY
-	OU8Dv/jWtnXfig7pUeuRbGS0eXjsAHQ9h8SSGpwG5wk+uhADbLprwNTA6fgeWL5raFudH8
-	2XrwIlswRmdlMy4peWFsAZaT/vO+4dc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760941986;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=p0JKnFlzd8UXhp4Y2ahcvueD8mr9lOiIzHpyyABEsqo=;
-	b=oWP6UlMhOLLTbXktLmPNEErrzaNa+ZmUxZvEEa9MuRXt7tqvf3aaeSy8kdqvC082HqphkR
-	svj25b6JCgk/21BA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760941982; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=p0JKnFlzd8UXhp4Y2ahcvueD8mr9lOiIzHpyyABEsqo=;
-	b=j5uPdZ5dR99iR8SZ2KHDneArjSvOf/3m1kNRCdC3xRJbRXkyzcrPmba2bnVMbIstLyFRYx
-	cTrZH58MfyazQ2KZS91WLpqlvLb8FeNqASy09USTbuCoWF2rqRI+gic2GrZs2xw8MmNIK6
-	0DCUImX9QMkEjoKYJRV0c5c/GL9qAGw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760941982;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=p0JKnFlzd8UXhp4Y2ahcvueD8mr9lOiIzHpyyABEsqo=;
-	b=1l9JSvhuWBF4M6RNyqjohjr8IWZJ4MnU/PoweesWkkhqvQcnrRBy2t370oq1MQGT+7+4D7
-	yJq/E4t1p6tpp7CA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9193B13A8E;
-	Mon, 20 Oct 2025 06:33:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Jp9EIZ3X9WgJXgAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 20 Oct 2025 06:33:01 +0000
-Message-ID: <8d6d76b4-6361-4392-9351-bd9d59c96ba0@suse.de>
-Date: Mon, 20 Oct 2025 08:33:01 +0200
+	s=arc-20240116; t=1760942472; c=relaxed/simple;
+	bh=HvkZQIT3YWSHEloVSkLh35b3GVu96O2L6Q9lSbh+XQc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B8eBu9di+JM+QrtrU0TmCu98axHSL1txz0sW+osHuYdQoL7a48/8+qMCQPmb3qnsQHw0b8FnLeYnIvncrSuJTaJNmrFD6VvQ3bLYs2Qt2xnlH7GQ47Q1VdFkpDF0D7zM3ZdrqAbyOOvo1KlzXBCj4VHO2oJgPa61kUGCWHTNXak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=oqywBw51; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1760942469; x=1792478469;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HvkZQIT3YWSHEloVSkLh35b3GVu96O2L6Q9lSbh+XQc=;
+  b=oqywBw51x9eUYgQqWXJajaW9qtb3sv2deRIrktLWWhAulT8ZFcr7iQW4
+   uNP8U3DF5NS2bjl+RS+zzhm+oONrpSVo+mketSWtm8BIhkq32DGvXXUo5
+   3ockl8W4I5/DCJlxlY9BK9UJV2lxq6XvMGB6bku2iL3AYg7lmaL5pGseT
+   3DTkNBgx5L1evvWDFJ03HTJ5OgVQrr1sAu3UKQES/zFW1O5+fO5xfpLqi
+   3rpbkJQpQC2nZCN3azWIRoIJTgAwA4mCvTTLBDzaVKtF7K9MQbGiSNWUT
+   T0j/LzaqICxX21dKFkzMaRxvC4LZ/MOwGi/TEjWYQTNAjitIQV8hMj//N
+   A==;
+X-CSE-ConnectionGUID: Xi2sZDkeQe6Wff5fg4d3MA==
+X-CSE-MsgGUID: lnWFWEOvRpCYlHV8kcUaDw==
+X-IronPort-AV: E=Sophos;i="6.19,242,1754982000"; 
+   d="scan'208";a="215334774"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Oct 2025 23:41:02 -0700
+Received: from chn-vm-ex1.mchp-main.com (10.10.87.30) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Sun, 19 Oct 2025 23:40:50 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
+ chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.27; Sun, 19 Oct 2025 23:40:50 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Sun, 19 Oct 2025 23:40:50 -0700
+Date: Mon, 20 Oct 2025 08:39:45 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Gerhard Engleder <gerhard@engleder-embedded.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>
+Subject: Re: [PATCH net-next] net: phy: micrel: Add support for non PTP SKUs
+ for lan8814
+Message-ID: <20251020063945.dwqgn5yphdwnt4vk@DEN-DL-M31836.microchip.com>
+References: <20251017074730.3057012-1-horatiu.vultur@microchip.com>
+ <79f403f0-84ed-43fe-b093-d7ce122d41fd@engleder-embedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 6/7] nvme-tcp: Allow userspace to trigger a KeyUpdate
- with debugfs
-To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
- kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
-Cc: kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
- kch@nvidia.com, Alistair Francis <alistair.francis@wdc.com>
-References: <20251017042312.1271322-1-alistair.francis@wdc.com>
- <20251017042312.1271322-7-alistair.francis@wdc.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20251017042312.1271322-7-alistair.francis@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.995];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,oracle.com,kernel.org,lists.linux.dev,vger.kernel.org,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <79f403f0-84ed-43fe-b093-d7ce122d41fd@engleder-embedded.com>
 
-On 10/17/25 06:23, alistair23@gmail.com wrote:
-> From: Alistair Francis <alistair.francis@wdc.com>
+The 10/17/2025 23:15, Gerhard Engleder wrote:
+
+Hi Gerhard,
+
 > 
-> Allow userspace to trigger a KeyUpdate via debugfs. This patch exposes a
-> key_update file that can be written to with the queue number to trigger
-> a KeyUpdate on that queue.
+> On 17.10.25 09:47, Horatiu Vultur wrote:
+> > The lan8814 has 4 different SKUs and for 2 of these SKUs the PTP is
+> > disabled. All these SKUs have the same value in the register 2 and 3
+> > meaning we can't differentiate them based on device id therefore check
 > 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
-> v4:
->   - No change
-> v3:
->   - New patch
+> Did you miss to start a new sentence?
+
+Yes, I think so. I will update this.
+
 > 
->   drivers/nvme/host/tcp.c | 72 +++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 72 insertions(+)
+> > the SKU register and based on this allow or not to create a PTP device.
+> > 
+> > Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> > ---
+> >   drivers/net/phy/micrel.c | 38 ++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 38 insertions(+)
+> > 
+> > diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+> > index 79ce3eb6752b6..16855bf8c3916 100644
+> > --- a/drivers/net/phy/micrel.c
+> > +++ b/drivers/net/phy/micrel.c
+> > @@ -101,6 +101,8 @@
+> >   #define LAN8814_CABLE_DIAG_VCT_DATA_MASK    GENMASK(7, 0)
+> >   #define LAN8814_PAIR_BIT_SHIFT                      12
+> > 
+> > +#define LAN8814_SKUS                         0xB
+> > +
+> >   #define LAN8814_WIRE_PAIR_MASK                      0xF
+> > 
+> >   /* Lan8814 general Interrupt control/status reg in GPHY specific block. */
+> > @@ -367,6 +369,9 @@
+> > 
+> >   #define LAN8842_REV_8832                    0x8832
+> > 
+> > +#define LAN8814_REV_LAN8814                  0x8814
+> > +#define LAN8814_REV_LAN8818                  0x8818
+> > +
+> >   struct kszphy_hw_stat {
+> >       const char *string;
+> >       u8 reg;
+> > @@ -449,6 +454,7 @@ struct kszphy_priv {
+> >       bool rmii_ref_clk_sel;
+> >       bool rmii_ref_clk_sel_val;
+> >       bool clk_enable;
+> > +     bool is_ptp_available;
+> >       u64 stats[ARRAY_SIZE(kszphy_hw_stats)];
+> >       struct kszphy_phy_stats phy_stats;
+> >   };
+> > @@ -4130,6 +4136,17 @@ static int lan8804_config_intr(struct phy_device *phydev)
+> >       return 0;
+> >   }
+> > 
+> > +/* Check if the PHY has 1588 support. There are multiple skus of the PHY and
+> > + * some of them support PTP while others don't support it. This function will
+> > + * return true is the sku supports it, otherwise will return false.
+> > + */
 > 
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index 791e0cc91ad8..f5c7b646d002 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -11,6 +11,7 @@
->   #include <linux/crc32.h>
->   #include <linux/nvme-tcp.h>
->   #include <linux/nvme-keyring.h>
-> +#include <linux/debugfs.h>
->   #include <net/sock.h>
->   #include <net/tcp.h>
->   #include <net/tls.h>
-> @@ -1429,6 +1430,75 @@ static void update_tls_keys(struct nvme_tcp_queue *queue)
->   	}
->   }
->   
-> +#ifdef CONFIG_NVME_TCP_TLS
-> +#define NVME_DEBUGFS_RW_ATTR(field) \
-> +	static int field##_open(struct inode *inode, struct file *file) \
-> +	{ return single_open(file, field##_show, inode->i_private); } \
-> +	\
-> +	static const struct file_operations field##_fops = { \
-> +		.open = field##_open, \
-> +		.read = seq_read, \
-> +		.write = field##_write, \
-> +		.release = single_release, \
-> +	}
-> +
-> +static int nvme_ctrl_key_update_show(struct seq_file *m, void *p)
-> +{
-> +	seq_printf(m, "0\n");
-> +
-> +	return 0;
-> +}
-> +
-> +static ssize_t nvme_ctrl_key_update_write(struct file *file, const char __user *buf,
-> +					  size_t count, loff_t *ppos)
-> +{
-> +	struct seq_file *m = file->private_data;
-> +	struct nvme_ctrl *nctrl = m->private;
-> +	struct nvme_tcp_ctrl *ctrl = to_tcp_ctrl(nctrl);
-> +	char kbuf[16] = {0};
-> +	int queue_nr, rc;
-> +	struct nvme_tcp_queue *queue;
-> +
-> +	if (count > sizeof(kbuf) - 1)
-> +		return -EINVAL;
-> +	if (copy_from_user(kbuf, buf, count))
-> +		return -EFAULT;
-> +	kbuf[count] = 0;
-> +
-> +	rc = kstrtouint(kbuf, 10, &queue_nr);
-> +	if (rc)
-> +		return rc;
-> +
-> +	if (queue_nr >= nctrl->queue_count)
-> +		return -EINVAL;
-> +
-> +	queue = &ctrl->queues[queue_nr];
-> +
-> +	update_tls_keys(queue);
+> Hasn't net also switched to the common kernel multiline comment style
+> starting with an empty line?
 
-Are you sure this is correct?
+I am not sure because I can see some previous commits where people used
+the same comment style:
+e82c64be9b45 ("net: stmmac: avoid PHY speed change when configuring MTU")
+100dfa74cad9 ("net: dev_queue_xmit() llist adoption")
 
-'update_tls_keys' is issuing a handshake request
-with 'HANDSHAKE_KEY_UPDATE_TYPE_RECEIVED'.
+> 
+> > +static bool lan8814_has_ptp(struct phy_device *phydev)
+> > +{
+> > +     struct kszphy_priv *priv = phydev->priv;
+> > +
+> > +     return priv->is_ptp_available;
+> > +}
+> > +
+> >   static irqreturn_t lan8814_handle_interrupt(struct phy_device *phydev)
+> >   {
+> >       int ret = IRQ_NONE;
+> > @@ -4146,6 +4163,9 @@ static irqreturn_t lan8814_handle_interrupt(struct phy_device *phydev)
+> >               ret = IRQ_HANDLED;
+> >       }
+> > 
+> > +     if (!lan8814_has_ptp(phydev))
+> > +             return ret;
+> > +
+> >       while (true) {
+> >               irq_status = lanphy_read_page_reg(phydev, LAN8814_PAGE_PORT_REGS,
+> >                                                 PTP_TSU_INT_STS);
+> > @@ -4207,6 +4227,9 @@ static void lan8814_ptp_init(struct phy_device *phydev)
+> >           !IS_ENABLED(CONFIG_NETWORK_PHY_TIMESTAMPING))
+> >               return;
+> > 
+> > +     if (!lan8814_has_ptp(phydev))
+> > +             return;
+> > +
+> >       lanphy_write_page_reg(phydev, LAN8814_PAGE_PORT_REGS,
+> >                             TSU_HARD_RESET, TSU_HARD_RESET_);
+> > 
+> > @@ -4336,6 +4359,9 @@ static int __lan8814_ptp_probe_once(struct phy_device *phydev, char *pin_name,
+> > 
+> >   static int lan8814_ptp_probe_once(struct phy_device *phydev)
+> >   {
+> > +     if (!lan8814_has_ptp(phydev))
+> > +             return 0;
+> > +
+> >       return __lan8814_ptp_probe_once(phydev, "lan8814_ptp_pin",
+> >                                       LAN8814_PTP_GPIO_NUM);
+> >   }
+> > @@ -4450,6 +4476,18 @@ static int lan8814_probe(struct phy_device *phydev)
+> >       devm_phy_package_join(&phydev->mdio.dev, phydev,
+> >                             addr, sizeof(struct lan8814_shared_priv));
+> > 
+> > +     /* There are lan8814 SKUs that don't support PTP. Make sure that for
+> > +      * those skus no PTP device is created. Here we check if the SKU
+> > +      * supports PTP.
+> > +      */
+> 
+> Check comment style.
+> 
+> > +     err = lanphy_read_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
+> > +                                LAN8814_SKUS);
+> > +     if (err < 0)
+> > +             return err;
+> > +
+> > +     priv->is_ptp_available = err == LAN8814_REV_LAN8814 ||
+> > +                              err == LAN8814_REV_LAN8818;
+> > +
+> >       if (phy_package_init_once(phydev)) {
+> >               err = lan8814_release_coma_mode(phydev);
+> >               if (err)
+> 
 
-And the patch introducing it states:
-At this time we don't support initiating a KeyUpdate.
-
-So please move this to the patchset implementing support
-for initiating KeyUpdates.
-
-Cheers,
-
-Hannes
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+/Horatiu
 
