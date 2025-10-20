@@ -1,318 +1,199 @@
-Return-Path: <netdev+bounces-230770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7027BEF0AC
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 04:01:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D441DBEF1D9
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 04:44:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6D8724E36FF
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 02:01:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CD933B0D09
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 02:44:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2951E511;
-	Mon, 20 Oct 2025 02:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F2829B217;
+	Mon, 20 Oct 2025 02:44:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="2NHjJnW6"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="eMl4HhHG"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011056.outbound.protection.outlook.com [52.101.70.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54BF61B808;
-	Mon, 20 Oct 2025 02:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760925660; cv=none; b=eiEszn5Up2VZZVWRt5R+J60tT7FhEQQ5UrzU82QZ3eFhkPhSVZFqARc+N9u103JoH9RTb3UWw3EMlAEnrnZ9d9MI1JG4wvHgPiUVqlSmiNeKyNdHSIsYI541OrHEKSKesr/lFSgoIxarSrX+lmdlZLBzoz2UOuTfM9iLcN0Po/U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760925660; c=relaxed/simple;
-	bh=J515h2CvnI02QPeAmu7FLgKZtNGW1+YczNFE02JNK6Y=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=CxYo7TqGs9fyWL63JfPpw8dhctUGMjwx7KknzoZHqoX4E+yyCDCRyMZZ5uHFJJobWwQGaMvEyCcb7v3d7QLq8ZKk4900ppryr7LdqF5APV19JGaqWILgdHHgz1VyIPT/ptO+5MgelndgTulWJ7YNn7q9ZjBR5cbUL8vWppX2dpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=2NHjJnW6; arc=none smtp.client-ip=113.46.200.224
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=ISsxNtEVgK67rnsMjqjIOEfhaba9KDZbj+YRWqHr0Mc=;
-	b=2NHjJnW6kRwOwsfFMMMmThAAFdwELZ3dE/VfEL7QqgejD5Kow8dIDVHKYzTXZBrQWcr5sDf5V
-	+GiBHmNwegUKr5mQNcrQMUyTiaV1/MBEU+rwlQ75J1CxKttNqJF9Jo1HbJCuF8vfy8VcWVEXkvB
-	dogBlOUBjzd8LsHfIL0tsho=
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4cqdtJ4cphz1cyVL;
-	Mon, 20 Oct 2025 10:00:24 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id C2BEA140142;
-	Mon, 20 Oct 2025 10:00:47 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 20 Oct 2025 10:00:46 +0800
-Message-ID: <33546397-6078-44c5-b5c6-15c917b18da5@huawei.com>
-Date: Mon, 20 Oct 2025 10:00:46 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40166946A;
+	Mon, 20 Oct 2025 02:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760928248; cv=fail; b=tHHVS1Lst0uLxZrwomRLXL4wz1YlBdqvWnekfNhcjG2r09aixPKzET1+N/Td6GVq83v1Np9JdrmxlqUM3rwh6tn0SxkTUR4E+sXylBDcASD/Azi3LHltRgg3aYMHV6bN1lEbN/VmVH6PYnd8IlGlQscX1qP9prDlNu/LKofIBDs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760928248; c=relaxed/simple;
+	bh=ZJJxI8cmJWlbvHrOxAUj6LdVhlJgQAzr9yr+KSqnoOA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=oHOeFW236c1ieU6o3IpI1je8Ef2LHg9D7SFfomLRhi2h5QciRzCsbKwignzvABbDiTVyvrAIXAav0E3nXkMb0jOUg+Goq3DitlqyUYKOGZpSJdmh4Ai/2g/Sn4pIRmGmXFaDwfNRjYR3FJWZYaB9j3KK2sjXvUy1gWjWbxjl0oU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=eMl4HhHG; arc=fail smtp.client-ip=52.101.70.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eY/Rna3txmTesHx3eDzXELzqjb/t/IhhXVPP+qOTMsaJV9C7Fkt2nRn2avoP6I3MetorNcAR5gMPXa3Qo7GcEaaw6dh/MD0+5AECqMAeec0ZDsBxbHfB3PbOXwp9Hq+5P9hq9RbY/kE95Xa7qLE44+yCYBhtj9NBA3q/X/DBGcRiWe2aco+zTpCqjilZx5GX2/s3bEBGhITaQfJ03NYm3ZXbkJKHaicpkB0vd4enB/kfyg4KvRyIZmj0YjYKUH5AjiutmyXZo7f8y8MRlohJm6IvSrOvyuf35mv6E25xoSDaKhuqBQiTi8/L4eLFpr4wzaa/pUe3GeLAqTnHUyXz9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZJJxI8cmJWlbvHrOxAUj6LdVhlJgQAzr9yr+KSqnoOA=;
+ b=qw6X8spfhzXQ8hzt1RG5eSRk7541uswmo0H/sgYCdyqCniJIS6IJiy023VdJ6SEkZmjL+MCzU1Ahxj8g1eJMo7Wib/J9/+Bxs5AuOKYOyArU+P74ynE8t5KQ2ZgWa+P9gp7AVVsHkq7aQPz7FE0Sj5HooAe9JL3VRLT7LItFwP4kE84lUWSL8bNEz0A9Vc8AaCkgJasHXWSNPdkCFZ4JbWR8cmP24BwOJaoPeu4YWdPAqNC5ZMgHAuRM15SjtztlrOsM4l8sogkDR2lBYzpADTIciuvnAePW4NAmN6lEkFGl4vnsDtDHjaS6tODnbpXXnYdnu5klzHFJOV1C2rMfbg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZJJxI8cmJWlbvHrOxAUj6LdVhlJgQAzr9yr+KSqnoOA=;
+ b=eMl4HhHGHJbjSvhpYc7URSUDM9IPNOWdE0s5RHHVw20yKfPfyOTsz4R/guim0Ya+otdUihTmwNh6gQRWosFzArqyZlvqJ+fvK8cBqMC8ZY6crZqBOPKjr0RlRW8rqjSX9Ln+Fy9I6Z0EK1l/kXKNS56dwqcLHvmYRioxhVNJVXJLhFTwXlRXbkwAq1+ZZMX/931ibsB3yLnA3/mLe9W90cW8W4yPwNsH8TOuuEO/+AxZlXTX3p8Ki4HiTjYNwUtzfPebMf1LqDaAWEKU6Wj4EsGiDgMgg90jfbYwp+NTVBkwEAkL8LgPmNTTlzBduLl45KfBU3MeFRdpXQvzzDfpDQ==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by AS8PR04MB7864.eurprd04.prod.outlook.com (2603:10a6:20b:2a4::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.16; Mon, 20 Oct
+ 2025 02:44:03 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9228.015; Mon, 20 Oct 2025
+ 02:44:03 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "imx@lists.linux.dev"
+	<imx@lists.linux.dev>, "linux-omap@vger.kernel.org"
+	<linux-omap@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>, Shenwei
+ Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Siddharth
+ Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>
+Subject: RE: [PATCH net-next 0/4] net: phy: add iterator phy_for_each
+Thread-Topic: [PATCH net-next 0/4] net: phy: add iterator phy_for_each
+Thread-Index: AQHcP6Yii8cDtrJXh0O7yn+PRvkyLrTKV0EA
+Date: Mon, 20 Oct 2025 02:44:03 +0000
+Message-ID:
+ <PAXPR04MB85101E1D2745F80940A5D14A88F5A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <68a7779c-acc2-45fc-b262-14d52e929b01@gmail.com>
+In-Reply-To: <68a7779c-acc2-45fc-b262-14d52e929b01@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|AS8PR04MB7864:EE_
+x-ms-office365-filtering-correlation-id: 6d6b2334-d754-4c34-f13c-08de0f8287fd
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|19092799006|7416014|376014|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?UGduSGtkL2d4WWloclJYZm1UMHorNTdtRmR2NVVhT01LTnNKemJDWWFudkpS?=
+ =?utf-8?B?WURiZWozT0JyYjNYNzB2SUY4ZHpNR2VPbHZWR2hyc3NwU1pOTWxVMkhweHVk?=
+ =?utf-8?B?MmtpNzdzaDFubDg1MHNFd2c3SmxKejF3eEVKS3haYzQzUDMzdFdTOE1JMWRS?=
+ =?utf-8?B?T29ZUFkvQzdRcVpOZ1psemZCdUdBdm1NVklGUGU4dUxDRmNaaDFtU1VlRmxY?=
+ =?utf-8?B?OVhkbWNuRjAxL0l4OXRud3BwUytCcUEySWtXblk1c3l0MS9aOE9XM0I0VG1Q?=
+ =?utf-8?B?aEdZRytiZnJuMi9mSXBRcWV3ZHFnMFY0cVRWNUFtV01DSlhpcy9vT2s5TmZC?=
+ =?utf-8?B?NVVpRCtBV0NRNVRVUlhzYXI5K1pzYjVybzZWaUJRdCtleEZiQWwwUjRiWTZs?=
+ =?utf-8?B?aEdEZit6d2dSZVZlNnArelZXenRDR0Z6OUNTRm1tcngwQUMvUFphcERWbERZ?=
+ =?utf-8?B?N3dPZVVOamdWTHA4NXVPY1NsQURKM2Z3aFQ0RXIzd1lDNHpiSTlXZWpSM25u?=
+ =?utf-8?B?bWJkN1BHZ0ZhQ0p0eWJtWXBielBOY0xWOTRZMERxMEhhYnc2Uk44Rjg2WG5z?=
+ =?utf-8?B?c2NDd1FxTTFZV2l4aURKdW9xWXJKbFg0bUxXeDVjZVJiUjJ4amp5ZUJKMUI4?=
+ =?utf-8?B?cS9SZUVaZzNTOUVCTHlGVG14NDgxa1owK29jUjZTam9GakNsRk9ZSkNvanFC?=
+ =?utf-8?B?VzBZNXEveGhSUWNaQnI5Kzl6bmRTcXpwcXFEUGdaVmZRblplakpMbXQ0czVE?=
+ =?utf-8?B?SngvajZwVWxQZFJ3a285SmplWjc2cmVYSE5vbmxGeFp6UXNPc2NNcmJReHEx?=
+ =?utf-8?B?YmQ5UE9mbCtzQis2WU4yZVVaaW9PeVEvaDFyb3doMnY1dzdaVm9BR2J0Q2oy?=
+ =?utf-8?B?SCt4MHZsVW9XZWptMTJCZmpyN2pDN3Y1SEFndDRqcWhpOWcrYUNHeG8rcHE2?=
+ =?utf-8?B?aVJRSmhxWUk3b0x2V0xjNUl6U05lVnZCaUNqNlJUK3U2R2xHYWJlR0V0Tmtl?=
+ =?utf-8?B?OGU1bHdiQ1VmZ3YzT0V1WjF6eGNvaEZ1OFBJMFBWNmxydE5FMzBpSytwVWdM?=
+ =?utf-8?B?UStwN3UrR3Jsd0lVd0NTd2g1LzNLNEJseldwMFJPdXRXVEpkRjJEQnQya2Ny?=
+ =?utf-8?B?KzlLV3ZnQk8ybHY5ajBvQnZGVzFQRnFpNzhoYzFJWitTRWtJSWdjdXM3MEwz?=
+ =?utf-8?B?ZytHQmFyclBFZnRnNGJwNUlpQk5tZnU0WHllY2xhTUo2cHhCYmE3RTVhYW5E?=
+ =?utf-8?B?elBudlBkczJYY2VsRjU4SVBkVEc2TlRib1RGdTIydURFK0JzYzBvZ3NlVTlh?=
+ =?utf-8?B?U3VYREZmOEYzOFVIWFdKcWUvYXZBc3A4ZHJvLzIxdm9YV2M1Z21JS3ppd3Rm?=
+ =?utf-8?B?VUtrTEp4RkRDMWlCbFR3czdJaXpXQ2c0THR1TVIrbDZkejVkKysrTmtCajQ0?=
+ =?utf-8?B?T0xlNjAzM3Fqa04zaXVCR2F1WjNWNjJNRmw5dzRtaVRSNUF5TkVLQUFwd2Rk?=
+ =?utf-8?B?RGVKalY3ZDNGY2RWSjNkMTF1eXQwM21nTlFteFJHN0ttOXpQL1AxeVVjY2tU?=
+ =?utf-8?B?aGVOb0Jya1hDZnhoRDROcFViOTBEb3psM0wzVEJRa242bjV1Ylp2YjlRZlA2?=
+ =?utf-8?B?RytYR1MvWk1YVzExOTcrVkY0TjZ0bTVwQ3kwcWloZ0J0WVRvaG9IbU56aEVw?=
+ =?utf-8?B?RGhlWDdYeWxEdE45eCtBRzR2MDkwVnByQnhTT2cxQkxrNVU0M0dXSTNsNE0z?=
+ =?utf-8?B?TStleG5mN2VOM3FudzRsTzZCc1JtQTJvUnV4d0QvZys1Zy9KbVJ4RndDKzE3?=
+ =?utf-8?B?L0dmK01XL3Y1SWtDL2FIOEh4RVpTQ0ptUFJuTUx3NVkxbXRQOHRQV3IrQW5U?=
+ =?utf-8?B?L3J4ak1FRFNNQUQ1L040UU51RDU4dDlDVlJiMlhRVllYd2E0N2YxTk1ZeHN5?=
+ =?utf-8?B?YXUya0FHc0VJcXo3UGFDa2QzSExaUDdNUC9lS3YxU1ZrZWlEekloU1JzYWdF?=
+ =?utf-8?B?bVlERzF3ZEJwcHlSM2FIaDFjaUI2TldKZHU5cXhXNGZvRmY2RjBBako3d09K?=
+ =?utf-8?Q?ipOA7r?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(19092799006)(7416014)(376014)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?RVM3dW50ZjJ1dHpseG1VOW1OK29GQWRTY3hQTWowRUxzemJVSFoxa3psakE1?=
+ =?utf-8?B?eGxYM2FSR2p5UUlTb3JzM0VQU3cwTmZ2aXFNd0pDdmxzWHRCa3NrQmJFVWhD?=
+ =?utf-8?B?VEE1Zm5BL2ROQ3FlQlJ5cGljNGdtNjVITUNCT1BLVEJJV2lqeWpJVFdyM21Q?=
+ =?utf-8?B?ZThWbVdnSU15OUkzUkdMWVF3dEFUWVNYcEpLcCtadUk4WFMxRnNDb2ZWVXp0?=
+ =?utf-8?B?cWxSL3kzQXRYVHVjT3d4NDlSOEN3cWFFanV6SHpudkhyL2szM3NISlFaYVVY?=
+ =?utf-8?B?Ukpzem85bGI3a2tUK05yQXQ5UUo5dXplVzVneGFYNlY2a1JZekZheWFkbS9r?=
+ =?utf-8?B?MUVOMW1IdjFMTGtVcHBUcUVZNnU0alVWY2p6NzF2VkpJcjBNR2tucFk5TVNN?=
+ =?utf-8?B?eExtWnFuMmNxUzdxRDNkQk9XYitOUkpiSzBoRkNESUwwTVVrb3hXNEtFR3FG?=
+ =?utf-8?B?ZmdpSjgvNXBMVzYwQWFRVmNPLzdXYnJUejI2L0NIWU9SMXp0RmlVNkpvU0Jh?=
+ =?utf-8?B?U3BiRVFacWl1NWtMVy9xNkJybWV1RG81VGxvaE03SkpaN21xb1Bxa2tSdzNi?=
+ =?utf-8?B?QkwxYlgreTUwaWtuYnArd091YnFlQzVQRUdHQ2pVVEd2LzR5OUZzcTAwRWlX?=
+ =?utf-8?B?a1pXTVhORHhDbnhJVitHaG1aRkNpeXM0SzlZUkVQQk1ZUWRnK3RKQjc2T3RO?=
+ =?utf-8?B?bENqUi8vdUJDaUlqUHZZRXhpWEQrZkZtbnVLM3ZubkxJRHNFZFc1c1B5TDdC?=
+ =?utf-8?B?YkV1TGpXMFExTWJ0VWpqS09uVE9adFpOV0puUTc4b3J6MVFXUkhsMlVMaW9z?=
+ =?utf-8?B?ZGRuR3ppTUNlc053VDFoazZJajY4aHpDMFR5SzBtalpUcEttREFmcnpCdllE?=
+ =?utf-8?B?R05RYTBFd0xkcG95MllqYThEWFdReUZHMXVvNG44b0pVaWJ5VGtsV0VJRDQ5?=
+ =?utf-8?B?UFF6aWNraHJINFlUR0FpaE8wQTkvV1dMRDdidXhsRVA3aHZYNnRQT2FGMjJC?=
+ =?utf-8?B?Q2gwY28yNlNqNkVJSUx3NTgzYmpoY0x3VHp3a1BZY3Q5OGdvTXVBWWkzZW5u?=
+ =?utf-8?B?bEdJTW1FM3ZrZnc3akNtSmNwY3lxWDllajdBVlNsMzFWTGdDRE9tQlREaGVt?=
+ =?utf-8?B?YVl4MUZIWFlZVmM5RjQrbjNPa0g2UzFpSEtEMXVjeWhvYjFMY2haaXljcjVi?=
+ =?utf-8?B?K3A0ZUQ0V0RVZkEzdXN3cTMzZFc4QWxtYml4bnE4ZG52U0NLcFgvZ0pjUHYz?=
+ =?utf-8?B?V3NoYVYvQ3YvQWRzWFE4ajZCek9kbTdkTjZZdWtnYTdHakIyYUhiUXpITWxx?=
+ =?utf-8?B?bE5ZeDJsODFWNXpVckxFeHIrdmc1K0Fib3g1OHB0L3pIMTZtdkVYbytEKzdy?=
+ =?utf-8?B?V3lrS1lIcnhlSXpGdHVaQlZRamxGaytMaGZTei9lRi82aUxSUlVMNFgwZzVX?=
+ =?utf-8?B?bHpqWjNvVzFHKzlwTFB0Y2R6Q1B2dk1jMktiRVFOeEtFTysrSkptc0dTYmo3?=
+ =?utf-8?B?Z0I5UWJXMVAyYkd6b3k5Zkh3d2FUeXo5ek1XekEzUm95S0xnVkg0Qk1Bb1Bj?=
+ =?utf-8?B?M05lbkZVdjhUTUd1ZVZYL0Z5ckVIZ25OTWwraG9GaWx2WTladEtZVFRFYm9j?=
+ =?utf-8?B?K21GVmQyeFU1aHlCRmVnbUZTY1ZlZUpmMmNLcVJVRHMxb2tpVC9jTmZETUYv?=
+ =?utf-8?B?azlGWlVpeGZOS1NvTVdLNS80UWxwUEhsVGFEWExRYUp3b0dJSDR0bU1Pb0lW?=
+ =?utf-8?B?aWIzMTU4ZUxCWXhzdHhQbDhlc2NzbWFWc1ZwTWk5cURUZmJJTmxIbS9iYnNM?=
+ =?utf-8?B?UldZYVFiQVNDcWVQaWhsdjkwclVqS24yUUxXZ01DSml0TWJabjlTQ3cyYmlQ?=
+ =?utf-8?B?SytJQjUyYVIrWm05a0wyNzRvNEhEdHhwT3JONUN0NVlzbTJ3VEZUODRpZDlL?=
+ =?utf-8?B?T29JaFY0ZW5pUi9wMVpMaW92WkJUSXpaWUE0NFd3OGRzWGZXT1hueldGczd2?=
+ =?utf-8?B?ZzVaTkRVMDNwUlZMNHNudVQvNmszT0cyWE1URHF6QUNYLzgyT2xCaDhEbmJ5?=
+ =?utf-8?B?dXhuZEN0aXlKL0s3UGt4K1BDR3BNV2ZrSVVuMUlhUThXdE9HR0FzSGVkQUNT?=
+ =?utf-8?Q?WggE=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <linux-renesas-soc@vger.kernel.org>, Richard
- Cochran <richardcochran@gmail.com>, Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 6/6] net: hns3: add hwtstamp_get/hwtstamp_set
- ops
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jian Shen
-	<shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya
-	<gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, Bharat Bhushan
-	<bbhushan2@marvell.com>, Tariq Toukan <tariqt@nvidia.com>, Brett Creeley
-	<brett.creeley@amd.com>, =?UTF-8?Q?Niklas_S=C3=B6derlund?=
-	<niklas.soderlund@ragnatech.se>, Paul Barker <paul@pbarker.dev>, Yoshihiro
- Shimoda <yoshihiro.shimoda.uh@renesas.com>
-References: <20251017182128.895687-1-vadim.fedorenko@linux.dev>
- <20251017182128.895687-7-vadim.fedorenko@linux.dev>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20251017182128.895687-7-vadim.fedorenko@linux.dev>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d6b2334-d754-4c34-f13c-08de0f8287fd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Oct 2025 02:44:03.4629
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: iqKy1YAoOuD10lDtTSzQmfnEJ0hYbhqWEnoX7BnhvpyAPNgXx1bJYqOeo0nHKgL5PYJe/HKyAUqrE1aeeZ3vLw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7864
 
-
-on 2025/10/18 2:21, Vadim Fedorenko wrote:
-> And .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks to HNS3 framework
-> to support HW timestamp configuration via netlink and adopt hns3pf to
-> use .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
->
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-
-Thanks,
-Reviewed-by: Jijie Shao <shaojijie@huawei.com>
-
-> ---
-> v1 -> v2:
-> - actually assign ndo_tstamp callbacks
-> ---
->   drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  5 +++
->   .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 31 ++++++++++++++++++
->   .../hisilicon/hns3/hns3pf/hclge_main.c        | 13 +++-----
->   .../hisilicon/hns3/hns3pf/hclge_ptp.c         | 32 +++++++++++--------
->   .../hisilicon/hns3/hns3pf/hclge_ptp.h         |  9 ++++--
->   5 files changed, 64 insertions(+), 26 deletions(-)
->
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-> index 3b548f71fa8a..d7c3df1958f3 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-> @@ -804,6 +804,11 @@ struct hnae3_ae_ops {
->   	int (*dbg_get_read_func)(struct hnae3_handle *handle,
->   				 enum hnae3_dbg_cmd cmd,
->   				 read_func *func);
-> +	int (*hwtstamp_get)(struct hnae3_handle *handle,
-> +			    struct kernel_hwtstamp_config *config);
-> +	int (*hwtstamp_set)(struct hnae3_handle *handle,
-> +			    struct kernel_hwtstamp_config *config,
-> +			    struct netlink_ext_ack *extack);
->   };
->   
->   struct hnae3_dcb_ops {
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-> index bfa5568baa92..7a0654e2d3dd 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-> @@ -2419,6 +2419,35 @@ static int hns3_nic_do_ioctl(struct net_device *netdev,
->   	return h->ae_algo->ops->do_ioctl(h, ifr, cmd);
->   }
->   
-> +static int hns3_nic_hwtstamp_get(struct net_device *netdev,
-> +				 struct kernel_hwtstamp_config *config)
-> +{
-> +	struct hnae3_handle *h = hns3_get_handle(netdev);
-> +
-> +	if (!netif_running(netdev))
-> +		return -EINVAL;
-> +
-> +	if (!h->ae_algo->ops->hwtstamp_get)
-> +		return -EOPNOTSUPP;
-> +
-> +	return h->ae_algo->ops->hwtstamp_get(h, config);
-> +}
-> +
-> +static int hns3_nic_hwtstamp_set(struct net_device *netdev,
-> +				 struct kernel_hwtstamp_config *config,
-> +				 struct netlink_ext_ack *extack)
-> +{
-> +	struct hnae3_handle *h = hns3_get_handle(netdev);
-> +
-> +	if (!netif_running(netdev))
-> +		return -EINVAL;
-> +
-> +	if (!h->ae_algo->ops->hwtstamp_set)
-> +		return -EOPNOTSUPP;
-> +
-> +	return h->ae_algo->ops->hwtstamp_set(h, config, extack);
-> +}
-> +
->   static int hns3_nic_set_features(struct net_device *netdev,
->   				 netdev_features_t features)
->   {
-> @@ -3048,6 +3077,8 @@ static const struct net_device_ops hns3_nic_netdev_ops = {
->   	.ndo_set_vf_rate	= hns3_nic_set_vf_rate,
->   	.ndo_set_vf_mac		= hns3_nic_set_vf_mac,
->   	.ndo_select_queue	= hns3_nic_select_queue,
-> +	.ndo_hwtstamp_get	= hns3_nic_hwtstamp_get,
-> +	.ndo_hwtstamp_set	= hns3_nic_hwtstamp_set,
->   };
->   
->   bool hns3_is_phys_func(struct pci_dev *pdev)
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-> index 9d34d28ff168..81d3bdc098e6 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-> @@ -9445,15 +9445,8 @@ static int hclge_do_ioctl(struct hnae3_handle *handle, struct ifreq *ifr,
->   	struct hclge_vport *vport = hclge_get_vport(handle);
->   	struct hclge_dev *hdev = vport->back;
->   
-> -	switch (cmd) {
-> -	case SIOCGHWTSTAMP:
-> -		return hclge_ptp_get_cfg(hdev, ifr);
-> -	case SIOCSHWTSTAMP:
-> -		return hclge_ptp_set_cfg(hdev, ifr);
-> -	default:
-> -		if (!hdev->hw.mac.phydev)
-> -			return hclge_mii_ioctl(hdev, ifr, cmd);
-> -	}
-> +	if (!hdev->hw.mac.phydev)
-> +		return hclge_mii_ioctl(hdev, ifr, cmd);
->   
->   	return phy_mii_ioctl(hdev->hw.mac.phydev, ifr, cmd);
->   }
-> @@ -12901,6 +12894,8 @@ static const struct hnae3_ae_ops hclge_ops = {
->   	.get_dscp_prio = hclge_get_dscp_prio,
->   	.get_wol = hclge_get_wol,
->   	.set_wol = hclge_set_wol,
-> +	.hwtstamp_get = hclge_ptp_get_cfg,
-> +	.hwtstamp_set = hclge_ptp_set_cfg,
->   };
->   
->   static struct hnae3_ae_algo ae_algo = {
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-> index 4bd52eab3914..0081c5281455 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-> @@ -204,13 +204,17 @@ static int hclge_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
->   	return 0;
->   }
->   
-> -int hclge_ptp_get_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
-> +int hclge_ptp_get_cfg(struct hnae3_handle *handle,
-> +		      struct kernel_hwtstamp_config *config)
->   {
-> +	struct hclge_vport *vport = hclge_get_vport(handle);
-> +	struct hclge_dev *hdev = vport->back;
-> +
->   	if (!test_bit(HCLGE_STATE_PTP_EN, &hdev->state))
->   		return -EOPNOTSUPP;
->   
-> -	return copy_to_user(ifr->ifr_data, &hdev->ptp->ts_cfg,
-> -		sizeof(struct hwtstamp_config)) ? -EFAULT : 0;
-> +	*config = hdev->ptp->ts_cfg;
-> +	return 0;
->   }
->   
->   static int hclge_ptp_int_en(struct hclge_dev *hdev, bool en)
-> @@ -269,7 +273,7 @@ static int hclge_ptp_cfg(struct hclge_dev *hdev, u32 cfg)
->   	return ret;
->   }
->   
-> -static int hclge_ptp_set_tx_mode(struct hwtstamp_config *cfg,
-> +static int hclge_ptp_set_tx_mode(struct kernel_hwtstamp_config *cfg,
->   				 unsigned long *flags, u32 *ptp_cfg)
->   {
->   	switch (cfg->tx_type) {
-> @@ -287,7 +291,7 @@ static int hclge_ptp_set_tx_mode(struct hwtstamp_config *cfg,
->   	return 0;
->   }
->   
-> -static int hclge_ptp_set_rx_mode(struct hwtstamp_config *cfg,
-> +static int hclge_ptp_set_rx_mode(struct kernel_hwtstamp_config *cfg,
->   				 unsigned long *flags, u32 *ptp_cfg)
->   {
->   	int rx_filter = cfg->rx_filter;
-> @@ -332,7 +336,7 @@ static int hclge_ptp_set_rx_mode(struct hwtstamp_config *cfg,
->   }
->   
->   static int hclge_ptp_set_ts_mode(struct hclge_dev *hdev,
-> -				 struct hwtstamp_config *cfg)
-> +				 struct kernel_hwtstamp_config *cfg)
->   {
->   	unsigned long flags = hdev->ptp->flags;
->   	u32 ptp_cfg = 0;
-> @@ -359,9 +363,12 @@ static int hclge_ptp_set_ts_mode(struct hclge_dev *hdev,
->   	return 0;
->   }
->   
-> -int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
-> +int hclge_ptp_set_cfg(struct hnae3_handle *handle,
-> +		      struct kernel_hwtstamp_config *config,
-> +		      struct netlink_ext_ack *extack)
->   {
-> -	struct hwtstamp_config cfg;
-> +	struct hclge_vport *vport = hclge_get_vport(handle);
-> +	struct hclge_dev *hdev = vport->back;
->   	int ret;
->   
->   	if (!test_bit(HCLGE_STATE_PTP_EN, &hdev->state)) {
-> @@ -369,16 +376,13 @@ int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
->   		return -EOPNOTSUPP;
->   	}
->   
-> -	if (copy_from_user(&cfg, ifr->ifr_data, sizeof(cfg)))
-> -		return -EFAULT;
-> -
-> -	ret = hclge_ptp_set_ts_mode(hdev, &cfg);
-> +	ret = hclge_ptp_set_ts_mode(hdev, config);
->   	if (ret)
->   		return ret;
->   
-> -	hdev->ptp->ts_cfg = cfg;
-> +	hdev->ptp->ts_cfg = *config;
->   
-> -	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
-> +	return 0;
->   }
->   
->   int hclge_ptp_get_ts_info(struct hnae3_handle *handle,
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-> index 61faddcc3dd0..0162fa5ac146 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-> @@ -62,7 +62,7 @@ struct hclge_ptp {
->   	unsigned long flags;
->   	void __iomem *io_base;
->   	struct ptp_clock_info info;
-> -	struct hwtstamp_config ts_cfg;
-> +	struct kernel_hwtstamp_config ts_cfg;
->   	spinlock_t lock;	/* protects ptp registers */
->   	u32 ptp_cfg;
->   	u32 last_tx_seqid;
-> @@ -133,8 +133,11 @@ bool hclge_ptp_set_tx_info(struct hnae3_handle *handle, struct sk_buff *skb);
->   void hclge_ptp_clean_tx_hwts(struct hclge_dev *hdev);
->   void hclge_ptp_get_rx_hwts(struct hnae3_handle *handle, struct sk_buff *skb,
->   			   u32 nsec, u32 sec);
-> -int hclge_ptp_get_cfg(struct hclge_dev *hdev, struct ifreq *ifr);
-> -int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr);
-> +int hclge_ptp_get_cfg(struct hnae3_handle *handle,
-> +		      struct kernel_hwtstamp_config *config);
-> +int hclge_ptp_set_cfg(struct hnae3_handle *handle,
-> +		      struct kernel_hwtstamp_config *config,
-> +		      struct netlink_ext_ack *extack);
->   int hclge_ptp_init(struct hclge_dev *hdev);
->   void hclge_ptp_uninit(struct hclge_dev *hdev);
->   int hclge_ptp_get_ts_info(struct hnae3_handle *handle,
+PiBBZGQgYW5kIHVzZSBhbiBpdGVyYXRvciBmb3IgYWxsIFBIWSdzIG9uIGEgTUlJIGJ1cywgYW5k
+IHBoeV9maW5kX25leHQoKSBhcyBhDQo+IHByZXJlcXVpc2l0ZS4NCj4gDQo+IEhlaW5lciBLYWxs
+d2VpdCAoNCk6DQo+ICAgbmV0OiBwaHk6IGFkZCBpdGVyYXRvciBwaHlfZm9yX2VhY2gNCj4gICBu
+ZXQ6IGZlYzogdXNlIG5ldyBpdGVyYXRvciBwaHlfZm9yX2VhY2gNCj4gICBuZXQ6IGRhdmluY2lf
+bWRpbzogdXNlIG5ldyBpdGVyYXRvciBwaHlfZm9yX2VhY2gNCj4gICBuZXQ6IHBoeTogdXNlIG5l
+dyBpdGVyYXRvciBwaHlfZm9yX2VhY2ggaW4gbWRpb2J1c19wcmV2ZW50X2M0NV9zY2FuDQo+IA0K
+PiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvZnJlZXNjYWxlL2ZlY19tYWluLmMgfCAgOCArKy0tLS0t
+LQ0KPiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvdGkvZGF2aW5jaV9tZGlvLmMgICAgfCAxNCArKysr
+Ky0tLS0tLS0tLQ0KPiAgZHJpdmVycy9uZXQvcGh5L21kaW9fYnVzX3Byb3ZpZGVyLmMgICAgICAg
+fCAxMyArKysrLS0tLS0tLS0tDQo+ICBkcml2ZXJzL25ldC9waHkvcGh5X2RldmljZS5jICAgICAg
+ICAgICAgICB8IDE0ICsrKysrKystLS0tLS0tDQo+ICBpbmNsdWRlL2xpbnV4L3BoeS5oICAgICAg
+ICAgICAgICAgICAgICAgICB8IDExICsrKysrKysrKystDQo+ICA1IGZpbGVzIGNoYW5nZWQsIDI4
+IGluc2VydGlvbnMoKyksIDMyIGRlbGV0aW9ucygtKQ0KPiANCj4gLS0NCj4gMi41MS4xLmRpcnR5
+DQoNCkZvciB0aGlzIHBhdGNoIHNldC4NCg0KUmV2aWV3ZWQtYnk6IFdlaSBGYW5nIDx3ZWkuZmFu
+Z0BueHAuY29tPg0KDQo=
 
