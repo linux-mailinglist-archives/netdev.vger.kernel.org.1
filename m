@@ -1,203 +1,249 @@
-Return-Path: <netdev+bounces-230926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 000B4BF1F18
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:56:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B307DBF1F4B
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:58:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4072F461D56
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:56:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20FA73B7496
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12163229B38;
-	Mon, 20 Oct 2025 14:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F346222B5AD;
+	Mon, 20 Oct 2025 14:58:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h1GdVrlv"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="cnJgu+R8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11020121.outbound.protection.outlook.com [52.101.193.121])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D8A2288E3
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 14:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760972181; cv=none; b=eafd3b6vtdtT1WafosEXIETpjyPD377jlpD9XaCfoKOxYSw6KNUKJewTzBmwBoCJagf7xeLSzSxHu2ocu7DAnVF5SbHNuTQbWlFcwlABlQXOPRsGzRraGyYvFiX2aQit/CNvfJgzowhjzM4Yhh2yb3KL+1rtMXjtKx/eWEksVB8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760972181; c=relaxed/simple;
-	bh=/HR2FTJi1fhmbceyaoHcX88vfCwNJFFtxcpJPIU9AAU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KdtUGkEOylDvYlcbUIKRNZDH/BanbRUfbeCI+bB8D6hso2fycoj8D+hxb0M/KD5ZJV9bhZEHhPZTbaH9Y8UHwafefe0id1dkUFm8IY7rJcqkWLb5CQ0yi6lFz0owN+t8nXxv5ttxiHBRvDueOorjAp3YlXRU3Aa47+3nAcb+1qs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h1GdVrlv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760972178;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1k4CgXl3sl9wN3j76v6ryt7WSQ6sNGhilXai3IXkOjA=;
-	b=h1GdVrlvbXm4Ksa47MGapoAtlmZZYIQtZuRasgOOpXJjzEiOvebp45fSXYcaNH7WDC1dep
-	MIpZ3GG6twYlcl3rCi8iODYzw3/3wsSsESfsBrjGTzaoA+vCZPhqQ0kgp8iy++2ZuT9CFO
-	Qarqd6kQTMFcEwxuwlsMmLokVPkRjpY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-235-JjJQ8Q-nNhmBHRXARECA8Q-1; Mon, 20 Oct 2025 10:56:17 -0400
-X-MC-Unique: JjJQ8Q-nNhmBHRXARECA8Q-1
-X-Mimecast-MFC-AGG-ID: JjJQ8Q-nNhmBHRXARECA8Q_1760972176
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-4270a61ec48so3482240f8f.1
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 07:56:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760972176; x=1761576976;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1k4CgXl3sl9wN3j76v6ryt7WSQ6sNGhilXai3IXkOjA=;
-        b=t0rxpggLWgRgLxA2G/2OKl9JKGGQfss7gHwJ0n8upR2CHCcNwJyYmKPt8PnRNJ5NV6
-         5J3QjSH19mruWS6oDwK3CjVUTVORTm6Mh9MCr5ytJtSbLztNV1DldsgUbZHVliSovSf+
-         nRx8cSAweRNboRzmFiyU4UjhQuB1NypV3ex7U3MuN96jbvay6LM2zsBaj4bdUtfCpS2p
-         3O7Vtrn1zXnbTPaLX5y8wO6tTdcXPFsKnty4Bqt+s1w388ApAZ1YciQfHxzTNnHKx7df
-         noJd5yhzBBgCGlaMzfU3yMkPrPBW4b+5VOknGCyTrxoM0M8r94MCIRmMfVFOElgZv7HD
-         nTzw==
-X-Forwarded-Encrypted: i=1; AJvYcCXTTq+jtchKCUM57vjWRPH7KDJyAYBlJFe+kG901piTBVLgkZdBDsHCI/fuivzeYn9dG5bPQSQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7jjqN4PCTxCCju8YCNqHooba+qKeRPILo8akqrOv5lRKKnA4B
-	N0F2LfsGJCKwTRopHOmY5SQv5ltEKFyuODz98Yjx3Iu98kLFiCYTR8Utel3wTZTRnNtpLPgWhgn
-	XWSZ+EYtlaH5HfDPheiYjvyY6sMlI38tYbtk89k7FdPiM1OkxVA183Acz2w==
-X-Gm-Gg: ASbGncuEYyZIq+cINHUa46gA1h5iPr50LHR/emYjz2PFwuY+hXMkgy+7P9xIOkZeco/
-	cn4Jl9RRrGtAnkrsf704p595+XIZuPCF6jzJNZK9Lk+i5ycuAmspA2YFrYNFirm6ypuROOPDX1T
-	EEfTotfRvV6gPmwST48xUC6OkF0OfnpxgVshXIYHBukiFMEn+jExNeOWgLxxGIOyeD3ioSxlgrx
-	ETjaQIbVeVgMuDH6R8SNwPplZKfhPX91swuR8gRcym6lN4kHS1qLGAAATNugYTQeNhqKmCZaJa9
-	UmDp/vPnoFHt1vGte9jX192j36uorBEOEKwZC6EgUm1oB0h0PiOOQx3xdlaOc/8/jw==
-X-Received: by 2002:a05:6000:4021:b0:426:d836:f323 with SMTP id ffacd0b85a97d-42704d7e928mr9224486f8f.13.1760972175833;
-        Mon, 20 Oct 2025 07:56:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG5sg+KduAEaSO0d/WTabEkdjCGGskJwx7DMn5BIab28WZa40Ixe7cQ3ithEZxOA44qPb92Gw==
-X-Received: by 2002:a05:6000:4021:b0:426:d836:f323 with SMTP id ffacd0b85a97d-42704d7e928mr9224439f8f.13.1760972175185;
-        Mon, 20 Oct 2025 07:56:15 -0700 (PDT)
-Received: from fedora ([212.133.41.37])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427f00ba070sm15840369f8f.42.2025.10.20.07.56.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 07:56:14 -0700 (PDT)
-Date: Mon, 20 Oct 2025 16:56:08 +0200
-From: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
-To: Francesco Valla <francesco@valla.it>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>,
-	Harald Mommer <harald.mommer@opensynergy.com>,
-	Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Damir Shaikhutdinov <Damir.Shaikhutdinov@opensynergy.com>,
-	linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	development@redaril.me
-Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
-Message-ID: <aPZNiD1SN16K7hmT@fedora>
-References: <20240108131039.2234044-1-Mikhail.Golubev-Ciuchea@opensynergy.com>
- <2243144.yiUUSuA9gR@fedora.fritz.box>
- <aO4isIfRbgKuCvRX@fedora>
- <1997333.7Z3S40VBb9@fedora.fritz.box>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6041DE4C2;
+	Mon, 20 Oct 2025 14:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.121
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760972311; cv=fail; b=nuKe6NOaoJlIFv6QNJjpncJWSNbAlcAV5A04fLGnRKYDACzjhMlYG7h2lIs01747/L2h1jbMvCWOHIyBqcfO7sX2p87ihxGeEeD5SA0SAtdSkOXcVac9YYWYymSQGWNg1nHVzysBalDPndftTQfqqQXRJGeKr+s2SUJPd25RX/c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760972311; c=relaxed/simple;
+	bh=plKSlmJ9Upk2TtQeCR9NxfjxCRz7Co9qh5TbKUov64k=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=IC7etTAyEbNvg2EolZnAzCMHnpB6PIV88BDR8cl6chVUAc0az1WtLXjyZ6Zu9l/3a3aHz0gN03svphzdmvMY4geGbQau9SFtinYrtkrmGEcb75puMMs1IFs7v1HeP657Zp3apIP15//REJJgR+Dp8xDRojaQO2gsIdQyWm2OJ1c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=cnJgu+R8; arc=fail smtp.client-ip=52.101.193.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MHMa0pKnBswXaIfu9VpRCGu4NH0GocnbgkhA8OvgU2dKSrsv92Kab58j1ODlOMzwAQOaazx2k+W4k8ome9tX4zgZPoYSPvb8UZZ+ZvhwLl0rSmt+2yC+XfFUTdrXnOtQOer7aenbH16WVyIY9NwtuvidapaJpnRPHILnTEaLBBXlls1mtxMtfikufDU2sgJMjqlwR02C/93f1FjYHBjDBqwYEUQM7gCF2ZeLalMHAvzNT49G83VanzME3w1+ClQ39k0Oelbs9iPU8F7Czvy1sQtd6c/crAKdYY4MuMl+09opgp3e7M0D+xMOJrSytRG70GEtywBkuh8mu6HOCgfgNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pCi4EZRMmAoK5qLqQpIJYHfJhTEnXeDCwutNvAaQ6iA=;
+ b=L0vAFgkQHebv3Jxit26GAKsKBtuurQgzvEUajye484CVC0f+sYTBIo/5+zF8KFF1HWPbcOiktSbPcLkLRICJIUPmOygq0CHJTaVCRsGFab8YgSfbxXpuHDgc3kaeX55dDDGo7YkYecOVewg6jDqq4QFO//PUSva7nq3R7SDDSU0r1PaN9naHyP2H1u7WUxJYOceIXDXhVvUo7dhSSfulZxzpffAlYWwGd0Dl39MhJ5RkdpsWuzoi4HgdVdzKD+h1ITJeqEqMILGEuA+x6xjjYTjrtHm3O4Bj9VtIx23xyZ+dRUKr5ISkx7u00a4t23i8CYYdNNWm90Ggpy5FlKa1dw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pCi4EZRMmAoK5qLqQpIJYHfJhTEnXeDCwutNvAaQ6iA=;
+ b=cnJgu+R8ytfWsEmz25f6p8R0pa7WtDfLbEixLpGsD4sG2pP4KdctNJKQ2TpbeTGzcfyQXZ2ysF02/TCc7nQVwmsKl/0l7f7PpXoyiAqgZVs0ucZWQjJFUqMRw80fTwvovvefZeLeWD53H13650AvDQyxA5HGbtg60xfmVvRaC7A=
+Received: from SA3PR21MB3867.namprd21.prod.outlook.com (2603:10b6:806:2fc::15)
+ by DM4PR21MB3320.namprd21.prod.outlook.com (2603:10b6:8:69::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.4; Mon, 20 Oct
+ 2025 14:58:26 +0000
+Received: from SA3PR21MB3867.namprd21.prod.outlook.com
+ ([fe80::70ff:4d3:2cb6:92a3]) by SA3PR21MB3867.namprd21.prod.outlook.com
+ ([fe80::70ff:4d3:2cb6:92a3%4]) with mapi id 15.20.9275.002; Mon, 20 Oct 2025
+ 14:58:26 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>, Haiyang Zhang
+	<haiyangz@linux.microsoft.com>
+CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Paul Rosswurm
+	<paulros@microsoft.com>, Dexuan Cui <DECUI@microsoft.com>, KY Srinivasan
+	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "pabeni@redhat.com" <pabeni@redhat.com>, Long Li
+	<longli@microsoft.com>, "ssengar@linux.microsoft.com"
+	<ssengar@linux.microsoft.com>, "ernis@linux.microsoft.com"
+	<ernis@linux.microsoft.com>, "dipayanroy@linux.microsoft.com"
+	<dipayanroy@linux.microsoft.com>, Konstantin Taranov
+	<kotaranov@microsoft.com>, "horms@kernel.org" <horms@kernel.org>,
+	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
+	"leon@kernel.org" <leon@kernel.org>, "mlevitsk@redhat.com"
+	<mlevitsk@redhat.com>, "yury.norov@gmail.com" <yury.norov@gmail.com>, Shiraz
+ Saleem <shirazsaleem@microsoft.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [EXTERNAL] Re: [PATCH net-next,v2] net: mana: Support HW link
+ state events
+Thread-Topic: [EXTERNAL] Re: [PATCH net-next,v2] net: mana: Support HW link
+ state events
+Thread-Index: AQHcPVFWD9nsmGKsp0STD2ymhxH2HbTG+nuAgAQumFA=
+Date: Mon, 20 Oct 2025 14:58:26 +0000
+Message-ID:
+ <SA3PR21MB38676E685565E2B144C1E1F3CAF5A@SA3PR21MB3867.namprd21.prod.outlook.com>
+References: <1760477209-9026-1-git-send-email-haiyangz@linux.microsoft.com>
+ <20251017160541.4ce65ede@kernel.org>
+In-Reply-To: <20251017160541.4ce65ede@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=7ddb914f-1a61-4541-bab8-c1cf3be7cc9f;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-10-20T14:57:29Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA3PR21MB3867:EE_|DM4PR21MB3320:EE_
+x-ms-office365-filtering-correlation-id: 5385a5a4-4214-4b9d-1b8e-08de0fe91f7c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|376014|366016|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?+V2T9ummH+ki6asOnudrf8gUDfCGiWmwRgEW5EI+YK0pm9Ic8hXCHFGumXl2?=
+ =?us-ascii?Q?MDOsU5pTJPXMbuo2QnAB8pNYnNL1whBwHvKIljL/Stuq7qHYDerJqr5gKxX/?=
+ =?us-ascii?Q?6eR6yBWAXllzUFOK3CMYrW/uepiHKveH9rxPdgQUwGRF/RtZod7dKty7dVfa?=
+ =?us-ascii?Q?6Vuxza3wvZJkziEUIstHM8YbvQIINo59pgiYeyC4Lz1SF2FseIjrtEeliaH3?=
+ =?us-ascii?Q?7KyXLAQhl9vMShosECiLjUTZCbOksyZFy8FmmwLiFwMFnrb1PLRAzaWz2mB2?=
+ =?us-ascii?Q?dRSypzhu2x+nDEMR/e5e19fjrrs/DG8NRsLYy8n/6giVSMNRBTHG3HFm04PF?=
+ =?us-ascii?Q?u8kveKJB73kuz6AcP7985hr2nLwXlkEMHGgX0Ku3KmELDx8ql30GnZAhE4Cn?=
+ =?us-ascii?Q?W0Vil3eQB6S9UQFuHFYBaPIQczEc6Sm/FYNlEiWAbmeyK2B+5ym+ELancvvM?=
+ =?us-ascii?Q?bGHTjDEQdj1bX543/uqKCIVR+Kzmf5wtkagfPXTs22R+OGODyEwdI9QYTUut?=
+ =?us-ascii?Q?AVYyjvwCGd8azGhFBKlD/GwMGgi3jDR4Yvi+NStahU4/N45rqNvQln2TWB6u?=
+ =?us-ascii?Q?vm/x1yDXljx4H306Kse8Ghzijwg+ziD76HOAtnFbr1rOaD/PI3Z307OwSY8W?=
+ =?us-ascii?Q?RNgnIE7QFeqI+olShwC3EkcqeW8ti+Oyfm145k7C9FyS6eZZagt6UV1e4kCS?=
+ =?us-ascii?Q?/WFVg+Zo9FTFRb2PfXFA1sV8LPXMpQz/blBIqWLtN/UOZ9+hqw6fLH3tP+Ex?=
+ =?us-ascii?Q?UCnTjEULtQNcqciT7g3Z9RVCf1nIS2jK+E6qctEN13yxLbf3jI6wlXp0qg7e?=
+ =?us-ascii?Q?JWAjkSeEWpFlUalL28MbVflzZ56x6WGYu2gsAhp/ETWfDbJFMi8WebN9fq1S?=
+ =?us-ascii?Q?n1Cj3y5viOmMaGZcsaZs4A0ARj74Vv+DDBKIp1UNdR+e6yhybGDU96HmoaSF?=
+ =?us-ascii?Q?qIdoqI9nIMYY/hRUhVi8oSzbNbjh20LGa65sAg41HyjWV3YZbdBqijbaN1Jl?=
+ =?us-ascii?Q?j4Q8Ytj5PpFTfEVxk91lu6A2KPsnKToD/OTdpHirB6ickUVKrS9b/gJex6x4?=
+ =?us-ascii?Q?AQLLGW4e014xnRbdOR8iLDie+MwWhdPQBtK57NbAUfciMjOlG+KNtIhfQ2hk?=
+ =?us-ascii?Q?8VD+MbgyomsN63kMzRGjBmeY2VVusuRVhrnvFa5oHmnSdOqfQ5xvo1bQ/qIt?=
+ =?us-ascii?Q?tOLvefkToQxbVw2ZL0bsycC9h9GYN9X/nnOZ+HGXnXCNPYLRYJjDeTi05viC?=
+ =?us-ascii?Q?M82sKNRIMAA8dnWWqSiMp+e3WWpOYEhoV0j189TVVZatREvKVHiz/SJEO3g3?=
+ =?us-ascii?Q?75anDx8+uQvsaW4/toBgXhxFRWXnBo6lnvB/eKwWMFJfPUc8aX7DEe6ArG1H?=
+ =?us-ascii?Q?UZjHDYhvv5nb6VvNbwqFS4h29/6L5cwuUfxNG9hZrLHpN9Atk+6jf8KuMkNG?=
+ =?us-ascii?Q?L2PDFh0yswIdeXmFx0SAsmjgp4zzB+MxvK23CiQXNnf2cIfxETWW54zdk/l4?=
+ =?us-ascii?Q?2ABZ8NFHB2RPH5CMbRHwfbFPwPLS6BXTBbuc?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR21MB3867.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?sKffxg4mHLipDg7yytJCb+MIGdnyhx+Hn4994n5Vyu+mCBg+tahele34a4WB?=
+ =?us-ascii?Q?SQC/8+Lhpv8sJzH1x1lRPkP+stP6zOJ9sZJCpDuuDUcnQnpulMGzpCZS4NTV?=
+ =?us-ascii?Q?L6jbTkbWiQX2mOAv3qlKTbamHJbuuDAbTeZ8MZ3OL5qe4RWv3ANWXREZMJun?=
+ =?us-ascii?Q?KGE91wn2f2An/GBVwvnaOB/ShV7PW8RPToIq3zN3uT3jP0sMZA9oKZ0njHoM?=
+ =?us-ascii?Q?XBnGmMECJP5iXwGzuqVB7RyZTXOngGjfb4rsfgsLL1B45W7XVj5BUBJx9LdA?=
+ =?us-ascii?Q?QgyGvviKqpNoD89Aq79EJ5N3WHzZhukfMBUs3lwQeGeDlzWgqgPkxLDn03y5?=
+ =?us-ascii?Q?egyYSxQjPQI+hxo7XM9XbMC+zYD5yMlHBK17AI7YqH0i0s02YIpj6ppLj/c9?=
+ =?us-ascii?Q?fDHloFe30frvs+8xSlXeCwEiwjB0zu6PVrspmXneuFSVSSPURz/Ia134GoL3?=
+ =?us-ascii?Q?e13eptD7AG2Wqm9c3Fxm0uF6TZZ73Qu7bh3U5zdldI1jsRt5oN8a65sYF0QT?=
+ =?us-ascii?Q?79VNxrI9krRMUqQcKAWGzhSN/iHR/Cg4rCJkPJ7wUaa4yvm7J0CfxNPDTQCb?=
+ =?us-ascii?Q?weagSAqkMP7abmoU+m6dGeLLbgM7CNvJVDUJzHPH4+97zUU2gYo6r14JB4Cg?=
+ =?us-ascii?Q?XaOcurBgcPYHvg0AA87U1nOULkWy8feB9kaVTBgz5kgQ/6na4Meb7fYTE3JG?=
+ =?us-ascii?Q?tYDgaIk5FEC+OWebBEoOCuX3IuEYPm1Qg4Z+RJ2m9H5k6zuzx3dFrlTfD7S3?=
+ =?us-ascii?Q?snj4dLTuoOwsciG6OC8+O3x2oXrwOLYXHPRUuLg/40KMyNLj5Knz62X+RkXY?=
+ =?us-ascii?Q?OD20rSmgrqEX3kwvO0yHCo3+0gkKkP0PCzys7Zxz/9QuNQwURyxmgUnqWPZA?=
+ =?us-ascii?Q?BZd/j7efNUxTfJhcfFLJriZGDa02IMY/7uaVB/xFPxjz0X+pXRTNImvv72fG?=
+ =?us-ascii?Q?qGQnIo1OQtKs9n6lkyx2fS8MkeHrlry7OmQHusXiJ1y2Sqi1rO4dJVI/rQ7R?=
+ =?us-ascii?Q?foeAeX/Vq7+DNhnKEnlAgEXSoIMnPB1LsBOKEjvl14Q7Tog8gdkNK+9baGTl?=
+ =?us-ascii?Q?6CtbdZfLRAzCW4AT5i8wulEeHauTsmpdZsvCWmJ68GJi1kkSISUOrsw3BRpI?=
+ =?us-ascii?Q?N/nI4pOCC37vrIzPI4W4lroqj1iJjdAWuG+2NnaQ3sL55xq0iMrfcdOTi8b1?=
+ =?us-ascii?Q?EEc1A7HnLjrandfJK2BZT6c9iU2FIl9VBKxj/bbokacQBW3dFkKi3EDxuC23?=
+ =?us-ascii?Q?a/2bBOEc2NeV+DIYshCTlllbOPku+Uu+AnwMfYchxrpA8pYXo2bhseCaqevL?=
+ =?us-ascii?Q?KIaBp57eGWoA0I/IKl/y3/4N3kOTtHJm2wi5SAn7UGSwYmpHgZI9aDYGDcwR?=
+ =?us-ascii?Q?r+Ql+7KECZr8mar6ZCFoUPyb4BZAzjnwBXcgLAoeqIyODP9seInbzmgcieYa?=
+ =?us-ascii?Q?nrWkSlS+NRN5mC/ZmWlU1WVUSeSWU8+nasMmWx+nRhN7JQkUe0ixTy3R3de0?=
+ =?us-ascii?Q?76wOnnzIxLK2n+ifp2BY9IucukgLZFS3+RyN4nRKXZaw12/3/kWBNvnAkfzE?=
+ =?us-ascii?Q?SY/po9AlDTQoGRE9JvIaia3WxGWsCHSF9afqhH6q?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1997333.7Z3S40VBb9@fedora.fritz.box>
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR21MB3867.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5385a5a4-4214-4b9d-1b8e-08de0fe91f7c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Oct 2025 14:58:26.2946
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: E3/DYmZGimNWY0ivg2Mjhep8ZKKVv5eTGc6atVxdHt864i36o7N7Nwhvtf+Mow3D+Is+gGdaubd66WaWOQU3dQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR21MB3320
 
-On Tue, Oct 14, 2025 at 06:01:07PM +0200, Francesco Valla wrote:
-> On Tuesday, 14 October 2025 at 12:15:12 Matias Ezequiel Vara Larsen <mvaralar@redhat.com> wrote:
-> > On Thu, Sep 11, 2025 at 10:59:40PM +0200, Francesco Valla wrote:
-> > > Hello Mikhail, Harald,
-> > > 
-> > > hoping there will be a v6 of this patch soon, a few comments:
-> > > 
-> > > On Monday, 8 January 2024 at 14:10:35 Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com> wrote:
-> > > 
-> > > [...]
-> > > > +
-> > > > +/* Compare with m_can.c/m_can_echo_tx_event() */
-> > > > +static int virtio_can_read_tx_queue(struct virtqueue *vq)
-> > > > +{
-> > > > +	struct virtio_can_priv *can_priv = vq->vdev->priv;
-> > > > +	struct net_device *dev = can_priv->dev;
-> > > > +	struct virtio_can_tx *can_tx_msg;
-> > > > +	struct net_device_stats *stats;
-> > > > +	unsigned long flags;
-> > > > +	unsigned int len;
-> > > > +	u8 result;
-> > > > +
-> > > > +	stats = &dev->stats;
-> > > > +
-> > > > +	/* Protect list and virtio queue operations */
-> > > > +	spin_lock_irqsave(&can_priv->tx_lock, flags);
-> > > > +
-> > > > +	can_tx_msg = virtqueue_get_buf(vq, &len);
-> > > > +	if (!can_tx_msg) {
-> > > > +		spin_unlock_irqrestore(&can_priv->tx_lock, flags);
-> > > > +		return 0; /* No more data */
-> > > > +	}
-> > > > +
-> > > > +	if (unlikely(len < sizeof(struct virtio_can_tx_in))) {
-> > > > +		netdev_err(dev, "TX ACK: Device sent no result code\n");
-> > > > +		result = VIRTIO_CAN_RESULT_NOT_OK; /* Keep things going */
-> > > > +	} else {
-> > > > +		result = can_tx_msg->tx_in.result;
-> > > > +	}
-> > > > +
-> > > > +	if (can_priv->can.state < CAN_STATE_BUS_OFF) {
-> > > > +		/* Here also frames with result != VIRTIO_CAN_RESULT_OK are
-> > > > +		 * echoed. Intentional to bring a waiting process in an upper
-> > > > +		 * layer to an end.
-> > > > +		 * TODO: Any better means to indicate a problem here?
-> > > > +		 */
-> > > > +		if (result != VIRTIO_CAN_RESULT_OK)
-> > > > +			netdev_warn(dev, "TX ACK: Result = %u\n", result);
-> > > 
-> > > Maybe an error frame reporting CAN_ERR_CRTL_UNSPEC would be better?
-> > > 
-> > I am not sure. In xilinx_can.c, CAN_ERR_CRTL_UNSPEC is indicated during
-> > a problem in the rx path and this is the tx path. I think the comment
-> > refers to improving the way the driver informs this error to the user
-> > but I may be wrong.
-> > 
-> 
-> Since we have no detail of what went wrong here, I suggested
-> CAN_ERR_CRTL_UNSPEC as it is "unspecified error", to be coupled with a
-> controller error with id CAN_ERR_CRTL; however, a different error might be
-> more appropriate.
-> 
-> For sure, at least in my experience, having a warn printed to kmsg is *not*
-> enough, as the application sending the message(s) would not be able to detect
-> the error.
-> 
-> 
-> > > For sure, counting the known errors as valid tx_packets and tx_bytes
-> > > is misleading.
-> > > 
-> > 
-> > I'll remove the counters below.
-> > 
-> 
-> We don't really know what's wrong here - the packet might have been sent and
-> and then not ACK'ed, as well as any other error condition (as it happens in the
-> reference implementation from the original authors [1]). Echoing the packet
-> only "to bring a waiting process in an upper layer to an end" and incrementing
-> counters feels wrong, but maybe someone more expert than me can advise better
-> here.
-> 
-> 
 
-I agree. IIUC, in case there has been a problem during transmission, I
-should 1) indicate this by injecting a CAN_ERR_CRTL_UNSPEC package with
-netif_rx() and 2) use can_free_echo_skb() and increment the tx_error
-stats. Is this correct?
 
-Matias
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Friday, October 17, 2025 7:06 PM
+> To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+> Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; Haiyang Zhang
+> <haiyangz@microsoft.com>; Paul Rosswurm <paulros@microsoft.com>; Dexuan
+> Cui <DECUI@microsoft.com>; KY Srinivasan <kys@microsoft.com>;
+> wei.liu@kernel.org; edumazet@google.com; davem@davemloft.net;
+> pabeni@redhat.com; Long Li <longli@microsoft.com>;
+> ssengar@linux.microsoft.com; ernis@linux.microsoft.com;
+> dipayanroy@linux.microsoft.com; Konstantin Taranov
+> <kotaranov@microsoft.com>; horms@kernel.org;
+> shradhagupta@linux.microsoft.com; leon@kernel.org; mlevitsk@redhat.com;
+> yury.norov@gmail.com; Shiraz Saleem <shirazsaleem@microsoft.com>;
+> andrew+netdev@lunn.ch; linux-rdma@vger.kernel.org; linux-
+> kernel@vger.kernel.org
+> Subject: [EXTERNAL] Re: [PATCH net-next,v2] net: mana: Support HW link
+> state events
+>=20
+> On Tue, 14 Oct 2025 14:26:49 -0700 Haiyang Zhang wrote:
+> > From: Haiyang Zhang <haiyangz@microsoft.com>
+> >
+> > Handle the HW link state events received from HW channel, and
+> > set the proper link state, also stop/wake queues accordingly.
+>=20
+> Why do you have to stop / start the queues? I think it's unusual.
+> Let the packets get dropped, sending out potentially old packets
+> when link comes back is not going to make anyone happier.
+Will do.
 
+>=20
+> > +static void mana_link_state_handle(struct work_struct *w)
+> > +{
+> > +	struct mana_port_context *apc;
+> > +	struct mana_context *ac;
+> > +	struct net_device *ndev;
+> > +	bool link_up;
+> > +	int i;
+> > +
+> > +	ac =3D container_of(w, struct mana_context, link_change_work);
+> > +
+> > +	if (ac->mana_removing)
+> > +		return;
+> > +
+> > +	rtnl_lock();
+> > +
+>=20
+> > @@ -3500,6 +3556,10 @@ void mana_remove(struct gdma_dev *gd, bool
+> suspending)
+> >  	int err;
+> >  	int i;
+> >
+> > +	ac->mana_removing =3D true;
+> > +
+> > +	cancel_work_sync(&ac->link_change_work);
+>=20
+> Looks racy, the work needs @ac to check the ->mana_removing but
+> mana_remove() frees @ac. Just use disable_work_sync() please.
+
+Good idea. Will update the patch.
+
+Thanks,
+- Haiyang
 
