@@ -1,134 +1,125 @@
-Return-Path: <netdev+bounces-231021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4250BBF3D1E
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 00:03:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9E68BF3FE4
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 01:14:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B0ED18C5585
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 22:03:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 821EB18A6F4F
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 23:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C77B2EBB8F;
-	Mon, 20 Oct 2025 22:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D0D2F6596;
+	Mon, 20 Oct 2025 23:14:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="f43cV1wJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jXW0Im8x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1332EBDCB
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 22:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B712475CD
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 23:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760997740; cv=none; b=tGC5sOdqA+KegMGAF0dshaxBeSQ+04H1lthtznAU473mI3E7z4k5fPUXYsDbSuMbCa3mJL/gQbY14U9MWFBI0g9bPPYeqCN7HgierMoKuo84NUoOtB8ATblSgMCFo23FnIDAR1d9N+XfRqtYexQpzo/mCIjSiWSTCpvUFzwT/K0=
+	t=1761002088; cv=none; b=dnB+3cn7djHjG6jTk4hvLQmi5nZNSwHLlmyzojC1YwfAXMMMU7mOzdRGIHrwi8GZu7pdSq0Rb6YnzYwhC60NvOsOftA3L7kPSjUALOxlB62PFCw3PztH0dSL5RcFxK2b5pdHAmziOjbBlc2eJnZ5x8ORP7UYAZGdnBX8YA0CMcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760997740; c=relaxed/simple;
-	bh=g84O5BBHxizBzlTbx0ENCKIA1qgZHwTAxI+AXD4hRmE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kpwx9uKg3qccbfuaj9bAl4WnyOXqydUTR9h3h8S5VogG+CeGbk/5Mf4XU93Lr8WsOxhNSn3DesHVgXqYCGdGVMMY8raxSd8IED6zkZSFN/yKHZPlMCjUohMPHjBPC6/bjM79i5yS3ITNh6J80dQD6DT9SX5u/7Gbh4zfXJnFGBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=f43cV1wJ; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-33ba5d8f3bfso4222759a91.3
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 15:02:18 -0700 (PDT)
+	s=arc-20240116; t=1761002088; c=relaxed/simple;
+	bh=F9XmdbMoYNlCr4el47J3Bv0ZE391rmUeYD178V6unOs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DOrnsChq1k+p1J/Eptdl7nBbhbxUxs+W/D+dVmA9pZBpfxv2wp0zgmlryTtMqyLqsKFypVBz4eHhVgW/PK+iILL9KPN5bl2UlJNoet1qekuV5LJVJOWJyJ9Uk7C6+8+zKbSf1eJ0sG1myTIqp6GnrHiAruGo3/9cIbsmhn/t8NY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jXW0Im8x; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4710665e7deso17511345e9.1
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 16:14:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1760997738; x=1761602538; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pGC4lUtZkCybSPABd3uFIGUFJMNEDwCb9SB1IGRtFls=;
-        b=f43cV1wJ0wD9bOozHx6QDqZdd4Mjx7TlaJBZ2YPlFTMbY5ka9lXgPegeH5wHFAyhBs
-         o9eZgBH9xU5fSAXMLzN5UjYr6VYFQeoyHYycHdHGMWyLul6gCKluhfMnlBOovtZbGtNS
-         cG7TvCzeKMZI5mtvInhMqt9mPBVfvVRMpLASmuUAhUr+044xu9wF0ab4zaARBzvOcVjZ
-         bHhC6YAlHxYkrWEeseYapPvqKI+v7wRYWZRvFTq7NvBYecY8U0fKyqF3u0biieBxlPfm
-         FXWXq6TOShj0OEhyvcNIeKi7HE2gB8fGItk2w2b7eS6e7qw24e3UNLzXM1JUcIzm0ksH
-         61gA==
+        d=gmail.com; s=20230601; t=1761002085; x=1761606885; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GkTarXuXdqwnRmmvR/7gRtPxkDyx0bQrkvu8spcNQuM=;
+        b=jXW0Im8xftFMOJXYzU0n6ULhX+irbQkpzeCfToouT9J0J7qOqlTcwNLv4rnrywLgkz
+         KJvApIotTDEhiZ+GUAtDFGRAbJkN1unJWYSE+DtMND8UC+Ibs3Hxp1oIkJ6JMKfXBTuf
+         +YZwR7vjWH016zf48z39EdNzOsfbaE7noDWuTTv/x/SAQbG2z4mrYKrX5E+eMbUcPjTS
+         vtq6Cw98xkyW8C/oPHsxW1T1hDmoH6VDrGcVsj6wdJZ1sgEJGOSGW8ynU/GnksRzn6ue
+         761rlNBKr85NI3CQAZdPS/S/ttPbTaMqb9M+9vbHw/qI7gQIRZyZboV4k6zTUjU3gF3k
+         pYxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760997738; x=1761602538;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1761002085; x=1761606885;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pGC4lUtZkCybSPABd3uFIGUFJMNEDwCb9SB1IGRtFls=;
-        b=AzjNX99Udp+2DG4BXJhzjkOG8O0lWWllK9nQnTIpleCRgx9O98ktrYYbHZnjmX1Tmm
-         iGrfZMt0/IdsqwpksHSoXt1knMqLdh9O4lXnqZ9HGe++B8Ao7jsn0LHM0mlqsakFAN3b
-         9xtyc0dGvpI9qBkJt/rNcsFNu5vUOVzXDX6t7GCCj/Xwbz7isP18f89OhZZi4A44lit3
-         A14yFi+lHo8fjUi/HJilVa/QvSHx/c6UlMy5ereCX0/qzyPJ9bfmdQjOxlmPoWOuwHhM
-         10QPty2rEcVTCGCCZ4MCUOLUtiJqf43gagO7av6r9KtymcNIYCEHDzSHL21nEsX6fYHq
-         Hfig==
-X-Gm-Message-State: AOJu0YzQQVTtItJ2XLYi67tUoVv9k/ebMIf/p+n/KWO5HtHgDERI4wrB
-	SF29HJv48hiCIWTvRSrykWsJDL6GWcB/q8d5xb5P3BC+0yHuafqCZoUFEnSmsiag4WkKxXtUhaH
-	6pZj7TJE=
-X-Gm-Gg: ASbGnctuz2KUTA+b0JohumOp/nsHQ7juyOfWGnkGQmk0GH8WWAT4yvt8ScWlRtbd0ic
-	NE0xOg4pcvQj5eAAsTktmrcaFNcCBML6cnDJu0cp8d45TYZX7Scn3nDtPIxRha7slW3Jm25++vh
-	+GM/qr8JlcAqGuGm3uMrD+BcAs+TG6PVKgoRn6orVx46P0sApKaiEOWobKmvq2Ir3hgLVQJBBGo
-	kGGGSPpznf57bQ1wWnZf4dDPxD9u6FTOCp/G/e2SAFNAQJR2WlL+BiPio8oBnK4YY/0HGWwSLHw
-	LTFRTY8ZKjBsdqp4bYKn8FtqSr9PzGm2sW/+VMBV/cNVOt/ECdxCo3VWj1xXaHNUnfRwbLJLeWq
-	m1pCoKe/GMUJzHlGQrw5jFL7qK8iyp1JZFzWRMG6Eq2YXgFiwsFmiETAkkgKs4HXd4QQrLY877k
-	T2dVx4wEFNgw4hnt63BsJ9SwNev6pqn4VefBDWEF8bputxneQt0j0=
-X-Google-Smtp-Source: AGHT+IHAqzdpX3WollrdS6iAJjINTNksPg/CfvXjqQwa4xvz9GrNKp0B6IipUBCVkGkdK+Jqwy4kbg==
-X-Received: by 2002:a17:90b:4b51:b0:32e:7c34:70cf with SMTP id 98e67ed59e1d1-33bcf9237b8mr15583037a91.36.1760997736382;
-        Mon, 20 Oct 2025 15:02:16 -0700 (PDT)
-Received: from ?IPV6:2606:4700:110:899a:69eb:7404:382b:b6e3? ([2a09:bac1:76a0:838::1d1:a5])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33d5ddeb131sm8906676a91.4.2025.10.20.15.02.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Oct 2025 15:02:15 -0700 (PDT)
-Message-ID: <1f974f16-c46d-4e9b-b0ed-c15b5d5c45cd@cloudflare.com>
-Date: Mon, 20 Oct 2025 15:02:11 -0700
+        bh=GkTarXuXdqwnRmmvR/7gRtPxkDyx0bQrkvu8spcNQuM=;
+        b=Ubx1czkmaynbCxtjl+VZqoNI7xdst0yK9H+8d6rZu22ZcjLgLen3urzTGdaq1xfwx/
+         XEs0f5FUB6EdUbKCT1rhNvXtmtCxcCXIplA7BTlQTd8ZT/Mssfa7aUQCDXMC5KvIQJDQ
+         aWvhggxfiOGqnlOEitOO8eI2IQr3z5N525l7HloYIsM3yoTq7C+FE3kmnCXmRP6hK9b2
+         LH4gmeJVYeR2hy+Tejr2y5Gu3uKyQR3apdazJ6IUnn3gZRLQWi/q0HFpavJHpSfDFhIH
+         1ldsO63kbCzEYCVXrX7u9/quaToevIZJPJM/mTqtKlq03T3Gw1BheH5jWl71ZJyv7oUO
+         +hCA==
+X-Forwarded-Encrypted: i=1; AJvYcCVpVj6K3E7iHlvzB4fD9mLIvL2e9gr8gwyKaW6JDed4Yn/11I3dpS1AOW676K4Zzuwb0OCf7RM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxysyA3SUcGjUXpEwgE1l19PNVNqzYYPAkFRV3SPSfT7GifR5xB
+	IBBi6Z1ay3kQPEJKPCnHQFde1GuRrF0zuOGEyWCZDozm5HArID706dm7
+X-Gm-Gg: ASbGncsxhCuGuKMM1HO9F2tTYe+xk/HDOE15oegW+qsn+PEK0PQCqwLArwtHCTKdUb8
+	F8Cb3oGiCOKtIazICW3knFvV/ALpYNYAUFZ7xOIEf+UKKv34GDAmFaBOKQMJymaKFRs08rGrzhs
+	ntshyz3+WOSqzrQgrWnloq/mNLqTj6sNq4nGBgwVnnQqCJ6A3ux/PiQ7grJanv0GRlBQPVeYivP
+	WlHydRgXJbiZnN3C1EgDsRkHuEDc1r/forTPXbnIEWDbDlp0MSGn+8eNK5mQaSP3Y/J74VK7zR8
+	zTBB1GWR7PpKj+0UhfarmPF3EOLhzjUUVSAVfD1WqPVTHvThBiIUnTeZWNk/VkFvUuDseTdzMVT
+	CRbP/LUXodKhk9y8m6YKxvuyUcIVG1SUEtMVLh6lHl6MRbdhX3EWlh6BOIPJnAMEvOHXj4LGTmZ
+	cGzhi5PK0cn6HmE6m6Pw==
+X-Google-Smtp-Source: AGHT+IEo9EX3KYMSBA1tzRcWECn+Ied0y6jeP/WpvATQ9dbq7Lz/7CbUrDecochWfyk3s8hotzootA==
+X-Received: by 2002:a5d:5849:0:b0:426:eef2:fa86 with SMTP id ffacd0b85a97d-42704d83873mr10529691f8f.11.1761002084931;
+        Mon, 20 Oct 2025 16:14:44 -0700 (PDT)
+Received: from archlinux ([143.58.192.81])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427ea5b3c34sm17204706f8f.17.2025.10.20.16.14.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Oct 2025 16:14:43 -0700 (PDT)
+Date: Tue, 21 Oct 2025 00:14:42 +0100
+From: Andre Carvalho <asantostc@gmail.com>
+To: Gustavo Luiz Duarte <gustavold@gmail.com>
+Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Matthew Wood <thepacketgeek@gmail.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net 1/2] selftests: netconsole: Add race condition test
+ for userdata corruption
+Message-ID: <uaxu3wlt5jqhzibmhjy44sb5mlekdezqbt5b3p2e5zza25jcpu@uqxdynirj3lp>
+References: <20251020-netconsole-fix-race-v1-0-b775be30ee8a@gmail.com>
+ <20251020-netconsole-fix-race-v1-1-b775be30ee8a@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] ice: General protection fault in
- ptp_clock_index
-To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>,
- Frederick Lawler <fred@cloudflare.com>,
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- AndrewLunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- "kernel-team@cloudflare.com" <kernel-team@cloudflare.com>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-References: <aIKWoZzEPoa1omlw@CMGLRV3>
- <8743bbc9-8299-495c-8aef-842197bd8714@cloudflare.com>
- <IA1PR11MB6219645389921FD751CA0C8B9227A@IA1PR11MB6219.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Jesse Brandeburg <jbrandeburg@cloudflare.com>
-Autocrypt: addr=jbrandeburg@cloudflare.com; keydata=
- xjMEZs5VGxYJKwYBBAHaRw8BAQdAUXN66Fq6fDRHlu6zZLTPwJ/h0HAPFdy8PYYCdZZ3wfjN
- LUplc3NlIEJyYW5kZWJ1cmcgPGpicmFuZGVidXJnQGNsb3VkZmxhcmUuY29tPsKZBBMWCgBB
- FiEEbDWZ8Owh8iVtmZ5hwWdFDvX9eL8FAmbOVRsCGwMFCQWjmoAFCwkIBwICIgIGFQoJCAsC
- BBYCAwECHgcCF4AACgkQwWdFDvX9eL/S7QD7BVW5aabfPjCwaGfLU2si1OkRh2lOHeWx7cvG
- fGUD3CUBAIYDDglURDpWnxWcN34nE2IHAnowjBpGnjG1ffX+h4UFzjgEZs5VGxIKKwYBBAGX
- VQEFAQEHQBkrBJLpr10LX+sBL/etoqvy2ZsqJ1JO2yXv+q4nTKJWAwEIB8J+BBgWCgAmFiEE
- bDWZ8Owh8iVtmZ5hwWdFDvX9eL8FAmbOVRsCGwwFCQWjmoAACgkQwWdFDvX9eL8blgEA4ZKn
- npEoWmyR8uBK44T3f3D4sVs0Fmt3kFKp8m6qoocBANIyEYnUUfsJFtHh+5ItB/IUk67vuEXg
- snWjdbYM6ZwN
-In-Reply-To: <IA1PR11MB6219645389921FD751CA0C8B9227A@IA1PR11MB6219.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251020-netconsole-fix-race-v1-1-b775be30ee8a@gmail.com>
 
-On 7/31/25 4:01 AM, Nitka, Grzegorz wrote:
+Hi Gustavo,
 
->> Hi Intel team, anyone have an idea on this? Looks like maybe removal of
->> device 0 that had originally registered PTP clock isn't handled well?
->>
-> 
-> Hi All,
-> 
-> Thank you for your message. We're looking into this.
-> Yes, at first sight it seems to be a race condition hit while removing PF which is PTP
-> owner (and responsible for removing PTP clock).
+On Mon, Oct 20, 2025 at 02:22:34PM -0700, Gustavo Luiz Duarte wrote:
+> This test validates the fix for potential race conditions in the
+> netconsole userdata path and serves as a regression test to prevent
+> similar issues in the future.
 
-Hi Intel team, any progress on this issue?
+I noticed the test was not added to the TEST_PROGS in the Makefile like other
+selftests. Is that intentional? 
 
-BR,
-  Jesse
+You might also need to change the order of the patches in the series to
+make sure the test passes in CI.
+
+> +cleanup_children() {
+> +	pkill_socat
+> +	# Remove the namespace, interfaces and netconsole target
+> +	cleanup
+> +	kill $child1 $child2 2> /dev/null || true
+> +	wait $child1 $child2 2> /dev/null || true
+> +}
+
+Calling cleanup before stopping loop_set_userdata causes writing the userdata to
+fail. You might want to move the kill and wait lines to before call to cleanup.
+Additionally, shellcheck also suggests wrapping $child1 and $child2 with double
+quotes.
+
 
