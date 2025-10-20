@@ -1,100 +1,107 @@
-Return-Path: <netdev+bounces-230779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CB38BEF5A5
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 07:27:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFA22BEF630
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 08:01:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22E22189877C
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 05:27:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0105A3E18F2
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 06:01:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8DE82BEFFF;
-	Mon, 20 Oct 2025 05:27:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eStqRMmD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE04218827;
+	Mon, 20 Oct 2025 06:01:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB2120322;
-	Mon, 20 Oct 2025 05:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73193354AFF
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 06:01:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760938040; cv=none; b=JJ2fWb/BfMcpzb9dmzNXygnTBaZZWLCKACheQKCYCFHwLEglQTBsUQJL1bqakoYAB/OrsZj87XoD56xU/RvJNOMy5T5qLry94J+yi0nourIQdRpBhSclnsEdKKZnXSHwDXyPEybsaN3jXls/AAhGODMUjSArJIareqjZhNgxCZk=
+	t=1760940081; cv=none; b=nm+XZUjOsL7TT1ZigdrjXsOwAmToeZMeT+Y01jkc5dqga2XyFY9ww1UIMEhibS4CBXpu087kc+ZxgX/zND6uhKfzWkmrkF97rWPjB94K1+R6M+2pnqLM6zhpRYzhQ65m2pfJ1/A2L89j+vFmy/qCjzCZKtZoszVUxSsa7B7m5Z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760938040; c=relaxed/simple;
-	bh=pjv27r7QuFlJLltYkIKIqdG/4fKNXr9By/FnskhCl08=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pMErOiFbJAIMKt1vFhH987O/rkyy7FN36bakMlvkbKuGZU6HU8pFKj7myv3lIZoI1tsViW7XNe8Z7xsP3pCCwzicymwsDLZUeFDH9UlN06i+J9JzKQNECWn9219HwjZ6wwsctz6iC7k/s4gIQyYS08+mQWgycHvjLgbFsL0At6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=eStqRMmD; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=yVsea+HCN4hY4YZQuidit4w4s7phlBugarke+Sz1tAU=; b=eStqRMmDCJEPNcUMBc8FGsBVrf
-	UF3TZX00nSkm1drMyNnewzv91Fy7DfC9jsqXVpwLLcHnPuoB7yjWFbQsMXt30UOqwUFLCTV4y/v26
-	XyW+FgIOT3PC2nxykESchXuXWEMpUot/qEwai3ZhDeAzkF5468JTP4ugDzYYlk1s8/+KFyeBMU7ED
-	jtrPC9B376FD3dhvJxmplbzpBdrr5kGZ6xEwVkTk47RLW3xSVWudGVDwZJplfs8+Kig+edrnKRaYj
-	7q7kEP08oCZ/CBLJtO9ngaylZdyGoSFoiht4WhJN2RkClyp7dyOTskzohlxRF9XsHRTBU5fZojWRd
-	E9Sv4DzA==;
-Received: from [50.53.43.113] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vAiQP-0000000Bw8d-1eAD;
-	Mon, 20 Oct 2025 05:27:17 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: netdev@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	linux-hams@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org
-Subject: [PATCH] Documentation: networking: ax25: update the mailing list info.
-Date: Sun, 19 Oct 2025 22:27:16 -0700
-Message-ID: <20251020052716.3136773-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1760940081; c=relaxed/simple;
+	bh=zPx/qHajOmP6Qog6UePYyw24VcXnPdZWtnfS4h2h30I=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=nSu27+0Gh+Xapt4fvvZkvygZ1zn2Iqi8PpZWlSyA59YLMkG943SUq9CCl8wnQZ8FxoUEH9M6mzZBkaU6Y9gxvMomydng5Ue0boHjKVqkHvypWb83dq+STMB7JtDe06dD8HtDEg9jPN2yQ6H5BQe6uG3OZRJfb4hK3Ofi+tLlM5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-93e7f4f7bb1so218748339f.3
+        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 23:01:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760940078; x=1761544878;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qDD8Ubc5Av0L90IL8EuqGy3Z2uaxhW47eENinTlYn0s=;
+        b=CoclELkINkWiUGH70LJ3FQg7DYYFB1j5CLLBSsgATnS/bAv0h9uK634Ywo+K+sDJKB
+         Kz6Kp17fe8jK3VmOsj6rlO+CSPfefAhuBn1NFr2bvZPYbXVCTshZ+299w1jTdieQBDCQ
+         nzzdWCUKjCvW924AKKKGpL0XhLLObPZFuies2+ynvlHkyDKyIk9Bi8AmeM4bOMjHK2BA
+         wOxiU28nWgv5LJcc2ulzRJIyclQXwHCsu442VUFt4/IUYwDtnunRA0wBVDGMnwLu5Mcq
+         gUmTusu/6+SuW935i2kvyXAJpP15coNRvy5GnULknzlL4SYwX20+orUMDjIosL7eS/f/
+         bDKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVunLbVu1lhLsn5cWtRoRvfjMNCgzSx16CJF9SwcBOI+boC9SLdvnbXV3hgW+4g+UDuIG90mJ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPH8CDpeHYuKpU9pXzvxng9ryX7UstoJtrGhgP7LHE/w8V49Th
+	4w4V+wKECjMpO/+2y5eS+Gtt6GOfgVb68WvmGDzFG2LkQm4pKRK+dkmwL4famx6hN2KWyvK0tza
+	CdN9arAsfO6Y3nOJb9EdpweD/Ps5l+BMkoPWpLBnDZUDpcvNuFGrmahNJJTI=
+X-Google-Smtp-Source: AGHT+IEj9qyfg/IroSssxxfUTR6ez8zaAKoPAwc6VRxxAK8shZj0Z9kW2XzlzJS26xBJt3sjwCybZih8L4SBskLHCJKfK1iuLHB0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6602:640e:b0:940:d700:3a01 with SMTP id
+ ca18e2360f4ac-940d7003b01mr409890539f.3.1760940078571; Sun, 19 Oct 2025
+ 23:01:18 -0700 (PDT)
+Date: Sun, 19 Oct 2025 23:01:18 -0700
+In-Reply-To: <tencent_03EA78899E616FF00CC749FE8840EA81410A@qq.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68f5d02e.050a0220.91a22.043e.GAE@google.com>
+Subject: Re: [syzbot] [net?] kernel BUG in set_ipsecrequest
+From: syzbot <syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com>
+To: 1599101385@qq.com
+Cc: 1599101385@qq.com, davem@davemloft.net, edumazet@google.com, 
+	herbert@gondor.apana.org.au, horms@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	steffen.klassert@secunet.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Update the mailing list subscription information for the linux-hams
-mailing list.
+> #syz test:
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
----
-Cc: linux-hams@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: linux-doc@vger.kernel.org
----
- Documentation/networking/ax25.rst |    7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+want either no args or 2 args (repo, branch), got 7
 
---- linux-next-20251016.orig/Documentation/networking/ax25.rst
-+++ linux-next-20251016/Documentation/networking/ax25.rst
-@@ -11,6 +11,7 @@ found on https://linux-ax25.in-berlin.de
- 
- There is a mailing list for discussing Linux amateur radio matters
- called linux-hams@vger.kernel.org. To subscribe to it, send a message to
--majordomo@vger.kernel.org with the words "subscribe linux-hams" in the body
--of the message, the subject field is ignored.  You don't need to be
--subscribed to post but of course that means you might miss an answer.
-+linux-hams+subscribe@vger.kernel.org or use the web interface at
-+https://vger.kernel.org. The subject and body of the message are
-+ignored.  You don't need to be subscribed to post but of course that
-+means you might miss an answer.
+> From 2edfc8833e43cdf5ccda8bd5be3da5d1bbdc69c6 Mon Sep 17 00:00:00 2001
+> From: clingfei <1599101385@qq.com>
+> Date: Mon, 20 Oct 2025 13:40:35 +0800
+> Subject: [PATCH] fix integer overflow in set_ipsecrequest
+> The mp->new_family and mp->old_family is u16, while set_ipsecrequest receives family as uint8_t, 
+> causing a integer overflow and the later size_req calculation error, which ultimately triggered a 
+> kernel bug in skb_put.
+>
+> Reported-by: syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=be97dd4da14ae88b6ba4
+>
+> ---
+>  net/key/af_key.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/key/af_key.c b/net/key/af_key.c
+> index 2ebde0352245..08f4cde01994 100644
+> --- a/net/key/af_key.c
+> +++ b/net/key/af_key.c
+> @@ -3518,7 +3518,7 @@ static int set_sadb_kmaddress(struct sk_buff *skb, const struct xfrm_kmaddress *
+>
+>  static int set_ipsecrequest(struct sk_buff *skb,
+>                             uint8_t proto, uint8_t mode, int level,
+> -                           uint32_t reqid, uint8_t family,
+> +                           uint32_t reqid, uint16_t family,
+>                             const xfrm_address_t *src, const xfrm_address_t *dst)
+>  {
+>         struct sadb_x_ipsecrequest *rq;
+> --
+> 2.34.1
 
