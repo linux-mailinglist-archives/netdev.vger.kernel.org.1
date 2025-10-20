@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-231029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37A25BF4138
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 01:53:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8AEBBF416C
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 02:00:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02D9A18C502D
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 23:54:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF4063B15CC
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 00:00:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E31D2EF67F;
-	Mon, 20 Oct 2025 23:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B19335078;
+	Mon, 20 Oct 2025 23:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X4WNqzCz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bCCjcFoW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8309238C1F;
-	Mon, 20 Oct 2025 23:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFB872628;
+	Mon, 20 Oct 2025 23:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761004430; cv=none; b=ZVeJExwePiimRihsFFRPXMIpsPFdWoxiV9uOo3fEjJNkfk4gHHqweRJ3x32O9ujwLxdlSD6/+mMYvxhfX0/YFprPSxkuo28aLMCbn5jIOFLL+GiSWz2bFZclIAz05udLC3LI2Eg69Cwpv5SVGpUKnwb7hLlGzdLGjtMbLY+DL8g=
+	t=1761004799; cv=none; b=ZMpG/zfDZEshBAz9V94BGCax81CJuiCqj83Jw36rR1dFQ3rAL4a5X/e3qb9DhUFwKCRDQvfACoOFmUA/eUFUHbnVGIPghCshXhz0Q7vVFsdKIX8d4TbbATFYJIHCWyXIevAyTBYlA0cfCVZ2KU5AbJFKjlGsUxXd288Ed8I7RTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761004430; c=relaxed/simple;
-	bh=QnBcUs+LxaiGrX+ZfWPM2gKJapapQgzwF2K0+kBGOq8=;
+	s=arc-20240116; t=1761004799; c=relaxed/simple;
+	bh=hq2DKy2kEQVil563QjDfbIGT0J+Iyeb4JU92X7xZgHQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Lyvt7OHbEeim5GTlbEbzJ46i2Pi9pS0embZ8G3qCWUUACeNHx+H0W0u8jncqfLAjsQqS/Qbg9i5m9zedLmuyylvmEa+Xt0zKrOV/3VeJuNtSG1va/T57aztiY115SXYE6Nxllo3Yza86LKJdkdxdbL2tp42Fxp50nc+xENL/KlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X4WNqzCz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D809CC4CEFB;
-	Mon, 20 Oct 2025 23:53:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=g8VDA8jBwhJ/Df62ITfxH/GeyPeUtEiM7pljaFhm2SAY5b3mM/AMGGIUqWSNAqAD3HhuaJ3tL0rSs3k33ShCooWaVxMABdbKl0THaJtdhqgz5+j5mXBK+Xwj5+dLzhzxGLQfpPYWA8xt+w4/CMPIWdCmAWKaFCm97zL55tGWhOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bCCjcFoW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79A0EC4CEFB;
+	Mon, 20 Oct 2025 23:59:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761004428;
-	bh=QnBcUs+LxaiGrX+ZfWPM2gKJapapQgzwF2K0+kBGOq8=;
+	s=k20201202; t=1761004799;
+	bh=hq2DKy2kEQVil563QjDfbIGT0J+Iyeb4JU92X7xZgHQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X4WNqzCzcVQZ9GBpnd8DabQwfzn1yNMhqjxHF7RZqmO+RT2xt3ZMPMQM51KhG2fqA
-	 qPrUfIrOth1zWV4U28M4g6g0QpkpmduQNeOGR0kr46Gj9JIX8omDa+sNZRqhPMOmQF
-	 i61oYOVRAYG74McTgVkWgYPGVoipPSDqG6eDulaX0WdgZw0DxuLmJc1bWDXbd/T3IJ
-	 TM6KqDzJw8DqMnpkbPAMf4vkECxDKbRicanGFHpTMqhAD7H3mEqJAQy2XZy3FuWtLC
-	 F84FxjAyQCiW7rxeMIiNAve1Hrdshw9sPjEdDuMpZYFPEP4AX9Qph4ykTpQVK00Yie
-	 N4qw1G2tF4JYg==
-Date: Mon, 20 Oct 2025 16:53:46 -0700
+	b=bCCjcFoWdnMma3K6JpHFAZHJFYE0niS44n50siUBRzOydl5rBF8QxShj4hd9JBx/9
+	 o/YmkOPml8DlC21yE0vqVYxoK8sg+nltg3TDT0aSbmR8g1WOpHleQssh27G10hQfVr
+	 FckyBJIR/eBIKxmmH0uoki91UWsD/IcqN4OxGNKvbn0p0GrOEfK7cE4Fr1rzUKubIF
+	 RbXvB5TZt/pRwSXqTnlpIx7ZFmd7ZqUp2gN+dwM1RtVEfdm+yFD4P8oN9OZUl7tcm4
+	 /3EHOqx2zpM0M4APswzi6IwM1WsL1Re2/vMDxUfllb0StdylKOedIPFaktzLlVpJr5
+	 27Bpe6kjip6XQ==
+Date: Mon, 20 Oct 2025 16:59:57 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: <andrew@lunn.ch>
-Cc: Horatiu Vultur <horatiu.vultur@microchip.com>, <hkallweit1@gmail.com>,
- <linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <richardcochran@gmail.com>, <vladimir.oltean@nxp.com>,
- <vadim.fedorenko@linux.dev>, <rmk+kernel@armlinux.org.uk>,
- <christophe.jaillet@wanadoo.fr>, <rosenp@gmail.com>,
- <steen.hegelund@microchip.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v4 2/2] phy: mscc: Fix PTP for VSC8574 and VSC8572
-Message-ID: <20251020165346.276cd17e@kernel.org>
-In-Reply-To: <20251017064819.3048793-3-horatiu.vultur@microchip.com>
-References: <20251017064819.3048793-1-horatiu.vultur@microchip.com>
-	<20251017064819.3048793-3-horatiu.vultur@microchip.com>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: <netdev@vger.kernel.org>, <mst@redhat.com>, <jasowang@redhat.com>,
+ <alex.williamson@redhat.com>, <pabeni@redhat.com>,
+ <virtualization@lists.linux.dev>, <parav@nvidia.com>,
+ <shshitrit@nvidia.com>, <yohadt@nvidia.com>, <xuanzhuo@linux.alibaba.com>,
+ <eperezma@redhat.com>, <shameerali.kolothum.thodi@huawei.com>,
+ <jgg@ziepe.ca>, <kevin.tian@intel.com>, <andrew+netdev@lunn.ch>,
+ <edumazet@google.com>
+Subject: Re: [PATCH net-next v5 05/12] virtio_net: Query and set flow filter
+ caps
+Message-ID: <20251020165957.62a127eb@kernel.org>
+In-Reply-To: <20251016050055.2301-6-danielj@nvidia.com>
+References: <20251016050055.2301-1-danielj@nvidia.com>
+	<20251016050055.2301-6-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,15 +66,38 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 17 Oct 2025 08:48:19 +0200 Horatiu Vultur wrote:
-> For VSC8574 and VSC8572, the PTP initialization is incomplete. It is
-> missing the first part but it makes the second part. Meaning that the
-> ptp_clock_register() is never called.
-> 
-> There is no crash without the first part when enabling PTP but this is
-> unexpected because some PHys have PTP functionality exposed by the
-> driver and some don't even though they share the same PTP clock PTP.
+On Thu, 16 Oct 2025 00:00:48 -0500 Daniel Jurgens wrote:
+> +struct virtio_net_ff_selector {
+> +	__u8 type;
+> +	__u8 flags;
+> +	__u8 reserved[2];
+> +	__u8 length;
+> +	__u8 reserved1[3];
+> +	__u8 mask[];
+> +};
 
-I'm tempted to queue this to net-next, sounds like a "never worked 
-in an obvious way" case.  I'd appreciate a second opinion.. Andrew?
+> +/**
+> + * struct virtio_net_ff_cap_mask_data - Supported selector mask formats
+> + * @count: number of entries in @selectors
+> + * @reserved: must be set to 0 by the driver and ignored by the device
+> + * @selectors: array of supported selector descriptors
+> + */
+> +struct virtio_net_ff_cap_mask_data {
+> +	__u8 count;
+> +	__u8 reserved[7];
+> +	struct virtio_net_ff_selector selectors[];
+> +};
+
+sparse complains:
+
+  include/uapi/linux/virtio_net_ff.h:73:48: warning: array of flexible structures
+
+which seems legit. Since only element 0 can reasonably be accessed
+perhaps make selectors
+
+	__u8 selectors[]; /* struct virtio_net_ff_selector */
+
+?
+-- 
+pw-bot: cr
 
