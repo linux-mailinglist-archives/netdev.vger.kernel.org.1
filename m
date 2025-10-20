@@ -1,145 +1,154 @@
-Return-Path: <netdev+bounces-231001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECD7ABF3A93
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 23:09:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7352CBF3A99
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 23:10:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6681D487CB5
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 21:09:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 797DF18C4D18
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 21:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA362333754;
-	Mon, 20 Oct 2025 21:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAA42E7BA3;
+	Mon, 20 Oct 2025 21:08:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8632C333738
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 21:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1649B1E511
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 21:08:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760994450; cv=none; b=NRvz4Hd4JCpej6PCckSYQBmkJ0O3lj0mqyMhlMOqFpeMngyGMwVMCLkBT/uiV7+Djn705SG4S6l9FIzoi7Y34r3/QaIjUHNzU/37CwSzUNdeo77E9MxOX5lYTUhCEbOp5DN6uGJ3c/guAlmSn9m+DN0Peq+JrbKAEX9mweYTRGU=
+	t=1760994506; cv=none; b=f5eOowFrp6K1nNXeRZVYzzEDJERLWgrG2MGR4Z5MNUwcX/9EOJGQLgCdDwj3hCrUEvaTt35Jceg2xsP0VZgHN/Hmu/PLtRQxHtLUHk75eT2wRE1cziR3zAK10+oX7U7UicBJrLMeYNtuBAl168dYD/OZ5YFtHLDMfIuicypvnE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760994450; c=relaxed/simple;
-	bh=+edOF3wQZR0xUdhdOH2cokGxCXFpzafo+xsd1IEDA4M=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hR+SJ9ahzx230j+jfLHHLGxZhYWM0TbaNKoa2F9nenKzrYvKc63M5PVuMSVPZsoxXhn//OzJOUOpgo5oS9z5E46s7Snd8OgX345zNFA1ldU2DP6JFS/ldFfZAc6CGPXF366f5kc/s07Za79GLNjixnsGBFNXs2778/1Rf+h3d7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+	s=arc-20240116; t=1760994506; c=relaxed/simple;
+	bh=hxhjLCBZfNBCCzqgf9QcOOR3d4nK6IBdQqW32aYBurE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=bWi+OK2rS01LEnAWSpmmfz3wjuHAOrdias1OoN/A/xu49Cj0dYjMFhOepyZVFcihJ6gEttZLroh9gm1B4dKKvpqC8/lZ5Lywct2EsOZQ+ri03Bf/pnFCaiuF/KBUa2O9KKQ4reSO75sfLs1Ju0Wnui4917MEW7n93UL4uI4/xDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-430d003e87eso122399505ab.3
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 14:07:28 -0700 (PDT)
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-430ced58cd2so97302315ab.3
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 14:08:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760994447; x=1761599247;
+        d=1e100.net; s=20230601; t=1760994504; x=1761599304;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=S2uSfryshhqKkYzlSGfWI1sm7gHyIclZwLi4RwyNKL0=;
-        b=uAOGd6aCaEgabMOOTwwP7kSvCnxuuaU39GgfVTBiMryNsN0wZn1tOa4pe+akKEjSfU
-         c3clAT01IS6bjWlbhf46C1zdqeQnP3CfQoW0FMyFs5kmnRe8ZZK5hbgDZciqbkM6+WMR
-         lSGcZ0Nucs+Dlf+gn0DZpeM69ZhNBkUkVgWvpEhMdhDhwMd6/W+47e9CeC075Ay+0Bou
-         3QXl9v74nT6lqkePk7KlM9MTJd2Fnbt+ZCtPniC9jAKziG5L8Js0qGvPvZotkapb3OSd
-         Fvi4bC+zWKwNsIIRWReqWBo5el1HRgeLqDfwm+11CbOiaXgmafIUQAodKSe1bDvXzrzP
-         3jgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW/1zQniUH3sVrAZnEf0FWezEkFZaeOT0kwuy3CnRDbWiBXi4EbSJyudNt0Q0a48HqZxEVwf1Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwP3MeAZe60B1d1jxxjk25eTWIz64BktigMwGbl9bfsLMgEOtgO
-	QgYyDH67lQ/Vwl5UQh1/fxb2CeVSsFxkyJSMsGe0zSPDQ9UCvHGYMroR/WrmuU7RqtoGvVcwm4e
-	6ZvSdoITBxVnymSJ2euVTPmx6yaoVnUegwnEerlS6LTW9n+SyrodKOBALjzI=
-X-Google-Smtp-Source: AGHT+IHh2h7Y2t70fZwKx9fRj8FB1KNlnr1jFGorloaS0RZfP7ZyxNBHS8ZSZXvyUBfSYm5fpwYccIeU019XMCiS+DB8enk53Oi4
+        bh=Bu7UmFKZwYM7EYVrujSk24G85KpdWniCmCnGeTN1CEw=;
+        b=Pz6vU063pgJYP75+VtMKd9vuT6Vgl4bOGNJsfF7BM1stvfxRGBO9JkglaftTtEzKbD
+         +eJHCUHEJuaesn9vSy/hnaygyyHttsE6YZOaGpvJGZTvyr5k347dcerh/VIxg46MDD9h
+         TgzEyWIbSY5RETylGbiIaHuFUjK/QXsUB+q7vZpbwaHDJOht7sdHXOahtRWd6MtWZW2m
+         7kEEcx4aAKxwLvmsTH2tkzlfCYd75ZnMJDEu07pCbzUEFag1UBQg/9gXDj31g0yBM/+d
+         HdOhB2+xxE7kwe57VhU/PI/Bdkw+vzeHVUnlSd80xgvdFE82DqVpxfi8ms9dCK30JNTf
+         ijOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUtzWAFVgrfiL+7sPiT9qgwccwUewWDnZxJauSmLI5OvJ4146tw1/oxNQn3cNfe8FIElRaQ3DU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVF8fn6Ey37JLO0NmHR7pUkHD4b29qgen1E/zca0VWgvD65J8L
+	52PqKaW0TQWzFNjsqVLgA+KKnNvwZ6IIp9112+3pSSUbTiWjpH8sYGbsCor9Pw8wSP7avRAg/47
+	BV5/Cy6PJ7S4xQOs6pBTx4snF6BK+Dyth2lXM6HEr70AfnWxodqMs7e4h2Tg=
+X-Google-Smtp-Source: AGHT+IHwFfnjoIwpmNlUmVtUUXMe0VJy0ObADhZw4QPUWijMCBpDpKIyDlCxEVFHJY+z7r9ICr7Ir+ld2d8LJquRMzrwpZyjcYvG
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:4510:b0:430:c77c:cc35 with SMTP id
- e9e14a558f8ab-430c77ccd47mr201197075ab.29.1760994447649; Mon, 20 Oct 2025
- 14:07:27 -0700 (PDT)
-Date: Mon, 20 Oct 2025 14:07:27 -0700
+X-Received: by 2002:a92:c265:0:b0:430:af8f:1d28 with SMTP id
+ e9e14a558f8ab-430c5223e4cmr232929755ab.11.1760994504129; Mon, 20 Oct 2025
+ 14:08:24 -0700 (PDT)
+Date: Mon, 20 Oct 2025 14:08:24 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68f6a48f.050a0220.91a22.0453.GAE@google.com>
-Subject: [syzbot] [wireless?] KMSAN: uninit-value in cfg80211_classify8021d
-From: syzbot <syzbot+878ddc3962f792e9af59@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+Message-ID: <68f6a4c8.050a0220.1be48.0011.GAE@google.com>
+Subject: [syzbot] [bpf?] WARNING in bpf_bprintf_prepare (3)
+From: syzbot <syzbot+b0cff308140f79a9c4cb@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	chandna.sahil@gmail.com, daniel@iogearbox.net, eddyz87@gmail.com, 
+	haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org, 
+	kpsingh@kernel.org, linux-kernel@vger.kernel.org, listout@listout.xyz, 
+	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me, 
+	song@kernel.org, syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    98ac9cc4b445 Merge tag 'f2fs-fix-6.18-rc2' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16be6734580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bbd3e7f3c2e28265
-dashboard link: https://syzkaller.appspot.com/bug?extid=878ddc3962f792e9af59
+HEAD commit:    a1e83d4c0361 selftests/bpf: Fix redefinition of 'off' as d..
+git tree:       bpf
+console output: https://syzkaller.appspot.com/x/log.txt?x=12d21de2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9ad7b090a18654a7
+dashboard link: https://syzkaller.appspot.com/bug?extid=b0cff308140f79a9c4cb
 compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=111e7dcd980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1223a492580000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=160cf542580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=128d5c58580000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f8ad8459a8da/disk-98ac9cc4.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/28720fa307c1/vmlinux-98ac9cc4.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e4f310acec99/bzImage-98ac9cc4.xz
+disk image: https://storage.googleapis.com/syzbot-assets/2f6a7a0cd1b7/disk-a1e83d4c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/873984cfc71e/vmlinux-a1e83d4c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/16711d84070c/bzImage-a1e83d4c.xz
+
+The issue was bisected to:
+
+commit 7c33e97a6ef5d84e98b892c3e00c6d1678d20395
+Author: Sahil Chandna <chandna.sahil@gmail.com>
+Date:   Tue Oct 14 18:56:35 2025 +0000
+
+    bpf: Do not disable preemption in bpf_test_run().
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=172fe492580000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=14afe492580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=10afe492580000
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+878ddc3962f792e9af59@syzkaller.appspotmail.com
+Reported-by: syzbot+b0cff308140f79a9c4cb@syzkaller.appspotmail.com
+Fixes: 7c33e97a6ef5 ("bpf: Do not disable preemption in bpf_test_run().")
 
-mac80211_hwsim hwsim5 wlan1: entered allmulticast mode
-=====================================================
-BUG: KMSAN: uninit-value in cfg80211_classify8021d+0x99d/0x12b0 net/wireless/util.c:1027
- cfg80211_classify8021d+0x99d/0x12b0 net/wireless/util.c:1027
- ieee80211_select_queue+0x37a/0x9e0 net/mac80211/wme.c:180
- __ieee80211_subif_start_xmit+0x60f/0x1d90 net/mac80211/tx.c:4304
- ieee80211_subif_start_xmit+0xa8/0x6d0 net/mac80211/tx.c:4538
- __netdev_start_xmit include/linux/netdevice.h:5248 [inline]
- netdev_start_xmit include/linux/netdevice.h:5257 [inline]
- xmit_one net/core/dev.c:3845 [inline]
- dev_hard_start_xmit+0x22f/0xa30 net/core/dev.c:3861
- __dev_queue_xmit+0x3c51/0x5e60 net/core/dev.c:4763
- dev_queue_xmit include/linux/netdevice.h:3365 [inline]
- packet_xmit+0x8f/0x710 net/packet/af_packet.c:275
- packet_snd net/packet/af_packet.c:3076 [inline]
- packet_sendmsg+0x9173/0xa2a0 net/packet/af_packet.c:3108
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x333/0x3d0 net/socket.c:742
- __sys_sendto+0x593/0x720 net/socket.c:2244
- __do_sys_sendto net/socket.c:2251 [inline]
- __se_sys_sendto net/socket.c:2247 [inline]
- __x64_sys_sendto+0x130/0x200 net/socket.c:2247
- x64_sys_call+0x3924/0x3e30 arch/x86/include/generated/asm/syscalls_64.h:45
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4962 [inline]
- slab_alloc_node mm/slub.c:5265 [inline]
- kmem_cache_alloc_node_noprof+0x989/0x16b0 mm/slub.c:5317
- kmalloc_reserve+0x13c/0x4b0 net/core/skbuff.c:579
- __alloc_skb+0x347/0x7d0 net/core/skbuff.c:670
- alloc_skb include/linux/skbuff.h:1383 [inline]
- alloc_skb_with_frags+0xc5/0xa60 net/core/skbuff.c:6671
- sock_alloc_send_pskb+0xacc/0xc60 net/core/sock.c:2965
- packet_alloc_skb net/packet/af_packet.c:2926 [inline]
- packet_snd net/packet/af_packet.c:3019 [inline]
- packet_sendmsg+0x743d/0xa2a0 net/packet/af_packet.c:3108
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x333/0x3d0 net/socket.c:742
- __sys_sendto+0x593/0x720 net/socket.c:2244
- __do_sys_sendto net/socket.c:2251 [inline]
- __se_sys_sendto net/socket.c:2247 [inline]
- __x64_sys_sendto+0x130/0x200 net/socket.c:2247
- x64_sys_call+0x3924/0x3e30 arch/x86/include/generated/asm/syscalls_64.h:45
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 0 UID: 0 PID: 6051 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(none) 
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 6145 at kernel/bpf/helpers.c:781 bpf_try_get_buffers kernel/bpf/helpers.c:781 [inline]
+WARNING: CPU: 1 PID: 6145 at kernel/bpf/helpers.c:781 bpf_bprintf_prepare+0x12cf/0x13a0 kernel/bpf/helpers.c:834
+Modules linked in:
+CPU: 1 UID: 0 PID: 6145 Comm: syz.4.53 Not tainted syzkaller #0 PREEMPT(full) 
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
-=====================================================
+RIP: 0010:bpf_try_get_buffers kernel/bpf/helpers.c:781 [inline]
+RIP: 0010:bpf_bprintf_prepare+0x12cf/0x13a0 kernel/bpf/helpers.c:834
+Code: ff e9 ce fe ff ff e8 10 ec e0 ff e9 be fe ff ff e8 06 ec e0 ff e9 b4 fe ff ff e8 fc eb e0 ff e9 aa fe ff ff e8 f2 eb e0 ff 90 <0f> 0b 90 65 ff 0d 27 fd b2 10 b8 f0 ff ff ff e9 17 ff ff ff e8 d8
+RSP: 0018:ffffc90003797840 EFLAGS: 00010293
+RAX: ffffffff81df57fe RBX: ffffc90003797a10 RCX: ffff888026493c80
+RDX: 0000000000000000 RSI: 0000000000000004 RDI: 0000000000000003
+RBP: ffffc90003797970 R08: 0000000000585870 R09: 0000000000000005
+R10: dffffc0000000000 R11: fffff520006f2f20 R12: dffffc0000000000
+R13: 0000000000000004 R14: 0000000000000003 R15: 1ffff920006f2f42
+FS:  00005555805f5500(0000) GS:ffff888125e0c000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000007c04e000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ ____bpf_trace_printk kernel/trace/bpf_trace.c:372 [inline]
+ bpf_trace_printk+0xdb/0x190 kernel/trace/bpf_trace.c:362
+ bpf_prog_bfbd7bf4bf171090+0x41/0x5a
+ bpf_dispatcher_nop_func include/linux/bpf.h:1350 [inline]
+ __bpf_prog_run include/linux/filter.h:721 [inline]
+ bpf_prog_run include/linux/filter.h:728 [inline]
+ bpf_prog_run_pin_on_cpu include/linux/filter.h:745 [inline]
+ bpf_flow_dissect+0x225/0x720 net/core/flow_dissector.c:1024
+ bpf_prog_test_run_flow_dissector+0x37c/0x5c0 net/bpf/test_run.c:1414
+ bpf_prog_test_run+0x2c7/0x340 kernel/bpf/syscall.c:4688
+ __sys_bpf+0x562/0x860 kernel/bpf/syscall.c:6167
+ __do_sys_bpf kernel/bpf/syscall.c:6259 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:6257 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6257
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f25b0f8efc9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe036cd5e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007f25b11e5fa0 RCX: 00007f25b0f8efc9
+RDX: 0000000000000050 RSI: 0000200000000180 RDI: 000000000000000a
+RBP: 00007f25b1011f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f25b11e5fa0 R14: 00007f25b11e5fa0 R15: 0000000000000003
+ </TASK>
 
 
 ---
@@ -149,6 +158,7 @@ syzbot engineers can be reached at syzkaller@googlegroups.com.
 
 syzbot will keep track of this issue. See:
 https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
 If the report is already addressed, let syzbot know by replying with:
 #syz fix: exact-commit-title
