@@ -1,233 +1,248 @@
-Return-Path: <netdev+bounces-231007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71019BF3B87
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 23:24:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DFFC0BF3BAB
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 23:26:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 41F714E2AE3
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 21:24:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3443C4E96FA
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 21:26:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E93133375F;
-	Mon, 20 Oct 2025 21:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54AAB334C01;
+	Mon, 20 Oct 2025 21:26:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b="a+s0epdt";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=valla.it header.i=@valla.it header.b="m0JvxP3Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gdMDObck"
 X-Original-To: netdev@vger.kernel.org
-Received: from delivery.antispam.mailspamprotection.com (delivery.antispam.mailspamprotection.com [185.56.87.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72B233375D;
-	Mon, 20 Oct 2025 21:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.56.87.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760995490; cv=pass; b=ipXR2KBSJhT34R8PP8lRqHG4H6UjqmxbWO0ZiTRT2j3IDOMy2uEU/UgsdW9DHy7c0zSt+542rwZATNRhBdho3IfL54n7tOK6U0nYmHf5yR+XU6EfSqfY3eh4bcL0PlA6WkryevykQn20OKQ0QAahKXicrmAxXWWm2MGygzuOMu4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760995490; c=relaxed/simple;
-	bh=2ouFT+alOTtWn5rhfE5oAisrrN6mYTQD5/35TSdIxvc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fSuJUyAoXQCTuH3s/GX5xKJfCez3cF07aP0N8RseVPD1DuSmRBllvzduSJQPzHI7iGTnsO9g/5ep0XeRZ7Xd9Y6NyPoyQ4QhbIhTw7Ahmy6e4oP5FUnjbKq0/yu54+SpdWKQ9Tnc6pMQS0OG6N1KABb9jzRHE8pmILuwMjPgX7U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it; spf=pass smtp.mailfrom=valla.it; dkim=pass (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b=a+s0epdt; dkim=pass (1024-bit key) header.d=valla.it header.i=@valla.it header.b=m0JvxP3Y; arc=pass smtp.client-ip=185.56.87.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=valla.it
-ARC-Seal: i=1; cv=none; a=rsa-sha256; d=outgoing.instance-europe-west4-75hr.prod.antispam.mailspamprotection.com; s=arckey; t=1760995488;
-	 b=IhkeGxCVyP7ycTt1elxOBBdHTAo+YAoWiFbJObxpcAONLCW/k4SdetLdNz3rqQV4Xp5ioEL4Dp
-	  fxBnweBZYYws3HtCB8cciDMfqDjMcypjDUmpwy0IKnKrH7N1aG1BuUJ+GpbVJg78bq77bzGQsP
-	  MmoftBhpZ6TABsJg6Nhtlg18KnXXlLPQcDbPUEE0vulwLixAh8SwPpxYfsjisVoP2iymWaDmsv
-	  BUQ5sWwyk3JDEGzoJAgb40obvsqMx5goGH/Grqmpav//br/AB0HD/9SRqr77Ruzqqv9MmusnCV
-	  iBK24fZxY2djhkd/77/FTm7hTURO+V7+dUkwdwDQDVJAPw==;
-ARC-Authentication-Results: i=1; outgoing.instance-europe-west4-75hr.prod.antispam.mailspamprotection.com; smtp.remote-ip=35.214.173.214;
-	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
-	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
-	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
-	arc=none
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed; d=outgoing.instance-europe-west4-75hr.prod.antispam.mailspamprotection.com; s=arckey; t=1760995488;
-	bh=2ouFT+alOTtWn5rhfE5oAisrrN6mYTQD5/35TSdIxvc=;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	  Message-ID:Date:Subject:Cc:To:From:DKIM-Signature:DKIM-Signature;
-	b=k2hnKffgdNhjf14vG1EzS5l8NCBpdVdQPVg1WIW97FAm7wdfaBMQC/t2OXrV3+dm5c4sabw84D
-	  kXmzsnJhCWnw57UytXsShJeSemcT3uYctUWRU5wkdxRBycQ+6Vf2qQKr8V+M36cS1J3hj/JOhD
-	  smluQEUI4M4a9lVmyxyPZXFWdtlUV6PNXEabkc6PoMSdOyiFWt17KocKYyU+luGjLbor8BuFQK
-	  da5Npb7rvqLDYV3kkQfmN5Vmem0nn7VR8GWKoM8501EHKg8BSj40TomSLGKqU8qfwMNA5W9i5T
-	  FaScbaEn5EueeVwEgkC2Qe8BJgedyfnuieRQLjTdqogJaw==;
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=antispam.mailspamprotection.com; s=default; h=CFBL-Feedback-ID:CFBL-Address
-	:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	Cc:To:From:Reply-To:List-Unsubscribe;
-	bh=SnX1nQdEuaGWMQh+pLSXIZd/hCY6zPBWbspwRBykrrs=; b=a+s0epdtt2GB39nYfc7Kn9klls
-	h+JIHQjJFykYDljzXgaFWpy7z4eKwXcmVnuX0iBMidceVUzzoraFZlyXRe9a6OqOoNApLEZfL3UcL
-	h0jaeiYnmpXoCXjR58qEsh7B5P9XRgYL0rnciNFDOYPsyJv0U873eHnNdoFZQEuWn3j8=;
-Received: from 214.173.214.35.bc.googleusercontent.com ([35.214.173.214] helo=esm19.siteground.biz)
-	by instance-europe-west4-75hr.prod.antispam.mailspamprotection.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <francesco@valla.it>)
-	id 1vAxMq-00000009sHv-3BNg;
-	Mon, 20 Oct 2025 21:24:39 +0000
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=valla.it;
-	s=default; h=Date:Subject:Cc:To:From:list-help:list-unsubscribe:
-	list-subscribe:list-post:list-owner:list-archive;
-	bh=SnX1nQdEuaGWMQh+pLSXIZd/hCY6zPBWbspwRBykrrs=; b=m0JvxP3YhlvEKT+SYapQA6y1pK
-	eudCWGk+b4z4DhlFO1FxlCzqd/gZaM/JRU625IW4OLptCIRO1GYpgeK/uUo502GJD+P+nDJKL0IEy
-	QvKyUxlpoY3EpzPsNxIJ5yc/koZL4MqoObUZXsMP5F9z1jKIqmUG766341xbyDv+T6xM=;
-Received: from [87.16.13.60] (port=60132 helo=fedora.fritz.box)
-	by esm19.siteground.biz with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <francesco@valla.it>)
-	id 1vAxMX-00000000AIj-08n4;
-	Mon, 20 Oct 2025 21:24:17 +0000
-From: Francesco Valla <francesco@valla.it>
-To: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>,
- Harald Mommer <harald.mommer@opensynergy.com>,
- Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com>,
- Wolfgang Grandegger <wg@grandegger.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Damir Shaikhutdinov <Damir.Shaikhutdinov@opensynergy.com>,
- linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, virtualization@lists.linux.dev,
- development@redaril.me
-Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
-Date: Mon, 20 Oct 2025 23:24:15 +0200
-Message-ID: <27327622.1r3eYUQgxm@fedora.fritz.box>
-In-Reply-To: <aPZNiD1SN16K7hmT@fedora>
-References:
- <20240108131039.2234044-1-Mikhail.Golubev-Ciuchea@opensynergy.com>
- <1997333.7Z3S40VBb9@fedora.fritz.box> <aPZNiD1SN16K7hmT@fedora>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A42233375D;
+	Mon, 20 Oct 2025 21:26:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760995600; cv=none; b=DxMrWqWr0Mri9q3Q5I2S8Kq3AAQzpd6jmD+3uO+PRTvKh/2le7V+SsIZcB+kC/xSnHqhoiScGWf1LkCi1Q1dPO0zoQca7lRW38bLK6QHM3ooIPj13ioG3YJD0ZPLWjEzQcRPsfv4/yoetHAU8HXS3MyLIrygb91I/Lvwn5Hfj3w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760995600; c=relaxed/simple;
+	bh=Vl0LkZmcqdOilJhaw5cYs+K+TtJi8z4nn49piM4Us7I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bvDsEM8sSLDOZDt/3fviYF/7HbUBxCpYhlq8Fi08uDEDWOe+MQJvRFRhVoTw95fGT215OnCQ0QCdvOG3lpGHxmgXkUAwOahNbtfmIKptbHJgzaDVnyVlcOtG3NDBRjAUGncBjj9msdpNuqUXPe4O96gsPeOb//n3HOh7glM+7Yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gdMDObck; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9979C116C6;
+	Mon, 20 Oct 2025 21:26:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760995599;
+	bh=Vl0LkZmcqdOilJhaw5cYs+K+TtJi8z4nn49piM4Us7I=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gdMDObckHy+NxEkwxjfSkC7R1bwKgRt2UNZignA+OoLCAWbAYp+OhAzNHSMmbpMs7
+	 HLSgLrHUJZWcAME4snDcfIh+oG4LxZykpg/gcaE1zAXJ5ttIFw4XS+jvJnKBnjNlIg
+	 CJp6qcST0bPbFueQp6iOeEZdRRsRm9ojt5GJXNAmsNY5nM2W7XLFhFFnbxZZnX/6dX
+	 tsqpJtEQ8bpnHFP2yr5S5A148Jp51UV4VLm2k5RSm2nwqt9T8j7hlVHN3qTU1CqE9j
+	 WugVpCaqtnkDWexRiOnGPvxAJbAE3hEm7jaXMHsgt0nhyHEnsvhxvJ8nO5BWp0Qgfw
+	 WZppfnH7scWow==
+From: Kees Cook <kees@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH v3 0/9] net: Introduce struct sockaddr_unspec
+Date: Mon, 20 Oct 2025 14:26:29 -0700
+Message-Id: <20251020212125.make.115-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - esm19.siteground.biz
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - valla.it
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-SGantispam-id: 92a448e4b3ce077e46e201b844574c38
-AntiSpam-DLS: false
-AntiSpam-DLSP: 
-AntiSpam-DLSRS: 
-AntiSpam-TS: 1.0
-CFBL-Address: feedback@antispam.mailspamprotection.com; report=arf
-CFBL-Feedback-ID: 1vAxMq-00000009sHv-3BNg-feedback@antispam.mailspamprotection.com
-Authentication-Results: outgoing.instance-europe-west4-75hr.prod.antispam.mailspamprotection.com;
-	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
-	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
-	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
-	arc=none
+X-Developer-Signature: v=1; a=openpgp-sha256; l=9326; i=kees@kernel.org; h=from:subject:message-id; bh=Vl0LkZmcqdOilJhaw5cYs+K+TtJi8z4nn49piM4Us7I=; b=owGbwMvMwCVmps19z/KJym7G02pJDBnfVnJl/DwsUdZ9cxejif1zEa2nrxi/VHE/mfgs9eHWP Ee5C3mFHaUsDGJcDLJiiixBdu5xLh5v28Pd5yrCzGFlAhnCwMUpABOpd2Bk+LOLs/rFF36W7c4L 3/2W+V9/ZIH525XME0XXCfWFxT2QPMPwkzEoWC0oanvAnR1eU2bksRpXTFi+KK582Ub9fzsjv79 fyQMA
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
-On Monday, 20 October 2025 at 16:56:08 Matias Ezequiel Vara Larsen <mvaralar@redhat.com> wrote:
-> On Tue, Oct 14, 2025 at 06:01:07PM +0200, Francesco Valla wrote:
-> > On Tuesday, 14 October 2025 at 12:15:12 Matias Ezequiel Vara Larsen <mvaralar@redhat.com> wrote:
-> > > On Thu, Sep 11, 2025 at 10:59:40PM +0200, Francesco Valla wrote:
-> > > > Hello Mikhail, Harald,
-> > > > 
-> > > > hoping there will be a v6 of this patch soon, a few comments:
-> > > > 
-> > > > On Monday, 8 January 2024 at 14:10:35 Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com> wrote:
-> > > > 
-> > > > [...]
-> > > > > +
-> > > > > +/* Compare with m_can.c/m_can_echo_tx_event() */
-> > > > > +static int virtio_can_read_tx_queue(struct virtqueue *vq)
-> > > > > +{
-> > > > > +	struct virtio_can_priv *can_priv = vq->vdev->priv;
-> > > > > +	struct net_device *dev = can_priv->dev;
-> > > > > +	struct virtio_can_tx *can_tx_msg;
-> > > > > +	struct net_device_stats *stats;
-> > > > > +	unsigned long flags;
-> > > > > +	unsigned int len;
-> > > > > +	u8 result;
-> > > > > +
-> > > > > +	stats = &dev->stats;
-> > > > > +
-> > > > > +	/* Protect list and virtio queue operations */
-> > > > > +	spin_lock_irqsave(&can_priv->tx_lock, flags);
-> > > > > +
-> > > > > +	can_tx_msg = virtqueue_get_buf(vq, &len);
-> > > > > +	if (!can_tx_msg) {
-> > > > > +		spin_unlock_irqrestore(&can_priv->tx_lock, flags);
-> > > > > +		return 0; /* No more data */
-> > > > > +	}
-> > > > > +
-> > > > > +	if (unlikely(len < sizeof(struct virtio_can_tx_in))) {
-> > > > > +		netdev_err(dev, "TX ACK: Device sent no result code\n");
-> > > > > +		result = VIRTIO_CAN_RESULT_NOT_OK; /* Keep things going */
-> > > > > +	} else {
-> > > > > +		result = can_tx_msg->tx_in.result;
-> > > > > +	}
-> > > > > +
-> > > > > +	if (can_priv->can.state < CAN_STATE_BUS_OFF) {
-> > > > > +		/* Here also frames with result != VIRTIO_CAN_RESULT_OK are
-> > > > > +		 * echoed. Intentional to bring a waiting process in an upper
-> > > > > +		 * layer to an end.
-> > > > > +		 * TODO: Any better means to indicate a problem here?
-> > > > > +		 */
-> > > > > +		if (result != VIRTIO_CAN_RESULT_OK)
-> > > > > +			netdev_warn(dev, "TX ACK: Result = %u\n", result);
-> > > > 
-> > > > Maybe an error frame reporting CAN_ERR_CRTL_UNSPEC would be better?
-> > > > 
-> > > I am not sure. In xilinx_can.c, CAN_ERR_CRTL_UNSPEC is indicated during
-> > > a problem in the rx path and this is the tx path. I think the comment
-> > > refers to improving the way the driver informs this error to the user
-> > > but I may be wrong.
-> > > 
-> > 
-> > Since we have no detail of what went wrong here, I suggested
-> > CAN_ERR_CRTL_UNSPEC as it is "unspecified error", to be coupled with a
-> > controller error with id CAN_ERR_CRTL; however, a different error might be
-> > more appropriate.
-> > 
-> > For sure, at least in my experience, having a warn printed to kmsg is *not*
-> > enough, as the application sending the message(s) would not be able to detect
-> > the error.
-> > 
-> > 
-> > > > For sure, counting the known errors as valid tx_packets and tx_bytes
-> > > > is misleading.
-> > > > 
-> > > 
-> > > I'll remove the counters below.
-> > > 
-> > 
-> > We don't really know what's wrong here - the packet might have been sent and
-> > and then not ACK'ed, as well as any other error condition (as it happens in the
-> > reference implementation from the original authors [1]). Echoing the packet
-> > only "to bring a waiting process in an upper layer to an end" and incrementing
-> > counters feels wrong, but maybe someone more expert than me can advise better
-> > here.
-> > 
-> > 
-> 
-> I agree. IIUC, in case there has been a problem during transmission, I
-> should 1) indicate this by injecting a CAN_ERR_CRTL_UNSPEC package with
-> netif_rx() and 2) use can_free_echo_skb() and increment the tx_error
-> stats. Is this correct?
-> 
-> Matias
-> 
-> 
+Hi!
 
-That's my understanding too! stats->tx_dropped should be the right value to
-increment (see for example [1]).
+ v3:
+   - fix missed kernel_connect/bind casts in bpf selftests
+   - fix missed kernel_connect cast in samples/
+   - drop "bpf: Add size validation to bpf_sock_addr_set_sun_path()",
+     which is technically unrelated to the sockaddr conversion
+ v2: https://lore.kernel.org/linux-hardening/20251014223349.it.173-kees@kernel.org/
+ v1: https://lore.kernel.org/all/20250723230354.work.571-kees@kernel.org/
 
-[1] https://elixir.bootlin.com/linux/v6.17.3/source/drivers/net/can/ctucanfd/ctucanfd_base.c#L1035
+The historically fixed-size struct sockaddr is part of UAPI and embedded
+in many existing structures. The kernel uses struct sockaddr extensively
+within the kernel to represent arbitrarily sized sockaddr structures,
+which caused problems with the compiler's ability to determine object
+sizes correctly. The "temporary" solution was to make sockaddr explicitly
+use a flexible array, but this causes problems for embedding struct
+sockaddr in structures, where once again the compiler has to guess about
+the size of such objects, and causes thousands of warnings under the
+coming -Wflex-array-member-not-at-end warning.
 
-Regards,
-Francesco
+Switching to sockaddr_storage internally everywhere wastes a lot of memory,
+so we are left with needing two changes:
+- introduction of an explicitly arbitrarily sized sockaddr struct
+- switch struct sockaddr back to being fixed size
 
+Doing the latter step requires all "arbitrarily sized" uses of struct
+sockaddr to be replaced with the new struct from the first step.
 
+So, introduce the new struct and do enough conversions that we can
+switch sockaddr back to a fixed-size sa_data.
 
+Thanks!
 
+-Kees
+
+Kees Cook (9):
+  net: Add struct sockaddr_unspec for sockaddr of unknown length
+  net/l2tp: Add missing sa_family validation in
+    pppol2tp_sockaddr_get_info
+  net: Convert proto_ops bind() callbacks to use sockaddr_unspec
+  net: Convert proto_ops connect() callbacks to use sockaddr_unspec
+  net: Remove struct sockaddr from net.h
+  net: Convert proto callbacks from sockaddr to sockaddr_unspec
+  bpf: Convert cgroup sockaddr filters to use sockaddr_unspec
+    consistently
+  bpf: Convert bpf_sock_addr_kern "uaddr" to sockaddr_unspec
+  net: Convert struct sockaddr to fixed-size "sa_data[14]"
+
+ include/linux/bpf-cgroup.h                    | 17 ++++++++------
+ include/linux/filter.h                        |  2 +-
+ include/linux/net.h                           |  9 ++++----
+ include/linux/socket.h                        | 23 +++++++++++++++----
+ include/net/inet_common.h                     | 13 +++++------
+ include/net/ip.h                              |  4 ++--
+ include/net/ipv6.h                            | 10 ++++----
+ include/net/ipv6_stubs.h                      |  2 +-
+ include/net/ping.h                            |  2 +-
+ include/net/sctp/sctp.h                       |  2 +-
+ include/net/sock.h                            | 14 +++++------
+ include/net/tcp.h                             |  2 +-
+ include/net/udp.h                             |  2 +-
+ include/net/vsock_addr.h                      |  2 +-
+ net/rds/rds.h                                 |  2 +-
+ net/smc/smc.h                                 |  4 ++--
+ .../perf/trace/beauty/include/linux/socket.h  |  5 +---
+ crypto/af_alg.c                               |  2 +-
+ drivers/block/drbd/drbd_receiver.c            |  6 ++---
+ drivers/infiniband/hw/erdma/erdma_cm.c        |  6 ++---
+ drivers/infiniband/sw/siw/siw_cm.c            |  8 +++----
+ drivers/isdn/mISDN/l1oip_core.c               |  2 +-
+ drivers/isdn/mISDN/socket.c                   |  4 ++--
+ drivers/net/ppp/pppoe.c                       |  4 ++--
+ drivers/net/ppp/pptp.c                        |  8 +++----
+ drivers/net/wireless/ath/ath10k/qmi.c         |  2 +-
+ drivers/net/wireless/ath/ath11k/qmi.c         |  2 +-
+ drivers/net/wireless/ath/ath12k/qmi.c         |  2 +-
+ drivers/nvme/host/tcp.c                       |  4 ++--
+ drivers/nvme/target/tcp.c                     |  2 +-
+ drivers/slimbus/qcom-ngd-ctrl.c               |  2 +-
+ drivers/target/iscsi/iscsi_target_login.c     |  2 +-
+ drivers/xen/pvcalls-back.c                    |  4 ++--
+ fs/afs/rxrpc.c                                |  6 ++---
+ fs/coredump.c                                 |  2 +-
+ fs/dlm/lowcomms.c                             |  8 +++----
+ fs/ocfs2/cluster/tcp.c                        |  6 ++---
+ fs/smb/client/connect.c                       |  4 ++--
+ fs/smb/server/transport_tcp.c                 |  4 ++--
+ kernel/bpf/cgroup.c                           |  8 +++----
+ net/9p/trans_fd.c                             |  8 +++----
+ net/appletalk/ddp.c                           |  4 ++--
+ net/atm/pvc.c                                 |  4 ++--
+ net/atm/svc.c                                 |  4 ++--
+ net/ax25/af_ax25.c                            |  4 ++--
+ net/bluetooth/hci_sock.c                      |  2 +-
+ net/bluetooth/iso.c                           |  6 ++---
+ net/bluetooth/l2cap_sock.c                    |  4 ++--
+ net/bluetooth/rfcomm/core.c                   |  6 ++---
+ net/bluetooth/rfcomm/sock.c                   |  5 ++--
+ net/bluetooth/sco.c                           |  4 ++--
+ net/caif/caif_socket.c                        |  2 +-
+ net/can/bcm.c                                 |  2 +-
+ net/can/isotp.c                               |  2 +-
+ net/can/j1939/socket.c                        |  4 ++--
+ net/can/raw.c                                 |  2 +-
+ net/ceph/messenger.c                          |  2 +-
+ net/core/dev.c                                |  2 +-
+ net/core/dev_ioctl.c                          |  2 +-
+ net/core/filter.c                             |  5 ++--
+ net/core/sock.c                               |  6 ++---
+ net/ieee802154/socket.c                       | 12 +++++-----
+ net/ipv4/af_inet.c                            | 16 ++++++-------
+ net/ipv4/arp.c                                |  2 +-
+ net/ipv4/datagram.c                           |  4 ++--
+ net/ipv4/ping.c                               |  8 +++----
+ net/ipv4/raw.c                                |  3 ++-
+ net/ipv4/tcp.c                                |  2 +-
+ net/ipv4/tcp_ipv4.c                           |  4 ++--
+ net/ipv4/udp.c                                |  6 +++--
+ net/ipv4/udp_tunnel_core.c                    |  4 ++--
+ net/ipv6/af_inet6.c                           |  6 ++---
+ net/ipv6/datagram.c                           |  8 +++----
+ net/ipv6/ip6_udp_tunnel.c                     |  4 ++--
+ net/ipv6/ping.c                               |  2 +-
+ net/ipv6/raw.c                                |  3 ++-
+ net/ipv6/tcp_ipv6.c                           |  6 ++---
+ net/ipv6/udp.c                                |  5 ++--
+ net/iucv/af_iucv.c                            |  6 ++---
+ net/l2tp/l2tp_core.c                          |  8 +++----
+ net/l2tp/l2tp_ip.c                            |  6 +++--
+ net/l2tp/l2tp_ip6.c                           |  5 ++--
+ net/l2tp/l2tp_ppp.c                           |  9 +++++++-
+ net/llc/af_llc.c                              |  4 ++--
+ net/mctp/af_mctp.c                            |  4 ++--
+ net/mctp/test/route-test.c                    |  2 +-
+ net/mctp/test/utils.c                         |  5 ++--
+ net/mptcp/pm_kernel.c                         |  4 ++--
+ net/mptcp/protocol.c                          |  5 ++--
+ net/mptcp/subflow.c                           |  4 ++--
+ net/netfilter/ipvs/ip_vs_sync.c               |  6 ++---
+ net/netlink/af_netlink.c                      |  4 ++--
+ net/netrom/af_netrom.c                        |  6 ++---
+ net/nfc/llcp_sock.c                           |  6 ++---
+ net/nfc/rawsock.c                             |  2 +-
+ net/packet/af_packet.c                        | 15 ++++++------
+ net/phonet/pep.c                              |  3 ++-
+ net/phonet/socket.c                           | 10 ++++----
+ net/qrtr/af_qrtr.c                            |  4 ++--
+ net/qrtr/ns.c                                 |  2 +-
+ net/rds/af_rds.c                              |  2 +-
+ net/rds/bind.c                                |  2 +-
+ net/rds/tcp_connect.c                         |  4 ++--
+ net/rds/tcp_listen.c                          |  2 +-
+ net/rose/af_rose.c                            |  4 ++--
+ net/rxrpc/af_rxrpc.c                          |  4 ++--
+ net/rxrpc/rxperf.c                            |  2 +-
+ net/sctp/socket.c                             | 13 ++++++-----
+ net/smc/af_smc.c                              |  6 ++---
+ net/socket.c                                  | 14 +++++------
+ net/sunrpc/clnt.c                             |  6 ++---
+ net/sunrpc/svcsock.c                          |  2 +-
+ net/sunrpc/xprtsock.c                         |  9 ++++----
+ net/tipc/socket.c                             |  6 ++---
+ net/unix/af_unix.c                            | 12 +++++-----
+ net/vmw_vsock/af_vsock.c                      |  6 ++---
+ net/vmw_vsock/vsock_addr.c                    |  2 +-
+ net/x25/af_x25.c                              |  4 ++--
+ net/xdp/xsk.c                                 |  2 +-
+ samples/qmi/qmi_sample_client.c               |  2 +-
+ .../selftests/bpf/test_kmods/bpf_testmod.c    |  4 ++--
+ 121 files changed, 326 insertions(+), 290 deletions(-)
+
+-- 
+2.34.1
 
 
