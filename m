@@ -1,150 +1,170 @@
-Return-Path: <netdev+bounces-230955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D267BF2623
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 18:23:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 577ABBF2662
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 18:25:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CC3BE4E3B2E
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:23:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E7A134F8E83
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B9F283FD9;
-	Mon, 20 Oct 2025 16:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9330293C44;
+	Mon, 20 Oct 2025 16:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ADQoFust"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="axmQzGe+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D769526B77B
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 16:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0A5286422;
+	Mon, 20 Oct 2025 16:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760977417; cv=none; b=doSE7U9djxGHr94GoVP4c1d4LzG8ZbZWqddJhdFy8xBne5amAUeglHnDVByiR7pSr+Yq70+dlfy5hgPc2wmWYR/RCl6pXdQyj82u9V5k+xRkMNyb6GfliI8AAq9szpsFWpoqayMa2xJS1zHqysDrbpuIxE5YOJs3rnHIi8wk6Po=
+	t=1760977459; cv=none; b=YeBrDsR2krVA6YFbWwZu4MPcw6lontHysB7sXDJrdy3Ri2eBzVXTiE8hT763EcChmJt6lZ89VqaDabjNHgRWPL/axvZDt5lR45/6e87wSgMhMsi7tMb1lZGY/mir61yXnnUJWq6twvypyj2aqWuX9Cb8JjcWGN7M3nhgttVwO7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760977417; c=relaxed/simple;
-	bh=JhybXE7R11FfldinfG02n4nm7gpPTPzG49BibXV0xGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qo96NsxDPVEySLSKqJwcOj8Jbwyu2rv6AL5ehFp9Ei53dPV7/FdPosXv603lRXoOK3haX0xtpIyrqBMG8Y67h2ahBMM6b3SwPMFG+Gpt6rg6JCjS4wnuEPKREzguvjEwaXHSDcgJp868z88nhcC0uGuZ8czPU5K6X2qOW7NpUfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ADQoFust; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-36639c30bb7so40353471fa.3
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 09:23:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760977414; x=1761582214; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3LPzc0R6LMpiWe8eMNmrj2awjMOaGK9U57/pCxBYSG0=;
-        b=ADQoFustomFtocHdVdTfI1p/t5hXbXj2GFrinPqsE2fvvJqRh7CjotmmMPc1Oeif36
-         kR6xXsgudObNn71Xfz4Gzoat6LDoQHGdjkVAo9oAseUQlGHCxaFu7HCaJP1GG89y7n4b
-         HiMZdGolsNRUrnumnx1HVYo01/tWnYH5Ul+ZzJ9+z+KalYxy6Dz4IolPSto2fx6XLdsR
-         +P0RVIDUwl3fxIz5HjfFTuIAz6Ri2DOQqrKrwV7kwk3pL2yBwKtjRAhMtlT9T6BSn09G
-         u4M7TVPJpkKma/uU2I9nhGb9yABsU5XELxLEFJPG+QpDvkv9cc/RvORFyv5TpfimqwlZ
-         nU7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760977414; x=1761582214;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3LPzc0R6LMpiWe8eMNmrj2awjMOaGK9U57/pCxBYSG0=;
-        b=w20gxLoG7gilYaU47r9rIOdXa6g8R8v84bSRtAOUwlDaYYZreWSQXRIBplFKFZyzHF
-         K9g7OfwHdaSxkj68GjafTPAd14cYOPLFglfAu//YyIu3+TEUtWOBml8Z+KN73P6+HdoC
-         p+nhTfEMWZZq7myW8U25rG7IhDUHup8y4MvsWMhk0R+IYg9JAyWllJkcMmYLjQ2pA3SF
-         yf+5+HINeubgUxPQqWQPXzG9J5LyIm+9EtlRkre9qK474CDo/na0tpxTxc4V2ERGQSfu
-         yqnW0GAVHrN1KWYR6grZMTYOAV3H1IppErFeboODV5lB5lAiItBJHIwIS/04VZ20UTcu
-         n4UA==
-X-Forwarded-Encrypted: i=1; AJvYcCW6FCA0wpc+fatCTjs9Orrs+ysOrBOUxWSgN1ViloBkHcw1TuuA27b/igP8oHdd6YGuHMuO5O4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhW2gMX3LP+qqHQ6/Kb9KK+OV49mSRr52Y0ie3wVMyit4PoPil
-	bUT2kNzO0r3wKYbJKc1a4O3U4AFa6yMt8XDs+M+nQn38gvitpX5DwZKUWOEvWw==
-X-Gm-Gg: ASbGncsAx5TO+eQFRNIEJAVMhzeJsmIpxB8iGXzDL58o1fwgxSVQe/89BsYRsnGK8pU
-	fMiBMkXDVkD1aowDofzqjE6jabrdghDvjDcOa8V29mqFzFS7Qfd5ZqT8SqnpHpWyK1iPfjNlJEc
-	+rVOfJ4dKwH/8KggbGvjJ45M6wVJNxmk3/uHJCf/5RYniRNWAZJ8nVKRxpb/j8lA9jKLaz34BE7
-	GEFQ+EprS1gZwKZYMY0JmReDLobrC5yLfOcDC8p7Z3IutCQ/6V140NQkV6fdv3hhoNjyQ7Jbg9J
-	dndBLqWkGD69iCgKTn23Dx47sTFWc3iXGnG1vm+3ikGvFMdAHbzcPHMf9OCivIwpNWNN3iFBZzM
-	nYVnXL0H5eJ2HVez1Xv6CUsw/UShHYvYmY8lqI7YgFz1EjbHGowR/pR1chheNH7noAl0P//Me9m
-	FKUOyQxtv/JsHDWl0tznEFW7X6DuE=
-X-Google-Smtp-Source: AGHT+IFl1QPDX6Ojn5Td2m0DZOehjJbEt94UzdPkTL0dqFsYL/3PF17ph4lGeiIlQ5KrtBb3EJb94A==
-X-Received: by 2002:a2e:9a0c:0:b0:351:786c:e533 with SMTP id 38308e7fff4ca-377978ab86cmr42134981fa.15.1760977413859;
-        Mon, 20 Oct 2025 09:23:33 -0700 (PDT)
-Received: from foxbook (bey128.neoplus.adsl.tpnet.pl. [83.28.36.128])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-377a91f5a3dsm23228331fa.19.2025.10.20.09.23.31
-        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
-        Mon, 20 Oct 2025 09:23:33 -0700 (PDT)
-Date: Mon, 20 Oct 2025 18:23:27 +0200
-From: Michal Pecio <michal.pecio@gmail.com>
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: yicongsrfy@163.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, oliver@neukum.org, pabeni@redhat.com
-Subject: Re: [PATCH net v5 2/3] net: usb: ax88179_178a: add USB device
- driver for config selection
-Message-ID: <20251020182327.0dd8958a.michal.pecio@gmail.com>
-In-Reply-To: <e4ce396c-0047-4bd1-a5d2-aee3b86315b1@rowland.harvard.edu>
-References: <20251013110753.0f640774.michal.pecio@gmail.com>
-	<20251017024229.1959295-1-yicongsrfy@163.com>
-	<db3db4c6-d019-49d0-92ad-96427341589c@rowland.harvard.edu>
-	<20251017191511.6dd841e9.michal.pecio@gmail.com>
-	<bda50568-a05d-4241-adbe-18efb2251d6e@rowland.harvard.edu>
-	<20251018172156.69e93897.michal.pecio@gmail.com>
-	<6640b191-d25b-4c4e-ac67-144357eb5cc3@rowland.harvard.edu>
-	<20251018175618.148d4e59.michal.pecio@gmail.com>
-	<e4ce396c-0047-4bd1-a5d2-aee3b86315b1@rowland.harvard.edu>
+	s=arc-20240116; t=1760977459; c=relaxed/simple;
+	bh=Z4UT22EGyvlEG1tl2tPWz5AKAW8ctXe9I+yn5eN28bU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JZNzwhx6QTpv1pX2sfi+IhOp92opjpa/Ck5oWcH2miChdB5Wts7BaXgTOatFVe9aT4nTuPRs020rym7qj5yfbQ6zd3Ed5Qav6e9vwHTXqtaedBNUtrbYD08IxY0T9ua6b30rY71QicmbkDAfvLUYeT6VXZCHD6uZ43ZPak1AS/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=axmQzGe+; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=zMQLgJjxGNREMvSiUsrqy2mt5zVHgiDcqKcyCwADK3Y=; b=axmQzGe+tJZnIL9mTVbOUmk/1U
+	qyHt7UVn1a3cHQSRedVCD8JOqPdN6S7mllnigoo1acACnGFSJF9BovaYRgpIIrVyvuEst8ddUje3F
+	pHvWyYlWPO0xIqIQDrP/XoSlfWwbA64lDdMtHw6n15U860BLzIO8EQcoezzzqP9FuezSSxzfNRpp8
+	kl+QMc/1K2K/3oY6g70VeGldQ1O9Mu+L7/fjg6wvzXwfSBvsg2mkQ/aAKhvLuofMMGCyap+dEpt60
+	oEORRXLZm3o64bZwTLJ/O2GA6RHpiTdP2TGqjPf+Db/bYq7X3uX3K2iVhhtqW7aY+gkSeRsv+N78i
+	iKvnFfSw==;
+Received: from localhost ([127.0.0.1])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1vAsfs-000JiL-1n;
+	Mon, 20 Oct 2025 18:23:56 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	razor@blackwall.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	sdf@fomichev.me,
+	john.fastabend@gmail.com,
+	martin.lau@kernel.org,
+	jordan@jrife.io,
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	dw@davidwei.uk,
+	toke@redhat.com,
+	yangzhenze@bytedance.com,
+	wangdongdong.6@bytedance.com
+Subject: [PATCH net-next v3 00/15] netkit: Support for io_uring zero-copy and AF_XDP
+Date: Mon, 20 Oct 2025 18:23:40 +0200
+Message-ID: <20251020162355.136118-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.0.9/27798/Mon Oct 20 11:37:28 2025)
 
-On Mon, 20 Oct 2025 11:56:50 -0400, Alan Stern wrote:
-> On Sat, Oct 18, 2025 at 05:56:18PM +0200, Michal Pecio wrote:
-> > On Sat, 18 Oct 2025 11:36:11 -0400, Alan Stern wrote:  
-> > > How are prefer_vendor() and usb_driver_preferred() supposed to know 
-> > > which configuration is being considered?  
-> > 
-> > Currently they don't need to know, but this could be added by passing
-> > a temporary struct with more stuff in place of udev.
-> > 
-> > Really, this whole usb_drv->preferred business could be a simple
-> > boolean flag, if not for r8152 needing to issue control transfers to
-> > the chip to find whether it supports at all.
-> > 
-> > It seems that ax88179_preferred() could simply always return true.  
-> 
-> Instead of all this preferred() stuff, why not have the ax88179 driver's 
-> probe routine check for a different configuration with a vendor-specific 
-> interface?  If that other config is present and the chip is the right 
-> type then you can call usb_driver_set_configuration() -- this is exactly 
-> what it's meant for.
+Containers use virtual netdevs to route traffic from a physical netdev
+in the host namespace. They do not have access to the physical netdev
+in the host and thus can't use memory providers or AF_XDP that require
+reconfiguring/restarting queues in the physical netdev.
 
-That could be doable and some code could be shared I guess, but how to
-get the probe() routine to run in the first place?
+This patchset adds the concept of queue peering to virtual netdevs that
+allow containers to use memory providers and AF_XDP at native speed.
+These mapped queues are bound to a real queue in a physical netdev and
+act as a proxy.
 
-The chip may be in other configuration, without this vendor interface.
-If we remove _AND_INTERFACE_INFO, it's still a problem that cdc_ether
-may already be bound to the CDC interface in CDC config.
+Memory providers and AF_XDP operations takes an ifindex and queue id,
+so containers would pass in an ifindex for a virtual netdev and a queue
+id of a mapped queue, which then gets proxied to the underlying real
+queue. Peered queues are created and bound to a real queue atomically
+through a generic ynl netdev operation.
 
-Registering a *device* driver plows through such obstacles, because
-core allows device drivers to immediately displace existing drivers.
+We have implemented support for this concept in netkit and tested the
+latter against Nvidia ConnectX-6 (mlx5) as well as Broadcom BCM957504
+(bnxt_en) 100G NICs. For more details see the individual patches.
 
+v2->v3:
+ - Use netdev_ops_assert_locked instead of netdev_assert_locked (syzbot)
+ - Add missing netdev_lockdep_set_classes in netkit
+v1->v2:
+ - Removed bind sample ynl code (Stan)
+ - Reworked netdev locking to have consistent order (Stan, Kuba)
+ - Return 'not supported' in API patch (Stan)
+ - Improved ynl documentation (Kuba)
+ - Added 'max: s32-max' in ynl spec for ifindex (Kuba)
+ - Added also queue type in ynl to have user specify rx to make
+   it obvious (Kuba)
+ - Use of netdev_hold (Kuba)
+ - Avoid static inlines from another header (Kuba)
+ - Squashed some commits (Kuba, Stan)
+ - Removed ndo_{peer,unpeer}_queues callback and simplified
+   code (Kuba)
+ - Improved commit messages (Toke, Kuba, Stan, zf)
+ - Got rid of locking genl_sk_priv_get (Stan)
+ - Removed af_xdp cleanup churn (Maciej)
+ - Added netdev locking asserts (Stan)
+ - Reject ethtool ioctl path queue resizing (Kuba)
+ - Added kdoc for ndo_queue_create (Stan)
+ - Uninvert logic in netkit single dev mode (Jordan)
+ - Added binding support for multiple queues
 
-It seems that this could work, if cdc_ether blacklisting and revert
-of _AND_INTERFACE_INFO are applied as suggested in this series.
-(But as part of the main commit, to avoid transient regressions).
+Daniel Borkmann (9):
+  net, ethtool: Disallow peered real rxqs to be resized
+  xsk: Move NETDEV_XDP_ACT_ZC into generic header
+  xsk: Move pool registration into single function
+  xsk: Add small helper xp_pool_bindable
+  xsk: Change xsk_rcv_check to check netdev/queue_id from pool
+  xsk: Proxy pool management for mapped queues
+  netkit: Add single device mode for netkit
+  netkit: Document fast vs slowpath members via macros
+  netkit: Add xsk support for af_xdp applications
 
-I wonder if blacklisting is considered necessary evil? Without it, it's
-possible that cdc_ether binds for a moment before it's kicked out by
-the vendor driver. Looks weird in dmesg, at the very least.
+David Wei (6):
+  net: Add bind-queue operation
+  net: Implement netdev_nl_bind_queue_doit
+  net: Add peer info to queue-get response
+  net: Proxy net_mp_{open,close}_rxq for mapped queues
+  netkit: Implement rtnl_link_ops->alloc and ndo_queue_create
+  netkit: Add io_uring zero-copy support for TCP
 
-FWIW, my RTL8153 is blacklisted in cdc_ether too. So much for the
-promise that cfgselectors will allow users to choose drivers ;)
+ Documentation/netlink/specs/netdev.yaml |  84 ++++++
+ drivers/net/netkit.c                    | 330 ++++++++++++++++++++----
+ include/linux/ethtool.h                 |   1 +
+ include/net/netdev_queues.h             |   5 +
+ include/net/netdev_rx_queue.h           |  39 ++-
+ include/net/page_pool/memory_provider.h |   4 +-
+ include/net/xdp_sock_drv.h              |   8 +-
+ include/uapi/linux/if_link.h            |   6 +
+ include/uapi/linux/netdev.h             |  22 ++
+ net/core/netdev-genl-gen.c              |  25 ++
+ net/core/netdev-genl-gen.h              |   1 +
+ net/core/netdev-genl.c                  | 177 ++++++++++++-
+ net/core/netdev_rx_queue.c              | 126 +++++++--
+ net/ethtool/channels.c                  |  12 +-
+ net/ethtool/common.c                    |  10 +-
+ net/ethtool/ioctl.c                     |   4 +-
+ net/xdp/xsk.c                           |  44 +++-
+ net/xdp/xsk.h                           |   5 +-
+ net/xdp/xsk_buff_pool.c                 |  18 +-
+ tools/include/uapi/linux/netdev.h       |  22 ++
+ 20 files changed, 830 insertions(+), 113 deletions(-)
 
-Regards,
-Michal
+-- 
+2.43.0
+
 
