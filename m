@@ -1,92 +1,79 @@
-Return-Path: <netdev+bounces-230922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70DE8BF1CE7
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:21:13 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46EF7BF1D53
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 16:27:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D09B04E1D25
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:20:50 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2653F4E1DB0
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299E330595A;
-	Mon, 20 Oct 2025 14:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6872F8BCB;
+	Mon, 20 Oct 2025 14:27:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057182FD7B2;
-	Mon, 20 Oct 2025 14:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB65F2A1B2;
+	Mon, 20 Oct 2025 14:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760970047; cv=none; b=RUowt71V8KwrvrWkkKBQPji/h+OXsGz7ZQht8CUZ7se+GErFHZA5Pa/jk0drg32HWVXVvxCnsBMVY05uK1fvvb2wZkLq0A3sBL7KUnqx8jppz6VVHA05O5MzMs2NwmPb+P+MMHdfntX3GaBwQsyh/23UI7hidYIHi3SZVo7CsUw=
+	t=1760970428; cv=none; b=bpHFCdcU7Oiev6w5SOIQAK5Q7ZnjYQx4ZHrhf8EUnTPRnIPqorhy1mOKEiV+1tCXa4MxYl6mVv9zh6uHjhxMUTnaKGGw1PIL4E3t/SXiEeJFyi1OK/zXEB/Lh0K3F8Oqu8pUJF9VWwBQd89nFp3RAoXIsktP4xpzAsrqcuCAC8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760970047; c=relaxed/simple;
-	bh=Svv7NMXFNpj2k34olEOUeJp95lr/GE8kZLjPFyLzbtc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F7KLuMUu5nZhOvO+ZgqHY1H1/rKMhbTzHzAemJxHJSQUHDMUTmzVg2dbgw16Swdh/w04V2ohFZRKvOvcjLDfr840wTLPOnER724ZGr/wmov+WSXd8IE554LwJ7X4WJQsUUo2GGduSsWsaceTnti9bDxBv8/3Dz2xIttU+OVo7V0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 95C3A618FC; Mon, 20 Oct 2025 16:20:36 +0200 (CEST)
-Date: Mon, 20 Oct 2025 16:20:36 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Andrii Melnychenko <a.melnychenko@vyos.io>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, phil@nwl.cc,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/1] nf_conntrack_ftp: Added nfct_seqadj_ext_add() for
- ftp's conntrack.
-Message-ID: <aPZFNBNXlyq0Q5dM@strlen.de>
-References: <20251016104802.567812-1-a.melnychenko@vyos.io>
- <20251016104802.567812-2-a.melnychenko@vyos.io>
- <aPDU6i1HKhy5v-nh@strlen.de>
- <CANhDHd-k2Ros8nFo4fNi=-Mu1DxkK4A2MgLYjuDqPwpfJYYfdw@mail.gmail.com>
+	s=arc-20240116; t=1760970428; c=relaxed/simple;
+	bh=pYq1JavfYitI+ssl6RYRoZSzLuV7OwqWcBa6ttivJrY=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=JEIU8bEpwc5aTxs/vxMsMNvY6U9/q3mSn5D0pd4OHmSJ1FcrGswwLHtW20UBXb36mYnWnFke1WEmXIuu1QIG2/UCf9N39WjPZXpm56pa3LPu4U5sxUQxr/msBpdj71RxbqMOFh5TQ1IEXLe9fdHaEjZvT1D+rTFDxaIdAOSYWSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+	id B2E0E92009C; Mon, 20 Oct 2025 16:27:03 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by angie.orcam.me.uk (Postfix) with ESMTP id AB90F92009B;
+	Mon, 20 Oct 2025 15:27:03 +0100 (BST)
+Date: Mon, 20 Oct 2025 15:27:03 +0100 (BST)
+From: "Maciej W. Rozycki" <macro@orcam.me.uk>
+To: Ido Schimmel <idosch@idosch.org>
+cc: g.goller@proxmox.com, "David S. Miller" <davem@davemloft.net>, 
+    dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, 
+    pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org
+Subject: Re: Wrong source address selection in arp_solicit for forwarded
+ packets
+In-Reply-To: <aPZB33C-C1t1z7Dk@shredder>
+Message-ID: <alpine.DEB.2.21.2510201524210.8377@angie.orcam.me.uk>
+References: <eykjh3y2bse2tmhn5rn2uvztoepkbnxpb7n2pvwq62pjetdu7o@r46lgxf4azz7> <aPZB33C-C1t1z7Dk@shredder>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANhDHd-k2Ros8nFo4fNi=-Mu1DxkK4A2MgLYjuDqPwpfJYYfdw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-Andrii Melnychenko <a.melnychenko@vyos.io> wrote:
-> I've researched the issue a bit. Despite the fact that in `nf_nat_ftp()`
-> the helper for the expected connection is installed, it isn't executed in
-> the following functions - `nf_nat_mangle_tcp_packet()`. Also, shouldn't the
-> logic of `nf_nat_follow_master` affect the "upcoming" passive FTP
-> connection?
+On Mon, 20 Oct 2025, Ido Schimmel wrote:
 
-Yes, but we need the seqadj extension on the control connection to
-rewrite the announced address to connect to/from.
+> > I have the following simple infrastructure with linux hosts where the ip
+> > addresses are configured on dummy interfaces and all other interfaces are
+> > unnumbered:
+> > 
+> >   ┌────────┐     ┌────────┐     ┌────────┐    │ node1  ├─────┤ node2
+> > ├─────┤ node3  │    │10.0.1.1│     │10.0.1.2│     │10.0.1.3│    └────────┘
+> > └────────┘     └────────┘
+> 
+> The diagram looks mangled. At least I don't understand it.
 
-nf_nat_setup_info() takes care of this but only for template-based
-helper assignment, not for the explicit assign done via
-nft_ct_helper_obj_eval().
+ It's been broken by:
 
-> I've also checked the setup of `nfct_seqadj_ext_add()` in the
-> `ft_ct_helper_obj_eval()` routine - it works. However, now the seqadj would
-> be added to all "NATed" conntrack helpers.
+Content-Type: text/plain; charset=utf-8; format=flowed
 
-Yes.
+Cf. Documentation/process/email-clients.rst.  Raw message contents look 
+good.
 
-> Maybe it's better to leave the
-> seqadj setup in `nf_conntrack_ftp`, so it would apply explicitly to FTP
-> traffic, but with an additional `(ct->status & IPS_NAT_MASK)` check?
+ HTH,
 
-As-is, almost all the helpers are broken when used with nat and assignment
-via nft objref infra.  We could add some annotation to those that don't
-need seqadj, but afaics thats just the netbios helper.
-
-> I can prepare a new patch with changes in either `nft_ct` or
-> `nf_conntrack_ftp`.
-> Any suggestions?
-
-Thanks, please fix nft_ct infra.  Does the above make sense to you?
+  Maciej
 
