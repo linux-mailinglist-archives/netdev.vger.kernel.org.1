@@ -1,157 +1,233 @@
-Return-Path: <netdev+bounces-231006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65170BF3B84
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 23:24:33 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71019BF3B87
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 23:24:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E18B54FE6FF
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 21:24:04 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 41F714E2AE3
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 21:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C146D334C33;
-	Mon, 20 Oct 2025 21:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E93133375F;
+	Mon, 20 Oct 2025 21:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="liUGcVyg"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b="a+s0epdt";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=valla.it header.i=@valla.it header.b="m0JvxP3Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from delivery.antispam.mailspamprotection.com (delivery.antispam.mailspamprotection.com [185.56.87.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDCBD334C1C
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 21:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760995429; cv=none; b=uuIxUHt4UPmBqh6ihFQeDcwxx+iqiJdMSgtdaRgPLOd7mVmWnDDXvV2wXxddS74N/L5gKiiFuea9NZq1ALE9CNu89McU1vrtUOHuFks/oC6Q5bJnxFMCuUgG7qFf0QTkVhYmxwdEPQwxA5fJ/bPagu7/Q54UVGbS4u6wPfmNVE0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760995429; c=relaxed/simple;
-	bh=ibhPvtx39doJjXzqMVBHPIxV8whgIxw3fdx9JJ7FKfI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nTNIRpLVTPcdaGd6YkKztA5theZtxNz5Ktp4ccymR6Hcx6rW2yJxefMSP5LY5Mv/dSmnpUX7gpEXKapBKVJCZsOD+NDbjcKGJRliTvbs2L02/5ZWXxjOJNz7npPxeQ5UiYjrCLEcU6OBjx4aeUE7wxt4FthCm4+qBslZQvksQ0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=liUGcVyg; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-4270900c887so503912f8f.1
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 14:23:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760995426; x=1761600226; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3wc9icIF6ANq7bIYtjR0bXRUcBUAsbuuGXfXqpMDQNE=;
-        b=liUGcVygdye/ajx7eBmNlJqxsDUvPOQBCesrNkiw15KnpbZwfScNtWqYR15mOeSQ8w
-         9Zk5aWnFIsNI7fuilYhfAFfTGGEv70dSvcJyRTBfh3xca9NE32AAEkrppDUvJ4kzLof0
-         F+Ts8Py8a+Gcnx3rxQGLIDomUX2dGlcWs/f+QPfjH1cmOmVyAus2ORI8Y7id2U4lpdee
-         GVvhx4pUbK84jc8WAQPJW9y8dVY1kX1zxYkhY79J6HcojeASl78GcYjSX3Igv5M0F8he
-         xNHSOr7gZW05ATnr9a21SR0BWGgSSkhs7V2zmYBVaIcOHl1oSQEOrkhfUNSLg/HjYgg5
-         SX3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760995426; x=1761600226;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3wc9icIF6ANq7bIYtjR0bXRUcBUAsbuuGXfXqpMDQNE=;
-        b=Co7Kff2zKpHu1RmJR0GBKJ96CQzMGAoHLE0yKhb60/NIJK4IsPLGbvO/ldGxYS5vZ7
-         iGHDuWI3TB/YPq71o8r0rPY8IJ2IdJ28gwXfL6shpus2Fy6aTL1apr509js95NCxk2LZ
-         0e6qG+uUPE1/rmrfBlNLWt2+6/7mEpn3fO+JbIEJsSV9r/E/Mn1aQNEeLbnBoEWvD4VK
-         q8yz+i4YmCRlPEWBXAwIpcQ1UcopjVzkvgSpHgVqG+i3bcdPYty2knYaDjHo9YJ4tsvj
-         k/pX3Jzs4/kBTMFT0dk8fBCulwaoH9cX7YOo5IrnbBOO8fm21gr7nTDvPHKdZCojvdar
-         JJkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXnxsGcIRNUefXf537dej7RgMiPIQwcukSRP4b3GU/+nWLbFqpNoAuppTB9pcneOmS20SNpDjY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQuzrxsxIRn3QxlraV08fcQ3hgXKyNYjNbY9x8Z2CpHluCIyEe
-	EbdeW937Yqdsv3MlR0pDkhvEGKAyBYGWlJoMQE4ZbjgtYntgtrlluD7G
-X-Gm-Gg: ASbGncv1JED41aNK6pBSSb5OtQOOcUheySTvVxnblsA+lvhpXMHpbnR8EvMyX5p5P5f
-	whZbkjXO00DWpwcWje6aYXPHP9FR52RSIYvInSrT57sG3kGYklZYf0Bg3DhezF6vFcIQh0K2IIv
-	B7gDvbX86W42FZ7Pe6edVcmJ+Ntlb9geXJTEVnD+hkVKUV+/LEHP1ImNeeXdQm0pkQIxJKbIfhv
-	41o6DIXaihR1x1WzFXeeNC1UysLwrEusuReTUw3CfddivZX6rjT6b14zVQLFqnBJTONkqFUxjKs
-	0ExwYzCZrssABzVOATZ02iEtjVRseh26WeEYp0bpHVs1wWAt4M0QRaaDwoi98zs6uGqo94UFeE3
-	M/ymvhi2DE/0S4FuJt6kbGewr/dnjRSbC76KfoIzIFwn4JV3sOcTtBh8aV5RGLuoT0+OMHbxjV3
-	0QIl8O
-X-Google-Smtp-Source: AGHT+IFKeEzNOuZE8Rb5SdMiZ8cxxtJjmrvr71zG4Tr9HOdYTow9+lCka3okRv5TO5BvJQ/+TEWOJw==
-X-Received: by 2002:a05:600c:1d25:b0:471:152a:e574 with SMTP id 5b1f17b1804b1-474942c4fa0mr5690495e9.2.1760995426167;
-        Mon, 20 Oct 2025 14:23:46 -0700 (PDT)
-Received: from localhost ([2a03:2880:31ff:4a::])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4715257d916sm157517505e9.4.2025.10.20.14.23.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 14:23:45 -0700 (PDT)
-From: Gustavo Luiz Duarte <gustavold@gmail.com>
-Date: Mon, 20 Oct 2025 14:22:35 -0700
-Subject: [PATCH net 2/2] netconsole: Fix race condition in between reader
- and writer of userdata
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72B233375D;
+	Mon, 20 Oct 2025 21:24:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.56.87.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760995490; cv=pass; b=ipXR2KBSJhT34R8PP8lRqHG4H6UjqmxbWO0ZiTRT2j3IDOMy2uEU/UgsdW9DHy7c0zSt+542rwZATNRhBdho3IfL54n7tOK6U0nYmHf5yR+XU6EfSqfY3eh4bcL0PlA6WkryevykQn20OKQ0QAahKXicrmAxXWWm2MGygzuOMu4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760995490; c=relaxed/simple;
+	bh=2ouFT+alOTtWn5rhfE5oAisrrN6mYTQD5/35TSdIxvc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fSuJUyAoXQCTuH3s/GX5xKJfCez3cF07aP0N8RseVPD1DuSmRBllvzduSJQPzHI7iGTnsO9g/5ep0XeRZ7Xd9Y6NyPoyQ4QhbIhTw7Ahmy6e4oP5FUnjbKq0/yu54+SpdWKQ9Tnc6pMQS0OG6N1KABb9jzRHE8pmILuwMjPgX7U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it; spf=pass smtp.mailfrom=valla.it; dkim=pass (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b=a+s0epdt; dkim=pass (1024-bit key) header.d=valla.it header.i=@valla.it header.b=m0JvxP3Y; arc=pass smtp.client-ip=185.56.87.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=valla.it
+ARC-Seal: i=1; cv=none; a=rsa-sha256; d=outgoing.instance-europe-west4-75hr.prod.antispam.mailspamprotection.com; s=arckey; t=1760995488;
+	 b=IhkeGxCVyP7ycTt1elxOBBdHTAo+YAoWiFbJObxpcAONLCW/k4SdetLdNz3rqQV4Xp5ioEL4Dp
+	  fxBnweBZYYws3HtCB8cciDMfqDjMcypjDUmpwy0IKnKrH7N1aG1BuUJ+GpbVJg78bq77bzGQsP
+	  MmoftBhpZ6TABsJg6Nhtlg18KnXXlLPQcDbPUEE0vulwLixAh8SwPpxYfsjisVoP2iymWaDmsv
+	  BUQ5sWwyk3JDEGzoJAgb40obvsqMx5goGH/Grqmpav//br/AB0HD/9SRqr77Ruzqqv9MmusnCV
+	  iBK24fZxY2djhkd/77/FTm7hTURO+V7+dUkwdwDQDVJAPw==;
+ARC-Authentication-Results: i=1; outgoing.instance-europe-west4-75hr.prod.antispam.mailspamprotection.com; smtp.remote-ip=35.214.173.214;
+	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
+	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
+	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
+	arc=none
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed; d=outgoing.instance-europe-west4-75hr.prod.antispam.mailspamprotection.com; s=arckey; t=1760995488;
+	bh=2ouFT+alOTtWn5rhfE5oAisrrN6mYTQD5/35TSdIxvc=;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
+	  Message-ID:Date:Subject:Cc:To:From:DKIM-Signature:DKIM-Signature;
+	b=k2hnKffgdNhjf14vG1EzS5l8NCBpdVdQPVg1WIW97FAm7wdfaBMQC/t2OXrV3+dm5c4sabw84D
+	  kXmzsnJhCWnw57UytXsShJeSemcT3uYctUWRU5wkdxRBycQ+6Vf2qQKr8V+M36cS1J3hj/JOhD
+	  smluQEUI4M4a9lVmyxyPZXFWdtlUV6PNXEabkc6PoMSdOyiFWt17KocKYyU+luGjLbor8BuFQK
+	  da5Npb7rvqLDYV3kkQfmN5Vmem0nn7VR8GWKoM8501EHKg8BSj40TomSLGKqU8qfwMNA5W9i5T
+	  FaScbaEn5EueeVwEgkC2Qe8BJgedyfnuieRQLjTdqogJaw==;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=antispam.mailspamprotection.com; s=default; h=CFBL-Feedback-ID:CFBL-Address
+	:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Reply-To:List-Unsubscribe;
+	bh=SnX1nQdEuaGWMQh+pLSXIZd/hCY6zPBWbspwRBykrrs=; b=a+s0epdtt2GB39nYfc7Kn9klls
+	h+JIHQjJFykYDljzXgaFWpy7z4eKwXcmVnuX0iBMidceVUzzoraFZlyXRe9a6OqOoNApLEZfL3UcL
+	h0jaeiYnmpXoCXjR58qEsh7B5P9XRgYL0rnciNFDOYPsyJv0U873eHnNdoFZQEuWn3j8=;
+Received: from 214.173.214.35.bc.googleusercontent.com ([35.214.173.214] helo=esm19.siteground.biz)
+	by instance-europe-west4-75hr.prod.antispam.mailspamprotection.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <francesco@valla.it>)
+	id 1vAxMq-00000009sHv-3BNg;
+	Mon, 20 Oct 2025 21:24:39 +0000
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=valla.it;
+	s=default; h=Date:Subject:Cc:To:From:list-help:list-unsubscribe:
+	list-subscribe:list-post:list-owner:list-archive;
+	bh=SnX1nQdEuaGWMQh+pLSXIZd/hCY6zPBWbspwRBykrrs=; b=m0JvxP3YhlvEKT+SYapQA6y1pK
+	eudCWGk+b4z4DhlFO1FxlCzqd/gZaM/JRU625IW4OLptCIRO1GYpgeK/uUo502GJD+P+nDJKL0IEy
+	QvKyUxlpoY3EpzPsNxIJ5yc/koZL4MqoObUZXsMP5F9z1jKIqmUG766341xbyDv+T6xM=;
+Received: from [87.16.13.60] (port=60132 helo=fedora.fritz.box)
+	by esm19.siteground.biz with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <francesco@valla.it>)
+	id 1vAxMX-00000000AIj-08n4;
+	Mon, 20 Oct 2025 21:24:17 +0000
+From: Francesco Valla <francesco@valla.it>
+To: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>,
+ Harald Mommer <harald.mommer@opensynergy.com>,
+ Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com>,
+ Wolfgang Grandegger <wg@grandegger.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Damir Shaikhutdinov <Damir.Shaikhutdinov@opensynergy.com>,
+ linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ development@redaril.me
+Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
+Date: Mon, 20 Oct 2025 23:24:15 +0200
+Message-ID: <27327622.1r3eYUQgxm@fedora.fritz.box>
+In-Reply-To: <aPZNiD1SN16K7hmT@fedora>
+References:
+ <20240108131039.2234044-1-Mikhail.Golubev-Ciuchea@opensynergy.com>
+ <1997333.7Z3S40VBb9@fedora.fritz.box> <aPZNiD1SN16K7hmT@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251020-netconsole-fix-race-v1-2-b775be30ee8a@gmail.com>
-References: <20251020-netconsole-fix-race-v1-0-b775be30ee8a@gmail.com>
-In-Reply-To: <20251020-netconsole-fix-race-v1-0-b775be30ee8a@gmail.com>
-To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, Matthew Wood <thepacketgeek@gmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Gustavo Luiz Duarte <gustavold@gmail.com>
-X-Mailer: b4 0.13.0
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - esm19.siteground.biz
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - valla.it
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-SGantispam-id: 92a448e4b3ce077e46e201b844574c38
+AntiSpam-DLS: false
+AntiSpam-DLSP: 
+AntiSpam-DLSRS: 
+AntiSpam-TS: 1.0
+CFBL-Address: feedback@antispam.mailspamprotection.com; report=arf
+CFBL-Feedback-ID: 1vAxMq-00000009sHv-3BNg-feedback@antispam.mailspamprotection.com
+Authentication-Results: outgoing.instance-europe-west4-75hr.prod.antispam.mailspamprotection.com;
+	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
+	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
+	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
+	arc=none
 
-The update_userdata() function constructs the complete userdata string
-in nt->extradata_complete and updates nt->userdata_length. This data
-is then read by write_msg() and write_ext_msg() when sending netconsole
-messages. However, update_userdata() was not holding target_list_lock
-during this process, allowing concurrent message transmission to read
-partially updated userdata.
+On Monday, 20 October 2025 at 16:56:08 Matias Ezequiel Vara Larsen <mvaralar@redhat.com> wrote:
+> On Tue, Oct 14, 2025 at 06:01:07PM +0200, Francesco Valla wrote:
+> > On Tuesday, 14 October 2025 at 12:15:12 Matias Ezequiel Vara Larsen <mvaralar@redhat.com> wrote:
+> > > On Thu, Sep 11, 2025 at 10:59:40PM +0200, Francesco Valla wrote:
+> > > > Hello Mikhail, Harald,
+> > > > 
+> > > > hoping there will be a v6 of this patch soon, a few comments:
+> > > > 
+> > > > On Monday, 8 January 2024 at 14:10:35 Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com> wrote:
+> > > > 
+> > > > [...]
+> > > > > +
+> > > > > +/* Compare with m_can.c/m_can_echo_tx_event() */
+> > > > > +static int virtio_can_read_tx_queue(struct virtqueue *vq)
+> > > > > +{
+> > > > > +	struct virtio_can_priv *can_priv = vq->vdev->priv;
+> > > > > +	struct net_device *dev = can_priv->dev;
+> > > > > +	struct virtio_can_tx *can_tx_msg;
+> > > > > +	struct net_device_stats *stats;
+> > > > > +	unsigned long flags;
+> > > > > +	unsigned int len;
+> > > > > +	u8 result;
+> > > > > +
+> > > > > +	stats = &dev->stats;
+> > > > > +
+> > > > > +	/* Protect list and virtio queue operations */
+> > > > > +	spin_lock_irqsave(&can_priv->tx_lock, flags);
+> > > > > +
+> > > > > +	can_tx_msg = virtqueue_get_buf(vq, &len);
+> > > > > +	if (!can_tx_msg) {
+> > > > > +		spin_unlock_irqrestore(&can_priv->tx_lock, flags);
+> > > > > +		return 0; /* No more data */
+> > > > > +	}
+> > > > > +
+> > > > > +	if (unlikely(len < sizeof(struct virtio_can_tx_in))) {
+> > > > > +		netdev_err(dev, "TX ACK: Device sent no result code\n");
+> > > > > +		result = VIRTIO_CAN_RESULT_NOT_OK; /* Keep things going */
+> > > > > +	} else {
+> > > > > +		result = can_tx_msg->tx_in.result;
+> > > > > +	}
+> > > > > +
+> > > > > +	if (can_priv->can.state < CAN_STATE_BUS_OFF) {
+> > > > > +		/* Here also frames with result != VIRTIO_CAN_RESULT_OK are
+> > > > > +		 * echoed. Intentional to bring a waiting process in an upper
+> > > > > +		 * layer to an end.
+> > > > > +		 * TODO: Any better means to indicate a problem here?
+> > > > > +		 */
+> > > > > +		if (result != VIRTIO_CAN_RESULT_OK)
+> > > > > +			netdev_warn(dev, "TX ACK: Result = %u\n", result);
+> > > > 
+> > > > Maybe an error frame reporting CAN_ERR_CRTL_UNSPEC would be better?
+> > > > 
+> > > I am not sure. In xilinx_can.c, CAN_ERR_CRTL_UNSPEC is indicated during
+> > > a problem in the rx path and this is the tx path. I think the comment
+> > > refers to improving the way the driver informs this error to the user
+> > > but I may be wrong.
+> > > 
+> > 
+> > Since we have no detail of what went wrong here, I suggested
+> > CAN_ERR_CRTL_UNSPEC as it is "unspecified error", to be coupled with a
+> > controller error with id CAN_ERR_CRTL; however, a different error might be
+> > more appropriate.
+> > 
+> > For sure, at least in my experience, having a warn printed to kmsg is *not*
+> > enough, as the application sending the message(s) would not be able to detect
+> > the error.
+> > 
+> > 
+> > > > For sure, counting the known errors as valid tx_packets and tx_bytes
+> > > > is misleading.
+> > > > 
+> > > 
+> > > I'll remove the counters below.
+> > > 
+> > 
+> > We don't really know what's wrong here - the packet might have been sent and
+> > and then not ACK'ed, as well as any other error condition (as it happens in the
+> > reference implementation from the original authors [1]). Echoing the packet
+> > only "to bring a waiting process in an upper layer to an end" and incrementing
+> > counters feels wrong, but maybe someone more expert than me can advise better
+> > here.
+> > 
+> > 
+> 
+> I agree. IIUC, in case there has been a problem during transmission, I
+> should 1) indicate this by injecting a CAN_ERR_CRTL_UNSPEC package with
+> netif_rx() and 2) use can_free_echo_skb() and increment the tx_error
+> stats. Is this correct?
+> 
+> Matias
+> 
+> 
 
-This race condition could result in netconsole messages containing
-incomplete or inconsistent userdata - for example, reading the old
-userdata_length with new extradata_complete content, or vice versa,
-leading to truncated or corrupted output.
+That's my understanding too! stats->tx_dropped should be the right value to
+increment (see for example [1]).
 
-Fix this by acquiring target_list_lock with spin_lock_irqsave() before
-updating extradata_complete and userdata_length, and releasing it after
-both fields are fully updated. This ensures that readers see a
-consistent view of the userdata, preventing corruption during concurrent
-access.
+[1] https://elixir.bootlin.com/linux/v6.17.3/source/drivers/net/can/ctucanfd/ctucanfd_base.c#L1035
 
-The fix aligns with the existing locking pattern used throughout the
-netconsole code, where target_list_lock protects access to target
-fields including buf[] and msgcounter that are accessed during message
-transmission.
+Regards,
+Francesco
 
-Fixes: df03f830d099 ("net: netconsole: cache userdata formatted string in netconsole_target")
 
-Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
----
- drivers/net/netconsole.c | 5 +++++
- 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 194570443493b..1f9cf6b12dfc5 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -888,6 +888,9 @@ static void update_userdata(struct netconsole_target *nt)
- {
- 	int complete_idx = 0, child_count = 0;
- 	struct list_head *entry;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&target_list_lock, flags);
- 
- 	/* Clear the current string in case the last userdatum was deleted */
- 	nt->userdata_length = 0;
-@@ -918,6 +921,8 @@ static void update_userdata(struct netconsole_target *nt)
- 	}
- 	nt->userdata_length = strnlen(nt->extradata_complete,
- 				      sizeof(nt->extradata_complete));
-+
-+	spin_unlock_irqrestore(&target_list_lock, flags);
- }
- 
- static ssize_t userdatum_value_store(struct config_item *item, const char *buf,
 
--- 
-2.47.3
 
 
