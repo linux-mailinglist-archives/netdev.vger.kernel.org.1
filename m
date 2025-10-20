@@ -1,268 +1,259 @@
-Return-Path: <netdev+bounces-230776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08974BEF37D
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 06:04:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A581BEF4F8
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 06:50:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A10714E524A
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 04:04:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF2D918958F2
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 04:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84761286891;
-	Mon, 20 Oct 2025 04:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CXZ1xttV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21BA2BEFFD;
+	Mon, 20 Oct 2025 04:50:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14E8354AEA
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 04:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+Received: from www.nop.hu (www.nop.hu [80.211.201.218])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 3672618DB1E
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 04:50:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.211.201.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760933089; cv=none; b=bcRRPrlXx38vdjMU8Dmf74yWOmw3Qczo0ojKIAR0pV46CmsFfcHpFKkKQLztonVxa9Y8+4tDMacc9EYnnLFZUQNybGADPwgZNiQ/h7kdIC/HJIxA8rYAChL7SioqTKAKBQCl9SWS5+tAjzcfJziJ+KKaINl2L1gVSmnce4owq/Q=
+	t=1760935807; cv=none; b=TPgMrjDsYa/WaYWXu1Ph12RZaQrkNmbRzLpvaSH/jKSPR6jQCbvKFgTjX5G+z+nhAhgyHTBefHWcFRauKuwkmK8Bj43qh1Ao0jAk2KKaCLVZSx5n2LDu0CDgg6O3O2nWTqU7Nwn/RdJMFkg3onI6pHf7BXirHFjgoaC7UaDFl7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760933089; c=relaxed/simple;
-	bh=BrBSwvP4U1oadRL+lkNQZU8qTv/t08T3CSd325/A6yw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WUmIDRYR4yyDbWyeDbQiwXSJyEJi4qGQUFvSNlI2sZIn5ffyRL1EQQJI9NhLdnaDGngR4CgeICUm2kuv/XHdJkHksjYZvgJYxCUnsdN6MLIjs/5JUrFaTfiZkVTqyTLlHUvh5IPaKhTTLG0J3aSlMjw1HDYU0ebtFpbk7HuwBJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CXZ1xttV; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-93e2c9821fcso352390739f.3
-        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 21:04:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760933087; x=1761537887; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bTk8LQSKM8ZGCaHMHDpO18C5oLMVQQjrf2wrzeY1hAA=;
-        b=CXZ1xttVCr6kpp1e0y7Erx+TC7lr3ZIT28HFBh8GNXdPIB5EVnQcX6a8Yi531KEMSx
-         nTH7uGWfo61LhbiEGlRJ1bnyMXc9A8RN72jL3qYkmcEb3hvtDg6mOmc5KcNx4ksuXni5
-         si2clbj5Ie1UKMenWZmLFm+MVf/D+mAeAOKKPB+AtRatRrEiSGm6r4/rUN9Cnu4J2QQW
-         ZBFVP7sYKeIzROSkEA+bCG37EvO/WVEKoLzMTC+fXWNy2Hm97iR1FVTqt2XdrvMVOLV+
-         EBLhzNFKgstylwBuxVe81t5ZjY+D5lNcFvT1M28PBV4mUSiGfP1pabMAdTI0g3MmCxvu
-         KfiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760933087; x=1761537887;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bTk8LQSKM8ZGCaHMHDpO18C5oLMVQQjrf2wrzeY1hAA=;
-        b=uCEtK0IlSybbqYWh0E6JcN4EqBiBZ9DBQTcKKMsHO1nDSRucX1WFtsyRkVkSmwxFei
-         0GYb82ush/G5juYMRmiFiYh4cYnbrPuWDknFifvEBWffj7WlTehT6+m3kyn7ZOwN8zme
-         DqC01Wrgfn6+z7YSoBxSyuop62fq7DBcHES1NcdKzQdmOz3VoiS1rQIBHC/Bu0zKMBlr
-         JLqbLaIyuuaYm2Fpyf7+I0LqDYFL5Upg57KvBPCXQJA2LYUXzBrNrpSwnkZRRtFQGHWx
-         NXFvNC67Kvb0KRXkV6djjU4FSTPyLulxAuy/nvI83Es1nSNTIrboItCiN+/THgk4ClHP
-         C/Mg==
-X-Forwarded-Encrypted: i=1; AJvYcCU7IiWf1E4iBRbcoEQA8M/vcmhVEjJqUN3jitsoXMLLvLsr1BYs8++IneIcWG0MVe4yNC/mF3U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztEftuhoE9oFQNSwFwk+UGM8/ooQDpz9hfbPzbTAOfMiz5aXM0
-	vuAGNW+bduqfv4uWbpzKZJcRA7YGYsCGcQZmHhA+/udpG490fOWVVCkOuE4+g2oHeGrZ8rzCxfS
-	yxJGA4QKKvBKXNDuNby0JDL+tixZU5P2KNr1pzUs=
-X-Gm-Gg: ASbGncuTu7e82s6HdwKwt+qvrBrjNKp2iNIFBtYP479bvyZRHPc560VYttMmbwmPw9w
-	t41o89UZCeo8org36JJXF4F0bVvumKTezBpL6qnvhYoVbeBpWaSi9HSkN+8RDptbh0v65grd0Px
-	IwrzPGAqCdFgjD/EXve1jJpvLSlktIiQ5zCgUD2b5MZL6TBkU512WntpMAF5Dk66EmnPYVyuM/v
-	Pls7w8+r0MnXxYA6k5r84AzvUBmOciXW5mBuQI9VyRaNZALt+zQ2pZSL6vx
-X-Google-Smtp-Source: AGHT+IFE+jMAi7h84qz7XsmrOA79Sd5fnA4EM2eXCUcvh21k25H/Gc4+Y4wEo+5nw8VEoR1gFzucPWsrRT+RdmGjjkk=
-X-Received: by 2002:a05:6e02:440b:20b0:430:c78c:75d6 with SMTP id
- e9e14a558f8ab-430c78c7663mr136337455ab.2.1760933086863; Sun, 19 Oct 2025
- 21:04:46 -0700 (PDT)
+	s=arc-20240116; t=1760935807; c=relaxed/simple;
+	bh=FU9ZdJS0YivoZ39SmXxiegSacnUpa+qJT4cJbPWyy30=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=urokePEDtTN3R/s73/YdbYiIMViPRCpQWcTg7U2iHG7JW9gkEBk00uWMJ54CxbmriGRBW67dd7DYDwLEleVFBD4a9N+4MZBKPObUHACviIj4RBk4nRIWrzo74zD2Dine0iIeGcpH0Pb2FH2OvINAsp+7b3PDNNG4hhOSpQbSJWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nop.hu; spf=pass smtp.mailfrom=nop.hu; arc=none smtp.client-ip=80.211.201.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nop.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nop.hu
+Received: from 2001:db8:8319::200:11ff:fe11:2222 (helo [IPV6:2001:db8:8319:0:200:11ff:fe11:2222])
+    (reverse as null)
+    by 2001:db8:1101::18 (helo www.nop.hu)
+    (envelope-from csmate@nop.hu) with smtp (freeRouter v25.10.19-cur)
+    for jonathan.lemon@gmail.com sdf@fomichev.me maciej.fijalkowski@intel.com magnus.karlsson@intel.com bjorn@kernel.org 1118437@bugs.debian.org netdev@vger.kernel.org bpf@vger.kernel.org ; Mon, 20 Oct 2025 06:45:06 +0200
+Message-ID: <0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu>
+Date: Mon, 20 Oct 2025 06:45:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251019170016.138561-1-peng.yu@alibaba-inc.com>
- <CANn89iLsDDQuuQF2i73_-HaHMUwd80Q_ePcoQRy_8GxY2N4eMQ@mail.gmail.com>
- <befd947e-8725-4637-8fac-6a364b0b4df0.peng.yu@alibaba-inc.com> <CANn89iJN4V8SeythtQVrSjhztWmCySdAxR8h35i4Ea2ceq9k8w@mail.gmail.com>
-In-Reply-To: <CANn89iJN4V8SeythtQVrSjhztWmCySdAxR8h35i4Ea2ceq9k8w@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 20 Oct 2025 12:04:10 +0800
-X-Gm-Features: AS18NWALYw2lHzYBSWjmSmUBTSCtc_mSfoRsooIveVePQXl350PkrjeJ8WzCf2o
-Message-ID: <CAL+tcoD8akZPp87CFnc2d98eZGvXheNeUEJBZcJEaqHZst4DFQ@mail.gmail.com>
-Subject: Re: [PATCH] net: set is_cwnd_limited when the small queue check fails
-To: Eric Dumazet <edumazet@google.com>
-Cc: "YU, Peng" <peng.yu@alibaba-inc.com>, Peng Yu <yupeng0921@gmail.com>, 
-	ncardwell <ncardwell@google.com>, kuniyu <kuniyu@google.com>, 
-	netdev <netdev@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Magnus Karlsson <magnus.karlsson@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>
+Cc: 1118437@bugs.debian.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+From: mc36 <csmate@nop.hu>
+Subject: null pointer dereference in interrupt after receiving an ip packet on
+ veth from xsk from user space
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 20, 2025 at 12:00=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Sun, Oct 19, 2025 at 4:00=E2=80=AFPM YU, Peng <peng.yu@alibaba-inc.com=
-> wrote:
-> >
-> > I think we know the root cause in the driver. We are using the
-> > virtio_net driver. We found that the issue happens after this driver
-> > commit:
-> >
-> > b92f1e6751a6 virtio-net: transmit napi
-> >
-> > According to our test, the issue will happen if we apply below change:
-> >
-> >
-> >  static int xmit_skb(struct send_queue *sq, struct sk_buff *skb)
-> >  {
-> >         struct virtio_net_hdr_mrg_rxbuf *hdr;
-> > @@ -1130,6 +1174,7 @@ static netdev_tx_t start_xmit(struct sk_buff *skb=
-, struct net_device *dev)
-> >         int err;
-> >         struct netdev_queue *txq =3D netdev_get_tx_queue(dev, qnum);
-> >         bool kick =3D !skb->xmit_more;
-> > +       bool use_napi =3D sq->napi.weight;
-> >
-> >         /* Free up any pending old buffers before queueing new ones. */
-> >         free_old_xmit_skbs(sq);
-> > @@ -1152,8 +1197,10 @@ static netdev_tx_t start_xmit(struct sk_buff *sk=
-b, struct net_device *dev)
-> >         }
-> >
-> >         /* Don't wait up for transmitted skbs to be freed. */
-> > -       skb_orphan(skb);
-> > -       nf_reset(skb);
-> > +       if (!use_napi) {
-> > +               skb_orphan(skb);
-> > +               nf_reset(skb);
-> > +       }
-> >
-> >
-> > Before this change, the driver will invoke skb_orphan immediately when
-> > it receives a skb, then the tcp layer will decrease the wmem_alloc.
-> > Thus the small queue check won't fail. After applying this change, the
-> > virtio_net driver will tell tcp layer to decrease the wmem_alloc when
-> > the skp is really sent out.
-> > If we set use_napi to false, the virtio_net driver will invoke
-> > skb_orphan immediately as before, then the issue won't happen.
-> > But invoking skb_orphan in start_xmit looks like a workaround to me,
-> > I'm not sure if we should rollback this change.  The small queue check
-> > and cwnd window would come into a kind of "dead lock" situation to me,
-> > so I suppose we should fix that "dead lock".  If you believe we
-> > shouldn't change TCP layer for this issue, may I know the correct
-> > direction to resolve this issue? Should we modify the virtio_net
-> > driver, let it always invoke skb_orphan as before?
-> > As a workaround, we set the virtio_net module parameter napi_tx to
-> > false, then the use_napi would be false too. Thus the issue won't
-> > happen. But we indeed want to enable napi_tx, so may I know what's
-> > your suggestion about this issue?
-> >
->
-> I think you should start a conversation with virtio_net experts,
-> instead of making TCP
-> bufferbloated again.
->
-> TX completions dynamics are important, and we are not going to
-> penalize all drivers
-> just because of one.
->
-> You are claiming deadlocks, but the mechanisms in place are proven to
-> work damn well.
+hi,
 
-Oh, we're almost at the same time to reply to the thread :)
+freertr.org xsk dataplane is triggering a null pointer de-reference after sending
 
-Right, I'm totally with you.
+a single ip packet from user space to an xsk socket bound to a veth interface.
 
-Thanks,
-Jason
+the same code works fine when using physical interfaces to send packets to...
 
->
-> >
-> > ------------------------------------------------------------------
-> > From:Eric Dumazet <edumazet@google.com>
-> > Send Time:2025 Oct. 20 (Mon.) 01:43
-> > To:Peng Yu<yupeng0921@gmail.com>
-> > CC:ncardwell<ncardwell@google.com>; kuniyu<kuniyu@google.com>; netdev<n=
-etdev@vger.kernel.org>; "linux-kernel"<linux-kernel@vger.kernel.org>; Peng =
-YU<peng.yu@alibaba-inc.com>
-> > Subject:Re: [PATCH] net: set is_cwnd_limited when the small queue check=
- fails
-> >
-> >
-> > On Sun, Oct 19, 2025 at 10:00 AM Peng Yu <yupeng0921@gmail.com> wrote:
-> > >
-> > > The limit of the small queue check is calculated from the pacing rate=
-,
-> > > the pacing rate is calculated from the cwnd. If the cwnd is small,
-> > > the small queue check may fail.
-> > > When the samll queue check fails, the tcp layer will send less
-> > > packages, then the tcp_is_cwnd_limited would alreays return false,
-> > > then the cwnd would have no chance to get updated.
-> > > The cwnd has no chance to get updated, it keeps small, then the pacin=
-g
-> > > rate keeps small, and the limit of the small queue check keeps small,
-> > > then the small queue check would always fail.
-> > > It is a kind of dead lock, when a tcp flow comes into this situation,
-> > > it's throughput would be very small, obviously less then the correct
-> > > throughput it should have.
-> > > We set is_cwnd_limited to true when the small queue check fails, then
-> > > the cwnd would have a chance to get updated, then we can break this
-> > > deadlock.
-> > >
-> > > Below ss output shows this issue:
-> > >
-> > > skmem:(r0,rb131072,
-> > > t7712, <------------------------------ wmem_alloc =3D 7712
-> > > tb243712,f2128,w219056,o0,bl0,d0)
-> > > ts sack cubic wscale:7,10 rto:224 rtt:23.364/0.019 ato:40 mss:1448
-> > > pmtu:8500 rcvmss:536 advmss:8448
-> > > cwnd:28 <------------------------------ cwnd=3D28
-> > > bytes_sent:2166208 bytes_acked:2148832 bytes_received:37
-> > > segs_out:1497 segs_in:751 data_segs_out:1496 data_segs_in:1
-> > > send 13882554bps lastsnd:7 lastrcv:2992 lastack:7
-> > > pacing_rate 27764216bps <--------------------- pacing_rate=3D27764216=
-bps
-> > > delivery_rate 5786688bps delivered:1485 busy:2991ms unacked:12
-> > > rcv_space:57088 rcv_ssthresh:57088 notsent:188240
-> > > minrtt:23.319 snd_wnd:57088
-> > >
-> > > limit=3D(27764216 / 8) / 1024 =3D 3389 < 7712
-> > > So the samll queue check fails. When it happens, the throughput is
-> > > obviously less than the normal situation.
-> > >
-> > > By setting the tcp_is_cwnd_limited to true when the small queue check
-> > > failed, we can avoid this issue, the cwnd could increase to a reasona=
-lbe
-> > > size, in my test environment, it is about 4000. Then the small queue
-> > > check won't fail.
-> >
-> >
-> > >
-> > > Signed-off-by: Peng Yu <peng.yu@alibaba-inc.com>
-> > > ---
-> > >  net/ipv4/tcp_output.c | 4 +++-
-> > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> > > index b94efb3050d2..8c70acf3a060 100644
-> > > --- a/net/ipv4/tcp_output.c
-> > > +++ b/net/ipv4/tcp_output.c
-> > > @@ -2985,8 +2985,10 @@ static bool tcp_write_xmit(struct sock *sk, un=
-signed int mss_now, int nonagle,
-> > >                     unlikely(tso_fragment(sk, skb, limit, mss_now, gf=
-p)))
-> > >                         break;
-> > >
-> > > -               if (tcp_small_queue_check(sk, skb, 0))
-> > > +               if (tcp_small_queue_check(sk, skb, 0)) {
-> > > +                       is_cwnd_limited =3D true;
-> > >                         break;
-> > > +               }
-> > >
-> > >                 /* Argh, we hit an empty skb(), presumably a thread
-> > >                  * is sleeping in sendmsg()/sk_stream_wait_memory().
-> > > --
-> > > 2.47.3
-> >
-> > Sorry this makes no sense to me.  CWND_LIMITED should not be hijacked.
-> >
-> > Something else is preventing your flows to get to nominal speed,
-> > because we have not seen anything like that.
-> >
-> > It is probably a driver issue or a receive side issue : Instead of
-> > trying to work around the issue, please root cause it.
->
+it does not matter if an ip address is assigned to the veth pair or not...
+
+please find below the reproducer code with some comments on how to use it...
+
+tldr: create a veth pair, bring them up, compile and run the c code...
+
+this happens 10/10 on host or in qemu-system-x86_64-kvm running 6.16.12 or 6.17.2...
+
+if it does not belongs here, just let me know....
+
+have a nice day,
+
+csaba
+
+
+------------------------------------------------------[cut]---------------------------------------------------------
+
+
+p4emu login: [  119.074634] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[  119.076747] #PF: supervisor read access in kernel mode
+[  119.078334] #PF: error_code(0x0000) - not-present page
+[  119.079855] PGD 0 P4D 0
+[  119.080648] Oops: Oops: 0000 [#1] SMP NOPTI
+[  119.081993] CPU: 2 UID: 1 PID: 927 Comm: p4xsk.bin Not tainted 6.16.12+deb14-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.16.12-1
+[  119.085247] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
+[  119.088065] RIP: 0010:xsk_destruct_skb+0xd0/0x180
+[  119.089502] Code: 40 10 48 89 cf 89 28 e8 9e 7e 07 00 48 89 df 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 c8 cc da ff 48 8b 7b 30 4c 8d 5b 30 <48> 8b 07 4c 8d 67 f8 4c 8d 70 
+f8 49 39 fb 74 b7 48 89 5c 24 10 4c
+[  119.094947] RSP: 0018:ffffcd5b4012cd48 EFLAGS: 00010002
+[  119.096499] RAX: ffffcd5b40fcf000 RBX: ffff898e05dfcf00 RCX: ffff898e043cf9e8
+[  119.098612] RDX: ffff898e048ccc80 RSI: 0000000000000246 RDI: 0000000000000000
+[  119.100687] RBP: 0000000000000001 R08: 0000000000000000 R09: ffff898e01d21900
+[  119.102794] R10: 0000000000000000 R11: ffff898e05dfcf30 R12: ffff898e05f95000
+[  119.104880] R13: ffff898e043cf900 R14: ffff898e7dd32bd0 R15: 0000000000000002
+[  119.107000] FS:  00007f0cd9e0a6c0(0000) GS:ffff898ede530000(0000) knlGS:0000000000000000
+[  119.109358] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  119.111080] CR2: 0000000000000000 CR3: 00000000043ba003 CR4: 0000000000372ef0
+[  119.113175] Call Trace:
+[  119.113996]  <IRQ>
+[  119.114662]  ? napi_complete_done+0x7a/0x1a0
+[  119.115952]  ip_rcv_core+0x1bb/0x340
+[  119.117050]  ip_rcv+0x30/0x1f0
+[  119.118014]  __netif_receive_skb_one_core+0x85/0xa0
+[  119.119468]  process_backlog+0x87/0x130
+[  119.120617]  __napi_poll+0x28/0x180
+[  119.121685]  net_rx_action+0x339/0x420
+[  119.122850]  handle_softirqs+0xdc/0x320
+[  119.124003]  ? handle_edge_irq+0x90/0x1e0
+[  119.125218]  do_softirq.part.0+0x3b/0x60
+[  119.126422]  </IRQ>
+[  119.127085]  <TASK>
+[  119.127753]  __local_bh_enable_ip+0x60/0x70
+[  119.128998]  __dev_direct_xmit+0x14e/0x1f0
+[  119.130128]  __xsk_generic_xmit+0x482/0xb70
+[  119.131184]  ? __remove_hrtimer+0x41/0xa0
+[  119.132199]  ? __xsk_generic_xmit+0x51/0xb70
+[  119.133300]  ? _raw_spin_unlock_irqrestore+0xe/0x40
+[  119.134637]  xsk_sendmsg+0xda/0x1c0
+[  119.135580]  __sys_sendto+0x1ee/0x200
+[  119.136509]  __x64_sys_sendto+0x24/0x30
+[  119.137493]  do_syscall_64+0x84/0x2f0
+[  119.138452]  ? __pfx_pollwake+0x10/0x10
+[  119.139454]  ? __rseq_handle_notify_resume+0xad/0x4c0
+[  119.140718]  ? restore_fpregs_from_fpstate+0x3c/0x90
+[  119.141999]  ? switch_fpu_return+0x5b/0xe0
+[  119.143023]  ? do_syscall_64+0x204/0x2f0
+[  119.144007]  ? do_syscall_64+0x204/0x2f0
+[  119.144990]  ? do_syscall_64+0x204/0x2f0
+[  119.146022]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[  119.147278] RIP: 0033:0x7f0cde0a49ee
+[  119.148217] Code: 08 0f 85 f5 4b ff ff 49 89 fb 48 89 f0 48 89 d7 48 89 ce 4c 89 c2 4d 89 ca 4c 8b 44 24 08 4c 8b 4c 24 10 4c 89 5c 24 08 0f 05 <c3> 66 2e 0f 1f 84 00 00 00 00 
+00 0f 1f 80 00 00 00 00 48 83 ec 08
+[  119.152877] RSP: 002b:00007f0cd9e09c98 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+[  119.154774] RAX: ffffffffffffffda RBX: 00007f0cd9e0a6c0 RCX: 00007f0cde0a49ee
+[  119.156526] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000029
+[  119.158317] RBP: 0000000000000005 R08: 0000000000000000 R09: 0000000000000000
+[  119.160078] R10: 0000000000000040 R11: 0000000000000246 R12: 0000000000000405
+[  119.161893] R13: 00007f0ccc055ce0 R14: 0000000000000001 R15: 00007f0cde8db900
+[  119.163646]  </TASK>
+[  119.164243] Modules linked in: veth intel_rapl_msr intel_rapl_common iosf_mbi binfmt_misc kvm_intel kvm irqbypass ghash_clmulni_intel sha512_ssse3 sha1_ssse3 aesni_intel rapl 
+button evdev sg efi_pstore configfs nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg ip_tables x_tables autofs4 sd_mod 
+sr_mod cdrom ata_generic ata_piix libata virtio_net scsi_mod net_failover serio_raw failover scsi_common
+[  119.174216] CR2: 0000000000000000
+[  119.175068] ---[ end trace 0000000000000000 ]---
+[  119.176224] RIP: 0010:xsk_destruct_skb+0xd0/0x180
+[  119.177432] Code: 40 10 48 89 cf 89 28 e8 9e 7e 07 00 48 89 df 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 c8 cc da ff 48 8b 7b 30 4c 8d 5b 30 <48> 8b 07 4c 8d 67 f8 4c 8d 70 
+f8 49 39 fb 74 b7 48 89 5c 24 10 4c
+[  119.182155] RSP: 0018:ffffcd5b4012cd48 EFLAGS: 00010002
+[  119.183462] RAX: ffffcd5b40fcf000 RBX: ffff898e05dfcf00 RCX: ffff898e043cf9e8
+[  119.185237] RDX: ffff898e048ccc80 RSI: 0000000000000246 RDI: 0000000000000000
+[  119.187022] RBP: 0000000000000001 R08: 0000000000000000 R09: ffff898e01d21900
+[  119.188872] R10: 0000000000000000 R11: ffff898e05dfcf30 R12: ffff898e05f95000
+[  119.190693] R13: ffff898e043cf900 R14: ffff898e7dd32bd0 R15: 0000000000000002
+[  119.192655] FS:  00007f0cd9e0a6c0(0000) GS:ffff898ede530000(0000) knlGS:0000000000000000
+[  119.194681] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  119.196244] CR2: 0000000000000000 CR3: 00000000043ba003 CR4: 0000000000372ef0
+[  119.198034] Kernel panic - not syncing: Fatal exception in interrupt
+[  119.199761] Kernel Offset: 0x1c000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[  119.202403] ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+
+
+------------------------------------------------------[cut]---------------------------------------------------------
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <pthread.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <poll.h>
+#include <linux/if_link.h>
+#include <xdp/xsk.h>
+
+////// gcc xskInt.c -lxdp
+////// sudo ip link add veth1 type veth
+////// sudo ip link set veth0 up
+////// sudo ip link set veth1 up
+////// sudo ./a.out
+
+void err(char*buf) {
+     printf("%s\n", buf);
+     _exit(1);
+}
+
+
+
+
+int main(int argc, char **argv) {
+
+     int bpf_flag = XDP_FLAGS_SKB_MODE;
+
+     char ifaceName[] = "veth0";
+     printf("opening interface %s\n", ifaceName);
+
+#define framesNum 1024
+
+struct xsk_umem *ifaceUmem;
+struct xsk_socket *ifaceXsk;
+struct xsk_ring_prod ifaceFq;
+struct xsk_ring_cons ifaceCq;
+struct xsk_ring_cons ifaceRx;
+struct xsk_ring_prod ifaceTx;
+char *ifaceBuf;
+struct pollfd ifacePfd;
+
+     posix_memalign((void**)&ifaceBuf, getpagesize(), XSK_UMEM__DEFAULT_FRAME_SIZE * 2 * framesNum);
+     if (ifaceBuf == NULL) err("error allocating buffer");
+
+     if (xsk_umem__create(&ifaceUmem, ifaceBuf, XSK_UMEM__DEFAULT_FRAME_SIZE * 2 * framesNum, &ifaceFq, &ifaceCq, NULL) != 0) err("error creating umem");
+
+     struct xsk_socket_config cfg;
+     memset(&cfg, 0, sizeof(cfg));
+     cfg.rx_size = XSK_RING_CONS__DEFAULT_NUM_DESCS;
+     cfg.tx_size = XSK_RING_PROD__DEFAULT_NUM_DESCS;
+     cfg.xdp_flags = bpf_flag;
+     if (xsk_socket__create(&ifaceXsk, ifaceName, 0, ifaceUmem, &ifaceRx, &ifaceTx, &cfg) != 0) err("error creating xsk");
+
+     unsigned int i = 0;
+     xsk_ring_prod__reserve(&ifaceFq, framesNum, &i);
+     for (i=0; i < framesNum; i++) *xsk_ring_prod__fill_addr(&ifaceFq, i) = i * XSK_UMEM__DEFAULT_FRAME_SIZE;
+     xsk_ring_prod__submit(&ifaceFq, framesNum);
+
+     memset(&ifacePfd, 0, sizeof (ifacePfd));
+     ifacePfd.fd = xsk_socket__fd(ifaceXsk);
+     ifacePfd.events = POLLIN | POLLERR;
+
+     setgid(1);
+     setuid(1);
+     printf("serving others\n");
+
+
+unsigned char bufD[] = {0x3a, 0x10, 0x5c, 0x53, 0xb3, 0x5c, 0x0, 0x1e, 0x11, 0x4c, 0x7e, 0x66, 0x8, 0x0, 0x45, 0x0, 0x0, 0x40, 0x0, 0x0, 0x0, 0x0, 0xff, 0x1, 0xb7, 0xa0, 0x1, 0x1, 
+0x1, 0xd, 0x1, 0x1, 0x1, 0xe, 0x8, 0x0, 0xa5, 0xfd, 0x16, 0x3b, 0x3b, 0xc7, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
+int bufS = sizeof(bufD);
+
+         unsigned int idx;
+         idx = xsk_ring_cons__peek(&ifaceCq, 16, &idx);
+         xsk_ring_cons__release(&ifaceCq, idx);
+         if (xsk_ring_prod__reserve(&ifaceTx, 1, &idx) < 1) err("error getting index");
+         struct xdp_desc *dsc = xsk_ring_prod__tx_desc(&ifaceTx, idx);
+         dsc->addr = (framesNum + (idx % framesNum)) * XSK_UMEM__DEFAULT_FRAME_SIZE;
+         dsc->options = 0;
+         dsc->len = bufS;
+         memcpy(ifaceBuf + dsc->addr, bufD, bufS);
+         xsk_ring_prod__submit(&ifaceTx, 1);
+         if (!xsk_ring_prod__needs_wakeup(&ifaceTx)) err("error waking up");
+         sendto(xsk_socket__fd(ifaceXsk), NULL, 0, MSG_DONTWAIT, NULL, 0);
+
+     sleep(10);
+}
+
 
