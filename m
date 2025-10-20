@@ -1,317 +1,275 @@
-Return-Path: <netdev+bounces-230798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63DAFBEF982
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 09:08:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D155BEFA15
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 09:16:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 669734EEB8E
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 07:07:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB7FA3BC0ED
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 07:15:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F3F2D7DCF;
-	Mon, 20 Oct 2025 07:07:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mBuRFVNp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E8F2DC355;
+	Mon, 20 Oct 2025 07:15:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011001.outbound.protection.outlook.com [52.101.52.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3923B2D94A6;
-	Mon, 20 Oct 2025 07:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.1
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760944028; cv=fail; b=cw3X+11ik+VkzbtSxvoIZEJ+YQY2+U3hfCKcewuBm58gunZ/ivOSiVX7XSa7LoSS1lpngmEQYKVXb9LKwt7727O2JCJ8s9reyhcKAp9Wo5ZdEzO9GvODMTK4KfTxofJhECDFgAmGEnpIk5/NBd1mgQ2ijDqXmK/sLJIljqCk2CI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760944028; c=relaxed/simple;
-	bh=Hbo/ycf9KJ517XxSMF+VMKY0vnTCce1ejzFfDkDoeJc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=U21+Q/qeXLoVlR1c6SSgNAi35pNEIMNzIMkUfK1rPr93dRPO5OosJ+jBaBUFe+vhzzSWdxSqnDUNSAIHshOF2xx2Xqg7vycyANylEaemD4Hbo52PjunSRSyPLH328Q+7dt8TZ2L5WSBDWhwTPiYb0+RRL8YEL+1m0BIyqUSmcKs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mBuRFVNp; arc=fail smtp.client-ip=52.101.52.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f3HPnc0OYkUtnXJWxole8gQlK6w4eKxndYfYJWviQ/3vsZ5G9lXEI/Vret1DtyUBG5AYac6YsQahdOTBVFNsMu3jSiBlZyjn6jVA+kA0ZuNdd57nHaZgJFkDEcEoqUvr/JVNLTMNsMEuYqQ41lzBLjA8sLaEsTIbEVUuNm9IrySy1QfY6i+rgeavdT7la1E5dGcgXKPBn/dv+wmnoS2dRT6EoxuEl2gg1qfbM9fIl9ZgQJ382y6d7xSn+B/xNIniDCTb6ZePJpwEEIY4eL6lEtBp9ztN2JGk87fthB9lpE9Fbugj3JOKrjCne1wb3MEmHpiP8pGXHsIRKPwa1IjMcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H7SfOgdydjxsO8gT09nsoHE1S/SEjCbSgzNnfDtlwK0=;
- b=S66hi48M1BthFr4LFJD7EV690qJcBdePhEpmp5iusX7p+m+vg4WmonMsdPcq4Vn/FadmRPqfKBuy9nbI4UZxGRWvzGtG0eo+klm8rdsjcZh+ODdKSQOlVbJMANp2eCisQ9vb3mLc7jQr+BpGOKwSFhOSplRQ26lYqd5pU/Bp/f9ePrZ3M5BOj6hDlR8WvV/tPFBfXKAeUH/foSfOBZp46uTKEWZhNJ9Gase6BtXwE2cV+9K2bsDdEQ327sXaNhBUgEneTXlk+JWeJULy3s4s/NalacJU2b4SOGpFrffn+HiwNvr/6ntct+mm9KoFb/YR1+BytbE//XU9MgQZ8RgQZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H7SfOgdydjxsO8gT09nsoHE1S/SEjCbSgzNnfDtlwK0=;
- b=mBuRFVNpZn5nzdhj+4homcfX5h4EjcT5k53W3oWCkjbwYxmNn4JKw3O3DqAHZ24vR1QoDNZ+oH6Tl1kweL2dwzt6lcwnyK9qcTL7Yf2vScdwpgrCfHkJ2fZ2RAYHWbaHZw/gWwbK3iITW2SqQX3CQBW8G/CRry+7aWEAQTZ7SKFQZo+a2Dx354VQdXQZ+Usp4faFMfyJYAzPbOrsPFftZMcZ3LeSpTb7U/cWMiOtOPi4iJSLzRv1FXr7OC2qmJ6ivq/A2G5D+dPEJOU7lRI2AHVRRkP1MXCDT0kq64gnlD2fYpfKtKhDFcAMOq6ZPzw4cIP5QBZT7yygoNilIiDKdA==
-Received: from BN0PR04CA0191.namprd04.prod.outlook.com (2603:10b6:408:e9::16)
- by MN2PR12MB4288.namprd12.prod.outlook.com (2603:10b6:208:1d2::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.17; Mon, 20 Oct
- 2025 07:06:58 +0000
-Received: from BN2PEPF000044A8.namprd04.prod.outlook.com
- (2603:10b6:408:e9:cafe::55) by BN0PR04CA0191.outlook.office365.com
- (2603:10b6:408:e9::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9228.14 via Frontend Transport; Mon,
- 20 Oct 2025 07:06:58 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BN2PEPF000044A8.mail.protection.outlook.com (10.167.243.102) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9253.7 via Frontend Transport; Mon, 20 Oct 2025 07:06:57 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 20 Oct
- 2025 00:06:46 -0700
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Mon, 20 Oct 2025 00:06:45 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
- Transport; Mon, 20 Oct 2025 00:06:41 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, "John
- Fastabend" <john.fastabend@gmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Shahar Shitrit
-	<shshitrit@nvidia.com>
-Subject: [PATCH net V2 3/3] net/mlx5e: kTLS, Cancel RX async resync request in error flows
-Date: Mon, 20 Oct 2025 10:05:54 +0300
-Message-ID: <1760943954-909301-4-git-send-email-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.8.0
-In-Reply-To: <1760943954-909301-1-git-send-email-tariqt@nvidia.com>
-References: <1760943954-909301-1-git-send-email-tariqt@nvidia.com>
+Received: from www.nop.hu (www.nop.hu [80.211.201.218])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 36E6E2DAFC4
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 07:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.211.201.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760944524; cv=none; b=but+9Eqj3cVzYDdqSojclHpgO82ALk7Q0Kav3FkmfYqO1Qj8jWttx7Gac8GqpXO5U8vJsFUDkS29ML2pivFX+GaYKoYQdrBDfXdfhGTWpZL7YN3hFblhKq21+++wZCsgHkwWX+6YzAIstqj29b52j5RnAgIdMBzHPFpSrZa0mEA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760944524; c=relaxed/simple;
+	bh=PLzS2gUQYKZS74PMiwxmn9p4m1HpxEX8J6w9MZGOpsU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iBWuFiFDdN51eS5RQRu/Hvm2HTro8xR0YC+Zw2kam56Jbdwt7eF5/N7oLlr21EtCJQ3dPHhg+ODhHi5eCdLIXmPufjd/CaU/YV00M/nhve3Ky2/7KzFhq8WyaqmPFao8PHQcS1XhfJwhXT6P5IxFniHD0GgxS+KKk9aSzJWd0O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nop.hu; spf=pass smtp.mailfrom=nop.hu; arc=none smtp.client-ip=80.211.201.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nop.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nop.hu
+Received: from 100.100.5.9 (helo [100.100.5.9])
+    (reverse as null)
+    by 100.100.3.18 (helo www.nop.hu)
+    (envelope-from csmate@nop.hu) with smtp (freeRouter v25.10.20-cur)
+    for kerneljasonxing@gmail.com jonathan.lemon@gmail.com sdf@fomichev.me maciej.fijalkowski@intel.com magnus.karlsson@intel.com bjorn@kernel.org 1118437@bugs.debian.org netdev@vger.kernel.org bpf@vger.kernel.org ; Mon, 20 Oct 2025 09:15:20 +0200
+Message-ID: <921fd025-9159-4221-9cd8-bbfef202ffed@nop.hu>
+Date: Mon, 20 Oct 2025 09:15:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044A8:EE_|MN2PR12MB4288:EE_
-X-MS-Office365-Filtering-Correlation-Id: cb48c12c-0c43-4905-636c-08de0fa74261
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|7416014|376014|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?BoLrrhRXHjIwvWjCnSDAsYGdRyRYBoFV5A42gIz2sycdXJzi/MlhVyrCs6qm?=
- =?us-ascii?Q?cvjgeyQA6c7Zo7wtbEsmbVZzm3Dd31m6GK1rTFXpHUYPNmeBkSyln+wIBX8V?=
- =?us-ascii?Q?3BvUg9OJnripN8S9RYwroIOKy7pApZWihI8Og7GA0eeftBgajYCimqrBB/X3?=
- =?us-ascii?Q?EoVzbLSKQkZfUtWuW7qI+NRpM3sGB0PdSAfo4upHEz4+C61X5+nTvI18NK/5?=
- =?us-ascii?Q?lqe24GJpcHhnSYHemTM2xLc/VRBr3dnW01cRD1YjEuxdY3rkZaPX6bwfNdoj?=
- =?us-ascii?Q?zdtuDd7HZepqfaj8eRrbg1Dt2XnJlTMK1mjuozWlrKXHHOfxzacKx+r7OnDl?=
- =?us-ascii?Q?Vuv/2tI0ip1ivq8rs41ODNMsJOPe/0naybgsMmqgMcnlBqt0qAvmZAmRKz71?=
- =?us-ascii?Q?UcKIz49bxknAfdmzg5tXmRjCBh8qiXZCQoMnvuR2Uc/QdB209jGdap94UsfS?=
- =?us-ascii?Q?47tMiVofT9DP4DV484QZu93XiHO8+UqleRfxvx01qTjVJVvTINqbOt5P6Mdb?=
- =?us-ascii?Q?50UFrvldNbSjgQsWfBLohEzTqDrKd9LskOfo14fS29oMHt/6MG947fU4L0I7?=
- =?us-ascii?Q?8GEgtE7dGTg/1fZxbQBf/OMjt3APAj8efOOI/njNBVcUrLH0u2VRl8y6abMa?=
- =?us-ascii?Q?NlCvAWiZFBq7kPWiZ1Pw7WDlz6rkE2ty/WeEXZ1qRTJjhYUkuwcF01EeWhsR?=
- =?us-ascii?Q?L+0vKnBM0ORI3vQRW2ys65nefeWRALoeM4yO/CxSdYnQjgtuQXw35OrAiJmU?=
- =?us-ascii?Q?9lQq3HvJZdNLKDO5cIIZ8hy5u9ekqRE+4SW0I4QPOe6Il2RlZRL/mGYoH+rr?=
- =?us-ascii?Q?YAec5bpBjOoXtsay/L6Y4IWmBn1aUnK20bvq3MfLjEr1ely4tenXP6U6r4Dn?=
- =?us-ascii?Q?sTJPOEnGbVxjmJ3VQjCkvunrF0kq7Uqlowp7g1mbZwcLHycor7/I9GXNnDo+?=
- =?us-ascii?Q?l9hnNJBhF1Af+5RXiWMRXQnT27ZhSdQCkJakiTNqD+sC7XTA9gZ8DYhUeURm?=
- =?us-ascii?Q?LcdM/ar/ukAI94AZThM9k44g4UbA1d8BlTw7al8PgyZgesZ/PLnx/VpTOQuM?=
- =?us-ascii?Q?1YIq+C2zol7jZyd36gcSvYEBDMrBbrIxqpqxpgohU1c1uYkMxTAM+1dweHPz?=
- =?us-ascii?Q?QUpiJuQtXW9dXbh6Dve5i7c6eLzIdPYXsrK1bLWR0DzNYYEe7ehVH+eWNV4V?=
- =?us-ascii?Q?8sGKnJJSw0TSjklOaWG3N5ms9VXXoFbDC8xQkTMKx4UPidKPgWKsuWlHBaOq?=
- =?us-ascii?Q?SRLHjzG2wgz8pRIBvljPKaclDAhAAhsI8LX4MR7NJJilv7Tn+wO8Unxp67/l?=
- =?us-ascii?Q?Lke/ZDE1vLrrpN7HgfVBVqI0YaCV74n49Ww3DpJn8syb40IkcRnTYyXhh8ea?=
- =?us-ascii?Q?Olk695lLQytk9sEXXpKwc8WJQ1Wncw1kHEFt2gXtZiVxIEFL9Ud3mUHi48Mj?=
- =?us-ascii?Q?hnWBDvlIJRiPUSYv7IINv8+iRdoKrrxdDMr7bYHRwMM7KsWkTyphIpZK7atd?=
- =?us-ascii?Q?dQONPbiVNQCJ96iqihlEOMIf3kZ8Xd0Chd7wWWbYDCLbhBp2R5j1kMbovBSC?=
- =?us-ascii?Q?suRCFwTdV84L7v90lP4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2025 07:06:57.8952
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cb48c12c-0c43-4905-636c-08de0fa74261
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF000044A8.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4288
+User-Agent: Mozilla Thunderbird
+Subject: Re: null pointer dereference in interrupt after receiving an ip
+ packet on veth from xsk from user space
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Magnus Karlsson <magnus.karlsson@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, 1118437@bugs.debian.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu>
+ <CAL+tcoA5qDAcnZpmULsnD=X6aVP-ztRxPv5z1OSP-nvtNEk+-w@mail.gmail.com>
+Content-Language: en-US
+From: mc36 <csmate@nop.hu>
+In-Reply-To: <CAL+tcoA5qDAcnZpmULsnD=X6aVP-ztRxPv5z1OSP-nvtNEk+-w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Shahar Shitrit <shshitrit@nvidia.com>
+hi,
 
-When device loses track of TLS records, it attempts to resync by
-monitoring records and requests an asynchronous resynchronization
-from software for this TLS connection.
+On 10/20/25 08:41, Jason Xing wrote:
+>> this happens 10/10 on host or in qemu-system-x86_64-kvm running 6.16.12 or 6.17.2...
+> 
+> Thanks for the report.
+> 
+> I'm wondering if you have time to bisect which recent commit has
+> brought this problem. It looks like it never happens before 6.16?
+> 
 
-The TLS module handles such device RX resync requests by logging record
-headers and comparing them with the record tcp_sn when provided by the
-device. It also increments rcd_delta to track how far the current
-record tcp_sn is from the tcp_sn of the original resync request.
-If the device later responds with a matching tcp_sn, the TLS module
-approves the tcp_sn for resync.
+no bisect done from my side yet, but i'll try to narrow this down a bit...
 
-However, the device response may be delayed or never arrive,
-particularly due to traffic-related issues such as packet drops or
-reordering. In such cases, the TLS module remains unaware that resync
-will not complete, and continues performing unnecessary work by logging
-headers and incrementing rcd_delta, which can eventually exceed the
-threshold and trigger a WARN(). For example, this was observed when the
-device got out of tracking, causing
-mlx5e_ktls_handle_get_psv_completion() to fail and ultimately leading
-to the rcd_delta warning.
+(i also just got the report from a packager of freertr.org and found the trigger)
 
-To address this, call tls_offload_rx_resync_async_request_cancel()
-to cancel the resync request and stop resync tracking in such error
-cases. Also, increment the tls_resync_req_skip counter to track these
-cancellations.
 
-Fixes: 0419d8c9d8f8 ("net/mlx5e: kTLS, Add kTLS RX resync support")
-Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- .../mellanox/mlx5/core/en_accel/ktls_rx.c     | 33 ++++++++++++++++---
- .../mellanox/mlx5/core/en_accel/ktls_txrx.h   |  4 +++
- .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  4 +++
- 3 files changed, 37 insertions(+), 4 deletions(-)
+all new info from my side is the decoded stack trace below, i'll do the same
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
-index 5fbc92269585..ae325c471e7f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
-@@ -339,14 +339,19 @@ static void resync_handle_work(struct work_struct *work)
- 
- 	if (unlikely(test_bit(MLX5E_PRIV_RX_FLAG_DELETING, priv_rx->flags))) {
- 		mlx5e_ktls_priv_rx_put(priv_rx);
-+		priv_rx->rq_stats->tls_resync_req_skip++;
-+		tls_offload_rx_resync_async_request_cancel(&resync->core);
- 		return;
- 	}
- 
- 	c = resync->priv->channels.c[priv_rx->rxq];
- 	sq = &c->async_icosq;
- 
--	if (resync_post_get_progress_params(sq, priv_rx))
-+	if (resync_post_get_progress_params(sq, priv_rx)) {
-+		priv_rx->rq_stats->tls_resync_req_skip++;
-+		tls_offload_rx_resync_async_request_cancel(&resync->core);
- 		mlx5e_ktls_priv_rx_put(priv_rx);
-+	}
- }
- 
- static void resync_init(struct mlx5e_ktls_rx_resync_ctx *resync,
-@@ -425,6 +430,7 @@ void mlx5e_ktls_handle_get_psv_completion(struct mlx5e_icosq_wqe_info *wi,
- {
- 	struct mlx5e_ktls_rx_resync_buf *buf = wi->tls_get_params.buf;
- 	struct mlx5e_ktls_offload_context_rx *priv_rx;
-+	struct tls_offload_resync_async *async_resync;
- 	struct tls_offload_context_rx *rx_ctx;
- 	u8 tracker_state, auth_state, *ctx;
- 	struct device *dev;
-@@ -433,8 +439,12 @@ void mlx5e_ktls_handle_get_psv_completion(struct mlx5e_icosq_wqe_info *wi,
- 	priv_rx = buf->priv_rx;
- 	dev = mlx5_core_dma_dev(sq->channel->mdev);
- 	rx_ctx = tls_offload_ctx_rx(tls_get_ctx(priv_rx->sk));
--	if (unlikely(test_bit(MLX5E_PRIV_RX_FLAG_DELETING, priv_rx->flags)))
-+	async_resync = rx_ctx->resync_async;
-+	if (unlikely(test_bit(MLX5E_PRIV_RX_FLAG_DELETING, priv_rx->flags))) {
-+		priv_rx->rq_stats->tls_resync_req_skip++;
-+		tls_offload_rx_resync_async_request_cancel(async_resync);
- 		goto out;
-+	}
- 
- 	dma_sync_single_for_cpu(dev, buf->dma_addr, PROGRESS_PARAMS_PADDED_SIZE,
- 				DMA_FROM_DEVICE);
-@@ -445,11 +455,12 @@ void mlx5e_ktls_handle_get_psv_completion(struct mlx5e_icosq_wqe_info *wi,
- 	if (tracker_state != MLX5E_TLS_PROGRESS_PARAMS_RECORD_TRACKER_STATE_TRACKING ||
- 	    auth_state != MLX5E_TLS_PROGRESS_PARAMS_AUTH_STATE_NO_OFFLOAD) {
- 		priv_rx->rq_stats->tls_resync_req_skip++;
-+		tls_offload_rx_resync_async_request_cancel(async_resync);
- 		goto out;
- 	}
- 
- 	hw_seq = MLX5_GET(tls_progress_params, ctx, hw_resync_tcp_sn);
--	tls_offload_rx_resync_async_request_end(rx_ctx->resync_async,
-+	tls_offload_rx_resync_async_request_end(async_resync,
- 						cpu_to_be32(hw_seq));
- 	priv_rx->rq_stats->tls_resync_req_end++;
- out:
-@@ -475,8 +486,10 @@ static bool resync_queue_get_psv(struct sock *sk)
- 
- 	resync = &priv_rx->resync;
- 	mlx5e_ktls_priv_rx_get(priv_rx);
--	if (unlikely(!queue_work(resync->priv->tls->rx_wq, &resync->work)))
-+	if (unlikely(!queue_work(resync->priv->tls->rx_wq, &resync->work))) {
- 		mlx5e_ktls_priv_rx_put(priv_rx);
-+		return false;
-+	}
- 
- 	return true;
- }
-@@ -561,6 +574,18 @@ void mlx5e_ktls_rx_resync(struct net_device *netdev, struct sock *sk,
- 	resync_handle_seq_match(priv_rx, c);
- }
- 
-+void
-+mlx5e_ktls_rx_resync_async_request_cancel(struct mlx5e_icosq_wqe_info *wi)
-+{
-+	struct mlx5e_ktls_offload_context_rx *priv_rx;
-+	struct mlx5e_ktls_rx_resync_buf *buf;
-+
-+	buf = wi->tls_get_params.buf;
-+	priv_rx = buf->priv_rx;
-+	priv_rx->rq_stats->tls_resync_req_skip++;
-+	tls_offload_rx_resync_async_request_cancel(&priv_rx->resync.core);
-+}
-+
- /* End of resync section */
- 
- void mlx5e_ktls_handle_rx_skb(struct mlx5e_rq *rq, struct sk_buff *skb,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.h
-index f87b65c560ea..cb08799769ee 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.h
-@@ -29,6 +29,10 @@ void mlx5e_ktls_handle_get_psv_completion(struct mlx5e_icosq_wqe_info *wi,
- void mlx5e_ktls_tx_handle_resync_dump_comp(struct mlx5e_txqsq *sq,
- 					   struct mlx5e_tx_wqe_info *wi,
- 					   u32 *dma_fifo_cc);
-+
-+void
-+mlx5e_ktls_rx_resync_async_request_cancel(struct mlx5e_icosq_wqe_info *wi);
-+
- static inline bool
- mlx5e_ktls_tx_try_handle_resync_dump_comp(struct mlx5e_txqsq *sq,
- 					  struct mlx5e_tx_wqe_info *wi,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-index 263d5628ee44..39419172a690 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-@@ -1036,6 +1036,10 @@ int mlx5e_poll_ico_cq(struct mlx5e_cq *cq)
- 				netdev_WARN_ONCE(cq->netdev,
- 						 "Bad OP in ICOSQ CQE: 0x%x\n",
- 						 get_cqe_opcode(cqe));
-+#ifdef CONFIG_MLX5_EN_TLS
-+				if (wi->wqe_type == MLX5E_ICOSQ_WQE_GET_PSV_TLS)
-+					mlx5e_ktls_rx_resync_async_request_cancel(wi);
-+#endif
- 				mlx5e_dump_error_cqe(&sq->cq, sq->sqn,
- 						     (struct mlx5_err_cqe *)cqe);
- 				mlx5_wq_cyc_wqe_dump(&sq->wq, ci, wi->num_wqebbs);
--- 
-2.31.1
+for 6.17 and take a look on earlier kernels to see where it appeared first...
+
+have a nice day,
+
+csaba
+
+
+mc36@noti:~/Downloads/linux-6.16.12/scripts$ ./decode_stacktrace.sh ../../usr/lib/debug/boot/vmlinux-6.16.12+deb14+1-amd64 < /nfs/temp/linux-xsk.txt
+
+p4emu login: [  119.074634] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[  119.076747] #PF: supervisor read access in kernel mode
+[  119.078334] #PF: error_code(0x0000) - not-present page
+[  119.079855] PGD 0 P4D 0
+[  119.080648] Oops: Oops: 0000 [#1] SMP NOPTI
+[  119.081993] CPU: 2 UID: 1 PID: 927 Comm: p4xsk.bin Not tainted 6.16.12+deb14-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.16.12-1
+[  119.085247] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
+[  119.088065] RIP: 0010:xsk_destruct_skb (net/xdp/xsk.c:573 net/xdp/xsk.c:613)
+[ 119.089502] Code: 40 10 48 89 cf 89 28 e8 9e 7e 07 00 48 89 df 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 c8 cc da ff 48 8b 7b 30 4c 8d 5b 30 <48> 8b 07 4c 8d 67 f8 4c 8d 70 f8 
+49 39 fb 74 b7 48 89 5c 24 10 4c
+All code
+========
+    0: 40 10 48 89           rex adc %cl,-0x77(%rax)
+    4: cf                    iret
+    5: 89 28                 mov    %ebp,(%rax)
+    7: e8 9e 7e 07 00        call   0x77eaa
+    c: 48 89 df              mov    %rbx,%rdi
+    f: 48 83 c4 18           add    $0x18,%rsp
+   13: 5b                    pop    %rbx
+   14: 5d                    pop    %rbp
+   15: 41 5c                 pop    %r12
+   17: 41 5d                 pop    %r13
+   19: 41 5e                 pop    %r14
+   1b: 41 5f                 pop    %r15
+   1d: e9 c8 cc da ff        jmp    0xffffffffffdaccea
+   22: 48 8b 7b 30           mov    0x30(%rbx),%rdi
+   26: 4c 8d 5b 30           lea    0x30(%rbx),%r11
+   2a:* 48 8b 07              mov    (%rdi),%rax  <-- trapping instruction
+   2d: 4c 8d 67 f8           lea    -0x8(%rdi),%r12
+   31: 4c 8d 70 f8           lea    -0x8(%rax),%r14
+   35: 49 39 fb              cmp    %rdi,%r11
+   38: 74 b7                 je     0xfffffffffffffff1
+   3a: 48 89 5c 24 10        mov    %rbx,0x10(%rsp)
+   3f: 4c                    rex.WR
+
+Code starting with the faulting instruction
+===========================================
+    0: 48 8b 07              mov    (%rdi),%rax
+    3: 4c 8d 67 f8           lea    -0x8(%rdi),%r12
+    7: 4c 8d 70 f8           lea    -0x8(%rax),%r14
+    b: 49 39 fb              cmp    %rdi,%r11
+    e: 74 b7                 je     0xffffffffffffffc7
+   10: 48 89 5c 24 10        mov    %rbx,0x10(%rsp)
+   15: 4c                    rex.WR
+[  119.094947] RSP: 0018:ffffcd5b4012cd48 EFLAGS: 00010002
+[  119.096499] RAX: ffffcd5b40fcf000 RBX: ffff898e05dfcf00 RCX: ffff898e043cf9e8
+[  119.098612] RDX: ffff898e048ccc80 RSI: 0000000000000246 RDI: 0000000000000000
+[  119.100687] RBP: 0000000000000001 R08: 0000000000000000 R09: ffff898e01d21900
+[  119.102794] R10: 0000000000000000 R11: ffff898e05dfcf30 R12: ffff898e05f95000
+[  119.104880] R13: ffff898e043cf900 R14: ffff898e7dd32bd0 R15: 0000000000000002
+[  119.107000] FS:  00007f0cd9e0a6c0(0000) GS:ffff898ede530000(0000) knlGS:0000000000000000
+[  119.109358] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  119.111080] CR2: 0000000000000000 CR3: 00000000043ba003 CR4: 0000000000372ef0
+[  119.113175] Call Trace:
+[  119.113996]  <IRQ>
+[  119.114662] ? napi_complete_done (include/linux/list.h:37 (discriminator 2) include/net/gro.h:533 (discriminator 2) include/net/gro.h:528 (discriminator 2) net/core/dev.c:6592 
+(discriminator 2))
+[  119.115952] ip_rcv_core (include/linux/skbuff.h:3329 net/ipv4/ip_input.c:539)
+[  119.117050] ip_rcv (net/ipv4/ip_input.c:565)
+[  119.118014] __netif_receive_skb_one_core (net/core/dev.c:5989 (discriminator 4))
+[  119.119468] process_backlog (include/linux/rcupdate.h:873 net/core/dev.c:6455)
+[  119.120617] __napi_poll (net/core/dev.c:7426)
+[  119.121685] net_rx_action (net/core/dev.c:7492 net/core/dev.c:7617)
+[  119.122850] handle_softirqs (kernel/softirq.c:579)
+[  119.124003] ? handle_edge_irq (kernel/irq/chip.c:799)
+[  119.125218] do_softirq.part.0 (kernel/softirq.c:480 (discriminator 20))
+[  119.126422]  </IRQ>
+[  119.127085]  <TASK>
+[  119.127753] __local_bh_enable_ip (kernel/softirq.c:482 kernel/softirq.c:407)
+[  119.128998] __dev_direct_xmit (net/core/dev.c:4786)
+[  119.130128] __xsk_generic_xmit (net/xdp/xsk.c:907)
+[  119.131184] ? __remove_hrtimer (kernel/time/hrtimer.c:1121 (discriminator 1))
+[  119.132199] ? __xsk_generic_xmit (net/xdp/xsk.c:941)
+[  119.133300] ? _raw_spin_unlock_irqrestore (arch/x86/include/asm/paravirt.h:562 arch/x86/include/asm/qspinlock.h:57 include/linux/spinlock.h:204 
+include/linux/spinlock_api_smp.h:150 kernel/locking/spinlock.c:194)
+[  119.134637] xsk_sendmsg (net/xdp/xsk.c:949 net/xdp/xsk.c:1003 net/xdp/xsk.c:1013)
+[  119.135580] __sys_sendto (net/socket.c:714 (discriminator 1) net/socket.c:729 (discriminator 1) net/socket.c:2182 (discriminator 1))
+[  119.136509] __x64_sys_sendto (net/socket.c:2189 (discriminator 1) net/socket.c:2185 (discriminator 1) net/socket.c:2185 (discriminator 1))
+[  119.137493] do_syscall_64 (arch/x86/entry/syscall_64.c:66 (discriminator 1) arch/x86/entry/syscall_64.c:97 (discriminator 1))
+[  119.138452] ? __pfx_pollwake (fs/select.c:209)
+[  119.139454] ? __rseq_handle_notify_resume (kernel/rseq.c:439 (discriminator 1))
+[  119.140718] ? restore_fpregs_from_fpstate (arch/x86/kernel/fpu/xstate.h:240 arch/x86/kernel/fpu/core.c:205)
+[  119.141999] ? switch_fpu_return (arch/x86/kernel/fpu/context.h:49 (discriminator 5) arch/x86/kernel/fpu/context.h:76 (discriminator 5) arch/x86/kernel/fpu/core.c:830 
+(discriminator 5))
+[  119.143023] ? do_syscall_64 (arch/x86/include/asm/entry-common.h:57 arch/x86/include/asm/entry-common.h:66 include/linux/entry-common.h:332 include/linux/entry-common.h:414 
+include/linux/entry-common.h:449 arch/x86/entry/syscall_64.c:103)
+[  119.144007] ? do_syscall_64 (arch/x86/include/asm/entry-common.h:57 arch/x86/include/asm/entry-common.h:66 include/linux/entry-common.h:332 include/linux/entry-common.h:414 
+include/linux/entry-common.h:449 arch/x86/entry/syscall_64.c:103)
+[  119.144990] ? do_syscall_64 (arch/x86/include/asm/entry-common.h:57 arch/x86/include/asm/entry-common.h:66 include/linux/entry-common.h:332 include/linux/entry-common.h:414 
+include/linux/entry-common.h:449 arch/x86/entry/syscall_64.c:103)
+[  119.146022] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+[  119.147278] RIP: 0033:0x7f0cde0a49ee
+[ 119.148217] Code: 08 0f 85 f5 4b ff ff 49 89 fb 48 89 f0 48 89 d7 48 89 ce 4c 89 c2 4d 89 ca 4c 8b 44 24 08 4c 8b 4c 24 10 4c 89 5c 24 08 0f 05 <c3> 66 2e 0f 1f 84 00 00 00 00 00 
+0f 1f 80 00 00 00 00 48 83 ec 08
+All code
+========
+    0: 08 0f                 or     %cl,(%rdi)
+    2: 85 f5                 test   %esi,%ebp
+    4: 4b ff                 rex.WXB (bad)
+    6: ff 49 89              decl   -0x77(%rcx)
+    9: fb                    sti
+    a: 48 89 f0              mov    %rsi,%rax
+    d: 48 89 d7              mov    %rdx,%rdi
+   10: 48 89 ce              mov    %rcx,%rsi
+   13: 4c 89 c2              mov    %r8,%rdx
+   16: 4d 89 ca              mov    %r9,%r10
+   19: 4c 8b 44 24 08        mov    0x8(%rsp),%r8
+   1e: 4c 8b 4c 24 10        mov    0x10(%rsp),%r9
+   23: 4c 89 5c 24 08        mov    %r11,0x8(%rsp)
+   28: 0f 05                 syscall
+   2a:* c3                    ret  <-- trapping instruction
+   2b: 66 2e 0f 1f 84 00 00  cs nopw 0x0(%rax,%rax,1)
+   32: 00 00 00
+   35: 0f 1f 80 00 00 00 00  nopl   0x0(%rax)
+   3c: 48 83 ec 08           sub    $0x8,%rsp
+
+Code starting with the faulting instruction
+===========================================
+    0: c3                    ret
+    1: 66 2e 0f 1f 84 00 00  cs nopw 0x0(%rax,%rax,1)
+    8: 00 00 00
+    b: 0f 1f 80 00 00 00 00  nopl   0x0(%rax)
+   12: 48 83 ec 08           sub    $0x8,%rsp
+[  119.152877] RSP: 002b:00007f0cd9e09c98 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+[  119.154774] RAX: ffffffffffffffda RBX: 00007f0cd9e0a6c0 RCX: 00007f0cde0a49ee
+[  119.156526] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000029
+[  119.158317] RBP: 0000000000000005 R08: 0000000000000000 R09: 0000000000000000
+[  119.160078] R10: 0000000000000040 R11: 0000000000000246 R12: 0000000000000405
+[  119.161893] R13: 00007f0ccc055ce0 R14: 0000000000000001 R15: 00007f0cde8db900
+[  119.163646]  </TASK>
+[  119.164243] Modules linked in: veth intel_rapl_msr intel_rapl_common iosf_mbi binfmt_misc kvm_intel kvm irqbypass ghash_clmulni_intel sha512_ssse3 sha1_ssse3 aesni_intel rapl 
+button evdev sg efi_pstore configfs nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg ip_tables x_tables autofs4 sd_mod 
+sr_mod cdrom ata_generic ata_piix libata virtio_net scsi_mod net_failover serio_raw failover scsi_common
+[  119.174216] CR2: 0000000000000000
+[  119.175068] ---[ end trace 0000000000000000 ]---
+[  119.176224] RIP: 0010:xsk_destruct_skb (net/xdp/xsk.c:573 net/xdp/xsk.c:613)
+[ 119.177432] Code: 40 10 48 89 cf 89 28 e8 9e 7e 07 00 48 89 df 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 c8 cc da ff 48 8b 7b 30 4c 8d 5b 30 <48> 8b 07 4c 8d 67 f8 4c 8d 70 f8 
+49 39 fb 74 b7 48 89 5c 24 10 4c
+All code
+========
+    0: 40 10 48 89           rex adc %cl,-0x77(%rax)
+    4: cf                    iret
+    5: 89 28                 mov    %ebp,(%rax)
+    7: e8 9e 7e 07 00        call   0x77eaa
+    c: 48 89 df              mov    %rbx,%rdi
+    f: 48 83 c4 18           add    $0x18,%rsp
+   13: 5b                    pop    %rbx
+   14: 5d                    pop    %rbp
+   15: 41 5c                 pop    %r12
+   17: 41 5d                 pop    %r13
+   19: 41 5e                 pop    %r14
+   1b: 41 5f                 pop    %r15
+   1d: e9 c8 cc da ff        jmp    0xffffffffffdaccea
+   22: 48 8b 7b 30           mov    0x30(%rbx),%rdi
+   26: 4c 8d 5b 30           lea    0x30(%rbx),%r11
+   2a:* 48 8b 07              mov    (%rdi),%rax  <-- trapping instruction
+   2d: 4c 8d 67 f8           lea    -0x8(%rdi),%r12
+   31: 4c 8d 70 f8           lea    -0x8(%rax),%r14
+   35: 49 39 fb              cmp    %rdi,%r11
+   38: 74 b7                 je     0xfffffffffffffff1
+   3a: 48 89 5c 24 10        mov    %rbx,0x10(%rsp)
+   3f: 4c                    rex.WR
+
+Code starting with the faulting instruction
+===========================================
+    0: 48 8b 07              mov    (%rdi),%rax
+    3: 4c 8d 67 f8           lea    -0x8(%rdi),%r12
+    7: 4c 8d 70 f8           lea    -0x8(%rax),%r14
+    b: 49 39 fb              cmp    %rdi,%r11
+    e: 74 b7                 je     0xffffffffffffffc7
+   10: 48 89 5c 24 10        mov    %rbx,0x10(%rsp)
+   15: 4c                    rex.WR
+[  119.182155] RSP: 0018:ffffcd5b4012cd48 EFLAGS: 00010002
+[  119.183462] RAX: ffffcd5b40fcf000 RBX: ffff898e05dfcf00 RCX: ffff898e043cf9e8
+[  119.185237] RDX: ffff898e048ccc80 RSI: 0000000000000246 RDI: 0000000000000000
+[  119.187022] RBP: 0000000000000001 R08: 0000000000000000 R09: ffff898e01d21900
+[  119.188872] R10: 0000000000000000 R11: ffff898e05dfcf30 R12: ffff898e05f95000
+[  119.190693] R13: ffff898e043cf900 R14: ffff898e7dd32bd0 R15: 0000000000000002
+[  119.192655] FS:  00007f0cd9e0a6c0(0000) GS:ffff898ede530000(0000) knlGS:0000000000000000
+[  119.194681] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  119.196244] CR2: 0000000000000000 CR3: 00000000043ba003 CR4: 0000000000372ef0
+[  119.198034] Kernel panic - not syncing: Fatal exception in interrupt
+[  119.199761] Kernel Offset: 0x1c000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[  119.202403] ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+mc36@noti:~/Downloads/linux-6.16.12/scripts$
+
 
 
