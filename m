@@ -1,173 +1,187 @@
-Return-Path: <netdev+bounces-230763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF46ABEEE6D
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 01:01:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C0A0BEEEB9
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 02:00:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15E9E3AA749
-	for <lists+netdev@lfdr.de>; Sun, 19 Oct 2025 23:00:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D86AD189693D
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 00:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C46E24729C;
-	Sun, 19 Oct 2025 23:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA326946A;
+	Mon, 20 Oct 2025 00:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="4nuaGIy/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QhDFAL4k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kdN8T2LH"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8749202976
-	for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 23:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D85184
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 00:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760914850; cv=none; b=Zq208squ37Kf7sLsyk2z+i0ntqFgWqUW9NKsE/D3DCUxwb81CIRItSi8rXIbOym4MNp5HmHpvKXEJr/s+gdPCOJGsfGR9oyVOA61mTAbOuHICwuMup1B5X1sOfEebha7KvQ4G44quCv/Mh40TOr+RAYA4IyU1k4yI8C0dAzMtTs=
+	t=1760918420; cv=none; b=S0Q8LBew1EATH4ROundUWSt5WOadi0ie2LfuF/juUOvpLxGXgziyMItxJwyHz++y+uOCinkEnMxGaPllRSiHzEIpCSEY85KHlHWP/2NAXSNhW5cmhvKcNyVBHArKYrQibchxtwqyD6UzmB1PbPl2WM0b0INLVCylmoigdHc5pV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760914850; c=relaxed/simple;
-	bh=vDSwGwbdYtsn7LQdKYHvWAIvfQA1/egDi0A2fjbkEuA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mHGXscAfy7HlQ6UEHETQTZwzhY8muvw6eV/aY3Y72VYNepYhBHBK5N1VJAJeJGrXvjfAJqKC7IhVPtuNFZSKkNc1CT/mQaJ5Smnvo40GxzbLsogYZZjSdMAfrphdivX3dCJEYsyU+CGaOF3/kID8Ej49q/UY8LHQdLVDQL4ggNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=4nuaGIy/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QhDFAL4k; arc=none smtp.client-ip=103.168.172.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfout.phl.internal (Postfix) with ESMTP id CC16EEC0122;
-	Sun, 19 Oct 2025 19:00:45 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Sun, 19 Oct 2025 19:00:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1760914845; x=
-	1761001245; bh=29TPynyEp1oN42nw9gedUTkz9DI5eNHDBplK4IjE9YQ=; b=4
-	nuaGIy/83sbxawN39TsBQQhjsOiAT+oPtOKIhWWZgkNHdeJZzcg5L95vBbxdNQ1n
-	ihWEVwOrWJoDODxvmsFcUyzQO8autsuLbe+D4ze3vRZA+Lh7y78AHg9Yuu1q9X2U
-	ibqGZ0Vf7KzDxqj4owsMe+uOKAsNFL1urUSbFS1W40CGh63aNyyufv+5EZpcl5I1
-	4jfa7PuQEYj+bu+oc6mX+SE0rVHTq3D3jYa9xE7/wyagVqXs1A3qQ9kJy6++M5qf
-	Lz6WjjNRXRSh/hHbN1aJui9/5PY6eiw2XgfqNII5JD7SMStf0yqOeLLI4mcSpXDL
-	59SF1mcbazT3snIvExQCA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1760914845; x=1761001245; bh=29TPynyEp1oN42nw9gedUTkz9DI5eNHDBpl
-	K4IjE9YQ=; b=QhDFAL4k5TSJ3JCM6xfHsPVvyQWBLAlmoBbeiYik6aFQq9WL98v
-	1/+0OVLJ09WcPXfpLBq4Zw1+qVdEgHlgEILang0wzMAlelqcCeGmXFdoiIMLEDox
-	Ia1gVelrenJIrZPtQ8biL1Xl7B/euJvWO4dQTGzjEGjdfnkdERue0hKJ7wLveAw9
-	kjKJpecnLc9yKLClWw69QkRDlwVtRz8dzbqYs5JY3k031lh0LB/JFHDmiy5YaYmm
-	eSfc4XEn5tv/KF7kH3Pik9NOrFbpFWgh6XjDf1KQqL0bbPNQP8sOoDKpp+Nzxm4M
-	ddfSTeZLyvCWgiDlFkkkBj5mmBkwsR2pHUw==
-X-ME-Sender: <xms:nG31aHnknRrm674WvE-ajArqsWxiFE6-0swwNyme_rip8i4JVT1D3Q>
-    <xme:nG31aMUnrEO3x1G12IkzptbFNjpD8HxX0s0FDzRFWYtgadaJNH30VriqkQmC4k16D
-    Y9XjggNKpt17ar9aAK8t106wpwuKtF8pSK3PE3lWxLW4sX-1e0EPg>
-X-ME-Received: <xmr:nG31aNupuTBjf8heh7x7k2RO02FZJxJafVaP3EoYiDutFktSpExfOT5yr5hn>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddufeeivdduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepueejjeeivdejvddtgffgfeelvedvvdfgjeffudfhgefhudekkefhffef
-    heduieeunecuffhomhgrihhnpehgihhtqdhstghmrdgtohhmpdhgihhthhhusgdrtghomh
-    dpkhgvrhhnvghlrdhorhhgpddtuddrohhrghenucevlhhushhtvghrufhiiigvpedtnecu
-    rfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnh
-    gspghrtghpthhtohephedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepshhtvghf
-    fhgvnhdrkhhlrghsshgvrhhtsehsvggtuhhnvghtrdgtohhmpdhrtghpthhtohepnhgvth
-    guvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohgvqdhksghuihhl
-    ugdqrghllheslhhishhtshdrlhhinhhugidruggvvhdprhgtphhtthhopehlkhhpsehinh
-    htvghlrdgtohhmpdhrtghpthhtoheprgguohgsrhhihigrnhesghhmrghilhdrtghomh
-X-ME-Proxy: <xmx:nW31aPZtiBE8qkt4xqWUb9j5UtBcMC5whh2X0fyJu79dD_9mP9HY5A>
-    <xmx:nW31aMUd4xK-Fnh-vK1kOkpBAhISodgDt5sb52NTdawoZIZxT43BrQ>
-    <xmx:nW31aETsf1bkqq3xW7U3s6PxoCHZdwxkgrLLhGtXMt_BXwUYnTFTVQ>
-    <xmx:nW31aKMLMNLVGJbp6gA3JUkGqIatisQPFvj75-u3re7ksjJs0x_qfQ>
-    <xmx:nW31aOTsDrisoF49dyF6deIW7Oiq9IGIAFpeV7DV2I_CF7QTmaAnyn_V>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 19 Oct 2025 19:00:44 -0400 (EDT)
-Date: Mon, 20 Oct 2025 01:00:42 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: steffen.klassert@secunet.com
-Cc: netdev@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
-	kernel test robot <lkp@intel.com>,
-	Alexey Dobriyan <adobriyan@gmail.com>
-Subject: Re: [PATCH ipsec 6/6] xfrm: check all hash buckets for leftover
- states during netns deletion
-Message-ID: <aPVtmloGOCQi_7ue@krikkit>
-References: <2a743a05bbad7ebdc36c2c86a5fcbb9e99071c7b.1760610268.git.sd@queasysnail.net>
- <202510172159.iLR9bfcc-lkp@intel.com>
+	s=arc-20240116; t=1760918420; c=relaxed/simple;
+	bh=ezMN77l/qcVaMgmJJ7bxGKgebH9Xy6zHK2EiL+Mja6g=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=M3P9WJS4Sa5TZAcDPWJdgyL05pBGLfbf9JKzL4JyAaeoTSj/1xu7FxLdUtyc71lTl21MHq3jRLhSn7jGg2Y0Hp/GXEiFQh3ytAGdN2Gr6E9zE/6oyN5weiJmlk95JXzreXPKMp1HqNL8I2GfD+CByaRuN5eH4HEawru7JuZw1zA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kdN8T2LH; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-28e7cd6dbc0so47361545ad.0
+        for <netdev@vger.kernel.org>; Sun, 19 Oct 2025 17:00:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760918419; x=1761523219; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VaiAWLD4XNNKUuKlNpoWsuUt8QnNRZuGQMftj6fdN74=;
+        b=kdN8T2LHmzKckBMEPGtkUkWjbogtRZAwPdlIHx57qD83musWmtd0xsxOSKzPMPL8do
+         TnhzIB+vYpaFYF8BQRmmGF3KPqnaR77lQJCt64yhAypRca6ptgkqYdHpIxPhvaaaUA1F
+         aCvySa+wsBaL7xrgZv00qyviGhIm+V7WxHWChnS44ZZuwoPn9Z+Rb6xoDs9hEXJMm4oI
+         KRsyz1XYy3C03ZxwOjGUqCvxk3X4qsvXbX45ire5Hu/1eTS0NRg0JfYkSHMbiOnubiJH
+         AXWwhJbp0eZx/6Ok2HIMTnaPgSlW477iMJ7sz2EEB5zEIADJ33l941LHqabfUdEI8OrZ
+         pMjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760918419; x=1761523219;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VaiAWLD4XNNKUuKlNpoWsuUt8QnNRZuGQMftj6fdN74=;
+        b=xM8YkMR2dxs+JYZZgjdaHIKWnriorVFBoelNowtkYS2kWDrV5c9OQjK6/dnPssW/tq
+         2MzPOl2NnhR6CV4A+oKcz7DnbBm6VAq3UVJMPfEqzVRzRyr377u/EiqZvB6S9bfknm1t
+         KjRQZIIDw7ImC5fw3fa5+7j8My//jhczk7OMP3x9fPxP91NObtU5+ByPlriPuEP2Lgt1
+         ZUMHppdPSsNAeCK5qCNT3LLJQlbx9AmIrxKeJXPGVOKj9cU1fMpviBiMx71TpkqAONwo
+         tB5MIIhB4sA5sL1cNOtlR+ZdnHxaR2mETAG5wvMg2+2yMjTepneRymc82PeXFdLuYMl/
+         upPA==
+X-Forwarded-Encrypted: i=1; AJvYcCXITvjCjqISWZrIQA6vbxKS4j8bAsafUl8JX426oE4WvURDUHrldKZFclF1DjjP9WE9LGYekDM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzscSQEAaf37uN8eAVmk6HjOml2m5DFofCa0FNoWT9IGbSob6q7
+	eOUZO2dibnuNGo+6FqsJAMOjuyKjw64TQdKafEegIW3oprftuGMfQlmv
+X-Gm-Gg: ASbGnctcQ3lGBZrbARxdL6bFegfBBuqAIg4hwNVX33yPG7Pkt+v0Nnxr0CwYJRTIQBw
+	HmfYseO+qe8xLOB7ScBaLa55O5Ph6uLrml6+V7g52MxQdghvwvAU+9DUvbGeSdUwk512849P4PY
+	AQGKuxHmucMjZRYFMzX86dU/Pj+x/3X3H2NE8W9NB1fIc+UgYwaB34ScxHBXN+RaNSTwDqyYbSD
+	yF9lW1+1fyF3gBpgnvFt9RsBF6Kh0RekuRA9twct9HxnkEuDzQ5+g1lsVIndqjHzUTYuRCVj6sE
+	gwApXeMPNvVut7Y23A/8nI9Ed7FenFWtTeI7gVulO6PnMZa8I1T4PB+jEpiplcmINJr54xsijXV
+	47oJ38IW6JvcHS1N0UIXe7UEQb5vd8SmHQWKP9Vykgfs9tFAgjGmtQnnYv6PvnFcarWi6jIPEIR
+	NOtZzwxMmMfJvDsArCTlRtdMmrFw==
+X-Google-Smtp-Source: AGHT+IFcYo/fAegdA2C1gTxKem+CDCv348ZEZtfdFlF8lK+pytqmCXrWbosTkVJ1I3pvpi+J3kCQTA==
+X-Received: by 2002:a17:903:98f:b0:277:3488:787e with SMTP id d9443c01a7336-290c9cf8e7fmr138965325ad.12.1760918418408;
+        Sun, 19 Oct 2025 17:00:18 -0700 (PDT)
+Received: from [192.168.0.69] ([159.196.5.243])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-292471fdee2sm63726695ad.92.2025.10.19.17.00.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 19 Oct 2025 17:00:18 -0700 (PDT)
+Message-ID: <f0f97b8980fb141849861e67132dfffdfef4771a.camel@gmail.com>
+Subject: Re: [PATCH net-next v6 1/2] net/tls: support setting the maximum
+ payload size
+From: Wilfred Mallawa <wilfred.opensource@gmail.com>
+To: Sabrina Dubroca <sd@queasysnail.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, "David S . Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	 <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+	 <corbet@lwn.net>, John Fastabend <john.fastabend@gmail.com>, Shuah Khan
+	 <shuah@kernel.org>, syzbot@syzkaller.appspotmail.com
+Date: Mon, 20 Oct 2025 10:00:11 +1000
+In-Reply-To: <aPAjm1tKMKxIdUlj@krikkit>
+References: <20251015015243.72259-2-wilfred.opensource@gmail.com>
+	 <aPAjm1tKMKxIdUlj@krikkit>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <202510172159.iLR9bfcc-lkp@intel.com>
 
-Hi Steffen,
+On Thu, 2025-10-16 at 00:43 +0200, Sabrina Dubroca wrote:
+> 2025-10-15, 11:52:43 +1000, Wilfred Mallawa wrote:
+> > diff --git a/Documentation/networking/tls.rst
+> > b/Documentation/networking/tls.rst
+> > index 36cc7afc2527..dabab17ab84a 100644
+> > --- a/Documentation/networking/tls.rst
+> > +++ b/Documentation/networking/tls.rst
+> > @@ -280,6 +280,17 @@ If the record decrypted turns out to had been
+> > padded or is not a data
+> > =C2=A0record it will be decrypted again into a kernel buffer without
+> > zero copy.
+> > =C2=A0Such events are counted in the ``TlsDecryptRetry`` statistic.
+> > =C2=A0
+> > +TLS_TX_MAX_PAYLOAD_LEN
+> > +~~~~~~~~~~~~~~~~~~~~~~
+> > +
+> > +Sets the maximum size for the plaintext of a protected record.
+> > +
+> > +When this option is set, the kernel enforces this limit on all
+> > transmitted TLS
+> > +records, ensuring no plaintext fragment exceeds the specified
+> > size. This can be
+> > +used to specify the TLS Record Size Limit [1].
+>=20
+> Since this is now "max payload" instead of directly the record size,
+> we should probably add something to describe how to derive the value
+> to pass to TLS_TX_MAX_PAYLOAD_LEN from the record size limit:
+>=20
+> =C2=A0=C2=A0=C2=A0 For TLS1.2, the record size limit can be used directly=
+.
+> =C2=A0=C2=A0=C2=A0 For TLS1.3, limit-1 should be passed, as the record si=
+ze limit
+> =C2=A0=C2=A0=C2=A0 includes 1B for the ContentType.
+>=20
+>=20
+Good idea, I will add this on.
+> And possibly mention that TLS1.3 record padding is currently
+> unsupported, so whether it should be counted in the value passed via
+> this setsockopt or not is undecided. (I'm not sure we need to go that
+> far. Jakub, WDYT?)
+>=20
+>=20
+> [...]
+> > +static int do_tls_setsockopt_tx_payload_len(struct sock *sk,
+> > sockptr_t optval,
+> > +					=C2=A0=C2=A0=C2=A0 unsigned int optlen)
+> > +{
+> > +	struct tls_context *ctx =3D tls_get_ctx(sk);
+> > +	struct tls_sw_context_tx *sw_ctx =3D tls_sw_ctx_tx(ctx);
+> > +	u16 value;
+> > +
+> > +	if (sw_ctx && sw_ctx->open_rec)
+> > +		return -EBUSY;
+> > +
+> > +	if (sockptr_is_null(optval) || optlen !=3D sizeof(value))
+> > +		return -EINVAL;
+> > +
+> > +	if (copy_from_sockptr(&value, optval, sizeof(value)))
+> > +		return -EFAULT;
+> > +
+> > +	if (value < TLS_MIN_RECORD_SIZE_LIM || value >
+> > TLS_MAX_PAYLOAD_SIZE)
+>=20
+> For 1.3, should we allow TLS_MIN_RECORD_SIZE_LIM-1? The smallest
+> valid
+> record size limit (according to rfc8449) is 64
+> (TLS_MIN_RECORD_SIZE_LIM), so after userspace subtracts 1 we would
+> get
+> TLS_MIN_RECORD_SIZE_LIM-1?
+>=20
+> (but this would bring back one "are we 1.2 or 1.3?" check :/)
+Yeah I don't think there's a way around this...? I will update the
+description to specify these details and add the limit checks. I do
+think the payload size approach makes more sense, since, it could be
+used for reasons other than just `record_size_limit`.
 
-2025-10-17, 23:10:36 +0800, kernel test robot wrote:
-> Hi Sabrina,
-> 
-> kernel test robot noticed the following build warnings:
-> 
-> [auto build test WARNING on klassert-ipsec-next/master]
-> [also build test WARNING on klassert-ipsec/master net/main net-next/main linus/master v6.18-rc1 next-20251016]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Sabrina-Dubroca/xfrm-drop-SA-reference-in-xfrm_state_update-if-dir-doesn-t-match/20251016-184507
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git master
-> patch link:    https://lore.kernel.org/r/2a743a05bbad7ebdc36c2c86a5fcbb9e99071c7b.1760610268.git.sd%40queasysnail.net
-> patch subject: [PATCH ipsec 6/6] xfrm: check all hash buckets for leftover states during netns deletion
-> config: x86_64-randconfig-r123-20251017 (https://download.01.org/0day-ci/archive/20251017/202510172159.iLR9bfcc-lkp@intel.com/config)
-> compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251017/202510172159.iLR9bfcc-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202510172159.iLR9bfcc-lkp@intel.com/
-> 
-> sparse warnings: (new ones prefixed by >>)
-[...]
->   3308	void xfrm_state_fini(struct net *net)
->   3309	{
->   3310		unsigned int sz;
->   3311		int i;
->   3312	
->   3313		flush_work(&net->xfrm.state_hash_work);
->   3314		xfrm_state_flush(net, 0, false);
->   3315		flush_work(&xfrm_state_gc_work);
->   3316	
->   3317		WARN_ON(!list_empty(&net->xfrm.state_all));
->   3318	
->   3319		for (i = 0; i <= net->xfrm.state_hmask; i++) {
-> > 3320			WARN_ON(!hlist_empty(net->xfrm.state_byseq + i));
-
-So, before my patch there was a sparse waraning on the
-
-	WARN_ON(!hlist_empty(net->xfrm.state_by*));
-
-lines, and now there's a sparse warning on the loop.
-(and plenty on other lines in net/xfrm/xfrm_state.c)
-
-This bot message gave me the push to finally take a look at all the
-sparse warnings in net/xfrm/xfrm_state.c, I have solutions for a big
-chunk of them (and a few in other files).
-
-If you want to drop this patch from the set, I'll re-send it later, on
-top of the sparse stuff. The rest of the series works without it. If
-you want to take it as is, it doesn't change the sparse situation in
-this file (a few warnings moved around) and I'll do the sparse
-cleanups on top of it.
-
-Thanks,
-
--- 
-Sabrina
+Regards,
+Wilfred
+>=20
+> > +		return -EINVAL;
+> > +
+> > +	ctx->tx_max_payload_len =3D value;
+> > +
+> > +	return 0;
+> > +}
 
