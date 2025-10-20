@@ -1,161 +1,265 @@
-Return-Path: <netdev+bounces-230983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3425DBF2D67
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 19:59:48 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19F17BF2DB6
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 20:06:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 025FD4EDF93
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 17:59:39 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 629973431B8
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 18:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCB6D3328E1;
-	Mon, 20 Oct 2025 17:59:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5628D2C0F9A;
+	Mon, 20 Oct 2025 18:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ckMa2meL"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="NqPflI/R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx17lb.world4you.com (mx17lb.world4you.com [81.19.149.127])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE21D332EA7
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 17:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B01223EAA3
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 18:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.127
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760983172; cv=none; b=WsYJnvOVwhGdJYrYpodVK0pIy7cFBmmiLaWmIbOamn39zESz5zPbrKnPY9w2njItRNvFu2x8UoXC3x8NaO1YNxzDKO0J76u+UtPGGvE9w4DaAnmcYXsv1bOh9FAXgSIxtpCatplz95mJWQfM/5kLFR9mOUSlmt0mPmgSH+8CwL8=
+	t=1760983585; cv=none; b=XRLJD3a2EfR5q91oSzl9B/YOOxUXAersS9Uh01aLZKPdKiHs4QaB7yKdLrXWSQZKC6cHNfOv44rhOgPwhWDp28iw0c5UvllrGkNMW5Iy98MFh0itsZgD0l1mfnPkwp4O+0ErPcQ2Fe0ehVA9O0T90/TWnw8VTCzS+8pgu1oMSgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760983172; c=relaxed/simple;
-	bh=KSaItg7owfwMA4E/6gJC21JmHwkSPxOVuYXpwaVH8eM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YdqHinJsUeZsuQeeG2wLR79L0vwlSk84zCwg4fiV4Ib3L0IHsqzUADuM/Uyg4wHwHpGQynOsmNbHzf4rNaJFv4CxeyPZQRslFDEK9zR1ojJjm7yjLU397GQrhzVjENqtPp7knaR9c4gACzaEpJLFgvVzZggBqYqCLJWL4UqwGH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ckMa2meL; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-427091cd4fdso2086332f8f.1
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 10:59:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1760983169; x=1761587969; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BBIpzP5plYQbXfXPYKWyaixauHg0jqN/NWqmZVZnNC0=;
-        b=ckMa2meL3YPvWDcGwBK+YxZErpGCddB46OFWhK2kz//Y7OXWaoplOQkNAUnmuUlwhT
-         UwUO6qTztXkgLnBUOXTeLpklIcjZRjsDO3IEU+AFS+JJqIA+a7HDyMCYG9HvBLEydabR
-         /4o4ZqrEgoLWcIok+8h01A1f9lIWHwlSzU3eTBwV+uSlRlLscuKyMxK5QJ0ybL50ZE1+
-         +gOWFTSqXucUWRMvQP8qZKVsNowus5gAKTCoJlW/pXj56ZH3kR4aqo9AaAS6HdWjr3DJ
-         TOwLL3ppprrSfziX5fJ85idP8N87tMXbhB9xh/CYvHlmiLKf7uFZ8bD4plCSecztaNnJ
-         zCDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760983169; x=1761587969;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BBIpzP5plYQbXfXPYKWyaixauHg0jqN/NWqmZVZnNC0=;
-        b=akJ2HSS2T9AzqTa9Ojf/tknJcCF6C6z8wq8CAFpZyufL6AjQJgHulfNxYm1OQ2uHWE
-         ka9R9E2LOOL7d+Q09xEC1K+i8kB9F8y/VFBPYt5JOE8l5bQRlZIxk95WI9SZF/3gQvh8
-         gxz3k9Ys0I/KgOi8VhNoPPnyKLwpABEKPbQGCQzaMKavlpvZ0PLEHoXkieXPC2LoOc9T
-         IBOtIn9wqtiW30v+obfzlbWXDEvb8tFtoSByRtmYjgu8ySMSr7EsJhv+JPcsrHW1RryZ
-         9US+Sh4eyu/+6Rfqq/IK/QEmN9PLt0gDH0lyBKv9QlJNGddce+KPsfhtjaDbqxUCRk/I
-         Rawg==
-X-Forwarded-Encrypted: i=1; AJvYcCV6B1Xda18VOIuy0Ql3/7/baScnPQ6YL/SWjRmPt1oyEdoPqSSWEB6if5b7NyG2YvqMZ7OybSQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4lklWPeOg+GaWAkGokSE5jTLrM0kO30nBYE9/08maNiTbK9Py
-	ueouUyT2DZx3JFM2QY7mu3xpTshRGybORq6HvjVDaz+AnWOuZpc0irR9/FkmVq/lWzY=
-X-Gm-Gg: ASbGncsd1lBRPLRnJejHCEYTtP0OFaHbvHlgUBfgHeUan9oGMKPZArYxJW8Sbi688rq
-	PoWGVkxfjXH9fwj770cLcXhJ9HeOdNmaHzSxZrizrOXUQgw+NWDD2wpN4jTNIbD2gLpHUaUEDKh
-	pNtlASEz5K68D5NCt/xTqWp3kQNYKBk+mzRToTLTpVpHI+AnAMJwaX13mxWv0+pka522Lz5YjmI
-	qwMqckSXkSB6cr5HSDjZjusdkarGhlUt1bdWIZdeu8w6JD4MdvhaSae92wsmlnoRvkgXk4lByaW
-	XnOSerhu8OueVTtWqX9IrLaH/sdfv1/wIyzo0hK59xXxMno/KyydQOC4RKPCpChyBm38RhnEXc6
-	DM4ZKVr3F3RDZOAZxA455PhDk8PpglsaZmHCummbvCwpr0gY7QSxHCdgicCQ1NDKo/g/Zd1NSWe
-	ix+x2gRZ46GOUWxv4=
-X-Google-Smtp-Source: AGHT+IEve3rptaTxAGdVVvZ3C2zYTFALcxP2rlbTlJDOAnuR0ODFvI8Ya+F1oDNmVuli022ySOULYw==
-X-Received: by 2002:a05:6000:2881:b0:427:1ba4:de9e with SMTP id ffacd0b85a97d-4271ba4dfdemr7326245f8f.63.1760983168883;
-        Mon, 20 Oct 2025 10:59:28 -0700 (PDT)
-Received: from localhost ([41.210.143.179])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-427f00ce06bsm16113493f8f.45.2025.10.20.10.59.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 10:59:28 -0700 (PDT)
-Date: Mon, 20 Oct 2025 20:59:24 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Lizhi Xu <lizhi.xu@windriver.com>
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	kuba@kernel.org, linux-hams@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+2860e75836a08b172755@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH V2] netrom: Prevent race conditions between multiple add
- route
-Message-ID: <aPZ4fLKBiCCIGr9e@stanley.mountain>
-References: <20251020133456.3564833-1-lizhi.xu@windriver.com>
- <20251020134912.3593047-1-lizhi.xu@windriver.com>
+	s=arc-20240116; t=1760983585; c=relaxed/simple;
+	bh=WAlMIgrQ7t80hoyRpcsbnfZLZg438On56BgfzKPGOaI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dFTfye3miWykrKrOj57tYA3KvyOIchAL+8uLTra/MzdMB636Ah9UEnTvQw4C28hFw3lbuKbiYEy6J3A4y55d0WL8NYn/25eXS93ka/g168txgeoDEdbu/4HWC07JMGlKh39MgLMzh2mzXKlFUTwIBlbfh/z4k3MuciPo1PXRMFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=NqPflI/R; arc=none smtp.client-ip=81.19.149.127
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=VdvoJ+VQpvGn4l9EKA6cn39ZuSmZrHLUMjICO3n7SGI=; b=NqPflI/RW+XWcPm21WIyYfCnmw
+	fLQ2cvJbnOrQ78v9woYGxRTjahyg7jICqJxDC6q/+vOdxzmhIiWg/sxOuBr7lr2PnCs0vEuH1EtqV
+	L18uyiFoZaRX7np30hDtaY6+5kkcznXCaOP2QcOmby5ukqCa2mGk7Z+1dZ0rQ2GKgH8g=;
+Received: from [178.191.104.35] (helo=[10.0.0.160])
+	by mx17lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1vAu35-000000004l5-1Yzg;
+	Mon, 20 Oct 2025 19:51:59 +0200
+Message-ID: <375eed92-0f76-4df1-9837-2c29208417fa@engleder-embedded.com>
+Date: Mon, 20 Oct 2025 19:51:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251020134912.3593047-1-lizhi.xu@windriver.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 6/7] tsnep: convert to ndo_hwtstatmp API
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Egor Pomozov <epomozov@marvell.com>, Potnuri Bharat Teja
+ <bharat@chelsio.com>, Dimitris Michailidis <dmichail@fungible.com>,
+ MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>
+References: <20251016152515.3510991-1-vadim.fedorenko@linux.dev>
+ <20251016152515.3510991-7-vadim.fedorenko@linux.dev>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20251016152515.3510991-7-vadim.fedorenko@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-On Mon, Oct 20, 2025 at 09:49:12PM +0800, Lizhi Xu wrote:
-> On Mon, 20 Oct 2025 21:34:56 +0800, Lizhi Xu wrote:
-> > > Task0					Task1						Task2
-> > > =====					=====						=====
-> > > [97] nr_add_node()
-> > > [113] nr_neigh_get_dev()		[97] nr_add_node()
-> > > 					[214] nr_node_lock()
-> > > 					[245] nr_node->routes[2].neighbour->count--
-> > > 					[246] nr_neigh_put(nr_node->routes[2].neighbour);
-> > > 					[248] nr_remove_neigh(nr_node->routes[2].neighbour)
-> > > 					[283] nr_node_unlock()
-> > > [214] nr_node_lock()
-> > > [253] nr_node->routes[2].neighbour = nr_neigh
-> > > [254] nr_neigh_hold(nr_neigh);							[97] nr_add_node()
-> > > 											[XXX] nr_neigh_put()
-> > >                                                                                         ^^^^^^^^^^^^^^^^^^^^
-> > > 
-> > > These charts are supposed to be chronological so [XXX] is wrong because the
-> > > use after free happens on line [248].  Do we really need three threads to
-> > > make this race work?
-> > The UAF problem occurs in Task2. Task1 sets the refcount of nr_neigh to 1,
-> > then Task0 adds it to routes[2]. Task2 releases routes[2].neighbour after
-> > executing [XXX]nr_neigh_put().
-> Execution Order:
-> 1 -> Task0
-> [113] nr_neigh_get_dev() // After execution, the refcount value is 3
+On 16.10.25 17:25, Vadim Fedorenko wrote:
+> Convert to .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
+> After conversions the rest of tsnep_netdev_ioctl() becomes pure
+> phy_do_ioctl_running(), so remove tsnep_netdev_ioctl() and replace
+> it with phy_do_ioctl_running() in .ndo_eth_ioctl.
 > 
-> 2 -> Task1
-> [246] nr_neigh_put(nr_node->routes[2].neighbour);   // After execution, the refcount value is 2
-> [248] nr_remove_neigh(nr_node->routes[2].neighbour) // After execution, the refcount value is 1
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> ---
+>   drivers/net/ethernet/engleder/tsnep.h      |  8 +-
+>   drivers/net/ethernet/engleder/tsnep_main.c | 14 +---
+>   drivers/net/ethernet/engleder/tsnep_ptp.c  | 88 +++++++++++-----------
+>   3 files changed, 51 insertions(+), 59 deletions(-)
 > 
-> 3 -> Task0
-> [253] nr_node->routes[2].neighbour = nr_neigh       // nr_neigh's refcount value is 1 and add it to routes[2]
-> 
-> 4 -> Task2
-> [XXX] nr_neigh_put(nr_node->routes[2].neighbour)    // After execution, neighhour is freed
-> if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)  // Uaf occurs this line when accessing neighbour->count
+> diff --git a/drivers/net/ethernet/engleder/tsnep.h b/drivers/net/ethernet/engleder/tsnep.h
+> index f188fba021a6..03e19aea9ea4 100644
+> --- a/drivers/net/ethernet/engleder/tsnep.h
+> +++ b/drivers/net/ethernet/engleder/tsnep.h
+> @@ -176,7 +176,7 @@ struct tsnep_adapter {
+>   	struct tsnep_gcl gcl[2];
+>   	int next_gcl;
+>   
+> -	struct hwtstamp_config hwtstamp_config;
+> +	struct kernel_hwtstamp_config hwtstamp_config;
+>   	struct ptp_clock *ptp_clock;
+>   	struct ptp_clock_info ptp_clock_info;
+>   	/* ptp clock lock */
+> @@ -203,7 +203,11 @@ extern const struct ethtool_ops tsnep_ethtool_ops;
+>   
+>   int tsnep_ptp_init(struct tsnep_adapter *adapter);
+>   void tsnep_ptp_cleanup(struct tsnep_adapter *adapter);
+> -int tsnep_ptp_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd);
+> +int tsnep_ptp_hwtstamp_get(struct net_device *netdev,
+> +			   struct kernel_hwtstamp_config *config);
+> +int tsnep_ptp_hwtstamp_set(struct net_device *netdev,
+> +			   struct kernel_hwtstamp_config *config,
+> +			   struct netlink_ext_ack *extack);
+>   
+>   int tsnep_tc_init(struct tsnep_adapter *adapter);
+>   void tsnep_tc_cleanup(struct tsnep_adapter *adapter);
+> diff --git a/drivers/net/ethernet/engleder/tsnep_main.c b/drivers/net/ethernet/engleder/tsnep_main.c
+> index eba73246f986..b118407c30e8 100644
+> --- a/drivers/net/ethernet/engleder/tsnep_main.c
+> +++ b/drivers/net/ethernet/engleder/tsnep_main.c
+> @@ -2168,16 +2168,6 @@ static netdev_tx_t tsnep_netdev_xmit_frame(struct sk_buff *skb,
+>   	return tsnep_xmit_frame_ring(skb, &adapter->tx[queue_mapping]);
+>   }
+>   
+> -static int tsnep_netdev_ioctl(struct net_device *netdev, struct ifreq *ifr,
+> -			      int cmd)
+> -{
+> -	if (!netif_running(netdev))
+> -		return -EINVAL;
+> -	if (cmd == SIOCSHWTSTAMP || cmd == SIOCGHWTSTAMP)
+> -		return tsnep_ptp_ioctl(netdev, ifr, cmd);
+> -	return phy_mii_ioctl(netdev->phydev, ifr, cmd);
+> -}
+> -
+>   static void tsnep_netdev_set_multicast(struct net_device *netdev)
+>   {
+>   	struct tsnep_adapter *adapter = netdev_priv(netdev);
+> @@ -2384,7 +2374,7 @@ static const struct net_device_ops tsnep_netdev_ops = {
+>   	.ndo_open = tsnep_netdev_open,
+>   	.ndo_stop = tsnep_netdev_close,
+>   	.ndo_start_xmit = tsnep_netdev_xmit_frame,
+> -	.ndo_eth_ioctl = tsnep_netdev_ioctl,
+> +	.ndo_eth_ioctl = phy_do_ioctl_running,
+>   	.ndo_set_rx_mode = tsnep_netdev_set_multicast,
+>   	.ndo_get_stats64 = tsnep_netdev_get_stats64,
+>   	.ndo_set_mac_address = tsnep_netdev_set_mac_address,
+> @@ -2394,6 +2384,8 @@ static const struct net_device_ops tsnep_netdev_ops = {
+>   	.ndo_bpf = tsnep_netdev_bpf,
+>   	.ndo_xdp_xmit = tsnep_netdev_xdp_xmit,
+>   	.ndo_xsk_wakeup = tsnep_netdev_xsk_wakeup,
+> +	.ndo_hwtstamp_get = tsnep_ptp_hwtstamp_get,
+> +	.ndo_hwtstamp_set = tsnep_ptp_hwtstamp_set,
+>   };
+>   
+>   static int tsnep_mac_init(struct tsnep_adapter *adapter)
+> diff --git a/drivers/net/ethernet/engleder/tsnep_ptp.c b/drivers/net/ethernet/engleder/tsnep_ptp.c
+> index 54fbf0126815..ae1308eb813d 100644
+> --- a/drivers/net/ethernet/engleder/tsnep_ptp.c
+> +++ b/drivers/net/ethernet/engleder/tsnep_ptp.c
+> @@ -19,57 +19,53 @@ void tsnep_get_system_time(struct tsnep_adapter *adapter, u64 *time)
+>   	*time = (((u64)high) << 32) | ((u64)low);
+>   }
+>   
+> -int tsnep_ptp_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
+> +int tsnep_ptp_hwtstamp_get(struct net_device *netdev,
+> +			   struct kernel_hwtstamp_config *config)
+>   {
+>   	struct tsnep_adapter *adapter = netdev_priv(netdev);
+> -	struct hwtstamp_config config;
+> -
+> -	if (!ifr)
+> -		return -EINVAL;
+> -
+> -	if (cmd == SIOCSHWTSTAMP) {
+> -		if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
+> -			return -EFAULT;
+> -
+> -		switch (config.tx_type) {
+> -		case HWTSTAMP_TX_OFF:
+> -		case HWTSTAMP_TX_ON:
+> -			break;
+> -		default:
+> -			return -ERANGE;
+> -		}
+> -
+> -		switch (config.rx_filter) {
+> -		case HWTSTAMP_FILTER_NONE:
+> -			break;
+> -		case HWTSTAMP_FILTER_ALL:
+> -		case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
+> -		case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
+> -		case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
+> -		case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
+> -		case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
+> -		case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
+> -		case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
+> -		case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
+> -		case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
+> -		case HWTSTAMP_FILTER_PTP_V2_EVENT:
+> -		case HWTSTAMP_FILTER_PTP_V2_SYNC:
+> -		case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
+> -		case HWTSTAMP_FILTER_NTP_ALL:
+> -			config.rx_filter = HWTSTAMP_FILTER_ALL;
+> -			break;
+> -		default:
+> -			return -ERANGE;
+> -		}
+> -
+> -		memcpy(&adapter->hwtstamp_config, &config,
+> -		       sizeof(adapter->hwtstamp_config));
+> +
+> +	*config = adapter->hwtstamp_config;
+> +	return 0;
+> +}
+> +
+> +int tsnep_ptp_hwtstamp_set(struct net_device *netdev,
+> +			   struct kernel_hwtstamp_config *config,
+> +			   struct netlink_ext_ack *extack)
+> +{
+> +	struct tsnep_adapter *adapter = netdev_priv(netdev);
+> +
+> +	switch (config->tx_type) {
+> +	case HWTSTAMP_TX_OFF:
+> +	case HWTSTAMP_TX_ON:
+> +		break;
+> +	default:
+> +		return -ERANGE;
+>   	}
+>   
+> -	if (copy_to_user(ifr->ifr_data, &adapter->hwtstamp_config,
+> -			 sizeof(adapter->hwtstamp_config)))
+> -		return -EFAULT;
+> +	switch (config->rx_filter) {
+> +	case HWTSTAMP_FILTER_NONE:
+> +		break;
+> +	case HWTSTAMP_FILTER_ALL:
+> +	case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
+> +	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
+> +	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
+> +	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
+> +	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
+> +	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
+> +	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
+> +	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
+> +	case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
+> +	case HWTSTAMP_FILTER_PTP_V2_EVENT:
+> +	case HWTSTAMP_FILTER_PTP_V2_SYNC:
+> +	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
+> +	case HWTSTAMP_FILTER_NTP_ALL:
+> +		config->rx_filter = HWTSTAMP_FILTER_ALL;
+> +		break;
+> +	default:
+> +		return -ERANGE;
+> +	}
+>   
+> +	adapter->hwtstamp_config = *config;
+>   	return 0;
+>   }
 
-Let's step back a bit and look at the bigger picture design.  (Which is
-completely undocumented so we're just guessing).
+As you were first, I skip my patch.
 
-When we put nr_neigh into nr_node->routes[] we bump the nr_neigh_hold()
-reference count and nr_neigh->count++, then when we remove it from
-->routes[] we drop the reference and do nr_neigh->count--.
-
-If it's the last reference (and we are not holding ->locked) then we
-remove it from the &nr_neigh_list and drop the reference count again and
-free it.  So we drop the reference count twice.  This is a complicated
-design with three variables: nr_neigh_hold(), nr_neigh->count and
-->locked.  Why can it not just be one counter nr_neigh_hold().  So
-instead of setting locked = true we would just take an extra reference?
-The nr_neigh->count++ would be replaced with nr_neigh_hold() as well.
-
-Because that's fundamentally the problem, right?  We call
-nr_neigh_get_dev() so we think we're holding a reference and we're
-safe, but we don't realize that calling neighbour->count-- can
-result in dropping two references.
-
-regards,
-dan carpenter
-
+Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
 
