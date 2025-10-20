@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-230838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6970FBF0565
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 11:56:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91E20BF057A
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 11:57:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4D9ED4E6896
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 09:56:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 178823B549D
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 09:56:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 364172F6173;
-	Mon, 20 Oct 2025 09:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EBD2F6900;
+	Mon, 20 Oct 2025 09:56:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cgSeHrpA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NhBYNuRv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777F62F60CA
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 09:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBE52F6574
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 09:56:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760954175; cv=none; b=dU6eP76oThcyhBtFbgDSRzyJlGBLEv+OQorHWdRYC/ieHQPX99e/JiOozpZDlFEuP3lB/ltukKNyDJjeNxtMvnczCG4zfFzd2DF0PzIqSxjaeBAFGwo5MhjbGEN69JWS/X5muaevGT5eej5Xr9s130JnL3Naeme/U6PrsPheDyA=
+	t=1760954179; cv=none; b=KwC2QsOcA/MNboqRO/ixDDsHKhofJyGML3P5FNjBKiLIYcZ81ETOZId9J4AiFxTyHNx4k4cHQ7mGrnDadygwUoWT300birabJkPVzv1AJlS7ALTUgnLuUqzaS4S0NLVEXhmAQN+0P1/geoNcRUA25NX6Ia2N0MU69c4lvAA8o6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760954175; c=relaxed/simple;
-	bh=v+f2Vjc0v4EBJIBoDldEnMcWRnSy9HeOrciMh+mTn64=;
+	s=arc-20240116; t=1760954179; c=relaxed/simple;
+	bh=+B7PvhGg1S0PvwspMXETMgLYp/UFFAeeaKBgvPZ6eIc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XWQt+E6ubWfr+S0VNgAdevtxaUvABMaTw0DSeq1nrjCR7OKvwj+GW0Z1SW3i3OfiZJAkDb136O8jV9+EZseq5gZOMvHZ2KkPk4q5+X48Nw88gDjsIocm6l/J8wNDvoSgclxTSJp2jCHYqtFMvkFwb3pPt4GJ65wHsVGQg0QbOU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cgSeHrpA; arc=none smtp.client-ip=209.85.216.50
+	 MIME-Version; b=AFlNUEyjkxzptviaZKy4/QOOQuzC5fwbq0fUaRqTg4/uz+v0XFolfQ/nEwgepy8BvmuBSBhYLWfw+KMI9ARKjoYgp4e7R7ZZF7LlGd1rK2nGgDMrU6Fd4Bqk/r64+vNFSoh7WCdILPJIAi3qTQxS4hJWdiMvI/Gtc5VnnXHU73A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NhBYNuRv; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-33ba2f134f1so3877657a91.2
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 02:56:13 -0700 (PDT)
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b4755f37c3eso3490147a12.3
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 02:56:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760954173; x=1761558973; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760954176; x=1761558976; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NAetlB1rfruY8L6GWaLiiP+AhNOGwi30zR6SQ1TQ+GY=;
-        b=cgSeHrpAsiYn9LkIb6KoFVjKjiK33xxVMRArAoFOirEQPfDLUsrx7QSYA1B0jc4dUw
-         5rZFmSQj+G2j9Ma3LZqd+a9KbRYUg5FqIOpctqwDRooc2f+7xUlu4mGkBcFynScqk+vt
-         xc1fYhgFOryIpeW6f/WEVJkkZgRMW+dMGaugAd3nnfc1EKafFPcKJLwuLjCgMKKnKNhy
-         ydaTrFE2EhIAF5gmSuK8lCxrbrsZSWCGrSJpZ1DEPpDaQN2o7djEDhIbpSI8Zx02iRH8
-         8xNImkaJW8GECvSQb7m384IS9V8Jbe0mHM/EZ2afzf+wd5hp/NLSQEhkMzodljLYIaP5
-         UuYw==
+        bh=dZEu6atp1wquusXB2V3FIm0pgDgjjEvvFZHTGTlW15k=;
+        b=NhBYNuRvjS2ScG4xVzpvUN7roYkGgOJyYjn9l2+JK+bSiYA8jBntGhLkbY8RyAVHMJ
+         /JdOQt7VPya+9s11SXSKrTTgciV8fw7D4rD55Ls4xJjLAkOED82JTbxO7W3nHmxOTcPS
+         mzHyouOZ8yry5MfWANo4VFJr7mPbDwaSlkgL95vMKwgYMiYUdhCFrLiHB3+nslapxwr2
+         btSHwsocopNwObOH4r4/sU1Rglwovq+jlYiEVd7SgPPMODYAPr9l2OrzcvIxeo3a7Avt
+         JyTxTjiyigW/4djIfiHMLpyP3Oi6WMhQ5F7MX+SN7dfuTkFiGTcbvlCyn86Xsr5mL4JM
+         nryA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760954173; x=1761558973;
+        d=1e100.net; s=20230601; t=1760954176; x=1761558976;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NAetlB1rfruY8L6GWaLiiP+AhNOGwi30zR6SQ1TQ+GY=;
-        b=KF+qG3pOY8UsaiIeckrjB7WITjiUdyIT+VWEPCuQN/5SVC0W+0Z88Af0sV5EKLPSTY
-         lxa9FcBuXczSimgBkdq6bjscMZUdviaSY/cgP+6ZGCYg2BPpaJNjzjYcOPJ3CFGkjkwz
-         1UMSUyL+/wTasUnxp6qZRCrRi16LHMrGb+ikaZ0mxIlVJYCqyq6TCl9I7cbQiS9kc2+T
-         +APMp1XmIps7si32RYqPSSf77TDPflhT84mUiSlQ9tb8ODu2BL7G3oPUIj/LLOxGDVit
-         aQLr9G0QS7ojp2sAaSlldDB7DWJnGSexnUrVWlVnVg2rATnIT2op1zXA/yOU+J2bIoT9
-         JsfA==
-X-Gm-Message-State: AOJu0Yytnrr+oCOZCpgeoMzg+toruAV2Zoy6QkHr4KPNWzZPdXuugyS3
-	MF+8+u5HVfWhMb31tWr2FKD7WP3TKwpTloCPRIf3taaAqtw9RsFLJVQ3
-X-Gm-Gg: ASbGncvfyFZyaERyod+AaETFXRV3t6zsYLoanw2ENihbESrbxaQMWb747jQGVieNpCc
-	VazVlYQKoTzQEFaiNUN3x+V+KyhIqnqp3z6C92xLHqRx3FzxVm2UDhxQRDqaQtQdpB5pPSmc/eP
-	fptsk60XIK63BvchhsY66+/4RH27zyAMzFq9W/NtHDtGg44gEtKwcYQmWzi3Wy1aE5UAFYui2Wn
-	NgsLpWoU2maYVN9I9nBvlrJ2ryDUmYrCD4AQFENfl05Kdeu8HluaU1zhozIjtR8VDsz/ah1DTPF
-	iN7s+mOX0ePzf/ep/UkdK3C+15i+MKHiKFTIu8SXoju6ELyPqMl94V9BEGdvT715Xw3FuptXXLW
-	R3KrUyvKpShHt3iNarib1mZch5Q1Ag6fUWv3fkfvdnr39qk3FAZP8C9d6uJeJPNFN1ziiRzf3On
-	AL78ejxtocEw==
-X-Google-Smtp-Source: AGHT+IE7zVwzQMhb5BY4ayD1uNx5wi44qB2+5gan5ZQtQHTnM1ourkvH3ZfDn2OiMchcyVMlnamnPg==
-X-Received: by 2002:a17:90a:ec8b:b0:32b:6145:fa63 with SMTP id 98e67ed59e1d1-33bcf860229mr19877507a91.4.1760954172663;
-        Mon, 20 Oct 2025 02:56:12 -0700 (PDT)
+        bh=dZEu6atp1wquusXB2V3FIm0pgDgjjEvvFZHTGTlW15k=;
+        b=OsuM+kpJ2GNKWTgBjPw4ZGzvniVdkBz43N9JFm6xvcadKgRnWDqA2CfMohv3xT5URG
+         S1Pqjz3rB2cHynXYWZOXasl2rbCnvls0xKulxRCgNYorgO3fFX8rtyeJIAvf4exb4H9R
+         IEgt97wNOFMUBHKJ6O+AUTsGZy2vbdViiHgIjjRRWIwlVihlexNdWtg/t4LTva4Nj1F2
+         oGMMHpuYyQ/wk1vhiJLsfEkdIzGbyCsHrUlOXi6NfXSBEWkFQarypPzA61dJqe2IqkG7
+         x7yD5an6fk0JMkzmdTQRP3KroiHT8VYsQl4Fna18GROS0xUjmF0FYoJ+Vf/m4wbfDk0b
+         XF0g==
+X-Gm-Message-State: AOJu0YxEZlC7VeuIrWe91+FFVbgGeurVBcFPpX7OTj7UnmmbewZNYUHf
+	AOibHfdYyas5Izw7wjE09Fv1qF+ApuVRbEv7ncKsPlleXuh0fcWsgNiS
+X-Gm-Gg: ASbGnctGAZ1CY0v60MGBk6/19D9kiqpYqgAz8YLMXY4twRY61/wKnmfttBP7C9NYNca
+	ARx+bZEs7+s6TbCZYTiZf9eeZxUCwgtzzeA817eVOEyqXLaasLM0iDbpxPZg2Ktq9zJ8GoBT5t9
+	iTxXTwlAHFQPyv2Qrhf1sRrhCgFuzLube9uTpmXQvWOFfBtP+amNwgN8u1j3tAIw6fC04ItTVDT
+	vRbR5u4+/z16+8LY042+LOjXs4MxqpvH/y2UN7R6QoLw9ib0w/30ZXPyx7v4WdEbrZ9k/vi0WRw
+	qIMcjMAmVXkMQvRMfLPRiSz8jJ3IWjCypyXlYQ4V3HHJJnN2JiJT2yd63GewNFTFYdIFgcFQTyl
+	LFqoxO5ZQyuZcRn5Mm9vz/vrhdf4uRGifejTz6dqkDE6G2qRqXK6UWHz4GLBC8vZoRGIV3JZMAV
+	c=
+X-Google-Smtp-Source: AGHT+IGGbVMAvLRNPJzY/dwiHRiAXKBM0roNWAjS8uuWlxmmRK+1VU9M3wcXUApOTf5kLg4NLvhkzA==
+X-Received: by 2002:a17:902:eccb:b0:28e:80d7:662d with SMTP id d9443c01a7336-290cbb483demr161050105ad.58.1760954175971;
+        Mon, 20 Oct 2025 02:56:15 -0700 (PDT)
 Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b6a76b33bf3sm7265996a12.19.2025.10.20.02.56.11
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-292471d5794sm74880555ad.53.2025.10.20.02.56.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 02:56:12 -0700 (PDT)
+        Mon, 20 Oct 2025 02:56:15 -0700 (PDT)
 From: Inochi Amaoto <inochiama@gmail.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -101,9 +101,9 @@ Cc: netdev@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	Yixun Lan <dlan@gentoo.org>,
 	Longbin Li <looong.bin@gmail.com>
-Subject: [PATCH v2 2/3] net: phy: Add helper for fixing RGMII PHY mode based on internal mac delay
-Date: Mon, 20 Oct 2025 17:54:58 +0800
-Message-ID: <20251020095500.1330057-3-inochiama@gmail.com>
+Subject: [PATCH v2 3/3] net: stmmac: dwmac-sophgo: Add phy interface filter
+Date: Mon, 20 Oct 2025 17:54:59 +0800
+Message-ID: <20251020095500.1330057-4-inochiama@gmail.com>
 X-Mailer: git-send-email 2.51.1.dirty
 In-Reply-To: <20251020095500.1330057-1-inochiama@gmail.com>
 References: <20251020095500.1330057-1-inochiama@gmail.com>
@@ -115,88 +115,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The "phy-mode" property of devicetree indicates whether the PCB has
-delay now, which means the mac needs to modify the PHY mode based
-on whether there is an internal delay in the mac.
+As the SG2042 has an internal rx delay, the delay should be remove
+when init the mac, otherwise the phy will be misconfigurated.
 
-This modification is similar for many ethernet drivers. To simplify
-code, define the helper phy_fix_phy_mode_for_mac_delays(speed, mac_txid,
-mac_rxid) to fix PHY mode based on whether mac adds internal delay.
-
+Fixes: 543009e2d4cd ("net: stmmac: dwmac-sophgo: Add support for Sophgo SG2042 SoC")
 Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+Tested-by: Han Gao <rabenda.cn@gmail.com>
 ---
- drivers/net/phy/phy-core.c | 43 ++++++++++++++++++++++++++++++++++++++
- include/linux/phy.h        |  3 +++
- 2 files changed, 46 insertions(+)
+ .../net/ethernet/stmicro/stmmac/dwmac-sophgo.c  | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
-index 605ca20ae192..4f258fb409da 100644
---- a/drivers/net/phy/phy-core.c
-+++ b/drivers/net/phy/phy-core.c
-@@ -101,6 +101,49 @@ const char *phy_rate_matching_to_str(int rate_matching)
- }
- EXPORT_SYMBOL_GPL(phy_rate_matching_to_str);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+index 3b7947a7a7ba..960357d6e282 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+@@ -7,11 +7,16 @@
 
-+/**
-+ * phy_fix_phy_mode_for_mac_delays - Convenience function for fixing PHY
-+ * mode based on whether mac adds internal delay
-+ *
-+ * @interface: The current interface mode of the port
-+ * @mac_txid: True if the mac adds internal tx delay
-+ * @mac_rxid: True if the mac adds internal rx delay
-+ *
-+ * Return fixed PHY mode, or PHY_INTERFACE_MODE_NA if the interface can
-+ * not apply the internal delay
-+ */
-+phy_interface_t phy_fix_phy_mode_for_mac_delays(phy_interface_t interface,
-+						bool mac_txid, bool mac_rxid)
-+{
-+	if (!phy_interface_mode_is_rgmii(interface))
-+		return interface;
+ #include <linux/clk.h>
+ #include <linux/module.h>
++#include <linux/property.h>
+ #include <linux/mod_devicetable.h>
+ #include <linux/platform_device.h>
+
+ #include "stmmac_platform.h"
+
++struct sophgo_dwmac_data {
++	bool has_internal_rx_delay;
++};
 +
-+	if (mac_txid && mac_rxid) {
-+		if (interface == PHY_INTERFACE_MODE_RGMII_ID)
-+			return PHY_INTERFACE_MODE_RGMII;
-+		return PHY_INTERFACE_MODE_NA;
-+	}
+ static int sophgo_sg2044_dwmac_init(struct platform_device *pdev,
+ 				    struct plat_stmmacenet_data *plat_dat,
+ 				    struct stmmac_resources *stmmac_res)
+@@ -32,6 +37,7 @@ static int sophgo_sg2044_dwmac_init(struct platform_device *pdev,
+ static int sophgo_dwmac_probe(struct platform_device *pdev)
+ {
+ 	struct plat_stmmacenet_data *plat_dat;
++	const struct sophgo_dwmac_data *data;
+ 	struct stmmac_resources stmmac_res;
+ 	struct device *dev = &pdev->dev;
+ 	int ret;
+@@ -50,11 +56,20 @@ static int sophgo_dwmac_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		return ret;
+
++	data = device_get_match_data(&pdev->dev);
++	if (data && data->has_internal_rx_delay)
++		plat_dat->phy_interface = phy_fix_phy_mode_for_mac_delays(plat_dat->phy_interface,
++									  false, true);
 +
-+	if (mac_txid) {
-+		if (interface == PHY_INTERFACE_MODE_RGMII_ID)
-+			return PHY_INTERFACE_MODE_RGMII_RXID;
-+		if (interface == PHY_INTERFACE_MODE_RGMII_TXID)
-+			return PHY_INTERFACE_MODE_RGMII;
-+		return PHY_INTERFACE_MODE_NA;
-+	}
-+
-+	if (mac_rxid) {
-+		if (interface == PHY_INTERFACE_MODE_RGMII_ID)
-+			return PHY_INTERFACE_MODE_RGMII_TXID;
-+		if (interface == PHY_INTERFACE_MODE_RGMII_RXID)
-+			return PHY_INTERFACE_MODE_RGMII;
-+		return PHY_INTERFACE_MODE_NA;
-+	}
-+
-+	return interface;
-+}
-+EXPORT_SYMBOL_GPL(phy_fix_phy_mode_for_mac_delays);
-+
- /**
-  * phy_interface_num_ports - Return the number of links that can be carried by
-  *			     a given MAC-PHY physical link. Returns 0 if this is
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 3c7634482356..0bc00a4cceb2 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1813,6 +1813,9 @@ static inline bool phy_is_pseudo_fixed_link(struct phy_device *phydev)
- 	return phydev->is_pseudo_fixed_link;
+ 	return stmmac_dvr_probe(dev, plat_dat, &stmmac_res);
  }
 
-+phy_interface_t phy_fix_phy_mode_for_mac_delays(phy_interface_t interface,
-+						bool mac_txid, bool mac_rxid);
++static struct sophgo_dwmac_data sg2042_dwmac_data = {
++	.has_internal_rx_delay = true,
++};
 +
- int phy_save_page(struct phy_device *phydev);
- int phy_select_page(struct phy_device *phydev, int page);
- int phy_restore_page(struct phy_device *phydev, int oldpage, int ret);
+ static const struct of_device_id sophgo_dwmac_match[] = {
+-	{ .compatible = "sophgo,sg2042-dwmac" },
++	{ .compatible = "sophgo,sg2042-dwmac", .data = &sg2042_dwmac_data },
+ 	{ .compatible = "sophgo,sg2044-dwmac" },
+ 	{ /* sentinel */ }
+ };
 --
 2.51.1.dirty
 
