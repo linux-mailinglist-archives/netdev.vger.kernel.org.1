@@ -1,347 +1,114 @@
-Return-Path: <netdev+bounces-230850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B27B8BF0861
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:25:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4189BF0882
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:27:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99B343A5791
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 10:25:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9383E3AB675
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 10:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1872EC0BB;
-	Mon, 20 Oct 2025 10:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98BBD2F617E;
+	Mon, 20 Oct 2025 10:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VshzGVNN"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="IMHcVSVk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A378023372C
-	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 10:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651261E9919
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 10:27:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760955937; cv=none; b=G8EGtj4dM2s81XFhhXrVzAsC4zIw3MjBuVw/EkHxBlm5mJf7mV2CTpit2UdoIPpRbYuPryqBapA8fhUmn/87soejGL/vMemiQ3NJZOdtWGP0gkVACMkwtrvHvsfFINeAfmriS9vcB7xhlYq8YcIwWgQlx74Tt/JGFV/eIRh3coA=
+	t=1760956071; cv=none; b=bF5WnUMLRZdOmKS2eE3L0zD1FayWRjmARD8HE6RKbZ0kVa5wAE6OcRbEHObdpZDMdPDDUkzcISs/pMfGLPKKxj3W19MosdFK4hGYV56CPU0QJjR9V3M/3Q2qK3g0RzaJCYCTIff8J1fR6hIfe5hvxXxhq7kdcyqjQaReWMMMln0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760955937; c=relaxed/simple;
-	bh=CwF+yZDak0Elu4utklnJ/uFv7Gi4MxASsza7h+em8FY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ihn+GWOqlImhy6u5m49XOXBcWqHrLOJZdRhikBYc12qOogt3AwjLw9c0X7WC6kOkqdGOHg+iLE66PogmEaZMFaZAYDtnGlD2kzByVntvu+zauu8tevbvGHRzL0S2Fo2w4/L4q+ZbFgn1J6tjUQBoxZF0IJKPVavgQUxBOVNKCBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VshzGVNN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760955934;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xHVay0ecEvOk/WYTNlxi8BsqYH5mFIhmM9aH7MtmBnQ=;
-	b=VshzGVNNZHdDT4MR6DbFRrV4urweC0wqxl1zTLkfRbnWb57iBKnMl8WYILXI2T/XwrVHXI
-	73v4TYA474aKIdL7+FWkLQGSVeQ9HfouV/ERlv7NdGSQ8s5li4rPYXuu7l43iRlXOycvqY
-	63LMHquHaR9wEy6p6yzMiGQTut8D4Qs=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-655-9EuHqk8FMauWyuO8fUtciw-1; Mon, 20 Oct 2025 06:25:33 -0400
-X-MC-Unique: 9EuHqk8FMauWyuO8fUtciw-1
-X-Mimecast-MFC-AGG-ID: 9EuHqk8FMauWyuO8fUtciw_1760955932
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-6305c385adbso5915585a12.1
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 03:25:33 -0700 (PDT)
+	s=arc-20240116; t=1760956071; c=relaxed/simple;
+	bh=YdJQT23MmkSBi0ZaNdhCdqOffP2+xSjXp9ntW1Fk190=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U2ccaiY4sUw+DmdZqshJZaP7mB9WfChLZvmCfI185vBi4hQxVR6ZvP6x4pLgO6Iv2yxn6LyYq5n1KM7PFd4/GNTlU68y/azu/91ZO8q/Jv5riTZLd1m22iDz08o46fai9h8Ik7qi1NSA92hypeSxwLEcXvv2jCAmN/Ks1GuZLcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=IMHcVSVk; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-46e542196c7so33356675e9.0
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 03:27:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1760956068; x=1761560868; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3dvtYsvwys6UCmfh+4mUwt2dao0xzogPu4+lUcRk6l4=;
+        b=IMHcVSVkfBD/+AZS0X1KRxJODyFg+227YpSjHD8cOia4U7Zt1OraRcqyjTDyAdeJ3G
+         Dqqj+kvuuAhuFo0G3IhIaej7b4CsUbvJPem9+qHDxAa6Ax1GQDWIt2n8hClm16HqvGwV
+         p7hgTsH7xKhRb7Jlt88lCkeQFPwREodmEpB2Eq01YVii02SqlW8ontAya5c+kgYZsjRb
+         BYBsm5/bVWLqz1g/Yfbdo3F2N0vFevsXtE/DluQZsZCfPGuCrAzSFsj9ij1B++/VOQZT
+         /mdpzuCFb76kUu1L1lO7KBqWUh7SN0sVQnUt08QKEqfAwd/qEFi2ozLJcq++1X13v/QO
+         xHaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760955932; x=1761560732;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xHVay0ecEvOk/WYTNlxi8BsqYH5mFIhmM9aH7MtmBnQ=;
-        b=Ru7Bzn1nMu2dLKW0I+jH2r8BrLmc0fQBALL2onjKm+54fCP1NfKa6czqXxjIH3Cv4J
-         DT23RXYX8NOg+427K/yH+OCclOv7jpURMB0U1M74VtOlYV0o0dBauEb1lupATYFWZKP4
-         KmmM+T2b7ofFYOZA31cceOyWVaClfmAdCpo4liAXZVHy3eFX4s+HtMC88toJ7WkzP3i6
-         d+NrEbweWqe1HTCCYXXNp5Iefzvlg08BNaWSe6Vxbr6lu0GAS/VpDpBC2oD9RLwe5dy+
-         czYBu3uLdMzghfDRg+w+CjdWJYIVpCBWfXB3QP3PK80/kZOg+RuOKB5OQDgJJsQtVwzw
-         ra7A==
-X-Forwarded-Encrypted: i=1; AJvYcCWkVaeosa3svqJBs3ahKrz+WIHttTUhVdfTctywjObNSoLvjNjRP3qaqcXBC6dNNIPVgXMK+/k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8mmj0/tup+SCrLh1AJV5YUaoYZr5yu2xkFYcCsbIh3gzDRgKp
-	ocDragLSByRlNW68do5nyMwk3YFrp/sTaHOFSXKaiz9Yn/D/Id6Ingo20EP5a76L4YW8DYXDQ/e
-	OmpFVsUbkWZ3jeBOPCVJqfqqvDNvsjGGZToXIyrGwZwmZcahTkQSg9CYbY/JomxlBPw==
-X-Gm-Gg: ASbGncs4ZBV7XA/15lLaiYpgJXcGe5xNMDtfA91kEm3+p0bUJTF/sRn3Uplw6GQnysW
-	75yDNnYoKcFYUdiJma5cJoZN/FPE0uVltK9dmfZeupa0j5EcrqeAfGwy85meT9TvQNzYs10m/2/
-	EmkuA5LvUJGm12cFZIXbT1sOoIuiElGc+gYag+0VWNBW1TO+1sXTgvLfQqvOKT6bqQs7f4eOlxG
-	8022v0BGHrOYGvi4ju4+aKfaLHsuqoYAV1J5DharDR0A8yv9Ncea/dkEG8ytRbFfZIa3BfWecG6
-	BIiOecALPiNtYx+LQr7/ydX35+xDl7RIb4BXxr5szGrIhZPEbz0BbXcdwSJhLNZfY1hsuJZoSCE
-	ER8KEa5CXYPI6XhCZ7yu6GkpSWw==
-X-Received: by 2002:a05:6402:f0f:b0:637:e94a:fb56 with SMTP id 4fb4d7f45d1cf-63c1f6da02bmr8502669a12.35.1760955931849;
-        Mon, 20 Oct 2025 03:25:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEayzUZ8wlpZv1q9uCinMJ/D3prJbd1R7i0pa57HpUHs6t7Ux8nd9I3AiX4f+8zOHehqIINiw==
-X-Received: by 2002:a05:6402:f0f:b0:637:e94a:fb56 with SMTP id 4fb4d7f45d1cf-63c1f6da02bmr8502645a12.35.1760955931347;
-        Mon, 20 Oct 2025 03:25:31 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63c49430272sm6305091a12.23.2025.10.20.03.25.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 03:25:30 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id B219C2E9E7C; Mon, 20 Oct 2025 12:25:29 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, ilias.apalodimas@linaro.org, lorenzo@kernel.org,
- kuba@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com,
- andrii@kernel.org, stfomichev@gmail.com, aleksander.lobakin@intel.com
-Subject: Re: [PATCH v2 bpf 2/2] veth: update mem type in xdp_buff
-In-Reply-To: <aPKiC0jZV6kLBvIq@boxer>
-References: <20251017143103.2620164-1-maciej.fijalkowski@intel.com>
- <20251017143103.2620164-3-maciej.fijalkowski@intel.com>
- <87a51pij2l.fsf@toke.dk> <aPJ0YqfH+pdSIbVS@boxer> <87347hifgh.fsf@toke.dk>
- <87zf9pgzx2.fsf@toke.dk> <aPKiC0jZV6kLBvIq@boxer>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 20 Oct 2025 12:25:29 +0200
-Message-ID: <87wm4phnty.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1760956068; x=1761560868;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3dvtYsvwys6UCmfh+4mUwt2dao0xzogPu4+lUcRk6l4=;
+        b=VBsdzfsamLRxVLq/YQIsKpHRKG7we2uEBKef3ZEVxT0BhPTFg6RHZuGWgMYj60Cm/D
+         6X4TDXon0+2egMnuo2xYR/flGkilCfQeJbqj9OLqov04af8wDitpT7JjON2uBXIB+TR2
+         rxf6sxOMAcuBh7ucBc5oPQ2A4qFG6/+7iBp7MW6oaOeyml1LJDxJO7murH7cDGeqzKpl
+         Wa79xxrSWYZdh7F1Hpx9Yb4iDMVXoxTW9yzXH91OFDtBRp7wvGd1zMJCTbGG/z/1VIsw
+         qzFykuncMHjr9d08sq949y5gjCUGfq5lLrEGqkTwzr2DBsx+vXcC/iEadRTEDuMCYDlJ
+         GneA==
+X-Forwarded-Encrypted: i=1; AJvYcCWYzpZrAZ7FMaMCiAraGddCLQWKOTY/+jru1yxvoD4/cB+ciLG4OnXm8LlGcoFRsFGlHzhYVHM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbGreNnyf1M26OhfVNZ9Oc5OjBbmeJJgFLqYx0/eJEWXKXD7Yo
+	0RenNgP59KRl4qF1DLFRUedRDAqI5Hai1xcXrVvwhsGY7rciNxJ30rp2GTOb2eHUhsM=
+X-Gm-Gg: ASbGnctJCaz5/MjyJn/4HXBOGfaE0K5cQtDSSf8GJL96g59wqmQp8BtXmTVoBg9tZwp
+	ryEQse7UOtWeeDFU6mO0QfcCZzubnEbw4+GetpNv5BdJ78E4idGJDA1VsLZkuixslT8YNQH8V+p
+	IeZswl7KWO1STHXNoF5yLSN40cOBlAoXY2JE5AMFbBYIQnNOGPev3PD2Y3AnPn+sw5E1bJ2OkvC
+	t6fsflJnpLpffWssuOC3QTQETqy6YEKdmlaRu3EHZtaD7HBILZfEitW361n90dICQB970Vou4a1
+	xez52sLPcuBXUR/FRS0qYDZztsN3xxHKDZU+6kYbw4QXa/tuBPmSBkJ44liq7pv5NkBedgHmh4y
+	4vPIV9g1uBGutnZgYayeHbuZ6/Pbx0SfLOTH1CSJzdzF7qZYMDqUph10aFXG+K5YqOU9f520e9M
+	3dBzKKs/STj/peW4XtMEj4EDcaEKXSSmtqkl3M4mPq4jJTlmUzWg55ZQ==
+X-Google-Smtp-Source: AGHT+IFjlH+J8EM55S3REFmZyZsIciSPk/zzo+ozqFlEcxZKYkS0tz+EKjw+SI9tTxE3OLx1rl1AVA==
+X-Received: by 2002:a05:6000:4b08:b0:427:55e:9a50 with SMTP id ffacd0b85a97d-427055e9a5fmr11181093f8f.22.1760956067678;
+        Mon, 20 Oct 2025 03:27:47 -0700 (PDT)
+Received: from ?IPV6:2001:a61:135e:6601:24e0:f40b:1a23:7445? ([2001:a61:135e:6601:24e0:f40b:1a23:7445])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427ea5a0f7dsm14383873f8f.4.2025.10.20.03.27.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Oct 2025 03:27:47 -0700 (PDT)
+Message-ID: <c522fde0-97ab-4285-aa78-40c5ca39b5b2@suse.com>
+Date: Mon, 20 Oct 2025 12:27:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v5 2/3] net: usb: ax88179_178a: add USB device driver
+ for config selection
+To: Michal Pecio <michal.pecio@gmail.com>,
+ Alan Stern <stern@rowland.harvard.edu>
+Cc: yicongsrfy@163.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, oliver@neukum.org, pabeni@redhat.com
+References: <20251013110753.0f640774.michal.pecio@gmail.com>
+ <20251017024229.1959295-1-yicongsrfy@163.com>
+ <db3db4c6-d019-49d0-92ad-96427341589c@rowland.harvard.edu>
+ <20251017191511.6dd841e9.michal.pecio@gmail.com>
+Content-Language: en-US
+From: Oliver Neukum <oneukum@suse.com>
+In-Reply-To: <20251017191511.6dd841e9.michal.pecio@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
+On 17.10.25 19:15, Michal Pecio wrote:
 
-> On Fri, Oct 17, 2025 at 08:12:57PM +0200, Toke H=C3=B8iland-J=C3=B8rgense=
-n wrote:
->> Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
->>=20
->> > Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
->> >
->> >> On Fri, Oct 17, 2025 at 06:33:54PM +0200, Toke H=C3=B8iland-J=C3=B8rg=
-ensen wrote:
->> >>> Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
->> >>>=20
->> >>> > Veth calls skb_pp_cow_data() which makes the underlying memory to
->> >>> > originate from system page_pool. For CONFIG_DEBUG_VM=3Dy and XDP p=
-rogram
->> >>> > that uses bpf_xdp_adjust_tail(), following splat was observed:
->> >>> >
->> >>> > [   32.204881] BUG: Bad page state in process test_progs  pfn:11c9=
-8b
->> >>> > [   32.207167] page: refcount:0 mapcount:0 mapping:000000000000000=
-0 index:0x0 pfn:0x11c98b
->> >>> > [   32.210084] flags: 0x1fffe0000000000(node=3D0|zone=3D1|lastcpup=
-id=3D0x7fff)
->> >>> > [   32.212493] raw: 01fffe0000000000 dead000000000040 ff11000123c9=
-b000 0000000000000000
->> >>> > [   32.218056] raw: 0000000000000000 0000000000000001 00000000ffff=
-ffff 0000000000000000
->> >>> > [   32.220900] page dumped because: page_pool leak
->> >>> > [   32.222636] Modules linked in: bpf_testmod(O) bpf_preload
->> >>> > [   32.224632] CPU: 6 UID: 0 PID: 3612 Comm: test_progs Tainted: G=
- O        6.17.0-rc5-gfec474d29325 #6969 PREEMPT
->> >>> > [   32.224638] Tainted: [O]=3DOOT_MODULE
->> >>> > [   32.224639] Hardware name: QEMU Standard PC (i440FX + PIIX, 199=
-6), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
->> >>> > [   32.224641] Call Trace:
->> >>> > [   32.224644]  <IRQ>
->> >>> > [   32.224646]  dump_stack_lvl+0x4b/0x70
->> >>> > [   32.224653]  bad_page.cold+0xbd/0xe0
->> >>> > [   32.224657]  __free_frozen_pages+0x838/0x10b0
->> >>> > [   32.224660]  ? skb_pp_cow_data+0x782/0xc30
->> >>> > [   32.224665]  bpf_xdp_shrink_data+0x221/0x530
->> >>> > [   32.224668]  ? skb_pp_cow_data+0x6d1/0xc30
->> >>> > [   32.224671]  bpf_xdp_adjust_tail+0x598/0x810
->> >>> > [   32.224673]  ? xsk_destruct_skb+0x321/0x800
->> >>> > [   32.224678]  bpf_prog_004ac6bb21de57a7_xsk_xdp_adjust_tail+0x52=
-/0xd6
->> >>> > [   32.224681]  veth_xdp_rcv_skb+0x45d/0x15a0
->> >>> > [   32.224684]  ? get_stack_info_noinstr+0x16/0xe0
->> >>> > [   32.224688]  ? veth_set_channels+0x920/0x920
->> >>> > [   32.224691]  ? get_stack_info+0x2f/0x80
->> >>> > [   32.224693]  ? unwind_next_frame+0x3af/0x1df0
->> >>> > [   32.224697]  veth_xdp_rcv.constprop.0+0x38a/0xbe0
->> >>> > [   32.224700]  ? common_startup_64+0x13e/0x148
->> >>> > [   32.224703]  ? veth_xdp_rcv_one+0xcd0/0xcd0
->> >>> > [   32.224706]  ? stack_trace_save+0x84/0xa0
->> >>> > [   32.224709]  ? stack_depot_save_flags+0x28/0x820
->> >>> > [   32.224713]  ? __resched_curr.constprop.0+0x332/0x3b0
->> >>> > [   32.224716]  ? timerqueue_add+0x217/0x320
->> >>> > [   32.224719]  veth_poll+0x115/0x5e0
->> >>> > [   32.224722]  ? veth_xdp_rcv.constprop.0+0xbe0/0xbe0
->> >>> > [   32.224726]  ? update_load_avg+0x1cb/0x12d0
->> >>> > [   32.224730]  ? update_cfs_group+0x121/0x2c0
->> >>> > [   32.224733]  __napi_poll+0xa0/0x420
->> >>> > [   32.224736]  net_rx_action+0x901/0xe90
->> >>> > [   32.224740]  ? run_backlog_napi+0x50/0x50
->> >>> > [   32.224743]  ? clockevents_program_event+0x1cc/0x280
->> >>> > [   32.224746]  ? hrtimer_interrupt+0x31e/0x7c0
->> >>> > [   32.224749]  handle_softirqs+0x151/0x430
->> >>> > [   32.224752]  do_softirq+0x3f/0x60
->> >>> > [   32.224755]  </IRQ>
->> >>> >
->> >>> > It's because xdp_rxq with mem model set to MEM_TYPE_PAGE_SHARED wa=
-s used
->> >>> > when initializing xdp_buff.
->> >>> >
->> >>> > Fix this by using new helper xdp_convert_skb_to_buff() that, besid=
-es
->> >>> > init/prepare xdp_buff, will check if page used for linear part of
->> >>> > xdp_buff comes from page_pool. We assume that linear data and frag=
-s will
->> >>> > have same memory provider as currently XDP API does not provide us=
- a way
->> >>> > to distinguish it (the mem model is registered for *whole* Rx queu=
-e and
->> >>> > here we speak about single buffer granularity).
->> >>> >
->> >>> > In order to meet expected skb layout by new helper, pull the mac h=
-eader
->> >>> > before conversion from skb to xdp_buff.
->> >>> >
->> >>> > However, that is not enough as before releasing xdp_buff out of ve=
-th via
->> >>> > XDP_{TX,REDIRECT}, mem type on xdp_rxq associated with xdp_buff is
->> >>> > restored to its original model. We need to respect previous settin=
-g at
->> >>> > least until buff is converted to frame, as frame carries the mem_t=
-ype.
->> >>> > Add a page_pool variant of veth_xdp_get() so that we avoid refcount
->> >>> > underflow when draining page frag.
->> >>> >
->> >>> > Fixes: 0ebab78cbcbf ("net: veth: add page_pool for page recycling")
->> >>> > Reported-by: Alexei Starovoitov <ast@kernel.org>
->> >>> > Closes: https://lore.kernel.org/bpf/CAADnVQ+bBofJDfieyOYzSmSujSfJw=
-DTQhiz3aJw7hE+4E2_iPA@mail.gmail.com/
->> >>> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
->> >>> > ---
->> >>> >  drivers/net/veth.c | 43 +++++++++++++++++++++++++++--------------=
---
->> >>> >  1 file changed, 27 insertions(+), 16 deletions(-)
->> >>> >
->> >>> > diff --git a/drivers/net/veth.c b/drivers/net/veth.c
->> >>> > index a3046142cb8e..eeeee7bba685 100644
->> >>> > --- a/drivers/net/veth.c
->> >>> > +++ b/drivers/net/veth.c
->> >>> > @@ -733,7 +733,7 @@ static void veth_xdp_rcv_bulk_skb(struct veth_=
-rq *rq, void **frames,
->> >>> >  	}
->> >>> >  }
->> >>> >=20=20
->> >>> > -static void veth_xdp_get(struct xdp_buff *xdp)
->> >>> > +static void veth_xdp_get_shared(struct xdp_buff *xdp)
->> >>> >  {
->> >>> >  	struct skb_shared_info *sinfo =3D xdp_get_shared_info_from_buff(=
-xdp);
->> >>> >  	int i;
->> >>> > @@ -746,12 +746,33 @@ static void veth_xdp_get(struct xdp_buff *xd=
-p)
->> >>> >  		__skb_frag_ref(&sinfo->frags[i]);
->> >>> >  }
->> >>> >=20=20
->> >>> > +static void veth_xdp_get_pp(struct xdp_buff *xdp)
->> >>> > +{
->> >>> > +	struct skb_shared_info *sinfo =3D xdp_get_shared_info_from_buff(=
-xdp);
->> >>> > +	int i;
->> >>> > +
->> >>> > +	page_pool_ref_page(virt_to_page(xdp->data));
->> >>> > +	if (likely(!xdp_buff_has_frags(xdp)))
->> >>> > +		return;
->> >>> > +
->> >>> > +	for (i =3D 0; i < sinfo->nr_frags; i++) {
->> >>> > +		skb_frag_t *frag =3D &sinfo->frags[i];
->> >>> > +
->> >>> > +		page_pool_ref_page(netmem_to_page(frag->netmem));
->> >>> > +	}
->> >>> > +}
->> >>> > +
->> >>> > +static void veth_xdp_get(struct xdp_buff *xdp)
->> >>> > +{
->> >>> > +	xdp->rxq->mem.type =3D=3D MEM_TYPE_PAGE_POOL ?
->> >>> > +		veth_xdp_get_pp(xdp) : veth_xdp_get_shared(xdp);
->> >>> > +}
->> >>> > +
->> >>> >  static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
->> >>> >  					struct xdp_buff *xdp,
->> >>> >  					struct sk_buff **pskb)
->> >>> >  {
->> >>> >  	struct sk_buff *skb =3D *pskb;
->> >>> > -	u32 frame_sz;
->> >>> >=20=20
->> >>> >  	if (skb_shared(skb) || skb_head_is_locked(skb) ||
->> >>> >  	    skb_shinfo(skb)->nr_frags ||
->> >>> > @@ -762,19 +783,9 @@ static int veth_convert_skb_to_xdp_buff(struc=
-t veth_rq *rq,
->> >>> >  		skb =3D *pskb;
->> >>> >  	}
->> >>> >=20=20
->> >>> > -	/* SKB "head" area always have tailroom for skb_shared_info */
->> >>> > -	frame_sz =3D skb_end_pointer(skb) - skb->head;
->> >>> > -	frame_sz +=3D SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
->> >>> > -	xdp_init_buff(xdp, frame_sz, &rq->xdp_rxq);
->> >>> > -	xdp_prepare_buff(xdp, skb->head, skb_headroom(skb),
->> >>> > -			 skb_headlen(skb), true);
->> >>> > +	__skb_pull(*pskb, skb->data - skb_mac_header(skb));
->> >>>=20
->> >>> veth_xdp_rcv_skb() does:
->> >>>=20
->> >>> 	__skb_push(skb, skb->data - skb_mac_header(skb));
->> >>> 	if (veth_convert_skb_to_xdp_buff(rq, xdp, &skb))
->> >>>=20
->> >>> so how about just getting rid of that push instead of doing the oppo=
-site
->> >>> pull straight after? :)
->> >>
->> >> Hi Toke,
->> >>
->> >> I believe this is done so we get a proper headroom representation whi=
-ch is
->> >> needed for XDP_PACKET_HEADROOM comparison. Maybe we could be smarter =
-here
->> >> and for example subtract mac header length? However I wanted to prese=
-rve
->> >> old behavior.
->> >
->> > Yeah, basically what we want is to check if the mac_header offset is
->> > larger than the headroom. So the check could just be:
->> >
->> >     skb->mac_header < XDP_PACKET_HEADROOM
->> >
->> > however, it may be better to use the helper? Since that makes sure we
->> > keep hitting the DEBUG_NET_WARN_ON_ONCE inside the helper... So:
->> >
->> >     skb_mac_header(skb) - skb->head < XDP_PACKET_HEADROOM
->> >
->> > or, equivalently:
->> >
->> >     skb_headroom(skb) - skb_mac_offset(skb) < XDP_PACKET_HEADROOM
->> >
->> > I think the first one is probably more readable, since skb_mac_offset()
->> > is negative here, so the calculation looks off...
->>=20
->> Wait, veth_xdp_rcv_skb() calls skb_reset_mac_header() further down, so
->> it expects skb->data to point to the mac header. So getting rid of the
->
-> Oof. Correct.
->
->> __skb_push() is not a good idea; but neither is doing the __skb_pull() as
->> your patch does currently.
->>=20
->> How about just making xdp_convert_skb_to_buff() agnostic to where
->> skb->data is?
->>=20
->> 	headroom =3D skb_mac_header(skb) - skb->head;
->>         data_len =3D skb->data + skb->len - skb_mac_header(skb);
->
-> could we just use skb->tail - skb_mac_header(skb) here?
+> A less complicated improvement could be moving the common part of all
+> cfgselectors into usbnet. Not sure if it's worth it yet for only two?
 
-Yeah, guess so. Tail is a length, though, so that would be
-skb_tail_pointer(skb) - skb_mac_header(skb)
+Please leave usbnet out of this. The selection of a configuration
+belongs into core code.
 
-> anyways, i'm gonna try out your suggestion on weekend or on monday and
-> will send a v3. maybe input from someone else in different time zones will
-> land in by tomorrow. thanks again:)
-
-Cool!
-
--Toke
+	Regards
+		Oliver
 
 
