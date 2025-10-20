@@ -1,187 +1,347 @@
-Return-Path: <netdev+bounces-230849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73EB6BF0840
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:23:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B27B8BF0861
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:25:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C7A6534B2C2
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 10:23:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99B343A5791
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 10:25:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D9C2F7AA6;
-	Mon, 20 Oct 2025 10:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1872EC0BB;
+	Mon, 20 Oct 2025 10:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="XH//neKq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VshzGVNN"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17D9E2F5A02;
-	Mon, 20 Oct 2025 10:23:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A378023372C
+	for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 10:25:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760955800; cv=none; b=D61aOzpNp8cPAyH5nuBL7L0vl/ky4ldqK/EMFdvSC6YrX7zRq2owhwejWCoEITTpzf9QqLhZ75NEkwv2GELQC/RIwXc3WaclMgD63UiyndLwDVmGdZV3ycggva5aPJCRi90FFYeYPtdMoCFxbaqOAnyrmcbb7r9t63OI3V7CwLc=
+	t=1760955937; cv=none; b=G8EGtj4dM2s81XFhhXrVzAsC4zIw3MjBuVw/EkHxBlm5mJf7mV2CTpit2UdoIPpRbYuPryqBapA8fhUmn/87soejGL/vMemiQ3NJZOdtWGP0gkVACMkwtrvHvsfFINeAfmriS9vcB7xhlYq8YcIwWgQlx74Tt/JGFV/eIRh3coA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760955800; c=relaxed/simple;
-	bh=OxzG71sDwuES4H6I4qFPGwWEW0NNXV3gRKLkV68zpaE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PSyqSGuUkR5aIeic0UTQHy4kUt2Kc81bOTx/HUme4zOZRC4qEhOu1ntvwXUOHSCbQ/AOFwf1VIumBS85hcKvXHySTivmslgkcuGJ5i50cJ032NfcWpKcAJ+z5FQ7b27f+eMjSfe9nhfSa916ITYusmz8I2yZEkYkYWY6Ej3JGOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=XH//neKq; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1760955796;
-	bh=OxzG71sDwuES4H6I4qFPGwWEW0NNXV3gRKLkV68zpaE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XH//neKq+w5ZgmjiqKKIco53S1kTKoUN8zlzWGaHQ8eqMxEhNaqwvK724JMy91qct
-	 SqKfpex0IJtdEjSv88RB15h0kV/JycwfSC8bTA9LFfHIQZ10PQ0ES8GNIIQxrZ5snr
-	 JC939XvsPv0CDkgO+8enjSZ0MeRrXJ8axcyu5SVnYUQCPZJo4aiiXMCUE2ZvWpDXp/
-	 /crTyWIfJAIkew8Hpq8q2uyIhqben3OMy18dM0yJ/3dpAn3KiSJym0YV91fopaPvOR
-	 AEYNXvHbCVg4i4NP3th6xaoTA5npM+/tS1btPBBSuu+/OVxIOjV1hSX+EOX8JAWqT0
-	 E8WFxFyEYHcoQ==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 462D917E04DA;
-	Mon, 20 Oct 2025 12:23:15 +0200 (CEST)
-Message-ID: <82594ce7-f093-4753-b808-cd234845aed8@collabora.com>
-Date: Mon, 20 Oct 2025 12:23:14 +0200
+	s=arc-20240116; t=1760955937; c=relaxed/simple;
+	bh=CwF+yZDak0Elu4utklnJ/uFv7Gi4MxASsza7h+em8FY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ihn+GWOqlImhy6u5m49XOXBcWqHrLOJZdRhikBYc12qOogt3AwjLw9c0X7WC6kOkqdGOHg+iLE66PogmEaZMFaZAYDtnGlD2kzByVntvu+zauu8tevbvGHRzL0S2Fo2w4/L4q+ZbFgn1J6tjUQBoxZF0IJKPVavgQUxBOVNKCBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VshzGVNN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760955934;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xHVay0ecEvOk/WYTNlxi8BsqYH5mFIhmM9aH7MtmBnQ=;
+	b=VshzGVNNZHdDT4MR6DbFRrV4urweC0wqxl1zTLkfRbnWb57iBKnMl8WYILXI2T/XwrVHXI
+	73v4TYA474aKIdL7+FWkLQGSVeQ9HfouV/ERlv7NdGSQ8s5li4rPYXuu7l43iRlXOycvqY
+	63LMHquHaR9wEy6p6yzMiGQTut8D4Qs=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-655-9EuHqk8FMauWyuO8fUtciw-1; Mon, 20 Oct 2025 06:25:33 -0400
+X-MC-Unique: 9EuHqk8FMauWyuO8fUtciw-1
+X-Mimecast-MFC-AGG-ID: 9EuHqk8FMauWyuO8fUtciw_1760955932
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-6305c385adbso5915585a12.1
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 03:25:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760955932; x=1761560732;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xHVay0ecEvOk/WYTNlxi8BsqYH5mFIhmM9aH7MtmBnQ=;
+        b=Ru7Bzn1nMu2dLKW0I+jH2r8BrLmc0fQBALL2onjKm+54fCP1NfKa6czqXxjIH3Cv4J
+         DT23RXYX8NOg+427K/yH+OCclOv7jpURMB0U1M74VtOlYV0o0dBauEb1lupATYFWZKP4
+         KmmM+T2b7ofFYOZA31cceOyWVaClfmAdCpo4liAXZVHy3eFX4s+HtMC88toJ7WkzP3i6
+         d+NrEbweWqe1HTCCYXXNp5Iefzvlg08BNaWSe6Vxbr6lu0GAS/VpDpBC2oD9RLwe5dy+
+         czYBu3uLdMzghfDRg+w+CjdWJYIVpCBWfXB3QP3PK80/kZOg+RuOKB5OQDgJJsQtVwzw
+         ra7A==
+X-Forwarded-Encrypted: i=1; AJvYcCWkVaeosa3svqJBs3ahKrz+WIHttTUhVdfTctywjObNSoLvjNjRP3qaqcXBC6dNNIPVgXMK+/k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8mmj0/tup+SCrLh1AJV5YUaoYZr5yu2xkFYcCsbIh3gzDRgKp
+	ocDragLSByRlNW68do5nyMwk3YFrp/sTaHOFSXKaiz9Yn/D/Id6Ingo20EP5a76L4YW8DYXDQ/e
+	OmpFVsUbkWZ3jeBOPCVJqfqqvDNvsjGGZToXIyrGwZwmZcahTkQSg9CYbY/JomxlBPw==
+X-Gm-Gg: ASbGncs4ZBV7XA/15lLaiYpgJXcGe5xNMDtfA91kEm3+p0bUJTF/sRn3Uplw6GQnysW
+	75yDNnYoKcFYUdiJma5cJoZN/FPE0uVltK9dmfZeupa0j5EcrqeAfGwy85meT9TvQNzYs10m/2/
+	EmkuA5LvUJGm12cFZIXbT1sOoIuiElGc+gYag+0VWNBW1TO+1sXTgvLfQqvOKT6bqQs7f4eOlxG
+	8022v0BGHrOYGvi4ju4+aKfaLHsuqoYAV1J5DharDR0A8yv9Ncea/dkEG8ytRbFfZIa3BfWecG6
+	BIiOecALPiNtYx+LQr7/ydX35+xDl7RIb4BXxr5szGrIhZPEbz0BbXcdwSJhLNZfY1hsuJZoSCE
+	ER8KEa5CXYPI6XhCZ7yu6GkpSWw==
+X-Received: by 2002:a05:6402:f0f:b0:637:e94a:fb56 with SMTP id 4fb4d7f45d1cf-63c1f6da02bmr8502669a12.35.1760955931849;
+        Mon, 20 Oct 2025 03:25:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEayzUZ8wlpZv1q9uCinMJ/D3prJbd1R7i0pa57HpUHs6t7Ux8nd9I3AiX4f+8zOHehqIINiw==
+X-Received: by 2002:a05:6402:f0f:b0:637:e94a:fb56 with SMTP id 4fb4d7f45d1cf-63c1f6da02bmr8502645a12.35.1760955931347;
+        Mon, 20 Oct 2025 03:25:31 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63c49430272sm6305091a12.23.2025.10.20.03.25.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Oct 2025 03:25:30 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id B219C2E9E7C; Mon, 20 Oct 2025 12:25:29 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, ilias.apalodimas@linaro.org, lorenzo@kernel.org,
+ kuba@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com,
+ andrii@kernel.org, stfomichev@gmail.com, aleksander.lobakin@intel.com
+Subject: Re: [PATCH v2 bpf 2/2] veth: update mem type in xdp_buff
+In-Reply-To: <aPKiC0jZV6kLBvIq@boxer>
+References: <20251017143103.2620164-1-maciej.fijalkowski@intel.com>
+ <20251017143103.2620164-3-maciej.fijalkowski@intel.com>
+ <87a51pij2l.fsf@toke.dk> <aPJ0YqfH+pdSIbVS@boxer> <87347hifgh.fsf@toke.dk>
+ <87zf9pgzx2.fsf@toke.dk> <aPKiC0jZV6kLBvIq@boxer>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 20 Oct 2025 12:25:29 +0200
+Message-ID: <87wm4phnty.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/15] arm64: dts: mediatek: mt7981b-openwrt-one:
- Configure UART0 pinmux
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Sjoerd Simons <sjoerd@collabora.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- Ryder Lee <ryder.lee@mediatek.com>, Jianjun Wang
- <jianjun.wang@mediatek.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>,
- Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>, Lee Jones <lee@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- kernel@collabora.com, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
- linux-phy@lists.infradead.org, netdev@vger.kernel.org,
- Bryan Hinton <bryan@bryanhinton.com>
-References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
- <20251016-openwrt-one-network-v1-2-de259719b6f2@collabora.com>
- <aPDnT4tuSzNDzyAE@makrotopia.org>
- <5f430ff9-d701-426a-bf93-5290e6912eb4@collabora.com>
- <aPEfUBl6fMe6QYdY@makrotopia.org>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <aPEfUBl6fMe6QYdY@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Il 16/10/25 18:37, Daniel Golle ha scritto:
-> On Thu, Oct 16, 2025 at 04:29:14PM +0200, AngeloGioacchino Del Regno wrote:
->> Il 16/10/25 14:38, Daniel Golle ha scritto:
->>> On Thu, Oct 16, 2025 at 12:08:38PM +0200, Sjoerd Simons wrote:
->>>> Add explicit pinctrl configuration for UART0 on the OpenWrt One board,
->>>>
->>>> Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
->>>> ---
->>>>    arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts | 11 +++++++++++
->>>>    1 file changed, 11 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
->>>> index 968b91f55bb27..f836059d7f475 100644
->>>> --- a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
->>>> +++ b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
->>>> @@ -22,6 +22,17 @@ memory@40000000 {
->>>>    	};
->>>>    };
->>>> +&pio {
->>>> +	uart0_pins: uart0-pins {
->>>> +		mux {
->>>> +			function = "uart";
->>>> +			groups = "uart0";
->>>> +		};
->>>> +	};
->>>> +};
->>>> +
->>>>    &uart0 {
->>>> +	pinctrl-names = "default";
->>>> +	pinctrl-0 = <&uart0_pins>;
->>>>    	status = "okay";
->>>>    };
->>>
->>> As there is only a single possible pinctrl configuration for uart0,
->>> both the pinmux definition as well as the pinctrl properties should go
->>> into mt7981b.dtsi rather than in the board's dts.
->>
->> If there's really one single possible pin configuration for the UART0 pins,
->> as in, those pins *do not* have a GPIO mode, then yes I agree.
->>
->> If those pins can be as well configured as GPIOs, this goes to board DTS.
-> 
-> I respectfully disagree and will explain below.
-> 
+Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
 
-Thanks a lot for taking the time to write all this - explains everything,
-and even too much :) :)
+> On Fri, Oct 17, 2025 at 08:12:57PM +0200, Toke H=C3=B8iland-J=C3=B8rgense=
+n wrote:
+>> Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
+>>=20
+>> > Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
+>> >
+>> >> On Fri, Oct 17, 2025 at 06:33:54PM +0200, Toke H=C3=B8iland-J=C3=B8rg=
+ensen wrote:
+>> >>> Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
+>> >>>=20
+>> >>> > Veth calls skb_pp_cow_data() which makes the underlying memory to
+>> >>> > originate from system page_pool. For CONFIG_DEBUG_VM=3Dy and XDP p=
+rogram
+>> >>> > that uses bpf_xdp_adjust_tail(), following splat was observed:
+>> >>> >
+>> >>> > [   32.204881] BUG: Bad page state in process test_progs  pfn:11c9=
+8b
+>> >>> > [   32.207167] page: refcount:0 mapcount:0 mapping:000000000000000=
+0 index:0x0 pfn:0x11c98b
+>> >>> > [   32.210084] flags: 0x1fffe0000000000(node=3D0|zone=3D1|lastcpup=
+id=3D0x7fff)
+>> >>> > [   32.212493] raw: 01fffe0000000000 dead000000000040 ff11000123c9=
+b000 0000000000000000
+>> >>> > [   32.218056] raw: 0000000000000000 0000000000000001 00000000ffff=
+ffff 0000000000000000
+>> >>> > [   32.220900] page dumped because: page_pool leak
+>> >>> > [   32.222636] Modules linked in: bpf_testmod(O) bpf_preload
+>> >>> > [   32.224632] CPU: 6 UID: 0 PID: 3612 Comm: test_progs Tainted: G=
+ O        6.17.0-rc5-gfec474d29325 #6969 PREEMPT
+>> >>> > [   32.224638] Tainted: [O]=3DOOT_MODULE
+>> >>> > [   32.224639] Hardware name: QEMU Standard PC (i440FX + PIIX, 199=
+6), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+>> >>> > [   32.224641] Call Trace:
+>> >>> > [   32.224644]  <IRQ>
+>> >>> > [   32.224646]  dump_stack_lvl+0x4b/0x70
+>> >>> > [   32.224653]  bad_page.cold+0xbd/0xe0
+>> >>> > [   32.224657]  __free_frozen_pages+0x838/0x10b0
+>> >>> > [   32.224660]  ? skb_pp_cow_data+0x782/0xc30
+>> >>> > [   32.224665]  bpf_xdp_shrink_data+0x221/0x530
+>> >>> > [   32.224668]  ? skb_pp_cow_data+0x6d1/0xc30
+>> >>> > [   32.224671]  bpf_xdp_adjust_tail+0x598/0x810
+>> >>> > [   32.224673]  ? xsk_destruct_skb+0x321/0x800
+>> >>> > [   32.224678]  bpf_prog_004ac6bb21de57a7_xsk_xdp_adjust_tail+0x52=
+/0xd6
+>> >>> > [   32.224681]  veth_xdp_rcv_skb+0x45d/0x15a0
+>> >>> > [   32.224684]  ? get_stack_info_noinstr+0x16/0xe0
+>> >>> > [   32.224688]  ? veth_set_channels+0x920/0x920
+>> >>> > [   32.224691]  ? get_stack_info+0x2f/0x80
+>> >>> > [   32.224693]  ? unwind_next_frame+0x3af/0x1df0
+>> >>> > [   32.224697]  veth_xdp_rcv.constprop.0+0x38a/0xbe0
+>> >>> > [   32.224700]  ? common_startup_64+0x13e/0x148
+>> >>> > [   32.224703]  ? veth_xdp_rcv_one+0xcd0/0xcd0
+>> >>> > [   32.224706]  ? stack_trace_save+0x84/0xa0
+>> >>> > [   32.224709]  ? stack_depot_save_flags+0x28/0x820
+>> >>> > [   32.224713]  ? __resched_curr.constprop.0+0x332/0x3b0
+>> >>> > [   32.224716]  ? timerqueue_add+0x217/0x320
+>> >>> > [   32.224719]  veth_poll+0x115/0x5e0
+>> >>> > [   32.224722]  ? veth_xdp_rcv.constprop.0+0xbe0/0xbe0
+>> >>> > [   32.224726]  ? update_load_avg+0x1cb/0x12d0
+>> >>> > [   32.224730]  ? update_cfs_group+0x121/0x2c0
+>> >>> > [   32.224733]  __napi_poll+0xa0/0x420
+>> >>> > [   32.224736]  net_rx_action+0x901/0xe90
+>> >>> > [   32.224740]  ? run_backlog_napi+0x50/0x50
+>> >>> > [   32.224743]  ? clockevents_program_event+0x1cc/0x280
+>> >>> > [   32.224746]  ? hrtimer_interrupt+0x31e/0x7c0
+>> >>> > [   32.224749]  handle_softirqs+0x151/0x430
+>> >>> > [   32.224752]  do_softirq+0x3f/0x60
+>> >>> > [   32.224755]  </IRQ>
+>> >>> >
+>> >>> > It's because xdp_rxq with mem model set to MEM_TYPE_PAGE_SHARED wa=
+s used
+>> >>> > when initializing xdp_buff.
+>> >>> >
+>> >>> > Fix this by using new helper xdp_convert_skb_to_buff() that, besid=
+es
+>> >>> > init/prepare xdp_buff, will check if page used for linear part of
+>> >>> > xdp_buff comes from page_pool. We assume that linear data and frag=
+s will
+>> >>> > have same memory provider as currently XDP API does not provide us=
+ a way
+>> >>> > to distinguish it (the mem model is registered for *whole* Rx queu=
+e and
+>> >>> > here we speak about single buffer granularity).
+>> >>> >
+>> >>> > In order to meet expected skb layout by new helper, pull the mac h=
+eader
+>> >>> > before conversion from skb to xdp_buff.
+>> >>> >
+>> >>> > However, that is not enough as before releasing xdp_buff out of ve=
+th via
+>> >>> > XDP_{TX,REDIRECT}, mem type on xdp_rxq associated with xdp_buff is
+>> >>> > restored to its original model. We need to respect previous settin=
+g at
+>> >>> > least until buff is converted to frame, as frame carries the mem_t=
+ype.
+>> >>> > Add a page_pool variant of veth_xdp_get() so that we avoid refcount
+>> >>> > underflow when draining page frag.
+>> >>> >
+>> >>> > Fixes: 0ebab78cbcbf ("net: veth: add page_pool for page recycling")
+>> >>> > Reported-by: Alexei Starovoitov <ast@kernel.org>
+>> >>> > Closes: https://lore.kernel.org/bpf/CAADnVQ+bBofJDfieyOYzSmSujSfJw=
+DTQhiz3aJw7hE+4E2_iPA@mail.gmail.com/
+>> >>> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+>> >>> > ---
+>> >>> >  drivers/net/veth.c | 43 +++++++++++++++++++++++++++--------------=
+--
+>> >>> >  1 file changed, 27 insertions(+), 16 deletions(-)
+>> >>> >
+>> >>> > diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+>> >>> > index a3046142cb8e..eeeee7bba685 100644
+>> >>> > --- a/drivers/net/veth.c
+>> >>> > +++ b/drivers/net/veth.c
+>> >>> > @@ -733,7 +733,7 @@ static void veth_xdp_rcv_bulk_skb(struct veth_=
+rq *rq, void **frames,
+>> >>> >  	}
+>> >>> >  }
+>> >>> >=20=20
+>> >>> > -static void veth_xdp_get(struct xdp_buff *xdp)
+>> >>> > +static void veth_xdp_get_shared(struct xdp_buff *xdp)
+>> >>> >  {
+>> >>> >  	struct skb_shared_info *sinfo =3D xdp_get_shared_info_from_buff(=
+xdp);
+>> >>> >  	int i;
+>> >>> > @@ -746,12 +746,33 @@ static void veth_xdp_get(struct xdp_buff *xd=
+p)
+>> >>> >  		__skb_frag_ref(&sinfo->frags[i]);
+>> >>> >  }
+>> >>> >=20=20
+>> >>> > +static void veth_xdp_get_pp(struct xdp_buff *xdp)
+>> >>> > +{
+>> >>> > +	struct skb_shared_info *sinfo =3D xdp_get_shared_info_from_buff(=
+xdp);
+>> >>> > +	int i;
+>> >>> > +
+>> >>> > +	page_pool_ref_page(virt_to_page(xdp->data));
+>> >>> > +	if (likely(!xdp_buff_has_frags(xdp)))
+>> >>> > +		return;
+>> >>> > +
+>> >>> > +	for (i =3D 0; i < sinfo->nr_frags; i++) {
+>> >>> > +		skb_frag_t *frag =3D &sinfo->frags[i];
+>> >>> > +
+>> >>> > +		page_pool_ref_page(netmem_to_page(frag->netmem));
+>> >>> > +	}
+>> >>> > +}
+>> >>> > +
+>> >>> > +static void veth_xdp_get(struct xdp_buff *xdp)
+>> >>> > +{
+>> >>> > +	xdp->rxq->mem.type =3D=3D MEM_TYPE_PAGE_POOL ?
+>> >>> > +		veth_xdp_get_pp(xdp) : veth_xdp_get_shared(xdp);
+>> >>> > +}
+>> >>> > +
+>> >>> >  static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
+>> >>> >  					struct xdp_buff *xdp,
+>> >>> >  					struct sk_buff **pskb)
+>> >>> >  {
+>> >>> >  	struct sk_buff *skb =3D *pskb;
+>> >>> > -	u32 frame_sz;
+>> >>> >=20=20
+>> >>> >  	if (skb_shared(skb) || skb_head_is_locked(skb) ||
+>> >>> >  	    skb_shinfo(skb)->nr_frags ||
+>> >>> > @@ -762,19 +783,9 @@ static int veth_convert_skb_to_xdp_buff(struc=
+t veth_rq *rq,
+>> >>> >  		skb =3D *pskb;
+>> >>> >  	}
+>> >>> >=20=20
+>> >>> > -	/* SKB "head" area always have tailroom for skb_shared_info */
+>> >>> > -	frame_sz =3D skb_end_pointer(skb) - skb->head;
+>> >>> > -	frame_sz +=3D SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+>> >>> > -	xdp_init_buff(xdp, frame_sz, &rq->xdp_rxq);
+>> >>> > -	xdp_prepare_buff(xdp, skb->head, skb_headroom(skb),
+>> >>> > -			 skb_headlen(skb), true);
+>> >>> > +	__skb_pull(*pskb, skb->data - skb_mac_header(skb));
+>> >>>=20
+>> >>> veth_xdp_rcv_skb() does:
+>> >>>=20
+>> >>> 	__skb_push(skb, skb->data - skb_mac_header(skb));
+>> >>> 	if (veth_convert_skb_to_xdp_buff(rq, xdp, &skb))
+>> >>>=20
+>> >>> so how about just getting rid of that push instead of doing the oppo=
+site
+>> >>> pull straight after? :)
+>> >>
+>> >> Hi Toke,
+>> >>
+>> >> I believe this is done so we get a proper headroom representation whi=
+ch is
+>> >> needed for XDP_PACKET_HEADROOM comparison. Maybe we could be smarter =
+here
+>> >> and for example subtract mac header length? However I wanted to prese=
+rve
+>> >> old behavior.
+>> >
+>> > Yeah, basically what we want is to check if the mac_header offset is
+>> > larger than the headroom. So the check could just be:
+>> >
+>> >     skb->mac_header < XDP_PACKET_HEADROOM
+>> >
+>> > however, it may be better to use the helper? Since that makes sure we
+>> > keep hitting the DEBUG_NET_WARN_ON_ONCE inside the helper... So:
+>> >
+>> >     skb_mac_header(skb) - skb->head < XDP_PACKET_HEADROOM
+>> >
+>> > or, equivalently:
+>> >
+>> >     skb_headroom(skb) - skb_mac_offset(skb) < XDP_PACKET_HEADROOM
+>> >
+>> > I think the first one is probably more readable, since skb_mac_offset()
+>> > is negative here, so the calculation looks off...
+>>=20
+>> Wait, veth_xdp_rcv_skb() calls skb_reset_mac_header() further down, so
+>> it expects skb->data to point to the mac header. So getting rid of the
+>
+> Oof. Correct.
+>
+>> __skb_push() is not a good idea; but neither is doing the __skb_pull() as
+>> your patch does currently.
+>>=20
+>> How about just making xdp_convert_skb_to_buff() agnostic to where
+>> skb->data is?
+>>=20
+>> 	headroom =3D skb_mac_header(skb) - skb->head;
+>>         data_len =3D skb->data + skb->len - skb_mac_header(skb);
+>
+> could we just use skb->tail - skb_mac_header(skb) here?
 
-Though, there's something funny here! The following snippet of "main" text
-does explain stuff that is interesting, but that I (not other people, so
-thanks again for saying all this) know already, but.....
+Yeah, guess so. Tail is a length, though, so that would be
+skb_tail_pointer(skb) - skb_mac_header(skb)
 
-> All pinmux pins on the MediaTek platform also allow being configured as
-> GPIOs. However, if you configure those as GPIOs the consequence is that
-> you cannot use UART0 any more at all. So using UART0 at all always
-> implies using exactly those pins, there is no alternative to that.
-> 
-> Hence every board with every possible uses of pins 32 and 33 (there is
-> only RX and TX for UART0, RTS/CTS flow-control is not possible) can be
-> represented without needing to configure the pinctrl for uart0 on the
-> board level. There isn't going to be any variation on the board-level
-> when it comes to uart0. Either it is enabled (status = "okay";), and
-> that will always imply using the 'uart0' group in mode 'uart', or, in
-> case any of the two pins of uart0 is used for something else that means
-> uart0 cannot be enabled. Simple as that.
-> 
-> Hence there is no need to duplicate that pinctrl settings on each and
-> every board, as controlling the 'status' property on the board-level
-> already gives 100% freedom.
-> 
+> anyways, i'm gonna try out your suggestion on weekend or on monday and
+> will send a v3. maybe input from someone else in different time zones will
+> land in by tomorrow. thanks again:)
 
-...all of this is not justifying your point.
+Cool!
 
-> (Sidenote: As even the BootROM already uses those two pins as UART for
-> debug output,
-
-Funny thing is, your side note is what *fully* justifies your disagreement
-and it's also what triggers me to say that you're right, lol :)
-
-Okay then, I am fine with this commit now and I can renew my
-
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-
-Cheers!
-Angelo
-
-> it is very unlikely that anyone would actually use them
-> for anything else in production. Apart from being used as GPIOs you can
-> also use pins 32 and 33 as an I2C target for external debug access to the
-> registers of either the sgmii0_phy, sgmii1_phy or u3_phy. However, that
-> doesn't matter in terms of the debate above, as the crucial point there
-> is that using uart0 always implies using group 'uart0' in 'uart' mode.)
-
+-Toke
 
 
