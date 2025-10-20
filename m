@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-230863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2872BF0B69
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 13:03:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9515BBF0BBA
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 13:07:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CC52189E29E
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 11:03:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4320A1894582
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 11:08:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54C829D270;
-	Mon, 20 Oct 2025 11:03:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB3EF2F6587;
+	Mon, 20 Oct 2025 11:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
 	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ddZS/Sn9"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C9C25A2B5;
-	Mon, 20 Oct 2025 11:02:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609EA230BCB;
+	Mon, 20 Oct 2025 11:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760958181; cv=none; b=t8DRKhcPsI1Jn1DjwcHq5EZ5epHiqjuB6LyiUjJtzyqxhwqAGUhXNjoaQeDQuoDoTQcb//5odHsKj0dt4a5fW/JFhmIh+9BR+4RqZKNCuevo8KZB6qG9YwlvAv9MioFOwvBeYoVazSwD8mNmIlqy4Gu0jGDUO6tDrCn369Xy6ZM=
+	t=1760958460; cv=none; b=QZYT2gekgoI0qeKjF0PlXNJ8QlZmqPJfmlghBWrz0PZnhaULz2umgSUp0YrGBIvmFkqPcAKY4g9xCaw4GiFpmrBa1gSdGpTp8rDqdQrQ40ZVChT2H5KgIqQFrjUl3gKu46F7NtVy6xOseoTn0c1EfmA6HAz71duuIHpRkVqzwyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760958181; c=relaxed/simple;
+	s=arc-20240116; t=1760958460; c=relaxed/simple;
 	bh=37JXeaabSnQEBCgvzFMhmKS7+aCd6QldkTzU3wu9728=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=to9ygj4nBqgXzbkxEMuNusN97wGuatazBAo8gY0jQKhkWYpa02AAUu0FmnljSvv9Q6SMD6yole+Mgz2S8mXSeITo/EyJM6XQb5vEuR5A+3CzZBrE2cW7licxYOHZT9INTbiI3hmH4sNhcA52pfV8+2anNkjA4cqutw1sMvEj5/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ddZS/Sn9; arc=none smtp.client-ip=113.46.200.222
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JDz5539/l9MfZR+VER+Ot2KfvvqcCCPQJhpAw5dSb+Vxt3QD7CGXBNaz5jhFErFoLg+nO+cgj/X94P0TZPNBqc/A9hocXN3S4yROLYmoCW+XOKG3UNS6ToO34GANwhrEsAFTGM3E5Gq5ia7z9Z+zBn0V2b/BBklushiu6I3nxQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ddZS/Sn9; arc=none smtp.client-ip=113.46.200.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
@@ -37,27 +37,27 @@ dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	b=ddZS/Sn9zzzc8Kf5fxuDeSAb2exjusBlWN7RobWM674HE7ExtsIcj3uJw6wB3xYX/wTy7PhQg
 	DxAj9XoxB911hHx53WA7FFF8Qbjhxm6jMqsc7aYXBU4upkKMFUNyWMsZyHF2WIwI3kBGYtxFTs1
 	sfgFUoJN6tXSYbRFG/Hth3g=
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4cqsvr6CF4zLlVc;
-	Mon, 20 Oct 2025 19:02:32 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4cqt0Y5NBcz1T4Jx;
+	Mon, 20 Oct 2025 19:06:37 +0800 (CST)
 Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id 484B61400CB;
-	Mon, 20 Oct 2025 19:02:56 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 467EE180491;
+	Mon, 20 Oct 2025 19:07:29 +0800 (CST)
 Received: from huawei.com (10.50.85.128) by dggpemf500016.china.huawei.com
  (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 20 Oct
- 2025 19:02:55 +0800
+ 2025 19:07:28 +0800
 From: Wang Liang <wangliang74@huawei.com>
-To: <syzbot+999eb23467f83f9bf9bf@syzkaller.appspotmail.com>
+To: <syzbot+3df59a64502c71cab3d5@syzkaller.appspotmail.com>
 CC: <syzkaller-bugs@googlegroups.com>, <steffen.klassert@secunet.com>,
 	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <edumazet@google.com>,
 	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
 	<wangliang74@huawei.com>
-Subject: [PATCH net] Re: [syzbot] [net?] WARNING in xfrm_state_fini (4)
-Date: Mon, 20 Oct 2025 19:25:53 +0800
-Message-ID: <20251020112553.2345296-1-wangliang74@huawei.com>
+Subject: [PATCH net] Re: [syzbot] [net?] WARNING in xfrm6_tunnel_net_exit (4)
+Date: Mon, 20 Oct 2025 19:30:26 +0800
+Message-ID: <20251020113026.2461281-1-wangliang74@huawei.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
