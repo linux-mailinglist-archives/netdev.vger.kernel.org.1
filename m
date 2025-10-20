@@ -1,60 +1,69 @@
-Return-Path: <netdev+bounces-230861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98755BF0A7A
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:48:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CCFABF0B59
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 13:02:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3302D3E81AA
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 10:48:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9E1C3B300F
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 11:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97A992459F8;
-	Mon, 20 Oct 2025 10:48:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="vWN4iWE3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED753259CA7;
+	Mon, 20 Oct 2025 11:02:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6070B1C2334;
-	Mon, 20 Oct 2025 10:48:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE22156236;
+	Mon, 20 Oct 2025 11:02:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760957302; cv=none; b=DYnC8KgwSjRW5U1c/fa8lW21TygcPd/QQn6DxZo9PDfiIucqwwx6ioqLCBg+Hh1uUnL5ajxP42GezOihHo+oHn1H2lVUf7D5MC8dDS6/B23Ov3Vf7vUcZHawxfbAlNSRwhrkKZXG111RiONtzm5qLdFs4BS+2YBgcyO1JvoE1vI=
+	t=1760958147; cv=none; b=DXbwWFfDpjuiLJl+rSS0a01vGLf14ydiXcQduw+frykdKEHSGV/S79QWAO0e+7G6iVgK10+p2GKAwDr+Xgo/QpnH942FnfkdVajZjEaCfuYWQAeDMQbwKPhTVyfsOxhF8lojFTMNOTy12bbPf6lzREO14SwnjqjQf2uLTqKsA+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760957302; c=relaxed/simple;
-	bh=R/XOimWAWa2N4HyOQsjFOKp4+nAIIkzSLl05o6cSXs4=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hsLjDwmN1w9mgl9DqDnInJvGdFtIaJ/ei7bhNOPmIZAKvHYYp0HSB7Ap0zblYRa58eaV69es3Ji/sfCFFA2IXES7jGGqNIN6gstVZYGIGZu9kAx+F0ZItarrGdhKftrezXrgFCM4b0oGV7x/Ot9P8ZzimA3HN6xl7o1mLKuBDMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=vWN4iWE3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AE9DC4CEF9;
-	Mon, 20 Oct 2025 10:48:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1760957302;
-	bh=R/XOimWAWa2N4HyOQsjFOKp4+nAIIkzSLl05o6cSXs4=;
-	h=Date:From:To:Subject:References:In-Reply-To:From;
-	b=vWN4iWE3M66SXFxNO2sCX+65HkRG/M+0Du4uXfg0EIPmcsDlVA+wgPGnfCFDFO7lb
-	 LxvUJ4Nb3tKpmfcYc9hOwazXKSBIt9iIcVKUHk+LnlVfTbJnZ+duSsSZ5KT4CVQyCF
-	 uBWyXoDtfB3iVt+7Pnrivb9FxwDtSBdktK83vrZg=
-Date: Mon, 20 Oct 2025 12:48:18 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Oliver Neukum <oneukum@suse.com>, Michal Pecio <michal.pecio@gmail.com>,
-	Alan Stern <stern@rowland.harvard.edu>, yicongsrfy@163.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	oliver@neukum.org, pabeni@redhat.com
-Subject: Re: [PATCH net v5 2/3] net: usb: ax88179_178a: add USB device driver
- for config selection
-Message-ID: <2025102007-garland-splendid-abc9@gregkh>
-References: <20251013110753.0f640774.michal.pecio@gmail.com>
- <20251017024229.1959295-1-yicongsrfy@163.com>
- <db3db4c6-d019-49d0-92ad-96427341589c@rowland.harvard.edu>
- <20251017191511.6dd841e9.michal.pecio@gmail.com>
- <bda50568-a05d-4241-adbe-18efb2251d6e@rowland.harvard.edu>
- <20251018172156.69e93897.michal.pecio@gmail.com>
- <2fae9966-5e3a-488b-8ab5-51d46488e097@suse.com>
+	s=arc-20240116; t=1760958147; c=relaxed/simple;
+	bh=97MHgTGoIdfNRsIhMVNAs3S+pxC+Qx4D00c17a5Yzfk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qRmbMX/QEtMx2kxf4cMvSVRG3nzWM9BhuJBPWGpYTcofhDe16hnamdhq1VA0T3SDHJhWG54zqxE2TqxeHxZNAmavW+XrpSgBFYklP4OgixDT0hQAix8A57prI2QvexAiVqapDh+ZFLiHIzZMjoBBemlBY1fGetaEHAXTU7UKPLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
+Received: from localhost (unknown [116.232.147.23])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: dlan)
+	by smtp.gentoo.org (Postfix) with ESMTPSA id EF5D9341EEB;
+	Mon, 20 Oct 2025 11:02:23 +0000 (UTC)
+Date: Mon, 20 Oct 2025 19:02:19 +0800
+From: Yixun Lan <dlan@gentoo.org>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Han Gao <rabenda.cn@gmail.com>, Icenowy Zheng <uwu@icenowy.me>,
+	Vivian Wang <wangruikang@iscas.ac.cn>, Yao Zi <ziyao@disroot.org>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	sophgo@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH v2 3/3] net: stmmac: dwmac-sophgo: Add phy interface
+ filter
+Message-ID: <20251020110219-GYH1506524@gentoo.org>
+References: <20251020095500.1330057-1-inochiama@gmail.com>
+ <20251020095500.1330057-4-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,39 +72,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2fae9966-5e3a-488b-8ab5-51d46488e097@suse.com>
+In-Reply-To: <20251020095500.1330057-4-inochiama@gmail.com>
 
-On Mon, Oct 20, 2025 at 11:59:06AM +0200, Oliver Neukum wrote:
-> On 18.10.25 17:21, Michal Pecio wrote:
+Hi Inochi,
+
+On 17:54 Mon 20 Oct     , Inochi Amaoto wrote:
+> As the SG2042 has an internal rx delay, the delay should be remove
+missed my comment in v1?
+
+> when init the mac, otherwise the phy will be misconfigurated.
 > 
-> > index e85105939af8..1d2c5ebc81ab 100644
-> > --- a/include/linux/usb.h
-> > +++ b/include/linux/usb.h
-> > @@ -1202,6 +1202,8 @@ extern ssize_t usb_show_dynids(struct usb_dynids *dynids, char *buf);
-> >    * @post_reset: Called by usb_reset_device() after the device
-> >    *	has been reset
-> >    * @shutdown: Called at shut-down time to quiesce the device.
-> > + * @preferred: Check if this driver is preferred over generic class drivers
-> > + *	applicable to the device. May probe device with control transfers.
-> >    * @id_table: USB drivers use ID table to support hotplugging.
-> >    *	Export this with MODULE_DEVICE_TABLE(usb,...).  This must be set
-> >    *	or your driver's probe function will never get called.
-> > @@ -1255,6 +1257,8 @@ struct usb_driver {
-> >   	void (*shutdown)(struct usb_interface *intf);
-> > +	bool (*preferred)(struct usb_device *udev);
+> Fixes: 543009e2d4cd ("net: stmmac: dwmac-sophgo: Add support for Sophgo SG2042 SoC")
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> Tested-by: Han Gao <rabenda.cn@gmail.com>
+> ---
+>  .../net/ethernet/stmicro/stmmac/dwmac-sophgo.c  | 17 ++++++++++++++++-
+>  1 file changed, 16 insertions(+), 1 deletion(-)
 > 
-> I am sorry, but this is a bit clunky. If you really want to
-> introduce such a method, why not just return the preferred configuration?
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+> index 3b7947a7a7ba..960357d6e282 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+> @@ -7,11 +7,16 @@
+> 
+>  #include <linux/clk.h>
+>  #include <linux/module.h>
+> +#include <linux/property.h>
+>  #include <linux/mod_devicetable.h>
+>  #include <linux/platform_device.h>
+> 
+>  #include "stmmac_platform.h"
+> 
+> +struct sophgo_dwmac_data {
+> +	bool has_internal_rx_delay;
+> +};
+> +
+>  static int sophgo_sg2044_dwmac_init(struct platform_device *pdev,
+>  				    struct plat_stmmacenet_data *plat_dat,
+>  				    struct stmmac_resources *stmmac_res)
+> @@ -32,6 +37,7 @@ static int sophgo_sg2044_dwmac_init(struct platform_device *pdev,
+>  static int sophgo_dwmac_probe(struct platform_device *pdev)
+>  {
+>  	struct plat_stmmacenet_data *plat_dat;
+> +	const struct sophgo_dwmac_data *data;
+>  	struct stmmac_resources stmmac_res;
+>  	struct device *dev = &pdev->dev;
+>  	int ret;
+> @@ -50,11 +56,20 @@ static int sophgo_dwmac_probe(struct platform_device *pdev)
+>  	if (ret)
+>  		return ret;
+> 
+> +	data = device_get_match_data(&pdev->dev);
+> +	if (data && data->has_internal_rx_delay)
+> +		plat_dat->phy_interface = phy_fix_phy_mode_for_mac_delays(plat_dat->phy_interface,
+> +									  false, true);
+> +
+>  	return stmmac_dvr_probe(dev, plat_dat, &stmmac_res);
+>  }
+> 
+> +static struct sophgo_dwmac_data sg2042_dwmac_data = {
+static const?
+> +	.has_internal_rx_delay = true,
+> +};
+> +
+>  static const struct of_device_id sophgo_dwmac_match[] = {
+> -	{ .compatible = "sophgo,sg2042-dwmac" },
+> +	{ .compatible = "sophgo,sg2042-dwmac", .data = &sg2042_dwmac_data },
+>  	{ .compatible = "sophgo,sg2044-dwmac" },
+>  	{ /* sentinel */ }
+>  };
+> --
+> 2.51.1.dirty
+> 
 
-And note, this idea has come up many many times over the past 25 years,
-ever since we first added USB support to Linux.  In the end, it was
-always deemed "not going to work" for a variety of real-world reasons.
-
-I suggest reviewing the archives of the mailing list and then, if this
-series is resent, documenting why this attempt is different than the
-others and why it will now work properly.
-
-thanks,
-
-greg k-h
+-- 
+Yixun Lan (dlan)
 
