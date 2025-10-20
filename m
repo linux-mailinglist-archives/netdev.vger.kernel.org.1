@@ -1,135 +1,126 @@
-Return-Path: <netdev+bounces-230885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-230886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C5D3BF122A
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:23:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC248BF121B
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 14:22:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3245B423829
-	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:19:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B4E818966CC
+	for <lists+netdev@lfdr.de>; Mon, 20 Oct 2025 12:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48EE83164A4;
-	Mon, 20 Oct 2025 12:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4B12F83AA;
+	Mon, 20 Oct 2025 12:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="ED+T8UAU";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="T4U+6ceh"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3009A3128AB;
-	Mon, 20 Oct 2025 12:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6E5228CB8;
+	Mon, 20 Oct 2025 12:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760962703; cv=none; b=tzG4zTt14ppgQCessZK/uQYCH00hfDfILU2qUSXshyN7xTmL8al5wqDlAKVmxg3O7Y2oq8bPW0ETkqhMkgoYle/AGWubtT77UFIub/aw2N6qvlvoFsZjnxs50e6juPySSuKhRDj39pOMd+dRWYqc19hKvH7DZwkeGUrgm2jl9sw=
+	t=1760962814; cv=none; b=e27V5x8jyvv718+GzsGGEZCrAOg5u/JlgNwGxFZnLnCQ67+JlwWbHlUkDc/pFFGckb5voEqSlAcu5lCSNy/B0g5sl3n93nvSvBl4rZTzdzLBF3oro0bYRLC8HzIRsj+F65isPNub2lFUNKrgAuBF9Za50xmWcRH/0ZFVhfYPx8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760962703; c=relaxed/simple;
-	bh=80FbDkBe1shvB1vnoWDwQhn8pRsa4OW0LHoxQpVfERE=;
+	s=arc-20240116; t=1760962814; c=relaxed/simple;
+	bh=0EcbDveXf0J+xVodzGLLy9+lLNXsm0t/s0zfqzuvq3w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MYBE2vrklGToIXhcTHGqreRkJ+kEpEhLNp8C4I9brv8/3oA1A5W/8JhFSu6nPChDlGxJhJsIVLuGRI/TfgGMWyUlhG5YSFbIYjws2MgEzf39uvz45m6fpkK8IkxFzj1yt+ZQ8u63POFkyUEotQyZRaCRxMbgzkTI4fxARbVroTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vAopx-000000003X8-401e;
-	Mon, 20 Oct 2025 12:18:06 +0000
-Date: Mon, 20 Oct 2025 13:17:57 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Sjoerd Simons <sjoerd@collabora.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Ryder Lee <ryder.lee@mediatek.com>,
-	Jianjun Wang <jianjun.wang@mediatek.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	kernel@collabora.com, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
-	linux-phy@lists.infradead.org, netdev@vger.kernel.org,
-	Bryan Hinton <bryan@bryanhinton.com>
-Subject: Re: [PATCH 10/15] arm64: dts: mediatek: mt7981b: Add Ethernet and
- WiFi offload support
-Message-ID: <aPYodR5N89vRUyQp@makrotopia.org>
-References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
- <20251016-openwrt-one-network-v1-10-de259719b6f2@collabora.com>
- <aPEhiVdgkVLvF9Et@makrotopia.org>
- <8a637fc2-7768-4816-bb4f-3af2e32908e4@collabora.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EwUdOcFCGLLXf/EL9SUHkQNpAMhibl9dKXpTqUv2Ddylw1BNgpwlyDa9NgPxUTVdntlScj2XBuvbllSBwsjhIIdNHzT0aWoz+CQC7yAD80WtpW35psjJFUT9TrqoUS4BI79QaehRRoIXoOCf8CZaIYwvx1SKooAXoZHBDLFxV6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=ED+T8UAU; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=T4U+6ceh; arc=none smtp.client-ip=202.12.124.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id 99F201D000CA;
+	Mon, 20 Oct 2025 08:20:08 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Mon, 20 Oct 2025 08:20:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1760962808; x=
+	1761049208; bh=PKh5Wl/ZPsV5XtmPQ2Ms9jV5CN2xEptRs8u2MKhw23w=; b=E
+	D+T8UAUrWD/x+DVDvC7EPYajI2dDyiz8AkSko8OAln+UykMgPt5fuYLoDsSGJKnT
+	+Ejh3hxbvRzhOKZQiAfyxUckcJf/no1mk0kLFS0fghox/T9Nz5un70SSftYmK5U1
+	8kIFZSS/KpDjSYt68B8FQRfO7uTxLymuoV1LmFN+1cvwW2mqs0unYUOyCGqWroa6
+	LBLJm7Jk6lKQ5xDG0iAbzwd/8e3e8ZMwKuYaY/4UHLusfYAT/9s7kdx3THQOtJHj
+	mcxGR8PnnmqziDkjbAs1v7lKha1pUeV/55ex757mzEMrOkv6ObxPu95Fud6dPZwj
+	fiZ2kwl2kbUK3lkJEbZGw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1760962808; x=1761049208; bh=PKh5Wl/ZPsV5XtmPQ2Ms9jV5CN2xEptRs8u
+	2MKhw23w=; b=T4U+6cehyaccwKMCqqOUlBYyN8zJMWoETTrERIJ1CPSL8qRnEqb
+	BETIBGkcpLZ8pCYF+ZX0C2ca1drFF8HO3qCEAJvmidUCc6+z444yBYYd8ziZuVFO
+	cI7yDGQ9DY/apJn/sY1rsrWJkdYkIdJeVmQvgPik3b67JSRcbCglgD5vKJKne6of
+	swmO/tAZQkDra9S22VvFRTPK1+cMNVsLZTv8X2KzOM8T2Vanrt4jTTM/Q3uVlEIq
+	PA6eQt7O6YvP1Bga39H21dbskmQMA/7TJ5f1lFQCzVodYNHAix9qYctdFKown0D3
+	iXzkkk3QNUxCuG4jtSMYmN2B4CTmL9QbTeA==
+X-ME-Sender: <xms:9ij2aNwfEnVUSNuIL8lzOUEZdlbWFQfhx6f0e56gkcXCjAzR8KR7VQ>
+    <xme:9ij2aHpNXM-VRKiqdQFq7H64cnFN0CJBX244RUE45bdIRGgpzsvTY3zNV-KuVrhEE
+    RBqZDbcAFCC7uQqEwKzAbcr5Zk33MyxPiHIjSXxazLotPaXLLAFdw>
+X-ME-Received: <xmr:9ij2aNc4Jx0PL3XpP5TWOiHDCznpPmZ6C8AGZDxVNRtm69SBzMZKh_V25glO>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddufeejkedtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfetffeffefghedvvefhjeejvdek
+    feelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
+    nhgvthdpnhgspghrtghpthhtohepudegpdhmohguvgepshhmthhpohhuthdprhgtphhtth
+    hopeifrghnghhlihgrnhhgjeegsehhuhgrfigvihdrtghomhdprhgtphhtthhopehshiii
+    sghothdoleellegvsgdvfeegieejfhekfehflegsfhelsghfsehshiiikhgrlhhlvghrrd
+    grphhpshhpohhtmhgrihhlrdgtohhmpdhrtghpthhtohepshihiihkrghllhgvrhdqsghu
+    ghhssehgohhoghhlvghgrhhouhhpshdrtghomhdprhgtphhtthhopehsthgvfhhfvghnrd
+    hklhgrshhsvghrthesshgvtghunhgvthdrtghomhdprhgtphhtthhopehhvghrsggvrhht
+    sehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepuggrvhgvmhesug
+    grvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgv
+    rdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    hprggsvghnihesrhgvughhrghtrdgtohhm
+X-ME-Proxy: <xmx:9ij2aKqBX5ou8PP1r3YJsseRT_Ld4TIzT2jxg2Cpnis6sv2BKodRQQ>
+    <xmx:9ij2aHn2CxLSybvvPZLEb7BKtP8VepZbo_-gF9HSz2Ed_Yk4Z8d6kw>
+    <xmx:9ij2aLQav8c31lXf1exrMOs4-etGTUsPTatDDrecmTzptzPUnXxfdQ>
+    <xmx:9ij2aNaGL9WWSgPgI7bCcV53D0Ot8ISBA-HDJPPovXDN7r3Nl2yi_Q>
+    <xmx:-Cj2aI4Mcir2SaysmhdY1HLuneWvudHYWTNBtIRExGkKQekcNPkgBHDh>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 20 Oct 2025 08:20:05 -0400 (EDT)
+Date: Mon, 20 Oct 2025 14:20:03 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: syzbot+999eb23467f83f9bf9bf@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com, steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
+	zhangchangzhong@huawei.com
+Subject: Re: [PATCH net] Re: [syzbot] [net?] WARNING in xfrm_state_fini (4)
+Message-ID: <aPYo8wGLna44_57b@krikkit>
+References: <20251020112553.2345296-1-wangliang74@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8a637fc2-7768-4816-bb4f-3af2e32908e4@collabora.com>
+In-Reply-To: <20251020112553.2345296-1-wangliang74@huawei.com>
 
-On Mon, Oct 20, 2025 at 12:27:53PM +0200, AngeloGioacchino Del Regno wrote:
-> Il 16/10/25 18:47, Daniel Golle ha scritto:
-> > On Thu, Oct 16, 2025 at 12:08:46PM +0200, Sjoerd Simons wrote:
-> > > Add device tree nodes for the Ethernet subsystem on MT7981B SoC,
-> > > including:
-> > > - Ethernet MAC controller with dual GMAC support
-> > > - Wireless Ethernet Dispatch (WED)
-> > > - SGMII PHY controllers for high-speed Ethernet interfaces
-> > > - Reserved memory regions for WiFi offload processor
-> > > 
-> > > Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
-> > > ---
-> > >   arch/arm64/boot/dts/mediatek/mt7981b.dtsi | 133 ++++++++++++++++++++++++++++++
-> > >   1 file changed, 133 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi b/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
-> > > index 13950fe6e8766..c85fa0ddf2da8 100644
-> > > --- a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
-> > > +++ b/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
-> 
-> ..snip..
-> 
-> > > +
-> > > +			mdio_bus: mdio-bus {
-> > > +				#address-cells = <1>;
-> > > +				#size-cells = <0>;
-> > > +
-> > > +				int_gbe_phy: ethernet-phy@0 {
-> > > +					compatible = "ethernet-phy-ieee802.3-c22";
-> > > +					reg = <0>;
-> > > +					phy-mode = "gmii";
-> > > +					phy-is-integrated;
-> > > +					nvmem-cells = <&phy_calibration>;
-> > > +					nvmem-cell-names = "phy-cal-data";
-> > 
-> > Please also define the two LEDs here with their corresponding (only)
-> > pinctrl options for each of them, with 'status = "disabled";'. This
-> > makes it easier for boards to make use of the Ethernet PHY leds by just
-> > referencing the LED and setting the status to 'okay'.
-> > 
-> 
-> Sorry Daniel, definitely no. The LEDs really are board specific.
-> 
-> Try to convince me otherwise, but for this one I really doubt that you can.
+2025-10-20, 19:25:53 +0800, Wang Liang wrote:
+> #syz test
 
-You are right, the LEDs themselves are board-specific and may not even
-be present.
+I've already sent
+https://lore.kernel.org/all/15c383b3491b6ecedc98380e9db5b23f826a4857.1760610268.git.sd@queasysnail.net/
+which should address this issue (and the other report in
+xfrm6_tunnel_net_exit).
 
-However, the LED controller is always present because it is part of the
-PHY which is built-into the SoC. And the pinctrl property which I'd like
-to see described on SoC-level is a property of the LED controller rather
-than the LED itself. Sadly the device tree node doesn't make the
-distinction between LED and LED controller, so I understand you your
-argument as well.
+-- 
+Sabrina
 
