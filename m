@@ -1,192 +1,180 @@
-Return-Path: <netdev+bounces-231113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6C55BF54B7
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 10:38:34 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 235D6BF5589
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 10:46:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE3574031FE
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 08:36:25 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9E3AD351588
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 08:46:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56B24306484;
-	Tue, 21 Oct 2025 08:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025D4328B4D;
+	Tue, 21 Oct 2025 08:46:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="sYwUqKAZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QmIDUXCW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8531926A0BD;
-	Tue, 21 Oct 2025 08:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6D2324B21
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 08:46:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761035721; cv=none; b=Eyy4yMpOBN2POMHVMazdjKFTpopGH/zq8VZtLOsiT2cUbwz22rlEyvZ1r7Obvvf+lKtJGx8SvwErF+sgPBQaH5+feHWFwF/8pD2IcqdpRxryVl8PvRoOIma2bZA2Tf7QFHUEw6kDx+PAWC052nwdmpqBYO4gYQacf68bcAfrNMs=
+	t=1761036391; cv=none; b=Fo2LPvA8piQK+cFDaBVjWiNWPD8vDkXR3/X0VSr8pxAgwv4kvr+4/H+8T4HP88To4alGW+LT+pJXiCFjsv+L2lqz1R/5QOeCpIPkXcO6aE84/vA6zMB6w9X3GGbqBDbzKvNVohvgXoqv/Cjhkh+v/LH2/SFpOoe+FGFieBiy58s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761035721; c=relaxed/simple;
-	bh=OO4nIMufSB4ldrgsSdF9mAmKfDFf2t053EM8hj0JaG0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DRgVtihELWAQN+DIl3lKum70B/a5Xi0Vuj1ZgoeVl2G1rjTbHxJiiWRZWEMZNDqVFhX7LZAPPI88smPxC0OnzwDYhq84pv802f3qCk5R0JovqfMdBbxH1FScEs3twdJWFU67uFez73uffMDWIVm1xF+3VZ/0A2IkLn/xGK2+pl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=sYwUqKAZ; arc=none smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59L5wDft312028;
-	Tue, 21 Oct 2025 08:35:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	PPS06212021; bh=2fnFQR+6jm3xGhhZsm58t7caj5CpzncJi/HtLQWUUSo=; b=
-	sYwUqKAZhz6MHBodZbwY1L/U4zn2AYbivcDn5M50GMWrFAhAUP+uaxJmUh7wyIUg
-	NSwu1HwhEP/gfzY4uvSDsg1YFgaFaommFO7hRtKneDRc2ErHJHAR4J/IvLX0bgGv
-	ejKIeomOFA/nJS7aKvoQ/GLJgR2JzvkeyC4hQghczrZf2MGHN7vIrLxFP/ovToDy
-	ogLAZ54KOAQ7njaTP+L2ioVg73UX55Jfdq1thD3jrngGX82INWwkcwQgV/UVS3hs
-	Z7ZHchmH1zfSF1DKOOCgEKVN7mYUNDlWCXDLbu5wZZEnyVrHuLn4wNktpLoyPnl6
-	1G72eyVq8qKXlotxa3jKbw==
-Received: from ala-exchng01.corp.ad.wrs.com ([128.224.246.36])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 49wrpx8rd5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 21 Oct 2025 08:35:10 +0000 (GMT)
-Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
- ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.59; Tue, 21 Oct 2025 01:35:09 -0700
-Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
- ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
- 15.1.2507.59 via Frontend Transport; Tue, 21 Oct 2025 01:35:06 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <dan.carpenter@linaro.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <linux-hams@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
-        <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-        <syzbot+2860e75836a08b172755@syzkaller.appspotmail.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH V3] netrom: Prevent race conditions between neighbor operations
-Date: Tue, 21 Oct 2025 16:35:05 +0800
-Message-ID: <20251021083505.3049794-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <aPcp_xemzpDuw-MW@stanley.mountain>
-References: <aPcp_xemzpDuw-MW@stanley.mountain>
+	s=arc-20240116; t=1761036391; c=relaxed/simple;
+	bh=TpzzFfcks+i/8NbAyOtY67RjKecMIpCXc/ht890k5AA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Jkhp/oEASjfxp45CbN8iRuX+SIyFlDqmXKexRSLSZJyF/ZoDeJbqghdpofkP+CeQjahnzudPRwNuWvr+fFwcmKSwMgFX+QBkzDVNODWbbn1kcJU92ZEzajqKkprxYX8FVP2i63A1aZn3poOS87bRa7wJX+21TyCMI5DcFCzOBs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QmIDUXCW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761036388;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=00fUrBf0Q4px2FT8LQcfYm3XMw7xBPoyqZCdVsDVhGA=;
+	b=QmIDUXCWxliNH46pBcXQ50QsRTzfO4BA800tENTgKXw9FOLrRwiDYJ6GIHV1sH8tlM7yQX
+	f34QeMafsSkW4pQr6kwzzgRXasxKPOw5Oa0ZQ6mXqCsnZUQIFnmOw2WcEPsEFIyWRfAF/r
+	aTlEfzKwRK5vRv3zvjoPAwz+kD3ucgk=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-607-eLY_59DYOfeY23O-h_mLoA-1; Tue, 21 Oct 2025 04:46:26 -0400
+X-MC-Unique: eLY_59DYOfeY23O-h_mLoA-1
+X-Mimecast-MFC-AGG-ID: eLY_59DYOfeY23O-h_mLoA_1761036386
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47113dfdd20so16682965e9.1
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 01:46:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761036385; x=1761641185;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=00fUrBf0Q4px2FT8LQcfYm3XMw7xBPoyqZCdVsDVhGA=;
+        b=qQQx+d5A+CCclL2QsD8iZeQT7VfSEojwXgBukeeJY6HtnbUKgNP+n48lIe0hP1xgyy
+         c++UOraSFlfXIzhYTyguAcOkc7Mb8R3lnQiwjVMOUAQM+w4z8WB17Pw4DiYd5YUjVy3M
+         sz5U5AO8YJl23WoqomLzGOvUdyD3rJ37dLqAvevbInfePhnrcaJOpROn/peRRMeLyVOP
+         oBoOyyh3PKKIjN4e4cBwh/CchnA7X7bOjsz3BXlgQNd6W8d1mD/dasmYWpsQMQwe0ZOO
+         PxO0dhNY4Ms42yHFSghHBHXtyeVbLuS3I+FQ2xVgbzjCBvDR6rp+CEbx+Rq1gJl7Uua9
+         c8TQ==
+X-Gm-Message-State: AOJu0Yw2qFbJmXwZJjT8u5C9LSB59i4CaU67CkdbwxQMQRxkoHeZluRx
+	A/iq0thbloFIWmYxJpy9pIEsf2O6WLTcORG3E3yBu7bbSuxZ471tPuCXMYiC6V7kqZcPFKOe6F4
+	rk7iUz+GEkxezYT4Y6SqEqxWzI11fvP41vV8ow4YcjxsezJFIoA2mgpyNTw==
+X-Gm-Gg: ASbGncucxHoPFKFDXVcs2Hm6OpOS5HYK1BWFZPvYOGhgPK6xDeSHygKlclhiQX4Xr/J
+	CRfTABAhfuQQdj3JDxon0bJWJptOTWSvouB/A/sghfjS0s4xFq9yNVjT5eM5MM9q7dqbnWH+t99
+	De8qNzN1ExE3f9/OMHpJOOl052s2+FQykxk5ahmiQQ7GJyvw6NNfwVqdsXy2C8k9Tc+VSM+jx0N
+	6iQXzjuVTH2Eq9mTr25w4eEUNAm8jCeuwHtpmddYWSgx9VWV/1iby2h88qCtAxy9Z6gX6JkjOG2
+	eb8xkAay5gaC+f4x7VqKBhvPsTsGL2VEkGZJtw4cCghWGiuhq3CEs54zcpPxCmcu8aXalTotWmr
+	EIv16vYx6EUlEwe6qdzbetEjEDEh0Mp7JaG3vwaUmsyW9UMM=
+X-Received: by 2002:a05:600c:870e:b0:46e:37a7:48d1 with SMTP id 5b1f17b1804b1-4711791f94dmr149275775e9.34.1761036385506;
+        Tue, 21 Oct 2025 01:46:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IER23LbhF/waeMFxIZ3tVMBTzNNjsK3AFz1Qz2WEJLL+1IU3R8oWYr1yCKAHDnzB9vrI2gn0Q==
+X-Received: by 2002:a05:600c:870e:b0:46e:37a7:48d1 with SMTP id 5b1f17b1804b1-4711791f94dmr149275465e9.34.1761036385083;
+        Tue, 21 Oct 2025 01:46:25 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47154d382d8sm189481805e9.12.2025.10.21.01.46.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Oct 2025 01:46:24 -0700 (PDT)
+Message-ID: <a2e85a2b-58b0-4460-ae7a-b1ea01e4d7e4@redhat.com>
+Date: Tue, 21 Oct 2025 10:46:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=b9O/I9Gx c=1 sm=1 tr=0 ts=68f745be cx=c_pps
- a=AbJuCvi4Y3V6hpbCNWx0WA==:117 a=AbJuCvi4Y3V6hpbCNWx0WA==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=edf1wS77AAAA:8 a=hSkVLCK3AAAA:8
- a=t7CeM3EgAAAA:8 a=BnyrbAF_MDX3GoWRWn8A:9 a=DcSpbTIhAlouE1Uv7lRv:22
- a=cQPPKAXgyycSBL8etih5:22 a=FdTzh2GWekK77mhwV6Dw:22 a=poXaRoVlC6wW9_mwW8W4:22
- a=cPQSjfK2_nFv0Q5t_7PE:22 a=Z5ABNNGmrOfJ6cZ5bIyy:22 a=SsAZrZ5W_gNWK9tOzrEV:22
-X-Proofpoint-GUID: LZ8KSgBZEumey4C32dDrVBSPbxChGpA7
-X-Proofpoint-ORIG-GUID: LZ8KSgBZEumey4C32dDrVBSPbxChGpA7
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIxMDA2NyBTYWx0ZWRfX5xlvyd63P3uk
- bBbfxBw0zI1fRr1OI0D1wIIDjfl0aeleapFPZCd1/2LaelAORbgSslR85VYL1o0Gx4uSVuUEwVi
- gl1pVvptYoB027QyjeOVuAqVf+CCPh+TXpPmPu6Q2Sa12jXiULJCGoUbqclOUKzcT68ZEAuczR8
- lrZQV2cXH1jFe/HHP4I84jd2sVf+teDcLogInTiI22SCoT5ukY9dFdo/D3JRwHhvREMTAuvgyYE
- nxnh7F+ULXZV2jGo0k1d2xoIF+mo+RWWla6niKPUCJ2ibo6zsiywlt0kvxBsYgBHxgBhSDQjfTf
- wjM0fSbFCKsJbVqIYemATZExXxWjDiwf0bVUruyyL61nPHOT6OJWsoOBFOrTvGdaOy27FtCUJJb
- v3YxaIr+KNOE1x2+0Zdu3ZEnXADmpA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-20_07,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 clxscore=1015 phishscore=0 priorityscore=1501 malwarescore=0
- spamscore=0 adultscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510210067
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv6 net-next 1/4] net: add a common function to compute
+ features for upper devices
+To: Sabrina Dubroca <sd@queasysnail.net>, Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+ Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ Shuah Khan <shuah@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+ Stanislav Fomichev <stfomichev@gmail.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, bridge@lists.linux.dev
+References: <20251017034155.61990-1-liuhangbin@gmail.com>
+ <20251017034155.61990-2-liuhangbin@gmail.com> <aPX8di8QX96JvIZY@krikkit>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <aPX8di8QX96JvIZY@krikkit>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The root cause of the problem is that multiple different tasks initiate
-SIOCADDRT & NETROM_NODE commands to add new routes, there is no lock
-between them to protect the same nr_neigh.
+On 10/20/25 11:10 AM, Sabrina Dubroca wrote:
+> 2025-10-17, 03:41:52 +0000, Hangbin Liu wrote:
+>> Some high level software drivers need to compute features from lower
+>> devices. But each has their own implementations and may lost some
+>> feature compute. Let's use one common function to compute features
+>> for kinds of these devices.
+>>
+>> The new helper uses the current bond implementation as the reference
+>> one, as the latter already handles all the relevant aspects: netdev
+>> features, TSO limits and dst retention.
+>>
+>> Suggested-by: Paolo Abeni <pabeni@redhat.com>
+>> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> 
+> No objection to this patch/series, just a nit and some discussion below, so:
+> 
+> Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+> 
+> 
+> [...]
+>> +/**
+>> + *	netdev_compute_master_upper_features - compute feature from lowers
+> 
+> nit: I'm slightly annoyed (that's not quite the right word, sorry)
+> that we're adding a new function to "compute features" that doesn't
+> touch netdev->features, but I can't come up with a better name
+> (the best I got was "compute extra features" and it doesn't help).
 
-Task0 can add the nr_neigh.refcount value of 1 on Task1 to routes[2].
-When Task2 executes nr_neigh_put(nr_node->routes[2].neighbour), it will
-release the neighbour because its refcount value is 1.
+I'm not the right person to ask a good name, and I'm ok with the current
+one, but since the question is pending... what about:
 
-In this case, the following situation causes a UAF on Task2:
+netdev_{compute,update}_offloads_from_lower()
 
-Task0					Task1						Task2
-=====					=====						=====
-nr_add_node()
-nr_neigh_get_dev()			nr_add_node()
-					nr_node_lock()
-					nr_node->routes[2].neighbour->count--
-					nr_neigh_put(nr_node->routes[2].neighbour);
-					nr_remove_neigh(nr_node->routes[2].neighbour)
-					nr_node_unlock()
-nr_node_lock()
-nr_node->routes[2].neighbour = nr_neigh
-nr_neigh_hold(nr_neigh);								nr_add_node()
-											nr_neigh_put()
-											if (nr_node->routes[2].neighbour->count
-Description of the UAF triggering process:
-First, Task 0 executes nr_neigh_get_dev() to set neighbor refcount to 3.
-Then, Task 1 puts the same neighbor from its routes[2] and executes
-nr_remove_neigh() because the count is 0. After these two operations,
-the neighbor's refcount becomes 1. Then, Task 0 acquires the nr node
-lock and writes it to its routes[2].neighbour.
-Finally, Task 2 executes nr_neigh_put(nr_node->routes[2].neighbour) to
-release the neighbor. The subsequent execution of the neighbor->count
-check triggers a UAF.
+?
 
-The solution to the problem is to use a lock to synchronize each add a
-route to node, but for rigor, I'll add locks to related ioctl and route
-frame operations to maintain synchronization.
+As it actually updates (some of) the offloads available to the (upper)
+device?
 
-syzbot reported:
-BUG: KASAN: slab-use-after-free in nr_add_node+0x25db/0x2c00 net/netrom/nr_route.c:248
-Read of size 4 at addr ffff888051e6e9b0 by task syz.1.2539/8741
+>> + *	@dev: the upper device
+>> + *	@update_header: whether to update upper device's header_len/headroom/tailroom
+>> + *
+>> + *	Recompute the upper device's feature based on all lower devices.
+>> + */
+>> +void netdev_compute_master_upper_features(struct net_device *dev, bool update_header)
+>> +{
+> [...]
+>> +	netif_set_tso_max_segs(dev, tso_max_segs);
+>> +	netif_set_tso_max_size(dev, tso_max_size);
+>> +
+>> +	netdev_change_features(dev);
+> 
+> Maybe a dumb idea: I'm wondering if we're doing this from the wrong
+> side.
+> 
+> Right now we have:
+> 
+> [some device op] -> [this new function] -> netdev_change_features -> __netdev_update_features -> ndo_fix_features
+> 
+> Would it make more sense to go instead:
+> 
+> [some device op] -> netdev_change_features -> __netdev_update_features -> ndo_fix_features -> [this new function]
+> 
+> ?
 
-Call Trace:
- <TASK>
- nr_add_node+0x25db/0x2c00 net/netrom/nr_route.c:248
+Uhmmm.... this function touches a few more things beyond dev->*features,
+calling it from ndo_fix_features() looks a bit out-of-scope.
 
-Reported-by: syzbot+2860e75836a08b172755@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=2860e75836a08b172755
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
----
-V1 -> V2: update comments for cause uaf
-V2 -> V3: sync neighbor operations in ioctl and route frame, update comments
-
- net/netrom/nr_route.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/netrom/nr_route.c b/net/netrom/nr_route.c
-index b94cb2ffbaf8..debe3e925338 100644
---- a/net/netrom/nr_route.c
-+++ b/net/netrom/nr_route.c
-@@ -40,6 +40,7 @@ static HLIST_HEAD(nr_node_list);
- static DEFINE_SPINLOCK(nr_node_list_lock);
- static HLIST_HEAD(nr_neigh_list);
- static DEFINE_SPINLOCK(nr_neigh_list_lock);
-+static DEFINE_MUTEX(neighbor_lock);
- 
- static struct nr_node *nr_node_get(ax25_address *callsign)
- {
-@@ -633,6 +634,8 @@ int nr_rt_ioctl(unsigned int cmd, void __user *arg)
- 	ax25_digi digi;
- 	int ret;
- 
-+	guard(mutex)(&neighbor_lock);
-+
- 	switch (cmd) {
- 	case SIOCADDRT:
- 		if (copy_from_user(&nr_route, arg, sizeof(struct nr_route_struct)))
-@@ -765,6 +768,7 @@ int nr_route_frame(struct sk_buff *skb, ax25_cb *ax25)
- 	nr_dest = (ax25_address *)(skb->data + 7);
- 
- 	if (ax25 != NULL) {
-+		guard(mutex)(&neighbor_lock);
- 		ret = nr_add_node(nr_src, "", &ax25->dest_addr, ax25->digipeat,
- 				  ax25->ax25_dev->dev, 0,
- 				  READ_ONCE(sysctl_netrom_obsolescence_count_initialiser));
--- 
-2.43.0
+/P
 
 
