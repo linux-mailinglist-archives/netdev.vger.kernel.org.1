@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-231040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B6BABF4293
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 02:40:55 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B922BF4296
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 02:41:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E5905350B90
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 00:40:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9017D4E563D
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 00:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B0D1F4289;
-	Tue, 21 Oct 2025 00:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D5E20102B;
+	Tue, 21 Oct 2025 00:40:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RuVmwOUX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WXMWxPUZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9691C695;
-	Tue, 21 Oct 2025 00:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9083A1FC0EA
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 00:40:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761007251; cv=none; b=DCvK4wtl+3NE5SKzw2cZ7Sn/mrt/BfztDLe1sMgfdEm//hbqE50wd86WfjDnsFQnNpYHv3L6JyfyMUgsla+13fmngmnsNTvqnETjwMG++eP+A8Dj9bl19i3psTo9Re5V3uqIhzU1ykCOuXSJsExZaWs6Tw14f9kFisQXyIzHrJ0=
+	t=1761007252; cv=none; b=g3Z6FGG9Vj1e6LKvDI4v6DDKKdwtIT7YpXSEWrH4KWGevoMuQ1kt/cjS5fkNzNHTD5xISQ/JDzSI+ZJgidKP0VXQhYiYNvIjkpX97aBe3WtOvV7f4Ruts0k6oUaOz1fobCx7R+bhnFAtzdVbJn54rUlcKqOJCcd5RVgSgAGJEbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761007251; c=relaxed/simple;
-	bh=UU1RkXwZN8NwOrfKRqz1pbaC+bNTIeLHOSMus2MSmCI=;
+	s=arc-20240116; t=1761007252; c=relaxed/simple;
+	bh=ZqWea6XZm8LxpNEnbbKZyXqhWtkMarxkaURtMLCChBk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tYowRB/HSRo5g5/kVWY1bPMnBYgQJynnIoWSNShIztGujfC+OjSIAe78HGSq1t9og1BlDy7wsau/RS7BGrzy6+/DhAxnS8b1mTLoQRWzL+kViy6c1g7baudk96e5EimJgkOwMtvaYt7bH02ZmqRLduHdCb6Sw1QeW/hgqjBklAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RuVmwOUX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8F8AC4CEFB;
-	Tue, 21 Oct 2025 00:40:50 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=J4/m4j+bEQjypMdEZ345wjvFP7d6gM7fik0wvnWbGyU1WBBVYJsig9LpdHHl2QaFFUjnWEbiuwPu+f6G7x+iveSqWcXHSCm6yAWzBc90r2OX/jA3dSenewsJ+C+OY8jNiy2g0NqU9cHMsmHqbg/uAYIKnv+AjO2YHRyyUjkj80k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WXMWxPUZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 200FDC4CEFB;
+	Tue, 21 Oct 2025 00:40:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761007250;
-	bh=UU1RkXwZN8NwOrfKRqz1pbaC+bNTIeLHOSMus2MSmCI=;
+	s=k20201202; t=1761007252;
+	bh=ZqWea6XZm8LxpNEnbbKZyXqhWtkMarxkaURtMLCChBk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RuVmwOUXaDCl969T+Def4jubbj5ikNZL1Jx+dMTQsZsDS/LntPH3l06U4H+N30OaJ
-	 0iJUOXcIrix6lyQw/c0S5arVQH19mYzFYMxfDmHLYV10LYhcnA5wToKukUmz3TfFcd
-	 UhpG5GehVxOG9PrEA2NWHu+QaoG8iQz6vY19Zow4+5SvQh/B6T4o8Qt7dcHJJb+rtm
-	 7fYIZnsdZxRgs52WtPeOThufbn/RooNRUOnd9shGeA16HyvZItmqx7NAU2AILD2gsQ
-	 3jyVQv/3Yup5sCGwmxrLirr0UYNWqw4fgY+Vl3YUdBeWN8UHqdQgqEtwYAIwlfFEoz
-	 8ARJgAhOeJJSw==
+	b=WXMWxPUZwGhQTaRWiHQOz25dFzhuDpbf0NU3n9Kb9nZeNtTjmJmW9ZerslSHBr9z+
+	 aKdQtt5GUacmqLxFll3suQYsRzK9Fzc7ztaQw2aUKQiphoeIWb/PGxCo9qAOoXezvf
+	 nbx7WcilzFtz6Ve2fenomFDvcWrmUwRbXbY6o8/fQloJ9QlWN1IzUmRBk4Jsj/eevX
+	 M3SMtQIbb7dVP4Q1Vr8999ZEfrd4zLVA//yIpRhsfzdoNYnVLvo51VnBXTcFJYsA8A
+	 qqSrmWjeUj2QBomcbTBJjzdyMOO2nHDNHFRdAy0J4RvYZ5ml1F/T1kBgQ4Oevd3tJc
+	 C6F2ohiuR2ExQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEF33A4102D;
-	Tue, 21 Oct 2025 00:40:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 343C23A4102D;
+	Tue, 21 Oct 2025 00:40:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,78 +52,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/14] net: stmmac: phylink PCS conversion
+Subject: Re: [PATCH net-next v3 0/7] convert net drivers to ndo_hwtstamp API
+ part
+ 1
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176100723252.470828.3402215548050414141.git-patchwork-notify@kernel.org>
-Date: Tue, 21 Oct 2025 00:40:32 +0000
-References: <aPECqg0vZGnBFCbh@shell.armlinux.org.uk>
-In-Reply-To: <aPECqg0vZGnBFCbh@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, quic_abchauha@quicinc.com,
- alexandre.torgue@foss.st.com, alexis.lothore@bootlin.com,
- andrew+netdev@lunn.ch, boon.khai.ng@altera.com,
- yong.liang.choong@linux.intel.com, daniel.machon@microchip.com,
- davem@davemloft.net, dfustini@tenstorrent.com,
- emil.renner.berthing@canonical.com, edumazet@google.com,
- faizal.abdul.rahim@linux.intel.com, 0x1207@gmail.com, inochiama@gmail.com,
- jacob.e.keller@intel.com, kuba@kernel.org, jan.petrous@oss.nxp.com,
- jszhang@kernel.org, kees@kernel.org, hayashi.kunihiko@socionext.com,
- prabhakar.mahadev-lad.rj@bp.renesas.com, leyfoon.tan@starfivetech.com,
- linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com, matthew.gerlach@altera.com,
- maxime.chevallier@bootlin.com, mcoquelin.stm32@gmail.com,
- michal.swiatkowski@linux.intel.com, netdev@vger.kernel.org,
- o.rempel@pengutronix.de, pabeni@redhat.com, rohan.g.thomas@altera.com,
- shenwei.wang@nxp.com, horms@kernel.org, yoong.siang.song@intel.com,
- swathi.ks@samsung.com, yangtiezhu@loongson.cn, vkoul@kernel.org,
- olteanv@gmail.com, vladimir.oltean@nxp.com, eleanor15x@gmail.com
+ <176100723376.470828.13115546758428194297.git-patchwork-notify@kernel.org>
+Date: Tue, 21 Oct 2025 00:40:33 +0000
+References: <20251016152515.3510991-1-vadim.fedorenko@linux.dev>
+In-Reply-To: <20251016152515.3510991-1-vadim.fedorenko@linux.dev>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Shyam-sundar.S-k@amd.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ epomozov@marvell.com, bharat@chelsio.com, dmichail@fungible.com,
+ danishanwar@ti.com, rogerq@kernel.org, richardcochran@gmail.com,
+ linux@armlinux.org.uk, vladimir.oltean@nxp.com, horms@kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 16 Oct 2025 15:35:22 +0100 you wrote:
-> This series is radical - it takes the brave step of ripping out much of
-> the existing PCS support code and throwing it all away.
-> 
-> I have discussed the introduction of the STMMAC_FLAG_HAS_INTEGRATED_PCS
-> flag with Bartosz Golaszewski, and the conclusion I came to is that
-> this is to workaround the breakage that I've been going on about
-> concerning the phylink conversion for the last five or six years.
+On Thu, 16 Oct 2025 15:25:08 +0000 you wrote:
+> This is part 1 of patchset to convert drivers which support HW
+> timestamping to use .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
+> The new API uses netlink to communicate with user-space and have some
+> test coverage. Part 2 will contain another 6 patches from v1 of the
+> series.
+> There are some drivers left with old ioctl interface after this series:
+> - mlx5 driver be shortly converted by nVidia folks
+> - TI netcp ethss driver which needs separate series which I'll post
+>   after this one.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,01/14] net: stmmac: remove broken PCS code
-    https://git.kernel.org/netdev/net-next/c/813882ae2275
-  - [net-next,v2,02/14] net: stmmac: remove xstats.pcs_* members
-    https://git.kernel.org/netdev/net-next/c/14f74bc6dc69
-  - [net-next,v2,03/14] net: stmmac: remove SGMII/RGMII/SMII interrupt handling
-    https://git.kernel.org/netdev/net-next/c/2e2c878a3141
-  - [net-next,v2,04/14] net: stmmac: remove PCS "mode" pause handling
-    https://git.kernel.org/netdev/net-next/c/ebc5d656b78c
-  - [net-next,v2,05/14] net: stmmac: remove unused PCS loopback support
-    https://git.kernel.org/netdev/net-next/c/19064a58bd3c
-  - [net-next,v2,06/14] net: stmmac: remove hw->ps xxx_core_init() hardware setup
-    https://git.kernel.org/netdev/net-next/c/aa1b6775aef7
-  - [net-next,v2,07/14] net: stmmac: remove RGMII "pcs" mode
-    https://git.kernel.org/netdev/net-next/c/70589b05a03e
-  - [net-next,v2,08/14] net: stmmac: move reverse-"pcs" mode setup to stmmac_check_pcs_mode()
-    https://git.kernel.org/netdev/net-next/c/c7b0d7874de0
-  - [net-next,v2,09/14] net: stmmac: simplify stmmac_check_pcs_mode()
-    https://git.kernel.org/netdev/net-next/c/412d5f32cb36
-  - [net-next,v2,10/14] net: stmmac: hw->ps becomes hw->reverse_sgmii_enable
-    https://git.kernel.org/netdev/net-next/c/5d1e7621f869
-  - [net-next,v2,11/14] net: stmmac: do not require snps,ps-speed for SGMII
-    https://git.kernel.org/netdev/net-next/c/5c61db08d9ae
-  - [net-next,v2,12/14] net: stmmac: only call stmmac_pcs_ctrl_ane() for integrated SGMII PCS
-    https://git.kernel.org/netdev/net-next/c/045d7e5727c4
-  - [net-next,v2,13/14] net: stmmac: provide PCS initialisation hook
-    https://git.kernel.org/netdev/net-next/c/237e54caeaef
-  - [net-next,v2,14/14] net: stmmac: convert to phylink PCS support
-    https://git.kernel.org/netdev/net-next/c/2c81f3357136
+  - [net-next,v3,1/7] net: ti: am65-cpsw: move hw timestamping to ndo callback
+    https://git.kernel.org/netdev/net-next/c/ed5d5928bd54
+  - [net-next,v3,2/7] ti: icssg: convert to ndo_hwtstamp API
+    https://git.kernel.org/netdev/net-next/c/b8fa98ea4a22
+  - [net-next,v3,3/7] amd-xgbe: convert to ndo_hwtstamp callbacks
+    https://git.kernel.org/netdev/net-next/c/149cfae71166
+  - [net-next,v3,4/7] net: atlantic: convert to ndo_hwtstamp API
+    https://git.kernel.org/netdev/net-next/c/8a15a84e80dc
+  - [net-next,v3,5/7] cxgb4: convert to ndo_hwtstamp API
+    https://git.kernel.org/netdev/net-next/c/a6a64bb4115f
+  - [net-next,v3,6/7] tsnep: convert to ndo_hwtstatmp API
+    https://git.kernel.org/netdev/net-next/c/d8db98db0d46
+  - [net-next,v3,7/7] funeth: convert to ndo_hwtstamp API
+    https://git.kernel.org/netdev/net-next/c/dc34040654e4
 
 You are awesome, thank you!
 -- 
