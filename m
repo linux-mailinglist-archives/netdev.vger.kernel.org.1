@@ -1,124 +1,101 @@
-Return-Path: <netdev+bounces-231384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29D30BF848A
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 21:42:18 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9867BBF84F0
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 21:47:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DFEBF4E2B8D
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 19:42:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5B9B94EE8B9
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 19:47:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD84D26F280;
-	Tue, 21 Oct 2025 19:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35EEE25BEF2;
+	Tue, 21 Oct 2025 19:47:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d6+4sQMv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QAr1UBUT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D77225761;
-	Tue, 21 Oct 2025 19:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E8F350A00;
+	Tue, 21 Oct 2025 19:47:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761075731; cv=none; b=iIIJZXMla7eOMtUjP9HLMJwt1OJrhu4H2zMmqp2aZSzSCdjlCBL1urnfbnPQahlLq3gaaVqzGs3SA3QGjfSDAvhKdU5S6N1taN0ggd96Y25rHZwm6NtZPHQFaRBkf8McDl3nd5osT0yLaX51PPD8f/ckbxWtZ019a9lFA5YTPpo=
+	t=1761076073; cv=none; b=uJy6G9mGHSbeZPiuKzB/N0Byqm8GtrYs2pQgscjy9ZwIKmRovyEh6sxIkqJrnQlCxFdVVH2KwdTJZ8Q1eqYYPVV96tsUkW6aDkigHcz+iF4mg8YWyRW3yyfdjORPkfo94VYpNTsy+cRd8PeFehn2tV1ZK3j0SzRCBh56WepSG48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761075731; c=relaxed/simple;
-	bh=eGVocM0DQBl2qPI9FUGWA58zJ38JkhcoJ7N7a2UjFQg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p2qeGpEmYU7ioPBByKMTHmmLh/pjCEmGXm2c+OIaHh1s/YFjbmZAKx09G0CbzE5b+ouyRgluwFDMVcb7X8n3G6deBIrBaL9eeXoJ2dyoCxrbRtOQjwlj3H8HUOrndRCuuAWNHqV6LnRtX1+Oym0+VozIMqRjKDdSf3h7JQI1lWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d6+4sQMv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A187C4CEF1;
-	Tue, 21 Oct 2025 19:42:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761075731;
-	bh=eGVocM0DQBl2qPI9FUGWA58zJ38JkhcoJ7N7a2UjFQg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d6+4sQMvhUimGHIK1nPetkCrJVVSOtCes8Qf4GEREJFkNiG4tmp/OGcdPsZKZJ4Gn
-	 rj1WUrpqoQkyXZ9eA6Oh2l5n0ABLUprAtIlBlr7O/tWdTMT4t/vRX/QMjeWV+hHtoG
-	 zUlsxKRoxbvXaAXUef9xwdTkS9WTiceuCHGssxF8OOzwt1+Mj4dIrheB14lpqzwRMt
-	 IKXTkkTw+uBfLG86Bjh99RijkIN1NLuesht+WVNtEw1zlLWBXVmIaOLI81u0XARW/m
-	 aiS9LNoKFZvEg6edN0ifyGkPGOnaBpqx1boYxwZiEoOBTNWkOH2GGRue5YwaeBedL2
-	 Z7nTXSIHQgbUg==
-Date: Tue, 21 Oct 2025 12:42:10 -0700
-From: Kees Cook <kees@kernel.org>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3 1/9] net: Add struct sockaddr_unspec for sockaddr of
- unknown length
-Message-ID: <202510211232.77A0F8A@keescook>
-References: <20251020212125.make.115-kees@kernel.org>
- <20251020212639.1223484-1-kees@kernel.org>
- <20251021102600.2838d216@pumpkin>
+	s=arc-20240116; t=1761076073; c=relaxed/simple;
+	bh=99XOQ8/c1bSey+JyTeJXM1222mQtTxFiwkbfFTqMK2c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=josDSFVtjteloEGdIz+PIJBWu1y0sSBW/v2XLvlPkkp5KcwToOLwAxsiNd4wgXNnWbjk5ZsF6Z5Pxl4UNSCu11NevqB8y865bOj8HndwKupQun+spVvrH0XYdNXLFxsZBriPFG8y/QyHBNm0wcXKs/UG6TrMhEj3RNjxwUfqpB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QAr1UBUT; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <951141f8-f26b-4d0e-bf54-5c7f4e0b99af@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761076066;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eD409e6hY+qRd6MhDEDpdC+HWvW0mADRZZeGBzPBkr0=;
+	b=QAr1UBUTj+UKkxgh0C2c9YUBV+RQz1HEYGs1x5JNXxVw+2+O9PLK6BxsFYX7L8U2HGs+rU
+	8f2E2RgI7rwvVz4kt8cbUJxoNvkFJHSPHtzOuGHRejAFMoeYoneOQH1uMUb2awkvAOpP/t
+	kTR81ogxPV+L51RlvQKJUFs2oOxy7dA=
+Date: Tue, 21 Oct 2025 20:47:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251021102600.2838d216@pumpkin>
+Subject: Re: [PATCH] ptp: ocp: Fix typo using index 1 instead of i in SMA
+ initialization loop
+To: Jiasheng Jiang <jiashengjiangcool@gmail.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251021182456.9729-1-jiashengjiangcool@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20251021182456.9729-1-jiashengjiangcool@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Oct 21, 2025 at 10:26:00AM +0100, David Laight wrote:
-> On Mon, 20 Oct 2025 14:26:30 -0700
-> Kees Cook <kees@kernel.org> wrote:
+On 21/10/2025 19:24, Jiasheng Jiang wrote:
+> In ptp_ocp_sma_fb_init(), the code mistakenly used bp->sma[1]
+> instead of bp->sma[i] inside a for-loop, which caused only SMA[1]
+> to have its DIRECTION_CAN_CHANGE capability cleared. This led to
+> inconsistent capability flags across SMA pins.
 > 
-> > Add flexible sockaddr structure to support addresses longer than the
-> > traditional 14-byte struct sockaddr::sa_data limitation without
-> > requiring the full 128-byte sa_data of struct sockaddr_storage. This
-> > allows the network APIs to pass around a pointer to an object that
-> > isn't lying to the compiler about how big it is, but must be accompanied
-> > by its actual size as an additional parameter.
-> > 
-> > It's possible we may way to migrate to including the size with the
-> > struct in the future, e.g.:
-> > 
-> > struct sockaddr_unspec {
-> > 	u16 sa_data_len;
-> > 	u16 sa_family;
-> > 	u8  sa_data[] __counted_by(sa_data_len);
-> > };
+> Fixes: 09eeb3aecc6c ("ptp_ocp: implement DPLL ops")
+> Signed-off-by: Jiasheng Jiang <jiashengjiangcool@gmail.com>
+> ---
+>   drivers/ptp/ptp_ocp.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> One on the historic Unix implementations split the 'sa_family'
-> field into two single byte fields - the second one containing the length.
-> That might work - although care would be needed not to pass a length
-> back to userspace.
+> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+> index 794ec6e71990..a5c363252986 100644
+> --- a/drivers/ptp/ptp_ocp.c
+> +++ b/drivers/ptp/ptp_ocp.c
+> @@ -2548,7 +2548,7 @@ ptp_ocp_sma_fb_init(struct ptp_ocp *bp)
+>   		for (i = 0; i < OCP_SMA_NUM; i++) {
+>   			bp->sma[i].fixed_fcn = true;
+>   			bp->sma[i].fixed_dir = true;
+> -			bp->sma[1].dpll_prop.capabilities &=
+> +			bp->sma[i].dpll_prop.capabilities &=
+>   				~DPLL_PIN_CAPABILITIES_DIRECTION_CAN_CHANGE;
+>   		}
+>   		return;
 
-I think this is just asking for trouble -- leaving that inline could
-be hard to track down places that needed filtering out.
+Thanks!
 
-It might be easier to move to a separate struct like I suggest above,
-though maybe as:
-
-struct sockaddr_sized {
-    u16 sa_data_len;
-    struct {
-        u16 sa_family;
-        u8  sa_data[] __counted_by(sa_data_len);
-    } sa_unspec;
-};
-
-(So it's easier to cast between implementation-specific sockaddr and the
-"sa_unspec" member.)
-
-And then pass that around. But I think that'll require a LOT of
-refactoring. But that could happen separately from this change, which is
-to just get us back to the existing state of passing around an unknown
-sized object but now we're not lying to the compiler about its size.
-
--- 
-Kees Cook
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
