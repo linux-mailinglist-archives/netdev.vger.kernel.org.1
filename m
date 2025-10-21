@@ -1,159 +1,224 @@
-Return-Path: <netdev+bounces-231082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CF2ABF491B
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 06:03:57 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F628BF4948
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 06:10:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17778462AF3
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 04:03:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BC5BB4E21C7
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 04:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28E223AB98;
-	Tue, 21 Oct 2025 04:03:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48002475C8;
+	Tue, 21 Oct 2025 04:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VGxhb3mW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NYkzamR1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1211EB193
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 04:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252C8246781
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 04:10:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761019423; cv=none; b=QzKafQ1oVK38nwu4WQSDbgWiKmrsHoA0v8DZC2EuIG/C+LfQQzK8Bh8owg1tGWGXbEb635RMz246AbFcOI277tVLs7gHT6GKuLUMRiByN70PENg8hOCgJIf+/4BtBHMU5DBeHsBtqRrkQPo4c/pbnqfCLYlNqPrw9tMHZbO7OV8=
+	t=1761019826; cv=none; b=f1Ggq03fcwtzKCPC1zdiY1pMDq4e1X1JhTACuRUyzdQkGwuyQZNn/IBf4RRxZR21Ml1gePh8xPkKEzy5JBCRBnYvOcFzwLSzWvGLuvrxkKXbjOxKXxewdlAeP1iQbiToGcM8PRZ5mmjimKwvCra2uHOFPlOFJe3b4lx8dMfXGQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761019423; c=relaxed/simple;
-	bh=FGw9uKLVYLz8Atlzf9NPOuGFgink3pTJjbUmcWekYM0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QfjqTpOB79nEMa3bypGifoBr1Ty26ZO8d9VjVhrTS8Rm9TtVwmWdv9BLZEfV1CFkizH0Yn6Txe3rf4uTfTlNBmoo1/+wHAvGvXx+JMIRgo84Dx/Jm/qNurDMwyj2ZhIgOTnn1S0tjhRwziEYIUDiJ2kaymEFHdg7VhtWy32hjRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VGxhb3mW; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-339d7c4039aso4448535a91.0
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 21:03:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761019422; x=1761624222; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CzjId5UhLzcQWxSkjMlTd353fisikKEHJ9Xlvn4jmOs=;
-        b=VGxhb3mWnVIiQCZZfA8VgNgnCKZvHnfLJu+Hy9mFVGyw1dFSfmM27GUBl1AyZAaYl2
-         JFhiYQ2yEfWmn5CJH/MM9Edr6miIKotEna3xyIu3K2k1a0FJVg9z+gLIgZtmFZ6XRHGU
-         IRvBt5tiaEDuQKpCjpIzhlCNtTwaIN+yb/WdTe6gC+NcZOPG6Lqw4FF29WemTl0XrPpv
-         67h1Ex2dWfa5YxijOanGIgeFHBHz1hBlWEq6sXKoU4RIzQy3GJ/rIkG8YIY1I1xgycC2
-         p5pI9H9vwdV0LW4hbYUatf3ICrNoKaj5KgVcZXGx1oj0vwMpejd9k8W3gIkjKOwpR8nI
-         JzEw==
+	s=arc-20240116; t=1761019826; c=relaxed/simple;
+	bh=m6Ygrj9CfSu9M6zL1BkSWa/FjgjlVS2hjqfbAo77jSE=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ndYf/M//XFwu58a4str5CsiYeTQhKUdqysg9wKFwUguH0chH/UPGzulMAXOE8lR3G+7PRBbF/3XrutahkBcxFeJiGVRroQ6uVUzJHghxAQPJ6ml7DC7NcYCEtWQxnwHu8rQyoqqYkczyICgiqhaM7J3itnuSd6n1/aIsW/aFYzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NYkzamR1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761019824;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r9OupL1guxMQZzERaZQ5HIFJ+HTh+MX5SgUIo3LTaUY=;
+	b=NYkzamR1FELhoKMF7VWDJNGNZw1TzZ/h5BNYgcNd1ZRX6yURgSdG8FTilKrCyf6xARbFHc
+	GEFdvf4fOkhKHPs0gGM4sSEQLe6p06uCIhTS7FXLMsN/coollQkV3hyIYuA1/BpRO0vhvE
+	AgQixz/q7FGuhj+IwkDK9I9x0nfdNlM=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-512-s0E0Pr2dPZ234DAx3WVjvw-1; Tue, 21 Oct 2025 00:10:22 -0400
+X-MC-Unique: s0E0Pr2dPZ234DAx3WVjvw-1
+X-Mimecast-MFC-AGG-ID: s0E0Pr2dPZ234DAx3WVjvw_1761019822
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-87c146f81cdso129018576d6.1
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 21:10:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761019422; x=1761624222;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1761019822; x=1761624622;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CzjId5UhLzcQWxSkjMlTd353fisikKEHJ9Xlvn4jmOs=;
-        b=MjVpOehOX/iewcsqUZMAy3ibdHHn3MgOHTqVTTj7dAYxIrv3A40MeyA98X87PkmmFC
-         Pk74Fkf/PpITUpm1lYoh2xrETURanN4/n8Z6pmkvPK0+CFROh6VtDzFsckIdey9knQp8
-         cBWejx62DHfpY9pc630mmkZvppE6ZnSObQuiNuNPq6cEzGHCO8zu3X5Wx4yP9bStydPg
-         9D3HzrEuGXqMvAgdOBSfqfqcLxGyoTRLa00ZVqUrni/yIF3v4RljKLHOSmE8+zgfd0S8
-         le3iwEoZJMxrq3nC/rrhohBp5K1sIwa2HLYTLWZDfE1ERGhyGgMnx7TZ5XpZKe5cytI8
-         PCyg==
-X-Gm-Message-State: AOJu0YywRd4ySW4+BJ9M9ZBu+2MWKq5CWc1/Bvq+cOzXgLAT4rpyvbDh
-	IF0KgRhKT/bR+mHR861sxpfjS/hv3GxlTWymTVbtxCkI8hBCv7AybXuz
-X-Gm-Gg: ASbGncusul4gzQA9dKASxHwl7pOfI0hWfAOtR1DNbiGAyJ8cYEgDjo0stpaJBF9X4qM
-	eAH9TBlCZqMhtgodprNKG8FAHHeyqqSGr5TV5PwINh/Q/9SCyoER9IdAMNP9LqdgrOwVS4k/3Sv
-	sOb0VOvpd0cIK0aR8csxd1bb47IUSxvdok1jUBTmcv4y3GzNjFN+M1h3F57E+1tTY8gK37Q7Oxs
-	B3weojzI9Hjx5OYtvrAhIIFHFnPSOZ8uzeVPo3nDqSfkzMKLkhHM3yzawn+u+5s1LKkqds1gCGj
-	uLM+p9Zln/L6kispNSSARq/2HbAkVxpvw2jk8f0NshzL/kzxcFJ6AJVoCTE+ugAfRklLpH99xZ4
-	pEuPdzrI3qy0VKCnBJioCWHJUZKfeTTNucsayrofWdZOpdW94CSMgw8Sv2s6Xd/DUTvnr4TXFk6
-	HALaH1aIQA0SjD2BI=
-X-Google-Smtp-Source: AGHT+IEGLHBHLBcEiZkt0e0q2lpyK6XnA2EHB5p+AIeBPMFAHNsp8qccXxyZON/4GBnP34d68j285w==
-X-Received: by 2002:a17:90b:4cce:b0:32e:dd8c:dd18 with SMTP id 98e67ed59e1d1-33bcf8f7617mr21437755a91.17.1761019421547;
-        Mon, 20 Oct 2025 21:03:41 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33d5df93591sm9771411a91.17.2025.10.20.21.03.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 21:03:40 -0700 (PDT)
-Date: Tue, 21 Oct 2025 04:03:31 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>, Shuah Khan <shuah@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	bridge@lists.linux.dev
-Subject: Re: [PATCHv6 net-next 1/4] net: add a common function to compute
- features for upper devices
-Message-ID: <aPcGE36U9DSza8xU@fedora>
-References: <20251017034155.61990-1-liuhangbin@gmail.com>
- <20251017034155.61990-2-liuhangbin@gmail.com>
- <aPX8di8QX96JvIZY@krikkit>
+        bh=r9OupL1guxMQZzERaZQ5HIFJ+HTh+MX5SgUIo3LTaUY=;
+        b=mfcjq4qwRsA4N+CpPoCmML1X0ZvxO+afBgutq0xbz7n9U8lvytR+ifEj4sPJ+ZJUUk
+         Dm2ouI4ZaotvrLfeyidX4OA8e7+834cK7W4f+UtNFibb8BSPpp+VyIJ5jcJtTGJ341YQ
+         DKr8FAcQnjg4x1cdUpVUh0nnJvPxp2G8aZ8Qj3B9loh6WfxigMP7PmKsHImYowY73MGF
+         ABIV2+A6+R6D/WNYei2Q58f20MYe5sO/uLyBuK2/pYzJT2Pc4tV+D2Q7v2U33vCZT6EL
+         7QBJXiDFptrAFpIOrBJxxMSXHzlai/TwHyG+Rq+SX1p2/z4vnghP0f3AW5pGT9BDz/ox
+         kwIA==
+X-Forwarded-Encrypted: i=1; AJvYcCWEU2AcVO7kAQfeGbxTHLGRFh5ze6mLr3niXol1KGKt1f5lVBN3cRfg2+g9UY0RjAbVQyZNHsY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZyQvp9kmC63W+txYTDi4e7PuTeOnB7FxWShciytEjsbUGbMm5
+	ceCiQo7yZfYSZDGIB7xqestRUsTQXnwmRh6ogampxVFIKAINmHNl9yRa0m0CtKnLpuKvPay/oFn
+	QF6K2FY+LrXpVcaCEXoo9PGosXBH5H8z4hP/86+c+N4LxUvwLZzd5dCp/xQ==
+X-Gm-Gg: ASbGncswx1UrEBbHRqwxYqy2/iFhhTE58DvnL0XP2m6WW5OdxKVqEvmg28OJxvXI+aM
+	fDr3UqjMuCHD7i53kkvaj9+Y6R32OQ8tOeRWfjiyh6JK1qLAuShWUSBEvxaaEq4wjYKAk0xV+51
+	NRLg+AlcdxQTwXTeC/IoODBxPU2VoHAZUOEySt+80J6D5TPDtD2EPNLA7oa+x+7TRSFBhK/pVLP
+	98UrOUl1nfUwWblohqj4QqSwQXpv4avZBB2VfVQYOlQBrk8CbL/0OArIWFZMAuDU7cVjMMwRBpC
+	Onefz40mVXAZLQG2OTb96pSdEV0z+u+Vxjn4tRPeaSRZacaGyesVLDkujqcRI/JF1v8hfsRK0bN
+	b8o57CLhwR3uSypog2R+piJhgBEiZgBemiQ55OpfOwWRp0Q==
+X-Received: by 2002:a05:6214:808f:b0:87c:223c:c5c8 with SMTP id 6a1803df08f44-87c223cc6b8mr152673776d6.20.1761019821862;
+        Mon, 20 Oct 2025 21:10:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGdm2hwRLRcjdAJaN67gocvEQv/ytDjJvvxgQlCm7/W761K2ldQ2/8L5ftdru4g+9p/5t/b/A==
+X-Received: by 2002:a05:6214:808f:b0:87c:223c:c5c8 with SMTP id 6a1803df08f44-87c223cc6b8mr152673626d6.20.1761019821460;
+        Mon, 20 Oct 2025 21:10:21 -0700 (PDT)
+Received: from ?IPV6:2601:600:947f:f020:85dc:d2b2:c5ee:e3c4? ([2601:600:947f:f020:85dc:d2b2:c5ee:e3c4])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-87d028af525sm62600596d6.51.2025.10.20.21.10.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Oct 2025 21:10:20 -0700 (PDT)
+From: Waiman Long <llong@redhat.com>
+X-Google-Original-From: Waiman Long <longman@redhat.com>
+Message-ID: <0e02915f-bde7-4b04-b760-89f34fb0a436@redhat.com>
+Date: Tue, 21 Oct 2025 00:10:16 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aPX8di8QX96JvIZY@krikkit>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 13/33] cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
+To: Frederic Weisbecker <frederic@kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Danilo Krummrich
+ <dakr@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
+ <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
+ Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
+ cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20251013203146.10162-1-frederic@kernel.org>
+ <20251013203146.10162-14-frederic@kernel.org>
+Content-Language: en-US
+In-Reply-To: <20251013203146.10162-14-frederic@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 20, 2025 at 11:10:14AM +0200, Sabrina Dubroca wrote:
-> > +/**
-> > + *	netdev_compute_master_upper_features - compute feature from lowers
-> 
-> nit: I'm slightly annoyed (that's not quite the right word, sorry)
-> that we're adding a new function to "compute features" that doesn't
-> touch netdev->features, but I can't come up with a better name
-> (the best I got was "compute extra features" and it doesn't help).
+On 10/13/25 4:31 PM, Frederic Weisbecker wrote:
+> Until now, HK_TYPE_DOMAIN used to only include boot defined isolated
+> CPUs passed through isolcpus= boot option. Users interested in also
+> knowing the runtime defined isolated CPUs through cpuset must use
+> different APIs: cpuset_cpu_is_isolated(), cpu_is_isolated(), etc...
+>
+> There are many drawbacks to that approach:
+>
+> 1) Most interested subsystems want to know about all isolated CPUs, not
+>    just those defined on boot time.
+>
+> 2) cpuset_cpu_is_isolated() / cpu_is_isolated() are not synchronized with
+>    concurrent cpuset changes.
+>
+> 3) Further cpuset modifications are not propagated to subsystems
+>
+> Solve 1) and 2) and centralize all isolated CPUs within the
+> HK_TYPE_DOMAIN housekeeping cpumask.
+>
+> Subsystems can rely on RCU to synchronize against concurrent changes.
+>
+> The propagation mentioned in 3) will be handled in further patches.
+>
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> ---
+>   include/linux/sched/isolation.h |  2 +
+>   kernel/cgroup/cpuset.c          |  2 +
+>   kernel/sched/isolation.c        | 75 ++++++++++++++++++++++++++++++---
+>   kernel/sched/sched.h            |  1 +
+>   4 files changed, 74 insertions(+), 6 deletions(-)
+>
+> diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+> index da22b038942a..94d5c835121b 100644
+> --- a/include/linux/sched/isolation.h
+> +++ b/include/linux/sched/isolation.h
+> @@ -32,6 +32,7 @@ extern const struct cpumask *housekeeping_cpumask(enum hk_type type);
+>   extern bool housekeeping_enabled(enum hk_type type);
+>   extern void housekeeping_affine(struct task_struct *t, enum hk_type type);
+>   extern bool housekeeping_test_cpu(int cpu, enum hk_type type);
+> +extern int housekeeping_update(struct cpumask *mask, enum hk_type type);
+>   extern void __init housekeeping_init(void);
+>   
+>   #else
+> @@ -59,6 +60,7 @@ static inline bool housekeeping_test_cpu(int cpu, enum hk_type type)
+>   	return true;
+>   }
+>   
+> +static inline int housekeeping_update(struct cpumask *mask, enum hk_type type) { return 0; }
+>   static inline void housekeeping_init(void) { }
+>   #endif /* CONFIG_CPU_ISOLATION */
+>   
+> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
+> index aa1ac7bcf2ea..b04a4242f2fa 100644
+> --- a/kernel/cgroup/cpuset.c
+> +++ b/kernel/cgroup/cpuset.c
+> @@ -1403,6 +1403,8 @@ static void update_unbound_workqueue_cpumask(bool isolcpus_updated)
+>   
+>   	ret = workqueue_unbound_exclude_cpumask(isolated_cpus);
+>   	WARN_ON_ONCE(ret < 0);
+> +	ret = housekeeping_update(isolated_cpus, HK_TYPE_DOMAIN);
+> +	WARN_ON_ONCE(ret < 0);
+>   }
+>   
+>   /**
+> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+> index b46c20b5437f..95d69c2102f6 100644
+> --- a/kernel/sched/isolation.c
+> +++ b/kernel/sched/isolation.c
+> @@ -29,18 +29,48 @@ static struct housekeeping housekeeping;
+>   
+>   bool housekeeping_enabled(enum hk_type type)
+>   {
+> -	return !!(housekeeping.flags & BIT(type));
+> +	return !!(READ_ONCE(housekeeping.flags) & BIT(type));
+>   }
+>   EXPORT_SYMBOL_GPL(housekeeping_enabled);
+>   
+> +static bool housekeeping_dereference_check(enum hk_type type)
+> +{
+> +	if (IS_ENABLED(CONFIG_LOCKDEP) && type == HK_TYPE_DOMAIN) {
+> +		/* Cpuset isn't even writable yet? */
+> +		if (system_state <= SYSTEM_SCHEDULING)
+> +			return true;
+> +
+> +		/* CPU hotplug write locked, so cpuset partition can't be overwritten */
+> +		if (IS_ENABLED(CONFIG_HOTPLUG_CPU) && lockdep_is_cpus_write_held())
+> +			return true;
+> +
+> +		/* Cpuset lock held, partitions not writable */
+> +		if (IS_ENABLED(CONFIG_CPUSETS) && lockdep_is_cpuset_held())
+> +			return true;
 
-Ah, yes, the term "compute features" can be confusing since we don’t actually
- update netdev->features. We can rename it if there’s a better alternative.
+I have some doubt about this condition as the cpuset_mutex may be held 
+in the process of making changes to an isolated partition that will 
+impact HK_TYPE_DOMAIN cpumask.
 
-> 
-> > + *	@dev: the upper device
-> > + *	@update_header: whether to update upper device's header_len/headroom/tailroom
-> > + *
-> > + *	Recompute the upper device's feature based on all lower devices.
-> > + */
-> > +void netdev_compute_master_upper_features(struct net_device *dev, bool update_header)
-> > +{
-> [...]
-> > +	netif_set_tso_max_segs(dev, tso_max_segs);
-> > +	netif_set_tso_max_size(dev, tso_max_size);
-> > +
-> > +	netdev_change_features(dev);
-> 
-> Maybe a dumb idea: I'm wondering if we're doing this from the wrong
-> side.
-> 
-> Right now we have:
-> 
-> [some device op] -> [this new function] -> netdev_change_features -> __netdev_update_features -> ndo_fix_features
-> 
-> Would it make more sense to go instead:
-> 
-> [some device op] -> netdev_change_features -> __netdev_update_features -> ndo_fix_features -> [this new function]
+Cheers,
+Longman
 
-Since we actually doesn't touch netdev->feature. I think [this new function]
-and netdev_change_features() should be in parallel relationship.
-
-> 
-> Possible benefit: not forgetting to fix up the "extra" features in
-> some cases?  (ie calling netdev_change_features when we should have
-> called netdev_compute_master_upper_features)
-
-That’s a good reason to call them together. However, ndo_fix_features is used
-for computing new features for later use. Since we both compute and set them,
-maybe we should put this in ndo_set_features instead?
-
-Thanks
-Hangbin
 
