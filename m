@@ -1,139 +1,183 @@
-Return-Path: <netdev+bounces-231244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93C0DBF66EB
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 14:25:52 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62E7CBF675D
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 14:32:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3F7B0355815
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:25:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0B7B34E1BF8
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:32:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2DE62F3612;
-	Tue, 21 Oct 2025 12:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQxK/5Hx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3554E2DECB0;
+	Tue, 21 Oct 2025 12:32:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8C11E5B71
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 12:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0414B2F2616;
+	Tue, 21 Oct 2025 12:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761049548; cv=none; b=McZgOIYYFGMjDFVs0K52r4BpRXV+RnNbQ0Igr4E9JrV6ZTh4+7ZYEQo2B3DqVbm4ceq/9wemR8CCqnp5gPa0xZRz59Rv+HcYwUQXkux5gu2PPo9WusGUib3lWuMv8rCvmHA/jgw3Crl+xXXgOF1Xg98zJ7MUjTmNwBbWuYFzHjk=
+	t=1761049924; cv=none; b=avk1nZOjjEV0oLGSJN0N912MQrlbR6Y0xitLYqb4LktOoXbtnOJ0YtkSTPbK2iLHZifSHrRgsy4/7u1VS3+gCOnVVxuhNBP0YUVGISUfNXtPO408cZGKPA4GUsL3e76XiZPZsnzwzAdzlEpgwX+93bT1Y799HUtrtpCj0PuURz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761049548; c=relaxed/simple;
-	bh=ktWOZ8sx65f0/bJwZvgY/DZ5tkUetuyN7nRy1XtAE/g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VVRb5DesTnru5sWJprz+0rarAysMsTpzL/FLIi+huAkMBIlfYFjiJLFj5cxVWlDx4kFNFq19pseopfs/67vYsVm8rWR6wGOcBxrKJyRTWncPbaxYDdzrU1v4aDUhWpv1xkkHYadVs4A7Q60BaPuvcJRFsGiHG7QWBzhWcKeYGQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FQxK/5Hx; arc=none smtp.client-ip=209.85.166.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-940e06b4184so166388139f.1
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 05:25:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761049546; x=1761654346; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ktWOZ8sx65f0/bJwZvgY/DZ5tkUetuyN7nRy1XtAE/g=;
-        b=FQxK/5HxZ/yY6nHDZ5wzGjhOiq65vgv3PVwf6BJ2UYo5mcmBTPMF3h+cr3KyqAZ6f0
-         hI9DNCC6LYV5WOsNSekhYUuXV2mHYM9fO1zJ7yu82Le+sCHUHSPtoEGwtwdkF60O9Sth
-         n2227CZQi8YnVKDjAAyvI8oZtTzD26UIwSLNBKICCO2/f1VNRrxTR3fz/RP4aRfa/zdV
-         zRduRFO4qy+lbeNIRd666QvxYUIufYeyBIMaIs9MJYXbD069nmU48lVFFZ2yLPPqJQTF
-         dEqG8SmvhrvjAey6onNMV6N387oGaHhvakh93oDWR7Mn9FXbIUwDw5fEhGWdz1gxV6S2
-         RP7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761049546; x=1761654346;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ktWOZ8sx65f0/bJwZvgY/DZ5tkUetuyN7nRy1XtAE/g=;
-        b=cyJWsIs18vK6IRTBPhSo3/D/AnqlHbaZFrYdmpHoqGogl97XAfCeqlm4v7BfsI96X+
-         ypSxm2ZLe8RMRUNVHY04kmSxymQW7XkvSo31VoAsbknIP0p1VF+1zWRMqnR6ut1NZXLb
-         KOjOb0YcqVaPxpNSga+Yzz9umHOlq1GOosRl1vm2ifEHtqAE9oXlPOnEyuyC0Tk4kZ2z
-         HWGT3DPva7gdCF4Sdqst4ZBFzFPMG8+pxaKKGtByquDpy78o4q4clxiwh1sIJYUzOkz6
-         rRI6dl3rP6BWnlBhwqAFmGsKkRwxATw2zu9jqxXmDoLraBl4R8Ag02rx+zFAoB4LQtda
-         zf+w==
-X-Forwarded-Encrypted: i=1; AJvYcCXcGmDuZdFLk9HcarWkGrQt5NmTxYuFqUZDP138g1diw7GVJJ9aK7x4AG8R0EOp9AuHKPsZ7To=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoJMvjvqW8/O8jQEcV+8qJmYEkqy1CBSPqwhEVA0e6ZLx4xX8B
-	HY3yrD4Y2r6wQ3/HYXeVeNBI3434SNgWiVgJAHvhc/36Bhbe5Len7pmbiEQP4Z2cuXhd4T1G/DG
-	dDVcVl0SaXX8of0KvzonIePaX5+bmYSA=
-X-Gm-Gg: ASbGncvK0uIvT2IgMQwyI6otRFjtEOmcPJA0xWBuvpVATLg/3bwTcvwU5k2m0Kjympr
-	07DcaIFK/EHBpnJsYZgD8vDN9R5j/oXYG9UJ1EEB9I6EqteyMX498Rh8ozzwXWkgMBojx267yEP
-	dnV+TFaA0g5GGJDcjFJ2ZwJSTwJjTWcuRoZdpy67d/j53I4ofQo/7OfrWSQfQNjoRUxGoXeZWlU
-	OinjPBcOwLL2WMt/Hz86XPKhASeldpdV/+kI+gSVg5vBSSqV8giiftHrC4K6dU7JuaDMgE=
-X-Google-Smtp-Source: AGHT+IEPjbfrKNwYdqhrdEIinLi4QHAD2LgZDidtG7WC2qmQgFHIghWWQJSKStO7jWPBz4mHplHpo+iB8yDDyXogzpE=
-X-Received: by 2002:a05:6e02:1d9d:b0:430:a65c:a833 with SMTP id
- e9e14a558f8ab-430c52ccf5fmr254378145ab.31.1761049545965; Tue, 21 Oct 2025
- 05:25:45 -0700 (PDT)
+	s=arc-20240116; t=1761049924; c=relaxed/simple;
+	bh=BbHrSanNbvDNOCEHSd7v5dXDuNcF7qVtGsFeh2Ji/zo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FT/kFhJAmfnzo8J36j0VFICFDi32SHoLcf0gog3sxsjhlsEUUSpeL3b5czW1177fg05ZUiSLTe12ewJwBkCkgoQpXconSdDocLNuJz6Qbm6hck45uTISjiqyF9hZIJdMbqA/068CqoTY193D9ie0RIu++Xwnz46B5DymAB6CMdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 0E45CA72E6;
+	Tue, 21 Oct 2025 14:31:53 +0200 (CEST)
+Date: Tue, 21 Oct 2025 14:31:51 +0200
+From: Gabriel Goller <g.goller@proxmox.com>
+To: Ido Schimmel <idosch@idosch.org>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: Wrong source address selection in arp_solicit for forwarded
+ packets
+Message-ID: <76z4ckbvjimtrf2foaislezs4vlru5upxn3i5ysu4au2m2pfei@slgxispho2iv>
+Mail-Followup-To: Ido Schimmel <idosch@idosch.org>, davem@davemloft.net, 
+	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <eykjh3y2bse2tmhn5rn2uvztoepkbnxpb7n2pvwq62pjetdu7o@r46lgxf4azz7>
+ <aPZB33C-C1t1z7Dk@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu> <CAL+tcoA5qDAcnZpmULsnD=X6aVP-ztRxPv5z1OSP-nvtNEk+-w@mail.gmail.com>
- <643fbe8f-ba76-49b4-9fb7-403535fd5638@nop.hu> <CAL+tcoDqgQbs20xV34RFWDoE5YPXS-ne3FBns2n9t4eggx8LAQ@mail.gmail.com>
- <d8808206-0951-4512-91cb-58839ba9b8c4@nop.hu> <7e58078f-8355-4259-b929-c37abbc1f206@suse.de>
-In-Reply-To: <7e58078f-8355-4259-b929-c37abbc1f206@suse.de>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 21 Oct 2025 20:25:09 +0800
-X-Gm-Features: AS18NWCK7bntQZTu0FjGx1VkqHaElYhEKFMOKaTvnzFXM91Cgx5Y_qGTKEr-zew
-Message-ID: <CAL+tcoDLr_soUTsZzFE+f-M0R83tvqx7tGjU+a5nBFSdtyP7Lw@mail.gmail.com>
-Subject: Re: null pointer dereference in interrupt after receiving an ip
- packet on veth from xsk from user space
-To: Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: mc36 <csmate@nop.hu>, alekcejk@googlemail.com, 
-	Jonathan Lemon <jonathan.lemon@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Magnus Karlsson <magnus.karlsson@intel.com>, 
-	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 1118437@bugs.debian.org, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aPZB33C-C1t1z7Dk@shredder>
+User-Agent: NeoMutt/20241002-35-39f9a6
+X-Bm-Milter-Handled: 55990f41-d878-4baa-be0a-ee34c49e34d2
+X-Bm-Transport-Timestamp: 1761049905233
 
-On Tue, Oct 21, 2025 at 6:52=E2=80=AFPM Fernando Fernandez Mancera
-<fmancera@suse.de> wrote:
->
->
->
-> On 10/20/25 11:31 PM, mc36 wrote:
-> > hi,
-> >
-> > On 10/20/25 11:04, Jason Xing wrote:
-> >>
-> >> I followed your steps you attached in your code:
-> >> ////// gcc xskInt.c -lxdp
-> >> ////// sudo ip link add veth1 type veth
-> >> ////// sudo ip link set veth0 up
-> >> ////// sudo ip link set veth1 up
-> >
-> > ip link set dev veth1 address 3a:10:5c:53:b3:5c
-> >
-> >> ////// sudo ./a.out
-> >>
-> > that will do the trick on a recent kerlek....
-> >
-> > its the destination mac in the c code....
-> >
-> > ps: chaining in the original reporter from the fedora land.....
-> >
-> >
-> > have a nice day,
-> >
-> > cs
-> >
-> >
->
-> hi, FWIW I have reproduced this and I bisected it, issue was introduced
-> at 30f241fcf52aaaef7ac16e66530faa11be78a865 - working on a patch.
+On 20.10.2025 17:06, Ido Schimmel wrote:
+> On Fri, Oct 17, 2025 at 04:47:27PM +0200, Gabriel Goller wrote:
+> > Hi,
+> > I have a question about the arp solicit behavior:
+> > 
+> > I have the following simple infrastructure with linux hosts where the ip
+> > addresses are configured on dummy interfaces and all other interfaces are
+> > unnumbered:
+> > 
+> >   ┌────────┐     ┌────────┐     ┌────────┐    │ node1  ├─────┤ node2
+> > ├─────┤ node3  │    │10.0.1.1│     │10.0.1.2│     │10.0.1.3│    └────────┘
+> > └────────┘     └────────┘
+> 
+> The diagram looks mangled. At least I don't understand it.
 
-Exactly. I simply reverted it and its dependencies and didn't see any
-crash then. It was newly introduced, hopefully it will not bring much
-trouble. As I replied before, I will take a look tomorrow morning.
+Ah sorry about that, looks like I had format=flowed configured on my
+client.
 
-Thanks,
-Jason
+Diagram should be correct now:
+
+   ┌────────┐     ┌────────┐     ┌────────┐
+   │ node1  ├─────┤ node2  ├─────┤ node3  │
+   │10.0.1.1│     │10.0.1.2│     │10.0.1.3│
+   └────────┘     └────────┘     └────────┘
+
+If it's still not right it's correctly rendered on lore:
+https://lore.kernel.org/netdev/eykjh3y2bse2tmhn5rn2uvztoepkbnxpb7n2pvwq62pjetdu7o@r46lgxf4azz7/
+
+> > All nodes have routes configured and can ping each other. ipv4 forwarding is
+> > enabled on all nodes, so pinging from node1 to node3 should work. However, I'm
+> > encountering an issue where node2 does not send correct arp solicitation
+> > packets when forwarding icmp packets from node1 to node3.
+> 
+> I believe ICMP is irrelevant here.
+
+Yep, ICMP is just an example.
+
+> > For example, when pinging from node1 to node3, node2 sends out the
+> > following arp packet:
+> > 
+> > 13:57:43.198959 bc:24:11:a4:f6:cd > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100),
+> > length 46: vlan 300, p 0, ethertype ARP (0x0806), Ethernet (len 6),
+> > IPv4 (len 4), Request who-has 10.0.1.3 tell 172.16.0.102, length 28
+> > 
+> > Here, 172.16.0.102 is an ip address configured on a different interface on
+> > node2. This request will never receive a response because `rp_filter=2`.
+> > 
+> > node2 has the following (correct) routes installed:
+> > 
+> > 10.0.1.3 nhid 18 via 10.0.1.3 dev ens22 proto openfabric src 10.0.1.2 metric 20 onlink
+> > 
+> > Since arp_announce is set to 0 (the default), arp_solicit selects the first
+> > interface with an ip address (inet_select_addr), which results in
+> > selecting the wrong source address (172.16.0.102) for the arp request.
+> > Because rp_filter is set to 2, we won't receive an answer to this arp
+> > packet, and the ping will fail unless we explicitly ping from node2 to
+> > node3.
+> > 
+> > I'm wondering if it would be possible (and correct) to modify arp_solicit to
+> > perform a fib lookup to check if there's a route with an explicit source
+> > address (e.g., the route above using src 10.0.1.2) and use that address as the
+> > source address for the arp packet. Of course, this wouldn't be backward
+> > compatible, as some users might rely on the current interface ordering behavior
+> > (or the loopback interface being selected first), so it would need to be
+> > controlled via a sysctl configuration flag. Perhaps I'm missing something
+> > obvious here though.
+> 
+> This would probably entail adding a new arp_announce level, but nobody
+> added a new level in at least 20 years, so you will need to explain why
+> your setup is special and why the same functionality cannot be achieved
+> in a different way that does not require kernel changes.
+
+To add a bit more context, I'm using FRR on all nodes and the dummy
+interface ips are distributed using OpenFabric. But this shouldn't
+matter because the routes are inserted correctly and work fine.
+
+> A few things you can consider:
+> 
+> 1. You wrote that the router interfaces are unnumbered. Modern
+> unnumbered networks usually assign IPv6 link-local addresses to these
+> interfaces. These addresses are only used for neighbour resolution and
+> can be used as the nexthop address for IPv4 routes. For example:
+> 
+> ip route add 192.0.2.1/32 nexthop via inet6 fe80::1 dev dummy1
+> 
+> Or using nexthop objects:
+> 
+> ip nexthop add id 1 via fe80::1 dev dummy1
+> ip route add 192.0.2.1/32 nhid 1
+
+Hmm I don't know how this would help? There is a link-local address set
+on the interface, but we would have to add a ipv6 source address to the
+arp packet which wouldn't be right?
+
+The route already exists (see `dev ens22` and `onlink`).
+
+> 2. If you have interfaces whose addresses should not be considered as
+> source addresses when generating IP/ARP packets out of other interfaces,
+> then you can try placing them in a different VRF if it's viable.
+
+Yep, this is definitely a solution as the "loopback" address of the VRF
+is its master device. Still, what if the master device or the loopback
+device have multiple ips?
+
+> 3. Requires some work and I didn't look too much into it, but I believe
+> it should be possible to derive the preferred source address and rewrite
+> it in ARP packets using tc-bpf on egress. See:
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=dab4e1f06cabb6834de14264394ccab197007302
+
+Yeah ebpf is definitely also a solution, but IMO this is a bit of a
+weird behavior and should be fixed in the kernel.
+
+We have all the information we need (from the routes) and just need to
+use them to select the correct source address, and not just give up and
+select randomly.
+
+
+Thanks for the answer!
+Gabriel
+
 
