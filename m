@@ -1,96 +1,208 @@
-Return-Path: <netdev+bounces-231255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1D7CBF6ABD
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 15:09:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC564BF6AF0
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 15:12:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6C207345B3F
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 13:09:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3777419A45BF
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 13:12:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDFB5334373;
-	Tue, 21 Oct 2025 13:09:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C15E3346A3;
+	Tue, 21 Oct 2025 13:12:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D0BNN4bv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c16Q1L7+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7860925B2E7;
-	Tue, 21 Oct 2025 13:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B6D2459F7
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 13:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761052191; cv=none; b=RCmdzJ9i0vWlIWheTFAqC8TvG2DZ6ZJLZJ62UfKYBbis61ViaXT8zSdU7V+34NRNC1gJq0x3qh3UpjH9LS2xSzbXb4vtI6+cHhXFci/k13Aq9JKhVm9V3mo7c0zZNtIY0BSlcT/ZMhzLUtZkj4+L9Mzhz06lERRYGHHrblykufM=
+	t=1761052339; cv=none; b=i4n+adPD8bob/rNLiRuk9D43eRQxHGIw4fasY7PixTymRkDSFqdijXl5ULzMFOfpJ0WexHeOC+Hdy30Hhj7K8abfC3LYcbEUK1Tr0wIFKZ6OgcXMK3ubbyhcvMwmZxBAUI08yte4BPhth8vVlmoQoLRwe2oocdLLRzWZrpLvVrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761052191; c=relaxed/simple;
-	bh=H7UgwUYXbmCQ0jWM81jD1014fDBSOlu/wN7/eync+l8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=igAfYIQ9yEETzzpKO6usXA+AVF5RL1BhYJNmJFDwN6bHt48pJvnJatpBmxXTBkV2Ok9qxDyvrN8vwILPl0rTk7c5sZPNJ8+TnYZHXV17ST6CZPYLyX/lzUhpIdPujPtOoPyR8DbzXmenbwnpjUuzGgj4xJpLn4UwX9GC1Hr67Vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D0BNN4bv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D69DC4CEF1;
-	Tue, 21 Oct 2025 13:09:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761052191;
-	bh=H7UgwUYXbmCQ0jWM81jD1014fDBSOlu/wN7/eync+l8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D0BNN4bv0f2bxHTh/+Nw5MNWVpFs/tQMMePND99gLOmnI0NT3sCkhUKwGW+t4YPJH
-	 hZxzQX/M2vfwhm82SiZp/NNrc9v/0+zip5dAUoBT+IFspML+LLlpWy4SAzOAV3KQrV
-	 lH3bhwZyVYkVak5I/n29kivKEpVz9lmKMS/YEw2pv7kB004pduoQd9/OpTz4Q6s4rt
-	 RYTmObHjwfYDi9vtkBhiuZmHyQF5GHxpqhG/E9pu5FLL4iKBk4ozH8VpRO9HaiGHWb
-	 UxeJTM2Iu+UcAxf7miIVbDtU8CAnNRG21EVRX6ejjt2wb8iUy7aVLNFlCMgg4tvHQ9
-	 FuMhBhxywkORg==
-Date: Tue, 21 Oct 2025 15:09:39 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Miklos Szeredi <miklos@szeredi.hu>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Chuck Lever <chuck.lever@oracle.com>, 
-	Alexander Aring <alex.aring@gmail.com>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>, 
-	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
-	Bharath SM <bharathsm@microsoft.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, NeilBrown <neil@brown.name>, 
-	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
-	Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, netfs@lists.linux.dev, 
-	ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 00/11] vfs: recall-only directory delegations for knfsd
-Message-ID: <20251021-meditation-bahnverbindung-7c1d2aa25415@brauner>
-References: <20251017-dir-deleg-ro-v2-0-8c8f6dd23c8b@kernel.org>
+	s=arc-20240116; t=1761052339; c=relaxed/simple;
+	bh=lXXrXhZQlKkja3Hsm370JTFLnuv6HR//m4/vJrb54HY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z5aK4A6V5gAHoQl6UvSeVzkpASM6IJBvXOsqNlVPPBYyZIM/JMiPK/2YCSMqJ6s2WODmNVkJZE4Ynj0/2YX4ZQI0lTjCs309Ly5LyFmEgAt6suQxUMnn/QH4/sQsZTsqp80yERm4h99YVOz+gSFd3zM215cgsCxjXdjvyDKCocg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c16Q1L7+; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2897522a1dfso55471605ad.1
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 06:12:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761052337; x=1761657137; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jnwEDlLy9NGxzXc8xxMXBW1U2krgWGY/nWxqk6w/IGA=;
+        b=c16Q1L7+9Z85/9lvjd7D/pNTdY8AAkV24tDmadXnYRELemSFgvGXw0aYyH4n9S4s4f
+         Uzv0FdoSWFTI8nNwV2ZuKmA847+q/rVZcmrqOxCdt9YOxin8Dpbilgb+xD5rbgWouqZC
+         0/aKebhrNXIpO0q+hDMyhW57K5C1jCDTmQbatMCJN2KqYPNPAfhgKpF3xUQkRmxHUoHb
+         Bo3PC6sxGzJ/TQ/pmvOqLs0JvRqY2Mr8Y0xixxHTVfCePzjpL7wCPthllIXgeo0OZqKX
+         IWfSrXyrvkVFclt3SS7sXuN8NrL4EbNje0f3o1aVJ0WjbGNSDg/vQC8VVTS7ndcBs0qI
+         5wkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761052337; x=1761657137;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jnwEDlLy9NGxzXc8xxMXBW1U2krgWGY/nWxqk6w/IGA=;
+        b=fk+q0carwSJNpuhtmmYpboSH1M7lW5kkTlQggr8od0A3mySOg9kxU1BOdzZ7hQXfVH
+         kckQdJC7TDqAslxeR7oggnG85mjkQg5oRhPC+l1gmMEeX2A6gM844UF0MHFdwtflupiz
+         a3i+WMQfM/x3Kry2bDFdGLqJLP9g6Nf59ArMnml20j7ar3AIRVfwVT9z9EIxUk1TtLLa
+         Row2t7/GIpmShDxxVnPMh09HvMRZtxC7VuSobd8Z0YgxAYrLeS7tNvkcp7CXeuD5lJBV
+         ZzpdGiTVTEq239gqx9STSTVpwxwTKkfpnujlp7qfr/jlIUAG2m4ituwRtLGCAmxL7/o6
+         4zUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUcgTM4jk3PQn1jWvyuUjUZi2bJtFovYxbNUWM5KTYuBcCHgrRSJElFGdIdjCAK2kJZoNlvNz4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbsATQ1wgiQmKnj/xWbMdUT37lG/u1JqTLOACo5d1hxAa6rPpw
+	c9KsMPVNZ4N2NX2N4zaIhiVOPIWO0qgxm41vvEL6N0XtcA2ciUGkqJRk
+X-Gm-Gg: ASbGnctUW7SdMExT8WPNEsPUhPnPO6dukyKSs9InG47Gno6EbdqGalK/v7d5SPO6sss
+	2R1vYrWK4J4M2HNU50IRMJklQDfcd8725qIuDV/DdPfRJ1YjAp2iwPR8ypwOkwOTT3rO51aDev9
+	Z3cOVHWlhz7rqxP7YKNROmwtJFKfgSk2VQA2tdWp45yJScH4JXtHV5zEdSRVF9QZrUhOxLBiaKc
+	rbGqQl1aVjIL2fSHe0eGe7AxyJiS5fsuLTfReMGtSuFJkRwfyId3kucqBlZkoS2D8aEWFh2lTn2
+	F7pLonFtlZIEzLGrbDiv7jNeTiqBj7hUNdYHmwzymSQ3/otRDAWG4Cw06yo8DYeQ7azmwtNdkTb
+	M9PLnSsd3xxUFiYk4jJM96Uz9D0j96geamjjRh+wl0hTcwYrPtGZmQJt+tVhUxT/o45cJ+QIUBr
+	P+DMtloiMJhaTzG9mEdm9HDNvgRpSj/+R8BS9MnqeQ62NAvhLmmCClzTL4uw==
+X-Google-Smtp-Source: AGHT+IEIVWVEFQQJlwTvkcEsPIa9G1I0ilTN8+mEn+ignqV9jVSKxaeVbgILkk1uZgjXZQfay/Ld0g==
+X-Received: by 2002:a17:902:e5cf:b0:290:9576:d6ef with SMTP id d9443c01a7336-290cba423b1mr231725315ad.54.1761052336909;
+        Tue, 21 Oct 2025 06:12:16 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-292471fd9ddsm109248175ad.89.2025.10.21.06.12.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Oct 2025 06:12:16 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	joe@dama.to,
+	willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v3 0/9] xsk: batch xmit in copy mode
+Date: Tue, 21 Oct 2025 21:12:00 +0800
+Message-Id: <20251021131209.41491-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251017-dir-deleg-ro-v2-0-8c8f6dd23c8b@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 17, 2025 at 07:31:52AM -0400, Jeff Layton wrote:
-> A smaller variation of the v1 patchset that I posted earlier this week.
-> Neil's review inspired me to get rid of the lm_may_setlease operation
-> and to do the conflict resolution internally inside of nfsd. That means
-> a smaller VFS-layer change, and an overall reduction in code.
-> 
-> This patchset adds support for directory delegations to nfsd. This
-> version only supports recallable delegations. There is no CB_NOTIFY
-> support yet. I have patches for those, but we've decided to add that
-> support in a later kernel once we get some experience with this part.
-> Anna is working on the client-side pieces.
-> 
-> It would be great if we could get into linux-next soon so that it can be
-> merged for v6.19. Christian, could you pick up the vfs/filelock patches,
-> and Chuck pick up the nfsd patches?
+From: Jason Xing <kernelxing@tencent.com>
 
-Happy to! Sorry, for the late reply. I was out for a few days.
+This series is focused on the performance improvement in copy mode. As
+observed in the physical servers, there are much room left to ramp up
+the transmission for copy mode, compared to zerocopy mode.
+
+Even though we can apply zerocopy to achieve a much better performance,
+some limitations are still there especially for virtio and veth cases.
+In the real world, many hosts still don't implement and support zerocopy
+mode for VMs, so copy mode is the only way we can resort to.
+
+Zerocopy has a good function name xskq_cons_read_desc_batch() which
+reads descriptors in batch and then sends them out at a time, rather
+than just read and send the descriptor one by one in a loop. Similar
+batch ideas can be seen from classic mechanisms like GSO/GRO which also
+try to handle as many packets as they can at one time. So the motivation
+and idea of the series actually originated from them.
+
+Looking back to the initial design and implementation of AF_XDP, it's
+not hard to find the big difference it made is to speed up the
+transmission when zerocopy mode is enabled. So the conclusion is that
+zerocopy mode of AF_XDP outperforms AF_PACKET that still uses copy mode.
+As to the whole logic of copy mode for both of them, they looks quite
+similar, especially when application using AF_PACKET sets
+PACKET_QDISC_BYPASS option. Digging into the details of AF_PACKET, we
+can find the implementation is comparatively heavy which can also be
+proved by the real test as shown below. The numbers of AF_PACKET test
+are a little bit lower.
+
+At the current moment, I consider copy mode of AF_XDP as a half bypass
+mechanism to some extent in comparison with the well known bypass
+mechanism like DPDK. To avoid much consumption in kernel as much as
+possible, then the batch xmit is proposed to aggregate descriptors in a
+certain small group and then read/allocate/build/send them in individual
+loops.
+
+Applications are allowed to use setsockopt to turn on this feature.
+Since memory allocation can be time consuming and heavy due to lack of
+memory, it might not be that good to hold one descriptor for too long,
+which brings high latency for one skb. That's the reason why the feature
+is not set as default.
+
+Experiments numbers:
+1) Tested on ixgbe at 10Gb/sec.
+copy mode:   1,861,347 pps (baseline)
+batch mode:  2,344,052 pps (+25.9%)
+xmit.more:   2,711,077 pps (+45.6%)
+zc mode:    13,333,593 pps (+616.3%)
+AF_PACKET:   1,375,808 pps (-26.0%)
+
+2) Tested on i40e at 10Gb/sec.
+copy mode:   1,813,071 pps (baseline)
+xmit.more:   3,044,596 pps (67.9%)
+zc mode:    14,880,841 pps (720.7%)
+AF_PACKET:   1,553,856 pps (-14.0%)
+
+[2]: taskset -c 1 ./xdpsock -i eth1 -t  -S -s 64
+---
+v3
+Link: https://lore.kernel.org/all/20250825135342.53110-1-kerneljasonxing@gmail.com/
+1. I retested and got different test numbers. Previous test is not that
+right because my env has two NUMA nodes and only the first one has a
+faster speed.
+2. To achieve a stable performance result, the development and
+evaluation are also finished in physical servers just like the numbers
+that I share.
+3. I didn't use pool->tx_descs because sockets can share the same umem
+pool.
+3. Use skb list to chain the allocated and built skbs to send.
+5. Add AF_PACKET test numbers.
+
+
+V2
+Link: https://lore.kernel.org/all/20250811131236.56206-1-kerneljasonxing@gmail.com/
+1. add xmit.more sub-feature (Jesper)
+2. add kmem_cache_alloc_bulk (Jesper and Maciej)
+
+Jason Xing (9):
+  xsk: introduce XDP_GENERIC_XMIT_BATCH setsockopt
+  xsk: extend xsk_build_skb() to support passing an already allocated
+    skb
+  xsk: add xsk_alloc_batch_skb() to build skbs in batch
+  xsk: add direct xmit in batch function
+  xsk: rename nb_pkts to nb_descs in xsk_tx_peek_release_desc_batch
+  xsk: extend xskq_cons_read_desc_batch to count nb_pkts
+  xsk: support batch xmit main logic
+  xsk: support generic batch xmit in copy mode
+  xsk: support dynamic xmit.more control for batch xmit
+
+ Documentation/networking/af_xdp.rst |  17 +++
+ include/net/xdp_sock.h              |  14 ++
+ include/uapi/linux/if_xdp.h         |   1 +
+ net/core/dev.c                      |  26 ++++
+ net/core/skbuff.c                   | 101 +++++++++++++
+ net/xdp/xsk.c                       | 223 ++++++++++++++++++++++++----
+ net/xdp/xsk_queue.h                 |   5 +-
+ tools/include/uapi/linux/if_xdp.h   |   1 +
+ 8 files changed, 359 insertions(+), 29 deletions(-)
+
+-- 
+2.41.3
+
 
