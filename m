@@ -1,74 +1,94 @@
-Return-Path: <netdev+bounces-231380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D65DBF8445
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 21:32:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FF70BF844E
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 21:33:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B76A74E2119
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 19:32:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58F0E5457CC
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 19:33:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BAC14C5B0;
-	Tue, 21 Oct 2025 19:32:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A44D25D540;
+	Tue, 21 Oct 2025 19:33:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VrX+H99/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BSuXqKmb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1999D350A3B
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 19:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11E9350A0D
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 19:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761075143; cv=none; b=Ae/Y4MOvxIvE/ezpN2bgCbRPKccEsNqlbz5z+1ChaIqrBpQQYS2rOvzpj5NFuIxdkH6nAGxc6uGMlzbYmb5W5gFg8+1TgBfTffq4IlZg2MU6uU4xxEBRr9JJS9X+ycuIRvBRfs3gcfqwEumtQow5iNBdQ3h3KAlEmLp9apz2Egk=
+	t=1761075210; cv=none; b=PVMCAWV5gEqEiO/wrImDfBKel9ftpSedr5626+f0yhShp44bobmuBGAXmss+/mykq5JdCffA8or1+qOm0PwWaLdFk+Ay2dPgL3Oy4tXk4aozqfyzyHTL+MqUjj9Xm2loiUJYmJWddU5NHM8VHLqZIxBbd/FXOWkTlpjQdhkjY2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761075143; c=relaxed/simple;
-	bh=kb1n4e50vwLb2MESluC2opPUNy4EGt9kz42zkcw2xIA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XFQSVeC24IO6AqCElJHHBQ/7NOEiDV1JM0U+CUIe78GEjI7XEdCUHDCJuFfqwU3zuKPZqj6X5zgefQPeA1di5sKvZ1mb5iYNnol0bJA/E/BkD6pAU1oC38+aBwlfrhJyAFn93Eu2wConEZ4oFtDpkWRwGDEg0r/nVWZ1Qg2F/7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=VrX+H99/; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59LIRMmC008699;
-	Tue, 21 Oct 2025 19:32:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=xPmAhom93LupiUCkdmp7KzXxGSnEr
-	oJcVaNYIA5/O2w=; b=VrX+H99/gSXenmHO4Zi2ETD6nac/zxtY2BTMVWxN6V+OI
-	57USpFq2PBjvoXzydh2COqx9jV3XW8+UokeqzFCYFlkWIC/CI7qWe5YW7KpnC+qS
-	nIOKtrUiY313GHrQPNYYczyILW44mqNXO447fbvzTERlICwcpST1uWiHM/R9lAQD
-	+qvbDiArZ1RQTe8X60EEJQS9jq3fY7YZevRUfXI20pcm5EN1pQIV549L1+MyHS2X
-	xFR96RU2sTUEuYrA33XgXTTszGI4bMpqJz1UKs/NYEZaLV3jKy9bWvT29Wff79Hq
-	mx16xjrC1n97haLUn/nWqN9hYTCcC4KGgj7ekhvpg==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49v2vvxayv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 Oct 2025 19:32:07 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59LHIPGu014029;
-	Tue, 21 Oct 2025 19:32:06 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 49v1bc853v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 Oct 2025 19:32:06 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 59LJW5nd017565;
-	Tue, 21 Oct 2025 19:32:05 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 49v1bc8530-1;
-	Tue, 21 Oct 2025 19:32:05 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-        andrew+netdev@lunn.ch, kuba@kernel.org, davem@davemloft.net,
-        edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
-        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
-Subject: [PATCH net-next] igbvf: fix misplaced newline in VLAN add warning message
-Date: Tue, 21 Oct 2025 12:32:01 -0700
-Message-ID: <20251021193203.2393365-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1761075210; c=relaxed/simple;
+	bh=2H049I89BxKd0KACb/ORIx1f6NaIgJoRwhXgD3m6n1o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mv5nQbGDiO7xNv7QqXtNFrwWxXmwnU/dRyOE9z2fUsSxzDdQ2KpEH2yK0wewJDPVw4IcvS6/Big7A3gmjuXwQVmZcFW6kYQERTiwBBE8VpCfPlJ4iIRrgNZywqBD2A37qTeNKQb/paQZjr2lme8mgdGPIfslbmjT9Mwa4FcatzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BSuXqKmb; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3f0ae439b56so4371516f8f.3
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 12:33:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761075206; x=1761680006; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eceHFX0RmtQDMq4x5hNy8OnbHWKSwCTIDv7MpsAV2Jo=;
+        b=BSuXqKmbhlWrR1eJ0jOAdn81p/OJpmfzRt/wdSwvcsrsfvShTTVIumDzCzpaQ6cmwh
+         vLJo4eIUh2OGEegQn2nULP7KLfTYA7NIqGHPNFgmxqT/0OgX9ksb0YtSJl0X3SU2IKnR
+         FhTHpVznJK1exGjANHJm8g/expuqCvSHKWHHGq9TH2EHg3iwTOsw4DAEL/1/zjyG5rLJ
+         dlrvgScutxigc9S9V4Fsw52VzksfQN00AYb19Q/jXqspuA5kMNZMEnCUfsIBv8Ubce6X
+         jK8QW77Dh3h4rE6/Qli+sAijFeNk3g1GDb7Gl/uc5JpIaFdhydivrUkgxNMSov9u1h8U
+         OdVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761075206; x=1761680006;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eceHFX0RmtQDMq4x5hNy8OnbHWKSwCTIDv7MpsAV2Jo=;
+        b=OO5gR9F3LBsU8QXqK2aph4d+Bt4TWLArBpOBsLkwVDOPwuthgud1XdNvqdbAiNdkqa
+         VR2vDn/5u8xIJ0qvGLfiOthqXVaxJGtaBWjdtlkfJPHWG5TmOtAAbAFw9E/mvt6feezF
+         dEuqMo9vPx8qh7mxLKuOajs8dpRK24ybwKIz87R89ESj5HBjeRpDfSkmJg9ggxozODTX
+         wnaPSBudvCEmLtiSSgPguq801Lsa41PhmR+sgZAqp5HW2gOKgK8U7cOYfTnXU+wPRIcr
+         rBCqFEU62qMCgIBGFfRYXteVW63tN/eRPr2LB51nj0S7IGeSCegHatKPB7EWhQafgJAK
+         RpeA==
+X-Forwarded-Encrypted: i=1; AJvYcCUNLKZeLue3hY1awzLQQf+jyreDkD29AG17UIbwWrVxwPqai5aSiOFs/0CKHB2S8dgAxaK5S7Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yya2sCOdu3/8KQQ3t43377GJCzEFdIjOqB2xgNXFE4+S7bSPBfJ
+	8NBP4xTznk1f6siopV2pmHug6iUrg4JMUAGK2J7LmydFB0zi6Ey8/qht
+X-Gm-Gg: ASbGnctFY0mMm6Um4I9YBsQrDGwMhmxngFo+LqslJpLaIUIOfOGfKp4vQtYAMheWUjW
+	kOv2UsIe859ql+/nfCulQkliMu+BezuioL4jFY50GWeeTb+s9LA4BfSC4ccJMFk2/n3EGvC2E79
+	sq6YY4CxDZqIsxWjqGEdQn9MTy/Ivje4agTKs9evPwgw6uKwtosBdZVMeVPlI3YyeTOi2pbCSmb
+	V+vw14RUkGM9PPD6T5YNBUDsb1yYWW0vpOwKWEwYHdDtGlQF28wzQ2q+PokcB0hqm1dXALjFFX9
+	DhaXzJ/nDoC1jYiWZ9GcBT16cd2y+XEeFoHaqv9TCMfrhINc39OxLLBGILOXrW3TOYyp8uuKplN
+	2+B3lKqIt089Uol1N/gbq4J8EzuLleyQGYf+iVFTmxnXMiDzh7eswFFlKCZ0pV97zff3yY/YeDK
+	wfQld4t02oj3ZNj9zQ3DP3KRLZkSsea94M4zfYk4dDSgc=
+X-Google-Smtp-Source: AGHT+IHOYqls17257tkZfrI1j3S/rbxbkd3G5LS7Xa1V5wyrUo+IQJd6ypdrMXOGDYIilpkwXDnmEQ==
+X-Received: by 2002:a05:6000:22c5:b0:427:492:79e5 with SMTP id ffacd0b85a97d-42704d7504emr10968810f8f.21.1761075205922;
+        Tue, 21 Oct 2025 12:33:25 -0700 (PDT)
+Received: from Ansuel-XPS24 (93-34-92-177.ip49.fastwebnet.it. [93.34.92.177])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-427f00b97f8sm21327187f8f.36.2025.10.21.12.33.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Oct 2025 12:33:25 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next PATCH 0/2] net: airoha: initial phylink support
+Date: Tue, 21 Oct 2025 21:33:10 +0200
+Message-ID: <20251021193315.2192359-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,49 +96,22 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-21_03,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
- suspectscore=0 spamscore=0 adultscore=0 bulkscore=0 phishscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2510020000 definitions=main-2510210156
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMiBTYWx0ZWRfX/IGAbA+V4eXP
- uLvCRNVJVoApg0cnfaOh5xMEwUXYztqdN9o9tPv+Dv4NRYPuOyrAps42mXB3zPOgIGG09eiz0LE
- VzMh7pvO2xJBIiwFRGiWdrzMJqho9wxT17PxFnlYmhyKbvpq2xVioo9MBnRpbXJcn3ieeHwYsYF
- vzoMIFdEFRqV3RJjEflf+y0mpBH/1DBuN19SBTvorXbRcjj+PR3L/Bkmr1oUvcVGwXgkweAGYVE
- UydTYXP9ZhiUbN9SddlxYhghfXSsUgECX0fTSs9DEHXhOGQNm86K71tVW6whgsr9HEKk3/xxQlX
- GFSm8mqwk8kNnj3bKEMtBXaMCaQ0Uo/jR9STHsv7TAm+Dg48prmvypw2wDWV9mvGqwBXRW1GEmI
- cS2Gyc0uhjIPtCUT08blDjxIpsRprQ==
-X-Proofpoint-ORIG-GUID: -N4oouHI-rZ9AvZHMsU_QyfZHdwbikiJ
-X-Proofpoint-GUID: -N4oouHI-rZ9AvZHMsU_QyfZHdwbikiJ
-X-Authority-Analysis: v=2.4 cv=FuwIPmrq c=1 sm=1 tr=0 ts=68f7dfb7 b=1 cx=c_pps
- a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
- a=TjKbjQt2ObX76LaVSKkA:9
 
-Corrected the dev_warn format string:
-- "Vlan id %d\n is not added" -> "Vlan id %d is not added\n"
+This trivial patch adds the initial phylink support. It's expected
+in the future to add the dedicated PCS for the other GDM port.
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- drivers/net/ethernet/intel/igbvf/netdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This is to give consistent data when running ethtool on the GDM1
+port instead of the "No Data"
 
-diff --git a/drivers/net/ethernet/intel/igbvf/netdev.c b/drivers/net/ethernet/intel/igbvf/netdev.c
-index 61dfcd8cb370..ac57212ab02b 100644
---- a/drivers/net/ethernet/intel/igbvf/netdev.c
-+++ b/drivers/net/ethernet/intel/igbvf/netdev.c
-@@ -1235,7 +1235,7 @@ static int igbvf_vlan_rx_add_vid(struct net_device *netdev,
- 	spin_lock_bh(&hw->mbx_lock);
- 
- 	if (hw->mac.ops.set_vfta(hw, vid, true)) {
--		dev_warn(&adapter->pdev->dev, "Vlan id %d\n is not added", vid);
-+		dev_warn(&adapter->pdev->dev, "Vlan id %d is not added\n", vid);
- 		spin_unlock_bh(&hw->mbx_lock);
- 		return -EINVAL;
- 	}
+Christian Marangi (2):
+  net: airoha: use device_set_node helper to setup GDM node
+  net: airoha: add phylink support for GDM1
+
+ drivers/net/ethernet/airoha/airoha_eth.c | 110 ++++++++++++++++++++---
+ drivers/net/ethernet/airoha/airoha_eth.h |   3 +
+ 2 files changed, 100 insertions(+), 13 deletions(-)
+
 -- 
-2.50.1
+2.51.0
 
 
