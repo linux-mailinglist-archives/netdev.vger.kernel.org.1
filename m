@@ -1,93 +1,192 @@
-Return-Path: <netdev+bounces-231163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EF42BF5E1C
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:50:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5C81BF5E49
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:53:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B15118C7840
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 10:50:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3A21198314F
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 10:53:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD2032C929;
-	Tue, 21 Oct 2025 10:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49D225A659;
+	Tue, 21 Oct 2025 10:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ny3nfq0f"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="UYk3zA5I";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Npv0mdRr";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="RJ5wY9Sw";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="MKymBbHE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5B3E32C33B;
-	Tue, 21 Oct 2025 10:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFABE321422
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 10:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761043815; cv=none; b=gXFjzlOPqphVlU6eMl6Sm2yRRWhFl9alGjz5Adl6J2ELPFziUm5+AarsDTKjwNmq6aIjv7/W1wqzcgJGFZCPliMTCWxGqj5JmjdO7hevrGxTIVPKaTe9Ne3st/7VVbJQfZosP0mwLwg6+yshqUu5EyyTt49gRTF2JnfSxz03SpA=
+	t=1761043928; cv=none; b=VdqHOQueg0SAjMLcXNLMzq7o3gbnXJ9F84D8Twp88kzol11WUAtYrfh8tzngEInF2illOJxlDw5Ru6kCE22kq4PwBmaY8Of/Eo57X6YJIpB/vuoFtxCRW0oPfALwE1tYpwlS78XRSrrpYUNcfD8nWfsZD+nKCwXZjfM7nIZpfnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761043815; c=relaxed/simple;
-	bh=K/2vERcbAwFCVwr76LZbkx/kjJBJLSsur2UIOY6FUpM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eOXEpa8pr/02HCIGqqPZLxZe6v7CvomnuncfvqxVQrC27lb1QROPiJtLChhjVc0aoKogdaAus+SOFr/dmfSpaCCxCVrezviadEPeVG+oMG502Bx5tkQZIGn7cMs4EgxlO9Z7NyTqhcVyf0mh1RatNYRipk11dkTcRavgSPBupS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ny3nfq0f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3E24C116B1;
-	Tue, 21 Oct 2025 10:50:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761043815;
-	bh=K/2vERcbAwFCVwr76LZbkx/kjJBJLSsur2UIOY6FUpM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ny3nfq0fWu7YAOY8Rane5t5+nVdm4p2WchbMvlCQWdTZiX+HJQ3u0xYL03LsIsn3f
-	 rRTLNVZSPUkEI9c2HtCxrUAGwUwnJIlAL6yG7dEiwFEB4OCFV0ZM+bZO//yn4YuCMb
-	 W8EZl18n4easc0wXhlZ3Fp0dXfMOaiCWUdwpaPJRVhzDTkBcNZKR9l601GgZJ9H+3e
-	 +pQwwu5LS4LlI3RRsz1Emxbo+OyW/yvvz1IKW/6j/lYO0yqwGIVnqG1+cvIe3zZZvv
-	 xFJlnLjNvpRFOH1M8s6x8YPX3UyprAIb9ypIj7j2/lwwRkoi7+D8vw+kqbmwPPs6+U
-	 N2xlM6Eo/S4XQ==
-Date: Tue, 21 Oct 2025 11:50:10 +0100
-From: Lee Jones <lee@kernel.org>
-To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	linux-leds@vger.kernel.org, netdev@vger.kernel.org,
-	Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Subject: Re: [PATCH leds v2 00/10] Add support for offloading netdev trigger
- to HW + example implementation for Turris Omnia
-Message-ID: <20251021105010.GD475031@google.com>
-References: <20210601005155.27997-1-kabel@kernel.org>
- <CA+V-a8tW9tWw=-fFHXSvYPeipd8+ADUuQj7DGuKP-xwDrdAbyQ@mail.gmail.com>
- <7d510f5f-959c-49b7-afca-c02009898ef2@lunn.ch>
- <CA+V-a8ve0eKmBWuxGgVd_8uzy0mkBm=qDq2U8V7DpXhvHTFFww@mail.gmail.com>
- <87875554-1747-4b0e-9805-aed1a4c69a82@lunn.ch>
- <CA+V-a8vv=5yRDD-fRMohTiJ=8j-1Nq-Q7iU16Opoe0PywFb6Zg@mail.gmail.com>
- <bd95b778-a062-47b1-a386-e4561ef0c8cd@lunn.ch>
- <CA+V-a8uB2WxU74mhkZ3SCpcty4T10Y3MOAf-SkodLCkp-_-AGA@mail.gmail.com>
+	s=arc-20240116; t=1761043928; c=relaxed/simple;
+	bh=09Lqe84KKzgJpR85NdRkX0PiWo7i/dASLhMTtLoTRYA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UKdOMwGu2/QPmrTVhRJtAyfaeQWIA8uwhwxgC0sQSVoRGqwK0vkZhRXbk6rz+n1LGFcDtZf7gHccT6ZRvBGXUH8V5S5YnnKEbGbDhdZVvVbxGYRxZ7NhIAwsUqOLOUN9SnLWTIh60Pi39YQnoJ6ez1zctLWMTCXsthO0z7T4L2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=UYk3zA5I; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Npv0mdRr; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=RJ5wY9Sw; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MKymBbHE; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id ED5C3211C8;
+	Tue, 21 Oct 2025 10:51:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761043921; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7XP7QtIU8gKj770j1vZYLnbvcbRkQv38eNG7ETO4pCs=;
+	b=UYk3zA5IjUNkZsjcQxP3pdFQ0/bZxAEnyVClPUPuzyROpaRchKCT4Nqb4ONKKaISIfpIlw
+	E5wgO8DdDRRuBWpQ8dQfMVShhM67Yi4cPLHOBHmqr/Nu5X5/gVY4j/9OFPVpEZgVGkU+AX
+	swoFztrKS2njOZ1FTyTa26SVGD+b088=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761043921;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7XP7QtIU8gKj770j1vZYLnbvcbRkQv38eNG7ETO4pCs=;
+	b=Npv0mdRr3tv/DJvS+6UFbHNnBWxDMrnjxNuqn7zpiAaV4Y0eWmTgpPqpaxG5DJz1WxDJBV
+	K87792718Xv+jHBA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=RJ5wY9Sw;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=MKymBbHE
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761043916; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7XP7QtIU8gKj770j1vZYLnbvcbRkQv38eNG7ETO4pCs=;
+	b=RJ5wY9SwB/hsdfbG99akV0FGV/GegdsKLOdRBR8vJa6bp0SFmZfheipPPlM3NsFwoAdwfI
+	G61toC9OiPtIjCp2zUmYAJ1GmdxmKbT/oGQa2xuWu23BkBizA0q6J9pYb6Z4qBhu5QblGd
+	7eg2zsIczdZ2VEdwGTByrQKgwer2LRg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761043916;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7XP7QtIU8gKj770j1vZYLnbvcbRkQv38eNG7ETO4pCs=;
+	b=MKymBbHEiW9BmwQCNbXaeOgFb8gosorgrEjl+MTzuiTZZ6r5ywlzVilJxx2n/pKYr+Xm5E
+	kT1nzX86B6OtRZAg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5DB58139D2;
+	Tue, 21 Oct 2025 10:51:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id iFoeFMxl92huGwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 21 Oct 2025 10:51:56 +0000
+Message-ID: <7e58078f-8355-4259-b929-c37abbc1f206@suse.de>
+Date: Tue, 21 Oct 2025 12:51:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+V-a8uB2WxU74mhkZ3SCpcty4T10Y3MOAf-SkodLCkp-_-AGA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: null pointer dereference in interrupt after receiving an ip
+ packet on veth from xsk from user space
+To: mc36 <csmate@nop.hu>, Jason Xing <kerneljasonxing@gmail.com>,
+ alekcejk@googlemail.com
+Cc: Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Magnus Karlsson <magnus.karlsson@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, 1118437@bugs.debian.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu>
+ <CAL+tcoA5qDAcnZpmULsnD=X6aVP-ztRxPv5z1OSP-nvtNEk+-w@mail.gmail.com>
+ <643fbe8f-ba76-49b4-9fb7-403535fd5638@nop.hu>
+ <CAL+tcoDqgQbs20xV34RFWDoE5YPXS-ne3FBns2n9t4eggx8LAQ@mail.gmail.com>
+ <d8808206-0951-4512-91cb-58839ba9b8c4@nop.hu>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <d8808206-0951-4512-91cb-58839ba9b8c4@nop.hu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: ED5C3211C8
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_TO(0.00)[nop.hu,gmail.com,googlemail.com];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_TLS_ALL(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,fomichev.me,intel.com,kernel.org,bugs.debian.org,vger.kernel.org];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_RCPT(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid]
+X-Spam-Score: -3.01
 
-On Fri, 17 Oct 2025, Lad, Prabhakar wrote:
 
-> Hi Andrew,
 
-[...]
+On 10/20/25 11:31 PM, mc36 wrote:
+> hi,
+> 
+> On 10/20/25 11:04, Jason Xing wrote:
+>>
+>> I followed your steps you attached in your code:
+>> ////// gcc xskInt.c -lxdp
+>> ////// sudo ip link add veth1 type veth
+>> ////// sudo ip link set veth0 up
+>> ////// sudo ip link set veth1 up
+> 
+> ip link set dev veth1 address 3a:10:5c:53:b3:5c
+> 
+>> ////// sudo ./a.out
+>>
+> that will do the trick on a recent kerlek....
+> 
+> its the destination mac in the c code....
+> 
+> ps: chaining in the original reporter from the fedora land.....
+> 
+> 
+> have a nice day,
+> 
+> cs
+> 
+> 
 
-> > mxl-gpy.c:              .led_brightness_set = gpy_led_brightness_set,
+hi, FWIW I have reproduced this and I bisected it, issue was introduced 
+at 30f241fcf52aaaef7ac16e66530faa11be78a865 - working on a patch.
 
-[...]
-
-> Thank you for the pointers.
-
-Yes, thank you, Andrew.
-
--- 
-Lee Jones [李琼斯]
+Thanks,
+Fernando.
 
