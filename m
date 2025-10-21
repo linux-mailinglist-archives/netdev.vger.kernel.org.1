@@ -1,141 +1,124 @@
-Return-Path: <netdev+bounces-231304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B02FBF7318
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 16:56:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2ADFBF7339
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 16:57:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D458819C153C
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 14:56:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 553CB18970EF
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 14:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 418BC34029A;
-	Tue, 21 Oct 2025 14:55:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25B2340282;
+	Tue, 21 Oct 2025 14:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="PazWs+dZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Kk76gNOg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aOaH5L36"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0D4340295;
-	Tue, 21 Oct 2025 14:55:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C1833FE3B
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 14:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761058545; cv=none; b=tKFVLOqJhLZpKonYKaKgmQX9kFtTRcAsyiufWvly6gBIolcKs0gOAQ8XcR/1NfspDkteDpctmQEZiGg3yam6riKcB/f4b2ePxUuVDxye1y2bbmdS6qxsZCNFGj142OWP8WVRGiwAdPVlgu/F1mq19IPgMn3++uznPrHhVR8JTUg=
+	t=1761058620; cv=none; b=MyAvw0UMs43ojllP0H8waXmUnblncZyyaJxXryQxOUHKsDkcncgsPHx16BjZGzMBg9zD1i0QCzUtpdr7GJmnr2+AEQEVv6h+MpkQNuYkdYjRrbx314k5jrUPLJakh5OGCS16/xwo77SyoBvEB9+8Yf55IUaeBHINIrGrb7frTeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761058545; c=relaxed/simple;
-	bh=ZHKXRQnOr45eMNPdTrXJCDdwQdNWjeacIeNiXkeVips=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UjD+n1JDnnsbMc7vyBBvBdWIuDo76pMrnucOTFE2k6xgtm/rONikfILwcZiSxhL/ti5OhZMZL+BkOCfMjbiXax2Ys8HCIy0lgwRt+9znjKKMmWY7Kvvy9vkqhFqf69JoilEKDnFnQbn1YKBQZtFS9IbN60mIF8nb7RmFRf9u1ZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=PazWs+dZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Kk76gNOg; arc=none smtp.client-ip=202.12.124.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id BDA637A007D;
-	Tue, 21 Oct 2025 10:55:41 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-10.internal (MEProxy); Tue, 21 Oct 2025 10:55:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1761058541; x=
-	1761144941; bh=uKgl255miv6qiJG3yGmCoN/VZZMKpbBf187RZlaNjO4=; b=P
-	azWs+dZr2N7GwfVwiaCqsNKMJUBpT/CbRxIjt7zMcYc3lrFMzI3Pitjn59atg81S
-	aRiiyz0y5PV4NZ/kfYEpLkpNExUjUZSWL/iH0mLgpW4OBj3jXvhUq1rKh23nOemm
-	EXXUvvmSF2vdy26MBUKC5NmrPbNf6rC749fmPGAFtVi5Bkb1oTPdZRbkDE57lSmA
-	tkIfj1zqOqdlHsH/OD3VpZCGE4+8KmtdyWp/idlWko0W7+0hJkkT0p6BJiY4Ycyx
-	1N8OYXcbQZ1bXRh9zrQuGPG6mapSDc8/BZ/LLVFnH2TdnrHlIGAZkwGlGYGdmxml
-	I5lC6wRvsoP3lE7SoI+Uw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1761058541; x=1761144941; bh=uKgl255miv6qiJG3yGmCoN/VZZMKpbBf187
-	RZlaNjO4=; b=Kk76gNOgqsutCTopivhiMFGEu1BaW5EQigqy43wfK6PUse72527
-	HJN/AR9Yn3DpDOnJpECGvHGDfv8kiWqA9DBZ6PsvvF9/wAL+HlSS8wr3Pu73OHuC
-	eZnaa5ViEeuU7SR+NfDxwg7voS6lUwCsUmGXZVuwJrMpgxdlKZzqBS2CeZI+2G6D
-	kIELo7jQ1KRLECH0xuu69z0yr2vZfd8kfXFp9d7+qqnvzOQw5/wtKm14cpxFC50k
-	4MdeeRiwpgEyGeR8XmSsb6zIE5HRv7mN3EcdtpzDuSeVd0MJ/JWW3XOGA9yQX5Zc
-	hRNO6swJvgKVICdwMOEdT343aUSz4JeX9RA==
-X-ME-Sender: <xms:7Z73aLM42opTAPPOzaEgrKiRUTPCEAL2M9SbJP_TVRjCOumu98Z9WA>
-    <xme:7Z73aFYaRshthxN2eWD2fQPMIrDFjk3moGUdhYxMdaNCZ8fzkhVzpK2IHN8bp4Hqd
-    qfcokGhdxFuY_Q0LHEOAFYx_Tax3emdKWZV7JO_FBojOtmdxaqwvw>
-X-ME-Received: <xmr:7Z73aLV_9bDi-Hdon0Gkc78G4gqqRId6pf15DIR_EbR_W5tVHQFrq9xDJp5->
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddugedutddtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduhedpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtohepthgrrhhiqhhtsehnvhhiughirgdrtghomh
-    dprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohep
-    khhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrg
-    htrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdp
-    rhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepsh
-    grvggvughmsehnvhhiughirgdrtghomhdprhgtphhtthhopehlvghonheskhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohepmhgslhhotghhsehnvhhiughirgdrtghomh
-X-ME-Proxy: <xmx:7Z73aEBxys00l640kfuF3svzG3WD_28Z_BrMdhOt0ol5urTIuKUjAw>
-    <xmx:7Z73aHIo1ch1YA76Gfx8vmGTXswxpJodOw45_OC5U_LhBxbX2u-Tbw>
-    <xmx:7Z73aCt0woBC6upWARhNWGZqCOyAcp3rOH1Fivb5Ll5TaaW8xqjYFA>
-    <xmx:7Z73aPUieQMrkwuFG0qJAjEo06A0rrGUwL07S_dDl4GH7_30WZMJvA>
-    <xmx:7Z73aPh3Uh8ax1XU8PtTxFZ7xUTnENmpxvAhyXgS3wzM6PlVXkI9uUJs>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 21 Oct 2025 10:55:40 -0400 (EDT)
-Date: Tue, 21 Oct 2025 16:55:39 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>,
-	Shahar Shitrit <shshitrit@nvidia.com>
-Subject: Re: [PATCH net V2 1/3] net: tls: Change async resync helpers argument
-Message-ID: <aPee6zUrKP-HNqTo@krikkit>
-References: <1760943954-909301-1-git-send-email-tariqt@nvidia.com>
- <1760943954-909301-2-git-send-email-tariqt@nvidia.com>
+	s=arc-20240116; t=1761058620; c=relaxed/simple;
+	bh=lB0O8j3S3miMAone/f+ICAYtXJf1J8inqWCWvoB54Bc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=IxzLhwhgkNdIDq30pcc0pm+ulpUW2R0qI7AgOODG9YJC6BJyu7z+Sbusj3VE5Hy5ALSJ3AMkduNVNCv0oycFNKr1rN7bBn4InyIvFPh+NzkLdNWEE0EPig/+qdl12c+HXNxTCwr9PfUStjJs5JLAndSIgpXahtDUn0Q37ksgAy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aOaH5L36; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761058618;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=2Ber0DwJnF+w6pf5w+EAkS6wDZY1zESW0Eqmz8tJxow=;
+	b=aOaH5L36d22Ik5OkCJ6xlYJrN8igtZbw9XUDEXPPGKlqHYsUZEedM3IsT5hFHziWwQ41CQ
+	e2emQ0Lo6p6bzcjWePNActZSDovvbCSsfHZaBISlxEraRR1hvAMN9ujd8LF9wTsmRDcLwN
+	OSkbkpA4RJbjoWfP/jzryG0rZW7b7Z8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-497-r26rW06bNe6MlRb0_yxi9g-1; Tue, 21 Oct 2025 10:56:56 -0400
+X-MC-Unique: r26rW06bNe6MlRb0_yxi9g-1
+X-Mimecast-MFC-AGG-ID: r26rW06bNe6MlRb0_yxi9g_1761058615
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-471148ad64aso23723665e9.2
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 07:56:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761058615; x=1761663415;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Ber0DwJnF+w6pf5w+EAkS6wDZY1zESW0Eqmz8tJxow=;
+        b=SgkQ+kfUKfw94E1jFjV1fYpCm9cDt+PnQyenUWcJYd3WqAqnh5rBOUVoM18qb86mJe
+         /5u3AdV/wKaifTW6VZnC9+RWUR0yZSZJz/pc6N5UFd6jkcL85/c9w2AjReoqZodrF5+6
+         ye85gGGG5K8dCNXyWFMsYTbIxhoiM92VvmYSMT0d1zTnsW+B7w8gmHg5oBc96xBrIk7W
+         8kOlr5ePBwHz420YIknqX+MWjHIEXZ6/5km1VrViXVyA5NEH5kRCVyc3Kx9a7k6V4ray
+         AkuNoy1W/xMGqRITC3cKVGXCJ9z5wRnhM71agg4uoSbd3p/VQXMfo/QiJMQ4sBWPPLmr
+         XwWA==
+X-Forwarded-Encrypted: i=1; AJvYcCW3BuTzTWfXOVVIb4/s1FyhCuvBQmAMdZr5ZoQaR8tVRfAihKVIR3RHUGrLRDNhiJDaWlb/0yc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDH4cLDjBlerCxJMhkQT/Mh7nHh6vF8JYUrdkuxRcRxcS3IMwH
+	TLvg+C7jlcjj4dwZqJ9g07c8bq6I+BBg3rQlC7fsapN8XV8aFuAG52VkBm+p9A1VvtxzBTOL60E
+	6kprsOf+WgHyCiB3FI7H2ab3B+12vKy0kRRv7zobdEAx/7min20Vnlt/TWA==
+X-Gm-Gg: ASbGncs1wqBLk+woecnuesRLdxb9mHdFca33zZ6GhYDM1Ytp6Ffd8SWAeFSLxjB0qG7
+	scvwyNEmzOFAJhxunZe3zSLZEwOjxNX/p4wpNPznu0qCzVbfF5poLyk/ZwZPIiVyYqM9+nPJon+
+	a7zJPkUedDz2PyhU0IZFmDSWZhkRpINs2HRvR5uRKJ6RsS0EgJSVePtOWZ57Qt1s7pzWpJs8ouU
+	gqpjDgM4rKTSfanA9ikZjWeDsPGTUbojNPmyCV6Jiotzjb4hUcyAnQh+qtKCurQQnccpXpsTnZ9
+	mvR+TMRgjacDlZPKXAWQIh2CPT46gl+IDdhmQMu+gjMREOSGnM5HhkZLxwn2ZGFQRTlv
+X-Received: by 2002:a05:600c:828a:b0:46e:39e1:fc3c with SMTP id 5b1f17b1804b1-4711787617amr124347075e9.5.1761058615406;
+        Tue, 21 Oct 2025 07:56:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHFktoT+limgbPVdpx1wPopFmtIPHLY2OPatp+bLIP4HKwWumE1HcGxwTuzl98f6QYo38c2HQ==
+X-Received: by 2002:a05:600c:828a:b0:46e:39e1:fc3c with SMTP id 5b1f17b1804b1-4711787617amr124346865e9.5.1761058614813;
+        Tue, 21 Oct 2025 07:56:54 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:152d:b200:2a90:8f13:7c1e:f479])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47494ae5510sm19394145e9.3.2025.10.21.07.56.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Oct 2025 07:56:54 -0700 (PDT)
+Date: Tue, 21 Oct 2025 10:56:52 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
+Subject: [PATCH v2 0/2] virtio: feature related cleanups
+Message-ID: <cover.1761058274.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1760943954-909301-2-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
-2025-10-20, 10:05:52 +0300, Tariq Toukan wrote:
-> From: Shahar Shitrit <shshitrit@nvidia.com>
-> 
-> Update tls_offload_rx_resync_async_request_start() and
-> tls_offload_rx_resync_async_request_end() to get a struct
-> tls_offload_resync_async parameter directly, rather than
-> extracting it from struct sock.
-> 
-> This change aligns the function signatures with the upcoming
-> tls_offload_rx_resync_async_request_cancel() helper, which
-> will be introduced in a subsequent patch.
-> 
-> Fixes: 0419d8c9d8f8 ("net/mlx5e: kTLS, Add kTLS RX resync support")
-> Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->  .../mellanox/mlx5/core/en_accel/ktls_rx.c     |  9 ++++++--
->  include/net/tls.h                             | 21 +++++++------------
->  2 files changed, 15 insertions(+), 15 deletions(-)
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+A minor cleanup around handling of feature bits: this fixes
+up terminology and adds build checks.
+
+Lightly tested.
+
+changes from v1:
+	dropped using "word" completely
+
+
+Michael S. Tsirkin (2):
+  virtio: clean up features qword/dword terms
+  vhost: use checked versions of VIRTIO_BIT
+
+ drivers/vhost/net.c                    | 16 +++++------
+ drivers/virtio/virtio.c                | 12 ++++-----
+ drivers/virtio/virtio_debug.c          | 10 +++----
+ drivers/virtio/virtio_pci_modern_dev.c |  6 ++---
+ include/linux/virtio.h                 |  2 +-
+ include/linux/virtio_config.h          |  2 +-
+ include/linux/virtio_features.h        | 37 ++++++++++++++++----------
+ include/linux/virtio_pci_modern.h      |  8 +++---
+ scripts/lib/kdoc/kdoc_parser.py        |  2 +-
+ 9 files changed, 52 insertions(+), 43 deletions(-)
 
 -- 
-Sabrina
+MST
+
 
