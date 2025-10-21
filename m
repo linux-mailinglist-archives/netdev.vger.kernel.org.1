@@ -1,152 +1,387 @@
-Return-Path: <netdev+bounces-231307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 601AABF7357
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 16:58:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E3A9BF7442
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 17:12:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 019D719C1D84
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 14:58:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DE84188D02F
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 15:07:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17E6B340A65;
-	Tue, 21 Oct 2025 14:57:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 415A5340279;
+	Tue, 21 Oct 2025 15:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RTkqkhAb"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GlnTlnj0";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sMo0E4T+";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0hPcoWu6";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Tec1mRF4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315DE340A6F
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 14:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F93D340280
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 15:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761058626; cv=none; b=PgBAWsqjsVQziQ/lE1axnwkQ4u7rnvlRpo+yB1+Zrzvv6JF0I6vXe/Y60d7PSP8Q6faZwCXkHrmiTlL5N7Jv9IuZQPwCxXPSowXJgm9T35kMft1bGx37zKLcvIgb9Mtn+3GO/cK2Csk29b7QLyST/9dzjBHsyo7oe5h++Nca3Sw=
+	t=1761059244; cv=none; b=BtGRATNWbBejSN1Zzruf/nWUdyc1LcK5ccwY0phtT4dMswyJ2F+vqMDjg5k9xrLb7c4QpUvyzFMJAQUk9hn6/VU1OQr+qTxuu8r5f4VJMBfRoGncN4Yq8M6TqJEKz5Qq3kSe7F5R07SnWdz+5G6+8HgiocX/DAJSxKBAnHTR2A8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761058626; c=relaxed/simple;
-	bh=3zLiBpGpx3N7y1mDFocEIkcoo3BHMmz6kvCLUvGCdoo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kAMaRmu6KqsBz3KgJitqiR4LNADQlV/eoAcOXVDsqpqNXOgFpL8YmyFm3gQPLS7XS3AbJQIgJJBFwfQMpRzBk9RWRS0dSnU8erZ0euBHpisPc+qFivoI229QsN3y81IYVBq+NiPEBSEHXvO/kuAuEv1HUvwG8YQTEidrR8OK9Os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RTkqkhAb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761058623;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ON6jaTzp8OadpSErRLgvJU/FcjQ+VbZlFjItkP49EIg=;
-	b=RTkqkhAbKB9aEAecAEm42ldIkqWsovZpMMTDKSI+TV9L3U6tl4lf9kSGRiJQxBqcCoJp/I
-	7pS7/5hTRxC0kHOcZIUTlK79oXlBIzJ+BKTb6TDoLJOZbLVKOx8aO+DqqNaJSdyYVW9/BG
-	HcXLL/htwKlaUdE908RxgonkfKxQTT4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-460-ye5Gg2RRNUGRzflpjzSfJQ-1; Tue, 21 Oct 2025 10:57:01 -0400
-X-MC-Unique: ye5Gg2RRNUGRzflpjzSfJQ-1
-X-Mimecast-MFC-AGG-ID: ye5Gg2RRNUGRzflpjzSfJQ_1761058620
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47107fcb257so78655415e9.0
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 07:57:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761058620; x=1761663420;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ON6jaTzp8OadpSErRLgvJU/FcjQ+VbZlFjItkP49EIg=;
-        b=hkyi23l2UZHFfl+rOjn3fhQzfZTlnk8cws1BpkJcWLkl9Jwzxy6FwEUljbFN9N9f9h
-         aCqixpcAmljs9XkB0AAd8xStThzK+HnZ7XWjh1nsze2GaBTcfIxmQCQsD/8Gazzb7cjU
-         gBr+9t2SbeqdTORdghOw+RIRnknQt+aVExaTApJ6CWjzdQz1gLCL/0j2hOKldvv6j2bR
-         DfDa4in1eRFow9h8AuzZ59jyhq7D16tYi0qbcVdULPeehCZALZ3Iae5f7o3dI6KjEMBK
-         gnn/SU6xBOxoEIy2UhorW1QCAYFLCninn3ET494Tc4l5BUsUzxNqUGfrx+Ox97IqoPTp
-         CJng==
-X-Forwarded-Encrypted: i=1; AJvYcCX02y29hkT/C3E4T+1Pt/5om5A6cMdnppSefO6JRGUClqpKDOvHG96wOAz9z8gK2dT27Xec52c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrHvNueTeblkRhknK7fcqg5M09eUtlHd1c7PQXp89YiO71WLTp
-	viu2thx/jFo4ejcE+eKVY/Gm5SkvTS2bMb0LtrkcRR9jTIAnzU+uJJNbjhNNGiW1kuLqpnxCSdw
-	0OTgTgXJoLKyWH8doGzumPlyr/VgUSHpEaZgD8nu3RaatrUnfQAa9+RiLiQ==
-X-Gm-Gg: ASbGncs6CuDyTTf2+SdB68HzCPP+b2uZ0mexs1cEP0cgfo1Txm/aGSo+ezkLL6YOChH
-	R8MvfOSclT69qEeN2m/PQ+NG1BtlJji+vLPrYhFxW4kmw76iXV1aLWDb0Te7vkVxtzM2nSJb98X
-	EMbqvB/E1TZh9kLyPvJeK/6UeRq5HT4/ZhvySQe+74l9jeRU4d72CuJXM7DUXIsZh0Xr+gzCGs4
-	qaJJKFXKQ+Djw47isx9J3eBI/oMkh9ZjCX/U9/cWIQNewpjB80RWXwfBaz2YsGAFBvCG4+t7Km1
-	jzpYSQOO4Ity66rCKWWAc2B4uGP+vH3gvkYjCUArcFOLtDc8FZPtLr/gXXlX8mWw1uVa
-X-Received: by 2002:a05:600c:470d:b0:471:12c2:2025 with SMTP id 5b1f17b1804b1-471179140abmr147850995e9.32.1761058620008;
-        Tue, 21 Oct 2025 07:57:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHhlH9J/gDJ2/ok4e+k1pdgybvyjWEgAIxCOLewvwxsR9SE4iH4+h2twWM4wXk1Rh2Mp/BOKg==
-X-Received: by 2002:a05:600c:470d:b0:471:12c2:2025 with SMTP id 5b1f17b1804b1-471179140abmr147850765e9.32.1761058619536;
-        Tue, 21 Oct 2025 07:56:59 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:152d:b200:2a90:8f13:7c1e:f479])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-471144239bdsm339012145e9.3.2025.10.21.07.56.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 07:56:59 -0700 (PDT)
-Date: Tue, 21 Oct 2025 10:56:57 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: [PATCH v2 2/2] vhost: use checked versions of VIRTIO_BIT
-Message-ID: <5423d46e5c6f8a4204f8fe1bcea8bf1e21c10f39.1761058528.git.mst@redhat.com>
-References: <492ef5aaa196d155d0535b5b6f4ad5b3fba70a1b.1761058528.git.mst@redhat.com>
+	s=arc-20240116; t=1761059244; c=relaxed/simple;
+	bh=hixvYbrC0kxLMAUZVabKLa+06sPY4gK9W7EK7YKFeoo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NePOzwGGH9ugHy8wpnIsRGw7Y1Qmq/gLIUkNWdkZKtHDNdPjZqfgLyzw5rKSVnjuZaJz3dnLsxcU/0Th5GjrPKrYQCubRQqkVgarZv7ADc5OwRiVPb6O+4M9cN22dw6u9Afxh5+elykne2bvY/hdTybXWhLah2UrGnXoxkMZ3Uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GlnTlnj0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sMo0E4T+; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0hPcoWu6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Tec1mRF4; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id D82B81F38D;
+	Tue, 21 Oct 2025 15:07:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761059236; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ZFLuloM4HcoGuPMqKzXBmieGYZFizjS9WkGw+2k5t9o=;
+	b=GlnTlnj007QOycU4Nm5dJ22ZkfbWA6EJbunDOBuVBX4Okk+W1G/zweD2Kxyvkf0mnZ7ZNo
+	1UbtYmqsonEA48Ftd2saM2ewlGAqiBZi1QaxieSFvWveFgN2P1NJGW8NOy2FPqPgXS+fRE
+	a7B68cHgzoq4g78wlv5fcnVlrligXsA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761059236;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ZFLuloM4HcoGuPMqKzXBmieGYZFizjS9WkGw+2k5t9o=;
+	b=sMo0E4T+ZgllN3ijUu9UNgp1ICrUIHKTzt4ubj2wfksA/5OWGn0hpC9d7NVC7PttYIdWe6
+	A+xVsb9IFg9G7EAQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761059231; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ZFLuloM4HcoGuPMqKzXBmieGYZFizjS9WkGw+2k5t9o=;
+	b=0hPcoWu6b3vbV7/rzr/ziX/T3df+/+pysf1nfRx65FWa2GM2zWNK9cBKpvfSvlkeE4wLl4
+	t0ftKVW7T3d88rFRbwkLURqrO9rXPuOq35ZKgpRCGR0jcf4/2/IZTzrQloMqa9AoovhfpJ
+	DRu0M6AW1+9EQUnOo+pctiKSoHg08l8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761059231;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ZFLuloM4HcoGuPMqKzXBmieGYZFizjS9WkGw+2k5t9o=;
+	b=Tec1mRF4jnKZgFwklkiqtjlcUSVJ96YlZDAFwlWTPMMtGzSHi/kNv7lvQZYK8aDY+3mxzt
+	LsmhNnfHzzdXncCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 57EE8139D2;
+	Tue, 21 Oct 2025 15:07:11 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id JxPCEp+h92igFQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 21 Oct 2025 15:07:11 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: csmate@nop.hu,
+	kerneljasonxing@gmail.com,
+	maciej.fijalkowski@intel.com,
+	bjorn@kernel.org,
+	sdf@fomichev.me,
+	jonathan.lemon@gmail.com,
+	bpf@vger.kernel.org,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Subject: [PATCH net] xsk: avoid data corruption on cq descriptor number
+Date: Tue, 21 Oct 2025 17:06:56 +0200
+Message-ID: <20251021150656.6704-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <492ef5aaa196d155d0535b5b6f4ad5b3fba70a1b.1761058528.git.mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-1.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[nop.hu,gmail.com,intel.com,kernel.org,fomichev.me,vger.kernel.org,suse.de];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo];
+	FROM_EQ_ENVFROM(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Spam-Flag: NO
+X-Spam-Score: -1.30
 
-This adds compile-time checked versions of VIRTIO_BIT that set bits in
-low and high qword, respectively.  Will prevent confusion when people
-set bits in the wrong qword.
+Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
+production"), the descriptor number is store in skb control block and
+xsk_cq_submit_addr_locked() relies on it to put the umem addrs onto
+pool's completion queue.
 
-Cc: "Paolo Abeni" <pabeni@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+skb control block shouldn't be used for this purpose as after transmit
+xsk doesn't have control over it and other subsystems could use it. This
+leads to the following kernel panic due to a NULL pointer dereference.
+
+ BUG: kernel NULL pointer dereference, address: 0000000000000000
+ #PF: supervisor read access in kernel mode
+ #PF: error_code(0x0000) - not-present page
+ PGD 0 P4D 0
+ Oops: Oops: 0000 [#1] SMP NOPTI
+ CPU: 2 UID: 1 PID: 927 Comm: p4xsk.bin Not tainted 6.16.12+deb14-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.16.12-1
+ Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
+ RIP: 0010:xsk_destruct_skb+0xd0/0x180
+ [...]
+ Call Trace:
+  <IRQ>
+  ? napi_complete_done+0x7a/0x1a0
+  ip_rcv_core+0x1bb/0x340
+  ip_rcv+0x30/0x1f0
+  __netif_receive_skb_one_core+0x85/0xa0
+  process_backlog+0x87/0x130
+  __napi_poll+0x28/0x180
+  net_rx_action+0x339/0x420
+  handle_softirqs+0xdc/0x320
+  ? handle_edge_irq+0x90/0x1e0
+  do_softirq.part.0+0x3b/0x60
+  </IRQ>
+  <TASK>
+  __local_bh_enable_ip+0x60/0x70
+  __dev_direct_xmit+0x14e/0x1f0
+  __xsk_generic_xmit+0x482/0xb70
+  ? __remove_hrtimer+0x41/0xa0
+  ? __xsk_generic_xmit+0x51/0xb70
+  ? _raw_spin_unlock_irqrestore+0xe/0x40
+  xsk_sendmsg+0xda/0x1c0
+  __sys_sendto+0x1ee/0x200
+  __x64_sys_sendto+0x24/0x30
+  do_syscall_64+0x84/0x2f0
+  ? __pfx_pollwake+0x10/0x10
+  ? __rseq_handle_notify_resume+0xad/0x4c0
+  ? restore_fpregs_from_fpstate+0x3c/0x90
+  ? switch_fpu_return+0x5b/0xe0
+  ? do_syscall_64+0x204/0x2f0
+  ? do_syscall_64+0x204/0x2f0
+  ? do_syscall_64+0x204/0x2f0
+  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+  </TASK>
+ [...]
+ Kernel panic - not syncing: Fatal exception in interrupt
+ Kernel Offset: 0x1c000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+
+The approach proposed store the first address also in the xsk_addr_node
+along with the number of descriptors. The head xsk_addr_node is
+referenced by skb_shinfo(skb)->destructor_arg. The rest of the fragments
+store the address on the list.
+
+This is less efficient as the kmem_cache must be initialized even if a
+single fragment is received and also 4 bytes are wasted when storing
+each address.
+
+Fixes: 30f241fcf52a ("xsk: Fix immature cq descriptor production")
+Closes: https://lore.kernel.org/netdev/0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu/
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 ---
- drivers/vhost/net.c             | 4 ++--
- include/linux/virtio_features.h | 8 ++++++++
- 2 files changed, 10 insertions(+), 2 deletions(-)
+Note: Please notice I am not an XDP expert so I cannot tell if this
+would cause a performance regression, advice is welcomed.
+---
+ net/xdp/xsk.c | 57 ++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 34 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index afabc5cf31a6..e208bb0ca7da 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -76,8 +76,8 @@ static const u64 vhost_net_features[VIRTIO_FEATURES_ARRAY_SIZE] = {
- 	(1ULL << VIRTIO_F_ACCESS_PLATFORM) |
- 	(1ULL << VIRTIO_F_RING_RESET) |
- 	(1ULL << VIRTIO_F_IN_ORDER),
--	VIRTIO_BIT(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
--	VIRTIO_BIT(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
-+	VIRTIO_BIT_HI(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
-+	VIRTIO_BIT_HI(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 7b0c68a70888..203934aeade6 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -37,18 +37,14 @@
+ #define MAX_PER_SOCKET_BUDGET 32
+ 
+ struct xsk_addr_node {
++	u32 num_descs;
+ 	u64 addr;
+ 	struct list_head addr_node;
  };
  
- enum {
-diff --git a/include/linux/virtio_features.h b/include/linux/virtio_features.h
-index 9c99014196ea..2eaee0b7c2df 100644
---- a/include/linux/virtio_features.h
-+++ b/include/linux/virtio_features.h
-@@ -8,6 +8,14 @@
- #define VIRTIO_BIT(b)		BIT_ULL((b) & 0x3f)
- #define VIRTIO_U64(b)		((b) >> 6)
+-struct xsk_addr_head {
+-	u32 num_descs;
+-	struct list_head addrs_list;
+-};
+-
+ static struct kmem_cache *xsk_tx_generic_cache;
  
-+/* Get a given feature bit in a given u64 entry. */
-+#define VIRTIO_BIT_U64(bit, entry) \
-+	(BUILD_BUG_ON_ZERO(const_true(VIRTIO_U64(bit) != (qword))) + \
-+	 BIT_ULL((bit) - 64 * (entry)))
-+
-+#define VIRTIO_BIT_LO(b) VIRTIO_BIT_U64(b, 0)
-+#define VIRTIO_BIT_HI(b) VIRTIO_BIT_U64(b, 1)
-+
- #define VIRTIO_FEATURES_ARRAY_SIZE VIRTIO_U64(VIRTIO_FEATURES_BITS)
+-#define XSKCB(skb) ((struct xsk_addr_head *)((skb)->cb))
++#define XSK_TX_HEAD(skb) ((struct xsk_addr_node *)((skb_shinfo(skb)->destructor_arg)))
  
- #define VIRTIO_DECLARE_FEATURES(name)			\
+ void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
+ {
+@@ -569,12 +565,11 @@ static void xsk_cq_submit_addr_locked(struct xsk_buff_pool *pool,
+ 	spin_lock_irqsave(&pool->cq_lock, flags);
+ 	idx = xskq_get_prod(pool->cq);
+ 
+-	xskq_prod_write_addr(pool->cq, idx,
+-			     (u64)(uintptr_t)skb_shinfo(skb)->destructor_arg);
++	xskq_prod_write_addr(pool->cq, idx, XSK_TX_HEAD(skb)->addr);
+ 	descs_processed++;
+ 
+-	if (unlikely(XSKCB(skb)->num_descs > 1)) {
+-		list_for_each_entry_safe(pos, tmp, &XSKCB(skb)->addrs_list, addr_node) {
++	if (unlikely(XSK_TX_HEAD(skb)->num_descs > 1)) {
++		list_for_each_entry_safe(pos, tmp, &XSK_TX_HEAD(skb)->addr_node, addr_node) {
+ 			xskq_prod_write_addr(pool->cq, idx + descs_processed,
+ 					     pos->addr);
+ 			descs_processed++;
+@@ -582,6 +577,7 @@ static void xsk_cq_submit_addr_locked(struct xsk_buff_pool *pool,
+ 			kmem_cache_free(xsk_tx_generic_cache, pos);
+ 		}
+ 	}
++	kmem_cache_free(xsk_tx_generic_cache, XSK_TX_HEAD(skb));
+ 	xskq_prod_submit_n(pool->cq, descs_processed);
+ 	spin_unlock_irqrestore(&pool->cq_lock, flags);
+ }
+@@ -597,12 +593,12 @@ static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
+ 
+ static void xsk_inc_num_desc(struct sk_buff *skb)
+ {
+-	XSKCB(skb)->num_descs++;
++	XSK_TX_HEAD(skb)->num_descs++;
+ }
+ 
+ static u32 xsk_get_num_desc(struct sk_buff *skb)
+ {
+-	return XSKCB(skb)->num_descs;
++	return XSK_TX_HEAD(skb)->num_descs;
+ }
+ 
+ static void xsk_destruct_skb(struct sk_buff *skb)
+@@ -619,16 +615,16 @@ static void xsk_destruct_skb(struct sk_buff *skb)
+ }
+ 
+ static void xsk_skb_init_misc(struct sk_buff *skb, struct xdp_sock *xs,
+-			      u64 addr)
++			      struct xsk_addr_node *head, u64 addr)
+ {
+-	BUILD_BUG_ON(sizeof(struct xsk_addr_head) > sizeof(skb->cb));
+-	INIT_LIST_HEAD(&XSKCB(skb)->addrs_list);
++	INIT_LIST_HEAD(&head->addr_node);
++	head->addr = addr;
++	head->num_descs = 0;
+ 	skb->dev = xs->dev;
+ 	skb->priority = READ_ONCE(xs->sk.sk_priority);
+ 	skb->mark = READ_ONCE(xs->sk.sk_mark);
+-	XSKCB(skb)->num_descs = 0;
+ 	skb->destructor = xsk_destruct_skb;
+-	skb_shinfo(skb)->destructor_arg = (void *)(uintptr_t)addr;
++	skb_shinfo(skb)->destructor_arg = (void *)head;
+ }
+ 
+ static void xsk_consume_skb(struct sk_buff *skb)
+@@ -638,11 +634,12 @@ static void xsk_consume_skb(struct sk_buff *skb)
+ 	struct xsk_addr_node *pos, *tmp;
+ 
+ 	if (unlikely(num_descs > 1)) {
+-		list_for_each_entry_safe(pos, tmp, &XSKCB(skb)->addrs_list, addr_node) {
++		list_for_each_entry_safe(pos, tmp, &XSK_TX_HEAD(skb)->addr_node, addr_node) {
+ 			list_del(&pos->addr_node);
+ 			kmem_cache_free(xsk_tx_generic_cache, pos);
+ 		}
+ 	}
++	kmem_cache_free(xsk_tx_generic_cache, XSK_TX_HEAD(skb));
+ 
+ 	skb->destructor = sock_wfree;
+ 	xsk_cq_cancel_locked(xs->pool, num_descs);
+@@ -712,6 +709,8 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+ 	buffer = xsk_buff_raw_get_data(pool, addr);
+ 
+ 	if (!skb) {
++		struct xsk_addr_node *head_addr;
++
+ 		hr = max(NET_SKB_PAD, L1_CACHE_ALIGN(xs->dev->needed_headroom));
+ 
+ 		skb = sock_alloc_send_skb(&xs->sk, hr, 1, &err);
+@@ -720,7 +719,11 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+ 
+ 		skb_reserve(skb, hr);
+ 
+-		xsk_skb_init_misc(skb, xs, desc->addr);
++		head_addr = kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KERNEL);
++		if (!head_addr)
++			return ERR_PTR(-ENOMEM);
++
++		xsk_skb_init_misc(skb, xs, head_addr, desc->addr);
+ 		if (desc->options & XDP_TX_METADATA) {
+ 			err = xsk_skb_metadata(skb, buffer, desc, pool, hr);
+ 			if (unlikely(err))
+@@ -736,7 +739,7 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+ 		 * would be dropped, which implies freeing all list elements
+ 		 */
+ 		xsk_addr->addr = desc->addr;
+-		list_add_tail(&xsk_addr->addr_node, &XSKCB(skb)->addrs_list);
++		list_add_tail(&xsk_addr->addr_node, &XSK_TX_HEAD(skb)->addr_node);
+ 	}
+ 
+ 	len = desc->len;
+@@ -774,6 +777,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ {
+ 	struct net_device *dev = xs->dev;
+ 	struct sk_buff *skb = xs->skb;
++	struct page *page;
+ 	int err;
+ 
+ 	if (dev->priv_flags & IFF_TX_SKB_NO_LINEAR) {
+@@ -791,6 +795,8 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 		len = desc->len;
+ 
+ 		if (!skb) {
++			struct xsk_addr_node *head_addr;
++
+ 			hr = max(NET_SKB_PAD, L1_CACHE_ALIGN(dev->needed_headroom));
+ 			tr = dev->needed_tailroom;
+ 			skb = sock_alloc_send_skb(&xs->sk, hr + len + tr, 1, &err);
+@@ -804,7 +810,13 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 			if (unlikely(err))
+ 				goto free_err;
+ 
+-			xsk_skb_init_misc(skb, xs, desc->addr);
++			head_addr = kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KERNEL);
++			if (!head_addr) {
++				__free_page(page);
++				err = -ENOMEM;
++				goto free_err;
++			}
++			xsk_skb_init_misc(skb, xs, head_addr, desc->addr);
+ 			if (desc->options & XDP_TX_METADATA) {
+ 				err = xsk_skb_metadata(skb, buffer, desc,
+ 						       xs->pool, hr);
+@@ -814,7 +826,6 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 		} else {
+ 			int nr_frags = skb_shinfo(skb)->nr_frags;
+ 			struct xsk_addr_node *xsk_addr;
+-			struct page *page;
+ 			u8 *vaddr;
+ 
+ 			if (unlikely(nr_frags == (MAX_SKB_FRAGS - 1) && xp_mb_desc(desc))) {
+@@ -843,7 +854,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 			refcount_add(PAGE_SIZE, &xs->sk.sk_wmem_alloc);
+ 
+ 			xsk_addr->addr = desc->addr;
+-			list_add_tail(&xsk_addr->addr_node, &XSKCB(skb)->addrs_list);
++			list_add_tail(&xsk_addr->addr_node, &XSK_TX_HEAD(skb)->addr_node);
+ 		}
+ 	}
+ 
 -- 
-MST
+2.51.0
 
 
