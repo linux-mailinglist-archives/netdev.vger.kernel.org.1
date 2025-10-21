@@ -1,221 +1,198 @@
-Return-Path: <netdev+bounces-231154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F337BF5BAE
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:16:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B7AEBF5BB1
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:16:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F182E1890852
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 10:16:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15473421600
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 10:16:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34AA032038D;
-	Tue, 21 Oct 2025 10:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4BCA313539;
+	Tue, 21 Oct 2025 10:16:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VBoS2JS5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nosdlo/B"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF602ED84C
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 10:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332B332BF59
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 10:16:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761041789; cv=none; b=Cm5rORsu2GKmCjqOa4cA5HlpVI6ouxdQxJWRWa9OFkYX7BSo6qvm93UaFzqR1xRYkj49bnyZDgIgwHKA5uYIu1gRAevrAMF8853Eaoe6dPhldG5bmLzFB1wmrbIdd2/gXFgtHYkGqTbA/7aGGLjVpNaRyRgM1OKsb0Ngr0OA/Jk=
+	t=1761041793; cv=none; b=q2a/yqCob9tpzIhV0kg/T9tTt+QKyswZDThUrIuGnDLF22yk+Kt1ETRgs7VClkh5AzMUdXngAqGNTalD3Y0EMVXplNTvUlwDuvJVKIPGIxICLbue0oYCP7UIlJm60eoEYKKdJ8Bm9XFZAwvKhzrGMAkJTyGotXxdW3DflKh3v3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761041789; c=relaxed/simple;
-	bh=K8Bt1F4duKaYZD6FM5I3/3n7I5nh0OjMrdkO6KPZNLE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=St1xhu4tC7tCcMsD287qyMnih4KrkDUuW4B+H6V3TJub+5r25+/uhHm6HaXaNR7AcCSu0rccJdKjLvhB/tLcMWmr6UMO78ua8D5m7U23jKidrPICl5hGpY7r5aJ48pLI5uP7Rl1rIBe300b4dzTnYimlPZauBqg4/Avb32/9U9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VBoS2JS5; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1761041793; c=relaxed/simple;
+	bh=k4u+Ihr8vkpW4CkylMViplglhKtMWRS32gog7rSU0tw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sI9Js0+3wnjVed+laz6eQKkgVFLMJZ1znBcfE83Fh7dtSJdk6YQK41aSnWuwPbIU0EFsmJ0M5pg09ZiG/SJ2J8IWuLVHnrfdXCBXJ+EMjvvExjhi8ZF9yxNygjwA6vr1DRrRGen14869Tf8Hjy5SYTkpRj46OPPEhexAf6Nk6S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nosdlo/B; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761041786;
+	s=mimecast20190719; t=1761041791;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JJYhMYYkH+gP1AV8KxmcpA9zINZajsuC9HdWMXBqSjE=;
-	b=VBoS2JS5SuqhMXXfOpkEdciHIfiQDmXXYEHikyq4vT6T1dBgyUm8tnASku7egtuCMRGD5T
-	KPJSwckLvtOguHA7idMKNPYw1qbjVxPcFkBI6z8KORnABeoe93rqH4jBLYSfEbcNE5DZYZ
-	RzulxnnuQGepq23NiVoajb3ZPMFEplQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=aAfOpf2VC9r1Aq/Ba8aQCcqsQ1cmp5ERa0FiKT74Dxg=;
+	b=Nosdlo/BkFLTqHyC+X/Wh5QjqmQwK5lXaYkFIqc5KXxnBIco1Z78dCqnGYXTu4OAmCuciJ
+	/5LcKMT7wqID1gBmFGRrvhtQL4Q8TQSaxQsXl/2K3RvxbKtOcOTzjViM7x6EO+huO2kKzY
+	9HyQ6uYtkH92LfbfCFiMXkR/UEko6bM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-661-yPB-aFkMMqKaBPNNjx_gkQ-1; Tue, 21 Oct 2025 06:16:25 -0400
-X-MC-Unique: yPB-aFkMMqKaBPNNjx_gkQ-1
-X-Mimecast-MFC-AGG-ID: yPB-aFkMMqKaBPNNjx_gkQ_1761041784
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-471168953bdso38965095e9.1
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 03:16:24 -0700 (PDT)
+ us-mta-312-Pfi9_MDJPLOfd1KEI8hC2w-1; Tue, 21 Oct 2025 06:16:29 -0400
+X-MC-Unique: Pfi9_MDJPLOfd1KEI8hC2w-1
+X-Mimecast-MFC-AGG-ID: Pfi9_MDJPLOfd1KEI8hC2w_1761041788
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-427091cd689so1924254f8f.2
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 03:16:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761041781; x=1761646581;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JJYhMYYkH+gP1AV8KxmcpA9zINZajsuC9HdWMXBqSjE=;
-        b=tAOne1HlzaF2PMgOeIq/tpAzexRVdj5XPBB8XbJ5CahNW3V15aLcUS9u8qXTxn9vVr
-         BX7ySR3dZVkVZkH9qVhf8xanCbpZC50wgGIUS0TcZioqkLNFyMgO5Rhhxqhb1Aaf6SUf
-         cxPI1rVidopgcrNXyw/6nYfH+rlWHDrQWhv2XlcuM4+kmehKw8622Q8ANrS2yc5RrYWj
-         qYvqQ4si0BWP1NV03tcroi5QxuaeUxicXs9GCOAjPy4cGySKOnFcdAhii5RLP92Q/zoC
-         snUa6rkgaAj+Gi60isRvc9tsmeCnFfW4RNLzuEBbl6+JcmHPGYBeYcZ3bVzPsKtCxaaD
-         l4kA==
-X-Forwarded-Encrypted: i=1; AJvYcCUUMPuqyK691su+NQFzlgkzfovg6mqMh5Mrs35rcMdatQ+fWckoLIqXFS9p1R99lvZxmNl+enY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWI7CRsQqNF3H2bdoqMX6pcg0OFIZpIcFgRRh4tDivl0NDwTeN
-	q1V24moxesuJ1+Yz/QRYve6/7QKcwxMecg4YIJa8RlX4rsKroFI3MW/TVk+4ycB7R+TkZ/j6U5m
-	tkP/JegONF+XDiNNnjxqQPa4hhddBMQK2//mExM2ehHJWR+7dCktn7I+NgA==
-X-Gm-Gg: ASbGncvdbWtvj0SSx6kL+ErDGDoU9lxxrrQpr2jb7dYbJGtTQsqhrlluYXb3zkx/B9e
-	sf1rDDcI6LJAQSrvh7In6uXHSWHmI8puQu2EN5nzCIq9H1KPUaLIsxreOzS/BakgBta/n2+gr8W
-	WyjpIQNvnk7cy5intO4iMOH3QCFi1MvIbtI2+1/iQfTYbmAl2gaIYwyHvsxrcBkNHF03iUTxBz7
-	vk8hczYeV7nD3fZv6TEQLxoXP4tRL6PCos2E1I6J/D89cl75OL4izh1Iq0hLfdzIBqrQuqJNBGO
-	oQfptLoIPVMctcIrSwXxZzvHk2Ho4zY7U25AMTYTEZ6/2LqOChp/Cbq2QK0SzOvTs30eWXn6MnW
-	FiLx7IySZ5WzpDRxDX3wQZcdFrM64bBBvzVgDBzZXMmnShbm1ag8=
-X-Received: by 2002:a05:600c:a088:b0:46f:a2ba:581f with SMTP id 5b1f17b1804b1-47117315d8emr128167585e9.16.1761041780844;
-        Tue, 21 Oct 2025 03:16:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFi58yEM3Ci3GlIQ7LRsfZT8Jz32v9v6BKO98V35kuEXc5OOA/pGgs/FK9jj1Yuy4hgaCi++g==
-X-Received: by 2002:a05:600c:a088:b0:46f:a2ba:581f with SMTP id 5b1f17b1804b1-47117315d8emr128167295e9.16.1761041780382;
-        Tue, 21 Oct 2025 03:16:20 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-153.retail.telecomitalia.it. [79.46.200.153])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-471144c82c9sm272580385e9.14.2025.10.21.03.16.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 03:16:19 -0700 (PDT)
-Date: Tue, 21 Oct 2025 12:16:14 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: syzbot <syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
-Subject: Re: [syzbot] [virt?] [net?] possible deadlock in vsock_linger
-Message-ID: <u6mwe4gtor7cgqece6ctyabmlxcaxn7t2yk7k3xivifwxreu65@z5tjmfkoami7>
-References: <68f6cdb0.a70a0220.205af.0039.GAE@google.com>
+        d=1e100.net; s=20230601; t=1761041788; x=1761646588;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aAfOpf2VC9r1Aq/Ba8aQCcqsQ1cmp5ERa0FiKT74Dxg=;
+        b=fi6DNx+dtYllifZ+1+DP32MnSMm3Jg5MMN6ctS5dKGJ1up9j9yTVqqTi9W6VcB6pWV
+         G3iof2CUMGT2lOz9IdsIzo3AgxT5rIoaEIC2e0OYoJGPLB+WkdrOeyeXirZOKnAJ1K4s
+         d439pSyjhGxqfe7LrQc5h4PVPRfoKhbQ0Ta8LZjK0zM2EwS4GFmHFXsvQt3WTo8CjSWv
+         BBYoCq4dc2QP1GmVGNCN7w2R4RqruoaG80vl0FDmXFazmx9fkEJwwlNWHV7Lhq0v7aG8
+         IoLwi/yuNzGY77PguM5zv5s8RH7lkqDGZUfadiekFWfgq0x+4jm6Q0L8pD4WW1QO2bKO
+         zoWA==
+X-Forwarded-Encrypted: i=1; AJvYcCVIXsWVOvByVToFwpYX52YqUPJEsAn0pbbvz+i6ZqV3R8GHt5RfcvwYMh4/2oJnHBhvVKnwocs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YylHWw631//UBmoMMIfwA4ulx2Ro1crkZ8gTK4aY3DTur3p4D8V
+	73whooanMGdDTl/gsvTZIW5kTG4+R8pNr0EkFQ9VhYqGs6oFlN5f4hC17DA5epGoip1ilMsGDT1
+	wfTs25tXfZ+Xrc6fg3ecenMUGmoUmXmSEGflIP8y4PHhaiIJ4poXI2UYlXQ==
+X-Gm-Gg: ASbGncv74g7/a6JjGMYyMVKmmYD4qUU//ixkQPJDcysQYrXluOEn88iYn1kG6SIVTa3
+	WV56TW5QhWdoFn3v74lAGRCZ8TYBxqbtxdQBal2Bz4TGPJ7RqNj5mFPZIgUoI/7ApkVsAPjnbvk
+	N6PaJeTAC1qw7Bq6JfKS9k/fHLw1EXGGizDIW4ZbypoIPT/cbZdRkRewQ3dCjZwKFMe4v59h1Ry
+	lTN1R4wtlTmzKQGdcCVr0U7NFvCLtlrQBL4XfvYZUbky8cV9vPEFXYQ0VSrJoC/CRp2j+dyljjX
+	95LY/ARFM5oMui53ayHna38Uo8wR4BupCvFPV4fQJxgux1NAmYFysEfAAZtUAlhHnkDvraLBLUJ
+	RcKw3KLI/aCND7745DmHZIsYQx14Wn03OukzsQ2OpHcnGVeo=
+X-Received: by 2002:a05:6000:186a:b0:3ec:db13:89e with SMTP id ffacd0b85a97d-42704d1441cmr9403287f8f.7.1761041788477;
+        Tue, 21 Oct 2025 03:16:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEk4jyuQMg0K8Aws1Lv1y09/ZSf7i4qxnIBZGs2bQmXI8n6Npjep0Yjfazd/+t0xT4RT5Y7QQ==
+X-Received: by 2002:a05:6000:186a:b0:3ec:db13:89e with SMTP id ffacd0b85a97d-42704d1441cmr9403254f8f.7.1761041788036;
+        Tue, 21 Oct 2025 03:16:28 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4731c95efb9sm155390235e9.8.2025.10.21.03.16.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Oct 2025 03:16:27 -0700 (PDT)
+Message-ID: <1e779b80-4645-420d-8cae-36c36c3575e3@redhat.com>
+Date: Tue, 21 Oct 2025 12:16:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="ixrysslziegqmao6"
-Content-Disposition: inline
-In-Reply-To: <68f6cdb0.a70a0220.205af.0039.GAE@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v02 4/6] hinic3: Add mac filter ops
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Markus.Elfring@web.de, pavan.chebbi@broadcom.com
+Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ luosifu <luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>,
+ Shen Chenyang <shenchenyang1@hisilicon.com>,
+ Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+ Shi Jing <shijing34@huawei.com>, Luo Yang <luoyang82@h-partners.com>,
+ Meny Yossefi <meny.yossefi@huawei.com>, Gur Stavi <gur.stavi@huawei.com>
+References: <cover.1760685059.git.zhuyikai1@h-partners.com>
+ <dccaa516308f83aed2058175fdb4b752b6cbf4ae.1760685059.git.zhuyikai1@h-partners.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <dccaa516308f83aed2058175fdb4b752b6cbf4ae.1760685059.git.zhuyikai1@h-partners.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 10/17/25 10:30 AM, Fan Gong wrote:
+> +static int hinic3_mac_filter_sync(struct net_device *netdev,
+> +				  struct list_head *mac_filter_list, bool uc)
+> +{
+> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> +	struct list_head tmp_del_list, tmp_add_list;
+> +	struct hinic3_mac_filter *fclone;
+> +	struct hinic3_mac_filter *ftmp;
+> +	struct hinic3_mac_filter *f;
+> +	int err = 0, add_count;
+> +
+> +	INIT_LIST_HEAD(&tmp_del_list);
+> +	INIT_LIST_HEAD(&tmp_add_list);
+> +
+> +	list_for_each_entry_safe(f, ftmp, mac_filter_list, list) {
+> +		if (f->state != HINIC3_MAC_WAIT_HW_UNSYNC)
+> +			continue;
+> +
+> +		f->state = HINIC3_MAC_HW_UNSYNCED;
+> +		list_move_tail(&f->list, &tmp_del_list);
+> +	}
+> +
+> +	list_for_each_entry_safe(f, ftmp, mac_filter_list, list) {
+> +		if (f->state != HINIC3_MAC_WAIT_HW_SYNC)
+> +			continue;
+> +
+> +		fclone = hinic3_mac_filter_entry_clone(f);
+> +		if (!fclone) {
+> +			err = -ENOMEM;
+> +			break;
+> +		}
+> +
+> +		f->state = HINIC3_MAC_HW_SYNCED;
+> +		list_add_tail(&fclone->list, &tmp_add_list);
+> +	}
+> +
+> +	if (err) {
+> +		hinic3_undo_del_filter_entries(mac_filter_list, &tmp_del_list);
+> +		hinic3_undo_add_filter_entries(mac_filter_list, &tmp_add_list);
+> +		netdev_err(netdev, "Failed to clone mac_filter_entry\n");
+> +
+> +		hinic3_cleanup_filter_list(&tmp_del_list);
+> +		hinic3_cleanup_filter_list(&tmp_add_list);
+> +		goto err_out;
+> +	}
+> +
+> +	add_count = hinic3_mac_filter_sync_hw(netdev, &tmp_del_list,
+> +					      &tmp_add_list);
+> +	if (!list_empty(&tmp_add_list)) {
+> +		/* there were errors, delete all mac in hw */
+> +		hinic3_undo_add_filter_entries(mac_filter_list, &tmp_add_list);
+> +		/* VF does not support promiscuous mode, don't delete any other uc mac */
+> +		if (!HINIC3_IS_VF(nic_dev->hwdev) || !uc) {
+> +			list_for_each_entry_safe(f, ftmp, mac_filter_list,
+> +						 list) {
+> +				if (f->state != HINIC3_MAC_HW_SYNCED)
+> +					continue;
+> +
+> +				fclone = hinic3_mac_filter_entry_clone(f);
+> +				if (!fclone)
+> +					break;
+> +
+> +				f->state = HINIC3_MAC_WAIT_HW_SYNC;
+> +				list_add_tail(&fclone->list, &tmp_del_list);
+> +			}
+> +		}
+> +
+> +		hinic3_cleanup_filter_list(&tmp_add_list);
+> +		hinic3_mac_filter_sync_hw(netdev, &tmp_del_list, &tmp_add_list);
+> +
+> +		/* need to enter promiscuous/allmulti mode */
+> +		err = -ENOMEM;
+> +		goto err_out;
+> +	}
 
---ixrysslziegqmao6
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+I'm under the impression that this code could be simpler if
+hinic3_mac_filter_sync_hw() don't modifiy the argment lists, but set
+some flag on the successfully added entries.
 
-On Mon, Oct 20, 2025 at 05:02:56PM -0700, syzbot wrote:
->Hello,
->
->syzbot found the following issue on:
->
->HEAD commit:    d9043c79ba68 Merge tag 'sched_urgent_for_v6.18_rc2' of git..
->git tree:       upstream
->console output: https://syzkaller.appspot.com/x/log.txt?x=130983cd980000
->kernel config:  https://syzkaller.appspot.com/x/.config?x=f3e7b5a3627a90dd
->dashboard link: https://syzkaller.appspot.com/bug?extid=10e35716f8e4929681fa
->compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
->syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17f0f52f980000
->C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11ea9734580000
+In case of failure, you traverse the tmp_add_list and delete all the
+unflagged entries.
 
-#syz test
+Both lists are always cleaned-up at function exit.
 
-
---ixrysslziegqmao6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="0001-TODO.patch"
-
-From c32c21ea301aadc56160a57ddcd99f836a49f028 Mon Sep 17 00:00:00 2001
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Tue, 21 Oct 2025 12:12:24 +0200
-Subject: [PATCH] TODO
-
-From: Stefano Garzarella <sgarzare@redhat.com>
-
----
- net/vmw_vsock/af_vsock.c | 38 ++++++++++++++++++++++++++------------
- 1 file changed, 26 insertions(+), 12 deletions(-)
-
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 4c2db6cca557..5434fe6a1d6b 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -565,6 +565,11 @@ static u32 vsock_registered_transport_cid(const struct vsock_transport **transpo
- 	return cid;
- }
- 
-+/* vsock_find_cid() must be called outside lock_sock/release_sock
-+ * section to avoid a potential lock inversion deadlock with
-+ * vsock_assign_transport() where `vsock_register_mutex` is taken when
-+ * `sk_lock-AF_VSOCK` is already held.
-+ */
- bool vsock_find_cid(unsigned int cid)
- {
- 	if (cid == vsock_registered_transport_cid(&transport_g2h))
-@@ -735,23 +740,14 @@ static int __vsock_bind_dgram(struct vsock_sock *vsk,
- 	return vsk->transport->dgram_bind(vsk, addr);
- }
- 
-+/* The caller must ensure the socket is not already bound and provide a valid
-+ * `addr` to bind (VMADDR_CID_ANY, or a CID assgined to a transport).
-+ */
- static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr)
- {
- 	struct vsock_sock *vsk = vsock_sk(sk);
- 	int retval;
- 
--	/* First ensure this socket isn't already bound. */
--	if (vsock_addr_bound(&vsk->local_addr))
--		return -EINVAL;
--
--	/* Now bind to the provided address or select appropriate values if
--	 * none are provided (VMADDR_CID_ANY and VMADDR_PORT_ANY).  Note that
--	 * like AF_INET prevents binding to a non-local IP address (in most
--	 * cases), we only allow binding to a local CID.
--	 */
--	if (addr->svm_cid != VMADDR_CID_ANY && !vsock_find_cid(addr->svm_cid))
--		return -EADDRNOTAVAIL;
--
- 	switch (sk->sk_socket->type) {
- 	case SOCK_STREAM:
- 	case SOCK_SEQPACKET:
-@@ -991,15 +987,33 @@ vsock_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
- {
- 	int err;
- 	struct sock *sk;
-+	struct vsock_sock *vsk;
- 	struct sockaddr_vm *vm_addr;
- 
- 	sk = sock->sk;
-+	vsk = vsock_sk(sk);
- 
- 	if (vsock_addr_cast(addr, addr_len, &vm_addr) != 0)
- 		return -EINVAL;
- 
-+	/* Like AF_INET prevents binding to a non-local IP address (in most
-+	 * cases), we only allow binding to a local CID.
-+	 */
-+	if (vm_addr->svm_cid != VMADDR_CID_ANY &&
-+	    !vsock_find_cid(vm_addr->svm_cid))
-+		return -EADDRNOTAVAIL;
-+
- 	lock_sock(sk);
-+
-+	/* Ensure this socket isn't already bound. */
-+	if (vsock_addr_bound(&vsk->local_addr)) {
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
- 	err = __vsock_bind(sk, vm_addr);
-+
-+out:
- 	release_sock(sk);
- 
- 	return err;
--- 
-2.51.0
-
-
---ixrysslziegqmao6--
+/P
 
 
