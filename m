@@ -1,105 +1,113 @@
-Return-Path: <netdev+bounces-231388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29879BF89C5
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 22:10:28 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F125BF8B4C
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 22:22:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C58094FE85F
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 20:10:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2999A4E7E3A
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 20:22:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78AE42797B5;
-	Tue, 21 Oct 2025 20:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55F32561C2;
+	Tue, 21 Oct 2025 20:22:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SFlB+Ka5"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=sjoerd@collabora.com header.b="LTIsdLSW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC72277CBD;
-	Tue, 21 Oct 2025 20:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761077425; cv=none; b=WRj9AtqTVUIY8y9SX642GHrLw93ZckBbYPhKlhSs+zyyPQpMVh2LrCSgMW+dRkEyf/1FT2QpQNMxc5hLYyWCXJ0p4NKSictNlqoSnBwYxtssXKCF+eRtVRWbxmi6LfjLWSnatsyc/pj1wg2Vd21SZqBFAmkMxwXW6AZsOhfQMyw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761077425; c=relaxed/simple;
-	bh=pgcesUdsb4sOk+nQyeiALpy53Al2dO4CVJReuvh25oM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jcKXhHyzXvi2APkKga7HkvL5ofoajyKjQjH9v1Fi2kdfmBB6soQ9P2eSmW0eqoKpGSpmO8htN9mt5gnIS2QBZ3xVVf4vTsAiR6sauLufAsqLRjxwlatKlE/mEqlca+oYTxoww9UC64naUATgEcxut9ryxSVDxkKU7w63Shd6pNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SFlB+Ka5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1817C4CEF5;
-	Tue, 21 Oct 2025 20:10:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761077424;
-	bh=pgcesUdsb4sOk+nQyeiALpy53Al2dO4CVJReuvh25oM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SFlB+Ka53VGE4pbBygrynKZSImqRezXoDmxS8uwAcEFQd1ao/cJxXY//XG5MTO+ZB
-	 1zEwXwd2XuT96c6NC20Zhg4QM2/gjo9fFH5jWpTgX8vXlIGHi/as/IKFH8NYr+tvmg
-	 ccDbWHQAa/LRifV5e+mxENW7Vn7hSqVJT+fiiwKYprqYV1wXSvtFXQMNr8c4T4/L9F
-	 dM0rs7t/IL1mPjyPF38XSQ65h5mG0e2buc+7+YE4Ot16GxHWjCOg5fIAWVEnou4sYA
-	 wYNnNhxnkFn7LN0wWcREnrAIEg9FabstmbSczcHAQ68SyTYh1TX8grUYjhBDeTh+4x
-	 YuN6/IOnEwgmw==
-Date: Tue, 21 Oct 2025 15:10:23 -0500
-From: Rob Herring <robh@kernel.org>
-To: Buday Csaba <buday.csaba@prolan.hu>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] dt-bindings: net: mdio: add
- phy-id-read-needs-reset property
-Message-ID: <20251021201023.GA741540-robh@kernel.org>
-References: <20251015134503.107925-1-buday.csaba@prolan.hu>
- <20251015134503.107925-3-buday.csaba@prolan.hu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F103F9FB;
+	Tue, 21 Oct 2025 20:22:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761078157; cv=pass; b=DZRttURrMToWn0bO4aPMs45s9KV8VDMAU7/IsWWxBY43ods84SvAFBI0xXzSfoLXtJzyKYZgP8DHBzT/BMD8abCQ9a1PUOWTwv2psewYUOP+MngqePha54kO17rEOC46YJeA4FDVzyF0lT4tRcFb9iC4M9PXnvMzbEP/epRSzu8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761078157; c=relaxed/simple;
+	bh=dQUuT/cvEQMcRlSDp4ZHtYKdqQ9zzwEEbrwS4uf5EgE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=RSJcXbO5tMHvF452T1rmLzdAtBBLN1DNdgjyNdciL/Iof636M/x2OvjxAvsPkxOl/RYjyz8borkgpF61xadQjywgb2rZvsffW6SHWPLxUYw9l0ud0Qxb8DzaJCkvIoFXK5l2AmnQvZa+pIgh+lpJGuZGNWuYR7c0cLP6jbHm7K8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=sjoerd@collabora.com header.b=LTIsdLSW; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1761078107; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=QrY/3a0vxy2P8JAKFOWpysYjzg9YpdQXvP+aIg2gtIeBQB2GZ0VHr/28YkYykdW1ePNjrhHjDLlNaNi9fEJyHUG5G84GGV+Qi6KCIYFeIZLscaE0Hl2YgCokXDgmszFSTsboUhQiDF9EqFGB6cyWBrnfxf9G4VNp2kbMWlXz99k=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1761078107; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=hAvzwpzQSETC2lKwgfVXJKcyUwiMeJEWklgbWrWua1w=; 
+	b=gaqh9cwprh56WWxPqBWHY4c06cztH2dd/JXRzKlsNmG22IMiFPCpx/AFJwoyXYumggiRClhix/qPEJKDiKGhcE9Zd5yA1RcLNfdMI/XXOF5Gt11RwoioTvYx65Qh9MTuSA/FFIfk6Mae178SBhmcmkGsHceWA6x8pa1aLvj2A3c=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=sjoerd@collabora.com;
+	dmarc=pass header.from=<sjoerd@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1761078107;
+	s=zohomail; d=collabora.com; i=sjoerd@collabora.com;
+	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
+	bh=hAvzwpzQSETC2lKwgfVXJKcyUwiMeJEWklgbWrWua1w=;
+	b=LTIsdLSW3epqhH5OvoiycJDnQqP3nIYZbR5vNpzfS79o/Limr7vlOShUEfzal4LV
+	b7iKvQLnGJUd2uIs+yNTkLy8SIRK5GbE+5pjp3160njZMvf4itG+twGlnZe1TQRFU41
+	QQ6j6xhEEGpWCgs+L/LFvW1FZFSKrlJ3BdlarpLs=
+Received: by mx.zohomail.com with SMTPS id 176107810303712.61020879160435;
+	Tue, 21 Oct 2025 13:21:43 -0700 (PDT)
+Message-ID: <8f5335a703905dea9d8d0c1840862a3478da1ca7.camel@collabora.com>
+Subject: Re: [PATCH 12/15] arm64: dts: mediatek: mt7981b-openwrt-one: Enable
+ Ethernet
+From: Sjoerd Simons <sjoerd@collabora.com>
+To: Andrew Lunn <andrew@lunn.ch>, Eric Woudstra <ericwouds@gmail.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+  Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno	
+ <angelogioacchino.delregno@collabora.com>, Ryder Lee
+ <ryder.lee@mediatek.com>,  Jianjun Wang <jianjun.wang@mediatek.com>, Bjorn
+ Helgaas <bhelgaas@google.com>, Lorenzo Pieralisi	 <lpieralisi@kernel.org>,
+ Krzysztof =?UTF-8?Q?Wilczy=C5=84ski?=	 <kwilczynski@kernel.org>, Manivannan
+ Sadhasivam <mani@kernel.org>, Chunfeng Yun	 <chunfeng.yun@mediatek.com>,
+ Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
+ Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,  "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
+	kernel@collabora.com, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, 	linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, 	linux-pci@vger.kernel.org,
+ linux-phy@lists.infradead.org, netdev@vger.kernel.org,  Daniel Golle
+ <daniel@makrotopia.org>, Bryan Hinton <bryan@bryanhinton.com>
+Date: Tue, 21 Oct 2025 22:21:31 +0200
+In-Reply-To: <4f82aa17-1bf8-4d72-bc1f-b32f364e1cf6@lunn.ch>
+References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
+	 <20251016-openwrt-one-network-v1-12-de259719b6f2@collabora.com>
+	 <4f82aa17-1bf8-4d72-bc1f-b32f364e1cf6@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2-5 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251015134503.107925-3-buday.csaba@prolan.hu>
+X-ZohoMailClient: External
 
-On Wed, Oct 15, 2025 at 03:45:02PM +0200, Buday Csaba wrote:
-> Some Ethernet PHYs require a hard reset before accessing their MDIO
-> registers. When the ID is not provided by a compatible string,
-> reading the PHY ID may fail on such devices.
-> 
-> This patch introduces a new device tree property called
-> `phy-id-read-needs-reset`, which can be used to hard reset the
-> PHY before attempting to read its ID via MDIO.
-> 
-> Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
-> ---
->  Documentation/devicetree/bindings/net/ethernet-phy.yaml | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> index 2ec2d9fda..b570f8038 100644
-> --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> @@ -215,6 +215,14 @@ properties:
->        Delay after the reset was deasserted in microseconds. If
->        this property is missing the delay will be skipped.
->  
-> +  phy-id-read-needs-reset:
-> +    $ref: /schemas/types.yaml#/definitions/flag
-> +    description:
-> +      Some PHYs require a hard reset before accessing MDIO registers.
-> +      This workaround allows auto-detection of the PHY ID in such cases.
-> +      When the PHY ID is provided with the 'compatible' string, setting
-> +      this property has no effect.
+On Fri, 2025-10-17 at 19:31 +0200, Andrew Lunn wrote:
+> > +&mdio_bus {
+> > +	phy15: ethernet-phy@f {
+> > +		compatible =3D "ethernet-phy-id03a2.a411";
+> > +		reg =3D <0xf>;
+> > +		interrupt-parent =3D <&pio>;
+> > +		interrupts =3D <38 IRQ_TYPE_EDGE_FALLING>;
+>=20
+> This is probably wrong. PHY interrupts are generally level, not edge.
 
-If the phy is listed in DT, then it should have a compatible. Therefore, 
-you don't need this property.
+Sadly i can't find a datasheet for the PHY, so can't really validate that e=
+asily. Maybe Eric can
+comment here as the author of the relevant PHY driver.
 
-Rob
+I'd note that the mt7986a-bananapi-bpi-r3-mini dts has the same setup for t=
+his PHY, however that's
+ofcourse not authoritative.
+
+--=20
+Sjoerd Simons <sjoerd@collabora.com>
 
