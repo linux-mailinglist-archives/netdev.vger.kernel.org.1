@@ -1,107 +1,93 @@
-Return-Path: <netdev+bounces-231052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55F93BF43A8
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 03:16:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91491BF43CD
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 03:19:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B2571897C2A
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 01:17:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 384BB46075A
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 01:19:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25251DC198;
-	Tue, 21 Oct 2025 01:16:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DAA4190664;
+	Tue, 21 Oct 2025 01:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f0uN+GWj"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ROotCBXF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9553418CBE1;
-	Tue, 21 Oct 2025 01:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE0615E5DC;
+	Tue, 21 Oct 2025 01:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761009406; cv=none; b=KY+h42IQG2jfeHe9z6HcPeptRZ5uYrHi5R0PW6JTC5u/T1gexucts2l/POK9d20PMnPDij3nOQYYRsPYZWH+PYpqYmbnvo+p/H2/X6ojgszmfDPetO1bxcGvU1WFGhWDN2WMXWWiZJx0ffj3WcIqtd0DB/Ke1mrMSeRdOkqQxA8=
+	t=1761009544; cv=none; b=a4YZ9r8lVMtreGHq8rpmU2WrMZqiuXbPM30AZoaPn1hhhSNpe0CNNeDQt0V1HmX2VdcRgtUI5kTTTyEQ0zKnf8STAj4P0QE/a7gJW3uLwxmCTrmd3pG+S281OjC2bI29227qHA6oWTUtncZmXL5kDQ7dVYNRVezVXQcniHN9Jc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761009406; c=relaxed/simple;
-	bh=FlG+exzSWR++/edIMS0S5Y+KS4hcAr0q2UH5cA3Hx28=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f+kyREmI0HaKSQbCR+VrESx5j3wTmIeqW2ApbzjyYyMx3miutDft7UO7E/QYTPCrYxga7FxChYH/nb50jK0ShNMuFo2u/qUUgAI62HHps0iWTi+hQ8YujTVv0/oo7+baUrHAKpAO7IkbfmwbIfeP1+QxUBol4EpjLpBOVCuIdxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f0uN+GWj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 664A1C4CEFB;
-	Tue, 21 Oct 2025 01:16:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761009406;
-	bh=FlG+exzSWR++/edIMS0S5Y+KS4hcAr0q2UH5cA3Hx28=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f0uN+GWjFLqoIVLzDdrkPOJbT42cSjN81WJxOrJIgcS2nsX1w0KLhzoX0J0NTH014
-	 KVlPKkGOEYVYGVfS+O+5zBuHTl/YeI/EjUGjOyioazJl9ZeonnXyIyDK92Ayif48Io
-	 l9vW3HBG7tDVxsPrz6l60OXCjb43UCCgpA7zo7DMGE2oWnqNkCAfy+rFQnZxklYnHt
-	 9UQjDk5VRVdEMOrurh1VVtXRensKY+fRyKyHmFax4XS/KiwEQS3X3oprhY3lLDAnWk
-	 1sMtsK4L0gRQxRGOocW0GV9hGfNc2Hx0iCYmDezS790nFbVoH7VApKtg0K1egwkfxI
-	 4n7QqZuvC2TtA==
-Date: Mon, 20 Oct 2025 18:16:44 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Alexander Lobakin <aleksander.lobakin@intel.com>, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Aleksandr
- Loktionov <aleksandr.loktionov@intel.com>, Dan Nowlin
- <dan.nowlin@intel.com>, Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: Re: [PATCH net-next v2 05/14] ice: improve TCAM priority handling
- for RSS profiles
-Message-ID: <20251020181644.5b651591@kernel.org>
-In-Reply-To: <20251016-jk-iwl-next-2025-10-15-v2-5-ff3a390d9fc6@intel.com>
-References: <20251016-jk-iwl-next-2025-10-15-v2-0-ff3a390d9fc6@intel.com>
-	<20251016-jk-iwl-next-2025-10-15-v2-5-ff3a390d9fc6@intel.com>
+	s=arc-20240116; t=1761009544; c=relaxed/simple;
+	bh=nopaWkQFGS2iMxso0Hn2i1ziWVRkua1QbyjI2qTYzpY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=QB4ky9FQYf7zzRV3tMB1aevbsUgbF0WVTO7xH1ymMz1qOE3b11mP6zCPxjxyj3ftf9HG2tTnkqbegvzhhUVujzpM3W13nq7Q2VabtFRznLNNYrLe5rot/UDL/M8YESZIgN49YBNjYwb5cMA+fwUFhjwjxEYnCCw86voBf+KEbTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ROotCBXF; arc=none smtp.client-ip=113.46.200.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=nopaWkQFGS2iMxso0Hn2i1ziWVRkua1QbyjI2qTYzpY=;
+	b=ROotCBXFX6RPOHU2uwrGgEBQcd0I8tPduU2rAlytXQv6Ta7KVvwk1jCqfOnglnQfgOmmrWOME
+	1ztwKv9ANvXr3PxJufq5II7blgt3TFOWpaSeR6BfFYhKwahXBHXUU7yAvewxdhdI+wHsZM8BdDs
+	IkOtsIuXPIyw0HohmAbZXO8=
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4crDtl2kb6zcZyT;
+	Tue, 21 Oct 2025 09:17:51 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 11573140156;
+	Tue, 21 Oct 2025 09:19:00 +0800 (CST)
+Received: from [10.174.177.19] (10.174.177.19) by
+ dggpemf500016.china.huawei.com (7.185.36.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 21 Oct 2025 09:18:58 +0800
+Message-ID: <031f1945-295d-4c33-a12e-798220ce68cc@huawei.com>
+Date: Tue, 21 Oct 2025 09:18:57 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] Re: [syzbot] [net?] WARNING in xfrm_state_fini (4)
+To: Sabrina Dubroca <sd@queasysnail.net>
+CC: <syzbot+999eb23467f83f9bf9bf@syzkaller.appspotmail.com>,
+	<syzkaller-bugs@googlegroups.com>, <steffen.klassert@secunet.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>
+References: <20251020112553.2345296-1-wangliang74@huawei.com>
+ <aPYo8wGLna44_57b@krikkit>
+From: Wang Liang <wangliang74@huawei.com>
+In-Reply-To: <aPYo8wGLna44_57b@krikkit>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-On Thu, 16 Oct 2025 23:08:34 -0700 Jacob Keller wrote:
-> +/**
-> + * ice_set_tcam_flags - set TCAM flag don't care mask
-> + * @mask: mask for flags
-> + * @dc_mask: pointer to the don't care mask
-> + */
-> +static void ice_set_tcam_flags(u16 mask, u8 dc_mask[ICE_TCAM_KEY_VAL_SZ])
-> +{
-> +	u16 *flag_word;
-> +
-> +	/* flags are lowest u16 */
-> +	flag_word = (u16 *)dc_mask;
-> +	*flag_word = ~mask;
 
-Please don't cast pointers to wider types, get_unaligned() exists 
-for a reason. BTW endian also exists, AFAIU, this will do a different
-thing on BE and LE.
+在 2025/10/20 20:20, Sabrina Dubroca 写道:
+> 2025-10-20, 19:25:53 +0800, Wang Liang wrote:
+>> #syz test
+> I've already sent
+> https://lore.kernel.org/all/15c383b3491b6ecedc98380e9db5b23f826a4857.1760610268.git.sd@queasysnail.net/
+> which should address this issue (and the other report in
+> xfrm6_tunnel_net_exit).
 
->  /**
->   * ice_adj_prof_priorities - adjust profile based on priorities
->   * @hw: pointer to the HW struct
-> @@ -3688,10 +3733,17 @@ ice_adj_prof_priorities(struct ice_hw *hw, enum ice_block blk, u16 vsig,
->  			struct list_head *chg)
->  {
->  	DECLARE_BITMAP(ptgs_used, ICE_XLT1_CNT);
-> +	struct ice_tcam_inf **attr_used;
->  	struct ice_vsig_prof *t;
-> -	int status;
-> +	u16 attr_used_cnt = 0;
-> +	int status = 0;
->  	u16 idx;
->  
-> +	attr_used = devm_kcalloc(ice_hw_to_dev(hw), ICE_MAX_PTG_ATTRS,
 
-attr_used is freed before exiting this function, every time.
-Why the devm_* ?
+Sorry! Yesterday I worked in the issue 'WARNING in xfrm6_tunnel_net_exit'
+and I didn't find any patchs that Reported-by/Tested-by its syzbot link in
+mail list, or syz test patchs, so I send the test patch.
+
+Please ignore my test patchs. Thanks.
+
 
