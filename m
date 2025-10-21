@@ -1,426 +1,230 @@
-Return-Path: <netdev+bounces-231355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DB67BF7BBA
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 18:40:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 322A9BF7BCA
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 18:41:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A258C480C88
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 16:37:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C19A919C3C62
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 16:41:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94C252FD676;
-	Tue, 21 Oct 2025 16:36:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23DCB1C8606;
+	Tue, 21 Oct 2025 16:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="L3dV9kPq"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="GjUZqukO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f230.google.com (mail-qk1-f230.google.com [209.85.222.230])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012011.outbound.protection.outlook.com [52.101.53.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F842FD663
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 16:36:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.230
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761064570; cv=none; b=miBun6Gjm+pMKMt2FcHZ0WlvNuDpevEkSsZoyRblayEplLWUgH7D+D7yDa8YmVEBLVWNXXzzmCMneKnvo47yW5LVpzaeAvtJ+93n572mrVPrG0REtZR8mHeZpJ4Zc2ujk9nSantlLVtElUerdFt+SJVSqX3brjCxxg1W5UFUiiY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761064570; c=relaxed/simple;
-	bh=RJWWmxDqTL/DNcsSQy19tTZJ37KdEDjK/Pm9xuYJXjc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=J/5FJQSJZ9vLPJzzAX+IojhnoXW4H4Gu49Xibj8YyU3oWre5CTPplF+CbF/3wuM0vscm7QNaDhHJtIm37oNG1i7Fr9M85+EGYuNoG4A9uyG+tsHcEX5gSvxByKvGDS+LKJOK//QNzTPY5XdxdfuDirMxEzRtxNJRTPGRQJsGfH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=L3dV9kPq; arc=none smtp.client-ip=209.85.222.230
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f230.google.com with SMTP id af79cd13be357-8901a7d171bso726707385a.1
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:36:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761064567; x=1761669367;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:dkim-signature:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=b3biXi1AQBo+SW2vlwfSLIfx+ACLE08h5MiQFwzx3wQ=;
-        b=GWgQIm2XL17TlDBjSRgZT+HlGJwq8Nr3PQeosWkIi11crtm5voGsp5mFFjQmhNdocn
-         LyF1nZAreSeNShen4w6y/KP0E1JKXrU2oRQkcraloEPAo4KWQEm5HHILMnbWLR0FvPHc
-         gzhwvs7z+qL/pDz9M0HVRxBSpjuYjYVZLAgOIJneQYgJcwHZBTPE+O6G1m8aP8lIh8Mp
-         8G5SzYxvIatpLbvSX42UZYbfuofXYIZ+PZZaloJTd5GBrWqJvV4cEZ3sha81Z5DNrWsz
-         4JPiAoSgv4twm1PufotIQtkLAYpX92jrIIXlGLsLrl2/yhWjKDqQszJJqbBKRLzNu8KP
-         Yy/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVFE7S05DZYjYur/o2p97YTCsP27NJbT918hPzX80fwkdBSRprLjT1wk0/wk8x1PKL0VPbGSEI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzg7yiknXDPPytpUUctiGeob9rXuhikI4KU0aNCOJkpdtOIiEEb
-	D2FBmqYclbtth1ccDnZH6U5DmYoIMPyt5DEhIETz+UKDqY3EzFLjJ5tSIirIxHz31Fc/OMm4DcQ
-	mqgE5Scid1ZjH4BXYN7FPDtBjaGA96yFRrRuUs+FWQ6RTu/t+sEJmf+wQfjAGjI69qiRCxleL+D
-	AJ+bQf3X9Pw2P/axkH/O97fc8xUEjnHyED55DWB6uTLYCebpfsUqd84lEjNjjb0iBAEobuhztQz
-	5RWokfQFUiY6xgmxSc=
-X-Gm-Gg: ASbGnctMQVy949BdFvBlcvg2EHfXgzZ4cVz5dI4Cpw85rTHepgnJCKMIwHhIjo0nZp6
-	nWBv4B6VuzxxBewXmt51xBcW9x40ad7UxlIzqWBKVxh6oAECTirxLG3grHXxqUoUr6+hkhCNbCe
-	I+AxdGO8/bsQlX5xGELFY7+5Iqrg7urJFIsCyt0L4pD6zZAYSbdebVnOItJTT3sUvn2udlps5dM
-	+i41M1SQMIeWekUJAO43xNu+jfBF1NdYdDl7ZTENcBxbWC6NaEChz9ZZ7i0lyw2wZF+qkGRAKp3
-	j7NF5mdJMEiam9PRRxVZz4WjWbF5NNRTIuauRCGMqOXjxKvYYfUZ6+kSALQ1muj5VU7VrDRY4M8
-	xQMupal0vPLGO50Ac4BbXEvlSyVWBHVTGTCsgEKdmdrY6MQI3ZQZS/9zeqSZP+3Dq0cieYraROU
-	bO/Nc4ilMVtoIbZLO9t0ZHq7Wb6E5+IBUQdN0h++8=
-X-Google-Smtp-Source: AGHT+IFFNamj2En2J+hLFSaRZmaXwEDTab8oExOuF04FV934fSZ4Aib+54eK3fL3rOocSAO8xxRGxLNxTOLZ
-X-Received: by 2002:a05:620a:4152:b0:892:eb85:53cf with SMTP id af79cd13be357-892eb855690mr1236616585a.54.1761064567027;
-        Tue, 21 Oct 2025 09:36:07 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-72.dlp.protect.broadcom.com. [144.49.247.72])
-        by smtp-relay.gmail.com with ESMTPS id af79cd13be357-891cfb58f23sm133157685a.7.2025.10.21.09.36.06
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 21 Oct 2025 09:36:07 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-780fb254938so4949812b3a.0
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:36:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1761064566; x=1761669366; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=b3biXi1AQBo+SW2vlwfSLIfx+ACLE08h5MiQFwzx3wQ=;
-        b=L3dV9kPqKx6pSwIOFen5vwzPXmI3JUQ8nRldVjNVCiOeRfdTvsU4AL2omN82NsZQuC
-         Dmivl7qkcMl2PLRvdjHjMEBdSiN+W22BVtHGN0St91K+quKk8SBI/Tnmb5lJ2d+j4BbY
-         f/pI40pFW294DiMD5cGcFX09vwU0m1aoTuhTo=
-X-Forwarded-Encrypted: i=1; AJvYcCVf6WqQW5BOFMs6tGfwPP0ctnS8q71pEz/T6jILNfml/LhFN5F5B4EL/FgTdtpwVr0ZR1DYix8=@vger.kernel.org
-X-Received: by 2002:a05:6a21:798b:b0:338:c1c0:130 with SMTP id adf61e73a8af0-338c1c00179mr4792639637.37.1761064565620;
-        Tue, 21 Oct 2025 09:36:05 -0700 (PDT)
-X-Received: by 2002:a05:6a21:798b:b0:338:c1c0:130 with SMTP id adf61e73a8af0-338c1c00179mr4792613637.37.1761064565159;
-        Tue, 21 Oct 2025 09:36:05 -0700 (PDT)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b6a76b77bf6sm10772837a12.41.2025.10.21.09.36.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Oct 2025 09:36:04 -0700 (PDT)
-Message-ID: <7039d3f0-8102-4d0d-afec-1b96e3709aa6@broadcom.com>
-Date: Tue, 21 Oct 2025 09:36:02 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE2634A76E
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 16:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761064860; cv=fail; b=MYWkWsEPLI848G5TJaLWZhuMU6aXA3LcUBttLql+jzwFN1SUslAqKWB0soOTmU/rOprCcs2I4h2OcG84UD9Z9b9Vji6/xVb6jb3NdD0cvckZvHgTkOJ6d3tYDRzRKtmJIFtKNDEXli34FScumOMa6J0+KmbLLciorWQZFU9Zeuo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761064860; c=relaxed/simple;
+	bh=lXsDdl/2dZu9iMB+kDFzsD+S4VocNeO8zqSEZhQ6Cpo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=uGch8HJeWdBvrmkMy+o4/b/03E1n3casdvQ6zUXRbmZSFKFKyfewZ2z8hBNOt2pxnowp4wjqZwSQQrsnbks6qGNM1KllIPQgxwGBhU1XL+5YhnERCXoS74/wQc3jcsFj7NZvHkroetYp3PVBqgllBpzAc7Uh7UD9LDRxnq0Mecw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=GjUZqukO; arc=fail smtp.client-ip=52.101.53.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aUq+7makWO7DXVLuedK6zMnv+SqRVgVcbdZhoooNMDLJPB0fJo3aVL/2XFmUxjbhlpv5hIk2kJ5F0U2k4f2GwQHre5Y93PwXl9qn4GCJY6MuCFaSnAqEqwjLRFfPXAkfbdbFtWAWxcY372Lbwm2sk2ulcQFJJ4P2XCpGe3GAu32Z7I8k1yv4jjfVR4oKlH94NB8TvdLjI/5zSfquEReO1OmIPWLGq2vv1dnxWnmqiqmNGmmo0tFmrGF3/wgGg9DA9H+HTPcDQh/RvgVvtZRb8Jo986dXgMu+MjQhbzzBAUMLCPHdgBN2aB5VWRD5BccPu6cYaWxT6iqeR1KIl14AxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aA91SiT6SidBPOBnDprG/c2r4YXlYy4VnltKqhFg1pg=;
+ b=Vm5Vtmoz8URv1K22q/EJJgxVT/KMc6ptUMJhwH6xmf5/opgHGSM2uen8Tu1XBrBM0VTu+gXu6IfKH30Fhj0+816Y5vksDNmQcUv4K8P+Jf4hH8UPzyAYWg1GCiwU5gG3F5P8PrTi6BBL20zYxzU9gG5PvNjGbMBckMgqspoViOciD4knLuPqHmUX34GSMhC8kBq/uEYvYc7zRpzmOkAnzmGGku2ZgDpwBXPQOJxjG8c1zXz3d6vfbB8A6UsFMmnO9Xve0e0dLFZ5dezsHEALJMBTfig0xe8PzwXCrcSs64gtmkMuKhAM4vaPvdBn09fu8NU73bdEDXngFEqRn1IRNg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aA91SiT6SidBPOBnDprG/c2r4YXlYy4VnltKqhFg1pg=;
+ b=GjUZqukOb9SMTpoyL2d1pe8pAxpPwIoN9rRYCr+If54//rgopO3jn54XFqBkWxsb0ZTIqZDQG5M+sD6Gss8Nx7lc/a1eMkl+bpAhnsPnkNKDK3cbfwyvddOhWY143fI6ZR6eUcCueGP7OsbUNYhkAJCzsPFZRESSUAyTO+qbaxA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB6395.namprd12.prod.outlook.com (2603:10b6:510:1fd::14)
+ by MN0PR12MB5761.namprd12.prod.outlook.com (2603:10b6:208:374::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.17; Tue, 21 Oct
+ 2025 16:40:54 +0000
+Received: from PH7PR12MB6395.namprd12.prod.outlook.com
+ ([fe80::5a9e:cee7:496:6421]) by PH7PR12MB6395.namprd12.prod.outlook.com
+ ([fe80::5a9e:cee7:496:6421%5]) with mapi id 15.20.9228.015; Tue, 21 Oct 2025
+ 16:40:53 +0000
+Message-ID: <53151eb0-5c1c-47a1-95bb-2a6654d5d230@amd.com>
+Date: Tue, 21 Oct 2025 22:10:42 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/4] amd-xgbe: add ethtool phy selftest
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
+ Shyam-sundar.S-k@amd.com
+References: <20251020152228.1670070-1-Raju.Rangoju@amd.com>
+ <20251020152228.1670070-3-Raju.Rangoju@amd.com>
+ <ba2c0a35-eaad-4ae7-a337-b32cdf6323c6@bootlin.com>
+ <9ba51a79-5a0e-42ab-90aa-950673633cda@lunn.ch>
+ <563f3f1b-985f-4a9e-a32c-cb8e9b6af43a@bootlin.com>
+Content-Language: en-US
+From: "Rangoju, Raju" <raju.rangoju@amd.com>
+In-Reply-To: <563f3f1b-985f-4a9e-a32c-cb8e9b6af43a@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA5P287CA0088.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a01:1d8::9) To PH7PR12MB6395.namprd12.prod.outlook.com
+ (2603:10b6:510:1fd::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net-phy-bcm84881: add support for other 2.5G / 5G / 10G
- phys
-To: =?UTF-8?Q?Bal=C3=A1zs_Triszka?= <info@balika011.hu>,
- bcm-kernel-feedback-list@broadcom.com, Russell King <linux@armlinux.org.uk>,
- netdev@vger.kernel.org
-References: <20251020222721.2800678-1-info@balika011.hu>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20251020222721.2800678-1-info@balika011.hu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB6395:EE_|MN0PR12MB5761:EE_
+X-MS-Office365-Filtering-Correlation-Id: ddd062fe-481d-4b94-f487-08de10c0999d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SjBaKy9Ea3lkWVRqUHdEN3F2M0lTckYrb21YNDRmT0paK1JnTm96WHpPWlMw?=
+ =?utf-8?B?SWVDSFhCbHFJVVpMbXhGQ251RXdIa2NmRUh4Sjc5TFRxd0tubGt6b0VsREY4?=
+ =?utf-8?B?V1hoblFMcjBFQnUwS1V5RlBENFRGdDRiT1RhTURoazRGckoxNTdnTXV2UENi?=
+ =?utf-8?B?dDhkd0dJV1Y3Mi8zN2NLZlJkV205Z01OaFQ3bDYvL0ZBQnVYZ2RLS0t0TW9F?=
+ =?utf-8?B?K2ZEbXV6cVAyT0k5OUFaNWJuc0pib3VvcUpaTlZYWnBoM0VzQzdLOUdoZVhF?=
+ =?utf-8?B?OFB1c1p1WTNrRkdLTmdmc3ZuN1VweDRKTVU0b3dmR0JnRnc0eWhpdGF2eE5Y?=
+ =?utf-8?B?cUdwMlJrcVE5UnBCZ2llM1dFR0huRDVnSlU3cWEwV1pXODhid2tYNU16MEcv?=
+ =?utf-8?B?NDBnM2hBald5UXlLWUtvSXdKYXJteFA4MXErRVhFYVJ4QzdsbU8wZWRuVmFk?=
+ =?utf-8?B?NkcwTU1lSE10ODZqUmk5SlI1V0ptUlBXOGk0bFB0elFwWmNnSnErUjRSY1Vr?=
+ =?utf-8?B?VnVQb1BjV3NHemdWRElHQUJDWjdpa3RtVkkzYjlyUkJhY01uejBSa3VhSmtE?=
+ =?utf-8?B?REpNb1BRU21TM1NhbzBJTzlzcnZsQ1lVcjB6bGJ6eVgrZHROQnRUZVNYVEVV?=
+ =?utf-8?B?Y2FxMzJ3MzJVU1A5eWYyNlZIMExidUp0RStuKzgvclF3TEpGMTJZclRkNW42?=
+ =?utf-8?B?Ky9IT0tHZzhRTlBieWRFaXBPc0psTVdyYmppcTMxZlZ1azV2azd3QkZIQzdX?=
+ =?utf-8?B?ZDluVC9wcVpiaWNvWWdkSll4ai9oOVZhOTN4ZlIydFovMkxhbTVKVWRvNDlF?=
+ =?utf-8?B?OFRYWjNsSVBlWGFVU0lXMHBFL2F1bE81WVpONWFnK21HSSsrLzlWSHMxNG9j?=
+ =?utf-8?B?cU9vUnRzYWx0S1Z5WjlqTzQ0bzJOZXl5cFlORVpVaS9NS1FQSmxqSXpORDJo?=
+ =?utf-8?B?VCtyVTN0S3NPRUJrZm5tWlJJWk11WlpTQ1dOV01Xb0lNT1EvQU1MSmd1Skdn?=
+ =?utf-8?B?eDNhNWtPSjRuTU1WUDJwVDJKdUp5WldCQmltZ1FIdnpJZEFwS0g5aEZkOHlr?=
+ =?utf-8?B?QTBjUFNoc0pTay9OOUIwdzREUkpwL3JVRnM1QTJ1RWJhVDlURnI2Ky9ER3NL?=
+ =?utf-8?B?Y21rS0hja1dpYVhWTzAvTlhQdmR3akMvN1hKLzBRL2YwZjJLR0c1Q1U1clNt?=
+ =?utf-8?B?OHNHeGNjQ1ovNjJLVmxDeGFkdG1tRkNiUjd1TkZrb0RHeVZDVnFvTGtxSlpl?=
+ =?utf-8?B?a0ZEdHI1U0ZnR1E0a3ZqdmpZL3dNTkk5azY0eUtucmEwYUJ6V1I5S2NTaDh5?=
+ =?utf-8?B?UFE0bC9ZZ1pCMHlkTEE1UGdlV0xKd2dFeUc5a1l2bzlUTVBCTFE1VHRsdnNt?=
+ =?utf-8?B?RVRMUk1kL0tNdSs5YlA1SFVXUFoyeFFHWGxjWXRWbFdaZVpBNFpLRTZEdkhB?=
+ =?utf-8?B?YWU2YitEc2x1VmVzeGlWZ1NkMTN5MnhhbURxUHI2a3BVcHdQd1hUT1A1T2ht?=
+ =?utf-8?B?Q3gzWEQ2YXgwNTAwS0ZXbUg2TnZZZmtVWC9sTTZ1NEV1aWdtdTNPOWM5clBP?=
+ =?utf-8?B?QjJJem9jWGpQcW0rWTk5NjBtN3JMcjlVN3h3MklvdXpPN1IxZFFSaS9hVVUv?=
+ =?utf-8?B?YVk4Ym9yUWhXdm8rZ2IvSERtdzBDeDZoTmZ6aG8zQkg4bCtkOU1oSjExaFl0?=
+ =?utf-8?B?SGlFaWRyZ05YalljVmpHV2w0RkNjS1J6QURiZWRwUGwxRHVqUUt3a1cybFhk?=
+ =?utf-8?B?ZTkxV041bC8xWmJ3QWNtZG00NTZ6R0NLck9EdkhvZ3k4QllEMzZzeGJ3Y0ZZ?=
+ =?utf-8?B?V2dWQ3FqOXRUNk0zMWRjZUVnR1BoMmRCNDExczVQSGtIemJVRmVEMnAyVVY5?=
+ =?utf-8?B?b2pFVXJJa01uK2cwOUJZK2wxem0vYko0ckx0RGZ0aTZVRVE9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB6395.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?L3RPMWQ4MFNJOFd4d0xJdE1mbUNpb1lwWTAwT0RONmpRQXh6NUd5blBZK2kw?=
+ =?utf-8?B?YjRSelBPT3ZGZjQ2emhZOThaRkRTa0ZvMFN0Z2xaNE14dkUrZnNHMjNYSi95?=
+ =?utf-8?B?aXFoMTlWVWgrOGNqc1UwZkpTajM3aElrNnQ4NnUvcStlRTBmeVBXdytjbzgv?=
+ =?utf-8?B?Nkk0WkNnZ00razlJTzUyUVNTSWZDdXVxcU0wNGNZWW54aDliYi9EQW1HSnIw?=
+ =?utf-8?B?d0NGL3hWRVhDTlRLamkyUkJhMGRKVk8rVW9EVU83a0NVWTJqMGF5VjhBVUtK?=
+ =?utf-8?B?NzVwakRBR0pMcFBDSDdKSVdONjR5aCt1WUhleG5kOEJGdmpvYlJYMG5PeE9Z?=
+ =?utf-8?B?eWFGenVEdkxjakk2dE9BVjFrZ2IyTXdYWm0vaDF0MWNWWGJ6NnBXaHpWLys1?=
+ =?utf-8?B?RXlYZWdmSWY4eTQ1TmVmQTlaRFVieTA2Z2pOSWQ2SFZtU2x3ZlJkN1BaZG8v?=
+ =?utf-8?B?MDR2Q3hSSkIxbXVzc3NOd3FEVzNvNE1UcVJRajhaMG5hTW44ekJkeVVpN2hT?=
+ =?utf-8?B?TFlHRHJYVEhFRmY3SWVPNW12WXlONjRFTXIzQnVqNzFkdzE4MjBSL21LNS9u?=
+ =?utf-8?B?cWZWNy9MRityUjRkVC9JUXlmeDZIbS95Q0VEbW5kOEp5aWtuNitVRWVORnIw?=
+ =?utf-8?B?VENDYzhpbmEvcStjNjRjZHhqR0ZzT2JGYURVdEdXRXRoMXd5NG5Jc2ZPcE5N?=
+ =?utf-8?B?REdONm5NU3BGMDB0QTE4UEVRN0dFQysyRXYyZkRsblJBZkpscDZGWUI5OHlj?=
+ =?utf-8?B?MW83RlAvTmFDblFTeTc2L0g5V29WaWMwemNLS1lJL0x2YjNUbEw2OSsrc09t?=
+ =?utf-8?B?Y0MyZmFSaUk5Syt1MTBNeEtiaGhPTCtSSDdKWkRyOFZ0M3pxK3hhMWZwUThh?=
+ =?utf-8?B?T0pjWkwrZVZRdVczcVFJOUFRSDlOWnZDRnJ4S3NhcHptTWswMXJDYXpRMU5l?=
+ =?utf-8?B?NERPZVhqaU51TlV6eDRVSTQ3MU5uRE51ZGdPM2xoaFF4amFKZ25uNE0rbEtW?=
+ =?utf-8?B?ak00ZHViSEc2cGQ3N0NuUHR2VTZHL3lPblZkSytiVWpiNkFGcHM4TUdTcXl5?=
+ =?utf-8?B?cCs5UWhQSklVSWJqazVXTWVpZkJBRVFDLytnR3JRTFU1MHlaazg3VCtiMjNY?=
+ =?utf-8?B?eCs3dlh3bW5jTGdLdWRxeUtvZFpmdkNRMXMyTWhtblZnZk1ISTU5c2lKQk41?=
+ =?utf-8?B?dlZHaTdNbForb29KdUwwMDF3b0phOUdicXVTUE11aVlsbldQamJCZ1F5Y3lF?=
+ =?utf-8?B?ZGw4NkR4Y0NhOU9rbWNkRlJUeUlRVmRobWRBbkR1OVA0RlZQWHpwK1ZPZ2pO?=
+ =?utf-8?B?QlBzVnpYTGdYNzJCK2NidGkrZmdUZ1pxSzlGZmRQSnNsYWRWNVZ2eUw3RVhu?=
+ =?utf-8?B?S2N3bDJpOU56b0hQaTh6aEc4R1B1V2UzRlgrcld5ZXJtbDhzclk4d1dqSEYw?=
+ =?utf-8?B?T21YdFVEZXB1OVNYdUluVWU1UmFhOThZUU1ENUFzMW1vbkl4RUYyU1R1NEti?=
+ =?utf-8?B?K0YwYUI4RWRQK2NXVTA5UDBZUnE2Tk5rWldrcjV4djQ3NG8vYzN3VHVOSklq?=
+ =?utf-8?B?c0dPYTFicTdaNk1qUEM4TFNaUnhVTW1UM0JOKzR1bkRQQkZ5TE9oK2ZPblVQ?=
+ =?utf-8?B?R3VvMDVIZXVTWm5HQ3lCcmxMZE83UHFrWlQwNE1jOTlieVRBOFpqVENHQi8w?=
+ =?utf-8?B?UjlMNjIrc0FnMDBPeWJCck14Z2ZYUjRKVkhrTDBGSEJ2eXh0NlVuM2U2d3E0?=
+ =?utf-8?B?WEcwUUJyOVlzZmtLZHZCYzgzU2NjeU1QWmVWLzY5R3g4Z0JDK0wzdmN6dDdM?=
+ =?utf-8?B?TDFQamJMUjlLL3h5RDNzREJ2eVNCMUo1NG4xazJPekxyRFlGQURlWEpZamFI?=
+ =?utf-8?B?cW1tN3NFSzIzb2taZTQyeVgwNmhMWHZoRmhsT1oraE42ZGxoZ2RyL1Vla1VP?=
+ =?utf-8?B?cmoyaU5RcDRxN285bVhXVlNYSWUzWit1M24rd2c2R2d2M0d4VU5ORHFSMGla?=
+ =?utf-8?B?OUpYZDltUG5yOUVwZER0eGk4VnZ6b1V3LytmVllKNjlDa1ZvcXp1Q3pzY2FV?=
+ =?utf-8?B?bWlsZWpzRHlyOFRVaUcyOWRwRVQ3N3ZHRHg3MmRyNzlpSWpFTGw1REhQSTVs?=
+ =?utf-8?Q?MslV9WzpP3mKyZpPd7F875ZCT?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddd062fe-481d-4b94-f487-08de10c0999d
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB6395.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2025 16:40:53.5362
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ek69J8Voa8d7/Ay7bIAWTqw3flKQEnjsqcRfNvy0Or7YgunZROx+nPc2fIrM9MMID9SIa9oMWs/0Yt5ot1JR5w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5761
 
-Hello,
 
-On 10/20/2025 3:25 PM, 'Balázs Triszka' via BCM-KERNEL-FEEDBACK-LIST,PDL 
-wrote:
-> This patch add support for mako, orca, blackfin, shortfin and
-> longfin phys to bcm84881 driver.
+
+On 10/21/2025 3:02 PM, Maxime Chevallier wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
-> Signed-off-by: Balázs Triszka <info@balika011.hu>
-> Cc:florian.fainelli@broadcom.com
-> Cc:andrew@lunn.ch
-
-You need to run ./scripts/get_maintainer.pl to get the proper 
-recipients, right now this patch has not been sent to all of them, 
-specifically the driver author, Russell, is critically missing from the 
-recipients list.
-
-> ---
->   drivers/net/phy/bcm84881.c | 1127 +++++++++++++++++++++++++++++++++++-
->   1 file changed, 1110 insertions(+), 17 deletions(-)
 > 
-> diff --git a/drivers/net/phy/bcm84881.c b/drivers/net/phy/bcm84881.c
-> index d7f7cc44c532..d8dc32aa4ada 100644
-> --- a/drivers/net/phy/bcm84881.c
-> +++ b/drivers/net/phy/bcm84881.c
-> @@ -16,6 +16,106 @@
->   #include <linux/module.h>
->   #include <linux/phy.h>
->   
-> +#define PHYID_BCM4912			0x359050cd
-> +#define PHYID_BCM4912M			0x359051cd
-> +#define PHYID_BCM50991EL_A0		0x359050c8
-> +#define PHYID_BCM50991EL_B0		0x359050c9
-> +#define PHYID_BCM50991ELM_B0	0x3590518d
-> +#define PHYID_BCM50994E_A0		0x359050f8
-> +#define PHYID_BCM50994E_B0		0x359050f9
-> +#define PHYID_BCM54991E_A0		0x35905098
-> +#define PHYID_BCM54991E_B0		0x35905099
-> +#define PHYID_BCM54991EL_A0		0x35905088
-> +#define PHYID_BCM54991EL_B0		0x35905089
-> +#define PHYID_BCM54991ELM_A0	0x35905188
-> +#define PHYID_BCM54991ELM_B0	0x35905189
-> +#define PHYID_BCM54991EM_A0		0x35905198
-> +#define PHYID_BCM54991EM_B0		0x35905199
-> +#define PHYID_BCM54992E_A0		0x359050a8
-> +#define PHYID_BCM54992E_B0		0x359050a9
-> +#define PHYID_BCM54992EM_A0		0x359051a8
-> +#define PHYID_BCM54992EM_B0		0x359051a9
-> +#define PHYID_BCM54994E_A0		0x359050b8
-> +#define PHYID_BCM54994E_B0		0x359050b9
-> +#define PHYID_BCM54994EM_A0		0x359051b8
-> +#define PHYID_BCM54994EM_B0		0x359051b9
-> +
-> +#define PHYID_BCM49418			0x359050c1
-> +#define PHYID_BCM49418M			0x359051c1
-> +#define PHYID_BCM54991_A0		0x35905094
-> +#define PHYID_BCM54991_B0		0x35905095
-> +#define PHYID_BCM54991L_A0		0x35905084
-> +#define PHYID_BCM54991L_B0		0x35905085
-> +#define PHYID_BCM54991M_A0		0x35905194
-> +#define PHYID_BCM54991M_B0		0x35905195
-> +#define PHYID_BCM54992_A0		0x359050a4
-> +#define PHYID_BCM54992_B0		0x359050a5
-> +#define PHYID_BCM54992M_A0		0x359051a4
-> +#define PHYID_BCM54992M_B0		0x359051a5
-> +#define PHYID_BCM54994_A0		0x359050b4
-> +#define PHYID_BCM54994_B0		0x359050b5
-> +#define PHYID_BCM54994M_A0		0x359051b4
-> +#define PHYID_BCM54994M_B0		0x359051b5
-> +#define PHYID_BCM84860_A0		0xae025048
-> +#define PHYID_BCM84861_A0		0xae025040
-> +#define PHYID_BCM84880_A0		0xae025158
-> +#define PHYID_BCM84880_B0		0xae025159
-> +#define PHYID_BCM84884_A0		0xae025148
-> +#define PHYID_BCM84884_B0		0xae025149
-> +#define PHYID_BCM84884E_A0		0xae025168
-> +#define PHYID_BCM84884E_B0		0xae025169
-> +#define PHYID_BCM84885_A0		0xae025178
-> +#define PHYID_BCM84885_B0		0xae025179
-> +
-> +#define PHYID_BCM54991H_A0		0x359050d0
-> +#define PHYID_BCM54991H_A1		0x359051d0
-> +#define PHYID_BCM54991H_B0		0x359050d1
-> +#define PHYID_BCM54991H_B1		0x359051d1
-> +#define PHYID_BCM54991LM_A0		0x35905184
-> +#define PHYID_BCM54991LM_B0		0x35905185
-> +#define PHYID_BCM54991SK_B0		0x359051d5
-> +#define PHYID_BCM54994EL_B0		0x3590501d
-> +#define PHYID_BCM54994H_A0		0x359050f0
-> +#define PHYID_BCM54994H_A1		0x359051f0
-> +#define PHYID_BCM54994H_B0		0x359050f1
-> +#define PHYID_BCM54994H_B1		0x359051f1
-> +#define PHYID_BCM54994L_B0		0x35905019
-> +#define PHYID_BCM54994SK_B0		0x359051f5
-> +#define PHYID_BCM54998_B0		0x35905011
-> +#define PHYID_BCM54998E_B0		0x35905015
-> +#define PHYID_BCM54998ES_B0		0x3590500d
-> +#define PHYID_BCM54998S_B0		0x35905009
-> +#define PHYID_BCM84881_A0		0xae025150
-> +#define PHYID_BCM84881_B0		0xae025151
-> +#define PHYID_BCM84886_A0		0xae025170
-> +#define PHYID_BCM84886_B0		0xae025171
-> +#define PHYID_BCM84887_A0		0xae025144
-> +#define PHYID_BCM84887_B0		0xae025145
-> +#define PHYID_BCM84888_A0		0xae025140
-> +#define PHYID_BCM84888_B0		0xae025141
-> +#define PHYID_BCM84888E_A0		0xae025160
-> +#define PHYID_BCM84888E_B0		0xae025161
-> +#define PHYID_BCM84888S_A0		0xae025174
-> +#define PHYID_BCM84888S_B0		0xae025175
-> +#define PHYID_BCM84891_A0		0x35905090
-> +#define PHYID_BCM84891_B0		0x35905091
-> +#define PHYID_BCM84891L_A0		0x35905080
-> +#define PHYID_BCM84891L_B0		0x35905081
-> +#define PHYID_BCM84891LM_A0		0x35905180
-> +#define PHYID_BCM84891LM_B0		0x35905181
-> +#define PHYID_BCM84891M_A0		0x35905190
-> +#define PHYID_BCM84891M_B0		0x35905191
-> +#define PHYID_BCM84892_A0		0x359050a0
-> +#define PHYID_BCM84892_B0		0x359050a1
-> +#define PHYID_BCM84892M_A0		0x359051a0
-> +#define PHYID_BCM84892M_B0		0x359051a1
-> +#define PHYID_BCM84894_A0		0x359050b0
-> +#define PHYID_BCM84894_B0		0x359050b1
-> +#define PHYID_BCM84894M_A0		0x359051b0
-> +#define PHYID_BCM84894M_B0		0x359051b1
-> +#define PHYID_BCM84896_B0		0x35905005
-> +#define PHYID_BCM84898_B0		0x35905001
+> On 20/10/2025 21:07, Andrew Lunn wrote:
+>> On Mon, Oct 20, 2025 at 06:19:55PM +0200, Maxime Chevallier wrote:
+>>> Hi Raju,
+>>>
+>>> On 20/10/2025 17:22, Raju Rangoju wrote:
+>>>> Adds support for ethtool PHY loopback selftest. It uses
+>>>> genphy_loopback function, which use BMCR loopback bit to
+>>>> enable or disable loopback.
+>>>>
+>>>> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+>>>
+>>> This all looks a lot like the stmmac selftests, hopefully one day
+>>> we can extract that logic into a more generic selftest framework
+>>> for all drivers to use.
+>>
+>> https://elixir.bootlin.com/linux/v6.17.3/source/net/core/selftests.c#L441
+>>
+>> Sorry, not looked at the patch to see if this is relevant for this
+>> driver. But we do have a generic selftest framework...
+>>
+>>        Andrew
+> 
+> Ah ! And this also looks like this driver code. It seems to me that the
+> main diffence that the amd-xgbe selftest brings is the ability to
+> fallback to MAC-side loopback should PHY loopback fails, so they don't
+> 1:1 map to these, but we could consider extending the existing selftests.
+> 
+> Besides that it seems that the generic selftest are more efficient wrt
+> how they deal with PHY loopback, as they don't re-configure it for each
+> selftest.
+> 
+> I don't necessarly think this series should be reworked but this is
+> starting to be a lot of code duplication.
+> 
+> Raju, maybe you can re-use at least the generic packet generation
+> functions (i.e net_tst_get_skb() 
 
-PHY identifiers are all maintained in include/linux/brcmphy.h, also 
-there is no need to be maintaining per-revision PHY identifiers, just 
-the main chip identifiers are enough.
+Sure Maxime. The net_test_get_skb() is currently not exported, let me 
+see if these can be re-used.
 
-> +
->   enum {
->   	MDIO_AN_C22 = 0xffe0,
->   };
-> @@ -29,22 +129,57 @@ static int bcm84881_wait_init(struct phy_device *phydev)
->   					 100000, 2000000, false);
->   }
->   
-> -static void bcm84881_fill_possible_interfaces(struct phy_device *phydev)
-> +static int bcm84881_config_init_2500(struct phy_device *phydev)
->   {
->   	unsigned long *possible = phydev->possible_interfaces;
->   
->   	__set_bit(PHY_INTERFACE_MODE_SGMII, possible);
->   	__set_bit(PHY_INTERFACE_MODE_2500BASEX, possible);
-> -	__set_bit(PHY_INTERFACE_MODE_10GBASER, possible);
-> +
-> +	switch (phydev->interface) {
-> +	case PHY_INTERFACE_MODE_SGMII:
-> +	case PHY_INTERFACE_MODE_2500BASEX:
-> +		break;
-> +	default:
-> +		return -ENODEV;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int bcm84881_config_init_5G(struct phy_device *phydev)
+Thanks,
+Raju
 
-Why not bcm84881_config_init_5000() for consistenty with 
-bcm84881_config_init_2500()?
-
-> +{
-> +	unsigned long *possible = phydev->possible_interfaces;
-> +
-> +	__set_bit(PHY_INTERFACE_MODE_SGMII, possible);
-> +	__set_bit(PHY_INTERFACE_MODE_2500BASEX, possible);
-> +	__set_bit(PHY_INTERFACE_MODE_5GBASER, possible);
-> +
-> +	switch (phydev->interface) {
-> +	case PHY_INTERFACE_MODE_SGMII:
-> +	case PHY_INTERFACE_MODE_2500BASEX:
-> +	case PHY_INTERFACE_MODE_5GBASER:
-> +		break;
-> +	default:
-> +		return -ENODEV;
-> +	}
-> +
-> +	return 0;
->   }
->   
-> -static int bcm84881_config_init(struct phy_device *phydev)
-> +static int bcm84881_config_init_10G(struct phy_device *phydev)
-
-Likewise.
-
->   {
-> -	bcm84881_fill_possible_interfaces(phydev);
-> +	unsigned long *possible = phydev->possible_interfaces;
-> +
-> +	__set_bit(PHY_INTERFACE_MODE_SGMII, possible);
-> +	__set_bit(PHY_INTERFACE_MODE_2500BASEX, possible);
-> +	__set_bit(PHY_INTERFACE_MODE_5GBASER, possible);
-> +	__set_bit(PHY_INTERFACE_MODE_10GBASER, possible);
->   
->   	switch (phydev->interface) {
->   	case PHY_INTERFACE_MODE_SGMII:
->   	case PHY_INTERFACE_MODE_2500BASEX:
-> +	case PHY_INTERFACE_MODE_5GBASER:
->   	case PHY_INTERFACE_MODE_10GBASER:
->   		break;
->   	default:
-> @@ -208,26 +343,25 @@ static int bcm84881_read_status(struct phy_device *phydev)
->   	 */
->   	val = phy_read_mmd(phydev, MDIO_MMD_VEND1, 0x4011);
->   	mode = (val & 0x1e) >> 1;
-> -	if (mode == 1 || mode == 2)
-> -		phydev->interface = PHY_INTERFACE_MODE_SGMII;
-> -	else if (mode == 3)
-> -		phydev->interface = PHY_INTERFACE_MODE_10GBASER;
-> -	else if (mode == 4)
-> -		phydev->interface = PHY_INTERFACE_MODE_2500BASEX;
->   	switch (mode & 7) {
->   	case 1:
-
-It would be a good idea to get some defines for these numbers.
-
-> +		phydev->interface = PHY_INTERFACE_MODE_SGMII;
->   		phydev->speed = SPEED_100;
->   		break;
->   	case 2:
-> +		phydev->interface = PHY_INTERFACE_MODE_SGMII;
->   		phydev->speed = SPEED_1000;
->   		break;
->   	case 3:
-> +		phydev->interface = PHY_INTERFACE_MODE_10GBASER;
->   		phydev->speed = SPEED_10000;
->   		break;
->   	case 4:
-> +		phydev->interface = PHY_INTERFACE_MODE_2500BASEX;
->   		phydev->speed = SPEED_2500;
->   		break;
->   	case 5:
-> +		phydev->interface = PHY_INTERFACE_MODE_5GBASER;
->   		phydev->speed = SPEED_5000;
->   		break;
->   	}
-> @@ -246,11 +380,970 @@ static unsigned int bcm84881_inband_caps(struct phy_device *phydev,
->   
->   static struct phy_driver bcm84881_drivers[] = {
->   	{
-> -		.phy_id		= 0xae025150,
-> -		.phy_id_mask	= 0xfffffff0,
-> -		.name		= "Broadcom BCM84881",
-> +		PHY_ID_MATCH_EXACT(PHYID_BCM4912),
-> +		.name		= "Broadcom BCM4912",
-> +		.inband_caps	= bcm84881_inband_caps,
-> +		.config_init	= bcm84881_config_init_2500,
-> +		.probe		= bcm84881_probe,
-> +		.get_features	= bcm84881_get_features,
-> +		.config_aneg	= bcm84881_config_aneg,
-> +		.aneg_done	= bcm84881_aneg_done,
-> +		.read_status	= bcm84881_read_status,
-
-Please create a macro that simplifies the creation of such entries:
-
-#define BCM84881_PHY_ENTRY(id, speed)			\
-{							\
-	PHY_ID_MATCH_EXACT(PHYID_##id),			\
-	.name	= "Broadcom BCM" # __stringify(id),	\
-	.inband_caps	= bcm84881_inband_caps,		\
-	.config_init	= bcm84881_config_init_## speed, \
-	.probe		= bcm84881_probe,		\
-	.get_Features	= bcm84881_get_features,	\
-	.aneg_done	= bcm84881_aneg_done,		\
-	.read_status	= bcm84881_read_status,		\
-}
-
-And then it just becomes:
-
-	BCM84881_PHY_ENTRY(4912, 2500),
-	BCM84881_PHY_ENTRY(4912M, 2500),
-
-etc.
--- 
-Florian
+> 
+> Maxime
 
 
