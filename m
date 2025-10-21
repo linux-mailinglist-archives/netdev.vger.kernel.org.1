@@ -1,157 +1,219 @@
-Return-Path: <netdev+bounces-231339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 063AABF7A5B
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 18:26:31 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D1B1BF7ADC
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 18:33:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 597F4354847
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 16:26:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0BE844EF255
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 16:33:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D0B3491E0;
-	Tue, 21 Oct 2025 16:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F89934DCCF;
+	Tue, 21 Oct 2025 16:33:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b="fAvmGZ4T"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Bk35bp5z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C483A3491D4
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 16:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0A234DB6B;
+	Tue, 21 Oct 2025 16:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761063985; cv=none; b=B9WCFKgYj1Spk6jrNXNZMeP3PXVz2TWmfJea38JrsrdS9+qklaYU2YfC5So5/ik6RmKNpRzWSyyUiqVj8f4tewpycr+73mv8X2KrJ4SmPRMoJhEmIrBfBh97/iPexPM3YXSbljckDJwPuwYLBICED+JopO/A08TnaiBVAtOMlmo=
+	t=1761064393; cv=none; b=Dw2wpjkq9+yO1wDPDsQSPzjNisJM5yhdzN2a/+ZEkWVOR7OOAb3gc5ebL1yzKsc0pOmUZ8SdxYQ8MsO41duVGqCw0eqJ0vQQqrsa5H3uhQLteuOiSje880ETpV3W1T2ACiskwrNrh3mUFamsSiJV1xcjGvulqViweJE7MSHZ7RY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761063985; c=relaxed/simple;
-	bh=CuQeZe4Y5bn9FzHbLB46TKbarzG3ntEyBt3DxwbZKqw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cp4ULrlLsLxqd71r10uvZB73oha4swYLAfrQxiMTXta6Xr1aK4pOJ3s7dTT+lcIHXLdKDNusm9hNJfevaMFuKu7R8Sn9BwWkJT5Vtbs6DAcf4lEPZqxbofg95ww1BfnPPpZPePEjqDg1BhNRfOFZHnugjNbytNpSGAHvwPGsBfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu; spf=fail smtp.mailfrom=g.harvard.edu; dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b=fAvmGZ4T; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=g.harvard.edu
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4e88cd19bc5so1308651cf.3
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:26:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rowland.harvard.edu; s=google; t=1761063982; x=1761668782; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=TBIEUW1Ijn6qLPXihQhrTNnQ7Cp+uMufdF3SJ+N/9tw=;
-        b=fAvmGZ4TClMRZ9T7NyftoGiXfKXDAS6PVmP/+mpLloPvrVPQL1+w7tEjSTtFcldxmJ
-         /aL/QZ9juGa/WmJ8FJ5ivvzQL2IFhorCjWpe2uoSFuOjoEtEc9vIBAU/9zJEyQHg5fVv
-         GIpS+xbHWX0CX1SdQ/uD19hG03viQAihcGcuTX4Ho/0vA88Kdo0jvqfxU00KlG1DwgBK
-         9ABVl98Ckt1LwktLfceJT0zeVWijZbu19rwdamhAPqTkVwB21han01Ih0U6nviqn8vOH
-         iqEF0rgEwOHHk31ww9wFtyy1DdawU75VTQi5+BxQYpjoH6/3rqmdos8LArlzeYIm4uib
-         W65A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761063982; x=1761668782;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TBIEUW1Ijn6qLPXihQhrTNnQ7Cp+uMufdF3SJ+N/9tw=;
-        b=mh823Q/fObJkKobmpNpBpLMluYa0cboujHF1yLYwHcof4bA0D2iY7ephvJVj0gWeLN
-         B2Oabk1nkihHmDJyPPoFLtr7yBnB3tdJqkxi42atQGXd96jnspAJ/P6ChEwLB7iLHMUE
-         kCcLtijesAAkTF4r+JodJ0vPbWb3R6kpYYvLpGAdjFxAb8iPv/9JJEx8ANRpJk//k9I6
-         bvo+QiwN5vELsOGVbQnAS90UgQLNzmPm437a5SkiUY7DIq/5v/LtCpKUD/2F24vKcMcM
-         oJT0Xz3sTxBdf1ohzwTLRiXMiwvK5r4jxCDKFji10onvOMOEN2Dd9spjv4J4XsxunSaV
-         92oA==
-X-Forwarded-Encrypted: i=1; AJvYcCXIrpluQIzqICjMLmHMlTqXAdYE08GEp8qhH8HtAy6QCcFmSVHF0mIkc9Ud9NTwEmdty+iaaaw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6UYXDyZIv01N5M/UUt6Rfif8nk+1cVD0qnyIQUXkPSIkWtb2X
-	1Dd+dVLb8aMpjkDw/QK8Ws2+N8g7nJxCcuf/ZQ4w7yktuMbyeobJ4KPfAibTVHVsng==
-X-Gm-Gg: ASbGncv+oZBjnKQceAXNjzRrunVGqYOZLaTAxbemR4QkVT9rPrexqX3PRd2Q7egwgcx
-	XHnPiwbG59kYhe1SUY5X4K0GvOemhRukn6iZZqJUjgn8yV1D0f86je6KX+IO3jh5dxJA/ju6YwL
-	kLSY2vu5Pz2YLoGyRRl6WqqPBEMZn/p7npdcVRsFZeoebd9lRyTIZ2vDpDdngZzsDIVEdQsnD6t
-	lw3+FarscdU5NhKwLTdfvnhKs7+SHXrrJhTgrfPmMdisl8/mRHV5SLlY7nNWQ0VzQl+ww0+rw6Q
-	QPskcJBuembEQ4GMSP0koT5c0/f7zzJ38izc6QdeKumll3crMwszYl/THnQlDX2mJAjmjGucul1
-	bq11Fp1kBVRzYcVIf380ObFCseQdwePvvaxRp/ieMnAVrplvclqyCrLlCm7XRqsWrzoZuUJRBXF
-	Q+4A==
-X-Google-Smtp-Source: AGHT+IHA/MSFpgq5NDyGr8WrflLyOACBFE86QRu/uhfrAdUbUBGXWHWfTlUHBZGHXFWlLPjyOYFF1w==
-X-Received: by 2002:ac8:7d94:0:b0:4e8:b979:c7c8 with SMTP id d75a77b69052e-4e8b979cc1bmr117233881cf.28.1761063982457;
-        Tue, 21 Oct 2025 09:26:22 -0700 (PDT)
-Received: from rowland.harvard.edu ([2601:19b:d03:1700::ba76])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-87cf5235863sm70942586d6.29.2025.10.21.09.26.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 09:26:22 -0700 (PDT)
-Date: Tue, 21 Oct 2025 12:26:19 -0400
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Yi Cong <yicongsrfy@163.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, linux-usb@vger.kernel.org, michal.pecio@gmail.com,
-	netdev@vger.kernel.org, oliver@neukum.org, pabeni@redhat.com
-Subject: Re: [PATCH net v5 2/3] net: usb: ax88179_178a: add USB device driver
- for config selection
-Message-ID: <3fe0a4f7-ba9a-4eb2-9df9-0273584ebbc3@rowland.harvard.edu>
-References: <7353775a-bc2c-4c2d-93bc-b8d3e03c3496@rowland.harvard.edu>
- <20251021062629.2919772-1-yicongsrfy@163.com>
+	s=arc-20240116; t=1761064393; c=relaxed/simple;
+	bh=eVMrRTLFu012jIHRJzrysd/z4FK2cRudttyNR7qqrX4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=m3Vewq8EU+eHv0TYBRZIIcDPGADqQjyZhqV1GDlDwNU1m0V9vRFh8jfoB6p6GBOesSCsXsbr3tDLzPm3+xqe28UQlLCkOlVJW5oo3hBGwhlYBzWtK194/rWk4InQzMJuCnnTKu2d7mvUsz2sfZtYhxOzcgPX/HmRizGTdOCZ65c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Bk35bp5z; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id D93B4C0B896;
+	Tue, 21 Oct 2025 16:32:47 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 6166960680;
+	Tue, 21 Oct 2025 16:33:07 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id AFCAD102F23EA;
+	Tue, 21 Oct 2025 18:32:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761064385; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=aN99o7OkOHWybNH2qjnfg/oT5mK0uPFrJ+4ao/bPan4=;
+	b=Bk35bp5z/HmjI09zpUheBUxeeY8DX1bjpIabg+gBb9ThCzjKu/do7w/IuA/3agfidF977f
+	772od6VR7YP+nodGEw/O1D6LbR0UfrclDv3CrR4comS8ZxjpzWSBiC1igP9ZVAMqn2fpcV
+	VNZ8EzJ0V9UWwfX510ooHsFA/LlB91j+tJWp09neCUyVkgA0TPlbIqy2UER/pyvWT6ndj9
+	70Tzba+s5Ici7nHW8qKJlVi2ePG3pJ5g61oTMBD7RegY/x6NKZIUCrFdEfdpj7Ja3pT5pi
+	9b9ad3M/t6FKkbg/D+r33rsN2OK7c/qXVZrJu9bqtcm6+WoHnjYsj4ODb8WVzw==
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: [PATCH net-next 00/12] net: macb: EyeQ5 support (alongside generic
+ PHY driver in syscon)
+Date: Tue, 21 Oct 2025 18:32:41 +0200
+Message-Id: <20251021-macb-eyeq5-v1-0-3b0b5a9d2f85@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251021062629.2919772-1-yicongsrfy@163.com>
+X-B4-Tracking: v=1; b=H4sIAKm192gC/x3MQQqAIBBG4avErBtQQYKuEi1K/2oWWWlEEd49a
+ fkt3nspIQoStdVLEZck2UKBrityyxBmsPhiMspYrYzidXAj48FheYJxymt411gqwR4xyf3POgo
+ 4OeA+qc/5A5GaO7pmAAAA
+X-Change-ID: 20251020-macb-eyeq5-fe2c0d1edc75
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
+ =?utf-8?q?Gr=C3=A9gory_Clement?= <gregory.clement@bootlin.com>, 
+ Russell King <linux@armlinux.org.uk>, Vinod Koul <vkoul@kernel.org>, 
+ Kishon Vijay Abraham I <kishon@kernel.org>, 
+ Michael Turquette <mturquette@baylibre.com>, 
+ Stephen Boyd <sboyd@kernel.org>, 
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+ Philipp Zabel <p.zabel@pengutronix.de>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org, 
+ linux-phy@lists.infradead.org, linux-clk@vger.kernel.org, 
+ Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ =?utf-8?q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Jerome Brunet <jbrunet@baylibre.com>
+X-Mailer: b4 0.14.3
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Tue, Oct 21, 2025 at 02:26:29PM +0800, Yi Cong wrote:
-> On Mon, 20 Oct 2025 22:59:36 -0400, Alan Stern <stern@rowland.harvard.edu> wrote:
-> >
-> > On Tue, Oct 21, 2025 at 10:29:25AM +0800, Yi Cong wrote:
-> > > On Mon, 20 Oct 2025 11:56:50 -0400, Alan Stern <stern@rowland.harvard.edu> wrote:
-> > > >
-> > > > Instead of all this preferred() stuff, why not have the ax88179 driver's
-> > > > probe routine check for a different configuration with a vendor-specific
-> > > > interface?  If that other config is present and the chip is the right
-> > > > type then you can call usb_driver_set_configuration() -- this is exactly
-> > > > what it's meant for.
-> > >
-> > > I tried calling usb_driver_set_configuration inside driver's probe()
-> > > to select the configuration, but my USB network card has three
-> > > configurations (bNumConfigurations=3), which causes usb_driver_set_configuration
-> > > to be called twice within probe():
-> > > ```
-> > > static int ax88179_probe()
-> > > {
-> > >         if (bConfigurationValue != I_WANT) {
-> > >                 usb_driver_set_configuration(udev, I_WANT)
-> > >                 return -ENODEV;
-> > >         }
-> > >         //else really probe
-> > > }
-> > > ```
-> >
-> > Why is it called twice?  The first time probe() runs, it calls
-> > usb_driver_set_configuration() with the config that you want.  Then the
-> > second time probe() runs, the config you want has been installed, so
-> > there's no reason to call usb_driver_set_configuration() again.
-> >
-> > Unless something is going wrong, that's how it should work.  And the
-> > total number of configurations should not matter.
-> 
-> It might not be caused by the number of configurations, but rather by
-> the fact that usb_driver_set_configuration handles configuration changes
-> through a work queue.
+This series' goal is adding support to the MACB driver for EyeQ5 GEM.
+The specifics for this compatible are:
 
-I don't see why using a work queue should make any difference.  If you 
-really want to find out what's going on, you could add a dump_stack() 
-call to the probe routine.  And maybe a printk at the point where it 
-calls usb_driver_set_configuration().
+ - HW cannot add dummy bytes at the start of IP packets for alignment
+   purposes. The behavior can be detected using DCFG6 so it isn't
+   attached to compatible data.
 
-Alan Stern
+ - The hardware LSO/TSO is known to be buggy: add a compatible
+   capability flag to force disable it.
 
-> I suspect this is the reason (although I haven't verified it further
-> —I just observed this behavior and switched to a different implementation
-> by using choose_configuration):
-> ```
-> int usb_driver_set_configuration(struct usb_device *udev, int config)
-> {
-> ...
-> 	INIT_WORK(&req->work, driver_set_config_work);
-> 	schedule_work(&req->work);
-> 	return 0;
-> }
-> ```
+ - At init, we have to wiggle two syscon registers that configure the
+   PHY integration.
+
+   In past attempts [0] we did it in macb_config->init() using a syscon
+   regmap. That was far from ideal so now a generic PHY driver
+   abstracts that away. We reuse the bp->sgmii_phy field used by some
+   compatibles.
+
+   We have to add a phy_set_mode() call as the PHY power on sequence
+   depends on whether we do RGMII or SGMII.
+
+I want drivers/phy/phy-eyeq5-eth.c to appear in this series for
+review-ability, but that leads to this series having many patches
+unrelated to net & MACB:
+
+ - [02/12] dt-bindings: soc: mobileye: OLB is an Ethernet PHY provider on EyeQ5
+   [07/12] phy: Add driver for EyeQ5 Ethernet PHY wrapper
+   [09/12] clk: eyeq: add EyeQ5 children auxiliary device for generic PHYs
+
+   Add the generic PHY driver that lives in the OLB register region.
+   In Linux, we model that with auxiliary devices (spawned by clk-eyeq).
+
+   [08/12] clk: eyeq: use the auxiliary device creation helper
+   [10/12] reset: eyeq: drop device_set_of_node_from_dev() done by parent
+
+   Auxiliary devices don't inherit a dev->of_node by default. Previously
+   we addressed that with a call to device_set_of_node_from_dev() from
+   each clk-eyeq children device probe. Jerome Brunet improved the
+   situation with creation helpers that do the call in the parent. We
+   take that patch to ensure we get a dev->of_node assigned to our PHY
+   device. [1]
+
+Merging all this won't be easy, sorry. Is this split across trees OK?
+The net-next part is pretty evident, it is the rest that appears
+complex to merge to me. I can resend the series exploded if useful
+(or at least split net-next versus the rest).
+
+=> net-next
+[PATCH net-next 01/12] dt-bindings: net: cdns,macb: add Mobileye EyeQ5 ethernet interface
+[PATCH net-next 03/12] net: macb: match skb_reserve(skb, NET_IP_ALIGN) with HW alignment
+[PATCH net-next 04/12] net: macb: add no LSO capability (MACB_CAPS_NO_LSO)
+[PATCH net-next 05/12] net: macb: rename bp->sgmii_phy field to bp->phy
+[PATCH net-next 06/12] net: macb: Add "mobileye,eyeq5-gem" compatible
+=> linux-phy
+[PATCH net-next 02/12] dt-bindings: soc: mobileye: OLB is an Ethernet PHY provider on EyeQ5
+[PATCH net-next 07/12] phy: Add driver for EyeQ5 Ethernet PHY wrapper
+=> linux-clk
+[PATCH net-next 08/12] clk: eyeq: use the auxiliary device creation helper
+[PATCH net-next 09/12] clk: eyeq: add EyeQ5 children auxiliary device for generic PHYs
+=> linux-reset
+[PATCH net-next 10/12] reset: eyeq: drop device_set_of_node_from_dev() done by parent
+=> linux-mips
+[PATCH net-next 11/12] MIPS: mobileye: eyeq5: add two Cadence GEM Ethernet controllers
+[PATCH net-next 12/12] MIPS: mobileye: eyeq5-epm: add two Cadence GEM Ethernet PHYs
+
+About potential conflicts, Benoît Monin has a series [5] touching
+dt-bindings, clk-eyeq, reset-eyeq and the Mobileye MAINTAINERS section.
+Maybe [02/12] dt-bindings of OLB shouldn't go to the linux-phy tree (?).
+
+Thanks,
+Have a nice day,
+Théo
+
+[0]: https://lore.kernel.org/lkml/20250627-macb-v2-15-ff8207d0bb77@bootlin.com/
+[1]: https://lore.kernel.org/lkml/20250611-clk-aux-v1-0-fb6575ed86a7@baylibre.com/
+[2]: https://lore.kernel.org/lkml/20250903-clk-eyeq7-v1-19-3f5024b5d6e2@bootlin.com/
+
+Past versions of the MACB EyeQ5 patches:
+ - March 2025: [PATCH net-next 00/13] Support the Cadence MACB/GEM
+   instances on Mobileye EyeQ5 SoCs
+   https://lore.kernel.org/lkml/20250321-macb-v1-0-537b7e37971d@bootlin.com/
+ - June 2025: [PATCH net-next v2 00/18] Support the Cadence MACB/GEM
+   instances on Mobileye EyeQ5 SoCs
+   https://lore.kernel.org/lkml/20250627-macb-v2-0-ff8207d0bb77@bootlin.com/
+ - August 2025: [PATCH net v3 00/16] net: macb: various fixes & cleanup
+   https://lore.kernel.org/lkml/20250808-macb-fixes-v3-0-08f1fcb5179f@bootlin.com/
+
+Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+---
+Jerome Brunet (1):
+      clk: eyeq: use the auxiliary device creation helper
+
+Théo Lebrun (11):
+      dt-bindings: net: cdns,macb: add Mobileye EyeQ5 ethernet interface
+      dt-bindings: soc: mobileye: OLB is an Ethernet PHY provider on EyeQ5
+      net: macb: match skb_reserve(skb, NET_IP_ALIGN) with HW alignment
+      net: macb: add no LSO capability (MACB_CAPS_NO_LSO)
+      net: macb: rename bp->sgmii_phy field to bp->phy
+      net: macb: Add "mobileye,eyeq5-gem" compatible
+      phy: Add driver for EyeQ5 Ethernet PHY wrapper
+      clk: eyeq: add EyeQ5 children auxiliary device for generic PHYs
+      reset: eyeq: drop device_set_of_node_from_dev() done by parent
+      MIPS: mobileye: eyeq5: add two Cadence GEM Ethernet controllers
+      MIPS: mobileye: eyeq5-epm: add two Cadence GEM Ethernet PHYs
+
+ .../devicetree/bindings/net/cdns,macb.yaml         |  10 +
+ .../bindings/soc/mobileye/mobileye,eyeq5-olb.yaml  |   7 +-
+ MAINTAINERS                                        |   1 +
+ arch/mips/boot/dts/mobileye/eyeq5-epm5.dts         |  26 +++
+ arch/mips/boot/dts/mobileye/eyeq5.dtsi             |  47 ++++
+ drivers/clk/clk-eyeq.c                             |  60 ++---
+ drivers/net/ethernet/cadence/macb.h                |   6 +-
+ drivers/net/ethernet/cadence/macb_main.c           |  92 ++++++--
+ drivers/phy/Kconfig                                |  13 ++
+ drivers/phy/Makefile                               |   1 +
+ drivers/phy/phy-eyeq5-eth.c                        | 254 +++++++++++++++++++++
+ drivers/reset/reset-eyeq.c                         |  24 +-
+ 12 files changed, 454 insertions(+), 87 deletions(-)
+---
+base-commit: 3ff9bcecce83f12169ab3e42671bd76554ca521a
+change-id: 20251020-macb-eyeq5-fe2c0d1edc75
+
+Best regards,
+-- 
+Théo Lebrun <theo.lebrun@bootlin.com>
+
 
