@@ -1,196 +1,196 @@
-Return-Path: <netdev+bounces-231241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B483BF663A
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 14:17:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D71E8BF666D
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 14:20:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9BB719A346E
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:18:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50FD419A36B5
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A3E32B9BD;
-	Tue, 21 Oct 2025 12:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2162F260B;
+	Tue, 21 Oct 2025 12:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VC9dQvNI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fBRLNBfV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513842E7BDF
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 12:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592CD355026
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 12:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761049054; cv=none; b=ZpnYxXjHOqziVwDqLBBGn6oL0tdl/XRHKygJrm1s+TSXgwjCmg1YdfSy7MGIEdHVLo8sC9g+F/Dslh7U88+HeZkm3gytGvqBt4AjpPLu9e5EthlyonnHe3Wkqb+n0UKhyVp6d4KujDuK5D2Py9GN5y+emiaskmU4Ri19BVrLXvM=
+	t=1761049199; cv=none; b=kw+LgIqRNYEcIPB3BWyI/75upaYcJ3JRdl7m4PFU0LphFbag5i3Nybq+7eoZ3UHPTHoRGmryud1bOi48WzHY8Zn37iq90C9Q1y7qXVcWo5Xgui1sfPf0QpESa5OUIGbm96jaf8gBsVZoHvYC5pwwyODazffAknuYgQdijQBKFX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761049054; c=relaxed/simple;
-	bh=8jAVkUMH/+u3VOLZBfozegkzfmtTLIRMJxxRi5VQsQo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Zo9/JXHoq78PZUycXnGFPavknDKhSNPRcZpNi/8BTPcne7Fw2WjufnQKbaJhAr41C7zAB0JOkj5bm1WQUPKAmA9xEeJbenQOm3WqPl3Wf2ttzP2zYWY6mRsc3LkOUmjlf7DS4/F/tHpuELPySmI0Jg+5DdPASMkB9nXerLfmVWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VC9dQvNI; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1761049199; c=relaxed/simple;
+	bh=04jig4Ew32PJE27e851+YpkrUpXPpXriHzMbwYtti64=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=noBgRF3CeKwEBDY9oGehaFVtW3/UpBq3MowVceJXTdaCucF3kLu6myqMmIKBRsBNwDZ6zYBNr7Q4Yt5QVgZnYc/3Mu+Qz12WvTVVk3Xb400HN5lyS4wiaYv/m6236AGSsqRO8kq7zVrijk1b7epmDKn6hp9EJ8J9b3v1k2D0A8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fBRLNBfV; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761049049;
+	s=mimecast20190719; t=1761049196;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=bCWN2qWia5U/NhXPrwUuTQXMXPl3dg4yyzToKGFJy2Y=;
-	b=VC9dQvNITFoAq7Wu4DbaxoQJ1w90sAb5q4Tcdp4VwSky1CkI2dr11L2rZR8lb4QmAP/R6a
-	sxMqImck/mOpr5VT/OmS6Atgwexyb609q06c8fNUA+/KhJPurFpyDX1nZfDXEq5Eb8Hbct
-	fbLPZQJ0wyhp9iX7jzETMvObzoAmVp0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VytZNZiW26mdO2fPKatgW8HrREZWu6cP3h0tgc9fJDg=;
+	b=fBRLNBfVZZaXK2qyoYYh0/Cvl4JxKoei2cTlL2ghHfODrAEyr2VcB8pv4LP6+8rUUzbHKG
+	DU3oAqLfQTij2M7sWCNNUxRJ9zfMotLSdlvG3jWdBP6Bzcb6yBzDsT+0SgtkbFm72GO1Y/
+	5a01qVnWEh0MAJIpCMaUhytM2g1I/9U=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-324-G-bWuvNVOuutbWtAhYPi1Q-1; Tue, 21 Oct 2025 08:17:28 -0400
-X-MC-Unique: G-bWuvNVOuutbWtAhYPi1Q-1
-X-Mimecast-MFC-AGG-ID: G-bWuvNVOuutbWtAhYPi1Q_1761049047
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3f6b44ab789so2883480f8f.3
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 05:17:27 -0700 (PDT)
+ us-mta-421-exVhzDi9N4yNWnXbJtiGwg-1; Tue, 21 Oct 2025 08:19:54 -0400
+X-MC-Unique: exVhzDi9N4yNWnXbJtiGwg-1
+X-Mimecast-MFC-AGG-ID: exVhzDi9N4yNWnXbJtiGwg_1761049194
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-336b646768eso6253331a91.1
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 05:19:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761049046; x=1761653846;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1761049193; x=1761653993;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bCWN2qWia5U/NhXPrwUuTQXMXPl3dg4yyzToKGFJy2Y=;
-        b=ctVeHeFh4UiN0b7/d6ZwA/HO/2kL7nn09RuE8yZ+BE30QzYx2ytaERtSaj5Dn3RLKI
-         O0vr49x9antiCrl+4DeIF/nMr8ObHTgk/cdN9OVKqLKWST3SP8lEVGK+QD50brcgTn3g
-         1K41N0FPfhWEMcYz7+mEik8glb6dSiKWcRkqm9CQQ5I3PNHVYHiyzAwy0P/FwlmX1+6R
-         VY8Bk9U5pCLqkQBb16lLOjw/jHS8h49n44Y3alzdTh0ShfiL6oEZnsykrCAaqXS+oTmH
-         vEJzATFOgIW8njZRcY78gBM/ZiWyYd8j8pBvE6pRYb9sOBaijmiPXwB4rJsHlWhPwNvo
-         kS9w==
-X-Gm-Message-State: AOJu0YyYHSAe48vPYo8Ca0ZwZyyYTEJU/WHsf7NTzxMSeCiMM6uPVvZu
-	1QydMozyLRfK5xzUZMq2xccsBOurAYp2WD+vdQmm1QT6Q7TolJu5WESpxgLkeLwU15aVZlqMqev
-	peFJU7ObcYgMXTyqTLE9XpFtop/Ug43POrL5ti86qb2xUdodRoc0LwdCbuLTM8QJ3swPX3CAhGk
-	IGggDFIP0o/hakuZ70vD4ZH3MPV2FgAkrxqFpp0WhhyA==
-X-Gm-Gg: ASbGncvAAdx+C5Bh70a924hfJM3tPdKE9d2ZC5Vt4b5WwW+/gEbKx05uM1YRB3Ekybp
-	q/NVHObB+nvNlNl2SHmHh8iavzTwLiGL9M42MYZQoz3K6e5XHftXwmkYaTL3sYhqQvkmQwHCo2Z
-	cM1K0dRt2h8+pYqYjlQuImT3WgDWoh+ynvTk5TqqlTOnmmKscdb4/ESb3WCQtWVbPJHvwfOjasW
-	w0B21NkUmIKSnQ+Kn1ZdBWZJKGMnKNYiJ3sLDCWMc7Xaumomo0YBy837JP+hpEpTVdhk/uTNFeY
-	unTFHDAAJEBBdl1pf0SG2l5cO0LW5j0KKpT2qWFaeNKgguxck61it5A1sbiIV3O4iRScqoFdHma
-	1BYwqNMq5v1TpAdh2aKDRDLuM/wlEzz3ZkCy7mA6uSNx6OvL49rJc
-X-Received: by 2002:a05:6000:1867:b0:427:6a4:93da with SMTP id ffacd0b85a97d-42706a496dcmr8994724f8f.49.1761049045938;
-        Tue, 21 Oct 2025 05:17:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFIDzVJ2UzNuMp+C3slOnSBweFytGxnRjkV0uaR+1r+JrGCQpAt/7Y9bGWU8thLnHIYoiPCxA==
-X-Received: by 2002:a05:6000:1867:b0:427:6a4:93da with SMTP id ffacd0b85a97d-42706a496dcmr8994691f8f.49.1761049045378;
-        Tue, 21 Oct 2025 05:17:25 -0700 (PDT)
-Received: from stex1.redhat.com (host-79-46-200-153.retail.telecomitalia.it. [79.46.200.153])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47154d38309sm194606535e9.9.2025.10.21.05.17.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 05:17:24 -0700 (PDT)
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	virtualization@lists.linux.dev,
-	Michal Luczaj <mhal@rbox.co>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com,
-	stable@vger.kernel.org
-Subject: [PATCH net] vsock: fix lock inversion in vsock_assign_transport()
-Date: Tue, 21 Oct 2025 14:17:18 +0200
-Message-ID: <20251021121718.137668-1-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.51.0
+        bh=VytZNZiW26mdO2fPKatgW8HrREZWu6cP3h0tgc9fJDg=;
+        b=rojx7Qld8c48ENCnUBbRgEY7Vkmx6vW6vw96ccIOsJl2Q1RKq7v3TC4+1v4+8p6g3V
+         awQkPtuUT1OJRX4RwRht5yPZTRuCC8iMaaNzKy+UOfkLkJiH6iyfXd2Z9mvvs6CZWlo3
+         hkHYKyL4GtQs7SCYpdUxgfAGRZLvxbVfHsopyIASi7v4gVCsKJaOmkzw3Gt41eK03sFd
+         /emFGRunV4Mb3bkVVpG1rqVOQ5KeHo1jOEae0vsAt8Blu7Il8qh5XcNRwJ6E6ldzQLgF
+         cCkJGwT+5SsR7LKrWkh+eSD2WaMgrbTITHy5QLdExnWuLhVC4lohnXALmyBd7Z7bFOdS
+         n38Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUKnfvxk59qutUMOnSm3P9LN1dcZhv82t6OC4oqwpvIsqWRQE9Tu3d6NbcYexy1E8aJ6ie1Vv0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVvQ5o/VCTTGwV7a3ELX/oT6dZmg67UVtzDANODH4QUBmTT9V2
+	SFewSAkc1sB3bcAjZTUWHXV0kcU7ZKnqQXCbCuUUqp8xTGmeWhzmmqP/mKkVaGjdcIkIYERCtXm
+	SQth6dJBAQuedN4nfEA3sOplKY7YQkX+JMEVshJ7Hqwh+CXSzduLvKHH8FndF55C1v0nJfYieoH
+	bdAXFGSEPBUlA6yAf7aR2NOOuXG7qfbs7b
+X-Gm-Gg: ASbGncuQq2yDVQefzmG8RNBUDjmby7rOley10FvKDr+4txPA6CPRf+E04FoE2I/D/UD
+	Tbx+Iv7VcF5n7xzkMopxO8u7LuRgqmM37zMwVtpoJy05yQaP3E/Juw3qsKftVnFFmo2+iDyCMlA
+	FIahGXlP41NWkKYraQUjvQM9h7JXYiNngY8ssNLvg8O5KriTXD22OZiVk=
+X-Received: by 2002:a17:90b:1dc6:b0:339:a4ef:c8b9 with SMTP id 98e67ed59e1d1-33bcf8e61admr23670252a91.17.1761049192752;
+        Tue, 21 Oct 2025 05:19:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHmSXfUc0iO36yPnQ88RId8W3XGa+y2OOF1seQkx56qIphJkyoHALzCc4N+WH3586fhrgaivgyyWSAowI99uuA=
+X-Received: by 2002:a17:90b:1dc6:b0:339:a4ef:c8b9 with SMTP id
+ 98e67ed59e1d1-33bcf8e61admr23670216a91.17.1761049192186; Tue, 21 Oct 2025
+ 05:19:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-
+References: <68f6cdb0.a70a0220.205af.0039.GAE@google.com> <pehr4umqwjv3a7p4uudrz3uuqacu3ut66kmazw2ovm73gimyry@oevxmd4o664k>
+ <CAGxU2F5y+kdByEwAq-t15fyrfrgQGpmapmLgkmDmY4xH4TJSDw@mail.gmail.com>
+In-Reply-To: <CAGxU2F5y+kdByEwAq-t15fyrfrgQGpmapmLgkmDmY4xH4TJSDw@mail.gmail.com>
 From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Tue, 21 Oct 2025 14:19:40 +0200
+X-Gm-Features: AS18NWDqKAs-Kz2GQH31Gp4VrZ2zildQDUJ-O-_PmOWtbzzb8xRFvXlqFAxJHao
+Message-ID: <CAGxU2F6KaqmmK7qP55Rs8YHLOX62HyT77wY-RU1qPFpjhgV4jg@mail.gmail.com>
+Subject: Re: [syzbot] [virt?] [net?] possible deadlock in vsock_linger
+To: syzbot <syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com>, 
+	Michal Luczaj <mhal@rbox.co>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Syzbot reported a potential lock inversion deadlock between
-vsock_register_mutex and sk_lock-AF_VSOCK when vsock_linger() is called.
+On Tue, 21 Oct 2025 at 12:48, Stefano Garzarella <sgarzare@redhat.com> wrote:
+>
+> On Tue, 21 Oct 2025 at 10:27, Stefano Garzarella <sgarzare@redhat.com> wrote:
+> >
+> > Hi Michal,
+> >
+> > On Mon, Oct 20, 2025 at 05:02:56PM -0700, syzbot wrote:
+> > >Hello,
+> > >
+> > >syzbot found the following issue on:
+> > >
+> > >HEAD commit:    d9043c79ba68 Merge tag 'sched_urgent_for_v6.18_rc2' of git..
+> > >git tree:       upstream
+> > >console output: https://syzkaller.appspot.com/x/log.txt?x=130983cd980000
+> > >kernel config:  https://syzkaller.appspot.com/x/.config?x=f3e7b5a3627a90dd
+> > >dashboard link: https://syzkaller.appspot.com/bug?extid=10e35716f8e4929681fa
+> > >compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> > >syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17f0f52f980000
+> > >C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11ea9734580000
+> > >
+> > >Downloadable assets:
+> > >disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-d9043c79.raw.xz
+> > >vmlinux: https://storage.googleapis.com/syzbot-assets/0546b6eaf1aa/vmlinux-d9043c79.xz
+> > >kernel image: https://storage.googleapis.com/syzbot-assets/81285b4ada51/bzImage-d9043c79.xz
+> > >
+> > >IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > >Reported-by: syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com
+> > >
+> > >======================================================
+> > >WARNING: possible circular locking dependency detected
+> > >syzkaller #0 Not tainted
+> > >------------------------------------------------------
+> > >syz.0.17/6098 is trying to acquire lock:
+> > >ffff8880363b8258 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1679 [inline]
+> > >ffff8880363b8258 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: vsock_linger+0x25e/0x4d0 net/vmw_vsock/af_vsock.c:1066
+> >
+> > Could this be related to our recent work on linger in vsock?
+> >
+> > >
+> > >but task is already holding lock:
+> > >ffffffff906260a8 (vsock_register_mutex){+.+.}-{4:4}, at: vsock_assign_transport+0xf2/0x900 net/vmw_vsock/af_vsock.c:469
+> > >
+> > >which lock already depends on the new lock.
+> > >
+> > >
+> > >the existing dependency chain (in reverse order) is:
+> > >
+> > >-> #1 (vsock_register_mutex){+.+.}-{4:4}:
+> > >       __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+> > >       __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
+> > >       vsock_registered_transport_cid net/vmw_vsock/af_vsock.c:560 [inline]
+> >
+> > Ah, no maybe this is related to commit 209fd720838a ("vsock:
+> > Fix transport_{g2h,h2g} TOCTOU") where we added locking in
+> > vsock_find_cid().
+> >
+> > Maybe we can just move the checks on top of __vsock_bind() to the
+> > caller. I mean:
+> >
+> >         /* First ensure this socket isn't already bound. */
+> >         if (vsock_addr_bound(&vsk->local_addr))
+> >                 return -EINVAL;
+> >
+> >         /* Now bind to the provided address or select appropriate values if
+> >          * none are provided (VMADDR_CID_ANY and VMADDR_PORT_ANY).  Note that
+> >          * like AF_INET prevents binding to a non-local IP address (in most
+> >          * cases), we only allow binding to a local CID.
+> >          */
+> >         if (addr->svm_cid != VMADDR_CID_ANY && !vsock_find_cid(addr->svm_cid))
+> >                 return -EADDRNOTAVAIL;
+> >
+> > We have 2 callers: vsock_auto_bind() and vsock_bind().
+> >
+> > vsock_auto_bind() is already checking if the socket is already bound,
+> > if not is setting VMADDR_CID_ANY, so we can skip those checks.
+> >
+> > In vsock_bind() we can do the checks before lock_sock(sk), at least the
+> > checks on vm_addr, calling vsock_find_cid().
+> >
+> > I'm preparing a patch to do this.
+>
+> mmm, no, this is more related to vsock_linger() where sk_wait_event()
+> releases and locks again the sk_lock.
+> So, it should be related to commit 687aa0c5581b ("vsock: Fix
+> transport_* TOCTOU") where we take vsock_register_mutex in
+> vsock_assign_transport() while calling vsk->transport->release().
+>
+> So, maybe we need to move the release and vsock_deassign_transport()
+> after unlocking vsock_register_mutex.
 
-The issue was introduced by commit 687aa0c5581b ("vsock: Fix
-transport_* TOCTOU") which added vsock_register_mutex locking in
-vsock_assign_transport() around the transport->release() call, that can
-call vsock_linger(). vsock_assign_transport() can be called with sk_lock
-held. vsock_linger() calls sk_wait_event() that temporarily releases and
-re-acquires sk_lock. During this window, if another thread hold
-vsock_register_mutex while trying to acquire sk_lock, a circular
-dependency is created.
+I implemented this here:
+https://lore.kernel.org/netdev/20251021121718.137668-1-sgarzare@redhat.com/
 
-Fix this by releasing vsock_register_mutex before calling
-transport->release() and vsock_deassign_transport(). This is safe
-because we don't need to hold vsock_register_mutex while releasing the
-old transport, and we ensure the new transport won't disappear by
-obtaining a module reference first via try_module_get().
+sysbot successfully tested it.
 
-Reported-by: syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com
-Tested-by: syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com
-Fixes: 687aa0c5581b ("vsock: Fix transport_* TOCTOU")
-Cc: mhal@rbox.co
-Cc: stable@vger.kernel.org
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- net/vmw_vsock/af_vsock.c | 38 +++++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 19 deletions(-)
-
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 4c2db6cca557..76763247a377 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -487,12 +487,26 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
- 		goto err;
- 	}
- 
--	if (vsk->transport) {
--		if (vsk->transport == new_transport) {
--			ret = 0;
--			goto err;
--		}
-+	if (vsk->transport && vsk->transport == new_transport) {
-+		ret = 0;
-+		goto err;
-+	}
- 
-+	/* We increase the module refcnt to prevent the transport unloading
-+	 * while there are open sockets assigned to it.
-+	 */
-+	if (!new_transport || !try_module_get(new_transport->module)) {
-+		ret = -ENODEV;
-+		goto err;
-+	}
-+
-+	/* It's safe to release the mutex after a successful try_module_get().
-+	 * Whichever transport `new_transport` points at, it won't go away until
-+	 * the last module_put() below or in vsock_deassign_transport().
-+	 */
-+	mutex_unlock(&vsock_register_mutex);
-+
-+	if (vsk->transport) {
- 		/* transport->release() must be called with sock lock acquired.
- 		 * This path can only be taken during vsock_connect(), where we
- 		 * have already held the sock lock. In the other cases, this
-@@ -512,20 +526,6 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
- 		vsk->peer_shutdown = 0;
- 	}
- 
--	/* We increase the module refcnt to prevent the transport unloading
--	 * while there are open sockets assigned to it.
--	 */
--	if (!new_transport || !try_module_get(new_transport->module)) {
--		ret = -ENODEV;
--		goto err;
--	}
--
--	/* It's safe to release the mutex after a successful try_module_get().
--	 * Whichever transport `new_transport` points at, it won't go away until
--	 * the last module_put() below or in vsock_deassign_transport().
--	 */
--	mutex_unlock(&vsock_register_mutex);
--
- 	if (sk->sk_type == SOCK_SEQPACKET) {
- 		if (!new_transport->seqpacket_allow ||
- 		    !new_transport->seqpacket_allow(remote_cid)) {
--- 
-2.51.0
+Stefano
 
 
