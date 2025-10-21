@@ -1,118 +1,121 @@
-Return-Path: <netdev+bounces-231133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B61EEBF599E
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:48:04 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D833FBF5A06
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:50:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDCF11980B0E
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:48:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 901D3500CDC
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:49:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DBFB32B9B7;
-	Tue, 21 Oct 2025 09:46:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76ED3303A21;
+	Tue, 21 Oct 2025 09:48:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rY1jsVhe"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tz35rc9l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3938732B9AD
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403DE25BF13
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761039961; cv=none; b=ilqS1LV84DmzmNTefCvzunViYlKzljHCWSgRqNi51IiTODaUs8M3nwytO3O8afTp5kiVr+TpLrCxmeKd17e2FW3ZzPZM4rY7VCpENTss1vTw+RME8Ipx4oosFmTqFBNg11IVYnAQkIf0ej1Xq73fPTfUZbgJGc8aMJrZj7aW1LM=
+	t=1761040108; cv=none; b=scRkDgTlEOcurgv8N0Zny32kxSguvJlsWNXbu7wzK24yQXDi7VpRvSVQndRt527xBhFNw6Vq9lqxiOwwEmCZl2pEJ8P83t4GAo0sbLPQGV1BkIBJv4JsQarWcst/Bs3TdwHUcaupmCq67oeLtIYjeTSbCxdYg0ZjBMfj/prk3DE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761039961; c=relaxed/simple;
-	bh=C10WxW7/AbLOp4zp5DbAKNupE50VkLXOUwPIe3yt9SI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qkasc9bE86WoB0W8O7vJhZSofSNS+hKN6WmPG7QtXJuRGduD+PaH8tTPokjG9C9LKYWmLbYJBjTNIQIXcCf8/tEswIp3we9qxjzbKXVAhaSBtiepbC+d/8ja2qDAosFJqqytk7gLRgEcMxC53JhN5KEd5v6k1uJhqRz5KmsjEPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rY1jsVhe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBD63C116C6;
-	Tue, 21 Oct 2025 09:45:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761039960;
-	bh=C10WxW7/AbLOp4zp5DbAKNupE50VkLXOUwPIe3yt9SI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rY1jsVheJ296MCsuiKzKJQy9WiNiMhMvHDb+iPPLYnId3KqK5MhNy+2Vq/1LF9RSa
-	 kMI8GMnqcKX55qzf6uPnEggb2hDJC+5tEvneXjBfbUgg6Yy3PzUtc2iSKgRGfi+Z/l
-	 +yrLSLbCnp3Vc2xe0fV3sWznCvnar0vO1dAhjCLLrIHOIhwWPwB0uccusVwOHnAc0d
-	 oP2/RX/W475Ro0WBLh9Ja9fKywv5h3twLunXdFMVtB6o5xU/xwGv8awkeN6or84KCo
-	 G7mj/GFjQbOFBa9nxEUpN1KMgFo/1V5YsrifTMQyREebaEVRMDpUt0l5iv+3QOKEL+
-	 HoMSKgOtWJAqw==
-Date: Tue, 21 Oct 2025 10:45:56 +0100
-From: Simon Horman <horms@kernel.org>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net-next] tsnep: convert to ndo_hwtstamp_get() and
- ndo_hwtstamp_set()
-Message-ID: <aPdWVMFUzoSIAEHb@horms.kernel.org>
-References: <20251017203430.64321-1-gerhard@engleder-embedded.com>
- <aPYKDkBaoWuxuNBl@horms.kernel.org>
- <b55a017f-ab51-48f9-a852-c0c4ff37cb7f@engleder-embedded.com>
+	s=arc-20240116; t=1761040108; c=relaxed/simple;
+	bh=BeRkcYdNuRP9VtAYS7+2+hIhdROOZ2RLTiuy7nQekzk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=K+p4O8hqCnvLdDNIqfZXR+5/oBFa/BLWc02VUEFI5r+gx18tVNelToqee66FzxPQZ0+UmU2bOJOxC3LvrI1YEJVvwLEznUhinymTDcEk3+kKuQVjpDyZcFAOr/caxqEdrg5GLdxOh5eiQ/LoQH2won9Enpr1uXoZ0WCGWck+Zww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tz35rc9l; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761040103;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0prnOTx0qdT5A7vnEONNMuy2PWCa/37sN43he+oZ48M=;
+	b=tz35rc9lYZ24KZZPYmVND7+5MNZC3J01XZCqJXbt7gO+szf+3361vGEF4q+i3FXOoOJ8yJ
+	V8868sQFnVnjyv+sqXtLiY8cHSri+vjlVeIuJ+fxGprnyly57mMGyM3+ggYhYEfjMP2/ZN
+	yUX5fspPMp/X1aS4gTLyLsBGHBQQfw0=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Jian Shen <shenjian15@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+	Paul Barker <paul@pbarker.dev>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc: linux-renesas-soc@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	netdev@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next v3 0/6] convert net drivers to ndo_hwtstamp API part 2
+Date: Tue, 21 Oct 2025 09:47:45 +0000
+Message-ID: <20251021094751.900558-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b55a017f-ab51-48f9-a852-c0c4ff37cb7f@engleder-embedded.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Oct 20, 2025 at 07:59:22PM +0200, Gerhard Engleder wrote:
-> On 20.10.25 12:08, Simon Horman wrote:
-> > + Vadim
-> > 
-> > On Fri, Oct 17, 2025 at 10:34:30PM +0200, Gerhard Engleder wrote:
-> > > From: Vladimir Oltean <vladimir.oltean@nxp.com>
-> > > 
-> > > I took over this patch from Vladimir Oltean. The only change from my
-> > > side is the adaption of the commit message. I hope I mentioned his work
-> > > correctly in the tags.
-> > > 
-> > > New timestamping API was introduced in commit 66f7223039c0 ("net: add
-> > > NDOs for configuring hardware timestamping") from kernel v6.6.
-> > > 
-> > > It is time to convert the tsnep driver to the new API, so that
-> > > timestamping configuration can be removed from the ndo_eth_ioctl()
-> > > path completely.
-> > > 
-> > > The driver does not need the interface to be down in order for
-> > > timestamping to be changed. Thus, the netif_running() restriction in
-> > > tsnep_netdev_ioctl() is not migrated to the new API. There is no
-> > > interaction with hardware registers for either operation, just a
-> > > concurrency with the data path which is fine.
-> > > 
-> > > After removing the PHY timestamping logic from tsnep_netdev_ioctl(),
-> > > the rest is almost equivalent to phy_do_ioctl_running(), except for the
-> > > return code on the !netif_running() condition: -EINVAL vs -ENODEV.
-> > > Let's make the conversion to phy_do_ioctl_running() anyway, on the
-> > > premise that a return code standardized tree-wide is less complex.
-> > > 
-> > > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> > > Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
-> > > Tested-by: Gerhard Engleder <gerhard@engleder-embedded.com>
-> > 
-> > Hi Gerhard, Vladimir, Vadim, all,
-> > 
-> > Recently Vadim has been working on converting a number of drivers to
-> > use ndo_hwtstamp_get() and ndo_hwtstamp_set(). And this includes a
-> > patch, rather similar to this one, for the tsnep [1].
-> > 
-> > I think it would be good to agree on the way forward here.
-> > 
-> > [1] https://lore.kernel.org/all/20251016152515.3510991-7-vadim.fedorenko@linux.dev/
-> 
-> I already replied to Vadim, but on the first patch version, not on V3.
-> 
-> @Vadim: I reviewed your V3. Thanks for your work!
-> 
-> So this patch can be stopped.
+This is part 2 of patchset to convert drivers which support HW 
+timestamping to use .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
+The new API uses netlink to communicate with user-space and have some
+test coverage.
 
-Thanks for the clarification, much appreciated.
+v2 -> v3:
+ use NL_SET_ERR_MSG_MOD() variant to report errors back to user-space
+v1 -> v2: 
+ hns3: actually set up new ndo callbacks
+ ionic: remove _lif_ portion from name to align with other ndo callbacks
+
+
+Vadim Fedorenko (6):
+  octeontx2: convert to ndo_hwtstamp API
+  mlx4: convert to ndo_hwtstamp API
+  ionic: convert to ndo_hwtstamp API
+  net: ravb: convert to ndo_hwtstamp API
+  net: renesas: rswitch: convert to ndo_hwtstamp API
+  net: hns3: add hwtstamp_get/hwtstamp_set ops
+
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  5 ++
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 31 ++++++++++
+ .../hisilicon/hns3/hns3pf/hclge_main.c        | 13 ++--
+ .../hisilicon/hns3/hns3pf/hclge_ptp.c         | 32 +++++-----
+ .../hisilicon/hns3/hns3pf/hclge_ptp.h         |  9 ++-
+ .../marvell/octeontx2/nic/otx2_common.h       |  9 ++-
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 56 ++++++++---------
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  3 +-
+ .../net/ethernet/mellanox/mlx4/en_netdev.c    | 62 ++++++++-----------
+ drivers/net/ethernet/mellanox/mlx4/mlx4_en.h  |  6 +-
+ .../net/ethernet/pensando/ionic/ionic_lif.c   | 17 +----
+ .../net/ethernet/pensando/ionic/ionic_lif.h   | 11 ++--
+ .../net/ethernet/pensando/ionic/ionic_phc.c   | 61 +++++++++++-------
+ drivers/net/ethernet/renesas/ravb_main.c      | 61 ++++++------------
+ drivers/net/ethernet/renesas/rswitch_main.c   | 53 ++++++----------
+ 15 files changed, 211 insertions(+), 218 deletions(-)
+
+-- 
+2.47.3
 
