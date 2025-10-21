@@ -1,217 +1,116 @@
-Return-Path: <netdev+bounces-231131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F98BBF58E8
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:40:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A1A05BF5910
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:42:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CA4904FF6D1
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:40:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 64FEA4FBF5C
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:42:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C4B2F6933;
-	Tue, 21 Oct 2025 09:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="en0ww0HG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C225932038D;
+	Tue, 21 Oct 2025 09:42:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C08B2EA47C
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:40:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7CA28640C;
+	Tue, 21 Oct 2025 09:42:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761039618; cv=none; b=Yz3YIYCJ9T/qVKSTG3fEky/WdnRSCnuT/mOh40+gdaKI0QyQeGUIM9s7kY60kh9pLryP/AuiePywSpwGIah1/5bX+Gj50PpYstUQdyiJKyB6lGlCZcbM6ZCSzov8OqWIJdGzZF+MU+AZnFnoH8qWojtXcRXk5IMUNAYgD0Tzmz4=
+	t=1761039763; cv=none; b=N/2NmISJ9SZYq8UQI08AKzq0rKi+wl9GXZ2erJT1/MUvETGg/ll9xjg8K55H78vqVzdm+u6SJ3Ji2g+D/RrIkQ0mcsfwTvfmNgfURoH7wRSPA9D0h2vcYH7ZGcshM4kKlB0UVFA6wGF9G/XZOpbiFM8vqvJPULNqLZlfHXf2BPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761039618; c=relaxed/simple;
-	bh=joioCTHNcicHEl18wOj/vKbeHGh0dtHXxJrEocOCvK4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R4v5EGdvagdX2gPsDeJaHuDtCCkkyXngg+JyIb4uOIrc0HjmBtvVmYkY7c1KqvOJcQu/wGt83ajUWLgyJV+Il1u+abw5cA/7ValW2m19CKZr4B6hXR0VA12m2YXK4qlpRFIeueK0+njbo16fpVLcHkm20lBMlVyEvmvpL5XXoWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=en0ww0HG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761039614;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=58p/SRCqJ0LAx3dnpJuwG+DdvwsYHwAoukVUv/kmb8g=;
-	b=en0ww0HGHzRWkDE+pjf65xXKf52vaUYu456z5EfiTl39SOe+L6UwBQvxl6015Byg323/bf
-	bnti0qInA/sIxXJRJ/0QeKJYkT10qzyg+L0KgCQ4ITCaCE5niMILHNPcwH6sm/EqTyn7L0
-	f9lHP6j6Jq9k5oSapvgNLq9LaRccrXA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-355-JAEa1pTJNAC3Yh5gR01T_g-1; Tue, 21 Oct 2025 05:40:12 -0400
-X-MC-Unique: JAEa1pTJNAC3Yh5gR01T_g-1
-X-Mimecast-MFC-AGG-ID: JAEa1pTJNAC3Yh5gR01T_g_1761039611
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-46b303f6c9cso59897165e9.2
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 02:40:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761039611; x=1761644411;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=58p/SRCqJ0LAx3dnpJuwG+DdvwsYHwAoukVUv/kmb8g=;
-        b=Jb5p3awRE57ZYtZMeaewQG5q7RyInDFYKwFr0BSDEdeVljqobIyXOykm0TnEJRLjba
-         dHwtgqsC/L9EOifqmVigMo3z85ie8990iOhjsViAscc5UOVFdoC/dD48j4iyMM8e5IGi
-         PWitqvK9lDrubL+4xFVuGlpR0R1fgDr7hfWhJX3zMONcQydNO1OGj+fNcVeGYWms519Z
-         fCZ+XVABnHarFeh873SaF9YGylO1YUqFlmLFkPI66AL5Zzy5iAkXcJsJQ9RUIrQ0XxbW
-         MPgPjL/Xeocd45dqTFZPxljRs4GLTefnLYjf/2SI/RQEvSK8epjFhtEFUXtEb78qod27
-         Nnfw==
-X-Forwarded-Encrypted: i=1; AJvYcCUsWIWLXZZ//pjKo7lkN4fcZR9JLqO/cEHoVvya5xZbAzP+9l9A8MTz0enYqwmPsEGLrfi9KcE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTy1tQW7hxiCbRmO03pdPRUgZYzJiCxMSPWOlr+r7xRasPK+eX
-	TEy/d8qklP6zrb+hpI3qIKakmoogvw+hbL/ktuGErXAF2jv9rvlx6np1/BE+L8/Ixf93TBV3OI1
-	aCi0A6uvPBqBEHd3/GbsrxSZ5QnYSOMWv14XhAlZQEZzRJkPv1ibxEUIx0Q==
-X-Gm-Gg: ASbGncvOocwNzvL063jxgUiWWsbXswz8tYwl3w+tMakymPKxka1BW5EqhGHHU82h/Xz
-	wUEKpw6109rFYE3z1lQxyWC8/J62/xvi7k6+r5z3KpqKMgSZLRNghrmy3atw8GwdVPhhDIWHZNg
-	36mMgvS4mHPfdY7y4UGRfjC6Pjy7gdm5a0eDqAOP8/STZaiPeor5YcujDTI7lOl9Y/cFqXjoehA
-	+NLdhdVJYdbKnCfX4XQo2Yx/25q5znkl/8V/CVp12qEHDerbd4T0+zG03/nGR2d//H4ldA4FcsQ
-	QxzAG0yBxs0QZeLwQS1j3IjV0At7zxMTghV+V4SHsRxAwrtib1pPX3yxb8Jlygcukxnx
-X-Received: by 2002:a05:600c:524f:b0:46e:326e:4501 with SMTP id 5b1f17b1804b1-471178a785bmr115492785e9.10.1761039611095;
-        Tue, 21 Oct 2025 02:40:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEnKSW02QAXJ0oFhtSLv5TjL06FH3eXdLlv337/+4vkyG1qVajLc6qLhwPGLEda7bmT57ysBw==
-X-Received: by 2002:a05:600c:524f:b0:46e:326e:4501 with SMTP id 5b1f17b1804b1-471178a785bmr115492395e9.10.1761039610598;
-        Tue, 21 Oct 2025 02:40:10 -0700 (PDT)
-Received: from fedora ([2a01:e0a:257:8c60:80f1:cdf8:48d0:b0a1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-474949dd479sm15669425e9.0.2025.10.21.02.40.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 02:40:08 -0700 (PDT)
-Date: Tue, 21 Oct 2025 11:40:07 +0200
-From: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
-To: Francesco Valla <francesco@valla.it>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>,
-	Harald Mommer <harald.mommer@opensynergy.com>,
-	Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Damir Shaikhutdinov <Damir.Shaikhutdinov@opensynergy.com>,
-	linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	development@redaril.me
-Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
-Message-ID: <aPdU93e2RQy5MHQr@fedora>
-References: <20240108131039.2234044-1-Mikhail.Golubev-Ciuchea@opensynergy.com>
- <1997333.7Z3S40VBb9@fedora.fritz.box>
- <aPZNiD1SN16K7hmT@fedora>
- <27327622.1r3eYUQgxm@fedora.fritz.box>
+	s=arc-20240116; t=1761039763; c=relaxed/simple;
+	bh=JY3CF+2FP66H5ZXTKxBoAbQmuRj8bLfZ6H68G2I1PCQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=l9To2JFw51repd3APAa+0CUq2U6scywSAfRhKWRtEX/ztCihegegvdOPG7uul/hFC7Z3nQzXn2So6L3o79wRRge6Jc370RI4Yi1hrzJDwVKwWu/oxx8Q/c+FidYVlwDMGQsN/B7Os7BDIH9BaJrPLucAp2q+ZqPERlVSvEot4zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 43caf076ae6211f0a38c85956e01ac42-20251021
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.6,REQID:9efcfa40-2da7-45ab-92d8-592a550acbed,IP:0,UR
+	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:-5
+X-CID-META: VersionHash:a9d874c,CLOUDID:63a0de5be62f8f25bb7fa231967758b2,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:81|82|102|850,TC:nil,Content:0|50,EDM:-3
+	,IP:nil,URL:99|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0
+	,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 43caf076ae6211f0a38c85956e01ac42-20251021
+X-User: xiaopei01@kylinos.cn
+Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <xiaopei01@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 438995428; Tue, 21 Oct 2025 17:42:31 +0800
+From: Pei Xiao <xiaopei01@kylinos.cn>
+To: lkp@intel.com,
+	alexanderduyck@fb.com,
+	kernel-team@meta.com,
+	netdev@vger.kernel.org
+Cc: horms@kernel.org,
+	kuba@kernel.org,
+	lee@trager.us,
+	linux-kernel@vger.kernel.org,
+	oe-kbuild-all@lists.linux.dev,
+	pabeni@redhat.com,
+	Pei Xiao <xiaopei01@kylinos.cn>
+Subject: [PATCH] eth: fbnic: fix integer overflow warning in TLV_MAX_DATA definition
+Date: Tue, 21 Oct 2025 17:42:27 +0800
+Message-Id: <182b9d0235d044d69d7a57c1296cc6f46e395beb.1761039651.git.xiaopei01@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <202510190832.3SQkTCHe-lkp@intel.com>
+References: <202510190832.3SQkTCHe-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <27327622.1r3eYUQgxm@fedora.fritz.box>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 20, 2025 at 11:24:15PM +0200, Francesco Valla wrote:
-> On Monday, 20 October 2025 at 16:56:08 Matias Ezequiel Vara Larsen <mvaralar@redhat.com> wrote:
-> > On Tue, Oct 14, 2025 at 06:01:07PM +0200, Francesco Valla wrote:
-> > > On Tuesday, 14 October 2025 at 12:15:12 Matias Ezequiel Vara Larsen <mvaralar@redhat.com> wrote:
-> > > > On Thu, Sep 11, 2025 at 10:59:40PM +0200, Francesco Valla wrote:
-> > > > > Hello Mikhail, Harald,
-> > > > > 
-> > > > > hoping there will be a v6 of this patch soon, a few comments:
-> > > > > 
-> > > > > On Monday, 8 January 2024 at 14:10:35 Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com> wrote:
-> > > > > 
-> > > > > [...]
-> > > > > > +
-> > > > > > +/* Compare with m_can.c/m_can_echo_tx_event() */
-> > > > > > +static int virtio_can_read_tx_queue(struct virtqueue *vq)
-> > > > > > +{
-> > > > > > +	struct virtio_can_priv *can_priv = vq->vdev->priv;
-> > > > > > +	struct net_device *dev = can_priv->dev;
-> > > > > > +	struct virtio_can_tx *can_tx_msg;
-> > > > > > +	struct net_device_stats *stats;
-> > > > > > +	unsigned long flags;
-> > > > > > +	unsigned int len;
-> > > > > > +	u8 result;
-> > > > > > +
-> > > > > > +	stats = &dev->stats;
-> > > > > > +
-> > > > > > +	/* Protect list and virtio queue operations */
-> > > > > > +	spin_lock_irqsave(&can_priv->tx_lock, flags);
-> > > > > > +
-> > > > > > +	can_tx_msg = virtqueue_get_buf(vq, &len);
-> > > > > > +	if (!can_tx_msg) {
-> > > > > > +		spin_unlock_irqrestore(&can_priv->tx_lock, flags);
-> > > > > > +		return 0; /* No more data */
-> > > > > > +	}
-> > > > > > +
-> > > > > > +	if (unlikely(len < sizeof(struct virtio_can_tx_in))) {
-> > > > > > +		netdev_err(dev, "TX ACK: Device sent no result code\n");
-> > > > > > +		result = VIRTIO_CAN_RESULT_NOT_OK; /* Keep things going */
-> > > > > > +	} else {
-> > > > > > +		result = can_tx_msg->tx_in.result;
-> > > > > > +	}
-> > > > > > +
-> > > > > > +	if (can_priv->can.state < CAN_STATE_BUS_OFF) {
-> > > > > > +		/* Here also frames with result != VIRTIO_CAN_RESULT_OK are
-> > > > > > +		 * echoed. Intentional to bring a waiting process in an upper
-> > > > > > +		 * layer to an end.
-> > > > > > +		 * TODO: Any better means to indicate a problem here?
-> > > > > > +		 */
-> > > > > > +		if (result != VIRTIO_CAN_RESULT_OK)
-> > > > > > +			netdev_warn(dev, "TX ACK: Result = %u\n", result);
-> > > > > 
-> > > > > Maybe an error frame reporting CAN_ERR_CRTL_UNSPEC would be better?
-> > > > > 
-> > > > I am not sure. In xilinx_can.c, CAN_ERR_CRTL_UNSPEC is indicated during
-> > > > a problem in the rx path and this is the tx path. I think the comment
-> > > > refers to improving the way the driver informs this error to the user
-> > > > but I may be wrong.
-> > > > 
-> > > 
-> > > Since we have no detail of what went wrong here, I suggested
-> > > CAN_ERR_CRTL_UNSPEC as it is "unspecified error", to be coupled with a
-> > > controller error with id CAN_ERR_CRTL; however, a different error might be
-> > > more appropriate.
-> > > 
-> > > For sure, at least in my experience, having a warn printed to kmsg is *not*
-> > > enough, as the application sending the message(s) would not be able to detect
-> > > the error.
-> > > 
-> > > 
-> > > > > For sure, counting the known errors as valid tx_packets and tx_bytes
-> > > > > is misleading.
-> > > > > 
-> > > > 
-> > > > I'll remove the counters below.
-> > > > 
-> > > 
-> > > We don't really know what's wrong here - the packet might have been sent and
-> > > and then not ACK'ed, as well as any other error condition (as it happens in the
-> > > reference implementation from the original authors [1]). Echoing the packet
-> > > only "to bring a waiting process in an upper layer to an end" and incrementing
-> > > counters feels wrong, but maybe someone more expert than me can advise better
-> > > here.
-> > > 
-> > > 
-> > 
-> > I agree. IIUC, in case there has been a problem during transmission, I
-> > should 1) indicate this by injecting a CAN_ERR_CRTL_UNSPEC package with
-> > netif_rx() and 2) use can_free_echo_skb() and increment the tx_error
-> > stats. Is this correct?
-> > 
-> > Matias
-> > 
-> > 
-> 
-> That's my understanding too! stats->tx_dropped should be the right value to
-> increment (see for example [1]).
-> 
-> [1] https://elixir.bootlin.com/linux/v6.17.3/source/drivers/net/can/ctucanfd/ctucanfd_base.c#L1035
-> 
+The TLV_MAX_DATA macro calculates (PAGE_SIZE - 512) which can exceed
+the maximum value of a 16-bit unsigned integer on architectures with
+large page sizes, causing compiler warnings:
 
-I think the counter to increment would be stats->tx_errors in this case ...
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.h:83:24: warning: conversion
+from 'long unsigned int' to 'short unsigned int' changes value from
+'261632' to '65024' [-Woverflow]
 
-Matias
+Fix this by explicitly masking the result to 16 bits using bitwise AND
+with 0xFFFF, ensuring the value fits within the expected data type
+while maintaining the intended behavior for normal page sizes.
+
+This preserves the existing functionality while eliminating the
+compiler warning and potential undefined behavior from integer
+truncation.
+
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202510190832.3SQkTCHe-lkp@intel.com/
+Signed-off-by: Pei Xiao <xiaopei01@kylinos.cn>
+---
+ drivers/net/ethernet/meta/fbnic/fbnic_tlv.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_tlv.h b/drivers/net/ethernet/meta/fbnic/fbnic_tlv.h
+index c34bf87eeec9..3508b46ebdd0 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_tlv.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_tlv.h
+@@ -80,7 +80,7 @@ struct fbnic_tlv_index {
+ 	enum fbnic_tlv_type	type;
+ };
+ 
+-#define TLV_MAX_DATA			(PAGE_SIZE - 512)
++#define TLV_MAX_DATA			((PAGE_SIZE - 512) & 0xFFFF)
+ #define FBNIC_TLV_ATTR_ID_UNKNOWN	USHRT_MAX
+ #define FBNIC_TLV_ATTR_STRING(id, len)	{ id, len, FBNIC_TLV_STRING }
+ #define FBNIC_TLV_ATTR_FLAG(id)		{ id, 0, FBNIC_TLV_FLAG }
+-- 
+2.25.1
 
 
