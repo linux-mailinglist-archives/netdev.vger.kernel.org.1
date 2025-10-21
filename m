@@ -1,183 +1,151 @@
-Return-Path: <netdev+bounces-231245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62E7CBF675D
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 14:32:07 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C184BF67BD
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 14:41:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0B7B34E1BF8
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:32:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9BA2F4E9A4D
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:41:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3554E2DECB0;
-	Tue, 21 Oct 2025 12:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F4032ED27;
+	Tue, 21 Oct 2025 12:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="IXuFI9KG"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0414B2F2616;
-	Tue, 21 Oct 2025 12:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469013128D3
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 12:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761049924; cv=none; b=avk1nZOjjEV0oLGSJN0N912MQrlbR6Y0xitLYqb4LktOoXbtnOJ0YtkSTPbK2iLHZifSHrRgsy4/7u1VS3+gCOnVVxuhNBP0YUVGISUfNXtPO408cZGKPA4GUsL3e76XiZPZsnzwzAdzlEpgwX+93bT1Y799HUtrtpCj0PuURz0=
+	t=1761050463; cv=none; b=o0Wc82EG1YlI61T76bXx6+RnKvJfuCEhnUyA5iTxL2bLWLllWym6EEhQswxmy3auwtVsRo90XxObYjdX82u03wMn7vuTJ+PwlGWuRpHrSkupK8cuFFIaKAJccbeDrlQwgzMpEBGhcvdPVlVYIWtGpq0UXjLyOF06SqsMSbwKjac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761049924; c=relaxed/simple;
-	bh=BbHrSanNbvDNOCEHSd7v5dXDuNcF7qVtGsFeh2Ji/zo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FT/kFhJAmfnzo8J36j0VFICFDi32SHoLcf0gog3sxsjhlsEUUSpeL3b5czW1177fg05ZUiSLTe12ewJwBkCkgoQpXconSdDocLNuJz6Qbm6hck45uTISjiqyF9hZIJdMbqA/068CqoTY193D9ie0RIu++Xwnz46B5DymAB6CMdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 0E45CA72E6;
-	Tue, 21 Oct 2025 14:31:53 +0200 (CEST)
-Date: Tue, 21 Oct 2025 14:31:51 +0200
-From: Gabriel Goller <g.goller@proxmox.com>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: Wrong source address selection in arp_solicit for forwarded
- packets
-Message-ID: <76z4ckbvjimtrf2foaislezs4vlru5upxn3i5ysu4au2m2pfei@slgxispho2iv>
-Mail-Followup-To: Ido Schimmel <idosch@idosch.org>, davem@davemloft.net, 
-	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <eykjh3y2bse2tmhn5rn2uvztoepkbnxpb7n2pvwq62pjetdu7o@r46lgxf4azz7>
- <aPZB33C-C1t1z7Dk@shredder>
+	s=arc-20240116; t=1761050463; c=relaxed/simple;
+	bh=yuVQZTDGjvvcPalMUgTg4epkdUaGdD4g6/GxObBxEI0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YAIgK9+17jF2pN1RqtMrTsixrCbw7DczcT4YANzpoDt+SqghEopnkfkmd2gYA6v39rvODuVVDGwBmQcsgJ+29prBbCCW+3QXNuG5q5RsF3zHDrFB/v8Cdd4N7FCxAMBCj9/JajaepGM5dSHRFL3PbPIqS5ZPUN7EJT/bAfQjaQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=IXuFI9KG; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-57edfeaa05aso6341739e87.0
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 05:41:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1761050459; x=1761655259; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NWb3L2HC5GL7gJV88qPeFIZPSp/OKkdc2F2PK/9kqwo=;
+        b=IXuFI9KG4A3E4U5Fibyo6SAZNeh861N5dZ2edgvOUXsjhDgufvCVHz/9zsQZEjK3BW
+         MjdzfFJgfVaycKMJmwOmMDVjWwXkD7nlGV67Jf8zvmtPIwiJnQ2Hi16/68lWT3XbNX0q
+         7UCzdCkaXSC/d6+2uyK1aPWErerdzs6Igm9Tb1vs/sYCNuAVd6bEm8yBMPW3HV7o+6lR
+         oKyQWdMb9O1alofphP99ZmDTFd+Qzv6AnI2dCfLRhj8HNObmEMBPQTn+FgswF+1mdw56
+         trf8UoHLlB9JpJl1xWI4L0iPsJJXVTFXUuRVtCxZ3EA8ysrGASRUvQ/StiZWJHbSyx4X
+         GBuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761050459; x=1761655259;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NWb3L2HC5GL7gJV88qPeFIZPSp/OKkdc2F2PK/9kqwo=;
+        b=aiCLGEH1kYH7aQMPtLxI15uRVu4eaec7RfPC20ZhbZmTX8gTjz5cOgOf+kdbQl99YA
+         L/4FcsU7KY/N7i0ujDKYXT/xZWcX1qosrL4CkCLCTitFv39R8xKFRRR65BzWa5uCCqrI
+         MF9WHzPxMxGXla942zJirwJHLgS6yIKsPTS5fS97gQ94QFlFwkf1UgIIxguV1wHg5b3N
+         pdUZzSlq7ucjc6IgjePNglSASeao+GsfsiXW/iC5wLzNX2TBgomVWD+m+IbWslxPTfdz
+         7AWMIZRdA4IsWKKI2gOofPypYXCVy8C0oeX1F7oVjky9u4C0oH7erE5P/UEFKnc068Gl
+         lVow==
+X-Forwarded-Encrypted: i=1; AJvYcCUdpgFkbDo4QDj51Jn2EhUOy0dHfE7D7dbRlJSwGqh4hGKphZpDhNYv2rd1pzLm8GcO26CHdpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmnhdqC+k0paM7cNuKYg5jSdG2j0zl9s9yocjbaiK8bx1r8bvM
+	r3Vgtfq68/QJHUSoUhg/2MM+ge8OI4fyEh5t9twFpF6Al7zkqTsRuW/dmkM1u1wJMnmZ24sBidb
+	NpsPXBkS9XTx0FnF2jMBCcHvMAdUY2HpVQmFUEUE4iw==
+X-Gm-Gg: ASbGnctbs3nOE/X6X7iPbq37UGAzqjVSB7IQrmzme7jRYgBhD3SkL5EIBJ+ihrz1Z3L
+	CzMn8bvS7MB8OiLJkQlp3eaWbRumM3KO5ZCHJJe7HaRi/iHuKjp5h2DIDOSLSDl7n2h6wJtwhis
+	xAIdxFTk3nNnJ9f3lhavVok9DLsqUG9rlDWphSdlr7OTzqxI1fNUQN7sZ4SXnyo1Q21NwWSN5sZ
+	faSM7dRVeaS9i+Ea6un17qAeLUuSlwjoi2ORMzfFmxlhfs/1SoMC87OKX045OvKgb6Q5jI1K8cL
+	5w017tmuP0kiXjjiPGxvO7jVa4Y=
+X-Google-Smtp-Source: AGHT+IHJJi40QO2j+AEEIXG+FSVZbH+WW1DwyjfojmvqVA8OuBIji8cOMNjvhsKfbFVOj/fVZy/UensL3Bqq96jG85U=
+X-Received: by 2002:a05:6512:3b0c:b0:57a:310:66a8 with SMTP id
+ 2adb3069b0e04-591d85773ffmr5098755e87.55.1761050459418; Tue, 21 Oct 2025
+ 05:40:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aPZB33C-C1t1z7Dk@shredder>
-User-Agent: NeoMutt/20241002-35-39f9a6
-X-Bm-Milter-Handled: 55990f41-d878-4baa-be0a-ee34c49e34d2
-X-Bm-Transport-Timestamp: 1761049905233
+References: <20251015232015.846282-1-robh@kernel.org>
+In-Reply-To: <20251015232015.846282-1-robh@kernel.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Tue, 21 Oct 2025 14:40:47 +0200
+X-Gm-Features: AS18NWCQWmhq7gNfZEHIkGW0O-gEdDRZh4gksyliLmXKxwOZhptAVz-Dcd8I0sA
+Message-ID: <CAMRc=Mf++cYPVrFH5_1KggTQi2Tew_MaeHMHSiczkVfM+=Y4rg@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: Fix inconsistent quoting
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Stephen Boyd <sboyd@kernel.org>, Thierry Reding <thierry.reding@gmail.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Shawn Guo <shawnguo@kernel.org>, 
+	Fabio Estevam <festevam@gmail.com>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
+	Lars-Peter Clausen <lars@metafoo.de>, Michael Hennerich <Michael.Hennerich@analog.com>, 
+	Jonathan Cameron <jic23@kernel.org>, Andy Shevchenko <andy@kernel.org>, 
+	Jassi Brar <jassisinghbrar@gmail.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
+	Lee Jones <lee@kernel.org>, Joel Stanley <joel@jms.id.au>, 
+	Andrew Jeffery <andrew@codeconstruct.com.au>, Andrew Lunn <andrew@lunn.ch>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Daire McNamara <daire.mcnamara@microchip.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Vinod Koul <vkoul@kernel.org>, 
+	Kishon Vijay Abraham I <kishon@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Tony Lindgren <tony@atomide.com>, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-iio@vger.kernel.org, linux-media@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
+	linux-phy@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 20.10.2025 17:06, Ido Schimmel wrote:
-> On Fri, Oct 17, 2025 at 04:47:27PM +0200, Gabriel Goller wrote:
-> > Hi,
-> > I have a question about the arp solicit behavior:
-> > 
-> > I have the following simple infrastructure with linux hosts where the ip
-> > addresses are configured on dummy interfaces and all other interfaces are
-> > unnumbered:
-> > 
-> >   ┌────────┐     ┌────────┐     ┌────────┐    │ node1  ├─────┤ node2
-> > ├─────┤ node3  │    │10.0.1.1│     │10.0.1.2│     │10.0.1.3│    └────────┘
-> > └────────┘     └────────┘
-> 
-> The diagram looks mangled. At least I don't understand it.
+On Thu, Oct 16, 2025 at 1:20=E2=80=AFAM Rob Herring (Arm) <robh@kernel.org>=
+ wrote:
+>
+> yamllint has gained a new check which checks for inconsistent quoting
+> (mixed " and ' quotes within a file). Fix all the cases yamllint found
+> so we can enable the check (once the check is in a release). Use
+> whichever quoting is dominate in the file.
+>
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>  .../arm/altera/socfpga-clk-manager.yaml       |  4 ++--
+>  .../bindings/clock/nvidia,tegra124-car.yaml   |  8 ++++----
+>  .../bindings/clock/nvidia,tegra20-car.yaml    |  6 +++---
+>  .../devicetree/bindings/gpio/gpio-mxs.yaml    |  9 +++++----
+>  .../bindings/gpio/snps,dw-apb-gpio.yaml       |  4 ++--
+>  .../bindings/iio/temperature/adi,ltc2983.yaml | 20 +++++++++----------
+>  .../mailbox/qcom,apcs-kpss-global.yaml        | 16 +++++++--------
+>  .../mailbox/xlnx,zynqmp-ipi-mailbox.yaml      |  2 +-
+>  .../bindings/media/fsl,imx6q-vdoa.yaml        |  2 +-
+>  .../devicetree/bindings/mfd/aspeed-lpc.yaml   |  4 ++--
+>  .../devicetree/bindings/mfd/ti,twl.yaml       |  4 ++--
+>  .../bindings/net/ethernet-switch.yaml         |  2 +-
+>  .../pci/plda,xpressrich3-axi-common.yaml      |  2 +-
+>  .../bindings/phy/motorola,cpcap-usb-phy.yaml  |  4 ++--
+>  .../pinctrl/microchip,sparx5-sgpio.yaml       | 12 +++++------
+>  .../bindings/pinctrl/qcom,pmic-gpio.yaml      | 10 +++++-----
+>  .../bindings/pinctrl/qcom,pmic-mpp.yaml       |  6 +++---
+>  .../bindings/pinctrl/renesas,pfc.yaml         |  4 ++--
+>  .../bindings/pinctrl/renesas,rza1-ports.yaml  |  2 +-
+>  .../pinctrl/renesas,rzg2l-pinctrl.yaml        |  2 +-
+>  .../pinctrl/renesas,rzv2m-pinctrl.yaml        |  2 +-
+>  .../bindings/power/renesas,sysc-rmobile.yaml  |  4 ++--
+>  .../soc/microchip/atmel,at91rm9200-tcb.yaml   |  8 ++++----
+>  .../soc/tegra/nvidia,tegra20-pmc.yaml         | 12 +++++------
 
-Ah sorry about that, looks like I had format=flowed configured on my
-client.
+For GPIO:
 
-Diagram should be correct now:
-
-   ┌────────┐     ┌────────┐     ┌────────┐
-   │ node1  ├─────┤ node2  ├─────┤ node3  │
-   │10.0.1.1│     │10.0.1.2│     │10.0.1.3│
-   └────────┘     └────────┘     └────────┘
-
-If it's still not right it's correctly rendered on lore:
-https://lore.kernel.org/netdev/eykjh3y2bse2tmhn5rn2uvztoepkbnxpb7n2pvwq62pjetdu7o@r46lgxf4azz7/
-
-> > All nodes have routes configured and can ping each other. ipv4 forwarding is
-> > enabled on all nodes, so pinging from node1 to node3 should work. However, I'm
-> > encountering an issue where node2 does not send correct arp solicitation
-> > packets when forwarding icmp packets from node1 to node3.
-> 
-> I believe ICMP is irrelevant here.
-
-Yep, ICMP is just an example.
-
-> > For example, when pinging from node1 to node3, node2 sends out the
-> > following arp packet:
-> > 
-> > 13:57:43.198959 bc:24:11:a4:f6:cd > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100),
-> > length 46: vlan 300, p 0, ethertype ARP (0x0806), Ethernet (len 6),
-> > IPv4 (len 4), Request who-has 10.0.1.3 tell 172.16.0.102, length 28
-> > 
-> > Here, 172.16.0.102 is an ip address configured on a different interface on
-> > node2. This request will never receive a response because `rp_filter=2`.
-> > 
-> > node2 has the following (correct) routes installed:
-> > 
-> > 10.0.1.3 nhid 18 via 10.0.1.3 dev ens22 proto openfabric src 10.0.1.2 metric 20 onlink
-> > 
-> > Since arp_announce is set to 0 (the default), arp_solicit selects the first
-> > interface with an ip address (inet_select_addr), which results in
-> > selecting the wrong source address (172.16.0.102) for the arp request.
-> > Because rp_filter is set to 2, we won't receive an answer to this arp
-> > packet, and the ping will fail unless we explicitly ping from node2 to
-> > node3.
-> > 
-> > I'm wondering if it would be possible (and correct) to modify arp_solicit to
-> > perform a fib lookup to check if there's a route with an explicit source
-> > address (e.g., the route above using src 10.0.1.2) and use that address as the
-> > source address for the arp packet. Of course, this wouldn't be backward
-> > compatible, as some users might rely on the current interface ordering behavior
-> > (or the loopback interface being selected first), so it would need to be
-> > controlled via a sysctl configuration flag. Perhaps I'm missing something
-> > obvious here though.
-> 
-> This would probably entail adding a new arp_announce level, but nobody
-> added a new level in at least 20 years, so you will need to explain why
-> your setup is special and why the same functionality cannot be achieved
-> in a different way that does not require kernel changes.
-
-To add a bit more context, I'm using FRR on all nodes and the dummy
-interface ips are distributed using OpenFabric. But this shouldn't
-matter because the routes are inserted correctly and work fine.
-
-> A few things you can consider:
-> 
-> 1. You wrote that the router interfaces are unnumbered. Modern
-> unnumbered networks usually assign IPv6 link-local addresses to these
-> interfaces. These addresses are only used for neighbour resolution and
-> can be used as the nexthop address for IPv4 routes. For example:
-> 
-> ip route add 192.0.2.1/32 nexthop via inet6 fe80::1 dev dummy1
-> 
-> Or using nexthop objects:
-> 
-> ip nexthop add id 1 via fe80::1 dev dummy1
-> ip route add 192.0.2.1/32 nhid 1
-
-Hmm I don't know how this would help? There is a link-local address set
-on the interface, but we would have to add a ipv6 source address to the
-arp packet which wouldn't be right?
-
-The route already exists (see `dev ens22` and `onlink`).
-
-> 2. If you have interfaces whose addresses should not be considered as
-> source addresses when generating IP/ARP packets out of other interfaces,
-> then you can try placing them in a different VRF if it's viable.
-
-Yep, this is definitely a solution as the "loopback" address of the VRF
-is its master device. Still, what if the master device or the loopback
-device have multiple ips?
-
-> 3. Requires some work and I didn't look too much into it, but I believe
-> it should be possible to derive the preferred source address and rewrite
-> it in ARP packets using tc-bpf on egress. See:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=dab4e1f06cabb6834de14264394ccab197007302
-
-Yeah ebpf is definitely also a solution, but IMO this is a bit of a
-weird behavior and should be fixed in the kernel.
-
-We have all the information we need (from the routes) and just need to
-use them to select the correct source address, and not just give up and
-select randomly.
-
-
-Thanks for the answer!
-Gabriel
-
+Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
