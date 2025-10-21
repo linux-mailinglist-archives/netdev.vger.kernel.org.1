@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-231092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D46E4BF4C50
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 08:55:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94969BF4B75
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 08:37:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 744C218C5279
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 06:55:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7225403508
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 06:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8123F26B764;
-	Tue, 21 Oct 2025 06:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10962673B0;
+	Tue, 21 Oct 2025 06:36:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iram.es header.i=@iram.es header.b="YpYVuGBx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yp+gDZXg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-006a4e02.pphosted.com (mx07-006a4e02.pphosted.com [143.55.146.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB942224245;
-	Tue, 21 Oct 2025 06:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.55.146.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B325E25B1D2
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 06:36:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761029728; cv=none; b=LoaORVwXEiIWmDRcwdCLQvBTfkV5M5Z9g24NmgjPEK2Zty+gjH8uhpDDwxDdmJu30rsB02cLwuqV9Yv8wyf8zNSTRQJIB3WlIJKLHpJB8DxrZDEJVIKulnL1Dl8rTGh0M84VLTQhEI2WajVPra76MvzrB2rYRrhmDvpgb5EmcZo=
+	t=1761028614; cv=none; b=l+cZQkOPIKIMP2uTv/JHk8dyWwX/0fLnuOBPOAw6Am7mo6gLob+t8qEnUo2PzPdPuXPIqJB5aSTMue4hGlZySXYcSqxNhkX291zyvM0ZTEFi2esF5kqWby5Ncd3VgeTqD7U1ECjNaCD0yQIVJIcJ/K21FTxHc7huzR0i+OxntnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761029728; c=relaxed/simple;
-	bh=HMGdk3I075bK5E/gp9SATIQq1qBXSq91Oir+DGivIiE=;
+	s=arc-20240116; t=1761028614; c=relaxed/simple;
+	bh=pPHShIOw0fKqNBE6FP/aihpLejo2j/yJSiQbkCPkF1o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E4fJ1vz/dMDfZ6fSERaYY86VUJyd1zbs/JlufaBjMqwZtOCBcMuvtWZXNH/wU8npIikjJYARc+G0CaXmV8B4BtBYYWPV0+SpcepLT4PU/9Tosrw2JyTPv4fTAJAcr7PVwylij9e1uUFKDwQT7wKou/qhGJCkHtTv96Olwi13Jkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iram.es; spf=pass smtp.mailfrom=iram.es; dkim=pass (2048-bit key) header.d=iram.es header.i=@iram.es header.b=YpYVuGBx; arc=none smtp.client-ip=143.55.146.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iram.es
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iram.es
-Received: from pps.filterd (m0316690.ppops.net [127.0.0.1])
-	by mx07-006a4e02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59L63AQs1248592;
-	Tue, 21 Oct 2025 08:34:48 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iram.es; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=dkim3; bh=F164kmUr5EMZ6e+BTntGiD39zV8R
-	xXZwoRaGnCHEUKE=; b=YpYVuGBxuCwNJOQ3pBoy4A9ND5k7mRQOc+KGKrd42ih8
-	OAXsKtgh51RKxIBPRqYFZZhxoqsJDsHSjdT+uBjxoUEETInGL/mkVbpDNQSh0jTi
-	AINogUjyNJYUKHNOvirHoJmCRTw0E0AGyG1mEh2hfTH9ypTfEajsFBmTzWEW6AcI
-	3cDOIJXKeNn4+YDr1ZUiqzADvthene2bFu72cXBErZFkYhcAwTd24ZD9nwGwRTu/
-	6/0YkK7nru8rVpz30c/b25h17gRRIVulAV1foZlV1gIXNsVELI9YAVooBm+XaTJL
-	kaMRQ+ZSe2o1We13qnamNjH/qaU+Hcfl/guzkqy5Wg==
-Received: from mta-out02.sim.rediris.es (mta-out02.sim.rediris.es [130.206.24.44])
-	by mx07-006a4e02.pphosted.com (PPS) with ESMTPS id 49wrkpfknq-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 21 Oct 2025 08:34:47 +0200 (MEST)
-Received: from mta-out02.sim.rediris.es (localhost.localdomain [127.0.0.1])
-	by mta-out02.sim.rediris.es (Postfix) with ESMTPS id 15B3914009E;
-	Tue, 21 Oct 2025 08:34:47 +0200 (CEST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mta-out02.sim.rediris.es (Postfix) with ESMTP id DF9E7140FAD;
-	Tue, 21 Oct 2025 08:34:46 +0200 (CEST)
-X-Amavis-Modified: Mail body modified (using disclaimer) -
- mta-out02.sim.rediris.es
-Received: from mta-out02.sim.rediris.es ([127.0.0.1])
- by localhost (mta-out02.sim.rediris.es [127.0.0.1]) (amavis, port 10026)
- with ESMTP id 9cGW7RgyfRah; Tue, 21 Oct 2025 08:34:46 +0200 (CEST)
-Received: from lt-gp.iram.es (haproxy01.sim.rediris.es [130.206.24.69])
-	by mta-out02.sim.rediris.es (Postfix) with ESMTPA id 2DFB114009E;
-	Tue, 21 Oct 2025 08:34:45 +0200 (CEST)
-Date: Tue, 21 Oct 2025 08:34:43 +0200
-From: Gabriel Paubert <paubert@iram.es>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Darren Hart <dvhart@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Andre Almeida <andrealmeid@igalia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        Willem de Bruijn <willemb@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v3 10/10] powerpc/uaccess: Implement masked user access
-Message-ID: <aPcpg0lQUk0IhHvL@lt-gp.iram.es>
-References: <cover.1760529207.git.christophe.leroy@csgroup.eu>
- <179dbcda9eb3bdc5d314c949047db6ef8fd8a2ee.1760529207.git.christophe.leroy@csgroup.eu>
+	 Content-Type:Content-Disposition:In-Reply-To; b=o9WxxGqdWzAXthIWk3UmoVPrD/5JNknwROFwC37ZJODmUNrLaTE34GOowo3bqy4eK/2uVLb3oDKSz+CDnx3IbUXlvkYFBVJ6fBQWq4KpDbCkzDyIUVW1YXst3GD/DNV7g3j/bTiB5dmMaKnKSI6dIRJ38CPvY5NVAIiCssWpMzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Yp+gDZXg; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47495477241so3976095e9.3
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 23:36:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1761028611; x=1761633411; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yWWblYrlCLEpcH5LTQcbLzZ3/EiI9nz+a1hzMsf4pNQ=;
+        b=Yp+gDZXg8xLE7MShXtTr3l9G7P5t8spbIFozLyQ9bWRRAPW3uxHW92Vt26khlqrH6i
+         taQWHH9LaEHqMoS1RhgK8XsedBuIGMJVPqN/kL4BT0r9inczmuXKmOQ2siss6dpqtidX
+         6mBC0SfEni/uRrcBIQQk/R8ImrAK2dyFUgEjnrETW7+g028b0QVygZTG61MHtSGwyQuP
+         JkipUU9iSwPt40z4EFwpTjvFSzjT+KaQYIa3HQ51d+KSYJ+1OJ8Bhg3huSlMLhToaWfB
+         3ZizoAFI4HJt+2usx8dXH9+NP6Zy5jxkFm33PYKTURjOLFrOk3oM4dfRSOXGPpRs+xiF
+         8KwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761028611; x=1761633411;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yWWblYrlCLEpcH5LTQcbLzZ3/EiI9nz+a1hzMsf4pNQ=;
+        b=ULlUJoU2TrLlDeJu/3a3fFek+ptnLHJ8pEBG1+o1NA015VUWkB4CvFulIdja8490ZG
+         nifrCmfomMdiL1Bj18jWhJwsiRhgOo5bqXvQS8tYjnO5ZNcRbC27Lj1GfiUUoV9y6iWa
+         m8RGoRHcd4iXx6InBXnUvaZ8xVFh/7RotreU9J0QKi3fNXZ4bISEJj+v/A/gkVTb1dXu
+         Q6FwdJQG8v9+qXIO37wwc/2nVylygmIUxmonSgmQrlU1pB7mf9ygauDddj6HrjlmE7LE
+         GaV3c9xHzvdU9NScT8gIpLQlDznkj8dPN/CcSELTSAl7p46rH1MKjiwVm2oxWehXaOhc
+         jG1w==
+X-Forwarded-Encrypted: i=1; AJvYcCU2lvE8aqjAeD7OX+6ZhmG7G2z61M/U1vRbFNjkAvNyeHU1Vknhf4py9MJ/eOGtE4G+cFMhMZU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzv2uW0cFe4Cycb7X+FsoNCrlf/WoVorceTfEMJWheduDjo/xrr
+	z+EufqOC+8vrMk3B5b1WVGvR/xiNyogfSb9XMGDfn0HpmfB/nSQ6yVtkmL4NmdWzCsFOUCv4P7z
+	WaTFR
+X-Gm-Gg: ASbGncvXKcMpvVXVS12Oq7HFabigMHm7YPyCUWFmCdyw5IO0jotzM+/PH2vfNcWUgHp
+	+CqI4XrpOrHDiJiI9zoQgr9h2Yike+VxbyKIRMKUgr6QWskxvuB7QazuyifBpP9j4+SY/tBOWZt
+	GCBq/K/NnSqzFCexXz3kBz1wy4mykfJM77QuCIAmyagRImfn6/3M0ZEfwSsXAMBcU8Ci6Wyy0l6
+	VEV4c5C2nQP86ElxCEWCV4kA061ZH3qHaINsk5VG8Toylz+bFBz1ZWB/1yZU3C7VlmRK/LtfhXz
+	roXOnCH5C8LRH4QRSf7FvHuypZ+3tUaKFIkimHBN0e6RSEIuFuz8vwY3uDr25zcqpa1PN38qHoR
+	bTsjifQvswCh05h65yS1hSSGRak7A0uMx1lMWzky39UzTuX7mpqE7W5lNhRzu+Z8qV6NMkEQN6e
+	3tF5C2+Q==
+X-Google-Smtp-Source: AGHT+IEkQcqp1ksk1Cj9+LjNgTTmawr/C6jo8SGgwsLly2e1GhUHXpoCb0o0/Ssyg6De4Q0iYDMU6Q==
+X-Received: by 2002:a05:600c:8b66:b0:46e:1d8d:cfa2 with SMTP id 5b1f17b1804b1-471179117b3mr102871395e9.20.1761028610907;
+        Mon, 20 Oct 2025 23:36:50 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-427ea5b3c56sm18971798f8f.18.2025.10.20.23.36.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Oct 2025 23:36:50 -0700 (PDT)
+Date: Tue, 21 Oct 2025 09:36:47 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Lizhi Xu <lizhi.xu@windriver.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	kuba@kernel.org, linux-hams@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+2860e75836a08b172755@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH V2] netrom: Prevent race conditions between multiple add
+ route
+Message-ID: <aPcp_xemzpDuw-MW@stanley.mountain>
+References: <aPZ4fLKBiCCIGr9e@stanley.mountain>
+ <20251021020533.1234755-1-lizhi.xu@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,109 +96,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <179dbcda9eb3bdc5d314c949047db6ef8fd8a2ee.1760529207.git.christophe.leroy@csgroup.eu>
-X-Authority-Analysis: v=2.4 cv=QvxTHFyd c=1 sm=1 tr=0 ts=68f72988 cx=c_pps
- a=N+btqqeLiyZkBSWNmht35Q==:117 a=N+btqqeLiyZkBSWNmht35Q==:17
- a=kj9zAlcOel0A:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=pbnP-CYKNpT2arfVchsA:9 a=CjuIK1q_8ugA:10 a=nl4s5V0KI7Kw-pW0DWrs:22
- a=pHzHmUro8NiASowvMSCR:22 a=xoEH_sTeL_Rfw54TyV31:22
-X-Proofpoint-ORIG-GUID: fPY5OWlvYhbiva90HCVVCXenrvtnOCXX
-X-Proofpoint-GUID: fPY5OWlvYhbiva90HCVVCXenrvtnOCXX
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIxMDA1MCBTYWx0ZWRfX2lPxlPelhpYO
- fKzNMXsOb4ELb/Gi1Q5qBO8bWlp8UOoMX00pFGk6ILvZghWaahLfwNY1BC8iutNisGPxbYKcfK5
- 4MhDp3/ncePuRlR/rquIly1v6w2VvpjCqmMBBRwbC86Ke4g/JPasy6W84eYdQkoWsP1JdD0GNE4
- 4w8bDukcBTT9KRN2Hwq+ouDLYqLo+b4eLMTzAvpwKaoTlBLi8+9N4ZR0+oAC0aiImf/KfuErwi2
- llnHe09xbNiWeHl8ok/ZcciYVmj2p82Vu/bg1rMmjKvAs9nmCQ94pQWKiv/nqhnpm5gTjuu9ch9
- 08WPk+WA9Fx7B6JEMFzL2tsZJrphM8OT8ykb1U3ruJrsbXfnXvrJZqyBKRtX/wBu7SkUYv7uUd1
- T8qu9FfLEfoIX5vM8kLOIPLSRBhb7Q==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-20_07,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=salida_notspam policy=salida score=0
- spamscore=0 phishscore=0 lowpriorityscore=0 adultscore=0 impostorscore=0
- bulkscore=0 clxscore=1011 priorityscore=1501 suspectscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510210050
+In-Reply-To: <20251021020533.1234755-1-lizhi.xu@windriver.com>
 
+On Tue, Oct 21, 2025 at 10:05:33AM +0800, Lizhi Xu wrote:
+> On Mon, 20 Oct 2025 20:59:24 +0300, Dan Carpenter wrote:
+> > On Mon, Oct 20, 2025 at 09:49:12PM +0800, Lizhi Xu wrote:
+> > > On Mon, 20 Oct 2025 21:34:56 +0800, Lizhi Xu wrote:
+> > > > > Task0					Task1						Task2
+> > > > > =====					=====						=====
+> > > > > [97] nr_add_node()
+> > > > > [113] nr_neigh_get_dev()		[97] nr_add_node()
+> > > > > 					[214] nr_node_lock()
+> > > > > 					[245] nr_node->routes[2].neighbour->count--
+> > > > > 					[246] nr_neigh_put(nr_node->routes[2].neighbour);
+> > > > > 					[248] nr_remove_neigh(nr_node->routes[2].neighbour)
+> > > > > 					[283] nr_node_unlock()
+> > > > > [214] nr_node_lock()
+> > > > > [253] nr_node->routes[2].neighbour = nr_neigh
+> > > > > [254] nr_neigh_hold(nr_neigh);							[97] nr_add_node()
+> > > > > 											[XXX] nr_neigh_put()
+> > > > >                                                                                         ^^^^^^^^^^^^^^^^^^^^
+> > > > >
+> > > > > These charts are supposed to be chronological so [XXX] is wrong because the
+> > > > > use after free happens on line [248].  Do we really need three threads to
+> > > > > make this race work?
+> > > > The UAF problem occurs in Task2. Task1 sets the refcount of nr_neigh to 1,
+> > > > then Task0 adds it to routes[2]. Task2 releases routes[2].neighbour after
+> > > > executing [XXX]nr_neigh_put().
+> > > Execution Order:
+> > > 1 -> Task0
+> > > [113] nr_neigh_get_dev() // After execution, the refcount value is 3
+> > >
+> > > 2 -> Task1
+> > > [246] nr_neigh_put(nr_node->routes[2].neighbour);   // After execution, the refcount value is 2
+> > > [248] nr_remove_neigh(nr_node->routes[2].neighbour) // After execution, the refcount value is 1
+> > >
+> > > 3 -> Task0
+> > > [253] nr_node->routes[2].neighbour = nr_neigh       // nr_neigh's refcount value is 1 and add it to routes[2]
+> > >
+> > > 4 -> Task2
+> > > [XXX] nr_neigh_put(nr_node->routes[2].neighbour)    // After execution, neighhour is freed
+> > > if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)  // Uaf occurs this line when accessing neighbour->count
+> > 
+> > Let's step back a bit and look at the bigger picture design.  (Which is
+> > completely undocumented so we're just guessing).
+> > 
+> > When we put nr_neigh into nr_node->routes[] we bump the nr_neigh_hold()
+> > reference count and nr_neigh->count++, then when we remove it from
+> > ->routes[] we drop the reference and do nr_neigh->count--.
+> > 
+> > If it's the last reference (and we are not holding ->locked) then we
+> > remove it from the &nr_neigh_list and drop the reference count again and
+> > free it.  So we drop the reference count twice.  This is a complicated
+> > design with three variables: nr_neigh_hold(), nr_neigh->count and
+> > ->locked.  Why can it not just be one counter nr_neigh_hold().  So
+> > instead of setting locked = true we would just take an extra reference?
+> > The nr_neigh->count++ would be replaced with nr_neigh_hold() as well.
+> locked controls whether the neighbor quality can be automatically updated;
 
-Hi Christophe,
+I'm not sure your patch fixes the bug because we could still race against
+nr_del_node().
 
-On Fri, Oct 17, 2025 at 12:21:06PM +0200, Christophe Leroy wrote:
-> Masked user access avoids the address/size verification by access_ok().
-> Allthough its main purpose is to skip the speculation in the
-> verification of user address and size hence avoid the need of spec
-> mitigation, it also has the advantage of reducing the amount of
-> instructions required so it even benefits to platforms that don't
-> need speculation mitigation, especially when the size of the copy is
-> not know at build time.
-> 
-> So implement masked user access on powerpc. The only requirement is
-> to have memory gap that faults between the top user space and the
-> real start of kernel area.
-> 
-> On 64 bits platforms the address space is divided that way:
-> 
-> 	0xffffffffffffffff	+------------------+
-> 				|                  |
-> 				|   kernel space   |
->  		 		|                  |
-> 	0xc000000000000000	+------------------+  <== PAGE_OFFSET
-> 				|//////////////////|
-> 				|//////////////////|
-> 	0x8000000000000000	|//////////////////|
-> 				|//////////////////|
-> 				|//////////////////|
-> 	0x0010000000000000	+------------------+  <== TASK_SIZE_MAX
-> 				|                  |
-> 				|    user space    |
-> 				|                  |
-> 	0x0000000000000000	+------------------+
-> 
-> Kernel is always above 0x8000000000000000 and user always
-> below, with a gap in-between. It leads to a 3 instructions sequence:
-> 
->   20:	7c 69 fe 76 	sradi   r9,r3,63
->   24:	7c 69 48 78 	andc    r9,r3,r9
->   28:	79 23 00 4c 	rldimi  r3,r9,0,1
-> 
+I'm not saying get rid of locked completely, I'm saying get rid of code like
+this:
+		if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)
+			nr_remove_neigh(nr_node->routes[2].neighbour);
 
-Actually there is an even simpler (more obvious) sequence:
+Right now, locked serves as a special kind of reference count, because we
+don't drop the reference if it's true.
 
-sradi r9,r3,63
-srdi r9,r9,1  
-andc r3,r3,r9
+> count controls the number of different routes a neighbor is linked to;
 
-(the second instruction could also be clrldi r9,r9,1)
+Sure, that is interesting information for the user, so keep it around to
+print in the proc file, but don't use it as a reference count.
 
-which translates back to C as:
+> refcount is simply used to manage the neighbor lifecycle.
 
-[snipped]
-> +static inline void __user *mask_user_address_simple(const void __user *ptr)
-> +{
-> +	unsigned long addr = (unsigned long)ptr;
-> +	unsigned long sh = BITS_PER_LONG - 1;
-> +	unsigned long mask = (unsigned long)((long)addr >> sh);
-> +
-> +	addr = ((addr & ~mask) & ((1UL << sh) - 1)) | ((mask & 1UL) << sh);
-> +
-> +	return (void __user *)addr;
-> +}
-> +
+The bug is caused because our reference counting is bad.
 
-either (srdi):
-	unsigned long mask = ((unsigned long)((long)addr >> sh)) >> 1;
-or (clrldi):
-	unsigned long mask = (unsigned long)(((long)addr >> sh) & LONG_MAX);
+So right now what happens is we allocate nr_neigh and we put it on the
+&nr_neigh_list.  Then we lock it or we add it to ->routes[] and each of
+those has a different reference count.  Then when we drop those references
+we do:
 
-followed by:
-	return (void __user *)(addr & ~ mask);
+		if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)
+			nr_remove_neigh(nr_node->routes[2].neighbour);
 
-the result is the same but I find it easier to read, and it may be
-easier for the compiler than to recognize an rl?imi insruction.
+This removes it from the list, and hopefully this is the last reference
+and it frees it.
 
-Cheers,
-Gabriel
+It would be much simpler to say, we only use nr_neigh_hold()/put() for
+reference counting.  When we set locked we do:
 
- 
+	nr_neigh_hold(nr_neigh);
+	nr_neigh->locked  = true;
 
+Incrementing the refcount means it can't be freed.
+
+Then when we remove nr_neigh from ->routes[] we wouldn't "remove it from
+the list", instead we would just drop a reference.  When we dropped the
+last reference, nr_neigh_put() would remove it from the list.
+
+My proposal would be a behavior change because right now what happens is:
+
+1: allocate nr_neigh
+2: add it to ->routes[]
+3: remove it from ->routes[]
+   (freed automatically because we drop two references)
+
+Now it would be:
+1: allocate nr_neigh
+2: add it to ->routes[]
+3: remove it from ->routes[]
+4: needs to be freed manually with nr_del_neigh().
+
+regards,
+dan carpenter
 
