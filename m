@@ -1,212 +1,140 @@
-Return-Path: <netdev+bounces-231357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E01BF7C9B
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 18:53:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 966B2BF7CB6
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 18:55:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CC3314E9BC6
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 16:53:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 646AB19A59D1
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 16:55:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81FE32E11CB;
-	Tue, 21 Oct 2025 16:53:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23B2034A777;
+	Tue, 21 Oct 2025 16:55:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="km/RNYBE";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ccJsJ1yw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NNRc5cnX"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52A0346E73
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 16:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464DB348899
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 16:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761065580; cv=none; b=lJSeYK7M86ddX51uxL8LCw+WV9myJLLb1BkZoQh18oZK29q/VvDRF5nGlDxKBsj+Gkmp2zdU/jsLIWouL+Czxc8Axg/dAKcroPFgBfDhGVxb1MaxoeHC5yJvLCjHrp21CK739p+xuEb82Bhv6/YJ7BwnLbqKlRIR/D40tE8SR80=
+	t=1761065709; cv=none; b=HVkJJjBfWWmar0p08hlF35GhmTE4rJVdOcWM85MzGxiqytYDEVxSzp/5JjayV7Tfks1IUNlAfRxSuasYEXAnIfM40l+Qv95GhNXP7IAHCno0HTXI+Cc6l3f1uvXEaMUk7NL5Gr3pbST5khUnAt7V+gSA2EJjmufo3jiX4ZFjSQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761065580; c=relaxed/simple;
-	bh=4JfixZFPfVihXjKhMmwk1/yB7Zcjh++/ZO67fzTTx1Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qu90/6lK0Ta3CHNBbwReTKsZGgO2TtkRlK1aNRoi9J/685ewH2ECe5Y16rDpPnGXcZUw1Duwo/Yt+phlD2MmrrhvTCeSQafNF6mlfpD/QkXvERYa63+mqyhP2GZRYMAeqAH33tTHFHAL8Xpkcdkl4HNMz4chhotOQP5NMzf/vn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=km/RNYBE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ccJsJ1yw; arc=none smtp.client-ip=202.12.124.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id A10141D0000C;
-	Tue, 21 Oct 2025 12:52:55 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Tue, 21 Oct 2025 12:52:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1761065575; x=
-	1761151975; bh=4OaAX2xEk2neBRfluWdNHM2MvJ4wdhZGJvRC6TwttHQ=; b=k
-	m/RNYBEByaImddACRmAHv7AGdxhfa56a2TzMdu/QsxNvzQ/XMWX5zEAK+aMrMGyh
-	+CPEbDR+KrsRqAjbkXtrLIEN1cuDbnQBsCb5J6ZO9N1AvPHXfQD6dNsdJgjSrJhX
-	5iJwB5QklHMY1dDobknrWlSwxOiVCx+bnMh2/aVCDZq8JwSSL/6G36j5do42xh7U
-	tmiuYt71Daw8UML2lU0X0lBuutW8fqeOcVqsRKdrRmBU72VDrqXPV4nCEUwPXMaG
-	j0+YJ95nHhi4hxtBfBhMXKRVepPvBhJC2Df3d9D98FEb5JXSNphe/z0tQO/Vz99L
-	e2o/chII7jhOD3GD9iT6w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1761065575; x=1761151975; bh=4OaAX2xEk2neBRfluWdNHM2MvJ4wdhZGJvR
-	C6TwttHQ=; b=ccJsJ1ywZzXP1dQSDHdQFL3/f8qUro14zActJgHsYIUYUJssR9e
-	ipn+/lHAWzI1/b3rPOYdTJIQHglBcA368Fb1G16uiOhTdwOfPkArOLUssGr+Xq43
-	N2rKT5OtHbSdxwfSO5XvCtl/FxR05+EjYsuTo5tWVKl/tJn8/iGaRn6bkdlQzX+P
-	7xkp+vdtGu0SW0VsuimXEZgUUvcg6uzdY1RbjvwtzZloSlbsToQ/0HJjyCkm1bP+
-	w7oQby0fHhIeB46fUPRow9WunHKfi1IoLyEeIakSMxcb8neX+uqYFEGb1P9QklUz
-	IdJduMebJUub5vv9b7bhMEVv8+ZVvP3G+IA==
-X-ME-Sender: <xms:Zrr3aOMQdGsWNTsyIA5riM01XWw7vz7hkT_WWV6ooYeeIRkt8jwxCA>
-    <xme:Zrr3aGVuQUQcMn4b7bjvvz9AoJKllzGOUfT8WHehfQmgf-xJN8mhZNpbFWuSzm6Ce
-    IyPGFuPk061rdM2dCpky78rEuIwla4CbQst4Q3UROtaUrBl220BbFMy>
-X-ME-Received: <xmr:Zrr3aNz8JQQFOoa9PbVXdlve7DyLDeXTCh9nvJCaQ5bP9h3WXXsACfhqsStN>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddugeduvdefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedujedpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-    dprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhmrghilhdrtghomhdprhgtphhtthho
-    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehjvhesjh
-    hvohhssghurhhghhdrnhgvthdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehl
-    uhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprh
-    gtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhu
-    sggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjihhrihesrhgvshhnuhhllhhird
-    hush
-X-ME-Proxy: <xmx:Zrr3aOPPYgTUvagRZ1f34p1zBe9hElKtroryGE391I1lArY-JETZwg>
-    <xmx:Zrr3aHp7yQLuilIS10mvwFWH6nXbowdVv-WXg7TGNPgXcdA_lX2I1Q>
-    <xmx:Zrr3aN_4soJVmBNFsZb4HnirwE5ExSqsoKW_QME-DyeSAAczkE4lng>
-    <xmx:Zrr3aF3zVfvwlyUI_MsrXbs0XzAqso7CMZ9yAyRtjkVGmQC2R4ZK2Q>
-    <xmx:Z7r3aJmP6COHdQTQOwuFGI26TXkkdgQ_h97RGA01QxInL6l2n_FDZDyf>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 21 Oct 2025 12:52:53 -0400 (EDT)
-Date: Tue, 21 Oct 2025 18:52:51 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
-	Shuah Khan <shuah@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	bridge@lists.linux.dev
-Subject: Re: [PATCHv6 net-next 1/4] net: add a common function to compute
- features for upper devices
-Message-ID: <aPe6Y86R0vqc3a-R@krikkit>
-References: <20251017034155.61990-1-liuhangbin@gmail.com>
- <20251017034155.61990-2-liuhangbin@gmail.com>
- <aPX8di8QX96JvIZY@krikkit>
- <a2e85a2b-58b0-4460-ae7a-b1ea01e4d7e4@redhat.com>
+	s=arc-20240116; t=1761065709; c=relaxed/simple;
+	bh=MD15u5LqqmayWloxdzFGq0sNLTBc1b1Ii0ATLOQcv8U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Y0S541404Tk4dMSaLiQB+YJvWwZLRecw3hfO8u+qK1nxEx4YH/svXER1eHp6USJeD+4b7viDShKj1RP155gM7m7BtBcY0k2Ih7XiKZPyYR8EvC48E92je4DZfzHa6FO9EYJZ28gLMIoC2nX0uB1CT/qUXq0Y9p+niaVvSZdKKZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NNRc5cnX; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-42701b29a7eso55172f8f.0
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:55:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761065704; x=1761670504; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qn9OLNMyl8gChDp28IqA1MLvsXpL32JwaHFC00xTtCc=;
+        b=NNRc5cnXLfbWheS5JvW+1vO5mWwePGxYnLtn01PAfA8vOtmQgEH3BXpgbYE8SclLYk
+         8a4pbZfjxmSgujPZLxwhP4zb96V/v8PsjkxYq1YdTF7DUAnudpRCWr0wK4tJOu59Hc0G
+         09WR0FfLVoRl0GkpwNk+vbcDMiSEGpRwRZ84fgxqepsGR4WGySjqrbof4L8qqRsutft4
+         ndac/Fn9/YZEYqqiLSXOskn3N0ca1MHiHvZOZQMHxqqE+zgiIlcm5aQMd4QGEx7qktQH
+         g1opwS5cWzwg2yrN7pyEQq5CR+69rPX0HDQBjYnXAISKd8JS4rrhIh0DjmEPMDfGXccI
+         dy/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761065704; x=1761670504;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Qn9OLNMyl8gChDp28IqA1MLvsXpL32JwaHFC00xTtCc=;
+        b=GKPE+cBKAkxKcx8c6B47vCuzv2cJWxJRnvmsrPhMVTv8n7lyFmyQORV8MYD8njbotS
+         7I4SflVvBmVA088iNsAgYXhgA3GorMeWnVt78KwuEMjunYX6K5t+bh1PoWLTNGGT+k4t
+         JU2DVnHqky2xdaX4uvEut3UKHJLavz8QckzWOsIAZvpawnuyXBtsuIqommxeXhjlQgBB
+         NedZ++0bTKnhoyJh+FfPNxkVnlad/J9ycclOEsY/jbfY23kqBtwRbTVPUultSPNMm24Z
+         vHyyTosk7brKhdIBJhVU/Bjh+iFaSO1XtGV69jTtEAFaDShGMnHxJFonfgbngzOsZXtR
+         SDQg==
+X-Forwarded-Encrypted: i=1; AJvYcCVGVSq/UtIZf5jT5JToODI2vRLBqAMZrN/2rvsa9PnWcbOEx5FXuaqFeWnEx1CyBD258rpoGvY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHGV3wnJLJTsx/RyCA5JJzCUm+zi+lggh4jY/ZGBOigo7dl71u
+	89lDtzRTfioRyodtVZifXAwRoTk250Wov4RGPZe+6lPxYW3iV37w3Dbj
+X-Gm-Gg: ASbGncsy9jLM36+Ora2cP+cGnGI95sEHhKHGkvAST7QzCc6LsKuNsIceMY3LmE1EHP5
+	IR/m7gIIasD8aG3TL8i6aWUbbEEzxhJDy3SQxwr2P7FUEWhDF9MSFAzzi/l0NiliWRhtp9E/y5+
+	Z//3CWD3n+gCWF/L4FGv+VjD2CyzgM144yNcWuoPei+IdiGZfJyXYulhOvxa2rsLUXi33nrCUp7
+	I8oIxU9hqsAL/NlvANI++PT0zhkrRKAYvjgeqiC05czHoRzLk70QMuCxP0vZ8oIqX80Lzr5y/+o
+	9Vt5+w6mmbZf76sqiEBKQA37c1xKgLtv3BA9KuYzv7mufb8vVmLD6INB1exEcbj9yFCC1SUUgir
+	PnKvZLSoojdaNInk8XnZrzNoA1fxs7C0wcN+D8eKLuLgRWKXW/yiJHdDxOFY0kiytakyPgoqHrb
+	p0pcW8eoNioZ22E0uOAx4fCTKIqkLBsh9VQa/1dOkfs38e1BG/kGj4UIZi5QpO6WYl6k5alw==
+X-Google-Smtp-Source: AGHT+IFB8n84f69J64AkWR9VGuZDwOZaYOeLxR1PP9RJZ4VLcpx4xH2b3szKu1AMRcrRkxak/JLlHg==
+X-Received: by 2002:a5d:5847:0:b0:3dc:1473:17fb with SMTP id ffacd0b85a97d-428531c8828mr255369f8f.20.1761065704306;
+        Tue, 21 Oct 2025 09:55:04 -0700 (PDT)
+Received: from alessandro-pc.station (net-2-37-207-41.cust.vodafonedsl.it. [2.37.207.41])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475c427f77bsm1649005e9.3.2025.10.21.09.55.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Oct 2025 09:55:04 -0700 (PDT)
+From: Alessandro Zanni <alessandro.zanni87@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org
+Cc: Alessandro Zanni <alessandro.zanni87@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] selftest: net: prevent use of uninitialized variable
+Date: Tue, 21 Oct 2025 18:54:33 +0200
+Message-ID: <20251021165451.32984-1-alessandro.zanni87@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a2e85a2b-58b0-4460-ae7a-b1ea01e4d7e4@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-2025-10-21, 10:46:22 +0200, Paolo Abeni wrote:
-> On 10/20/25 11:10 AM, Sabrina Dubroca wrote:
-> > 2025-10-17, 03:41:52 +0000, Hangbin Liu wrote:
-> >> Some high level software drivers need to compute features from lower
-> >> devices. But each has their own implementations and may lost some
-> >> feature compute. Let's use one common function to compute features
-> >> for kinds of these devices.
-> >>
-> >> The new helper uses the current bond implementation as the reference
-> >> one, as the latter already handles all the relevant aspects: netdev
-> >> features, TSO limits and dst retention.
-> >>
-> >> Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> >> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> > 
-> > No objection to this patch/series, just a nit and some discussion below, so:
-> > 
-> > Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-> > 
-> > 
-> > [...]
-> >> +/**
-> >> + *	netdev_compute_master_upper_features - compute feature from lowers
-> > 
-> > nit: I'm slightly annoyed (that's not quite the right word, sorry)
-> > that we're adding a new function to "compute features" that doesn't
-> > touch netdev->features, but I can't come up with a better name
-> > (the best I got was "compute extra features" and it doesn't help).
-> 
-> I'm not the right person to ask a good name, and I'm ok with the current
-> one, but since the question is pending... what about:
-> 
-> netdev_{compute,update}_offloads_from_lower()
-> 
-> ?
-> 
-> As it actually updates (some of) the offloads available to the (upper)
-> device?
+Fix to avoid the usage of the `ret` variable uninitialized in the
+following macro expansions.
 
-(and the DST_RELEASE flags. at least the tso_max_* kind of fits into "offloads")
+It solves the following warning:
 
-I think we can keep the current name. It's more "it kind of bothers
-the pedantic part of me" than "annoyed", and we can't find a better
-name, so let's ignore the pedantic part. Sorry for the noise.
+In file included from netlink-dumps.c:21:
+netlink-dumps.c: In function ‘dump_extack’:
+../kselftest_harness.h:788:35: warning: ‘ret’ may be used uninitialized [-Wmaybe-uninitialized]
+  788 |                         intmax_t  __exp_print = (intmax_t)__exp; \
+      |                                   ^~~~~~~~~~~
+../kselftest_harness.h:631:9: note: in expansion of macro ‘__EXPECT’
+  631 |         __EXPECT(expected, #expected, seen, #seen, ==, 0)
+      |         ^~~~~~~~
+netlink-dumps.c:169:9: note: in expansion of macro ‘EXPECT_EQ’
+  169 |         EXPECT_EQ(ret, FOUND_EXTACK);
+      |         ^~~~~~~~~
 
+The issue can be reproduced, building the tests, with the command:
+make -C tools/testing/selftests TARGETS=net
 
-> >> + *	@dev: the upper device
-> >> + *	@update_header: whether to update upper device's header_len/headroom/tailroom
-> >> + *
-> >> + *	Recompute the upper device's feature based on all lower devices.
-> >> + */
-> >> +void netdev_compute_master_upper_features(struct net_device *dev, bool update_header)
-> >> +{
-> > [...]
-> >> +	netif_set_tso_max_segs(dev, tso_max_segs);
-> >> +	netif_set_tso_max_size(dev, tso_max_size);
-> >> +
-> >> +	netdev_change_features(dev);
-> > 
-> > Maybe a dumb idea: I'm wondering if we're doing this from the wrong
-> > side.
-> > 
-> > Right now we have:
-> > 
-> > [some device op] -> [this new function] -> netdev_change_features -> __netdev_update_features -> ndo_fix_features
-> > 
-> > Would it make more sense to go instead:
-> > 
-> > [some device op] -> netdev_change_features -> __netdev_update_features -> ndo_fix_features -> [this new function]
-> > 
-> > ?
-> 
-> Uhmmm.... this function touches a few more things beyond dev->*features,
-> calling it from ndo_fix_features() looks a bit out-of-scope.
+Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
+---
+ tools/testing/selftests/net/netlink-dumps.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-True. And as Hangbin said, it's setting (so a bit more "update" than
-"compute", as you wrote above) values whereas ndo_fix_features is just
-returning a value.
-
-So if we wanted to have this done by netdev_change_features, we'd
-probably need a new ndo, or some kind of flag to tell
-__netdev_update_features that this device needs the new function
-called. Well, we have netif_is_bridge_master, netif_is_team_master,
-netif_is_bond_master. But at this stage we don't know if update_header
-should be true/false. So ndo would be cleaner, but a lot
-heavier... it's probably not worth all this mess.
-
+diff --git a/tools/testing/selftests/net/netlink-dumps.c b/tools/testing/selftests/net/netlink-dumps.c
+index 7618ebe528a4..8ebb8b1b9c5c 100644
+--- a/tools/testing/selftests/net/netlink-dumps.c
++++ b/tools/testing/selftests/net/netlink-dumps.c
+@@ -112,7 +112,7 @@ static const struct {
+ TEST(dump_extack)
+ {
+ 	int netlink_sock;
+-	int i, cnt, ret;
++	int i, cnt, ret = 0;
+ 	char buf[8192];
+ 	int one = 1;
+ 	ssize_t n;
 -- 
-Sabrina
+2.43.0
+
 
