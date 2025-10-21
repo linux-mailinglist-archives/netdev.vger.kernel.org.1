@@ -1,132 +1,134 @@
-Return-Path: <netdev+bounces-231144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94A0DBF5ADF
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:05:02 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3407DBF5AEB
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:05:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 431964E1EA6
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 10:05:01 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 99F01351188
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 10:05:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45F72EFDB7;
-	Tue, 21 Oct 2025 10:04:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF6E02F3C1C;
+	Tue, 21 Oct 2025 10:05:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="druJg+gG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZmL+vvwe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8530A25BF13;
-	Tue, 21 Oct 2025 10:04:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7196F2EFDB7
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 10:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761041098; cv=none; b=fPqOoA+Is3KhqC2qPEA/5oaA1XOeamBOc8uXMU5XFmySC8fd4QVhgvLZPf3CZOAs2DYzv2PTa3hNP+MmKklzu4S4uZU2IijUIUC+DZRxPgUQVZHxw/iXG2NhEmsc4Ybqzv8zGreVovydKpo3jbTuC4m9swCIznIfUY547pCFMEo=
+	t=1761041141; cv=none; b=t2Q0WJ5UEjkjQjMvKe0Z/BEBqXq34WOCkkSMXWSwfqUKcj9EHgjFRkGAnvVqbrupDpu0Gx0jB/UNq0hLK45RQcKa5ASw23AbTeGNaJ/7nS+cqtZHdiThfwxi9PcluIHcMANnF8s6AOITUqLAMUsXZnwfpUMRNyd8wxQNFFH5jVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761041098; c=relaxed/simple;
-	bh=UNDuyBu/H9MLieySEn/zKXMZnN2v+zyRHcL9xe+3KKI=;
+	s=arc-20240116; t=1761041141; c=relaxed/simple;
+	bh=FTOsFMG3yp3pBDy8xOCbJF+xRG784OPBIBrqv7Flc2I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ddUv8zewE/EF6SKXMp61WkYVLre2RwWGwjDJghoFMJPAKOwWN4JAvCfYTtu6GF2c2P4vkw86quRxTEQOj3O5qV14QobW3euNc+K+S7WDoq4MQpxawBWUY8DXxAJvFeFEVhF5tTy3Mk/A0fguXm8zbvlIpAIgQjKQ3uTk0ymWKK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=druJg+gG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4448C4CEF1;
-	Tue, 21 Oct 2025 10:04:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761041098;
-	bh=UNDuyBu/H9MLieySEn/zKXMZnN2v+zyRHcL9xe+3KKI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=druJg+gGstrNmnqvB3SEHDFZc6qu9YG+3G4hJWNMy42QLfnZJDQWICRungso+3O9H
-	 MkND4jyCl2Q/7nlXIxdvfsOhuz7M6PFpUzA7UPbgy3P7yAu8PDbC4fyClhMmYMGJtn
-	 T2bCHqCmrJGuSm9+AJxnvnOFYXpfiD9L90b4bSphYADfNU2V1TVh1o9Hic1UImtZx+
-	 BO5E5xVu4lG8Fq/1VqCP+hbYSfiswqAxDnMh+uCnj44Hj6k5Pr8ipu3nraUE+zNpVk
-	 OHTLz/ViFQdRThwbTx8kVZT/qPBw1lgaeQ4LHTZCUaSsSYt5GdvVQ17mNZStiqQzN3
-	 vG6A8al9ZiQhg==
-Date: Tue, 21 Oct 2025 11:04:53 +0100
-From: Simon Horman <horms@kernel.org>
-To: Gustavo Luiz Duarte <gustavold@gmail.com>
-Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=X3C18ok6RyrzBDg/4kmSaRivo0Au1q5d+7ABLlDObkcDDfng0LSrfrKPg9LRwP0AtK+bCCp2sTZwQGXBoXelwJjaIyO9D+jy93l5GvDLlSmbZb12uC5h6pIl96v8ZKuA6maIdpU7hPXvnM8FCOh/YKL1pmSo+atj5mWnJMlNCG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZmL+vvwe; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-793021f348fso4788036b3a.1
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 03:05:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761041140; x=1761645940; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OK982plIE5xTlCsEWAT0p4OG+z+MqKJ2ACtf5l2iauI=;
+        b=ZmL+vvweWzmu0JJ1kGQykJP7cgBv+3ihjHpt+s+HxMEiqWm2Kl5LIRZ0jo7uRdqJ10
+         36te9gFpg8Alb7oP1X6XCFlbLYjdYz22Xh1Rcg1nFM3VSiX940Mj+kwVQvnhlsZLzKUV
+         LZrzo2Iz8CAA/2ZqjjJ8tV5MCcsryafi33PB9HTRQ6AQKNJBJxoYyEjxchtjoMSL2wmf
+         iB0pXq9SKKru7kx9IGyWEH+AO60XxBYpZpeABRs859TawgX02bkcTxVpAQiI1oWj344W
+         o8/HPxfl+t6OJTBqbT+B7ark4KjWp8NRtDlCG7UnJLUhItxXgwpXbuYJVri40iVMOqjl
+         20FA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761041140; x=1761645940;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OK982plIE5xTlCsEWAT0p4OG+z+MqKJ2ACtf5l2iauI=;
+        b=NVNLB1lLFTIZA282b12nMJeU6l7gLEYjcvUQy6lVPkOt7hLROXAsdz6FzDBayfNK76
+         2bYuG+6gyPISOHHvW3r1xaKTOqxBvg+KHmhi2Z8tDGNlsHJYntlKVH5Ez+etmbPLn0aZ
+         8N3tJWb4Ai3DBP90dXsu2K27zSkKfKi5tfWWH4nAmrZzNjg8AM99+oIGZCzGyfcqWeto
+         ygbTLkK4ceATeLwYA2CgIjE1Fh+dX44SYuC0aQQY48zIwNpkrh7FQ9hI457SPJlg3dyg
+         wCRobe3kSyjR9odPV7Z9P3l5EgfCrM2ePFIhTMIaZnzGMe3LWeeBEDbw7QR1izVmpxsN
+         0ZmA==
+X-Forwarded-Encrypted: i=1; AJvYcCWNOfsqfQduVWuH8o+BJMlG2XFjJM86ctUvjp8qbe12jQ5/s3H1KYeWjByAFKkJtVje2hHjWFE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0vgQ4Fr76BAxnfGSFd6BpxfX0tQ3hxumtsYfBur0VK4a0N6sd
+	ffFjuOGa74m2WR034Ocr0cLBXDNG4ACfcSrWmsFAXvzQ40iiPmZT+920
+X-Gm-Gg: ASbGncsrXR66kCb0qC5dHxjMpTU15STifPhUntcZA85VD8d0YyJKm4iHXyc6s9NCJ3C
+	to8D0Wx6MU32bpWfgMIL4eYcaXkVkJVyxxvyR5h+kzSsD/3M1Wh1neYitGC3SAlXuc02P3EZ0td
+	MsTFymii5BeNoFKQbvgVNCOd/NMDX6UV6z18Z7GLAtma+qSilk3IFYhtdzhzcvnNyTZ47wVXFuu
+	BtqBNotMZTRM7BWlgmqhB8lLdbTxRvW8v4gOggjCEf9ybLPgI5OCnaI9WZFxap3aOpeVCFyFk70
+	AQLBh0ifblUL+C2YbUb4GDgU98RDqf1ZBNEmKIO99QukEpIBQubwHNg85FM4CCi3asCULVOH3Ap
+	D6rlczBO1JXvlHqwrOQ7XS6AqbkUspIiaLVdERi/PiTZN+eg+CsBoQJSfpHC7+B4T7AQJZlpCA4
+	+08w2U
+X-Google-Smtp-Source: AGHT+IHJQ0BdOK4jZyJacNzTC1eK//itHFo/MOna8+vtP/DHwBgPdvCVlQ4hYf0g7EVbWtGRbkRLqg==
+X-Received: by 2002:a17:90b:4c0b:b0:32e:d599:1f66 with SMTP id 98e67ed59e1d1-33bcf8fbaa0mr18152011a91.30.1761041139455;
+        Tue, 21 Oct 2025 03:05:39 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b6a7664a228sm9783349a12.4.2025.10.21.03.05.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Oct 2025 03:05:38 -0700 (PDT)
+Date: Tue, 21 Oct 2025 10:05:29 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Matthew Wood <thepacketgeek@gmail.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net 2/2] netconsole: Fix race condition in between reader
- and writer of userdata
-Message-ID: <aPdaxSUBMYwfQXW6@horms.kernel.org>
-References: <20251020-netconsole-fix-race-v1-0-b775be30ee8a@gmail.com>
- <20251020-netconsole-fix-race-v1-2-b775be30ee8a@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bridge@lists.linux.dev
+Subject: Re: [PATCHv6 net-next 1/4] net: add a common function to compute
+ features for upper devices
+Message-ID: <aPda6cAl5UK1g-ze@fedora>
+References: <20251017034155.61990-1-liuhangbin@gmail.com>
+ <20251017034155.61990-2-liuhangbin@gmail.com>
+ <aPX8di8QX96JvIZY@krikkit>
+ <a2e85a2b-58b0-4460-ae7a-b1ea01e4d7e4@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251020-netconsole-fix-race-v1-2-b775be30ee8a@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a2e85a2b-58b0-4460-ae7a-b1ea01e4d7e4@redhat.com>
 
-On Mon, Oct 20, 2025 at 02:22:35PM -0700, Gustavo Luiz Duarte wrote:
-> The update_userdata() function constructs the complete userdata string
-> in nt->extradata_complete and updates nt->userdata_length. This data
-> is then read by write_msg() and write_ext_msg() when sending netconsole
-> messages. However, update_userdata() was not holding target_list_lock
-> during this process, allowing concurrent message transmission to read
-> partially updated userdata.
+On Tue, Oct 21, 2025 at 10:46:22AM +0200, Paolo Abeni wrote:
+> >> + *	netdev_compute_master_upper_features - compute feature from lowers
+> > 
+> > nit: I'm slightly annoyed (that's not quite the right word, sorry)
+> > that we're adding a new function to "compute features" that doesn't
+> > touch netdev->features, but I can't come up with a better name
+> > (the best I got was "compute extra features" and it doesn't help).
 > 
-> This race condition could result in netconsole messages containing
-> incomplete or inconsistent userdata - for example, reading the old
-> userdata_length with new extradata_complete content, or vice versa,
-> leading to truncated or corrupted output.
+> I'm not the right person to ask a good name, and I'm ok with the current
+> one, but since the question is pending... what about:
 > 
-> Fix this by acquiring target_list_lock with spin_lock_irqsave() before
-> updating extradata_complete and userdata_length, and releasing it after
-> both fields are fully updated. This ensures that readers see a
-> consistent view of the userdata, preventing corruption during concurrent
-> access.
-> 
-> The fix aligns with the existing locking pattern used throughout the
-> netconsole code, where target_list_lock protects access to target
-> fields including buf[] and msgcounter that are accessed during message
-> transmission.
-> 
-> Fixes: df03f830d099 ("net: netconsole: cache userdata formatted string in netconsole_target")
+> netdev_{compute,update}_offloads_from_lower()
 
-nit: no blank line here please
+The naming is a bit inconsistent.
 
-> 
-> Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
-> ---
->  drivers/net/netconsole.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> index 194570443493b..1f9cf6b12dfc5 100644
-> --- a/drivers/net/netconsole.c
-> +++ b/drivers/net/netconsole.c
-> @@ -888,6 +888,9 @@ static void update_userdata(struct netconsole_target *nt)
->  {
->  	int complete_idx = 0, child_count = 0;
->  	struct list_head *entry;
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(&target_list_lock, flags);
->  
->  	/* Clear the current string in case the last userdatum was deleted */
->  	nt->userdata_length = 0;
-> @@ -918,6 +921,8 @@ static void update_userdata(struct netconsole_target *nt)
->  	}
->  	nt->userdata_length = strnlen(nt->extradata_complete,
->  				      sizeof(nt->extradata_complete));
-> +
-> +	spin_unlock_irqrestore(&target_list_lock, flags);
->  }
->  
->  static ssize_t userdatum_value_store(struct config_item *item, const char *buf,
-> 
-> -- 
-> 2.47.3
-> 
-> 
+We originally used netdev_compute_features_from_lowers(), but later changed it
+to netdev_compute_master_upper_features() based on Jiri’s suggestion.
+Following that pattern, maybe netdev_compute_master_upper_offloads() would be
+a suitable name?
+
+If you agree, I can post a new version. If not, we can just leave it as is.
+
+Thanks
+Hangbin
 
