@@ -1,135 +1,145 @@
-Return-Path: <netdev+bounces-231142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1668BF5A93
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:57:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80B4ABF5AD3
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:03:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90120405A6B
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:57:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38722401CB5
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 10:03:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CBE52EBB9B;
-	Tue, 21 Oct 2025 09:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7BE52EF66D;
+	Tue, 21 Oct 2025 10:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YGmBDpIj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cXuYgoaj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12D528725A
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477A62E9EB9
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 10:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761040659; cv=none; b=t3WhmsRX6RgVAOn6z/TjPdJquksGEbr0GkfGK5DiimDMQC3UNQzYTWmRCyhbvdAlKuYYoA0+b49j4pTazOj2KU1r9U39vTbVvhwEL2KjcUIitjniiedyMYJa3WenRcdqsus5n/S+yD6jltgMtKOaWp8YAPknStoOgP7e6GXimaE=
+	t=1761040987; cv=none; b=aG0zmrdDyti7yJQLdgsxhwuXyLtayGk5fM77EBOLpuy9PvmbJs2pREANL9e65ddEJfyhrpNO97KgfAFBOmLHdeQqeXAgy9GcqCcJqhFDvlfu7t05zoe1LVOelInN/IyOJlsAYTTkDeqkadfOL1gDnfcUBi3EO7bY5UxMre2XfHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761040659; c=relaxed/simple;
-	bh=3rHdcF1gkowZn0MaD0PIbEANXOSfLSax16NhvoBYzXM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DNoWxWZRltmRZVHFb1OZaubdIgbIJFoil4GLhklGy7w8lXRFFg7g5DPv4F0c40KaNA9j+vqcDKFi4r0hhdMvYSGWkLBDj3OD6MGPA2w7z3OAFxVN82BerFqpzSNor3NwsytYumc5KApQ9FpEw6E63vL/nqjlSULdhCsbihyxruI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YGmBDpIj; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-33d7589774fso2931582a91.0
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 02:57:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761040657; x=1761645457; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7sC9oR3m4VtzSoHRqoSz+2ga+6oLEF4co52Cu8N8glo=;
-        b=YGmBDpIjP056d6WZYU91Do1Cm0YrE0JXvBnNaicvfvpXogZjB7adxKPyUlWaAKZBId
-         WN28oXhBt0Dt2nPAqOfXLjoPLmtiNLyXDlOnG44c4ky7YsfryEj6FZk+adfLf52ZQoK7
-         3XTwKYymIP1jGUiYfwTPAbjFJrY9b0AES1hFjbvYlA+l2i7zO2FSMzuDaKm0/oLD6QdE
-         XRPPm0VAcI8jVEh5pMdQ63KOM1st3sA5pixXyNlVVS7nwvVDPwwVFjbLvZg6N1xSlGrF
-         Cn2mMbA/DAF+Ml00DWGfdpEvBCGxHroJ2mV7Z247PMTNXx4JU2ljTZ69yIAqd504Wn3y
-         Zl1Q==
+	s=arc-20240116; t=1761040987; c=relaxed/simple;
+	bh=4X3PCzTUi+t6U3Xb46bofkEjcpM45wzgycTZWdrLVKI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MQsLr+5/2Ipb/O2heAKFkcafo3fxWqSHDNr71O/Xvp0knmeQWmJzqXYOx2QmZQD9gNqzOc+GVKVkMMqjB0SF/5GHsqL5X1xx6/2ED0AEexR7cRxjJ2vxXJ9/uLeSBwuz4EHXwIs5Oohbi52Ngwo4vvGJvXLvnXxr/Us5mEXVXHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cXuYgoaj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761040984;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dh9VBIDeD1YW+winnmo1WNn0Q66KIhY7uXc+kNmNSe8=;
+	b=cXuYgoajPhz83P9c1UQDrY6DeDB5bdiVpbybYPHO6tZ3Sb34l1Kz/1WT17DfVd2/jIB13I
+	wURZENSc6ymmiOh7fUoNRzfQpuARjrCljnh6qM+Pyz1o9MaXkNOPnw+BqjwIH1E/x3G9z8
+	6uBZ0hmfqqjycCDhhbb7qPilEG9ZWWM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-325-f0pReYQZNribh3cUxVdJvw-1; Tue, 21 Oct 2025 06:03:03 -0400
+X-MC-Unique: f0pReYQZNribh3cUxVdJvw-1
+X-Mimecast-MFC-AGG-ID: f0pReYQZNribh3cUxVdJvw_1761040982
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47108163eeaso26038405e9.3
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 03:03:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761040657; x=1761645457;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7sC9oR3m4VtzSoHRqoSz+2ga+6oLEF4co52Cu8N8glo=;
-        b=VFxdyUPFIvoR3s2OexO/t1eO1UA3M4sgP9c3I60WXPmaaK2q79jX2x4cTwY/A9RM9q
-         MpN7ZtSxOfgMmKJsARg5a6URlIfO77vNmEqJESZalXYui2J89d6/AmS/nc9mLn3z/MKP
-         JbJpKOMrbUvnACJUmKXut/VBXrNnniEB+1nZf0wf+XWcXGjfnGhga9ax5xF82fsoFxWy
-         PmQNSNawjYwjKmw/j8LnYuoIoPXCBsAqJMoOiE9jIH2AIVY1xC8wiKd44fkIDzVyzi8H
-         W7KTZlCrVUnldQ75VnPUtlhcYyibaP0PpLCzKNjNODuPBm89NyFd9B4h7IPIB+4qXEeT
-         QEHA==
-X-Gm-Message-State: AOJu0Yx9IJ65fke9zLWR7Vfu6lscdKU2bVZcuY+WOUshwMPus0aHQx+t
-	0mXOa3XssS+0rPy/cf6rBKe+7HRoSD54ymlKI0PSGyKcU1WZx+sHtX6HZh4/pxStW60=
-X-Gm-Gg: ASbGncsTrsTfXwAGFccrnA/UpCe9uENGSCCoBccY1gGhxVpHmqDpv2g5YB8BihkTXRk
-	iboyOpxnGKdAbiri+OiwdRC3u7cZ9tzXz/IrLVZcQdF/KPZ0QuDUIvxpNMOiaSrgXlOIawnkZdZ
-	G/pHWM7gR4lJgb5hK0pMsk65BGUPKcYg20dFxLCQs35g8iY/nPzzlAZV7PCQ9UFoM2XXBSABygy
-	JQahWM/uXO3VoKuVf9p6kzve7NHV395aaTUWg2WazlSVX/yiOVlZPKx28fT8VWd/FVpVWq0YOrr
-	2eSPUPw70fweM5BjiZ5W9n9Nlw4bvDnQc52Rt6DvJPRQTETRX5Sy9CaNoV5U4KHj9FyrwITf1Fo
-	oiarWuo9kz+tcwMlQdJwmFfwJroLdw+lshXOHhTtEwxKfreAKJSXENMEiXlOk9M1NHWhdD+GjqB
-	KQm3r+iGUAOX2obKo=
-X-Google-Smtp-Source: AGHT+IEglQrz1zljoE46soPg8HDaXlilgAqH/So7w07dITCXiNqVjLxHnBo8xfPWys0sYVgI3S7INQ==
-X-Received: by 2002:a17:90b:3fc6:b0:338:3dca:e0a3 with SMTP id 98e67ed59e1d1-33bcf87f8b8mr23748112a91.16.1761040657134;
-        Tue, 21 Oct 2025 02:57:37 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33d5df5c2eesm10634540a91.13.2025.10.21.02.57.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 02:57:36 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Dong Chenchen <dongchenchen2@huawei.com>,
-	Oscar Maes <oscmaes92@gmail.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net] net: vlan: sync VLAN features with lower device
-Date: Tue, 21 Oct 2025 09:56:53 +0000
-Message-ID: <20251021095658.86478-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.50.1
+        d=1e100.net; s=20230601; t=1761040982; x=1761645782;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dh9VBIDeD1YW+winnmo1WNn0Q66KIhY7uXc+kNmNSe8=;
+        b=em1oFzNop5M9/yssIW/Nqbkl66WIA98Uq9N3BgaT0j7FY/Ofd4B/3NTshDTr3bOLvn
+         vXbFX9DLVToD/tp0KkTpm3cKuUsJRKrYOQTqxRzrdbcDxnydqq7Fgh/iCWf3QlOg52Na
+         tBVUXA/e/dTZqojTdsJ+IYrhP7DzJb6TOoYaZOI4LzpIabk0y+yKOc05KZk0i6onxhBr
+         ORUT8I1UfnGq6Uq5QBdzOplRDcwwog5zuCmDskITVpN6pUVX+HxYnV1ZwYAUer+917uK
+         DBxvmsplPy+G4JkAjaqISQypjmDJs1PoPkF+iTSuLNvzjZ1xuvFqqOR2Xr78W3xliZva
+         XDrA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2B+u4kEMSSR+DbgSaRk+tfUmkG6Uj4W8fk+H4spJVfVW5NeOWJfsdqO7ww3bKeWHDH0zXv4c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0KzGU4Wh9OCR+imCJ3hQbvkIW6up/KR1u2IBujWYl6Q5H8Sh7
+	5JJERcVmwnns/74k4iP6POFVEQpMNvhsNpKk5QyunKi+KpfkVU/9JiARyXF3b8ycr3OJ5e7JDrk
+	IApQNNzLx/0ad6IBC0C2+jUO0IyoFDMHnOFixKdS7xhvLACzI1NjSG8EXIw==
+X-Gm-Gg: ASbGnct+2rFio/puxAGpeXzg3zJGXg7lULwVkBT6PEjx+zTF3kko22lgbCDAYmuw1tH
+	VkUYZLznu2HT6hAxXkj9xI/+QptPu45uERRBfNgzjGQglxTRp/y8lTcBipY8MQydKoXr/Vcs3pc
+	R0pZPUt5zlnFhi9RXyTJAZHzlN4NdzdH/HxK5rFovdoMILJPQN9dSM+rmcjcjeF3OWkXo4uIrnK
+	S8KNe2gJrAOARkRrFYWhv1UCPRCStzPteCJkzkW9vD9L0i/+eWxOp9sJ1mjJ+NAKfJ2a3aHfOMx
+	GY1Il0cp3ypbM1y4t73ph1QYyYQDhS9n7nE/hs5ePPQ+yIIh/m8RjEtMb7zCQQ9jrEFNxTTF1wU
+	02spGsFNoHG7DoPeaFg0jR8y9uuTWqdrPvvqPmMj2lM1Xk9s=
+X-Received: by 2002:a05:600c:4e89:b0:45d:dc85:c009 with SMTP id 5b1f17b1804b1-471178a236cmr113650945e9.10.1761040982364;
+        Tue, 21 Oct 2025 03:03:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFz0MIaxzEx8MqXNj7QakxLNajYTx+Vzevf5zqj7jjSvfZ+GyZLrKl3dgVva61Mp2iFS2TUNA==
+X-Received: by 2002:a05:600c:4e89:b0:45d:dc85:c009 with SMTP id 5b1f17b1804b1-471178a236cmr113650685e9.10.1761040981961;
+        Tue, 21 Oct 2025 03:03:01 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-471553f8a3asm218799785e9.16.2025.10.21.03.02.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Oct 2025 03:03:01 -0700 (PDT)
+Message-ID: <465d5a38-abee-40b4-9026-aefaf47a943c@redhat.com>
+Date: Tue, 21 Oct 2025 12:02:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v02 3/6] hinic3: Add NIC configuration ops
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Markus.Elfring@web.de, pavan.chebbi@broadcom.com
+Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ luosifu <luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>,
+ Shen Chenyang <shenchenyang1@hisilicon.com>,
+ Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+ Shi Jing <shijing34@huawei.com>, Luo Yang <luoyang82@h-partners.com>,
+ Meny Yossefi <meny.yossefi@huawei.com>, Gur Stavi <gur.stavi@huawei.com>
+References: <cover.1760685059.git.zhuyikai1@h-partners.com>
+ <b5b92e0bdc2bd399c56ee356a7b6593f3ddf69c2.1760685059.git.zhuyikai1@h-partners.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <b5b92e0bdc2bd399c56ee356a7b6593f3ddf69c2.1760685059.git.zhuyikai1@h-partners.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-After registering a VLAN device and setting its feature flags, we need to
-synchronize the VLAN features with the lower device. For example, the VLAN
-device does not have the NETIF_F_LRO flag, it should be synchronized with
-the lower device based on the NETIF_F_UPPER_DISABLES definition.
+On 10/17/25 10:30 AM, Fan Gong wrote:
+> @@ -368,12 +407,16 @@ static void hinic3_nic_remove(struct auxiliary_device *adev)
+>  	netdev = nic_dev->netdev;
+>  	unregister_netdev(netdev);
+>  
+> +	cancel_delayed_work_sync(&nic_dev->periodic_work);
 
-As the dev->vlan_features has changed, we need to call
-netdev_change_features(). The caller must run after netdev_upper_dev_link()
-links the lower devices, so this patch adds the netdev_change_features()
-call in register_vlan_dev().
+periodic_work unconditionally reschedule itself, I think you shoudl use
+disable_delayed_work_sync() here.
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
+> +	destroy_workqueue(nic_dev->workq);
+> +
+>  	hinic3_update_nic_feature(nic_dev, 0);
+>  	hinic3_set_nic_feature_to_hw(nic_dev);
+>  	hinic3_sw_uninit(netdev);
+>  
+>  	hinic3_free_nic_io(nic_dev);
+>  
+> +	kfree(nic_dev->vlan_bitmap);
+>  	free_netdev(netdev);
+>  }
 
-I’m not sure what the proper Fixes tag should be, so I’ve left it blank for
-now. If anyone has a clue, please let me know.
+[...]> @@ -406,6 +418,8 @@ static void hinic3_vport_down(struct
+net_device *netdev)
+>  	netif_carrier_off(netdev);
+>  	netif_tx_disable(netdev);
+>  
+> +	cancel_delayed_work_sync(&nic_dev->moderation_task);
 
----
- net/8021q/vlan.c | 2 ++
- 1 file changed, 2 insertions(+)
+Same here.
 
-diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
-index fda3a80e9340..4857fb0ee11d 100644
---- a/net/8021q/vlan.c
-+++ b/net/8021q/vlan.c
-@@ -193,6 +193,8 @@ int register_vlan_dev(struct net_device *dev, struct netlink_ext_ack *extack)
- 	vlan_group_set_device(grp, vlan->vlan_proto, vlan_id, dev);
- 	grp->nr_vlan_devs++;
- 
-+	netdev_change_features(dev);
-+
- 	return 0;
- 
- out_unregister_netdev:
--- 
-2.50.1
+/P
 
 
