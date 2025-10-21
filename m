@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-231283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D20CBF6F2D
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 16:03:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51489BF6F1E
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 16:01:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2400D188D8E0
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 14:02:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3349B3B1A20
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 14:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025B530F7F7;
-	Tue, 21 Oct 2025 14:00:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765F333A013;
+	Tue, 21 Oct 2025 14:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ECwFJ8/z"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="I+ERaNQe"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B922533CEBF;
-	Tue, 21 Oct 2025 14:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F58633B958;
+	Tue, 21 Oct 2025 14:00:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761055255; cv=none; b=aC3mfaGqZ9mlX3jyCQ+WtrN1w3Exm6fwQ82l3ALFU7eDkjGZV6dlmFdTBfLdVpheb5Y5XTrtI8YscNNYvjSk06UfLjhEWxiSj6mBK8HbaKpI3tMwAKfKtbs/ez1LaL6AtSVgefOG01/ZRcFXdEX0x926gXGxQ+6U3RQzcU7AYZY=
+	t=1761055251; cv=none; b=fASuYrDMcUbdT3d0T7OQoTE/DUZQWAcjdFcI940tlU4uORiRdOvbAe0za0735pAFlACmnJ9Qdwry2p9P3WzGIXTukxtgs0X1N6DfEI6gEOfjU1BEneoXg6Kl8VJNYUWLjdbEvGVl0gnFvCtMXmWuAB+yLWNe3BK+2/1xNHl8olw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761055255; c=relaxed/simple;
-	bh=gMIsksCQwqW2WOBKE1WoapjqbMI/EM72ZloxIN93b7I=;
+	s=arc-20240116; t=1761055251; c=relaxed/simple;
+	bh=Z4e+Rda2bYfjLOZMWdTklKDon1bvj8FeVYa8pl1efVc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cwd9hb9r+a2SED7ZvdSLG/SvMuLUHxyvNxDNYTisWceZ4oDD0NcCK+kmHLTp+5yxXZ7le993lkCsc+RXR5Q5MA3rEWIQQatmgqQ+xDSHp/Jc/9CHeE4zgNBLnMbtGPUIRfNszYERaeov2tWfiODV7DErxWbw/q2rRjWgH1i97f0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ECwFJ8/z; arc=none smtp.client-ip=113.46.200.221
+	 MIME-Version:Content-Type; b=Y+PqoIYbv5BXgoFRtkRY6f3pt6pZ2IXbVPzD4FdV8X/AIwMiCOId96xLp+nTMTfYswzj2HnaevWb1eMT4gelhIUh5e3+EAOvLyAYeIkhGeQrV+kdRfrMdKSW6pUIrtVByeZ1em/iTbh/soSfFWe3Enb3X86C82QCNmXD3mQkYvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=I+ERaNQe; arc=none smtp.client-ip=113.46.200.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=aaFhJKGeApZV5kHQ1f9y5s5XqI9oMdC5Ee/Le7sF7BY=;
-	b=ECwFJ8/zyMcNEApe4Dd6/mHOX4vTrIAMlxcshIoxD5e5O/v8lHq7/H2bON+ZMExJD3gq4axpH
-	LyEzYB79L8jV+e/i9yE7eahQ2lv+iNvxl3HX5fZYIyax8CQgwyil3xHDn6ei9gSyxvT2xXMZPnf
-	gRblb0uXpRLsA+m12NdytkU=
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4crYpX5t6GzRhR0;
-	Tue, 21 Oct 2025 22:00:20 +0800 (CST)
+	bh=opBLMIIAqFH/C9JqHJAmW6L6I2eQ3SJbotO5tszdkkw=;
+	b=I+ERaNQevgxnbk0VcY7vk1EyDWj5hZ8e1WqC3F+EYXUFBWEfYX+f4RpWr4qcmryBYiGgO82gy
+	p8ZZqwYykXuR7NKWF9a6YSdwqNSI8PN59ADJFyWyOquVbn0MLbJMo28Y0QIdZL5EZ+pmFc53jFp
+	ufGyDdtKdkbcSgMb0K02Yf8=
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4crYp047dgz1T4Kh;
+	Tue, 21 Oct 2025 21:59:52 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 24714180B5A;
+	by mail.maildlp.com (Postfix) with ESMTPS id 9B950140155;
 	Tue, 21 Oct 2025 22:00:45 +0800 (CST)
 Received: from localhost.localdomain (10.90.31.46) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
@@ -57,9 +57,9 @@ CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
 	<jonathan.cameron@huawei.com>, <salil.mehta@huawei.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<shaojijie@huawei.com>
-Subject: [PATCH net 2/3] net: hibmcge: remove unnecessary check for np_link_fail in scenarios without phy.
-Date: Tue, 21 Oct 2025 22:00:15 +0800
-Message-ID: <20251021140016.3020739-3-shaojijie@huawei.com>
+Subject: [PATCH net 3/3] net: hibmcge: fix the inappropriate netif_device_detach()
+Date: Tue, 21 Oct 2025 22:00:16 +0800
+Message-ID: <20251021140016.3020739-4-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20251021140016.3020739-1-shaojijie@huawei.com>
 References: <20251021140016.3020739-1-shaojijie@huawei.com>
@@ -74,60 +74,62 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
-hibmcge driver uses fixed_phy to configure scenarios without PHY,
-where the driver is always in a linked state. However,
-there might be no link in hardware, so the np_link error
-is detected in hbg_hw_adjust_link(), which can cause abnormal logs.
+current, driver will call netif_device_detach() in
+pci_error_handlers.error_detected() and do reset in
+pci_error_handlers.slot_reset().
+However, if pci_error_handlers.slot_reset() is not called
+after pci_error_handlers.error_detected(),
+driver will be detached and unable to recover.
 
-Therefore, in scenarios without a PHY, the driver no longer
-checks the np_link status.
+drivers/pci/pcie/err.c/report_error_detected() says:
+  If any device in the subtree does not have an error_detected
+  callback, PCI_ERS_RESULT_NO_AER_DRIVER prevents subsequent
+  error callbacks of any device in the subtree, and will
+  exit in the disconnected error state.
 
-Fixes: 1d7cd7a9c69c ("net: hibmcge: support scenario without PHY")
+Therefore, when the hibmcge device and other devices that do not
+support the error_detected callback are under the same subtree,
+hibmcge will be unable to do slot_reset.
+
+This path move netif_device_detach from error_detected to slot_reset,
+ensuring that detach and reset are always executed together.
+
+Fixes: fd394a334b1c ("net: hibmcge: Add support for abnormal irq handling feature")
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h | 1 +
- drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c     | 3 +++
- drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c   | 1 -
- 3 files changed, 4 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
-index ea09a09c451b..2097e4c2b3d7 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
-@@ -17,6 +17,7 @@
- #define HBG_PCU_CACHE_LINE_SIZE		32
- #define HBG_TX_TIMEOUT_BUF_LEN		1024
- #define HBG_RX_DESCR			0x01
-+#define HBG_NO_PHY			0xFF
- 
- #define HBG_PACKET_HEAD_SIZE	((HBG_RX_SKIP1 + HBG_RX_SKIP2 + \
- 				  HBG_RX_DESCR) * HBG_PCU_CACHE_LINE_SIZE)
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-index d0aa0661ecd4..d6e8ce8e351a 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-@@ -244,6 +244,9 @@ void hbg_hw_adjust_link(struct hbg_priv *priv, u32 speed, u32 duplex)
- 
- 	hbg_hw_mac_enable(priv, HBG_STATUS_ENABLE);
- 
-+	if (priv->mac.phy_addr == HBG_NO_PHY)
-+		return;
-+
- 	/* wait MAC link up */
- 	ret = readl_poll_timeout(priv->io_base + HBG_REG_AN_NEG_STATE_ADDR,
- 				 link_status,
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
-index 37791de47f6f..b6f0a2780ea8 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
-@@ -20,7 +20,6 @@
- #define HBG_MDIO_OP_INTERVAL_US		(5 * 1000)
- 
- #define HBG_NP_LINK_FAIL_RETRY_TIMES	5
--#define HBG_NO_PHY			0xFF
- 
- static void hbg_mdio_set_command(struct hbg_mac *mac, u32 cmd)
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
+index 83cf75bf7a17..e11495b7ee98 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
+@@ -136,12 +136,11 @@ static pci_ers_result_t hbg_pci_err_detected(struct pci_dev *pdev,
  {
+ 	struct net_device *netdev = pci_get_drvdata(pdev);
+ 
+-	netif_device_detach(netdev);
+-
+-	if (state == pci_channel_io_perm_failure)
++	if (state == pci_channel_io_perm_failure) {
++		netif_device_detach(netdev);
+ 		return PCI_ERS_RESULT_DISCONNECT;
++	}
+ 
+-	pci_disable_device(pdev);
+ 	return PCI_ERS_RESULT_NEED_RESET;
+ }
+ 
+@@ -150,6 +149,9 @@ static pci_ers_result_t hbg_pci_err_slot_reset(struct pci_dev *pdev)
+ 	struct net_device *netdev = pci_get_drvdata(pdev);
+ 	struct hbg_priv *priv = netdev_priv(netdev);
+ 
++	netif_device_detach(netdev);
++	pci_disable_device(pdev);
++
+ 	if (pci_enable_device(pdev)) {
+ 		dev_err(&pdev->dev,
+ 			"failed to re-enable PCI device after reset\n");
 -- 
 2.33.0
 
