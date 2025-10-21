@@ -1,141 +1,90 @@
-Return-Path: <netdev+bounces-231178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E801BF5FC8
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 13:19:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E7C0BF5FE3
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 13:19:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 22953353600
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:19:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A53F718C876D
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B03B1242D89;
-	Tue, 21 Oct 2025 11:17:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFC95235C01;
+	Tue, 21 Oct 2025 11:19:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142BB25228D;
-	Tue, 21 Oct 2025 11:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0112F3C20
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 11:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761045462; cv=none; b=jNvlRQWzmE/ZA6gFBnJ/wWbTESLkeHRHebeFI2vjoPE+gqMtK5fppi1pIBQcYeHQCrOsUu5zUiKTx8JNMD65PyMJ1Pat9d8m3cjVEdphbNFn/hhIUZu2Z4CfyVY7YyJKYprueAhW/vbdI08ihXfDM59wxizDsckC/6edTJDJsYg=
+	t=1761045545; cv=none; b=F2QbeAYSnoHV8v8TePJFtuHSvjjoJ9w2zTFtFQ3NmzyfeBRM5MTRt0X+bNtgR5PYMWVNQB775vNPvtwN7CCrNXNy6Kt6qX/+egKMKha1xD7YuiZCTz9uW7+8Q/E1MBaNx6KRb6jSummEDi2yTTOKFwCKMOaBtUbPtj0wyO/lmJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761045462; c=relaxed/simple;
-	bh=0jQAE9NJaD5rb2OX67iZAe1R26T25E+MjT4h6Zc+lBE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H4NRM4mHN8cqTRX6g6iURa+Vi2CK6fvZ/KGw+BrBXg79VmgSc+wRCCR1qC0rDptNO/eseQkmctiOxrcJ0mdMZIEZknFk0c5Zt+Qr5g5gzHKIrMpo0eciPFTwbAEyIeyo348Hi1wW54XRzdSqGVsa0Y7/LiUTvOVg5fUMGNH9ERU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vBAMy-0000000019n-1Vmt;
-	Tue, 21 Oct 2025 11:17:36 +0000
-Date: Tue, 21 Oct 2025 12:17:33 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v5 7/7] net: dsa: lantiq_gswip: harmonize
- gswip_mii_mask_*() parameters
-Message-ID: <218854236c97a152af071852bda83d02ff2dd918.1761045000.git.daniel@makrotopia.org>
-References: <cover.1761045000.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1761045545; c=relaxed/simple;
+	bh=wMfqNgwnFuW6kaOfH5o5fhpzsdLETYMsMm8MQ+qtlac=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=j0gF0ZNhA1g1jQUX37OfGSW7lS179NEO5wjCMXT6bnJg7uIzes6ynVLJK74V+QXInOjBqGa8CXr2DAkhQsboozL5h68PUBI1oaTt2P/73sPoA1YjZv16Xx068cUX/9caxBbkXbfCwtI45K26nuvCWiFhE+owl8YdxzlM8oBeuS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-430d4ed5cfcso99024035ab.0
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 04:19:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761045542; x=1761650342;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NNdyPlI5JNwn11Fal6tTcpVingDDGvbnySJfVkaupSQ=;
+        b=cKzmouhQ3izKFLHha5iW8PNxiXu9Jzc3OEgRrK9uoZc1qQ9IoKqCYcSv+exBxiX+UN
+         kiWsPuQe+BHIUmmF3lojU2XsFceXJIJabX/HznR4c5f0XbvqtfSxZdHzqDOmjN7OYOVF
+         +CKkIlXXwhxWUDU8YkKWAhNpgPxMlN14TIsYR0O6y9K7P38RwTwbGmoi4RMa1YC1JXTC
+         3d6MuLstjZdnLJN3AZuCWvES6Wg296RK8jzw3yHz5h+gi53PMjQqGV66I/N717nKXS6t
+         JjsMkZsnS0mrGkCY9+igrHtqNgspdgcM6Ly+zaHwu34KftEdJRbrJlH7+S4y6M8onO6Q
+         tFMA==
+X-Forwarded-Encrypted: i=1; AJvYcCXGWqGyCN8//61KOjw+zDz/gN6indf8dhnQ/DFeWXevdIosf6nKaKiEb+/UgPlFXIrlcUGAmp0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsNXB3+JzcTdNBmT5L60LqgLOTrbRc+3ASl7DY2+NphacTs0L6
+	zlPrmbaD0Vhc2sATyB7WbzdSI9CY+02NkJYBDYE7w+N0b/DtYhr8sLUs6llCUFCaRmOa7UZsExE
+	AEo5+S7Jzok6qtUznjNRaoXNJ9vnQWIWlpNWstjWo/1Ee1yh03pcjwJ4ZSew=
+X-Google-Smtp-Source: AGHT+IEcIo1pO4xDhDquoKwxmVbPrU03oJXllEdu6f5jSLQeJz66ctdLZISCA/3D47hgXamRzMXq0eAzq6GenTwToWEorDdtJPHH
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1761045000.git.daniel@makrotopia.org>
+X-Received: by 2002:a05:6e02:1b02:b0:430:bf89:f7f7 with SMTP id
+ e9e14a558f8ab-430c524fb13mr270754915ab.13.1761045542520; Tue, 21 Oct 2025
+ 04:19:02 -0700 (PDT)
+Date: Tue, 21 Oct 2025 04:19:02 -0700
+In-Reply-To: <jms5wjabuhoohobldv4zzfa6gurpnbw5xb5ejeha7md4z7atpj@r5b7mk5mn4n3>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68f76c26.050a0220.346f24.0014.GAE@google.com>
+Subject: Re: [syzbot] [virt?] [net?] possible deadlock in vsock_linger
+From: syzbot <syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, sgarzare@redhat.com, syzkaller-bugs@googlegroups.com, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-The 'clear' parameter of gswip_mii_mask_cfg() and gswip_mii_mask_pcdu()
-is inconsistent with the semantics of regmap_write_bits() which also
-applies the mask to the value to be written.
-Change the semantic mask/set of the functions gswip_mii_mask_cfg() and
-gswip_mii_mask_pcdu() to follow the regmap_write_bits() pattern.
+Hello,
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/dsa/lantiq/lantiq_gswip.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-index 248323524166..38f7f6352e8d 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
-@@ -120,7 +120,7 @@ static u32 gswip_switch_r_timeout(struct gswip_priv *priv, u32 offset,
- 					!(val & cleared), 20, 50000);
- }
- 
--static void gswip_mii_mask_cfg(struct gswip_priv *priv, u32 clear, u32 set,
-+static void gswip_mii_mask_cfg(struct gswip_priv *priv, u32 mask, u32 set,
- 			       int port)
- {
- 	int reg_port;
-@@ -131,11 +131,11 @@ static void gswip_mii_mask_cfg(struct gswip_priv *priv, u32 clear, u32 set,
- 
- 	reg_port = port + priv->hw_info->mii_port_reg_offset;
- 
--	regmap_write_bits(priv->mii, GSWIP_MII_CFGp(reg_port), clear | set,
-+	regmap_write_bits(priv->mii, GSWIP_MII_CFGp(reg_port), mask,
- 			  set);
- }
- 
--static void gswip_mii_mask_pcdu(struct gswip_priv *priv, u32 clear, u32 set,
-+static void gswip_mii_mask_pcdu(struct gswip_priv *priv, u32 mask, u32 set,
- 				int port)
- {
- 	int reg_port;
-@@ -148,16 +148,13 @@ static void gswip_mii_mask_pcdu(struct gswip_priv *priv, u32 clear, u32 set,
- 
- 	switch (reg_port) {
- 	case 0:
--		regmap_write_bits(priv->mii, GSWIP_MII_PCDU0, clear | set,
--				  set);
-+		regmap_write_bits(priv->mii, GSWIP_MII_PCDU0, mask, set);
- 		break;
- 	case 1:
--		regmap_write_bits(priv->mii, GSWIP_MII_PCDU1, clear | set,
--				  set);
-+		regmap_write_bits(priv->mii, GSWIP_MII_PCDU1, mask, set);
- 		break;
- 	case 5:
--		regmap_write_bits(priv->mii, GSWIP_MII_PCDU5, clear | set,
--				  set);
-+		regmap_write_bits(priv->mii, GSWIP_MII_PCDU5, mask, set);
- 		break;
- 	}
- }
-@@ -1501,7 +1498,7 @@ static void gswip_phylink_mac_link_up(struct phylink_config *config,
- 		gswip_port_set_pause(priv, port, tx_pause, rx_pause);
- 	}
- 
--	gswip_mii_mask_cfg(priv, 0, GSWIP_MII_CFG_EN, port);
-+	gswip_mii_mask_cfg(priv, GSWIP_MII_CFG_EN, GSWIP_MII_CFG_EN, port);
- }
- 
- static void gswip_get_strings(struct dsa_switch *ds, int port, u32 stringset,
--- 
-2.51.1
+Reported-by: syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com
+Tested-by: syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com
+
+Tested on:
+
+commit:         6548d364 Merge tag 'cgroup-for-6.18-rc2-fixes' of git:..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1534c3cd980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f3e7b5a3627a90dd
+dashboard link: https://syzkaller.appspot.com/bug?extid=10e35716f8e4929681fa
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=11a90d2f980000
+
+Note: testing is done by a robot and is best-effort only.
 
