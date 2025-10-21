@@ -1,66 +1,61 @@
-Return-Path: <netdev+bounces-231423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B710ABF92DD
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 01:07:53 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7C59BF92F2
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 01:10:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 323FC4E43D6
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 23:07:52 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 750313478B2
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 23:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35893292938;
-	Tue, 21 Oct 2025 23:07:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85938298CB7;
+	Tue, 21 Oct 2025 23:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qKxnu4tB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ss19cS+T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E2915CD74;
-	Tue, 21 Oct 2025 23:07:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532E515CD74;
+	Tue, 21 Oct 2025 23:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761088068; cv=none; b=WdEFZglJ5i2rZzRaJLTVwYYb3lPmm8zbt1CPzMLMkyVmFvqGZm8Alxk4/Tu3owMGBJpwtjdp6MESe8Prndnn0RuoFr/2qicIuaN+0kbn5XMglznAOP6R4uTJ2z4VWST0KuFpBOVjpmHg8Ak8vxCHKJLsxoRcmmQsI5ruif8rn5g=
+	t=1761088208; cv=none; b=R/5X/jUwpdcQjXZUd66Dl42r6JceCznT7qnH09thJ2Q/qjXNS4PIr9My4qoLqKbK6RjosdrP+6+VU4R32ziRZPSrHPLuIA0GtKMtRreZtDzniQ8bgdOYjOAnH75gE7kYT4EZfOE+ggVHEgq6mk9wZcfEbMKDKfoU5fXNKM2wVnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761088068; c=relaxed/simple;
-	bh=pyMV3cdwE0Pa3g75ct4gXzBftCoQzFcqhaO3cwgS6tU=;
+	s=arc-20240116; t=1761088208; c=relaxed/simple;
+	bh=NGV1UzFE2Uh7tl2QQ+zFh/mVjQTfDNAfn+ezZJjyUVw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oYyn53uYhJPm6wc2gDQGZKJw+u3GQTYpMIvWgt+Ff768HARFFwC5XMECWzlVxkkVtObMVhwTIbH4XJUMbZqWGeltoqO2gUefcNdt1MS/Dk+qfzuwT5b36HpzzdS54WXHBlA7P8eHC7i+BJ1v+iMzqvzzN71vgOFo1BcmaQAmO94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qKxnu4tB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE225C4CEFF;
-	Tue, 21 Oct 2025 23:07:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=EbNjnFybvkVYBh1S2/MKV8QORrtGSbG6UjbGWAKWb53sT7u4bY/SPr961NRTUEpBsbGBS6fGATzgvucwLeWn7Tk0EOOVZEk93kmCXEdgvO8Ugg1EQC5P6r//NqdTDb96crAJSkwWIXV+6d03rG4UuVyWgP4hoikAGz/iS0+FyyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ss19cS+T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C25CC4CEF1;
+	Tue, 21 Oct 2025 23:10:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761088067;
-	bh=pyMV3cdwE0Pa3g75ct4gXzBftCoQzFcqhaO3cwgS6tU=;
+	s=k20201202; t=1761088207;
+	bh=NGV1UzFE2Uh7tl2QQ+zFh/mVjQTfDNAfn+ezZJjyUVw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qKxnu4tBvDWczzaNbMvL6MgO7srWwr2R2NWK6PQ29OXfBHnL0Q75w1gb+iIh06ldb
-	 q9jnd7SL+AJc1RyM+V7OJogymmCcOo77oGK0CirceecroybbTZPjOJ9uy6W8pgiE1a
-	 zb75gBm8GMSnkXB0VvCeueLXtBgKGIf6mKuT+XyUAIT6DUV0uh4CML1VPM20QqJrm0
-	 ObBr7vdEhamOW5+93LG5opwSlhKO/b4FmQaVi0A+xhgq+enOS7/HMAgomNCYzpGU/X
-	 Ho59UWkBFqmGnAj5AwUxMpkNCOiqrOJQufLjNDMVMIqH0cO9+kYMn+iNvKTVTee/IJ
-	 CHupcw3yTd+0A==
-Date: Tue, 21 Oct 2025 16:07:45 -0700
+	b=ss19cS+TG3YX6h+4SiNY/TdEzix8LEKDm+eP/Fma8qH/+T1Pp9SzlQR4ZBzAszWs4
+	 UheV2tXS+F8OF3nieb0ws5zkd+bCQIFo9ipPIaHqwz4zZK4tX+33rOVLwhr9gtbYd+
+	 7qri9sW8bQb5uH1ImpLxU/a/gZ+Gv7rSYgZL3EFXxiZb6onZ3s7QDdI2vwjYdcTUac
+	 yPE5/AxjOMwSJGVtQP1dDgN0kfGG0zu3wD0cFGEMg9SWIW8UH1hiaOdvV+jukPUFJx
+	 dEhNlkDx2wP7KsiUgRIlTpMs9X18/mJGzssRCB8B7gvFlRdncesYbtMLBv5PXS6Yd5
+	 xn4wAkCfiIf7A==
+Date: Tue, 21 Oct 2025 16:10:06 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Alexander Lobakin <aleksander.lobakin@intel.com>, <netdev@vger.kernel.org>,
- <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Mohammad Heib
- <mheib@redhat.com>, Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: Re: [PATCH net-next v2 02/14] i40e: support generic devlink param
- "max_mac_per_vf"
-Message-ID: <20251021160745.7ff31970@kernel.org>
-In-Reply-To: <d39fc2bd-56bf-4c5b-99a2-398433238220@intel.com>
-References: <20251016-jk-iwl-next-2025-10-15-v2-0-ff3a390d9fc6@intel.com>
-	<20251016-jk-iwl-next-2025-10-15-v2-2-ff3a390d9fc6@intel.com>
-	<20251020182515.457ad11c@kernel.org>
-	<d39fc2bd-56bf-4c5b-99a2-398433238220@intel.com>
+To: Kohei Enju <enjuk@amazon.com>
+Cc: <aleksander.lobakin@intel.com>, <andrew+netdev@lunn.ch>,
+ <anthony.l.nguyen@intel.com>, <corbet@lwn.net>, <davem@davemloft.net>,
+ <edumazet@google.com>, <horms@kernel.org>, <jacob.e.keller@intel.com>,
+ <jiri@resnulli.us>, <linux-doc@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>, <sx.rinitha@intel.com>
+Subject: Re: [PATCH net-next v2 13/14] ixgbe: preserve RSS indirection table
+ across admin down/up
+Message-ID: <20251021161006.47e42133@kernel.org>
+In-Reply-To: <20251021040000.15434-1-enjuk@amazon.com>
+References: <20251020183246.481e08f1@kernel.org>
+	<20251021040000.15434-1-enjuk@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,49 +65,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 21 Oct 2025 13:39:27 -0700 Jacob Keller wrote:
-> On 10/20/2025 6:25 PM, Jakub Kicinski wrote:
-> > On Thu, 16 Oct 2025 23:08:31 -0700 Jacob Keller wrote:  
-> >> - The configured value is a theoretical maximum. Hardware limits may
-> >>   still prevent additional MAC addresses from being added, even if the
-> >>   parameter allows it.  
-> > 
-> > Is "administrative policy" better than "theoretical max" ?
-> 
-> That could be a bit more accurate.
-> 
-> > Also -- should we be scanning the existing state to check if some VM
-> > hasn't violated the new setting and error or at least return a extack
-> > to the user to warn that the policy is not currently adhered to?  
-> 
-> My understanding here is that this enforces the VF to never go *above*
-> this value, but its possible some other hardware restriction (i.e. out
-> of filters) could prevent a VF from adding more filters even if the
-> value is set higher.
-> 
-> Basically, this sets the maximum allowed number of filters, but doesn't
-> guarantee that many filters are actually available, at least on X710
-> where filters are a shared resource and we do not have a good mechanism
-> to coordinate across PFs to confirm how many have been made available or
-> reserved already. (Until firmware rejects adding a filter because
-> resources are capped)
-> 
-> Thus, I don't think we need to scan to check anything here. VFs should
-> be unable to exceed this limit, and thats checked on filter add.
+On Tue, 21 Oct 2025 12:59:34 +0900 Kohei Enju wrote:
+> For example, consider a scenario where the queue count is 8 with user
+> configuration containing values from 0 to 7. When queue count changes
+> from 8 to 4 and we skip the reinitialization in this scenario, entries
+> pointing to queues 4-7 become invalid. The same issue applies when the
+> RETA table size changes.
 
-Sorry, just to be clear -- this comment is independent on the comment
-about "policy" vs "theoretical".
+Core should reject this. See ethtool_check_max_channel()
 
-What if:
- - max is set to 4
- - VF 1 adds 4 filters
- - (some time later) user asks to decrease max to 2
+> Furthermore, IIUC, adding netif_is_rxfh_configured() to the current
+> condition wouldn't provide additional benefit. When parameters remain
+> unchanged, regardless of netif_is_rxfh_configured(), we already preserve
+> the RETA entries which might be user-configured or default values, 
 
-The devlink param is CMODE_RUNTIME so I'm assuming it can be tweaked 
-at any point in time.
-
-We probably don't want to prevent lowering the max as admin has no way
-to flush the filters. Either we don't let the knob be turned when SRIOV
-is enabled or we should warn if some VF has more filters than the new
-max?
+User may decide to "isolate" (take out of RSS) a lower queue,
+to configure it for AF_XDP or other form of zero-copy. Install
+explicit rules to direct traffic to that queue. If you reset
+the RSS table random traffic will get stranded in the ZC queue
+(== dropped).
 
