@@ -1,58 +1,62 @@
-Return-Path: <netdev+bounces-231469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12268BF9673
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 01:58:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13745BF966A
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 01:58:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E7D5E4FAF88
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 23:56:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75BA73AE06E
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 23:57:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E117E2C0F81;
-	Tue, 21 Oct 2025 23:48:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DF725A2A5;
+	Tue, 21 Oct 2025 23:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CUqqQujo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a9gW+0r+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B451C8611;
-	Tue, 21 Oct 2025 23:48:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8A6D515;
+	Tue, 21 Oct 2025 23:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761090481; cv=none; b=X3a5IzkZPmJ4OfJFv0CiSgvrqc3S5zGKeBu3LrRtJ7GCg+opkRb+/EyGPRzKp4afqfSj3shvYccF6P8P8xf7XSJoB6j9yQVDGBcW3doLdPaxNLrO844dB0FRLY36Q9zksCxyKt2a0zSldBKtYEtCBaNz4u1tdXlFm8SRrvJ8fWE=
+	t=1761090720; cv=none; b=nDqQwCcrJ6I8l4tHiUszV3MFsuMpCTtitZI56zWrN3jkAz+8WNlYPGI0QTAhhMN6Wc3uEqH577qy14fIRRt5vYgfB61BEynHUMJzWz1dAQsEJURB9mugSgZGf99hwpVrxytvfG4evRmv2kEEmVAj9+8USRSYFMOLtrQYq9joRHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761090481; c=relaxed/simple;
-	bh=+NdS7WesNl88CrHTIVbyWa+8GFooWUYwX7Uts1AzlH0=;
+	s=arc-20240116; t=1761090720; c=relaxed/simple;
+	bh=s5b8JsPws/6buYmUD3YxYk879o+RIT+ObwFiZmy82Os=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HlEZVko+0RKPUhSUQPNwQC4c/PZhGakM9lCcdZfY7sNQtSs2hvCcVxm1deeaiNWDw7OuYyyFhWn8PAJ6LuD12sKSMbt4KIwKEEib35MMhwY3y3urfOLmAbeA5HQXpx5HD8SVqzRjFj66QxJYMMudvMvK9JrzkLqzid84uYABdLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CUqqQujo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8479C4CEF1;
-	Tue, 21 Oct 2025 23:48:00 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qquhhpWFDjObY/lKb2TdzP5Zr25Cn7+44Wx3SY3naU2/6Rv96MlDkzfZoxwRLSnt2E1AfsTj1HSbYBtgdZt0p9XNjSdCwDuLBV0oKL5A0qZIG79GNbuGIE8Z7s4dsQ4SjcIc2K/oTvAc4Mm5IlTACDS9+g84Id9DzejtFculqNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a9gW+0r+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FA62C4CEF1;
+	Tue, 21 Oct 2025 23:51:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761090481;
-	bh=+NdS7WesNl88CrHTIVbyWa+8GFooWUYwX7Uts1AzlH0=;
+	s=k20201202; t=1761090720;
+	bh=s5b8JsPws/6buYmUD3YxYk879o+RIT+ObwFiZmy82Os=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CUqqQujo4WLrcCey0Ur1krzv9etZ8h/7HRI3aePzBl2fPYaAb3fV6vjuaCdzjHzUm
-	 97lmz5l58fBcQNruQcrpl1ceM5AW2nBXH9Gp4yE9MOYnloZUGLP99/PKkTG7+xkytz
-	 s8WXSyMEjmcokfYIOjBAFctkGw/dNxJ2m9x0kR0wuwqhHnMpwYDZfBcVS6yvl9bIZr
-	 g8qBjI/dR+DUWuuz8Judr6b4VlNba0cutYMGo2tbbBmchaGN1ELUc8UBwtPY8GOz3B
-	 VUZgiYYgGBvI0VZTQGTZ6XuIGuliqauOZRwdBBKkN9DSMOCk1hQSdJVKWl3tQrMWPM
-	 JMT5Gw39i62xA==
-Date: Tue, 21 Oct 2025 16:47:59 -0700
+	b=a9gW+0r+rbbLOsTDz/v9BsWaWaJR1tTj+cJCune9NLo0Qu1SY6hjmpF2tHSzW/O+w
+	 NvZ7nozEVaUsnYjvOeQ4gLz2p1C6LZecwtFtadpjsjpoHqgDfPwXPco22qEppx4e+7
+	 q3uF+XCKQHj1vW0AZpJ3T/doonQmx+lasdfa54GBP5hKQZR6LKwpWBfrUd9rSVvXYL
+	 7CCxyOSFVfg66dIoLyO2Y+RgxwMqadf29/AQrRgtR7n6OpHs1ZY5LFEUS7zm6EueE2
+	 zr59BGec8s9SjAVbzIk4LUHngELr3A6AzCtZ7+GSdjMBaumRgM3jCtgmS0O2+zN3Ek
+	 PJ5kbt7JHMXUw==
+Date: Tue, 21 Oct 2025 16:51:58 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
- Jason Gunthorpe <jgg@nvidia.com>, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>, Adithya
- Jayachandran <ajayachandra@nvidia.com>, Mark Bloch <mbloch@nvidia.com>
-Subject: Re: [PATCH mlx5-next] {rdma,net}/mlx5: Query vports mac address
- from device
-Message-ID: <20251021164759.2c6a5dc9@kernel.org>
-In-Reply-To: <20251016014055.2040934-1-saeed@kernel.org>
-References: <20251016014055.2040934-1-saeed@kernel.org>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <richardcochran@gmail.com>, <vladimir.oltean@nxp.com>,
+ <vadim.fedorenko@linux.dev>, <rmk+kernel@armlinux.org.uk>,
+ <christophe.jaillet@wanadoo.fr>, <rosenp@gmail.com>,
+ <steen.hegelund@microchip.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v4 1/2] phy: mscc: Use PHY_ID_MATCH_MODEL for
+ VSC8584, VSC8582, VSC8575, VSC856X
+Message-ID: <20251021165158.5cb0bd94@kernel.org>
+In-Reply-To: <20251017064819.3048793-2-horatiu.vultur@microchip.com>
+References: <20251017064819.3048793-1-horatiu.vultur@microchip.com>
+	<20251017064819.3048793-2-horatiu.vultur@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,11 +66,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 15 Oct 2025 18:40:55 -0700 Saeed Mahameed wrote:
-> Before this patch during either switchdev or legacy mode enablement we
-> cleared the mac address of vports between changes. This change allows us
-> to preserve the vports mac address between eswitch mode changes.
+On Fri, 17 Oct 2025 08:48:18 +0200 Horatiu Vultur wrote:
+> -	if ((phydev->phy_id & MSCC_DEV_REV_MASK) != VSC8584_REVB) {
 
-Not knowing what exactly a vport is I can't tell whether this preserves
-MAC addrs of reprs, the uplink, something else?
+I think MSCC_DEV_REV_MASK is no longer used after this patch?
 
