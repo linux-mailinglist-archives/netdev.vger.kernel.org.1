@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-231188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 771B3BF61E1
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 13:44:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CA0BBF6223
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 13:47:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2428A34F2F1
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:44:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B9FB3ADDA3
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:45:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A533321B9;
-	Tue, 21 Oct 2025 11:43:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C4B333748;
+	Tue, 21 Oct 2025 11:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gnhNCayn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pu1xDtJn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BBA32ED40;
-	Tue, 21 Oct 2025 11:43:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1EAA32E73E;
+	Tue, 21 Oct 2025 11:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761047039; cv=none; b=I2FPnOXXDjsFLLdy5uD1Cjwans1UnnoCthaHvv2OzFNnPc1uitqactF6gxmwzmB45n53KkHp5Ct5f7ZB65FAmla6lKZO9zde8Q5mHzoqfsPtTRYzOOs1J212gIAa72LGGTwJ9CpZLwnCjuMBXwmmjVLWtkzK/G2UuHMQXlDYVL4=
+	t=1761047050; cv=none; b=YXQ4WDSGi0n9N+xkMyll1v9sjsx38q5jrTPeVEQaax1zZt8texUksOFMES3BKoKiLClGA9hEpBHm4wZcAXnR6VXd+/9h8w47cZC5ui73EMYcoNK8UwrVb1/0PprUoHNBi4vOHn4y+vkHbXMoMhO3ZgMQ81oSoHe9y2WuQMco9c0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761047039; c=relaxed/simple;
-	bh=jSqJBpD/6utq5kB6r0uVAxUcKbpMKsXXqLyZPGG0ICk=;
+	s=arc-20240116; t=1761047050; c=relaxed/simple;
+	bh=LCe8V3QgmxQPWsHxmkO/HYNSTPj5l9bqGO1onywb9Xk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BCHksQ4OalDKUfpTyiS1eBJc9U4eMEb7J5uvY7CAA3xF/mx+WzFqMgg2gcn9K2MbviDTtdErNSc2d/LD5PWItDjlGf2kWlX/gfibOvglPD2t+qmcVQ5CCtr4akP0EUCpcTmXoqimAIn68NPYlEWoFHNcil2yPOz2H0r+YAkjla4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gnhNCayn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 377D4C4CEF1;
-	Tue, 21 Oct 2025 11:43:54 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ct2vH6AjtTg9wSmarZZSQjrABAcmD4G66mh7Wk/JQcYJI/Pub0VjZi+XLsH4jG2iAs4q7UWmqjcyF9UJrHW+ffQIHvJZUSr+7q3W7iK2Q79oD0jlESJn0Z1YAuUNK2UFWKK2tDhEm6fJoLUzUZzH2Wg4GiP4Y4htB56+TRIG6SI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pu1xDtJn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6104C4CEF1;
+	Tue, 21 Oct 2025 11:44:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761047039;
-	bh=jSqJBpD/6utq5kB6r0uVAxUcKbpMKsXXqLyZPGG0ICk=;
+	s=k20201202; t=1761047049;
+	bh=LCe8V3QgmxQPWsHxmkO/HYNSTPj5l9bqGO1onywb9Xk=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=gnhNCaynkM0wMfth/IMqriE+JgndxI+bTqUyj+wXWaqobttsBP32n1bOTm7T6UR7O
-	 PN9BUSUaCZZ60BWOQv/+qMuoUU6rILKgOZx8SRTf5o7mTZ4LhQr/4mbk3/BmR7aRth
-	 LCYOTa8bt9TOP2gTYSh7KHYkUkYOF5mAa2k8xRHJUdqKizvyfmeZj5c88hZ7d+Rk/X
-	 MldoAI/4/FIkLlrnzYs19iouUA5nf95oslSHHEhTGsKBtlqr6M9//LgmyyH+UaamP6
-	 0SS1+O/rMehuZk2WUDmQT2W+jJQWf3+lMaNzlpFtoT7tfHi4I+8Q96Ti2DaJLCLIhP
-	 gMcp/sDMFxMuA==
+	b=pu1xDtJnprXIvW9VopwRTIAuFxGl24Tp6PZAaZBFgrQX/pZ3bXAl2hOhKnTPcKtk+
+	 KZGgSPy3JeSpUQWGgj3S9grTqMDv2O6sUdkQeayHK06RzMjWRu/lFnQeZcE+aZE+tM
+	 48lDjuD+0UDdqnaP6BSeJg+g1Mo15KkOQhZYyDij6esAO8yTEuLtRt7F4mdzjsXJ72
+	 kXngMJev2z7TdiCNLHiMvHRTXjTxUN2tLLyoo9YfC305O9H2VLz6ej8hish4FJUOxK
+	 eH7jBdf5SK8mmX9K+nC05D2vRlJlKx0GSLAQyM80ibHAu4HTum3PBK6F19mKOdYjsC
+	 Zg31pBPEb1x1Q==
 From: Christian Brauner <brauner@kernel.org>
-Date: Tue, 21 Oct 2025 13:43:08 +0200
-Subject: [PATCH RFC DRAFT 02/50] nsfs: use inode_just_drop()
+Date: Tue, 21 Oct 2025 13:43:10 +0200
+Subject: [PATCH RFC DRAFT 04/50] pidfs: raise DCACHE_DONTCACHE explicitly
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251021-work-namespace-nstree-listns-v1-2-ad44261a8a5b@kernel.org>
+Message-Id: <20251021-work-namespace-nstree-listns-v1-4-ad44261a8a5b@kernel.org>
 References: <20251021-work-namespace-nstree-listns-v1-0-ad44261a8a5b@kernel.org>
 In-Reply-To: <20251021-work-namespace-nstree-listns-v1-0-ad44261a8a5b@kernel.org>
 To: linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
@@ -69,41 +69,37 @@ Cc: Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>,
  netdev@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
  Christian Brauner <brauner@kernel.org>
 X-Mailer: b4 0.15-dev-96507
-X-Developer-Signature: v=1; a=openpgp-sha256; l=930; i=brauner@kernel.org;
- h=from:subject:message-id; bh=jSqJBpD/6utq5kB6r0uVAxUcKbpMKsXXqLyZPGG0ICk=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWR8L3zzlsf+uqnpzEsJ7MEcDGpT1u65H7z1S6yw+yz+O
- Sblb1P5OkpZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTAG6yDSPD+ws3DSyXFBqvnLwk
- zOmO5UWlgnc3tB4etQlSkX/y6G++O8N/x3XG5+fNUw7pfqGk5rznMDvnuuV3Gww/15mX8TkfT73
- LAwA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=824; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=LCe8V3QgmxQPWsHxmkO/HYNSTPj5l9bqGO1onywb9Xk=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWR8L3xzpUw74sT9VzwZYXxT9R+KPFHO3D9ZJZLnoPoXO
+ f5tW1KXdZSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAExk1mWGP7x7zG8x/LdL3bji
+ doLlwp37ubctLuY+2vb9ieajYpamjTkMf8WUVhmoXBNrrn+06P82MTebamHOX/NtbZOu1/ft2mz
+ 2iQkA
 X-Developer-Key: i=brauner@kernel.org; a=openpgp;
  fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-Currently nsfs uses the default inode_generic_drop() fallback which
-drops the inode when it's unlinked or when it's unhashed. Since nsfs
-never hashes inodes that always amounts to dropping the inode.
-
-But that's just annoying to have to reason through every time we look at
-this code. Switch to inode_just_drop() which always drops the inode
-explicitly. This also aligns the behavior with pidfs which does the
-same.
+While pidfs dentries are never hashed and thus retain_dentry() will never
+consider them for placing them on the LRU it isn't great to always have
+to go and remember that. Raise DCACHE_DONTCACHE explicitly as a visual
+marker that dentries aren't kept but freed immediately instead.
 
 Signed-off-by: Christian Brauner <brauner@kernel.org>
 ---
- fs/nsfs.c | 1 +
+ fs/pidfs.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/fs/nsfs.c b/fs/nsfs.c
-index 648dc59bef7f..4e77eba0c8fc 100644
---- a/fs/nsfs.c
-+++ b/fs/nsfs.c
-@@ -408,6 +408,7 @@ static const struct super_operations nsfs_ops = {
- 	.statfs = simple_statfs,
- 	.evict_inode = nsfs_evict,
- 	.show_path = nsfs_show_path,
-+	.drop_inode = inode_just_drop,
- };
+diff --git a/fs/pidfs.c b/fs/pidfs.c
+index 0ef5b47d796a..db236427fc2c 100644
+--- a/fs/pidfs.c
++++ b/fs/pidfs.c
+@@ -1022,6 +1022,7 @@ static int pidfs_init_fs_context(struct fs_context *fc)
  
- static int nsfs_init_inode(struct inode *inode, void *data)
+ 	fc->s_iflags |= SB_I_NOEXEC;
+ 	fc->s_iflags |= SB_I_NODEV;
++	ctx->s_d_flags |= DCACHE_DONTCACHE;
+ 	ctx->ops = &pidfs_sops;
+ 	ctx->eops = &pidfs_export_operations;
+ 	ctx->dops = &pidfs_dentry_operations;
 
 -- 
 2.47.3
