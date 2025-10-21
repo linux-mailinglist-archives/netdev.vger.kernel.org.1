@@ -1,230 +1,212 @@
-Return-Path: <netdev+bounces-231356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 322A9BF7BCA
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 18:41:03 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0E01BF7C9B
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 18:53:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C19A919C3C62
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 16:41:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CC3314E9BC6
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 16:53:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23DCB1C8606;
-	Tue, 21 Oct 2025 16:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81FE32E11CB;
+	Tue, 21 Oct 2025 16:53:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="GjUZqukO"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="km/RNYBE";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ccJsJ1yw"
 X-Original-To: netdev@vger.kernel.org
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012011.outbound.protection.outlook.com [52.101.53.11])
+Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE2634A76E
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 16:40:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761064860; cv=fail; b=MYWkWsEPLI848G5TJaLWZhuMU6aXA3LcUBttLql+jzwFN1SUslAqKWB0soOTmU/rOprCcs2I4h2OcG84UD9Z9b9Vji6/xVb6jb3NdD0cvckZvHgTkOJ6d3tYDRzRKtmJIFtKNDEXli34FScumOMa6J0+KmbLLciorWQZFU9Zeuo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761064860; c=relaxed/simple;
-	bh=lXsDdl/2dZu9iMB+kDFzsD+S4VocNeO8zqSEZhQ6Cpo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=uGch8HJeWdBvrmkMy+o4/b/03E1n3casdvQ6zUXRbmZSFKFKyfewZ2z8hBNOt2pxnowp4wjqZwSQQrsnbks6qGNM1KllIPQgxwGBhU1XL+5YhnERCXoS74/wQc3jcsFj7NZvHkroetYp3PVBqgllBpzAc7Uh7UD9LDRxnq0Mecw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=GjUZqukO; arc=fail smtp.client-ip=52.101.53.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aUq+7makWO7DXVLuedK6zMnv+SqRVgVcbdZhoooNMDLJPB0fJo3aVL/2XFmUxjbhlpv5hIk2kJ5F0U2k4f2GwQHre5Y93PwXl9qn4GCJY6MuCFaSnAqEqwjLRFfPXAkfbdbFtWAWxcY372Lbwm2sk2ulcQFJJ4P2XCpGe3GAu32Z7I8k1yv4jjfVR4oKlH94NB8TvdLjI/5zSfquEReO1OmIPWLGq2vv1dnxWnmqiqmNGmmo0tFmrGF3/wgGg9DA9H+HTPcDQh/RvgVvtZRb8Jo986dXgMu+MjQhbzzBAUMLCPHdgBN2aB5VWRD5BccPu6cYaWxT6iqeR1KIl14AxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aA91SiT6SidBPOBnDprG/c2r4YXlYy4VnltKqhFg1pg=;
- b=Vm5Vtmoz8URv1K22q/EJJgxVT/KMc6ptUMJhwH6xmf5/opgHGSM2uen8Tu1XBrBM0VTu+gXu6IfKH30Fhj0+816Y5vksDNmQcUv4K8P+Jf4hH8UPzyAYWg1GCiwU5gG3F5P8PrTi6BBL20zYxzU9gG5PvNjGbMBckMgqspoViOciD4knLuPqHmUX34GSMhC8kBq/uEYvYc7zRpzmOkAnzmGGku2ZgDpwBXPQOJxjG8c1zXz3d6vfbB8A6UsFMmnO9Xve0e0dLFZ5dezsHEALJMBTfig0xe8PzwXCrcSs64gtmkMuKhAM4vaPvdBn09fu8NU73bdEDXngFEqRn1IRNg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aA91SiT6SidBPOBnDprG/c2r4YXlYy4VnltKqhFg1pg=;
- b=GjUZqukOb9SMTpoyL2d1pe8pAxpPwIoN9rRYCr+If54//rgopO3jn54XFqBkWxsb0ZTIqZDQG5M+sD6Gss8Nx7lc/a1eMkl+bpAhnsPnkNKDK3cbfwyvddOhWY143fI6ZR6eUcCueGP7OsbUNYhkAJCzsPFZRESSUAyTO+qbaxA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB6395.namprd12.prod.outlook.com (2603:10b6:510:1fd::14)
- by MN0PR12MB5761.namprd12.prod.outlook.com (2603:10b6:208:374::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.17; Tue, 21 Oct
- 2025 16:40:54 +0000
-Received: from PH7PR12MB6395.namprd12.prod.outlook.com
- ([fe80::5a9e:cee7:496:6421]) by PH7PR12MB6395.namprd12.prod.outlook.com
- ([fe80::5a9e:cee7:496:6421%5]) with mapi id 15.20.9228.015; Tue, 21 Oct 2025
- 16:40:53 +0000
-Message-ID: <53151eb0-5c1c-47a1-95bb-2a6654d5d230@amd.com>
-Date: Tue, 21 Oct 2025 22:10:42 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/4] amd-xgbe: add ethtool phy selftest
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
- Shyam-sundar.S-k@amd.com
-References: <20251020152228.1670070-1-Raju.Rangoju@amd.com>
- <20251020152228.1670070-3-Raju.Rangoju@amd.com>
- <ba2c0a35-eaad-4ae7-a337-b32cdf6323c6@bootlin.com>
- <9ba51a79-5a0e-42ab-90aa-950673633cda@lunn.ch>
- <563f3f1b-985f-4a9e-a32c-cb8e9b6af43a@bootlin.com>
-Content-Language: en-US
-From: "Rangoju, Raju" <raju.rangoju@amd.com>
-In-Reply-To: <563f3f1b-985f-4a9e-a32c-cb8e9b6af43a@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA5P287CA0088.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a01:1d8::9) To PH7PR12MB6395.namprd12.prod.outlook.com
- (2603:10b6:510:1fd::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52A0346E73
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 16:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761065580; cv=none; b=lJSeYK7M86ddX51uxL8LCw+WV9myJLLb1BkZoQh18oZK29q/VvDRF5nGlDxKBsj+Gkmp2zdU/jsLIWouL+Czxc8Axg/dAKcroPFgBfDhGVxb1MaxoeHC5yJvLCjHrp21CK739p+xuEb82Bhv6/YJ7BwnLbqKlRIR/D40tE8SR80=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761065580; c=relaxed/simple;
+	bh=4JfixZFPfVihXjKhMmwk1/yB7Zcjh++/ZO67fzTTx1Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qu90/6lK0Ta3CHNBbwReTKsZGgO2TtkRlK1aNRoi9J/685ewH2ECe5Y16rDpPnGXcZUw1Duwo/Yt+phlD2MmrrhvTCeSQafNF6mlfpD/QkXvERYa63+mqyhP2GZRYMAeqAH33tTHFHAL8Xpkcdkl4HNMz4chhotOQP5NMzf/vn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=km/RNYBE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ccJsJ1yw; arc=none smtp.client-ip=202.12.124.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id A10141D0000C;
+	Tue, 21 Oct 2025 12:52:55 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Tue, 21 Oct 2025 12:52:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1761065575; x=
+	1761151975; bh=4OaAX2xEk2neBRfluWdNHM2MvJ4wdhZGJvRC6TwttHQ=; b=k
+	m/RNYBEByaImddACRmAHv7AGdxhfa56a2TzMdu/QsxNvzQ/XMWX5zEAK+aMrMGyh
+	+CPEbDR+KrsRqAjbkXtrLIEN1cuDbnQBsCb5J6ZO9N1AvPHXfQD6dNsdJgjSrJhX
+	5iJwB5QklHMY1dDobknrWlSwxOiVCx+bnMh2/aVCDZq8JwSSL/6G36j5do42xh7U
+	tmiuYt71Daw8UML2lU0X0lBuutW8fqeOcVqsRKdrRmBU72VDrqXPV4nCEUwPXMaG
+	j0+YJ95nHhi4hxtBfBhMXKRVepPvBhJC2Df3d9D98FEb5JXSNphe/z0tQO/Vz99L
+	e2o/chII7jhOD3GD9iT6w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1761065575; x=1761151975; bh=4OaAX2xEk2neBRfluWdNHM2MvJ4wdhZGJvR
+	C6TwttHQ=; b=ccJsJ1ywZzXP1dQSDHdQFL3/f8qUro14zActJgHsYIUYUJssR9e
+	ipn+/lHAWzI1/b3rPOYdTJIQHglBcA368Fb1G16uiOhTdwOfPkArOLUssGr+Xq43
+	N2rKT5OtHbSdxwfSO5XvCtl/FxR05+EjYsuTo5tWVKl/tJn8/iGaRn6bkdlQzX+P
+	7xkp+vdtGu0SW0VsuimXEZgUUvcg6uzdY1RbjvwtzZloSlbsToQ/0HJjyCkm1bP+
+	w7oQby0fHhIeB46fUPRow9WunHKfi1IoLyEeIakSMxcb8neX+uqYFEGb1P9QklUz
+	IdJduMebJUub5vv9b7bhMEVv8+ZVvP3G+IA==
+X-ME-Sender: <xms:Zrr3aOMQdGsWNTsyIA5riM01XWw7vz7hkT_WWV6ooYeeIRkt8jwxCA>
+    <xme:Zrr3aGVuQUQcMn4b7bjvvz9AoJKllzGOUfT8WHehfQmgf-xJN8mhZNpbFWuSzm6Ce
+    IyPGFuPk061rdM2dCpky78rEuIwla4CbQst4Q3UROtaUrBl220BbFMy>
+X-ME-Received: <xmr:Zrr3aNz8JQQFOoa9PbVXdlve7DyLDeXTCh9nvJCaQ5bP9h3WXXsACfhqsStN>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddugeduvdefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedujedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+    dprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhmrghilhdrtghomhdprhgtphhtthho
+    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehjvhesjh
+    hvohhssghurhhghhdrnhgvthdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehl
+    uhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprh
+    gtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhu
+    sggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjihhrihesrhgvshhnuhhllhhird
+    hush
+X-ME-Proxy: <xmx:Zrr3aOPPYgTUvagRZ1f34p1zBe9hElKtroryGE391I1lArY-JETZwg>
+    <xmx:Zrr3aHp7yQLuilIS10mvwFWH6nXbowdVv-WXg7TGNPgXcdA_lX2I1Q>
+    <xmx:Zrr3aN_4soJVmBNFsZb4HnirwE5ExSqsoKW_QME-DyeSAAczkE4lng>
+    <xmx:Zrr3aF3zVfvwlyUI_MsrXbs0XzAqso7CMZ9yAyRtjkVGmQC2R4ZK2Q>
+    <xmx:Z7r3aJmP6COHdQTQOwuFGI26TXkkdgQ_h97RGA01QxInL6l2n_FDZDyf>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 21 Oct 2025 12:52:53 -0400 (EDT)
+Date: Tue, 21 Oct 2025 18:52:51 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bridge@lists.linux.dev
+Subject: Re: [PATCHv6 net-next 1/4] net: add a common function to compute
+ features for upper devices
+Message-ID: <aPe6Y86R0vqc3a-R@krikkit>
+References: <20251017034155.61990-1-liuhangbin@gmail.com>
+ <20251017034155.61990-2-liuhangbin@gmail.com>
+ <aPX8di8QX96JvIZY@krikkit>
+ <a2e85a2b-58b0-4460-ae7a-b1ea01e4d7e4@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB6395:EE_|MN0PR12MB5761:EE_
-X-MS-Office365-Filtering-Correlation-Id: ddd062fe-481d-4b94-f487-08de10c0999d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SjBaKy9Ea3lkWVRqUHdEN3F2M0lTckYrb21YNDRmT0paK1JnTm96WHpPWlMw?=
- =?utf-8?B?SWVDSFhCbHFJVVpMbXhGQ251RXdIa2NmRUh4Sjc5TFRxd0tubGt6b0VsREY4?=
- =?utf-8?B?V1hoblFMcjBFQnUwS1V5RlBENFRGdDRiT1RhTURoazRGckoxNTdnTXV2UENi?=
- =?utf-8?B?dDhkd0dJV1Y3Mi8zN2NLZlJkV205Z01OaFQ3bDYvL0ZBQnVYZ2RLS0t0TW9F?=
- =?utf-8?B?K2ZEbXV6cVAyT0k5OUFaNWJuc0pib3VvcUpaTlZYWnBoM0VzQzdLOUdoZVhF?=
- =?utf-8?B?OFB1c1p1WTNrRkdLTmdmc3ZuN1VweDRKTVU0b3dmR0JnRnc0eWhpdGF2eE5Y?=
- =?utf-8?B?cUdwMlJrcVE5UnBCZ2llM1dFR0huRDVnSlU3cWEwV1pXODhid2tYNU16MEcv?=
- =?utf-8?B?NDBnM2hBald5UXlLWUtvSXdKYXJteFA4MXErRVhFYVJ4QzdsbU8wZWRuVmFk?=
- =?utf-8?B?NkcwTU1lSE10ODZqUmk5SlI1V0ptUlBXOGk0bFB0elFwWmNnSnErUjRSY1Vr?=
- =?utf-8?B?VnVQb1BjV3NHemdWRElHQUJDWjdpa3RtVkkzYjlyUkJhY01uejBSa3VhSmtE?=
- =?utf-8?B?REpNb1BRU21TM1NhbzBJTzlzcnZsQ1lVcjB6bGJ6eVgrZHROQnRUZVNYVEVV?=
- =?utf-8?B?Y2FxMzJ3MzJVU1A5eWYyNlZIMExidUp0RStuKzgvclF3TEpGMTJZclRkNW42?=
- =?utf-8?B?Ky9IT0tHZzhRTlBieWRFaXBPc0psTVdyYmppcTMxZlZ1azV2azd3QkZIQzdX?=
- =?utf-8?B?ZDluVC9wcVpiaWNvWWdkSll4ai9oOVZhOTN4ZlIydFovMkxhbTVKVWRvNDlF?=
- =?utf-8?B?OFRYWjNsSVBlWGFVU0lXMHBFL2F1bE81WVpONWFnK21HSSsrLzlWSHMxNG9j?=
- =?utf-8?B?cU9vUnRzYWx0S1Z5WjlqTzQ0bzJOZXl5cFlORVpVaS9NS1FQSmxqSXpORDJo?=
- =?utf-8?B?VCtyVTN0S3NPRUJrZm5tWlJJWk11WlpTQ1dOV01Xb0lNT1EvQU1MSmd1Skdn?=
- =?utf-8?B?eDNhNWtPSjRuTU1WUDJwVDJKdUp5WldCQmltZ1FIdnpJZEFwS0g5aEZkOHlr?=
- =?utf-8?B?QTBjUFNoc0pTay9OOUIwdzREUkpwL3JVRnM1QTJ1RWJhVDlURnI2Ky9ER3NL?=
- =?utf-8?B?Y21rS0hja1dpYVhWTzAvTlhQdmR3akMvN1hKLzBRL2YwZjJLR0c1Q1U1clNt?=
- =?utf-8?B?OHNHeGNjQ1ovNjJLVmxDeGFkdG1tRkNiUjd1TkZrb0RHeVZDVnFvTGtxSlpl?=
- =?utf-8?B?a0ZEdHI1U0ZnR1E0a3ZqdmpZL3dNTkk5azY0eUtucmEwYUJ6V1I5S2NTaDh5?=
- =?utf-8?B?UFE0bC9ZZ1pCMHlkTEE1UGdlV0xKd2dFeUc5a1l2bzlUTVBCTFE1VHRsdnNt?=
- =?utf-8?B?RVRMUk1kL0tNdSs5YlA1SFVXUFoyeFFHWGxjWXRWbFdaZVpBNFpLRTZEdkhB?=
- =?utf-8?B?YWU2YitEc2x1VmVzeGlWZ1NkMTN5MnhhbURxUHI2a3BVcHdQd1hUT1A1T2ht?=
- =?utf-8?B?Q3gzWEQ2YXgwNTAwS0ZXbUg2TnZZZmtVWC9sTTZ1NEV1aWdtdTNPOWM5clBP?=
- =?utf-8?B?QjJJem9jWGpQcW0rWTk5NjBtN3JMcjlVN3h3MklvdXpPN1IxZFFSaS9hVVUv?=
- =?utf-8?B?YVk4Ym9yUWhXdm8rZ2IvSERtdzBDeDZoTmZ6aG8zQkg4bCtkOU1oSjExaFl0?=
- =?utf-8?B?SGlFaWRyZ05YalljVmpHV2w0RkNjS1J6QURiZWRwUGwxRHVqUUt3a1cybFhk?=
- =?utf-8?B?ZTkxV041bC8xWmJ3QWNtZG00NTZ6R0NLck9EdkhvZ3k4QllEMzZzeGJ3Y0ZZ?=
- =?utf-8?B?V2dWQ3FqOXRUNk0zMWRjZUVnR1BoMmRCNDExczVQSGtIemJVRmVEMnAyVVY5?=
- =?utf-8?B?b2pFVXJJa01uK2cwOUJZK2wxem0vYko0ckx0RGZ0aTZVRVE9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB6395.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?L3RPMWQ4MFNJOFd4d0xJdE1mbUNpb1lwWTAwT0RONmpRQXh6NUd5blBZK2kw?=
- =?utf-8?B?YjRSelBPT3ZGZjQ2emhZOThaRkRTa0ZvMFN0Z2xaNE14dkUrZnNHMjNYSi95?=
- =?utf-8?B?aXFoMTlWVWgrOGNqc1UwZkpTajM3aElrNnQ4NnUvcStlRTBmeVBXdytjbzgv?=
- =?utf-8?B?Nkk0WkNnZ00razlJTzUyUVNTSWZDdXVxcU0wNGNZWW54aDliYi9EQW1HSnIw?=
- =?utf-8?B?d0NGL3hWRVhDTlRLamkyUkJhMGRKVk8rVW9EVU83a0NVWTJqMGF5VjhBVUtK?=
- =?utf-8?B?NzVwakRBR0pMcFBDSDdKSVdONjR5aCt1WUhleG5kOEJGdmpvYlJYMG5PeE9Z?=
- =?utf-8?B?eWFGenVEdkxjakk2dE9BVjFrZ2IyTXdYWm0vaDF0MWNWWGJ6NnBXaHpWLys1?=
- =?utf-8?B?RXlYZWdmSWY4eTQ1TmVmQTlaRFVieTA2Z2pOSWQ2SFZtU2x3ZlJkN1BaZG8v?=
- =?utf-8?B?MDR2Q3hSSkIxbXVzc3NOd3FEVzNvNE1UcVJRajhaMG5hTW44ekJkeVVpN2hT?=
- =?utf-8?B?TFlHRHJYVEhFRmY3SWVPNW12WXlONjRFTXIzQnVqNzFkdzE4MjBSL21LNS9u?=
- =?utf-8?B?cWZWNy9MRityUjRkVC9JUXlmeDZIbS95Q0VEbW5kOEp5aWtuNitVRWVORnIw?=
- =?utf-8?B?VENDYzhpbmEvcStjNjRjZHhqR0ZzT2JGYURVdEdXRXRoMXd5NG5Jc2ZPcE5N?=
- =?utf-8?B?REdONm5NU3BGMDB0QTE4UEVRN0dFQysyRXYyZkRsblJBZkpscDZGWUI5OHlj?=
- =?utf-8?B?MW83RlAvTmFDblFTeTc2L0g5V29WaWMwemNLS1lJL0x2YjNUbEw2OSsrc09t?=
- =?utf-8?B?Y0MyZmFSaUk5Syt1MTBNeEtiaGhPTCtSSDdKWkRyOFZ0M3pxK3hhMWZwUThh?=
- =?utf-8?B?T0pjWkwrZVZRdVczcVFJOUFRSDlOWnZDRnJ4S3NhcHptTWswMXJDYXpRMU5l?=
- =?utf-8?B?NERPZVhqaU51TlV6eDRVSTQ3MU5uRE51ZGdPM2xoaFF4amFKZ25uNE0rbEtW?=
- =?utf-8?B?ak00ZHViSEc2cGQ3N0NuUHR2VTZHL3lPblZkSytiVWpiNkFGcHM4TUdTcXl5?=
- =?utf-8?B?cCs5UWhQSklVSWJqazVXTWVpZkJBRVFDLytnR3JRTFU1MHlaazg3VCtiMjNY?=
- =?utf-8?B?eCs3dlh3bW5jTGdLdWRxeUtvZFpmdkNRMXMyTWhtblZnZk1ISTU5c2lKQk41?=
- =?utf-8?B?dlZHaTdNbForb29KdUwwMDF3b0phOUdicXVTUE11aVlsbldQamJCZ1F5Y3lF?=
- =?utf-8?B?ZGw4NkR4Y0NhOU9rbWNkRlJUeUlRVmRobWRBbkR1OVA0RlZQWHpwK1ZPZ2pO?=
- =?utf-8?B?QlBzVnpYTGdYNzJCK2NidGkrZmdUZ1pxSzlGZmRQSnNsYWRWNVZ2eUw3RVhu?=
- =?utf-8?B?S2N3bDJpOU56b0hQaTh6aEc4R1B1V2UzRlgrcld5ZXJtbDhzclk4d1dqSEYw?=
- =?utf-8?B?T21YdFVEZXB1OVNYdUluVWU1UmFhOThZUU1ENUFzMW1vbkl4RUYyU1R1NEti?=
- =?utf-8?B?K0YwYUI4RWRQK2NXVTA5UDBZUnE2Tk5rWldrcjV4djQ3NG8vYzN3VHVOSklq?=
- =?utf-8?B?c0dPYTFicTdaNk1qUEM4TFNaUnhVTW1UM0JOKzR1bkRQQkZ5TE9oK2ZPblVQ?=
- =?utf-8?B?R3VvMDVIZXVTWm5HQ3lCcmxMZE83UHFrWlQwNE1jOTlieVRBOFpqVENHQi8w?=
- =?utf-8?B?UjlMNjIrc0FnMDBPeWJCck14Z2ZYUjRKVkhrTDBGSEJ2eXh0NlVuM2U2d3E0?=
- =?utf-8?B?WEcwUUJyOVlzZmtLZHZCYzgzU2NjeU1QWmVWLzY5R3g4Z0JDK0wzdmN6dDdM?=
- =?utf-8?B?TDFQamJMUjlLL3h5RDNzREJ2eVNCMUo1NG4xazJPekxyRFlGQURlWEpZamFI?=
- =?utf-8?B?cW1tN3NFSzIzb2taZTQyeVgwNmhMWHZoRmhsT1oraE42ZGxoZ2RyL1Vla1VP?=
- =?utf-8?B?cmoyaU5RcDRxN285bVhXVlNYSWUzWit1M24rd2c2R2d2M0d4VU5ORHFSMGla?=
- =?utf-8?B?OUpYZDltUG5yOUVwZER0eGk4VnZ6b1V3LytmVllKNjlDa1ZvcXp1Q3pzY2FV?=
- =?utf-8?B?bWlsZWpzRHlyOFRVaUcyOWRwRVQ3N3ZHRHg3MmRyNzlpSWpFTGw1REhQSTVs?=
- =?utf-8?Q?MslV9WzpP3mKyZpPd7F875ZCT?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ddd062fe-481d-4b94-f487-08de10c0999d
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB6395.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2025 16:40:53.5362
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ek69J8Voa8d7/Ay7bIAWTqw3flKQEnjsqcRfNvy0Or7YgunZROx+nPc2fIrM9MMID9SIa9oMWs/0Yt5ot1JR5w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5761
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a2e85a2b-58b0-4460-ae7a-b1ea01e4d7e4@redhat.com>
+
+2025-10-21, 10:46:22 +0200, Paolo Abeni wrote:
+> On 10/20/25 11:10 AM, Sabrina Dubroca wrote:
+> > 2025-10-17, 03:41:52 +0000, Hangbin Liu wrote:
+> >> Some high level software drivers need to compute features from lower
+> >> devices. But each has their own implementations and may lost some
+> >> feature compute. Let's use one common function to compute features
+> >> for kinds of these devices.
+> >>
+> >> The new helper uses the current bond implementation as the reference
+> >> one, as the latter already handles all the relevant aspects: netdev
+> >> features, TSO limits and dst retention.
+> >>
+> >> Suggested-by: Paolo Abeni <pabeni@redhat.com>
+> >> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> > 
+> > No objection to this patch/series, just a nit and some discussion below, so:
+> > 
+> > Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+> > 
+> > 
+> > [...]
+> >> +/**
+> >> + *	netdev_compute_master_upper_features - compute feature from lowers
+> > 
+> > nit: I'm slightly annoyed (that's not quite the right word, sorry)
+> > that we're adding a new function to "compute features" that doesn't
+> > touch netdev->features, but I can't come up with a better name
+> > (the best I got was "compute extra features" and it doesn't help).
+> 
+> I'm not the right person to ask a good name, and I'm ok with the current
+> one, but since the question is pending... what about:
+> 
+> netdev_{compute,update}_offloads_from_lower()
+> 
+> ?
+> 
+> As it actually updates (some of) the offloads available to the (upper)
+> device?
+
+(and the DST_RELEASE flags. at least the tso_max_* kind of fits into "offloads")
+
+I think we can keep the current name. It's more "it kind of bothers
+the pedantic part of me" than "annoyed", and we can't find a better
+name, so let's ignore the pedantic part. Sorry for the noise.
 
 
+> >> + *	@dev: the upper device
+> >> + *	@update_header: whether to update upper device's header_len/headroom/tailroom
+> >> + *
+> >> + *	Recompute the upper device's feature based on all lower devices.
+> >> + */
+> >> +void netdev_compute_master_upper_features(struct net_device *dev, bool update_header)
+> >> +{
+> > [...]
+> >> +	netif_set_tso_max_segs(dev, tso_max_segs);
+> >> +	netif_set_tso_max_size(dev, tso_max_size);
+> >> +
+> >> +	netdev_change_features(dev);
+> > 
+> > Maybe a dumb idea: I'm wondering if we're doing this from the wrong
+> > side.
+> > 
+> > Right now we have:
+> > 
+> > [some device op] -> [this new function] -> netdev_change_features -> __netdev_update_features -> ndo_fix_features
+> > 
+> > Would it make more sense to go instead:
+> > 
+> > [some device op] -> netdev_change_features -> __netdev_update_features -> ndo_fix_features -> [this new function]
+> > 
+> > ?
+> 
+> Uhmmm.... this function touches a few more things beyond dev->*features,
+> calling it from ndo_fix_features() looks a bit out-of-scope.
 
-On 10/21/2025 3:02 PM, Maxime Chevallier wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> 
-> 
-> On 20/10/2025 21:07, Andrew Lunn wrote:
->> On Mon, Oct 20, 2025 at 06:19:55PM +0200, Maxime Chevallier wrote:
->>> Hi Raju,
->>>
->>> On 20/10/2025 17:22, Raju Rangoju wrote:
->>>> Adds support for ethtool PHY loopback selftest. It uses
->>>> genphy_loopback function, which use BMCR loopback bit to
->>>> enable or disable loopback.
->>>>
->>>> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
->>>
->>> This all looks a lot like the stmmac selftests, hopefully one day
->>> we can extract that logic into a more generic selftest framework
->>> for all drivers to use.
->>
->> https://elixir.bootlin.com/linux/v6.17.3/source/net/core/selftests.c#L441
->>
->> Sorry, not looked at the patch to see if this is relevant for this
->> driver. But we do have a generic selftest framework...
->>
->>        Andrew
-> 
-> Ah ! And this also looks like this driver code. It seems to me that the
-> main diffence that the amd-xgbe selftest brings is the ability to
-> fallback to MAC-side loopback should PHY loopback fails, so they don't
-> 1:1 map to these, but we could consider extending the existing selftests.
-> 
-> Besides that it seems that the generic selftest are more efficient wrt
-> how they deal with PHY loopback, as they don't re-configure it for each
-> selftest.
-> 
-> I don't necessarly think this series should be reworked but this is
-> starting to be a lot of code duplication.
-> 
-> Raju, maybe you can re-use at least the generic packet generation
-> functions (i.e net_tst_get_skb() 
+True. And as Hangbin said, it's setting (so a bit more "update" than
+"compute", as you wrote above) values whereas ndo_fix_features is just
+returning a value.
 
-Sure Maxime. The net_test_get_skb() is currently not exported, let me 
-see if these can be re-used.
+So if we wanted to have this done by netdev_change_features, we'd
+probably need a new ndo, or some kind of flag to tell
+__netdev_update_features that this device needs the new function
+called. Well, we have netif_is_bridge_master, netif_is_team_master,
+netif_is_bond_master. But at this stage we don't know if update_header
+should be true/false. So ndo would be cleaner, but a lot
+heavier... it's probably not worth all this mess.
 
-Thanks,
-Raju
-
-> 
-> Maxime
-
+-- 
+Sabrina
 
