@@ -1,97 +1,86 @@
-Return-Path: <netdev+bounces-231060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95D59BF4490
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 03:40:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8612BF44E1
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 03:47:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAA9B18C0E56
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 01:41:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9188740514C
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 01:47:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8695A2472BC;
-	Tue, 21 Oct 2025 01:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B78142D9481;
+	Tue, 21 Oct 2025 01:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uqQyfjUP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LYWtAMwa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D91A246762;
-	Tue, 21 Oct 2025 01:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EDA92D6E5C;
+	Tue, 21 Oct 2025 01:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761010833; cv=none; b=RJbjoSM4aHE1K8RlPsdXProrRLAFngJbIlMS1eaXyRPH4EO1CDY6EledA6xVgvmXhuT6/jhGmc0vzEgjmbtsnu9/EUYbhoJCCf/ep9dQys+w49bQnAPEhqW3fr7OeRY2pB8/BcpoTy5iKER5SNE6rM3fPwyB24uS7+eMXvuR9O8=
+	t=1761011139; cv=none; b=YhUqHrO1E+B6yuw4KLJqL0m1vwIUgO4qXaqxWxVWnJexLuhW4D+5KqThLNTk30CVj3NprQ9y/6gDnCOSBm3riifK7uLW7fySG5qCfA4nc+GzO4jWtcGwfaQSKY0xWUTZdBzhxJHQe8HovO3IB68XiQpwncOd8ViGXTgT24/6r6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761010833; c=relaxed/simple;
-	bh=9j/NwYb2uzgrW6O++TqHgQBWqYvtL1IgF0kMNUqMjU4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DAvXEdw5ZjlOyIJ4gsjznQznGvy5g8EtxvlxPHhK/l7c2FBTI6bDRvmqlI/stM4q9JAGpMXFSq4nofPMaQCilPVjmpwhoTPHs4NRszxPdquZHzEfob/3lS5IvwvpxorVWcAv74qrFldpw47tQD8DIAoeaidd7IJ2KUj8rADTlXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uqQyfjUP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEACFC116D0;
-	Tue, 21 Oct 2025 01:40:32 +0000 (UTC)
+	s=arc-20240116; t=1761011139; c=relaxed/simple;
+	bh=h31EBvV8csPhsup4AJXlixdin0clBjDe0xtnGV4uVn8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Fo0t/lkj7cKk5jH3yjnLUwG3WpvFCgCU+P0pIZtfUXkotWANpJ71aomwml2bZCz+5rdmOM4qwjgRI9t6T361QWIv0MLiRYP8wQQsdwQPODOswwkg2QKXJz2POmzy4wkTwsxzW1g/ZSFzbIRIXhUBDVIwb8kpxBMxs96SzOXaM4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LYWtAMwa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27B5CC4CEFB;
+	Tue, 21 Oct 2025 01:45:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761010832;
-	bh=9j/NwYb2uzgrW6O++TqHgQBWqYvtL1IgF0kMNUqMjU4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uqQyfjUPz2hZIZv982wUpTSLXbDgsyCxU8/aHHx/nK6zBMtli9FTEGthXjqlI+zEl
-	 Snt2jabThVXqjUTWrBCC9l84XARiUeGklCrXoFJHTFmuAxWY1TRceAS72CFmvXl5Pm
-	 CFmCTIU4eYQwPtIDqdG6Y78Y6eRxPlIZUh2n0QGv0vT4dGEY+s/0gKW4RsbyVvS40C
-	 hWluhOoxuIglspB0iMM+zG9DdLrsK/1utfLkYTdmQ4os8ZnIgFyCAxtA97uwxR6mmR
-	 KrlIQWRetW9EqwgdVQx8OKSdbHSWlqOxFuR2cT0yKnAOY6zw6SiglLJA2Aspmh01Fs
-	 7QAy8+NdJ4LYQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE023A4102D;
-	Tue, 21 Oct 2025 01:40:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1761011139;
+	bh=h31EBvV8csPhsup4AJXlixdin0clBjDe0xtnGV4uVn8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LYWtAMwaRAP5wym98g8ezvDR6ZPHEt6rN9AQDcJW/Hunj7AIjTmpHNmqMt1zikfjF
+	 hWon9ZVrwPSsP4CwlErkVCDLxSUDl3Fz1XAHZCa7H2CtwuHtxiqmX+B53mleqz62fI
+	 47ygV3V0Q+TJKwjQkaVVGQKMf4tslY1T4ky8nOb8M8iAwYJ/1JLmlT2ijSz/bKOKqB
+	 3HmzNrLgTuUS0d7+CNeNjrwQGXWFQxFmLwr3HRvXs4/GF3b7AaFbBP8ss/ox9MzypD
+	 mAqhyT1ND7yZxIMF/6dMRkNK8Uol8Ljl/rpEvSJpM/unnE87edm+HLOK4XPhVo1+SO
+	 dAw2SAb7+gGew==
+Date: Mon, 20 Oct 2025 18:45:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Jian Shen <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
+ Jijie Shao <shaojijie@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Sunil Goutham
+ <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Subbaraya
+ Sundeep <sbhatta@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>,
+ Tariq Toukan <tariqt@nvidia.com>, Brett Creeley <brett.creeley@amd.com>,
+ Niklas =?UTF-8?B?U8O2ZGVybHVuZA==?= <niklas.soderlund@ragnatech.se>, Paul
+ Barker <paul@pbarker.dev>, Yoshihiro Shimoda
+ <yoshihiro.shimoda.uh@renesas.com>, linux-renesas-soc@vger.kernel.org,
+ Richard Cochran <richardcochran@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Vladimir Oltean <vladimir.oltean@nxp.com>, Simon
+ Horman <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/6] octeontx2: convert to ndo_hwtstamp API
+Message-ID: <20251020184537.711e3ebc@kernel.org>
+In-Reply-To: <20251017182128.895687-2-vadim.fedorenko@linux.dev>
+References: <20251017182128.895687-1-vadim.fedorenko@linux.dev>
+	<20251017182128.895687-2-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] s390/iucv: Convert sprintf/snprintf to scnprintf
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176101081451.484471.13334778110409476366.git-patchwork-notify@kernel.org>
-Date: Tue, 21 Oct 2025 01:40:14 +0000
-References: <20251017094954.1402684-1-wintera@linux.ibm.com>
-In-Reply-To: <20251017094954.1402684-1-wintera@linux.ibm.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, aswin@linux.ibm.com,
- twinkler@linux.ibm.com, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
- borntraeger@linux.ibm.com, svens@linux.ibm.com, horms@kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 17 Oct 2025 18:21:23 +0000 Vadim Fedorenko wrote:
+> +		if (!test_bit(CN10K_PTP_ONESTEP, &pfvf->hw.cap_flag)) {
+> +			NL_SET_ERR_MSG(extack,
+> +				       "One-step time stamping is not supported");
+>  			return -ERANGE;
+> +		}
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 17 Oct 2025 11:49:54 +0200 you wrote:
-> From: Aswin Karuvally <aswin@linux.ibm.com>
-> 
-> Convert sprintf/snprintf calls to scnprintf to better align with the
-> kernel development community practices [1].
-> 
-> Link: https://lwn.net/Articles/69419 [1]
-> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-> Signed-off-by: Aswin Karuvally <aswin@linux.ibm.com>
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] s390/iucv: Convert sprintf/snprintf to scnprintf
-    https://git.kernel.org/netdev/net-next/c/38516e3fa4ca
-
-You are awesome, thank you!
+You're adding quite a few extacks in this series.
+Drivers should generally used the _MOD() flavor of the extack helpers
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
