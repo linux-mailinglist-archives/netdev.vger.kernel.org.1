@@ -1,165 +1,133 @@
-Return-Path: <netdev+bounces-231124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FEA6BF57C3
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:25:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11D2ABF57E5
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:26:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7F49188829A
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:25:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C81C91890982
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0945328B67;
-	Tue, 21 Oct 2025 09:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D573732AAD1;
+	Tue, 21 Oct 2025 09:26:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Waxd1GKO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="noEdxz1c"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CACA246BD5
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D34328B67
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761038714; cv=none; b=W4kSm57S9rwxPKhAkIiMAq0TcrHp7a6OVnIleRGTU2upPAfyB+EVQ16pk6XRO0l/WPrBWRAt5I2DYDalBVM4Renw3LnPFfnIPEXIfwvj+14M+onUx6Ytii4+GKYClTp0uwmdYSZjcgJBwyHhWAoYdJ8oTHidZJpWmUpr8eewecM=
+	t=1761038766; cv=none; b=IKSd/70ugZOxHzJJwXB57aIK2Br9msPWUJjF32+gB7Mbo7q+Nwd3xht2xFhgueMc3kTCn4N/tkxzPPtRKaJRAK0sGpMQoL5bp2J8L6dlYJSuCl4qJgBRl7JetSHC1isGXqKHfiUFIlOa1jeBssbA3uPxv8ZPS2zbzr3vuEX+1gQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761038714; c=relaxed/simple;
-	bh=70fh7l0TLwEingT0Dlsm17GX58QH+efSGCknR2mPUfQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OOlBcxEj3OK1IkNbVMJdsPM9UUghBLcCW5cTQkngZ5df3C2eFXqPBSjPbh81biyW0d6Rsd47AOfES8astCVbt5230tsWDAw2mPSd9oH57r55u+pPsSWUckZM7p4LlcLxVESKc/y8zCoyVj3ioM73iAj2iFqkNJbOgsSl3Fr9KFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Waxd1GKO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761038711;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4RANMdE5VJt3ZJzx3yGMY3tj7r6cm2tCoc3fFUR1o9c=;
-	b=Waxd1GKOmZORm9wGxuuEenpLRd2wDC8mu12YYx9O64VnlQmArRyZP/38VnH+9QcmD1ejBF
-	wVVFwo9qQw+Gk8hULL+UHrAKCLqwUEFyhxfweH3nZtxRq7XGYlYiDDq4W2TTzyppgwI3+i
-	FDXLq/h0uoF/SAtrHp8q4asvx5CPbM4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-299-Uyz1ntC5MhmcCOSnszimYg-1; Tue, 21 Oct 2025 05:25:10 -0400
-X-MC-Unique: Uyz1ntC5MhmcCOSnszimYg-1
-X-Mimecast-MFC-AGG-ID: Uyz1ntC5MhmcCOSnszimYg_1761038709
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3ef9218daf5so6132189f8f.1
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 02:25:10 -0700 (PDT)
+	s=arc-20240116; t=1761038766; c=relaxed/simple;
+	bh=VFQphnGkoktZvUzEwKwCJ8sXqt24rjb9W6hVqumfQyA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VMoYER18stEv5NvFVSBIZ0ddxWnAH5IM3+xafdcxQdS4I8OsXOc/XY6OjsQDlFDioOLVgELPRLHaKTpcE3hwtM3Pv1cxJPwiCP3wL25B0QAbltqX6WsEuijeJOKa/tyrlnE7APv93R1xZ1DBnn4NQ900mM6XGdiV/n5PmbZ4Q2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=noEdxz1c; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-46b303f7469so42559625e9.1
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 02:26:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761038762; x=1761643562; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bOpWrFnzvrU8dTkKh9SzfT0djhjWURZWY8moqWPz71I=;
+        b=noEdxz1cmxgyCrbf3Wd6MWCQBkpKNuZl7HVtYdP3Y3ADUEPOGo/W4mv8fGrl1kwgzs
+         bF2CQSmwtzufVKYln5FMiHBQMBapwLx1+DDrJjaSyhC7Kez+WAI6iP4j2YvQmOllZmU7
+         1IvELMEK2Tcic7sajjCEp6mIlkYRnpjSUfJw24joMxXOVfhjeQZu1xiKCOm7cbzzUCLT
+         Mq/ls385ZSNy6/l/+Km18SBrMO777cinIWNAwFhtu9Z461iVlI1N6PHW7+JRQHINlgHc
+         3lpHy4tO7TTbHoShpmcBV2JXIe3ziQxhzpoWB+kqiDPbyrNEdbu3gLjbXLYHYIQ3FtDO
+         O2Dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761038709; x=1761643509;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4RANMdE5VJt3ZJzx3yGMY3tj7r6cm2tCoc3fFUR1o9c=;
-        b=FZGF18Jz9cZBEm3u5NoqF64iSjBd8jS9hx0NGi1XpuXqb89Gl+e5Nbbx8lgHbjefah
-         pmIQpcigJja6yWBcpwt/fwnNVjN7UNTcRVTSiMfiAPyOm4qz3W3rbVesag2rmMT7/uim
-         iOmyJPTTC+fnY4FXgdwlUeZSXbf4dRqstOEF4zabsCUkEKOnd8opQaTKNN8mR5CLqJyz
-         r27poEBIydPterQeaXuKqk6rpyzCtCSDgmdN8mT31DN43xn9Mu0dLI1NIlyLIfRvf0Qq
-         WOXvpau2669H9hzJtTY5920phA5jtUm3dtyDIVUNCZo9CafdKXlwX2bin31YW616pUIU
-         Mxvg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5J9htCBTN8MQkg9oyj9QEXYAn7O/tiAY07EXgHM7O50iuXma8iNp/viAVAnP2qm3XDsgg6MU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxf+2bxP+ohASPNhavBTZZiYpId0iNI2HPv/Bcl5XyipeDrZcbk
-	NsdZYigmrco/eh8KgycJCrg9O/TaGtiG7xtJBXk4XnSueE3NxTnJDS+4wClgCsZnnwdXHeJnLN1
-	h0RibNukI50nQoEi3fDndHmYQBH7/jDuCaecKZI88mUWXuPNjl9VwG85SaA==
-X-Gm-Gg: ASbGnctcoIWw/gXtNSRQAStxhtH6CQQLLbzZaLNBrxqjTCuruW5c1vPK5y+m/tcNgfA
-	FA0jzQGDOeAocd/fs34ndyyc4LekOZCuymafG+jaTgQbJa8PWGGqN97RUIqdIxEUbLGeVmd9CpP
-	CVFVSVdNzdBMiX4BrGYBUNdcL4IfKOMFJruyfyJ9ouUHJbk6+w1/jmZq0mY6WGcst73Y6/0+umG
-	tozts74jviu/dMbLcpLFCcV6AeXmjnK5HhyX2GE3+azkwhOlEcCg/UH8kK4Hc3X9/PAvE1/hOPM
-	hpzXQ6nRHq9SEehr8Dg13mUEgkE67j3OcydT0bXAa9x0624iR085NQavK5864ikDGQ6/woR5bX6
-	l5scUdxrJZgeeCb/gRk01YZFI+t/gP982b7zpIHW1nV2itcw=
-X-Received: by 2002:a05:6000:22c6:b0:3ec:db18:1695 with SMTP id ffacd0b85a97d-42704dc9395mr11530731f8f.45.1761038709182;
-        Tue, 21 Oct 2025 02:25:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEW/8VpN7+oRVVI2gacXOhu1lhYOkSBU8WbVYkhEZvqfdiTjdCOVwmyWkwuv1K6C+wnD9GcTg==
-X-Received: by 2002:a05:6000:22c6:b0:3ec:db18:1695 with SMTP id ffacd0b85a97d-42704dc9395mr11530698f8f.45.1761038708787;
-        Tue, 21 Oct 2025 02:25:08 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427ea5a0f88sm18692002f8f.7.2025.10.21.02.25.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Oct 2025 02:25:08 -0700 (PDT)
-Message-ID: <c2534ab3-a843-43db-9447-19954467e2ed@redhat.com>
-Date: Tue, 21 Oct 2025 11:25:00 +0200
+        d=1e100.net; s=20230601; t=1761038762; x=1761643562;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bOpWrFnzvrU8dTkKh9SzfT0djhjWURZWY8moqWPz71I=;
+        b=xBjoAzjPz2Z25K54xvpxKAR7OzGjWfGfp7hnc+VOZFOxAARu3oSVMoOqvv+y9GqKt0
+         MJwOxAwD+7zVdiuitPN3P0vhKi7PLzu75JKZ5cG3GOxXxOM7S4JqLPsKkVaIgUuRpndj
+         0AIcqwdqvPJn+ILPgaN4kngWbm00tGFPkkU4J0n9xJaIPmYl7T6h+6AK3hCxyb/YxSYt
+         ow+amRQ4eKX8TmrJMqOVu3p5hzuU9rsKzFPfpivZ3uOnQCns1I7jBgb61i9l7ac2IRmm
+         gHg+eYVRl9RTtjlSj34CCK75dmEWX1Z3pJE9B67w/x4KtQqRxQuvxP1/a64FzQrHLl5I
+         /5bw==
+X-Forwarded-Encrypted: i=1; AJvYcCX7MGch8uZwjFxorCBtRozzS/h+dU+OGTthqVHYxrgjmLVekU1BE/jt2wBL/plfUmbbz1BdGvw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqYZNgpZFfOrc54cyiSTUHvfaoTpZng0k1Z8PdUYU7/CyL2BCX
+	z1vk2h/ftuMinM2O4hJ6iPhStttVvPL5PU0EsOQzvDRLb7+YgzXAXjq5
+X-Gm-Gg: ASbGnctgYmjzV/OxiXFRHQKjORo1j3ytJj3ML1ihGQfAqy+eP79CjHL3YD+WtmiSWyG
+	sAFfy4OBghzBExiR4H0j/ftXwozLA+8iu9ZpFR9pRQ6DgFsjN+dumF3ufHfC+ZNdR5aGju3U1hh
+	D8GkG9TY4yR7ePGRdSs1h53FKvRxe2SGRXpt78Dy1Q+v0ON6XOQedkTI186KawwgBC1CnAIp8Mm
+	IaEyaR2rag8UHxoRFn7d8HG6tpPFqVmGzkn1UurcTVXgV8UoQsBX71y0at1AMSC1ap70LfM9atR
+	z4RWM02jTnoWlZyKKx8PBLRv8n5oK9Iax80nOCNaDCpHIuUJrbib3x/KIw3RhewAp/nEQyf7POG
+	6c8fZ7GQO+EyverEnACyiy+sxWZRI2XRVyzzrzQ8XmFspfb3GFBeGWufJOWuiYNFlTW1eT7aezg
+	IgN6kPEbQVm5xofAqpVIyml9DgkL+T6dUkh7BAdmPWaUmsqa378norccIVEtfhp1I=
+X-Google-Smtp-Source: AGHT+IHG9qJps3XQWPNYA4OPAfHFr1juDXQi4VNXIDoZlFbccTY3/HGAyaSBPRBTf6Mk1q4iNuNdsg==
+X-Received: by 2002:a05:600c:818f:b0:46f:b42e:e361 with SMTP id 5b1f17b1804b1-47117931c89mr109559365e9.41.1761038762110;
+        Tue, 21 Oct 2025 02:26:02 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427ea5a0ec2sm19195113f8f.3.2025.10.21.02.26.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Oct 2025 02:26:01 -0700 (PDT)
+Date: Tue, 21 Oct 2025 10:26:00 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Kees Cook <kees@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, "Gustavo A. R. Silva"
+ <gustavo@embeddedor.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v3 1/9] net: Add struct sockaddr_unspec for sockaddr of
+ unknown length
+Message-ID: <20251021102600.2838d216@pumpkin>
+In-Reply-To: <20251020212639.1223484-1-kees@kernel.org>
+References: <20251020212125.make.115-kees@kernel.org>
+	<20251020212639.1223484-1-kees@kernel.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v02 2/6] hinic3: Add PF management interfaces
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Markus.Elfring@web.de, pavan.chebbi@broadcom.com
-Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- luosifu <luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>,
- Shen Chenyang <shenchenyang1@hisilicon.com>,
- Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
- Shi Jing <shijing34@huawei.com>, Luo Yang <luoyang82@h-partners.com>,
- Meny Yossefi <meny.yossefi@huawei.com>, Gur Stavi <gur.stavi@huawei.com>
-References: <cover.1760685059.git.zhuyikai1@h-partners.com>
- <8ad645360ce86569ec9c2c6532441352c06bc44a.1760685059.git.zhuyikai1@h-partners.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <8ad645360ce86569ec9c2c6532441352c06bc44a.1760685059.git.zhuyikai1@h-partners.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 10/17/25 10:30 AM, Fan Gong wrote:
-> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.h b/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.h
-> index 78cface6ddd7..58c0c0b55097 100644
-> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.h
-> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.h
-> @@ -39,24 +39,25 @@ struct hinic3_pcidev {
->  };
->  
->  struct hinic3_hwdev {
-> -	struct hinic3_pcidev        *adapter;
-> -	struct pci_dev              *pdev;
-> -	struct device               *dev;
-> -	int                         dev_id;
-> -	struct hinic3_hwif          *hwif;
-> -	struct hinic3_cfg_mgmt_info *cfg_mgmt;
-> -	struct hinic3_aeqs          *aeqs;
-> -	struct hinic3_ceqs          *ceqs;
-> -	struct hinic3_mbox          *mbox;
-> -	struct hinic3_cmdqs         *cmdqs;
-> -	struct delayed_work         sync_time_task;
-> -	struct workqueue_struct     *workq;
-> -	/* protect channel init and uninit */
-> -	spinlock_t                  channel_lock;
-> -	u64                         features[COMM_MAX_FEATURE_QWORD];
-> -	u32                         wq_page_size;
-> -	u8                          max_cmdq;
-> -	ulong                       func_state;
-> +	struct hinic3_pcidev         *adapter;
-> +	struct pci_dev               *pdev;
-> +	struct device                *dev;
-> +	int                          dev_id;
-> +	struct hinic3_hwif           *hwif;
-> +	struct hinic3_cfg_mgmt_info  *cfg_mgmt;
-> +	struct hinic3_aeqs           *aeqs;
-> +	struct hinic3_ceqs           *ceqs;
-> +	struct hinic3_mbox           *mbox;
-> +	struct hinic3_msg_pf_to_mgmt *pf_to_mgmt;
-> +	struct hinic3_cmdqs          *cmdqs;
-> +	struct delayed_work          sync_time_task;
-> +	struct workqueue_struct      *workq;
-> +	/* protect hwdev channel init and uninit */
-> +	spinlock_t                   channel_lock;
-> +	u64                          features[COMM_MAX_FEATURE_QWORD];
-> +	u32                          wq_page_size;
-> +	u8                           max_cmdq;
-> +	ulong                        func_state;
+On Mon, 20 Oct 2025 14:26:30 -0700
+Kees Cook <kees@kernel.org> wrote:
 
-The above is a nice way to hide a single line addition. Please either
-avoid the reformatting entirely (preferred) or do the re-indentation in
-a separate pre-req patch.
+> Add flexible sockaddr structure to support addresses longer than the
+> traditional 14-byte struct sockaddr::sa_data limitation without
+> requiring the full 128-byte sa_data of struct sockaddr_storage. This
+> allows the network APIs to pass around a pointer to an object that
+> isn't lying to the compiler about how big it is, but must be accompanied
+> by its actual size as an additional parameter.
+> 
+> It's possible we may way to migrate to including the size with the
+> struct in the future, e.g.:
+> 
+> struct sockaddr_unspec {
+> 	u16 sa_data_len;
+> 	u16 sa_family;
+> 	u8  sa_data[] __counted_by(sa_data_len);
+> };
 
-/P
+One on the historic Unix implementations split the 'sa_family'
+field into two single byte fields - the second one containing the length.
+That might work - although care would be needed not to pass a length
+back to userspace.
 
+NetBSD certainly forbid declaring variables of type 'sockaddr storage',
+the kernel could only use pointers to it.
+These days that might be enforcable by the compiler.
+
+	David
 
