@@ -1,223 +1,121 @@
-Return-Path: <netdev+bounces-231101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31528BF4F68
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:31:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49CBABF5095
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:45:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C35573AD798
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 07:31:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0696D18C63D0
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 07:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516A22417DE;
-	Tue, 21 Oct 2025 07:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88BE4284671;
+	Tue, 21 Oct 2025 07:43:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SQfWzCU1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nuhjVe7d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9561A26F28B
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 07:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64128284672
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 07:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761031858; cv=none; b=ahnJndREFA+OzDXxxSFoZdNEmaeCF7AZ1xQkuZDhjtQzleQuSQ/2rxbQCUsyBBMwqhkqhzwdxHTNewFMh39wDLksNil06axxjR/6WbeGAYaQhu1vopXq0dKgsq9mkwhIlDAVGEbszhiGnNqZuu7yVoUbrvpQwqsBalQRJLpR46A=
+	t=1761032626; cv=none; b=tOIueWkYuRcUsHAR/aBp5chlgfdMCZdnyewgM0PiXMZz6PKDNGj6Eds0rlToBsk54moaEi6tvNECzCtsyMl2lL0p7xGoCQU75Gq08BOV5criJUfYzvKAn77rWpS0xJ922NUmSs315C4M4Pyd12yv9kY5J1caNmPsztyzrDq9GJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761031858; c=relaxed/simple;
-	bh=C8XVNi81mQNmodpigCUip9wr2dzMQanyPKYqCm0rROE=;
+	s=arc-20240116; t=1761032626; c=relaxed/simple;
+	bh=L3OSHu/zykUUrMf0jhQiVo+5X5Tp4yjmsTRArUNbg40=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LvF4pUu67IAm+Z792CMpwcPFz5ygWZP+8nCdRintIDOSxdwn4NsHWgNNqS6jGWg+l+P0zHE0jvPinnhQC6A0YfDgtxE8xYBqckmidIZrM3pLqIthYzVKqgBLITvAYx13I6qzS2wJCg2zmlVtpNuUyl2WKe7wz3HOdxpyjgzTfiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SQfWzCU1; arc=none smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-7836853a0d6so77409467b3.1
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 00:30:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761031855; x=1761636655; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VbPxFvUCCg4jmFcZFZj7j0Tcz4pvz/ZN3cQUOFkRlHU=;
-        b=SQfWzCU1cO0IfsEBD4zTbRTqsTCSv1qbBFoXaAWs/OS+K9u9h9xGR3KmxSAHEN5WLU
-         3/AY3UtHJ86y94i4JRyVuMSZdYzVRguGVALzb43P+0EZY2A4IJ2dUonin1yBbjW9VJ0W
-         GbZBn16AlMzk7/K6U1hH8qwvzLmQnVLDDjLIkalzNMrv1Ks1I47zwWmZrgI+Kbknp/j0
-         2736PfTHJOsQMatWKC58fUgQmFxfw0Kj7nBWKZqP829MCVc3bOGu84qaErSqL9Abi/NB
-         cihJfEnIvhqLwKsZwv+J8la6CVHUUVbAkZNhRWtlyJ35cjn8azVaYaR+m7W6dzP5lpbD
-         q2HA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761031855; x=1761636655;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VbPxFvUCCg4jmFcZFZj7j0Tcz4pvz/ZN3cQUOFkRlHU=;
-        b=F3kpDkKbJri8PWfqkyLiTr3D4RYIQsiVCN7Z/s+mJ/udYkvi0kPyNKLI4MFP8zYyQX
-         e5JgB+iWra+Os7lmI1tBihRlb4JxmOy4QWQL9c+0daoTBW/UA1GA6OfYnYBYg1GUXmYF
-         SA+NlPhZ1xa7YI4wdxK7G6L3ltmZ0wdheyvc+XRBHCrBPG/wHzbdVF1o70IAMjCmI2/3
-         jn8p1ccLi4BulUdZDMiRhGC7SPn7uqCtrMbIVfQYeuukw5KOqR4Y/DBKT1nyaa07Yt0B
-         B9WsiOUkOFMj9pK4mM60Cc2fsTRldGtM6I+DcyieRXXCjeVlsgKymzkl4OEF2vTbeY2f
-         AoWA==
-X-Forwarded-Encrypted: i=1; AJvYcCV7acrS6NxK2x8NWpxfkeUuUASH3JvP+h2a/LoeWDXOBDxERVePeEgRh6EaOwnkL7kYMab56iU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7W5Hxws/3Li1kZF/bIaNSnDvsh74RBGqldxc9Bb3KANuQaV6C
-	VVVGOgZ8j+OWhSr7wgbhMhyEcKws+NqdtFDibekdoT0mu2+nx4zgxhmR/Ja2e55058CxCYnukLR
-	kD5d3nILGt3bH+PsTqKkhsvHf5HeWRbw=
-X-Gm-Gg: ASbGnctWW+FPI7ZcDBDt1bOw2cH++jHxBpt5arQut9MnmHGs99RKqG8z4s06y2oG2ct
-	5LA1XKxg149z9aIdlTT4R7ewTKNtncflxnayVi3lgIoyyhLZa4Z1TdM9k/QemQ2VRfbNEy8GHcF
-	JZamc1jXsbAgRFpPHFkedNH6sYRfuGIFA1NWPrDGYoImh29ZGoyvShrgbMWM+hpqkSiNdUlMkmm
-	p9EO8w9TatSxptLuu1oyxiOGNEcSYGyH7pcM57RcyDRDiXZJLDshv5tKWnT1g5bkwz7cA==
-X-Google-Smtp-Source: AGHT+IGzlrMBYLAYCCqhquuvoJhBcsKXndbOYaVlNX01Smr67T6hmkO2TRG9qxIJI/zeECHf8/X7yw/0zn/rtO8VP0k=
-X-Received: by 2002:a05:690e:168b:b0:63e:1113:bde2 with SMTP id
- 956f58d0204a3-63e1113c469mr12624865d50.20.1761031855348; Tue, 21 Oct 2025
- 00:30:55 -0700 (PDT)
+	 To:Cc:Content-Type; b=TETHzLPueOQp4s+JhuRllSsP+H16TaTDNTiEbUxR1Lm42I23Stur4/VQN2qsXEenD+Qr4Y5H4iwBySmUo3rUTfdC56gMmkiQFtsFAy+RefEnXicH8NjVQ44fxPP5G6ckU/oj7sWq/jWT7BpZUlal8h3x2EFrLqe3WUwTbKRYQ1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nuhjVe7d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C683C2BC86
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 07:43:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761032626;
+	bh=L3OSHu/zykUUrMf0jhQiVo+5X5Tp4yjmsTRArUNbg40=;
+	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
+	b=nuhjVe7dewQwiCcKzJosmLlrhCng/YZTQCU888Cw1JRGstMFQKq1pbud2Z8PIRkc9
+	 EL4ZiMTVQYItN2lOof0KUvZZ31mV8AJaD79wJAm7T6tlf1UMsiLQwhyZxD2MlFEqre
+	 /KQUWp71efacnNSB5bOVbi12pFYCcECOH9GuOJNF8C0PtAG9fZ6VWIuHGxpF2DaPzU
+	 poxS+KXXVMrc9lfatxufE8h9v1S3j+YDO2kfnWMICIVyKeCAjglWR2P9p6ow2sler5
+	 tOxZrlqn5eUjnCQ2qu06YvN39P83knb1R4AqEVKTZIxh0e7QWamVASXkckmlrRCqZo
+	 BFfWu0KvZIh1A==
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-36639c30bb7so47099071fa.3
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 00:43:45 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCX9TfaTIhZhozCuvYCznBo/upDF5L3Z/yJ/J6LFSp4xmFqSHnifULPGJT3rcaKOMrIn2e3a81w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkKZs/0vTxOpncGh4PfG80AWeq8Tq8XHCBi6irqKrmPT50sbDB
+	8MoY9YP8WYrYI8Ab57RDk/wy5096GXIRDm3lhcQIn8l9V/dQLVf+97ynXuKXdwSp79p0fx1m0v1
+	Vr+SUWMBXRNJZ3+AoxebABi3NbeU14II=
+X-Google-Smtp-Source: AGHT+IGdlueTEgM73EYjdJJ7MYdcpYR/rotWSKlN7mFY5uUlnnqxOjkAfgQUxRhc1E7On08N06u+r1J6has1Jnhp3yI=
+X-Received: by 2002:a2e:9fcb:0:b0:375:ebfa:2986 with SMTP id
+ 38308e7fff4ca-37797a728f1mr44182921fa.34.1761032624223; Tue, 21 Oct 2025
+ 00:43:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251015070854.36281-1-jonas.gorski@gmail.com>
- <20251016102725.x5gqyehuyu44ejj3@skbuf> <CAOiHx=mNnMJTnAN35D6=LPYVTQB+oEmedwqrkA6VRLRVi13Kjw@mail.gmail.com>
- <b0bc747b-82ee-4d7b-90f9-3ea299d1249c@redhat.com>
-In-Reply-To: <b0bc747b-82ee-4d7b-90f9-3ea299d1249c@redhat.com>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Tue, 21 Oct 2025 09:30:44 +0200
-X-Gm-Features: AS18NWC1Mf8lnFCtKgGd5UYG_oNVrVCkSUbN5C3c0oo10ERDN6XxPU3UCmTVL2Q
-Message-ID: <CAOiHx=kU_UnAMECgwW3RODkVvojkcPsiy66pS_afF4jSm4HsAg@mail.gmail.com>
-Subject: Re: [PATCH net] net: dsa: tag_brcm: legacy: fix untagged rx on
- unbridged ports for bcm63xx
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+References: <E1vB6ld-0000000BIPy-2Qi4@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1vB6ld-0000000BIPy-2Qi4@rmk-PC.armlinux.org.uk>
+Reply-To: wens@kernel.org
+From: Chen-Yu Tsai <wens@kernel.org>
+Date: Tue, 21 Oct 2025 15:43:29 +0800
+X-Gmail-Original-Message-ID: <CAGb2v67U1KUeEvQ8yhSHP5NY1-9hGuwuTwgKMWGJB2LZn5pwqw@mail.gmail.com>
+X-Gm-Features: AS18NWBVywV_yRWAV-n1YGVmZIEA5XvU8OAR8wbCjrwgr8Xivfn8oNIG-rClQ6c
+Message-ID: <CAGb2v67U1KUeEvQ8yhSHP5NY1-9hGuwuTwgKMWGJB2LZn5pwqw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: stmmac: replace has_xxxx with core_type
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	=?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	Jakub Kicinski <kuba@kernel.org>, Jan Petrous <jan.petrous@oss.nxp.com>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Jonathan Hunter <jonathanh@nvidia.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-sunxi@lists.linux.dev, 
+	linux-tegra@vger.kernel.org, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
+	Richard Cochran <richardcochran@gmail.com>, s32@nxp.com, 
+	Samuel Holland <samuel@sholland.org>, Thierry Reding <thierry.reding@gmail.com>, 
+	Vinod Koul <vkoul@kernel.org>, Vladimir Zapolskiy <vz@mleia.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 21, 2025 at 9:08=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Tue, Oct 21, 2025 at 3:27=E2=80=AFPM Russell King (Oracle)
+<rmk+kernel@armlinux.org.uk> wrote:
 >
-> On 10/16/25 1:50 PM, Jonas Gorski wrote:
-> > On Thu, Oct 16, 2025 at 12:27=E2=80=AFPM Vladimir Oltean <olteanv@gmail=
-.com> wrote:
-> >> On Wed, Oct 15, 2025 at 09:08:54AM +0200, Jonas Gorski wrote:
-> >>> The internal switch on BCM63XX SoCs will unconditionally add 802.1Q V=
-LAN
-> >>> tags on egress to CPU when 802.1Q mode is enabled. We do this
-> >>> unconditionally since commit ed409f3bbaa5 ("net: dsa: b53: Configure
-> >>> VLANs while not filtering").
-> >>>
-> >>> This is fine for VLAN aware bridges, but for standalone ports and vla=
-n
-> >>> unaware bridges this means all packets are tagged with the default VI=
-D,
-> >>> which is 0.
-> >>>
-> >>> While the kernel will treat that like untagged, this can break usersp=
-ace
-> >>> applications processing raw packets, expecting untagged traffic, like
-> >>> STP daemons.
-> >>>
-> >>> This also breaks several bridge tests, where the tcpdump output then
-> >>> does not match the expected output anymore.
-> >>>
-> >>> Since 0 isn't a valid VID, just strip out the VLAN tag if we encounte=
-r
-> >>> it, unless the priority field is set, since that would be a valid tag
-> >>> again.
-> >>>
-> >>> Fixes: 964dbf186eaa ("net: dsa: tag_brcm: add support for legacy tags=
-")
-> >>> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
-> >>> ---
-> >>>  net/dsa/tag_brcm.c | 12 ++++++++++--
-> >>>  1 file changed, 10 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/net/dsa/tag_brcm.c b/net/dsa/tag_brcm.c
-> >>> index 26bb657ceac3..32879d1b908b 100644
-> >>> --- a/net/dsa/tag_brcm.c
-> >>> +++ b/net/dsa/tag_brcm.c
-> >>> @@ -224,12 +224,14 @@ static struct sk_buff *brcm_leg_tag_rcv(struct =
-sk_buff *skb,
-> >>>  {
-> >>>       int len =3D BRCM_LEG_TAG_LEN;
-> >>>       int source_port;
-> >>> +     __be16 *proto;
-> >>>       u8 *brcm_tag;
-> >>>
-> >>>       if (unlikely(!pskb_may_pull(skb, BRCM_LEG_TAG_LEN + VLAN_HLEN))=
-)
-> >>>               return NULL;
-> >>>
-> >>>       brcm_tag =3D dsa_etype_header_pos_rx(skb);
-> >>> +     proto =3D (__be16 *)(brcm_tag + BRCM_LEG_TAG_LEN);
-> >>>
-> >>>       source_port =3D brcm_tag[5] & BRCM_LEG_PORT_ID;
-> >>>
-> >>> @@ -237,8 +239,14 @@ static struct sk_buff *brcm_leg_tag_rcv(struct s=
-k_buff *skb,
-> >>>       if (!skb->dev)
-> >>>               return NULL;
-> >>>
-> >>> -     /* VLAN tag is added by BCM63xx internal switch */
-> >>> -     if (netdev_uses_dsa(skb->dev))
-> >>> +     /* The internal switch in BCM63XX SoCs will add a 802.1Q VLAN t=
-ag on
-> >>> +      * egress to the CPU port for all packets, regardless of the un=
-tag bit
-> >>> +      * in the VLAN table.  VID 0 is used for untagged traffic on un=
-bridged
-> >>> +      * ports and vlan unaware bridges. If we encounter a VID 0 tagg=
-ed
-> >>> +      * packet, we know it is supposed to be untagged, so strip the =
-VLAN
-> >>> +      * tag as well in that case.
-> >>> +      */
-> >>> +     if (proto[0] =3D=3D htons(ETH_P_8021Q) && proto[1] =3D=3D 0)
-> >>>               len +=3D VLAN_HLEN;
-> >>>
-> >>>       /* Remove Broadcom tag and update checksum */
-> >>>
-> >>> base-commit: 7f0fddd817ba6daebea1445ae9fab4b6d2294fa8
-> >>> --
-> >>> 2.43.0
-> >>>
-> >>
-> >> Do I understand correctly the following:
-> >>
-> >> - b53_default_pvid() returns 0 for this switch
-> >> - dsa_software_untag_vlan_unaware_bridge() does not remove it, because=
-,
-> >>   as the FIXME says, 0 is not the PVID of the VLAN-unaware bridge (and
-> >>   even if it were, the same problem exists for standalone ports and is
-> >>   not tackled by that logic)?
-> >
-> > In general yes. And it happens to work for vlan aware bridges because
-> > br_get_pvid() returns 0 if a port has no PVID configured.
-> >
-> > Also b53 doesn't set untag_bridge_pvid except in very weird edge
-> > cases, so dsa_software_untag_vlan_unaware_bridge() isn't even called
-> > ;-)
-> >
-> >> I'm trying to gauge the responsibility split between taggers and
-> >> dsa_software_vlan_untag(). We could consider implementing the missing
-> >> bits in that function and letting the generic untagging logic do it.
-> >
-> > If there are more devices that need this, it might make sense. Not
-> > sure if this has any negative performance impact compared to directly
-> > stripping it along the proprietary tag.
+> Replace the has_gmac, has_gmac4 and has_xgmac ints, of which only one
+> can be set when matching a core to its driver backend, with an
+> enumerated type carrying the DWMAC core type.
 >
-> I think this patch makes sense for 'net' and reaching stable trees,
-> where most b53 users sits (I think/guess).
+> Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> v2:
+> - fix conflict with removal with STMMAC_FLAG_HAS_INTEGRATED_PCS removal
+> - wrap 88 char line in stmmac_xmit()
+> - add Maxime's tested-by
 >
-> The DSA-core base solution could be a follow-up IMHO.
+> I haven't added Maxime's r-b because the patch has changed subtly, but
+> not in a way that invalidates testing. Given the minor changes and it's
+> possibilities for further conflicts, can we get this in sooner please?
+> Thanks.
 >
-> @Jonas, please still clarify a bit the comment, as per Simon's request.
+>  drivers/net/ethernet/stmicro/stmmac/common.h  |  5 ++
+>  .../stmicro/stmmac/dwmac-dwc-qos-eth.c        |  2 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac-intel.c |  5 +-
+>  .../ethernet/stmicro/stmmac/dwmac-ipq806x.c   |  2 +-
+>  .../ethernet/stmicro/stmmac/dwmac-loongson.c  |  2 +-
+>  .../ethernet/stmicro/stmmac/dwmac-lpc18xx.c   |  2 +-
+>  .../stmicro/stmmac/dwmac-qcom-ethqos.c        |  2 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac-rk.c    |  4 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac-s32.c   |  2 +-
+>  .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |  2 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac-sunxi.c |  2 +-
 
-That was my plan until my internet connection at home went down
-yesterday, and hasn't been fixed since. Once the ISP fixed it I will
-send out a V2 (+/- me being back home from work)
+For sunxi,
 
-Best regards,
-Jonas
+Acked-by: Chen-Yu Tsai <wens@kernel.org>
 
