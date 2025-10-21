@@ -1,96 +1,92 @@
-Return-Path: <netdev+bounces-231037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CB32BF4233
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 02:21:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91872BF426F
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 02:32:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EC4E1346F27
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 00:21:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B247464A26
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 00:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FDFD1D516C;
-	Tue, 21 Oct 2025 00:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D41C1EDA1E;
+	Tue, 21 Oct 2025 00:32:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BDWeEZLk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R21UTIxD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983FD1D5ABF
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 00:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8EC81E5206
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 00:32:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761006104; cv=none; b=cVq+tvtrmQJB/4s4K8O4PbAh0si++9Q/dkWTccvgRecY2Zop9QdnkE6ndAJZbEBH0sDmKFkvVLc7xnr9XlIpwjSIeg/NuivMnh4LrKxhNeAgwtcp5JrBQWcDfJYkogHgKI6nxtMl6w1VMYgHiqEVDCN31IeoClKN60WdD6FLodw=
+	t=1761006728; cv=none; b=sjOR76lskyQak0885RV8JFHmWndCYsYnn64sSOYCXFlYCMMCAdPkmwetduiWcoqYlAvBXqqoheYLxh8jeP11C5rd7/qJljPcTQvbx0ZJzwKyvc1YO/R3FtQ/cwVfEL+JhbXHBGKI0G1I6yBhOCfFdvxt0r+O6zWQNeLlwJEv4t0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761006104; c=relaxed/simple;
-	bh=yjHPLVgEdW5sJWrbNXJ3MIoDYB+QxWa40YMfzuMRRyA=;
+	s=arc-20240116; t=1761006728; c=relaxed/simple;
+	bh=+Stx3Yos3Zj4FpodRRmLagmV52djBLh7XEfBTjgyG68=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K8Sjvu1kv+N7Y6Vmb+C2DeRRDgPNu7PW2GaRR52s9YyHkp9hjySgVbx8n24wN5azA1QVBnOd2IXGz1RJbC2PYMtkIahBqnyYiTWxJBrivWiNfrGECnKQMXkM6kBso4YWRyxXxbtjIv3tNlSNkoi795jUE45pvbma3HnWDLHS5Gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BDWeEZLk; arc=none smtp.client-ip=209.85.210.170
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q2uKCOXlpuF3I9QpLz2n3Zul/9hxYFe/2y6L2LXyA4RzeOPLBT1a+QWcoRU7x4+Ggc/fT8GwYSmhlIbngBj1nqo/hjU6yaWKYjCg93I7vTmKOC2tXwl9Xgkler82Rxw4mpsrNbXTB76KcWca5cDG+RPRyQbAqIBqwHZhSdasgJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R21UTIxD; arc=none smtp.client-ip=209.85.215.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7810289cd4bso4763587b3a.2
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 17:21:42 -0700 (PDT)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b57bf560703so3479490a12.2
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 17:32:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761006102; x=1761610902; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761006726; x=1761611526; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yjHPLVgEdW5sJWrbNXJ3MIoDYB+QxWa40YMfzuMRRyA=;
-        b=BDWeEZLkSVwrdkmTnB91g6L1OqHF2LRA2AkMW0JV1/t0JTYUj5gsF/tLeKeKn57zAf
-         njFHX/hr6Ugh2dJkHDfs3oELaH/w3K/RMD7LCFGgd6WVSU19QaoTHUUSIEka2k6Az1cG
-         H1sV6LQ/mf6QKbHQxGKPqyLs66BS/doVGya0w0BE2I3kXP36Zv57imLE29copPk/BPnO
-         0VPA+YjiMJClAsKCeczgjVadZ7kpVVxeoKhQiC4D24Uxckp9xRHNOvnezU+h9IW5jD1X
-         YnJ0jI8qIucmQ9+ZhBQ3STD8JrEeuoODg2Ytnrt8wKYXck9gI8EpurDrFGWNbFoQ62a7
-         cd+Q==
+        bh=v/cpiZvdnPNi45E0SRBN32Ra3TMzhvL+cs3dmR0W4Tg=;
+        b=R21UTIxDJYopFIaaGEXEOLgBYWWmCI1PcUR8eF/oplFCKbzIWEDN8E2ApPU2yrTMfK
+         5MbYDQ34eCYgNtK3TIfUc9G79wP3QGJE2hkncymQJUzvGUji628rQTwE5j0akM3Xpo/f
+         YlaJKYUSjjcv9NyEzOqLUyGo7YV9/BkdqUHes8aI7mUh18EjpKQag5edT66dmjFxkb0C
+         9cutgdyoS52OvhbJwMeR+Y3GzmyIUJy4pGbL48J/RUy15MGCmdrpDu3OAcMau07LBINn
+         v/tCBo3QWGqOeSsT2iNaQCjv7NP12BHRqIeDFxCfmGeRgVUT3iXwyih7fwCE7KWhDuEE
+         l8WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761006102; x=1761610902;
+        d=1e100.net; s=20230601; t=1761006726; x=1761611526;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yjHPLVgEdW5sJWrbNXJ3MIoDYB+QxWa40YMfzuMRRyA=;
-        b=Zn35jeplRC/SUAnzqvZk7xAS9a6qDrlfVa60skGFcyghML36LGIstoXvnb5SE1kprA
-         geDBF1m5pyqsM4qRs4zrrOzkSFtVCDMBS2zgHzEf8jPLoxaQcYMTsshruX+tctZcCwNs
-         FFIUcPrXqkE1mI+a3ICpu01j3rCtgG4w+JrXGuSujcOCtKe1fh0mBxrg5YfL/ca1sbFU
-         SbYID/gGAKQdv6Nal9/nTi6wzYsXXV8hm3InGvljHLoNSKwbveoQoR5SzwyMAESfBVsh
-         ImLWfUIqBKtaHyE3bRA4iy9JFOnMY4Vl5/IlZjGGxmYz8b3atVYPknj4Yy/MkXF/j+AC
-         EXmg==
-X-Forwarded-Encrypted: i=1; AJvYcCUmwdZAQWxiVZiRWvGsxnawRDR2yK5qaT0uvJYegf05QVJ02GTfUN0kaejagLhMnLpT69h3tTk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbRM7QghWcbW/ABvbjTUJONjEtvEWY9IvkfmkM12Y1awT+npbW
-	zImlz8otVJo4uFGin7Ss8OxEdwaqFvF93GmEC+z51nNuJ7sTmbx3M7YP
-X-Gm-Gg: ASbGncvKpgWjC+76nLVX9zDgmeRPDJ3m9rDaTdMDbtqwZ/R2NElr2C7mCVh6my8GrmR
-	3YCCI/D6ZvXMMdFLi49JLAYVzpLLKthCmpsWMCTgOxSayU7hsYr6V4tulqDdyLM9BVq/a0W0Thq
-	qmvdNggzoztA5y9tCtyxOfIsdCo0nAXu0qiZDpEDGcIo8+zUnLmFW3HQ6gLfmJXhYWFFW9wUk5n
-	7I4DIsASw5yDvO2LyEjUNB9q38gLKOGYt3JghCyScMAGqo2cvmxFRZOQb/EzD6bcxfdt7OM9Pqr
-	KOE9zLo9hlRXGfjLs6T3DC36fYaSsDep43uJ/cnOGo6TOWokqWHyU/VWn2ruJIQMRHi5fQQg9Pj
-	B2yAQYusRIEiV5OeOvaXznWKJkdFuuOb2xnXe1lMRG9yBeSmAg155GP/ZlI3h0JMV116G3QoOMT
-	9dpqU=
-X-Google-Smtp-Source: AGHT+IGbji5PS2wR9+wnyLjXP7fZ55l75L4OjmPE1c9z6DFc+64aTfHdBaYLcLRVmf1fSi0fYoMixA==
-X-Received: by 2002:a05:6a21:7914:b0:334:bec2:5b63 with SMTP id adf61e73a8af0-334bec25e36mr9854338637.24.1761006101915;
-        Mon, 20 Oct 2025 17:21:41 -0700 (PDT)
+        bh=v/cpiZvdnPNi45E0SRBN32Ra3TMzhvL+cs3dmR0W4Tg=;
+        b=G0U+6iODUDnpsRZY97MX23aoXuZkvbZuRty7tLZZZFt8KjyjOjfyxs02cyCLIMeTmw
+         MNy6/9v32QCObvK7HNYT4KnguPuJjNGescFsIc6MAET3o2XwsyTRpoq1PD6G1Yps27tq
+         +UxWaBN16cLmAdr83dcxKb9Ow6L81NiUItO5RSl7ro7fsdh8hgAJQiebwuOjdgNqXW/4
+         t5BWvVz4ETLZ2dxqye9v9Ox3HsGB3cVHcQ5vgZZHYAD1PVGqVbS3T/b6MiG2h9vbuRuZ
+         Sl7FB2qK4i4j/DwfNjf4Kufl/HS7SiW8kixRdfO6jcVZr6fOaGH1vIya8x7ro54Xxif3
+         vb/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUurXwFTpucljkCmZf6pO/vb5C23DjhShfWRiF8t9rEpWV2RTKlS1T1PRlGZb5Z3hSLx9iihOE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxd3l9KSXdrgsfU35TcBmMSODU3MEo62OZamovy9sJeB7wCNJYY
+	HyvnZX5P4AFvak+biluU556GENy2xw4LNSD3oK7yhlb7Wj7BAX+shPNw
+X-Gm-Gg: ASbGncvH5gq+NLZfiBD7DgSZ9hwjaztUwzh1fwxuFgoEBPLj/byMTj2T3p5T0whthKU
+	jYY2lnihCtkRFhFiX+7NBd6muMk8wah81sv4rE5kZER6xu5xGNbG4D6Zf6bVpGdxJnVmdj7b1oK
+	z2YpN051KKVt4ZLbjwKFK6OiVOofzuVngunWZG9cK+2HzfQMdCPaNjIbAzyLcX663CxhOnWvhOR
+	k4Y46jftiX7W+lUWOrVl6540z/eDFYgPK2PUPV3C31LSs1EJC3/lKQU/37SVoBruPD1RWNRtEpL
+	qU2QDtSdRykukFyp+4vcozNAHUEnJvu4FOXBXLaWCRWwN5ZuA558nBk/ZrgJQhJ2zFqWW2T06eO
+	SkBge4uxwKjxpPivF6fA96sceMd3L+CXo8xDTzZOkxiGaNjh+V/yQPkxevJ+4rt8stWdwbWWV7u
+	2F006r/5iTy3CZVA==
+X-Google-Smtp-Source: AGHT+IEsUPJvzG8we/lPr0Ah4Byy7131lhTqUy6IYRR/KgOr9A5mhJJoZH9DBN/+obua52bJEsmONw==
+X-Received: by 2002:a17:902:e944:b0:290:b14c:4f36 with SMTP id d9443c01a7336-290cba4edaemr170898085ad.31.1761006725838;
+        Mon, 20 Oct 2025 17:32:05 -0700 (PDT)
 Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a2300f251fsm9453888b3a.39.2025.10.20.17.21.40
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-292471d5971sm91702065ad.56.2025.10.20.17.32.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 17:21:40 -0700 (PDT)
+        Mon, 20 Oct 2025 17:32:04 -0700 (PDT)
 Received: by archie.me (Postfix, from userid 1000)
-	id 676F2412B0A6; Tue, 21 Oct 2025 07:21:38 +0700 (WIB)
-Date: Tue, 21 Oct 2025 07:21:38 +0700
+	id 2E36D412B0A6; Tue, 21 Oct 2025 07:32:02 +0700 (WIB)
+Date: Tue, 21 Oct 2025 07:32:02 +0700
 From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>,
-	Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH net-next] net: rmnet: Use section heading for packet
- format subsections
-Message-ID: <aPbSErGuC_FZPCvf@archie.me>
-References: <20251016092552.27053-1-bagasdotme@gmail.com>
- <20251020171629.0c2c5f5e@kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org
+Cc: linux-hams@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH] Documentation: networking: ax25: update the mailing list
+ info.
+Message-ID: <aPbUghAytyXEZAra@archie.me>
+References: <20251020052716.3136773-1-rdunlap@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,45 +94,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="LjzbLi24OC08S6O0"
+	protocol="application/pgp-signature"; boundary="GkTDwKgTYWZMUyjt"
 Content-Disposition: inline
-In-Reply-To: <20251020171629.0c2c5f5e@kernel.org>
+In-Reply-To: <20251020052716.3136773-1-rdunlap@infradead.org>
 
 
---LjzbLi24OC08S6O0
+--GkTDwKgTYWZMUyjt
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 20, 2025 at 05:16:29PM -0700, Jakub Kicinski wrote:
-> On Thu, 16 Oct 2025 16:25:52 +0700 Bagas Sanjaya wrote:
-> > -a. MAP packet v1 (data / control)
-> > +A. MAP packet v1 (data / control)
-> > +---------------------------------
+On Sun, Oct 19, 2025 at 10:27:16PM -0700, Randy Dunlap wrote:
+> Update the mailing list subscription information for the linux-hams
+> mailing list.
 >=20
-> Why capitalize the "A" here? it could have stayed the way it was, IMO
-> lowercase is actually more common and (at least my) Sphinx doesn't seem
-> to detect this leading letter as in any way special.
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> ---
+> Cc: linux-hams@vger.kernel.org
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: linux-doc@vger.kernel.org
+> ---
+>  Documentation/networking/ax25.rst |    7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>=20
+> --- linux-next-20251016.orig/Documentation/networking/ax25.rst
+> +++ linux-next-20251016/Documentation/networking/ax25.rst
+> @@ -11,6 +11,7 @@ found on https://linux-ax25.in-berlin.de
+> =20
+>  There is a mailing list for discussing Linux amateur radio matters
+>  called linux-hams@vger.kernel.org. To subscribe to it, send a message to
+> -majordomo@vger.kernel.org with the words "subscribe linux-hams" in the b=
+ody
+> -of the message, the subject field is ignored.  You don't need to be
+> -subscribed to post but of course that means you might miss an answer.
+> +linux-hams+subscribe@vger.kernel.org or use the web interface at
+> +https://vger.kernel.org. The subject and body of the message are
+> +ignored.  You don't need to be subscribed to post but of course that
+> +means you might miss an answer.
 
-I follow Simon's suggestion in packet formatting patch [1].
+vger mailing lists has been moved to subspace infrastructure though (and
+so does subscribing information [1]).
 
-Thanks.
-
-[1]: https://lore.kernel.org/linux-doc/aO_MefPIlQQrCU3j@horms.kernel.org/
+[1]: https://subspace.kernel.org/subscribing.html
 
 --=20
 An old man doll... just what I always wanted! - Clara
 
---LjzbLi24OC08S6O0
+--GkTDwKgTYWZMUyjt
 Content-Type: application/pgp-signature; name=signature.asc
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaPbSEgAKCRD2uYlJVVFO
-oz1JAP92OJiXU9/4Buy/9Zrw/pTqhdMb4tVYDi+526Un+p3DxgEA7ksgvqYHKaNm
-qY32OXGc7Yp4NPYMuQ7KKxncy36TdwE=
-=Utyd
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaPbUgQAKCRD2uYlJVVFO
+oxZzAQDVOGnv/ATVv5w6QV/t85wZvi3c09MTXjDU04j04yxQpAEAkxwHtFWG0Kb9
+I7AC36LLnSDWXI5ugl6JsU/TUeE3FgA=
+=WAqV
 -----END PGP SIGNATURE-----
 
---LjzbLi24OC08S6O0--
+--GkTDwKgTYWZMUyjt--
 
