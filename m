@@ -1,103 +1,80 @@
-Return-Path: <netdev+bounces-231030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8AEBBF416C
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 02:00:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF5BEBF4181
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 02:02:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF4063B15CC
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 00:00:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3B2342617C
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 00:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B19335078;
-	Mon, 20 Oct 2025 23:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB4E524D1;
+	Tue, 21 Oct 2025 00:02:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bCCjcFoW"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Qz06iSNl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFB872628;
-	Mon, 20 Oct 2025 23:59:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264DE800;
+	Tue, 21 Oct 2025 00:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761004799; cv=none; b=ZMpG/zfDZEshBAz9V94BGCax81CJuiCqj83Jw36rR1dFQ3rAL4a5X/e3qb9DhUFwKCRDQvfACoOFmUA/eUFUHbnVGIPghCshXhz0Q7vVFsdKIX8d4TbbATFYJIHCWyXIevAyTBYlA0cfCVZ2KU5AbJFKjlGsUxXd288Ed8I7RTQ=
+	t=1761004935; cv=none; b=O4QFbApemkC5ynejCu3/KpX0u0f9ujcChFTdXRK3SIuKHPeoI069f2jOsqzJbcU9RkIp2ibLwIKyWJpSfgKfuKXnhl4Yfj2VQcqCx+kDfr5PUdD419FKT2eUqTGqDQEl1JjHsBOdk5hE5ockD7L1asBRCVJqLd1wth4hKXzTZEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761004799; c=relaxed/simple;
-	bh=hq2DKy2kEQVil563QjDfbIGT0J+Iyeb4JU92X7xZgHQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g8VDA8jBwhJ/Df62ITfxH/GeyPeUtEiM7pljaFhm2SAY5b3mM/AMGGIUqWSNAqAD3HhuaJ3tL0rSs3k33ShCooWaVxMABdbKl0THaJtdhqgz5+j5mXBK+Xwj5+dLzhzxGLQfpPYWA8xt+w4/CMPIWdCmAWKaFCm97zL55tGWhOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bCCjcFoW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79A0EC4CEFB;
-	Mon, 20 Oct 2025 23:59:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761004799;
-	bh=hq2DKy2kEQVil563QjDfbIGT0J+Iyeb4JU92X7xZgHQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bCCjcFoWdnMma3K6JpHFAZHJFYE0niS44n50siUBRzOydl5rBF8QxShj4hd9JBx/9
-	 o/YmkOPml8DlC21yE0vqVYxoK8sg+nltg3TDT0aSbmR8g1WOpHleQssh27G10hQfVr
-	 FckyBJIR/eBIKxmmH0uoki91UWsD/IcqN4OxGNKvbn0p0GrOEfK7cE4Fr1rzUKubIF
-	 RbXvB5TZt/pRwSXqTnlpIx7ZFmd7ZqUp2gN+dwM1RtVEfdm+yFD4P8oN9OZUl7tcm4
-	 /3EHOqx2zpM0M4APswzi6IwM1WsL1Re2/vMDxUfllb0StdylKOedIPFaktzLlVpJr5
-	 27Bpe6kjip6XQ==
-Date: Mon, 20 Oct 2025 16:59:57 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Jurgens <danielj@nvidia.com>
-Cc: <netdev@vger.kernel.org>, <mst@redhat.com>, <jasowang@redhat.com>,
- <alex.williamson@redhat.com>, <pabeni@redhat.com>,
- <virtualization@lists.linux.dev>, <parav@nvidia.com>,
- <shshitrit@nvidia.com>, <yohadt@nvidia.com>, <xuanzhuo@linux.alibaba.com>,
- <eperezma@redhat.com>, <shameerali.kolothum.thodi@huawei.com>,
- <jgg@ziepe.ca>, <kevin.tian@intel.com>, <andrew+netdev@lunn.ch>,
- <edumazet@google.com>
-Subject: Re: [PATCH net-next v5 05/12] virtio_net: Query and set flow filter
- caps
-Message-ID: <20251020165957.62a127eb@kernel.org>
-In-Reply-To: <20251016050055.2301-6-danielj@nvidia.com>
-References: <20251016050055.2301-1-danielj@nvidia.com>
-	<20251016050055.2301-6-danielj@nvidia.com>
+	s=arc-20240116; t=1761004935; c=relaxed/simple;
+	bh=RPKMz+FZqU3Ym9VUHosAG0Mmo/rDbbCY7J0xa//Gio8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tqrwu3lZHQuqDmIeb6wVvEp063abGFmKH1F7ws9zgWV4N8iXiE9JUqv5dkHtbPgAhaW7uqig4c2LyHBsrdaWR5LhssSo6KsWCo43qtq2O4KGXw/uQ27avrci5D2/sC8v6EhnxS5o2PkvWGYotW08GV9fmEVKnAG1maTnJcgIZJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Qz06iSNl; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=RPKMz+FZqU3Ym9VUHosAG0Mmo/rDbbCY7J0xa//Gio8=;
+	t=1761004934; x=1762214534; b=Qz06iSNlfQAF7UoSi60fRsPkmRikk3Mv/K69HZ3Q4TeHCBq
+	RrL9rRJuMsF4rPVClibMCyQ3UpF72s/QsA+l2nXGnVKocMCTbPo1X5J80M1wO5+ptyp8tecTEjLnE
+	o/IUpC41sfb9TH9tKS0SKUC21vJFt9yReGy6ovkbeY8SfFmxmViVfnJsFVbxdJoo6FR1CC95L7hVk
+	XnN+L6chb6g7nkSzFxr2tDVCKtshJsVRMoqdOhB4wzJe4Z0soblTZW6ouSCErPKCQ2/IAxCwZGWDX
+	jVzThJ6yogPc/plGxEwvVY3riL7edVmpurDOb4/Bc+QxV2prdLYQztuUmem8/PgQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vAzpK-0000000A2VQ-3wBP;
+	Tue, 21 Oct 2025 02:02:11 +0200
+Message-ID: <017a316a1200a41cd5a51c4f1b7c46292860386f.camel@sipsolutions.net>
+Subject: Re: [PATCH v1 6.14] wireless: aic8800: add support for AIC8800 WiFi
+ chipset
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Bitterblue Smith <rtl8821cerfe2@gmail.com>, "he.zhenang"
+	 <he.zhenang@bedmex.com>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Date: Tue, 21 Oct 2025 02:02:10 +0200
+In-Reply-To: <0d807f54-7579-43a2-99c7-2a19cf715ec3@gmail.com> (sfid-20251020_232725_435849_A51F912E)
+References: <20251020092144.25259-1-he.zhenang@bedmex.com>
+	 <0d807f54-7579-43a2-99c7-2a19cf715ec3@gmail.com>
+	 (sfid-20251020_232725_435849_A51F912E)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-malware-bazaar: not-scanned
 
-On Thu, 16 Oct 2025 00:00:48 -0500 Daniel Jurgens wrote:
-> +struct virtio_net_ff_selector {
-> +	__u8 type;
-> +	__u8 flags;
-> +	__u8 reserved[2];
-> +	__u8 length;
-> +	__u8 reserved1[3];
-> +	__u8 mask[];
-> +};
+Hi,
 
-> +/**
-> + * struct virtio_net_ff_cap_mask_data - Supported selector mask formats
-> + * @count: number of entries in @selectors
-> + * @reserved: must be set to 0 by the driver and ignored by the device
-> + * @selectors: array of supported selector descriptors
-> + */
-> +struct virtio_net_ff_cap_mask_data {
-> +	__u8 count;
-> +	__u8 reserved[7];
-> +	struct virtio_net_ff_selector selectors[];
-> +};
+> However, there are some problems with this patch.
 
-sparse complains:
+That's a _massive_ understatement.
 
-  include/uapi/linux/virtio_net_ff.h:73:48: warning: array of flexible structures
+johannes
 
-which seems legit. Since only element 0 can reasonably be accessed
-perhaps make selectors
-
-	__u8 selectors[]; /* struct virtio_net_ff_selector */
-
-?
--- 
-pw-bot: cr
 
