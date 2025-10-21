@@ -1,329 +1,116 @@
-Return-Path: <netdev+bounces-231127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05859BF582D
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:30:07 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C497ABF5856
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:32:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE4B13BA2B0
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:30:05 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 300E0352A4C
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:32:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CAE6329C74;
-	Tue, 21 Oct 2025 09:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5562284686;
+	Tue, 21 Oct 2025 09:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m0mU7F9S"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JejDprwl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9D732BF24
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70445221F0C
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761038988; cv=none; b=Yri8PquFz333sZbbCsEoFEtuZIIlAn4ZTzZc038pMxHYfNimgdJKrthP7/W1zQ8OQjaNu5INZLnbqxA2xeKQZFz47eEsKZ0SIjGSLXOGGlj2eeAknom0YIS9Yv43vEr6WF7IAUFDD+JeXzk1j90T/0d/21tSIhqekC9gSkxMd8U=
+	t=1761039142; cv=none; b=byV5FXmvG3Yxfu43kmNap4u2SaHxLgxDtxEztmZaqAoEtm3n8NWldkP1QtTRgN+sHZGVGlZApHciwvRKG+gusg/zGvpY/AsVwNuYoqp3bn0W7fRFhsA9G+CatTEQtlkBx6dsEagzpgwOXcBy0+dXeQTqVmDgKpqMXJvlt3Q8PJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761038988; c=relaxed/simple;
-	bh=a0aYEnjhpTG92+dnI0WBlUVlRCWAmJ8S6jfAl5OV3b0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nPPzE5Fys/dLYOnvd4xKEGULS5YHYn8rDGta92Oqq+oYxABIuyaSDI+UWFlz3PBi2iwk+vjmCJK4nkyt/DxrDLhCvykjcV3uEd0caY4I6qWDrbNPvTI7Lfjk2X1U56Wuam4CrNr3EJp6pQNxx0ed1wFoQSofZEryfeUM1SU/DrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m0mU7F9S; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b593def09e3so3575737a12.2
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 02:29:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761038986; x=1761643786; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xvR5jT1gTJqYZoXGVwpmZ3jCtyBD10kX3ZPMFN21KF0=;
-        b=m0mU7F9ScuY9yV0ke51OMEnR8mn6fnRzvNVB1pZPpObxmNZOcRhNAY4ic7cKPqwGsW
-         RepEORdMPadhq7RyuDkxN0eYNGjjc7DelhO10IMeKcvf9ms0banPOZeOIOBy9vy78o6R
-         kWBTA1bl1zpoTDKttQTaNfvTOfODb6uSOCLanSc9Zwdz2diOEFYZo+/nQCUQNqTcl0vN
-         WybJLuIxSGnxdzqb1H9/x3fUVeWMU1xhRL1/RqC7+WDEQDAufDWjN9C9VPcXshUrMwi6
-         i/HU2VXaoGbYqu22edL+lmM+wMRq3rcwAmPqbaka6CT12IvbRJr9JeirO7JP4a7+75iq
-         dnyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761038986; x=1761643786;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xvR5jT1gTJqYZoXGVwpmZ3jCtyBD10kX3ZPMFN21KF0=;
-        b=n4o400GjpGVdtUQQ6EVPqPrStp4AjnQQdUJOWHtJNeYY3837HZzXkf4Psq7uceZDZT
-         C73fz18nGdDyZkYCvcKEtXhKjuWZ8/r0fkFo2M3zmqNz8yuloiez4Gs6acVyWps/RBsx
-         U5uKHObfcQv2W9kZhXGg37/7CVwkj0GHdu20uKfnpwKI77ZkvGdl3jUBZ+IStQf05dh/
-         GW3ySMAKfO/y7KaulS30pScmind7Lw+ztoXF6QfhDM43yf4FmdDuXqGR7oUXpB1uFiVW
-         GwLA9ByFgDK+ydVwl6ZxXFFtLlONe5quxmsEn2L9LCEMgIm5albp3xCqiUqNAJvimjQZ
-         WFvQ==
-X-Gm-Message-State: AOJu0Yw8/IBSeDN7J9qldt934nLE0CYwwjYo/yzvHxS1VAmN9WRoJSWu
-	1/GDxOQQjNwoTcjCtcQajikvEh1HWmQ0wOLGi/m+hhd3bYkYSxAobEcXQ5oIBtWZ
-X-Gm-Gg: ASbGncud5f3WQbVVqD3tFyWnClTgXL96SfOgimf0oXEM+B3Bs+vVQbawx/VFj2AIf/q
-	3Rfjfml0uYRGVm8lwAmPedXvD+Z3XoZnY/7SLqKQ4e5j0s91pGLGaJ+L8uDePDGDvUCdw4OCRZF
-	cWar11ar0MF2gq/NK/P87BV1Dk79UvcQJ9rRynKHDbeumRlor+49tvmCuis0oR1DB2CPZw+RauM
-	OnheYxE8UPd/BQ/x7CAKG81O/tTVVJ4nOoufzgTiLdOYyIY12xjpN6DF71FjtT9BRA0uaW4Nvnt
-	BUiKD/O8JrpmH+q4HZ6LTzRoSYzlVHhCJYdEHioSDsoshkcUzuOohoP/7ueZDK4ISYHcOL7Slfs
-	/ek1LwiiuSew/4AYhog2G5VG8NnURruMvJxkCupf7OnhCw6lX+0GN++9ut6Y+m7HiNeko4ChKdR
-	c2M6nzzTQt+T7DeBU=
-X-Google-Smtp-Source: AGHT+IGNpCqiz7TPzWCbt9/AmNXXOBYfhN0gHSeI/H2uNi+8T0qW2fZHA/ppMSHGKcSUDizFe+92aA==
-X-Received: by 2002:a17:902:c942:b0:264:a34c:c6d with SMTP id d9443c01a7336-290ca121a65mr193635025ad.37.1761038985547;
-        Tue, 21 Oct 2025 02:29:45 -0700 (PDT)
-Received: from fedora ([159.196.5.243])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29246fcc83esm104497195ad.38.2025.10.21.02.29.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 02:29:45 -0700 (PDT)
-From: Wilfred Mallawa <wilfred.opensource@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Shuah Khan <shuah@kernel.org>,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>
-Subject: [PATCH net-next v7 2/2] selftests: tls: add tls record_size_limit test
-Date: Tue, 21 Oct 2025 19:29:18 +1000
-Message-ID: <20251021092917.386645-3-wilfred.opensource@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251021092917.386645-2-wilfred.opensource@gmail.com>
-References: <20251021092917.386645-2-wilfred.opensource@gmail.com>
+	s=arc-20240116; t=1761039142; c=relaxed/simple;
+	bh=FCQ74zzf7PMaDBq02X1r3Jy/kD2zmjpWhtB4w7YbLIU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lklop5ToRsBQ0Uel8E3dBH7Tfj66PzVU13RcyhUfijAJmFx+iWNhTrsqCxzS9wuYNBNlE4vco8WsY0u7yAOaf9KtjfwpFUuARAkAINLLxxog+IGfZB/9AjJwBzqZQxKiOgVOJNKJ6zBZwpMWtMbKfDFVNDeSDyNrWtanxXRhKE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JejDprwl; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id AEDDB4E41235;
+	Tue, 21 Oct 2025 09:32:17 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 849E560680;
+	Tue, 21 Oct 2025 09:32:17 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B5D57102F23A8;
+	Tue, 21 Oct 2025 11:32:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761039136; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=dlDkAq1VSlkhX1Mtmjitmb/y9AT4xni68v3r5mMJ44c=;
+	b=JejDprwlP6tFnfjWSSFt421IQ6GyFjUkMTUJZh8j+CCTdBwPMgIvXrtOuogtrHLGTFSyvL
+	d4YtI8/wLDT/e3ATO+gBjwCvSpAVywyFhanT9etwrEYarTHV7bD+YfkARDyhQvp5p0B6Vk
+	R+fXP7yyisfwrW+WOveU/gRxjNLcFEqR3vU2qBeRs/hLJ9Glpm/gcqTPn9ftkdH7NfCNzC
+	3f5H8QtYbkXvV8WYIMM1GAh6CbgaPdG6rdoh9HsN7AjxpIBqtzs+zcoGwgIIMpqHiNkbGP
+	u9AZFpmj41QzfGgiN1oD7f/MRe867Nx95FCdyTLbgnnbEpPGM0blelVliBhkJQ==
+Message-ID: <563f3f1b-985f-4a9e-a32c-cb8e9b6af43a@bootlin.com>
+Date: Tue, 21 Oct 2025 11:32:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/4] amd-xgbe: add ethtool phy selftest
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, andrew+netdev@lunn.ch, Shyam-sundar.S-k@amd.com
+References: <20251020152228.1670070-1-Raju.Rangoju@amd.com>
+ <20251020152228.1670070-3-Raju.Rangoju@amd.com>
+ <ba2c0a35-eaad-4ae7-a337-b32cdf6323c6@bootlin.com>
+ <9ba51a79-5a0e-42ab-90aa-950673633cda@lunn.ch>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <9ba51a79-5a0e-42ab-90aa-950673633cda@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
 
-Test that outgoing plaintext records respect the tls TLS_TX_MAX_PAYLOAD_LEN
-set using setsockopt(). The limit is set to be 128, thus, in all received
-records, the plaintext must not exceed this amount.
 
-Also test that setting a new record size limit whilst a pending open
-record exists is handled correctly by discarding the request.
+On 20/10/2025 21:07, Andrew Lunn wrote:
+> On Mon, Oct 20, 2025 at 06:19:55PM +0200, Maxime Chevallier wrote:
+>> Hi Raju,
+>>
+>> On 20/10/2025 17:22, Raju Rangoju wrote:
+>>> Adds support for ethtool PHY loopback selftest. It uses
+>>> genphy_loopback function, which use BMCR loopback bit to
+>>> enable or disable loopback.
+>>>
+>>> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+>>
+>> This all looks a lot like the stmmac selftests, hopefully one day
+>> we can extract that logic into a more generic selftest framework
+>> for all drivers to use.
+> 
+> https://elixir.bootlin.com/linux/v6.17.3/source/net/core/selftests.c#L441
+> 
+> Sorry, not looked at the patch to see if this is relevant for this
+> driver. But we do have a generic selftest framework...
+> 
+> 	Andrew
 
-Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
-Signed-off-by: Wilfred Mallawa <wilfred.mallawa@wdc.com>
----
-V6 -> V7:
- - Added a TLS 1.3 test case
----
- tools/testing/selftests/net/tls.c | 192 ++++++++++++++++++++++++++++++
- 1 file changed, 192 insertions(+)
+Ah ! And this also looks like this driver code. It seems to me that the
+main diffence that the amd-xgbe selftest brings is the ability to
+fallback to MAC-side loopback should PHY loopback fails, so they don't
+1:1 map to these, but we could consider extending the existing selftests.
 
-diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
-index 5c6d8215021c..d256668b35bf 100644
---- a/tools/testing/selftests/net/tls.c
-+++ b/tools/testing/selftests/net/tls.c
-@@ -2856,6 +2856,198 @@ TEST_F(tls_err, oob_pressure)
- 		EXPECT_EQ(send(self->fd2, buf, 5, MSG_OOB), 5);
- }
- 
-+/*
-+ * Parse a stream of TLS records and ensure that each record respects
-+ * the specified @max_payload_len.
-+ */
-+static size_t parse_tls_records(struct __test_metadata *_metadata,
-+				const __u8 *rx_buf, int rx_len, int overhead,
-+				__u16 max_payload_len)
-+{
-+	const __u8 *rec = rx_buf;
-+	size_t total_plaintext_rx = 0;
-+	const __u8 rec_header_len = 5;
-+
-+	while (rec < rx_buf + rx_len) {
-+		__u16 record_payload_len;
-+		__u16 plaintext_len;
-+
-+		/* Sanity check that it's a TLS header for application data */
-+		ASSERT_EQ(rec[0], 23);
-+		ASSERT_EQ(rec[1], 0x3);
-+		ASSERT_EQ(rec[2], 0x3);
-+
-+		memcpy(&record_payload_len, rec + 3, 2);
-+		record_payload_len = ntohs(record_payload_len);
-+		ASSERT_GE(record_payload_len, overhead);
-+
-+		plaintext_len = record_payload_len - overhead;
-+		total_plaintext_rx += plaintext_len;
-+
-+		/* Plaintext must not exceed the specified limit */
-+		ASSERT_LE(plaintext_len, max_payload_len);
-+		rec += rec_header_len + record_payload_len;
-+	}
-+
-+	return total_plaintext_rx;
-+}
-+
-+TEST(tls_12_tx_max_payload_len)
-+{
-+	struct tls_crypto_info_keys tls12;
-+	int cfd, ret, fd, overhead;
-+	size_t total_plaintext_rx = 0;
-+	__u8 tx[1024], rx[2000];
-+	__u16 limit = 128;
-+	__u16 opt = 0;
-+	unsigned int optlen = sizeof(opt);
-+	bool notls;
-+
-+	tls_crypto_info_init(TLS_1_2_VERSION, TLS_CIPHER_AES_CCM_128,
-+			     &tls12, 0);
-+
-+	ulp_sock_pair(_metadata, &fd, &cfd, &notls);
-+
-+	if (notls)
-+		exit(KSFT_SKIP);
-+
-+	/* Don't install keys on fd, we'll parse raw records */
-+	ret = setsockopt(cfd, SOL_TLS, TLS_TX, &tls12, tls12.len);
-+	ASSERT_EQ(ret, 0);
-+
-+	ret = setsockopt(cfd, SOL_TLS, TLS_TX_MAX_PAYLOAD_LEN, &limit,
-+			 sizeof(limit));
-+	ASSERT_EQ(ret, 0);
-+
-+	ret = getsockopt(cfd, SOL_TLS, TLS_TX_MAX_PAYLOAD_LEN, &opt, &optlen);
-+	EXPECT_EQ(ret, 0);
-+	EXPECT_EQ(limit, opt);
-+	EXPECT_EQ(optlen, sizeof(limit));
-+
-+	memset(tx, 0, sizeof(tx));
-+	ASSERT_EQ(send(cfd, tx, sizeof(tx), 0), sizeof(tx));
-+	close(cfd);
-+
-+	ret = recv(fd, rx, sizeof(rx), 0);
-+
-+	/*
-+	 * 16B tag + 8B IV -- record header (5B) is not counted but we'll
-+	 * need it to walk the record stream
-+	 */
-+	overhead = 16 + 8;
-+	total_plaintext_rx = parse_tls_records(_metadata, rx, ret, overhead,
-+					       limit);
-+
-+	ASSERT_EQ(total_plaintext_rx, sizeof(tx));
-+	close(fd);
-+}
-+
-+TEST(tls_13_tx_max_payload_len)
-+{
-+	struct tls_crypto_info_keys tls13;
-+	int cfd, ret, fd, overhead;
-+	size_t total_plaintext_rx = 0;
-+	__u8 tx[1024], rx[2000];
-+	__u16 limit = 63;
-+	__u16 opt = 0;
-+	unsigned int optlen = sizeof(opt);
-+	bool notls;
-+
-+	tls_crypto_info_init(TLS_1_3_VERSION, TLS_CIPHER_AES_CCM_128,
-+			     &tls13, 0);
-+
-+	ulp_sock_pair(_metadata, &fd, &cfd, &notls);
-+
-+	if (notls)
-+		exit(KSFT_SKIP);
-+
-+	/* Don't install keys on fd, we'll parse raw records */
-+	ret = setsockopt(cfd, SOL_TLS, TLS_TX, &tls13, tls13.len);
-+	ASSERT_EQ(ret, 0);
-+
-+	ret = setsockopt(cfd, SOL_TLS, TLS_TX_MAX_PAYLOAD_LEN, &limit,
-+			 sizeof(limit));
-+	ASSERT_EQ(ret, 0);
-+
-+	ret = getsockopt(cfd, SOL_TLS, TLS_TX_MAX_PAYLOAD_LEN, &opt, &optlen);
-+	EXPECT_EQ(ret, 0);
-+	/* TLS 1.3: plaintext length should contain the ContentType byte */
-+	EXPECT_EQ(limit + 1, opt);
-+	EXPECT_EQ(optlen, sizeof(limit));
-+
-+	memset(tx, 0, sizeof(tx));
-+	ASSERT_EQ(send(cfd, tx, sizeof(tx), 0), sizeof(tx));
-+	close(cfd);
-+
-+	ret = recv(fd, rx, sizeof(rx), 0);
-+
-+	/*
-+	 * 16B tag + 1B ContentType -- record header (5B) is not counted but
-+	 * we'll need it to walk the record stream
-+	 */
-+	overhead = 16 + 1;
-+	total_plaintext_rx = parse_tls_records(_metadata, rx, ret, overhead,
-+					       opt);
-+
-+	ASSERT_EQ(total_plaintext_rx, sizeof(tx));
-+	close(fd);
-+}
-+
-+TEST(tls_12_tx_max_payload_len_open_rec)
-+{
-+	struct tls_crypto_info_keys tls12;
-+	int cfd, ret, fd, overhead;
-+	size_t total_plaintext_rx = 0;
-+	__u8 tx[1024], rx[2000];
-+	__u16 tx_partial = 256;
-+	__u16 og_limit = 512, limit = 128;
-+	bool notls;
-+
-+	tls_crypto_info_init(TLS_1_2_VERSION, TLS_CIPHER_AES_CCM_128,
-+			     &tls12, 0);
-+
-+	ulp_sock_pair(_metadata, &fd, &cfd, &notls);
-+
-+	if (notls)
-+		exit(KSFT_SKIP);
-+
-+	/* Don't install keys on fd, we'll parse raw records */
-+	ret = setsockopt(cfd, SOL_TLS, TLS_TX, &tls12, tls12.len);
-+	ASSERT_EQ(ret, 0);
-+
-+	ret = setsockopt(cfd, SOL_TLS, TLS_TX_MAX_PAYLOAD_LEN, &og_limit,
-+			 sizeof(og_limit));
-+	ASSERT_EQ(ret, 0);
-+
-+	memset(tx, 0, sizeof(tx));
-+	ASSERT_EQ(send(cfd, tx, tx_partial, MSG_MORE), tx_partial);
-+
-+	/*
-+	 * Changing the payload limit with a pending open record should
-+	 * not be allowed.
-+	 */
-+	ret = setsockopt(cfd, SOL_TLS, TLS_TX_MAX_PAYLOAD_LEN, &limit,
-+			 sizeof(limit));
-+	ASSERT_EQ(ret, -1);
-+	ASSERT_EQ(errno, EBUSY);
-+
-+	ASSERT_EQ(send(cfd, tx + tx_partial, sizeof(tx) - tx_partial, MSG_EOR),
-+		  sizeof(tx) - tx_partial);
-+	close(cfd);
-+
-+	ret = recv(fd, rx, sizeof(rx), 0);
-+
-+	/*
-+	 * 16B tag + 8B IV -- record header (5B) is not counted but we'll
-+	 * need it to walk the record stream
-+	 */
-+	overhead = 16 + 8;
-+	total_plaintext_rx = parse_tls_records(_metadata, rx, ret, overhead,
-+					       og_limit);
-+	ASSERT_EQ(total_plaintext_rx, sizeof(tx));
-+	close(fd);
-+}
-+
- TEST(non_established) {
- 	struct tls12_crypto_info_aes_gcm_256 tls12;
- 	struct sockaddr_in addr;
--- 
-2.51.0
+Besides that it seems that the generic selftest are more efficient wrt
+how they deal with PHY loopback, as they don't re-configure it for each
+selftest.
 
+I don't necessarly think this series should be reworked but this is
+starting to be a lot of code duplication.
+
+Raju, maybe you can re-use at least the generic packet generation
+functions (i.e net_tst_get_skb() ) ?
+
+Maxime
 
