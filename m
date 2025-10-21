@@ -1,287 +1,80 @@
-Return-Path: <netdev+bounces-231391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 407AABF8BA8
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 22:35:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 49096BF8BB7
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 22:38:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5ADB3AF80E
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 20:35:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0949F426A16
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 20:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30EBA1F3FED;
-	Tue, 21 Oct 2025 20:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B982527FB37;
+	Tue, 21 Oct 2025 20:38:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TRztIxoh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QxqvCWVP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C55350A3C
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 20:35:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761078910; cv=fail; b=MS7Jhwg99Irp4UgEiKD8HfPyDrJkfboIn8BLKZ6r89z+H1m4Z1/kSjDkWAukKdBs4Tp6qiCQzhSt40IszNiS34IUylqBRjTgK+gAHn1RK47I1d1QCGvkohajtfigkRfXtupQpgYUAFFmEqxQoCIhDJGwAQ2FEG7FI3oIoW2F6VU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761078910; c=relaxed/simple;
-	bh=tXeDpFuOc/a6iiL/Oi6jWR/3jAkkJAcvGQCbULzQceQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=h/B8QvF0KDXyrXflXTzct9TDeH6hsBB5PDKxyTAf+VKax/WE6fpYmrmEIBKbKv/omqoqGqXoCGwxmu/Ttl2I00yDLxuCoiw4kv6+WU5kFKhBWHVeRp0CFrkwxoEvxRV0uVoUOKkmBIoJaPBtvlo9W3I4sXwX9061DYyxVJiIjCA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TRztIxoh; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761078908; x=1792614908;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=tXeDpFuOc/a6iiL/Oi6jWR/3jAkkJAcvGQCbULzQceQ=;
-  b=TRztIxohbGaPX1rNunqZtsycgUCDoUFGpG/ASqZpwdVV9wLdZ3K8c7ol
-   uU76FjTi3UcGTKo0Hbbm+zU43LfNpuyPMnQ23xYeSWH62ZYuehE1QLe2e
-   6PFhI1q0/a2Yy6yHgTDhIqwNp8o0JK3oCmKLfxzV7nWcOJ8HWGBHRpOum
-   gF7bE6jvv17UEmnLGCIV13eSv0rKMfEoCIXINd/byBnL1IWlv3/ua2shL
-   ooZI6GDxBKxJ4lqC978Sj1Y7BkpOAZ24gzlIXFjszjx+ZGoE53/UU8pYz
-   EvWXhJida+daNME4DRKgldEdPhRHudznGMXFe28sME2QQzVRWZL+n0I2f
-   A==;
-X-CSE-ConnectionGUID: T7Vn8HkfSwOupg0SQLByEg==
-X-CSE-MsgGUID: 1YOyW0iwSS26vj7PsGTyYA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63365723"
-X-IronPort-AV: E=Sophos;i="6.19,245,1754982000"; 
-   d="scan'208";a="63365723"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2025 13:35:07 -0700
-X-CSE-ConnectionGUID: 8/u3Gm6sRVi33O1mCdWiWA==
-X-CSE-MsgGUID: fL6att76Rl2vSpOef9tCfg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,245,1754982000"; 
-   d="scan'208";a="207356799"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2025 13:35:06 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 21 Oct 2025 13:35:05 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Tue, 21 Oct 2025 13:35:05 -0700
-Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.62) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 21 Oct 2025 13:35:05 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EXFXK7gfe7rttU0M7OBCokBFp0Tn6YEkC/kWCtlrjy1nG9BCi7fMHTxSR8P7P8irKf6JjH5DYGmCn2ZYkAcguLOfczpgrWxRK0qZW7UGJAVO8id8woWfHxfeQm9edqAJugK/vJJNSHWHXxDRKl4qWCfYDiQsSssT03n7rYAncn8qtCyFHSGtLztJUVEezc1tumaHnx/60L69VUpN78miJPCRt4PdEdYc+3SAQa55DRwoPSmEOx2wB2F7vGqERpEGnhkr9+mwpbHKaLq6H3H9qg+3nJUGK6FMBe4zGvmlMa9jUXNQbz2S0JD0ANbTS20uHdtIyCCUydOFGck9RAp8eA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bT/Jczlyf2ksLWCI999hpb/baCiPDh/Gwf8+eGFshWg=;
- b=Hmhhoei8vHmW5kwKJdexvNeozNL6wPaOuUtAw3UzF0TKIj7npys6K2oDDQyvhQ0+uTm/0OMY4sWnxnMAO9oNMzIycETObrHekN682KjWcshwzIsvCPMABJmI1hBOEte0kDG+8x2Yk3XBKWpGycbGtblWHYOIhzaagTCJs2hCNHqzFNXSqtwj5TIQi1N1TtO/FrDFVS2VkIrOKvMQnzLDpDb0JVC4w8+f3zPbLoKqyZYY4tX+1sZIjU+wJuabaod6n4l/LEdX8ImPsQ5zcsadTDdlEMcm++UP77rPwm9FQJDkLIJe9/GoK5o3p7rr0Nd5bRRjsyEiJ3cFOTXNnmlylw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by LV3PR11MB8696.namprd11.prod.outlook.com (2603:10b6:408:216::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.17; Tue, 21 Oct
- 2025 20:35:00 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3%4]) with mapi id 15.20.9228.016; Tue, 21 Oct 2025
- 20:35:00 +0000
-From: "Keller, Jacob E" <jacob.e.keller@intel.com>
-To: Robert Malz <robert.malz@canonical.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
- . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
-	"Czapnik, Lukasz" <lukasz.czapnik@intel.com>, Jamie Bainbridge
-	<jamie.bainbridge@gmail.com>, Jay Vosburgh <jay.vosburgh@canonical.com>,
-	Dennis Chen <dechen@redhat.com>, Michal Swiatkowski
-	<michal.swiatkowski@linux.intel.com>
-Subject: RE: [PATCH] i40e: avoid redundant VF link state updates
-Thread-Topic: [PATCH] i40e: avoid redundant VF link state updates
-Thread-Index: AQHcQqGqBnfWQmT0u0eRaqP2069YjbTNDupQ
-Date: Tue, 21 Oct 2025 20:35:00 +0000
-Message-ID: <CO1PR11MB5089A29DFDC077EDE6E535BAD6F2A@CO1PR11MB5089.namprd11.prod.outlook.com>
-References: <20251021154439.180838-1-robert.malz@canonical.com>
-In-Reply-To: <20251021154439.180838-1-robert.malz@canonical.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CO1PR11MB5089:EE_|LV3PR11MB8696:EE_
-x-ms-office365-filtering-correlation-id: 78822fbf-c358-4f99-e3fd-08de10e14ea7
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?bqUGVCqmHKB/8Wgq7FQS1iZa9/GKqHPwI7mZV+CUNkHi4SCz4Ke+tGuZeU0s?=
- =?us-ascii?Q?IyNVvXP+jGt+fayWlPkL5gKBLikoBfXHC6zavnNw9HRDRSiVHGaHXufesdIl?=
- =?us-ascii?Q?MoXcQNplgACTl3ISfjULRMh1KQz4SvI0vOJvE4IkwxzxN6BYBR9NXbdPiKtI?=
- =?us-ascii?Q?IoWwgWSAqqw2NT3PtaBD2E5d+SBLlBnMePwOJgNwo5yjmIrfxENlLj7zYLff?=
- =?us-ascii?Q?7bJP5lvH8ucYBnOWl3/kCfET4MipaXhfF9kXPRxK6dssG55+WvWSxdd8te4m?=
- =?us-ascii?Q?qCmOBo2zeaGbx8759A1SMDhWiByorMgEZk5VZkLEzLXYby5B+um0E8sNkEaA?=
- =?us-ascii?Q?rUISOVEO8srAAQNvEuHh6U5qgqzhm8BYC1S0d7EMWaLlqiEbozCfuCar7ilb?=
- =?us-ascii?Q?8LD5pyHHVsfobafqWfZLT2f7R0Ge+iJZWPmn9uIH9GiJAUY+NDgLmGmRMjbD?=
- =?us-ascii?Q?pX+XUbSoyI9rNmauebwS+8WCknfdz9KEbbamEJpon6sdI0c10GLfTHWWmN2B?=
- =?us-ascii?Q?re0cwUPbWVsoX5wIJxRkcl4AwL8nmnTg27Adjnr2vz7P8RBbhgt+5fi7flbT?=
- =?us-ascii?Q?l1PBbU6eQzG32yEbRE8lqXEjFL8vCp0RsJG0rY6bdArCU0AGbd9hr2NG6rTc?=
- =?us-ascii?Q?pJjZrOnPTP4WF6psWKDGpsikiV0e05RGWgQGfcuCQrUd5LSVyQ58Uprn4UrN?=
- =?us-ascii?Q?IlCgoWDKYJVJEggt/JQCCmxaOJ1/C4wdU/BVOrTJfMHBKth5nNvHWmzV9iuK?=
- =?us-ascii?Q?2DgBEblhykZe/0v8HStn4YbfSBWXImg5EK3oaIMvhefyyetMvQZlL8YgZ/lK?=
- =?us-ascii?Q?0BDwTIAc6lGq8HXFuSheQLk5iZrlBVsh7IJ4Y2ml14O2Te00W6lE0XwHUa/D?=
- =?us-ascii?Q?Cg56ZpSXceQnjPBGPzujMRf+JOHwVtokl8B+04yZm/5bZABqd+qGJ4BVZKWH?=
- =?us-ascii?Q?0IecffrbJE6WGTzuhurw3r2mieMTS4M463YPgplqfwbRvGikf5R5S0h+VHMa?=
- =?us-ascii?Q?8dpGbn7UVW2ZeOQTt7DIYIViPU6RoUN5yUNvZpryWyd0x6dxH/R/g3F0KKdL?=
- =?us-ascii?Q?xW5VEbnG5s8hpIAzDQO2+fsqvwjubtT1RGZokDg+bjBUZTrR2ZQajnJv75Gw?=
- =?us-ascii?Q?po7vkQic1HDY33LDNYBL+iEptGC83x1JIXGzACorRWlRC8rkV4K3Yb5xscg5?=
- =?us-ascii?Q?BaplHU5q+3IR8UZIXtlj44TX2ufYvpZawhtioy4+2GGRma/k8tEl/Vhl/Oq1?=
- =?us-ascii?Q?bFiQRHjStanYdhQvXMtfmBf0pISVYOSmeTDaVgh2insNgtPVz/xSbxTyTL7J?=
- =?us-ascii?Q?+ld94rKKzpsEKkyBRAh44El6ByZJ4U5H/lvygSMAF/Shj3g0riuryigenXhO?=
- =?us-ascii?Q?v5Fb2ASirBYDeP1hxjTIsSEImDzDovb/cDOxVOsxt9SzJcPi0SPlP8gd01Dr?=
- =?us-ascii?Q?HcgyILxe6S+S1aa7pJBeiDlg/8FGe99IAwch5vHXxVTPkK+wqt5OjfUfiR6F?=
- =?us-ascii?Q?c65F12j0EZ5YtVOOKNjaWiRVFMpj6DrLJN6p?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?YdoORqsgesAcSbGqpw/birjPGG1a60yjuSxMfopKZRrBNY5wtoK0eigf1Jw5?=
- =?us-ascii?Q?Ot+s93vuImlCMvfMrmRhKlP3mhKlliqI8Z9omkJKh4N6aUz46oSKPv8ABi91?=
- =?us-ascii?Q?J6j99V+34lBS7dgLereD/IYWai6C4lT8ZnyOURkalnj9y/UVvq9IZXjV1jOq?=
- =?us-ascii?Q?lamtohPe3lqJFne0OnvfoKffpoItoswB6h3aKtR46djbPlXG55s+TRKlXgdv?=
- =?us-ascii?Q?0XKEiTZk5SvZBMxXmHE99XbywjEwX1gHMaBZQCuXwSk/i+C26IMZgBoXD7v2?=
- =?us-ascii?Q?+nvebvBWGz36jfqN6qogGYr75X25bZ7uZnpNyYWaq3JmUL5z5+TQm06HUB/o?=
- =?us-ascii?Q?4HhraKRasCtUs9qNnEqo6sKESaRveB/hgOY3TLjKeN/uYpM/ZucPVRzDifba?=
- =?us-ascii?Q?gUwbFwWkokqa8Jj7ao1R4kK3Jt7Uhdgq1KWZeuAvSE8v83wsisTPKCbcmd6S?=
- =?us-ascii?Q?Ole2QxREAEOljHSxdYAbDMQ6JERZYuA2ROfUyVyW+Qk2yA8xq2/eczqasQpv?=
- =?us-ascii?Q?AxUxIQqIf28idIPSrvDm7zdMNe21+GzwUFjFK0kHa65OOYDasF8aHYv9zOEm?=
- =?us-ascii?Q?wQYI3jCV8dQsmE3QzgqLDYscA2VgTyjhx5WdhYj8kBW7++fwRuGmNXZbKyp3?=
- =?us-ascii?Q?JWi3s0kDDnknRSwbUE0Cm+Ywgpcb024E1z2nbPvG+wBk9kciC//9TMZTGEuK?=
- =?us-ascii?Q?xwBpiHt8Hca2XSTPQixW46861ZT1K+RrGW21qb+8jPlfaHio6+qaXZiIojhq?=
- =?us-ascii?Q?mhydffjb9AuUl7XrldontNBpXvvWby6y9TVQGW9uoChLtvpO3XX4IhilMS91?=
- =?us-ascii?Q?mlr2IA3x5JBtNrf54o5tt7kwSlt4l9W7nC5kF5M8VanNo73cEgevZuO171kd?=
- =?us-ascii?Q?tyRjCjzmWkvcpyY0Si82saRwWn3oZyHxTL294InwQo1HQEwBZwCcQCZhUbts?=
- =?us-ascii?Q?OPMGsj924Ak8Ir4iHzfac2oGfHnZv/d2MOjhnn9rZ2tj6MZvjoUKPH/ha/6a?=
- =?us-ascii?Q?wyAKpEOr0/flNPIexlR9Jz9pTn6g4U9na7RjWGwGZ6ipyUoGxPykRurv/wqg?=
- =?us-ascii?Q?cEX4zolrS2SPNv/J0wJ2JuC58BiZ1cNFoA7rJk9uF07NHYQbIDAjkwW2n/H1?=
- =?us-ascii?Q?VLNA3c/CY/XdhJjb0OQz19tootuTSHYyvofCFrdD2AreHItpihRNtTZKXS9e?=
- =?us-ascii?Q?c35i2VbUnfH1USqTYzPi41q0KmY/jptTA+ph2T6ruto7fKI905KuWmSHh0Qq?=
- =?us-ascii?Q?JliBj54kTHxF2zr2jNSWFztIL0oGsZJ1Pt259e0tjNZAng0yT+W5QVvri7qJ?=
- =?us-ascii?Q?tSH7/xWhv2prgtLcIKKKXFMn+D30/3HFVV+kYVtA+ehBRaGa8To4hGkwzok2?=
- =?us-ascii?Q?5k91AjRejBg5ogsuNOzWLGyzMecH/xw4ggM28rW2LEtgG3HQSa4dhB6AI0uI?=
- =?us-ascii?Q?z2UhyewabTCzJjufRKntCZ6/kMT97Ny6UfMfYI/XGdVNqlJGbo5Slv3Jie6B?=
- =?us-ascii?Q?LWl5MWPYUd7njbBDIVjt2T21xEpcPMbVzIpazQCacM4xi3oUVXg+nMorzirU?=
- =?us-ascii?Q?mBoF1LPez7sh/THNEP6Y47j/HF5S/qA2chUNltWW?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E47278E47;
+	Tue, 21 Oct 2025 20:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761079091; cv=none; b=uyJpuYKlGwab9uX1MHtRvz+bshS8kTSIsHJorHy5XS+7SdLvbjA5T1zDG+KCaOKVM2vLx2Oi9Zn6j0L+FWL5e3a5WJY7bedTBliJR/vAdUWDrlxAih8BKltrsDRziDRdgLheyLAJm1YPegDGeGMi84g0wZz4FtCg0hbynbAucl4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761079091; c=relaxed/simple;
+	bh=ia3Nc+aBiEWsw6lzxIwHJIH6FTSei7DoOMNQPMRgNQU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R0SFNN5PJYt5Lo66cMmQUZIaH6gYqANp142jJJLT2uRjcssxDOFGMuKq2eS0EKtuAzZ9U9xWWOu8zZ5JjTOBvAgujmn6hYt3cljaKRnQt121OVf7fZS94raFlddRjVLjKrN3tinOaRBYj9Q49afjVL0jugYJFUQhLtJ3c3f2Qm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QxqvCWVP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1742C4CEF1;
+	Tue, 21 Oct 2025 20:38:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761079090;
+	bh=ia3Nc+aBiEWsw6lzxIwHJIH6FTSei7DoOMNQPMRgNQU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QxqvCWVP0bNfEZlCEnqcRk0d7+zRQq1ttyM5+JY19EUytZ8YqqcGgSv+V59PrNoKE
+	 eFU+Ca46qgGuUStEMts8ZwrdtoqWi6ifcZKDW/2ghKpMpgWE7my5JHfsVgBYK3+4Bt
+	 IxUedaI2zyp5Y41G2HD6C3uuGrbIGI4hla678mkWfi10fWSfE7aafQMz8aCBTP/Kl1
+	 PCkJJUw1W9HJxXUotJrur/QtJJ1b9IR9zJ8I/MythhzOJRjry7/CQgo/ONCFVkk9uy
+	 bRVlZyYbWyhhL6klUdu39l4ZFQWu55Tu/3p+Q5Gyw2ZrkY619BEwyL4mNJ9xcx7iGd
+	 GABHbkBDaat8Q==
+Date: Tue, 21 Oct 2025 15:38:08 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: devicetree@vger.kernel.org, davem@davemloft.net,
+	richardcochran@gmail.com, linux-kernel@vger.kernel.org,
+	kuba@kernel.org, Frank.Li@nxp.com, netdev@vger.kernel.org,
+	vladimir.oltean@nxp.com, krzk+dt@kernel.org, andrew+netdev@lunn.ch,
+	claudiu.manoil@nxp.com, imx@lists.linux.dev, conor+dt@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, xiaoning.wang@nxp.com
+Subject: Re: [PATCH net-next 1/8] dt-bindings: net: netc-blk-ctrl: add
+ compatible string for i.MX94 platforms
+Message-ID: <176107908528.775814.3309266572882987703.robh@kernel.org>
+References: <20251016102020.3218579-1-wei.fang@nxp.com>
+ <20251016102020.3218579-2-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 78822fbf-c358-4f99-e3fd-08de10e14ea7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Oct 2025 20:35:00.5990
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WESooikWqCWif/73iXwD70d+KbsK2j5mnJ5+r7yqrTmABc3t0DWeeQnGAje0vwf0BNIxeR6oh1CHOwEeydjpvISA83Hv6wmIAzvLo96bbY4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8696
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251016102020.3218579-2-wei.fang@nxp.com>
 
 
-
-> -----Original Message-----
-> From: Robert Malz <robert.malz@canonical.com>
-> Sent: Tuesday, October 21, 2025 8:45 AM
-> To: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>; Davi=
-d
-> S . Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>;
-> Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Simon
-> Horman <horms@kernel.org>; Loktionov, Aleksandr
-> <aleksandr.loktionov@intel.com>; Czapnik, Lukasz <lukasz.czapnik@intel.co=
-m>;
-> Robert Malz <robert.malz@canonical.com>; Jamie Bainbridge
-> <jamie.bainbridge@gmail.com>; Jay Vosburgh <jay.vosburgh@canonical.com>;
-> Dennis Chen <dechen@redhat.com>; Keller, Jacob E <jacob.e.keller@intel.co=
-m>;
-> Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Subject: [PATCH] i40e: avoid redundant VF link state updates
->=20
-> From: Jay Vosburgh <jay.vosburgh@canonical.com>
->=20
-> Multiple sources can request VF link state changes with identical
-> parameters. For example, Neutron may request to set the VF link state to
-> IFLA_VF_LINK_STATE_AUTO during every initialization or user can issue:
-> `ip link set <ifname> vf 0 state auto` multiple times. Currently, the i40=
-e
-> driver processes each of these requests, even if the requested state is
-> the same as the current one. This leads to unnecessary VF resets and can
-> cause performance degradation or instability in the VF driver - particula=
-rly
-> in DPDK environment.
->=20
-> With this patch i40e will skip VF link state change requests when the
-> desired link state matches the current configuration. This prevents
-> unnecessary VF resets and reduces PF-VF communication overhead.
->=20
-> Co-developed-by: Robert Malz <robert.malz@canonical.com>
-> Signed-off-by: Robert Malz <robert.malz@canonical.com>
-> Signed-off-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+On Thu, 16 Oct 2025 18:20:12 +0800, Wei Fang wrote:
+> Add the compatible string "nxp,imx95-netc-blk-ctrl" for i.MX94 platforms.
+> 
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
 > ---
->  drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->=20
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> index 081a4526a2f0..0fe0d52c796b 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> @@ -4788,6 +4788,7 @@ int i40e_ndo_set_vf_link_state(struct net_device
-> *netdev, int vf_id, int link)
->  	unsigned long q_map;
->  	struct i40e_vf *vf;
->  	int abs_vf_id;
-> +	int old_link;
->  	int ret =3D 0;
->  	int tmp;
->=20
-> @@ -4806,6 +4807,17 @@ int i40e_ndo_set_vf_link_state(struct net_device
-> *netdev, int vf_id, int link)
->  	vf =3D &pf->vf[vf_id];
->  	abs_vf_id =3D vf->vf_id + hw->func_caps.vf_base_id;
->=20
-> +	/* skip VF link state change if requested state is already set */
-> +	if (!vf->link_forced)
-> +		old_link =3D IFLA_VF_LINK_STATE_AUTO;
-> +	else if (vf->link_up)
-> +		old_link =3D IFLA_VF_LINK_STATE_ENABLE;
-> +	else
-> +		old_link =3D IFLA_VF_LINK_STATE_DISABLE;
-> +
-> +	if (link =3D=3D old_link)
-> +		goto error_out;
-> +
+>  Documentation/devicetree/bindings/net/nxp,netc-blk-ctrl.yaml | 1 +
+>  1 file changed, 1 insertion(+)
+> 
 
-This seems reasonable to me. We should check if ice needs something similar=
- as well.
-
-Thanks,
-Jake
-
->  	pfe.event =3D VIRTCHNL_EVENT_LINK_CHANGE;
->  	pfe.severity =3D PF_EVENT_SEVERITY_INFO;
->=20
-> --
-> 2.34.1
+Acked-by: Rob Herring (Arm) <robh@kernel.org>
 
 
