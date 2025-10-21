@@ -1,213 +1,123 @@
-Return-Path: <netdev+bounces-231236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF4D5BF654B
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 14:08:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15783BF65D7
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 14:13:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E0AC5423FF
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:04:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 915B55416E8
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:08:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6AE3314DF;
-	Tue, 21 Oct 2025 11:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD1233CEBF;
+	Tue, 21 Oct 2025 11:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C4mlpyhI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fN7l/pOj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F225B34029B;
-	Tue, 21 Oct 2025 11:48:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2129833CEAA;
+	Tue, 21 Oct 2025 11:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761047293; cv=none; b=oLOUDV3XgbbEQmlN42VHx6o7fGnyH2aLEo+Sp27VPyiZ7HZ8NPNKDIByFsw+Cgt577GLN3Q6LBihYekO2soI9Em4jP3i+h/lglzVeHuwwCUq8qPRd8KjRR1MHGFXqgMR7B5r/47pma3pcSoU5gec9iI2iTAl6Iz8iiH8PqDK/Dc=
+	t=1761047657; cv=none; b=QF+jx0OyJAlcnL+nKXve6oOQvumj1FZa3RacD83mHf7Ba0wa+PLaBs4am5PzbGLchEDtgKT6rm0zCsSom60T6e6HXoMUFBmEMPnrbjSXpFp6hte5c4K11utXQql7RfrBG/w15VB/jpxpQWDft6TSnHj/IwjdHQbI2H+rDxFzNvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761047293; c=relaxed/simple;
-	bh=Jz2qZpRe8+RR2mHCIjuTDi9/gaS5B8ErVeSfakXzmUk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Cor0cmAvOjx6qYcz4n2beO2ZpAchv6Ub5u7EG67/bSPpY5X9DU7R1NseaSpmiEeXlvrVIE9MMv42Lq/IQvM4SgCQprtb6JlDF+7z94Y0yZX0wK7qzRFxUKBKFWs1xwbRi2AuB3jmbpnnEICMWX7FhdxVORh7genhkIJ19JNHZWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C4mlpyhI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E1DFC4CEF1;
-	Tue, 21 Oct 2025 11:48:07 +0000 (UTC)
+	s=arc-20240116; t=1761047657; c=relaxed/simple;
+	bh=uPZbpRtuUAGL7PXaUrKempyAjExOsq+OSZosdwkFDXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=F1lZsJXssdcrGOZiJY3/MxoGab4ls0+pfCyqdzj44WizkOMihnNs2ggC8XLBKYgRsdy5hhHYRjy0o9N1skKpYCR4C5fFhhKZnElbGqrlDvNfcZ9B5oKsnL4VKooiPgQbN4HKfbzBmUGR4osb5hpvnRcXbd12R10ROXCzBb6d3lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fN7l/pOj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C460C4CEF1;
+	Tue, 21 Oct 2025 11:54:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761047292;
-	bh=Jz2qZpRe8+RR2mHCIjuTDi9/gaS5B8ErVeSfakXzmUk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=C4mlpyhIGvKUgqqLYymipY+q92Q0Y6a8LxZZHPWt8Q9Ms8fcpxI+zKHIRhAGNSY0v
-	 2sFBTo0bbJ/mGEr7zSeIZjxwolrW3hmf5ndAKnPD6nms66SRweZDmq3kEDC4QTQJoJ
-	 b3AJJztU7NwjCMT/r/77QwrjfWQmicCSrGNIqCLKxYytRhWPcddLdkMyh7GmTamXMT
-	 xvnQRhKlQDkhV6bi+K1bg5IxXOUkbBGBzQPZKdgHxptAutGLmlVSmHbJbiMiJsYmad
-	 lcZ2tGpq3i3W59BlICyKrkcgJ4DyN/OKQ04KFg8GtmSRXQu2AhsYnw6stvPUjjue0V
-	 iDR251KCbcthA==
-From: Christian Brauner <brauner@kernel.org>
-Date: Tue, 21 Oct 2025 13:43:56 +0200
-Subject: [PATCH RFC DRAFT 50/50] selftests/namespaces: seventh listns()
- permission test
+	s=k20201202; t=1761047657;
+	bh=uPZbpRtuUAGL7PXaUrKempyAjExOsq+OSZosdwkFDXc=;
+	h=Date:From:To:Cc:Subject:From;
+	b=fN7l/pOj403MC/dOkqseufxCFbACPUg2lwxHFfFY5q4H9hqfuUlOPralnu4qGlMMP
+	 Yf8Y6gbDYv9gPMQoRJ+k9QtKGb8F1Zdy1ulks5cy7QOoLoCxpNKNSByBzSeWkrjs9s
+	 nTo5xpLi2DVSdgNtHyuhWGX5dVw8ZIfxUBLhicyM40KnkflGnvoaF22dt91B67OW94
+	 /PAeI2BPwTb971P1Xtu3W6F1BNiRBRMAnsyHk5Bt5ZWXBSLJguxpjl8giNlKonIKyw
+	 JvlHTZIGU3TX0MZs4EwizUxBkS1y5D2s+fJdv91HHCuriJ9KAep61/OM30zoj4kEYf
+	 vMOmklZ5sV+PA==
+Date: Tue, 21 Oct 2025 12:54:10 +0100
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yixun Lan <dlan@gentoo.org>
+Cc: netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+	spacemit@lists.linux.dev, linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH][next] net: spacemit: Avoid -Wflex-array-member-not-at-end
+ warnings
+Message-ID: <aPd0YjO-oP60Lgvj@kspp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251021-work-namespace-nstree-listns-v1-50-ad44261a8a5b@kernel.org>
-References: <20251021-work-namespace-nstree-listns-v1-0-ad44261a8a5b@kernel.org>
-In-Reply-To: <20251021-work-namespace-nstree-listns-v1-0-ad44261a8a5b@kernel.org>
-To: linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
- Jeff Layton <jlayton@kernel.org>
-Cc: Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, 
- =?utf-8?q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, 
- Lennart Poettering <mzxreary@0pointer.de>, 
- Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
- Amir Goldstein <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>, 
- Johannes Weiner <hannes@cmpxchg.org>, Thomas Gleixner <tglx@linutronix.de>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
- linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, bpf@vger.kernel.org, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- netdev@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
- Christian Brauner <brauner@kernel.org>
-X-Mailer: b4 0.15-dev-96507
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3549; i=brauner@kernel.org;
- h=from:subject:message-id; bh=Jz2qZpRe8+RR2mHCIjuTDi9/gaS5B8ErVeSfakXzmUk=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWR8L3x/e8KebWaLVN8qlM2KcXcwOs+8WPUeZ5KJ736P1
- 34Vc35c7ShlYRDjYpAVU2RxaDcJl1vOU7HZKFMDZg4rE8gQBi5OAZiI4xZGhqvfppWEf9T0mB3s
- 6D9V+Yqkd1LimZ0not0c7//a8X1Clhsjw31D/3O7BCdOus2g/WHNqwtr5yv8fn5KX+iupP6xmU5
- SubwA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Test that dropping CAP_SYS_ADMIN restricts what we can see.
+-Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+getting ready to enable it, globally.
 
-Signed-off-by: Christian Brauner <brauner@kernel.org>
+Use regular arrays instead of flexible-array members (they're not
+really needed in this case) in a couple of unions, and fix the
+following warnings:
+
+      1 drivers/net/ethernet/spacemit/k1_emac.c:122:42: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+      1 drivers/net/ethernet/spacemit/k1_emac.c:122:32: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+      1 drivers/net/ethernet/spacemit/k1_emac.c:121:42: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+      1 drivers/net/ethernet/spacemit/k1_emac.c:121:32: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 ---
- .../selftests/namespaces/listns_permissions_test.c | 111 +++++++++++++++++++++
- 1 file changed, 111 insertions(+)
+ drivers/net/ethernet/spacemit/k1_emac.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/namespaces/listns_permissions_test.c b/tools/testing/selftests/namespaces/listns_permissions_test.c
-index 709250ce1542..9d1767e8b804 100644
---- a/tools/testing/selftests/namespaces/listns_permissions_test.c
-+++ b/tools/testing/selftests/namespaces/listns_permissions_test.c
-@@ -663,4 +663,115 @@ TEST(listns_cap_sys_admin_inside_userns)
- 	TH_LOG("Process can see user namespace it has CAP_SYS_ADMIN inside of");
- }
+diff --git a/drivers/net/ethernet/spacemit/k1_emac.h b/drivers/net/ethernet/spacemit/k1_emac.h
+index 5a09e946a276..577efe66573e 100644
+--- a/drivers/net/ethernet/spacemit/k1_emac.h
++++ b/drivers/net/ethernet/spacemit/k1_emac.h
+@@ -363,7 +363,7 @@ struct emac_desc {
+ /* Keep stats in this order, index used for accessing hardware */
  
-+/*
-+ * Test that dropping CAP_SYS_ADMIN restricts what we can see.
-+ */
-+TEST(listns_drop_cap_sys_admin)
-+{
-+	cap_t caps;
-+	cap_value_t cap_list[1] = { CAP_SYS_ADMIN };
-+
-+	/* This test needs to start with CAP_SYS_ADMIN */
-+	caps = cap_get_proc();
-+	if (!caps) {
-+		SKIP(return, "Cannot get capabilities");
-+	}
-+
-+	cap_flag_value_t cap_val;
-+	if (cap_get_flag(caps, CAP_SYS_ADMIN, CAP_EFFECTIVE, &cap_val) < 0) {
-+		cap_free(caps);
-+		SKIP(return, "Cannot check CAP_SYS_ADMIN");
-+	}
-+
-+	if (cap_val != CAP_SET) {
-+		cap_free(caps);
-+		SKIP(return, "Test needs CAP_SYS_ADMIN to start");
-+	}
-+	cap_free(caps);
-+
-+	int pipefd[2];
-+	pid_t pid;
-+	int status;
-+	bool correct;
-+	ssize_t count_before, count_after;
-+
-+	ASSERT_EQ(pipe(pipefd), 0);
-+
-+	pid = fork();
-+	ASSERT_GE(pid, 0);
-+
-+	if (pid == 0) {
-+		struct ns_id_req req = {
-+			.size = sizeof(req),
-+			.spare = 0,
-+			.ns_id = 0,
-+			.ns_type = CLONE_NEWNET,
-+			.spare2 = 0,
-+			.user_ns_id = LISTNS_CURRENT_USER,
-+		};
-+		__u64 ns_ids_before[100];
-+		ssize_t count_before;
-+		__u64 ns_ids_after[100];
-+		ssize_t count_after;
-+		bool correct;
-+
-+		close(pipefd[0]);
-+
-+		/* Create user namespace */
-+		if (setup_userns() < 0) {
-+			close(pipefd[1]);
-+			exit(1);
-+		}
-+
-+		/* Count namespaces with CAP_SYS_ADMIN */
-+		count_before = sys_listns(&req, ns_ids_before, ARRAY_SIZE(ns_ids_before), 0);
-+
-+		/* Drop CAP_SYS_ADMIN */
-+		caps = cap_get_proc();
-+		if (caps) {
-+			cap_set_flag(caps, CAP_EFFECTIVE, 1, cap_list, CAP_CLEAR);
-+			cap_set_flag(caps, CAP_PERMITTED, 1, cap_list, CAP_CLEAR);
-+			cap_set_proc(caps);
-+			cap_free(caps);
-+		}
-+
-+		/* Ensure we can't regain the capability */
-+		prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0);
-+
-+		/* Count namespaces without CAP_SYS_ADMIN */
-+		count_after = sys_listns(&req, ns_ids_after, ARRAY_SIZE(ns_ids_after), 0);
-+
-+		/* Without CAP_SYS_ADMIN, we should see same or fewer namespaces */
-+		correct = (count_after <= count_before);
-+
-+		write(pipefd[1], &correct, sizeof(correct));
-+		write(pipefd[1], &count_before, sizeof(count_before));
-+		write(pipefd[1], &count_after, sizeof(count_after));
-+		close(pipefd[1]);
-+		exit(0);
-+	}
-+
-+	/* Parent */
-+	close(pipefd[1]);
-+
-+	correct = false;
-+	count_before = 0;
-+	count_after = 0;
-+	read(pipefd[0], &correct, sizeof(correct));
-+	read(pipefd[0], &count_before, sizeof(count_before));
-+	read(pipefd[0], &count_after, sizeof(count_after));
-+	close(pipefd[0]);
-+
-+	waitpid(pid, &status, 0);
-+	ASSERT_TRUE(WIFEXITED(status));
-+
-+	if (WEXITSTATUS(status) != 0) {
-+		SKIP(return, "Child failed to setup namespace");
-+	}
-+
-+	ASSERT_TRUE(correct);
-+	TH_LOG("With CAP_SYS_ADMIN: %zd namespaces, without: %zd namespaces",
-+			count_before, count_after);
-+}
-+
- TEST_HARNESS_MAIN
-
+ union emac_hw_tx_stats {
+-	struct {
++	struct individual_tx_stats {
+ 		u64 tx_ok_pkts;
+ 		u64 tx_total_pkts;
+ 		u64 tx_ok_bytes;
+@@ -378,11 +378,11 @@ union emac_hw_tx_stats {
+ 		u64 tx_pause_pkts;
+ 	} stats;
+ 
+-	DECLARE_FLEX_ARRAY(u64, array);
++	u64 array[sizeof(struct individual_tx_stats) / sizeof(u64)];
+ };
+ 
+ union emac_hw_rx_stats {
+-	struct {
++	struct individual_rx_stats {
+ 		u64 rx_ok_pkts;
+ 		u64 rx_total_pkts;
+ 		u64 rx_crc_err_pkts;
+@@ -410,7 +410,7 @@ union emac_hw_rx_stats {
+ 		u64 rx_truncate_fifo_full_pkts;
+ 	} stats;
+ 
+-	DECLARE_FLEX_ARRAY(u64, array);
++	u64 array[sizeof(struct individual_rx_stats) / sizeof(u64)];
+ };
+ 
+ #endif /* _K1_EMAC_H_ */
 -- 
-2.47.3
+2.43.0
 
 
