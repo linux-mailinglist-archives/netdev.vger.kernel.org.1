@@ -1,143 +1,78 @@
-Return-Path: <netdev+bounces-231268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DAA5BF6BAE
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 15:21:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E944BF6BFC
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 15:24:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 828F5483969
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 13:20:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 313D518C6E6C
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 13:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31CF633710E;
-	Tue, 21 Oct 2025 13:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A057337B8B;
+	Tue, 21 Oct 2025 13:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="b6aHvt4s"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tCid0iwf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E1133507E
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 13:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97183370EB;
+	Tue, 21 Oct 2025 13:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761052845; cv=none; b=X2WWxqQl/31uSIgDq+9dqTAI4FYXRs5kShk2XGEcXwaiWqhS8vMz4mTwjsfzZjF3hLYPkC9bFJzpuiXff3yTVrcQazo1ulQVUElVRRp6VdErOwTKvfFzjQzyOSamGxLmeKekDg9ww5opUC64MDRBmTIJUgJ4YbL04Nuu/ZAVwLM=
+	t=1761053063; cv=none; b=lK8rEdE7XmsYjcRqRRo/h7jsGmHRyQXHpHbtOotvoDYq2LrcJAOg0Jz8HoasODtTFyS8nWYZg6IhJ9d9m6P3j0CCvrR4P7QZD674T8pIHdfG3qZt/6AvZU/H0x564HiWLb9mqgakFvpgr5jd7c6UHl3GjdtFZORIp+gmObRTDNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761052845; c=relaxed/simple;
-	bh=bRW96s5K6QK1fhMIG4F+/LZV86w+m746kxeTcv+vD6o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gW2oqK4NoUd7+OL1F/+q4C+FbM6a3g/gVGC5dLO04/PRuTufzbq69jF3pHBWA8nB0cNWNrVT9+0x7MOioLlMc7jBHR2x2udMb+P1FuGdvO5CdMTF1L7TJedtVZfaHiEkZKKgc3ym/qfWrtwcnLfzyMlaqnzTg1VwGzcSc8n4aec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=b6aHvt4s; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b3e7cc84b82so1076597266b.0
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 06:20:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1761052841; x=1761657641; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1oycTZzUoDkyJ6pS20q3YjjueHvpdaaRdxxEpcgucsU=;
-        b=b6aHvt4semsPi1UX57Ejx4zzuClW0umBw5uppbI9G4bh+AhcnOIf2NwXvhXYIZ2NQq
-         cEJq2nR3SAKSsHP/EpWsDObyIPxrySKGjd1DwBK21mYJwuqsPLqWk/lpB3CDaztkUuq9
-         GwDFYpgF+n+5Sb9F8Goy/gnqHut3ZJTMIcBsW4hxRbCv6VIOhRpqzBoVe41nxQLzDura
-         /4RntuVBvWxSs+Up+/YN9xkeI+sui6NODThFBor2lkkR95mcHJbG9fRT1w6zlb9TUzgu
-         FrLZ6UkGn/0fRuPf54mjiGB71AvRgnyELQVwKqVmL8+L2IgqsckjVYFWgFJNo6GEzZgi
-         UEkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761052841; x=1761657641;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1oycTZzUoDkyJ6pS20q3YjjueHvpdaaRdxxEpcgucsU=;
-        b=N72StXfLlREnxuYEqX1KhVGA0RVBdraqIXZHbHa2iqsloSs98Yd/VLGNTCq7ATrEID
-         flQbZLTOGkhwjvMK2q4GzEzqtXAe2OG3LTP223gjrSAuX2p+D7/Gpv91FxJSn8xNIg62
-         YBl+tDl7EYxn5LURYN6rWz2cmB0JfTA1y8gMSfn4fR5eyY4Wdg4V+p9pcSqFnY1JxNHm
-         9IEJtUl0EL2bby98N09E/Ujv2y0+nbjpbyt63CmfvD7KHgkrWxTPRrCEe0tQtLcVrQkx
-         W6RVyn1/2wOx06kp9RlcW027VUxtTDTn9tWv3/3F5uuSzz9+tHfD+9a8jqYIWvTPq676
-         CqTg==
-X-Forwarded-Encrypted: i=1; AJvYcCXayJZXsJIUuaI9Zj9ncS6FdsRj3QbWW2+FK1XM93WpO9kxUIsiMYkRcYgsfQLbS3KKp1Fm/xg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJkghBuOGBlN99ElCOjuP5baS/91ZjV/MAKYzHpbNxyiCeZ0P8
-	9oCOpCAh7uA+R25kXrVGN+1gfosdY+Tf0hxY8DVQPRymRuOlRPGtB5ul84J8C9zbUqk=
-X-Gm-Gg: ASbGncvos50U+dWDI1C46CibUj+G+WUnZFaAbUJX7j9bNk/Gq0C1RSkomdNeYJ3/UT4
-	t4/aESd27wxaEZrvNA5GVVtw554BXgAOy8JMjcx19rZYJc91BE6QrXbdLQea6QkCoNypPK3mOfS
-	0dWhZAwcTplClRMGOBJSHJJm2JoEqFIcpvwN3ArXGwxgB/4Utu5zdMgpYRFe1JkVMpczrbjr7Q6
-	0CFfXBKyQzHaFgpkHT0dABrxObxS7nj/nBLLvLFlSUlrihCDmOonQ2rGH4ROqIKwPvcfsqkA8xp
-	F0mgkZ4FATnlbYILvy4SxJLRe80/rdijX0zQdR+TU3IUJgwkse1S6dFVSgH4OLvyLSk0Tk7oKjP
-	NPbz9lqval2e99bSREo/Ll29pch5R0O6C+b98bd1+SjS1KNviFYAiaa6doEufogpURYRzdOJIPl
-	H5xneVM8wJoyivWg==
-X-Google-Smtp-Source: AGHT+IHnkN9J6ls3cCQo+Po0+g62l+AXaT/giOLW+xSQzumCyw88Vb6sghpJAPP8D5BWv1wyco3vDA==
-X-Received: by 2002:a17:907:9607:b0:b04:2452:e267 with SMTP id a640c23a62f3a-b6475705103mr1935315766b.56.1761052841452;
-        Tue, 21 Oct 2025 06:20:41 -0700 (PDT)
-Received: from fedora (dh207-14-87.xnet.hr. [88.207.14.87])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b65e7da2bc7sm1057788566b.16.2025.10.21.06.20.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 06:20:40 -0700 (PDT)
-From: Robert Marko <robert.marko@sartura.hr>
-To: daniel.machon@microchip.com,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	vadim.fedorenko@linux.dev,
-	horatiu.vultur@microchip.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: luka.perkov@sartura.hr,
-	Robert Marko <robert.marko@sartura.hr>
-Subject: [PATCH net] net: phy: micrel: always set shared->phydev for LAN8814
-Date: Tue, 21 Oct 2025 15:20:26 +0200
-Message-ID: <20251021132034.983936-1-robert.marko@sartura.hr>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1761053063; c=relaxed/simple;
+	bh=S+JBlEuUoutO6nIhz1j6pwR1DVQjlcD3ljLAQ1XBfzM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jT7xudy9X0R6beGZtFL+id6k/oJBt7D72lMDR8RhTlpRkf07nmGbKdYIK1zOwo5X3Z7J+9rbJetNpYVaOblJa0QKeneNyB3n3a3ihgAXDie7Jc/l8G/ofJaGBdL1U1uNn0xi/Po5UAdWuuBc2j9UpfUawphnO6IWmDKhcQ0oSY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tCid0iwf; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Lrri0Cr907MtkmIMRNvGQLSiTljN+gHtzJCG/I8kPio=; b=tCid0iwf/AFzkWpFd1rVfmh9cZ
+	rbLedkbcdoi2qFkY/hIHLMUpWUrmKSkHhLrRMnMIcRWNswesBPIW268Ox6uVHCLA7luCH3EmUhAZW
+	BfAzJRx8EH8M11GQRCoR/anPDKXOjY5rCueHUbRVy8FN89ZSX6Tsktdfj8pxpyN8UFV0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vBCLQ-00BdZh-5j; Tue, 21 Oct 2025 15:24:08 +0200
+Date: Tue, 21 Oct 2025 15:24:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	richardcochran@gmail.com, gerhard@engleder-embedded.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: phy: micrel: Add support for non PTP
+ SKUs for lan8814
+Message-ID: <f1fb532d-b0e0-4d61-a415-8e224cefcb26@lunn.ch>
+References: <20251021070726.3690685-1-horatiu.vultur@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251021070726.3690685-1-horatiu.vultur@microchip.com>
 
-Currently, during the LAN8814 PTP probe shared->phydev is only set if PTP
-clock gets actually set, otherwise the function will return before setting
-it.
+On Tue, Oct 21, 2025 at 09:07:26AM +0200, Horatiu Vultur wrote:
+> The lan8814 has 4 different SKUs and for 2 of these SKUs the PTP is
+> disabled. All these SKUs have the same value in the register 2 and 3.
+> Meaning that we can't differentiate them based on device id, therefore
+> check the SKU register and based on this allow or not to create a PTP
+> device.
+> 
+> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 
-This is an issue as shared->phydev is unconditionally being used when IRQ
-is being handled, especially in lan8814_gpio_process_cap and since it was
-not set it will cause a NULL pointer exception and crash the kernel.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-So, simply always set shared->phydev to avoid the NULL pointer exception.
-
-Fixes: b3f1a08fcf0d ("net: phy: micrel: Add support for PTP_PF_EXTTS for lan8814")
-Signed-off-by: Robert Marko <robert.marko@sartura.hr>
----
- drivers/net/phy/micrel.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 16855bf8c391..4929f9b81f54 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -4285,6 +4285,8 @@ static int __lan8814_ptp_probe_once(struct phy_device *phydev, char *pin_name,
- {
- 	struct lan8814_shared_priv *shared = phy_package_get_priv(phydev);
- 
-+	shared->phydev = phydev;
-+
- 	/* Initialise shared lock for clock*/
- 	mutex_init(&shared->shared_lock);
- 
-@@ -4340,8 +4342,6 @@ static int __lan8814_ptp_probe_once(struct phy_device *phydev, char *pin_name,
- 
- 	phydev_dbg(phydev, "successfully registered ptp clock\n");
- 
--	shared->phydev = phydev;
--
- 	/* The EP.4 is shared between all the PHYs in the package and also it
- 	 * can be accessed by any of the PHYs
- 	 */
--- 
-2.51.0
-
+    Andrew
 
