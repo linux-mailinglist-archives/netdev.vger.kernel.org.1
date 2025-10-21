@@ -1,100 +1,131 @@
-Return-Path: <netdev+bounces-231420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 690B0BF9292
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 00:55:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEFFBBF929E
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 00:56:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B6D3A4EA337
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 22:54:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 198DC18974DB
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 22:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D372309AA;
-	Tue, 21 Oct 2025 22:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E8022BEC2A;
+	Tue, 21 Oct 2025 22:56:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="Ec9Wg9hN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HVDctv+2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0255D1DE4C4;
-	Tue, 21 Oct 2025 22:54:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A85C296BD8
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 22:56:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761087260; cv=none; b=O83x0LqM7/IxZxThUGSHWCQQ2puJx+O5fn/s/Mn65ecQSB1/O0mPj789D/zz+KK0lu0ViExoqZQaFX7o7F+cySZUxyso7G13aiLSWJwxgEzBBMjc6LH24xhcz+x60NvfWqPIe4GQo1CtCXUif6wCgV/IseENeQAZgTiVosWB9c4=
+	t=1761087390; cv=none; b=YQZQUFKJ/2Qh1MlYB9xn/aRFVguHNKsr7SjxC+I3aLCMhLZYSZPMvHOPRbiCCqUcNc885VnCGj7KQkQBXUPTtzMiPzKbzMRT2R2CPWpFRQ1NHys526ytE2c+RkLx3uv93+JmnOv+syEAGrTtItM022CFWm7T4aVCAQOoG//VmiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761087260; c=relaxed/simple;
-	bh=Mz6ppVPbPpZy4N6bSRCqo74i7MJXXQUsttNkV9dweYM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OxdwjhmlYGv+qXJ/Ho919KXo3AHCSRRMu2qJzjGPDhisJH43nQWSEKUckx2jNMIXkUuio6Gw/qNbPmK5UO4DOpPCckPTIEGqC3AYNgqa9Q4siO9MVAFS1W7pUBu7sGLSv+m0G2TgCjgnblabGdSTrMqcRSK1UgyjI/wBci8jNzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=Ec9Wg9hN; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1761087248;
-	bh=Mz6ppVPbPpZy4N6bSRCqo74i7MJXXQUsttNkV9dweYM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ec9Wg9hN1I0HzLAu495AZ/VzRkMZBnsY6sJvrjdRhk3OgIRMcLwWwMjLAlB5ZxWno
-	 1AHjxr9dwaSHcjWpeUOnvXlQKKxQ/6/3odaD93jlGQWQmS+quC66sgFffYknCdgrEF
-	 9kH3iacZsWkDZvRMvLIU59+w3pVXRox8Qotk99HYNTVSagje6cv/C9ttLrb33aWMOW
-	 o83xSzxSOMLln1h5Zcre3P+9Z+HyL/JLwc2utFvqrvGsnYAgssLAt8tkLU3jNhVLw2
-	 9h4soE8Io+f1b7F4EEsGo2ryfVSjdO5xMIP0bZ9ygINGuUP4xjl2T6gKn1Y+NgJVI7
-	 63J/metiOCNUg==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 29D096000C;
-	Tue, 21 Oct 2025 22:53:58 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 84F52200ABF;
-	Tue, 21 Oct 2025 22:52:57 +0000 (UTC)
-Message-ID: <de6e309f-0b03-4224-a035-d06c2765b023@fiberby.net>
-Date: Tue, 21 Oct 2025 22:52:56 +0000
+	s=arc-20240116; t=1761087390; c=relaxed/simple;
+	bh=lQIy5OmM0g4Bx04XenAx/SMjMc7ULEgLvmSxKg2NdTo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JCEjFZSJd3nBHNXRPichucif+9wgFe55JUXWv6YfUPDixux8SiOzJkkR7ZfiAIfSJYrN6g/9sWlmqscxXifgnApv5wjzYUYYClPdUJehp03vHrqgDgmtqwDgw4JnWtgXIKfI+OXxNuH5Oddfb12/KlxK7gzxzJHq6eSujgzj2DU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HVDctv+2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15C9CC4CEF1;
+	Tue, 21 Oct 2025 22:56:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761087389;
+	bh=lQIy5OmM0g4Bx04XenAx/SMjMc7ULEgLvmSxKg2NdTo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HVDctv+2OwEwZI9Z2aAwvDCA6Dsk6V19t+fkSBGNC9mIigKJuoSi67PAEIoqDmkPx
+	 /UgU/is9sBT7rNVCq8OYSdczZXCTIvqF0bQW0SL34Ks1jXu6J3mKSx9IXQIxi1S50s
+	 ewkeaDb6kvA4fj2ONF4n3MNykp99MVwpoP5jsV3h3Y0E2xVp8SGbzxunZT5ADDnelA
+	 3T1Sxs/hscB3/4/M13lnYeqG04+JU8n46nTHL+6n8OGyCd4v5sGbfkbaVcN/PRy4Bb
+	 qnIevgRn4iXPISlpk3pQYWHlnpxrBX8hKGz98Zq1qMjfCa0fAa33plqhkkBfE4ybmK
+	 oo8dcqCS1Babg==
+Date: Tue, 21 Oct 2025 15:56:28 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Wilder <wilder@us.ibm.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "jv@jvosburgh.net" <jv@jvosburgh.net>, Pradeep
+ Satyanarayana <pradeep@us.ibm.com>, "i.maximets@ovn.org"
+ <i.maximets@ovn.org>, Adrian Moreno Zapata <amorenoz@redhat.com>, Hangbin
+ Liu <haliu@redhat.com>, "stephen@networkplumber.org"
+ <stephen@networkplumber.org>, "horms@kernel.org" <horms@kernel.org>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "edumazet@google.com"
+ <edumazet@google.com>, Nikolay Aleksandrov <razor@blackwall.org>
+Subject: Re: [PATCH net-next v13 6/7] bonding: Update for extended
+ arp_ip_target format.
+Message-ID: <20251021155628.7383bfca@kernel.org>
+In-Reply-To: <MW3PR15MB3913E83123930C417DDD1AC8FAE9A@MW3PR15MB3913.namprd15.prod.outlook.com>
+References: <20251013235328.1289410-1-wilder@us.ibm.com>
+	<20251013235328.1289410-7-wilder@us.ibm.com>
+	<ef443366-f841-4a84-9409-818fc31b2c0c@redhat.com>
+	<20251016124908.759bbb63@kernel.org>
+	<MW3PR15MB3913E83123930C417DDD1AC8FAE9A@MW3PR15MB3913.namprd15.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] tools: ynl: add start-index property for indexed
- arrays
-To: Zahari Doychev <zahari.doychev@linux.com>,
- Jakub Kicinski <kuba@kernel.org>, jacob.e.keller@intel.com
-Cc: donald.hunter@gmail.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, matttbe@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jhs@mojatatu.com,
- xiyou.wangcong@gmail.com, jiri@resnulli.us, johannes@sipsolutions.net
-References: <20251018151737.365485-1-zahari.doychev@linux.com>
- <20251018151737.365485-5-zahari.doychev@linux.com>
- <20251020163221.2c8347ea@kernel.org>
- <75gog4sxd6oommzndamgddjbz3jrrrpbmnd4rhxg4khjg3rnnp@tlciirwh5cig>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <75gog4sxd6oommzndamgddjbz3jrrrpbmnd4rhxg4khjg3rnnp@tlciirwh5cig>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 10/21/25 5:50 PM, Zahari Doychev wrote:
-> On Mon, Oct 20, 2025 at 04:32:21PM -0700, Jakub Kicinski wrote:
->> We need to be selective about what API stupidity we try to
->> cover up in YNL. Otherwise the specs will be unmanageably complex.
->> IMO this one should be a comment in the spec explaining that action
->> 0 is ignore and that's it.
->>
+On Fri, 17 Oct 2025 00:21:02 +0000 David Wilder wrote:
+> > > I guess you should update bond_get_size() accordingly???
+> > >
+> > > Also changing the binary layout of an existing NL type does not feel
+> > > safe. @Jakub: is that something we can safely allow?  
+> >
+> > In general extending attributes is fine, but going from a scalar
+> > to a struct is questionable. YNL for example will not allow it.  
 > 
-> I am not sure if this applies for all cases of indexed arrays. For sure
-> it applies for the tc_act_attrs case but I need to check the rest again.
+> I am not sure I understand your concern. I have change the
+> netlink socket payload from a fixed 4 bytes to a variable number of bytes.
+> 4 bytes for ipv4 address followed by some number of bytes with the
+> list of vlans, could be zero. Netlink sockets just need to be told the
+> payload size.  Or have I missed the point?
+
+Are you replacing a line that says nla_put() which outputs raw bytes
+or a line which says nla_put_x32() which outputs a scalar?
+What I'm saying is that while growing raw byte attrs is pretty common
+in Netlink, replacing a scalar with a struct may cause user space
+to reject the attrs.
+
+> > I haven't looked at the series more closely until now.
+> >
+> > Why are there multiple vlan tags per target?  
 > 
-> Do you think it would be fine to start from 1 for all indexed arrays?
+> You can have a vlan inside a vlan, the original arp_ip_target
+> option code supported this.
+> 
+> > Is this configuration really something we should support in the kernel?
+> > IDK how much we should push "OvS-compatibility" into other parts of the
+> > stack. If user knows that they have to apply this funny configuration
+> > on the bond maybe they should just arp from user space?  
+> 
+> This change is not just for compatibility with OVS. Ilya Maximets pointed out:
+> "..this is true not only for OVS.  You can add various TC qdiscs onto the
+> interface that will break all those assumptions as well, for example.  Loaded
+> BPF/XDP programs will too."
+> 
+> When using the arp_ip_target option the bond driver must discover what
+> vlans are in the path to the target. These special arps must be generated by
+> the bonding driver to know what bonded slave the packets is to sent and
+> received on and at what frequency.
+> 
+> When the the arp_ip_target feature was first introduced discovering vlans in the
+> path to the target was easy by following the linked net_devices. As our
+> networking code has evolved this is no longer possible with all configurations
+> as Ilya pointed out.  What I have done is provide alternate way to provide the
+> list of vlans so this desirable feature can continue to function.
 
-I have a series, that I will try to get posted tomorrow, where I add a new
-attribute `ignore-index` which can be used to mark indexed arrays where the
-index is just an incremental value. This is a follow-up to an earlier
-discussion[1].
+I understand your perspective. I'm not convinced that kernel must
+support such custom configurations, if it can't infer the correct
+behavior from information it already has.
 
-In that series, in order to add the new attribute to the existing specs,
-in the commit messages I walk through all the existing indexed arrays,
-and also include things like if they start their indexes from 0 or 1.
-
-[1] https://lore.kernel.org/netdev/7fff6b2f-f17e-4179-8507-397b76ea24bb@intel.com/
+I don't feel strongly about it, if you manage to collect a review 
+tag from the bonding maintainers or another netdev maintainer I won't
+stand in the way. Otherwise, given that the uAPI is questionable and
+there's total of 0 review tags on v13, this series is starting to look
+like a dead end.
 
