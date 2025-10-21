@@ -1,174 +1,120 @@
-Return-Path: <netdev+bounces-231117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 943C2BF565E
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:02:45 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C4F5BF566A
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:04:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 89E564FE5F5
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:02:34 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 285AB3516A6
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:04:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BA9329C40;
-	Tue, 21 Oct 2025 09:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 740CB31DD85;
+	Tue, 21 Oct 2025 09:04:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="JXqgQRiC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mfCbNVAC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC70303A39
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068A5328B60;
+	Tue, 21 Oct 2025 09:04:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761037350; cv=none; b=uIxcZX5tCFssnvd9lgCojX5RM8HDMZk7El+pv1EZjtkwLfsk+gVxuvPlU7vBu6rKNqbZR71cUOuPqyfwbvR4cFGoHqh3jNLLWqNqdc3xDbYokR/7jUb9ghitKbwgphT4QhpdJXQCUlhywYKYBCjZACOA9SmzZL/V73JCrI8IFjI=
+	t=1761037446; cv=none; b=hImINQ/PX1OxC5kqzizh+TrNpP8+3FCm21Ckssr1KDiW+qJnq4kZFKo6mLCx/0jaGQG3pMevF1dfs2NTE8hToSsxJI8zjdVXbPAUNuWSIm0wKGOCxHDNotxR1Y2DpRu+GSPyKz/UjyiA2STfG92CShcRfaP1FqKWbsH5A7HnykM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761037350; c=relaxed/simple;
-	bh=OffQ204+Nyj5VGiYdW6PGJRNUJ3xhRI9Iw3cpA0RNp8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lRe2PHbPSNjd3Z/lEORoWpz2KM9CHhzsLOMcxeNQNytJQ7XsfAmI613EcybzAgXXu+eKtoKmK7hh+Ade53DayDb6S07EogIcJqBzcXcGNAgTTPssDhtZqlS6+CdWRmle9Zwl1Dwu5rq5mK8oiyr80ODoS7r/uIpwBxGN+fQCJ/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=JXqgQRiC; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-4283be7df63so1532744f8f.1
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 02:02:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1761037347; x=1761642147; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uV95Izl15icyzjNabiyKCGR1CIjMB77dOSJKauGty+Q=;
-        b=JXqgQRiCeO/6bZC53J0LtiasJjjfxtp7weqhbCvhvkJRsME2Uo4sLgIb5X3jKHDL7w
-         MoOv88N18VE/CP8yIPTL2pV+vGyUGhGAgaEVr/how2NtaFpsi9zsu74gBChM3S+g6UDw
-         R59c69MOghHXFoywwC7yDdFc/QoAqfelLaBxbt/Os01BpwqmJG0uxWbTSwAQ6GwbNmkX
-         piPGYdocSnbvwq3j8PRMkhQAUzTDRET5mLsXercyiRb2R0eFxCkIm11aevDhawPzf4ZF
-         Kf1YrESL6oTZMuFqNCmAZvh1xAox6lyaK6yxAS461WzJIjQaevvRJEYMoOMLycRAB4eb
-         l+Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761037347; x=1761642147;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uV95Izl15icyzjNabiyKCGR1CIjMB77dOSJKauGty+Q=;
-        b=tvhdNDGZxTfw+J6Hc003a8i+7/HWV6yHOP9b17evAjBoZyqLH75wd/n0Ayyy/qrYIo
-         dmw0Yz2X2DzXxj72tVzJtsXQqNOTX2jbV3t8HXMKgYPGMcDf6pWAZ8oNx/tG2WjCsZ9G
-         /2/BO5MyHoCXUECMnMdj8ijpanMhGDiM7KbtfB3MhcUuSZPeBK8pODqM5L8D9KEZvJGx
-         v8haLQLvMPMXdKGFZ5PluyvK0EVZ+/R6jU8vTTeYlgrE0pAUpHQFSpee1SiAO/Rytx/d
-         EozvJ1HMyqMvEHbP5rrV+qn3XagzHlG0pI15SVyHS8Y2R6i1RSQ2mvyhZx9g/EaOyKjt
-         OkYA==
-X-Forwarded-Encrypted: i=1; AJvYcCWG6xlRLo1cPie/6jhay5LIOgF1Qnn0AoUypRGtIafFkrUHpqfQBH1ESOKSvkAmKcDFbhTCxsU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywe1tY6OXSXl2xVCbmWbDamPAA8eJyCMzCzstNy4rCgGGMA7w5y
-	NBFlRGFR+8nonRvfQUqldm7jwZytHhq1Y0F2tleXt+pnN/HIDfUKIqZjasWryFbZOz4=
-X-Gm-Gg: ASbGncvsD4E87m/awgIuW7ik5k/K/jyPEE0JNYw30LQzwPFtNqN0ECMubTFXUrYnAGQ
-	aG3099RmSQRFSeStnyAWuWUdVJ5M6VbK2nMXsrsmC0n6yhkNYigCybCnOohVv1WMzqbpF/V+MBx
-	fBq4qIh+X9w8HtjRDC9xVknFXgLH0j2Wkwkrkp8R4czrRPkUSOTMwX4/LNNfUK+FeCtSZhKpT3+
-	0eGFd2jKMsg4FpyiRRzCMUBkrbOWAMgDTSD/PSAcB3wDw/jqYbE3Wm7GeWDLm+2ostyzxwvzNev
-	onD7Dk4NmjzQB5i+RcG1UcWzMbpWkpLCdQ+Xfw4ExPqY02Gcmf9pNT7UfLV6DOUxQD6a9/SrwwN
-	qIWpCoTj6jzRMWKJDVoIgXRDlkGkSTBtWuskBdWDhGdJnAj1icv2sBQ9qumAGqPBCemDh5cww9u
-	WyTPz3/ZP46ohCFW3JSLgLOvoWcBuIsChlOBRYj8Cl1Rpd1HSrNl92
-X-Google-Smtp-Source: AGHT+IFq6w36inwR7PpG+ZkZbBwkFGa55fsBXWBVdNad663sGiVEFpxwXvkazBKvYy9SUPhOCmUAYg==
-X-Received: by 2002:a05:6000:40df:b0:3ec:42ad:591 with SMTP id ffacd0b85a97d-42704d9899emr12228828f8f.36.1761037346574;
-        Tue, 21 Oct 2025 02:02:26 -0700 (PDT)
-Received: from ?IPV6:2001:a61:1369:8e01:d78f:5536:188:1544? ([2001:a61:1369:8e01:d78f:5536:188:1544])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427f00ba070sm19511194f8f.42.2025.10.21.02.02.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Oct 2025 02:02:26 -0700 (PDT)
-Message-ID: <806d82e6-6db6-4ec8-a49c-665a97ea36f8@suse.com>
-Date: Tue, 21 Oct 2025 11:02:25 +0200
+	s=arc-20240116; t=1761037446; c=relaxed/simple;
+	bh=k5Buo0le6EqXUC/QN/g5Mt0ej2j7xhhd8+t9O1O2Png=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bqBf6YJmevmKS7vFdrZCGhxVA6KsPfWcxHgzCAxrneix1G4D8n+42nx/7q0peRwwk6JjFIbMPgGYk4qk00vegxLmvJ9+nWCOHakuAFcWq+1vPQ2+6kuCm7YvIa/I7EYQIadjGbTVu/9RMDqrEMeXDfOLiWhWIY1sNji+NyJefjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mfCbNVAC; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=VSk3y2Mk5tvsRCRDhegaZJGDtEZ5KIaLNXeYF9q4FCs=; b=mfCbNVACWYLZeUU8wq34OFmldn
+	sC4nEKCA2KivdMJn9v8HB1QudaCWpHUkIBU/t+1ig0eaMY4bl32KlpN5RmSWCpdRybkdB6CECGgfO
+	xblkQ5paGdsAKuNqkLovVDx1diBFbmbavQG/PDfLgG9+r0l7fS65SRv15jDmqqSrUB+JZukPnLzGr
+	J0KitZsqY3pIh81IVNWYKFvsxs5obKEheAcne8A4J6hqLjXehFw/Lud2vCow/ycSyJ+55pBTemwVI
+	25Pz25DbgZpkVF/0DwCAbWSDpN1EU+hscanWWCG03IPVfUs6yE/vjaOCQ5vZw3zQei0Qlgzlr79EF
+	8ooGeWow==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57544)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vB8Hf-000000003Uk-1ylP;
+	Tue, 21 Oct 2025 10:03:59 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vB8Hc-00000000847-2URk;
+	Tue, 21 Oct 2025 10:03:56 +0100
+Date: Tue, 21 Oct 2025 10:03:56 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Gerhard Engleder <gerhard@engleder-embedded.com>
+Cc: Horatiu Vultur <horatiu.vultur@microchip.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, richardcochran@gmail.com
+Subject: Re: [PATCH net-next] net: phy: micrel: Add support for non PTP SKUs
+ for lan8814
+Message-ID: <aPdMfMlYMXHjvw_l@shell.armlinux.org.uk>
+References: <20251017074730.3057012-1-horatiu.vultur@microchip.com>
+ <79f403f0-84ed-43fe-b093-d7ce122d41fd@engleder-embedded.com>
+ <20251020063945.dwqgn5yphdwnt4vk@DEN-DL-M31836.microchip.com>
+ <e0a8830e-6267-4b2a-b1fa-f3cbe34bd3ba@engleder-embedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v5 2/3] net: usb: ax88179_178a: add USB device driver
- for config selection
-To: Michal Pecio <michal.pecio@gmail.com>, Oliver Neukum <oneukum@suse.com>
-Cc: Alan Stern <stern@rowland.harvard.edu>, yicongsrfy@163.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- pabeni@redhat.com
-References: <20251013110753.0f640774.michal.pecio@gmail.com>
- <20251017024229.1959295-1-yicongsrfy@163.com>
- <db3db4c6-d019-49d0-92ad-96427341589c@rowland.harvard.edu>
- <20251017191511.6dd841e9.michal.pecio@gmail.com>
- <bda50568-a05d-4241-adbe-18efb2251d6e@rowland.harvard.edu>
- <20251018172156.69e93897.michal.pecio@gmail.com>
- <2fae9966-5e3a-488b-8ab5-51d46488e097@suse.com>
- <20251020175921.37f35e5a.michal.pecio@gmail.com>
-Content-Language: en-US
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <20251020175921.37f35e5a.michal.pecio@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e0a8830e-6267-4b2a-b1fa-f3cbe34bd3ba@engleder-embedded.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 20.10.25 17:59, Michal Pecio wrote:
-> On Mon, 20 Oct 2025 11:59:06 +0200, Oliver Neukum wrote:
->> On 18.10.25 17:21, Michal Pecio wrote:
-
->>> @@ -1255,6 +1257,8 @@ struct usb_driver {
->>>    
->>>    	void (*shutdown)(struct usb_interface *intf);
->>>    
->>> +	bool (*preferred)(struct usb_device *udev);
->>
->> I am sorry, but this is a bit clunky. If you really want to
->> introduce such a method, why not just return the preferred
->> configuration?
+On Mon, Oct 20, 2025 at 08:11:13PM +0200, Gerhard Engleder wrote:
+> On 20.10.25 08:39, Horatiu Vultur wrote:
+> > The 10/17/2025 23:15, Gerhard Engleder wrote:
 > 
-> Because I wanted to introduce exactly such a method, rather than one
-> which returns the configuration ;)
-
-Well, then I have to state that your patch perfectly implements
-your wish. >:->
-Would you allow me a follow up question, though? Why have you
-developed that wish?
-
-> The point was to pull configuration selection *out* of those drivers.
-
-While I appreciate the goal, it is not clear to me how adding
-a method to the generic interface driver template achieves that goal.
-In fact this approach seems counterproductive.
-
-In particular a bool will not work for the generic case.
-If you really want to make this generic, you'll have to face
-the unfortunate possibility that a configuration have
-multiple interfaces whose drivers disagree in that regard.
-At a minimum you'd have to be able to return a "don't care"
-value to compute a reasonable pick.
-  > They already do it, and it makes them copy-paste the same trivial loop
-> which iterates through configs until it finds the vendor interface.
-
-If the concern is simply getting the code centralized (which
-is not wrong), then Alan's original proposal of having a flag
-(let's not call it a quirk) in usbcore for devices that need
-the logic in the heuristic for picking a configuration to be
-inverted would seem to be the simplest approach.
-
-> The idea is to have a maximally simple check for a known-good vendor
-> interface driver before making unfounded assumptions like:
+> ...
 > 
-> /* From the remaining configs, choose the first one whose
->   * first interface is for a non-vendor-specific class.
->   * Reason: Linux is more likely to have a class driver
->   * than a vendor-specific driver. */
+> > > > 
+> > > > +/* Check if the PHY has 1588 support. There are multiple skus of the PHY and
+> > > > + * some of them support PTP while others don't support it. This function will
+> > > > + * return true is the sku supports it, otherwise will return false.
+> > > > + */
+> > > 
+> > > Hasn't net also switched to the common kernel multiline comment style
+> > > starting with an empty line?
+> > 
+> > I am not sure because I can see some previous commits where people used
+> > the same comment style:
+> > e82c64be9b45 ("net: stmmac: avoid PHY speed change when configuring MTU")
+> > 100dfa74cad9 ("net: dev_queue_xmit() llist adoption")
 > 
-> Unfortunately, that's only half the battle. The other half is forcing
-> configuration reevaluation when such a driver is loaded. I hoped it
+> The special coding style for multi line comments for net and drivers/net has
+> been removed with
+> 82b8000c28 ("net: drop special comment style")
+> 
+> But I checked a few mails on the list and also found the old style in
+> new patches.
 
-Exactly. Hence don't put the information that the assumption
-must not be made into a driver but into usbcore. Problem avoided.
+I hope this means we aren't going to be flooded with loads of "cleanup"
+patches converting the comment style.
 
-It looks like this is an issue we are not going to find a perfect
-solution for. Hence our priority should be finding the simplest
-change. IMHO that's a new quirk just inverting existing logic.
-Sure, it is a bit ugly because it depends on the kernel configuration,
-but that is what we have a preprocessor for.
+I also think that the general rule of coding should still apply: keep to
+the style that is already present in the file being modified - or if
+you're intending to change style, one of the initial patches should do
+that before one's own modifications (so the style remains consistent.)
+Hopefully netdev maintainers will agree with this ^^^ :)
 
-	Regards
-		Oliver
-
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
