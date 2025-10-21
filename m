@@ -1,73 +1,122 @@
-Return-Path: <netdev+bounces-231043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD982BF42DB
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 02:49:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AF368BF42EA
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 02:50:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8832E3A52BE
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 00:49:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F0813ABC65
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 00:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E1361922FD;
-	Tue, 21 Oct 2025 00:49:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B391F7910;
+	Tue, 21 Oct 2025 00:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pqoo2JAq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mPv7SLjv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F195617736;
-	Tue, 21 Oct 2025 00:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7331E7C19;
+	Tue, 21 Oct 2025 00:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761007769; cv=none; b=tMNzwDuy9qxtG1BmJP3yNfXBp/OXieroBzp8zIyDIJwSi3xTee8kuX7aZ5hZHX0h9Q12lOg3qjTVba7aRz2zHHexcUYW7EdnrlYlC2m4z1ngsbJE2ttqMnXg795fyke6GtsrvpqdiKaA/vIdjNa1KYhjhsTGHnbZfhAY1Ah68kY=
+	t=1761007828; cv=none; b=nRxgTxg3J/IaL/gFwZrzUMeOk4k2Y13+Np5rlemfTvFPTjIAFlIqWyMqKVzcT8uj82XKLm7r5nvGi4HFUfQCsKltVDqHJbFe/2Y6aAbOahL9h2cN6d0MhBTRZyZsYBVdiYT4cKfazh6wMhBmTm5rNaVlalquY/4pY5MFQAHXK5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761007769; c=relaxed/simple;
-	bh=r0SRqh0K/5CeBJ5oVQRkSGK/ydvO1n0dQnYqh5+SFbk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A4X3VRtSO3KSEJBgmizxOPWvUL+4Z/CU3wd3CEL2Kr+2P+ieCJ+sVPO3v2cNuZIxeq/4DD6GeCPaPN5ZRprmJJ/2QGXha6GgcWRUKtl9HyYviVxuVPzHe31p3PyFTwZDFZae2A/a85rOZbsGsPvqEvL8gjqfnGVi/JCom8SZHUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pqoo2JAq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F366DC4CEFB;
-	Tue, 21 Oct 2025 00:49:27 +0000 (UTC)
+	s=arc-20240116; t=1761007828; c=relaxed/simple;
+	bh=oMlYshkcc5RvJ9NUcckvVdcCEGPA36gUCVeoMsopJGA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=F5ga9dKoQuTmB6Ar9uSi8mXD8rpalYnZS7pSwW/YYoXK6AxMxfiy2nB1uV1wq7hP2icYNG5UdlbirCYu/UDFnwkCo9qq1x0t0/Wb959989VN+ocH5zEOMRHsS7ASNhLog2I8d0Zq1LTvvfLHmPlDiXWKvI2CkBGGeF6ldKlqVgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mPv7SLjv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5E51C113D0;
+	Tue, 21 Oct 2025 00:50:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761007768;
-	bh=r0SRqh0K/5CeBJ5oVQRkSGK/ydvO1n0dQnYqh5+SFbk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pqoo2JAq7ivbC+kgC/w+jiSg70nh6l8h9uTxjfjKBxpd5JlgDMj7wofWNOGrk+zWq
-	 ALAKOtrifQQK2zmQ3u/cXPGTHoCN3PQ/4vn04a1Ksej/Hlm4niC6QI5vf1t1fT7bG0
-	 mDzC7M+k5yX4Zbg9Xy4Sjbfy0F3qbMRCog3QvaOH7TSNrUbRcpPrTnYLhdYrlxxz4A
-	 EF2AZICJ0FB6DSXnWAljrLhC5FcFpLQ9UlMExPOmyOiWaNkn/ZAdiqordPaPNs6vLB
-	 WdyaZwbYv5mmLbpOvOpm1g2PSpAwTupyJcdCg7kDCkPiNIp76FLbDyiBC86LmXf4Iq
-	 sgH/Xrjj/9/nw==
-Date: Mon, 20 Oct 2025 17:49:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: yicongsrfy@163.com
-Cc: michal.pecio@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, oliver@neukum.org, pabeni@redhat.com,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org, Yi Cong
- <yicong@kylinos.cn>
-Subject: Re: [PATCH net v6 0/3] ax88179 driver optimization
-Message-ID: <20251020174926.36ec9464@kernel.org>
-In-Reply-To: <20251017025404.1962110-1-yicongsrfy@163.com>
-References: <20251017025404.1962110-1-yicongsrfy@163.com>
+	s=k20201202; t=1761007827;
+	bh=oMlYshkcc5RvJ9NUcckvVdcCEGPA36gUCVeoMsopJGA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=mPv7SLjvpy8cYOFjoXpon0RIFeTwfAPLGEldBhOJfikRorQxmZo3h304ruAyy9E6a
+	 PY2whK3LjxepK8Chiq7zx5UvJtkAEW18HSiS7gYBckljdnj44EfgZUBNulJ/j+Xo9l
+	 +1/VFaUiIcqPHoyQiI1220a3Lungf7ixG5rlIAnNiwmPGQD9N1LY3hkqM5jPQqo1aC
+	 ov5UCon9YX6HbV341G+H2n41TFTBm3nqjb2v2Xtm171PMxgS6Luns9fC3GezAFWars
+	 UvECPmLB4Q1hHnSqMgkN3GnxGzGWFPXLmbS7RcVi9spFm64wxfmlROORM8J8+KYKX+
+	 WNmL947DncnAQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE503A4102D;
+	Tue, 21 Oct 2025 00:50:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net/smc: fix general protection fault in
+ __smc_diag_dump
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176100780950.473459.10068795081815761640.git-patchwork-notify@kernel.org>
+Date: Tue, 21 Oct 2025 00:50:09 +0000
+References: <20251017024827.3137512-1-wangliang74@huawei.com>
+In-Reply-To: <20251017024827.3137512-1-wangliang74@huawei.com>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com,
+ sidraya@linux.ibm.com, wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
+ tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
+ zhangchangzhong@huawei.com
 
-On Fri, 17 Oct 2025 10:54:01 +0800 yicongsrfy@163.com wrote:
-> This series of patches first fixes the issues related to the vendor
-> driver, then reverts the previous changes to allow the vendor-specific
-> driver to be loaded.
+Hello:
 
-Discussion on v5 reads as an outright rejection, so I'm dropping this
-from our review queue.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 17 Oct 2025 10:48:27 +0800 you wrote:
+> The syzbot report a crash:
+> 
+>   Oops: general protection fault, probably for non-canonical address 0xfbd5a5d5a0000003: 0000 [#1] SMP KASAN NOPTI
+>   KASAN: maybe wild-memory-access in range [0xdead4ead00000018-0xdead4ead0000001f]
+>   CPU: 1 UID: 0 PID: 6949 Comm: syz.0.335 Not tainted syzkaller #0 PREEMPT(full)
+>   Hardware name: Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+>   RIP: 0010:smc_diag_msg_common_fill net/smc/smc_diag.c:44 [inline]
+>   RIP: 0010:__smc_diag_dump.constprop.0+0x3ca/0x2550 net/smc/smc_diag.c:89
+>   Call Trace:
+>    <TASK>
+>    smc_diag_dump_proto+0x26d/0x420 net/smc/smc_diag.c:217
+>    smc_diag_dump+0x27/0x90 net/smc/smc_diag.c:234
+>    netlink_dump+0x539/0xd30 net/netlink/af_netlink.c:2327
+>    __netlink_dump_start+0x6d6/0x990 net/netlink/af_netlink.c:2442
+>    netlink_dump_start include/linux/netlink.h:341 [inline]
+>    smc_diag_handler_dump+0x1f9/0x240 net/smc/smc_diag.c:251
+>    __sock_diag_cmd net/core/sock_diag.c:249 [inline]
+>    sock_diag_rcv_msg+0x438/0x790 net/core/sock_diag.c:285
+>    netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2552
+>    netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+>    netlink_unicast+0x5a7/0x870 net/netlink/af_netlink.c:1346
+>    netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1896
+>    sock_sendmsg_nosec net/socket.c:714 [inline]
+>    __sock_sendmsg net/socket.c:729 [inline]
+>    ____sys_sendmsg+0xa95/0xc70 net/socket.c:2614
+>    ___sys_sendmsg+0x134/0x1d0 net/socket.c:2668
+>    __sys_sendmsg+0x16d/0x220 net/socket.c:2700
+>    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>    do_syscall_64+0xcd/0x4e0 arch/x86/entry/syscall_64.c:94
+>    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>    </TASK>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] net/smc: fix general protection fault in __smc_diag_dump
+    https://git.kernel.org/netdev/net/c/f584239a9ed2
+
+You are awesome, thank you!
 -- 
-pw-bot: reject
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
