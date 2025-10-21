@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-231470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13745BF966A
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 01:58:09 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA3B9BF9685
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 01:59:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75BA73AE06E
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 23:57:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8E0374F3D02
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 23:57:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DF725A2A5;
-	Tue, 21 Oct 2025 23:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E15D242D8B;
+	Tue, 21 Oct 2025 23:52:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a9gW+0r+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h/mw2CFt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8A6D515;
-	Tue, 21 Oct 2025 23:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DB121019C;
+	Tue, 21 Oct 2025 23:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761090720; cv=none; b=nDqQwCcrJ6I8l4tHiUszV3MFsuMpCTtitZI56zWrN3jkAz+8WNlYPGI0QTAhhMN6Wc3uEqH577qy14fIRRt5vYgfB61BEynHUMJzWz1dAQsEJURB9mugSgZGf99hwpVrxytvfG4evRmv2kEEmVAj9+8USRSYFMOLtrQYq9joRHg=
+	t=1761090752; cv=none; b=GZ2dXewO7z75suRLRVB6ew9aQl3ghZdsEyTyuhHRYVx+lnT/qWrPeowt/biHnWsL3BPSbX9nw2NNlUqh8KewM653AJIM3whocORyBps2ViytmeQPR+LAjPxlngQpgrsg4EV+Z+YmHzD01VgjDj3pCAijzpCds7pJFZS+315veoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761090720; c=relaxed/simple;
-	bh=s5b8JsPws/6buYmUD3YxYk879o+RIT+ObwFiZmy82Os=;
+	s=arc-20240116; t=1761090752; c=relaxed/simple;
+	bh=ODw5GOX3PmEJ7dwaSWuCqf64HN9Wh+HC/oIRywtWbqc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qquhhpWFDjObY/lKb2TdzP5Zr25Cn7+44Wx3SY3naU2/6Rv96MlDkzfZoxwRLSnt2E1AfsTj1HSbYBtgdZt0p9XNjSdCwDuLBV0oKL5A0qZIG79GNbuGIE8Z7s4dsQ4SjcIc2K/oTvAc4Mm5IlTACDS9+g84Id9DzejtFculqNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a9gW+0r+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FA62C4CEF1;
-	Tue, 21 Oct 2025 23:51:59 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Q6ty9iKcO3WhYJnuhgkinCJuPFpbiaozXDtNDLdqq5YMzLgRwQLrmmQh/pH84tAINyd5Sw54B2ridEBzMm2pidJFaTtDdctsTuphW/zdXROlHjeg1liPfYbkBPPRUpjVS+41eeW8TLNvDdYDbDHS9j4X11E4jj6buboluEBa4rM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h/mw2CFt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 002CFC4CEF1;
+	Tue, 21 Oct 2025 23:52:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761090720;
-	bh=s5b8JsPws/6buYmUD3YxYk879o+RIT+ObwFiZmy82Os=;
+	s=k20201202; t=1761090751;
+	bh=ODw5GOX3PmEJ7dwaSWuCqf64HN9Wh+HC/oIRywtWbqc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=a9gW+0r+rbbLOsTDz/v9BsWaWaJR1tTj+cJCune9NLo0Qu1SY6hjmpF2tHSzW/O+w
-	 NvZ7nozEVaUsnYjvOeQ4gLz2p1C6LZecwtFtadpjsjpoHqgDfPwXPco22qEppx4e+7
-	 q3uF+XCKQHj1vW0AZpJ3T/doonQmx+lasdfa54GBP5hKQZR6LKwpWBfrUd9rSVvXYL
-	 7CCxyOSFVfg66dIoLyO2Y+RgxwMqadf29/AQrRgtR7n6OpHs1ZY5LFEUS7zm6EueE2
-	 zr59BGec8s9SjAVbzIk4LUHngELr3A6AzCtZ7+GSdjMBaumRgM3jCtgmS0O2+zN3Ek
-	 PJ5kbt7JHMXUw==
-Date: Tue, 21 Oct 2025 16:51:58 -0700
+	b=h/mw2CFtD5og9xtSlO3QOmo/W9AdssFMBkQWtBD+4xzvyG31Z5BvdNZNPuo5PnGF3
+	 E8LESzBzdHM0MHqVeCPTePiJleVa3Jg7AC767KLmGFgqZwG1Ei04B+0L75m1Jl2663
+	 9H78k1MLHGZ8SA93ofzSWU5z3sav10qBShGHSNxAybh8CwUYAzNQajEXjOmZuG7/an
+	 5etsQu6Hd/Ohf348cvd04Ki8e2LThbeXQeGRlvIiHzch3p2qJYnNfzJ8BzV2wSo2hQ
+	 T5UhYWVFj167cbtvQ9esvJ6t7xuwl65EhTiDyJnE9L5NanUIwGuzfW1RdGUvJ/WTfz
+	 5bbcr4DE+gOpg==
+Date: Tue, 21 Oct 2025 16:52:30 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <richardcochran@gmail.com>, <vladimir.oltean@nxp.com>,
- <vadim.fedorenko@linux.dev>, <rmk+kernel@armlinux.org.uk>,
- <christophe.jaillet@wanadoo.fr>, <rosenp@gmail.com>,
- <steen.hegelund@microchip.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v4 1/2] phy: mscc: Use PHY_ID_MATCH_MODEL for
- VSC8584, VSC8582, VSC8575, VSC856X
-Message-ID: <20251021165158.5cb0bd94@kernel.org>
-In-Reply-To: <20251017064819.3048793-2-horatiu.vultur@microchip.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: andrew@lunn.ch, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, richardcochran@gmail.com, vladimir.oltean@nxp.com,
+ vadim.fedorenko@linux.dev, rmk+kernel@armlinux.org.uk,
+ christophe.jaillet@wanadoo.fr, rosenp@gmail.com,
+ steen.hegelund@microchip.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v4 2/2] phy: mscc: Fix PTP for VSC8574 and VSC8572
+Message-ID: <20251021165230.1a702ffd@kernel.org>
+In-Reply-To: <09b90c94-4b55-4b9f-a23b-e2bd920545bf@redhat.com>
 References: <20251017064819.3048793-1-horatiu.vultur@microchip.com>
-	<20251017064819.3048793-2-horatiu.vultur@microchip.com>
+	<20251017064819.3048793-3-horatiu.vultur@microchip.com>
+	<20251020165346.276cd17e@kernel.org>
+	<09b90c94-4b55-4b9f-a23b-e2bd920545bf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,8 +67,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 17 Oct 2025 08:48:18 +0200 Horatiu Vultur wrote:
-> -	if ((phydev->phy_id & MSCC_DEV_REV_MASK) != VSC8584_REVB) {
+On Tue, 21 Oct 2025 11:07:20 +0200 Paolo Abeni wrote:
+> On 10/21/25 1:53 AM, Jakub Kicinski wrote:
+> > On Fri, 17 Oct 2025 08:48:19 +0200 Horatiu Vultur wrote:  
+> >> For VSC8574 and VSC8572, the PTP initialization is incomplete. It is
+> >> missing the first part but it makes the second part. Meaning that the
+> >> ptp_clock_register() is never called.
+> >>
+> >> There is no crash without the first part when enabling PTP but this is
+> >> unexpected because some PHys have PTP functionality exposed by the
+> >> driver and some don't even though they share the same PTP clock PTP.  
+> > 
+> > I'm tempted to queue this to net-next, sounds like a "never worked 
+> > in an obvious way" case.  I'd appreciate a second opinion.. Andrew?  
+> 
+> FTR, I agree with the above, as (out of sheer ignorance) I think/fear
+> the first patch can potentially cause regressions.
 
-I think MSCC_DEV_REV_MASK is no longer used after this patch?
+Thanks, let's rephrase the commits message on patch 1 (per Russell's
+comments) and get this reposted for net-next (without the Fixes tag).
 
