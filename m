@@ -1,197 +1,135 @@
-Return-Path: <netdev+bounces-231141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A9B8BF5A75
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:55:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1668BF5A93
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:57:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08EF21883C43
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:55:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90120405A6B
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:57:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3756D2D5C97;
-	Tue, 21 Oct 2025 09:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CBE52EBB9B;
+	Tue, 21 Oct 2025 09:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YGmBDpIj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892C21DED4C
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12D528725A
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761040516; cv=none; b=BoBLT4SO9EdLRSdZ8WZvfknSFO+O+ClZY7Y3VL4DmH+O4soWJfrASiW/xCj/JdvyuMokP9WFoUcRD8oB41+hkfe6YV9QHGJwmTQca5oLMn0gMg0VXOOqm5AlVs4P/kMtDh3M9l9BZBpAYjJ17ZMCkSUdB2HN83kWyS7PjbS5TS4=
+	t=1761040659; cv=none; b=t3WhmsRX6RgVAOn6z/TjPdJquksGEbr0GkfGK5DiimDMQC3UNQzYTWmRCyhbvdAlKuYYoA0+b49j4pTazOj2KU1r9U39vTbVvhwEL2KjcUIitjniiedyMYJa3WenRcdqsus5n/S+yD6jltgMtKOaWp8YAPknStoOgP7e6GXimaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761040516; c=relaxed/simple;
-	bh=kocGB7v2cvblvznO/e05vjQjJOYKCGasKn9a9iHXLSw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Q2cl8Kk+04ZPRJBJ7OqsFCuaNKlQWLSIO590cQ3PpwPtBbjLGBf7exUnS4XZwEwBg9n9prMI5cePNXnOz0HBs8Z/rNzjTrDzsCJZ70bcVP4u/fqscZhmtRLNQTlvTzyV08YBdmofr6TX11/YforYsiIJX4aW6Zi6w1ag7EbwfqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=none smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bamaicloud.com
-X-QQ-mid: esmtpgz10t1761040430t568f1b3b
-X-QQ-Originating-IP: dOXkMTjlpCBTxKFM+Rf37EHkXm80imBLEYQWq8FF9aE=
-Received: from localhost.localdomain ( [111.204.182.100])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 21 Oct 2025 17:53:48 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 4410683970554246087
-EX-QQ-RecipientCnt: 10
-From: Tonghao Zhang <tonghao@bamaicloud.com>
+	s=arc-20240116; t=1761040659; c=relaxed/simple;
+	bh=3rHdcF1gkowZn0MaD0PIbEANXOSfLSax16NhvoBYzXM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DNoWxWZRltmRZVHFb1OZaubdIgbIJFoil4GLhklGy7w8lXRFFg7g5DPv4F0c40KaNA9j+vqcDKFi4r0hhdMvYSGWkLBDj3OD6MGPA2w7z3OAFxVN82BerFqpzSNor3NwsytYumc5KApQ9FpEw6E63vL/nqjlSULdhCsbihyxruI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YGmBDpIj; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-33d7589774fso2931582a91.0
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 02:57:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761040657; x=1761645457; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7sC9oR3m4VtzSoHRqoSz+2ga+6oLEF4co52Cu8N8glo=;
+        b=YGmBDpIjP056d6WZYU91Do1Cm0YrE0JXvBnNaicvfvpXogZjB7adxKPyUlWaAKZBId
+         WN28oXhBt0Dt2nPAqOfXLjoPLmtiNLyXDlOnG44c4ky7YsfryEj6FZk+adfLf52ZQoK7
+         3XTwKYymIP1jGUiYfwTPAbjFJrY9b0AES1hFjbvYlA+l2i7zO2FSMzuDaKm0/oLD6QdE
+         XRPPm0VAcI8jVEh5pMdQ63KOM1st3sA5pixXyNlVVS7nwvVDPwwVFjbLvZg6N1xSlGrF
+         Cn2mMbA/DAF+Ml00DWGfdpEvBCGxHroJ2mV7Z247PMTNXx4JU2ljTZ69yIAqd504Wn3y
+         Zl1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761040657; x=1761645457;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7sC9oR3m4VtzSoHRqoSz+2ga+6oLEF4co52Cu8N8glo=;
+        b=VFxdyUPFIvoR3s2OexO/t1eO1UA3M4sgP9c3I60WXPmaaK2q79jX2x4cTwY/A9RM9q
+         MpN7ZtSxOfgMmKJsARg5a6URlIfO77vNmEqJESZalXYui2J89d6/AmS/nc9mLn3z/MKP
+         JbJpKOMrbUvnACJUmKXut/VBXrNnniEB+1nZf0wf+XWcXGjfnGhga9ax5xF82fsoFxWy
+         PmQNSNawjYwjKmw/j8LnYuoIoPXCBsAqJMoOiE9jIH2AIVY1xC8wiKd44fkIDzVyzi8H
+         W7KTZlCrVUnldQ75VnPUtlhcYyibaP0PpLCzKNjNODuPBm89NyFd9B4h7IPIB+4qXEeT
+         QEHA==
+X-Gm-Message-State: AOJu0Yx9IJ65fke9zLWR7Vfu6lscdKU2bVZcuY+WOUshwMPus0aHQx+t
+	0mXOa3XssS+0rPy/cf6rBKe+7HRoSD54ymlKI0PSGyKcU1WZx+sHtX6HZh4/pxStW60=
+X-Gm-Gg: ASbGncsTrsTfXwAGFccrnA/UpCe9uENGSCCoBccY1gGhxVpHmqDpv2g5YB8BihkTXRk
+	iboyOpxnGKdAbiri+OiwdRC3u7cZ9tzXz/IrLVZcQdF/KPZ0QuDUIvxpNMOiaSrgXlOIawnkZdZ
+	G/pHWM7gR4lJgb5hK0pMsk65BGUPKcYg20dFxLCQs35g8iY/nPzzlAZV7PCQ9UFoM2XXBSABygy
+	JQahWM/uXO3VoKuVf9p6kzve7NHV395aaTUWg2WazlSVX/yiOVlZPKx28fT8VWd/FVpVWq0YOrr
+	2eSPUPw70fweM5BjiZ5W9n9Nlw4bvDnQc52Rt6DvJPRQTETRX5Sy9CaNoV5U4KHj9FyrwITf1Fo
+	oiarWuo9kz+tcwMlQdJwmFfwJroLdw+lshXOHhTtEwxKfreAKJSXENMEiXlOk9M1NHWhdD+GjqB
+	KQm3r+iGUAOX2obKo=
+X-Google-Smtp-Source: AGHT+IEglQrz1zljoE46soPg8HDaXlilgAqH/So7w07dITCXiNqVjLxHnBo8xfPWys0sYVgI3S7INQ==
+X-Received: by 2002:a17:90b:3fc6:b0:338:3dca:e0a3 with SMTP id 98e67ed59e1d1-33bcf87f8b8mr23748112a91.16.1761040657134;
+        Tue, 21 Oct 2025 02:57:37 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33d5df5c2eesm10634540a91.13.2025.10.21.02.57.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Oct 2025 02:57:36 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
-Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next] net: sched: readjust the execution conditions for dev_watchdog()
-Date: Tue, 21 Oct 2025 17:53:36 +0800
-Message-Id: <20251021095336.65626-1-tonghao@bamaicloud.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Dong Chenchen <dongchenchen2@huawei.com>,
+	Oscar Maes <oscmaes92@gmail.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH net] net: vlan: sync VLAN features with lower device
+Date: Tue, 21 Oct 2025 09:56:53 +0000
+Message-ID: <20251021095658.86478-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: OE2SNMSfMbmOQXlpAZNky8M49xAORnlNr8Y6GYhynEcQBjoz7RG1NYfb
-	lWz7a/ejSZPYt3bYp3vOlyI+vYhzKIkTXS7I6nHh+lQMTkwhX81pYRB6xfT1uz9mDx+hlVy
-	YZ7K5helQxq2lCJ7zHMXQMlL7BKxwJ4TJJ6v7mSzq1mBIujgVAxXeiMtGjmzRaFVMM00VrH
-	ogEce6dIvD82rpSBVpAh8C02vzI0Lu4J9Tohp+a52huvkNKLUF5vg5mQ04840EylQDZ9tYb
-	16+Mcnr/++ydGFB0XwPlymlS4tOBL+bxd32YEpJ5CIO6/t9pxHRFlM2PrMJ+CADh3Kaaup3
-	QbMxVgGg6HaAvevKx9pFhAiKdjWIf+pl0jBaBQs2/uov5WKAdDezF8d/TQvzBQHSMkINux7
-	dLlvxlJhqS+9841NM2XcSQANsFMokHjOWRX2ZhEB3hGsNUyY9X8Adn/iM6K6VIJjgxz1/7f
-	k8+BtcBn05xl05qk1NPtWyNG1rNHZGEgwyt8I2gROYUiCUNrWRnHjFtp5YZYxFwv7NFa9iH
-	WnRX1hMgFvs0HHtzovOMq2zSJe07al9okWr/+29IyC1ZuWQ4ZmZgbuZmhMhJ0xyrEx7Zbuq
-	hSuNxy9KUFILGtqkNYjbffbSbvzJGH8E1Vzkw/VEOR3zBq2XZ/LqU96mOJ2y5LjhsyM4UG3
-	7AfL+koWfAZroPf731LmZHO4fDGxeSpF37dMRTpskPGmG7vLIzBCNeq2/uCBOp4CZwZooQz
-	YMqWCin5fx597T3js2zmIutce9easn0g7cYoi5FXlE71+ir13hryOBpMvXtJIDqylr3Tfv6
-	kQ7otHwwOChjFagHu6ECz1Fx/TVB0cT5p3QEDiA8OT9XC4ULZhCOZZX4+BxbqwRUGZGwoyu
-	UIHoQMVe6xS7OrgRboX7pRcBXNH9aylDl3MFH3q1Vfhv5yzt+HdO+mhAwVqrKfvdSmzfOO8
-	dwE3BVMpR6dsQezrX1wUYMw1HRp/6X+s1XhAaaFnSWV3Aei7dQJ/CyEDG4L2vZ8MSW/Q=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
 
-readjust the execution conditions for dev_watchdog() and reduce
-the tab indentation of the code.
+After registering a VLAN device and setting its feature flags, we need to
+synchronize the VLAN features with the lower device. For example, the VLAN
+device does not have the NETIF_F_LRO flag, it should be synchronized with
+the lower device based on the NETIF_F_UPPER_DISABLES definition.
 
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: Jiri Pirko <jiri@resnulli.us>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+As the dev->vlan_features has changed, we need to call
+netdev_change_features(). The caller must run after netdev_upper_dev_link()
+links the lower devices, so this patch adds the netdev_change_features()
+call in register_vlan_dev().
+
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- net/sched/sch_generic.c | 82 ++++++++++++++++++++---------------------
- 1 file changed, 40 insertions(+), 42 deletions(-)
 
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index 16afb834fe4a..1b905cc05520 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -500,51 +500,49 @@ static void dev_watchdog(struct timer_list *t)
- 	bool release = true;
+I’m not sure what the proper Fixes tag should be, so I’ve left it blank for
+now. If anyone has a clue, please let me know.
+
+---
+ net/8021q/vlan.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
+index fda3a80e9340..4857fb0ee11d 100644
+--- a/net/8021q/vlan.c
++++ b/net/8021q/vlan.c
+@@ -193,6 +193,8 @@ int register_vlan_dev(struct net_device *dev, struct netlink_ext_ack *extack)
+ 	vlan_group_set_device(grp, vlan->vlan_proto, vlan_id, dev);
+ 	grp->nr_vlan_devs++;
  
- 	spin_lock(&dev->tx_global_lock);
--	if (!qdisc_tx_is_noop(dev)) {
--		if (netif_device_present(dev) &&
--		    netif_running(dev) &&
--		    netif_carrier_ok(dev)) {
--			unsigned int timedout_ms = 0;
--			unsigned int i;
--			unsigned long trans_start;
--			unsigned long oldest_start = jiffies;
--
--			for (i = 0; i < dev->num_tx_queues; i++) {
--				struct netdev_queue *txq;
--
--				txq = netdev_get_tx_queue(dev, i);
--				if (!netif_xmit_stopped(txq))
--					continue;
--
--				/* Paired with WRITE_ONCE() + smp_mb...() in
--				 * netdev_tx_sent_queue() and netif_tx_stop_queue().
--				 */
--				smp_mb();
--				trans_start = READ_ONCE(txq->trans_start);
--
--				if (time_after(jiffies, trans_start + dev->watchdog_timeo)) {
--					timedout_ms = jiffies_to_msecs(jiffies - trans_start);
--					atomic_long_inc(&txq->trans_timeout);
--					break;
--				}
--				if (time_after(oldest_start, trans_start))
--					oldest_start = trans_start;
--			}
-+	if (!qdisc_tx_is_noop(dev) &&
-+	    netif_device_present(dev) &&
-+	    netif_running(dev) && netif_carrier_ok(dev)) {
-+		unsigned int timedout_ms = 0;
-+		unsigned int i;
-+		unsigned long trans_start;
-+		unsigned long oldest_start = jiffies;
++	netdev_change_features(dev);
 +
-+		for (i = 0; i < dev->num_tx_queues; i++) {
-+			struct netdev_queue *txq;
-+
-+			txq = netdev_get_tx_queue(dev, i);
-+			if (!netif_xmit_stopped(txq))
-+				continue;
-+
-+			/* Paired with WRITE_ONCE() + smp_mb...() in
-+			 * netdev_tx_sent_queue() and netif_tx_stop_queue().
-+			 */
-+			smp_mb();
-+			trans_start = READ_ONCE(txq->trans_start);
+ 	return 0;
  
--			if (unlikely(timedout_ms)) {
--				trace_net_dev_xmit_timeout(dev, i);
--				netdev_crit(dev, "NETDEV WATCHDOG: CPU: %d: transmit queue %u timed out %u ms\n",
--					    raw_smp_processor_id(),
--					    i, timedout_ms);
--				netif_freeze_queues(dev);
--				dev->netdev_ops->ndo_tx_timeout(dev, i);
--				netif_unfreeze_queues(dev);
-+			if (time_after(jiffies, trans_start + dev->watchdog_timeo)) {
-+				timedout_ms = jiffies_to_msecs(jiffies - trans_start);
-+				atomic_long_inc(&txq->trans_timeout);
-+				break;
- 			}
--			if (!mod_timer(&dev->watchdog_timer,
--				       round_jiffies(oldest_start +
--						     dev->watchdog_timeo)))
--				release = false;
-+			if (time_after(oldest_start, trans_start))
-+				oldest_start = trans_start;
-+		}
-+
-+		if (unlikely(timedout_ms)) {
-+			trace_net_dev_xmit_timeout(dev, i);
-+			netdev_crit(dev, "NETDEV WATCHDOG: CPU: %d: transmit queue %u timed out %u ms\n",
-+				    raw_smp_processor_id(),
-+				    i, timedout_ms);
-+			netif_freeze_queues(dev);
-+			dev->netdev_ops->ndo_tx_timeout(dev, i);
-+			netif_unfreeze_queues(dev);
- 		}
-+		if (!mod_timer(&dev->watchdog_timer,
-+			       round_jiffies(oldest_start +
-+					     dev->watchdog_timeo)))
-+			release = false;
- 	}
- 	spin_unlock(&dev->tx_global_lock);
- 
+ out_unregister_netdev:
 -- 
-2.34.1
+2.50.1
 
 
