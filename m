@@ -1,165 +1,87 @@
-Return-Path: <netdev+bounces-231050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64BD9BF436B
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 03:02:19 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D4F4BF437D
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 03:03:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F283918C46EA
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 01:02:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9658B4E369D
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 01:03:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21811DFE26;
-	Tue, 21 Oct 2025 01:02:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE4E16CD33;
+	Tue, 21 Oct 2025 01:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sf+6tmfG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KoQlZE7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C9E1E868
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 01:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA71354AC9;
+	Tue, 21 Oct 2025 01:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761008534; cv=none; b=qonkHHzSm3wLKgiiALZFcUjO1V1DW7VC+yLbd+imdUAUKWuktVS6biBKH2/rme+TJNLFXdX0d9/AxFtP9fVBgx3SOogpSgsgiUCVw4yYqpaELe6laNZ+VuBe+WaHll+f11Gb/3ap5QiCMr8RSRSGYRiEZXZ3G686j0XOdOJGXvI=
+	t=1761008591; cv=none; b=G1SbDJZtO5QEdwGcad/77Ov2lmmJfL9xZgIFXcCvM0DPx7kbSwaJp0PYzMn8FtphVzpaDN1a+VfDSQ9wvdMlDbnSGyF+85AMOZst9zMkNhACjBKmw7mDGxfDqIaBAxGR6WERUR6zWjQg6VywUUrMDQpfPwhd9hu80Qugl5YlnR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761008534; c=relaxed/simple;
-	bh=qZLBj6arx9QOTLUUblWHZMf3JCAP1L/JUAsq+xSZU/A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q8SuPAzUSbTakQFd8FtE63qG3yAQr7z3RVyAy0ATePLwF9hQlnlNYkvKbykk5wMZT1XzeedevHZQ9iJyvZHF5X3KGyafMOdq00Nxf8BGiuJYiva2wFamp2/zs+PdxweaL19N5ij9SOHUtUfCSWHWehlEcc6x6VqXyxEHn1TZgME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sf+6tmfG; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b5e19810703so822545566b.2
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 18:02:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761008531; x=1761613331; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qdrgppHkZAyxxVFGpYMxDncigVmTn7Xgn5GmJmM4fFM=;
-        b=Sf+6tmfGpZDcI/M0c62kkU5qeaG/2FJJK5UAolk3tRNhBAOm9fD7xllxZXs93aSczH
-         2DXzyVC6B75L7qaLqaqGSQSQ+gUXPllOtdPnS/BmxAccVCAa8WGt4D1l8vGuBXuiKdD+
-         q5vbFhUvD1i8N52HiSj4F1TYmGeSlghHKiPMjDBdMMz50l4SoFnCOKfrNi0ZvSQ10nWQ
-         dtw1kZ9GDeDIB7BIu+PRZXnxzALM/JhTUzSr6ohNGGhlVRxhercxLD8zeCKLqBI+zNTJ
-         xCQwgAMz3szZQawuYe+Q8U6er4lCpu8VNS9mVGECfAw6ImjZOi1I9xox//02avtmC9fD
-         e3MQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761008531; x=1761613331;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qdrgppHkZAyxxVFGpYMxDncigVmTn7Xgn5GmJmM4fFM=;
-        b=nPusoXrWppgO9/4rs/MSlCn2NgGeBGjPU6keYoK7su9u2PkZ1bT+gXwojIRIsO7Par
-         3D+cTUiwgKM08G4anOMoBQgS8FpV3HNZ0HVIHuMEeaXy5b29Q2h/rKlUNQIvliOS6gzc
-         DCA/gtW9VM0gEc7VG2E3VnN1yUeckz/uni9lo1GYVfPkSKW4UNSu5ySZzW5AB5jVXHM0
-         SuTuF8+z03VbXpM5lytd/tLeLt3Tes5qYtSB7mUcl1KNLhfZt5p0oeBrbjmrdQIfmuZw
-         I+4qmGLHsyYT1XxjAmx4HZKfo5xOy2ptanFJIQ6rXcsHnRzrroLskEWJENkuIN+idmYY
-         tapA==
-X-Forwarded-Encrypted: i=1; AJvYcCXmRdt1ncmAcP35l1nl/Qn5dgJgTxVrpjs3SlLPtdVxDse3ibOZTx9ZB7kjKH7Q6YivkcaykUU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFQrduyumN9CIGBJbsITr49c2YRxE5aMnB+IpXdgFDy+Gf99VL
-	U/ZiouR/MH2qQyD8KFDxG5hE0GzGZ/1yYdm6+HvRv833JgcPOfUxa8N1Oiubex6wEgS73lyHQc1
-	lW5Mh7+XVZYLJOlEmiWYzkRaAqh9arT4=
-X-Gm-Gg: ASbGncvvm+XXVlis0+JfXpoTbLXP3q+JMnjcu20pgChiaw57dKPf36YWpn9ZRwnd25a
-	ln84JjnZ+7SFLRvCJWd7YwFAGwLww+mqozXt7+ZRimsYqQucPi7RdzQjC7R8fXVBL7X/GL45XoH
-	neJVQSpLfcAi5ibgNweil38jmpoHl7LbFyRJaXtKV3bHTyBeHBBOOVGc76/XQxulq87AqrLylEx
-	NUUfqQoocbc8y2McN7BrsprRsDog8NkEZRRrASeIs8mDXloNzIP6paiQQ9jecvTepVoYGGrWoHP
-	b6/35CGIQzma6ro=
-X-Google-Smtp-Source: AGHT+IEKUvPReN1WIc8WWqIkjL1j43sIvxC4HgtgT3kVUG9Iyo7fRBo0aTHcqpyZOi9DM/GsvtqbZf+qS2DkcF9tE4g=
-X-Received: by 2002:a17:907:a07:b0:b3b:f19:ac7c with SMTP id
- a640c23a62f3a-b647443cef7mr1691282766b.36.1761008531342; Mon, 20 Oct 2025
- 18:02:11 -0700 (PDT)
+	s=arc-20240116; t=1761008591; c=relaxed/simple;
+	bh=kZUG3ekjbgqMUNy0q3i+gFuqeUpAWQ8+S6giYThScJw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Cr1d7FzuAbq6JulKWWCfmP6jgBWB/XOxdIdJqW4htxYFsOO31c6Ex0dgBcOdwmiU+R+5rl/jpmJ19/0EUOWUXCaSO5BR57t9JUVgPzxM2C3xw9dXw2Ei52qKZPM7qt6zqmrHs0LLjnjQUPR9gZZrguzyby5HPDrwGLfstcZ3tC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KoQlZE7f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CB3CC4CEFB;
+	Tue, 21 Oct 2025 01:03:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761008591;
+	bh=kZUG3ekjbgqMUNy0q3i+gFuqeUpAWQ8+S6giYThScJw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KoQlZE7fEp/69DTCsk3mks1FSpdb5anEGzXte01mSzflvCuUOU+bVpIhvRGX6o/iL
+	 4OTw5EJxosg4VkG/ckez1u8WrVPGStAgTIg3CU/bsYmzpqADp/q65xcqUTMbuPCOuC
+	 f/v5G3D9e9nIn2aw1rkiN2dPrdx70JHXNdrW/MaZf/Y7wtsbSSoFZtRZCv4eD61DCJ
+	 /B2b5Amdzzv9vGJgByWu+vKjA9fRj9qnHcmFLjXfOAuHF3frPYU8t74Jog1iMuUtHv
+	 SXqDtdgvs+YLiHAgwRpcOvy5L8B9aqpp05DwKSzlNIel5baHxPmf9AHQu5lbXEbDJ9
+	 5Ey8byknV+a+w==
+Date: Mon, 20 Oct 2025 18:03:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Richard
+ Cochran <richardcochran@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Alexis
+ =?UTF-8?B?TG90aG9yw6k=?= <alexis.lothore@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/3] net: stmmac: Allow supporting coarse
+ adjustment mode
+Message-ID: <20251020180309.5e283d90@kernel.org>
+In-Reply-To: <d40cbc17-22fa-4829-8eb0-e9fd26fc54b1@bootlin.com>
+References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
+	<20251015102725.1297985-3-maxime.chevallier@bootlin.com>
+	<20251017182358.42f76387@kernel.org>
+	<d40cbc17-22fa-4829-8eb0-e9fd26fc54b1@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251017042312.1271322-1-alistair.francis@wdc.com> <fe16288e-e3f2-4de3-838e-181bbb0ce3ee@suse.de>
-In-Reply-To: <fe16288e-e3f2-4de3-838e-181bbb0ce3ee@suse.de>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 21 Oct 2025 11:01:45 +1000
-X-Gm-Features: AS18NWDiepjJ-jRwTWQwDakRt00NDvcpR1iprtqV_ILiMUcAXQFVJU3hWPRHcZA
-Message-ID: <CAKmqyKP0eB_WTZtMqtaNELPE4Bs9Ln-0U+_Oqk8fuJXTay_DPg@mail.gmail.com>
-Subject: Re: [PATCH v4 0/7] nvme-tcp: Support receiving KeyUpdate requests
-To: Hannes Reinecke <hare@suse.de>
-Cc: chuck.lever@oracle.com, hare@kernel.org, 
-	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org, kbusch@kernel.org, 
-	axboe@kernel.dk, hch@lst.de, sagi@grimberg.me, kch@nvidia.com, 
-	Alistair Francis <alistair.francis@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 21, 2025 at 3:46=E2=80=AFAM Hannes Reinecke <hare@suse.de> wrot=
-e:
->
-> On 10/17/25 06:23, alistair23@gmail.com wrote:
-> > From: Alistair Francis <alistair.francis@wdc.com>
-> >
-> > The TLS 1.3 specification allows the TLS client or server to send a
-> > KeyUpdate. This is generally used when the sequence is about to
-> > overflow or after a certain amount of bytes have been encrypted.
-> >
-> > The TLS spec doesn't mandate the conditions though, so a KeyUpdate
-> > can be sent by the TLS client or server at any time. This includes
-> > when running NVMe-OF over a TLS 1.3 connection.
-> >
-> > As such Linux should be able to handle a KeyUpdate event, as the
-> > other NVMe side could initiate a KeyUpdate.
-> >
-> > Upcoming WD NVMe-TCP hardware controllers implement TLS support
-> > and send KeyUpdate requests.
-> >
-> > This series builds on top of the existing TLS EKEYEXPIRED work,
-> > which already detects a KeyUpdate request. We can now pass that
-> > information up to the NVMe layer (target and host) and then pass
-> > it up to userspace.
-> >
-> > Userspace (ktls-utils) will need to save the connection state
-> > in the keyring during the initial handshake. The kernel then
-> > provides the key serial back to userspace when handling a
-> > KeyUpdate. Userspace can use this to restore the connection
-> > information and then update the keys, this final process
-> > is similar to the initial handshake.
-> >
->
-> I am rather sceptical at the current tlshd implementation.
-> At which place do you update the sending keys?
+On Sat, 18 Oct 2025 09:42:57 +0200 Maxime Chevallier wrote:
+> > If the HW really needs it, just lob a devlink param at it?  
+> 
+> I'm totally OK with that. I'm not well versed into devlink, working mostly with
+> embedded devices with simple-ish NICs, most of them don't use devlink. Let me
+> give it a try then :)
+> 
+> Thanks for taking a look at this,
 
-The sending keys are updated as part of gnutls_session_key_update().
-
-gnutls_session_key_update() calls update_sending_key() which updates
-the sending keys.
-
-The idea is that when the sequence number is about to overflow the
-kernel will request userspace to update the sending keys via the
-HANDSHAKE_KEY_UPDATE_TYPE_SEND key_update_type. Userspace updates the
-keys and initiates a KeyUpdate.
-
-> I'm only seeing a call to 'gnutls_handhake_update_receiving_key()'.
->
-> But I haven't found the matching function
-> 'gnutls_handshake_update_sending_key()' in current gnutls.
-> So how does updating of the sending keys work?
-
-gnutls_session_key_update() calls update_sending_key() which updates
-the sending keys.
-
-When updating the sending keys we want to send a KeyUpdate request,
-which is why it's a different flow.
-
-Alistair
-
->
-> Cheers,
->
-> Hannes
-> --
-> Dr. Hannes Reinecke                  Kernel Storage Architect
-> hare@suse.de                                +49 911 74053 688
-> SUSE Software Solutions GmbH, Frankenstr. 146, 90461 N=C3=BCrnberg
-> HRB 36809 (AG N=C3=BCrnberg), GF: I. Totev, A. McDonald, W. Knoblich
+FWIW I dropped this form PW in an attempt to unblock testing of
+Russell's series. I'm not convinced that the tsconfig API is correct
+here but I don't get how the HW works. Could you perhaps put together
+some pseudocode?
 
