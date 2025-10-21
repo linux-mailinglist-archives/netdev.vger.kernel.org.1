@@ -1,55 +1,48 @@
-Return-Path: <netdev+bounces-231128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C497ABF5856
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:32:26 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA318BF588F
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 11:37:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 300E0352A4C
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:32:26 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8699A352B3C
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 09:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5562284686;
-	Tue, 21 Oct 2025 09:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEB72E2F03;
+	Tue, 21 Oct 2025 09:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JejDprwl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GRGFgEvG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70445221F0C
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 09:32:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D75C7D07D;
+	Tue, 21 Oct 2025 09:37:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761039142; cv=none; b=byV5FXmvG3Yxfu43kmNap4u2SaHxLgxDtxEztmZaqAoEtm3n8NWldkP1QtTRgN+sHZGVGlZApHciwvRKG+gusg/zGvpY/AsVwNuYoqp3bn0W7fRFhsA9G+CatTEQtlkBx6dsEagzpgwOXcBy0+dXeQTqVmDgKpqMXJvlt3Q8PJo=
+	t=1761039430; cv=none; b=BwSRFcejENYEb8xVQttuDn2BcrY7Aue18HWP6r2SiI/c9ctr+QB4oR0nD+NxLnAALI4NqiO7RCrvJ3Abh78KN5TRPHNZ+fzqjjaE9evEFPKEdSsg5/Njih/7x9XcalZELdlBXBhFpbsm8KiJ3x2uxeL2Eep2bSBBKHOiM4Bv0Oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761039142; c=relaxed/simple;
-	bh=FCQ74zzf7PMaDBq02X1r3Jy/kD2zmjpWhtB4w7YbLIU=;
+	s=arc-20240116; t=1761039430; c=relaxed/simple;
+	bh=vROLQ/huaW8/CmioOws1Snjr2nLyqHBL1ATXlL1hhH8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lklop5ToRsBQ0Uel8E3dBH7Tfj66PzVU13RcyhUfijAJmFx+iWNhTrsqCxzS9wuYNBNlE4vco8WsY0u7yAOaf9KtjfwpFUuARAkAINLLxxog+IGfZB/9AjJwBzqZQxKiOgVOJNKJ6zBZwpMWtMbKfDFVNDeSDyNrWtanxXRhKE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JejDprwl; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id AEDDB4E41235;
-	Tue, 21 Oct 2025 09:32:17 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 849E560680;
-	Tue, 21 Oct 2025 09:32:17 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B5D57102F23A8;
-	Tue, 21 Oct 2025 11:32:07 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761039136; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=dlDkAq1VSlkhX1Mtmjitmb/y9AT4xni68v3r5mMJ44c=;
-	b=JejDprwlP6tFnfjWSSFt421IQ6GyFjUkMTUJZh8j+CCTdBwPMgIvXrtOuogtrHLGTFSyvL
-	d4YtI8/wLDT/e3ATO+gBjwCvSpAVywyFhanT9etwrEYarTHV7bD+YfkARDyhQvp5p0B6Vk
-	R+fXP7yyisfwrW+WOveU/gRxjNLcFEqR3vU2qBeRs/hLJ9Glpm/gcqTPn9ftkdH7NfCNzC
-	3f5H8QtYbkXvV8WYIMM1GAh6CbgaPdG6rdoh9HsN7AjxpIBqtzs+zcoGwgIIMpqHiNkbGP
-	u9AZFpmj41QzfGgiN1oD7f/MRe867Nx95FCdyTLbgnnbEpPGM0blelVliBhkJQ==
-Message-ID: <563f3f1b-985f-4a9e-a32c-cb8e9b6af43a@bootlin.com>
-Date: Tue, 21 Oct 2025 11:32:06 +0200
+	 In-Reply-To:Content-Type; b=LPfdsirZOwrJb/eJfzendjQ0lJQdYY1+7adHGm4vwEivla/9H9DESrnS8oLEVjzHkzlxGaYMYZ0Ts/VnGdNDodxq7IbSH4VtVKtt0q78iOvROEqzSER1SOk+woUk9Nnv0vdmvKzfW/wfyGcd39wCyv1nuV3XNG3iiepLFC+l5nA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GRGFgEvG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2211C4CEF1;
+	Tue, 21 Oct 2025 09:37:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761039427;
+	bh=vROLQ/huaW8/CmioOws1Snjr2nLyqHBL1ATXlL1hhH8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GRGFgEvG7nDjyoNfr+98OUc31cYs1vcfeJ1lZ19J39hKo6KNETy4lLfe8i1yrFd2z
+	 AEWh7m8gQ3Q0A0brHYhNsr966m+eGOBlduSiyN9Qf+I4zLSYE+dSz9SSC8fuMMS2Bo
+	 oAq7+wMNBvMpwh9p9bqypFSReeSKxBwk+l95Ea2CasiTlpqOPT1GYOQiHxaTxXoVy6
+	 3PajPbL4ITGPJ1ixgTR6dz8UDX7wKWfJ0qAxIqgbFW6RHjFGPEt9Lx3a0la+alcc5o
+	 UwwmcsDehn+kIvOFLk/h/tiGAZnY6BN0qVow27leRxghJGOBkuOSzGBC1UUJcOfZ/n
+	 hulvUWugCRQ4Q==
+Message-ID: <e0901356-ef48-4652-9ad4-ff85ae07d83a@kernel.org>
+Date: Tue, 21 Oct 2025 11:37:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,60 +50,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/4] amd-xgbe: add ethtool phy selftest
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch, Shyam-sundar.S-k@amd.com
-References: <20251020152228.1670070-1-Raju.Rangoju@amd.com>
- <20251020152228.1670070-3-Raju.Rangoju@amd.com>
- <ba2c0a35-eaad-4ae7-a337-b32cdf6323c6@bootlin.com>
- <9ba51a79-5a0e-42ab-90aa-950673633cda@lunn.ch>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH bpf-next v2] bpf/cpumap.c: Remove unnecessary TODO comment
+To: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>, ast@kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
+ john.fastabend@gmail.com, sdf@fomichev.me, andrii@kernel.org,
+ martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, haoluo@google.com,
+ jolsa@kernel.org
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+ david.hunter.linux@gmail.com, khalid@kernel.org,
+ linux-kernel-mentees@lists.linuxfoundation.org
+References: <20251020170254.14622-1-mehdi.benhadjkhelifa@gmail.com>
 Content-Language: en-US
-In-Reply-To: <9ba51a79-5a0e-42ab-90aa-950673633cda@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20251020170254.14622-1-mehdi.benhadjkhelifa@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
 
 
 
-On 20/10/2025 21:07, Andrew Lunn wrote:
-> On Mon, Oct 20, 2025 at 06:19:55PM +0200, Maxime Chevallier wrote:
->> Hi Raju,
->>
->> On 20/10/2025 17:22, Raju Rangoju wrote:
->>> Adds support for ethtool PHY loopback selftest. It uses
->>> genphy_loopback function, which use BMCR loopback bit to
->>> enable or disable loopback.
->>>
->>> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
->>
->> This all looks a lot like the stmmac selftests, hopefully one day
->> we can extract that logic into a more generic selftest framework
->> for all drivers to use.
+On 20/10/2025 19.02, Mehdi Ben Hadj Khelifa wrote:
+> After discussion with bpf maintainers[1], queue_index could
+> be propagated to the remote XDP program by the xdp_md struct[2]
+> which makes this todo a misguide for future effort.
 > 
-> https://elixir.bootlin.com/linux/v6.17.3/source/net/core/selftests.c#L441
+> [1]:https://lore.kernel.org/all/87y0q23j2w.fsf@cloudflare.com/
+> [2]:https://docs.ebpf.io/linux/helper-function/bpf_xdp_adjust_meta/
 > 
-> Sorry, not looked at the patch to see if this is relevant for this
-> driver. But we do have a generic selftest framework...
+> Signed-off-by: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
+> ---
+> Changelog:
 > 
-> 	Andrew
+> Changes from v1:
+> 
+> -Added a comment to clarify that RX queue_index is lost after the frame
+> redirection.
+> 
+> Link:https://lore.kernel.org/bpf/d9819687-5b0d-4bfa-9aec-aef71b847383@gmail.com/T/#mcb6a0315f174d02db3c9bc4fa556cc939c87a706
+>   kernel/bpf/cpumap.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+> index 703e5df1f4ef..6856a4a67840 100644
+> --- a/kernel/bpf/cpumap.c
+> +++ b/kernel/bpf/cpumap.c
+> @@ -195,7 +195,10 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
+>   
+>   		rxq.dev = xdpf->dev_rx;
+>   		rxq.mem.type = xdpf->mem_type;
+> -		/* TODO: report queue_index to xdp_rxq_info */
+> +		/* The NIC RX queue_index is lost after the frame redirection
+> +		 * but in case of need, it can be passed as a custom XDP
+> +		 * metadata via xdp_md struct to the remote XDP program
 
-Ah ! And this also looks like this driver code. It seems to me that the
-main diffence that the amd-xgbe selftest brings is the ability to
-fallback to MAC-side loopback should PHY loopback fails, so they don't
-1:1 map to these, but we could consider extending the existing selftests.
+Argh, saying XDP metadata is accessed via the xdp_md struct is just wrong.
 
-Besides that it seems that the generic selftest are more efficient wrt
-how they deal with PHY loopback, as they don't re-configure it for each
-selftest.
+Nacked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
-I don't necessarly think this series should be reworked but this is
-starting to be a lot of code duplication.
+> +		 */
+>   
+>   		xdp_convert_frame_to_buff(xdpf, &xdp);
+>   
 
-Raju, maybe you can re-use at least the generic packet generation
-functions (i.e net_tst_get_skb() ) ?
-
-Maxime
 
