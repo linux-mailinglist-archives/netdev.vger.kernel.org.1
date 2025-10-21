@@ -1,170 +1,226 @@
-Return-Path: <netdev+bounces-231070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75698BF4590
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 04:06:16 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46692BF45B1
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 04:09:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 166ED467F36
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 02:06:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F21554E31C2
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 02:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5CA25EFB6;
-	Tue, 21 Oct 2025 02:05:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6523273D66;
+	Tue, 21 Oct 2025 02:09:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="EWJG35kv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aOkdXt0M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32FA24A058;
-	Tue, 21 Oct 2025 02:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B705635
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 02:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761012355; cv=none; b=Rzl2lCEp0kuvj0nPEyizPEIUEUbFtb0IYVtnsMCxvo2l6nDcAPsZPJB86u3+KA7x/pbHLiwv4Eg6anxRq+4a5tVwsCwYmg38mWEd6ah40dIp4SerLOAJ2hFwrJw4P4dqGwVlpXF8f5QNT/VC9bYKwFHZLlhHhuFzHh/QzXosxYQ=
+	t=1761012549; cv=none; b=o+UaOpBccmIIuIYFFzORy5Vtlo8XqyG9s/Of+fNxo+03suPj+vCLgX6SohUNgv7dGANmIlK828/1BvluzC3j0nSvQRItz46M37eR9YnyZG/KezeNDnztaFTIqQBs3vdW/ChMCjpUWvN/FXbhTuNRXaCPyii/fFeR0La07QmFb+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761012355; c=relaxed/simple;
-	bh=f771sbmADVzs9LQeaRMK13QS6eL9wIksvSbwZ0HJ7h4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eZxOM/9aZVli3xDgiCCB+5SGy9LkJc3MukvksRQzTxRWgPd0j8Sv2Anb1TO73qLmZjxs42+9+yc6Z5ngoriO+zNslXCj46cx4OgNZYH8c2HG6F+ji9T8EH/5li3mTKWpZquLBGmdzfm8FBRzyNyrom7bfp0G5COJa/gw+VTM2u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=EWJG35kv; arc=none smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59KNo2OS3070029;
-	Tue, 21 Oct 2025 02:05:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	PPS06212021; bh=BL5f/Hmeb5kOwkwf+4l6waB6+ZBgZpieNxgNqnBtByg=; b=
-	EWJG35kvwc5G/L+X3nWjtLgccmAGIemwrZ1OIvji2mV7NugfjUIqXTkQfkU6wGXo
-	etgB2XXcywaea5SEkBn3Yy+H6ZHR3crGEeDa8Hi92PiyZLpS+Y65XiSqIHHBQrnv
-	/h8P/whj7VFiWjcHg+hlkzDI8nbSH/Up1R6QaxnhX//A6kGk7edP5jYRgf8oAYyo
-	2QPps1wL3K0QVbGZIVKFdZ78QNukPfjbgZhftNRldWeFBwhE5T3Sl7t7TIBopROr
-	9WbUGoJSUsiC/6X7lfS0ERBgJ/iSSQ8P7xbnakFykRiz64eh4nCzjJD6CReX3MPD
-	1LsLAwsVqlhJF4DUxf+y6A==
-Received: from ala-exchng02.corp.ad.wrs.com ([128.224.246.37])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 49v1v5akgt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 21 Oct 2025 02:05:37 +0000 (GMT)
-Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
- ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.59; Mon, 20 Oct 2025 19:05:36 -0700
-Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
- ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
- 15.1.2507.59 via Frontend Transport; Mon, 20 Oct 2025 19:05:34 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <dan.carpenter@linaro.org>
-CC: <lizhi.xu@windriver.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <horms@kernel.org>, <kuba@kernel.org>, <linux-hams@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <pabeni@redhat.com>,
-        <syzbot+2860e75836a08b172755@syzkaller.appspotmail.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: Re: [PATCH V2] netrom: Prevent race conditions between multiple add route
-Date: Tue, 21 Oct 2025 10:05:33 +0800
-Message-ID: <20251021020533.1234755-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <aPZ4fLKBiCCIGr9e@stanley.mountain>
-References: <aPZ4fLKBiCCIGr9e@stanley.mountain>
+	s=arc-20240116; t=1761012549; c=relaxed/simple;
+	bh=yGtbk5lHI3kq7dyR6Ccfn979PbRPyfWmTul2ikCiYio=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=cR0yoUuaThRKxtP8iDKqAmP/4SSYIzv4DqdMPMKV13DSmX7nvfhYy1hksIu7+lTbzHsEPoD0d+02leldPGxP3+QpaaCAelPi1CcAIfiwkQs+6QdYJQoi6KlEvzXAvM3tWE0eC42xFyItsGfwJ6rVYNVnqm6o12T17iTuRkYLQ2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aOkdXt0M; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-290d4d421f6so36825065ad.2
+        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 19:09:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761012547; x=1761617347; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=RSHZrMdT1rNKLCfHO0WzHkGQXMBPH1VXE0UZcdITjiE=;
+        b=aOkdXt0MDl9aBkRGHyw++3wUld6q8+dOq9sbqlDRjsd1ad3ZJYWa75/wMiM7r/uVb7
+         QV1e5vvV4iHjL40vnZqyELu65QVSlR0XYxoH+kF8FTU+0q0Kz/hBx6tJHWROUww22+oV
+         PB9liGTb0b6xDxpEpXpgnA0eMIgIuWi9wIurU4f7KJWezZ2Qvo20tIw4h94kmevY4p77
+         FA4tZwjQEqYn7UzLeUXh/gZkB7+l4o1YwsIKYh+Gvf7r1+NuMwXpiHOqBKC3xCb6Qf2k
+         ghnVZuglZkG4rdCvlqcNLHlhmUe0ZcfoxyqzQ2BfqzKp9wpkR1cJ69iEJhwGO8Ontpb6
+         0B6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761012547; x=1761617347;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RSHZrMdT1rNKLCfHO0WzHkGQXMBPH1VXE0UZcdITjiE=;
+        b=suO4XVQRSoCIH8kQNqeJqREYep4uNQTTkAhq4NpuA3jFeYbRjXXVd0IpTx3qkr7oNm
+         dT2y6m5fidnbSc16POH9zJmWjKfBdp/nORpMQi/WInCf6xx+0opHORzZXLIfxgoyjySb
+         gsU6WzDYDpRL0iBA8o3eVN19ILr+JzhKvlsgmzC4KkJ6bZmmkVym67WjW2ojqW7BdwPw
+         QcVS31n8XPVrRIdbpPUg5hX0VAEDojT0TMQOFZkkI0sHx6E4zZ/R39NQ+wOUIB8v2vmm
+         /cWgQksIBPMBFdNa3OAQejB6pG3RmK4hm4bV8mM8XGWMGhR9Cl2VO/PvfgnRvI+STkqT
+         6B4A==
+X-Forwarded-Encrypted: i=1; AJvYcCV0+fxD2yDb9xX52NZqLJSYP7pn1fsbyontEX6OHmSEKixDydc1RaJiMvpHWDoPGTJX0/vE9tA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5141LJ3pHOSBaAFvLjWPIZrqFq5Z27LUOC1JgsRpRsXW59OzL
+	iUCnwOrly3+HO4HeozeR51kTsQc+VLNsNlXHhRVs6EjOvc3V9MjmvuTi8/XbTzO7sWvNktZvxif
+	ejpUjbwNUGnYSS3tmNgAxOwklyyv4Cyw=
+X-Gm-Gg: ASbGnct0YLe1MFd/JRn8Cb94tfW+GekY5bNgiPffDGzO5ZJKD73IbzJGl4/vVXmb5S6
+	7dWvsxxXhS59ezcI7CY4fnSkuXeJ9AFPkhpYQzzE8EAu2ZGPxDs4YeqRZWZ8MYs0dnMaWbzbFEx
+	ce4pWj7gPgpX7bT3FTBIOmd3kKinCKzjNEnfncPJz8tVDnC0vFgIw9DB83Bk/4iznMZSgrdjl+G
+	Lnn+DncI1yEqh72rAVxjvUBvIH45BsYWyiAVz6uajerXw0GDKtce7+7oQiERUmIaZ0bEQ==
+X-Google-Smtp-Source: AGHT+IGI6nmhwmy6qVV/5p98VPbodX2KbY/ejETa/NKy48hQF8/IWksWUPDrLNOcGYbgqzWaEnpoxE+cPeFDLYDBOeI=
+X-Received: by 2002:a17:902:d501:b0:28e:7fce:667e with SMTP id
+ d9443c01a7336-290c9cbc6d2mr196330075ad.17.1761012547292; Mon, 20 Oct 2025
+ 19:09:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIxMDAxNSBTYWx0ZWRfX878suZql/q9N
- QGNajCu1lXaG+56F8nAQDz4dIBS56QujxQBcj/Nb2Sn6NXhlZUEZZFocgV5N0qXN2MuFrPbf0ef
- MiyaGYhsowChs4QLttXn1/zB0tp9Xi7LHInsO4yEusOz5Iml9ItRFCNxPK3Lg30lAnV7+T8iOCT
- IcqyEC6aC/DGb7aTxHIyhZCWkSDTAmam8kqTQipVruw2ddP9FZPxU7SkjzoJpcNUYk5M2sz89hx
- gXfWHBGgEFnzE9aGNvv0CBnOwzNWkBiltSEy718SmUBx5QfAtbzgyD8iAWsJq+BI/6FIZx7gyqj
- qEV7ElgiiAtkTL6dbEI0/1c1//bke7WyyLN5FuCrX8BzmzfCCYvYUpZifmfiztTARDuM6arlc+V
- FWA6AvRJ89bq6fkkl5RdZ8UfqzCeEQ==
-X-Proofpoint-GUID: FAgoz_CITOh0pcZ0grgHcl-G_46ABxAW
-X-Proofpoint-ORIG-GUID: FAgoz_CITOh0pcZ0grgHcl-G_46ABxAW
-X-Authority-Analysis: v=2.4 cv=ANdmIO46 c=1 sm=1 tr=0 ts=68f6ea72 cx=c_pps
- a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=AKGgawUbhjWeLciGq18A:9
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-20_07,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 priorityscore=1501 phishscore=0 malwarescore=0 bulkscore=0
- impostorscore=0 clxscore=1015 suspectscore=0 lowpriorityscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510210015
+From: Jesper Juhl <jesperjuhl76@gmail.com>
+Date: Tue, 21 Oct 2025 04:08:31 +0200
+X-Gm-Features: AS18NWCV60O9H_TfISsqY7ZnWFD9f_H8XtVJP2DI992D3PQ7BXcUyCc296_2jFs
+Message-ID: <CAHaCkmc_CrwBRj-Gji_td9S19oPg9U9-n8B4u8yTR4sPm9Vx7Q@mail.gmail.com>
+Subject: [PATCH] Fix up 'make versioncheck' issues
+To: wireguard@lists.zx2c4.com, linux-kselftest@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
+	Jesper Juhl <jesperjuhl76@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 20 Oct 2025 20:59:24 +0300, Dan Carpenter wrote:
-> On Mon, Oct 20, 2025 at 09:49:12PM +0800, Lizhi Xu wrote:
-> > On Mon, 20 Oct 2025 21:34:56 +0800, Lizhi Xu wrote:
-> > > > Task0					Task1						Task2
-> > > > =====					=====						=====
-> > > > [97] nr_add_node()
-> > > > [113] nr_neigh_get_dev()		[97] nr_add_node()
-> > > > 					[214] nr_node_lock()
-> > > > 					[245] nr_node->routes[2].neighbour->count--
-> > > > 					[246] nr_neigh_put(nr_node->routes[2].neighbour);
-> > > > 					[248] nr_remove_neigh(nr_node->routes[2].neighbour)
-> > > > 					[283] nr_node_unlock()
-> > > > [214] nr_node_lock()
-> > > > [253] nr_node->routes[2].neighbour = nr_neigh
-> > > > [254] nr_neigh_hold(nr_neigh);							[97] nr_add_node()
-> > > > 											[XXX] nr_neigh_put()
-> > > >                                                                                         ^^^^^^^^^^^^^^^^^^^^
-> > > >
-> > > > These charts are supposed to be chronological so [XXX] is wrong because the
-> > > > use after free happens on line [248].  Do we really need three threads to
-> > > > make this race work?
-> > > The UAF problem occurs in Task2. Task1 sets the refcount of nr_neigh to 1,
-> > > then Task0 adds it to routes[2]. Task2 releases routes[2].neighbour after
-> > > executing [XXX]nr_neigh_put().
-> > Execution Order:
-> > 1 -> Task0
-> > [113] nr_neigh_get_dev() // After execution, the refcount value is 3
-> >
-> > 2 -> Task1
-> > [246] nr_neigh_put(nr_node->routes[2].neighbour);   // After execution, the refcount value is 2
-> > [248] nr_remove_neigh(nr_node->routes[2].neighbour) // After execution, the refcount value is 1
-> >
-> > 3 -> Task0
-> > [253] nr_node->routes[2].neighbour = nr_neigh       // nr_neigh's refcount value is 1 and add it to routes[2]
-> >
-> > 4 -> Task2
-> > [XXX] nr_neigh_put(nr_node->routes[2].neighbour)    // After execution, neighhour is freed
-> > if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)  // Uaf occurs this line when accessing neighbour->count
-> 
-> Let's step back a bit and look at the bigger picture design.  (Which is
-> completely undocumented so we're just guessing).
-> 
-> When we put nr_neigh into nr_node->routes[] we bump the nr_neigh_hold()
-> reference count and nr_neigh->count++, then when we remove it from
-> ->routes[] we drop the reference and do nr_neigh->count--.
-> 
-> If it's the last reference (and we are not holding ->locked) then we
-> remove it from the &nr_neigh_list and drop the reference count again and
-> free it.  So we drop the reference count twice.  This is a complicated
-> design with three variables: nr_neigh_hold(), nr_neigh->count and
-> ->locked.  Why can it not just be one counter nr_neigh_hold().  So
-> instead of setting locked = true we would just take an extra reference?
-> The nr_neigh->count++ would be replaced with nr_neigh_hold() as well.
-locked controls whether the neighbor quality can be automatically updated;
-count controls the number of different routes a neighbor is linked to;
-refcount is simply used to manage the neighbor lifecycle.
-> 
-> Because that's fundamentally the problem, right?  We call
-> nr_neigh_get_dev() so we think we're holding a reference and we're
-> safe, but we don't realize that calling neighbour->count-- can
-> result in dropping two references.
-After nr_neigh_get_dev() retrieves a neighbor, there shouldn't be an
-unfinished nr_add_node() call operating on the neighbor in the route.
-Therefore, we need to use a lock before the nr_neigh_get_dev() operation
-begins to ensure that the neighbor is added atomically to the routing table.
+From d2e411b4cd37b1936a30d130e2b21e37e62e0cfb Mon Sep 17 00:00:00 2001
+From: Jesper Juhl <jesperjuhl76@gmail.com>
+Date: Tue, 21 Oct 2025 03:51:21 +0200
+Subject: [PATCH] [PATCH] Fix up 'make versioncheck' issues
 
-BR,
-Lizhi
+'make versioncheck' currently flags a few files that don't need to
+needs it but doesn't include it. This patch fixes that up.
+
+Signed-Off-By: Jesper Juhl <jesperjuhl76@gmail.com>
+---
+samples/bpf/spintest.bpf.c                                | 1 -
+tools/lib/bpf/bpf_helpers.h                               | 2 ++
+tools/testing/selftests/bpf/progs/dev_cgroup.c            | 1 -
+tools/testing/selftests/bpf/progs/netcnt_prog.c           | 2 --
+tools/testing/selftests/bpf/progs/test_map_lock.c         | 1 -
+tools/testing/selftests/bpf/progs/test_send_signal_kern.c | 1 -
+tools/testing/selftests/bpf/progs/test_spin_lock.c        | 1 -
+tools/testing/selftests/bpf/progs/test_tcp_estats.c       | 1 -
+tools/testing/selftests/wireguard/qemu/init.c             | 1 -
+9 files changed, 2 insertions(+), 9 deletions(-)
+
+diff --git a/samples/bpf/spintest.bpf.c b/samples/bpf/spintest.bpf.c
+index cba5a9d507831..6278f6d0b731f 100644
+--- a/samples/bpf/spintest.bpf.c
++++ b/samples/bpf/spintest.bpf.c
+@@ -5,7 +5,6 @@
+ * License as published by the Free Software Foundation.
+ */
+#include "vmlinux.h"
+-#include <linux/version.h>
+#include <bpf/bpf_helpers.h>
+#include <bpf/bpf_tracing.h>
+
+diff --git a/tools/lib/bpf/bpf_helpers.h b/tools/lib/bpf/bpf_helpers.h
+index 80c0285406561..393ce1063a977 100644
+--- a/tools/lib/bpf/bpf_helpers.h
++++ b/tools/lib/bpf/bpf_helpers.h
+@@ -2,6 +2,8 @@
+#ifndef __BPF_HELPERS__
+#define __BPF_HELPERS__
+
++#include <linux/version.h>
++
+/*
+ * Note that bpf programs need to include either
+ * vmlinux.h (auto-generated from BTF) or linux/types.h
+diff --git a/tools/testing/selftests/bpf/progs/dev_cgroup.c
+b/tools/testing/selftests/bpf/progs/dev_cgroup.c
+index c1dfbd2b56fc9..4c4e747bf827a 100644
+--- a/tools/testing/selftests/bpf/progs/dev_cgroup.c
++++ b/tools/testing/selftests/bpf/progs/dev_cgroup.c
+@@ -6,7 +6,6 @@
+ */
+
+#include <linux/bpf.h>
+-#include <linux/version.h>
+#include <bpf/bpf_helpers.h>
+
+SEC("cgroup/dev")
+diff --git a/tools/testing/selftests/bpf/progs/netcnt_prog.c
+b/tools/testing/selftests/bpf/progs/netcnt_prog.c
+index f9ef8aee56f16..3cf6b7a27a34a 100644
+--- a/tools/testing/selftests/bpf/progs/netcnt_prog.c
++++ b/tools/testing/selftests/bpf/progs/netcnt_prog.c
+@@ -1,7 +1,5 @@
+// SPDX-License-Identifier: GPL-2.0
+#include <linux/bpf.h>
+-#include <linux/version.h>
+-
+#include <bpf/bpf_helpers.h>
+#include "netcnt_common.h"
+
+diff --git a/tools/testing/selftests/bpf/progs/test_map_lock.c
+b/tools/testing/selftests/bpf/progs/test_map_lock.c
+index 1c02511b73cdb..982bdbf0dba6b 100644
+--- a/tools/testing/selftests/bpf/progs/test_map_lock.c
++++ b/tools/testing/selftests/bpf/progs/test_map_lock.c
+@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0
+// Copyright (c) 2019 Facebook
+#include <linux/bpf.h>
+-#include <linux/version.h>
+#include <bpf/bpf_helpers.h>
+
+#define VAR_NUM 16
+diff --git a/tools/testing/selftests/bpf/progs/test_send_signal_kern.c
+b/tools/testing/selftests/bpf/progs/test_send_signal_kern.c
+index 176a355e30624..e70b191162359 100644
+--- a/tools/testing/selftests/bpf/progs/test_send_signal_kern.c
++++ b/tools/testing/selftests/bpf/progs/test_send_signal_kern.c
+@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0
+// Copyright (c) 2019 Facebook
+#include <vmlinux.h>
+-#include <linux/version.h>
+#include <bpf/bpf_helpers.h>
+
+struct task_struct *bpf_task_from_pid(int pid) __ksym;
+diff --git a/tools/testing/selftests/bpf/progs/test_spin_lock.c
+b/tools/testing/selftests/bpf/progs/test_spin_lock.c
+index d8d77bdffd3d2..9bcee268f828b 100644
+--- a/tools/testing/selftests/bpf/progs/test_spin_lock.c
++++ b/tools/testing/selftests/bpf/progs/test_spin_lock.c
+@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0
+// Copyright (c) 2019 Facebook
+#include <linux/bpf.h>
+-#include <linux/version.h>
+#include <bpf/bpf_helpers.h>
+#include "bpf_misc.h"
+
+diff --git a/tools/testing/selftests/bpf/progs/test_tcp_estats.c
+b/tools/testing/selftests/bpf/progs/test_tcp_estats.c
+index e2ae049c2f850..eb0e55ba3f284 100644
+--- a/tools/testing/selftests/bpf/progs/test_tcp_estats.c
++++ b/tools/testing/selftests/bpf/progs/test_tcp_estats.c
+@@ -34,7 +34,6 @@
+#include <string.h>
+#include <linux/bpf.h>
+#include <linux/ipv6.h>
+-#include <linux/version.h>
+#include <sys/socket.h>
+#include <bpf/bpf_helpers.h>
+
+diff --git a/tools/testing/selftests/wireguard/qemu/init.c
+b/tools/testing/selftests/wireguard/qemu/init.c
+index 3e49924dd77e8..20d8d3192f75c 100644
+--- a/tools/testing/selftests/wireguard/qemu/init.c
++++ b/tools/testing/selftests/wireguard/qemu/init.c
+@@ -24,7 +24,6 @@
+#include <sys/sysmacros.h>
+#include <sys/random.h>
+#include <linux/random.h>
+-#include <linux/version.h>
+
+__attribute__((noreturn)) static void poweroff(void)
+{
+--
+2.51.1
 
