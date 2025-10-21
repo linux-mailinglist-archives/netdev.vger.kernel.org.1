@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-231258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3C79BF6B14
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 15:13:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB93CBF6B08
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 15:13:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B96683BED83
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 13:12:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C75A19A54BB
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 13:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4AE334C1C;
-	Tue, 21 Oct 2025 13:12:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA77334C2A;
+	Tue, 21 Oct 2025 13:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BcsqL+/D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H6KzmLHy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B72334C0F
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 13:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9703A334373
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 13:12:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761052348; cv=none; b=o8oWi3p4wNIUJ1zKkxeKZ1UeLx7gHfoD8ERV9vaQC49RU4JbOsxcEqHyrNurC7XBf+9GDZmcPwQCDU8+8JYfBYfTHE9lnsmtH16PdkLOz4I05uokZki2CEhGSLD20TV2LExCKV/AJk5bXLrzoh8ZE7+Q/7psCSBQibEWquIEa3o=
+	t=1761052353; cv=none; b=u+eAMQI1/US2brjK8YA70PIPXUzDatigi5cbt8S51Bm8FEjhRropZmtc/F+HZSZ8jCzmBAialuQyJAJGlNaUuovodWAYzGWVzsLBZc6vSFYxPiFxYgy/so5ZQ1pr5r785fsR21FUvadnht51DtYhZaFt8koH0GmLaykNbbJgYXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761052348; c=relaxed/simple;
-	bh=OalRNjUbwogRdEZGkYjFYCPbwuw+lvhcwqs4I3EUtkI=;
+	s=arc-20240116; t=1761052353; c=relaxed/simple;
+	bh=x416DJPTmQXTm8XE6ZkVhfdHai2ADq7eJGifrFrmn14=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JXe5LQ8BACZ1pay/liG9H8blXhL2/w8JRA8EBNBfpHxLrQnf0eOip8SJhMhDlB7RgUqCygX+TCGQ0HeXHpO1eBKgIoEA3zkuwi0o3trO4jfLhSS/6PBSgaXrV4PGZ7lwm1ya8nxQUsbO7o9DGNzuGx/PcD8ILGHxwDKlzXcq80k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BcsqL+/D; arc=none smtp.client-ip=209.85.210.174
+	 MIME-Version; b=PkaUuBz8+a/MizGVr9pBPgUs7/HBp9lCk9z/x2JVcyj2Cu0D9B2Bh7z/91c2qinmqHSBiplXNzLM8R2J8VO0LGgf58ff+B2uISB29+xXuO5Ys2UFPOZYHaWMKuXwqq8ybeucMezHJUs23qJbPffd+F1Y4bMOACNAMyhHAWDTFb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H6KzmLHy; arc=none smtp.client-ip=209.85.215.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-782a77b5ec7so5106315b3a.1
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 06:12:26 -0700 (PDT)
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b57bffc0248so3927824a12.0
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 06:12:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761052346; x=1761657146; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761052351; x=1761657151; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QfT6R8DUz6iGvUEZdMZ9t6TvFyv6jslwQUFkkPxFNUU=;
-        b=BcsqL+/D+tGMQpP10bzCTIltncDtRf40YD4ZAqccrJ9oK2W2/hruG9elp4+sQgH3nX
-         qDrmJ8X4Va+3EqKHoE8/kZ6r3WfnF/76IiE2xMcAXRqECSu/9yUrW8rxxa/bw729xf66
-         IWZNLigBfiJoe3hDmJo8Zj/Hr1phtk4zlUS0j+K1JaHq6vOxOCCr9td5m2BitcdSufjZ
-         U1CmqQATZV3udSSi4K6x/PikQXj7YIWJBae9XcVqrxMbpr9F6r7LtLxXeqWavTs2xvVR
-         clSQbeC/+ggBzx+zC0kc1StdGVjyYEh+ZEFdbNNCUPeKy182fF2Im+K4I9dTrVp3Cm4T
-         irQQ==
+        bh=G1r4hJXktqrgi/xhdNR7M1d2EmSJ0O1fWXeaj+3yGzA=;
+        b=H6KzmLHyE4m3bkZZm2v4jzK8ZP72nwGwlIBL+Ixgxu3BcgC6Gj/ERNoGqvm2Pt6n4p
+         o7zHyhUQjN1obU79xjjPzvsiACz0UF4ypLpW29NoiRINrlG1YFHWJZAXRHHTNPRPGLIp
+         2+Ikmk22WiPws8CRhYwtW66dbi23O6sol3ZPc8Sen9fAtY6af3Vy78bODSuyj8hmsJ2y
+         OqgyU2YtBV78UF+xjebTXZ/98Oc/cFbx5iFrtzGs9rnPYTYvFTF3W6OW4YcCtRLhBIvd
+         AsFU+G1jpvJ0i2BbKrzJZnCQjfEpw1RA7UIFQXqsIF9bDyNWcphjehzX4H2aSX7t0TdK
+         wnqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761052346; x=1761657146;
+        d=1e100.net; s=20230601; t=1761052351; x=1761657151;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QfT6R8DUz6iGvUEZdMZ9t6TvFyv6jslwQUFkkPxFNUU=;
-        b=jWYnrIPdrTU6MTd2DapdcRlMKQNeljwVAze92TQzY44vnKrqusLSgG2luDtEpyFGfT
-         YYsKqJGdaBWzYpumxyV+fGIIcCECGV3dFakXsdIE9g/Xloo7qxfYjuu38Ohu/ND3cZl4
-         TwjZjkZYEHdZUygSp9XdB5X8AGA+bkAq0gst0Hh0dg/t8MTsw0k7F+Zt1x5/cyUKxojU
-         4siYpYbwNVU0xjiuuBdH6rqwMxZHwdXRB6p6s1hEdWXyCWitdThA1+7K8DnPRLKI8Y5x
-         I+befYIN/wySTRBMDq3+0IO1ZOjEa6SXoCFEwwR8dyLC6zvXFe7NWbxnf3CxFHPK8wXu
-         ZkoA==
-X-Forwarded-Encrypted: i=1; AJvYcCWGnuCX4tFM/vuZ/5L0iqG2gUKIHSd8B3ZKnBp0pIKkd/07ygdKYK8C7VAGumHCGCYKySriyLY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwA6GMvMewuIFuEnwhGmeP5fZ2CxBzPb34T2+LEB8hNidVqStoP
-	5VTIgYL5sAtymVQgsI8UJzLaWGa6Gy/EO2Jw9T4TkaoF2PHLGhCAx1Sc
-X-Gm-Gg: ASbGnctxjSS6Di0iSE+/m0SxGkUGooMT/phqZx9QQOAhzFipL0foTwzp8CbM0Bgc52S
-	M8du7QNzd7IoMW9Bh83P0pk7p4g7b/cEywJePX5hdNH9OMmXer1CG/Vb2gZXHPo8yipRzBRscut
-	VT0s9BUO14e8bG3WrWwVIgKvSpGOPuy0yB/d3YTPk+juREaRl2WG+VtcIg2qHSgDpuZp5KLvFv2
-	2uKvdFyv0pQ7i/QlpL2ZvNdPy73gmafAv8Be61GK/rioh3QJeYdXGXvmiI2RLt7FFoDBh4Msc1K
-	NzFmYfIODPTVw2ABRNou6fWy+qLcQy4SjvsHuV3EqiDqG+e4rK4yJgFpQ2Kp0lx09eY53hnS+Y5
-	4n7dETDW/tbvh+ZgjdbdOkW0sP0ZNeXPnunqgSM4Pd9tqd4PC7fo6znp6NYKJK6gFbS6l0gDqj3
-	zXZuFMjp8XDnZ+Ih452fyfsJuCzE6q+QdGQhQwGPHSsF0USrV2oAvyiQd6AXhtAu/20BKw
-X-Google-Smtp-Source: AGHT+IHHHL9U+nD1VYobHrqUIbr9Ge8ylqi/izQYBJI4A4Bi6BhEpKUifMO+u2HRQOt/Dz66Z0TaAg==
-X-Received: by 2002:a17:902:d2c6:b0:290:c0d7:237e with SMTP id d9443c01a7336-290caf831cdmr243944045ad.39.1761052346173;
-        Tue, 21 Oct 2025 06:12:26 -0700 (PDT)
+        bh=G1r4hJXktqrgi/xhdNR7M1d2EmSJ0O1fWXeaj+3yGzA=;
+        b=EZjp/pyq21yjEDMXiqkxc8ZLHVPgRfc5B73QRg9QUe9BwekX2M3VfFxKVGisxj1S45
+         Oz5z8yCUwtPRUR2z4FJgW7xdfDp5bVgfVbeGhpBow6Hbc7kuaMnuv11eiQL4+aWU315N
+         CG2D4Z0PdAsiKbYgEN+YQg/8La3NAYeEwohiSKukSBsRdcwHU+W3Pm6E74tL/uG/dSeC
+         DrFDdyRUbwfHbDrK6zBiVTGVrG4CT4ejI+a0kTlOs0pSqVeN/zyB8mmzH4bTNs9f/okH
+         yYPUEy9eOe3OkUP6Y1JW5eZzN6D1o5tEFXlDj1EyNtkNB6bzdSTMK+Ba8VlCvIg1lVWO
+         k/+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCULeIflfJssZBFAkd/hRJJGMx/jfFqwQ16kVrIhOdzRkmU0rRu+Nyx7JLVw6HNmt4zr/zrf7fk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxj3iKiM+8uiItw+VY+1+o0xypgTgTzti9GACB5cZI6FRDybbhB
+	VDLK8sFW5Nw5TbRMa+8vb5ed1VuGSwpLJIgr+trhoE/WiGa6Lr+Mbj5WHxaZqHXwtyo=
+X-Gm-Gg: ASbGncu1V8+DW7NojlNie5ydoetRCmdiyelqXH9qXZNKxj8sxWHDQbZByZL7zz8/VnT
+	th29qZbm/+KpfAnnIQisqP7jRLxhyvSH5A6dNsFG/Gm8t7gCPR247a7hEEoMuPRH4hmd090Owrm
+	C/pCTxI8MykoB/pyRCkfaiMGNRu4IF9Y2qlShOosed9XPT3NxnpVEhJHs6TCD0I3Pb1z1o996xb
+	+tHV9TZV5bmdlmshK77GHniPnDGFBe+XuPlmjCLO2Jl+OEsBT2S+8mR/Y4M6DDPF1bvcxHOHA2x
+	J0NhwA4xMDvr0lkrIJDEG/1mg0/rMV8YgmJuoAWcEqIenxfho0rieaXil7YIdScPJwy+/K/SxrF
+	3oHBGEmWUNzFuoddLLyzsPoHf11CHx+c1s6afnNWfZzJ0O31z5MsSkw34gF7yBcARb+Iuwqnd69
+	aKNCCR/7clRI6rJMn9jF8a61uHJRdmqMLDXeDjK8zXTOMb0cca5JoqF+r8yQ==
+X-Google-Smtp-Source: AGHT+IHYFGhUmZxyysQHFil1L0K9sDArAoc0iH+PkiIhYFFUVEN7aFnAht9Gz/xLbgin2jX4tsmrbw==
+X-Received: by 2002:a17:902:f541:b0:292:9ac7:2608 with SMTP id d9443c01a7336-2929ac72697mr101761965ad.8.1761052350711;
+        Tue, 21 Oct 2025 06:12:30 -0700 (PDT)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-292471fd9ddsm109248175ad.89.2025.10.21.06.12.21
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-292471fd9ddsm109248175ad.89.2025.10.21.06.12.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 06:12:25 -0700 (PDT)
+        Tue, 21 Oct 2025 06:12:30 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -93,9 +93,9 @@ To: davem@davemloft.net,
 Cc: bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v3 2/9] xsk: extend xsk_build_skb() to support passing an already allocated skb
-Date: Tue, 21 Oct 2025 21:12:02 +0800
-Message-Id: <20251021131209.41491-3-kerneljasonxing@gmail.com>
+Subject: [PATCH net-next v3 3/9] xsk: add xsk_alloc_batch_skb() to build skbs in batch
+Date: Tue, 21 Oct 2025 21:12:03 +0800
+Message-Id: <20251021131209.41491-4-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20251021131209.41491-1-kerneljasonxing@gmail.com>
 References: <20251021131209.41491-1-kerneljasonxing@gmail.com>
@@ -109,104 +109,188 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-To avoid reinvent the wheel, the patch provides a way to let batch
-feature to reuse xsk_build_skb() as the rest process of the whole
-initialization just after the skb is allocated.
+Support allocating and building skbs in batch.
 
-The original xsk_build_skb() itself allocates a new skb by calling
-sock_alloc_send_skb whether in copy mode or zerocopy mode. Add a new
-parameter allocated skb to let other callers to pass an already
-allocated skb to support later xmit batch feature. It replaces the
-previous allocation of memory function with a bulk one.
+This patch uses kmem_cache_alloc_bulk() to complete the batch allocation
+which relies on the global common cache 'net_hotdata.skbuff_cache'. Use
+a xsk standalone skb cache (namely, xs->skb_cache) to store allocated
+skbs instead of resorting to napi_alloc_cache that was designed for
+softirq condition.
+
+After allocating memory for each of skbs, in a 'for' loop, the patch
+borrows part of __allocate_skb() to initialize skb and then calls
+xsk_build_skb() to complete the rest of initialization process, like
+copying data and stuff.
+
+Add batch.send_queue and use the skb->list to make skbs into one chain
+so that they can be easily sent which is shown in the subsequent patches.
+
+In terms of freeing skbs process, napi_consume_skb() in the tx completion
+would put the skb into global cache 'net_hotdata.skbuff_cache' that
+implements the deferred freeing skb feature to avoid freeing skb one
+by one to improve the performance.
 
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- include/net/xdp_sock.h |  3 +++
- net/xdp/xsk.c          | 23 ++++++++++++++++-------
- 2 files changed, 19 insertions(+), 7 deletions(-)
+ include/net/xdp_sock.h |   3 ++
+ net/core/skbuff.c      | 101 +++++++++++++++++++++++++++++++++++++++++
+ net/xdp/xsk.c          |   1 +
+ 3 files changed, 105 insertions(+)
 
 diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-index f33f1e7dcea2..8944f4782eb6 100644
+index 8944f4782eb6..cb5aa8a314fe 100644
 --- a/include/net/xdp_sock.h
 +++ b/include/net/xdp_sock.h
-@@ -127,6 +127,9 @@ struct xsk_tx_metadata_ops {
- 	void	(*tmo_request_launch_time)(u64 launch_time, void *priv);
+@@ -47,8 +47,10 @@ struct xsk_map {
+ 
+ struct xsk_batch {
+ 	u32 generic_xmit_batch;
++	unsigned int skb_count;
+ 	struct sk_buff **skb_cache;
+ 	struct xdp_desc *desc_cache;
++	struct sk_buff_head send_queue;
  };
  
-+struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
-+			      struct sk_buff *allocated_skb,
-+			      struct xdp_desc *desc);
+ struct xdp_sock {
+@@ -130,6 +132,7 @@ struct xsk_tx_metadata_ops {
+ struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 			      struct sk_buff *allocated_skb,
+ 			      struct xdp_desc *desc);
++int xsk_alloc_batch_skb(struct xdp_sock *xs, u32 nb_pkts, u32 nb_descs, int *err);
  #ifdef CONFIG_XDP_SOCKETS
  
  int xsk_generic_rcv(struct xdp_sock *xs, struct xdp_buff *xdp);
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index bc12790017b0..5b6d3b4fa895 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -81,6 +81,8 @@
+ #include <net/page_pool/helpers.h>
+ #include <net/psp/types.h>
+ #include <net/dropreason.h>
++#include <net/xdp_sock.h>
++#include <net/xsk_buff_pool.h>
+ 
+ #include <linux/uaccess.h>
+ #include <trace/events/skb.h>
+@@ -615,6 +617,105 @@ static void *kmalloc_reserve(unsigned int *size, gfp_t flags, int node,
+ 	return obj;
+ }
+ 
++int xsk_alloc_batch_skb(struct xdp_sock *xs, u32 nb_pkts, u32 nb_descs, int *err)
++{
++	struct xsk_batch *batch = &xs->batch;
++	struct xdp_desc *descs = batch->desc_cache;
++	struct sk_buff **skbs = batch->skb_cache;
++	gfp_t gfp_mask = xs->sk.sk_allocation;
++	struct net_device *dev = xs->dev;
++	int node = NUMA_NO_NODE;
++	struct sk_buff *skb;
++	u32 i = 0, j = 0;
++	bool pfmemalloc;
++	u32 base_len;
++	u8 *data;
++
++	base_len = max(NET_SKB_PAD, L1_CACHE_ALIGN(dev->needed_headroom));
++	if (!(dev->priv_flags & IFF_TX_SKB_NO_LINEAR))
++		base_len += dev->needed_tailroom;
++
++	if (batch->skb_count >= nb_pkts)
++		goto build;
++
++	if (xs->skb) {
++		i = 1;
++		batch->skb_count++;
++	}
++
++	batch->skb_count += kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
++						  gfp_mask, nb_pkts - batch->skb_count,
++						  (void **)&skbs[batch->skb_count]);
++	if (batch->skb_count < nb_pkts)
++		nb_pkts = batch->skb_count;
++
++build:
++	for (i = 0, j = 0; j < nb_descs; j++) {
++		if (!xs->skb) {
++			u32 size = base_len + descs[j].len;
++
++			/* In case we don't have enough allocated skbs */
++			if (i >= nb_pkts) {
++				*err = -EAGAIN;
++				break;
++			}
++
++			if (sk_wmem_alloc_get(&xs->sk) > READ_ONCE(xs->sk.sk_sndbuf)) {
++				*err = -EAGAIN;
++				break;
++			}
++
++			skb = skbs[batch->skb_count - 1 - i];
++
++			prefetchw(skb);
++			/* We do our best to align skb_shared_info on a separate cache
++			 * line. It usually works because kmalloc(X > SMP_CACHE_BYTES) gives
++			 * aligned memory blocks, unless SLUB/SLAB debug is enabled.
++			 * Both skb->head and skb_shared_info are cache line aligned.
++			 */
++			data = kmalloc_reserve(&size, gfp_mask, node, &pfmemalloc);
++			if (unlikely(!data)) {
++				*err = -ENOBUFS;
++				break;
++			}
++			/* kmalloc_size_roundup() might give us more room than requested.
++			 * Put skb_shared_info exactly at the end of allocated zone,
++			 * to allow max possible filling before reallocation.
++			 */
++			prefetchw(data + SKB_WITH_OVERHEAD(size));
++
++			memset(skb, 0, offsetof(struct sk_buff, tail));
++			__build_skb_around(skb, data, size);
++			skb->pfmemalloc = pfmemalloc;
++			skb_set_owner_w(skb, &xs->sk);
++		} else if (unlikely(i == 0)) {
++			/* We have a skb in cache that is left last time */
++			kmem_cache_free(net_hotdata.skbuff_cache,
++					skbs[batch->skb_count - 1]);
++			skbs[batch->skb_count - 1] = xs->skb;
++		}
++
++		skb = xsk_build_skb(xs, skb, &descs[j]);
++		if (IS_ERR(skb)) {
++			*err = PTR_ERR(skb);
++			break;
++		}
++
++		if (xp_mb_desc(&descs[j])) {
++			xs->skb = skb;
++			continue;
++		}
++
++		xs->skb = NULL;
++		i++;
++		__skb_queue_tail(&batch->send_queue, skb);
++	}
++
++	batch->skb_count -= i;
++
++	return j;
++}
++
+ /* 	Allocate a new skbuff. We do this ourselves so we can fill in a few
+  *	'private' fields and also do memory statistics to find all the
+  *	[BEEP] leaks.
 diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index ace91800c447..f9458347ff7b 100644
+index f9458347ff7b..cf45c7545124 100644
 --- a/net/xdp/xsk.c
 +++ b/net/xdp/xsk.c
-@@ -697,6 +697,7 @@ static int xsk_skb_metadata(struct sk_buff *skb, void *buffer,
- }
+@@ -1906,6 +1906,7 @@ static int xsk_create(struct net *net, struct socket *sock, int protocol,
  
- static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
-+					      struct sk_buff *allocated_skb,
- 					      struct xdp_desc *desc)
- {
- 	struct xsk_buff_pool *pool = xs->pool;
-@@ -714,7 +715,10 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
- 	if (!skb) {
- 		hr = max(NET_SKB_PAD, L1_CACHE_ALIGN(xs->dev->needed_headroom));
+ 	INIT_LIST_HEAD(&xs->map_list);
+ 	spin_lock_init(&xs->map_list_lock);
++	__skb_queue_head_init(&xs->batch.send_queue);
  
--		skb = sock_alloc_send_skb(&xs->sk, hr, 1, &err);
-+		if (!allocated_skb)
-+			skb = sock_alloc_send_skb(&xs->sk, hr, 1, &err);
-+		else
-+			skb = allocated_skb;
- 		if (unlikely(!skb))
- 			return ERR_PTR(err);
- 
-@@ -769,15 +773,16 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
- 	return skb;
- }
- 
--static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
--				     struct xdp_desc *desc)
-+struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
-+			      struct sk_buff *allocated_skb,
-+			      struct xdp_desc *desc)
- {
- 	struct net_device *dev = xs->dev;
- 	struct sk_buff *skb = xs->skb;
- 	int err;
- 
- 	if (dev->priv_flags & IFF_TX_SKB_NO_LINEAR) {
--		skb = xsk_build_skb_zerocopy(xs, desc);
-+		skb = xsk_build_skb_zerocopy(xs, allocated_skb, desc);
- 		if (IS_ERR(skb)) {
- 			err = PTR_ERR(skb);
- 			skb = NULL;
-@@ -792,8 +797,12 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 
- 		if (!skb) {
- 			hr = max(NET_SKB_PAD, L1_CACHE_ALIGN(dev->needed_headroom));
--			tr = dev->needed_tailroom;
--			skb = sock_alloc_send_skb(&xs->sk, hr + len + tr, 1, &err);
-+			if (!allocated_skb) {
-+				tr = dev->needed_tailroom;
-+				skb = sock_alloc_send_skb(&xs->sk, hr + len + tr, 1, &err);
-+			} else {
-+				skb = allocated_skb;
-+			}
- 			if (unlikely(!skb))
- 				goto free_err;
- 
-@@ -906,7 +915,7 @@ static int __xsk_generic_xmit(struct sock *sk)
- 			goto out;
- 		}
- 
--		skb = xsk_build_skb(xs, &desc);
-+		skb = xsk_build_skb(xs, NULL, &desc);
- 		if (IS_ERR(skb)) {
- 			err = PTR_ERR(skb);
- 			if (err != -EOVERFLOW)
+ 	mutex_lock(&net->xdp.lock);
+ 	sk_add_node_rcu(sk, &net->xdp.list);
 -- 
 2.41.3
 
