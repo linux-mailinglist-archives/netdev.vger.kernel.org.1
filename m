@@ -1,84 +1,159 @@
-Return-Path: <netdev+bounces-231326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0521EBF7633
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 17:32:50 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7742EBF768A
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 17:35:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E77ED1887084
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 15:32:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 60640501211
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 15:31:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E5F3451C4;
-	Tue, 21 Oct 2025 15:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63A8345739;
+	Tue, 21 Oct 2025 15:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="illozJEc";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="zDZnIRCs"
 X-Original-To: netdev@vger.kernel.org
-Received: from www.nop.hu (www.nop.hu [80.211.201.218])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 466B7343D8D
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 15:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.211.201.218
+Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F118F40;
+	Tue, 21 Oct 2025 15:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761060507; cv=none; b=mtDZrWAsx2j2xvsFyBofy3pnwmNHRu154mnmtddbiaXSd9oLE7goj3KCfRycTFx6L15SUvA59GBaCbSFr0Ovd7Q8Vgqow+ZeA4e43m3f7Q1lWWWBalSNhv4iuSDITjOhLiU7ImbOqCB1JBGqSl2DVM7ei8ZiAK5GPtMASFz5Xd0=
+	t=1761060517; cv=none; b=dzOlHhSuXk6QR33YXLFuSfA1ATgXeXjpQbWJayISvduh2B+z4/WmNr9r9quQXbbZRnv16Cf/GRAj8qC8h9I7kSGeYyE5zyQlMtvmt4Ja7XThL1Fq1rlQqCY6usIrPCqHgJpuP5WqRnt8BYvQhubV0M22PDS089wR7e0Hyc7m9JU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761060507; c=relaxed/simple;
-	bh=1suUE1u6GypwD1Ynv1u2Mk6Y8Z28xL35eub4UFoDswA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r0kX5z4a2Xmr1D48A9gDqYNnycYld4dCgpke2GZWPw9srOXIqVierm/s0u2moGxd67anabjloeLpFQmzFZ8OaoBhuBZ1+rgp3KR2unbGeSCTQXdSnG0yXK3uc8S35ZXIU4FU6vDIiXqXiMmJ7tCPQYONd/tKLFjVqzL5HKtyTBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nop.hu; spf=pass smtp.mailfrom=nop.hu; arc=none smtp.client-ip=80.211.201.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nop.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nop.hu
-Received: from 2001:db8:8319::200:11ff:fe11:2222 (helo [IPV6:2001:db8:8319:0:200:11ff:fe11:2222])
-    (reverse as null)
-    by 2001:db8:1101::18 (helo www.nop.hu)
-    (envelope-from csmate@nop.hu) with smtp (freeRouter v25.10.21-cur)
-    for maciej.fijalkowski@intel.com kerneljasonxing@gmail.com alekcejk@googlemail.com jonathan.lemon@gmail.com sdf@fomichev.me magnus.karlsson@intel.com bjorn@kernel.org 1118437@bugs.debian.org netdev@vger.kernel.org bpf@vger.kernel.org ; Tue, 21 Oct 2025 17:28:23 +0200
-Message-ID: <495b042e-62f3-4eb5-9190-f39d082b1291@nop.hu>
-Date: Tue, 21 Oct 2025 17:28:23 +0200
+	s=arc-20240116; t=1761060517; c=relaxed/simple;
+	bh=U49MvGVLzCqO4hQorwFLQBzFnxw3haJO6lOXYCje+Hg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ACrOggPGOCosOVXKqBmwPvtUdHaY8fGjYTJdu72Zyv0AnFeBqsU9WBD7+Ex9oznceuynsxzF76f2yRt3RKfQ+q5NbN6zy5kDUsamGUL+SIgSHhjeFIXR8tpmpFukdGOyL8VkyiMlREScstr/iJD1xBior1AzLBWbUPdTINuA6X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=illozJEc; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=zDZnIRCs; arc=none smtp.client-ip=202.12.124.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 678BE7A00F6;
+	Tue, 21 Oct 2025 11:28:33 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-10.internal (MEProxy); Tue, 21 Oct 2025 11:28:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1761060513; x=
+	1761146913; bh=RsSUkrCMKOIZxBieiWhZiSAasxCCl0dZ3IycAPFI1Z8=; b=i
+	llozJEcDwTEnTUNBLxxSbL1ju1AXDFkwFINDkDMWCBSN3cQsCrUY0xMqldTjyXbk
+	mb9EU5kmUtbGKe8x7WUtHPvWWJffwERZBQD10EYu203QoMLjEZ0ft52k3URqoAVD
+	4QWlsWgFeSd4GL3Y8nXKJH2JS7g1MRGXbaF71wpUxPr15WMSnI5imFrRFpLL7bEQ
+	hT1Qx+BI7MzU+T0HlkztqLL0VBbQW5xx5cl5VXkuSMSGBhXR4pGpDfb1DkZaEc3d
+	tnYLOPj2q4dxabsreQBW0WO896QuXm+fzUaw6VUerUSzTlXpFINztKf4pWMN8r8p
+	uixCkNbwoHih4MRY2oZkA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1761060513; x=1761146913; bh=RsSUkrCMKOIZxBieiWhZiSAasxCCl0dZ3Iy
+	cAPFI1Z8=; b=zDZnIRCsLrpj8ykWp5MruUFvf3HmG6nJy+rqSYJGpubpU7w4vyz
+	KyI+bBDWx7BmteyeGwO4ZyfxrkZ1qXBGenGJyPJKU7MYEke1LGBYnMOHWpQHZWEY
+	aQA7XJPoCZSm5pOZAPRGbJ5IzVoRa25HKmLT0J4uxjiuRwZ/htBTzVVV4tsbjTQ2
+	+FsS1K176ynrE2kqlF3i2i1W+vZ7D6cO0e8BDBQfEvInuV7vIDyS0yvdpVFWI8Pi
+	5wPRaGWsqDKZBB9eXmpcFLqTilbAIAHTtmM/mqKH6TEvCgXMcn9fm+rSG+PN03t6
+	E1SNmtyrtJNcoHTVz9UCzW+dCHY9poEqE1A==
+X-ME-Sender: <xms:oKb3aEo5xXABWs-iE0--njefAg-uXIOKF2pu0xHSGVkDPqcapFKDOw>
+    <xme:oKb3aKEEEU1dO_gCJtJfwteF0iM6emprr2phWf1W0Vsvjfme8yYD4HDOPW_haPVBu
+    9hIFIJZ9S8S_s8cMlYM0tHZg0hl5iZlvWxCfI6hucKnbc30dvBZxUA>
+X-ME-Received: <xmr:oKb3aKSj_pDb_MxuG7PXdoVURPvzKUZ3ztVguQ2o7W14AYBDlPnpisnIFxFe>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddugedutdeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduhedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepthgrrhhiqhhtsehnvhhiughirgdrtghomh
+    dprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohep
+    khhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrg
+    htrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdp
+    rhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepsh
+    grvggvughmsehnvhhiughirgdrtghomhdprhgtphhtthhopehlvghonheskhgvrhhnvghl
+    rdhorhhgpdhrtghpthhtohepmhgslhhotghhsehnvhhiughirgdrtghomh
+X-ME-Proxy: <xmx:oKb3aAN4S8qGvgOjOjb0k6yxZQelzEGCPd2UrZh2WKG8nN7fZ7i71w>
+    <xmx:oKb3aHk7nI2ULWYKx2-5v7GPRvrYjeTqlCxwSOz3wN8n_PCHmNeinA>
+    <xmx:oKb3aCbYEcENiDKWuZ0jL08Z3ruuT23N8OraPXUDJcpemp8KizMKkQ>
+    <xmx:oKb3aNQ2fo5pV4tLQD5rKPm9iVxvLxa4YT4kqykVtJsshJPYxJ8mPw>
+    <xmx:oab3aAOR1ilAtzKsOP-KQ7oavNqnP634HWbezqw5opN9CUkSbGs1jOgP>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 21 Oct 2025 11:28:32 -0400 (EDT)
+Date: Tue, 21 Oct 2025 17:28:30 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>,
+	Shahar Shitrit <shshitrit@nvidia.com>
+Subject: Re: [PATCH net V2 2/3] net: tls: Cancel RX async resync request on
+ rdc_delta overflow
+Message-ID: <aPemno8TB-McfE24@krikkit>
+References: <1760943954-909301-1-git-send-email-tariqt@nvidia.com>
+ <1760943954-909301-3-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: null pointer dereference in interrupt after receiving an ip
- packet on veth from xsk from user space
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jason Xing <kerneljasonxing@gmail.com>
-Cc: alekcejk@googlemail.com, Jonathan Lemon <jonathan.lemon@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>,
- Magnus Karlsson <magnus.karlsson@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, 1118437@bugs.debian.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org
-References: <0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu>
- <CAL+tcoA5qDAcnZpmULsnD=X6aVP-ztRxPv5z1OSP-nvtNEk+-w@mail.gmail.com>
- <643fbe8f-ba76-49b4-9fb7-403535fd5638@nop.hu>
- <CAL+tcoDqgQbs20xV34RFWDoE5YPXS-ne3FBns2n9t4eggx8LAQ@mail.gmail.com>
- <d8808206-0951-4512-91cb-58839ba9b8c4@nop.hu>
- <CAL+tcoA0TKWQY4oP4jJ5BHmEnA+HzHRrgsnQL9vRpnaqb+_8Ag@mail.gmail.com>
- <aPedG99fdFBnbIqz@boxer>
-Content-Language: en-US
-From: mc36 <csmate@nop.hu>
-In-Reply-To: <aPedG99fdFBnbIqz@boxer>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1760943954-909301-3-git-send-email-tariqt@nvidia.com>
 
-hi,
+nit if you end up respinning, there's a typo in the subject:
+s/rdc_delta/rcd_delta/
 
-On 10/21/25 16:47, Maciej Fijalkowski wrote:
 
-> However, I do not understand why setting mac addr on one veth interface
-> triggers this path.
+2025-10-20, 10:05:53 +0300, Tariq Toukan wrote:
+> From: Shahar Shitrit <shshitrit@nvidia.com>
 > 
+> When a netdev issues a RX async resync request for a TLS connection,
+> the TLS module handles it by logging record headers and attempting to
+> match them to the tcp_sn provided by the device. If a match is found,
+> the TLS module approves the tcp_sn for resynchronization.
+> 
+> While waiting for a device response, the TLS module also increments
+> rcd_delta each time a new TLS record is received, tracking the distance
+> from the original resync request.
+> 
+> However, if the device response is delayed or fails (e.g due to
+> unstable connection and device getting out of tracking, hardware
+> errors, resource exhaustion etc.), the TLS module keeps logging and
+> incrementing, which can lead to a WARN() when rcd_delta exceeds the
+> threshold.
+> 
+> To address this, introduce tls_offload_rx_resync_async_request_cancel()
+> to explicitly cancel resync requests when a device response failure is
+> detected. Call this helper also as a final safeguard when rcd_delta
+> crosses its threshold, as reaching this point implies that earlier
+> cancellation did not occur.
+> 
+> Fixes: 138559b9f99d ("net/tls: Fix wrong record sn in async mode of device resync")
 
-just my 10 cents but imho i saw a check for promisc while walking through the call
+The patch itself looks good, but what issue is fixed within this
+patch? The helper will be useful in the next patch, but right now
+we're only resetting the resync_async status. The only change I see
+(without patch 3) is that we won't call tls_device_rx_resync_async()
+next time we decrypt a record in SW, but it wouldn't have done
+anything.
 
-stack's small epsilon surroundings, maybe there is a for-us check somewhere earlier?
+Actually, also in patch 1/3, there is no "fix" is in that patch.
 
-recall that we're setting the interface hw-address to the packet's destination mac...
-
-br,
-
-cs
-
+-- 
+Sabrina
 
