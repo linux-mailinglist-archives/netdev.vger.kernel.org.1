@@ -1,152 +1,93 @@
-Return-Path: <netdev+bounces-231162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E96BBF5E01
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:49:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EF42BF5E1C
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 12:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C33C189A850
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 10:49:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B15118C7840
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 10:50:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 013B42EC54B;
-	Tue, 21 Oct 2025 10:49:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD2032C929;
+	Tue, 21 Oct 2025 10:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ChnEU0FF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ny3nfq0f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303431E5B71
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 10:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5B3E32C33B;
+	Tue, 21 Oct 2025 10:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761043764; cv=none; b=ayV1GJ+LYQrzaTeL/MLy0chJJ2qov2jFeyGDeD3Zr7rSSW6dxwqkCI4SyEfl1Q3eQmmmbFAtERbISYpCDwlu9+rnYILqZmRnd7F+e4vnpEm+12jYIEf6rVBm9lu+V5IpXWws0TFshorXYCJXbsZ3fBJuC2En+R0a/MeJpY/Pk24=
+	t=1761043815; cv=none; b=gXFjzlOPqphVlU6eMl6Sm2yRRWhFl9alGjz5Adl6J2ELPFziUm5+AarsDTKjwNmq6aIjv7/W1wqzcgJGFZCPliMTCWxGqj5JmjdO7hevrGxTIVPKaTe9Ne3st/7VVbJQfZosP0mwLwg6+yshqUu5EyyTt49gRTF2JnfSxz03SpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761043764; c=relaxed/simple;
-	bh=hrF0LCmElQ4WpX5W62bYMJ+jvZnpkYWbqiea2O+smAw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=qiiSduWKeLxwETxkDk0u2urek0CZql1fkw8zE72iEyM/f2qeoMayETkI2bd5qg5CLdUkZmynE8FVWWZvkhHhMRxNX6LWG/YnzLPDCgMDDEIimfp5ZhnxliqbTDDQnB1d77FAmimOgWDpn5C2BcYhk+TCczCL0U982KUpKgpvRDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=ChnEU0FF; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b54f55a290cso828174766b.2
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 03:49:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1761043761; x=1761648561; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7EOHmK2OfLfwzNiHBksUI9w2NZOUojlK5wP3wAwmdUc=;
-        b=ChnEU0FF2MBGOqWLekXisSjna5eNyAi/g7y7+pWsBzT+/GkhltvS4OgQ9nA5zuUr1U
-         IFLooonoNDeXoajSkb3prNRHm6TwqZFYgAejnP4ksdDwixBcv8344/JvpF/FWHuU+gCw
-         eGV22EtHpMnzAPzkWxTWaySDw4GbQQN5PETcJhsYDehrigkHuoAKxqGvsUAWHt2DhHZ3
-         NM1EGCJcAZAr9sqt6RAUtPKbMkm6gUQdGg0ba7nvi2KLdWlHqBQ+A0/gHSl/rgk/4OmG
-         ic5jgPQs54mKjT2ng05T8j3L80wd+9zgOdLbY9UlGQ2E+gAvPRoz56TjsT+c7RQxRyr9
-         2ysw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761043761; x=1761648561;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7EOHmK2OfLfwzNiHBksUI9w2NZOUojlK5wP3wAwmdUc=;
-        b=h3DR7DL1Z3Xi0z7Lr2yClfFk73EsIHlzu+ecIhaXmtJ2qwVwlZa96rPUAgdJUd2fK/
-         R8N/ndy+a9/VxtODxNnGbpf22v4+pnd06mnC1NT7N+zfritfGKJhUvc0uc0by5D93PR0
-         OydK7AlAkhrtu9cRwJ8mtpu4LzDaAr/MNUeggUEN4gIZ2HqR3MXe6Z3fFoVG6P+5IPSd
-         iS/RfksQtL5lwLGfuF+/ftxieT/Q2g3pruYqObVqeyN6e/KJqWHykBsyB/VvDhbVigJb
-         s1HlCtnAT6rIMoOOZTLzhO4sV1RoZ3PNE8k8eSiQT0bBjEN3Sc17rc5Cl3s9OZJG24p2
-         Vd+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVxyEtaUCgAQucjG7T3snw1QqyiSe5VPzDitKvorHZRItzK6uVouFPk6h7ZegIdGAW6+SPQSSA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyl2T4A/YfHYPTrRORyMSFf752EqKFfXLq9K9eKN90RAlFzI5oe
-	Chq9tHF8NSJ4zZhIhohO9SkWU8QuD2SOAk1U/lNKae4Gq4AcCfZkF2AqMW3AmOUZESI=
-X-Gm-Gg: ASbGncv4azc6HRG+ufzIsNATvU3xxbn7FvRa942t6XUFACNOuOoQny9EZ1pRt5fky3e
-	zgTBDPpDIhFcVggMrjMv2mTJlJnftEK9smQvcHwLoUA7bTQKkoRp56/BmPSnmXGni24tobcgxFh
-	ibCJ+qKLt3nWu6nNC0p2uUDa8cqcZjM6xVxhcBxcbl5MOmYACqiWKIs9L9bDbkmWRO5qET8OhqD
-	9M4OOyK1l+oBoPO2GjKI83ngF8wriOlkpwt/9/Ihwaj+sYd3ejBrLxQbHpKzmVfxYnUIbXkS1Jg
-	UUnNyrzKEPVXTq4JBRDMG1r865Px/aei9yLO+YAmIakDffzXzrkqWv727S033UB54wKdBvJNQ75
-	S58z8+Q0H9BWGr5QYilGDF8vZl/PB8luIRFgxntWHPyG6xu4yOZTdfX6uNhjazXwIcQ8JpUISHt
-	5TvZU=
-X-Google-Smtp-Source: AGHT+IHy8op2SrI/lJue90xZTdUE8jYPVJKT9x3Xt5nh13yYcQucOr2Oqx/NtzVh356uT2+TUQAh8g==
-X-Received: by 2002:a17:907:3f11:b0:b42:7c2:1f9f with SMTP id a640c23a62f3a-b6475706f53mr1757165566b.62.1761043761371;
-        Tue, 21 Oct 2025 03:49:21 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:d0])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b65eb036a3esm1068920266b.46.2025.10.21.03.49.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 03:49:20 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: mptcp@lists.linux.dev,  netdev@vger.kernel.org,  bpf@vger.kernel.org,
-  Eric Dumazet <edumazet@google.com>,  Kuniyuki Iwashima
- <kuniyu@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Willem de Bruijn
- <willemb@google.com>,  John Fastabend <john.fastabend@gmail.com>,  "David
- S. Miller" <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>,
-  Simon Horman <horms@kernel.org>,  Matthieu Baerts <matttbe@kernel.org>,
-  Mat Martineau <martineau@kernel.org>,  Geliang Tang <geliang@kernel.org>,
-  Alexei Starovoitov <ast@kernel.org>,  Daniel Borkmann
- <daniel@iogearbox.net>,  Andrii Nakryiko <andrii@kernel.org>,  Martin
- KaFai Lau <martin.lau@linux.dev>,  Eduard Zingerman <eddyz87@gmail.com>,
-  Song Liu <song@kernel.org>,  Yonghong Song <yonghong.song@linux.dev>,  KP
- Singh <kpsingh@kernel.org>,  Stanislav Fomichev <sdf@fomichev.me>,  Hao
- Luo <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Shuah Khan
- <shuah@kernel.org>,  Florian Westphal <fw@strlen.de>,
-  linux-kernel@vger.kernel.org,  linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net v2 2/3] bpf,sockmap: disallow MPTCP sockets from
- sockmap updates
-In-Reply-To: <20251020060503.325369-3-jiayuan.chen@linux.dev> (Jiayuan Chen's
-	message of "Mon, 20 Oct 2025 14:04:47 +0800")
-References: <20251020060503.325369-1-jiayuan.chen@linux.dev>
-	<20251020060503.325369-3-jiayuan.chen@linux.dev>
-Date: Tue, 21 Oct 2025 12:49:19 +0200
-Message-ID: <87cy6gwmvk.fsf@cloudflare.com>
+	s=arc-20240116; t=1761043815; c=relaxed/simple;
+	bh=K/2vERcbAwFCVwr76LZbkx/kjJBJLSsur2UIOY6FUpM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eOXEpa8pr/02HCIGqqPZLxZe6v7CvomnuncfvqxVQrC27lb1QROPiJtLChhjVc0aoKogdaAus+SOFr/dmfSpaCCxCVrezviadEPeVG+oMG502Bx5tkQZIGn7cMs4EgxlO9Z7NyTqhcVyf0mh1RatNYRipk11dkTcRavgSPBupS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ny3nfq0f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3E24C116B1;
+	Tue, 21 Oct 2025 10:50:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761043815;
+	bh=K/2vERcbAwFCVwr76LZbkx/kjJBJLSsur2UIOY6FUpM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ny3nfq0fWu7YAOY8Rane5t5+nVdm4p2WchbMvlCQWdTZiX+HJQ3u0xYL03LsIsn3f
+	 rRTLNVZSPUkEI9c2HtCxrUAGwUwnJIlAL6yG7dEiwFEB4OCFV0ZM+bZO//yn4YuCMb
+	 W8EZl18n4easc0wXhlZ3Fp0dXfMOaiCWUdwpaPJRVhzDTkBcNZKR9l601GgZJ9H+3e
+	 +pQwwu5LS4LlI3RRsz1Emxbo+OyW/yvvz1IKW/6j/lYO0yqwGIVnqG1+cvIe3zZZvv
+	 xFJlnLjNvpRFOH1M8s6x8YPX3UyprAIb9ypIj7j2/lwwRkoi7+D8vw+kqbmwPPs6+U
+	 N2xlM6Eo/S4XQ==
+Date: Tue, 21 Oct 2025 11:50:10 +0100
+From: Lee Jones <lee@kernel.org>
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	linux-leds@vger.kernel.org, netdev@vger.kernel.org,
+	Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Subject: Re: [PATCH leds v2 00/10] Add support for offloading netdev trigger
+ to HW + example implementation for Turris Omnia
+Message-ID: <20251021105010.GD475031@google.com>
+References: <20210601005155.27997-1-kabel@kernel.org>
+ <CA+V-a8tW9tWw=-fFHXSvYPeipd8+ADUuQj7DGuKP-xwDrdAbyQ@mail.gmail.com>
+ <7d510f5f-959c-49b7-afca-c02009898ef2@lunn.ch>
+ <CA+V-a8ve0eKmBWuxGgVd_8uzy0mkBm=qDq2U8V7DpXhvHTFFww@mail.gmail.com>
+ <87875554-1747-4b0e-9805-aed1a4c69a82@lunn.ch>
+ <CA+V-a8vv=5yRDD-fRMohTiJ=8j-1Nq-Q7iU16Opoe0PywFb6Zg@mail.gmail.com>
+ <bd95b778-a062-47b1-a386-e4561ef0c8cd@lunn.ch>
+ <CA+V-a8uB2WxU74mhkZ3SCpcty4T10Y3MOAf-SkodLCkp-_-AGA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+V-a8uB2WxU74mhkZ3SCpcty4T10Y3MOAf-SkodLCkp-_-AGA@mail.gmail.com>
 
-On Mon, Oct 20, 2025 at 02:04 PM +08, Jiayuan Chen wrote:
-> MPTCP creates subflows for data transmission, and these sockets should not
-> be added to sockmap because MPTCP sets specialized data_ready handlers
-> that would be overridden by sockmap.
->
-> Additionally, for the parent socket of MPTCP subflows (plain TCP socket),
-> MPTCP sk requires specific protocol handling that conflicts with sockmap's
-> operation(mptcp_prot).
->
-> This patch adds proper checks to reject MPTCP subflows and their parent
-> sockets from being added to sockmap, while preserving compatibility with
-> reuseport functionality for listening MPTCP sockets.
->
-> Fixes: 0b4f33def7bb ("mptcp: fix tcp fallback crash")
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> ---
->  net/core/sock_map.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-> index 5947b38e4f8b..da21deb970b3 100644
-> --- a/net/core/sock_map.c
-> +++ b/net/core/sock_map.c
-> @@ -535,6 +535,15 @@ static bool sock_map_redirect_allowed(const struct sock *sk)
->  
->  static bool sock_map_sk_is_suitable(const struct sock *sk)
->  {
-> +	if ((sk_is_tcp(sk) && sk_is_mptcp(sk)) /* subflow */ ||
-> +	    (sk->sk_protocol == IPPROTO_MPTCP && sk->sk_state != TCP_LISTEN)) {
-> +		/* Disallow MPTCP subflows and their parent socket.
-> +		 * However, a TCP_LISTEN MPTCP socket is permitted because
-> +		 * sockmap can also serve for reuseport socket selection.
-> +		 */
-> +		pr_err_once("sockmap: MPTCP sockets are not supported\n");
-> +		return false;
-> +	}
->  	return !!sk->sk_prot->psock_update_sk_prot;
->  }
+On Fri, 17 Oct 2025, Lad, Prabhakar wrote:
 
-You're checking sk_state without sk_lock held. That doesn't seem right.
-Take a look how we always call sock_map_sk_state_allowed() after
-grabbing the lock.
+> Hi Andrew,
 
-Same might apply to sk_is_mptcp(). Please double check.
+[...]
+
+> > mxl-gpy.c:              .led_brightness_set = gpy_led_brightness_set,
+
+[...]
+
+> Thank you for the pointers.
+
+Yes, thank you, Andrew.
+
+-- 
+Lee Jones [李琼斯]
 
