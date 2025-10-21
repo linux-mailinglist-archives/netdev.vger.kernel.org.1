@@ -1,215 +1,180 @@
-Return-Path: <netdev+bounces-231088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94969BF4B75
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 08:37:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 767A2BF4BC0
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 08:46:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7225403508
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 06:37:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AFB218A4285
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 06:47:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10962673B0;
-	Tue, 21 Oct 2025 06:36:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yp+gDZXg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8425238C07;
+	Tue, 21 Oct 2025 06:46:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B325E25B1D2
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 06:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FB91FC8
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 06:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761028614; cv=none; b=l+cZQkOPIKIMP2uTv/JHk8dyWwX/0fLnuOBPOAw6Am7mo6gLob+t8qEnUo2PzPdPuXPIqJB5aSTMue4hGlZySXYcSqxNhkX291zyvM0ZTEFi2esF5kqWby5Ncd3VgeTqD7U1ECjNaCD0yQIVJIcJ/K21FTxHc7huzR0i+OxntnA=
+	t=1761029190; cv=none; b=jlMqMa7ryJGpws4bXEQGNdd1/lNasBHkgv6GBPvkfyr7HHjdGaWeEvzh2YkNmZGNazrTVjQHWtF/VuMon48+pTYQ99ad1rYEKWxjf0KURnGbGXyi5MnWzx4Y91y0eo1HLG8iX8qk3M8JyY23wGLzFZLOvyQaShzZ8EocrNIpS0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761028614; c=relaxed/simple;
-	bh=pPHShIOw0fKqNBE6FP/aihpLejo2j/yJSiQbkCPkF1o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o9WxxGqdWzAXthIWk3UmoVPrD/5JNknwROFwC37ZJODmUNrLaTE34GOowo3bqy4eK/2uVLb3oDKSz+CDnx3IbUXlvkYFBVJ6fBQWq4KpDbCkzDyIUVW1YXst3GD/DNV7g3j/bTiB5dmMaKnKSI6dIRJ38CPvY5NVAIiCssWpMzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Yp+gDZXg; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47495477241so3976095e9.3
-        for <netdev@vger.kernel.org>; Mon, 20 Oct 2025 23:36:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1761028611; x=1761633411; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yWWblYrlCLEpcH5LTQcbLzZ3/EiI9nz+a1hzMsf4pNQ=;
-        b=Yp+gDZXg8xLE7MShXtTr3l9G7P5t8spbIFozLyQ9bWRRAPW3uxHW92Vt26khlqrH6i
-         taQWHH9LaEHqMoS1RhgK8XsedBuIGMJVPqN/kL4BT0r9inczmuXKmOQ2siss6dpqtidX
-         6mBC0SfEni/uRrcBIQQk/R8ImrAK2dyFUgEjnrETW7+g028b0QVygZTG61MHtSGwyQuP
-         JkipUU9iSwPt40z4EFwpTjvFSzjT+KaQYIa3HQ51d+KSYJ+1OJ8Bhg3huSlMLhToaWfB
-         3ZizoAFI4HJt+2usx8dXH9+NP6Zy5jxkFm33PYKTURjOLFrOk3oM4dfRSOXGPpRs+xiF
-         8KwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761028611; x=1761633411;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yWWblYrlCLEpcH5LTQcbLzZ3/EiI9nz+a1hzMsf4pNQ=;
-        b=ULlUJoU2TrLlDeJu/3a3fFek+ptnLHJ8pEBG1+o1NA015VUWkB4CvFulIdja8490ZG
-         nifrCmfomMdiL1Bj18jWhJwsiRhgOo5bqXvQS8tYjnO5ZNcRbC27Lj1GfiUUoV9y6iWa
-         m8RGoRHcd4iXx6InBXnUvaZ8xVFh/7RotreU9J0QKi3fNXZ4bISEJj+v/A/gkVTb1dXu
-         Q6FwdJQG8v9+qXIO37wwc/2nVylygmIUxmonSgmQrlU1pB7mf9ygauDddj6HrjlmE7LE
-         GaV3c9xHzvdU9NScT8gIpLQlDznkj8dPN/CcSELTSAl7p46rH1MKjiwVm2oxWehXaOhc
-         jG1w==
-X-Forwarded-Encrypted: i=1; AJvYcCU2lvE8aqjAeD7OX+6ZhmG7G2z61M/U1vRbFNjkAvNyeHU1Vknhf4py9MJ/eOGtE4G+cFMhMZU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzv2uW0cFe4Cycb7X+FsoNCrlf/WoVorceTfEMJWheduDjo/xrr
-	z+EufqOC+8vrMk3B5b1WVGvR/xiNyogfSb9XMGDfn0HpmfB/nSQ6yVtkmL4NmdWzCsFOUCv4P7z
-	WaTFR
-X-Gm-Gg: ASbGncvXKcMpvVXVS12Oq7HFabigMHm7YPyCUWFmCdyw5IO0jotzM+/PH2vfNcWUgHp
-	+CqI4XrpOrHDiJiI9zoQgr9h2Yike+VxbyKIRMKUgr6QWskxvuB7QazuyifBpP9j4+SY/tBOWZt
-	GCBq/K/NnSqzFCexXz3kBz1wy4mykfJM77QuCIAmyagRImfn6/3M0ZEfwSsXAMBcU8Ci6Wyy0l6
-	VEV4c5C2nQP86ElxCEWCV4kA061ZH3qHaINsk5VG8Toylz+bFBz1ZWB/1yZU3C7VlmRK/LtfhXz
-	roXOnCH5C8LRH4QRSf7FvHuypZ+3tUaKFIkimHBN0e6RSEIuFuz8vwY3uDr25zcqpa1PN38qHoR
-	bTsjifQvswCh05h65yS1hSSGRak7A0uMx1lMWzky39UzTuX7mpqE7W5lNhRzu+Z8qV6NMkEQN6e
-	3tF5C2+Q==
-X-Google-Smtp-Source: AGHT+IEkQcqp1ksk1Cj9+LjNgTTmawr/C6jo8SGgwsLly2e1GhUHXpoCb0o0/Ssyg6De4Q0iYDMU6Q==
-X-Received: by 2002:a05:600c:8b66:b0:46e:1d8d:cfa2 with SMTP id 5b1f17b1804b1-471179117b3mr102871395e9.20.1761028610907;
-        Mon, 20 Oct 2025 23:36:50 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-427ea5b3c56sm18971798f8f.18.2025.10.20.23.36.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 23:36:50 -0700 (PDT)
-Date: Tue, 21 Oct 2025 09:36:47 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Lizhi Xu <lizhi.xu@windriver.com>
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	kuba@kernel.org, linux-hams@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+2860e75836a08b172755@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH V2] netrom: Prevent race conditions between multiple add
- route
-Message-ID: <aPcp_xemzpDuw-MW@stanley.mountain>
-References: <aPZ4fLKBiCCIGr9e@stanley.mountain>
- <20251021020533.1234755-1-lizhi.xu@windriver.com>
+	s=arc-20240116; t=1761029190; c=relaxed/simple;
+	bh=LeOry7RPUWo3FUh1P5mR0q55I8f/+97qq/p16TvVoOw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RcOTmAJGkWJpK7+rzSzGks43EI8bpNjmJHRZ1Ix4bbPAhotgt35yrXzX+M7Ti11EdF6/5zYFG1hJSyS5wL29EUKjqt0brehhbkb3kZRHHt5uUC3WpCIRxIpBA88gSW9XQOy1wMwqiQ15no6k6y4Wp+7xFD6rc/y6JuaHPc+On9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [134.104.51.229] (unknown [134.104.51.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 42B6D6020D519;
+	Tue, 21 Oct 2025 08:40:06 +0200 (CEST)
+Message-ID: <92097ccf-e54d-404f-866c-8d6dc808e498@molgen.mpg.de>
+Date: Tue, 21 Oct 2025 08:39:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251021020533.1234755-1-lizhi.xu@windriver.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v2 iwl-net] ice: fix PTP cleanup on
+ driver removal in error path
+To: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>, netdev@vger.kernel.org,
+ vadim.fedorenko@linux.dev
+References: <20251020100216.4144401-1-grzegorz.nitka@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251020100216.4144401-1-grzegorz.nitka@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 21, 2025 at 10:05:33AM +0800, Lizhi Xu wrote:
-> On Mon, 20 Oct 2025 20:59:24 +0300, Dan Carpenter wrote:
-> > On Mon, Oct 20, 2025 at 09:49:12PM +0800, Lizhi Xu wrote:
-> > > On Mon, 20 Oct 2025 21:34:56 +0800, Lizhi Xu wrote:
-> > > > > Task0					Task1						Task2
-> > > > > =====					=====						=====
-> > > > > [97] nr_add_node()
-> > > > > [113] nr_neigh_get_dev()		[97] nr_add_node()
-> > > > > 					[214] nr_node_lock()
-> > > > > 					[245] nr_node->routes[2].neighbour->count--
-> > > > > 					[246] nr_neigh_put(nr_node->routes[2].neighbour);
-> > > > > 					[248] nr_remove_neigh(nr_node->routes[2].neighbour)
-> > > > > 					[283] nr_node_unlock()
-> > > > > [214] nr_node_lock()
-> > > > > [253] nr_node->routes[2].neighbour = nr_neigh
-> > > > > [254] nr_neigh_hold(nr_neigh);							[97] nr_add_node()
-> > > > > 											[XXX] nr_neigh_put()
-> > > > >                                                                                         ^^^^^^^^^^^^^^^^^^^^
-> > > > >
-> > > > > These charts are supposed to be chronological so [XXX] is wrong because the
-> > > > > use after free happens on line [248].  Do we really need three threads to
-> > > > > make this race work?
-> > > > The UAF problem occurs in Task2. Task1 sets the refcount of nr_neigh to 1,
-> > > > then Task0 adds it to routes[2]. Task2 releases routes[2].neighbour after
-> > > > executing [XXX]nr_neigh_put().
-> > > Execution Order:
-> > > 1 -> Task0
-> > > [113] nr_neigh_get_dev() // After execution, the refcount value is 3
-> > >
-> > > 2 -> Task1
-> > > [246] nr_neigh_put(nr_node->routes[2].neighbour);   // After execution, the refcount value is 2
-> > > [248] nr_remove_neigh(nr_node->routes[2].neighbour) // After execution, the refcount value is 1
-> > >
-> > > 3 -> Task0
-> > > [253] nr_node->routes[2].neighbour = nr_neigh       // nr_neigh's refcount value is 1 and add it to routes[2]
-> > >
-> > > 4 -> Task2
-> > > [XXX] nr_neigh_put(nr_node->routes[2].neighbour)    // After execution, neighhour is freed
-> > > if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)  // Uaf occurs this line when accessing neighbour->count
-> > 
-> > Let's step back a bit and look at the bigger picture design.  (Which is
-> > completely undocumented so we're just guessing).
-> > 
-> > When we put nr_neigh into nr_node->routes[] we bump the nr_neigh_hold()
-> > reference count and nr_neigh->count++, then when we remove it from
-> > ->routes[] we drop the reference and do nr_neigh->count--.
-> > 
-> > If it's the last reference (and we are not holding ->locked) then we
-> > remove it from the &nr_neigh_list and drop the reference count again and
-> > free it.  So we drop the reference count twice.  This is a complicated
-> > design with three variables: nr_neigh_hold(), nr_neigh->count and
-> > ->locked.  Why can it not just be one counter nr_neigh_hold().  So
-> > instead of setting locked = true we would just take an extra reference?
-> > The nr_neigh->count++ would be replaced with nr_neigh_hold() as well.
-> locked controls whether the neighbor quality can be automatically updated;
+Dear Grzegorz,
 
-I'm not sure your patch fixes the bug because we could still race against
-nr_del_node().
 
-I'm not saying get rid of locked completely, I'm saying get rid of code like
-this:
-		if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)
-			nr_remove_neigh(nr_node->routes[2].neighbour);
+Am 20.10.25 um 12:02 schrieb Grzegorz Nitka:
+> Improve the cleanup on releasing PTP resources in error path.
+> The error case might happen either at the driver probe and PTP
+> feature initialization or on PTP restart (errors in reset handling, NVM
+> update etc). In both cases, calls to PF PTP cleanup (ice_ptp_cleanup_pf
+> function) and 'ps_lock' mutex deinitialization were missed.
+> Additionally, ptp clock was not unregistered in the latter case.
+> 
+> Keep PTP state as 'uninitialized' on init to distinguish between error
+> scenarios and to avoid resource release duplication at driver removal.
+> 
+> The consequence of missing ice_ptp_cleanup_pf call is the following call
+> trace dumped when ice_adapter object is freed (port list is not empty,
+> as it is required at this stage):
+> 
+> [  T93022] ------------[ cut here ]------------
+> [  T93022] WARNING: CPU: 10 PID: 93022 at ice/ice_adapter.c:67 ice_adapter_put+0xef/0x100 [ice]
+> ...
+> [  T93022] RIP: 0010:ice_adapter_put+0xef/0x100 [ice]
+> ...
+> [  T93022] Call Trace:
+> [  T93022]  <TASK>
+> [  T93022]  ? ice_adapter_put+0xef/0x100 [ice 33d2647ad4f6d866d41eefff1806df37c68aef0c]
+> [  T93022]  ? __warn.cold+0xb0/0x10e
+> [  T93022]  ? ice_adapter_put+0xef/0x100 [ice 33d2647ad4f6d866d41eefff1806df37c68aef0c]
+> [  T93022]  ? report_bug+0xd8/0x150
+> [  T93022]  ? handle_bug+0xe9/0x110
+> [  T93022]  ? exc_invalid_op+0x17/0x70
+> [  T93022]  ? asm_exc_invalid_op+0x1a/0x20
+> [  T93022]  ? ice_adapter_put+0xef/0x100 [ice 33d2647ad4f6d866d41eefff1806df37c68aef0c]
+> [  T93022]  pci_device_remove+0x42/0xb0
+> [  T93022]  device_release_driver_internal+0x19f/0x200
+> [  T93022]  driver_detach+0x48/0x90
+> [  T93022]  bus_remove_driver+0x70/0xf0
+> [  T93022]  pci_unregister_driver+0x42/0xb0
+> [  T93022]  ice_module_exit+0x10/0xdb0 [ice 33d2647ad4f6d866d41eefff1806df37c68aef0c]
+> ...
+> [  T93022] ---[ end trace 0000000000000000 ]---
+> [  T93022] ice: module unloaded
+> 
+> Fixes: e800654e85b5 ("ice: Use ice_adapter for PTP shared data instead of auxdev")
+> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+> v1->v2:
+>   - rebased
+>   - complete full cleanup if failure in PTP intialization path (no need
+>     to do a cleanup on PTP release then) and added a comment with clarification
+>     why keeping PTP_UNINIT state on failure at init
+>   - setting ptp->clock to NULL explicitly in error path
+> ---
+>   drivers/net/ethernet/intel/ice/ice_ptp.c | 22 +++++++++++++++++++---
+>   1 file changed, 19 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> index fb0f6365a6d6..13b73f835f06 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> @@ -3246,7 +3246,7 @@ void ice_ptp_init(struct ice_pf *pf)
+>   
+>   	err = ice_ptp_init_port(pf, &ptp->port);
+>   	if (err)
+> -		goto err_exit;
+> +		goto err_clean_pf;
+>   
+>   	/* Start the PHY timestamping block */
+>   	ice_ptp_reset_phy_timestamping(pf);
+> @@ -3263,13 +3263,19 @@ void ice_ptp_init(struct ice_pf *pf)
+>   	dev_info(ice_pf_to_dev(pf), "PTP init successful\n");
+>   	return;
+>   
+> +err_clean_pf:
+> +	mutex_destroy(&ptp->port.ps_lock);
+> +	ice_ptp_cleanup_pf(pf);
+>   err_exit:
+>   	/* If we registered a PTP clock, release it */
+>   	if (pf->ptp.clock) {
+>   		ptp_clock_unregister(ptp->clock);
+>   		pf->ptp.clock = NULL;
+>   	}
+> -	ptp->state = ICE_PTP_ERROR;
+> +	/* Keep ICE_PTP_UNINIT state to avoid ambiguity at driver unload
+> +	 * and to avoid duplicated resources release.
+> +	 */
+> +	ptp->state = ICE_PTP_UNINIT;
+>   	dev_err(ice_pf_to_dev(pf), "PTP failed %d\n", err);
+>   }
+>   
+> @@ -3282,9 +3288,19 @@ void ice_ptp_init(struct ice_pf *pf)
+>    */
+>   void ice_ptp_release(struct ice_pf *pf)
+>   {
+> -	if (pf->ptp.state != ICE_PTP_READY)
+> +	if (pf->ptp.state == ICE_PTP_UNINIT)
+>   		return;
+>   
+> +	if (pf->ptp.state != ICE_PTP_READY) {
+> +		ice_ptp_cleanup_pf(pf);
+> +		mutex_destroy(&pf->ptp.port.ps_lock);
+> +		if (pf->ptp.clock) {
+> +			ptp_clock_unregister(pf->ptp.clock);
+> +			pf->ptp.clock = NULL;
+> +		}
+> +		return;
+> +	}
+> +
+>   	pf->ptp.state = ICE_PTP_UNINIT;
+>   
+>   	/* Disable timestamping for both Tx and Rx */
 
-Right now, locked serves as a special kind of reference count, because we
-don't drop the reference if it's true.
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-> count controls the number of different routes a neighbor is linked to;
 
-Sure, that is interesting information for the user, so keep it around to
-print in the proc file, but don't use it as a reference count.
+Kind regards,
 
-> refcount is simply used to manage the neighbor lifecycle.
-
-The bug is caused because our reference counting is bad.
-
-So right now what happens is we allocate nr_neigh and we put it on the
-&nr_neigh_list.  Then we lock it or we add it to ->routes[] and each of
-those has a different reference count.  Then when we drop those references
-we do:
-
-		if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)
-			nr_remove_neigh(nr_node->routes[2].neighbour);
-
-This removes it from the list, and hopefully this is the last reference
-and it frees it.
-
-It would be much simpler to say, we only use nr_neigh_hold()/put() for
-reference counting.  When we set locked we do:
-
-	nr_neigh_hold(nr_neigh);
-	nr_neigh->locked  = true;
-
-Incrementing the refcount means it can't be freed.
-
-Then when we remove nr_neigh from ->routes[] we wouldn't "remove it from
-the list", instead we would just drop a reference.  When we dropped the
-last reference, nr_neigh_put() would remove it from the list.
-
-My proposal would be a behavior change because right now what happens is:
-
-1: allocate nr_neigh
-2: add it to ->routes[]
-3: remove it from ->routes[]
-   (freed automatically because we drop two references)
-
-Now it would be:
-1: allocate nr_neigh
-2: add it to ->routes[]
-3: remove it from ->routes[]
-4: needs to be freed manually with nr_del_neigh().
-
-regards,
-dan carpenter
+Paul
 
