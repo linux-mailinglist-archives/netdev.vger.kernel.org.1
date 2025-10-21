@@ -1,191 +1,143 @@
-Return-Path: <netdev+bounces-231362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1302EBF7E9F
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 19:32:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2D99BF7EDB
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 19:37:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 14E95507492
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 17:32:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 43ED94F5E98
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 17:37:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B843134C80D;
-	Tue, 21 Oct 2025 17:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297E034C126;
+	Tue, 21 Oct 2025 17:37:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y7LGBQ3E"
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="RqF93lxt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175E634B68A
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 17:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1CA23BCE4
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 17:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761067939; cv=none; b=LTD4nLSDkXthvZFkOLnWiH6pBzO0OczzkBhbphExCr4wLOxGgvsVhcp5zrp4C0oM2v3r93hwZoAlisdLttItrgP88rViKIHHWyyiUjHHmlrRuYRrTKc4a40MfYgU2vJakJhbbVQsb4RixaOaBjZtUY4RhU2C2x+rnWnF2HZQWO4=
+	t=1761068271; cv=none; b=KJ9NZt2IsWv8vJxnJi44KyEjA1t9/KiTHONsQY9kETCxWyj033YYtVZ3ooof1jGCrjE1DchOC+yl1/vApE9Pli2cjDniA6TckVm/Myrf9Bej6fKPZu10JiDhRio7wRlpS8LQI4I7RBEyl0eBerLu3ZK89oHrxKsIX68gI6l3HpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761067939; c=relaxed/simple;
-	bh=LWmEWjRyeCjLG1cMy0JCFnlQjX+UfVSwvPnfh+zdDvY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hmBK/+EAbcWZdsCIrdN6mvP6yn8DMoggoNVXfjy3YtoQuu4MkiICN/WNfHzIjgl8LgLSol1fGPEd9hJMJ+lZZsx4rh2EyY8hY5Jhrx0683C9ThO6CyBdwRAHE3gPjveNjJHlSHE7WoLWASP3CL+ahLdDaRdL/8dL+uwuDj9Dlwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y7LGBQ3E; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-77f67ba775aso7636554b3a.3
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 10:32:17 -0700 (PDT)
+	s=arc-20240116; t=1761068271; c=relaxed/simple;
+	bh=w9lLASQAb3MzFOmkR8MUQwtJkigXHJHfhdRGIS8U5uw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=imv+d8YgjOo5+GvR7c+85DvSXmXVl7muZhZ9VDczrqpWEphM/RVlu99yTidXFhqRGn0uYZvvXy4AOP0ONLytAna++gXT18DNB55MEkPynuxUlfQHpjEihxMklqrWHi1UwNBoMljdG8OixiOaHjarSYB4V2NSHO//FDvBwGw7jDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=RqF93lxt; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b4aed12cea3so987869366b.1
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 10:37:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761067937; x=1761672737; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W32bDqvyR7vujxfMeW9XwQgpRLc26l7oP7qKEtb01No=;
-        b=Y7LGBQ3Eu306T0aGNRBFKPOr4ENkYud1JYkAp3ik7YU6dlFxfLIkDAM0a2y5bMLSBo
-         Zu6MLlzerY683jwzk35LECn+2TaRwld2EsiyyzQYWwBzEdV3BwsQjVTOCVB+ZJjmFvI5
-         T8d8jReqZy2cjlUAAUXHWjg4aj8aXH3ZOnenyS9tzrYpXtFhVl/mQ7Mvym1ZaUpKI4hh
-         zXzYibJ/hCCSVdUI/PG9XZ0WmrG7arnMljArqad6w5/wvgGJKiEQmJZPsUqmwRgpROQv
-         WKZeBkhWvFZOHXyd+elu00bk/qjD5aGn+kVIz8Dcp1ATnvSLVspE2hsRsGjS5QfyFlNK
-         GAOQ==
+        d=googlemail.com; s=20230601; t=1761068266; x=1761673066; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HzP3NHmpVePzzX4Nk37cJRY8V/e1399mO4lbkZpYbsI=;
+        b=RqF93lxtG6PghOL5VRLMk65VX6Pbpe4A3qwYxBD4FsmdNSxD2MG3438XNC7q7Prd4x
+         PfMTiT6KkUnOfwlbhJZxwO7kgd3RmYC7VmjvtGjinffal4VIVv0um+cJA63V2pUugK19
+         5epYaT7woeB3Mia1jq6ykvsWa3eof7AVCbQXlxs9Cza93/oKgQAPpRwwXaTRAyulGp7B
+         YQU3PveRq6NXd3FYNIFGuRHGP+D8CfIHxpWgk4EnD5eavXD1VG+xrRB4bIQfzKhFeEz2
+         4aiuJPzd1NElG3Sbs6e8ihGXkBpDG7nbOIpJMQe8er+Tssxkv5eT/ySZKU4CexXLrJuV
+         iSEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761067937; x=1761672737;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1761068266; x=1761673066;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=W32bDqvyR7vujxfMeW9XwQgpRLc26l7oP7qKEtb01No=;
-        b=ekq/0OIbNfAnOJ+mKyN0R5Uj4Gv+Wa4eiJvmbUDNmG9KFRAJ6iBGq6dwFwYofj8DQQ
-         vKSN+RJT5s7zs3v6gtIA4t9irzDfCWHtkKgKaP5Njm9NHtptapVyJU2DRxK4XKknbuCQ
-         b2JiN/IjJeoZ+hgAD08/wZdDk4zcHXv7ifGT6O6QN38kuJvp2Ts5d9/f3FtzDk2Txc2y
-         GxNv9tyont+DO+A8Cy4D4tWl6vjYdzNTGoFoaBCIFGeiO700ICFn7h6VWdJ0fQ/Gbs+3
-         8kJ43NwkzEuQSiTiUTmMU+/y6bYUAmVu54NZFOwxMB6HDLwIavkR0CY/4egeKJW5v5Ro
-         V4TQ==
-X-Gm-Message-State: AOJu0YwCCo/sXXQDJ/73hk3mtoX33rN82LtlIJ5kCXbK6XkMFCh/4Qt6
-	Iep4QPBXVeOSa0yLuJuislQEdZNdi1zJaKnQvgW87v1ymOK460QgSXP8t/KfBqvZKCo=
-X-Gm-Gg: ASbGncsJlllFuGKOg8TCGOwvCJpycyeV5hI1pXBcIQ5jjESvAwatsO/2LrNbtg/IQmA
-	67Ho1Mb/NJLUbUil4vwClRkeV9D2hUJ9ZbyAjvAjMn522sSZHziL1nywp5DoAdb/+ICG0abaP+B
-	/0FapokS/9y0CYVtAhvr0ukt5NfHgNwwGE4xXKdGN37LAeylqMh+ItK4ri3w5CIwoaDN1rTzS6J
-	K9+DDOoAk9IH0oEUaFGY9taVVDNTdASNQCIcs7GfNaNk4l/gL1i8P5bZD/c6alGGliNSyYoflse
-	f8B3fXg+sutP/14/s5CPRtPRYMQJhneJTWytrV12LzZUUgfiH/I1vZhVSlk43ZY6Oc2NVBYiZMv
-	wspyV8GNkgMRzal/BzJNl/6KNVqbf6nbYPwE2VpOFnwhEnPUYwwcljGEFvNuy3xtBD9JqKdjGH4
-	cQGTyW71SiaFehqw==
-X-Google-Smtp-Source: AGHT+IGJnLDF4X5uEtsa2xDyV0cUHKx8VFYNG1No6zJf1JQmgFUvBau7xsPVnXixxXlAbB/zCJrVMg==
-X-Received: by 2002:a05:6a21:9986:b0:320:3da8:34d7 with SMTP id adf61e73a8af0-334a85661b7mr22334007637.22.1761067936853;
-        Tue, 21 Oct 2025 10:32:16 -0700 (PDT)
-Received: from 192.168.1.4 ([104.28.246.147])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b6a76b346aasm10941006a12.20.2025.10.21.10.32.11
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 21 Oct 2025 10:32:16 -0700 (PDT)
-From: Alessandro Decina <alessandro.d@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Tirthendu Sarkar <tirthendu.sarkar@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	bpf@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org,
-	Alessandro Decina <alessandro.d@gmail.com>
-Subject: [PATCH net v2 1/1] i40e: xsk: advance next_to_clean on status descriptors
-Date: Wed, 22 Oct 2025 00:32:00 +0700
-Message-Id: <20251021173200.7908-2-alessandro.d@gmail.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <20251021173200.7908-1-alessandro.d@gmail.com>
-References: <20251021173200.7908-1-alessandro.d@gmail.com>
+        bh=HzP3NHmpVePzzX4Nk37cJRY8V/e1399mO4lbkZpYbsI=;
+        b=vXiXOvBz3K/ij0YT7J1u7cCfRY5ZYoPDRtaTgKsBXafC6kvzduwIB7hXuvEbU2UObc
+         ZEBskOTK39KMEkLfOCOSZNcJnZS6TkiU6yFvmBPBIHpwhnFWXGBf0wgwvT/AGEN1xyHI
+         fNLKt9+UOYcVyXWhH9yb9g5gGw239COwip8l6UK/TECiEhq4u6b9cK/kQgGLJunn363a
+         sUxBdo1XeFqPhOoo1bx5a3Rv3J7jDxlqHyFC8X6dBO10VJ7uWFutWsSuvSG6HkwUUrOM
+         alokEgUbz4x0AX/rVUjsyZAeEglS65cJlJ6Ads0ZQBTsoN5ttmq0OHrTX+KiKTgToe7/
+         UJaw==
+X-Forwarded-Encrypted: i=1; AJvYcCXZBc/ZjrTN0OqvPMisSVpZvmjNvzQfz9o0sT3oWtiIIAw6DIhMXw4SzV8N4FMHgzjMd8OgeRc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQr+9PKLYUeaJRYOlJG8cXePJqrN78Q8kJBd7rKt7cB7B9Zy1K
+	aHqCJH9MwvesIxe2mbhyk047Mii3G1weSNLTsaBRhqIFFbjIwgW/KWdW
+X-Gm-Gg: ASbGncsi4iSrrJlxqyiCxtQL7BPGTqWfzxKquzkXT2C44bU0HquUwz1/Danz8H/lD2B
+	2tBjcCa/vtDeRejaIknG8c3NvcfiTErD6CJm0pFLlrGZdQlAVir3pb0wlSh+x2pm3wxBfpPgoPL
+	GiSKM+kXREm8uyCz8pGLbVYJ8orevGKbyybGPoKbxSaPV50O7BRrszMvlr5+uAMbMyz7Y0inHks
+	WTbSmB39ni8mCQv7LDrAjOWJmPS7hTayaaeMNQRKP+1x8lzMrbH84Aim1NhYo0NG7M8kYr5YHEC
+	3SANgk80/v0uyWIg4OJRHm/39qGKL2i0BpXXiZpwOzl4CZ2Yu4lhWKLP8agwG1A5M+PGVB1+C77
+	qFusF57nt7uilDC1W/QWUUAGiJgbnP6tvpwD3/MWXv/XmJUhP5eQJdLUoDaLw5jngW0lh430A+h
+	IWPBgzVxw=
+X-Google-Smtp-Source: AGHT+IE3bWO5VTrkecU9jvIu327KrROeLdwSscMAWS5uaEu1sOxAkVe3ftuURMlxB+jwqRZpHVyG5A==
+X-Received: by 2002:a17:906:7316:b0:b54:981c:4072 with SMTP id a640c23a62f3a-b6472d5e88cmr1997955166b.11.1761068266270;
+        Tue, 21 Oct 2025 10:37:46 -0700 (PDT)
+Received: from hp-kozhuh ([2a01:5a8:304:48d5::100])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b65e8971897sm1122485866b.37.2025.10.21.10.37.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Oct 2025 10:37:45 -0700 (PDT)
+Sender: Zahari Doychev <zahari.doychev@googlemail.com>
+Date: Tue, 21 Oct 2025 20:36:38 +0300
+From: Zahari Doychev <zahari.doychev@linux.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: donald.hunter@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, horms@kernel.org, jacob.e.keller@intel.com, ast@fiberby.net, 
+	matttbe@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	johannes@sipsolutions.net
+Subject: Re: [PATCH 2/4] tools: ynl: zero-initialize struct ynl_sock memory
+Message-ID: <7mgcwqzafkqheqmbvkdx6bfeugfkuqrgik6ipdoxy3rtvinkqq@uxwnz7243zec>
+References: <20251018151737.365485-1-zahari.doychev@linux.com>
+ <20251018151737.365485-3-zahari.doychev@linux.com>
+ <20251020161639.7b1734c6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251020161639.7b1734c6@kernel.org>
 
-Whenever a status descriptor is received, i40e processes and skips over
-it, correctly updating next_to_process but forgetting to update
-next_to_clean. In the next iteration this accidentally causes the
-creation of an invalid multi-buffer xdp_buff where the first fragment
-is the status descriptor.
+On Mon, Oct 20, 2025 at 04:16:39PM -0700, Jakub Kicinski wrote:
+> On Sat, 18 Oct 2025 17:17:35 +0200 Zahari Doychev wrote:
+> > The memory belonging to tx_buf and rx_buf in ynl_sock is not
+> > initialized after allocation. This commit ensures the entire
+> > allocated memory is set to zero.
+> > 
+> > When asan is enabled, uninitialized bytes may contain poison values.
+> > This can cause failures e.g. when doing ynl_attr_put_str then poisoned
+> > bytes appear after the null terminator. As a result, tc filter addition
+> > may fail.
+> 
+> We add strings with the null-terminating char, AFAICT.
+> Do you mean that the poison value appears in the padding?
+> 
 
-If then a skb is constructed from such an invalid buffer - because the
-eBPF program returns XDP_PASS - a panic occurs:
+Yes, correct. The function nla_strcmp(...) does not match in this case as
+the poison value appears in the padding after the null byte.
 
-[ 5866.367317] BUG: unable to handle page fault for address: ffd31c37eab1c980
-[ 5866.375050] #PF: supervisor read access in kernel mode
-[ 5866.380825] #PF: error_code(0x0000) - not-present page
-[ 5866.386602] PGD 0
-[ 5866.388867] Oops: Oops: 0000 [#1] SMP NOPTI
-[ 5866.393575] CPU: 34 UID: 0 PID: 0 Comm: swapper/34 Not tainted 6.17.0-custom #1 PREEMPT(voluntary)
-[ 5866.403740] Hardware name: Supermicro AS -2115GT-HNTR/H13SST-G, BIOS 3.2 03/20/2025
-[ 5866.412339] RIP: 0010:memcpy+0x8/0x10
-[ 5866.416454] Code: cc cc 90 cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 90 48 89 f8 48 89 d1 <f3> a4 e9 fc 26 c0 fe 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
-[ 5866.437538] RSP: 0018:ff428d9ec0bb0ca8 EFLAGS: 00010286
-[ 5866.443415] RAX: ff2dd26dbd8f0000 RBX: ff2dd265ad161400 RCX: 00000000000004e1
-[ 5866.451435] RDX: 00000000000004e1 RSI: ffd31c37eab1c980 RDI: ff2dd26dbd8f0000
-[ 5866.459454] RBP: ff428d9ec0bb0d40 R08: 0000000000000000 R09: 0000000000000000
-[ 5866.467470] R10: 0000000000000000 R11: 0000000000000000 R12: ff428d9eec726ef8
-[ 5866.475490] R13: ff2dd26dbd8f0000 R14: ff2dd265ca2f9fc0 R15: ff2dd26548548b80
-[ 5866.483509] FS:  0000000000000000(0000) GS:ff2dd2c363592000(0000) knlGS:0000000000000000
-[ 5866.492600] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 5866.499060] CR2: ffd31c37eab1c980 CR3: 0000000178d7b040 CR4: 0000000000f71ef0
-[ 5866.507079] PKRU: 55555554
-[ 5866.510125] Call Trace:
-[ 5866.512867]  <IRQ>
-[ 5866.515132]  ? i40e_clean_rx_irq_zc+0xc50/0xe60 [i40e]
-[ 5866.520921]  i40e_napi_poll+0x2d8/0x1890 [i40e]
-[ 5866.526022]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 5866.531408]  ? raise_softirq+0x24/0x70
-[ 5866.535623]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 5866.541011]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 5866.546397]  ? rcu_sched_clock_irq+0x225/0x1800
-[ 5866.551493]  __napi_poll+0x30/0x230
-[ 5866.555423]  net_rx_action+0x20b/0x3f0
-[ 5866.559643]  handle_softirqs+0xe4/0x340
-[ 5866.563962]  __irq_exit_rcu+0x10e/0x130
-[ 5866.568283]  irq_exit_rcu+0xe/0x20
-[ 5866.572110]  common_interrupt+0xb6/0xe0
-[ 5866.576425]  </IRQ>
-[ 5866.578791]  <TASK>
+> > Signed-off-by: Zahari Doychev <zahari.doychev@linux.com>
+> > ---
+> >  tools/net/ynl/lib/ynl.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
+> > index 2bcd781111d7..16a4815d6a49 100644
+> > --- a/tools/net/ynl/lib/ynl.c
+> > +++ b/tools/net/ynl/lib/ynl.c
+> > @@ -744,7 +744,7 @@ ynl_sock_create(const struct ynl_family *yf, struct ynl_error *yse)
+> >  	ys = malloc(sizeof(*ys) + 2 * YNL_SOCKET_BUFFER_SIZE);
+> >  	if (!ys)
+> >  		return NULL;
+> > -	memset(ys, 0, sizeof(*ys));
+> > +	memset(ys, 0, sizeof(*ys) + 2 * YNL_SOCKET_BUFFER_SIZE);
+> 
+> This is just clearing the buffer initially, it can be used for multiple
+> requests. This change is no good as is.
 
-Advance next_to_clean to ensure invalid xdp_buff(s) aren't created.
+I see. Should then the ynl_attr_put_str be changed to zero the padding
+bytes or it is better to make sure the buffers are cleared for each
+request?
 
-Fixes: 1c9ba9c14658 ("i40e: xsk: add RX multi-buffer support")
-Signed-off-by: Alessandro Decina <alessandro.d@gmail.com>
----
- drivers/net/ethernet/intel/i40e/i40e_xsk.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-index 9f47388eaba5..dbc19083bbb7 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-@@ -441,13 +441,18 @@ int i40e_clean_rx_irq_zc(struct i40e_ring *rx_ring, int budget)
- 		dma_rmb();
- 
- 		if (i40e_rx_is_programming_status(qword)) {
-+			u16 ntp;
-+
- 			i40e_clean_programming_status(rx_ring,
- 						      rx_desc->raw.qword[0],
- 						      qword);
- 			bi = *i40e_rx_bi(rx_ring, next_to_process);
- 			xsk_buff_free(bi);
--			if (++next_to_process == count)
-+			ntp = next_to_process++;
-+			if (next_to_process == count)
- 				next_to_process = 0;
-+			if (next_to_clean == ntp)
-+				next_to_clean = next_to_process;
- 			continue;
- 		}
- 
--- 
-2.43.0
-
+Thanks
 
