@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-231261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38275BF6B11
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 15:13:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9059FBF6B17
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 15:13:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3C1FA502B1F
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 13:12:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A40955035F0
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 13:13:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF7C335093;
-	Tue, 21 Oct 2025 13:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6E7336ECD;
+	Tue, 21 Oct 2025 13:12:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C+D379Wb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iyk2OnHH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BACE5334C21
-	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 13:12:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C3C61096F
+	for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 13:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761052362; cv=none; b=CNbg1GsDRZdZdoBpFIUbie3eCuWxVL54HevOQfnMWCMn4M4zgZjqfbFV99IgWKbIGfvf/6jFXbim3U3np7pkYilNIC7aHfcyGQBYsB31M1vQTMTNV2PfEo+254MePxvCVFSoJ11PQHcFNau6lwvwsfe55v7OIE+ixtwTnd5nKjk=
+	t=1761052366; cv=none; b=thxuHIvOTTKSYgRCOtW0SL6FrZs6RxTotWFe3GloLfMOMboYKcvXAKpCjDjIehOmtfMrMKS4rPohWJyQ01Abs3TeFFklkDgFuJ8vWZUWPOlIzBH2m4i2MNQZLqCR3NpvSaSG6C8SsmaYkqxuc5fDG0FPc4wLZGNor2x9cOB9GVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761052362; c=relaxed/simple;
-	bh=ZtKe7rf8/Qt5t19CHQEgL3Mcx4Wc4i0VtmUGfdUJZgc=;
+	s=arc-20240116; t=1761052366; c=relaxed/simple;
+	bh=et6B9jpYWtCzdXVd+olRhHB34fm5eTa7Z2yaMlv8P8Q=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ae+/mqw2QROZCEwWlst5cf/rfiG/kKimtk6fygzZ5CKPvd87XK3l9tkUJd+z1nOMn1EunFJwq+yuyhxVVQKtevcurCRRXkKC+0pkI73Gon5xClW18X+bEjxMXMUyMvwzBRhacufgsfHaurAmxqTf0zrlY9rDFVc5fjDACZqx3bM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C+D379Wb; arc=none smtp.client-ip=209.85.214.169
+	 MIME-Version; b=B/As9+roVqYKoeI+F/MSI+JTijziQCe3tBR5ZsO2Rmb6KfAERZEyBwCmlKHaIcx7Eow+DE+TP4lqli0X/BScMQL2gk9AMvpQbCkUWa+nNNPj7YT10Q6AEBPmyiXrykBXzaN3Bog6OAUTm+5LmROykHFqVJ3upnS+k2Lt8TdTs5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iyk2OnHH; arc=none smtp.client-ip=209.85.215.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2907948c1d2so60000035ad.3
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 06:12:40 -0700 (PDT)
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b6a0a7f3a47so5183683a12.1
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 06:12:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761052360; x=1761657160; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761052364; x=1761657164; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8MSfMW+zmjrtLOUzwiM4d0ZjMjmVjcLFErbCjOZ3pck=;
-        b=C+D379WbZPoCpwaEXxWzjM5mqxLkU5JV+BTfCMwysvNxc/Z/Pg0vniQ7MDoCjwcP6s
-         Txb/L1nNt7QtM62mj8EcJjNIbJ7Gzg5AtfRi8Egxrm12heI0I+rfbaiuMbZrxM7sMsd6
-         N5GhYXelN0N58wfGfKg+bqpoyERqDa2a1I6WmvHLTVIGYRmI2qg4lzJLRM5bI/ahAXSy
-         5F8feN8HupFYnojdhBUFIOdXQeMrZw5ydeQgmN6xtfGwBCIeVZBAnRxbRKc5nv8Pgkmg
-         630QeJDeLq4ZY77+8uO02vg7lEZdPuB/acl9kitor3FLVfQAr79ilWIM8wfUqw96/qy6
-         8Skw==
+        bh=WYks9YiGVI8btVCzGqfhMQ1rij+nkpQpVNndbIX1uww=;
+        b=iyk2OnHH+5qbJVUaztqoDol/kSAempvvlxoHdlOCK6ru9u99cUVxJ3MYdZI0OUn7fl
+         +7WFpBlUh4yN4qT5/rHmWvCjA0ImiCcIbt7COq2FJai1iRJNknmJi2lWzfeg6wMhpN+h
+         aV6A8+SVBCPJHILTgkN69dZxuTbOH7ih4HlJ3/CIEIUVrE1lXQx81I5lcWSFhrRh8j2b
+         fEaU2l3wQrmNf79wl2RqSnvoWH5JQ7IUE4foAcJ7trZT7syCZk5rdBozei44GAdKm5+4
+         yNPYf+QyEPiZXvFWMf/H/dj9BJeCNSw1LQl+cdG20VcwOzTjHSuCs+YUFpTMjxtwYyw+
+         rG+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761052360; x=1761657160;
+        d=1e100.net; s=20230601; t=1761052364; x=1761657164;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8MSfMW+zmjrtLOUzwiM4d0ZjMjmVjcLFErbCjOZ3pck=;
-        b=MnGz7YF1weG63Vtusekt1jcOykTQR8NmFtpctrq/D2rMN4PG5z8bxKMjdAM7BwWqtF
-         TFqVdIo2LQBr3Qf8m+FskO5a3usP6IjJUWUSx93MEHDmrnv9r759WUh2r5SrXnDxFcW6
-         ffJgfL/gpwjtje8Cf9FSwjSQ8EFYxSolyknqcCfBHlWQGdVwiCrGgZJ5jkGGjaCk418W
-         joHMZWAZWUqGtPB1BHvHJ48oGpBURptOI173HNU1PiDl1/RR92RTSngMqV+6FGC8R61B
-         /SUVo9jrulV5oOuECpnw++cuVKzdcTZm2n+d1JfenOWpCc04348+5NrWacfx1hMwpPWD
-         1vFg==
-X-Forwarded-Encrypted: i=1; AJvYcCUt8rWeuWdA+1QSmaX3RMp/hd0nHQu7EHLjgvrMczEYla1Q20E4D4+tmFq9bC/POyNOg7t0Iho=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXAAuxfv2Irm53jSEnvZ4naoBTLb/WuvNIfaf/hHwNPCOjQkJK
-	qrXP0tszxDOKT+41uAzbwn8p4g2KYxOJ/zLQtGdx2sAzyRXBRF83TtD0
-X-Gm-Gg: ASbGncv9gkR279a+Q6nisSQWh96YxjW9ZXIUKlae0T4Hre/xghr0Nu++/EKPPAPAdub
-	5e2ky5Yi4Wj64y1L4VGmpK3FD80cRqr5F9qOUuJ7rCbZRmVcf327gGEl3t/nTEcZt2Q3algT7q/
-	Qa+wjEJvabglFr6xRKvDCwlqt2gfxMM4AKg0JSAQCDRiC0TvNxjKW18QBqCoV/QtSokv1yPsrbe
-	a6cUFJOinMnfzeHDb8sTSDyQxo5Nind1DCHcnCS7TGEilEvPhPDHeIdoxHjwjOtaeKNklpVabhX
-	ScH6Cj7EAACuxqsJbrZ0GxSVjQSOh181IJJM/rY4V8yEmBo1nIlvyFQVM/FMuntbm+Ve8HgpImP
-	ddaOQIpb0hy7lgjAK1MFEjhzWZjw+OrYYYl5Yp5XesFddkmNsz/3AQkvK1Hlz9onzRihVO2gGee
-	eTypDB/Ju7L/L152OG06l3zJkxNZkROYGbUuLHWOc2SMyauz4fBOeVFaMmXQ==
-X-Google-Smtp-Source: AGHT+IHhPNweO1wabVVKhC4V8yZ7wro/fBZN5HXZyIOv7CwY+uVFnmKxkr4+SXZV3kOy5ThjmEaSTg==
-X-Received: by 2002:a17:902:f647:b0:24b:11c8:2d05 with SMTP id d9443c01a7336-290cb65c5b1mr183011415ad.45.1761052359953;
-        Tue, 21 Oct 2025 06:12:39 -0700 (PDT)
+        bh=WYks9YiGVI8btVCzGqfhMQ1rij+nkpQpVNndbIX1uww=;
+        b=CUyYB9dCwt9xoiDZHinVn4+DQX2gil8/jULDRw5YD4LKREUqT+VUKJo3uXy7WZ25cq
+         xntLqZYQz5AxDtxu9ROTjq4/APOI3BSrWPmMSYqXyS72Ndf9spBH++NKW0qIB1booY/E
+         y2z2NvcS4RtdZ7O3z9GfF8s6RMR70nTYLKNs79bwQ3aHn/SQNU3ZbdmrlBy3eTAJ59Qw
+         pSlMNeaDl8SIbXhhie4MrBZzRL93VWlzTvarCHyfHDw9pT+pXjaZTCzo/EoUFadqsqYJ
+         7bEurH69fk0Rhp6nQgkU5NDvalzcYSfUaQVpZ5SiPW0w9dQa5LrZzbXx1glp57SR9ZcW
+         M5bA==
+X-Forwarded-Encrypted: i=1; AJvYcCVqF0SLPsoQN/+IJi7QzDzfs+xaeGMe3yISLJcOqr3Pq3z6/kU/Ii89hSCApekJezmN77RfjhY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBvNTfs4f48nFLymq5zKy/a7IMahbUJZPp9PXUqRZJu1KGZksS
+	MZJJ/Vxv+NX5MGhG0Ctwn0R4lUDNJM9PiR23B3euMg1Fc6GMfp0y+zys
+X-Gm-Gg: ASbGncvKfZMwwVFE1C5MJ+mQr+iHudE8R2ZZa0T0jOYcg4HdIkQYBxVYYYPBJqbZVob
+	jt0n2WZUcOZ1MrxHuguuJu2hzdGnF4QXd/ZuZK5eFSoYSQPIDcS18Z2ZConzbT9gj73ix6q+xzW
+	Ev0ZehAsz6iArvGbrzaFKYq7pU5NJVKVBe9fMzQHVHqVLOHaH4J1YyjLaofr5b5s5V5Luqo8nE0
+	N5VFQXT8YxJGwubssQubxrIE/58JViyqeCtPu0LLuP7cLpsboS/a1vws56H3n6P9hB3okEHSFC0
+	jTEizKCLID9FO1dyzRggJMze0cgVFphw5ycVJ/HsBz1XVAEh4b6Eov3Ud8rm3+bHYez5aLu9EH+
+	r624r5CaKggsZrwBH6+vjctVDZ1eF1ZXqE1FPWihTyX3i27pmU6rr93tKn654xtsX3d7oq2ArEo
+	LM27Jnc7z9n91ZiC4DfWDL4Q6eoi1YTdtoA05719zFcp/1U+uf4JD/ff/FLg==
+X-Google-Smtp-Source: AGHT+IGooEV5+ooG0aaYa2pPQEXWWO6T0gE0QTgFSG0e71ronKcRxW+iMapccUAf07rZSXUj2t3S/A==
+X-Received: by 2002:a17:903:1d1:b0:290:2a14:2ed5 with SMTP id d9443c01a7336-290c9c89fd2mr183379455ad.4.1761052364484;
+        Tue, 21 Oct 2025 06:12:44 -0700 (PDT)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-292471fd9ddsm109248175ad.89.2025.10.21.06.12.35
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-292471fd9ddsm109248175ad.89.2025.10.21.06.12.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 06:12:39 -0700 (PDT)
+        Tue, 21 Oct 2025 06:12:44 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -93,9 +93,9 @@ To: davem@davemloft.net,
 Cc: bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v3 5/9] xsk: rename nb_pkts to nb_descs in xsk_tx_peek_release_desc_batch
-Date: Tue, 21 Oct 2025 21:12:05 +0800
-Message-Id: <20251021131209.41491-6-kerneljasonxing@gmail.com>
+Subject: [PATCH net-next v3 6/9] xsk: extend xskq_cons_read_desc_batch to count nb_pkts
+Date: Tue, 21 Oct 2025 21:12:06 +0800
+Message-Id: <20251021131209.41491-7-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20251021131209.41491-1-kerneljasonxing@gmail.com>
 References: <20251021131209.41491-1-kerneljasonxing@gmail.com>
@@ -109,93 +109,57 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-Rename the last parameter to nb_descs for more accurate naming. Next
-patch will add a real nb_pkts parameter to help copy mode count how
-many pakcets are needed.
+Add a new parameter nb_pkts to count how many packets are needed
+practically by copy mode with the help of XDP_PKT_CONTD option.
 
-No functional change here.
+Add descs to provide a way to pass xs->desc_cache to store the
+descriptors for copy mode.
 
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- net/xdp/xsk.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ net/xdp/xsk.c       | 3 ++-
+ net/xdp/xsk_queue.h | 5 +++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index cf45c7545124..b057d10fcf6a 100644
+index b057d10fcf6a..d30090a8420f 100644
 --- a/net/xdp/xsk.c
 +++ b/net/xdp/xsk.c
-@@ -485,16 +485,16 @@ EXPORT_SYMBOL(xsk_tx_peek_desc);
- static u32 xsk_tx_peek_release_fallback(struct xsk_buff_pool *pool, u32 max_entries)
- {
- 	struct xdp_desc *descs = pool->tx_descs;
--	u32 nb_pkts = 0;
-+	u32 nb_descs = 0;
- 
--	while (nb_pkts < max_entries && xsk_tx_peek_desc(pool, &descs[nb_pkts]))
--		nb_pkts++;
-+	while (nb_descs < max_entries && xsk_tx_peek_desc(pool, &descs[nb_descs]))
-+		nb_descs++;
- 
- 	xsk_tx_release(pool);
--	return nb_pkts;
-+	return nb_descs;
- }
- 
--u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 nb_pkts)
-+u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 nb_descs)
- {
- 	struct xdp_sock *xs;
- 
-@@ -502,16 +502,16 @@ u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 nb_pkts)
- 	if (!list_is_singular(&pool->xsk_tx_list)) {
- 		/* Fallback to the non-batched version */
- 		rcu_read_unlock();
--		return xsk_tx_peek_release_fallback(pool, nb_pkts);
-+		return xsk_tx_peek_release_fallback(pool, nb_descs);
- 	}
- 
- 	xs = list_first_or_null_rcu(&pool->xsk_tx_list, struct xdp_sock, tx_list);
- 	if (!xs) {
--		nb_pkts = 0;
-+		nb_descs = 0;
- 		goto out;
- 	}
- 
--	nb_pkts = xskq_cons_nb_entries(xs->tx, nb_pkts);
-+	nb_descs = xskq_cons_nb_entries(xs->tx, nb_descs);
- 
- 	/* This is the backpressure mechanism for the Tx path. Try to
- 	 * reserve space in the completion queue for all packets, but
-@@ -519,23 +519,23 @@ u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 nb_pkts)
- 	 * packets. This avoids having to implement any buffering in
- 	 * the Tx path.
- 	 */
--	nb_pkts = xskq_prod_nb_free(pool->cq, nb_pkts);
--	if (!nb_pkts)
-+	nb_descs = xskq_prod_nb_free(pool->cq, nb_descs);
-+	if (!nb_descs)
+@@ -523,7 +523,8 @@ u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 nb_descs)
+ 	if (!nb_descs)
  		goto out;
  
--	nb_pkts = xskq_cons_read_desc_batch(xs->tx, pool, nb_pkts);
--	if (!nb_pkts) {
-+	nb_descs = xskq_cons_read_desc_batch(xs->tx, pool, nb_descs);
-+	if (!nb_descs) {
+-	nb_descs = xskq_cons_read_desc_batch(xs->tx, pool, nb_descs);
++	nb_descs = xskq_cons_read_desc_batch(xs->tx, pool, pool->tx_descs,
++					     nb_descs, NULL);
+ 	if (!nb_descs) {
  		xs->tx->queue_empty_descs++;
  		goto out;
- 	}
+diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
+index f16f390370dc..9caa0cfe29de 100644
+--- a/net/xdp/xsk_queue.h
++++ b/net/xdp/xsk_queue.h
+@@ -235,10 +235,9 @@ static inline void parse_desc(struct xsk_queue *q, struct xsk_buff_pool *pool,
  
- 	__xskq_cons_release(xs->tx);
--	xskq_prod_write_addr_batch(pool->cq, pool->tx_descs, nb_pkts);
-+	xskq_prod_write_addr_batch(pool->cq, pool->tx_descs, nb_descs);
- 	xs->sk.sk_write_space(&xs->sk);
+ static inline
+ u32 xskq_cons_read_desc_batch(struct xsk_queue *q, struct xsk_buff_pool *pool,
+-			      u32 max)
++			      struct xdp_desc *descs, u32 max, u32 *nb_pkts)
+ {
+ 	u32 cached_cons = q->cached_cons, nb_entries = 0;
+-	struct xdp_desc *descs = pool->tx_descs;
+ 	u32 total_descs = 0, nr_frags = 0;
  
- out:
- 	rcu_read_unlock();
--	return nb_pkts;
-+	return nb_descs;
- }
- EXPORT_SYMBOL(xsk_tx_peek_release_desc_batch);
- 
+ 	/* track first entry, if stumble upon *any* invalid descriptor, rewind
+@@ -258,6 +257,8 @@ u32 xskq_cons_read_desc_batch(struct xsk_queue *q, struct xsk_buff_pool *pool,
+ 		if (likely(!parsed.mb)) {
+ 			total_descs += (nr_frags + 1);
+ 			nr_frags = 0;
++			if (nb_pkts)
++				(*nb_pkts)++;
+ 		} else {
+ 			nr_frags++;
+ 			if (nr_frags == pool->xdp_zc_max_segs) {
 -- 
 2.41.3
 
