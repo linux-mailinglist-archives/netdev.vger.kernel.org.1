@@ -1,63 +1,57 @@
-Return-Path: <netdev+bounces-231042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3726EBF42AB
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 02:43:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD982BF42DB
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 02:49:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9014818A5B9D
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 00:43:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8832E3A52BE
+	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 00:49:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A8D61FC0ED;
-	Tue, 21 Oct 2025 00:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E1361922FD;
+	Tue, 21 Oct 2025 00:49:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cEtkjrjS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pqoo2JAq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 577D41C695;
-	Tue, 21 Oct 2025 00:43:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F195617736;
+	Tue, 21 Oct 2025 00:49:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761007392; cv=none; b=TKfjyzBVrbBGlw6v4faD1vCQMJupbUdyRzglbbW/e86UusCZsbi/1FzWm0ZZXgB4VVVPkD/ioNRfTlzxxaT7bSDUknbpJcpn/CX756+jc+Yw/LM2d5IJrkPOflSF4DlIkbpkLJsKBT/WC0rCjUS/4prGUUvNvyurbaZ7zNIBbcM=
+	t=1761007769; cv=none; b=tMNzwDuy9qxtG1BmJP3yNfXBp/OXieroBzp8zIyDIJwSi3xTee8kuX7aZ5hZHX0h9Q12lOg3qjTVba7aRz2zHHexcUYW7EdnrlYlC2m4z1ngsbJE2ttqMnXg795fyke6GtsrvpqdiKaA/vIdjNa1KYhjhsTGHnbZfhAY1Ah68kY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761007392; c=relaxed/simple;
-	bh=4RCzmBSn1YK3dNU1eu6WlsS+oiC3sOWT4kMWZcs60Is=;
+	s=arc-20240116; t=1761007769; c=relaxed/simple;
+	bh=r0SRqh0K/5CeBJ5oVQRkSGK/ydvO1n0dQnYqh5+SFbk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=khbWUDAsS/2Wm8baceCgQz8rpcxKbos8Vdmc6kXqJpBexh76UGWhgeU5Ieyovo7aT/dk69o+BaUTHgxNmZF5voxNEMWAWiGYtr6oxWgGRkBl4LE2wQobWffJ4iKOJIdu2MF2dT/7dXxZe/3OMjpE765zMnbfiykzzFx0LRuirrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cEtkjrjS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65B00C4CEFB;
-	Tue, 21 Oct 2025 00:43:09 +0000 (UTC)
+	 MIME-Version:Content-Type; b=A4X3VRtSO3KSEJBgmizxOPWvUL+4Z/CU3wd3CEL2Kr+2P+ieCJ+sVPO3v2cNuZIxeq/4DD6GeCPaPN5ZRprmJJ/2QGXha6GgcWRUKtl9HyYviVxuVPzHe31p3PyFTwZDFZae2A/a85rOZbsGsPvqEvL8gjqfnGVi/JCom8SZHUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pqoo2JAq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F366DC4CEFB;
+	Tue, 21 Oct 2025 00:49:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761007390;
-	bh=4RCzmBSn1YK3dNU1eu6WlsS+oiC3sOWT4kMWZcs60Is=;
+	s=k20201202; t=1761007768;
+	bh=r0SRqh0K/5CeBJ5oVQRkSGK/ydvO1n0dQnYqh5+SFbk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cEtkjrjSI92wIHZJsTGhCickdT6aybd2B/sEoCNPQBq/fTzMFYu6KnoutQup+d3Ro
-	 lM5gStw8JWQUxulUM1ObqQoPovLRzmAZd6pDkxLZNOvipZeJs8WuC5drCdqW3pVzlM
-	 h/BndLLXV6OHUq6iIpQRcM7bJYk9icyWPTB5HiUu6//tb+H7Qb/DdZ+aG3zjCUS/Ty
-	 PRoWZxS854wCjMVNWDg3mNdhBMvr5w0gjQF3eaI2lbwC9unraJMT4P1SItRyPIjrWH
-	 8Pxo7LIrp/88tlKL+LQ5d1imWkZr7hsHbzmQNAOzfATefCser5tkqQeUtnFxqAIwLz
-	 OaSBPwcvab96Q==
-Date: Mon, 20 Oct 2025 17:43:08 -0700
+	b=pqoo2JAq7ivbC+kgC/w+jiSg70nh6l8h9uTxjfjKBxpd5JlgDMj7wofWNOGrk+zWq
+	 ALAKOtrifQQK2zmQ3u/cXPGTHoCN3PQ/4vn04a1Ksej/Hlm4niC6QI5vf1t1fT7bG0
+	 mDzC7M+k5yX4Zbg9Xy4Sjbfy0F3qbMRCog3QvaOH7TSNrUbRcpPrTnYLhdYrlxxz4A
+	 EF2AZICJ0FB6DSXnWAljrLhC5FcFpLQ9UlMExPOmyOiWaNkn/ZAdiqordPaPNs6vLB
+	 WdyaZwbYv5mmLbpOvOpm1g2PSpAwTupyJcdCg7kDCkPiNIp76FLbDyiBC86LmXf4Iq
+	 sgH/Xrjj/9/nw==
+Date: Mon, 20 Oct 2025 17:49:26 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: <horms@kernel.org>, <namcao@linutronix.de>, <jacob.e.keller@intel.com>,
- <christian.koenig@amd.com>, <sumit.semwal@linaro.org>, <sdf@fomichev.me>,
- <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
- <ast@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
- <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
- <linaro-mm-sig@lists.linaro.org>, <dri-devel@lists.freedesktop.org>,
- <linux-media@vger.kernel.org>, <bpf@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
- <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: Re: [PATCH net-next v3 0/6] Add AF_XDP zero copy support
-Message-ID: <20251020174308.59b87130@kernel.org>
-In-Reply-To: <20251014105613.2808674-1-m-malladi@ti.com>
-References: <20251014105613.2808674-1-m-malladi@ti.com>
+To: yicongsrfy@163.com
+Cc: michal.pecio@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, oliver@neukum.org, pabeni@redhat.com,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org, Yi Cong
+ <yicong@kylinos.cn>
+Subject: Re: [PATCH net v6 0/3] ax88179 driver optimization
+Message-ID: <20251020174926.36ec9464@kernel.org>
+In-Reply-To: <20251017025404.1962110-1-yicongsrfy@163.com>
+References: <20251017025404.1962110-1-yicongsrfy@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,20 +61,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 14 Oct 2025 16:26:06 +0530 Meghana Malladi wrote:
-> This series adds AF_XDP zero coppy support to icssg driver.
-> 
-> Tests were performed on AM64x-EVM with xdpsock application [1].
-> 
-> A clear improvement is seen Transmit (txonly) and receive (rxdrop)
-> for 64 byte packets. 1500 byte test seems to be limited by line
-> rate (1G link) so no improvement seen there in packet rate
-> 
-> Having some issue with l2fwd as the benchmarking numbers show 0
-> for 64 byte packets after forwading first batch packets and I am
-> currently looking into it.
+On Fri, 17 Oct 2025 10:54:01 +0800 yicongsrfy@163.com wrote:
+> This series of patches first fixes the issues related to the vendor
+> driver, then reverts the previous changes to allow the vendor-specific
+> driver to be loaded.
 
-This series stopped applying, could you please respin?
+Discussion on v5 reads as an outright rejection, so I'm dropping this
+from our review queue.
 -- 
-pw-bot: cr
+pw-bot: reject
 
