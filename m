@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-231512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1244BF9BE7
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 04:35:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97C05BF9BF0
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 04:37:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8DFDD350DC1
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:35:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D43019C485F
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:37:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE521DE3C7;
-	Wed, 22 Oct 2025 02:35:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC46820E704;
+	Wed, 22 Oct 2025 02:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="n/GWZS3a"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UoyoDwFs"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED73157493;
-	Wed, 22 Oct 2025 02:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32181153BED;
+	Wed, 22 Oct 2025 02:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761100544; cv=none; b=fk96HMrWDGXWaQZW2ds0YBt9VBn7owyq8wcSVSSvZHJt95UXbmlu4FxH86HDj3nWpLs7GXDjX8cRdRUs4dkOqdaj1Ci38uTAuYxKXFg2gECh7E/JVHOz4ksXe6hr1QfoROVGrSUdVdcZHkfn2aR2vXwx3PjBI3e0DAscUx0QF5s=
+	t=1761100632; cv=none; b=V0Wxfr4Oc5Np5WnwErWTYr5erPDp7QRW5SCC2izExT0VUsnjkEcH/eX3nDj2PULAc7omdwuUbUmnxHb0DgNnpcFpO63Jy1vdLVcNnKt0w1tCpP6w02rVfdOoGrQGZYmSascWDbfALIrWzxx+DaM6L5oMSbh2h0HhmFeSmXvEqgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761100544; c=relaxed/simple;
-	bh=rUVDmSBAq9+UnHqJwHpqywoKXJXnQ8xt45b0rUZQmPY=;
+	s=arc-20240116; t=1761100632; c=relaxed/simple;
+	bh=XhyYllBfwHf72vSC18rS/Cm87Saoovo31wHcPD36wlQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MAAAL+RpZlrqgNSx0SISy9HQ25+K+PoEnLHmi2Nm/5Vzt72tRLI7fssi63th3Jr1nkDHal4sCrR9PZrmfSjDmkKy4VwXk3qhf9lFpjEp66D4zBld9TQykOER+as/doYvH8qNXRl5QzOv/p8sR4B0CQJaEgT2XlVj6RV7hx8gHU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=n/GWZS3a; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=o64KoajkbRZYjmlVP9XYJdGrXCilmIbPZgEYqSXijGEeJ19ORNHvsiYgHiTm2rgIKivDdLVi+X47DR1HrxJhifrmWob1QhsqWiXxZDEz5RhOzL9AToZU5Xkb4sOIxdGLiXYkO95D/FJGJxJPXS9mZkTK2pTvNVkwacenWGH/9fQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UoyoDwFs; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9aS4v5r+DPrGhVErpC22FrMUKU+3Vgd8yP4YQQiNfRw=; b=n/GWZS3a9lNZ7VriE8SU2rKDt9
-	5OstIsy0MUHxBGdZHqmUQtQNzizibuV0PNCnWaJGMjkyXv7QobmE0LGAs4McOhVVf6FVz5z/acBJo
-	MOhT44pxDUtz7dqF5lZ7ts16/dEr6WuGqG85diQrAbBQ3mLINn6oEndqcFB1BNpaKOPM=;
+	bh=XfctmnZLfrlop/d15JrrVkXBGMbnmekiyc6xg+1wABw=; b=UoyoDwFs9etYeDMMLLtSnNHExS
+	g9rTXhzqWXFOS5U1MFw1G6zwBZtqRu/iCO2I8jzjj5hTM27eqQ741MAyNHrHMOHoxkp25UB+PYL8c
+	QI3S3MnBIXUIQdu1CL7SaaKALe8xVTLcRka29pg1uiqWSfEnNHg7WYaB4eeIu+sT0hkg=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vBOhE-00BhfN-6M; Wed, 22 Oct 2025 04:35:28 +0200
-Date: Wed, 22 Oct 2025 04:35:28 +0200
+	id 1vBOie-00BhgU-0x; Wed, 22 Oct 2025 04:36:56 +0200
+Date: Wed, 22 Oct 2025 04:36:56 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Daniel Golle <daniel@makrotopia.org>
 Cc: Hauke Mehrtens <hauke@hauke-m.de>, Vladimir Oltean <olteanv@gmail.com>,
@@ -62,11 +62,11 @@ Cc: Hauke Mehrtens <hauke@hauke-m.de>, Vladimir Oltean <olteanv@gmail.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v3 3/7] net: dsa: lantiq_gswip: convert trivial
- accessor uses to regmap
-Message-ID: <37673fb9-b40d-4fb6-aa7b-09cc1fcd2499@lunn.ch>
+Subject: Re: [PATCH net-next v3 5/7] net: dsa: lantiq_gswip: replace *_mask()
+ functions with regmap API
+Message-ID: <cf92b303-33c0-4e53-9406-0a9d33d05e21@lunn.ch>
 References: <cover.1760877626.git.daniel@makrotopia.org>
- <594cd080da549a1d8353642a40ad4630b75c7e33.1760877626.git.daniel@makrotopia.org>
+ <f7726b479ee82457823260280d5b6057c19188a7.1760877626.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,64 +75,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <594cd080da549a1d8353642a40ad4630b75c7e33.1760877626.git.daniel@makrotopia.org>
+In-Reply-To: <f7726b479ee82457823260280d5b6057c19188a7.1760877626.git.daniel@makrotopia.org>
 
-On Sun, Oct 19, 2025 at 01:48:22PM +0100, Daniel Golle wrote:
-> Use coccinelle semantic patch to convert all trivial uses of the register
-> accessor functions to use the regmap API directly.
+On Sun, Oct 19, 2025 at 01:48:43PM +0100, Daniel Golle wrote:
+> Use coccinelle to replace all uses of *_mask() with an equivalent call
+> to regmap_write_bits().
 > 
-> // Replace gswip_switch_w with regmap_write
+> // Replace gswip_switch_mask with regmap_write_bits
 > @@
-> expression priv, val, offset;
+> expression priv, clear, set, offset;
 > @@
-> - gswip_switch_w(priv, val, offset)
-> + regmap_write(priv->gswip, offset, val)
+> - gswip_switch_mask(priv, clear, set, offset)
+> + regmap_write_bits(priv->gswip, offset, clear | set, set)
 > 
-> // Replace gswip_mdio_w with regmap_write
+> // Replace gswip_mdio_mask with regmap_write_bits
 > @@
-> expression priv, val, offset;
+> expression priv, clear, set, offset;
 > @@
-> - gswip_mdio_w(priv, val, offset)
-> + regmap_write(priv->mdio, offset, val)
+> - gswip_mdio_mask(priv, clear, set, offset)
+> + regmap_write_bits(priv->mdio, offset, clear | set, set)
 > 
-> // Replace gswip_switch_r in simple assignment - only for u32
+> // Replace gswip_mii_mask with regmap_write_bits
 > @@
-> expression priv, offset;
-> u32 var;
+> expression priv, clear, set, offset;
 > @@
-> - var = gswip_switch_r(priv, offset)
-> + regmap_read(priv->gswip, offset, &var)
+> - gswip_mii_mask(priv, clear, set, offset)
+> + regmap_write_bits(priv->mii, offset, clear | set, set)
 > 
-> // Replace gswip_switch_mask with regmap_set_bits when clear is 0
-> @@
-> expression priv, set, offset;
-> @@
-> - gswip_switch_mask(priv, 0, set, offset)
-> + regmap_set_bits(priv->gswip, offset, set)
-> 
-> // Replace gswip_mdio_mask with regmap_set_bits when clear is 0
-> @@
-> expression priv, set, offset;
-> @@
-> - gswip_mdio_mask(priv, 0, set, offset)
-> + regmap_set_bits(priv->mdio, offset, set)
-> 
-> // Replace gswip_switch_mask with regmap_clear_bits when set is 0
-> @@
-> expression priv, clear, offset;
-> @@
-> - gswip_switch_mask(priv, clear, 0, offset)
-> + regmap_clear_bits(priv->gswip, offset, clear)
-> 
-> // Replace gswip_mdio_mask with regmap_clear_bits when set is 0
-> @@
-> expression priv, clear, offset;
-> @@
-> - gswip_mdio_mask(priv, clear, 0, offset)
-> + regmap_clear_bits(priv->mdio, offset, clear)
-> 
-> Remove gswip_switch_w() and gswip_mdio_w() functions as they now no
-> longer have any users.
+> Remove the new unused *_mask() functions.
+> This naive approach will be further optmized manually in the next commit.
 > 
 > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
