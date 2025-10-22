@@ -1,191 +1,108 @@
-Return-Path: <netdev+bounces-231875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A21BEBFE10A
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 21:38:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CDAF1BFE128
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 21:41:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CCA23A8F98
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 19:38:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D2233A468D
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 19:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FBC7350295;
-	Wed, 22 Oct 2025 19:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD7834C144;
+	Wed, 22 Oct 2025 19:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJBR23m/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RZyJMxxH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7481634FF72
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 19:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2638D2F60B4;
+	Wed, 22 Oct 2025 19:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761161868; cv=none; b=SaQ8T6oQmvM20AeGZi95VEYwfnXiXq9D0jganE14jDTZ1zpmc3/vgQ47TWxZYaUS7rwCnsubN1YKvKfKsGZoKuJAGu96itBezjIE27gUeY2rbcto0Uu7m0BkGLs1+p0lRz6YJpBVTslb/D21QDgD7lZodktjKg6EwwrT55eGzoc=
+	t=1761162113; cv=none; b=RGHWLsxdtWojEsV3qx4o4gniXYoPpBZ5/uFRm5ANRWsZ8x16Wfry9huYbs+GNsi77C69YWmn87pdZ7ryWV3FGfNJD4ZLkJAXUvqXrMBX6VUEOJr/hvgbNXwE9v+w+TiuoAcgZWIZ0cNhxyjGan29i40hfIs3BK8M0vbxU9um9xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761161868; c=relaxed/simple;
-	bh=ylW0lW+wuEzlGL+hHENqSKVEnatP0qVhMDiawJdeZVU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AtSU9u5X3GvhSMEPew9diqVNu+isDBAgSjwymXmW1pBao/m3M80BinzXzeznrwBKzpM1u+Q57awYBRHdjZ3pHbiMWN/DPoG0GZfl0/RkIBvq3oXWcTWP3jrZ/cvX5Mqob2EfDfMurkfNwq8NJhqMXeJYySCvLSKrT6Z6ASRofZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iJBR23m/; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-71d71bcab6fso71572757b3.0
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 12:37:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761161865; x=1761766665; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ivCZW/5kdODw7DGks4Fdh9OvB5fw5w/Le7nkqaVGoCM=;
-        b=iJBR23m/a/4iEfx19vRkNc2zjH2dI4ddBdOzyQVwf7Z06L/eDCj8P26vbEbpviy5mT
-         oYRYXpGZ7KyvaDXcLxJH5pKYFmxVPk8e4pg9LIaO2GS/jnrVSG/I2onR/Ms3bzOSSS+O
-         DzM+AOibYomae44qu75X+WQTJN23dNHRs8ekFHiJ7s8v+vg6NZC7N6pHrUz+NAxWllou
-         /0gI7ZMSDmhM20kc5RsorE1N9Z2bsGaTc6aC9uCLShaAZX+ElgN0FfDndkM/c1d+5qE7
-         RckNzQ7l6bLuvevHkF49AigpqNX9YYSaM9psf5rSQZiLyqOlfB4gGcfgSIAMOaviwwu6
-         ElTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761161865; x=1761766665;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ivCZW/5kdODw7DGks4Fdh9OvB5fw5w/Le7nkqaVGoCM=;
-        b=wgy2HDqbiiJCdzp4+7eWYa2qcnQqX1EEaCapmSp9Z4TtgGMVHd0VrFErih/PnF1tXJ
-         AUGyrDpDWe/gVzAbdiqzqOmsZJpOObm8mI+k/LVcYvU1NxGr9+a9nxFfgEpMwCQoX4WD
-         yt/7vPBv79lojXjI1KKgGMwgWAAibP9cA5b2J9HZ+Uw2ihNJHOLnApDibPqRTEtTkoEf
-         5Rb5lJ33B+MCNpBHz17SFn+GffZles+5udTtd0rPogQ6zbWYCtrKgfVtuAxvvcbdmaRU
-         kVfuMjP7oeGarmm9lI6O8uKL7CJsoVxz7r7QI2ArhSzLLimr62zjOUzfSl8qpuBS8BCb
-         6fDg==
-X-Forwarded-Encrypted: i=1; AJvYcCXkU9VNU6rAv0PzsNAcI7YAXmsGdlCRZH+78iMFG1qvLu4pSTSav9RymiSLjurg1/esNmNwDmk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIK4v4Qjt9rHbrwADXZqJKghM3R6hfqTtTkNncqwKbWnvY+xKX
-	1uoOAP08+ZjlAl4e5VObGGKpT8Ae4YmlXXaS6oSHG6JPF5H/mblrO9e3
-X-Gm-Gg: ASbGncvS1JXfmdmoG8mnD11a016z2NpwMjXmG1xpt2fS5QSf6kGBcpkYGzkAhKENzeZ
-	N5AjcY3c7ywzuGx4RWKSG80wbPaFijVldicboPeT2vmIB6aoNaHw0mzXNuzzU6roX2j5qsChKL8
-	RUFNrkJ9nrNSE/A3VVh/yJBj2rJk4hHwHvKUkZNRdDEJxU+6qMmYNsUcu47PoooHWofp504f6CK
-	y/ALhnqhaJj4kp/7oR6x4nqwlVKFDJHklrfI5nATgYng/IJvUjTpCnWRbvvy1Bt2ZuWV0lYQ85g
-	VW3vx7ETAZWCQuuTZB++NGKzVsfx+9hTYpYWRgFHN8QpMYdlXth6569yeu5VuEgjBkI/OgG8im9
-	eSzyb0X2a0eK1+O+5b+LyO1Fv1KVojdF3Hvw3IwDvVSmUh5NLii4VlEOdf+CTZM2C/jMcnf+kz0
-	++RXpPJ3YsfA==
-X-Google-Smtp-Source: AGHT+IGjCWGo1TAspfTDu45sSrwaWKqH3Wc9qY1tqCL28A1h73pipVf/1H81/xPqRvUVY3LjX8WpnQ==
-X-Received: by 2002:a05:690c:6910:b0:785:28dd:2fee with SMTP id 00721157ae682-78528dd3420mr76741147b3.11.1761161865366;
-        Wed, 22 Oct 2025 12:37:45 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:49::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-785cd5e23e4sm369957b3.22.2025.10.22.12.37.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Oct 2025 12:37:44 -0700 (PDT)
-From: Daniel Zahka <daniel.zahka@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: Simon Horman <horms@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Willem de Bruijn <willemb@google.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>,
-	Raed Salem <raeds@nvidia.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next 5/5] netdevsim: implement psp device stats
-Date: Wed, 22 Oct 2025 12:37:37 -0700
-Message-ID: <20251022193739.1376320-6-daniel.zahka@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251022193739.1376320-1-daniel.zahka@gmail.com>
-References: <20251022193739.1376320-1-daniel.zahka@gmail.com>
+	s=arc-20240116; t=1761162113; c=relaxed/simple;
+	bh=J958PiBjG200PYShzC71/+JJi9SG0ZYAQy9R0y7Hqv0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kuz9JR/x4U2fo5Q6MgKVogITfG3hGjsna1Mgvw9yjSBqBoUg7E/keC7sDdlW7qiNew8BO1hT5MElF0m+dlUb5sDpzBKPrJGrp49dZgybqpo1fASIGpBcmKCu6vQ8V/LNyVn/3XBXj2+S3TVRfufU2mL616EPOtFDdMgRwvQ/a3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RZyJMxxH; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=UimyisFTul8+MR2D50IK49ml177jHy2wLXd2XtkGKxw=; b=RZyJMxxHQK/iho9i+AipZqwbvN
+	9jrqQ/UWZjyPKlgZWdXRnf8Sfj3XvcJniwXjcICZ1xgTbP0cHWabmVQSh7yYuYWU1l5r9jrXcuQ9Z
+	myHM7bxK/V6pGm2PQo99xebxMb+ShtjIt1WDUgaj8EnnhqppctLEQxhuMHOWRYIf4BWU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vBeiO-00Bo8l-GE; Wed, 22 Oct 2025 21:41:44 +0200
+Date: Wed, 22 Oct 2025 21:41:44 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Biancaa Ramesh <biancaa2210329@ssn.edu.in>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Signed-off-by: Biancaa Ramesh <biancaa2210329@ssn.edu.in>
+Message-ID: <8b8e75f7-8fc2-41c9-b5ec-596552b1b0d9@lunn.ch>
+References: <20251022172045.57132-1-biancaa2210329@ssn.edu.in>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251022172045.57132-1-biancaa2210329@ssn.edu.in>
 
-For now only tx/rx packets/bytes are reported. This is not compliant
-with the PSP Architecture Specification.
+On Wed, Oct 22, 2025 at 10:50:45PM +0530, Biancaa Ramesh wrote:
+> net/llc: add socket locking in llc_conn_state_process to fix race conditions
+> 
+> The llc_conn_state_process function handles LLC socket state transitions and is called from timer callbacks and network packet processing.
+> 
+> Currently, there is a race condition due to concurrent access to the LLC socket's state machine and connection state without proper locking. This causes use-after-free, array out-of-bounds, and general protection faults due to invalid concurrent state access.
+> 
+> This patch adds socket bottom-half locking (bh_lock_sock and bh_unlock_sock) around the call to llc_conn_service() in llc_conn_state_process. This serializes access to the LLC state machine and protects against races with LLC socket freeing and timer callbacks.
+> 
+> It complements existing fixes that lock the socket during socket freeing (llc_sk_free) and timer cancellation.
+> 
+> This fix prevents Kernel Address Sanitizer (KASAN) null pointer dereferences, Undefined Behavior Sanitizer (UBSAN) array index out-of-bounds, and rare kernel panics due to LLC state races.
+> 
+> Reported-by: syzbot
 
-Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
----
- drivers/net/netdevsim/netdevsim.h |  5 +++++
- drivers/net/netdevsim/psp.c       | 27 +++++++++++++++++++++++++++
- 2 files changed, 32 insertions(+)
+Please take a look at
 
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index 02c1c97b7008..af6fcfcda8ba 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -109,6 +109,11 @@ struct netdevsim {
- 	int rq_reset_mode;
- 
- 	struct {
-+		u64 rx_packets;
-+		u64 rx_bytes;
-+		u64 tx_packets;
-+		u64 tx_bytes;
-+		struct u64_stats_sync syncp;
- 		struct psp_dev *dev;
- 		u32 spi;
- 		u32 assoc_cnt;
-diff --git a/drivers/net/netdevsim/psp.c b/drivers/net/netdevsim/psp.c
-index 332b5b744f01..3912f2611862 100644
---- a/drivers/net/netdevsim/psp.c
-+++ b/drivers/net/netdevsim/psp.c
-@@ -70,6 +70,13 @@ nsim_do_psp(struct sk_buff *skb, struct netdevsim *ns,
- 		*psp_ext = skb->extensions;
- 		refcount_inc(&(*psp_ext)->refcnt);
- 		skb->decrypted = 1;
-+
-+		u64_stats_update_begin(&ns->psp.syncp);
-+		ns->psp.tx_packets++;
-+		ns->psp.rx_packets++;
-+		ns->psp.tx_bytes += skb->len - skb_inner_transport_offset(skb);
-+		ns->psp.rx_bytes += skb->len - skb_inner_transport_offset(skb);
-+		u64_stats_update_end(&ns->psp.syncp);
- 	} else {
- 		struct ipv6hdr *ip6h __maybe_unused;
- 		struct iphdr *iph;
-@@ -164,12 +171,32 @@ static void nsim_assoc_del(struct psp_dev *psd, struct psp_assoc *pas)
- 	ns->psp.assoc_cnt--;
- }
- 
-+static void nsim_get_stats(struct psp_dev *psd, struct psp_dev_stats *stats)
-+{
-+	struct netdevsim *ns = psd->drv_priv;
-+	unsigned int start;
-+
-+	/* WARNING: do *not* blindly zero stats in real drivers!
-+	 * All required stats must be reported by the device!
-+	 */
-+	memset(stats, 0, offsetof(struct psp_dev_stats, required_end));
-+
-+	do {
-+		start = u64_stats_fetch_begin(&ns->psp.syncp);
-+		stats->rx_bytes = ns->psp.rx_bytes;
-+		stats->rx_packets = ns->psp.rx_packets;
-+		stats->tx_bytes = ns->psp.tx_bytes;
-+		stats->tx_packets = ns->psp.tx_packets;
-+	} while (u64_stats_fetch_retry(&ns->psp.syncp, start));
-+}
-+
- static struct psp_dev_ops nsim_psp_ops = {
- 	.set_config	= nsim_psp_set_config,
- 	.rx_spi_alloc	= nsim_rx_spi_alloc,
- 	.tx_key_add	= nsim_assoc_add,
- 	.tx_key_del	= nsim_assoc_del,
- 	.key_rotate	= nsim_key_rotate,
-+	.get_stats	= nsim_get_stats,
- };
- 
- static struct psp_dev_caps nsim_psp_caps = {
--- 
-2.47.3
+https://docs.kernel.org/process/submitting-patches.html
 
+> ::DISCLAIMER::
+> 
+> ---------------------------------------------------------------------
+> The 
+> contents of this e-mail and any attachment(s) are confidential and
+> intended 
+> for the named recipient(s) only. Views or opinions, if any,
+> presented in 
+> this email are solely those of the author and may not
+> necessarily reflect 
+> the views or opinions of SSN Institutions (SSN) or its
+> affiliates. Any form 
+> of reproduction, dissemination, copying, disclosure,
+> modification, 
+> distribution and / or publication of this message without the
+> prior written 
+> consent of authorized representative of SSN is strictly
+> prohibited.
+
+FYI, this email will be archived, and be publically available for
+approximately forever, which probably goes against this policy.  Your
+best bet is to remove the disclaimer, if you want anybody to actually
+look at your patches.
+
+	Andrew
 
