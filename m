@@ -1,97 +1,106 @@
-Return-Path: <netdev+bounces-231521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CEE1BF9E14
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 05:55:06 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F76BF9F55
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 06:38:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DB694233E3
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 03:55:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4EFDA4E03AB
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 04:38:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 750022D47FF;
-	Wed, 22 Oct 2025 03:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FCC72D23B1;
+	Wed, 22 Oct 2025 04:38:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="uQANblin"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="EvkABKX6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from mx18lb.world4you.com (mx18lb.world4you.com [81.19.149.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF67323958D;
-	Wed, 22 Oct 2025 03:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A3419DFA2;
+	Wed, 22 Oct 2025 04:38:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761105302; cv=none; b=fLNo//muyU/g/M0rLzZp/VORrM3+MGu2cZi7l4Ey5BnkFOlLNTdmRg0UL6w/Sd3mdLXNoX+SqoRZVGkxHLGP6QltWwyzo1CwbdxsMgjmY6sAycQ1rMue+0r03jabPWlg/MoflE1eLTlKx0uET1Z2/uL9RXBmj9Ars2UfjnN8lRw=
+	t=1761107914; cv=none; b=HQ0xEeOdaLSl5GGORSObDNCojhbhMgj6auXSiB06G+ACM1pasAqmF7kKqC+wLFQ55goHjBfpNtwP8i12Q37dmH0weG7r4gEl6MG1CSNwiP/pRT0VpcDvX1ykWVusU/Js90e76ElqSrCEJpkUDU9JVLNUqP3bM0I0k4XdMQNlMHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761105302; c=relaxed/simple;
-	bh=uQfk3Le9KERMMWm52SnZ/oM/1kH5gLp0h68A3u/zq7I=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=IcFYWIKXZ4YaMm2tPfAjehtJ0oHqR23QL6f8rTEuzWRkSrq0puhwxJD3vyyJ/s8PEfddGAJ1fZptqTFToBJC4gr9ZSCffesBSh4AQYEsHNXQ5vKahHJ4mJAV6Uj+AqggsiHJVr1mgVK4+ma/H99J7F8flBZgPKaZQJ3Oqt6q6Kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=uQANblin; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1761105295; h=Message-ID:Subject:Date:From:To;
-	bh=S0LUDwuX2bVNX84XTQkfDh81t8I2QtGUEauu7kdK/QI=;
-	b=uQANblin50gzpIj42XzDV45dJTF17+9iY/AHO+6jjvUi6MZ0J9pWu45pr5/+Jn3ZGlSPVY7RTLDpa7SsBNZ5Z3dRCYv5H6xlcoqOd2SNc0JdVptul8QcnVrfwXUvEwjhABa1IqliHBMKMcCXMs16ev8W0tbCNr2ZOM/CABMrKls=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WqlI4cU_1761105294 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 22 Oct 2025 11:54:55 +0800
-Message-ID: <1761105287.0200958-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net V2] virtio-net: zero unused hash fields
-Date: Wed, 22 Oct 2025 11:54:47 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- stable@vger.kernel.org,
- mst@redhat.com,
- jasowang@redhat.com,
- eperezma@redhat.com,
- pabeni@redhat.com,
- virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20251022034421.70244-1-jasowang@redhat.com>
-In-Reply-To: <20251022034421.70244-1-jasowang@redhat.com>
+	s=arc-20240116; t=1761107914; c=relaxed/simple;
+	bh=18FlkdQsiJPJAWiBoXayMc4f6mpPL3bylWWf3NZHpQ4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HTEmdbNwdpAZ9hyBBfurlKFeKOYNs19Y1NHwQK01SgpoE6NhRPWuBngBbbf2so7/3tVy8fWaU8UjoKgNdbyM76mb/+LAJ8KqS2NMDB9CfUkSHJfVlJNaSLrI6e7c/GxAoWyCbNNoWt1qsw7gOhK/soN6U7zPxe6PZpJbu572+8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=EvkABKX6; arc=none smtp.client-ip=81.19.149.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=IPRze5FkHFbMvW64NXYkFdwwtGyQKARdVchokBmbTF8=; b=EvkABKX6NTJPmt0vUcBCqtFoLw
+	RUZ5gIj0bmZyrIJOZGxwV+RsMzeteXcxEoMdHsptAsliwAMnY3PNfPdAGzriJvV4r5ikwHwI1V4+7
+	XND33w1ribTLm+6AuFL3oNbZahdZFz8ck8GHfkjC/CfrMYSa1YlZddrRFzX8Ydzg4uYk=;
+Received: from [188.22.5.236] (helo=[10.0.0.160])
+	by mx18lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1vBQD2-000000001OC-0W5t;
+	Wed, 22 Oct 2025 06:12:24 +0200
+Message-ID: <4041a6f5-2033-47f8-9e33-69d7a5b3de04@engleder-embedded.com>
+Date: Wed, 22 Oct 2025 06:12:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: phy: micrel: Add support for non PTP SKUs
+ for lan8814
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Horatiu Vultur <horatiu.vultur@microchip.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, richardcochran@gmail.com
+References: <20251017074730.3057012-1-horatiu.vultur@microchip.com>
+ <79f403f0-84ed-43fe-b093-d7ce122d41fd@engleder-embedded.com>
+ <20251020063945.dwqgn5yphdwnt4vk@DEN-DL-M31836.microchip.com>
+ <e0a8830e-6267-4b2a-b1fa-f3cbe34bd3ba@engleder-embedded.com>
+ <20251021161447.311a3e0f@kernel.org>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20251021161447.311a3e0f@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-On Wed, 22 Oct 2025 11:44:21 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> When GSO tunnel is negotiated virtio_net_hdr_tnl_from_skb() tries to
-> initialize the tunnel metadata but forget to zero unused rxhash
-> fields. This may leak information to another side. Fixing this by
-> zeroing the unused hash fields.
+On 22.10.25 01:14, Jakub Kicinski wrote:
+> On Mon, 20 Oct 2025 20:11:13 +0200 Gerhard Engleder wrote:
+>>>> Hasn't net also switched to the common kernel multiline comment style
+>>>> starting with an empty line?
+>>>
+>>> I am not sure because I can see some previous commits where people used
+>>> the same comment style:
+>>> e82c64be9b45 ("net: stmmac: avoid PHY speed change when configuring MTU")
+>>> 100dfa74cad9 ("net: dev_queue_xmit() llist adoption")
+>>
+>> The special coding style for multi line comments for net and drivers/net
+>> has been removed with
+>> 82b8000c28 ("net: drop special comment style")
+>>
+>> But I checked a few mails on the list and also found the old style in
+>> new patches.
+> 
+> We removed the check that _suggests_ the use of the superior style.
+> Aesthetic taste is not evenly distributed within the population.
+> But we still prefer the old style in netdev.
+> 
+> That said I don't think nit picking on comment style is productive,
+> in either direction.
 
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+I already had to remove the superior style on netdev. That's why I
+commented it here. But I also like the old style more. Thank you for
+the clarification!
 
->
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> Fixes: a2fb4bc4e2a6a ("net: implement virtio helpers to handle UDP GSO tunneling")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  include/linux/virtio_net.h | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-> index 20e0584db1dd..4d1780848d0e 100644
-> --- a/include/linux/virtio_net.h
-> +++ b/include/linux/virtio_net.h
-> @@ -401,6 +401,10 @@ virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
->  	if (!tnl_hdr_negotiated)
->  		return -EINVAL;
->
-> +        vhdr->hash_hdr.hash_value = 0;
-> +        vhdr->hash_hdr.hash_report = 0;
-> +        vhdr->hash_hdr.padding = 0;
-> +
->  	/* Let the basic parsing deal with plain GSO features. */
->  	skb_shinfo(skb)->gso_type &= ~tnl_gso_type;
->  	ret = virtio_net_hdr_from_skb(skb, hdr, true, false, vlan_hlen);
-> --
-> 2.42.0
->
+Gerhard
 
