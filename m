@@ -1,114 +1,141 @@
-Return-Path: <netdev+bounces-231616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94B59BFB8C0
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:08:10 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9043BFB8D8
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:10:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 81C324E54D6
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:08:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B78804EF481
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F7C32860A;
-	Wed, 22 Oct 2025 11:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1783E32B986;
+	Wed, 22 Oct 2025 11:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YciUx0qr"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="bBTUloRn"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE3D2E8882
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2DF329C54;
+	Wed, 22 Oct 2025 11:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761131287; cv=none; b=Un95evJcQrtPie+iaYhVSeRVxUgo9Rd9JJPbdzWTdmrSlaJkFSjt43M2Y+Dq/5l+4W+YTqwlorhK6ECE6P5q57rpmGedd08DPknfFZ0ME56Bk/xs6veiuhE/r2FCGc4V5SB8a8gAwhrv3w4BNx1sHcP6ZJCikrLmW58nI0A05ns=
+	t=1761131408; cv=none; b=hKC1XaWB5ZzQo9o1+1ZLbOeOeiG6LtAfV6dILfHbck4jFNYSgU96lXuPndQZsIUmgSEdX50yGQPEdn2+CLnuhTVJ/6vsqcNr3fuq+CU7dDVivQ7jwvF6bizHdzdrECkLWqkY1h3HqNMi2nnpKBAl05odRqXx1q7fWL5Syf4wbrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761131287; c=relaxed/simple;
-	bh=dryTu160NAioyrV82eYEOGrU55Cf+S0NldTsVQdl8o4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V197ussvZ576iu9pbxBUb3rftrUO5VI8GElEiuqekmYzx9YSW3b/Ft6FaqF+EoLZPETWbSlOetzh0WUEsHtiGt1XT5ojzEVCsz4a1HAgB0u+4vvV9XID7aFsBbloyP+jFQ1wo7OfvYEMKilt4prkNNc5JZey+fs0slsMeZqhEzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YciUx0qr; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d46abe01-2f1d-42ec-ab93-a0be3d431c09@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761131282;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jPm89C7FqdTmhO30I0w2UGstjkIjIA23l5k97iIU32g=;
-	b=YciUx0qr6pTDbtWnMnWnpq4rFmRLdYv+bEXebdHsNSV47k7JpnR9nki2gS1/DLEs3v5si8
-	yQ/Pw8Hi61jduYpIkz+Fz1vR7RGGo0WQyY1/cUngBmpFBCTzSsex5EBejXHngmotjT6qww
-	azNl9WfT8q/S4Ng9croSmpMQJbxuA4w=
-Date: Wed, 22 Oct 2025 12:07:59 +0100
+	s=arc-20240116; t=1761131408; c=relaxed/simple;
+	bh=Df1Zuu/W3r3KXBN6OyD39DrqlVJkr+jTfzyj06wvxvI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H/w8cJRgQsb6h/rrftR8eImSXjBl4o1z8tc3A/blFvgRGFWqLjqVqS3gFJ1OY3sUEQMAVqFtDiwS2eBkQVutM1kfM2czGKqXdpVoKh+9RRNmO9R1vSAbzw9IGSlS5u8ArxTD8xQtB24hJuGM6uNVrMku52aCSfXBcZh9zdVhQDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=bBTUloRn; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 9D02A602AD;
+	Wed, 22 Oct 2025 13:10:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1761131400;
+	bh=OXA7ZSBo1Bs8VoUjz2xdm61oiofhFYeAuoMwklpy4B0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bBTUloRnl24pBO5ytJ0JrN6iGhGhmjpJpKkZZjraj+6PkZGpntNEMHFIDopQESwra
+	 UEmyUZUp4q8QAwZC7JC3+kB2nZHZohzUGgfRxMBkN09yAF3PCyQ6qFePqY+A185q23
+	 OpiJ6mWOq0VlvfVgqf4sabYosXfIWajbo43eW7S5VD+f859fpLiMeWsbgexn+63IW7
+	 DwXPpFOnVhkB13fMzcYKQDZD/MgCo9B7KSHcBz8GPdHLAbEVEcPBc3vJP1Dpj3QteL
+	 2UvAQDyqk0XAi+5g7a3C4RuYkeD8Bw8tzigv2PlAFFMCgRTs3vyklURtzHr2u9QsYg
+	 D7mluIKicZWGw==
+Date: Wed, 22 Oct 2025 13:09:57 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Phil Sutter <phil@nwl.cc>, Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH nf-next v7 0/3] Add IPIP flowtable SW acceleration
+Message-ID: <aPi7haYp3pWqM0oW@calendula>
+References: <20251021-nf-flowtable-ipip-v7-0-a45214896106@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v15 4/5] net: rnpgbe: Add basic mbx_fw support
-To: Dong Yibo <dong100@mucse.com>, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
- andrew+netdev@lunn.ch, danishanwar@ti.com, geert+renesas@glider.be,
- mpe@ellerman.id.au, lorenzo@kernel.org, lukas.bulwahn@redhat.com
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251022081351.99446-1-dong100@mucse.com>
- <20251022081351.99446-5-dong100@mucse.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20251022081351.99446-5-dong100@mucse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251021-nf-flowtable-ipip-v7-0-a45214896106@kernel.org>
 
-On 22/10/2025 09:13, Dong Yibo wrote:
-> Add fundamental firmware (FW) communication operations via PF-FW
-> mailbox, including:
-> - FW sync (via HW info query with retries)
-> - HW reset (post FW command to reset hardware)
-> - MAC address retrieval (request FW for port-specific MAC)
-> - Power management (powerup/powerdown notification to FW)
-> 
-> Signed-off-by: Dong Yibo <dong100@mucse.com>
+Hi Lorenzo,
+
+On Tue, Oct 21, 2025 at 07:48:17PM +0200, Lorenzo Bianconi wrote:
+> Introduce SW acceleration for IPIP tunnels in the netfilter flowtable
+> infrastructure. This series introduces basic infrastructure to
+> accelerate other tunnel types (e.g. IP6IP6).
+
+Would you be so kind to rebase this series on top of:
+
+https://patchwork.ozlabs.org/project/netfilter-devel/list/?series=477081
+
+That series should simplify the integration of your IPIP support.
+
+Thanks.
+
 > ---
->   drivers/net/ethernet/mucse/rnpgbe/Makefile    |   3 +-
->   drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |   4 +
->   .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    |   1 +
->   .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c | 194 ++++++++++++++++++
->   .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h |  88 ++++++++
->   5 files changed, 289 insertions(+), 1 deletion(-)
->   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
->   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
-
-[...]
-
-> +static int mucse_mbx_get_info(struct mucse_hw *hw)
-> +{
-> +	struct mbx_fw_cmd_req req = {
-> +		.datalen = cpu_to_le16(MUCSE_MBX_REQ_HDR_LEN),
-> +		.opcode  = cpu_to_le16(GET_HW_INFO),
-> +	};
-> +	struct mbx_fw_cmd_reply reply = {};
-> +	struct mucse_hw_info info = {};
-> +	int err;
-> +
-> +	err = mucse_fw_send_cmd_wait_resp(hw, &req, &reply);
-> +	if (!err) {
-> +		memcpy(&info, &reply.hw_info, sizeof(struct mucse_hw_info));
-> +		hw->pfvfnum = FIELD_GET(GENMASK_U16(7, 0),
-> +					le16_to_cpu(info.pfnum));
-
-why do you need local struct mucse_hw_info info? The reply is stack
-allocated, nothing else will use it afterwards. You clear out
-info on allocation (40 bytes memset), then you copy whole structure from
-reply to info (another round of 40 bytes reads/writes) and then use only
-2 bytes out of it - it does look like an overkill, you can access
-reply.hwinfo.pfnum directly.
-
-
+> Changes in v7:
+> - Introduce sw acceleration for tx path of IPIP tunnels
+> - Rely on exact match during flowtable entry lookup
+> - Fix typos
+> - Link to v6: https://lore.kernel.org/r/20250818-nf-flowtable-ipip-v6-0-eda90442739c@kernel.org
+> 
+> Changes in v6:
+> - Rebase on top of nf-next main branch
+> - Link to v5: https://lore.kernel.org/r/20250721-nf-flowtable-ipip-v5-0-0865af9e58c6@kernel.org
+> 
+> Changes in v5:
+> - Rely on __ipv4_addr_hash() to compute the hash used as encap ID
+> - Remove unnecessary pskb_may_pull() in nf_flow_tuple_encap()
+> - Add nf_flow_ip4_ecanp_pop utility routine
+> - Link to v4: https://lore.kernel.org/r/20250718-nf-flowtable-ipip-v4-0-f8bb1c18b986@kernel.org
+> 
+> Changes in v4:
+> - Use the hash value of the saddr, daddr and protocol of outer IP header as
+>   encapsulation id.
+> - Link to v3: https://lore.kernel.org/r/20250703-nf-flowtable-ipip-v3-0-880afd319b9f@kernel.org
+> 
+> Changes in v3:
+> - Add outer IP header sanity checks
+> - target nf-next tree instead of net-next
+> - Link to v2: https://lore.kernel.org/r/20250627-nf-flowtable-ipip-v2-0-c713003ce75b@kernel.org
+> 
+> Changes in v2:
+> - Introduce IPIP flowtable selftest
+> - Link to v1: https://lore.kernel.org/r/20250623-nf-flowtable-ipip-v1-1-2853596e3941@kernel.org
+> 
+> ---
+> Lorenzo Bianconi (3):
+>       net: netfilter: Add IPIP flowtable rx sw acceleration
+>       net: netfilter: Add IPIP flowtable tx sw acceleration
+>       selftests: netfilter: nft_flowtable.sh: Add IPIP flowtable selftest
+> 
+>  include/linux/netdevice.h                          |  16 +++
+>  include/net/netfilter/nf_flow_table.h              |  26 +++++
+>  net/ipv4/ipip.c                                    |  29 +++++
+>  net/netfilter/nf_flow_table_core.c                 |  10 ++
+>  net/netfilter/nf_flow_table_ip.c                   | 118 ++++++++++++++++++++-
+>  net/netfilter/nft_flow_offload.c                   |  79 ++++++++++++--
+>  .../selftests/net/netfilter/nft_flowtable.sh       |  40 +++++++
+>  7 files changed, 307 insertions(+), 11 deletions(-)
+> ---
+> base-commit: d1d7998df9d7d3ee20bcfc876065fa897b11506d
+> change-id: 20250623-nf-flowtable-ipip-1b3d7b08d067
+> 
+> Best regards,
+> -- 
+> Lorenzo Bianconi <lorenzo@kernel.org>
+> 
 
