@@ -1,141 +1,113 @@
-Return-Path: <netdev+bounces-231816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 369E2BFDCBB
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 20:16:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D139BFDCD1
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 20:20:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04D6E1887101
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 18:16:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BEEC19C38E9
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 18:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30EB12BDC03;
-	Wed, 22 Oct 2025 18:16:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCFB1315D29;
+	Wed, 22 Oct 2025 18:20:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GkWCRWn2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="eYqIBWwz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52F535B120
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 18:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF4532AAAE
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 18:20:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761156961; cv=none; b=e93e/spjnT0hS4Lxzk+2JJJ+fzadUwX9ikVPJ/YGKxmMCmGjN36HGcWFHEKijJJ2N93Q8EbLFN+V7XEcUv3H/430by7gZqbccTVCvbiJPknOD8NHwzr3244DpIBW+/pPAGzZiKBbALO7L4hXe/rvLOAV9rSEsllRdsuFPpj/HZw=
+	t=1761157252; cv=none; b=qpBCzjHXLw1m0TDwqyeUZQfs252UYYjWnJkYA9WJWXCUQOX5EwRsL6wn+cIbMlcunBulW8VTFwiRg7dFn6OGidEzdgaOnhLUipAhm2AaztiHTZfCck4ishAbBEmedbiAEgivgrQvPbjRs67jfgWKKrtC875qb68YXXXYWGrLo3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761156961; c=relaxed/simple;
-	bh=F/FQ5YUWu+YcwL0adkw4aV8mATYP6rRTj+QeHmQu/6Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XkABE0zOUZmXz6F96Uk1Sp7iDe+JpGbTe5Qk1hUYLLCSpfqZsgL0p/8iQldZCZwCIOYkBfAGIl9aP+yNXQz9p6H/3OBsJIuPISqeQ3OCg0yD9gf82tYRLA0o+L0KQZuKZCGcPYVFKkvNiE0waXwzgyJav/ZASci/wpMxL/yBIAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GkWCRWn2; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7a213c3c3f5so9340944b3a.3
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:15:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761156959; x=1761761759; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9QGp0U/4pbaeep/z7J48UOg7Dw8fa3jK3AlCVPGVI18=;
-        b=GkWCRWn24QjuLWoF0aAhBNpjxkwYzZ01z5j5TAAjg+CFLm/jMwt1vaOCIWu7YNNREx
-         oW3OG1UIyJMloZsHjhKHVygHrV1y+3Vm4AgO1xSQnbdMD5L+bB1MEYN9mgQz3Ll9FJVm
-         5o4KqP4uaVGKlapznEwMJQMEHjGFY3jrhLy4nHjCNaKyPFKaYFkV4Bee0D+O6l9h63yF
-         gymXaJyNmbFYGHcaCk5MKo644b/Ak5L2FEPodwk7daIA3qzqe7mlujHmKYqB5c5ICmCu
-         XnPuyoSQImCuuX62Cxa+V9AUvy6ZSbuYL38aTM1CfT9R9ZiRk4zPb93JuQ5daXsiy926
-         aZRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761156959; x=1761761759;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9QGp0U/4pbaeep/z7J48UOg7Dw8fa3jK3AlCVPGVI18=;
-        b=rqEeB+/WLf5CfRVP2B1RN9eezjr/ROKWlEdQ8cAfHw5b81/CDgDXz2/ledq+xnDnH0
-         Vn3mP+FBZpOK0+NulvoS950IFXhcyUEi2n6A1TXgVgKsO4+LV3rgfty4/KroOajfqTrg
-         IitOZiyuhT40SfjY/2SoKEiJhaCDjXpydvceilbYyYmTONCNuVvBaKmANUmYO0cE/GQE
-         lYkq+G6DVW6XgYER7+ksQI557UWFzw+PFYeIQ+HCLXvr7e3OcJ/tOIy+IGy4lUiciUuG
-         Z9g+zA3FN98cM6TkQhtkIzJj6v9/3ZKCCeDivSOL6514rWJX+4uUPKCFOx0lcSpE7Jif
-         U2gA==
-X-Forwarded-Encrypted: i=1; AJvYcCX3HqOsD2nTfLqM7bFTdb3fceRIuYe28S944VNquOv8YbGIogYiT3Zd4MvrclbGQ6GFqg+HoSE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7eiDDaFNIuroxzxgU2v2/xJsJ+9yAfpV+IOxf35g6i508Vg8/
-	zIWTb1SWAnV75HE9WXxHClyVKRJvuLu8uSmpX6p6VKPYdLvlhXomLjeR
-X-Gm-Gg: ASbGncuCN+mf2qzmKWCqQD3NqbkWOlDZkRyEDCFx9aa7ZLcnv9WhOIaqj9xeQDfeEEz
-	JRwlRwJby/AO+B7k5dTWtSN24RHkzAOlZweXrTMJhwzNruBMV6nvO4U55C9e0QYvRN/742Q922Q
-	filtiG4VSYfWQ/S6cOFgbLt4a59kISbasC6WvfWB8B1lu0b4KASHB3rwsegOq/PX8xEZIBqNdKd
-	C6eEGdMhQoIKEqMNSKftI63DmLkfVlZ8P/HvleGwqVVy/GUqU+J28juKnlPBWezx5DhI15+veg6
-	9AEqU+C9ADJhotBhR2jkLgzRrx9+VbWHON8mbosPSpRDPYZG5kWt8GyUckEiBqnqCtXPBiApYuG
-	jSPl+umaE9LtSGnaeagRQLHNZ3X5fEJIBAURScPgZcV5cTs9o8N8k3PucRjvurt6GhtN8GZ1IEm
-	28f5AaPxQ1+WzGTu/mIWSaYv9xaV4=
-X-Google-Smtp-Source: AGHT+IFMLQ6LX3tUc8TguSda9gIy2Uw3Gh8Ff81wUitAtyD2okPrCzKkucLqxqPjpTHJn/jjBsd/SQ==
-X-Received: by 2002:a05:6a00:8d3:b0:781:24cb:13f4 with SMTP id d2e1a72fcca58-7a220a95434mr26308242b3a.1.1761156958833;
-        Wed, 22 Oct 2025 11:15:58 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a230121ebfsm15114561b3a.70.2025.10.22.11.15.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Oct 2025 11:15:57 -0700 (PDT)
-Message-ID: <6a962d4b-f624-4eac-8a59-5472fb82b591@gmail.com>
-Date: Wed, 22 Oct 2025 11:15:56 -0700
+	s=arc-20240116; t=1761157252; c=relaxed/simple;
+	bh=2yd4yS/64ARZJEJKeCA4TfQv/5KvaeRsYTgL3hmqU+s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iQG3qDj12NtXlnRFdOIYPqrPh/pvI9/3DUIzR3YInT8idmycGd4xfbqJD/NFOHGa3I7cuP0LnxAmPcVjvTb7QF/m9pnD/l5Zjv9l03p8BjhwFEOOdRPvY9u6tk0hn3WyVbN+QVjDJCUacC9v5SvX+CuyKf0iwdBGDRx1V3nyEbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=eYqIBWwz; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=2eg5VCKhxpUu6/CBY1uNQQlvIa7Z/RikQOCRPOIN5rs=; b=eYqIBWwzr42NbDZUgJACt+frDZ
+	i7ljnO/w9b5sT4KjlaNpTFUbK5JNnvqHzCflRrJZYUk5yHDXajRMQfblY8A3PDMu2g7jrLcnFZaFv
+	hwZp/RHAkQaM7d9Jk3pU8g6t4hCJNeSnx817L7Vipz3TsRTTbt8IDMA1EpWZv/coVNrsMet0TjGI9
+	cMWI7Nzb11DBcFfC9oiB5aGvK4DKqX6/GaWmWkXTTIU+eJFWGUmtqbd1CKse7sCk3GIPiEfUIzEza
+	SwKecesTrtcNMIYnPeI7rd3RitMEk/VCq++jvTiZCOQxcG7B3yeVFk+ScGQKPVS7Zh85hQc3G2Vz0
+	uFUxJIaQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38592)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vBdS0-000000005IZ-1ACS;
+	Wed, 22 Oct 2025 19:20:44 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vBdRy-000000000v1-1be2;
+	Wed, 22 Oct 2025 19:20:42 +0100
+Date: Wed, 22 Oct 2025 19:20:42 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 2/6] net: phy: add phy_may_wakeup()
+Message-ID: <aPkgeuOAX98aT-T7@shell.armlinux.org.uk>
+References: <aPIwqo9mCEOb7ZQu@shell.armlinux.org.uk>
+ <E1v9jCO-0000000B2O4-1L3V@rmk-PC.armlinux.org.uk>
+ <ad16837d-6a30-4b3d-ab9a-99e31523867f@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/6] net: phylink: add phylink managed MAC
- Wake-on-Lan support
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-References: <aPIwqo9mCEOb7ZQu@shell.armlinux.org.uk>
- <E1v9jCT-0000000B2Ob-1yo3@rmk-PC.armlinux.org.uk>
-Content-Language: en-US, fr-FR
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <E1v9jCT-0000000B2Ob-1yo3@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ad16837d-6a30-4b3d-ab9a-99e31523867f@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 10/17/25 05:04, Russell King (Oracle) wrote:
-> Add core phylink managed Wake-on-Lan support, which is enabled when the
-> MAC driver fills in the new .mac_wol_set() method that this commit
-> creates.
+On Wed, Oct 22, 2025 at 03:43:20PM +0200, Maxime Chevallier wrote:
+> Hi Russell,
 > 
-> When this feature is disabled, phylink acts as it has in the past,
-> merely passing the ethtool WoL calls to phylib whenever a PHY exists.
-> No other new functionality provided by this commit is enabled.
+> That's not exactly what's happening, this suggest this is merely a
+> wrapper around device_may_wakeup().
 > 
-> When this feature is enabled, a more inteligent approach is used.
-> Phylink will first pass WoL options to the PHY, read them back, and
-> attempt to set any options that were not set at the PHY at the MAC.
+> I don't think it's worth blocking the series though, but if you need to
+> respin maybe this could be reworded.
 > 
-> Since we have PHY drivers that report they support WoL, and accept WoL
-> configuration even though they aren't wired up to be capable of waking
-> the system, we need a way to differentiate between PHYs that think
-> they support WoL and those which actually do. As PHY drivers do not
-> make use of the driver model's wake-up infrastructure, but could, we
-> use this to determine whether PHY drivers can participate. This gives
-> a path forward where, as MAC drivers are converted to this, it
-> encourages PHY drivers to also be converted.
-> 
-> Phylink will also ignore the mac_wol argument to phylink_suspend() as
-> it now knows the WoL state at the MAC.
-> 
-> MAC drivers are expected to record/configure the Wake-on-Lan state in
-> their .mac_set_wol() method, and deal appropriately with it in their
-> suspend/resume methods. The driver model provides assistance to set the
-> IRQ wake support which may assist driver authors in achieving the
-> necessary configuration.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+I've updated the description as I think patch 4 needs a repost:
+
++/**
++ * phy_may_wakeup() - indicate whether PHY has wakeup enabled
++ * @phydev: The phy_device struct
++ *
++ * Returns: true/false depending on the PHY driver's device_set_wakeup_enabled()
++ * setting if using the driver model, otherwise the legacy determination.
++ */
++bool phy_may_wakeup(struct phy_device *phydev);
++
+
+Do you want me to still add your r-b?
+
 -- 
-Florian
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
