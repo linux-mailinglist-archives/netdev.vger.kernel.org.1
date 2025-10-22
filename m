@@ -1,78 +1,143 @@
-Return-Path: <netdev+bounces-231692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42F6FBFCB97
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 16:58:17 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BAF7BFCAFB
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 16:53:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16B706E36D8
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 14:50:28 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5FB71501975
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 14:51:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9438B34D4DB;
-	Wed, 22 Oct 2025 14:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55C834E759;
+	Wed, 22 Oct 2025 14:49:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nxffNB4L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rQGkMyMz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E823347FEC
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 14:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6AA34C99D;
+	Wed, 22 Oct 2025 14:49:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761144497; cv=none; b=fwZhTUSlq9aQlNwnr6KD7q/zSYY6M1ybXmxLi4WbtX4zt7k3PsJpW0Iu/mUH1xWeoHJBjPqKwAyO77G0aNi+B7UdwLXVkTd/kKcSU7EP0LtY5F8CNe7f7UZ6WEW117UzbJ7pN+t6QJaCVMHTag9kwO6t1TV5TlmmzpVRpo9LM/U=
+	t=1761144586; cv=none; b=Do44fcO8X8hrD6OllDRV4vRN8Le7xpMKbE1RMPoZZnZfhptzBstPLVoAK4YNTN8r6xy1Eu/Z2S+Ntkt5I42bXCs3ZEYnFYv/6DMGJmFQi8QJggfmTLrhXfnRxGDXLylnVcIh/MX2dMnDHErLOlg+uCSMJGIwTE15jRZ2Ii9VaAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761144497; c=relaxed/simple;
-	bh=3EkH0sa2eXpE4fErqxGg2HLpYctPFuUlQHQ8YpxpWMw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HPF1I3WmvONPgg8WBom94QgMFq52wFxcvRqvd7umiNJBOxZj8Pk4XL16mLkyF6eypVwDdYt8m2qsu1p2aGJjNILwj58zzQvwKLiczvf95P5ioLdtX+Xc3kaBipFyiFcDmtswIptn2J7tOEdCsT/JEFy+pFfV9k3NbLYnSxr4B74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nxffNB4L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C378AC4CEE7;
-	Wed, 22 Oct 2025 14:48:14 +0000 (UTC)
+	s=arc-20240116; t=1761144586; c=relaxed/simple;
+	bh=h0sYHm0Xo+3NIn59BPTKhxZ35jHlbCrDCGDtkpfDB+U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bwmLo/KcI55G7AcTdqR7fSBxAo8mVsiZFsVuVTSun8GK8lNmqOFRn5NtpKCFr5Zl6D+r6LG6l+LIClPN4cLjvsDLv8dxDAqzU14rR/M1kPybXBuAm3Qk4vs0rhTl5np5/VjBHAcuHAFODt1cBjE4KPxaFqrBxqywZUws8DQ5W2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rQGkMyMz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF08AC116D0;
+	Wed, 22 Oct 2025 14:49:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761144496;
-	bh=3EkH0sa2eXpE4fErqxGg2HLpYctPFuUlQHQ8YpxpWMw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nxffNB4LsLQ1/IdjCbmcr0ovnH3/ifdnsyNzy5wTP5cFItXN+4UsJ8H8ing8vHu6f
-	 GcUVsfrT9cTI41kmq4NHEgYVjqkTpS7t6cXwFZMb9HKR3eqAdxkuJ0tXYrc/ikM/td
-	 SQsLWvd0tYEEwetsqgU6thRFODS2loYtX5He20QpeNXVye1kLlqxEIicmBBg2JC5BC
-	 GI4tmBTQkzvt1jUszH6O3EjHTfxCRZYTdl3u3AnvwbXPc23lv/Dnb4wu7v0g9quCph
-	 2Cc9E5ejALTgjKnEgS479F1dF9iqTWPcLGzLJJ1DsM7p4gT1vbRSiFvR8RYkyQ/0ri
-	 0bDbGEVEdsnxA==
-Date: Wed, 22 Oct 2025 15:48:12 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch, kuba@kernel.org, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	alok.a.tiwarilinux@gmail.com
-Subject: Re: [PATCH net-next] igbvf: fix misplaced newline in VLAN add
- warning message
-Message-ID: <aPjurC9zjCBX1A_P@horms.kernel.org>
-References: <20251021193203.2393365-1-alok.a.tiwari@oracle.com>
+	s=k20201202; t=1761144586;
+	bh=h0sYHm0Xo+3NIn59BPTKhxZ35jHlbCrDCGDtkpfDB+U=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=rQGkMyMzZ0W1dXxFtaDUJ715Jd2eVM5WLt3VVPCTmpbcr6Xb+cV9YMb6+/jzw9eK4
+	 Au6BG8/eu2CKERkHz+tZBQfjb5sNATxH9rt6M2PRZcTjXKjAvs3HatHcKVAS9dIHFt
+	 7KHg+KTpV/Rh2c7O5FxG+aTHHxD1nb1A+SOBaezi83w2gYQ0+sB8ngRDVb1ppYYZ4l
+	 P+ZEQsIjFbFOb+eZgp3t8mQZNIdNuzxVOdoGSYsyRGVi5eou2+Vtk04wS/NeviMsfq
+	 RkuE1fAEHF4Zw30DAVj1D9LSpticQAr1ODyjwIvEXbYs6s76TEXKxVgv3mqZ1My2bA
+	 vLW/cOhRJ0LkQ==
+Message-ID: <946ceea8-eb58-4140-aa5a-94605cd697ce@kernel.org>
+Date: Wed, 22 Oct 2025 16:49:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251021193203.2393365-1-alok.a.tiwari@oracle.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next] mptcp: add implicit flag to the 'ip mptcp'
+ inline help
+Content-Language: en-GB, fr-BE
+To: Andrea Claudi <aclaudi@redhat.com>,
+ Stephen Hemminger <stephen@networkplumber.org>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+ MPTCP Linux <mptcp@lists.linux.dev>
+References: <0a81085b8be2bee69cf217d2379e87730c28b1c1.1761074697.git.aclaudi@redhat.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <0a81085b8be2bee69cf217d2379e87730c28b1c1.1761074697.git.aclaudi@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 21, 2025 at 12:32:01PM -0700, Alok Tiwari wrote:
-> Corrected the dev_warn format string:
-> - "Vlan id %d\n is not added" -> "Vlan id %d is not added\n"
+Hi Andrea,
+
+Sorry, I'm reacting a bit too late here (but Stephen applied the patch
+very quickly :) ).
+
+On 21/10/2025 21:26, Andrea Claudi wrote:
+> ip mptcp supports the implicit flag since commit 3a2535a41854 ("mptcp:
+> add support for implicit flag"), however this flag is not listed in the
+> command inline help.
 > 
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> Add the implicit flag to the inline help.
 
-Interesting, there seem to be some other cases of this, at least under
-net/divers. Do you plan to address those too?
+I would rather not: as written in the man page (by you in the mentioned
+commit :) ) "Implicit endpoints cannot be created from user-space". Such
+endpoints can be created by the MPTCP in-kernel path-manager in some
+circumstances, but if the user-space cannot set the flag, then probably
+better not to add it in the command inline help, no?
 
-In any case, looks good to me.
+If someone tries to create an "implicit" endpoint, the kernel will
+reject this request, see:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+https://elixir.bootlin.com/linux/v6.17/source/net/mptcp/pm_kernel.c#L813
+
+I can send a revert. I have other small changes to send.
+
+@Stephen: while at it, would it be OK if I also add an entry for files
+linked related to MPTCP in the MAINTAINERS file?
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
