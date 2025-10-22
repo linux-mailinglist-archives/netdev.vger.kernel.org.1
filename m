@@ -1,216 +1,157 @@
-Return-Path: <netdev+bounces-231847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5ACEBFDFD1
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 21:16:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9A25BFDFE1
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 21:17:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E7751A60EB4
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 19:16:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64B7E188E3DB
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 19:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9556B257824;
-	Wed, 22 Oct 2025 19:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C42532A3F2;
+	Wed, 22 Oct 2025 19:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oe9mta9v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF1B1F4C9F
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 19:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4843F32860B
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 19:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761160573; cv=none; b=riOXX1nvcpaviMpKy6jeDQ3HXKraOymouIh9uz6772ToP9s1k7VMptzj+D53Jzpm6Sxj/OwjnEDCgxEl5/BOyU+Wbvlf2lztfy/Z1RdqnAjer2WZ11okflU+MuRAKhFWpBMeKe6L/8oaHfPCsghWahP8+3mWkqakYXLgG5GwCuM=
+	t=1761160637; cv=none; b=OAsBbDU5bqPaxeN80EGpShzRQxlZcmJP7sfx+DXVEujOO6EpTpMjA69Hba3HaleHj2Xxcl2hCcoDfUYwCnk1qyx1mSYKKunEWMQcAZCEFkp/SXomhpI+TglBFWO7oeQnBFOL15OZ1sf3OlWj10osTekIRI15k9/DWctdJqR4hfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761160573; c=relaxed/simple;
-	bh=jTqzqpq0wKiEGFhz2E0f2SrvJaKKx2gYXx+fetZYG/I=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=r/5SXnYtEgrnNQV88gGIIEg5z+ppowTN/RbhXZ/qgYYnnHKnHws3aZo1/EGez9Rnywm4figoDG2xfOqGOR2+miljCw5k9qD8Mgg7kIEf2fIpwqjO938CUqzv6icTL3eWodrxtv7sGLFxBgWO88gOA9KCqTxkH9G0EY9LZ+VBfcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-93e7ece2ff4so1710279439f.2
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 12:16:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761160570; x=1761765370;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xVAwk4TZwAsOUy7yFniWKauZ87Pvr8R3p3UyVOapIqY=;
-        b=aMxbQIytXKTrXOhe+rIaWKBpq69HtATaDHeUIoDlpv/+BfwTz9Emd46hY37AB8fhSk
-         C9DlYdHc1Q5lzcb1MACNzZPPXJ8S9zWjniGHp8X0v/qlngtqJnOvbWSOSJ7AHvniTcsT
-         fNMiGMgZ+4LSEF8/u0X8on6pqWb42JM57wMJM5bgyNM9TqorrmlIZB9xrwxmvpQOX3Tf
-         yM8anhIJ3sJm49xwRWbU8KwufTCEXBkRdAc2VrWFyi3uTWv5Y6dlFshAxaupcUbAmiFH
-         OHuhgJ4ftZN/ZFZAH9r0LScQbc0+qYdfRR31IrZ7+uTrHrHcUG67NLcn1b4YEjjzlcoe
-         +Ilw==
-X-Forwarded-Encrypted: i=1; AJvYcCW3TeCgxWoDWOsHmtDXVcomfBnKAVBb5jq2GYuO1D+ZkO1VXFJqagnb/CkoP3xGv3/6Qpqi+Gk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXge1I90KEt4eJLGSosPYQorVayJoTEV/H7jLvPCeVXjhUOGe1
-	E3cmsQqvRO6K8wgdPnMsebcgvumpreTTTYGNMxMPcwtmkNFNkEDXndpMusGLt3yIgF4MeD0ZgjA
-	9ol5Riq1n2cV2TQWE982BUUZqo93obrRPUJbghS2HrDO7Z0iSKixQtCGrqBk=
-X-Google-Smtp-Source: AGHT+IE9YMgRXbsiBihlZmXvuOwlYJ4oAY1aAdGjqEgMOZ45S4fxNHwYERqLkPKagaAfa1OpMchm7B1RZCBA6JqTCf4avvHGfRRz
+	s=arc-20240116; t=1761160637; c=relaxed/simple;
+	bh=a9X0pbkHIsKsJCwPaKQgVXDkb5RtA6GrXmDnL4jrNtE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EdA2fkGmakLyfxMcXtps3rRb1R9XtV2Qp1T8BfwyMeb1XFOsxylLEi7tTkOfjGBwYKjIjJWoaj+KqIeehMlpA3FWdU3DpHZrel+23MHQYyGfz36z23j7PKOFyXDRMJSfg2zPuTkUBiL6ldxzy5tcsSr7wnZEysPiVbNlu1vg+DE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oe9mta9v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B694DC4CEE7
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 19:17:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761160636;
+	bh=a9X0pbkHIsKsJCwPaKQgVXDkb5RtA6GrXmDnL4jrNtE=;
+	h=From:To:Subject:Date:From;
+	b=oe9mta9vwOhMjHLUYZucGrPj8E6nnHluSE9lIxQDeKlWibXXmpsUL17ARJAa00qU+
+	 byfPhZwdfddNudoOk+fnKolNkmiM43PFTp8By9m3wJNunKxoerTCR/fCAWzzUDhatq
+	 i2R8Qmnx9YDheWlDmZZFNtdFV7hzoAoa3lACoRG1M48/zOAiKbtwmQBZHl4CtJz44i
+	 BRH4nHxjMS7lRafvaqhXq9rvXaQePZ7Db580nS/xydrfqypnZ2Itd/Jl8drF4VP3eD
+	 BhgLc80bKKTuQ0i+9pALXeiwtUMKmHPjuV82jeHnNDxiGcd8bpPKE5H2nKOC2KjHGc
+	 YWdGhxtpt4Tdg==
+From: Allison Henderson <achender@kernel.org>
+To: netdev@vger.kernel.org
+Subject: [RFC 00/15] net/rds: RDS-TCP bug fix collection
+Date: Wed, 22 Oct 2025 12:17:00 -0700
+Message-ID: <20251022191715.157755-1-achender@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:2c05:b0:940:f0a7:30d7 with SMTP id
- ca18e2360f4ac-940f0a7354emr996339639f.15.1761160570591; Wed, 22 Oct 2025
- 12:16:10 -0700 (PDT)
-Date: Wed, 22 Oct 2025 12:16:10 -0700
-In-Reply-To: <20251022-work-namespace-nstree-listns-v2-0-71a588572371@kernel.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68f92d7a.a70a0220.3bf6c6.0023.GAE@google.com>
-Subject: [syzbot ci] Re: nstree: listns()
-From: syzbot ci <syzbot+cia016abba7fbbfb27@syzkaller.appspotmail.com>
-To: amir73il@gmail.com, arnd@arndb.de, bpf@vger.kernel.org, brauner@kernel.org, 
-	cgroups@vger.kernel.org, cyphar@cyphar.com, daan.j.demeyer@gmail.com, 
-	edumazet@google.com, hannes@cmpxchg.org, jack@suse.cz, jannh@google.com, 
-	jlayton@kernel.org, josef@toxicpanda.com, kuba@kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, me@yhndnzj.com, 
-	mzxreary@0pointer.de, netdev@vger.kernel.org, tglx@linutronix.de, 
-	tj@kernel.org, viro@zeniv.linux.org.uk, zbyszek@in.waw.pl
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-syzbot ci has tested the following series
+From: Allison Henderson <allison.henderson@oracle.com>
 
-[v2] nstree: listns()
-https://lore.kernel.org/all/20251022-work-namespace-nstree-listns-v2-0-71a588572371@kernel.org
-* [PATCH v2 01/63] libfs: allow to specify s_d_flags
-* [PATCH v2 02/63] nsfs: use inode_just_drop()
-* [PATCH v2 03/63] nsfs: raise DCACHE_DONTCACHE explicitly
-* [PATCH v2 04/63] pidfs: raise DCACHE_DONTCACHE explicitly
-* [PATCH v2 05/63] nsfs: raise SB_I_NODEV and SB_I_NOEXEC
-* [PATCH v2 06/63] cgroup: add cgroup namespace to tree after owner is set
-* [PATCH v2 07/63] nstree: simplify return
-* [PATCH v2 08/63] ns: initialize ns_list_node for initial namespaces
-* [PATCH v2 09/63] ns: add __ns_ref_read()
-* [PATCH v2 10/63] ns: add active reference count
-* [PATCH v2 11/63] ns: use anonymous struct to group list member
-* [PATCH v2 12/63] nstree: introduce a unified tree
-* [PATCH v2 13/63] nstree: allow lookup solely based on inode
-* [PATCH v2 14/63] nstree: assign fixed ids to the initial namespaces
-* [PATCH v2 15/63] ns: maintain list of owned namespaces
-* [PATCH v2 16/63] nstree: add listns()
-* [PATCH v2 17/63] arch: hookup listns() system call
-* [PATCH v2 18/63] nsfs: update tools header
-* [PATCH v2 19/63] selftests/filesystems: remove CLONE_NEWPIDNS from setup_userns() helper
-* [PATCH v2 20/63] selftests/namespaces: first active reference count tests
-* [PATCH v2 21/63] selftests/namespaces: second active reference count tests
-* [PATCH v2 22/63] selftests/namespaces: third active reference count tests
-* [PATCH v2 23/63] selftests/namespaces: fourth active reference count tests
-* [PATCH v2 24/63] selftests/namespaces: fifth active reference count tests
-* [PATCH v2 25/63] selftests/namespaces: sixth active reference count tests
-* [PATCH v2 26/63] selftests/namespaces: seventh active reference count tests
-* [PATCH v2 27/63] selftests/namespaces: eigth active reference count tests
-* [PATCH v2 28/63] selftests/namespaces: ninth active reference count tests
-* [PATCH v2 29/63] selftests/namespaces: tenth active reference count tests
-* [PATCH v2 30/63] selftests/namespaces: eleventh active reference count tests
-* [PATCH v2 31/63] selftests/namespaces: twelth active reference count tests
-* [PATCH v2 32/63] selftests/namespaces: thirteenth active reference count tests
-* [PATCH v2 33/63] selftests/namespaces: fourteenth active reference count tests
-* [PATCH v2 34/63] selftests/namespaces: fifteenth active reference count tests
-* [PATCH v2 35/63] selftests/namespaces: add listns() wrapper
-* [PATCH v2 36/63] selftests/namespaces: first listns() test
-* [PATCH v2 37/63] selftests/namespaces: second listns() test
-* [PATCH v2 38/63] selftests/namespaces: third listns() test
-* [PATCH v2 39/63] selftests/namespaces: fourth listns() test
-* [PATCH v2 40/63] selftests/namespaces: fifth listns() test
-* [PATCH v2 41/63] selftests/namespaces: sixth listns() test
-* [PATCH v2 42/63] selftests/namespaces: seventh listns() test
-* [PATCH v2 43/63] selftests/namespaces: ninth listns() test
-* [PATCH v2 44/63] selftests/namespaces: ninth listns() test
-* [PATCH v2 45/63] selftests/namespaces: first listns() permission test
-* [PATCH v2 46/63] selftests/namespaces: second listns() permission test
-* [PATCH v2 47/63] selftests/namespaces: third listns() permission test
-* [PATCH v2 48/63] selftests/namespaces: fourth listns() permission test
-* [PATCH v2 49/63] selftests/namespaces: fifth listns() permission test
-* [PATCH v2 50/63] selftests/namespaces: sixth listns() permission test
-* [PATCH v2 51/63] selftests/namespaces: seventh listns() permission test
-* [PATCH v2 52/63] selftests/namespaces: first inactive namespace resurrection test
-* [PATCH v2 53/63] selftests/namespaces: second inactive namespace resurrection test
-* [PATCH v2 54/63] selftests/namespaces: third inactive namespace resurrection test
-* [PATCH v2 55/63] selftests/namespaces: fourth inactive namespace resurrection test
-* [PATCH v2 56/63] selftests/namespaces: fifth inactive namespace resurrection test
-* [PATCH v2 57/63] selftests/namespaces: sixth inactive namespace resurrection test
-* [PATCH v2 58/63] selftests/namespaces: seventh inactive namespace resurrection test
-* [PATCH v2 59/63] selftests/namespaces: eigth inactive namespace resurrection test
-* [PATCH v2 60/63] selftests/namespaces: ninth inactive namespace resurrection test
-* [PATCH v2 61/63] selftests/namespaces: tenth inactive namespace resurrection test
-* [PATCH v2 62/63] selftests/namespaces: eleventh inactive namespace resurrection test
-* [PATCH v2 63/63] selftests/namespaces: twelth inactive namespace resurrection test
+Hi all,
 
-and found the following issue:
-general protection fault in copy_creds
+This set is a collection of  bug-fixes we've been working on for RDS.
 
-Full report is available here:
-https://ci.syzbot.org/series/edb88bd4-fe2f-4399-a44b-69d30faa57fb
+This series was last seen in April, but further testing turned up
+additional bugs that we thought best to address as part of the same
+effort. So the series has grown a bit, and I’ve restarted versioning
+since the set sent last spring. Many of the April patches are retained
+here though.
 
-***
+To refresh: under stress testing, RDS has shown dropped or
+out-of-sequence message issues. These patches address those problems,
+together with a bit of work queue refactoring.
 
-general protection fault in copy_creds
+Since the April posting, patches 2, 3, 6 and 10–16 are new. To ease
+reviewing, I was thinking we could split the set into smaller logical
+subsets.  Maybe something like this:
 
-tree:      bpf
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/bpf/bpf.git
-base:      5fb750e8a9ae123b2034771b864b8a21dbef65cd
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/b6fa4981-93e1-4b9c-a4b4-a1be1c33d835/config
+Workqueue scalability (subset 1)
+net/rds: Add per cp work queue
+net/rds: Give each connection its own workqueue
 
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000012: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000090-0x0000000000000097]
-CPU: 1 UID: 0 PID: 5952 Comm: syz-executor Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:copy_creds+0x473/0xd10
-Code: 6a 8b e8 a0 76 0f 00 48 c7 c7 e0 cd 13 8e 48 89 de e8 81 5c 0f 00 e8 6c 01 19 00 ba 01 00 00 00 4c 89 f7 31 f6 e8 6d 99 00 00 <41> 80 7c 24 12 00 74 0a bf 90 00 00 00 e8 eb bc 97 00 4c 8b 34 25
-RSP: 0018:ffffc900045d7938 EFLAGS: 00010286
-RAX: 0000000000000131 RBX: ffffffff818e8499 RCX: ffff88810d1ad700
-RDX: 0000000000000000 RSI: 7fffffffffffffff RDI: 0000000000000131
-RBP: 0000000000000001 R08: ffffffff8dfef75f R09: 1ffffffff1bfdeeb
-R10: dffffc0000000000 R11: fffffbfff1bfdeec R12: dffffc0000000000
-R13: 0000000000010000 R14: ffffffff8dfef6c0 R15: 1ffff110216064bd
-FS:  000055558d65c500(0000) GS:ffff8882a9d02000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fd1e15c36f0 CR3: 000000011b786000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- copy_process+0x964/0x3c00
- kernel_clone+0x21e/0x840
- __se_sys_clone3+0x256/0x2d0
- do_syscall_64+0xfa/0xfa0
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fd1e15c3709
-Code: d6 08 00 48 8d 3d bc d6 08 00 e8 02 29 f6 ff 66 90 b8 ea ff ff ff 48 85 ff 74 2c 48 85 d2 74 27 49 89 c8 b8 b3 01 00 00 0f 05 <48> 85 c0 7c 18 74 01 c3 31 ed 48 83 e4 f0 4c 89 c7 ff d2 48 89 c7
-RSP: 002b:00007fff0ae99118 EFLAGS: 00000202 ORIG_RAX: 00000000000001b3
-RAX: ffffffffffffffda RBX: 00007fd1e1545b10 RCX: 00007fd1e15c3709
-RDX: 00007fd1e1545b10 RSI: 0000000000000058 RDI: 00007fff0ae99160
-RBP: 00007fd1e13ff6c0 R08: 00007fd1e13ff6c0 R09: 00007fff0ae99247
-R10: 0000000000000008 R11: 0000000000000202 R12: ffffffffffffffa8
-R13: 0000000000000009 R14: 00007fff0ae99160 R15: 00007fff0ae99248
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:copy_creds+0x473/0xd10
-Code: 6a 8b e8 a0 76 0f 00 48 c7 c7 e0 cd 13 8e 48 89 de e8 81 5c 0f 00 e8 6c 01 19 00 ba 01 00 00 00 4c 89 f7 31 f6 e8 6d 99 00 00 <41> 80 7c 24 12 00 74 0a bf 90 00 00 00 e8 eb bc 97 00 4c 8b 34 25
-RSP: 0018:ffffc900045d7938 EFLAGS: 00010286
-RAX: 0000000000000131 RBX: ffffffff818e8499 RCX: ffff88810d1ad700
-RDX: 0000000000000000 RSI: 7fffffffffffffff RDI: 0000000000000131
-RBP: 0000000000000001 R08: ffffffff8dfef75f R09: 1ffffffff1bfdeeb
-R10: dffffc0000000000 R11: fffffbfff1bfdeec R12: dffffc0000000000
-R13: 0000000000010000 R14: ffffffff8dfef6c0 R15: 1ffff110216064bd
-FS:  000055558d65c500(0000) GS:ffff8882a9d02000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fed5f717d60 CR3: 000000011b786000 CR4: 00000000000006f0
+Bug fixes (subset 2)
+net/rds: Change return code from rds_send_xmit() when lock is taken
+net/rds: No shortcut out of RDS_CONN_ERROR
+net/rds: rds_tcp_accept_one ought to not discard messages
+
+Protocol/extension fixes (subset 3)
+net/rds: new extension header: rdma bytes
+net/rds: Encode cp_index in TCP source port
+net/rds: rds_tcp_conn_path_shutdown must not discard messages
+net/rds: Kick-start TCP receiver after accept
+net/rds: Clear reconnect pending bit
+net/rds: Use the first lane until RDS_EXTHDR_NPATHS arrives
+net/rds: Trigger rds_send_hs_ping() more than once
+
+Send path and fan-out fixes (subset 4)
+net/rds: Delegate fan-out to a background worker
+net/rds: Use proper peer port number even when not connected
+net/rds: rds_sendmsg should not discard payload_len
+
+If this breakdown seems useful, we can start with just the first set
+and I'll keep with a branch with the full set available for those who
+want to look ahead.  Otherwise I’ll keep the full set together.  Let me
+know what would be most helpful.
+
+Questions, comments, flames appreciated!
+Thanks,
+Allison
 
 
-***
+Allison Henderson (2):
+  net/rds: Add per cp work queue
+  net/rds: rds_sendmsg should not discard payload_len
 
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
+Gerd Rausch (8):
+  net/rds: No shortcut out of RDS_CONN_ERROR
+  net/rds: rds_tcp_accept_one ought to not discard messages
+  net/rds: Encode cp_index in TCP source port
+  net/rds: rds_tcp_conn_path_shutdown must not discard messages
+  net/rds: Kick-start TCP receiver after accept
+  net/rds: Use the first lane until RDS_EXTHDR_NPATHS arrives
+  net/rds: Trigger rds_send_ping() more than once
+  net/rds: Delegate fan-out to a background worker
 
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+Greg Jumper (1):
+  net/rds: Use proper peer port number even when not connected
+
+Håkon Bugge (3):
+  net/rds: Give each connection its own workqueue
+  net/rds: Change return code from rds_send_xmit() when lock is taken
+  net/rds: Clear reconnect pending bit
+
+Shamir Rabinovitch (1):
+  net/rds: new extension header: rdma bytes
+
+ net/rds/connection.c  |  25 ++++-
+ net/rds/ib.c          |   5 +
+ net/rds/ib_recv.c     |   2 +-
+ net/rds/ib_send.c     |  21 +++-
+ net/rds/message.c     |  66 +++++++++---
+ net/rds/rds.h         |  97 +++++++++++------
+ net/rds/recv.c        |  39 ++++++-
+ net/rds/send.c        | 136 +++++++++++++++---------
+ net/rds/stats.c       |   1 +
+ net/rds/tcp.c         |  31 +++---
+ net/rds/tcp.h         |  34 ++++--
+ net/rds/tcp_connect.c |  70 +++++++++++-
+ net/rds/tcp_listen.c  | 240 +++++++++++++++++++++++++++++++++++-------
+ net/rds/tcp_recv.c    |   6 +-
+ net/rds/tcp_send.c    |   4 +-
+ net/rds/threads.c     |  17 +--
+ 16 files changed, 618 insertions(+), 176 deletions(-)
+
+-- 
+2.43.0
+
 
