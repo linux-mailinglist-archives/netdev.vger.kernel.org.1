@@ -1,94 +1,99 @@
-Return-Path: <netdev+bounces-231868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C4F3BFE0E3
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 21:37:02 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4831BFE0E6
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 21:37:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA4CF3A4424
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 19:37:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8E8E84E16C8
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 19:37:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BF12F39D7;
-	Wed, 22 Oct 2025 19:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBA02F5466;
+	Wed, 22 Oct 2025 19:37:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ao9KTbJS"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="JaL73+ye"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0F829B8EF
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 19:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C1C2F60B4;
+	Wed, 22 Oct 2025 19:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761161818; cv=none; b=pwg8CwEnAwgKr1yoZ0iEghcZB6gODQAA+vaVK0a6zcr3+Oz+VRisNAdRZ5EeO2gBLDp8ThNBf2aCXEVU/yZF9AlKmKtLB1F8EuNF/geUN8+Yui2JjJ1MK927kk7Cu8sfgC509ZWYaId1cnVuwnaOews9BugpxUo0SLlEhohR8ts=
+	t=1761161842; cv=none; b=briKdrFfpiu6kwXL58GPxynh2K30ZulyTHLt77HrtDGTpSJlKd/O++V2Ecg/TDCkPgINm1wi44oyRlGwRf8IWpfnjGdOvPVYlnGvS3MYQGM3erDOiCyc5AT7qRKMqkbsrLs9Dn6QvcPSXYBfWP8BEx8qEZ4JS1pncKvOMgIMxL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761161818; c=relaxed/simple;
-	bh=fBOtIzcXjE7IPDheJl/AziHiueCgicpzGFj02ZSzMVQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I6KCSF/4QcAD4d4Znq7hs62NOKBQX7svJKFNhNt460UXiMq06m8fLFMGBComi2khvjfd6w0loe9DlxNNwp+6P5IR6LP7J/8WZ7U8LKs04+x+5hlvqUKycglpAb/34kSQhfOmjyJ5BAdGqfgq2MNtQAaYL+bgXUcAIRD3vFrolnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ao9KTbJS; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=safbpmwl5fLs708AHrDZ84M9WSTNjMNRo/APE6jZwn0=; b=ao9KTbJScHRgVPJ8ziAqheQ0Oy
-	lu7ZD++nE80j1iU47Q7XFfgtedyowInufQBkL8QtOxIann/cF2vxCSFr/krzqP1YEnskBIL5taj65
-	5ub2gPYWm8fmseDLQW6BcUWETQ67tdfN1BiktagSS8X3jeRK3trm4nN0cwnXYsatXLew=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vBedi-00Bo56-8w; Wed, 22 Oct 2025 21:36:54 +0200
-Date: Wed, 22 Oct 2025 21:36:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Johannes Eigner <johannes.eigner@a-eberle.de>
-Cc: netdev@vger.kernel.org, Michal Kubecek <mkubecek@suse.cz>,
-	Danielle Ratson <danieller@nvidia.com>,
-	Stephan Wurm <stephan.wurm@a-eberle.de>
-Subject: Re: [PATCH ethtool v2 0/2] fix module info JSON output
-Message-ID: <9859b471-5635-4e8c-bd63-00919b4a0965@lunn.ch>
-References: <20251022-fix-module-info-json-v2-0-d1f7b3d2e759@a-eberle.de>
+	s=arc-20240116; t=1761161842; c=relaxed/simple;
+	bh=0TYebRvbuZCp2Egy8udf+FKsqp2mhDPfM30PftmeBPI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SzXbeIPrHD5lSx2IAfTkfmj7H0KYYwXSY4VlJOnFGXIQmzSQGUggnNuZJkXObYiMzaNJUNlcAVnBZBJsiklWBhSpaORDOdONWIW4N54cUeZbuoPpiPyzMTy922ygossxE+DfxpczjCdwVEifn23LxBMt6Q7dcTgSg7u4RSCcuVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=JaL73+ye; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1761161836;
+	bh=0TYebRvbuZCp2Egy8udf+FKsqp2mhDPfM30PftmeBPI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=JaL73+yewkM1u0JVqVbdzqOZ0k5bEAE8enr/czIZCAu4E1DFnYsODfPZM67ZPIHlJ
+	 5t2BkJbFQCNTkUqpV8+jvBxvQ2mHY1LoYUEbtl1A0tuuPw72l18ZdOJ4/mse4SmJWJ
+	 PvuyJNa6DS/G9FvZH1AbuPREyiQH9scSQkuJNkTLeo6r6eSaq/eIoSmYXGkfnskR2M
+	 xzFdqOsrbXWwL6PgfZzTgA0eSt6oSyhBLXJVm47WVJ6YP1m7zbFNyYt3pqFN/nEirO
+	 MekL1023ispxU3c3KD0kD4mc/X3kPNjCzYskasLETjuTUTwno46U4AaZlSVrZdBZE/
+	 ThuNP2NL1X47g==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 66F0B6000C;
+	Wed, 22 Oct 2025 19:37:15 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id 41751201540;
+	Wed, 22 Oct 2025 19:37:11 +0000 (UTC)
+Message-ID: <e9cd34d4-2970-462a-9c80-bf6d55ccb6ff@fiberby.net>
+Date: Wed, 22 Oct 2025 19:37:10 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251022-fix-module-info-json-v2-0-d1f7b3d2e759@a-eberle.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/4] tools: ynl: add start-index property for indexed
+ arrays
+To: Zahari Doychev <zahari.doychev@linux.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: donald.hunter@gmail.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, jacob.e.keller@intel.com,
+ matttbe@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ johannes@sipsolutions.net
+References: <20251018151737.365485-1-zahari.doychev@linux.com>
+ <20251018151737.365485-5-zahari.doychev@linux.com>
+ <20251020163221.2c8347ea@kernel.org>
+ <75gog4sxd6oommzndamgddjbz3jrrrpbmnd4rhxg4khjg3rnnp@tlciirwh5cig>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <75gog4sxd6oommzndamgddjbz3jrrrpbmnd4rhxg4khjg3rnnp@tlciirwh5cig>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 22, 2025 at 04:52:42PM +0200, Johannes Eigner wrote:
-> In one of our products we need to show the SFP diagnostics in a web
-> interface. Therefore we want to use the JSON output of the ethtool
-> module information. During integration I found two problems.
+On 10/21/25 5:50 PM, Zahari Doychev wrote:
+> On Mon, Oct 20, 2025 at 04:32:21PM -0700, Jakub Kicinski wrote:
+>> We need to be selective about what API stupidity we try to
+>> cover up in YNL. Otherwise the specs will be unmanageably complex.
+>> IMO this one should be a comment in the spec explaining that action
+>> 0 is ignore and that's it.
+>>
 > 
-> When using `ethtool -j -m sfpX` only the basic module information was
-> JSON formatted, the diagnostics part was not. First patch ensures whole
-> module information output is JSON formatted for SFP modules.
+> I am not sure if this applies for all cases of indexed arrays. For sure
+> it applies for the tc_act_attrs case but I need to check the rest again.
 > 
-> The same keys were used for both the actual and threshold values in the
-> diagnostics JSON output, which is not valid JSON. Second patch avoids
-> this by renaming the threshold keys.
-> This solution is not backward compatible. I don't see a possibility to
-> fix this in a backward compatible way. If anyone knows a solution,
-> please let me know so I can improve the patch.
-> Another solution for the second patch would be to rename the keys for
-> the actual values instead of the thresholds. But this is also not
-> backward compatible. I decided to rename the threshold keys, as this
-> aligns with the naming used for the warning and alarm flags.
-> Second bug is definitely affecting SFP modules and maybe also affecting
-> QSFP and CMIS modules. Possible bug for QSFP and CMIS modules are based
-> on my understanding of the code only. I have only access to hardware
-> supporting SFP modules.
-> 
-> Signed-off-by: Johannes Eigner <johannes.eigner@a-eberle.de>
+> Do you think it would be fine to start from 1 for all indexed arrays?
+Yes, AFAICT it would. Most of indexed-array attributes that are parsed by
+the kernel uses nla_for_each_nested(), and don't use the index. The TC
+actions are the only ones I found, that are parsed into a nlattr array.
 
-So there are still some open discussions on v1 of these
-patches. Please don't merge this version yet.
+Disclaimer: I have only mapped out the indexed-arrays that are declared in
+the current specs.
 
-	 Andrew
+See patch 4-7 in this series for the full analysis:
+https://lore.kernel.org/netdev/20251022182701.250897-1-ast@fiberby.net/
 
