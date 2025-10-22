@@ -1,168 +1,148 @@
-Return-Path: <netdev+bounces-231573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7392ABFAB8B
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 09:58:46 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C522CBFABA0
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 09:59:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25C2C18977FD
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 07:59:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 57A11504DE2
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 07:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F432FE598;
-	Wed, 22 Oct 2025 07:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B7D2FF16B;
+	Wed, 22 Oct 2025 07:59:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="MOIaNm8d"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="gaNqaGBX"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D6F2FE59A;
-	Wed, 22 Oct 2025 07:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB3B2FE59B
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 07:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761119908; cv=none; b=dEXZ7wg/tlXF2QPuyj46Auw6gtQ8osOJkhI69fPy5B0Q+2G5PO7XlWuaJn61W1xPOlPpXFxWqfmFygIEonhVgQ8iNthL5BqAtXjbacI8o7Hxufk9jJWwEnd5D+/XAnex7tsTszR90oisvD/NeqEc1LFiQFRc5iwKLvQgA6NsuTk=
+	t=1761119943; cv=none; b=rW2kIWCctZG23lOmV4o5uojcWjbAkTxijzQW+9s9b7sqKiAnwQblySy4TZmo6TJ3jQwWHKpuy+wEnoi9Aqac1ImX7ss7fxFr8nKWwO2EhJzAenJVhow3CZGvu+2o86hJtNFqlcZN7xKxjB4hKFAb0aEBK1HR+vm94AWtIfB9Re0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761119908; c=relaxed/simple;
-	bh=/dM6Iq8oa787huqymjEo36xu+0zARKREn4b1f8LhZjU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q0IESjKVx2a6gtAJKjTUQq7y7wu9LHQZsX4LIQ6PVy4fGmnXF0JULdqfOBIGhbpKBuZzN24wQfIfFT5DpLhiFWLq+0kNR2O1AQUTyeCsmV/C8EUz8cvdsRQjPHdgrr0dDjRIEblsiRY316bfAbMEqrib4LztcwZIhdAvKf/ziuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=MOIaNm8d; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1761119906; x=1792655906;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/dM6Iq8oa787huqymjEo36xu+0zARKREn4b1f8LhZjU=;
-  b=MOIaNm8djzKwKjOCs/GpO5MY77hEOWNe+r8Ag26o0LhrYZXr0bWJm0hc
-   JBptxBuQqZSTv9YNupJckZuY5BfP7OXlpY3A3bjDU/SqpIODuOWFrsljd
-   +5/OkGzxzHDLiDrIfXlMZJZR/qGYi5bGwKybgZYYrpzzgYnN5BT++hbCH
-   9DEOBcynMnHum0ArreSgMoZNs8e2gAbsBbwxVSxyfc/rxrAqczrNTsbGE
-   6NJ1vX6BWeZsT2IHNeNsDWizQgoI0gGK8LAJZw+/OIxmfBn7qpZ9vxdFN
-   XT/+6Ujyxpj866dtk7tqM8wCUvVujYHmmxA5QxwbWKorHOcIv6mzLny79
-   g==;
-X-CSE-ConnectionGUID: bXoNwrFvQ+2mZ7nz08/S7A==
-X-CSE-MsgGUID: 9DWPnlUhQxavr9wRNALmBw==
-X-IronPort-AV: E=Sophos;i="6.19,246,1754982000"; 
-   d="scan'208";a="54326722"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Oct 2025 00:58:25 -0700
-Received: from chn-vm-ex2.mchp-main.com (10.10.87.31) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Wed, 22 Oct 2025 00:58:02 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.87.151) by
- chn-vm-ex2.mchp-main.com (10.10.87.31) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.27; Wed, 22 Oct 2025 00:58:02 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Wed, 22 Oct 2025 00:58:01 -0700
-Date: Wed, 22 Oct 2025 09:56:55 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <vladimir.oltean@nxp.com>,
-	<vadim.fedorenko@linux.dev>, <christophe.jaillet@wanadoo.fr>,
-	<rosenp@gmail.com>, <steen.hegelund@microchip.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v4 1/2] phy: mscc: Use PHY_ID_MATCH_MODEL for
- VSC8584, VSC8582, VSC8575, VSC856X
-Message-ID: <20251022075655.m42pxagwvqg3x3y6@DEN-DL-M31836.microchip.com>
-References: <20251017064819.3048793-1-horatiu.vultur@microchip.com>
- <20251017064819.3048793-2-horatiu.vultur@microchip.com>
- <aPdNrFe4JfCTNbAM@shell.armlinux.org.uk>
+	s=arc-20240116; t=1761119943; c=relaxed/simple;
+	bh=KaczBMCVSo8E8GAhgih1ppyG0a1tcQb6nFPNBNW7DRk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U1dZCeQoG6mnhzLhC9zXavOFv0jmgpxgHgnmw/wlyloUTZjlfzn+Qjcg4+Fp5Of1V2vrvsr2UOGtlSEzMKtKA0iC2C8a3NcwS+setwfG4lpp5o/te78oVkJKspmkIYi6Hj0NuK7j9Vm2BHsSmWyuPmkuP22M6U7sWfSmgPQCEFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=gaNqaGBX; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4710a1f9e4cso47888745e9.0
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 00:59:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1761119940; x=1761724740; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nFYdyU/glg7sl7RbwsHpqkuatNUumTfQgUBn8W9ze4k=;
+        b=gaNqaGBXDaXbduMQ0VNaYdzAQRxZ0Uagbe8MbIvebahOJX3q49dhoGI+3ITn04OCnM
+         oZxvzWZhLkvEl+hzVTbyZcJXP1dyRyJYsbe6Nt9iSn1CEPgRemwvoy00BH2v/TikQI3m
+         R6nx9N6CFXUsOdFR3OptsLrHh6jB/g1/dIcZONmAJoZgB+5qCaZviKw56V/mjWsu2P86
+         qXiie1Vwot3B7IeBDy/1h4uvl3biKPepdJTBWb6y/yOSQNuoK3/BuFoEbTwHElb8NzeJ
+         jR/VfukkKMJrrtUjp76mGQfdMimYQLIr2eye5cPrEs9CNxPzqc73Y1/ElGiqemwAO34X
+         YwcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761119940; x=1761724740;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nFYdyU/glg7sl7RbwsHpqkuatNUumTfQgUBn8W9ze4k=;
+        b=itZKIfdT97gmfrZCjga/HDvGpAPIYnZfR4Yg3Hzbd5Vppr8BoNfbjJkQky9ekngbWI
+         lHAxrjHgEc83meVYqbnI9Y9i6Dtd/f+1oJ0UHmzcsg+2Uwwx52Dq9s2ILcFKEaot2PiY
+         scna6E2GCwwWXxla580cFBeYb3SrYxyl3/97rzNczhmd5XOo1koSpLqXNyDYhmwBat8y
+         yYE+w5DW9Jv6uNwYPJRSAsXkM3f7cZeC9C8qmu7K3fqwOvAeixMlvBOazsWau7XexBNm
+         8pxSBsuwVRcCvra+tl87GOZ+DfXoJZmDVT58xrufSElrPJ/GRuq0DJCZi5zfAwWjKhZy
+         iOiA==
+X-Forwarded-Encrypted: i=1; AJvYcCWm3g0jTz33TioA4DxC72ALayy/oDUsqds6ONAlDnf4E4iAhEq9coi7WazrFiPjFgu5FZRjRMo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywe3OP/ZulofT58ublBUrL0tn1FDWI3lQWBddbW6+rX5oyFTn6w
+	WpJLCEnGq25x+qnENmMPHd/f0BvSDQ876j+KqAQcVqEwWEyo5nzsTf3VQ0h/4YMRbxw=
+X-Gm-Gg: ASbGncu9d7aMnEMnBYEw3+xLtQLpoqbba1zmC4goA+Xe0+xkviYteGap2srmqS7gHlq
+	kTaG3kd3yW0pQBwYYPsA4JU4xQIZZsNq+HowoJvkevUnZ51efUZ9hz+Y7RzeRMqNPL1YTP1vMdK
+	LWG7kxH49oNS17o7VR0A1dYjYNRjRh4GEexEddwPp/zBRFM0qBjR9z09Lkf4HC65AEK7Wcln2es
+	pLzgEOWKMXb9E1wM0ENoGeEcpp/28t6CZfpnAE8PjlFKSlJ0Q4qXZqny7PKSvjqa6e+mhEdxhXK
+	JW79pQlvJUzz1WG8en/fzv1gczSlVDtXh7E4soqEjhGUWlegmAB56uqBkk+DW77WkSTwb9lrpij
+	wz6x04X0xouCnhthrM6JjJhROZiEE9WizvF1TnUyr6yQmnm3oe6bZz9wYtyC71xc6J9uBU68MuE
+	3VrOlwQ6t/eJhtKRdE3kxr8e47kRzI9Xf530OKQ8Oi6qI=
+X-Google-Smtp-Source: AGHT+IGpOXlGpshXPJscBFg3kXgTW2ZV1U65opkxir+ofQ9dHjoYOdKb0EQ6iu2fUKVd00yHCcNGkA==
+X-Received: by 2002:a05:600c:4ec6:b0:46f:b327:ecfb with SMTP id 5b1f17b1804b1-4711787bfe8mr152128615e9.9.1761119939787;
+        Wed, 22 Oct 2025 00:58:59 -0700 (PDT)
+Received: from ?IPV6:2001:a61:1373:ee01:2756:594b:8e92:5d4b? ([2001:a61:1373:ee01:2756:594b:8e92:5d4b])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47496c2c9dasm32452465e9.4.2025.10.22.00.58.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Oct 2025 00:58:59 -0700 (PDT)
+Message-ID: <b3eb1a6f-696b-4ece-b906-4ecd14252321@suse.com>
+Date: Wed, 22 Oct 2025 09:58:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <aPdNrFe4JfCTNbAM@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v5 2/3] net: usb: ax88179_178a: add USB device driver
+ for config selection
+To: Alan Stern <stern@rowland.harvard.edu>
+Cc: Michal Pecio <michal.pecio@gmail.com>, yicongsrfy@163.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ pabeni@redhat.com
+References: <db3db4c6-d019-49d0-92ad-96427341589c@rowland.harvard.edu>
+ <20251017191511.6dd841e9.michal.pecio@gmail.com>
+ <bda50568-a05d-4241-adbe-18efb2251d6e@rowland.harvard.edu>
+ <20251018172156.69e93897.michal.pecio@gmail.com>
+ <6640b191-d25b-4c4e-ac67-144357eb5cc3@rowland.harvard.edu>
+ <20251018175618.148d4e59.michal.pecio@gmail.com>
+ <e4ce396c-0047-4bd1-a5d2-aee3b86315b1@rowland.harvard.edu>
+ <20251020182327.0dd8958a.michal.pecio@gmail.com>
+ <3c2a20ef-5388-49bd-ab09-27921ef1a729@rowland.harvard.edu>
+ <3cb55160-8cca-471a-a707-188c7b411e34@suse.com>
+ <fe42645d-0447-4bf4-98c5-ea288f8f6f5a@rowland.harvard.edu>
+Content-Language: en-US
+From: Oliver Neukum <oneukum@suse.com>
+In-Reply-To: <fe42645d-0447-4bf4-98c5-ea288f8f6f5a@rowland.harvard.edu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The 10/21/2025 10:09, Russell King (Oracle) wrote:
+On 21.10.25 18:33, Alan Stern wrote:
+> On Tue, Oct 21, 2025 at 11:13:29AM +0200, Oliver Neukum wrote:
+>> On 20.10.25 18:59, Alan Stern wrote:
+>>
+>>> Another possibility is simply to give up on handling all of this
+>>> automatically in the kernel.  The usb_modeswitch program certainly
+>>> should be capable of determining when a USB network device ought to
+>>> switch to a different configuration; that's very similar to the things
+>>> it does already.  Maybe userspace is the best place to implement this
+>>> stuff.
+>>
+>> That would make usb_modeswitch or yet a new udev component mandatory.
+>> That is the exact opposite of what we would like to achieve.
+> 
+> In the same way that usb_modeswitch or a udev script is already
+> mandatory for a bunch of other devices?
 
-Hi,
+Arguably broken devices. 
+> I agree, it would be great if the kernel could handle all these things
+> for people.  But sometimes it's just a lot easier to do stuff in
+> userspace.
 
+Well the kernel does handle them. It just handles them wrong.
+You are not proposing to leave devices in the unconfigured state,
+are you?
+>> That is probably not wise in the long run. If the device whose driver
+>> we kick off is a CD-ROM, nobody cares. If it is a network interface,
+>> we'll have to deal with ugly cases like user space already having
+>> sent a DHCP query when we kick the old driver off the interface.
 > 
-> On Fri, Oct 17, 2025 at 08:48:18AM +0200, Horatiu Vultur wrote:
-> > As the PHYs VSC8584, VSC8582, VSC8575 and VSC856X exists only as rev B,
-> > we can use PHY_ID_MATCH_MODEL to match exactly on revision B of the PHY.
-> 
-> I don't follow this. PHY_ID_MATCH_MODEL() uses a mask of bits 31:4,
-> omitting the revision field. So that is equivalent to a .phy_id_mask
-> of 0xfffffff0, which is what the code already uses.
+> Doesn't the same concern apply every time a network interface goes down?
 
-I totally understand why you don't understand this as this is I made big
-mistake!
-I was supposed to use PHY_ID_MATCH_EXACT instead of PHY_ID_MATCH_MODEL.
+It does and that is why spontaneously shutting down network interfaces
+in the kernel is a bad idea.
 
-> 
-> > Because of this change then there is not need the check if it is a
-> > different revision than rev B in the function vsc8584_probe() as we
-> > already know that this will never happen.
-> 
-> Since bits 3:0 are masked out, this statement seems to be false.
-> 
-> > @@ -2587,9 +2576,8 @@ static struct phy_driver vsc85xx_driver[] = {
-> >       .config_inband  = vsc85xx_config_inband,
-> >  },
-> >  {
-> > -     .phy_id         = PHY_ID_VSC856X,
-> > +     PHY_ID_MATCH_MODEL(PHY_ID_VSC856X),
-> >       .name           = "Microsemi GE VSC856X SyncE",
-> > -     .phy_id_mask    = 0xfffffff0,
-> >       /* PHY_GBIT_FEATURES */
-> >       .soft_reset     = &genphy_soft_reset,
-> >       .config_init    = &vsc8584_config_init,
-> > @@ -2667,9 +2655,8 @@ static struct phy_driver vsc85xx_driver[] = {
-> >       .config_inband  = vsc85xx_config_inband,
-> >  },
-> >  {
-> > -     .phy_id         = PHY_ID_VSC8575,
-> > +     PHY_ID_MATCH_MODEL(PHY_ID_VSC8575),
-> >       .name           = "Microsemi GE VSC8575 SyncE",
-> > -     .phy_id_mask    = 0xfffffff0,
-> >       /* PHY_GBIT_FEATURES */
-> >       .soft_reset     = &genphy_soft_reset,
-> >       .config_init    = &vsc8584_config_init,
-> > @@ -2693,9 +2680,8 @@ static struct phy_driver vsc85xx_driver[] = {
-> >       .config_inband  = vsc85xx_config_inband,
-> >  },
-> >  {
-> > -     .phy_id         = PHY_ID_VSC8582,
-> > +     PHY_ID_MATCH_MODEL(PHY_ID_VSC8582),
-> >       .name           = "Microsemi GE VSC8582 SyncE",
-> > -     .phy_id_mask    = 0xfffffff0,
-> >       /* PHY_GBIT_FEATURES */
-> >       .soft_reset     = &genphy_soft_reset,
-> >       .config_init    = &vsc8584_config_init,
-> > @@ -2719,9 +2705,8 @@ static struct phy_driver vsc85xx_driver[] = {
-> >       .config_inband  = vsc85xx_config_inband,
-> >  },
-> >  {
-> > -     .phy_id         = PHY_ID_VSC8584,
-> > +     PHY_ID_MATCH_MODEL(PHY_ID_VSC8584),
-> >       .name           = "Microsemi GE VSC8584 SyncE",
-> > -     .phy_id_mask    = 0xfffffff0,
-> >       /* PHY_GBIT_FEATURES */
-> >       .soft_reset     = &genphy_soft_reset,
-> >       .config_init    = &vsc8584_config_init,
-> 
-> Due to what I've said above, the above part of the patch is a cleanup,
-> and functionally is a no-op.
-> 
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+	Regards
+		Oliver
 
--- 
-/Horatiu
 
