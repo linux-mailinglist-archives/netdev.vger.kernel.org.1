@@ -1,97 +1,90 @@
-Return-Path: <netdev+bounces-231474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E376BF96E7
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:12:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C0A3BF96F6
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:14:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 61C894E1EB4
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 00:12:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1466421E58
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 00:14:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9D625557;
-	Wed, 22 Oct 2025 00:11:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E1D339A8;
+	Wed, 22 Oct 2025 00:14:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="f0rbFhnB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZjDDTk4e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D5C219EB;
-	Wed, 22 Oct 2025 00:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA932A1BA;
+	Wed, 22 Oct 2025 00:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761091916; cv=none; b=SE1kRbtbwhh26xl5p/YzAtCKLrupG4aQYPdNyipifYFI1AeRneQ5TgFPxaBFJcd6slxKwvHzcOawTcgOvzrykQgYUU3R4Lua1j2T0Dhk1L4qVY2yTtyANHn1QH44MgtM089Ho63+7KFJUJtV+gkFWxA5xd0evf1Ws6tiqthAQzg=
+	t=1761092073; cv=none; b=QxlIvQf4Uhqe0gW0WUkeI80ANKrVXPdjl7uAWFpleVsVmJk/fb9kJ/rrQEG9XfV2IOAOA4u60KU18k/00tuYxPOyoWhKQxpPh+EQm2xgfc0jLOLVUw/DHdLcdCy97+iGLqVqw4lqny1XFsLN3NHCYindG6Q9QOQsWWcP3BUTl1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761091916; c=relaxed/simple;
-	bh=H2BiOOdDmFkaJj6cEX+TAhbKeUmKCwY0zJbaooI3Bj0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RFVMmb+KuAQjMU8RUX1V+E5x56XM9+QKm4KUqI5j62/18+pgpAqw+FWFexZzQD4+toeLAUK3/E+gIW4P8Xtsrxb7IF5EehBq4tlTa35lhPnWMpekDFetr8iCJ6K5g+zQN3s89IW+l7getoTcxoZA8d0bVOMwwWUcqvu/AR36RFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=f0rbFhnB; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id CC4BA6029E;
-	Wed, 22 Oct 2025 02:11:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1761091911;
-	bh=GIo4OUKTs32Xr2u1m5Ejie/Gh94AY9rDWZGoguZ01/s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=f0rbFhnB3fb/45Evo5200edshHp+oScnd5Jx9lyVnd5eT7mru9W0eGeP2mcOs1kxK
-	 W7jO4VPmgcpHgHfjgRY0hGAQPbXXIw+RCBkLFbPl2LVNMB39xUiIQT9ryrMhW/NjLh
-	 jrovz+oDj/ec98t3w2oJlC5qbgtzoPrMZXR9sk4wflW1Bx4zYi2Bxb+6uVsvZfxG7z
-	 jpbDiAUmCs31mCFRvYSjLJwcSxgfD2N1vVCVq5/H1/cQ57OLk46aJAo5jXLIPzJbOJ
-	 EHfG3voaD8jbfxGcCj0DhLvsistvHA76otmXe/tlCPQ5x0KjStakbGCbJH66FDQ7u1
-	 S7TDl9ZQnHTBQ==
-Date: Wed, 22 Oct 2025 02:11:47 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Andrii Melnychenko <a.melnychenko@vyos.io>, kadlec@netfilter.org,
-	phil@nwl.cc, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/1] nft_ct: Added nfct_seqadj_ext_add() for NAT'ed
- conntrack.
-Message-ID: <aPghQ2-QVkeNgib1@calendula>
-References: <20251021133918.500380-1-a.melnychenko@vyos.io>
- <20251021133918.500380-2-a.melnychenko@vyos.io>
- <aPeZ_4bano8JJigk@strlen.de>
+	s=arc-20240116; t=1761092073; c=relaxed/simple;
+	bh=qdTemEah2ZwUDwzRjVNCeMAn63LZUADIEQLUkKwzNvI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EZOj6q5pSOQrlcFNdFeAiGvrEVtayUwkCBk+joZ3aR0PfeKUjAVLw9AeASJCmKqb6QGrDECIoxU36loUbTiu9+xfSdE5lqF5s00+MaUTl/UeA1JukZadPtBnN3cQilFg6NpKsWeNgOsfuLXExcd3nd5INl47kGsezEPyHbnRxMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZjDDTk4e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C51B0C4CEF1;
+	Wed, 22 Oct 2025 00:14:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761092073;
+	bh=qdTemEah2ZwUDwzRjVNCeMAn63LZUADIEQLUkKwzNvI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZjDDTk4eNS2NWwQItnYm4fEAytnHF94dLxeWHleQAHpVRxYO4gR618BunjzSts/2O
+	 dQKqqrIV5MJGXQ/6mnrDgLrC2lO/VX54XFyZFwL22MXxAE4jk9KBetXZzfrETjpiJk
+	 Pak39RSQ+mhEPeaRRFm4AAthCEgbZQBchmbu8Tfn13r7F/PH7AtCMCuAPnZ7VlWj4E
+	 uTLCKhBi+lf2M5oetDe5qycSvbmjc9HqXTAaF9P8DHxpr6iSUwSEbvGbbr3XAy0ghc
+	 komcG6/Aozv8TU8zbF40bGCR81K3WWokPJN7sqoZSVk/F05NaiL1aYQ4fBxgFQrxIa
+	 +H7lZe6V8z7Fg==
+Date: Tue, 21 Oct 2025 17:14:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?VGjDqW8=?= Lebrun <theo.lebrun@bootlin.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, =?UTF-8?B?R3I=?=
+ =?UTF-8?B?w6lnb3J5?= Clement <gregory.clement@bootlin.com>, Russell King
+ <linux@armlinux.org.uk>, Vinod Koul <vkoul@kernel.org>, Kishon Vijay
+ Abraham I <kishon@kernel.org>, Michael Turquette <mturquette@baylibre.com>,
+ Stephen Boyd <sboyd@kernel.org>, Thomas Bogendoerfer
+ <tsbogend@alpha.franken.de>, Philipp Zabel <p.zabel@pengutronix.de>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-clk@vger.kernel.org, Tawfik Bayouk
+ <tawfik.bayouk@mobileye.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, =?UTF-8?B?QmVub8OudA==?= Monin
+ <benoit.monin@bootlin.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Andrew Lunn <andrew@lunn.ch>, Jerome
+ Brunet <jbrunet@baylibre.com>
+Subject: Re: [PATCH net-next 00/12] net: macb: EyeQ5 support (alongside
+ generic PHY driver in syscon)
+Message-ID: <20251021171430.579211b2@kernel.org>
+In-Reply-To: <20251021-macb-eyeq5-v1-0-3b0b5a9d2f85@bootlin.com>
+References: <20251021-macb-eyeq5-v1-0-3b0b5a9d2f85@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aPeZ_4bano8JJigk@strlen.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 21, 2025 at 04:34:46PM +0200, Florian Westphal wrote:
-> Andrii Melnychenko <a.melnychenko@vyos.io> wrote:
-> >  
-> >  struct nft_ct_helper_obj  {
-> >  	struct nf_conntrack_helper *helper4;
-> > @@ -1173,6 +1174,9 @@ static void nft_ct_helper_obj_eval(struct nft_object *obj,
-> >  	if (help) {
-> >  		rcu_assign_pointer(help->helper, to_assign);
-> >  		set_bit(IPS_HELPER_BIT, &ct->status);
-> > +
-> > +		if ((ct->status & IPS_NAT_MASK) && !nfct_seqadj(ct))
-> > +			nfct_seqadj_ext_add(ct);
-> 
-> Any reason why you removed the drop logic of earlier versions?
-> 
-> I think this needs something like this:
-> 
-> 	if (!nfct_seqadj_ext_add(ct))
->            regs->verdict.code = NF_DROP;
-> 
-> so client will eventually retransmit the connection request.
-> 
-> I can also mangle this locally, let me know.
+On Tue, 21 Oct 2025 18:32:41 +0200 Th=C3=A9o Lebrun wrote:
+> Merging all this won't be easy, sorry. Is this split across trees OK?
+> The net-next part is pretty evident, it is the rest that appears
+> complex to merge to me. I can resend the series exploded if useful
+> (or at least split net-next versus the rest).
 
-BTW, this fixes DNAT case, but SNAT case is still broken because flag
-is set at a later stage, right?
+Yes, please respin just the patches that need to go via net-next
+for us (1,3-6?). The rest I don't car^W know :)
+--=20
+pw-bot: cr
 
