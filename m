@@ -1,120 +1,117 @@
-Return-Path: <netdev+bounces-231818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DDA5BFDCD7
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 20:21:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2694BFDCDA
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 20:23:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A4775355119
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 18:21:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EA2718C596E
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 18:23:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F022E7F25;
-	Wed, 22 Oct 2025 18:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B223933DECE;
+	Wed, 22 Oct 2025 18:23:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WzZGa/PW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hkczl1UU"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B758D33030D
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 18:21:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3711B331A55
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 18:23:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761157308; cv=none; b=GyjZBb5tjwnzdyZY5n0/AxrjPxGNgmSY8SlKq4dexy92mF6Na3ifhcGhR7F4K93p/lb6r1xGyC3QrmM+spb9w1tEWdNg0gPcxl4EHRt61mRZ5OEz3njwtOlWapHM2U3d2HClxv9Ua2CyG3W2P34YliKL26xgeEHT6/wRUb3L7ZE=
+	t=1761157385; cv=none; b=sRgbPbp6aLsSDlZm5XUB7oxjPq4tLilG+dSQoELjLVOeDSDerz9/187IejR9HeyIlNcRrwsGYj1QQdTY76mTFHZghTWqO9zkIET9p6UYfFAbGlnBa7JvIOz+T/N/vENCGxB9iSxkuXdFZpHDIcyieCFGwLtoeHfN8DvCZgKdbnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761157308; c=relaxed/simple;
-	bh=lELXTrKaiyhaK8Gx0X2Cev3upaWWSLx9rZPi1vP4M+4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bEGJfL6f5SG2xKHjfSX7xb+8T3g2GuqZ/dq6M+cVqmAc+kv7ml6PLHKzMckOdZHthu+LiGC9dcm/khh7tqKcN9J2eD0bwi0EtkbOoHXntq8Zj7kQnTfJCJqX0nAnZDy9SpkOfkmRb1zZ51xdtIENHhfc2o3ax53VhdTDNVBVC1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WzZGa/PW; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Bku8ZfM1vd1cxkJC/JuPNt08MeKU8abxyCWkKmsYXbM=; b=WzZGa/PWzfHHLyzzZox92f11dx
-	jfzyLEMXDOhoxlluvfXPRcA3iQ0LQWc22quFb5M9ZwO9ZNQglgdRhMkb/nMPeqzDpKL1na/fPd5bT
-	Z2Ur+DfOCNO2NcllHSm7JcoNHtPDQaa/5omjJOUiWV8Te+tNc97UdHHv+nHrPJ9qk2K52/Vz73CQy
-	c344P5Tn+IAbIOkGjXrnr8Bycjyz3NQEntfS2ODGglEHKEtvF2bog2NrGzJLAWxL46H8sNf9wiK5E
-	stmTVIU6yCX79eMwav6tOmj905wLBoEC/Ix/xyYRsq5CsKxjFHk++iLDPiJdI5j8Urg+bLDWo3lT0
-	OpD80XVQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50792)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vBdSv-000000005Iv-0yvw;
-	Wed, 22 Oct 2025 19:21:41 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vBdSt-000000000vC-2c8q;
-	Wed, 22 Oct 2025 19:21:39 +0100
-Date: Wed, 22 Oct 2025 19:21:39 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 2/6] net: phy: add phy_may_wakeup()
-Message-ID: <aPkgs44E2ahwsaWx@shell.armlinux.org.uk>
-References: <aPIwqo9mCEOb7ZQu@shell.armlinux.org.uk>
- <E1v9jCO-0000000B2O4-1L3V@rmk-PC.armlinux.org.uk>
- <432ac9c4-845d-4fe4-84fb-1b2407b88b3f@gmail.com>
+	s=arc-20240116; t=1761157385; c=relaxed/simple;
+	bh=+K6gU4pDbN962OTbzW72F8Pr0/D3a7NXwC5GrI/TXjw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Y/jxQvVkgdced53N3u3fAnU0p4osuxdFHgNFhmqHdJA3I/nxQTCPxeGxSBHLgp3gIRPdnDjjJhdX2q26Bl3llrgsOt0TBHAx87HAfduvEHS8O+6IFpWldkaLngk//p+uKaCMucuL7R8+f6iPhWsXV9WSTVXGa6/fpmg4IP2EeYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hkczl1UU; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7a26485fc5dso1240540b3a.1
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:23:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761157383; x=1761762183; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QnvERTjVk/9VYPJjwrSuIH93DeOljHL/NDPQQyXq2Vw=;
+        b=hkczl1UUyddiFx7n+FZWrZQqnZhimPBkblec/hV3IDwnS3TFXBT++Gagdu3kIVCjdN
+         tCm9u9NYimkqJYqtF3plr7V1Qu5oDzOusatSYwNvajkJblGCEDmR5zt4tTkvPemAwsKn
+         lcJ1OSXCZlFX2JG5zIwWIsF2enCcHVzLFSttfxNqQ/9KnMoekAx1+d+7PY9zWOgltNIQ
+         nRw9/hR0ITxEIfDuBEMu9bNAA9I7rvxVuCyuHJzjpB4SgFfnU+7L1NVq1gGpOyzWaiPr
+         QQBVA3NmFlRVAJvr253An/Szqz2u38kX0fOXz50OllwSI2HIrQ9ISlPMf+yakJ5Z6Vk8
+         yfCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761157383; x=1761762183;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QnvERTjVk/9VYPJjwrSuIH93DeOljHL/NDPQQyXq2Vw=;
+        b=Bn4/NCCSSh/NL1SzR6k/29mfliaEkCcHwmZYDDUyPgzPPJymE90cUCYVM6v+Oy2iNH
+         Bbuxj5IPW5eGAqxeYSHUxadvRAmGBbICGB7d4VS+nTshfEWZOflnN3wr+3MOMRRgEeqw
+         5GG3UFHfWYqfDLDw/sdYPXAHDTqBCVzgAtjZqUgmXCO4ZjkIh1sag7fFpuhQxrcDh6AS
+         huokk9WORfKrugTHrFucW6G1W3erjKQ856lXZg4t6yaW4R6QlInPviYlyxIB67MrbSV1
+         RRbP7tSFNYxYwIYrwDI2jU9WsC3MIFcIE95mOddyX0tfsbcK3FBixPc3LBHPgnB4khaB
+         JnQA==
+X-Gm-Message-State: AOJu0Yyg0Py06rE5cNxXNoGHu+u/sAXJpbtDVgAWZVlfNPP18Em3z0Ce
+	2vOLcIs4JtR+qbm12w0xDxDT9aZwtXxtn0s/HGF+/IBzvCk+sY1PYXxqHGnL1iyash4G7sXwfBW
+	YesCvViimdlizZ8Gs52EWoWgX46NyNRRf74UU6ijO9SX7YMm86tQ9ayAiTNkYH+MNB1DmO6LurV
+	p8BNVffPzf3QU9HcKOk5Uk8GxBiY+yAbXH+4wwyddAYYbMgnQ=
+X-Google-Smtp-Source: AGHT+IElUWWYopXNTwmr/idOyOr/ov9LIeHGwd/y43eNeyAOHt49H7xt00mt6Xqrw1/VPrWa9Emeo6hD3nePDA==
+X-Received: from pfbhe9.prod.google.com ([2002:a05:6a00:6609:b0:777:8649:793e])
+ (user=joshwash job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:94ce:b0:771:fa65:ae6e with SMTP id d2e1a72fcca58-7a220a99177mr31030524b3a.17.1761157383397;
+ Wed, 22 Oct 2025 11:23:03 -0700 (PDT)
+Date: Wed, 22 Oct 2025 11:22:22 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <432ac9c4-845d-4fe4-84fb-1b2407b88b3f@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.1.814.gb8fa24458f-goog
+Message-ID: <20251022182301.1005777-1-joshwash@google.com>
+Subject: [PATCH net-next 0/3] gve: Improve RX buffer length management
+From: Joshua Washington <joshwash@google.com>
+To: netdev@vger.kernel.org
+Cc: Ankit Garg <nktgrg@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Oct 22, 2025 at 11:14:08AM -0700, Florian Fainelli wrote:
-> On 10/17/25 05:04, Russell King (Oracle) wrote:
-> > Add phy_may_wakeup() which uses the driver model's device_may_wakeup()
-> > when the PHY driver has marked the device as wakeup capable in the
-> > driver model, otherwise use phy_drv_wol_enabled().
-> > 
-> > Replace the sites that used to call phy_drv_wol_enabled() with this
-> > as checking the driver model will be more efficient than checking the
-> > WoL state.
-> > 
-> > Export phy_may_wakeup() so that phylink can use it.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+From: Ankit Garg <nktgrg@google.com>
 
-Note my reply to Maxime, I've changed the description to:
+This patch series improves the management of the RX buffer length for
+the DQO queue format in the gve driver. The goal is to make RX buffer
+length config more explicit, easy to change, and performant by default.
 
-+/**
-+ * phy_may_wakeup() - indicate whether PHY has wakeup enabled
-+ * @phydev: The phy_device struct
-+ *
-+ * Returns: true/false depending on the PHY driver's device_set_wakeup_enabled()
-+ * setting if using the driver model, otherwise the legacy determination.
-+ */
-+bool phy_may_wakeup(struct phy_device *phydev);
-+
+We accomplish that in three patches:
 
-Are you still okay for me to add your r-b?
+1.  Currently, the buffer length is implicitly coupled with the header
+    split setting, which is an unintuitive and restrictive design. The
+    first patch decouples the RX buffer length from the header split
+    configuration.
 
-Thanks.
+2.  The second patch exposes the `rx_buf_len` parameter to userspace via
+    ethtool, allowing user to directly view or modify the RX buffer
+    length.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+3.  The final patch improves the out-of-the-box RX single stream
+    throughput by >10%  by changing the driver's default behavior to
+    select the maximum supported RX buffer length advertised by the
+    device during initialization.
+
+Ankit Garg (3):
+  gve: Decouple header split from RX buffer length
+  gve: Allow ethtool to configure rx_buf_len
+  gve: Default to max_rx_buffer_size for DQO if device supported
+
+ drivers/net/ethernet/google/gve/gve.h         | 12 +++-
+ drivers/net/ethernet/google/gve/gve_adminq.c  |  4 ++
+ drivers/net/ethernet/google/gve/gve_ethtool.c | 13 ++++-
+ drivers/net/ethernet/google/gve/gve_main.c    | 55 +++++++++++++++----
+ 4 files changed, 69 insertions(+), 15 deletions(-)
+
+--
+2.51.1.814.gb8fa24458f-goog
+
 
