@@ -1,146 +1,348 @@
-Return-Path: <netdev+bounces-231611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE6D0BFB7CD
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 12:56:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D6F8BFB905
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:13:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB4A21892B8F
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 10:57:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A33153A633F
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:12:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE5A32549A;
-	Wed, 22 Oct 2025 10:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F292F1FE6;
+	Wed, 22 Oct 2025 11:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RgETvft1"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="b0XYqmwL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6AF4325489
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 10:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3761911CA9
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761130615; cv=none; b=IozOC2nFYKwWyv1FgGekSKgOOjvi6zOg2AMgh9zSa1oY2zq6ax4dOIlIH6b8wG/9d1IDJEVzjeC3IxLjNFSokFEq8k9jahm3tIdpO8/WXqO1925BwCiTAan4UOk9WL/utjAtqhT+RL9CKhsyHuA40mQm6mESkOA3kpy6DZJ4wR8=
+	t=1761131570; cv=none; b=nTEjWibeIZEtSRDHLNGv1zYQoKlXljkCu4ixwaGCLgJu52YXegDzBM64U3BwlM/wrlXGU/JRkiyQbl8056SMHWooZMRU352g1RdBjvYZje1NeXCruOiij8uWQ6M//g1AAH81ebUOjM2sI1ZqKnrrsZ7/cbuSc3i86ogenVJXxWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761130615; c=relaxed/simple;
-	bh=+OQhCvBYkTpaNWYG55IZVFDwsdOq0gp6aB1fewv6Sx0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=lRW1f8PE/hr5TNCKCrHZhXeW/EWduEceKZLCgPvDaLxOcoJR5sCnSMdyc1sC2ackE+aMPOapzls33R/Bp7oPJAzzaKT8B+mRhXG6IbXir/dRtZm/BDmwgmV+XvujSwHa68hp6t7UDFIBiTsg+yU6lLHw4Cf//bopUMD16qGb8L0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RgETvft1; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-47495477241so16963825e9.3
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 03:56:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1761130612; x=1761735412; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=w5Yq6CrB7/8ZGzQ8ZrURUA4zqj0X89zvbStvTznlwuA=;
-        b=RgETvft1UlaeP08tvnc908Oyclhl9wTe54Ch7CqURZ+CL+tUZpDyOUHhmGOftusPsf
-         nB9YIso98OXkda1obe+Fo/I54IC0wG8JqOspyD47YHtoXB9vv4zwg6uuJIAl/ljsw7i4
-         gZAINjbDX/WOI83QXx5lfhDR+E9hC4e7s3NMVolWqdrZfzac8QAX4nO8lO5+nkR0lFKj
-         5mGTex6z8WJ8H+jdFH7o535+HLvfP/ZFuormVU7Q3M6TAilcKKySqyNYY1Q17LCjmClY
-         oaS7UTCB2fCmpzWVNo0huoaa0+9RxgJa7H0RVuTcdmNJenwgKIiKfZMDQ3GsLnauyTAc
-         HW/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761130612; x=1761735412;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w5Yq6CrB7/8ZGzQ8ZrURUA4zqj0X89zvbStvTznlwuA=;
-        b=S49xqbFgXj8RQ8CjpzKWnCSCcSqbjNM+3A2OEKVys7by9HYzStwPPgirayf90FKeNm
-         EmXCvAILTmP0qo2y24qYlFe3PJR6ZOt3QdyKTiQzW6uEjTkusTOJ87+PO0VehGIF+crv
-         V4TmbiucfHNP1W8pwNZGQyIHTMQGjpbdI2+xa5ddU6aYvM9h8XglWyavwNaIG5c+3E1X
-         NS0PYfD/IScQdokek+boMc4Y/QXd/qSdrUZa01B4ysAgdTwAQayB2jTbQKKvxqo4HKoo
-         X+0pv7AEtmOFUHrBS2Nci2tlWTBpfhFgm4X9X/a0ocfIeSeIqQsqxJOj9xY3iC86PRTM
-         yA3w==
-X-Gm-Message-State: AOJu0YyqwWM31rYMIn6J8MEV0+knxdkhs0c1bK+5Lno27iW40nQNsKWK
-	zhKhRRvzS/Wu5fEclQShTPYXFvCGrZ49w6ROOfNHpVKwRVjjsHB+P0mA7l/UFjThiqE=
-X-Gm-Gg: ASbGncvllL1zTotNSNcTeoSv11+jqNOJovVZbCy3LGuL18ubSfBshUIPPXnGhqpT+2q
-	l3CI+zviNRjKNdwwu9897sv6nFVfp1Kq8MPcDAdNOw5XRKtgZaJb83cCCIecx/K1vlmmTvDg+XS
-	ifgXS24xtoZG6O69haoyYPUJo8jfa1UBHFHtRtAITdJU3oTSehyXB/gwDAgrVPwmN0+u8toy7ay
-	2pDEh0I12A7ByL72rRIOJZhmxOOYqAF0P6XWbHxD/HPbHhPL0uplowB9ozjaWsGqQ9perYnnnwp
-	FcB59b93oAikcgDzw18R5+wDNUvC18/1PFacr109LFk0c+vAvSToVD5VUFbTgZYEM0xyInuALsd
-	xSyz3/GgYVCDl9q7An10uVpj/8bKSOZuKTROxLL8VR7MgDf3bjLsPS29VPk8hmBEMKn8zVZlFQN
-	tUdVKTzhz5U0YJr97g
-X-Google-Smtp-Source: AGHT+IF2HsKdNWozp3kks+JuugpR+yLTWHUECd0/Tb/1+16TX4IrhWmgDDoUB2ZA7B8/GIbMyn7Xyg==
-X-Received: by 2002:a05:600c:4e0a:b0:456:13b6:4b18 with SMTP id 5b1f17b1804b1-4711791cb96mr160237355e9.31.1761130610899;
-        Wed, 22 Oct 2025 03:56:50 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-475c428dafesm37369885e9.6.2025.10.22.03.56.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Oct 2025 03:56:50 -0700 (PDT)
-Date: Wed, 22 Oct 2025 13:56:47 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org
-Subject: [bug report] tcp: Convert tcp-md5 to use MD5 library instead of
- crypto_ahash
-Message-ID: <aPi4b6aWBbBR52P1@stanley.mountain>
+	s=arc-20240116; t=1761131570; c=relaxed/simple;
+	bh=GLEtLX0EX4+VTL8sESR8sSRLcZQykRROatGHBmjo3VE=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=LgjfGKdB6Pm/jlbopYoWKR3zTI/WJWsmKqyrvRVUQC0Ogfsr20KJv+/ooF6KleN8jpm3frlenZfsUCCVq8n03BDMWzY+0fcxcdCWx3fUtkpZxBKNngC+TM+CZvmdEI0LXtPzS/I6aLgoHqxiF4tV8mexa/qCEK4U2vH9b1KVfzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=b0XYqmwL; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1761131558; h=Message-ID:Subject:Date:From:To;
+	bh=vBeMUNRy2ZjWJszR5X5SVHD1+3XUIiL0O7zlL5CT89U=;
+	b=b0XYqmwL1ZZqki3JKnG1dA/QKQys+x7lRCHqSzZ3829qESHlydk0y+Xpl4Vff4G7Bo/3LUkoF/zrnIxxFUvo+x1/PwJSz/hlVV5Y1jmUwe72rEFQn3vazE+Ml2LLIQTonoW85W7oqPVM/Tut791f/DHxOKHuV3e6tmU2tw8WVg4=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Wqmh2tb_1761131556 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 22 Oct 2025 19:12:36 +0800
+Message-ID: <1761130643.6132474-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v7 4/5] eea: create/destroy rx,tx queues for netdevice open and stop
+Date: Wed, 22 Oct 2025 18:57:23 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Wen Gu <guwen@linux.alibaba.com>,
+ Philo Lu <lulie@linux.alibaba.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Vivian Wang <wangruikang@iscas.ac.cn>,
+ Troy Mitchell <troy.mitchell@linux.spacemit.com>,
+ Dust Li <dust.li@linux.alibaba.com>,
+ netdev@vger.kernel.org
+References: <20251016110617.35767-1-xuanzhuo@linux.alibaba.com>
+ <20251016110617.35767-5-xuanzhuo@linux.alibaba.com>
+ <1b1697fe-2393-4959-b29e-59fb30e5ed49@redhat.com>
+In-Reply-To: <1b1697fe-2393-4959-b29e-59fb30e5ed49@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-Hello Eric Biggers,
+On Tue, 21 Oct 2025 10:28:49 +0200, Paolo Abeni <pabeni@redhat.com> wrote:
+> On 10/16/25 1:06 PM, Xuan Zhuo wrote:
+> > +/* resources: ring, buffers, irq */
+> > +int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_tmp *tmp)
+> > +{
+> > +	struct eea_net_tmp _tmp;
+> > +	int err;
+> > +
+> > +	if (!tmp) {
+> > +		enet_init_cfg(enet, &_tmp);
+> > +		tmp = &_tmp;
+>
+> As suggested on v5, you should:
+>
+> 		enet_init_cfg(enet, &status);
+> 		eea_reset_hw_resources(enet, &status);
+>
+> in the caller currently using a NULL argument.
+>
+> > +	}
+> > +
+> > +	if (!netif_running(enet->netdev)) {
+> > +		enet->cfg = tmp->cfg;
+> > +		return 0;
+> > +	}
+> > +
+> > +	err = eea_alloc_rxtx_q_mem(tmp);
+> > +	if (err) {
+> > +		netdev_warn(enet->netdev,
+> > +			    "eea reset: alloc q failed. stop reset. err %d\n",
+> > +			    err);
+> > +		return err;
+> > +	}
+> > +
+> > +	eea_netdev_stop(enet->netdev);
+> > +
+> > +	enet_bind_new_q_and_cfg(enet, tmp);
+> > +
+> > +	err = eea_active_ring_and_irq(enet);
+> > +	if (err) {
+> > +		netdev_warn(enet->netdev,
+> > +			    "eea reset: active new ring and irq failed. err %d\n",
+> > +			    err);
+> > +		return err;
+> > +	}
+> > +
+> > +	err = eea_start_rxtx(enet->netdev);
+> > +	if (err)
+> > +		netdev_warn(enet->netdev,
+> > +			    "eea reset: start queue failed. err %d\n", err);
+>
+> Following-up on v5 discussion, I see this function is used to handle
+> scenario where the entire setup fails, but it's also used in the next
+> patch to do set_ring/set_channel operations. The latter should leave the
+> device in a working state even when the requested change is not
+> possible, so this function should need gracefully failures at least on
+> such invocations.
 
-Commit 37a183d3b7cd ("tcp: Convert tcp-md5 to use MD5 library instead
-of crypto_ahash") from Oct 14, 2025 (linux-next), leads to the
-following Smatch static checker warning:
+Yes. In this function, I allocate memory for the queues, release the previously
+allocated resources, activate the new ring, and then start the RX and TX
+operations for the network device. If the allocation fails, we can return
+directly.
 
-	net/ipv4/tcp.c:4911 tcp_inbound_md5_hash()
-	error: we previously assumed 'key' could be null (see line 4900)
+The functions `eea_active_ring_and_irq()` and `eea_start_rxtx()` only fail under
+exceptional circumstances. If such a failure occurs, there is little else we can
+do.
 
-net/ipv4/tcp.c
-  4884  tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
-  4885                       const void *saddr, const void *daddr,
-  4886                       int family, int l3index, const __u8 *hash_location)
-  4887  {
-  4888          /* This gets called for each TCP segment that has TCP-MD5 option.
-  4889           * We have 3 drop cases:
-  4890           * o No MD5 hash and one expected.
-  4891           * o MD5 hash and we're not expecting one.
-  4892           * o MD5 hash and its wrong.
-  4893           */
-  4894          const struct tcp_sock *tp = tcp_sk(sk);
-  4895          struct tcp_md5sig_key *key;
-  4896          u8 newhash[16];
-  4897  
-  4898          key = tcp_md5_do_lookup(sk, l3index, saddr, family);
-  4899  
-  4900          if (!key && hash_location) {
+>
+> [...]
+> > +/* ha handle code */
+> > +static void eea_ha_handle_work(struct work_struct *work)
+> > +{
+> > +	struct eea_pci_device *ep_dev;
+> > +	struct eea_device *edev;
+> > +	struct pci_dev *pci_dev;
+> > +	u16 reset;
+> > +
+> > +	ep_dev = container_of(work, struct eea_pci_device, ha_handle_work);
+> > +	edev = &ep_dev->edev;
+> > +
+> > +	/* Ha interrupt is triggered, so there maybe some error, we may need to
+> > +	 * reset the device or reset some queues.
+> > +	 */
+> > +	dev_warn(&ep_dev->pci_dev->dev, "recv ha interrupt.\n");
+> > +
+> > +	if (ep_dev->reset_pos) {
+> > +		pci_read_config_word(ep_dev->pci_dev, ep_dev->reset_pos,
+> > +				     &reset);
+> > +		/* clear bit */
+> > +		pci_write_config_word(ep_dev->pci_dev, ep_dev->reset_pos,
+> > +				      0xFFFF);
+> > +
+> > +		if (reset & EEA_PCI_CAP_RESET_FLAG) {
+> > +			dev_warn(&ep_dev->pci_dev->dev,
+> > +				 "recv device reset request.\n");
+> > +
+> > +			pci_dev = ep_dev->pci_dev;
+> > +
+> > +			/* The pci remove callback may hold this lock. If the
+> > +			 * pci remove callback is called, then we can ignore the
+> > +			 * ha interrupt.
+> > +			 */
+> > +			if (mutex_trylock(&edev->ha_lock)) {
+> > +				edev->ha_reset = true;
+> > +
+> > +				__eea_pci_remove(pci_dev, false);
+> > +				__eea_pci_probe(pci_dev, ep_dev);
+> > +
+> > +				edev->ha_reset = false;
+> > +				mutex_unlock(&edev->ha_lock);
+> > +			} else {
+> > +				dev_warn(&ep_dev->pci_dev->dev,
+> > +					 "ha device reset: trylock failed.\n");
+> > +			}
+> > +			return;
+>
+> Nesting here is quite high, possibly move the above in a separate helper.
+>
+> > @@ -45,9 +52,17 @@ u16 eea_pci_dev_id(struct eea_device *edev);
+> >
+> >  int eea_device_reset(struct eea_device *dev);
+> >  void eea_device_ready(struct eea_device *dev);
+> > +
+>
+> Minor nit: either do not introduce this whitespace, or add it together
+> with the surronding chunk of code
+>
+> [...]> +static void meta_align_offset(struct eea_net_rx *rx, struct
+> eea_rx_meta *meta)
+> > +{
+> > +	int h, b;
+> > +
+> > +	h = rx->headroom;
+> > +	b = meta->offset + h;
+> > +
+> > +	b = ALIGN(b, 128);
+>
+> Out of sheer curiosity, why the above align?
 
-If key is NULL and hash_location is zero
+The hardware engineer asked me.
 
-  4901                  NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5UNEXPECTED);
-  4902                  trace_tcp_hash_md5_unexpected(sk, skb);
-  4903                  return SKB_DROP_REASON_TCP_MD5UNEXPECTED;
-  4904          }
-  4905  
-  4906          /* Check the signature.
-  4907           * To support dual stack listeners, we need to handle
-  4908           * IPv4-mapped case.
-  4909           */
-  4910          if (family == AF_INET)
-  4911                  tcp_v4_md5_hash_skb(newhash, key, NULL, skb);
-  4912          else
-  4913                  tp->af_specific->calc_md5_hash(newhash, key, NULL, skb);
+> Possibly a comment and a
+> macro instead of a magic number would be useful.
+>
+> > +static int eea_alloc_rx_hdr(struct eea_net_tmp *tmp, struct eea_net_rx *rx)
+> > +{
+> > +	struct page *hdr_page = NULL;
+> > +	struct eea_rx_meta *meta;
+> > +	u32 offset = 0, hdrsize;
+> > +	struct device *dmadev;
+> > +	dma_addr_t dma;
+> > +	int i;
+> > +
+> > +	dmadev = tmp->edev->dma_dev;
+> > +	hdrsize = tmp->cfg.split_hdr;
+> > +
+> > +	for (i = 0; i < tmp->cfg.rx_ring_depth; ++i) {
+> > +		meta = &rx->meta[i];
+> > +
+> > +		if (!hdr_page || offset + hdrsize > PAGE_SIZE) {
+> > +			hdr_page = dev_alloc_page();
+> > +			if (!hdr_page)
+> > +				return -ENOMEM;
+>
+> Why you are not using the page pool for the headers?
 
-then we are toasted one way or the other.
+The HDR buffers are not accessing with other layers. I will copy the header into
+the skb, and the buffers will be reused directly without being released.
 
-  4914          if (memcmp(hash_location, newhash, 16) != 0) {
-  4915                  NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5FAILURE);
-  4916                  trace_tcp_hash_md5_mismatch(sk, skb);
-  4917                  return SKB_DROP_REASON_TCP_MD5FAILURE;
-  4918          }
-  4919          return SKB_NOT_DROPPED_YET;
-  4920  }
+So, allocating pages are sufficient and simpler.
 
-regards,
-dan carpenter
+>
+> > +
+> > +			dma = dma_map_page(dmadev, hdr_page, 0, PAGE_SIZE,
+> > +					   DMA_FROM_DEVICE);
+> > +
+> > +			if (unlikely(dma_mapping_error(dmadev, dma))) {
+> > +				put_page(hdr_page);
+> > +				return -ENOMEM;
+> > +			}
+> > +
+> > +			offset = 0;
+> > +			meta->hdr_page = hdr_page;
+> > +			meta->dma = dma;
+> > +		}
+> > +
+> > +		meta->hdr_dma = dma + offset;
+> > +		meta->hdr_addr = page_address(hdr_page) + offset;
+> > +		offset += hdrsize;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static void eea_rx_meta_dma_sync_for_cpu(struct eea_net_rx *rx,
+> > +					 struct eea_rx_meta *meta, u32 len)
+> > +{
+> > +	dma_sync_single_for_cpu(rx->enet->edev->dma_dev,
+> > +				meta->dma + meta->offset + meta->headroom,
+> > +				len, DMA_FROM_DEVICE);
+> > +}
+> > +
+> > +static int eea_harden_check_overflow(struct eea_rx_ctx *ctx,
+> > +				     struct eea_net *enet)
+> > +{
+> > +	if (unlikely(ctx->len > ctx->meta->truesize - ctx->meta->room)) {
+>
+> Give the above, it looks like the hypervisor could corrupt the guest
+> driver memory. If so, are any defensive, related, checks in the guests
+> really effective?
+
+This is merely a check; we do not consider this case here.
+
+
+>
+> > +		pr_debug("%s: rx error: len %u exceeds truesize %u\n",
+> > +			 enet->netdev->name, ctx->len,
+> > +			 ctx->meta->truesize - ctx->meta->room);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+>
+>
+>
+> > +static bool eea_rx_post(struct eea_net *enet,
+> > +			struct eea_net_rx *rx, gfp_t gfp)
+>
+> It looks like this function is always called with gfp == GFP_ATOMIC. If
+> so, just drop the argument.
+>
+> [...]> +static int eea_tx_post_skb(struct eea_net_tx *tx, struct sk_buff
+> *skb)
+> > +{
+> > +	const struct skb_shared_info *shinfo = skb_shinfo(skb);
+> > +	u32 hlen = skb_headlen(skb);
+> > +	struct eea_tx_meta *meta;
+> > +	dma_addr_t addr;
+> > +	int i, err;
+> > +	u16 flags;
+> > +
+> > +	addr = dma_map_single(tx->dma_dev, skb->data, hlen, DMA_TO_DEVICE);
+> > +	if (unlikely(dma_mapping_error(tx->dma_dev, addr)))
+> > +		return -ENOMEM;
+> > +
+> > +	flags = skb->ip_summed == CHECKSUM_PARTIAL ? EEA_DESC_F_DO_CSUM : 0;
+> > +
+> > +	meta = eea_tx_desc_fill(tx, addr, hlen, !shinfo->nr_frags, skb, flags);
+> > +
+> > +	if (eea_fill_desc_from_skb(skb, tx->ering, meta->desc))
+> > +		goto err;
+> > +
+> > +	for (i = 0; i < shinfo->nr_frags; i++) {
+> > +		const skb_frag_t *frag = &shinfo->frags[i];
+> > +		bool is_last = i == (shinfo->nr_frags - 1);
+> > +
+> > +		err = eea_tx_add_skb_frag(tx, meta, frag, is_last);
+> > +		if (err)
+> > +			goto err;
+> > +	}
+> > +
+> > +	meta->num = shinfo->nr_frags + 1;
+>
+> It looks like there is no memory barrier after filling the descriptor
+> and before commiting it. Whoever is processing this data could possibly
+> observe inconsistent/corrupted descriptors.
+
+In our design, the device only accesses descriptors indexed by the doorbell;
+therefore, we believe that the barrier associated with MMIO operations is
+sufficient.
+
+Thanks
+
+
+>
+> /P
+>
 
