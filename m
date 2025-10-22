@@ -1,63 +1,70 @@
-Return-Path: <netdev+bounces-231471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA3B9BF9685
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 01:59:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8812BF96C2
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:01:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8E0374F3D02
-	for <lists+netdev@lfdr.de>; Tue, 21 Oct 2025 23:57:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 676A319C4447
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 00:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E15D242D8B;
-	Tue, 21 Oct 2025 23:52:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFEDD515;
+	Wed, 22 Oct 2025 00:01:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h/mw2CFt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pme7V+h4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DB121019C;
-	Tue, 21 Oct 2025 23:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27A017D2;
+	Wed, 22 Oct 2025 00:01:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761090752; cv=none; b=GZ2dXewO7z75suRLRVB6ew9aQl3ghZdsEyTyuhHRYVx+lnT/qWrPeowt/biHnWsL3BPSbX9nw2NNlUqh8KewM653AJIM3whocORyBps2ViytmeQPR+LAjPxlngQpgrsg4EV+Z+YmHzD01VgjDj3pCAijzpCds7pJFZS+315veoM=
+	t=1761091310; cv=none; b=JUROphAgUSjJaBu4JYcsoYpP8JiCR4ZoCJ6ty2eJ5mLp358cBbRFteHq4UWeyX+L7cRyCmscApymJJCxkiJovEPmhGsZQOkRUPFftG9siojrkIVa2OsmnP/zSDdc9laa0cGkzrLPKIs3IXCK2O5WBG2uZBCzmFwziR3cXQTqwnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761090752; c=relaxed/simple;
-	bh=ODw5GOX3PmEJ7dwaSWuCqf64HN9Wh+HC/oIRywtWbqc=;
+	s=arc-20240116; t=1761091310; c=relaxed/simple;
+	bh=p+ZizTiGxIaoODfuSopyyeSnYFPc7WE7M0A6WnSxqmE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q6ty9iKcO3WhYJnuhgkinCJuPFpbiaozXDtNDLdqq5YMzLgRwQLrmmQh/pH84tAINyd5Sw54B2ridEBzMm2pidJFaTtDdctsTuphW/zdXROlHjeg1liPfYbkBPPRUpjVS+41eeW8TLNvDdYDbDHS9j4X11E4jj6buboluEBa4rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h/mw2CFt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 002CFC4CEF1;
-	Tue, 21 Oct 2025 23:52:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=u4D6ewPeEo0w+gDdVDpwYtsOc19W8ec8CXh6Qogqr3WdIDSkCsF+94zy3L+JqQRRRj9K+BsSGwTTFcgrYwev+f8EsIHEAfN5BrnAPRavNgiRhfzCmqhLuuTCeoII75fNYNofDDmnUz9L9kU7Sdjofcbqr77XsVUay3Enuvrht4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pme7V+h4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49BA4C4CEF1;
+	Wed, 22 Oct 2025 00:01:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761090751;
-	bh=ODw5GOX3PmEJ7dwaSWuCqf64HN9Wh+HC/oIRywtWbqc=;
+	s=k20201202; t=1761091309;
+	bh=p+ZizTiGxIaoODfuSopyyeSnYFPc7WE7M0A6WnSxqmE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h/mw2CFtD5og9xtSlO3QOmo/W9AdssFMBkQWtBD+4xzvyG31Z5BvdNZNPuo5PnGF3
-	 E8LESzBzdHM0MHqVeCPTePiJleVa3Jg7AC767KLmGFgqZwG1Ei04B+0L75m1Jl2663
-	 9H78k1MLHGZ8SA93ofzSWU5z3sav10qBShGHSNxAybh8CwUYAzNQajEXjOmZuG7/an
-	 5etsQu6Hd/Ohf348cvd04Ki8e2LThbeXQeGRlvIiHzch3p2qJYnNfzJ8BzV2wSo2hQ
-	 T5UhYWVFj167cbtvQ9esvJ6t7xuwl65EhTiDyJnE9L5NanUIwGuzfW1RdGUvJ/WTfz
-	 5bbcr4DE+gOpg==
-Date: Tue, 21 Oct 2025 16:52:30 -0700
+	b=Pme7V+h4OVfRJg7agdV9osvbp48/KAdTtFv4m7ugnYlgC5tWftPij+MItChJ57SjV
+	 7+vRyzH+x4ac7qLh3UVJiDFqn7TAbluRfOWOgCOC4JToXzg8IXAiR5og2hUEI1/CEf
+	 kqkEmJ6uNAqhIn4DFo0iBEh0SajTNqk6ThpRxCjDt7IF9wWhMwmvahIi3Yzbd4VTcw
+	 GDV/Nd519/dZwYtNrpCBd+GJQ6vl5ZSST8D047hX/uOxLgDCXVM4Nz94I+Kez97U0K
+	 vNDOKNWZaJS+21bEFY0HZ57CeeUmRZHMKU4okd21jA65Z454Qy/qmSPHHHqKgxAI+x
+	 Z2JSVzIsvys4Q==
+Date: Tue, 21 Oct 2025 17:01:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: andrew@lunn.ch, Horatiu Vultur <horatiu.vultur@microchip.com>,
- hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, richardcochran@gmail.com, vladimir.oltean@nxp.com,
- vadim.fedorenko@linux.dev, rmk+kernel@armlinux.org.uk,
- christophe.jaillet@wanadoo.fr, rosenp@gmail.com,
- steen.hegelund@microchip.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v4 2/2] phy: mscc: Fix PTP for VSC8574 and VSC8572
-Message-ID: <20251021165230.1a702ffd@kernel.org>
-In-Reply-To: <09b90c94-4b55-4b9f-a23b-e2bd920545bf@redhat.com>
-References: <20251017064819.3048793-1-horatiu.vultur@microchip.com>
-	<20251017064819.3048793-3-horatiu.vultur@microchip.com>
-	<20251020165346.276cd17e@kernel.org>
-	<09b90c94-4b55-4b9f-a23b-e2bd920545bf@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
+ <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang
+ Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa
+ <vishnu.dasa@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, berrange@redhat.com, Bobby Eshleman
+ <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v7 08/26] selftests/vsock: improve logging in
+ vmtest.sh
+Message-ID: <20251021170147.7c0d96b2@kernel.org>
+In-Reply-To: <20251021-vsock-vmtest-v7-8-0661b7b6f081@meta.com>
+References: <20251021-vsock-vmtest-v7-0-0661b7b6f081@meta.com>
+	<20251021-vsock-vmtest-v7-8-0661b7b6f081@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,23 +74,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 21 Oct 2025 11:07:20 +0200 Paolo Abeni wrote:
-> On 10/21/25 1:53 AM, Jakub Kicinski wrote:
-> > On Fri, 17 Oct 2025 08:48:19 +0200 Horatiu Vultur wrote:  
-> >> For VSC8574 and VSC8572, the PTP initialization is incomplete. It is
-> >> missing the first part but it makes the second part. Meaning that the
-> >> ptp_clock_register() is never called.
-> >>
-> >> There is no crash without the first part when enabling PTP but this is
-> >> unexpected because some PHys have PTP functionality exposed by the
-> >> driver and some don't even though they share the same PTP clock PTP.  
-> > 
-> > I'm tempted to queue this to net-next, sounds like a "never worked 
-> > in an obvious way" case.  I'd appreciate a second opinion.. Andrew?  
+On Tue, 21 Oct 2025 16:46:51 -0700 Bobby Eshleman wrote:
+> Improve usability of logging functions. Remove the test name prefix from
+> logging functions so that logging calls can be made deeper into the call
+> stack without passing down the test name or setting some global. Teach
+> log function to accept a LOG_PREFIX variable to avoid unnecessary
+> argument shifting.
 > 
-> FTR, I agree with the above, as (out of sheer ignorance) I think/fear
-> the first patch can potentially cause regressions.
+> Remove log_setup() and instead use log_host(). The host/guest prefixes
+> are useful to show whether a failure happened on the guest or host side,
+> but "setup" doesn't really give additional useful information. Since all
+> log_setup() calls happen on the host, lets just use log_host() instead.
 
-Thanks, let's rephrase the commits message on patch 1 (per Russell's
-comments) and get this reposted for net-next (without the Fixes tag).
+And this cannot be posted separately / before the rest? I don't think
+this series has to be 26 patches long.
+
+I'm dropping this from PW, please try to obey the local customs :(
 
