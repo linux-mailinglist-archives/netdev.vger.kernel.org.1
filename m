@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-231681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD078BFC8A6
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 16:31:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3171FBFC9E4
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 16:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 006CB189CBAA
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 14:29:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 496CA4281E3
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 14:31:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C152534CFD5;
-	Wed, 22 Oct 2025 14:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB9934C144;
+	Wed, 22 Oct 2025 14:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kn3BN3hL"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="oQEsosCM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF4634CFB9
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 14:24:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A3E34EEFA
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 14:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761143063; cv=none; b=bpe70o3MZRQn0XlE5Y4OFFRk8Tku7Nsa1Xp4sf5CiG7hlJvCdfIHwi/OtQjyoxasPu+MmElkR96v0nrN19YmrCHS5il8ToPWG5NT6QLzRy64CEcp+yBRc7lLQQyScv8vF9suhxqFKgrtf+yiRJkuTb2C5gqXv4caNQeWoUyUcfg=
+	t=1761143246; cv=none; b=QCiihSKUW39mq1y+Y411eFjwkTAEdvaD4JLGlBql/zh6UXIt9HXe/yncNTn/hCvNKo53KwZnIicowgmeejEqHLpw5GnDeFR1smiWaZqpDb67vEg6mhfc3UKRED8Si2+pYgwD6RMNc1wNIMT9te6Qp3mqa9gpfQZm2VY5tOeNB1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761143063; c=relaxed/simple;
-	bh=KiLb3Ij4kNTsI8p5dH+8PrPKjndGfKFXyCL4d4sUz0Y=;
+	s=arc-20240116; t=1761143246; c=relaxed/simple;
+	bh=RZM9nt+kwLCYwQZklggOSRY1olXaCxq9hVj3DYtBkOo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tqsUyZOgOXmZUqrZ0eu06O5+ldDiWSfJYu3sjUMbBR5SLMqC7x6qBsc1pfPW0Ke59e3Eg+JboeNpVpwPUsj0hwouFr453BXCr5bNnVhw3ApIjgi7dJnLYZeRlUM/06z0JNZblKTyuC25tFsCEmV99mg0z62k3+qVy68S5K7AKF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kn3BN3hL; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-471066cfc2aso21679775e9.0
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 07:24:21 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=nuBI80nZx4roOOTuZNyukU5C2DIbGLcWT8jm/ST11z0gMyf13D67BJV1ZeW5+kNfYH2luCqjgCDkWCb/I6qE/vfqLz2vqmVQ6qUQqcK71J9ZK8q1h2AFmFPqlW2FfREHQgm2WJIMkE0h6P3/0n6E0PC3qQLifhyqnkHPPFyR6iM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=oQEsosCM; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b5c18993b73so1107096266b.0
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 07:27:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761143060; x=1761747860; darn=vger.kernel.org;
+        d=blackwall.org; s=google; t=1761143242; x=1761748042; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=cxCF3VSt3yJ/4Htvgm+f7POBa00pQ4DGvcpk5YYFwFI=;
-        b=Kn3BN3hLjmTkizkKIxOxadJhSQLPWaoz05eSckFXqDqMMCmaNvPTl38yEbTFJGwvcP
-         uyk4YABp+kCczzgYdW/EQcs9vHWD+LJyCRP9TjqwwK2lWsxbGK8cneHQU4arMJiTiLDj
-         4vGOPnkYtpuAQnNrvGCX15PgTZXpyc0eLn40ztllaemrQ0XGh0C2z0t6ySmtg0wdGKBz
-         4MrgajiBEstbQq40dGiPkyNuxVgE+dyqUhKZyi4FxHW7tYPg//zQEH5S8JAOuI55VwJi
-         7wY1BJ7S9GYcw6Kr69i9fCKLd6f1dqSDWNAbTN2kQHoP7kHfd3NRBR8esXvYkA1exBP5
-         L4sA==
+        bh=/6JXyTnl4/CTgSiYlD4AsySyt1xWwLhH6bPhS5L6+ns=;
+        b=oQEsosCMj+q+bS0XPgzOe/ySDo6EtvE6qpsfUle6q/pc8j7SHko3v30geSxE4i/HvD
+         FeakV8V8vZPP3VV6nw4CPHIiLaHpEAzTL1od3ZuxF32PBUwwLmVvsVxZBNDamxZQpY39
+         5OSqFKHPCWLUx2lJc5i6ndMxvTcIRfBTsGVa2YyDSfcANuswNVkAZZyIXqK/tri8/VoI
+         vSbKKKSUOy7cGicbJik92xi4Gk6dwg2y5qUed39FRhGLgACC9gNTlum2N63ESps54M7f
+         1ZcsbqCqL2YRT2HaG1mHCPJA2tZ0ZtQ1eTKDuHgIKG5uoHWJ1TtlrV+Oc39TxGFlkELt
+         GCrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761143060; x=1761747860;
+        d=1e100.net; s=20230601; t=1761143242; x=1761748042;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cxCF3VSt3yJ/4Htvgm+f7POBa00pQ4DGvcpk5YYFwFI=;
-        b=cGXSCvy3WbK1tLu0TlSIQtsdCilc/v46ntmlKt6UwvU3scRiYesNPiLd1MkEgNsofX
-         7WDZmHTjjmsb1jeYXVEo6PYk2xkIF9/M9o9iY5riouH4TTo8CWGhXxXZGaglTx9PB6a+
-         1WgHReX4iLInMChxgZQ36nbxd9hG4A0kvaLyMdhxHsSRw1rbqGTnHZKLZgn5Y92+MWz0
-         5Jupf2WSvpw3g5J56TuLs0SbXlolohwBRr+yn3FsWPtUd74fu4eL2JEWHZJMSUHZ21XN
-         YIU8Wz28Glov8cqkb2V6FeVsdil1voh+r188FMJ22SsrJwSyVVv7HjR5pwMZnKo2QnNJ
-         VT5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWH0UlkBEP8appY4D6ZBuVr45bJlfJe+/6kNydZ/Gmao2G9KBVRzwOrv9rjuWJXlRyTu4hgC/E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfQIui7pB+WKWmTUzHIu4KfFOIgdUCz9fu7vNA89cMG8fdumdD
-	+0GIr6EjpmGaYUKsTdwiuz7oqjZcZmjrcX26jcWZGGboy4u0a7DWvfZ9
-X-Gm-Gg: ASbGncs2ZRP06mMPN9r/Pm9BN3NKh8vnbG3w8Kitr9aYRm3IBazl6t8lt1BSeExkiJD
-	HOAjiBr2/qjRb8A5k2FgTCwugUxaJiZBg2/pqDCZRWFSHFAhrcfxS70Fn4AnPqBCZlzQauB/qR4
-	+SuJZYBPLBmQw+N5qAYzwLGoAJuRZT6bKOX+NS6LZIzGPl6f2pywl10tlXL/bFUvjKZNbwYC1iI
-	Ew46Iksy/MizRfsjf4qlu9AYslwXlJE4sl+DbDBBmGZy1sRfEfA9gK7d38KIZOhL+H5rGnQ6um3
-	0OhXxQbCeDadCyPSLCcOr37q/lHoEM2mhJAzHUihkUhHs5zfQarEOPhikpDVLiVRxAsOckNKbVF
-	degBK/l9mbQFW4W16hR8gda7RnMIPDfZAJXwwev8K6EWBfZqN8E24JajMMWyP/t61dT0h2pfGgQ
-	jzdgByo/YLMladw2xQIVlmMyCY9F92ZLxH
-X-Google-Smtp-Source: AGHT+IFkTw7szOwawIqv47HRGrQT8MYYw4EHyKoRoa8ZcG7xMhhP9wIMt2VXTQKAISRkcJMJnQVZ3A==
-X-Received: by 2002:a05:6000:25ee:b0:427:62d:132c with SMTP id ffacd0b85a97d-427062d135emr11501252f8f.21.1761143059543;
-        Wed, 22 Oct 2025 07:24:19 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:b576])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42856e45062sm1965758f8f.41.2025.10.22.07.24.18
+        bh=/6JXyTnl4/CTgSiYlD4AsySyt1xWwLhH6bPhS5L6+ns=;
+        b=v/GS/RJ66uLKqLvy9ic7jxaQV1As+ipmgPMGFover+oU0iF5TxBS6BwdNyYyE47TWA
+         G7anbvP7MxiGeu5VwsWVPczuB6cBiCSbrb04JLRYUmTC4zvQ+AEpaoeDnW3GKxjPs5Ha
+         y4SRWY/89tpOJCcc2v04OjEGUD9n3FqeQc89R35RNQPXMHKzkgf88PPM7T/Sca9zQ/m4
+         p8/hpv9VDLKk5+Jf/vT8UBkq7ltZ5tUqm0Ywp13yGLh0MbLya+3GO9LP8bgT6ntJcBNe
+         WCekHGGTxUBXCvIVAY+7B+ACjgChwZ0h9y5Ei6J9lsDFAZMp1vdjq0zIOWm3uP5XYd+R
+         PRGw==
+X-Forwarded-Encrypted: i=1; AJvYcCUE0q7EXlKi4awnZiqv7UQTHbINLpNFg6Rult3opTSZDkboTKWI3OHd8ChEdBTRLiqEtOiaV6w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYMyamXcgquJF36OUBezbD1oKl9Ovclbc2VXomMvKKZUe8wjDH
+	eZ4i5vJ965oWRMvK4Gbr5vD9HVCajGJY9jcTKm0QZU2uifmv8J4iF/Xs3k4zTNvRh4s=
+X-Gm-Gg: ASbGncvcrjscNxWhD4/Dde9Nx/XdkOkAIbZIxonCqOibTpZRw7q4greitgBhumH1PsH
+	bjty9B9GsTa8J29SdgfEPLqQbJWDDTBbKjiWrRTOWt58KD+yWYncf3tkbolwqCGruwAXU5vj9Vr
+	F8N7GpxnMZNQBWk3Zf0PZXnFC/GCJf/Gm1ycHTHM1UdasEpbOqfXRezy3fa5Ec4BGu+WWaS6MHO
+	U9zqIt1KfA4M6W3c+yOFOTJEf/jcdW5sn4BweZIpfLRR3Mvzq/NOBSKvJITBVn7yabNIjU15NFs
+	60AXI8gIWE+pJdp88nQbKtCjrJoWyNLyPcdb+/91r1n4f97pIIwZ10ZJu4gWbyvNEYtlbPCCwET
+	RoCQA4VKIDxZTFk6DbAHtz7PAuKtxVfHENVvfTvR1tDZHN9VBNC5HhKOipV/sAuLNdRQJ+jWpSU
+	lG0MDvAj5DQXkXpBxs4U5vyGYqr18e2m7X
+X-Google-Smtp-Source: AGHT+IERjCtVPjayNeyvtIlXJNCXCbJfsnwrTGxOW9ZK5k/XoJSYtSsD3B7zemyh98rdbn4aRjVzNA==
+X-Received: by 2002:a17:907:3c92:b0:b6b:d71:6d97 with SMTP id a640c23a62f3a-b6b0d71825amr1475084166b.31.1761143241998;
+        Wed, 22 Oct 2025 07:27:21 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b65e83937a3sm1374200266b.23.2025.10.22.07.27.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Oct 2025 07:24:18 -0700 (PDT)
-Message-ID: <3990f8ee-4194-4b06-820e-c0ecbcb08af1@gmail.com>
-Date: Wed, 22 Oct 2025 15:25:44 +0100
+        Wed, 22 Oct 2025 07:27:21 -0700 (PDT)
+Message-ID: <50d4a072-209e-4751-80c3-1929c536afcb@blackwall.org>
+Date: Wed, 22 Oct 2025 17:27:20 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,83 +83,206 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] io_uring zcrx: add MAINTAINERS entry
-To: Jens Axboe <axboe@kernel.dk>, David Wei <dw@davidwei.uk>,
- io-uring@vger.kernel.org, netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>
-References: <20251021202944.3877502-1-dw@davidwei.uk>
- <60d18b98-6a25-4db7-a4c6-0c86d6c4f787@gmail.com>
- <832b03de-6b59-4a07-b7ea-51492c4cca7e@kernel.dk>
+Subject: Re: [PATCH net-next v3 15/15] netkit: Add xsk support for af_xdp
+ applications
+To: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+ pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, dw@davidwei.uk,
+ toke@redhat.com, yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+References: <20251020162355.136118-1-daniel@iogearbox.net>
+ <20251020162355.136118-16-daniel@iogearbox.net>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <832b03de-6b59-4a07-b7ea-51492c4cca7e@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20251020162355.136118-16-daniel@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/22/25 14:17, Jens Axboe wrote:
-> On 10/22/25 5:38 AM, Pavel Begunkov wrote:
->> On 10/21/25 21:29, David Wei wrote:
->>> Same as [1] but also with netdev@ as an additional mailing list.
->>> io_uring zero copy receive is of particular interest to netdev
->>> participants too, given its tight integration to netdev core.
->>
->> David, I can guess why you sent it, but it doesn't address the bigger
->> problem on the networking side. Specifically, why patches were blocked
->> due to a rule that had not been voiced before and remained blocked even
->> after pointing this out? And why accusations against me with the same
->> circumstances, which I equate to defamation, were left as is without
->> any retraction? To avoid miscommunication, those are questions to Jakub
->> and specifically about the v3 of the large buffer patchset without
->> starting a discussion here on later revisions.
->>
->> Without that cleared, considering that compliance with the new rule
->> was tried and lead to no results, this behaviour can only be accounted
->> to malice, and it's hard to see what cooperation is there to be had as
->> there is no indication Jakub is going to stop maliciously blocking
->> my work.
+On 10/20/25 19:23, Daniel Borkmann wrote:
+> Enable support for AF_XDP applications to operate on a netkit device.
+> The goal is that AF_XDP applications can natively consume AF_XDP
+> from network namespaces. The use-case from Cilium side is to support
+> Kubernetes KubeVirt VMs through QEMU's AF_XDP backend. KubeVirt is a
+> virtual machine management add-on for Kubernetes which aims to provide
+> a common ground for virtualization. KubeVirt spawns the VMs inside
+> Kubernetes Pods which reside in their own network namespace just like
+> regular Pods.
 > 
-> The netdev side has been pretty explicit on wanting a MAINTAINERS entry
-
-Can you point out where that was requested dated before the series in
-question? Because as far as I know, only CC'ing was mentioned and
-only as a question, for which I proposed a fairly standard way of
-dealing with it by introducing API and agreeing on any changes to that,
-and got no reply. Even then, I was CC'ing netdev for changes that might
-be interesting to netdev, that includes the blocked series.
-
-> so that they see changes. I don't think it's unreasonable to have that,
-> and it doesn't mean that they need to ack things that are specific to
-> zcrx. Nobody looks at all the various random lists, giving them easier
-> insight is a good thing imho. I think we all agree on that.
+> Raw QEMU AF_XDP backend example with eth0 being a physical device with
+> 16 queues where netkit is bound to the last queue (for multi-queue RSS
+> context can be used if supported by the driver):
 > 
-> Absent that change, it's also not unreasonable for that side to drag
-> their feet a bit on further changes. Could the communication have been
-> better on that side? Certainly yes. But it's hard to blame them too much
-> on that front, as any response would have predictably yielded an
-> accusatory reply back.
-
-Not really, solely depends on the reply.
-
-> And honestly, nobody wants to deal with that, if
-
-Understandable, but you're making it sound like I started by
-throwing accusations and not the other way around. But it's
-true that I never wanted to deal with it.
-
-> they can avoid it. Since there's plenty of other work to do and patches
-> to review which is probably going to be more pleasurable, then people go
-> and do that.
+>   # ethtool -X eth0 start 0 equal 15
+>   # ethtool -X eth0 start 15 equal 1 context new
+>   # ethtool --config-ntuple eth0 flow-type ether \
+>             src 00:00:00:00:00:00 \
+>             src-mask ff:ff:ff:ff:ff:ff \
+>             dst $mac dst-mask 00:00:00:00:00:00 \
+>             proto 0 proto-mask 0xffff action 15
+>   [ ... setup BPF/XDP prog on eth0 to steer into shared xsk map ... ]
+>   # ip netns add foo
+>   # ip link add numrxqueues 2 nk type netkit single
+>   # ./pyynl/cli.py --spec ~/netlink/specs/netdev.yaml \
+>                    --do bind-queue \
+>                    --json "{"src-ifindex": $(ifindex eth0), "src-queue-id": 15, \
+>                             "dst-ifindex": $(ifindex nk), "queue-type": "rx"}"
+>   {'dst-queue-id': 1}
+>   # ip link set nk netns foo
+>   # ip netns exec foo ip link set lo up
+>   # ip netns exec foo ip link set nk up
+>   # ip netns exec foo qemu-system-x86_64 \
+>           -kernel $kernel \
+>           -drive file=${image_name},index=0,media=disk,format=raw \
+>           -append "root=/dev/sda rw console=ttyS0" \
+>           -cpu host \
+>           -m $memory \
+>           -enable-kvm \
+>           -device virtio-net-pci,netdev=net0,mac=$mac \
+>           -netdev af-xdp,ifname=nk,id=net0,mode=native,queues=1,start-queue=1,inhibit=on,map-path=$dir/xsks_map \
+>           -nographic
 > 
-> The patch David sent is a way to at least solve one part of the issue,
-> and imho something like that is a requirement for anything further to be
-> considered. Let's perhaps roll with that and attempt to help ourselves
-> here, by unblocking that part.
+> We have tested the above against a dual-port Nvidia ConnectX-6 (mlx5)
+> 100G NIC with successful network connectivity out of QEMU. An earlier
+> iteration of this work was presented at LSF/MM/BPF [0].
 > 
-> Are you fine with the patch? If so, I will queue it up and let's please
-> move on from beating this dead horse.
+> For getting to a first starting point to connect all things with
+> KubeVirt, bind mounting the xsk map from Cilium into the VM launcher
+> Pod which acts as a regular Kubernetes Pod while not perfect, is not
+> a big problem given its out of reach from the application sitting
+> inside the VM (and some of the control plane aspects are baked in
+> the launcher Pod already), so the isolation barrier is still the VM.
+> Eventually the goal is to have a XDP/XSK redirect extension where
+> there is no need to have the xsk map, and the BPF program can just
+> derive the target xsk through the queue where traffic was received
+> on.
 > 
+> The exposure through netkit is because Cilium should not act as a
+> proxy handing out xsk sockets. Existing applications expect a netdev
+> from kernel side and should not need to rewrite just to implement
+> against a CNI's protocol. Also, all the memory should not be accounted
+> against Cilium but rather the application Pod itself which is consuming
+> AF_XDP. Further, on up/downgrades we expect the data plane to being
+> completely decoupled from the control plane; if Cilium would own the
+> sockets that would be disruptive. Another use-case which opens up and
+> is regularly asked from users would be to have DPDK applications on
+> top of AF_XDP in regular Kubernetes Pods.
+> 
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Co-developed-by: David Wei <dw@davidwei.uk>
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> Link: https://bpfconf.ebpf.io/bpfconf2025/bpfconf2025_material/lsfmmbpf_2025_netkit_borkmann.pdf [0]
+> ---
+>  drivers/net/netkit.c | 71 +++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 70 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
+> index a281b39a1047..f69abe5ec4cd 100644
+> --- a/drivers/net/netkit.c
+> +++ b/drivers/net/netkit.c
+> @@ -12,6 +12,7 @@
+>  #include <net/netdev_lock.h>
+>  #include <net/netdev_queues.h>
+>  #include <net/netdev_rx_queue.h>
+> +#include <net/xdp_sock_drv.h>
+>  #include <net/netkit.h>
+>  #include <net/dst.h>
+>  #include <net/tcx.h>
+> @@ -235,6 +236,71 @@ static void netkit_get_stats(struct net_device *dev,
+>  	stats->tx_dropped = DEV_STATS_READ(dev, tx_dropped);
+>  }
+>  
+> +static bool netkit_xsk_supported_at_phys(const struct net_device *dev)
+> +{
+> +	if (!dev->netdev_ops->ndo_bpf ||
+> +	    !dev->netdev_ops->ndo_xdp_xmit ||
+> +	    !dev->netdev_ops->ndo_xsk_wakeup)
+> +		return false;
+> +	if ((dev->xdp_features & NETDEV_XDP_ACT_XSK) != NETDEV_XDP_ACT_XSK)
+> +		return false;
+> +	return true;
+> +}
+> +
+> +static int netkit_xsk(struct net_device *dev, struct netdev_bpf *xdp)
+> +{
+> +	struct netkit *nk = netkit_priv(dev);
+> +	struct netdev_bpf xdp_lower;
+> +	struct netdev_rx_queue *rxq;
+> +	struct net_device *phys;
+> +
+> +	switch (xdp->command) {
+> +	case XDP_SETUP_XSK_POOL:
+> +		if (nk->pair == NETKIT_DEVICE_PAIR)
+> +			return -EOPNOTSUPP;
+> +		if (xdp->xsk.queue_id >= dev->real_num_rx_queues)
+> +			return -EINVAL;
+> +
+> +		rxq = __netif_get_rx_queue(dev, xdp->xsk.queue_id);
+> +		if (!rxq->peer)
+> +			return -EOPNOTSUPP;
+> +
+> +		phys = rxq->peer->dev;
+> +		if (!netkit_xsk_supported_at_phys(phys))
+> +			return -EOPNOTSUPP;
+> +
+> +		memcpy(&xdp_lower, xdp, sizeof(xdp_lower));
+> +		xdp_lower.xsk.queue_id = get_netdev_rx_queue_index(rxq->peer);
+> +		break;
+> +	case XDP_SETUP_PROG:
+> +		return -EPERM;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	return phys->netdev_ops->ndo_bpf(phys, &xdp_lower);
+> +}
+> +
+> +static int netkit_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags)
+> +{
+> +	struct netdev_rx_queue *rxq;
+> +	struct net_device *phys;
+> +
+> +	if (queue_id >= dev->real_num_rx_queues)
+> +		return -EINVAL;
+> +
+> +	rxq = __netif_get_rx_queue(dev, queue_id);
+> +	if (!rxq->peer)
+> +		return -EOPNOTSUPP;
+> +
+> +	phys = rxq->peer->dev;
+> +	if (!netkit_xsk_supported_at_phys(phys))
+> +		return -EOPNOTSUPP;
+> +
+> +	return phys->netdev_ops->ndo_xsk_wakeup(phys,
+> +			get_netdev_rx_queue_index(rxq->peer), flags);
+> +}
+> +
+>  static int netkit_init(struct net_device *dev)
+>  {
+>  	netdev_lockdep_set_classes(dev);
+> @@ -255,6 +321,8 @@ static const struct net_device_ops netkit_netdev_ops = {
+>  	.ndo_get_peer_dev	= netkit_peer_dev,
+>  	.ndo_get_stats64	= netkit_get_stats,
+>  	.ndo_uninit		= netkit_uninit,
+> +	.ndo_bpf		= netkit_xsk,
+> +	.ndo_xsk_wakeup		= netkit_xsk_wakeup,
+>  	.ndo_features_check	= passthru_features_check,
+>  };
+>  
+> @@ -409,10 +477,11 @@ static void netkit_setup(struct net_device *dev)
+>  	dev->hw_enc_features = netkit_features;
+>  	dev->mpls_features = NETIF_F_HW_CSUM | NETIF_F_GSO_SOFTWARE;
+>  	dev->vlan_features = dev->features & ~netkit_features_hw_vlan;
+> -
+>  	dev->needs_free_netdev = true;
+>  
+>  	netif_set_tso_max_size(dev, GSO_MAX_SIZE);
+> +
+> +	xdp_set_features_flag(dev, NETDEV_XDP_ACT_XSK);
+>  }
+>  
+>  static struct net *netkit_get_link_net(const struct net_device *dev)
 
--- 
-Pavel Begunkov
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
