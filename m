@@ -1,70 +1,56 @@
-Return-Path: <netdev+bounces-231472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8812BF96C2
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:01:55 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D52F2BF96E3
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:10:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 676A319C4447
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 00:02:19 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9AFD74E1486
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 00:10:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFEDD515;
-	Wed, 22 Oct 2025 00:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC1114F70;
+	Wed, 22 Oct 2025 00:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pme7V+h4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AoKigjnX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27A017D2;
-	Wed, 22 Oct 2025 00:01:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6EE1DF72
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 00:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761091310; cv=none; b=JUROphAgUSjJaBu4JYcsoYpP8JiCR4ZoCJ6ty2eJ5mLp358cBbRFteHq4UWeyX+L7cRyCmscApymJJCxkiJovEPmhGsZQOkRUPFftG9siojrkIVa2OsmnP/zSDdc9laa0cGkzrLPKIs3IXCK2O5WBG2uZBCzmFwziR3cXQTqwnE=
+	t=1761091807; cv=none; b=AvnkMtPyB44sWmiY4IBtbvTYQNrmB840CFGd69HgB08RSQVyJet7Dr8X76GLYq0I3MsFekNc4h2XqHSY4YebI2dMOTDSAyM1W0/+LwSFoNkOUYt8eW1RyI4Ues8B7KJmQyN6e4ymTiw6S2Y64xDs7GYVpckGAB+CmH4jbdXgay0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761091310; c=relaxed/simple;
-	bh=p+ZizTiGxIaoODfuSopyyeSnYFPc7WE7M0A6WnSxqmE=;
+	s=arc-20240116; t=1761091807; c=relaxed/simple;
+	bh=5+lsmVoiQGOGFVGmMtMyDKhRMEVJpi8PtM60HqBwSss=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u4D6ewPeEo0w+gDdVDpwYtsOc19W8ec8CXh6Qogqr3WdIDSkCsF+94zy3L+JqQRRRj9K+BsSGwTTFcgrYwev+f8EsIHEAfN5BrnAPRavNgiRhfzCmqhLuuTCeoII75fNYNofDDmnUz9L9kU7Sdjofcbqr77XsVUay3Enuvrht4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pme7V+h4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49BA4C4CEF1;
-	Wed, 22 Oct 2025 00:01:48 +0000 (UTC)
+	 MIME-Version:Content-Type; b=GWt9z99BJ2bH91OS8NC9VXPZdrG0B44BVrxrNk3CU7A/0iKxeVwIPl6tvt6CEJXMbkRKmCD1ByiT6qJD1Suup9gNK/m0PGdNxaDI9bRoGKOKqJn/8V2pcMI5ksIZMbtg7iu08LZGFYTwvfGI/5RhPtHTKGR/xcxMGEnqEs6HKzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AoKigjnX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 050C3C4CEF1;
+	Wed, 22 Oct 2025 00:10:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761091309;
-	bh=p+ZizTiGxIaoODfuSopyyeSnYFPc7WE7M0A6WnSxqmE=;
+	s=k20201202; t=1761091807;
+	bh=5+lsmVoiQGOGFVGmMtMyDKhRMEVJpi8PtM60HqBwSss=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Pme7V+h4OVfRJg7agdV9osvbp48/KAdTtFv4m7ugnYlgC5tWftPij+MItChJ57SjV
-	 7+vRyzH+x4ac7qLh3UVJiDFqn7TAbluRfOWOgCOC4JToXzg8IXAiR5og2hUEI1/CEf
-	 kqkEmJ6uNAqhIn4DFo0iBEh0SajTNqk6ThpRxCjDt7IF9wWhMwmvahIi3Yzbd4VTcw
-	 GDV/Nd519/dZwYtNrpCBd+GJQ6vl5ZSST8D047hX/uOxLgDCXVM4Nz94I+Kez97U0K
-	 vNDOKNWZaJS+21bEFY0HZ57CeeUmRZHMKU4okd21jA65Z454Qy/qmSPHHHqKgxAI+x
-	 Z2JSVzIsvys4Q==
-Date: Tue, 21 Oct 2025 17:01:47 -0700
+	b=AoKigjnXY/V5CIurT93Dve7cfSva+eC/lzlwdbdSBTN1ig1qxSEry/AAn5FiB8v+t
+	 fmt4PZhkIA66wRP7U9jtP7LvPDBLNfydwz6WdQ6PqwPPhfpZer/4+04+GTQXEGEsp9
+	 JUo3qq8AYht5d7YBQUdtgN4FfoGUofumixT6AZNJvPPBeh5om5gi20TJX5Tn0u3rUF
+	 Pfu6ewHlkF2HgWSM7GTZQf5SDGTcJ231KWOfMDvXHDefP7dVEoMSyIu/pazx6NVh6s
+	 UwcZcocWfPmdxkzbFRXvWfeRUs5ZgY9S0JUx0z/JdOVoaBUGde+V9OBy7fTh2MxnZI
+	 pQ9+oI9CnSxWA==
+Date: Tue, 21 Oct 2025 17:10:06 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
- <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang
- Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
- <decui@microsoft.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa
- <vishnu.dasa@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-hyperv@vger.kernel.org, berrange@redhat.com, Bobby Eshleman
- <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v7 08/26] selftests/vsock: improve logging in
- vmtest.sh
-Message-ID: <20251021170147.7c0d96b2@kernel.org>
-In-Reply-To: <20251021-vsock-vmtest-v7-8-0661b7b6f081@meta.com>
-References: <20251021-vsock-vmtest-v7-0-0661b7b6f081@meta.com>
-	<20251021-vsock-vmtest-v7-8-0661b7b6f081@meta.com>
+To: Tonghao Zhang <tonghao@bamaicloud.com>
+Cc: netdev@vger.kernel.org, Eran Ben Elisha <eranbe@mellanox.com>, Jiri
+ Pirko <jiri@mellanox.com>, Cong Wang <xiyou.wangcong@gmail.com>
+Subject: Re: [PATCH net-next] net: add the ifindex for
+ trace_net_dev_xmit_timeout
+Message-ID: <20251021171006.725400e3@kernel.org>
+In-Reply-To: <20251021091900.62978-1-tonghao@bamaicloud.com>
+References: <20251021091900.62978-1-tonghao@bamaicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,20 +60,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 21 Oct 2025 16:46:51 -0700 Bobby Eshleman wrote:
-> Improve usability of logging functions. Remove the test name prefix from
-> logging functions so that logging calls can be made deeper into the call
-> stack without passing down the test name or setting some global. Teach
-> log function to accept a LOG_PREFIX variable to avoid unnecessary
-> argument shifting.
-> 
-> Remove log_setup() and instead use log_host(). The host/guest prefixes
-> are useful to show whether a failure happened on the guest or host side,
-> but "setup" doesn't really give additional useful information. Since all
-> log_setup() calls happen on the host, lets just use log_host() instead.
+On Tue, 21 Oct 2025 17:19:00 +0800 Tonghao Zhang wrote:
+> In a multi-network card or container environment, provide more accurate information.
 
-And this cannot be posted separately / before the rest? I don't think
-this series has to be 26 patches long.
-
-I'm dropping this from PW, please try to obey the local customs :(
+Why do you think that ifindex is more accurate than the name?
+Neither is unique with netns..
+-- 
+pw-bot: cr
 
