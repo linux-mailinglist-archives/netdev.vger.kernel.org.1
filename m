@@ -1,89 +1,91 @@
-Return-Path: <netdev+bounces-231613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63436BFB8AB
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:07:26 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BC6BBFB8B1
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:07:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFB6A3A6496
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:07:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 27B124F2B0E
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E6B0328B54;
-	Wed, 22 Oct 2025 11:07:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A8232AAA4;
+	Wed, 22 Oct 2025 11:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="b8H4kUzn"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Zgka9XoA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f97.google.com (mail-oa1-f97.google.com [209.85.160.97])
+Received: from mail-io1-f99.google.com (mail-io1-f99.google.com [209.85.166.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A446D320CBC
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:07:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16863328630
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:07:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761131236; cv=none; b=ldrMhbvxSjjCxJF6TIgnyyiFCpEnTk2Tcsl5SiXuq7yHhxGlv/fqcH/33BEngrFchrNop4IGCr5QDp6airxxGoYIieNeoVfz3/XMXvPP1gW+VRU9lUZLjQOO1K0v7UpW1cUlLMvJVQxcNg9TzrMB9qJzjvzMJDXQtN6xWKeWB5c=
+	t=1761131237; cv=none; b=R0UYWxYF/C7YvU7W1G0vztLyxPOU61o/BjRd+ECpgXwjHQIvgJREQQlc5O0tRbgEXEep4pKJUXwoJ8jou30tZ7kOt/aH8UkXRaaiQPNi4zAkQarbuMGW/LSdJqy2TNMQT/yuwp1TKaXRRavtoKtpIMbnf2bYWw6yzvaDP4JCmJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761131236; c=relaxed/simple;
-	bh=ZY4ksHec6wJzWCalGrMOvAU5kA0Tf1c5wcS05kGhWVw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Xsz9SqIL6nhUoGPHYuWHn6pZ6vECIsamCktOPBak9e29OEujmgK3UT22jtiClN4xAwGnmKJyge+rx2M6z8/Tq6b3pZ2s28/1BpouZ0A1ikglesaWpjb82lR5BW9ZyO6WGD5ZRksKBMKEO3k1cHQjNZCS7pkgRKARIbEaYEDHiC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=b8H4kUzn; arc=none smtp.client-ip=209.85.160.97
+	s=arc-20240116; t=1761131237; c=relaxed/simple;
+	bh=tphZkRN4cfZYFVTFehKBYnLpVKDqMthpMvjmWlBcnCk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=tVUGDS+6ZHCc96zneT4ZOAcVObK5VezgBjwwHAtAwlL8fUrm+4qws3/yJ0Zic3WP5YuoXZNMVNz+fnwZeYSibSHmtTZ/2sQu1R8JrVuwG8I10URApBQOju9gAjd3y/y4q1azVe8nTEnGUB2e6DvtKErhZADKhl1BOxkVpIvLmEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Zgka9XoA; arc=none smtp.client-ip=209.85.166.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oa1-f97.google.com with SMTP id 586e51a60fabf-3c8fb195c23so4067808fac.1
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 04:07:13 -0700 (PDT)
+Received: by mail-io1-f99.google.com with SMTP id ca18e2360f4ac-93e7ece3025so41961639f.1
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 04:07:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761131233; x=1761736033;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f2jSL7X+YIPN8ymI0EGsh1TEga+mDeE0bn24UOno88E=;
-        b=En7xNMkxJ3+7pMSB4tOpsx86sKBo6OxaGFkKyUXXaRJzGAf7oMylFb62pZrJGeb/LQ
-         s28pyF3uX9DnkWATgMhYrYL73LpgUIPL+XEPalJxMSfCkJ+DDUPJWrDilRoPpl/HHp5h
-         MIbRpS2EGIqm7jFPPcTdJDx8/6Ay/BbjVO0fnNtspTTEEbszrLI7uvNaBZPqBCdOxNPc
-         9X614tsGjnwxz0YFESf2nIsrQI4NHxP7fNMc/0o9y5HXtvARIB1t4zQNtvy/O/RAGRGo
-         /0A9gH9AQNURDhNR+5JfdpNYBiAX7DyMCDeqmQGxwX1RtQ8aEHegybKfBIWS1hxxjQRS
-         R3/Q==
-X-Gm-Message-State: AOJu0Yy9E7hkEo5g3ykCEJanBBD8f/tAlH8doH5iEe8GrHL/81Ycpaxj
-	u617ICzYlI1x65odtux22DWLPc8/N3X3GVIXATt6BgfvlCc9UduQv/5Id3R0gLPGVoi9cYXCx+7
-	7YTpHQyyhX3/6bImGpYrXJhwd0Ej/KyvZmcR+rkkJMJtwEswtgkqGhriAg+OUZed4/R0nONXFdg
-	DMo8VrPe/yh0rA144TBU+DM8B0EThex0zvpVPgJEMcV3y5mIAw/EXz2BIHoH4iJBDQg7CYIhBnt
-	9Ak3PuBMC0=
-X-Gm-Gg: ASbGncsBfZST7UwRcAYa5HWWsBnn0NwWdXo7yCv1dTDOX6Wv782J0bXmOU6x1mKzTAU
-	TycIH9VraMCtI9v+YSS34bIVZesRLtvwJjSaPWutafw2b0wyT0zZwSacw5GlLGbOQGBBT5mEltx
-	ig/r4iK+hJXbI0oDr/YGf8s3DwPlJBgFq/ARqgTJ4wb1dUergINQUfYazpd8HyxByt29FywO+4W
-	+J5CIzxO9I2YjAg5pFKmcTO/dIT3adjAOlsmue1ZPuAC5grYvNip9RyjnbpLgFaBc71MwMwLTGX
-	kxaD1PLyqLbnwb4fMPM8h6I12BOQLteQHfpxBt5ws9e0BNPuCNEYDQOqHmqEdddtqr32ngB//2u
-	d9cSRCykdbqbY1555dBX9MHxbUqP6UKpcyerZBvMxsM998pjoX7E6yohEP3XBoarPZ+B8OvLeCE
-	QkR7rHrjh9LNASASBMnmLyT2/AxpJ7P6Y=
-X-Google-Smtp-Source: AGHT+IHYjwyH7GxjxJ1yS6XeNNBhDjFyze9l1e1SQx4XsRLzqat0sdVWWL4Qw1d4kwfda8lO8pmwqZR0TqZU
-X-Received: by 2002:a05:6870:548a:b0:3c9:74fb:a719 with SMTP id 586e51a60fabf-3c98d11ed8amr7546003fac.39.1761131232587;
-        Wed, 22 Oct 2025 04:07:12 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-14.dlp.protect.broadcom.com. [144.49.247.14])
-        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-3c9aef0a5ddsm1453291fac.5.2025.10.22.04.07.12
+        d=1e100.net; s=20230601; t=1761131234; x=1761736034;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:dkim-signature
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kA9Oy21XPeXmPlSwKvLYBk2PQ/Fy4Lvp8jR4DRUe+f8=;
+        b=jePee5+LzUFdpLen4lE/2MZPPLxXrIAts62vEZwkwJ6/CWNMi9oxJfukN6b9CFlkOa
+         NRowEA08GGpE2YLF0/KQZQU9CRxoI9T4n8se2mjpeqinSqIQ6dHfx0lwEbo3iDsqSNP8
+         3i1pV/xaIdRZuyxzO7/5Rnrty5zi6iHmpamwMUpgajK9xpQg0zFP1i6RQuz96bs/PFyY
+         5GtfeHCsHeFAdODwGxongDjzjtoES0o24TnxEp+c7tTa8lYYe1vHs8kttdhCGNPkPCw2
+         XJcayJFrl39jBJd8WJe+GJypbLIUPzWob/To8QZ36gX7n325MMlJj/g+fFab7/1ROm7P
+         2UcQ==
+X-Gm-Message-State: AOJu0YxFdy7ZMauVAFcvGoWfrMAuJ1JhqHRLWrK4nB255ibchVHOyktk
+	R00S7ImjemP2QknoVJEjCnC/5EvPd+ZlmXFMdq7JXDMltr94v/AwWbzr3sc0Sei4ov4bMv/qQrx
+	6zKu9MdrtEx7Mt7N6WeBEwNo88DbB0HdOOrU9ws5jI7rBM32ypNlAk3MPpWOUYc6faFVtXy83PQ
+	JOZpNqvhv3klXCQW48rpCBO+Jjhkrv0RSe9AP9p+B2pLLC5QjWleyHQSFPY+CisKDh53Uo7kXQf
+	TGE/H9l/uk=
+X-Gm-Gg: ASbGncufjXzSMHrDu3iYWMGJicPCUulCxDTK+s/yOliyrcofr1Iofu/ew9awtDhwtnC
+	LvWrs+C6MD+vfmmdmAjdzRl/fsd/m+f1BivHbB8xneZ+n/kwSUo0u5PJkiclUFkJCj9ylSGAk4o
+	TznEv+3VWMXvPhL145JjGrVErXIjtnZY4FSRSFP39Alu8cLW44qZjlnU2qDbWamBftRc2Rv5sp2
+	8XOVACt43M+Af6SujA32hsPqqLLe5jaEZ44f1LpXZKXXWcdTH9brvWmeyRuBFWvghxf2Rl6chnM
+	7/C5TFTAzSRL2fgZxYDBDkQ7qZF344NmWaP0JJQrqH3nnFkQiW3wV9FKJ0E4sDCgdYyPIv3tB1W
+	gcuu8EnSuLTKmZVPPsNFpQZtrD9sWu5a0RzfJk7QzFt5C/fXWwzZXMzr8+uGqWqaj5PsjX9SSFm
+	S1+XDtqXRcGld/3gtrlFy2DfDV+Qm/nik=
+X-Google-Smtp-Source: AGHT+IEjxmrvnr2TOTruifT/p5nQDXBOCZfaibCan4HPf9oeFWGEMvVcMe1Ytv081/8KLC4jqBLphEiNftUF
+X-Received: by 2002:a05:6602:341a:b0:940:d833:a83d with SMTP id ca18e2360f4ac-940f44127a4mr478369839f.1.1761131234084;
+        Wed, 22 Oct 2025 04:07:14 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-72.dlp.protect.broadcom.com. [144.49.247.72])
+        by smtp-relay.gmail.com with ESMTPS id ca18e2360f4ac-93e8663b577sm103782339f.6.2025.10.22.04.07.13
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 22 Oct 2025 04:07:12 -0700 (PDT)
+        Wed, 22 Oct 2025 04:07:14 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-28eb14e3cafso133944235ad.1
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 04:07:11 -0700 (PDT)
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2909daa65f2so10627575ad.0
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 04:07:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1761131231; x=1761736031; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=f2jSL7X+YIPN8ymI0EGsh1TEga+mDeE0bn24UOno88E=;
-        b=b8H4kUzn3LR4nBn5WgN0jxYsNNWyc/rAO6CMXtrdr4pme/cKfK5Dgna3BycP51lBNd
-         5rBTXA71hiujrDqKNzBhQpJKL24O3BelmMPTPHLdAv0C1lhg1atiU77dfu8MVmdQfJzQ
-         57m48BNn2jXULvdZDDXz+eP0VzUaZq7iZcdXc=
-X-Received: by 2002:a17:902:d58d:b0:269:9719:fffd with SMTP id d9443c01a7336-290c9cf9775mr254082085ad.1.1761131230998;
-        Wed, 22 Oct 2025 04:07:10 -0700 (PDT)
-X-Received: by 2002:a17:902:d58d:b0:269:9719:fffd with SMTP id d9443c01a7336-290c9cf9775mr254081735ad.1.1761131230496;
-        Wed, 22 Oct 2025 04:07:10 -0700 (PDT)
+        d=broadcom.com; s=google; t=1761131232; x=1761736032; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kA9Oy21XPeXmPlSwKvLYBk2PQ/Fy4Lvp8jR4DRUe+f8=;
+        b=Zgka9XoA3l7OIOI4OLkeZJH/Na1b5BVlHCBcQKLDnck1NIcLbIgzmR4MS5Zsj+0dh4
+         819h9Cndr3YHJXCOM+934lRz0i7Ii2UVHfAPWcPSSGwax/PJisvYJDxCIcfvosSEdnyP
+         oLEstaS+13AgAX1EL4M+QDJcuvm8PNY9+8uWQ=
+X-Received: by 2002:a17:902:f690:b0:28e:873d:8a with SMTP id d9443c01a7336-292ffc0ab76mr41333935ad.15.1761131232524;
+        Wed, 22 Oct 2025 04:07:12 -0700 (PDT)
+X-Received: by 2002:a17:902:f690:b0:28e:873d:8a with SMTP id d9443c01a7336-292ffc0ab76mr41333645ad.15.1761131232122;
+        Wed, 22 Oct 2025 04:07:12 -0700 (PDT)
 Received: from photon-dev-haas.. ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29246ffeec3sm135964955ad.52.2025.10.22.04.07.08
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29246ffeec3sm135964955ad.52.2025.10.22.04.07.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Oct 2025 04:07:10 -0700 (PDT)
+        Wed, 22 Oct 2025 04:07:11 -0700 (PDT)
 From: Ajay Kaher <ajay.kaher@broadcom.com>
 To: kuba@kernel.org,
 	davem@davemloft.net,
@@ -113,10 +115,12 @@ Cc: netdev@vger.kernel.org,
 	karen.wang@broadcom.com,
 	hari-krishna.ginka@broadcom.com,
 	ajay.kaher@broadcom.com
-Subject: [PATCH v2 0/2] ptp/ptp_vmw: enhancements to ptp_vmw
-Date: Wed, 22 Oct 2025 10:51:26 +0000
-Message-Id: <20251022105128.3679902-1-ajay.kaher@broadcom.com>
+Subject: [PATCH v2 1/2] ptp/ptp_vmw: Implement PTP clock adjustments ops
+Date: Wed, 22 Oct 2025 10:51:27 +0000
+Message-Id: <20251022105128.3679902-2-ajay.kaher@broadcom.com>
 X-Mailer: git-send-email 2.40.4
+In-Reply-To: <20251022105128.3679902-1-ajay.kaher@broadcom.com>
+References: <20251022105128.3679902-1-ajay.kaher@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -126,29 +130,120 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-This series provides:
+Implement PTP clock ops that set time and frequency of the underlying
+clock. On supported versions of VMware precision clock virtual device,
+new commands can adjust its time and frequency, allowing time transfer
+from a virtual machine to the underlying hypervisor.
 
-- implementation of PTP clock adjustments ops for ptp_vmw driver to
-adjust its time and frequency, allowing time transfer from a virtual
-machine to the underlying hypervisor.
+In case of error, vmware_hypercall doesn't return Linux defined errno,
+converting it to -EIO.
 
-- add a module parameter probe_hv_port that allows ptp_vmw driver to
-be loaded even when ACPI is disabled, by directly probing for the
-device using VMware hypervisor port commands.
+Cc: Shubham Gupta <shubham-sg.gupta@broadcom.com>
+Cc: Nick Shi <nick.shi@broadcom.com>
+Tested-by: Karen Wang <karen.wang@broadcom.com>
+Tested-by: Hari Krishna Ginka <hari-krishna.ginka@broadcom.com>
+Signed-off-by: Ajay Kaher <ajay.kaher@broadcom.com>
+---
+ drivers/ptp/ptp_vmw.c | 39 +++++++++++++++++++++++++++++----------
+ 1 file changed, 29 insertions(+), 10 deletions(-)
 
-v2:
-- [PATCH 2/2]: remove blank line in ptp_vmw_init()
-
-v1 link:
-https://lore.kernel.org/lkml/20250821110323.974367-1-ajay.kaher@broadcom.com/
-
-Ajay Kaher (2):
-  ptp/ptp_vmw: Implement PTP clock adjustments ops
-  ptp/ptp_vmw: load ptp_vmw driver by directly probing the device
-
- drivers/ptp/ptp_vmw.c | 109 +++++++++++++++++++++++++++++++++---------
- 1 file changed, 87 insertions(+), 22 deletions(-)
-
+diff --git a/drivers/ptp/ptp_vmw.c b/drivers/ptp/ptp_vmw.c
+index 20ab05c4d..7d117eee4 100644
+--- a/drivers/ptp/ptp_vmw.c
++++ b/drivers/ptp/ptp_vmw.c
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
+ /*
+- * Copyright (C) 2020 VMware, Inc., Palo Alto, CA., USA
++ * Copyright (C) 2020-2023 VMware, Inc., Palo Alto, CA., USA
++ * Copyright (C) 2024-2025 Broadcom Ltd.
+  *
+  * PTP clock driver for VMware precision clock virtual device.
+  */
+@@ -16,20 +17,36 @@
+ 
+ #define VMWARE_CMD_PCLK(nr) ((nr << 16) | 97)
+ #define VMWARE_CMD_PCLK_GETTIME VMWARE_CMD_PCLK(0)
++#define VMWARE_CMD_PCLK_SETTIME VMWARE_CMD_PCLK(1)
++#define VMWARE_CMD_PCLK_ADJTIME VMWARE_CMD_PCLK(2)
++#define VMWARE_CMD_PCLK_ADJFREQ VMWARE_CMD_PCLK(3)
+ 
+ static struct acpi_device *ptp_vmw_acpi_device;
+ static struct ptp_clock *ptp_vmw_clock;
+ 
++/*
++ * Helpers for reading and writing to precision clock device.
++ */
+ 
+-static int ptp_vmw_pclk_read(u64 *ns)
++static int ptp_vmw_pclk_read(int cmd, u64 *ns)
+ {
+ 	u32 ret, nsec_hi, nsec_lo;
+ 
+-	ret = vmware_hypercall3(VMWARE_CMD_PCLK_GETTIME, 0,
+-				&nsec_hi, &nsec_lo);
++	ret = vmware_hypercall3(cmd, 0, &nsec_hi, &nsec_lo);
+ 	if (ret == 0)
+ 		*ns = ((u64)nsec_hi << 32) | nsec_lo;
+-	return ret;
++
++	return ret != 0 ? -EIO : 0;
++}
++
++static int ptp_vmw_pclk_write(int cmd, u64 in)
++{
++	u32 ret, unused;
++
++	ret = vmware_hypercall5(cmd, 0, 0, in >> 32, in & 0xffffffff,
++				&unused);
++
++	return ret != 0 ? -EIO : 0;
+ }
+ 
+ /*
+@@ -38,19 +55,19 @@ static int ptp_vmw_pclk_read(u64 *ns)
+ 
+ static int ptp_vmw_adjtime(struct ptp_clock_info *info, s64 delta)
+ {
+-	return -EOPNOTSUPP;
++	return ptp_vmw_pclk_write(VMWARE_CMD_PCLK_ADJTIME, (u64)delta);
+ }
+ 
+ static int ptp_vmw_adjfine(struct ptp_clock_info *info, long delta)
+ {
+-	return -EOPNOTSUPP;
++	return ptp_vmw_pclk_write(VMWARE_CMD_PCLK_ADJFREQ, (u64)delta);
+ }
+ 
+ static int ptp_vmw_gettime(struct ptp_clock_info *info, struct timespec64 *ts)
+ {
+ 	u64 ns;
+ 
+-	if (ptp_vmw_pclk_read(&ns) != 0)
++	if (ptp_vmw_pclk_read(VMWARE_CMD_PCLK_GETTIME, &ns) != 0)
+ 		return -EIO;
+ 	*ts = ns_to_timespec64(ns);
+ 	return 0;
+@@ -59,7 +76,9 @@ static int ptp_vmw_gettime(struct ptp_clock_info *info, struct timespec64 *ts)
+ static int ptp_vmw_settime(struct ptp_clock_info *info,
+ 			  const struct timespec64 *ts)
+ {
+-	return -EOPNOTSUPP;
++	u64 ns = timespec64_to_ns(ts);
++
++	return ptp_vmw_pclk_write(VMWARE_CMD_PCLK_SETTIME, ns);
+ }
+ 
+ static int ptp_vmw_enable(struct ptp_clock_info *info,
+@@ -71,7 +90,7 @@ static int ptp_vmw_enable(struct ptp_clock_info *info,
+ static struct ptp_clock_info ptp_vmw_clock_info = {
+ 	.owner		= THIS_MODULE,
+ 	.name		= "ptp_vmw",
+-	.max_adj	= 0,
++	.max_adj	= 999999999,
+ 	.adjtime	= ptp_vmw_adjtime,
+ 	.adjfine	= ptp_vmw_adjfine,
+ 	.gettime64	= ptp_vmw_gettime,
 -- 
 2.40.4
 
