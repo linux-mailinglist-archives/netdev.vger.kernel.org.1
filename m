@@ -1,236 +1,480 @@
-Return-Path: <netdev+bounces-231516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E29E1BF9CB4
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 05:11:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C869BF9D27
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 05:23:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A0D764E43CF
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 03:11:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 106D0188A748
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 03:23:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1AAD1DE3C7;
-	Wed, 22 Oct 2025 03:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 931D3264614;
+	Wed, 22 Oct 2025 03:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ecU5J8UT"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="rDwsjI+p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CEE12222AF
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 03:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723101547F2;
+	Wed, 22 Oct 2025 03:23:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761102700; cv=none; b=dfO3Rm4fiHlDdJZiYgUVJtWriW3Vn/Z1MJF8unE/F7yeVoWiNbkesHdR8TLImMg7YExByL+Zb+08N9FDsJMcq12/YcHNgCzB9wuzw7/6iMCGtFveBNcxHpGWwJopxjdocFsFBoDcsfdHqnc4LyggHMx1BM/cijTvkTayiQFRPMg=
+	t=1761103400; cv=none; b=ibAULFg8FtLd/HDY4oPZotTwfqj+Q20SHZx5nuvWzab2379r4ebyqZp2UnWkiQGcqq6gvvGVSs3abX7ZXTECB84eEI6xr+IDRR82lG3aaA2T6emSt2MkpgEe4INXEW+PcUQ7SyyYtt2FChaanUST39NyMlN1TCLR5MGOIqWTXJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761102700; c=relaxed/simple;
-	bh=vo4X/k8QJ+NxqbcWxXdeO1gco1FXAXIvNeqYsVUxN+4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AtB6Txm2o/u+j6xyNqyHgHszLF8lS6cbvX1byuEWpFw9tfmJu9uX6Y0fG7qtvK/hQzn0znthziqzHzqn67C6KoyOwFpsP41ejTN+oWZAhLgO8+70Gkntvj896Iqv+BBh1BjwuoA0rWbmx1z0OlwXzskPHTOzxi+R9OZqL/mZ1oY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ecU5J8UT; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-938bf212b72so268381339f.1
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 20:11:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761102698; x=1761707498; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1w81N5UwqCcLk9lzNRuUpjETqoES8d1bFB+ZdpugPTA=;
-        b=ecU5J8UT2Bwg8ULPydtna8dAQMF62PFne2fmf1Y9Ag8gK6uy29cNT/9sEC0fepMoUR
-         zxGvA9KDaX+D52B/boKTWnBLfg5u2nbMp3jj2VSm5DmxVfgxsjNTvul8Bq6n+oi4IHUG
-         o51N065I48yH3pYK1LeJafJCxj2cRlUhJwnxSwdnXFp0iwqvzKrzwJXqFtZiR8q6v90w
-         1/PcZ5EBGpqvawUyH3eTTS+i+QH5kDq0f3SJJtZCWP1dIKRRjNbDbnD+ArQZFEDjyl4h
-         QaEbDbvMFBBcNxAEuqjKjeDq20z1s5v9bpJvAiT/e1nDxqDYrrdUW7DPUZVuu5bPnAqd
-         TPLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761102698; x=1761707498;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1w81N5UwqCcLk9lzNRuUpjETqoES8d1bFB+ZdpugPTA=;
-        b=U3GHNsbUe0YBB91Fk+VSwCZ8TB6WpVhOlcBGjgeV4zrAVzM3EgY/v1aNaHfaCnok24
-         F3IRCrYd9TLQmJ9w5B35+CCSuZ0i+OCopCx6xjLO+2/KzKDTUqoCBYea2DIH7gdU21Oz
-         hiIDUHiLspDQ4u2fO+3pcHm+rDxgQ7c5SInZbBNzJmeQgoOWmLak7cDfd9CZmtbF8hQZ
-         sTNAVyA11Krp6Yk/aB8mO7Ax3yzmQoQ1m7Q/wSCbbOfkv4nysWGljzTiw4cCyLndSIJu
-         VJfYqV0NTUzgMQ2FTuntFPCw77JzpY7h2/A/PBWxybJ9cPB/oKGRIGqhOl7RZGeVjzKv
-         0cdA==
-X-Gm-Message-State: AOJu0YypKnhi2CKehWwNoYIEhnBB1u1iGdZO/QSFLS/utJC5f51SDlU1
-	1RcPVhggWZ1Ane4c/LR+U4BOeDGFmxK38gxSokAShmpsJoDqLu3nu8TOJVQy2yCuA7Zie2GPiv6
-	7g9bq3JkM4LkuUlGisMxZ3pI0DDzN2Pc=
-X-Gm-Gg: ASbGncv/ZcpkrNdKPtNKvtRurlGsY6POJlL4dKHcIwY6jhJGuUJkMoQjamPoaE1f7gI
-	bjMtRC4IWZHzW2b++bt5rxV44dfT1I8T+X6iTTyXFTJrPf52SBRPPnycvpuUgM4Kvt7RRvx6tNx
-	reeGlKemlBSAqpmjkmhSY8PeMPsEFlokotJNjnpekazKIpYc0MFdo6Q1lUXcUk4q43IU2f7PpZC
-	QqY8BAeBhvaYcVwu1lAQppRg4iZd3wcUBT77teRu9w72grh4IapPjJVqssyX/+I6XLYcgY=
-X-Google-Smtp-Source: AGHT+IHsc5L8H41oQ6pWuGlwc/6nz3oXWi8+Bcroke4DapuC5C0EkQMaKnI90LLtcbQ2XDw0xbZs5GobUsx8JgiIzoU=
-X-Received: by 2002:a05:6e02:1689:b0:42d:876e:61bd with SMTP id
- e9e14a558f8ab-430c527fb41mr284123945ab.28.1761102697970; Tue, 21 Oct 2025
- 20:11:37 -0700 (PDT)
+	s=arc-20240116; t=1761103400; c=relaxed/simple;
+	bh=UHDnJ8vauuuF3M0YsOFuY76aby+PUPN3+lG/pbnuT/s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L1VxVBzJ7mquZSnvHD7dnTmkpNJg34zueF+c/8Y+8haGrR1bg809DkC9Fnss9Xtql3Ewb5v3WrX8UtWvnN8l+Cd5vnZD5N4ma6qNhySMrVaJXyyFXHc1roegbhjWGDswRlhVDK7iIQ0PH7P+hQWWoH43jo8gdTPDVGdlTasi8tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=rDwsjI+p; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1761103393; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=A/R6kPpIZRb0cPkZp73nLXE23+DLo5Ek9FmnTAYZhb8=;
+	b=rDwsjI+psaG3PpAEJzRsz0QXWDGjrktloizwZoWJUPd/N+DSPzlYzjH1RnYK2/JDlenMpf6h1prqbHaXkwkUTcFWjDniQoJPeraCXxgF5KaDqdsNzIcy2lCRn7YdVsgkGobHGN6Rr6iosIgL2cuy2P7NPrnl7X4tBlM0x/fQvWQ=
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WqlApR6_1761103389 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 22 Oct 2025 11:23:13 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: mjambigi@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	wintera@linux.ibm.com,
+	dust.li@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	sidraya@linux.ibm.com,
+	jaka@linux.ibm.com
+Subject: [PATCH net-next v2] net/smc: add full IPv6 support for SMC
+Date: Wed, 22 Oct 2025 11:23:09 +0800
+Message-ID: <20251022032309.66386-1-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251021173200.7908-1-alessandro.d@gmail.com> <20251021173200.7908-2-alessandro.d@gmail.com>
-In-Reply-To: <20251021173200.7908-2-alessandro.d@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 22 Oct 2025 11:11:01 +0800
-X-Gm-Features: AS18NWBBSoMIxcuhS-7Wwy3NqCqJITQFYqxcB1a6KZpfmjK1-38rwvJFwSyOIzY
-Message-ID: <CAL+tcoCwGQyNSv9BZ_jfsia6YFoyT790iknqxG7bB7wVi3C_vQ@mail.gmail.com>
-Subject: Re: [PATCH net v2 1/1] i40e: xsk: advance next_to_clean on status descriptors
-To: Alessandro Decina <alessandro.d@gmail.com>
-Cc: netdev@vger.kernel.org, Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
-	"David S. Miller" <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Tirthendu Sarkar <tirthendu.sarkar@intel.com>, 
-	Tony Nguyen <anthony.l.nguyen@intel.com>, bpf@vger.kernel.org, 
-	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 22, 2025 at 1:33=E2=80=AFAM Alessandro Decina
-<alessandro.d@gmail.com> wrote:
->
-> Whenever a status descriptor is received, i40e processes and skips over
-> it, correctly updating next_to_process but forgetting to update
-> next_to_clean. In the next iteration this accidentally causes the
-> creation of an invalid multi-buffer xdp_buff where the first fragment
-> is the status descriptor.
->
-> If then a skb is constructed from such an invalid buffer - because the
-> eBPF program returns XDP_PASS - a panic occurs:
->
-> [ 5866.367317] BUG: unable to handle page fault for address: ffd31c37eab1=
-c980
-> [ 5866.375050] #PF: supervisor read access in kernel mode
-> [ 5866.380825] #PF: error_code(0x0000) - not-present page
-> [ 5866.386602] PGD 0
-> [ 5866.388867] Oops: Oops: 0000 [#1] SMP NOPTI
-> [ 5866.393575] CPU: 34 UID: 0 PID: 0 Comm: swapper/34 Not tainted 6.17.0-=
-custom #1 PREEMPT(voluntary)
-> [ 5866.403740] Hardware name: Supermicro AS -2115GT-HNTR/H13SST-G, BIOS 3=
-.2 03/20/2025
-> [ 5866.412339] RIP: 0010:memcpy+0x8/0x10
-> [ 5866.416454] Code: cc cc 90 cc cc cc cc cc cc cc cc cc cc cc cc cc cc c=
-c 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 90 48 89 f8 48 89 d1 <=
-f3> a4 e9 fc 26 c0 fe 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
-> [ 5866.437538] RSP: 0018:ff428d9ec0bb0ca8 EFLAGS: 00010286
-> [ 5866.443415] RAX: ff2dd26dbd8f0000 RBX: ff2dd265ad161400 RCX: 000000000=
-00004e1
-> [ 5866.451435] RDX: 00000000000004e1 RSI: ffd31c37eab1c980 RDI: ff2dd26db=
-d8f0000
-> [ 5866.459454] RBP: ff428d9ec0bb0d40 R08: 0000000000000000 R09: 000000000=
-0000000
-> [ 5866.467470] R10: 0000000000000000 R11: 0000000000000000 R12: ff428d9ee=
-c726ef8
-> [ 5866.475490] R13: ff2dd26dbd8f0000 R14: ff2dd265ca2f9fc0 R15: ff2dd2654=
-8548b80
-> [ 5866.483509] FS:  0000000000000000(0000) GS:ff2dd2c363592000(0000) knlG=
-S:0000000000000000
-> [ 5866.492600] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 5866.499060] CR2: ffd31c37eab1c980 CR3: 0000000178d7b040 CR4: 000000000=
-0f71ef0
-> [ 5866.507079] PKRU: 55555554
-> [ 5866.510125] Call Trace:
-> [ 5866.512867]  <IRQ>
-> [ 5866.515132]  ? i40e_clean_rx_irq_zc+0xc50/0xe60 [i40e]
-> [ 5866.520921]  i40e_napi_poll+0x2d8/0x1890 [i40e]
-> [ 5866.526022]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [ 5866.531408]  ? raise_softirq+0x24/0x70
-> [ 5866.535623]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [ 5866.541011]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [ 5866.546397]  ? rcu_sched_clock_irq+0x225/0x1800
-> [ 5866.551493]  __napi_poll+0x30/0x230
-> [ 5866.555423]  net_rx_action+0x20b/0x3f0
-> [ 5866.559643]  handle_softirqs+0xe4/0x340
-> [ 5866.563962]  __irq_exit_rcu+0x10e/0x130
-> [ 5866.568283]  irq_exit_rcu+0xe/0x20
-> [ 5866.572110]  common_interrupt+0xb6/0xe0
-> [ 5866.576425]  </IRQ>
-> [ 5866.578791]  <TASK>
->
-> Advance next_to_clean to ensure invalid xdp_buff(s) aren't created.
->
-> Fixes: 1c9ba9c14658 ("i40e: xsk: add RX multi-buffer support")
-> Signed-off-by: Alessandro Decina <alessandro.d@gmail.com>
-> ---
->  drivers/net/ethernet/intel/i40e/i40e_xsk.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/net/eth=
-ernet/intel/i40e/i40e_xsk.c
-> index 9f47388eaba5..dbc19083bbb7 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-> @@ -441,13 +441,18 @@ int i40e_clean_rx_irq_zc(struct i40e_ring *rx_ring,=
- int budget)
->                 dma_rmb();
->
->                 if (i40e_rx_is_programming_status(qword)) {
-> +                       u16 ntp;
-> +
->                         i40e_clean_programming_status(rx_ring,
->                                                       rx_desc->raw.qword[=
-0],
->                                                       qword);
->                         bi =3D *i40e_rx_bi(rx_ring, next_to_process);
->                         xsk_buff_free(bi);
-> -                       if (++next_to_process =3D=3D count)
-> +                       ntp =3D next_to_process++;
-> +                       if (next_to_process =3D=3D count)
->                                 next_to_process =3D 0;
-> +                       if (next_to_clean =3D=3D ntp)
-> +                               next_to_clean =3D next_to_process;
->                         continue;
->                 }
->
-> --
-> 2.43.0
->
->
+The current SMC implementation is IPv4-centric. While it contains a
+workaround for IPv4-mapped IPv6 addresses, it lacks a functional path
+for native IPv6, preventing its use in modern dual-stack or IPv6-only
+networks.
 
-I'm copying your reply from v1 as shown below so that we can continue
-with the discussion :)
+This patch introduces full, native IPv6 support by refactoring the
+address handling mechanism to be IP-version agnostic, which is
+achieved by:
 
-> It really depends on whether a status descriptor can be received in the
-> middle of multi-buffer packet. Based on the existing code, I assumed it
-> can. Therefore, consider this case:
->
-> [valid_1st_packet][status_descriptor][valid_2nd_packet]
->
-> In this case you want to skip status_descriptor but keep the existing
-> logic that leads to:
->
->     first =3D next_to_clean =3D valid_1st_packet
->
-> so then you can go and add valid_2nd_packet as a fragment to the first.
+- Introducing a generic `struct smc_ipaddr` to abstract IP addresses.
+- Implementing an IPv6-specific route lookup function.
+- Extend GID matching logic for both IPv4 and IPv6 addresses
 
-Sorry, honestly, I still don't follow you.
+With these changes, SMC can now discover RDMA devices and establish
+connections over both native IPv4 and IPv6 networks.
 
-Looking at the case you provided, I think @first always pointing to
-valid_1st_packet is valid which does not bring any trouble. You mean
-the case is what you're trying to handle?
+Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+---
+v2: Fix build failure with CONFIG_IPV6 disabled
+---
+ net/smc/af_smc.c   |  48 +++++++++++----
+ net/smc/smc_core.h |  40 ++++++++++++-
+ net/smc/smc_ib.c   | 145 ++++++++++++++++++++++++++++++++++++++-------
+ net/smc/smc_ib.h   |   9 +++
+ net/smc/smc_llc.c  |   6 +-
+ 5 files changed, 209 insertions(+), 39 deletions(-)
 
-You patch updates next_to_clean that is only used at the very
-beginning, so it will not affect @first. Imaging the following case:
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index 77b99e8ef35a..b435c8ba95f5 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -1132,12 +1132,15 @@ static int smc_find_proposal_devices(struct smc_sock *smc,
+ 
+ 	/* check if there is an rdma v2 device available */
+ 	ini->check_smcrv2 = true;
+-	ini->smcrv2.saddr = smc->clcsock->sk->sk_rcv_saddr;
+-	if (!(ini->smcr_version & SMC_V2) ||
++
++	if (smc->clcsock->sk->sk_family == AF_INET)
++		smc_ipaddr_from_v4addr(&ini->smcrv2.saddr, smc->clcsock->sk->sk_rcv_saddr);
+ #if IS_ENABLED(CONFIG_IPV6)
+-	    (smc->clcsock->sk->sk_family == AF_INET6 &&
+-	     !ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)) ||
+-#endif
++	else
++		smc_ipaddr_from_v6addr(&ini->smcrv2.saddr, &smc->clcsock->sk->sk_v6_rcv_saddr);
++#endif /* CONFIG_IPV6 */
++
++	if (!(ini->smcr_version & SMC_V2) ||
+ 	    !smc_clc_ueid_count() ||
+ 	    smc_find_rdma_device(smc, ini))
+ 		ini->smcr_version &= ~SMC_V2;
+@@ -1230,11 +1233,27 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
+ 		memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_ALEN);
+ 		ini->smcrv2.uses_gateway = false;
+ 	} else {
+-		if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
+-				      smc_ib_gid_to_ipv4(aclc->r0.lcl.gid),
+-				      ini->smcrv2.nexthop_mac,
+-				      &ini->smcrv2.uses_gateway))
++		struct smc_ipaddr peer_gid;
++
++		smc_ipaddr_from_gid(&peer_gid, aclc->r0.lcl.gid);
++		if (peer_gid.family == AF_INET) {
++			/* v4-mapped v6 address should also be treated as v4 address. */
++			if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
++					      peer_gid.addr,
++					      ini->smcrv2.nexthop_mac,
++					      &ini->smcrv2.uses_gateway))
++				return SMC_CLC_DECL_NOROUTE;
++		} else {
++#if IS_ENABLED(CONFIG_IPV6)
++			if (smc_ib_find_route_v6(net, &smc->clcsock->sk->sk_v6_rcv_saddr,
++						 &peer_gid.addr_v6,
++						 ini->smcrv2.nexthop_mac,
++						 &ini->smcrv2.uses_gateway))
++				return SMC_CLC_DECL_NOROUTE;
++#else
+ 			return SMC_CLC_DECL_NOROUTE;
++#endif /* CONFIG_IPV6 */
++		}
+ 		if (!ini->smcrv2.uses_gateway) {
+ 			/* mismatch: peer claims indirect, but its direct */
+ 			return SMC_CLC_DECL_NOINDIRECT;
+@@ -2307,8 +2326,15 @@ static void smc_find_rdma_v2_device_serv(struct smc_sock *new_smc,
+ 	memcpy(ini->peer_mac, pclc->lcl.mac, ETH_ALEN);
+ 	ini->check_smcrv2 = true;
+ 	ini->smcrv2.clc_sk = new_smc->clcsock->sk;
+-	ini->smcrv2.saddr = new_smc->clcsock->sk->sk_rcv_saddr;
+-	ini->smcrv2.daddr = smc_ib_gid_to_ipv4(smc_v2_ext->roce);
++
++	if (new_smc->clcsock->sk->sk_family == AF_INET)
++		smc_ipaddr_from_v4addr(&ini->smcrv2.saddr, new_smc->clcsock->sk->sk_rcv_saddr);
++#if IS_ENABLED(CONFIG_IPV6)
++	else
++		smc_ipaddr_from_v6addr(&ini->smcrv2.saddr, &new_smc->clcsock->sk->sk_v6_rcv_saddr);
++#endif /* CONFIG_IPV6 */
++	smc_ipaddr_from_gid(&ini->smcrv2.daddr, smc_v2_ext->roce);
++
+ 	rc = smc_find_rdma_device(new_smc, ini);
+ 	if (rc) {
+ 		smc_find_ism_store_rc(rc, ini);
+diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
+index a5a78cbff341..6b07785f9874 100644
+--- a/net/smc/smc_core.h
++++ b/net/smc/smc_core.h
+@@ -279,6 +279,14 @@ struct smc_llc_flow {
+ 	struct smc_llc_qentry *qentry;
+ };
+ 
++struct smc_ipaddr {
++	sa_family_t family;
++	union {
++		__be32          addr;
++		struct in6_addr addr_v6;
++	};
++};
++
+ struct smc_link_group {
+ 	struct list_head	list;
+ 	struct rb_root		conns_all;	/* connection tree */
+@@ -359,7 +367,7 @@ struct smc_link_group {
+ 						/* rsn code for termination */
+ 			u8			nexthop_mac[ETH_ALEN];
+ 			u8			uses_gateway;
+-			__be32			saddr;
++			struct smc_ipaddr saddr;
+ 						/* net namespace */
+ 			struct net		*net;
+ 			u8			max_conns;
+@@ -389,9 +397,9 @@ struct smc_gidlist {
+ 
+ struct smc_init_info_smcrv2 {
+ 	/* Input fields */
+-	__be32			saddr;
++	struct smc_ipaddr saddr;
+ 	struct sock		*clc_sk;
+-	__be32			daddr;
++	struct smc_ipaddr daddr;
+ 
+ 	/* Output fields when saddr is set */
+ 	struct smc_ib_device	*ib_dev_v2;
+@@ -618,4 +626,30 @@ static inline struct smc_link_group *smc_get_lgr(struct smc_link *link)
+ {
+ 	return link->lgr;
+ }
++
++static inline void smc_ipaddr_from_v4addr(struct smc_ipaddr *ipaddr, __be32 v4_addr)
++{
++	ipaddr->family = AF_INET;
++	ipaddr->addr = v4_addr;
++}
++
++static inline void smc_ipaddr_from_v6addr(struct smc_ipaddr *ipaddr, const struct in6_addr *v6_addr)
++{
++	ipaddr->family = AF_INET6;
++	ipaddr->addr_v6 = *v6_addr;
++}
++
++static inline void smc_ipaddr_from_gid(struct smc_ipaddr *ipaddr, u8 gid[SMC_GID_SIZE])
++{
++	__be32 gid_v4 = smc_ib_gid_to_ipv4(gid);
++
++	if (gid_v4 != cpu_to_be32(INADDR_NONE)) {
++		ipaddr->family = AF_INET;
++		ipaddr->addr = gid_v4;
++	} else {
++		ipaddr->family = AF_INET6;
++		ipaddr->addr_v6 = *smc_ib_gid_to_ipv6(gid);
++	}
++}
++
+ #endif
+diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+index 0052f02756eb..9c4c53be7bfc 100644
+--- a/net/smc/smc_ib.c
++++ b/net/smc/smc_ib.c
+@@ -22,6 +22,7 @@
+ #include <linux/inetdevice.h>
+ #include <rdma/ib_verbs.h>
+ #include <rdma/ib_cache.h>
++#include <net/ip6_route.h>
+ 
+ #include "smc_pnet.h"
+ #include "smc_ib.h"
+@@ -225,48 +226,148 @@ int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
+ 	return -ENOENT;
+ }
+ 
+-static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
++#if IS_ENABLED(CONFIG_IPV6)
++int smc_ib_find_route_v6(struct net *net, struct in6_addr *saddr,
++			 struct in6_addr *daddr, u8 nexthop_mac[],
++			 u8 *uses_gateway)
++{
++	struct dst_entry *dst;
++	struct rt6_info *rt;
++	struct neighbour *neigh;
++	struct in6_addr *nexthop_addr;
++	int rc = -ENOENT;
++
++	struct flowi6 fl6 = {
++		.daddr = *daddr,
++		.saddr = *saddr,
++	};
++
++	if (ipv6_addr_any(daddr))
++		return -EINVAL;
++
++	dst = ip6_route_output(net, NULL, &fl6);
++	if (!dst || dst->error) {
++		rc = dst ? dst->error : -EINVAL;
++		goto out;
++	}
++	rt = (struct rt6_info *)dst;
++
++	if (ipv6_addr_type(&rt->rt6i_gateway) != IPV6_ADDR_ANY) {
++		*uses_gateway = 1;
++		nexthop_addr = &rt->rt6i_gateway;
++	} else {
++		*uses_gateway = 0;
++		nexthop_addr = daddr;
++	}
++
++	neigh = dst_neigh_lookup(dst, nexthop_addr);
++	if (!neigh)
++		goto out;
++
++	read_lock_bh(&neigh->lock);
++	if (neigh->nud_state & NUD_VALID) {
++		memcpy(nexthop_mac, neigh->ha, ETH_ALEN);
++		rc = 0;
++	}
++	read_unlock_bh(&neigh->lock);
++
++	neigh_release(neigh);
++out:
++	dst_release(dst);
++	return rc;
++}
++#endif /* CONFIG_IPV6 */
++
++static bool smc_ib_match_gid_rocev2(const struct net_device *ndev,
+ 				    const struct ib_gid_attr *attr,
+-				    u8 gid[], u8 *sgid_index,
+ 				    struct smc_init_info_smcrv2 *smcrv2)
+ {
+-	if (!smcrv2 && attr->gid_type == IB_GID_TYPE_ROCE) {
+-		if (gid)
+-			memcpy(gid, &attr->gid, SMC_GID_SIZE);
+-		if (sgid_index)
+-			*sgid_index = attr->index;
+-		return 0;
+-	}
+-	if (smcrv2 && attr->gid_type == IB_GID_TYPE_ROCE_UDP_ENCAP &&
+-	    smc_ib_gid_to_ipv4((u8 *)&attr->gid) != cpu_to_be32(INADDR_NONE)) {
++	struct net *net = dev_net(ndev);
++	bool subnet_match = false;
++
++	if (smc_ib_gid_to_ipv4((u8 *)&attr->gid) != cpu_to_be32(INADDR_NONE)) {
+ 		struct in_device *in_dev = __in_dev_get_rcu(ndev);
+-		struct net *net = dev_net(ndev);
+ 		const struct in_ifaddr *ifa;
+-		bool subnet_match = false;
+ 
+ 		if (!in_dev)
+-			goto out;
++			return false;
++
++		if (smcrv2->saddr.family != AF_INET)
++			return false;
++
+ 		in_dev_for_each_ifa_rcu(ifa, in_dev) {
+-			if (!inet_ifa_match(smcrv2->saddr, ifa))
++			if (!inet_ifa_match(smcrv2->saddr.addr, ifa))
+ 				continue;
+ 			subnet_match = true;
+ 			break;
+ 		}
++
+ 		if (!subnet_match)
+-			goto out;
+-		if (smcrv2->daddr && smc_ib_find_route(net, smcrv2->saddr,
+-						       smcrv2->daddr,
+-						       smcrv2->nexthop_mac,
+-						       &smcrv2->uses_gateway))
+-			goto out;
++			return false;
++
++		if (smcrv2->daddr.addr &&
++		    smc_ib_find_route(net, smcrv2->saddr.addr,
++				      smcrv2->daddr.addr,
++				      smcrv2->nexthop_mac,
++				      &smcrv2->uses_gateway))
++			return false;
++#if IS_ENABLED(CONFIG_IPV6)
++	} else if (!(ipv6_addr_type(smc_ib_gid_to_ipv6((u8 *)&attr->gid)) & IPV6_ADDR_LINKLOCAL)) {
++		struct inet6_dev *in6_dev = __in6_dev_get(ndev);
++		const struct inet6_ifaddr *if6;
++
++		if (!in6_dev)
++			return false;
++
++		if (smcrv2->saddr.family != AF_INET6)
++			return false;
++
++		list_for_each_entry_rcu(if6, &in6_dev->addr_list, if_list) {
++			if (ipv6_addr_type(&if6->addr) & IPV6_ADDR_LINKLOCAL)
++				continue;
++			if (!ipv6_prefix_equal(&if6->addr, &smcrv2->saddr.addr_v6, if6->prefix_len))
++				continue;
++			subnet_match = true;
++			break;
++		}
+ 
++		if (!subnet_match)
++			return false;
++
++		if ((ipv6_addr_type(&smcrv2->daddr.addr_v6) != IPV6_ADDR_ANY) &&
++		    smc_ib_find_route_v6(net, &smcrv2->saddr.addr_v6,
++					 &smcrv2->daddr.addr_v6,
++					 smcrv2->nexthop_mac,
++					 &smcrv2->uses_gateway))
++			return false;
++#endif /* CONFIG_IPV6 */
++	} else {
++		return false;
++	}
++
++	return true;
++}
++
++static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
++				    const struct ib_gid_attr *attr,
++				    u8 gid[], u8 *sgid_index,
++				    struct smc_init_info_smcrv2 *smcrv2)
++{
++	bool gid_match = false;
++
++	if (!smcrv2 && attr->gid_type == IB_GID_TYPE_ROCE)
++		gid_match = true;
++	else if (smcrv2 && attr->gid_type == IB_GID_TYPE_ROCE_UDP_ENCAP)
++		gid_match = smc_ib_match_gid_rocev2(ndev, attr, smcrv2);
++
++	if (gid_match) {
+ 		if (gid)
+ 			memcpy(gid, &attr->gid, SMC_GID_SIZE);
+ 		if (sgid_index)
+ 			*sgid_index = attr->index;
+ 		return 0;
+ 	}
+-out:
++
+ 	return -ENODEV;
+ }
+ 
+diff --git a/net/smc/smc_ib.h b/net/smc/smc_ib.h
+index ef8ac2b7546d..7cbeb7350478 100644
+--- a/net/smc/smc_ib.h
++++ b/net/smc/smc_ib.h
+@@ -69,6 +69,12 @@ static inline __be32 smc_ib_gid_to_ipv4(u8 gid[SMC_GID_SIZE])
+ 	return cpu_to_be32(INADDR_NONE);
+ }
+ 
++static inline struct in6_addr *smc_ib_gid_to_ipv6(u8 gid[SMC_GID_SIZE])
++{
++	struct in6_addr *addr6 = (struct in6_addr *)gid;
++	return addr6;
++}
++
+ static inline struct net *smc_ib_net(struct smc_ib_device *smcibdev)
+ {
+ 	if (smcibdev && smcibdev->ibdev)
+@@ -114,6 +120,9 @@ int smc_ib_determine_gid(struct smc_ib_device *smcibdev, u8 ibport,
+ 			 struct smc_init_info_smcrv2 *smcrv2);
+ int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
+ 		      u8 nexthop_mac[], u8 *uses_gateway);
++int smc_ib_find_route_v6(struct net *net, struct in6_addr *saddr,
++			 struct in6_addr *daddr, u8 nexthop_mac[],
++			 u8 *uses_gateway);
+ bool smc_ib_is_valid_local_systemid(void);
+ int smcr_nl_get_device(struct sk_buff *skb, struct netlink_callback *cb);
+ #endif
+diff --git a/net/smc/smc_llc.c b/net/smc/smc_llc.c
+index f865c58c3aa7..f2a02611ab25 100644
+--- a/net/smc/smc_llc.c
++++ b/net/smc/smc_llc.c
+@@ -1055,8 +1055,9 @@ int smc_llc_cli_add_link(struct smc_link *link, struct smc_llc_qentry *qentry)
+ 	if (lgr->smc_version == SMC_V2) {
+ 		ini->check_smcrv2 = true;
+ 		ini->smcrv2.saddr = lgr->saddr;
+-		ini->smcrv2.daddr = smc_ib_gid_to_ipv4(llc->sender_gid);
++		smc_ipaddr_from_gid(&ini->smcrv2.daddr, llc->sender_gid);
+ 	}
++
+ 	smc_pnet_find_alt_roce(lgr, ini, link->smcibdev);
+ 	if (!memcmp(llc->sender_gid, link->peer_gid, SMC_GID_SIZE) &&
+ 	    (lgr->smc_version == SMC_V2 ||
+@@ -1438,8 +1439,7 @@ int smc_llc_srv_add_link(struct smc_link *link,
+ 		if (send_req_add_link_resp) {
+ 			struct smc_llc_msg_req_add_link_v2 *req_add =
+ 				&req_qentry->msg.req_add_link;
+-
+-			ini->smcrv2.daddr = smc_ib_gid_to_ipv4(req_add->gid[0]);
++			smc_ipaddr_from_gid(&ini->smcrv2.daddr, req_add->gid[0]);
+ 		}
+ 	}
+ 	smc_pnet_find_alt_roce(lgr, ini, link->smcibdev);
+-- 
+2.45.0
 
-     [status_descriptor][valid_1st_packet][valid_2nd_packet]
-
-Even if the next_to_clean is updated, the @first still points to
-[status_descriptor] that is invalid and that will later cause the
-panic when constructing the skb.
-
-I'm afraid that we're not on the same page. Let me confirm that it is
-@first that points to the status descriptor that causes the panic,
-right? Could you share with us the exact case just like you did as
-above. Thank you.
-
-Thanks,
-Jason
 
