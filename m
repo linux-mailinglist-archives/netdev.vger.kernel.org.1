@@ -1,119 +1,112 @@
-Return-Path: <netdev+bounces-231519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC154BF9DC3
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 05:42:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8E88BF9DDE
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 05:44:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 914363BFF84
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 03:42:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1407919A073E
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 03:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD20C2D1F7E;
-	Wed, 22 Oct 2025 03:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7160627FD49;
+	Wed, 22 Oct 2025 03:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HNB9+QYw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QCu1DHKi"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67142D1907
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 03:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C332D24A3
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 03:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761104531; cv=none; b=n1sDgAANeFxUjkeukXNpX/8hHZHwZLSVDzqWAMGim5xuxZRMUXMXjvY7Ln9CTlHsbpL+5ZA00hlK0GcbIcH/MzYMwmfRvJAzHm5qf6I4nde+IGwBKdVcXHieNBopIx8lnwEanqmgCXY4r5YdWTOytZxfkkjwEjU2uv64prow/hU=
+	t=1761104684; cv=none; b=G4X+tU5/IJ6sWCoSD7PQU2Lnk4U6Utt3bvQeN4+C3U41vrqJ9+d9QdVcSoxPi8a76Stl3lq7MkuDcaq2uteXa/tUu3NPhp43G2KB9WECli0bv6CPZAgWwOcyYOyfrzfPUw0ivqFWpImtA7r/0Qc9QtRxPdIWLQ4+Kb2lXMivLPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761104531; c=relaxed/simple;
-	bh=HMZaRHd3QBC0oWYyy9CqpnKYlqU3jX1Jp7DLd0mUWxo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IJ+riZgFmukxI4SUDBMuRdOiEUCqRx8dI6MR9IrAfZUuI0KTvs4B69EgMaUoqY89y/FFdRoSRUxoGsz5LA0rQAEOMR42xTipj34hw8QVExYuHZFKFndPWhfvwY7ZdxDG7Eerrqxb2d2KwnRh/INlEbPkoqHDIy65APmJHc/fk48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HNB9+QYw; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1761104684; c=relaxed/simple;
+	bh=GSf7P5eeM6DUVSbiDUnm9pzJvTlKHLcPcHgt1685c6g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=b0Yvr1GukPFRApBSxe6WdjUFvU3mAJFLU6ZeuA4C51H5dPOXcSnmc8ZUkDl3taq7NxVjIJELiBXuoCJrUHaL0SJiCjXnaEPIEiKIQO37RsrL6raifDd+GwfR6okGglcOVW2sVtcnb0l55pLM4q+wjxeYNTCuXSpwH1ZgTAG0/XU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QCu1DHKi; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761104527;
+	s=mimecast20190719; t=1761104680;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HMZaRHd3QBC0oWYyy9CqpnKYlqU3jX1Jp7DLd0mUWxo=;
-	b=HNB9+QYwU/hlwidmnzylFJwkl3Hbs8qwdnHmEbjOoKJ8jm//jgjEmuZ950FdD0S0EGnrIo
-	ikwOO6M2180DUg0r/7k01YNIfO3FKCSKXPyDoDZB+wbusqrGSRPSeoO0ef1Z0mvWXxEEjP
-	IGLwYzq4DxYHVb5ukQOeBXLut/+3c9I=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-64-dzt7DJ-2P0CLvvFTZmALeQ-1; Tue, 21 Oct 2025 23:42:06 -0400
-X-MC-Unique: dzt7DJ-2P0CLvvFTZmALeQ-1
-X-Mimecast-MFC-AGG-ID: dzt7DJ-2P0CLvvFTZmALeQ_1761104525
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-33bcb7796d4so5758312a91.0
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 20:42:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761104525; x=1761709325;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HMZaRHd3QBC0oWYyy9CqpnKYlqU3jX1Jp7DLd0mUWxo=;
-        b=j+Sx3rsJv8LKd5GqxVz+h+Y6LHLoinVbF6fnTt6U8jYRv4cFsjDmyTJ23uMrVZGMB3
-         +WANj4ntTNfFhe6++53vJYwN9aDWnwu7viaaCY7CCqm4d75VKIlCf/NxMio5LoahA0qr
-         9LOKCo6rTX+eE9XkvDO/2wB3YgPJdKZAEXnZJD9AtuE1hjmqCr+IBExLfG/FVWN2I7f2
-         EKLR8KyLuPOGEKdy1qEoIL66gM9fX/qe8IVsbWRg4E3YjLffBJ3BY2WUtjUUGI4yopwG
-         EfIWkMgzf0G+e4NMH7tjGhQD1pvZqsJM0XMVh/cIqqtD6ka79iWp9+zg2K/YGwfctNeL
-         J76w==
-X-Forwarded-Encrypted: i=1; AJvYcCX33ImVRG89Vifryl1nQeSoXoAnLtAKXTYNADwtjNdqE3yR8UlJjxHfwrQs3v8sSikhKBsYXK4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtaWE4moEqvkEs+evISfZzgNks7E43KXLbRr6EZK7gBEdrwRHK
-	TVgoogsEZP41lwHhI1NSrbza3pwIm/B+apan74jtDNG8N1TJWYf3kriCf7jf/kXL4OqnK1m8RKd
-	UyPUqsEYjWwGN4IRfNocTdgvkCb/96SYKRIsRx2ABpUhvwo5wnp9PMUoPEwB7ovgL4DdAE1P/2f
-	rVo7Cck1X6CZYcmSsuAescCdLLB7fk7Ail
-X-Gm-Gg: ASbGnctoHrRAHhzDvSpbgD5CiaDlSwG/E93Gp4I/MnkaqjEK1eIcqDO7ONIzdwz6jrO
-	vCNVLGBQFC0zXgRyL6UDo21U2D+jdt4Yreik/De/7JbaXCdk9r5cI3+O2Z32p4yIkpM1EZv85uK
-	wiamRS2gcBrsadIPIw1xP9+lGUJs9YcMR+Md3TNUcUqDk2X61ULJf3
-X-Received: by 2002:a17:90b:4b:b0:334:cb89:bde6 with SMTP id 98e67ed59e1d1-33bcf8628ebmr27742377a91.4.1761104525161;
-        Tue, 21 Oct 2025 20:42:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHfFJjBBe9gj2JxeQntVU5I+I/K52WZIsvD7m3axHWRDtjxyFzVKU1vVPQFwjwwB3wSt/W9MIela5+BXvbcA7U=
-X-Received: by 2002:a17:90b:4b:b0:334:cb89:bde6 with SMTP id
- 98e67ed59e1d1-33bcf8628ebmr27742351a91.4.1761104524805; Tue, 21 Oct 2025
- 20:42:04 -0700 (PDT)
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Y4YJ9DUknv9IQ4DZMUZL0RfnKpN3mq1st9g8ZzhMtYo=;
+	b=QCu1DHKienHe5NhN9gWlD0Ka52kqY5Yybfp3EFmoYxx6s2+SzvPciutD8oIQQDCo7M7IQP
+	6T27jHnHViRq3w0IhsFzGXRyn4abBAlSDaqxRRfFxHNn2D5/hCYZGh7gUz63R/xCm1tboH
+	FEmrrgu9FFGMW3CHuJd2epnUjb9eLyE=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-613-N4HUP1niPQSCwWAd55P3OA-1; Tue,
+ 21 Oct 2025 23:44:35 -0400
+X-MC-Unique: N4HUP1niPQSCwWAd55P3OA-1
+X-Mimecast-MFC-AGG-ID: N4HUP1niPQSCwWAd55P3OA_1761104673
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6ED0118002F9;
+	Wed, 22 Oct 2025 03:44:32 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.72.112.88])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D71A219560B2;
+	Wed, 22 Oct 2025 03:44:27 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	pabeni@redhat.com,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net V2] virtio-net: zero unused hash fields
+Date: Wed, 22 Oct 2025 11:44:21 +0800
+Message-ID: <20251022034421.70244-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251021040155.47707-1-jasowang@redhat.com> <20251021042820-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20251021042820-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 22 Oct 2025 11:41:50 +0800
-X-Gm-Features: AS18NWAAJdWZmZZaokLYDDF4FQaIYsA-DM4Fq2y-aLHj75kmJUbkmf7MCRS75P0
-Message-ID: <CACGkMEtUjP2UN4s2ZRF8UGV6Bb3-6oPkU50oJ0ek8qfYwxjv1w@mail.gmail.com>
-Subject: Re: [PATCH net] virtio-net: zero unused hash fields
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: xuanzhuo@linux.alibaba.com, eperezma@redhat.com, pabeni@redhat.com, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Tue, Oct 21, 2025 at 4:28=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> On Tue, Oct 21, 2025 at 12:01:55PM +0800, Jason Wang wrote:
-> > When GSO tunnel is negotiated virtio_net_hdr_tnl_from_skb() tries to
-> > initialize the tunnel metadata but forget to zero unused rxhash
-> > fields. This may leak information to another side. Fixing this by
-> > zeroing the unused hash fields.
-> >
-> > Fixes: a2fb4bc4e2a6a ("net: implement virtio helpers to handle UDP GSO =
-tunneling")x
+When GSO tunnel is negotiated virtio_net_hdr_tnl_from_skb() tries to
+initialize the tunnel metadata but forget to zero unused rxhash
+fields. This may leak information to another side. Fixing this by
+zeroing the unused hash fields.
 
-I just spotted this has an unnecessary trailing 'x'. Will post V2.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Fixes: a2fb4bc4e2a6a ("net: implement virtio helpers to handle UDP GSO tunneling")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ include/linux/virtio_net.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-> > Cc: <stable@vger.kernel.org>
-> > Signed-off-by: Jason Wang <jasowang@redhat.com>
->
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-Thanks
+diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+index 20e0584db1dd..4d1780848d0e 100644
+--- a/include/linux/virtio_net.h
++++ b/include/linux/virtio_net.h
+@@ -401,6 +401,10 @@ virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
+ 	if (!tnl_hdr_negotiated)
+ 		return -EINVAL;
+ 
++        vhdr->hash_hdr.hash_value = 0;
++        vhdr->hash_hdr.hash_report = 0;
++        vhdr->hash_hdr.padding = 0;
++
+ 	/* Let the basic parsing deal with plain GSO features. */
+ 	skb_shinfo(skb)->gso_type &= ~tnl_gso_type;
+ 	ret = virtio_net_hdr_from_skb(skb, hdr, true, false, vlan_hlen);
+-- 
+2.42.0
 
 
