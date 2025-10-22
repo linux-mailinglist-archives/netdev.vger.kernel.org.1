@@ -1,113 +1,169 @@
-Return-Path: <netdev+bounces-231637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F5A6BFBD56
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 14:23:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF977BFBD62
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 14:25:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E4B056382A
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 12:23:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90AC61A031D5
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 12:26:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5D09314A8B;
-	Wed, 22 Oct 2025 12:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L8MoGJE2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F63342CBF;
+	Wed, 22 Oct 2025 12:25:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A2C33EB10
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 12:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C8EC32E142
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 12:25:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761135793; cv=none; b=TPz35uT50XwGCNTWm2K6TCHPg1zFTVc5ehcLsdzWM78WybGV3JoT7ClIfrcN2Fxtj84xc8ojBGsMmGXWZJmlpzpEuehxqNDBYfYglYtI3/h4T+U3p974oo4xwz1Iaactjzr035ONLN4+58m80l8+RF+KOTEQuQGja/adViY7J38=
+	t=1761135951; cv=none; b=l3nuJufvBYIlBdmCPBAJOV1HnhbfrGaIGumStCfvuj0TCKwmuleKCrtUTSsLrrtHfUCmyrYTvTH3IhQVIYRXyEGGDPlLaHOm/yRTBNAW6+6uMycUuPsZEtDviaclh6p2uNO6cekH6LOxreXJeMC3fP4FGE60x8aSqfcdSXm71sA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761135793; c=relaxed/simple;
-	bh=HbeFBwtgzquCzF8PTJMvgwZfmjwm0zMaLYvKCsuZUnY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RK9ysuUr/wvo/ouoF05zwsi65d6/b8DZG/31Tsgq6mMRyRmsC5ruMpCtBxrXQWbEcid5G+5AIZdNVSCDj68lFgGk3FxgADZGF2rue2p0KCljBfFLoe31gJNjMtlxQ55EP0OXFkFxucmOalkhFAf8xzzVrqh+kjUE6VBzSbNyJnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L8MoGJE2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761135788;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Udv/fmgj5IzxIAQ59j8QIxSocwUXj3+ehFUJn9q19yA=;
-	b=L8MoGJE2ISv5kZDQndsnSt+vwYS6446UmuU0fIUz12frOAIyy3Qk/BTbI3ilaNSU7PHmuj
-	JCgfCNTlZE0KlLIWub5FaL4cao4snd2h2+62KTYcK1cK4d/qExlBUpU9ymNlAWQaI4G5cI
-	itYCbR+e4aA3nL6LS6+czSndDQfb3Lw=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-466-8dkaZ0OjMuiCmI6LhkR1BA-1; Wed,
- 22 Oct 2025 08:23:07 -0400
-X-MC-Unique: 8dkaZ0OjMuiCmI6LhkR1BA-1
-X-Mimecast-MFC-AGG-ID: 8dkaZ0OjMuiCmI6LhkR1BA_1761135786
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	s=arc-20240116; t=1761135951; c=relaxed/simple;
+	bh=jLyg9N+A5uKrj1SJy5T9rDF7hoz761qWAi3Nlg4joC8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MX4+48A/Oh295VDOFGMwY/HcceeEwW9bdgU7FDB5FC1tIKiBCjUjTOrnOQyeNrfm6onkn7GKH+2tsVaYIOeTkSmA17GT+VzmUs/V8doF8Wl69dqszLW2RXhYpMv3YvtrpLH6+vsc6mMNyPa1baxGLT/GMKCE5uqJ755M6iukfbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [134.104.50.123] (unknown [134.104.50.123])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1164818001C6;
-	Wed, 22 Oct 2025 12:23:06 +0000 (UTC)
-Received: from p16v.redhat.com (unknown [10.45.224.69])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2122119560B4;
-	Wed, 22 Oct 2025 12:23:03 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	Jiri Pirko <jiri@resnulli.us>
-Subject: [PATCH iproute2] devlink: fix devlink flash error reporting
-Date: Wed, 22 Oct 2025 14:23:02 +0200
-Message-ID: <20251022122302.71766-1-ivecera@redhat.com>
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id CCD6E6028F34B;
+	Wed, 22 Oct 2025 14:25:06 +0200 (CEST)
+Message-ID: <5578e792-2dd6-42db-8ad6-b12cd05c2617@molgen.mpg.de>
+Date: Wed, 22 Oct 2025 14:24:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH] i40e: avoid redundant VF link state
+ updates
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Robert Malz <robert.malz@canonical.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ Jamie Bainbridge <jamie.bainbridge@gmail.com>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ Dennis Chen <dechen@redhat.com>,
+ Przemyslaw Kitszel <przemyslaw.kitszel@intel.com>,
+ Lukasz Czapnik <lukasz.czapnik@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Anthony L Nguyen <anthony.l.nguyen@intel.com>,
+ Simon Horman <horms@kernel.org>, "Keller, Jacob E"
+ <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>
+References: <20251021154439.180838-1-robert.malz@canonical.com>
+ <0c62b505-abe7-474e-9859-a301f4104eeb@molgen.mpg.de>
+ <IA3PR11MB89860CA0245498E6FF720E48E5F3A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <IA3PR11MB89860CA0245498E6FF720E48E5F3A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Currently, devlink silently exits when a non-existent device is specified
-for flashing or when the user lacks sufficient permissions. This makes it
-hard to diagnose the problem.
+Dear Alex,
 
-Print an appropriate error message in these cases to improve user feedback.
 
-Prior:
-$ devlink dev flash foo/bar file test
-$ sudo devlink dev flash foo/bar file test
-$
+Thank you for your input.
 
-After patch:
-$ devlink/devlink dev flash foo/bar file test
-devlink answers: Operation not permitted
-$ sudo devlink/devlink dev flash foo/bar file test
-devlink answers: No such device
+Am 22.10.25 um 14:06 schrieb Loktionov, Aleksandr:
 
-Fixes: 9b13cddfe268 ("devlink: implement flash status monitoring")
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- devlink/devlink.c | 2 ++
- 1 file changed, 2 insertions(+)
+>> -----Original Message-----
+>> From: Paul Menzel <pmenzel@molgen.mpg.de>
+>> Sent: Wednesday, October 22, 2025 1:49 PM
 
-diff --git a/devlink/devlink.c b/devlink/devlink.c
-index 171b85327be3..b162cf4050f9 100644
---- a/devlink/devlink.c
-+++ b/devlink/devlink.c
-@@ -4594,6 +4594,8 @@ static int cmd_dev_flash(struct dl *dl)
- 	} while (!ctx.flash_done || (ctx.not_first && !ctx.received_end));
- 
- 	err = mnlu_gen_socket_recv_run(&dl->nlg, NULL, NULL);
-+	if (err < 0)
-+		pr_err("devlink answers: %s\n", strerror(errno));
- 
- out:
- 	close(pipe_r);
--- 
-2.51.0
+>> Am 21.10.25 um 17:44 schrieb Robert Malz:
+>>> From: Jay Vosburgh <jay.vosburgh@canonical.com>
+>>>
+>>> Multiple sources can request VF link state changes with identical
+>>> parameters. For example, Neutron may request to set the VF link state
+>>> to
+>>
+>> What is Neutron?
+>>
+>>> IFLA_VF_LINK_STATE_AUTO during every initialization or user can issue:
+>>> `ip link set <ifname> vf 0 state auto` multiple times. Currently, the
+>>> i40e driver processes each of these requests, even if the requested
+>>> state is the same as the current one. This leads to unnecessary VF
+>>> resets and can cause performance degradation or instability in the VF
+>>> driver - particularly in DPDK environment.
+>>
+>> What is DPDK?
+>>
+> I think Robert needs:
+> - to expand acronyms in the commit message (Neutron → OpenStack Neutron, DPDK → Data Plane Development Kit).
+> - to fix the comment style as per coding guidelines.
+> - add a short note in the commit message about how to reproduce the issue.
+> @Paul Menzel right?
 
+Correct.
+
+Maybe also mention how to force it, as there seems to be such an option 
+judging from the diff.
+
+>>> With this patch i40e will skip VF link state change requests when the
+>>> desired link state matches the current configuration. This prevents
+>>> unnecessary VF resets and reduces PF-VF communication overhead.
+>>
+>> Add a test (with `ip link …`) case to show, that it works now.
+>>
+>>> Co-developed-by: Robert Malz <robert.malz@canonical.com>
+>>> Signed-off-by: Robert Malz <robert.malz@canonical.com>
+>>> Signed-off-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+>>> ---
+>>>    drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 12 ++++++++++++
+>>>    1 file changed, 12 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+>>> b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+>>> index 081a4526a2f0..0fe0d52c796b 100644
+>>> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+>>> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+>>> @@ -4788,6 +4788,7 @@ int i40e_ndo_set_vf_link_state(struct net_device *netdev, int vf_id, int link)
+>>>    	unsigned long q_map;
+>>>    	struct i40e_vf *vf;
+>>>    	int abs_vf_id;
+>>> +	int old_link;
+>>>    	int ret = 0;
+>>>    	int tmp;
+>>>
+>>> @@ -4806,6 +4807,17 @@ int i40e_ndo_set_vf_link_state(struct net_device *netdev, int vf_id, int link)
+>>>    	vf = &pf->vf[vf_id];
+>>>    	abs_vf_id = vf->vf_id + hw->func_caps.vf_base_id;
+>>>
+>>> +	/* skip VF link state change if requested state is already set */
+>>> +	if (!vf->link_forced)
+>>> +		old_link = IFLA_VF_LINK_STATE_AUTO;
+>>> +	else if (vf->link_up)
+>>> +		old_link = IFLA_VF_LINK_STATE_ENABLE;
+>>> +	else
+>>> +		old_link = IFLA_VF_LINK_STATE_DISABLE;
+>>> +
+>>> +	if (link == old_link)
+>>> +		goto error_out;
+>>
+>> Should a debug message be added?
+> 
+> I think adding one would be redundant since skipping identical state
+> changes is expected behavior.
+
+My thinking was, if something does not work as expected for a user, like 
+issuing the command to force a reset, that it might be useful to see 
+something in the logs.
+
+>>> +
+>>>    	pfe.event = VIRTCHNL_EVENT_LINK_CHANGE;
+>>>    	pfe.severity = PF_EVENT_SEVERITY_INFO;
+
+Kind regards,
+
+Paul
 
