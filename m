@@ -1,191 +1,134 @@
-Return-Path: <netdev+bounces-231907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EAD5BFE75A
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 00:57:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18052BFE7C8
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 01:12:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28C663A254B
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 22:57:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A46518C5BED
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 23:13:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D8E2D9499;
-	Wed, 22 Oct 2025 22:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60DA72D7DC5;
+	Wed, 22 Oct 2025 23:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yjRyB3Sr"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="n0pDSE52"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B914329AB05
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 22:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A6C302166
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 23:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761173822; cv=none; b=XajXBDki5HsY+gjxJx/1XdhSHsH7dTqPXGCXXzzMh4jX7FXoOAjQsa3s1P1Xf9Ztzxb1/RRtYelGJQFy2zSNTMUjCeYFl2j9vUwLyZ+wDBZvH4BKOf7H2YqaXs9FjLF0FAKANLCS58bZ/03yduwR1xfy/NIqZL6uD1R9Zn74uAg=
+	t=1761174771; cv=none; b=Wohwozyc5ljlTaWgkK1gXmx77rS04MDaHfTgTsavy9XIxDhvL5tU2chR6hgAEiC699sd0jz9Uo9/ojVPh/RTsmYWNid5ZQA0cO0MbzeOL4k2iOHx5TxaWhwZ3gJk9qonAmYqBavaCG0hyrjSOwSnA3KYGZl6jiymQWggIG75m/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761173822; c=relaxed/simple;
-	bh=trZcEH5fbIfpy/dy4uIh80UnlmTcj8EtKaSfbZVY90c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YYJyVB3aIoMVI/JHHNQtOoCzC0SUSF06F1JaIhkT2FK4N1Y44wfemWQYdxrM+w/FjWQ61N3jXpA2Hb0RxRNjQwpjxTYtZu6aUb3po1LWUtplGikcfqJBljyIz2eMfDs31mOPMOginy+ILiACdks92pbHQW7y5X1YmNS7yoa5a14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yjRyB3Sr; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2907948c1d2so1276035ad.3
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 15:57:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761173820; x=1761778620; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s0E4BJaLARHiiBGcGtJuIEWLcE6spNNO+nXwVK4hnAA=;
-        b=yjRyB3SrHAzUgxF19tdzC8rd47tPMrErsaKsfPRfu8dNjMebsFgTP4ABSbwSQoHp3c
-         liOfqSaK5VfGWpPGGvM/RC7MXQUpnWQJiY3Kxpyu2+kE8njXI7GSSdHaYtfjQCTG6BlX
-         mijMWu4HmGhWndZcJpCQID2KxmwIsOEiA3RMmgKJ7HfK4ylCfskn6BoCPSVcYEqqPiFr
-         IvQuCEeLalDwLJvo7Mr0HJji7INpJIwmp2C64Z8MLEhiopEw8dmz8UgHVWtNPGD2c2rI
-         VC+mTcdR/qrZNHBa9qbqJvkahdnLhlWDGwnKyR9UDBQZstpDgCa783VdKNJ1R5awzCjk
-         PDBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761173820; x=1761778620;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s0E4BJaLARHiiBGcGtJuIEWLcE6spNNO+nXwVK4hnAA=;
-        b=UGS46qv0bjuXOUL8zHFl5DCDC24wsYfWSmmBSpOGTIt6hCi8kvEQxQpcZ/fRnD7eEK
-         UTKuC0q97XLrUWOxsTh3SlNGUXhoTulo40UmMkoQ0OohY3+u2z4ASbJ86Dfb+Moig4X7
-         lHkGbzJcatCUYkAhLlHLcB5/A9Tfe11/NWZh3ryTkJRd4zGxPEevmOP8MKZLtm0YIvFg
-         XuV5me3PxcUrwH7M5hMw8Tu6WJewGDUASKKpq5x3VR52wBEGb2x9UdBGwcguNrz1XZs9
-         CFKLfYgvz/LOfCvDuA+qk23Wh0d3Pftzuzes7XQmLM3fcLPykYSeVnsxMqw5Q+oEyj16
-         KSTw==
-X-Forwarded-Encrypted: i=1; AJvYcCXjyPzb95pU9FcCr8JGQq0wpzMZLjB3QEjxs7vhhyBoSMx1jfldjZcLWlblOtRtQb8fInzyRRE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYfcjp9IXVyq7/LConG9m/ob2u6DYVYE4kuPhZX9lK1JjWLD2x
-	T6o07P0+lwfbkYVccNosOLw9Oh6+Dx1EIuOazvZWSy3tRh65os+Kk6jbaVjUVlVVYUE1kT+aP14
-	Vf2qdOZbaQsLGYaUAh8kk2kJme6KURu4YOXxpqDy/Sa6oFfrJI7IvW+EJ
-X-Gm-Gg: ASbGncvlFkles6bo2pAqIkB7UZy+iSTLpsJH6rc/5kzrWQkZ/OYdXpIJ5ISCgifDkTG
-	BLFB/WPjsiwuyD3Rh/msSVeTtamXL77YEfn2nM4dewa5948qLu6tz4F88BEBwP05Y2PFlroeTCx
-	3Kb1XENnSdmh7E8hCRz8nGQOdP1RjQaisB9QxqBhFooziWkL7PXEKHil6H9VuNgFSaisu6fIr2D
-	h0BDTioCMjLXtoRy767eWNxeD0IrTrGAMuDV9YJo8GvqJbZowKrW1QgPytLk1ZiICvnC0oq8+dD
-	Z4mWcpQoI/2FEKY=
-X-Google-Smtp-Source: AGHT+IGxpDwt4YvjZ56YxobTy3ltNAHy7C7Pud3TA9U1beR9QmaCB+kX/1DAeKFCc4faFAeG8XREdykN8LEjQHPkT0c=
-X-Received: by 2002:a17:902:f551:b0:290:9576:d6ef with SMTP id
- d9443c01a7336-2946e27fb28mr4220875ad.54.1761173819769; Wed, 22 Oct 2025
- 15:56:59 -0700 (PDT)
+	s=arc-20240116; t=1761174771; c=relaxed/simple;
+	bh=NvBrYAYp5zpgQVkY3YYE9Fqqhz8bUc+Bun/3qLlMW5M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ghoy2gW7lbsFIXM0BJB/GVquhM8/f3IyWc6XYHWxWrU84ikwYSsBweO5p4dHNA1xw1xzCe/wCWXFwIxBCCb8MTNJ7rSmxiQ/RAP5tvXJMkXzFB34TeYXcWVIgwhPrUTO8G543snzKgBtGshi4j8CzJ+Dg3hWkCgO9Ndqwt3VnFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=n0pDSE52; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <2753c96b-48f9-480e-923c-60d2c20ebb03@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761174766;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TQR3+niA3WL1Q5qAf+tYkxJSLyabvkBcayOKnKsYXT8=;
+	b=n0pDSE52OnOEthN3PSbHDCWq4EIiBdvXtsThCfAo+mTN32m/8WpJsAYts74PEcod1CQOf4
+	sbaGaxFPQkAmg1+y4ERFU9k2nFgsxUS/7bR9ex6rLXSUr9z+sEpqcpoIYC5PI1QdZvZIeR
+	HC51NCUrDfqX4AM+sen8mJGnL+koKnA=
+Date: Wed, 22 Oct 2025 16:12:39 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251022211722.2819414-1-kuniyu@google.com> <20251022211722.2819414-5-kuniyu@google.com>
- <CADvbK_eYHxO4sU3sOvRvpOoKwdbvZBLq86bPtQ7kK1Zf5z0Juw@mail.gmail.com>
-In-Reply-To: <CADvbK_eYHxO4sU3sOvRvpOoKwdbvZBLq86bPtQ7kK1Zf5z0Juw@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 22 Oct 2025 15:56:48 -0700
-X-Gm-Features: AS18NWD_AvQFuKAQMs4vtLDRJ1JQ043_7Ul1gYcUTwYE2sK9UaiNk_RN_p3beqA
-Message-ID: <CAAVpQUCCT-3tV+i19gNjvcQUZkHVUEOuPohiLgqD56MvUmQO4A@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 4/8] net: Add sk_clone().
-To: Xin Long <lucien.xin@gmail.com>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	linux-sctp@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH bpf-next v2 11/15] selftests/bpf: Expect unclone to
+ preserve skb metadata
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Arthur Fabre <arthur@arthurfabre.com>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, kernel-team@cloudflare.com
+References: <20251019-skb-meta-rx-path-v2-0-f9a58f3eb6d6@cloudflare.com>
+ <20251019-skb-meta-rx-path-v2-11-f9a58f3eb6d6@cloudflare.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20251019-skb-meta-rx-path-v2-11-f9a58f3eb6d6@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Oct 22, 2025 at 3:04=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wro=
-te:
->
-> On Wed, Oct 22, 2025 at 5:17=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.=
-com> wrote:
-> >
-> > sctp_accept() will use sk_clone_lock(), but it will be called
-> > with the parent socket locked, and sctp_migrate() acquires the
-> > child lock later.
-> >
-> > Let's add no lock version of sk_clone_lock().
-> >
-> > Note that lockdep complains if we simply use bh_lock_sock_nested().
-> >
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> > ---
-> >  include/net/sock.h |  7 ++++++-
-> >  net/core/sock.c    | 21 ++++++++++++++-------
-> >  2 files changed, 20 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/include/net/sock.h b/include/net/sock.h
-> > index 01ce231603db..c7e58b8e8a90 100644
-> > --- a/include/net/sock.h
-> > +++ b/include/net/sock.h
-> > @@ -1822,7 +1822,12 @@ struct sock *sk_alloc(struct net *net, int famil=
-y, gfp_t priority,
-> >  void sk_free(struct sock *sk);
-> >  void sk_net_refcnt_upgrade(struct sock *sk);
-> >  void sk_destruct(struct sock *sk);
-> > -struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority=
-);
-> > +struct sock *sk_clone(const struct sock *sk, const gfp_t priority, boo=
-l lock);
-> > +
-> > +static inline struct sock *sk_clone_lock(const struct sock *sk, const =
-gfp_t priority)
-> > +{
-> > +       return sk_clone(sk, priority, true);
-> > +}
-> >
-> >  struct sk_buff *sock_wmalloc(struct sock *sk, unsigned long size, int =
-force,
-> >                              gfp_t priority);
-> > diff --git a/net/core/sock.c b/net/core/sock.c
-> > index a99132cc0965..0a3021f8f8c1 100644
-> > --- a/net/core/sock.c
-> > +++ b/net/core/sock.c
-> > @@ -2462,13 +2462,16 @@ static void sk_init_common(struct sock *sk)
-> >  }
-> >
-> >  /**
-> > - *     sk_clone_lock - clone a socket, and lock its clone
-> > - *     @sk: the socket to clone
-> > - *     @priority: for allocation (%GFP_KERNEL, %GFP_ATOMIC, etc)
-> > + * sk_clone - clone a socket
-> > + * @sk: the socket to clone
-> > + * @priority: for allocation (%GFP_KERNEL, %GFP_ATOMIC, etc)
-> > + * @lock: if true, lock the cloned sk
-> >   *
-> > - *     Caller must unlock socket even in error path (bh_unlock_sock(ne=
-wsk))
-> > + * If @lock is true, the clone is locked by bh_lock_sock(), and
-> > + * caller must unlock socket even in error path by bh_unlock_sock().
-> >   */
-> > -struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority=
-)
-> > +struct sock *sk_clone(const struct sock *sk, const gfp_t priority,
-> > +                     bool lock)
-> >  {
-> >         struct proto *prot =3D READ_ONCE(sk->sk_prot);
-> >         struct sk_filter *filter;
-> > @@ -2497,9 +2500,13 @@ struct sock *sk_clone_lock(const struct sock *sk=
-, const gfp_t priority)
-> >                 __netns_tracker_alloc(sock_net(newsk), &newsk->ns_track=
-er,
-> >                                       false, priority);
-> >         }
-> > +
-> >         sk_node_init(&newsk->sk_node);
-> >         sock_lock_init(newsk);
-> > -       bh_lock_sock(newsk);
-> > +
-> > +       if (lock)
-> > +               bh_lock_sock(newsk);
-> > +
-> does it really need bh_lock_sock() that early, if not, maybe we can move
-> it out of sk_clone_lock(), and names sk_clone_lock() back to sk_clone()?
 
-I think sk_clone_lock() and leaf functions do not have
-lockdep_sock_is_held(), and probably the closest one is
-security_inet_csk_clone() which requires lock_sock() for
-bpf_setsockopt(), this can be easily adjusted though.
-(see bpf_lsm_locked_sockopt_hooks)
 
-Only concern would be moving bh_lock_sock() there will
-introduce one cache line miss.
+On 10/19/25 5:45 AM, Jakub Sitnicki wrote:
+> @@ -447,12 +448,14 @@ int clone_dynptr_empty_on_meta_slice_write(struct __sk_buff *ctx)
+>   
+>   /*
+>    * Check that skb_meta dynptr is read-only before prog writes to packet payload
+> - * using dynptr_write helper. Applies only to cloned skbs.
+> + * using dynptr_write helper, and becomes read-write afterwards. Applies only to
+> + * cloned skbs.
+>    */
+>   SEC("tc")
+> -int clone_dynptr_rdonly_before_data_dynptr_write(struct __sk_buff *ctx)
+> +int clone_dynptr_rdonly_before_data_dynptr_write_then_rw(struct __sk_buff *ctx)
+>   {
+>   	struct bpf_dynptr data, meta;
+> +	__u8 meta_have[META_SIZE];
+>   	const struct ethhdr *eth;
+>   
+>   	bpf_dynptr_from_skb(ctx, 0, &data);
+> @@ -465,15 +468,23 @@ int clone_dynptr_rdonly_before_data_dynptr_write(struct __sk_buff *ctx)
+>   
+>   	/* Expect read-only metadata before unclone */
+>   	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
+> -	if (!bpf_dynptr_is_rdonly(&meta) || bpf_dynptr_size(&meta) != META_SIZE)
+> +	if (!bpf_dynptr_is_rdonly(&meta))
+
+Can the bpf_dynptr_set_rdonly() be lifted from the 
+bpf_dynptr_from_skb_meta()?
+
+iiuc, the remaining thing left should be handling a cloned skb in 
+__bpf_dynptr_write()? The __bpf_skb_store_bytes() is using 
+bpf_try_make_writable, so maybe something similar can be done for the 
+BPF_DYNPTR_TYPE_SKB_META?
+
+> +		goto out;
+> +
+> +	bpf_dynptr_read(meta_have, META_SIZE, &meta, 0, 0);
+> +	if (!check_metadata(meta_have))
+>   		goto out;
+>   
+>   	/* Helper write to payload will unclone the packet */
+>   	bpf_dynptr_write(&data, offsetof(struct ethhdr, h_proto), "x", 1, 0);
+>   
+> -	/* Expect no metadata after unclone */
+> +	/* Expect r/w metadata after unclone */
+>   	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
+> -	if (bpf_dynptr_is_rdonly(&meta) || bpf_dynptr_size(&meta) != 0)
+> +	if (bpf_dynptr_is_rdonly(&meta))
+
+then it does not have to rely on the bpf_dynptr_write(&data, ...) above 
+to make the metadata writable.
+
+I have a high level question about the set. I assume the skb_data_move() 
+in patch 2 will be useful in the future to preserve the metadata across 
+the stack. Preserving the metadata across different tc progs (which this 
+set does) is nice to have but it is not the end goal. Can you shed some 
+light on the plan for building on top of this set?
 
