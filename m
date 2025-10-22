@@ -1,159 +1,162 @@
-Return-Path: <netdev+bounces-231893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87C96BFE564
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 23:42:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 129F4BFE593
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 23:51:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6EF0C4F63BD
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 21:42:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDCC51881E4D
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 21:51:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E440303A20;
-	Wed, 22 Oct 2025 21:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590502FF173;
+	Wed, 22 Oct 2025 21:51:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2o0zIKaG"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="KuwbYWp2";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mALDxU6u"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6B930275C;
-	Wed, 22 Oct 2025 21:42:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C2F027B354;
+	Wed, 22 Oct 2025 21:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761169371; cv=none; b=GXfAm5tULy7ilnvEYEnVGDIIw72pvpzV5pUvRHeJSOxayoXXu2It7D5zL16gZwtjbS1Rsjp/Xg0+8fHNStuBFzxvS1sI3SMEKKAyvGk4a3lwmz92pnCx1E4gZw9gz8SJ31zWtwGKIwjJbQGYXWLzuh8fZIjM2kyYIbsOiEuX/iw=
+	t=1761169876; cv=none; b=KWYTGHZ0QYoct30WUEpPCW/1HjxTkGsERv9Z7DVms99RiMlLag93HYyHvlEncXUmnYPaKsYO50IGwREVmVPxcJT6J8sVwO9nzqrrNwKmlg0ToYTt0YphYknygyALWtmddwLGqK+ofuQr5F86Lzw7+TQpDCDvxuY+AF9xpeiWR04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761169371; c=relaxed/simple;
-	bh=cGR7lMWBKqDn3+3GH8ZZjkJeJeokkQWRL6FFJ9SDucM=;
+	s=arc-20240116; t=1761169876; c=relaxed/simple;
+	bh=dn0HwXYQmRQZXxo4hkZFxuJSWZQyybh4xR+3qIH7kd8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cKLGp7YOeWNbetPRJfSUFVz+M7qu36oLJKsXX1ckWtrBfIsuU2SUX2Np2bLAYqG0br2otnoxQOTMpPd6M4c/06UjS6M7hFz1ZaxZGhyvt47XfQkRilptmyEn1Fu77rfAWJ4RzJPqEVuFwO+tj90eUfTcZV5gL0Z41yXN+kxhFXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2o0zIKaG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=RoLMA7YAWuosvmrIBLI8Zurj/FpRrXqerMkVboDNB+Y=; b=2o0zIKaGyuU7jtl6xkuRA757+/
-	As1Ixp9TgpYCJDhpfUu1tGXwnnJp89Oxc92MQcKIqa1/B82750L/nqFG+MHAVGVbDX/ljYXwf4ptn
-	Mszwaf22Z0j5sZeu62hOivGPjEZMSXwueveV3YZbNwS/5syABoUZ7lmMIjcqFgBc2bLw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vBgbA-00Boc8-AG; Wed, 22 Oct 2025 23:42:24 +0200
-Date: Wed, 22 Oct 2025 23:42:24 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>
-Subject: Re: [PATCH net-next v14 03/16] net: ethtool: Introduce
- ETHTOOL_LINK_MEDIUM_* values
-Message-ID: <cb217bf8-763e-4c48-9233-e577b32b14a8@lunn.ch>
-References: <20251013143146.364919-1-maxime.chevallier@bootlin.com>
- <20251013143146.364919-4-maxime.chevallier@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TcUmnkAXEbMppukQTSoXADUbA08id8MiUVGt4kVtq6XWXRMt8BOk+TOE/PW1rXaepRqaJDqrB4+rltyBZx+EtqaCiSJ3pTnu9IFdiyGhU1+2FJltFPeb+/7kPZ9ppTwClVKelqxO7MYSyDtOVYUXNRta+t7yf9gk55LhDC+a1Eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=KuwbYWp2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mALDxU6u; arc=none smtp.client-ip=202.12.124.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 01E337A0125;
+	Wed, 22 Oct 2025 17:51:11 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-12.internal (MEProxy); Wed, 22 Oct 2025 17:51:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1761169871; x=
+	1761256271; bh=hbG6RsnJYSgulUi4OAThtCw5VfjfNUbCoBtc+xp3w7g=; b=K
+	uwbYWp2BQH2k1UF4Gcwg2z3z1f3vZnDqoU/DhGEc+TCIB8gmohgm+Yib5XtNl2wE
+	1GiCIyPcg6UTha6jt0e1g4sSP5+FncC5fFLt4pBHrXvbFaDI4zfWPiiJX52ZTVYW
+	bKX64BcY3OYzI0Sau4mkTmx1weZI8elFj1JfaewCNzC5gm3NCXLkcqUZq7HqUbf4
+	kZj4wR6rEftZ9iQc93TNVjr2zpN+8szXdCgrpVE5Qd78qJTQ3EKW+tjCHJ8qSod8
+	dl6TFbGyuqkbyS0GVGoGsEpLC6pPLTkBcyHuRa6+xLpEhyQQn9ob8Nn2AEACM4qw
+	83fpZlpZ2Jq2HFIrHLirg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1761169871; x=1761256271; bh=hbG6RsnJYSgulUi4OAThtCw5VfjfNUbCoBt
+	c+xp3w7g=; b=mALDxU6u4ug2q5nX7gWT/vJIh6d0vG9Uvc5JMYJA3uJTNvCsLib
+	Ve/F5d1pjFGtgsJEWbt7BYGmJSZeZQU21MTYI69+uvQZzKM5JkZYUFhmqTZkycKw
+	rf3oDXBD36CjqV0bbYq8HqeBZiIirFG52+9oT82iPh3eegMNFHiPirjLnj+JhcDx
+	bGS15bHLe9UFFXHnH8sSGsHrz4S6fRlQ4YhRT6TRQDhT/xVhsYBpolw9FfMB6qh9
+	4btr4QsR/5i4rRjbVnTAujM7u3vXcmN2uaSWuiI20Qk+LGTGZVQ5G4UKJEEu3t0N
+	XqdRZTIjbDCo78gxjLa+LRVCYZpIrChQ76Q==
+X-ME-Sender: <xms:z1H5aDgBeJbVpYPQc3HyDm1m0Ah4srAcBpI8-VOzzFV-WXSAwOmmtg>
+    <xme:z1H5aMZUsdIqPWc1T28tfF0nyA8jvli_GxJwWinLzoyA_F9jZoeP8V4zjdTqJY6bw
+    fE_TPBrgqcJbpO8mHjQVq_pG0tW3eDAwiHImG2ga2mnqrw1fu7ZdQ>
+X-ME-Received: <xmr:z1H5aHiN7iSEsq3N5bVg0KoKuUaTWa38zI3nI8C_UeUlzWOZ3JLT2ESyEZVy>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddugeegjeduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtrodttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepveeileffffegueduleffgeeghefgkeffuedvhfehtdfgtdekhfetteef
+    gfejueefnecuffhomhgrihhnpehrfhgtqdgvughithhorhdrohhrghenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhn
+    rghilhdrnhgvthdpnhgspghrtghpthhtohepudegpdhmohguvgepshhmthhpohhuthdprh
+    gtphhtthhopeifihhlfhhrvggurdhophgvnhhsohhurhgtvgesghhmrghilhdrtghomhdp
+    rhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehlihhnuhigqdguohgtsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    lhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    eplhhinhhugidqkhhsvghlfhhtvghsthesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuh
+    hmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghl
+    rdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-ME-Proxy: <xmx:z1H5aOYggQ4Ygt1qW_XonnaI6GpJqAXPmJEWdtMUsEXG5u_hsI59Rw>
+    <xmx:z1H5aNNFWKVU6JEgDQIRy-U2SH5upapJCPrnrUE9zVJZOgke_SaOAg>
+    <xmx:z1H5aPZwPClYIXUo-WhJpHVh-Zbmq_Az_8FN_Pqko_beIQnULEbkwg>
+    <xmx:z1H5aNUhLOdncpxSvyrVjS7ZVDUND4f5K9JJ_ZQ3wPWwMKPhytDdMg>
+    <xmx:z1H5aAZZ-fbRVkflSlAuwQk-Dme9ProS48-E9p_zqIcctenE6qOEE2nK>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 22 Oct 2025 17:51:10 -0400 (EDT)
+Date: Wed, 22 Oct 2025 23:51:09 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Wilfred Mallawa <wilfred.opensource@gmail.com>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Simon Horman <horms@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Wilfred Mallawa <wilfred.mallawa@wdc.com>
+Subject: Re: [PATCH net-next v8 1/2] net/tls: support setting the maximum
+ payload size
+Message-ID: <aPlRzZtmnbLJNzmR@krikkit>
+References: <20251022001937.20155-1-wilfred.opensource@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251013143146.364919-4-maxime.chevallier@bootlin.com>
+In-Reply-To: <20251022001937.20155-1-wilfred.opensource@gmail.com>
 
-On Mon, Oct 13, 2025 at 04:31:29PM +0200, Maxime Chevallier wrote:
-> In an effort to have a better representation of Ethernet ports,
-> introduce enumeration values representing the various ethernet Mediums.
+2025-10-22, 10:19:36 +1000, Wilfred Mallawa wrote:
+> From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
 > 
-> This is part of the 802.3 naming convention, for example :
+> During a handshake, an endpoint may specify a maximum record size limit.
+> Currently, the kernel defaults to TLS_MAX_PAYLOAD_SIZE (16KB) for the
+> maximum record size. Meaning that, the outgoing records from the kernel
+> can exceed a lower size negotiated during the handshake. In such a case,
+> the TLS endpoint must send a fatal "record_overflow" alert [1], and
+> thus the record is discarded.
 > 
-> 1000 Base T 4
->  |    |   | |
->  |    |   | \_ lanes (4)
->  |    |   \___ Medium (T == Twisted Copper Pairs)
->  |    \_______ Baseband transmission
->  \____________ Speed
+> Upcoming Western Digital NVMe-TCP hardware controllers implement TLS
+> support. For these devices, supporting TLS record size negotiation is
+> necessary because the maximum TLS record size supported by the controller
+> is less than the default 16KB currently used by the kernel.
+> 
+> Currently, there is no way to inform the kernel of such a limit. This patch
+> adds support to a new setsockopt() option `TLS_TX_MAX_PAYLOAD_LEN` that
+> allows for setting the maximum plaintext fragment size. Once set, outgoing
+> records are no larger than the size specified. This option can be used to
+> specify the record size limit.
+> 
+> [1] https://www.rfc-editor.org/rfc/rfc8449
+> 
+> Signed-off-by: Wilfred Mallawa <wilfred.mallawa@wdc.com>
+> ---
+> V7 -> V8:
+>  - Fixup HTML doc indentation
+>  - Drop the getsockopt() change in V7 where ContentType was included in the
+>    max payload length
+> ---
+>  Documentation/networking/tls.rst | 20 ++++++++++
+>  include/net/tls.h                |  3 ++
+>  include/uapi/linux/tls.h         |  2 +
+>  net/tls/tls_device.c             |  2 +-
+>  net/tls/tls_main.c               | 64 ++++++++++++++++++++++++++++++++
+>  net/tls/tls_sw.c                 |  2 +-
+>  6 files changed, 91 insertions(+), 2 deletions(-)
 
-Dumb question. Does 802.3 actually use the word lanes here?
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-I'm looking at the commit which added lanes:
+Thanks Wilfred.
 
-commit 012ce4dd3102a0f4d80167de343e9d44b257c1b8
-
-    Add 'ETHTOOL_A_LINKMODES_LANES' attribute and expand 'struct
-    ethtool_link_settings' with lanes field in order to implement a new
-    lanes-selector that will enable the user to advertise a specific number
-    of lanes as well.
-
-    $ ethtool -s swp1 lanes 4
-    $ ethtool swp1
-      Settings for swp1:
-            Supported ports: [ FIBRE ]
-            Supported link modes:   1000baseKX/Full
-                                    10000baseKR/Full
-                                    40000baseCR4/Full
-                                    40000baseSR4/Full
-                                    40000baseLR4/Full
-                                    25000baseCR/Full
-                                    25000baseSR/Full
-                                    50000baseCR2/Full
-                                    100000baseSR4/Full
-                                    100000baseCR4/Full
-            Supported pause frame use: Symmetric Receive-only
-            Supports auto-negotiation: Yes
-            Supported FEC modes: Not reported
-            Advertised link modes:  40000baseCR4/Full
-                                    40000baseSR4/Full
-                                    40000baseLR4/Full
-                                    100000baseSR4/Full
-                                    100000baseCR4/Full
-
-
-For these link modes we are talking about 4 PCS outputs feeding an
-SFP module. The module when has one fibre pair, the media.
-
-For baseT4 what you call a lane is a twisted pair, the media.
-
-These two definitions seem to contradict each other.
-
-For SGMII, 1000BaseX, we have 1 PCS lane, feeding a PHY with 4 pairs.
-
-It gets more confusing at 10G, where the MAC might have 4 lanes
-feeding 4 pairs, or 1 lane feeding 4 pairs.
-
-Also, looking at the example above, if i have a MAC/PHY combination
-which can do 10/100/1G and i did:
-
-    $ ethtool -s swp1 lanes 2
-
-would it then only advertise 10 and 100, since 1G need four 'lanes'?
-
-Is reusing lanes going to cause us problems in the future, and maybe
-we should add a pairs member, to represent the media? And we can
-ignore bidi fibre modules for the moment :-)
-
-       Andrew
+-- 
+Sabrina
 
