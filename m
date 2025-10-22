@@ -1,82 +1,123 @@
-Return-Path: <netdev+bounces-231509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0778DBF9BCF
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 04:29:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0407BF9BD5
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 04:30:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C31DA19A63E9
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:30:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 998D75658CC
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7019A21ABD7;
-	Wed, 22 Oct 2025 02:29:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93048221FB8;
+	Wed, 22 Oct 2025 02:30:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wm0+ZWk/"
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="lv26I2Xy"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62FE8F54;
-	Wed, 22 Oct 2025 02:29:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8E5221282;
+	Wed, 22 Oct 2025 02:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761100181; cv=none; b=Uwzip5fDChBM5Q6PK+Q/rAcfQ5uIDmtSAtMP1dl+9xy90hpxSGxnZ/0UajgOsPmQD7ZSoEgpJkUNrXdO/2G5UJKKD7kza9qraNaWZMyb3C8wOfv3ng4l82TUIWrzH0O/aD4iQ6p/sZ6lwQvoEDdUJssbLwTTodCEATwgy80AKE4=
+	t=1761100208; cv=none; b=dGvauP66BfmXg6QcKwVnLvrKineQWxN9MFpaVmyb8PYPkuCTjs5y++RR0WQuc7H/z47z6e3d4Rkz+lWhXzaV/PdeSgpOSk4uP2VNVvGbH0sPb/j6vZx/1itjEDoVJ0KF3ufIAEo/Ewm5t5l4AeBuQ+ejKJ1DSwtPK1Uq2Pgktbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761100181; c=relaxed/simple;
-	bh=u7G3MSyaJJFcLqXMsW5Y3pWQLkifOfmhb13B/nbhyCU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F0HM9N2vO01hrIwWu9oQJ5HyJJgMlX8AB3U46lE5kir+59LM7K7oIq7UQCsziW9k8WcOBX+iFSO7p+dvk0x7w2DRqTYL07Ci+ZXrSrV2DV7Y8L1Jg/3VjyCW3ZlyGjIi1kax8QojwsIpsNAp4FuvrBRx0ExFni/toYrzLBHoFl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wm0+ZWk/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Df44MTAgxkkYPJInA2yVjdmTeke9LT+BYhNr0/13xno=; b=wm0+ZWk/Ppieg+AIXZ/mkr2ZVA
-	Gi6GbovNf6CGD1cF9vDCzqI0KRkQvT1sqiKr8cGbe3pKEkbThLdjBDsGaaaFpSmzS9elbs3Q4NApI
-	MS7r7gpQ31YYmvQnc3SJSpDYyK7ePAM2PtjpPNCQcDpt852YKXwznU8cj8b/MojjwDeY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vBObO-00Bhcd-N5; Wed, 22 Oct 2025 04:29:26 +0200
-Date: Wed, 22 Oct 2025 04:29:26 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Hauke Mehrtens <hauke@hauke-m.de>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/7] net: dsa: lantiq_gswip: clarify GSWIP
- 2.2 VLAN mode in comment
-Message-ID: <9d0a589a-23f5-45a9-b3ab-1db10eb56af3@lunn.ch>
-References: <cover.1760877626.git.daniel@makrotopia.org>
- <58f05c68362388083cda32805a31bc6b0fcb4bd0.1760877626.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1761100208; c=relaxed/simple;
+	bh=nL5OpE8VSi09xoMa52FvGYHtlPIOpRB2poQAX7RpnUU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UE7oFkXL1gh0SdIVrgRTNdfK/39hggq/h283wHKNMyMAtYfydRCzv2BDkJ+MjD3FzZSzzb56WCBhdCYaFaPoujcmotRk3S3PofJgxFM6XDuYOM0/nTxi2itbyQJYrzHwz03HCzvgsyyVHWeOCD6ALl6iCiQWB/jMlr8ieRuRNVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=lv26I2Xy; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59M28eW31473070;
+	Wed, 22 Oct 2025 02:29:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	PPS06212021; bh=+kQKwWlHD0KEJH+Nb7OHDeBVYcPh1DbK+sA2XmbQ/5Y=; b=
+	lv26I2Xy9JEpOTQoB9Fbr7S0s8G+oxVlOfe3AcNel9urx9RRreJZid3P1RQYfp1u
+	j7SRaY9Yb07FagHVGD1FlgW4LafOGFGP15QuEOA4Ulo6VrdeH/6nn5U4bU2OqeCZ
+	X979x+nTbvkh0JWl4KCGiY8L77gY8Th3ibpeh3INb0hWYAxnxN+4LA+fXeek94lF
+	chxoN9mrD7xu3E4LVbTYRnV43LTC5OeGAXPpI1G02cnDYMFabkkS/gYp65wfs3tO
+	c4GUH9vHYlb4BrWjgp6w1v8ryd2jxkKtKtEcZM8JwxZjFisV6cm0YeLSOF3lgzj5
+	P2kCLDNQJIThlJWDUfs4tQ==
+Received: from ala-exchng02.corp.ad.wrs.com ([128.224.246.37])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 49v1v5c2jq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 22 Oct 2025 02:29:42 +0000 (GMT)
+Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
+ ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.59; Tue, 21 Oct 2025 19:29:41 -0700
+Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
+ 15.1.2507.59 via Frontend Transport; Tue, 21 Oct 2025 19:29:38 -0700
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <kuba@kernel.org>
+CC: <ahmed.zaki@intel.com>, <aleksander.lobakin@intel.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+        <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+        <lizhi.xu@windriver.com>, <netdev@vger.kernel.org>,
+        <pabeni@redhat.com>, <samsun1006219@gmail.com>, <sdf@fomichev.me>,
+        <syzkaller-bugs@googlegroups.com>, <syzkaller@googlegroups.com>
+Subject: Re: [PATCH V3] usbnet: Prevents free active kevent
+Date: Wed, 22 Oct 2025 10:29:37 +0800
+Message-ID: <20251022022937.1799714-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251021183252.2eb25aac@kernel.org>
+References: <20251021183252.2eb25aac@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <58f05c68362388083cda32805a31bc6b0fcb4bd0.1760877626.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIyMDAxOSBTYWx0ZWRfX0qxcADagfoWs
+ goQgINwrKOZEMyI5LGqI0cNEsOTsiwLx3ipocOPOFSbYUgy8HWibMoRwsSZc02/DeoOAR3XL870
+ uwWSo/yMulFZSxiyAtAX5H5sSBqhEx547fVVXyTVHkJ63itCipwXzREUaUp+ZF4FfgYDDIHFWiD
+ OqMsXCo9BSuGo/Ub1m1E/g3frWBUfho0E0ieg1wv1BWO3FcqQCazeJ2gly9LhoqeFWR9g3KfWpE
+ H+L/kUzaz/LO6W8cgwjdWkfydBjx7OKwGICkkvvSBHBt77l98FAIdcVMBRwMYPKBpre/wuw2vFG
+ kjzLHN/3OtPbmbvlrFe7Xn6Zkug8R+DkCYi+luPAgMjZDsOq2P0WVVb+jAygHsUnXU1PuGhHZh5
+ pMlX1xaqtPl6zCvxg2x4x22xaLIMtQ==
+X-Proofpoint-GUID: PGjGzVj_trjw-qXofp2AK8DxyQp3spUB
+X-Proofpoint-ORIG-GUID: PGjGzVj_trjw-qXofp2AK8DxyQp3spUB
+X-Authority-Analysis: v=2.4 cv=ANdmIO46 c=1 sm=1 tr=0 ts=68f84196 cx=c_pps
+ a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=AM3EBoPtxtKq-eUOr5sA:9
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-22_01,2025-10-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 priorityscore=1501 phishscore=0 malwarescore=0 bulkscore=0
+ impostorscore=0 clxscore=1015 suspectscore=0 lowpriorityscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510220019
 
-On Sun, Oct 19, 2025 at 01:46:54PM +0100, Daniel Golle wrote:
-61;8003;1c> The comment above writing the default PVID incorrectly states that
-> "GSWIP 2.2 (GRX300) and later program here the VID directly."
-> The truth is that even GSWIP 2.2 and newer maintain the behavior of
-> GSWIP 2.1 unless the VLANMD bit in PCE Global Control Register 1 is
-> set ("GSWIP2.2 VLAN Mode").
-> Fix the misleading comment accordingly.
+On Tue, 21 Oct 2025 18:32:52 -0700, Jakub Kicinski wrote:
+> > --- a/drivers/net/usb/usbnet.c
+> > +++ b/drivers/net/usb/usbnet.c
+> > @@ -1672,6 +1672,9 @@ void usbnet_disconnect (struct usb_interface *intf)
+> >  	usb_free_urb(dev->interrupt);
+> >  	kfree(dev->padding_pkt);
+> >  
+> > +	cancel_work_sync(&dev->kevent);
+> > +	timer_delete_sync(&dev->delay);
+> > +
+> >  	free_netdev(net);
 > 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> Is this the best spot to place the cancel?
+> I think it may be better right after unregister_netdev().
+> I haven't analyze this driver too closely but for example since
+> kevent may call the sub-driver having it running after we already
+> called dev->driver_info->unbind() seems risky.
+I agree with your analysis. I'll update the patch and release a new version.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+BR,
+Lizhi
 
