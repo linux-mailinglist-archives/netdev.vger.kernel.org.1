@@ -1,116 +1,96 @@
-Return-Path: <netdev+bounces-231503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5414BF9AAB
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 04:00:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01697BF9AB1
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 04:01:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CA5AD4F9F65
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:00:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBD6018C75A7
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0006F21A421;
-	Wed, 22 Oct 2025 02:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 847DE1885A5;
+	Wed, 22 Oct 2025 02:01:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="psWWBkHO"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="B2jdotmx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC47C21771C;
-	Wed, 22 Oct 2025 02:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE757846F;
+	Wed, 22 Oct 2025 02:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761098427; cv=none; b=gaEPTRD2aJwf8yzatkD23eKvSgIdbEbW22BZzbc8lWV+hkF1Evp/8OUkwjzLwQzV4kn8MKinS+XPxnaD9P7CMoqgVzUpp5w3HsYgpm9MpWhVSeVQV/4fBE3NnXhTMmJWx5uRNUFehLeQ0BuwusbeYrD2mIVFOAVd/HGi2WoAcag=
+	t=1761098474; cv=none; b=ZxX0dAUhAmMD1wxqcLx4dKACDvJIoCtBbR3IZLPCn3c0ED8o0s0kbANmMfb86oHh/ph1ZNXZJJse9ptZQ6Dwb8MV5qccbpPZ7CEittlsTIuMpgNYjxkB6AXAJHNDMBq31HlTeDexubDTb+8hgc2wyAII7LOGzVyp/fCWUzrTj84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761098427; c=relaxed/simple;
-	bh=v0O4fWziTO6/a681AJmwCA/4NN5ljtFphVVfNcPUhGU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rX/y/rFzlZoi+ogvHNl0noxSEIILfNykwOnnBYYw757yk28m5SS0beINobBbFtISKBVC69ZfqKkSQG6bmV7993qTCuVOxwsppdhG6vGHSND5WDmzAyjXUZGfqzYBrWTev7YXPDbhypNRQra3eJZlaUj15RleZK5dwIaLg82WGPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=psWWBkHO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EDB1C4CEFD;
-	Wed, 22 Oct 2025 02:00:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761098427;
-	bh=v0O4fWziTO6/a681AJmwCA/4NN5ljtFphVVfNcPUhGU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=psWWBkHOO/d8io68ad/QYVBLr5a2TgCPCIO35Ge590bmE8w6a35wKZ2tbylSDcaIL
-	 VUCTmW6zwFMvEpAo01MXwa9eJ/WMfFYYHtqGUAeLdjVUqH/XV2jwDLNgCsOTSXoEUE
-	 Vr+/dmK6TEnmeuDsmQn9BdbnVAcSaUtM/AW+FauuUsTYriQKOdKhFEGeMerT3cDTI2
-	 GC3Z2tN2kQAT1aqte3YRvdMaMBRijHcpsySme7OrGvk8lY0loJHrcA3f7Is3EO/enW
-	 Rcd57x7c1imJKV8TExvBE1Tb63gfY5x8LEFwHMQEe0cvYobEspbRpA4daAGavYiq+L
-	 ebyoDzckGcUww==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB3F03A55FAA;
-	Wed, 22 Oct 2025 02:00:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1761098474; c=relaxed/simple;
+	bh=DSwtTN2XXSW7N1cHymSHCM6sSDHXD9Ex9wHauZncz10=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=idHtb4U09+/QjdF36BIPjAMpchqvTyvX9IM2thzWgZ4Yo0AHCuFf2Xec+dGXJMVzWag5HKqePp6nmEo9jIpKrJJjqCld6YOys35UgL6JHkMf+FT9WZA5qUIdA4HQU1cnTMdIcfJmbEXfVsNO4Xut7Ul/cBZR+DKvE4FZsWA3onE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=B2jdotmx; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=v+ZfD9fF/UgDZ1OrbezXxvZHnxhAXNZ3sZ94dluEoBw=; b=B2jdotmxtbCfwFLP1pOyhPTHbA
+	j0Pmymrvd/jGFe54iMstNIvQ/mn0sAe2YrxfbtCmBJl3lDICkphQnVBrVUq+BNCLliHWUELPYHeT+
+	BJqtlddRKYIkV4LJpeCROz77udQjYARW94fWdoSsS3eocl/HEJ2BGN2NGQhuG15Y6aSU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vBO9r-00BhU6-7v; Wed, 22 Oct 2025 04:00:59 +0200
+Date: Wed, 22 Oct 2025 04:00:59 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	imx@lists.linux.dev, linux-omap@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>
+Subject: Re: [PATCH net-next 1/4] net: phy: add iterator phy_for_each
+Message-ID: <42e2d7f6-e3bb-41e8-bf55-46cdb11c713e@lunn.ch>
+References: <68a7779c-acc2-45fc-b262-14d52e929b01@gmail.com>
+ <7d33ee44-8558-40d9-b258-2942b2caf95f@gmail.com>
+ <20251021182451.33de59e8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: dlink: use dev_kfree_skb_any instead of
- dev_kfree_skb
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176109840874.1307287.10859562608584734988.git-patchwork-notify@kernel.org>
-Date: Wed, 22 Oct 2025 02:00:08 +0000
-References: <20251019075540.55697-1-yyyynoom@gmail.com>
-In-Reply-To: <20251019075540.55697-1-yyyynoom@gmail.com>
-To: Yeounsu Moon <yyyynoom@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, horms@kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251021182451.33de59e8@kernel.org>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sun, 19 Oct 2025 16:55:40 +0900 you wrote:
-> Replace `dev_kfree_skb()` with `dev_kfree_skb_any()` in `start_xmit()`
-> which can be called from netpoll (hard IRQ) and from other contexts.
+On Tue, Oct 21, 2025 at 06:24:51PM -0700, Jakub Kicinski wrote:
+> On Fri, 17 Oct 2025 22:41:12 +0200 Heiner Kallweit wrote:
+> > +#define phy_for_each(_bus, _phydev)			\
+> > +	for (_phydev = phy_find_first(_bus); _phydev;	\
+> > +	     _phydev = phy_find_next(_bus, _phydev))
 > 
-> Also, `np->link_status` can be changed at any time by interrupt handler.
+> Wouldn't this better be called mii_for_each_phy() or
+> mii_bus_for_each_phy() ?
 > 
->   <idle>-0       [011] dNh4.  4541.754603: start_xmit <-netpoll_start_xmit
->   <idle>-0       [011] dNh4.  4541.754622: <stack trace>
->  => [FTRACE TRAMPOLINE]
->  => start_xmit
->  => netpoll_start_xmit
->  => netpoll_send_skb
->  => write_msg
->  => console_flush_all
->  => console_unlock
->  => vprintk_emit
->  => _printk
->  => rio_interrupt
->  => __handle_irq_event_percpu
->  => handle_irq_event
->  => handle_fasteoi_irq
->  => __common_interrupt
->  => common_interrupt
->  => asm_common_interrupt
->  => mwait_idle
->  => default_idle_call
->  => do_idle
->  => cpu_startup_entry
->  => start_secondary
->  => common_startup_64
-> 
-> [...]
+> To an outsider and with PHY typologies it may not be
+> sufficiently obvious that this helper is used to iterate
+> a all addresses on a MII bus.
 
-Here is the summary with links:
-  - [net,v2] net: dlink: use dev_kfree_skb_any instead of dev_kfree_skb
-    https://git.kernel.org/netdev/net/c/5523508258d3
+The naming scheme suggest it either needs to start with phy_ or
+mdiobus_.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+mdiobus_for_each_phy() might be the best name, if you want to indicate
+it iterates an mdio bus. It should also be noted that it will ignore
+devices on the bus which are not PHYs. So we need phy in the name
+somewhere.
 
-
+	Andrew
 
