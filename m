@@ -1,148 +1,445 @@
-Return-Path: <netdev+bounces-231621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C9A3BFB966
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:17:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D55F3BFB972
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:17:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2788B4EC347
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:17:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 555DD3A155C
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D594A3314D1;
-	Wed, 22 Oct 2025 11:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5173932ED51;
+	Wed, 22 Oct 2025 11:17:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GtZ7IAcJ"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="Qfj838wH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0CF32ED45
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B4D32E748
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761131810; cv=none; b=BgMF+hJy/+MEysdu4HtBSfQvnw70wfg4hpQhvxudgr8Hsh+hd0bGYWa0vJ7MPg0VOKp0vrYgDKhlwqaPB1xLQLu4Qp5gWVlOHbGmDrkFkRhC4WpQuBUvpWp31m9ZLog0A7x+BO5T/o6nSlBthN0ufMT/cnqtJ+b+R16E+MyafS4=
+	t=1761131844; cv=none; b=FqdgX50BWhT6pBYXIgQTWLJiDWsl23vpa8t+4y5Z71ly9xnHnQienXZg9sRZUSgZet8R2pLtYwkjYdV6orU3QzEXrXZNRY0mLoqfum5Qnu4mhWpzTKGzd/lBwSvzxgZQufKEo1xYiGR2adiHfuzT6bsAJCgd5PwwfP53tQuxksE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761131810; c=relaxed/simple;
-	bh=MkLx2R4aQDQRSte1k6rDu2d4S0+mLWdRZ24YtDib+QU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cUHUBZT69kMTh7jqUxOzMCGm5g7SgtHad97uq1z6F/mnEvBV3LjYLoEKOpFQOFTBe4TknIX42cgbeSxVk9p9M5CLc8DIZqIxtrmh8nTmvYJTkpFaUCNkEsxTnktqOLPphLFcOSWGPUCwzYUByCMVkc5deF534G84mAwoczLQDfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GtZ7IAcJ; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-63bad3cd668so12687477a12.3
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 04:16:48 -0700 (PDT)
+	s=arc-20240116; t=1761131844; c=relaxed/simple;
+	bh=QeuDe5mCKorRYZdcLTYRatLCEejo1OGDNU3ebkGHVs0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m4c03ge/vk5bqSlxN+cDLQ+nYiTwivsXlIbFME9RH3fC1dLQq7gvKwZpRtDQf0iCoyPRYIDaXdECPa45GBtGCl83+p4lzRSwGynOLPCXSBiSjY/5d8PoFMhbZrPP998IZgTRtg+mFrq36J3d9cI6Y8xH5eliIKWnjNKimwMbriQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=Qfj838wH; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b3e7cc84b82so1308630766b.0
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 04:17:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761131807; x=1761736607; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HUpfROanALk009O5ukzxUjqqmJACMBILWAOKJHciC34=;
-        b=GtZ7IAcJ+qPUT1UbyjSQlczc/FYy37J5wFuyZSAtHhyN8k8n4AQCldnUC7PgsdQ/Ds
-         nQ9DwjeO5G3bQs1dfBeP0ZiaA3kwUeIuVqrrrDMmpvXtbKgkoC3YE0aRj0MSiIIjOQfm
-         O0h28Bn0E38Y8RxtcMLU6yN6BOzpM0KSZALGkq+kphNBZkwBB1zabOwMjBnSGgIYLHoj
-         eAPCezGxDjNyexsTJwbVrWuZkI1m6S0PagwCbHBXelSO40N+BIGIQkNIso4gV9LZIKak
-         obLWnXS/nhyY3mC2H1SbOaX1toSgPt/gVJdbgNTrfE1lwxxiFxCyYLdjYTyDgoYgd7vb
-         Oc4g==
+        d=blackwall.org; s=google; t=1761131840; x=1761736640; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B9ZcYPe0GIdrUPaEzv9iPEgZlS6j3OkZvxTywqWGaxI=;
+        b=Qfj838wHA3fL83twfmBIF+4/Gner83a6Bvy2PUVu3GfGANF1x60kZRd/Ckzszy3YUy
+         rrkUC43HErzfgOHs0arpOQZlGDp3+zu2MWvM8CYReqDtt4UbHTQg8G3OAHMgfh9kR5df
+         Z/eKHMXFifY/WCp/qcWzA+2T8zUIzEvK1CWnU0RWp4IRNHLFjGqGNeEVWGsMT35ltn10
+         GRIHEg1288Nq4fhL7uFA7F9OHLJbhZsv7SOchI7B8qRfISXIMZWz/t+AVCvaGthgHv/X
+         iFMBlEYDx8OidbjEqDXYggF7LPv+r51WLTHlJikbK33iqLuMlWytAtMdoWlYbPQZ45LF
+         kAJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761131807; x=1761736607;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HUpfROanALk009O5ukzxUjqqmJACMBILWAOKJHciC34=;
-        b=sYirPkNrL4UGKr1m1+TSgOZUvnoBCm1Zw/piGqnuyKxawPH6j95FK5C/HdNWwsXjkw
-         x0WaxczFFmeyw0zSfQcqOfyXGuWKq5NZ5rDjdTkCJhrwNQBsrQ3gJD2BC5ULGkC3doLt
-         PQupT/bCpoulKTvP6BWWVSvExujop0cVxifxzQZwUCoo9U6496nuLU0Avz8BRYqvW9Cu
-         PKVlVKVGrdFqTMgrhwo1050Zic30N+JJ0VkuPsfO1B4Z35xhAQJMHg9GDOajkk3YnAK3
-         jzRjIAzdrCVziIEvMs/UTUjnRndqxjpUzfQNV84CKRfcTDageHG19JW1V0liF5R36tlm
-         hOzw==
-X-Forwarded-Encrypted: i=1; AJvYcCXCYjfZlK/yKa3jb/5bkamD50ZRGljH+i3CV/NnN58aC58UaZ1FEezAgcXGRKsIaHAGIcfZkqc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7POnPzcg7CzAbjhhP9jRZc6nk7bpdqPsSelKWmqhxByzmcIjt
-	bl6UV0e3xYqF1Ilz5AuMnVuMqR1DueBlOeAk3CZdMLrOBgztZM00aEijC0/ZFaAeogB1z+9APG5
-	b9bgGRmdLN9ePphYLw60Eo2tmmZ5Irg4=
-X-Gm-Gg: ASbGncvkOrKmJ61u5xrHBa/FxxLVioPoYnKfcwOEBpCmSXcMIj0YXFsks96Ehk3wYwr
-	TLg1Fk103PLf+HzUUbHPZ3lO4+x7E5r3Q6Um/No2bc9uL9Llebt/tZgSX2caOMnFXhR4Qq6QWd8
-	j7C4Qjw0kjLmdhz6xxCtytDe0D8wjivUDgOlwIhdhxRymeaS+mtR6EaT7MBlfuLLyC+Yx6OdLkP
-	pC+kp33//RAPMUvM+xgHTPYuZG7AOi3vj8YSjGtV/SHzqIcSNWjZXE+DqAgwp7j6oUUOrWNYo81
-	c06OO5SWL9M6MMaL8cR/FcJwoQ==
-X-Google-Smtp-Source: AGHT+IFeLMsqZpbHAvlJBzKIdahXOOBShjYQZyOY7ATbt5n7WHdXXR/ON08TB4hturxLMLEB0GOq3i/bLAd52DC8p3U=
-X-Received: by 2002:a05:6402:13ca:b0:62f:8274:d6bd with SMTP id
- 4fb4d7f45d1cf-63c1f626dd4mr21176233a12.8.1761131807215; Wed, 22 Oct 2025
- 04:16:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761131840; x=1761736640;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B9ZcYPe0GIdrUPaEzv9iPEgZlS6j3OkZvxTywqWGaxI=;
+        b=P4kqEpeMbhLmrIIhMCQqgmV+WX3AwVkSYdMdX8reQXT6B1mCEaau6+GpLHuP/zR97G
+         szmyDFTV3jMsf7/Dw/IbOv82KO/sEktExJ+mQJqVwg2eAeRT2oULmqZFXEhDMZxYWYSn
+         Ec5V6+zfVtN9Lo/7JJmjSATTJB7OwNJmILtKo41+D1sO1JR0n2Zngx+8H7yzGS6DCFvM
+         tnPOzkvND+8DamfuLIASYR7lIPbGlHo3EfY7oj/r2wui6Yfe+9+xxF/F6UPThzsC6IzU
+         1H+fcFjZOvuKGIHuiKBFHlsTCSn9WZzCXm70qBmZYZBKAcgOyHMlYZklwT5hrBqzDalH
+         mU3A==
+X-Forwarded-Encrypted: i=1; AJvYcCUbQj/r5+u4bvlVdKymqlLmQnvahxbQrrBlL/8aL/dxqaXpMBl8PhiUAlViKCIiaVrk6uaxgzM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWyUEeHlmP1uNpWo8f7ee7xVo1KyxvC8k18OVoEaHVXeZjvHlt
+	VpgQHS0Xf2bBMaclvP8piXUFajIYQJ8wumJdcQHs9+UtfQmSjoIH2zO8GtLaHmBxttb/XZmcErU
+	MsOnU8sIVTw==
+X-Gm-Gg: ASbGncsosFe93syQ8hnJdL62konNcbZmWASxF+WlKzoTLioQeOiLeqP4VhaWwJdNsv2
+	iWVt4sTTgoKZIYOqmJra7C7y5dlN/CuxlHjbvkwOZPmjy/fRQ1tC+A3jq8+xK/J7/sucsiRCV6O
+	pB1EiolEfABtZ/uocJk6bSBoTzY7Ayax+VgLAxHBLyIR5d890KYaMY06qN2nJ+vjTNEzAZkiPQv
+	jJ5fjadqhjuXT3KXrJadKzc9EX4Q0ms+DRJJxkqjzv9icXvKio7lzRV058AYhtGSiKYS6iFjCeC
+	UB6KW0H8bEjXJRdfRt9veF8WOSflBkAZZtwGxJ0UuZWyIBCwoKVFncWeuT2Jc0ViKerUYi7kmgz
+	ivF8Qd8Qt7nRYDkEcMpgXRKT4C2//Rtnry7dCQSs89aXqSbDtBe7TFgBO12MSR9wyzjX5aeLdgM
+	CkejBWechr+qZ3s3XBUUPulz6zYWgdmPj0RGHsVbaWrTM=
+X-Google-Smtp-Source: AGHT+IGfQc0bKjK//UOsSHK/HgtEoC/56tPnU0c/UlK8cXX5VNwt+LQy6yAuVEG0LKO+SzfnOftPog==
+X-Received: by 2002:a17:906:c104:b0:b40:5752:16b7 with SMTP id a640c23a62f3a-b6475124787mr2456134266b.51.1761131839762;
+        Wed, 22 Oct 2025 04:17:19 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d3b4f48cfsm47250866b.41.2025.10.22.04.17.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Oct 2025 04:17:19 -0700 (PDT)
+Message-ID: <ce3a6866-17fa-4b91-b02e-18b72538bb19@blackwall.org>
+Date: Wed, 22 Oct 2025 14:17:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251017042312.1271322-1-alistair.francis@wdc.com>
- <20251017042312.1271322-6-alistair.francis@wdc.com> <dc19d073-0266-4143-9c74-08e30a90b875@suse.de>
- <CAKmqyKNBN7QmpC8Lb=0xKJ7u9Vru2mfTktwKgtyQURGmq4gUtg@mail.gmail.com> <4b2e5998-a646-4f99-8c87-95975ff8fe66@suse.de>
-In-Reply-To: <4b2e5998-a646-4f99-8c87-95975ff8fe66@suse.de>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 22 Oct 2025 21:16:19 +1000
-X-Gm-Features: AS18NWBDgW-hay2VUeCdIjfUCzoI0NhxABO1jEUfCaPHUmJ8eBnU71SyICyiPWc
-Message-ID: <CAKmqyKM-uX6_a+Ru01RD3-CwoucTN7P_sU+d=MEKSo2pxG_tDA@mail.gmail.com>
-Subject: Re: [PATCH v4 5/7] nvme-tcp: Support KeyUpdate
-To: Hannes Reinecke <hare@suse.de>
-Cc: chuck.lever@oracle.com, hare@kernel.org, 
-	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org, kbusch@kernel.org, 
-	axboe@kernel.dk, hch@lst.de, sagi@grimberg.me, kch@nvidia.com, 
-	Alistair Francis <alistair.francis@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 02/15] net: Implement
+ netdev_nl_bind_queue_doit
+To: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+ pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, dw@davidwei.uk,
+ toke@redhat.com, yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+References: <20251020162355.136118-1-daniel@iogearbox.net>
+ <20251020162355.136118-3-daniel@iogearbox.net>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20251020162355.136118-3-daniel@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 22, 2025 at 4:56=E2=80=AFPM Hannes Reinecke <hare@suse.de> wrot=
-e:
->
-> On 10/22/25 06:35, Alistair Francis wrote:
-> > On Mon, Oct 20, 2025 at 4:22=E2=80=AFPM Hannes Reinecke <hare@suse.de> =
-wrote:
-> >>
-> >> On 10/17/25 06:23, alistair23@gmail.com wrote:
-> >>> From: Alistair Francis <alistair.francis@wdc.com>
-> >>>
-> [ .. ]>>> @@ -1723,6 +1763,7 @@ static void nvme_tcp_tls_done(void
-> *data, int status, key_serial_t pskid,
-> >>>                        ctrl->ctrl.tls_pskid =3D key_serial(tls_key);
-> >>>                key_put(tls_key);
-> >>>                queue->tls_err =3D 0;
-> >>> +             queue->user_session_id =3D user_session_id;
-> >>
-> >> Hmm. I wonder, do we need to store the generation number somewhere?
-> >> Currently the sysfs interface is completely oblivious that a key updat=
-e
-> >> has happened. I really would like to have _some_ indicator there telli=
-ng
-> >> us that a key update had happened, and the generation number would be
-> >> ideal here.
-> >
-> > I don't follow.
-> >
-> > The TLS layer will report the number of KeyUpdates that have been
-> > received. Userspace also knows that a KeyUpdate happened as we call to
-> > userspace to handle updating the keys.
-> >
-> Oh, the tlshd will know that (somehow). But everyone else will not; the
-> 'tls_pskid' contents will stay the the same.
-> Can we have a sysfs attribute reporting the sequence number of the most
-> recent KeyUpdate?
+On 10/20/25 19:23, Daniel Borkmann wrote:
+> From: David Wei <dw@davidwei.uk>
+> 
+> Implement netdev_nl_bind_queue_doit() that creates an rx queue in a
+> virtual netdev and then binds it to an rxq in a real netdev to create
+> a queue pair.
+> 
+> Example with ynl client:
+> 
+>   # ./pyynl/cli.py \
+>       --spec ~/netlink/specs/netdev.yaml \
+>       --do bind-queue \
+>       --json '{"src-ifindex": 4, "src-queue-id": 15, "dst-ifindex": 8, "queue-type": "rx"}'
+>   {'dst-queue-id': 1}
+> 
+> Note that the netdevice locking order is always from the virtual to
+> the physical device.
+> 
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> Co-developed-by: Daniel Borkmann <daniel@iogearbox.net>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>  include/net/netdev_queues.h   |   5 ++
+>  include/net/netdev_rx_queue.h |  36 ++++++++-
+>  net/core/netdev-genl.c        | 141 +++++++++++++++++++++++++++++++++-
+>  net/core/netdev_rx_queue.c    |  61 +++++++++++++++
+>  4 files changed, 240 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+> index cd00e0406cf4..286d5edce07d 100644
+> --- a/include/net/netdev_queues.h
+> +++ b/include/net/netdev_queues.h
+> @@ -130,6 +130,10 @@ void netdev_stat_queue_sum(struct net_device *netdev,
+>   * @ndo_queue_get_dma_dev: Get dma device for zero-copy operations to be used
+>   *			   for this queue. Return NULL on error.
+>   *
+> + * @ndo_queue_create: Create a new RX queue which can be bound to another queue.
+> + *		      Ops on this queue are redirected to the peer queue e.g.
+> + *		      when opening a memory provider.
+> + *
 
-Why do we want to reveal that to userspace though?
+It'd be nice to mention what the expected return value can be. See more below.
 
-Realistically it should just be ~2^64 and it'll should remain the same
-number, even after multiple updates
+>   * Note that @ndo_queue_mem_alloc and @ndo_queue_mem_free may be called while
+>   * the interface is closed. @ndo_queue_start and @ndo_queue_stop will only
+>   * be called for an interface which is open.
+> @@ -149,6 +153,7 @@ struct netdev_queue_mgmt_ops {
+>  						  int idx);
+>  	struct device *		(*ndo_queue_get_dma_dev)(struct net_device *dev,
+>  							 int idx);
+> +	int			(*ndo_queue_create)(struct net_device *dev);
+>  };
+>  
+>  bool netif_rxq_has_unreadable_mp(struct net_device *dev, int idx);
+> diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
+> index 8cdcd138b33f..db3ef94c0744 100644
+> --- a/include/net/netdev_rx_queue.h
+> +++ b/include/net/netdev_rx_queue.h
+> @@ -28,6 +28,7 @@ struct netdev_rx_queue {
+>  #endif
+>  	struct napi_struct		*napi;
+>  	struct pp_memory_provider_params mp_params;
+> +	struct netdev_rx_queue		*peer;
+>  } ____cacheline_aligned_in_smp;
+>  
+>  /*
+> @@ -56,6 +57,37 @@ get_netdev_rx_queue_index(struct netdev_rx_queue *queue)
+>  	return index;
+>  }
+>  
+> -int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq);
+> +static inline void __netdev_rx_queue_peer(struct netdev_rx_queue *src_rxq,
+> +					  struct netdev_rx_queue *dst_rxq)
+> +{
+> +	src_rxq->peer = dst_rxq;
+> +	dst_rxq->peer = src_rxq;
+> +}
+>  
+> -#endif
+> +static inline void __netdev_rx_queue_unpeer(struct netdev_rx_queue *src_rxq,
+> +					    struct netdev_rx_queue *dst_rxq)
+> +{
+> +	src_rxq->peer = NULL;
+> +	dst_rxq->peer = NULL;
+> +}
+> +
+> +static inline bool netdev_rx_queue_peered(struct net_device *dev,
+> +					  u16 queue_id)
+> +{
+> +	if (queue_id < dev->real_num_rx_queues)
+> +		return dev->_rx[queue_id].peer;
+> +	return false;
+> +}
+> +
+> +void netdev_rx_queue_peer(struct net_device *src_dev,
+> +			  struct netdev_rx_queue *src_rxq,
+> +			  struct netdev_rx_queue *dst_rxq);
+> +void netdev_rx_queue_unpeer(struct net_device *src_dev,
+> +			    struct netdev_rx_queue *src_rxq,
+> +			    struct netdev_rx_queue *dst_rxq);
+> +int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq);
+> +struct netdev_rx_queue *
+> +netif_get_rx_queue_peer_locked(struct net_device **dev,
+> +			       unsigned int *rxq_idx,
+> +			       bool *needs_unlock);
+> +#endif /* _LINUX_NETDEV_RX_QUEUE_H */
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index ce1018ea390f..579469abac8c 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c
+> @@ -1122,7 +1122,146 @@ int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
+>  
+>  int netdev_nl_bind_queue_doit(struct sk_buff *skb, struct genl_info *info)
+>  {
+> -	return -EOPNOTSUPP;
+> +	u32 src_ifidx, src_qid, dst_ifidx, dst_qid, q_type;
+> +	struct netdev_rx_queue *src_rxq, *dst_rxq, *tmp_rxq;
+> +	struct net_device *src_dev, *dst_dev;
+> +	struct sk_buff *rsp;
+> +	int err = 0;
+> +	void *hdr;
 
-Alistair
+nit: reverse xmas tree order
 
-> Cheers,
-> Hannes
-> --
-> Dr. Hannes Reinecke                  Kernel Storage Architect
-> hare@suse.de                                +49 911 74053 688
-> SUSE Software Solutions GmbH, Frankenstr. 146, 90461 N=C3=BCrnberg
-> HRB 36809 (AG N=C3=BCrnberg), GF: I. Totev, A. McDonald, W. Knoblich
+> +
+> +	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_PAIR_QUEUE_TYPE) ||
+> +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_PAIR_SRC_IFINDEX) ||
+> +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_PAIR_SRC_QUEUE_ID) ||
+> +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_PAIR_DST_IFINDEX))
+> +		return -EINVAL;
+> +
+> +	src_ifidx = nla_get_u32(info->attrs[NETDEV_A_QUEUE_PAIR_SRC_IFINDEX]);
+> +	src_qid = nla_get_u32(info->attrs[NETDEV_A_QUEUE_PAIR_SRC_QUEUE_ID]);
+> +	dst_ifidx = nla_get_u32(info->attrs[NETDEV_A_QUEUE_PAIR_DST_IFINDEX]);
+> +	q_type = nla_get_u32(info->attrs[NETDEV_A_QUEUE_PAIR_QUEUE_TYPE]);
+> +
+> +	if (q_type != NETDEV_QUEUE_TYPE_RX) {
+> +		NL_SET_ERR_MSG(info->extack, "Only binding of RX queue supported");
+> +		return -EOPNOTSUPP;
+> +	}
+> +	if (dst_ifidx == src_ifidx) {
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Destination driver cannot be same as source driver");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	rsp = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
+> +	if (!rsp)
+> +		return -ENOMEM;
+> +
+> +	hdr = genlmsg_iput(rsp, info);
+> +	if (!hdr) {
+> +		err = -EMSGSIZE;
+> +		goto err_genlmsg_free;
+> +	}
+> +
+> +	/* Locking order is always from the virtual to the physical device
+> +	 * since this is also the same order when applications open the
+> +	 * memory provider later on.
+> +	 */
+> +	dst_dev = netdev_get_by_index_lock(genl_info_net(info), dst_ifidx);
+> +	if (!dst_dev) {
+> +		err = -ENODEV;
+> +		goto err_genlmsg_free;
+> +	}
+> +	if (dst_dev->dev.parent) {
+> +		err = -EOPNOTSUPP;
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Destination device is not a virtual device");
+> +		goto err_unlock_dst_dev;
+> +	}
+> +	if (!dst_dev->queue_mgmt_ops ||
+> +	    !dst_dev->queue_mgmt_ops->ndo_queue_create) {
+> +		err = -EOPNOTSUPP;
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Destination driver does not support queue management operations");
+> +		goto err_unlock_dst_dev;
+> +	}
+> +	if (dst_dev->real_num_rx_queues < 1) {
+> +		err = -EOPNOTSUPP;
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Destination device must have at least one real RX queue");
+> +		goto err_unlock_dst_dev;
+> +	}
+> +
+> +	src_dev = netdev_get_by_index_lock(genl_info_net(info), src_ifidx);
+> +	if (!src_dev) {
+> +		err = -ENODEV;
+> +		goto err_unlock_dst_dev;
+> +	}
+> +	if (!src_dev->dev.parent) {
+> +		err = -EOPNOTSUPP;
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Source device is a virtual device");
+> +		goto err_unlock_src_dev;
+> +	}
+> +	if (!netif_device_present(src_dev)) {
+> +		err = -ENODEV;
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Source device has been removed from the system");
+> +		goto err_unlock_src_dev;
+> +	}
+> +	if (!src_dev->queue_mgmt_ops) {
+> +		err = -EOPNOTSUPP;
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Source driver does not support queue management operations");
+> +		goto err_unlock_src_dev;
+> +	}
+> +	if (src_qid >= src_dev->num_rx_queues) {
+> +		err = -ERANGE;
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Source device queue is out of range");
+> +		goto err_unlock_src_dev;
+> +	}
+> +
+> +	src_rxq = __netif_get_rx_queue(src_dev, src_qid);
+> +	if (src_rxq->peer) {
+> +		err = -EBUSY;
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Source device queue is already bound");
+> +		goto err_unlock_src_dev;
+> +	}
+> +
+> +	tmp_rxq = __netif_get_rx_queue(dst_dev, dst_dev->real_num_rx_queues - 1);
+> +	if (tmp_rxq->peer && tmp_rxq->peer->dev != src_dev) {
+> +		err = -EOPNOTSUPP;
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Binding multiple queues from difference source devices not supported");
+
+s/difference/different/
+
+> +		goto err_unlock_src_dev;
+> +	}
+> +
+> +	err = dst_dev->queue_mgmt_ops->ndo_queue_create(dst_dev);
+> +	if (err <= 0) {
+
+<= 0 is a bit weird, if 0 signals an error perhaps "err" must be set?
+
+Maybe directly use dst_qid above and set "err" appropriately to better
+demonstrate what's expected?
+
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Destination device is unable to create a new queue");
+> +		goto err_unlock_src_dev;
+> +	}
+> +
+> +	dst_qid = err - 1;
+> +	dst_rxq = __netif_get_rx_queue(dst_dev, dst_qid);
+> +
+> +	netdev_rx_queue_peer(src_dev, src_rxq, dst_rxq);
+> +
+> +	nla_put_u32(rsp, NETDEV_A_QUEUE_PAIR_DST_QUEUE_ID, dst_qid);
+> +	genlmsg_end(rsp, hdr);
+> +
+> +	netdev_unlock(src_dev);
+> +	netdev_unlock(dst_dev);
+> +
+> +	return genlmsg_reply(rsp, info);
+> +
+> +err_unlock_src_dev:
+> +	netdev_unlock(src_dev);
+> +err_unlock_dst_dev:
+> +	netdev_unlock(dst_dev);
+> +err_genlmsg_free:
+> +	nlmsg_free(rsp);
+> +	return err;
+>  }
+>  
+>  void netdev_nl_sock_priv_init(struct netdev_nl_sock *priv)
+> diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
+> index c7d9341b7630..916ca8d7ae7c 100644
+> --- a/net/core/netdev_rx_queue.c
+> +++ b/net/core/netdev_rx_queue.c
+> @@ -18,6 +18,67 @@ bool netif_rxq_has_unreadable_mp(struct net_device *dev, int idx)
+>  }
+>  EXPORT_SYMBOL(netif_rxq_has_unreadable_mp);
+>  
+> +void netdev_rx_queue_peer(struct net_device *src_dev,
+> +			  struct netdev_rx_queue *src_rxq,
+> +			  struct netdev_rx_queue *dst_rxq)
+> +{
+> +	netdev_assert_locked(src_dev);
+> +	netdev_assert_locked(dst_rxq->dev);
+> +
+> +	netdev_hold(src_dev, &src_rxq->dev_tracker, GFP_KERNEL);
+> +	__netdev_rx_queue_peer(src_rxq, dst_rxq);
+> +}
+> +
+> +void netdev_rx_queue_unpeer(struct net_device *src_dev,
+> +			    struct netdev_rx_queue *src_rxq,
+> +			    struct netdev_rx_queue *dst_rxq)
+> +{
+> +	WARN_ON_ONCE(READ_ONCE(dst_rxq->dev->reg_state) != NETREG_UNREGISTERING);
+> +
+> +	netdev_assert_locked(dst_rxq->dev);
+> +	netdev_assert_locked(src_dev);
+> +
+> +	__netdev_rx_queue_unpeer(src_rxq, dst_rxq);
+> +	netdev_put(src_dev, &src_rxq->dev_tracker);
+> +}
+> +
+> +static struct netdev_rx_queue *
+> +__netif_get_rx_queue_peer(struct net_device **dev, unsigned int *rxq_idx,
+> +			  bool virt_to_phys_only)
+> +{
+> +	struct net_device *req_dev = *dev;
+> +	struct netdev_rx_queue *rxq = __netif_get_rx_queue(req_dev, *rxq_idx);
+> +
+> +	if (rxq->peer) {
+> +		if (virt_to_phys_only &&
+> +		    req_dev->dev.parent)
+> +			return NULL;
+> +		rxq = rxq->peer;
+> +		*rxq_idx = get_netdev_rx_queue_index(rxq);
+> +		*dev = rxq->dev;
+> +	}
+> +	return rxq;
+> +}
+> +
+> +struct netdev_rx_queue *
+> +netif_get_rx_queue_peer_locked(struct net_device **dev, unsigned int *rxq_idx,
+> +			       bool *needs_unlock)
+> +{
+> +	struct net_device *req_dev = *dev;
+> +	struct netdev_rx_queue *rxq;
+> +
+> +	/* Locking order is always from the virtual to the physical device
+> +	 * see netdev_nl_bind_queue_doit().
+> +	 */
+> +	netdev_ops_assert_locked(req_dev);
+> +	rxq = __netif_get_rx_queue_peer(dev, rxq_idx, true);
+> +	if (rxq && req_dev != *dev) {
+> +		*needs_unlock = true;
+> +		netdev_lock(*dev);
+> +	}
+> +	return rxq;
+> +}
+> +>  int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
+>  {
+>  	struct netdev_rx_queue *rxq = __netif_get_rx_queue(dev, rxq_idx);
+
 
