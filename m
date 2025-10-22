@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-231532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0AECBFA151
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 07:40:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0256BBFA154
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 07:40:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56FD318C738A
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 05:41:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 692FD19A0051
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 05:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ED052EC0BB;
-	Wed, 22 Oct 2025 05:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A922ECE84;
+	Wed, 22 Oct 2025 05:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XR43WWyq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RwAb3n0o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FD92EC563
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 05:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D506E2EC54E
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 05:40:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761111621; cv=none; b=nTaqHzvIXa0hC6Eu/QO9AhmQWMBH+OSl5jYmksZpaQR3BZC3RlUyGSkzbwWHe81BH03crZNveX4viAXXYpknRXvL5obtsyCcL/UlQGLALqKe7lpZcL5CcGaTOwF1PUb52MjDrh0LyuArspt7odl3NQtK4KRAE5hi1ilBLGgYEfI=
+	t=1761111622; cv=none; b=DIwKImnJ2YORGuc1+OtRg6lJEIlIJ0k9BCcrVjP6rSYggCffCzZs2UeKeX/HlQb33/xRP21Hap61IxfFd5cs38daoeZ0SJesydI79YwJyG8agfP8vgcO0IlDnlP+IIMXBTUQHyF/gmahRf4yEHmVFSlSOmaOSw8y0YP30QZSwYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761111621; c=relaxed/simple;
-	bh=K0Vu2XXte8z5Wpl1L/lPwvu+Ot8Hg84Mgs1BV0CQM08=;
+	s=arc-20240116; t=1761111622; c=relaxed/simple;
+	bh=EDC76k8OxKVorclMyVx69i2IKo2FCNnvWkZ33MMvNzg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=izMJgRPlVm/Y8Pp2UrHrEnSBnK+PeXTK4D2tSiPmzFozUdE7PGKvvAxkdSIhgOaFf37+gJixtrvynFbRggXhYmLkJv/+6aaNRJpTg9XDZdUz2EQn4k5JLudckzR7BCmYNNdrMtQWtJwh6nbAPIuRkIiNsk2pggKwF1vZo1bK7H8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XR43WWyq; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=s/YXdobaeYg/Eyjlt6Z41wBU65M7Cz+9aLc0SU5XUxYqTD1IB6NCeNeY+g+WUvZM5nsFyB1WR119Jk2SM3Yi8kF7Koifb6ZRdbB0VQKLWIC6+AHtCtGIs5KbdjYSxzJ8v65oGL/mW2kxXjtSdt0Mva2N2+ofTP0tIkrk//0H8gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RwAb3n0o; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b67c546a6e3so14249971a12.0
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 22:40:19 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32ee4998c50so5265824a91.3
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 22:40:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761111618; x=1761716418; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761111620; x=1761716420; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M583yWpsfiw8Xn0uI+4quMq0lPvp0Z7c+ZYs6VEcQUE=;
-        b=XR43WWyqpgo6vSkFvbVJQpOzCfgmVbr3Zts6lfw1W3SgBnn7/X9Q4gvCrPoOgUtfiN
-         hqyjs3+/gg39qVhRXuCxJQfL9WwnB9MsAcQeVN/Va0r8wvZFlEnEqvDg0kSU5OALxqhH
-         fwCkw3IHpcY8Pxjxq6hMfSxLBZRew5vd2/3gLhx90JhUHwBZu1voslGpF9I8Tybsl6sH
-         yYNowRnqUKVM9SG1CPBaLKf2offzqXQZbTIQwCuDQ8TW1Gni9tkP/q3vmWz8+rL/NFrp
-         CMhkDPRQgJAVZLRpc+tFhPQngj/f9uH6z/NvhxaetcjO3YVTI8vsu4gay+XTJq0fdX8Y
-         gzIQ==
+        bh=Uz04VgWYi3yNnqNngdSsPvTIlsKcel1tMSBPIkeWESA=;
+        b=RwAb3n0oFv/ns2yNVq9rw7PZ5GUjSFPTYBG6izy3SPWVuF+zqgyXKJJx0FWGnxBHBR
+         rVHzd9x8KA4qbFbzBduO7vh3zrQmLBC0P5SkWl5g0zDapyiQMci5Fjo0pLYOCtxqS+GW
+         vxzZ/TNxr+UeG3+/ouLAap3OWEX5kYH5BpyvclrmkKO9sUJ7rqb+2Tsq8HtnR/iE6rE0
+         adDZkvYlSpVSzxT3pqY1NMsbbjK5YBoNRFlUJpZN6Iw6r4yiE5DwmOokTN7FS29XJykM
+         ilf40473hJ6QTzGlKzyeNbO2CVRrSTjRxoIq563p7VavciO3WqSwDWXnKVnKQJalgVUM
+         DH6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761111618; x=1761716418;
+        d=1e100.net; s=20230601; t=1761111620; x=1761716420;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M583yWpsfiw8Xn0uI+4quMq0lPvp0Z7c+ZYs6VEcQUE=;
-        b=eI3WyorsOOlwkdCgIc3Fvs52ubG0r4Mz93nQ7Z2Hm+zEV8ZgVpZK+OzRgR5C50hZ4F
-         TbB742w3M+ME9O6iVpctctq80fRHngPS2CpEgyQ3OxbdFyVy6uXv3i8Xv9C+JhyNSrPW
-         gApEZkCiBZbPLLYOCklNf3FcTrRQv2JTfmAB0/Rp7xA57xOtQKtMBuvq03HupBKeFYmW
-         POydJQnmBFxYNtQQDhRMoK9bMkhEJH3QfGKdAA7vOaCPUr5B3R4z/H+wkMy7s3jDdKZ7
-         fqE3X6D8msxLx5WCGKJ1gY0IZ0uv+O/8D6246WVkWDbBV8GkS47pOhr2Bp67Wo/bWFB+
-         z25w==
-X-Forwarded-Encrypted: i=1; AJvYcCWDbG/8eRBOkPpfiwFgWBI9bxosnL7tNJYPqHP4flyl6K+7GUhVl0T6a1h/4vVqbtzCyvKD7yA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywpt27Jr1Gis82JgqxY2ub/Js+3LLygTAddLWhgpIuVfcJN0S5P
-	b2+JF4UebWFXgJaRzbG27Y7ASgfC3TVgDvDHGj9pmfMO2lZD1f0Yl/uU2+pueWnJyZuzyHYqBGe
-	bKT5F4A==
-X-Google-Smtp-Source: AGHT+IG8tCFbwQ6CqMsPxYYlSz+FIGLEUqyIaQkyQ4wFnkCaot7v42VNyticfuAZiTD7TF57sPcTnOBYK6A=
-X-Received: from pjsg6.prod.google.com ([2002:a17:90a:7146:b0:33b:9e06:6b9])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:72a4:b0:2f9:48ac:c8ed
- with SMTP id adf61e73a8af0-334a8534251mr24978795637.1.1761111618639; Tue, 21
- Oct 2025 22:40:18 -0700 (PDT)
-Date: Wed, 22 Oct 2025 05:39:46 +0000
+        bh=Uz04VgWYi3yNnqNngdSsPvTIlsKcel1tMSBPIkeWESA=;
+        b=saW9FA9wG7FtUMxkrEsTs37uh5Q/70BInZMpphbgQxNVdd8jbsialXMIpy8tSdnfph
+         Y9aDalBxWMDQvr/DcI1WkSpr2Qf/YIW2Zoo1ErUgi0wIbc7YWdm1TjsNwyhfcsh3BUsW
+         TV516e7pn+FtqQvkEfUJF6UsPa9uKzB9c2vclN5O4zi8Yio0v4qjBVGc2sBydqIj7R5z
+         HtPouI1m/FCMPKkGw+B4XK6d1xyh5lTgLyxA3QRqtC5jBmqVLFj4mAMM29O7DbBcYqOu
+         3ugsDCoa2xxVUZaS5Bhdz8uchGGo3alGXIMykXLcWKjU+0SJ4j4JS+Z4cl6TR1x0U7Dy
+         /1kA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5mwBwNZn50txqJfaL0i7JKQyPN9+mYXaMACfJZmLb7MJJ6WeLn5HCpdUE7H8X+kd+N3ZNUPg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4QASfTh3WkMKLXetm4jM/QWcusCsYJGhJtdxx6AeJT0FAe2Qa
+	oMcRCPmZNG12ouSrq12quZyRBcN9leQdeV3F5dicoz+yplKK67IiewzjDBrbQI1mVlinYo15Cta
+	pDolK7w==
+X-Google-Smtp-Source: AGHT+IEI3WHP7htz7jov9qoMOUYSpPuthBbi5bWfhRMIL/6BNE8Ez5An1vOrvPrH5MIW+rgM3hUC+Tj+8nc=
+X-Received: from plot1.prod.google.com ([2002:a17:902:8c81:b0:290:28e2:ce65])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:b90:b0:269:96db:94f
+ with SMTP id d9443c01a7336-290cc9be353mr242189605ad.49.1761111620037; Tue, 21
+ Oct 2025 22:40:20 -0700 (PDT)
+Date: Wed, 22 Oct 2025 05:39:47 +0000
 In-Reply-To: <20251022054004.2514876-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251022054004.2514876-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.51.0.915.g61a8936c21-goog
-Message-ID: <20251022054004.2514876-3-kuniyu@google.com>
-Subject: [PATCH v1 net-next 2/5] neighbour: Annotate access to neigh_parms fields.
+Message-ID: <20251022054004.2514876-4-kuniyu@google.com>
+Subject: [PATCH v1 net-next 3/5] neighbour: Convert RTM_GETNEIGHTBL to RCU.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
@@ -83,156 +83,135 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-NEIGH_VAR() is read locklessly in the fast path, and IPv6 ndisc uses
-NEIGH_VAR_SET() locklessly.
+neightbl_dump_info() calls these functions for each neigh_tables[]
+entry:
 
-The next patch will convert neightbl_dump_info() to RCU.
+  1. neightbl_fill_info() for tbl->parms
+  2. neightbl_fill_param_info() for tbl->parms_list (except tbl->parms)
 
-Let's annotate accesses to neigh_param with READ_ONCE() and WRITE_ONCE().
+Both functions rely on the table lock (read_lock_bh(&tbl->lock))
+and RTNL is not needed.
 
-Note that ndisc_ifinfo_sysctl_change() uses &NEIGH_VAR() and we cannot
-use '&' with READ_ONCE(), so NEIGH_VAR_PTR() is introduced.
+Let's fetch the table under RCU and convert RTM_GETNEIGHTBL to RCU.
 
-Note also that NEIGH_VAR_INIT() does not need WRITE_ONCE() as it is before
-parms is published.  Also, the only user hippi_neigh_setup_dev() is no
-longer called since commit e3804cbebb67 ("net: remove COMPAT_NET_DEV_OPS"),
-which looks wrong, but probably no one uses HIPPI and RoadRunner.
+Note that the first entry of tbl->parms_list is tbl->parms.list and
+embedded in neigh_table, so list_next_entry() is safe.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- include/net/neighbour.h | 15 ++++++++++++---
- net/core/neighbour.c    | 17 ++++++-----------
- net/ipv6/ndisc.c        |  8 ++++----
- 3 files changed, 22 insertions(+), 18 deletions(-)
+ net/core/neighbour.c | 23 +++++++++--------------
+ 1 file changed, 9 insertions(+), 14 deletions(-)
 
-diff --git a/include/net/neighbour.h b/include/net/neighbour.h
-index 4a30bd458c5a9..998ff9eccebb7 100644
---- a/include/net/neighbour.h
-+++ b/include/net/neighbour.h
-@@ -92,15 +92,17 @@ struct neigh_parms {
- static inline void neigh_var_set(struct neigh_parms *p, int index, int val)
- {
- 	set_bit(index, p->data_state);
--	p->data[index] = val;
-+	WRITE_ONCE(p->data[index], val);
- }
- 
--#define NEIGH_VAR(p, attr) ((p)->data[NEIGH_VAR_ ## attr])
-+#define __NEIGH_VAR(p, attr) ((p)->data[NEIGH_VAR_ ## attr])
-+#define NEIGH_VAR(p, attr) READ_ONCE(__NEIGH_VAR(p, attr))
-+#define NEIGH_VAR_PTR(p, attr) (&(__NEIGH_VAR(p, attr)))
- 
- /* In ndo_neigh_setup, NEIGH_VAR_INIT should be used.
-  * In other cases, NEIGH_VAR_SET should be used.
-  */
--#define NEIGH_VAR_INIT(p, attr, val) (NEIGH_VAR(p, attr) = val)
-+#define NEIGH_VAR_INIT(p, attr, val) (__NEIGH_VAR(p, attr) = val)
- #define NEIGH_VAR_SET(p, attr, val) neigh_var_set(p, NEIGH_VAR_ ## attr, val)
- 
- static inline void neigh_parms_data_state_setall(struct neigh_parms *p)
-@@ -378,6 +380,13 @@ struct net *neigh_parms_net(const struct neigh_parms *parms)
- 
- unsigned long neigh_rand_reach_time(unsigned long base);
- 
-+static inline void neigh_set_reach_time(struct neigh_parms *p)
-+{
-+	unsigned long base = NEIGH_VAR(p, BASE_REACHABLE_TIME);
-+
-+	WRITE_ONCE(p->reachable_time, neigh_rand_reach_time(base));
-+}
-+
- void pneigh_enqueue(struct neigh_table *tbl, struct neigh_parms *p,
- 		    struct sk_buff *skb);
- struct pneigh_entry *pneigh_lookup(struct neigh_table *tbl, struct net *net,
 diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 56ce01db1bcb4..b08a9df31a15b 100644
+index b08a9df31a15b..0c5170438c51e 100644
 --- a/net/core/neighbour.c
 +++ b/net/core/neighbour.c
-@@ -995,8 +995,7 @@ static void neigh_periodic_work(struct work_struct *work)
+@@ -2176,7 +2176,7 @@ static int neightbl_fill_parms(struct sk_buff *skb, struct neigh_parms *parms)
+ 		return -ENOBUFS;
  
- 		WRITE_ONCE(tbl->last_rand, jiffies);
- 		list_for_each_entry(p, &tbl->parms_list, list)
--			p->reachable_time =
--				neigh_rand_reach_time(NEIGH_VAR(p, BASE_REACHABLE_TIME));
-+			neigh_set_reach_time(p);
- 	}
+ 	if ((parms->dev &&
+-	     nla_put_u32(skb, NDTPA_IFINDEX, parms->dev->ifindex)) ||
++	     nla_put_u32(skb, NDTPA_IFINDEX, READ_ONCE(parms->dev->ifindex))) ||
+ 	    nla_put_u32(skb, NDTPA_REFCNT, refcount_read(&parms->refcnt)) ||
+ 	    nla_put_u32(skb, NDTPA_QUEUE_LENBYTES,
+ 			NEIGH_VAR(parms, QUEUE_LEN_BYTES)) ||
+@@ -2228,8 +2228,6 @@ static int neightbl_fill_info(struct sk_buff *skb, struct neigh_table *tbl,
+ 		return -EMSGSIZE;
  
- 	if (atomic_read(&tbl->entries) < READ_ONCE(tbl->gc_thresh1))
-@@ -1749,8 +1748,7 @@ struct neigh_parms *neigh_parms_alloc(struct net_device *dev,
- 	if (p) {
- 		p->tbl		  = tbl;
- 		refcount_set(&p->refcnt, 1);
--		p->reachable_time =
--				neigh_rand_reach_time(NEIGH_VAR(p, BASE_REACHABLE_TIME));
-+		neigh_set_reach_time(p);
- 		p->qlen = 0;
- 		netdev_hold(dev, &p->dev_tracker, GFP_KERNEL);
- 		p->dev = dev;
-@@ -1810,8 +1808,7 @@ void neigh_table_init(int index, struct neigh_table *tbl)
- 	list_add(&tbl->parms.list, &tbl->parms_list);
- 	write_pnet(&tbl->parms.net, &init_net);
- 	refcount_set(&tbl->parms.refcnt, 1);
--	tbl->parms.reachable_time =
--			  neigh_rand_reach_time(NEIGH_VAR(&tbl->parms, BASE_REACHABLE_TIME));
-+	neigh_set_reach_time(&tbl->parms);
- 	tbl->parms.qlen = 0;
+ 	ndtmsg = nlmsg_data(nlh);
+-
+-	read_lock_bh(&tbl->lock);
+ 	ndtmsg->ndtm_family = tbl->family;
+ 	ndtmsg->ndtm_pad1   = 0;
+ 	ndtmsg->ndtm_pad2   = 0;
+@@ -2255,11 +2253,9 @@ static int neightbl_fill_info(struct sk_buff *skb, struct neigh_table *tbl,
+ 			.ndtc_proxy_qlen	= READ_ONCE(tbl->proxy_queue.qlen),
+ 		};
  
- 	tbl->stats = alloc_percpu(struct neigh_statistics);
-@@ -2194,7 +2191,7 @@ static int neightbl_fill_parms(struct sk_buff *skb, struct neigh_parms *parms)
- 			NEIGH_VAR(parms, MCAST_PROBES)) ||
- 	    nla_put_u32(skb, NDTPA_MCAST_REPROBES,
- 			NEIGH_VAR(parms, MCAST_REPROBES)) ||
--	    nla_put_msecs(skb, NDTPA_REACHABLE_TIME, parms->reachable_time,
-+	    nla_put_msecs(skb, NDTPA_REACHABLE_TIME, READ_ONCE(parms->reachable_time),
- 			  NDTPA_PAD) ||
- 	    nla_put_msecs(skb, NDTPA_BASE_REACHABLE_TIME,
- 			  NEIGH_VAR(parms, BASE_REACHABLE_TIME), NDTPA_PAD) ||
-@@ -2475,8 +2472,7 @@ static int neightbl_set(struct sk_buff *skb, struct nlmsghdr *nlh,
- 				 * only be effective after the next time neigh_periodic_work
- 				 * decides to recompute it (can be multiple minutes)
- 				 */
--				p->reachable_time =
--					neigh_rand_reach_time(NEIGH_VAR(p, BASE_REACHABLE_TIME));
-+				neigh_set_reach_time(p);
- 				break;
- 			case NDTPA_GC_STALETIME:
- 				NEIGH_VAR_SET(p, GC_STALETIME,
-@@ -3721,8 +3717,7 @@ static int neigh_proc_base_reachable_time(const struct ctl_table *ctl, int write
- 		 * only be effective after the next time neigh_periodic_work
- 		 * decides to recompute it
- 		 */
--		p->reachable_time =
--			neigh_rand_reach_time(NEIGH_VAR(p, BASE_REACHABLE_TIME));
-+		neigh_set_reach_time(p);
- 	}
- 	return ret;
+-		rcu_read_lock();
+ 		nht = rcu_dereference(tbl->nht);
+ 		ndc.ndtc_hash_rnd = nht->hash_rnd[0];
+ 		ndc.ndtc_hash_mask = ((1 << nht->hash_shift) - 1);
+-		rcu_read_unlock();
+ 
+ 		if (nla_put(skb, NDTA_CONFIG, sizeof(ndc), &ndc))
+ 			goto nla_put_failure;
+@@ -2297,12 +2293,10 @@ static int neightbl_fill_info(struct sk_buff *skb, struct neigh_table *tbl,
+ 	if (neightbl_fill_parms(skb, &tbl->parms) < 0)
+ 		goto nla_put_failure;
+ 
+-	read_unlock_bh(&tbl->lock);
+ 	nlmsg_end(skb, nlh);
+ 	return 0;
+ 
+ nla_put_failure:
+-	read_unlock_bh(&tbl->lock);
+ 	nlmsg_cancel(skb, nlh);
+ 	return -EMSGSIZE;
  }
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index f427e41e9c49b..59d17b6f06bfd 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -1449,7 +1449,7 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
- 					      BASE_REACHABLE_TIME, rtime);
- 				NEIGH_VAR_SET(in6_dev->nd_parms,
- 					      GC_STALETIME, 3 * rtime);
--				in6_dev->nd_parms->reachable_time = neigh_rand_reach_time(rtime);
-+				neigh_set_reach_time(in6_dev->nd_parms);
- 				in6_dev->tstamp = jiffies;
- 				send_ifinfo_notify = true;
- 			}
-@@ -1948,9 +1948,9 @@ int ndisc_ifinfo_sysctl_change(const struct ctl_table *ctl, int write, void *buf
- 		ret = -1;
+@@ -2321,8 +2315,6 @@ static int neightbl_fill_param_info(struct sk_buff *skb,
+ 		return -EMSGSIZE;
  
- 	if (write && ret == 0 && dev && (idev = in6_dev_get(dev)) != NULL) {
--		if (ctl->data == &NEIGH_VAR(idev->nd_parms, BASE_REACHABLE_TIME))
--			idev->nd_parms->reachable_time =
--					neigh_rand_reach_time(NEIGH_VAR(idev->nd_parms, BASE_REACHABLE_TIME));
-+		if (ctl->data == NEIGH_VAR_PTR(idev->nd_parms, BASE_REACHABLE_TIME))
-+			neigh_set_reach_time(idev->nd_parms);
+ 	ndtmsg = nlmsg_data(nlh);
+-
+-	read_lock_bh(&tbl->lock);
+ 	ndtmsg->ndtm_family = tbl->family;
+ 	ndtmsg->ndtm_pad1   = 0;
+ 	ndtmsg->ndtm_pad2   = 0;
+@@ -2331,11 +2323,9 @@ static int neightbl_fill_param_info(struct sk_buff *skb,
+ 	    neightbl_fill_parms(skb, parms) < 0)
+ 		goto errout;
+ 
+-	read_unlock_bh(&tbl->lock);
+ 	nlmsg_end(skb, nlh);
+ 	return 0;
+ errout:
+-	read_unlock_bh(&tbl->lock);
+ 	nlmsg_cancel(skb, nlh);
+ 	return -EMSGSIZE;
+ }
+@@ -2575,10 +2565,12 @@ static int neightbl_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
+ 
+ 	family = ((struct rtgenmsg *)nlmsg_data(nlh))->rtgen_family;
+ 
++	rcu_read_lock();
 +
- 		WRITE_ONCE(idev->tstamp, jiffies);
- 		inet6_ifinfo_notify(RTM_NEWLINK, idev);
- 		in6_dev_put(idev);
+ 	for (tidx = 0; tidx < NEIGH_NR_TABLES; tidx++) {
+ 		struct neigh_parms *p;
+ 
+-		tbl = rcu_dereference_rtnl(neigh_tables[tidx]);
++		tbl = rcu_dereference(neigh_tables[tidx]);
+ 		if (!tbl)
+ 			continue;
+ 
+@@ -2592,7 +2584,7 @@ static int neightbl_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
+ 
+ 		nidx = 0;
+ 		p = list_next_entry(&tbl->parms, list);
+-		list_for_each_entry_from(p, &tbl->parms_list, list) {
++		list_for_each_entry_from_rcu(p, &tbl->parms_list, list) {
+ 			if (!net_eq(neigh_parms_net(p), net))
+ 				continue;
+ 
+@@ -2612,6 +2604,8 @@ static int neightbl_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
+ 		neigh_skip = 0;
+ 	}
+ out:
++	rcu_read_unlock();
++
+ 	cb->args[0] = tidx;
+ 	cb->args[1] = nidx;
+ 
+@@ -3913,7 +3907,8 @@ static const struct rtnl_msg_handler neigh_rtnl_msg_handlers[] __initconst = {
+ 	{.msgtype = RTM_DELNEIGH, .doit = neigh_delete},
+ 	{.msgtype = RTM_GETNEIGH, .doit = neigh_get, .dumpit = neigh_dump_info,
+ 	 .flags = RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
+-	{.msgtype = RTM_GETNEIGHTBL, .dumpit = neightbl_dump_info},
++	{.msgtype = RTM_GETNEIGHTBL, .dumpit = neightbl_dump_info,
++	 .flags = RTNL_FLAG_DUMP_UNLOCKED},
+ 	{.msgtype = RTM_SETNEIGHTBL, .doit = neightbl_set},
+ };
+ 
 -- 
 2.51.0.915.g61a8936c21-goog
 
