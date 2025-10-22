@@ -1,134 +1,236 @@
-Return-Path: <netdev+bounces-231783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C730FBFD6C2
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 18:59:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F38BDBFD593
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 18:49:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E1C15584A98
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 16:48:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F51018823CF
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 16:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177F12D1907;
-	Wed, 22 Oct 2025 16:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA4235B136;
+	Wed, 22 Oct 2025 16:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cCgRrlOn"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="IAmJ8k7K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5EE6255240
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 16:43:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38EA35B129;
+	Wed, 22 Oct 2025 16:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761151383; cv=none; b=GyM9eL3egrGMeBL5amguLkSdEV0k7YNX73bYko0LaKoWbvjvjoqLNs9TPtEmwHCC82WxkpO57afIZ4FUzpvlRUYIFRCnSIUBCZzxfMTQ623ow+lijuncI5PWnQdZg6cL7Ym12p53vGp9ewD2kY8J9/wWPRDvPHGHU55vWu2svsU=
+	t=1761151455; cv=none; b=EFAFwpQ49Blkn3UB3nl8ZD6gpnydgPcfiYuYGWCD6DthBfMNJRfzaydoXS7vOKwQ06GtGu+D1nwy8J4JDI210SAnXp17egiWCMZqu520qBLNVXNyH8tovTKZCYEGmyNKrE+EMK4hlMHhCuXfUEIXbaokFPxB2RF/c+aD9KY5ymU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761151383; c=relaxed/simple;
-	bh=WdlrB3q2QZ33xOe+SYTWXpKBwIrqF8HtmsZYMedGrb4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bk2YVNPOQCcqyz7LzUBeO7z0meP/3NHkWbIYnT3TzIwKxBbzODzCBQTei52MRTUDU7kBX8NOVP9epi4o0cPyuNEZvK+OVZ5j0HLy7DBzhqFFh8g1FmiyRcVwnl5X8rFP8BNMbl63NtvFR8ljvmiAkp0bpKw1iTWBUYQmYF2PK1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cCgRrlOn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B292C4CEE7;
-	Wed, 22 Oct 2025 16:43:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761151382;
-	bh=WdlrB3q2QZ33xOe+SYTWXpKBwIrqF8HtmsZYMedGrb4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cCgRrlOnrDJMGn4fTtRxFEDD/h1IgCunNltO3TZJUjD+aRRrurh8S5WvRrxria7Be
-	 tEr+vGYbNUJ3yTlEtgIwpO1+Zu6wkrDFrXawlLoCKeF4R3SL5baELZ2t9/NzPcJWAj
-	 +JwPwS7lHlsTUgiKQOmPsMocYV95XTbHtEbm6pptWKg1hdKnnUAw8gPFu8WVFcAy4+
-	 Bw/zuROYCsSD2k0TCW6vzSQH3JmlY7pEJMfBxfWl46Un64ZVmRQ6YR55TifKlDSPUT
-	 62u50Z+EsvAL60SZgYsfzEK6FdRF8+0NaEjDWzcxesEdyzieWlNhrFFbHIfKIxRnVU
-	 3XBooe0EGc9CA==
-Date: Wed, 22 Oct 2025 16:43:00 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: [bug report] tcp: Convert tcp-md5 to use MD5 library instead of
- crypto_ahash
-Message-ID: <20251022164300.GA245108@google.com>
-References: <aPi4b6aWBbBR52P1@stanley.mountain>
+	s=arc-20240116; t=1761151455; c=relaxed/simple;
+	bh=CClu27EVIMb0L+/utii1f+p0OGlvQYvUTKRT8So2Tq8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QRdaxhPvelrV8dGJqBvJ9aDmeJAd/gyKJXT417tNze4tfLQRUd4qaWYUrb6qBHzECcCTPdHx5D2vER5S3+37BuM1GdNO6t+z2GWqhsIl/qk6cK4x/BIHC05o3WjR/eeKtKAlAdTn5Rs7WvFlR/ZKPHuRQHaPcJLwAfLwpu4G1jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=IAmJ8k7K; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [192.168.1.19] (unknown [103.212.145.76])
+	by linux.microsoft.com (Postfix) with ESMTPSA id B7C7D206595A;
+	Wed, 22 Oct 2025 09:44:06 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B7C7D206595A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1761151452;
+	bh=QD4gN2DR0xkuQGbWjt1Moftwz75l5x53sM6fqnFk+q4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IAmJ8k7KCZJwvov2ZtpqG5Dn0YM29BJq+o5gcgkdK4M9QRKnuElFrhpLHxm4njEeP
+	 7Wszxn/cro5H0MhVCV0WK8lY8Ckx26xr44bwFEqx0WImBYjaMoj8v1lEbhvaQIA7/T
+	 ADal63Odxasth2mBWNSX1UvCrJZJP1waF3/kMMLM=
+Message-ID: <cd716f3f-cb08-4ff9-8de4-25363180d7a4@linux.microsoft.com>
+Date: Wed, 22 Oct 2025 22:14:03 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aPi4b6aWBbBR52P1@stanley.mountain>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: mana: Linearize SKB if TX SGEs exceeds
+ hardware limit
+To: Eric Dumazet <edumazet@google.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+ kotaranov@microsoft.com, horms@kernel.org, shradhagupta@linux.microsoft.com,
+ ernis@linux.microsoft.com, dipayanroy@linux.microsoft.com,
+ shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, gargaditya@microsoft.com,
+ ssengar@linux.microsoft.com
+References: <20251003154724.GA15670@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <CANn89iJwkbxC5HvSKmk807K-3HY+YR1kt-LhcYwnoFLAaeVVow@mail.gmail.com>
+ <9d886861-2e1f-4ea8-9f2c-604243bd751b@linux.microsoft.com>
+ <CANn89iKwHWdUaeAsdSuZUXG-W8XwyM2oppQL9spKkex0p9-Azw@mail.gmail.com>
+ <7bc327ba-0050-4d9e-86b6-1b7427a96f53@linux.microsoft.com>
+ <1d3ac973-7bc7-4abe-9fe2-6b17dbba223b@linux.microsoft.com>
+ <CANn89iKFsuUnwMb-upqwswrCYaTL-MXVwsQdxFhduZeZRAJZ2A@mail.gmail.com>
+Content-Language: en-US
+From: Aditya Garg <gargaditya@linux.microsoft.com>
+In-Reply-To: <CANn89iKFsuUnwMb-upqwswrCYaTL-MXVwsQdxFhduZeZRAJZ2A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 22, 2025 at 01:56:47PM +0300, Dan Carpenter wrote:
-> Hello Eric Biggers,
+On 17-10-2025 23:36, Eric Dumazet wrote:
+> On Fri, Oct 17, 2025 at 10:41 AM Aditya Garg
+> <gargaditya@linux.microsoft.com> wrote:
+>>
+>> On 08-10-2025 20:58, Aditya Garg wrote:
+>>> On 08-10-2025 20:51, Eric Dumazet wrote:
+>>>> On Wed, Oct 8, 2025 at 8:16 AM Aditya Garg
+>>>> <gargaditya@linux.microsoft.com> wrote:
+>>>>>
+>>>>> On 03-10-2025 21:45, Eric Dumazet wrote:
+>>>>>> On Fri, Oct 3, 2025 at 8:47 AM Aditya Garg
+>>>>>> <gargaditya@linux.microsoft.com> wrote:
+>>>>>>>
+>>>>>>> The MANA hardware supports a maximum of 30 scatter-gather entries
+>>>>>>> (SGEs)
+>>>>>>> per TX WQE. In rare configurations where MAX_SKB_FRAGS + 2 exceeds
+>>>>>>> this
+>>>>>>> limit, the driver drops the skb. Add a check in mana_start_xmit() to
+>>>>>>> detect such cases and linearize the SKB before transmission.
+>>>>>>>
+>>>>>>> Return NETDEV_TX_BUSY only for -ENOSPC from
+>>>>>>> mana_gd_post_work_request(),
+>>>>>>> send other errors to free_sgl_ptr to free resources and record the tx
+>>>>>>> drop.
+>>>>>>>
+>>>>>>> Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
+>>>>>>> Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+>>>>>>> ---
+>>>>>>>     drivers/net/ethernet/microsoft/mana/mana_en.c | 26 +++++++++++++
+>>>>>>> ++----
+>>>>>>>     include/net/mana/gdma.h                       |  8 +++++-
+>>>>>>>     include/net/mana/mana.h                       |  1 +
+>>>>>>>     3 files changed, 29 insertions(+), 6 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/
+>>>>>>> drivers/net/ethernet/microsoft/mana/mana_en.c
+>>>>>>> index f4fc86f20213..22605753ca84 100644
+>>>>>>> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+>>>>>>> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+>>>>>>> @@ -20,6 +20,7 @@
+>>>>>>>
+>>>>>>>     #include <net/mana/mana.h>
+>>>>>>>     #include <net/mana/mana_auxiliary.h>
+>>>>>>> +#include <linux/skbuff.h>
+>>>>>>>
+>>>>>>>     static DEFINE_IDA(mana_adev_ida);
+>>>>>>>
+>>>>>>> @@ -289,6 +290,19 @@ netdev_tx_t mana_start_xmit(struct sk_buff
+>>>>>>> *skb, struct net_device *ndev)
+>>>>>>>            cq = &apc->tx_qp[txq_idx].tx_cq;
+>>>>>>>            tx_stats = &txq->stats;
+>>>>>>>
+>>>>>>> +       BUILD_BUG_ON(MAX_TX_WQE_SGL_ENTRIES !=
+>>>>>>> MANA_MAX_TX_WQE_SGL_ENTRIES);
+>>>>>>> +       #if (MAX_SKB_FRAGS + 2 > MANA_MAX_TX_WQE_SGL_ENTRIES)
+>>>>>>> +               if (skb_shinfo(skb)->nr_frags + 2 >
+>>>>>>> MANA_MAX_TX_WQE_SGL_ENTRIES) {
+>>>>>>> +                       netdev_info_once(ndev,
+>>>>>>> +                                        "nr_frags %d exceeds max
+>>>>>>> supported sge limit. Attempting skb_linearize\n",
+>>>>>>> +                                        skb_shinfo(skb)->nr_frags);
+>>>>>>> +                       if (skb_linearize(skb)) {
+>>>>>>
+>>>>>> This will fail in many cases.
+>>>>>>
+>>>>>> This sort of check is better done in ndo_features_check()
+>>>>>>
+>>>>>> Most probably this would occur for GSO packets, so can ask a software
+>>>>>> segmentation
+>>>>>> to avoid this big and risky kmalloc() by all means.
+>>>>>>
+>>>>>> Look at idpf_features_check()  which has something similar.
+>>>>>
+>>>>> Hi Eric,
+>>>>> Thank you for your review. I understand your concerns regarding the use
+>>>>> of skb_linearize() in the xmit path, as it can fail under memory
+>>>>> pressure and introduces additional overhead in the transmit path. Based
+>>>>> on your input, I will work on a v2 that will move the SGE limit check to
+>>>>> the ndo_features_check() path and for GSO skbs exceding the hw limit
+>>>>> will disable the NETIF_F_GSO_MASK to enforce software segmentation in
+>>>>> kernel before the call to xmit.
+>>>>> Also for non GSO skb exceeding the SGE hw limit should we go for using
+>>>>> skb_linearize only then or would you suggest some other approach here?
+>>>>
+>>>> I think that for non GSO, the linearization attempt is fine.
+>>>>
+>>>> Note that this is extremely unlikely for non malicious users,
+>>>> and MTU being usually small (9K or less),
+>>>> the allocation will be much smaller than a GSO packet.
+>>>
+>>> Okay. Will send a v2
+>> Hi Eric,
+>> I tested the code by disabling GSO in ndo_features_check when the number
+>> of SGEs exceeds the hardware limit, using iperf for a single TCP
+>> connection with zerocopy enabled. I noticed a significant difference in
+>> throughput compared to when we linearize the skbs.
+>> For reference, the throughput is 35.6 Gbits/sec when using
+>> skb_linearize, but drops to 6.75 Gbits/sec when disabling GSO per skb.
 > 
-> Commit 37a183d3b7cd ("tcp: Convert tcp-md5 to use MD5 library instead
-> of crypto_ahash") from Oct 14, 2025 (linux-next), leads to the
-> following Smatch static checker warning:
+> You must be doing something very wrong.
 > 
-> 	net/ipv4/tcp.c:4911 tcp_inbound_md5_hash()
-> 	error: we previously assumed 'key' could be null (see line 4900)
+> Difference between TSO and non TSO should not be that high.
 > 
-> net/ipv4/tcp.c
->   4884  tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
->   4885                       const void *saddr, const void *daddr,
->   4886                       int family, int l3index, const __u8 *hash_location)
->   4887  {
->   4888          /* This gets called for each TCP segment that has TCP-MD5 option.
->   4889           * We have 3 drop cases:
->   4890           * o No MD5 hash and one expected.
->   4891           * o MD5 hash and we're not expecting one.
->   4892           * o MD5 hash and its wrong.
->   4893           */
->   4894          const struct tcp_sock *tp = tcp_sk(sk);
->   4895          struct tcp_md5sig_key *key;
->   4896          u8 newhash[16];
->   4897  
->   4898          key = tcp_md5_do_lookup(sk, l3index, saddr, family);
->   4899  
->   4900          if (!key && hash_location) {
+> ethtool -K eth0 tso on
+> netperf -H tjbp27
+> MIGRATED TCP STREAM TEST from ::0 (::) port 0 AF_INET6 to
+> tjbp27.prod.google.com () port 0 AF_INET6
+> Recv   Send    Send
+> Socket Socket  Message  Elapsed
+> Size   Size    Size     Time     Throughput
+> bytes  bytes   bytes    secs.    10^6bits/sec
 > 
-> If key is NULL and hash_location is zero
+> 540000 262144 262144    10.00    92766.69
 > 
->   4901                  NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5UNEXPECTED);
->   4902                  trace_tcp_hash_md5_unexpected(sk, skb);
->   4903                  return SKB_DROP_REASON_TCP_MD5UNEXPECTED;
->   4904          }
->   4905  
->   4906          /* Check the signature.
->   4907           * To support dual stack listeners, we need to handle
->   4908           * IPv4-mapped case.
->   4909           */
->   4910          if (family == AF_INET)
->   4911                  tcp_v4_md5_hash_skb(newhash, key, NULL, skb);
->   4912          else
->   4913                  tp->af_specific->calc_md5_hash(newhash, key, NULL, skb);
 > 
-> then we are toasted one way or the other.
+> ethtool -K eth0 tso off
+> netperf -H tjbp27
+> MIGRATED TCP STREAM TEST from ::0 (::) port 0 AF_INET6 to
+> tjbp27.prod.google.com () port 0 AF_INET6
+> Recv   Send    Send
+> Socket Socket  Message  Elapsed
+> Size   Size    Size     Time     Throughput
+> bytes  bytes   bytes    secs.    10^6bits/sec
 > 
->   4914          if (memcmp(hash_location, newhash, 16) != 0) {
->   4915                  NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5FAILURE);
->   4916                  trace_tcp_hash_md5_mismatch(sk, skb);
->   4917                  return SKB_DROP_REASON_TCP_MD5FAILURE;
->   4918          }
->   4919          return SKB_NOT_DROPPED_YET;
->   4920  }
+> 540000 262144 262144    10.00    52218.97
+> 
+> Now if I force linearization, you can definitely see the very high
+> cost of the copies !
+> 
+> ethtool -K eth1 sg off
+> tjbp26:/home/edumazet# ./netperf -H tjbp27
+> MIGRATED TCP STREAM TEST from ::0 (::) port 0 AF_INET6 to
+> tjbp27.prod.google.com () port 0 AF_INET6
+> Recv   Send    Send
+> Socket Socket  Message  Elapsed
+> Size   Size    Size     Time     Throughput
+> bytes  bytes   bytes    secs.    10^6bits/sec
+> 
+> 540000 262144 262144    10.00    16951.32
+> 
+>>
+>> Hence, We propose to  linearizing skbs until the first failure occurs.
+> 
+> Hmm... basically hiding a bug then ?
+> 
+>> After that, we switch to a fail-safe mode by disabling GSO for SKBs with
+>>    sge > hw limit using the ndo_feature_check implementation, while
+>> continuing to apply  skb_linearize() for non-GSO packets that exceed the
+>> hardware limit. This ensures we remain on the optimal performance path
+>> initially, and only transition to the fail-safe path after encountering
+>> a failure.
+> 
+> Please post your patch (adding the check in ndo_features_check()),
+> perhaps one of us is able to help.
 
-Thanks.  I don't think there's a problem with this patch: it just
-simplified the code, which happened to make this warning visible.  If
-both key and hash_location are NULL, then 'key' gets dereferenced in
-tcp_md5_hash_key(), both before and after this patch.  If only
-'hash_location' is NULL, then it gets dereferenced when comparing the
-hash values.  Before this patch it was conditional on
-tcp_v4_md5_hash_skb() succeeding, whereas after it's unconditional.  But
-tcp_v4_md5_hash_skb() should never have failed anyway, and even if it
-did, its failure or success was unrelated to hash_location.
+Okay Eric, I'll Post a v2 with RFC. Please let me know.
 
-Looking at the calling code in tcp_inbound_hash(), it actually
-guarantees hash_location != NULL.  So, that's why it works.
-
-So, the misleading null check of hash_location in tcp_inbound_md5_hash()
-should just be deleted.
-
-- Eric
+Regards,
+Aditya
 
