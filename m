@@ -1,298 +1,114 @@
-Return-Path: <netdev+bounces-231612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AA1ABFB806
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:00:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 94B59BFB8C0
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:08:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B3BCF4E9732
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:00:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 81C324E54D6
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC13328B68;
-	Wed, 22 Oct 2025 11:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F7C32860A;
+	Wed, 22 Oct 2025 11:08:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YciUx0qr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23384328625
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE3D2E8882
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761130807; cv=none; b=dwVzJwowAobtUVe8tlWnUOLODOoonvtJGtPIWgVrRVbgan8HlV3rAhCdQ0Geu3LfRlSDKQ6qWzZ61svlyejBXR7NC0g6VSgTYMig/4BUkZsJ+w0dqCcsfCxjLIe10GVGeuLNf8v1woKhXu2qnx+0K7qNasaK08PPi1436mauNOY=
+	t=1761131287; cv=none; b=Un95evJcQrtPie+iaYhVSeRVxUgo9Rd9JJPbdzWTdmrSlaJkFSjt43M2Y+Dq/5l+4W+YTqwlorhK6ECE6P5q57rpmGedd08DPknfFZ0ME56Bk/xs6veiuhE/r2FCGc4V5SB8a8gAwhrv3w4BNx1sHcP6ZJCikrLmW58nI0A05ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761130807; c=relaxed/simple;
-	bh=OKz+xmkKiE9OVC+4fDjQc95t5WKflma0N2qOQ8z5SZg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WjCphxhL1FEF/ECmVA9+bI+9LL9nDH2E4gfWdOqIfv0YRVLfuWD3Y2ej1uitbhB2YDhA4TMwJ/tdLaS1qOfBF8ky26bPbEX95v24Lya3+C6rEXaPGA5oo7W7a4BakGdNBAVeqd+SWOshgubXFMBl3Q4LwIG7crwwv59ooZiCezE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=fejes.dev; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=fejes.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3ee64bc6b85so8675585f8f.3
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 04:00:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761130803; x=1761735603;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WMhlNDo8ASWwcI8u3mjsBd+rOMePpOl7Ef330eW/SSU=;
-        b=O69WFoUipmEawp1hRHoqDCz2+hpMxON/P4S3H7Bq5EI79dKfgPIqIDzom73svLK+Il
-         fdwLqhyZq+W6n8CkQVcKdtQ4myZEacrHryjLc5o1kZVugiro2U0vmFoNaQaTdbA9ZcbX
-         Cc45fwAFTZPcE+ZBD/T32PUEZCK1zQaljRP5UiCZjLLrM8Vow5ZZCejmRfw0EQQT+RuO
-         PRRVFbqJR0QqdZjeWHhT/gC6aBMHVqByG5spl0LiMlPdrJAkOYxYRxyyiRN4UyY2bOuB
-         FBakpbf+IxjkREGppDroIE1ePtP0YhGndEepmOyg5sG0pgYDb4/rgF7242z3ASyTGtg2
-         R7Rg==
-X-Forwarded-Encrypted: i=1; AJvYcCW2SW+vsaYFW0QTHehuUJRV45Dm4i1I4jcqDy3iWvXsVyvXp2rVA5q8jKrN6joFKcrjGG/nn6Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUL0p73/NJa1iRas9AOZDQH6iyKL3MKOnHewJtOYRIG5GyefXU
-	sSAKm1yaJLoXpGrQkP6P5vxMzIbj8cvzUMw5Ng/fZlJRNpC8iWDLMGZu
-X-Gm-Gg: ASbGnctBjYA+9J8iZ/x0Xh2mVmpn+rvWMNlxQBCMCR3wLj/wl9Fe4T7qNfMXwavEnC7
-	jfA5kTLXBcG/0ldvrT3VL+FChslWK0bO9MRAS/Z/pyn9D2vpoROboWACDVCQdA7VpMmI/uHne85
-	FQT8rAO+Qnel73x6KGaN/bjNX4UXyhEh6crDJUVtSKeawG4fcfSN3QP8OVoO2t7Qc3kPYaqMv7i
-	fFLA4MY7kJH+7mIhbbTLmQNZ38m7DMdWO54KzQ6C4cPu8bTTqi6svPDp4ujnXK0ScMEqIWb3VVa
-	8qJVI/7gt3irDrV8bfGDkWnWp1f+uX0uzZpxdLDSB9A4JYerOg965svKQj/saqzC+yJmeT2m66w
-	RPePyiC6Zd6ixn8oA4XdUSl+vIX+cjneCZOZeZH/I4ZENyCXIQN75lyA6+8blM4Z7ZXjh34rMxx
-	jdAXZu8yAWSxZKOYO7JAP+KK/gGRtncB6YQhcAca9msnSOYaxcceSSbo20oiSp6RSQ
-X-Google-Smtp-Source: AGHT+IH5uo+eTYMpftiVH0dhTJ/g13dymxown9/4klXMfyReEafbuUyOsJCDQx0E42CrJS41YtQEjg==
-X-Received: by 2002:a05:6000:250a:b0:428:3bb5:5813 with SMTP id ffacd0b85a97d-4283bb55a33mr11110213f8f.59.1761130803127;
-        Wed, 22 Oct 2025 04:00:03 -0700 (PDT)
-Received: from [10.148.83.128] (business-89-135-192-225.business.broadband.hu. [89.135.192.225])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427f00b9f71sm24812193f8f.37.2025.10.22.04.00.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Oct 2025 04:00:02 -0700 (PDT)
-Message-ID: <f708a1119b2ad8cf2514b1df128a4ef7cf21c636.camel@fejes.dev>
-Subject: Re: [PATCH RFC DRAFT 00/50] nstree: listns()
-From: Ferenc Fejes <ferenc@fejes.dev>
-To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org, 
- Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>
-Cc: Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, Zbigniew
- =?UTF-8?Q?J=C4=99drzejewski-Szmek?=	 <zbyszek@in.waw.pl>, Lennart
- Poettering <mzxreary@0pointer.de>, Daan De Meyer	
- <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, Amir
- Goldstein	 <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner
-	 <hannes@cmpxchg.org>, Thomas Gleixner <tglx@linutronix.de>, Alexander Viro
-	 <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, bpf@vger.kernel.org,
-  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, Arnd Bergmann	 <arnd@arndb.de>
-Date: Wed, 22 Oct 2025 13:00:01 +0200
-In-Reply-To: <20251021-work-namespace-nstree-listns-v1-0-ad44261a8a5b@kernel.org>
-References: 
-	<20251021-work-namespace-nstree-listns-v1-0-ad44261a8a5b@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2-5 
+	s=arc-20240116; t=1761131287; c=relaxed/simple;
+	bh=dryTu160NAioyrV82eYEOGrU55Cf+S0NldTsVQdl8o4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V197ussvZ576iu9pbxBUb3rftrUO5VI8GElEiuqekmYzx9YSW3b/Ft6FaqF+EoLZPETWbSlOetzh0WUEsHtiGt1XT5ojzEVCsz4a1HAgB0u+4vvV9XID7aFsBbloyP+jFQ1wo7OfvYEMKilt4prkNNc5JZey+fs0slsMeZqhEzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YciUx0qr; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d46abe01-2f1d-42ec-ab93-a0be3d431c09@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761131282;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jPm89C7FqdTmhO30I0w2UGstjkIjIA23l5k97iIU32g=;
+	b=YciUx0qr6pTDbtWnMnWnpq4rFmRLdYv+bEXebdHsNSV47k7JpnR9nki2gS1/DLEs3v5si8
+	yQ/Pw8Hi61jduYpIkz+Fz1vR7RGGo0WQyY1/cUngBmpFBCTzSsex5EBejXHngmotjT6qww
+	azNl9WfT8q/S4Ng9croSmpMQJbxuA4w=
+Date: Wed, 22 Oct 2025 12:07:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next v15 4/5] net: rnpgbe: Add basic mbx_fw support
+To: Dong Yibo <dong100@mucse.com>, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+ andrew+netdev@lunn.ch, danishanwar@ti.com, geert+renesas@glider.be,
+ mpe@ellerman.id.au, lorenzo@kernel.org, lukas.bulwahn@redhat.com
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251022081351.99446-1-dong100@mucse.com>
+ <20251022081351.99446-5-dong100@mucse.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20251022081351.99446-5-dong100@mucse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 2025-10-21 at 13:43 +0200, Christian Brauner wrote:
-> Hey,
->=20
-> As announced a while ago this is the next step building on the nstree
-> work from prior cycles. There's a bunch of fixes and semantic cleanups
-> in here and a ton of tests.
->=20
-> I need helper here!: Consider the following current design:
->=20
-> Currently listns() is relying on active namespace reference counts which
-> are introduced alongside this series.
->=20
-> The active reference count of a namespace consists of the live tasks
-> that make use of this namespace and any namespace file descriptors that
-> explicitly pin the namespace.
->=20
-> Once all tasks making use of this namespace have exited or reaped, all
-> namespace file descriptors for that namespace have been closed and all
-> bind-mounts for that namespace unmounted it ceases to appear in the
-> listns() output.
->=20
-> My reason for introducing the active reference count was that namespaces
-> might obviously still be pinned internally for various reasons. For
-> example the user namespace might still be pinned because there are still
-> open files that have stashed the openers credentials in file->f_cred, or
-> the last reference might be put with an rcu delay keeping that namespace
-> active on the namespace lists.
->=20
-> But one particularly strange example is CONFIG_MMU_LAZY_TLB_REFCOUNT=3Dy.
-> Various architectures support the CONFIG_MMU_LAZY_TLB_REFCOUNT option
-> which uses lazy TLB destruction.
->=20
-> When this option is set a userspace task's struct mm_struct may be used
-> for kernel threads such as the idle task and will only be destroyed once
-> the cpu's runqueue switches back to another task. So the kernel thread
-> will take a reference on the struct mm_struct pinning it.
->=20
-> And for ptrace() based access checks struct mm_struct stashes the user
-> namespace of the task that struct mm_struct belonged to originally and
-> thus takes a reference to the users namespace and pins it.
->=20
-> So on an idle system such user namespaces can be persisted for pretty
-> arbitrary amounts of time via struct mm_struct.
->=20
-> Now, without the active reference count regulating visibility all
-> namespace that still are pinned in some way on the system will appear in
-> the listns() output and can be reopened using namespace file handles.
->=20
-> Of course that requires suitable privileges and it's not really a
-> concern per se because a task could've also persist the namespace
-> recorded in struct mm_struct explicitly and then the idle task would
-> still reuse that struct mm_struct and another task could still happily
-> setns() to it afaict and reuse it for something else.
->=20
-> The active reference count though has drawbacks itself. Namely that
-> socket files break the assumption that namespaces can only be opened if
-> there's either live processes pinning the namespace or there are file
-> descriptors open that pin the namespace itself as the socket SIOCGSKNS
-> ioctl() can be used to open a network namespace based on a socket which
-> only indirectly pins a network namespace.
->=20
-> So that punches a whole in the active reference count tracking. So this
-> will have to be handled as right now socket file descriptors that pin a
-> network namespace that don't have an active reference anymore (no live
-> processes, not explicit persistence via namespace fds) can't be used to
-> issue a SIOCGSKNS ioctl() to open the associated network namespace.
->=20
-> So two options I see if the api is based on ids:
->=20
-> (1) We use the active reference count and somehow also make it work with
-> =C2=A0=C2=A0=C2=A0 sockets.
-> (2) The active reference count is not needed and we say that listns() is
-> =C2=A0=C2=A0=C2=A0 an introspection system call anyway so we just always =
-list
-> =C2=A0=C2=A0=C2=A0 namespaces regardless of why they are still pinned: fi=
-les,
-> =C2=A0=C2=A0=C2=A0 mm_struct, network devices, everything is fair game.
-> (3) Throw hands up in the air and just not do it.
->=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> Add a new listns() system call that allows userspace to iterate through
-> namespaces in the system. This provides a programmatic interface to
-> discover and inspect namespaces, enhancing existing namespace apis.
->=20
-> Currently, there is no direct way for userspace to enumerate namespaces
-> in the system. Applications must resort to scanning /proc/<pid>/ns/
-> across all processes, which is:
->=20
-> 1. Inefficient - requires iterating over all processes
-> 2. Incomplete - misses inactive namespaces that aren't attached to any
-> =C2=A0=C2=A0 running process but are kept alive by file descriptors, bind=
- mounts,
-> =C2=A0=C2=A0 or parent namespace references
-> 3. Permission-heavy - requires access to /proc for many processes
-> 4. No ordering or ownership.
-> 5. No filtering per namespace type: Must always iterate and check all
-> =C2=A0=C2=A0 namespaces.
->=20
-> The list goes on. The listns() system call solves these problems by
-> providing direct kernel-level enumeration of namespaces. It is similar
-> to listmount() but obviously tailored to namespaces.
+On 22/10/2025 09:13, Dong Yibo wrote:
+> Add fundamental firmware (FW) communication operations via PF-FW
+> mailbox, including:
+> - FW sync (via HW info query with retries)
+> - HW reset (post FW command to reset hardware)
+> - MAC address retrieval (request FW for port-specific MAC)
+> - Power management (powerup/powerdown notification to FW)
+> 
+> Signed-off-by: Dong Yibo <dong100@mucse.com>
+> ---
+>   drivers/net/ethernet/mucse/rnpgbe/Makefile    |   3 +-
+>   drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |   4 +
+>   .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    |   1 +
+>   .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c | 194 ++++++++++++++++++
+>   .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h |  88 ++++++++
+>   5 files changed, 289 insertions(+), 1 deletion(-)
+>   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+>   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
 
-I've been waiting for such an API for years; thanks for working on it. I mo=
-stly
-deal with network namespaces, where points 2 and 3 are especially painful.
+[...]
 
-Recently, I've used this eBPF snippet to discover (at most 1024, because of=
- the
-verifier's halt checking) network namespaces, even if no process is attache=
-d.
-But I can't do anything with it in userspace since it's not possible to pas=
-s the
-inode number or netns cookie value to setns()...
+> +static int mucse_mbx_get_info(struct mucse_hw *hw)
+> +{
+> +	struct mbx_fw_cmd_req req = {
+> +		.datalen = cpu_to_le16(MUCSE_MBX_REQ_HDR_LEN),
+> +		.opcode  = cpu_to_le16(GET_HW_INFO),
+> +	};
+> +	struct mbx_fw_cmd_reply reply = {};
+> +	struct mucse_hw_info info = {};
+> +	int err;
+> +
+> +	err = mucse_fw_send_cmd_wait_resp(hw, &req, &reply);
+> +	if (!err) {
+> +		memcpy(&info, &reply.hw_info, sizeof(struct mucse_hw_info));
+> +		hw->pfvfnum = FIELD_GET(GENMASK_U16(7, 0),
+> +					le16_to_cpu(info.pfnum));
 
-extern const void net_namespace_list __ksym;
-static void list_all_netns()
-{
-    struct list_head *nslist =3D=C2=A0
-	bpf_core_cast(&net_namespace_list, struct list_head);
+why do you need local struct mucse_hw_info info? The reply is stack
+allocated, nothing else will use it afterwards. You clear out
+info on allocation (40 bytes memset), then you copy whole structure from
+reply to info (another round of 40 bytes reads/writes) and then use only
+2 bytes out of it - it does look like an overkill, you can access
+reply.hwinfo.pfnum directly.
 
-    struct list_head *iter =3D nslist->next;
 
-    bpf_repeat(1024) {
-        const struct net *net =3D=C2=A0
-		bpf_core_cast(container_of(iter, struct net, list), struct
-net);
-
-        // bpf_printk("net: %p inode: %u cookie: %lu",=C2=A0
-	//	net, net->ns.inum, net->net_cookie);
-
-        if (iter->next =3D=3D nslist)
-            break;
-        iter =3D iter->next;
-    }
-}
-
->=20
-> /*
-> =C2=A0* @req: Pointer to struct ns_id_req specifying search parameters
-> =C2=A0* @ns_ids: User buffer to receive namespace IDs
-> =C2=A0* @nr_ns_ids: Size of ns_ids buffer (maximum number of IDs to retur=
-n)
-> =C2=A0* @flags: Reserved for future use (must be 0)
-> =C2=A0*/
-> ssize_t listns(const struct ns_id_req *req, u64 *ns_ids,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 size_t nr_ns_ids, unsigned int flags);
->=20
-> Returns:
-> - On success: Number of namespace IDs written to ns_ids
-> - On error: Negative error code
->=20
-> /*
-> =C2=A0* @size: Structure size
-> =C2=A0* @ns_id: Starting point for iteration; use 0 for first call, then
-> =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 use the last retu=
-rned ID for subsequent calls to paginate
-> =C2=A0* @ns_type: Bitmask of namespace types to include (from enum ns_typ=
-e):
-> =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0: Re=
-turn all namespace types
-> =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 MNT_N=
-S: Mount namespaces
-> =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NET_N=
-S: Network namespaces
-> =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 USER_=
-NS: User namespaces
-> =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 etc. =
-Can be OR'd together
-> =C2=A0* @user_ns_id: Filter results to namespaces owned by this user name=
-space:
-> =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 0: Return all namespaces (subject to permission checks)
-> =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 LISTNS_CURRENT_USER: Namespaces owned by caller's user
-> namespace
-> =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 Other value: Namespaces owned by the specified user namespace
-> ID
-> =C2=A0*/
-> struct ns_id_req {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u32 size;=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* sizeof(struct ns_id_req) */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u32 spare;=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 /* Reserved, must be 0 */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u64 ns_id;=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 /* Last seen namespace ID (for pagination) */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u32 ns_type;=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 /* Filter by namespace type(s) */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u32 spare2;=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 /* Reserved, must be 0 */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u64 user_ns_id;=C2=A0=C2=A0 =
-/* Filter by owning user namespace */
-> };
->=20
-
-After this merged, do you see any chance for backports? Does it rely on rec=
-ent
-bits which is hard/impossible to backport? I'm not aware of backported sysc=
-alls
-but this would be really nice to see in older kernels.
-
-Ferenc
 
