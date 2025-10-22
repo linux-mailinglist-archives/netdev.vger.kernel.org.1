@@ -1,135 +1,142 @@
-Return-Path: <netdev+bounces-231558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D429BFA82E
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 09:22:33 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2694EBFA891
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 09:27:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B68B63BAF08
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 07:22:31 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9B85634AE5B
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 07:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D4482F616A;
-	Wed, 22 Oct 2025 07:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 325CD2F6587;
+	Wed, 22 Oct 2025 07:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sbKSnHJn"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=sjoerd@collabora.com header.b="WS0HFeV7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90C32F49FC
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 07:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761117748; cv=none; b=R4tMPmYPH5CX3tnbD9iwLVz9Up2B+0P3RsaCmG4qKvFoCREuwnGXcfGJQ9DRJVr4VT5THolJvfWQZEHGDhptEZ9CN2eIbsJOveqPYyA4lMIWegfHeUyxIajrq7gDv7yFJ/U3123K9DWiu1ySJn2aYno++yCF5GwpCHLdf53a1Xs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761117748; c=relaxed/simple;
-	bh=TwvetbWdKUMVFU6QjT4CxeRWEq57eDBbx7k02Vd8Xwg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iq3E5MVCuDFwM+wun7i0Imfqn1XYhRQiy0uCLCLJYTHRwCigyIqyWYd2PPClZ8C/NclNQ9DrbIqRHKdfKl+RuzWXfpsOMJvz2uPhxG1dwcwl6ygGiJsWGiRQ7p/UmhKi3LcKOWWu8f5skURuG7wVfTwog+vqJEiT1BZxqy3VXas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sbKSnHJn; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b6cdba2663dso539400a12.2
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 00:22:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761117746; x=1761722546; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TwvetbWdKUMVFU6QjT4CxeRWEq57eDBbx7k02Vd8Xwg=;
-        b=sbKSnHJnGdnh+SChtyk2b/0waFj4rbMcqOv4ob03KHBOzUErCS4Bn3r1oF0OZBIRWV
-         IKzKO7IrmChUpAXw+N8CYcCIKP4X5DzySIglYxMovlWcuTkByG5AZj4pXSxM/cTk32JT
-         v/UjqrlTFvvK3IyNGByKQR/UdTXv5UOO440oqI6fcXsU1dFpNzWMRSGcDklEsMwpNDRC
-         OdxGa0mksyoxyAupeIgNxQe5/nReB+PpBpnNsJw/OJDoctvGvimAWTPMuwgj52Lg/Buy
-         NMeh5cXxKMhFS1xcQa2g7mprNs+WpcRpA1xi9/J12lTiEsqExqboyTYGRsE3+UXmAD/+
-         g7oA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761117746; x=1761722546;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TwvetbWdKUMVFU6QjT4CxeRWEq57eDBbx7k02Vd8Xwg=;
-        b=YMetjH4woxKXR7FAbQ2c2SJCg1IRJqx/6dwmEZI3IbuPS/4941e/T7vozxx4GDVWgk
-         zS5Ref28obStdCo4i31DUqJNQkcELkr8qBofLq+jJwqtfWTiTMk999CZ8ilUf6Oonn4J
-         lolrgeKEtsScGsKSE+xuHoSSkvpbwJtPxjoJVdeXxPY6rCFjYsrRpbiB6TjDO14W9TxR
-         gsuLkeSOdP58sQyPdlUXR9GKVhvyQybfLq4lcIT2eEbAo6oKf5/b2rA00DbtZmz6EEdd
-         VVbix1clRlWzsdMzJs2Ad4FrYERvnBueF8UXOxwYrDFfiRCs2vNjvxumI7hAAj2AcXNR
-         RYtg==
-X-Forwarded-Encrypted: i=1; AJvYcCV1vEEfHYSePbb9+MBNRPh8/J9rOp7l78kg0Ee0I486M7bXJAmPAVzgyFNLbxKhTM5dKBsCakQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJo/+H5MMGbK0d1c4HWPNCrIrqVZA/vQ/P+k1ySv+CfQ1R6rXR
-	b7ET3aqwfXYbsneuMPDrwroH5+H7pdeSupazsuFVDpenb6f7dHI2TxQ5pyS7z07AWr2gVYbmtr4
-	zGTczmv2C55wQTP6/MZbx7ax8W2CT2tCUVQeqHFqZyXlYSDW1YMoCAcEK3m0=
-X-Gm-Gg: ASbGncuwMpVuSlG8End+Dkuhfr/uz3RpLurloZ2mW0xp6FNE3JsSxDCU2do8qApus+n
-	rbyAtydIlzrNbc/OxEDVV+0CM4zDUduPI+z1eHakGKOSPleULEJVDlhWBlhD9XyJf9F6EKCEeoi
-	usk8h8aOHkd6qt/PYJ0mLShCLzaJtDXIAx9DPPk31BH55epiBEhrnlzNpAYJux1ayFjTui0Cs0q
-	g7ChN3XEUYVA7Bf+a3B9KMOOtcXsHw0GHW0HcdSr45ds0PlkweTB0vHlt+7wj8gIK80oEO5+6zp
-	S4Mma/ku0ju2hakZ+A==
-X-Google-Smtp-Source: AGHT+IHFIZ0C34j+sahAzN6WmAzcBj8zZCC8xVi4muVmwKBX9i9JtWfdmefM51LsQSvwB9xwcIwZOiFOi/DKJceh1yw=
-X-Received: by 2002:a17:903:8c6:b0:26d:353c:75cd with SMTP id
- d9443c01a7336-290c9cc30b8mr247581035ad.21.1761117745989; Wed, 22 Oct 2025
- 00:22:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D5B2F5499;
+	Wed, 22 Oct 2025 07:27:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761118030; cv=pass; b=Ztr11Da0sB4r2mwx5E9OFiXytwRXcZDRHQNWdzBy70xT596I92TSJVFjB6rnpD0s/79ePk1UioDMyFZdCjf7TgOJuHx5701VIvCKW3zsJj5YaKi412x1AdPzpjI8c6n1B8RjNfMbwgRi89hBpn83VRRTpL1J745B7YxiBPcrr/A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761118030; c=relaxed/simple;
+	bh=NDxYGC5XxpUY1aK/+Eotq3Iw1MRu+0HKGlYJLjiIChc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=cWZMw29TxHgB2xyAlfrVrgt8ii7Y8rAR2nJOWFSDOC/BPifdHtvlHsIV/RW0BU1iq6kkiMCLsXp7Ezn2n8BbSu3FRTnA5i/OsgBNJ5Hquled9ugXszt2w2UeCTJHhcLlz9jz4bL+T8WaZZ7Q/bEqbYoKhRQ1/z9EfvE2NLviM8k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=sjoerd@collabora.com header.b=WS0HFeV7; arc=pass smtp.client-ip=136.143.188.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1761117986; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=GWdWVJIci83v/eS69HecZIVsU2dKjax3EaKZENbtz8G9fVU3kFO9nY0W8fbL857a5mW3ciUZqRmPGiAn2qFYSRfUsXikN42get9YJK0XRoxavO8HtvhmmTrh6sXVgQ091coljHNh/p5NRqUQXn8vNn0LieCpkgF8NE75OevzYL8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1761117986; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=Ne+Pmve/YJpQYWLxsEpgG2oak24NJMv5+UeWTnSp+5I=; 
+	b=ZFwP3ceil6N4YJkKFYDLfc3uNtz7sFBZZs9URI8eHspzPQ9RO5mfmYIwTuRp/Pt0BgCsLXgGGmuDL0oIbK3wlG8wJHJesye68F3WBpKfNl3nVdW2Waqixq2ZVPbPC8gOtczfnFApIzT0yRx1/5t9XZJUMQlDgLGmCtf2orhIpWw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=sjoerd@collabora.com;
+	dmarc=pass header.from=<sjoerd@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1761117986;
+	s=zohomail; d=collabora.com; i=sjoerd@collabora.com;
+	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
+	bh=Ne+Pmve/YJpQYWLxsEpgG2oak24NJMv5+UeWTnSp+5I=;
+	b=WS0HFeV7KBFtIbds/DTNEOfzlWHiuEhf7zgrHzyBNXymtekgif2dvr8//CXl1Eja
+	5o0inS7TmzZMLQ8iQ3Ei7kl5nEinVZYEVFx7L46Nzx0eWtQ5TQX0iSAx2IQCmJK8X72
+	FD3DTFDuVjIDxFN5LhSIHklpFieoF/gr9TrumGso=
+Received: by mx.zohomail.com with SMTPS id 1761117982200158.6072297880238;
+	Wed, 22 Oct 2025 00:26:22 -0700 (PDT)
+Message-ID: <79d4a7379bce245d22b56c677fd7b3a263836239.camel@collabora.com>
+Subject: Re: [PATCH 15/15] arm64: dts: mediatek: mt7981b-openwrt-one: Enable
+ leds
+From: Sjoerd Simons <sjoerd@collabora.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+  Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno	
+ <angelogioacchino.delregno@collabora.com>, Ryder Lee
+ <ryder.lee@mediatek.com>,  Jianjun Wang <jianjun.wang@mediatek.com>, Bjorn
+ Helgaas <bhelgaas@google.com>, Lorenzo Pieralisi	 <lpieralisi@kernel.org>,
+ Krzysztof =?UTF-8?Q?Wilczy=C5=84ski?=	 <kwilczynski@kernel.org>, Manivannan
+ Sadhasivam <mani@kernel.org>, Chunfeng Yun	 <chunfeng.yun@mediatek.com>,
+ Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
+ Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,  "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
+	kernel@collabora.com, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, 	linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, 	linux-pci@vger.kernel.org,
+ linux-phy@lists.infradead.org, netdev@vger.kernel.org,  Daniel Golle
+ <daniel@makrotopia.org>, Bryan Hinton <bryan@bryanhinton.com>
+Date: Wed, 22 Oct 2025 09:26:11 +0200
+In-Reply-To: <d8077ee4-21c2-43c5-b130-7ff270b09791@lunn.ch>
+References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
+	 <20251016-openwrt-one-network-v1-15-de259719b6f2@collabora.com>
+	 <d8077ee4-21c2-43c5-b130-7ff270b09791@lunn.ch>
+Organization: Collabora
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2-5 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251021195906.20389-1-adelodunolaoluwa.ref@yahoo.com> <20251021195906.20389-1-adelodunolaoluwa@yahoo.com>
-In-Reply-To: <20251021195906.20389-1-adelodunolaoluwa@yahoo.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 22 Oct 2025 00:22:14 -0700
-X-Gm-Features: AS18NWDYOZ-Ja2ju3PTAqCAsY0yiy5CA_MHH0MVY47CpxTMi1dFAZm_Pu3fijwA
-Message-ID: <CAAVpQUCqiTUQM6gfFE_qps19vcsE12QsMifzqPc19M_2arWtsQ@mail.gmail.com>
-Subject: Re: [PATCH v2] net: unix: remove outdated BSD behavior comment in unix_release_sock()
-To: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, 
-	david.hunter.linux@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-ZohoMailClient: External
 
-On Tue, Oct 21, 2025 at 12:59=E2=80=AFPM Sunday Adelodun
-<adelodunolaoluwa@yahoo.com> wrote:
->
-> Remove the long-standing comment in unix_release_sock() that described a
-> behavioral difference between Linux and BSD regarding when ECONNRESET is
-> sent to connected UNIX sockets upon closure.
->
-> As confirmed by testing on macOS (similar to BSD behavior), ECONNRESET
+Hey,
 
-I tested on FreeBSD and the behaviour was the same with macOS.
+On Fri, 2025-10-17 at 19:35 +0200, Andrew Lunn wrote:
+> On Thu, Oct 16, 2025 at 12:08:51PM +0200, Sjoerd Simons wrote:
+> > The Openwrt One has 3 status leds at the front (red, white, green) as
+> > well as 2 software controlled leds for the LAN jack (amber, green).
+>=20
+> A previous patch in this series added 2 PHY LEDs. Are they connected
+> to a LAN jack? Are there multiple RJ45 connectors? Is it clear from
+> /sys/class/leds what LED is what?
 
----8<---
-$ qemu-system-x86_64 -drive file=3DFreeBSD-14.3-RELEASE-amd64.qcow2 \
--enable-kvm -cpu host -serial mon:stdio -nographic
-...
-root@freebsd:~ # uname -r
-14.3-RELEASE
-root@freebsd:~ # python a.py
-test 1
-b'hello'
-b''
-test 2
-b''
-b''
-test 3
-[Errno 54] Connection reset by peer
----8<---
+Yeah there are two RJ45 jacks. One referred to as WAN in the openwrt one
+documentation (2.5G), which uses phy integrated leds. One referred to as LA=
+N,
+which for some reason is using software controlled leds rather then the phy=
+'s
+led controller, which this patch adds support for.
 
-> is only observed for SOCK_DGRAM sockets, not for SOCK_STREAM. Meanwhile,
-> Linux already returns ECONNRESET in cases where a socket is closed with
-> unread data or is not yet accept()ed. This means the previous comment no
-> longer accurately describes current behavior and is misleading.
->
-> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
-> Signed-off-by: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
+When applying this set you'll get:
+```
+root@openwrt-debian:/sys/class/leds# ls -1                                 =
+   =20
+amber:lan                                                                  =
+   =20
+green:lan                                                                  =
+   =20
+green:status                                                               =
+   =20
+mdio-bus:0f:amber:wan                                                      =
+   =20
+mdio-bus:0f:green:wan                                                      =
+   =20
+mt76-phy0                                                                  =
+   =20
+mt76-phy1                                                                  =
+   =20
+red:status                                                                 =
+   =20
+white:status                      =20
+```
 
-The comment is outdated anyway, so
+Which is hopefully clear enough
 
-Link: https://lore.kernel.org/netdev/20251018235325.897059-1-kuniyu@google.=
-com/
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+
+
+--=20
+Sjoerd Simons <sjoerd@collabora.com>
+Collabora
 
