@@ -1,113 +1,119 @@
-Return-Path: <netdev+bounces-231797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0F86BFD7E5
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 19:13:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23799BFD73D
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 19:06:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 41EE6565BF9
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 17:05:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDF1F19A5F4C
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 17:06:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD83272E63;
-	Wed, 22 Oct 2025 17:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E8F25E824;
+	Wed, 22 Oct 2025 17:06:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pbJR9jVQ";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sCG7m/Gr"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qc/EHNnA"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6EF525A341;
-	Wed, 22 Oct 2025 17:05:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735222638B2
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 17:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761152713; cv=none; b=hAs+W6x9aIpWIJO5ewwgPdQ/ybcxZ8DbCs8XRCWXynw0PUaJ/DdAU+zg3ghTlnC2EJlgCIjrh6fil9rS0qEskYcwfEPt9DaZUvQiiQ+6WkyhnMLMsVe8KGp7B2yPz9uvshzhIFRXRRK5NVeyV4Y1/aer8LOq60gN7l8tzrq2zHU=
+	t=1761152764; cv=none; b=WmscsjQog4oeplFfG7uUNY5w7w5mWqOi+hhCTiyi41xPGWlxq7v/E1cfsHgFmyjhdZPfy9XiFQFwtu+05mUDmjcMlC3Ooi8sDy1dFKCrzW96l1gQQuEoVfoRrW3SvsZKa+zC95+s+X4I6QImvl3y1OveMTHEdFE6Wfjosy0vKJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761152713; c=relaxed/simple;
-	bh=UiPn/GnL997VS+8t5o8a29N6aQcfn2fNK+YW5w5pdRY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=s/aXo+F675BwWlpAFsjEGDZARl0LyC69zRk/AecgJcDX4Ipzylk7fkP3UnNlZpxND3RFJzR6vmajw2D+KLukl4PDEcx8Dh9D0C5ew79puag5N2Ll5iPSOfSGqTlK165pOgpaz+SgbXNRs4DAIe9P32RATF5x7M37tmR9o0FVhFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pbJR9jVQ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sCG7m/Gr; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1761152709;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oQ2RBVYKWQ5VGf96MS/2zH2TN/ADfNL38D/U5RR3xQM=;
-	b=pbJR9jVQB5nr+G8FFj8RmvDtwsOIWSvd8E6t+m3j3n+0H3B0jqNrjeiEi2dk1Plj3VirQN
-	yA/1V7sUF8faAQfZfcsGicIAzo3BuCrCtp9sM1r+CCFvRumcubP0BTQjKsmmkHkqsU4SB6
-	P4FKQ4SXRCBNVgzpu7rNh5bRZmUxbM5wYzbEVt4q3BfiT2pVRWQKtJjAhC7QXvUch9Wc5g
-	1ykJvAtC37H+CceUcCldztlAX1LwExlWrqz+ncLjsiQfm/fPFU+/nr5IWQvZalrCr+kiBY
-	+AAFXvOu5w0HuDFiuQYd4GUcnBqs1oot36h5XkZZ06TOGao+ogzZSCsP6vRpTw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1761152709;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oQ2RBVYKWQ5VGf96MS/2zH2TN/ADfNL38D/U5RR3xQM=;
-	b=sCG7m/GraXt0ezpnYBgZ/Npnx8XVxrxQ5s9GmVsZF5pgEe3UYpCM3NR8gSrtBKmgBh+DVK
-	EdE+sr9Ir7P4SxDw==
-To: Christophe Leroy <christophe.leroy@csgroup.eu>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan
- Kara <jack@suse.cz>, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra
- <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, Davidlohr
- Bueso <dave@stgolabs.net>, Andre Almeida <andrealmeid@igalia.com>, Andrew
- Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman
- <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Dave Hansen
- <dave.hansen@linux.intel.com>, Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
- linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v3 03/10] uaccess: Add
- masked_user_{read/write}_access_begin
-In-Reply-To: <a4ef0a8e1659805c60fafc8d3b073ecd08117241.1760529207.git.christophe.leroy@csgroup.eu>
-References: <cover.1760529207.git.christophe.leroy@csgroup.eu>
- <a4ef0a8e1659805c60fafc8d3b073ecd08117241.1760529207.git.christophe.leroy@csgroup.eu>
-Date: Wed, 22 Oct 2025 19:05:09 +0200
-Message-ID: <87bjlyyiii.ffs@tglx>
+	s=arc-20240116; t=1761152764; c=relaxed/simple;
+	bh=NgBRi8tUVN5yYh7DPI/U4uS3U973lRB0/wcmFBtzgUQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=kjdfUabjPAlLteKUnY0REXkTtjV2Ipx46DNHwm859joHZ0dlht294wwFrxXwxhxCRCLO8GY1oFmnI+g+q/iViF6u0HWK2aVg+JtAiNreZLYYHPJosUZUMFYPYJnaMyegAy7TgeKZfnaKL/9GmqZ/ksXQyI6v3soGy1OFS4tvGbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=qc/EHNnA; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-430b6a0eaeaso56477605ab.1
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 10:06:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761152761; x=1761757561; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BsD28wm3nsAnGm5Ka75ENH+2h7LDrDV5IjCCCq827ng=;
+        b=qc/EHNnAuDZhoj3m+FmjAyUm/IyLGcvd3/LTaZUMbYOkpcdwaKoRMRsV9czkIpzmJy
+         EITLN2tTzU7QGvaFi9sCBHhr8BqfehZY7OpXbtGf/Khw99RqPjMluzW1lw2Xa/wQDxN1
+         Fu5WKAch1OqWpySXd1mmjEKwvMXVj346LDr3aCiZXLy8uWIrkG28HNkcuGG3zp0IJep+
+         ebjHHwBlOFhgggOI44DHXvWB/aOOqjBSh9/eiu6gPmeiTyZ2EksXALI8sHYSkQlfXPWK
+         f1ryYxV4kGli0f12PZpr9+u0ygbvTU7TNuIza1h1YhpN/aHcpasLf+cihEIiMzw4ZX4J
+         1RwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761152761; x=1761757561;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BsD28wm3nsAnGm5Ka75ENH+2h7LDrDV5IjCCCq827ng=;
+        b=lu5mdj98cB/TVZanPDVOO/syV40C2c/M743d6SXyOKri7Hu7E3qJcPgaNVzjS72hur
+         S0pb9djF4mG31CgX82CNci+tMwiAb2RDdJGf+nJJrs+pe49PWYIbMfu9UIxNviooIhUr
+         ILsTcIZ/N4zkM5R/Xsu2zNCLGIttf5MGcJ0VfHLdKLY5JxEVThFyS3oWaUhwVeqRTrwG
+         stOZ5+auu+33qDmmhNZL+tBbQfGrQy2xxE1x2yqmTDFr6pPtmuEpbnerxuKyD8nVGlOi
+         QNnedTKWHM68nQmwRkhJXxs2C6H1jHVdSjOQzA/1LTS8oAmappyg0p+DBYC0/NghbQrM
+         A6zw==
+X-Forwarded-Encrypted: i=1; AJvYcCUDUsVaf3I5NoDEqQvtTllqBqimMLSo5A1sTeQYD4FRTgtFUvH+SIQqVD1RAeBljKbtQF/yEf0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTSfZ7ixYzs+abHgZSG61C5aNdM5GKNdC2+6C35+a9eIhxFA2T
+	B+5AShPn8JbEXRRiwCIjpiA9Ve4DqMbRMSV+FMc3j59Qset1YNnRJ1T4i2UWUSp7eC4=
+X-Gm-Gg: ASbGncvj0PP1Wj5JTWbPkBIxDurpc7b98/JwQbYeC1wNfBJ+CRlrlhGmuRAm0LmeZOJ
+	yZuGator0ce9DGWNIt4vHF8BSAVO6dcwLs39uwnqmMKGGOav1r6oKB33QgvWSxmIO77elo72ui+
+	FEAQmPfGicYopXs3AtwETuiAGHGPrJQ1QzE0ZbTV1Zcokeni5vsJeicJXhNfABkbAXnMxxePAkt
+	TCyOb+0ZTQQ9ie7Uf0ixkZaDT3Ac3hIUgKJArWBXUurKDv1CpAhD7xkLZekpSgj/X6fj8xjgvZC
+	dl427/1MqnZDmMzxsAoTX5zv/cG6rYMNn5QIZGw+FjVKw2qot0nVsItEtSOIVwP2+WlA5kzHavc
+	d7givMlXXuP2S/IiIWH05/o0F4L5gQ7Lku1jVc4TTW3KFy4Ih4io7uyduk/ORNhcZeMJlyof3Rm
+	3fyw==
+X-Google-Smtp-Source: AGHT+IGzRtJE9jnwV9ZF0g1PKAzX6y/BSm0gYBqpWRIwH+Lt9MCz+RMkrUYLZZb8PO74y1TH49X5Xw==
+X-Received: by 2002:a92:c265:0:b0:430:af8f:1d28 with SMTP id e9e14a558f8ab-430c5223e4cmr339162185ab.11.1761152761353;
+        Wed, 22 Oct 2025 10:06:01 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5a8a9770b1asm5278156173.54.2025.10.22.10.06.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Oct 2025 10:06:00 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+ David Wei <dw@davidwei.uk>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>
+In-Reply-To: <20251021202944.3877502-1-dw@davidwei.uk>
+References: <20251021202944.3877502-1-dw@davidwei.uk>
+Subject: Re: [PATCH 1/1] io_uring zcrx: add MAINTAINERS entry
+Message-Id: <176115276062.117701.12360717585804633704.b4-ty@kernel.dk>
+Date: Wed, 22 Oct 2025 11:06:00 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On Fri, Oct 17 2025 at 12:20, Christophe Leroy wrote:
-> Allthough masked_user_access_begin() is to only be used when reading
-> data from user at the moment, introduce masked_user_read_access_begin()
-> and masked_user_write_access_begin() in order to match
-> user_read_access_begin() and user_write_access_begin().
->
-> That means masked_user_read_access_begin() is used when user memory is
-> exclusively read during the window, masked_user_write_access_begin()
-> is used when user memory is exclusively writen during the window,
-> masked_user_access_begin() remains and is used when both reads and
-> writes are performed during the open window. Each of them is expected
-> to be terminated by the matching user_read_access_end(),
-> user_write_access_end() and user_access_end().
->
-> Have them default to masked_user_access_begin() when they are
-> not defined.
->
-> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 
-Can we please coordinate on that vs. the scoped_access() work as this
-nicely collides all over the place?
+On Tue, 21 Oct 2025 13:29:44 -0700, David Wei wrote:
+> Same as [1] but also with netdev@ as an additional mailing list.
+> io_uring zero copy receive is of particular interest to netdev
+> participants too, given its tight integration to netdev core.
+> 
+> With this updated entry, folks running get_maintainer.pl on patches that
+> touch io_uring/zcrx.* will know to send it to netdev@ as well.
+> 
+> [...]
 
-Thanks,
+Applied, thanks!
 
-        tglx
+[1/1] io_uring zcrx: add MAINTAINERS entry
+      commit: 060aa0b0c26c9e88cfc1433fab3d0145700e8247
+
+Best regards,
+-- 
+Jens Axboe
+
 
 
 
