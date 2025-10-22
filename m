@@ -1,141 +1,180 @@
-Return-Path: <netdev+bounces-231514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBE90BF9C06
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 04:40:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C99CBF9C5A
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 04:55:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C98E19C4868
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:40:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D03823A8436
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6605517BB35;
-	Wed, 22 Oct 2025 02:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE9C214807;
+	Wed, 22 Oct 2025 02:55:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="o/gQEfPE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gx9rxgF5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89845153BED;
-	Wed, 22 Oct 2025 02:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD55322A
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 02:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761100830; cv=none; b=nPdvx9HJX19uRe6IOIl4NyntGkngvmW7GI58xzpCevvfHgx6OmbDFV8zeW3A6C1O7QNbIlB0QVsVyq8KX8QTEio4lYZjPPV6pm6IKdUWIJ5BcPZPBxaw3kZyNFX8b+UUUb+aaDsR4DxL1yyNNrEq2VS94c8oYuuTiGPunBNqU0A=
+	t=1761101728; cv=none; b=NzhP1Rb/+WkAZT3A2Gb7kLBt7RjTL57IfysCt5WqadwhhADgR8uuaxcZQzsIvgHcgYkskfVK6DiI1wAks4QFlMZUMZTwo1XB/3WB41rOx4Y1tPzxlOtKgRPwm2iH8pf0w3Z/88dkxI8S9AQy7uzYyWnpZfVqbspGqdpGaNv5y10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761100830; c=relaxed/simple;
-	bh=YfLxz+1xwnVOpzZ2JUu5fbWVJwN2+rzZWBbl8phqto8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ukvj3YqgwsgM9gTQ3EsYuJ9LNOLzTI5+911faDcVFyVXjrMANGrXTYoyLddjQ5SfWGzuZNl7hX4PXh24sz71zPZ4aJELCCqzcIoNbJkI+4ROekJii/2yMLp2/U1Njhxkz+FbThDTClTk+lPuQGCAEDgzByIAcaUPauu4/xmGBI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=o/gQEfPE; arc=none smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59M1x5NO2299378;
-	Wed, 22 Oct 2025 02:40:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:message-id:mime-version:subject:to; s=PPS06212021; bh=ZjKAK0Bf+
-	4pkvg3Bam7nabKNYs94G5UaVYnLMnn5k8U=; b=o/gQEfPEprw+UkLDMU1/5CqIu
-	TiN593tmtyoA8hQ8YS8umOdvzL921S+Zd93B2QN98dk144UJExjF/0ecwzUZydwY
-	jtdas6XuGJScCOIbnWk66QhTjVU9YCgsg+uwkzhILdi1EMAIvMQYVcKDBSj+4AI4
-	dGzcw143X+8LTLgftuMS66OEtFcRyPFIytaUzZbVxy+JFU+3EC4nlv4pHY2hR/zF
-	PiDSsMjhy9+ngEAGiKzXaH0gFTsim2/g176qrhN2nSb1Of/hTpIVqGEyH2qt+KDa
-	1MajoAMndVlunL90Z+/DkvPA0r/SAa5rN7G+2joO+GtukBif+f6a1ugq5EQtg==
-Received: from ala-exchng02.corp.ad.wrs.com ([128.224.246.37])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 49wrpx9y6s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 22 Oct 2025 02:40:12 +0000 (GMT)
-Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
- ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.59; Tue, 21 Oct 2025 19:40:11 -0700
-Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
- ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
- 15.1.2507.59 via Frontend Transport; Tue, 21 Oct 2025 19:40:08 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <samsun1006219@gmail.com>
-CC: <kuba@kernel.org>, <ahmed.zaki@intel.com>, <aleksander.lobakin@intel.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-        <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@fomichev.me>,
-        <syzkaller-bugs@googlegroups.com>, <syzkaller@googlegroups.com>
-Subject: [PATCH V4] usbnet: Prevents free active kevent
-Date: Wed, 22 Oct 2025 10:40:07 +0800
-Message-ID: <20251022024007.1831898-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1761101728; c=relaxed/simple;
+	bh=ZrtvSK7jB4iwBAh0fO0oro7IBTovy7isMjxunmOiW34=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ebkYaaRLGNZe87qsk4sOouQxBd8oPg74DFq2cdh5NmgTpw3Ca9BQrAjkhRtrzJKvxSktSBxulkiOND2eyVfQK6iejdxyZ7pj40IIEts9RsSx7rrofpjYFYYiKj9P+e/UbS0I4hBIjeCHvkDrQYneLs8PO1jfVLy+7/hqg+9NuzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gx9rxgF5; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-290c5dec559so50849355ad.3
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 19:55:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761101726; x=1761706526; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VPky2Dr4hSQM4X8209nAybku8lFOdlCo9dChOXhSn7w=;
+        b=gx9rxgF5yCDjzfHU7IuloYnk4no07vSFSDB76rb5CTSw8jCH2EBYLJrHjNAV+QD8Zk
+         DThIgmboZ42Zd0iyuW2o3eu0ltNkRU/ZQpKbK+gWeJ0ivYRn7hQgfNnivaa232FTiDLy
+         Wq2jGJTm4u9h1HrU/YiusxYdtJBULym0/eqxJeAtpNbR72w4Kmd8H9d56N/MTXiaD86D
+         C+rU8NozMGjYCmenkhwMAmoiyhWLptWnklR8B4PYaunwltsV6C7Ex5SewLufPVGeJsls
+         3D6pPH9e80ZsCdv9pSZZRjSOQ1qiFETnvn7x79HW5+fNJ6+un72OK5rsDrcvcnlrirNs
+         q2Yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761101726; x=1761706526;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VPky2Dr4hSQM4X8209nAybku8lFOdlCo9dChOXhSn7w=;
+        b=Sg8JCqTVF2XVRu0E7JsoWKA6pt3VkR5O0ut+9+Utz75+UhqIxCSIwrWfGGYv66K9On
+         tJCNHtdbvtB3TMclVvpCca1V5lqeHWhj9jxtvE9klOnghQHTyo94qOEAZ25/1H6oya5X
+         aqkOQFngYsv8egszEGXgeDuG214Oz8smiXtuXmlOxlY1Z6mvh0xavf9BQU+U0EEzMsw5
+         BGz3b//L7k2DnjU2BXyvP1eL0Srq7aC35CxutxSJTevMoyATUcEgj0qWl91BT8SHwgTx
+         0mRnf3csVnmldRnTYSvXjFcIgOWliAjV9iEMmV5I8uoR57XodTM3ndc6Jb/Y+twIeNrt
+         +u3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCURM9ig0WRZjVYDHgoNaIK6DKWGXe9EaIydedf+5oDdT8+9fLKQXvhXCh8dxY4bmhC3c+1bMPQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxI3Ht/uQoFzpdvwsebm0y5/LJsMh/TgT78dJeJV5vTvI3ou8x8
+	2tf0LCed4jGyKrkZ3cE5DXlFZX2LQNnicbUN4zHF6TjVC91Zhqb/jLX2
+X-Gm-Gg: ASbGncuFVBi1XERmJmXavjjZIaFGkRBC7dd8luhR7aLndhAYivGODb2nNAkwNKAGTRr
+	SNWxlD24HibLp3E7cVyBaluuxvzpSZ7kdsvxbSeN57Zypyadf95YfqIakcowEHPBNTRHPC+NFfY
+	mH5KOEUAk6bFqfWxHaWEYjIyb6brHDkSgXTraVAZYTa8nRaFqoARLPkVg0x7PCblo1U5as+WCfA
+	K7jxT46Qo63tgJwkpRYQJS4l2hjfcVDq1mdBNE9L2fFthD4c0TPAbfNqtTJUT/qiHyzI2xub0t7
+	BLfmu0V1dYTPsGIfzIHJhIpwqOcPfEFjA0DkV3gYpdtYeaRUWKk++Gi/ElW1uzvzF3tKcK/xocx
+	9UHAvdcYZsKJKn/TmZfL7hK86A6HYtbw8HNfYU/ch107ph/Ds4fCHwHKHfBiv3khB1Mi7gVET1N
+	PygMSspM08jyz/
+X-Google-Smtp-Source: AGHT+IF3djNIS7WVATUe83XXRS6aA9D+T77xapsJjzDewNLTQQ9xMPqmOrivckESaDuZU7VdzZJBJg==
+X-Received: by 2002:a17:902:ce0e:b0:28e:9427:68f6 with SMTP id d9443c01a7336-290c9cd4d59mr232428945ad.27.1761101725760;
+        Tue, 21 Oct 2025 19:55:25 -0700 (PDT)
+Received: from archie.me ([103.124.138.80])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33e223c7e19sm1005066a91.3.2025.10.21.19.55.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Oct 2025 19:55:24 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id CD5934241829; Wed, 22 Oct 2025 09:55:12 +0700 (WIB)
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>
+Cc: Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>,
+	Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: [PATCH net-next v2] net: rmnet: Use section heading markup for packet format subsections
+Date: Wed, 22 Oct 2025 09:54:57 +0700
+Message-ID: <20251022025456.19004-2-bagasdotme@gmail.com>
+X-Mailer: git-send-email 2.51.1.dirty
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2656; i=bagasdotme@gmail.com; h=from:subject; bh=ZrtvSK7jB4iwBAh0fO0oro7IBTovy7isMjxunmOiW34=; b=kA0DAAoW9rmJSVVRTqMByyZiAGj4Ry2gyX0MRLPqbia0igTNfutoOdLbqzUVsP6RDDWyvmEPI 4h1BAAWCgAdFiEEkmEOgsu6MhTQh61B9rmJSVVRTqMFAmj4Ry0ACgkQ9rmJSVVRTqOUtQEAm58D 549RYpDUAIN5+kudZXDIlihx/ZkYhjQ6/oWP5ZEA/AmNkHNiuXMpFU8YZ2Pcj+h2TTsRJsO5IhK agiCrIGYH
+X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=b9O/I9Gx c=1 sm=1 tr=0 ts=68f8440c cx=c_pps
- a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=edf1wS77AAAA:8 a=pGLkceISAAAA:8
- a=t7CeM3EgAAAA:8 a=KMxUBI-LuQ3xbY_cxn0A:9 a=DcSpbTIhAlouE1Uv7lRv:22
- a=FdTzh2GWekK77mhwV6Dw:22 a=poXaRoVlC6wW9_mwW8W4:22 a=cPQSjfK2_nFv0Q5t_7PE:22
- a=Z5ABNNGmrOfJ6cZ5bIyy:22 a=SsAZrZ5W_gNWK9tOzrEV:22
-X-Proofpoint-GUID: HfAhk5HfZUqTgAHLbbzazWwXt4njlAaX
-X-Proofpoint-ORIG-GUID: HfAhk5HfZUqTgAHLbbzazWwXt4njlAaX
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIyMDAyMSBTYWx0ZWRfXz66lZ1KamRCd
- Whoy6tAKHt9qMn/ImYhHv98VXuvgyTKc/jAEIhx1Pem3QNdf1oo0dVg4YeaNA32rgO9ZTrVjtNm
- XHvfINhdPalGFlamFQ34PQSPn+s1rEQJGgKAchiZZO4w/k3yEMJ7xH+fr/x4WIvxtlwXRSuJkup
- gAmikifYYSoq/BF/A5iH9mFqZnjiNCKOdRqsJSn0dHXfpmhiBuCThPRDG1ZbAHkIo4W5yvTOtyi
- bkVRkwZCq/oS9ElqBAIm95gUKflumLTqX+XMUyIjA04rZtZYlooAh7vSgZTLnQrridaToVygnJP
- RNlPTcjJA/i+sgZhd2lduLUDt3s/AtfWlgl+MaEB/n6Js+dfZuqlrPHwnFZliAmvyM9fESy1xUc
- pLqtmjnENY0soNbVqycslXpcZzhj3Q==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-22_01,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 clxscore=1015 phishscore=0 priorityscore=1501 malwarescore=0
- spamscore=0 adultscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510220021
 
-The root cause of this issue are:
-1. When probing the usbnet device, executing usbnet_link_change(dev, 0, 0);
-put the kevent work in global workqueue. However, the kevent has not yet
-been scheduled when the usbnet device is unregistered. Therefore, executing
-free_netdev() results in the "free active object (kevent)" error reported
-here.
+Format subsections of "Packet format" section as reST subsections.
 
-2. Another factor is that when calling usbnet_disconnect()->unregister_netdev(),
-if the usbnet device is up, ndo_stop() is executed to cancel the kevent.
-However, because the device is not up, ndo_stop() is not executed.
-
-The solution to this problem is to cancel the kevent before executing
-free_netdev().
-
-Fixes: a69e617e533e ("usbnet: Fix linkwatch use-after-free on disconnect")
-Reported-by: Sam Sun <samsun1006219@gmail.com>
-Closes: https://syzkaller.appspot.com/bug?extid=8bfd7bcc98f7300afb84
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+Link: https://lore.kernel.org/linux-doc/aO_MefPIlQQrCU3j@horms.kernel.org/
+Suggested-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
-V1 -> V2: update comments for typos
-V2 -> V3: add fixes tag
-V3 -> V4: move cancel_work_sync to right after unregister_netdev
+Changes since v1 [1]:
 
- drivers/net/usb/usbnet.c | 2 ++
- 1 file changed, 2 insertions(+)
+  - Keep section number letters in lowercase (Jakub)
 
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index bf01f2728531..697cd9d866d3 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -1659,6 +1659,8 @@ void usbnet_disconnect (struct usb_interface *intf)
- 	net = dev->net;
- 	unregister_netdev (net);
+[1]: https://lore.kernel.org/linux-doc/20251016092552.27053-1-bagasdotme@gmail.com/
+
+ .../device_drivers/cellular/qualcomm/rmnet.rst         | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
+index 289c146a829153..28753765fba288 100644
+--- a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
++++ b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
+@@ -28,6 +28,7 @@ these MAP frames and send them to appropriate PDN's.
+ ================
  
-+	cancel_work_sync(&dev->kevent);
+ a. MAP packet v1 (data / control)
++---------------------------------
+ 
+ MAP header fields are in big endian format.
+ 
+@@ -54,6 +55,7 @@ Payload length includes the padding length but does not include MAP header
+ length.
+ 
+ b. Map packet v4 (data / control)
++---------------------------------
+ 
+ MAP header fields are in big endian format.
+ 
+@@ -107,6 +109,7 @@ over which checksum is computed.
+ Checksum value, indicates the checksum computed.
+ 
+ c. MAP packet v5 (data / control)
++---------------------------------
+ 
+ MAP header fields are in big endian format.
+ 
+@@ -134,6 +137,7 @@ Payload length includes the padding length but does not include MAP header
+ length.
+ 
+ d. Checksum offload header v5
++-----------------------------
+ 
+ Checksum offload header fields are in big endian format.
+ 
+@@ -154,7 +158,10 @@ indicates that the calculated packet checksum is invalid.
+ 
+ Reserved bits must be zero when sent and ignored when received.
+ 
+-e. MAP packet v1/v5 (command specific)::
++e. MAP packet v1/v5 (command specific)
++--------------------------------------
 +
- 	while ((urb = usb_get_from_anchor(&dev->deferred))) {
- 		dev_kfree_skb(urb->context);
- 		kfree(urb->sg);
++Packet format::
+ 
+     Bit             0             1         2-7      8 - 15           16 - 31
+     Function   Command         Reserved     Pad   Multiplexer ID    Payload length
+@@ -177,6 +184,7 @@ Command types
+ = ==========================================
+ 
+ f. Aggregation
++--------------
+ 
+ Aggregation is multiple MAP packets (can be data or command) delivered to
+ rmnet in a single linear skb. rmnet will process the individual
+
+base-commit: 962ac5ca99a5c3e7469215bf47572440402dfd59
 -- 
-2.43.0
+An old man doll... just what I always wanted! - Clara
 
 
