@@ -1,134 +1,121 @@
-Return-Path: <netdev+bounces-231900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9B4EBFE625
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 00:11:45 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C043BFE62B
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 00:12:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCF573A9BF6
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 22:11:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 335434E037A
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 22:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3034305E0D;
-	Wed, 22 Oct 2025 22:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A055130597A;
+	Wed, 22 Oct 2025 22:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="hyezpTns";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VdTtwvAz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="boW6afkY"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB942F83B4
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 22:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA9630595B
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 22:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761171088; cv=none; b=ibE7ovyn0pPJxHDyy5oOiKX2SLFdnGvNvBLYM0qgcnfNJsPaU5Erqw2WZfkaxovt8+qybOIah60z1K2fXn6i5OjnYimjsPAECTqkOK7A29cm913WWAIf+0XY8dB8TWRXb4zzLF/2NieCGek9hpD1256O0L2Snq8feJ7fh+CA88E=
+	t=1761171160; cv=none; b=gUlIu7RrAwekxnlMS49RrUvSzSp6NK6lx5xY/1pLQHTh20uyZ25w3qJiQEyFfTbRkRSq7sPjGZahGjDYODVQrAt6gggUeVMmS9ZJu3Kc0Mlta6DZ8h0f4w6LnbNIlxXaHXC/dwydzcb8WdrQ/bmPY026pDj6776d12iXymOW+bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761171088; c=relaxed/simple;
-	bh=YWSQ2GSfWdXGk7ualW/p5/OJetKeZjmFlGOjlfVpFA0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Udd60pJldHqZmu59DeZCHnTgNzlT+stVH0OpGrIc/sf0oBPUd/nTQgtC3cQDbWyMO0Tq56WJiKnd53xI/EfMBnmxS397JwEL7kaJWBTcjuilcrcMozLtpHjXVsU0HnY2Dwt3VMgwCt8FSuI9jCczN55tB1MKTciDdpxOng9iuuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=hyezpTns; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VdTtwvAz; arc=none smtp.client-ip=202.12.124.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 4C26C7A001C;
-	Wed, 22 Oct 2025 18:11:24 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Wed, 22 Oct 2025 18:11:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1761171084; x=
-	1761257484; bh=sJ9gGZJ8+b/G5Bg7LhH8kJO167GNDh4hEeZ6Uq59l3k=; b=h
-	yezpTnscDTvihjquLv3hNRobup5uPzibNmQMG/lTFgcDlAAu+faSkRNyg9r56XvX
-	9OEkUMQcUVNrqsXL9L9GMb63EK1e5GujWHfW+UuoICWlyM4jVZcds1fz1KA/XbfP
-	CuBeGDn9RrPz+U+DfU3Qtt7h7R226F190A6aq4KOKB3xFco9X7j8P6rY7uAn7Tiq
-	+C/clKpop0uR8TaTDPRfJv9HIxLYmQ5sDXplTiA4Cigri5szj2sg2VKjr1zkKn6M
-	AjmhBAC6soj/sp5WRh+FGVgPwMG3/wV1KfniJbwkSZTiCKYODPgeplJTE3lttSpk
-	sPSGaHlHPwmPDvV15Y68A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1761171084; x=1761257484; bh=sJ9gGZJ8+b/G5Bg7LhH8kJO167GNDh4hEeZ
-	6Uq59l3k=; b=VdTtwvAzHqXDKzQwxwKqyQT9fYYWQAh6U/ojYj49ZF1cFrC+M1i
-	xGFiph4XF1lB7smJvx7n3LaBY3b/NbNAbz+pE6HdK0/siVGFUdBQnP+2uXmCFA4G
-	S+VYjTehXHEG0IV68RmPjpubgIVRFmlzUWRjlBmscIMW3Dy+Zj77ZW1VLc4IqX5S
-	RlOR9NU9D9BGexQgptUNN1w3HMeIzWHP4SnZ7q9kG37D7+CKLzWpneb6rha9aiTb
-	0fFHFQ7NuqVCl7PHP71VFUGrcM0aHx8rEGwGe7/kYvAzp7ResAxi9q3Z8lkujGI+
-	y2cT1HomNwKCAX9MQbIjp7SnkVk4PnL5+Ug==
-X-ME-Sender: <xms:iVb5aNqTwN8C_71V1OJAqJqMbRWASSuL6DfVKk3vk8GmWta2rNbmdg>
-    <xme:iVb5aLiisZlpMb6auiTi_lhfoDjeQc1CVmXHlPvUzARsdRcWQB8whjOn2ShDg8gwH
-    ab3JmNEkKzAyY7lhKMyxVWiIdswZu3zXxi2-QiXklL29Hr18Pk0Z6E>
-X-ME-Received: <xmr:iVb5aHOzPmrbbtDiZqsv56RiooNF38Ld7fr13O7GDkH_uioP2BnrW6v-b-34>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddugeegjeehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduuddpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhhtse
-    hsvggtuhhnvghtrdgtohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrdgr
-    phgrnhgrrdhorhhgrdgruhdprhgtphhtthhopehprghulhesnhhohhgrthhsrdgtrgdprh
-    gtphhtthhopegrnhgurhgvrghsrdhsthgvfhhfvghnsehsthhrohhnghhsfigrnhdrohhr
-    ghdprhgtphhtthhopehtohgsihgrshesshhtrhhonhhgshifrghnrdhorhhgpdhrtghpth
-    htoheprghnthhonhihsehphhgvnhhomhgvrdhorhhgpdhrtghpthhtohepthhishesfhho
-    ohgsrghrrdhfihdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpd
-    hrtghpthhtohepfhifsehsthhrlhgvnhdruggv
-X-ME-Proxy: <xmx:iVb5aNwkIXc2-u9AAv6vM4pS3C23Jy9_-u5Nb6GJTjmoMjL6CHtBAQ>
-    <xmx:iVb5aBqTWwsXfmXgZwyzZ6lIbTp9ooduQsObnr5x95bUVPm-jJAHZg>
-    <xmx:iVb5aFM7zXbzDbt6IaBikQmC0cLxU42U-fHVhHWVR0zYmuVCi-W90A>
-    <xmx:iVb5aNdqvem-d6BlUppeWAicNEgD7fabXfjFMqgkcLEcOXNb9DJBPA>
-    <xmx:jFb5aI6iWvzKZ4hO-Q97T_bo457bvpY27OxAC-Gg9kaLv892h9n4FOwh>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 22 Oct 2025 18:11:20 -0400 (EDT)
-Date: Thu, 23 Oct 2025 00:11:19 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, Paul Wouters <paul@nohats.ca>,
-	Andreas Steffen <andreas.steffen@strongswan.org>,
-	Tobias Brunner <tobias@strongswan.org>,
-	Antony Antony <antony@phenome.org>, Tuomo Soini <tis@foobar.fi>,
-	"David S. Miller" <davem@davemloft.net>,
-	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
-	devel@linux-ipsec.org
-Subject: Re: [PATCH ipsec-next] pfkey: Deprecate pfkey
-Message-ID: <aPlWh6mBAmRINhfp@krikkit>
-References: <aPh1a1LeC5hZZEZG@secunet.com>
+	s=arc-20240116; t=1761171160; c=relaxed/simple;
+	bh=AIJALJq9EkMeNg6XdK1W0cNkmQC8F+8+odhi/bRT+oQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VTWJsRgBKoCbCBLslOoQGo8srfznLCDfKBmuknrUxXSyvGNJwWpK9ZvVxlu97CZTo8r+KWxIsJDZ933afeSMVC+Acjg+FvL7eo4E5yFXZNtnKA9JEsdL7HrIfGFySi2wo7huJaxwUUkhDNtYnkoUNLVaBWQkkMC8GQuW+oIxAK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=boW6afkY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95159C4CEE7;
+	Wed, 22 Oct 2025 22:12:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761171159;
+	bh=AIJALJq9EkMeNg6XdK1W0cNkmQC8F+8+odhi/bRT+oQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=boW6afkYYcyeh0NRSzHCg7B53VPk4L0FPk4+kRarQDEe4hhs8Kz8bkP4EKi/6RSAq
+	 mtrkqnAEfBNIXdYeMtNWHuM9HM0tuzzsXquF/CEchGbk+pH+QvjfcKDfdQ9r3av0Gq
+	 3dOM1EA0weJbHOxZUT17O5Z0ybTcyI9axkVHZ/J3jW0X2ep4VXxpjeTtfXtP5Ax/JM
+	 NZQPpaZQs/LwJ/Du/M1Qjoo1QiR7g0ZggOKjpFK5WRCWF4kmjPxtFLGyYQJMDLj3Lr
+	 EYJ/cLYGyP7XbOnGm5QYHqlef8FBl5Zdr7+21eNUkNUhl+IF2qHTdISf3mmQCytxHj
+	 bGmbAuPb3dNoQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH net-next] tcp: Remove unnecessary null check in tcp_inbound_md5_hash()
+Date: Wed, 22 Oct 2025 15:12:09 -0700
+Message-ID: <20251022221209.19716-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aPh1a1LeC5hZZEZG@secunet.com>
+Content-Transfer-Encoding: 8bit
 
-2025-10-22, 08:10:51 +0200, Steffen Klassert wrote:
-> The pfkey user configuration interface was replaced by the netlink
-> user configuration interface more than a decade ago. In between
-> all maintained IKE implementations moved to the netlink interface.
-> So let config NET_KEY default to no in Kconfig. The pfkey code
-> will be remoced in a secomd step.
+The 'if (!key && hash_location)' check in tcp_inbound_md5_hash() implies
+that hash_location might be null.  However, later code in the function
+dereferences hash_location anyway, without checking for null first.
+Fortunately, there is no real bug, since tcp_inbound_md5_hash() is
+called only with non-null values of hash_location.
 
-nit: typos: s/remoced/removed/ and s/secomd/second/
+Therefore, remove the unnecessary and misleading null check of
+hash_location.  This silences a Smatch static checker warning
+(https://lore.kernel.org/netdev/aPi4b6aWBbBR52P1@stanley.mountain/)
 
-> 
-> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
-> Acked-by: Antony Antony <antony.antony@secunet.com>
-> Acked-by: Tobias Brunner <tobias@strongswan.org>
+Also fix the related comment at the beginning of the function.
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ net/ipv4/tcp.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-The deprecation/removal plan sounds good to me.
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index e15b38f6bd2d5..b79da6d393927 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -4884,22 +4884,20 @@ static enum skb_drop_reason
+ tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
+ 		     const void *saddr, const void *daddr,
+ 		     int family, int l3index, const __u8 *hash_location)
+ {
+ 	/* This gets called for each TCP segment that has TCP-MD5 option.
+-	 * We have 3 drop cases:
+-	 * o No MD5 hash and one expected.
+-	 * o MD5 hash and we're not expecting one.
+-	 * o MD5 hash and its wrong.
++	 * We have 2 drop cases:
++	 * o An MD5 signature is present, but we're not expecting one.
++	 * o The MD5 signature is wrong.
+ 	 */
+ 	const struct tcp_sock *tp = tcp_sk(sk);
+ 	struct tcp_md5sig_key *key;
+ 	u8 newhash[16];
+ 
+ 	key = tcp_md5_do_lookup(sk, l3index, saddr, family);
+-
+-	if (!key && hash_location) {
++	if (!key) {
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5UNEXPECTED);
+ 		trace_tcp_hash_md5_unexpected(sk, skb);
+ 		return SKB_DROP_REASON_TCP_MD5UNEXPECTED;
+ 	}
+ 
 
+base-commit: 962ac5ca99a5c3e7469215bf47572440402dfd59
 -- 
-Sabrina
+2.51.0
+
 
