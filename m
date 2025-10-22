@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-231580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3DEABFAD6B
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 10:15:58 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A8ACBFAD7D
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 10:17:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FA514861D0
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 08:14:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B3A6450663F
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 08:16:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C51C03064AC;
-	Wed, 22 Oct 2025 08:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6835130AAB4;
+	Wed, 22 Oct 2025 08:15:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CFC7305051;
-	Wed, 22 Oct 2025 08:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B8B307AF5;
+	Wed, 22 Oct 2025 08:15:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761120883; cv=none; b=m2T1okKsThRqtiT9sokxol1dMgeBDZqJHypKI0yBUOb1e6C8MwIEhnk2J6t8givm+bnbrwBtDalCvRV0TBux2JaWpdxi04XUoVn0s5WZUHPxw50yBvCR0vgGLWHUcT+3L3gsaWtCk/uFli/SgPNcsbs4Dg3Z6EreNtmlHcKEuDY=
+	t=1761120909; cv=none; b=RF6PLSPpgqwVUo2SkkiUrIu4Cq+CSi9f6/1VmiyrH/MDaPw2ytRtFBKKNQHLGRPyNpHwaSkHdm3w0qFCflVlL/7oKoLeKPobo+on/q19tSW0o4lVCApHynDHx0tVoOqxCzJMHsaQS+3j5aO+bvMjjtqUCdoi0VkD52NDm6nmm2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761120883; c=relaxed/simple;
-	bh=yylqr0ZYPBPOGgmERNRKLiMRtMZcKQ4qF5Lr3+QiIYA=;
+	s=arc-20240116; t=1761120909; c=relaxed/simple;
+	bh=0JJ/ovzmfSJ1jb9Vdak2WoRAgXatAloCuZPSZSQiBUY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gvhWO7F2vYCkwTHnpQV4XFh6NaIYiimyx0WAZoescVtrSkHlyl5kVqACo11+Eey6SdAO3cYvPSiJxLbO1GZwvS3/rVU5lu1QYjDWGEatmylIrx7xL6rhQLNPwSszTlApluL7jZsQiwr9cVfvd+/Y/ZfEj2g1mA3hcXGWDnL0KLk=
+	 MIME-Version; b=JhCbqnPUn4ohR+khTe33lexjBWIBabfu6bRSs1BrfTyz6x+soTwl5p7BnIGLot18ZdKdLHouHvlFFhmhXlQByKJYqCbbto9g/V3qR1FvLCdroNdjw4GhxfQSlS5o+Q+ErkvlOP+hRV+ZoeN5JHUj48v/axKjQUV4fsGek0SBAOE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.207.19.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpsz17t1761120847tde92aa42
-X-QQ-Originating-IP: K/xe2SaX+FNZ9pMdodmI1K/A7FELKfzzLOcHzLchr30=
+X-QQ-mid: esmtpsz17t1761120850tb1eb85de
+X-QQ-Originating-IP: Qnq1rIXX6wkrfS7oTX1QPvuBjBCKdt3P49Rf2PK2a3A=
 Received: from localhost.localdomain ( [203.174.112.180])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 22 Oct 2025 16:14:04 +0800 (CST)
+	id ; Wed, 22 Oct 2025 16:14:08 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 16654939309829115426
-EX-QQ-RecipientCnt: 18
+X-BIZMAIL-ID: 12093381508814799168
+EX-QQ-RecipientCnt: 17
 From: Dong Yibo <dong100@mucse.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -55,11 +55,10 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	dong100@mucse.com,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next v15 1/5] net: rnpgbe: Add build support for rnpgbe
-Date: Wed, 22 Oct 2025 16:13:47 +0800
-Message-Id: <20251022081351.99446-2-dong100@mucse.com>
+	dong100@mucse.com
+Subject: [PATCH net-next v15 2/5] net: rnpgbe: Add n500/n210 chip support with BAR2 mapping
+Date: Wed, 22 Oct 2025 16:13:48 +0800
+Message-Id: <20251022081351.99446-3-dong100@mucse.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20251022081351.99446-1-dong100@mucse.com>
 References: <20251022081351.99446-1-dong100@mucse.com>
@@ -72,345 +71,212 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz3a-1
-X-QQ-XMAILINFO: M75I2DDAzREFszZQvwjaFlz08bVjvd8z1CeFtZfBOrq5RqszwVlY8s3A
-	Sgf0pMFadDqib1HsJWjQFQMvG2hQC1vEPSAlqdnhN6NarwUZ7BLhikBy/R+hhuQ5Qpl73fW
-	rzA93/qUFd1v8V0XEzSo0GDtOoDqOoD0R+WWCQhM66T2wpnifaifl9cMQzkOL+vVpQCy6cw
-	fi0+RPa6Fz9icpl5FDxrUK3Ly06kH8ad3aRHrNa2frCF4ZKYAlhX5N80koMZ2f8P0cO8SMj
-	jSZ5eMiLoaTFAT866gLbSZ0o2vXJDvP0pNIIgf83/SVc9jgm49N5lXr49cdGrd8i/iwTQU7
-	xre+S29XkDf5BCnFiYFrKVIQtPWlHE2ugHvSS8LZNwm5Kmr/5aVbOC0+UGcu12UE1swDfBD
-	bbtm30C2KN6mkvCMlwLbQzU1jnfto0Mv5NCumM4GUR2KnsT8XBlHjWiiSW4GJxbGmXyCfVX
-	N54dACzyAlXKeTdi6hyI0oZVocZ6aYUEJagN/8otaGWsYz81+Mu5HVI4EpOLGzodrFDotFc
-	vd1kV0QGuZeSV2n4XpNbHZacPJNmtcc2L70wtUY0Xj3F7noDSZ7wcRYE0Weu1AHPK2SH03M
-	snux6haav/IZKuhys9pJwqd2ryK1/iCTWIWsrVCdkq9hK2SwUnaDzpTmoOULaGOg2aWfKOM
-	u1YRitzgWlhyjeI+zzIBSv3nQfFPFRQRR7bVRq7QRYV4yaYysKe+6CEfnL21fyJXMH/Es9d
-	WFUdrQcsmtzx1lyR1rZihG0FtuLvAaQjqDEVmVrzClJjgbKQQkEtoCFzrhqCHCWt+uQF30V
-	WEauSJBpXGBA/hpllGPehnKAoagY33l6/PJrXGqU4/8Ik8Q+/bGIy/Ng4km/sw++oWuK++j
-	F5UUcfXEPlVawrYu7zC8eNBIZgysbns6AveFZwQgdgeiRmKCyfrE41NkdemmMVvZVArlo/s
-	8bohDzrAFJV5v/JAOmlJKPve07FFCv5aA6Jt2i35t/Y6PRGyi9I7wIO/Lc2QKnZWpK4r4Gz
-	mb0ojkm1rA7fF0Ez/XWoDonC5k/jw=
+X-QQ-XMAILINFO: NwIS3Zdzte8wjKFJMFA0f9Iyx6T0SGofc2bEl+tk4DZ9sVHZldW8X8eL
+	j5FkUsU3pwQAdBMxl4cPDnaPOp8R9OI/p6ZdbpLSa8YnCLJEMViaoPf/lLLZpWwSa6KBMfW
+	s44B+6IbK3vrygTbDsVBF2e7AUqFpxG22FOEij+Bmv9VoGnzjY/R7EYSJK9VLjk4+uhAgGQ
+	tbbcLJw8qzqrVXCpo8tzin0n3hGiELYRFFfBsd4dD6/ZQI0ht2b4Plm7kGv/2DuR+ek7+uN
+	vwysrjpYh/wMOCtLwKB3Hd25vCh2AQpfYN6nq6pjky0XkOTLo2uy2KPv3crFEIjxzvbjVJd
+	Cy1tdY8sCIf44N8Rmoe8+cF6Dc41MJvfPrmdwRlxhUjYWK8Y+v42fBv0xj0iilICgk0/tJd
+	SvboGhm/uycNpMAwwHVPJ+UgaTz1mlbcuWzmqTh5bU3p3NxVi3D0/O3a1amekLwsAv5PCTK
+	470RAq5PWFdkPOJX3IRL8c0v8J5DKZjJMST/PbpjuADGN2ZVOTLutNZ6TJ2+e1ILEX1LQFZ
+	766n5WnC7qRQQuOUM/HHAq/VIvNQFtJWGLSvc2oIAvw/1mD6S0qBRAnIAw7MtwK/JpzAfyr
+	fQE2hr5bCEk4LTEu5x9iAFl062JNaHojCQY+l7iDRiaURE+QXLIkpCGN45f7g1Z01yubs1T
+	466In6y1m57xlAAAevLKNstm5KDQcHfrtkMFRslYpLM28FQ5QTDDZf9I5lW4Jt0ndJ6ZnmV
+	8YF2RiBxMYfhVlltSAdyDWHLaP/c9m2in6U0x6cxSVdJkxek5zmUn+QblhKQlpFsLlOCHp1
+	Rogl77MqGLc10aJ93aHt95w+UC9VEchEmK6dzNVLWC76p6UJugHiZZokPFkj67z+bDHU9ZK
+	CcXpPjMTvI0Co5JqPVmejs3HoNjsUhGkVAt8R8hHoPZGfCx4KGSWM27XdbqnYujtCmncHK3
+	gHwt5I4Zs0h4sU/cRwrXf4caNr9UWPq06AwBx5bSVOJfxSkPVM955++O0uVItl3iJAd98pM
+	ObCBIs3d1ZEpGSBAAn
 X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
 X-QQ-RECHKSPAM: 0
 
-Add build options and doc for mucse.
-Initialize pci device access for MUCSE devices.
+Add hardware initialization foundation for MUCSE 1Gbe controller,
+including:
+1. Map PCI BAR2 as hardware register base;
+2. Bind PCI device to driver private data (struct mucse) and
+   initialize hardware context (struct mucse_hw);
+3. Reserve board-specific init framework via rnpgbe_init_hw.
 
 Signed-off-by: Dong Yibo <dong100@mucse.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
 ---
- .../device_drivers/ethernet/index.rst         |   1 +
- .../device_drivers/ethernet/mucse/rnpgbe.rst  |  17 +++
- MAINTAINERS                                   |   8 ++
- drivers/net/ethernet/Kconfig                  |   1 +
- drivers/net/ethernet/Makefile                 |   1 +
- drivers/net/ethernet/mucse/Kconfig            |  33 +++++
- drivers/net/ethernet/mucse/Makefile           |   7 +
- drivers/net/ethernet/mucse/rnpgbe/Makefile    |   8 ++
- drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  18 +++
- .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 120 ++++++++++++++++++
- 10 files changed, 214 insertions(+)
- create mode 100644 Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
- create mode 100644 drivers/net/ethernet/mucse/Kconfig
- create mode 100644 drivers/net/ethernet/mucse/Makefile
- create mode 100644 drivers/net/ethernet/mucse/rnpgbe/Makefile
- create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
- create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    | 10 +++
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  8 ++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 80 +++++++++++++++++++
+ 3 files changed, 98 insertions(+)
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
 
-diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
-index 7cfcd183054f..bcc02355f828 100644
---- a/Documentation/networking/device_drivers/ethernet/index.rst
-+++ b/Documentation/networking/device_drivers/ethernet/index.rst
-@@ -47,6 +47,7 @@ Contents:
-    mellanox/mlx5/index
-    meta/fbnic
-    microsoft/netvsc
-+   mucse/rnpgbe
-    neterion/s2io
-    netronome/nfp
-    pensando/ionic
-diff --git a/Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst b/Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
-new file mode 100644
-index 000000000000..d35cf8a46b6c
---- /dev/null
-+++ b/Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
-@@ -0,0 +1,17 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+===========================================================
-+Linux Base Driver for MUCSE(R) Gigabit PCI Express Adapters
-+===========================================================
-+
-+Contents
-+========
-+
-+- Identifying Your Adapter
-+
-+Identifying Your Adapter
-+========================
-+The driver is compatible with devices based on the following:
-+
-+ * MUCSE(R) Ethernet Controller N210 series
-+ * MUCSE(R) Ethernet Controller N500 series
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ea72b3bd2248..92989a566bc4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17598,6 +17598,14 @@ T:	git git://linuxtv.org/media.git
- F:	Documentation/devicetree/bindings/media/i2c/aptina,mt9v111.yaml
- F:	drivers/media/i2c/mt9v111.c
- 
-+MUCSE ETHERNET DRIVER
-+M:	Yibo Dong <dong100@mucse.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+W:	https://www.mucse.com/en/
-+F:	Documentation/networking/device_drivers/ethernet/mucse/
-+F:	drivers/net/ethernet/mucse/
-+
- MULTIFUNCTION DEVICES (MFD)
- M:	Lee Jones <lee@kernel.org>
- S:	Maintained
-diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
-index aead145dd91d..4a1b368ca7e6 100644
---- a/drivers/net/ethernet/Kconfig
-+++ b/drivers/net/ethernet/Kconfig
-@@ -129,6 +129,7 @@ source "drivers/net/ethernet/microchip/Kconfig"
- source "drivers/net/ethernet/mscc/Kconfig"
- source "drivers/net/ethernet/microsoft/Kconfig"
- source "drivers/net/ethernet/moxa/Kconfig"
-+source "drivers/net/ethernet/mucse/Kconfig"
- source "drivers/net/ethernet/myricom/Kconfig"
- 
- config FEALNX
-diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
-index 998dd628b202..2e18df8ca8ec 100644
---- a/drivers/net/ethernet/Makefile
-+++ b/drivers/net/ethernet/Makefile
-@@ -65,6 +65,7 @@ obj-$(CONFIG_NET_VENDOR_MICREL) += micrel/
- obj-$(CONFIG_NET_VENDOR_MICROCHIP) += microchip/
- obj-$(CONFIG_NET_VENDOR_MICROSEMI) += mscc/
- obj-$(CONFIG_NET_VENDOR_MOXART) += moxa/
-+obj-$(CONFIG_NET_VENDOR_MUCSE) += mucse/
- obj-$(CONFIG_NET_VENDOR_MYRI) += myricom/
- obj-$(CONFIG_FEALNX) += fealnx.o
- obj-$(CONFIG_NET_VENDOR_NATSEMI) += natsemi/
-diff --git a/drivers/net/ethernet/mucse/Kconfig b/drivers/net/ethernet/mucse/Kconfig
-new file mode 100644
-index 000000000000..0b3e853d625f
---- /dev/null
-+++ b/drivers/net/ethernet/mucse/Kconfig
-@@ -0,0 +1,33 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Mucse network device configuration
-+#
-+
-+config NET_VENDOR_MUCSE
-+	bool "Mucse devices"
-+	default y
-+	help
-+	  If you have a network (Ethernet) card from Mucse(R), say Y.
-+
-+	  Note that the answer to this question doesn't directly affect the
-+	  kernel: saying N will just cause the configurator to skip all
-+	  the questions about Mucse(R) cards. If you say Y, you will
-+	  be asked for your specific card in the following questions.
-+
-+if NET_VENDOR_MUCSE
-+
-+config MGBE
-+	tristate "Mucse(R) 1GbE PCI Express adapters support"
-+	depends on PCI
-+	help
-+	  This driver supports Mucse(R) 1GbE PCI Express family of
-+	  adapters.
-+
-+	  More specific information on configuring the driver is in
-+	  <file:Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst>.
-+
-+	  To compile this driver as a module, choose M here. The module
-+	  will be called rnpgbe.
-+
-+endif # NET_VENDOR_MUCSE
-+
-diff --git a/drivers/net/ethernet/mucse/Makefile b/drivers/net/ethernet/mucse/Makefile
-new file mode 100644
-index 000000000000..675173fa05f7
---- /dev/null
-+++ b/drivers/net/ethernet/mucse/Makefile
-@@ -0,0 +1,7 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright(c) 2020 - 2025 MUCSE Corporation.
-+#
-+# Makefile for the MUCSE(R) network device drivers
-+#
-+
-+obj-$(CONFIG_MGBE) += rnpgbe/
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/Makefile b/drivers/net/ethernet/mucse/rnpgbe/Makefile
-new file mode 100644
-index 000000000000..9df536f0d04c
---- /dev/null
-+++ b/drivers/net/ethernet/mucse/rnpgbe/Makefile
-@@ -0,0 +1,8 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright(c) 2020 - 2025 MUCSE Corporation.
-+#
-+# Makefile for the MUCSE(R) 1GbE PCI Express ethernet driver
-+#
-+
-+obj-$(CONFIG_MGBE) += rnpgbe.o
-+rnpgbe-objs := rnpgbe_main.o
 diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-new file mode 100644
-index 000000000000..d3439d28c654
---- /dev/null
+index d3439d28c654..a121ce4872a6 100644
+--- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
 +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-@@ -0,0 +1,18 @@
+@@ -9,6 +9,16 @@ enum rnpgbe_boards {
+ 	board_n210
+ };
+ 
++struct mucse_hw {
++	void __iomem *hw_addr;
++};
++
++struct mucse {
++	struct net_device *netdev;
++	struct pci_dev *pdev;
++	struct mucse_hw hw;
++};
++
+ /* Device IDs */
+ #define PCI_VENDOR_ID_MUCSE               0x8848
+ #define RNPGBE_DEVICE_ID_N500_QUAD_PORT   0x8308
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+new file mode 100644
+index 000000000000..3a779806e8be
+--- /dev/null
++++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+@@ -0,0 +1,8 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/* Copyright(c) 2020 - 2025 Mucse Corporation. */
 +
-+#ifndef _RNPGBE_H
-+#define _RNPGBE_H
++#ifndef _RNPGBE_HW_H
++#define _RNPGBE_HW_H
 +
-+enum rnpgbe_boards {
-+	board_n500,
-+	board_n210
-+};
-+
-+/* Device IDs */
-+#define PCI_VENDOR_ID_MUCSE               0x8848
-+#define RNPGBE_DEVICE_ID_N500_QUAD_PORT   0x8308
-+#define RNPGBE_DEVICE_ID_N500_DUAL_PORT   0x8318
-+#define RNPGBE_DEVICE_ID_N210             0x8208
-+#define RNPGBE_DEVICE_ID_N210L            0x820a
-+#endif /* _RNPGBE_H */
++#define RNPGBE_MAX_QUEUES 8
++#endif /* _RNPGBE_HW_H */
 diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-new file mode 100644
-index 000000000000..019e819fb497
---- /dev/null
+index 019e819fb497..305657d73e25 100644
+--- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
 +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-@@ -0,0 +1,120 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright(c) 2020 - 2025 Mucse Corporation. */
-+
-+#include <linux/pci.h>
-+
-+#include "rnpgbe.h"
-+
-+static const char rnpgbe_driver_name[] = "rnpgbe";
-+
-+/* rnpgbe_pci_tbl - PCI Device ID Table
-+ *
-+ * { PCI_VDEVICE(Vendor ID, Device ID),
-+ *   private_data (used for different hw chip) }
-+ */
-+static struct pci_device_id rnpgbe_pci_tbl[] = {
-+	{ PCI_VDEVICE(MUCSE, RNPGBE_DEVICE_ID_N210), board_n210 },
-+	{ PCI_VDEVICE(MUCSE, RNPGBE_DEVICE_ID_N210L), board_n210 },
-+	{ PCI_VDEVICE(MUCSE, RNPGBE_DEVICE_ID_N500_DUAL_PORT), board_n500 },
-+	{ PCI_VDEVICE(MUCSE, RNPGBE_DEVICE_ID_N500_QUAD_PORT), board_n500 },
-+	/* required last entry */
-+	{0, },
-+};
-+
+@@ -2,8 +2,11 @@
+ /* Copyright(c) 2020 - 2025 Mucse Corporation. */
+ 
+ #include <linux/pci.h>
++#include <net/rtnetlink.h>
++#include <linux/etherdevice.h>
+ 
+ #include "rnpgbe.h"
++#include "rnpgbe_hw.h"
+ 
+ static const char rnpgbe_driver_name[] = "rnpgbe";
+ 
+@@ -21,6 +24,54 @@ static struct pci_device_id rnpgbe_pci_tbl[] = {
+ 	{0, },
+ };
+ 
 +/**
-+ * rnpgbe_probe - Device initialization routine
-+ * @pdev: PCI device information struct
-+ * @id: entry in rnpgbe_pci_tbl
++ * rnpgbe_add_adapter - Add netdev for this pci_dev
++ * @pdev: PCI device information structure
++ * @board_type: board type
 + *
-+ * rnpgbe_probe initializes a PF adapter identified by a pci_dev
-+ * structure.
++ * rnpgbe_add_adapter initializes a netdev for this pci_dev
++ * structure. Initializes Bar map, private structure, and a
++ * hardware reset occur.
 + *
 + * Return: 0 on success, negative errno on failure
 + **/
-+static int rnpgbe_probe(struct pci_dev *pdev, const struct pci_device_id *id)
++static int rnpgbe_add_adapter(struct pci_dev *pdev,
++			      int board_type)
 +{
++	struct net_device *netdev;
++	void __iomem *hw_addr;
++	struct mucse *mucse;
++	struct mucse_hw *hw;
 +	int err;
 +
-+	err = pci_enable_device_mem(pdev);
-+	if (err)
-+		return err;
++	netdev = alloc_etherdev_mq(sizeof(struct mucse), RNPGBE_MAX_QUEUES);
++	if (!netdev)
++		return -ENOMEM;
 +
-+	err = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(56));
-+	if (err) {
-+		dev_err(&pdev->dev,
-+			"No usable DMA configuration, aborting %d\n", err);
-+		goto err_disable_dev;
++	SET_NETDEV_DEV(netdev, &pdev->dev);
++	mucse = netdev_priv(netdev);
++	mucse->netdev = netdev;
++	mucse->pdev = pdev;
++	pci_set_drvdata(pdev, mucse);
++
++	hw = &mucse->hw;
++	hw_addr = devm_ioremap(&pdev->dev,
++			       pci_resource_start(pdev, 2),
++			       pci_resource_len(pdev, 2));
++	if (!hw_addr) {
++		err = -EIO;
++		goto err_free_net;
 +	}
 +
-+	err = pci_request_mem_regions(pdev, rnpgbe_driver_name);
-+	if (err) {
-+		dev_err(&pdev->dev,
-+			"pci_request_selected_regions failed %d\n", err);
-+		goto err_disable_dev;
-+	}
-+
-+	pci_set_master(pdev);
-+	err = pci_save_state(pdev);
-+	if (err) {
-+		dev_err(&pdev->dev, "pci_save_state failed %d\n", err);
-+		goto err_free_regions;
-+	}
++	hw->hw_addr = hw_addr;
 +
 +	return 0;
-+err_free_regions:
-+	pci_release_mem_regions(pdev);
-+err_disable_dev:
-+	pci_disable_device(pdev);
++
++err_free_net:
++	free_netdev(netdev);
 +	return err;
 +}
 +
+ /**
+  * rnpgbe_probe - Device initialization routine
+  * @pdev: PCI device information struct
+@@ -33,6 +84,7 @@ static struct pci_device_id rnpgbe_pci_tbl[] = {
+  **/
+ static int rnpgbe_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ {
++	int board_type = id->driver_data;
+ 	int err;
+ 
+ 	err = pci_enable_device_mem(pdev);
+@@ -60,6 +112,10 @@ static int rnpgbe_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		goto err_free_regions;
+ 	}
+ 
++	err = rnpgbe_add_adapter(pdev, board_type);
++	if (err)
++		goto err_free_regions;
++
+ 	return 0;
+ err_free_regions:
+ 	pci_release_mem_regions(pdev);
+@@ -68,6 +124,23 @@ static int rnpgbe_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	return err;
+ }
+ 
 +/**
-+ * rnpgbe_remove - Device removal routine
++ * rnpgbe_rm_adapter - Remove netdev for this mucse structure
 + * @pdev: PCI device information struct
 + *
-+ * rnpgbe_remove is called by the PCI subsystem to alert the driver
-+ * that it should release a PCI device. This could be caused by a
-+ * Hot-Plug event, or because the driver is going to be removed from
-+ * memory.
++ * rnpgbe_rm_adapter remove a netdev for this mucse structure
 + **/
-+static void rnpgbe_remove(struct pci_dev *pdev)
++static void rnpgbe_rm_adapter(struct pci_dev *pdev)
 +{
-+	pci_release_mem_regions(pdev);
-+	pci_disable_device(pdev);
++	struct mucse *mucse = pci_get_drvdata(pdev);
++	struct net_device *netdev;
++
++	if (!mucse)
++		return;
++	netdev = mucse->netdev;
++	free_netdev(netdev);
 +}
 +
-+/**
-+ * rnpgbe_dev_shutdown - Device shutdown routine
-+ * @pdev: PCI device information struct
-+ **/
-+static void rnpgbe_dev_shutdown(struct pci_dev *pdev)
-+{
-+	pci_disable_device(pdev);
-+}
+ /**
+  * rnpgbe_remove - Device removal routine
+  * @pdev: PCI device information struct
+@@ -79,6 +152,7 @@ static int rnpgbe_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+  **/
+ static void rnpgbe_remove(struct pci_dev *pdev)
+ {
++	rnpgbe_rm_adapter(pdev);
+ 	pci_release_mem_regions(pdev);
+ 	pci_disable_device(pdev);
+ }
+@@ -89,6 +163,12 @@ static void rnpgbe_remove(struct pci_dev *pdev)
+  **/
+ static void rnpgbe_dev_shutdown(struct pci_dev *pdev)
+ {
++	struct mucse *mucse = pci_get_drvdata(pdev);
++	struct net_device *netdev = mucse->netdev;
 +
-+/**
-+ * rnpgbe_shutdown - Device shutdown routine
-+ * @pdev: PCI device information struct
-+ *
-+ * rnpgbe_shutdown is called by the PCI subsystem to alert the driver
-+ * that os shutdown. Device should setup wakeup state here.
-+ **/
-+static void rnpgbe_shutdown(struct pci_dev *pdev)
-+{
-+	rnpgbe_dev_shutdown(pdev);
-+}
-+
-+static struct pci_driver rnpgbe_driver = {
-+	.name     = rnpgbe_driver_name,
-+	.id_table = rnpgbe_pci_tbl,
-+	.probe    = rnpgbe_probe,
-+	.remove   = rnpgbe_remove,
-+	.shutdown = rnpgbe_shutdown,
-+};
-+
-+module_pci_driver(rnpgbe_driver);
-+
-+MODULE_DEVICE_TABLE(pci, rnpgbe_pci_tbl);
-+MODULE_AUTHOR("Yibo Dong, <dong100@mucse.com>");
-+MODULE_DESCRIPTION("Mucse(R) 1 Gigabit PCI Express Network Driver");
-+MODULE_LICENSE("GPL");
++	rtnl_lock();
++	netif_device_detach(netdev);
++	rtnl_unlock();
+ 	pci_disable_device(pdev);
+ }
+ 
 -- 
 2.25.1
 
