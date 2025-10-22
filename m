@@ -1,184 +1,113 @@
-Return-Path: <netdev+bounces-231796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7449BBFD6CD
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 19:00:34 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0F86BFD7E5
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 19:13:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A7771896B12
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 17:00:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 41EE6565BF9
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 17:05:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29EC6258ED6;
-	Wed, 22 Oct 2025 17:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD83272E63;
+	Wed, 22 Oct 2025 17:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hGf/b6wu"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pbJR9jVQ";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sCG7m/Gr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231C1246764
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 17:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6EF525A341;
+	Wed, 22 Oct 2025 17:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761152423; cv=none; b=qnKZiSevTaToZQbpo8GRIg1zRtr0jOh9YabTAN7uXWCdD7eIxTHX619K/APcFex+MhjUxl8fdbCHnTjYnHwIH653KBwyxSe+C2AofZ4PD8C0QY/B8Ai8z2oK1I92rs4JdQ8k2ZTVLtlyhlCnStAVGqNe3XjlULxiz53aHLVGBdE=
+	t=1761152713; cv=none; b=hAs+W6x9aIpWIJO5ewwgPdQ/ybcxZ8DbCs8XRCWXynw0PUaJ/DdAU+zg3ghTlnC2EJlgCIjrh6fil9rS0qEskYcwfEPt9DaZUvQiiQ+6WkyhnMLMsVe8KGp7B2yPz9uvshzhIFRXRRK5NVeyV4Y1/aer8LOq60gN7l8tzrq2zHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761152423; c=relaxed/simple;
-	bh=jEIK/MnFGgvkU2jSoBVRXZVtORuZhZu66mF1C8+cc1M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nNBuAOkx1GHBXMO43ncJi5X2t4ELFmCvcmQRe7URFN1ULH6VgXDNmYnL8aOOt2AEG5TAs4D5DdVQp2CxhHg2eQXlVSbrsE7+AKz6yG8cLd/0Z5qUN+8qQSkxikN80zVF40dbMHa9cJxwudL7rZtJERm2+JmeXz1UFnkDTqU7hm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hGf/b6wu; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-475c9881821so343105e9.0
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 10:00:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761152419; x=1761757219; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DmMvg3UcZfyV6BSGB2AmIHcJ7yJomZZTxM0vi/9tarU=;
-        b=hGf/b6wuq1w0zN87xVcaPsBNJ8D7KrdU3L3ilTOFgFuBEVDt8jGhDSQNFu5d+CIBzP
-         8rLDuvcQp6FU2XjWpR3Jb9j48ClbfbSmwULdf/IrSEaUHO8ymLDC2MrBmmlP0NFrS5TO
-         sXGLNG/8LNJLxgXCN8ltU8MiU9NBDEfuCkUUj4hmkCfDHfdtO1ilvupOV5rnr5zEOwUI
-         Glcomfrc/7TvVr5uK9ictSS2UkEpsJ0Z4C3yUVgzKjLHlWMr7Bv81dgnzri72lrjKWTy
-         7uKVg3ujsfpiH+fuG5po5PN5jzWVYFnLncS7dtqZOAXJ7fM3tCXbDedgtmEwm2y1rO32
-         0sqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761152419; x=1761757219;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DmMvg3UcZfyV6BSGB2AmIHcJ7yJomZZTxM0vi/9tarU=;
-        b=QkAEVCRXmznE0zUl74Pf+vo4b6mIg8d/+J5VzLQebFhNLhLjFtS1yPYCZ/d9a1CdZW
-         5Db0nCeb0VRnQ2zrIsCU/QuPjFz9YrF4+C/fgxczMXMsB/RGZmhrOv+D/T1QA0999TXv
-         CmGqKl27YQb5w7TM/YsOtOv0g9UVotpV1EJfo2ymFxY/qsLfyhhACOvy5nweDVzWlmpg
-         iLK2Z+ZCUBetJXCiqtA8PY1oSW0r45QCjrBp/ZbBuVxVfJlYFk1OF7Mjj8wszsypIgAl
-         QoilAqQzxRo/Q5JD3g4K78deQztOq+ZDqzciCaU5b5GtTIOyt0PdJahQvyZgsVHkP0iD
-         xajg==
-X-Forwarded-Encrypted: i=1; AJvYcCWC6zCss6h7vVx1wGTciHgQ5dc5zINof9JczyVzCup0PhBovcyJ3f4vtMowhWgTcKgkwkfqMfs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhdQeDwBo9b4B1QJ1d+6NLh9AFJQkOwDMnuXWqm2yyAy3c/gyZ
-	Zx+lT9pSqhfvP/u7UVBUJonHDF+rekokC2BQwJvOnElMuAvxByWW01sa
-X-Gm-Gg: ASbGncsZ97tuKgJgIMWyg7HR4uau0tcv2KGI5WY5b6K8Im3EyrLFXLqLoFLdwPOgDzz
-	9b5J71z21kk5IRySbNRQtEjZUlceYrMCPdexcqZK/tt17tW2TPTsNRAtI//nhCG/6xeFcrLgITF
-	z2M8tKdLe5C2upgg9Pp6EM5V1rnnlCpWLJUwxwRWx+AzJqsvNDcMlM3zlNxnnK58KU0UivdSi0h
-	SrXuT686O4M/S5bb/dKbdI64Zk0SS+9tgTKSzHl1v9EfgSO7oksXA9NMZqRVWmtMiD96Dinr8bY
-	6CMztYb6PF7pETunnLGldq2OLC20faE23UcGO9qVyvJZz9NvC5KWnTZ23qlcgVG0ZjZ0qBRw477
-	O8Bo6tUyw/Ue36eQ7ZcrdxOMR0cPr20IpfXX0dsB7wHM0uYzSjuMMkp1TrVPxmis3jHX9SmuQ8y
-	obT3ehfI6ztoLKtXoxbYY+w/8ZR5HtPtTS43b8as5yXCk=
-X-Google-Smtp-Source: AGHT+IEMXPTtbN3fcgfvF2OXh/lo9HWBSKGGaPfgEOyBk8teyMLT7+VrOSifMFf/Ae1v5WbO89iFqw==
-X-Received: by 2002:a05:6000:22c5:b0:427:401:197e with SMTP id ffacd0b85a97d-42856a82823mr1703265f8f.25.1761152419203;
-        Wed, 22 Oct 2025 10:00:19 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:b576])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475c438caeesm50619835e9.18.2025.10.22.10.00.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Oct 2025 10:00:17 -0700 (PDT)
-Message-ID: <20f8d441-914d-48b9-85d4-c1891f44d20f@gmail.com>
-Date: Wed, 22 Oct 2025 18:01:42 +0100
+	s=arc-20240116; t=1761152713; c=relaxed/simple;
+	bh=UiPn/GnL997VS+8t5o8a29N6aQcfn2fNK+YW5w5pdRY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=s/aXo+F675BwWlpAFsjEGDZARl0LyC69zRk/AecgJcDX4Ipzylk7fkP3UnNlZpxND3RFJzR6vmajw2D+KLukl4PDEcx8Dh9D0C5ew79puag5N2Ll5iPSOfSGqTlK165pOgpaz+SgbXNRs4DAIe9P32RATF5x7M37tmR9o0FVhFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pbJR9jVQ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sCG7m/Gr; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1761152709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oQ2RBVYKWQ5VGf96MS/2zH2TN/ADfNL38D/U5RR3xQM=;
+	b=pbJR9jVQB5nr+G8FFj8RmvDtwsOIWSvd8E6t+m3j3n+0H3B0jqNrjeiEi2dk1Plj3VirQN
+	yA/1V7sUF8faAQfZfcsGicIAzo3BuCrCtp9sM1r+CCFvRumcubP0BTQjKsmmkHkqsU4SB6
+	P4FKQ4SXRCBNVgzpu7rNh5bRZmUxbM5wYzbEVt4q3BfiT2pVRWQKtJjAhC7QXvUch9Wc5g
+	1ykJvAtC37H+CceUcCldztlAX1LwExlWrqz+ncLjsiQfm/fPFU+/nr5IWQvZalrCr+kiBY
+	+AAFXvOu5w0HuDFiuQYd4GUcnBqs1oot36h5XkZZ06TOGao+ogzZSCsP6vRpTw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1761152709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oQ2RBVYKWQ5VGf96MS/2zH2TN/ADfNL38D/U5RR3xQM=;
+	b=sCG7m/GraXt0ezpnYBgZ/Npnx8XVxrxQ5s9GmVsZF5pgEe3UYpCM3NR8gSrtBKmgBh+DVK
+	EdE+sr9Ir7P4SxDw==
+To: Christophe Leroy <christophe.leroy@csgroup.eu>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan
+ Kara <jack@suse.cz>, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra
+ <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, Davidlohr
+ Bueso <dave@stgolabs.net>, Andre Almeida <andrealmeid@igalia.com>, Andrew
+ Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman
+ <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Dave Hansen
+ <dave.hansen@linux.intel.com>, Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v3 03/10] uaccess: Add
+ masked_user_{read/write}_access_begin
+In-Reply-To: <a4ef0a8e1659805c60fafc8d3b073ecd08117241.1760529207.git.christophe.leroy@csgroup.eu>
+References: <cover.1760529207.git.christophe.leroy@csgroup.eu>
+ <a4ef0a8e1659805c60fafc8d3b073ecd08117241.1760529207.git.christophe.leroy@csgroup.eu>
+Date: Wed, 22 Oct 2025 19:05:09 +0200
+Message-ID: <87bjlyyiii.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] io_uring zcrx: add MAINTAINERS entry
-To: Jens Axboe <axboe@kernel.dk>, David Wei <dw@davidwei.uk>,
- io-uring@vger.kernel.org, netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>
-References: <20251021202944.3877502-1-dw@davidwei.uk>
- <60d18b98-6a25-4db7-a4c6-0c86d6c4f787@gmail.com>
- <832b03de-6b59-4a07-b7ea-51492c4cca7e@kernel.dk>
- <3990f8ee-4194-4b06-820e-c0ecbcb08af1@gmail.com>
- <8486dc74-44a3-4972-9713-2e24cefced22@kernel.dk>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <8486dc74-44a3-4972-9713-2e24cefced22@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 10/22/25 15:34, Jens Axboe wrote:
-> On 10/22/25 8:25 AM, Pavel Begunkov wrote:
->> On 10/22/25 14:17, Jens Axboe wrote:
->>> On 10/22/25 5:38 AM, Pavel Begunkov wrote:
->>>> On 10/21/25 21:29, David Wei wrote:
->>>>> Same as [1] but also with netdev@ as an additional mailing list.
->>>>> io_uring zero copy receive is of particular interest to netdev
->>>>> participants too, given its tight integration to netdev core.
->>>>
->>>> David, I can guess why you sent it, but it doesn't address the bigger
->>>> problem on the networking side. Specifically, why patches were blocked
->>>> due to a rule that had not been voiced before and remained blocked even
->>>> after pointing this out? And why accusations against me with the same
->>>> circumstances, which I equate to defamation, were left as is without
->>>> any retraction? To avoid miscommunication, those are questions to Jakub
->>>> and specifically about the v3 of the large buffer patchset without
->>>> starting a discussion here on later revisions.
->>>>
->>>> Without that cleared, considering that compliance with the new rule
->>>> was tried and lead to no results, this behaviour can only be accounted
->>>> to malice, and it's hard to see what cooperation is there to be had as
->>>> there is no indication Jakub is going to stop maliciously blocking
->>>> my work.
->>>
->>> The netdev side has been pretty explicit on wanting a MAINTAINERS entry
->>
->> Can you point out where that was requested dated before the series in
->> question? Because as far as I know, only CC'ing was mentioned and
->> only as a question, for which I proposed a fairly standard way of
->> dealing with it by introducing API and agreeing on any changes to that,
->> and got no reply. Even then, I was CC'ing netdev for changes that might
->> be interesting to netdev, that includes the blocked series.
-> 
-> Not interested in digging out those other discussions, but Mina had a
-> patch back in August, and there was the previous discussion on the big
+On Fri, Oct 17 2025 at 12:20, Christophe Leroy wrote:
+> Allthough masked_user_access_begin() is to only be used when reading
+> data from user at the moment, introduce masked_user_read_access_begin()
+> and masked_user_write_access_begin() in order to match
+> user_read_access_begin() and user_write_access_begin().
+>
+> That means masked_user_read_access_begin() is used when user memory is
+> exclusively read during the window, masked_user_write_access_begin()
+> is used when user memory is exclusively writen during the window,
+> masked_user_access_begin() remains and is used when both reads and
+> writes are performed during the open window. Each of them is expected
+> to be terminated by the matching user_read_access_end(),
+> user_write_access_end() and user_access_end().
+>
+> Have them default to masked_user_access_begin() when they are
+> not defined.
+>
+> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 
-If August, I'm pretty sure you're referring to one of the
-replies / follow ups after the mentioned series.
+Can we please coordinate on that vs. the scoped_access() work as this
+nicely collides all over the place?
 
-> patchset. At least I very much understood it as netdev wanting to be
-> CC'ed, and the straight forward way to always have that is to make it
-> explicit in MAINTAINERS.
-> 
->>> so that they see changes. I don't think it's unreasonable to have that,
->>> and it doesn't mean that they need to ack things that are specific to
->>> zcrx. Nobody looks at all the various random lists, giving them easier
->>> insight is a good thing imho. I think we all agree on that.
->>>
->>> Absent that change, it's also not unreasonable for that side to drag
->>> their feet a bit on further changes. Could the communication have been
->>> better on that side? Certainly yes. But it's hard to blame them too much
->>> on that front, as any response would have predictably yielded an
->>> accusatory reply back.
->>
->> Not really, solely depends on the reply.
-> 
-> Well, statistically based on recent and earlier replies in those
-> threads, if I was on that side, I'd say that would be a fair assumption.
-> 
->>> And honestly, nobody wants to deal with that, if
->>
->> Understandable, but you're making it sound like I started by
->> throwing accusations and not the other way around. But it's
->> true that I never wanted to deal with it.
-> 
-> Honestly I don't even know where this all started, but it hasn't been
-> going swimmingly the last few months would be my assessment.
-> 
-> My proposal is to put all of this behind us and move forward in a
-> productive manner. There's absolutely nothing to be gained from
-> continuing down the existing path of arguing about who did what and why,
-> and frankly I have zero inclination to participate in that. It should be
-> in everybody's best interest to move forward, productively. And if that
-> starts with a simple MAINTAINERS entry, that seems like a good place to
-> start. So _please_, can we do that?
+Thanks,
 
-I'm convinced it's not going to help with the work being
-blocked or the aforementioned issues, but ok, let's have it
-your way.
+        tglx
 
--- 
-Pavel Begunkov
 
 
