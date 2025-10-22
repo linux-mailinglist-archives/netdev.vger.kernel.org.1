@@ -1,55 +1,39 @@
-Return-Path: <netdev+bounces-231577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDB79BFAD11
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 10:12:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE391BFAD26
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 10:13:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F8741899CFA
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 08:10:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5575319A04AD
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 08:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 129F02FD694;
-	Wed, 22 Oct 2025 08:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="0KfuQQMD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155E12FD7CE;
+	Wed, 22 Oct 2025 08:10:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234F8301035
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 08:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7E81684B0;
+	Wed, 22 Oct 2025 08:10:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761120605; cv=none; b=aqnlGJ0+j0iy8CyZBuNCFY7P9OYHmNqJnsIiT8I4G82pWicdwrzRrB+4+jlgo5tK7HGnWs40iugSCAcBTrSZeDkFMRPnQsuDaV2U0XynU9NzPXzv1be+EjrZTFCO/q2OgxZzX2h4j+THhPOe7t2TzmdDD7x5bqYX9Zlt14qNTbI=
+	t=1761120649; cv=none; b=gS9Oex501uwWINbKbBdPkG39nb0ABCGgMZPUkX7+R1VP2ehxWZoy/Z8z+lTcOgWTAIvnvwVVrs1fL7tEOyjjFw3zIVSp0pJXOh+awHgLuKwb2KrYRV5Rr3JcZTzLyHO7re3VnToaitIYNfbPeOt1IcK70TsPRnqAF7i+ON3K5b8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761120605; c=relaxed/simple;
-	bh=Ist7iXsFS/EtIeLfo+26/9ri6j+gatskDLyPArpudyU=;
+	s=arc-20240116; t=1761120649; c=relaxed/simple;
+	bh=stqOx4m9vFLsGbyVhAdnxZb+Jc7vK7BpKLYzESDs1xI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=awzU5xrwRNEHedmRmb662h5NPYalGiS3rlHel6oMBhHjeGQqtPINlLdnrfcSVQGfNdiftsOg7vMCXvpgVoIU8o5J1zoXDcUtcjx5yMElwWXfJXtDJlMgyAxgqMTFmkcN8BWnPEYMQvGU2gWXefwVrPohKMIpeBbtOXjjXdeTnvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=0KfuQQMD; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id CEFF34E41273;
-	Wed, 22 Oct 2025 08:09:56 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id A53DE606DC;
-	Wed, 22 Oct 2025 08:09:56 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2F51C102F2357;
-	Wed, 22 Oct 2025 10:09:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761120595; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=eFCQ4jx45F1FYN8BqQ6y7HUaiF9XH7IuNi4lw4uwUHU=;
-	b=0KfuQQMDRPIv7aFraJgEJgBaBQp4xDq6zkX4ez3L0k0oTa8lzTT3LExxbsvZo7zW7YoJeh
-	xal0jqVWdMtlSuOJCWASzxDHrXsG+4obIOuGcY9GIqSoJ6fnoZraeUXfl0Ki185YKh1IYr
-	s9EiapCGt/7WWh8FvEQoE555NnTwNPOQwmVSo/+RPY9xyFzL1eX1ltoZ5zCGdZ7R3wRpJ+
-	exy1Hreb6QP9sBwCS7vEjR5pIN8+/cZGAY3U8cItUS4C+3FyCpp7BiVfKmbFxj1mohERxT
-	AS6+M9Umc0+8noHgeC//ZAY5Rw5GrhTjUdQFjRSgQUFLLKU64GJYUTKZeRCVhg==
-Message-ID: <ef92f3be-176d-4e83-8c96-7bd7f5af365f@bootlin.com>
-Date: Wed, 22 Oct 2025 10:09:49 +0200
+	 In-Reply-To:Content-Type; b=iTKoQUwZ6Ud2CnzJgkoNEooxZftShaimwWTIwET22v8pFPZl6Aqg5uBlI5PyDeJOP92Q+hWTA57x15zFokSzPC8YGS6VuviKgaw6WsF9KMRnp9YH25W5aRpo1ZGzqcS7Iv8/sA2lKYt7KAOpd9zzhXirgHtG5rukYqzL5tUNwQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [192.168.0.105] (unknown [114.241.85.109])
+	by APP-01 (Coremail) with SMTP id qwCowABHoaNlkfhoW8rMEw--.47485S2;
+	Wed, 22 Oct 2025 16:10:14 +0800 (CST)
+Message-ID: <d66db3f6-4c6f-4dc3-ae4f-3502d9b81c79@iscas.ac.cn>
+Date: Wed, 22 Oct 2025 16:10:13 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,56 +41,87 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 5/5] net: macb: Add "mobileye,eyeq5-gem"
- compatible
-To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
+Subject: Re: [PATCH][next] net: spacemit: Avoid -Wflex-array-member-not-at-end
+ warnings
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, =?UTF-8?Q?Beno=C3=AEt_Monin?=
- <benoit.monin@bootlin.com>, =?UTF-8?Q?Gr=C3=A9gory_Clement?=
- <gregory.clement@bootlin.com>, Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>
-References: <20251022-macb-eyeq5-v2-0-7c140abb0581@bootlin.com>
- <20251022-macb-eyeq5-v2-5-7c140abb0581@bootlin.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+ Yixun Lan <dlan@gentoo.org>
+Cc: netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+ spacemit@lists.linux.dev, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+References: <aPd0YjO-oP60Lgvj@kspp>
 Content-Language: en-US
-In-Reply-To: <20251022-macb-eyeq5-v2-5-7c140abb0581@bootlin.com>
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <aPd0YjO-oP60Lgvj@kspp>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:qwCowABHoaNlkfhoW8rMEw--.47485S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw17trW3ArWkur1xJr4Dtwb_yoW8tr1kpa
+	y8J3s7Ar4kJrWxW3ZrAayxZay5K3y8tFZ8GryFyan5ZFnFyF45CF1FkF4rCryqk3yxGryS
+	vrs0yw1UA3Wvq37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvvb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I
+	8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8Jw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l
+	c7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+	IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
+	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73Uj
+	IFyTuYvjxUqiFxDUUUU
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-Hi,
+Hi Gustavo,
 
-On 22/10/2025 09:38, Théo Lebrun wrote:
-> Add support for the two GEM instances inside Mobileye EyeQ5 SoCs, using
-> compatible "mobileye,eyeq5-gem". With it, add a custom init sequence
-> that must grab a generic PHY and initialise it.
-> 
-> We use bp->phy in both RGMII and SGMII cases. Tell our mode by adding a
-> phy_set_mode_ext() during macb_open(), before phy_power_on(). We are
-> the first users of bp->phy that use it in non-SGMII cases.
-> 
-> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+Thanks for the patch.
 
-This seems good to me. I was worried that introducing the unconditionnal
-call to phy_set_mode_ext() could trigger spurious errors should the
-generic PHY driver not support the requested interface, but AFAICT
-there's only the zynqmp in-tree that use the 'phys' property with macb,
-and the associated generic PHY driver (drivers/phy/phy-zynqmp.c) doesn't
-implement a .set_mode, so that looks safe.
+On 10/21/25 19:54, Gustavo A. R. Silva wrote:
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+> getting ready to enable it, globally.
+>
+> Use regular arrays instead of flexible-array members (they're not
+> really needed in this case) in a couple of unions, and fix the
+> following warnings:
+>
+>       1 drivers/net/ethernet/spacemit/k1_emac.c:122:42: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+>       1 drivers/net/ethernet/spacemit/k1_emac.c:122:32: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+>       1 drivers/net/ethernet/spacemit/k1_emac.c:121:42: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+>       1 drivers/net/ethernet/spacemit/k1_emac.c:121:32: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+>
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> ---
+>  drivers/net/ethernet/spacemit/k1_emac.h | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/spacemit/k1_emac.h b/drivers/net/ethernet/spacemit/k1_emac.h
+> index 5a09e946a276..577efe66573e 100644
+> --- a/drivers/net/ethernet/spacemit/k1_emac.h
+> +++ b/drivers/net/ethernet/spacemit/k1_emac.h
+> @@ -363,7 +363,7 @@ struct emac_desc {
+>  /* Keep stats in this order, index used for accessing hardware */
+>  
+>  union emac_hw_tx_stats {
+> -	struct {
+> +	struct individual_tx_stats {
+>  		u64 tx_ok_pkts;
+>  		u64 tx_total_pkts;
+>  		u64 tx_ok_bytes;
+> @@ -378,11 +378,11 @@ union emac_hw_tx_stats {
+>  		u64 tx_pause_pkts;
+>  	} stats;
+>  
+> -	DECLARE_FLEX_ARRAY(u64, array);
+> +	u64 array[sizeof(struct individual_tx_stats) / sizeof(u64)];
 
-Thanks !
+I originally wrote it as DECLARE_FLEX_ARRAY to avoid having to do the
+sizeof dance, but I guess that's no good now? Oh well, I guess...
 
-Maxime
+Acked-by: Vivian Wang <wangruikang@iscas.ac.cn>
 
 
