@@ -1,115 +1,113 @@
-Return-Path: <netdev+bounces-231636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDF7BBFBD35
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 14:22:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F5A6BFBD56
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 14:23:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A305218C7A1C
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 12:22:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E4B056382A
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 12:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4032C34165E;
-	Wed, 22 Oct 2025 12:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5D09314A8B;
+	Wed, 22 Oct 2025 12:23:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="tkC6Iyek"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L8MoGJE2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A2B341AD7
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 12:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A2C33EB10
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 12:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761135747; cv=none; b=dnVFAM5yQPAzi6KNbBoAZ93KiX/Mkv5O87PPDShh4irGPEMwTSKlVGvhPfaA10uGQ29AA1aTRf2sj9Fw+25Mpj7g2puZqXYjCpJfg+p/o94psPEJueBEhIY46E7Rt5QZKKQVT7NdukZfCc6C1ZXWlorkuzH9D/yCPBSqP8NhXtk=
+	t=1761135793; cv=none; b=TPz35uT50XwGCNTWm2K6TCHPg1zFTVc5ehcLsdzWM78WybGV3JoT7ClIfrcN2Fxtj84xc8ojBGsMmGXWZJmlpzpEuehxqNDBYfYglYtI3/h4T+U3p974oo4xwz1Iaactjzr035ONLN4+58m80l8+RF+KOTEQuQGja/adViY7J38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761135747; c=relaxed/simple;
-	bh=BElxTAqqQJrOvJZFCpntAANa1E1RXpxMqA95MHL9q3U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qOe1HNDJSUctCVfeMn3Tl2e89CPJLGAclhA5IT1fG//aC/8Csxd9Z2Tz71W0YPbP4hh8sqV2p2OmPpuOjB+SKVAhAcn8hYTwavKKo4QG62Eo/Va973hgiHEXGQG31ZRs2Av727qsfr53LCVC3DPC3iqE4EtzYzYDNveLvxI6bBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=tkC6Iyek; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-58affa66f2bso8036301e87.1
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 05:22:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1761135744; x=1761740544; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BElxTAqqQJrOvJZFCpntAANa1E1RXpxMqA95MHL9q3U=;
-        b=tkC6IyekXWvqNvAZqlRKLLBx1zlHKlMKy9AHypgVQKvlOe56k3XChntNbSdlHkAUy+
-         Xf/FvunI1z2cdFIdBOKkTcdoEjf+imBkwT1skSBCHgIQj6Mm14EWAQMyGLsA3nkq2qsr
-         zJssNoPnhy1Ei58rouZfoV3dX9TFV/gVxxM5hxTHWNyg7FOgEohqCG/HB58DMHNPirVk
-         KNnXFthviULPqHjQ9r4aUafqb62fQgITQF6eZhsO1fq7cczxiE5SDcM8y6rawXMCTv5N
-         /MVS/hEpyTOIsN7+iW/xsXGq7RdSZtfXF4nw+pU7ZB5UPs/4R29eqU1SlWLyS2TWLyUV
-         Vsew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761135744; x=1761740544;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BElxTAqqQJrOvJZFCpntAANa1E1RXpxMqA95MHL9q3U=;
-        b=bqWymg+e8rwC5DUlB3TMExq90WQ7xNzV1VW0esDfFKMD40ONzZEKP/Di6vxJ/yNZyc
-         Dn5oE4XsN154P5KRHBKaJETBbcPUbwL8X3AM32wORG0bNlnZOJR729DUU0foqhPGGtzE
-         Kapwp6YE+XvovRtFxer4MZ5QXpaUN445SyF6mvdDwS7bu6S5o2ZQ5mQ5CiVhujmSVlt/
-         oyQCUq4mTxfTiAyVSe41a5WXtx6bnn/HN25+xIoFdGgF1KpDgTe1BhoPQdGYYsnPm1xQ
-         qcXDcPVP/bqkPaCNCUUVFQH1c7pTC3VZXEI18gOAPXBwvDVq0P7cO4P9DzG93JTOrZOn
-         veOg==
-X-Forwarded-Encrypted: i=1; AJvYcCW4cB8Hh56RY0e2239Y8z+H+V/Mg0MQWUBNq0vHavjKl6HrxKtrIcj1h3zpEhIfyr3UPMb+s+8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCkA3BnrsBIdoVcYssiq+qzrS4+I2VtHKRe+cJo9ayFSwp3OIy
-	27/gY2GCdBjGzLMyms0mAS6LuUgw3hJL3iOCkQBE7HVbV4UeM8h8eBapa/KJOadhW7AwRrlqPZf
-	Y8hjmeOpgmuZmfF84e7Lt+QNcHCL1Fyg9E3Zda9GZsw==
-X-Gm-Gg: ASbGncudfnJe1heNsDlPwBMcsl1/1k6kx8GTiWZcxw4zLxg0Dm0gYO8v+zosUbGGDBj
-	lRzOyDFAKW7fBd+dtpaMCWlsChKUU1jz4Gjaf3sWjL3qY2FJ/QjnQpfQJn/lMup8iQoLnha0dD7
-	fZGd6UF3q0llA1C4Sa3lCnAjb4yHp4MbIqLnr3nrBeAa4b6/b4FR1GtSeSOiKDZGcFAjMy2Q4Sk
-	y6PVqWl6q0ewf2vrNvf48nuYIK+JfXHMiMYh980VkWbe8qMB3Bvz4fHFdEYjepzMyJg0KY/cvWm
-	Y5ocA8iLPpAIU2Ip
-X-Google-Smtp-Source: AGHT+IHopjIXv8jRnOM7SdbKGejL8HmLCEbi6BqZ/fl5zn8nC+umc/NX29TWVW5P2ry8JnLwjKerkQkMpRF8tHTR1Sg=
-X-Received: by 2002:a05:6512:6c6:b0:591:c473:5bc7 with SMTP id
- 2adb3069b0e04-591d858f85emr7186831e87.50.1761135743550; Wed, 22 Oct 2025
- 05:22:23 -0700 (PDT)
+	s=arc-20240116; t=1761135793; c=relaxed/simple;
+	bh=HbeFBwtgzquCzF8PTJMvgwZfmjwm0zMaLYvKCsuZUnY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RK9ysuUr/wvo/ouoF05zwsi65d6/b8DZG/31Tsgq6mMRyRmsC5ruMpCtBxrXQWbEcid5G+5AIZdNVSCDj68lFgGk3FxgADZGF2rue2p0KCljBfFLoe31gJNjMtlxQ55EP0OXFkFxucmOalkhFAf8xzzVrqh+kjUE6VBzSbNyJnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L8MoGJE2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761135788;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Udv/fmgj5IzxIAQ59j8QIxSocwUXj3+ehFUJn9q19yA=;
+	b=L8MoGJE2ISv5kZDQndsnSt+vwYS6446UmuU0fIUz12frOAIyy3Qk/BTbI3ilaNSU7PHmuj
+	JCgfCNTlZE0KlLIWub5FaL4cao4snd2h2+62KTYcK1cK4d/qExlBUpU9ymNlAWQaI4G5cI
+	itYCbR+e4aA3nL6LS6+czSndDQfb3Lw=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-466-8dkaZ0OjMuiCmI6LhkR1BA-1; Wed,
+ 22 Oct 2025 08:23:07 -0400
+X-MC-Unique: 8dkaZ0OjMuiCmI6LhkR1BA-1
+X-Mimecast-MFC-AGG-ID: 8dkaZ0OjMuiCmI6LhkR1BA_1761135786
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1164818001C6;
+	Wed, 22 Oct 2025 12:23:06 +0000 (UTC)
+Received: from p16v.redhat.com (unknown [10.45.224.69])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2122119560B4;
+	Wed, 22 Oct 2025 12:23:03 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	Jiri Pirko <jiri@resnulli.us>
+Subject: [PATCH iproute2] devlink: fix devlink flash error reporting
+Date: Wed, 22 Oct 2025 14:23:02 +0200
+Message-ID: <20251022122302.71766-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <E1vB6ld-0000000BIPy-2Qi4@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1vB6ld-0000000BIPy-2Qi4@rmk-PC.armlinux.org.uk>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 22 Oct 2025 14:22:12 +0200
-X-Gm-Features: AS18NWDxwRikRa37d3sfSPIurHFNsUg5soxDVQrWVC_wnbUDqwvc55kIMFCSQNk
-Message-ID: <CAMRc=MdWFL_+RJXPUNLd0BTyxbt9x8jztf5SDViPQCkxSqoHdg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: stmmac: replace has_xxxx with core_type
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Chen-Yu Tsai <wens@csie.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Jan Petrous <jan.petrous@oss.nxp.com>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Jonathan Hunter <jonathanh@nvidia.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-sunxi@lists.linux.dev, 
-	linux-tegra@vger.kernel.org, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
-	Richard Cochran <richardcochran@gmail.com>, s32@nxp.com, 
-	Samuel Holland <samuel@sholland.org>, Thierry Reding <thierry.reding@gmail.com>, 
-	Vinod Koul <vkoul@kernel.org>, Vladimir Zapolskiy <vz@mleia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Tue, Oct 21, 2025 at 9:27=E2=80=AFAM Russell King (Oracle)
-<rmk+kernel@armlinux.org.uk> wrote:
->
-> Replace the has_gmac, has_gmac4 and has_xgmac ints, of which only one
-> can be set when matching a core to its driver backend, with an
-> enumerated type carrying the DWMAC core type.
->
-> Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
+Currently, devlink silently exits when a non-existent device is specified
+for flashing or when the user lacks sufficient permissions. This makes it
+hard to diagnose the problem.
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Print an appropriate error message in these cases to improve user feedback.
+
+Prior:
+$ devlink dev flash foo/bar file test
+$ sudo devlink dev flash foo/bar file test
+$
+
+After patch:
+$ devlink/devlink dev flash foo/bar file test
+devlink answers: Operation not permitted
+$ sudo devlink/devlink dev flash foo/bar file test
+devlink answers: No such device
+
+Fixes: 9b13cddfe268 ("devlink: implement flash status monitoring")
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ devlink/devlink.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/devlink/devlink.c b/devlink/devlink.c
+index 171b85327be3..b162cf4050f9 100644
+--- a/devlink/devlink.c
++++ b/devlink/devlink.c
+@@ -4594,6 +4594,8 @@ static int cmd_dev_flash(struct dl *dl)
+ 	} while (!ctx.flash_done || (ctx.not_first && !ctx.received_end));
+ 
+ 	err = mnlu_gen_socket_recv_run(&dl->nlg, NULL, NULL);
++	if (err < 0)
++		pr_err("devlink answers: %s\n", strerror(errno));
+ 
+ out:
+ 	close(pipe_r);
+-- 
+2.51.0
+
 
