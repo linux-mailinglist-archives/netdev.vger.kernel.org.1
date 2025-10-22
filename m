@@ -1,83 +1,88 @@
-Return-Path: <netdev+bounces-231507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96678BF9AF9
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 04:12:29 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E36FBF9B57
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 04:21:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4C0A03563F3
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:12:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E6AC44EBB17
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD1D211472;
-	Wed, 22 Oct 2025 02:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0604A217F33;
+	Wed, 22 Oct 2025 02:21:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MWuOtdQ9"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MUDpJNL6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E085220458A;
-	Wed, 22 Oct 2025 02:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92BEA1F7580;
+	Wed, 22 Oct 2025 02:21:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761099144; cv=none; b=lC7+XMIiUw5pVabXN5IE7QCa8ZRP4JT4nCvTNGuHfX38suAq8oYKMmwt/PmmEwvHe3WOb1gTFu7uqcEorPUcYeIxWgmid5pwNb0j5PeYSgBq8GUOPvQxgWmJR2/SD703BrE+daj+6OClTxi/OrPmvGE862kJ1SvPUJ1uFY523yA=
+	t=1761099666; cv=none; b=DXx46c88GC/KBjYjrJEANtcKLHcJCXKMvWIiQ8zsP+AcAZQjOpz+nGARymXaxLhw1iY//661PZDjhC7jDjxUzEUjXI6HHLK0Y6l/7fORLcQG85To7LTD/ueUQv9TfN/uDWSkEuiesuapUAYwkv/9SlLUrijR2Z2qRnSnmNOMqT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761099144; c=relaxed/simple;
-	bh=gAkvGRuwev6aA7j0NLPJmn5MTYfW/6H3MmdzWIHKM+g=;
+	s=arc-20240116; t=1761099666; c=relaxed/simple;
+	bh=16KFnA4NoEBxZ+Pe7rN2Vjt7kHABx+RK9w4cgVMEyIM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AyMUItJDH0r10zRCM3DIcNAoTtcrbJJMy0PKYXdFTaJKbIBKIl4znqes7hNYp4nShCig9VGXyTu5x0kOJ2TrFzkOM2UegMhAOkpMZsMICGTrYvrDzPZr+5xNMbyhaHMzl4+gdpX97gTprFl3D2zevfTcVSODMearOSSGA9+FYA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MWuOtdQ9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 516A1C4CEF1;
-	Wed, 22 Oct 2025 02:12:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761099143;
-	bh=gAkvGRuwev6aA7j0NLPJmn5MTYfW/6H3MmdzWIHKM+g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MWuOtdQ9tThNlydhnrJH1VgFh2IxR5HDlpg2L0rx2/QUUZzbeuLWqkQU+2SoUTuF3
-	 nx9rfU1Bb6G3Jg/65HV1oKT+yEGJs5zXyu8qT7WMCnU/tM3vMIOI6RpnlCJ+jNFCgK
-	 ra5XDoRGKk27ajozO7a9te43PnNRuD4PVlcvYW5o8+88mpXYvfV7ij028e+OudVpO+
-	 w70wBzTBOAWnYrwd5T4ysnOBKhkC2JIjLDHzeBgu8ZktdZLh3GCYffvRwlCskXaOt3
-	 rtKKFBY6KLP8gJiwoe+MvdIeu9yMvRFp35BziA8Vg3RNN2Tw7DoroaZWXXMJLAh/5W
-	 a8tWxukYCv5qA==
-Date: Tue, 21 Oct 2025 19:12:21 -0700
-From: Saeed Mahameed <saeed@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>,
-	Adithya Jayachandran <ajayachandra@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>
-Subject: Re: [PATCH mlx5-next] {rdma,net}/mlx5: Query vports mac address from
- device
-Message-ID: <aPg9hQjpXeR-mJG2@x130>
-References: <20251016014055.2040934-1-saeed@kernel.org>
- <20251021164759.2c6a5dc9@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XwuevSFVWoQbpzEo6oF/2nk2dNH1Q8J0oIVHpSTZlxcjGVCKndH6L16TXoR8HVGCYgGJkP4GGeGxdIoYF7ygkjcixoaXDd5brMb91Jr9LxRZ9nrYA7Jtrjsq0JJDQuvoh/mWo3b/xCOtvxruWkVaV4CnKHYTrBNImEHT/Vk9dOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MUDpJNL6; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=6RFJilJdKj46N0sK2TzoAhWSxeTUKkqdVtOb7d7qsBQ=; b=MUDpJNL6r6j1PkzdDAKco9/T2/
+	kX1CD5ZJX38zmHStdn6dJsLqSlFUUh+CsGfAbimAqyDINq3YRbOgjWPogLV+DVa1vSzEaqxe3aBIx
+	JryZBr1CXvTLNCG1dxeW+n8s7zEmib9/wBK6VYRWoiLXE1jCPOubfjVMZcYROTXJEwrA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vBOT6-00Bhav-7w; Wed, 22 Oct 2025 04:20:52 +0200
+Date: Wed, 22 Oct 2025 04:20:52 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] virtio: clean up features qword/dword terms
+Message-ID: <8138fb02-f7c5-4c83-a4cb-d86412d8c048@lunn.ch>
+References: <cover.1761058274.git.mst@redhat.com>
+ <492ef5aaa196d155d0535b5b6f4ad5b3fba70a1b.1761058528.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251021164759.2c6a5dc9@kernel.org>
+In-Reply-To: <492ef5aaa196d155d0535b5b6f4ad5b3fba70a1b.1761058528.git.mst@redhat.com>
 
-On 21 Oct 16:47, Jakub Kicinski wrote:
->On Wed, 15 Oct 2025 18:40:55 -0700 Saeed Mahameed wrote:
->> Before this patch during either switchdev or legacy mode enablement we
->> cleared the mac address of vports between changes. This change allows us
->> to preserve the vports mac address between eswitch mode changes.
->
->Not knowing what exactly a vport is I can't tell whether this preserves
->MAC addrs of reprs, the uplink, something else?
+> @@ -1752,7 +1752,7 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+>  
+>  		/* Copy the net features, up to the user-provided buffer size */
+>  		argp += sizeof(u64);
+> -		copied = min(count, VIRTIO_FEATURES_DWORDS);
+> +		copied = min(count, (u64)VIRTIO_FEATURES_ARRAY_SIZE);
 
-vport == vf or sf, so VF/SF permanent mac address. It can be set either by
-iproute vf interface or devlink function interface. For no obvious reason
-we reset it to 0 on switchdev legacy mode changes.. this patch is fixing
-that. 
+Why is the cast needed? Why was 2 O.K, but (128 >> 6) needs a cast?
 
-Of course vport holds more information than just the mac address, e.g GUID,
-mtu, promisc mode, mulitcast mode, and other stuff.
+> -#define VIRTIO_FEATURES_DWORDS	2
+> -#define VIRTIO_FEATURES_MAX	(VIRTIO_FEATURES_DWORDS * 64)
+> -#define VIRTIO_FEATURES_WORDS	(VIRTIO_FEATURES_DWORDS * 2)
+> +#define VIRTIO_FEATURES_BITS	(128)
+>  #define VIRTIO_BIT(b)		BIT_ULL((b) & 0x3f)
+> -#define VIRTIO_DWORD(b)		((b) >> 6)
+> +#define VIRTIO_U64(b)		((b) >> 6)
+> +
+> +#define VIRTIO_FEATURES_ARRAY_SIZE VIRTIO_U64(VIRTIO_FEATURES_BITS)
+
+	Andrew
 
