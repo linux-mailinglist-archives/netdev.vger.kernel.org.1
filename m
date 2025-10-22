@@ -1,87 +1,148 @@
-Return-Path: <netdev+bounces-231620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AFDCBFB92C
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:14:36 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9A3BFB966
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:17:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C021635576A
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:14:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2788B4EC347
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:17:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 129D132D0D6;
-	Wed, 22 Oct 2025 11:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D594A3314D1;
+	Wed, 22 Oct 2025 11:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GtZ7IAcJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ECD032B998;
-	Wed, 22 Oct 2025 11:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0CF32ED45
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761131668; cv=none; b=jAsiGhhZ20R8wvxqHIzRFUIzb3cjAhlm6apZvVHpdYujTLfbQQb+SEjR1+TzBzvXW8mt+gzGJiS2hxaonvXw/7zmd1GWLgUt2BZlqZ/F3cbGPAida+0s8BE6KOJ/ei9QpYnYem+K1kbutj3e26v6ljpbFGivJtfoC86sY/jcnx8=
+	t=1761131810; cv=none; b=BgMF+hJy/+MEysdu4HtBSfQvnw70wfg4hpQhvxudgr8Hsh+hd0bGYWa0vJ7MPg0VOKp0vrYgDKhlwqaPB1xLQLu4Qp5gWVlOHbGmDrkFkRhC4WpQuBUvpWp31m9ZLog0A7x+BO5T/o6nSlBthN0ufMT/cnqtJ+b+R16E+MyafS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761131668; c=relaxed/simple;
-	bh=GmYKF+tllvcBNVgbxMIirqobghZMH0caVF7Aa0v/NWs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ya0gC3FcM1BOMIHq+//SHf57iQd31bc2hz//05Zv8wjto6yF3KF9lma7IT1aIf1zNghRPocIupkjPg9R7A3b12LG2VtcbFZ/fbGSXjGMqtepYAB8hW0mYry2soaQETA3J8hV2WHI8eYwuPSj3s+A9beqF2M540F0CHXumjxgz2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id C269B6046B; Wed, 22 Oct 2025 13:14:23 +0200 (CEST)
-Date: Wed, 22 Oct 2025 13:14:23 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Andrii Melnychenko <a.melnychenko@vyos.io>, kadlec@netfilter.org,
-	phil@nwl.cc, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/1] nft_ct: Added nfct_seqadj_ext_add() for NAT'ed
- conntrack.
-Message-ID: <aPi8h_Ervgips4X4@strlen.de>
-References: <20251021133918.500380-1-a.melnychenko@vyos.io>
- <20251021133918.500380-2-a.melnychenko@vyos.io>
- <aPeZ_4bano8JJigk@strlen.de>
- <aPghQ2-QVkeNgib1@calendula>
+	s=arc-20240116; t=1761131810; c=relaxed/simple;
+	bh=MkLx2R4aQDQRSte1k6rDu2d4S0+mLWdRZ24YtDib+QU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cUHUBZT69kMTh7jqUxOzMCGm5g7SgtHad97uq1z6F/mnEvBV3LjYLoEKOpFQOFTBe4TknIX42cgbeSxVk9p9M5CLc8DIZqIxtrmh8nTmvYJTkpFaUCNkEsxTnktqOLPphLFcOSWGPUCwzYUByCMVkc5deF534G84mAwoczLQDfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GtZ7IAcJ; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-63bad3cd668so12687477a12.3
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 04:16:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761131807; x=1761736607; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HUpfROanALk009O5ukzxUjqqmJACMBILWAOKJHciC34=;
+        b=GtZ7IAcJ+qPUT1UbyjSQlczc/FYy37J5wFuyZSAtHhyN8k8n4AQCldnUC7PgsdQ/Ds
+         nQ9DwjeO5G3bQs1dfBeP0ZiaA3kwUeIuVqrrrDMmpvXtbKgkoC3YE0aRj0MSiIIjOQfm
+         O0h28Bn0E38Y8RxtcMLU6yN6BOzpM0KSZALGkq+kphNBZkwBB1zabOwMjBnSGgIYLHoj
+         eAPCezGxDjNyexsTJwbVrWuZkI1m6S0PagwCbHBXelSO40N+BIGIQkNIso4gV9LZIKak
+         obLWnXS/nhyY3mC2H1SbOaX1toSgPt/gVJdbgNTrfE1lwxxiFxCyYLdjYTyDgoYgd7vb
+         Oc4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761131807; x=1761736607;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HUpfROanALk009O5ukzxUjqqmJACMBILWAOKJHciC34=;
+        b=sYirPkNrL4UGKr1m1+TSgOZUvnoBCm1Zw/piGqnuyKxawPH6j95FK5C/HdNWwsXjkw
+         x0WaxczFFmeyw0zSfQcqOfyXGuWKq5NZ5rDjdTkCJhrwNQBsrQ3gJD2BC5ULGkC3doLt
+         PQupT/bCpoulKTvP6BWWVSvExujop0cVxifxzQZwUCoo9U6496nuLU0Avz8BRYqvW9Cu
+         PKVlVKVGrdFqTMgrhwo1050Zic30N+JJ0VkuPsfO1B4Z35xhAQJMHg9GDOajkk3YnAK3
+         jzRjIAzdrCVziIEvMs/UTUjnRndqxjpUzfQNV84CKRfcTDageHG19JW1V0liF5R36tlm
+         hOzw==
+X-Forwarded-Encrypted: i=1; AJvYcCXCYjfZlK/yKa3jb/5bkamD50ZRGljH+i3CV/NnN58aC58UaZ1FEezAgcXGRKsIaHAGIcfZkqc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7POnPzcg7CzAbjhhP9jRZc6nk7bpdqPsSelKWmqhxByzmcIjt
+	bl6UV0e3xYqF1Ilz5AuMnVuMqR1DueBlOeAk3CZdMLrOBgztZM00aEijC0/ZFaAeogB1z+9APG5
+	b9bgGRmdLN9ePphYLw60Eo2tmmZ5Irg4=
+X-Gm-Gg: ASbGncvkOrKmJ61u5xrHBa/FxxLVioPoYnKfcwOEBpCmSXcMIj0YXFsks96Ehk3wYwr
+	TLg1Fk103PLf+HzUUbHPZ3lO4+x7E5r3Q6Um/No2bc9uL9Llebt/tZgSX2caOMnFXhR4Qq6QWd8
+	j7C4Qjw0kjLmdhz6xxCtytDe0D8wjivUDgOlwIhdhxRymeaS+mtR6EaT7MBlfuLLyC+Yx6OdLkP
+	pC+kp33//RAPMUvM+xgHTPYuZG7AOi3vj8YSjGtV/SHzqIcSNWjZXE+DqAgwp7j6oUUOrWNYo81
+	c06OO5SWL9M6MMaL8cR/FcJwoQ==
+X-Google-Smtp-Source: AGHT+IFeLMsqZpbHAvlJBzKIdahXOOBShjYQZyOY7ATbt5n7WHdXXR/ON08TB4hturxLMLEB0GOq3i/bLAd52DC8p3U=
+X-Received: by 2002:a05:6402:13ca:b0:62f:8274:d6bd with SMTP id
+ 4fb4d7f45d1cf-63c1f626dd4mr21176233a12.8.1761131807215; Wed, 22 Oct 2025
+ 04:16:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aPghQ2-QVkeNgib1@calendula>
+References: <20251017042312.1271322-1-alistair.francis@wdc.com>
+ <20251017042312.1271322-6-alistair.francis@wdc.com> <dc19d073-0266-4143-9c74-08e30a90b875@suse.de>
+ <CAKmqyKNBN7QmpC8Lb=0xKJ7u9Vru2mfTktwKgtyQURGmq4gUtg@mail.gmail.com> <4b2e5998-a646-4f99-8c87-95975ff8fe66@suse.de>
+In-Reply-To: <4b2e5998-a646-4f99-8c87-95975ff8fe66@suse.de>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 22 Oct 2025 21:16:19 +1000
+X-Gm-Features: AS18NWBDgW-hay2VUeCdIjfUCzoI0NhxABO1jEUfCaPHUmJ8eBnU71SyICyiPWc
+Message-ID: <CAKmqyKM-uX6_a+Ru01RD3-CwoucTN7P_sU+d=MEKSo2pxG_tDA@mail.gmail.com>
+Subject: Re: [PATCH v4 5/7] nvme-tcp: Support KeyUpdate
+To: Hannes Reinecke <hare@suse.de>
+Cc: chuck.lever@oracle.com, hare@kernel.org, 
+	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org, kbusch@kernel.org, 
+	axboe@kernel.dk, hch@lst.de, sagi@grimberg.me, kch@nvidia.com, 
+	Alistair Francis <alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> > so client will eventually retransmit the connection request.
-> > 
-> > I can also mangle this locally, let me know.
-> 
-> BTW, this fixes DNAT case, but SNAT case is still broken because flag
-> is set at a later stage, right?
+On Wed, Oct 22, 2025 at 4:56=E2=80=AFPM Hannes Reinecke <hare@suse.de> wrot=
+e:
+>
+> On 10/22/25 06:35, Alistair Francis wrote:
+> > On Mon, Oct 20, 2025 at 4:22=E2=80=AFPM Hannes Reinecke <hare@suse.de> =
+wrote:
+> >>
+> >> On 10/17/25 06:23, alistair23@gmail.com wrote:
+> >>> From: Alistair Francis <alistair.francis@wdc.com>
+> >>>
+> [ .. ]>>> @@ -1723,6 +1763,7 @@ static void nvme_tcp_tls_done(void
+> *data, int status, key_serial_t pskid,
+> >>>                        ctrl->ctrl.tls_pskid =3D key_serial(tls_key);
+> >>>                key_put(tls_key);
+> >>>                queue->tls_err =3D 0;
+> >>> +             queue->user_session_id =3D user_session_id;
+> >>
+> >> Hmm. I wonder, do we need to store the generation number somewhere?
+> >> Currently the sysfs interface is completely oblivious that a key updat=
+e
+> >> has happened. I really would like to have _some_ indicator there telli=
+ng
+> >> us that a key update had happened, and the generation number would be
+> >> ideal here.
+> >
+> > I don't follow.
+> >
+> > The TLS layer will report the number of KeyUpdates that have been
+> > received. Userspace also knows that a KeyUpdate happened as we call to
+> > userspace to handle updating the keys.
+> >
+> Oh, the tlshd will know that (somehow). But everyone else will not; the
+> 'tls_pskid' contents will stay the the same.
+> Can we have a sysfs attribute reporting the sequence number of the most
+> recent KeyUpdate?
 
-Hmm, why?  nf_nat_setup_info() will add seqadj extension if a helper
-is assigned.  I only see two nat cases:
+Why do we want to reveal that to userspace though?
 
-The helper is assigned, no NAT was requested.
+Realistically it should just be ~2^64 and it'll should remain the same
+number, even after multiple updates
 
-Then, in postrouting, a NAT rule gets triggered.
-nf_nat_setup_info() will add the seqadj extension for us.
+Alistair
 
-This case doesn't need this patch.  Broken scenario:
-
-NAT rule gets triggered, no helper is assigned yet.
-Then, 'helper set foo' rule gets triggered.
-
-This case missed the seqadj extension add.
-
-An alternative would be to reject 'helper set foo' rule add unless the
-expression is called from prerouting or output with a priority that is
-after conntrack but before nat.
-
-But its more risky change, it would surely break some setups.
+> Cheers,
+> Hannes
+> --
+> Dr. Hannes Reinecke                  Kernel Storage Architect
+> hare@suse.de                                +49 911 74053 688
+> SUSE Software Solutions GmbH, Frankenstr. 146, 90461 N=C3=BCrnberg
+> HRB 36809 (AG N=C3=BCrnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
