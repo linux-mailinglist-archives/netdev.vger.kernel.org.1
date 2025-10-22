@@ -1,141 +1,101 @@
-Return-Path: <netdev+bounces-231654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 987E9BFC125
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 15:16:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6915BFC276
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 15:31:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9D89C5613F8
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:09:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D5476257AE
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A4A34DB79;
-	Wed, 22 Oct 2025 13:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E8D345CBB;
+	Wed, 22 Oct 2025 13:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="PTn+OJr7"
+	dkim=pass (2048-bit key) header.d=vyos.io header.i=@vyos.io header.b="EMT3FnbT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FF8A34DB52
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 13:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6FD2F8BD2
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 13:02:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761138035; cv=none; b=Vh5fF25AHNZmMpCtLRvCcjXxiIirfTrLlBnwwzfFUhgwGbK8NjJT9sudf1B1rG/Y3kXORGCn5dvrNwZKqOooW1X6ZHhhCETNPLLwd9rcsnPtiC74JjN+GXhalJwDHyFkPWm564hf7WhqMPvGeG5sS8IKv+hZyvSBaRemrKkmCTs=
+	t=1761138124; cv=none; b=hS48QTDptydCHGAnjPQaj5z4mUZFFVRljT1Y9FlR1akyJXfAHSqkiMv60Xt8MJqJX4rpvonrIwCtzv/Jqc4Jl62NIc9zUWzjj9/qKxpnA7G+TtXfE9++AcVNyRx0TOtmYH0/kgctzLGMx3i2j4H7N0WkYtLeFSTvSCU+kaHRBIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761138035; c=relaxed/simple;
-	bh=lj3+/9vLftsCBjCzdN+X3Nq0wpevMM5aO27bK9qqcGY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n/rGADhNyXpLV87+f8kFj+hqPAJ9kULSDfRzcFN0zAlTscyjEnYvjo9CuX/L+HbTkDiy1nhMuXO0hYs/2o8Ut5vL2Kvquoak8r4fzt6z86+Hepgr6QOEKSsC9q8SL2vy/aKk9XR5/ENU+MHo5yFmIn59cCDN2AfhSpzxk0d168g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=PTn+OJr7; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6399328ff1fso11584597a12.0
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 06:00:33 -0700 (PDT)
+	s=arc-20240116; t=1761138124; c=relaxed/simple;
+	bh=YyOT6xckVX0MriiIl7HBo2d4T8KTUI4Zs0unfYBtZTE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O9HOi9HMqUTP9x4t9xuyWbZ9i3jTtGN2vZptwc+ltigxUlGCN3Xwsfw5LNvj7PGLCrmG0+I0CwLWKxd0Z5etmFaCxIiHkNYR4VjBGrr7JKwgHOGKEYmiUcN0uwV2rJdUjnUdZ0+7a11SFfllKS9l5DqyUupPdStTBumOWG3mz0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vyos.io; spf=pass smtp.mailfrom=vyos.io; dkim=pass (2048-bit key) header.d=vyos.io header.i=@vyos.io header.b=EMT3FnbT; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vyos.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vyos.io
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-78488cdc20aso56769547b3.1
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 06:02:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1761138032; x=1761742832; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Jh5ksIpXLgI3yn70biwBJxvXCxdN+NZ47Ntk3kQ1cJ0=;
-        b=PTn+OJr7MF2zFiPuTLFVHExDALR/jSjRUkBvljF1Hru5pJzzEd8FEXZ1PUb8vGMpRF
-         YOnx3Bux518QljD/PQ0sE3I2oRg8f46jpZf5W+mnAahf+T8QtpyuSqsZHcYZ2OR1NN8g
-         brloWwuY0s3w4Uiosfu+MubOjKCxjXCmnICSH9qPBVY4iIjwkO7esXHJQaCk8FIzLMia
-         RY+yFmucdT+r80/thguCJ/1pR4T1YAoRbf4cPjIU0RzA/aWLiGo78HesRgJ+Rh7aTquW
-         ++1AFaOl/EYnFjx6Wik/PcLAdKFUH2fXtJgYr/YNtA8KJwBvfDDcPIX5pfoXJfpIZrPV
-         pnkQ==
+        d=vyos.io; s=google; t=1761138122; x=1761742922; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=YyOT6xckVX0MriiIl7HBo2d4T8KTUI4Zs0unfYBtZTE=;
+        b=EMT3FnbTWISnp8qFS8tmeCFyrvbxL4ZJ3ydv8XGpLrnSQyGWnNTULQQ1Y4/Uv7YtmJ
+         aejyuE/km3ZFPTNKjgN35GzsNqohMByj2wC3QhKxYd4BTwyYnzO8/PimtHyP4DWyoUmC
+         HbQmXuGB7ijOqy+DW0+cnwrvuyAPzXLvEEvWLH3YlMN5N7hXu1htCCv0Ju4buO0PQYca
+         BKJLZkFB2wj5fDbS8BIdY5l1/ZZC28uY8WFgIbJAQD/y9gzBsEBc9kAXHAh24JO4okOD
+         wdm2j6AkVXrjr920Hq9FSNCStvE9MVB6Q6rWrwny4fxWx8knVoz6lCNVeNEuUjL+jY9z
+         7kQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761138032; x=1761742832;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jh5ksIpXLgI3yn70biwBJxvXCxdN+NZ47Ntk3kQ1cJ0=;
-        b=IFv+f2Yvcyg7Av1bU5EW9V1EhiOJYCOlWU7SeJN5nGYF+lqxQ5IVwRIxvjLKDVVJvS
-         sij2yPRXF1B/vp4GSuE5RA4XK4mbVLDd8sTrHuQ6KzsWrjiwd2fbRrxwcaiQVV3iJaul
-         HOA2khhzD4Hqoo6vz8wNChwCUOz2w63iga3WEwxjZYH0XC3WN80vhiBaR3b25EibWlB7
-         gxVcx02mqQb0gcVT914MXg4fh4/CGtxsdBzJlMU0ojwOAU4VdyLzFWGghLsMP5KQX639
-         Z8ue74U1FAj6+kijjmR4k7kz1PkAeHfQgzo+FrtRuLOcKkCPCxiiIjZ6jcVwSAorYKVa
-         koow==
-X-Forwarded-Encrypted: i=1; AJvYcCXgX2Y2clVPOjbK/IGZ303zHXN9UD4n+Xan04IqODLH5sSyMdaRTiB2X2ZC9G8fk/9yF+LVFA8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyx0iKfY0nT7MjnbcuSLX7Skpm+lFnnGJarigbtak+W9bTv0DGt
-	+KfA5WCYwRYEoB1Lxg7LW3xFJkX1khNwuXt6MRwhNgqVE3NO8tNFgtlmkaot8LUNrmGkkGbg8TW
-	d6zsC9Isaaw==
-X-Gm-Gg: ASbGncuzVI1NuyXQ8jUvRzbCcFo5THaxahJlqAtu3nNDIzjX/L8/h05ST+huc0nsn7G
-	c3DMu/mxYQdTLIABMV0QSpQbvwiBG8cVEng/FNCG32DHb1Z+2bUHF4ge/sjQ4rYCwCzfeHFVDot
-	XdXRJsGtCO1wUg3XP7Fnx/kCle0y1/0v0u4bOG3Yjcrzf1M7wyGHPUY4lIN6kniVZuSHiCtmSRT
-	FrlsBG6vInqW4JPpbI+5BhB3iyyK7FOHi+QArQs/KwNzPBpdpHpWjT2//bTkH56qEiP4WORQVHA
-	SqWoL91AeqA5qHQ/m+Bk9odS3qGvcIZ+1fpxWlf/tEANlFEwBbIo+UAjRcg5Knvm7vcKsrMHqyl
-	/0DQWsfuifKVxqWMmm2XXZVuCECC8gVigbsUdL/YF6RvUfadWWhhhVD5BPPNBj8HGbgQqBtibUt
-	/hwlH5UxY65VpHASFn1enYKrriXSc00hcLW5wT5zwg2hc=
-X-Google-Smtp-Source: AGHT+IFEjQbW6rQ6MVYPA9PtdiwaaNzRaYiTiaZSKasSAGkhUbT61kH4OnM5E1/HHnZyIvoOzcB/6g==
-X-Received: by 2002:a05:6402:5248:b0:63b:f76f:c87e with SMTP id 4fb4d7f45d1cf-63c1f64e87dmr20911347a12.1.1761138031552;
-        Wed, 22 Oct 2025 06:00:31 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63c48acf60dsm11891136a12.18.2025.10.22.06.00.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Oct 2025 06:00:31 -0700 (PDT)
-Message-ID: <8994bee9-d384-4c95-b4f9-1f322c240242@blackwall.org>
-Date: Wed, 22 Oct 2025 16:00:30 +0300
+        d=1e100.net; s=20230601; t=1761138122; x=1761742922;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YyOT6xckVX0MriiIl7HBo2d4T8KTUI4Zs0unfYBtZTE=;
+        b=Dg+Nr0UmMHj6G5f5Xo9ZxnqL+FXF3n5azL6RHdQfHjIgX57DBy1idGDhVhNLg3XQJY
+         d26Gp2jwAmut0molUI12hJVGPwa4xFUuIY88557v6rJuvB5of2zuy2XJzNfYnLR0gL5a
+         0fP0VPRvMDAQqAC+AWoKxGoTStVOnjGKsZOmrR3qPGK9h2nS7caBB4qqUUT5G4k+fK9U
+         ffxCs3h927sv7nBHUzl4IvzJmyoqw8t8BqKty/1ASfiH3KfoNlW+GDX+gmjzS681syoD
+         QLhHj3kS1YAWdXoWQHHbEdHDckFQRQiILOj+cwJC+Al9r1mlr4hYkMKkC5PFfBSSeXLM
+         M5aQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV50/YSjxjVfySPFh//g2UG3sn8Uz1MgfHX1eyknPk9BFlsZhn0JBKs+hyzFzwp7+MpqnZR5wg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPqgkjPfFaykcVhwyFl3hVfeR7nC6br20uET+9cDjTs86aY6ec
+	7gHGmWIt9oWkwyifnxqrrdhUDXv00Xhf3/4qZxxepUnyO36ZuCrFzG6GqHyt45ObIKCFW8tedOm
+	S3cGJID++OXHTn3eVvADeM76spCFYlSyqt+jmp7iykw==
+X-Gm-Gg: ASbGncun1thN/llC9ZxcSFZqZOu48xhwIbS1FEWqBj9s2zzxLbyp7j497UnkZCpyNZS
+	QBwj3EJVhXAWcqfbVMoDHKhMaeyTH5tiGdjuhtaHNrUMaZe9PDXZwZT+jddpw0f82JDiFm915om
+	gUclva9cEkwioq6i1qmffz4TqWKOQ1uKPrA0rhW/61WdSKXmXCJXgp3O9878mnATVpN9JvBoUkf
+	DtofBr/KUlzn0VS0ZZVO8Rd1XzmhfxUYSwqPbfbhBZVXweckHkl9LL7RU5fDFbpB+owdGSX
+X-Google-Smtp-Source: AGHT+IF9jG7efkMJkLjrKK96cUycd0uKP1eoJk4jV4LE5zYD+KPHywlzQYSMFmQ/paz3aQtOfKK1rFQpJc1+j+AphxY=
+X-Received: by 2002:a05:690e:4182:b0:63e:d1f:d683 with SMTP id
+ 956f58d0204a3-63e161c551amr14636102d50.45.1761138121557; Wed, 22 Oct 2025
+ 06:02:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 13/15] netkit: Implement rtnl_link_ops->alloc
- and ndo_queue_create
-To: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
- pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
- john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, dw@davidwei.uk,
- toke@redhat.com, yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-References: <20251020162355.136118-1-daniel@iogearbox.net>
- <20251020162355.136118-14-daniel@iogearbox.net>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20251020162355.136118-14-daniel@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251021133918.500380-1-a.melnychenko@vyos.io>
+ <20251021133918.500380-2-a.melnychenko@vyos.io> <aPeZ_4bano8JJigk@strlen.de>
+ <aPghQ2-QVkeNgib1@calendula> <aPi8h_Ervgips4X4@strlen.de>
+In-Reply-To: <aPi8h_Ervgips4X4@strlen.de>
+From: Andrii Melnychenko <a.melnychenko@vyos.io>
+Date: Wed, 22 Oct 2025 15:01:50 +0200
+X-Gm-Features: AS18NWCJ-LY11lV6XRcH3jguswzoDQqltcrK4QfPMuRXpo5tSQWNpGqcBGGDgzU
+Message-ID: <CANhDHd_iPWgSuxi-6EVWE2HVbFUKqfuGoo-p_vcZgNst=RSqCA@mail.gmail.com>
+Subject: Re: [PATCH v3 1/1] nft_ct: Added nfct_seqadj_ext_add() for NAT'ed conntrack.
+To: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, kadlec@netfilter.org, phil@nwl.cc, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 10/20/25 19:23, Daniel Borkmann wrote:
-> From: David Wei <dw@davidwei.uk>
-> 
-> Implement rtnl_link_ops->alloc that allows the number of rx queues to be
-> set when netkit is created. By default, netkit has only a single rxq (and
-> single txq). The number of queues is deliberately not allowed to be changed
-> via ethtool -L and is fixed for the lifetime of a netkit instance.
-> 
-> For netkit device creation, numrxqueues with larger than one rxq can be
-> specified. These rxqs are then mappable to real rxqs in physical netdevs:
-> 
->   ip link add type netkit peer numrxqueues 64      # for device pair
->   ip link add numrxqueues 64 type netkit single    # for single device
-> 
-> The limit of numrxqueues for netkit is currently set to 256, which allows
-> binding multiple real rxqs from physical netdevs.
-> 
-> The implementation of ndo_queue_create() adds a new rxq during the bind
-> queue operation. We allow to create queues either in single device mode or
-> for the case of dual device mode for the netkit peer device which gets
-> placed into the target network namespace. For dual device mode the bind
-> against the primary device does not make sense for the targeted use cases,
-> and therefore gets rejected.
-> 
-> We also need to add a lockdep class for netkit, such that lockdep does
-> not trip over us, similarly done as in commit 0bef512012b1 ("net: add
-> netdev_lockdep_set_classes() to virtual drivers").
-> 
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> Co-developed-by: Daniel Borkmann <daniel@iogearbox.net>
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> ---
->  drivers/net/netkit.c | 129 +++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 117 insertions(+), 12 deletions(-)
-> 
+Hi all,
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+> BTW, this fixes DNAT case, but SNAT case is still broken because flag
+> is set at a later stage, right?
 
+I've checked SNAT with the "PORT" FTP command - didn't reproduce the bug.
+I assume that `nft_nat_eval()` -> `nf_nat_setup_info()` sets up seqadj
+for the SNAT case.
 
