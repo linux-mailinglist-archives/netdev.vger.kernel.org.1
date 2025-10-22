@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-231861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34295BFE011
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 21:18:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11D4FBFE005
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 21:18:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F2EA44FDD15
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 19:18:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DDB7189D46F
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 19:18:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F33351FAC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577D0351FC1;
 	Wed, 22 Oct 2025 19:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iLvgQVsV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BW0N37DG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3BCF351FA0
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 19:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332DE351FB8
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 19:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761160641; cv=none; b=XPoIyiA4f2A85lSkOld9pdMx9U0Jw3aigLCxz7etgR6cDRc1+hcP34chwgnwfSTakUcy6ulfa2K0KQDQ10v7a1rP6rbKiPKPt49f4duzage4vuETvufBiS11JUnRaQSzypgvwYoIv5sSgO7ko78GmF22Im2aafRHqgZwa3MwW2Y=
+	t=1761160642; cv=none; b=uprKaPr6quU2/odtjuMcQoSgo7CgJasqcTVuo3ROioSjxlqDnFXJmBxAQJzPWh7tY5SCKb1MqdyyAGggN3EJ3iIAqwp4ekhKWPvggRUKf+lGZofr9YYPyYVoh5VigXA+x6WRysnuKZ1EMPEQzxC1P4c+y4mztys77PhW+vfsNCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761160641; c=relaxed/simple;
-	bh=mUN3BTWKGPONvfCEKmAW81IPY0gWokVgHv/p/7PSRpc=;
+	s=arc-20240116; t=1761160642; c=relaxed/simple;
+	bh=wZgkyP6uwuVcYDn8ubYgpRBva77PdbGATa3CZpOz9RQ=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b+Oxnsah8qyT841H8AyIW8+lVI86RD6FSugMfKsXL+sBoRsuuJScP3SXuiQNew3P3xacK/yBupowWvN+/oUaHTnwAnF37fA2bHOHGMhjQXXeTCSi4GWrgVWyI00Rm1/fmk5DfvfTj8PYy6jfn6YUh+7WF4925FLpho+zmnupTO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iLvgQVsV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96932C4CEF7
+	 MIME-Version; b=S2GR5Q544ABheH7A9q6Ok2LlA0sFfixd1UNaD7kyNk8GEYABqV2IxzCjujLPIEDPwM/ZxUwtFFsKKKHfmOM3OnR1qW+RwAtBV2OWIEEC0ovV7uzFb7GQC/Y6Duf6UorbKi7AvsFgSl67hWNHeWIgMNepkFtuWj1MNXguwo5JTdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BW0N37DG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA67DC4CEE7
 	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 19:17:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761160641;
-	bh=mUN3BTWKGPONvfCEKmAW81IPY0gWokVgHv/p/7PSRpc=;
+	s=k20201202; t=1761160642;
+	bh=wZgkyP6uwuVcYDn8ubYgpRBva77PdbGATa3CZpOz9RQ=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=iLvgQVsVtTaUAZSRbra7DTaMbmH0t8jsOILqHgn1zGD+xQVQB70goJz/wN8D/QQ/s
-	 M//jwcPyyWp/etJlZIRelTWDqEmPpogxSFkmaIt1BptOmeoHdcGH2TsFrOPhKUeqV+
-	 853JVRfmNP8vPA2gjeqkdRnGRdvZZwDqjUxK9c2yKtzfSGKNnpdYxQpWIHafIJdlQX
-	 KTzNCcHsD6WRXZpbUNlAq3f/6FdJyeR42CqHdyP/PbAM5Qx6j6AdGB1DD8bgxpUN/Z
-	 YhQjh270coguyi064HyDDdwF/zDrVMpH3Ju9SHvtFegUQDQbrUHf3hCBEXVDy0Es4X
-	 KWa60QVkIOmpw==
+	b=BW0N37DG+8Ahnj+xAgAwUjCtWXgW1hSR1R47yjEPOaaa+PuOmBbLrsTDapu3jemPd
+	 YKsZkpz0oAv4uINy86cofDVsNK3uNRAwMexvrbhNdkx1dJZx/k3KbPAyu8s3zsamv4
+	 MRRBOm74/alNLE4KJ7+OPNrVVJEczJCuNYnYbMALhjTt6VFDnF4JLeIHwuaDVvgQsg
+	 9a3T0wvIEakXtWXzKRzN/MzfWXahTTq2yq2EAVI+sMD7bAG5qqr6AD3oGFn/NahE5S
+	 1lpKWom5irkFPnSd5BHOHefl43pgDrGVq3tb2mquO7N4iqACZYz9AWKxmZ19LAr+nY
+	 m+9Yq0U9vt0iw==
 From: Allison Henderson <achender@kernel.org>
 To: netdev@vger.kernel.org
-Subject: [RFC 14/15] net/rds: Use proper peer port number even when not connected
-Date: Wed, 22 Oct 2025 12:17:14 -0700
-Message-ID: <20251022191715.157755-15-achender@kernel.org>
+Subject: [RFC 15/15] net/rds: rds_sendmsg should not discard payload_len
+Date: Wed, 22 Oct 2025 12:17:15 -0700
+Message-ID: <20251022191715.157755-16-achender@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251022191715.157755-1-achender@kernel.org>
 References: <20251022191715.157755-1-achender@kernel.org>
@@ -57,49 +57,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Greg Jumper <greg.jumper@oracle.com>
+From: Allison Henderson <allison.henderson@oracle.com>
 
-The function rds_tcp_get_peer_sport() should return the peer port of a
-socket, even when the socket is not currently connected, so that RDS
-can reliably determine the MPRDS "lane" corresponding to the port.
+Commit 3db6e0d172c9 ("rds: use RCU to synchronize work-enqueue with
+connection teardown") modifies rds_sendmsg to avoid enqueueing work
+while a tear down is in progress. However, it also changed the return
+value of rds_sendmsg to that of rds_send_xmit instead of the
+payload_len. This means the user may incorrectly receive errno values
+when it should have simply received a payload of 0 while the peer
+attempts a reconnections.  So this patch corrects the teardown handling
+code to only use the out error path in that case, thus restoring the
+original payload_len return value.
 
-rds_tcp_get_peer_sport() calls kernel_getpeername() to get the port
-number; however, when paths between endpoints frequently drop and
-reconnect, kernel_getpeername() can return -ENOTCONN, causing
-rds_tcp_get_peer_sport() to return an error, and ultimately causing
-RDS to use the wrong lane for a port when reconnecting to a peer.
-
-This patch modifies rds_tcp_get_peer_sport() to directly call the
-socket-specific get-name function (inet_getname() in this case) that
-kernel_getpeername() also calls.  The socket-specific function offers
-an additional argument which, when set to a value greater than 1,
-causes the function to return the socket's peer name even when the
-socket is not connected, which in turn allows rds_tcp_get_peer_sport()
-to return the correct port number.
-
-Signed-off-by: Greg Jumper <greg.jumper@oracle.com>
+Fixes: 3db6e0d172c9 ("rds: use RCU to synchronize work-enqueue with connection teardown")
 Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
 ---
- net/rds/tcp_listen.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ net/rds/send.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index f46bdfbd0834..db87a3e1bd5c 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -67,7 +67,11 @@ rds_tcp_get_peer_sport(struct socket *sock)
- 	} saddr;
- 	int sport;
+diff --git a/net/rds/send.c b/net/rds/send.c
+index 8b051f1dfc6a..3d0d914eb027 100644
+--- a/net/rds/send.c
++++ b/net/rds/send.c
+@@ -1418,9 +1418,11 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
+ 		else
+ 			queue_delayed_work(cpath->cp_wq, &cpath->cp_send_w, 1);
+ 		rcu_read_unlock();
++
++		if (ret)
++			goto out;
+ 	}
+-	if (ret)
+-		goto out;
++
+ 	rds_message_put(rm);
  
--	if (kernel_getpeername(sock, &saddr.addr) >= 0) {
-+	/* Call the socket's getname() function (inet_getname() in this case)
-+	 * with a final argument greater than 1 to get the peer's port
-+	 * regardless of whether the socket is currently connected.
-+	 */
-+	if (sock->ops->getname(sock, &saddr.addr, 2) >= 0) {
- 		switch (saddr.addr.sa_family) {
- 		case AF_INET:
- 			sport = ntohs(saddr.sin.sin_port);
+ 	for (ind = 0; ind < vct.indx; ind++)
 -- 
 2.43.0
 
