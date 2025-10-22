@@ -1,81 +1,43 @@
-Return-Path: <netdev+bounces-231630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 725BDBFBAA7
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:37:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CCCFBBFBBAC
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:51:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D0B83AAA54
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:37:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8627A582891
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:51:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B1633DEF2;
-	Wed, 22 Oct 2025 11:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WnqcW51w"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F59D30F7FA;
+	Wed, 22 Oct 2025 11:51:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60607350A1E
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E94D30CDB6
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761133054; cv=none; b=UibVz9LV+PwHS9qkc5xbzV0oIHLWD3DAx0gthaq/ERW6zAQKWKNIlBSxN2t/3VT4yifyHXQcbNoF6kBgvDSv4mTXDg+8+Ow479yT7aPt2DmL4a5qKTNzeJbFCWYEhavIpSYmINb/PosFf1Okb/XPq4tWdMhfN8Tr8XPcPs3DN0w=
+	t=1761133861; cv=none; b=bXCmClayqreruAUzaCbzDPrv2jb0WaBpGr2gha6JGiBT9xh0i/n9vfCww53dUvjSpoGcyAi/6xCktbLqSlnsWdI5uVwJZ4fttVbog1hbX+9yt9wJetWXE0AYyVv2GQfXzih+WWfqUua85lte/lpuG0m536ZzNgga8pN5HAL3avQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761133054; c=relaxed/simple;
-	bh=FG/sqVsd+Fkf+vzSHEKocUTNSQsoT3V83aU84GAKYY8=;
+	s=arc-20240116; t=1761133861; c=relaxed/simple;
+	bh=/Vb5L+H+waTMoBTEsYOOaYJ/2i7JrVSEP8Zd/yI6hBU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SDm7Yk+XINKuR70bnK1/gWDJmmGoGc2sktD6ofuIU5S3LTJBhN6HCQuu2h4+q7WPANb1h9XNDqtrm4MvobeF2w973ZLd6Eql6IuUsLkp4lYwW7veAm+t/a17QosaRlFJU+3yhe+N1O3NfrrLZ2fO6bSHquDzw5wLdWeWA/5hWVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WnqcW51w; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-471066cfc2aso20014255e9.0
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 04:37:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761133052; x=1761737852; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0FtzE1rGRbv5DLLs6IdqszbOo09k06GGLQDtP8qxuLo=;
-        b=WnqcW51weQjU3Gms5L0SW1ZFHWG+92KccPkiO40aEri/GJwAudkF8Um6MwChdcpyse
-         8/8LuAkj65yHcdzQoRu9d3swlL2bDbl4iWk8UpIYdBo6PPn5zvhR7YUu3lRgTGSe638Q
-         c75CbpMuMegPz2F5YqTOB4xTbxOhsE3094pggEsB5zuP9Bs1lBsjxAPcLh6wCsHwkdHe
-         9FKJUOppNWQLfBVp5irZ2FZE35N++Zi7usoQ79Gury3+kr38Cz+rectEPHUygxmG3v3S
-         TkNlEbFUCQbNax1EU0vNTy111DThxkdlSmyJrJM6Gt5VjFSXK/Jnlm4YLy9OoH7DD/P+
-         O5tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761133052; x=1761737852;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0FtzE1rGRbv5DLLs6IdqszbOo09k06GGLQDtP8qxuLo=;
-        b=VT2Pit+vPAYCrfqmglDedecVeiPBITVxOhNMHVu3oNZCa3gboKnm41J8jqhLUT26SR
-         EB7T7r/1nn8qG/J05ibvYPk62Fpi6ia7dAGJKL4lW3uGtqoDANJ/RbWQbnQWtXDFknoM
-         qqNolVTTQER17RiPbepNJ5W4xhTduHHKRP3h4Tkj4ft9sqdSprVMd4KCK6yvjBoj4FHP
-         xeVf8kgIDB7KtnEaluKblVTxGEOU3D9JPoPWIkwWxd+bcvnNUzaBduO5hyhz1dmR+OOI
-         f1HC9UszfpJ7CUGEcBawn9CrN1+pqwPANfAOqKWypZTcDbFS57CKXhgoBdTSaxEKwkkr
-         33qw==
-X-Forwarded-Encrypted: i=1; AJvYcCUqWUWlwrdtGdLwcqBZbqTkOjLPiD2ng2h7a/sD6AwEVRGyv7Gly7lh5LchiUO/oGoxwJvad8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy24q921c8LJ89oQvF1PJwB+gswLWELhQ3g/gt5MswbKF77GugB
-	9KjBL+4BvRKekO0+98Y9Z9tMgLbS6h6DCGSoo2Hz1Rs3gaoxo3L2ZhW19mjSPA==
-X-Gm-Gg: ASbGnctZJZBKAWBuWUmU8MhLUYZ1+XWbu4gBIbiuIcwiEd+Pc1T1csCnbphaK5gf7St
-	6kY40z7sbqMA/kMXuh+4gZGFiY9CVi6DKgblv9KxsoakeK+PpTOO14U+QcdV/CPOD6l6umCFwTk
-	sOY0jLrsHH66fNGLyvDBaXKIwvvSLfBbfnC6oJvJtmCSYFrnr+cEzaUIZ8bQWEhwjvJvu9tC1qE
-	TGTW7T4gLlHPVd7/NHmem0Ji7BSNPUAvNrwV3plX6RLLvOs/rG6aWUh5+X4D1HdY3bIcRCyASd8
-	eiMMGEzQqbelzyyK2I8AL0CUxOrUTjJedO5mE24dK3GXqPsIVKQrW9ORoaSOQ7xUNSl2rI/6bA1
-	f0t+EC3UQ1oLu2QKxgOER9uJlU+xzjal/YU9pMQnVi59owd7FvVlUMW5f8mldVMprKWz8n+Tvam
-	2WWsM22iCtCzjKLd8iQiFZabyJW67km7AinYSebq5cylY=
-X-Google-Smtp-Source: AGHT+IF1K9hk2a0iyyh3ud+8OPJTCJbS/H5dwBoY8Q+Fhh4l8AUQ8L0NbvpOr/KEqwF+bTLI+BK+gg==
-X-Received: by 2002:a05:600c:3104:b0:46e:1fb9:5497 with SMTP id 5b1f17b1804b1-471178a5c6emr144735275e9.18.1761133051582;
-        Wed, 22 Oct 2025 04:37:31 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:b576])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47494ac30b4sm36090325e9.2.2025.10.22.04.37.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Oct 2025 04:37:30 -0700 (PDT)
-Message-ID: <60d18b98-6a25-4db7-a4c6-0c86d6c4f787@gmail.com>
-Date: Wed, 22 Oct 2025 12:38:56 +0100
+	 In-Reply-To:Content-Type; b=D1coGlD3+iqrKRhh3rX0AUIkY8KEIw8egfzddYQw26+ZimpoCDoOwFUStZQ4QFrCE2qZEA+sc/wtSpM9bHlOhyzWJIhuLSBUaMmCFBVEZ+qrHWqkacTCvhCWJUHEXtM1hzFlCo7Ah/Co++UARHBKSlmQmcRjcZM29BEN3Tr5yWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [134.104.50.123] (unknown [134.104.50.123])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 6824760213CB5;
+	Wed, 22 Oct 2025 13:49:58 +0200 (CEST)
+Message-ID: <0c62b505-abe7-474e-9859-a301f4104eeb@molgen.mpg.de>
+Date: Wed, 22 Oct 2025 13:49:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,43 +45,98 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] io_uring zcrx: add MAINTAINERS entry
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>
-References: <20251021202944.3877502-1-dw@davidwei.uk>
+Subject: Re: [Intel-wired-lan] [PATCH] i40e: avoid redundant VF link state
+ updates
+To: Robert Malz <robert.malz@canonical.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ Jamie Bainbridge <jamie.bainbridge@gmail.com>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ Dennis Chen <dechen@redhat.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Lukasz Czapnik <lukasz.czapnik@intel.com>,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, Simon Horman <horms@kernel.org>,
+ Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>
+References: <20251021154439.180838-1-robert.malz@canonical.com>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20251021202944.3877502-1-dw@davidwei.uk>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251021154439.180838-1-robert.malz@canonical.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/21/25 21:29, David Wei wrote:
-> Same as [1] but also with netdev@ as an additional mailing list.
-> io_uring zero copy receive is of particular interest to netdev
-> participants too, given its tight integration to netdev core.
+Dear Robert,
 
-David, I can guess why you sent it, but it doesn't address the bigger
-problem on the networking side. Specifically, why patches were blocked
-due to a rule that had not been voiced before and remained blocked even
-after pointing this out? And why accusations against me with the same
-circumstances, which I equate to defamation, were left as is without
-any retraction? To avoid miscommunication, those are questions to Jakub
-and specifically about the v3 of the large buffer patchset without
-starting a discussion here on later revisions.
 
-Without that cleared, considering that compliance with the new rule
-was tried and lead to no results, this behaviour can only be accounted
-to malice, and it's hard to see what cooperation is there to be had as
-there is no indication Jakub is going to stop maliciously blocking
-my work.
+Thank you for your patch.
 
-In general, if I'm as a patch submitter asked to follow rules, it's
-only natural to assume there is a process and rules maintainers keep to
-as well. And I'd believe that includes unbiased treatment and technical
-merit rather than decision based on mood of the day.
+Am 21.10.25 um 17:44 schrieb Robert Malz:
+> From: Jay Vosburgh <jay.vosburgh@canonical.com>
+> 
+> Multiple sources can request VF link state changes with identical
+> parameters. For example, Neutron may request to set the VF link state to
 
--- 
-Pavel Begunkov
+What is Neutron?
 
+> IFLA_VF_LINK_STATE_AUTO during every initialization or user can issue:
+> `ip link set <ifname> vf 0 state auto` multiple times. Currently, the i40e
+> driver processes each of these requests, even if the requested state is
+> the same as the current one. This leads to unnecessary VF resets and can
+> cause performance degradation or instability in the VF driver - particularly
+> in DPDK environment.
+
+What is DPDK?
+
+> With this patch i40e will skip VF link state change requests when the
+> desired link state matches the current configuration. This prevents
+> unnecessary VF resets and reduces PF-VF communication overhead.
+
+Add a test (with `ip link …`) case to show, that it works now.
+
+> Co-developed-by: Robert Malz <robert.malz@canonical.com>
+> Signed-off-by: Robert Malz <robert.malz@canonical.com>
+> Signed-off-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+> ---
+>   drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> index 081a4526a2f0..0fe0d52c796b 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> @@ -4788,6 +4788,7 @@ int i40e_ndo_set_vf_link_state(struct net_device *netdev, int vf_id, int link)
+>   	unsigned long q_map;
+>   	struct i40e_vf *vf;
+>   	int abs_vf_id;
+> +	int old_link;
+>   	int ret = 0;
+>   	int tmp;
+>   
+> @@ -4806,6 +4807,17 @@ int i40e_ndo_set_vf_link_state(struct net_device *netdev, int vf_id, int link)
+>   	vf = &pf->vf[vf_id];
+>   	abs_vf_id = vf->vf_id + hw->func_caps.vf_base_id;
+>   
+> +	/* skip VF link state change if requested state is already set */
+> +	if (!vf->link_forced)
+> +		old_link = IFLA_VF_LINK_STATE_AUTO;
+> +	else if (vf->link_up)
+> +		old_link = IFLA_VF_LINK_STATE_ENABLE;
+> +	else
+> +		old_link = IFLA_VF_LINK_STATE_DISABLE;
+> +
+> +	if (link == old_link)
+> +		goto error_out;
+
+Should a debug message be added?
+
+> +
+>   	pfe.event = VIRTCHNL_EVENT_LINK_CHANGE;
+>   	pfe.severity = PF_EVENT_SEVERITY_INFO;
+>   
+
+
+Kind regards,
+
+Paul
 
