@@ -1,585 +1,232 @@
-Return-Path: <netdev+bounces-231629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18827BFBA41
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:28:35 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C21A5BFBAB0
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 13:38:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E12AB4E5DA4
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:28:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5FDF14E2A29
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 11:38:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36DF33893B;
-	Wed, 22 Oct 2025 11:28:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8DC33DEFC;
+	Wed, 22 Oct 2025 11:38:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n9PIp5N/"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Wk3ZUkaH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010005.outbound.protection.outlook.com [52.101.61.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9112338921;
-	Wed, 22 Oct 2025 11:28:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761132509; cv=none; b=NmNnzVGw/F+coKJbVsKgboskw9bgxZjncrZ8KiCMzLh3f19vaQb9IHgoBRl5d70nYpNqAEv4MsTWcuraGHYFTpF4cHvB5ps78xD9SqIo+ZFbVBT4yslKzbgbM8GkC40qOjISGAS0d3t5IAVUuuMf/8+tZcY+Sd6ab4R0dcPBXTY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761132509; c=relaxed/simple;
-	bh=HK1tER5cJLrWKlUVFJYX8QkxT3I0HTQ78VkpAXwtlr8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TxyGWwcMb35R5smyN2Sb5QhkfAd3HDi8fPH5Dw/WHTNrD3xjbJ+dig97SUfIqIorJ9rS5deAFruJw5ajNlteieHlsTBeA2wJKOnBSkvHARb9+f/0MqynvL8a4cvRjTxId8ixzYgGOOASl5ng2XuovH3WaCp0AK5odkA6C/jBF0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n9PIp5N/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B41CC4CEE7;
-	Wed, 22 Oct 2025 11:28:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761132509;
-	bh=HK1tER5cJLrWKlUVFJYX8QkxT3I0HTQ78VkpAXwtlr8=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=n9PIp5N/BVCWCCa5XvkyUCnRt6OfkY9w1GbNWtn2n+58DrvENuEcmO7QJbIwNwtr3
-	 0p8lVbbyWdFt3C9SKvoeZlPlpSHwYVJqtRwQ8Z4SJ6kzMf/bYXyP0VhWkAxjGW+QWl
-	 sv/nD78o1DaH5ULLGtElE2Jq6XPuNVCQ1YuC6oOGA5uFVoZJlr757IilyWYsAHUD1i
-	 ULF51+L4ug3zTYc33IGIHvMSKgJ4SlM1sNZxbxsQfliYU7TyVlrT19C47cMVwt2gEu
-	 cnra04n+brdS0b0gizaQywLdIgGkjmlklUGEdSYLcMcWJH0OrRAhq5uTzTFNMVlQds
-	 jrlVYOc1+v3uQ==
-Message-ID: <97bb1f9baba905e0e8bde62cce858b0def091d5c.camel@kernel.org>
-Subject: Re: [PATCH RFC DRAFT 00/50] nstree: listns()
-From: Jeff Layton <jlayton@kernel.org>
-To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org, 
- Josef Bacik <josef@toxicpanda.com>
-Cc: Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, Zbigniew
- =?UTF-8?Q?J=C4=99drzejewski-Szmek?=	 <zbyszek@in.waw.pl>, Lennart
- Poettering <mzxreary@0pointer.de>, Daan De Meyer	
- <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, Amir
- Goldstein	 <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner
-	 <hannes@cmpxchg.org>, Thomas Gleixner <tglx@linutronix.de>, Alexander Viro
-	 <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, bpf@vger.kernel.org,
-  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, Arnd Bergmann	 <arnd@arndb.de>
-Date: Wed, 22 Oct 2025 07:28:26 -0400
-In-Reply-To: <20251021-work-namespace-nstree-listns-v1-0-ad44261a8a5b@kernel.org>
-References: 
-	<20251021-work-namespace-nstree-listns-v1-0-ad44261a8a5b@kernel.org>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA0132A3E5;
+	Wed, 22 Oct 2025 11:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.5
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761133105; cv=fail; b=N85zPHVKiqlF0BPcmZtn1Nkwq3moYc3bH09YcLuJVOeDQ15rDFMf0iDdxxGXq9pxaPM15EPTsS+aCzs/shX8AT2qWPRau6t3E6wsFjqEwGxqng7RMz3toA/WNQA6cw1WuM0/GmgnUcYvuprBfdOGbz6HbbJ8fbRtJf+Ry6pdHTU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761133105; c=relaxed/simple;
+	bh=QD5sKv+t+FkdFQ9bNLJlZ1s+ryO36WpM/UoCnXPqNJo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ta576te1rIwsLHM1Rl2z2xoSUolwgq9FBalLVbvjMj9k9ua5Df3VpaAahsUC8jXyujdbJEIpHzgm+5zvBADHFWONEVBox3ki4zRagmzbCm/0+4X4CDDI8/OCYSyHjc/j2MrXMxUZaQBcJ1su4gWRNnpTIuHtsIC6k6O4Jj88PT8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Wk3ZUkaH; arc=fail smtp.client-ip=52.101.61.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=O3O7fg1ii4N5neFtzUj8jkHznWYktmyBoHerOBBifPFxdWw/XCRpuLnaIDrD56W6ltIr21dL3cHzTAfbfiR1pDucV53+Ueia42XHEbc2RPRvBhJj84vhnIMOk5EgC4arEVNsqOhTP7fRt73DOitVhcdeWVVTwH/cYyaH9dSn/eeIoq1wh724GeyYwB5ffVGEZIfij9PC8dsPRAA2wnNBiz/EGDXeMlyiz6Vjd0SiavyIGR3TckrPwXcapDJlF1ANlh/bplIbmfhNxjwR6Vny2h83YXxnKIEbeX5XUpKZwP1I6DqBZCIzLX8ykhKrUoSFvFOlqaG0zugma7R9cu1B7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QjHYUnntTKHvZLJJhPO2JhDY5/OopOUCuY0HJbQE8AY=;
+ b=weMG3LUMqoj4jwpbC+b86YFOeTE95KHQDeVbt2e2xh2/wAAFy/C94miGkvNgl0g1jct2D8gS170J26e+lvWSGBoZvZ8/YP/9QrXZ7LOhgdLm1cChuTLtTHQmJJpDe1nJjMWoaamEVQJdSMiaBCsR8zJRJfipn8pr5bl1suOSVfuodV/Ntj4UN/289D/3bPTDzqvAVxd82kASWiqhQc0REXfPZHEc/zs6lroR8d6wkiKWButnXhWJ4x516+3/b4Vs9Yi2NSBRdoIrL9ATyHZepyEo1Qck6h5gFS+p0AYxX/217nYoQr8cuGdjsqAl83N/aLd7eI1DS6xjSgJVU5DDKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QjHYUnntTKHvZLJJhPO2JhDY5/OopOUCuY0HJbQE8AY=;
+ b=Wk3ZUkaHqW9ykZbf3Fy/ijGpdpKazJONWoJicvcfoBV+eV0XjA0hfsSbajv8z2fxMslrdfBWYQL3v+ZtZhNoKtKDJDqu6vZ+WJnWll+tBjsziMc15o0CJedmdZfhEhWS9D+cyaT0pIEOOr2g0l/sBstfvJLCbE37RRwO0Y085JH/Ssx3PazdwJV1cfiU1q5TKztdIpUF6aPAlY9t0WcS1LDIzlgR3rp+FWKTt25q/kOZcDDlYGvLG1CBPfqKBZWRuDT6XM9hmTxsBN7nOb9cKzogzHTvxlrARKYvJvMuWwcKLk/6VGU7YI6rDjBFaBIuTLfHxEbILUL14VTIgIej5g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5505.namprd12.prod.outlook.com (2603:10b6:208:1ce::7)
+ by DS0PR12MB7654.namprd12.prod.outlook.com (2603:10b6:8:11d::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.12; Wed, 22 Oct
+ 2025 11:38:20 +0000
+Received: from BL0PR12MB5505.namprd12.prod.outlook.com
+ ([fe80::9329:96cf:507a:eb21]) by BL0PR12MB5505.namprd12.prod.outlook.com
+ ([fe80::9329:96cf:507a:eb21%4]) with mapi id 15.20.9253.011; Wed, 22 Oct 2025
+ 11:38:20 +0000
+Message-ID: <ae854fd5-dda1-416a-9327-ac8f9f7d25ba@nvidia.com>
+Date: Wed, 22 Oct 2025 14:38:17 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net V2 2/3] net: tls: Cancel RX async resync request on
+ rdc_delta overflow
+To: Sabrina Dubroca <sd@queasysnail.net>, Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+ John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Gal Pressman <gal@nvidia.com>
+References: <1760943954-909301-1-git-send-email-tariqt@nvidia.com>
+ <1760943954-909301-3-git-send-email-tariqt@nvidia.com>
+ <aPemno8TB-McfE24@krikkit>
+Content-Language: en-US
+From: Shahar Shitrit <shshitrit@nvidia.com>
+In-Reply-To: <aPemno8TB-McfE24@krikkit>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL0P290CA0001.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::15) To BL0PR12MB5505.namprd12.prod.outlook.com
+ (2603:10b6:208:1ce::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL0PR12MB5505:EE_|DS0PR12MB7654:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52311fd6-4bde-408b-5bd4-08de115f7fff
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?R3F6NnZqbWR5cFpzNUNIdDloemh4YVZvSmxFZFdLdzlOQU1BS3lYSThDYWZU?=
+ =?utf-8?B?eUxIQTVxbU5vK0hxelR0VDlKVXZKMkR3QmFFSUZUZ0g3d3B6YWVFM0ZBalFj?=
+ =?utf-8?B?T2xUd3kzcVZrR1VtNERkNnUyOXVjZ1VWYStxWmpFdExlUzA1Q1ZzTTBpUG1x?=
+ =?utf-8?B?WG1NUGxBemRzUitkcXpMemwzdG04Ry8rRVhhcGZRNWlNdnhEN0pEeTRIcVJi?=
+ =?utf-8?B?VVZIclh3RGRHd0pJNEpzNGllcHQ5eVVCUUZRWTJBNWdOSHRyaENMTEsvNS84?=
+ =?utf-8?B?LzNncFJ0NFIwR2lSN3hma0JVc1U1Q0VNMXVUaWhlU3FIZ2JoV2VoRU4yQ3B3?=
+ =?utf-8?B?S1NHekl3SlVDQUFkMVhmc1hsTGo3a2ZmSm5GWm5nRW5QakZuMGdabTc5Uk51?=
+ =?utf-8?B?WHZIT3U1NTZYQjhLRmJUdHd5d3JnOUdKa2EybllTTW5xVXB3VEt4ZGpvRkVO?=
+ =?utf-8?B?TDIvdkdOTHVwUkZOMEI0RWwxOGtSdGNsV3hyYXRnOCtVTFVmZFl4SmNBaFMz?=
+ =?utf-8?B?b3VJVTMxdkIzdmN1R0gvc2NZQVluUkpvMjk2cFd0VTh5TXJLejJGTmV3TGNj?=
+ =?utf-8?B?SVJJL1pMalRuK2JtaXVKNlA3ZllYc2ZBMkZ5YkN4R2h2dXJEZUtRSjFEYlhi?=
+ =?utf-8?B?T0N2alJkR0wrdWJuREI1aCtTSHBTbENUUmhLVnJDa2MxNXMwODlDRlZ5UmF5?=
+ =?utf-8?B?Q2srM3NkNmZCdWFRZytOZ0VaeFFwYUYvVHpiazA3SG1WMmFrZ3NSTEg4TmxH?=
+ =?utf-8?B?NkFTRFFscTFRRWlMRVBhSW52ODN5ZDFFeFUyWWdsU0J5YzhHeHd6UjdyNFNw?=
+ =?utf-8?B?UTZaaVNDaDRCOHRoeGY0RU95c3A1RDZvTmJOc3ZNaFF2aXo0ZGVxajU2aHR3?=
+ =?utf-8?B?SjcwSVFobnlMbXNGaFZNZWdIT054cWdFSHFQbUJEZzUyNTM2V0FWMlJFMVdC?=
+ =?utf-8?B?WHVsOHorazdZUXZGYlhyNGd3V2FLS2JhQ2xGK2RhWVpIMllJVlhhK0ZacWpU?=
+ =?utf-8?B?UW9XV3J6SlRnVlNGVlBmbTZvY05GMC85OFJFejVzMm9nTHFzaHd2ZDZxMFRD?=
+ =?utf-8?B?anlFbG5yZGtDMjFUNjZKcE4rNUZFZjhjVzVFMFpnVGFEay9HY0hCUHVybkw0?=
+ =?utf-8?B?ZTZ4WEZZNWRVbGRsTlA0RHlqVlJXeDgycmlveEE2dE1mcjB3Y0ZVMlF1WUo5?=
+ =?utf-8?B?Nk5sN3MyVHhubmxSOFlNUjluM2JseFQzNkh0aVU0MmlaWWJMUVRHSXZQOU1Z?=
+ =?utf-8?B?TWxHS3dXMDVyN0NQZDRKc0dJbE9tSVhuV0g3WDBjRGZxejBJdWJCZ0RuWTRP?=
+ =?utf-8?B?MWw1UWc0MFZFblkxYy9pa1J3M1gvSWlLc1FaQW9CbVppNEY0NVlBYmI2blVD?=
+ =?utf-8?B?SkJNYlhseUpUN2M4K0Y5TkVDTUZEQkI4NVJCd1o4WVUybXU5a0VTdGhMSnor?=
+ =?utf-8?B?MWdBUHNmUjRsVXIzZ3hWZ0w2aWtPbUtFeUd5WjhxT2l4Vm5udFJMQXJvdlF6?=
+ =?utf-8?B?U2g1aGxuanQ2UmJJZXVCTVZDR0MxMFJLUWFqVXlLN01FTFltaytiQnF0WXpz?=
+ =?utf-8?B?Y1lMMnNYVTF5NWFINHM2SmtCNlozR3hob1N5c2tZbGRMWXNOMXRYeDB2MzhF?=
+ =?utf-8?B?cGtRSm40bzc2bGtwN2FrV0ZuUTVkY05HTUNPUzJIeE1ObjlNMVYvUllia1Jk?=
+ =?utf-8?B?Y2FBSi81RTNsT1NEeW92SlFQYUJOdjVha3BhSmVBck9pZWlkMW9qc0x3WUll?=
+ =?utf-8?B?MEVnRDZHbm40a0Y4Ty9HLzJCSEp0S25iTG8rbDNsS0JDOSthTnN5LzVYQW5r?=
+ =?utf-8?B?OGFNUjJPRFNySFExV0R1UEcxVUZSQlFLN2pKdlBkUkFrUEhoZkxUQ1VoQWZY?=
+ =?utf-8?B?MDdKTG82TElhMFNGdXljY0xJR0ZyR3pRcFdPTHNYYXU1ckl5N3FVUkdBWVFy?=
+ =?utf-8?Q?2EqB7aYpWzqQFX/M+jxulUcdLgArWzNX?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5505.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?QmZOTlZzZGxnd3RvUnRYZ0hJMEowTWNsQW8vdU5XeGhIek1OeG9ZelFxN2pl?=
+ =?utf-8?B?cGZaOHlSenFVa2RJZjVSeVU2dWNDS1pidXRmaW1kdU1aeEIwczZGOWQyZVl6?=
+ =?utf-8?B?T1JacjNENUR3VVBYUWRsdkNJeFdCeEtaMnRHL1VUZmpxRTVMNThFVDhWdkpu?=
+ =?utf-8?B?M2VRRFFReC9zWjJTekhzUlROc0FJR1kwVlg0bk8zWkVYZjZ5cUdPck9VZ2ho?=
+ =?utf-8?B?SVc0Q3dGZXJ2WlZQN1RrSnRwOFNSc2FYL1RzOU5LQW14NElkVjhzcUMvQWhC?=
+ =?utf-8?B?cVRaQkQxRlhtWHBrU1FEbkFBVUZObzYzOWxxVWdBSEpCekFadnV5SFNPejRR?=
+ =?utf-8?B?QkkxT1NUTVR1OGxKeVRXQkU1NjhUZWI1YUZFZkRSUTVxODJtZkRpL2hiNncy?=
+ =?utf-8?B?STJMV1NsdW0ydXpJblk0dHJVL3diU0JkLzV0QVhITmRWWTEyZjF5SmJWMVhW?=
+ =?utf-8?B?SEI3cnNFM0tJL1ZFMDcrYm1pSFk0NW8vR0lvUlY2a1VtZWpyTTNkMENMNDhF?=
+ =?utf-8?B?MCtteHVPa2U3Y3FzeXNHcldsUmdQaklvNEJ4RUhFeWRkdWxEZy9BdWgrMEla?=
+ =?utf-8?B?RExyYWN3UEJPMTNyVWpiTUlrY1hVOTg2alJBeEkzWkdXTFF2YjVMYlFlUm8v?=
+ =?utf-8?B?ZG8xYzNHTWtwQk1IOWh2V0dVQzQ2MnE5OVFnc2diUERHaVdsMjRQR2RlS2Uv?=
+ =?utf-8?B?b2FLUnltc1JmM0V3ZTg2RDd2Y0FVT2VZZkpyVTR5a1A2bndiMnIwZzA5dUVE?=
+ =?utf-8?B?aU8yN253b1F6QnMyamRudFlWOGxVc3ZXaFlNU24zVWVNc0VjZUc3V0tUOUx0?=
+ =?utf-8?B?SDVRUXBPNFNYc3lBaG9RRkUwTm1KNlcxUW1TU1JlWXhmY0F4VjRKTUpzL3BC?=
+ =?utf-8?B?Z0E4WUpuNm1hVWFwdmxFUnNnT3Z5OWRPTGdOMEJRMm9yTTI5TGhnekdTdmZj?=
+ =?utf-8?B?OW9CK3BZcGU5Sjlmc20rbVM5TFVjRlhRZTkzaFg0a1gwbEZISlhRcFMwSlRz?=
+ =?utf-8?B?QXFmMnhmUjI1aUw5QjRrdUxCQ3ZwZzJ6cmJKOVV3YmVLaE1KeGhoY2VZQTlL?=
+ =?utf-8?B?WGgxVFhQUGNTVjNLTm96OU9sekZVNWFWTjRLRnJ6QlpkZE90QnJmVXViV0Ni?=
+ =?utf-8?B?TU1Xb1duRDRDSmZzTmoxdk83aVVUNzA1THRic2ZMY1F3ektPeG9RYnZEV1E1?=
+ =?utf-8?B?bEdTczNhRjVGRitBdEQybWwvbVFadm5iYTA1bUhqd2dOZ3dDVXhxWDFkYlcv?=
+ =?utf-8?B?L29GbzJGcVhSMDIwbHJRQjRhNjlkQTNZbFIxRldPRTFnZkErS2pLcS9NMGpL?=
+ =?utf-8?B?dHZGS214YmhJZzAxdWlEY2NuVHBtU0JQZ3J3VEVtMFpRdWw3YnhYTEpvYmdQ?=
+ =?utf-8?B?V0E5OWlkWURYV1VScDU5WllUQ0RqVm5OOThYSnhkZXpCODZwdjJqdE5EUkJE?=
+ =?utf-8?B?RExsVVN2OFZsQmtuT0k3QnNLR3VGbS82L3FzZUVJb0hTSFBiR1pBUC9FdU1z?=
+ =?utf-8?B?eitkTW5vRmdCR2g1OURTbUpmeEdoTDEvTmVuOVUvdE0wOGJVZG5CL3dwcy9I?=
+ =?utf-8?B?MHREcEF1VG9GQU5IR21wVW44NkRYRFAydThUZUNGSmY2WDNEWkxrOGRUcjdE?=
+ =?utf-8?B?Rll0UWpCRExqbnR6cXRtUkt5MmtIZ0xreDRFNXpRQWt3Lzk0dnVidHFESDMw?=
+ =?utf-8?B?VFNFS0NsTzZlbGttRUdhOFpZN0FmMGFTYXRtMDA5UTVSUHhSQUpvc3VKNFRl?=
+ =?utf-8?B?cS9FdE9EVUNHU0kyM3ltdW5XNDM3YkVFOWRSak1XYkQ3dkxvejhhZW45L1gy?=
+ =?utf-8?B?VWdQb2kwYWJSTlQxT0FCVGlhMWlxV3pKSlg5MVVUS0dnT2RzUzVtZTYwQW9I?=
+ =?utf-8?B?amp3V0Y4d1NFUWxLdzhJcVJaZm9WbkZqWGxwRk5uNWtGRWZiVWNYbTFDcWNI?=
+ =?utf-8?B?dWsrNlVnczNNT3JUcVI1dEg4SE9HTkdVR01ZdG9XbnUySFlBNGFpdWZKNlh1?=
+ =?utf-8?B?UEd0Mkhvemg3Q2VYTjBLZno0V0NiWHlEdkdTSitoL245Mk5uK0FtaklockNY?=
+ =?utf-8?B?bXhTSkdUN1A1dklWRGdqdnFpNDZEeUoxZU5rR2ZRNUphM1NDMHdTeHoyeURU?=
+ =?utf-8?Q?dBfdu0bpHVB9DsN3R7EZFz5/9?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52311fd6-4bde-408b-5bd4-08de115f7fff
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5505.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2025 11:38:20.2638
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: k/g1nRgZ0Jd6dZTNXyr57RuH7JFz3nV9HDYSh/sMxRQC5dqToYD0i+9orfr4MED1mBIRDNaFf/Uwbji9jBStLg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7654
 
-On Tue, 2025-10-21 at 13:43 +0200, Christian Brauner wrote:
-> Hey,
->=20
-> As announced a while ago this is the next step building on the nstree
-> work from prior cycles. There's a bunch of fixes and semantic cleanups
-> in here and a ton of tests.
->=20
-> I need helper here!: Consider the following current design:
->=20
-> Currently listns() is relying on active namespace reference counts which
-> are introduced alongside this series.
->=20
-> The active reference count of a namespace consists of the live tasks
-> that make use of this namespace and any namespace file descriptors that
-> explicitly pin the namespace.
->=20
-> Once all tasks making use of this namespace have exited or reaped, all
-> namespace file descriptors for that namespace have been closed and all
-> bind-mounts for that namespace unmounted it ceases to appear in the
-> listns() output.
->=20
-> My reason for introducing the active reference count was that namespaces
-> might obviously still be pinned internally for various reasons. For
-> example the user namespace might still be pinned because there are still
-> open files that have stashed the openers credentials in file->f_cred, or
-> the last reference might be put with an rcu delay keeping that namespace
-> active on the namespace lists.
->=20
-> But one particularly strange example is CONFIG_MMU_LAZY_TLB_REFCOUNT=3Dy.
-> Various architectures support the CONFIG_MMU_LAZY_TLB_REFCOUNT option
-> which uses lazy TLB destruction.
->=20
-> When this option is set a userspace task's struct mm_struct may be used
-> for kernel threads such as the idle task and will only be destroyed once
-> the cpu's runqueue switches back to another task. So the kernel thread
-> will take a reference on the struct mm_struct pinning it.
->=20
-> And for ptrace() based access checks struct mm_struct stashes the user
-> namespace of the task that struct mm_struct belonged to originally and
-> thus takes a reference to the users namespace and pins it.
->=20
-> So on an idle system such user namespaces can be persisted for pretty
-> arbitrary amounts of time via struct mm_struct.
->=20
-> Now, without the active reference count regulating visibility all
-> namespace that still are pinned in some way on the system will appear in
-> the listns() output and can be reopened using namespace file handles.
->=20
-> Of course that requires suitable privileges and it's not really a
-> concern per se because a task could've also persist the namespace
-> recorded in struct mm_struct explicitly and then the idle task would
-> still reuse that struct mm_struct and another task could still happily
-> setns() to it afaict and reuse it for something else.
->=20
-> The active reference count though has drawbacks itself. Namely that
-> socket files break the assumption that namespaces can only be opened if
-> there's either live processes pinning the namespace or there are file
-> descriptors open that pin the namespace itself as the socket SIOCGSKNS
-> ioctl() can be used to open a network namespace based on a socket which
-> only indirectly pins a network namespace.
->=20
-> So that punches a whole in the active reference count tracking. So this
-> will have to be handled as right now socket file descriptors that pin a
-> network namespace that don't have an active reference anymore (no live
-> processes, not explicit persistence via namespace fds) can't be used to
-> issue a SIOCGSKNS ioctl() to open the associated network namespace.
->=20
 
-Is this capability something we need to preserve? It seems like the
-fact that SIOCGSKNS works when there are no active references left
-might have been an accident. Is there a legit use-case for allowing
-that?
 
-I don't see a problem with active+passive refcounts. They're more
-complicated to deal with, but we've used them elsewhere so it's a
-pattern we all know (even if we don't necessarily love them).
+On 21/10/2025 18:28, Sabrina Dubroca wrote:
+> nit if you end up respinning, there's a typo in the subject:
+> s/rdc_delta/rcd_delta/
+> 
+> 
+> 2025-10-20, 10:05:53 +0300, Tariq Toukan wrote:
+>> From: Shahar Shitrit <shshitrit@nvidia.com>
+>>
+>> When a netdev issues a RX async resync request for a TLS connection,
+>> the TLS module handles it by logging record headers and attempting to
+>> match them to the tcp_sn provided by the device. If a match is found,
+>> the TLS module approves the tcp_sn for resynchronization.
+>>
+>> While waiting for a device response, the TLS module also increments
+>> rcd_delta each time a new TLS record is received, tracking the distance
+>> from the original resync request.
+>>
+>> However, if the device response is delayed or fails (e.g due to
+>> unstable connection and device getting out of tracking, hardware
+>> errors, resource exhaustion etc.), the TLS module keeps logging and
+>> incrementing, which can lead to a WARN() when rcd_delta exceeds the
+>> threshold.
+>>
+>> To address this, introduce tls_offload_rx_resync_async_request_cancel()
+>> to explicitly cancel resync requests when a device response failure is
+>> detected. Call this helper also as a final safeguard when rcd_delta
+>> crosses its threshold, as reaching this point implies that earlier
+>> cancellation did not occur.
+>>
+>> Fixes: 138559b9f99d ("net/tls: Fix wrong record sn in async mode of device resync")
+> 
+> The patch itself looks good, but what issue is fixed within this
+> patch? The helper will be useful in the next patch, but right now
+> we're only resetting the resync_async status. The only change I see
+> (without patch 3) is that we won't call tls_device_rx_resync_async()
+> next time we decrypt a record in SW, but it wouldn't have done
+> anything.
+> 
+> Actually, also in patch 1/3, there is no "fix" is in that patch.
+> 
 
-I'll also point out that net namespaces already have two refcounts for
-this exact reason. Do you plan to replace the passive refcount in
-struct net with the new passive refcount you're implementing here?
+I agree about patch 1/3 so I'll remove the fixes tag.
 
-> So two options I see if the api is based on ids:
->=20
-> (1) We use the active reference count and somehow also make it work with
->     sockets.
-> (2) The active reference count is not needed and we say that listns() is
->     an introspection system call anyway so we just always list
->     namespaces regardless of why they are still pinned: files,
->     mm_struct, network devices, everything is fair game.
-> (3) Throw hands up in the air and just not do it.
->=20
-
-Is listns() the only reason we'd need a active/passive refcounts? It
-seems like we might need them for other reasons (e.g. struct net).
-
-In any case, given that this is a privileged syscall, I don't
-necessarily see a problem with #2 here. Leaked namespaces can be a
-problem and we don't have good visibility into them at the moment.
-
-IMO, even if you keep the active+passive refcounts, it would be good to
-be able to tell listns() to return all the namespaces, and not just the
-ones that are still active. Maybe that can be the first flag for this
-new syscall?
-
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> Add a new listns() system call that allows userspace to iterate through
-> namespaces in the system. This provides a programmatic interface to
-> discover and inspect namespaces, enhancing existing namespace apis.
->=20
-> Currently, there is no direct way for userspace to enumerate namespaces
-> in the system. Applications must resort to scanning /proc/<pid>/ns/
-> across all processes, which is:
->=20
-> 1. Inefficient - requires iterating over all processes
-> 2. Incomplete - misses inactive namespaces that aren't attached to any
->    running process but are kept alive by file descriptors, bind mounts,
->    or parent namespace references
-> 3. Permission-heavy - requires access to /proc for many processes
-> 4. No ordering or ownership.
-> 5. No filtering per namespace type: Must always iterate and check all
->    namespaces.
->=20
-> The list goes on. The listns() system call solves these problems by
-> providing direct kernel-level enumeration of namespaces. It is similar
-> to listmount() but obviously tailored to namespaces.
->=20
-> /*
->  * @req: Pointer to struct ns_id_req specifying search parameters
->  * @ns_ids: User buffer to receive namespace IDs
->  * @nr_ns_ids: Size of ns_ids buffer (maximum number of IDs to return)
->  * @flags: Reserved for future use (must be 0)
->  */
-> ssize_t listns(const struct ns_id_req *req, u64 *ns_ids,
->                size_t nr_ns_ids, unsigned int flags);
->=20
-> Returns:
-> - On success: Number of namespace IDs written to ns_ids
-> - On error: Negative error code
->=20
-> /*
->  * @size: Structure size
->  * @ns_id: Starting point for iteration; use 0 for first call, then
->  *         use the last returned ID for subsequent calls to paginate
->  * @ns_type: Bitmask of namespace types to include (from enum ns_type):
->  *           0: Return all namespace types
->  *           MNT_NS: Mount namespaces
->  *           NET_NS: Network namespaces
->  *           USER_NS: User namespaces
->  *           etc. Can be OR'd together
->  * @user_ns_id: Filter results to namespaces owned by this user namespace=
-:
->  *              0: Return all namespaces (subject to permission checks)
->  *              LISTNS_CURRENT_USER: Namespaces owned by caller's user na=
-mespace
->  *              Other value: Namespaces owned by the specified user names=
-pace ID
->  */
-> struct ns_id_req {
->         __u32 size;         /* sizeof(struct ns_id_req) */
->         __u32 spare;        /* Reserved, must be 0 */
->         __u64 ns_id;        /* Last seen namespace ID (for pagination) */
->         __u32 ns_type;      /* Filter by namespace type(s) */
->         __u32 spare2;       /* Reserved, must be 0 */
->         __u64 user_ns_id;   /* Filter by owning user namespace */
-> };
->=20
-> Example 1: List all namespaces
->=20
-> void list_all_namespaces(void)
-> {
-> 	struct ns_id_req req =3D {
-> 		.size =3D sizeof(req),
-> 		.ns_id =3D 0,      /* Start from beginning */
-> 		.ns_type =3D 0,    /* All types */
-> 		.user_ns_id =3D 0, /* All user namespaces */
-> 	};
-> 	uint64_t ids[100];
-> 	ssize_t ret;
->=20
-> 	printf("All namespaces in the system:\n");
-> 	do {
-> 		ret =3D listns(&req, ids, 100, 0);
-> 		if (ret < 0) {
-> 			perror("listns");
-> 			break;
-> 		}
->=20
-> 		for (ssize_t i =3D 0; i < ret; i++)
-> 			printf("  Namespace ID: %llu\n", (unsigned long long)ids[i]);
->=20
-> 		/* Continue from last seen ID */
-> 		if (ret > 0)
-> 			req.ns_id =3D ids[ret - 1];
-> 	} while (ret =3D=3D 100); /* Buffer was full, more may exist */
-> }
->=20
-> Example 2 : List network namespaces only
->=20
-> void list_network_namespaces(void)
-> {
-> 	struct ns_id_req req =3D {
-> 		.size =3D sizeof(req),
-> 		.ns_id =3D 0,
-> 		.ns_type =3D NET_NS, /* Only network namespaces */
-> 		.user_ns_id =3D 0,
-> 	};
-> 	uint64_t ids[100];
-> 	ssize_t ret;
->=20
-> 	ret =3D listns(&req, ids, 100, 0);
-> 	if (ret < 0) {
-> 		perror("listns");
-> 		return;
-> 	}
->=20
-> 	printf("Network namespaces: %zd found\n", ret);
-> 	for (ssize_t i =3D 0; i < ret; i++)
-> 		printf("  netns ID: %llu\n", (unsigned long long)ids[i]);
-> }
->=20
-> Example 3 : List namespaces owned by current user namespace
->=20
-> void list_owned_namespaces(void)
-> {
-> 	struct ns_id_req req =3D {
-> 		.size =3D sizeof(req),
-> 		.ns_id =3D 0,
-> 		.ns_type =3D 0,                      /* All types */
-> 		.user_ns_id =3D LISTNS_CURRENT_USER, /* Current userns */
-> 	};
-> 	uint64_t ids[100];
-> 	ssize_t ret;
->=20
-> 	ret =3D listns(&req, ids, 100, 0);
-> 	if (ret < 0) {
-> 		perror("listns");
-> 		return;
-> 	}
->=20
-> 	printf("Namespaces owned by my user namespace: %zd\n", ret);
-> 	for (ssize_t i =3D 0; i < ret; i++)
-> 		printf("  ns ID: %llu\n", (unsigned long long)ids[i]);
-> }
->=20
-> Example 4 : List multiple namespace types
->=20
-> void list_network_and_mount_namespaces(void)
-> {
-> 	struct ns_id_req req =3D {
-> 		.size =3D sizeof(req),
-> 		.ns_id =3D 0,
-> 		.ns_type =3D NET_NS | MNT_NS, /* Network and mount */
-> 		.user_ns_id =3D 0,
-> 	};
-> 	uint64_t ids[100];
-> 	ssize_t ret;
->=20
-> 	ret =3D listns(&req, ids, 100, 0);
-> 	printf("Network and mount namespaces: %zd found\n", ret);
-> }
->=20
-> Example 5 : Pagination through large namespace sets
->=20
-> void list_all_with_pagination(void)
-> {
-> 	struct ns_id_req req =3D {
-> 		.size =3D sizeof(req),
-> 		.ns_id =3D 0,
-> 		.ns_type =3D 0,
-> 		.user_ns_id =3D 0,
-> 	};
-> 	uint64_t ids[50];
-> 	size_t total =3D 0;
-> 	ssize_t ret;
->=20
-> 	printf("Enumerating all namespaces with pagination:\n");
->=20
-> 	while (1) {
-> 		ret =3D listns(&req, ids, 50, 0);
-> 		if (ret < 0) {
-> 			perror("listns");
-> 			break;
-> 		}
-> 		if (ret =3D=3D 0)
-> 			break; /* No more namespaces */
->=20
-> 		total +=3D ret;
-> 		printf("  Batch: %zd namespaces\n", ret);
->=20
-> 		/* Last ID in this batch becomes start of next batch */
-> 		req.ns_id =3D ids[ret - 1];
->=20
-> 		if (ret < 50)
-> 			break; /* Partial batch =3D end of results */
-> 	}
->=20
-> 	printf("Total: %zu namespaces\n", total);
-> }
->=20
-> listns() respects namespace isolation and capabilities:
->=20
-> (1) Global listing (user_ns_id =3D 0):
->     - Requires CAP_SYS_ADMIN in the namespace's owning user namespace
->     - OR the namespace must be in the caller's namespace context (e.g.,
->       a namespace the caller is currently using)
->     - User namespaces additionally allow listing if the caller has
->       CAP_SYS_ADMIN in that user namespace itself
-> (2) Owner-filtered listing (user_ns_id !=3D 0):
->     - Requires CAP_SYS_ADMIN in the specified owner user namespace
->     - OR the namespace must be in the caller's namespace context
->     - This allows unprivileged processes to enumerate namespaces they own
-> (3) Visibility:
->     - Only "active" namespaces are listed
->     - A namespace is active if it has a non-zero __ns_ref_active count
->     - This includes namespaces used by running processes, held by open
->       file descriptors, or kept active by bind mounts
->     - Inactive namespaces (kept alive only by internal kernel
->       references) are not visible via listns()
->=20
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
-> ---
-> Christian Brauner (50):
->       libfs: allow to specify s_d_flags
->       nsfs: use inode_just_drop()
->       nsfs: raise DCACHE_DONTCACHE explicitly
->       pidfs: raise DCACHE_DONTCACHE explicitly
->       nsfs: raise SB_I_NODEV and SB_I_NOEXEC
->       nstree: simplify return
->       ns: initialize ns_list_node for initial namespaces
->       ns: add __ns_ref_read()
->       ns: add active reference count
->       ns: use anonymous struct to group list member
->       nstree: introduce a unified tree
->       nstree: allow lookup solely based on inode
->       nstree: assign fixed ids to the initial namespaces
->       ns: maintain list of owned namespaces
->       nstree: add listns()
->       arch: hookup listns() system call
->       nsfs: update tools header
->       selftests/filesystems: remove CLONE_NEWPIDNS from setup_userns() he=
-lper
->       selftests/namespaces: first active reference count tests
->       selftests/namespaces: second active reference count tests
->       selftests/namespaces: third active reference count tests
->       selftests/namespaces: fourth active reference count tests
->       selftests/namespaces: fifth active reference count tests
->       selftests/namespaces: sixth active reference count tests
->       selftests/namespaces: seventh active reference count tests
->       selftests/namespaces: eigth active reference count tests
->       selftests/namespaces: ninth active reference count tests
->       selftests/namespaces: tenth active reference count tests
->       selftests/namespaces: eleventh active reference count tests
->       selftests/namespaces: twelth active reference count tests
->       selftests/namespaces: thirteenth active reference count tests
->       selftests/namespaces: fourteenth active reference count tests
->       selftests/namespaces: fifteenth active reference count tests
->       selftests/namespaces: add listns() wrapper
->       selftests/namespaces: first listns() test
->       selftests/namespaces: second listns() test
->       selftests/namespaces: third listns() test
->       selftests/namespaces: fourth listns() test
->       selftests/namespaces: fifth listns() test
->       selftests/namespaces: sixth listns() test
->       selftests/namespaces: seventh listns() test
->       selftests/namespaces: ninth listns() test
->       selftests/namespaces: ninth listns() test
->       selftests/namespaces: first listns() permission test
->       selftests/namespaces: second listns() permission test
->       selftests/namespaces: third listns() permission test
->       selftests/namespaces: fourth listns() permission test
->       selftests/namespaces: fifth listns() permission test
->       selftests/namespaces: sixth listns() permission test
->       selftests/namespaces: seventh listns() permission test
->=20
->  arch/alpha/kernel/syscalls/syscall.tbl             |    1 +
->  arch/arm/tools/syscall.tbl                         |    1 +
->  arch/arm64/tools/syscall_32.tbl                    |    1 +
->  arch/m68k/kernel/syscalls/syscall.tbl              |    1 +
->  arch/microblaze/kernel/syscalls/syscall.tbl        |    1 +
->  arch/mips/kernel/syscalls/syscall_n32.tbl          |    1 +
->  arch/mips/kernel/syscalls/syscall_n64.tbl          |    1 +
->  arch/mips/kernel/syscalls/syscall_o32.tbl          |    1 +
->  arch/parisc/kernel/syscalls/syscall.tbl            |    1 +
->  arch/powerpc/kernel/syscalls/syscall.tbl           |    1 +
->  arch/s390/kernel/syscalls/syscall.tbl              |    1 +
->  arch/sh/kernel/syscalls/syscall.tbl                |    1 +
->  arch/sparc/kernel/syscalls/syscall.tbl             |    1 +
->  arch/x86/entry/syscalls/syscall_32.tbl             |    1 +
->  arch/x86/entry/syscalls/syscall_64.tbl             |    1 +
->  arch/xtensa/kernel/syscalls/syscall.tbl            |    1 +
->  fs/libfs.c                                         |    1 +
->  fs/namespace.c                                     |    8 +-
->  fs/nsfs.c                                          |   79 +-
->  fs/pidfs.c                                         |    1 +
->  include/linux/ns_common.h                          |  147 +-
->  include/linux/nsfs.h                               |    3 +
->  include/linux/nstree.h                             |   26 +-
->  include/linux/pseudo_fs.h                          |    1 +
->  include/linux/syscalls.h                           |    4 +
->  include/uapi/asm-generic/unistd.h                  |    4 +-
->  include/uapi/linux/nsfs.h                          |   58 +
->  init/version-timestamp.c                           |    5 +
->  ipc/msgutil.c                                      |    5 +
->  ipc/namespace.c                                    |    1 +
->  kernel/cgroup/cgroup.c                             |    5 +
->  kernel/cgroup/namespace.c                          |    1 +
->  kernel/cred.c                                      |   17 +
->  kernel/exit.c                                      |    1 +
->  kernel/nscommon.c                                  |   59 +-
->  kernel/nsproxy.c                                   |    7 +
->  kernel/nstree.c                                    |  527 ++++-
->  kernel/pid.c                                       |   15 +
->  kernel/pid_namespace.c                             |    1 +
->  kernel/time/namespace.c                            |    6 +
->  kernel/user.c                                      |    5 +
->  kernel/user_namespace.c                            |    1 +
->  kernel/utsname.c                                   |    1 +
->  net/core/net_namespace.c                           |    3 +-
->  scripts/syscall.tbl                                |    1 +
->  tools/include/uapi/linux/nsfs.h                    |   70 +
->  tools/testing/selftests/filesystems/utils.c        |    2 +-
->  tools/testing/selftests/namespaces/.gitignore      |    3 +
->  tools/testing/selftests/namespaces/Makefile        |    7 +-
->  .../selftests/namespaces/listns_permissions_test.c |  777 +++++++
->  tools/testing/selftests/namespaces/listns_test.c   |  656 ++++++
->  .../selftests/namespaces/ns_active_ref_test.c      | 2226 ++++++++++++++=
-++++++
->  tools/testing/selftests/namespaces/wrappers.h      |   35 +
->  53 files changed, 4737 insertions(+), 48 deletions(-)
-> ---
-> base-commit: 3a8660878839faadb4f1a6dd72c3179c1df56787
-> change-id: 20251020-work-namespace-nstree-listns-9fd71518515c
-
---=20
-Jeff Layton <jlayton@kernel.org>
+For this patch, indeed at this point the WARN() was already fired,
+however, the bug being addressed is the unnecessary work the TLS module
+continues to do. For my liking, the wasted CPU cycles and resources
+alone justify the fix, even if we've already issued a warning.
+What do you think?
 
