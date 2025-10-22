@@ -1,115 +1,123 @@
-Return-Path: <netdev+bounces-231602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A5A5BFB70F
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 12:45:45 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A491BFB733
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 12:50:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B0C0188A4EB
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 10:46:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 19B3C506069
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 10:49:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0322B2765E2;
-	Wed, 22 Oct 2025 10:45:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14AD6328616;
+	Wed, 22 Oct 2025 10:49:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gilCXgff"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h0XqAQ2v"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28925487BE
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 10:45:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340D6323417
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 10:49:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761129941; cv=none; b=gu5p51hXHvUVd/dqskCks8OOg3ARwTJl+8XJlwvxaay0e1qfS+DUyvaDufYBO/Kkg8WGBT3QPWU4amnluqBFK8wgvHxw9D7cE7LZt18p7KK0+FMip6YeG/s+vSPed7+E3m9rLhurvVQgE8VNV/kkl13qRC6m4cq1cyJO0p8TGmE=
+	t=1761130170; cv=none; b=KvIvb6bb+bxHIzsic/v9fIZvmG6LTzA4vty1PPsaFIqUztfP9q4O1kXCEOR64lMGH7H7frR8IBRYXGXxcWhLMfxpn1EjTpRxlHLesRdmT2w5OJrlCAadDg9omRIzU7iXpQmxvrtkbiA1OpYtDpKxxOQK1SEhI7yin9fWayuuv1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761129941; c=relaxed/simple;
-	bh=Zj8rFDKRtb8uCvUQL4/0fON2f8BB4nZtU51UIH2n/9o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NUcLU22Iq5ke0DVb/zW39uZ9TQNQCd8/EsIrWs8/e1XhJl0U6+NveFpeTtnLttXXo+A23+ef88HDo1sw/DIt/IrK9TVKqiUuY+iFGTOG/p20YrBUbHNeiWX0mmg0+A0y0pVVGozmBMhPTvLLoagJZoL0YddxbBemqCXHPS6368Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gilCXgff; arc=none smtp.client-ip=202.12.124.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
-	by mailfout.stl.internal (Postfix) with ESMTP id 1990D1D000AB;
-	Wed, 22 Oct 2025 06:45:39 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Wed, 22 Oct 2025 06:45:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1761129938; x=1761216338; bh=uxyO+Kkfu/CiEQvIrijT6h181NpzcnSAV7d
-	H1PJL3Jw=; b=gilCXgffZgJMcg8ACM5DI1WpJd0ilUhd7VXMdJ4DnOqY7bJ4slj
-	wc+2M0baW2QIgZRFLR72jAsUs+coN3hWyewEQpv6IJvHZE9MQiHpajNn8w6v4xr5
-	f1PL8NQcZj0Dc5duiN6fOm33PBRcdnohru90k+Zzjh65hlPVPBzBpFuDC09627yG
-	P+gqkXEGxAR7jyPpd29T9WdeIe4iVieCKv99eQ8ZB1IRYn9rK8vpYzwtIp7IR0rT
-	30cohGBv6GbAazU46CQQWwpcvLWVfNngttdcAYgB/lSrOieddWChQKC7nIVDoys/
-	Ght81WefVC2lytFZK/Qx/lVpVdpkme8Gy6A==
-X-ME-Sender: <xms:0bX4aBsXY1Ul4FRs_sL4Uc2WcLP--BwbZDbLE3dRZLz1ebaBidiSBQ>
-    <xme:0bX4aOJZSBCiOv0Zm6fR9gFOabts6BvWe5ShtS3A_qNE9WHmrARV9DSuHhujvi0SA
-    3chPhjr6zcsMu06I7eBiAh4wiFd8P-k3C4q-K6jHAEbr6t4jQ>
-X-ME-Received: <xmr:0bX4aOmrqhAoeWSgbscVyaVXTpWZ_mtnK5MwwhvpNy3HuFnq7PrEomXY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddugeeffeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcuufgt
-    hhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrthhtvg
-    hrnhephefhtdejvdeiffefudduvdffgeetieeigeeugfduffdvffdtfeehieejtdfhjeek
-    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhn
-    sggprhgtphhtthhopeeipdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehtohhngh
-    hhrghosegsrghmrghitghlohhuugdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtohepvghrrghnsggvsehmvghllhgrnhhogidrtghomhdprhgtphhtthho
-    pehjihhrihesmhgvlhhlrghnohigrdgtohhmpdhrtghpthhtohepgihihihouhdrfigrnh
-    hgtghonhhgsehgmhgrihhlrdgtohhm
-X-ME-Proxy: <xmx:0bX4aPL319v43mmBWg2OfpJe8PA4GOZzWKnjGIqcGVKQ02cNJp_bjg>
-    <xmx:0bX4aD7NRXkFnB3OJarcNcoGlfcmOP6JAtTXp1ZAVcqpkIk8ajy_Bw>
-    <xmx:0bX4aD02duG2CydQJyE09HEkPs8hVysJoQzykWas5W-gETzfvmnyqw>
-    <xmx:0bX4aJdcVChRsgPmnML9B_qqgNr4VWbWgi0mm9r36c_GjWIJuypZaA>
-    <xmx:0rX4aIxXYgSqwvU8jbORg8gCxGQ2SwZdT-4_NIwOcRO8vef2OG-_5xAO>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 22 Oct 2025 06:45:37 -0400 (EDT)
-Date: Wed, 22 Oct 2025 13:45:35 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Tonghao Zhang <tonghao@bamaicloud.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Eran Ben Elisha <eranbe@mellanox.com>,
-	Jiri Pirko <jiri@mellanox.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>
-Subject: Re: [PATCH net-next] net: add the ifindex for
- trace_net_dev_xmit_timeout
-Message-ID: <aPi1z_frpBzpBPpa@shredder>
-References: <20251021091900.62978-1-tonghao@bamaicloud.com>
- <20251021171006.725400e3@kernel.org>
- <27169B5F-3269-4075-89F4-FA7459241EB3@bamaicloud.com>
+	s=arc-20240116; t=1761130170; c=relaxed/simple;
+	bh=J26Z9D1vT4AHlG+7HePuGaJBpStTnOVExBXnz/HFoT8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=suaxuhbJXrOyOYNqZ8nW6xdxS9ocND+d880V91ZfeXFYHlahBFi1QnwTquv01e14ekx0Z/lT2mDU8PNpuxKBNsffc1feobVFqD8xfQzwjC7WFsyXAXdJ3Y/IfeIuj3ohO/lxewr1GiGArzZeMK27gdAVPqQNTUTNuIDHukXt6H4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h0XqAQ2v; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761130155;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=WJxY2mOEgsL6GRvP8mJCFMLO+Hk8CymaXvBDnFqEOyk=;
+	b=h0XqAQ2vfdtj0smaatDuQZgDwA7aHqUVLwFXQEOeDJ7Zr9EeKnxqc8TOF80zCrtvWnWqQO
+	4/5wgPHpiU65bx41D9QNqasO4HI3ZV/0Oq073wU+2i3Vp4M/y+fcz/YFRoiIfASTBBZgVv
+	KmPp/hiaFOX18x8K6V2gFi0WAwVrkLY=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Jian Shen <shenjian15@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+	Paul Barker <paul@pbarker.dev>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc: linux-renesas-soc@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	netdev@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next v4 0/6] convert net drivers to ndo_hwtstamp API part 2
+Date: Wed, 22 Oct 2025 10:48:54 +0000
+Message-ID: <20251022104900.901973-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <27169B5F-3269-4075-89F4-FA7459241EB3@bamaicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Oct 22, 2025 at 04:31:34PM +0800, Tonghao Zhang wrote:
-> > On Oct 22, 2025, at 08:10, Jakub Kicinski <kuba@kernel.org> wrote:
-> > 
-> > On Tue, 21 Oct 2025 17:19:00 +0800 Tonghao Zhang wrote:
-> >> In a multi-network card or container environment, provide more accurate information.
-> > 
-> > Why do you think that ifindex is more accurate than the name?
-> > Neither is unique with netns..
-> I thought ifindex was globally unique, but in fact, different namespaces may have the same ifindex value. What about adding the ns.inum inode ?
+This is part 2 of patchset to convert drivers which support HW 
+timestamping to use .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
+The new API uses netlink to communicate with user-space and have some
+test coverage.
 
-The netns cookie is probably better. See this thread:
+v3 -> v4:
+ fix commit message in patch 6
+v2 -> v3:
+ use NL_SET_ERR_MSG_MOD() variant to report errors back to user-space
+v1 -> v2: 
+ hns3: actually set up new ndo callbacks
+ ionic: remove _lif_ portion from name to align with other ndo callbacks
 
-https://lore.kernel.org/netdev/c28ded3224734ca62187ed9a41f7ab39ceecb610.camel@fejes.dev/
 
-You can also retrieve it by attaching a BPF program to the tracepoint.
+Vadim Fedorenko (6):
+  octeontx2: convert to ndo_hwtstamp API
+  mlx4: convert to ndo_hwtstamp API
+  ionic: convert to ndo_hwtstamp API
+  net: ravb: convert to ndo_hwtstamp API
+  net: renesas: rswitch: convert to ndo_hwtstamp API
+  net: hns3: add hwtstamp_get/hwtstamp_set ops
+
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  5 ++
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 31 ++++++++++
+ .../hisilicon/hns3/hns3pf/hclge_main.c        | 13 ++--
+ .../hisilicon/hns3/hns3pf/hclge_ptp.c         | 32 +++++-----
+ .../hisilicon/hns3/hns3pf/hclge_ptp.h         |  9 ++-
+ .../marvell/octeontx2/nic/otx2_common.h       |  9 ++-
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 56 ++++++++---------
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  3 +-
+ .../net/ethernet/mellanox/mlx4/en_netdev.c    | 62 ++++++++-----------
+ drivers/net/ethernet/mellanox/mlx4/mlx4_en.h  |  6 +-
+ .../net/ethernet/pensando/ionic/ionic_lif.c   | 17 +----
+ .../net/ethernet/pensando/ionic/ionic_lif.h   | 11 ++--
+ .../net/ethernet/pensando/ionic/ionic_phc.c   | 61 +++++++++++-------
+ drivers/net/ethernet/renesas/ravb_main.c      | 61 ++++++------------
+ drivers/net/ethernet/renesas/rswitch_main.c   | 53 ++++++----------
+ 15 files changed, 211 insertions(+), 218 deletions(-)
+
+-- 
+2.47.3
 
