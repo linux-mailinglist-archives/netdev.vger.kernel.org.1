@@ -1,348 +1,165 @@
-Return-Path: <netdev+bounces-231680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 580D4BFC88B
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 16:30:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD078BFC8A6
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 16:31:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85465188977A
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 14:29:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 006CB189CBAA
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 14:29:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42CBB34C822;
-	Wed, 22 Oct 2025 14:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C152534CFD5;
+	Wed, 22 Oct 2025 14:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MmgWdvyy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kn3BN3hL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F5434B676;
-	Wed, 22 Oct 2025 14:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF4634CFB9
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 14:24:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761143029; cv=none; b=rNT1oLPTpzepMhmiCOEU84nn+WxL19oBYrP5ziWntrgVdpLCafyj/tGcc40JNrcXXdDmkF8h3lhj1vHbEsac+HXRClT4lUwyu5aySAZFLf3TgUfIj5BDybllAlhyWmGlzqNf43uhWuEp7U1ZM2zTCpq1M9EpnAX8xo/H2zpi7YM=
+	t=1761143063; cv=none; b=bpe70o3MZRQn0XlE5Y4OFFRk8Tku7Nsa1Xp4sf5CiG7hlJvCdfIHwi/OtQjyoxasPu+MmElkR96v0nrN19YmrCHS5il8ToPWG5NT6QLzRy64CEcp+yBRc7lLQQyScv8vF9suhxqFKgrtf+yiRJkuTb2C5gqXv4caNQeWoUyUcfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761143029; c=relaxed/simple;
-	bh=g14dVRL9UcLqQAhoiCkffLwKcVRFh+iUcW6+TqdtP84=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VeQcTjePIrnSc5QKVda79xZX1jv2EzpftqmhT5eBE+45qzKdj/+NXqrNObGW9MML1UVmlBMOPk0VwtTDBAtRDLy8MJI732IPZEIHunXt1lSR+vjZHw66tYFt1P16nWf1zwpdv5GLF/spm7uheRQ6Svp1jq0QksA+zsteiCbHm5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MmgWdvyy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CC60C4CEE7;
-	Wed, 22 Oct 2025 14:23:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761143027;
-	bh=g14dVRL9UcLqQAhoiCkffLwKcVRFh+iUcW6+TqdtP84=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MmgWdvyy8ZHjgsEAHal9RzTXMCtnVEshZ//9G8h2uqN385QCnzxl4jAPCarM4jfFM
-	 iJ0iHPkgTkGApl/LGbHSn3/2XNDN6SH1tldpeo+VqV2q/JxLpuvMgFYy6N1tKWfWdj
-	 4xlqTG7yIPqocYfjdbkpFjrIpIsBdDJ4jYnpPypvnpQ0Z4AZGrsyVVtkEpqYS+zSne
-	 34juKfVb9eMUx0gqIE1rfO1F3qdnIo9SPSm+qIT3iG1h+RkmjzlFFPL3bNT04fFOvf
-	 ZYSPgWBNd8rujqwNY9jDFqMBtcIL2KP6bILvt+Ne30jkT9AL1eBH0lF0zNITMowY8d
-	 6VQgWOEukQjQA==
-Date: Wed, 22 Oct 2025 15:23:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, andrey.bokhanko@huawei.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH net-next 1/8] ipvlan: Implement learnable L2-bridge
-Message-ID: <aPjo76T8c8SbOB04@horms.kernel.org>
-References: <20251021144410.257905-1-skorodumov.dmitry@huawei.com>
- <20251021144410.257905-2-skorodumov.dmitry@huawei.com>
+	s=arc-20240116; t=1761143063; c=relaxed/simple;
+	bh=KiLb3Ij4kNTsI8p5dH+8PrPKjndGfKFXyCL4d4sUz0Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tqsUyZOgOXmZUqrZ0eu06O5+ldDiWSfJYu3sjUMbBR5SLMqC7x6qBsc1pfPW0Ke59e3Eg+JboeNpVpwPUsj0hwouFr453BXCr5bNnVhw3ApIjgi7dJnLYZeRlUM/06z0JNZblKTyuC25tFsCEmV99mg0z62k3+qVy68S5K7AKF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kn3BN3hL; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-471066cfc2aso21679775e9.0
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 07:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761143060; x=1761747860; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cxCF3VSt3yJ/4Htvgm+f7POBa00pQ4DGvcpk5YYFwFI=;
+        b=Kn3BN3hLjmTkizkKIxOxadJhSQLPWaoz05eSckFXqDqMMCmaNvPTl38yEbTFJGwvcP
+         uyk4YABp+kCczzgYdW/EQcs9vHWD+LJyCRP9TjqwwK2lWsxbGK8cneHQU4arMJiTiLDj
+         4vGOPnkYtpuAQnNrvGCX15PgTZXpyc0eLn40ztllaemrQ0XGh0C2z0t6ySmtg0wdGKBz
+         4MrgajiBEstbQq40dGiPkyNuxVgE+dyqUhKZyi4FxHW7tYPg//zQEH5S8JAOuI55VwJi
+         7wY1BJ7S9GYcw6Kr69i9fCKLd6f1dqSDWNAbTN2kQHoP7kHfd3NRBR8esXvYkA1exBP5
+         L4sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761143060; x=1761747860;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cxCF3VSt3yJ/4Htvgm+f7POBa00pQ4DGvcpk5YYFwFI=;
+        b=cGXSCvy3WbK1tLu0TlSIQtsdCilc/v46ntmlKt6UwvU3scRiYesNPiLd1MkEgNsofX
+         7WDZmHTjjmsb1jeYXVEo6PYk2xkIF9/M9o9iY5riouH4TTo8CWGhXxXZGaglTx9PB6a+
+         1WgHReX4iLInMChxgZQ36nbxd9hG4A0kvaLyMdhxHsSRw1rbqGTnHZKLZgn5Y92+MWz0
+         5Jupf2WSvpw3g5J56TuLs0SbXlolohwBRr+yn3FsWPtUd74fu4eL2JEWHZJMSUHZ21XN
+         YIU8Wz28Glov8cqkb2V6FeVsdil1voh+r188FMJ22SsrJwSyVVv7HjR5pwMZnKo2QnNJ
+         VT5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWH0UlkBEP8appY4D6ZBuVr45bJlfJe+/6kNydZ/Gmao2G9KBVRzwOrv9rjuWJXlRyTu4hgC/E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfQIui7pB+WKWmTUzHIu4KfFOIgdUCz9fu7vNA89cMG8fdumdD
+	+0GIr6EjpmGaYUKsTdwiuz7oqjZcZmjrcX26jcWZGGboy4u0a7DWvfZ9
+X-Gm-Gg: ASbGncs2ZRP06mMPN9r/Pm9BN3NKh8vnbG3w8Kitr9aYRm3IBazl6t8lt1BSeExkiJD
+	HOAjiBr2/qjRb8A5k2FgTCwugUxaJiZBg2/pqDCZRWFSHFAhrcfxS70Fn4AnPqBCZlzQauB/qR4
+	+SuJZYBPLBmQw+N5qAYzwLGoAJuRZT6bKOX+NS6LZIzGPl6f2pywl10tlXL/bFUvjKZNbwYC1iI
+	Ew46Iksy/MizRfsjf4qlu9AYslwXlJE4sl+DbDBBmGZy1sRfEfA9gK7d38KIZOhL+H5rGnQ6um3
+	0OhXxQbCeDadCyPSLCcOr37q/lHoEM2mhJAzHUihkUhHs5zfQarEOPhikpDVLiVRxAsOckNKbVF
+	degBK/l9mbQFW4W16hR8gda7RnMIPDfZAJXwwev8K6EWBfZqN8E24JajMMWyP/t61dT0h2pfGgQ
+	jzdgByo/YLMladw2xQIVlmMyCY9F92ZLxH
+X-Google-Smtp-Source: AGHT+IFkTw7szOwawIqv47HRGrQT8MYYw4EHyKoRoa8ZcG7xMhhP9wIMt2VXTQKAISRkcJMJnQVZ3A==
+X-Received: by 2002:a05:6000:25ee:b0:427:62d:132c with SMTP id ffacd0b85a97d-427062d135emr11501252f8f.21.1761143059543;
+        Wed, 22 Oct 2025 07:24:19 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:b576])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42856e45062sm1965758f8f.41.2025.10.22.07.24.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Oct 2025 07:24:18 -0700 (PDT)
+Message-ID: <3990f8ee-4194-4b06-820e-c0ecbcb08af1@gmail.com>
+Date: Wed, 22 Oct 2025 15:25:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251021144410.257905-2-skorodumov.dmitry@huawei.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/1] io_uring zcrx: add MAINTAINERS entry
+To: Jens Axboe <axboe@kernel.dk>, David Wei <dw@davidwei.uk>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>
+References: <20251021202944.3877502-1-dw@davidwei.uk>
+ <60d18b98-6a25-4db7-a4c6-0c86d6c4f787@gmail.com>
+ <832b03de-6b59-4a07-b7ea-51492c4cca7e@kernel.dk>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <832b03de-6b59-4a07-b7ea-51492c4cca7e@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 21, 2025 at 05:44:03PM +0300, Dmitry Skorodumov wrote:
-> Now it is possible to create link in L2E mode: learnable
-> bridge. The IPs will be learned from TX-packets of child interfaces.
-
-Is there a standard for this approach - where does the L2E name come from?
-
+On 10/22/25 14:17, Jens Axboe wrote:
+> On 10/22/25 5:38 AM, Pavel Begunkov wrote:
+>> On 10/21/25 21:29, David Wei wrote:
+>>> Same as [1] but also with netdev@ as an additional mailing list.
+>>> io_uring zero copy receive is of particular interest to netdev
+>>> participants too, given its tight integration to netdev core.
+>>
+>> David, I can guess why you sent it, but it doesn't address the bigger
+>> problem on the networking side. Specifically, why patches were blocked
+>> due to a rule that had not been voiced before and remained blocked even
+>> after pointing this out? And why accusations against me with the same
+>> circumstances, which I equate to defamation, were left as is without
+>> any retraction? To avoid miscommunication, those are questions to Jakub
+>> and specifically about the v3 of the large buffer patchset without
+>> starting a discussion here on later revisions.
+>>
+>> Without that cleared, considering that compliance with the new rule
+>> was tried and lead to no results, this behaviour can only be accounted
+>> to malice, and it's hard to see what cooperation is there to be had as
+>> there is no indication Jakub is going to stop maliciously blocking
+>> my work.
 > 
-> Also, dev_add_pack() protocol is attached to the main port
-> to support communication from main to child interfaces.
+> The netdev side has been pretty explicit on wanting a MAINTAINERS entry
+
+Can you point out where that was requested dated before the series in
+question? Because as far as I know, only CC'ing was mentioned and
+only as a question, for which I proposed a fairly standard way of
+dealing with it by introducing API and agreeing on any changes to that,
+and got no reply. Even then, I was CC'ing netdev for changes that might
+be interesting to netdev, that includes the blocked series.
+
+> so that they see changes. I don't think it's unreasonable to have that,
+> and it doesn't mean that they need to ack things that are specific to
+> zcrx. Nobody looks at all the various random lists, giving them easier
+> insight is a good thing imho. I think we all agree on that.
 > 
-> This mode is intended for the desktop virtual machines, for
-> bridging to Wireless interfaces.
+> Absent that change, it's also not unreasonable for that side to drag
+> their feet a bit on further changes. Could the communication have been
+> better on that side? Certainly yes. But it's hard to blame them too much
+> on that front, as any response would have predictably yielded an
+> accusatory reply back.
+
+Not really, solely depends on the reply.
+
+> And honestly, nobody wants to deal with that, if
+
+Understandable, but you're making it sound like I started by
+throwing accusations and not the other way around. But it's
+true that I never wanted to deal with it.
+
+> they can avoid it. Since there's plenty of other work to do and patches
+> to review which is probably going to be more pleasurable, then people go
+> and do that.
 > 
-> The mode should be specified while creating first child interface.
-> It is not possible to change it after this.
+> The patch David sent is a way to at least solve one part of the issue,
+> and imho something like that is a requirement for anything further to be
+> considered. Let's perhaps roll with that and attempt to help ourselves
+> here, by unblocking that part.
 > 
-> Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-
-...
-
-> diff --git a/drivers/net/ipvlan/ipvlan.h b/drivers/net/ipvlan/ipvlan.h
-
-...
-
-It is still preferred in networking code to linewrap lines
-so that they are not wider than 80 columns, where than can be done without
-reducing readability. Which appears to be the case here.
-
-Flagged by checkpatch.pl --max-line-length=80
-
-...
-> diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
-
-...
-
-> @@ -414,6 +426,77 @@ struct ipvl_addr *ipvlan_addr_lookup(struct ipvl_port *port, void *lyr3h,
->  	return addr;
->  }
->  
-> +static inline bool is_ipv4_usable(__be32 addr)
-> +{
-> +	return !ipv4_is_lbcast(addr) && !ipv4_is_multicast(addr) &&
-> +	       !ipv4_is_zeronet(addr);
-> +}
-> +
-> +static inline bool is_ipv6_usable(const struct in6_addr *addr)
-> +{
-> +	return !ipv6_addr_is_multicast(addr) && !ipv6_addr_loopback(addr) &&
-> +	       !ipv6_addr_any(addr);
-> +}
-
-Please don't use the inline keyword in .c files unless there
-is a demonstrable reason to do so - usually performance.
-Rather, please let the compiler inline functions as it sees fit.
-
-> +
-> +static void ipvlan_addr_learn(struct ipvl_dev *ipvlan, void *lyr3h,
-> +			      int addr_type)
-> +{
-> +	void *addr = NULL;
-> +	bool is_v6;
-> +
-> +	switch (addr_type) {
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	/* No need to handle IPVL_ICMPV6, since it never has valid src-address */
-> +	case IPVL_IPV6: {
-> +		struct ipv6hdr *ip6h;
-> +
-> +		ip6h = (struct ipv6hdr *)lyr3h;
-> +		if (!is_ipv6_usable(&ip6h->saddr))
-
-It is preferred to avoid #if / #ifdef in order to improve compile coverage
-(and, I would argue, readability).
-
-In this case I think that can be achieved by changing the line above to:
-
-		if (!IS_ENABLED(CONFIG_IPV6) || !is_ipv6_usable(&ip6h->saddr))
-
-I think it would be interesting to see if a similar approach can be used
-to remove other #if CONFIG_IPV6 conditions in this file, and if successful
-provide that as a clean-up as the opening patch in this series.
-
-However, without that, I can see how one could argue for the approach
-you have taken here on the basis of consistency.
-
-> +			return;
-> +		is_v6 = true;
-> +		addr = &ip6h->saddr;
-> +		break;
-> +	}
-> +#endif
-
-...
-
-> @@ -618,15 +701,56 @@ static int ipvlan_xmit_mode_l3(struct sk_buff *skb, struct net_device *dev)
->  
->  static int ipvlan_xmit_mode_l2(struct sk_buff *skb, struct net_device *dev)
->  {
-> -	const struct ipvl_dev *ipvlan = netdev_priv(dev);
-> -	struct ethhdr *eth = skb_eth_hdr(skb);
-> -	struct ipvl_addr *addr;
->  	void *lyr3h;
-> +	struct ipvl_addr *addr;
->  	int addr_type;
-> +	bool same_mac_addr;
-> +	struct ipvl_dev *ipvlan = netdev_priv(dev);
-> +	struct ethhdr *eth = skb_eth_hdr(skb);
-
-I realise that the convention is not followed in the existing code,
-but please prefer to arrange local variables in reverse xmas tree order -
-longest line to shortest.
-
-In this case I think we can avoid moving things away
-from that order like this (completely untested):
-
--	const struct ipvl_dev *ipvlan = netdev_priv(dev);
-+	struct ipvl_dev *ipvlan = netdev_priv(dev);
- 	struct ethhdr *eth = skb_eth_hdr(skb);
- 	struct ipvl_addr *addr;
-+	bool same_mac_addr;
- 	void *lyr3h;
- 	int addr_type;
-
-Likewise elsewhere in this patch.
-
-This too can be helpful in this area
-github.com/ecree-solarflare/xmastree/commits/master/
-
-> +
-> +	if (ipvlan_is_learnable(ipvlan->port) &&
-> +	    ether_addr_equal(eth->h_source, dev->dev_addr)) {
-> +		/* ignore tx-packets from host */
-> +		goto out_drop;
-> +	}
-> +
-> +	same_mac_addr = ether_addr_equal(eth->h_dest, eth->h_source);
-> +
-> +	lyr3h = ipvlan_get_L3_hdr(ipvlan->port, skb, &addr_type);
->  
-> -	if (!ipvlan_is_vepa(ipvlan->port) &&
-> -	    ether_addr_equal(eth->h_dest, eth->h_source)) {
-> -		lyr3h = ipvlan_get_L3_hdr(ipvlan->port, skb, &addr_type);
-> +	if (ipvlan_is_learnable(ipvlan->port)) {
-> +		if (lyr3h)
-> +			ipvlan_addr_learn(ipvlan, lyr3h, addr_type);
-> +		/* Mark SKB in advance */
-> +		skb = skb_share_check(skb, GFP_ATOMIC);
-> +		if (!skb)
-> +			return NET_XMIT_DROP;
-
-I think that when you drop packets a counter should be incremented.
-Likewise elsewhere in this function.
-
-> +		ipvlan_mark_skb(skb, ipvlan->phy_dev);
-> +	}
-> +
-> +	if (is_multicast_ether_addr(eth->h_dest)) {
-> +		skb_reset_mac_header(skb);
-> +		ipvlan_skb_crossing_ns(skb, NULL);
-> +		ipvlan_multicast_enqueue(ipvlan->port, skb, true);
-> +		return NET_XMIT_SUCCESS;
-> +	}
-> +
-> +	if (ipvlan_is_vepa(ipvlan->port))
-> +		goto tx_phy_dev;
-> +
-> +	if (!same_mac_addr &&
-> +	    ether_addr_equal(eth->h_dest, ipvlan->phy_dev->dev_addr)) {
-> +		/* It is a packet from child with destination to main port.
-> +		 * Pass it to main.
-> +		 */
-> +		skb = skb_share_check(skb, GFP_ATOMIC);
-> +		if (!skb)
-> +			return NET_XMIT_DROP;
-> +		skb->pkt_type = PACKET_HOST;
-> +		skb->dev = ipvlan->phy_dev;
-> +		dev_forward_skb(ipvlan->phy_dev, skb);
-> +		return NET_XMIT_SUCCESS;
-> +	} else if (same_mac_addr) {
->  		if (lyr3h) {
->  			addr = ipvlan_addr_lookup(ipvlan->port, lyr3h, addr_type, true);
->  			if (addr) {
-> @@ -649,16 +773,14 @@ static int ipvlan_xmit_mode_l2(struct sk_buff *skb, struct net_device *dev)
->  		 */
->  		dev_forward_skb(ipvlan->phy_dev, skb);
->  		return NET_XMIT_SUCCESS;
-> -
-> -	} else if (is_multicast_ether_addr(eth->h_dest)) {
-> -		skb_reset_mac_header(skb);
-> -		ipvlan_skb_crossing_ns(skb, NULL);
-> -		ipvlan_multicast_enqueue(ipvlan->port, skb, true);
-> -		return NET_XMIT_SUCCESS;
->  	}
->  
-> +tx_phy_dev:
->  	skb->dev = ipvlan->phy_dev;
->  	return dev_queue_xmit(skb);
-> +out_drop:
-> +	consume_skb(skb);
-> +	return NET_XMIT_DROP;
->  }
->  
->  int ipvlan_queue_xmit(struct sk_buff *skb, struct net_device *dev)
-
-...
-
-> diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan_main.c
-
-...
-
-> +static int ipvlan_port_receive(struct sk_buff *skb, struct net_device *wdev,
-> +			       struct packet_type *pt, struct net_device *orig_wdev)
-> +{
-> +	struct ipvl_port *port;
-> +	struct ipvl_addr *addr;
-> +	struct ethhdr *eth;
-> +	void *lyr3h;
-> +	int addr_type;
-> +
-> +	port = container_of(pt, struct ipvl_port, ipvl_ptype);
-> +	/* We are interested only in outgoing packets.
-> +	 * rx-path is handled in rx_handler().
-> +	 */
-> +	if (skb->pkt_type != PACKET_OUTGOING || ipvlan_is_skb_marked(skb, port->dev))
-> +		goto out;
-> +
-> +	skb = skb_share_check(skb, GFP_ATOMIC);
-> +	if (!skb)
-> +		goto no_mem;
-> +
-> +	/* data should point to eth-header */
-> +	skb_push(skb, skb->data - skb_mac_header(skb));
-> +	skb->dev = port->dev;
-> +	eth = eth_hdr(skb);
-> +
-> +	if (is_multicast_ether_addr(eth->h_dest)) {
-> +		ipvlan_skb_crossing_ns(skb, NULL);
-> +		skb->protocol = eth_type_trans(skb, skb->dev);
-> +		skb->pkt_type = PACKET_HOST;
-> +		ipvlan_mark_skb(skb, port->dev);
-> +		ipvlan_multicast_enqueue(port, skb, false);
-> +		return 0;
-> +	}
-> +
-> +	lyr3h = ipvlan_get_L3_hdr(port, skb, &addr_type);
-> +	if (!lyr3h)
-> +		goto out;
-> +
-> +	addr = ipvlan_addr_lookup(port, lyr3h, addr_type, true);
-> +	if (addr) {
-> +		int ret, len;
-> +
-> +		ipvlan_skb_crossing_ns(skb, addr->master->dev);
-> +		skb->protocol = eth_type_trans(skb, skb->dev);
-> +		skb->pkt_type = PACKET_HOST;
-> +		ipvlan_mark_skb(skb, port->dev);
-> +		len = skb->len + ETH_HLEN;
-> +		ret = netif_rx(skb);
-> +		ipvlan_count_rx(ipvlan, len, ret == NET_RX_SUCCESS, false);
-
-This fails to build because ipvlan is not declared in this scope.
-Perhaps something got missed due to an edit?
-
-> +		return 0;
-> +	}
-> +
-> +out:
-> +	dev_kfree_skb(skb);
-> +no_mem:
-> +	return 0; // actually, ret value is ignored
-
-Maybe, but it seems to me that the return values
-should follow that of netif_receive_skb_core().
-
-> +}
-
-...
+> Are you fine with the patch? If so, I will queue it up and let's please
+> move on from beating this dead horse.
+> 
 
 -- 
-pw-bot: changes-requested
+Pavel Begunkov
+
 
