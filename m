@@ -1,188 +1,125 @@
-Return-Path: <netdev+bounces-231645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B614BFBEA9
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 14:48:02 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17CB8BFBF72
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 14:53:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 269583B9F34
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 12:48:00 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A36A7355A41
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 12:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99CE3451DF;
-	Wed, 22 Oct 2025 12:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F212347BB5;
+	Wed, 22 Oct 2025 12:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="UxGR4x5p";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="fT55qfJg"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="UNS2drj+"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52CB3191A1;
-	Wed, 22 Oct 2025 12:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F16F344046
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 12:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761137274; cv=none; b=iS9ZBhgR45njmPbpUBIuHwdhzNtGdg487O2XV3QSmWUavucxLVwm8U9MjMPXRAG0FvJajZDmrdsFImpZrt6/7G+tZyCuj3FZmbaQ+o5FZuG9tu0C0yKX4UQoEghAeHTgU3jSiGmQfM8kK/R0HuLQUgZtAmGcy+6eZnutCmqZdK8=
+	t=1761137428; cv=none; b=inOWAkP+X6D/G8AwLM50dLfcuzreUzZgq5n9xm6IHU4b0UCBKr5AG0jlmS8COvXUCT/gvkR7+qF76w3zocN4ceo+1VGzk9upgQM5XdF3JxZy1WbGwIiozZ3KYrmqBFQfXPNI/c9VKRsEja2O1QFMMGFK6RKei+fB3UyGxoCgwBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761137274; c=relaxed/simple;
-	bh=cG8noai2W8YSEH0BaQ/J3UBAfOo9Q7IkDxX/lpAP9nQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wvk9QTKVCbKv+5H5OnTzOWyXnaWJ9bRAR/QJW+N3RXvO7/5e0HXccrQUlGWE7IQJIGYDD3FPOlnEgMuACzk13UUjF4+nOpF9MTJZkclcUARY9NhNzR24uDxw/tRkIQsa+0n1Wo0/wLPWUuctLNZsfRMzIuC9v5sNrD0Dq58o0G4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=UxGR4x5p; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fT55qfJg; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfout.phl.internal (Postfix) with ESMTP id 6DA88EC0169;
-	Wed, 22 Oct 2025 08:47:43 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Wed, 22 Oct 2025 08:47:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1761137263; x=
-	1761223663; bh=A0VTtOmF5fNkFsxu94lUPFDgCfNpNIBkLTSLEFv6gqo=; b=U
-	xGR4x5prz5fCol3kOscuXG6QOjiCn0+d5bvyN2/wF7nRE/NMK/RhAabi9O+c+nuf
-	nDAcgE6XY3iauM5Qu8cQtKNFA2W3ICgXdriFYVh14gI8MQzcJPw7wcr0pkrPkW4A
-	mw/LQWjcwx07IWBiRSzxlWkrWkTmgKDQRLyLRS1mleeqLH1Har+jIFYexmy47IQf
-	PEvleO9SVwlJi8wW154c6ymwKDmWwN+M4DBmXRNYsbiG9rhCWYpFYsZPmDaELFVC
-	FaYPs05NhRzx8BQm/2BI9flN7IBkmAa7xQfG59cm8voFvXeEPdFRTcWXQCCnjUqf
-	OVNCWmf/hOpGEmkaPAJwA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1761137263; x=1761223663; bh=A0VTtOmF5fNkFsxu94lUPFDgCfNpNIBkLTS
-	LEFv6gqo=; b=fT55qfJgjWEqR5nUDft9SPPWdfqaK0ng3PrjLypNe4ShSJKHrft
-	+AXpGh6ACch5/deY9frIrWqmztWoYRn+CiY9fw4W+pCJYPZL2MIOx1v5xaO7bzKH
-	O4bvrcha2WS4eYPgnuZupFxUhcr/yzvkx6onxv6spmtPYXeByVeZer8T8oEkRQEV
-	D2FaW/R8aSkNWKVf1SJEa1ivplEti6MFemvpO9xrwhmxNSH59ryOSQ6UXsIZis5P
-	GhxCTapHGGQYcw5IQxkuRy1YE9v99gJwt7yUCp7uHOj7fIIwXukqNQMBL4k1SnRh
-	1Ns6LNnh1WKEOyI6Ygl3nM8q2dClmmomSVg==
-X-ME-Sender: <xms:btL4aNEQ3e6Bezih54dU1Et7tIqNvDCmiNdX6sBTGk4i42AdrCbDYg>
-    <xme:btL4aBwTTyt1ogYxKQIYe4Pk6j16O-TUUPBIGTl2890ozGNYDWf4QFdjLaVJqlyOt
-    4ai49zpQ6sCvVBKLvZH0zMltspK_Uig1WiWNmguMJRi2qvl3F__LBk>
-X-ME-Received: <xmr:btL4aANQ0fXjMGQrweBEeB5jSNSHGiUCqlLL99WZytnwIIN_rJEGuv8wSkN2>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddugeefiedvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduhedpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtohepshhhshhhihhtrhhithesnhhvihguihgrrd
-    gtohhmpdhrtghpthhtohepthgrrhhiqhhtsehnvhhiughirgdrtghomhdprhgtphhtthho
-    pegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvg
-    hrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhr
-    tghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhope
-    gurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepshgrvggvughmsehn
-    vhhiughirgdrtghomhdprhgtphhtthhopehlvghonheskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:btL4aHY2cEgQ5oAEwnbWjKGTQJXkrLeTgxOlPHDif_ZVBHJfHP0s1w>
-    <xmx:btL4aHCkYJI7e_tAGd7oK2eUrwXHE9FnycAOK1tKUr0z0bxn7xc-Eg>
-    <xmx:btL4aFFztDSOhYWv6as5lPawGIKsfpfePls_vebU0jVM1eE1sKqRNw>
-    <xmx:btL4aCPqxjcguybzLXs9GpJRrXrFnyhhQogzZnxlLe3Ui4jjnua84g>
-    <xmx:b9L4aD6aVsdbAZnIoIe_n-m7skbUYKWwR6azazsP8Bs5320J6r1k4Lct>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 22 Oct 2025 08:47:41 -0400 (EDT)
-Date: Wed, 22 Oct 2025 14:47:40 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Shahar Shitrit <shshitrit@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>
-Subject: Re: [PATCH net V2 2/3] net: tls: Cancel RX async resync request on
- rdc_delta overflow
-Message-ID: <aPjSbFE-nQwDHUu1@krikkit>
-References: <1760943954-909301-1-git-send-email-tariqt@nvidia.com>
- <1760943954-909301-3-git-send-email-tariqt@nvidia.com>
- <aPemno8TB-McfE24@krikkit>
- <ae854fd5-dda1-416a-9327-ac8f9f7d25ba@nvidia.com>
+	s=arc-20240116; t=1761137428; c=relaxed/simple;
+	bh=ZXohKXzTXjxyhGmIta74tVz7YubZEcgHibf5y0hQrzE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PyISqr5/+uVgJVAjDinKoV3hql90Y5cNsa/m5ngKGZQA0UN6jynXZWvSFkKJAlQzIRTQiX9Dh7Tc4LhMZpzBcn5aL+cxpliMC/xhjLU9P44znNtLBJVD1TB8mSI4Sgj5sUwT8gB7m5fd3oXA9a2l/xXZazpRYBDomubJcQlh3GA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=UNS2drj+; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-afcb7ae6ed0so1313639766b.3
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 05:50:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1761137421; x=1761742221; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OlBzXeLMRR7oz24/jCJCTbfxBakkjsQ0pgWftELTrS4=;
+        b=UNS2drj+Nt/qR4ZfAnlpRfG8ploIjPfOdCa7LIwderQ2zx1Wb5UvuJL/FtbD4G18xi
+         VB1IVyaQm7gbSNzJoZxVCL16kuGgGdIg0jBAetw1m9QEwuLTiegmY9JckKG4qHIv17tz
+         9+lVxvn89f1CgCz+dygcoewS9TlJU0tn9ldDf7AzeMQqOQVDPb4iTJQ9Eg/yrurTQB36
+         NBVQ3agKEOdjbh0ZEK+htdV2HuiycS86FIjiMdmFBH232pHsA8yhlh9Dv6Ke5hzTQ4KW
+         PbXpM+UqnX/+l4soczXV+ySTUsDqqer0g/cxZzKK+P/+MJOQya9NeKWJfCfDCehQtlJ3
+         cnag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761137421; x=1761742221;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OlBzXeLMRR7oz24/jCJCTbfxBakkjsQ0pgWftELTrS4=;
+        b=OHhjdq4XuFZqGCStjougxQ1OHFMm+fK4v5tBa6KmzwN2PZGLj2INa0jcICRYgH5fcx
+         E4EbLGZRWHQmJOEosNQRTEONiFITfDIRK54abVODKgPibUtox0+BDPoxIKr8UyPOq0qr
+         YHHZMZQJx9dtdIY2ue1pwO4qPoVCS3ZnyLsx2bs51qZghntXMvjJACZz2NFWdpy2WiPd
+         J1oR1aoqeC8gl8dj+CMq/xFs3xqfre9xr3im1BsfqGN1ieVNwCMQTvxG/WwixcneOhDL
+         JLnFapH5y50tBtLdWjtzGsUSVYqWE/1GG3OAo9gQS6uxghCMr3XGisiFFdYY/imgOmUQ
+         vayg==
+X-Forwarded-Encrypted: i=1; AJvYcCUZDcuwg8IUxqjjxRr0vmO4y21IImuK7paqLj8pKuREnYLzcMtJIhe8YDM92+yUSTgTxhv1t8A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyYFEGtB6rI1GxPN8dx6Ulh43LRwSmve4dHIRiuwaZRi0z4TrD
+	7QkGKOuJ2nWOKVScPHBphH3iTBqiIrHI3RsXoNGnghP30yU+irGkGP5rg6U3QD3h2TQ=
+X-Gm-Gg: ASbGncsMMJOmYoPeK9Qc8Fnd2CiOGh1yrBaE7XyMcX28AYFtapMjuWmJEV0VyF8/o22
+	Ui3Cb4dMcgj65FRPcbzDobH7COSL95tHmONMS5NFBo9qJsJqfCIhIFGk6bT94qCfZxFIIhkzkN8
+	qZK8x8XRcJtz8x0pcvVT+Nh97Ik+rWlAckT7csjoZWex2oQCM0TUDAT8A3wVPrumWTzAup6JAYe
+	5+z97EzsGXgGXkGy31XCe0HvTcsT0OE+obcsM9iFeick9+R4+hbYzeV/CFThemYvIyUflDt7dEL
+	aRQRq+IIP/2BbTq7DEW3QGgRcPiUA3LLVeJbUbt61651kt/rha5jESwtuxfE6cSl6R5yC9M/Sx2
+	K8XGYt9ovqz8+OFXo+5ovzBDguGrBUotTr3fxqG9UzQuNarjwjwWHG3GpZxXhU3iqEIQPAxeJF/
+	rCpx2P0og6LM1sgJr8AS4nFwE81nNk+BMfHiIc/5DeBTQ=
+X-Google-Smtp-Source: AGHT+IGK2M2QMmjt0Ltj+ax30YpGqmkyiLmafC7IwyMavI6cGNjRmi8OmQnBBPx18MSOTcJS0+DWug==
+X-Received: by 2002:a17:906:9fc1:b0:b41:3c27:e3ca with SMTP id a640c23a62f3a-b6474039b13mr2332953366b.7.1761137420912;
+        Wed, 22 Oct 2025 05:50:20 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d3501ed5esm144343666b.70.2025.10.22.05.50.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Oct 2025 05:50:20 -0700 (PDT)
+Message-ID: <f610a76a-c482-4e3d-b652-237261955553@blackwall.org>
+Date: Wed, 22 Oct 2025 15:50:19 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ae854fd5-dda1-416a-9327-ac8f9f7d25ba@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 05/15] net: Proxy net_mp_{open,close}_rxq for
+ mapped queues
+To: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+ pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, dw@davidwei.uk,
+ toke@redhat.com, yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+References: <20251020162355.136118-1-daniel@iogearbox.net>
+ <20251020162355.136118-6-daniel@iogearbox.net>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20251020162355.136118-6-daniel@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-2025-10-22, 14:38:17 +0300, Shahar Shitrit wrote:
+On 10/20/25 19:23, Daniel Borkmann wrote:
+> From: David Wei <dw@davidwei.uk>
 > 
+> When a process in a container wants to setup a memory provider, it will
+> use the virtual netdev and a mapped rxq, and call net_mp_{open,close}_rxq
+> to try and restart the queue. At this point, proxy the queue restart on
+> the real rxq in the physical netdev.
 > 
-> On 21/10/2025 18:28, Sabrina Dubroca wrote:
-> > nit if you end up respinning, there's a typo in the subject:
-> > s/rdc_delta/rcd_delta/
-> > 
-> > 
-> > 2025-10-20, 10:05:53 +0300, Tariq Toukan wrote:
-> >> From: Shahar Shitrit <shshitrit@nvidia.com>
-> >>
-> >> When a netdev issues a RX async resync request for a TLS connection,
-> >> the TLS module handles it by logging record headers and attempting to
-> >> match them to the tcp_sn provided by the device. If a match is found,
-> >> the TLS module approves the tcp_sn for resynchronization.
-> >>
-> >> While waiting for a device response, the TLS module also increments
-> >> rcd_delta each time a new TLS record is received, tracking the distance
-> >> from the original resync request.
-> >>
-> >> However, if the device response is delayed or fails (e.g due to
-> >> unstable connection and device getting out of tracking, hardware
-> >> errors, resource exhaustion etc.), the TLS module keeps logging and
-> >> incrementing, which can lead to a WARN() when rcd_delta exceeds the
-> >> threshold.
-> >>
-> >> To address this, introduce tls_offload_rx_resync_async_request_cancel()
-> >> to explicitly cancel resync requests when a device response failure is
-> >> detected. Call this helper also as a final safeguard when rcd_delta
-> >> crosses its threshold, as reaching this point implies that earlier
-> >> cancellation did not occur.
-> >>
-> >> Fixes: 138559b9f99d ("net/tls: Fix wrong record sn in async mode of device resync")
-> > 
-> > The patch itself looks good, but what issue is fixed within this
-> > patch? The helper will be useful in the next patch, but right now
-> > we're only resetting the resync_async status. The only change I see
-> > (without patch 3) is that we won't call tls_device_rx_resync_async()
-> > next time we decrypt a record in SW, but it wouldn't have done
-> > anything.
-> > 
-> > Actually, also in patch 1/3, there is no "fix" is in that patch.
-> > 
+> For memory providers (io_uring zero-copy rx and devmem), it causes the
+> real rxq in the physical netdev to be filled from a memory provider that
+> has DMA mapped memory from a process within a container.
 > 
-> I agree about patch 1/3 so I'll remove the fixes tag.
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> Co-developed-by: Daniel Borkmann <daniel@iogearbox.net>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>  include/net/page_pool/memory_provider.h |  4 +-
+>  net/core/netdev_rx_queue.c              | 57 +++++++++++++++++--------
+>  2 files changed, 41 insertions(+), 20 deletions(-)
 > 
-> For this patch, indeed at this point the WARN() was already fired,
-> however, the bug being addressed is the unnecessary work the TLS module
-> continues to do. For my liking, the wasted CPU cycles and resources
-> alone justify the fix, even if we've already issued a warning.
-> What do you think?
 
-Is there any work being done/avoided other than calling
-tls_device_rx_resync_async and returning immediately?
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-With or without the patch, tls_device_rx_resync_new_rec will be called
-during stream parsing.
-
-Currently, resync_async->req doesn't get reset so we'll call
-tls_device_rx_resync_async. We're still in async phase, rcd_delta is
-still USHRT_MAX, and we're done, tls_device_rx_resync_new_rec returns.
-
-With the patch, we'll see that resync_async->req is 0 and avoid
-calling tls_device_rx_resync_async.
-
-Did I miss something else?
-
--- 
-Sabrina
 
