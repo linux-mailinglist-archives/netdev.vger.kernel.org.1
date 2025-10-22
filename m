@@ -1,239 +1,221 @@
-Return-Path: <netdev+bounces-231778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F07ABFD419
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 18:35:47 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0D26BFD3EF
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 18:34:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EED4188AFAC
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 16:32:53 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 44BE235832F
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 16:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1BFE26ED52;
-	Wed, 22 Oct 2025 16:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94E334FF7C;
+	Wed, 22 Oct 2025 16:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="JUOeD+4H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iavnuc7c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7811635B15E
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 16:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F28435B15E
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 16:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761149534; cv=none; b=mFXHJNkXIapbEUi+jNhYNj26WvPImI9r1PwEeygOV//iWIcfPqHJce0pfXu5u0yaX56UK8t9QkiYKVoFpCFH4xICX0Oa78XaQ/fpoQzh7qbiuqUOjzQq8V+TR1IUcB9o5/ZT5WKv+sBrjGzqpBpDVkjmM6CFH1v/N04uqOe9gtQ=
+	t=1761149889; cv=none; b=HIHqyWjlGet9OCf2udOv8TwGibKzuFVTlcX9p3YlJS4owT6ak3wKn10HXdqiAjtTDQ4+YLLoECJ0+ag2yVBygLaj99TLG2m8S0k967e3TLRuGuur7V7nRGwOzip2WDGzTPYIXIkKisNdfRreQbO5zRDbcmk4Lf2SMK6X3paRSOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761149534; c=relaxed/simple;
-	bh=rJ5Nrs/lUYNBsHYppRWP2ng7D8AjCDafkKve5RN48d8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uaamw8jIPtdDdyjorotpkJ7I/Eg+/J1AWn02gp63uyI8B5ASXX2pvIHEs+45dLVm7AOsxSJytGSVOSHlCBW95oDv/j5H+CQIM2Kygg1nlsr7UyKUz3JP3w9mzB5Gaxkm46pHXGLiED7QhukQjnLHkqdQtoYNC6wmjBE6maWKwIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=JUOeD+4H; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 0968F3F7C4
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 16:12:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1761149524;
-	bh=hXJoSIXKAZqZaV1/Vtgd9fT53zuB/ef3PvkedjBFaZE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=JUOeD+4HQBn8EMZNYZMiFc/lT/+997XKFa7JYTFUfzO2EzJfCIgHdAW5/nishzAQ4
-	 PILk+zbpevhhWhmWUCf2Q6YF3qJg/V+OqXwp8hDaL3oTi1407IyoZq1dlESBvrkaKW
-	 iGSd879PqzqcUjoqMr2y89BAM9rYL03UIBwyI10iZLf4JJ7fjxJ0vwauGtpNKnwmqO
-	 o3ZFybdi40nqebyjj3LtEyWOo8Z08s5GFcmWWZeUlETWN34fSY6duHZyGxGo0jB/6d
-	 2impmt+fDf3lKZhYJj1tmnP7uG93zzF+RtxIMBb0PVogkqRPMRNuzCZpqYZy2K+h3i
-	 /joi/imre2Ep2tK96ckSrLvBrKdhPFpg7iPMiS0zzXY/AYnwjqVUpMc9o6EuuS5aGP
-	 5l3Ei2MLABdcxITZYaNw1kb9BeSkKOuCi5xH2FvfuqMx3YgWfvwpAzOZUkWn3vPTGO
-	 xEc/cFzNPADFx3L05miWi+EtCYuXjGVglgzbLKa2N6B7yBRwKqC/Xjzg2xd46ZlsJj
-	 fuXv7GtYQ/fBU43ibYnT4mDO1V3rUixBFhf7Q2bi+uvyh+z3SDStQ1KtOjkgCTlkZv
-	 GKbdfOXSIfpzvchqQWnzkgcoAm7PQQKZLP5j6BfbYcDX0Vv1thOwv+T208YS2/zbJI
-	 8x+SatSybPmo0pZFA2irdbAQ=
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-6349af0e766so10661793a12.3
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 09:12:03 -0700 (PDT)
+	s=arc-20240116; t=1761149889; c=relaxed/simple;
+	bh=4jHXjbabXeSFPpF/fqCcgJ6XdNu0nQpkS0GreRBSQ6s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MEnsHDtyzeBAhl+bTQ9tW9GD3yNEsFAR7tFs9yNwwT7Ce+joMR/1WJQKZu0+5gdAV857IeLdam/zGd2mVV40KttGBR0nsmP3i7Z28bCPjQtuNA9ukzsZ9HWfb0eoSa7P2v/7rYkhMWVZfyN9aM5ghYpvLa7atVh//ba4RjnTL7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iavnuc7c; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b6ceb3b68eeso431599a12.2
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 09:18:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761149887; x=1761754687; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RLP+bpkdPGjagGTgRPPp7+rOmgDtjlSKoZhywvA67RM=;
+        b=iavnuc7ceDYkWYY2LGIpqjQXKEQ/HQggb818cJjqa8TfhFd9HtVYKPL5yt5Od7lSbr
+         L6U3bQTTj0NLwRLARhG9kv5+ofSW+pru6UcY7/5ugfSk0RPn6gH1uycqPQpwEyNOio4c
+         zKQS+JRfkLJGhTCoMjNT6ugt3AL3a+WY+duIwcXSvPJOSnX3GfH5Vj1jBPVkmXWM+Igl
+         LJU7TMbIJXUTxs7PZhGMWYns+bblL16qeD5VC6cviObR6suYrNnsGOfQ/NMCFG5PsfIg
+         yhLswtxX4cHNInZO7Ojd/fHOCI2MzgG7opQpn0iHnGp2pf5P1EaoSD/QfEh4ovD6GaRR
+         NQ2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761149519; x=1761754319;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hXJoSIXKAZqZaV1/Vtgd9fT53zuB/ef3PvkedjBFaZE=;
-        b=LJpV0xV1RKyX6LwLub/k2b3dXWvYgqzLZ9ROI/S88GPysGRoWLHPaUnA7oUOnrTRuN
-         sjUYN9Vn3LFowQH9LZ1tYaehmDhmhdXphN+8FmTHucXRRrv0fegExyaVvcrAkd+F8BT8
-         vdGE2IrUCd2zytVFyWP9JkN8GLjDVNjoku4N8gSVKg5nmJffFvV0nq0Sv7WKYziba8Cv
-         fClm9DH/e5nZ9acsKhT2eeemiR8PRu/yWHSRL0aOgbADnqa0UWLi7YbaLirWGdJM46fB
-         pWDUmnwK//qpT1Vc9ElVWwyzPEYsyitJlFTPCjamfLK6gsiFpvArGRbylvfgi4t37O+0
-         9+1A==
-X-Forwarded-Encrypted: i=1; AJvYcCVRTqwroSkJz5Tt02NXfT7AO1k/3rzTTYNQzlr+bbWbr14D8r3Ezmvw5C0O+MSyIcxR0MqAoYs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwB5PkeJKoBtqMfGQ1h4YNR+gVUZAea3S198MAWX4XZmXSY/aB5
-	IaN3pEeb2mmuzMFa+SL77Em/oKE0zd2ZUHC0lUgFrvJOmvo0Sks0XBViTCIMstQu1tDQyCcHsIQ
-	PJhDaxtqUkWK2FdqSCdQdgqnSgron8zN+wbXdRGdlLPKdWz4/alaVILcRb6KlpgR2NYuDbYDEFJ
-	7dSoqGUJIFjewvcb4FFEzwDBIwO4MzgZIrWfja+IdLDoQDlBrA
-X-Gm-Gg: ASbGnct4g3SHYa8r1nZ7r7lFIi5gOg6ARKIxccIbf+p2pb1mZe3lwVVe5vKOCFMs6h/
-	4EsnLwbdmN71RIFj0iN/ewnxXviKJPqBoNDM9vKShd+063HWhOVmR5WdymHU6YlkrnxDIKVgHw9
-	uC5knGuLCoKTy74HaO/TPxCMiS2x5l4LKM0SsFX6eqaNww3ythzxG7nO07ZFZkDcJLKCgGweIZU
-	TMbZhZxSxoTUQ==
-X-Received: by 2002:a05:6402:3585:b0:636:240f:9ece with SMTP id 4fb4d7f45d1cf-63c1f6d90d0mr21265284a12.34.1761149519158;
-        Wed, 22 Oct 2025 09:11:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGo+EUlFBfQHcw0UwsmPphdFUhsNMc7g4lASSpo/GqY9R6yD4UV9MMURzb4IVRJTknj/6hFy7Q+FY5jHEndIVo=
-X-Received: by 2002:a05:6402:3585:b0:636:240f:9ece with SMTP id
- 4fb4d7f45d1cf-63c1f6d90d0mr21265253a12.34.1761149518706; Wed, 22 Oct 2025
- 09:11:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761149887; x=1761754687;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RLP+bpkdPGjagGTgRPPp7+rOmgDtjlSKoZhywvA67RM=;
+        b=WzPWHUu5cC+bdEQu9mmzVuMcAsHm3dZlHREfvfopAkW1a8DN3medhjm8QEFwDSsP6D
+         nMF+TSAkhYJFlBXcgsT4J0/+R5OhozBBSo39sKjKWnd5dP7DuZ/CRQT5Ss+2pIJl6LYE
+         h2RbC2FsCz2ntUA/ebUXlCPuYVK7WYsVIifej16vEhRmkDo3eVOE0zytPxyw44ZqrWPK
+         N+7jZor/IWbk9b8OZu9GwE95LC9EJ7A6T4ERrKTW+hWFMFA4mgENl5k2XjBobeWfF7wQ
+         Qtgk12qr0lK7oVFNhs5PPt7wp+htw2lOE6zeTm21he5+EZ+KTYcxfB8+Bd+y+bAL5YQD
+         Dlag==
+X-Forwarded-Encrypted: i=1; AJvYcCWMC0BWQxdzW7w7B1JYQMymH5gZIABidLeTs5Siib2tMXFBub9EqE8uC0nDTc48krnHDRAgLx8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyExhUe8Ym76hHzzlDcAbPBpUNsKOnQaCb8TdWnSSaatRyGqp8R
+	Y7nIuEKI49aBVgiRhi5PEyux/FkBrbCTu9iOiFEJ3cXO1cl+HePDJhXA
+X-Gm-Gg: ASbGncu0jNmUwb1zyd1JhOWPfR0dfMbBymp26vCaSwzO8JzsGO26KpZ1Yrj43m+9Dha
+	+s2iVhJ/8qt0wxq+UYhM9vvgVraUl7kti47rssre73Zy/iFvW5NbqJb8rMj6YQcDFghFe2EOzUd
+	vOgEujavFQgcUsSSRwaXJsPPGH8AfFkKrL8fOpiB/ispqUpzPwgO1ptGoqQpRcv6d8Y/nQ1/yUo
+	vN05KqcUjLFAA0sgSEZRclkge5bAIRWUiA6NDm7I5zPGwO8hEsSA6eUjkR3sZXxwfYwx64aw23e
+	xF3ZPSRs01Myh8da25syjpt1rdbsZZ/xXdZUJZ8dx/SzXsbU+USby8gN2BpBBkit8WcZdAR6MGQ
+	pg85DdSs8KGmcNtO8awWrA/kXbNMwKtIV1zEnKrutTu2jLPW2sVlTe9CweOZLsKbY4EzfR73Xu2
+	C9JazN
+X-Google-Smtp-Source: AGHT+IHfAOCNJGgUXhdj6sgYkuAO4xsbyh4B6nGpWidzyORSpqM0a8O04rj58jJ6k/uvjC5jyroU0w==
+X-Received: by 2002:a17:903:19f0:b0:264:5c06:4d7b with SMTP id d9443c01a7336-290cba4f065mr257718945ad.32.1761149887296;
+        Wed, 22 Oct 2025 09:18:07 -0700 (PDT)
+Received: from lima-default ([104.28.246.147])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-292472193a1sm142156625ad.106.2025.10.22.09.18.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Oct 2025 09:18:06 -0700 (PDT)
+Date: Thu, 23 Oct 2025 03:17:58 +1100
+From: Alessandro Decina <alessandro.d@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Alessandro Decina <alessandro.d@gmail.com>, netdev@vger.kernel.org,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Tirthendu Sarkar <tirthendu.sarkar@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, bpf@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2 1/1] i40e: xsk: advance next_to_clean on status
+ descriptors
+Message-ID: <aPkDtuVgbS4J-Og_@lima-default>
+References: <20251021173200.7908-1-alessandro.d@gmail.com>
+ <20251021173200.7908-2-alessandro.d@gmail.com>
+ <CAL+tcoCwGQyNSv9BZ_jfsia6YFoyT790iknqxG7bB7wVi3C_vQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251021154439.180838-1-robert.malz@canonical.com>
- <0c62b505-abe7-474e-9859-a301f4104eeb@molgen.mpg.de> <IA3PR11MB89860CA0245498E6FF720E48E5F3A@IA3PR11MB8986.namprd11.prod.outlook.com>
- <5578e792-2dd6-42db-8ad6-b12cd05c2617@molgen.mpg.de>
-In-Reply-To: <5578e792-2dd6-42db-8ad6-b12cd05c2617@molgen.mpg.de>
-From: Robert Malz <robert.malz@canonical.com>
-Date: Wed, 22 Oct 2025 18:11:47 +0200
-X-Gm-Features: AS18NWC0K4JlNBwhxK-j9aBt205Uc7UwVg8g7j0m6_4GsNSQueSsgnqvetVnQuU
-Message-ID: <CADcc-bxT13tqWKQFfXX6a5R125dRT21VT+5_ozzV-pmpX708gA@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [PATCH] i40e: avoid redundant VF link state updates
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Aleksandr Loktionov <aleksandr.loktionov@intel.com>, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, Jamie Bainbridge <jamie.bainbridge@gmail.com>, 
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, Dennis Chen <dechen@redhat.com>, 
-	Przemyslaw Kitszel <przemyslaw.kitszel@intel.com>, Lukasz Czapnik <lukasz.czapnik@intel.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
-	Anthony L Nguyen <anthony.l.nguyen@intel.com>, Simon Horman <horms@kernel.org>, 
-	"Keller, Jacob E" <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL+tcoCwGQyNSv9BZ_jfsia6YFoyT790iknqxG7bB7wVi3C_vQ@mail.gmail.com>
 
-Hey Paul, Aleksandr
-Thanks for the feedback.
-I have updated the commit message in [PATCH v2], some notes inline.
-
-On Wed, Oct 22, 2025 at 2:25=E2=80=AFPM Paul Menzel <pmenzel@molgen.mpg.de>=
- wrote:
->
-> Dear Alex,
->
->
-> Thank you for your input.
->
-> Am 22.10.25 um 14:06 schrieb Loktionov, Aleksandr:
->
-> >> -----Original Message-----
-> >> From: Paul Menzel <pmenzel@molgen.mpg.de>
-> >> Sent: Wednesday, October 22, 2025 1:49 PM
->
-> >> Am 21.10.25 um 17:44 schrieb Robert Malz:
-> >>> From: Jay Vosburgh <jay.vosburgh@canonical.com>
-> >>>
-> >>> Multiple sources can request VF link state changes with identical
-> >>> parameters. For example, Neutron may request to set the VF link state
-> >>> to
-> >>
-> >> What is Neutron?
-> >>
-> >>> IFLA_VF_LINK_STATE_AUTO during every initialization or user can issue=
-:
-> >>> `ip link set <ifname> vf 0 state auto` multiple times. Currently, the
-> >>> i40e driver processes each of these requests, even if the requested
-> >>> state is the same as the current one. This leads to unnecessary VF
-> >>> resets and can cause performance degradation or instability in the VF
-> >>> driver - particularly in DPDK environment.
-> >>
-> >> What is DPDK?
-> >>
-> > I think Robert needs:
-> > - to expand acronyms in the commit message (Neutron =E2=86=92 OpenStack=
- Neutron, DPDK =E2=86=92 Data Plane Development Kit).
-> > - to fix the comment style as per coding guidelines.
-> > - add a short note in the commit message about how to reproduce the iss=
-ue.
-> > @Paul Menzel right?
->
-
-@Aleksandr Loktionov you mentioned that comment style does not follow
-coding guidelines, from my perspective it looks good.
-Could you elaborate on that point?
-
-> Correct.
->
-> Maybe also mention how to force it, as there seems to be such an option
-> judging from the diff.
->
-> >>> With this patch i40e will skip VF link state change requests when the
-> >>> desired link state matches the current configuration. This prevents
-> >>> unnecessary VF resets and reduces PF-VF communication overhead.
-> >>
-> >> Add a test (with `ip link =E2=80=A6`) case to show, that it works now.
-> >>
-> >>> Co-developed-by: Robert Malz <robert.malz@canonical.com>
-> >>> Signed-off-by: Robert Malz <robert.malz@canonical.com>
-> >>> Signed-off-by: Jay Vosburgh <jay.vosburgh@canonical.com>
-> >>> ---
-> >>>    drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 12 ++++++++++=
-++
-> >>>    1 file changed, 12 insertions(+)
-> >>>
-> >>> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> >>> b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> >>> index 081a4526a2f0..0fe0d52c796b 100644
-> >>> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> >>> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> >>> @@ -4788,6 +4788,7 @@ int i40e_ndo_set_vf_link_state(struct net_devic=
-e *netdev, int vf_id, int link)
-> >>>     unsigned long q_map;
-> >>>     struct i40e_vf *vf;
-> >>>     int abs_vf_id;
-> >>> +   int old_link;
-> >>>     int ret =3D 0;
-> >>>     int tmp;
-> >>>
-> >>> @@ -4806,6 +4807,17 @@ int i40e_ndo_set_vf_link_state(struct net_devi=
-ce *netdev, int vf_id, int link)
-> >>>     vf =3D &pf->vf[vf_id];
-> >>>     abs_vf_id =3D vf->vf_id + hw->func_caps.vf_base_id;
-> >>>
-> >>> +   /* skip VF link state change if requested state is already set */
-> >>> +   if (!vf->link_forced)
-> >>> +           old_link =3D IFLA_VF_LINK_STATE_AUTO;
-> >>> +   else if (vf->link_up)
-> >>> +           old_link =3D IFLA_VF_LINK_STATE_ENABLE;
-> >>> +   else
-> >>> +           old_link =3D IFLA_VF_LINK_STATE_DISABLE;
-> >>> +
-> >>> +   if (link =3D=3D old_link)
-> >>> +           goto error_out;
-> >>
-> >> Should a debug message be added?
+On Wed, Oct 22, 2025 at 11:11:01AM +0800, Jason Xing wrote:
+> On Wed, Oct 22, 2025 at 1:33 AM Alessandro Decina
+> <alessandro.d@gmail.com> wrote:
+> > diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+> > index 9f47388eaba5..dbc19083bbb7 100644
+> > --- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+> > +++ b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+> > @@ -441,13 +441,18 @@ int i40e_clean_rx_irq_zc(struct i40e_ring *rx_ring, int budget)
+> >                 dma_rmb();
 > >
-> > I think adding one would be redundant since skipping identical state
-> > changes is expected behavior.
->
-> My thinking was, if something does not work as expected for a user, like
-> issuing the command to force a reset, that it might be useful to see
-> something in the logs.
+> >                 if (i40e_rx_is_programming_status(qword)) {
+> > +                       u16 ntp;
+> > +
+> >                         i40e_clean_programming_status(rx_ring,
+> >                                                       rx_desc->raw.qword[0],
+> >                                                       qword);
+> >                         bi = *i40e_rx_bi(rx_ring, next_to_process);
+> >                         xsk_buff_free(bi);
+> > -                       if (++next_to_process == count)
+> > +                       ntp = next_to_process++;
+> > +                       if (next_to_process == count)
+> >                                 next_to_process = 0;
+> > +                       if (next_to_clean == ntp)
+> > +                               next_to_clean = next_to_process;
+> >                         continue;
+> >                 }
+> >
+> > --
+> > 2.43.0
+> >
+> >
+> 
+> I'm copying your reply from v1 as shown below so that we can continue
+> with the discussion :)
+> 
+> > It really depends on whether a status descriptor can be received in the
+> > middle of multi-buffer packet. Based on the existing code, I assumed it
+> > can. Therefore, consider this case:
+> >
+> > [valid_1st_packet][status_descriptor][valid_2nd_packet]
+> >
+> > In this case you want to skip status_descriptor but keep the existing
+> > logic that leads to:
+> >
+> >     first = next_to_clean = valid_1st_packet
+> >
+> > so then you can go and add valid_2nd_packet as a fragment to the first.
+> 
+> Sorry, honestly, I still don't follow you.
+> 
+> Looking at the case you provided, I think @first always pointing to
+> valid_1st_packet is valid which does not bring any trouble. You mean
+> the case is what you're trying to handle?
 
-I treat VF reset in this scenario as a side effect which helps VF
-bring up the queues.
-User should not expect to see VF reset each time these commands are
-run and there are
-specific commands, like triggering VFLR through pci reset, which are
-available for that
-purpose.
-Like Aleksandr, I found the logs in this area to be redundant.
->
-> >>> +
-> >>>     pfe.event =3D VIRTCHNL_EVENT_LINK_CHANGE;
-> >>>     pfe.severity =3D PF_EVENT_SEVERITY_INFO;
->
-> Kind regards,
->
-> Paul
+Yes, I mean this case needs to keep working, so we can't move
+next_to_clean unconditionally, we can only move it when
+next_to_clean == ntp, which is equivalent to checking that
+first == NULL. See below.
+ 
+> You patch updates next_to_clean that is only used at the very
+> beginning, so it will not affect @first. Imaging the following case:
+> 
+>      [status_descriptor][valid_1st_packet][valid_2nd_packet]
+> 
+> Even if the next_to_clean is updated, the @first still points to
+> [status_descriptor] that is invalid and that will later cause the
+> panic when constructing the skb.
 
-Thanks,
-Robert
+Exactly - the key is to make sure we never get into this state :)
+
+At the beginning of the function - outside the loop - first is only
+assigned if (next_to_process != next_to_clean). This condition means: if
+we previously exited the function in the middle of a multi-buffer
+packet, we must resume from the start of that packet (next_to_clean) and
+process the next fragment in it (next_to_process).
+
+Consider the case you just gave:
+
+> [status_descriptor][valid_1st_mb_packet][valid_2nd_mb_packet]
+
+Assume we enter the function and next_to_process == next_to_clean, we
+don't assign first, so first = NULL.
+
+We find the status descriptor: without this patch, we increment
+next_to_process, don't increment next_to_clean, say we run out of budget
+and break the loop, the next time the function is entered we set first =
+status_descriptor because next_to_process != next_to_clean. This is
+exactly what we want to avoid.
+
+With this patch upon processing the status descriptor, we see
+next_to_clean == ntp, we increment next_to_clean, the next time the
+function is entered next_to_process == next_to_clean, first is correctly
+set to NULL and the next packet starts from valid_1st_mb_packet.
+
+So I've covered both the scenarios:
+
+a) [status][mb_packet1][mb_packet2]
+b) [mb_packet1][status][mb_packet2]
+
+The last case
+
+c) [packet1][packet2][status] is actually just a), because at packet2
+we'd find the EOP marker and close off the previous multi-buffer packet.
+
+I hope I was more clear and please check my logic :)
+
+Ciao,
+Alessandro
 
