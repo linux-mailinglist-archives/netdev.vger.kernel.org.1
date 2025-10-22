@@ -1,134 +1,112 @@
-Return-Path: <netdev+bounces-231909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18052BFE7C8
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 01:12:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5E7DBFE7CB
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 01:13:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A46518C5BED
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 23:13:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C273518C7BDB
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 23:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60DA72D7DC5;
-	Wed, 22 Oct 2025 23:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8409B30595B;
+	Wed, 22 Oct 2025 23:13:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="n0pDSE52"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hIbA6qyr"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A6C302166
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 23:12:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94D32D7DC5
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 23:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761174771; cv=none; b=Wohwozyc5ljlTaWgkK1gXmx77rS04MDaHfTgTsavy9XIxDhvL5tU2chR6hgAEiC699sd0jz9Uo9/ojVPh/RTsmYWNid5ZQA0cO0MbzeOL4k2iOHx5TxaWhwZ3gJk9qonAmYqBavaCG0hyrjSOwSnA3KYGZl6jiymQWggIG75m/s=
+	t=1761174782; cv=none; b=lt42vLTBJF7beZtxg1sv9RHNrTQMI58/6cypoPy7uqpuaPyrMfzqwJzy/2wVwCA7ytg06of6NUJfqelUDtk85OY+tp31XcF4DTLEw3zwSjUahZMaCbfT/f2y1qfjKGirxNEU888uZ1SXtZ0kW5iBWtIbmzt54jkBrt/aBjv0xek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761174771; c=relaxed/simple;
-	bh=NvBrYAYp5zpgQVkY3YYE9Fqqhz8bUc+Bun/3qLlMW5M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ghoy2gW7lbsFIXM0BJB/GVquhM8/f3IyWc6XYHWxWrU84ikwYSsBweO5p4dHNA1xw1xzCe/wCWXFwIxBCCb8MTNJ7rSmxiQ/RAP5tvXJMkXzFB34TeYXcWVIgwhPrUTO8G543snzKgBtGshi4j8CzJ+Dg3hWkCgO9Ndqwt3VnFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=n0pDSE52; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2753c96b-48f9-480e-923c-60d2c20ebb03@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761174766;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TQR3+niA3WL1Q5qAf+tYkxJSLyabvkBcayOKnKsYXT8=;
-	b=n0pDSE52OnOEthN3PSbHDCWq4EIiBdvXtsThCfAo+mTN32m/8WpJsAYts74PEcod1CQOf4
-	sbaGaxFPQkAmg1+y4ERFU9k2nFgsxUS/7bR9ex6rLXSUr9z+sEpqcpoIYC5PI1QdZvZIeR
-	HC51NCUrDfqX4AM+sen8mJGnL+koKnA=
-Date: Wed, 22 Oct 2025 16:12:39 -0700
+	s=arc-20240116; t=1761174782; c=relaxed/simple;
+	bh=HFgjSYdm8Qn7aeniSTWww+GwN2mmX1rRN9bBV3DPGAw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kKGcqAKEqdT+i+Q72uDfvqQ69f08CpmlE02U51LDqO+rP16rz9YBaXTZ4zi6VtsrwJUuAdJavWGU0TOaHYPCRMSPSGQZiFQ8QMmFK7DRPSQx3YdBZuKUi/Uo0thL515gTg+lfq2uwPIDjjzhg4X/KNgYdxTaA061FDjCSfgCkJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hIbA6qyr; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-63e0cec110eso207340a12.2
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 16:13:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761174779; x=1761779579; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fxFAnF6XcsAwEWpdTDR586Woen3eGEVHOet3tUa9++Q=;
+        b=hIbA6qyrLRqd4jEOVMdAHpEKhDwyx06xsvqnJ+vq+fj8v9JXVxoqh7zqsBc0rIlta5
+         CSoQ7INrY/4TGa8TBqHeXwWK2EpAryAHS8ZXtq3g9uInKQwoN0ndM8CsifcPykBGpXdF
+         B4eKXFqSl5rrQRKR9xoClJBpW7FdGnUcevRjFdeJIeruWjhmejGZSw4vScWrm+wFC0jb
+         phHGON71Ujz69R70CSu5yIZPzi1bms9OOzRz8Q5LKY6Q76A+qh93kdF1tD3VyY3sfBZ6
+         BN6kWqX47H2CLouhZTuRvn3RjVzYl+MNHgSETBiiseQZXmvMG2mvvjGumdMfQ1duUA4w
+         t7ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761174779; x=1761779579;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fxFAnF6XcsAwEWpdTDR586Woen3eGEVHOet3tUa9++Q=;
+        b=E4ELWhcTuIc85BQH3XJCr0SySpErLmWkWxA4SXyyyNt2/S6Xydmazp1nqDrKeIS+Wf
+         QYKuyLdIvT64I5Hd3yBvVpa0xP7Bm4CrFSXAsR9LW+wVty5kwmAOJNUgqVA8uuzreHtP
+         TeaBy/lUlOieTR+WXkpiYPUF/6btVe6OE78DwdJzGsgFtf6ajk3EZaO9v2lvbmALhu03
+         X2nagCrPGriBmBdaAL6lBHXDW4e7xPP4AG/pw1Ngg17q8J7nBQG1RuaOFCBydlMk2Z0n
+         aBbdsnR5h4j80UEh8sTdfvebxa48rXuIBjVjlhpIYVxzNpbcbSPjLF+q57DMdcfDfE8O
+         RKow==
+X-Gm-Message-State: AOJu0YwhfX1S8HDYG/+Z+CDc7XBXDESyrOetYID11xvV9p44TjFILLB9
+	9ZTBxHDegQ2n//ht5cWxZZUYKSmppzydOsyQ401ygFbEObvD5R/Bxpo1Bjou9QycKTf2kw4Ljdo
+	l5Dak1t581xKCuvB0BB1hPmV7VnKX4KTT15nuK5r4LspHTXUt318vDL5M9bg=
+X-Gm-Gg: ASbGncsRg3UN27qSf4IjRtTpUw4PFBhdV99dha9C++9nmTWnAhHBW2LtDvw2rkEYSvc
+	HdJonwVCQUpeCLxjV7QZlTmnO1ruMFHZSDi+WTm515JWzaps2ZbTmkv1EzIAIrHGNMCOmTsswvd
+	ayuiK2w91dPqU0L0bG4eaYA8mjP8gr4l655+BNuedzyMoz7JAj2f6UJHmtTjNk1jAKE1XHwxl1e
+	pHfMT5+QHni5aNfGzJ3PK+YF1HYmw4zBnQ2yM+ZSAS7JFDGTzAOeKoOBXbGZAohp1OI9wFJuE0I
+	GVMaHSVnSTTGkZc=
+X-Google-Smtp-Source: AGHT+IFzUC8Igm/62oEkkFjnbCLNJyRB5mms2TWRp+OBg9/a3xDEWAqzoLMjGWFmHbD4pwxZVEean0+cgSNwM2c0aQc=
+X-Received: by 2002:a05:6402:2551:b0:639:ff4f:4bba with SMTP id
+ 4fb4d7f45d1cf-63c1f631c38mr20866766a12.2.1761174778924; Wed, 22 Oct 2025
+ 16:12:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 11/15] selftests/bpf: Expect unclone to
- preserve skb metadata
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Arthur Fabre <arthur@arthurfabre.com>,
- bpf@vger.kernel.org, netdev@vger.kernel.org, kernel-team@cloudflare.com
-References: <20251019-skb-meta-rx-path-v2-0-f9a58f3eb6d6@cloudflare.com>
- <20251019-skb-meta-rx-path-v2-11-f9a58f3eb6d6@cloudflare.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20251019-skb-meta-rx-path-v2-11-f9a58f3eb6d6@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20251022221209.19716-1-ebiggers@kernel.org>
+In-Reply-To: <20251022221209.19716-1-ebiggers@kernel.org>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 22 Oct 2025 16:12:46 -0700
+X-Gm-Features: AS18NWCLwSkPmXXrwrRUKAzZQqdCkLiWFiRbclQU2Gkm3fJ5lh-vq1VECTvgGx8
+Message-ID: <CAAVpQUAuCGendBRk1DCxoMyTz4vh6S0SbyY6GmSQoGdpG6RQ1A@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: Remove unnecessary null check in tcp_inbound_md5_hash()
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	David Ahern <dsahern@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>, 
+	Dan Carpenter <dan.carpenter@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Oct 22, 2025 at 3:12=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
+wrote:
+>
+> The 'if (!key && hash_location)' check in tcp_inbound_md5_hash() implies
+> that hash_location might be null.  However, later code in the function
+> dereferences hash_location anyway, without checking for null first.
+> Fortunately, there is no real bug, since tcp_inbound_md5_hash() is
+> called only with non-null values of hash_location.
+>
+> Therefore, remove the unnecessary and misleading null check of
+> hash_location.  This silences a Smatch static checker warning
+> (https://lore.kernel.org/netdev/aPi4b6aWBbBR52P1@stanley.mountain/)
+>
+> Also fix the related comment at the beginning of the function.
+>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
-
-On 10/19/25 5:45 AM, Jakub Sitnicki wrote:
-> @@ -447,12 +448,14 @@ int clone_dynptr_empty_on_meta_slice_write(struct __sk_buff *ctx)
->   
->   /*
->    * Check that skb_meta dynptr is read-only before prog writes to packet payload
-> - * using dynptr_write helper. Applies only to cloned skbs.
-> + * using dynptr_write helper, and becomes read-write afterwards. Applies only to
-> + * cloned skbs.
->    */
->   SEC("tc")
-> -int clone_dynptr_rdonly_before_data_dynptr_write(struct __sk_buff *ctx)
-> +int clone_dynptr_rdonly_before_data_dynptr_write_then_rw(struct __sk_buff *ctx)
->   {
->   	struct bpf_dynptr data, meta;
-> +	__u8 meta_have[META_SIZE];
->   	const struct ethhdr *eth;
->   
->   	bpf_dynptr_from_skb(ctx, 0, &data);
-> @@ -465,15 +468,23 @@ int clone_dynptr_rdonly_before_data_dynptr_write(struct __sk_buff *ctx)
->   
->   	/* Expect read-only metadata before unclone */
->   	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
-> -	if (!bpf_dynptr_is_rdonly(&meta) || bpf_dynptr_size(&meta) != META_SIZE)
-> +	if (!bpf_dynptr_is_rdonly(&meta))
-
-Can the bpf_dynptr_set_rdonly() be lifted from the 
-bpf_dynptr_from_skb_meta()?
-
-iiuc, the remaining thing left should be handling a cloned skb in 
-__bpf_dynptr_write()? The __bpf_skb_store_bytes() is using 
-bpf_try_make_writable, so maybe something similar can be done for the 
-BPF_DYNPTR_TYPE_SKB_META?
-
-> +		goto out;
-> +
-> +	bpf_dynptr_read(meta_have, META_SIZE, &meta, 0, 0);
-> +	if (!check_metadata(meta_have))
->   		goto out;
->   
->   	/* Helper write to payload will unclone the packet */
->   	bpf_dynptr_write(&data, offsetof(struct ethhdr, h_proto), "x", 1, 0);
->   
-> -	/* Expect no metadata after unclone */
-> +	/* Expect r/w metadata after unclone */
->   	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
-> -	if (bpf_dynptr_is_rdonly(&meta) || bpf_dynptr_size(&meta) != 0)
-> +	if (bpf_dynptr_is_rdonly(&meta))
-
-then it does not have to rely on the bpf_dynptr_write(&data, ...) above 
-to make the metadata writable.
-
-I have a high level question about the set. I assume the skb_data_move() 
-in patch 2 will be useful in the future to preserve the metadata across 
-the stack. Preserving the metadata across different tc progs (which this 
-set does) is nice to have but it is not the end goal. Can you shed some 
-light on the plan for building on top of this set?
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
