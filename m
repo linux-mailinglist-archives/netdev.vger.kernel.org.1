@@ -1,252 +1,161 @@
-Return-Path: <netdev+bounces-231844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8D3ABFDE60
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 20:41:38 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73E8BBFDF1D
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 20:56:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75BA41894B08
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 18:42:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 15B8D4E2DC0
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 18:56:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1EBB34F46B;
-	Wed, 22 Oct 2025 18:41:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 367C12EBB9B;
+	Wed, 22 Oct 2025 18:56:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WQZ+o5oS"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="PUBN45MA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD6E34E769
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 18:41:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C894C34D4F1
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 18:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761158477; cv=none; b=B+Zc/T+4wTzUj7bihpu1yTNLfUBHFK4wUGbMb2aTdVNjJpzIH6AYrLcLajiLohCvPZpId0Bk3oeszIZXxL1fj7xRdYo95ELsCy+rZ8X9LnK1sQU3zvd+2KSdwlLrUQuDmaMISsfZjY3Fs/baG8KL1u8WbmqycRYVBci+oHz7cP8=
+	t=1761159397; cv=none; b=RosuqmU5BmbEQpv8aqHjP4k6qvtFx4naiosHoCHF7qK5AqO3O/+R6tyHlfeJfrqun+2T5WAawfxOIMpXo/hR+FP2OxxYz3xMKU4tB7dfUeGOPCQgOLcSzB//5ZU9I8WUpsHaEU5xoPiqaufF52kievLuPu9so8NMPhe0qVs6sYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761158477; c=relaxed/simple;
-	bh=Srdz0YdwKP8fBJdp00SvYH14YKC7endGqxbblYxmxmU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mQAltHM9MMwD4T0heDRATXVmynnIB3002C4JouYHX0l0hvTBiwOJN1I4882aEOnQm3oNmXdHWzBdk3HCe8CnNW+Wb+tisTGhSt5Xr+ZpXen9G5d8dpOq9+oHB/Y2OyVQfsqMJ4YrP5ZFWezSxlz+VbD8/+1PJZtDP1avUANLKWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WQZ+o5oS; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-27d3540a43fso74750055ad.3
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:41:15 -0700 (PDT)
+	s=arc-20240116; t=1761159397; c=relaxed/simple;
+	bh=/RVtcH/u7iWfm2o9vgeKfQ7ivd+HQa0+OoDrKazmqnQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oTksNA4aZdWkkuJPXTHAEc/86AOsxIiDjgPF79Q6tJGGopYhlJH5NqhAd5catNLqyO9lLs1bS5icJKDbxVZ6sfWBkSGXD8T94EbU07X5469AX1/69H66imrTnW+irZ5g+LRXVOjdq60zlTZyHLHIqetcl30q64wTzI3icPgHnOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=PUBN45MA; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b6d2f5c0e8eso333127166b.3
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 11:56:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761158475; x=1761763275; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MwSSsIMdPEv7A4eQ3QmSWhovEg7spF/mgUkKOL7vAOA=;
-        b=WQZ+o5oScuY8GhK9TUDT+8rodUBgEbEDs1/ItuAbO1infVuX7KrbQedR7KH/BtGAkT
-         2R/vvIIlAGIj4DW9+vD0YIC+NLAItoBnsurvN3W4kTeMfjQe3TRKNSVkQTc/WXBMlGC2
-         DHH4HxAgmPLhltBL4NR3Ox6SybFeYNsZHrijZXvqTOnyMiyGUyd99p2JnA3U0WkV5MG4
-         qqMqSnTfSefIpNDOL3H+JS41rM/6e2GuhtwZvvsgNZOR1f5ZcdhPv/xHOcOEc2Mu9m1+
-         V2bxWmZ9fcAtKOQ8+lxsRWz0KLiEtu+cvZSETaTgU+3iGDQDxhJqM62QJPYfKHuLoaai
-         zZmQ==
+        d=openvpn.net; s=google; t=1761159393; x=1761764193; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ldVYHaLpW+euOSC9ObMmwQbYCKGkzzAB2Gt5PKa8Qog=;
+        b=PUBN45MAPwbCbpa1va0T11UJyXUrJJ+wS8vaS1QftKRZZmNzv+KB2hTSEobP0Jzgis
+         N1txbUwAYQwAjiSRHxgGh/Zc57b3LW7B0bQ03uqLSz3HEEbSlz85qMlf7nkuUgPP5HDg
+         zcsxMIJIkEwBYelVqEsHdff+nwpA+snV4L3rd1V3EF7FmGKJD4CUSVQJN9KxAofe8wGG
+         zhuiYp3/YfZ/p2V/Zge8UIII/TzBQMggy88xz9D7aI6g9PPEMf83Szr2iRAWuaADin3E
+         6ERXj/1MjC+fBIni6C2QVSYFEr+0PRebwZ1v16o64eMPZ/UO6VXGR4jWGwnKP3ObYHcM
+         Ttqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761158475; x=1761763275;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1761159393; x=1761764193;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MwSSsIMdPEv7A4eQ3QmSWhovEg7spF/mgUkKOL7vAOA=;
-        b=ePVOKXt3TbSx7FvS4Tphn9mY7HFdqXXI/BF3fPOAQC0iA46nyOsNGN4jyjG5aNVo4+
-         OXelLTAGjf//u9mI9D/v+9UWwXedvenL5dRWp05WjPpHPBzrYeWPtM8MIgBGYSje/Q2K
-         Etz3HQQWeBZJXzWxBRDN66zvPlWt3hNoQrCTKiI+dpkLekkRkMSi4bTZRfbFEvcLawuU
-         IuizzAwNoJQ/i8Z0Vf4tVQlQFFHhKThIG4TblKrzvyPXh3Z/YTIkYuXVVldnPbRnkxdT
-         1/WjuCvU7GlQscYgOoiP9hACn6JZNH9DO5DZJiH9ozdfLvHa1/e4xVGDSaqiiRpvh6YZ
-         HGgw==
-X-Forwarded-Encrypted: i=1; AJvYcCUz+2KiXTFWqFXQsSPQMEfjgaXmELtShD5F1yuQhr5vfwCaGOJs9qQcrPeilmZFm5/EqwLI/HE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysAJL5HNCl7V3BqWHLGk7MoZg8j4/DHoMzt8wEwIeoJaAon5cJ
-	xMEDPI0e107Ct2DTRWT8mxMhYBz8vVRO24H+pgDP3HH250PpAMVq+tqk
-X-Gm-Gg: ASbGnctxcyNAVtqe7b68Ld6MuNGb8DtGp3Z/PaTVqEv7hWuh7356H5SKqn72wp9lHVh
-	rWiwF8AX55y2OWktTvvTN2+DFCKZaX2g+KzXNTZKp2LPQymJRWqlzvEn+wYxBhholtJyaVFXYet
-	kx1kctY/QeX7owy9WAOMludnzvN7FvNtbCJ8XcoPl3ohbDdZJI2u7dRLyeB39yob66eLsEhNsL5
-	u/2wqeW5y5nNQrgvDN9T7kWg4BnXuEeuIzGCkKjjmpd0he/i5GZ3u8l/FTtub37bmcxRblwHyBt
-	AdaXWtTRTvrYgL/6klkIJio2SGZMmZGn7cI114Pq9R/l3INL8XIyrFwU6JNbFKk+tREiYDnZIiC
-	wIesv2i+S+PjNYr4PaIJfGoCYv/Zf5/UDvE8j8e4Bqx2BAYsFTOnULsfBTXZtwi4yORApkZy4WP
-	GVDavbVh2MnA/LtDs=
-X-Google-Smtp-Source: AGHT+IHzrkR8kQC2JkBfpPS5AblvPCgWlm5WoPllvAcMI7Ncjl9ri4KHEv/uC8RZ1oR6PgS00gPyww==
-X-Received: by 2002:a17:902:e944:b0:290:a3b9:d4c6 with SMTP id d9443c01a7336-290caf831b6mr285229685ad.36.1761158474775;
-        Wed, 22 Oct 2025 11:41:14 -0700 (PDT)
-Received: from chandna.localdomain ([106.222.229.91])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29246ec20a4sm145578975ad.7.2025.10.22.11.41.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Oct 2025 11:41:14 -0700 (PDT)
-Date: Thu, 23 Oct 2025 00:10:59 +0530
-From: Sahil Chandna <chandna.sahil@gmail.com>
-To: Yonghong Song <yonghong.song@linux.dev>
-Cc: syzbot+b0cff308140f79a9c4cb@syzkaller.appspotmail.com,
-	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com,
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
-	linux-kernel@vger.kernel.org, listout@listout.xyz,
-	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me,
-	song@kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [bpf?] WARNING in bpf_bprintf_prepare (3)
-Message-ID: <aPklOxw0W-xUbMEI@chandna.localdomain>
-References: <68f6a4c8.050a0220.1be48.0011.GAE@google.com>
- <14371cf8-e49a-4c68-b763-fa7563a9c764@linux.dev>
+        bh=ldVYHaLpW+euOSC9ObMmwQbYCKGkzzAB2Gt5PKa8Qog=;
+        b=aaVpCCkIgmGkiyQHs+9l/3VcOjUZwtXKhzXcII+eTD76np2zSIYPok8iLbYCpTU9Zx
+         02UD/h1MxE2NOFABi3DXBOJjgdulLMESG1HXvkonXGMfsK2WaIEKwQEKRFZsaJjriGdc
+         RcQ69e2Gx6Gz6m4bZ7kkU0fSnqS4vg2NM+yMh4DvMf6Ss6sPQ2+YNG4KVCyzbaJgDoHE
+         ps7lSrAhQ9a5I3wpnq8rhfxxolKTd6az4d4CEevziYs1hgwpd9jsDaISahGbRI06XDrk
+         Jbd036SDbSSpgNd+4Z6FCyII9FiYKMEcdwEMGD/OE+92vHNlebhQ0GzkUX2RAu5vRCkM
+         UZBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUTdgEK7uYlt7H87ThueWsg5oSoj2EdiMWcvewj1vnBONiAK5wXzkpAD5Q3TglAOh/NfS66gfw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFsoeI6p3JBfnuV84MEw0VjfGs2Ybn1AjOjfngK6MafvfX0xYo
+	YNWqh99ZMTLvrp7jz70O6hflL5gGokhiNhbUJGZZLPeG5fUIVB7HwYEyajmtdlfUVUslFe25YEU
+	rKS9s9TwulMps7Dqba2Qq0Ibyr4yKN+cl8DNB4iNgMtdEzbSsnAk=
+X-Gm-Gg: ASbGncsUYnYy14Z2GEZvmu7/DM9wdOr5TBF5JHPpV/c/w74KTtfgyyypjYvYSBg4XVf
+	XB8pA3TpFnpmcAWr8MZwyRh1fi3eaqm084k1r/NGTosuY+TB0NtXblUAYyLZsTliKcMvGC3+4Ac
+	PnQ7ubPugWStLDQ2odnsfH6yDz6Ru8lG/Me5Tpy1KtM0vfKwwf2UMWyoh208nlO6kbBZ2HU8Vws
+	63tBs+vIOSI9/KrgJ8fGA1DZvg3miEsqBL6bQyvn2uUBLqvPP5W/FTjT17tvQB58ivSWskBQNTv
+	LchT9izk4n76i62dlbGZq9czIO6KQLkLR33+aWzR/kN67rooIshSdPKC92SoU2GYvdsSJQ3VbsB
+	nifAPTFNWgmzKQGbh32zfy6JCFm3F0HiK1cA+VhEH4Hoj471CnkejuUQ88dyvDvyryugTpQ3p/w
+	0ZoT5k26isvkfodOsxTqXCa6K1bPUr3i/D3jtsKKM=
+X-Google-Smtp-Source: AGHT+IFoaZWW0RUuXchQuLGszdhX8rQoRFFhk2svxVmhQUlsTL2tJ4y4vLuUdq4Q+Z/mDzYu1Nxcvw==
+X-Received: by 2002:a17:906:2615:b0:b64:76fc:ea5c with SMTP id a640c23a62f3a-b6476fceab3mr1803858866b.52.1761159393009;
+        Wed, 22 Oct 2025 11:56:33 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:1:df21:10eb:f32f:be16? ([2001:67c:2fbc:1:df21:10eb:f32f:be16])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b65eb525f48sm1407863566b.60.2025.10.22.11.56.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Oct 2025 11:56:32 -0700 (PDT)
+Message-ID: <7333eeaf-e28a-45c3-802e-bde9717c8b0d@openvpn.net>
+Date: Wed, 22 Oct 2025 20:56:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <14371cf8-e49a-4c68-b763-fa7563a9c764@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 1/3] net: datagram: introduce datagram_poll_queue
+ for custom receive queues
+To: Ralf Lici <ralf@mandelbit.com>, netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Mina Almasry <almasrymina@google.com>, Eric Biggers <ebiggers@google.com>,
+ Sabrina Dubroca <sd@queasysnail.net>
+References: <20251021100942.195010-1-ralf@mandelbit.com>
+ <20251021100942.195010-2-ralf@mandelbit.com>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <20251021100942.195010-2-ralf@mandelbit.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 22, 2025 at 09:57:22AM -0700, Yonghong Song wrote:
->
->
->On 10/20/25 2:08 PM, syzbot wrote:
->>Hello,
->>
->>syzbot found the following issue on:
->>
->>HEAD commit:    a1e83d4c0361 selftests/bpf: Fix redefinition of 'off' as d..
->>git tree:       bpf
->>console output: https://syzkaller.appspot.com/x/log.txt?x=12d21de2580000
->>kernel config:  https://syzkaller.appspot.com/x/.config?x=9ad7b090a18654a7
->>dashboard link: https://syzkaller.appspot.com/bug?extid=b0cff308140f79a9c4cb
->>compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
->>syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=160cf542580000
->>C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=128d5c58580000
->>
->>Downloadable assets:
->>disk image: https://storage.googleapis.com/syzbot-assets/2f6a7a0cd1b7/disk-a1e83d4c.raw.xz
->>vmlinux: https://storage.googleapis.com/syzbot-assets/873984cfc71e/vmlinux-a1e83d4c.xz
->>kernel image: https://storage.googleapis.com/syzbot-assets/16711d84070c/bzImage-a1e83d4c.xz
->>
->>The issue was bisected to:
->>
->>commit 7c33e97a6ef5d84e98b892c3e00c6d1678d20395
->>Author: Sahil Chandna <chandna.sahil@gmail.com>
->>Date:   Tue Oct 14 18:56:35 2025 +0000
->>
->>     bpf: Do not disable preemption in bpf_test_run().
->>
->>bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=172fe492580000
->>final oops:     https://syzkaller.appspot.com/x/report.txt?x=14afe492580000
->>console output: https://syzkaller.appspot.com/x/log.txt?x=10afe492580000
->>
->>IMPORTANT: if you fix the issue, please add the following tag to the commit:
->>Reported-by: syzbot+b0cff308140f79a9c4cb@syzkaller.appspotmail.com
->>Fixes: 7c33e97a6ef5 ("bpf: Do not disable preemption in bpf_test_run().")
->>
->>------------[ cut here ]------------
->>WARNING: CPU: 1 PID: 6145 at kernel/bpf/helpers.c:781 bpf_try_get_buffers kernel/bpf/helpers.c:781 [inline]
->>WARNING: CPU: 1 PID: 6145 at kernel/bpf/helpers.c:781 bpf_bprintf_prepare+0x12cf/0x13a0 kernel/bpf/helpers.c:834
->
->Okay, the warning is due to the following WARN_ON_ONCE:
->
->static DEFINE_PER_CPU(struct bpf_bprintf_buffers[MAX_BPRINTF_NEST_LEVEL], bpf_bprintf_bufs);
->static DEFINE_PER_CPU(int, bpf_bprintf_nest_level);
->
->int bpf_try_get_buffers(struct bpf_bprintf_buffers **bufs)
->{
->        int nest_level;
->
->        nest_level = this_cpu_inc_return(bpf_bprintf_nest_level);
->        if (WARN_ON_ONCE(nest_level > MAX_BPRINTF_NEST_LEVEL)) {
->                this_cpu_dec(bpf_bprintf_nest_level);
->                return -EBUSY;
->        }
->        *bufs = this_cpu_ptr(&bpf_bprintf_bufs[nest_level - 1]);
->
->        return 0;
->}
->
->Basically without preempt disable, at process level, it is possible
->more than one process may trying to take bpf_bprintf_buffers.
->Adding softirq and nmi, it is totally likely to have more than 3
->level for buffers. Also, more than one process with bpf_bprintf_buffers
->will cause problem in releasing buffers, so we need to have
->preempt_disable surrounding bpf_try_get_buffers() and
->bpf_put_buffers().
-Right, but using preempt_disable() may impact builds with
-CONFIG_PREEMPT_RT=y, similar to bug[1]? Do you think local_lock() could be used here
-as nest level is per cpu variable and local lock semantics can work
-for both RT and non rt builds ?
->
->There are some kfuncs/helpers need such preempt_disable
->protection, e.g. bpf_stream_printk, bpf_snprintf,
->bpf_trace_printk, bpf_trace_vprintk, bpf_seq_printf.
->But please double check.
->
-Sure, thanks!
->
-[1] https://syzkaller.appspot.com/bug?extid=1f1fbecb9413cdbfbef8
->>Modules linked in:
->>CPU: 1 UID: 0 PID: 6145 Comm: syz.4.53 Not tainted syzkaller #0 PREEMPT(full)
->>Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
->>RIP: 0010:bpf_try_get_buffers kernel/bpf/helpers.c:781 [inline]
->>RIP: 0010:bpf_bprintf_prepare+0x12cf/0x13a0 kernel/bpf/helpers.c:834
->>Code: ff e9 ce fe ff ff e8 10 ec e0 ff e9 be fe ff ff e8 06 ec e0 ff e9 b4 fe ff ff e8 fc eb e0 ff e9 aa fe ff ff e8 f2 eb e0 ff 90 <0f> 0b 90 65 ff 0d 27 fd b2 10 b8 f0 ff ff ff e9 17 ff ff ff e8 d8
->>RSP: 0018:ffffc90003797840 EFLAGS: 00010293
->>RAX: ffffffff81df57fe RBX: ffffc90003797a10 RCX: ffff888026493c80
->>RDX: 0000000000000000 RSI: 0000000000000004 RDI: 0000000000000003
->>RBP: ffffc90003797970 R08: 0000000000585870 R09: 0000000000000005
->>R10: dffffc0000000000 R11: fffff520006f2f20 R12: dffffc0000000000
->>R13: 0000000000000004 R14: 0000000000000003 R15: 1ffff920006f2f42
->>FS:  00005555805f5500(0000) GS:ffff888125e0c000(0000) knlGS:0000000000000000
->>CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>CR2: 0000000000000000 CR3: 000000007c04e000 CR4: 00000000003526f0
->>Call Trace:
->>  <TASK>
->>  ____bpf_trace_printk kernel/trace/bpf_trace.c:372 [inline]
->>  bpf_trace_printk+0xdb/0x190 kernel/trace/bpf_trace.c:362
->>  bpf_prog_bfbd7bf4bf171090+0x41/0x5a
->>  bpf_dispatcher_nop_func include/linux/bpf.h:1350 [inline]
->>  __bpf_prog_run include/linux/filter.h:721 [inline]
->>  bpf_prog_run include/linux/filter.h:728 [inline]
->>  bpf_prog_run_pin_on_cpu include/linux/filter.h:745 [inline]
->>  bpf_flow_dissect+0x225/0x720 net/core/flow_dissector.c:1024
->>  bpf_prog_test_run_flow_dissector+0x37c/0x5c0 net/bpf/test_run.c:1414
->>  bpf_prog_test_run+0x2c7/0x340 kernel/bpf/syscall.c:4688
->>  __sys_bpf+0x562/0x860 kernel/bpf/syscall.c:6167
->>  __do_sys_bpf kernel/bpf/syscall.c:6259 [inline]
->>  __se_sys_bpf kernel/bpf/syscall.c:6257 [inline]
->>  __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6257
->>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->>  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
->>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->>RIP: 0033:0x7f25b0f8efc9
->>Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
->>RSP: 002b:00007ffe036cd5e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
->>RAX: ffffffffffffffda RBX: 00007f25b11e5fa0 RCX: 00007f25b0f8efc9
->>RDX: 0000000000000050 RSI: 0000200000000180 RDI: 000000000000000a
->>RBP: 00007f25b1011f91 R08: 0000000000000000 R09: 0000000000000000
->>R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
->>R13: 00007f25b11e5fa0 R14: 00007f25b11e5fa0 R15: 0000000000000003
->>  </TASK>
->>
->>
->>---
->>This report is generated by a bot. It may contain errors.
->>See https://goo.gl/tpsmEJ for more information about syzbot.
->>syzbot engineers can be reached at syzkaller@googlegroups.com.
->>
->>syzbot will keep track of this issue. See:
->>https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->>For information about bisection process see: https://goo.gl/tpsmEJ#bisection
->>
->>If the report is already addressed, let syzbot know by replying with:
->>#syz fix: exact-commit-title
->>
->>If you want syzbot to run the reproducer, reply with:
->>#syz test: git://repo/address.git branch-or-commit-hash
->>If you attach or paste a git patch, syzbot will apply it before testing.
->>
->>If you want to overwrite report's subsystems, reply with:
->>#syz set subsystems: new-subsystem
->>(See the list of subsystem names on the web dashboard)
->>
->>If the report is a duplicate of another one, reply with:
->>#syz dup: exact-subject-of-another-report
->>
->>If you want to undo deduplication, reply with:
->>#syz undup
->
+On 21/10/2025 12:09, Ralf Lici wrote:
+> Some protocols using TCP encapsulation (e.g., espintcp, openvpn) deliver
+> userspace-bound packets through a custom skb queue rather than the
+> standard sk_receive_queue.
+> 
+> Introduce datagram_poll_queue that accepts an explicit receive queue,
+> and convert datagram_poll into a wrapper around datagram_poll_queue.
+> This allows protocols with custom skb queues to reuse the core polling
+> logic without relying on sk_receive_queue.
+> 
+> Cc: Sabrina Dubroca <sd@queasysnail.net>
+> Cc: Antonio Quartulli <antonio@openvpn.net>
+> Signed-off-by: Ralf Lici <ralf@mandelbit.com>
+
+Reviewed-by: Antonio Quartulli <antonio@openvpn.net>
+
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
+
 
