@@ -1,180 +1,236 @@
-Return-Path: <netdev+bounces-231515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C99CBF9C5A
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 04:55:32 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E29E1BF9CB4
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 05:11:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D03823A8436
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 02:55:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A0D764E43CF
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 03:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE9C214807;
-	Wed, 22 Oct 2025 02:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1AAD1DE3C7;
+	Wed, 22 Oct 2025 03:11:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gx9rxgF5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ecU5J8UT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD55322A
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 02:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CEE12222AF
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 03:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761101728; cv=none; b=NzhP1Rb/+WkAZT3A2Gb7kLBt7RjTL57IfysCt5WqadwhhADgR8uuaxcZQzsIvgHcgYkskfVK6DiI1wAks4QFlMZUMZTwo1XB/3WB41rOx4Y1tPzxlOtKgRPwm2iH8pf0w3Z/88dkxI8S9AQy7uzYyWnpZfVqbspGqdpGaNv5y10=
+	t=1761102700; cv=none; b=dfO3Rm4fiHlDdJZiYgUVJtWriW3Vn/Z1MJF8unE/F7yeVoWiNbkesHdR8TLImMg7YExByL+Zb+08N9FDsJMcq12/YcHNgCzB9wuzw7/6iMCGtFveBNcxHpGWwJopxjdocFsFBoDcsfdHqnc4LyggHMx1BM/cijTvkTayiQFRPMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761101728; c=relaxed/simple;
-	bh=ZrtvSK7jB4iwBAh0fO0oro7IBTovy7isMjxunmOiW34=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ebkYaaRLGNZe87qsk4sOouQxBd8oPg74DFq2cdh5NmgTpw3Ca9BQrAjkhRtrzJKvxSktSBxulkiOND2eyVfQK6iejdxyZ7pj40IIEts9RsSx7rrofpjYFYYiKj9P+e/UbS0I4hBIjeCHvkDrQYneLs8PO1jfVLy+7/hqg+9NuzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gx9rxgF5; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1761102700; c=relaxed/simple;
+	bh=vo4X/k8QJ+NxqbcWxXdeO1gco1FXAXIvNeqYsVUxN+4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AtB6Txm2o/u+j6xyNqyHgHszLF8lS6cbvX1byuEWpFw9tfmJu9uX6Y0fG7qtvK/hQzn0znthziqzHzqn67C6KoyOwFpsP41ejTN+oWZAhLgO8+70Gkntvj896Iqv+BBh1BjwuoA0rWbmx1z0OlwXzskPHTOzxi+R9OZqL/mZ1oY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ecU5J8UT; arc=none smtp.client-ip=209.85.166.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-290c5dec559so50849355ad.3
-        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 19:55:26 -0700 (PDT)
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-938bf212b72so268381339f.1
+        for <netdev@vger.kernel.org>; Tue, 21 Oct 2025 20:11:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761101726; x=1761706526; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VPky2Dr4hSQM4X8209nAybku8lFOdlCo9dChOXhSn7w=;
-        b=gx9rxgF5yCDjzfHU7IuloYnk4no07vSFSDB76rb5CTSw8jCH2EBYLJrHjNAV+QD8Zk
-         DThIgmboZ42Zd0iyuW2o3eu0ltNkRU/ZQpKbK+gWeJ0ivYRn7hQgfNnivaa232FTiDLy
-         Wq2jGJTm4u9h1HrU/YiusxYdtJBULym0/eqxJeAtpNbR72w4Kmd8H9d56N/MTXiaD86D
-         C+rU8NozMGjYCmenkhwMAmoiyhWLptWnklR8B4PYaunwltsV6C7Ex5SewLufPVGeJsls
-         3D6pPH9e80ZsCdv9pSZZRjSOQ1qiFETnvn7x79HW5+fNJ6+un72OK5rsDrcvcnlrirNs
-         q2Yw==
+        d=gmail.com; s=20230601; t=1761102698; x=1761707498; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1w81N5UwqCcLk9lzNRuUpjETqoES8d1bFB+ZdpugPTA=;
+        b=ecU5J8UT2Bwg8ULPydtna8dAQMF62PFne2fmf1Y9Ag8gK6uy29cNT/9sEC0fepMoUR
+         zxGvA9KDaX+D52B/boKTWnBLfg5u2nbMp3jj2VSm5DmxVfgxsjNTvul8Bq6n+oi4IHUG
+         o51N065I48yH3pYK1LeJafJCxj2cRlUhJwnxSwdnXFp0iwqvzKrzwJXqFtZiR8q6v90w
+         1/PcZ5EBGpqvawUyH3eTTS+i+QH5kDq0f3SJJtZCWP1dIKRRjNbDbnD+ArQZFEDjyl4h
+         QaEbDbvMFBBcNxAEuqjKjeDq20z1s5v9bpJvAiT/e1nDxqDYrrdUW7DPUZVuu5bPnAqd
+         TPLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761101726; x=1761706526;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VPky2Dr4hSQM4X8209nAybku8lFOdlCo9dChOXhSn7w=;
-        b=Sg8JCqTVF2XVRu0E7JsoWKA6pt3VkR5O0ut+9+Utz75+UhqIxCSIwrWfGGYv66K9On
-         tJCNHtdbvtB3TMclVvpCca1V5lqeHWhj9jxtvE9klOnghQHTyo94qOEAZ25/1H6oya5X
-         aqkOQFngYsv8egszEGXgeDuG214Oz8smiXtuXmlOxlY1Z6mvh0xavf9BQU+U0EEzMsw5
-         BGz3b//L7k2DnjU2BXyvP1eL0Srq7aC35CxutxSJTevMoyATUcEgj0qWl91BT8SHwgTx
-         0mRnf3csVnmldRnTYSvXjFcIgOWliAjV9iEMmV5I8uoR57XodTM3ndc6Jb/Y+twIeNrt
-         +u3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCURM9ig0WRZjVYDHgoNaIK6DKWGXe9EaIydedf+5oDdT8+9fLKQXvhXCh8dxY4bmhC3c+1bMPQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxI3Ht/uQoFzpdvwsebm0y5/LJsMh/TgT78dJeJV5vTvI3ou8x8
-	2tf0LCed4jGyKrkZ3cE5DXlFZX2LQNnicbUN4zHF6TjVC91Zhqb/jLX2
-X-Gm-Gg: ASbGncuFVBi1XERmJmXavjjZIaFGkRBC7dd8luhR7aLndhAYivGODb2nNAkwNKAGTRr
-	SNWxlD24HibLp3E7cVyBaluuxvzpSZ7kdsvxbSeN57Zypyadf95YfqIakcowEHPBNTRHPC+NFfY
-	mH5KOEUAk6bFqfWxHaWEYjIyb6brHDkSgXTraVAZYTa8nRaFqoARLPkVg0x7PCblo1U5as+WCfA
-	K7jxT46Qo63tgJwkpRYQJS4l2hjfcVDq1mdBNE9L2fFthD4c0TPAbfNqtTJUT/qiHyzI2xub0t7
-	BLfmu0V1dYTPsGIfzIHJhIpwqOcPfEFjA0DkV3gYpdtYeaRUWKk++Gi/ElW1uzvzF3tKcK/xocx
-	9UHAvdcYZsKJKn/TmZfL7hK86A6HYtbw8HNfYU/ch107ph/Ds4fCHwHKHfBiv3khB1Mi7gVET1N
-	PygMSspM08jyz/
-X-Google-Smtp-Source: AGHT+IF3djNIS7WVATUe83XXRS6aA9D+T77xapsJjzDewNLTQQ9xMPqmOrivckESaDuZU7VdzZJBJg==
-X-Received: by 2002:a17:902:ce0e:b0:28e:9427:68f6 with SMTP id d9443c01a7336-290c9cd4d59mr232428945ad.27.1761101725760;
-        Tue, 21 Oct 2025 19:55:25 -0700 (PDT)
-Received: from archie.me ([103.124.138.80])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33e223c7e19sm1005066a91.3.2025.10.21.19.55.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 19:55:24 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id CD5934241829; Wed, 22 Oct 2025 09:55:12 +0700 (WIB)
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>
-Cc: Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>,
-	Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH net-next v2] net: rmnet: Use section heading markup for packet format subsections
-Date: Wed, 22 Oct 2025 09:54:57 +0700
-Message-ID: <20251022025456.19004-2-bagasdotme@gmail.com>
-X-Mailer: git-send-email 2.51.1.dirty
+        d=1e100.net; s=20230601; t=1761102698; x=1761707498;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1w81N5UwqCcLk9lzNRuUpjETqoES8d1bFB+ZdpugPTA=;
+        b=U3GHNsbUe0YBB91Fk+VSwCZ8TB6WpVhOlcBGjgeV4zrAVzM3EgY/v1aNaHfaCnok24
+         F3IRCrYd9TLQmJ9w5B35+CCSuZ0i+OCopCx6xjLO+2/KzKDTUqoCBYea2DIH7gdU21Oz
+         hiIDUHiLspDQ4u2fO+3pcHm+rDxgQ7c5SInZbBNzJmeQgoOWmLak7cDfd9CZmtbF8hQZ
+         sTNAVyA11Krp6Yk/aB8mO7Ax3yzmQoQ1m7Q/wSCbbOfkv4nysWGljzTiw4cCyLndSIJu
+         VJfYqV0NTUzgMQ2FTuntFPCw77JzpY7h2/A/PBWxybJ9cPB/oKGRIGqhOl7RZGeVjzKv
+         0cdA==
+X-Gm-Message-State: AOJu0YypKnhi2CKehWwNoYIEhnBB1u1iGdZO/QSFLS/utJC5f51SDlU1
+	1RcPVhggWZ1Ane4c/LR+U4BOeDGFmxK38gxSokAShmpsJoDqLu3nu8TOJVQy2yCuA7Zie2GPiv6
+	7g9bq3JkM4LkuUlGisMxZ3pI0DDzN2Pc=
+X-Gm-Gg: ASbGncv/ZcpkrNdKPtNKvtRurlGsY6POJlL4dKHcIwY6jhJGuUJkMoQjamPoaE1f7gI
+	bjMtRC4IWZHzW2b++bt5rxV44dfT1I8T+X6iTTyXFTJrPf52SBRPPnycvpuUgM4Kvt7RRvx6tNx
+	reeGlKemlBSAqpmjkmhSY8PeMPsEFlokotJNjnpekazKIpYc0MFdo6Q1lUXcUk4q43IU2f7PpZC
+	QqY8BAeBhvaYcVwu1lAQppRg4iZd3wcUBT77teRu9w72grh4IapPjJVqssyX/+I6XLYcgY=
+X-Google-Smtp-Source: AGHT+IHsc5L8H41oQ6pWuGlwc/6nz3oXWi8+Bcroke4DapuC5C0EkQMaKnI90LLtcbQ2XDw0xbZs5GobUsx8JgiIzoU=
+X-Received: by 2002:a05:6e02:1689:b0:42d:876e:61bd with SMTP id
+ e9e14a558f8ab-430c527fb41mr284123945ab.28.1761102697970; Tue, 21 Oct 2025
+ 20:11:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2656; i=bagasdotme@gmail.com; h=from:subject; bh=ZrtvSK7jB4iwBAh0fO0oro7IBTovy7isMjxunmOiW34=; b=kA0DAAoW9rmJSVVRTqMByyZiAGj4Ry2gyX0MRLPqbia0igTNfutoOdLbqzUVsP6RDDWyvmEPI 4h1BAAWCgAdFiEEkmEOgsu6MhTQh61B9rmJSVVRTqMFAmj4Ry0ACgkQ9rmJSVVRTqOUtQEAm58D 549RYpDUAIN5+kudZXDIlihx/ZkYhjQ6/oWP5ZEA/AmNkHNiuXMpFU8YZ2Pcj+h2TTsRJsO5IhK agiCrIGYH
-X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
-Content-Transfer-Encoding: 8bit
+References: <20251021173200.7908-1-alessandro.d@gmail.com> <20251021173200.7908-2-alessandro.d@gmail.com>
+In-Reply-To: <20251021173200.7908-2-alessandro.d@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 22 Oct 2025 11:11:01 +0800
+X-Gm-Features: AS18NWBBSoMIxcuhS-7Wwy3NqCqJITQFYqxcB1a6KZpfmjK1-38rwvJFwSyOIzY
+Message-ID: <CAL+tcoCwGQyNSv9BZ_jfsia6YFoyT790iknqxG7bB7wVi3C_vQ@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/1] i40e: xsk: advance next_to_clean on status descriptors
+To: Alessandro Decina <alessandro.d@gmail.com>
+Cc: netdev@vger.kernel.org, Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Tirthendu Sarkar <tirthendu.sarkar@intel.com>, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, bpf@vger.kernel.org, 
+	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Format subsections of "Packet format" section as reST subsections.
+On Wed, Oct 22, 2025 at 1:33=E2=80=AFAM Alessandro Decina
+<alessandro.d@gmail.com> wrote:
+>
+> Whenever a status descriptor is received, i40e processes and skips over
+> it, correctly updating next_to_process but forgetting to update
+> next_to_clean. In the next iteration this accidentally causes the
+> creation of an invalid multi-buffer xdp_buff where the first fragment
+> is the status descriptor.
+>
+> If then a skb is constructed from such an invalid buffer - because the
+> eBPF program returns XDP_PASS - a panic occurs:
+>
+> [ 5866.367317] BUG: unable to handle page fault for address: ffd31c37eab1=
+c980
+> [ 5866.375050] #PF: supervisor read access in kernel mode
+> [ 5866.380825] #PF: error_code(0x0000) - not-present page
+> [ 5866.386602] PGD 0
+> [ 5866.388867] Oops: Oops: 0000 [#1] SMP NOPTI
+> [ 5866.393575] CPU: 34 UID: 0 PID: 0 Comm: swapper/34 Not tainted 6.17.0-=
+custom #1 PREEMPT(voluntary)
+> [ 5866.403740] Hardware name: Supermicro AS -2115GT-HNTR/H13SST-G, BIOS 3=
+.2 03/20/2025
+> [ 5866.412339] RIP: 0010:memcpy+0x8/0x10
+> [ 5866.416454] Code: cc cc 90 cc cc cc cc cc cc cc cc cc cc cc cc cc cc c=
+c 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 90 48 89 f8 48 89 d1 <=
+f3> a4 e9 fc 26 c0 fe 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
+> [ 5866.437538] RSP: 0018:ff428d9ec0bb0ca8 EFLAGS: 00010286
+> [ 5866.443415] RAX: ff2dd26dbd8f0000 RBX: ff2dd265ad161400 RCX: 000000000=
+00004e1
+> [ 5866.451435] RDX: 00000000000004e1 RSI: ffd31c37eab1c980 RDI: ff2dd26db=
+d8f0000
+> [ 5866.459454] RBP: ff428d9ec0bb0d40 R08: 0000000000000000 R09: 000000000=
+0000000
+> [ 5866.467470] R10: 0000000000000000 R11: 0000000000000000 R12: ff428d9ee=
+c726ef8
+> [ 5866.475490] R13: ff2dd26dbd8f0000 R14: ff2dd265ca2f9fc0 R15: ff2dd2654=
+8548b80
+> [ 5866.483509] FS:  0000000000000000(0000) GS:ff2dd2c363592000(0000) knlG=
+S:0000000000000000
+> [ 5866.492600] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [ 5866.499060] CR2: ffd31c37eab1c980 CR3: 0000000178d7b040 CR4: 000000000=
+0f71ef0
+> [ 5866.507079] PKRU: 55555554
+> [ 5866.510125] Call Trace:
+> [ 5866.512867]  <IRQ>
+> [ 5866.515132]  ? i40e_clean_rx_irq_zc+0xc50/0xe60 [i40e]
+> [ 5866.520921]  i40e_napi_poll+0x2d8/0x1890 [i40e]
+> [ 5866.526022]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [ 5866.531408]  ? raise_softirq+0x24/0x70
+> [ 5866.535623]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [ 5866.541011]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [ 5866.546397]  ? rcu_sched_clock_irq+0x225/0x1800
+> [ 5866.551493]  __napi_poll+0x30/0x230
+> [ 5866.555423]  net_rx_action+0x20b/0x3f0
+> [ 5866.559643]  handle_softirqs+0xe4/0x340
+> [ 5866.563962]  __irq_exit_rcu+0x10e/0x130
+> [ 5866.568283]  irq_exit_rcu+0xe/0x20
+> [ 5866.572110]  common_interrupt+0xb6/0xe0
+> [ 5866.576425]  </IRQ>
+> [ 5866.578791]  <TASK>
+>
+> Advance next_to_clean to ensure invalid xdp_buff(s) aren't created.
+>
+> Fixes: 1c9ba9c14658 ("i40e: xsk: add RX multi-buffer support")
+> Signed-off-by: Alessandro Decina <alessandro.d@gmail.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_xsk.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/net/eth=
+ernet/intel/i40e/i40e_xsk.c
+> index 9f47388eaba5..dbc19083bbb7 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+> @@ -441,13 +441,18 @@ int i40e_clean_rx_irq_zc(struct i40e_ring *rx_ring,=
+ int budget)
+>                 dma_rmb();
+>
+>                 if (i40e_rx_is_programming_status(qword)) {
+> +                       u16 ntp;
+> +
+>                         i40e_clean_programming_status(rx_ring,
+>                                                       rx_desc->raw.qword[=
+0],
+>                                                       qword);
+>                         bi =3D *i40e_rx_bi(rx_ring, next_to_process);
+>                         xsk_buff_free(bi);
+> -                       if (++next_to_process =3D=3D count)
+> +                       ntp =3D next_to_process++;
+> +                       if (next_to_process =3D=3D count)
+>                                 next_to_process =3D 0;
+> +                       if (next_to_clean =3D=3D ntp)
+> +                               next_to_clean =3D next_to_process;
+>                         continue;
+>                 }
+>
+> --
+> 2.43.0
+>
+>
 
-Link: https://lore.kernel.org/linux-doc/aO_MefPIlQQrCU3j@horms.kernel.org/
-Suggested-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
----
-Changes since v1 [1]:
+I'm copying your reply from v1 as shown below so that we can continue
+with the discussion :)
 
-  - Keep section number letters in lowercase (Jakub)
+> It really depends on whether a status descriptor can be received in the
+> middle of multi-buffer packet. Based on the existing code, I assumed it
+> can. Therefore, consider this case:
+>
+> [valid_1st_packet][status_descriptor][valid_2nd_packet]
+>
+> In this case you want to skip status_descriptor but keep the existing
+> logic that leads to:
+>
+>     first =3D next_to_clean =3D valid_1st_packet
+>
+> so then you can go and add valid_2nd_packet as a fragment to the first.
 
-[1]: https://lore.kernel.org/linux-doc/20251016092552.27053-1-bagasdotme@gmail.com/
+Sorry, honestly, I still don't follow you.
 
- .../device_drivers/cellular/qualcomm/rmnet.rst         | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Looking at the case you provided, I think @first always pointing to
+valid_1st_packet is valid which does not bring any trouble. You mean
+the case is what you're trying to handle?
 
-diff --git a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
-index 289c146a829153..28753765fba288 100644
---- a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
-+++ b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
-@@ -28,6 +28,7 @@ these MAP frames and send them to appropriate PDN's.
- ================
- 
- a. MAP packet v1 (data / control)
-+---------------------------------
- 
- MAP header fields are in big endian format.
- 
-@@ -54,6 +55,7 @@ Payload length includes the padding length but does not include MAP header
- length.
- 
- b. Map packet v4 (data / control)
-+---------------------------------
- 
- MAP header fields are in big endian format.
- 
-@@ -107,6 +109,7 @@ over which checksum is computed.
- Checksum value, indicates the checksum computed.
- 
- c. MAP packet v5 (data / control)
-+---------------------------------
- 
- MAP header fields are in big endian format.
- 
-@@ -134,6 +137,7 @@ Payload length includes the padding length but does not include MAP header
- length.
- 
- d. Checksum offload header v5
-+-----------------------------
- 
- Checksum offload header fields are in big endian format.
- 
-@@ -154,7 +158,10 @@ indicates that the calculated packet checksum is invalid.
- 
- Reserved bits must be zero when sent and ignored when received.
- 
--e. MAP packet v1/v5 (command specific)::
-+e. MAP packet v1/v5 (command specific)
-+--------------------------------------
-+
-+Packet format::
- 
-     Bit             0             1         2-7      8 - 15           16 - 31
-     Function   Command         Reserved     Pad   Multiplexer ID    Payload length
-@@ -177,6 +184,7 @@ Command types
- = ==========================================
- 
- f. Aggregation
-+--------------
- 
- Aggregation is multiple MAP packets (can be data or command) delivered to
- rmnet in a single linear skb. rmnet will process the individual
+You patch updates next_to_clean that is only used at the very
+beginning, so it will not affect @first. Imaging the following case:
 
-base-commit: 962ac5ca99a5c3e7469215bf47572440402dfd59
--- 
-An old man doll... just what I always wanted! - Clara
+     [status_descriptor][valid_1st_packet][valid_2nd_packet]
 
+Even if the next_to_clean is updated, the @first still points to
+[status_descriptor] that is invalid and that will later cause the
+panic when constructing the skb.
+
+I'm afraid that we're not on the same page. Let me confirm that it is
+@first that points to the status descriptor that causes the panic,
+right? Could you share with us the exact case just like you did as
+above. Thank you.
+
+Thanks,
+Jason
 
