@@ -1,181 +1,239 @@
-Return-Path: <netdev+bounces-231777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D6BABFD69B
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 18:57:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F07ABFD419
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 18:35:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2847F3BB47F
-	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 16:32:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EED4188AFAC
+	for <lists+netdev@lfdr.de>; Wed, 22 Oct 2025 16:32:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A5E035B12E;
-	Wed, 22 Oct 2025 16:12:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1BFE26ED52;
+	Wed, 22 Oct 2025 16:12:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="lq7PtUW3"
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="JUOeD+4H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD7535B122
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 16:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7811635B15E
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 16:12:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761149523; cv=none; b=XSn63aQySti0wp2Y16lAZ7bI30VlWgw39XgCcPLhVqsGNZprQfOG2ieR84ceZcOTBkaCvKdcd/N6ln1qxQWnYdl8D3OKfMnQGuElW2TWm7UtVy2PRKdgwCm8x5+BIYrKbQMxT0QtTe+Cz/njFCcxrova0GQvb6mj9tTWqSwj4as=
+	t=1761149534; cv=none; b=mFXHJNkXIapbEUi+jNhYNj26WvPImI9r1PwEeygOV//iWIcfPqHJce0pfXu5u0yaX56UK8t9QkiYKVoFpCFH4xICX0Oa78XaQ/fpoQzh7qbiuqUOjzQq8V+TR1IUcB9o5/ZT5WKv+sBrjGzqpBpDVkjmM6CFH1v/N04uqOe9gtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761149523; c=relaxed/simple;
-	bh=MYRiBXo/2SYsN7m0ssFE9OarNO83Yxq1TyCrISUvu6U=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A+nxz7sHHc/xaBGHWriSIwpb/J3W3atYLY+Qtuu6/AxPddI0pEPznfEbOI+W2Wb5kTN7b1j1+jlFF6jPoW7+ZQBBqVKI5kg9WZfdIYJE4Vbt1TTobjcwz8Gyi7SVJkrQ6XkzSnW9kpY5NGEQ/vB2aQ8tM7N9IYJp61s1h026whU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=lq7PtUW3; arc=none smtp.client-ip=185.125.188.122
+	s=arc-20240116; t=1761149534; c=relaxed/simple;
+	bh=rJ5Nrs/lUYNBsHYppRWP2ng7D8AjCDafkKve5RN48d8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uaamw8jIPtdDdyjorotpkJ7I/Eg+/J1AWn02gp63uyI8B5ASXX2pvIHEs+45dLVm7AOsxSJytGSVOSHlCBW95oDv/j5H+CQIM2Kygg1nlsr7UyKUz3JP3w9mzB5Gaxkm46pHXGLiED7QhukQjnLHkqdQtoYNC6wmjBE6maWKwIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=JUOeD+4H; arc=none smtp.client-ip=185.125.188.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 1BDF83FCEE
-	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 16:11:50 +0000 (UTC)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 0968F3F7C4
+	for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 16:12:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1761149510;
-	bh=fJ4eaCLAd1T6Qi1tAvgT59ff6VgTNShusVhiWjf+ZSE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-	b=lq7PtUW3t4+fQxHunzHrT2Y9IndVcm1MKv6z95bsYP3vOcBO95KTOtXQJvFaxuJcj
-	 1UXUvBVt8oY7Xy2CMPeAYIDGIvhlpq7se/NgVxTSrU4KPlFtL/L8mBQ9tzfi/9gjQo
-	 bGlOUMWgMxIMtEVjHlismMry0PvA6eBVhkeEoCXPfWReJ02fBXfba8ZCftglcRFLJ6
-	 o/pGXopBS8zDtP/L5yMUwTCU6V9eGoBj+ydyco9sKz3pcdZazCsb+tWFUcZb2PJceU
-	 nVgeeTz9nyiPLhiszWXLHgAzumfKujtcMFW7CjyKtK9QdyLMHBv8fF53tDvg5MxwNO
-	 blnJ+LPMXkb9zIWoWHLnctG2EOXM8w1c7857B6NAwaTu5uK443WAN0gZD57jp805fT
-	 /3ZR5tovUjuptwdXEP6yh0QAOKfgUpgCHL2w0fT78Bh0moy4vHaT04ql+/LcQ4kRjq
-	 +Km5IvZiM7pvEmhz8N8x1CBsBclqAOJkoJ+3zg4D1THM/iYR/aw3enX/m8kcnfVPx+
-	 yw7NnzF9jK0mHJYCfnAkc57nCsNIy8wm/wM10BYSUqHQNy1fqWUyvE8LKlOVfef3sM
-	 hEhEUVKBHEfJhC5JcmInMIUKHHGlKRvezTrWM9EmdxFTusWaB+Ck1tjAPnxuslZaQv
-	 d9MfaH/LwlNlgIrlf07H0Efg=
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b5cbb3629f2so899496066b.1
-        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 09:11:50 -0700 (PDT)
+	s=20251003; t=1761149524;
+	bh=hXJoSIXKAZqZaV1/Vtgd9fT53zuB/ef3PvkedjBFaZE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=JUOeD+4HQBn8EMZNYZMiFc/lT/+997XKFa7JYTFUfzO2EzJfCIgHdAW5/nishzAQ4
+	 PILk+zbpevhhWhmWUCf2Q6YF3qJg/V+OqXwp8hDaL3oTi1407IyoZq1dlESBvrkaKW
+	 iGSd879PqzqcUjoqMr2y89BAM9rYL03UIBwyI10iZLf4JJ7fjxJ0vwauGtpNKnwmqO
+	 o3ZFybdi40nqebyjj3LtEyWOo8Z08s5GFcmWWZeUlETWN34fSY6duHZyGxGo0jB/6d
+	 2impmt+fDf3lKZhYJj1tmnP7uG93zzF+RtxIMBb0PVogkqRPMRNuzCZpqYZy2K+h3i
+	 /joi/imre2Ep2tK96ckSrLvBrKdhPFpg7iPMiS0zzXY/AYnwjqVUpMc9o6EuuS5aGP
+	 5l3Ei2MLABdcxITZYaNw1kb9BeSkKOuCi5xH2FvfuqMx3YgWfvwpAzOZUkWn3vPTGO
+	 xEc/cFzNPADFx3L05miWi+EtCYuXjGVglgzbLKa2N6B7yBRwKqC/Xjzg2xd46ZlsJj
+	 fuXv7GtYQ/fBU43ibYnT4mDO1V3rUixBFhf7Q2bi+uvyh+z3SDStQ1KtOjkgCTlkZv
+	 GKbdfOXSIfpzvchqQWnzkgcoAm7PQQKZLP5j6BfbYcDX0Vv1thOwv+T208YS2/zbJI
+	 8x+SatSybPmo0pZFA2irdbAQ=
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-6349af0e766so10661793a12.3
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 09:12:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761149506; x=1761754306;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fJ4eaCLAd1T6Qi1tAvgT59ff6VgTNShusVhiWjf+ZSE=;
-        b=ObsIbL5HCKHAbtS3m3pCbsV6OklkVTljZLkHU1o8tepM6vuqIvo++WcYR7dIhC0bap
-         1m/klDgZUTTyR91zFhskXQOfyPUlIQN99ucYeq8/McwPCudJvc9flmAB/TiUbzl44ooM
-         oKnLGmqrH+qgzwjpiwTcsflNHBnd6w+N2NFQivqSvGskcwfadY2nRvXw1bAe1XAPyjoW
-         W6Dsu8Z6U1Zh8cKEzocYNSme7fpzvVUXZeBCPsRdYYQfBNTyhWoBwtbRbqfYmQSVwrp9
-         6i37G74L/fD7Y/Cr6Wv65BdP7Mg2BjtjfWQRqdif6oqniefg1F5I4MvQfk1fGhZvMC3b
-         wL1A==
-X-Forwarded-Encrypted: i=1; AJvYcCX8PgTXrZ2c5ZN7HmRZ8l4PbDt3xKO/ITwopdcr31OdFQyLXbBz6zi55iqHwC3vve+1PEDQHLc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiQOYgz22VcsefHuilJt8FFy6etpaJTfBaH3Ssf4LZz4cAOqbh
-	pWk9tFW1Osx6GTkGm3uu7uVyih6hPjtD1YzIqRwYlIINEMHC9Y/iwk7Zo+Xdbv2mbu7fNxibXY4
-	ChKuqgRHL2lGFXTGclrPejyDug8OYvJTnIV6O4KAOco2m//5MCGALjwJZ1WBhrsWvG26yTwQXvQ
-	==
-X-Gm-Gg: ASbGncuxB8kzQBY5AYTa52HMvNLzWwmkM+ioTydPUss7/ZG9UXmOp4ZwuFhkAZ90Vi/
-	TXPz3ijRRXJ3cQbVOpcK338BF35maEH776DbBmhvYbHvu53GFZH4ElSuzNvmeigJb1IxU8Z4c9x
-	BqB4k/FrGLUo5qQLAuM+tfx49rsAsRtUUmjT4RW48vSanvjLKp0PpL/yayhPAsB7QruFY/G2+uB
-	Jcp0jGVZZJeqjkXdiART6R/desihDTowPIR4M9HsDZMhPCZM39lruFrKGE3c82BDxSX/O8DZ1ZG
-	acbFU1SshF0Hc/rbrBMyCJer3U83pRXF3YWTkSyddCVcQkkQ+J6LwXv2oLFkWWPFtXJaLmo8Y81
-	EmdxCj26PKgrlJxLkVySKKtDYTJQvnoneWakrN2sHc5ojKRRWpSAAz6nhi/E=
-X-Received: by 2002:a17:906:fe4b:b0:b0b:f228:25a with SMTP id a640c23a62f3a-b6475a0347bmr2374826066b.64.1761149505837;
-        Wed, 22 Oct 2025 09:11:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEsIOTZ0/NmXygXvRAij62k1mXr5cxAWBu/F6+ubCac0eQdjwISwDyzdPouZt9bR27eiPT2Jg==
-X-Received: by 2002:a17:906:fe4b:b0:b0b:f228:25a with SMTP id a640c23a62f3a-b6475a0347bmr2374823266b.64.1761149505472;
-        Wed, 22 Oct 2025 09:11:45 -0700 (PDT)
-Received: from rmalz.. (89-64-24-203.dynamic.play.pl. [89.64.24.203])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b65e7da33c6sm1360296966b.2.2025.10.22.09.11.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Oct 2025 09:11:45 -0700 (PDT)
-From: Robert Malz <robert.malz@canonical.com>
-To: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Lukasz Czapnik <lukasz.czapnik@intel.com>,
-	Robert Malz <robert.malz@canonical.com>,
-	Jamie Bainbridge <jamie.bainbridge@gmail.com>,
-	Jay Vosburgh <jay.vosburgh@canonical.com>,
-	Dennis Chen <dechen@redhat.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: [PATCH v2] i40e: avoid redundant VF link state updates
-Date: Wed, 22 Oct 2025 18:11:43 +0200
-Message-Id: <20251022161143.370040-1-robert.malz@canonical.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1761149519; x=1761754319;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hXJoSIXKAZqZaV1/Vtgd9fT53zuB/ef3PvkedjBFaZE=;
+        b=LJpV0xV1RKyX6LwLub/k2b3dXWvYgqzLZ9ROI/S88GPysGRoWLHPaUnA7oUOnrTRuN
+         sjUYN9Vn3LFowQH9LZ1tYaehmDhmhdXphN+8FmTHucXRRrv0fegExyaVvcrAkd+F8BT8
+         vdGE2IrUCd2zytVFyWP9JkN8GLjDVNjoku4N8gSVKg5nmJffFvV0nq0Sv7WKYziba8Cv
+         fClm9DH/e5nZ9acsKhT2eeemiR8PRu/yWHSRL0aOgbADnqa0UWLi7YbaLirWGdJM46fB
+         pWDUmnwK//qpT1Vc9ElVWwyzPEYsyitJlFTPCjamfLK6gsiFpvArGRbylvfgi4t37O+0
+         9+1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVRTqwroSkJz5Tt02NXfT7AO1k/3rzTTYNQzlr+bbWbr14D8r3Ezmvw5C0O+MSyIcxR0MqAoYs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwB5PkeJKoBtqMfGQ1h4YNR+gVUZAea3S198MAWX4XZmXSY/aB5
+	IaN3pEeb2mmuzMFa+SL77Em/oKE0zd2ZUHC0lUgFrvJOmvo0Sks0XBViTCIMstQu1tDQyCcHsIQ
+	PJhDaxtqUkWK2FdqSCdQdgqnSgron8zN+wbXdRGdlLPKdWz4/alaVILcRb6KlpgR2NYuDbYDEFJ
+	7dSoqGUJIFjewvcb4FFEzwDBIwO4MzgZIrWfja+IdLDoQDlBrA
+X-Gm-Gg: ASbGnct4g3SHYa8r1nZ7r7lFIi5gOg6ARKIxccIbf+p2pb1mZe3lwVVe5vKOCFMs6h/
+	4EsnLwbdmN71RIFj0iN/ewnxXviKJPqBoNDM9vKShd+063HWhOVmR5WdymHU6YlkrnxDIKVgHw9
+	uC5knGuLCoKTy74HaO/TPxCMiS2x5l4LKM0SsFX6eqaNww3ythzxG7nO07ZFZkDcJLKCgGweIZU
+	TMbZhZxSxoTUQ==
+X-Received: by 2002:a05:6402:3585:b0:636:240f:9ece with SMTP id 4fb4d7f45d1cf-63c1f6d90d0mr21265284a12.34.1761149519158;
+        Wed, 22 Oct 2025 09:11:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGo+EUlFBfQHcw0UwsmPphdFUhsNMc7g4lASSpo/GqY9R6yD4UV9MMURzb4IVRJTknj/6hFy7Q+FY5jHEndIVo=
+X-Received: by 2002:a05:6402:3585:b0:636:240f:9ece with SMTP id
+ 4fb4d7f45d1cf-63c1f6d90d0mr21265253a12.34.1761149518706; Wed, 22 Oct 2025
+ 09:11:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251021154439.180838-1-robert.malz@canonical.com>
+ <0c62b505-abe7-474e-9859-a301f4104eeb@molgen.mpg.de> <IA3PR11MB89860CA0245498E6FF720E48E5F3A@IA3PR11MB8986.namprd11.prod.outlook.com>
+ <5578e792-2dd6-42db-8ad6-b12cd05c2617@molgen.mpg.de>
+In-Reply-To: <5578e792-2dd6-42db-8ad6-b12cd05c2617@molgen.mpg.de>
+From: Robert Malz <robert.malz@canonical.com>
+Date: Wed, 22 Oct 2025 18:11:47 +0200
+X-Gm-Features: AS18NWC0K4JlNBwhxK-j9aBt205Uc7UwVg8g7j0m6_4GsNSQueSsgnqvetVnQuU
+Message-ID: <CADcc-bxT13tqWKQFfXX6a5R125dRT21VT+5_ozzV-pmpX708gA@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH] i40e: avoid redundant VF link state updates
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Aleksandr Loktionov <aleksandr.loktionov@intel.com>, intel-wired-lan@lists.osuosl.org, 
+	netdev@vger.kernel.org, Jamie Bainbridge <jamie.bainbridge@gmail.com>, 
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, Dennis Chen <dechen@redhat.com>, 
+	Przemyslaw Kitszel <przemyslaw.kitszel@intel.com>, Lukasz Czapnik <lukasz.czapnik@intel.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
+	Anthony L Nguyen <anthony.l.nguyen@intel.com>, Simon Horman <horms@kernel.org>, 
+	"Keller, Jacob E" <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
+Hey Paul, Aleksandr
+Thanks for the feedback.
+I have updated the commit message in [PATCH v2], some notes inline.
 
-Multiple sources can request VF link state changes with identical
-parameters. For example, OpenStack Neutron may request to set the VF link
-state to IFLA_VF_LINK_STATE_AUTO during every initialization or user can
-issue: `ip link set <ifname> vf 0 state auto` multiple times. Currently,
-the i40e driver processes each of these requests, even if the requested
-state is the same as the current one. This leads to unnecessary VF resets
-and can cause performance degradation or instability in the VF driver,
-particularly in environment using Data Plane Development Kit (DPDK).
+On Wed, Oct 22, 2025 at 2:25=E2=80=AFPM Paul Menzel <pmenzel@molgen.mpg.de>=
+ wrote:
+>
+> Dear Alex,
+>
+>
+> Thank you for your input.
+>
+> Am 22.10.25 um 14:06 schrieb Loktionov, Aleksandr:
+>
+> >> -----Original Message-----
+> >> From: Paul Menzel <pmenzel@molgen.mpg.de>
+> >> Sent: Wednesday, October 22, 2025 1:49 PM
+>
+> >> Am 21.10.25 um 17:44 schrieb Robert Malz:
+> >>> From: Jay Vosburgh <jay.vosburgh@canonical.com>
+> >>>
+> >>> Multiple sources can request VF link state changes with identical
+> >>> parameters. For example, Neutron may request to set the VF link state
+> >>> to
+> >>
+> >> What is Neutron?
+> >>
+> >>> IFLA_VF_LINK_STATE_AUTO during every initialization or user can issue=
+:
+> >>> `ip link set <ifname> vf 0 state auto` multiple times. Currently, the
+> >>> i40e driver processes each of these requests, even if the requested
+> >>> state is the same as the current one. This leads to unnecessary VF
+> >>> resets and can cause performance degradation or instability in the VF
+> >>> driver - particularly in DPDK environment.
+> >>
+> >> What is DPDK?
+> >>
+> > I think Robert needs:
+> > - to expand acronyms in the commit message (Neutron =E2=86=92 OpenStack=
+ Neutron, DPDK =E2=86=92 Data Plane Development Kit).
+> > - to fix the comment style as per coding guidelines.
+> > - add a short note in the commit message about how to reproduce the iss=
+ue.
+> > @Paul Menzel right?
+>
 
-With this patch i40e will skip VF link state change requests when the
-desired link state matches the current configuration. This prevents
-unnecessary VF resets and reduces PF-VF communication overhead.
+@Aleksandr Loktionov you mentioned that comment style does not follow
+coding guidelines, from my perspective it looks good.
+Could you elaborate on that point?
 
-To reproduce the problem run following command multiple times
-on the same interface: 'ip link set <ifname> vf 0 state auto'
-Every time command is executed, PF driver will trigger VF reset.
+> Correct.
+>
+> Maybe also mention how to force it, as there seems to be such an option
+> judging from the diff.
+>
+> >>> With this patch i40e will skip VF link state change requests when the
+> >>> desired link state matches the current configuration. This prevents
+> >>> unnecessary VF resets and reduces PF-VF communication overhead.
+> >>
+> >> Add a test (with `ip link =E2=80=A6`) case to show, that it works now.
+> >>
+> >>> Co-developed-by: Robert Malz <robert.malz@canonical.com>
+> >>> Signed-off-by: Robert Malz <robert.malz@canonical.com>
+> >>> Signed-off-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+> >>> ---
+> >>>    drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 12 ++++++++++=
+++
+> >>>    1 file changed, 12 insertions(+)
+> >>>
+> >>> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> >>> b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> >>> index 081a4526a2f0..0fe0d52c796b 100644
+> >>> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> >>> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> >>> @@ -4788,6 +4788,7 @@ int i40e_ndo_set_vf_link_state(struct net_devic=
+e *netdev, int vf_id, int link)
+> >>>     unsigned long q_map;
+> >>>     struct i40e_vf *vf;
+> >>>     int abs_vf_id;
+> >>> +   int old_link;
+> >>>     int ret =3D 0;
+> >>>     int tmp;
+> >>>
+> >>> @@ -4806,6 +4807,17 @@ int i40e_ndo_set_vf_link_state(struct net_devi=
+ce *netdev, int vf_id, int link)
+> >>>     vf =3D &pf->vf[vf_id];
+> >>>     abs_vf_id =3D vf->vf_id + hw->func_caps.vf_base_id;
+> >>>
+> >>> +   /* skip VF link state change if requested state is already set */
+> >>> +   if (!vf->link_forced)
+> >>> +           old_link =3D IFLA_VF_LINK_STATE_AUTO;
+> >>> +   else if (vf->link_up)
+> >>> +           old_link =3D IFLA_VF_LINK_STATE_ENABLE;
+> >>> +   else
+> >>> +           old_link =3D IFLA_VF_LINK_STATE_DISABLE;
+> >>> +
+> >>> +   if (link =3D=3D old_link)
+> >>> +           goto error_out;
+> >>
+> >> Should a debug message be added?
+> >
+> > I think adding one would be redundant since skipping identical state
+> > changes is expected behavior.
+>
+> My thinking was, if something does not work as expected for a user, like
+> issuing the command to force a reset, that it might be useful to see
+> something in the logs.
 
-Co-developed-by: Robert Malz <robert.malz@canonical.com>
-Signed-off-by: Robert Malz <robert.malz@canonical.com>
-Signed-off-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+I treat VF reset in this scenario as a side effect which helps VF
+bring up the queues.
+User should not expect to see VF reset each time these commands are
+run and there are
+specific commands, like triggering VFLR through pci reset, which are
+available for that
+purpose.
+Like Aleksandr, I found the logs in this area to be redundant.
+>
+> >>> +
+> >>>     pfe.event =3D VIRTCHNL_EVENT_LINK_CHANGE;
+> >>>     pfe.severity =3D PF_EVENT_SEVERITY_INFO;
+>
+> Kind regards,
+>
+> Paul
 
----
-V1 -> V2: updated commit message, added information how to reproduce
-
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 081a4526a2f0..0fe0d52c796b 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -4788,6 +4788,7 @@ int i40e_ndo_set_vf_link_state(struct net_device *netdev, int vf_id, int link)
- 	unsigned long q_map;
- 	struct i40e_vf *vf;
- 	int abs_vf_id;
-+	int old_link;
- 	int ret = 0;
- 	int tmp;
- 
-@@ -4806,6 +4807,17 @@ int i40e_ndo_set_vf_link_state(struct net_device *netdev, int vf_id, int link)
- 	vf = &pf->vf[vf_id];
- 	abs_vf_id = vf->vf_id + hw->func_caps.vf_base_id;
- 
-+	/* skip VF link state change if requested state is already set */
-+	if (!vf->link_forced)
-+		old_link = IFLA_VF_LINK_STATE_AUTO;
-+	else if (vf->link_up)
-+		old_link = IFLA_VF_LINK_STATE_ENABLE;
-+	else
-+		old_link = IFLA_VF_LINK_STATE_DISABLE;
-+
-+	if (link == old_link)
-+		goto error_out;
-+
- 	pfe.event = VIRTCHNL_EVENT_LINK_CHANGE;
- 	pfe.severity = PF_EVENT_SEVERITY_INFO;
- 
--- 
-2.34.1
-
+Thanks,
+Robert
 
