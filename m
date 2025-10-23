@@ -1,183 +1,183 @@
-Return-Path: <netdev+bounces-232253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53689C03327
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 21:37:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AFF5C03392
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 21:50:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F8F41A658C8
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 19:38:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A368C3B2F3A
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 19:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E67F34D4E6;
-	Thu, 23 Oct 2025 19:37:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D4CC34D93B;
+	Thu, 23 Oct 2025 19:50:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hmXuKXx5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jXAlWtw9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7793735B138
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 19:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05C1347BC3;
+	Thu, 23 Oct 2025 19:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761248261; cv=none; b=PO168n0Z8K5Dr2NMw4PKa3DmafySNxJ3TJTIEiJNK0k7BjIGGQs1rRNiP31Ib++qBWHVj0RNBNTQMr+51Uar/RlMYPhNsqnDxXJLloOLLMLbExYeBXj66Pai8njGz5ikUzEnL885VdbzrCFI2VHShrPLV7X6ER/hsvefyDIHogQ=
+	t=1761249018; cv=none; b=bmzR8Jk0gQ0yJ7cglNwYNaCP0oHy/W56HaPbx0I+u7d1zW1CLOWLRR8IT9kLVV+4x/GHN7AW8oQf1pAmvovUhU16acgYyGoOY3koHdzd+ZGaaPjWxHNbWsbLvH3c/HlHJHuK93nVhzR2LBexwx8MuvJpUMEP+N81fj9jDo89Dz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761248261; c=relaxed/simple;
-	bh=lSgu3nilc+FoS0eOXBUtZUH7bFANmrn+EnLRvkUufcI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mwdEGO+qk6petaXfr61NYVC1OUZ9o/yMixx5ZCZ29cz7y7Ho+BMpCQvkhe24pStsJUBi01jmrZhMluTp9Ua5e0pIUxe0YUMhCjFPOt6nRSgygfQdvq0D9eddGkhKEQI5E6cvJkv892TcpXIlgV25WySpu5u3U0o6RJsGMTeGQ2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hmXuKXx5; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b6cea3f34ebso868029a12.0
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 12:37:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761248258; x=1761853058; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WZ1LxDTD94mTUxZEgC//vZy3WRPH3SzHMiLz9if+iA8=;
-        b=hmXuKXx5al7xrzBvjqvu5Vq5PUL7Y1ca02dPCo5sQwQVn8JnUnkHo1q7mr8qJYo6JX
-         by2pqnd+8IKUdczE6QH2x/DgzVbHLfMcunK/Fr2u0nw990gg5X/qBUYnoDciAkoISRP1
-         PflhUGwGGwFUcSyuudSUAuMYVNH+24YlW1JjsaTMfu+izVm/C7IyxwAbdYsvai9nzS4n
-         YtPjO946wQwnQ31CIrg9DwN72XmNRHuGVMi8ZfH5btetFNgtbPJoMt0rJY93keqJi6Ec
-         ZzWI2HN00BlHrsmZv2KVGN3Xj5L0UG2PJYho5EinI6noFhhlHR0npX3UGeG/Zj25Y0xt
-         wn/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761248258; x=1761853058;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WZ1LxDTD94mTUxZEgC//vZy3WRPH3SzHMiLz9if+iA8=;
-        b=ThnyTnWlWWfPT7dMJ6OHgk9RgWwyk4o/7Y///4B88YtQEG7zn4ssA+jH2R56sn52Ex
-         9IaDiY8UG8dIvNhowKwcuQCFZF4JoklqfM8Uym7xif2IoAnhBrbSVOvWnVk/RfZVnHKd
-         zMZKHnrQU34OpxPrBLpzVYZWJ2jzOfpVbJIraLM/qmUZdF0OR3BD8rpg3FA6gA/tOzQ/
-         EDG5sUCdZympiQG9lLSR+cc237sjGEwt584N6VsGU9yshUzArVvmMmIhOYi2fTQr08wu
-         4D8EEZ84s9zXf6T4nUKg2T+KafdkoINnlOSRfF9e9Q79X0gbz01m8gTHCPxueQncsEXs
-         xGug==
-X-Forwarded-Encrypted: i=1; AJvYcCWsiM+7OxssiExx9CtDnjWkvFWJDZUPvkJovKW+1638pvXRRt/V/vaUX4xSHpZWx/hQXz8RhJ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxtgi8s8gTL1GMOMJiy3RrisvxmoqVJq1wnA5533K4mq/JRm45F
-	qNbIkB0YelyPdgENU7XWIQdMQh3KgJIK0VOnhmbDLIzaQ0UbSoS++xBToAmHhBSmgRSkUpfY+i6
-	cDKblSYVYMtE0ZtscosXIlETA0ch8RahU4dSncn7B
-X-Gm-Gg: ASbGncvth9WSBMRv+ycyZA38MKCVR1jXABlid+EvSPOV3DuipvXaps4UJESO+4PaXr4
-	gHC74DhW9EnY1swMAMALXreVOLWP+8VOA/bovCbbOTedTKteSapZ/NEYuoSGiLPdqBzsERYEp/z
-	DXkdqEpbitftod2qisSdB/61YB3u9UV0ytUUuZ6ybZQl5TjNtzA7BcA8U51L8UZzzU/V/D1Oui+
-	IrP/8u9kuBnL7KJNfFT6DqkDSEUWp5EjJeaP0H5HL4CMc51vKrmmzBHMWBIniKYju93BEmPCIfN
-	X+7+hb5/Nx5JWgfu5arI4PJa2g==
-X-Google-Smtp-Source: AGHT+IEdJA3haUsbTz+16YzBdMM68eI0eHjD98BC0sTPMoAeLto2g3VcHvdassvHL9jiwGwrO33J0kGL9Kn2MLkP/pc=
-X-Received: by 2002:a17:902:e88e:b0:290:9332:eed1 with SMTP id
- d9443c01a7336-290ca12153emr299361315ad.34.1761248257584; Thu, 23 Oct 2025
- 12:37:37 -0700 (PDT)
+	s=arc-20240116; t=1761249018; c=relaxed/simple;
+	bh=4GgD8rXzGcd0V4eTBPz9wgSl28VHshWZ5xyM0DTjwes=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Agj28hBn8ZFu7KxSAxtrIFyddWe9ITutUCv+f5Nuy+Fyv1vPxe4y7uqxeI8W1DaRP8s1T2SDf3fVgtmuijebcZgD39yUZiyoAEv23pA3ylRvL65CqtXxgmTkq6V6JVmphM40v9fklRcgI9n8u+YZ1qXXb2YM0a8InxMoK0bvlMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jXAlWtw9; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761249018; x=1792785018;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=4GgD8rXzGcd0V4eTBPz9wgSl28VHshWZ5xyM0DTjwes=;
+  b=jXAlWtw9O1N/hmdHP+L6wWgUhmkaWFuEuN9Kde5UxKP5wrlD6s3uR42G
+   98jGWMvh2440X9mEjqFSfj7JLC8WBg2QX9vMX01fxM1qSGcM+SWD5luCP
+   5TWsddfm1QtsA7h/rRDhA9RQY5PMXisDftNsRwwImXGceKQWzRD3KRBSq
+   fEJsyDF7xCWjTOMOVnz4POp5+82H0rTwKQcLf0MmpQ8uB1MrlQ7nSyjM2
+   xui5XTI4aRXXCATW68mv0Ndy3r9BZuz40O1PXgWsHT2wi7ZkRYr82skeq
+   I64mXwT0kiVl09c3lU7edGf4LeUT7xUcuM6sQLJuMK6MWTk6Yweh1dHTm
+   Q==;
+X-CSE-ConnectionGUID: PVSor8bLSGa/APeyslzlHg==
+X-CSE-MsgGUID: KRJa+DPAQwOeYq5yeY3Sag==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="73719734"
+X-IronPort-AV: E=Sophos;i="6.19,250,1754982000"; 
+   d="scan'208";a="73719734"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 12:50:17 -0700
+X-CSE-ConnectionGUID: QqnZZascSZOxoU53Pwz9pA==
+X-CSE-MsgGUID: utWaX7cHQSidqSJVHTZSqw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,250,1754982000"; 
+   d="scan'208";a="183950468"
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by fmviesa007.fm.intel.com with ESMTP; 23 Oct 2025 12:50:10 -0700
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vC1Jt-000Dp9-2V;
+	Thu, 23 Oct 2025 19:50:00 +0000
+Date: Fri, 24 Oct 2025 03:49:18 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jian Shen <shenjian15@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
+	Paul Barker <paul@pbarker.dev>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH net-next v4 3/6] ionic: convert to ndo_hwtstamp API
+Message-ID: <202510240344.2MuPn70o-lkp@intel.com>
+References: <20251022104900.901973-4-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANn89i+0bmXUz=T+cGPexiMpS-epfhbz+Ds84A+Lewrj880TBg@mail.gmail.com>
- <20251023144805.1979484-1-wokezhong@tencent.com> <20251023144805.1979484-3-wokezhong@tencent.com>
-In-Reply-To: <20251023144805.1979484-3-wokezhong@tencent.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 23 Oct 2025 12:37:26 -0700
-X-Gm-Features: AS18NWCNBUrdZzai3h5f3kN93-JxNAspDqdkgoGxQ_vgOOCGtaLuec2K14EBHaY
-Message-ID: <CAAVpQUC7qk_1Dj+fuC-wfesHkUMQhNoVdUY9GXo=vYzmJJ1WdA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] net/tcp: add packetdrill test for FIN-WAIT-1
- zero-window fix
-To: HaiYang Zhong <wokezhong@gmail.com>
-Cc: edumazet@google.com, ncardwell@google.com, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, wokezhong@tencent.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251022104900.901973-4-vadim.fedorenko@linux.dev>
 
-On Thu, Oct 23, 2025 at 7:48=E2=80=AFAM HaiYang Zhong <wokezhong@gmail.com>=
- wrote:
->
-> Add packetdrill test to reproduce and verify the permanent FIN-WAIT-1
-> state issue when continuous zero window packets are received.
->
-> The test simulates:
-> - TCP connection establishment
-> - Peer advertising zero window
-> - Local FIN blocked in send buffer due to zero window
-> - Continuous zero window ACKs from peer
-> - Verification of connection timeout (after fix)
->
-> Signed-off-by: HaiYang Zhong <wokezhong@tencent.com>
-> ---
->  .../net/tcp_fin_wait1_zero_window.pkt         | 58 +++++++++++++++++++
->  1 file changed, 58 insertions(+)
->  create mode 100644 tools/testing/selftests/net/tcp_fin_wait1_zero_window=
-.pkt
->
-> diff --git a/tools/testing/selftests/net/tcp_fin_wait1_zero_window.pkt b/=
-tools/testing/selftests/net/tcp_fin_wait1_zero_window.pkt
-> new file mode 100644
-> index 000000000000..86ceb95de744
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/tcp_fin_wait1_zero_window.pkt
-> @@ -0,0 +1,58 @@
-> +// Test for permanent FIN-WAIT-1 state with continuous zero-window adver=
-tisements
-> +// Author: HaiYang Zhong <wokezhong@tencent.com>
-> +
-> +
-> +0.000 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
-> +0.000 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
-> +0.000 bind(3, ..., ...) =3D 0
-> +0.000 listen(3, 1) =3D 0
-> +
-> +0.100 < S 0:0(0) win 65535 <mss 1460>
-> +0.100 > S. 0:0(0) ack 1 <mss 1460>
-> +0.100 < . 1:1(0) ack 1 win 65535
-> +0.100 accept(3, ..., ...) =3D 4
-> +
-> +// Send data to fill receive window
-> +0.200 write(4, ..., 5) =3D 5
-> +0.200 > P. 1:6(5) ack 1
-> +
-> +// Advertise zero-window
-> +0.200 < . 1:1(0) ack 6 win 0
-> +
-> +// Application closes connection, sends FIN (but blocked by zero window)
-> +0.200 close(4) =3D 0
-> +
-> +//Send zero-window probe packet
-> ++0.200 > . 5:5(0) ack 1
-> ++0.400 > . 5:5(0) ack 1
-> ++0.800 > . 5:5(0) ack 1
-> ++1.600 > . 5:5(0) ack 1
-> ++3.200 > . 5:5(0) ack 1
-> ++6.400 > . 5:5(0) ack 1
-> ++12.800 > . 5:5(0) ack 1
-> +
-> +// Continuously sending zero-window ACKs
-> +30.000 < . 1:1(0) ack 6 win 0
-> +
-> +// Key verification points
-> +// Without fix: waiting for packet timeout due to timer reset
-> +// With fix: this probe is sent as scheduled
-> ++22.000~+23.000 > . 5:5(0) ack 1
-> +
-> +// More zero-window ACKs from peer
-> +60.000 < . 1:1(0) ack 6 win 0
-> +90.000 < . 1:1(0) ack 6 win 0
-> ++16.000~+19.000 > . 5:5(0) ack 1
-> +120.000 < . 1:1(0) ack 6 win 0
-> +150.000 < . 1:1(0) ack 6 win 0
-> +180.000 < . 1:1(0) ack 6 win 0
-> +210.000 < . 1:1(0) ack 6 win 0
-> ++0.000~+5.000  > . 5:5(0) ack 1
-> +240.000 < . 1:1(0) ack 6 win 0
-> +270.000 < . 1:1(0) ack 6 win 0
-> +300.000 < . 1:1(0) ack 6 win 0
-> +330.000 < . 1:1(0) ack 6 win 0
-> +360.000 < . 1:1(0) ack 6 win 0
-> +
-> +// Connection reset after zero-window probe timeout
-> ++0.000 > R 6:6(0)
+Hi Vadim,
 
-I guess this test will time out if you run via selftest ?
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/octeontx2-convert-to-ndo_hwtstamp-API/20251022-185103
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20251022104900.901973-4-vadim.fedorenko%40linux.dev
+patch subject: [PATCH net-next v4 3/6] ionic: convert to ndo_hwtstamp API
+config: x86_64-randconfig-001-20251024 (https://download.01.org/0day-ci/archive/20251024/202510240344.2MuPn70o-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251024/202510240344.2MuPn70o-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202510240344.2MuPn70o-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/net/ethernet/pensando/ionic/ionic_lif.c:2821:22: error: use of undeclared identifier 'ionic_hwstamp_get'; did you mean 'ionic_lif_hwstamp_get'?
+    2821 |         .ndo_hwtstamp_get       = ionic_hwstamp_get,
+         |                                   ^~~~~~~~~~~~~~~~~
+         |                                   ionic_lif_hwstamp_get
+   drivers/net/ethernet/pensando/ionic/ionic_lif.h:384:19: note: 'ionic_lif_hwstamp_get' declared here
+     384 | static inline int ionic_lif_hwstamp_get(struct ionic_lif *lif, struct ifreq *ifr)
+         |                   ^
+>> drivers/net/ethernet/pensando/ionic/ionic_lif.c:2822:22: error: use of undeclared identifier 'ionic_hwstamp_set'; did you mean 'ionic_lif_hwstamp_set'?
+    2822 |         .ndo_hwtstamp_set       = ionic_hwstamp_set,
+         |                                   ^~~~~~~~~~~~~~~~~
+         |                                   ionic_lif_hwstamp_set
+   drivers/net/ethernet/pensando/ionic/ionic_lif.h:379:19: note: 'ionic_lif_hwstamp_set' declared here
+     379 | static inline int ionic_lif_hwstamp_set(struct ionic_lif *lif, struct ifreq *ifr)
+         |                   ^
+>> drivers/net/ethernet/pensando/ionic/ionic_lif.c:2821:22: error: incompatible function pointer types initializing 'int (*)(struct net_device *, struct kernel_hwtstamp_config *)' with an expression of type 'int (struct ionic_lif *, struct ifreq *)' [-Wincompatible-function-pointer-types]
+    2821 |         .ndo_hwtstamp_get       = ionic_hwstamp_get,
+         |                                   ^~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/pensando/ionic/ionic_lif.c:2822:22: error: incompatible function pointer types initializing 'int (*)(struct net_device *, struct kernel_hwtstamp_config *, struct netlink_ext_ack *)' with an expression of type 'int (struct ionic_lif *, struct ifreq *)' [-Wincompatible-function-pointer-types]
+    2822 |         .ndo_hwtstamp_set       = ionic_hwstamp_set,
+         |                                   ^~~~~~~~~~~~~~~~~
+   4 errors generated.
+
+
+vim +2821 drivers/net/ethernet/pensando/ionic/ionic_lif.c
+
+  2797	
+  2798	static const struct net_device_ops ionic_netdev_ops = {
+  2799		.ndo_open               = ionic_open,
+  2800		.ndo_stop               = ionic_stop,
+  2801		.ndo_start_xmit		= ionic_start_xmit,
+  2802		.ndo_bpf		= ionic_xdp,
+  2803		.ndo_xdp_xmit		= ionic_xdp_xmit,
+  2804		.ndo_get_stats64	= ionic_get_stats64,
+  2805		.ndo_set_rx_mode	= ionic_ndo_set_rx_mode,
+  2806		.ndo_set_features	= ionic_set_features,
+  2807		.ndo_set_mac_address	= ionic_set_mac_address,
+  2808		.ndo_validate_addr	= eth_validate_addr,
+  2809		.ndo_tx_timeout         = ionic_tx_timeout,
+  2810		.ndo_change_mtu         = ionic_change_mtu,
+  2811		.ndo_vlan_rx_add_vid    = ionic_vlan_rx_add_vid,
+  2812		.ndo_vlan_rx_kill_vid   = ionic_vlan_rx_kill_vid,
+  2813		.ndo_set_vf_vlan	= ionic_set_vf_vlan,
+  2814		.ndo_set_vf_trust	= ionic_set_vf_trust,
+  2815		.ndo_set_vf_mac		= ionic_set_vf_mac,
+  2816		.ndo_set_vf_rate	= ionic_set_vf_rate,
+  2817		.ndo_set_vf_spoofchk	= ionic_set_vf_spoofchk,
+  2818		.ndo_get_vf_config	= ionic_get_vf_config,
+  2819		.ndo_set_vf_link_state	= ionic_set_vf_link_state,
+  2820		.ndo_get_vf_stats       = ionic_get_vf_stats,
+> 2821		.ndo_hwtstamp_get	= ionic_hwstamp_get,
+> 2822		.ndo_hwtstamp_set	= ionic_hwstamp_set,
+  2823	};
+  2824	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
