@@ -1,262 +1,95 @@
-Return-Path: <netdev+bounces-232176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9A1BC02116
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:20:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBF0CC02143
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:22:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28C0D3AA32F
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 15:11:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AED9188DFEF
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 15:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5D9330B35;
-	Thu, 23 Oct 2025 15:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F18F633858C;
+	Thu, 23 Oct 2025 15:21:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s9dJRR4J"
+	dkim=pass (1024-bit key) header.d=nohats.ca header.i=@nohats.ca header.b="j3/oQ74H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.nohats.ca (mx.nohats.ca [193.110.157.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A1B30EF84;
-	Thu, 23 Oct 2025 15:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDF9333736
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 15:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.85
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761232273; cv=none; b=sCjmgK8IbrBfgLgImIhFaRjluoIIP2r393fHhjOgKrRRbPsKKJtvbdv7PVDIcjOUK5TsdsRDI00M+UXd9yfd4rcV+jrjYFXmY+5EXQ+QYfcESXHE1gp0LAdZ3EgHKFRjaulP9DWYyOARu+CNhTgD/j/374LyZ3PZTp1Msdy35tQ=
+	t=1761232871; cv=none; b=B8+HNoLPSGBkkj2L/UZlI/uAsmxqsK1Nr8MRrY8oS49A2PxiunrIBx+kMbHorat84YuUweG9DiRpdueLy7HmQazsMVPZY2tPE6+n29EUb6UqIXxUbHTSvGvOaNkqjTG5o63rl1oSMsQXGoKuqswX0cK00MNxqpLxiSjR0Opycjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761232273; c=relaxed/simple;
-	bh=FqogIAnnyd1/hXRU6ygWHWPx68vkuiHwgBhzvU/xZ+s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i9jZ9JyvxiwDwG0VJGD4/A5inAC4kuggy0V+UsFuRba5W/+uFGgIxWI+1nv6Al80BDefHww/BaxXwbEvS4vdMMquZ/QafJIyJtC4W2Zx2mKjrh4S+40MJD/30+X3o1ApI2P0gr91ClohE5AAzgnWbX/u65+JL7pYPJxQ4/mzDHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s9dJRR4J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74EE1C4CEE7;
-	Thu, 23 Oct 2025 15:11:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761232272;
-	bh=FqogIAnnyd1/hXRU6ygWHWPx68vkuiHwgBhzvU/xZ+s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s9dJRR4JBy4HMSnIgMV5KSXc84e82BWN3nrDVgb/ojTjVX6Oxy4BepWx11uvAtddF
-	 QdMFqODu0O6qaf9VgGxdvKMklmaQACUwbinfIwpqA76etpGXuT/9tD610jpd2G5kqC
-	 LMQFciKnOX2TmI8V1rOC0iCT8El9aBOL93xl5n9LatYIgE37Mia8dGfZLZrikr6+4l
-	 imF5XyUXPHxJvTSbRxfeG6rgbzbf9bZnOLrxSmEzRAkhQBWRbvgj+2bSJgdTUPmG+1
-	 sRH+u8OVFdC2Myr8aBrLJVPSil00KyAAqI4JdAm4+ZBjk9/wQ5DCrHGY5rganKBqNt
-	 IQfoxANng/GvQ==
-Date: Thu, 23 Oct 2025 17:11:10 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v2 2/2] net: airoha: add phylink support for GDM1
-Message-ID: <aPpFjvJTv1_CEMy6@lore-desk>
-References: <20251023145850.28459-1-ansuelsmth@gmail.com>
- <20251023145850.28459-3-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1761232871; c=relaxed/simple;
+	bh=G3vVaD7ixpd4+xuP9GGFwzUQu6SiNlgz1X5/g/M73So=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Cef5Gl5ZKl+ezHoVr17YhciHqbTSii310LGb5wvlMnhZw7dCBa60VynaPAieaeroITXgT007fd3KlD35D2xhL54sk7nf6OWQ5VGIpsJXLw+Zu67N9W30R0/HwOdOzoRtwOc9jWYF+nO7eJ+kB1xJlwO0pKMKNONEWsMlhSM6mZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nohats.ca; spf=pass smtp.mailfrom=nohats.ca; dkim=pass (1024-bit key) header.d=nohats.ca header.i=@nohats.ca header.b=j3/oQ74H; arc=none smtp.client-ip=193.110.157.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nohats.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nohats.ca
+Received: from localhost (localhost [IPv6:::1])
+	by mx.nohats.ca (Postfix) with ESMTP id 4csqJ31X9Gz71d;
+	Thu, 23 Oct 2025 17:11:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nohats.ca;
+	s=default; t=1761232307;
+	bh=G3vVaD7ixpd4+xuP9GGFwzUQu6SiNlgz1X5/g/M73So=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=j3/oQ74HQhySFFhlzZWg0365cAlnfEWVMCe4W/nMfehHl2Rsv74BYrJtHkFeuB88R
+	 78WpgT3IuJHUvODWMVA9wpWinXKYFI77oc5aBkP/tLwPkPBpQgKd0TBLzU16d6plax
+	 2zYsOlxhhZpJVuI+7hqN/XxtFUDKkbr1pVd6/s74=
+X-Virus-Scanned: amavisd-new at mx.nohats.ca
+X-Spam-Flag: NO
+X-Spam-Score: 1.206
+X-Spam-Level: *
+Received: from mx.nohats.ca ([IPv6:::1])
+	by localhost (mx.nohats.ca [IPv6:::1]) (amavisd-new, port 10024)
+	with ESMTP id 3JMFke1VBXZh; Thu, 23 Oct 2025 17:11:46 +0200 (CEST)
+Received: from bofh.nohats.ca (bofh.nohats.ca [193.110.157.194])
+	(using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx.nohats.ca (Postfix) with ESMTPS;
+	Thu, 23 Oct 2025 17:11:45 +0200 (CEST)
+Received: by bofh.nohats.ca (Postfix, from userid 1000)
+	id 1685E177A1D0; Thu, 23 Oct 2025 11:11:45 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+	by bofh.nohats.ca (Postfix) with ESMTP id 12D5E177A1CF;
+	Thu, 23 Oct 2025 11:11:45 -0400 (EDT)
+Date: Thu, 23 Oct 2025 11:11:45 -0400 (EDT)
+From: Paul Wouters <paul@nohats.ca>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+    Andreas Steffen <andreas.steffen@strongswan.org>, 
+    Tobias Brunner <tobias@strongswan.org>, Antony Antony <antony@phenome.org>, 
+    Tuomo Soini <tis@foobar.fi>, "David S. Miller" <davem@davemloft.net>, 
+    Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
+    devel@linux-ipsec.org
+Subject: Re: [PATCH ipsec-next] pfkey: Deprecate pfkey
+In-Reply-To: <aPh1a1LeC5hZZEZG@secunet.com>
+Message-ID: <a8d32543-f783-9039-56af-ceb5e45e207a@nohats.ca>
+References: <aPh1a1LeC5hZZEZG@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="R0NsogCUtGj5e3sD"
-Content-Disposition: inline
-In-Reply-To: <20251023145850.28459-3-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
+On Wed, 22 Oct 2025, Steffen Klassert wrote:
 
---R0NsogCUtGj5e3sD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> The pfkey user configuration interface was replaced by the netlink
+> user configuration interface more than a decade ago. In between
+> all maintained IKE implementations moved to the netlink interface.
+> So let config NET_KEY default to no in Kconfig. The pfkey code
+> will be remoced in a secomd step.
 
-> In preparation for support of GDM2+ port, fill in phylink OPs for GDM1
-> that is an INTERNAL port for the Embedded Switch.
+No supported libreswan version still uses the old NET_KEY PFKEY API.
 
-Hi Christian,
+Acked-by: Paul Wouters <paul@nohats.ca>
 
-just few nitpicks inline. Fixing them:
-
-Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
-
->=20
-> Add all the phylink start/stop and fill in the MAC capabilities and the
-> internal interface as the supported interface.
->=20
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  drivers/net/ethernet/airoha/Kconfig      |  1 +
->  drivers/net/ethernet/airoha/airoha_eth.c | 77 +++++++++++++++++++++++-
->  drivers/net/ethernet/airoha/airoha_eth.h |  3 +
->  3 files changed, 80 insertions(+), 1 deletion(-)
->=20
-
-[...]
-
-> @@ -2813,6 +2817,18 @@ static const struct ethtool_ops airoha_ethtool_ops=
- =3D {
->  	.get_link		=3D ethtool_op_get_link,
->  };
-> =20
-> +static struct phylink_pcs *airoha_phylink_mac_select_pcs(struct phylink_=
-config *config,
-> +							 phy_interface_t interface)
-
-can you please do not go over 79 columns? (I still like it :))
-
-static struct phylink_pcs *
-airoha_phylink_mac_select_pcs(struct phylink_config *config,
-			      phy_interface_t interface)
-{
-	return NULL;
-}
-
-> +{
-> +	return NULL;
-> +}
-> +
-> +static void airoha_mac_config(struct phylink_config *config,
-> +			      unsigned int mode,
-> +			      const struct phylink_link_state *state)
-> +{
-> +}
-> +
->  static int airoha_metadata_dst_alloc(struct airoha_gdm_port *port)
->  {
->  	int i;
-> @@ -2857,6 +2873,57 @@ bool airoha_is_valid_gdm_port(struct airoha_eth *e=
-th,
->  	return false;
->  }
-> =20
-> +static void airoha_mac_link_up(struct phylink_config *config,
-> +			       struct phy_device *phy, unsigned int mode,
-> +			       phy_interface_t interface, int speed,
-> +			       int duplex, bool tx_pause, bool rx_pause)
-> +{
-> +}
-> +
-> +static void airoha_mac_link_down(struct phylink_config *config,
-> +				 unsigned int mode, phy_interface_t interface)
-> +{
-> +}
-> +
-> +static const struct phylink_mac_ops airoha_phylink_ops =3D {
-> +	.mac_select_pcs =3D airoha_phylink_mac_select_pcs,
-> +	.mac_config =3D airoha_mac_config,
-> +	.mac_link_up =3D airoha_mac_link_up,
-> +	.mac_link_down =3D airoha_mac_link_down,
-> +};
-
-can you please align it like airoha_ethtool_ops or airoha_netdev_ops?
-
-> +
-> +static int airoha_setup_phylink(struct net_device *netdev)
-> +{
-> +	struct airoha_gdm_port *port =3D netdev_priv(netdev);
-> +	struct device *dev =3D &netdev->dev;
-> +	struct phylink *phylink;
-> +	int phy_mode;
-> +
-> +	phy_mode =3D device_get_phy_mode(dev);
-> +	if (phy_mode < 0) {
-> +		dev_err(dev, "incorrect phy-mode\n");
-> +		return phy_mode;
-> +	}
-> +
-> +	port->phylink_config.dev =3D dev;
-> +	port->phylink_config.type =3D PHYLINK_NETDEV;
-> +	port->phylink_config.mac_capabilities =3D MAC_ASYM_PAUSE |
-> +						MAC_SYM_PAUSE |
-> +						MAC_10000FD;
-> +
-> +	__set_bit(PHY_INTERFACE_MODE_INTERNAL,
-> +		  port->phylink_config.supported_interfaces);
-> +
-> +	phylink =3D phylink_create(&port->phylink_config, dev_fwnode(dev),
-> +				 phy_mode, &airoha_phylink_ops);
-> +	if (IS_ERR(phylink))
-> +		return PTR_ERR(phylink);
-> +
-> +	port->phylink =3D phylink;
-> +
-> +	return 0;
-> +}
-> +
->  static int airoha_alloc_gdm_port(struct airoha_eth *eth,
->  				 struct device_node *np, int index)
->  {
-> @@ -2935,12 +3002,18 @@ static int airoha_alloc_gdm_port(struct airoha_et=
-h *eth,
->  	if (err)
->  		return err;
-> =20
-> -	err =3D register_netdev(dev);
-> +	err =3D airoha_setup_phylink(port->dev);
->  	if (err)
->  		goto free_metadata_dst;
-> =20
-> +	err =3D register_netdev(dev);
-> +	if (err)
-> +		goto free_phylink;
-> +
->  	return 0;
-> =20
-> +free_phylink:
-> +	phylink_destroy(port->phylink);
->  free_metadata_dst:
->  	airoha_metadata_dst_free(port);
->  	return err;
-> @@ -3049,6 +3122,7 @@ static int airoha_probe(struct platform_device *pde=
-v)
-> =20
->  		if (port && port->dev->reg_state =3D=3D NETREG_REGISTERED) {
->  			unregister_netdev(port->dev);
-> +			phylink_destroy(port->phylink);
->  			airoha_metadata_dst_free(port);
->  		}
->  	}
-> @@ -3076,6 +3150,7 @@ static void airoha_remove(struct platform_device *p=
-dev)
-> =20
->  		airoha_dev_stop(port->dev);
->  		unregister_netdev(port->dev);
-> +		phylink_destroy(port->phylink);
->  		airoha_metadata_dst_free(port);
->  	}
->  	free_netdev(eth->napi_dev);
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
-net/airoha/airoha_eth.h
-> index eb27a4ff5198..c144c1ece23b 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> @@ -531,6 +531,9 @@ struct airoha_gdm_port {
->  	struct net_device *dev;
->  	int id;
-> =20
-> +	struct phylink *phylink;
-> +	struct phylink_config phylink_config;
-> +
->  	struct airoha_hw_stats stats;
-> =20
->  	DECLARE_BITMAP(qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS);
-> --=20
-> 2.51.0
->=20
-
---R0NsogCUtGj5e3sD
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaPpFjgAKCRA6cBh0uS2t
-rL2yAPwJ+sKCvxS7WnskEFkXW0ArW6kWm9QdRR7nw7/AaF0oswEAicDLHyIRsu6Z
-cd6vajttTttrfzyKaU85HnHQ3XtOcQU=
-=fV9Y
------END PGP SIGNATURE-----
-
---R0NsogCUtGj5e3sD--
+Paul
 
