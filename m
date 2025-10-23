@@ -1,152 +1,115 @@
-Return-Path: <netdev+bounces-232090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A4F0C00B14
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 13:22:13 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08846C00B6D
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 13:27:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F54E1A61D01
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 11:22:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C2D764E8EAE
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 11:27:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D738630DD19;
-	Thu, 23 Oct 2025 11:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DFD30DEAC;
+	Thu, 23 Oct 2025 11:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LEU+NiH4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A6h2AZl0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF36830DEC4
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 11:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A152DECB1
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 11:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761218502; cv=none; b=se3Kpe2Wgfi4KO0Rz+Jf5mz3n1OJDjUk0ody+gZyTztpC5kIMLe/B/6tbXeTE5L096S3tcdGMHtW2uAvHIveaYaPQtcmONlgvlSA3t3d2437aq3IQbV5xyYW6eUzO6sIKzYYVaR9jsxCMQeWQ8zJZKqj4NAWhdUF3cRIA4nPNAQ=
+	t=1761218845; cv=none; b=SgQsAAHs2jpjsvfzt/bi/VD1PdbRSNxX6pLFWbW8KD72ksjtqEza+NdYoIV0VeAdbF0id7XTcTcNhPOhYd7W26A+QzyRL1PQ3vBTo3IahkIbFxML2pSvOMOwv8JgbZniLrbpoNaIP1oGVWENg0LATXxS03VKN+CfmT0DJT8u1TU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761218502; c=relaxed/simple;
-	bh=RjE+kSOTS/IiW9MLEPxrKjF6SoubNJTDr9T4H60naJQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LqU6acN1X7Y5ocG6X4wvVQOLCVsBeqVdgb5WndjbH69L0TNH79rA7Khr56ycMT2zUmMfugyZuhJ9sKC3Sob6UMYFBLSJEG7PkGk0wOUncpMPQsHdcrefjs+k6ofhVPQFTbdu2l4WjEAX2dKmWBkI8cJQ8HVWaVeKwixhvVrG9qI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LEU+NiH4; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1761218845; c=relaxed/simple;
+	bh=omXtqGdVwaLttMqdnLj+e50P9l/qbdlv1wXvTweGH/Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i+HOuIFS8OflFQTLyR0jNa+Avcz0hUufkXFnHfF60nDSOVq0yAQGvIhPI5NkRITXQ2nMMtcGod4XwcpSpWjHSkLo/1nz3i0UwQrufwikBXiyksBxIcdougY9aP/5PafuCVp/2DAs1ESnN3Ywl4mrQbBFmyRK0j18EBOeu3+WpTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A6h2AZl0; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-269af38418aso8793235ad.1
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 04:21:40 -0700 (PDT)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3ee64bc6b90so574842f8f.0
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 04:27:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761218500; x=1761823300; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5ajYhoORHhWFBc8HqyGQt4ZFGixfkx5nJ2hdJSz5FZA=;
-        b=LEU+NiH4zX4xYRXMXM9GaR4bi4TP4mdxgdEQQjelXjj9FIDM1+p0W4f1VrZl3uCV/L
-         VAwbKn3jYvOwB89W0aDGlUpSbeR+5Iefc2dxKJs6n0Z4jqfwIRH4yzZTb0JP4o0sOGtH
-         b+MfUGbdXJ2I3TYch71ZvcmAb3AQimNGwF3wBelgQIxVr17wwfjmQb2VcpXo9E8EqxW2
-         nkNfBChdXrMcxBMt0pe8inc+GvOXHFc1PfFB4Eg6IjVkUn+ie6X2JnRzTxxBSDdycVOu
-         GrKx4du3G6vT2MkifR1osmVOm5xPBVQiSjffwRNqU5VXKmVNRc8FOSAbLmD9hFtvfQge
-         cCoA==
+        d=gmail.com; s=20230601; t=1761218842; x=1761823642; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Z5A/JaBnPQddwxFBHkEH+pN3tR6CjA0uTWCxQ0JnFwY=;
+        b=A6h2AZl0uTC2GseDEA2suZ/jOBvgIMvIBE6rNRpTxVH6jkWpt9B2nBQOkplD2/sy6x
+         J+wDlS5hj20v3ZpTJWmL1H8VyhPY2FfK2umYGOEzSdfkTNf5xbGI4w/kAOsykCkJWR+s
+         YI1VUIf7dqOMQl2h2I6StV7MhVAN7wd1gsVXVaDLaTdGCXMwz/gNKu1umjOoaAlm1lOs
+         ps61AAacxyXiRqSnel3htnGoiQ8ZLMIhVHyiOyKdFWfiSm2C0MZDIK0WLZXQKtHtJR8J
+         mlfvxis6exuotn4n4lcDzr5mH/RNzv15Rs0vdiKha1LhQckYrvwkhIwSPd0v/QcKY30b
+         vDQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761218500; x=1761823300;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5ajYhoORHhWFBc8HqyGQt4ZFGixfkx5nJ2hdJSz5FZA=;
-        b=unKYusGHcIHmfacmwN/ze5sjsTb5Td8o3dgG6uCVEB8UTGf6nolZe4fkGyTmbTU7KE
-         dsQHjjXoeaBTKjXmzcv4ZW7TQdnAY5zrq/qtTUnPH6jnkJ3PkhyyL+mWh4tynxzsfOTv
-         RWGKKl/9VhxQ8Bkd4j4Ivamv7MHEvUnF0+OQngLCX4/M2Gqxu64o0TttjxXRBb9xdLMU
-         mBUwvV5s4D8MpOi4Rla03/6YnG9aCcisruRRt+FZuE8Ik+8x/De1GPWelrM7SxGVyYLb
-         COBKdi+PcZjwavfltMsYVKmjhj+DDkVLKAbH042omF/XIM91zG6E49K/wZEhIkdfHTFv
-         Na/w==
-X-Gm-Message-State: AOJu0YxdMZNeXhVPlRixilnZNqhT5D7nTo5xL7ZCo3B+wPQtaGyoouI3
-	tzoC0VMcH/MvF6/pkxlskB74qpcowQ5tho1DSCGMZUroAvEtOO0t5/6j
-X-Gm-Gg: ASbGncuzDb91SYVwW6hN54qp28pKBo7q6sBCsqhnJ8UWF0GfNgmDp6B3GMfdzx3u79/
-	0vR4nWecQBkKGbSyfw0Yal++yBpYp2xlLCNiB3w7zryrXU0vZ87IVf3Q8gXhln9j8vXle/vcrSg
-	Rao7Bav0lrw7gVGS6R4oG16C2O60VqtvVd2ilHsedGv2w2aKCz9cWHP6hHvqwZTZgAC2dJWzUrl
-	F6B19hdTHYPCFRPV9rmjpDRID0lte0H3GU35Xj9mpg5WAE7bDpnvIjNY6VGrXK5Jlf8bu71pP50
-	IkHdUgxcCbGYGaZ6InOiQL+uLeWAXk7U1dOga1cujEos7kyZQCSes3n3iNIGFQPMkUAvZH25ePZ
-	6FWVxdZxeEJXIMuPTNFu3Tcz0O3wjw144u2k1SJ36bS9cA71MEPblauA3NjAfpxWhPr54bwj66M
-	Hf5xPKWMyfAAkzOggjcUtP12muK4O9cw==
-X-Google-Smtp-Source: AGHT+IG70LMDucQ/v+ZD8r8xVVgqwdpVy8r9nkjL/iPjUWjvVho9/jKVj6iNLo9FQk+xdUIb+ldKdQ==
-X-Received: by 2002:a17:903:1d1:b0:290:2a14:2ed5 with SMTP id d9443c01a7336-290c9c89fd2mr259763605ad.4.1761218499912;
-        Thu, 23 Oct 2025 04:21:39 -0700 (PDT)
-Received: from iku.. ([2401:4900:1c06:ef2:36b5:9454:6fa:e888])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2946dded613sm20226885ad.37.2025.10.23.04.21.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Oct 2025 04:21:39 -0700 (PDT)
-From: Prabhakar <prabhakar.csengg@gmail.com>
-X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-	Paul Barker <paul@pbarker.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Prabhakar <prabhakar.csengg@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Subject: [PATCH net-next v3 2/2] net: ravb: Allocate correct number of queues based on SoC support
-Date: Thu, 23 Oct 2025 12:21:11 +0100
-Message-ID: <20251023112111.215198-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251023112111.215198-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-References: <20251023112111.215198-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+        d=1e100.net; s=20230601; t=1761218842; x=1761823642;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z5A/JaBnPQddwxFBHkEH+pN3tR6CjA0uTWCxQ0JnFwY=;
+        b=Sj85Xchr7gZYnwe0BqiY87/YT278rmrYplL0xNZx/KqUsIBT1uTqbU611CKc6IkRuR
+         zG4qWsZ/ZPW7eOn5MdXzTHeEiLhgkBzhY9s1dI1yeH9I3rtUgVcL4HNqC6HeEt3/ecp9
+         90aoyXZ6eEsthUwPszP2d9Y7qV55umEXMLrwpDQ9u1vwQz7ejDgWe+02CacYgeIPaPjk
+         Phy6e9KIjedwHfnRNvABDUY54KlXuZ5Vgv1h936sENQA6bg+swwYzR0x0gpToV9RT8K/
+         T6nhdLicakgC7QAPErMS7CPreliVj3H6Au++QQhg7aH5fwMBqYOda62Ntxn9s0H/hPaT
+         LDOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXqWsVKNGRvDd272QIgAI+uCGpaOjrPoOahmhlcTBoHwJZGhHtc6QIrzg0uxYvSzgLrpvZbPr8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKuXoCnnBQegw70UWx7ZRX4Dm0lHPh764crskbJkaEhuIrj/ar
+	p17tf4tVX2f8vGP1z+529Y6ZjOXKiOD9HnJREYrHV8am1J5ZyKk3ZJCr
+X-Gm-Gg: ASbGncuNSJ3+T8sHNcPGvjETaMGHIQ1m5nMmJILDuMok2pAqtkCZFDLVMSPDv+zGzw1
+	jGiyc1m+FdbPiKj4R6ZE2/wB7KJvsQv69N5XSiS5qTC/mBwXHmbDbZ9mk9C2K/sLFtGqMzt+/uk
+	QVfnCmuWm2RhTAo7xLwGLiEwwuSpuK7+JgjIaUvtNPVlugnQXkAuhHExN+G7qgrzQgB9nDpFH5D
+	2r7/2/xoaWswk9dAbX1a6K5/daHGDZoy8QioAKGnTE/mxQbtLzJvbUFKrkfA5lN7Ne0tDJJnZ0r
+	FYDirdut2GY8MyedLcvk3jejIhYHpZ29vEarMk9dYHgjADskie+7crlf6wRmEq46sjGMQpTPxuc
+	CJc5RZn3m1Ab7TNEV0zLdVQnfuG4rUwCtRcASSa221KhPVeuLmMzwXiOF0WrL+I+QfWWR0fwGfT
+	PD7BC7rvM3BphBOaGR+gjiJ0C+gb7n52LqWKxpqXUJLQ0GVX307yE0GQ3QZEbOd6U=
+X-Google-Smtp-Source: AGHT+IFWosB3kP1cunqsyc3Wf0i3HHGXOo97SMwmCET8H8ejn6hdK+I4Wg/ThmA0FKOUA8GfgazJig==
+X-Received: by 2002:a05:6000:1a8a:b0:428:3f7c:bcf8 with SMTP id ffacd0b85a97d-4283f7cbeefmr13605166f8f.29.1761218841399;
+        Thu, 23 Oct 2025 04:27:21 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429897f53bcsm3516370f8f.11.2025.10.23.04.27.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Oct 2025 04:27:21 -0700 (PDT)
+Message-ID: <bf3d9390-f1f6-428d-b47f-81d2ed1707e9@gmail.com>
+Date: Thu, 23 Oct 2025 12:27:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] sfc: fix potential memory leak in
+ efx_mae_process_mport()
+To: Abdun Nihaal <nihaal@cse.iitm.ac.in>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, alejandro.lucero-palau@amd.com,
+ habetsm.xilinx@gmail.com, netdev@vger.kernel.org, linux-net-drivers@amd.com,
+ linux-kernel@vger.kernel.org
+References: <20251022163525.86362-1-nihaal@cse.iitm.ac.in>
+Content-Language: en-GB
+From: Edward Cree <ecree.xilinx@gmail.com>
+In-Reply-To: <20251022163525.86362-1-nihaal@cse.iitm.ac.in>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On 22/10/2025 17:35, Abdun Nihaal wrote:
+> In efx_mae_enumerate_mports(), memory allocated for mae_mport_desc is
+> passed as a argument to efx_mae_process_mport(), but when the error path
+> in efx_mae_process_mport() gets executed, the memory allocated for desc
+> gets leaked.
+> 
+> Fix that by freeing the memory allocation before returning error.
+> 
+> Fixes: a6a15aca4207 ("sfc: enumerate mports in ef100")
+> Signed-off-by: Abdun Nihaal <nihaal@cse.iitm.ac.in>
 
-Use the per-SoC match data flag `nc_queues` to decide how many TX/RX
-queues to allocate. If the SoC does not provide a network-control queue,
-fall back to a single TX/RX queue. Obtain the match data before calling
-alloc_etherdev_mqs() so the allocation is sized correctly.
+Acked-by: Edward Cree <ecree.xilinx@gmail.com>
 
-Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
----
-v2->v3:
-- Reworded commit message for clarity.
-
-v1->v2:
-- Added Reviewed-by tag from Niklas.
----
- drivers/net/ethernet/renesas/ravb_main.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 69d382e8757d..a200e205825a 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -2926,13 +2926,14 @@ static int ravb_probe(struct platform_device *pdev)
- 		return dev_err_probe(&pdev->dev, PTR_ERR(rstc),
- 				     "failed to get cpg reset\n");
- 
-+	info = of_device_get_match_data(&pdev->dev);
-+
- 	ndev = alloc_etherdev_mqs(sizeof(struct ravb_private),
--				  NUM_TX_QUEUE, NUM_RX_QUEUE);
-+				  info->nc_queues ? NUM_TX_QUEUE : 1,
-+				  info->nc_queues ? NUM_RX_QUEUE : 1);
- 	if (!ndev)
- 		return -ENOMEM;
- 
--	info = of_device_get_match_data(&pdev->dev);
--
- 	ndev->features = info->net_features;
- 	ndev->hw_features = info->net_hw_features;
- 	ndev->vlan_features = info->vlan_features;
--- 
-2.43.0
-
+It might be nice to also add a comment on top of efx_mae_process_mport()
+ stating that it takes ownership of @desc from the caller.
 
