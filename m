@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-232200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99E29C026F2
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 18:24:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBB45C0270A
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 18:26:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EA9FF4E99F4
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:24:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 305273B03D0
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7FD3191DE;
-	Thu, 23 Oct 2025 16:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5361B33375D;
+	Thu, 23 Oct 2025 16:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="xPYy8HOU"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PnZNrSW6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1B030BF6A
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 16:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748B9314B9D;
+	Thu, 23 Oct 2025 16:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761236604; cv=none; b=eSt9HGpLCveioYpUG6oXdfr1FwqirL6MlNI5q+lEkfhuZGM0+jsoQOjc5j4065g4nveEFlIqAAIYOVD9BKESHFaMQ1TfKjJwTL0grvfEId9qnwnaMYOYQDb+whRipaCw+EuzVhW4a6V2EqdkM3BZmC1mn8jo9zsBdVoue+yyjak=
+	t=1761236606; cv=none; b=WJzh8LpvzdhxHYrEVh0veatsFRR6jczHhOEq4qH1rZVoquuzcb4LmxmHS9t2vsUEAZvsNMj7H7ssDzpJxfj1+kbybzDsEmf0ASfdldSdM7HrruPcUT9HFpqlTFh840goBp90Tc4gJPtcOiVyMTRs9hDRvAjyL7SqS3XKxiUZEtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761236604; c=relaxed/simple;
-	bh=Yarsu4uhSLB3FJ1cHK2srBqjp/s6m4XAw0u/FPKQHUM=;
+	s=arc-20240116; t=1761236606; c=relaxed/simple;
+	bh=BoI04ne66BgdO6RQx8tLnItxQ9eDqwU1DrU84iIL4D8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=s5qc6ZG60gR9QzfQNEid41xSQvh7CNxZ99pmY9zrZ4YxS69gFZNNN1RlpDuqHZg/EbNGswgVaUi1oS6sAxQQRybIdMB85ypGv9AO6WzNZmJJx+XISFV+z/R8iPsHUkbObmVf2p0S2tE508yl/uwJHEyDUMN3PMOMYvghoclPvbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=xPYy8HOU; arc=none smtp.client-ip=185.246.85.4
+	 In-Reply-To:To:Cc; b=WUKUX5uWXKmpkfwL3hBSEmIXLxQHqnO3tupba6YEz3ug4fecKpKPzsXwIaWlvN3EgcizJIcWbca3ZqILgy8ilzeD5eRer7uI0sMlOYd5AqTiwkjsTiVlmE8UzxITxzGhrCdIWp60cxEUENoSm2e85xqfPpOgrufUote8bc87qRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PnZNrSW6; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 137C94E412AE;
-	Thu, 23 Oct 2025 16:23:21 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id A7B401A1619;
+	Thu, 23 Oct 2025 16:23:22 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id DDBF9606DE;
-	Thu, 23 Oct 2025 16:23:20 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 90502102F246C;
-	Thu, 23 Oct 2025 18:23:18 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 7E275606DE;
+	Thu, 23 Oct 2025 16:23:22 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 50C5F102F2475;
+	Thu, 23 Oct 2025 18:23:20 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761236599; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1761236601; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=8RNDmW36KMuKuYt5YOI1V2Yuesuf7NyM/xPRiEzXIF4=;
-	b=xPYy8HOU2j4YU4kOJOwbopzzHc9BV9X/cU+MirOwbtkdLkqmoLtiLJ46b/KiULluaO67Dw
-	DtFgGSwI9+rkaTTIwdrTstd24ydJV81yYvsUsFnGPEWnDgAW7hvsv+ASx0jfVjKdMEwyec
-	K4/sW69csDNvkHb9gpBPwtUzNxr2UVw+iYCI7yZBdRXqdAhuFmluwA4s9vnOETef1QoO9A
-	rhHh/8ITEdNrSShIikKjpeSlC7mRe6Duak4vfOzF881XSsrzwtO/p019HkmPPhaxkdprno
-	KBx1ZinBKukBcZbK+ZfQDyZRmfiOCuUreL7s/YjLglB4BKXVD/NTwstxm8YLfw==
+	bh=ZJv3iwv2xhtLbUdm9xnAIqJx8pCFt3cC26JBlEGXT88=;
+	b=PnZNrSW6hlNuyaCxQD0TaSMfii29T1liLZdhZfgXwf3EEcPRWeRETPPMAKz2//807EQBkv
+	MvsTg+4Kk26ZQDIvB8HX6WKG0BXY27xHD+PW6UhgWjGyZsq9DH/y0+5q99zevUaR+fX7Vu
+	aCtqBK9JwqzDO4/DumTh6iW/gm22JGlfmzoUdzEvS5coJq08hUun7uyBEcX73ySQntomSf
+	SAiDWTi6VglIK8NICve4GYgNtSFaYAIVJSARB9jcpD6qoArcylR5hF5/OFh6KoeRM2C/Hk
+	tHQpohCaStWu6N77Nr8XbVV44WhPPLRzy7YtkHPG+poT/1Buzx8x4yp8FBxCqw==
 From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Thu, 23 Oct 2025 18:22:54 +0200
-Subject: [PATCH net-next v3 4/5] net: macb: rename bp->sgmii_phy field to
- bp->phy
+Date: Thu, 23 Oct 2025 18:22:55 +0200
+Subject: [PATCH net-next v3 5/5] net: macb: Add "mobileye,eyeq5-gem"
+ compatible
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,7 +60,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20251023-macb-eyeq5-v3-4-af509422c204@bootlin.com>
+Message-Id: <20251023-macb-eyeq5-v3-5-af509422c204@bootlin.com>
 References: <20251023-macb-eyeq5-v3-0-af509422c204@bootlin.com>
 In-Reply-To: <20251023-macb-eyeq5-v3-0-af509422c204@bootlin.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -79,146 +79,105 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
  Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
  Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
- =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
- Andrew Lunn <andrew@lunn.ch>
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
 X-Mailer: b4 0.14.3
 X-Last-TLS-Session-Version: TLSv1.3
 
-The bp->sgmii_phy field is initialised at probe by init_reset_optional()
-if bp->phy_interface == PHY_INTERFACE_MODE_SGMII. It gets used by:
- - zynqmp_config: "cdns,zynqmp-gem" or "xlnx,zynqmp-gem" compatibles.
- - mpfs_config: "microchip,mpfs-macb" compatible.
- - versal_config: "xlnx,versal-gem" compatible.
+Add support for the two GEM instances inside Mobileye EyeQ5 SoCs, using
+compatible "mobileye,eyeq5-gem". With it, add a custom init sequence
+that must grab a generic PHY and initialise it.
 
-Make name more generic as EyeQ5 requires the PHY in SGMII & RGMII cases.
+We use bp->phy in both RGMII and SGMII cases. Tell our mode by adding a
+phy_set_mode_ext() during macb_open(), before phy_power_on(). We are
+the first users of bp->phy that use it in non-SGMII cases.
 
-Drop "for ZynqMP SGMII mode" comment that is already a lie, as it gets
-used on Microchip platforms as well. And soon it won't be SGMII-only.
+The phy_set_mode_ext() call is made unconditionally. It cannot cause
+issues on platforms where !bp->phy or !bp->phy->ops->set_mode as, in
+those cases, the call is a no-op (returning zero). From reading
+upstream DTS, we can figure out that no platform has a bp->phy and a
+PHY driver that has a .set_mode() implementation:
+ - cdns,zynqmp-gem: no DTS upstream.
+ - microchip,mpfs-macb: microchip/mpfs.dtsi, &mac0..1, no PHY attached.
+ - xlnx,versal-gem: xilinx/versal-net.dtsi, &gem0..1, no PHY attached.
+ - xlnx,zynqmp-gem: xilinx/zynqmp.dtsi, &gem0..3, PHY attached to
+   drivers/phy/xilinx/phy-zynqmp.c which has no .set_mode().
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
- drivers/net/ethernet/cadence/macb.h      |  2 +-
- drivers/net/ethernet/cadence/macb_main.c | 26 +++++++++++++-------------
- 2 files changed, 14 insertions(+), 14 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 38 ++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index 05bfa9bd4782..87414a2ddf6e 100644
---- a/drivers/net/ethernet/cadence/macb.h
-+++ b/drivers/net/ethernet/cadence/macb.h
-@@ -1341,7 +1341,7 @@ struct macb {
- 
- 	struct macb_ptp_info	*ptp_info;	/* macb-ptp interface */
- 
--	struct phy		*sgmii_phy;	/* for ZynqMP SGMII mode */
-+	struct phy		*phy;
- 
- 	spinlock_t tsu_clk_lock; /* gem tsu clock locking */
- 	unsigned int tsu_rate;
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 8b688a6cb2f9..44188e7eee56 100644
+index 44188e7eee56..b1ed98d9c438 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -2965,7 +2965,7 @@ static int macb_open(struct net_device *dev)
+@@ -2965,6 +2965,10 @@ static int macb_open(struct net_device *dev)
  
  	macb_init_hw(bp);
  
--	err = phy_power_on(bp->sgmii_phy);
-+	err = phy_power_on(bp->phy);
++	err = phy_set_mode_ext(bp->phy, PHY_MODE_ETHERNET, bp->phy_interface);
++	if (err)
++		goto reset_hw;
++
+ 	err = phy_power_on(bp->phy);
  	if (err)
  		goto reset_hw;
- 
-@@ -2981,7 +2981,7 @@ static int macb_open(struct net_device *dev)
- 	return 0;
- 
- phy_off:
--	phy_power_off(bp->sgmii_phy);
-+	phy_power_off(bp->phy);
- 
- reset_hw:
- 	macb_reset_hw(bp);
-@@ -3013,7 +3013,7 @@ static int macb_close(struct net_device *dev)
- 	phylink_stop(bp->phylink);
- 	phylink_disconnect_phy(bp->phylink);
- 
--	phy_power_off(bp->sgmii_phy);
-+	phy_power_off(bp->phy);
- 
- 	spin_lock_irqsave(&bp->lock, flags);
- 	macb_reset_hw(bp);
-@@ -5141,13 +5141,13 @@ static int init_reset_optional(struct platform_device *pdev)
- 
- 	if (bp->phy_interface == PHY_INTERFACE_MODE_SGMII) {
- 		/* Ensure PHY device used in SGMII mode is ready */
--		bp->sgmii_phy = devm_phy_optional_get(&pdev->dev, NULL);
-+		bp->phy = devm_phy_optional_get(&pdev->dev, NULL);
- 
--		if (IS_ERR(bp->sgmii_phy))
--			return dev_err_probe(&pdev->dev, PTR_ERR(bp->sgmii_phy),
-+		if (IS_ERR(bp->phy))
-+			return dev_err_probe(&pdev->dev, PTR_ERR(bp->phy),
- 					     "failed to get SGMII PHY\n");
- 
--		ret = phy_init(bp->sgmii_phy);
-+		ret = phy_init(bp->phy);
- 		if (ret)
- 			return dev_err_probe(&pdev->dev, ret,
- 					     "failed to init SGMII PHY\n");
-@@ -5176,7 +5176,7 @@ static int init_reset_optional(struct platform_device *pdev)
- 	/* Fully reset controller at hardware level if mapped in device tree */
- 	ret = device_reset_optional(&pdev->dev);
- 	if (ret) {
--		phy_exit(bp->sgmii_phy);
-+		phy_exit(bp->phy);
- 		return dev_err_probe(&pdev->dev, ret, "failed to reset controller");
- 	}
- 
-@@ -5184,7 +5184,7 @@ static int init_reset_optional(struct platform_device *pdev)
- 
- err_out_phy_exit:
- 	if (ret)
--		phy_exit(bp->sgmii_phy);
-+		phy_exit(bp->phy);
- 
+@@ -5189,6 +5193,28 @@ static int init_reset_optional(struct platform_device *pdev)
  	return ret;
  }
-@@ -5594,7 +5594,7 @@ static int macb_probe(struct platform_device *pdev)
- 	mdiobus_free(bp->mii_bus);
  
- err_out_phy_exit:
--	phy_exit(bp->sgmii_phy);
-+	phy_exit(bp->phy);
- 
- err_out_free_netdev:
- 	free_netdev(dev);
-@@ -5618,7 +5618,7 @@ static void macb_remove(struct platform_device *pdev)
- 	if (dev) {
- 		bp = netdev_priv(dev);
- 		unregister_netdev(dev);
--		phy_exit(bp->sgmii_phy);
++static int eyeq5_init(struct platform_device *pdev)
++{
++	struct net_device *netdev = platform_get_drvdata(pdev);
++	struct macb *bp = netdev_priv(netdev);
++	struct device *dev = &pdev->dev;
++	int ret;
++
++	bp->phy = devm_phy_get(dev, NULL);
++	if (IS_ERR(bp->phy))
++		return dev_err_probe(dev, PTR_ERR(bp->phy),
++				     "failed to get PHY\n");
++
++	ret = phy_init(bp->phy);
++	if (ret)
++		return dev_err_probe(dev, ret, "failed to init PHY\n");
++
++	ret = macb_init(pdev);
++	if (ret)
 +		phy_exit(bp->phy);
- 		mdiobus_unregister(bp->mii_bus);
- 		mdiobus_free(bp->mii_bus);
++	return ret;
++}
++
+ static const struct macb_usrio_config sama7g5_usrio = {
+ 	.mii = 0,
+ 	.rmii = 1,
+@@ -5343,6 +5369,17 @@ static const struct macb_config versal_config = {
+ 	.usrio = &macb_default_usrio,
+ };
  
-@@ -5645,7 +5645,7 @@ static int __maybe_unused macb_suspend(struct device *dev)
- 	u32 tmp;
- 
- 	if (!device_may_wakeup(&bp->dev->dev))
--		phy_exit(bp->sgmii_phy);
-+		phy_exit(bp->phy);
- 
- 	if (!netif_running(netdev))
- 		return 0;
-@@ -5774,7 +5774,7 @@ static int __maybe_unused macb_resume(struct device *dev)
- 	int err;
- 
- 	if (!device_may_wakeup(&bp->dev->dev))
--		phy_init(bp->sgmii_phy);
-+		phy_init(bp->phy);
- 
- 	if (!netif_running(netdev))
- 		return 0;
++static const struct macb_config eyeq5_config = {
++	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_JUMBO |
++		MACB_CAPS_GEM_HAS_PTP | MACB_CAPS_QUEUE_DISABLE |
++		MACB_CAPS_NO_LSO,
++	.dma_burst_length = 16,
++	.clk_init = macb_clk_init,
++	.init = eyeq5_init,
++	.jumbo_max_len = 10240,
++	.usrio = &macb_default_usrio,
++};
++
+ static const struct macb_config raspberrypi_rp1_config = {
+ 	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_CLK_HW_CHG |
+ 		MACB_CAPS_JUMBO |
+@@ -5374,6 +5411,7 @@ static const struct of_device_id macb_dt_ids[] = {
+ 	{ .compatible = "microchip,mpfs-macb", .data = &mpfs_config },
+ 	{ .compatible = "microchip,sama7g5-gem", .data = &sama7g5_gem_config },
+ 	{ .compatible = "microchip,sama7g5-emac", .data = &sama7g5_emac_config },
++	{ .compatible = "mobileye,eyeq5-gem", .data = &eyeq5_config },
+ 	{ .compatible = "raspberrypi,rp1-gem", .data = &raspberrypi_rp1_config },
+ 	{ .compatible = "xlnx,zynqmp-gem", .data = &zynqmp_config},
+ 	{ .compatible = "xlnx,zynq-gem", .data = &zynq_config },
 
 -- 
 2.51.1
