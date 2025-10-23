@@ -1,83 +1,82 @@
-Return-Path: <netdev+bounces-232219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF4A7C02EFF
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 20:28:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B39BC02F50
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 20:29:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 108A75043A8
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 18:28:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CBC3E50393F
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 18:28:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B7A345CD5;
-	Thu, 23 Oct 2025 18:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B9B34D4F5;
+	Thu, 23 Oct 2025 18:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZluPI/AT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TPRKKDH8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8091734B40B
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 18:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CBA34B1AE
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 18:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761244089; cv=none; b=XAcR+ZCoAWMQeJKO7TZv5BcOAPMYmkxY4LUyWOHPJrVe6tdY3NpHat5/44YrlF0uy6sJoTYjBKiXyoHp46DclURIckuIxJ2zI5M8CCMmO6gGzNkWCpkqb3uFnNPFGop2sK6ffhIfbsrYy0zDEVJYK7iJsa9sAkmYvfa9ZSNdP+c=
+	t=1761244094; cv=none; b=PikkZOGjcWjgka6tDf3o6c3JnzaIf43z9KZGLFclNyYv18K7QXkBreUdWvWhburQXcL3Pqai7hRevbUZJS7C0EwEqU65miMRdkLA3ohUHfWOOU+o3jKLEpFhXCizZanwGsmtY7aWfeN2zgJHo6jwo3OKPx98T9C40fpwTJl0b4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761244089; c=relaxed/simple;
-	bh=5ZnZPrVDfdO+Z9/UM3e8BCikhyLuP+zNDA80rKqdbMY=;
+	s=arc-20240116; t=1761244094; c=relaxed/simple;
+	bh=/NnsC3/kyQkEuJK5iOUFqzrZwSnxBzzrLIV6TJlSX58=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qkVQJ6ycnHdwbmSBf7AlIUQcQP5/SA3PRSD0DLeYYYAMzceBUMf/K6zlLDIFf8bxy5o92JKv/RPIhSb1Fhx4jLsm7xofE1JeR6B8rZ0N3CTaPHdDlqIWwEwuqLJLQed9ghuTFWj3Vh7mjamQp7IslfsV3kNknxOQDl5NjFn9HIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZluPI/AT; arc=none smtp.client-ip=209.85.214.175
+	 In-Reply-To:To:Cc; b=SIMvdqua6fTHL73rfHe4ZA+dpNhAQbpRoS4j7Tg6GvGfO0nMLhBoxPZqSJTUH6aGzgp+9nyraN8B/jr/PJ+jRGUd23llpQLrUwpI99AQG2GEgUnZ3s4GUa6c83ApP1oRP9StjLLNiT2uAsyJfjn5A9akNnUX1gzQ3Mfiu+EVyO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TPRKKDH8; arc=none smtp.client-ip=209.85.215.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-269af38418aso14804815ad.1
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 11:28:06 -0700 (PDT)
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b55517e74e3so1115233a12.2
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 11:28:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761244086; x=1761848886; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761244087; x=1761848887; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=j0IJv9dMDzYNAhk3DeojEckJoVGEYAGQr1mrX7CZmVI=;
-        b=ZluPI/ATyLxWxTZnYtnR1Q+2uqTB8mTBDQVYynXfkdJqsa6A9Txt9/KjUi4mCfhZ/Y
-         6XLP/aLF5CVY9ezJucDQCws4m1PpC0+ulGf2zweCjxbvf6bfEKR1MiMTRXJQ0wPXrTTx
-         leva9rnWFR43CoZ2ATmAEOtOJrCAkQQ+pfX59nKs1bNb4NWM52FTWeXJLq/gLHHr+wFS
-         5whdVdBitUm2RU7sV+qHkbRjyemuJ+TfwBgvHIITwc7W7uIkYNSSmWLUjjTPoQHSguef
-         +1s1PKqKYefGRIu/7tV2+Gd61SpbNP06SvCt5aOZgzKxwzM4ARH1o65DylVHpdAR7/tY
-         cbhA==
+        bh=t/1b6yRMCqBZzs7tcE4MzTOrQu/agnNRge7CXTKa+MI=;
+        b=TPRKKDH8XrBk5rLrPo62mWYsMVyGUT1Dap05tyaLhbEe8BhVhGFYgWX94whDYZI987
+         5sXL8jHFGMqdCUXNCoTIWrgxnSWyYN2tctS/AW53U1pKM+VkR1hl1O38k0UCk+PLd7Ik
+         Gg1EQh0C80BhpMx8ST+tiQA4O2UIxt5k3lN+gAB4A5+AvPEcrgMLOyb000M3Kz6fcmGY
+         qGpSzUtCOVtP1zxyuBsp2y/ywXm/162dCEUpH1+bgZUWRpEeqjk/iN6ClpCNrCrs2WYH
+         jIg6eaVV3v4V0EBZOG8LtOABMzphoh9ZYmDdG0O76yF0pqQWnyEUGk6d4DEENKsHh/w8
+         6k7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761244086; x=1761848886;
+        d=1e100.net; s=20230601; t=1761244087; x=1761848887;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=j0IJv9dMDzYNAhk3DeojEckJoVGEYAGQr1mrX7CZmVI=;
-        b=JyvLZ+a632xNrvilWZ3zQzuy0WFAs2Bdkqrhbcb21zA5S70WTEHJyWnvwbn5j52fbr
-         aR7zSAaTux58q+BeLMWThFK83pXb5+ldaY9IktEjKGuqBvX01+fcr8fFQd1iXDhV2GRd
-         TTBjVmCRUiLjWPwhripRnoeh2fQ9it9KrvORhkSwNUSEOu5l71mIZY/pXicJIKFdTzFA
-         IHE4nUjW3sZ2gGTDtilw03M40LncUtoXRRLBfpqILNiz05wM5uL07VTfAiyuP+4NvFCW
-         deU47kdtHh1LGdhxKOBGDg3Cf5GWeLh+8ZGq89K4uWjWNl/kJPcBqWfdKCOilB2CTGnB
-         +h4w==
-X-Forwarded-Encrypted: i=1; AJvYcCXuCDTYhA+i+HPRYscZ/ccZQr6mMiKmHbe5W+pg2xV4clP5DRet7R6mE6v6oNORMZRFJwkQCjA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+rKn2/M5frdweVS4tfj0ALWnicw5m5lzDVZ8ongVpxqusSr5S
-	35NtPydWHBUt+SVT2fQ918/n2giFQf1S3WE+fcoGvFx3nFVvOeeh38Ou
-X-Gm-Gg: ASbGncuRdqMSpARID6Z3NZR4uDPumCrg4kmo24LtaeaaJLzBofRkX7nig2i1QAuKR55
-	vOqXX8OiWrOfoaVocGo4D28iv1EtaDfYqxAvmJip7FMr/XeTKnlT7Uc9ejHrP41B0lry+dwz+W4
-	CuDoZQpT1+0eg1MEEboZXJM3B8iYuV51/y/0DWmc74sFbIttH3OGA3y+hZbq2gtGpc80mTY/6bN
-	g+HDWslXPXNwcgSFYB7iN2CkAab7Wo8Ictk3prPbXzpYWFSxSAGMjZOMZGP5C0NoNswGC68+5bS
-	9ovB8OpsdEQe7NeuZmyhoRpETVQqZsmIl1DiClDGcH0+4I9tU9tDBo50+0Gjq8vBDgQu+kkLHAG
-	hwXei4hX4iCsBchhjBmc8tCx2i4en9Dm9h2QL7TtZQNLadE8ng+S/gzExkBTl3Un+0hnyPdgBwH
-	bpfiT4iXpt2y3WNpcIrBo=
-X-Google-Smtp-Source: AGHT+IHuF0nGiLuYIY7bEPnV/kWChQOzz0OHyllyc5LZQHhWV90GhBaf/if/KbPVYud5pvRswtc0Ww==
-X-Received: by 2002:a17:902:ebc6:b0:290:9a74:a8ad with SMTP id d9443c01a7336-290cba41dc7mr337313795ad.53.1761244085636;
-        Thu, 23 Oct 2025 11:28:05 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:42::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2946de152e7sm30294645ad.29.2025.10.23.11.28.05
+        bh=t/1b6yRMCqBZzs7tcE4MzTOrQu/agnNRge7CXTKa+MI=;
+        b=Z4eXWtZdzoEB5aoPoRgxen9cVao91dCDUhYcFjqd9/Lc6uottLdSAA37qQh+mQqwvv
+         kg8RdUn6moPzTVytMar8eIQ0/LufD3Q26qRui9S8KU9NP3kHTnqWZqUE1AZwJAJvuXlQ
+         /jvGx4vY8j+ra8x790K7x7ZxvfT5BNM44YfClxzvXVdvxv4lruXqYYy6h81/TseKrMXn
+         7S1nxzUFCfM6ZmBTRvISCvzVhRBSxQfK2QR4XzCejFV/sEXJO9T0+/gIybBKpohjSkUX
+         9NV/5HPDV1DUFI2B+bycdsOnlStSHEHI7jUd4gUnnrIHha+0HPgP/FuGD1lz7NHzxfhD
+         Xdcg==
+X-Forwarded-Encrypted: i=1; AJvYcCV1r8zUwb/ySJuQrg+OvXSswbaKtQvhCf3iMygZVAj4BfiH7qVcDz7ynYq+2OTOfR5xpptZf7U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx42KLI7QJNnmMcBn+DxbAVdFhz55eoIZybuNHM2c+Xf/IFXaFX
+	7Tk/l9hJxhyFk6TV/brhHQzJs5jvpROK1Qu7jzxNSp3Jc4fMo6EJIN/Fv9jUb0Re
+X-Gm-Gg: ASbGncshmvays7McSJOIDgqoZmwzvSJGCqplwqGJyby000kK82sPkuSTRHnvM+akQ+X
+	gBZT95ye8+zjrjHskCWPj6OdankSwdOnW6YCD85rsbogcAtG3sdof/gCDeNzF/v81ft/dzwHZ4x
+	VApthHavONBnwUO8AQyTV8RgW/gENDWpZcto1ZUP9OqfEAHpXzY9UoE5vYTHt1a/pcBccReajf/
+	isJYyfIKI9uYr6uVsXvpvc5SrF4ALOHAYOPYZYiXmwmibicVRYqY0dQq/gt277A9haMcLzh/mSp
+	zZxfq7VA5CX7Vhp7xyqRwIJNXeMI9AvbrtvQNkkQ4FIpipIDr398ebFz2i8pRuRerWC4yv2LA8L
+	2ci0H+/4/tU3xPWuvWav0op8mpciSRH15TO7qvfGQRzn+3/BzAFZlunXGGB0DTXJRc1VxLVK7O8
+	wh7tDN+IPm
+X-Google-Smtp-Source: AGHT+IGRrKHIe8i2PewhMjRBhP1W+eQCJR1uY99As6NL8XQQmuNG2L450IKTPePeAvu2qClkS7Jbsg==
+X-Received: by 2002:a17:902:dad2:b0:293:e5f:85b7 with SMTP id d9443c01a7336-2930e5f9113mr89467435ad.11.1761244086676;
+        Thu, 23 Oct 2025 11:28:06 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:73::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2946e0f06d5sm30959555ad.82.2025.10.23.11.28.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Oct 2025 11:28:05 -0700 (PDT)
+        Thu, 23 Oct 2025 11:28:06 -0700 (PDT)
 From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Thu, 23 Oct 2025 11:27:41 -0700
-Subject: [PATCH net-next v8 02/14] vsock/virtio: pack struct
- virtio_vsock_skb_cb
+Date: Thu, 23 Oct 2025 11:27:42 -0700
+Subject: [PATCH net-next v8 03/14] vsock: add netns to vsock skb cb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,7 +85,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251023-vsock-vmtest-v8-2-dea984d02bb0@meta.com>
+Message-Id: <20251023-vsock-vmtest-v8-3-dea984d02bb0@meta.com>
 References: <20251023-vsock-vmtest-v8-0-dea984d02bb0@meta.com>
 In-Reply-To: <20251023-vsock-vmtest-v8-0-dea984d02bb0@meta.com>
 To: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
@@ -110,65 +109,80 @@ X-Mailer: b4 0.14.3
 
 From: Bobby Eshleman <bobbyeshleman@meta.com>
 
-Reduce holes in struct virtio_vsock_skb_cb. As this struct continues to
-grow, we want to keep it trimmed down so it doesn't exceed the size of
-skb->cb (currently 48 bytes). Eliminating the 2 byte hole provides an
-additional two bytes for new fields at the end of the structure. It does
-not shrink the total size, however.
+Add a net pointer and net_mode to the vsock skb and helpers for
+getting/setting them. When skbs are received the transport needs a way
+to tell the vsock layer and/or virtio common layer which namespace and
+what namespace mode the packet belongs to. This will be used by those
+upper layers for finding the correct socket object. This patch stashes
+these fields in the skb control buffer.
 
-Future work could include combining fields like reply and tap_delivered
-into a single bitfield, but currently doing so will not make the total
-struct size smaller (although, would extend the tail-end padding area by
-one byte).
-
-Before this patch:
+This extends virtio_vsock_skb_cb to 24 bytes:
 
 struct virtio_vsock_skb_cb {
-	bool                       reply;                /*     0     1 */
-	bool                       tap_delivered;        /*     1     1 */
+	struct net *               net;                  /*     0     8 */
+	enum vsock_net_mode        net_mode;        /*     8     4 */
+	u32                        offset;               /*    12     4 */
+	bool                       reply;                /*    16     1 */
+	bool                       tap_delivered;        /*    17     1 */
 
-	/* XXX 2 bytes hole, try to pack */
-
-	u32                        offset;               /*     4     4 */
-
-	/* size: 8, cachelines: 1, members: 3 */
-	/* sum members: 6, holes: 1, sum holes: 2 */
-	/* last cacheline: 8 bytes */
-};
-;
-
-After this patch:
-
-struct virtio_vsock_skb_cb {
-	u32                        offset;               /*     0     4 */
-	bool                       reply;                /*     4     1 */
-	bool                       tap_delivered;        /*     5     1 */
-
-	/* size: 8, cachelines: 1, members: 3 */
-	/* padding: 2 */
-	/* last cacheline: 8 bytes */
+	/* size: 24, cachelines: 1, members: 5 */
+	/* padding: 6 */
+	/* last cacheline: 24 bytes */
 };
 
 Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
 ---
- include/linux/virtio_vsock.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes in v7:
+- rename `orig_net_mode` to `net_mode`
+- update commit message with a more complete explanation of changes
+
+Changes in v5:
+- some diff context change due to rebase to current net-next
+---
+ include/linux/virtio_vsock.h | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
 diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-index 0c67543a45c8..87cf4dcac78a 100644
+index 87cf4dcac78a..7f334a32133c 100644
 --- a/include/linux/virtio_vsock.h
 +++ b/include/linux/virtio_vsock.h
-@@ -10,9 +10,9 @@
+@@ -10,6 +10,8 @@
  #define VIRTIO_VSOCK_SKB_HEADROOM (sizeof(struct virtio_vsock_hdr))
  
  struct virtio_vsock_skb_cb {
-+	u32 offset;
++	struct net *net;
++	enum vsock_net_mode net_mode;
+ 	u32 offset;
  	bool reply;
  	bool tap_delivered;
--	u32 offset;
- };
+@@ -130,6 +132,27 @@ static inline size_t virtio_vsock_skb_len(struct sk_buff *skb)
+ 	return (size_t)(skb_end_pointer(skb) - skb->head);
+ }
  
- #define VIRTIO_VSOCK_SKB_CB(skb) ((struct virtio_vsock_skb_cb *)((skb)->cb))
++static inline struct net *virtio_vsock_skb_net(struct sk_buff *skb)
++{
++	return VIRTIO_VSOCK_SKB_CB(skb)->net;
++}
++
++static inline void virtio_vsock_skb_set_net(struct sk_buff *skb, struct net *net)
++{
++	VIRTIO_VSOCK_SKB_CB(skb)->net = net;
++}
++
++static inline enum vsock_net_mode virtio_vsock_skb_net_mode(struct sk_buff *skb)
++{
++	return VIRTIO_VSOCK_SKB_CB(skb)->net_mode;
++}
++
++static inline void virtio_vsock_skb_set_net_mode(struct sk_buff *skb,
++						      enum vsock_net_mode net_mode)
++{
++	VIRTIO_VSOCK_SKB_CB(skb)->net_mode = net_mode;
++}
++
+ /* Dimension the RX SKB so that the entire thing fits exactly into
+  * a single 4KiB page. This avoids wasting memory due to alloc_skb()
+  * rounding up to the next page order and also means that we
 
 -- 
 2.47.3
