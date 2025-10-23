@@ -1,126 +1,96 @@
-Return-Path: <netdev+bounces-232144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DB4EC01B85
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:20:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44C26C01C4A
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:30:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18693188CA9F
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:20:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33F781884270
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:31:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816D5329C54;
-	Thu, 23 Oct 2025 14:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B859230F7ED;
+	Thu, 23 Oct 2025 14:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PkZlHRgh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IxVmq1SJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18DB2C08BA
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 14:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909AC30ACFF;
+	Thu, 23 Oct 2025 14:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761229224; cv=none; b=rCYlK1uVqJERfCXpbC4wPaNg2c77fxVQuTY+COn31/WVeeyWxmYEQxWoLF0RNIhrNk16TO6J00PO3x8bCwLWKtD14aUKrpR+INLn4upSoeicqQ9aWyuwiWNKonoFrUyNXd/SPNqHqkSYcd9SCLAHSr6cmSxsC3Cu6JjpdVLVDnU=
+	t=1761229835; cv=none; b=H7kON4OFM68L0REhGWqrQAd9yAEcKW6HuDmnucSVM37COfPxA+LAkXhbg40ShKyBjRNWTEMiq6c39f4GFslPoRkaQV4AwiWg3TDIxSvBWcvvw1ldmBnHbgHxDUlVZXPJUZ97BipZIOtqLPPDkB2TnJcKe11YWqITB2/EfowDTJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761229224; c=relaxed/simple;
-	bh=t4XAMtlQ87nQTynvcekkQhTGmcfXyfcCovczOm0sFp8=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
-	 References:In-Reply-To; b=u+2i0ezaPEVoGippc1uQdEBtCHh9NbU2801EiokXuCXB9ztDBT1MkJgN8BUI3EWXffr9W249FWBwEVqmZppUu8zd90MmMDHNWgqNsKHvOK4POUV5QpPC3D00Ppx77O4+fvhs6bgW8r6ZfyanVUQwaho6NS1xCKJ72mnl3msnJ80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PkZlHRgh; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 12C544E41295;
-	Thu, 23 Oct 2025 14:20:21 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id DAF436068C;
-	Thu, 23 Oct 2025 14:20:20 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 95066102F2467;
-	Thu, 23 Oct 2025 16:20:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761229219; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=t4XAMtlQ87nQTynvcekkQhTGmcfXyfcCovczOm0sFp8=;
-	b=PkZlHRghL79Owhl/cu3HX506BAbg9Ulr67THDScpepEFLIyIBSX8QZ6wjhov7HI3MkhflN
-	YbNKiCbCXUmuH00e5dIQQvFIl74MSCulsjRB1L7W42oLGMKu7ymEPTF/9tiauPI0BzNHRK
-	nOIiWenY8PIitQUtDl1ICo+fOoAjZ18BO6cVs3oDs9uN1wrwC1p5kE7RZ1BHoDVxRpy8hs
-	j3+wbOK/PQxzQ+hLCJKzK5PvXJRT5ouuuotfkDdL5xEcO0xtwJTdihBuOTRGIzj+LQ8kfk
-	98JXEzm8nqU2JZhyj0EDfYpSSCelX/AFFwjSt8+t115//coe18INk75gCdtIsw==
+	s=arc-20240116; t=1761229835; c=relaxed/simple;
+	bh=5EExnN7gsO/XceRkVCZsD8PNVtYXY7UJwfNTTnd58sA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JN5mceFbNSErASr/ZGCh7GxAj66LevkYtGn6rqmGdMn6ytfGSI4z13GxBAoib5+72MH+U9sCtucocysX1YOPbcweydFava7dS/XHRQMQcN8A8VbsbDYY4l4rW9ECWjfDhscVnEFiGH+rnlUsQ0quWolVZxpR5vca5Tt6ea8NnIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IxVmq1SJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D28BC4CEE7;
+	Thu, 23 Oct 2025 14:30:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761229835;
+	bh=5EExnN7gsO/XceRkVCZsD8PNVtYXY7UJwfNTTnd58sA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=IxVmq1SJRNQJfQusb1WTfbamXvNj4R0K6h0hpmV8CnTK9w3rxNGaJKIcrq5C9w7Ir
+	 /QMfRy7Mbj7dMNawdsleito7ZpRkYtAEurADog5qEkaHqwq+X/+9i1ihWnnRHQzGJf
+	 dtqzXCWSpHytkaVn+3ojfVG0B+lt3BVlx8ryb5MquSdDaPGCT/Jj/Y2GHdSgFcsm5E
+	 hSW6sSsiVVb32Es2TKiinjwhOjWZ/OdXrsPCRMlSN3IO8SD6zzGLBum4tYP+zBrz2o
+	 Gq58TIIA/1mUvDj5AHSsjq1SSz6hID65oFE8B+GV9GuRCDJHTc/2brLin6zmZpt+uJ
+	 ACIS2/BDyjFbg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0BD3809A97;
+	Thu, 23 Oct 2025 14:30:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 23 Oct 2025 16:20:16 +0200
-Message-Id: <DDPRNG6XVUMS.3RIOD71L748WE@bootlin.com>
-Cc: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
- "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Russell King" <linux@armlinux.org.uk>,
- <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, =?utf-8?q?Beno=C3=AEt_Monin?=
- <benoit.monin@bootlin.com>, =?utf-8?q?Gr=C3=A9gory_Clement?=
- <gregory.clement@bootlin.com>, "Tawfik Bayouk"
- <tawfik.bayouk@mobileye.com>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>, "Vladimir Kondratiev"
- <vladimir.kondratiev@mobileye.com>
-To: "Andrew Lunn" <andrew@lunn.ch>, "Maxime Chevallier"
- <maxime.chevallier@bootlin.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net-next v2 5/5] net: macb: Add "mobileye,eyeq5-gem"
- compatible
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20251022-macb-eyeq5-v2-0-7c140abb0581@bootlin.com>
- <20251022-macb-eyeq5-v2-5-7c140abb0581@bootlin.com>
- <ef92f3be-176d-4e83-8c96-7bd7f5af365f@bootlin.com>
- <51833ec4-e417-4ba3-a6d1-c383ee9ea839@lunn.ch>
-In-Reply-To: <51833ec4-e417-4ba3-a6d1-c383ee9ea839@lunn.ch>
-X-Last-TLS-Session-Version: TLSv1.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: phy: micrel: always set shared->phydev for
+ LAN8814
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176122981550.3105055.6331670234588911698.git-patchwork-notify@kernel.org>
+Date: Thu, 23 Oct 2025 14:30:15 +0000
+References: <20251021132034.983936-1-robert.marko@sartura.hr>
+In-Reply-To: <20251021132034.983936-1-robert.marko@sartura.hr>
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: daniel.machon@microchip.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, vadim.fedorenko@linux.dev,
+ horatiu.vultur@microchip.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, luka.perkov@sartura.hr
 
-On Wed Oct 22, 2025 at 9:33 PM CEST, Andrew Lunn wrote:
-> On Wed, Oct 22, 2025 at 10:09:49AM +0200, Maxime Chevallier wrote:
->> Hi,
->>=20
->> On 22/10/2025 09:38, Th=C3=A9o Lebrun wrote:
->> > Add support for the two GEM instances inside Mobileye EyeQ5 SoCs, usin=
-g
->> > compatible "mobileye,eyeq5-gem". With it, add a custom init sequence
->> > that must grab a generic PHY and initialise it.
->> >=20
->> > We use bp->phy in both RGMII and SGMII cases. Tell our mode by adding =
-a
->> > phy_set_mode_ext() during macb_open(), before phy_power_on(). We are
->> > the first users of bp->phy that use it in non-SGMII cases.
->> >=20
->> > Signed-off-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
->>=20
->> This seems good to me. I was worried that introducing the unconditionnal
->> call to phy_set_mode_ext() could trigger spurious errors should the
->> generic PHY driver not support the requested interface, but AFAICT
->> there's only the zynqmp in-tree that use the 'phys' property with macb,
->> and the associated generic PHY driver (drivers/phy/phy-zynqmp.c) doesn't
->> implement a .set_mode, so that looks safe.
->
-> I was thinking along the same lines, is this actually safe? It would
-> be good to add something like this to the commit message to indicate
-> this change is safe, the needed code analysis has been performed.
+Hello:
 
-Sure, will integrate a summary similar to my reply to Maxime's message.
-https://lore.kernel.org/lkml/DDOQYH87ZV1H.1QZH1R36WMIC6@bootlin.com/
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Thanks,
+On Tue, 21 Oct 2025 15:20:26 +0200 you wrote:
+> Currently, during the LAN8814 PTP probe shared->phydev is only set if PTP
+> clock gets actually set, otherwise the function will return before setting
+> it.
+> 
+> This is an issue as shared->phydev is unconditionally being used when IRQ
+> is being handled, especially in lan8814_gpio_process_cap and since it was
+> not set it will cause a NULL pointer exception and crash the kernel.
+> 
+> [...]
 
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Here is the summary with links:
+  - [net] net: phy: micrel: always set shared->phydev for LAN8814
+    https://git.kernel.org/netdev/net/c/399d10934740
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
