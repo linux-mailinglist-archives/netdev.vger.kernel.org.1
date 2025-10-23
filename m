@@ -1,211 +1,262 @@
-Return-Path: <netdev+bounces-232095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F7EDC00E97
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 13:54:31 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F90C00ED0
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 13:56:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2EA018C7B78
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 11:54:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 26A9E5020AF
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 11:56:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6251E30EF7B;
-	Thu, 23 Oct 2025 11:54:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57DE30EF87;
+	Thu, 23 Oct 2025 11:55:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dsXB9ZTF"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Uc55ETVX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104CE29BDA3
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 11:54:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2C63043C0
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 11:55:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761220467; cv=none; b=ZuVcnUUfkevRULoiGCLKTwkQnX2KyYj1ETGf11g+1BOeB0Rf1sVIBcirxGfpsfnnzNaRQbLg+h+YJo/ZO7IlsAs9mQZofBwLWtv7nncFlgDfZiQJ+CntTjc9nr+zc3Ibs+fC0WcOSDNg2+Vy82jXtRWHaAu9Aej86cmUel2sqKw=
+	t=1761220556; cv=none; b=LAn8TscVrphLSpc333wdVkRCQBEXu1G6J1G/AJAPdIPtYrRA3q1H+CXmqeP+Jmm+Y0iD27inWaZ8QeR8hfREVSCiRChzilunYDcIgCbxdfjEBUQmJE5eEzR2bm1Yym0/o0VhO8PXRdv/ye+QsndjpUUJLbmycRX2mEGLL+OJPHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761220467; c=relaxed/simple;
-	bh=WRt/DcHFyVQCUj2nKIuiHXnnK3ayNkXOxmMkACYehvs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n0NZc1qWRbGON/VGB6zRWIsrzuaQ+5uoyhn6ErM3tLlNKgo7kM6y/6suWcKLc1nkabdTLJGv8FmXT3THs1qflZbT/kRwOcajHJiQimCiNFJJKpFz5VXnDn+RIGo9MNhiMp9BWCCy0HyGsJqqRnm+b3KdGGjnK1S6QnohqOr83aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dsXB9ZTF; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4e8b90e9328so5324841cf.1
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 04:54:24 -0700 (PDT)
+	s=arc-20240116; t=1761220556; c=relaxed/simple;
+	bh=azviEF2Y9DsjLGlZO8zdXXKHk7bppBImzg31itZmqpY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=epjjw9GKV7eiKOBTzyyJsc04ACe/qjup65VgbgAqncaqqjtLzUBFBHKTVM4mjvcUYa8ObWUUbv1u+9QGvEcToPyPkyyzcpqsu51IugS0xGbnx70EoffunFE48vMGsZ8gxe/iM/vFReis6Iwf64EvqfBUQnnAG4ioPYGL0EPefsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Uc55ETVX; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b3e9d633b78so80406166b.1
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 04:55:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761220464; x=1761825264; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vcRTFIsNfqtqINMSUqvwdCmpc1Pr0XIO2OTRxxjhVa4=;
-        b=dsXB9ZTFf15YF3uA6FNCCLIO0UnPvTuokC0IFcAHhKTQ0ZpkNt6fFtd22JaQSY2egd
-         TPvpOyO9cYTvbE4GOt65qFWMQkDPnxAdpVA7fd7oEjf18+fo1stVsQ3y3N/d5MsyPRin
-         n8qBWloP6Lu6QRAjCl8WcKa21GUc3rSMdkrcLVnWKsJwcCj9cQ4AU+RJ7crWGbLoiAhX
-         7GrM52jkFytivp0cSOfuUqsXQANuKGvEILH3zYKVumseTL7R7po5+UXhugJnEDVHonsA
-         tvHarb8PhM3Sqd2sXBNGMKab19EKWvhWd4zQlPRXFzdhuzG0cKdham1qQ90r4QzebayC
-         kepw==
+        d=cloudflare.com; s=google09082023; t=1761220553; x=1761825353; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SfSzc8kJaozUiCooo0tA6ZYtUG0roletvLtB9N7dv/Q=;
+        b=Uc55ETVXKsRvMNmqiEV7evJnAWjyLlua4LNaEGxMQ0Z+ZPXjiP+xwrjeiBov3Pp8XF
+         C2V1X+QLMGKqk+Zdqb+JD/2poTt20J24rpchxTkCfPuXwe8TUDaHiRqV6A5ciTaja6Wl
+         rgLNa4vl80a0BI6FdWtuJiVMF+Qm4c48fMSG40TyiiW4v13WedpD4BR75XdeEEu2YP/z
+         b5bS5hilKBblTyiAnrejPIzvFgxbSI+UvSBPLhDP3TLtEErfonhoQw3K8rNk5vv8yc4v
+         5j2k2CmA6aiAeaoblISN5/c/zPz5sYmhqic5sJZqyX80RB72SrE76g9O4vEuququSIrN
+         n+oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761220464; x=1761825264;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vcRTFIsNfqtqINMSUqvwdCmpc1Pr0XIO2OTRxxjhVa4=;
-        b=uDzLJ+JKXScNgLWeGjYF9skNVkXA7ZGHrKYUsgfaAg3gs5hHZwsnjCinEeH9pPnDjO
-         mI243IZjaJon/4rRzdV3+VhygiSFvFd5CtsBT5s8R7HPKUewB5n5otlGnrLeRAkmeYVh
-         pqXwtiR1pNYq2LatDou6LTM2ZMvmPOC2nFaLOzaOYlI9vG47a4C8cocdwdjR5hhz7wgI
-         R44TvuPLIKs21hWKVOOCbnhR/whEVnKilOFGWjOaNtb63KOFuE/PirnB4f7XdK18mExX
-         o0qvA36QrD9unv5sKH/Ku+7B8IFg/NLeuOKHO9PRtIt7EEL84mv8KTNHFCTFU/Y0UJL+
-         PZ7g==
-X-Forwarded-Encrypted: i=1; AJvYcCWAOolgpk7F0jxd9jT6B5EkT64MOoM+0uoi2CApO/ueo3TSqgBUyBHJa/WGu1/ukkVArUtzX/o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHJoynieBUhJVoApa2CPBeJBM6s8XxZrAfRHD/k+0Kc+Y0w3Ce
-	4swIsKLx8GhjDB/0eqo4MaJH5nN3mwmX0Bno++sqcmrmCElC83czORDW+p0db1d1FYqojjpesot
-	sXPnGxbJC4NZlTF1dKuYR7dpbVl7IHkMa4vntFIx2
-X-Gm-Gg: ASbGnctSxJ9N1zhnsT41J3u0HTwdreBPlrlAt0c61stzlqvKZG8liSUk5Aq2WGbMqHu
-	zh+1hi4jV9aFwnmGQ01xzeEdOSw2XIZA+WLnX6f++edy6E3JrAcWBIrewAGMU7ZSZy6JfOBTBTU
-	3iT5nJBNLPM2vqJgL7Xv9/Qog5C+W7kQrCU3/GqZtuUnsn8oBuPeYWB1JUl1g0ZnjpTkdqKpOAh
-	KwKEUF2GqK2MrTsJD/XHezbGEqHTC88aosdoRabsHX/h0VIe+LUDYe6abgR
-X-Google-Smtp-Source: AGHT+IFwRsjXFwOVquH93Ov+wkUcdOodRX9YBEt002vnoRNK+OjJBZ8/zDqB/x6qABeRz/8ZEZIGvRrfcxa4bm43FmM=
-X-Received: by 2002:ac8:5a88:0:b0:4b3:119b:ce78 with SMTP id
- d75a77b69052e-4e89d215680mr277950761cf.6.1761220463337; Thu, 23 Oct 2025
- 04:54:23 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761220553; x=1761825353;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SfSzc8kJaozUiCooo0tA6ZYtUG0roletvLtB9N7dv/Q=;
+        b=hJvX6sL2VeTenhRgOHwuuXqj1L27cnM2BGiFIkLprZbhqVzbj87EXjkbcy9vRoymZI
+         C6Xj4thwhxKYHuJ9o7PHnz9PVKOhr6FIoIux78NMU1VKdsIu6iIC9foU2tMRGflBybuO
+         xtipYvJG7u/PoYwoFDEsP1OBqblxZHtkM7uJ2GgvBaPWBEkBOSqdOeGy1ILeX5+sfgb1
+         HpXlfNyeYMhNNRMzf1oWMCmYYkuHlEtWSIvmQK6EXlPoNTiL77d1IbqWwJC6WtTZFy8f
+         AgrN7BIWivcYaYwiaZ7vGVVm5/16Z+44R9xxTGpLtJWXMiGvayytAnIoV5AuJ6FGc+JM
+         C0XA==
+X-Forwarded-Encrypted: i=1; AJvYcCXMlYVzwuC6RNsilShiAxqDLKnSpUQEUQcniOJDyCgj8B/CjexcAu6XVB4zrdvVoEwF/xabH+0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHob5pVBqhaDO8M9bcCbrDZTls243fH9Mb1egjDYLEIM8KRT+Q
+	LbofqwQ3MYZaZcngWGzwErIHwKT47GOs3sZ6l++m2DRMwOBKB+HMtTBO0tdVXTF0wr0=
+X-Gm-Gg: ASbGnctDsMQujyj5HJimDKDAyuawdQqkfbG66+7ScOTuNujx5XZDhdoaaKMnGBgv/7W
+	XTV2Kc4FB5TXmYpNiCCBuK6UEOW7Vn0MI0DWl210X7rxS5uS8dHTmoo9RJs/VvvqWYie+rYzzmq
+	ctk1pxp1lDbSFBEKc95UNy7QTSJ984oO2W0lxRV3MU0ANX53LL04pMP37S3EKQ16uTK9jnEkLIm
+	oqpJBTMmieW98q0cs/p3P69xZpLdqmckg7WA3uPnnP8LFY9w6n84hK4H9JiwGZeMM+szVX9uFIQ
+	4bC30Jkjg/Yod+Nplhbcsitz2EREONHSQBvxQauJriRtQ8R9jPdaz6oh3nECYmypOCd/ndMGLN4
+	pC50ELnxdoJnlwZscgNKaElrNSBCP9sOtmXjg0tdaOO6LQ+1oX87QEPKhcV6eOCZVskFp
+X-Google-Smtp-Source: AGHT+IEI3LwYTd9zFcd/viEBkli7RyXBE4AUj66P9/ZXp+kyUrGJGoB9rBxYKTCx1VJkF4vIwOM3HA==
+X-Received: by 2002:a17:907:7f19:b0:afa:1d2c:bbd1 with SMTP id a640c23a62f3a-b6d2c79fd9emr844385366b.30.1761220553164;
+        Thu, 23 Oct 2025 04:55:53 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:7f])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d511f7027sm223524166b.25.2025.10.23.04.55.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Oct 2025 04:55:52 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,  Daniel Borkmann
+ <daniel@iogearbox.net>,  John Fastabend <john.fastabend@gmail.com>,
+  Stanislav Fomichev <sdf@fomichev.me>,  Alexei Starovoitov
+ <ast@kernel.org>,  Andrii Nakryiko <andrii@kernel.org>,  Eduard Zingerman
+ <eddyz87@gmail.com>,  Song Liu <song@kernel.org>,  Yonghong Song
+ <yonghong.song@linux.dev>,  KP Singh <kpsingh@kernel.org>,  Hao Luo
+ <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Arthur Fabre
+ <arthur@arthurfabre.com>,  bpf@vger.kernel.org,  netdev@vger.kernel.org,
+  kernel-team@cloudflare.com
+Subject: Re: [PATCH bpf-next v2 11/15] selftests/bpf: Expect unclone to
+ preserve skb metadata
+In-Reply-To: <2753c96b-48f9-480e-923c-60d2c20ebb03@linux.dev> (Martin KaFai
+	Lau's message of "Wed, 22 Oct 2025 16:12:39 -0700")
+References: <20251019-skb-meta-rx-path-v2-0-f9a58f3eb6d6@cloudflare.com>
+	<20251019-skb-meta-rx-path-v2-11-f9a58f3eb6d6@cloudflare.com>
+	<2753c96b-48f9-480e-923c-60d2c20ebb03@linux.dev>
+Date: Thu, 23 Oct 2025 13:55:51 +0200
+Message-ID: <87ms5hvnlk.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aPcp_xemzpDuw-MW@stanley.mountain> <20251021083505.3049794-1-lizhi.xu@windriver.com>
- <7232849d-cf15-47e1-9ffb-ed0216358be8@redhat.com>
-In-Reply-To: <7232849d-cf15-47e1-9ffb-ed0216358be8@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 23 Oct 2025 04:54:12 -0700
-X-Gm-Features: AS18NWAbKgVO0Sapt_HB1jGQJt1BlcGe-9cCoPLe451vSidlOu-GnSXxYRPeOSI
-Message-ID: <CANn89i+td+wS2=VpCB6Jb6m6arR5qv+PTkJ6G1Sc6y7ZBY2q-w@mail.gmail.com>
-Subject: Re: [PATCH V3] netrom: Prevent race conditions between neighbor operations
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Lizhi Xu <lizhi.xu@windriver.com>, dan.carpenter@linaro.org, davem@davemloft.net, 
-	horms@kernel.org, kuba@kernel.org, linux-hams@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzbot+2860e75836a08b172755@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Thu, Oct 23, 2025 at 4:44=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Wed, Oct 22, 2025 at 04:12 PM -07, Martin KaFai Lau wrote:
+> On 10/19/25 5:45 AM, Jakub Sitnicki wrote:
+>> @@ -447,12 +448,14 @@ int clone_dynptr_empty_on_meta_slice_write(struct __sk_buff *ctx)
+>>     /*
+>>    * Check that skb_meta dynptr is read-only before prog writes to packet payload
+>> - * using dynptr_write helper. Applies only to cloned skbs.
+>> + * using dynptr_write helper, and becomes read-write afterwards. Applies only to
+>> + * cloned skbs.
+>>    */
+>>   SEC("tc")
+>> -int clone_dynptr_rdonly_before_data_dynptr_write(struct __sk_buff *ctx)
+>> +int clone_dynptr_rdonly_before_data_dynptr_write_then_rw(struct __sk_buff *ctx)
+>>   {
+>>   	struct bpf_dynptr data, meta;
+>> +	__u8 meta_have[META_SIZE];
+>>   	const struct ethhdr *eth;
+>>     	bpf_dynptr_from_skb(ctx, 0, &data);
+>> @@ -465,15 +468,23 @@ int clone_dynptr_rdonly_before_data_dynptr_write(struct __sk_buff *ctx)
+>>     	/* Expect read-only metadata before unclone */
+>>   	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
+>> -	if (!bpf_dynptr_is_rdonly(&meta) || bpf_dynptr_size(&meta) != META_SIZE)
+>> +	if (!bpf_dynptr_is_rdonly(&meta))
 >
-> On 10/21/25 10:35 AM, Lizhi Xu wrote:
-> > The root cause of the problem is that multiple different tasks initiate
-> > SIOCADDRT & NETROM_NODE commands to add new routes, there is no lock
-> > between them to protect the same nr_neigh.
-> >
-> > Task0 can add the nr_neigh.refcount value of 1 on Task1 to routes[2].
-> > When Task2 executes nr_neigh_put(nr_node->routes[2].neighbour), it will
-> > release the neighbour because its refcount value is 1.
-> >
-> > In this case, the following situation causes a UAF on Task2:
-> >
-> > Task0                                 Task1                            =
-               Task2
-> > =3D=3D=3D=3D=3D                                 =3D=3D=3D=3D=3D        =
-                                   =3D=3D=3D=3D=3D
-> > nr_add_node()
-> > nr_neigh_get_dev()                    nr_add_node()
-> >                                       nr_node_lock()
-> >                                       nr_node->routes[2].neighbour->cou=
-nt--
-> >                                       nr_neigh_put(nr_node->routes[2].n=
-eighbour);
-> >                                       nr_remove_neigh(nr_node->routes[2=
-].neighbour)
-> >                                       nr_node_unlock()
-> > nr_node_lock()
-> > nr_node->routes[2].neighbour =3D nr_neigh
-> > nr_neigh_hold(nr_neigh);                                               =
-               nr_add_node()
-> >                                                                        =
-               nr_neigh_put()
-> >                                                                        =
-               if (nr_node->routes[2].neighbour->count
-> > Description of the UAF triggering process:
-> > First, Task 0 executes nr_neigh_get_dev() to set neighbor refcount to 3=
-.
-> > Then, Task 1 puts the same neighbor from its routes[2] and executes
-> > nr_remove_neigh() because the count is 0. After these two operations,
-> > the neighbor's refcount becomes 1. Then, Task 0 acquires the nr node
-> > lock and writes it to its routes[2].neighbour.
-> > Finally, Task 2 executes nr_neigh_put(nr_node->routes[2].neighbour) to
-> > release the neighbor. The subsequent execution of the neighbor->count
-> > check triggers a UAF.
-> >
-> > The solution to the problem is to use a lock to synchronize each add a
-> > route to node, but for rigor, I'll add locks to related ioctl and route
-> > frame operations to maintain synchronization.
+> Can the bpf_dynptr_set_rdonly() be lifted from the bpf_dynptr_from_skb_meta()?
 >
-> I think that adding another locking mechanism on top of an already
-> complex and not well understood locking and reference infra is not the
-> right direction.
->
-> Why reordering the statements as:
->
->         if (nr_node->routes[2].neighbour->count =3D=3D 0 &&
-> !nr_node->routes[2].neighbour->locked)
->                 nr_remove_neigh(nr_node->routes[2].neighbour);
->         nr_neigh_put(nr_node->routes[2].neighbour);
->
-> is not enough?
->
-> > syzbot reported:
-> > BUG: KASAN: slab-use-after-free in nr_add_node+0x25db/0x2c00 net/netrom=
-/nr_route.c:248
-> > Read of size 4 at addr ffff888051e6e9b0 by task syz.1.2539/8741
-> >
-> > Call Trace:
-> >  <TASK>
-> >  nr_add_node+0x25db/0x2c00 net/netrom/nr_route.c:248
-> >
-> > Reported-by: syzbot+2860e75836a08b172755@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=3D2860e75836a08b172755
-> > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
->
->
->
-> > ---
-> > V1 -> V2: update comments for cause uaf
-> > V2 -> V3: sync neighbor operations in ioctl and route frame, update com=
-ments
-> >
-> >  net/netrom/nr_route.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/net/netrom/nr_route.c b/net/netrom/nr_route.c
-> > index b94cb2ffbaf8..debe3e925338 100644
-> > --- a/net/netrom/nr_route.c
-> > +++ b/net/netrom/nr_route.c
-> > @@ -40,6 +40,7 @@ static HLIST_HEAD(nr_node_list);
-> >  static DEFINE_SPINLOCK(nr_node_list_lock);
-> >  static HLIST_HEAD(nr_neigh_list);
-> >  static DEFINE_SPINLOCK(nr_neigh_list_lock);
-> > +static DEFINE_MUTEX(neighbor_lock);
-> >
-> >  static struct nr_node *nr_node_get(ax25_address *callsign)
-> >  {
-> > @@ -633,6 +634,8 @@ int nr_rt_ioctl(unsigned int cmd, void __user *arg)
-> >       ax25_digi digi;
-> >       int ret;
-> >
-> > +     guard(mutex)(&neighbor_lock);
->
-> See:
->
-> https://elixir.bootlin.com/linux/v6.18-rc1/source/Documentation/process/m=
-aintainer-netdev.rst#L395
->
+> iiuc, the remaining thing left should be handling a cloned skb in
+> __bpf_dynptr_write()? The __bpf_skb_store_bytes() is using
+> bpf_try_make_writable, so maybe something similar can be done for the
+> BPF_DYNPTR_TYPE_SKB_META?
 
-I would also try to use a single spinlock : ie fuse together
-nr_node_list_lock and nr_neigh_list_lock
+I'm with you. This is not user-friendly at all currently.
 
-Having two locks for something that is primarily used by fuzzers
-nowadays is wasting our time.
+This patch set has already gotten quite long so how about I split out
+the pskb_expand_head patch (#1) and the related selftest change (patch
+#11) from this series, expand it to lift bpf_dynptr_set_rdonly()
+limitation for skb_meta dynptr, and do that first in a dedicated series?
+
+>
+>> +		goto out;
+>> +
+>> +	bpf_dynptr_read(meta_have, META_SIZE, &meta, 0, 0);
+>> +	if (!check_metadata(meta_have))
+>>   		goto out;
+>>     	/* Helper write to payload will unclone the packet */
+>>   	bpf_dynptr_write(&data, offsetof(struct ethhdr, h_proto), "x", 1, 0);
+>>   -	/* Expect no metadata after unclone */
+>> +	/* Expect r/w metadata after unclone */
+>>   	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
+>> -	if (bpf_dynptr_is_rdonly(&meta) || bpf_dynptr_size(&meta) != 0)
+>> +	if (bpf_dynptr_is_rdonly(&meta))
+>
+> then it does not have to rely on the bpf_dynptr_write(&data, ...) above to make
+> the metadata writable.
+>
+> I have a high level question about the set. I assume the skb_data_move() in
+> patch 2 will be useful in the future to preserve the metadata across the
+> stack. Preserving the metadata across different tc progs (which this set does)
+> is nice to have but it is not the end goal. Can you shed some light on the plan
+> for building on top of this set?
+
+Right. Starting at the highest level, I want to work toward preserving
+the metadata on RX path first (ongoing), forward path next, and TX path
+last.
+
+On RX path, the end game is for sk_filter prog to be able to access
+metadata thru dynptr. For that we need to know where the metadata
+resides. I see two ways how we can tackle that:
+
+A) We keep relying on metadata being in front of skb_mac_header().
+
+   Fun fact - if you don't call any TC BPF helpers that touch
+   skb->mac_header and don't have any tunnel or tagging devices on RX
+   path, this works out of the box today. But we need to make sure that
+   any call site that changes the MAC header offset, moves the
+   metadata. I expect this approach will be a pain on TX path.
+
+... or ...
+
+B) We track the metadata offset separately from MAC header offset
+
+   This requires additional state, we need to store the metadata offset
+   somewhere. However, in exchange for a couple bytes we gain some
+   benefits:
+
+   1. We don't need to move the metadata after skb_pull.
+
+   2. We only need to move the metadata for skb_push if there's not
+     enough space left, that is the gap between skb->data and where
+     metadata ends is too small.
+
+     (This means that anyone who is not using skb->data_meta on RX path
+     but the skb_meta dynptr instead, can avoid any memmove's of the
+     metadata itself.)
+     
+   3. We can place the metadata at skb->head, which plays nicely with TX
+      path, where we need the headroom for pushing headers.
+
+I've been trying out how (B) plays out when safe-proofing the tunnel &
+tagging devices, your VLANs and GREs, to preserve the metadata.
+
+To that end I've added a new u16 field in skb_shinfo to track
+meta_end. There a 4B hole there currently and we load the whole
+cacheline from skb_shinf to access meta_len anyway.
+
+Once I had that, I could modify the skb_data_move() to relocate the
+metadata only if necessary, which looks like so:
+
+static inline void skb_data_move(struct sk_buff *skb, const int len,
+				 const unsigned int n)
+{
+	const u8 meta_len = skb_metadata_len(skb);
+	u8 *meta, *meta_end;
+
+	if (!len || (!n && !meta_len))
+		return;
+
+	if (!meta_len)
+		goto no_metadata;
+
+	/* Not enough headroom left for metadata. Drop it. */
+	if (WARN_ON_ONCE(meta_len > skb_headroom(skb))) {
+		skb_metadata_clear(skb);
+		goto no_metadata;
+	}
+
+	meta_end = skb_metadata_end(skb);
+	meta = meta_end - meta_len;
+
+	/* Metadata in front of data before push/pull. Keep it that way. */
+	if (meta_end == skb->data - len) {
+		memmove(meta + len, meta, meta_len + n);
+		skb_shinfo(skb)->meta_end += len;
+		return;
+	}
+
+	if (len < 0) {
+		/* Data pushed. Move metadata to the top. */
+		memmove(skb->head, meta, meta_len);
+		skb_shinfo(skb)->meta_end = meta_len;
+	}
+no_metadata:
+	memmove(skb->data, skb->data - len, n);
+}
+
+The goal is for RX path is to hit everwhere just the last memmove(),
+since we will be usually pulling from skb->data, if you're not using the
+skb->data_meta pseudo-pointer in your TC(X) BPF programs.
+
+There are some verifier changes needed to keep skb->data_meta
+working. We need to move the metadata back in front of the MAC header
+before a TC(X) prog that uses skb->data_meta runs, or things break.
+
+Early code for that is also available for a preview. I've pushed it to:
+
+https://github.com/jsitnicki/linux/commits/skb-meta/safeproof-netdevs/
+
+Thanks,
+-jkbs
 
