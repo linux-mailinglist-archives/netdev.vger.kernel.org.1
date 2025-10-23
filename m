@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-231967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27938BFF0AE
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 05:47:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBCD1BFF0B4
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 05:47:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B5D05353113
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 03:47:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03AB919C10CF
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 03:48:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0EA22E5D2A;
-	Thu, 23 Oct 2025 03:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89402E7623;
+	Thu, 23 Oct 2025 03:46:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fmrkr7Ns"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aovxd7c+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D002E2EF3;
-	Thu, 23 Oct 2025 03:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC972E7178;
+	Thu, 23 Oct 2025 03:46:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761191196; cv=none; b=AR9GasZ4CD7y6K44NrUwtLhg8grggXFRvMDAEnfsVknhQtpOsREJGCwcwhdTosgBrBlsrE45cQ+TljLz7PPET0BykHK2Tk0y2SGxGphh4Vx3imBgxYti7f/72X3qbP7Amg48C9rSApYHrg4WacBM4IHb3ceqKcnzILDG5aiquKM=
+	t=1761191197; cv=none; b=gMg3ktKolM2dM0iRXdYa9CX1nWUF3Usg6r8Mm+4t0sY3FilCdYY/rEqJXrlOzk3hc1NLBi1vMUDc7ZkyWYVoBdIrs5J5IwfT3Z618lniV+mmv5aFxRv8yvCFqCqAXGbjsEnPCNDaffhTBU7lVzbcYVX7ujpqYjiitMvGN8iFjjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761191196; c=relaxed/simple;
-	bh=F9SWjrb1CQ0a0RkDQmktXYjIX9Z7TMwqsasaeOEVCGs=;
+	s=arc-20240116; t=1761191197; c=relaxed/simple;
+	bh=S5nq9k5QQTCvi4edbviNu3JsShOWgvRf9oPWOteO+hY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PEnEVyHe/hnwECC7KLUVRkluFbksAuELXsjOcXiNWdz7ocl3ia1rubzSp5JwU1foS62t8EaAmAQHo+CBQSc7qswJKF3Ci01dJ2hNY8GPaJNI12jdB3eKDdg5E/pzSGtRjWlr+MsH8SDQW1NzGEJ9D+RQachlSCjdlieBR1SPPyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fmrkr7Ns; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AF0EC4CEF7;
-	Thu, 23 Oct 2025 03:46:36 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=p7VbABRrlLFVqZxM3iyoAelV7h1NjqsB0zg/frK5cp6LGwCCnRN5dyyGYnAeODp37AGp6qqusDqnredvrzjcNw2tffhAl2VbgyvlLH5K+1pU8FA5/Q/CNQGDuw/O8/Z2GOGCl5yhorRb8eSa8pxUupfHgSR9JjUIs4ai7wy2Qo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aovxd7c+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89B9FC4CEE7;
+	Thu, 23 Oct 2025 03:46:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761191196;
-	bh=F9SWjrb1CQ0a0RkDQmktXYjIX9Z7TMwqsasaeOEVCGs=;
+	s=k20201202; t=1761191197;
+	bh=S5nq9k5QQTCvi4edbviNu3JsShOWgvRf9oPWOteO+hY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fmrkr7NscNmMP7NN3Vla9VKhJnEZWY9k9SOWeHB3gmxknifHgH6Ozy1JXcWZlIah9
-	 c3UAvPFG1VPRQ4ekVY+rK7nMBQ29RGB7R0ZWSUXY00A8P10ub9+iEdgsrQFIm3iz3I
-	 PKj5pw4JHR555krjZ3FEgybq3Ib/zaE0Cse2+Tt/+hlZD/yoxmrBhs+YBZS5azsZ6Q
-	 kLaXFASCOXCUd/CZ7fQeoE3ur6QxYFlsPLPQEF8i9ZEzgsaShP+2FvBdEKocAZAveT
-	 ZJSPhpqvBcbXp150T1sLg8I/4SPYuUvHKIb73m081M2Hi4aF9v9QY2zEAd2mZmt/JP
-	 OdhMGpNRmOVSA==
+	b=Aovxd7c+O5QHJrm2lAE7rz5L0Xg261/UJ4rQjpPRmwmHHlfDLLIhJbejzQ+TASkza
+	 CS3Gxt7jpk6c55lzrJQLKW8GCZGmPjPQqKbbm/dX7WcXUeRaF7eeWlItrSGTKK7mlo
+	 1+zDrfBDdmP7A7396lgw6PV0lVKwb2K2W66Xdpcc0U2bxvrkREQKmjR/DHrZ3Aq6i3
+	 8Q+YbA3iyiHokS1uI0B3+fBf2RTL4Np+hIYFslmTuWUO2Bs3zJzkKJGNHMUCyovxwP
+	 X8A9T2AzOy860YMidZvS0q1Ke5HrBtXCCn33hdocX1nusgg724CkozTaH4635g7mVP
+	 NqJlPsNSlZwXQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 341A83809A04;
-	Thu, 23 Oct 2025 03:46:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7F2063809A04;
+	Thu, 23 Oct 2025 03:46:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] eth: fbnic: fix integer overflow warning in TLV_MAX_DATA
- definition
+Subject: Re: [PATCH net-next] net/sched: Remove unused inline helper
+ qdisc_from_priv()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176119117676.2145463.10144749814100093339.git-patchwork-notify@kernel.org>
-Date: Thu, 23 Oct 2025 03:46:16 +0000
-References: 
- <182b9d0235d044d69d7a57c1296cc6f46e395beb.1761039651.git.xiaopei01@kylinos.cn>
-In-Reply-To: 
- <182b9d0235d044d69d7a57c1296cc6f46e395beb.1761039651.git.xiaopei01@kylinos.cn>
-To: Pei Xiao <xiaopei01@kylinos.cn>
-Cc: lkp@intel.com, alexanderduyck@fb.com, kernel-team@meta.com,
- netdev@vger.kernel.org, horms@kernel.org, kuba@kernel.org, lee@trager.us,
- linux-kernel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
- pabeni@redhat.com
+ <176119117824.2145463.1631804906122880287.git-patchwork-notify@kernel.org>
+Date: Thu, 23 Oct 2025 03:46:18 +0000
+References: <20251021114626.3148894-1-yuehaibing@huawei.com>
+In-Reply-To: <20251021114626.3148894-1-yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, xmei5@asu.edu, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 21 Oct 2025 17:42:27 +0800 you wrote:
-> The TLV_MAX_DATA macro calculates (PAGE_SIZE - 512) which can exceed
-> the maximum value of a 16-bit unsigned integer on architectures with
-> large page sizes, causing compiler warnings:
+On Tue, 21 Oct 2025 19:46:26 +0800 you wrote:
+> Since commit fb38306ceb9e ("net/sched: Retire ATM qdisc"), this is
+> not used and can be removed.
 > 
-> drivers/net/ethernet/meta/fbnic/fbnic_tlv.h:83:24: warning: conversion
-> from 'long unsigned int' to 'short unsigned int' changes value from
-> '261632' to '65024' [-Woverflow]
-> 
-> [...]
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+>  include/net/pkt_sched.h | 5 -----
+>  1 file changed, 5 deletions(-)
 
 Here is the summary with links:
-  - eth: fbnic: fix integer overflow warning in TLV_MAX_DATA definition
-    https://git.kernel.org/netdev/net-next/c/d550d63d0082
+  - [net-next] net/sched: Remove unused inline helper qdisc_from_priv()
+    https://git.kernel.org/netdev/net-next/c/114573962a68
 
 You are awesome, thank you!
 -- 
