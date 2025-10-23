@@ -1,212 +1,284 @@
-Return-Path: <netdev+bounces-232167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEE77C01F7E
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:04:07 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3755BC01FDB
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:07:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C2145501FB0
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 15:00:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A3AC94FC59F
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 15:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46BA83346BA;
-	Thu, 23 Oct 2025 14:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1FCD32ED3B;
+	Thu, 23 Oct 2025 15:01:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U6d8xsXj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O+JI8x2S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1447A330D34;
-	Thu, 23 Oct 2025 14:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B13E32AAC8;
+	Thu, 23 Oct 2025 15:01:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761231590; cv=none; b=rkgu5CYZQ9W8ehnEG3weY0nW//1O3AJJR6S+EjGPKU0Wpizv8aa4Fz9OejecVpm4uMsInQRh0vGp+4XKtsIGUhHoqlSy99OkGR0oqU95EzHnMp0dLpaSgQDGwqRJvhhjBA6kxFf0npKk6rcRh9HhVYCSPzFZ5S7vlFw+SBs3A0A=
+	t=1761231716; cv=none; b=b68XOx19s2sU68Q47HagJkgDBKxr7UZbw8eFlfj6Q8oCaiUuRaj+9Cf0y181L+Mb3V04sFSWexzbpoQqExtIsxB9x0x6LoaMzmp6KpLqz5zWtIGiTZzKUCxO1WSWfZ4PBP4S87zUpJYZa0oe7OLaNzr9YBKv/owX8bDiAkttWhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761231590; c=relaxed/simple;
-	bh=cXZ5FzyudK+Ly7PkDe/gmfBGxOLTQi1YvUaQvOnWpu0=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pBUkekU+zF9h8oxwdkDrfYOHvVE+RuvNNlolIUgxAsp0w85fXLLYtlyygW7NY0gNJVQoURleW8fBwzDZjIP5VknkVnjXtWDDdiwKuWZBXt4UfFN/gAvDC5Tcq8aQN6CLWYqtIZAtobahwvGCA/476XyttKPE2OhmxdEUBossrVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U6d8xsXj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C770C4CEE7;
-	Thu, 23 Oct 2025 14:59:46 +0000 (UTC)
+	s=arc-20240116; t=1761231716; c=relaxed/simple;
+	bh=F2b9gqkX1yV+MACqtaIDs32Jt0xkHc9ac6F1bohNmPI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Pt6SVjMGTqhvon4DY5FI9nHLEoM2T4vBTB+5OYYXkWhpBgcg81BhyTWgnE5aVWhVCKKwH7tm3z2oReedVRSVHR75qzpE/flrKT7wJIPi6Vah1OijtPHy59n9NpdwiWgH5oz6F2vxxzXqVKCpwrERO/R97hPW8El2+EtNiXt08Ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O+JI8x2S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABC41C4CEF7;
+	Thu, 23 Oct 2025 15:01:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761231589;
-	bh=cXZ5FzyudK+Ly7PkDe/gmfBGxOLTQi1YvUaQvOnWpu0=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=U6d8xsXjRjSS47t571oe1/ZnaeeWoHx9XGxaWBr5xPWhVIfSSSUVZaVYXRkNoK9Ir
-	 My5WbSTlGMIhq1LD7gpHXJYg1S6nXBp6PS+wQNpFYiDU6v8BYCJOsejGPhr44Incv5
-	 v1fMEpr0bfG4VTO0LHi2paGDXC3yuUsmkTcQFryQi31ULsIke+au5NdMIQqbnn/G70
-	 zayvrLbRRssm3HTtPg6r23rECEal5WIGaKpgxhDt30PZUlyRvY4kTe0q9osXrymj49
-	 Uyg49UmH3z60XeAnWc0lx83rJiJ4XZvGXz0SKTLURYntuBDs/5rApIecL373J3KPli
-	 cqy+ncC6WD55Q==
-Subject: [PATCH net V1 3/3] veth: more robust handing of race to avoid txq
- getting stuck
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: netdev@vger.kernel.org, makita.toshiaki@lab.ntt.co.jp
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
- Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, ihor.solodrai@linux.dev,
- toshiaki.makita1@gmail.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-team@cloudflare.com
-Date: Thu, 23 Oct 2025 16:59:44 +0200
-Message-ID: <176123158453.2281302.11061466460805684097.stgit@firesoul>
-In-Reply-To: <176123150256.2281302.7000617032469740443.stgit@firesoul>
-References: <176123150256.2281302.7000617032469740443.stgit@firesoul>
-User-Agent: StGit/1.5
+	s=k20201202; t=1761231716;
+	bh=F2b9gqkX1yV+MACqtaIDs32Jt0xkHc9ac6F1bohNmPI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=O+JI8x2SFECprqxC2CYvlXUbxTLEqKiDsTHOiUcHr2p5cGBWG80baIG2vFCrken+6
+	 yAHKmYRpiFlH6i3gntNUf7AYLCR8b536dPRQl4Mavk671yjWLtCAoOMfD1csFLmPhb
+	 w45KdA1EkxIBCCZvC+5RU7c82Pp0djfUN1UGSrGgRoRR0MpnFhNhVn8s3hR73l7MsJ
+	 C1/S0tvBqB3fiDEuaz/E3HKcophVIesGO7xhK/+98fOVyT5KtwlBwBWnmNi7FwUkkn
+	 qD94tMObgZwM5rXVocYXWk5q4CXYXa6EOhUaEwM9Y1T8W9M9LBsSssB2xx+neDme6w
+	 9K5LAtNojzyvw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v6.18-rc3
+Date: Thu, 23 Oct 2025 08:01:54 -0700
+Message-ID: <20251023150154.1295917-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Commit dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to
-reduce TX drops") introduced a race condition that can lead to a permanently
-stalled TXQ. This was observed in production on ARM64 systems (Ampere Altra
-Max).
+Hi Linus!
 
-The race occurs in veth_xmit(). The producer observes a full ptr_ring and
-stops the queue (netif_tx_stop_queue()). The subsequent conditional logic,
-intended to re-wake the queue if the consumer had just emptied it (if
-(__ptr_ring_empty(...)) netif_tx_wake_queue()), can fail. This leads to a
-"lost wakeup" where the TXQ remains stopped (QUEUE_STATE_DRV_XOFF) and
-traffic halts.
+The following changes since commit 634ec1fc7982efeeeeed4a7688b0004827b43a21:
 
-This failure is caused by an incorrect use of the __ptr_ring_empty() API
-from the producer side. As noted in kernel comments, this check is not
-guaranteed to be correct if a consumer is operating on another CPU. The
-empty test is based on ptr_ring->consumer_head, making it reliable only for
-the consumer. Using this check from the producer side is fundamentally racy.
+  Merge tag 'net-6.18-rc2' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-10-16 09:41:21 -0700)
 
-This patch fixes the race by adopting the more robust logic from an earlier
-version V4 of the patchset, which always flushed the peer:
+are available in the Git repository at:
 
-(1) In veth_xmit(), the racy conditional wake-up logic and its memory barrier
-are removed. Instead, after stopping the queue, we unconditionally call
-__veth_xdp_flush(rq). This guarantees that the NAPI consumer is scheduled,
-making it solely responsible for re-waking the TXQ.
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.18-rc3
 
-(2) On the consumer side, the logic for waking the peer TXQ is centralized.
-It is moved out of veth_xdp_rcv() (which processes a batch) and placed at
-the end of the veth_poll() function. This ensures netif_tx_wake_queue() is
-called once per complete NAPI poll cycle.
+for you to fetch changes up to cb68d1e5c51870601be9394fbb5751fc6532c78e:
 
-(3) Finally, the NAPI completion check in veth_poll() is updated. If NAPI is
-about to complete (napi_complete_done), it now also checks if the peer TXQ
-is stopped. If the ring is empty but the peer TXQ is stopped, NAPI will
-reschedule itself. This prevents a new race where the producer stops the
-queue just as the consumer is finishing its poll, ensuring the wakeup is not
-missed.
+  Merge branch 'mlx5-misc-fixes-2025-10-22' (2025-10-23 07:14:39 -0700)
 
-Fixes: dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to reduce TX drops")
-Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
----
- drivers/net/veth.c |   42 +++++++++++++++++++++---------------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
+----------------------------------------------------------------
+Including fixes from can. Slim pickings, I'm guessing people haven't
+really started testing.
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 3976ddda5fb8..1d70377481eb 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -392,14 +392,12 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
- 		}
- 		/* Restore Eth hdr pulled by dev_forward_skb/eth_type_trans */
- 		__skb_push(skb, ETH_HLEN);
--		/* Depend on prior success packets started NAPI consumer via
--		 * __veth_xdp_flush(). Cancel TXQ stop if consumer stopped,
--		 * paired with empty check in veth_poll().
--		 */
- 		netif_tx_stop_queue(txq);
--		smp_mb__after_atomic();
--		if (unlikely(__ptr_ring_empty(&rq->xdp_ring)))
--			netif_tx_wake_queue(txq);
-+		/* Handle race: Makes sure NAPI peer consumer runs. Consumer is
-+		 * responsible for starting txq again, until then ndo_start_xmit
-+		 * (this function) will not be invoked by the netstack again.
-+		 */
-+		__veth_xdp_flush(rq);
- 		break;
- 	case NET_RX_DROP: /* same as NET_XMIT_DROP */
- drop:
-@@ -900,17 +898,9 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
- 			struct veth_xdp_tx_bq *bq,
- 			struct veth_stats *stats)
- {
--	struct veth_priv *priv = netdev_priv(rq->dev);
--	int queue_idx = rq->xdp_rxq.queue_index;
--	struct netdev_queue *peer_txq;
--	struct net_device *peer_dev;
- 	int i, done = 0, n_xdpf = 0;
- 	void *xdpf[VETH_XDP_BATCH];
- 
--	/* NAPI functions as RCU section */
--	peer_dev = rcu_dereference_check(priv->peer, rcu_read_lock_bh_held());
--	peer_txq = peer_dev ? netdev_get_tx_queue(peer_dev, queue_idx) : NULL;
--
- 	for (i = 0; i < budget; i++) {
- 		void *ptr = __ptr_ring_consume(&rq->xdp_ring);
- 
-@@ -959,11 +949,6 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
- 	rq->stats.vs.xdp_packets += done;
- 	u64_stats_update_end(&rq->stats.syncp);
- 
--	if (peer_txq && unlikely(netif_tx_queue_stopped(peer_txq))) {
--		txq_trans_cond_update(peer_txq);
--		netif_tx_wake_queue(peer_txq);
--	}
--
- 	return done;
- }
- 
-@@ -971,12 +956,20 @@ static int veth_poll(struct napi_struct *napi, int budget)
- {
- 	struct veth_rq *rq =
- 		container_of(napi, struct veth_rq, xdp_napi);
-+	struct veth_priv *priv = netdev_priv(rq->dev);
-+	int queue_idx = rq->xdp_rxq.queue_index;
-+	struct netdev_queue *peer_txq;
- 	struct veth_stats stats = {};
-+	struct net_device *peer_dev;
- 	struct veth_xdp_tx_bq bq;
- 	int done;
- 
- 	bq.count = 0;
- 
-+	/* NAPI functions as RCU section */
-+	peer_dev = rcu_dereference_check(priv->peer, rcu_read_lock_bh_held());
-+	peer_txq = peer_dev ? netdev_get_tx_queue(peer_dev, queue_idx) : NULL;
-+
- 	xdp_set_return_frame_no_direct();
- 	done = veth_xdp_rcv(rq, budget, &bq, &stats);
- 
-@@ -986,7 +979,8 @@ static int veth_poll(struct napi_struct *napi, int budget)
- 	if (done < budget && napi_complete_done(napi, done)) {
- 		/* Write rx_notify_masked before reading ptr_ring */
- 		smp_store_mb(rq->rx_notify_masked, false);
--		if (unlikely(!__ptr_ring_empty(&rq->xdp_ring))) {
-+		if (unlikely(!__ptr_ring_empty(&rq->xdp_ring) ||
-+			     (peer_txq && netif_tx_queue_stopped(peer_txq)))) {
- 			if (napi_schedule_prep(&rq->xdp_napi)) {
- 				WRITE_ONCE(rq->rx_notify_masked, true);
- 				__napi_schedule(&rq->xdp_napi);
-@@ -998,6 +992,12 @@ static int veth_poll(struct napi_struct *napi, int budget)
- 		veth_xdp_flush(rq, &bq);
- 	xdp_clear_return_frame_no_direct();
- 
-+	/* Release backpressure per NAPI poll */
-+	if (peer_txq && netif_tx_queue_stopped(peer_txq)) {
-+		txq_trans_cond_update(peer_txq);
-+		netif_tx_wake_queue(peer_txq);
-+	}
-+
- 	return done;
- }
- 
+Current release - new code bugs:
 
+ - eth: mlx5e:
+   - psp: avoid 'accel' NULL pointer dereference
+   - skip PPHCR register query for FEC histogram if not supported
 
+Previous releases - regressions:
+
+ - bonding: update the slave array for broadcast mode
+
+ - rtnetlink: re-allow deleting FDB entries in user namespace
+
+ - eth: dpaa2: fix the pointer passed to PTR_ALIGN on Tx path
+
+Previous releases - always broken:
+
+ - can: drop skb on xmit if device is in listen-only mode
+
+ - gro: clear skb_shinfo(skb)->hwtstamps in napi_reuse_skb()
+
+ - eth: mlx5e
+   - RX, fix generating skb from non-linear xdp_buff if program
+     trims frags
+   - make devcom init failures non-fatal, fix races with IPSec
+
+Misc:
+
+ - some documentation formatting "fixes"
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Aksh Garg (1):
+      net: ethernet: ti: am65-cpts: fix timestamp loss due to race conditions
+
+Aleksander Jan Bajkowski (1):
+      net: phy: realtek: fix rtl8221b-vm-cg name
+
+Alexei Lazar (2):
+      net/mlx5: Add PPHCR to PCAM supported registers mask
+      net/mlx5e: Skip PPHCR register query if not supported by the device
+
+Alexey Simakov (1):
+      sctp: avoid NULL dereference when chunk data buffer is missing
+
+Amery Hung (2):
+      net/mlx5e: RX, Fix generating skb from non-linear xdp_buff for legacy RQ
+      net/mlx5e: RX, Fix generating skb from non-linear xdp_buff for striding RQ
+
+Bagas Sanjaya (2):
+      net: rmnet: Fix checksum offload header v5 and aggregation packet formatting
+      Documentation: net: net_failover: Separate cloud-ifupdown-helper and reattach-vf.sh code blocks marker
+
+Cosmin Ratiu (1):
+      net/mlx5e: psp, avoid 'accel' NULL pointer dereference
+
+Eric Dumazet (2):
+      net: gro: clear skb_shinfo(skb)->hwtstamps in napi_reuse_skb()
+      net: gro_cells: fix lock imbalance in gro_cells_receive()
+
+Fernando Fernandez Mancera (1):
+      net: hsr: prevent creation of HSR device with slaves from another netns
+
+Heiner Kallweit (1):
+      net: hibmcge: select FIXED_PHY
+
+Ioana Ciornei (1):
+      dpaa2-eth: fix the pointer passed to PTR_ALIGN on Tx path
+
+Jakub Kicinski (5):
+      Merge branch 'fix-generating-skb-from-non-linear-xdp_buff-for-mlx5'
+      Merge branch 'mptcp-handle-late-add_addr-selftests-skip'
+      Merge tag 'linux-can-fixes-for-6.18-20251020' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
+      Merge branch 'net-ravb-fix-soc-specific-configuration-and-descriptor-handling-issues'
+      Merge branch 'mlx5-misc-fixes-2025-10-22'
+
+Jason Wang (1):
+      virtio-net: zero unused hash fields
+
+Jianpeng Chang (1):
+      net: enetc: fix the deadlock of enetc_mdio_lock
+
+Jiasheng Jiang (1):
+      ptp: ocp: Fix typo using index 1 instead of i in SMA initialization loop
+
+Johannes Wiesböck (1):
+      rtnetlink: Allow deleting FDB entries in user namespace
+
+Lad Prabhakar (2):
+      net: ravb: Enforce descriptor type ordering
+      net: ravb: Ensure memory write completes before ringing TX doorbell
+
+Marc Kleine-Budde (5):
+      can: bxcan: bxcan_start_xmit(): use can_dev_dropped_skb() instead of can_dropped_invalid_skb()
+      can: esd: acc_start_xmit(): use can_dev_dropped_skb() instead of can_dropped_invalid_skb()
+      can: rockchip-canfd: rkcanfd_start_xmit(): use can_dev_dropped_skb() instead of can_dropped_invalid_skb()
+      Merge patch series "can: drivers: drop skb in xmit if device is in listen only mode"
+      can: netlink: can_changelink(): allow disabling of automatic restart
+
+Matthieu Baerts (NGI0) (5):
+      mptcp: pm: in-kernel: C-flag: handle late ADD_ADDR
+      selftests: mptcp: join: mark 'flush re-add' as skipped if not supported
+      selftests: mptcp: join: mark implicit tests as skipped if not supported
+      selftests: mptcp: join: mark 'delete re-add signal' as skipped if not supported
+      selftests: mptcp: join: mark laminar tests as skipped if not supported
+
+Michal Pecio (1):
+      net: usb: rtl8150: Fix frame padding
+
+Nathan Chancellor (1):
+      net/mlx5e: Return 1 instead of 0 in invalid case in mlx5e_mpwrq_umr_entry_size()
+
+Paolo Abeni (1):
+      Merge branch 'fix-poll-behaviour-for-tcp-based-tunnel-protocols'
+
+Patrisious Haddad (2):
+      net/mlx5: Refactor devcom to return NULL on failure
+      net/mlx5: Fix IPsec cleanup over MPV device
+
+Ralf Lici (3):
+      net: datagram: introduce datagram_poll_queue for custom receive queues
+      espintcp: use datagram_poll_queue for socket readiness
+      ovpn: use datagram_poll_queue for socket readiness in TCP
+
+Randy Dunlap (1):
+      Documentation: networking: ax25: update the mailing list info.
+
+Robert Marko (1):
+      net: phy: micrel: always set shared->phydev for LAN8814
+
+Sebastian Reichel (1):
+      net: stmmac: dwmac-rk: Fix disabling set_clock_selection
+
+Stefano Garzarella (1):
+      vsock: fix lock inversion in vsock_assign_transport()
+
+Tonghao Zhang (2):
+      net: bonding: update the slave array for broadcast mode
+      net: bonding: fix possible peer notify event loss or dup issue
+
+Wang Liang (1):
+      net/smc: fix general protection fault in __smc_diag_dump
+
+Wei Fang (1):
+      net: enetc: correct the value of ENETC_RXB_TRUESIZE
+
+Xin Long (1):
+      selftests: net: fix server bind failure in sctp_vrf.sh
+
+Yeounsu Moon (1):
+      net: dlink: use dev_kfree_skb_any instead of dev_kfree_skb
+
+ Documentation/networking/ax25.rst                  |  7 ++-
+ .../device_drivers/cellular/qualcomm/rmnet.rst     | 12 +++-
+ Documentation/networking/net_failover.rst          |  6 +-
+ drivers/net/bonding/bond_main.c                    | 47 +++++++-------
+ drivers/net/can/bxcan.c                            |  2 +-
+ drivers/net/can/dev/netlink.c                      |  6 +-
+ drivers/net/can/esd/esdacc.c                       |  2 +-
+ drivers/net/can/rockchip/rockchip_canfd-tx.c       |  2 +-
+ drivers/net/ethernet/dlink/dl2k.c                  |  2 +-
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c   |  3 +-
+ drivers/net/ethernet/freescale/enetc/enetc.c       | 25 ++++++--
+ drivers/net/ethernet/freescale/enetc/enetc.h       |  2 +-
+ drivers/net/ethernet/hisilicon/Kconfig             |  1 +
+ .../net/ethernet/mellanox/mlx5/core/en/params.c    |  2 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ipsec.h   |  5 ++
+ .../mellanox/mlx5/core/en_accel/ipsec_fs.c         | 25 +++++++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |  8 ++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_rx.c    | 51 ++++++++++++---
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.c |  4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tx.c    |  7 ++-
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |  4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c  |  7 +--
+ .../net/ethernet/mellanox/mlx5/core/lib/clock.c    |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/lib/devcom.c   | 53 ++++++++--------
+ drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c   |  4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/main.c     |  5 +-
+ drivers/net/ethernet/renesas/ravb_main.c           | 24 ++++++-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c     |  9 +--
+ drivers/net/ethernet/ti/am65-cpts.c                | 63 +++++++++++++------
+ drivers/net/ovpn/tcp.c                             | 26 ++++++--
+ drivers/net/phy/micrel.c                           |  4 +-
+ drivers/net/phy/realtek/realtek_main.c             | 16 ++---
+ drivers/net/usb/rtl8150.c                          | 11 +++-
+ drivers/ptp/ptp_ocp.c                              |  2 +-
+ include/linux/mlx5/mlx5_ifc.h                      |  4 +-
+ include/linux/skbuff.h                             |  3 +
+ include/linux/virtio_net.h                         |  4 ++
+ net/core/datagram.c                                | 44 ++++++++++---
+ net/core/gro.c                                     | 10 ++-
+ net/core/gro_cells.c                               |  5 +-
+ net/core/rtnetlink.c                               |  3 -
+ net/hsr/hsr_netlink.c                              |  8 ++-
+ net/mptcp/pm_kernel.c                              |  6 ++
+ net/sctp/inqueue.c                                 | 13 ++--
+ net/smc/smc_inet.c                                 | 13 ----
+ net/vmw_vsock/af_vsock.c                           | 38 +++++------
+ net/xfrm/espintcp.c                                |  6 +-
+ tools/testing/selftests/net/mptcp/mptcp_join.sh    | 18 +++---
+ tools/testing/selftests/net/sctp_hello.c           | 17 +----
+ tools/testing/selftests/net/sctp_vrf.sh            | 73 +++++++++++++---------
+ 50 files changed, 451 insertions(+), 263 deletions(-)
 
