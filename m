@@ -1,180 +1,140 @@
-Return-Path: <netdev+bounces-231926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB7A9BFEBD0
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 02:25:43 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA1FFBFEBD9
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 02:26:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 551BE3A5368
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 00:25:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0646D4E262A
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 00:26:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 228EC18A6AD;
-	Thu, 23 Oct 2025 00:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD93A19258E;
+	Thu, 23 Oct 2025 00:26:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LFuUA9UG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UpsaGEj6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA911885A5;
-	Thu, 23 Oct 2025 00:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B7A1547E7;
+	Thu, 23 Oct 2025 00:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761179140; cv=none; b=QA/67yaOzzavTgPLTZqkkzwkP86hGaCStReLFcKlzyVLySKgRMnvp/KKcV6+9KOAZonQgNdyuXccgdAIvQL+b++SRRkBuJgm6B99bdESBt5Id/NoqLFifme3rpC8rmqrW2NT+V2reO5G8AKBzRVFq8FzoyoX0eEGkvhmXaqaeM0=
+	t=1761179211; cv=none; b=MEClgSzJ5XaCfqD/gzFteEeJMIYyfUMXXNMXS4xRbpFkOLEMWpM1nYwKx5JZyx506mmaf6+3Za9RX15pjAljup5AykFwmEDxhof7le8nOMDOghkh9IM/TRDSbFlGHuUP9kplpBd0B6cwjkT6zjm73yGf2O3Wp7QEtNKpjXf8wZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761179140; c=relaxed/simple;
-	bh=YYcMB7Q3mvTugbrTSzjRN78TCh/K5FdU735e2uugVwU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BvQL47MYVRBjoVjdJkhEY2Yxl3ZIA450JlHHsiqMCWJ+RVoTf9OvDCb6CbInIjBN3sfM0MJlduU2C+wI25tcWjJldUnUOgCFdJqlIZPjpPb/oFebYcik8eBrpBKitZJaMfcUmSxVtMfz2guNiB/w6SbBSwRNFRrWD3xg1lQDV0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LFuUA9UG; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761179137; x=1792715137;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YYcMB7Q3mvTugbrTSzjRN78TCh/K5FdU735e2uugVwU=;
-  b=LFuUA9UG+BRevllhoBNUx2en0N0W5Vnu4hsPuIsWsaMRA+Y5r0H/O2fU
-   fAUOFcRfChCV7hAT5vbNro6PP2ilskGl8LWND5YqTQRyi4xj9Hj2ga8Ij
-   zqJFPehSC14BJczaMySka+GaYXkp30u7nLGhZmLpB3o5pheatW7YiJbVx
-   qoBIAYmltyF47Wc4/Tw2Fp4uQk1ZO0yrmHd4aWGCZNuAfnPIZqAo6+Xvb
-   spiXLmowfWDpr4r+jWiAdS7DcJnAffEgjJcG3qot7vGDdpGp3loM4xPF1
-   MkByAtnxR2DWnGDZiPoI36mp7KW0YCnAQnlZiUZ7qd0+inbA/27sk2Zzd
-   w==;
-X-CSE-ConnectionGUID: UfUM1NvBQXCbIr0hlRKT5w==
-X-CSE-MsgGUID: Z38cdvW4QfiikLTOGNC3Xw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="66983972"
-X-IronPort-AV: E=Sophos;i="6.19,248,1754982000"; 
-   d="scan'208";a="66983972"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2025 17:25:36 -0700
-X-CSE-ConnectionGUID: shxj0CcnTT+x4lR6IEcqPQ==
-X-CSE-MsgGUID: Q9oZZhToTg27z6LfIJU0Fg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,248,1754982000"; 
-   d="scan'208";a="183909661"
-Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
-  by orviesa007.jf.intel.com with ESMTP; 22 Oct 2025 17:25:34 -0700
-Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vBj91-000CrD-28;
-	Thu, 23 Oct 2025 00:25:31 +0000
-Date: Thu, 23 Oct 2025 08:24:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, andrey.bokhanko@huawei.com,
-	Dmitry Skorodumov <skorodumov.dmitry@huawei.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 7/8] ipvlan: Support IPv6 for learnable l2-bridge
-Message-ID: <202510230845.sa3eZvoK-lkp@intel.com>
-References: <20251021144410.257905-8-skorodumov.dmitry@huawei.com>
+	s=arc-20240116; t=1761179211; c=relaxed/simple;
+	bh=tVvYZsxkCrxwXNpjOJQVKaTFbg1BT7j7hRKyeC8BWm8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TcIBUoTGX8Dw0wBGuHdncH0RIWxGA/SsdvEgg2Jtm/tU4g4wZiWNRZ+MJxRQiNXwVkTJUI0jv+bKT71xfO8Z23PHkbHmzp4pnj45RO6uFHomovDqdgULkUfYCyYS37LyFd09VFuhmaKvdfW4L19j6S6qgp1V/2LnTvkiSpkjU+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UpsaGEj6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BDCEC4CEE7;
+	Thu, 23 Oct 2025 00:26:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761179211;
+	bh=tVvYZsxkCrxwXNpjOJQVKaTFbg1BT7j7hRKyeC8BWm8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UpsaGEj6bYZcuHN1P5Q+DT0iYce5v/Jbt3KroSe4b5KzlH+j2yGVq7joczftxIDtw
+	 N/ASxnfQD+UiilPFo9q9QuK3P/cuFw987ZeMOvzanYK7870BhETUpGF1kGqyFoVREO
+	 +IXV2/OCGyw1OH0fpSBzO2Yxjj5s+Q7gRoMkNCk6ZJjDvElWssND0qe1mf4ILSPOu4
+	 tU6weKjaiMeKzOYE4eJ+4ZKUyuA7ipZuQMIlt/sNGR6/9Pc7eoqLkOPoIqvzCsLjFL
+	 ybSbg9xqzYTZ9i0sdWZdjI/HlnT0qLzUixZeUXvhz3/w7EUJKXb1cT6+GSIsNlgPa3
+	 aDj7efZQeBS8w==
+Date: Wed, 22 Oct 2025 17:26:49 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kohei Enju <enjuk@amazon.com>
+Cc: <aleksander.lobakin@intel.com>, <andrew+netdev@lunn.ch>,
+ <anthony.l.nguyen@intel.com>, <corbet@lwn.net>, <davem@davemloft.net>,
+ <edumazet@google.com>, <horms@kernel.org>, <jacob.e.keller@intel.com>,
+ <jiri@resnulli.us>, <linux-doc@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>, <sx.rinitha@intel.com>
+Subject: Re: [PATCH net-next v2 13/14] ixgbe: preserve RSS indirection table
+ across admin down/up
+Message-ID: <20251022172649.0faa0548@kernel.org>
+In-Reply-To: <20251022034051.28052-2-enjuk@amazon.com>
+References: <20251021161006.47e42133@kernel.org>
+	<20251022034051.28052-2-enjuk@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251021144410.257905-8-skorodumov.dmitry@huawei.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Dmitry,
+On Wed, 22 Oct 2025 12:40:45 +0900 Kohei Enju wrote:
+> On Tue, 21 Oct 2025 16:10:06 -0700, Jakub Kicinski wrote:
+> >On Tue, 21 Oct 2025 12:59:34 +0900 Kohei Enju wrote:  
+> >> For example, consider a scenario where the queue count is 8 with user
+> >> configuration containing values from 0 to 7. When queue count changes
+> >> from 8 to 4 and we skip the reinitialization in this scenario, entries
+> >> pointing to queues 4-7 become invalid. The same issue applies when the
+> >> RETA table size changes.  
+> >
+> >Core should reject this. See ethtool_check_max_channel()  
+> 
+> Indeed, you're right that the situation above will be rejected. I missed
+> it.
+> 
+> BTW, I think reinitializing the RETA table when queue count changes or
+> RETA table size changes is reasonable for predictability and safety.
+> Does this approach make sense to you?
 
-kernel test robot noticed the following build errors:
+Yes, if !netif_is_rxfh_configured() re-initializing is expected.
 
-[auto build test ERROR on net-next/main]
+> >> Furthermore, IIUC, adding netif_is_rxfh_configured() to the current
+> >> condition wouldn't provide additional benefit. When parameters remain
+> >> unchanged, regardless of netif_is_rxfh_configured(), we already preserve
+> >> the RETA entries which might be user-configured or default values,   
+> >
+> >User may decide to "isolate" (take out of RSS) a lower queue,
+> >to configure it for AF_XDP or other form of zero-copy. Install
+> >explicit rules to direct traffic to that queue. If you reset
+> >the RSS table random traffic will get stranded in the ZC queue
+> >(== dropped).
+> 
+> You're correct about the ZC queue scenario. The original implementation
+> (before this patch) would indeed cause this problem by unconditionally
+> reinitializing.
+> 
+> I believe this patch addresses that issue - it preserves the user
+> configuration since neither queue count nor RETA table size changes in
+> that case. If I'm misunderstanding your scenario, please let me know.
+> 
+> I could update the logic to explicitly check netif_is_rxfh_configured()
+> as in [1], though the actual behavior would be the same as [2] since
+> the default RETA table is a deterministic function of (rss_indices,
+> reta_entries):
+> 
+> [1] Check user configuration explicitly:
+>     if (!netif_is_rxfh_configured(adapter->netdev) ||
+>         adapter->last_rss_indices != rss_i ||
+>         adapter->last_reta_entries != reta_entries) {
+>         // reinitialize
+>     }
+> 
+> [2] Current patch:
+>     if (adapter->last_rss_indices != rss_i ||
+>         adapter->last_reta_entries != reta_entries) {
+>         // reinitialize
+>     }
+> 
+> Do you have any preference between these approaches, or would you
+> recommend a different solution?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dmitry-Skorodumov/ipvlan-Implement-learnable-L2-bridge/20251021-224923
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20251021144410.257905-8-skorodumov.dmitry%40huawei.com
-patch subject: [PATCH net-next 7/8] ipvlan: Support IPv6 for learnable l2-bridge
-config: x86_64-rhel-9.4-func (https://download.01.org/0day-ci/archive/20251023/202510230845.sa3eZvoK-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251023/202510230845.sa3eZvoK-lkp@intel.com/reproduce)
+I was expecting something like:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202510230845.sa3eZvoK-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/ipvlan/ipvlan_core.c: In function 'ipvlan_snat_patch_tx_ipv6':
->> drivers/net/ipvlan/ipvlan_core.c:832:30: error: implicit declaration of function 'csum_ipv6_magic'; did you mean 'csum_tcpudp_magic'? [-Wimplicit-function-declaration]
-     832 |         icmph->icmp6_cksum = csum_ipv6_magic(&ip6h->saddr, &ip6h->daddr,
-         |                              ^~~~~~~~~~~~~~~
-         |                              csum_tcpudp_magic
-
-
-vim +832 drivers/net/ipvlan/ipvlan_core.c
-
-   788	
-   789	static void ipvlan_snat_patch_tx_ipv6(struct ipvl_dev *ipvlan,
-   790					      struct sk_buff *skb)
-   791	{
-   792		struct ipv6hdr *ip6h;
-   793		struct icmp6hdr *icmph;
-   794		u8 icmp_option;
-   795		u8 *lladdr;
-   796		u16 ndsize;
-   797	
-   798		if (unlikely(!pskb_may_pull(skb, sizeof(*ip6h))))
-   799			return;
-   800	
-   801		if (ipv6_hdr(skb)->nexthdr != NEXTHDR_ICMP)
-   802			return;
-   803	
-   804		if (unlikely(!pskb_may_pull(skb, sizeof(*ip6h) + sizeof(*icmph))))
-   805			return;
-   806	
-   807		ip6h = ipv6_hdr(skb);
-   808		icmph = (struct icmp6hdr *)(ip6h + 1);
-   809	
-   810		/* Patch Source-LL for solicitation, Target-LL for advertisement */
-   811		if (icmph->icmp6_type == NDISC_NEIGHBOUR_SOLICITATION ||
-   812		    icmph->icmp6_type == NDISC_ROUTER_SOLICITATION)
-   813			icmp_option = ND_OPT_SOURCE_LL_ADDR;
-   814		else if (icmph->icmp6_type == NDISC_NEIGHBOUR_ADVERTISEMENT)
-   815			icmp_option = ND_OPT_TARGET_LL_ADDR;
-   816		else
-   817			return;
-   818	
-   819		ndsize = htons(ip6h->payload_len);
-   820		if (unlikely(!pskb_may_pull(skb, sizeof(*ip6h) + ndsize)))
-   821			return;
-   822	
-   823		lladdr = ipvlan_search_icmp6_ll_addr(skb, icmp_option);
-   824		if (!lladdr)
-   825			return;
-   826	
-   827		ether_addr_copy(lladdr, ipvlan->phy_dev->dev_addr);
-   828	
-   829		ip6h = ipv6_hdr(skb);
-   830		icmph = (struct icmp6hdr *)(ip6h + 1);
-   831		icmph->icmp6_cksum = 0;
- > 832		icmph->icmp6_cksum = csum_ipv6_magic(&ip6h->saddr, &ip6h->daddr,
-   833						     ndsize,
-   834						     IPPROTO_ICMPV6,
-   835						     csum_partial(icmph,
-   836								  ndsize,
-   837								  0));
-   838		skb->ip_summed = CHECKSUM_COMPLETE;
-   839	}
-   840	#else
-   841	static void ipvlan_snat_patch_tx_ipv6(struct ipvl_dev *ipvlan,
-   842					      struct sk_buff *skb)
-   843	{
-   844	}
-   845	#endif
-   846	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+if (netif_is_rxfh_configured(adapter->netdev)) {
+	if (!check_that_rss_is_okay()) {
+		/* This should never happen, barring FW errors etc */
+		warn("user configuration lost due to XYZ");
+		reinit();
+	}
+} else if (...rss_ind != rss_id ||
+           ...reta_entries != reta_entries) {
+	reinit();
+}
 
