@@ -1,102 +1,107 @@
-Return-Path: <netdev+bounces-232207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6D4CC02AA9
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 19:09:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB1FFC02A3D
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 19:05:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6AACE5847DE
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:03:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96C563B04A7
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D0032AAAC;
-	Thu, 23 Oct 2025 17:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="M9pUntZf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67243446C8;
+	Thu, 23 Oct 2025 17:03:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F48B257427;
-	Thu, 23 Oct 2025 17:01:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7F233DEFF;
+	Thu, 23 Oct 2025 17:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761238909; cv=none; b=QQ7hf26gUOEOpd+GB4BmPf91mkqkC1i3cryV6mzzzDkRXnKGTSLVo0OWnjC3I1zTzuTzsuZIYJ7J6zs2KKTtsjyVBGvGUQ2vQw3pYe4qKBPshl0X/2Z8vMVJCRuEYYVbbQepfgXozbfyTAQpiCHwDgtLz6bbquIV5li5QherYvk=
+	t=1761239028; cv=none; b=GMMlYWD92qAuLH4jNAp0B1kM0L593G2MduIkoksTBVijuO5dDHpwyzCXCfLczRqg6+uZotvNYSvhJGx/kIeXD4GFKVGqqzHtmIZPCC9OjSDhmZYsc/YwxdsDW+XSF6f4IOy+yEdjLx2xJky8d6hg7e83X1eJZH7RLZ+dkMYSLHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761238909; c=relaxed/simple;
-	bh=hdmq/sRayl6/auhTmgwlv9zfI+n+5rqdaNCPOPrk0aY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KH3DQxxfGbQ9gFSqJqUqJKwngWvR+ZZVz73tLULnAhULQh3E41KKHX6OnwOUZOALFhSKzu1Y2xp3Nb7Y3X9sCInAYjCvRRnOH1Pp/kcnfGI/DS32pLXa8PzBUFqgJosIcOyLDANsG61I6gtRBhqctNHO8Cn7ne5G8vowdvnhY5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=M9pUntZf; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=p7rBIGumlMcci27kMgSWW94FUPYeAc7w0OEyP+alJhY=; b=M9pUntZf8dbZP5qLisc0QF2O0j
-	ZMr+j8SvzUpGicdgVvORE6WYSt53H7MmZkEN5VK5DTnJlay0kGDcwTVSH1XplHzQNrWGcpNJ7cHpd
-	geo1lK/PR3CM2gcbBWC4OMcQYGk3teTSwOLYvzdrDbADNK1RofquGDWYGgKLOoR8z554=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vBygw-00Bu7J-CS; Thu, 23 Oct 2025 19:01:34 +0200
-Date: Thu, 23 Oct 2025 19:01:34 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Emanuele Ghidoli <ghidoliemanuele@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v1] net: phy: dp83867: Disable EEE support as not
- implemented
-Message-ID: <0b61689c-ac4a-402c-bbc8-2c1207e19c76@lunn.ch>
-References: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
+	s=arc-20240116; t=1761239028; c=relaxed/simple;
+	bh=nxTUBjHrTQSW+359MSp0LTYbt0Gb5eQbxn246r4LBZQ=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JB7Xg+ClrWTPrJuwkjZTK4RHhNt9ZMteaRaLB0tCxCdvmVHK7Kn6+LJPtvdiU9TQIKpRGPIqPZv/CUifsd/BZUtBIo/sniJe6E49yhx6gkXmQQEJ+nb/Ktw3/XBVCwbyJCy0U6QRLoC0pWoWg7nZ3NuAdMQAw3OOE6+XAUe+0O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cssjR1QSNz6HJjd;
+	Fri, 24 Oct 2025 01:00:27 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 226131402FB;
+	Fri, 24 Oct 2025 01:03:43 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 23 Oct
+ 2025 18:03:40 +0100
+Date: Thu, 23 Oct 2025 18:03:39 +0100
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+CC: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Stephen Boyd <sboyd@kernel.org>, David Airlie
+	<airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Maarten Lankhorst
+	<maarten.lankhorst@linux.intel.com>, Thomas Zimmermann <tzimmermann@suse.de>,
+	Andrzej Hajda <andrzej.hajda@intel.com>, Robert Foss <rfoss@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
+	<yilun.xu@intel.com>, Bartosz Golaszewski <brgl@bgdev.pl>, Guenter Roeck
+	<linux@roeck-us.net>, Andi Shyti <andi.shyti@kernel.org>, Jonathan Cameron
+	<jic23@kernel.org>, "Dmitry Torokhov" <dmitry.torokhov@gmail.com>, Georgi
+ Djakov <djakov@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Joerg
+ Roedel <joro@8bytes.org>, "Jassi Brar" <jassisinghbrar@gmail.com>, Mauro
+ Carvalho Chehab <mchehab@kernel.org>, Lee Jones <lee@kernel.org>, Miquel
+ Raynal <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>,
+	"Vignesh Raghavendra" <vigneshr@ti.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	"Jakub Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Johannes
+ Berg <johannes@sipsolutions.net>, Krzysztof =?UTF-8?Q?Wilczy=C5=84ski?=
+	<kwilczynski@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, "Bjorn
+ Helgaas" <bhelgaas@google.com>, Kishon Vijay Abraham I <kishon@kernel.org>,
+	Sebastian Reichel <sre@kernel.org>, Uwe =?UTF-8?Q?Kleine-K=C3=B6nig?=
+	<ukleinek@kernel.org>, Mark Brown <broonie@kernel.org>, Mathieu Poirier
+	<mathieu.poirier@linaro.org>, Philipp Zabel <p.zabel@pengutronix.de>, Olivia
+ Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>, Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+	<dri-devel@lists.freedesktop.org>, <linux-fbdev@vger.kernel.org>,
+	<dmaengine@vger.kernel.org>, <linux-fpga@vger.kernel.org>,
+	<linux-gpio@vger.kernel.org>, <linux-hwmon@vger.kernel.org>,
+	<linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
+	<linux-input@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+	<iommu@lists.linux.dev>, <linux-media@vger.kernel.org>,
+	<linux-mtd@lists.infradead.org>, <netdev@vger.kernel.org>,
+	<linux-wireless@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+	<linux-phy@lists.infradead.org>, <linux-pwm@vger.kernel.org>,
+	<linux-remoteproc@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-sound@vger.kernel.org>, <linux-usb@vger.kernel.org>
+Subject: Re: [PATCH] dt-bindings: Remove extra blank lines
+Message-ID: <20251023180339.0000525e@huawei.com>
+In-Reply-To: <20251023143957.2899600-1-robh@kernel.org>
+References: <20251023143957.2899600-1-robh@kernel.org>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Thu, Oct 23, 2025 at 04:48:53PM +0200, Emanuele Ghidoli wrote:
-> From: Emanuele Ghidoli <emanuele.ghidoli@toradex.com>
+On Thu, 23 Oct 2025 09:37:56 -0500
+"Rob Herring (Arm)" <robh@kernel.org> wrote:
+
+> Generally at most 1 blank line is the standard style for DT schema
+> files. Remove the few cases with more than 1 so that the yamllint check
+> for this can be enabled.
 > 
-> While the DP83867 PHYs report EEE capability through their feature
-> registers, the actual hardware does not support EEE (see Links).
-> When the connected MAC enables EEE, it causes link instability and
-> communication failures.
-> 
-> The issue is reproducible with a iMX8MP and relevant stmmac ethernet port.
-> Since the introduction of phylink-managed EEE support in the stmmac driver,
-> EEE is now enabled by default, leading to issues on systems using the
-> DP83867 PHY.
-> 
-> Call phy_disable_eee during phy initialization to prevent EEE from being
-> enabled on DP83867 PHYs.
-> 
-> Link: https://e2e.ti.com/support/interface-group/interface/f/interface-forum/1445244/dp83867ir-dp83867-disable-eee-lpi
-> Link: https://e2e.ti.com/support/interface-group/interface/f/interface-forum/658638/dp83867ir-eee-energy-efficient-ethernet
-
-Interesting statement this last one. "None of our gigabit PHYs
-support EEE operation today."
-
-I wounder if any of the other TI PHY drivers need this fix?
-
-> Fixes: 2a10154abcb7 ("net: phy: dp83867: Add TI dp83867 phy")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Emanuele Ghidoli <emanuele.ghidoli@toradex.com>
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+Acked-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 
