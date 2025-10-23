@@ -1,155 +1,344 @@
-Return-Path: <netdev+bounces-232056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26AFDC00589
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 11:52:32 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC4BFC005FC
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 12:01:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D57923A59A5
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 09:52:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 43AE94E1CD9
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 10:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC50130ACE3;
-	Thu, 23 Oct 2025 09:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B4A1280024;
+	Thu, 23 Oct 2025 10:01:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UkJU1aEY"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="tX5yKIBY";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="qwZ/ApOf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4C730AAD2
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 09:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56BE1D9346
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 10:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761213147; cv=none; b=KzB1r0WoFUfSR8oOAK1Y6soSXEpODIZcKao+RTwnVbSuooH6wSG9rVHLRnBvi9y28fbNGSZiKO/kTrGsrWolxVGKThOc6xO4vB+YjYcV5lomzzQ9S9cYLCJ6f1iPrnL1FbPCQbhiqxP3/xzReIpi3ue6eDtq3Q6XSnKZhN1i3GA=
+	t=1761213713; cv=none; b=JPrtVttInsBjDzo0CqrJ6v8kdjYwSGyubrbtRZGoWh0SynRW4DmXwym2kivTkUUNmxXEHB4dd6sy7Zb7dH9ILx7twjBwRgurknpDzaH9op+vI1uEk5EIggJm6fNHS8HI6MBqu/CHeycB59Ei3q8zpbsH2ohnZVX/+vXAVyoJbKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761213147; c=relaxed/simple;
-	bh=YgxDyRN4ofYBe5Adc/skKfZKavkw9WdqKOsDqlZOpfg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=EmbHl1TrltfXRcT801UoFiW/gM0Ncun/1aDX8oJ8rzGhmuHbc58QD1ylSAU75Bk/TACcR7+8IKGZLzIn7Yn9aeEIEdsjUW6SVa6kgLUp75Zr6FGIPHuz5hd7efY4vLwi6CKeY4eV92nNbzOnS/dVQmyZP6LAeK6/hvB07nepVmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UkJU1aEY; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-33bdd2b3b77so127687a91.2
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 02:52:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761213145; x=1761817945; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kycvQORLzyv+m6c4IfN7Tc5J35vHVuRL3jrZaefms2E=;
-        b=UkJU1aEYYGi3k3k4ie54xn8nyzW6MItzaI89KDXtnt4pRbmYAHetVLlZ3u47v5U+Ak
-         D7J3Xl3tyqptSLw9+dtlcK1lXTnukkftJjxwD28Bw7vi0mG8l4HWnjXaxDuOJkyzvkkq
-         DXOt+zzMaQXZv0BLHFmplYrnsk7vjlaaM2KsBf7YxnxKrcqIy6cA5Fux73mfxzygr5Cc
-         6YOaRB9hEYnKxRELrsBU+hm1JI82b5kxz9co7xwZGF4rR0zK0CdUzW4MHXK2h8GT+akc
-         COSguI3WsVXm/KWzH++jLkctqRVGNAOkWMGm2sjw3wBVHNOWndQpvA+FqIXu4VcM2kaW
-         PHnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761213145; x=1761817945;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kycvQORLzyv+m6c4IfN7Tc5J35vHVuRL3jrZaefms2E=;
-        b=T0inYaO7ix0VLwsCd15Xav14U7y/YGw/7KQiqSz0VtmCpc1L4F4RYeZ51avbAOaWcP
-         JQfRsvod/qV0msY7b16Six9OmgfReNbfB8+n7EqSXrdPt5+rYVRobIv9pVJe/XxlCmtu
-         GUNPhzhjAnrwiL4X9xaQfvjJVhCtLTNwrygPJjUJSYQo/h2uZIHVQ2hLIb0CeQSkLu8n
-         C0cdh1C7Iuk2+/TbIrn5Sr+HaQIp+KjlkRLzaEtQtjCk4uDQg5hmKOe80n3veQV8noiV
-         LS9PWxrt3gSUN0SzvIwrh9ajpgWoQXGw1YNlC/xso0UGQ5cvIAAR+nqK9FCYBFRxWDHS
-         2X7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUGZy6La08gUf972/GSOKuqB1c9ED9EEkHjPZ8QHURIRcf4U1TkxU0mtK+3p698cYue5FYtJ44=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybGMY4BcnVCYs5l+JAKH1KBPd1qDECVI5nA1d+46olSXtHDG0Z
-	t68kuiSprxJ0LJvmIQywnSeS0CTSKFu0Ivdz3YPMPgyU1oOKXwyI+oWN
-X-Gm-Gg: ASbGnctpu+7TVUrUxUpygH94zLr/J215uxCYfIs1yIvH7U5tELslTmXQ9tf1ZENnUPe
-	l7tqCQUlaWsULO3wuN8VGjT2uZlZUoZJM9u1ErKE/7yW0KBAUrOXnvzCmN3pHAv5pmA2t50n3+y
-	Go5LEu8/Qi4ON5OnvvJPua5cn1nT130cMDjbk5aPpIA6uwtJSLMPhtDYmR+n8H3PNMPBsbizCOV
-	eyn76a2spCTNyxgECWTUSLybHCHqUBDCAWKy4UsK4etM6zlX+eawcXVrH2bz6XIiLagQTpu4OwM
-	gx/LZvGf5KyGQK990aS0U32DOTa1jx5+Z3Y4wYDLpi/6F1+GoxKaBV0XJX8olgkimy9BF+jUdQL
-	E6xVmtPNxCWdRl1nXQyAMpEonjXns/6OLClhgjT/FYmjtWiaYqN1//Hqr/XyWX7Y5atJkcao/k4
-	I+tzXpD7S7eRQ72CqhjSyhuK4lWIzLo5AXuE0qaDQx1Q==
-X-Google-Smtp-Source: AGHT+IEtqGW4IiwBCRAkhLR4GgJO5Ha3iipzwFeyZXwIB20yXWTxUWvqYd9qkwRwxN+A8Z4KoCOQ8A==
-X-Received: by 2002:a17:90b:4f8d:b0:32b:9416:3125 with SMTP id 98e67ed59e1d1-33dfabf9ec3mr6477574a91.7.1761213145330;
-        Thu, 23 Oct 2025 02:52:25 -0700 (PDT)
-Received: from [127.0.1.1] ([2401:4900:c919:de72:c3d6:19e5:82a7:de6e])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33faff37afesm1832177a91.1.2025.10.23.02.52.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Oct 2025 02:52:24 -0700 (PDT)
-From: Ranganath V N <vnranganath.20@gmail.com>
-Date: Thu, 23 Oct 2025 15:22:17 +0530
-Subject: [PATCH] net: sctp: fix KMSAN uninit-value in sctp_inq_pop
+	s=arc-20240116; t=1761213713; c=relaxed/simple;
+	bh=i8iTFIpSYHr7NzE1lDkPHpkvPukENwJx5HMYBoh3o1U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Htiu3Q9hbCvhixgXb/r+cOiX0opK1uwmoKS0dWZMneqVHa9540WLShMynj6HKQIAj/ZTW3lLTP7j7XbiQ9SbDEXOgPDgCatvybmwXMl2rnnTh0jZ99SIi0nVp+xruom5G8ntrnDj5DcLcPn15ZRlLyO7OkJgQnTW+CHa/yyBpa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=tX5yKIBY; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=qwZ/ApOf; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id B8FFC1F388;
+	Thu, 23 Oct 2025 10:01:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1761213703; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=8CphuBVHORvBwJQPcaj5D55Ah/F0BPK3ytrl067uAgA=;
+	b=tX5yKIBYzbBZj/BQYIXPh0+mjlAtOJmPNxvCaerMk9w09wmW9rpnjYghvOHFRZeoysy1qj
+	st15Muds/PAm9ZQzEbMD0xJ5g3B1LUokCAS2eE5eyZJgoXE1Xsvb+XVWLLgjHdGA7ni1V4
+	vVvUylnAE9jjqPcVB20U+NE+2p8nMtc=
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.com header.s=susede1 header.b="qwZ/ApOf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1761213699; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=8CphuBVHORvBwJQPcaj5D55Ah/F0BPK3ytrl067uAgA=;
+	b=qwZ/ApOfaf4ZA07/9ksOrwwVDhnolkyMDpZ1W6Oa3f+WLSnPUCeob/vbTebWKyuPMGlIDa
+	T79xELna0goXVq8/TIG1D4ab+udFBTlZJ/8QDrexwAMAfNm6jOh8+c7gqlonodFGdUXD4C
+	WyjXNHj3ej/UnND7Ot2eEZi9LBUAtJA=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 79A0713285;
+	Thu, 23 Oct 2025 10:01:39 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id OSOWHAP9+WgvXwAAD6G6ig
+	(envelope-from <oneukum@suse.com>); Thu, 23 Oct 2025 10:01:39 +0000
+From: Oliver Neukum <oneukum@suse.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Oliver Neukum <oneukum@suse.com>
+Subject: [PATCH net-next 1/1] net: usb: usbnet: coding style for functions
+Date: Thu, 23 Oct 2025 12:00:19 +0200
+Message-ID: <20251023100136.909118-1-oneukum@suse.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251023-kmsan_fix-v1-1-d08c18db8877@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAND6+WgC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1NDAyNj3ezc4sS8+LTMCl1zixRTI/MkS0szgyQloPqColSgMNis6NjaWgB
- e8LkUWwAAAA==
-To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
- Xin Long <lucien.xin@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com, 
- syzbot+d101e12bccd4095460e7@syzkaller.appspotmail.com, 
- Ranganath V N <vnranganath.20@gmail.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1761213140; l=1717;
- i=vnranganath.20@gmail.com; s=20250816; h=from:subject:message-id;
- bh=YgxDyRN4ofYBe5Adc/skKfZKavkw9WdqKOsDqlZOpfg=;
- b=N+rGD+nOzg05+/WRyPSDnt/qkxsarHxN2Fxy+Jq7bpfYDwKG3zvwRzAwCjrv0D7KU6nhMwFMC
- d0XDaYHELDiAysN3t522buK9pj9ALp94ylS8sj95gk06940Z2BRmkLy
-X-Developer-Key: i=vnranganath.20@gmail.com; a=ed25519;
- pk=7mxHFYWOcIJ5Ls8etzgLkcB0M8/hxmOh8pH6Mce5Z1A=
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: B8FFC1F388
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-1.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:email,suse.com:mid,suse.com:dkim];
+	DKIM_TRACE(0.00)[suse.com:+]
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: -1.51
+X-Spam-Level: 
 
-Fix an issue detected by syzbot:
+Functions are not to have blanks between names
+and parameter lists. Remove them.
 
-KMSAN reported an uninitialized-value access in sctp_inq_pop
-while parsing an SCTP chunk header received frma a locally transmitted packet.
-
-BUG: KMSAN: uninit-value in sctp_inq_pop
-
-skb allocated in sctp_packet_transmit() contain uninitialized bytes.
-sctp transmit path writes only the necessary header and chunk data,
-the receive path read from uinitialized parts of the skb, triggering KMSAN.
-
-Fix this by explicitly zeroing the skb payload area after allocation
-and reservation, ensuring all future reads from this region are fully
-initialized.
-
-Reported-by: syzbot+d101e12bccd4095460e7@syzkaller.appspotmail.com
-Tested-by: syzbot+d101e12bccd4095460e7@syzkaller.appspotmail.com
-Fixes: https://syzkaller.appspot.com/bug?extid=d101e12bccd4095460e7
-Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
+Signed-off-by: Oliver Neukum <oneukum@suse.com>
 ---
-KMSAN reported an uninitialized-value access in sctp_inq_pop
-while parsing an SCTP chunk header received frma a locally transmitted packet.
----
- net/sctp/output.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/usb/usbnet.c | 49 ++++++++++++++++++++--------------------
+ 1 file changed, 24 insertions(+), 25 deletions(-)
 
-diff --git a/net/sctp/output.c b/net/sctp/output.c
-index 23e96305cad7..e76413741faf 100644
---- a/net/sctp/output.c
-+++ b/net/sctp/output.c
-@@ -602,6 +602,8 @@ int sctp_packet_transmit(struct sctp_packet *packet, gfp_t gfp)
- 	skb_reserve(head, packet->overhead + MAX_HEADER);
- 	skb_set_owner_w(head, sk);
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index bf01f2728531..62a85dbad31a 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -189,7 +189,7 @@ static bool usbnet_needs_usb_name_format(struct usbnet *dev, struct net_device *
+ 		 is_local_ether_addr(net->dev_addr));
+ }
  
-+	memset(head->data, 0, skb_tailroom(head));
-+
- 	/* set sctp header */
- 	sh = skb_push(head, sizeof(struct sctphdr));
- 	skb_reset_transport_header(head);
-
----
-base-commit: 43e9ad0c55a369ecc84a4788d06a8a6bfa634f1c
-change-id: 20251023-kmsan_fix-78d527b9960b
-
-Best regards,
+-static void intr_complete (struct urb *urb)
++static void intr_complete(struct urb *urb)
+ {
+ 	struct usbnet	*dev = urb->context;
+ 	int		status = urb->status;
+@@ -221,7 +221,7 @@ static void intr_complete (struct urb *urb)
+ 			  "intr resubmit --> %d\n", status);
+ }
+ 
+-static int init_status (struct usbnet *dev, struct usb_interface *intf)
++static int init_status(struct usbnet *dev, struct usb_interface *intf)
+ {
+ 	char		*buf = NULL;
+ 	unsigned	pipe = 0;
+@@ -326,7 +326,7 @@ static void __usbnet_status_stop_force(struct usbnet *dev)
+  * Some link protocols batch packets, so their rx_fixup paths
+  * can return clones as well as just modify the original skb.
+  */
+-void usbnet_skb_return (struct usbnet *dev, struct sk_buff *skb)
++void usbnet_skb_return(struct usbnet *dev, struct sk_buff *skb)
+ {
+ 	struct pcpu_sw_netstats *stats64 = this_cpu_ptr(dev->net->tstats);
+ 	unsigned long flags;
+@@ -396,7 +396,7 @@ EXPORT_SYMBOL_GPL(usbnet_update_max_qlen);
+  *
+  *-------------------------------------------------------------------------*/
+ 
+-int usbnet_change_mtu (struct net_device *net, int new_mtu)
++int usbnet_change_mtu(struct net_device *net, int new_mtu)
+ {
+ 	struct usbnet	*dev = netdev_priv(net);
+ 	int		ll_mtu = new_mtu + net->hard_header_len;
+@@ -472,7 +472,7 @@ static enum skb_state defer_bh(struct usbnet *dev, struct sk_buff *skb,
+  * NOTE:  annoying asymmetry:  if it's active, schedule_work() fails,
+  * but tasklet_schedule() doesn't.  hope the failure is rare.
+  */
+-void usbnet_defer_kevent (struct usbnet *dev, int work)
++void usbnet_defer_kevent(struct usbnet *dev, int work)
+ {
+ 	set_bit (work, &dev->flags);
+ 	if (!usbnet_going_away(dev)) {
+@@ -489,9 +489,9 @@ EXPORT_SYMBOL_GPL(usbnet_defer_kevent);
+ 
+ /*-------------------------------------------------------------------------*/
+ 
+-static void rx_complete (struct urb *urb);
++static void rx_complete(struct urb *urb);
+ 
+-static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
++static int rx_submit(struct usbnet *dev, struct urb *urb, gfp_t flags)
+ {
+ 	struct sk_buff		*skb;
+ 	struct skb_data		*entry;
+@@ -597,7 +597,7 @@ static inline int rx_process(struct usbnet *dev, struct sk_buff *skb)
+ 
+ /*-------------------------------------------------------------------------*/
+ 
+-static void rx_complete (struct urb *urb)
++static void rx_complete(struct urb *urb)
+ {
+ 	struct sk_buff		*skb = (struct sk_buff *) urb->context;
+ 	struct skb_data		*entry = (struct skb_data *) skb->cb;
+@@ -728,7 +728,7 @@ EXPORT_SYMBOL_GPL(usbnet_purge_paused_rxq);
+ 
+ // unlink pending rx/tx; completion handlers do all other cleanup
+ 
+-static int unlink_urbs (struct usbnet *dev, struct sk_buff_head *q)
++static int unlink_urbs(struct usbnet *dev, struct sk_buff_head *q)
+ {
+ 	unsigned long		flags;
+ 	struct sk_buff		*skb;
+@@ -823,7 +823,7 @@ static void usbnet_terminate_urbs(struct usbnet *dev)
+ 	remove_wait_queue(&dev->wait, &wait);
+ }
+ 
+-int usbnet_stop (struct net_device *net)
++int usbnet_stop(struct net_device *net)
+ {
+ 	struct usbnet		*dev = netdev_priv(net);
+ 	const struct driver_info *info = dev->driver_info;
+@@ -892,7 +892,7 @@ EXPORT_SYMBOL_GPL(usbnet_stop);
+ 
+ // precondition: never called in_interrupt
+ 
+-int usbnet_open (struct net_device *net)
++int usbnet_open(struct net_device *net)
+ {
+ 	struct usbnet		*dev = netdev_priv(net);
+ 	int			retval;
+@@ -1048,7 +1048,7 @@ int usbnet_set_link_ksettings_mii(struct net_device *net,
+ }
+ EXPORT_SYMBOL_GPL(usbnet_set_link_ksettings_mii);
+ 
+-u32 usbnet_get_link (struct net_device *net)
++u32 usbnet_get_link(struct net_device *net)
+ {
+ 	struct usbnet *dev = netdev_priv(net);
+ 
+@@ -1076,7 +1076,7 @@ int usbnet_nway_reset(struct net_device *net)
+ }
+ EXPORT_SYMBOL_GPL(usbnet_nway_reset);
+ 
+-void usbnet_get_drvinfo (struct net_device *net, struct ethtool_drvinfo *info)
++void usbnet_get_drvinfo(struct net_device *net, struct ethtool_drvinfo *info)
+ {
+ 	struct usbnet *dev = netdev_priv(net);
+ 
+@@ -1087,7 +1087,7 @@ void usbnet_get_drvinfo (struct net_device *net, struct ethtool_drvinfo *info)
+ }
+ EXPORT_SYMBOL_GPL(usbnet_get_drvinfo);
+ 
+-u32 usbnet_get_msglevel (struct net_device *net)
++u32 usbnet_get_msglevel(struct net_device *net)
+ {
+ 	struct usbnet *dev = netdev_priv(net);
+ 
+@@ -1095,7 +1095,7 @@ u32 usbnet_get_msglevel (struct net_device *net)
+ }
+ EXPORT_SYMBOL_GPL(usbnet_get_msglevel);
+ 
+-void usbnet_set_msglevel (struct net_device *net, u32 level)
++void usbnet_set_msglevel(struct net_device *net, u32 level)
+ {
+ 	struct usbnet *dev = netdev_priv(net);
+ 
+@@ -1166,7 +1166,7 @@ static void __handle_set_rx_mode(struct usbnet *dev)
+  * especially now that control transfers can be queued.
+  */
+ static void
+-usbnet_deferred_kevent (struct work_struct *work)
++usbnet_deferred_kevent(struct work_struct *work)
+ {
+ 	struct usbnet		*dev =
+ 		container_of(work, struct usbnet, kevent);
+@@ -1277,7 +1277,7 @@ usbnet_deferred_kevent (struct work_struct *work)
+ 
+ /*-------------------------------------------------------------------------*/
+ 
+-static void tx_complete (struct urb *urb)
++static void tx_complete(struct urb *urb)
+ {
+ 	struct sk_buff		*skb = (struct sk_buff *) urb->context;
+ 	struct skb_data		*entry = (struct skb_data *) skb->cb;
+@@ -1332,7 +1332,7 @@ static void tx_complete (struct urb *urb)
+ 
+ /*-------------------------------------------------------------------------*/
+ 
+-void usbnet_tx_timeout (struct net_device *net, unsigned int txqueue)
++void usbnet_tx_timeout(struct net_device *net, unsigned int txqueue)
+ {
+ 	struct usbnet		*dev = netdev_priv(net);
+ 
+@@ -1382,8 +1382,7 @@ static int build_dma_sg(const struct sk_buff *skb, struct urb *urb)
+ 	return 1;
+ }
+ 
+-netdev_tx_t usbnet_start_xmit (struct sk_buff *skb,
+-				     struct net_device *net)
++netdev_tx_t usbnet_start_xmit(struct sk_buff *skb, struct net_device *net)
+ {
+ 	struct usbnet		*dev = netdev_priv(net);
+ 	unsigned int			length;
+@@ -1561,7 +1560,7 @@ static inline void usb_free_skb(struct sk_buff *skb)
+ 
+ // work (work deferred from completions, in_irq) or timer
+ 
+-static void usbnet_bh (struct timer_list *t)
++static void usbnet_bh(struct timer_list *t)
+ {
+ 	struct usbnet		*dev = timer_container_of(dev, t, delay);
+ 	struct sk_buff		*skb;
+@@ -1636,7 +1635,7 @@ static void usbnet_bh_work(struct work_struct *work)
+ 
+ // precondition: never called in_interrupt
+ 
+-void usbnet_disconnect (struct usb_interface *intf)
++void usbnet_disconnect(struct usb_interface *intf)
+ {
+ 	struct usbnet		*dev;
+ 	struct usb_device	*xdev;
+@@ -1700,7 +1699,7 @@ static const struct device_type wwan_type = {
+ };
+ 
+ int
+-usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
++usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
+ {
+ 	struct usbnet			*dev;
+ 	struct net_device		*net;
+@@ -1907,7 +1906,7 @@ EXPORT_SYMBOL_GPL(usbnet_probe);
+  * resume only when the last interface is resumed
+  */
+ 
+-int usbnet_suspend (struct usb_interface *intf, pm_message_t message)
++int usbnet_suspend(struct usb_interface *intf, pm_message_t message)
+ {
+ 	struct usbnet		*dev = usb_get_intfdata(intf);
+ 
+@@ -1940,7 +1939,7 @@ int usbnet_suspend (struct usb_interface *intf, pm_message_t message)
+ }
+ EXPORT_SYMBOL_GPL(usbnet_suspend);
+ 
+-int usbnet_resume (struct usb_interface *intf)
++int usbnet_resume(struct usb_interface *intf)
+ {
+ 	struct usbnet		*dev = usb_get_intfdata(intf);
+ 	struct sk_buff          *skb;
 -- 
-Ranganath V N <vnranganath.20@gmail.com>
+2.51.1
 
 
