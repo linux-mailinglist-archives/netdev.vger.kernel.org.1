@@ -1,139 +1,111 @@
-Return-Path: <netdev+bounces-232007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BCB5BFFEB9
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 10:28:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEFC6BFFEDD
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 10:29:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E83AB4F9FD6
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 08:28:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53E2F18C2210
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 08:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E8D2F83BC;
-	Thu, 23 Oct 2025 08:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C13422FD1B9;
+	Thu, 23 Oct 2025 08:29:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Z9EtBMWu"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA9E2BDC15;
-	Thu, 23 Oct 2025 08:27:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD17F2F7AAF
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 08:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761208084; cv=none; b=XNzYPoliIu4lrYEcAgWW3BMEYfxkKkwL+nrSMSh9XBPfC/sJNLgXfpybHvMonF+fDNWwReNUQ1bkBeUoTpB2fwzAo5KhEM/V/T9q+ZTQLYGusbjEh80UXX5i3RIA9z+j6t+7cqPueQNEEcERgLpAJtfUZ/BsLayia4FYgjs3LtI=
+	t=1761208196; cv=none; b=phZr01ktPUmg451Sm+63X5JoJNxgz4cjjL6qv/fmxC0R41lf66RQiPvDnjXrtLRobx03+5xSz6VBpNQBEhsgcYvEGInHLek9r90GPnelxzD8HokOzswNdj9Xcw3ijQquZD7hYAbScAhv/i/c1+MQl5WfhIInq3uD2tFSOs/3xM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761208084; c=relaxed/simple;
-	bh=AUgJ3Jmn3m2RnEHWD18AOjigfIzZkqbCx9HFiI29QkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DzFPdJjrNVqdPaPvncRvctHCDsklCtiYfY42tBDaMJFIt/bGdJWgY/3LhNNCxP199WjbgwqFTKSBF2MKk8OCp59IFYIfvQ3cP9hXUfsyi1+0MlJG+eKJ6ztqz3IsCI3HBarJU0PV4tchGz57tPJSf8MMxwpMcsn6juDum3liK88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c2dff70000001609-2b-68f9e70bae0f
-Date: Thu, 23 Oct 2025 17:27:50 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: axboe@kernel.dk, kuba@kernel.org, pabeni@redhat.com,
-	almasrymina@google.com, davem@davemloft.net, edumazet@google.com,
-	horms@kernel.org, hawk@kernel.org, ilias.apalodimas@linaro.org,
-	sdf@fomichev.me, dw@davidwei.uk, ap420073@gmail.com,
-	dtatulea@nvidia.com, toke@redhat.com, io-uring@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	kernel_team@skhynix.com, max.byungchul.park@gmail.com
-Subject: Re: [PATCH net-next] page_pool: check if nmdesc->pp is !NULL to
- confirm its usage as pp for net_iov
-Message-ID: <20251023082750.GA11851@system.software.com>
-References: <20251016063657.81064-1-byungchul@sk.com>
- <20251016072132.GA19434@system.software.com>
- <8d833a3f-ae18-4ea6-9092-ddaa48290a63@gmail.com>
+	s=arc-20240116; t=1761208196; c=relaxed/simple;
+	bh=RVOGLO4SU6Ag9PiMozB+SId9BXOCoH5S3lwExhVdiQM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lSSXaMqbEQsxYxNbXhuZ4jzex2+OnhrpWauT2pVMNRLxD2ZVzHCxi3Un9P5GbAZTmp6Y5kMyOu+Xneodkzv7WimblvbgPyPrUbbICG7jSQwSUWw0YOO6dlheSGAHdvznFkqX8VrySgTKC32actUVMjVwyZEQ7aheysWxPuJA8GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Z9EtBMWu; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 2C2F8C0C408;
+	Thu, 23 Oct 2025 08:29:31 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id F3BE86062C;
+	Thu, 23 Oct 2025 08:29:50 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BA200102F245F;
+	Thu, 23 Oct 2025 10:29:28 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761208190; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=r9GcjNdKx0l5qe7F9q2vo9g6zEhRHjHM5Fp6gH11pEQ=;
+	b=Z9EtBMWuXLdFsMpNL5Is/fGSdVkHMoU8On73jz/5/ppGCGeFA/s+BGs5fNBndHP/oE871A
+	Kwf77bbihCJTwF2SHIIloFW/npmFuSEW9T1aNCmWFlVk2urveiGjvVxKBzjOcUb1FuPTjc
+	N1UZY1+fzrl69/hREa0jTum9igth/ny1umb8LP1B7v+4PWW18Pc8iVnihuAgBElu6Zckg7
+	ZpqK34HeP6g3pp37DftoKuVKZpL/yre5EvwGMsncIEtc8X6Q9BvAHc+tTTVlK7g3aJqFTy
+	SL91odbrCbiLSoeyIKOUWZKhCaCe0ibxcolKfL2yT5j0H6Q1Gqr/UAJmto0eBA==
+Message-ID: <ac505a82-1a01-4c1d-8f9b-826133a07ecf@bootlin.com>
+Date: Thu, 23 Oct 2025 10:29:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8d833a3f-ae18-4ea6-9092-ddaa48290a63@gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrNIsWRmVeSWpSXmKPExsXC9ZZnoS73858ZBtv3KVus/lFh8XPNcyaL
-	Oau2MVqsvtvPZjHnfAuLxc5dzxktXs1Yy2bx9Ngjdos97duZLR71n2Cz6G35zWzxrvUci8WF
-	bX2sFpd3zWGzuDCxl9Xi2AIxi2+n3zBaXJ25i8ni0uFHLA7CHltW3mTyuDZjIovHjX2nmDx2
-	zrrL7rFgU6nH5bOlHptWdbJ53Lm2h82jt/kdm8f7fVfZPD5vkgvgjuKySUnNySxLLdK3S+DK
-	mNK+gblgvlDFon3T2BsYP/F2MXJySAiYSKzacZ4Rxr52YSpzFyMHB4uAqsSKZ+ogYTYBdYkb
-	N34yg9giAtoSr68fYu9i5OJgFljOLHHz4gugBDuHsECexDNjkBJeAQuJmW2TGUFKhASmM0pc
-	+T+dDSIhKHFy5hMWEJtZQEvixr+XTCCrmAWkJZb/4wAJcwrYSjzc+QWsRFRAWeLAtuNMIHMk
-	BDaxS5z9tZcF4kxJiYMrbrBMYBSYhWTsLCRjZyGMXcDIvIpRKDOvLDcxM8dEL6MyL7NCLzk/
-	dxMjMAqX1f6J3sH46ULwIUYBDkYlHl6H4z8yhFgTy4orcw8xSnAwK4nwlkUChXhTEiurUovy
-	44tKc1KLDzFKc7AoifMafStPERJITyxJzU5NLUgtgskycXBKNTAy3Aldv4v1g8GFrpd7+S4H
-	3zViOJi7NJXJN6fUabY0q4TKz/ln3ff+5U5M23e27cLVG45NUt+3//v8nn3n5NWZGy5aWta+
-	/OMqerZ4mrPGn8RG4TVaJ1a/mBLRIyCX4MGSe2SmjpairGHT6pTaQ5Gz52z02XKh6Urc88XP
-	rduK4g98ZFv3Lve6EktxRqKhFnNRcSIA5i0Vnr4CAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprEIsWRmVeSWpSXmKPExsXC5WfdrMv9/GeGQecFIYvVPyosfq55zmQx
-	Z9U2RovVd/vZLOacb2Gx2LnrOaPFqxlr2SyeHnvEbrGnfTuzxaP+E2wWvS2/mS3etZ5jsTg8
-	9ySrxYVtfawWl3fNYbO4MLGX1eLYAjGLb6ffMFpcnbmLyeLS4UcsDiIeW1beZPK4NmMii8eN
-	faeYPHbOusvusWBTqcfls6Uem1Z1snncubaHzaO3+R2bx/t9V9k8Fr/4wOTxeZNcAE8Ul01K
-	ak5mWWqRvl0CV8aU9g3MBfOFKhbtm8bewPiJt4uRk0NCwETi2oWpzF2MHBwsAqoSK56pg4TZ
-	BNQlbtz4yQxiiwhoS7y+foi9i5GLg1lgObPEzYsvgBLsHMICeRLPjEFKeAUsJGa2TWYEKRES
-	mM4oceX/dDaIhKDEyZlPWEBsZgEtiRv/XjKBrGIWkJZY/o8DJMwpYCvxcOcXsBJRAWWJA9uO
-	M01g5J2FpHsWku5ZCN0LGJlXMYpk5pXlJmbmmOoVZ2dU5mVW6CXn525iBMbUsto/E3cwfrns
-	fohRgINRiYfX4fiPDCHWxLLiytxDjBIczEoivGWRQCHelMTKqtSi/Pii0pzU4kOM0hwsSuK8
-	XuGpCUIC6YklqdmpqQWpRTBZJg5OqQbGE648Hp+zDS6G+Z1WOejJX66rmit3WOBC9bWY06vu
-	VF53lrnyTVtnVsDSxjgdU5vbHg9yf8b1Xd+d/fVIbyFv2quZ96x6niluOnlMir0xdWrlnl/6
-	+t3xJXz77PJLt18LyVtxuTNwRpbmg7Jrf3K2rM9Xk46rtF05/153Vpf/LNXkpijjqUuVWIoz
-	Eg21mIuKEwH3xgZVpQIAAA==
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/3] net: stmmac: Allow supporting coarse
+ adjustment mode
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20251015102725.1297985-1-maxime.chevallier@bootlin.com>
+ <20251015102725.1297985-3-maxime.chevallier@bootlin.com>
+ <20251017182358.42f76387@kernel.org>
+ <d40cbc17-22fa-4829-8eb0-e9fd26fc54b1@bootlin.com>
+ <20251020180309.5e283d90@kernel.org>
+ <911372f3-d941-44a8-bec2-dcc1c14d53dd@bootlin.com>
+ <20251021160221.4021a302@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251021160221.4021a302@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Fri, Oct 17, 2025 at 01:33:43PM +0100, Pavel Begunkov wrote:
-> On 10/16/25 08:21, Byungchul Park wrote:
-> > On Thu, Oct 16, 2025 at 03:36:57PM +0900, Byungchul Park wrote:
-> > > ->pp_magic field in struct page is current used to identify if a page
-> > > belongs to a page pool.  However, ->pp_magic will be removed and page
-> > > type bit in struct page e.g. PGTY_netpp should be used for that purpose.
-> > > 
-> > > As a preparation, the check for net_iov, that is not page-backed, should
-> > > avoid using ->pp_magic since net_iov doens't have to do with page type.
-> > > Instead, nmdesc->pp can be used if a net_iov or its nmdesc belongs to a
-> > > page pool, by making sure nmdesc->pp is NULL otherwise.
-> > > 
-> > > For page-backed netmem, just leave unchanged as is, while for net_iov,
-> > > make sure nmdesc->pp is initialized to NULL and use nmdesc->pp for the
-> > > check.
-> > 
-> > IIRC,
-> > 
-> > Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
-> 
-> Pointing out a problem in a patch with a fix doesn't qualify to
-> me as "suggested-by", you don't need to worry about that.
-> 
-> Did you get the PGTY bits merged? There is some uneasiness about
-> this patch as it does nothing good by itself, it'd be much better
-> to have it in a series finalising the page_pool conversion. And
 
-I also considered that.  However, I think the finalizing e.i. removing
-pp fields in struct page, would better be done once every thing else has
-been ready, so that I can focus on examining more thoroughly if there
-aren't accesses through struct page and it can be fianlized safely :-)
 
-	Byungchul
+On 22/10/2025 01:02, Jakub Kicinski wrote:
+> On Tue, 21 Oct 2025 10:02:01 +0200 Maxime Chevallier wrote:
+>> Let me know if you need more clarifications on this
+> 
+> The explanation was excellent, thank you. I wonder why it's designed
+> in such an odd way, instead of just having current_time with some
+> extra/fractional bits not visible in the timestamp. Sigh.
+> 
+> In any case, I don't feel strongly but it definitely seems to me like
+> the crucial distinction here is not the precision of the timestamp but
+> whether the user intends to dial the frequency.
 
-> I don't think it simplify merging anyhow, hmm?
-> 
-> ...>> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-> > > index 723e4266b91f..cf78227c0ca6 100644
-> > > --- a/io_uring/zcrx.c
-> > > +++ b/io_uring/zcrx.c
-> > > @@ -450,6 +450,10 @@ static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
-> > >              area->freelist[i] = i;
-> > >              atomic_set(&area->user_refs[i], 0);
-> > >              niov->type = NET_IOV_IOURING;
-> > > +
-> > > +            /* niov->desc.pp is already initialized to NULL by
-> > > +             * kvmalloc_array(__GFP_ZERO).
-> > > +             */
-> 
-> Please drop this hunk if you'll be resubmitting, it's not
-> needed.
-> 
-> --
-> Pavel Begunkov
+Yes indeed. I don't have a clear view on wether this is something unique
+to stmmac or if this is common enough to justify using the tsconfig API.
+
+As we discuss this, I would tend to think devlink is the way, as this
+all boils down to how this particular HW works. Moreover, if we use a
+dedicated hwprov qualifier, where do we make it sit in the current
+hierarchy (precise > approx) that's used for the TS source selection ?
+
+Maxime
 
