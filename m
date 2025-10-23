@@ -1,242 +1,162 @@
-Return-Path: <netdev+bounces-232191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FE33C024DD
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 18:04:49 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 694F2C025D9
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 18:15:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6DD93AE854
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:03:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 834B7506CC1
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:13:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D1626E6F5;
-	Thu, 23 Oct 2025 16:03:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25055299957;
+	Thu, 23 Oct 2025 16:11:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="UrjEPilY"
+	dkim=pass (2048-bit key) header.d=42.fr header.i=@42.fr header.b="NxBP1aD2"
 X-Original-To: netdev@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010068.outbound.protection.outlook.com [52.101.46.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABDED2222B4;
-	Thu, 23 Oct 2025 16:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761235423; cv=fail; b=tsvCweGeYY6/FfmRhasXz6U+ggviwizhyjMD7lqg+f/Jbn22x+0P/VeR64leMcZch0jlw1tsVBjKf2lg2nCEfgdcO2UDUVXCjpIR55UXhBaGYnyfAFERKovPVKNREcOyvK2pqDVX2wy84pcr2BTkJQXCHSjTMPCidh+azUQkoWk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761235423; c=relaxed/simple;
-	bh=nmHsPtomk3VMB+WindzsLvqE2d/GCaA2MG/8i+MKi1E=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MMp4LIamAG8+5b3PznbRLvEPKYlICNenUWNJv5ATLFFTuVVUZ46YtCJFNWZGidp5FaE9SVd7RTpQU3iq6Rc9cjVGLbEDUxQv9RSCkWxp7ntSpJsjA6IscZ0ik1482E0ASShGqoyjdaJcneTjWS3fhDc+DFzT8QUI4grBTywmdDE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=UrjEPilY; arc=fail smtp.client-ip=52.101.46.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=N+GNETWHhOcVN7D91sUWSDwQDOa6La2vbmcMcMl7Mt8J9tFdXCxQkC0oticHpdYhrBurn6q86H5xwIWogGBd4Khx0UQ9qQFPjFHrdiqM2t5zIySGQD0rGdeOV+0lRt7bj2If5mnho/m14pyEIA9FLAKfcg8VUNnCnlVfr82l++Z1gqKLSNKCOLUkUEBLhXA4AQWj/6ph1vtoxlvFa9Kkh85Qsz3+UyerikNH9Ir8MSPERyvjKU9DUraA7NKNKtKV5qBHALy2JeG3s34Y4OSd00r7T5tleRqAjMsJsPF80Oh+jt+V67LzvQBT+Fzay1jzESPaGFjAj6hE+UaWf8vz8Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IiQYlWzGxAzcmDxQx21R/s857ZIvlRsCxnCwp8B5EGA=;
- b=tPXMPe9xvZNxxHZ96siw899xQbNWfUeB23TyuLW1BXA5pkeBxRWf+x9BbzxpFLLB51KZUmB3hOZFgjvdlDvFfLMuHpX/CIa5Buee7Y7CEK6FEhFOf2veIpgILS3RGVhl9ByHke2/4js8TgvTv2ZMQuRh8co/EO55Ai9MTTzO+cKggo1tU3+KJyTnN/Nr3F3NipHp1emmxYzj2CwbEnZcBqyvFj49MRZVNi5XufNiDSz5EnXN6EIelhlMFm30Tq466eON71mhzfYV4RQGJyUUijSxcgGqXx40QPHvSZNL0cmquOWC+wluMKmnKNV42nU/Tvrmdl1HlwCnxR2wz+Pv5w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
- dkim=pass header.d=altera.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IiQYlWzGxAzcmDxQx21R/s857ZIvlRsCxnCwp8B5EGA=;
- b=UrjEPilYie9qGp/jqmGGWXmDrsP4H/8nbqb+cISOVMmPPLdQ0FkLEXnad2ClBhow1nCb3XcZTgzgaeY+ktoZC/EtbLSiC3Hc/iqDBubZeWJfqGnFPp90Cb8ShEKXk65SiXpBsrUehtEUlQ97YBtwBzQw6RZVt3IdfdbhId3gA+3x8LSL1Elyp2i0DqhhLj5F8Q3C3wpGN5QG5gvZOlEd8V0ScpXor5viaUXrBxBUvC7BqSt+vaiXqBQXGzm3Jxf54XX4BTkapMELI2y4uziuE49toRJdWuK+2DF+8Xdh/bHEMG8QUs4+LyNiXFMT/BAzwtGgA7qD25CNVOglt2T2jQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=altera.com;
-Received: from CH2PR03MB5368.namprd03.prod.outlook.com (2603:10b6:610:9d::22)
- by SN7PR03MB7260.namprd03.prod.outlook.com (2603:10b6:806:2dd::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.12; Thu, 23 Oct
- 2025 16:03:38 +0000
-Received: from CH2PR03MB5368.namprd03.prod.outlook.com
- ([fe80::ccdd:249f:7a8a:648]) by CH2PR03MB5368.namprd03.prod.outlook.com
- ([fe80::ccdd:249f:7a8a:648%6]) with mapi id 15.20.9253.011; Thu, 23 Oct 2025
- 16:03:37 +0000
-Message-ID: <e24d26a4-8c3d-4673-97a7-eed23f54c08c@altera.com>
-Date: Thu, 23 Oct 2025 21:33:26 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 2/3] net: stmmac: Consider Tx VLAN offload tag
- length for maxSDU
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <Jose.Abreu@synopsys.com>,
- Rohan G Thomas <rohan.g.thomas@intel.com>,
- Boon Khai Ng <boon.khai.ng@altera.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Matthew Gerlach <matthew.gerlach@altera.com>
-References: <20251017-qbv-fixes-v3-0-d3a42e32646a@altera.com>
- <20251017-qbv-fixes-v3-2-d3a42e32646a@altera.com>
- <d7bbb7dd-ddc6-43d6-b234-53213bde71bd@altera.com>
- <83ffc316-6711-4ae4-ad10-917f678de331@linux.dev>
- <0d3a8abe-773c-4859-9d6f-d08c118ce610@altera.com>
- <aPoKiREmRurn-Mle@shell.armlinux.org.uk>
-Content-Language: en-US
-From: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
-In-Reply-To: <aPoKiREmRurn-Mle@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MA5P287CA0220.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a01:1b4::12) To CH2PR03MB5368.namprd03.prod.outlook.com
- (2603:10b6:610:9d::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE8A293B75
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 16:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761235905; cv=none; b=lH/r5gN2CHishKa/uZEx7oOUXqi7he5oxxoatVI4isSHGcT7/g3I/DAGPh3XddakSYyiyZGdeSQI/VZ8FVMKtdICCxr9ZuuA2i3yT03HK2W6evvY2pinrU9o9IqtFHI3eLa7hr4hXQecPitOjLZYGrWemwksEGbzmDzp80FGsD4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761235905; c=relaxed/simple;
+	bh=nUteSuOJ9LX9qDQVOKziBVr0BfsdekpVG7OD+xDvs0A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KohapvWUw+N+DqBx5p2e8S+WcycttKpqEwhJxtBzS7+SNBN4aTv1VfxP3pqyD7HwY+obbDGfmp+9nAu7cE+h7RIWv3aNJON+IGpYse0eLkDJ94O03x3d4LpP1JRrrqqP0kmSOdnMNOzU4GrHqeHlvLX7XxRRYV8L3emSeogsf2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=42.fr; spf=pass smtp.mailfrom=42.fr; dkim=pass (2048-bit key) header.d=42.fr header.i=@42.fr header.b=NxBP1aD2; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=42.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=42.fr
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-428564f8d16so565011f8f.1
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 09:11:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=42.fr; s=gw; t=1761235901; x=1761840701; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3m9ah5kbgDLsSRMenHAMj3Q4xRuIZKbPu+Dxwh5kMt0=;
+        b=NxBP1aD2f7NUEHt0f46KvaLX0Eu3b2V60gHnF/g/kYm5ue4a/YW7pU2dpLCjt0UZb4
+         EgQLSeq7jccy6LALn5pVWVw9rorWCniIssLZPso2JWnSzE+bJZ2gzUWP2+gFg5mtuZ9S
+         3mZjbIO4TF1u2mGL/cs3wef1N7MXSiLTMhTP5KIklqJEmae3bcNVDrrzI2sX5hysOe//
+         HEpa/ZKahC/FVKQQ7cM7I+/x+rFT0vDNt2Y/2CFsR03H3mLuQz4vlF+TcovrccMoOc9B
+         muBc4U332Djsfj2EpbP4Mza0xRTmiPKeZkE8j50hQCaztudS2jZj/l30Y7O4fv71BSBa
+         bEOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761235901; x=1761840701;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3m9ah5kbgDLsSRMenHAMj3Q4xRuIZKbPu+Dxwh5kMt0=;
+        b=YcAvG5hgok9b7Zo9b1yUfZMCu4ehgkerH1bWSXpWa1+R6wwDZLstV3/j/622MIHvFj
+         inGnFhiX9FMUZBVqdnod0jOgu9NnwRHG2N5n6n8UZqD4R+/nmklajAGJBy6jIu+ZPSVL
+         t8M1XOnLBKXSyQV8UD7cLXah/QnKp7eB/s00mq6Ybmact2o4EjLCnJdzVeinoqy5O/kn
+         nMcPCwRFMkg28+lZUhpoU23rvuobIZ7Stsgcy62Ml9C5+nGPKq+drsTGq1dGA7MTFklB
+         k3ZZuYmuac1OiGzJ8pxBZHbQL6dTq0oQ8y0JxGhvQOxDiw46+MSV8Y8aAZTkOI8AeJGZ
+         1K/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXA/MhaAsLi9SB6slvVG7tCF4TkSd3WWkbNjXTmN9bLi9RsvUiPU8k1q0NYErwZGUgUKCZakg8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEc2vGg71YfFNwHeGQdSBRKwNqpBc/L3por09Jq28+SZB/cg0R
+	qIl6jLYN+2ErZTFq4iHfeqwGYpxxWuLUml9a6lIf05KQlSJKqSwiR+ThcCJT/T8cmeI=
+X-Gm-Gg: ASbGncsdefd70jliAjFpzV9/BIscIn5BA2n0T3EAlAyUtPjR1ZTuxiRrYG9L5SJI+pe
+	FAyH+fSNdZWY/EhOPjlV1Lz6IrkWe6qASBe+FGk402P7vTklL9TrPdVoxoE0xzmBsc0rUdW1VR9
+	I2zTf5xMYJbaexlPOjNw20x667X/0AWKDC1IQqeaIGQVbOmzVoJak7uNz2q0Vxku9IFuIGo1/z5
+	DHkQgFVPnhikR0GCgZoa3bJGQweBEz5gGpCzCTFRbc3jtfUDG0pgIuo11ExZ3aGghS+qJJLWlUw
+	TWcNWNWuqSdqur0/1biLWaA3OLd8PJsNsAyBXQLlJicAA6Tpf4XPH4j7uzuj7DI2Sjm4h3FAgcH
+	lqGbOxgL8Cpahv1EEEznOEKxcSNFl8hY4vS/nseKT8DBXjYRIajc+33u4+yyLoNBJm6SYnrMm4g
+	==
+X-Google-Smtp-Source: AGHT+IH0/HC+MxAgbHtrHb8ogRis9t+C7apRxSN2Uz8hQycBWUjbbsufH11Skh1m0YQyGENnztKy1A==
+X-Received: by 2002:a05:6000:984:b0:428:5673:11df with SMTP id ffacd0b85a97d-428567313d7mr4621322f8f.15.1761235901402;
+        Thu, 23 Oct 2025 09:11:41 -0700 (PDT)
+Received: from wow-42.42.school ([62.210.35.5])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4298b9963ccsm3017836f8f.7.2025.10.23.09.11.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Oct 2025 09:11:41 -0700 (PDT)
+From: Paul SAGE <paul.sage@42.fr>
+To: paul.sage@42.fr,
+	vinc@42.fr
+Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Michael Chan <mchan@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] tg3: replace placeholder MAC address with device property
+Date: Thu, 23 Oct 2025 18:08:42 +0200
+Message-ID: <20251023160946.380127-1-paul.sage@42.fr>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PR03MB5368:EE_|SN7PR03MB7260:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2ab7bfe4-d2c7-424f-fbd0-08de124db9bd
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?KzVoSUgwSnVGMXdGZlNmODVXWnFINEFDTjZqNkE4TjY4Y3VHRmt4RStpbG95?=
- =?utf-8?B?VVovMGFFYWZRUXlZai9xdlYyV2ZWYVYxQjhlK1hyODhKUVk0YzZ3SURuTjZD?=
- =?utf-8?B?ZzF0Z2gzUDk0cVk0YUFERTRIRW8zcFRaTTZRcmNrTDNsT2t0TnRRa1JVVDly?=
- =?utf-8?B?L0R6V0ZxbXd4Ris3aDNHNGpBVHNLTkVJZHlSemhvSXVUQ2ZTNjhnVmRFY1FU?=
- =?utf-8?B?eVFTenpmWXRCZ3phVGtFaTdDVTNVNnBjQUtRMEZ0TlJicWo2RCs4dXRQY01L?=
- =?utf-8?B?dlo1dDN1RVRoRWkwVkMzdENNUWtyQ3hZTVNKNTBHK0lVZjJWZUJ5TlR2VkxT?=
- =?utf-8?B?dFhlQlR2ZFdIMExBcHMwTWQ0dTZOZ0dkdWs4cVpxSlRRQStOM2o0SkttNGFN?=
- =?utf-8?B?c1BKaVd4VmJBV0ZUQW9GNXR4MTVJY2dFOVUrcmo1VXN5cWIyMzBjRklML2JP?=
- =?utf-8?B?N3l4RjU4ZnFndTk5dTNFdHgyYTY4di9naUxyemdpSFRRZnZQT1padnNtTDJR?=
- =?utf-8?B?TFlXa0J5T3JMQ1dCdU5VbzNqVEhFd3NQbThFNnNKaXltUHJsREZiVWFld3Yx?=
- =?utf-8?B?N2UrWXorbEtKTnZ4Mk5ZUlRDaTd4S0lETzltZEs0TldvaHZ2L1ZCcWRZekc4?=
- =?utf-8?B?OWo1a2NjMmhjMmxiY0V2NitKY3ZFeVBIaERGU2twZXkvb25UM1hBZklFUUdC?=
- =?utf-8?B?L3RoQmNHZmc2eXlTejkvTUwwT05oeGxhVUswdFpuUmJJN2c1WTM5ZTh6RlRl?=
- =?utf-8?B?MVJyNTdXUmpGMk5saXVSUFpsY3VsZXUxdkRPTVovWElnS2hHS0I5WEZKeE1s?=
- =?utf-8?B?RHZPVW5JSzNVS1Q5aUUzNHpZK3hxOXAxNWwyR3h1RDRTbzMybVRDVTFIZGpx?=
- =?utf-8?B?NGxCazBKQUJEa2pMclgyNUtkSUg2b1lzVVEwTWdxaUF1VjRJSzlVZjU4NHVa?=
- =?utf-8?B?SmZsTGpKOWVuUjhhWVc5ejhETnRsV2l2QzZtTGxDbmpaeld2NjNab0k0QU1I?=
- =?utf-8?B?TFJLVHRra0UvR0RRY3E0MndCeGp4RFZtR2cydWhJVUphVlJ0OEFkcnNWL3RT?=
- =?utf-8?B?TUlBSkVXNitkVmlqTlNScnZSd1FKdlBqRWx1ZUx6NTNoQS9VaFhnbzJBa2dX?=
- =?utf-8?B?WWg1aDlSOHczM2JQWmJ4Wit6cEdLSkJLMkJsNHoxY2JteEFucndGM3VMcEpH?=
- =?utf-8?B?QUlyVWs5aithRGZFZ2hEb3VnbVZUdkptWnhsYXVPUVd3R2paZ29HTzZLbFZE?=
- =?utf-8?B?TUZ3aDRPMWNuaXArQmgwK3dpdE9wWTBmMUZ1cUdQRHdybnI3NkN5WmxFUW5t?=
- =?utf-8?B?Wm1xa2ZtRjFkN21hOTl6UTN1WW1XUDE1K1V0U3h2M2FVdWttdThZRk9YVjhW?=
- =?utf-8?B?MThNRERxTmRJRlFOVU5hTmdYaDdnZVBNVko5UkRCeHo1TFdsVC9DV1BHb0Z4?=
- =?utf-8?B?Rk9LR0ZqWmJKc09qcEw0V0ZoMWJmNWsrcWlGNkxqaW1YQjVSR1dWeVdORncx?=
- =?utf-8?B?eXNkL2ZTVmIyL1hqMzhMaURROSt3T0NldkE1V0g2OXhVVXhBVFlkTU12RjlE?=
- =?utf-8?B?a1JJdzJZQU9RSnRGNjhEbk5hNW8rWWQ2TUF2eTVMeHBPdUdYQjBQbENjRGg1?=
- =?utf-8?B?eHREMzd1dktRd3JVb3lXSWV3TFZVWGFxaSt0U1ZkbGxwcDJZMFBDTG9nRUZR?=
- =?utf-8?B?a0VjbHpUVHJlUWFCTlAxT2hIcUgvYzBLMDJUMFZmbFFmS28vRXZ3WlloUWJu?=
- =?utf-8?B?UVZXdWc1T0piSUd1dXpkWlJJRjU3YmhqTFpaUVZwTXN6OXJjWlExQnp1bG16?=
- =?utf-8?B?cmhkaUNnZ2M1L0Y4SjBCQlNubVdpYUhqSytyYXJtOUdYeUJMNW4zY2d4YmlG?=
- =?utf-8?B?ek9rT0NUMUs2NlovSGZHTHlIUVZBRVlPeUFtS0RvaXlYOVdmaTArS3lkVjgx?=
- =?utf-8?Q?lUU10KLEahlwake+fyyoqT6OXRb+mH5X?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR03MB5368.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UXMrRlBpY2k1WC9MVS80RE1oOUV4RnFGRHJzOTlXVVd4V1JtWk9GNWhQeTMv?=
- =?utf-8?B?NDJJZzYvanlZR01vbk1ndzc5d1cvRk5pMnZmWllWdEtBV3g3Q2QrRS9Od3E5?=
- =?utf-8?B?TnptK0hTWUkzai82UlZIMGtHWkVkb1dNTDNpYml4WmpMRnliMVNVek1OZ2Nh?=
- =?utf-8?B?K2pJdVNJQys1cnpmWFRVellBUXhyZmtzNkd6NHdSanl3TUkweXBBSzF1eFZp?=
- =?utf-8?B?K1ZGMXdocUNiUFpib1ZQRzAweUg3L1plMUw3b2xrakRVaytTOFJDdW94OENM?=
- =?utf-8?B?NDBqREFFS3Z2UjN3VkJWd091WGN1ZVcvZkl5TWhFcGpjRXhsSUJBa2VaWUhz?=
- =?utf-8?B?VmN3OVd2UnFuR01uN3UwcFZEOTFWTGNJNC9nK2IySW5zTjFrc203aG9maE5Q?=
- =?utf-8?B?NTNRRWlRSm1GRkVoUU1COW5SWFhseCtFS05VaTZlUlh2d3E5UDFzTFJLNUph?=
- =?utf-8?B?UjI0bTJWa3Z6NlFWR0NON3pGa1FqRkMzSVpGeEx4WUZ2K0Y4dE5RbkxVT1NW?=
- =?utf-8?B?STBjRHU4WE5LaHBHOGlHWXNTVW5EMWVpZ1lkdG9GVVNzS0ljdm5qa1RNTkxM?=
- =?utf-8?B?UmpjOTdMdmxTSVB3Wk5BRStOSGFvaDFOaUVicEZuS1NWbVYvcXdYSSt4Zlkz?=
- =?utf-8?B?SWxJM3BnSEVhME9sNVdGM1FHR2tEcGIreVNyWWRRdHVwWU92UXpHaVBobTVu?=
- =?utf-8?B?cmxROGxIWEpWSTZPYloweW10RmlpRW5vUnUxZVRGVUFTRk9xUnZ5MlgyM3Fz?=
- =?utf-8?B?V2NNOEw1U1VPUTRmOUdXdCtIcS9UZTdVRngySCtYTGF2WHFuZVJjS09KRGJk?=
- =?utf-8?B?OEJVUERvTWVvWmdvMnlEa1BmM1NSOWkyeHV3S0xOM0pXZHBGaGlkdGQvZUla?=
- =?utf-8?B?aVpNbXBNSHFuUWNiNEMyMm5iT0NvNVpWd3FnVVo4ZUNEQXlab012QmpYY3dL?=
- =?utf-8?B?WEc0ZWkvV1crZjh3ajI0aHNCblp2NFg4STREamJoK1hvTWJJTHZyNW5iM3h5?=
- =?utf-8?B?a0FHZmd3bmtxblV0TTlaWGx0ek1rdWlYR2dyclpYQjV6bVZJUTRONEQvMkxn?=
- =?utf-8?B?T2FsTlpPTC9aeEFUOWRrV0wvaGFyOG0wMlg5VFVSWnFDcTZ3VGdSNVd0dmNM?=
- =?utf-8?B?V2tGK1k2QjNrcWg5L2lRMFlXaVZGTVBhM1RMSExOaSsxL0M4ZFg5dU1SSkdh?=
- =?utf-8?B?UDF6ekMwd3crY1hEZG4xUlQwRkd4ajJJQ0JCMm1VSUlreDYxSkFEcS9iZ1NN?=
- =?utf-8?B?L1NjTmxnRnVVZ2V4Vmh2cERKbmNLclZmNWNlSzZ0TzJWQWg3R01rSDVzVVRk?=
- =?utf-8?B?VGVjdndBVVFQSHlMS2pvclNnTXE3cENpcVZnTUJyeFBna21LblBvYWd5VlFz?=
- =?utf-8?B?d0d1bkZ0VFBMelU1Z3hWRTBHdzdrYitSU2JRRjZITmpPR1VndEhKNTNHNE5p?=
- =?utf-8?B?MldweElOYmFveWhZL1g3emhGYnozMWlwdDE5dTZKdXBEcjZnOFhFSnR0dnV1?=
- =?utf-8?B?clg3dllWaElHVmpET3NJYnNWL1d2UU9FeG5Uc3MwTHJ3UmNwZC9lWDRXbDl1?=
- =?utf-8?B?SGxRYXhZT2RQWGVXSmlEVlJPUG9qajJocUU2YXRJWEEveENwdXdYK1lCL05j?=
- =?utf-8?B?aXNnK2hYajJJSldLamlMNU91cEJPYkk0REc2VzJiSFV6MFc0eGdDZi9JK3Y5?=
- =?utf-8?B?UlA1MVJvWGpnL0NSbHE5QUFyV0hpNmhxUmdCa0pZL0ZVcTVIQUREblQ3UERm?=
- =?utf-8?B?R09PWDJGS3dkVXFGaFJsQ3lseGdqTkR3ZVh0M05XZHN5V2pQdGZ0RnE2Zm96?=
- =?utf-8?B?SGd4dW1CK0hEZ1NnR0g0aW8wRGxDN2tLTEd6OHZyYU5zZkY1UGtidnVSMzZE?=
- =?utf-8?B?QnFyTnBOYTExaktFM1RtTFJpQ25hYnJxN25IZzZ4bTRGa3JWd04yenEzWU9R?=
- =?utf-8?B?NVh0TEcyRVpKcjVBMmc4TWFaTFpZaWh1aU9aWlh5MXJ5UmpZOHMwZE5uY0VW?=
- =?utf-8?B?a1ZHanhxT3hDR1BOTnFhbzdiZ3R5cVcxUHp3UFZLeTA5UmhaNmdTMEpaT0do?=
- =?utf-8?B?SXB5eGZWTTgzbk15QndUVzZ1Y2Q1S2FqQWoyeEc5OGc4SEx3b2k5Y2NhQVRx?=
- =?utf-8?B?TnJEdW9EWXdtWmdVemZSU093bU9ickIxSEhvSUk1T0RIZzd6R1RCK2lzVGxm?=
- =?utf-8?B?VHc9PQ==?=
-X-OriginatorOrg: altera.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2ab7bfe4-d2c7-424f-fbd0-08de124db9bd
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR03MB5368.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2025 16:03:37.7981
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: A86lRv6R1woUj9opZE/vWWX1jmoO+XrN4xKs4MRXfrgd24cN0bFwl8Y0+l+fFPNLILPBd3jc3+bRXjF9CP7Py4HzWcfq7g/GG1fHbQyKqTM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR03MB7260
+Content-Transfer-Encoding: 8bit
 
-Hi Russell,
+On some systems (e.g. iMac 20,1 with BCM57766), the tg3 driver reads a default placeholder mac address (00:10:18:00:00:00) from the mailbox.
+The correct value on those systems are stored in the 'local-mac-address' property.
 
-On 10/23/2025 4:29 PM, Russell King (Oracle) wrote:
-> On Sat, Oct 18, 2025 at 07:20:03AM +0530, G Thomas, Rohan wrote:
->> Hi Vadim,
->>
->> On 10/17/2025 5:51 PM, Vadim Fedorenko wrote:
->>> On 17/10/2025 08:36, G Thomas, Rohan wrote:
->>>> Hi All,
->>>>
->>>> On 10/17/2025 11:41 AM, Rohan G Thomas via B4 Relay wrote:
->>>>> +    sdu_len = skb->len;
->>>>>        /* Check if VLAN can be inserted by HW */
->>>>>        has_vlan = stmmac_vlan_insert(priv, skb, tx_q);
->>>>> +    if (has_vlan)
->>>>> +        sdu_len += VLAN_HLEN;
->>>>> +
->>>>> +    if (priv->est && priv->est->enable &&
->>>>> +        priv->est->max_sdu[queue] &&
->>>>> +        skb->len > priv->est->max_sdu[queue]){
->>>>
->>>> I just noticed an issue with the reworked fix after sending the patch.
->>>> The condition should be: sdu_len > priv->est->max_sdu[queue]
->>>>
->>>> I’ll send a corrected version, and will wait for any additional comments
->>>> in the meantime.
->>>
->>> Well, even though it's a copy of original code, it would be good to
->>> improve some formatting and add a space at the end of if statement to
->>> make it look like 'if () {'>
->>
->> Thanks for pointing this out. I'll fix the formatting in the next version.
-> 
-> I suggest:
-> 
-> First patch - fix formatting.
-> Second patch - move the code.
-> 
-> We have a general rule that when code is moved, it should be moved with
-> no changes - otherwise it makes review much harder.
-> 
+This patch, detect the default value and tries to retrieve the correct address from the device_get_mac_address function instead.
 
-Thanks for the suggestion. Will do it in separate patches.
+The patch has been tested on two different systems:
+- iMac 20,1 (BCM57766) model which use the local-mac-address property
+- iMac 13,2 (BCM57766) model which can use the mailbox, NVRAM or MAC control registers
 
-> Thanks.
-> 
+Co-developed-by: Vincent MORVAN <vinc@42.fr>
+Signed-off-by: Vincent MORVAN <vinc@42.fr>
+Signed-off-by: Paul SAGE <paul.sage@42.fr>
+---
+ drivers/net/ethernet/broadcom/tg3.c | 12 ++++++++++++
+ drivers/net/ethernet/broadcom/tg3.h |  2 ++
+ 2 files changed, 14 insertions(+)
 
-Best Regards,
-Rohan
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index d78cafdb2094..55c2f2804df5 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -17042,6 +17042,14 @@ static int tg3_get_invariants(struct tg3 *tp, const struct pci_device_id *ent)
+ 	return err;
+ }
+ 
++static int tg3_is_default_mac_address(u8 *addr)
++{
++	u32 addr_high = (addr[0] << 16) | (addr[1] << 8) | addr[2];
++	u32 addr_low = (addr[3] << 16) | (addr[4] <<  8) | addr[5];
++
++	return addr_high == BROADCOM_OUI && addr_low == 0;
++}
++
+ static int tg3_get_device_address(struct tg3 *tp, u8 *addr)
+ {
+ 	u32 hi, lo, mac_offset;
+@@ -17115,6 +17123,10 @@ static int tg3_get_device_address(struct tg3 *tp, u8 *addr)
+ 
+ 	if (!is_valid_ether_addr(addr))
+ 		return -EINVAL;
++
++	if (tg3_is_default_mac_address(addr))
++		device_get_mac_address(&tp->pdev->dev, addr);
++
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/ethernet/broadcom/tg3.h b/drivers/net/ethernet/broadcom/tg3.h
+index a9e7f88fa26d..9fb226772e79 100644
+--- a/drivers/net/ethernet/broadcom/tg3.h
++++ b/drivers/net/ethernet/broadcom/tg3.h
+@@ -14,6 +14,8 @@
+ #ifndef _T3_H
+ #define _T3_H
+ 
++#define BROADCOM_OUI			0x00001018
++
+ #define TG3_64BIT_REG_HIGH		0x00UL
+ #define TG3_64BIT_REG_LOW		0x04UL
+ 
+-- 
+2.51.0
 
 
