@@ -1,214 +1,186 @@
-Return-Path: <netdev+bounces-232277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6C7BC03B81
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 00:52:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F157BC03CF9
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 01:18:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4AA8B34AE3E
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 22:52:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB2613B467F
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 23:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E2026E71B;
-	Thu, 23 Oct 2025 22:52:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA2727B324;
+	Thu, 23 Oct 2025 23:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="Kutc4zgt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="svjhxatP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E19184
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 22:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756A9221F0A
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 23:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761259952; cv=none; b=byzJpaN6tKYCAOeEZArfohMopAMjaD3Hg8wArXM/Kr7aqm5Lkrjrhg2H7CYZ+KUKNzpMEKoW230Ar/Z8XmUtCYBGOxUH7bX+Td7fs/Afyjx0VKcoGHxpE1oDGdISt1NqsTXFKlIhYMc2hDAClILCJqb23wSrzX96AIWEq+XoIVk=
+	t=1761261475; cv=none; b=IHPAKUOO6Ayfv6Xbne4Oloh1F/2IkO8dcZvbBgvx4g17HyJfnD1w5as78Dr5PjE7qtp37CPIgKKQiDnWqOepOCoLDLjNThNcyK5k4TaLGWhH9Gvx8Egm85kEA4YZrzIT2x6CKUCAqWXIhBdIgpeBB4VUIUy0DOaq+IlKmyP/bT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761259952; c=relaxed/simple;
-	bh=a/oVA+1W2W63nNBlqpwA4juoX4MUOMQKgdxV9IsDUtk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QgQ49CJAsKO6ay/HwG+S0R8eHMctx9ZsjRipaw19EZSOX8L7Xk/2CAKDm8UR8GN4TpHC/JY1k5Tsdpwre1tsM3lu44yHihxmDBW2nBScIAq5nxa/F+VQiF1zvTphBzLMoIT9CXolKpW8geMOBHF5rNTHdieKfjO8hkquE8F6QDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=Kutc4zgt; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7811a02316bso1049884b3a.3
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 15:52:30 -0700 (PDT)
+	s=arc-20240116; t=1761261475; c=relaxed/simple;
+	bh=H0UoUk7mrY8ApiouzoHqaM4xBIKytdZGjgYKOZ+Cmts=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hPMEL1ZLygYJCsNUMhMkIfi/6ZGSBXdiPCs1Ozi/pkq9gZYqqaVqAMbUzOekzN/uhWOXXLlaUEX9rWOPMXefpWALSyLpf29lAOn7l0bNNdLw+YnKDqnIz4CDQk67RIQJHmPa1mKDEl5GRnXCAesHM8mefNYGnMjyiL1cBbm5Qs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=svjhxatP; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-28a5b8b12bbso36686155ad.2
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 16:17:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1761259950; x=1761864750; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mprIX+RYkzlOHXK9v2bWr1TLOjlDU4ICDIXLml7GahI=;
-        b=Kutc4zgtcGNNvg8pP1ZdItmAPJRBs68LIqeUwqihZzrQ7QZD8OE6jag59lNswxDHcN
-         G/UKpYylrAwv23ZHxkwuc1DoAwTeu+nf8SVRv1LaxxKZRFePTsPFghKz09MwqZ945qfN
-         s3kOIX0k8UQAlDQ/c8lQnoOPNIn0IqC6ssApROeGflOixqhPaf665BwtZM1OdZdm6Vfl
-         tQuPs5okFJsv3ZvS9Q+GznsU+HLJ8rguO5xlUiCGhQ14k6swCjIxdYsb85HKWAwRXEx7
-         BTYXqk1kfzcN2RSk0C6C+hWXQy01qTsFVHCntdaU7tsdP9k4LPzgoAfxKDqBSXdpcaxm
-         PE2A==
+        d=google.com; s=20230601; t=1761261474; x=1761866274; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nPr+IHmc+5KcsOV/+l/1yTGitm3LXEpb7d4tT1QpRkA=;
+        b=svjhxatPoPWwFRT8uM95hxXuAPKG5b21GzvyaGWsYOyS/OVGkJczc63gqLFhU6U0mj
+         CRcyuz96akHfvoJVpCbe1g3wtuLxFQKYNxMahq0JIadp+hCoj9KO4cmVLgBlKiF7jteB
+         PmhnLaJfMDxvEtu6mHZ48MiqqQjjzRiBrR3gg8sKOIJsbOvFFmxbyNpbCnBy0vLBxrDr
+         LvVspnTmviPXVDL28D5HkeCnOuRR2HEJzSI43++fPjUaLE/eND8SBR48a5vqXIjSCYui
+         bvtfgNhjpHDxAQLJHY/qcUK/cZxvSGzJHosnpQ4cgo64djebmirvcVGkcUd4a3WW4+Bw
+         BPRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761259950; x=1761864750;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mprIX+RYkzlOHXK9v2bWr1TLOjlDU4ICDIXLml7GahI=;
-        b=sm70LwcX2kFf/deI4aVY98YtrkKfSTSmdc/ioMpPJcgOWQTvvz4WBBtXb9QRwuPnw4
-         u0Or/X4yZRxWJkh+Ufn2tXOuKKXEEfyIfqsW3868nJwpKpF7fRKR4joWkrzB56RwkJlm
-         okzo0uflDVXy634Tl2EZg79S0Wzl7FGhsh4o349+uFn4mu8Z/AoCJEM+7lUu3TAR5m47
-         WhHQA+xvhOTv3Tn8+Vj5e6CHyLNZOX21+XRlFMBunI/xddBI3lMLNymLf95LidMGezjN
-         0rYvTU7PAuGKUCe5Qq7bNuDlxbeoG5pdvmlSuKA46D+aPz4pL2MW0bKPBMTj7/JdKzag
-         +XmA==
-X-Forwarded-Encrypted: i=1; AJvYcCV1GNh3lavVDGGnUiGlYBq03PjT5S6k7/3KGE9NF9BIIbhNf+xcd9uJrKngQ+h0GWLxaw2Mcus=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlfHILbnzNTbkWMFDfTjFYQom16D9J+Fp3HsGxBSTXk4LozCmD
-	TpURQZWqC0Ev7vh3ZnPa04eo8pcY5Hbvv+uuA7GsM7Gqrc5nr7woETQVpb1UAyS8fQ==
-X-Gm-Gg: ASbGncv5GH6kNmUKgXlJP7FNhGaabCviPlL/R5Hjw5UlET9zoUUTNSh73J5fFgt4Eyy
-	UFq308hi4fHefL+3YETAZ8ABBt+2J9HeCEVBiRCIFjae2+xg5bvtj8Yie+F2uj6GLy5M0EtNG5q
-	lE17GLYitUprqJAd5Uc7h+qVe6VSeyNy0ucvcjLyAteZJb8dLZN/1MdlSJTdD3KRtuuLHb0kaMm
-	ZbEhIL0bAgy7vCogiiHfigwFfEkllYnI3F7dZYaqJg2MTQ/raKKVakZV2wkFQX2jkU5BRvgTrck
-	ot/LbnLsTpBq8BvwoILBpkAwxoBml9s4aeDP+2YozT0thZg5XMuGT+IcZgI9GEsPXPfVHdxEaRT
-	zeaQT0OHwnFzWIBuQuJYaHglFThW/znWEGiclAnvJ+4EUu11/6zhimQqMpflygL5cqOqxSJm7LR
-	9jF4yk6H1IAinswQ+zVypxAGoI7MvvINHtkHQg1a7C
-X-Google-Smtp-Source: AGHT+IEHe9SkuremXkwGFi2FaIb8CUv1fFBjSZogbj5L+apUmO6ApQDbI6nK3Rp0HrvwhEdBUvUfhQ==
-X-Received: by 2002:a05:6300:8812:b0:334:a915:21bf with SMTP id adf61e73a8af0-334a9152202mr32544364637.1.1761259949757;
-        Thu, 23 Oct 2025 15:52:29 -0700 (PDT)
-Received: from [192.168.2.125] (69-172-167-162.cable.teksavvy.com. [69.172.167.162])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b6cf4e318a2sm3140090a12.33.2025.10.23.15.52.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Oct 2025 15:52:29 -0700 (PDT)
-Message-ID: <bcff860e-749b-4911-9eba-41b47c00c305@arista.com>
-Date: Thu, 23 Oct 2025 15:52:28 -0700
+        d=1e100.net; s=20230601; t=1761261474; x=1761866274;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nPr+IHmc+5KcsOV/+l/1yTGitm3LXEpb7d4tT1QpRkA=;
+        b=d87UO3bfSDpXZjrum0//OCYI+J29KIJTQ43kA72YR7W9TxAFHFNfJWc01v1uvb0yCz
+         TqXnLIy1Yx5T5fH+qt44aMP6sarilxrnCQ8F6T23yWi8/s6Efj2PqgTuPXxf97cxs7DE
+         aEa9bv9BKlL/ezTn7A/6FMeLI3cTXZcU+4NEzY/TM2nZK5Rzj65XRW6snAaWKT6vKnFY
+         SxrO1Wg7lO1NLV6H5TH22REh62CCE1FA0KHSZogC3LOOTVqxlPtXofT+KK4NMcaznx9J
+         zS/HF8aDi6cUKF6MRy/Nq+s6VxbyzVTMz1aFLPQ6eXqM7qw93MfC/mAWvZD+DYlCcHKX
+         +jjg==
+X-Forwarded-Encrypted: i=1; AJvYcCXqdWKSdWHUIXo3D5wW5PrirdYxZEuly+1FQzE8CQu1D0tuLirAQ7bWqX3S/d9cejjHgRoD6+4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEHTkRZ7zeDzo6FNXbc1LVMYeI1aVh7BQ6LUsZCgEDhI/2/1ZJ
+	KT1ZADPb1SDmzujcx4AznLpkoCOOY7ZjlfqkiiddmAfntwBIx42Twkiplm/QaL62vjR9VYCJP+0
+	JPCyYyQ==
+X-Google-Smtp-Source: AGHT+IG5XgXdlnpqv2kQWZbN6dVjt0I/XcKJmdB0oc9j3In5M2rF8NmhfNVw1XUDgSvQzOaOuO2CryQn+so=
+X-Received: from plon3.prod.google.com ([2002:a17:903:1a83:b0:293:e4f:e3bc])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d60d:b0:28a:2e51:9272
+ with SMTP id d9443c01a7336-2948ba56877mr1597175ad.48.1761261473737; Thu, 23
+ Oct 2025 16:17:53 -0700 (PDT)
+Date: Thu, 23 Oct 2025 23:16:49 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: TCP sender stuck despite receiving ACKs from the peer
-To: Neal Cardwell <ncardwell@google.com>
-Cc: edumazet@google.com, netdev@vger.kernel.org
-References: <CA+suKw5OhWLJe_7uth4q=qxVpsD4qpwGRENORwA=beNLpiDuwg@mail.gmail.com>
- <CADVnQy=Bm2oNE7Ra7aiA2AQGcMUPjHcmhvQsp+ubvncU2YeN2A@mail.gmail.com>
-Content-Language: en-US
-From: Christoph Schwarz <cschwarz@arista.com>
-In-Reply-To: <CADVnQy=Bm2oNE7Ra7aiA2AQGcMUPjHcmhvQsp+ubvncU2YeN2A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.1.851.g4ebd6896fd-goog
+Message-ID: <20251023231751.4168390-1-kuniyu@google.com>
+Subject: [PATCH v3 net-next 0/8] sctp: Avoid redundant initialisation in
+ sctp_accept() and sctp_do_peeloff().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, linux-sctp@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 10/3/25 18:24, Neal Cardwell wrote:
-[...]
-> Thanks for the report!
-> 
-> A few thoughts:
-> 
-[...]
-> 
-> (2) After that, would it be possible to try this test with a newer
-> kernel? You mentioned this is with kernel version 5.10.165, but that's
-> more than 2.5 years old at this point, and it's possible the bug has
-> been fixed since then.  Could you please try this test with the newest
-> kernel that is available in your distribution? (If you are forced to
-> use 5.10.x on your distribution, note that even with 5.10.x there is
-> v5.10.245, which was released yesterday.)
-> 
-> (3) If this bug is still reproducible with a recent kernel, would it
-> be possible to gather .pcap traces from both client and server,
-> including SYN and SYN/ACK? Sometimes it can be helpful to see the
-> perspective of both ends, especially if there are middleboxes
-> manipulating the packets in some way.
-> 
-> Thanks!
-> 
-> Best regards,
-> neal
+When sctp_accept() and sctp_do_peeloff() allocates a new socket,
+somehow sk_alloc() is used, and the new socket goes through full
+initialisation, but most of the fields are overwritten later.
 
-Hi,
+  1)
+  sctp_accept()
+  |- sctp_v[46]_create_accept_sk()
+  |  |- sk_alloc()
+  |  |- sock_init_data()
+  |  |- sctp_copy_sock()
+  |  `- newsk->sk_prot->init() / sctp_init_sock()
+  |
+  `- sctp_sock_migrate()
+     `- sctp_copy_descendant(newsk, oldsk)
 
-I want to give an update as we made some progress.
+  sock_init_data() initialises struct sock, but many fields are
+  overwritten by sctp_copy_sock(), which inherits fields of struct
+  sock and inet_sock from the parent socket.
 
-We tried with the 6.12.40 kernel, but it was much harder to reproduce 
-and we were not able to do a successful packet capture and reproduction 
-at the same time. So we went back to 5.10.165, added more tracing and 
-eventually figured out how the TCP connection got into the bad state.
+  sctp_init_sock() fully initialises struct sctp_sock, but later
+  sctp_copy_descendant() inherits most fields from the parent's
+  struct sctp_sock by memcpy().
 
-This is a backtrace from the TCP stack calling down to the device driver:
-  => fdev_tx    // ndo_start_xmit hook of a proprietary device driver
-  => dev_hard_start_xmit
-  => sch_direct_xmit
-  => __qdisc_run
-  => __dev_queue_xmit
-  => vlan_dev_hard_start_xmit
-  => dev_hard_start_xmit
-  => __dev_queue_xmit
-  => ip_finish_output2
-  => __ip_queue_xmit
-  => __tcp_transmit_skb
-  => tcp_write_xmit
+  2)
+  sctp_do_peeloff()
+  |- sock_create()
+  |  |
+  |  ...
+  |      |- sk_alloc()
+  |      |- sock_init_data()
+  |  ...
+  |    `- newsk->sk_prot->init() / sctp_init_sock()
+  |
+  |- sctp_copy_sock()
+  `- sctp_sock_migrate()
+     `- sctp_copy_descendant(newsk, oldsk)
 
-tcp_write_xmit sends segments of 65160 bytes. Due to an MSS of 1448, 
-they get broken down into 45 packets of 1448 bytes each. These 45 
-packets eventually reach dev_hard_start_xmit, which is a simple loop 
-forwarding packets one by one. When the problem occurs, we see that 
-dev_hard_start_xmit transmits the initial N packets successfully, but 
-the remaining 45-N ones fail with error code 1. The loop runs to 
-completion and does not break.
+  sock_create() creates a brand new socket, but sctp_copy_sock()
+  and sctp_sock_migrate() overwrite most of the fields.
 
-The error code 1 from dev_hard_start_xmit gets returned through the call 
-stack up to tcp_write_xmit, which treats this as error and breaks its 
-own loop without advancing snd_nxt:
+So, sk_alloc(), sock_init_data(), sctp_copy_sock(), and
+sctp_copy_descendant() can be replaced with a single function
+like sk_clone_lock().
 
-		if (unlikely(tcp_transmit_skb(sk, skb, 1, gfp)))
-			break; // <<< breaks here
+This series does the conversion and removes TODO comment added
+by commit 4a997d49d92ad ("tcp: Save lock_sock() for memcg in
+inet_csk_accept().").
 
-repair:
-		/* Advance the send_head.  This one is sent out.
-		 * This call will increment packets_out.
-		 */
-		tcp_event_new_data_sent(sk, skb);
+Tested accept() and SCTP_SOCKOPT_PEELOFF and both work properly.
 
- From packet captures we can prove that the 45 packets show up on the 
-kernel device on the sender. In addition, the first N of those 45 
-packets show up on the kernel device on the peer. The connection is now 
-in the problem state where the peer is N packets ahead of the sender and 
-the sender thinks that it never those packets, leading to the problem as 
-described in my initial mail.
+  socket(AF_INET, SOCK_STREAM, IPPROTO_SCTP) = 3
+  bind(3, {sa_family=AF_INET, sin_port=htons(0), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+  listen(3, -1)                           = 0
+  getsockname(3, {sa_family=AF_INET, sin_port=htons(49460), sin_addr=inet_addr("127.0.0.1")}, [16]) = 0
+  socket(AF_INET, SOCK_STREAM, IPPROTO_SCTP) = 4
+  connect(4, {sa_family=AF_INET, sin_port=htons(49460), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+  accept(3, NULL, NULL)                   = 5
+  ...
+  socket(AF_INET, SOCK_SEQPACKET, IPPROTO_SCTP) = 3
+  bind(3, {sa_family=AF_INET, sin_port=htons(0), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+  listen(3, -1)                           = 0
+  getsockname(3, {sa_family=AF_INET, sin_port=htons(48240), sin_addr=inet_addr("127.0.0.1")}, [16]) = 0
+  socket(AF_INET, SOCK_SEQPACKET, IPPROTO_SCTP) = 4
+  connect(4, {sa_family=AF_INET, sin_port=htons(48240), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+  getsockopt(3, SOL_SCTP, SCTP_SOCKOPT_PEELOFF, "*\0\0\0\5\0\0\0", [8]) = 5
 
-Furthermore, we noticed that the N-45 missing packets show up as drops 
-on the sender's kernel device:
 
-vlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-         inet 127.2.0.1  netmask 255.255.255.0  broadcast 0.0.0.0
-         [...]
-         TX errors 0  dropped 36 overruns 0  carrier 0  collisions 0
+Changes:
+  v3:
+    * Patch 4: Check if (lock) for bh_unlock_sock(). (Xin Long)
 
-This device is a vlan device stacked on another device like this:
+  v2:
+    * Patch 7: Export __inet_accept()
 
-49: vlan0@parent: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc 
-noqueue state UP mode DEFAULT group default qlen 1000
-     link/ether 02:1c:a7:00:00:01 brd ff:ff:ff:ff:ff:ff
-3: parent: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 10000 qdisc prio state 
-UNKNOWN mode DEFAULT group default qlen 1000
-     link/ether xx:xx:xx:xx:xx:xx brd ff:ff:ff:ff:ff:ff
+  v1: https://lore.kernel.org/netdev/20251021214422.1941691-1-kuniyu@google.com/
 
-Eventually packets need to go through the device driver, which has only 
-a limited number of TX buffers. The driver implements flow control: when 
-it is about to exhaust its buffers, it stops TX by calling 
-netif_stop_queue. Once more buffers become available again, it resumes 
-TX by calling netif_wake_queue. From packet counters we can tell that 
-this is happening frequently.
 
-At this point we suspected "qdisc noqueue" to be a factor, and indeed, 
-after adding a queue to vlan0 the problem no longer happened, although 
-there are still TX drops on the vlan0 device.
+Kuniyuki Iwashima (8):
+  sctp: Defer SCTP_DBG_OBJCNT_DEC() to sctp_destroy_sock().
+  sctp: Don't copy sk_sndbuf and sk_rcvbuf in sctp_sock_migrate().
+  sctp: Don't call sk->sk_prot->init() in sctp_v[46]_create_accept_sk().
+  net: Add sk_clone().
+  sctp: Use sk_clone() in sctp_accept().
+  sctp: Remove sctp_pf.create_accept_sk().
+  sctp: Use sctp_clone_sock() in sctp_do_peeloff().
+  sctp: Remove sctp_copy_sock() and sctp_copy_descendant().
 
-Missing queue or not, we think there is a disconnect between the device 
-driver API and the TCP stack. The device driver API only allows 
-transmitting packets one by one (ndo_start_xmit). The TCP stack operates 
-on larger segments that is breaks down into smaller pieces 
-(tcp_write_xmit / __tcp_transmit_skb). This can lead to a classic "short 
-write" condition which the network stack doesn't seem to handle well in 
-all cases.
+ include/net/inet_sock.h    |   8 --
+ include/net/sctp/sctp.h    |   3 +-
+ include/net/sctp/structs.h |   3 -
+ include/net/sock.h         |   7 +-
+ net/core/sock.c            |  24 +++--
+ net/ipv4/af_inet.c         |   5 +-
+ net/sctp/ipv6.c            |  51 ---------
+ net/sctp/protocol.c        |  33 ------
+ net/sctp/socket.c          | 209 +++++++++++++++++--------------------
+ 9 files changed, 118 insertions(+), 225 deletions(-)
 
-Appreciate you comments,
-Chris
+-- 
+2.51.1.851.g4ebd6896fd-goog
 
 
