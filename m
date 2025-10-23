@@ -1,60 +1,65 @@
-Return-Path: <netdev+bounces-231944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA431BFECDE
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 03:04:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1A94BFED11
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 03:13:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DAFD84ED77F
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 01:04:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A174519A0134
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 01:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1DA1DFDA1;
-	Thu, 23 Oct 2025 01:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4661A9FB3;
+	Thu, 23 Oct 2025 01:13:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oUWeDzHp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t90ryWUD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F31017A305;
-	Thu, 23 Oct 2025 01:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4E217A305;
+	Thu, 23 Oct 2025 01:13:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761181269; cv=none; b=qFKXDRpTolvKAGI9HjtgEAgi7syJakxUWyHofMBC1p449DCTyl51xjHmtQBrLnU1kOT5Qt2VVPWP4PU5gGkJvoCZ/vZiTiM4vGJO2vn+WkSA0XiWNMhMoW2t+Gvwmy+zj0uxFS6AFmOEGkCMUu24a4BbKoHfqEpvWdXnJEMg6lY=
+	t=1761181986; cv=none; b=mBdLdQjzA0CHYI5wBnzAyNJE4Th6R//5d8yfsuLKQ6ua/k2Ak1mSPG/r2r/hZyDuEZsvuFvoohwGqjkPuYWLrXZHvP0Cp2BrHLGH1ZWlZLlBanzPozjtxAdQkC117k/Wr4sSMOoEfx9nCR9Ry9mLRYLORm43SS244UTASVug07g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761181269; c=relaxed/simple;
-	bh=XEkbu0iGLWOG7wCG5SIbdJ9Qe5+uq0vSYOn5vxQGxNI=;
+	s=arc-20240116; t=1761181986; c=relaxed/simple;
+	bh=jd2RQXnIrWi/0UPAGodHVow/J7/N5lZwqIISJWkzUls=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MG0hH1ayfbC7hNwNRYPik3akH+YhEcHlUrhZgM8HEwL2in2KPiNjj68gErJAQfF4C0IqAoidjNlxCQcKseuGCuL63X0f73mgtWSFVpZLDvfP1q9l6RWM0Z5WmpyizyktmPgOpEybuYi9oMUMMcIkVnHWGbsJCUfzbUTBKMBYHNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oUWeDzHp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F493C4CEE7;
-	Thu, 23 Oct 2025 01:01:08 +0000 (UTC)
+	 MIME-Version:Content-Type; b=brdoRNgll7z/nk5p+N/zgEDr0e4hFD1YX0SXH4IL5xFRcZIWELY0gGkSju9mRJAcSlPJYAb3CVqWhDQA3EcxFZ3heo1M3lymgPI4d+vhBTuFr6G+Hnaq/43mWZSlj5E+X1AGp7ectFjoZ7v5mgt3hnm02Z1YkURk1dVnHIisdXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t90ryWUD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9C58C4CEE7;
+	Thu, 23 Oct 2025 01:13:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761181268;
-	bh=XEkbu0iGLWOG7wCG5SIbdJ9Qe5+uq0vSYOn5vxQGxNI=;
+	s=k20201202; t=1761181985;
+	bh=jd2RQXnIrWi/0UPAGodHVow/J7/N5lZwqIISJWkzUls=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oUWeDzHpxUTpzQ2ye7AiBrr1U37kZOrT5mdYG0LeJ6MtZgxmDck6j5XJe7mnhTow7
-	 mUfHCxy6/AIRXOCNmKwUSEBkl3khYIIc2SyVcgVQOGexgSpuT8j3N701PNS+YRgvJ3
-	 i2b6ixBCbLd2mda/qUTmF0HBRDr/6m94tAKnQu7wqM5ve/kVxxVoF3YIL43sURoyL5
-	 GWLoFxJLyOx44/PD4ZVJZzYs3SZb/oaBoNqvnZuD8ShifNT702BScRq0Au01SWNYaJ
-	 A1bqTaVVFw9EvgOpyyLGyf/wj1Jn9uQWqO5nhwthKtoligOtaIq620ksXNYpcrloSN
-	 n4i08u5cE27qw==
-Date: Wed, 22 Oct 2025 18:01:07 -0700
+	b=t90ryWUDFgo0LESriCzY7nJDdQkw1zsv4O+AOoHLLyx+eNhQZiLYiuYFR16M3dZSZ
+	 xHWZEt/YY/MjnJ0xypJHjpyvGI5ao9PNccPkLtu73sx2Yzpm5Va4L0Z6w6oGdrdNcy
+	 Q9xGS5hpWKo40CDJG6ivcVrmgYb4/bLZeZu7MlrrYHJtnwu2crV7PC1fOJWQ8c0o69
+	 peOmPLZl/qvzKCBxm9khXMC8xTl9jd/2C7K3ZvblIlckjgmwKLJ3HCJtsacjB43Ahp
+	 iy3Y1sGPD64qBJJIXSI+2xXhFwNOg0ViN8+gf1pDI+/yhesx6dZ6J5Vqwv3S8UwzLJ
+	 KFWp/A9WPn+Kg==
+Date: Wed, 22 Oct 2025 18:13:03 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Gustavo Luiz Duarte <gustavold@gmail.com>
-Cc: Andre Carvalho <asantostc@gmail.com>, Simon Horman <horms@kernel.org>,
- Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Matthew Wood
- <thepacketgeek@gmail.com>, Shuah Khan <shuah@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net v2 0/2] netconsole: Fix userdata race condition
-Message-ID: <20251022180107.3a7d1198@kernel.org>
-In-Reply-To: <20251022-netconsole-fix-race-v2-0-337241338079@meta.com>
-References: <20251022-netconsole-fix-race-v2-0-337241338079@meta.com>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: Niklas =?UTF-8?B?U8O2ZGVybHVuZA==?= <niklas.soderlund@ragnatech.se>,
+ Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Geert Uytterhoeven <geert+renesas@glider.be>,
+ Mitsuhiro Kimura <mitsuhiro.kimura.kc@renesas.com>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, Biju Das
+ <biju.das.jz@bp.renesas.com>, Fabrizio Castro
+ <fabrizio.castro.jz@renesas.com>, Lad Prabhakar
+ <prabhakar.mahadev-lad.rj@bp.renesas.com>, stable@vger.kernel.org, Niklas
+ =?UTF-8?B?U8O2ZGVybHVuZA==?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: Re: [PATCH v2 1/4] net: ravb: Make DBAT entry count configurable
+ per-SoC
+Message-ID: <20251022181303.3dc4f41c@kernel.org>
+In-Reply-To: <20251017151830.171062-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+References: <20251017151830.171062-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	<20251017151830.171062-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,40 +69,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 22 Oct 2025 10:39:56 -0700 Gustavo Luiz Duarte wrote:
-> This series fixes a race condition in netconsole's userdata handling
-> where concurrent message transmission could read partially updated
-> userdata fields, resulting in corrupted netconsole output.
+On Fri, 17 Oct 2025 16:18:27 +0100 Prabhakar wrote:
+> The number of CDARq (Current Descriptor Address Register) registers is not
+> fixed to 22 across all SoC variants. For example, the GBETH implementation
+> uses only two entries. Hardcoding the value leads to incorrect resource
+> allocation on such platforms.
+
+What is the user-visible problem? "Incorrect resource allocation" could
+mean anything from slight waste of system memory to the device falling
+over.
+
+If it's the former this is not a fix..
+
+> Pass the DBAT entry count through the per-SoC hardware info struct and use
+> it during probe instead of relying on a fixed constant. This ensures
+> correct descriptor table sizing and initialization across different SoCs.
 > 
-> The first patch adds a selftest that reproduces the race condition by
-> continuously sending messages while rapidly changing userdata values,
-> detecting any torn reads in the output.
-> 
-> The second patch fixes the issue by ensuring update_userdata() holds
-> the target_list_lock while updating both extradata_complete and
-> userdata_length, preventing readers from seeing inconsistent state.
-> 
-> This targets net tree as it fixes a bug introduced in commit df03f830d099
-> ("net: netconsole: cache userdata formatted string in netconsole_target").
-
-This test is skipping on debug kernel builds in netdev CI.
-
-TAP version 13
-1..1
-# overriding timeout to 360
-# selftests: drivers/net: netcons_race_userdata.sh
-# socat died before we could check 10000 messages. Skipping test.
-ok 1 selftests: drivers/net: netcons_race_userdata.sh # SKIP
-
-We can't have skips for SW tests.
-
-I think Breno was fighting with a similar problem in the past.
-Not sure what he ended up doing. Maybe just leave it at the print?
-Don't actually mark the test as skipped?
-
-Slightly more advanced option is to only do that if KSFT_MACHINE_SLOW
-per:
-https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style#dealing-with-slow-runners-in-performancelatency-tests
--- 
-pw-bot: cr
+> Fixes: feab85c7ccea ("ravb: Add support for RZ/G2L SoC")
+> Cc: stable@vger.kernel.org
 
