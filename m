@@ -1,106 +1,153 @@
-Return-Path: <netdev+bounces-232215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D634C02CB1
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 19:50:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AE26C02D8B
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 20:06:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 09C1B4F20B9
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:50:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ECB33A8DAD
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 18:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D5D4322C98;
-	Thu, 23 Oct 2025 17:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B959834B1A9;
+	Thu, 23 Oct 2025 18:06:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JQzubiDz"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="wmYAcSpf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCEEA30B519
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 17:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5575236453;
+	Thu, 23 Oct 2025 18:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761241811; cv=none; b=jBrOymqqYJXycoigumA/OaHXZBw0gBmO/DcmWJeV7+7UDYVWHC+5jL0DvBDAXf8sZx1EfwhucepKlLfEg293MGiGxzzLxZ9/aXtAJ5IcqtZln60EHp3/o9Wf3ItZmvqKidjrpu0lOO/CPTI9pi5Cdc2IN1/BiaedQpjbO4yi+0Q=
+	t=1761242773; cv=none; b=nqGWtTNlmyJHlCtKHobTbLLNoDWHpwRclDYnQ+KMyJ68rtUYdPZyBC7KBxoGFOZujnV1qNaRRVYyBBR+LTXKSDh0UDj9sRe143BZi9K2DDnWoCTK2idrqaNiPpcqua55fKFZGRFhK/vZ/XDUVAbvsV/vZazTWDlktbggBKfQ2G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761241811; c=relaxed/simple;
-	bh=rmrFSVUHVZINnn18mE9h8LqSYST7xKMxaZNupWgxrjM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k9rZsblk0Ob09isy1d99lQfSMheypaH2P353NErOxzvEL52MgCztVZsZ7k9rSyOEPATTeiqq/tt9Q2llTGErVpHV4pyDvvFzZoHU710qLfLF52ZIQtaXYD6V4jULvTaQ3FGz6VoUDYrSgZ44o/VLJJ7srzaLayqS37mDS4V1V/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JQzubiDz; arc=none smtp.client-ip=209.85.217.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-5db308cddf0so983771137.3
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 10:50:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761241809; x=1761846609; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rmrFSVUHVZINnn18mE9h8LqSYST7xKMxaZNupWgxrjM=;
-        b=JQzubiDzmbNqDV95lZrTIg0yptiLGpTeX6V4I9YJxmaCMp2E0ScVVrmK3VOj33J4gd
-         EARbc4fNIgtpmI2H3/h87upSkmLx6YVmyIemn/eXusXQEs/KzvrO1l6h5bFR06A6u7kx
-         Xv9nDKoJnfDfsWrhJlY08sVfkhFA/KWz7fna29L0X4dVP9MeQV2coonVBN56DMDpqCN2
-         nG2OG/II5c5bMmEPXY+AM1xZc91aHXw0BNcdzrlxuwdxa1Y28ScuHds8rfdX7o6BUIvR
-         GTWj5vkcE3fbr9ok/68a3VDU9Zmrsx4R9RNtNqlYW1kiaRmcoGJxTeWwDMNuof9gOTOt
-         g87g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761241809; x=1761846609;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rmrFSVUHVZINnn18mE9h8LqSYST7xKMxaZNupWgxrjM=;
-        b=DrwmtXQX00PS6atWwNm/5kU6VKzpHvbKCPnwIoS+ZFDXOhxzccpx466/Ed6X4YCyl4
-         9HZE5eEfPqnl+VgVbSt16IL5Q7EUxj1kLSNrn6NjBqOvf1//dD3IQzWCsIw/7kumJEUS
-         ueTjvAiSMVHthIdmU9o+o9JshcxxV//25ENx1+MuO6hol+Nh88mQYWE1Af+5bySArmk5
-         fH/I+YBU2B0UtC3NGKapGAl+32MGmHLVjFRoCxOYo02yE7W7wNHod4vMQsuodqZMY17w
-         I8AJH4TcoXzbPgH7/5TwGOZ+l60Cb/aXeYtc5aePwLxqf54Af0FQLqhBG1VhWVPtlR3r
-         9Wtw==
-X-Forwarded-Encrypted: i=1; AJvYcCUi4jkPVAuQMAi+rpjpsBo6B/eYzTEzfCdfzr7DVSwkCMkXX2tmioDka2oSZgijUxMhZV3z3sM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwV5443nW+XzmfdKm5HDS2fAoEDyaIVJgEnQwjVqK+zdYuH72vA
-	wZ4HKWgf38FPMymMW0LAZF510svqXD8Pxs0O3+Kd4atTBRzL0U4Ytxi3lxmFuen8ombRoK1s5Z2
-	vG/M391s1VlL0xf1lJrSVWRTBhnbgz5s=
-X-Gm-Gg: ASbGncvq5H4nCesIlgRLxHFpyQFVMlO5K+bw3pCf87s11hOo/xsk+b7G8lRhgm3vIrp
-	1FNBXBOCNmyu6AWLVQt8LDYaqjh8ko1lFzdvnUkg8wy2GxFdwmjz1dp3G/bnDPAwD4uQbP3lLx6
-	9i1+ltygn+uHOA4emdpPtajaFyG7QViROxa4ldLguvK1w09C8jw1kYTcc8/rPZh5Apl2mq1wwDz
-	FkwDL77ce1Bvxa7ztxjsS1tkNnhKyRxOPUtF/7ceacE/+2p1X1Bk/3oZ9WK693X4++k2lG7XLFD
-	NeRLGvSdJimXArFBVqEmdlyNiXKHHPdqFOBESjiv
-X-Google-Smtp-Source: AGHT+IHpRyuoav5lJWR6O5jHg57c85VAu9Fw0WMge5AnlPcPoxSh3EP98NNnI6EblMA4ody0QL3Q+Pm2+edFZxbqWC8=
-X-Received: by 2002:a05:6102:5cc6:b0:5db:28ef:3dfb with SMTP id
- ada2fe7eead31-5db28ef4bb5mr2325429137.34.1761241808691; Thu, 23 Oct 2025
- 10:50:08 -0700 (PDT)
+	s=arc-20240116; t=1761242773; c=relaxed/simple;
+	bh=4WS7V+Ar3ZrEzSEP6kk+SJ2RfPh6RA/fmr4gByf8A6Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sXAqDGIFAB4y5dJj7cumd2uU2QwLxv0AAh0mPf7CaGaL7kVxTwY6Q8bKySnHV82bLRROKLqnExbaAqvVd1iuXCQEvOcv6fjBi5gu5odkyzqO0HUxA54sVieQ91v0YyrO9ahSvqHaTIxM2o1adUNTxU/2BYFE1Z5V/XR8Rl15IRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=wmYAcSpf; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=EwqNedB3On+EgqMf/8gkT0TjnyfVJmQtvxMJOxXoqZc=; t=1761242771; x=1762452371; 
+	b=wmYAcSpfVZaRsbZUxuw7UpFUWi4/Yfqv1MTGW3sz7Kizngude5z9xWqXABXCoWQrhXYdyJP0Wkr
+	/p0bMZ6Snlqjna0NWPcoQNkmsexEqfWSrEtoAD7Hjz/1i/W+0Jab7de2XkNxNuRjc33crKhFvO+Xq
+	9goCaa95cK7qOcB5mwjebJkOhh5VgjCAZP6NgBQpO+z97PtrmAYIXroZTpnsrFRj6XTkgV4cZ4Jdv
+	JRfjaA99BFkumdXorfET+nnl8dXOfQct/49uMpFBwLbbDjVs6TJRmtEuBJeoHMOQNWmU6gvot4VdB
+	uWvspgpnecrFLRgsg8XxKN2a9inhSI9YzfDA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vBzhQ-00000000UqB-18uc;
+	Thu, 23 Oct 2025 20:06:08 +0200
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-2025-10-23
+Date: Thu, 23 Oct 2025 20:05:04 +0200
+Message-ID: <20251023180604.626946-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CADvbK_c2zqQ76kzPmTovWqpRdN2ad7duHsCs9fW9oVNCLdd-Xw@mail.gmail.com>
- <20251023173801.11428-1-vnranganath.20@gmail.com>
-In-Reply-To: <20251023173801.11428-1-vnranganath.20@gmail.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 23 Oct 2025 13:49:55 -0400
-X-Gm-Features: AWmQ_bkWcF1bKMfuE_JeO2G03ig-UJSmO2Qz1WYBH2Xg-mAv7cSejiDOLi0AucQ
-Message-ID: <CADvbK_dJpnjZS_UjoM-D6xRhdhq_uH0FBBbr6tN_7qKih-7zKg@mail.gmail.com>
-Subject: Re: [PATCH] net: sctp: fix KMSAN uninit-value in sctp_inq_pop
-To: Ranganath V N <vnranganath.20@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	marcelo.leitner@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzbot+d101e12bccd4095460e7@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-malware-bazaar: not-scanned
 
-On Thu, Oct 23, 2025 at 1:38=E2=80=AFPM Ranganath V N <vnranganath.20@gmail=
-.com> wrote:
->
-> Hi Xin,
->
-> Thank you for the feedback and response to the patch.
-> I would like to know that above analysis is valid or not.
-> And do you want me to test this suggestion with the syzbot?
->
-Yes, if it's possible.
+Hi,
+
+Sorry, I meant to send this earlier, but ... I guess other
+things happened. Luckily none of the below seems really all
+that urgent, most issues have been around for a while and
+I'm not currently aware of anyone being affected too badly.
+
+Please pull and let us know if there's any problem.
+
+Thanks,
+johannes
+
+
+
+The following changes since commit 634ec1fc7982efeeeeed4a7688b0004827b43a21:
+
+  Merge tag 'net-6.18-rc2' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-10-16 09:41:21 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2025-10-23
+
+for you to fetch changes up to 69e4b75a5b90ef74300c283c0aafe8d41daf13a8:
+
+  Merge tag 'iwlwifi-fixes-2025-10-19' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next (2025-10-20 13:58:10 +0200)
+
+----------------------------------------------------------------
+First set of fixes:
+ - brcmfmac: long-standing crash when used w/o P2P
+ - iwlwifi: fix for a use-after-free bug
+ - mac80211: key tailroom accounting bug could leave
+             allocation overhead and cause a warning
+ - ath11k: add a missing platform,
+           fix key flag operations
+ - bcma: skip devices disabled in OF/DT
+ - various (potential) memory leaks
+
+----------------------------------------------------------------
+Aloka Dixit (1):
+      wifi: mac80211: reset FILS discovery and unsol probe resp intervals
+
+Dan Carpenter (1):
+      wifi: iwlwifi: fix potential use after free in iwl_mld_remove_link()
+
+Dr. David Alan Gilbert (1):
+      MAINTAINERS: wcn36xx: Add linux-wireless list
+
+Emmanuel Grumbach (1):
+      wifi: nl80211: call kfree without a NULL check
+
+Gokul Sivakumar (1):
+      wifi: brcmfmac: fix crash while sending Action Frames in standalone AP Mode
+
+Johannes Berg (3):
+      Merge tag 'ath-current-20251006' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
+      wifi: mac80211: fix key tailroom accounting leak
+      Merge tag 'iwlwifi-fixes-2025-10-19' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
+
+Karthik M (1):
+      wifi: ath12k: free skb during idr cleanup callback
+
+Loic Poulain (1):
+      wifi: ath10k: Fix memory leak on unsupported WMI command
+
+Mark Pearson (1):
+      wifi: ath11k: Add missing platform IDs for quirk table
+
+Rafał Miłecki (1):
+      bcma: don't register devices disabled in OF
+
+Rameshkumar Sundaram (1):
+      wifi: ath11k: avoid bit operation on key flags
+
+ MAINTAINERS                                        |  1 +
+ drivers/bcma/main.c                                |  6 +++
+ drivers/net/wireless/ath/ath10k/wmi.c              |  1 +
+ drivers/net/wireless/ath/ath11k/core.c             | 54 +++++++++++++++++++---
+ drivers/net/wireless/ath/ath11k/mac.c              | 10 ++--
+ drivers/net/wireless/ath/ath12k/mac.c              | 34 +++++++-------
+ .../broadcom/brcm80211/brcmfmac/cfg80211.c         |  3 +-
+ .../net/wireless/broadcom/brcm80211/brcmfmac/p2p.c | 28 ++++-------
+ .../net/wireless/broadcom/brcm80211/brcmfmac/p2p.h |  3 +-
+ drivers/net/wireless/intel/iwlwifi/mld/link.c      |  5 +-
+ net/mac80211/cfg.c                                 |  3 ++
+ net/mac80211/key.c                                 | 11 +++--
+ net/wireless/nl80211.c                             |  3 +-
+ 13 files changed, 106 insertions(+), 56 deletions(-)
 
