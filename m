@@ -1,262 +1,117 @@
-Return-Path: <netdev+bounces-232096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0F90C00ED0
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 13:56:23 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9C27C00FC5
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:08:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 26A9E5020AF
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 11:56:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7E28E4E41AB
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 12:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57DE30EF87;
-	Thu, 23 Oct 2025 11:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E9830EF7E;
+	Thu, 23 Oct 2025 12:06:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Uc55ETVX"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="P8RhfIsj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2C63043C0
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 11:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6762F6592
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 12:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761220556; cv=none; b=LAn8TscVrphLSpc333wdVkRCQBEXu1G6J1G/AJAPdIPtYrRA3q1H+CXmqeP+Jmm+Y0iD27inWaZ8QeR8hfREVSCiRChzilunYDcIgCbxdfjEBUQmJE5eEzR2bm1Yym0/o0VhO8PXRdv/ye+QsndjpUUJLbmycRX2mEGLL+OJPHk=
+	t=1761221191; cv=none; b=SBvveh+oXxkjPHRpLqAJp3uSRNhrXYF1ppF4c1DZyoGDHQeCA+ejTEIE3j+deC3RTJGlhh/sMIA00aCjCDnwkbZz8rPfF685sztCNkZA4BhSAngqCBspumPAxE32vpnp+PQmss1MaN7g8iasxsFwqdg/OAqA38s6ZhFsI88C3SI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761220556; c=relaxed/simple;
-	bh=azviEF2Y9DsjLGlZO8zdXXKHk7bppBImzg31itZmqpY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=epjjw9GKV7eiKOBTzyyJsc04ACe/qjup65VgbgAqncaqqjtLzUBFBHKTVM4mjvcUYa8ObWUUbv1u+9QGvEcToPyPkyyzcpqsu51IugS0xGbnx70EoffunFE48vMGsZ8gxe/iM/vFReis6Iwf64EvqfBUQnnAG4ioPYGL0EPefsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Uc55ETVX; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b3e9d633b78so80406166b.1
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 04:55:54 -0700 (PDT)
+	s=arc-20240116; t=1761221191; c=relaxed/simple;
+	bh=hPmHx44aw4/MuCBOKepCAb/VY50gLeqy+XS/PsI9ph8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sOSbFVkFRtq+x9HvwBVBzc7gKObfJgPQDvodyn8PFPndpIpAlwKUISkqlL32p+54tdyzbX8HlnsIGPV3+9EmzSo86wExkAiojXxK7A+ymrOp4QiS6Z6dwSDSQXw7IrPTf0iemC20NZZVsOtugv+K3dReGUSZQx6J1ZHsM9lNnLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=P8RhfIsj; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47117e75258so5634785e9.2
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 05:06:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1761220553; x=1761825353; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SfSzc8kJaozUiCooo0tA6ZYtUG0roletvLtB9N7dv/Q=;
-        b=Uc55ETVXKsRvMNmqiEV7evJnAWjyLlua4LNaEGxMQ0Z+ZPXjiP+xwrjeiBov3Pp8XF
-         C2V1X+QLMGKqk+Zdqb+JD/2poTt20J24rpchxTkCfPuXwe8TUDaHiRqV6A5ciTaja6Wl
-         rgLNa4vl80a0BI6FdWtuJiVMF+Qm4c48fMSG40TyiiW4v13WedpD4BR75XdeEEu2YP/z
-         b5bS5hilKBblTyiAnrejPIzvFgxbSI+UvSBPLhDP3TLtEErfonhoQw3K8rNk5vv8yc4v
-         5j2k2CmA6aiAeaoblISN5/c/zPz5sYmhqic5sJZqyX80RB72SrE76g9O4vEuququSIrN
-         n+oA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1761221186; x=1761825986; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hPmHx44aw4/MuCBOKepCAb/VY50gLeqy+XS/PsI9ph8=;
+        b=P8RhfIsj0p0g1inRzb0CHeZCIC0xKrgqfTOrVKXHw5Pv8+8h32FzMbr2bXFk58R7Xj
+         prfZ2xlXPq6gASSCpYjlNGRSf7azr9n17tL2LYJM3lrztF9hXPpG9yff54ze3lzzc5k8
+         cCQnfWaa3hvBjqMNgzpAXc0cG4vZvJi3rfQ2TvANqYorRWPbpP4uIbDcdRGlf65fwRwV
+         hk0qJwxaZRJa7yJyhpcbsONbDZ1p6DaHMVaS6vF9n+cfJKmXG15Wy6t6GgnR+JXazrYm
+         dOzTe+65NAFB/xnQT+RJNm6n+GzLYMqhd8QizpQNoljCrFglUZKFKHggDbCxgGWRmGAL
+         /4vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761220553; x=1761825353;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SfSzc8kJaozUiCooo0tA6ZYtUG0roletvLtB9N7dv/Q=;
-        b=hJvX6sL2VeTenhRgOHwuuXqj1L27cnM2BGiFIkLprZbhqVzbj87EXjkbcy9vRoymZI
-         C6Xj4thwhxKYHuJ9o7PHnz9PVKOhr6FIoIux78NMU1VKdsIu6iIC9foU2tMRGflBybuO
-         xtipYvJG7u/PoYwoFDEsP1OBqblxZHtkM7uJ2GgvBaPWBEkBOSqdOeGy1ILeX5+sfgb1
-         HpXlfNyeYMhNNRMzf1oWMCmYYkuHlEtWSIvmQK6EXlPoNTiL77d1IbqWwJC6WtTZFy8f
-         AgrN7BIWivcYaYwiaZ7vGVVm5/16Z+44R9xxTGpLtJWXMiGvayytAnIoV5AuJ6FGc+JM
-         C0XA==
-X-Forwarded-Encrypted: i=1; AJvYcCXMlYVzwuC6RNsilShiAxqDLKnSpUQEUQcniOJDyCgj8B/CjexcAu6XVB4zrdvVoEwF/xabH+0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHob5pVBqhaDO8M9bcCbrDZTls243fH9Mb1egjDYLEIM8KRT+Q
-	LbofqwQ3MYZaZcngWGzwErIHwKT47GOs3sZ6l++m2DRMwOBKB+HMtTBO0tdVXTF0wr0=
-X-Gm-Gg: ASbGnctDsMQujyj5HJimDKDAyuawdQqkfbG66+7ScOTuNujx5XZDhdoaaKMnGBgv/7W
-	XTV2Kc4FB5TXmYpNiCCBuK6UEOW7Vn0MI0DWl210X7rxS5uS8dHTmoo9RJs/VvvqWYie+rYzzmq
-	ctk1pxp1lDbSFBEKc95UNy7QTSJ984oO2W0lxRV3MU0ANX53LL04pMP37S3EKQ16uTK9jnEkLIm
-	oqpJBTMmieW98q0cs/p3P69xZpLdqmckg7WA3uPnnP8LFY9w6n84hK4H9JiwGZeMM+szVX9uFIQ
-	4bC30Jkjg/Yod+Nplhbcsitz2EREONHSQBvxQauJriRtQ8R9jPdaz6oh3nECYmypOCd/ndMGLN4
-	pC50ELnxdoJnlwZscgNKaElrNSBCP9sOtmXjg0tdaOO6LQ+1oX87QEPKhcV6eOCZVskFp
-X-Google-Smtp-Source: AGHT+IEI3LwYTd9zFcd/viEBkli7RyXBE4AUj66P9/ZXp+kyUrGJGoB9rBxYKTCx1VJkF4vIwOM3HA==
-X-Received: by 2002:a17:907:7f19:b0:afa:1d2c:bbd1 with SMTP id a640c23a62f3a-b6d2c79fd9emr844385366b.30.1761220553164;
-        Thu, 23 Oct 2025 04:55:53 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:7f])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d511f7027sm223524166b.25.2025.10.23.04.55.52
+        d=1e100.net; s=20230601; t=1761221186; x=1761825986;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hPmHx44aw4/MuCBOKepCAb/VY50gLeqy+XS/PsI9ph8=;
+        b=MbKDh4IyhkDNhEph98sSHnjq2PIZdqcNzj8F+Mg1hOHrIhHDCBJZHe7aE2RNM7prQh
+         qh5LMo/veNf8JafzZpts6Burq1e+huGOJ9Bfz+G3VpSM4i1tP5s6qdrMyyuyVeMFrCUb
+         QTGhowcx3+VtPMNVVFluX4ghfldfCEYMo3KgKHGfW4z3XRwe/iIf1sHBIs4F7A6LMErj
+         ezotIuKE8TYjM0ggUKrVX4Qx1ohyKTAM3xfvliaM4lG6ctK0mY5eCoZhbWUuaKI44wdF
+         EWdYR8EPQ73bvWYigj2GrPAlz7OsP9RJxgQ3P5A3T4iGO1W/RLs19avxU35kZ9xYICUJ
+         3yZA==
+X-Gm-Message-State: AOJu0Yxg+SC2LJIML1XmCCTYG/qmNfxHemrwcYqCPRwdYV+OYC98ZYmj
+	DQQChUNR5BqHfMRXj/cCB+SpnrTdnuk3SVmZoXOGiArPhKKDbkEqaX9Br7+a1DY43VoNE6hvtYN
+	aBHEPYRo=
+X-Gm-Gg: ASbGncs9lg/Zec2QajkEt+CZPREA6lSJibP1hJ9prSSpEWYkls9Cdlfs1YlqDWsC3HE
+	kU2vf00x5Z74AQJPQtYtLYo5+PqzO/6aDkNiXipqAjfM6oqO4q1cps9BJhspdkLJ0K1WhM7TBw6
+	EGxyqcJcxywb4Nz2Aiq1ZGoTCufEQsBURYLBRIGore20f0fUNInuYJ7gbN7E5JXy3NS2vW/4V1Y
+	mIDRlHKsqq4/UypkQiWmfpgXg+85fASAIPTvjL4gaHHvu8I0MviVDb9vW9rDVCSKf6Ns0/xNdnp
+	3lWMg+b2lSn75ppGMi8qz8yebhmNksH1EiOsz+p4edx7uhU5uPZBt9zwj4WoTvdpX+q580h4XTd
+	tl7mfJAGZbITnIdPS8qvbMGZ3Z4Fo0+RJi8p2XyaoGL1QFdicLco0nT3zZKs2vtd44zLiOSPPIV
+	TbDFfT2CIjyt7nMZP6/Ps159E3UXdqDU6kGYQmxQ==
+X-Google-Smtp-Source: AGHT+IE/ZFB/FkNtSsSj/a9XHSfYqDn/p+RkIpv2w7TjfbTtfe4lhoS+DxKWsp5VKtASQ4PM1AB2SQ==
+X-Received: by 2002:a05:600c:4e45:b0:471:786:94d3 with SMTP id 5b1f17b1804b1-475cb02faa5mr15127305e9.22.1761221186248;
+        Thu, 23 Oct 2025 05:06:26 -0700 (PDT)
+Received: from jiri-mlt.client.nvidia.com ([140.209.217.211])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475cae9253bsm32727225e9.1.2025.10.23.05.06.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Oct 2025 04:55:52 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,  Daniel Borkmann
- <daniel@iogearbox.net>,  John Fastabend <john.fastabend@gmail.com>,
-  Stanislav Fomichev <sdf@fomichev.me>,  Alexei Starovoitov
- <ast@kernel.org>,  Andrii Nakryiko <andrii@kernel.org>,  Eduard Zingerman
- <eddyz87@gmail.com>,  Song Liu <song@kernel.org>,  Yonghong Song
- <yonghong.song@linux.dev>,  KP Singh <kpsingh@kernel.org>,  Hao Luo
- <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Arthur Fabre
- <arthur@arthurfabre.com>,  bpf@vger.kernel.org,  netdev@vger.kernel.org,
-  kernel-team@cloudflare.com
-Subject: Re: [PATCH bpf-next v2 11/15] selftests/bpf: Expect unclone to
- preserve skb metadata
-In-Reply-To: <2753c96b-48f9-480e-923c-60d2c20ebb03@linux.dev> (Martin KaFai
-	Lau's message of "Wed, 22 Oct 2025 16:12:39 -0700")
-References: <20251019-skb-meta-rx-path-v2-0-f9a58f3eb6d6@cloudflare.com>
-	<20251019-skb-meta-rx-path-v2-11-f9a58f3eb6d6@cloudflare.com>
-	<2753c96b-48f9-480e-923c-60d2c20ebb03@linux.dev>
-Date: Thu, 23 Oct 2025 13:55:51 +0200
-Message-ID: <87ms5hvnlk.fsf@cloudflare.com>
+        Thu, 23 Oct 2025 05:06:25 -0700 (PDT)
+Date: Thu, 23 Oct 2025 14:06:19 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>
+Subject: Re: [PATCH iproute2] devlink: fix devlink flash error reporting
+Message-ID: <m36eg2tmmnqnu7yznbn5jdlqxsxxgwknv2vnc4bpfc36q6zopw@macasn5cvvrh>
+References: <20251022122302.71766-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251022122302.71766-1-ivecera@redhat.com>
 
-On Wed, Oct 22, 2025 at 04:12 PM -07, Martin KaFai Lau wrote:
-> On 10/19/25 5:45 AM, Jakub Sitnicki wrote:
->> @@ -447,12 +448,14 @@ int clone_dynptr_empty_on_meta_slice_write(struct __sk_buff *ctx)
->>     /*
->>    * Check that skb_meta dynptr is read-only before prog writes to packet payload
->> - * using dynptr_write helper. Applies only to cloned skbs.
->> + * using dynptr_write helper, and becomes read-write afterwards. Applies only to
->> + * cloned skbs.
->>    */
->>   SEC("tc")
->> -int clone_dynptr_rdonly_before_data_dynptr_write(struct __sk_buff *ctx)
->> +int clone_dynptr_rdonly_before_data_dynptr_write_then_rw(struct __sk_buff *ctx)
->>   {
->>   	struct bpf_dynptr data, meta;
->> +	__u8 meta_have[META_SIZE];
->>   	const struct ethhdr *eth;
->>     	bpf_dynptr_from_skb(ctx, 0, &data);
->> @@ -465,15 +468,23 @@ int clone_dynptr_rdonly_before_data_dynptr_write(struct __sk_buff *ctx)
->>     	/* Expect read-only metadata before unclone */
->>   	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
->> -	if (!bpf_dynptr_is_rdonly(&meta) || bpf_dynptr_size(&meta) != META_SIZE)
->> +	if (!bpf_dynptr_is_rdonly(&meta))
+Wed, Oct 22, 2025 at 02:23:02PM +0200, ivecera@redhat.com wrote:
+>Currently, devlink silently exits when a non-existent device is specified
+>for flashing or when the user lacks sufficient permissions. This makes it
+>hard to diagnose the problem.
 >
-> Can the bpf_dynptr_set_rdonly() be lifted from the bpf_dynptr_from_skb_meta()?
+>Print an appropriate error message in these cases to improve user feedback.
 >
-> iiuc, the remaining thing left should be handling a cloned skb in
-> __bpf_dynptr_write()? The __bpf_skb_store_bytes() is using
-> bpf_try_make_writable, so maybe something similar can be done for the
-> BPF_DYNPTR_TYPE_SKB_META?
-
-I'm with you. This is not user-friendly at all currently.
-
-This patch set has already gotten quite long so how about I split out
-the pskb_expand_head patch (#1) and the related selftest change (patch
-#11) from this series, expand it to lift bpf_dynptr_set_rdonly()
-limitation for skb_meta dynptr, and do that first in a dedicated series?
-
+>Prior:
+>$ devlink dev flash foo/bar file test
+>$ sudo devlink dev flash foo/bar file test
+>$
 >
->> +		goto out;
->> +
->> +	bpf_dynptr_read(meta_have, META_SIZE, &meta, 0, 0);
->> +	if (!check_metadata(meta_have))
->>   		goto out;
->>     	/* Helper write to payload will unclone the packet */
->>   	bpf_dynptr_write(&data, offsetof(struct ethhdr, h_proto), "x", 1, 0);
->>   -	/* Expect no metadata after unclone */
->> +	/* Expect r/w metadata after unclone */
->>   	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
->> -	if (bpf_dynptr_is_rdonly(&meta) || bpf_dynptr_size(&meta) != 0)
->> +	if (bpf_dynptr_is_rdonly(&meta))
+>After patch:
+>$ devlink/devlink dev flash foo/bar file test
+>devlink answers: Operation not permitted
+>$ sudo devlink/devlink dev flash foo/bar file test
+>devlink answers: No such device
 >
-> then it does not have to rely on the bpf_dynptr_write(&data, ...) above to make
-> the metadata writable.
->
-> I have a high level question about the set. I assume the skb_data_move() in
-> patch 2 will be useful in the future to preserve the metadata across the
-> stack. Preserving the metadata across different tc progs (which this set does)
-> is nice to have but it is not the end goal. Can you shed some light on the plan
-> for building on top of this set?
+>Fixes: 9b13cddfe268 ("devlink: implement flash status monitoring")
+>Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
-Right. Starting at the highest level, I want to work toward preserving
-the metadata on RX path first (ongoing), forward path next, and TX path
-last.
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
-On RX path, the end game is for sk_filter prog to be able to access
-metadata thru dynptr. For that we need to know where the metadata
-resides. I see two ways how we can tackle that:
-
-A) We keep relying on metadata being in front of skb_mac_header().
-
-   Fun fact - if you don't call any TC BPF helpers that touch
-   skb->mac_header and don't have any tunnel or tagging devices on RX
-   path, this works out of the box today. But we need to make sure that
-   any call site that changes the MAC header offset, moves the
-   metadata. I expect this approach will be a pain on TX path.
-
-... or ...
-
-B) We track the metadata offset separately from MAC header offset
-
-   This requires additional state, we need to store the metadata offset
-   somewhere. However, in exchange for a couple bytes we gain some
-   benefits:
-
-   1. We don't need to move the metadata after skb_pull.
-
-   2. We only need to move the metadata for skb_push if there's not
-     enough space left, that is the gap between skb->data and where
-     metadata ends is too small.
-
-     (This means that anyone who is not using skb->data_meta on RX path
-     but the skb_meta dynptr instead, can avoid any memmove's of the
-     metadata itself.)
-     
-   3. We can place the metadata at skb->head, which plays nicely with TX
-      path, where we need the headroom for pushing headers.
-
-I've been trying out how (B) plays out when safe-proofing the tunnel &
-tagging devices, your VLANs and GREs, to preserve the metadata.
-
-To that end I've added a new u16 field in skb_shinfo to track
-meta_end. There a 4B hole there currently and we load the whole
-cacheline from skb_shinf to access meta_len anyway.
-
-Once I had that, I could modify the skb_data_move() to relocate the
-metadata only if necessary, which looks like so:
-
-static inline void skb_data_move(struct sk_buff *skb, const int len,
-				 const unsigned int n)
-{
-	const u8 meta_len = skb_metadata_len(skb);
-	u8 *meta, *meta_end;
-
-	if (!len || (!n && !meta_len))
-		return;
-
-	if (!meta_len)
-		goto no_metadata;
-
-	/* Not enough headroom left for metadata. Drop it. */
-	if (WARN_ON_ONCE(meta_len > skb_headroom(skb))) {
-		skb_metadata_clear(skb);
-		goto no_metadata;
-	}
-
-	meta_end = skb_metadata_end(skb);
-	meta = meta_end - meta_len;
-
-	/* Metadata in front of data before push/pull. Keep it that way. */
-	if (meta_end == skb->data - len) {
-		memmove(meta + len, meta, meta_len + n);
-		skb_shinfo(skb)->meta_end += len;
-		return;
-	}
-
-	if (len < 0) {
-		/* Data pushed. Move metadata to the top. */
-		memmove(skb->head, meta, meta_len);
-		skb_shinfo(skb)->meta_end = meta_len;
-	}
-no_metadata:
-	memmove(skb->data, skb->data - len, n);
-}
-
-The goal is for RX path is to hit everwhere just the last memmove(),
-since we will be usually pulling from skb->data, if you're not using the
-skb->data_meta pseudo-pointer in your TC(X) BPF programs.
-
-There are some verifier changes needed to keep skb->data_meta
-working. We need to move the metadata back in front of the MAC header
-before a TC(X) prog that uses skb->data_meta runs, or things break.
-
-Early code for that is also available for a preview. I've pushed it to:
-
-https://github.com/jsitnicki/linux/commits/skb-meta/safeproof-netdevs/
-
-Thanks,
--jkbs
+Thanks!
 
