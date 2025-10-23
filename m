@@ -1,113 +1,106 @@
-Return-Path: <netdev+bounces-232214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2279C02C2D
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 19:39:00 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D634C02CB1
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 19:50:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E3C9C4EB7F4
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:38:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 09C1B4F20B9
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A62D34B423;
-	Thu, 23 Oct 2025 17:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D5D4322C98;
+	Thu, 23 Oct 2025 17:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WQvTCQ2p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JQzubiDz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E5034B407
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 17:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCEEA30B519
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 17:50:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761241094; cv=none; b=F2iB+AsrKBZKO51T1LOs0mSwEUhfxORtXY2W4O/xnTAEvyNUamG5K5OTFEIxQOAkGRN1r8n95Zt4dFBiECpG5BhMOpTR7k07un6UCKuCB7woFz+qhx6UC2iPfRaf/s4TylLdXYX7HDUC038oT0d1j180xUo+vtmCXRI8E8loSYg=
+	t=1761241811; cv=none; b=jBrOymqqYJXycoigumA/OaHXZBw0gBmO/DcmWJeV7+7UDYVWHC+5jL0DvBDAXf8sZx1EfwhucepKlLfEg293MGiGxzzLxZ9/aXtAJ5IcqtZln60EHp3/o9Wf3ItZmvqKidjrpu0lOO/CPTI9pi5Cdc2IN1/BiaedQpjbO4yi+0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761241094; c=relaxed/simple;
-	bh=ywuqBEwRpRScnW+bb5t/i7Wkw4UY4DDO5j+kmL9KXEA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bdusQRkgcKytzY6374jsM1U8ayQqgu4l3nsWW2WPuhokvi7PnyHjqBntPmZ3sfO+Hz5T3RFr38YNHm5WatQajhnFaKHrp/Hvq1TQdxJUg9KBpR9CfjvotD1LJLH9C2sTrNKCxB0Sq41vHHzO7ia8ZAKhi6J52Jxdw4ufVHhqtqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WQvTCQ2p; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1761241811; c=relaxed/simple;
+	bh=rmrFSVUHVZINnn18mE9h8LqSYST7xKMxaZNupWgxrjM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k9rZsblk0Ob09isy1d99lQfSMheypaH2P353NErOxzvEL52MgCztVZsZ7k9rSyOEPATTeiqq/tt9Q2llTGErVpHV4pyDvvFzZoHU710qLfLF52ZIQtaXYD6V4jULvTaQ3FGz6VoUDYrSgZ44o/VLJJ7srzaLayqS37mDS4V1V/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JQzubiDz; arc=none smtp.client-ip=209.85.217.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-29245cb814cso1846575ad.1
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 10:38:12 -0700 (PDT)
+Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-5db308cddf0so983771137.3
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 10:50:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761241092; x=1761845892; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1761241809; x=1761846609; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ywuqBEwRpRScnW+bb5t/i7Wkw4UY4DDO5j+kmL9KXEA=;
-        b=WQvTCQ2poQ0X9GhbZuZkC9Z4n1R0iEJDBtYFiyVZ3meO8N9uKX1HVXbvcP+9/b0DxG
-         6iVcPY/brnKMN2r+VNHegV0SY4w/c6ERr5yDJq5z+SqusZUrRo/tJHIIHDADWh31qVxv
-         BaezDXoL7fp30b8l+GXtAzWTsh7vo1rzve9hxJlJX+75aCa3w+8N6aBdQMg11AzaNurQ
-         Ouk8ClgLzowIVgGb0ENVkbExGBkmKndvmmOBVhb0W75Haavx/RGKlx3b1ZAB9jxlXMoE
-         d/70SFMOrYugIjnaWAsHqMQO5hlAF+TWX4CkFofAPO6rujT3LcUFI2vwJmMSK3Q7xMwM
-         lmxw==
+        bh=rmrFSVUHVZINnn18mE9h8LqSYST7xKMxaZNupWgxrjM=;
+        b=JQzubiDzmbNqDV95lZrTIg0yptiLGpTeX6V4I9YJxmaCMp2E0ScVVrmK3VOj33J4gd
+         EARbc4fNIgtpmI2H3/h87upSkmLx6YVmyIemn/eXusXQEs/KzvrO1l6h5bFR06A6u7kx
+         Xv9nDKoJnfDfsWrhJlY08sVfkhFA/KWz7fna29L0X4dVP9MeQV2coonVBN56DMDpqCN2
+         nG2OG/II5c5bMmEPXY+AM1xZc91aHXw0BNcdzrlxuwdxa1Y28ScuHds8rfdX7o6BUIvR
+         GTWj5vkcE3fbr9ok/68a3VDU9Zmrsx4R9RNtNqlYW1kiaRmcoGJxTeWwDMNuof9gOTOt
+         g87g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761241092; x=1761845892;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1761241809; x=1761846609;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ywuqBEwRpRScnW+bb5t/i7Wkw4UY4DDO5j+kmL9KXEA=;
-        b=MloMNc3bakfpG10ybORzdWXmSIj2d9nLstp9pgSmDXEL0iclFlvPk8opN4oRkcrSKJ
-         3NzQJZrtzZra62wDWAIx93tufeqYkiFSa3/j3k83t1xkiiYIL8IXpaZ6TSEg7Lr3WQsL
-         FP+JF7PlRRuxeqhKwUgfkMArm6kgl/QkH29fsoRiH/rZuTGfTlghovL5a2fFQ0+jOs3z
-         QJmgN4qYIF2XqNNRJwirk0Pwtzv6DtdHUKzOonF8gRDyHWuHUwdPttO8Tr/Nu2coX17t
-         eR8mfBcxLmJ9xFv72R9+x0MI3wRxSylCT7u9mg2tUp0FudXx/qElATmIsmsrW/Of0DI+
-         NDRg==
-X-Forwarded-Encrypted: i=1; AJvYcCXHSxerFD5mTUZNwMdBRM/QRydNzzZ/qMBw9sF/97xQg7jVUD71JdEkqsc4BlmiaxZMMhKheqI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsRTPlo+iZvSW8SLxZckwM7EATd6DNtmwZCGwDZ1hX22zY46H9
-	te5IK/OXAQNMIkFvrmVZymnXxkMJ31/6mELFYTEhTZM82kFuRbRdPGbp
-X-Gm-Gg: ASbGncvloyae9h1/aglerCcTuJ9wVVyfdUSMd68627A/xeJ132rZ8ZgLnXs+mNEJgVf
-	PLxll1fUEN9F4k6fcu05K/JGMAV9k2ESqYIkUJ5RlyPFOs69jp4XqvqYMCr9JldHc0nktAInCm0
-	R1jUZWAS7/X7OrRlUtim7pcOaWXgcgZ3VLqXUYp5i3wiSa1Jp2/bppOhj9Eoe8wSxE7Diccspz/
-	HRdIqkHZGsksNmy8TY49F1t4VbuDES4gHCkorBKNiaWezUrjTEMq2kznmDobqeG1gFeFeldR7xU
-	p3eqB/VxLG3c6MW957THn8OycJAGxXKKy0bZMtzQZGQGd/tydF6TaeGHMIpdpkYPnsks+l45LZX
-	2TXIRtz2I29XqJjKrkdgHSAb7A9/VW/ZZa7mW7XpXZODtUedKp8IX0SEqs5oy2RGtWc/BusYKAa
-	9XryPG8RUYMCFIqQxiYPwzftXcPidbnDrTy8Uk4zFI2WT6i3tWdI7Q69VXRFgQJ6w=
-X-Google-Smtp-Source: AGHT+IHS0h+JRFSFpKN3ABn8gJENaNAJSEiO+0aN8t2XO48O5XiQnQC/G+gPhMwXVqJDR85nhMuBag==
-X-Received: by 2002:a17:903:2a8d:b0:27e:eee6:6df2 with SMTP id d9443c01a7336-292d3fb7f47mr76907185ad.7.1761241091900;
-        Thu, 23 Oct 2025 10:38:11 -0700 (PDT)
-Received: from ranganath.. ([2401:4900:c919:de72:5515:28c0:ad28:8093])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2946ddea29csm29417515ad.30.2025.10.23.10.38.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Oct 2025 10:38:11 -0700 (PDT)
-From: Ranganath V N <vnranganath.20@gmail.com>
-To: lucien.xin@gmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-sctp@vger.kernel.org,
-	marcelo.leitner@gmail.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+d101e12bccd4095460e7@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com,
-	vnranganath.20@gmail.com
-Subject: Re: [PATCH] net: sctp: fix KMSAN uninit-value in sctp_inq_pop
-Date: Thu, 23 Oct 2025 23:08:01 +0530
-Message-ID: <20251023173801.11428-1-vnranganath.20@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <CADvbK_c2zqQ76kzPmTovWqpRdN2ad7duHsCs9fW9oVNCLdd-Xw@mail.gmail.com>
-References: <CADvbK_c2zqQ76kzPmTovWqpRdN2ad7duHsCs9fW9oVNCLdd-Xw@mail.gmail.com>
+        bh=rmrFSVUHVZINnn18mE9h8LqSYST7xKMxaZNupWgxrjM=;
+        b=DrwmtXQX00PS6atWwNm/5kU6VKzpHvbKCPnwIoS+ZFDXOhxzccpx466/Ed6X4YCyl4
+         9HZE5eEfPqnl+VgVbSt16IL5Q7EUxj1kLSNrn6NjBqOvf1//dD3IQzWCsIw/7kumJEUS
+         ueTjvAiSMVHthIdmU9o+o9JshcxxV//25ENx1+MuO6hol+Nh88mQYWE1Af+5bySArmk5
+         fH/I+YBU2B0UtC3NGKapGAl+32MGmHLVjFRoCxOYo02yE7W7wNHod4vMQsuodqZMY17w
+         I8AJH4TcoXzbPgH7/5TwGOZ+l60Cb/aXeYtc5aePwLxqf54Af0FQLqhBG1VhWVPtlR3r
+         9Wtw==
+X-Forwarded-Encrypted: i=1; AJvYcCUi4jkPVAuQMAi+rpjpsBo6B/eYzTEzfCdfzr7DVSwkCMkXX2tmioDka2oSZgijUxMhZV3z3sM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwV5443nW+XzmfdKm5HDS2fAoEDyaIVJgEnQwjVqK+zdYuH72vA
+	wZ4HKWgf38FPMymMW0LAZF510svqXD8Pxs0O3+Kd4atTBRzL0U4Ytxi3lxmFuen8ombRoK1s5Z2
+	vG/M391s1VlL0xf1lJrSVWRTBhnbgz5s=
+X-Gm-Gg: ASbGncvq5H4nCesIlgRLxHFpyQFVMlO5K+bw3pCf87s11hOo/xsk+b7G8lRhgm3vIrp
+	1FNBXBOCNmyu6AWLVQt8LDYaqjh8ko1lFzdvnUkg8wy2GxFdwmjz1dp3G/bnDPAwD4uQbP3lLx6
+	9i1+ltygn+uHOA4emdpPtajaFyG7QViROxa4ldLguvK1w09C8jw1kYTcc8/rPZh5Apl2mq1wwDz
+	FkwDL77ce1Bvxa7ztxjsS1tkNnhKyRxOPUtF/7ceacE/+2p1X1Bk/3oZ9WK693X4++k2lG7XLFD
+	NeRLGvSdJimXArFBVqEmdlyNiXKHHPdqFOBESjiv
+X-Google-Smtp-Source: AGHT+IHpRyuoav5lJWR6O5jHg57c85VAu9Fw0WMge5AnlPcPoxSh3EP98NNnI6EblMA4ody0QL3Q+Pm2+edFZxbqWC8=
+X-Received: by 2002:a05:6102:5cc6:b0:5db:28ef:3dfb with SMTP id
+ ada2fe7eead31-5db28ef4bb5mr2325429137.34.1761241808691; Thu, 23 Oct 2025
+ 10:50:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CADvbK_c2zqQ76kzPmTovWqpRdN2ad7duHsCs9fW9oVNCLdd-Xw@mail.gmail.com>
+ <20251023173801.11428-1-vnranganath.20@gmail.com>
+In-Reply-To: <20251023173801.11428-1-vnranganath.20@gmail.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 23 Oct 2025 13:49:55 -0400
+X-Gm-Features: AWmQ_bkWcF1bKMfuE_JeO2G03ig-UJSmO2Qz1WYBH2Xg-mAv7cSejiDOLi0AucQ
+Message-ID: <CADvbK_dJpnjZS_UjoM-D6xRhdhq_uH0FBBbr6tN_7qKih-7zKg@mail.gmail.com>
+Subject: Re: [PATCH] net: sctp: fix KMSAN uninit-value in sctp_inq_pop
+To: Ranganath V N <vnranganath.20@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	marcelo.leitner@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzbot+d101e12bccd4095460e7@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Xin,
-
-Thank you for the feedback and response to the patch.
-I would like to know that above analysis is valid or not.
-And do you want me to test this suggestion with the syzbot?
-
-regards,
-Ranganath
+On Thu, Oct 23, 2025 at 1:38=E2=80=AFPM Ranganath V N <vnranganath.20@gmail=
+.com> wrote:
+>
+> Hi Xin,
+>
+> Thank you for the feedback and response to the patch.
+> I would like to know that above analysis is valid or not.
+> And do you want me to test this suggestion with the syzbot?
+>
+Yes, if it's possible.
 
