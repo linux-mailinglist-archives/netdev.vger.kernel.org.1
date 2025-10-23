@@ -1,182 +1,358 @@
-Return-Path: <netdev+bounces-232264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33A6BC0386D
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 23:25:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94F72C03909
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 23:39:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D96D53A2FAE
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 21:25:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39EFB189B7D8
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 21:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D61F261B9C;
-	Thu, 23 Oct 2025 21:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10765226CFE;
+	Thu, 23 Oct 2025 21:39:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HdWgpEOm"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Xx41vVak"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A591DB375
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 21:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420771E5B95
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 21:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761254727; cv=none; b=XitDaEz0J1o1bWOYY+dlNkm99W9CjiIovl3UwKzTBLnTFTqeD2su2UpValarPpvCbyvizf/XEWoXM9gaZimndXgDE3aowHBBN9RL7qc5AqZhNMZbqEiW63DqW/kHJ/d59gsySTUm8hUIRvDXU9Z+zNafw+koJ/CCx2gpLUNIbms=
+	t=1761255574; cv=none; b=O2Sno9grYQph0lUGIG8FEz2vSDccrrG1RGIAcfJxhqrCeXLI0Yql0wQhLQWuyYCm50yx+q8Zri2rAkmYXtVk2s2fJ3Jgxk+A4FT/z+Q0xoJtAnapCprEYwNzhCBA+ZBVnK1CpX6bcR/oW2Z6X9heauRMf5HK6RjbSokBFNPmJ+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761254727; c=relaxed/simple;
-	bh=KL8MH4uiDwXzDJGJgKqg6xWOMUxs8dFvLHB+r+h12q0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=cVxCu/gVYj5mWFOsUW6EdQyLudaEoPB2/Kaob72FyhVv6RnnYNc4iejL2X7uZheIR57mdIsQVPngaJytYStXV+AIdfzlBLmpejMPaL+VfdDfd2UsE7H0R+sCD3SW1ei1bzdex/AqIf9+XaZOidfS8M9hYZstE+5IvEVGq1e1dQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HdWgpEOm; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-88e51cf965dso176611385a.2
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 14:25:25 -0700 (PDT)
+	s=arc-20240116; t=1761255574; c=relaxed/simple;
+	bh=vktg7TzNejM4HGzP62nJe3a3/sSTdo6B9txohbxks2c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a1LDcetxTEpgQ1apm18Yhm44VlYQPmlOLT9B1X70sBY+DSmnZUwvNEiO4nJcZPbKJt9mQf9Bg7jR9C1vnWhj5x0pASTRgXsxy55qR6SnG7Shrwk9MGhmAL32MeEp2ZloqvyxiqYjyZe7MTDKjGBhJ4+xYEqIUPncUdbmWhakFGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Xx41vVak; arc=none smtp.client-ip=209.85.210.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7c28bf230feso2210546a34.0
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 14:39:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761254725; x=1761859525; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yD8t7GPMvKAHRGElvreZlEBxLi862Pnc19yFSqIvIB0=;
-        b=HdWgpEOm7uC8E+e081VqSRQhEyLjRMPaJXjYnGgyPrGgXJAEg1nV3t0+EiceqYrSGI
-         AbeAbMs7fA+UZyBY80l3AWlbqPGUPI6ZC6e9Mvv4IBZ5LfPc426voxNmd64LCSCL1t2A
-         9He2FDXCB3UtldxQtBepWc7Hw0LGpi6qlgIoA5kdFIkDsU5jFgu33Plyw8ALKOD+6P6b
-         PzDykNKkH/xL1evMOGXYK4z34qKxGTBn3n4EUOuQ7nsvnKTBoMGmGXauKWHRe8o7YfQI
-         GhH3KHX2UE7vv+afZZ61ztVmqxN18Q6FevLa8bX66pt5DJe85Sm70PQ0PXccjGefkhkr
-         yTdw==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761255571; x=1761860371; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RusTwYzmfQt1i/MMnUWOiMy7mTgUsaeXYk3E3ujdD8A=;
+        b=Xx41vVak7F9pjtkyhztRXXlCXV8F0atVK1j0zyh1EDOqkU+47gzLhfqdQrKU9mgH2u
+         y7Ghxf2AaWAAShzW+xGtuvubRz5nG3XM/jin3AN59cqJ6ljhVCPzhxPxd1XouupiiCaG
+         kpSSprNBX7DA0eLxSBYJ1SITglgGd7IA2/HktUBY/oqnLOrWjc21aBDicECowMWPkqZb
+         dpk+OoktumsIPoWSCLL4zGsMw3/GnCJQdK+R1i2VJpTaKpcan70DpiMLZ0SZIPCeur8/
+         zDcXPdOxcsD02xzTShlglXnmuZCVGfQc7Jv8dG6SyFOjmqQ8E43qWP0CLgQ7nMNenJoo
+         suig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761254725; x=1761859525;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yD8t7GPMvKAHRGElvreZlEBxLi862Pnc19yFSqIvIB0=;
-        b=c8fti4eJcZpn9iUOT5j43ugMrgW98XSHeZ3DYJTGy2IuDa/ceQxxHiywxdpzCEpfIf
-         Puvk6Zub9QurhQ+iyHeWALtJcGoLZPFbQtEx9lDsmMrOEvQ6+453WYcz4dBWtgN/AA14
-         pILX3Xeml4yNZeK4qyhNTcKUAbsW6wqtLrc46lAoE4cynhHBSbzTgitqjGsdsOFqIf8d
-         /cYskJNkf0Ji8K130IhdWWn/4QqEomFK01ubS2680bCIeZCxJtL6bK7xnbaUE9DBDMR3
-         KCPoBNS+uzl63REDMEtR2Q5w4ORkbEtZe2jBKWtvu6j7/dRW3+4H9wX3CrckzNc8o8WI
-         bs4A==
-X-Gm-Message-State: AOJu0YwcX3tW/9u+6BBuOLkTPJnkb6y0qCcWD0uxbXEsgFcBnjDmq5lz
-	EmxsSA58DyZbfuNdY+DMbq526vcG8x+kjYhoTmbbKEGzFyT1Qywm6KMZ
-X-Gm-Gg: ASbGncvfaDdyVpUC3+/OlLcucXBs/Ie8wovw1ygq7SlSdberAFy7nXTKDnsECf4fDlp
-	wkW7GuhfDfa9ZJu7Y9LIxUm7RqNWxVLPigzcX5PjSvYtrwNzVFuJyZVFVIokQd2XSG+RT/8R0Hm
-	csgJs/JGT05PPMhHU+CD5V3PsLBzWDDwBwP5H3QCHAk1YTn9FhN7QreIy1E04A6j12j2LNDeo9L
-	BnJpGrCu6M8AJ8AmWqBmQ7C/Rle5R0IqXDBYJC6Az9RFTKp2WhrvNzj30tcZJYBWcTjAIvZi5Hu
-	kpcE0LkJI2Z3bR6b/HXMxYYXdyEhwjWa62mYaEUnUBvmnYXigbHKOAqWMagUs5d/9FlZA+2FDzN
-	z0LrUEcgpEzKBY2q2WitlyL8+gtwplGqiNt2W3TRJskRMmVEybQs7zHTgGKGvw8gQoCrs8Fp3iw
-	fFw8W7UqXpIpYUgLs5AGFJZihyhXT43qQN6fFoeZ6sxo9QNugqDZei
-X-Google-Smtp-Source: AGHT+IE+/hzS/vGrRzSKQdGSR4NcId7rk/TeVbgs5eLd/tk8OY8lA1rMAVBrA+H0+CV7kdHxkJVMxQ==
-X-Received: by 2002:a05:620a:f04:b0:85f:89:e116 with SMTP id af79cd13be357-8906e2d040cmr3479556385a.1.1761254724853;
-        Thu, 23 Oct 2025 14:25:24 -0700 (PDT)
-Received: from gmail.com (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-89c0dbcb6b8sm239229785a.13.2025.10.23.14.25.24
+        d=1e100.net; s=20230601; t=1761255571; x=1761860371;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RusTwYzmfQt1i/MMnUWOiMy7mTgUsaeXYk3E3ujdD8A=;
+        b=iowR+NTUvGJeRe/Vdsoq9ct6dJHeBlJ5F1Z84C0PCEcgEYi3xbAa9An9liPjKsItQ7
+         yGw8+SS7gqKPrgxY+VnxtmFAyYIqsSSAPLQQGpuujE2ZBfLy37Y711aJXaCU1VNO6FiR
+         LTKsLkCqHo+7XpHsf45SIPe3BkE4AGk4Kkn8d/6HVfdG21enCP/soN9v87wVlrDBYdVt
+         pOBVThdayVUVYQWLr93ja9ShsPjBH8AXhjvrMNX5je86aqn/c1/kUSjiA2cgbf1c1maK
+         rb9x8+tkG7ojOYc2F55mdQ9Hup21kW2U4xyJ6I222Nb/3eEqyDmMi6jDDPZL/lO0sntf
+         sxcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWsPIGNwFrzEWb+Lt1Ikt1WeovS70ktNI5dlDeIcPNowc3A3X+W+42jyIo8Z8WPzabN6sma0oQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhsawtOWF6VyZqSgwLCbF147WVgjroOzPrHlIu3E1JyPfM0ePf
+	9wOG5h/3fAZSjfxWsx8llBEGr94BU70ajAAuHkvBB6l3G53aBIJegSI8Ko4ecPXkalZhPF6dqRE
+	9Aa7y
+X-Gm-Gg: ASbGncv20fqrb3mXEYhrzSfC+DcRQ6XxXbPMPa02MGwu++EpegSdeqDN+W1+33v3z6U
+	gkX250WC9+iXg65+iMoHXyCbMmJCTm68khsNQO9xEZe1OGJtZruAomqgqS/4cgBV+42zIr8F0gb
+	Zgv2fpsH23IZFvhJomN8L3WoStU62Pum2YCzQCRCpOqQ+VDctQ8JOj/XzvgXhh9Ny1QwvWiHmOO
+	lBqeQlGzo2pPrqTQDCZhdAlMYgHyytPC5gFNKrrX6uz+46kCG4HxfX9923L195nGDsBODP+FCvV
+	vWYGaWwR+gqHbQE7r21v6heEC7oP/KZ1HEHapduoyML7nTu3CCHeQKI8u0Gfgu6WyzOgj7oorNQ
+	T0eDtVC64tYv3+1KKcmpz2FqHlEK50w98Wes/94Ud+/Sydfn3FpqDwJmYpAdkr+GNXz7W+xz32t
+	unmjkti0NLlCwK0Wk=
+X-Google-Smtp-Source: AGHT+IGgUK5gvXJyPWAdvjPmbwbyrBbJXLLjTwwhrM34BooBIU9ikpp8WOZFSTBcvUor7L6A/kDRjQ==
+X-Received: by 2002:a05:6808:1984:b0:443:a3c0:893c with SMTP id 5614622812f47-44d918b6e6amr199835b6e.24.1761255571217;
+        Thu, 23 Oct 2025 14:39:31 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff::])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-44bd44c22ccsm739380b6e.20.2025.10.23.14.39.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Oct 2025 14:25:24 -0700 (PDT)
-Date: Thu, 23 Oct 2025 17:25:23 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Ido Schimmel <idosch@nvidia.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- edumazet@google.com, 
- horms@kernel.org, 
- dsahern@kernel.org, 
- petrm@nvidia.com, 
- willemb@google.com, 
- daniel@iogearbox.net, 
- fw@strlen.de, 
- ishaangandhi@gmail.com, 
- rbonica@juniper.net, 
- tom@herbertland.com
-Message-ID: <willemdebruijn.kernel.2fa37d812e711@gmail.com>
-In-Reply-To: <aPpMItF35gwpgzZx@shredder>
-References: <20251022065349.434123-1-idosch@nvidia.com>
- <20251022065349.434123-4-idosch@nvidia.com>
- <willemdebruijn.kernel.2a6712077e40c@gmail.com>
- <aPpMItF35gwpgzZx@shredder>
-Subject: Re: [PATCH net-next 3/3] selftests: traceroute: Add ICMP extensions
- tests
+        Thu, 23 Oct 2025 14:39:30 -0700 (PDT)
+From: David Wei <dw@davidwei.uk>
+To: io-uring@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>
+Subject: [PATCH v1] io_uring zcrx: allow sharing of ifqs with other instances
+Date: Thu, 23 Oct 2025 14:39:22 -0700
+Message-ID: <20251023213922.3451751-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Ido Schimmel wrote:
-> On Wed, Oct 22, 2025 at 06:12:13PM -0400, Willem de Bruijn wrote:
-> > Ido Schimmel wrote:
-> > > Test that ICMP extensions are reported correctly when enabled and not
-> > > reported when disabled. Test both IPv4 and IPv6 and using different
-> > > packet sizes, to make sure trimming / padding works correctly.
-> > > 
-> > > Disable ICMP rate limiting (defaults to 1 per-second per-target) so that
-> > > the kernel will always generate ICMP errors when needed.
-> > 
-> > This reminds me that when I added SOL_IP/IP_RECVERR_4884, the selftest
-> > was not integrated into kselftests. Commit eba75c587e81 points to
-> > 
-> > https://github.com/wdebruij/kerneltools/blob/master/tests/recv_icmp_v2.c
-> > 
-> > It might be useful to verify that the kernel recv path that parses
-> > RFC 4884 compliant ICMP messages correctly handles these RFC 4884
-> > messages.
-> 
-> FYI, I just ran this test with this series and it seems fine:
-> 
-> # sysctl -wq net.ipv4.icmp_errors_extension_mask=0x0
-> # sysctl -wq net.ipv6.icmp.errors_extension_mask=0x0
-> # ./recv_icmp_v2 
-> 
-> TEST(10, 0, 0)
-> len=0 ee_info=0x0, ee_data=0x0 rfc4884=(0, 0x0, 0)
-> 
-> TEST(10, 41, 31)
-> len=0 ee_info=0x0, ee_data=0x0 rfc4884=(0, 0x0, 0)
-> 
-> TEST(2, 0, 0)
-> len=0 ee_info=0x0, ee_data=0x0 rfc4884=(0, 0x0, 0)
-> 
-> TEST(2, 0, 26)
-> len=0 ee_info=0x0, ee_data=0x0 rfc4884=(0, 0x0, 0)
-> OK
-> # echo $?
-> 0
-> # sysctl -wq net.ipv4.icmp_errors_extension_mask=0x1
-> # sysctl -wq net.ipv6.icmp.errors_extension_mask=0x1
-> # ./recv_icmp_v2 
-> 
-> TEST(10, 0, 0)
-> len=0 ee_info=0x10000000, ee_data=0x0 rfc4884=(0, 0x0, 0)
-> 
-> TEST(10, 41, 31)
-> len=0 ee_info=0x10000000, ee_data=0x50 rfc4884=(80, 0x0, 0)
-> 
-> TEST(2, 0, 0)
-> len=0 ee_info=0x0, ee_data=0x0 rfc4884=(0, 0x0, 0)
-> 
-> TEST(2, 0, 26)
-> len=0 ee_info=0x0, ee_data=0x64 rfc4884=(100, 0x0, 0)
-> OK
-> # echo $?
-> 0
-> 
-> When the extensions are enabled and the RFC4884 socket options are used,
-> the offset to the extension structure relative to the beginning of the
-> UDP payload seems correct. In both cases the "original datagram" field
-> is 128 and if we remove the size of the headers from it we get the
-> offset to the extension structure:
-> 
-> IPv4: 128 - ipv4_hdr - udp_hdr = 128 - 20 - 8 = 100
-> IPv6: 128 - ipv6_hdr - udp_hdr = 128 - 40 - 8 = 80
-> 
-> In both cases SO_EE_RFC4884_FLAG_INVALID is not set.
+Each ifq is bound to a HW RX queue with no way to share this across
+multiple io_uring instances. It is possible that one io_uring instance
+will not be able to fully saturate an entire HW RX queue. To handle more
+work the only way is to add additional io_uring instances w/ ifqs, but
+HW RX queues are a limited resource on a system.
 
-Oh excellent. Thanks for running that.
+From userspace it is possible to move work from this io_uring instance
+w/ an ifq to other threads, but this will incur context switch overhead.
+What I'd like to do is share an ifq (and hence a HW RX queue) across
+multiple rings.
+
+Add a way for io_uring instances to clone an ifq from another. This is
+done by passing a new flag IORING_ZCRX_IFQ_REG_CLONE in the registration
+struct io_uring_zcrx_ifq_reg, alongside the fd and ifq id of the ifq to
+be cloned.
+
+The cloned ifq holds two refs:
+  1. On the source io_ring_ctx percpu_ref
+  2. On the source ifq refcount_t
+
+This ensures that the source ifq and ring ctx remains valid while there
+are proxies.
+
+The only way to destroy an ifq today is to destroy the entire ring, so
+both the real ifq and the proxy ifq are freed together.
+
+At runtime, io_zcrx_recv_frag checks the ifq in the net_iov->priv field.
+This is expected to be the primary ifq that is bound to a HW RX queue,
+and is what prevents another ring from issuing io_recvzc on a zero copy
+socket. Once a secondary ring clones the ifq, this check will pass.
+
+It's expected for userspace to coordinate the sharing and
+synchronisation of the refill queue when returning buffers. The kernel
+is not involved at all.
+
+It's also expected userspace to distributed accepted sockets with
+connections steered to zero copy queues across multiple rings for load
+balancing.
+
+Signed-off-by: David Wei <dw@davidwei.uk>
+---
+ include/uapi/linux/io_uring.h |  4 ++
+ io_uring/net.c                |  2 +
+ io_uring/rsrc.c               |  2 +-
+ io_uring/rsrc.h               |  1 +
+ io_uring/zcrx.c               | 90 +++++++++++++++++++++++++++++++++--
+ io_uring/zcrx.h               |  3 ++
+ 6 files changed, 98 insertions(+), 4 deletions(-)
+
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index 263bed13473e..8e4227a40d09 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -1055,6 +1055,10 @@ struct io_uring_zcrx_area_reg {
+ 	__u64	__resv2[2];
+ };
+ 
++enum io_uring_zcrx_ifq_reg_flags {
++	IORING_ZCRX_IFQ_REG_CLONE	= 1,
++};
++
+ /*
+  * Argument for IORING_REGISTER_ZCRX_IFQ
+  */
+diff --git a/io_uring/net.c b/io_uring/net.c
+index a95cc9ca2a4d..8eb6145e0f4d 100644
+--- a/io_uring/net.c
++++ b/io_uring/net.c
+@@ -1250,6 +1250,8 @@ int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 	zc->ifq = xa_load(&req->ctx->zcrx_ctxs, ifq_idx);
+ 	if (!zc->ifq)
+ 		return -EINVAL;
++	if (zc->ifq->proxy)
++		zc->ifq = zc->ifq->proxy;
+ 
+ 	zc->len = READ_ONCE(sqe->len);
+ 	zc->flags = READ_ONCE(sqe->ioprio);
+diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
+index d787c16dc1c3..aae5f2acfcf1 100644
+--- a/io_uring/rsrc.c
++++ b/io_uring/rsrc.c
+@@ -1148,7 +1148,7 @@ int io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
+ }
+ 
+ /* Lock two rings at once. The rings must be different! */
+-static void lock_two_rings(struct io_ring_ctx *ctx1, struct io_ring_ctx *ctx2)
++void lock_two_rings(struct io_ring_ctx *ctx1, struct io_ring_ctx *ctx2)
+ {
+ 	if (ctx1 > ctx2)
+ 		swap(ctx1, ctx2);
+diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
+index a3ca6ba66596..3a9b9e398249 100644
+--- a/io_uring/rsrc.h
++++ b/io_uring/rsrc.h
+@@ -70,6 +70,7 @@ int io_import_reg_vec(int ddir, struct iov_iter *iter,
+ int io_prep_reg_iovec(struct io_kiocb *req, struct iou_vec *iv,
+ 			const struct iovec __user *uvec, size_t uvec_segs);
+ 
++void lock_two_rings(struct io_ring_ctx *ctx1, struct io_ring_ctx *ctx2);
+ int io_register_clone_buffers(struct io_ring_ctx *ctx, void __user *arg);
+ int io_sqe_buffers_unregister(struct io_ring_ctx *ctx);
+ int io_sqe_buffers_register(struct io_ring_ctx *ctx, void __user *arg,
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index a816f5902091..753614820f8f 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -22,10 +22,10 @@
+ #include <uapi/linux/io_uring.h>
+ 
+ #include "io_uring.h"
+-#include "kbuf.h"
+ #include "memmap.h"
+ #include "zcrx.h"
+ #include "rsrc.h"
++#include "register.h"
+ 
+ #define IO_ZCRX_AREA_SUPPORTED_FLAGS	(IORING_ZCRX_AREA_DMABUF)
+ 
+@@ -519,6 +519,8 @@ static void io_close_queue(struct io_zcrx_ifq *ifq)
+ 
+ static void io_zcrx_ifq_free(struct io_zcrx_ifq *ifq)
+ {
++	if (ifq->proxy)
++		goto free;
+ 	io_close_queue(ifq);
+ 
+ 	if (ifq->area)
+@@ -528,6 +530,7 @@ static void io_zcrx_ifq_free(struct io_zcrx_ifq *ifq)
+ 
+ 	io_free_rbuf_ring(ifq);
+ 	mutex_destroy(&ifq->pp_lock);
++free:
+ 	kfree(ifq);
+ }
+ 
+@@ -541,6 +544,73 @@ struct io_mapped_region *io_zcrx_get_region(struct io_ring_ctx *ctx,
+ 	return ifq ? &ifq->region : NULL;
+ }
+ 
++static int io_clone_zcrx_ifq(struct io_ring_ctx *ctx,
++			     struct io_uring_zcrx_ifq_reg __user *arg,
++			     struct io_uring_zcrx_ifq_reg *reg)
++{
++	struct io_zcrx_ifq *ifq, *src_ifq;
++	struct io_ring_ctx *src_ctx;
++	struct file *file;
++	int src_fd, ret;
++	u32 src_id, id;
++
++	src_fd = reg->if_idx;
++	src_id = reg->if_rxq;
++
++	file = io_uring_register_get_file(src_fd, false);
++	if (IS_ERR(file))
++		return PTR_ERR(file);
++
++	src_ctx = file->private_data;
++	if (src_ctx == ctx)
++		return -EBADFD;
++
++	mutex_unlock(&ctx->uring_lock);
++	lock_two_rings(ctx, src_ctx);
++
++	percpu_ref_get(&src_ctx->refs);
++	ret = -EINVAL;
++	src_ifq = xa_load(&src_ctx->zcrx_ctxs, src_id);
++	if (!src_ifq)
++		goto err_unlock;
++	refcount_inc(&src_ifq->refs);
++
++	ifq = kzalloc(sizeof(*ifq), GFP_KERNEL);
++	ifq->proxy = src_ifq;
++	ifq->ctx = ctx;
++	ifq->if_rxq = src_ifq->if_rxq;
++
++	scoped_guard(mutex, &ctx->mmap_lock) {
++		ret = xa_alloc(&ctx->zcrx_ctxs, &id, NULL, xa_limit_31b, GFP_KERNEL);
++		if (ret)
++			goto err_free;
++
++		ret = -ENOMEM;
++		if (xa_store(&ctx->zcrx_ctxs, id, ifq, GFP_KERNEL)) {
++			xa_erase(&ctx->zcrx_ctxs, id);
++			goto err_free;
++		}
++	}
++
++	reg->zcrx_id = id;
++	if (copy_to_user(arg, reg, sizeof(*reg))) {
++		ret = -EFAULT;
++		goto err;
++	}
++	mutex_unlock(&src_ctx->uring_lock);
++	fput(file);
++	return 0;
++err:
++	scoped_guard(mutex, &ctx->mmap_lock)
++		xa_erase(&ctx->zcrx_ctxs, id);
++err_free:
++	kfree(ifq);
++err_unlock:
++	mutex_unlock(&src_ctx->uring_lock);
++	fput(file);
++	return ret;
++}
++
+ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+ 			  struct io_uring_zcrx_ifq_reg __user *arg)
+ {
+@@ -566,6 +636,8 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+ 		return -EINVAL;
+ 	if (copy_from_user(&reg, arg, sizeof(reg)))
+ 		return -EFAULT;
++	if (reg.flags & IORING_ZCRX_IFQ_REG_CLONE)
++		return io_clone_zcrx_ifq(ctx, arg, &reg);
+ 	if (copy_from_user(&rd, u64_to_user_ptr(reg.region_ptr), sizeof(rd)))
+ 		return -EFAULT;
+ 	if (!mem_is_zero(&reg.__resv, sizeof(reg.__resv)) ||
+@@ -587,6 +659,7 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+ 	if (!ifq)
+ 		return -ENOMEM;
+ 	ifq->rq_entries = reg.rq_entries;
++	refcount_set(&ifq->refs, 1);
+ 
+ 	scoped_guard(mutex, &ctx->mmap_lock) {
+ 		/* preallocate id */
+@@ -730,8 +803,19 @@ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
+ 	lockdep_assert_held(&ctx->uring_lock);
+ 
+ 	xa_for_each(&ctx->zcrx_ctxs, index, ifq) {
+-		io_zcrx_scrub(ifq);
+-		io_close_queue(ifq);
++		if (ifq->if_rxq == -1)
++			continue;
++
++		if (!ifq->proxy) {
++			if (refcount_read(&ifq->refs) > 1)
++				continue;
++			io_zcrx_scrub(ifq);
++			io_close_queue(ifq);
++		} else {
++			refcount_dec(&ifq->proxy->refs);
++			percpu_ref_put(&ifq->proxy->ctx->refs);
++			ifq->if_rxq = -1;
++		}
+ 	}
+ }
+ 
+diff --git a/io_uring/zcrx.h b/io_uring/zcrx.h
+index 33ef61503092..0df956cb9592 100644
+--- a/io_uring/zcrx.h
++++ b/io_uring/zcrx.h
+@@ -60,6 +60,9 @@ struct io_zcrx_ifq {
+ 	 */
+ 	struct mutex			pp_lock;
+ 	struct io_mapped_region		region;
++
++	refcount_t			refs;
++	struct io_zcrx_ifq		*proxy;
+ };
+ 
+ #if defined(CONFIG_IO_URING_ZCRX)
+-- 
+2.47.3
+
 
