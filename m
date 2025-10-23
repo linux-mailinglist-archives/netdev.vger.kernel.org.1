@@ -1,172 +1,155 @@
-Return-Path: <netdev+bounces-232140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D2E5C01C0B
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:26:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EA10C01C14
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:27:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C1073B209C
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:17:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E1FE3B6F0E
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:18:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3805E328B4F;
-	Thu, 23 Oct 2025 14:17:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A170A329C54;
+	Thu, 23 Oct 2025 14:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Teu2Xa+6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AGfwFRN4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09805318146;
-	Thu, 23 Oct 2025 14:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F40931E0ED
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 14:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761229056; cv=none; b=roQC7gFnDzs6ESATgYZI92mezvkANZbgyOxSUdRJMybcHVMhjVw8nfD4sVaSCSEZuaYrca2hbKv4KDQRSuvFk5yb4MzIJL4YyoXPva0ZdsosDMFVbOZmjqgUJexFJxMEQIBer7mPRPy6qjaVRfT9d8+miAk7j3jQGPWJa7NO1/Y=
+	t=1761229087; cv=none; b=neYOSs8KItf9EtqVSRnDZowo0qtTRB+7fUWyVcjuucw9/U+xNEpU1zV3o9hq3KRHSH4mZXEaoI0HGRTCwm6RM7vvJ/VKe+xgQtES87C05fKVw1OHXziP1ovzEn/15J/jaolg7NaaTJCYDX5YXavIVND0FIqf/fNy6Yo8C8jVA0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761229056; c=relaxed/simple;
-	bh=5z2CwcrsfghWCt50FGQg1cggIkm7cb/zWiEmyg6elfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l51Rxnwpfaej0mW6d+Hcq7W14S6s+SwhiJ0hJI8Brj/YfhJquA8RRhlO8sgihGWixHPcxxhCbWirpvdql06PDMQ0qIFjgwtGSZ64OpDyJC7uuG83mkEmvmuNCPBBR4r/eXwGgH2aIB5Dz0JIkrOHhLl+IxVK7LrizVutFdsC6Lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Teu2Xa+6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E390C4CEE7;
-	Thu, 23 Oct 2025 14:17:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761229055;
-	bh=5z2CwcrsfghWCt50FGQg1cggIkm7cb/zWiEmyg6elfQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Teu2Xa+6vZBzpTMntPbR5kZX0wapbccoOmRSn+z8mj6AXv+u2UUI3XKNHUTO61/fv
-	 YKMfHnUiy60PRDLwhK1U8k7zSCSCVO0eAGyJP34thG0107GBVZTkhXlU2Xb092GFg3
-	 YxpfHJK/PU1yN4s+JppPDtHq7RYte8GkzAoC6AGH9MK5cEbwImqwXURQa3rjmwh0AZ
-	 Fv/3IJWAa3ToYlWwkL3SIFa0JB84DK6sBx4oCXYw98zNInkIBKfe8SKHutT+5uYIpa
-	 kmKeyCg7axvavMKac3nae9CzebgtYJ4S/KiNVmoa4r8c44mI+/M96/YHKJ+DznUaFd
-	 EJpGO6DVmpcXw==
-Date: Thu, 23 Oct 2025 07:17:34 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
- <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, "Patrisious
- Haddad" <phaddad@nvidia.com>
-Subject: Re: [PATCH net 4/4] net/mlx5: Fix IPsec cleanup over MPV device
-Message-ID: <20251023071734.3f9233cb@kernel.org>
-In-Reply-To: <1761136182-918470-5-git-send-email-tariqt@nvidia.com>
-References: <1761136182-918470-1-git-send-email-tariqt@nvidia.com>
-	<1761136182-918470-5-git-send-email-tariqt@nvidia.com>
+	s=arc-20240116; t=1761229087; c=relaxed/simple;
+	bh=EHM7fQOHNeLsoiL3vC36Dccd2CyB8XS5TMseHrscFHo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YDA6AYXKDYLrGMiFBF/MDgAXLbJJdRYnLMh+EckX+bGOYcRPXdWsc8SpleEOVeCZqTg0UXAnpX8CYy8KbrJ6ThlVD8kGdWlU/pqxOKc2P5s1ClCfRzxb1b3TNpqyXD05KeRiXlfb/T41b9uz1dJvkNwj5wfeigwhuqowrAydkRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AGfwFRN4; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-32ec291a325so705407a91.1
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 07:18:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761229084; x=1761833884; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6lowMFcjGtC50avJO9ESsGiMhY7bgLV5uttBpBtCygM=;
+        b=AGfwFRN42/OJU/I/xtsfheKf7jmV/nFNWIGdjB9UXxFHoepSPPlWFyUcAEIuaTI4Jp
+         ncHAP4zSG9HnVOZbNV5uIdwiBJFTO+jrcGaAmqtEomh+Vk3ieBo3Vl2EV0cihpz/kUW8
+         ss6lSWyXplNhhS+3dvLHXEPoNjRd02GjNHyJRYp4fWgT7DowBbOVBlBy/RR2Dr7/QD+8
+         z0PKT7hxTHmfj3zqhFAzizpLYYvaYcSs+ZVkS9fPl/ZD1wcC+zeJK8fU/3ivmZqYtFCq
+         BytVhmU39//HpQoo5UEHKIl4DdrBBchGTtceCSSlqHvxuq+AxM7HP36CnjeG/WJzHzdK
+         fvfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761229084; x=1761833884;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6lowMFcjGtC50avJO9ESsGiMhY7bgLV5uttBpBtCygM=;
+        b=p13Ej1l2kZA2y+bQCl5JEyqaQChH64BCEl2onyJjrQY/uLevkN8hMD/jzA/m3Uguwz
+         2dUcOWVcVGAYJ+neNGW95Sqt/qkTqFIabpOUm9Xv6ZK3IC4htMdtq2j3+x+3a1j8Ca3h
+         mftS1VEAxDOc0WBBPghitXtQImywmstwwF6rAsR1BbQBG/76X5r2rhio5IKRyRQ6/Ml7
+         ErZ+t1FcbiPt3Pc+mkF9K2zR2Fsn4AGVXTL9JtaoouGTq5IRkc1y8qcFQj4bqt2d0lbq
+         LOl4R+or3GpovA+bVayhHlwWVVh7dD1gpxhNeTJ2zWZXsohuZNN3AbjfbegFHSq1pDrS
+         khVQ==
+X-Gm-Message-State: AOJu0YzdmsEmXHNNp9SC0BOzp5xx16zI0wLJb6IO5Y3UmJC7JKjMI0HS
+	0zZ0xAvGQpc0HgxnGt3Jjqqgu0/Cz8ye3oMt5q1lHLoB6JyBxPBjSv/U
+X-Gm-Gg: ASbGncsNHS3LFu4cwHhjuH76LMgb7J/XWqFxpNJLFRdxGYobJAZR6uI5hLG0cyqthMw
+	8GVJcjv6w3VW8JElCg/lfstkEwQdpoZuTyrDb0+DAQla8d8JLKL47+lld3v0Vz9PZ354X7GC4fR
+	fIjXj4J4e0aQ75i24Uo7pSq9iBXkPwSoRb72Vjs1Mu6FceNUH8gYrsXxW7kD5dFqpJTgclY2gK2
+	O142tRlr75u8cA5oy/2pk/HYjf2WgX6euaVt+DPNnvP+ZIVEXMb3a5Ix8h7+IYEeiXxmgDb6HS/
+	sk3o56RXcR9od/rF+5rRCwNtXhD4e7CoXeNAsdBGYhzpDvJiyjm8BoZlLdV4BrUXS20NzjnqLfL
+	oOSqozS2b4dRQ/9udmSN0OWXjTveVbnuCcH35MxkTnntgu2U0LTAAEcO3+K8sAE9s6e0YIOY6w4
+	Zhepb8
+X-Google-Smtp-Source: AGHT+IGDK0WHAgOUIbAsdqHX3U++zNVrDR2oq29rKFa2lE4dndEP53CQaWke7F3n+Iyv7vfKnFvSyA==
+X-Received: by 2002:a17:90b:4a50:b0:33b:938c:570a with SMTP id 98e67ed59e1d1-33bcf90e727mr36477602a91.33.1761229084168;
+        Thu, 23 Oct 2025 07:18:04 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33fb0196831sm2604687a91.20.2025.10.23.07.17.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Oct 2025 07:18:03 -0700 (PDT)
+Date: Thu, 23 Oct 2025 14:17:56 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Dong Chenchen <dongchenchen2@huawei.com>,
+	Oscar Maes <oscmaes92@gmail.com>
+Subject: Re: [PATCH net] net: vlan: sync VLAN features with lower device
+Message-ID: <aPo5FCLqkJc86ixe@fedora>
+References: <20251021095658.86478-1-liuhangbin@gmail.com>
+ <38605efc-32f5-4c78-a628-11f8f07668f0@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <38605efc-32f5-4c78-a628-11f8f07668f0@redhat.com>
 
-On Wed, 22 Oct 2025 15:29:42 +0300 Tariq Toukan wrote:
-> BUG: kernel NULL pointer dereference, address: 0000000000000010
-> PGD 146427067 P4D 146427067 PUD 146488067 PMD 0
-> Oops: Oops: 0000 [#1] SMP
-> CPU: 1 UID: 0 PID: 7735 Comm: devlink Tainted: GW 6.12.0-rc6_for_upstream_min_debug_2024_11_08_00_46 #1
-> Tainted: [W]=WARN
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-> RIP: 0010:mlx5_devcom_comp_set_ready+0x5/0x40 [mlx5_core]
-> Code: 00 01 48 83 05 23 32 1e 00 01 41 b8 ed ff ff ff e9 60 ff ff ff 48 83 05 00 32 1e 00 01 eb e3 66 0f 1f 44 00 00 0f 1f 44 00 00 <48> 8b 47 10 48 83 05 5f 32 1e 00 01 48 8b 50 40 48 85 d2 74 05 40
-> RSP: 0018:ffff88811a5c35f8 EFLAGS: 00010206
-> RAX: ffff888106e8ab80 RBX: ffff888107d7e200 RCX: ffff88810d6f0a00
-> RDX: ffff88810d6f0a00 RSI: 0000000000000001 RDI: 0000000000000000
-> RBP: ffff88811a17e620 R08: 0000000000000040 R09: 0000000000000000
-> R10: ffff88811a5c3618 R11: 0000000de85d51bd R12: ffff88811a17e600
-> R13: ffff88810d6f0a00 R14: 0000000000000000 R15: ffff8881034bda80
-> FS:  00007f27bdf89180(0000) GS:ffff88852c880000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000010 CR3: 000000010f159005 CR4: 0000000000372eb0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  ? __die+0x20/0x60
->  ? page_fault_oops+0x150/0x3e0
->  ? exc_page_fault+0x74/0x130
->  ? asm_exc_page_fault+0x22/0x30
->  ? mlx5_devcom_comp_set_ready+0x5/0x40 [mlx5_core]
->  mlx5e_devcom_event_mpv+0x42/0x60 [mlx5_core]
->  mlx5_devcom_send_event+0x8c/0x170 [mlx5_core]
->  blocking_event+0x17b/0x230 [mlx5_core]
->  notifier_call_chain+0x35/0xa0
->  blocking_notifier_call_chain+0x3d/0x60
->  mlx5_blocking_notifier_call_chain+0x22/0x30 [mlx5_core]
->  mlx5_core_mp_event_replay+0x12/0x20 [mlx5_core]
->  mlx5_ib_bind_slave_port+0x228/0x2c0 [mlx5_ib]
->  mlx5_ib_stage_init_init+0x664/0x9d0 [mlx5_ib]
->  ? idr_alloc_cyclic+0x50/0xb0
->  ? __kmalloc_cache_noprof+0x167/0x340
->  ? __kmalloc_noprof+0x1a7/0x430
->  __mlx5_ib_add+0x34/0xd0 [mlx5_ib]
->  mlx5r_probe+0xe9/0x310 [mlx5_ib]
->  ? kernfs_add_one+0x107/0x150
->  ? __mlx5_ib_add+0xd0/0xd0 [mlx5_ib]
->  auxiliary_bus_probe+0x3e/0x90
->  really_probe+0xc5/0x3a0
->  ? driver_probe_device+0x90/0x90
->  __driver_probe_device+0x80/0x160
->  driver_probe_device+0x1e/0x90
->  __device_attach_driver+0x7d/0x100
->  bus_for_each_drv+0x80/0xd0
->  __device_attach+0xbc/0x1f0
->  bus_probe_device+0x86/0xa0
->  device_add+0x62d/0x830
->  __auxiliary_device_add+0x3b/0xa0
->  ? auxiliary_device_init+0x41/0x90
->  add_adev+0xd1/0x150 [mlx5_core]
->  mlx5_rescan_drivers_locked+0x21c/0x300 [mlx5_core]
->  esw_mode_change+0x6c/0xc0 [mlx5_core]
->  mlx5_devlink_eswitch_mode_set+0x21e/0x640 [mlx5_core]
->  devlink_nl_eswitch_set_doit+0x60/0xe0
->  genl_family_rcv_msg_doit+0xd0/0x120
->  genl_rcv_msg+0x180/0x2b0
->  ? devlink_get_from_attrs_lock+0x170/0x170
->  ? devlink_nl_eswitch_get_doit+0x290/0x290
->  ? devlink_nl_pre_doit_port_optional+0x50/0x50
->  ? genl_family_rcv_msg_dumpit+0xf0/0xf0
->  netlink_rcv_skb+0x54/0x100
->  genl_rcv+0x24/0x40
->  netlink_unicast+0x1fc/0x2d0
->  netlink_sendmsg+0x1e4/0x410
->  __sock_sendmsg+0x38/0x60
->  ? sockfd_lookup_light+0x12/0x60
->  __sys_sendto+0x105/0x160
->  ? __sys_recvmsg+0x4e/0x90
->  __x64_sys_sendto+0x20/0x30
->  do_syscall_64+0x4c/0x100
->  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-> RIP: 0033:0x7f27bc91b13a
-> Code: bb 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 8b 05 fa 96 2c 00 45 89 c9 4c 63 d1 48 63 ff 85 c0 75 15 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 76 f3 c3 0f 1f 40 00 41 55 41 54 4d 89 c5 55
-> RSP: 002b:00007fff369557e8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-> RAX: ffffffffffffffda RBX: 0000000009c54b10 RCX: 00007f27bc91b13a
-> RDX: 0000000000000038 RSI: 0000000009c54b10 RDI: 0000000000000006
-> RBP: 0000000009c54920 R08: 00007f27bd0030e0 R09: 000000000000000c
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000001
->  </TASK>
-> Modules linked in: mlx5_vdpa vringh vhost_iotlb vdpa xt_MASQUERADE nf_conntrack_netlink nfnetlink iptable_nat xt_addrtype xt_conntrack nf_nat br_netfilter rpcsec_gss_krb5 auth_rpcgss oid_registry overlay rpcrdma rdma_ucm ib_iser libiscsi ib_umad scsi_transport_iscsi ib_ipoib rdma_cm iw_cm ib_cm mlx5_fwctl mlx5_ib ib_uverbs ib_core mlx5_core
-> CR2: 0000000000000010
+On Thu, Oct 23, 2025 at 03:39:07PM +0200, Paolo Abeni wrote:
+> On 10/21/25 11:56 AM, Hangbin Liu wrote:
+> > After registering a VLAN device and setting its feature flags, we need to
+> > synchronize the VLAN features with the lower device. For example, the VLAN
+> > device does not have the NETIF_F_LRO flag, it should be synchronized with
+> > the lower device based on the NETIF_F_UPPER_DISABLES definition.
+> > 
+> > As the dev->vlan_features has changed, we need to call
+> > netdev_change_features(). The caller must run after netdev_upper_dev_link()
+> > links the lower devices, so this patch adds the netdev_change_features()
+> > call in register_vlan_dev().
+> 
+> 
+> > 
+> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> > ---
+> > 
+> > I’m not sure what the proper Fixes tag should be, so I’ve left it blank for
+> > now. If anyone has a clue, please let me know.
+> 
+> Apparently the issue is there since fd867d51f889aec11cca235ebb008578780d052d
 
-Please trim the crashes in the future.
+Thanks, I thought it's a VLAN issue. Didn't expect it's from here.
 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> index 41fd5eee6306..9c46511e7b43 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -266,6 +266,7 @@ static void mlx5e_devcom_cleanup_mpv(struct mlx5e_priv *priv)
->  	}
->  
->  	mlx5_devcom_unregister_component(priv->devcom);
-> +	priv->devcom = NULL;
->  }
+> 
+> > 
+> > ---
+> >  net/8021q/vlan.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
+> > index fda3a80e9340..4857fb0ee11d 100644
+> > --- a/net/8021q/vlan.c
+> > +++ b/net/8021q/vlan.c
+> > @@ -193,6 +193,8 @@ int register_vlan_dev(struct net_device *dev, struct netlink_ext_ack *extack)
+> >  	vlan_group_set_device(grp, vlan->vlan_proto, vlan_id, dev);
+> >  	grp->nr_vlan_devs++;
+> >  
+> > +	netdev_change_features(dev);
+> 
+> Is this just for NETIF_F_LRO? it feels a bit overkill for single flag.
 
-This feels a little like it should be in patch 3. 
-But I guess the two are inextricably linked anyway :\
+Not only LRO, the vlan set all the dev features in vlan_dev_init() but doesn't
+call the netdev_change_features(). I think it need to compute the dev features
+once.
+
+> Also, why netdev_change_features() (vs netdev_update_features())?> +
+
+Hmm, I might made a mistake. I thought any_dev->vlan_features changes need
+to call netdev_change_features(). But actually only the lower_dev->vlan_features
+changes need to call netdev_change_features(). I will fix it.
+
+Thanks
+Hangbin
 
