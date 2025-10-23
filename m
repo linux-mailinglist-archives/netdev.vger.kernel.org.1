@@ -1,213 +1,327 @@
-Return-Path: <netdev+bounces-232180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A90A6C02269
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:35:00 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0EF6C0220F
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:32:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 516133A4EE2
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 15:30:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 688944F126F
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 15:32:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0895B2D5955;
-	Thu, 23 Oct 2025 15:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14ACB33C520;
+	Thu, 23 Oct 2025 15:32:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NUjebekZ"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="iLPZr8HO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013009.outbound.protection.outlook.com [40.107.162.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E28C32C93C
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 15:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761233431; cv=none; b=VttcnowWAWxD6Yy8ZXnURHaQNRMsYlTR7j8HYTB4LWCq0DewarJeYfRMvOJ4cz1mhSCkNVU+Oumsn1p6ndaJqSGaDD1oqapL72Eq/xUOh8zuKDdin5Tc637j+3zN5XSK9RweQeX9QVtiFnFTBeKT8FUKKb+c9i9uztqoO+IepcU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761233431; c=relaxed/simple;
-	bh=YzVTPHdODtgkjfAqPo2TUs8C0w4zPG177BNAJw4rqZI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NmaHPlhQBDoCCWViSJFWCa2z37BBGf6iPnqdRnsC6klv1ivaN/OHC2rtIw2ztrxvBhj3kup8XpoWVarresDebw1rlVgo6/3hxlANX4U65riG/R37lHlE6FONFqTrUypRgOVOwgDSb20tQScyoVgjFRqsTXLI9WtAXedgkVcJO/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NUjebekZ; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-378d710caedso11409801fa.3
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 08:30:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761233428; x=1761838228; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a0XSwLp3rurZjcg/iCUuM2j7M+MsdyW5UCWdMSUqC0M=;
-        b=NUjebekZ44xhiOn7fswI/DrPaa8A1m0ey4lS0VvbjzcxgVDR7kH14M8byMgKGnP+Jn
-         eP9kZkUYC/4cOUa+PvjOBv1qHd3CIesVPMWSXfNvnhxBMNTHx1U66tBmESFQqGFxjcK/
-         5gmGgwCkZU0jqvpNQFgOM2MwwoKMqWXe9dBX/DC66rOU9z/ms9XkeYHmHziYd8DycWY4
-         ke1/6laVTb2+n0CyemZdTxO8LT9/Hx1oOEJDlipQOVSp8TeekuMLY9vps62mj7Aji2sE
-         7NH97HOw52hea8dGG2/tkHfm7ANKtxwfICoCrpI0PAssYkEOrQCloPJ1FncF2U6bq5J4
-         oVww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761233428; x=1761838228;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a0XSwLp3rurZjcg/iCUuM2j7M+MsdyW5UCWdMSUqC0M=;
-        b=rLMNYgQt8ib9N7UPcE+7VpzQNwGu48L6dMK053arRWVGy+WBKwl96vCDp8OeRPJ6jF
-         Rb+2k2CrA2S2FeXqB/LvoignYZ4AM9S6JM/p4eZpZAA6/WIJh/DrTkwXn8VEppvjymgI
-         uah4+3lwMNFdG7cLQayxCIMDeYlyOvoeEbYgN3A5EOZm0zjxHcUr2dMrIuuo0aW60rkU
-         R1ZcfNBIVyu/iJVFoUwzs1aygfY+y5Y8OW/s2kxW44DwhsLA0bZqTEhNMoyFdPFvsEbH
-         sw/ezWs1LYxw77bIFbhxMeFhd1VEBofMVQMt3A41nTaNDP0sD7EIvR4AP3VqATcpw5UL
-         P+2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWKMNakhkuQVutkWwLDiQDewYFGIgSmConDX4gb5bmD7rJAM1TNVKpSKdUPnwjRlyGqvteBU74=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjJooVH9aCX6qEPbGEdvvx3g5vuP/9ze/Xoy9I0lHDhClNMJF+
-	BLuLNsFu+dn8Q6Oz0JACf6j4EHjqkevS++CDLO33ZOFzJkg3HbN6DAb59ve/WUJRDVFo4WNAxCu
-	UA2G/G3eJCUbm9EINR7seQ08MjwH5PGM=
-X-Gm-Gg: ASbGncvtRNzNOenjdCtLKWeWi90pwWNnudR5v4Q24Di3ynfQkVKYK+AyVNQVY+kaWPk
-	vwu5PnBE0omHSptfgFCMRSGk6IAvLEvYWMSkz00S6W3ty1jxIEQ/gkoWCT6HsApVK8shdvaWJiv
-	/VXaE+0dG53gI87irDq8daM0g82ChM4qA+K4mJH/7UhPPpvrDjCgo3Wx/EjBs3xXh893qsZLpEm
-	84lqRCztG+Dog7V4bEr9KuGiFWi41VHKtYvJqaBDXgn7JeOuIkn2zmxZHo=
-X-Google-Smtp-Source: AGHT+IEl2RZUYKaxM0WfteL/2R/j53zPX3tj0HhGZt5tPLqP6lrSOo3325jPU8Ww8DOZFgCUY+vG16twN/43XsEvtvE=
-X-Received: by 2002:a05:651c:504:b0:378:e0e0:3b3a with SMTP id
- 38308e7fff4ca-378e0e03dadmr2000661fa.14.1761233427702; Thu, 23 Oct 2025
- 08:30:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061D03148C1;
+	Thu, 23 Oct 2025 15:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761233540; cv=fail; b=jJznCf+YI83wE9Mltq9lyWqrRkBQq4uAX0Wi6yF1uiM8JKZ8FB3o21g3hzO9wY/f69KgALQoNlvqw34KqUiEY5t6TyfLEti5hRpaQh/sYKzTDjPWhrQRa2XayoRGqbDpUxQPG/3K+Xs0rPIjm+81jbqJHgO4/2DwzLRViUgwT4g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761233540; c=relaxed/simple;
+	bh=fV/crduRSv1MCrHDIX7tePsM9xb13ATGoccSFOKaooI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=iBCnK1quEgG+0QhPr3drdm5wkLmLfxwoClCtLe+vYmN9DXGrn4xg/hw/9GolwWC5DAC5VJ9bXfpDTg8vKAHJ5zqisw0y0XsXwz6BxTRc43A3CT+2BVh8UAUp7UHhZzSiW6zK3PaOI/mMfZuT9WzC8TU9Kjkwk58gzDCUaIY+fMU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=iLPZr8HO; arc=fail smtp.client-ip=40.107.162.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=EZ0dQN9dvYkTqIiZgiTub+Ns/jPwa5UFGfAMi3Kyql2JNlagaaj1EaQLKOT6P0794Iuunqo1jgzDlLa1S0aiasdSTaJhfcIiH3AGkX70eblQY+SsBrDvgZYm96GIHIEI/sFGtlAnAHMZX7o5C9A5yXSReVuxd2kN4EKz3uB/+oTjq9lC48ufyQfjSJMxllrVUKl+WXOnGegwO0Kapn7ZLNKaGVM428Xp6Jubdqxp8Ph61ifGCgqX143nFccx54Xl3AwuizOJaOg2l002+nMGExEmCI/l31y5/80S5S5fITQIzpmfRBi6BT5O6s/Tj2ldwvRHUFud1Pvg5JiejO8GOQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0RW/BtmjJfZqcvS2ChsfCYopAaXYWGYJc+gLhihkKYo=;
+ b=F9pyZd0fYlsYt+ItS9Q+2CK3kQHeBkxON6e5rBUv8+9mbjKOEdjJHF8w5YS1hbFLXpPi1Et1zIVogn9GM67bKyUe6kRasF+49xrz/1XIdR+1k+ApJSDLi+N6t65rTXY2sdy5+Zdg/oFSih+4w6pCC62vAAu8L7Ep5oFx+4IVdamlCXZ+vDMJewScDmtTvjVNSYKR9JgC/VT2zPxG3IIdvBJGXZXZkPnvNHpxMrY6nL9FPubhQlzdfqmh6ymHXJY/MssVw9i45nHgzaUvIREseDCGd1N8dI+urNGPQwJBsH0aWEfKlGoO4stpCtpZCyAxuIyObtLEgxJPeeQ4cw5oyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0RW/BtmjJfZqcvS2ChsfCYopAaXYWGYJc+gLhihkKYo=;
+ b=iLPZr8HOq2W3rI4b5k5WP79OMs0l0dA2glOWt9KnO6OOwrlcAAOJbkX3CsFgi1ABl9b93hB5PR2s6YpzfCLJ/4+PKjALxL5Cn8p/CxSWCd7VqBBbCnwLDKXMheCBP9cFPMWNlbl42v0JY1fRrJPDEhmbql6H3ICwqKIapWYAigqIL5XvBAOQTU4bc+OfbGHyqSegW6eiC2k2aP8q8z8ddTdBmZyZuYn1KdwbLCzd5bqgZRFZGpwNXaiC2u+uDvQJ6bzFt6pLN7a7VXSIepd3NyW/n6jySMPPv9vl/iqJx2RelJiUTaZTRryuMbtY3IMR0QVkAp7XNOwt6vOcGj/mRA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXSPRMB0053.eurprd04.prod.outlook.com (2603:10a6:102:23f::21)
+ by PR3PR04MB7433.eurprd04.prod.outlook.com (2603:10a6:102:86::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.13; Thu, 23 Oct
+ 2025 15:32:14 +0000
+Received: from PAXSPRMB0053.eurprd04.prod.outlook.com
+ ([fe80::504f:2a06:4579:5f15]) by PAXSPRMB0053.eurprd04.prod.outlook.com
+ ([fe80::504f:2a06:4579:5f15%6]) with mapi id 15.20.9253.011; Thu, 23 Oct 2025
+ 15:32:14 +0000
+Date: Thu, 23 Oct 2025 11:32:06 -0400
+From: Frank Li <Frank.li@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	claudiu.manoil@nxp.com, vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	richardcochran@gmail.com, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 3/6] net: enetc: add preliminary i.MX94 NETC
+ blocks control support
+Message-ID: <aPpKdjWPhzHEDR3I@lizhi-Precision-Tower-5810>
+References: <20251023065416.30404-1-wei.fang@nxp.com>
+ <20251023065416.30404-4-wei.fang@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251023065416.30404-4-wei.fang@nxp.com>
+X-ClientProxiedBy: PH7PR03CA0025.namprd03.prod.outlook.com
+ (2603:10b6:510:339::17) To PAXSPRMB0053.eurprd04.prod.outlook.com
+ (2603:10a6:102:23f::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251020151255.1807712-1-Ilia.Gavrilov@infotecs.ru>
- <CABBYNZKUNecJNPmrVFdkkOhG1A8C_32pUOdh0ZDWkCNkAugDdQ@mail.gmail.com> <3935eaf3-3a58-4b2d-b0ee-4c6c641b5343@infotecs.ru>
-In-Reply-To: <3935eaf3-3a58-4b2d-b0ee-4c6c641b5343@infotecs.ru>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 23 Oct 2025 11:30:14 -0400
-X-Gm-Features: AWmQ_bkT8LCrUdEn-siB3b4sJ2bnnDD9OQtnOwalGePObC_ChNWXpM67mT3yEBw
-Message-ID: <CABBYNZJLtTiFZ-1LchJ7Cy1JT=vuDmkkRHjrUY92jC740ihs5w@mail.gmail.com>
-Subject: Re: [PATCH net] Bluetooth: MGMT: Fix OOB access in parse_adv_monitor_pattern()
-To: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXSPRMB0053:EE_|PR3PR04MB7433:EE_
+X-MS-Office365-Filtering-Correlation-Id: 837267a2-7b55-4e9c-be65-08de12495733
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|19092799006|52116014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?RMEDkuayONqn5bSvKWc6YHjkqXNJnJ3/bmrqTcooSpnIRUs/3gKjlSkLLK2B?=
+ =?us-ascii?Q?ay8gIn5k9XH7EDQBdBnwO5rmtINHCUcgVm/FTLo+twwDmggnEcaYqUP0BP4z?=
+ =?us-ascii?Q?1jH5o2XhufAynccp3rgRjZ5Pg84HRdKXqRbdDTo4IJraALk6QaJPHCk+ZcD5?=
+ =?us-ascii?Q?3gEeJmK6IDLe+5ukfYKudcM2psByPMW5d4IFfUyZ4qg+uQWngFPKdNX3i9Kc?=
+ =?us-ascii?Q?Zo/2HUAAUUDrkhMNXJ3PF1JFVNLZoBvFmhlsIzxcNJgPXC8LjnGeyuP1z685?=
+ =?us-ascii?Q?tT2vD84z6dVeM4nw4BqQbvV9HJmP3Ncq4kj0rAK/hpIB8wJwF3RK4GX4ATSd?=
+ =?us-ascii?Q?gs/xql9leYaWyotYVqCAmZ8QjZ65e5imQN1FwSHGUQ9z9nkRNkK2BKW7e+kY?=
+ =?us-ascii?Q?I70gYPaTeD+AkAtxJemAx6moUfKaH2PShdoPWY+cUTyA8t5/PB4gx/VqZdJz?=
+ =?us-ascii?Q?oIFzfpX4++PoAMADO/7OBHEmEP2szPJJ9ISh6twC5tfysMjNz0BwRe0ovibz?=
+ =?us-ascii?Q?+Er3T97mzppSnbcClSvEwInlCnpDETQ+20wTgka+518Mngc5rUlKZJhtL11s?=
+ =?us-ascii?Q?14BA4y05OdtRJKkmMfO5ZyJHoXLj0AZA9nrP25hecm16qOQyAMzuu82/D6eN?=
+ =?us-ascii?Q?0TpV4VcPnug1hni0itX/ladXCfbOPY43mbRVswtLWjZz55Q4+mEjOzNXmMcR?=
+ =?us-ascii?Q?/OzFjBs8ZdrqBvARG++FICpWHRPR80gcQ95mRcrXN4GyjhG4pmxvzjz5plpD?=
+ =?us-ascii?Q?khpP6uJRBvfZNxIVEKB9EQykTGuIRQ/FLdwtkPdvLuHbdc9mSFqWqQE/Sj7A?=
+ =?us-ascii?Q?75xdwZKcYU47BwbLd09EM2ZQEbAzBYXaZiGR/GlKsDaIwdiisSXlKl2RMvDN?=
+ =?us-ascii?Q?8dzQcKqUr39Qy4Yi8yQfUnFbGtDSZFmqd3YZyLqI9ySU4PK/t6XrqicEU/sj?=
+ =?us-ascii?Q?nkqV6mvMRfMSYba+iysgGSpfFaJpHG2Tc4nqJ5gW9awHEg/Hw4OpQ+YhnQNo?=
+ =?us-ascii?Q?GRcryd7CUCqaZV8nvn9xEWiA8bE69FIgiLM0+ngYRo1+iDXh1jnQ9FqarhaK?=
+ =?us-ascii?Q?1+hH91IZYiiyyehQk10dumeZUN5JlelaruycEm1/PyVR+KQqMZQTPLuj7EhO?=
+ =?us-ascii?Q?zqbcnaBDmQ0W4n+sRsZv3vSrkwo1ppxkaZY7MqgJnZPeZllBDMceXzjRtVoc?=
+ =?us-ascii?Q?ogoZPUv6amuxt9fkVyOe0+XACje36R0MrDCT1AK69A4NYN3ug8+gJ4Brw6bc?=
+ =?us-ascii?Q?C0R32A4AyB6DvEWtt/K+0eC6CRPJS1H4dQjGvQi/fFM/FxfIxNcncmbKQ0Xp?=
+ =?us-ascii?Q?vBsK+JUltWmm79vBLrYJ3TIOCQDIgWNQnTtca7Ze2Hgah4c5V9k7mKWvVgAM?=
+ =?us-ascii?Q?QX1qrSZ0nOvRBGNNvIunqwSeXySypYYEx8v5Wr0xFbDyqXR/K7dwkaYNC7F7?=
+ =?us-ascii?Q?qGSyEwD/T0BGSXvy2/MTdDLWd/6v4syM9hYjwlE3O1cKtYpuYTEAdwz7v0Js?=
+ =?us-ascii?Q?nFDNjdbyHiV8x4o5csEI7kBnSAEPpJu/vRVz?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXSPRMB0053.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(19092799006)(52116014)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?eafrowjelEEIV9OyhryEnLLHuIi/LrNIqdl1oRduX2UjM0Lsv3yyErQH76Cm?=
+ =?us-ascii?Q?hnmOyiP6wOZzgbcAbC58fsF0wUTKLXEQUsTvSbNCfuGpCEi4rw4jQ1ty0Pb1?=
+ =?us-ascii?Q?+FLHrIPJGIOs4yGqEzFlgp0aIIGhklIrPWxxLCA17OOFkPAEstYBgwSmiJCA?=
+ =?us-ascii?Q?moNylLrwLy304BisKv3g++MbVE7H/G6ZpmnY9YzajU2nxjJ7EcPwzrzLnDss?=
+ =?us-ascii?Q?ZVPtaltBPKM2jTbS9MtAiBGmBXvMGing/QqjQJUY1qwynbJPZlD0KiGDA23q?=
+ =?us-ascii?Q?WSpmciM01saXw+s77eH8F3EY/KdOCbzR8l8iP1qhylMN3Lrtt6ojKXS3RSMM?=
+ =?us-ascii?Q?tLakLvdN3Rr0rL1Q6bA2J7IySIqGylNwZaIqfLsuS2gyma8yStbOl2Qn8OPw?=
+ =?us-ascii?Q?0P3KLCt1WvVtPLEi4pgV5TEtZxK6JLuH+HuVcFu7ila0woRMoXAowYp32p/B?=
+ =?us-ascii?Q?5uuvrOd09LIAGYQqYK/0AfdnXgNVqDSdFB5Oe8cq7hBV+jMBxtJuqGHolE80?=
+ =?us-ascii?Q?MqcFu2kbQ7wvCDXLd1q4O3GQYorlknsZQNqui5brhTc94W3g6Z8sff2QS+VT?=
+ =?us-ascii?Q?g0TlcpusrKXuIxX2ZwK1M18Pw2X0iihUWsymzv1bvLTi+iVaCNqnH+jdF13K?=
+ =?us-ascii?Q?MsRchxES9rTashVOf6trmoiw5jcvxj3jkGYbpsoVrzUtY0+3KwaGuH+kOZpS?=
+ =?us-ascii?Q?3PY+tixPjsdWu/+Y7WJNMYmeXNh7dqAFBkhfccFpXEwG7qMQ2agpQdv0JS7p?=
+ =?us-ascii?Q?cxZFRTroCuL++mOd2svEbO6yWBR681K8jhgTTzWouhTNr7xMyLWl7embFawt?=
+ =?us-ascii?Q?sTzroJsf6PDFoF9nOKjQntqsj/Nl5MhbC6jcE/2ltJZykeXpNwGjGyRMrQn/?=
+ =?us-ascii?Q?S17cq9b0xyMN2meLVsgJPuuOeyuPT7c4aqlH/Qz7mU1MphKSnN69q0Z8Lk2V?=
+ =?us-ascii?Q?vcuMiLfpDo+iI7OVdZqJr/Ot5ncdsJJVblSx6PQ9t3c3bFbS+/8e+SkDP9ym?=
+ =?us-ascii?Q?e+0kARmTf8/gm9K+HzZqvH4IGXJqp7f8YrTduzR64zg7asRvUO2UmFHk1Fgg?=
+ =?us-ascii?Q?RLxhAPrbdDqxx71powGV1WO+YRvUUAJNivBOj1+HkzuHWVZXIkk2LbkeCq5X?=
+ =?us-ascii?Q?eHKtajX3B4SGeCHqdrKdk12VanfpyxKF+aqJPCTZ+Ld6G2nlSOWkrmUBmZNO?=
+ =?us-ascii?Q?4Wg/3uKZpQDRzBWSCIeVlq5sB1owQFQpAcnKqVdJ3kZ/tfQT1SIa5F/hbWE1?=
+ =?us-ascii?Q?Xe0h9pWThAn6zy5xuR4k8DhytW5mA3xSCAtP0a91X+OfZFJFWpbiD3GROVht?=
+ =?us-ascii?Q?R6rsM8KIqmEB7yl+ebLMxnv51hd0qpuVLW+W1y2HHT19wCwzCHBs0y0CKJjd?=
+ =?us-ascii?Q?M8exs4404PaUx9/xRHSCtOkywyHgUa+WwjxqiLyXevBf00BffsgLCgdp7Vhy?=
+ =?us-ascii?Q?tZV58OXd2BV4Y6+l6C0lJtawoT5RDHFX0/OXykZciir8j0DVuD8WQD6FkGsv?=
+ =?us-ascii?Q?p0D/ZUgdi8dry761sOmSvLI9Z4gzOAryjnrXKJV4tOUriFvv+3TFvEPAhliU?=
+ =?us-ascii?Q?tjKhL5K625bbAin5AZaV1LarSCId9tOU5rOHyPZr?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 837267a2-7b55-4e9c-be65-08de12495733
+X-MS-Exchange-CrossTenant-AuthSource: PAXSPRMB0053.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2025 15:32:13.9529
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: q4bwc9x2bXE4rAxrTTpHC4ceQ4kQaht45ZhH/21moX6VYDTo1Si673CZ3jyY94saZ/65bhi7pIztwSs0mZRbTw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR04MB7433
 
-Hi Ilia,
-
-On Thu, Oct 23, 2025 at 11:08=E2=80=AFAM Ilia Gavrilov
-<Ilia.Gavrilov@infotecs.ru> wrote:
+On Thu, Oct 23, 2025 at 02:54:13PM +0800, Wei Fang wrote:
+> NETC blocks control is used for warm reset and pre-boot initialization.
+> Different versions of NETC blocks control are not exactly the same. We
+> need to add corresponding netc_devinfo data for each version. The NETC
+> version of i.MX94 is v4.3, which is different from i.MX95. Currently,
+> the patch adds the following configurations for ENETCs.
 >
-> Hi, Luiz, thank you for the review.
+> 1. Set the link's MII protocol.
+> 2. ENETC 0 (MAC 3) and the switch port 2 (MAC 2) share the same parallel
+> interface, but due to SoC constraint, they cannot be used simultaneously.
+> Since the switch is not supported yet, so the interface is assigned to
+> ENETC 0 by default.
 >
-> On 10/23/25 16:18, Luiz Augusto von Dentz wrote:
-> > Hi Ilia,
-> >
-> > On Mon, Oct 20, 2025 at 11:12=E2=80=AFAM Ilia Gavrilov
-> > <Ilia.Gavrilov@infotecs.ru> wrote:
-> >>
-> >> In the parse_adv_monitor_pattern() function, the value of
-> >> the 'length' variable is currently limited to HCI_MAX_EXT_AD_LENGTH(25=
-1).
-> >> The size of the 'value' array in the mgmt_adv_pattern structure is 31.
-> >> If the value of 'pattern[i].length' is set in the user space
-> >> and exceeds 31, the 'patterns[i].value' array can be accessed
-> >> out of bound when copied.
-> >>
-> >> Increasing the size of the 'value' array in
-> >> the 'mgmt_adv_pattern' structure will break the userspace.
-> >> Considering this, and to avoid OOB access revert the limits for 'offse=
-t'
-> >> and 'length' back to the value of HCI_MAX_AD_LENGTH.
-> >>
-> >> Found by InfoTeCS on behalf of Linux Verification Center
-> >> (linuxtesting.org) with SVACE.
-> >>
-> >> Fixes: db08722fc7d4 ("Bluetooth: hci_core: Fix missing instances using=
- HCI_MAX_AD_LENGTH")
-> >> Cc: stable@vger.kernel.org
-> >> Signed-off-by: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
-> >> ---
-> >>  include/net/bluetooth/mgmt.h | 2 +-
-> >>  net/bluetooth/mgmt.c         | 6 +++---
-> >>  2 files changed, 4 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt=
-.h
-> >> index 74edea06985b..4b07ce6dfd69 100644
-> >> --- a/include/net/bluetooth/mgmt.h
-> >> +++ b/include/net/bluetooth/mgmt.h
-> >> @@ -780,7 +780,7 @@ struct mgmt_adv_pattern {
-> >>         __u8 ad_type;
-> >>         __u8 offset;
-> >>         __u8 length;
-> >> -       __u8 value[31];
-> >> +       __u8 value[HCI_MAX_AD_LENGTH];
-> >
-> > Why not use HCI_MAX_EXT_AD_LENGTH above? Or perhaps even make it
-> > opaque since the actual size is defined by length - offset.
-> >
+> The switch configuration will be added separately in a subsequent patch.
 >
-> As I see it, user programs rely on this size of the structure, and if the=
- size is changed, they will be broken.
-> Excerpt from bluez tools sources:
-> ...
-> structure of mgmt_adv_pattern {
-> uint8_t ad type;
->         uint8_t offset;
->         length of uint8_t;
->         uint8_t value[31];
-> } __packed;
-> ...
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
 
-Well it is broken for EA already, so the question is should we leave
-it to just handle legacy advertisement or not? At some point I was
-actually just considering removing/deprecating the support of this
-command altogether since there exists a standard way to do
-advertisement monitoring called Monitoring Advertisers introduced in
-6.0:
+Reviewed-by: Frank Li <Frank.Li@nxp.com>
 
-https://www.bluetooth.com/core-specification-6-feature-overview/?utm_source=
-=3Dinternal&utm_medium=3Dblog&utm_campaign=3Dtechnical&utm_content=3Dnow-av=
-ailable-new-version-of-the-bluetooth-core-specification
-
-The the standard monitoring list doesn't seem to be able to do
-filtering on the data itself, which I think the where the decision
-based filtering used, so it is not really compatible with the MS
-vendor commands.
-
+> ---
+>  .../ethernet/freescale/enetc/netc_blk_ctrl.c  | 104 ++++++++++++++++++
+>  1 file changed, 104 insertions(+)
 >
-> >>  } __packed;
-> >>
-> >>  #define MGMT_OP_ADD_ADV_PATTERNS_MONITOR       0x0052
-> >> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> >> index a3d16eece0d2..500033b70a96 100644
-> >> --- a/net/bluetooth/mgmt.c
-> >> +++ b/net/bluetooth/mgmt.c
-> >> @@ -5391,9 +5391,9 @@ static u8 parse_adv_monitor_pattern(struct adv_m=
-onitor *m, u8 pattern_count,
-> >>         for (i =3D 0; i < pattern_count; i++) {
-> >>                 offset =3D patterns[i].offset;
-> >>                 length =3D patterns[i].length;
-> >> -               if (offset >=3D HCI_MAX_EXT_AD_LENGTH ||
-> >> -                   length > HCI_MAX_EXT_AD_LENGTH ||
-> >> -                   (offset + length) > HCI_MAX_EXT_AD_LENGTH)
-> >> +               if (offset >=3D HCI_MAX_AD_LENGTH ||
-> >> +                   length > HCI_MAX_AD_LENGTH ||
-> >> +                   (offset + length) > HCI_MAX_AD_LENGTH)
-> >>                         return MGMT_STATUS_INVALID_PARAMS;
-> >>
-> >>                 p =3D kmalloc(sizeof(*p), GFP_KERNEL);
-> >> --
-> >> 2.39.5
-> >
-> >
-> >
+> diff --git a/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c b/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c
+> index bcb8eefeb93c..5978ea096e80 100644
+> --- a/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c
+> +++ b/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c
+> @@ -47,6 +47,13 @@
+>  #define PCS_PROT_SFI			BIT(4)
+>  #define PCS_PROT_10G_SXGMII		BIT(6)
 >
-
-
---=20
-Luiz Augusto von Dentz
+> +#define IMX94_EXT_PIN_CONTROL		0x10
+> +#define  MAC2_MAC3_SEL			BIT(1)
+> +
+> +#define IMX94_NETC_LINK_CFG(a)		(0x4c + (a) * 4)
+> +#define  NETC_LINK_CFG_MII_PROT		GENMASK(3, 0)
+> +#define  NETC_LINK_CFG_IO_VAR		GENMASK(19, 16)
+> +
+>  /* NETC privileged register block register */
+>  #define PRB_NETCRR			0x100
+>  #define  NETCRR_SR			BIT(0)
+> @@ -68,6 +75,13 @@
+>  #define IMX95_ENETC1_BUS_DEVFN		0x40
+>  #define IMX95_ENETC2_BUS_DEVFN		0x80
+>
+> +#define IMX94_ENETC0_BUS_DEVFN		0x100
+> +#define IMX94_ENETC1_BUS_DEVFN		0x140
+> +#define IMX94_ENETC2_BUS_DEVFN		0x180
+> +#define IMX94_ENETC0_LINK		3
+> +#define IMX94_ENETC1_LINK		4
+> +#define IMX94_ENETC2_LINK		5
+> +
+>  /* Flags for different platforms */
+>  #define NETC_HAS_NETCMIX		BIT(0)
+>
+> @@ -192,6 +206,90 @@ static int imx95_netcmix_init(struct platform_device *pdev)
+>  	return 0;
+>  }
+>
+> +static int imx94_enetc_get_link_id(struct device_node *np)
+> +{
+> +	int bus_devfn = netc_of_pci_get_bus_devfn(np);
+> +
+> +	/* Parse ENETC link number */
+> +	switch (bus_devfn) {
+> +	case IMX94_ENETC0_BUS_DEVFN:
+> +		return IMX94_ENETC0_LINK;
+> +	case IMX94_ENETC1_BUS_DEVFN:
+> +		return IMX94_ENETC1_LINK;
+> +	case IMX94_ENETC2_BUS_DEVFN:
+> +		return IMX94_ENETC2_LINK;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +}
+> +
+> +static int imx94_link_config(struct netc_blk_ctrl *priv,
+> +			     struct device_node *np, int link_id)
+> +{
+> +	phy_interface_t interface;
+> +	int mii_proto;
+> +	u32 val;
+> +
+> +	/* The node may be disabled and does not have a 'phy-mode'
+> +	 * or 'phy-connection-type' property.
+> +	 */
+> +	if (of_get_phy_mode(np, &interface))
+> +		return 0;
+> +
+> +	mii_proto = netc_get_link_mii_protocol(interface);
+> +	if (mii_proto < 0)
+> +		return mii_proto;
+> +
+> +	val = mii_proto & NETC_LINK_CFG_MII_PROT;
+> +	if (val == MII_PROT_SERIAL)
+> +		val = u32_replace_bits(val, IO_VAR_16FF_16G_SERDES,
+> +				       NETC_LINK_CFG_IO_VAR);
+> +
+> +	netc_reg_write(priv->netcmix, IMX94_NETC_LINK_CFG(link_id), val);
+> +
+> +	return 0;
+> +}
+> +
+> +static int imx94_enetc_link_config(struct netc_blk_ctrl *priv,
+> +				   struct device_node *np)
+> +{
+> +	int link_id = imx94_enetc_get_link_id(np);
+> +
+> +	if (link_id < 0)
+> +		return link_id;
+> +
+> +	return imx94_link_config(priv, np, link_id);
+> +}
+> +
+> +static int imx94_netcmix_init(struct platform_device *pdev)
+> +{
+> +	struct netc_blk_ctrl *priv = platform_get_drvdata(pdev);
+> +	struct device_node *np = pdev->dev.of_node;
+> +	u32 val;
+> +	int err;
+> +
+> +	for_each_child_of_node_scoped(np, child) {
+> +		for_each_child_of_node_scoped(child, gchild) {
+> +			if (!of_device_is_compatible(gchild, "pci1131,e101"))
+> +				continue;
+> +
+> +			err = imx94_enetc_link_config(priv, gchild);
+> +			if (err)
+> +				return err;
+> +		}
+> +	}
+> +
+> +	/* ENETC 0 and switch port 2 share the same parallel interface.
+> +	 * Currently, the switch is not supported, so this interface is
+> +	 * used by ENETC 0 by default.
+> +	 */
+> +	val = netc_reg_read(priv->netcmix, IMX94_EXT_PIN_CONTROL);
+> +	val |= MAC2_MAC3_SEL;
+> +	netc_reg_write(priv->netcmix, IMX94_EXT_PIN_CONTROL, val);
+> +
+> +	return 0;
+> +}
+> +
+>  static bool netc_ierb_is_locked(struct netc_blk_ctrl *priv)
+>  {
+>  	return !!(netc_reg_read(priv->prb, PRB_NETCRR) & NETCRR_LOCK);
+> @@ -340,8 +438,14 @@ static const struct netc_devinfo imx95_devinfo = {
+>  	.ierb_init = imx95_ierb_init,
+>  };
+>
+> +static const struct netc_devinfo imx94_devinfo = {
+> +	.flags = NETC_HAS_NETCMIX,
+> +	.netcmix_init = imx94_netcmix_init,
+> +};
+> +
+>  static const struct of_device_id netc_blk_ctrl_match[] = {
+>  	{ .compatible = "nxp,imx95-netc-blk-ctrl", .data = &imx95_devinfo },
+> +	{ .compatible = "nxp,imx94-netc-blk-ctrl", .data = &imx94_devinfo },
+>  	{},
+>  };
+>  MODULE_DEVICE_TABLE(of, netc_blk_ctrl_match);
+> --
+> 2.34.1
+>
 
