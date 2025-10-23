@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-232146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D90CC01CE6
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:35:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7866EC01CFB
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:36:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3416B3AF475
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:30:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 236F43B2B8E
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0291032D448;
-	Thu, 23 Oct 2025 14:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B18732E73E;
+	Thu, 23 Oct 2025 14:30:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RZRs9nyB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MCLbUkYN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C861832D43E;
-	Thu, 23 Oct 2025 14:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD48E32E6A7;
+	Thu, 23 Oct 2025 14:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761229836; cv=none; b=bh3t3Bm91CC4SDjbBKWbIA9aBKxeMMf8L+m7qBwd+GFUp+x8Yg9Q0fgZCkrBRGzB8VWf84+1TMrMg6NDkysi+n3KVUWO49HcFdeKti/yZ+03FVGd7T4Y2qkZLntCkvOttmhHldyjaIbQ+jOC6Mx40pLr+R7S8qm95EDAJTwlJAg=
+	t=1761229838; cv=none; b=SjdkFUhB6gF2y7SQtEQyXqssjLgQAUf978iignVlSQmxVMGjrRCt4CWbz7mnc35R0EYaDiD2rNUx2Dc6Y9+b4OCiR1Hrw2pOYMb1RSc86HdUcfHpaJw/jnCxOkXoBaOf84dsMhQUCycx4qBvZl/ZvLtSbKDRDIsiiYEK15/08TI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761229836; c=relaxed/simple;
-	bh=AtBLuOu30wZ5DYW+wY+eKPBg8t1AvODpuADEttnpp0k=;
+	s=arc-20240116; t=1761229838; c=relaxed/simple;
+	bh=iMyrw87T/G4ZaU6ZmgUalIVzak0E6HRz5LjPpsf7ryc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uIaddGI9WO7PuvtEV4lKfEaYQLvBrccvB+zy9CbNWX1azHeqIu8x93H2YRfcLXBD4t4mEU1+fYscDFjHHjebyTv2yVi0ij1iRMAG9UkTY3W/2rzbWO1mNX/fQXszOyPcEP9Bnz6vA+bS5N6y6nT700/38WWmZDtXksv/juBNp3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RZRs9nyB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45402C4CEE7;
-	Thu, 23 Oct 2025 14:30:36 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=HEdBNQV4dTHo17Db2xuVoWw7iZXEt7m9rLx5dvcP9HNty0VDH6K1evJ/Bo/LjqFjIHWSJTksrhr0cvlEKlabXvbH3J7HuDIboVcuNA705bCByVN3JaPZDx4i82OUABLIAe51i75eh0lLmNc3EvmG9ZRgJ009hcZSCosVeJ/CO9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MCLbUkYN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7A78C4CEE7;
+	Thu, 23 Oct 2025 14:30:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761229836;
-	bh=AtBLuOu30wZ5DYW+wY+eKPBg8t1AvODpuADEttnpp0k=;
+	s=k20201202; t=1761229837;
+	bh=iMyrw87T/G4ZaU6ZmgUalIVzak0E6HRz5LjPpsf7ryc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RZRs9nyB4Mm8qPSdRmapwMQhcEGAnbIKs1FQHvXMqKipGanH43pui0FEd+bncs3Vb
-	 Mjrgdm1+qS8SSkovcZgzwaWrxjrqOoQAcYzCUM5FS9Gs9fzKCBW0rFHtifGlzFDjj/
-	 fgJhDiDw20y3Vbv6HqnIj2nJSy4nRWuhS9WC8/HbZvWB9pa6lyNO8FEuXAxoqZIEqh
-	 ddb/dfpnpyju+Bas4o20bhOBatNv5gtRulaGTb+dclfmhpNroofIqGhxKuVQIUZfiY
-	 cH5yXgevIgeyEO7dag94VfkzjGCUAgHbTNvbFBQ6Ms0fhInfRwOqLpDq0JLXi5ADoc
-	 4ZBpo1Ec/1kTw==
+	b=MCLbUkYNQfDRPocz9Gm5sgNvj5LBrFbcxBlfV0F1M0BFY/yoWoiKYHYVhu2ltTCHh
+	 gzOz+OxJAnUE99Hw/NX0K+mfrpEwJ/vB/kKjnjRasmNdQalYxjVVaR6vZ6y3+SNDeX
+	 clfT5/DIqbale74QVk/pGuag8QbrT96Bcybwt7NLUonRdVMWKrPsLCP9EMsgxoMLvp
+	 y6OmsoRvMrCSj+BD4LE1H+ur7IuR+J0HgDLfZiYfqy+BTzYtOsJxIT60BIppjmlndM
+	 emLAEaKDDXt3MVTbGgCnnhDKnclZpmQeEBg8LQOAEdFjinMOgCc1PQ0+b7Q1nY7jba
+	 CxDPpLw3VO0gA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB2413809A97;
-	Thu, 23 Oct 2025 14:30:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C203809A97;
+	Thu, 23 Oct 2025 14:30:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V2] virtio-net: zero unused hash fields
+Subject: Re: [PATCH net 0/4] mlx5 misc fixes 2025-10-22
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176122981674.3105055.12862313802330532402.git-patchwork-notify@kernel.org>
-Date: Thu, 23 Oct 2025 14:30:16 +0000
-References: <20251022034421.70244-1-jasowang@redhat.com>
-In-Reply-To: <20251022034421.70244-1-jasowang@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
- pabeni@redhat.com, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, stable@vger.kernel.org
+ <176122981799.3105055.12421671916328980048.git-patchwork-notify@kernel.org>
+Date: Thu, 23 Oct 2025 14:30:17 +0000
+References: <1761136182-918470-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1761136182-918470-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 22 Oct 2025 11:44:21 +0800 you wrote:
-> When GSO tunnel is negotiated virtio_net_hdr_tnl_from_skb() tries to
-> initialize the tunnel metadata but forget to zero unused rxhash
-> fields. This may leak information to another side. Fixing this by
-> zeroing the unused hash fields.
+On Wed, 22 Oct 2025 15:29:38 +0300 you wrote:
+> Hi,
 > 
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> Fixes: a2fb4bc4e2a6a ("net: implement virtio helpers to handle UDP GSO tunneling")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> This patchset provides misc bug fixes from the team to the mlx5 core and
+> Eth drivers.
+> 
+> Thanks,
+> Tariq.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,V2] virtio-net: zero unused hash fields
-    https://git.kernel.org/netdev/net/c/b2284768c6b3
+  - [net,1/4] net/mlx5: Add PPHCR to PCAM supported registers mask
+    https://git.kernel.org/netdev/net/c/bb65e0c141f8
+  - [net,2/4] net/mlx5e: Skip PPHCR register query if not supported by the device
+    https://git.kernel.org/netdev/net/c/d58a9a917aa3
+  - [net,3/4] net/mlx5: Refactor devcom to return NULL on failure
+    https://git.kernel.org/netdev/net/c/8f82f89550da
+  - [net,4/4] net/mlx5: Fix IPsec cleanup over MPV device
+    https://git.kernel.org/netdev/net/c/664f76be38a1
 
 You are awesome, thank you!
 -- 
