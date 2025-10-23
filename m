@@ -1,160 +1,195 @@
-Return-Path: <netdev+bounces-232172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB0AAC01FCF
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:07:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82025C01FF4
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:07:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6FC5D35AFD0
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 15:07:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD16B1A6668B
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 15:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D32C133033F;
-	Thu, 23 Oct 2025 15:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA4D332ED2;
+	Thu, 23 Oct 2025 15:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iXU94Yfl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OKc9AeHx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D62932ED3B;
-	Thu, 23 Oct 2025 15:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE30211A28;
+	Thu, 23 Oct 2025 15:07:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761232015; cv=none; b=ClZOUw6siQZboaAhB2hqi/EiAPhLmaJ+mKX4ubfmGVqJeqgpSoTbA45WFYwfIMmwIQG/DWFRXXNeInBSD6drE4/hMRQYzNFvzZ4wuvK+l7APyuX6dZxYGAber0RLnBWbAZZoE7Vgs8RoCqlnor0jGFS3yU/yexkw3rujmvjsHeI=
+	t=1761232038; cv=none; b=O6bcv4ntt1LCoaeo+H22KqGP/ylbMKZS498znPYJSTSILIWDwgHw9bsnwfBKTAHUUX9CN/kdN3xZBVgnRk/7PrTVtdsqWBTf2MhC4Dsju8htHBnzQXxAbGGub2a4LpH+WD/kpwy8HfvLemAlqWvcz3ciHfTIGru/7O5pvJDpDc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761232015; c=relaxed/simple;
-	bh=BRiUMqg9zivpYlI+dRZOSj6q2DCT+GPC87GO8SOJluE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b7jtrk6es0KvnywkdGZE4hOhEyGkU9LYKmjsAa8dqykd1KCff/Ti9itePbQiljuNlY3x0XNPv08wsLmMgLu2nVcJ9rn11xvNSM9VBUoHehDXYiOIUuG60b8OMKzVwFq1bhRBnHhhvs8ucIObtEItceAf0bOQPTfANx1s8ghkbpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iXU94Yfl; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59NEhZVE006824;
-	Thu, 23 Oct 2025 15:06:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=Ki3Evuoe0B+CtagIG
-	0TkiV52xQ1F0jWit7yNZUWO56s=; b=iXU94YflbpY407zElBAat94ElCDYIU/o7
-	n4kap5LUNABFa6WZln5BCssPcywrpxfLA5EzRbKzXFkZjWgrNkrumv5sgZuLUjQ2
-	+reRl9OAd5ClAhDN79VlOkOfldhti+WWUOJKF/mVulwmdAw/kwKLwjZJXINNhVHr
-	i2b+die3uTyOfaP3fSxMyer+tlF1Pr0om7RVSD0r8YWzJm4xiKWWUukqBdXkcYQR
-	u99Ds+zbLn4/dHoMn8LQdnmo2FQmwKsSSbMtRECHh6sIsv3dZXC5nBfdOrgUS06T
-	5ERflUTHoXGW/SgBdjS4yeW4yq71qWhdZ+hURHgRjw3N1S+XbX9kg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v3272xyp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Oct 2025 15:06:41 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 59NF4cPI012254;
-	Thu, 23 Oct 2025 15:06:41 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v3272xyh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Oct 2025 15:06:41 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59ND9n5r014676;
-	Thu, 23 Oct 2025 15:06:40 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 49vn7sekr7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Oct 2025 15:06:40 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59NF6a1937945798
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 Oct 2025 15:06:36 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 82FE020043;
-	Thu, 23 Oct 2025 15:06:36 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6DEC120040;
-	Thu, 23 Oct 2025 15:06:36 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu, 23 Oct 2025 15:06:36 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
-	id 3F35DE0AE5; Thu, 23 Oct 2025 17:06:36 +0200 (CEST)
-From: Alexandra Winter <wintera@linux.ibm.com>
-To: Julian Ruess <julianr@linux.ibm.com>, Mete Durlu <meted@linux.ibm.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Dust Li <dust.li@linux.alibaba.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 2/2] dibs: Use subsys_initcall()
-Date: Thu, 23 Oct 2025 17:06:36 +0200
-Message-ID: <20251023150636.3995476-2-wintera@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20251023150636.3995476-1-wintera@linux.ibm.com>
-References: <20251023150636.3995476-1-wintera@linux.ibm.com>
+	s=arc-20240116; t=1761232038; c=relaxed/simple;
+	bh=XWBnm4As/yEKwlRgDc/6pxtPDRTol/Yk+V45WwgsKmk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h4GW3jIkGDYDUN4oXsaJfF4fP11CtIN1UyfJn4HyG7xj3lJlfxh6OB4B8r6mRMIqSJYXPiksCEet3MRmC/AulfdP4CV0pZj6izALVZPm0lkg7JYJrTPeP6j+nytoysGD7kTT3ZVaSj6ogkAj8GR9+xqxmgeEdsuXf9CUtQIEDOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OKc9AeHx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64D76C4CEE7;
+	Thu, 23 Oct 2025 15:07:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761232037;
+	bh=XWBnm4As/yEKwlRgDc/6pxtPDRTol/Yk+V45WwgsKmk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OKc9AeHxRjm48dkSrMWCcwcADV/4aoeDUqc06Xwl01QwdRS0G1uFn4tFrWEF2u/hd
+	 o22GGIJX1lmPFeT3hxtMnbrFV3Of8pdz7HMema9bjL+D0eBa/7jgYU0NIXaNwpM4+x
+	 81D328997z0BoGeXOeA5tBWEReCXIsynLBnot2okkBqysJAyt+qkluNGfTzwRIozND
+	 YySA1vwt74D4O2l7P1EuZOalFAgROnzEoXtBG2JpquV5DAJ++ZYFt1r8smnUr12hS7
+	 hFd1x91xvjzPtbbseW+Lsa5fhzDwWGPAvyjn6Fs5Qbrak3TeVAJW31wiZ/HrnONrB7
+	 1n1bA1B/lJUIg==
+Date: Thu, 23 Oct 2025 16:07:02 +0100
+From: Mark Brown <broonie@kernel.org>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Stephen Boyd <sboyd@kernel.org>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Andrzej Hajda <andrzej.hajda@intel.com>,
+	Robert Foss <rfoss@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Georgi Djakov <djakov@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Joerg Roedel <joro@8bytes.org>,
+	Jassi Brar <jassisinghbrar@gmail.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Sebastian Reichel <sre@kernel.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-clk@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-fbdev@vger.kernel.org, dmaengine@vger.kernel.org,
+	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org,
+	linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+	linux-pm@vger.kernel.org, iommu@lists.linux.dev,
+	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-phy@lists.infradead.org,
+	linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-sound@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: Remove extra blank lines
+Message-ID: <9e828a4b-6012-4e2a-9790-4231f0285309@sirena.org.uk>
+Mail-Followup-To: "Rob Herring (Arm)" <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Stephen Boyd <sboyd@kernel.org>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Andrzej Hajda <andrzej.hajda@intel.com>,
+	Robert Foss <rfoss@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Georgi Djakov <djakov@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Joerg Roedel <joro@8bytes.org>,
+	Jassi Brar <jassisinghbrar@gmail.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Sebastian Reichel <sre@kernel.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-clk@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-fbdev@vger.kernel.org, dmaengine@vger.kernel.org,
+	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org,
+	linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+	linux-pm@vger.kernel.org, iommu@lists.linux.dev,
+	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-phy@lists.infradead.org,
+	linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-sound@vger.kernel.org,
+	linux-usb@vger.kernel.org
+References: <20251023143957.2899600-1-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=EJELElZC c=1 sm=1 tr=0 ts=68fa4481 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
- a=m79NEi6q5JIdXVT0lr0A:9 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMiBTYWx0ZWRfX1RVhHVXvwkgb
- RdbhPWY/IS5629wtPQbx7I4GIs7BcJer4pmmHzkcLNwHkt1yMz9snvsBvWxPXSBLr8GGjtH6BvT
- E+mSSGBeG50mScOUj4cHMfQnx2sjEq7PyNwGLLHdAlrqSEQSYv/GW6aUHARS7IoTxTj9qjsFt7M
- yGyFtGp56TeLgSlhdoC1k0lzAE5DHcvJhYjHJKjo1SUfcowEnBNEZ3jz17QJKrpwX6PMhpwFdXm
- vAlFeiFhxPLwlOWdGq6BjS4o4/rJTtuT8y75BHa6fMcgJVX5UA7If3FehRLswVbMaAw+gccYQZa
- l8oqonUsU4uMwMb53es1l3TBqbxAbzOfx9fLPaf4ekGW9PC29J/kjFe46NUW/sJeTOlPzlt91Zl
- iT2MdAvGbIiWXYOFObfu/eWPSUloUA==
-X-Proofpoint-GUID: SOYrsDjzavQjsdXSkb1-D5rOyWyG7NvC
-X-Proofpoint-ORIG-GUID: bLTXkn7G35PaUaHzU8ihRTp1WwNN2fWi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-23_01,2025-10-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 priorityscore=1501 suspectscore=0 bulkscore=0 spamscore=0
- malwarescore=0 phishscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510180022
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="zar6sraGOQMtGsj4"
+Content-Disposition: inline
+In-Reply-To: <20251023143957.2899600-1-robh@kernel.org>
+X-Cookie: I've got a bad feeling about this.
 
-In the case of built-in modules, the order of module_init() calls are
-derived from the Makefiles.
 
-Use subsys_initcall() for the dibs module, to make sure dibs_init() is
-executed before dibs clients like smc and dibs devices like ism are
-initialized. So future dibs client or dibs device modules can use
-module_init() without the risk of getting the order in the Makefiles wrong.
+--zar6sraGOQMtGsj4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Reported-by: Mete Durlu <meted@linux.ibm.com>
-Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
----
- drivers/dibs/dibs_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Oct 23, 2025 at 09:37:56AM -0500, Rob Herring (Arm) wrote:
+> Generally at most 1 blank line is the standard style for DT schema
+> files. Remove the few cases with more than 1 so that the yamllint check
+> for this can be enabled.
 
-diff --git a/drivers/dibs/dibs_main.c b/drivers/dibs/dibs_main.c
-index b015578b4d2e..dac14d843af7 100644
---- a/drivers/dibs/dibs_main.c
-+++ b/drivers/dibs/dibs_main.c
-@@ -271,5 +271,5 @@ static void __exit dibs_exit(void)
- 	class_destroy(dibs_class);
- }
- 
--module_init(dibs_init);
-+subsys_initcall(dibs_init);
- module_exit(dibs_exit);
--- 
-2.48.1
+Acked-by: Mark Brown <broonie@kernel.org>
 
+--zar6sraGOQMtGsj4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmj6RJUACgkQJNaLcl1U
+h9Bjcgf9H3jj+P7sfeIlnEdfq/Ody/eiqL682HMEokwJEmnrTl7XqELGSxt3FteB
+D40q4Z4wM3EUoz13JTzjaVMThQaIqtuFASfUGTjGv+lUGYgz4RmUvF10nSC8j0Gp
+0BfQgFSLb6G0vzWduYqYXORhQ44Su6ELfkRN3uv2b8+AypiYOlkyMm6qXVOL221W
+8b3HjR2K0RXBVipnKiDNcKxoFWroMDXSeSauuWxAjIQhFQXlW/NfM0p2zJ6f8RF6
+qmdTq99y3bnhhtTF+oofI+LJDhMaRZE18j92TF/Lvn5Cxyck6FLrSAfrveMd6mJ3
+dOE0e7PkFAnvIEhJc0g24Me6PhJJIg==
+=+K+K
+-----END PGP SIGNATURE-----
+
+--zar6sraGOQMtGsj4--
 
