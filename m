@@ -1,224 +1,379 @@
-Return-Path: <netdev+bounces-232286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1320C03D20
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 01:18:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A720C03E8D
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 01:57:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6B6524E28D6
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 23:18:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC3443A55DE
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 23:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 366C42D46D1;
-	Thu, 23 Oct 2025 23:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53882296BD4;
+	Thu, 23 Oct 2025 23:57:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QJyS4/V2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eVF6wdZN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2F329BDA3
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 23:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 196119463
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 23:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761261490; cv=none; b=QRL5yc3HDLtavZDt6zrsjcaggE408yzj7KUbNG48wjpIAWfTbkSeoSESfdug7t6apGPSt3JNrkrj/6TrpazWkLa6m5tdVeYqF2lgFhOmCwsovxhdS1U3UuOoUCIBxx9xXdLgjLhhWCapw/XjELwQWFFfu2iHiDvJ9e2cky9MNnk=
+	t=1761263870; cv=none; b=gJ6NvM4V7+b+KfkvmrVZT3oo7vsAaXoQLuE9x5QXYWFeOkqJp7osgMW52FF/cSmIEOXJzkb+Si+v5qwlBkOxeq9lVxjvhzxqVOsHULj1Wo6SZnFbUADV7t0QdE/JMTa1xSY01Kn+yoUBLS/7pbQhCDorTYMzhSTDSqu72ADjiCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761261490; c=relaxed/simple;
-	bh=0PfHiONiz3Grpom85rzQkqb75bJA6nEVVqf5UsChzA8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bE1L8KPsIILFg4D3fRMYO73Jdk12aKG0ZqQsuEYFIF93Sydb4DdyF4vqmYZ95tHVsJ699Cqj3jquYOe6TVuBRZ+wTNvodnMLE1eSa0/kycpPfkW9PmTjNqR8yQRKJ71lajRsYdgYGzIajX0V7QJ0FKuNTrRXgGEJe7C4JFFKYkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QJyS4/V2; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b6cff817142so620918a12.1
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 16:18:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761261486; x=1761866286; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8pExEr66VVW2J+70M7zAZNzEDsJqKgqLeYU1DZoxxTY=;
-        b=QJyS4/V24I7DScNBedSoeDJ9+wuD3E1kQaoeTc8lPqkml9ZYy/SO9Dy1c4o0ogtXtZ
-         Sa3+/1dTpG8xc7k7es0ZyQv9uniM9yomD0UclEfQmkgIu3HqNFU4IELnAPxQ7r8zPEM/
-         0fFXChPJvzPZ2k52TTD4EgfNKqXouAAbpNPEth/TFYvRJCPCjmJcUYulWBsGlpDybB/X
-         RdApEbArXpisoDbky38RYMy9ujMgZYjHyfDnqVfFsRDvp5jGg7qSLJtclXECzouFfzxC
-         mCCRFB0wMEnYMqJCbCvclTRKTaxHQi4CKxlgFGgwTsgyxgtrdABbU5p4Z8ttw6NNgPfh
-         p+Ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761261486; x=1761866286;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8pExEr66VVW2J+70M7zAZNzEDsJqKgqLeYU1DZoxxTY=;
-        b=C8gES7BIS3rNUzEUwnwI/0t2sfFexPe1OOohHVUNWtWWak2yqfVPvIoBu6x7u8ZDbw
-         MPUA9LH9MnjyXCRmSDFvhHz3m2vqShWrOJd5PG10BnVubl+gUkyugOnnrrGvSulmXDQR
-         4ykk4Fw8MXoVWcRo60LeGBfobJS1gyjtrMbA7Z/jSVpRjfAEsRfCO0+5BheNxolsV2Oc
-         UlhnJusWmEZ163Mfr6FGGSGpQzjqXwO0AslKjxwSjvr6VJR7Q9Hpn0uOpX5EbjDkmZNI
-         MpgMIavgDytwUP2DQgPRMMKQIFmJBxUPmVinxf/SQrTGs9EUgJsMAYXRhtQRn4NnmCEA
-         G9RQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUj0K6fPESIj/7ctAdws8tBTOROqHLWP+obKzCHPSkI1qq8bk9AL/p5Alyz0w25oXfQ54Fd+8E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAys1S5NbnGTkIhnItrPOgOTu2zhgPKNqbFGHj/0iRRMYthDi2
-	apIdrb5NfF5o7i6zl/+LWMyNdMOx+t6LzX3jw5GN1SL9Zwro+8G+lujK/VKtJfTKW7gGoHfjQbo
-	qQ8Gnfg==
-X-Google-Smtp-Source: AGHT+IGarXYjLpHaIuCvwZxGsrao9vzvkkWa0XlmyONjehKVDwWWj1elwmBqQu9bGrJArjkbnGP8nuyygHw=
-X-Received: from pjbgv18.prod.google.com ([2002:a17:90b:11d2:b0:33d:d0a9:ff0b])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3d1a:b0:33b:608f:2606
- with SMTP id adf61e73a8af0-33c619cf560mr5846872637.29.1761261485917; Thu, 23
- Oct 2025 16:18:05 -0700 (PDT)
-Date: Thu, 23 Oct 2025 23:16:57 +0000
-In-Reply-To: <20251023231751.4168390-1-kuniyu@google.com>
+	s=arc-20240116; t=1761263870; c=relaxed/simple;
+	bh=EjlYwcPaVvFzATfag5yUcw1n4hi7Y0mjUzvinT0L/jM=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=XLgj4SkyZs7fZ9IRCGpQoZ21AddNuL5nvM6bG2tKgzM9ffPaVHp/gf8+sFN8tRIBe9iZ59NnwXCkWVXcr4vUCMm/+oeUl7WEpxlqGhL9nWHMIoguCrZNR9UIRhvPu6sYSv+cLgKu8TBII5PBtLbXv3PZgyzz3j80us/iT45d4Ek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eVF6wdZN; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761263868; x=1792799868;
+  h=from:to:cc:subject:date:message-id;
+  bh=EjlYwcPaVvFzATfag5yUcw1n4hi7Y0mjUzvinT0L/jM=;
+  b=eVF6wdZN2eINl9yC3DWFeAgMpuiGX777a1sNChYfhAmj5rQnI7frcZtM
+   bsbNIxJVzPDDGJwXQUKblONQRa4eA1xXcA8w0kJUVhhf2n16nNqr5xiSE
+   3ZBje9RMpW0gyEILfGn/tMt8lHR36g3oUncrkiROivXoHoceTqSWoxDlj
+   OD7z4aAyEm/udkEn2gd9u9MMj1IdXgEVrlPtHJXntPKl0zWi4M4LLjLHW
+   lx0NrhYtNoG9N3hTxEUVZe6Ew4RsBCgne/+NlOtEiHauwMajF8SNgToIJ
+   JVTmh/RxN9pgdQvgny/oH4LP559Hyn1bp/5KC4uKTLhaxmTQla3kccVNH
+   Q==;
+X-CSE-ConnectionGUID: kur40+5qSjO01d8E/N9Gaw==
+X-CSE-MsgGUID: x6ipaQwvSEGRY7bKmsIbcg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="88913034"
+X-IronPort-AV: E=Sophos;i="6.19,251,1754982000"; 
+   d="scan'208";a="88913034"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 16:57:45 -0700
+X-CSE-ConnectionGUID: 4SsdLDpkQIuIjZxqJ84N2A==
+X-CSE-MsgGUID: WUEIDtjaSfqOlrUYoIjnTQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,251,1754982000"; 
+   d="scan'208";a="183468481"
+Received: from estantil-desk.jf.intel.com ([10.166.241.24])
+  by orviesa006.jf.intel.com with ESMTP; 23 Oct 2025 16:57:46 -0700
+From: Emil Tantilov <emil.s.tantilov@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Aleksandr.Loktionov@intel.com,
+	przemyslaw.kitszel@intel.com,
+	anthony.l.nguyen@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	decot@google.com,
+	willemb@google.com,
+	joshua.a.hay@intel.com,
+	madhu.chittim@intel.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	aleksander.lobakin@intel.com
+Subject: [PATCH iwl-next] idpf: convert vport state to bitmap
+Date: Thu, 23 Oct 2025 16:50:49 -0700
+Message-Id: <20251023235049.2199-1-emil.s.tantilov@intel.com>
+X-Mailer: git-send-email 2.17.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251023231751.4168390-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.51.1.851.g4ebd6896fd-goog
-Message-ID: <20251023231751.4168390-9-kuniyu@google.com>
-Subject: [PATCH v3 net-next 8/8] sctp: Remove sctp_copy_sock() and sctp_copy_descendant().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, linux-sctp@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-Now, sctp_accept() and sctp_do_peeloff() use sk_clone(), and
-we no longer need sctp_copy_sock() and sctp_copy_descendant().
+Convert vport state to a bitmap and remove the DOWN state which is
+redundant in the existing logic. There are no functional changes aside
+from the use of bitwise operations when setting and checking the states.
+Removed the double underscore to be consistent with the naming of other
+bitmaps in the header and renamed current_state to vport_is_up to match
+the meaning of the new variable.
 
-Let's remove them.
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Chittim Madhu <madhu.chittim@intel.com>
+Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
 ---
- include/net/inet_sock.h |  8 -----
- include/net/sctp/sctp.h |  3 +-
- net/sctp/socket.c       | 71 -----------------------------------------
- 3 files changed, 1 insertion(+), 81 deletions(-)
+This patch was previously submitted as part of series to -net:
+https://lore.kernel.org/netdev/20250822035248.22969-2-emil.s.tantilov@intel.com/
+Changed to -next, as the related follow-up patch was rejected:
+https://lore.kernel.org/netdev/20251001-jk-iwl-net-2025-10-01-v1-3-49fa99e86600@intel.com/
+---
+ drivers/net/ethernet/intel/idpf/idpf.h        | 12 ++++------
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    | 12 +++++-----
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    | 24 +++++++++----------
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  2 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  2 +-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   |  4 ++--
+ drivers/net/ethernet/intel/idpf/xdp.c         |  2 +-
+ 7 files changed, 28 insertions(+), 30 deletions(-)
 
-diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
-index b6ec08072533..ac1c75975908 100644
---- a/include/net/inet_sock.h
-+++ b/include/net/inet_sock.h
-@@ -355,14 +355,6 @@ static inline struct sock *skb_to_full_sk(const struct sk_buff *skb)
- 
- #define inet_sk(ptr) container_of_const(ptr, struct inet_sock, sk)
- 
--static inline void __inet_sk_copy_descendant(struct sock *sk_to,
--					     const struct sock *sk_from,
--					     const int ancestor_size)
--{
--	memcpy(inet_sk(sk_to) + 1, inet_sk(sk_from) + 1,
--	       sk_from->sk_prot->obj_size - ancestor_size);
--}
--
- int inet_sk_rebuild_header(struct sock *sk);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+index f0387b83a9ed..dab36c0c3cdc 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf.h
++++ b/drivers/net/ethernet/intel/idpf/idpf.h
+@@ -131,14 +131,12 @@ enum idpf_cap_field {
  
  /**
-diff --git a/include/net/sctp/sctp.h b/include/net/sctp/sctp.h
-index e96d1bd087f6..bb4b80c12541 100644
---- a/include/net/sctp/sctp.h
-+++ b/include/net/sctp/sctp.h
-@@ -94,8 +94,7 @@ void sctp_data_ready(struct sock *sk);
- __poll_t sctp_poll(struct file *file, struct socket *sock,
- 		poll_table *wait);
- void sctp_sock_rfree(struct sk_buff *skb);
--void sctp_copy_sock(struct sock *newsk, struct sock *sk,
--		    struct sctp_association *asoc);
-+
- extern struct percpu_counter sctp_sockets_allocated;
- int sctp_asconf_mgmt(struct sctp_sock *, struct sctp_sockaddr_entry *);
- struct sk_buff *sctp_skb_recv_datagram(struct sock *, int, int *);
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index 60d3e340dfed..ac737e60829b 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -9491,72 +9491,6 @@ static void sctp_skb_set_owner_r_frag(struct sk_buff *skb, struct sock *sk)
- 	sctp_skb_set_owner_r(skb, sk);
- }
- 
--void sctp_copy_sock(struct sock *newsk, struct sock *sk,
--		    struct sctp_association *asoc)
--{
--	struct inet_sock *inet = inet_sk(sk);
--	struct inet_sock *newinet;
--	struct sctp_sock *sp = sctp_sk(sk);
--
--	newsk->sk_type = sk->sk_type;
--	newsk->sk_bound_dev_if = sk->sk_bound_dev_if;
--	newsk->sk_flags = sk->sk_flags;
--	newsk->sk_tsflags = sk->sk_tsflags;
--	newsk->sk_no_check_tx = sk->sk_no_check_tx;
--	newsk->sk_no_check_rx = sk->sk_no_check_rx;
--	newsk->sk_reuse = sk->sk_reuse;
--	sctp_sk(newsk)->reuse = sp->reuse;
--
--	newsk->sk_shutdown = sk->sk_shutdown;
--	newsk->sk_destruct = sk->sk_destruct;
--	newsk->sk_family = sk->sk_family;
--	newsk->sk_protocol = IPPROTO_SCTP;
--	newsk->sk_backlog_rcv = sk->sk_prot->backlog_rcv;
--	newsk->sk_sndbuf = sk->sk_sndbuf;
--	newsk->sk_rcvbuf = sk->sk_rcvbuf;
--	newsk->sk_lingertime = sk->sk_lingertime;
--	newsk->sk_rcvtimeo = READ_ONCE(sk->sk_rcvtimeo);
--	newsk->sk_sndtimeo = READ_ONCE(sk->sk_sndtimeo);
--	newsk->sk_rxhash = sk->sk_rxhash;
--	newsk->sk_gso_type = sk->sk_gso_type;
--
--	newinet = inet_sk(newsk);
--
--	/* Initialize sk's sport, dport, rcv_saddr and daddr for
--	 * getsockname() and getpeername()
--	 */
--	newinet->inet_sport = inet->inet_sport;
--	newinet->inet_saddr = inet->inet_saddr;
--	newinet->inet_rcv_saddr = inet->inet_rcv_saddr;
--	newinet->inet_dport = htons(asoc->peer.port);
--	newinet->pmtudisc = inet->pmtudisc;
--	atomic_set(&newinet->inet_id, get_random_u16());
--
--	newinet->uc_ttl = inet->uc_ttl;
--	inet_set_bit(MC_LOOP, newsk);
--	newinet->mc_ttl = 1;
--	newinet->mc_index = 0;
--	newinet->mc_list = NULL;
--
--	if (newsk->sk_flags & SK_FLAGS_TIMESTAMP)
--		net_enable_timestamp();
--
--	/* Set newsk security attributes from original sk and connection
--	 * security attribute from asoc.
--	 */
--	security_sctp_sk_clone(asoc, sk, newsk);
--}
--
--static inline void sctp_copy_descendant(struct sock *sk_to,
--					const struct sock *sk_from)
--{
--	size_t ancestor_size = sizeof(struct inet_sock);
--
--	ancestor_size += sk_from->sk_prot->obj_size;
--	ancestor_size -= offsetof(struct sctp_sock, pd_lobby);
--	__inet_sk_copy_descendant(sk_to, sk_from, ancestor_size);
--}
--
- /* Populate the fields of the newsk from the oldsk and migrate the assoc
-  * and its messages to the newsk.
+  * enum idpf_vport_state - Current vport state
+- * @__IDPF_VPORT_DOWN: Vport is down
+- * @__IDPF_VPORT_UP: Vport is up
+- * @__IDPF_VPORT_STATE_LAST: Must be last, number of states
++ * @IDPF_VPORT_UP: Vport is up
++ * @IDPF_VPORT_STATE_NBITS: Must be last, number of states
   */
-@@ -9573,11 +9507,6 @@ static int sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
- 	struct sctp_bind_hashbucket *head;
+ enum idpf_vport_state {
+-	__IDPF_VPORT_DOWN,
+-	__IDPF_VPORT_UP,
+-	__IDPF_VPORT_STATE_LAST,
++	IDPF_VPORT_UP,
++	IDPF_VPORT_STATE_NBITS
+ };
+ 
+ /**
+@@ -162,7 +160,7 @@ struct idpf_netdev_priv {
+ 	u16 vport_idx;
+ 	u16 max_tx_hdr_size;
+ 	u16 tx_max_bufs;
+-	enum idpf_vport_state state;
++	DECLARE_BITMAP(state, IDPF_VPORT_STATE_NBITS);
+ 	struct rtnl_link_stats64 netstats;
+ 	spinlock_t stats_lock;
+ };
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+index 4c6e52253ae4..3fbe94a4ce6b 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+@@ -414,7 +414,7 @@ static int idpf_get_rxfh(struct net_device *netdev,
+ 	}
+ 
+ 	rss_data = &adapter->vport_config[np->vport_idx]->user_config.rss_data;
+-	if (np->state != __IDPF_VPORT_UP)
++	if (!test_bit(IDPF_VPORT_UP, np->state))
+ 		goto unlock_mutex;
+ 
+ 	rxfh->hfunc = ETH_RSS_HASH_TOP;
+@@ -464,7 +464,7 @@ static int idpf_set_rxfh(struct net_device *netdev,
+ 	}
+ 
+ 	rss_data = &adapter->vport_config[vport->idx]->user_config.rss_data;
+-	if (np->state != __IDPF_VPORT_UP)
++	if (!test_bit(IDPF_VPORT_UP, np->state))
+ 		goto unlock_mutex;
+ 
+ 	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
+@@ -1195,7 +1195,7 @@ static void idpf_get_ethtool_stats(struct net_device *netdev,
+ 	idpf_vport_ctrl_lock(netdev);
+ 	vport = idpf_netdev_to_vport(netdev);
+ 
+-	if (np->state != __IDPF_VPORT_UP) {
++	if (!test_bit(IDPF_VPORT_UP, np->state)) {
+ 		idpf_vport_ctrl_unlock(netdev);
+ 
+ 		return;
+@@ -1347,7 +1347,7 @@ static int idpf_get_q_coalesce(struct net_device *netdev,
+ 	idpf_vport_ctrl_lock(netdev);
+ 	vport = idpf_netdev_to_vport(netdev);
+ 
+-	if (np->state != __IDPF_VPORT_UP)
++	if (!test_bit(IDPF_VPORT_UP, np->state))
+ 		goto unlock_mutex;
+ 
+ 	if (q_num >= vport->num_rxq && q_num >= vport->num_txq) {
+@@ -1535,7 +1535,7 @@ static int idpf_set_coalesce(struct net_device *netdev,
+ 	idpf_vport_ctrl_lock(netdev);
+ 	vport = idpf_netdev_to_vport(netdev);
+ 
+-	if (np->state != __IDPF_VPORT_UP)
++	if (!test_bit(IDPF_VPORT_UP, np->state))
+ 		goto unlock_mutex;
+ 
+ 	for (i = 0; i < vport->num_txq; i++) {
+@@ -1738,7 +1738,7 @@ static void idpf_get_ts_stats(struct net_device *netdev,
+ 		ts_stats->err = u64_stats_read(&vport->tstamp_stats.discarded);
+ 	} while (u64_stats_fetch_retry(&vport->tstamp_stats.stats_sync, start));
+ 
+-	if (np->state != __IDPF_VPORT_UP)
++	if (!test_bit(IDPF_VPORT_UP, np->state))
+ 		goto exit;
+ 
+ 	for (u16 i = 0; i < vport->num_txq_grp; i++) {
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+index bd38ecc7872c..d9f6e9c0dcf9 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+@@ -542,7 +542,7 @@ static int idpf_del_mac_filter(struct idpf_vport *vport,
+ 	}
+ 	spin_unlock_bh(&vport_config->mac_filter_list_lock);
+ 
+-	if (np->state == __IDPF_VPORT_UP) {
++	if (test_bit(IDPF_VPORT_UP, np->state)) {
+ 		int err;
+ 
+ 		err = idpf_add_del_mac_filters(vport, np, false, async);
+@@ -613,7 +613,7 @@ static int idpf_add_mac_filter(struct idpf_vport *vport,
+ 	if (err)
+ 		return err;
+ 
+-	if (np->state == __IDPF_VPORT_UP)
++	if (test_bit(IDPF_VPORT_UP, np->state))
+ 		err = idpf_add_del_mac_filters(vport, np, true, async);
+ 
+ 	return err;
+@@ -917,7 +917,7 @@ static void idpf_vport_stop(struct idpf_vport *vport, bool rtnl)
+ {
+ 	struct idpf_netdev_priv *np = netdev_priv(vport->netdev);
+ 
+-	if (np->state <= __IDPF_VPORT_DOWN)
++	if (!test_bit(IDPF_VPORT_UP, np->state))
+ 		return;
+ 
+ 	if (rtnl)
+@@ -944,7 +944,7 @@ static void idpf_vport_stop(struct idpf_vport *vport, bool rtnl)
+ 	idpf_xdp_rxq_info_deinit_all(vport);
+ 	idpf_vport_queues_rel(vport);
+ 	idpf_vport_intr_rel(vport);
+-	np->state = __IDPF_VPORT_DOWN;
++	clear_bit(IDPF_VPORT_UP, np->state);
+ 
+ 	if (rtnl)
+ 		rtnl_unlock();
+@@ -1370,7 +1370,7 @@ static int idpf_up_complete(struct idpf_vport *vport)
+ 		netif_tx_start_all_queues(vport->netdev);
+ 	}
+ 
+-	np->state = __IDPF_VPORT_UP;
++	set_bit(IDPF_VPORT_UP, np->state);
+ 
+ 	return 0;
+ }
+@@ -1416,7 +1416,7 @@ static int idpf_vport_open(struct idpf_vport *vport, bool rtnl)
+ 	struct idpf_vport_config *vport_config;
  	int err;
  
--	/* Migrate all the socket level options to the new socket.
--	 * Brute force copy old sctp opt.
--	 */
--	sctp_copy_descendant(newsk, oldsk);
--
- 	/* Restore the ep value that was overwritten with the above structure
- 	 * copy.
- 	 */
+-	if (np->state != __IDPF_VPORT_DOWN)
++	if (test_bit(IDPF_VPORT_UP, np->state))
+ 		return -EBUSY;
+ 
+ 	if (rtnl)
+@@ -1628,7 +1628,7 @@ void idpf_init_task(struct work_struct *work)
+ 
+ 	/* Once state is put into DOWN, driver is ready for dev_open */
+ 	np = netdev_priv(vport->netdev);
+-	np->state = __IDPF_VPORT_DOWN;
++	clear_bit(IDPF_VPORT_UP, np->state);
+ 	if (test_and_clear_bit(IDPF_VPORT_UP_REQUESTED, vport_config->flags))
+ 		idpf_vport_open(vport, true);
+ 
+@@ -1827,7 +1827,7 @@ static void idpf_set_vport_state(struct idpf_adapter *adapter)
+ 			continue;
+ 
+ 		np = netdev_priv(adapter->netdevs[i]);
+-		if (np->state == __IDPF_VPORT_UP)
++		if (test_bit(IDPF_VPORT_UP, np->state))
+ 			set_bit(IDPF_VPORT_UP_REQUESTED,
+ 				adapter->vport_config[i]->flags);
+ 	}
+@@ -1965,7 +1965,7 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
+ 			     enum idpf_vport_reset_cause reset_cause)
+ {
+ 	struct idpf_netdev_priv *np = netdev_priv(vport->netdev);
+-	enum idpf_vport_state current_state = np->state;
++	bool vport_is_up = test_bit(IDPF_VPORT_UP, np->state);
+ 	struct idpf_adapter *adapter = vport->adapter;
+ 	struct idpf_vport *new_vport;
+ 	int err;
+@@ -2016,7 +2016,7 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
+ 		goto free_vport;
+ 	}
+ 
+-	if (current_state <= __IDPF_VPORT_DOWN) {
++	if (!vport_is_up) {
+ 		idpf_send_delete_queues_msg(vport);
+ 	} else {
+ 		set_bit(IDPF_VPORT_DEL_QUEUES, vport->flags);
+@@ -2049,7 +2049,7 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
+ 	if (err)
+ 		goto err_open;
+ 
+-	if (current_state == __IDPF_VPORT_UP)
++	if (vport_is_up)
+ 		err = idpf_vport_open(vport, false);
+ 
+ 	goto free_vport;
+@@ -2059,7 +2059,7 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
+ 				 vport->num_rxq, vport->num_bufq);
+ 
+ err_open:
+-	if (current_state == __IDPF_VPORT_UP)
++	if (vport_is_up)
+ 		idpf_vport_open(vport, false);
+ 
+ free_vport:
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+index 61e613066140..e3ddf18dcbf5 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+@@ -570,7 +570,7 @@ static bool idpf_tx_singleq_clean(struct idpf_tx_queue *tx_q, int napi_budget,
+ 	np = netdev_priv(tx_q->netdev);
+ 	nq = netdev_get_tx_queue(tx_q->netdev, tx_q->idx);
+ 
+-	dont_wake = np->state != __IDPF_VPORT_UP ||
++	dont_wake = !test_bit(IDPF_VPORT_UP, np->state) ||
+ 		    !netif_carrier_ok(tx_q->netdev);
+ 	__netif_txq_completed_wake(nq, ss.packets, ss.bytes,
+ 				   IDPF_DESC_UNUSED(tx_q), IDPF_TX_WAKE_THRESH,
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 828f7c444d30..1993a3b0da59 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -2275,7 +2275,7 @@ static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
+ 		/* Update BQL */
+ 		nq = netdev_get_tx_queue(tx_q->netdev, tx_q->idx);
+ 
+-		dont_wake = !complq_ok || np->state != __IDPF_VPORT_UP ||
++		dont_wake = !complq_ok || !test_bit(IDPF_VPORT_UP, np->state) ||
+ 			    !netif_carrier_ok(tx_q->netdev);
+ 		/* Check if the TXQ needs to and can be restarted */
+ 		__netif_txq_completed_wake(nq, tx_q->cleaned_pkts, tx_q->cleaned_bytes,
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+index cbb5fa30f5a0..44cd4b466c48 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+@@ -68,7 +68,7 @@ static void idpf_handle_event_link(struct idpf_adapter *adapter,
+ 
+ 	vport->link_up = v2e->link_status;
+ 
+-	if (np->state != __IDPF_VPORT_UP)
++	if (!test_bit(IDPF_VPORT_UP, np->state))
+ 		return;
+ 
+ 	if (vport->link_up) {
+@@ -2755,7 +2755,7 @@ int idpf_send_get_stats_msg(struct idpf_vport *vport)
+ 
+ 
+ 	/* Don't send get_stats message if the link is down */
+-	if (np->state <= __IDPF_VPORT_DOWN)
++	if (!test_bit(IDPF_VPORT_UP, np->state))
+ 		return 0;
+ 
+ 	stats_msg.vport_id = cpu_to_le32(vport->vport_id);
+diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
+index 21ce25b0567f..958d16f87424 100644
+--- a/drivers/net/ethernet/intel/idpf/xdp.c
++++ b/drivers/net/ethernet/intel/idpf/xdp.c
+@@ -418,7 +418,7 @@ static int idpf_xdp_setup_prog(struct idpf_vport *vport,
+ 	if (test_bit(IDPF_REMOVE_IN_PROG, vport->adapter->flags) ||
+ 	    !test_bit(IDPF_VPORT_REG_NETDEV, cfg->flags) ||
+ 	    !!vport->xdp_prog == !!prog) {
+-		if (np->state == __IDPF_VPORT_UP)
++		if (test_bit(IDPF_VPORT_UP, np->state))
+ 			idpf_xdp_copy_prog_to_rqs(vport, prog);
+ 
+ 		old = xchg(&vport->xdp_prog, prog);
 -- 
-2.51.1.851.g4ebd6896fd-goog
+2.37.3
 
 
