@@ -1,115 +1,190 @@
-Return-Path: <netdev+bounces-232091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08846C00B6D
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 13:27:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 795F4C00C51
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 13:34:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C2D764E8EAE
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 11:27:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA6F23B2BD6
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 11:31:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DFD30DEAC;
-	Thu, 23 Oct 2025 11:27:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F6530BB82;
+	Thu, 23 Oct 2025 11:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A6h2AZl0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HmQniJf6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A152DECB1
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 11:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0E62ECD3F;
+	Thu, 23 Oct 2025 11:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761218845; cv=none; b=SgQsAAHs2jpjsvfzt/bi/VD1PdbRSNxX6pLFWbW8KD72ksjtqEza+NdYoIV0VeAdbF0id7XTcTcNhPOhYd7W26A+QzyRL1PQ3vBTo3IahkIbFxML2pSvOMOwv8JgbZniLrbpoNaIP1oGVWENg0LATXxS03VKN+CfmT0DJT8u1TU=
+	t=1761219073; cv=none; b=YccUGX2y1ljHEi7O8J84uS6fxpHVuwah35T6qHQxZBCj2eW+TYFIsCUHruCa0Lra12i6afO8ZgnjAnc/yqGx2YIakwCE48DcLaWvp/wHdZ0hDAYFJkhNvlLgbQ8hItE9OWj3bSoBBeQC0GSZapogC9GSTeUykL/fQX7Ifu7THPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761218845; c=relaxed/simple;
-	bh=omXtqGdVwaLttMqdnLj+e50P9l/qbdlv1wXvTweGH/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i+HOuIFS8OflFQTLyR0jNa+Avcz0hUufkXFnHfF60nDSOVq0yAQGvIhPI5NkRITXQ2nMMtcGod4XwcpSpWjHSkLo/1nz3i0UwQrufwikBXiyksBxIcdougY9aP/5PafuCVp/2DAs1ESnN3Ywl4mrQbBFmyRK0j18EBOeu3+WpTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A6h2AZl0; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3ee64bc6b90so574842f8f.0
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 04:27:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761218842; x=1761823642; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z5A/JaBnPQddwxFBHkEH+pN3tR6CjA0uTWCxQ0JnFwY=;
-        b=A6h2AZl0uTC2GseDEA2suZ/jOBvgIMvIBE6rNRpTxVH6jkWpt9B2nBQOkplD2/sy6x
-         J+wDlS5hj20v3ZpTJWmL1H8VyhPY2FfK2umYGOEzSdfkTNf5xbGI4w/kAOsykCkJWR+s
-         YI1VUIf7dqOMQl2h2I6StV7MhVAN7wd1gsVXVaDLaTdGCXMwz/gNKu1umjOoaAlm1lOs
-         ps61AAacxyXiRqSnel3htnGoiQ8ZLMIhVHyiOyKdFWfiSm2C0MZDIK0WLZXQKtHtJR8J
-         mlfvxis6exuotn4n4lcDzr5mH/RNzv15Rs0vdiKha1LhQckYrvwkhIwSPd0v/QcKY30b
-         vDQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761218842; x=1761823642;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z5A/JaBnPQddwxFBHkEH+pN3tR6CjA0uTWCxQ0JnFwY=;
-        b=Sj85Xchr7gZYnwe0BqiY87/YT278rmrYplL0xNZx/KqUsIBT1uTqbU611CKc6IkRuR
-         zG4qWsZ/ZPW7eOn5MdXzTHeEiLhgkBzhY9s1dI1yeH9I3rtUgVcL4HNqC6HeEt3/ecp9
-         90aoyXZ6eEsthUwPszP2d9Y7qV55umEXMLrwpDQ9u1vwQz7ejDgWe+02CacYgeIPaPjk
-         Phy6e9KIjedwHfnRNvABDUY54KlXuZ5Vgv1h936sENQA6bg+swwYzR0x0gpToV9RT8K/
-         T6nhdLicakgC7QAPErMS7CPreliVj3H6Au++QQhg7aH5fwMBqYOda62Ntxn9s0H/hPaT
-         LDOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXqWsVKNGRvDd272QIgAI+uCGpaOjrPoOahmhlcTBoHwJZGhHtc6QIrzg0uxYvSzgLrpvZbPr8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKuXoCnnBQegw70UWx7ZRX4Dm0lHPh764crskbJkaEhuIrj/ar
-	p17tf4tVX2f8vGP1z+529Y6ZjOXKiOD9HnJREYrHV8am1J5ZyKk3ZJCr
-X-Gm-Gg: ASbGncuNSJ3+T8sHNcPGvjETaMGHIQ1m5nMmJILDuMok2pAqtkCZFDLVMSPDv+zGzw1
-	jGiyc1m+FdbPiKj4R6ZE2/wB7KJvsQv69N5XSiS5qTC/mBwXHmbDbZ9mk9C2K/sLFtGqMzt+/uk
-	QVfnCmuWm2RhTAo7xLwGLiEwwuSpuK7+JgjIaUvtNPVlugnQXkAuhHExN+G7qgrzQgB9nDpFH5D
-	2r7/2/xoaWswk9dAbX1a6K5/daHGDZoy8QioAKGnTE/mxQbtLzJvbUFKrkfA5lN7Ne0tDJJnZ0r
-	FYDirdut2GY8MyedLcvk3jejIhYHpZ29vEarMk9dYHgjADskie+7crlf6wRmEq46sjGMQpTPxuc
-	CJc5RZn3m1Ab7TNEV0zLdVQnfuG4rUwCtRcASSa221KhPVeuLmMzwXiOF0WrL+I+QfWWR0fwGfT
-	PD7BC7rvM3BphBOaGR+gjiJ0C+gb7n52LqWKxpqXUJLQ0GVX307yE0GQ3QZEbOd6U=
-X-Google-Smtp-Source: AGHT+IFWosB3kP1cunqsyc3Wf0i3HHGXOo97SMwmCET8H8ejn6hdK+I4Wg/ThmA0FKOUA8GfgazJig==
-X-Received: by 2002:a05:6000:1a8a:b0:428:3f7c:bcf8 with SMTP id ffacd0b85a97d-4283f7cbeefmr13605166f8f.29.1761218841399;
-        Thu, 23 Oct 2025 04:27:21 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429897f53bcsm3516370f8f.11.2025.10.23.04.27.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Oct 2025 04:27:21 -0700 (PDT)
-Message-ID: <bf3d9390-f1f6-428d-b47f-81d2ed1707e9@gmail.com>
-Date: Thu, 23 Oct 2025 12:27:19 +0100
+	s=arc-20240116; t=1761219073; c=relaxed/simple;
+	bh=ARRC88WkJJjPqGQVjd2vob6eGn9St1j7rknF1fJ82N0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AC/JmDRBFk8fW9nRVrBTpptlJcjossd3m7GeDnGTaE4wHbWk9YMBtrOaMqeqPO/3lM6mVI+EidVFdWI0HwlWNWSYGaP3yaHLij12x9XGuEGhw/JyZbOhENyC3KOv3CCkRkfVnkmTDlVpbT6uQM2L05hF6s31YV3aGeZnztVTmVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HmQniJf6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DE70C4CEE7;
+	Thu, 23 Oct 2025 11:31:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761219073;
+	bh=ARRC88WkJJjPqGQVjd2vob6eGn9St1j7rknF1fJ82N0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HmQniJf68vsKJSwbMC61UqGNxCcmsJbxY8s0x9InapF38RFtMmBFYOhZqxv8kbNyR
+	 0w9xj7J8vJt9vxd3Oqz+CP9XxW6QuFATzVOVN5OzIL0y6MkHBOuFq6SPRO9tYJZnbp
+	 tAmOdNU2A2ZbGszYzK9h1JFd4YvuDpSA4bWthHNyTjCvMypP1mw4zAaIjyivCx/DGL
+	 oNmUiTLjizWArrkalSaboq4jX4hNzn1Z4YouanCcmSHrVHaAyE/k5KE0PlfglmaxPa
+	 Qf7fI0EXuNK35Q3bj6C/zDTf7T+GE4YQdi5PY49Of30kLbobPSMOFOXVa1gKjeoOgF
+	 UmjpKxqt7PBlg==
+Date: Thu, 23 Oct 2025 12:31:08 +0100
+From: Simon Horman <horms@kernel.org>
+To: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, andrey.bokhanko@huawei.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Subject: Re: [PATCH net-next 1/8] ipvlan: Implement learnable L2-bridge
+Message-ID: <aPoR_HWEgmrs97Qd@horms.kernel.org>
+References: <20251021144410.257905-1-skorodumov.dmitry@huawei.com>
+ <20251021144410.257905-2-skorodumov.dmitry@huawei.com>
+ <aPjo76T8c8SbOB04@horms.kernel.org>
+ <58174e6d-f473-4e95-b78e-7a4a9711174e@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] sfc: fix potential memory leak in
- efx_mae_process_mport()
-To: Abdun Nihaal <nihaal@cse.iitm.ac.in>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, alejandro.lucero-palau@amd.com,
- habetsm.xilinx@gmail.com, netdev@vger.kernel.org, linux-net-drivers@amd.com,
- linux-kernel@vger.kernel.org
-References: <20251022163525.86362-1-nihaal@cse.iitm.ac.in>
-Content-Language: en-GB
-From: Edward Cree <ecree.xilinx@gmail.com>
-In-Reply-To: <20251022163525.86362-1-nihaal@cse.iitm.ac.in>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <58174e6d-f473-4e95-b78e-7a4a9711174e@huawei.com>
 
-On 22/10/2025 17:35, Abdun Nihaal wrote:
-> In efx_mae_enumerate_mports(), memory allocated for mae_mport_desc is
-> passed as a argument to efx_mae_process_mport(), but when the error path
-> in efx_mae_process_mport() gets executed, the memory allocated for desc
-> gets leaked.
+On Thu, Oct 23, 2025 at 01:21:20PM +0300, Dmitry Skorodumov wrote:
+> On 22.10.2025 17:23, Simon Horman wrote:
+> > On Tue, Oct 21, 2025 at 05:44:03PM +0300, Dmitry Skorodumov wrote:
+> >> Now it is possible to create link in L2E mode: learnable
+> >> bridge. The IPs will be learned from TX-packets of child interfaces.
+> > Is there a standard for this approach - where does the L2E name come from?
 > 
-> Fix that by freeing the memory allocation before returning error.
+> Actually, I meant "E" here as "Extended". But more or less standard naming - is "MAC NAT" - "Mac network address translation". I discussed a bit naming with LLM, and it suggested name "macsnat".. looks like  it is a better name. Hope it is ok, but I don't mind to rename if anyone has better idea
+
+I was more curious than anything else. But perhaps it would
+be worth providing some explanation of the name in the
+commit message.
+
+...
+
+> >> +static void ipvlan_addr_learn(struct ipvl_dev *ipvlan, void *lyr3h,
+> >> +			      int addr_type)
+> >> +{
+> >> +	void *addr = NULL;
+> >> +	bool is_v6;
+> >> +
+> >> +	switch (addr_type) {
+> >> +#if IS_ENABLED(CONFIG_IPV6)
+> >> +	/* No need to handle IPVL_ICMPV6, since it never has valid src-address */
+> >> +	case IPVL_IPV6: {
+> >> +		struct ipv6hdr *ip6h;
+> >> +
+> >> +		ip6h = (struct ipv6hdr *)lyr3h;
+> >> +		if (!is_ipv6_usable(&ip6h->saddr))
+> > It is preferred to avoid #if / #ifdef in order to improve compile coverage
+> > (and, I would argue, readability).
+> ..
+> > In this case I think that can be achieved by changing the line above to:
+> >
+> > 		if (!IS_ENABLED(CONFIG_IPV6) || !is_ipv6_usable(&ip6h->saddr))
+> >
+> > I think it would be interesting to see if a similar approach can be used
+> > to remove other #if CONFIG_IPV6 conditions in this file, and if successful
+> > provide that as a clean-up as the opening patch in this series.
+> >
+> > However, without that, I can see how one could argue for the approach
+> > you have taken here on the basis of consistency.
+> >
 > 
-> Fixes: a6a15aca4207 ("sfc: enumerate mports in ef100")
-> Signed-off-by: Abdun Nihaal <nihaal@cse.iitm.ac.in>
+> Hmmmm.... this raises a complicated for me questions of testing this refactoring: 
+> 
+> - whether IPv6 specific functions (like csum_ipv6_magic(), register_inet6addr_notifier()) are available if kernel is compiled without CONFIG_IPV6
+> 
+> - ideally the code should be retested with kernel without CONFIG_IPV6
+> 
+> This looks like a separate work that requires more or less additional efforts...
 
-Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+Understood, I agree this can be left as future work.
 
-It might be nice to also add a comment on top of efx_mae_process_mport()
- stating that it takes ownership of @desc from the caller.
+> 
+> > static int ipvlan_xmit_mode_l2(struct sk_buff *skb, struct net_device *dev)
+> >>  {
+> >> -	const struct ipvl_dev *ipvlan = netdev_priv(dev);
+> >> -	struct ethhdr *eth = skb_eth_hdr(skb);
+> >> -	struct ipvl_addr *addr;
+> >>  	void *lyr3h;
+> >> +	struct ipvl_addr *addr;
+> >>  	int addr_type;
+> >> +	bool same_mac_addr;
+> >> +	struct ipvl_dev *ipvlan = netdev_priv(dev);
+> >> +	struct ethhdr *eth = skb_eth_hdr(skb);
+> > I realise that the convention is not followed in the existing code,
+> > but please prefer to arrange local variables in reverse xmas tree order -
+> > longest line to shortest.
+> I fixed all my changes to follow this style, except one - where it seems a bit unnatural to to declare dependent variable before "parent" variable. Hope it is ok.
+
+I would lean towards reverse xmas here too.
+But I understand if you feel otherwise.
+And given the current state of this file, I think that is ok.
+
+> >> +	    ether_addr_equal(eth->h_source, dev->dev_addr)) {
+> >> +		/* ignore tx-packets from host */
+> >> +		goto out_drop;
+> >> +	}
+> >> +
+> >> +	same_mac_addr = ether_addr_equal(eth->h_dest, eth->h_source);
+> >> +
+> >> +	lyr3h = ipvlan_get_L3_hdr(ipvlan->port, skb, &addr_type);
+> >>  
+> >> -	if (!ipvlan_is_vepa(ipvlan->port) &&
+> >> -	    ether_addr_equal(eth->h_dest, eth->h_source)) {
+> >> -		lyr3h = ipvlan_get_L3_hdr(ipvlan->port, skb, &addr_type);
+> >> +	if (ipvlan_is_learnable(ipvlan->port)) {
+> >> +		if (lyr3h)
+> >> +			ipvlan_addr_learn(ipvlan, lyr3h, addr_type);
+> >> +		/* Mark SKB in advance */
+> >> +		skb = skb_share_check(skb, GFP_ATOMIC);
+> >> +		if (!skb)
+> >> +			return NET_XMIT_DROP;
+> > I think that when you drop packets a counter should be incremented.
+> > Likewise elsewhere in this function.
+> The counter appears to be handled in parent function - in ipvlan_start_xmit()
+
+Thanks, I see that now.
+
+> >> +	addr = ipvlan_addr_lookup(port, lyr3h, addr_type, true);
+> >> +	if (addr) {
+> >> +		int ret, len;
+> >> +
+> >> +		ipvlan_skb_crossing_ns(skb, addr->master->dev);
+> >> +		skb->protocol = eth_type_trans(skb, skb->dev);
+> >> +		skb->pkt_type = PACKET_HOST;
+> >> +		ipvlan_mark_skb(skb, port->dev);
+> >> +		len = skb->len + ETH_HLEN;
+> >> +		ret = netif_rx(skb);
+> >> +		ipvlan_count_rx(ipvlan, len, ret == NET_RX_SUCCESS, false);
+> >>
+> >> This fails to build because ipvlan is not declared in this scope.
+> >> Perhaps something got missed due to an edit?
+> Oops, really. Compilation was fixed in later patches.
+
+Stuff happens :)
+
+...
 
