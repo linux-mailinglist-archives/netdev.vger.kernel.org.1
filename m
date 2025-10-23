@@ -1,90 +1,94 @@
-Return-Path: <netdev+bounces-232154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01ACDC01E12
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:47:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 10E6AC01E0F
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:47:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A7AA1A629CD
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:47:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B1CD1A61590
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94F3133033F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ED5332F770;
 	Thu, 23 Oct 2025 14:47:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="b7KnGeiV"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="EOVWheoo"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012050.outbound.protection.outlook.com [40.93.195.50])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010028.outbound.protection.outlook.com [52.101.61.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0421432ED40
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 14:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94FC318136;
+	Thu, 23 Oct 2025 14:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.28
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761230841; cv=fail; b=lixqTSIkqTta9s+EvUYT7WpxTCIE1dPoagMXhvFtJou9PgNk7xMgOkI3JWIwawkx1TtvCIBF6BMGSxmYMTTGzH4MWEs7vcc7wBkp7g8NGRW79hTc0VHW+tBBu1ULlIOrH04E1FEsQZV1nSGYpsb5jZ/Tpjx392qgedav5n/l6Xk=
+	t=1761230841; cv=fail; b=NOeiLCTwrMWOw6vrcU29HWQF8vu8zpzYdTD1bCIZ+3gvKQnA/dV4uakNonhf1tO76Kju84VZw5auNVLSuKehSGiY6nt8N1J8temYTufBocnflZiDH6CbLSrBOoouM6xdWVvQAKe3HwueZunoiKTvzdr1Ep3zkt9yoCnlAdT6wAw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1761230841; c=relaxed/simple;
-	bh=5A19wqUTTQdZ+SgbWoL7IOHZys+MEmuqcfzcN8dbQMs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fOqow5izEiQRLuPpPCMzFe4h62z2DWm1lVcWXvTe/1qQnZhjHZsE6otCymPxWY5b3mmO12ciFo4FqkdKRVPx1UJFQccgBL3ZmXnj6c7gdMDhOXmLehcdPiKOI+9r9xXj0hICj5zWJ6E/ucWXV9MAFysFad3sIvsBgCwlprxCZFI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=b7KnGeiV; arc=fail smtp.client-ip=40.93.195.50
+	bh=Q46LWJB7pQ+ZoBLsb6KlyjXwTgf+AJpiazl5aLz8xMA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rDBSjQbCQ+qtUvGXPKALjDGh1KYT6g5u9A6Qppod8HBrkfvKqyekW7hXT2kPIFuYKzdtQVB3j5VL8IQDlkrv/jEtQi+JIJSRBq5plJV8dUMEPAqbr+v4QUvojgT3XmCHw3DM/n/mXwLPCPPwprbGBHfmbteyrbQX5nhCKa7f+RA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=EOVWheoo; arc=fail smtp.client-ip=52.101.61.28
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BJ7eJvRCFTsHQU3pOFjXSlxc5sY0shUfdH46j40ovNWNFBY8fapvWTeq8MAyNmVTkJ3q9iGzWfiMT0H1Jhph4BOoLAuCpnFlOcbmyj7RnX6yYU3xoTsBBn+dieeIE15CPPf3+VLpgfUdfXt63kRSDQvH6UlicBtGFQPDd/mTST2hec4ODwIG3IXRcZvuOeelXSnuNf9eNGlBJq1EGzeLcMqTyez4NY298xwQOouTSlj+hSJdO3C4r3V6aT7sFgakkzhkEka6R/PhpT2obpM7g8JTe3rdEa4r7nJUFhZDta1nUohaJ6qwsAU955u7RtCjB3VQHx1u+6fhdhqHqOYpRw==
+ b=ru1cNa8jyldOMSohrrkHy1b0+zC2TRP8kMKsjWVGWdx0YvqvfSSiCo5QdVBXmoGCUWkGsx9jD9nVuxPBnazWtu7ZuhUYAL+879kbInSK03YjuJIgaqWjDaS+ahFMXmt556SV4LTAES4gw4pp7olVcLiJOZLUkGJKr2631hSFupL71CIIvYsoLlM3CYJ9PHtNhMJWplAU0zqaGPYJ1Ircw27ZFdLr5TU+I1l6hP8AMQqOLfxAYCLRFYpgoex2XYex4j9uMVGOlRLnsDaTsND7BV4y9nT0UFEy39G3tdq8DCxfCaYGFiyVLHsBCoCr8weqTwsyuL6tnMvONHYvQ+JJ1A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=65tDy8DncG6XQ27CfJmf3d0k+wUG0/PWdAIactjQCLw=;
- b=uCCrEO/cr7aS+neo66+gyNP4g3d/2+iRp0OqIOn848wXfSPdW7ck8GHFwtr/kA7+6GrG1ojuJiEhSxS4EIYUIMhrEF7g/BzWFLtPZgnquGypIM+id1lqnw9ZyR3B4PdOAi7cL/b/rB72vLzD6eF3f5agJZ6YK4t752TRman+k3QtkXZmS1ko3exDK9Lzfrl/+hgj5RFXKhdoaL3mJNdYaDMUGKLJtQbp8U488nN7an6884esDtzAJlZnur6YLlXwCpb4RcGiEGdCG/8di9xvTmtcegDHX8snmMIFonYIVufLqEFSUpUqU3eqb2EZ3D5JrE/fA3g0q4NbfPNS7AmiWg==
+ bh=CAln3LAW5lLTHwBF9kSsGEHmUS/RQvaY2PTpHo0CRPg=;
+ b=CVDjfFWlEGZeKKTOlnkpF0QRZR8PBBul/neYnOzdqn0GLOvKMIYZ96efrg0q3NRe3+fhtXN3Yy5gwYSZH996gLpCCpDrlUxxhzhNwvuwKU8PNDYqVxLcn+bS4XCihUqQDAbdSZuV0s94edptsxbKUYSbe9hTnh5CWEj9xAtBZt8f5a/85gSfw2IR0+1SrlkHq/cAuMdZyvyxWBV3qcjHVPEgM0/UC0uhUh9t7DMB+QCfOs6YIm7sWcTyuhQ6QRUV3v7yLA2fFQXyC6LSyfn0jJMspjKdsJnOWzo9ybaobrHMRgb0kXzg3YAq2g2ylc4j65SsXB1bav+WoDppOneszg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=65tDy8DncG6XQ27CfJmf3d0k+wUG0/PWdAIactjQCLw=;
- b=b7KnGeiVq6RA2/g0H4ymz84TQ1SSsMFthiC4Vl+Xyx3Q2tPstOGBh1dklfC5ywk68IqgqO7HqoHeZtXH5WLvPnqg1nfVdO4dH88Cx0vSqThN1kkWQ+MLWPFov3ZL5tgB8qfDpk+q4ZN0xvetE9rP2TNkGqm1I0KYhzwOeS4QqAmPhsyH9FqCon6JfOOs/fuCtvvmve879G0JsAZPgPgP423S9a3X01LvqpqQT7hgXqoyce3e6Knf7L+a3GQ9BZf3fSDX2a32U7nyyhS1boXYAnQMc7dGwsu6Hl9IBtJ+3VjQXeCvXI9boePPpUc7+bWu1uAPBZ36FrXxNTb144hyUA==
-Received: from BN9PR03CA0295.namprd03.prod.outlook.com (2603:10b6:408:f5::30)
- by DM4PR12MB7551.namprd12.prod.outlook.com (2603:10b6:8:10d::12) with
+ bh=CAln3LAW5lLTHwBF9kSsGEHmUS/RQvaY2PTpHo0CRPg=;
+ b=EOVWheooDt4n346k7uyPPkNkHqQXpqkZaXYUXzMSP+o0cCLrH8o14lkevM7z+65SmsdvasJ5DoeawWIBVC/YcwXsNY4/ncOREpWyN4PTrAuG+H2pNQarKpY5gW2LrBw+DZSeN8ReCdcF2i77+ba7qg2effzzHO7Nxyb/LncJWQFQUnr906V9C5rCVCRnY6PVQa5Vg9taR5yFYMTuiTboiEBfp/TsnpCP47ZrtPIW/rKGcjuejRJfd7c1LlJJcXY773ScDBv7+GIA2vK6gmhX0yvskeIe/ob9ZDyDRVwh9nBVilLcuQ1/LBi3aVKS9bDA9cQxrn1z56Z3lvzKWQX5Mw==
+Received: from BYAPR07CA0066.namprd07.prod.outlook.com (2603:10b6:a03:60::43)
+ by DM4PR12MB7741.namprd12.prod.outlook.com (2603:10b6:8:103::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.13; Thu, 23 Oct
- 2025 14:47:16 +0000
-Received: from BN3PEPF0000B06B.namprd21.prod.outlook.com
- (2603:10b6:408:f5:cafe::ef) by BN9PR03CA0295.outlook.office365.com
- (2603:10b6:408:f5::30) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9253.12 via Frontend Transport; Thu,
- 23 Oct 2025 14:47:16 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ 2025 14:47:15 +0000
+Received: from SJ1PEPF00001CE5.namprd03.prod.outlook.com
+ (2603:10b6:a03:60:cafe::6a) by BYAPR07CA0066.outlook.office365.com
+ (2603:10b6:a03:60::43) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9253.13 via Frontend Transport; Thu,
+ 23 Oct 2025 14:47:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN3PEPF0000B06B.mail.protection.outlook.com (10.167.243.70) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ1PEPF00001CE5.mail.protection.outlook.com (10.167.242.21) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9275.0 via Frontend Transport; Thu, 23 Oct 2025 14:47:15 +0000
+ 15.20.9253.7 via Frontend Transport; Thu, 23 Oct 2025 14:47:15 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 23 Oct
- 2025 07:46:57 -0700
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.34; Thu, 23 Oct
+ 2025 07:47:02 -0700
 Received: from fedora.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 23 Oct
- 2025 07:46:52 -0700
+ 2025 07:46:57 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
 	"Nikolay Aleksandrov" <razor@blackwall.org>, <bridge@lists.linux.dev>, Petr
- Machata <petrm@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next 1/2] net: bridge: Flush multicast groups when snooping is disabled
-Date: Thu, 23 Oct 2025 16:45:37 +0200
-Message-ID: <5e992df1bb93b88e19c0ea5819e23b669e3dde5d.1761228273.git.petrm@nvidia.com>
+ Machata <petrm@nvidia.com>, <mlxsw@nvidia.com>,
+	<linux-kselftest@vger.kernel.org>, Shuah Khan <shuah@kernel.org>
+Subject: [PATCH net-next 2/2] selftests: bridge_mdb: Add a test for MDB flush on snooping disable
+Date: Thu, 23 Oct 2025 16:45:38 +0200
+Message-ID: <9420dfbcf26c8e1134d31244e9e7d6a49d677a69.1761228273.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <5e992df1bb93b88e19c0ea5819e23b669e3dde5d.1761228273.git.petrm@nvidia.com>
+References: <5e992df1bb93b88e19c0ea5819e23b669e3dde5d.1761228273.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,104 +101,200 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B06B:EE_|DM4PR12MB7551:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9a979fdd-555f-4ef3-f162-08de12430ed7
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE5:EE_|DM4PR12MB7741:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0985a30c-e4a0-4eb6-4d2e-08de12430ec8
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700013;
+	BCL:0;ARA:13230040|1800799024|36860700013|7416014|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?dNPA7bWp9d4bBONN4bJiV2FvdymPXkoS873nYBDsH/An3LqUwNY/zFjDnlbw?=
- =?us-ascii?Q?qvUWDwJ+CJm2joXOhD6YBtWTgRD/qQclmZx+iaSfG+0rzX5YVzafp2sDZR8I?=
- =?us-ascii?Q?bT1uNZGAkyBFYg8GH9tX89GI97XVxp1hBivh8jdTFbb2+Bn3fpBUIoEAKGf7?=
- =?us-ascii?Q?QlV994xVZUs7Dos5bkBVRkdoRQ4loyMb1jRlaOZOwvdTs62l/YIMT3jdtqNy?=
- =?us-ascii?Q?hnfgeGNG5hia1XS65OChUSEMloUAGVjeSA/QTsurTqKeZle8X3vGgSnwf41v?=
- =?us-ascii?Q?QMuNJ2/+PfYHOoM6akuroTpOSf9tTWJqye4Gu91e14ua78xL89gMCsggcwU4?=
- =?us-ascii?Q?FRoJMilKRharL1sKcKgLZ5WTGMxp6FXVXMo0noPp9R+/L3o6eSeY+gv/2lFb?=
- =?us-ascii?Q?6WUwQCJW5naA3RD/r7TDj8J1cr1MqUMcjvspomO8d9KK1Pswiiya9AstpmtX?=
- =?us-ascii?Q?yhMac1ZJT5stI0/ZU02g4ask4S2kK6+7RI4WHYBAOi2r+5g8eXhRPAY4Y1mt?=
- =?us-ascii?Q?Ym8+S3l23VVX/S7pwmPPkHHYglK3u8Lwy+s8WrwnuhgldvYu91Sx+ewDXAfG?=
- =?us-ascii?Q?3lkB0OdoQSShtBkE6WwPe97aDgrzorvtuADg5G3OspTGPWNE0znmxtZEsGwh?=
- =?us-ascii?Q?qqabVy/4Zab02FN77Tcf8WIDuliFNxmyssuxAI5HLQY/ZKOpXXRC78u5EnTi?=
- =?us-ascii?Q?EdfmfeRJXoIXQCa23C7zH5YWvJAlQlB6pdlD0C7S+H3UESvkBlfDdwrolovK?=
- =?us-ascii?Q?Wh55MyaU4B8H3vU46KCFk2GsYrbgSo0Dj7pOOatLvDhg+uR73PcDPmIfPu1G?=
- =?us-ascii?Q?h2/v58A2bfy8nSPUwz+YlspYbGxbAqNrwxP28KwZsqkJgTSFu+rsYvjkKH/3?=
- =?us-ascii?Q?y3+mV+AiIGfMJ/pcNoTAFLWqY1ExrscnEKYNCHsl6+3YszD7QfVz0KJdDzhn?=
- =?us-ascii?Q?isZ6coG3AJKX1DYLoQx7UcKf0JP8pQJla2KvqbEZuY1sHcO4jTfJBApmeNQM?=
- =?us-ascii?Q?frP7E0JUsRI2vpOBPfibCpBwict3Nw7exZhfoGOJ9VllU7QpYl9IqzZEKMBz?=
- =?us-ascii?Q?FRfYO9+Sxs/CQgkPUB6tbkEKiVItrRCaH+LnnpdEPWMid3bhAtb4MKPU7q30?=
- =?us-ascii?Q?0hJzVfhZYoM29/SsrlznWVuipt5f7fOtM1PE3WQxQ81JFAcTqImME0n0vqlX?=
- =?us-ascii?Q?wr0JrzBULZe8JGiL6luTW7wW9d5yU2g8ymOcEycGKif4qgpQkA0oevlmQe+2?=
- =?us-ascii?Q?PsAzO7Cj1JuzJiw5gVwoyv3GUAYL37+rRhBKTSHFJWOQj82Yt9kwCnL2xfXF?=
- =?us-ascii?Q?DDbAoV82AVN/D9IDSJVwAtfB5cx8ckLtRnarlUBEKPM9e9MmESULelwops9U?=
- =?us-ascii?Q?CumcpU7txG1h5+mNLYNJUy6Dj16i6epYYOSBYr8oepvKI8GzgR6Cw5epftr3?=
- =?us-ascii?Q?vkK4raT78rpv1XrA5UJvMRPfHz12KwcJn+jWASV0b5DokuAKH0qTHbYu7FSz?=
- =?us-ascii?Q?m633gy8+pp8ZxPOf8i7CF7qC4d2b37vs6DqzBeWI2M4OXIPlqAICinhWXQN0?=
- =?us-ascii?Q?wAk19Yls8/5rF38STFs=3D?=
+	=?us-ascii?Q?viqM8Oi+RALw8w41ARB52i6cCLS2bviwtaxjyPGWQtkzI7o7pSUWhT+zDOst?=
+ =?us-ascii?Q?4chIMLVgZnsrfnyN4X+i2flIyV0IYD83Tc8kUwPxpeKxlN5VgkflzSFnYO6T?=
+ =?us-ascii?Q?1GIhRFfXD0jI2KcMmp0bRg91Aj/uCudDaWXtRTEWWWdLVQCClqPIuoyucpSk?=
+ =?us-ascii?Q?Sm8DN9Dbg/ikBwdJGwHwdlRjWSbIxyM28fmCvRfZ9DigfpLhnf3WIwhBt4E/?=
+ =?us-ascii?Q?c2tMCn9Xr3tkucS1k10hqKc7LA229c90Y6RoKujMvx5jt5UQE9HrOXM1nZwQ?=
+ =?us-ascii?Q?3jW376dKGWomC0eUx6Ah91XuJWCYMRs21vl1NBGXexnm4S3v0WTG1jtxqGNN?=
+ =?us-ascii?Q?cojLT9ZKK7GesbfS2lW0Oq2HUSVVD9eokyWFzcU5fN9JhzH+FSw2tvs5sZOa?=
+ =?us-ascii?Q?c/+IgBeAwwb4NGsZwRqwhbiHSxgZaNQ3Pf9SaLgTALFNo8Sj8KQ8dIApuC5C?=
+ =?us-ascii?Q?hszw2NilCs5MZkVsQgc0ZfO2GF4hPl3bn3lRaCF5p9SAhOMCsHIitozxlp9U?=
+ =?us-ascii?Q?0eUpWquf3zZcYyu9mbthvW0NdUbTWXb+LGGfyxmjkWDsRP9UZoKbRTzxKYlV?=
+ =?us-ascii?Q?02V3cJrgyX3Cl0YSJ1R4DogGZYJ0nz9hSPd7q4cRcY482H0Q+d41FoEj4Fqt?=
+ =?us-ascii?Q?gcVokUgfi6eTDenpJA9P3QXhjIz+qMpr1KArL6Oe0CtoDJosa/Rr/Cp1CTXt?=
+ =?us-ascii?Q?+DPL9AUWg6ocAqoDRtIx8WawLhXVQIY4Jh+ISaioTXh2bSaC5ihWAPfk2KDh?=
+ =?us-ascii?Q?yzEP+0vZLFnYD1K8h+L8e/aD0CczXeNGFaPejOnMrJC9lrpl3+IfR9aC/vL5?=
+ =?us-ascii?Q?+H9UCAjRha3+CjAHNH2m+ltzGm0On+pSyIvi4cPMrJdzpx47BcxmSiTnNQeC?=
+ =?us-ascii?Q?t1icA4HlhQ1lKppVlvqS+5sQ27296Tpz6ZXDxMW45z4mzk6l4zutVerNfHYA?=
+ =?us-ascii?Q?ewBJC07k0K8CuP9GgM5Heghyxwz1olHDW023l0u/PGzRJnmAnDJ4uJyedsCi?=
+ =?us-ascii?Q?XlFwN/5aqbZoNnNnwIQGBxhPfqx2LAzLTNF3x3NedcFxBU39Kvue1m+qzsWP?=
+ =?us-ascii?Q?6iUR318mgPMSvym+Gm3nNkBRjtiMTuyvz3uyx4aQTwqRKoW0nuiNMhejkgdc?=
+ =?us-ascii?Q?YJoZWuu1SekAAMHLuXcLlLCIIjX4X40ms6ZSCZCm/tv0c/4M5ksIM0oF7YCB?=
+ =?us-ascii?Q?NBnB6RvJNfWfUsQ2UOAagejujqmLohz6YBQcSk6rSfy052njay6PL82Q6PKT?=
+ =?us-ascii?Q?oGBwLeLdRROCpf6xjNP5wH04OKJ9DvT1oIVRWQ4MoNA7XwhxXYXqR98QUQC0?=
+ =?us-ascii?Q?JzB2+tUQtggkk1FxUDs0G1fZtFS/kq/EkAplw+7O0p1KSTieOECbb72G01Qs?=
+ =?us-ascii?Q?xxtmkXooRK0IHUbLKAiFRpb4v3wbB5AUvKftAFpHoqBenLOqS5mjJpSTq4AK?=
+ =?us-ascii?Q?1vxYtqpve6Oi99HpJVBEZtTqXFvqyFz6VLLUZKY3cp9XiNuxwq7D8ChDp1in?=
+ =?us-ascii?Q?nbnAWllvI6Vpk/EuvcHkLB3w6+hiYmwSO8Bgw792cqmLsuLWtTJetLl4CMhU?=
+ =?us-ascii?Q?LY3Nqq9iRrd+ilEiEYA=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700013);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(7416014)(376014)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2025 14:47:15.2418
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2025 14:47:15.2828
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a979fdd-555f-4ef3-f162-08de12430ed7
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0985a30c-e4a0-4eb6-4d2e-08de12430ec8
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B06B.namprd21.prod.outlook.com
+	SJ1PEPF00001CE5.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7551
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7741
 
-When forwarding multicast packets, the bridge takes MDB into account when
-IGMP / MLD snooping is enabled. Currently, when snooping is disabled, the
-MDB is retained, even though it is not used anymore.
-
-At the same time, during the time that snooping is disabled, the IGMP / MLD
-control packets are obviously ignored, and after the snooping is reenabled,
-the administrator has to assume it is out of sync. In particular, missed
-join and leave messages would lead to traffic being forwarded to wrong
-interfaces.
-
-Keeping the MDB entries around thus serves no purpose, and just takes
-memory. Note also that disabling per-VLAN snooping does actually flush the
-relevant MDB entries.
-
-This patch flushes non-permanent MDB entries as global snooping is
+Check that non-permanent MDB entries are removed as IGMP / MLD snooping is
 disabled.
 
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 ---
- net/bridge/br_multicast.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-index 22d12e545966..d55a4ab87837 100644
---- a/net/bridge/br_multicast.c
-+++ b/net/bridge/br_multicast.c
-@@ -4649,6 +4649,14 @@ static void br_multicast_start_querier(struct net_bridge_mcast *brmctx,
- 	rcu_read_unlock();
+Notes:
+CC: linux-kselftest@vger.kernel.org
+CC: Shuah Khan <shuah@kernel.org>
+
+ .../selftests/net/forwarding/bridge_mdb.sh    | 100 +++++++++++++++++-
+ 1 file changed, 98 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb.sh b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+index 8c1597ebc2d3..e86d77946585 100755
+--- a/tools/testing/selftests/net/forwarding/bridge_mdb.sh
++++ b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+@@ -28,6 +28,7 @@ ALL_TESTS="
+ 	cfg_test
+ 	fwd_test
+ 	ctrl_test
++	disable_test
+ "
+ 
+ NUM_NETIFS=4
+@@ -64,7 +65,10 @@ h2_destroy()
+ 
+ switch_create()
+ {
+-	ip link add name br0 type bridge vlan_filtering 1 vlan_default_pvid 0 \
++	local vlan_filtering=$1; shift
++
++	ip link add name br0 type bridge \
++		vlan_filtering "$vlan_filtering" vlan_default_pvid 0 \
+ 		mcast_snooping 1 mcast_igmp_version 3 mcast_mld_version 2
+ 	bridge vlan add vid 10 dev br0 self
+ 	bridge vlan add vid 20 dev br0 self
+@@ -118,7 +122,7 @@ setup_prepare()
+ 
+ 	h1_create
+ 	h2_create
+-	switch_create
++	switch_create 1
  }
  
-+static void br_multicast_del_grps(struct net_bridge *br)
+ cleanup()
+@@ -1357,6 +1361,98 @@ ctrl_test()
+ 	ctrl_mldv2_is_in_test
+ }
+ 
++check_group()
 +{
-+	struct net_bridge_port *port;
++	local group=$1; shift
++	local vid=$1; shift
++	local should_fail=$1; shift
++	local when=$1; shift
++	local -a vidkws
 +
-+	list_for_each_entry(port, &br->port_list, list)
-+		__br_multicast_disable_port_ctx(&port->multicast_ctx);
++	if ((vid)); then
++		vidkws=(vid "$vid")
++	fi
++
++	bridge mdb get dev br0 grp "$group" "${vidkws[@]}" 2>/dev/null |
++		grep -q "port $swp1"
++	check_err_fail "$should_fail" $? "$group seen $when snooping disable:"
 +}
 +
- int br_multicast_toggle(struct net_bridge *br, unsigned long val,
- 			struct netlink_ext_ack *extack)
- {
-@@ -4669,6 +4677,7 @@ int br_multicast_toggle(struct net_bridge *br, unsigned long val,
- 	br_opt_toggle(br, BROPT_MULTICAST_ENABLED, !!val);
- 	if (!br_opt_get(br, BROPT_MULTICAST_ENABLED)) {
- 		change_snoopers = true;
-+		br_multicast_del_grps(br);
- 		goto unlock;
- 	}
- 
++__disable_test()
++{
++	local vid=$1; shift
++	local what=$1; shift
++	local -a vidkws
++
++	if ((vid)); then
++		vidkws=(vid "$vid")
++	fi
++
++	RET=0
++
++	bridge mdb add dev br0 port "$swp1" grp ff0e::1 permanent \
++		"${vidkws[@]}" filter_mode include source_list 2001:db8:1::1
++	bridge mdb add dev br0 port "$swp1" grp ff0e::2 permanent \
++		"${vidkws[@]}" filter_mode exclude
++
++	bridge mdb add dev br0 port "$swp1" grp ff0e::3 \
++		"${vidkws[@]}" filter_mode include source_list 2001:db8:1::2
++	bridge mdb add dev br0 port "$swp1" grp ff0e::4 \
++		"${vidkws[@]}" filter_mode exclude
++
++	bridge mdb add dev br0 port "$swp1" grp 239.1.1.1 permanent \
++		"${vidkws[@]}" filter_mode include source_list 192.0.2.1
++	bridge mdb add dev br0 port "$swp1" grp 239.1.1.2 permanent \
++		"${vidkws[@]}" filter_mode exclude
++
++	bridge mdb add dev br0 port "$swp1" grp 239.1.1.3 \
++		"${vidkws[@]}" filter_mode include source_list 192.0.2.2
++	bridge mdb add dev br0 port "$swp1" grp 239.1.1.4 \
++		"${vidkws[@]}" filter_mode exclude
++
++	check_group ff0e::1 "$vid" 0 "before"
++	check_group ff0e::2 "$vid" 0 "before"
++	check_group ff0e::3 "$vid" 0 "before"
++	check_group ff0e::4 "$vid" 0 "before"
++
++	check_group 239.1.1.1 "$vid" 0 "before"
++	check_group 239.1.1.2 "$vid" 0 "before"
++	check_group 239.1.1.3 "$vid" 0 "before"
++	check_group 239.1.1.4 "$vid" 0 "before"
++
++	ip link set dev br0 type bridge mcast_snooping 0
++
++	check_group ff0e::1 "$vid" 0 "after"
++	check_group ff0e::2 "$vid" 0 "after"
++	check_group ff0e::3 "$vid" 1 "after"
++	check_group ff0e::4 "$vid" 1 "after"
++
++	check_group 239.1.1.1 "$vid" 0 "after"
++	check_group 239.1.1.2 "$vid" 0 "after"
++	check_group 239.1.1.3 "$vid" 1 "after"
++	check_group 239.1.1.4 "$vid" 1 "after"
++
++	log_test "$what: Flush after disable"
++
++	ip link set dev br0 type bridge mcast_snooping 1
++	sleep 10
++}
++
++disable_test()
++{
++	__disable_test 10 802.1q
++
++	switch_destroy
++	switch_create 0
++	setup_wait
++
++	__disable_test 0 802.1d
++
++	switch_destroy
++	switch_create 1
++	setup_wait
++}
++
+ if ! bridge mdb help 2>&1 | grep -q "flush"; then
+ 	echo "SKIP: iproute2 too old, missing bridge mdb flush support"
+ 	exit $ksft_skip
 -- 
 2.49.0
 
