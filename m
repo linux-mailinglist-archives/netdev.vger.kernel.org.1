@@ -1,120 +1,107 @@
-Return-Path: <netdev+bounces-232194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96FBCC02692
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 18:20:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A60D1C026AD
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 18:21:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 49BA8501152
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:19:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EF1415014E1
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3EF029A9E9;
-	Thu, 23 Oct 2025 16:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FDD2C0267;
+	Thu, 23 Oct 2025 16:20:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MY69QPay"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D9E298CAF
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 16:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691D12BD5AF;
+	Thu, 23 Oct 2025 16:20:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761236366; cv=none; b=iNhQ3lKOTLSxzySpuce0hbUAbJ9hM3PbSdDpJ9mJbQy4UDMB3yQ9fmawR5Uzs3x7sSeSCRn8k5zYRfWe6sQF3CmtzwyVnZK6NmtMm1E34EJRA7TDwyYddgNQC+hHHor6G/zsKT9jiQnrD//3rb6/crYYl70gsDf9KPq8E7z9VzU=
+	t=1761236417; cv=none; b=IdADC3oZoMRiszgEjw3nMNFs/0326smlaMPaZlNPTrytfTKyCJo7td/GrI0U616xbty/IyOWkM2ge+yEgDHwjY6foSK9pPeR2lAJTsFeH1lSuKKDfXpWuLVHj6ehHd2w2czt0kcIUpXAlMLdcUh4S76Icl4IwbzGS22zMYU+V9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761236366; c=relaxed/simple;
-	bh=J9fgQRAtf/jgUHeHMg6pXGR492Zh7Odx8vgo1NDj8Sw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=aD0Zc5xDsnmd/+pJ6O09riIH7he38AHoXpBl9pUpy4uCw0W76rsTILA0ghYAh7ycq4jS+yqFpa7OTPMWPzUixH+l3cO6halVMKzGln77Ry3hlv6nIuZ9IR61oYn+hbbBsfVqT5TIMAK/XZZLYLJ2Yr2pVq4N3SuY1OZZhVqKIao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1vBy0f-0003DE-8X; Thu, 23 Oct 2025 18:17:53 +0200
-Received: from lupine.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::4e] helo=lupine)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1vBy0Z-0055JC-1Z;
-	Thu, 23 Oct 2025 18:17:47 +0200
-Received: from pza by lupine with local (Exim 4.98.2)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1vBy0Z-00000000E1b-1FyP;
-	Thu, 23 Oct 2025 18:17:47 +0200
-Message-ID: <660b87b77ac97a186796ce4783acd510741f7c54.camel@pengutronix.de>
-Subject: Re: [PATCH] dt-bindings: Remove extra blank lines
-From: Philipp Zabel <p.zabel@pengutronix.de>
-To: "Rob Herring (Arm)" <robh@kernel.org>, Krzysztof Kozlowski	
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Stephen Boyd	
- <sboyd@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter	
- <simona@ffwll.ch>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Thomas Zimmermann <tzimmermann@suse.de>, Andrzej Hajda
- <andrzej.hajda@intel.com>, Robert Foss <rfoss@kernel.org>,  Vinod Koul
- <vkoul@kernel.org>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
- <yilun.xu@intel.com>, Bartosz Golaszewski <brgl@bgdev.pl>, Guenter Roeck
- <linux@roeck-us.net>, Andi Shyti <andi.shyti@kernel.org>,  Jonathan Cameron
-	 <jic23@kernel.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Georgi
- Djakov	 <djakov@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Joerg
- Roedel	 <joro@8bytes.org>, Jassi Brar <jassisinghbrar@gmail.com>, Mauro
- Carvalho Chehab	 <mchehab@kernel.org>, Lee Jones <lee@kernel.org>, Miquel
- Raynal	 <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>,
- Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>,  Johannes Berg <johannes@sipsolutions.net>, Krzysztof
- =?UTF-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,  Manivannan
- Sadhasivam	 <mani@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Kishon
- Vijay Abraham I	 <kishon@kernel.org>, Sebastian Reichel <sre@kernel.org>,
- Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=	 <ukleinek@kernel.org>, Mark Brown
- <broonie@kernel.org>, Mathieu Poirier	 <mathieu.poirier@linaro.org>, Olivia
- Mackall <olivia@selenic.com>, Herbert Xu	 <herbert@gondor.apana.org.au>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,  Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-clk@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linux-fbdev@vger.kernel.org, dmaengine@vger.kernel.org, 
-	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
- linux-pm@vger.kernel.org, 	iommu@lists.linux.dev,
- linux-media@vger.kernel.org, 	linux-mtd@lists.infradead.org,
- netdev@vger.kernel.org, 	linux-wireless@vger.kernel.org,
- linux-pci@vger.kernel.org, 	linux-phy@lists.infradead.org,
- linux-pwm@vger.kernel.org, 	linux-remoteproc@vger.kernel.org,
- linux-crypto@vger.kernel.org, 	linux-sound@vger.kernel.org,
- linux-usb@vger.kernel.org
-Date: Thu, 23 Oct 2025 18:17:47 +0200
-In-Reply-To: <20251023143957.2899600-1-robh@kernel.org>
-References: <20251023143957.2899600-1-robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1-1 
+	s=arc-20240116; t=1761236417; c=relaxed/simple;
+	bh=fFVUi40XDCK9B7HixvDHQwpkFgo3/dBfhOzbpBXTDTk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YeJKmqlmIb5EP/YdtJ3Z6eNO2D4ArkG9w2Noil+MGxuYsucZ//btTMGEF1X6lzwvi6p89Ih+OolDI0SUGx/HvCgl6IRQpT+UmFOmvfuW53cskiVnGL69hk6CSuB6fR1R3OSaVGR2PbEX1+ZQDBpEXKohRQPxJgFfmraDW1JtxOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MY69QPay; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3260C4CEE7;
+	Thu, 23 Oct 2025 16:20:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761236417;
+	bh=fFVUi40XDCK9B7HixvDHQwpkFgo3/dBfhOzbpBXTDTk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MY69QPayrEeVsAOYAfDxnBHKtP4LY+mIEf+kykRLRh7UrmCItw9ch0v/IfnubidB3
+	 s+kE1VPjFfaUbpcfVYRMloqK1T89N0DGPN3sts5gjubAHfhcfasWlrnwYZ/5k+KvTq
+	 mx18RRSLyACPAY4NOAcn9CHoIJOuEprnSvtvco8f/jw9KZCYN/EGwEW9pzTQ/ZqNjq
+	 QYXzsVq/yfETa04aVZ04g67p6vXJVFUKrb7pVEeunSFQHnnkUfi0OOzgkOSE56OJ9l
+	 v/b9wZL6lmUWKVwMW5NdLKwINBfzlrUFZSWms9nq7nXIE7O4NWxJwZFatipEjGDmbQ
+	 gcg/+LfnF7w5g==
+Date: Thu, 23 Oct 2025 09:20:16 -0700
+From: Kees Cook <kees@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v3 1/9] net: Add struct sockaddr_unspec for sockaddr of
+ unknown length
+Message-ID: <202510230918.AFE383F9E0@keescook>
+References: <20251020212125.make.115-kees@kernel.org>
+ <20251020212639.1223484-1-kees@kernel.org>
+ <980907a1-255d-4aa4-ad49-0fba79fe8edc@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: p.zabel@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <980907a1-255d-4aa4-ad49-0fba79fe8edc@redhat.com>
 
-On Do, 2025-10-23 at 09:37 -0500, Rob Herring (Arm) wrote:
-> Generally at most 1 blank line is the standard style for DT schema
-> files. Remove the few cases with more than 1 so that the yamllint check
-> for this can be enabled.
->=20
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
-[...]
->  Documentation/devicetree/bindings/reset/ti,sci-reset.yaml    | 1 -
+On Thu, Oct 23, 2025 at 12:59:59PM +0200, Paolo Abeni wrote:
+> On 10/20/25 11:26 PM, Kees Cook wrote:
+> > Add flexible sockaddr structure to support addresses longer than the
+> > traditional 14-byte struct sockaddr::sa_data limitation without
+> > requiring the full 128-byte sa_data of struct sockaddr_storage. This
+> > allows the network APIs to pass around a pointer to an object that
+> > isn't lying to the compiler about how big it is, but must be accompanied
+> > by its actual size as an additional parameter.
+> > 
+> > It's possible we may way to migrate to including the size with the
+> > struct in the future, e.g.:
+> > 
+> > struct sockaddr_unspec {
+> > 	u16 sa_data_len;
+> > 	u16 sa_family;
+> > 	u8  sa_data[] __counted_by(sa_data_len);
+> > };
+> > 
+> > Signed-off-by: Kees Cook <kees@kernel.org>
+> 
+> Another side note: please include the 'net-next' subj prefix in next
+> submissions, otherwise patchwork could be fouled, and the patches will
+> not be picked by our CI - I guess we need all the possible testing done
+> here ;)
 
-Acked-by: Philipp Zabel <p.zabel@pengutronix.de>
+Okay, I've tweaked my workflow automation to attempt this now. I had a
+bit of a catch-22 in that I generated the CC list after "git
+format-patch" (and format-patch is what has the --prefix option, so I
+couldn't see if netdev@ was in the CC list yet...) Anyway, it should be
+part of my automation now...
 
-regards
-Philipp
+-- 
+Kees Cook
 
