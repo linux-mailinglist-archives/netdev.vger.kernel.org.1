@@ -1,198 +1,155 @@
-Return-Path: <netdev+bounces-232170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A587FC01FB4
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:06:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C546C01FC4
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 17:07:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0EFB18C53FC
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 15:06:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 620BD1A60EE5
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 15:07:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04BD126059D;
-	Thu, 23 Oct 2025 15:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16648219EB;
+	Thu, 23 Oct 2025 15:06:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lDmUQnKm"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="czB/VHzj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667E12FCBF5
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 15:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550012FCBF5;
+	Thu, 23 Oct 2025 15:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761231987; cv=none; b=iNEDafQEy6fUI/toYhR7pFUGV5nIwJDtitPXEK3z8nvgu9IauvAXP4G83Yh9UtuGQZhufNhL53Jr8X+8CTe1cKtA3hyQd7xvNqnnmgE1sGm5OuclDfHrWC+Xe60qWeINmX42QohG5XBMgB0L6n1GBl/9iSZ0H2ki9zJ+p985ZRQ=
+	t=1761232011; cv=none; b=hr4O29lDzANMnAcQpFx1Cj+ocapTKBr94Y4140gr1J+3UCQzsiisa2IdZc9KpmsMV1MZHn7kZIIW2xssowtBNfJlHK0YfbrcQFEaNpTVpti+BKvXl827SES6bQdApDJO0XcQYxbu//21W6anxEVnVl/HpYonwXESkPmU5gljryM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761231987; c=relaxed/simple;
-	bh=MvqFL77ZOpbzsQ/1SAvP195IIaFnAZVIetxFNQjBOxo=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=e/G3WSejj0T5cDc09aMQ7tohelrcVwSvvz9LeAID1ifxrweW00bt/ve0bkBHfATGQsvQ1Z2nTERrmAYIcJzqrqNVP9pUf00H11qpeDDmGjP621PeWKuiGy3gkXZ9ck28nZ3SHAB9q5feaZByJa9Vg4OR8BSPlh8+WXLJ4KVaM7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lDmUQnKm; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7a226a0798cso768882b3a.2
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 08:06:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761231986; x=1761836786; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mvQKZArUDl984Y6+2a44gK2373aPFXu4OMsdAqeqhEE=;
-        b=lDmUQnKmDhJ1d1CXwn9n35a64uUWYw5EQ6xSxdAf2Ot4bg4Pv0KSsFKVXtfUV/SaVI
-         O8GymYJcK/3mD0UHX4s/9x3I3/HHSqKirL1aaOOQYUCr09wKriSiN+Y5THpzxeY/W9OS
-         Tgex+GSFHB1+pNBSIqV3lE060wrgjhuD9EQ/0NE2L2UTFQ5sdPqJQnOHGM4cY9OxPdIt
-         ZSrtHuhEfrNLZ26uZgUr7CbWwLVePXUyEQpXBroCriVFdKgCDFNfMqKgCBocIo8GaPvO
-         CCtZudNzlvjoBvzVXxWkquT2PjfOdgPxJfyE/SftDNpAzXN7pS3epV/EMmh06b83+aiO
-         5KQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761231986; x=1761836786;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mvQKZArUDl984Y6+2a44gK2373aPFXu4OMsdAqeqhEE=;
-        b=WCvflRoOYgnyoonrSr12Q2Gj+k44BoVXq/dCZmyFNiAUtS4J5bhgz/CIVf53ADF4Fv
-         3xqn59OjHG2BocWPKK724E2rVsFj18sJ9n0cIo0WRypN2x3GdcZ/Z9dYAv7PsIkLk0Ms
-         rNSxOYPlUL04Yfrpw1BGE2P5A5+wuZD8r+umVAzQE1iYm/2EXGTCaeYnKhK6+lglcW9C
-         CBZ3q9gv0WKvTDlnqntCDRVYef94kwbN+axji6qh5CQQOkayOuLcRfQbKiSTQJ8XqWlM
-         GI2lH2slD2LvjZlfRbXTDSXvK6NpS2llyQLic58AB6RNMeyfT1/RF9P1OvirggJ7Kpul
-         PYtA==
-X-Forwarded-Encrypted: i=1; AJvYcCW9AxPflRqFopKTR+grrUr+tN2bn0bhEXWd08gZKuzgX+Wyl3sUg+ZjRhaaKnnH4CW4bDoZvXw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzd18wwtM2o8thkdR8oMZdA8KEKX+SwZd2t1zjRGXQXpO53ejt1
-	syoxbjIRJ1wyXuCem5laxI75qtrlFhJAwX39/n7xGLJQbjHZEvaCSkA3Uzfg1g==
-X-Gm-Gg: ASbGnctNM62rg49UAe2LbZVzZ/kKDQgbkqWUN0tzpH1m1IwTntw4RnQF92/3SoWbhg4
-	QGa0QUzbVaU3v0c/Dj8s8qpnZndF9aggZhgN49/3GZNoxGH94HwnLmiBr7qyt072cHOMIDMd79C
-	9OmczpVbz0C6icNKnBNH3s+REh7qmS4J9V4Ip/FIelazN3UlS6iSV0PckQOC8uZa0DTtMTEBnXG
-	9VUrcv4HPpupiEQQElGCDsfQe0O/xtUEyUvAQi7iqugIfiGzirBJXF6vTpv4qTGkFlRyIDzTQ4z
-	w2YvsY0sNOAgt+1Rd/WLn57raDD4xYn3XpZHU+aaeEDM+8AFV33imeG8PA1FsgJDDDW7zrTTV77
-	7ZnPCN4EUo2fwJrcx8HmgS9nc7xKG0iis5QNDN/RAjmsJv0Hz84wUf592GL4go4tZFiN6jbpNZR
-	PslynLh4tAIWjOJA7QfzzRRUIm2ZxGCC4wa3CMoAS0Y5I+GFnfQsY=
-X-Google-Smtp-Source: AGHT+IHmV7fyIld8QJGetoS158dw1CSCpgxRIKYp/OAxuCr3SCHqN63NNPoNTOeqZvoqcH0dXWwUhg==
-X-Received: by 2002:a05:6a21:4613:b0:334:a9b0:1c87 with SMTP id adf61e73a8af0-334a9b01d07mr31195853637.1.1761231985521;
-        Thu, 23 Oct 2025 08:06:25 -0700 (PDT)
-Received: from ?IPV6:2001:ee0:4f4c:210:5c6f:93f3:3b14:cac4? ([2001:ee0:4f4c:210:5c6f:93f3:3b14:cac4])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b6cf4c13ea9sm2360547a12.16.2025.10.23.08.06.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Oct 2025 08:06:25 -0700 (PDT)
-Message-ID: <9598c7ae-fda5-4b7f-8e49-751ce7d5eafe@gmail.com>
-Date: Thu, 23 Oct 2025 22:06:17 +0700
+	s=arc-20240116; t=1761232011; c=relaxed/simple;
+	bh=UoQ13NiOpGEiKHmwMpKk6tQhEhUFeAhW/pw6KPT0wg0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RYjm59+InjG0/yph8496Ww5DkxvDKM5Hy0mE2Fk5BvNEC3L+oyJymY8dps6dKRAbkbotyo1iwDMuEwthLHMShONWHti6jZlshFBphkWKO3CiSkQpzRwCt+hzse7QfNU2INMJUQzye8QwjdAnXlzgocP7K7u4QDWZBb3m5z+9VGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=czB/VHzj; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59N6tuVH019265;
+	Thu, 23 Oct 2025 15:06:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=Av0H3oynECbxpqDu2AL7/Q8q2mkewhV28IVGTKriN
+	SM=; b=czB/VHzj9ULWNVCFBwHoQd09I2+ahNHQLazFMGj05zOnpvkRdBMTH96NW
+	soxGkprKJVy1XzC/Jzb0LmyLzuKhpaS2QRexIf2Gg7XiaohFXKMGK6y5vZAqWHNY
+	LjqvSPnjbHSuHZy/vVdJAPoeilpRV2hGtV9nT1KBsmFK45ryz4kqnFI5beDMCRVA
+	+r8gqJ+aqU/v1+4YhhlgpPmEsfftpz2vOEoKyV2caI5kiUbTdWKq7l8yFp4A2Qrk
+	RMRwHPt33X+FDPb8UurkWPo8OPUjF+N06E5c7moevcN3dAHL4urlgfzPqsO463Hg
+	AYTcJjm5TurVBBKbl8x9c3o32kyww==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v30w1e0n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 23 Oct 2025 15:06:41 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 59NF619q013455;
+	Thu, 23 Oct 2025 15:06:41 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v30w1e0g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 23 Oct 2025 15:06:41 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59NEZrks011075;
+	Thu, 23 Oct 2025 15:06:40 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 49vqx1e3bg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 23 Oct 2025 15:06:40 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59NF6aDB26608020
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 23 Oct 2025 15:06:36 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 77C0E2004D;
+	Thu, 23 Oct 2025 15:06:36 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 646772004B;
+	Thu, 23 Oct 2025 15:06:36 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 23 Oct 2025 15:06:36 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
+	id 3A99CE0505; Thu, 23 Oct 2025 17:06:36 +0200 (CEST)
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: Julian Ruess <julianr@linux.ibm.com>, Mete Durlu <meted@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Dust Li <dust.li@linux.alibaba.com>,
+        Sidraya Jayagond <sidraya@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next 1/2] dibs: Remove reset of static vars in dibs_init()
+Date: Thu, 23 Oct 2025 17:06:35 +0200
+Message-ID: <20251023150636.3995476-1-wintera@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4] virtio-net: fix received length check in big
- packets
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Gavin Li <gavinl@nvidia.com>, Gavi Teitz <gavi@nvidia.com>,
- Parav Pandit <parav@nvidia.com>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, netdev@vger.kernel.org
-References: <20251022160623.51191-1-minhquangbui99@gmail.com>
- <1761206734.6182284-1-xuanzhuo@linux.alibaba.com>
- <cd963708-784a-4b1e-a44e-6fb799937707@gmail.com>
-Content-Language: en-US
-In-Reply-To: <cd963708-784a-4b1e-a44e-6fb799937707@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Thhvfx46WOP6PAZCaySNauprniLkgjZP
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMiBTYWx0ZWRfX+dGYMbMp9Hd9
+ wTK2r/i6byqOBUakCbYEPsyjaYhWp2Ko33i5am64cZaxilWE2tiD1OFdS0Ks6vA2h1BJJB1yJcn
+ zU7MleHmS9Vj7rZXi2NEVuw0hgRJAWmSrfHocAqecpzSP00DVks1bMbz234Ug1zg6aVBe6DGtsc
+ tdWjfsGJx8km9ZnNcqd+GDP4CuPu98HQUvN7BYOupUBZvYSrJQ1egdGX02EddPvwFwjZJgoPofm
+ /akljc9dEmoLl8uqat/s5gTh3BT+eKR4CHTJLD+mkS8LDepZJsu+wr8D7fNU4B+GSGKLUiKKmOf
+ aH/B5v4az78YVKBGaNwhE/QUGSdvMtL1fX2T/Grm9B5cb8ooLHVv3QJ6CT7y/vw99B12BsTKu44
+ KJ4rE3ZKKErNGtWo11vijnNNm9fLYA==
+X-Authority-Analysis: v=2.4 cv=MIJtWcZl c=1 sm=1 tr=0 ts=68fa4481 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
+ a=8oxiqV0urVS3dNMH5xsA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-ORIG-GUID: _U9ukBPxbYPmKBgv-HbeQZ81lRSho-wk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-23_01,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 spamscore=0 phishscore=0 lowpriorityscore=0 adultscore=0
+ clxscore=1015 impostorscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510180022
 
-On 10/23/25 21:39, Bui Quang Minh wrote:
-> On 10/23/25 15:05, Xuan Zhuo wrote:
->> On Wed, 22 Oct 2025 23:06:23 +0700, Bui Quang Minh 
->> <minhquangbui99@gmail.com> wrote:
->>> Since commit 4959aebba8c0 ("virtio-net: use mtu size as buffer length
->>> for big packets"), when guest gso is off, the allocated size for big
->>> packets is not MAX_SKB_FRAGS * PAGE_SIZE anymore but depends on
->>> negotiated MTU. The number of allocated frags for big packets is stored
->>> in vi->big_packets_num_skbfrags.
->>>
->>> Because the host announced buffer length can be malicious (e.g. the 
->>> host
->>> vhost_net driver's get_rx_bufs is modified to announce incorrect
->>> length), we need a check in virtio_net receive path. Currently, the
->>> check is not adapted to the new change which can lead to NULL page
->>> pointer dereference in the below while loop when receiving length that
->>> is larger than the allocated one.
->>>
->>> This commit fixes the received length check corresponding to the new
->>> change.
->>>
->>> Fixes: 4959aebba8c0 ("virtio-net: use mtu size as buffer length for 
->>> big packets")
->>> Cc: stable@vger.kernel.org
->>> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
->>> ---
->>> Changes in v4:
->>> - Remove unrelated changes, add more comments
->>> Changes in v3:
->>> - Convert BUG_ON to WARN_ON_ONCE
->>> Changes in v2:
->>> - Remove incorrect give_pages call
->>> ---
->>>   drivers/net/virtio_net.c | 16 +++++++++++++---
->>>   1 file changed, 13 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->>> index a757cbcab87f..0ffe78b3fd8d 100644
->>> --- a/drivers/net/virtio_net.c
->>> +++ b/drivers/net/virtio_net.c
->>> @@ -852,7 +852,7 @@ static struct sk_buff *page_to_skb(struct 
->>> virtnet_info *vi,
->>>   {
->>>       struct sk_buff *skb;
->>>       struct virtio_net_common_hdr *hdr;
->>> -    unsigned int copy, hdr_len, hdr_padded_len;
->>> +    unsigned int copy, hdr_len, hdr_padded_len, max_remaining_len;
->>>       struct page *page_to_free = NULL;
->>>       int tailroom, shinfo_size;
->>>       char *p, *hdr_p, *buf;
->>> @@ -915,13 +915,23 @@ static struct sk_buff *page_to_skb(struct 
->>> virtnet_info *vi,
->>>        * This is here to handle cases when the device erroneously
->>>        * tries to receive more than is possible. This is usually
->>>        * the case of a broken device.
->>> +     *
->>> +     * The number of allocated pages for big packet is
->>> +     * vi->big_packets_num_skbfrags + 1, the start of first page is
->>> +     * for virtio header, the remaining is for data. We need to ensure
->>> +     * the remaining len does not go out of the allocated pages.
->>> +     * Please refer to add_recvbuf_big for more details on big packet
->>> +     * buffer allocation.
->>>        */
->>> -    if (unlikely(len > MAX_SKB_FRAGS * PAGE_SIZE)) {
->>> +    BUG_ON(offset >= PAGE_SIZE);
->>> +    max_remaining_len = (unsigned int)PAGE_SIZE - offset;
->>> +    max_remaining_len += vi->big_packets_num_skbfrags * PAGE_SIZE;
->>
->> Could we perform this check inside `receive_big` to avoid computing
->> `max_remaining_len` altogether? Instead, we could directly compare 
->> `len` against
->> `(vi->big_packets_num_skbfrags + 1) * PAGE_SIZE`.
->
-> That looks better, I'll do that in the next version.
->
->> And I’d like to know if this check is necessary for other modes as well.
->
-> Other modes have this check as well. check_mergeable_len is used in 
-> mergeable mode. In receive_small, there is a check
->
->     if (unlikely(len > GOOD_PACKET_LEN)) {
->         goto err; 
+'clients' and 'max_client' are static variables and therefore don't need to
+be initialized.
 
-I forgot about XDP zerocopy (XSK) mode. In that mode, there is a check 
-in buf_to_xdp.
+Reported-by: Mete Durlu <meted@linux.ibm.com>
+Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+---
+ drivers/dibs/dibs_main.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-     if (unlikely(len > bufsize)) {
-         return NULL;
-
-Thanks,
-Quang Minh.
+diff --git a/drivers/dibs/dibs_main.c b/drivers/dibs/dibs_main.c
+index 0374f8350ff7..b015578b4d2e 100644
+--- a/drivers/dibs/dibs_main.c
++++ b/drivers/dibs/dibs_main.c
+@@ -254,9 +254,6 @@ static int __init dibs_init(void)
+ {
+ 	int rc;
+ 
+-	memset(clients, 0, sizeof(clients));
+-	max_client = 0;
+-
+ 	dibs_class = class_create("dibs");
+ 	if (IS_ERR(dibs_class))
+ 		return PTR_ERR(dibs_class);
+-- 
+2.48.1
 
 
