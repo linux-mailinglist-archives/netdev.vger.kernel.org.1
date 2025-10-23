@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-231961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0635BFF07D
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 05:46:25 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0606BFF08D
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 05:46:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8C447352B3D
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 03:46:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BC1A44E785C
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 03:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A6A2144C9;
-	Thu, 23 Oct 2025 03:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C7D2C21C3;
+	Thu, 23 Oct 2025 03:46:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="keiTn97A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hfAAWn+A"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2FF26290;
-	Thu, 23 Oct 2025 03:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49232C159F
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 03:46:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761191182; cv=none; b=QUWbR44bG96Bumj+M7SyWVEqMZAi0dIUuw3TCo/6lpPKmBpFHBySvvQqhf6yCNtkTtLH49HRbX27osF0PC9gujqULmpf+ErUs3RLqqlxHKZLpA67l4cRUAX7wTZJUNba33tQ6C9bMXI5RXh6rJvHIFQuuCHVrNTmfLU4w2VlQ4M=
+	t=1761191183; cv=none; b=pqLicqnKCL8XO8veqJMmEaI+nIqblbNhqpzekhPjxwicll7mLrMoyGRFTzAayC639OFnO3lJ6s4qJIA0QpGW2ObVswUVi1brAbCBS/zK1egnEBAryfdHd2wn+5127Uf053+gkxEeJUABhAZ7rNU/VaynqnRHszGex42AkoeESYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761191182; c=relaxed/simple;
-	bh=GdCibJvtuTRMiV7L0zjAW0Jnxh9es9ba4KecbvOdUhc=;
+	s=arc-20240116; t=1761191183; c=relaxed/simple;
+	bh=EDUH4wYq3jAJOje9Y4N0CyDgjlY9DisyObNGg3vhb6g=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Vzl61QY4jH3ucwT6473Eo+V4cFa7bG07szMZrCQ7KqNPNbS1moPaTPaFs3gI2VcP3+jZUaUM8Gc9KvInmesgvogHzwmgn1qHPPY4yfnYeAXk6XvXLD4i8kNQrNrvGuMw9pgLNEtJgCAmSU1KAv1/onV6dtYmUa52nLfu7xJCgK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=keiTn97A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 493CDC4CEE7;
-	Thu, 23 Oct 2025 03:46:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=YyjkuhaP4W/NNSJ0NH1IKi4MqmEOt/yjLQfQXNQtLvUIJVEW29z/emmacrHV/hiko0DL2QRc/R4qCqIwAk4FxitOibXyVB+gNZck7nzhG8BxmWE6o7KqHcchfdbqSJXoHyow/wlNC3xLPugf/JJ6Cjm/3cP/GUQTxORY3Astzts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hfAAWn+A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B63D2C4CEF7;
+	Thu, 23 Oct 2025 03:46:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761191180;
-	bh=GdCibJvtuTRMiV7L0zjAW0Jnxh9es9ba4KecbvOdUhc=;
+	s=k20201202; t=1761191181;
+	bh=EDUH4wYq3jAJOje9Y4N0CyDgjlY9DisyObNGg3vhb6g=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=keiTn97Ajzj/FfKg/YHHtQyv0Pbw0WLoOlqSHK68ESE1cifevpCkXeyaS4ARpRIYu
-	 diNx6lragK2CrXXvvCbLtRvyOQfyextC3IRDMSyo2oKu9JGZei3G1ES5gXHt+ddj3c
-	 zYpUPn5qON4UT7T6D2YqXj+Od33lb3CIP6Wp39XPM6+eae8oBrpsP8O41w6M6mqi0h
-	 9OWPgv9S9bMLCgIJzs9d16OgUEGzPztuKYIBIRROE7Rbi+6LvpKP/avlGYwTsRjQwF
-	 zZhM8Nq61FS5NHUFINYMIvr5b8Sd1O1+C4bDdw4JqA2gi1BVPpJ1gCjCIZ8gJIuvDk
-	 WEhW2/LkIY2LQ==
+	b=hfAAWn+A8K/QYrKAs9CNvNqtysQcMsDQL4UlzQG52AjMvE1dURdJoujZiDkfz6RCZ
+	 Oa0BhKXndXZuKeWpYuM4MERXKxLqpUjHSlB+ODUM/EV5/zK7nkCHG4LfL1CYj4WsPZ
+	 /WROvsguJzD0Los3X42zT/8Cr7tQeSN1c/fGNnlCILUbL5FhhQ9QbqxxjIXE31sTH8
+	 vWGSyxsZ7KCptZi3rMtBPntk4JjfK12F58vdzPDRhy8e4w68sPA0g2Qp4eAS1swPdb
+	 4958tJtV+H4HK0SCop2lJtOxMtQDS8771CGv1Tw4/QnICHV/Jg8gmlD0Y5hlrZ/Krd
+	 WVk83VMv7/v2Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EDA3809A04;
-	Thu, 23 Oct 2025 03:46:02 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF303809A04;
+	Thu, 23 Oct 2025 03:46:03 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,47 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/4] net: ravb: Fix SoC-specific configuration and
- descriptor handling issues
+Subject: Re: [PATCH net] net: hsr: prevent creation of HSR device with slaves
+ from
+ another netns
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176119116074.2145463.12912329630398549835.git-patchwork-notify@kernel.org>
-Date: Thu, 23 Oct 2025 03:46:00 +0000
-References: <20251017151830.171062-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-In-Reply-To: <20251017151830.171062-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: Lad@codeaurora.org, Prabhakar <prabhakar.csengg@gmail.com>
-Cc: niklas.soderlund@ragnatech.se, paul@pbarker.dev, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- geert+renesas@glider.be, mitsuhiro.kimura.kc@renesas.com,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org, biju.das.jz@bp.renesas.com,
- fabrizio.castro.jz@renesas.com, prabhakar.mahadev-lad.rj@bp.renesas.com
+ <176119116225.2145463.3539910996510064483.git-patchwork-notify@kernel.org>
+Date: Thu, 23 Oct 2025 03:46:02 +0000
+References: <20251020135533.9373-1-fmancera@suse.de>
+In-Reply-To: <20251020135533.9373-1-fmancera@suse.de>
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 17 Oct 2025 16:18:26 +0100 you wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On Mon, 20 Oct 2025 15:55:33 +0200 you wrote:
+> HSR/PRP driver does not handle correctly having slaves/interlink devices
+> in a different net namespace. Currently, it is possible to create a HSR
+> link in a different net namespace than the slaves/interlink with the
+> following command:
 > 
-> Hi all,
-> 
-> This series addresses several issues in the Renesas Ethernet AVB (ravb)
-> driver related to SoC-specific resource configuration and descriptor
-> ordering.
+>  ip link add hsr0 netns hsr-ns type hsr slave1 eth1 slave2 eth2
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,1/4] net: ravb: Make DBAT entry count configurable per-SoC
-    (no matching commit)
-  - [v2,2/4] net: ravb: Allocate correct number of queues based on SoC support
-    (no matching commit)
-  - [v2,3/4] net: ravb: Enforce descriptor type ordering
-    https://git.kernel.org/netdev/net/c/5370c31e84b0
-  - [v2,4/4] net: ravb: Ensure memory write completes before ringing TX doorbell
-    https://git.kernel.org/netdev/net/c/706136c57236
+  - [net] net: hsr: prevent creation of HSR device with slaves from another netns
+    https://git.kernel.org/netdev/net/c/c0178eec8884
 
 You are awesome, thank you!
 -- 
