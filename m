@@ -1,183 +1,108 @@
-Return-Path: <netdev+bounces-232150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D293BC01D46
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:39:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBFE5C01E6C
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:51:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 940FC1A63729
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:40:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BF763A5D0A
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:44:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E8D32D442;
-	Thu, 23 Oct 2025 14:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E5C307AC5;
+	Thu, 23 Oct 2025 14:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1p0PK7l"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DaByQdQY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF3032D44E
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 14:39:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E1322333B
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 14:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761230381; cv=none; b=lg1N/4FVbez44UOEwSZSL7+iMahXs7rT3lyfEybovY9S4zDqI13frnoeXAMtxXnfN6kSwFIcEzv6tNpc1jRHVpWwFhTeMB5VcZYnQph+mO37W92Ox7kILT6NhyeUWYw5C4q5AMUKmv0tngFznh9HarxfoXJrjuLhFRc8MYxqkZk=
+	t=1761230645; cv=none; b=bEknbecOClGx24w/CqJLNL8SpmwZEf9EkQiNLfNLinFtNo6dYbJmHsPe3Jme0dn4y1iEphbh4OJtlGKtEws6bOg7iWEBZrFVgKb+RQXgP2NRGHrKChHJgsv9uKT6omk5tLogFFjhAiGf1e4rPtjMFG4iVxl+wVQNRWYNBaqJaBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761230381; c=relaxed/simple;
-	bh=K6yURn9UYOo/OGlw/SxR7FpRD28Usu6/d+6K4vyqldg=;
+	s=arc-20240116; t=1761230645; c=relaxed/simple;
+	bh=5miEkZ1JSkp1jgmJ10ykJeedVvj7ITikApk6V9cWSJw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U/6r95sjff49ERAjaxMDkAtzA9GrNdVKuU638JwMZMdgeDVeFZQDwZykPEFAu1U45UQDmwMWD8AdxIb7CLpL1ci2XvPHaxLzfi9zspvGcalynQrfdYWAJX2RmK3osJ6ZPSVs1gLlJ3/wKHJmMeDSfXcv9UCNJnLmxH4y+6MaPKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L1p0PK7l; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b6cea7c527bso872092a12.3
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 07:39:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761230379; x=1761835179; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=R3zBGPrVkQkNSFhl6cJF22SK2sjH+IBauiisvtj1eDE=;
-        b=L1p0PK7lVeu/yyIpOepIK0JyvzlSfMoWFSTO2TWfZ1PLI3QzkVm5kk5XNLwoBfcn5y
-         QHgqcj8THFlDiWl5G2ABKZUEOCXvozGerwGY/xH2SbP8IPoGLDeMymKy0iDd4a2jbz9w
-         HbDadNIWJ/P6TYiRk4I61XkJiAjlUnkPZsyk1GXydbU/SsVWIwqmNJWUjQBEICg/6m8r
-         SEJAecq+BzRmz5AEZICVSWG9EeGfABVBI7qX6g3MrfskLLw9BQxJt/DC2bgOnHLUhcce
-         mYWKKrjvPljRsDgF0mRvuY4hTqtJehNBdEBgZJ6qbNI5VWjnLwMx7AVVLgdSNzWhpDCk
-         6Jqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761230379; x=1761835179;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R3zBGPrVkQkNSFhl6cJF22SK2sjH+IBauiisvtj1eDE=;
-        b=rshaFuvZ94AyyciwyEfQUCpbRN4fcFWUxQgaI/SP97RrmAg9R/U9Wtd2hpwbCLfBFx
-         sckG8fRY6H6KBjkkv6Dkqipd/qFO5pOC9lnaO2jHT4eDTV8n5RSBonNRXLjCNCxWSBa+
-         XtmoC7/Wznw79RXU1y9MNDLSpnXFwVixWXV9CXd+5zB9XnWFmqrGXH08OGW9aVNW2AcM
-         vz57Lt3nDdxICaFoWMrpImTQCjYqIXOcfImBpEXZGXWQWXbQ2sTcrBsvIvSqfl0/mFkN
-         Ie/vrT/L6FYVKQ8Tun6E8kD86GUj1yIdN4uXdFabRoPaQRPbyZHxlKlVWtBb7bIK4eHK
-         cGzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV1WAHfa2L9BKYiYLsTs0zC75IDJDwSPps/vdAU5Y7p7dBGu5PdG+pVblaZKjD/SEaw9nyqMwA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywor3tzMEMGdzBGylCbPMbSxECESz5kh1b1wUDtPmj1ECGmwwlS
-	lIpUcOlDqt4kzmi9LGUCqHkYALLbjW0ovlfawNEFaq89SssP9ph0Gq1J4tW61A==
-X-Gm-Gg: ASbGncs3hQxfGZtYnOumKR/UgHkVB//yym+VClWgS+p7bPP7imSMzMfqbZUBzgm0HKu
-	U7UoPcsqSlmbxpoKlEY1aZodfR4Bn3Xxd4wplAfa/NRCjXapZ51j83tupMwjtNsExunMsddtzHW
-	LCSaG1bxr8sSFTjC41NbCK0q7ukzACZvgx6vyr9Qymtf2Th8JmPZKz/vplezzBoucG79T1lepHx
-	DFdMwuLbgiUjVQ1I5YmazL7Pwsj8V178eQaEANoxRe86UvVX7zSK9t2LVAve6WUykAvll130oNp
-	fS1s3F6jr36QD2uNHa7+j/dkhP1aqhkftv7BkPze3q4bpEIQobuM0uDCV6AAOqkySjRSi5pjcJd
-	4PsIRArmWM0JZXGTPmXIz71nTWJSseC+rG1r1M9G3kgk3LXxbVzYJR8nHjgycmR6oCH10F5eYjB
-	wQ1DI/uYRPmIgtp7/oww1VYAApO9nAU34AANhXju5NXOMQLq5eAEE=
-X-Google-Smtp-Source: AGHT+IFucwEwOTFxaTJoVOzjbuSgOqn6+M6IcAfQome0saJAV+NsptRDrBbl50zj7o+T/juUYZJt+A==
-X-Received: by 2002:a17:903:1a4c:b0:27e:f201:ec90 with SMTP id d9443c01a7336-290c9ce63b3mr295801785ad.25.1761230379128;
-        Thu, 23 Oct 2025 07:39:39 -0700 (PDT)
-Received: from ?IPV6:2001:ee0:4f4c:210:5c6f:93f3:3b14:cac4? ([2001:ee0:4f4c:210:5c6f:93f3:3b14:cac4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2946dfc1c8asm26155705ad.71.2025.10.23.07.39.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Oct 2025 07:39:38 -0700 (PDT)
-Message-ID: <cd963708-784a-4b1e-a44e-6fb799937707@gmail.com>
-Date: Thu, 23 Oct 2025 21:39:30 +0700
+	 In-Reply-To:Content-Type; b=VsaZZFc2b9ybyb7WtgXDQkkKD0XTcC0s8pKG0Rxei3c0XHcriZTxUabu4gsJ7fXZcfvlOuq6aPD/aHLrMsQhdBFuHu1LT9ARyJk74UgyGicCHIGHQ6/UBV6ZqvTvU4iEnsBd4l11A3YXrdcYy4X64YNwqilhDzGHlMuPOlMRdN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DaByQdQY; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <76a998f5-2096-4981-8c71-ca114b63ecba@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761230632;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R67XIWMDeD6DjUBVMjLO8VImL2MsTx/yJ1nOycwL2NA=;
+	b=DaByQdQYzWh5hqkqeZExFHv7EDy/p3tjLK5KpjX5WFmRBxBZjM4V4epoNUN5RkQOszEOU3
+	e+K8Uw1wQ4eEHozlHpbzE3J/NUW7MhO0JmHiKam4D9taijDGF8G+RcXMQwl+htRG4nnKdF
+	7F8zHeJecYbt89EYRHadgBWAfgJi6t8=
+Date: Thu, 23 Oct 2025 15:43:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4] virtio-net: fix received length check in big
- packets
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Gavin Li <gavinl@nvidia.com>, Gavi Teitz <gavi@nvidia.com>,
- Parav Pandit <parav@nvidia.com>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, netdev@vger.kernel.org
-References: <20251022160623.51191-1-minhquangbui99@gmail.com>
- <1761206734.6182284-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH v3 0/2] ptp/ptp_vmw: enhancements to ptp_vmw
+To: Ajay Kaher <ajay.kaher@broadcom.com>, kuba@kernel.org,
+ davem@davemloft.net, richardcochran@gmail.com, nick.shi@broadcom.com,
+ alexey.makhalov@broadcom.com, andrew+netdev@lunn.ch, edumazet@google.com,
+ pabeni@redhat.com, jiashengjiangcool@gmail.com, andrew@lunn.ch,
+ viswanathiyyappan@gmail.com, wei.fang@nxp.com, rmk+kernel@armlinux.org.uk,
+ vladimir.oltean@nxp.com, cjubran@nvidia.com, dtatulea@nvidia.com,
+ tariqt@nvidia.com
+Cc: netdev@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
+ linux-kernel@vger.kernel.org, florian.fainelli@broadcom.com,
+ vamsi-krishna.brahmajosyula@broadcom.com, tapas.kundu@broadcom.com,
+ shubham-sg.gupta@broadcom.com, karen.wang@broadcom.com,
+ hari-krishna.ginka@broadcom.com
+References: <20251023131048.3718441-1-ajay.kaher@broadcom.com>
 Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <1761206734.6182284-1-xuanzhuo@linux.alibaba.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20251023131048.3718441-1-ajay.kaher@broadcom.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 10/23/25 15:05, Xuan Zhuo wrote:
-> On Wed, 22 Oct 2025 23:06:23 +0700, Bui Quang Minh <minhquangbui99@gmail.com> wrote:
->> Since commit 4959aebba8c0 ("virtio-net: use mtu size as buffer length
->> for big packets"), when guest gso is off, the allocated size for big
->> packets is not MAX_SKB_FRAGS * PAGE_SIZE anymore but depends on
->> negotiated MTU. The number of allocated frags for big packets is stored
->> in vi->big_packets_num_skbfrags.
->>
->> Because the host announced buffer length can be malicious (e.g. the host
->> vhost_net driver's get_rx_bufs is modified to announce incorrect
->> length), we need a check in virtio_net receive path. Currently, the
->> check is not adapted to the new change which can lead to NULL page
->> pointer dereference in the below while loop when receiving length that
->> is larger than the allocated one.
->>
->> This commit fixes the received length check corresponding to the new
->> change.
->>
->> Fixes: 4959aebba8c0 ("virtio-net: use mtu size as buffer length for big packets")
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
->> ---
->> Changes in v4:
->> - Remove unrelated changes, add more comments
->> Changes in v3:
->> - Convert BUG_ON to WARN_ON_ONCE
->> Changes in v2:
->> - Remove incorrect give_pages call
->> ---
->>   drivers/net/virtio_net.c | 16 +++++++++++++---
->>   1 file changed, 13 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->> index a757cbcab87f..0ffe78b3fd8d 100644
->> --- a/drivers/net/virtio_net.c
->> +++ b/drivers/net/virtio_net.c
->> @@ -852,7 +852,7 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
->>   {
->>   	struct sk_buff *skb;
->>   	struct virtio_net_common_hdr *hdr;
->> -	unsigned int copy, hdr_len, hdr_padded_len;
->> +	unsigned int copy, hdr_len, hdr_padded_len, max_remaining_len;
->>   	struct page *page_to_free = NULL;
->>   	int tailroom, shinfo_size;
->>   	char *p, *hdr_p, *buf;
->> @@ -915,13 +915,23 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
->>   	 * This is here to handle cases when the device erroneously
->>   	 * tries to receive more than is possible. This is usually
->>   	 * the case of a broken device.
->> +	 *
->> +	 * The number of allocated pages for big packet is
->> +	 * vi->big_packets_num_skbfrags + 1, the start of first page is
->> +	 * for virtio header, the remaining is for data. We need to ensure
->> +	 * the remaining len does not go out of the allocated pages.
->> +	 * Please refer to add_recvbuf_big for more details on big packet
->> +	 * buffer allocation.
->>   	 */
->> -	if (unlikely(len > MAX_SKB_FRAGS * PAGE_SIZE)) {
->> +	BUG_ON(offset >= PAGE_SIZE);
->> +	max_remaining_len = (unsigned int)PAGE_SIZE - offset;
->> +	max_remaining_len += vi->big_packets_num_skbfrags * PAGE_SIZE;
->
-> Could we perform this check inside `receive_big` to avoid computing
-> `max_remaining_len` altogether? Instead, we could directly compare `len` against
-> `(vi->big_packets_num_skbfrags + 1) * PAGE_SIZE`.
+On 23/10/2025 14:10, Ajay Kaher wrote:
+> This series provides:
+> 
+> - implementation of PTP clock adjustments ops for ptp_vmw driver to
+> adjust its time and frequency, allowing time transfer from a virtual
+> machine to the underlying hypervisor.
+> 
+> - add a module parameter probe_hv_port that allows ptp_vmw driver to
+> be loaded even when ACPI is disabled, by directly probing for the
+> device using VMware hypervisor port commands.
+> 
+> v3:
+> - [PATCH 1/2]: reverting back the changes of ptp_vmw_pclk_read()
+> - [PATCH 2/2]: calling ptp_vmw_pclk_read() without cmd
+> 
+> v2:
+> - [PATCH 2/2]: remove blank line in ptp_vmw_init()
+> 
+> v2 link:
+> https://lore.kernel.org/lkml/20251022105128.3679902-1-ajay.kaher@broadcom.com/
+> 
+> v1 link:
+> https://lore.kernel.org/lkml/20250821110323.974367-1-ajay.kaher@broadcom.com/
+> 
+> Ajay Kaher (2):
+>    ptp/ptp_vmw: Implement PTP clock adjustments ops
+>    ptp/ptp_vmw: load ptp_vmw driver by directly probing the device
+> 
+>   drivers/ptp/ptp_vmw.c | 99 +++++++++++++++++++++++++++++++++++--------
+>   1 file changed, 82 insertions(+), 17 deletions(-)
+> 
 
-That looks better, I'll do that in the next version.
-
-> And I’d like to know if this check is necessary for other modes as well.
-
-Other modes have this check as well. check_mergeable_len is used in 
-mergeable mode. In receive_small, there is a check
-
-     if (unlikely(len > GOOD_PACKET_LEN)) {
-         goto err;
-
-Thanks,
-Quang Minh.
+For the series:
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
