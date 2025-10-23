@@ -1,93 +1,112 @@
-Return-Path: <netdev+bounces-231952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9954FBFEDD8
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 03:45:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7533EBFEDE2
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 03:46:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A1B83A4ED2
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 01:45:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E06DA18C691C
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 01:47:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0241D5CD4;
-	Thu, 23 Oct 2025 01:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wp0mT1xM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC8119994F;
+	Thu, 23 Oct 2025 01:46:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10213AC1C;
-	Thu, 23 Oct 2025 01:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C590B19D07E
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 01:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761183919; cv=none; b=nIvsKPVeCrVZ7MW/FXLY1YU4D77aJxGJFiC1s+qoj4vSXO7A00KKk6d/ncosGm03PdMRUEMbgEBxFIYTy8TqEChcV8MZfNhuAMqp0RD+qWwmRa07zRa2766v5Dd8NSlHrpDyxqUyBL25dnyOfO1XkCJdJ7I1w0S5JccNz5MX1fU=
+	t=1761184016; cv=none; b=DDuEB9woSTeoCyeKEMYZZxi7vr2h1mqBBFjJy9mceZiAW/7NkAEgsK6BDJUTxy2VYTgGLP8MCn6wz3lVZQ29Ly2vetlGDzOVxl9ikPTrs/0yoE4HRk8JcljprbqefwnwZ4YwTHbIxyPOMsQSWwE92jw8OyN23aAGjO9/uNgHdXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761183919; c=relaxed/simple;
-	bh=ttnZlZqD9AOwVWY0BumPMO3jxsgOx+axuNso15oTxPQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mUPq1w5Byi0oy0B5nhcN1nWmxBJefDHOBKHKISvecWUbQsHAnb48kwnl4yjaKtrCnc+Ju/jvcup3/vsjy3KXNo23OLEmIujIVKO5hSAh0HOm+lx8QLQS7bky40OR2xT2/eGG1TgdU3WzA3ysvCCB6kErNZEXtrNBxgA27L8VcaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wp0mT1xM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCE5CC4CEE7;
-	Thu, 23 Oct 2025 01:45:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761183919;
-	bh=ttnZlZqD9AOwVWY0BumPMO3jxsgOx+axuNso15oTxPQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Wp0mT1xMf13zTLvjPiHx+Hippwo2+RHMf+Jnzo43L43VLesc/Os6jufVCDCVpFXqD
-	 9oYfuVjvi89+zpFOf5pZ916b2wmMGAGZ99WvdCprYQrQ81wPwJP3MwZBAP/fJgCx2T
-	 AZIwkR5CAMtSVZLBMqw03tn+r4+4DJnFmyOKKXAjum8SmnwPn4dZVxVoSAhGF6ifuJ
-	 QUbnw4+ZRfm/FwA4L6Q2GD0gOB0c+rh2Dq5lh+x1f993Z5G4wQFpF536f++eD9s/z8
-	 wmfYpXsGzU/3Iz3gG7afkY1h6aECjrWjtbSqw0T+21atRbsEJwgMfZk2Czajqjq4iS
-	 g7mfULbqTyz8A==
-Date: Wed, 22 Oct 2025 18:45:17 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?=
- <ast@fiberby.net>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Chia-Yu Chang
- <chia-yu.chang@nokia-bell-labs.com>, Chuck Lever <chuck.lever@oracle.com>,
- Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, Simon Horman
- <horms@kernel.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/7] ynl: add ignore-index flag for
- indexed-array
-Message-ID: <20251022184517.55b95744@kernel.org>
-In-Reply-To: <20251022182701.250897-1-ast@fiberby.net>
-References: <20251022182701.250897-1-ast@fiberby.net>
+	s=arc-20240116; t=1761184016; c=relaxed/simple;
+	bh=yO5bZerKcVTXt7wsZaaGlUagMYSMi1Cea+iN0hZEum8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=n2nVYGig2uf8WbHp/8dQMb50E4p7HZezcFwo5DCpWqOIw8rCaV89nQW6KrleBX5qv4CNvYdTr7Y5vmCJwWsm206DxCZydtaPRML08pgwfxBOgJODWuJmkLtdO9sFjYYIdfS27tNv+XTVOBKxNP7xYLt7h/kFXyqLFVTcqUxafOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: esmtpsz20t1761183943t745c6a2d
+X-QQ-Originating-IP: MNFrDuW36nLpBB+oeuRyxeUiPenvq9KlSaF+5/4wO48=
+Received: from lap-jiawenwu.trustnetic.com ( [60.186.187.129])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 23 Oct 2025 09:45:40 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 12696974371602837095
+EX-QQ-RecipientCnt: 9
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v2 0/3] Implement more features for txgbe devices
+Date: Thu, 23 Oct 2025 09:45:35 +0800
+Message-Id: <20251023014538.12644-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: MfQnJH+7WKv6FPyYUMxJb3FZlcorRuwKbpuuuJh0Eg4/YvwziO/8veZc
+	/QNb4/2EpOZ773ZiSZ2F1480jAOGsnrG2XOZL14ML1cKDMRvqmCJulUk2oWaavP9Lr5Jq8+
+	x2UX9BIS2DIpXzp2Z+z5L3/a19VXZsAPXwOpQxutbM+Gf8mZpr1bzEqtotX1kx61kPh4kPi
+	sXYXPttF7HDhFlU7crtWP2PjRS78J/nIsDwqJ4FGO7mAB1n+18NHN7gjUTVvgcpF+yvxFO8
+	xL+6v0VS4BaqqBJsZPkmkLbvtW6nTcL80mysxKRS5GWKqS51Ky5FyKFbpEbVniWplcbsAfY
+	35ZEawTCdpYEYC4EyzrTORLe5PiMoAWGUPsW955S38zSyTfzlXthlyIsBbqlws7T4OdmEbh
+	hGa8E0fKlG59UeY12g5kdqIj6Rp4sVGs7+Y4J0LTM/4awlSEtBIBtKCyhnpuII60dc6FxJx
+	UCbI46vEveRhXnkdDbR41QO/2OVOMuGbNIrIOTwRklq39vJQiT7A6M8Oomlzbi1UFcEiHfq
+	q+YcFxFY6IoNX5iICERJaswCb6K2GlbbxnTbbdWwZ/06gGPoQ/HwJYheXDLCku/QF1tuJCo
+	mHp4rHqOV7k13om23aGGkh7zE/BUjfMW2Ib3IWCM4q9NSpcW4KUWV+nWxyW7c4PvtFkezvi
+	w/hOwx/KNRuJ882l/CSvqTXwHSKL/Ng3xkg2r2FDVjnJU//hd6eZ+NCp+909M99mv/dI3dH
+	kVY9H7mFj7Ae8J5YZb3HN9PGZ42A8tLKXJq3V2eWSLAYNP3sYzWBjlwSSnHEvjsANkvJzXg
+	P7pQ1L8/PSOvrKgs+wWPoR7iY0t9aHMjrMkD77cCke3GKl5LwGQTRu2uCV3JfTdFKWgyzJO
+	dEwy8c5wpogsx6/J8Czanlcqi31Yrkhg2tUTEyJVdxX+a7e1ZG5r0T9HlqXV+tHbOZUOjFv
+	9z4RnC0ctLidmy4fXfEiCajLZ/bf4ZYzb+oeRYJGPk6Xi7c5aildhdWQE2Rw+BXLZNO72aS
+	D34ijDenOfMz+Ud1v0PWyq4aC2OcBmAmXMopm9lJ9ZDSMLhjmZIKFb+2tgGM4=
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-RECHKSPAM: 0
 
-On Wed, 22 Oct 2025 18:26:53 +0000 Asbj=C3=B8rn Sloth T=C3=B8nnesen wrote:
-> This patchset adds a way to mark if an indedex array is just an
-> array, and the index is uninteresting, as previously discussed[1].
->=20
-> Which is the case in most of the indexed-arrays in the current specs.
->=20
-> As the name indexed-array kinda implies that the index is interesting,
-> then I am using `ignore-index` to mark if the index is unused.
->=20
-> This adds some noise to YNL, and as it's only few indexed-arrays which
-> actually use the index, then if we can come up with some good naming,
-> it may be better to reverse it so it's the default behaviour.
+Based on the features of hardware support, implement RX desc merge and
+TX head write-back for AML devices, support RSC offload for AML and SP
+devices.
 
-C code already does this, right? We just collect the attributes
-completely ignoring the index. So why do we need to extend the
-spec.
+---
+v2:
+- remove memset 0 for 'tx_ring->headwb_mem'
 
-Have you found any case where the index matters and can be
-non-contiguous (other than the known TC kerfuffle).
+v1: https://lore.kernel.org/all/20251020082609.6724-1-jiawenwu@trustnetic.com/
+---
 
-FWIW another concept is what TypeValue does.
-"Inject" the index into the child nest as an extra member.
-Most flexible but also prolly a PITA for user space to init those
-for requests.
+Jiawen Wu (3):
+  net: txgbe: support RX desc merge mode
+  net: txgbe: support TX head write-back mode
+  net: txgbe: support RSC offload
+
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   |  61 +++++++-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  69 ++++++++-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 143 ++++++++++++++++--
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.c |   4 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  47 +++++-
+ drivers/net/ethernet/wangxun/libwx/wx_vf.h    |   4 +
+ .../net/ethernet/wangxun/libwx/wx_vf_lib.c    |  12 ++
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   5 +
+ .../ethernet/wangxun/txgbevf/txgbevf_main.c   |  12 ++
+ 9 files changed, 338 insertions(+), 19 deletions(-)
+
+-- 
+2.48.1
+
 
