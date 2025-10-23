@@ -1,125 +1,123 @@
-Return-Path: <netdev+bounces-232160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C2BAC01F17
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:58:25 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBB5CC01F23
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:59:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D8D18350118
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:58:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E05C04E4C8D
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:59:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381EA311C1E;
-	Thu, 23 Oct 2025 14:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B06F332E68B;
+	Thu, 23 Oct 2025 14:59:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FkKKvPFE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cK0t3XsS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE9632E69A
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 14:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFEE3074B1
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 14:59:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761231482; cv=none; b=FE5tmImhtDDrv3JMvujZb3em6j/gkMdNQqzOTXt13ryykwPY4VVtp5aE1kNuB0jFgWAoJ9AWTwVB9OH6iEGTfY7Pd8uW0gnW5lryvtFr0VlOQ6jzyAOK9MFVam7yLwuSyv2GNdEURe/B3uoZmfXMR50hUc680FNet5DW1wbGmNE=
+	t=1761231547; cv=none; b=evUcrFoMhjV2z1i8mGWnPAvR4DDVkoScC9R6meh7Z9Cr3FT/S1Fwd5iWPLn9AkfkYt8CbSOxdwoKcSVDYP8E0CoxUOdHxsFlb+RQD54Ys+2XnxP62DfjJ1sjG87nPwaH++jR2vZt7y30hlQaftx4Z0hjmPkvtXZ8lcwzz1eh0FU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761231482; c=relaxed/simple;
-	bh=zLuv+P05fR1PDJc1gb7G1HiUlEs2h5+XHgiL0ZmD7+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I1x4dTEn0vF4Fp+OOb+cUwVp8lyB5qMNwg1xkHqqOlaPn3EtS7S9r6mdyntDfUgXmKIsMH2sCQr3bvAOglWS814X3j3+L+QLmUVeP/yzDQnMuiauUakB+qEfed6dWJbff88B0D6lbCyI434PVv/PdTVnJriRiNWVqICd+E002us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FkKKvPFE; arc=none smtp.client-ip=209.85.216.43
+	s=arc-20240116; t=1761231547; c=relaxed/simple;
+	bh=S/0RC12Ct7sLa4BGsyULQ2Ksjr+REt4si7cQXyJnPMk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cr7ycxEJ7FPkeSqFF6pmGP441PwelMrwbQ5pLS5he/cmu+gaKasrNG3Uqf3iLL1794SlGh1BXqahgl/UtLq+Zy5ltUgQ+nLu00TEzDKvG5bsGFLC6SLGv1/6B0/GSXla9yvjv7Glq2JzWSydgkXZUDtpjJczUm9T5aKK+4lh8MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cK0t3XsS; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3304dd2f119so799721a91.2
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 07:58:00 -0700 (PDT)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-47118259fd8so6276535e9.3
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 07:59:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761231480; x=1761836280; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KdIBQPcbJPp/v0ECGLHUc6b0o6HYeXdKX+8k63J4F5o=;
-        b=FkKKvPFEekd97sQh+kpn7n8zB2aSoUm6zdRokt184pUqXEmwcBQe/pL8IbRiu0sKQq
-         a97EuMZMqYq8GUgUhS2kuEdzjOzgpZiyKXvi544kFJLmnjzaxGfXPsjffu5xhO8XfivD
-         k46QBj2K1vRVYbOoEQepM7O5Pcz6w2f6Ah1jAyfpa6d7jjD0oCzCEni9DZz92kJu6lVB
-         kESuHRr46bf8PNmvwurb1qlUVl2PCWJdAOPK9ZT1Qkbh1PNFSZ4bWqlgvAYKNmmtLGjr
-         tJRH4maGFO84tpNg2z9IK9qxCJRgpulb5l+xwoSYogr7FvzSyFtipjv2LVI8CGw+dgSF
-         tpRg==
+        d=gmail.com; s=20230601; t=1761231544; x=1761836344; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OWoL1UZ/q1eqzSis7uaNsqbiHg0hktnmtvNBWCaQMdw=;
+        b=cK0t3XsS/M4VuNiPBiOYP1ol2tFmd0l8dpUUmCpo4sNlLm6yb03+S8xPd4w8PKE08K
+         xRH+FeRICVyrzmvc+6FBWtj4y7phnSTi+9ImuZ5jmLhIZKlo9HcajY/AG+98Uz6h/lhx
+         jeprgLMO7+CDkilpM8FEj1RV2Br+VWRt+ikk5h02urws85egyZE5ZICDBjkq3QjnO3vX
+         2RKvbz7pYGGma9+Dyhc032DBvbFvEnGUT7EJMj+ydDWiDx54EgsOCytD2QM29FjI1nx7
+         mDe1pprPNjyNYnSsfFxqLyLuPFHZtkeJ+Wb0H+Kv6VFAD/+iz8Q67JnDlWllgM7o35t4
+         haHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761231480; x=1761836280;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KdIBQPcbJPp/v0ECGLHUc6b0o6HYeXdKX+8k63J4F5o=;
-        b=GANniJJ0Zc2+2DJTRsujxDb/A655HE84WkK3oVxwy/kAMtTP44kVGBGrU0htgYHjYS
-         V/aAiDCk3UeA6wwLZBrJylAnnSwwBpbnVEmNB6llqyarCChiZsNtPZUoCXfWArygaYIJ
-         aiaf0TBYYxhmsJUE6gPWSCfLHCbPkErm3ICxSQHLRVaigRG5W/nT2slIRVxE+5UxpQq9
-         KJZEl7zDn5xG6m8aBW/a1yeBtbvXwqUSrntwu5L1MJj5tQY8RD39DZgSjo6UcvJDWyoI
-         ffpzEGaMPX5fexViH+3UMFrf1pF2ythhkSalhMxN4mMrCUnXlPuBXg7uMskYDyg5T6xK
-         4PzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXZDCF8zdOb5St22kMIqdDZiOT7JgeZmNbrIOZazo5YYXboLwFFEQnn3Yy2/8ObuDpD2Vuat7c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5PM8xHCrIKRdUn4N2lHdEPKxTSFA+m0d4uIpanC5f0CJyNNKH
-	uPw3eHzCudy954Erj+3dDnv/tTw7/zvr+oXDKbMaZEIhS66JRy4MlFZE
-X-Gm-Gg: ASbGncsOJA3ks79Ragxt28L7SAWnpKJY6vUVf385/Mpz5WCZ8AqrBgRHunwcNQOJgpj
-	YBY4k4syBSPrPE2UfFSw1NlpAmAQCDnbi3XXiJV6SmMnul4NownJdFqa+K4k47JhvrB/7O1hbLD
-	V2TCZRscKMBcE0OjKuYnD6SsZ79z+LT0v2XUdl7nKATMYs/paFv9Bnvn9MeOQ/uZeiqa65Zy7GP
-	y+3au+0g472PTVy/si0+87r+T5/8474sM82GMIpn8INt6YSm9FheEUf7qEWP4DgCJnRddlc0aYr
-	BiOKE+EaO9dd9vj3LJc+1mtLcL0SanX9sj/+78k1YAvlk+/VG7x6TUqXSI5Q67tvxK5LBvXbCR4
-	4aWftfGxTrhjt1SAYb+TMiUMVtv4TeONin7V24aS/T7noExqWPnVpgR4Qd4Is11gBSivy2qjEAG
-	k50aFmjZ8o5dxAYZM=
-X-Google-Smtp-Source: AGHT+IFSi4LUU6uvPS4EAaycN/pLV0YAOoTgM8I/cwLZFPbgfiu1UMMIfYflMDVAwEr5Ex5bBfC0Zg==
-X-Received: by 2002:a17:90b:28c4:b0:327:c0c6:8829 with SMTP id 98e67ed59e1d1-33bcf8e4f50mr32240389a91.24.1761231479990;
-        Thu, 23 Oct 2025 07:57:59 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33dfb67f151sm4360980a91.2.2025.10.23.07.57.54
+        d=1e100.net; s=20230601; t=1761231544; x=1761836344;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OWoL1UZ/q1eqzSis7uaNsqbiHg0hktnmtvNBWCaQMdw=;
+        b=be3XALcdIHkQGcCulC65z+V99fwoxhNR8YcVMrdcmWRdU/MHaqqTMtBCL1lsVbQLmd
+         sHJsvV+jZpdD9sAOC10PIRhbjW4lvyoX2wWKyUn6E3JUslpLURdVW3Z9umz637gu/SQT
+         9ldvjtS/QXDUeSOh9KzaepA6yw0KEtnX/q0W5+XthUE3lPAmMMXdI66DzdyVcPRJu73Z
+         7EqZ6y0VJWYs+RQAUgt8i4qpmxgGdJk4f3n4sI+7WNi35nqNgQ0ilJ/4STt6/rRl/OvY
+         THY46+Zn7QyhfhVIZFwWfqPxE3+ziWOLeJq/5JJKacKGPRMMMiHuHSyg2QrxTx1R8gUC
+         DYfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU6WgnOkti765yQGDCWMBVGuJ0VkexEwZQ4tIA70WKK5MrHEsw2SwxhU9bPZKt9jWEPR1WG9NE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxbguzYc391To2YuTrU63JBI5obxroGsJ5/tWlwkhSMkPNtCVb
+	yxSQTQb7fEVcR/uj8IUa3msHMS2dBXguHD5PuD0mxnHnu8uJzq0K9h03
+X-Gm-Gg: ASbGncs/5ArElHW4GLxJEdQGPD3jiYm92/Btw/KRozPdeA+0iQiiigSglNk9bHA1549
+	cdIIb2ltKoMCSEHwgVEkJOeAvWnyGVgesPqwhGvFfbE0QdxIfWIlMb86CmO56zzAzmLMLAAH0/K
+	fsXi6tIiogenvrIPnm2j6YJ/KX0qb2szJWvtycGJa7OLfW17oC9mjdmBjWWaL6vX68VRVkR84Fu
+	Wf0FExJ+peC9Qfpo2/iblj9C6OBzG+fqJmua7/TWmqwSlifA44bGo5VpGXtJJ7c1WYRQOJYvK9G
+	uklTQIJvoGNuv4btl3UiQR35Wr0QjwLBMvBLYy+CXda++oHLkf6CGrg9XO5uh79iyQqD4EUhFIo
+	TdicyxmiHS7SLxTE5alkFpw9DxHJk9C4lF/PWG/hVcDuvA+tDcFyoNL0Bvwq0oY38RogPS2uqux
+	4a+zd9D8ZWjAoQROjbjqsFDFfst9amIm1wSmzif25Q
+X-Google-Smtp-Source: AGHT+IHX3KE00pQn3aNP1QwDiE6EhD5Q3hRD8inmO43mr2wuZ5/VM7zYPzKmzGmrYwsAVd3vpyhaEw==
+X-Received: by 2002:a05:600c:4f89:b0:46e:3edc:2811 with SMTP id 5b1f17b1804b1-4711787750dmr167242385e9.14.1761231544110;
+        Thu, 23 Oct 2025 07:59:04 -0700 (PDT)
+Received: from Ansuel-XPS24 (93-34-90-37.ip49.fastwebnet.it. [93.34.90.37])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-475cae9f292sm39822325e9.5.2025.10.23.07.59.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Oct 2025 07:57:59 -0700 (PDT)
-Date: Thu, 23 Oct 2025 14:57:51 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        Thu, 23 Oct 2025 07:59:03 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Dong Chenchen <dongchenchen2@huawei.com>,
-	Oscar Maes <oscmaes92@gmail.com>
-Subject: Re: [PATCH net] net: vlan: sync VLAN features with lower device
-Message-ID: <aPpCb_WP5_5v5N2E@fedora>
-References: <20251021095658.86478-1-liuhangbin@gmail.com>
- <38605efc-32f5-4c78-a628-11f8f07668f0@redhat.com>
- <20251023065517.2d3dfca0@kernel.org>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next PATCH v2 0/2] net: airoha: initial phylink support
+Date: Thu, 23 Oct 2025 16:58:47 +0200
+Message-ID: <20251023145850.28459-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251023065517.2d3dfca0@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 23, 2025 at 06:55:17AM -0700, Jakub Kicinski wrote:
-> On Thu, 23 Oct 2025 15:39:07 +0200 Paolo Abeni wrote:
-> > > @@ -193,6 +193,8 @@ int register_vlan_dev(struct net_device *dev, struct netlink_ext_ack *extack)
-> > >  	vlan_group_set_device(grp, vlan->vlan_proto, vlan_id, dev);
-> > >  	grp->nr_vlan_devs++;
-> > >  
-> > > +	netdev_change_features(dev);  
-> > 
-> > Is this just for NETIF_F_LRO? it feels a bit overkill for single flag.
-> > Also, why netdev_change_features() (vs netdev_update_features())?
-> 
-> Another thought -- isn't this a problem for more uppers?
-> Isn't this what all callers of netdev_upper_dev_link() effectively
-> need, and therefore perhaps we should stick it somewhere in the core
-> (netdev_upper_dev_link() itself or when device is registered) ?
+This trivial patch adds the initial phylink support. It's expected
+in the future to add the dedicated PCS for the other GDM port.
 
-I saw bond/team/bridge/hsr disabled lro via dev_disable_lro() when add new
-ports. But net_failover/ipvlan/macvlan and some others did not.
+This is to give consistent data when running ethtool on the GDM1
+port instead of the "No Data"
 
-Maybe as you said, we can do it in netdev_upper_dev_link(), as some
-devices may register first but not set upper dev link yet.
+Changes v2:
+- Move setup phylink to airoha_alloc_gdm_port
+- Better handle phylink_destroy on error path
+- Fix bug for device_get_phy_mode
 
-Thanks
-Hangbin
+Christian Marangi (2):
+  net: airoha: use device_set_node helper to setup GDM node
+  net: airoha: add phylink support for GDM1
+
+ drivers/net/ethernet/airoha/Kconfig      |  1 +
+ drivers/net/ethernet/airoha/airoha_eth.c | 79 +++++++++++++++++++++++-
+ drivers/net/ethernet/airoha/airoha_eth.h |  3 +
+ 3 files changed, 81 insertions(+), 2 deletions(-)
+
+-- 
+2.51.0
+
 
