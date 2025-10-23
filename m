@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-232086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0664C00AF9
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 13:20:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 007B0C00AFC
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 13:21:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D89AD4FBCBE
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 11:20:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BAFB3AE276
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 11:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEDC5309F1F;
-	Thu, 23 Oct 2025 11:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C4DC30DD17;
+	Thu, 23 Oct 2025 11:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cMJMx3LK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TSQWYUo5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9779830DD05;
-	Thu, 23 Oct 2025 11:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E890B2D8781;
+	Thu, 23 Oct 2025 11:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761218425; cv=none; b=gEKT4SOjeufyjkFbeRg9WFpzb5S116Gokn3TpgNmtzOmdgIDrAu7d5tZ1osgPr7sEowiWcJP+XcBtb4qv6r9P5RxmvttzPcNFpi/KORV1yk/wD6zp+hp9t5yMVGFOHcjD/DnSNi0kN6Pdyw8ZYkneC6fPG/480u8sba2yxtBnII=
+	t=1761218430; cv=none; b=lgOy/sOTHZnJPoSGW+CAyPqhRHWxdXh/7+7A3xkRgxcWjNv5xAE4EswYYAjUapyTaRv0rSY1rs7EAFO3WdgcRPOkDq0VyK4WozHdvxGwtoh3ntYBdUWZjzxuQFE9xfltUKfdSOxqdTQBQouARXG8s0Y6os3DlBvt7ls40Brdf/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761218425; c=relaxed/simple;
-	bh=EACSA+aR9Zcp1Yk9oT27Z6eIKRKW6aqxFMAM4e4KET8=;
+	s=arc-20240116; t=1761218430; c=relaxed/simple;
+	bh=lxEnNfGnQfgWNlDnm2QLqOM40rMpnIu3LcDpDqs7Z0E=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OJ4X52F35To7twMb7EmJ7Ziimqub5YJwCOiwVqSizb2asIiWKwNKoY2+fV0mducqmxT/uSLfGmlGhP9RGKfCY04BmfVY4ykdKg5cGI/C8FfbqMzCBovfvkAhj+UncEVSr8VLErRNVhWZ4+Ngy2iCkICss0cWY6XSPOmbLGxYHdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cMJMx3LK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73324C4CEE7;
-	Thu, 23 Oct 2025 11:20:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=N/Onxdlz/EAWwZVjesk2rAs6l2p4nK86uxhMI8kb6W6mY+9IbulVrOY/xCMGdd7LhobzuCybCBu88JARrgxDR0zCOZJcyZkIvh3BCs0oX6WybpHHHL45Zil3U6Hp4A7JTaUc1rt89MJdF7Lx9HlEYKo6W9gWrH5YMBETRj/NmsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TSQWYUo5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72F66C4CEE7;
+	Thu, 23 Oct 2025 11:20:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761218425;
-	bh=EACSA+aR9Zcp1Yk9oT27Z6eIKRKW6aqxFMAM4e4KET8=;
+	s=k20201202; t=1761218429;
+	bh=lxEnNfGnQfgWNlDnm2QLqOM40rMpnIu3LcDpDqs7Z0E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cMJMx3LKJDwxgQT3DSRQkV1Ftxp+AbI94yd8tsLlrvqOGrVfLiGAJieaC7CCfcx+s
-	 P8WYJKe4DCHUi/cCLRHjMkw9N4vCfBgAs0d209aIIM0nAL0kiu6VICfCXNIWQbS41z
-	 f+/3IFVqQXCX2sEA8RgBwReJEzsYAWz/bOpxZKiy/hAabtGqIb7RdoxO1H/qgaI+0c
-	 Ric6SAsMlNq986ie9VJTV2OZN996F48DOJ/8GGhfMQdyeJZFfrCUZuhbt8bmeuGls8
-	 JjnYXmw/gmm9yVETSw8fMj9YQ3EED6/jAHAdMNj9bgFIGAC3diOhJ7DohNTTz5hOKC
-	 B9kbLt2cfkdMQ==
+	b=TSQWYUo5eRtqK867mrGoiTiBO+Ux6QfTpY6Fx0S+Ca2/Z2wkXDaFxuE1J5ZluhkPp
+	 bbzA2Q74IyDyV8G1HYUUxXR9i7OkJf8Vfc9fd1ICQfO6jIIXmwQ4TpLfy/JgzarjyX
+	 k+R5a+iUBNTAe1ak21yj/F/F8Cdro8MSlpC4p60RrwIbkSinFu9/TJxRgAeoy4gOew
+	 R3lWQliBrQno7POLkKTQmtIuhEUjIpkJvM9GMrl4+myvIky83UOnsqBFrQhfWD7mnR
+	 eX29RygfIMtT8bZYP/T+MJ3ahmxhkxjoMccdlYMdSnV9sni1S/Su6pEEUmkADD8Qt0
+	 RJ1KzufJ3CHbw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BF63809A31;
-	Thu, 23 Oct 2025 11:20:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D523809A31;
+	Thu, 23 Oct 2025 11:20:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: bonding: fix possible peer notify event loss or
- dup
- issue
+Subject: Re: [PATCH net-next v2] net: phy: micrel: Add support for non PTP
+ SKUs
+ for lan8814
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176121840586.3001126.18409474218756623058.git-patchwork-notify@kernel.org>
-Date: Thu, 23 Oct 2025 11:20:05 +0000
-References: <20251021050933.46412-1-tonghao@bamaicloud.com>
-In-Reply-To: <20251021050933.46412-1-tonghao@bamaicloud.com>
-To: Tonghao Zhang <tonghao@bamaicloud.com>
-Cc: netdev@vger.kernel.org, jv@jvosburgh.net, andrew+netdev@lunn.ch,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- liuhangbin@gmail.com, razor@blackwall.org, vincent@bernat.ch,
- stable@vger.kernel.org
+ <176121840999.3001126.509044902185617300.git-patchwork-notify@kernel.org>
+Date: Thu, 23 Oct 2025 11:20:09 +0000
+References: <20251021070726.3690685-1-horatiu.vultur@microchip.com>
+In-Reply-To: <20251021070726.3690685-1-horatiu.vultur@microchip.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, gerhard@engleder-embedded.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Tue, 21 Oct 2025 13:09:33 +0800 you wrote:
-> If the send_peer_notif counter and the peer event notify are not synchronized.
-> It may cause problems such as the loss or dup of peer notify event.
+On Tue, 21 Oct 2025 09:07:26 +0200 you wrote:
+> The lan8814 has 4 different SKUs and for 2 of these SKUs the PTP is
+> disabled. All these SKUs have the same value in the register 2 and 3.
+> Meaning that we can't differentiate them based on device id, therefore
+> check the SKU register and based on this allow or not to create a PTP
+> device.
 > 
-> Before this patch:
-> - If should_notify_peers is true and the lock for send_peer_notif-- fails, peer
->   event may be sent again in next mii_monitor loop, because should_notify_peers
->   is still true.
-> - If should_notify_peers is true and the lock for send_peer_notif-- succeeded,
->   but the lock for peer event fails, the peer event will be lost.
+> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: bonding: fix possible peer notify event loss or dup issue
-    https://git.kernel.org/netdev/net/c/10843e1492e4
+  - [net-next,v2] net: phy: micrel: Add support for non PTP SKUs for lan8814
+    https://git.kernel.org/netdev/net-next/c/61b7ade9ba8c
 
 You are awesome, thank you!
 -- 
