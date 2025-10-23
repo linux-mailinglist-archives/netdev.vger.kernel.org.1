@@ -1,316 +1,252 @@
-Return-Path: <netdev+bounces-232273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E778BC03A37
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 00:05:50 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CD03C03A46
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 00:07:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4BB3C4E7B74
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 22:05:48 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A13E634DA31
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 22:07:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B5252BE634;
-	Thu, 23 Oct 2025 22:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0B39270EBB;
+	Thu, 23 Oct 2025 22:07:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bijcuTOU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WIispHrq"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE79727B355
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 22:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E984525A2BB
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 22:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761257127; cv=none; b=Y5tv+S35M9Wgi7haZtRVnCUHrB16I5UiE17ffVnvs3WhGlZo0YCigBCHoFl6L5d7dtMOsUqSid92l7ZLAxf6Vb4o2SxL08biDXtj41JSOoN9i4qR9Aowkwfhm9loeHJNt4/LAhlYrHXEow0w/RtwXPugaE5UEwxgzURqbOTMkf0=
+	t=1761257234; cv=none; b=jM2O4vgKbkwZNFaLYI48/AkNnP+51U/SKWu8UF6h7Fi+XQgD5Bi6d9wGnpAmBa3FTq8zxvm/lnvfs2yM8umRpPjM+kKQI9IRrnAf7LsV63tS8AtvyKCbUcciUwo2balWi5iegeQKMV0zNWTVopz3b2xXCq11drYOofE8zwEkZLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761257127; c=relaxed/simple;
-	bh=iu3Wm7sKtjIeVRCw+1srDJ3n8LrtjEKRqEmGdVvbvqY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JE0lz4tv2k5NwCBo87QjR5vX3/tbvixMzgaksjO/+nOEayB/RFKysG26MRFk7mrKzumSIFltGyrQW8qtcjd5arkilCe6pjSUjP4G+S1LnJHhWSmeZdFrgp+iyhYNw1QtfSciJVmquM/nSpwR6jOJBn1YQY1MYqC2WAWeaGemsI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bijcuTOU; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761257123;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UubabpsB3NqzyRThTjtkHYxzWLJLOWVkhG1MapA7GnQ=;
-	b=bijcuTOUdNomkg4LBmAxNzzXQIGnGzw/V/65toN+QZT3dzgjA+Fw3vuznqmQ2+s+Yl0IMK
-	ifQpv09AN4xFXIlsBkZexFmdfztNhVQACx4fIqhv6E4tMaV5bdO+aFYYppApiOWbdYTcr5
-	XDK5xr7kufo754qwlxbXNk3cyvHomJA=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: Jian Shen <shenjian15@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-	Paul Barker <paul@pbarker.dev>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc: linux-renesas-soc@vger.kernel.org,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	netdev@vger.kernel.org,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [PATCH net-next v5 6/6] net: hns3: add hwtstamp_get/hwtstamp_set ops
-Date: Thu, 23 Oct 2025 22:04:57 +0000
-Message-ID: <20251023220457.3201122-7-vadim.fedorenko@linux.dev>
-In-Reply-To: <20251023220457.3201122-1-vadim.fedorenko@linux.dev>
-References: <20251023220457.3201122-1-vadim.fedorenko@linux.dev>
+	s=arc-20240116; t=1761257234; c=relaxed/simple;
+	bh=lTNnDf1rAg7qRAW38f/WEdm7yRw5hmoLMS9ZeClJ7bQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qRpXZlaWYaVC53oZhzx4dPjv39eHrjMwaUPyxB/1ns9jzngNfNuVTIADXxFpuxvWQ28nHXIvpc0pfeJqZaWa5bqxvkIjfrHGLJAMrnPmF1EQHnh/yDVB9rGnNWlHGZUfBI3BDN4v4lBzIyDNALUH3ZOr9XYIkFCDH5s+fW6log8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WIispHrq; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-33e27cda4d7so2712968a91.0
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 15:07:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761257232; x=1761862032; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FCjLocsxqTh0RJXBqEJyhcalASleza4DX5F1KZZ25us=;
+        b=WIispHrqSVoZPtOHBc0DDER/r/rEYi1rWQmKhyjo1N5dGPVJDNzrhif0A0gh6D7HE/
+         av9rH5Zn6qXt9rWKWTRkEPXhzHk+jqZwoYxTNbGHAjKYlcoVvHYd/jTOPFaNTzlTJ3Of
+         usGfao0+UqZIyRmEq6Ua5ZjBIrzrNG/qgmBIYJVgaC2uHVsZmjtu4yaewebVgEzS5AeA
+         BiBlH1jpm47/v0s3VZ64PF2JTXxpEgV2GgOgzioL3+6woJyNL108Qt5UHv/F8SycdwBf
+         ztaje7E4GjRDw3XZyavQTzvHuoHJJfNboYkBPmNd+n8TBRXnRTM9fjdb4Mu02mpbPLLR
+         ddlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761257232; x=1761862032;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FCjLocsxqTh0RJXBqEJyhcalASleza4DX5F1KZZ25us=;
+        b=lw0iJR+pDz0sHinOxoIeB695NTKB229Xer4WGMhStuQKPExGPnA0k6OP3RTdJgSJ2q
+         eSEHwf763EdCaDrVYkuwWGlhmResgskAKmot4sFNOab0hgINw8FxxN5wJfTjnPqYXW9t
+         artWhsP/wHFuAApTGFJe/3hwq5qQJXEhZ4UzvsoaTnjqnzfsdhz71D8806zCBmUC8gVV
+         S+GI8P7U+D8XzdYgW/t+Da8LoJ0VV/yf5kJv8roKvRHBh5IMaGJVSBqu+22P/Cg7Ob54
+         YShisA0kP9kT8/xQJRvyaNPHru4MaHygigiL5nXCX0ZMviFBaVPK3TiEaBUGOBJeEm6u
+         hGwA==
+X-Forwarded-Encrypted: i=1; AJvYcCXwAl30CCS1QXdoHHqx1ZOF7SBOB/aADPzQKxt46BbRejJ5yZ6aN8Ks2d3pierAjUqywh1zaCw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4lxo2VCOp39rSrJXHrgLTdJGJSiNS660BQwdKEYjjfRpofWIQ
+	39wQWwJd09qVFpcugkMbS1kkjkC2JWNMn3LQelNTM061Tx78bSVjta8Uu1WxAQwTPtXcEZ907Ud
+	xfw9chTXh3nF0k9jZrnca59te2/TJWszT+Rp7YEsi
+X-Gm-Gg: ASbGncupAjsj3AAf8GLKG71Z+/Y/ps2PaRySxUUDYb/sFzjZ9tgtv/ZtJjr3qSPy65o
+	hCfDWtvDaFA/0n/ZTgck9Z+M67fmDR906VuLEANkFO6mwuP2p51jB0c4KUtOo5L92ANBHg0RQxZ
+	Hvp9mEAnUHFJTIXoxSF1rLY4D2YVhPd8S6af+CrjqURIPA8YsQ7TSpe7bixU/yyJ6VtptMLzSGU
+	YrsD8+GxDp7YPghb35hbTcVQh8y+qEIQz2eVTqlz9XhRptiZu9lSY5ul+4QR3SfuaqccAnWu29Y
+	XXVlkFZC3NzaJrNfzC/Gz0VOUW7cLZ5px9mA
+X-Google-Smtp-Source: AGHT+IFsjv4lekw2MZ3SKOMpczn5Z8XYT/zaU+enOR2vFwiWyiPgS/3CllscgbjsAkrjrGIX3i4q68RKMxqPB4G4j6o=
+X-Received: by 2002:a17:902:ce90:b0:293:639:6546 with SMTP id
+ d9443c01a7336-29489e33cbdmr4686385ad.20.1761257231864; Thu, 23 Oct 2025
+ 15:07:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <CADvbK_eGSkXO1F168tCKd37hNqTVhPLprWpXOM-Z3KN29dB=Zg@mail.gmail.com>
+ <20251023204833.3749214-1-kuniyu@google.com> <CADvbK_eObVPH9GJfkpCsHt1obg6sDY0jQ0cpA=c6yyjRiQEaYw@mail.gmail.com>
+In-Reply-To: <CADvbK_eObVPH9GJfkpCsHt1obg6sDY0jQ0cpA=c6yyjRiQEaYw@mail.gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 23 Oct 2025 15:07:00 -0700
+X-Gm-Features: AS18NWDON9nRgHPGqm_7FozN8hgAxw3F3MZtX_QAsvQp7B9vzMFy6dwiHnYhgyk
+Message-ID: <CAAVpQUC9fKbJX+AzNZPs9cRQNakyuSOm68c31CG6Ae=xM0kO3g@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 4/8] net: Add sk_clone().
+To: Xin Long <lucien.xin@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, kuni1840@gmail.com, linux-sctp@vger.kernel.org, 
+	marcelo.leitner@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-And .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks to HNS3 framework
-to support HW timestamp configuration via netlink and adopt hns3pf to
-use .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
+On Thu, Oct 23, 2025 at 2:57=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wro=
+te:
+>
+> On Thu, Oct 23, 2025 at 4:48=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.=
+com> wrote:
+> >
+> > From: Xin Long <lucien.xin@gmail.com>
+> > Date: Thu, 23 Oct 2025 15:55:57 -0400
+> > > On Thu, Oct 23, 2025 at 3:22=E2=80=AFPM Kuniyuki Iwashima <kuniyu@goo=
+gle.com> wrote:
+> > > >
+> > > > On Thu, Oct 23, 2025 at 12:08=E2=80=AFPM Xin Long <lucien.xin@gmail=
+.com> wrote:
+> > > > >
+> > > > > On Wed, Oct 22, 2025 at 6:57=E2=80=AFPM Kuniyuki Iwashima <kuniyu=
+@google.com> wrote:
+> > > > > >
+> > > > > > On Wed, Oct 22, 2025 at 3:04=E2=80=AFPM Xin Long <lucien.xin@gm=
+ail.com> wrote:
+> > > > > > >
+> > > > > > > On Wed, Oct 22, 2025 at 5:17=E2=80=AFPM Kuniyuki Iwashima <ku=
+niyu@google.com> wrote:
+> > > > > > > >
+> > > > > > > > sctp_accept() will use sk_clone_lock(), but it will be call=
+ed
+> > > > > > > > with the parent socket locked, and sctp_migrate() acquires =
+the
+> > > > > > > > child lock later.
+> > > > > > > >
+> > > > > > > > Let's add no lock version of sk_clone_lock().
+> > > > > > > >
+> > > > > > > > Note that lockdep complains if we simply use bh_lock_sock_n=
+ested().
+> > > > > > > >
+> > > > > > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > > > > > > > ---
+> > > > > > > >  include/net/sock.h |  7 ++++++-
+> > > > > > > >  net/core/sock.c    | 21 ++++++++++++++-------
+> > > > > > > >  2 files changed, 20 insertions(+), 8 deletions(-)
+> > > > > > > >
+> > > > > > > > diff --git a/include/net/sock.h b/include/net/sock.h
+> > > > > > > > index 01ce231603db..c7e58b8e8a90 100644
+> > > > > > > > --- a/include/net/sock.h
+> > > > > > > > +++ b/include/net/sock.h
+> > > > > > > > @@ -1822,7 +1822,12 @@ struct sock *sk_alloc(struct net *ne=
+t, int family, gfp_t priority,
+> > > > > > > >  void sk_free(struct sock *sk);
+> > > > > > > >  void sk_net_refcnt_upgrade(struct sock *sk);
+> > > > > > > >  void sk_destruct(struct sock *sk);
+> > > > > > > > -struct sock *sk_clone_lock(const struct sock *sk, const gf=
+p_t priority);
+> > > > > > > > +struct sock *sk_clone(const struct sock *sk, const gfp_t p=
+riority, bool lock);
+> > > > > > > > +
+> > > > > > > > +static inline struct sock *sk_clone_lock(const struct sock=
+ *sk, const gfp_t priority)
+> > > > > > > > +{
+> > > > > > > > +       return sk_clone(sk, priority, true);
+> > > > > > > > +}
+> > > > > > > >
+> > > > > > > >  struct sk_buff *sock_wmalloc(struct sock *sk, unsigned lon=
+g size, int force,
+> > > > > > > >                              gfp_t priority);
+> > > > > > > > diff --git a/net/core/sock.c b/net/core/sock.c
+> > > > > > > > index a99132cc0965..0a3021f8f8c1 100644
+> > > > > > > > --- a/net/core/sock.c
+> > > > > > > > +++ b/net/core/sock.c
+> > > > > > > > @@ -2462,13 +2462,16 @@ static void sk_init_common(struct s=
+ock *sk)
+> > > > > > > >  }
+> > > > > > > >
+> > > > > > > >  /**
+> > > > > > > > - *     sk_clone_lock - clone a socket, and lock its clone
+> > > > > > > > - *     @sk: the socket to clone
+> > > > > > > > - *     @priority: for allocation (%GFP_KERNEL, %GFP_ATOMIC=
+, etc)
+> > > > > > > > + * sk_clone - clone a socket
+> > > > > > > > + * @sk: the socket to clone
+> > > > > > > > + * @priority: for allocation (%GFP_KERNEL, %GFP_ATOMIC, et=
+c)
+> > > > > > > > + * @lock: if true, lock the cloned sk
+> > > > > > > >   *
+> > > > > > > > - *     Caller must unlock socket even in error path (bh_un=
+lock_sock(newsk))
+> > > > > > > > + * If @lock is true, the clone is locked by bh_lock_sock()=
+, and
+> > > > > > > > + * caller must unlock socket even in error path by bh_unlo=
+ck_sock().
+> > > > > > > >   */
+> > > > > > > > -struct sock *sk_clone_lock(const struct sock *sk, const gf=
+p_t priority)
+> > > > > > > > +struct sock *sk_clone(const struct sock *sk, const gfp_t p=
+riority,
+> > > > > > > > +                     bool lock)
+> > > > > > > >  {
+> > > > > > > >         struct proto *prot =3D READ_ONCE(sk->sk_prot);
+> > > > > > > >         struct sk_filter *filter;
+> > > > > > > > @@ -2497,9 +2500,13 @@ struct sock *sk_clone_lock(const str=
+uct sock *sk, const gfp_t priority)
+> > > > > > > >                 __netns_tracker_alloc(sock_net(newsk), &new=
+sk->ns_tracker,
+> > > > > > > >                                       false, priority);
+> > > > > > > >         }
+> > > > > > > > +
+> > > > > > > >         sk_node_init(&newsk->sk_node);
+> > > > > > > >         sock_lock_init(newsk);
+> > > > > > > > -       bh_lock_sock(newsk);
+> > > > > > > > +
+> > > > > > > > +       if (lock)
+> > > > > > > > +               bh_lock_sock(newsk);
+> > > > > > > > +
+> > > > > > > does it really need bh_lock_sock() that early, if not, maybe =
+we can move
+> > > > > > > it out of sk_clone_lock(), and names sk_clone_lock() back to =
+sk_clone()?
+> > > > > >
+> > > > > > I think sk_clone_lock() and leaf functions do not have
+> > > > > > lockdep_sock_is_held(), and probably the closest one is
+> > > > > > security_inet_csk_clone() which requires lock_sock() for
+> > > > > > bpf_setsockopt(), this can be easily adjusted though.
+> > > > > > (see bpf_lsm_locked_sockopt_hooks)
+> > > > > >
+> > > > > Right.
+> > > > >
+> > > > > > Only concern would be moving bh_lock_sock() there will
+> > > > > > introduce one cache line miss.
+> > > > > I think it=E2=80=99s negligible, and it=E2=80=99s not even on the=
+ data path, though others
+> > > > > may have different opinions.
+> > > >
+> > > > For SCTP, yes, but I'd avoid it for TCP.
+> > > Okay, not a problem, just doesn't look common to pass such a paramete=
+r.
+> >
+> > Another option would be add a check like this ?
+> >
+> > ---8<---
+> > diff --git a/include/net/sock.h b/include/net/sock.h
+> > index c7e58b8e8a90..e708b70b04da 100644
+> > --- a/include/net/sock.h
+> > +++ b/include/net/sock.h
+> > @@ -2904,6 +2904,12 @@ static inline bool sk_is_inet(const struct sock =
+*sk)
+> >         return family =3D=3D AF_INET || family =3D=3D AF_INET6;
+> >  }
+> >
+> > +static inline bool sk_is_sctp(const struct sock *sk)
+> > +{
+> > +       return IS_ENABLED(CONFIG_SCTP) &&
+> > +               sk->sk_protocol =3D=3D IPPROTO_SCTP;
+> > +}
+> > +
+> Oh, better not, I'm actually planning to use sk_clone() in quic_accept() =
+:D
+>
+> https://github.com/lxin/quic/blob/main/modules/net/quic/socket.c#L1421
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Jijie Shao <shaojijie@huawei.com>
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
----
-v1 -> v2:
-- actually assign ndo_tstamp callbacks
----
- drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  5 +++
- .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 31 ++++++++++++++++++
- .../hisilicon/hns3/hns3pf/hclge_main.c        | 13 +++-----
- .../hisilicon/hns3/hns3pf/hclge_ptp.c         | 32 +++++++++++--------
- .../hisilicon/hns3/hns3pf/hclge_ptp.h         |  9 ++++--
- 5 files changed, 64 insertions(+), 26 deletions(-)
-
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-index 3b548f71fa8a..d7c3df1958f3 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-@@ -804,6 +804,11 @@ struct hnae3_ae_ops {
- 	int (*dbg_get_read_func)(struct hnae3_handle *handle,
- 				 enum hnae3_dbg_cmd cmd,
- 				 read_func *func);
-+	int (*hwtstamp_get)(struct hnae3_handle *handle,
-+			    struct kernel_hwtstamp_config *config);
-+	int (*hwtstamp_set)(struct hnae3_handle *handle,
-+			    struct kernel_hwtstamp_config *config,
-+			    struct netlink_ext_ack *extack);
- };
- 
- struct hnae3_dcb_ops {
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index bfa5568baa92..7a0654e2d3dd 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -2419,6 +2419,35 @@ static int hns3_nic_do_ioctl(struct net_device *netdev,
- 	return h->ae_algo->ops->do_ioctl(h, ifr, cmd);
- }
- 
-+static int hns3_nic_hwtstamp_get(struct net_device *netdev,
-+				 struct kernel_hwtstamp_config *config)
-+{
-+	struct hnae3_handle *h = hns3_get_handle(netdev);
-+
-+	if (!netif_running(netdev))
-+		return -EINVAL;
-+
-+	if (!h->ae_algo->ops->hwtstamp_get)
-+		return -EOPNOTSUPP;
-+
-+	return h->ae_algo->ops->hwtstamp_get(h, config);
-+}
-+
-+static int hns3_nic_hwtstamp_set(struct net_device *netdev,
-+				 struct kernel_hwtstamp_config *config,
-+				 struct netlink_ext_ack *extack)
-+{
-+	struct hnae3_handle *h = hns3_get_handle(netdev);
-+
-+	if (!netif_running(netdev))
-+		return -EINVAL;
-+
-+	if (!h->ae_algo->ops->hwtstamp_set)
-+		return -EOPNOTSUPP;
-+
-+	return h->ae_algo->ops->hwtstamp_set(h, config, extack);
-+}
-+
- static int hns3_nic_set_features(struct net_device *netdev,
- 				 netdev_features_t features)
- {
-@@ -3048,6 +3077,8 @@ static const struct net_device_ops hns3_nic_netdev_ops = {
- 	.ndo_set_vf_rate	= hns3_nic_set_vf_rate,
- 	.ndo_set_vf_mac		= hns3_nic_set_vf_mac,
- 	.ndo_select_queue	= hns3_nic_select_queue,
-+	.ndo_hwtstamp_get	= hns3_nic_hwtstamp_get,
-+	.ndo_hwtstamp_set	= hns3_nic_hwtstamp_set,
- };
- 
- bool hns3_is_phys_func(struct pci_dev *pdev)
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index 9d34d28ff168..81d3bdc098e6 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -9445,15 +9445,8 @@ static int hclge_do_ioctl(struct hnae3_handle *handle, struct ifreq *ifr,
- 	struct hclge_vport *vport = hclge_get_vport(handle);
- 	struct hclge_dev *hdev = vport->back;
- 
--	switch (cmd) {
--	case SIOCGHWTSTAMP:
--		return hclge_ptp_get_cfg(hdev, ifr);
--	case SIOCSHWTSTAMP:
--		return hclge_ptp_set_cfg(hdev, ifr);
--	default:
--		if (!hdev->hw.mac.phydev)
--			return hclge_mii_ioctl(hdev, ifr, cmd);
--	}
-+	if (!hdev->hw.mac.phydev)
-+		return hclge_mii_ioctl(hdev, ifr, cmd);
- 
- 	return phy_mii_ioctl(hdev->hw.mac.phydev, ifr, cmd);
- }
-@@ -12901,6 +12894,8 @@ static const struct hnae3_ae_ops hclge_ops = {
- 	.get_dscp_prio = hclge_get_dscp_prio,
- 	.get_wol = hclge_get_wol,
- 	.set_wol = hclge_set_wol,
-+	.hwtstamp_get = hclge_ptp_get_cfg,
-+	.hwtstamp_set = hclge_ptp_set_cfg,
- };
- 
- static struct hnae3_ae_algo ae_algo = {
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-index 4bd52eab3914..0081c5281455 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-@@ -204,13 +204,17 @@ static int hclge_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
- 	return 0;
- }
- 
--int hclge_ptp_get_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
-+int hclge_ptp_get_cfg(struct hnae3_handle *handle,
-+		      struct kernel_hwtstamp_config *config)
- {
-+	struct hclge_vport *vport = hclge_get_vport(handle);
-+	struct hclge_dev *hdev = vport->back;
-+
- 	if (!test_bit(HCLGE_STATE_PTP_EN, &hdev->state))
- 		return -EOPNOTSUPP;
- 
--	return copy_to_user(ifr->ifr_data, &hdev->ptp->ts_cfg,
--		sizeof(struct hwtstamp_config)) ? -EFAULT : 0;
-+	*config = hdev->ptp->ts_cfg;
-+	return 0;
- }
- 
- static int hclge_ptp_int_en(struct hclge_dev *hdev, bool en)
-@@ -269,7 +273,7 @@ static int hclge_ptp_cfg(struct hclge_dev *hdev, u32 cfg)
- 	return ret;
- }
- 
--static int hclge_ptp_set_tx_mode(struct hwtstamp_config *cfg,
-+static int hclge_ptp_set_tx_mode(struct kernel_hwtstamp_config *cfg,
- 				 unsigned long *flags, u32 *ptp_cfg)
- {
- 	switch (cfg->tx_type) {
-@@ -287,7 +291,7 @@ static int hclge_ptp_set_tx_mode(struct hwtstamp_config *cfg,
- 	return 0;
- }
- 
--static int hclge_ptp_set_rx_mode(struct hwtstamp_config *cfg,
-+static int hclge_ptp_set_rx_mode(struct kernel_hwtstamp_config *cfg,
- 				 unsigned long *flags, u32 *ptp_cfg)
- {
- 	int rx_filter = cfg->rx_filter;
-@@ -332,7 +336,7 @@ static int hclge_ptp_set_rx_mode(struct hwtstamp_config *cfg,
- }
- 
- static int hclge_ptp_set_ts_mode(struct hclge_dev *hdev,
--				 struct hwtstamp_config *cfg)
-+				 struct kernel_hwtstamp_config *cfg)
- {
- 	unsigned long flags = hdev->ptp->flags;
- 	u32 ptp_cfg = 0;
-@@ -359,9 +363,12 @@ static int hclge_ptp_set_ts_mode(struct hclge_dev *hdev,
- 	return 0;
- }
- 
--int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
-+int hclge_ptp_set_cfg(struct hnae3_handle *handle,
-+		      struct kernel_hwtstamp_config *config,
-+		      struct netlink_ext_ack *extack)
- {
--	struct hwtstamp_config cfg;
-+	struct hclge_vport *vport = hclge_get_vport(handle);
-+	struct hclge_dev *hdev = vport->back;
- 	int ret;
- 
- 	if (!test_bit(HCLGE_STATE_PTP_EN, &hdev->state)) {
-@@ -369,16 +376,13 @@ int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
- 		return -EOPNOTSUPP;
- 	}
- 
--	if (copy_from_user(&cfg, ifr->ifr_data, sizeof(cfg)))
--		return -EFAULT;
--
--	ret = hclge_ptp_set_ts_mode(hdev, &cfg);
-+	ret = hclge_ptp_set_ts_mode(hdev, config);
- 	if (ret)
- 		return ret;
- 
--	hdev->ptp->ts_cfg = cfg;
-+	hdev->ptp->ts_cfg = *config;
- 
--	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
-+	return 0;
- }
- 
- int hclge_ptp_get_ts_info(struct hnae3_handle *handle,
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-index 61faddcc3dd0..0162fa5ac146 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-@@ -62,7 +62,7 @@ struct hclge_ptp {
- 	unsigned long flags;
- 	void __iomem *io_base;
- 	struct ptp_clock_info info;
--	struct hwtstamp_config ts_cfg;
-+	struct kernel_hwtstamp_config ts_cfg;
- 	spinlock_t lock;	/* protects ptp registers */
- 	u32 ptp_cfg;
- 	u32 last_tx_seqid;
-@@ -133,8 +133,11 @@ bool hclge_ptp_set_tx_info(struct hnae3_handle *handle, struct sk_buff *skb);
- void hclge_ptp_clean_tx_hwts(struct hclge_dev *hdev);
- void hclge_ptp_get_rx_hwts(struct hnae3_handle *handle, struct sk_buff *skb,
- 			   u32 nsec, u32 sec);
--int hclge_ptp_get_cfg(struct hclge_dev *hdev, struct ifreq *ifr);
--int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr);
-+int hclge_ptp_get_cfg(struct hnae3_handle *handle,
-+		      struct kernel_hwtstamp_config *config);
-+int hclge_ptp_set_cfg(struct hnae3_handle *handle,
-+		      struct kernel_hwtstamp_config *config,
-+		      struct netlink_ext_ack *extack);
- int hclge_ptp_init(struct hclge_dev *hdev);
- void hclge_ptp_uninit(struct hclge_dev *hdev);
- int hclge_ptp_get_ts_info(struct hnae3_handle *handle,
--- 
-2.47.3
-
+Okay, then I'll keep the current form.
 
