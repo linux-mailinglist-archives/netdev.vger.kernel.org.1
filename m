@@ -1,123 +1,137 @@
-Return-Path: <netdev+bounces-232071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67A34C00945
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 12:53:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27392C00960
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 12:54:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48B101A02ABF
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 10:53:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60B333A412E
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 10:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F300130B527;
-	Thu, 23 Oct 2025 10:53:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 717ED30ACF0;
+	Thu, 23 Oct 2025 10:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="frWti8oe"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Pf30+2tg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CC330ACF0
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 10:53:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7054B2D12EA;
+	Thu, 23 Oct 2025 10:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761216784; cv=none; b=dEDRDDxGkMhzbGsyYrjtsMWZmEZRKdx3AtQt3WGf5YpPxWSYPkjUgaJNPdsbJIKDlE0iX+aWtLDNoNY3dQR6Bxsu5MMHlRY5gAMaYFk91DZjQDs63WnTQwoelybmu2ohuboh2yiZ3orh7vp5eXT+Iybh/x9hfKJFYlFiVsw/gIU=
+	t=1761216872; cv=none; b=ti6k1wRnyt5V2TRye0q42QEgqi+kXOtgyGRDlu9GGEEcHH5F3XbIGdqdJd+P/5dDhpMB2SmqViENLIWGMaU0p6NmgDSEFDBz9SVr2mQSuluKv/YiD8vCHUf+dlSBkoDJxoG4abCKE0LoUI4Sgr//eeS7Qvt9eoZBbIN1ygitAJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761216784; c=relaxed/simple;
-	bh=+vMUjxVk+nS+BilhYa3CMtB+EET0zgU8rBG6KfAsYNI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=krhAEZHY7ptX+joHE5ZbBly8cuQ+UUm6/jB80Z7h/mEgIiACt8q4go6ncv0QG5gFYOzGp0CxtLVtnFOduujubV+LjYStW18xIwo/71HYbedTjMPB9qH52oclGSASy6GTIjyoDMS0zRJOJ5+c+EmMAvg2PILKEnronSaThSaBQRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=frWti8oe; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-42701b29a7eso344224f8f.0
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 03:53:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761216779; x=1761821579; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+vMUjxVk+nS+BilhYa3CMtB+EET0zgU8rBG6KfAsYNI=;
-        b=frWti8oeRBLu+QB6bESi/iuVYjSFqXMBUwngM/QfNOF/e3Ng1iNKsMJXQHBuypa2B8
-         zpF5RBc8CR175HiU9jLzYLIZz9IXjGL3r3n0fPSwJuGUgb11GsYQ77bYUOczAu8Lrg3A
-         PMb5rcR9NhLkCivvZJhr8sy5cGTi0zLNH6lSWgAbhYHWe+jPomKYPY+dCWcgttLYSKPc
-         1muu8SIhdCkJYlcYpITu29QL2/ng1avo4uMNvD4Xfp4S60j4Kex2lPc3+O87fbxRIvgz
-         dJuQ+ms/Y0+qonH80kIhtpGhPrjpR6iefBYv3T0tYa0lV3VucJMSWMmhO3UNl+Z4aw9N
-         dLQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761216779; x=1761821579;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+vMUjxVk+nS+BilhYa3CMtB+EET0zgU8rBG6KfAsYNI=;
-        b=diaBxdS3jx024zyic7SxCiFVUbHHGlXCvjnc4g/ijkrb8RJskGt7RQ1c3vYeYcxYYE
-         xsGpqJpL91CM/4T0hQQXoKPIm/IAsC7jbEi7VtTvFNiyf+rQiZNDVy46HBNU0AvjO3SU
-         QPPfAGPjlk03WC1FuTMkkMwjzvlUJV+s60c5RT+mX/7Z7FKJFcLDgxYb5dFYGfS4fdSW
-         oUXrQkLEQfWEhRGLdkOEEm9Zw9cKHi9lvI0V395Xmw5872qmHehFVq1dF/9284DTJbQh
-         vLWzikBc13tslHhdi0ChuJGm6vwnICLdlepebkheW7COWK2btT8x2fRGhe5xNoptyXde
-         fnjw==
-X-Forwarded-Encrypted: i=1; AJvYcCXpPwCewnqzAXeatEe1bahyM0rRAxwu7nRFg84l9IdMUPBgnwuvkpEpgeN+oMzpWZP49vViark=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFSMGP3mB6ZYBbeqdqqPNgGtN9XMyv3XSyUznTwPBY+kx3k6Kw
-	WINCAkLv1A3EWE+JAvcmZbwT7nW4V2nyM6MmvijITDRWxk2KlQ+8OHMLbY7OS1XS2AekNYPMCUJ
-	oNkXvIoIiNoPmdLhQt3+S4rV/WzxVLHQ=
-X-Gm-Gg: ASbGncuenMS/SstWdWQ5C1yz0T258WHcBwXSFpqR7nYMlwRN7Xts8lFpn29CVeZAHas
-	VzrFYyCXVQhWORhWwJmhbfLpbPj93w8HCXKWAye4//QKf1yLsZ3XUFsyMBuV5OBkdjTtII7nZPE
-	755VQZr4CKhgccdsVzxCnEJOVBgi5Rli+aKiDziVW0x/tmzgkeRt2xqSEfvcExBIDNSZ1wBpqIg
-	f2+2YvnWn33Y2MkTfDzkeHcl+/r8w/V3UwXI3vWObVf+NNINygMc0O/RuhCMg==
-X-Google-Smtp-Source: AGHT+IEq+zNMHj9WPfjzhOgVqdeT8MY8s9ConstnjU+A+nm1h37hA1lLmbMQ890yX6bv5OV3H8gCIbax8AgydOiwcEc=
-X-Received: by 2002:a05:6000:2312:b0:3e7:6424:1b47 with SMTP id
- ffacd0b85a97d-4285324c1ecmr5374774f8f.6.1761216779388; Thu, 23 Oct 2025
- 03:52:59 -0700 (PDT)
+	s=arc-20240116; t=1761216872; c=relaxed/simple;
+	bh=ZFnvfm+yWoOd7Q01/nDjdXk5cVbJUlrMR12+19gWEe4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BsDYSlVerjP2oymia+oB5QJZyJBkBrisTUqHUsNeKTdkr5Ub4S6Ofur8c957SqxTKZBwV1qK3L6KNppONsTeRsSln4d8C7i+pdGWI7Kxcj4X1iNd1mHbeIMjqvY5llrU5hX96grr1xmyTDXlCF3g8XNPyQPGhcBMTo0DC07lwe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Pf30+2tg; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=P5H/X2O6VAth3+1IJiZ1jVADDRZOBh553gExnuinE6g=; b=Pf30+2tgWHWff05MLYY0zw/0+w
+	abhcaYZwkQ0qPJr4E85uSPGBRk37p6qmfNoCVIxrBYfZCf8tOmpPEQJbblRJoZOCPOLObmbV/wvPO
+	uoVUr+lEphTXs9FQ9lp7Ty3ukn6EbY+cuU9CjUwYcdbXM9lcSfZCHvb7pS1TaajOqUYOdcmb+bYnz
+	23KRqaGwo77hReiEZUy5NBKDJvqtwSIfQ1zPJk1uwJSjCpWFbhzIpKvfPO7VnLWUwHPzkGWDIPQmA
+	lfcHw/CMNhIUXbIa7hewF4ETVeKLDIjTMnFGgcBAxt0qt06glhbgO9iD1tDuu+Dd8dPEB+vOLzwXm
+	PevYaXlA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45430)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vBsxV-000000006Cw-1WVS;
+	Thu, 23 Oct 2025 11:54:17 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vBsxQ-000000001cU-0p2n;
+	Thu, 23 Oct 2025 11:54:12 +0100
+Date: Thu, 23 Oct 2025 11:54:12 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	Rohan G Thomas <rohan.g.thomas@intel.com>,
+	"Ng, Boon Khai" <boon.khai.ng@altera.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v3 1/3] net: stmmac: vlan: Disable 802.1AD tag
+ insertion offload
+Message-ID: <aPoJVOUe-ASx1GmV@shell.armlinux.org.uk>
+References: <20251017-qbv-fixes-v3-0-d3a42e32646a@altera.com>
+ <20251017-qbv-fixes-v3-1-d3a42e32646a@altera.com>
+ <aPI5pBXnh5X7OXtG@shell.armlinux.org.uk>
+ <e45a8124-ace8-40bf-b55f-56dc8fbe6987@altera.com>
+ <1abbcd93-6144-440c-90d9-439d0f18383b@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251017151830.171062-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251017151830.171062-3-prabhakar.mahadev-lad.rj@bp.renesas.com> <20251022181348.1e16df68@kernel.org>
-In-Reply-To: <20251022181348.1e16df68@kernel.org>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Thu, 23 Oct 2025 11:52:33 +0100
-X-Gm-Features: AWmQ_bkmX85GH1EUjJGjidbFOCdBNnjQxmkV7py__nnaP17JZzd2tI33jtRLgQg
-Message-ID: <CA+V-a8un_DQdQcg+kQUs_HCRK15H-K3dW_yBtWXWzH9RMARJ_Q@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] net: ravb: Allocate correct number of queues based
- on SoC support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
-	Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Mitsuhiro Kimura <mitsuhiro.kimura.kc@renesas.com>, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, stable@vger.kernel.org, 
-	=?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1abbcd93-6144-440c-90d9-439d0f18383b@altera.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Jakub,
+On Thu, Oct 23, 2025 at 09:01:20AM +0530, G Thomas, Rohan wrote:
+> Hi Russell,
+> 
+> On 10/18/2025 7:26 AM, G Thomas, Rohan wrote:
+> > Hi Russell,
+> > 
+> > On 10/17/2025 6:12 PM, Russell King (Oracle) wrote:
+> > > On Fri, Oct 17, 2025 at 02:11:19PM +0800, Rohan G Thomas via B4 Relay wrote:
+> > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > > index 650d75b73e0b0ecd02d35dd5d6a8742d45188c47..dedaaef3208bfadc105961029f79d0d26c3289d8 100644
+> > > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > > @@ -4089,18 +4089,11 @@ static int stmmac_release(struct net_device *dev)
+> > > >    static bool stmmac_vlan_insert(struct stmmac_priv *priv, struct sk_buff *skb,
+> > > >    			       struct stmmac_tx_queue *tx_q)
+> > > >    {
+> > > > -	u16 tag = 0x0, inner_tag = 0x0;
+> > > > -	u32 inner_type = 0x0;
+> > > > +	u16 tag = 0x0;
+> > > >    	struct dma_desc *p;
+> > > 
+> > > #include <stdnetdevcodeformat.h> - Please maintain reverse christmas-
+> > > tree order.
+> > 
+> > Thanks for pointing this out. I'll fix the declaration order in the next
+> > revision.
+> > 
+> > > 
+> > > I haven't yet referred to the databook, so there may be more comments
+> > > coming next week.
+> > > 
+> > 
+> > Sure! Will wait for your feedback before sending the next revision.
+> 
+> Just checking in — have you had a chance to review the patch further? Or
+> would it be okay for me to go ahead and send the next revision for
+> review?
 
-Thank you for the review.
+I've checked my version of the databook, and the core version that has
+VLINS/DVLAN and my databook doesn't cover this. So I'm afraid I can't
+review further.
 
-On Thu, Oct 23, 2025 at 2:13=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Fri, 17 Oct 2025 16:18:28 +0100 Prabhakar wrote:
-> > On SoCs that only support the best-effort queue and not the network
-> > control queue, calling alloc_etherdev_mqs() with fixed values for
-> > TX/RX queues is not appropriate. Use the nc_queues flag from the
-> > per-SoC match data to determine whether the network control queue
-> > is available, and fall back to a single TX/RX queue when it is not.
-> > This ensures correct queue allocation across all supported SoCs.
->
-> Same comment as on patch 1, what is the _real_ problem?
-> Allocating a bit too much memory is not an stable-worthy issue.
-
-Ok, I will drop the fixes tag and cc to stable and post it for net-next.
-
-Cheers,
-Prabhakar
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
