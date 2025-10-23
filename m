@@ -1,164 +1,139 @@
-Return-Path: <netdev+bounces-232005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A28F2BFFCD9
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 10:10:21 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BCB5BFFEB9
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 10:28:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 226C43AA3FF
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 08:10:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E83AB4F9FD6
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 08:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4606D2EB84A;
-	Thu, 23 Oct 2025 08:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="MYgfIPNv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E8D2F83BC;
+	Thu, 23 Oct 2025 08:28:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 366FB2EB849;
-	Thu, 23 Oct 2025 08:09:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA9E2BDC15;
+	Thu, 23 Oct 2025 08:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761207000; cv=none; b=jvFxrlmFLofFtAhALr3fnvzWAXkIhHiK9jg1VRdb9mt8Tiw6eUlb7U2beAwDVWZapmYmTABx1fcBywqDnN+tu4RBZBo2niTa8quQN66MCKO/Xqp8oOmEjQ0ubW1hxnvzSZ3ZapraZlJUyYOU7AP4NfxsAhWCjWFA52TBCterEM8=
+	t=1761208084; cv=none; b=XNzYPoliIu4lrYEcAgWW3BMEYfxkKkwL+nrSMSh9XBPfC/sJNLgXfpybHvMonF+fDNWwReNUQ1bkBeUoTpB2fwzAo5KhEM/V/T9q+ZTQLYGusbjEh80UXX5i3RIA9z+j6t+7cqPueQNEEcERgLpAJtfUZ/BsLayia4FYgjs3LtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761207000; c=relaxed/simple;
-	bh=UMHvqXKAXLDewNQALGomwABCwZxZfH+IN/9gnJya+fI=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=ij/48k6s2I9fFVxIHUzbUKjvzhesU85f87w7CxguelYGICqkYGuJxFbmgrIjy8aWaUFWVNyX9sk32/S9/IrxS9jutRDvAjbEpwqgokMzjaIBNzk5fgNbCnTt/qoKG684LZzsJ1OkgfJSWRis0vozPRnbND0k1CPK1x4bnP3EJJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=MYgfIPNv; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1761206988; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=0pwkfXQbGk5Oqq1wZCavhvUj7jR9C8by8Jut+zAJHnU=;
-	b=MYgfIPNvY1PihNggVFqC/poHpU3u8DaNEYW/1EoPFj1syMck3FRPHhlvTEdRWbOcVIqgNzauHSJzAQRf8KZ/dnZELxyWXoCNGN+KSQrW6clNxTu0VNy+zjTMS0+a4hGFDSjdxIKngnBlbnOUAyw3Eov8NC3XGvszBVqKyoVdAhk=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WqqL4XV_1761206987 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 23 Oct 2025 16:09:47 +0800
-Message-ID: <1761206734.6182284-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net v4] virtio-net: fix received length check in big packets
-Date: Thu, 23 Oct 2025 16:05:34 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Gavin Li <gavinl@nvidia.com>,
- Gavi Teitz <gavi@nvidia.com>,
- Parav Pandit <parav@nvidia.com>,
- virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org,
- Bui Quang Minh <minhquangbui99@gmail.com>,
- stable@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20251022160623.51191-1-minhquangbui99@gmail.com>
-In-Reply-To: <20251022160623.51191-1-minhquangbui99@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1761208084; c=relaxed/simple;
+	bh=AUgJ3Jmn3m2RnEHWD18AOjigfIzZkqbCx9HFiI29QkE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DzFPdJjrNVqdPaPvncRvctHCDsklCtiYfY42tBDaMJFIt/bGdJWgY/3LhNNCxP199WjbgwqFTKSBF2MKk8OCp59IFYIfvQ3cP9hXUfsyi1+0MlJG+eKJ6ztqz3IsCI3HBarJU0PV4tchGz57tPJSf8MMxwpMcsn6juDum3liK88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c2dff70000001609-2b-68f9e70bae0f
+Date: Thu, 23 Oct 2025 17:27:50 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: axboe@kernel.dk, kuba@kernel.org, pabeni@redhat.com,
+	almasrymina@google.com, davem@davemloft.net, edumazet@google.com,
+	horms@kernel.org, hawk@kernel.org, ilias.apalodimas@linaro.org,
+	sdf@fomichev.me, dw@davidwei.uk, ap420073@gmail.com,
+	dtatulea@nvidia.com, toke@redhat.com, io-uring@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	kernel_team@skhynix.com, max.byungchul.park@gmail.com
+Subject: Re: [PATCH net-next] page_pool: check if nmdesc->pp is !NULL to
+ confirm its usage as pp for net_iov
+Message-ID: <20251023082750.GA11851@system.software.com>
+References: <20251016063657.81064-1-byungchul@sk.com>
+ <20251016072132.GA19434@system.software.com>
+ <8d833a3f-ae18-4ea6-9092-ddaa48290a63@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8d833a3f-ae18-4ea6-9092-ddaa48290a63@gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrNIsWRmVeSWpSXmKPExsXC9ZZnoS73858ZBtv3KVus/lFh8XPNcyaL
+	Oau2MVqsvtvPZjHnfAuLxc5dzxktXs1Yy2bx9Ngjdos97duZLR71n2Cz6G35zWzxrvUci8WF
+	bX2sFpd3zWGzuDCxl9Xi2AIxi2+n3zBaXJ25i8ni0uFHLA7CHltW3mTyuDZjIovHjX2nmDx2
+	zrrL7rFgU6nH5bOlHptWdbJ53Lm2h82jt/kdm8f7fVfZPD5vkgvgjuKySUnNySxLLdK3S+DK
+	mNK+gblgvlDFon3T2BsYP/F2MXJySAiYSKzacZ4Rxr52YSpzFyMHB4uAqsSKZ+ogYTYBdYkb
+	N34yg9giAtoSr68fYu9i5OJgFljOLHHz4gugBDuHsECexDNjkBJeAQuJmW2TGUFKhASmM0pc
+	+T+dDSIhKHFy5hMWEJtZQEvixr+XTCCrmAWkJZb/4wAJcwrYSjzc+QWsRFRAWeLAtuNMIHMk
+	BDaxS5z9tZcF4kxJiYMrbrBMYBSYhWTsLCRjZyGMXcDIvIpRKDOvLDcxM8dEL6MyL7NCLzk/
+	dxMjMAqX1f6J3sH46ULwIUYBDkYlHl6H4z8yhFgTy4orcw8xSnAwK4nwlkUChXhTEiurUovy
+	44tKc1KLDzFKc7AoifMafStPERJITyxJzU5NLUgtgskycXBKNTAy3Aldv4v1g8GFrpd7+S4H
+	3zViOJi7NJXJN6fUabY0q4TKz/ln3ff+5U5M23e27cLVG45NUt+3//v8nn3n5NWZGy5aWta+
+	/OMqerZ4mrPGn8RG4TVaJ1a/mBLRIyCX4MGSe2SmjpairGHT6pTaQ5Gz52z02XKh6Urc88XP
+	rduK4g98ZFv3Lve6EktxRqKhFnNRcSIA5i0Vnr4CAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprEIsWRmVeSWpSXmKPExsXC5WfdrMv9/GeGQecFIYvVPyosfq55zmQx
+	Z9U2RovVd/vZLOacb2Gx2LnrOaPFqxlr2SyeHnvEbrGnfTuzxaP+E2wWvS2/mS3etZ5jsTg8
+	9ySrxYVtfawWl3fNYbO4MLGX1eLYAjGLb6ffMFpcnbmLyeLS4UcsDiIeW1beZPK4NmMii8eN
+	faeYPHbOusvusWBTqcfls6Uem1Z1snncubaHzaO3+R2bx/t9V9k8Fr/4wOTxeZNcAE8Ul01K
+	ak5mWWqRvl0CV8aU9g3MBfOFKhbtm8bewPiJt4uRk0NCwETi2oWpzF2MHBwsAqoSK56pg4TZ
+	BNQlbtz4yQxiiwhoS7y+foi9i5GLg1lgObPEzYsvgBLsHMICeRLPjEFKeAUsJGa2TWYEKRES
+	mM4oceX/dDaIhKDEyZlPWEBsZgEtiRv/XjKBrGIWkJZY/o8DJMwpYCvxcOcXsBJRAWWJA9uO
+	M01g5J2FpHsWku5ZCN0LGJlXMYpk5pXlJmbmmOoVZ2dU5mVW6CXn525iBMbUsto/E3cwfrns
+	fohRgINRiYfX4fiPDCHWxLLiytxDjBIczEoivGWRQCHelMTKqtSi/Pii0pzU4kOM0hwsSuK8
+	XuGpCUIC6YklqdmpqQWpRTBZJg5OqQbGE648Hp+zDS6G+Z1WOejJX66rmit3WOBC9bWY06vu
+	VF53lrnyTVtnVsDSxjgdU5vbHg9yf8b1Xd+d/fVIbyFv2quZ96x6niluOnlMir0xdWrlnl/6
+	+t3xJXz77PJLt18LyVtxuTNwRpbmg7Jrf3K2rM9Xk46rtF05/153Vpf/LNXkpijjqUuVWIoz
+	Eg21mIuKEwH3xgZVpQIAAA==
+X-CFilter-Loop: Reflected
 
-On Wed, 22 Oct 2025 23:06:23 +0700, Bui Quang Minh <minhquangbui99@gmail.co=
-m> wrote:
-> Since commit 4959aebba8c0 ("virtio-net: use mtu size as buffer length
-> for big packets"), when guest gso is off, the allocated size for big
-> packets is not MAX_SKB_FRAGS * PAGE_SIZE anymore but depends on
-> negotiated MTU. The number of allocated frags for big packets is stored
-> in vi->big_packets_num_skbfrags.
->
-> Because the host announced buffer length can be malicious (e.g. the host
-> vhost_net driver's get_rx_bufs is modified to announce incorrect
-> length), we need a check in virtio_net receive path. Currently, the
-> check is not adapted to the new change which can lead to NULL page
-> pointer dereference in the below while loop when receiving length that
-> is larger than the allocated one.
->
-> This commit fixes the received length check corresponding to the new
-> change.
->
-> Fixes: 4959aebba8c0 ("virtio-net: use mtu size as buffer length for big p=
-ackets")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
-> ---
-> Changes in v4:
-> - Remove unrelated changes, add more comments
-> Changes in v3:
-> - Convert BUG_ON to WARN_ON_ONCE
-> Changes in v2:
-> - Remove incorrect give_pages call
-> ---
->  drivers/net/virtio_net.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index a757cbcab87f..0ffe78b3fd8d 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -852,7 +852,7 @@ static struct sk_buff *page_to_skb(struct virtnet_inf=
-o *vi,
->  {
->  	struct sk_buff *skb;
->  	struct virtio_net_common_hdr *hdr;
-> -	unsigned int copy, hdr_len, hdr_padded_len;
-> +	unsigned int copy, hdr_len, hdr_padded_len, max_remaining_len;
->  	struct page *page_to_free =3D NULL;
->  	int tailroom, shinfo_size;
->  	char *p, *hdr_p, *buf;
-> @@ -915,13 +915,23 @@ static struct sk_buff *page_to_skb(struct virtnet_i=
-nfo *vi,
->  	 * This is here to handle cases when the device erroneously
->  	 * tries to receive more than is possible. This is usually
->  	 * the case of a broken device.
-> +	 *
-> +	 * The number of allocated pages for big packet is
-> +	 * vi->big_packets_num_skbfrags + 1, the start of first page is
-> +	 * for virtio header, the remaining is for data. We need to ensure
-> +	 * the remaining len does not go out of the allocated pages.
-> +	 * Please refer to add_recvbuf_big for more details on big packet
-> +	 * buffer allocation.
->  	 */
-> -	if (unlikely(len > MAX_SKB_FRAGS * PAGE_SIZE)) {
-> +	BUG_ON(offset >=3D PAGE_SIZE);
-> +	max_remaining_len =3D (unsigned int)PAGE_SIZE - offset;
-> +	max_remaining_len +=3D vi->big_packets_num_skbfrags * PAGE_SIZE;
+On Fri, Oct 17, 2025 at 01:33:43PM +0100, Pavel Begunkov wrote:
+> On 10/16/25 08:21, Byungchul Park wrote:
+> > On Thu, Oct 16, 2025 at 03:36:57PM +0900, Byungchul Park wrote:
+> > > ->pp_magic field in struct page is current used to identify if a page
+> > > belongs to a page pool.  However, ->pp_magic will be removed and page
+> > > type bit in struct page e.g. PGTY_netpp should be used for that purpose.
+> > > 
+> > > As a preparation, the check for net_iov, that is not page-backed, should
+> > > avoid using ->pp_magic since net_iov doens't have to do with page type.
+> > > Instead, nmdesc->pp can be used if a net_iov or its nmdesc belongs to a
+> > > page pool, by making sure nmdesc->pp is NULL otherwise.
+> > > 
+> > > For page-backed netmem, just leave unchanged as is, while for net_iov,
+> > > make sure nmdesc->pp is initialized to NULL and use nmdesc->pp for the
+> > > check.
+> > 
+> > IIRC,
+> > 
+> > Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
+> 
+> Pointing out a problem in a patch with a fix doesn't qualify to
+> me as "suggested-by", you don't need to worry about that.
+> 
+> Did you get the PGTY bits merged? There is some uneasiness about
+> this patch as it does nothing good by itself, it'd be much better
+> to have it in a series finalising the page_pool conversion. And
 
+I also considered that.  However, I think the finalizing e.i. removing
+pp fields in struct page, would better be done once every thing else has
+been ready, so that I can focus on examining more thoroughly if there
+aren't accesses through struct page and it can be fianlized safely :-)
 
-Could we perform this check inside `receive_big` to avoid computing
-`max_remaining_len` altogether? Instead, we could directly compare `len` ag=
-ainst
-`(vi->big_packets_num_skbfrags + 1) * PAGE_SIZE`.
+	Byungchul
 
-And I=E2=80=99d like to know if this check is necessary for other modes as =
-well.
-
-Thanks.
-
-
-
-> +	if (unlikely(len > max_remaining_len)) {
->  		net_dbg_ratelimited("%s: too much data\n", skb->dev->name);
->  		dev_kfree_skb(skb);
->  		return NULL;
->  	}
-> -	BUG_ON(offset >=3D PAGE_SIZE);
-> +
->  	while (len) {
->  		unsigned int frag_size =3D min((unsigned)PAGE_SIZE - offset, len);
->  		skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, page, offset,
+> I don't think it simplify merging anyhow, hmm?
+> 
+> ...>> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+> > > index 723e4266b91f..cf78227c0ca6 100644
+> > > --- a/io_uring/zcrx.c
+> > > +++ b/io_uring/zcrx.c
+> > > @@ -450,6 +450,10 @@ static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
+> > >              area->freelist[i] = i;
+> > >              atomic_set(&area->user_refs[i], 0);
+> > >              niov->type = NET_IOV_IOURING;
+> > > +
+> > > +            /* niov->desc.pp is already initialized to NULL by
+> > > +             * kvmalloc_array(__GFP_ZERO).
+> > > +             */
+> 
+> Please drop this hunk if you'll be resubmitting, it's not
+> needed.
+> 
 > --
-> 2.43.0
->
+> Pavel Begunkov
 
