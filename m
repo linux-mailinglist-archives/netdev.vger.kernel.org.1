@@ -1,379 +1,190 @@
-Return-Path: <netdev+bounces-232288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A720C03E8D
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 01:57:54 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96086C03E6D
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 01:53:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC3443A55DE
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 23:57:52 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1600434B873
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 23:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53882296BD4;
-	Thu, 23 Oct 2025 23:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B144D2BD5BF;
+	Thu, 23 Oct 2025 23:53:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eVF6wdZN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k4wVXkmy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 196119463
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 23:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2C627F00A
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 23:53:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761263870; cv=none; b=gJ6NvM4V7+b+KfkvmrVZT3oo7vsAaXoQLuE9x5QXYWFeOkqJp7osgMW52FF/cSmIEOXJzkb+Si+v5qwlBkOxeq9lVxjvhzxqVOsHULj1Wo6SZnFbUADV7t0QdE/JMTa1xSY01Kn+yoUBLS/7pbQhCDorTYMzhSTDSqu72ADjiCg=
+	t=1761263582; cv=none; b=qZ37719r8LK6h5UfBP5eaujqKkrCsoN8kurN7s03actrcd11hK+Ks9TVdOKEMvmGy9p0qlhmd+y0l7fFBp25/7EmQdc9eh0ljsTx6f+qZngWQ5+m24f3aEeXQWv4dFR3Mx5Ytxr7NarajXPH+82m55xRrExDnOHbGUtDB2CSILs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761263870; c=relaxed/simple;
-	bh=EjlYwcPaVvFzATfag5yUcw1n4hi7Y0mjUzvinT0L/jM=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=XLgj4SkyZs7fZ9IRCGpQoZ21AddNuL5nvM6bG2tKgzM9ffPaVHp/gf8+sFN8tRIBe9iZ59NnwXCkWVXcr4vUCMm/+oeUl7WEpxlqGhL9nWHMIoguCrZNR9UIRhvPu6sYSv+cLgKu8TBII5PBtLbXv3PZgyzz3j80us/iT45d4Ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eVF6wdZN; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761263868; x=1792799868;
-  h=from:to:cc:subject:date:message-id;
-  bh=EjlYwcPaVvFzATfag5yUcw1n4hi7Y0mjUzvinT0L/jM=;
-  b=eVF6wdZN2eINl9yC3DWFeAgMpuiGX777a1sNChYfhAmj5rQnI7frcZtM
-   bsbNIxJVzPDDGJwXQUKblONQRa4eA1xXcA8w0kJUVhhf2n16nNqr5xiSE
-   3ZBje9RMpW0gyEILfGn/tMt8lHR36g3oUncrkiROivXoHoceTqSWoxDlj
-   OD7z4aAyEm/udkEn2gd9u9MMj1IdXgEVrlPtHJXntPKl0zWi4M4LLjLHW
-   lx0NrhYtNoG9N3hTxEUVZe6Ew4RsBCgne/+NlOtEiHauwMajF8SNgToIJ
-   JVTmh/RxN9pgdQvgny/oH4LP559Hyn1bp/5KC4uKTLhaxmTQla3kccVNH
-   Q==;
-X-CSE-ConnectionGUID: kur40+5qSjO01d8E/N9Gaw==
-X-CSE-MsgGUID: x6ipaQwvSEGRY7bKmsIbcg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="88913034"
-X-IronPort-AV: E=Sophos;i="6.19,251,1754982000"; 
-   d="scan'208";a="88913034"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 16:57:45 -0700
-X-CSE-ConnectionGUID: 4SsdLDpkQIuIjZxqJ84N2A==
-X-CSE-MsgGUID: WUEIDtjaSfqOlrUYoIjnTQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,251,1754982000"; 
-   d="scan'208";a="183468481"
-Received: from estantil-desk.jf.intel.com ([10.166.241.24])
-  by orviesa006.jf.intel.com with ESMTP; 23 Oct 2025 16:57:46 -0700
-From: Emil Tantilov <emil.s.tantilov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Aleksandr.Loktionov@intel.com,
-	przemyslaw.kitszel@intel.com,
-	anthony.l.nguyen@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	decot@google.com,
-	willemb@google.com,
-	joshua.a.hay@intel.com,
-	madhu.chittim@intel.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	aleksander.lobakin@intel.com
-Subject: [PATCH iwl-next] idpf: convert vport state to bitmap
-Date: Thu, 23 Oct 2025 16:50:49 -0700
-Message-Id: <20251023235049.2199-1-emil.s.tantilov@intel.com>
-X-Mailer: git-send-email 2.17.2
+	s=arc-20240116; t=1761263582; c=relaxed/simple;
+	bh=AT3+wNihqmSYhjuBv/jofqfpVzIh8fFWtMB1yLIwi3E=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=rqYXluUNGypyb+3W3SLS+BRwdzwdxT9N+95UP9j3hTY7n5JBVPjmkGjhPN/avNKQgcji24ksh9EuEWGzLHQxlAeLWgzvS31a3FQqsRgAOHEJzO0ZOeVvLN4CUzgBHKpA7arUfJaWFd5zd/H+Awf6/lHS7CSV0Nj1+p4/vzy2V+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k4wVXkmy; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33428befc08so3308361a91.2
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 16:53:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761263580; x=1761868380; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eo2oCT09CGUkGtiJETLA5OKUbDW0FKSCX+nZlCeQsGg=;
+        b=k4wVXkmyhyqE9l48IJCLR9XPDG1UoTKsy9jmc5uMJFWTWMywf+DoPWrg2gHCuuqVYr
+         LeCUKQ6rVFOZ3IdqCgaf3gLEP+R6kAeYJ6vru8xogcHofAqs0i3RcTgtq150S9d8f6c/
+         ysCzsBZGiS4S4Si6DGe2UgqUevd6olZ/o8vgLrI0tZQBYM6rBecHctibwKw6pZMIvTnD
+         bQCwq3C6wXXs9Ao6TuO3Hmia2d7HcQiTZGQkXahVHFrXFxzFXOxmi0Wp2prR6ih4UUyG
+         T874NM7LkFEuXMv2a21EohwkciFnboHNC/4y9dZQ5fQzxhBkAn3W1viKYTEXDM5jfsKn
+         J6WQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761263580; x=1761868380;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eo2oCT09CGUkGtiJETLA5OKUbDW0FKSCX+nZlCeQsGg=;
+        b=kI5/c9+0NIqMdvfBP7rSFuj0VMTSJRJ3XK9dvHzPkmBOCXpJAGd/xy6du5B0d9uQca
+         lxGGU7ZjSwyyHPSo869L8qhwGCkDeeK8xd1vg5XmllBngW2ZOm5Vv3/6fPy4O+EvW66I
+         WoOr95ZDKFmbmc5FtqAiHS8v1icIkDhzKFUY8qt3uzzRK26x4JOC7GOa5BNc/sIJebDC
+         +L/wfRE7198RYVsmndk4s/mZH7vFexpnQhJEkIY7P2Usc5T9oMJnnCfujZoX0b/EDCUq
+         A9u28ebJok54lEjgl5AuDMWVkXHkOLzBZZlTtqRXwqF8q2E1v1gW1dFK5peaJ/5PPz+s
+         t/cw==
+X-Forwarded-Encrypted: i=1; AJvYcCXIgAzb7W0eceRHVqQKGsA7cg1Zhm4Rck+JeZWbAFCq8gCZ6p3rsMy52obvTBX9/ieZVxbLGC8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVTXPZEKDwObG5kqh4iTTJfTO03am0e1rrK6HYBcWE3zX3KU9A
+	vWc3jTWszkVTUo5IxFfoob8M2HMnTwvGU0T5M9lqNHxx4w6ZujZcT3ECldi2nN6cIfW7pB6Grus
+	SXLqppQ==
+X-Google-Smtp-Source: AGHT+IEQOeSykRo4Rj5MaMzLbvjbffFfTFsbM/EOLn0WBNXCeu8l+VNyetqRrDtzeRuqnAV/p+uqxvFuzh4=
+X-Received: from pjbsd7.prod.google.com ([2002:a17:90b:5147:b0:33b:b3b8:216b])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5105:b0:32e:e3af:45f6
+ with SMTP id 98e67ed59e1d1-33bcf87b6a4mr33427079a91.10.1761263580523; Thu, 23
+ Oct 2025 16:53:00 -0700 (PDT)
+Date: Thu, 23 Oct 2025 23:52:38 +0000
+In-Reply-To: <20251023191807.74006-2-stefan.wiehler@nokia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+References: <20251023191807.74006-2-stefan.wiehler@nokia.com>
+X-Mailer: git-send-email 2.51.1.851.g4ebd6896fd-goog
+Message-ID: <20251023235259.4179388-1-kuniyu@google.com>
+Subject: Re: [PATCH net] sctp: Hold RCU read lock while iterating over address list
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: stefan.wiehler@nokia.com
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	lucien.xin@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	kuniyu@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Convert vport state to a bitmap and remove the DOWN state which is
-redundant in the existing logic. There are no functional changes aside
-from the use of bitwise operations when setting and checking the states.
-Removed the double underscore to be consistent with the naming of other
-bitmaps in the header and renamed current_state to vport_is_up to match
-the meaning of the new variable.
+From: Stefan Wiehler <stefan.wiehler@nokia.com>
+Date: Thu, 23 Oct 2025 21:18:08 +0200
+> With CONFIG_PROVE_RCU_LIST=y and by executing
+> 
+>   $ netcat -l --sctp &
+>   $ netcat --sctp localhost &
+>   $ ss --sctp
+> 
+> one can trigger the following Lockdep-RCU splat(s):
+> 
+>   WARNING: suspicious RCU usage
+>   6.18.0-rc1-00093-g7f864458e9a6 #5 Not tainted
+>   -----------------------------
+>   net/sctp/diag.c:76 RCU-list traversed in non-reader section!!
+> 
+>   other info that might help us debug this:
+> 
+>   rcu_scheduler_active = 2, debug_locks = 1
+>   2 locks held by ss/215:
+>    #0: ffff9c740828bec0 (nlk_cb_mutex-SOCK_DIAG){+.+.}-{4:4}, at: __netlink_dump_start+0x84/0x2b0
+>    #1: ffff9c7401d72cd0 (sk_lock-AF_INET6){+.+.}-{0:0}, at: sctp_sock_dump+0x38/0x200
+> 
+>   stack backtrace:
+>   CPU: 0 UID: 0 PID: 215 Comm: ss Not tainted 6.18.0-rc1-00093-g7f864458e9a6 #5 PREEMPT(voluntary)
+>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+>   Call Trace:
+>    <TASK>
+>    dump_stack_lvl+0x5d/0x90
+>    lockdep_rcu_suspicious.cold+0x4e/0xa3
+>    inet_sctp_diag_fill.isra.0+0x4b1/0x5d0
+>    sctp_sock_dump+0x131/0x200
+>    sctp_transport_traverse_process+0x170/0x1b0
+>    ? __pfx_sctp_sock_filter+0x10/0x10
+>    ? __pfx_sctp_sock_dump+0x10/0x10
+>    sctp_diag_dump+0x103/0x140
+>    __inet_diag_dump+0x70/0xb0
+>    netlink_dump+0x148/0x490
+>    __netlink_dump_start+0x1f3/0x2b0
+>    inet_diag_handler_cmd+0xcd/0x100
+>    ? __pfx_inet_diag_dump_start+0x10/0x10
+>    ? __pfx_inet_diag_dump+0x10/0x10
+>    ? __pfx_inet_diag_dump_done+0x10/0x10
+>    sock_diag_rcv_msg+0x18e/0x320
+>    ? __pfx_sock_diag_rcv_msg+0x10/0x10
+>    netlink_rcv_skb+0x4d/0x100
+>    netlink_unicast+0x1d7/0x2b0
+>    netlink_sendmsg+0x203/0x450
+>    ____sys_sendmsg+0x30c/0x340
+>    ___sys_sendmsg+0x94/0xf0
+>    __sys_sendmsg+0x83/0xf0
+>    do_syscall_64+0xbb/0x390
+>    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>    ...
+>    </TASK>
+> 
+> Fixes: 8f840e47f190 ("sctp: add the sctp_diag.c file")
+> Signed-off-by: Stefan Wiehler <stefan.wiehler@nokia.com>
+> ---
+> It might be sufficient to add a check for one of the already held locks,
+> but I lack the domain knowledge to be sure about that...
+> ---
+>  net/sctp/diag.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/net/sctp/diag.c b/net/sctp/diag.c
+> index 996c2018f0e6..1a8761f87bf1 100644
+> --- a/net/sctp/diag.c
+> +++ b/net/sctp/diag.c
+> @@ -73,19 +73,23 @@ static int inet_diag_msg_sctpladdrs_fill(struct sk_buff *skb,
+>  	struct nlattr *attr;
+>  	void *info = NULL;
+>  
+> +	rcu_read_lock();
+>  	list_for_each_entry_rcu(laddr, address_list, list)
+>  		addrcnt++;
+> +	rcu_read_unlock();
+>  
+>  	attr = nla_reserve(skb, INET_DIAG_LOCALS, addrlen * addrcnt);
+>  	if (!attr)
+>  		return -EMSGSIZE;
+>  
+>  	info = nla_data(attr);
+> +	rcu_read_lock();
+>  	list_for_each_entry_rcu(laddr, address_list, list) {
+>  		memcpy(info, &laddr->a, sizeof(laddr->a));
+>  		memset(info + sizeof(laddr->a), 0, addrlen - sizeof(laddr->a));
+>  		info += addrlen;
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Chittim Madhu <madhu.chittim@intel.com>
-Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
----
-This patch was previously submitted as part of series to -net:
-https://lore.kernel.org/netdev/20250822035248.22969-2-emil.s.tantilov@intel.com/
-Changed to -next, as the related follow-up patch was rejected:
-https://lore.kernel.org/netdev/20251001-jk-iwl-net-2025-10-01-v1-3-49fa99e86600@intel.com/
----
- drivers/net/ethernet/intel/idpf/idpf.h        | 12 ++++------
- .../net/ethernet/intel/idpf/idpf_ethtool.c    | 12 +++++-----
- drivers/net/ethernet/intel/idpf/idpf_lib.c    | 24 +++++++++----------
- .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  2 +-
- drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  2 +-
- .../net/ethernet/intel/idpf/idpf_virtchnl.c   |  4 ++--
- drivers/net/ethernet/intel/idpf/xdp.c         |  2 +-
- 7 files changed, 28 insertions(+), 30 deletions(-)
+looks like TOCTOU issue exists here, we should check
+the boundary like this:
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index f0387b83a9ed..dab36c0c3cdc 100644
---- a/drivers/net/ethernet/intel/idpf/idpf.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -131,14 +131,12 @@ enum idpf_cap_field {
- 
- /**
-  * enum idpf_vport_state - Current vport state
-- * @__IDPF_VPORT_DOWN: Vport is down
-- * @__IDPF_VPORT_UP: Vport is up
-- * @__IDPF_VPORT_STATE_LAST: Must be last, number of states
-+ * @IDPF_VPORT_UP: Vport is up
-+ * @IDPF_VPORT_STATE_NBITS: Must be last, number of states
-  */
- enum idpf_vport_state {
--	__IDPF_VPORT_DOWN,
--	__IDPF_VPORT_UP,
--	__IDPF_VPORT_STATE_LAST,
-+	IDPF_VPORT_UP,
-+	IDPF_VPORT_STATE_NBITS
- };
- 
- /**
-@@ -162,7 +160,7 @@ struct idpf_netdev_priv {
- 	u16 vport_idx;
- 	u16 max_tx_hdr_size;
- 	u16 tx_max_bufs;
--	enum idpf_vport_state state;
-+	DECLARE_BITMAP(state, IDPF_VPORT_STATE_NBITS);
- 	struct rtnl_link_stats64 netstats;
- 	spinlock_t stats_lock;
- };
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-index 4c6e52253ae4..3fbe94a4ce6b 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-@@ -414,7 +414,7 @@ static int idpf_get_rxfh(struct net_device *netdev,
- 	}
- 
- 	rss_data = &adapter->vport_config[np->vport_idx]->user_config.rss_data;
--	if (np->state != __IDPF_VPORT_UP)
-+	if (!test_bit(IDPF_VPORT_UP, np->state))
- 		goto unlock_mutex;
- 
- 	rxfh->hfunc = ETH_RSS_HASH_TOP;
-@@ -464,7 +464,7 @@ static int idpf_set_rxfh(struct net_device *netdev,
- 	}
- 
- 	rss_data = &adapter->vport_config[vport->idx]->user_config.rss_data;
--	if (np->state != __IDPF_VPORT_UP)
-+	if (!test_bit(IDPF_VPORT_UP, np->state))
- 		goto unlock_mutex;
- 
- 	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
-@@ -1195,7 +1195,7 @@ static void idpf_get_ethtool_stats(struct net_device *netdev,
- 	idpf_vport_ctrl_lock(netdev);
- 	vport = idpf_netdev_to_vport(netdev);
- 
--	if (np->state != __IDPF_VPORT_UP) {
-+	if (!test_bit(IDPF_VPORT_UP, np->state)) {
- 		idpf_vport_ctrl_unlock(netdev);
- 
- 		return;
-@@ -1347,7 +1347,7 @@ static int idpf_get_q_coalesce(struct net_device *netdev,
- 	idpf_vport_ctrl_lock(netdev);
- 	vport = idpf_netdev_to_vport(netdev);
- 
--	if (np->state != __IDPF_VPORT_UP)
-+	if (!test_bit(IDPF_VPORT_UP, np->state))
- 		goto unlock_mutex;
- 
- 	if (q_num >= vport->num_rxq && q_num >= vport->num_txq) {
-@@ -1535,7 +1535,7 @@ static int idpf_set_coalesce(struct net_device *netdev,
- 	idpf_vport_ctrl_lock(netdev);
- 	vport = idpf_netdev_to_vport(netdev);
- 
--	if (np->state != __IDPF_VPORT_UP)
-+	if (!test_bit(IDPF_VPORT_UP, np->state))
- 		goto unlock_mutex;
- 
- 	for (i = 0; i < vport->num_txq; i++) {
-@@ -1738,7 +1738,7 @@ static void idpf_get_ts_stats(struct net_device *netdev,
- 		ts_stats->err = u64_stats_read(&vport->tstamp_stats.discarded);
- 	} while (u64_stats_fetch_retry(&vport->tstamp_stats.stats_sync, start));
- 
--	if (np->state != __IDPF_VPORT_UP)
-+	if (!test_bit(IDPF_VPORT_UP, np->state))
- 		goto exit;
- 
- 	for (u16 i = 0; i < vport->num_txq_grp; i++) {
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index bd38ecc7872c..d9f6e9c0dcf9 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -542,7 +542,7 @@ static int idpf_del_mac_filter(struct idpf_vport *vport,
- 	}
- 	spin_unlock_bh(&vport_config->mac_filter_list_lock);
- 
--	if (np->state == __IDPF_VPORT_UP) {
-+	if (test_bit(IDPF_VPORT_UP, np->state)) {
- 		int err;
- 
- 		err = idpf_add_del_mac_filters(vport, np, false, async);
-@@ -613,7 +613,7 @@ static int idpf_add_mac_filter(struct idpf_vport *vport,
- 	if (err)
- 		return err;
- 
--	if (np->state == __IDPF_VPORT_UP)
-+	if (test_bit(IDPF_VPORT_UP, np->state))
- 		err = idpf_add_del_mac_filters(vport, np, true, async);
- 
- 	return err;
-@@ -917,7 +917,7 @@ static void idpf_vport_stop(struct idpf_vport *vport, bool rtnl)
- {
- 	struct idpf_netdev_priv *np = netdev_priv(vport->netdev);
- 
--	if (np->state <= __IDPF_VPORT_DOWN)
-+	if (!test_bit(IDPF_VPORT_UP, np->state))
- 		return;
- 
- 	if (rtnl)
-@@ -944,7 +944,7 @@ static void idpf_vport_stop(struct idpf_vport *vport, bool rtnl)
- 	idpf_xdp_rxq_info_deinit_all(vport);
- 	idpf_vport_queues_rel(vport);
- 	idpf_vport_intr_rel(vport);
--	np->state = __IDPF_VPORT_DOWN;
-+	clear_bit(IDPF_VPORT_UP, np->state);
- 
- 	if (rtnl)
- 		rtnl_unlock();
-@@ -1370,7 +1370,7 @@ static int idpf_up_complete(struct idpf_vport *vport)
- 		netif_tx_start_all_queues(vport->netdev);
- 	}
- 
--	np->state = __IDPF_VPORT_UP;
-+	set_bit(IDPF_VPORT_UP, np->state);
- 
- 	return 0;
- }
-@@ -1416,7 +1416,7 @@ static int idpf_vport_open(struct idpf_vport *vport, bool rtnl)
- 	struct idpf_vport_config *vport_config;
- 	int err;
- 
--	if (np->state != __IDPF_VPORT_DOWN)
-+	if (test_bit(IDPF_VPORT_UP, np->state))
- 		return -EBUSY;
- 
- 	if (rtnl)
-@@ -1628,7 +1628,7 @@ void idpf_init_task(struct work_struct *work)
- 
- 	/* Once state is put into DOWN, driver is ready for dev_open */
- 	np = netdev_priv(vport->netdev);
--	np->state = __IDPF_VPORT_DOWN;
-+	clear_bit(IDPF_VPORT_UP, np->state);
- 	if (test_and_clear_bit(IDPF_VPORT_UP_REQUESTED, vport_config->flags))
- 		idpf_vport_open(vport, true);
- 
-@@ -1827,7 +1827,7 @@ static void idpf_set_vport_state(struct idpf_adapter *adapter)
- 			continue;
- 
- 		np = netdev_priv(adapter->netdevs[i]);
--		if (np->state == __IDPF_VPORT_UP)
-+		if (test_bit(IDPF_VPORT_UP, np->state))
- 			set_bit(IDPF_VPORT_UP_REQUESTED,
- 				adapter->vport_config[i]->flags);
- 	}
-@@ -1965,7 +1965,7 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
- 			     enum idpf_vport_reset_cause reset_cause)
- {
- 	struct idpf_netdev_priv *np = netdev_priv(vport->netdev);
--	enum idpf_vport_state current_state = np->state;
-+	bool vport_is_up = test_bit(IDPF_VPORT_UP, np->state);
- 	struct idpf_adapter *adapter = vport->adapter;
- 	struct idpf_vport *new_vport;
- 	int err;
-@@ -2016,7 +2016,7 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
- 		goto free_vport;
- 	}
- 
--	if (current_state <= __IDPF_VPORT_DOWN) {
-+	if (!vport_is_up) {
- 		idpf_send_delete_queues_msg(vport);
- 	} else {
- 		set_bit(IDPF_VPORT_DEL_QUEUES, vport->flags);
-@@ -2049,7 +2049,7 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
- 	if (err)
- 		goto err_open;
- 
--	if (current_state == __IDPF_VPORT_UP)
-+	if (vport_is_up)
- 		err = idpf_vport_open(vport, false);
- 
- 	goto free_vport;
-@@ -2059,7 +2059,7 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
- 				 vport->num_rxq, vport->num_bufq);
- 
- err_open:
--	if (current_state == __IDPF_VPORT_UP)
-+	if (vport_is_up)
- 		idpf_vport_open(vport, false);
- 
- free_vport:
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-index 61e613066140..e3ddf18dcbf5 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-@@ -570,7 +570,7 @@ static bool idpf_tx_singleq_clean(struct idpf_tx_queue *tx_q, int napi_budget,
- 	np = netdev_priv(tx_q->netdev);
- 	nq = netdev_get_tx_queue(tx_q->netdev, tx_q->idx);
- 
--	dont_wake = np->state != __IDPF_VPORT_UP ||
-+	dont_wake = !test_bit(IDPF_VPORT_UP, np->state) ||
- 		    !netif_carrier_ok(tx_q->netdev);
- 	__netif_txq_completed_wake(nq, ss.packets, ss.bytes,
- 				   IDPF_DESC_UNUSED(tx_q), IDPF_TX_WAKE_THRESH,
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 828f7c444d30..1993a3b0da59 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -2275,7 +2275,7 @@ static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
- 		/* Update BQL */
- 		nq = netdev_get_tx_queue(tx_q->netdev, tx_q->idx);
- 
--		dont_wake = !complq_ok || np->state != __IDPF_VPORT_UP ||
-+		dont_wake = !complq_ok || !test_bit(IDPF_VPORT_UP, np->state) ||
- 			    !netif_carrier_ok(tx_q->netdev);
- 		/* Check if the TXQ needs to and can be restarted */
- 		__netif_txq_completed_wake(nq, tx_q->cleaned_pkts, tx_q->cleaned_bytes,
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index cbb5fa30f5a0..44cd4b466c48 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -68,7 +68,7 @@ static void idpf_handle_event_link(struct idpf_adapter *adapter,
- 
- 	vport->link_up = v2e->link_status;
- 
--	if (np->state != __IDPF_VPORT_UP)
-+	if (!test_bit(IDPF_VPORT_UP, np->state))
- 		return;
- 
- 	if (vport->link_up) {
-@@ -2755,7 +2755,7 @@ int idpf_send_get_stats_msg(struct idpf_vport *vport)
- 
- 
- 	/* Don't send get_stats message if the link is down */
--	if (np->state <= __IDPF_VPORT_DOWN)
-+	if (!test_bit(IDPF_VPORT_UP, np->state))
- 		return 0;
- 
- 	stats_msg.vport_id = cpu_to_le32(vport->vport_id);
-diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
-index 21ce25b0567f..958d16f87424 100644
---- a/drivers/net/ethernet/intel/idpf/xdp.c
-+++ b/drivers/net/ethernet/intel/idpf/xdp.c
-@@ -418,7 +418,7 @@ static int idpf_xdp_setup_prog(struct idpf_vport *vport,
- 	if (test_bit(IDPF_REMOVE_IN_PROG, vport->adapter->flags) ||
- 	    !test_bit(IDPF_VPORT_REG_NETDEV, cfg->flags) ||
- 	    !!vport->xdp_prog == !!prog) {
--		if (np->state == __IDPF_VPORT_UP)
-+		if (test_bit(IDPF_VPORT_UP, np->state))
- 			idpf_xdp_copy_prog_to_rqs(vport, prog);
- 
- 		old = xchg(&vport->xdp_prog, prog);
--- 
-2.37.3
+		if (!--addrcnt)
+			break;
 
+Otherwise KASAN would complain about an out-of-bound write.
+
+>  	}
+> +	rcu_read_unlock();
+>  
+>  	return 0;
+>  }
+> -- 
+> 2.51.0
 
