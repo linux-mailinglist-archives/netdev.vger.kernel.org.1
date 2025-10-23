@@ -1,185 +1,178 @@
-Return-Path: <netdev+bounces-232201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBB45C0270A
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 18:26:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5032C02716
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 18:27:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 305273B03D0
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:24:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A147189F5AE
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 16:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5361B33375D;
-	Thu, 23 Oct 2025 16:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E863A2D7D27;
+	Thu, 23 Oct 2025 16:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PnZNrSW6"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="WlOenW9l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.42.203.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748B9314B9D;
-	Thu, 23 Oct 2025 16:23:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111012D46A7;
+	Thu, 23 Oct 2025 16:27:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.42.203.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761236606; cv=none; b=WJzh8LpvzdhxHYrEVh0veatsFRR6jczHhOEq4qH1rZVoquuzcb4LmxmHS9t2vsUEAZvsNMj7H7ssDzpJxfj1+kbybzDsEmf0ASfdldSdM7HrruPcUT9HFpqlTFh840goBp90Tc4gJPtcOiVyMTRs9hDRvAjyL7SqS3XKxiUZEtA=
+	t=1761236846; cv=none; b=GT1wwpavC+QEWjH9uiD7mTGyhhKpM0wmaCAAvMPuyIgwIOxCHyfenFd1wmQ04ZkDPP8iExppwtRZBzsYsHp9aoYHvxQfAahhfqWLlSOXGoKSMPEYGcZwKWmRIKRFGjuz7ER/Bu4bzfFm2kcDSUc4qPf5tv4e4N5PZVHuUkHOEmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761236606; c=relaxed/simple;
-	bh=BoI04ne66BgdO6RQx8tLnItxQ9eDqwU1DrU84iIL4D8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WUKUX5uWXKmpkfwL3hBSEmIXLxQHqnO3tupba6YEz3ug4fecKpKPzsXwIaWlvN3EgcizJIcWbca3ZqILgy8ilzeD5eRer7uI0sMlOYd5AqTiwkjsTiVlmE8UzxITxzGhrCdIWp60cxEUENoSm2e85xqfPpOgrufUote8bc87qRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PnZNrSW6; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id A7B401A1619;
-	Thu, 23 Oct 2025 16:23:22 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 7E275606DE;
-	Thu, 23 Oct 2025 16:23:22 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 50C5F102F2475;
-	Thu, 23 Oct 2025 18:23:20 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761236601; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=ZJv3iwv2xhtLbUdm9xnAIqJx8pCFt3cC26JBlEGXT88=;
-	b=PnZNrSW6hlNuyaCxQD0TaSMfii29T1liLZdhZfgXwf3EEcPRWeRETPPMAKz2//807EQBkv
-	MvsTg+4Kk26ZQDIvB8HX6WKG0BXY27xHD+PW6UhgWjGyZsq9DH/y0+5q99zevUaR+fX7Vu
-	aCtqBK9JwqzDO4/DumTh6iW/gm22JGlfmzoUdzEvS5coJq08hUun7uyBEcX73ySQntomSf
-	SAiDWTi6VglIK8NICve4GYgNtSFaYAIVJSARB9jcpD6qoArcylR5hF5/OFh6KoeRM2C/Hk
-	tHQpohCaStWu6N77Nr8XbVV44WhPPLRzy7YtkHPG+poT/1Buzx8x4yp8FBxCqw==
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Thu, 23 Oct 2025 18:22:55 +0200
-Subject: [PATCH net-next v3 5/5] net: macb: Add "mobileye,eyeq5-gem"
- compatible
+	s=arc-20240116; t=1761236846; c=relaxed/simple;
+	bh=Grs0gM9dzqfJn35R0W9gZX6wLE9dzv8v3TtYtjxwN38=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Wyqm1qSRGXNEiyJJEyF6ZGH/DxycLuI7QChmrYA7SBlNcZaHsx760W7xd3xNtqb9PxcAQm7LLZVgOkboEWhUpcVUo953mvdUUI3sg3FvYD9WBC9uXF4poOU/11oENwxLw8yQ8gYcSfi4k0CMDs8PFCrB+PNfPQl0vLv1l0gq3lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=WlOenW9l; arc=none smtp.client-ip=52.42.203.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1761236845; x=1792772845;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=2lBkDsdUPck2BkjmBB98y45Ia11Tv+czovWMGGK0xbU=;
+  b=WlOenW9l1lxRKm1tsARaU42w+BfCrASyqYJS50zecnFcdsZ+/PHVot+C
+   Yr0a1jnkHVWEtJbuLdZirwe+hdGsoVdsXtkXe5DhVyJ8MFBlxDZTVXxDK
+   MftfWeJqFTGFLIpm+JQPBnQg9BE31k/kOl1W3OdO6pIWF1hg2jNIyfv9W
+   c4obKXTbtYs32sCli22NXOd7zxu6EnY7gXcf4e5GnUriEiaNHHG+usY6i
+   dQrP+3rZIpNHffkKY9M/r8VFlK3Jhillht5lvicofKPH9UY7TfETFyZDa
+   RPr23vvIEllz1MEwRq1pJpsVhzqAhgYvFZLYeiVNskoL70S6fEAy4R0s0
+   g==;
+X-CSE-ConnectionGUID: 13dYSAKUR5iCcQWCEwQOCA==
+X-CSE-MsgGUID: FTESq6ZuRNqRxO6Pwk4pSw==
+X-IronPort-AV: E=Sophos;i="6.19,250,1754956800"; 
+   d="scan'208";a="5573970"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 16:27:22 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [205.251.233.236:31281]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.51:2525] with esmtp (Farcaster)
+ id 8f5bdf07-dcf1-41c5-b591-846f69aa12e2; Thu, 23 Oct 2025 16:27:22 +0000 (UTC)
+X-Farcaster-Flow-ID: 8f5bdf07-dcf1-41c5-b591-846f69aa12e2
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Thu, 23 Oct 2025 16:27:22 +0000
+Received: from b0be8375a521.amazon.com (10.37.244.11) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Thu, 23 Oct 2025 16:27:19 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <kuba@kernel.org>
+CC: <aleksander.lobakin@intel.com>, <andrew+netdev@lunn.ch>,
+	<anthony.l.nguyen@intel.com>, <corbet@lwn.net>, <davem@davemloft.net>,
+	<edumazet@google.com>, <enjuk@amazon.com>, <horms@kernel.org>,
+	<jacob.e.keller@intel.com>, <jiri@resnulli.us>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>, <sx.rinitha@intel.com>
+Subject: Re: [PATCH net-next v2 13/14] ixgbe: preserve RSS indirection table across admin down/up
+Date: Fri, 24 Oct 2025 01:26:38 +0900
+Message-ID: <20251023162711.97625-2-enjuk@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20251022172649.0faa0548@kernel.org>
+References: <20251022172649.0faa0548@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20251023-macb-eyeq5-v3-5-af509422c204@bootlin.com>
-References: <20251023-macb-eyeq5-v3-0-af509422c204@bootlin.com>
-In-Reply-To: <20251023-macb-eyeq5-v3-0-af509422c204@bootlin.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- =?utf-8?q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>, 
- =?utf-8?q?Gr=C3=A9gory_Clement?= <gregory.clement@bootlin.com>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
- =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: b4 0.14.3
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWB004.ant.amazon.com (10.13.139.170) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Add support for the two GEM instances inside Mobileye EyeQ5 SoCs, using
-compatible "mobileye,eyeq5-gem". With it, add a custom init sequence
-that must grab a generic PHY and initialise it.
+On Wed, 22 Oct 2025 17:26:49 -0700, Jakub Kicinski wrote:
 
-We use bp->phy in both RGMII and SGMII cases. Tell our mode by adding a
-phy_set_mode_ext() during macb_open(), before phy_power_on(). We are
-the first users of bp->phy that use it in non-SGMII cases.
+>On Wed, 22 Oct 2025 12:40:45 +0900 Kohei Enju wrote:
+>> On Tue, 21 Oct 2025 16:10:06 -0700, Jakub Kicinski wrote:
+>> >On Tue, 21 Oct 2025 12:59:34 +0900 Kohei Enju wrote:  
+>> >> For example, consider a scenario where the queue count is 8 with user
+>> >> configuration containing values from 0 to 7. When queue count changes
+>> >> from 8 to 4 and we skip the reinitialization in this scenario, entries
+>> >> pointing to queues 4-7 become invalid. The same issue applies when the
+>> >> RETA table size changes.  
+>> >
+>> >Core should reject this. See ethtool_check_max_channel()  
+>> 
+>> Indeed, you're right that the situation above will be rejected. I missed
+>> it.
+>> 
+>> BTW, I think reinitializing the RETA table when queue count changes or
+>> RETA table size changes is reasonable for predictability and safety.
+>> Does this approach make sense to you?
+>
+>Yes, if !netif_is_rxfh_configured() re-initializing is expected.
 
-The phy_set_mode_ext() call is made unconditionally. It cannot cause
-issues on platforms where !bp->phy or !bp->phy->ops->set_mode as, in
-those cases, the call is a no-op (returning zero). From reading
-upstream DTS, we can figure out that no platform has a bp->phy and a
-PHY driver that has a .set_mode() implementation:
- - cdns,zynqmp-gem: no DTS upstream.
- - microchip,mpfs-macb: microchip/mpfs.dtsi, &mac0..1, no PHY attached.
- - xlnx,versal-gem: xilinx/versal-net.dtsi, &gem0..1, no PHY attached.
- - xlnx,zynqmp-gem: xilinx/zynqmp.dtsi, &gem0..3, PHY attached to
-   drivers/phy/xilinx/phy-zynqmp.c which has no .set_mode().
+I got it.
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
----
- drivers/net/ethernet/cadence/macb_main.c | 38 ++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+>
+>> >> Furthermore, IIUC, adding netif_is_rxfh_configured() to the current
+>> >> condition wouldn't provide additional benefit. When parameters remain
+>> >> unchanged, regardless of netif_is_rxfh_configured(), we already preserve
+>> >> the RETA entries which might be user-configured or default values,   
+>> >
+>> >User may decide to "isolate" (take out of RSS) a lower queue,
+>> >to configure it for AF_XDP or other form of zero-copy. Install
+>> >explicit rules to direct traffic to that queue. If you reset
+>> >the RSS table random traffic will get stranded in the ZC queue
+>> >(== dropped).
+>> 
+>> You're correct about the ZC queue scenario. The original implementation
+>> (before this patch) would indeed cause this problem by unconditionally
+>> reinitializing.
+>> 
+>> I believe this patch addresses that issue - it preserves the user
+>> configuration since neither queue count nor RETA table size changes in
+>> that case. If I'm misunderstanding your scenario, please let me know.
+>> 
+>> I could update the logic to explicitly check netif_is_rxfh_configured()
+>> as in [1], though the actual behavior would be the same as [2] since
+>> the default RETA table is a deterministic function of (rss_indices,
+>> reta_entries):
+>> 
+>> [1] Check user configuration explicitly:
+>>     if (!netif_is_rxfh_configured(adapter->netdev) ||
+>>         adapter->last_rss_indices != rss_i ||
+>>         adapter->last_reta_entries != reta_entries) {
+>>         // reinitialize
+>>     }
+>> 
+>> [2] Current patch:
+>>     if (adapter->last_rss_indices != rss_i ||
+>>         adapter->last_reta_entries != reta_entries) {
+>>         // reinitialize
+>>     }
+>> 
+>> Do you have any preference between these approaches, or would you
+>> recommend a different solution?
+>
+>I was expecting something like:
+>
+>if (netif_is_rxfh_configured(adapter->netdev)) {
+>	if (!check_that_rss_is_okay()) {
+>		/* This should never happen, barring FW errors etc */
+>		warn("user configuration lost due to XYZ");
+>		reinit();
+>	}
+>} else if (...rss_ind != rss_id ||
+>           ...reta_entries != reta_entries) {
+>	reinit();
+>}
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 44188e7eee56..b1ed98d9c438 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -2965,6 +2965,10 @@ static int macb_open(struct net_device *dev)
- 
- 	macb_init_hw(bp);
- 
-+	err = phy_set_mode_ext(bp->phy, PHY_MODE_ETHERNET, bp->phy_interface);
-+	if (err)
-+		goto reset_hw;
-+
- 	err = phy_power_on(bp->phy);
- 	if (err)
- 		goto reset_hw;
-@@ -5189,6 +5193,28 @@ static int init_reset_optional(struct platform_device *pdev)
- 	return ret;
- }
- 
-+static int eyeq5_init(struct platform_device *pdev)
-+{
-+	struct net_device *netdev = platform_get_drvdata(pdev);
-+	struct macb *bp = netdev_priv(netdev);
-+	struct device *dev = &pdev->dev;
-+	int ret;
-+
-+	bp->phy = devm_phy_get(dev, NULL);
-+	if (IS_ERR(bp->phy))
-+		return dev_err_probe(dev, PTR_ERR(bp->phy),
-+				     "failed to get PHY\n");
-+
-+	ret = phy_init(bp->phy);
-+	if (ret)
-+		return dev_err_probe(dev, ret, "failed to init PHY\n");
-+
-+	ret = macb_init(pdev);
-+	if (ret)
-+		phy_exit(bp->phy);
-+	return ret;
-+}
-+
- static const struct macb_usrio_config sama7g5_usrio = {
- 	.mii = 0,
- 	.rmii = 1,
-@@ -5343,6 +5369,17 @@ static const struct macb_config versal_config = {
- 	.usrio = &macb_default_usrio,
- };
- 
-+static const struct macb_config eyeq5_config = {
-+	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_JUMBO |
-+		MACB_CAPS_GEM_HAS_PTP | MACB_CAPS_QUEUE_DISABLE |
-+		MACB_CAPS_NO_LSO,
-+	.dma_burst_length = 16,
-+	.clk_init = macb_clk_init,
-+	.init = eyeq5_init,
-+	.jumbo_max_len = 10240,
-+	.usrio = &macb_default_usrio,
-+};
-+
- static const struct macb_config raspberrypi_rp1_config = {
- 	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_CLK_HW_CHG |
- 		MACB_CAPS_JUMBO |
-@@ -5374,6 +5411,7 @@ static const struct of_device_id macb_dt_ids[] = {
- 	{ .compatible = "microchip,mpfs-macb", .data = &mpfs_config },
- 	{ .compatible = "microchip,sama7g5-gem", .data = &sama7g5_gem_config },
- 	{ .compatible = "microchip,sama7g5-emac", .data = &sama7g5_emac_config },
-+	{ .compatible = "mobileye,eyeq5-gem", .data = &eyeq5_config },
- 	{ .compatible = "raspberrypi,rp1-gem", .data = &raspberrypi_rp1_config },
- 	{ .compatible = "xlnx,zynqmp-gem", .data = &zynqmp_config},
- 	{ .compatible = "xlnx,zynq-gem", .data = &zynq_config },
+Thank you for clarification. 
 
--- 
-2.51.1
+At first glance, noting that check_that_rss_is_okay() would return false
+when the RETA table size is larger than the previous one, since
+user-configuration doesn't exist for the expanded portion of the RETA
+table. This should happen in realistic scenarios even though there are
+no hardware-related or HW errors.
 
+Anyway I'll refine the patch using netif_is_rxfh_configured() and then
+submit to iwl-next first.
 
