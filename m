@@ -1,190 +1,146 @@
-Return-Path: <netdev+bounces-232092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 795F4C00C51
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 13:34:59 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 494ACC00D17
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 13:41:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA6F23B2BD6
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 11:31:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AEF1050199F
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 11:41:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F6530BB82;
-	Thu, 23 Oct 2025 11:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637CB30DD2F;
+	Thu, 23 Oct 2025 11:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HmQniJf6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BSHez1p4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0E62ECD3F;
-	Thu, 23 Oct 2025 11:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E42D1FA272
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 11:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761219073; cv=none; b=YccUGX2y1ljHEi7O8J84uS6fxpHVuwah35T6qHQxZBCj2eW+TYFIsCUHruCa0Lra12i6afO8ZgnjAnc/yqGx2YIakwCE48DcLaWvp/wHdZ0hDAYFJkhNvlLgbQ8hItE9OWj3bSoBBeQC0GSZapogC9GSTeUykL/fQX7Ifu7THPM=
+	t=1761219693; cv=none; b=bGtNxQtcvkn/d238Nh9dYr0gFmTV8zp05KmHVccFs4mQiIH82/TYzAUPeXmOHEPp/csewven9o3zRbW27uOz5GH2U6LoS47pwMw2sIL/lZa+kj7zUpQXQslESjyhE3Iw/wuvKWH93kVeY+jzk4stdvD4ZRpHSN3HkRwxFqVjwsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761219073; c=relaxed/simple;
-	bh=ARRC88WkJJjPqGQVjd2vob6eGn9St1j7rknF1fJ82N0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AC/JmDRBFk8fW9nRVrBTpptlJcjossd3m7GeDnGTaE4wHbWk9YMBtrOaMqeqPO/3lM6mVI+EidVFdWI0HwlWNWSYGaP3yaHLij12x9XGuEGhw/JyZbOhENyC3KOv3CCkRkfVnkmTDlVpbT6uQM2L05hF6s31YV3aGeZnztVTmVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HmQniJf6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DE70C4CEE7;
-	Thu, 23 Oct 2025 11:31:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761219073;
-	bh=ARRC88WkJJjPqGQVjd2vob6eGn9St1j7rknF1fJ82N0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HmQniJf68vsKJSwbMC61UqGNxCcmsJbxY8s0x9InapF38RFtMmBFYOhZqxv8kbNyR
-	 0w9xj7J8vJt9vxd3Oqz+CP9XxW6QuFATzVOVN5OzIL0y6MkHBOuFq6SPRO9tYJZnbp
-	 tAmOdNU2A2ZbGszYzK9h1JFd4YvuDpSA4bWthHNyTjCvMypP1mw4zAaIjyivCx/DGL
-	 oNmUiTLjizWArrkalSaboq4jX4hNzn1Z4YouanCcmSHrVHaAyE/k5KE0PlfglmaxPa
-	 Qf7fI0EXuNK35Q3bj6C/zDTf7T+GE4YQdi5PY49Of30kLbobPSMOFOXVa1gKjeoOgF
-	 UmjpKxqt7PBlg==
-Date: Thu, 23 Oct 2025 12:31:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, andrey.bokhanko@huawei.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH net-next 1/8] ipvlan: Implement learnable L2-bridge
-Message-ID: <aPoR_HWEgmrs97Qd@horms.kernel.org>
-References: <20251021144410.257905-1-skorodumov.dmitry@huawei.com>
- <20251021144410.257905-2-skorodumov.dmitry@huawei.com>
- <aPjo76T8c8SbOB04@horms.kernel.org>
- <58174e6d-f473-4e95-b78e-7a4a9711174e@huawei.com>
+	s=arc-20240116; t=1761219693; c=relaxed/simple;
+	bh=tCWB8eZl8/ULIrv/Lv1JyFMJF12YEm+OEzrPMhTM5Sg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iO6IJgYSy97JT+4+6oQd/CRrexKnfjBqvhj8T5X9/M5vTkbRxJMrfDqecuAeuNv0enMp5iPC+prU39stqhfBYRzpow5MttT8Sx7YZyS4CNHUq6eGYRrsGP+B22gi5VbnRNZ+mqBcWH1Pm3kjlPmko1kqASTGFdO5xd68JVuwLuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BSHez1p4; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-471075c0a18so7874455e9.1
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 04:41:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761219690; x=1761824490; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lZyKD383bQoqOxFZk5G6Ho+/pzc/ouF37MPGyirm0sM=;
+        b=BSHez1p47gwsvywGYwab2fMcPReF/+6/m4kG6H0EFEUxqVLLRQ9cBsfLenW1TUbqFf
+         1NcchsVjjDBJEZI087dXzIGviz1a2lBSznlVU4EzYPvJ8dp5xj6Ra6icAZ+1aSPxzbmE
+         tG1Zg5OSPQpabLlH6Pud40I3fqKZxBHkE2OGEXVIgvx4u3eL5LZkn0xBD1YYa1ES0/bu
+         8wLkKQREkHRzkIithzfB7rZyuSsBos+liyBKGYqxbPjQZ/wGGu2soxTfTpJGz4kJ+65E
+         qr4CP+2J5R1jnPvO3nSTts94zEemIQisAzVjE7oSi7TDo7XxFVRMkwduluaEM4/KH79J
+         QnXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761219690; x=1761824490;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lZyKD383bQoqOxFZk5G6Ho+/pzc/ouF37MPGyirm0sM=;
+        b=r2aJYql2LwWmr8KncjVVwKHnEhN3ySQoFkl/CVxRCjeGgN1ncP8ETb9Yuzxfnguhmc
+         z+lRPZhxnAnmpdALdTtQ/jM3Vm45fIMBGoDZHW9C69Q+XD1PRcinvUZM1yput6hu8T2d
+         /rzbyvieyMzOZoCmQj2Q91swGmjTGd6M7dfJDfi80iqdxiqJMbVYZvPGMkUAi5w9AR3O
+         snHUFoOx4aLZTfTnPkrspmnVIXGcYPOpMVWITI8m8rWrjUvMHt8fzZvCNuj+Gtx36yFD
+         c6BDkq+5+pWK6u/nT6HhzNJEovnFQqTbr5QnqIpGwPjtSEbHwPEXAkl/fTKYB2KBKn2R
+         dVbA==
+X-Forwarded-Encrypted: i=1; AJvYcCW3SyVSdlfNYYiyCFbOklBjZ38+KkwzH2sFKT3Tf6UmSO9Qf9nlOikXFT05yEEZB7RgkP8umpc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxeO0Y4J1Hzb3nokO0u0euLQSc/r4/WL0bqZ0ElSS9iPqRrfgy
+	zatQ/+1WVngQQOjB1kJo30AQmKIS1m+QLCPhxmRbudweouWc+SIHF69m
+X-Gm-Gg: ASbGncvaMNuWzwvi74UyXPJ0BAl/SB1OCCvfcehV5/KwQfjMJYdY+zkp15D5s40W/Fg
+	iAYUCtRQbGAjHIBGvIhMLJQdvjEnojB5UcbKWMz/DkMiSRhsgsdNuHlILoCnNDOIj1EU6pLmOu+
+	CPDBSCu5+G/f5nBp3mrkZG0lwViT6uZskkVa7n2VSRRARvzBg72sXGJkoicRNdoFbOoXVXbiKXQ
+	ky4ldwgJP2E+WyQxfY4KNB7xvmM0b3/Ths/cYYMhXtnRuCbtQG1heVI9Rty/OWm0AF+4Aw/qifV
+	VbFvsJfSQlu70ZK0m2Crjq34w0KMKpBbHDLddEGQ6hy6kWeFp2wrMXGByNoEyvOYM1kmt58HF39
+	LSXZ7SMeVpnsViokNjBcyYSo/Q8wTF+jTvNShEq7JSkEkiPo0u+dOxILJ/HL6UTPuBa6CGHmpKQ
+	QNOMwr6Ep8fZbUzd8imTG4333x6NKUGHMy7y5MWrj7LA==
+X-Google-Smtp-Source: AGHT+IGlUn2L6ygzDQsBh/Eml4gQWf9e/nvZjjW9f4ITDsLcyuehhyiV2w5QA4lrO4ML01ofHt+lFA==
+X-Received: by 2002:a05:600c:3ba1:b0:46e:47cc:a17e with SMTP id 5b1f17b1804b1-47117870544mr196707655e9.1.1761219689367;
+        Thu, 23 Oct 2025 04:41:29 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475c4378cbesm89230435e9.16.2025.10.23.04.41.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Oct 2025 04:41:29 -0700 (PDT)
+Date: Thu, 23 Oct 2025 12:40:43 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Kees Cook <kees@kernel.org>, Jakub Kicinski <kuba@kernel.org>, "Gustavo
+ A. R. Silva" <gustavo@embeddedor.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
+ <john.fastabend@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Kuniyuki
+ Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v3 1/9] net: Add struct sockaddr_unspec for sockaddr of
+ unknown length
+Message-ID: <20251023124043.3dab5646@pumpkin>
+In-Reply-To: <268ee657-903a-4271-9e17-fcf1dc79b92c@redhat.com>
+References: <20251020212125.make.115-kees@kernel.org>
+	<20251020212639.1223484-1-kees@kernel.org>
+	<268ee657-903a-4271-9e17-fcf1dc79b92c@redhat.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <58174e6d-f473-4e95-b78e-7a4a9711174e@huawei.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 23, 2025 at 01:21:20PM +0300, Dmitry Skorodumov wrote:
-> On 22.10.2025 17:23, Simon Horman wrote:
-> > On Tue, Oct 21, 2025 at 05:44:03PM +0300, Dmitry Skorodumov wrote:
-> >> Now it is possible to create link in L2E mode: learnable
-> >> bridge. The IPs will be learned from TX-packets of child interfaces.
-> > Is there a standard for this approach - where does the L2E name come from?
-> 
-> Actually, I meant "E" here as "Extended". But more or less standard naming - is "MAC NAT" - "Mac network address translation". I discussed a bit naming with LLM, and it suggested name "macsnat".. looks like  it is a better name. Hope it is ok, but I don't mind to rename if anyone has better idea
+On Thu, 23 Oct 2025 12:43:06 +0200
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-I was more curious than anything else. But perhaps it would
-be worth providing some explanation of the name in the
-commit message.
+> On 10/20/25 11:26 PM, Kees Cook wrote:
+> > Add flexible sockaddr structure to support addresses longer than the
+> > traditional 14-byte struct sockaddr::sa_data limitation without
+> > requiring the full 128-byte sa_data of struct sockaddr_storage. This
+> > allows the network APIs to pass around a pointer to an object that
+> > isn't lying to the compiler about how big it is, but must be accompanied
+> > by its actual size as an additional parameter.
+> > 
+> > It's possible we may way to migrate to including the size with the
+> > struct in the future, e.g.:
+> > 
+> > struct sockaddr_unspec {
+> > 	u16 sa_data_len;
+> > 	u16 sa_family;
+> > 	u8  sa_data[] __counted_by(sa_data_len);
+> > };  
+> 
+> Side note: sockaddr_unspec is possibly not the optimal name, as
+> AF_UNSPEC has a specific meaning/semantic.
+> 
+> Name-wise, I think 'sockaddr_sized' would be better,
 
-...
+Or even sockaddr_unsized ?
 
-> >> +static void ipvlan_addr_learn(struct ipvl_dev *ipvlan, void *lyr3h,
-> >> +			      int addr_type)
-> >> +{
-> >> +	void *addr = NULL;
-> >> +	bool is_v6;
-> >> +
-> >> +	switch (addr_type) {
-> >> +#if IS_ENABLED(CONFIG_IPV6)
-> >> +	/* No need to handle IPVL_ICMPV6, since it never has valid src-address */
-> >> +	case IPVL_IPV6: {
-> >> +		struct ipv6hdr *ip6h;
-> >> +
-> >> +		ip6h = (struct ipv6hdr *)lyr3h;
-> >> +		if (!is_ipv6_usable(&ip6h->saddr))
-> > It is preferred to avoid #if / #ifdef in order to improve compile coverage
-> > (and, I would argue, readability).
-> ..
-> > In this case I think that can be achieved by changing the line above to:
-> >
-> > 		if (!IS_ENABLED(CONFIG_IPV6) || !is_ipv6_usable(&ip6h->saddr))
-> >
-> > I think it would be interesting to see if a similar approach can be used
-> > to remove other #if CONFIG_IPV6 conditions in this file, and if successful
-> > provide that as a clean-up as the opening patch in this series.
-> >
-> > However, without that, I can see how one could argue for the approach
-> > you have taken here on the basis of consistency.
-> >
-> 
-> Hmmmm.... this raises a complicated for me questions of testing this refactoring: 
-> 
-> - whether IPv6 specific functions (like csum_ipv6_magic(), register_inet6addr_notifier()) are available if kernel is compiled without CONFIG_IPV6
-> 
-> - ideally the code should be retested with kernel without CONFIG_IPV6
-> 
-> This looks like a separate work that requires more or less additional efforts...
+> but I agree with David the struct may cause unaligned access problems.
 
-Understood, I agree this can be left as future work.
+It probably also wants the 'sized_by' attribute rather than 'counted_by'.
+So wherever the length is saved it is the length the user supplied
+for the structure (or the sizeof the protocol-specific one).
+
+	David
+
 
 > 
-> > static int ipvlan_xmit_mode_l2(struct sk_buff *skb, struct net_device *dev)
-> >>  {
-> >> -	const struct ipvl_dev *ipvlan = netdev_priv(dev);
-> >> -	struct ethhdr *eth = skb_eth_hdr(skb);
-> >> -	struct ipvl_addr *addr;
-> >>  	void *lyr3h;
-> >> +	struct ipvl_addr *addr;
-> >>  	int addr_type;
-> >> +	bool same_mac_addr;
-> >> +	struct ipvl_dev *ipvlan = netdev_priv(dev);
-> >> +	struct ethhdr *eth = skb_eth_hdr(skb);
-> > I realise that the convention is not followed in the existing code,
-> > but please prefer to arrange local variables in reverse xmas tree order -
-> > longest line to shortest.
-> I fixed all my changes to follow this style, except one - where it seems a bit unnatural to to declare dependent variable before "parent" variable. Hope it is ok.
+> /P
+> 
+> 
 
-I would lean towards reverse xmas here too.
-But I understand if you feel otherwise.
-And given the current state of this file, I think that is ok.
-
-> >> +	    ether_addr_equal(eth->h_source, dev->dev_addr)) {
-> >> +		/* ignore tx-packets from host */
-> >> +		goto out_drop;
-> >> +	}
-> >> +
-> >> +	same_mac_addr = ether_addr_equal(eth->h_dest, eth->h_source);
-> >> +
-> >> +	lyr3h = ipvlan_get_L3_hdr(ipvlan->port, skb, &addr_type);
-> >>  
-> >> -	if (!ipvlan_is_vepa(ipvlan->port) &&
-> >> -	    ether_addr_equal(eth->h_dest, eth->h_source)) {
-> >> -		lyr3h = ipvlan_get_L3_hdr(ipvlan->port, skb, &addr_type);
-> >> +	if (ipvlan_is_learnable(ipvlan->port)) {
-> >> +		if (lyr3h)
-> >> +			ipvlan_addr_learn(ipvlan, lyr3h, addr_type);
-> >> +		/* Mark SKB in advance */
-> >> +		skb = skb_share_check(skb, GFP_ATOMIC);
-> >> +		if (!skb)
-> >> +			return NET_XMIT_DROP;
-> > I think that when you drop packets a counter should be incremented.
-> > Likewise elsewhere in this function.
-> The counter appears to be handled in parent function - in ipvlan_start_xmit()
-
-Thanks, I see that now.
-
-> >> +	addr = ipvlan_addr_lookup(port, lyr3h, addr_type, true);
-> >> +	if (addr) {
-> >> +		int ret, len;
-> >> +
-> >> +		ipvlan_skb_crossing_ns(skb, addr->master->dev);
-> >> +		skb->protocol = eth_type_trans(skb, skb->dev);
-> >> +		skb->pkt_type = PACKET_HOST;
-> >> +		ipvlan_mark_skb(skb, port->dev);
-> >> +		len = skb->len + ETH_HLEN;
-> >> +		ret = netif_rx(skb);
-> >> +		ipvlan_count_rx(ipvlan, len, ret == NET_RX_SUCCESS, false);
-> >>
-> >> This fails to build because ipvlan is not declared in this scope.
-> >> Perhaps something got missed due to an edit?
-> Oops, really. Compilation was fixed in later patches.
-
-Stuff happens :)
-
-...
 
