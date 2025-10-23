@@ -1,274 +1,367 @@
-Return-Path: <netdev+bounces-232098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B9D9C01064
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:13:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C42FC01113
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 14:18:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 182183A4FEF
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 12:13:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8B8C3AAE13
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 12:18:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC54E30F93E;
-	Thu, 23 Oct 2025 12:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E8A3128DC;
+	Thu, 23 Oct 2025 12:18:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="bXcf3T1R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E0F30FC11
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 12:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A24731281F
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 12:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761221622; cv=none; b=OMIcch83gta8Uk2wU/iaDeknKRIqir4aEkrn2OofPpg9TLzj2+vUbUhaYNxe/JDRpswS3TPOn9F5YiLAXeBkvmVP94BXRoQGY8zQHT5mFyB4KaGMlVcUa6syPTaPn0tizxM6f/evTXQt6WWNtxvHZ97V3Sfyjs8GgMwkIXkmHpU=
+	t=1761221909; cv=none; b=TjM78P3uXXmJpawc1L/6eA4Oh7yaKJQdP59N/TVlxd/38Bini65+x9LYh82FdGkOI8px9b3A4uzEccNbaZyZNJKMpg9H7KCeEF/GFmkGIJ02bAHi/yfPoqXLW8FwVhqlVNGfY6yvsavpAibjLvyj2gFyjFdwyalLAFdaGf1E+Zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761221622; c=relaxed/simple;
-	bh=3OYalnmnmKwShACgYaeWJVdJA3/45vqucJoDg6xxCKc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=GHji8U+4LV4To1YW+1SWK01U/e5ivJ1suY+HIs2pFVWOOdTmbukvK8VV0XMjogvyi9P3w5Li9lwZH712yZEQN6xGzXlBf3ZBXBFN9XXIwXlEnf5bhsAJcCfbHvJeIBo6PyeVC0JA04mhfjK4TkiKjMgVUlzl2lel8r+CqSsbHdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-430d83d262fso30204165ab.2
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 05:13:35 -0700 (PDT)
+	s=arc-20240116; t=1761221909; c=relaxed/simple;
+	bh=Iyk8BQ1Be4NI135CLWJIcY8wteD6EX2fK1i012jg9No=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rV4Eqz+5TZDnrAVETLlS8nSXV4BD6H6Ib+WpmNbIHFdZd9axBqoHEgNwmL6VIQ5PPk3nNfSheiMCEbFz2mTeFIyb7gXuH9/U+vao4zcH/GlIasuk27Xmql4HF137jQi4PVlkCs1rqCLckJC8n5+9i8vHZu5PBuNeLN0L3mqf3z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=bXcf3T1R; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-471075c0a18so8383915e9.1
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 05:18:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1761221902; x=1761826702; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+OAEkvBognBReklFZ/Tv+qPVxV3jDo2zgXc2ZXgPE3Q=;
+        b=bXcf3T1RUpvNb94hMplEqdz/ba6LHeJFNaw2HakzxnVzsKduXV7ON9TVMpzKfK5oF0
+         dBxwLMR3ndmF1G99nwd1a9FEkrIB/Aq4gRP34RPCBn1eAfnEyyT3jN7beia/Zrb4hQxS
+         SetNDXJNIHUe/JOv9oqV/8KDlYRuNsXjYCMALmaQ8PGwkDqzABTlc4R3Ot9KfjdfReD0
+         OC+2SzbHRQbeWB8CCCudO3mLbs27iXjcDzkQghUqmv7TVABPLRqN2OICpT6YEANiRITm
+         z+pvC6tYWTHXajMN03JjmLb8Fqsu8dirpXUFBH4DUGZNhIcsr1PPzjWwQWQ1eU1QS7B2
+         4zTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761221613; x=1761826413;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eMiZfwr32apJwYZ0mK2NrZ0bAlrXvUhOwPNa+z4KCVk=;
-        b=txi1+JmAUu1o3gfu7xPV3FT1s3XP+tNjivKh7bpLS/h7j92Y5qBL4xhHvxkCvmLYBc
-         CMCTta4Fx1uyDw3Hy0Z6BZ5/9EZG+ERJF2cahj69dXejPf7vC/vJD8wN5Cch/pv4eS1E
-         IfvAHDqDXdd1ZGsszKadNgnYtx/h4vgV1OhYIKDPf1lsd4e9DVLhPGucQLO+GkhFE2Ge
-         lsLEGZG9FL4CN5f1i8NfHHY8pPdV0sbRN9mM5Fg4NVLrHEu4f9rRoU5srSB/ArRGfkrJ
-         8xbhuJ5H4v0qHvNj3Y82GdMUmqERGwZ1QqJ1suO051sVAonhADM0q9MpIRUy2tECKYWP
-         kPsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXLOKNIzuSdCkNmgnw/joUbeiiIcFqvN9dOMGkaznlzz8Z7h3wlzgikW57Jv+xlaglrlJbkBw8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLmV5CH+rTwepRKcBTpXjTjlY/oqvYQJmsRhvsThn3/tt67Xv7
-	2G3nzhWBimiEUywyBDggcrtrBU++6Gxd7tWMTq9gZjtl1KAwTgl8mxpnLDJHBtkktuYi5uUIk7N
-	DmNcxKWU2DETMkzHsn2jJknF7lsRZ6P6ymJdxaZJXVTgQSFlzZtllwlaXDiw=
-X-Google-Smtp-Source: AGHT+IG1eho+3d8N6tgVB3Q7FcdfCNix3RhE4k7Y3EXmYf3pNJHOETKhkDyn7aCRphZU4/EAps6qnrQp5IfNxVLuwwWk1tOT1dbW
+        d=1e100.net; s=20230601; t=1761221903; x=1761826703;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+OAEkvBognBReklFZ/Tv+qPVxV3jDo2zgXc2ZXgPE3Q=;
+        b=Q7K94mvzVqzJHq5FwdIDNRhhPM10DQZAnDXSRVxEMpbhMnZSq73I59269rfK93efDI
+         2BKkQ8jKnh4HX4OZMpFE0FqWvejklk5Md7ETwHrrid09X2EUv5Zn9ITY0OiWoZGC2Loq
+         XiCnNyVdqun2wkf+oE/aIHhkDYn6T23SW3J0mb5m8cZgrdpAoumU/GgcC8CSy3KFc9Fj
+         +oCOcstb6V9LepvWP8RGWFwl8GZ8JQDAEM5rEFSfZnmb1A92n/v8GLB94aHy3zSir40E
+         UpqBF3XF8+SJDawlxYrU4g3MEjnaINR8zlJkpTVj/ZGQs1nCMSek+/NEtLw+uMhSdKfZ
+         bbwA==
+X-Forwarded-Encrypted: i=1; AJvYcCVwaeUWoBaVZEeQye8zBticSHq+wpvZPywLfMhmsr+qQPNj94sHL3j+yVSH8dCBRpcPRyc1npk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyA4ccPOklvDrOWfCwczE3JwZ1qcX2C1B1Rijku+mv1WvFVrKqI
+	yGd+cqJE2uwocMKe+UJ4RKjZz4ZaZ5hXvGkrQKucj20RmZecT2fhKYCKZzB1ezUY1Cg=
+X-Gm-Gg: ASbGncsLUVPbeUSh0qzY+ca0m4Vgdc5eif+vNjp/rMkHXj3ZX29TQjeEyhVpEuYCGc7
+	LE+pg+8hxkn5jewYdzZSDqCOA6XecHYUKnNP9a4rksyrIQMzD8hSRqr2BnNCvXPO4NWacvAEfcm
+	DHcw+fHnrA1v2Zvyjm1h+vwBgeeZS7RdHMlRYUWkj7yek/et/8L5AARn1BwM+p+pfQmyUxqoViW
+	tup1jl21E9Ep/QhKcij/VvdN/jY5hYGdFlGOIY1iFAZShph3zTaSOcoCjTl3RcLpHTaPq29jjeC
+	9dDLGm5BYJoZYXX2prM3kchy1K3I4qJ3/MY5DaMIC/M81W0lSMNKmkdMctvCrmP1wF3cvwc4Cx5
+	qPS/Mjt27N0AF11d8EHr3KJKz0GPVfAenc7fZxHHAHAQ0yYCPIK42JgX59XBzPUWfRCfFOnGiXN
+	Wvqj5omgkLxBr5V/U5mRMHQ8l6/n4=
+X-Google-Smtp-Source: AGHT+IEckDVpnjM+kF+Enrq8ICxQxXSWGQCvGZHBJMVHKPscv1KDy1zMbOMdSWmaiGYkQEbQx1nj8w==
+X-Received: by 2002:a05:600c:3492:b0:46e:45d3:82fd with SMTP id 5b1f17b1804b1-47117917267mr174487365e9.31.1761221902341;
+        Thu, 23 Oct 2025 05:18:22 -0700 (PDT)
+Received: from jiri-mlt.client.nvidia.com ([140.209.217.211])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47496afd459sm61138975e9.1.2025.10.23.05.18.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Oct 2025 05:18:21 -0700 (PDT)
+Date: Thu, 23 Oct 2025 14:18:20 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Daniel Zahka <daniel.zahka@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Tariq Toukan <tariqt@nvidia.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Leon Romanovsky <leon@kernel.org>, 
+	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Vlad Dumitrescu <vdumitrescu@nvidia.com>, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next] net/mlx5: Implement swp_l4_csum_mode via
+ devlink params
+Message-ID: <uqbng3vzz2ybmrrhdcocsfjtfxitck2rs76hcrsk7aiddjssp2@haqcnmzrljws>
+References: <20251022190932.1073898-1-daniel.zahka@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1fca:b0:42f:946f:8eb4 with SMTP id
- e9e14a558f8ab-430c527bca5mr309055585ab.21.1761221612752; Thu, 23 Oct 2025
- 05:13:32 -0700 (PDT)
-Date: Thu, 23 Oct 2025 05:13:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68fa1bec.a70a0220.3bf6c6.004f.GAE@google.com>
-Subject: [syzbot] [hams?] KASAN: slab-use-after-free Read in ax25_find_cb
-From: syzbot <syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jreuter@yaina.de, kuba@kernel.org, linux-hams@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251022190932.1073898-1-daniel.zahka@gmail.com>
 
-Hello,
+Wed, Oct 22, 2025 at 09:09:31PM +0200, daniel.zahka@gmail.com wrote:
+>swp_l4_csum_mode controls how L4 transmit checksums are computed when
+>using Software Parser (SWP) hints for header locations.
+>
+>Supported values:
+>  1. device_default: use device default setting.
 
-syzbot found the following issue on:
-
-HEAD commit:    250a17e8f955 Merge tag 'erofs-for-6.18-rc3-fixes' of git:/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=154a3734580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d1ce99afe6f71855
-dashboard link: https://syzkaller.appspot.com/bug?extid=caa052a0958a9146870d
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f51301069523/disk-250a17e8.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a4671c3f2507/vmlinux-250a17e8.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2b5a3b36a321/bzImage-250a17e8.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-use-after-free in ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
-Read of size 1 at addr ffff888059c704c0 by task syz.6.2733/17200
-
-CPU: 1 UID: 0 PID: 17200 Comm: syz.6.2733 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xcd/0x630 mm/kasan/report.c:482
- kasan_report+0xe0/0x110 mm/kasan/report.c:595
- ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
- ax25_send_frame+0x157/0xb60 net/ax25/ax25_out.c:55
- rose_send_frame+0xcc/0x2c0 net/rose/rose_link.c:106
- rose_transmit_restart_request+0x1b8/0x240 net/rose/rose_link.c:198
- rose_t0timer_expiry+0x1d/0x150 net/rose/rose_link.c:83
- call_timer_fn+0x19a/0x620 kernel/time/timer.c:1747
- expire_timers kernel/time/timer.c:1798 [inline]
- __run_timers+0x6ef/0x960 kernel/time/timer.c:2372
- __run_timer_base kernel/time/timer.c:2384 [inline]
- __run_timer_base kernel/time/timer.c:2376 [inline]
- run_timer_base+0x114/0x190 kernel/time/timer.c:2393
- run_timer_softirq+0x1a/0x40 kernel/time/timer.c:2403
- handle_softirqs+0x219/0x8e0 kernel/softirq.c:622
- __do_softirq kernel/softirq.c:656 [inline]
- invoke_softirq kernel/softirq.c:496 [inline]
- __irq_exit_rcu+0x109/0x170 kernel/softirq.c:723
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:739
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1052 [inline]
- sysvec_apic_timer_interrupt+0x57/0xc0 arch/x86/kernel/apic/apic.c:1052
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-RIP: 0033:0x7fd4a4c68253
-Code: 1f 84 00 00 00 00 00 48 8b 70 f8 48 83 e8 08 48 39 f2 72 f3 48 39 c3 73 3e 48 89 33 48 83 c3 08 48 8b 70 f8 48 89 08 48 8b 0b <49> 8b 14 24 eb bf 48 39 f2 72 97 48 39 f0 73 46 49 89 34 24 48 89
-RSP: 002b:00007ffd914df840 EFLAGS: 00000212
-RAX: 00007fd4a4777648 RBX: 00007fd4a47774b0 RCX: ffffffff8a01d69a
-RDX: ffffffff8a01d69a RSI: ffffffff8a01d69a RDI: 00007fd4a47777a0
-RBP: 00007fd4a4777358 R08: 00007fd4a4777578 R09: 00007fd4a4fd2000
-R10: 00007fd4a43fd008 R11: 000000000000000a R12: 00007fd4a4777350
-R13: 0000000000000016 R14: 00007ffd914dfab8 R15: 00007fd4a43fd008
- </TASK>
-
-Allocated by task 13773:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:56
- kasan_save_track+0x14/0x30 mm/kasan/common.c:77
- poison_kmalloc_redzone mm/kasan/common.c:400 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:417
- kmalloc_noprof include/linux/slab.h:957 [inline]
- rose_add_node net/rose/rose_route.c:109 [inline]
- rose_rt_ioctl+0x1c40/0x2580 net/rose/rose_route.c:748
- rose_ioctl+0x64d/0x7c0 net/rose/af_rose.c:1381
- sock_do_ioctl+0x118/0x280 net/socket.c:1254
- sock_ioctl+0x227/0x6b0 net/socket.c:1375
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl fs/ioctl.c:583 [inline]
- __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 17183:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:56
- kasan_save_track+0x14/0x30 mm/kasan/common.c:77
- __kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:587
- kasan_save_free_info mm/kasan/kasan.h:406 [inline]
- poison_slab_object mm/kasan/common.c:252 [inline]
- __kasan_slab_free+0x5f/0x80 mm/kasan/common.c:284
- kasan_slab_free include/linux/kasan.h:234 [inline]
- slab_free_hook mm/slub.c:2530 [inline]
- slab_free mm/slub.c:6619 [inline]
- kfree+0x2b8/0x6d0 mm/slub.c:6826
- rose_neigh_put include/net/rose.h:165 [inline]
- rose_timer_expiry+0x537/0x630 net/rose/rose_timer.c:183
- call_timer_fn+0x19a/0x620 kernel/time/timer.c:1747
- expire_timers kernel/time/timer.c:1798 [inline]
- __run_timers+0x6ef/0x960 kernel/time/timer.c:2372
- __run_timer_base kernel/time/timer.c:2384 [inline]
- __run_timer_base kernel/time/timer.c:2376 [inline]
- run_timer_base+0x114/0x190 kernel/time/timer.c:2393
- run_timer_softirq+0x1a/0x40 kernel/time/timer.c:2403
- handle_softirqs+0x219/0x8e0 kernel/softirq.c:622
- __do_softirq kernel/softirq.c:656 [inline]
- invoke_softirq kernel/softirq.c:496 [inline]
- __irq_exit_rcu+0x109/0x170 kernel/softirq.c:723
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:739
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1052 [inline]
- sysvec_apic_timer_interrupt+0xa4/0xc0 arch/x86/kernel/apic/apic.c:1052
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-
-The buggy address belongs to the object at ffff888059c70480
- which belongs to the cache kmalloc-96 of size 96
-The buggy address is located 64 bytes inside of
- freed 96-byte region [ffff888059c70480, ffff888059c704e0)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff888059c70b00 pfn:0x59c70
-flags: 0xfff00000000200(workingset|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000200 ffff88813ffa6280 ffffea0001df33d0 ffffea0000c94410
-raw: ffff888059c70b00 000000000020001f 00000000f5000000 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 5815, tgid 5815 (syz-executor), ts 66851059499, free_ts 66850862508
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1c0/0x230 mm/page_alloc.c:1850
- prep_new_page mm/page_alloc.c:1858 [inline]
- get_page_from_freelist+0x10a3/0x3a30 mm/page_alloc.c:3884
- __alloc_frozen_pages_noprof+0x25f/0x2470 mm/page_alloc.c:5183
- alloc_pages_mpol+0x1fb/0x550 mm/mempolicy.c:2416
- alloc_slab_page mm/slub.c:3046 [inline]
- allocate_slab mm/slub.c:3219 [inline]
- new_slab+0x24a/0x360 mm/slub.c:3273
- ___slab_alloc+0xdc4/0x1ae0 mm/slub.c:4643
- __slab_alloc.constprop.0+0x63/0x110 mm/slub.c:4762
- __slab_alloc_node mm/slub.c:4838 [inline]
- slab_alloc_node mm/slub.c:5260 [inline]
- __kmalloc_cache_noprof+0x477/0x780 mm/slub.c:5750
- kmalloc_noprof include/linux/slab.h:957 [inline]
- kzalloc_noprof include/linux/slab.h:1094 [inline]
- class_dir_create_and_add drivers/base/core.c:3223 [inline]
- get_device_parent+0x2b1/0x4e0 drivers/base/core.c:3283
- device_add+0x1ad/0x1aa0 drivers/base/core.c:3613
- netdev_register_kobject+0x1a9/0x3d0 net/core/net-sysfs.c:2358
- register_netdevice+0x13dc/0x2270 net/core/dev.c:11294
- cfg80211_register_netdevice+0x149/0x340 net/wireless/core.c:1518
- ieee80211_if_add+0xc9d/0x1a40 net/mac80211/iface.c:2295
- ieee80211_register_hw+0x393b/0x4120 net/mac80211/main.c:1608
- mac80211_hwsim_new_radio+0x32d8/0x50b0 drivers/net/wireless/virtual/mac80211_hwsim.c:5803
-page last free pid 5815 tgid 5815 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1394 [inline]
- __free_frozen_pages+0x7df/0x1160 mm/page_alloc.c:2906
- selinux_genfs_get_sid security/selinux/hooks.c:1357 [inline]
- inode_doinit_with_dentry+0xacb/0x12e0 security/selinux/hooks.c:1555
- selinux_d_instantiate+0x26/0x30 security/selinux/hooks.c:6523
- security_d_instantiate+0x142/0x1a0 security/security.c:4148
- d_instantiate+0x5c/0x90 fs/dcache.c:1961
- __debugfs_create_file+0x286/0x6b0 fs/debugfs/inode.c:459
- debugfs_create_file_short+0x41/0x60 fs/debugfs/inode.c:480
- add_link_files+0xff/0x120 net/mac80211/debugfs_netdev.c:990
- ieee80211_debugfs_add_netdev net/mac80211/debugfs_netdev.c:1011 [inline]
- ieee80211_debugfs_recreate_netdev+0xf70/0x17e0 net/mac80211/debugfs_netdev.c:1033
- ieee80211_if_add+0x9b9/0x1a40 net/mac80211/iface.c:2269
- ieee80211_register_hw+0x393b/0x4120 net/mac80211/main.c:1608
- mac80211_hwsim_new_radio+0x32d8/0x50b0 drivers/net/wireless/virtual/mac80211_hwsim.c:5803
- hwsim_new_radio_nl+0xba2/0x1330 drivers/net/wireless/virtual/mac80211_hwsim.c:6497
- genl_family_rcv_msg_doit+0x209/0x2f0 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2552
-
-Memory state around the buggy address:
- ffff888059c70380: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
- ffff888059c70400: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
->ffff888059c70480: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-                                           ^
- ffff888059c70500: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
- ffff888059c70580: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
-==================================================================
+Is this different between devices/fw_versions?
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+>  2. full_csum: calculate L4 checksum with the psuedo-header.
+>  3. l4_only: calculate L4 checksum without the psuedo-header. Only
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+s/psuedo/pseudo/
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+>     available when swp_l4_csum_mode_l4_only is set in
+>     mlx5_ifc_nv_sw_offload_cap_bits.
+>
+>The l4_only setting is a dependency for PSP initialization in
+>mlx5e_psp_init().
+>
+>Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+>---
+> Documentation/networking/devlink/mlx5.rst     |   9 ++
+> .../net/ethernet/mellanox/mlx5/core/devlink.h |   3 +-
+> .../mellanox/mlx5/core/lib/nv_param.c         | 148 ++++++++++++++++++
+> 3 files changed, 159 insertions(+), 1 deletion(-)
+>
+>diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
+>index 0e5f9c76e514..f366e551b2f7 100644
+>--- a/Documentation/networking/devlink/mlx5.rst
+>+++ b/Documentation/networking/devlink/mlx5.rst
+>@@ -218,6 +218,15 @@ parameters.
+>        * ``balanced`` : Merges fewer CQEs, resulting in a moderate compression ratio but maintaining a balance between bandwidth savings and performance
+>        * ``aggressive`` : Merges more CQEs into a single entry, achieving a higher compression rate and maximizing performance, particularly under high traffic loads
+> 
+>+    * - ``swp_l4_csum_mode``
+>+      - string
+>+      - permanent
+>+      - Configure how the L4 checksum is calculated by the device when using
+>+        Software Parser (SWP) hints for header locations.
+>+        * ``device_default`` : Use the device's default checksum calculation mode
+>+        * ``full_csum`` : Calculate full checksum including the pseudo-header
+>+        * ``l4_only`` : Calculate L4-only checksum, excluding the pseudo-header
+>+
+> The ``mlx5`` driver supports reloading via ``DEVLINK_CMD_RELOAD``
+> 
+> Info versions
+>diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
+>index c9555119a661..43b9bf8829cf 100644
+>--- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
+>+++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
+>@@ -26,7 +26,8 @@ enum mlx5_devlink_param_id {
+> 	MLX5_DEVLINK_PARAM_ID_PCIE_CONG_IN_HIGH,
+> 	MLX5_DEVLINK_PARAM_ID_PCIE_CONG_OUT_LOW,
+> 	MLX5_DEVLINK_PARAM_ID_PCIE_CONG_OUT_HIGH,
+>-	MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE
+>+	MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE,
+>+	MLX5_DEVLINK_PARAM_ID_SWP_L4_CSUM_MODE,
+> };
+> 
+> struct mlx5_trap_ctx {
+>diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
+>index 459a0b4d08e6..fac3d9801b3b 100644
+>--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
+>+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
+>@@ -8,6 +8,8 @@ enum {
+> 	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CONF               = 0x80,
+> 	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CAP                = 0x81,
+> 	MLX5_CLASS_0_CTRL_ID_NV_SW_OFFLOAD_CONFIG             = 0x10a,
+>+	MLX5_CLASS_0_CTRL_ID_NV_SW_OFFLOAD_CAP                = 0x10b,
+>+	MLX5_CLASS_0_CTRL_ID_NV_SW_ACCELERATE_CONF            = 0x11d,
+> 
+> 	MLX5_CLASS_3_CTRL_ID_NV_PF_PCI_CONF                   = 0x80,
+> };
+>@@ -123,6 +125,17 @@ struct mlx5_ifc_nv_sw_offload_conf_bits {
+> 	u8         lro_log_timeout0[0x4];
+> };
+> 
+>+struct mlx5_ifc_nv_sw_offload_cap_bits {
+>+	u8         reserved_at_0[0x19];
+>+	u8         swp_l4_csum_mode_l4_only[0x1];
+>+	u8         reserved_at_1a[0x6];
+>+};
+>+
+>+struct mlx5_ifc_nv_sw_accelerate_conf_bits {
+>+	u8         swp_l4_csum_mode[0x2];
+>+	u8         reserved_at_2[0x3e];
+>+};
+>+
+> #define MNVDA_HDR_SZ \
+> 	(MLX5_ST_SZ_BYTES(mnvda_reg) - \
+> 	 MLX5_BYTE_OFF(mnvda_reg, configuration_item_data))
+>@@ -195,9 +208,42 @@ mlx5_nv_param_read_sw_offload_conf(struct mlx5_core_dev *dev, void *mnvda,
+> 	return mlx5_nv_param_read(dev, mnvda, len);
+> }
+> 
+>+static int
+>+mlx5_nv_param_read_sw_offload_cap(struct mlx5_core_dev *dev, void *mnvda,
+>+				  size_t len)
+>+{
+>+	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, type_class, 0);
+>+	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, parameter_index,
+>+			       MLX5_CLASS_0_CTRL_ID_NV_SW_OFFLOAD_CAP);
+>+	MLX5_SET_CFG_HDR_LEN(mnvda, nv_sw_offload_cap);
+>+
+>+	return mlx5_nv_param_read(dev, mnvda, len);
+>+}
+>+
+>+static int
+>+mlx5_nv_param_read_sw_accelerate_conf(struct mlx5_core_dev *dev, void *mnvda,
+>+				      size_t len)
+>+{
+>+	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, type_class, 0);
+>+	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, parameter_index,
+>+			       MLX5_CLASS_0_CTRL_ID_NV_SW_ACCELERATE_CONF);
+>+	MLX5_SET_CFG_HDR_LEN(mnvda, nv_sw_accelerate_conf);
+>+
+>+	return mlx5_nv_param_read(dev, mnvda, len);
+>+}
+>+
+> static const char *const
+> 	cqe_compress_str[] = { "balanced", "aggressive" };
+> 
+>+enum swp_l4_csum_mode {
+>+	SWP_L4_CSUM_MODE_DEVICE_DEFAULT = 0,
+>+	SWP_L4_CSUM_MODE_FULL_CSUM = 1,
+>+	SWP_L4_CSUM_MODE_L4_ONLY = 2,
+>+};
+>+
+>+static const char *const
+>+	swp_l4_csum_mode_str[] = { "device_default", "full_csum", "l4_only" };
+>+
+> static int
+> mlx5_nv_param_devlink_cqe_compress_get(struct devlink *devlink, u32 id,
+> 				       struct devlink_param_gset_ctx *ctx)
+>@@ -268,6 +314,102 @@ mlx5_nv_param_devlink_cqe_compress_set(struct devlink *devlink, u32 id,
+> 	return mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
+> }
+> 
+>+static int
+>+mlx5_nv_param_devlink_swp_l4_csum_mode_get(struct devlink *devlink, u32 id,
+>+					   struct devlink_param_gset_ctx *ctx)
+>+{
+>+	struct mlx5_core_dev *dev = devlink_priv(devlink);
+>+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
+>+	u8 value = U8_MAX;
+>+	void *data;
+>+	int err;
+>+
+>+	err = mlx5_nv_param_read_sw_accelerate_conf(dev, mnvda, sizeof(mnvda));
+>+	if (err)
+>+		return err;
+>+
+>+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
+>+	value = MLX5_GET(nv_sw_accelerate_conf, data, swp_l4_csum_mode);
+>+
+>+	if (value >= ARRAY_SIZE(swp_l4_csum_mode_str))
+>+		return -EOPNOTSUPP;
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+Einval? I think this is another argument for introduction of extack for
+param getters. Care to add it?
 
-If you want to undo deduplication, reply with:
-#syz undup
+
+>+
+>+	strscpy(ctx->val.vstr, swp_l4_csum_mode_str[value],
+>+		sizeof(ctx->val.vstr));
+>+	return 0;
+>+}
+>+
+>+static int
+>+mlx5_nv_param_devlink_swp_l4_csum_mode_validate(struct devlink *devlink, u32 id,
+>+						union devlink_param_value val,
+>+						struct netlink_ext_ack *extack)
+>+{
+>+	struct mlx5_core_dev *dev = devlink_priv(devlink);
+>+	u32 cap[MLX5_ST_SZ_DW(mnvda_reg)] = {};
+>+	void *data;
+>+	int err, i;
+>+
+>+	for (i = 0; i < ARRAY_SIZE(swp_l4_csum_mode_str); i++) {
+>+		if (!strcmp(val.vstr, swp_l4_csum_mode_str[i]))
+>+			break;
+>+	}
+>+
+>+	if (i >= ARRAY_SIZE(swp_l4_csum_mode_str)) {
+>+		NL_SET_ERR_MSG_MOD(extack,
+>+				   "Invalid value, supported values are device_default/full_csum/l4_only");
+>+		return -EINVAL;
+>+	}
+>+
+>+	if (i == SWP_L4_CSUM_MODE_L4_ONLY) {
+>+		err = mlx5_nv_param_read_sw_offload_cap(dev, cap, sizeof(cap));
+>+		if (err) {
+>+			NL_SET_ERR_MSG_MOD(extack,
+>+					   "Failed to read sw_offload_cap");
+>+			return err;
+>+		}
+>+
+>+		data = MLX5_ADDR_OF(mnvda_reg, cap, configuration_item_data);
+>+		if (!MLX5_GET(nv_sw_offload_cap, data, swp_l4_csum_mode_l4_only)) {
+>+			NL_SET_ERR_MSG_MOD(extack,
+>+					   "l4_only mode is not supported on this device");
+>+			return -EOPNOTSUPP;
+>+		}
+>+	}
+>+
+>+	return 0;
+>+}
+>+
+>+static int
+>+mlx5_nv_param_devlink_swp_l4_csum_mode_set(struct devlink *devlink, u32 id,
+>+					   struct devlink_param_gset_ctx *ctx,
+>+					   struct netlink_ext_ack *extack)
+>+{
+>+	struct mlx5_core_dev *dev = devlink_priv(devlink);
+>+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
+>+	void *data;
+>+	u8 value;
+>+	int err;
+>+
+>+	if (!strcmp(ctx->val.vstr, "device_default"))
+>+		value = SWP_L4_CSUM_MODE_DEVICE_DEFAULT;
+>+	else if (!strcmp(ctx->val.vstr, "full_csum"))
+>+		value = SWP_L4_CSUM_MODE_FULL_CSUM;
+>+	else
+>+		value = SWP_L4_CSUM_MODE_L4_ONLY;
+>+
+>+	err = mlx5_nv_param_read_sw_accelerate_conf(dev, mnvda, sizeof(mnvda));
+>+	if (err) {
+>+		NL_SET_ERR_MSG_MOD(extack,
+>+				   "Failed to read sw_accelerate_conf mnvda reg");
+>+		return err;
+>+	}
+>+
+>+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
+>+	MLX5_SET(nv_sw_accelerate_conf, data, swp_l4_csum_mode, value);
+>+
+>+	return mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
+>+}
+>+
+> static int mlx5_nv_param_read_global_pci_conf(struct mlx5_core_dev *dev,
+> 					      void *mnvda, size_t len)
+> {
+>@@ -545,6 +687,12 @@ static const struct devlink_param mlx5_nv_param_devlink_params[] = {
+> 			     mlx5_nv_param_devlink_cqe_compress_get,
+> 			     mlx5_nv_param_devlink_cqe_compress_set,
+> 			     mlx5_nv_param_devlink_cqe_compress_validate),
+>+	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_SWP_L4_CSUM_MODE,
+
+Why this is driver specific? Isn't this something other drivers might
+eventually implement as well?
+
+
+>+			     "swp_l4_csum_mode", DEVLINK_PARAM_TYPE_STRING,
+>+			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
+>+			     mlx5_nv_param_devlink_swp_l4_csum_mode_get,
+>+			     mlx5_nv_param_devlink_swp_l4_csum_mode_set,
+>+			     mlx5_nv_param_devlink_swp_l4_csum_mode_validate),
+> };
+> 
+> int mlx5_nv_param_register_dl_params(struct devlink *devlink)
+>-- 
+>2.47.3
+>
 
