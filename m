@@ -1,115 +1,147 @@
-Return-Path: <netdev+bounces-231930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-231931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E99DBFEC33
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 02:56:08 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91E93BFEC48
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 03:00:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 238303A8532
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 00:56:07 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9EAD535109E
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 01:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7208D1891A9;
-	Thu, 23 Oct 2025 00:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C47221C6FE5;
+	Thu, 23 Oct 2025 01:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s27osoOf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kYzhO4nF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4667482899;
-	Thu, 23 Oct 2025 00:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3296729405
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 01:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761180965; cv=none; b=QXG5/ghDdbAET625c4Bi770Qeat+m2m8eZCzyUYplqqNuSu3QgIbP1uLopAi4jizJuZ7znX/vXp7rSbnEfRI5/XuxUhCJ73ox9eDglsl9T6pV7IqJDFfj4rrLdrTWkTkxtdtPFvcuL1zHfrN/SqbByv8Cd6jQCDgYFfCg5G8pe0=
+	t=1761181226; cv=none; b=TK8wyjsT51vj8QInfK+wM4Gi0yUvxstPr/ssW6tFwBWcgtyX2SQsZAEi3uJqEgtMbF3JSNz7LZhbUi0pp8cQMYhKmbdF+NJjgsZ5XRRjGnwbMg18QYKx7aV+Z01e0DT3MypT+Y0hJ4/VGFVkfo4bv3Ysq5FD5l9OKYflJnVEJYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761180965; c=relaxed/simple;
-	bh=919OIB7G8MYaz4vd3DIyciwxunOCOVhTx3Xiov1GHts=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aKHcUqoMBniJlJuP8UWZLDumQfA9quhzYlMp2IqGUM9Yl2mnIv6xvcitcAejr+8qdCFs9hR6YZ3ZtuV+XUq/vjwT/hwGx42a+aMByOhjFQbRnqUaxguecF/YoHCZmtNOxqn4iyQ0SewQT9L9zhkfRb/xuHxvTBeu+7sZi515nO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s27osoOf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A5B6C4CEE7;
-	Thu, 23 Oct 2025 00:56:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761180964;
-	bh=919OIB7G8MYaz4vd3DIyciwxunOCOVhTx3Xiov1GHts=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s27osoOfpL8QKkqw2yh4FK25fkGHdNowAoucEE6RMvLRpdgyizdwi3jdNZYGXMGGC
-	 xC+AcBzEoj2FPuAfxjgdaT79d++L76FSNO1MhUYZOOgMlT+E01ToxMoOMl/LdgPZMP
-	 BNkTu41LztzUE5jWQj6y/2oPHLDeby50biUQCk8v9GnAQhPa0aZUHBQQrncnEI2C0r
-	 fySrcZjqJ7IQAugmtwT3mp4wlvbsu72Jmhl5WSDZJ2q8S0bSHh/O4QZIDztRPbJujq
-	 lAR+fgN55rzx1LrIOp+2se1ZdyU/NY0ghSRkpza1DISsl6dEkDgMwFNzDXBbAPxCwc
-	 3/pNaQAyTcIUg==
-Date: Wed, 22 Oct 2025 17:56:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed
- <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan
- <tariqt@nvidia.com>, Shuah Khan <shuah@kernel.org>, Simon Horman
- <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, Boris Pismenny
- <borisp@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Willem de Bruijn <willemb@google.com>, Rahul
- Rameshbabu <rrameshbabu@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Raed
- Salem <raeds@nvidia.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 4/5] net/mlx5e: Add PSP stats support for Rx/Tx
- flows
-Message-ID: <20251022175602.560ad464@kernel.org>
-In-Reply-To: <20251022193739.1376320-5-daniel.zahka@gmail.com>
-References: <20251022193739.1376320-1-daniel.zahka@gmail.com>
-	<20251022193739.1376320-5-daniel.zahka@gmail.com>
+	s=arc-20240116; t=1761181226; c=relaxed/simple;
+	bh=OrsxdswB6rrhAmFOBRD5OXXftqbef7SMzTrZcBtK8PE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=UynGuYFFjb/BVBf6VPTxQI1meFE56FEXkVyvBo94X29EFH7Wg9AzgwBuNHyR5M17AqppK/apVgw55fb9KJUniDrT3pv87KUT43G5RY9DkSc9Kl+m0gceGSga+Mnuv57dhXr/fb7jqPRnMnzDnS3RDweYJnQz5MSlTBwZtoX02sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kYzhO4nF; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-33e0008d3b3so291828a91.3
+        for <netdev@vger.kernel.org>; Wed, 22 Oct 2025 18:00:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761181224; x=1761786024; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QcrG5SS8hn1JmYCm2wGF/gyiT6cJxpEJmuxnsfJHsCI=;
+        b=kYzhO4nFc+Gx2p2jzIoiE+x+jr9b6XPegQgKkshJYx0bZKoaXTRPJ27RskKeEYSHkP
+         Wv9Vt60bB3YfB7ileHm3bLMMqeP418RjoQA0T+rfPyda42UzlCkMfbZ2fvEFqDZV0Fhw
+         hWAk5fyNyjPqyalmDHrp4nKejCqxXsO/YOlQJ1b843T0U67+NPuXZNoM/UK7YP83Sruc
+         awOzaITnorzX7HhUq7GGNRhqhDAAsWspiW/zsaERcQZPb/0qyTUgOCFw4oFWlBQBbVm+
+         Tr6SOZ4CbiwmKZmyUCMbkjRGuwcV28LuReukOW6BeAjkxmeeYRqF58Rxavg7q+oWRYoU
+         lCzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761181224; x=1761786024;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QcrG5SS8hn1JmYCm2wGF/gyiT6cJxpEJmuxnsfJHsCI=;
+        b=Tz1eOKSbR65MkqtpI2wj1zDeDn9KyJURvmLaUnsF6vo9TlAEGleR9gbnccB7JoLWjq
+         0g/56+VTWK7kbb+rhkBma68o5JejVgLEl4re2LsPu/rFGWW3K8zaNZEiOxeQgKcZcEWx
+         PE+F0hjCiP9nshg2zFuRCqm3wkHFALyY2xIP7/tPx6RRGIXXVvoJmVJXq0b9/qkjtDoo
+         AXOXT8ZqokI19UUaz6A7iDaUcnrcr67cpoadCNfd6J7s0XqxnqWRxkbip/MqQceZRglr
+         GmdD4HUmPB1wBRcNufilYQpPQwNKKI5yj6AQEa6q6h1ltrNGtBxUFeaurHHLnzamWxDm
+         SyiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUlV5QhIUAijdkyySfsiolxr7QtVNxskan+dMFmMShiprRgc1Rk0nxhZQAZJmkYhy3l1uJL5Gg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjOgV2IsgJOQbtx7DgrJZYTVqKNBMWgVC/vFpy0ee53+Ve08Ur
+	CZwqIk5FyjalzK5lsy8Mqx82NGLEUT/ZosFXVoz9fLOxvXlTyeapK6A6e4ac9Kbb
+X-Gm-Gg: ASbGnct5+s44vOvYBshKs8NhUCrcKfn/Sic/KYIq5Z23fixFAQOKzfJjB92N2vK9zXI
+	UOiJbOyvEN0hHDrctII8pF44f9hvpBrjtwYWRqyKvmwjgOXo30P2a13GHHKaT7YwhEHuTvsH7Px
+	tuuaMLu1RSDArlrWgIdsbBJbkawf8wTq7n73mpUi4UXGblfOx+zevma4gbsFAqd3cadWNXhZz0U
+	OiXzDou4YE83Mna9DiENfoeC87WzQ/c4gxHdIGBfTG6uc8aWsPAtWlAqVoYeydQzDRQVgnRGgmF
+	U7NcfTJG54+5Q/xLX192VufS2nAxOvXQU92b4dPSPu4WOVWcxao/bJob+x4MNp0lJTstRz3QVzK
+	h3kx+JudMsGnbppohgCze+pV30xIUKbTjvBCUo2cSr5G2U6WVK2QW779SIgPEtuaoMz7gnnoV3g
+	f9f/dyTog=
+X-Google-Smtp-Source: AGHT+IGnOv9l1GPF2QRjAQJj6nCOHdYFB+j/jBqimM5n8rIVXUeoQADXI3xEZDsAaop4mPz3EecSjg==
+X-Received: by 2002:a17:90b:4c4c:b0:329:e4d1:c20f with SMTP id 98e67ed59e1d1-33bcf873e1bmr28314920a91.9.1761181224284;
+        Wed, 22 Oct 2025 18:00:24 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:8::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33e223e2a48sm3855388a91.6.2025.10.22.18.00.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Oct 2025 18:00:23 -0700 (PDT)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Subject: [PATCH net-next 00/12] selftests/vsock: refactor and improve
+ vmtest infrastructure
+Date: Wed, 22 Oct 2025 18:00:04 -0700
+Message-Id: <20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABR++WgC/42OQQrCMBREr1L+2i9JbCm68h7SRZr+2KBJSn4Il
+ dK7G4oHcDnzhpnZgCk5Yrg1GyQqjl0MVchTA2bW4UnopqpBCdVJoSQWjuaFTG+biTOjdSsx6jC
+ h80uKhTyFaouub1th7aishlq2JDqStesBgTIGWjMMlcyOc0yf40GRB/+NqX/HikSBLV37i52Uo
+ VHePWV9NtHDsO/7F6ESUlXlAAAA
+To: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Bobby Eshleman <bobbyeshleman@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Bobby Eshleman <bobbyeshleman@meta.com>
+X-Mailer: b4 0.13.0
 
-On Wed, 22 Oct 2025 12:37:36 -0700 Daniel Zahka wrote:
-> 		mlx5_core_warn(mdev,
-> +			       "fail to create psp rx flow counter err(%ld)\n",
-> +			       PTR_ERR(flow_counter));
-> +		err = PTR_ERR(flow_counter);
-> +		goto out_err;
-> +	}
-> +	accel_psp->rx_counter = flow_counter;
-> +
-> +	flow_counter = mlx5_fc_create(mdev, false);
-> +	if (IS_ERR(flow_counter)) {
-> +		mlx5_core_warn(mdev,
-> +			       "fail to create psp rx auth fail flow counter err(%ld)\n",
-> +			       PTR_ERR(flow_counter));
-> +		err = PTR_ERR(flow_counter);
-> +		goto out_counter_err;
-> +	}
-> +	accel_psp->rx_auth_fail_counter = flow_counter;
-> +
-> +	flow_counter = mlx5_fc_create(mdev, false);
-> +	if (IS_ERR(flow_counter)) {
-> +		mlx5_core_warn(mdev,
-> +			       "fail to create psp rx error flow counter err(%ld)\n",
-> +			       PTR_ERR(flow_counter));
-> +		err = PTR_ERR(flow_counter);
-> +		goto out_auth_fail_counter_err;
-> +	}
-> +	accel_psp->rx_err_counter = flow_counter;
-> +
-> +	flow_counter = mlx5_fc_create(mdev, false);
-> +	if (IS_ERR(flow_counter)) {
-> +		mlx5_core_warn(mdev,
-> +			       "fail to create psp rx auth fail flow counter err(%ld)\n",
-> +			       PTR_ERR(flow_counter));
+Hey all,
 
-Coccicheck sayeth (5x):
+This patch series refactors the vsock selftest VM infrastructure to
+improve test run times, reduce false-positives, improve logging
+generally, and fix several bugs.
 
-drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c:
-WARNING: Consider using %pe to print PTR_ERR()
+It also prepares for future tests which make heavy usage of these
+refactored functions and have new requirements such as simultaneous QEMU
+processes.
 
-That's %pe, flow_counter instead of %d, PTR_ERR(flow_counter)
+These patches were broken off from this prior series:
+https://lore.kernel.org/all/20251021-vsock-vmtest-v7-0-0661b7b6f081@meta.com/
+
+To: Stefano Garzarella <sgarzare@redhat.com>
+To: Shuah Khan <shuah@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: virtualization@lists.linux.dev
+Cc: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+
+---
+Bobby Eshleman (12):
+      selftests/vsock: improve logging in vmtest.sh
+      selftests/vsock: make wait_for_listener() work even if pipefail is on
+      selftests/vsock: reuse logic for vsock_test through wrapper functions
+      selftests/vsock: avoid multi-VM pidfile collisions with QEMU
+      selftests/vsock: do not unconditionally die if qemu fails
+      selftests/vsock: speed up tests by reducing the QEMU pidfile timeout
+      selftests/vsock: add check_result() for pass/fail counting
+      selftests/vsock: identify and execute tests that can re-use VM
+      selftests/vsock: add BUILD=0 definition
+      selftests/vsock: avoid false-positives when checking dmesg
+      selftests/vsock: add 1.37 to tested virtme-ng versions
+      selftests/vsock: add vsock_loopback module loading
+
+ tools/testing/selftests/vsock/vmtest.sh | 345 +++++++++++++++++++++-----------
+ 1 file changed, 227 insertions(+), 118 deletions(-)
+---
+base-commit: 962ac5ca99a5c3e7469215bf47572440402dfd59
+change-id: 20251021-vsock-selftests-fixes-and-improvements-057440ffb2fa
+
+Best regards,
 -- 
-pw-bot: cr
+Bobby Eshleman <bobbyeshleman@meta.com>
+
 
