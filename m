@@ -1,78 +1,148 @@
-Return-Path: <netdev+bounces-232127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17509C01831
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 15:45:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BA92C0183A
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 15:46:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0E4F1889136
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 13:41:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97CA31A681AD
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 13:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0AF31280B;
-	Thu, 23 Oct 2025 13:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F03301037;
+	Thu, 23 Oct 2025 13:39:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2qEoWid"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C66+2BRk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E42930B527;
-	Thu, 23 Oct 2025 13:38:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725CF2264C4
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 13:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761226687; cv=none; b=PjXVBFmU8f2+U+5RT0FxblSt0GAr4ArvOEmZ9arDbb3slmllJjVdBV9BfIKSRKKfq1prW7ekEci8prmuEjTKBe3pvIG0h2LJpzfC1JKezYOC4jsvDpE8ERcRmo2uiYNvW70apI/KvQ+H4juAxJ8DRY5KvsovGT2iyzGsfYBcHTw=
+	t=1761226758; cv=none; b=PhUBZzMhlubDiowDsQzU3m45VA4IDt/lSf0kSwoiQZLCRwMkex9VF6cUHj8mP4nUwX+uJXeYsz6eyGpKTRBQtGkTfejOoK7bbJcJtK+keqgOhV70qPeCZ4LIavXelVUvC0FfulAKYpfypUKOhbbJMW4xP7wAJGIYxuR0jN41t/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761226687; c=relaxed/simple;
-	bh=hJRiIku0v3R2e9HuMOMNdKlo5Q2k1VCqpifdBakfjZ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qjnx8IOKmjBrqezsTAGczVhAcZD0aQzjwyA2PanAnUw9sSSWG4hikmVsbI2loS7Wc2CJnfYijqehm71efjb7KAG+Im3WAs5w8eMsntCX7qJKrCNewKPufijzx0Hkx8zarvN4bv/G0KPVeuuzMskIVwAUi/gFFK8I54vhPCVl4fU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f2qEoWid; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15DEBC4CEE7;
-	Thu, 23 Oct 2025 13:38:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761226686;
-	bh=hJRiIku0v3R2e9HuMOMNdKlo5Q2k1VCqpifdBakfjZ8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f2qEoWidFhGQ35FvTPJO1wrglL6XxkIq+/SjZ7BvTsVJl5/z86DUOwzel49ph4u4M
-	 VhJiBvbEO738scaxpn+/66u5FWJl4qANcCFdz0SmoAZP9gpN/p2IdysoJBjrDeT+zP
-	 g6yJeoTzdIf5ku0myNdnG8udToIjh6TdBUx7vz4J71G6Atk+8tlC+hEXkGlzlywItT
-	 ZrMHUyzFYOHAeauP2nuVfJ55hx0xv2mcX3Mk9mcU54rnvukXw8DV/zey9zrbQR0X50
-	 kihNF0Q8wlALF77KVmH1NMEHY9qB+iWurTcPBA+nuuMq1vu7cZTtZks2HWDfiuQfu2
-	 96NDWwVe4/BMA==
-Date: Thu, 23 Oct 2025 06:38:05 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Daniel Zahka <daniel.zahka@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan
- <tariqt@nvidia.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Leon Romanovsky <leon@kernel.org>, Mark Bloch
- <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Vlad Dumitrescu
- <vdumitrescu@nvidia.com>, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next] net/mlx5: Implement swp_l4_csum_mode via
- devlink params
-Message-ID: <20251023063805.5635e50e@kernel.org>
-In-Reply-To: <uqbng3vzz2ybmrrhdcocsfjtfxitck2rs76hcrsk7aiddjssp2@haqcnmzrljws>
-References: <20251022190932.1073898-1-daniel.zahka@gmail.com>
-	<uqbng3vzz2ybmrrhdcocsfjtfxitck2rs76hcrsk7aiddjssp2@haqcnmzrljws>
+	s=arc-20240116; t=1761226758; c=relaxed/simple;
+	bh=nLCvLEkdc5q+ptZjzAZ6ZBYvlPEoBZk5NFegoEmROpQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D1wZTsNqxDpY7BRrZdfmtBeSJmdJCQCM+RaE2xu6SzDXkxqWEB/KeOoC2uPMh+oIv5BOZo0aX955TJ4700XXK6RUYk+U5nsd0t9CqehzkfZs5SaYvhwt21XYHrhV6aGDUzfLz4JsSY2q7l9r/JW1xn8KghC8mwqyWVd5NOcr1hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C66+2BRk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761226755;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3hRnqWZfluM80j2wuvefphaYJkh2F6l+zMWl7pNJRz0=;
+	b=C66+2BRkayp0qSeDbqcVfV3vLXel/XwzNr18HVYcrc4uICdnRnD+gyXTDcubHV/J+JWvIf
+	gdeD0EfC0V171tKL4dZanLw/Q+tfmh2SUYBkAoXES9AMcjDJna0qFPcsKQyGcRmjU3IeAr
+	l7qgIjTfvGlmDNkfyUNG09t+7feAQwQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-304-uQQoCAx2MTyN15tJiNq0mQ-1; Thu, 23 Oct 2025 09:39:12 -0400
+X-MC-Unique: uQQoCAx2MTyN15tJiNq0mQ-1
+X-Mimecast-MFC-AGG-ID: uQQoCAx2MTyN15tJiNq0mQ_1761226750
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-471005f28d2so5020845e9.0
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 06:39:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761226750; x=1761831550;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3hRnqWZfluM80j2wuvefphaYJkh2F6l+zMWl7pNJRz0=;
+        b=i2zDa/DwXV9boIbcM4gwatut49Grha/ejyJsFE234clGhqAQ72qUlMyOhaQazJuIP7
+         j8/Va1fOmU2XKwgZCJpqNn+BOS85TQUvDuwUL/ItEdfywVJqg6QPUnLrM2nulYYo+CC5
+         nZb+qXg2tlrv8A6lPEZ6zns2Fn7FOj9ebz73CNtpAvbAYEpuiC05UdATpm89b5fCYg9t
+         ubymDJNt/HMh0EcFvbu+zXqRI/+q+B3n/hZCiQgaICg8E86ZCfmVfcEfB9uNtEjsPftZ
+         MHdGBmmR3kLtMRqf3PdzBQPdtB6GUt4TvmPTBpTe366bl8D6K8ZA8ic1GCImaUtj2Ed7
+         SwDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV8nqKW5OiYGjRnQduS+skXJQ8ScwIdTDY1yk+C4cbeC/hOw9OhhFhHvExdULIu/nwAPf3Ndhk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLUzAYThYlLY9SAQmcQcVhOBMIXCwFGI7MbDfXoxFb9SAcMpYl
+	GxWRUFejTNrkLxdhugX173W3rGU687KHEuju9OXEKD4R2M1lzRAFwX+DzV0+gC2seAHGPHycv6D
+	gH2xBNDEFqKaKP34lZiS1fkHnLHUiXLcslVOeP8fxlZK1wHT2M73Ju5CN+A==
+X-Gm-Gg: ASbGncuU+A9KA+IJIfKFyz4ciOEDt4ke43xjLo0FN3DEWKB/0fdMmVy23IxJ2wsnQP9
+	ZyUrFJ5I7BZaXnzjxU13QJkTuJXCdyTgBTsYLQJr6PkN2sxMG8Y1JKpaoscvqhd34F5l0sbKY6O
+	9QvMCsEEj5fa46I8iU5XF14IkmyvExV6wjbPHk0eortezDrb3nL52McNu7a3pSuKMcbqdIGSMcY
+	btHahVMYJZ2PBvwwpxbqd2bGgpkyyc/0g8D0XOOg2Vw8AmatD+KK2rWazQ+DTpK8EC4ugbbFwal
+	aDBirTZJhWGV9ckNhZ8mr3U8NThTCCIrRERaG3g7+pOzpUAw+/jBNu4Tkirclhzn5TLmZkJYjm+
+	WMAGiSqQNzbTGJ5j5kpjwCwaxDS5REcKFCr8Zpy5pBVmpWRg=
+X-Received: by 2002:a05:600c:828a:b0:46e:39e1:fc3c with SMTP id 5b1f17b1804b1-4711787617amr172514655e9.5.1761226749912;
+        Thu, 23 Oct 2025 06:39:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEhLfDdm1Baiu89q1xz5zPuRntG/uiMjewVHvOV38lU3g102EskTDW+dqa0AcTwp/f9+N+bBw==
+X-Received: by 2002:a05:600c:828a:b0:46e:39e1:fc3c with SMTP id 5b1f17b1804b1-4711787617amr172514505e9.5.1761226749560;
+        Thu, 23 Oct 2025 06:39:09 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475c4342373sm116434815e9.12.2025.10.23.06.39.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Oct 2025 06:39:09 -0700 (PDT)
+Message-ID: <38605efc-32f5-4c78-a628-11f8f07668f0@redhat.com>
+Date: Thu, 23 Oct 2025 15:39:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: vlan: sync VLAN features with lower device
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+ "Dr. David Alan Gilbert" <linux@treblig.org>,
+ Dong Chenchen <dongchenchen2@huawei.com>, Oscar Maes <oscmaes92@gmail.com>
+References: <20251021095658.86478-1-liuhangbin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251021095658.86478-1-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, 23 Oct 2025 14:18:20 +0200 Jiri Pirko wrote:
-> >+	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_SWP_L4_CSUM_MODE,  
+On 10/21/25 11:56 AM, Hangbin Liu wrote:
+> After registering a VLAN device and setting its feature flags, we need to
+> synchronize the VLAN features with the lower device. For example, the VLAN
+> device does not have the NETIF_F_LRO flag, it should be synchronized with
+> the lower device based on the NETIF_F_UPPER_DISABLES definition.
 > 
-> Why this is driver specific? Isn't this something other drivers might
-> eventually implement as well?
+> As the dev->vlan_features has changed, we need to call
+> netdev_change_features(). The caller must run after netdev_upper_dev_link()
+> links the lower devices, so this patch adds the netdev_change_features()
+> call in register_vlan_dev().
 
-Seems highly unlikely, TBH.
+
+> 
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+> 
+> I’m not sure what the proper Fixes tag should be, so I’ve left it blank for
+> now. If anyone has a clue, please let me know.
+
+Apparently the issue is there since fd867d51f889aec11cca235ebb008578780d052d
+
+> 
+> ---
+>  net/8021q/vlan.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
+> index fda3a80e9340..4857fb0ee11d 100644
+> --- a/net/8021q/vlan.c
+> +++ b/net/8021q/vlan.c
+> @@ -193,6 +193,8 @@ int register_vlan_dev(struct net_device *dev, struct netlink_ext_ack *extack)
+>  	vlan_group_set_device(grp, vlan->vlan_proto, vlan_id, dev);
+>  	grp->nr_vlan_devs++;
+>  
+> +	netdev_change_features(dev);
+
+Is this just for NETIF_F_LRO? it feels a bit overkill for single flag.
+Also, why netdev_change_features() (vs netdev_update_features())?> +
+>  	return 0;
+>  
+>  out_unregister_netdev:
+
 
