@@ -1,358 +1,285 @@
-Return-Path: <netdev+bounces-232265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94F72C03909
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 23:39:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90ECFC039FF
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 23:57:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39EFB189B7D8
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 21:40:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21D3B3B195E
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 21:57:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10765226CFE;
-	Thu, 23 Oct 2025 21:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D856323C50F;
+	Thu, 23 Oct 2025 21:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Xx41vVak"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jq+/+ze9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420771E5B95
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 21:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CCE01F5827
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 21:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761255574; cv=none; b=O2Sno9grYQph0lUGIG8FEz2vSDccrrG1RGIAcfJxhqrCeXLI0Yql0wQhLQWuyYCm50yx+q8Zri2rAkmYXtVk2s2fJ3Jgxk+A4FT/z+Q0xoJtAnapCprEYwNzhCBA+ZBVnK1CpX6bcR/oW2Z6X9heauRMf5HK6RjbSokBFNPmJ+I=
+	t=1761256674; cv=none; b=g960PvAaJ1h4S7nbhh/RsG1KCpH4tyLTKGD9uHqF+zy6ER9Q2dnx0EpyVTIRaMZJaj9yNjRNUeMX8hrCogPa6GJSW2jgNK+zqvXQUME93psm9BnD7YvfrYAbmcbIjEP7qRHQPzLlAQtLco9vZlcl7I7cBrBeAwoNfge/f24YCkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761255574; c=relaxed/simple;
-	bh=vktg7TzNejM4HGzP62nJe3a3/sSTdo6B9txohbxks2c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a1LDcetxTEpgQ1apm18Yhm44VlYQPmlOLT9B1X70sBY+DSmnZUwvNEiO4nJcZPbKJt9mQf9Bg7jR9C1vnWhj5x0pASTRgXsxy55qR6SnG7Shrwk9MGhmAL32MeEp2ZloqvyxiqYjyZe7MTDKjGBhJ4+xYEqIUPncUdbmWhakFGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Xx41vVak; arc=none smtp.client-ip=209.85.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7c28bf230feso2210546a34.0
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 14:39:32 -0700 (PDT)
+	s=arc-20240116; t=1761256674; c=relaxed/simple;
+	bh=gDkOmzoP14z1GCVebJrdLtoXgwM0uE5dVdX8pgmVjII=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LdHYBh6cHTtONUwwxGgTnBG43uUw4A10cf2v3sXOpH/HPtmV/tMKqwMsPZR2u1hOqnjixKtUsrD2YwX06oDTM73MqWjeFD/KG/ERGUKoPx90Rs3bmHS39fPWfTgaOkTZVcII+0nnYAV2hfxqMDm/N5i58Vtg4KT9j22gFOar27s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jq+/+ze9; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-269639879c3so12055225ad.2
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 14:57:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761255571; x=1761860371; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RusTwYzmfQt1i/MMnUWOiMy7mTgUsaeXYk3E3ujdD8A=;
-        b=Xx41vVak7F9pjtkyhztRXXlCXV8F0atVK1j0zyh1EDOqkU+47gzLhfqdQrKU9mgH2u
-         y7Ghxf2AaWAAShzW+xGtuvubRz5nG3XM/jin3AN59cqJ6ljhVCPzhxPxd1XouupiiCaG
-         kpSSprNBX7DA0eLxSBYJ1SITglgGd7IA2/HktUBY/oqnLOrWjc21aBDicECowMWPkqZb
-         dpk+OoktumsIPoWSCLL4zGsMw3/GnCJQdK+R1i2VJpTaKpcan70DpiMLZ0SZIPCeur8/
-         zDcXPdOxcsD02xzTShlglXnmuZCVGfQc7Jv8dG6SyFOjmqQ8E43qWP0CLgQ7nMNenJoo
-         suig==
+        d=gmail.com; s=20230601; t=1761256672; x=1761861472; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q9WG+KOo9BCHH3lanx8NKocqYMchJGDyHo5r4QpwNmk=;
+        b=jq+/+ze9q9lnk6F0AUcW9fTDPFGk2+5tkDNwkYDv0a7p3BG8i+2xKgMR2dtE291Psw
+         gHeHZ5QGDRPmRrq6J3G7L0/Jt3zPgjdoJx9WwvXEAoXOO49s/XNsJnHjeIR+KfEDk6nz
+         qDoqQy1r0GJcfYlsVdKyiukow4DVP5shOrD6ivJ1GDiI0NCqoV+1CjK3nlQLTnbJTWOs
+         NLOPMWA5XsRrfV3acQj66zpmtMM9dniSyJjsmGWD0AZYril80GuwZyMcUOXC/T1g1oh0
+         VUMQtij6w62KgT7FXvSrFBvpn0AOt4YjkCFqHpfT2jRk8pbe7OplP5vC3EETWTLsHUd3
+         wcYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761255571; x=1761860371;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RusTwYzmfQt1i/MMnUWOiMy7mTgUsaeXYk3E3ujdD8A=;
-        b=iowR+NTUvGJeRe/Vdsoq9ct6dJHeBlJ5F1Z84C0PCEcgEYi3xbAa9An9liPjKsItQ7
-         yGw8+SS7gqKPrgxY+VnxtmFAyYIqsSSAPLQQGpuujE2ZBfLy37Y711aJXaCU1VNO6FiR
-         LTKsLkCqHo+7XpHsf45SIPe3BkE4AGk4Kkn8d/6HVfdG21enCP/soN9v87wVlrDBYdVt
-         pOBVThdayVUVYQWLr93ja9ShsPjBH8AXhjvrMNX5je86aqn/c1/kUSjiA2cgbf1c1maK
-         rb9x8+tkG7ojOYc2F55mdQ9Hup21kW2U4xyJ6I222Nb/3eEqyDmMi6jDDPZL/lO0sntf
-         sxcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWsPIGNwFrzEWb+Lt1Ikt1WeovS70ktNI5dlDeIcPNowc3A3X+W+42jyIo8Z8WPzabN6sma0oQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhsawtOWF6VyZqSgwLCbF147WVgjroOzPrHlIu3E1JyPfM0ePf
-	9wOG5h/3fAZSjfxWsx8llBEGr94BU70ajAAuHkvBB6l3G53aBIJegSI8Ko4ecPXkalZhPF6dqRE
-	9Aa7y
-X-Gm-Gg: ASbGncv20fqrb3mXEYhrzSfC+DcRQ6XxXbPMPa02MGwu++EpegSdeqDN+W1+33v3z6U
-	gkX250WC9+iXg65+iMoHXyCbMmJCTm68khsNQO9xEZe1OGJtZruAomqgqS/4cgBV+42zIr8F0gb
-	Zgv2fpsH23IZFvhJomN8L3WoStU62Pum2YCzQCRCpOqQ+VDctQ8JOj/XzvgXhh9Ny1QwvWiHmOO
-	lBqeQlGzo2pPrqTQDCZhdAlMYgHyytPC5gFNKrrX6uz+46kCG4HxfX9923L195nGDsBODP+FCvV
-	vWYGaWwR+gqHbQE7r21v6heEC7oP/KZ1HEHapduoyML7nTu3CCHeQKI8u0Gfgu6WyzOgj7oorNQ
-	T0eDtVC64tYv3+1KKcmpz2FqHlEK50w98Wes/94Ud+/Sydfn3FpqDwJmYpAdkr+GNXz7W+xz32t
-	unmjkti0NLlCwK0Wk=
-X-Google-Smtp-Source: AGHT+IGgUK5gvXJyPWAdvjPmbwbyrBbJXLLjTwwhrM34BooBIU9ikpp8WOZFSTBcvUor7L6A/kDRjQ==
-X-Received: by 2002:a05:6808:1984:b0:443:a3c0:893c with SMTP id 5614622812f47-44d918b6e6amr199835b6e.24.1761255571217;
-        Thu, 23 Oct 2025 14:39:31 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff::])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-44bd44c22ccsm739380b6e.20.2025.10.23.14.39.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Oct 2025 14:39:30 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: io-uring@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH v1] io_uring zcrx: allow sharing of ifqs with other instances
-Date: Thu, 23 Oct 2025 14:39:22 -0700
-Message-ID: <20251023213922.3451751-1-dw@davidwei.uk>
-X-Mailer: git-send-email 2.47.3
+        d=1e100.net; s=20230601; t=1761256672; x=1761861472;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q9WG+KOo9BCHH3lanx8NKocqYMchJGDyHo5r4QpwNmk=;
+        b=IrJAqGOlr9PyneLCuWaNjsMTZjW0fqJLTaKa+Rpb4Eyi93WL894IzZuBL2vdxit9E1
+         Ej/sC3fy8VdP3uuF9YYmYg8IMmjBshUyZ4m8H7kQeI1WTcKa2xVJI7AljUq6/lcDZoyW
+         /QmM2AsptbvZGm/I+ZG4re2dXzihccZvqbk0YGvS/FYzPfgVLaOXhCnlGUp+sM6Sx0Na
+         Zhsav0XQQsCqR3V36o8s0DISxal6GIOGmp1IUNqbnmipaxj+GoxqTAld0z/Ifr3fnEvr
+         kgih0SVKBGzCsd0pO5XKseNIwrHcCp27GOw1M9K3xzj6C4iVlKSu8uHWr3C9Mac7Q0kh
+         SRhA==
+X-Forwarded-Encrypted: i=1; AJvYcCW9WE1mD4T0cfW9xLMDJ8ue7VgztmndbIrGns80KDHvUIi9xN+c7XItF+9P7lX42i/2YR9voPo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqPGn27eYR+gtDBm4wkYyVzES+IWU4cWNOMSiCeAuMph8VFDr/
+	ykVXuKHBTiLn6I0pHyQHS2dKRQtvRtxaesBqACZTo7coRO0GkQt7yqxTD+rfoVT7lIVhihRAUG+
+	MpjIyoctbLTl3PUKWCua0o7qNoZ/ID7g=
+X-Gm-Gg: ASbGncuwKKQDW2A7MZOqw43suIfMSoG6y4Yn7Z5fMkzTIdMNcp8EyOGSO1gZ7kO52fh
+	y+UxhVmIEZ24wS43KM2gVMvH0PXVdRZu5mQvw8JVZPSCpQ4QwTnD9VXbDZBRi7ASO4ALSAxf2xQ
+	nR/zNELdqToYwpWDl5QZLr0HjVH1DD/ZLmo3eu3nZh1F2EnU9+rtLiMSSfJPjUGFSxYHRs/Y1jF
+	vRFZvm+tQBL048RAPACxkdz+sUHVza8kX+VlBXA7Pvd0n1wcPRU7wxIzQCehPCLzYM2KBRm6wFC
+	CVNxT5jpfVmJySH4HnNicFXNi1FhJA==
+X-Google-Smtp-Source: AGHT+IHT71u2lGyclYwLkstTK2gIVOr5R+zvwzIUtz5iOzpZIwYnd2M+Eglq5zNM3G0PQ0V1gAnlJXHXBnY0BFqhWsQ=
+X-Received: by 2002:a17:903:19e5:b0:24e:593b:d107 with SMTP id
+ d9443c01a7336-290caf85236mr311281715ad.32.1761256672434; Thu, 23 Oct 2025
+ 14:57:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CADvbK_eGSkXO1F168tCKd37hNqTVhPLprWpXOM-Z3KN29dB=Zg@mail.gmail.com>
+ <20251023204833.3749214-1-kuniyu@google.com>
+In-Reply-To: <20251023204833.3749214-1-kuniyu@google.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 23 Oct 2025 17:57:40 -0400
+X-Gm-Features: AS18NWDsx_UZlCPi1WP_2w7PSPPLODZDwSODMiCEI-KmDydayqlE_1iKzCLPUuI
+Message-ID: <CADvbK_eObVPH9GJfkpCsHt1obg6sDY0jQ0cpA=c6yyjRiQEaYw@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 4/8] net: Add sk_clone().
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, kuni1840@gmail.com, linux-sctp@vger.kernel.org, 
+	marcelo.leitner@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Each ifq is bound to a HW RX queue with no way to share this across
-multiple io_uring instances. It is possible that one io_uring instance
-will not be able to fully saturate an entire HW RX queue. To handle more
-work the only way is to add additional io_uring instances w/ ifqs, but
-HW RX queues are a limited resource on a system.
+On Thu, Oct 23, 2025 at 4:48=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
+m> wrote:
+>
+> From: Xin Long <lucien.xin@gmail.com>
+> Date: Thu, 23 Oct 2025 15:55:57 -0400
+> > On Thu, Oct 23, 2025 at 3:22=E2=80=AFPM Kuniyuki Iwashima <kuniyu@googl=
+e.com> wrote:
+> > >
+> > > On Thu, Oct 23, 2025 at 12:08=E2=80=AFPM Xin Long <lucien.xin@gmail.c=
+om> wrote:
+> > > >
+> > > > On Wed, Oct 22, 2025 at 6:57=E2=80=AFPM Kuniyuki Iwashima <kuniyu@g=
+oogle.com> wrote:
+> > > > >
+> > > > > On Wed, Oct 22, 2025 at 3:04=E2=80=AFPM Xin Long <lucien.xin@gmai=
+l.com> wrote:
+> > > > > >
+> > > > > > On Wed, Oct 22, 2025 at 5:17=E2=80=AFPM Kuniyuki Iwashima <kuni=
+yu@google.com> wrote:
+> > > > > > >
+> > > > > > > sctp_accept() will use sk_clone_lock(), but it will be called
+> > > > > > > with the parent socket locked, and sctp_migrate() acquires th=
+e
+> > > > > > > child lock later.
+> > > > > > >
+> > > > > > > Let's add no lock version of sk_clone_lock().
+> > > > > > >
+> > > > > > > Note that lockdep complains if we simply use bh_lock_sock_nes=
+ted().
+> > > > > > >
+> > > > > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > > > > > > ---
+> > > > > > >  include/net/sock.h |  7 ++++++-
+> > > > > > >  net/core/sock.c    | 21 ++++++++++++++-------
+> > > > > > >  2 files changed, 20 insertions(+), 8 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/include/net/sock.h b/include/net/sock.h
+> > > > > > > index 01ce231603db..c7e58b8e8a90 100644
+> > > > > > > --- a/include/net/sock.h
+> > > > > > > +++ b/include/net/sock.h
+> > > > > > > @@ -1822,7 +1822,12 @@ struct sock *sk_alloc(struct net *net,=
+ int family, gfp_t priority,
+> > > > > > >  void sk_free(struct sock *sk);
+> > > > > > >  void sk_net_refcnt_upgrade(struct sock *sk);
+> > > > > > >  void sk_destruct(struct sock *sk);
+> > > > > > > -struct sock *sk_clone_lock(const struct sock *sk, const gfp_=
+t priority);
+> > > > > > > +struct sock *sk_clone(const struct sock *sk, const gfp_t pri=
+ority, bool lock);
+> > > > > > > +
+> > > > > > > +static inline struct sock *sk_clone_lock(const struct sock *=
+sk, const gfp_t priority)
+> > > > > > > +{
+> > > > > > > +       return sk_clone(sk, priority, true);
+> > > > > > > +}
+> > > > > > >
+> > > > > > >  struct sk_buff *sock_wmalloc(struct sock *sk, unsigned long =
+size, int force,
+> > > > > > >                              gfp_t priority);
+> > > > > > > diff --git a/net/core/sock.c b/net/core/sock.c
+> > > > > > > index a99132cc0965..0a3021f8f8c1 100644
+> > > > > > > --- a/net/core/sock.c
+> > > > > > > +++ b/net/core/sock.c
+> > > > > > > @@ -2462,13 +2462,16 @@ static void sk_init_common(struct soc=
+k *sk)
+> > > > > > >  }
+> > > > > > >
+> > > > > > >  /**
+> > > > > > > - *     sk_clone_lock - clone a socket, and lock its clone
+> > > > > > > - *     @sk: the socket to clone
+> > > > > > > - *     @priority: for allocation (%GFP_KERNEL, %GFP_ATOMIC, =
+etc)
+> > > > > > > + * sk_clone - clone a socket
+> > > > > > > + * @sk: the socket to clone
+> > > > > > > + * @priority: for allocation (%GFP_KERNEL, %GFP_ATOMIC, etc)
+> > > > > > > + * @lock: if true, lock the cloned sk
+> > > > > > >   *
+> > > > > > > - *     Caller must unlock socket even in error path (bh_unlo=
+ck_sock(newsk))
+> > > > > > > + * If @lock is true, the clone is locked by bh_lock_sock(), =
+and
+> > > > > > > + * caller must unlock socket even in error path by bh_unlock=
+_sock().
+> > > > > > >   */
+> > > > > > > -struct sock *sk_clone_lock(const struct sock *sk, const gfp_=
+t priority)
+> > > > > > > +struct sock *sk_clone(const struct sock *sk, const gfp_t pri=
+ority,
+> > > > > > > +                     bool lock)
+> > > > > > >  {
+> > > > > > >         struct proto *prot =3D READ_ONCE(sk->sk_prot);
+> > > > > > >         struct sk_filter *filter;
+> > > > > > > @@ -2497,9 +2500,13 @@ struct sock *sk_clone_lock(const struc=
+t sock *sk, const gfp_t priority)
+> > > > > > >                 __netns_tracker_alloc(sock_net(newsk), &newsk=
+->ns_tracker,
+> > > > > > >                                       false, priority);
+> > > > > > >         }
+> > > > > > > +
+> > > > > > >         sk_node_init(&newsk->sk_node);
+> > > > > > >         sock_lock_init(newsk);
+> > > > > > > -       bh_lock_sock(newsk);
+> > > > > > > +
+> > > > > > > +       if (lock)
+> > > > > > > +               bh_lock_sock(newsk);
+> > > > > > > +
+> > > > > > does it really need bh_lock_sock() that early, if not, maybe we=
+ can move
+> > > > > > it out of sk_clone_lock(), and names sk_clone_lock() back to sk=
+_clone()?
+> > > > >
+> > > > > I think sk_clone_lock() and leaf functions do not have
+> > > > > lockdep_sock_is_held(), and probably the closest one is
+> > > > > security_inet_csk_clone() which requires lock_sock() for
+> > > > > bpf_setsockopt(), this can be easily adjusted though.
+> > > > > (see bpf_lsm_locked_sockopt_hooks)
+> > > > >
+> > > > Right.
+> > > >
+> > > > > Only concern would be moving bh_lock_sock() there will
+> > > > > introduce one cache line miss.
+> > > > I think it=E2=80=99s negligible, and it=E2=80=99s not even on the d=
+ata path, though others
+> > > > may have different opinions.
+> > >
+> > > For SCTP, yes, but I'd avoid it for TCP.
+> > Okay, not a problem, just doesn't look common to pass such a parameter.
+>
+> Another option would be add a check like this ?
+>
+> ---8<---
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index c7e58b8e8a90..e708b70b04da 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -2904,6 +2904,12 @@ static inline bool sk_is_inet(const struct sock *s=
+k)
+>         return family =3D=3D AF_INET || family =3D=3D AF_INET6;
+>  }
+>
+> +static inline bool sk_is_sctp(const struct sock *sk)
+> +{
+> +       return IS_ENABLED(CONFIG_SCTP) &&
+> +               sk->sk_protocol =3D=3D IPPROTO_SCTP;
+> +}
+> +
+Oh, better not, I'm actually planning to use sk_clone() in quic_accept() :D
 
-From userspace it is possible to move work from this io_uring instance
-w/ an ifq to other threads, but this will incur context switch overhead.
-What I'd like to do is share an ifq (and hence a HW RX queue) across
-multiple rings.
+https://github.com/lxin/quic/blob/main/modules/net/quic/socket.c#L1421
 
-Add a way for io_uring instances to clone an ifq from another. This is
-done by passing a new flag IORING_ZCRX_IFQ_REG_CLONE in the registration
-struct io_uring_zcrx_ifq_reg, alongside the fd and ifq id of the ifq to
-be cloned.
-
-The cloned ifq holds two refs:
-  1. On the source io_ring_ctx percpu_ref
-  2. On the source ifq refcount_t
-
-This ensures that the source ifq and ring ctx remains valid while there
-are proxies.
-
-The only way to destroy an ifq today is to destroy the entire ring, so
-both the real ifq and the proxy ifq are freed together.
-
-At runtime, io_zcrx_recv_frag checks the ifq in the net_iov->priv field.
-This is expected to be the primary ifq that is bound to a HW RX queue,
-and is what prevents another ring from issuing io_recvzc on a zero copy
-socket. Once a secondary ring clones the ifq, this check will pass.
-
-It's expected for userspace to coordinate the sharing and
-synchronisation of the refill queue when returning buffers. The kernel
-is not involved at all.
-
-It's also expected userspace to distributed accepted sockets with
-connections steered to zero copy queues across multiple rings for load
-balancing.
-
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- include/uapi/linux/io_uring.h |  4 ++
- io_uring/net.c                |  2 +
- io_uring/rsrc.c               |  2 +-
- io_uring/rsrc.h               |  1 +
- io_uring/zcrx.c               | 90 +++++++++++++++++++++++++++++++++--
- io_uring/zcrx.h               |  3 ++
- 6 files changed, 98 insertions(+), 4 deletions(-)
-
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index 263bed13473e..8e4227a40d09 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -1055,6 +1055,10 @@ struct io_uring_zcrx_area_reg {
- 	__u64	__resv2[2];
- };
- 
-+enum io_uring_zcrx_ifq_reg_flags {
-+	IORING_ZCRX_IFQ_REG_CLONE	= 1,
-+};
-+
- /*
-  * Argument for IORING_REGISTER_ZCRX_IFQ
-  */
-diff --git a/io_uring/net.c b/io_uring/net.c
-index a95cc9ca2a4d..8eb6145e0f4d 100644
---- a/io_uring/net.c
-+++ b/io_uring/net.c
-@@ -1250,6 +1250,8 @@ int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- 	zc->ifq = xa_load(&req->ctx->zcrx_ctxs, ifq_idx);
- 	if (!zc->ifq)
- 		return -EINVAL;
-+	if (zc->ifq->proxy)
-+		zc->ifq = zc->ifq->proxy;
- 
- 	zc->len = READ_ONCE(sqe->len);
- 	zc->flags = READ_ONCE(sqe->ioprio);
-diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-index d787c16dc1c3..aae5f2acfcf1 100644
---- a/io_uring/rsrc.c
-+++ b/io_uring/rsrc.c
-@@ -1148,7 +1148,7 @@ int io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
- }
- 
- /* Lock two rings at once. The rings must be different! */
--static void lock_two_rings(struct io_ring_ctx *ctx1, struct io_ring_ctx *ctx2)
-+void lock_two_rings(struct io_ring_ctx *ctx1, struct io_ring_ctx *ctx2)
- {
- 	if (ctx1 > ctx2)
- 		swap(ctx1, ctx2);
-diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
-index a3ca6ba66596..3a9b9e398249 100644
---- a/io_uring/rsrc.h
-+++ b/io_uring/rsrc.h
-@@ -70,6 +70,7 @@ int io_import_reg_vec(int ddir, struct iov_iter *iter,
- int io_prep_reg_iovec(struct io_kiocb *req, struct iou_vec *iv,
- 			const struct iovec __user *uvec, size_t uvec_segs);
- 
-+void lock_two_rings(struct io_ring_ctx *ctx1, struct io_ring_ctx *ctx2);
- int io_register_clone_buffers(struct io_ring_ctx *ctx, void __user *arg);
- int io_sqe_buffers_unregister(struct io_ring_ctx *ctx);
- int io_sqe_buffers_register(struct io_ring_ctx *ctx, void __user *arg,
-diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index a816f5902091..753614820f8f 100644
---- a/io_uring/zcrx.c
-+++ b/io_uring/zcrx.c
-@@ -22,10 +22,10 @@
- #include <uapi/linux/io_uring.h>
- 
- #include "io_uring.h"
--#include "kbuf.h"
- #include "memmap.h"
- #include "zcrx.h"
- #include "rsrc.h"
-+#include "register.h"
- 
- #define IO_ZCRX_AREA_SUPPORTED_FLAGS	(IORING_ZCRX_AREA_DMABUF)
- 
-@@ -519,6 +519,8 @@ static void io_close_queue(struct io_zcrx_ifq *ifq)
- 
- static void io_zcrx_ifq_free(struct io_zcrx_ifq *ifq)
- {
-+	if (ifq->proxy)
-+		goto free;
- 	io_close_queue(ifq);
- 
- 	if (ifq->area)
-@@ -528,6 +530,7 @@ static void io_zcrx_ifq_free(struct io_zcrx_ifq *ifq)
- 
- 	io_free_rbuf_ring(ifq);
- 	mutex_destroy(&ifq->pp_lock);
-+free:
- 	kfree(ifq);
- }
- 
-@@ -541,6 +544,73 @@ struct io_mapped_region *io_zcrx_get_region(struct io_ring_ctx *ctx,
- 	return ifq ? &ifq->region : NULL;
- }
- 
-+static int io_clone_zcrx_ifq(struct io_ring_ctx *ctx,
-+			     struct io_uring_zcrx_ifq_reg __user *arg,
-+			     struct io_uring_zcrx_ifq_reg *reg)
-+{
-+	struct io_zcrx_ifq *ifq, *src_ifq;
-+	struct io_ring_ctx *src_ctx;
-+	struct file *file;
-+	int src_fd, ret;
-+	u32 src_id, id;
-+
-+	src_fd = reg->if_idx;
-+	src_id = reg->if_rxq;
-+
-+	file = io_uring_register_get_file(src_fd, false);
-+	if (IS_ERR(file))
-+		return PTR_ERR(file);
-+
-+	src_ctx = file->private_data;
-+	if (src_ctx == ctx)
-+		return -EBADFD;
-+
-+	mutex_unlock(&ctx->uring_lock);
-+	lock_two_rings(ctx, src_ctx);
-+
-+	percpu_ref_get(&src_ctx->refs);
-+	ret = -EINVAL;
-+	src_ifq = xa_load(&src_ctx->zcrx_ctxs, src_id);
-+	if (!src_ifq)
-+		goto err_unlock;
-+	refcount_inc(&src_ifq->refs);
-+
-+	ifq = kzalloc(sizeof(*ifq), GFP_KERNEL);
-+	ifq->proxy = src_ifq;
-+	ifq->ctx = ctx;
-+	ifq->if_rxq = src_ifq->if_rxq;
-+
-+	scoped_guard(mutex, &ctx->mmap_lock) {
-+		ret = xa_alloc(&ctx->zcrx_ctxs, &id, NULL, xa_limit_31b, GFP_KERNEL);
-+		if (ret)
-+			goto err_free;
-+
-+		ret = -ENOMEM;
-+		if (xa_store(&ctx->zcrx_ctxs, id, ifq, GFP_KERNEL)) {
-+			xa_erase(&ctx->zcrx_ctxs, id);
-+			goto err_free;
-+		}
-+	}
-+
-+	reg->zcrx_id = id;
-+	if (copy_to_user(arg, reg, sizeof(*reg))) {
-+		ret = -EFAULT;
-+		goto err;
-+	}
-+	mutex_unlock(&src_ctx->uring_lock);
-+	fput(file);
-+	return 0;
-+err:
-+	scoped_guard(mutex, &ctx->mmap_lock)
-+		xa_erase(&ctx->zcrx_ctxs, id);
-+err_free:
-+	kfree(ifq);
-+err_unlock:
-+	mutex_unlock(&src_ctx->uring_lock);
-+	fput(file);
-+	return ret;
-+}
-+
- int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 			  struct io_uring_zcrx_ifq_reg __user *arg)
- {
-@@ -566,6 +636,8 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 		return -EINVAL;
- 	if (copy_from_user(&reg, arg, sizeof(reg)))
- 		return -EFAULT;
-+	if (reg.flags & IORING_ZCRX_IFQ_REG_CLONE)
-+		return io_clone_zcrx_ifq(ctx, arg, &reg);
- 	if (copy_from_user(&rd, u64_to_user_ptr(reg.region_ptr), sizeof(rd)))
- 		return -EFAULT;
- 	if (!mem_is_zero(&reg.__resv, sizeof(reg.__resv)) ||
-@@ -587,6 +659,7 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 	if (!ifq)
- 		return -ENOMEM;
- 	ifq->rq_entries = reg.rq_entries;
-+	refcount_set(&ifq->refs, 1);
- 
- 	scoped_guard(mutex, &ctx->mmap_lock) {
- 		/* preallocate id */
-@@ -730,8 +803,19 @@ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
- 	lockdep_assert_held(&ctx->uring_lock);
- 
- 	xa_for_each(&ctx->zcrx_ctxs, index, ifq) {
--		io_zcrx_scrub(ifq);
--		io_close_queue(ifq);
-+		if (ifq->if_rxq == -1)
-+			continue;
-+
-+		if (!ifq->proxy) {
-+			if (refcount_read(&ifq->refs) > 1)
-+				continue;
-+			io_zcrx_scrub(ifq);
-+			io_close_queue(ifq);
-+		} else {
-+			refcount_dec(&ifq->proxy->refs);
-+			percpu_ref_put(&ifq->proxy->ctx->refs);
-+			ifq->if_rxq = -1;
-+		}
- 	}
- }
- 
-diff --git a/io_uring/zcrx.h b/io_uring/zcrx.h
-index 33ef61503092..0df956cb9592 100644
---- a/io_uring/zcrx.h
-+++ b/io_uring/zcrx.h
-@@ -60,6 +60,9 @@ struct io_zcrx_ifq {
- 	 */
- 	struct mutex			pp_lock;
- 	struct io_mapped_region		region;
-+
-+	refcount_t			refs;
-+	struct io_zcrx_ifq		*proxy;
- };
- 
- #if defined(CONFIG_IO_URING_ZCRX)
--- 
-2.47.3
-
+>  static inline bool sk_is_tcp(const struct sock *sk)
+>  {
+>         return sk_is_inet(sk) &&
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 0a3021f8f8c1..ed5f36c6f33e 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -2470,10 +2470,10 @@ static void sk_init_common(struct sock *sk)
+>   * If @lock is true, the clone is locked by bh_lock_sock(), and
+>   * caller must unlock socket even in error path by bh_unlock_sock().
+>   */
+> -struct sock *sk_clone(const struct sock *sk, const gfp_t priority,
+> -                     bool lock)
+> +struct sock *sk_clone(const struct sock *sk, const gfp_t priority)
+>  {
+>         struct proto *prot =3D READ_ONCE(sk->sk_prot);
+> +       bool lock =3D !sk_is_sctp(sk);
+>         struct sk_filter *filter;
+>         bool is_charged =3D true;
+>         struct sock *newsk;
+> @@ -2597,7 +2597,8 @@ struct sock *sk_clone(const struct sock *sk, const =
+gfp_t priority,
+>          * destructor and make plain sk_free()
+>          */
+>         newsk->sk_destruct =3D NULL;
+> -       bh_unlock_sock(newsk);
+> +       if (lock)
+> +               bh_unlock_sock(newsk);
+>         sk_free(newsk);
+>         newsk =3D NULL;
+>         goto out;
+> ---8<---
+>
+>
+> >
+> > There is also bh_unlock_sock(newsk) in the free path in sk_clone(),
+> > does it also need a 'if (lock)' check?
+>
+> Good catch.  Will fix it in v3.
+>
+> Thanks!
 
