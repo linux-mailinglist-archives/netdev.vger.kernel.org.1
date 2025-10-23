@@ -1,140 +1,198 @@
-Return-Path: <netdev+bounces-232016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECBDAC00048
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 10:51:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AB55C000CC
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 10:58:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBE2D1A084A6
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 08:51:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C72C53A2771
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 08:58:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BF6304BDC;
-	Thu, 23 Oct 2025 08:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2F130146B;
+	Thu, 23 Oct 2025 08:58:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eU3PRZT8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FuKtiwkt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9469D304BC2;
-	Thu, 23 Oct 2025 08:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175C53043BE
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 08:58:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761209441; cv=none; b=iJHMPDlLMPLCwEa/VmMx/STuPSjDIiUyUQivaxsNdzoJGLIEZ5R4hCf6hDttrDyhgTl1GPDwFzN5+87LtDoZal20UyUHrKVqFmNWprMnXFce9LchEQhRIFbkTGlW9wWVKSoacL49cnpxX3dB60JKnk1pQzfTnAr4nH3pK/5JrXo=
+	t=1761209934; cv=none; b=i4b0NS9lLPNx3MLEyuw6FMZ5lfCw6WN+hAVwyx3KKZDUz1cZzGiUTCarTNVwcF3NjjwFBM9FJ3zC/0umLFbK2fXpdF4hnqzjbNfWl9YsFqbruU4bxHfFyT6Gnf28zANsjGnO2YVRhQekf/CEymRa9ZQsWMg7HrSmUnUo3l4LO/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761209441; c=relaxed/simple;
-	bh=zViVWbIqH/k2G08l4zC7D+eJnbQM8tCMSN3ai52tEeY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DMiym9J/u0zRwODTOgouLdcY+jGMp+dv2pI7xDevMaR+R3FnMZIVf6RUC5n3c2pjC/nOWuTjQjDGWM4GGQmBIo/y5iQHKvNWCj7P+RL2XJeNzg1YfO79992xveNA9+4P1MPg5su2kY/f2OP8mqRxSqQdgWMHAmGXKUIsBz1m+uM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eU3PRZT8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C368CC4CEFD;
-	Thu, 23 Oct 2025 08:50:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761209441;
-	bh=zViVWbIqH/k2G08l4zC7D+eJnbQM8tCMSN3ai52tEeY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=eU3PRZT8+VLXSQqpARiTGRHjExHw7/+GQK4EL5nRSMzJHy3kn8KECmGwpSbHG5kUy
-	 E+4qLZndYH+5FxWL2hragd9EAI04cg3LXVPdOLsHEKFwCghiuXY7MfaiEaNeGd1uV6
-	 jb9L2LdAPLYbf4iE6ZuwRhmfYy7ywYjwsUweJ112m0uSnIg8tc3yTkLKbh7dZMRhrg
-	 3L1AXce4VdZJf9DqO2PEGIhBJT6imu3/gjogEBFH5uTXeHPAx0/6daYbps5d2ZmQ1s
-	 QUiG1RXmFUOSNVn6C8MMN+J0/k7SEmbPlSFLsoAEnQspkGEH8rkLOSqfg3KVntQY6C
-	 RDrhrdjlUOs8A==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Thu, 23 Oct 2025 10:50:17 +0200
-Subject: [PATCH nf-next v8 3/3] selftests: netfilter: nft_flowtable.sh: Add
- IPIP flowtable selftest
+	s=arc-20240116; t=1761209934; c=relaxed/simple;
+	bh=7+QdE7u95F2srOVEyYJsJ3K+vNzuW01jxQiAAFCgJZQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gM/4+IgfQVgxsUGYdg0UAVcCQuABl5xVWgSF+C3eK5N9R1sLsgKvXRBAgAHNdP/6Bpc9ugA2DPE2Xp2yNXnIEjXuJqHIw+H7Fq47eaSO+OXb1eHZC3zchHGtg4EJ4/w82v08DFKCfsa1LHLBpYIjKJF7hYbrXDuCToWBWITPuEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FuKtiwkt; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-27ee41e0798so7859565ad.1
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 01:58:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761209932; x=1761814732; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1RU4IedZsSTtJdpKj+rxbznt86HzuF4sa6O2zsfwDOE=;
+        b=FuKtiwktcS/S7+3zUX0bzd8Q8g5y6mHRuzHm1yznUrcCfZ47HXJzwjmEPk9wj4t5bW
+         NQYLWhMNGD5/RBwczLZDZ8ydsrfXu/yXwEwa5lqhbolwVo4WVmJ7P4/3HusNOcATsB7E
+         OEAntUXDb/ZeEa/euj96kX7QDpcAtYkMAgAk3FF6efxReQIBSOaKHmW62MgD+G0vgxdy
+         38IFN9DuXPJulAngtsMy/+GXatrtdpAT9RYDggdVxLBvcvzIq7j5qT+OIXiXwTB8R46y
+         YqEzK5tHMXVywrBrPXEcM7h9LsvmyS9P0YDPvCos2cRXg1XkO/VH+VNZ0SnrOywKkWyq
+         6leQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761209932; x=1761814732;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1RU4IedZsSTtJdpKj+rxbznt86HzuF4sa6O2zsfwDOE=;
+        b=oJofA70CYBEw0FaXisVV0EmFA8PzhHncHRb7R8Z8OrsllHefc9FApPUa5lYNCBlmmJ
+         g+jW3wYquAYFEJFiceQ083Oq54aR8EGkev3O+kZik0ESQrcUJQ+PSBkKRND9I3LruX2v
+         wRS1dxxPTG84lchusUC1vztFAaD9EmdqIqh//XfejDZpLekKeIx08wI2v0WtAw4ngUTX
+         9oOrBQff5iQkRbq6xIZSFEyKk/CrvzAstio9CZCxs8GBW/jlg1DnlLDl3Hq7340tfwhX
+         kaVgKTdeOfRL6S6JJ91beG8Dh6Z79gVpjH4dtHj8z7sUIi/I1k6TTszh3ef4icmOnXWM
+         ztRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwLbfsl1WR66w/gsTV/KoWiqA4Q4lxBs/V8jutekMyG2AYnGHyc4b8+jlpOALqhBDlDjWB6o8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXrarFihDsslX32LnJ7GdpmElkHNWtDFWznwVASrXv0HkkA937
+	ovyTxhBA4HPI4G1DLNQ0mfjWG8MY3Jdvm4O/5c9RpFvOeiFs/bMQq7pt
+X-Gm-Gg: ASbGncsQY/EFS3OJfniuzx6exq/9CzIVS8bQsfsau0t2SxYsD6d4MqSDj7mNKk+tTHV
+	O6kOcwAQ75CSnL2JmOFvJPR0cLfV2ujuBaehdbA8m6IEW+pgfAUv1Eib8KGEPDS7AvWvzkVedaH
+	JVZvqb31HKzbeGhwfyXXAgqi201WI5BAtYI4yAntJE31Udf/smCzqbMqktpmIkuHMV4Zvth7Dba
+	Eci58/a/IRstIPgkZjnhS+/faVM/PahZeqp3pYiU9u2W9jvQ9nw+lAFhW+b7KcCaJYp+oKStGND
+	WTVV4xOob69GUgtMPhSSbWZ3AlKz1hodhrkpwBSGxwht4xtRCchX+5mZjk8FHTq+OvjRKtEoY3u
+	9F3AiIObuK04yfRK47+XC7ot7NvCUG2OnJqgp1ic+pAk1RKIBbg4yRbYkpvUa3Et/zaspj1ALWP
+	+fyoUYK4TFc4Bmp2U6Qqdkj3R5UvgaZZKxHyeupIXWtgSskljxfScYM+/S+pxZrIa7fBnqNEpg
+X-Google-Smtp-Source: AGHT+IEVUoymZeiSVlE/Uk+XC59V5IvcJHH/cBg60zVNVyFpWSnT3ANMTmgq33TFbobFjHJXmeQC8A==
+X-Received: by 2002:a17:903:2990:b0:264:8a8d:92e8 with SMTP id d9443c01a7336-290ccab59b1mr303357615ad.59.1761209932109;
+        Thu, 23 Oct 2025 01:58:52 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b6cf4e12d6asm1448513a12.21.2025.10.23.01.58.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Oct 2025 01:58:51 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	joe@dama.to,
+	willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Subject: [PATCH net-next] xsk: add indirect call for xsk_destruct_skb
+Date: Thu, 23 Oct 2025 16:58:43 +0800
+Message-Id: <20251023085843.25619-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251023-nf-flowtable-ipip-v8-3-5d5d8595c730@kernel.org>
-References: <20251023-nf-flowtable-ipip-v8-0-5d5d8595c730@kernel.org>
-In-Reply-To: <20251023-nf-flowtable-ipip-v8-0-5d5d8595c730@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
- Jozsef Kadlecsik <kadlec@netfilter.org>, Shuah Khan <shuah@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, Phil Sutter <phil@nwl.cc>
-Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
- linux-kselftest@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
 
-Introduce specific selftest for IPIP flowtable SW acceleration in
-nft_flowtable.sh
+From: Jason Xing <kernelxing@tencent.com>
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+Since Eric proposed an idea about adding indirect call for UDP and
+managed to see a huge improvement[1], the same situation can also be
+applied in xsk scenario.
+
+This patch adds an indirect call for xsk and helps current copy mode
+improve the performance by around 1% stably which was observed with
+IXGBE at 10Gb/sec loaded. If the throughput grows, the positive effect
+will be magnified. I applied this patch on top of batch xmit series[2],
+and was able to see <5% improvement.
+
+[1]: https://lore.kernel.org/netdev/20251006193103.2684156-2-edumazet@google.com/
+[2]: https://lore.kernel.org/all/20251021131209.41491-1-kerneljasonxing@gmail.com/
+
+Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- .../selftests/net/netfilter/nft_flowtable.sh       | 40 ++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ include/net/xdp_sock.h | 5 +++++
+ net/core/skbuff.c      | 8 +++++---
+ net/xdp/xsk.c          | 2 +-
+ 3 files changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/net/netfilter/nft_flowtable.sh b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-index 45832df982950c2164dcb6637497870f0d3daefe..e1434611464b3a8f5056e09a831180fa1bff7139 100755
---- a/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-+++ b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-@@ -558,6 +558,44 @@ if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 ""; then
- 	ip netns exec "$nsr1" nft list ruleset
- fi
+diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+index ce587a225661..431de372d0a0 100644
+--- a/include/net/xdp_sock.h
++++ b/include/net/xdp_sock.h
+@@ -125,6 +125,7 @@ struct xsk_tx_metadata_ops {
+ int xsk_generic_rcv(struct xdp_sock *xs, struct xdp_buff *xdp);
+ int __xsk_map_redirect(struct xdp_sock *xs, struct xdp_buff *xdp);
+ void __xsk_map_flush(struct list_head *flush_list);
++void xsk_destruct_skb(struct sk_buff *skb);
  
-+# IPIP tunnel test:
-+# Add IPIP tunnel interfaces and check flowtable acceleration.
-+test_ipip() {
-+if ! ip -net "$nsr1" link add name tun0 type ipip \
-+     local 192.168.10.1 remote 192.168.10.2 >/dev/null;then
-+	echo "SKIP: could not add ipip tunnel"
-+	[ "$ret" -eq 0 ] && ret=$ksft_skip
-+	return
-+fi
-+ip -net "$nsr1" link set tun0 up
-+ip -net "$nsr1" addr add 192.168.100.1/24 dev tun0
-+ip netns exec "$nsr1" sysctl net.ipv4.conf.tun0.forwarding=1 > /dev/null
-+
-+ip -net "$nsr2" link add name tun0 type ipip local 192.168.10.2 remote 192.168.10.1
-+ip -net "$nsr2" link set tun0 up
-+ip -net "$nsr2" addr add 192.168.100.2/24 dev tun0
-+ip netns exec "$nsr2" sysctl net.ipv4.conf.tun0.forwarding=1 > /dev/null
-+
-+ip -net "$nsr1" route change default via 192.168.100.2
-+ip -net "$nsr2" route change default via 192.168.100.1
-+ip -net "$ns2" route add default via 10.0.2.1
-+
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun0 accept'
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward \
-+	'meta oif "veth0" tcp sport 12345 ct mark set 1 flow add @f1 counter name routed_repl accept'
-+
-+if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 "IPIP tunnel"; then
-+	echo "FAIL: flow offload for ns1/ns2 with IPIP tunnel" 1>&2
-+	ip netns exec "$nsr1" nft list ruleset
-+	ret=1
-+fi
-+
-+# Restore the previous configuration
-+ip -net "$nsr1" route change default via 192.168.10.2
-+ip -net "$nsr2" route change default via 192.168.10.1
-+ip -net "$ns2" route del default via 10.0.2.1
-+}
-+
- # Another test:
- # Add bridge interface br0 to Router1, with NAT enabled.
- test_bridge() {
-@@ -643,6 +681,8 @@ ip -net "$nsr1" addr add dead:1::1/64 dev veth0 nodad
- ip -net "$nsr1" link set up dev veth0
+ /**
+  *  xsk_tx_metadata_to_compl - Save enough relevant metadata information
+@@ -218,6 +219,10 @@ static inline void __xsk_map_flush(struct list_head *flush_list)
+ {
  }
  
-+test_ipip
++static inline void xsk_destruct_skb(struct sk_buff *skb)
++{
++}
 +
- test_bridge
+ static inline void xsk_tx_metadata_to_compl(struct xsk_tx_metadata *meta,
+ 					    struct xsk_tx_metadata_compl *compl)
+ {
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 5b4bc8b1c7d5..00ea38248bd6 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -81,6 +81,7 @@
+ #include <net/page_pool/helpers.h>
+ #include <net/psp/types.h>
+ #include <net/dropreason.h>
++#include <net/xdp_sock.h>
  
- KEY_SHA="0x"$(ps -af | sha1sum | cut -d " " -f 1)
-
+ #include <linux/uaccess.h>
+ #include <trace/events/skb.h>
+@@ -1140,12 +1141,13 @@ void skb_release_head_state(struct sk_buff *skb)
+ 	if (skb->destructor) {
+ 		DEBUG_NET_WARN_ON_ONCE(in_hardirq());
+ #ifdef CONFIG_INET
+-		INDIRECT_CALL_3(skb->destructor,
++		INDIRECT_CALL_4(skb->destructor,
+ 				tcp_wfree, __sock_wfree, sock_wfree,
++				xsk_destruct_skb,
+ 				skb);
+ #else
+-		INDIRECT_CALL_1(skb->destructor,
+-				sock_wfree,
++		INDIRECT_CALL_2(skb->destructor,
++				sock_wfree, xsk_destruct_skb,
+ 				skb);
+ 
+ #endif
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 7b0c68a70888..8e6ccb2f79c0 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -605,7 +605,7 @@ static u32 xsk_get_num_desc(struct sk_buff *skb)
+ 	return XSKCB(skb)->num_descs;
+ }
+ 
+-static void xsk_destruct_skb(struct sk_buff *skb)
++void xsk_destruct_skb(struct sk_buff *skb)
+ {
+ 	struct xsk_tx_metadata_compl *compl = &skb_shinfo(skb)->xsk_meta;
+ 
 -- 
-2.51.0
+2.41.3
 
 
