@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-232239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64FDFC0313F
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 20:51:43 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4310EC03149
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 20:51:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D57803B12FB
-	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 18:51:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AE04B4F6B96
+	for <lists+netdev@lfdr.de>; Thu, 23 Oct 2025 18:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A599B34BA32;
-	Thu, 23 Oct 2025 18:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96ECF29B20A;
+	Thu, 23 Oct 2025 18:51:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="288TDzpZ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="o6QP+zM1"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1697B34B689
-	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 18:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C255303A2E
+	for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 18:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761245483; cv=none; b=kq76Ot/q/MjJ4FVO3Y9xDJpHC38L2rhab2tcfGgtUTb+IPS1R1HNFLoVyVejd+1Le/ektSH4fjj64SZneUrU3b1OJcO/ftEKyZc/Ibvznwwk+GGHKtJ+z0rbWu/Am6MlLapR8ZhzDol70fnAx6DaHSDtbj0XLU4p4x87vBlZP2g=
+	t=1761245496; cv=none; b=qcywVDJmaCtKEP3uJaezrGp/FpJwat0mfKggk1jLtU43bQkkgOW/8yY1EbKwj1zN3GGbpLkJA/wPuK3+zcU8uHWbO5rhOyv6qttn4xrgAhn8bpuSonjKGbjYJEOdXbd8lN4iTETaI8JIPuVZdERgpwbnIGzT9cu3sYT/4N5fOWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761245483; c=relaxed/simple;
-	bh=cyyr7bRTRYRQr8AiGsqXqWla1mPfJbBTFF8RlU7TqMk=;
+	s=arc-20240116; t=1761245496; c=relaxed/simple;
+	bh=An70VySsU8bumz/771ObvXggjhBHfLQh64qc1u+VqU0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UGh7OjyATCHQw1mf/+Hlrc9bZcXLuGWNSkVOWr97JXUXl6cJV6lZMPjyceiND35XLTLHH7brhm55CEz7fsuCT1FNCUq9EZlJL90Ep+E63oCjkqiHXXAM6je5uIDUFI5xSj1WTMPoG+jOGZH18AGP22ZM26ek03i7QlA0r6p3XHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=288TDzpZ; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=XL4GL5SJkwevXb86C4libyansUw+FpM2V7/PcTWucbWO4Al5bAy4lhOs96JvaP/4AcVv74VTKLZnTQisQ2pMcdrVv3xeMSDGHc/FWCFzSsxdqoA8Db4O9UEAPEKEhILXnEeHJ6gjt4YMRx13QuuCR2PMpnMWRaQqrZuPDQJAi34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=o6QP+zM1; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Imtfjv6ozCla3tj9/fUxCprWInsmyrRWdm7p+iTQCJM=; b=288TDzpZCmhUsvHKFbzcxMQzHi
-	21uxLNDcy74IOZKNdBIeNEUAyu+w5x6c+BbenRa5FxjwzbKkOapZtKd8NHXYnPuArSgyc9dWG3bpu
-	+StLVPnRipEpM7m1R+8Xs4DjcQkGssoTivGPI5AqVT/Ac+ZePW6yvxbdSyJbCkKZJpFQ=;
+	bh=Fck8LKgCheBTtzhirGZSgVYji9+4kt2G7PypWCpeZQ8=; b=o6QP+zM11VgjiUYwb3dDbDDxhB
+	itSVZWwvgs9DXykbevr1fDvhfNdpr7f4ev7J8vRWhAq35HLERa05sbIcrY2V8AgDHp7xzt3uQHxw8
+	03eN04bzBr4VbJkBKHOmVBLLLq0HOJc98EPj1sEQmJiMVQuv1Hemka56vt1skkpQcRyk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vC0P3-00Bud4-6k; Thu, 23 Oct 2025 20:51:13 +0200
-Date: Thu, 23 Oct 2025 20:51:13 +0200
+	id 1vC0PH-00Budg-KO; Thu, 23 Oct 2025 20:51:27 +0200
+Date: Thu, 23 Oct 2025 20:51:27 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -56,10 +56,11 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH net-next 6/8] net: stmmac: provide function to lookup hwif
-Message-ID: <13c82898-eaee-4210-998c-e73efadcd31a@lunn.ch>
+Subject: Re: [PATCH net-next 7/8] net: stmmac: use != rather than ^ for
+ comparing dev_id
+Message-ID: <4dbb99c6-77da-49f3-bce3-5bfc297f2c21@lunn.ch>
 References: <aPn3MSQvjUWBb92P@shell.armlinux.org.uk>
- <E1vBrlV-0000000BMQG-3WuD@rmk-PC.armlinux.org.uk>
+ <E1vBrla-0000000BMQM-462M@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,11 +69,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1vBrlV-0000000BMQG-3WuD@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1vBrla-0000000BMQM-462M@rmk-PC.armlinux.org.uk>
 
-On Thu, Oct 23, 2025 at 10:37:49AM +0100, Russell King (Oracle) wrote:
-> Provide a function to lookup the hwif entry given the core type,
-> Synopsys version, and device ID (used for XGMAC cores).
+On Thu, Oct 23, 2025 at 10:37:54AM +0100, Russell King (Oracle) wrote:
+> Use the more usual not-equals rather than exclusive-or operator when
+> comparing the dev_id in stmmac_hwif_find().
 > 
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
