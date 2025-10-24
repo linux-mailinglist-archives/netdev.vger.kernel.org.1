@@ -1,149 +1,231 @@
-Return-Path: <netdev+bounces-232656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B6E6C07BC9
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 20:25:55 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BBB1C07C6D
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 20:36:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E1A41C208CA
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 18:26:19 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B9C705028E5
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 18:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E8011F0E56;
-	Fri, 24 Oct 2025 18:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCEBC348898;
+	Fri, 24 Oct 2025 18:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nOTn9/FB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eQxlR8IZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10528311956
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 18:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA9730F7F8
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 18:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761330351; cv=none; b=RRN+IfDHuwGIksSHRTDjWUI9ASoJjIY2T3Ym8YNF0XmYphLML3+LihT5qdxHYDLikxunRNgHFCK2s+BUVGBvGDyhYJBzhnMlO0IgvQylHDWJy0VwVwHUrSaV/Ibh+/znrdp0Ak0VTHaY8VPINB3zYl00PBm7gWkSatTbeKgbNfY=
+	t=1761331013; cv=none; b=HmbyHCnrRzX9vZtkj5BbwKKrlpxQmrZY7MKm6JBo1zGMHZsD9OV5Vrp9+Qy2mfjHwIaekHeUVLojxJin1yi3NXpHfOx4FQDtfXn8QgyQREOm50gd/JHUesPtQhLyHeCIf6hNwRIqm7Vli68NWXLFR+dNegR4LeUsMQoqWQJV1S4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761330351; c=relaxed/simple;
-	bh=oF0xQKta9woMkjRloLNata7GnWCJUU9eN4GD1R9mQyQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c6DNf7co3pXH+QsRE8Y2otTCRt4Nl4A9q7kdODhS+AxUKDUSc3rNoJWU39X4Scb/TKuMSQI70oPYJOThbfKACUzEiRVD9ff+KcrmnJUieUb5SrWz7jXkb3TvRsoDy5VnrK221I1cMZdIvmh5v/w6PStq1rUZz1MbYoqkP2APv4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=nOTn9/FB; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59OINUkr012082;
-	Fri, 24 Oct 2025 18:25:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=XkKqZOV8sSSGZVqzvceBZEcc7n8sQ
-	98xxcCJSbJ8wEM=; b=nOTn9/FBkuwRXVtkFCXiwQn/jDWJIeX0/mNvmmvc2cdl2
-	P3X7B2ySGo2+mSKReiKqMbLlK38dW4o9vHHd+81xZTXl91whjIBdkp29ozT3UcWx
-	KRIx2eKTFMn4Qge/8rv56I8cXKSsuuZauMvEXjgPKFCnVmuHQN08d0vRVvpYq0Mu
-	IjjDAQwc5Ngwo5dY99QsTskzsA2hC7tiYVwcWGq+n45rCW9CBL5FgPE//qH7SMvk
-	C1Ae7gbVXwv345b9a9wZRcyB8qk7YfLyrlc5CSVQzv/V+avLZgWcXFixvlhsCuB+
-	9F/tGhVE6YssTO/fdmrBzel+Zdlu3a99ElpFnWEAQ==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49xvd0wcm0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 24 Oct 2025 18:25:33 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59OHwduC006350;
-	Fri, 24 Oct 2025 18:25:32 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 49xwkarut9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 24 Oct 2025 18:25:32 +0000
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 59OIPWHP016656;
-	Fri, 24 Oct 2025 18:25:32 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 49xwkarus9-1;
-	Fri, 24 Oct 2025 18:25:32 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: aleksander.lobakin@intel.com, anthony.l.nguyen@intel.com,
-        przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, kuba@kernel.org,
-        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-        horms@kernel.org, intel-wired-lan@lists.osuosl.org,
-        netdev@vger.kernel.org
-Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
-Subject: [PATCH net-next v3] idpf: correct queue index in Rx allocation error messages
-Date: Fri, 24 Oct 2025 11:25:23 -0700
-Message-ID: <20251024182528.1480729-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1761331013; c=relaxed/simple;
+	bh=TLJCfzmKFt/fyeAodJh1L0RNKxUAkg2mvHuuHAcwfAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SGqxha6NutGo+PQX83a3VNOcAvyTG76OiDH8Z7PByKdRruqr5YK5z697jSZkmw3bKn+nB1uQt4NRT3taB9HrFwq+XffdgEhnZ15KGm6Y5/473bRPQeagNYGpV5QZL1yg/1ADoyXCkPNERNYFQvfH8pYK4OyVppQpWVeCKm2hCLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eQxlR8IZ; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-793021f348fso2127502b3a.1
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 11:36:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761331011; x=1761935811; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/p9MJq52UuKppFKE5ODwKIT5v7QxFOxkS5Z3SporLhQ=;
+        b=eQxlR8IZNmUVp+ZCpAYgPqmumiZWyZ94J76Vo5Y58Z7pi2RkSXh8SQC9gwuwD3uyNY
+         XGAhCglqGSsfEDqYN5qHs5kI1V7vGYlrDJMkLsyus+tzca3GDSA2ub8o6xnQMy+NugE4
+         t9Qdt+d1l2NBTuyTvqx4sY+Zhbh2W+0XWFtzB8xrzLZzirIfb2kShOkpIucWqlud0N4c
+         yot24mYpbQ9T5C/R1TFvjUD1z5+drXSc87Cmp7+qTcbx3Hy5a9o13e4c9MLKRjbEqjB3
+         CWz3cZGS107L5ehn3lcSMS10GafAS/5XmQ00mHpJh0Y1xL+FCriT+tqPHUGMVqHjv99L
+         UZdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761331011; x=1761935811;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/p9MJq52UuKppFKE5ODwKIT5v7QxFOxkS5Z3SporLhQ=;
+        b=ZYVeMGikvrXJyU4HLk/+rwvMVp2g7fzQCzgk0FbQcUQ8L0A+/E/uePxGXeb8PAzoD4
+         q+AWOHctrSggex7PACliC7l8TbMSp5ZY214UH5eiJ2tdsgQAPnGVAScvjGktoCFf0t9H
+         kbIFuk7osEbhwL4GcUTgAqkxyl0YO4FSCkz9OTgoUxFeubLdmj77F02KhgDFbcG2cmUt
+         0UDg1483hY9vKft93Bh5FzAiLRUn7ADO31/t9zKAWyhI5S8L6BJvgSqIwuQ+wAzxOzfC
+         Q0mWz8Jt53NLHYJrSNDflm3+qx6i90yvJfgzCQpsA2MyIyzeM/ngZHbt6F2uDunDdEaP
+         nIvQ==
+X-Gm-Message-State: AOJu0YwTfH3AN0jSUnXzufRy0tJC9FuVY1ZlW8W2eooqVeuBK3/s+Nb1
+	JvVweZz/bvJFPHkIzaHp5IObtRRLg7eUw7Ob2abLlnEKeBl+P6t1Kxk=
+X-Gm-Gg: ASbGncu/dz/c+zHvKG3dxRNeo6VN4uJe1vzLISywHilQ5tkIUcuvzWJ8SnwFP3BbCin
+	bklNePD1ig7MnKwfK1LRBWovQjaBqq6cIJqBkBeu1F6ln42BFYvjsMAdpq9YXQSf+7rEC9Ai0D0
+	t8kGmE7UagjJ5sR381m3kvbnW6bO04yzCgC5udcqwtU5ShZR/fXvzT+xAjfecqthnC2UM767yjg
+	WbqLbnFU8ztMu/s7FkBeBX3f5SEwvJo2PbtvUuG//8DesGw2YwZih1sucTd/07MKIlUt9CKXdzw
+	+v0yqYEEStQv2S7WeYrk4fwZF0435RpADkeSSkYGG4LldslJnalWibGXSphBlHmWLT/fQ5FHAVz
+	IGByqmjVOlKi/dBi8I9dcAkZz9cJTe4T6PW+KynwUu0MF6Se6+wnBEAfpbe4Ma6Vw+t5/jZH1Eo
+	8kN8L1ZV7++4kiMewmWmr5vXwQR9s+l1oHPuMEEMPlx67Mp6GuNmmWQJZJTqooU79THXorYTyou
+	Z0EXs2Sfkfb4vCYR5dNJQjTWVzUu3r6bH0baW9wCajwgua5bScZrJ6X3u/5s2JSGf0=
+X-Google-Smtp-Source: AGHT+IElytHOLHqAJt40PmFD33nDV30/pQ9pjEo3pyPzbMNhsNB5oVrUYLU5jCyElmliYgWdmv3Z0Q==
+X-Received: by 2002:a05:6a20:3d84:b0:2af:65aa:4eef with SMTP id adf61e73a8af0-334a8621973mr36217923637.47.1761331010417;
+        Fri, 24 Oct 2025 11:36:50 -0700 (PDT)
+Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-33fb0191b1dsm6473090a91.18.2025.10.24.11.36.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Oct 2025 11:36:50 -0700 (PDT)
+Date: Fri, 24 Oct 2025 11:36:49 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, razor@blackwall.org, pabeni@redhat.com,
+	willemb@google.com, sdf@fomichev.me, john.fastabend@gmail.com,
+	martin.lau@kernel.org, jordan@jrife.io,
+	maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
+	dw@davidwei.uk, toke@redhat.com, yangzhenze@bytedance.com,
+	wangdongdong.6@bytedance.com
+Subject: Re: [PATCH net-next v3 05/15] net: Proxy net_mp_{open,close}_rxq for
+ mapped queues
+Message-ID: <aPvHQYXJ8SGA-lSw@mini-arch>
+References: <20251020162355.136118-1-daniel@iogearbox.net>
+ <20251020162355.136118-6-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-24_03,2025-10-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 mlxscore=0
- phishscore=0 suspectscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510020000
- definitions=main-2510240166
-X-Proofpoint-ORIG-GUID: fySugU6l_WVzUeeAOGR9ZKiKGisc8VqX
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIyMDA3MyBTYWx0ZWRfX5tyTx+m0H0HS
- 1i8wctG7IJzypw0CPh1NotZFkS/8/Bi9f9dXH/Jr0LFYcx1wOD9vziSysqk/jF7dhf8j0c6DdPk
- vvyt3TmIzNyDvXG5RQwz4aZcQP9+C+4x6m1WtluPQrRghFNFX9vaSajErVUBEh+G7ZO4k5BbSn9
- 4y0fN152LzJNNKpWac96uQEn/guPOHSfl+uVR94n9VuYLAgs75XfGFTH1yka9Q5QR7BAw72XPco
- A67AK3KsNdK6jgataMkxrPfCzA1qUH7MiaRU00sj9PR3nbgth5sA/r7DJhV3s0CAlYMq0unYI9H
- 4pxLUJiAvoagabKgGgKp+6HtMmQp9BRGBqak/OsHciAnsfMbv9MbZSoJU8bzkojUllSi0M0tJEk
- NBQx+9XqoplxjUz7e2BEvWHcPAqAClsWU8efCcjm/o4S366dRcY=
-X-Proofpoint-GUID: fySugU6l_WVzUeeAOGR9ZKiKGisc8VqX
-X-Authority-Analysis: v=2.4 cv=D9RK6/Rj c=1 sm=1 tr=0 ts=68fbc49e b=1 cx=c_pps
- a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8 a=VwQbUJbxAAAA:8
- a=bN0ZCpVs3yKAuBo6K4UA:9 cc=ntf awl=host:12092
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251020162355.136118-6-daniel@iogearbox.net>
 
-The error messages in idpf_rx_desc_alloc_all() used the group index i
-when reporting memory allocation failures for individual Rx and Rx buffer
-queues. This is incorrect.
+On 10/20, Daniel Borkmann wrote:
+> From: David Wei <dw@davidwei.uk>
+> 
+> When a process in a container wants to setup a memory provider, it will
+> use the virtual netdev and a mapped rxq, and call net_mp_{open,close}_rxq
+> to try and restart the queue. At this point, proxy the queue restart on
+> the real rxq in the physical netdev.
+> 
+> For memory providers (io_uring zero-copy rx and devmem), it causes the
+> real rxq in the physical netdev to be filled from a memory provider that
+> has DMA mapped memory from a process within a container.
+> 
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> Co-developed-by: Daniel Borkmann <daniel@iogearbox.net>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>  include/net/page_pool/memory_provider.h |  4 +-
+>  net/core/netdev_rx_queue.c              | 57 +++++++++++++++++--------
+>  2 files changed, 41 insertions(+), 20 deletions(-)
+> 
+> diff --git a/include/net/page_pool/memory_provider.h b/include/net/page_pool/memory_provider.h
+> index ada4f968960a..b6f811c3416b 100644
+> --- a/include/net/page_pool/memory_provider.h
+> +++ b/include/net/page_pool/memory_provider.h
+> @@ -23,12 +23,12 @@ bool net_mp_niov_set_dma_addr(struct net_iov *niov, dma_addr_t addr);
+>  void net_mp_niov_set_page_pool(struct page_pool *pool, struct net_iov *niov);
+>  void net_mp_niov_clear_page_pool(struct net_iov *niov);
+>  
+> -int net_mp_open_rxq(struct net_device *dev, unsigned ifq_idx,
+> +int net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+>  		    struct pp_memory_provider_params *p);
+>  int __net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+>  		      const struct pp_memory_provider_params *p,
+>  		      struct netlink_ext_ack *extack);
+> -void net_mp_close_rxq(struct net_device *dev, unsigned ifq_idx,
+> +void net_mp_close_rxq(struct net_device *dev, unsigned int rxq_idx,
+>  		      struct pp_memory_provider_params *old_p);
+>  void __net_mp_close_rxq(struct net_device *dev, unsigned int rxq_idx,
+>  			const struct pp_memory_provider_params *old_p);
+> diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
+> index 8ee289316c06..b4ff3497e086 100644
+> --- a/net/core/netdev_rx_queue.c
+> +++ b/net/core/netdev_rx_queue.c
+> @@ -170,48 +170,63 @@ int __net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+>  		      struct netlink_ext_ack *extack)
+>  {
+>  	struct netdev_rx_queue *rxq;
+> +	bool needs_unlock = false;
+>  	int ret;
+>  
+>  	if (!netdev_need_ops_lock(dev))
+>  		return -EOPNOTSUPP;
+> -
+>  	if (rxq_idx >= dev->real_num_rx_queues) {
+>  		NL_SET_ERR_MSG(extack, "rx queue index out of range");
+>  		return -ERANGE;
+>  	}
+> -	rxq_idx = array_index_nospec(rxq_idx, dev->real_num_rx_queues);
+>  
+> +	rxq_idx = array_index_nospec(rxq_idx, dev->real_num_rx_queues);
+> +	rxq = netif_get_rx_queue_peer_locked(&dev, &rxq_idx, &needs_unlock);
+> +	if (!rxq) {
+> +		NL_SET_ERR_MSG(extack, "rx queue peered to a virtual netdev");
+> +		return -EBUSY;
+> +	}
+> +	if (!dev->dev.parent) {
+> +		NL_SET_ERR_MSG(extack, "rx queue is mapped to a virtual netdev");
+> +		ret = -EBUSY;
+> +		goto out;
+> +	}
+>  	if (dev->cfg->hds_config != ETHTOOL_TCP_DATA_SPLIT_ENABLED) {
+>  		NL_SET_ERR_MSG(extack, "tcp-data-split is disabled");
+> -		return -EINVAL;
+> +		ret = -EINVAL;
+> +		goto out;
+>  	}
+>  	if (dev->cfg->hds_thresh) {
+>  		NL_SET_ERR_MSG(extack, "hds-thresh is not zero");
+> -		return -EINVAL;
+> +		ret = -EINVAL;
+> +		goto out;
+>  	}
+>  	if (dev_xdp_prog_count(dev)) {
+>  		NL_SET_ERR_MSG(extack, "unable to custom memory provider to device with XDP program attached");
+> -		return -EEXIST;
+> +		ret = -EEXIST;
+> +		goto out;
+>  	}
+> -
+> -	rxq = __netif_get_rx_queue(dev, rxq_idx);
+>  	if (rxq->mp_params.mp_ops) {
+>  		NL_SET_ERR_MSG(extack, "designated queue already memory provider bound");
+> -		return -EEXIST;
+> +		ret = -EEXIST;
+> +		goto out;
+>  	}
+>  #ifdef CONFIG_XDP_SOCKETS
+>  	if (rxq->pool) {
+>  		NL_SET_ERR_MSG(extack, "designated queue already in use by AF_XDP");
+> -		return -EBUSY;
+> +		ret = -EBUSY;
+> +		goto out;
+>  	}
+>  #endif
+> -
+>  	rxq->mp_params = *p;
+>  	ret = netdev_rx_queue_restart(dev, rxq_idx);
+>  	if (ret) {
+>  		rxq->mp_params.mp_ops = NULL;
+>  		rxq->mp_params.mp_priv = NULL;
+>  	}
+> +out:
+> +	if (needs_unlock)
+> +		netdev_unlock(dev);
 
-Update the messages to use the correct queue index j and include the
-queue group index i for clearer identification of the affected Rx and Rx
-buffer queues.
+Can we do something better than needs_unlock flag? Maybe something like the
+following?
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
-v1 -> v2  
-no change added Reviewed-by: Simon
-v2 -> v3
-added queue group index i as suggested by Alexander.
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+netif_put_rx_queue_peer_locked(orig_dev, dev)
+{
+	if (orig_dev != dev)
+		netdev_unlock(dev);
+}
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 828f7c444d30..ed0383ab5979 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -922,8 +922,8 @@ static int idpf_rx_desc_alloc_all(struct idpf_vport *vport)
- 			err = idpf_rx_desc_alloc(vport, q);
- 			if (err) {
- 				pci_err(vport->adapter->pdev,
--					"Memory allocation for Rx Queue %u failed\n",
--					i);
-+					"Memory allocation for Rx queue %u from queue group %u failed\n",
-+					j, i);
- 				goto err_out;
- 			}
- 		}
-@@ -939,8 +939,8 @@ static int idpf_rx_desc_alloc_all(struct idpf_vport *vport)
- 			err = idpf_bufq_desc_alloc(vport, q);
- 			if (err) {
- 				pci_err(vport->adapter->pdev,
--					"Memory allocation for Rx Buffer Queue %u failed\n",
--					i);
-+					"Memory allocation for Rx Buffer Queue %u from queue group %u failed\n",
-+					j, i);
- 				goto err_out;
- 			}
- 		}
--- 
-2.50.1
+Then we can do:
 
+orig_dev = dev;
+rxq = netif_get_rx_queue_peer_locked(&dev, &rx_idx);
+...
+netif_put_rx_queue_peer_locked(orig_dev, dev);
 
