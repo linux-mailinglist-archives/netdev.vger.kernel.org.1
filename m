@@ -1,86 +1,84 @@
-Return-Path: <netdev+bounces-232728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DECFAC0855F
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 01:42:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B3EEC085AA
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 01:52:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4BC124E605E
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 23:42:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29FA33B543D
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 23:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D55130DEBE;
-	Fri, 24 Oct 2025 23:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F55430E83A;
+	Fri, 24 Oct 2025 23:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="le42WXym"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B66In4xN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CDE2FE05B;
-	Fri, 24 Oct 2025 23:42:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E3D30B514;
+	Fri, 24 Oct 2025 23:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761349329; cv=none; b=XkQZx1ahNQ2mlWhJdtIYu38NfTJ12PPokXhPoGZ1IHwQhY7IK3/KB3ffIEKH9OXMMHy2PtlH83FnwNGSLGOVVCiEK2q7FI3hpFw/wU2U8VIb5ZD/dNxBX4pe3QZryo2vh+tlIIXeOuuQZPJl4sjeaQm1usokLZmSZscimo7cja4=
+	t=1761349969; cv=none; b=rtoa6gyLg0L8xAuV4Oz8YAfNvonkDERuoE/D7FZlR6T0BWOdND3mpn2kIulOi1pB/dpxybDTa0hIR4g+RPHZGcMxGMwkr91QbzOyqbaDLyn0KqAtfMBugZdWgmO3Lqx/FcqhoZBCVIKvVZMpwy2FO6M/U5bCcWBcca06nHgwwig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761349329; c=relaxed/simple;
-	bh=XWNdrRqN93VIvDQl6H8LxcywyJlO3tWIkLxQLeKXNpk=;
+	s=arc-20240116; t=1761349969; c=relaxed/simple;
+	bh=b0jfHYj44WW3Zp+PPuXiv/hESxuovunxR5Sto+KsZP8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i+IL8tiGiAjqnZ5rC7EpKGjbAkLq+rXAtyMTxd6FbdxFs1gJ/6Doj6rYeM6coVIUhOwfDUjs+FOzPmYxllg2wqEg86oQ3JFW8aM2TBkC+So+gKMavdXA56gy/Wy5QqgA6QYoCGDSicNGEEM6Eyae79IMwdyzAUha2Zxvj7CStG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=le42WXym; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07E02C4CEF1;
-	Fri, 24 Oct 2025 23:42:07 +0000 (UTC)
+	 MIME-Version:Content-Type; b=J3FzNb1ucG97+WJIl4rs2x/LTzspE0y6i4PsnHsft/Pzo4uTVmFLeRLQw7+SGhehdtrE+Mpuo5ZN3bL65QUQ8RK5gCWfx4Q7BI0/LFkRjvdQEkR6FmTxAmJnKWf/dN7pDAKQb19yndWWTjt8dkz/nV797ABUKomrofxd8dzIHdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B66In4xN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3827AC4CEF1;
+	Fri, 24 Oct 2025 23:52:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761349328;
-	bh=XWNdrRqN93VIvDQl6H8LxcywyJlO3tWIkLxQLeKXNpk=;
+	s=k20201202; t=1761349969;
+	bh=b0jfHYj44WW3Zp+PPuXiv/hESxuovunxR5Sto+KsZP8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=le42WXymzdHA6j7KcAW7kOp0kYQ2ff7rYI1VYGB3qIxxhqkJLOTOtX859GeHJ/oTm
-	 E1LRpVsKQEZL9PvqBNjadLzF2SoR8R5h669JnhZfGLtpV4CB59YXJX1axjSIW5H4AB
-	 b4SaW/uElIjnMiocFoCTiWUUYkKyA5QudXUG8qH5kWMYe/ER3CCkQalwERT1/3wyDc
-	 krc5f9avTdEMdj4JgRqfZXijIwfBGd24uXgofpQc4cgOlA8QKlKqBqL1gMueXXfWL3
-	 /j1OgZErwKEJWE8RZ/LM1sL8ErGFYsk6dQkZTedUWIsEwznB7ZLVt58/HJ6sh/z180
-	 oKWouFuzaSa+A==
-Date: Fri, 24 Oct 2025 16:42:07 -0700
+	b=B66In4xNCNxVEDQGPF8TPmdcO39k0bqwoxFirR2qqcGP05m9QpA8T+NoWo0XO4ppM
+	 tTwWLWDqeCSudvqHzVtXygwe7c9d0NxMbTwW2KzwJSJ9ySzFXjAVL7MSy/cd8zpz3t
+	 eJGeaFzaEwJKyGGiDSE0nOzPrRQLE+G6IuAqmyf45ycjXD95HubYAOcrXvm4DXocmV
+	 ZCEHtqQyQc1xTy0mcqzDYdlQPetyOmmHxZeHArhWGS8m0dMqYaMf0KYBkBPqkZiugG
+	 n+qC5RCRrFL9Z2sYkqbPA/GWZlmkwJY3HhUqo7kdpS4dWWtmNDNl2llAWZwkDyrzpZ
+	 dH85M0c66uWUg==
+Date: Fri, 24 Oct 2025 16:52:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Gustavo Luiz Duarte <gustavold@gmail.com>
-Cc: Andre Carvalho <asantostc@gmail.com>, Simon Horman <horms@kernel.org>,
- Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Matthew Wood
- <thepacketgeek@gmail.com>, Shuah Khan <shuah@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net v2 0/2] netconsole: Fix userdata race condition
-Message-ID: <20251024164207.3062ea9e@kernel.org>
-In-Reply-To: <CAGSyskWm=jDOSPAh3LWEQQzjAxvc-Od7DkQyP7W9EynoMdDnMg@mail.gmail.com>
-References: <20251022-netconsole-fix-race-v2-0-337241338079@meta.com>
-	<20251022180107.3a7d1198@kernel.org>
-	<CAGSyskWm=jDOSPAh3LWEQQzjAxvc-Od7DkQyP7W9EynoMdDnMg@mail.gmail.com>
+To: =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?=
+ <ast@fiberby.net>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Chia-Yu Chang
+ <chia-yu.chang@nokia-bell-labs.com>, Chuck Lever <chuck.lever@oracle.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, Simon Horman
+ <horms@kernel.org>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, "Jason A. Donenfeld"
+ <Jason@zx2c4.com>, Zahari Doychev <zahari.doychev@linux.com>
+Subject: Re: [PATCH net-next 0/7] ynl: add ignore-index flag for
+ indexed-array
+Message-ID: <20251024165247.5494ea93@kernel.org>
+In-Reply-To: <ee3b6ed7-a00d-4679-9aa6-482b8064d18f@fiberby.net>
+References: <20251022182701.250897-1-ast@fiberby.net>
+	<20251022184517.55b95744@kernel.org>
+	<f35cb9c8-7a5d-4fb7-b69b-aa14ab7f1dd5@fiberby.net>
+	<20251023170342.2bb7ce83@kernel.org>
+	<ee3b6ed7-a00d-4679-9aa6-482b8064d18f@fiberby.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 24 Oct 2025 18:10:06 -0300 Gustavo Luiz Duarte wrote:
-> There are two reasons for hitting this skip.
-> 1. The hardcoded 2s timeout in listen_port_and_save_to() expired
-> 2. socat died or failed to start for mysterious reasons
-> 
-> #1 should probably be a success (we ran the test for this long and no
-> corruption found), and for #2 we can try to return whatever exit code
-> socat give us.
-> Retrieving socat return code is a bit tricky because we are running it
-> in a subshell, but we can save it in a temp file.
-> 
-> I can also send a follow up patch to use a longer timeout in
-> listen_port_and_save_to() if KSFT_MACHINE_SLOW
+On Fri, 24 Oct 2025 19:19:10 +0000 Asbj=C3=B8rn Sloth T=C3=B8nnesen wrote:
+> Do we wanna do the same for sub-type nest in the python client?
 
-Frankly I'm not sure this test is worth the compute cycles it will burn.
-It's a direct repro for a very specific problem. The changes it will
-occur again for the same field a pretty low. Maybe just repost patch 1?
+> as the WG/Jason bandwidth seams pretty limited atm.
+
+Please focus on what's needed to get WG implemented.
+
+My "bandwidth" for pondering cleanups that may not matter in practice=20
+is also limited. Main goal for YNL is new families. Polishing the old
+stuff is a huge time sink.
 
