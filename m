@@ -1,167 +1,122 @@
-Return-Path: <netdev+bounces-232354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CD15C048AC
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 08:43:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4138DC048C1
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 08:44:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CE4904F5A41
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 06:43:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D93E3BAADE
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 06:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB062798F3;
-	Fri, 24 Oct 2025 06:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C7DB273D6C;
+	Fri, 24 Oct 2025 06:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nHA3U3Ws"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KYtGg25+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD52C277CA4
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 06:43:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827A51EE7DC
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 06:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761288221; cv=none; b=bXVZNQGM1GNM5sksqD5iokbDUVc7LVBQiC4d4WUCIsy3sZNAVS+jurKintYnXQYI1aB7XPOLycqGiTUy9HxV7JpLXXU+Z37+BvJMwp18ELU82dNAE7v6Rnd6nQeWV3sqBbRSAlxLGqPoSzU3uAUb3d01Kr9P31gm5oY1zOERYxo=
+	t=1761288267; cv=none; b=Q5ea39D3set9YtI5AaPs/XP6w04FxUvm7BbGHLPE/Q5LRsSaxblI5i5OgFw+HsAgmeQVaVZbois0jKw2EPCeM1z5dg+dTr3VlLEQ2PdAlUd/RVjuE3Ow/zGMoMI4ZRfrZRhfNcUcs+ExNVARk9sBneu/YUPvTkF2XUA2ElFbp8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761288221; c=relaxed/simple;
-	bh=h2do/o72s1S1CroaAeWrkIDYcS+e5vX7dYGFhfPZhPU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=khQ3tj1u7HNT4VBNOxswW7O0oLmyYKR68JDgzdAYR50pfgPyWHso9MTdVVmoow3ze89717Kjjbg69feheEEiAxLxM4CNfnY/s7MG0nxiOMm8CvEUIA8pCO42njj/ra1LXlf4Cc7RKgrBe0pltrqkjEG2k0qMRF3po1BM0rUWrjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nHA3U3Ws; arc=none smtp.client-ip=74.125.224.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-63e336b1ac4so2869599d50.1
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 23:43:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761288218; x=1761893018; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e2UFjwfCheMSDPhpGuyj3HSoQ9LJMT/wq2yi5Xk/+fI=;
-        b=nHA3U3WsN7mOTeoNeolfMS8TaMNQHYvssmz4Bz1fZaSuZgBr0Dpr2nPpNb06gfzyw2
-         m2XglHuFzsyM6eMA33z1GFsrw/LgmiV8+TDJNTl2BJ87DVGjyixDsbvguNWxZHxIJz2Z
-         VBT5UwqvqfoKBbdQXHfGT/cqMVCsmtQBTSRfpJhl4OGgFlJl01sqY6P3Oco6Sks4lsDF
-         u4q71fA9wwa6Y3zkbLIcvWgUmVUVnaLVnf9WGxmwVOKrJMeQ6iY33gLVVqkX//lOOBt1
-         BnLQHgnRWJMGFWB2v/zktoMWsoWBnZXevyitSGwFYS6wa7E5efHudzeyJ7+2wYN8QOLc
-         Wz4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761288218; x=1761893018;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e2UFjwfCheMSDPhpGuyj3HSoQ9LJMT/wq2yi5Xk/+fI=;
-        b=EdWAfQ3TZHio2d3RHtMtpkoLKq4dFiA1Lm+Z11MpvMLiALt9IWnjXesXlZ+u92Ipkk
-         lvWFFk026Kjh5h/Ru4WEapQwhOEDCDMYrR9ds3pHd1eRggrf/6rbqATax/dKGg5jcoym
-         YoGZYiNFfVU+BJ5h2FQDrOG70GYM7Nuife+BvL408YaxanKbx/peI5iRiDVWkNtdX/hw
-         Nm/Ix3oszr/z4ia2xOx+Oflq+uQDVjMveJpc+Lfp/wTk1fSeY63QdClmnmRf9jOHhTh5
-         iVATE8WlajpXNT+hLroYT1FZAeurq/LdSj2YCH9S023LIDcionUjcQlHJe4BpYDFRJrn
-         hNOw==
-X-Gm-Message-State: AOJu0Yzb446UM8fsHSTJEGxzR8qeNerIZMRJquBTV50P3OI+Nwf4ia/2
-	m5LdUH/fLjuYDUBcJwKjHbL1WQfRWeyOJNKh9SANOV25OE4w0MCvDiG827UGZKAdyj15iJfk0Kk
-	T75gOCKLHhZV/FHIJlo3egIoauTVAlqzUaFMsZAA9
-X-Gm-Gg: ASbGnctPQF/YiEcAYtKyc537S2Eb1FNKfFIBbpfr7EC12L2Rj4f8GXMfLTxwvMXmKr5
-	R86eDOmNucWXDH5PCFbTnvZwmyaNQkS83jD264AQfo15jMMcP12XbL0QRYd/LgQ8qraMpscoSc+
-	+ZT5U80E13G7Dv+youNX4adH1GT5t7cvg4y9ilFhVk+y/a30K/oAP6KmjgMcPl5t88y8bGUTdIO
-	2bRxd5YoOSDUZZzYquH3mqy0qPXbzR040hbcdmQCOLYNfkrZE/UfNFhML3n
-X-Google-Smtp-Source: AGHT+IF1HVSnu6HsUGLipnhFezBFZO84eR0OgQFQffQJBEg1eFTIaGcwBZzC2UliCBsgQ5v+CoTvGXzZDqC/JNbTkjE=
-X-Received: by 2002:a05:690e:1409:b0:63e:2366:7ce1 with SMTP id
- 956f58d0204a3-63f42a200d8mr1145430d50.0.1761288218376; Thu, 23 Oct 2025
- 23:43:38 -0700 (PDT)
+	s=arc-20240116; t=1761288267; c=relaxed/simple;
+	bh=OMrkExLxeo5n6zdxsI3+y2dFchD/7zAtf9EgEGt265Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K8QIRKLpSh33VvjwYaSf1yU7OM4D0XBqQGPN4DmKdRdc4z2OjXb34ZCUDU1pIjoTtAier/lzUmfnflpPT3VJUfLkEFNzxo5kd4emz0BG7YsVSK+6hN84PNv+CkV/Mna6uA99urPLlITwgiDRwg+onkNUh8m4tSy/UwtQ0TFfAJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KYtGg25+; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 3A3BD1A1636;
+	Fri, 24 Oct 2025 06:44:20 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 0E44660703;
+	Fri, 24 Oct 2025 06:44:20 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 689A9102F244A;
+	Fri, 24 Oct 2025 08:44:09 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761288259; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=23XHfjip0xavJrBGmNRM/VDGO8Z67OrHnHQ9YooOSIE=;
+	b=KYtGg25+hcycycAL+yfAnApj7zKCwrcjHD0C1XmCTEWz6G7WnS9cc30XTSyOgJ7icxC/Rk
+	BqgI0luB56xoC4ypAxklxqw+6dS0yUfe7IIHk658RN8QGGhIaoGUoyCH36Ds/llVKwuL2G
+	cyXkCiSkeGeITCYPhWpveysp++p/PCtKkPKbcYWiK1O9O1S2hTqj3/KiknDuIrbPbEwx8N
+	9f89N0J4qw/LPTkrbdvkIapLZMRr96Mp0gc71NlRrw8JLnVAG48SlzxBF5BCoE0yj4PYzr
+	Lm2PpayjuUmiKTH+iCuMujhGHnik45A6axwDm0WHsU+hp71f45Jyrhhu62cuqA==
+Message-ID: <28d91eca-28dd-4e5b-ae60-021e777ee064@bootlin.com>
+Date: Fri, 24 Oct 2025 08:44:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1761286996-39440-1-git-send-email-liyonglong@chinatelecom.cn> <1761286996-39440-2-git-send-email-liyonglong@chinatelecom.cn>
-In-Reply-To: <1761286996-39440-2-git-send-email-liyonglong@chinatelecom.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 23 Oct 2025 23:43:25 -0700
-X-Gm-Features: AWmQ_blbjdPZKhGT9XBif5vxZmEROBogKMIVtgj_e_I3KnoOsKnizLtuSDPMwUI
-Message-ID: <CANn89i+TsY67y-pCkOkJHsh11Leg77Ek7n2-j6X6ed-U20eR=g@mail.gmail.com>
-Subject: Re: [PATH net 1/2] net: ip: add drop reasons when handling ip fragments
-To: Yonglong Li <liyonglong@chinatelecom.cn>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
-	pabeni@redhat.com, kuba@kernel.org, horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/8] net: stmmac: hwif.c cleanups
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>
+References: <aPn3MSQvjUWBb92P@shell.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <aPn3MSQvjUWBb92P@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Thu, Oct 23, 2025 at 11:23=E2=80=AFPM Yonglong Li <liyonglong@chinatelec=
-om.cn> wrote:
->
-> 1, add new drop reason FRAG_FAILED, and use it in ip_do_fragment
-> 2, use drop reasons PKT_TOO_BIG in ip_fragment
->
-> Signed-off-by: Yonglong Li <liyonglong@chinatelecom.cn>
-> ---
->  include/net/dropreason-core.h | 3 +++
->  net/ipv4/ip_output.c          | 6 +++---
->  2 files changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.=
-h
-> index 58d91cc..7da80f4 100644
-> --- a/include/net/dropreason-core.h
-> +++ b/include/net/dropreason-core.h
-> @@ -99,6 +99,7 @@
->         FN(DUP_FRAG)                    \
->         FN(FRAG_REASM_TIMEOUT)          \
->         FN(FRAG_TOO_FAR)                \
-> +       FN(FRAG_FAILED)                 \
->         FN(TCP_MINTTL)                  \
->         FN(IPV6_BAD_EXTHDR)             \
->         FN(IPV6_NDISC_FRAG)             \
-> @@ -500,6 +501,8 @@ enum skb_drop_reason {
->          * (/proc/sys/net/ipv4/ipfrag_max_dist)
->          */
->         SKB_DROP_REASON_FRAG_TOO_FAR,
-> +       /* do ip/ip6 fragment failed */
-> +       SKB_DROP_REASON_FRAG_FAILED,
->         /**
->          * @SKB_DROP_REASON_TCP_MINTTL: ipv4 ttl or ipv6 hoplimit below
->          * the threshold (IP_MINTTL or IPV6_MINHOPCOUNT).
-> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-> index ff11d3a..879fe49 100644
-> --- a/net/ipv4/ip_output.c
-> +++ b/net/ipv4/ip_output.c
-> @@ -588,7 +588,7 @@ static int ip_fragment(struct net *net, struct sock *=
-sk, struct sk_buff *skb,
->                 IP_INC_STATS(net, IPSTATS_MIB_FRAGFAILS);
->                 icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED,
->                           htonl(mtu));
-> -               kfree_skb(skb);
-> +               kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
+Hello Russell,
 
-This part looks fine.
+On 23/10/2025 11:36, Russell King (Oracle) wrote:
+> Hi,
+> 
+> This series cleans up hwif.c:
+> 
+> - move the reading of the version information out of stmmac_hwif_init()
+>   into its own function, stmmac_get_version(), storing the result in a
+>   new struct.
+> 
+> - simplify stmmac_get_version().
+> 
+> - read the version register once, passing it to stmmac_get_id() and
+>   stmmac_get_dev_id().
+> 
+> - move stmmac_get_id() and stmmac_get_dev_id() into
+>   stmmac_get_version()
+> 
+> - define version register fields and use FIELD_GET() to decode
+> 
+> - start tackling the big loop in stmmac_hwif_init() - provide a
+>   function, stmmac_hwif_find(), which looks up the hwif entry, thus
+>   making a much smaller loop, which improves readability of this code.
+> 
+> - change the use of '^' to '!=' when comparing the dev_id, which is
+>   what is really meant here.
+> 
+> - reorganise the test after calling stmmac_hwif_init() so that we
+>   handle the error case in the indented code, and the success case
+>   with no indent, which is the classical arrangement.
+> 
+>  drivers/net/ethernet/stmicro/stmmac/common.h |   3 +
+>  drivers/net/ethernet/stmicro/stmmac/hwif.c   | 166 +++++++++++++++------------
+>  2 files changed, 98 insertions(+), 71 deletions(-)
 
->                 return -EMSGSIZE;
->         }
->
-> @@ -871,7 +871,7 @@ int ip_do_fragment(struct net *net, struct sock *sk, =
-struct sk_buff *skb,
->                         return 0;
->                 }
->
-> -               kfree_skb_list(iter.frag);
-> +               kfree_skb_list_reason(iter.frag, SKB_DROP_REASON_FRAG_FAI=
-LED);
->
->                 IP_INC_STATS(net, IPSTATS_MIB_FRAGFAILS);
->                 return err;
-> @@ -923,7 +923,7 @@ int ip_do_fragment(struct net *net, struct sock *sk, =
-struct sk_buff *skb,
->         return err;
->
->  fail:
-> -       kfree_skb(skb);
-> +       kfree_skb_reason(skb, SKB_DROP_REASON_FRAG_FAILED);
+I didn't have the bandwidth to do a full review, however I ran tests
+with this series on dwmac-socfpga and dwmac-stm32, no regressions found.
 
-There are many different reasons for the possible failures ?
-skb_checksum_help() error,
-ip_frag_next() error
-output() error.
+For the series,
 
-I think that having the distinction could really help, especially the
-output() one...
+Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
 
