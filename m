@@ -1,180 +1,153 @@
-Return-Path: <netdev+bounces-232652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39049C07B5C
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 20:21:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97D61C07BAB
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 20:24:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3DDD3A2D16
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 18:17:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C64553AD668
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 18:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B9A253F05;
-	Fri, 24 Oct 2025 18:17:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF443491E7;
+	Fri, 24 Oct 2025 18:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J1kkGTUn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RanOtGos"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4BE231832
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 18:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DDB4346A13
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 18:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761329839; cv=none; b=XbkdzMQ18oINTEfjD1Gm8x+/aYm8By7Zpiatg0Cy4wVzmrSJBqmaF+n0T8055y5US9Ok0KQIR/PMuX8s2/wNtRb0EbMrj/k+q5Qr7vwXz3mVDjh2DoEPGNB2wyLy6zJwLv2BWf9BPchIm6W8STlMXq0XMKk2YcYQYCdaVqLB4Wo=
+	t=1761329880; cv=none; b=bNURRQl+LLmx6N0ZvB1UdG9sVWgzXaTS5occ6NIqpcDQHzAem7+xtUSaQsZ/CEI4wgxOoNX1mvrWj3+ImCpDiucJYewzkUxb2KeM3qEGk4TuILSHLbTmNiA6iRwg37OBsQzRrRsPCrFczAJKRyRhtUghfiSr6c4ovCadbo3xiIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761329839; c=relaxed/simple;
-	bh=DrTetYwXYnChgeufrcDQ2X9huG25jnVcdcsflx4+eh4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QfPKZM1pon1qpVERE8LF5dM/rgelkpwApY6rwRMNQkr/+FYNjQcipJG2QlDyf1zPiRNB7bqxD8S3j4D3SpbJRtq75TsKe/kpKCMCcvxLjwAI+ox/FSJPlgJ1jvQwcTBTVWgcBffs547WNYG5mfdRJhuXFaHFGnDUW4sbNSQdcHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J1kkGTUn; arc=none smtp.client-ip=74.125.224.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-63e35e48a27so2381085d50.0
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 11:17:17 -0700 (PDT)
+	s=arc-20240116; t=1761329880; c=relaxed/simple;
+	bh=f9EWuUddQuX6YNL9LEZegSrVPjIgkYAeTAs+Ik6L294=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=um7qXbcYd1G6faZBZR7hmIcjO1t4Kiy/Rn4Y+w2roTg68MMxMWuKhHwY476n2Q9GDW03xzT7dQIuL2sZHZ2qrXn8kc6MqM1dLXehHLguCn+CnqdZGjqo5eupcvB97JnfDbKDp6ZBdwMs6nL9+efjCVYvpVoaIT9+P82eDmjnfa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RanOtGos; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7930132f59aso3116844b3a.0
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 11:17:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761329837; x=1761934637; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2h/ElMh0No0vgq96kFlbqzJt3eEKJ2285EnfEz82Ydg=;
-        b=J1kkGTUnTXpQ74o8T0Q1lGWtOP0oUF1WJhYxYZrSnxuKYXpWE03zauZ3w+BK4lCUPU
-         L7XoURzZ3JH2qYsUZTIxhZg2n7gbFMQLKibqpLOUNiGM11nEB0I2ijM3dPD/azWlEkJd
-         w5HhQsiQ+yoE6xGdjFWGoLRo7nnEHvatmBN0gxF8IMYgxitM6FYieKCQdBfsjX/S26y4
-         FXh/EykkV1ZyhCeH8CGpUi7nlfVknEivViteRhR/gSHgVFvjVUMoD+LeiRQEFr2dPoZt
-         LFCUqMs5+1xKgSxgjuVUi/3JKBVRFQuVFsCTPZR5AWFQ0ksC9YCyI3WnXTNBga3meGbA
-         Oxig==
+        d=gmail.com; s=20230601; t=1761329878; x=1761934678; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=f9EWuUddQuX6YNL9LEZegSrVPjIgkYAeTAs+Ik6L294=;
+        b=RanOtGosw9YedowY2h1khk7BmndTmXX44CLpZ3QtKrQzWo9NfVj59Pn9lOOtkDSJHb
+         DXML0NEX/QRF7Hsapad6xzTkpSN+EgM+92sfL0Kupu6D18qfcrQTnOQBlzQZTEdN+qrQ
+         N0Z5QAeTRmAppNeC7FZYNs/2zNxGsySFJIQ0AVKxRpBlB9whN3LFa7NNNJcnxD1Cjv1P
+         Eq7K1KCubw2c87EPvsrVDak+mlaZs7iPQB1mvEOpOqr72Y1kR1x4F59oi+GFIX4p6twX
+         0woyd5Xv0i9nzqL0TesXazjNhGr3zcQkdQbHgeHIfLvA5y3h2Nn68YqF+K3OsDSdQ66B
+         FUkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761329837; x=1761934637;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2h/ElMh0No0vgq96kFlbqzJt3eEKJ2285EnfEz82Ydg=;
-        b=ftTcJtQyQ+KKGY46nOR7IIz8VscAG3CdrJYA9XZum78M1TKmmdE+tunljHLSz4DiYW
-         RqdkNOr4U5k/0xmDHx5BFeScJK+ZLF9J1eJQYAb5Gg6NSZterO1hA0482Hdfl+DDhoZ0
-         86CFEQ8TTWjXhX0Yt4wSY9iPA+odbwjDgAodRMDyjYeQFFWhOtI3WKc9QpeoL+3t1A07
-         cnEMUpmttHzWn6U3UYvXtKvlOmSFinN0o0CQpaNJamrCwBRLyhI9GyXVv84t2tfOdH6/
-         cObS4/WIzNHbwgYwrBtbmNb6wgvGEJhr59jMLDycXCOkALIqV4bEhVfklLy3GQmaoe4Y
-         1gUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUt7ScsCebq3Xwe+PlbMKOnCyB0tFEBX47l20rParpOvTP6qdKLFcLWu4Ill9v/QgYNWu2Jyac=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXN28V8CnDgSrrntMhDICweUp0nOMANnmaisUYVsezUj1XpJ1h
-	NZXwCbEV1y/COKeaEjPdmdTdHxf+AsqJjHtANw0MoM9vKS2kp2cmIHihhKAkq17AcdWHLoUCUCx
-	uvfWlT/NLS/NcwnYb18INjuXJX5DtO9LI9sL5f9Cf
-X-Gm-Gg: ASbGnct4Lj6N4VbspSmHMPmPntU/vw6A0FoZf8pjOCsNz+osBcH36oLUiv2NFFQClox
-	mtfzl7il8IxlVSxK4FcNripqB3J53zEddiRGp9gmyUxyfTRYdxiXNWa3M+6mXqbGHpAYmMmTGxA
-	PJdyxLYLEqkRhZiPin8Ujk4xkD8o+JwzCKCTuhXHyBP6ffUHXoGsvPotUqbIgXrHn7CD4IgmjE9
-	AFUG8nI68JXCukskRt0tu1oo3PRQoxfJoMnq9jldcdVqbxhZx8hy8sG2OP2xpS10ogE0viL7Pts
-	IUYi3/FFnkaOoXzSfNhhF2GBxboSQj+g44D9
-X-Google-Smtp-Source: AGHT+IH7fLaxmQPiHVCyIFuVlkCG7QU1A/wthZwwqQkRRKGlnH5+qz2v1xZpkL3rChyG1ByYzAe4TaJtZZ5aJ7l0xXQ=
-X-Received: by 2002:a05:690e:1243:b0:63e:2a71:83b9 with SMTP id
- 956f58d0204a3-63e2a7189f5mr17754554d50.65.1761329836370; Fri, 24 Oct 2025
- 11:17:16 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761329878; x=1761934678;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f9EWuUddQuX6YNL9LEZegSrVPjIgkYAeTAs+Ik6L294=;
+        b=d7mqw+TZeZOzDjzWID1eTVRP9+iRKyyIKSX5QO233+duolZPYBSp8tX8Y4CoVU2giQ
+         ec7+gyBt+lycPS4a5H6HZ7l5hh8q0i1Drn1/NvDOvbKY9Jf3ED7Kz1//Guj5m6jrubb2
+         WmAk2S56N7Ee2zUIN5XZ6b0Qb2VMvH8KDGC8CxxYPNipG4WA7+ONOrNmS4b1hjSVM358
+         GxEIz2HLM2zeNRxR9arTFBwstRAudx8zqwuZihWi2RnM4FMvCTvPHV7kP2EKKeD+fCl+
+         8wjfDrgGHYs7JKau3sdFDVun45dVeXcLVvhvPwAjaSWiGcL25bxLRRopow6PPkki5iiV
+         hCDA==
+X-Gm-Message-State: AOJu0YySlBcMWCGOpNa1Ofiw3GDzF34OAqBbx7ghvzYtBG/tf++ECVmy
+	WKc3lMYDYu9oHDcmEW/3BOPZSH0RADD1L/xBwZkM2m10Lu/PNrv5K8ul
+X-Gm-Gg: ASbGncsZiCHxZ54Nsay7zbkFDqo5k6LhJ+Iu9D4gM4ephi7PacF3p3XVEkW7HKyIyQO
+	NPOSNwV41dnglF5ZqpDNQCfXVlxnXqVmY2s5rIUu+GwRT6hlBFE2PK5L8MsqIbmYAMck5Wa6MCA
+	6fuoHfUWJs4CDoThSon12ZjkA2qjINVHWvbbC3Dv7MQ7fsfQm9PSLD104KDQp8v72e99zHBR/5H
+	Dorum7Gx6mLpBxh+bf/ht+ICSvGXod+z+PNhaNurWt+1tD5Wktvo4uqxmJ5FcNlgJdJa22rw2zn
+	33m8kvvK9zs0xB0Fy4+6rAKy/hPuijn9H9Az47fF3nAhorS2DpkK8MlbU+YjKt3nLZl5ZcuFNx2
+	ZuFqD/zWjMUoVCwcrhZuh6eVg19EfRY9WCPfe01P6beJyOjW0m5+dwRUseGWGfR9yDcFsiUw2GJ
+	2x2qBbvOtzKY8l92gu0WV8sOs2EEg6lV6nWQfYoB3zI8y3OKbf/pzd6C/loNeM8fEwFKB+KX3o
+X-Google-Smtp-Source: AGHT+IHeiJK3KGe+VnGjHXLRnMJUwHVfOIfp/7GkKJJk9bi79iBVomfSlmVEYSTiEzsfJqqDkJvbHQ==
+X-Received: by 2002:a05:6a20:4311:b0:334:8002:740f with SMTP id adf61e73a8af0-33dec72d38cmr3947493637.41.1761329878500;
+        Fri, 24 Oct 2025 11:17:58 -0700 (PDT)
+Received: from ?IPV6:2405:201:8000:a149:4670:c55c:fe13:754d? ([2405:201:8000:a149:4670:c55c:fe13:754d])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a274b8adc8sm6527877b3a.39.2025.10.24.11.17.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Oct 2025 11:17:58 -0700 (PDT)
+Message-ID: <b262deee-de5e-48ba-9c16-88238fac37fb@gmail.com>
+Date: Fri, 24 Oct 2025 23:47:52 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251022182301.1005777-1-joshwash@google.com> <20251022182301.1005777-3-joshwash@google.com>
- <20251023171445.2d470bb3@kernel.org>
-In-Reply-To: <20251023171445.2d470bb3@kernel.org>
-From: Ankit Garg <nktgrg@google.com>
-Date: Fri, 24 Oct 2025 11:17:04 -0700
-X-Gm-Features: AWmQ_bkOcEz5vk4of_aFjLMcVnCbAUnvZuNnSpX91lCMUqEeQToL2-tc3L6UKxI
-Message-ID: <CAJcM6BFTb+ASBwO+5sMfLZyyO4+MhWKp3AweXMJrgis9P7ygag@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] gve: Allow ethtool to configure rx_buf_len
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Joshua Washington <joshwash@google.com>, netdev@vger.kernel.org, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Jordan Rhee <jordanrhee@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Ziwei Xiao <ziweixiao@google.com>, 
-	open list <linux-kernel@vger.kernel.org>, 
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: ethernet: emulex: benet: fix adapter->fw_on_flash
+ truncation warning
+To: ajit.khaparde@broadcom.com, sriharsha.basavapatna@broadcom.com,
+ somnath.kotur@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ skhan@linuxfoundation.org, khalid@kernel.org, david.hunter.linux@gmail.com,
+ linux-kernel-mentees@lists.linux.dev
+References: <20251024180342.1908-1-spyjetfayed@gmail.com>
+Content-Language: en-US
+From: Ankan Biswas <spyjetfayed@gmail.com>
+Autocrypt: addr=spyjetfayed@gmail.com; keydata=
+ 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
+ TRpGew2ozniUMliyaLH9UH6/e9Us
+In-Reply-To: <20251024180342.1908-1-spyjetfayed@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 23, 2025 at 5:14=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 22 Oct 2025 11:22:24 -0700 Joshua Washington wrote:
-> > +     if (priv->rx_cfg.packet_buffer_size !=3D SZ_2K) {
-> > +             netdev_warn(dev,
-> > +                         "XDP is not supported for Rx buf len %d. Set =
-Rx buf len to %d before using XDP.\n",
-> > +                         priv->rx_cfg.packet_buffer_size, SZ_2K);
-> > +             return -EOPNOTSUPP;
-> > +     }
->
-> Please plumb extack thru to here. It's inside struct netdev_bpf
->
+Hi all,
 
-Using extack just for this log will make it inconsistent with other
-logs in this method. Would it be okay if I send a fast follow patch to
-use exstack in this method and others?
+Please ignore [PATCH] and [PATCH v2].
 
-> >       max_xdp_mtu =3D priv->rx_cfg.packet_buffer_size - sizeof(struct e=
-thhdr);
-> >       if (priv->queue_format =3D=3D GVE_GQI_QPL_FORMAT)
-> >               max_xdp_mtu -=3D GVE_RX_PAD;
-> > @@ -2050,6 +2057,44 @@ bool gve_header_split_supported(const struct gve=
-_priv *priv)
-> >               priv->queue_format =3D=3D GVE_DQO_RDA_FORMAT && !priv->xd=
-p_prog;
-> >  }
-> >
-> > +int gve_set_rx_buf_len_config(struct gve_priv *priv, u32 rx_buf_len,
-> > +                           struct netlink_ext_ack *extack,
-> > +                           struct gve_rx_alloc_rings_cfg *rx_alloc_cfg=
-)
-> > +{
-> > +     u32 old_rx_buf_len =3D rx_alloc_cfg->packet_buffer_size;
-> > +
-> > +     if (rx_buf_len =3D=3D old_rx_buf_len)
-> > +             return 0;
-> > +
-> > +     if (!gve_is_dqo(priv)) {
-> > +             NL_SET_ERR_MSG_MOD(extack,
-> > +                                "Modifying Rx buf len is only supporte=
-d with DQO format");
-> > +             return -EOPNOTSUPP;
-> > +     }
-> > +
-> > +     if (priv->xdp_prog && rx_buf_len !=3D SZ_2K) {
-> > +             NL_SET_ERR_MSG_MOD(extack,
-> > +                                "Rx buf len can only be 2048 when XDP =
-is on");
-> > +             return -EINVAL;
-> > +     }
-> > +
-> > +     if (rx_buf_len > priv->max_rx_buffer_size) {
->
-> This check looks kinda pointless given the check right below against
-> the exact sizes?
->
+I have send [PATCH v3].
 
-My intent was to code defensively against device accidently advertising
-anything in [2k+1,4k) as max buffer size. I will remove this check.
-
-> > +             NL_SET_ERR_MSG_FMT_MOD(extack,
-> > +                                    "Rx buf len exceeds the max suppor=
-ted value of %u",
-> > +                                    priv->max_rx_buffer_size);
-> > +             return -EINVAL;
-> > +     }
-> > +
-> > +     if (rx_buf_len !=3D SZ_2K && rx_buf_len !=3D SZ_4K) {
-> > +             NL_SET_ERR_MSG_MOD(extack,
-> > +                                "Rx buf len can only be 2048 or 4096")=
-;
-> > +             return -EINVAL;
-> > +     }
-> > +     rx_alloc_cfg->packet_buffer_size =3D rx_buf_len;
-> > +
-> > +     return 0;
-> > +}
+Best Regards,
+Ankan Biswas
 
