@@ -1,145 +1,122 @@
-Return-Path: <netdev+bounces-232518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3149C06297
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:07:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96FFFC062EB
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:12:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 766A8189F52B
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 12:07:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 859591B873F1
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 12:12:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2E1313526;
-	Fri, 24 Oct 2025 12:07:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFC762E7652;
+	Fri, 24 Oct 2025 12:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Le0G96Ze"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JllN/EZ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B82126E702
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 12:07:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A9E1DB127;
+	Fri, 24 Oct 2025 12:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761307631; cv=none; b=aCxGuHX0nZsFzKXVl+b6Urx+35M9XBlE9GQLIvcfR5/pJyVYso/cyBJry8XfsquJv2dIlrn7w+KLXba9I5ogwcASaA2F7OqgQ4OmpMvuspRNDYnZ3SkuvzJXv8Cb/wdBwdK3q88GcjTw3SJ5RRq7Mx3VSQ1qXqPsOeipHvFn0Sk=
+	t=1761307931; cv=none; b=e8YQ5LJKdFr0C1AsrTRbRXaexhnS2bTFXSy1evlwlcAjQG5LDDXmvnw2zgoWCSmgxNxuTdHf6ADy2qiqb3yh1O6ym24neJrNNa0gJs6LFikqGU18/UEs2cb3fey7JRYX/UWk44J0HDvH9sjtmn9LSvKFi7At6asbB4JdV591JBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761307631; c=relaxed/simple;
-	bh=Ge/lC8zQ5jVeNC9B88lOaicJsTHA7YsVTocnMfDgbBo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SxE5/lVOFz/DTE97xiiZDZsGnRt83xf32QNZqcVHb/rUKfDp+Vtd7UdjXkaz95UqbxSlmRLRnRPJIuEqrPHQ6brIA1onSDPa3qfYkTBotb0HXbJ7xmTAT0Ucd45ykyconQWH0RiCC+0WR5m83sx0xTzQ0KfFwG8BUfp6TtyaIRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Le0G96Ze; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-892d6d7836dso419365485a.3
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 05:07:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761307629; x=1761912429; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SOXV5l+BvPedV6wprllzQPCcpXmgGNfZEp0jO0RclYY=;
-        b=Le0G96Ze6hWjbYAgsMJ2p6vmV7egeUBNJ5sM6pcFBar4RrorypPmFO75MFa0SGAMVu
-         M+2dROCPPPYilj6Jogfg0I89+s6NxgECvOhAnnGNwPlgKhUhr7pO6XiBm9fLDkCDPFDp
-         viHDrTQmXkrWBiAhCNhPsA8U0zUjORlF7wGcnXX7MYkSFu5l/msq62PJAPsTbH6RBM7V
-         BIj1I4NDg2Onpv1s+V5dZMop18s7J5uS6cf0U9Vv1NCRQGYYpXNVnWM9Ln02/EEQLK+M
-         a3v1rgW9gtPPgbcae4Ak3xoP0dqwDjT4A0X1TpfSeTWAkS7gnNXd4YBsunTCAEhCTCMQ
-         3/FQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761307629; x=1761912429;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SOXV5l+BvPedV6wprllzQPCcpXmgGNfZEp0jO0RclYY=;
-        b=om5IsR3u+kycsjtTs2oTii823sghFNnW+JF7KBuZPSj6D3CrW00pz3RgijBRudx5+5
-         fnhqQMuQA2QvggimRxJQyuzoh1sB0U0yoEkCgP14iEMrniz6w8/BMm/5sWaKkNWAMX0X
-         tWru2I8z7Hunn3+Em3dmbAkczYAt3FLxZioLxfZkTpFDxWozrMDE+vKSAVQvqgHOedbJ
-         xtEmEl8PkdtquFDTTxwFYEFAdKcrZxPTEzXl6zyNMAxDu5z3hM5rknEFClejIAmKy0kx
-         CRLNmLAeAFDfCpq6ZTKv9JrF+C9ytX8etW7MBXx7YeN1B2y8JsYJTQOdkmZrsbsJrJK8
-         oFEg==
-X-Forwarded-Encrypted: i=1; AJvYcCUxKYMAcISC2bo6fPUJBD11qmdR/fhkHDYAuOpqNyoty9WDAr1Qyd1buYpX7QfxL3Yuu2e+FYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHgew48fyu4f0mwP9We6es4zbFXoXTJ18iuZ/0hjvhqskfLaEF
-	/2A1iiSbRlQdXFpF8AzjM9Aqhh+D7mehFx/dlZw6fHzijDbdFmBkL1j6Hdv7L+Yz/lsg7f0fYl1
-	SCkTQiyTKOThyQA==
-X-Google-Smtp-Source: AGHT+IGMaP7wIhJip3T/xPSFnevBkz5oQ1FnKdRmrt6BV9Ea9oU71n38QAvyaDCDw+xclWFQbQEu+0552Kb+tA==
-X-Received: from qkpf18.prod.google.com ([2002:a05:620a:2812:b0:88e:12a2:6b9])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:4607:b0:88e:8d97:f3ae with SMTP id af79cd13be357-89dbff8349dmr250183685a.26.1761307628791;
- Fri, 24 Oct 2025 05:07:08 -0700 (PDT)
-Date: Fri, 24 Oct 2025 12:07:07 +0000
+	s=arc-20240116; t=1761307931; c=relaxed/simple;
+	bh=/zFFutCPy+n8j87wgq9tHUe0ADsqAV6k9QBgeuL8/0o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V3xGvqGjAG+8CAqccQHJ8vM+4JW+7AY19K7TjGRR3VAHFrWh0xfP4a8jyqBRjmi906ZN53Y/4yw9NmjyqmxKblKoBVxbo7/ZlokwNUupVxzVFF/ROdCD58038trBYuPX+PT2QXwUYtdb3m52bxm5EOrfCYtpf5ek69SBtJRmEn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JllN/EZ/; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id CBA701A1648;
+	Fri, 24 Oct 2025 12:12:01 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 9BBC060703;
+	Fri, 24 Oct 2025 12:12:01 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 337CE102F248D;
+	Fri, 24 Oct 2025 14:11:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761307920; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=JEt/kqGoBRuvo1mSCkAMwChIUVantu5YXampMxAZaZY=;
+	b=JllN/EZ/YRLRi+nQ0w7t9ZcaWf1s409bOeKeWf7oYmIbrP/q6TGYFlW4m8WAQ6Nn/EhOt6
+	EeJFLluQLB/IQYHO1BxyBTNjXyOXt1abGjxziSrwMJBihy4k9eclU5c8qCDN/9/4VDvHsV
+	tyGnQnSP8t8s09/YzWXdsFJMbcivhgXrt1qsPvgF/1fk7bn9VcT+kQgywQ72DOXzErUFKT
+	E1cGoTWkUDSx8yYo/xysPbJ+5ISMb76ttfwNCgexU+f5iPXHEd64/I1Z7GttAb5JOm9foI
+	nKQWZZbJ0sGGsF0QfVjISMt/t8JnFpedYJRFSrTwUJXYAG6mfCcn3ypxj7reew==
+Message-ID: <92e953b8-4581-4647-8173-6c7fa05a7895@bootlin.com>
+Date: Fri, 24 Oct 2025 14:11:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.1.821.gb6fe4d2222-goog
-Message-ID: <20251024120707.3516550-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: remove one ktime_get() from recvmsg() fast path
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 01/10] net: stmmac: dwmac-socfpga: don't set has_gmac
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Dinh Nguyen <dinguyen@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Matthew Gerlach <matthew.gerlach@altera.com>
+Cc: kernel@pengutronix.de, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+References: <20251024-v6-12-topic-socfpga-agilex5-v5-0-4c4a51159eeb@pengutronix.de>
+ <20251024-v6-12-topic-socfpga-agilex5-v5-1-4c4a51159eeb@pengutronix.de>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251024-v6-12-topic-socfpga-agilex5-v5-1-4c4a51159eeb@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Each time some payload is consumed by user space (recvmsg() and friends),
-TCP calls tcp_rcv_space_adjust() to run DRS algorithm to check
-if an increase of sk->sk_rcvbuf is needed.
+Hi Steffen
 
-This function is based on time sampling, and currently calls
-tcp_mstamp_refresh(tp), which is a wrapper around ktime_get_ns().
+On 24/10/2025 13:49, Steffen Trumtrar wrote:
+> Instead of setting the has_gmac or has_xgmac fields, let
+> stmmac_probe_config_dt()) fill these fields according to the more
+> generic compatibles.
+> 
+> Without setting the has_xgmac/has_gmac field correctly, even basic
+> functions will fail, because the register offsets are different.
+> 
+> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> index 354f01184e6cc..7ed125dcc73ea 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> @@ -497,7 +497,6 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
+>  	plat_dat->pcs_init = socfpga_dwmac_pcs_init;
+>  	plat_dat->pcs_exit = socfpga_dwmac_pcs_exit;
+>  	plat_dat->select_pcs = socfpga_dwmac_select_pcs;
+> -	plat_dat->has_gmac = true;
 
-ktime_get_ns() has a high cost on some platforms.
-100+ cycles for rdtscp on AMD EPYC Turin for instance.
+Note that this field is now gone as per :
 
-We do not have to refresh tp->tcp_mpstamp, using the last cached value
-is enough. We only need to refresh it from __tcp_cleanup_rbuf()
-if an ACK must be sent (this is a rare event).
+  26ab9830beab ("net: stmmac: replace has_xxxx with core_type")
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/tcp.c       |  4 +++-
- net/ipv4/tcp_input.c | 10 ++++++++--
- 2 files changed, 11 insertions(+), 3 deletions(-)
+You'll need to rebase the series :)
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index b79da6d39392751e189f1f65969b15c904a6792a..a9345aa5a2e5f4a2ca7ca599e7523d017ffa64ee 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -1556,8 +1556,10 @@ void __tcp_cleanup_rbuf(struct sock *sk, int copied)
- 				time_to_ack = true;
- 		}
- 	}
--	if (time_to_ack)
-+	if (time_to_ack) {
-+		tcp_mstamp_refresh(tp);
- 		tcp_send_ack(sk);
-+	}
- }
- 
- void tcp_cleanup_rbuf(struct sock *sk, int copied)
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 8fc97f4d8a6b2f8e39cabf6c9b3e6cdae294a5f5..ff19f6e54d55cb63f04c2da0b241e3d7d2f946a0 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -928,9 +928,15 @@ void tcp_rcv_space_adjust(struct sock *sk)
- 
- 	trace_tcp_rcv_space_adjust(sk);
- 
--	tcp_mstamp_refresh(tp);
-+	if (unlikely(!tp->rcv_rtt_est.rtt_us))
-+		return;
-+
-+	/* We do not refresh tp->tcp_mstamp here.
-+	 * Some platforms have expensive ktime_get() implementations.
-+	 * Using the last cached value is enough for DRS.
-+	 */
- 	time = tcp_stamp_us_delta(tp->tcp_mstamp, tp->rcvq_space.time);
--	if (time < (tp->rcv_rtt_est.rtt_us >> 3) || tp->rcv_rtt_est.rtt_us == 0)
-+	if (time < (tp->rcv_rtt_est.rtt_us >> 3))
- 		return;
- 
- 	/* Number of bytes copied to user in last RTT */
--- 
-2.51.1.821.gb6fe4d2222-goog
+Maxime
+
+
+>  
+>  	plat_dat->riwt_off = 1;
+>  
+> 
 
 
