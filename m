@@ -1,159 +1,142 @@
-Return-Path: <netdev+bounces-232392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14E32C054B2
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 11:18:47 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B19D6C05445
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 11:12:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D277425AE2
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 09:07:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D09AD4EF74B
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 09:11:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8E4309EFB;
-	Fri, 24 Oct 2025 09:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YiIl3eUw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835ED308F2A;
+	Fri, 24 Oct 2025 09:11:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D5C309EF0;
-	Fri, 24 Oct 2025 09:07:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69C93090D2
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 09:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761296848; cv=none; b=ucC/1CwvRk8o5ijqZ/CFzRjI8gXwEWHEG93B/RUDf7utR3U8TOacveenRdFXUw0F33u1DMFRFGflOa4hqJddpt8tbeGYpyGnxsF9KFv1TJJ+JeVti1NSPGdBXgT5NxEZjLg3NJoIgkM06VQyO19P/tyDUpNz4nCRO03l4wq+xnk=
+	t=1761297075; cv=none; b=t8aB0kUFoefP7SENqDSgtO/hxoPD0bTsPJpTWmy8+NtQBTBHpK/dbtF+FWa86NLO+JkrHnkucBWRTczxZtwHNiLqVf1JOjq9VUdA0hxQzqzqQunFZ6O32miCG825fVeQUT7YrJRrGMceqXaun1NvY5g8phZDA3Mu+cEH/DfpTt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761296848; c=relaxed/simple;
-	bh=h9h3p/jVZ0eKHnXV9CRiESXb7xFSh7Ag8XBeN8n1V8s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t1HcA5Ci6RuvKPHADUKn5Wvh83NOoVcQ4NGTZAulEvklwXi/DuNrXrmy2jJbenHD+4Xz9d74K+Y+S0f7pRl6ZzL4TJVPc5bdcqW8McwNPDlSusyYwnapsSZRxo0GVg9leU1UoWWS47fSFApcxe4tW3DswldnxD/e8ajgh0bxAxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YiIl3eUw; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59O5tjhr030688;
-	Fri, 24 Oct 2025 09:07:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=HRv57G
-	si46uRrAgqKUZas4j6gNZDFz8Rx+aMsHY/wpw=; b=YiIl3eUw/iQLVco0p/lvCp
-	VBKFASkiKfpQFV/5s54GF3cAyBepRw/cRxGKZzci/bM3jaEhZdCGyt4YCTf7ICpY
-	F6Uw/HZxNTYKvbBeTNSzusRN29z3+mC/ZlHj5fLeN5up8WQa39aTZr0BbuH/FzH6
-	tlnpv4l12YtVT7JbtyZLZB9t5ARqPwGrYlE9Cek8fen+SMth/qC8FMRbQsXYbvLi
-	+lVMiLhnKuQaYMht83yY6ONsvwiPMGIQLO8o4GSbuPRMNCDLqUWJkuVbGpsoW1z3
-	QtEOLMjt6eAOB1LdyNhLVWelOFSGNtuDoFr7e/HZ1N+bGwdBUG1PwnkFhteRpUaw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v31segsf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Oct 2025 09:07:17 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 59O8gZ6V014143;
-	Fri, 24 Oct 2025 09:07:16 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v31segsa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Oct 2025 09:07:16 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59O5OngH024687;
-	Fri, 24 Oct 2025 09:07:15 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49vpqka8ux-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Oct 2025 09:07:15 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59O97BIj60227880
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 24 Oct 2025 09:07:11 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1B38C20043;
-	Fri, 24 Oct 2025 09:07:11 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8BE8520040;
-	Fri, 24 Oct 2025 09:07:10 +0000 (GMT)
-Received: from [9.111.205.137] (unknown [9.111.205.137])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 24 Oct 2025 09:07:10 +0000 (GMT)
-Message-ID: <a608a894-e172-46c8-aaad-2eaaba16ff63@linux.ibm.com>
-Date: Fri, 24 Oct 2025 11:07:10 +0200
+	s=arc-20240116; t=1761297075; c=relaxed/simple;
+	bh=PUrfg4uGr+Oo/Ca7SJXLcnhod6KTFMtdEP9m1BKO36A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r+oM8w+bhUMhfAITTQcAnwTkjiyjxjFvutV4bjgA7hACO0oqrFoG7ajEiyQ3syADVol46o3PLuAAu5fOzFTKBoJWf3XjyV1UE2Eup8KWzwPHDQl/IOotLvTzRcBd6Qm0x5UNSxWQDkt739GPQmENZiytgudt5P6nr7Gyl01qyeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vCDpI-0000nP-3w; Fri, 24 Oct 2025 11:11:12 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vCDpF-005Ca4-31;
+	Fri, 24 Oct 2025 11:11:09 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vCDpF-00F7An-2b;
+	Fri, 24 Oct 2025 11:11:09 +0200
+Date: Fri, 24 Oct 2025 11:11:09 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Hariprasad Kelam <hkelam@marvell.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Gal Pressman <gal@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+	Edward Cree <ecree.xilinx@gmail.com>,
+	Breno Leitao <leitao@debian.org>,
+	Russell King <linux@armlinux.org.uk>
+Subject: Re: [RFC net-next] net: loopback: Extend netdev features with new
+ loopback modes
+Message-ID: <aPtCrc6EPpn_hcYp@pengutronix.de>
+References: <20251024044849.1098222-1-hkelam@marvell.com>
+ <e9aa0470-2bd2-4825-8333-ad9dbc7f40a0@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] dibs: Use subsys_initcall()
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Julian Ruess <julianr@linux.ibm.com>, Mete Durlu <meted@linux.ibm.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Dust Li <dust.li@linux.alibaba.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang
- <wenjia@linux.ibm.com>,
-        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-References: <20251023150636.3995476-1-wintera@linux.ibm.com>
- <20251023150636.3995476-2-wintera@linux.ibm.com>
- <00eb725b-1e0a-47ec-9352-72c2623f6ab9@intel.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <00eb725b-1e0a-47ec-9352-72c2623f6ab9@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: QWLuPd_aogdwqiJ554Fm_DrL3izEF1Sz
-X-Proofpoint-GUID: G-4PH_dXQ51ZvLx6nqzBCQkDSvGmy_AV
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMiBTYWx0ZWRfXzmb7GUpykigp
- vDB+iqrLtMZrcdDNaSH6AhRMJ3jmPvEiuGVdThsqVF8PeWvQwFgp/wl7hc0HW5XL8WFZ1zlNCOC
- 4XkV4FrA2umd/wE/z1daDXnYQlCv2f9dTu+Q+bSCugAjH6b8qoyxQboBCfMM45VBUXnBFdSA+XZ
- KcogNdL4BBJDUSdOobcyliHY1wAeBuI7V13uaUuYcNkRxHiApvhuGwt3i4XpyDdBsQaiX/RFXYl
- KOuXcYgXXfo9FPjp4N8diTxSshCPwoq8L2QPVfQv7lLteASXG3CM7QUpKrCndXhtIkk8MpnIISO
- H5Cl5EsSU8mwSHKd31AiO0i1p3Q4wocDjSI1b09PjOiQz5FHK0EntB6es2JZz5mp84eFHfmZaSU
- cS4kBYcc9wyEeE26RL2eRx47qU5qpg==
-X-Authority-Analysis: v=2.4 cv=IJYPywvG c=1 sm=1 tr=0 ts=68fb41c5 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=QyXUC8HyAAAA:8 a=UJyW0CPhy_1L27IWx-sA:9 a=QEXdDO2ut3YA:10
- a=zgiPjhLxNE0A:10 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-23_03,2025-10-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 clxscore=1015 suspectscore=0 spamscore=0
- bulkscore=0 adultscore=0 impostorscore=0 malwarescore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510180022
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e9aa0470-2bd2-4825-8333-ad9dbc7f40a0@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-
-
-On 23.10.25 17:18, Alexander Lobakin wrote:
->> Reported-by: Mete Durlu <meted@linux.ibm.com>
-> Was this reported on LKML, so that you could add a 'Closes:' tag with
-> the link here or the report was internal?
-
-It was an internal report, so no link available.
-We still want to give credit for the colleague who spent time to report
-this issue outside of his main area.
-
+On Fri, Oct 24, 2025 at 10:46:14AM +0200, Maxime Chevallier wrote:
+> Hi,
 > 
->> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-> Either way,
+> +Russell +Oleksij
 > 
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> On 24/10/2025 06:48, Hariprasad Kelam wrote:
+> > This patch enhances loopback support by exposing new loopback modes
+> > (e.g., MAC, SERDES) to userspace. These new modes are added extension
+> > to the existing netdev features.
+> > 
+> > This allows users to select the loopback at specific layer.
+> > 
+> > Below are new modes added:
+> > 
+> > MAC near end loopback
+> > 
+> > MAC far end loopback
+> > 
+> > SERDES loopback
+> > 
+> > Depending on the feedback will submit ethtool changes.
+> 
+> Good to see you're willing to tackle this work. However as Eric says,
+> I don't think the netdev_features is the right place for this :
+>  - These 3 loopback modes here may not be enough for some plaforms
+>  - This eludes all PHY-side and PCS-side loopback modes that we could
+>    also use.
+> 
+> If we want to expose these loopback modes to userspace, we may actually
+> need a dedicated ethtool netlink command for loopback configuration and
+> control. This could then hit netdev ethtool ops or phy_device ethtool
+> ops depending on the selected loopback point.
+> 
+> If you don't want to deal with the whole complexity of PHY loopback, you
+> can for now only hook into a newly introduced netdev ethtool ops dedicated
+> to loopback on the ethnl side, but keep the door open for PHY-side
+> loopback later on.
 
-Thank you very much.
+Ack, I agree. I would be better to have information and configuration
+for all loopbacks in one place.
+Will it be possible to reflect the chain of components and level of
+related loopbacks? I guess, at least each driver would be able to know
+own loopback levels/order.
 
+Please add me in CC if you decide to jump in to this rabbit hole :D
+
+Best Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
