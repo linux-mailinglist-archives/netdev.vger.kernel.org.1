@@ -1,182 +1,192 @@
-Return-Path: <netdev+bounces-232403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38FAEC05503
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 11:25:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24921C05629
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 11:41:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B1CF18933CB
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 09:26:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42D203B25D8
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 09:39:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3327309EEB;
-	Fri, 24 Oct 2025 09:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14AE30BB98;
+	Fri, 24 Oct 2025 09:39:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fqskLpHa"
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="TNDLV88d"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C178306D26
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 09:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30092308F24;
+	Fri, 24 Oct 2025 09:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761297937; cv=none; b=JxmM5+4aU8Z9DLTkiDUSDIUjaKY3bdk2RML7OnXBfLRYgJsI0LxfspXaWAHGDhR3bk3LimCJHELoeZFZ5V0qDF0vQihg3c7FPBSGNPYJhXW1FDSmdtglGA6YGfL9888BSGglX7aq9W4X9MT5c4JkI9rw2cfXlYOtKg1UcW7Kpkg=
+	t=1761298764; cv=none; b=c67qiSl7hXmdIdG63NLBKZgMA+UeMXgVno/mrvAJen/hJcOtZpKlsnMhdqJnFZcVIHkXueNXe18QIWdhuzSvBkt86ThSPTYZtJt2djMKRiFSGc4k8Z6nRmVcTlBdkbvr79Cd1/OD4ygAhQl3uc9GX+7xb8Yt3eMxzbbbleYFQyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761297937; c=relaxed/simple;
-	bh=ycwJPNaKXdP7ykIZso5OObT1oMAhKCHRAqkXq/epey0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kl+/ckmCok7J3boFLcgXRn87f6H/RTlrKbi8jldb7D0uz6+hNLuiWk08k8dqOugGXQL1N6CAhmRpLxEgmQv6vvklc/74RoEuYJf4qfN7e8itZlwhqGJeOUn50/NfzS3/qrDXhdQJgvcdXficH3NtDemSEomXmIZINWyACOKCQMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fqskLpHa; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761297934;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8bxSCY3ryT9EvARIVKSqFw+MJM7CiAqPgxi/1YTNuRA=;
-	b=fqskLpHa00xCUZvuLn87H0iUNlgN54JzUhjUIP2vJydCzuh1cAIYwb76UYUBi3u1SvFNgO
-	qD6ynboh+3ob6wUhqiQxH7PL07BtdqMtL7SwaAs/aEaFHxN7HzsTZQ3MEP7IzsHdAjhHuE
-	oBJ0hz7w6jxkhoEEUyO0mfuuRKkyqyw=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-375-o5i0dMZ9NQGxhzw9bEL6XQ-1; Fri, 24 Oct 2025 05:25:32 -0400
-X-MC-Unique: o5i0dMZ9NQGxhzw9bEL6XQ-1
-X-Mimecast-MFC-AGG-ID: o5i0dMZ9NQGxhzw9bEL6XQ_1761297932
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-63c41bc2dfcso1241911a12.3
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 02:25:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761297932; x=1761902732;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8bxSCY3ryT9EvARIVKSqFw+MJM7CiAqPgxi/1YTNuRA=;
-        b=PlZUEaUco4tiLuucjbwi/Gp4yJfk+l9Zj4Vy5NURVV84WthSTag2yYqoDJ97blRWiQ
-         SWPW0M5csqOY3VbzJxQpvqDBJmmhMVvMFvPsBbfaGSY6J7fm5wgTprJ9nzop87AL/fTC
-         FqQKzyoJhQhmtBWGwD8WJ5i0xSkRwSVMGC7IX+xGH1HbOfqafC9rpqxxXQJch1oFmXuN
-         nQLGka9G7JiD+idkS8+7Yw3NHYhsPqvc7/RmecHLkJ+2LJBgyIrDFxumF2nBF7qJgDIc
-         kr5vaql/yfq2S2UAzJAL9n8yL2l2origAWRKSXCigyn3pOMCO5NVkaUA9iPBnLScEtGm
-         wrBA==
-X-Gm-Message-State: AOJu0YwmOu0TbufVxUY7yWBMHE4uf57oh4qsFB+7e0ehuSyn2sJWrNu8
-	13CvVhbiYLrxTJlY5kqEpc3NOS64cDWqnYnd7Eykday+bMwg1wEm6xhaYqa2FZCOnmB+RM7K/Xt
-	pa/hzw6hP0HOd/80JV524zqtlVUEO0J8gqp+ZHq8MJZrR6WQcUaMq8XnB4g==
-X-Gm-Gg: ASbGncuvOeDt7aExCFb831rvvPPD6iBc5II15/paw2cPa7lkoR9JfxOYVPCmcgeBAGt
-	T3CQ2XSlZcBOg0XOtaMbvPF3vWELR8eMhWohqIIJ0u/3Z4T1AQCXAMtrk8XY5G5AX2580NiRZPd
-	MFgSKcW3Nj+9mo4KX3F5HW6TwR9F+/3fuMJ/mLc5OecerxCww3EoWZkc1Wwv5mlk8XhZb8ysCDY
-	84N2v8b7MThCckUwi+GmbnENSDE54KH9Taznk/uM0Unjaym1R6m4Zl0j25D16wH/MwMvc8dW5OM
-	tv5x21JQw6EXNC65OnB7Rr08DFY+qoCjkRySkM/PUfD6Q91T1tqfaaTzKwAnA7WV0DsLjgsPaPB
-	bEmR7koM0ZQdiYaBGiJv+kpM=
-X-Received: by 2002:a05:6402:13cc:b0:63b:dc7d:7308 with SMTP id 4fb4d7f45d1cf-63c1f6364d3mr25741580a12.5.1761297931580;
-        Fri, 24 Oct 2025 02:25:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGlOwaUMR8VZbVJ4djy08L7hrr6l8ANdpbOoJ+KZ4mKPMSj4WRf9s7vqK0lEtnMuhu39rcxDw==
-X-Received: by 2002:a05:6402:13cc:b0:63b:dc7d:7308 with SMTP id 4fb4d7f45d1cf-63c1f6364d3mr25741560a12.5.1761297931165;
-        Fri, 24 Oct 2025 02:25:31 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63e3ebb2736sm3659474a12.6.2025.10.24.02.25.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Oct 2025 02:25:30 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 6C4782EA50E; Fri, 24 Oct 2025 11:25:26 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org
-Cc: netdev@vger.kernel.org, magnus.karlsson@intel.com,
- aleksander.lobakin@intel.com, ilias.apalodimas@linaro.org,
- lorenzo@kernel.org, kuba@kernel.org, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>,
- syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com, Ihor Solodrai
- <ihor.solodrai@linux.dev>, Octavian Purdila <tavip@google.com>
-Subject: Re: [PATCH v3 bpf 1/2] xdp: introduce xdp_convert_skb_to_buff()
-In-Reply-To: <20251022125209.2649287-2-maciej.fijalkowski@intel.com>
-References: <20251022125209.2649287-1-maciej.fijalkowski@intel.com>
- <20251022125209.2649287-2-maciej.fijalkowski@intel.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 24 Oct 2025 11:25:26 +0200
-Message-ID: <87cy6cfy7t.fsf@toke.dk>
+	s=arc-20240116; t=1761298764; c=relaxed/simple;
+	bh=0RYoFADo1EPuktB0O9d6dPLkdJjpepS5ikmz2890HCw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ly2IirJsps01rJ1EKQbKajUD4szdkBOwOyZoS7qIq2BBOp740QCZ0uxvRAUMH0OwwvAOwQerJdDPy2Ra2a9j2cjL6wlgIkYGqoLac8eIX7W0CXuWNJxtTsjYEMGSDuH8tpgZ9bl1GddmpwPoO7ozdRv4pkQEMOJ+kIPl9J/MLEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=TNDLV88d; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59O6FvCf3793347;
+	Fri, 24 Oct 2025 09:39:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:message-id:mime-version:subject:to; s=PPS06212021; bh=JwGjQsJ2w
+	kdo6/actkEfv+tcXoAKIynQ/bX0pzAr1dc=; b=TNDLV88dO4J+4qoqrRxk4gKky
+	etdUE5VQXi4we/w5c+EDD+eUJdDPNPwm4YAiIdAUNEbJFeBwmMEPCdwilXkUU2MN
+	vhxgTxAPVm716aaHPVqMjefLkMzCVHAg4XiifPohSwOu087B+FtvoJV0sUyfo1GF
+	YRN2YgnwA/NEbJuiWdvhKxrCMTKfJRq1fFG1tzjfinNWIe1K2LklRXppLRavuFYg
+	YS2mttoVVDC2VihYCG8XSw7wnVtLigRgnWQ1P29IPhalPYvfKZ5SAQrNPpM/9M7H
+	TfQSJ4BuD4K4CFbPplvrXK0/ayPZ9xMcS3cMF6HlVTclF01xc1nst/8X5STTw==
+Received: from ala-exchng02.corp.ad.wrs.com ([128.224.246.37])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 49wrpxd234-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Fri, 24 Oct 2025 09:39:07 +0000 (GMT)
+Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
+ ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.59; Fri, 24 Oct 2025 02:39:04 -0700
+Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
+ 15.1.2507.59 via Frontend Transport; Fri, 24 Oct 2025 02:39:01 -0700
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <horms@kernel.org>, <jreuter@yaina.de>,
+        <kuba@kernel.org>, <kuniyu@google.com>, <linux-hams@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
+        <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+        <syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>
+Subject: [PATCH V3] net: rose: Prevent the use of freed digipeat
+Date: Fri, 24 Oct 2025 17:39:01 +0800
+Message-ID: <20251024093901.1202924-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=b9O/I9Gx c=1 sm=1 tr=0 ts=68fb493b cx=c_pps
+ a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=hSkVLCK3AAAA:8 a=t7CeM3EgAAAA:8
+ a=gSEv5m7Pi2YCfdlV860A:9 a=cQPPKAXgyycSBL8etih5:22 a=FdTzh2GWekK77mhwV6Dw:22
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: EitY1rHNFda6al5u31pAczI-Va6z52-1
+X-Proofpoint-ORIG-GUID: EitY1rHNFda6al5u31pAczI-Va6z52-1
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI0MDA4NSBTYWx0ZWRfX/NPJeP1CEAzk
+ oxSYTL5kESDtVFvYyFPDndPtFeugj11OBkg20Kg2EMiOWio5Pm1pFr07KNq3DhLIESejjdQFun7
+ f2IdACeFiNEavcKjHle8w4yffmlRGLvnes8XJ4SICcH0xB2JxVS8RygWfb+H6ZncSwXzyVb5B+g
+ 5zdjKnL0B7nSnmyFSb8eeVlXdEXqaUcgQ6xQA5izmEt+lZ1Y7sZDN1POfl3nM3TNzOkioBi951m
+ pQhU4yNzXTJ1kQWWUhOnorD4mnxGdZGb25QNKApFGID3JZbfqN59PMpZdcik7PskEo/TJdm6YpK
+ AezSBL7GOZy0Vl1nSTr3/vrbhTIZmtuj77sjbHPRzRJowYU4C6xtmWG/ggbNM0Fhbk/G+tDo031
+ xJIQsCo/o/nIG3gBz0tDUrkeCAwWFQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-24_01,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 clxscore=1015 phishscore=0 priorityscore=1501 malwarescore=0
+ spamscore=0 adultscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510240085
 
-Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
+There is no synchronization between the two timers, rose_t0timer_expiry
+and rose_timer_expiry.
+rose_timer_expiry() puts the neighbor when the rose state is ROSE_STATE_2.
+However, rose_t0timer_expiry() does initiate a restart request on the
+neighbor.
+When rose_t0timer_expiry() accesses the released neighbor member digipeat,
+a UAF is triggered.
 
-> Currently, generic XDP hook uses xdp_rxq_info from netstack Rx queues
-> which do not have its XDP memory model registered. There is a case when
-> XDP program calls bpf_xdp_adjust_tail() BPF helper, which in turn
-> releases underlying memory. This happens when it consumes enough amount
-> of bytes and when XDP buffer has fragments. For this action the memory
-> model knowledge passed to XDP program is crucial so that core can call
-> suitable function for freeing/recycling the page.
->
-> For netstack queues it defaults to MEM_TYPE_PAGE_SHARED (0) due to lack
-> of mem model registration. The problem we're fixing here is when kernel
-> copied the skb to new buffer backed by system's page_pool and XDP buffer
-> is built around it. Then when bpf_xdp_adjust_tail() calls
-> __xdp_return(), it acts incorrectly due to mem type not being set to
-> MEM_TYPE_PAGE_POOL and causes a page leak.
->
-> Pull out the existing code from bpf_prog_run_generic_xdp() that
-> init/prepares xdp_buff onto new helper xdp_convert_skb_to_buff() and
-> embed there rxq's mem_type initialization that is assigned to xdp_buff.
-> Make it agnostic to current skb->data position.
->
-> This problem was triggered by syzbot as well as AF_XDP test suite which
-> is about to be integrated to BPF CI.
->
-> Reported-by: syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/6756c37b.050a0220.a30f1.019a.GAE@g=
-oogle.com/
-> Fixes: e6d5dbdd20aa ("xdp: add multi-buff support for xdp running in gene=
-ric mode")
-> Tested-by: Ihor Solodrai <ihor.solodrai@linux.dev>
-> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> Co-developed-by: Octavian Purdila <tavip@google.com>
-> Signed-off-by: Octavian Purdila <tavip@google.com> # whole analysis, test=
-ing, initiating a fix
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com> # commit=
- msg and proposed more robust fix
-> ---
->  include/net/xdp.h | 27 +++++++++++++++++++++++++++
->  net/core/dev.c    | 25 ++++---------------------
->  2 files changed, 31 insertions(+), 21 deletions(-)
->
-> diff --git a/include/net/xdp.h b/include/net/xdp.h
-> index aa742f413c35..cec43f56ae9a 100644
-> --- a/include/net/xdp.h
-> +++ b/include/net/xdp.h
-> @@ -384,6 +384,33 @@ struct sk_buff *xdp_build_skb_from_frame(struct xdp_=
-frame *xdpf,
->  					 struct net_device *dev);
->  struct xdp_frame *xdpf_clone(struct xdp_frame *xdpf);
->=20=20
-> +static inline
-> +void xdp_convert_skb_to_buff(struct sk_buff *skb, struct xdp_buff *xdp,
-> +			     struct xdp_rxq_info *xdp_rxq)
-> +{
-> +	u32 frame_sz, pkt_len;
-> +
-> +	/* SKB "head" area always have tailroom for skb_shared_info */
-> +	frame_sz =3D skb_end_pointer(skb) - skb->head;
-> +	frame_sz +=3D SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> +
-> +	DEBUG_NET_WARN_ON_ONCE(!skb_mac_header_was_set(skb));
-> +	pkt_len =3D  skb->tail - skb->mac_header;
+To avoid this UAF, defer the put operation to rose_t0timer_expiry() and
+stop restarting t0timer after putting the neighbor.
 
-Should probably just use the helpers here:
+When putting the neighbor, set the neighbor to NULL. Setting neighbor to
+NULL prevents rose_t0timer_expiry() from restarting t0timer.
 
-pkt_len =3D skb_tail_pointer(skb) - skb_mac_header(skb);
+syzbot reported a slab-use-after-free Read in ax25_find_cb.
+BUG: KASAN: slab-use-after-free in ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
+Read of size 1 at addr ffff888059c704c0 by task syz.6.2733/17200
+Call Trace:
+ ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
+ ax25_send_frame+0x157/0xb60 net/ax25/ax25_out.c:55
+ rose_send_frame+0xcc/0x2c0 net/rose/rose_link.c:106
+ rose_transmit_restart_request+0x1b8/0x240 net/rose/rose_link.c:198
+ rose_t0timer_expiry+0x1d/0x150 net/rose/rose_link.c:83
 
-that way you don't have to open-code the WARN_ON_ONCE, and you get the
-right behaviour even when NET_SKBUFF_DATA_USES_OFFSET is set
+Freed by task 17183:
+ kfree+0x2b8/0x6d0 mm/slub.c:6826
+ rose_neigh_put include/net/rose.h:165 [inline]
+ rose_timer_expiry+0x537/0x630 net/rose/rose_timer.c:183
 
--Toke
+Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_t")
+Reported-by: syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com
+Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+---
+V1 -> V2: Putting the neighbor stops t0timer from automatically starting
+V2 -> V3: add rose_neigh_putex for set rose neigh to NULL
+
+ include/net/rose.h   | 12 ++++++++++++
+ net/rose/rose_link.c |  5 +++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/include/net/rose.h b/include/net/rose.h
+index 2b5491bbf39a..33de310ba778 100644
+--- a/include/net/rose.h
++++ b/include/net/rose.h
+@@ -167,6 +167,18 @@ static inline void rose_neigh_put(struct rose_neigh *rose_neigh)
+ 	}
+ }
+ 
++static inline void rose_neigh_putex(struct rose_neigh **roseneigh)
++{
++	struct rose_neigh *rose_neigh = *roseneigh;
++	if (refcount_dec_and_test(&rose_neigh->use)) {
++		if (rose_neigh->ax25)
++			ax25_cb_put(rose_neigh->ax25);
++		kfree(rose_neigh->digipeat);
++		kfree(rose_neigh);
++		*roseneigh = NULL;
++	}
++}
++
+ /* af_rose.c */
+ extern ax25_address rose_callsign;
+ extern int  sysctl_rose_restart_request_timeout;
+diff --git a/net/rose/rose_link.c b/net/rose/rose_link.c
+index 7746229fdc8c..334c8cc0876d 100644
+--- a/net/rose/rose_link.c
++++ b/net/rose/rose_link.c
+@@ -43,6 +43,9 @@ void rose_start_ftimer(struct rose_neigh *neigh)
+ 
+ static void rose_start_t0timer(struct rose_neigh *neigh)
+ {
++	if (!neigh)
++		return;
++
+ 	timer_delete(&neigh->t0timer);
+ 
+ 	neigh->t0timer.function = rose_t0timer_expiry;
+@@ -80,10 +83,12 @@ static void rose_t0timer_expiry(struct timer_list *t)
+ {
+ 	struct rose_neigh *neigh = timer_container_of(neigh, t, t0timer);
+ 
++	rose_neigh_hold(neigh);
+ 	rose_transmit_restart_request(neigh);
+ 
+ 	neigh->dce_mode = 0;
+ 
++	rose_neigh_putex(&neigh);
+ 	rose_start_t0timer(neigh);
+ }
+ 
+-- 
+2.43.0
 
 
