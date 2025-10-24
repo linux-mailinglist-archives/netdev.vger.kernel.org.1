@@ -1,90 +1,88 @@
-Return-Path: <netdev+bounces-232294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9B15C03F40
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 02:20:38 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76C97C03F43
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 02:25:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B9DF14E4D82
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 00:20:37 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E6CAA354AA9
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 00:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 366467E110;
-	Fri, 24 Oct 2025 00:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE9635971;
+	Fri, 24 Oct 2025 00:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVt8eGVt"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="b4kvzKIv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D4C13957E;
-	Fri, 24 Oct 2025 00:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55034A32;
+	Fri, 24 Oct 2025 00:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761265232; cv=none; b=YxGbXcH7KTXWK8S9JPz1ZjAOc2o5/zwGZpmMD4LPSBOhGAJX8NlFw5PNFjm2HpqpA1pC8RElh31oDJc0o3e4Wr636ScDrGAET16OL+WT3rmL1VbdSyx0sR7HhSxRXmVdUumN6l7QFK9ClZRgYsUAfqg8bOmonKgvZiQQ1sU6Bfo=
+	t=1761265501; cv=none; b=lbSL1Ds0OrxvT7PFpfU80JsdR5YMvXe9EYhrtdiRdFNRQpiqVwwIoRW/hC/eMI4cOfu4y+CjOyxGYn1KfbJonCTvhpY4yvnhJj1xed31Idju3NwmKIcTbXjzb3WLCgWk5+FHCF1J8aqb1qFy5BGXKHileImEbSGCqkZWzJCPoa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761265232; c=relaxed/simple;
-	bh=X0IqLZJz1hOoSPzrNuIREWT+bJjOZL5QWeaowQihK3U=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Y7RBpu0FPOyvTNaAaVKqJyMUv9tPL0px2cOPYtpVQ+xLPeGg+4lktr6L8lYRRudMBSJQ3fm9cvzR89E/Y/AkmoW+RuyXrTvGdxLwFprviV+wG9jX+eE4GPlx9nOsMFdMD22xALTCUVmVSp5IfMYePE8mCiOf3lMrdEOvrXLv97A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVt8eGVt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BE08C4CEE7;
-	Fri, 24 Oct 2025 00:20:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761265231;
-	bh=X0IqLZJz1hOoSPzrNuIREWT+bJjOZL5QWeaowQihK3U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YVt8eGVtim9C3d+1k+mTvO8Z4+ZGwRm+Kl1SRQ6VnKiBTIE1ia6eQ5Qr+D5kAptaC
-	 77neq1CIOlGXqCbDMdRXAGLdkmMYmwb7cqERqYrkXphqBnz1J7xrJQgSEpqauJtITx
-	 yiveVPXLrk0m7qc3C3f5Mk2Fn9bsVSGz/46IxQ8eoZfykot8Z6c4AVia46oFGdCnnx
-	 uFg8ZWrX8zHDRjU4zKlv8LH8ithKSP+v6UfRzb4EGKrgc4PWdOBpehSab12i0YIS+v
-	 rfjqgLL+ViuQmvYvDaQsO4ocHT22JUwXWH6slvKsr5XwDFG2jQIn93BB8taU9d0i3r
-	 zK2jzR/zDh0Pg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF593809A38;
-	Fri, 24 Oct 2025 00:20:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1761265501; c=relaxed/simple;
+	bh=FSNBGlAg7FKvXCJdls/1crLY1kJhxDB9v2AWwP9UgH4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=irswE7gFYat/mg7O0+K5Aa4M8TMPlKypVbzhnvCsP3J87X5d60UVz2YrDRbNwv/sKOp0ph+jEIy7e3EI3dddXLsbr52jfNT1TgzMWSkrz/Opm4cJ4MUEuFlBTdiVH3AZLqbK5GXD0G0qicGh3gcOeJNeWECkkOr216TrOBXUsmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=b4kvzKIv; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Zvpjbe+z5MHqFmu3+PTK6lXqGl0K38QQIGjrxq3Azhk=; b=b4kvzKIvZxLnJ4W+DltOKLFLm1
+	KtNTDQ2ZNNYAnq+3Hf2e0uDzEELQNfp9UO0fNjiU8yv5N/dRSGPlK/Nf/vZQNiv7+GP2ywbRCnury
+	B1SHu6D2EXkQiAW1aRR94FJTjf+363+6PYfzkRpuTS/L7XkAH2BkUxAxd6ieD2CzK+zQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vC5bf-00Bw60-Gb; Fri, 24 Oct 2025 02:24:35 +0200
+Date: Fri, 24 Oct 2025 02:24:35 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Marek Vasut <marek.vasut+renesas@mailbox.org>
+Cc: netdev@vger.kernel.org, Thanh Quan <thanh.quan.xn@renesas.com>,
+	Hai Pham <hai.pham.ud@renesas.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dan Murphy <dmurphy@ti.com>, Eric Dumazet <edumazet@google.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [net,PATCH] net: phy: dp83869: fix STRAP_OPMODE bitmask
+Message-ID: <825c8662-831d-43e0-ba28-a1373f9d5a9d@lunn.ch>
+References: <20251023224018.192899-1-marek.vasut+renesas@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] wireless-2025-10-23
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176126521175.3299299.4457170622726305895.git-patchwork-notify@kernel.org>
-Date: Fri, 24 Oct 2025 00:20:11 +0000
-References: <20251023180604.626946-3-johannes@sipsolutions.net>
-In-Reply-To: <20251023180604.626946-3-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251023224018.192899-1-marek.vasut+renesas@mailbox.org>
 
-Hello:
-
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 23 Oct 2025 20:05:04 +0200 you wrote:
-> Hi,
+On Fri, Oct 24, 2025 at 12:39:45AM +0200, Marek Vasut wrote:
+> From: Thanh Quan <thanh.quan.xn@renesas.com>
 > 
-> Sorry, I meant to send this earlier, but ... I guess other
-> things happened. Luckily none of the below seems really all
-> that urgent, most issues have been around for a while and
-> I'm not currently aware of anyone being affected too badly.
-> 
-> [...]
+> According to the TI DP83869HM datasheet Revision D (June 2025), section
+> 7.6.1.41 STRAP_STS Register, the STRAP_OPMODE bitmask is bit [11:9].
+> Fix this.
 
-Here is the summary with links:
-  - [GIT,PULL] wireless-2025-10-23
-    https://git.kernel.org/netdev/net/c/a83155cc4ec5
+It is a good idea to state in the commit message what the bad
+behaviour is which the patch fixes. Somebody looking through the
+patches can then decide if they need to cherry-pick the patch into
+their dead vendor tree, etc.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Please add to the commit message what issue you where seeing which
+made you create this patch.
 
+    Andrew
 
+---
+pw-bot: cr
 
