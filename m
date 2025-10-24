@@ -1,107 +1,199 @@
-Return-Path: <netdev+bounces-232658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 912F9C07CE1
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 20:48:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E6FAC07CFC
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 20:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16B703B3C83
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 18:48:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF2533B4611
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 18:49:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3154934B190;
-	Fri, 24 Oct 2025 18:48:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A95D634BA46;
+	Fri, 24 Oct 2025 18:49:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GEDQw34p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F06314B7A
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 18:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 083D9322527
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 18:49:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761331711; cv=none; b=fmRro5WK8Mbj8gyXdRIRGkbwd5/fLcYD1gteUsbCXqY0AKnIZVGaRHKxFUFC5wb+iGpz0AoPIZF1v9zfspgoYcgoB+8iTcBofG8WSlssoLCOhjsIj1xZx7BbjZj7HGPM90sjWWVNYE34UOKpiSMQV6LJhoxPyA7CeBIBH6f2Fac=
+	t=1761331768; cv=none; b=f9Wn8IKiq6PdCftbxI/B6A/yg7whAtC15kU5tFlz+Xeh85uR6GqphTkgWnIAKXmzvuHUUPZbU3o2YyPgbEUQguS63Fwru9ohlJFmf4iju2UyKyEYjFOvJqyShoi73HlGvqfzHcX/GUeaOggsQWVlyQVw2kGvPEjcjz+WUuYC5sI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761331711; c=relaxed/simple;
-	bh=fDijtuwiEhlwkDTtGcvFXRtp4U6kxPCtS3/c4WMiHgA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MQpQDO4PncyDtn1gcWeTCPr3a+tkXDS4lhnNqsErGldSFJn7e8kdmeKFTxjygS3m8qDbOkbVvpbLnz1T/IOxISpuYYxc9e5M8rGRyWKnRtNZXjE0hlnU0PY1ofzkWgkJiJr+AESvfAbBdLLRVsqmACrGCjEy8rnOua9IR3M6C8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-430c8321bc1so33024125ab.0
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 11:48:29 -0700 (PDT)
+	s=arc-20240116; t=1761331768; c=relaxed/simple;
+	bh=9OAJrpwPzl4HGRkU45vDY66wUHd7GQ/097gNeGpkgSs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FwG/2o1b4lDi/f8zD59wwfzlszDnbxx5jG2vpWYLIJN+k4MBleC2qYzyQNTpiwiYZtwaiHRvN5PIyt51rWi4uczRmEphQ1wMZctI7ZJhcNMY8YFkx1RhgKyPXZ64+/jSD4WYBKs0KSE7X5snufLhVu41Qhq20JFXaVIDgHJXMN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GEDQw34p; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-78125ed4052so2744094b3a.0
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 11:49:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761331766; x=1761936566; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=j8uwBvkrN4z1ERe0y1FsgiwQIgdWY2Fm+gyvMoJUcSg=;
+        b=GEDQw34pYpm3E/7cIgSR/hAuBqslpvUe2PMcG2vrSAk/srXwiMqmNcbDursuJe3c0X
+         mjo+cgbME+P0zDhAhNZLJ+4DY/+0C8suac/TFa/d7tNcmE62j8Y61e2IKvdur5VZcj2h
+         fDduqLhgAgfy6BsRNL6wSZh14Z66DZjPbYISzfiICnpgY/iOJQnJQ7TBMJJPbhW56+/q
+         lzsiirRSg3DI5NM5mnixb+kdkCDpiGnn9/xAQHrR9kNf5+Q+w7SwM9kBdV0D89w7Fwt2
+         LTkVvubj6jXpCLFrxo3PJDpccUgcrvMgPY8HG6pKNiw/vvoy5p5I8mwImFGMQ0CBfu0k
+         rU3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761331708; x=1761936508;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7TlINdt0svkSrJe3OM+W/FrHLw0RPfB7YQtqUWUDNfc=;
-        b=k0oirHzOzGmoJyIYe+Zjv7xx/TEpAfr/zXLLE76lfgCtD7QmjpzZffBojGxak1dtDb
-         osRpasU5SE3AJ2SsciJ9hBx0D6tdy3z2xynezJEDhoix3EANvdnQjFbWDN3qBIYbohtG
-         3bzCGHDM+FZmzmqBcrTXTy5QEEl9P9os8AjkOafUsmpWeqfyiVMIFSbKrdwNN76Elr2m
-         hxQh3pVCs6GQNE6VmUpLUJ2I9COovsS0/3H5n7GW3hSFCH84e6SX8Q3Ixe/3fCA5H2yZ
-         Eqm6WSiYaBoWHw0UW58VlOsKZMSVs+wlNQRPHVP23pm7ZCoiO0vvpGqaVDYwQdu7x81E
-         +m7A==
-X-Forwarded-Encrypted: i=1; AJvYcCUkyBQc74Fa4hb7vuLprfNAeDq8BJk9kd9lK+s5kuNNAmK75Pdouvrf1IJTLycBGWzsdpaBjaA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwibLR7ILmcWYeSYl+LYBZtbw5DzqWlGbjeZYDY596jUnoVwe05
-	3pMz8x9NCMoa6lg/vlVKFgjbnFYx4gM9F/6cnzJ3OGz0dguT+cMDJwjgf0TjsSX0gwLU3mP1FJb
-	t2+Lv6dGVTTn2sPkJTTPSHq1pH5IFrs7WXYzlmX3ZQWQz9f7WMWh9jrMqEzs=
-X-Google-Smtp-Source: AGHT+IEHw9DBAt30oJGNzYmdu/6XjHvDF53KydCD/kmP16b6cS6Vveh9KSeZRC8fkn/KpnF4de3BdXlnpk1GrRHhcHKoeoGTuveJ
+        d=1e100.net; s=20230601; t=1761331766; x=1761936566;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j8uwBvkrN4z1ERe0y1FsgiwQIgdWY2Fm+gyvMoJUcSg=;
+        b=UJUUL0TOfegrFjZeaTxpqVeLRZrhA6jgQ+j6cp4TY6mSOOszB+Cc9eroyUiyINz975
+         LIYTZdCleFqqZVUXXCAjT9umjRv7/1X/gcdb80DvNzSWQVEdONqfSIbc40q0P6l9Qurk
+         VjbR8TiEJ3Mc2GFzwSxSG0kh3v4UCdXr4XszyibfxM2Jh0eROmxRXx+CaxTLnYHSDRc3
+         xz0NB2fFaJ6yDfhSM3lEtDCR1X9Qa5sDcLlHLfOXWZb//aTo2vqpvkDyCkdygTuUBQ7A
+         chqoC66Spw3nbieAYCN+iPA0UFPtZt6WnU1B2iAoFpl4sohWcfBXI4hhVN/D/bUT9Kaq
+         M1jA==
+X-Forwarded-Encrypted: i=1; AJvYcCXglw10MH2vkZXWb+zAGh8JncjZKLkykehMp163z4TFYyQOLxkiSrBcu0Yk7eU0UYS5GNehBdQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzBL8wPmduHG+EAc7Y9Eg4ZRQj/sg4hydevC9TBgkMNOKlSXws
+	UftOsNx9wkDZQcHWuCe4xmXa9IhCxMaTnOBZq3lSIunGarYnPKlUKF0=
+X-Gm-Gg: ASbGncvFGJbSRKOFfVl/yjqFk6Pa0bI1/VHowe18fnv/gwqmUkqC8PIU5QkUmCvFQrl
+	UaLVonxbXwHM7xWWtJ4OrrW5tspj2WmTDQYTJ0LjcF8pa3fh1LD1YAMjPOg+ZE0XXuhSuhEIdXT
+	drmNcW+YMU6AXSypNhTGPDa0JLqi7jisaQUGzS0Jf8nNp84FtKLHh8VVB8NOPUj6idlCLSuAe+J
+	tF9CdnZYCv2U6yI1AxXIdK6jIh+HIAYa+MLjN4rNUpQ35MaF9o+NH1A2vPgCNb3WHYgqr8DsM1/
+	d2joU+UYTrH3e3VeXzpM6QXYrcw6DIBogRfrI0xqYJC1xBDj/d1DzQJtgO5nj4/a1EDlo4kyuRa
+	PhkgEmaFQtPKOo1TxJAcnl7L0CmXi3ZgKj2kp382NVqtW5zIdgpMRhKax6pX+goiTr6M62boEdO
+	zAdcJVweAv3gDs553+ZIazmzXWFDi9X40R1P/WP//H7/yuuO4WxDyWIRm/od9qV4GoTYnW02QgK
+	wrNP2azF74UTx4Qv3m5PtbIQ0WkA8B/khSLPseZLTOtVfB3D9WEmx2Ah8dyanakjYQ=
+X-Google-Smtp-Source: AGHT+IGsn+zJ+Chhg2sIUKUpGqm+Ej5PJ1ZPkvdgc+szauI7og7ciysiYZDs26a0/miBsx7EFB995g==
+X-Received: by 2002:a05:6a20:1585:b0:334:847c:dd3d with SMTP id adf61e73a8af0-334a864febdmr41446224637.54.1761331766075;
+        Fri, 24 Oct 2025 11:49:26 -0700 (PDT)
+Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7a274b8a0edsm6645874b3a.35.2025.10.24.11.49.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Oct 2025 11:49:25 -0700 (PDT)
+Date: Fri, 24 Oct 2025 11:49:24 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
+	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
+	hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to,
+	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v3 3/9] xsk: add xsk_alloc_batch_skb() to build
+ skbs in batch
+Message-ID: <aPvKNAZP8kKolwIm@mini-arch>
+References: <20251021131209.41491-1-kerneljasonxing@gmail.com>
+ <20251021131209.41491-4-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c26c:0:b0:431:d864:366a with SMTP id
- e9e14a558f8ab-431d8643888mr128262485ab.2.1761331708479; Fri, 24 Oct 2025
- 11:48:28 -0700 (PDT)
-Date: Fri, 24 Oct 2025 11:48:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68fbc9fc.050a0220.346f24.0154.GAE@google.com>
-Subject: [syzbot] Monthly hams report (Oct 2025)
-From: syzbot <syzbot+list9f996a166fa4824c1704@syzkaller.appspotmail.com>
-To: linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251021131209.41491-4-kerneljasonxing@gmail.com>
 
-Hello hams maintainers/developers,
+On 10/21, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> Support allocating and building skbs in batch.
+> 
+> This patch uses kmem_cache_alloc_bulk() to complete the batch allocation
+> which relies on the global common cache 'net_hotdata.skbuff_cache'. Use
+> a xsk standalone skb cache (namely, xs->skb_cache) to store allocated
+> skbs instead of resorting to napi_alloc_cache that was designed for
+> softirq condition.
+> 
+> After allocating memory for each of skbs, in a 'for' loop, the patch
+> borrows part of __allocate_skb() to initialize skb and then calls
+> xsk_build_skb() to complete the rest of initialization process, like
+> copying data and stuff.
+> 
+> Add batch.send_queue and use the skb->list to make skbs into one chain
+> so that they can be easily sent which is shown in the subsequent patches.
+> 
+> In terms of freeing skbs process, napi_consume_skb() in the tx completion
+> would put the skb into global cache 'net_hotdata.skbuff_cache' that
+> implements the deferred freeing skb feature to avoid freeing skb one
+> by one to improve the performance.
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  include/net/xdp_sock.h |   3 ++
+>  net/core/skbuff.c      | 101 +++++++++++++++++++++++++++++++++++++++++
+>  net/xdp/xsk.c          |   1 +
+>  3 files changed, 105 insertions(+)
+> 
+> diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+> index 8944f4782eb6..cb5aa8a314fe 100644
+> --- a/include/net/xdp_sock.h
+> +++ b/include/net/xdp_sock.h
+> @@ -47,8 +47,10 @@ struct xsk_map {
+>  
+>  struct xsk_batch {
+>  	u32 generic_xmit_batch;
+> +	unsigned int skb_count;
+>  	struct sk_buff **skb_cache;
+>  	struct xdp_desc *desc_cache;
+> +	struct sk_buff_head send_queue;
+>  };
+>  
+>  struct xdp_sock {
+> @@ -130,6 +132,7 @@ struct xsk_tx_metadata_ops {
+>  struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+>  			      struct sk_buff *allocated_skb,
+>  			      struct xdp_desc *desc);
+> +int xsk_alloc_batch_skb(struct xdp_sock *xs, u32 nb_pkts, u32 nb_descs, int *err);
+>  #ifdef CONFIG_XDP_SOCKETS
+>  
+>  int xsk_generic_rcv(struct xdp_sock *xs, struct xdp_buff *xdp);
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index bc12790017b0..5b6d3b4fa895 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -81,6 +81,8 @@
+>  #include <net/page_pool/helpers.h>
+>  #include <net/psp/types.h>
+>  #include <net/dropreason.h>
+> +#include <net/xdp_sock.h>
+> +#include <net/xsk_buff_pool.h>
+>  
+>  #include <linux/uaccess.h>
+>  #include <trace/events/skb.h>
+> @@ -615,6 +617,105 @@ static void *kmalloc_reserve(unsigned int *size, gfp_t flags, int node,
+>  	return obj;
+>  }
+>  
+> +int xsk_alloc_batch_skb(struct xdp_sock *xs, u32 nb_pkts, u32 nb_descs, int *err)
+> +{
+> +	struct xsk_batch *batch = &xs->batch;
+> +	struct xdp_desc *descs = batch->desc_cache;
+> +	struct sk_buff **skbs = batch->skb_cache;
+> +	gfp_t gfp_mask = xs->sk.sk_allocation;
+> +	struct net_device *dev = xs->dev;
+> +	int node = NUMA_NO_NODE;
+> +	struct sk_buff *skb;
+> +	u32 i = 0, j = 0;
+> +	bool pfmemalloc;
+> +	u32 base_len;
+> +	u8 *data;
+> +
+> +	base_len = max(NET_SKB_PAD, L1_CACHE_ALIGN(dev->needed_headroom));
+> +	if (!(dev->priv_flags & IFF_TX_SKB_NO_LINEAR))
+> +		base_len += dev->needed_tailroom;
+> +
+> +	if (batch->skb_count >= nb_pkts)
+> +		goto build;
+> +
+> +	if (xs->skb) {
+> +		i = 1;
 
-This is a 31-day syzbot report for the hams subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/hams
-
-During the period, 1 new issues were detected and 1 were fixed.
-In total, 10 issues are still open and 44 have already been fixed.
-
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 7989    Yes   possible deadlock in nr_rt_device_down (3)
-                  https://syzkaller.appspot.com/bug?extid=ccdfb85a561b973219c7
-<2> 2208    Yes   possible deadlock in nr_rt_ioctl (2)
-                  https://syzkaller.appspot.com/bug?extid=14afda08dc3484d5db82
-<3> 709     No    WARNING: ODEBUG bug in handle_softirqs
-                  https://syzkaller.appspot.com/bug?extid=60db000b8468baeddbb1
-<4> 560     Yes   possible deadlock in nr_remove_neigh (2)
-                  https://syzkaller.appspot.com/bug?extid=8863ad36d31449b4dc17
-<5> 230     No    WARNING: ODEBUG bug in __run_timers (3)
-                  https://syzkaller.appspot.com/bug?extid=7287222a6d88bdb559a7
-<6> 13      Yes   WARNING: refcount bug in ax25_setsockopt
-                  https://syzkaller.appspot.com/bug?extid=0ee4da32f91ae2a3f015
-<7> 2       No    KASAN: slab-use-after-free Write in rose_t0timer_expiry
-                  https://syzkaller.appspot.com/bug?extid=350060a9356421ae83dc
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+What is the point of setting i to 1 here? You always start the loop from
+i=0.
 
