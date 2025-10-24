@@ -1,129 +1,145 @@
-Return-Path: <netdev+bounces-232521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EAB2C0635B
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:20:05 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7231C0636A
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:20:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04AEC1C038A8
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 12:20:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C24124EC018
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 12:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE4E30B52C;
-	Fri, 24 Oct 2025 12:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92273316199;
+	Fri, 24 Oct 2025 12:20:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A2F2FC877
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 12:19:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9261B315D31
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 12:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761308400; cv=none; b=J5Uv1li+KQCkh0ZRUaopbSaGxryXrq4jztgJr4z2xgMMyAnLiCm7xfXHS2lMPgaRXBvZJt5uYNQQY7vllzUO+mN6XnHXrSIYVu0NUdZpKmTHjEgH93g0W0qk6Ne0vl3wJ6zfdLSOpoJKVE6fATu0fXX+fTAoRhM+JRmTDaHNK2o=
+	t=1761308428; cv=none; b=AnVHET3+piNMTFQS1LCegZlx6sp7XIq2ayQaFDh7aeI1Gmsm0HvSyQtdVVgj3tc4mgDP3U+LaQ1KoK5AP0e9KlRuAMoih+x/SZkj3oOZPQ2agMcMjTsv2R/9OJGYpEbzK/9bhq1rDDAHL/nLBh1JK0wvaJVMNkEEC2KnCJpMHv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761308400; c=relaxed/simple;
-	bh=N7bYvZ7G6mr5HXK56jX+rEn75FO4qMTwALC4zGvUuN0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=diopE/QyTyrNo4OOocBEXzEFLae0Qbxml3TjaKIhT8WPUKuyPH25QYs3KRfhmbU3HkOpGqNqfPXwkFFH6hqK0pjLdAvHcRUnoSiL17v+g/Qco1MlnbhOzB8f3LFkOIWvgNu9Flq5Mm1L+LNMVVMf2E+XP8gxSAnJ/zEuMrXbZKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=none smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.204.34.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bamaicloud.com
-X-QQ-mid: zesmtpsz6t1761308347t19260049
-X-QQ-Originating-IP: SXgeuczB0FTUkq+3R/HvNID98S4zrTFQMWH6iPe5GcI=
-Received: from localhost.localdomain ( [111.204.182.100])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 24 Oct 2025 20:19:05 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 10794608114889597100
-EX-QQ-RecipientCnt: 7
-From: Tonghao Zhang <tonghao@bamaicloud.com>
-To: netdev@vger.kernel.org
-Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
-	Eran Ben Elisha <eranbe@mellanox.com>,
-	Jiri Pirko <jiri@mellanox.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Ido Schimmel <idosch@idosch.org>,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2] net: add net cookie for trace_net_dev_xmit_timeout
-Date: Fri, 24 Oct 2025 20:18:53 +0800
-Message-Id: <20251024121853.94199-1-tonghao@bamaicloud.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1761308428; c=relaxed/simple;
+	bh=f4nLSZUbHXPOAJMornZBUvE6cqRt+o4rLfXHVdki47Q=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=UVAPXDidRvXb0E/97ZfPNadpjixhb5gk/ICoOaifKJg3KMsYKXXM6U2V8uIqJvmRLiXVGKqS1bBMvJqpNqXS3NYDtjaCEgBBdiHCUgvt6x6K4zCD7naRJZWpHlHUBzHJGxWd0FrM6CUp/n9e4sKQVc7OPXhCbHwe0xO0YRKIxNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=ratatoskr.pengutronix.de)
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <s.trumtrar@pengutronix.de>)
+	id 1vCGmD-0000ek-3D; Fri, 24 Oct 2025 14:20:13 +0200
+From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+To: Dinh Nguyen <dinguyen@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rob Herring
+ <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
+ Dooley <conor+dt@kernel.org>,  Maxime Chevallier
+ <maxime.chevallier@bootlin.com>,  Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>,  Alexandre Torgue
+ <alexandre.torgue@foss.st.com>,  Matthew Gerlach
+ <matthew.gerlach@altera.com>,  kernel@pengutronix.de,
+  netdev@vger.kernel.org,  devicetree@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  linux-stm32@st-md-mailman.stormreply.com,
+  linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v5 06/10] arm64: dts: socfpga: agilex5: add dwxgmac
+ compatible
+In-Reply-To: <b486bb52-7e95-44d3-ac65-1c28d4d0e40e@kernel.org> (Dinh Nguyen's
+	message of "Fri, 24 Oct 2025 07:00:36 -0500")
+References: <20251024-v6-12-topic-socfpga-agilex5-v5-0-4c4a51159eeb@pengutronix.de>
+	<20251024-v6-12-topic-socfpga-agilex5-v5-6-4c4a51159eeb@pengutronix.de>
+	<b486bb52-7e95-44d3-ac65-1c28d4d0e40e@kernel.org>
+User-Agent: mu4e 1.12.13; emacs 30.2
+Date: Fri, 24 Oct 2025 14:20:09 +0200
+Message-ID: <87zf9g7apy.fsf@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: NRkWGnbnkwTm1BQQgc9F6KeuibmtB5ePwGjGmYLygSsQ8zu0lvdYbqwy
-	JblvCUNNUHgSfOUAPRVZTsrBqqGKCT1+gkRTLUB/5s/FxKR8g6phv913kTD0skfowkls+fo
-	Xq2d7Wr16lZLkWFnSdM4lVNL2FH2+zj1V7x9sHY0ziuwBNYAPlg6yYgfwTK84TF6T1zUlu0
-	viGWI59mz4SzKUSRhUAla1nLErUMA3VGhtuuwGDPvto60Jpl/TR7SwCON0gehxI8U2eXOJz
-	9OYxAn5uOFI0tjp7pqt3yep5z9MeGEnQgZLwqjW5SvhjEWwFqTpQdFWzjqSqY72u9yhx+n+
-	sQwZXTppRD+wOPQXIpBTBntKjHYHV+1NDqpL1WcFofb+J6fKEhn9DLuliO86BFcNB3noMA1
-	zegQEDF8Ii2oMSF0a7aJOcluMiTxjkhpHhV7gR/tBVV3+R360oQiJPF3xjyKLK/LcJcR36Z
-	7UqtNuoPx1UEgSnXLcHNUPPAAFA1Q+9qRS8MhZSxsOmCXX8XgtOnmMEhd1QB7DS07i72/JK
-	rdm9MODtV/yFPLS57kKGnp3ek22a0a9IIkhsjU7I9E6A8XJ+y/x0Ex4pSnDocVebPjWSETV
-	gVWoWS+XiPBDmYHLxVFursqe30k3os3IMyhcSNY8TyqBZ1IhhpY6QwzX/6Ds8WtwRZ7jd8G
-	fQh2jJq3JANZHr6E14H00EgilkQ+KWLmuwEZhQ1YF0QLL2iSY+MiaLrkBsaFoljxm2qcgo5
-	bfXGCrOKxxaE89ZpUIVxwtZmjJTDh5flrA7eS0TEZ7mNFFeCWZ13l5WOrI5FlyoDchD7/Kt
-	pXZIFA76uwWgDczOoikI0wlHt6/bEjMQzz+OJnGKdG7A9as+GBDDYsdoWktGCdKHwcw2BRM
-	ngTr+arrKNT+eLYFGRoTil5xZGwJSWqK5MQFAAXuRY20In56kbolDKtjYV7R3hbrtvY5x1t
-	Tlw5FqBqifi5/MQ/bjANIaC5ClYSWj3FYIgqSAW+S5gS8okETlmzjWoTZ
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; format=flowed
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: s.trumtrar@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-In a multi-network card or container environment, provide more information.
 
-[002] ..s1.  1838.311662: net_dev_xmit_timeout: dev=eth0 driver=virtio_net queue=10 net_cookie=3
-[007] ..s1.  1839.335650: net_dev_xmit_timeout: dev=eth4 driver=virtio_net queue=10 net_cookie=4100
-[007] ..s1.  1844.455659: net_dev_xmit_timeout: dev=eth0 driver=virtio_net queue=10 net_cookie=3
-[007] ..s1.  1845.479663: net_dev_xmit_timeout: dev=eth4 driver=virtio_net queue=10 net_cookie=4100
-[002] ..s1.  1850.087647: net_dev_xmit_timeout: dev=eth0 driver=virtio_net queue=10 net_cookie=3
+Hi Dinh,
 
-Cc: Eran Ben Elisha <eranbe@mellanox.com>
-Cc: Jiri Pirko <jiri@mellanox.com>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: Ido Schimmel <idosch@idosch.org>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
----
-v2: use net cookie instead of ifindex.
----
- include/trace/events/net.h | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+On 2025-10-24 at 07:00 -05, Dinh Nguyen <dinguyen@kernel.org> wrote:
 
-diff --git a/include/trace/events/net.h b/include/trace/events/net.h
-index d55162c12f90..8d064bf1ae7f 100644
---- a/include/trace/events/net.h
-+++ b/include/trace/events/net.h
-@@ -107,16 +107,20 @@ TRACE_EVENT(net_dev_xmit_timeout,
- 		__string(	name,		dev->name	)
- 		__string(	driver,		netdev_drivername(dev))
- 		__field(	int,		queue_index	)
-+		__field(	u64,		net_cookie	)
- 	),
- 
- 	TP_fast_assign(
- 		__assign_str(name);
- 		__assign_str(driver);
- 		__entry->queue_index = queue_index;
-+		__entry->net_cookie = dev_net(dev)->net_cookie;
- 	),
- 
--	TP_printk("dev=%s driver=%s queue=%d",
--		__get_str(name), __get_str(driver), __entry->queue_index)
-+	TP_printk("dev=%s driver=%s queue=%d net_cookie=%llu",
-+		__get_str(name), __get_str(driver),
-+		__entry->queue_index,
-+		__entry->net_cookie)
- );
- 
- DECLARE_EVENT_CLASS(net_dev_template,
+> Hi Steffen,
+> 
+> On 10/24/25 06:49, Steffen Trumtrar wrote:
+> > The gmac0/1/2 are also compatible to the more generic "snps,dwxgmac"
+> > compatible. The platform code checks this to decide if it is a GMAC or
+> > GMAC4 compatible IP core.
+> > Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> > ---
+> >   arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi | 9 ++++++---
+> >   1 file changed, 6 insertions(+), 3 deletions(-)
+> > diff --git a/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
+> > b/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
+> > index 4ccfebfd9d322..d0c139f03541e 100644
+> > --- a/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
+> > +++ b/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
+> > @@ -536,7 +536,8 @@ qspi: spi@108d2000 {
+> >     		gmac0: ethernet@10810000 {
+> >   			compatible = "altr,socfpga-stmmac-agilex5",
+> > -				     "snps,dwxgmac-2.10";
+> > +				     "snps,dwxgmac-2.10",
+> > +				     "snps,dwxgmac";
+> >   			reg = <0x10810000 0x3500>;
+> >   			interrupts = <GIC_SPI 190 IRQ_TYPE_LEVEL_HIGH>;
+> >   			interrupt-names = "macirq";
+> > @@ -649,7 +650,8 @@ queue7 {
+> >     		gmac1: ethernet@10820000 {
+> >   			compatible = "altr,socfpga-stmmac-agilex5",
+> > -				     "snps,dwxgmac-2.10";
+> > +				     "snps,dwxgmac-2.10",
+> > +				     "snps,dwxgmac";
+> >   			reg = <0x10820000 0x3500>;
+> >   			interrupts = <GIC_SPI 207 IRQ_TYPE_LEVEL_HIGH>;
+> >   			interrupt-names = "macirq";
+> > @@ -762,7 +764,8 @@ queue7 {
+> >     		gmac2: ethernet@10830000 {
+> >   			compatible = "altr,socfpga-stmmac-agilex5",
+> > -				     "snps,dwxgmac-2.10";
+> > +				     "snps,dwxgmac-2.10",
+> > +				     "snps,dwxgmac";
+> >   			reg = <0x10830000 0x3500>;
+> >   			interrupts = <GIC_SPI 224 IRQ_TYPE_LEVEL_HIGH>;
+> >   			interrupt-names = "macirq";
+> > 
+> 
+> I just sent a patch for this yesterday:
+> 
+> https://lore.kernel.org/all/20251023214012.283600-1-dinguyen@kernel.org/
+>
+
+ah, I missed that, than this patch is unneccessary.
+
+> I'll make sure to include you on future submissions.
+> 
+> I didn't add it to the bindings document though.
+>
+
+As I always get complains from dt-check bot, I remembered to add it ;)
+
+
+Best regards,
+Steffen
+
 -- 
-2.34.1
-
+Pengutronix e.K.                | Dipl.-Inform. Steffen Trumtrar |
+Steuerwalder Str. 21            | https://www.pengutronix.de/    |
+31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
+Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
 
