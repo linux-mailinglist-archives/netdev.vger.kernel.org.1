@@ -1,162 +1,185 @@
-Return-Path: <netdev+bounces-232389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75854C053C1
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 11:05:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E3F0C053CD
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 11:06:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id ACA47351AB1
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 09:05:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7167E1A07545
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 09:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 051663090C2;
-	Fri, 24 Oct 2025 09:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69704308F0A;
+	Fri, 24 Oct 2025 09:05:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j5xO8y7U"
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="ctniuQxm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAB615665C
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 09:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEAF3081DD;
+	Fri, 24 Oct 2025 09:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761296721; cv=none; b=N/BadmnJf2YGeyeAYRmjfgszPRI+p1KNgQr7PL688Kuda9xL6MPQfK0KPBUANB15i1smGRAGvyzKgKiFhYRlXTRy3zRAxIkLvZsl5/CQ2uIdrYTq4i5UmE3f1u3CIVj1Cdy4ctNaSONHczQudeGrkYRoFWy8KOm0cFYKpoyZARk=
+	t=1761296743; cv=none; b=R93Fica7J0IBECTVdvAtfRQLUqONx1CSHoCAqyfEykw5G+VuzcOWahFlfwOR/owzzyyL+a6FsvU2GrEr9XxP2Haj6qCtUgcSjKMFzcGGMz0fGFeWls0OZ1KaJuLqS86+HDqROzYLEG7wYm6x1aRxgK5QUQzRKvc2ZY1cz/bqNrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761296721; c=relaxed/simple;
-	bh=5K97SsUnEfqdFwytsKvj2De1R9KsXAx82CNF2Zgpzps=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mPYzGEi405ZHGjNLLmejhsagICbxinle4F4k4/n000a5uCy9Eu0rpzMasP5HzsaAuYHtbUa3S93EazW95YJ6NqLZSBcUxc4SPtOpwvglioWCdQNt+mFTxqcggXkqakTPHuUxFlnvRJQTF8uvE+WDZFAtbu0J0ysHEFUoUTWtJ1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j5xO8y7U; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-86df46fa013so454536085a.2
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 02:05:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761296719; x=1761901519; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Fi5G9FDzNAyP7VCBLqTHNVcA0dfjoCrd2yNKOk994Bg=;
-        b=j5xO8y7UBBeSNzi1Hw+49pbCPAPxFax/qkEt4VUdAT5ehYN5TLT10F5JjIodAdQb89
-         eGX1uOBr+AxGeeaTabzG4Y2h7XLaxeZtl6FDh86LzL/3zAqo+TpbU5LarjzLJbVoZ4Lx
-         9uBAaXaAp9Wn66UWwJhB+m6DrF8joGDLEhI5LHZkEzE92P5R4fApqlDG7hxSdF44eRe+
-         jlAbTsRir+4O1fa0JqFEqfIrQz/kq/bRLA1ydzAnqG5HTEIf9LLi5mQjtY6dep3MBIGd
-         2ubzCaTwbhN2aOgc4bqOpbCxgxiMwBaCL2CBMNSHaKIXJeahW2NLbvnj2IXQwuRst0gl
-         auvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761296719; x=1761901519;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Fi5G9FDzNAyP7VCBLqTHNVcA0dfjoCrd2yNKOk994Bg=;
-        b=OQgK4Bz/KcvvvYEpBUQiP9MRga0kFvU3C1Z72AA53SPAYUhhcXuzHBfm36x8FfNUCk
-         NOx3ezz/gsLbySvy+kHRzSbTuL80bqXe4s1so4GSt6KbaAgMeX+jz2kn8awXaRB+iBqr
-         UppRRH8DFAy6Nf3BFMUqDVSGQmOPdSDTyi2mD55taIcIz5gSP/22RU0tnJtGjXPuXzLr
-         4F6Lts0cTSFEpMsSuSii5VuuFUAq0MhsBxLOPh13741hUYuYAI+6sTUDOcf9WlFbDnRB
-         odWNt5ug7gcxxhamYMtiaQv75LvQ3kumYUx8KW8FlUKv12becVS5B/Jk5K62q8TYZrCN
-         V0Bg==
-X-Forwarded-Encrypted: i=1; AJvYcCUVTWSolBDShnmsmBekejAfL1PXe8MtXJOERECPNpDLb/A4dQt1AXmS0GYdsaFT1onY+MD3Tzk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwK/sVL4RleUAhhztXV9Pi1Ydiz2P23ZcbgMJNYe47jxSaifwX4
-	Qv34rUbHher5MlPgXWtS7StPDPOXI/nTDHbT2o0ScaiAJOp323CCqqezcNwgnW0PFbbcxTVNHvF
-	0Oi33PsXRuZzJXQ==
-X-Google-Smtp-Source: AGHT+IFkBKQ1xhiu+J4ssdntf1LjBo4P0/7iB1Ky1RIeCz/7Y7wNoAFINU+j75Qk9kVluIq2rAIJ6gX8OqLeHw==
-X-Received: from qkat25.prod.google.com ([2002:a05:620a:ac19:b0:891:cf96:c9c3])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:1790:b0:82b:2bad:ba33 with SMTP id af79cd13be357-89c0f701d5dmr604113885a.2.1761296719108;
- Fri, 24 Oct 2025 02:05:19 -0700 (PDT)
-Date: Fri, 24 Oct 2025 09:05:17 +0000
+	s=arc-20240116; t=1761296743; c=relaxed/simple;
+	bh=UDrxfbNfMuvmybT6v67yaBFGtzSgDdt7UdublW9CJes=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZNQdSJ0zNjGCWPWeDNDBdIjC4fqiWtVzPxmoU/2GnkTEBmfSwIdnF581SOqHidIt62bnCx1Fkhc97TznyKaYKAmyz4e2P1uvSNAWkjzev4i1rsKJQ39bWn9LhpTTFK/wz7IgAVacMOFlPDixnFTD4xtD4qT5vr6yL6UchPL84rE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=ctniuQxm; arc=none smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59O50hRt1354560;
+	Fri, 24 Oct 2025 02:05:26 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	PPS06212021; bh=3k4BlGQ5x9MSwGyg0juXo0Qv3aQ5Xy11JMlksnMjaYQ=; b=
+	ctniuQxmGx7UEc3/y5Y55IlEqHslLaQGk1Z1FDfNLcYF9VazVMXFz6YeORYOw9v/
+	KHIkNVt4MPSYaQOFyq4b04d0yvZhm3i4IgQFRPJA4bP/4GvLCY39e/htT3yIUj4u
+	7muWfoULL4WETc3kbrS+MxD1GAXewsq3WFpPlllr36BGNLv+JPFXWYb12wkchLII
+	5ybkIAOHDHA9hIf0mPy6m4u4vuHc1E80aNacUc5+JlaNLZ8Zwq0r9DyS1sxlMMOA
+	375LiSuaiCrE6Fwx5uzMMvnjafpSDVsMUrld6awDuveK/ju3QKGvJ/C4wM0Gx21G
+	bZno6jVCgw6WaKp6QINzVg==
+Received: from ala-exchng02.corp.ad.wrs.com ([128.224.246.37])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 49ys00gnmk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Fri, 24 Oct 2025 02:05:26 -0700 (PDT)
+Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
+ ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.59; Fri, 24 Oct 2025 02:05:25 -0700
+Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
+ 15.1.2507.59 via Frontend Transport; Fri, 24 Oct 2025 02:05:22 -0700
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <kuniyu@google.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+        <jreuter@yaina.de>, <kuba@kernel.org>, <linux-hams@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
+        <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+        <syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>
+Subject: [PATCH] net: rose: Prevent the use of freed digipeat
+Date: Fri, 24 Oct 2025 17:05:21 +0800
+Message-ID: <20251024090521.1049558-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251024031801.35583-1-kuniyu@google.com>
+References: <20251024031801.35583-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.1.821.gb6fe4d2222-goog
-Message-ID: <20251024090517.3289181-1-edumazet@google.com>
-Subject: [PATCH net-next] net: optimize enqueue_to_backlog() for the fast path
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI0MDA3OSBTYWx0ZWRfX1uXN8Tsbb+du
+ vaeG0gNLCMroeNKBbdINoya2+mg+TFbDMiQtD7TEVtAIFGwWIPoRSUw0CneSwDX4ITeVUCHsVav
+ v+Ax0Wx/ZSBG2zQJSGIv83Qu1rwOWBvmrwkVsJjP0GWw+0TzBpkhed8WYj4KCHfuzTeJFLdMQax
+ UcnXyxQt3hCchLJF8X61UqVkspdApTj/LmyE3pu0wqPl0AMfEne3RL5zdzuoUXeE/gbXKQ8UlLk
+ MRZe1BSbyJT+lWBkxW98bNnCOn1RzShLNcXNFswL7VDCAndUIsRCFUIPuW4HXhcPfK8shkBfMpK
+ 30C52IPbwgko0+xmbl8NS5dyoy3MG9/aTTU74ILBiGg77xpK1PX1U/3ZKkmp4PqCEkIhL8ButdJ
+ NzdQfQz8/xH9VtDoLjdmCLBJm7U5GQ==
+X-Proofpoint-ORIG-GUID: OGIWkOzJod8E7h8k2dCTxdIB7_K-IwJh
+X-Proofpoint-GUID: OGIWkOzJod8E7h8k2dCTxdIB7_K-IwJh
+X-Authority-Analysis: v=2.4 cv=N/8k1m9B c=1 sm=1 tr=0 ts=68fb4156 cx=c_pps
+ a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=hSkVLCK3AAAA:8 a=t7CeM3EgAAAA:8
+ a=YldpWyYv74S14SR9DysA:9 a=cQPPKAXgyycSBL8etih5:22 a=FdTzh2GWekK77mhwV6Dw:22
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-23_03,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 phishscore=0 priorityscore=1501 impostorscore=0
+ suspectscore=0 bulkscore=0 malwarescore=0 adultscore=0 spamscore=0
+ clxscore=1011 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510020000
+ definitions=main-2510240079
 
-Add likely() and unlikely() clauses for the common cases:
+There is no synchronization between the two timers, rose_t0timer_expiry
+and rose_timer_expiry.
+rose_timer_expiry() puts the neighbor when the rose state is ROSE_STATE_2.
+However, rose_t0timer_expiry() does initiate a restart request on the
+neighbor.
+When rose_t0timer_expiry() accesses the released neighbor member digipeat,
+a UAF is triggered.
 
-Device is running.
-Queue is not full.
-Queue is less than half capacity.
+To avoid this UAF, defer the put operation to rose_t0timer_expiry() and
+stop restarting t0timer after putting the neighbor.
 
-Add max_backlog parameter to skb_flow_limit() to avoid
-a second READ_ONCE(net_hotdata.max_backlog).
+When putting the neighbor, set the neighbor to NULL. Setting neighbor to
+NULL prevents rose_t0timer_expiry() from restarting t0timer.
 
-skb_flow_limit() does not need the backlog_lock protection,
-and can be called before we acquire the lock, for even better
-resistance to attacks.
+syzbot reported a slab-use-after-free Read in ax25_find_cb.
+BUG: KASAN: slab-use-after-free in ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
+Read of size 1 at addr ffff888059c704c0 by task syz.6.2733/17200
+Call Trace:
+ ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
+ ax25_send_frame+0x157/0xb60 net/ax25/ax25_out.c:55
+ rose_send_frame+0xcc/0x2c0 net/rose/rose_link.c:106
+ rose_transmit_restart_request+0x1b8/0x240 net/rose/rose_link.c:198
+ rose_t0timer_expiry+0x1d/0x150 net/rose/rose_link.c:83
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Willem de Bruijn <willemb@google.com>
+Freed by task 17183:
+ kfree+0x2b8/0x6d0 mm/slub.c:6826
+ rose_neigh_put include/net/rose.h:165 [inline]
+ rose_timer_expiry+0x537/0x630 net/rose/rose_timer.c:183
+
+Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_t")
+Reported-by: syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com
+Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
 ---
- net/core/dev.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+V1 -> V2: Putting the neighbor stops t0timer from automatically starting
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 378c2d010faf251ffd874ebf0cc3dd6968eee447..d32f0b0c03bbd069d3651f5a6b772c8029baf96c 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -5249,14 +5249,15 @@ void kick_defer_list_purge(unsigned int cpu)
- int netdev_flow_limit_table_len __read_mostly = (1 << 12);
- #endif
+ include/net/rose.h   | 1 +
+ net/rose/rose_link.c | 5 +++++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/include/net/rose.h b/include/net/rose.h
+index 2b5491bbf39a..ecf37c8e24bb 100644
+--- a/include/net/rose.h
++++ b/include/net/rose.h
+@@ -164,6 +164,7 @@ static inline void rose_neigh_put(struct rose_neigh *rose_neigh)
+ 			ax25_cb_put(rose_neigh->ax25);
+ 		kfree(rose_neigh->digipeat);
+ 		kfree(rose_neigh);
++		rose_neigh = NULL;
+ 	}
+ }
  
--static bool skb_flow_limit(struct sk_buff *skb, unsigned int qlen)
-+static bool skb_flow_limit(struct sk_buff *skb, unsigned int qlen,
-+			   int max_backlog)
+diff --git a/net/rose/rose_link.c b/net/rose/rose_link.c
+index 7746229fdc8c..524e7935bd02 100644
+--- a/net/rose/rose_link.c
++++ b/net/rose/rose_link.c
+@@ -43,6 +43,9 @@ void rose_start_ftimer(struct rose_neigh *neigh)
+ 
+ static void rose_start_t0timer(struct rose_neigh *neigh)
  {
- #ifdef CONFIG_NET_FLOW_LIMIT
--	struct sd_flow_limit *fl;
--	struct softnet_data *sd;
- 	unsigned int old_flow, new_flow;
-+	const struct softnet_data *sd;
-+	struct sd_flow_limit *fl;
++	if (!neigh)
++		return;
++
+ 	timer_delete(&neigh->t0timer);
  
--	if (qlen < (READ_ONCE(net_hotdata.max_backlog) >> 1))
-+	if (likely(qlen < (max_backlog >> 1)))
- 		return false;
+ 	neigh->t0timer.function = rose_t0timer_expiry;
+@@ -80,10 +83,12 @@ static void rose_t0timer_expiry(struct timer_list *t)
+ {
+ 	struct rose_neigh *neigh = timer_container_of(neigh, t, t0timer);
  
- 	sd = this_cpu_ptr(&softnet_data);
-@@ -5301,19 +5302,19 @@ static int enqueue_to_backlog(struct sk_buff *skb, int cpu,
- 	u32 tail;
++	rose_neigh_hold(neigh);
+ 	rose_transmit_restart_request(neigh);
  
- 	reason = SKB_DROP_REASON_DEV_READY;
--	if (!netif_running(skb->dev))
-+	if (unlikely(!netif_running(skb->dev)))
- 		goto bad_dev;
+ 	neigh->dce_mode = 0;
  
--	reason = SKB_DROP_REASON_CPU_BACKLOG;
- 	sd = &per_cpu(softnet_data, cpu);
++	rose_neigh_put(neigh);
+ 	rose_start_t0timer(neigh);
+ }
  
- 	qlen = skb_queue_len_lockless(&sd->input_pkt_queue);
- 	max_backlog = READ_ONCE(net_hotdata.max_backlog);
--	if (unlikely(qlen > max_backlog))
-+	if (unlikely(qlen > max_backlog) ||
-+	    skb_flow_limit(skb, qlen, max_backlog))
- 		goto cpu_backlog_drop;
- 	backlog_lock_irq_save(sd, &flags);
- 	qlen = skb_queue_len(&sd->input_pkt_queue);
--	if (qlen <= max_backlog && !skb_flow_limit(skb, qlen)) {
-+	if (likely(qlen <= max_backlog)) {
- 		if (!qlen) {
- 			/* Schedule NAPI for backlog device. We can use
- 			 * non atomic operation as we own the queue lock.
-@@ -5334,6 +5335,7 @@ static int enqueue_to_backlog(struct sk_buff *skb, int cpu,
- 	backlog_unlock_irq_restore(sd, &flags);
- 
- cpu_backlog_drop:
-+	reason = SKB_DROP_REASON_CPU_BACKLOG;
- 	numa_drop_add(&sd->drop_counters, 1);
- bad_dev:
- 	dev_core_stats_rx_dropped_inc(skb->dev);
 -- 
-2.51.1.821.gb6fe4d2222-goog
+2.43.0
 
 
