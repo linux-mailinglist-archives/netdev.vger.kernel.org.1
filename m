@@ -1,86 +1,97 @@
-Return-Path: <netdev+bounces-232329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B2D6C04211
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 04:33:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6916EC0425C
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 04:40:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F28DD4ED46E
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 02:33:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27BD43AD417
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 02:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCF0523D7EC;
-	Fri, 24 Oct 2025 02:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F8825F7A7;
+	Fri, 24 Oct 2025 02:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sEbM0VPc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GnCBXB8v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53E114B06C;
-	Fri, 24 Oct 2025 02:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CAE1A9F90
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 02:40:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761273215; cv=none; b=Y60CWEan/CvIGLaWPmeyODYved7WdNQUXaEqh1puCTZrIeXXWxZj0UJHAMA15HzqZhCAARoYRBSUaq3fSzihNkptepW7krto61p5q79SL6X1HbUtkwy+3Ae9RvhvEXtsjth84YUnfM5MKIE7Ytz/J2v9XgNov2u4P3EN7QsRuTM=
+	t=1761273639; cv=none; b=rNaHuJIGZbxvZMszvuqbr8LOzcwU+T0+4BgDe71agg4RUcy6m+N/Up2bKCdxH+MGyN/qaVXxsrRSWmYxLDbVOIYnM8KDwW0RNuShW4Ofm0797WkUEo6hxFJcEwDnOsCr8fyHUJoDD0h1fyfiSutMSypjB67u70QU/H9+bXAc6eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761273215; c=relaxed/simple;
-	bh=W/KT21MQNUqapK/Ahwzqaa0gMdtJzy5ORU3UJ8PpDEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dKLsYPBtXBpnMtP3XvL3aSg37YVqPynMLsIMRofO9Dm+JB+Vi/HocD4kDA+mxC/Rf1sFWkhGfcOqysi4gIB1hgnWN2QfplVbN/oS98/TgaxO/Z/EyNqhdIfKZYqbTkIWrCtRAt6jMO/URNwVy5Fljd0LdHc8Lpf++jQ/VUjl2fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sEbM0VPc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67C82C4CEE7;
-	Fri, 24 Oct 2025 02:33:34 +0000 (UTC)
+	s=arc-20240116; t=1761273639; c=relaxed/simple;
+	bh=FAFQtjSvYfLaYuq38dEf6IIeOR0WewwEiGPFb9S97hs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LwwHQMvpRLo2yDY0KLVHWaSD7Qba8dhgYhW2y4YrjHE2LM621zA83FoniFJ6hMY1hum7pfqnj57ENjvSrNoGSN2R0P5BZfe/yihGLhG4GjyfoWORp31GCMa+TH6uwvm5Uji549Df/vMp14HwvRooJTmvNYeyLW4CBSVecqKeuJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GnCBXB8v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4A81C4CEE7;
+	Fri, 24 Oct 2025 02:40:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761273215;
-	bh=W/KT21MQNUqapK/Ahwzqaa0gMdtJzy5ORU3UJ8PpDEg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sEbM0VPcf7wO8u21Ib036Ne5nV6tTYDWNpxmGJsiBYR35wBWvP7qfdKy0jRt3TNOg
-	 4ZiERZHZd9zcE01EWAIqva4bmb8cop7sRF7Sh6UjOLQG7RbHHL/pDmT+qn22pg9lPb
-	 o6pANc97iihha/4DVyemEVCGIL9ov07HbJ6xix/Fp7bicHAPts9Tkuf1MGZoCBC1y9
-	 ZvSPC6lkh/tZMu4A+5Mp2lampm9tyPY83mulHnMQhOPKnbS+Xm5h50JTQFVNHKpTjt
-	 Q9u5RR273h/x25m7P0Hk+b1UZnBoJvIdTfaMH/9tHjHm7KK4uWpuxHsnZdo17zmUm3
-	 HMZ/0NkY5mLcQ==
-Date: Thu, 23 Oct 2025 19:33:33 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- razor@blackwall.org, pabeni@redhat.com, willemb@google.com,
- sdf@fomichev.me, john.fastabend@gmail.com, martin.lau@kernel.org,
- jordan@jrife.io, maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
- dw@davidwei.uk, toke@redhat.com, yangzhenze@bytedance.com,
- wangdongdong.6@bytedance.com
-Subject: Re: [PATCH net-next v3 03/15] net: Add peer info to queue-get
- response
-Message-ID: <20251023193333.751b686a@kernel.org>
-In-Reply-To: <20251020162355.136118-4-daniel@iogearbox.net>
-References: <20251020162355.136118-1-daniel@iogearbox.net>
-	<20251020162355.136118-4-daniel@iogearbox.net>
+	s=k20201202; t=1761273638;
+	bh=FAFQtjSvYfLaYuq38dEf6IIeOR0WewwEiGPFb9S97hs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GnCBXB8vuIYx0M+X0i8iKY1n0fkddwVsQ6QBrElvT6ewLNad8LPekWbTxoJo+ftWD
+	 Dt1rjz0aRT+VOl5nSJBv1T7WGHTdSd038ALo0xgo6i4431ni7Hr4R+tof4XOOwUrWj
+	 uEabNQSIxmTBlDdTKPiftyqm2RgCXrfrWk2Q+r6yaz1iibUiZC/CQxyK+QrwuubnLs
+	 dmcHnsumSo+FRbvikY/lhEAyM4xCAFm1SFlj9xkGv9bNxCBptYKdhyvE5qn9ETq7n2
+	 QE0XiNSCbMcUA4UnyXVcD9ghdJoeImVHWNsak8EdpmR5Ww0ePWhAmfM/dcEbtRmxB3
+	 cR57SFH230Mng==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EC33809A38;
+	Fri, 24 Oct 2025 02:40:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] tcp: Remove unnecessary null check in
+ tcp_inbound_md5_hash()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176127361900.3327514.1259136362900975267.git-patchwork-notify@kernel.org>
+Date: Fri, 24 Oct 2025 02:40:19 +0000
+References: <20251022221209.19716-1-ebiggers@kernel.org>
+In-Reply-To: <20251022221209.19716-1-ebiggers@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: netdev@vger.kernel.org, edumazet@google.com, ncardwell@google.com,
+ kuniyu@google.com, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, dsahern@kernel.org, 0x7f454c46@gmail.com,
+ dan.carpenter@linaro.org
 
-On Mon, 20 Oct 2025 18:23:43 +0200 Daniel Borkmann wrote:
-> Add a nested peer field to the queue-get response that returns the peered
-> ifindex and queue id.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 22 Oct 2025 15:12:09 -0700 you wrote:
+> The 'if (!key && hash_location)' check in tcp_inbound_md5_hash() implies
+> that hash_location might be null.  However, later code in the function
+> dereferences hash_location anyway, without checking for null first.
+> Fortunately, there is no real bug, since tcp_inbound_md5_hash() is
+> called only with non-null values of hash_location.
 > 
-> Example with ynl client:
+> Therefore, remove the unnecessary and misleading null check of
+> hash_location.  This silences a Smatch static checker warning
+> (https://lore.kernel.org/netdev/aPi4b6aWBbBR52P1@stanley.mountain/)
 > 
->   # ip netns exec foo ./pyynl/cli.py \
->       --spec ~/netlink/specs/netdev.yaml \
->       --do queue-get \
->       --json '{"ifindex": 3, "id": 1, "type": "rx"}'
->   {'id': 1, 'ifindex': 3, 'peer': {'id': 15, 'ifindex': 4, 'netns-id': 21}, 'type': 'rx'}
+> [...]
 
-I'm struggling with the roles of what is src and dst and peer :(
-No great suggestion off the top of my head but better terms would 
-make this much easier to review.
+Here is the summary with links:
+  - [net-next] tcp: Remove unnecessary null check in tcp_inbound_md5_hash()
+    https://git.kernel.org/netdev/net-next/c/05774d7e4201
 
-The example seems to be from the container side. Do we need to show peer
-info on the container side? Not just on the host side?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
