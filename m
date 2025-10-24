@@ -1,93 +1,76 @@
-Return-Path: <netdev+bounces-232419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4669DC05A6A
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 12:46:22 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 833D6C05A91
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 12:49:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 508633B028B
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 10:45:28 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2ED8B3592D8
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 10:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE11127F75C;
-	Fri, 24 Oct 2025 10:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112E53115A2;
+	Fri, 24 Oct 2025 10:49:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HtNoeQp9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0RI7a9/r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD88273D9A
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 10:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9D5266B46
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 10:48:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761302724; cv=none; b=aEpSOYYXC68LIF7svifugb329b6hncL2YsItLxYjY4SeFm09cJhn+CKn10qO6gHt9o2l1D9oXotF6/4QwGKUttftfq5vr3+GNp4iiW1sxDRXr760qG9TSA/qVVpTY98RL25MjOzrEagBL+qnE2c/VoabdeIaVpHSMGGOZvYDI3Q=
+	t=1761302940; cv=none; b=HP+L/9iQJcdDHmy8TZxH4yCP9GHXfwsil26ugjwAvEnMbRN5v9nOHiNf1HPaDa7Nwm02u2pHIuvuWmc7S1S2JCcdnKgw4kCsH8mE0OmlLDcEcfh9nQE6NtUl1xXWIm4xFUs1rbyK9PL974rWlcFcXmd/BlIJZRbBw1ya4UW/Xzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761302724; c=relaxed/simple;
-	bh=zitpUfd02mHfmWmKbxxXVMFAcuXxYP9GCRpf0oeD/9Y=;
+	s=arc-20240116; t=1761302940; c=relaxed/simple;
+	bh=PdEdUzCsrUG6TmLAVMWeZKL/jG6UW4FB+Um2k85O/iM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZHl76Gfyt4vnCbGOGNZ0sP3UdMjwlYlD+L3iFaOj6piSf3YFSYtgPV9nM56AlFEedbZsp72HuDhSAdYTodjNOuqpfk7FMUEixUTJ64nD1o2GnpbXri8t5y+O9i+N7nxoExJ6samqLJh0XIpzjG3NcJ7o8cp5LqR711954Jv105U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HtNoeQp9; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-42420c7de22so923895f8f.1
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 03:45:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1761302721; x=1761907521; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0LzYC4CXNtIhbU33+vNcLU3UwFYwR0NDqLzt3aZXlS8=;
-        b=HtNoeQp9JLCTH6rHZfTLnO3p7RnUjvCDk6KwZQYZ4/QbVbWV6WlMXpvXCiEAOsRVbm
-         LlXw8hekf3XHIYP2b//FxrTwO5g1Xu8g7v49t10Uzut4M2WCL3Q8TZgdH3X8n39wisQd
-         3Au6JfXCk2+cbtBaSYAo54+ujmQn3bCjyWEGNFXbRQcbZ0Afunq9mhN0FZBSc65DmtCV
-         IQbbk4ptLbpZroXzLhxN/vDCWGnClKNef1kj5GXR2X58DbbwzWfeAH8QWIa+re86tdfS
-         q8a1CknnjTyvy4pJGqRkZFdxx5yK1Vyiam7K5k27AzbBaIusDRHwmPUKQf/N/HHjPpZa
-         bybA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761302721; x=1761907521;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0LzYC4CXNtIhbU33+vNcLU3UwFYwR0NDqLzt3aZXlS8=;
-        b=JwXzg7bHxTm3El3vQs9HUaJ3FVTFNbu8cICKVZt3Em9V0Pbdkm7U0pQVmmMzyx1Q1X
-         K6Rm4z7RYd+eDoBN+RvEieXyEP5p8Cx6WxjUOKMHZswbj6tqhtxUn9jAHJ3x7j00/fTK
-         ztX8lONa4rJL0JH2mv0Q/0cHWCz593Ax8hiEZ5uP2dFxJnY0VZ55RPTZ5y6jzgmXcK0p
-         GYk6R0Qtf40iqRIKfL6fZwg9uhr9LaSndTbLJg2kzAQOcNGdbqHzehGDYkq1Y7CKx+0n
-         B0MymRRNWwqEeEJ+waMkC5hTL7fhC3Rr05rrFEH2Upx6ShdQeRCXhMzp09dYi8VkSNTy
-         Mzow==
-X-Forwarded-Encrypted: i=1; AJvYcCVV1+U1KXYxJ8dAXw3vRIv2cfNh56rKRmCkhKlswqrhDwVaMe4RvEJI0nZHGH/8sjdhvygYiGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxf8RYSBe+Jfp5sTinsHjKrxxDNKITZNvXIb9Wch/UOETpAuUmH
-	LmI3dOyw8qYMcRnPL8MPOZgniRbNlaZXrpS/5sC4RoUCezhMYsg3Y4f9Jgkmpp+S+dY=
-X-Gm-Gg: ASbGncuiQ/Reem/5dqEEtez94vG0tXXjpah4wQ5KZFK4MDZ0r4EknGI0OdlMFqLy9+E
-	FMGOcNQXdcnI+LHvcW0NbYtUn3BvhS5NX+Mlhk+NVqdwz/Tk4HMbLwTqz53KP0INymhhbbK/gPe
-	e6HL/t59S8k4RHvk2F/9/RCXvjmQXsd4AYStsilx8CGtTfOcM2GIGqFE4Zt489JLF8E4YYSAu1s
-	Vdh4ZG7TKwh0TU3M3hFdkMWphWt2BEmi7TjVQpRUyIUe4zb2nTsbBdmDHIuRnJSHT2lRWQ2PxOc
-	dAQegbPOut+9OLX5ct30lnH4evDS+j3q1C21/luBz3RJ//FOYE+3gYNpET6nIHlGcHUpxlkbNpl
-	KW3OslblqhEG0RdhomRQzoLiKQwVD7ZNB3nZBy2QlWFK37THbZd604NkxInnqv8UfHeEk+6ESIJ
-	kHtIxj7nuLC4scTRMH
-X-Google-Smtp-Source: AGHT+IFndIZtTS7LJDDfqCt6ZeNmFhEZyimvvM4KVVCj0BAZcLMsAD53m+FlpSvkb1XScbIdB5nUsw==
-X-Received: by 2002:a05:6000:2888:b0:3ec:dd12:54d3 with SMTP id ffacd0b85a97d-42704d9396fmr20083040f8f.35.1761302721251;
-        Fri, 24 Oct 2025 03:45:21 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-429897e75a0sm8916219f8f.5.2025.10.24.03.45.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Oct 2025 03:45:20 -0700 (PDT)
-Date: Fri, 24 Oct 2025 13:45:16 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Lizhi Xu <lizhi.xu@windriver.com>, davem@davemloft.net,
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org,
-	linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	syzbot+2860e75836a08b172755@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH V3] netrom: Prevent race conditions between neighbor
- operations
-Message-ID: <aPtYvPq12Txu9JCG@stanley.mountain>
-References: <aPcp_xemzpDuw-MW@stanley.mountain>
- <20251021083505.3049794-1-lizhi.xu@windriver.com>
- <7232849d-cf15-47e1-9ffb-ed0216358be8@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=X3Gp5PWJsCuyKKnEeJ4CWTV1hMDmimZKY8QMNhAOlTb+QhgtzzsbmcBtqdt8IeSYpHq7HThw8noxSzDWr2ZxZFZR5mA4zQ6bUS505w4WPpEdmTlJcbz3boJNxgl3KJZZu/omR0FfbEkZJmo1wZpPDl7Tv2o1APHMQNN+6V8uUjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0RI7a9/r; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=St90YPnsStMZ+8WdvRz0HPPenligqgpjDzaMg+CNa44=; b=0RI7a9/r0zJ+F/hwqE74pmKjfc
+	HybwQpD3cclhhl9ZA6zhGD/G7u5/Uj29NVHdGAPqYUtoWC9Az8sjpbvM9NK7nROw3vTU7ttqLtXrB
+	Lg4Ykv78Mjp81NuN3j9s5itvmdCVFlxsSYgEPSE8StTB/UNHIO+saNGpYwm94Oq7jR52u9sk49y1R
+	1EJ1pgip2mnwmtUI9OLG0QS7bnBGAm+tJxIF2Hb/Pw5dynnSt7/gQ73Ikn5jKzEVHWK9qdQIaEwjA
+	ErLm79mHxFQWnTsmDl2wQhlqLWReETrFaraFxHxY6gnqIQdhzKAqQenFfc8KiMO0QtQvfYdbvlf7L
+	9WBBTNOQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43764)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vCFLd-000000007RV-2TKn;
+	Fri, 24 Oct 2025 11:48:41 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vCFLX-000000002dR-44CK;
+	Fri, 24 Oct 2025 11:48:35 +0100
+Date: Fri, 24 Oct 2025 11:48:35 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH net-next 0/8] net: stmmac: hwif.c cleanups
+Message-ID: <aPtZg_v3H53hiQXo@shell.armlinux.org.uk>
+References: <aPn3MSQvjUWBb92P@shell.armlinux.org.uk>
+ <28d91eca-28dd-4e5b-ae60-021e777ee064@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,43 +79,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7232849d-cf15-47e1-9ffb-ed0216358be8@redhat.com>
+In-Reply-To: <28d91eca-28dd-4e5b-ae60-021e777ee064@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Oct 23, 2025 at 01:44:18PM +0200, Paolo Abeni wrote:
-> Why reordering the statements as:
+On Fri, Oct 24, 2025 at 08:44:07AM +0200, Maxime Chevallier wrote:
+> Hello Russell,
 > 
-> 	if (nr_node->routes[2].neighbour->count == 0 &&
-> !nr_node->routes[2].neighbour->locked)
-> 		nr_remove_neigh(nr_node->routes[2].neighbour);
-> 	nr_neigh_put(nr_node->routes[2].neighbour);
+> On 23/10/2025 11:36, Russell King (Oracle) wrote:
+> > Hi,
+> > 
+> > This series cleans up hwif.c:
+> > 
+> > - move the reading of the version information out of stmmac_hwif_init()
+> >   into its own function, stmmac_get_version(), storing the result in a
+> >   new struct.
+> > 
+> > - simplify stmmac_get_version().
+> > 
+> > - read the version register once, passing it to stmmac_get_id() and
+> >   stmmac_get_dev_id().
+> > 
+> > - move stmmac_get_id() and stmmac_get_dev_id() into
+> >   stmmac_get_version()
+> > 
+> > - define version register fields and use FIELD_GET() to decode
+> > 
+> > - start tackling the big loop in stmmac_hwif_init() - provide a
+> >   function, stmmac_hwif_find(), which looks up the hwif entry, thus
+> >   making a much smaller loop, which improves readability of this code.
+> > 
+> > - change the use of '^' to '!=' when comparing the dev_id, which is
+> >   what is really meant here.
+> > 
+> > - reorganise the test after calling stmmac_hwif_init() so that we
+> >   handle the error case in the indented code, and the success case
+> >   with no indent, which is the classical arrangement.
+> > 
+> >  drivers/net/ethernet/stmicro/stmmac/common.h |   3 +
+> >  drivers/net/ethernet/stmicro/stmmac/hwif.c   | 166 +++++++++++++++------------
+> >  2 files changed, 98 insertions(+), 71 deletions(-)
 > 
-> is not enough?
+> I didn't have the bandwidth to do a full review, however I ran tests
+> with this series on dwmac-socfpga and dwmac-stm32, no regressions found.
+> 
+> For the series,
+> 
+> Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-There are so many unfortunate things like this:
+Thanks, it's good to have someone else testing. I do need to post v2
+with some tweaks to patches 2, 3 and 4 due to a typo that gets
+eliminated in later patches. "verison*" -> "version*" in one instance.
 
-net/netrom/nr_route.c
-   243                          /* It must be better than the worst */
-   244                          if (quality > nr_node->routes[2].quality) {
-   245                                  nr_node->routes[2].neighbour->count--;
-
-++/-- are not atomic.
-
-   246                                  nr_neigh_put(nr_node->routes[2].neighbour);
-   247  
-   248                                  if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)
-   249                                          nr_remove_neigh(nr_node->routes[2].neighbour);
-   250  
-   251                                  nr_node->routes[2].quality   = quality;
-   252                                  nr_node->routes[2].obs_count = obs_count;
-   253                                  nr_node->routes[2].neighbour = nr_neigh;
-
-This line should come after the next two lines.
-
-   254  
-   255                                  nr_neigh_hold(nr_neigh);
-   256                                  nr_neigh->count++;
-   257                          }
-
-regards,
-dan carpenter
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
