@@ -1,189 +1,199 @@
-Return-Path: <netdev+bounces-232563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 289D4C069A7
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:03:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 404E5C069B9
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:04:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E0D0B4E97D4
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:03:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AB061C20226
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80CDF2DCBE6;
-	Fri, 24 Oct 2025 14:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2C7319862;
+	Fri, 24 Oct 2025 14:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RliSbp5L"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JfUoF9ra"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E7D186E40
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 14:02:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B522F83C9
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 14:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761314578; cv=none; b=RWpAkW4EpWUimhCi1W5fgf4CCOqGRIbvfTmbKN/AcNNU1iVgB0EGcO3bvRVrxVFHys8f8RczZ+Q5ZxhauuOGBdy7ajpsslm8OeC8UxIbrraykOHba842rvsSAFVExPRpMtgU46WJNtmt9ejwX3UGOZMLRgX2a+aI1YD68DrwTuY=
+	t=1761314631; cv=none; b=FaOg+N2ysdtm5UalAIaB0BAk/FTmqYxk+a9rJ/aaUN+0XedlKOFOrHd0DR714/0XLZryKk/apOUFOuuw6X6obhEta8VGED8Kn7/jzWGNP+ELA9wi/HfSm5CHP92Qh39ggvEzbtufMDON1xA3AfAFM4QVmci2U3ZMJu1w66iLums=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761314578; c=relaxed/simple;
-	bh=l6H3NSSBmlZvFpq1PqXPWWYmJopFN8+2OfEuhS0ok7k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ahh6iJp+dKcAGmROLcOcnYX0hnJnzj2fTod16T4KTOmX4gN7/EOeRNzum9YBmR8VyKs+knZgQzuCjxPXmQSbv5IwrZUOiDr4kpAvUOm5055puDsx4/ZzA/iCuehC3u2D0E8MfRBzKiJ2YWJKSdBU6wxSlig5YQn5zF7H0uSgRK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RliSbp5L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07B2EC4CEF1;
-	Fri, 24 Oct 2025 14:02:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761314577;
-	bh=l6H3NSSBmlZvFpq1PqXPWWYmJopFN8+2OfEuhS0ok7k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RliSbp5LWnuhWATmDUGCxW3fD1sgz1uGTgCAlnR6w81XApsR/kjW/Yk2b7U/ZtxH8
-	 QZeZC7Mh/RK0dcFCkum8fTcNustIiyefK9DJTej54QBJOgoxlEaLKepFik6G3PkWVi
-	 SgUnZrXd7ahWZYvtwWzh4LDn0TOnUpZ00LvTlKHDHmmgA14vLRRPij93s3AwOE0ebS
-	 Nktkz0FaQFNAHxIUMT5X8S6depb2b37iunyQVKdwJ+eo5HR3Qb2gNN0fBQh+DGIyXR
-	 HEC5QiWpOWkT5vXIGfnAGyzgd82+aSLHLto/tu4OI9Jim+hNM8W5TA4HJLsFicc/wi
-	 NLzDu4DDm6Dsg==
-Message-ID: <44b10f91-1e19-48d0-9578-9b033b07fab7@kernel.org>
-Date: Fri, 24 Oct 2025 16:02:51 +0200
+	s=arc-20240116; t=1761314631; c=relaxed/simple;
+	bh=sMJ1PmkqYrp6vR2wu1Lbm8ZzYUGtsCQD36kz0G6LniA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Rhqs6CA5nivNkVDO8jAcSQNxTef/GWcJF+bQLMRxbAAZWL8kQfFa6xCWYdo1EYkk6W3N51c8PPKlqjCas2X+dE+YEt45sj/fuw20YEqI6Sdn1pc4Hnm+oH3E1fDHf1HoN/dfDwHx+f9x2UzLwH6eXtWIPzzZThoRjcQCE+38+VI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JfUoF9ra; arc=none smtp.client-ip=209.85.217.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-5db3ec75828so337859137.1
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 07:03:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761314627; x=1761919427; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mX50h9CSTv1UzJrPKfKwquNCbEH3ys3tWym5NXMYo3s=;
+        b=JfUoF9raH3+iUhZWRuAznKWO+1ZvyoaEvk+0sz+l50p0rlyiac6ecfRg4TS06GP3o3
+         GMPLHDRURuSZQAMuLxULNHHwHrR2Ywk1H/8yeHJ/seqzGfL1677F0VzJXcgAyEAhUDWB
+         0qY4QAkHQ3ax8kxjVK2gv+mo0cdyKELh0dloDParfroFXRx5gdruBkjxsWV4bQZNtN+j
+         NON5VGpyQDcROP0idJGk7WqLyu8a3iHlhEg5xDlNXaKwas0xW1qwveclqeTEnP/9f/r1
+         ezNB4wBCWu9SvQoJN6Z8yWLnxutxGOhMPL1/SVJzU71v7FGwqujdc81DCkO/z+92uQ7d
+         jq2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761314627; x=1761919427;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mX50h9CSTv1UzJrPKfKwquNCbEH3ys3tWym5NXMYo3s=;
+        b=mWfozGAZktWmaubgeSGvS2CTojtsICiCwO2gavG/RWPY7EfTa+3A3JvZV3tE/WpjFT
+         7Da/Vh+0nv7O2N+Qe0bMh3HlX0td6+jrTskNsLDUkG0MMVSuAuy3oxdmwKpJiaAWYjxz
+         w2mkuwqXwWHNaCptc5CkVauqp13gX6MfQKOeZRuhdhsrnsH12muthoxBmBpXm3olbkdY
+         OQksO1C4s6hkXRA5M2mrljWWS6QzuSpx73WZWhtEwnPb5TzfU2LOUc8P2VMedEb08y/F
+         T6MG+QFaCSQvJ1+YlzCHcPjaGgfBAoq4/7yeeoT6lb2cVBEJr9OOriBgnS8eydZiMB6d
+         cDbA==
+X-Forwarded-Encrypted: i=1; AJvYcCX/jL6pzjIIk34/Fze95FWz5Pkzthh3CwhdPHowy/bt26T7qnHGIGP0q07Bm8a7hK3oBuKruVw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKCjhwnI1xMItBtv5W7o5F+5EXYpAzLvWv92qeZUjn4UKZJ9YE
+	ki7izO7CiWvGRU/jmRhw4BOhllAoOe2gb1NHU5JZDFUQEGpUSbeHnmo+
+X-Gm-Gg: ASbGncs28RKwWV9tkYH0p8pYqMHxT7jCcJgCHMFzjOwL9GMTU8XD5o1+rAv927ptayg
+	ItzEs0MVxmpifLlCYoeW5Fo9reZcBvJzxrnNxJ4eplrqZidPr66Zq2CFlS+3BZuTt9erN3/gpyf
+	bKh68RnB9P3N+Fr/w5AP0BF9PNKtuVFoqWCT56HuEQ1zzFXzupnI6hwpy5uwq2w2gfTibfdbTjU
+	V4rr4BKdTpRSOOlejtgOjHnOinSr5SSxkzFQVMHJqyIEp3ZJ/PlTIYaavO1dBqVdP3AyUODIo94
+	rNfnMc9t94I1wlCIaU8V/mcU5odOrbADk2irZZlopoZ0pIPZxeFnhgLyhQnfP+u/6q6LXVKpt2q
+	a+MIdhboC+TXMz538yHfHQZ0r7a1yKdpRza3p21qSqrrk9X29quaM0woP/rUOwYaUPdlXciX6Sv
+	nkV4PyQ7emLOLVLDuwrH0MZE2kKtdbH/8CojET/GSCvh0HTrtM34p/
+X-Google-Smtp-Source: AGHT+IEx4TZT6fxNhmpkgY0F0jSopvkG1C/Rk2fgoj4MKkxlUaKV3OyZGEaNw5Q7voNNWQPv4R5H3w==
+X-Received: by 2002:a05:6102:160e:b0:5db:2301:aa03 with SMTP id ada2fe7eead31-5db2301ac3emr3488133137.34.1761314625784;
+        Fri, 24 Oct 2025 07:03:45 -0700 (PDT)
+Received: from gmail.com (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with UTF8SMTPSA id ada2fe7eead31-5db2c77bc89sm2116978137.3.2025.10.24.07.03.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Oct 2025 07:03:45 -0700 (PDT)
+Date: Fri, 24 Oct 2025 10:03:44 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <willemdebruijn.kernel.249e3b8331c2c@gmail.com>
+In-Reply-To: <20251024090517.3289181-1-edumazet@google.com>
+References: <20251024090517.3289181-1-edumazet@google.com>
+Subject: Re: [PATCH net-next] net: optimize enqueue_to_backlog() for the fast
+ path
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] tcp: add newval parameter to
- tcp_rcvbuf_grow()
-Content-Language: en-GB, fr-BE
-To: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20251024075027.3178786-1-edumazet@google.com>
- <20251024075027.3178786-3-edumazet@google.com>
- <67abed58-2014-4df6-847e-3e82bc0957fe@redhat.com>
- <CANn89iLjPLbzBprZp3KFcbzsBYWefLgB3witokh5fvk3P2SFsA@mail.gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <CANn89iLjPLbzBprZp3KFcbzsBYWefLgB3witokh5fvk3P2SFsA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Eric,
-
-On 24/10/2025 13:19, Eric Dumazet wrote:
-> On Fri, Oct 24, 2025 at 3:09 AM Paolo Abeni <pabeni@redhat.com> wrote:
->>
->> Hi Eric,
->>
->> Many thanks for tracking this down!
->>
->> Recently we are observing mptcp selftests instabilities in
->> simult_flows.sh, Geliang bisected them to e118cdc34dd1 ("mptcp: rcvbuf
->> auto-tuning improvement") and the rcvbuf growing less. I *think* mptcp
->> selftests provide some value even for plain tcp :)
->>
->> On 10/24/25 9:50 AM, Eric Dumazet wrote:
->>> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
->>> index 94a5f6dcc5775e1265bb9f3c925fa80ae8c42924..2795acc96341765a3ec65657ec179cfd52ede483 100644
->>> --- a/net/mptcp/protocol.c
->>> +++ b/net/mptcp/protocol.c
->>> @@ -194,17 +194,19 @@ static bool mptcp_ooo_try_coalesce(struct mptcp_sock *msk, struct sk_buff *to,
->>>   * - mptcp does not maintain a msk-level window clamp
->>>   * - returns true when  the receive buffer is actually updated
->>>   */
->>> -static bool mptcp_rcvbuf_grow(struct sock *sk)
->>> +static bool mptcp_rcvbuf_grow(struct sock *sk, u32 newval)
->>>  {
->>>       struct mptcp_sock *msk = mptcp_sk(sk);
->>>       const struct net *net = sock_net(sk);
->>> -     int rcvwin, rcvbuf, cap;
->>> +     u32 rcvwin, rcvbuf, cap, oldval;
->>>
->>> +     oldval = msk->rcvq_space.copied;
->>> +     msk->rcvq_space.copied = newval;
->>
->> I *think* the above should be:
->>
->>         oldval = msk->rcvq_space.space;
->>         msk->rcvq_space.space = newval;
->>
+Eric Dumazet wrote:
+> Add likely() and unlikely() clauses for the common cases:
 > 
-> You are right, thanks for catching this.
+> Device is running.
+> Queue is not full.
+> Queue is less than half capacity.
 > 
-> I developed / tested this series on a kernel where MPTCP changes were
-> not there yet.
+> Add max_backlog parameter to skb_flow_limit() to avoid
+> a second READ_ONCE(net_hotdata.max_backlog).
 > 
-> Only when rebasing to net-next I realized MPTCP had to be changed.
-
-Thank you for the fix, and for having adapted MPTCP as well!
-
->> mptcp tracks the copied bytes incrementally - msk->rcvq_space.copied is
->> updated at each rcvmesg() iteration - and such difference IMHO makes
->> porting this kind of changes to mptcp a little more difficult.
->>
->> If you prefer, I can take care of the mptcp bits afterwards - I'll also
->> try to remove the mentioned difference and possibly move the algebra in
->> a common helper.
+> skb_flow_limit() does not need the backlog_lock protection,
+> and can be called before we acquire the lock, for even better
+> resistance to attacks.
 > 
-> Do you want me to split this patch in two parts or is it okay if I
-> send a V2 with
-> the a/msk->rcvq_space.copied/msk->rcvq_space.space/ ?
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Willem de Bruijn <willemb@google.com>
+> ---
+>  net/core/dev.c | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
+> 
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 378c2d010faf251ffd874ebf0cc3dd6968eee447..d32f0b0c03bbd069d3651f5a6b772c8029baf96c 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -5249,14 +5249,15 @@ void kick_defer_list_purge(unsigned int cpu)
+>  int netdev_flow_limit_table_len __read_mostly = (1 << 12);
+>  #endif
+>  
+> -static bool skb_flow_limit(struct sk_buff *skb, unsigned int qlen)
+> +static bool skb_flow_limit(struct sk_buff *skb, unsigned int qlen,
+> +			   int max_backlog)
+>  {
+>  #ifdef CONFIG_NET_FLOW_LIMIT
+> -	struct sd_flow_limit *fl;
+> -	struct softnet_data *sd;
+>  	unsigned int old_flow, new_flow;
+> +	const struct softnet_data *sd;
+> +	struct sd_flow_limit *fl;
+>  
+> -	if (qlen < (READ_ONCE(net_hotdata.max_backlog) >> 1))
+> +	if (likely(qlen < (max_backlog >> 1)))
+>  		return false;
+>  
+>  	sd = this_cpu_ptr(&softnet_data);
 
-If you send a v2, could it eventually target "net" instead please?
+I assume sd is warm here. Else we could even move skb_flow_limit
+behind a static_branch seeing how rarely it is likely used.
 
-If the idea is to delay the fix to stable, it is always possible to ask
-the stable team to backport it to stable in a few weeks / months, e.g.
+> @@ -5301,19 +5302,19 @@ static int enqueue_to_backlog(struct sk_buff *skb, int cpu,
+>  	u32 tail;
+>  
+>  	reason = SKB_DROP_REASON_DEV_READY;
+> -	if (!netif_running(skb->dev))
+> +	if (unlikely(!netif_running(skb->dev)))
+>  		goto bad_dev;
 
-  Cc: <stable@vger.kernel.org> # after -rc6
+Isn't unlikely usually predicted for branches without an else?
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+And that is ignoring both FDO and actual branch prediction hardware
+improving on the simple compiler heuristic.
+
+No immediately concerns. Just want to avoid precedence for others
+to sprinkle code with likely/unlikely with abandon. As is sometimes
+seen.
+
+>  
+> -	reason = SKB_DROP_REASON_CPU_BACKLOG;
+>  	sd = &per_cpu(softnet_data, cpu);
+>  
+>  	qlen = skb_queue_len_lockless(&sd->input_pkt_queue);
+>  	max_backlog = READ_ONCE(net_hotdata.max_backlog);
+> -	if (unlikely(qlen > max_backlog))
+> +	if (unlikely(qlen > max_backlog) ||
+> +	    skb_flow_limit(skb, qlen, max_backlog))
+>  		goto cpu_backlog_drop;
+>  	backlog_lock_irq_save(sd, &flags);
+>  	qlen = skb_queue_len(&sd->input_pkt_queue);
+> -	if (qlen <= max_backlog && !skb_flow_limit(skb, qlen)) {
+> +	if (likely(qlen <= max_backlog)) {
+>  		if (!qlen) {
+>  			/* Schedule NAPI for backlog device. We can use
+>  			 * non atomic operation as we own the queue lock.
+> @@ -5334,6 +5335,7 @@ static int enqueue_to_backlog(struct sk_buff *skb, int cpu,
+>  	backlog_unlock_irq_restore(sd, &flags);
+>  
+>  cpu_backlog_drop:
+> +	reason = SKB_DROP_REASON_CPU_BACKLOG;
+>  	numa_drop_add(&sd->drop_counters, 1);
+>  bad_dev:
+>  	dev_core_stats_rx_dropped_inc(skb->dev);
+> -- 
+> 2.51.1.821.gb6fe4d2222-goog
+> 
+
 
 
