@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-232648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 432A2C07A17
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 20:05:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C360FC07A7D
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 20:12:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 185AC4E6F13
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 18:04:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD7FC3A28B9
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 18:09:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61478345CC1;
-	Fri, 24 Oct 2025 18:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55E0F342CBC;
+	Fri, 24 Oct 2025 18:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lWisu4NV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AaDIQ10n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713F63396E5
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 18:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B049314A63
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 18:09:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761329060; cv=none; b=OUP50scZBQhAmAb+Txxs8NAH0o5NP9JRBakXrngNsssoF2/DLbPsRgW71dIgrvxsej/ND5Dj/GJyuqbSdRmyACpm+8fnZ/dPgE1CBY+AU9pNXND2m0kh5SwAOgbie4ZOEgnK/Oa346Hiu+YxCJ5nn5DSHolSWEMVnS4DL3IwsME=
+	t=1761329384; cv=none; b=MTf74637Nb885A+S48B29i6nY7L9N0GoAspoHr5E1z2wAsBrdsppIXHOfccZIOGg7yBLT5tskNqJTEtmLfzj8w+m9pJCpgL/HfumJzWT7EiOOaNI68dqp3F7ShYMh5GLtUeWvhUiTp5viiDwS1CD5mkNQDaaHDMpaGl4mToWU34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761329060; c=relaxed/simple;
-	bh=FD+uLET5TuaQ/SlLICNIujEOQLyze1Ha9Ev/0UmnsS8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OyIQuPP5NcJqsCh4NbNjONtZlKtmEukaSEvfeSkZz6trL2N1xZCJxL4lYkM9s0J680l4baGZg48ClHXopxcQbgQZ6B0rIkpYIYKl7CnMlzQW3iu0h8q8AYXdMBYlwxf69krd9v4aKlqt5WYbPCh3xm14Aznz6JdZS+blI8yNu1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lWisu4NV; arc=none smtp.client-ip=209.85.210.179
+	s=arc-20240116; t=1761329384; c=relaxed/simple;
+	bh=QU8xJ4i/Aw+Vyd7H8WdoblY3NJYZVZWy7OUfVpnGwS4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O0S1fJ+5ZvMNxHyTvOMBw6bTNEZAVMCScHB79YdJpuZE0CFYJqv6BjrheRCpUWe/sBIXGRUYKa3vith4ofV2hw5ko5nWFKM3tPRUoD4stT+pM6llDhmW6agW8wlh/Eaw6zi/sSZ5/tWp0qz3vsAQ1OENS+CW6TsxmX6QDUtfaUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AaDIQ10n; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-78125ed4052so2705033b3a.0
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 11:04:18 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-78af743c232so2357903b3a.1
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 11:09:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761329057; x=1761933857; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761329382; x=1761934182; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6jSNSoL6MN3rN9DlGA8YJd5PwyM+kEm6TobaAM50YPw=;
-        b=lWisu4NVLvAR4ysCssUyFTMfq1sN3nuqrXDA1yK/jhHZMc3X931ihspjC3gmHWen3y
-         EHH9evFGTvE3RZ1u6dK8BpMJWIhDLavrmHuzc+5t57hFuf37joplfgRsBWHw4QJ+KmWn
-         QpHgikUcNVUCJPj20cBXjvJ1crOiK7zeVX6ZZXWBMV1k9EijW27I69hGP1t7jQr9rqt2
-         v7AfTB9aZ24K2YUmMioFMoeraGwFVdgULMHygEaH+PyCDhV1yePAUxYE+1al49rlrq6k
-         Xe8JvPBPavlBN7g3Fls9EUBlq53PJTr3wdLNjuL/ckAXaOxx+FK3NVJnAz517A7SbF53
-         P0kA==
+        bh=7uYPj0SfejBh3YiQ4X3su8BApVdqBraujAWalEDiN6k=;
+        b=AaDIQ10nHVSPD7uFXcSBTcJUUhX/+piy6ma/Goy0ErP7E1dvK7d92erzXvyGyweIhV
+         eqv3lE38m6s4oqT87AWOVjFHg1FxkmgngpOyVtQM/Tmxizc5KoN+EShQ7BgurxcpUACF
+         CCfUy3wbsInEsHhv2t9J/2k7Aq9CDYtGVo7hgdFsUW+SWZs1DXAg7/FU2GDqfpOCBxXV
+         3rQZSoOBFTJnwmC7n7PmiARwm25GgS/b/8YHm7HbkX4AwHFHv84DVGZNgENZc/Z2DUcR
+         kURBgO8LshvP3xK/nOi2E31s9+2vaM5SZkxz2QK4lwzuNkDQev4bY9T+5ZNm8jrKKO6F
+         i52w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761329057; x=1761933857;
+        d=1e100.net; s=20230601; t=1761329382; x=1761934182;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=6jSNSoL6MN3rN9DlGA8YJd5PwyM+kEm6TobaAM50YPw=;
-        b=MMzq00Lw8BaFD/nIIiRP8mr1h3/via6zjVd1EGtUjFJM9p1wqpNP2mc02t0luTyL2u
-         SkkPDlMIKRKBscTR/epPwTMYJnlYLDyz6nYTs+hXA7kk0CWG8/hIlm2z7KiEGFYNDiF0
-         nxazdU3HfU1Gvs8uZi6HZViWLabY/59o0A29THjKN/JANqmTm6K3lwKW/Xc16QBp8wEy
-         fWZNmyzqdHzSOoccDitXb8gUtAxAXbXr1mqlyOxuwe3TscwPUOJvwphMWQdg4yDLO8oH
-         0o5D+w4e0Ag/oqtxiLZ+QkcuEvaNksPnGccD4r0fAsSAjKA1JaJ281roIvtIPVsHACPW
-         yFjw==
-X-Gm-Message-State: AOJu0Yz0TDql1RZULnvtszSRxeYiheE+fGqjBmmX0xOhn8hNQ0aaIjze
-	SFZ2QkvNy/1bDhgFmqopiqK5RcgNtNpLI+pPTD4bhYb2tnrafB/WLDE2
-X-Gm-Gg: ASbGncvISztEHd3bY2V4fH9172S+/UGgya7SvXWWw9CkjDNdTH++02VVdQriUaiUwN6
-	8XF3qZVtr3pkKqOAiiWR/I5yOjWiJgcxWPi8fJ8RTk0pCGScJOsapFhkLqTuN1ix4ER3X7QjDt8
-	hh6oX0SS3k4jgGz5src4RZUue8YKugsrkcrWOm9aAmCzZq6stiTSuN+n2gLhI0OF41DM0SX56uu
-	PhsbeP1BQ4cZGwjR+v03xEAwVFnKUpVCaCuZbB2rQsZwhth+KuntigoNhefb9S04Q0iaY0B/tcs
-	Bcf+DFN20T3gSMmgu3bPUam4njnynRjms5NMF1AJY/N13hBaRiWreI2REUKQNsUpi3Qtp4Aih7U
-	oQTwK9sx+dQonypbERyHe5bFwjqCJWKi1VFuyP943Mb36cSyHs5Ip4wrOF3QPZ4lMnnHemVI27P
-	hJrB/fdogI/DTyKMhSV+wbrIcmBFo=
-X-Google-Smtp-Source: AGHT+IEqqhg958lDuFGeAHS9RaqGf4P0XUAnU1shDFq0E+4EETe2pVFAR+Por5sTueLRIulvDD0XbA==
-X-Received: by 2002:a05:6a00:3cd5:b0:783:cb49:c67b with SMTP id d2e1a72fcca58-7a220d2327emr39144304b3a.32.1761329057439;
-        Fri, 24 Oct 2025 11:04:17 -0700 (PDT)
+        bh=7uYPj0SfejBh3YiQ4X3su8BApVdqBraujAWalEDiN6k=;
+        b=YUgWeKTP2YZIWYP34ZfdGXH2MEVOk+9fvM0X/cami2ZD2IIHNl+cbRqOzCzfadyYXW
+         d0p1Zov70PCMC6IzYGprd3ynfGWHJ5/K3dfJMhDo54VT7QO41wCbHH1HAkzKrN31ev6W
+         TGr1r4a1bbBTJ3mKDIcv89t6/O9i751YX+23Tp5f1HIsAkgCv5tYlt/NQNsJ63Jol9Ri
+         rxTmB4gzt0WIW3DjLtemba+Ge4b5yISefqDxKaQdlwgJH52rt1T/aZZa18dLNc7g8vF/
+         J//fWokOU/iQquDwjz7LaCHecrD8NmqmAiFX1LkUgDUdGz18szPY5SaVXXxv/7r1WJzr
+         BozA==
+X-Gm-Message-State: AOJu0Ywa8dtfN/678hRrz5gqt4LynJINcrP1JDGiu9/LnM5ydpAOIIpu
+	rYhoqRrpb8b8jfnMyC3WrWfhGjFgRnBmSyzWK9jCnrZBgE4fsKWIcriO
+X-Gm-Gg: ASbGncsIBALoysxru3wfDf5BaOH9baUb517JeUk6ZXHHGbJYp4EI8eaCiMAQ8sWAn/d
+	rarODbeO3oZ5iJ44MX3YLsyrqhgjR0TWzt+AGu8Lh6QjSqGG+DATfL0XhtOkC1FtqhLI8qjUNgp
+	podiX0i7HTQN90uvsI00GOCav3TeVskL19VMicXEaVydI4aXfzBDEU316RJusp6MO9maVEn5Lax
+	K1Vo4CqZye0VgpugmEUiZZfzNJpnOQftrUHnBrD4/WrLpk+WlGq4Ov8ItM4u6WpXFJMfIjvVm3J
+	L0T8uj1MgJiPVr8yeVp5Jx1/fIW8uVd6hmINYIQ1hILUFM8qsSl364ZoyclOaGllR3UUDGEpI8/
+	p9433IWIgeSE4d7+6ztS9wh6jn+jFeOxkJTUbO6cR+hHeNzZnHMFgEyAHZNcIUu1CpbzM7+bgYa
+	OvSQMLZxBL8bIjhQIP
+X-Google-Smtp-Source: AGHT+IEs14yzKo807oappAF1m6JTB8e3oPccYkCYJQsAbVjRETvcZutpUdb8D5Sas5c982XlhF6cwA==
+X-Received: by 2002:a05:6a00:99c:b0:7a2:7fd2:4132 with SMTP id d2e1a72fcca58-7a28685ed77mr3453308b3a.22.1761329381658;
+        Fri, 24 Oct 2025 11:09:41 -0700 (PDT)
 Received: from tixy.nay.do ([2405:201:8000:a149:4670:c55c:fe13:754d])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a274a60464sm6585920b3a.15.2025.10.24.11.04.11
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a274dbffacsm6679137b3a.66.2025.10.24.11.09.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Oct 2025 11:04:17 -0700 (PDT)
+        Fri, 24 Oct 2025 11:09:41 -0700 (PDT)
 From: Ankan Biswas <spyjetfayed@gmail.com>
 To: ajit.khaparde@broadcom.com,
 	sriharsha.basavapatna@broadcom.com,
@@ -87,9 +87,9 @@ Cc: netdev@vger.kernel.org,
 	david.hunter.linux@gmail.com,
 	linux-kernel-mentees@lists.linux.dev,
 	Ankan Biswas <spyjetfayed@gmail.com>
-Subject: [PATCH] net: ethernet: emulex: benet: fix adapter->fw_on_flash truncation warning
-Date: Fri, 24 Oct 2025 23:33:42 +0530
-Message-ID: <20251024180342.1908-1-spyjetfayed@gmail.com>
+Subject: [PATCH v2] net: ethernet: emulex: benet: fix adapter->fw_on_flash truncation warning
+Date: Fri, 24 Oct 2025 23:39:26 +0530
+Message-ID: <20251024180926.3842-1-spyjetfayed@gmail.com>
 X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -108,26 +108,32 @@ drivers use to report secondary firmware information.
 
 Signed-off-by: Ankan Biswas <spyjetfayed@gmail.com>
 ---
- .../net/ethernet/emulex/benet/be_ethtool.c    | 96 ++++++++++---------
- 1 file changed, 52 insertions(+), 44 deletions(-)
+ .../net/ethernet/emulex/benet/be_ethtool.c    | 100 ++++++++++--------
+ 1 file changed, 54 insertions(+), 46 deletions(-)
 
 diff --git a/drivers/net/ethernet/emulex/benet/be_ethtool.c b/drivers/net/ethernet/emulex/benet/be_ethtool.c
-index f9216326bdfe..0d154c7e2716 100644
+index f9216326bdfe..42803999ea1d 100644
 --- a/drivers/net/ethernet/emulex/benet/be_ethtool.c
 +++ b/drivers/net/ethernet/emulex/benet/be_ethtool.c
-@@ -225,8 +225,16 @@ static void be_get_drvinfo(struct net_device *netdev,
+@@ -221,12 +221,20 @@ static void be_get_drvinfo(struct net_device *netdev,
+ 	struct be_adapter *adapter = netdev_priv(netdev);
+ 
+ 	strscpy(drvinfo->driver, DRV_NAME, sizeof(drvinfo->driver));
+-	if (!memcmp(adapter->fw_ver, adapter->fw_on_flash, FW_VER_LEN))
++	if (!memcmp(adapter->fw_ver, adapter->fw_on_flash, FW_VER_LEN)) {
  		strscpy(drvinfo->fw_version, adapter->fw_ver,
  			sizeof(drvinfo->fw_version));
- 	else
+-	else
 -		snprintf(drvinfo->fw_version, sizeof(drvinfo->fw_version),
 -			 "%s [%s]", adapter->fw_ver, adapter->fw_on_flash);
-+	{
++
++	} else {
 +		strscpy(drvinfo->fw_version, adapter->fw_ver,
 +			sizeof(drvinfo->fw_version));
 +
-+		/* 
-+		* Report fw_on_flash in ethtool's erom_version field.
-+		*/
++		/*
++		 * Report fw_on_flash in ethtool's erom_version field.
++		 */
 +		strscpy(drvinfo->erom_version, adapter->fw_on_flash,
 +			sizeof(drvinfo->erom_version));
 +	}
