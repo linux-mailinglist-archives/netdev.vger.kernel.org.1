@@ -1,114 +1,123 @@
-Return-Path: <netdev+bounces-232628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76993C07700
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 19:03:33 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69E1EC07709
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 19:03:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 107593475F5
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 17:03:27 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 10C6C34F852
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 17:03:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D12F341AB9;
-	Fri, 24 Oct 2025 17:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6403D342C80;
+	Fri, 24 Oct 2025 17:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F5R7YQeC"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861D4340A67;
-	Fri, 24 Oct 2025 17:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC7B33EAE4
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 17:02:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761325371; cv=none; b=GpdaJBvyyG81wWOcIgVxkffT8tonVkgvr22NIdZGlv1dgdphoOkOckrgQ/akx5Leg42pymDDih/bGZuvj5o/VB3Xw08V/UWCY8Anc0VLOn1maI8eh8KJRS0MUfCazdPtnv09aa/3hhDrkxe9jwGnqnQaBnoQU3uACcZ7LKUSbeM=
+	t=1761325378; cv=none; b=J89Vzr1JbmO54VUZGav+kDd+zMD0HHecPRVh+20b50/dqMBhgwPO5oTfsT4RRPWb6DrQSCOnooYmlmSTHmw/ApSmBloEHskCYJHni7p9KmOAd/Xu7v8VRNCkvYbAyGdFCLP702wBKgSSYbUxz0RdiwwE10ZecXhe5jHlPk5onao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761325371; c=relaxed/simple;
-	bh=KSuJWpS345vnoGocxDypkTYsfuzpf9+GCPlDBfHsVBg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IlCTQe2of5xhd4I2rBs6+2+oGnMzayyP3e8GTLDWabTWDE0xoR0CSr3dyCDkANJ1QY/2Uj85xVYaQp63PnMBjr5k+JpYTT8B6u8udnlzM+AJHVfYIbvxulQ8Ton2Av2V6KVwBzw1AM/wxLXwdoW6IT7a4sbSxyOepikIqmvCbRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vCLBd-0000000067o-0k7S;
-	Fri, 24 Oct 2025 17:02:45 +0000
-Date: Fri, 24 Oct 2025 18:02:33 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next 05/13] net: dsa: lantiq_gswip: define and use
- GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID
-Message-ID: <ea60edb7f78930fa57bd20749365e58f01e141c9.1761324950.git.daniel@makrotopia.org>
-References: <cover.1761324950.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1761325378; c=relaxed/simple;
+	bh=0lgUeGSBFp8vZVsfUQP4sAWjlut2BFJBh0VzjaExPRg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iPPZUtPt/bv7pHwZ1PlplU0jHo3S5bppU68g2dI2uzzPdzZDpnzSVMpP1yo3vAzWm2GAnvsV4iMZGR634+Pr4sJHi+LZ0qdFCh2JScY8oRB3gABO9b0FSEqoQ6aGK65zHBTE59zS5Ypf7TDiuVpYcixm3D4QUNVYs8KA96WN1DA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F5R7YQeC; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4e8b6144288so19350921cf.0
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 10:02:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761325376; x=1761930176; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0lgUeGSBFp8vZVsfUQP4sAWjlut2BFJBh0VzjaExPRg=;
+        b=F5R7YQeC9v66vcuk8yuEmllIeIsk2DfRY+cNlmKaBPiGxrYEn6tFw9SlFwniMhukK/
+         1h3A0xW2Lx0u2sgkLdEuSz35j5eOner1dIV4SoP8ZXJU2VVhKVJu3Ir9NN7214dwouej
+         e1eqL0DGPFYJZTg02Ar/jiwuJlay4zFSLsmh4B+KBmvpHISAm9V9CZpliiPjUp/kZJ03
+         c+8dEFn71vlzuOsiIC7WMl0cQMXlsVDGj09IqYtke3BIA3/sPCkddd87wrHi0efFGD6F
+         TUtb1uS4XZPL6D56yRnl97wzrYEMb7KiWhWNolTrIyFZSRwLMQc6Xx25rWl8IW4wseR5
+         kHlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761325376; x=1761930176;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0lgUeGSBFp8vZVsfUQP4sAWjlut2BFJBh0VzjaExPRg=;
+        b=sZnfuiIB2Vt/DCN5ZicJMkdDc9EhLrAJnpYamLahgV/SiQdbobE+KyOMziXE13DzLa
+         Edr2CcnmokYdB4O0DPjy4pn0Ie7nXx6m75uuq55ob9xrFFrPLCgMKhOTMswubFmDe/FA
+         zajn0vcUVgzeMInoaG+OBzHX+bqwtu0yBDXHIPRn0976eHbqf/97Uz4O3NBfcPNAujce
+         kAWLNZN2QWV4TMmqZT4/Aw29GrzHM0oVGZsw3oQXMynw1clCgky7GOp6kbCHL4V/9h/f
+         ZCm4GNSOW0k5Xo9rO/EKX/M/jzG+4On1KhQXmp0kafYl9EF2R9LU9EOZfYK9Uv4hwphG
+         vafg==
+X-Forwarded-Encrypted: i=1; AJvYcCWr0CevOfQKkBmCSNWuuZNRzOkyJER5WiAHPaB3LZ6gJ/qxKZzuTe220n6xMjvpEGjolxCHZPo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywqw9RONpUJhyExG/0K9B3sjf6TlEmEAmhcc7CVWeReDkF2xcDG
+	mNa7j2A29u8Ku2GJNN0vTMv/IG3hBTyMVzjDItErOPvPz+Q/6UoIvKLtwHZK1NlHRieKolzBp5u
+	pZUlj4LXT5s45AXImngxbEzlR469MIakalivKKgRW
+X-Gm-Gg: ASbGncvIHVQXVE0Rf2uQkc+V/OTe+wLB/Slqe4Jz8VWX2xKjp3yIEBFeGSCIqPqkM5Z
+	U+fCzw4Z/BeKwHeYSnt1AkNuzOtFZoFSh3Ecf7/56T+lcW/TnsyZoFRuS3aLC/e/0W1+t/GymYR
+	eela1SgnWLJf1VkiuKpltYvsLzgjP2g9GMEtGcTgEFvtlsgGSyoA/xz+IHiqud24uzbJHsaduyW
+	BLENg6RR2/4VEa/+A0syAxJ0wa5jDLpoItHckvylT3dKM31Dq5a1M2K6ygHKlbUH/U/5w==
+X-Google-Smtp-Source: AGHT+IGY43V3QoFGqbSqtG38LbLRBiJzXSxcn5ImHu6m5amKrBRR6EPPQ6rqb9xR9yV1mz2IrUEr5ost0KlL2mjkd90=
+X-Received: by 2002:a05:622a:1808:b0:4e8:ae23:58b with SMTP id
+ d75a77b69052e-4eb948df990mr37862701cf.42.1761325374996; Fri, 24 Oct 2025
+ 10:02:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1761324950.git.daniel@makrotopia.org>
+References: <20251022054004.2514876-1-kuniyu@google.com> <20251022054004.2514876-6-kuniyu@google.com>
+ <CANn89i+Wv_tzq7LR64bN=x76=HBBmtR+GG5nDEi4fX8zokj71A@mail.gmail.com> <CAAVpQUBd8ZW1BZMN0FAPbr=MzP7drSN8YsxdJLmQVeTfmvNqVw@mail.gmail.com>
+In-Reply-To: <CAAVpQUBd8ZW1BZMN0FAPbr=MzP7drSN8YsxdJLmQVeTfmvNqVw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 24 Oct 2025 10:02:43 -0700
+X-Gm-Features: AS18NWAMDmEqy_0ehrg3_xgMbrcd9RSY8m7xw3jTsegcpfPE6Lv0phnBQZCRSYk
+Message-ID: <CANn89iJ6TK025Dac-K9-oZLuPLiFVF+Gnp1UwcC3OQfc1x4PkA@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 5/5] neighbour: Convert rwlock of struct
+ neigh_table to spinlock.
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When adding FDB entries to the MAC bridge table it is needed to set an
-(undocumented) bit to mark the entry as valid. If this bit isn't set for
-entries in the MAC bridge table, then those entries won't be considered as
-valid MAC addresses.
+On Fri, Oct 24, 2025 at 9:42=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.co=
+m> wrote:
+>
+> On Fri, Oct 24, 2025 at 5:31=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Tue, Oct 21, 2025 at 10:40=E2=80=AFPM Kuniyuki Iwashima <kuniyu@goog=
+le.com> wrote:
+> > >
+> > > Only neigh_for_each() and neigh_seq_start/stop() are on the
+> > > reader side of neigh_table.lock.
+> > >
+> > > Let's convert rwlock to the plain spinlock.
+> > >
+> > > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > >
+> >
+> > Do we still need _bh prefix ?
+>
+> Yes, I think _bh is just for IPv6 ndisc calling neigh_update().
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/dsa/lantiq/lantiq_gswip.h        | 1 +
- drivers/net/dsa/lantiq/lantiq_gswip_common.c | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+OK, this is presumably to protect tbl->gc_list.
 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
-index 56de869fc472..42000954d842 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.h
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
-@@ -224,6 +224,7 @@
- #define  GSWIP_TABLE_MAC_BRIDGE_KEY3_FID	GENMASK(5, 0)	/* Filtering identifier */
- #define  GSWIP_TABLE_MAC_BRIDGE_VAL0_PORT	GENMASK(7, 4)	/* Port on learned entries */
- #define  GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC	BIT(0)		/* Static, non-aging entry */
-+#define  GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID	BIT(1)		/* Valid bit */
- 
- #define XRX200_GPHY_FW_ALIGN	(16 * 1024)
- 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-index 7ea5f26f3899..4cf548319b1b 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-@@ -1149,7 +1149,8 @@ static int gswip_port_fdb(struct dsa_switch *ds, int port,
- 	mac_bridge.key[2] = addr[1] | (addr[0] << 8);
- 	mac_bridge.key[3] = FIELD_PREP(GSWIP_TABLE_MAC_BRIDGE_KEY3_FID, fid);
- 	mac_bridge.val[0] = add ? BIT(port) : 0; /* port map */
--	mac_bridge.val[1] = GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC;
-+	mac_bridge.val[1] = add ? (GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC |
-+				   GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID) : 0;
- 	mac_bridge.valid = add;
- 
- 	err = gswip_pce_table_entry_write(priv, &mac_bridge);
--- 
-2.51.0
+This list could use a separate spinlock, given neigh_forced_gc() can
+spin for up to 1ms.
+
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+
+Thanks !
 
