@@ -1,112 +1,91 @@
-Return-Path: <netdev+bounces-232620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 671CBC075D7
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 18:43:01 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60C27C076A9
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 18:57:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 800531A635B7
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:43:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A7F5F4E93AB
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5FDC283686;
-	Fri, 24 Oct 2025 16:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85B233B958;
+	Fri, 24 Oct 2025 16:57:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bAGp3pVD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bDeNgxpx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E68327FD52
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 16:42:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F66309F1E;
+	Fri, 24 Oct 2025 16:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761324169; cv=none; b=RqurKnrAX/pM3dsrwzyqMCmQyDDc/6kokGT8uA8CLZRqaFOgdwC6XEcrf4JqjYyB9ZeiJOkQqGGVDqp6WD6FIgArtidc7nJdK128ly9a/73M1nVdqvh2t+nLoApeDNFurYM1DaSXdsRMrMZPAQ9/lZshQj8wekzO3MqClkqBm/s=
+	t=1761325060; cv=none; b=qmtfah8g2Z2Kykb1WbQlZw6VfN6W1PS7p7+PzH+NywbRIjHyVg0+hv5vLg4ZXqH17cd8YglssHlZ7Sy3a/SKgYvPtAN5HFM4fUskIz9bmRHoGbV+nyB+dOWrGJJRpVuP1RQYtXnC0u/iGLm2vxNsC7wrD7EopWd2PWMRghrU6Jc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761324169; c=relaxed/simple;
-	bh=/blf/azS5NEQNvNlO3JBJPajNsZb+Sbs7B77kxrnl7U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jHNYyck1h7Z/razrNTvpiS8EQN6oCCFUrbQ9MEVVdCNKEHn1tdsf3vV9E4rZmYZDBZGUD+3xWsW1XdiFt9Cc5TXzJxlyPQp+BcO0UgoE6ZW2Us6h/y6/AFGgNlqck9+d5kdFDryk57GB3+UGeptzU4vL97uh9J78dagCyhvTQPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bAGp3pVD; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-292fd52d527so25262135ad.2
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 09:42:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761324168; x=1761928968; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/blf/azS5NEQNvNlO3JBJPajNsZb+Sbs7B77kxrnl7U=;
-        b=bAGp3pVDkboELtC5bvodpi+jgo1LU7vfLp/ihi5rsLTVQLxBNbjg8Wy1swpMhN+O6t
-         ZW7CWICV+ZPkYY8Ts215tpoy+vl75oYGLYjhE6VG2Z9xRWJ9cmsGZMWxmgU3Q0zaAOoI
-         IHzqO2N8qCVaHTmA1ZV82+vZsad3GXTifaWuM/YLGJeBqjc7fzltLd6i6RyCGBasMhNk
-         2c4gqnZzQ6YJRkxsUHGSy7iNG+itU/85PWTD9CXAF11BTz9uPEv4tjwgwqdYxZsPcYhN
-         h6NBK3Mgg/tW5XI5V0xE0rllwmvkR3PTqTkvkCIwR/FFfsdBnzjuNkNBgX/wbQWKuyqw
-         zktQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761324168; x=1761928968;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/blf/azS5NEQNvNlO3JBJPajNsZb+Sbs7B77kxrnl7U=;
-        b=S+UpGgxtd4HyZkebYfORXUCO9ymcLkYjSxId+6DI+TT8PwTgGbDp7PIjd0CNzk/e5I
-         6VCSD+veDkmn6Yygz+TRbc22nBatJxbQXPvC3DmJ1OVDCzLwn09pJumBvF0eH/0dad04
-         5mBkanZWxFKt8eHURvgG/WvPUytaIev3K71z18eHB3C9B7oMkxDdefIJTTHZeVjulNLV
-         dFBifT9rxvmeW88hpP768PcrrKPeiAlmDviY+/wSqDxOOukam8PR1E8tXNZcpx5NXPhW
-         CWgVDgqhuVfvFlK7QqdXAGBhBMnZOjCfYwWlvZtYwmwnX4q/dL/hqBwgLvBb9t0h4a69
-         VhKA==
-X-Forwarded-Encrypted: i=1; AJvYcCUHDeWgQxEUT3TXM2w3QXZiqewJRS4vFpcWBJginTaqqkyDUSAk6yJcaVjuZMQ0Sq+r0ZNHzSE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbUvrFXU5PprOP0vHYzKFbWST8RTAYRlBKxEZkCqjaSTygBzvB
-	WhFzUnzUSpvXXTCKwTjpIbJ7xfUVbBxpoUQeTQ6KXlFJYMauhvHjOkbMH4jpApfjy5KxK3oBrX5
-	0jBLoAsKr2BSDOE/vv2Xg6/+0tyh+triVV/tsrlbK
-X-Gm-Gg: ASbGncuaXhznVeBUWs9U/6huKRs+qWG7jV2yyRb4/RP8KSfhVnrr7quL6kJDI53jH/V
-	93nmvjgoHqSfgdTexJRpu3AIjxHjSaeL2DCVMFZMBpstH0qo6cAzc/+CJpK5cmqAEyaDgk4Ntcg
-	gYV/2Ajh/F3GLMnW+y92BkFC7sOXgiwP+S/vzRZsyzJbDlu77+IdMZSy/y55ItefGX8mUgwoPWo
-	AHPh4mm7+tLkSByrPH0yjoWF/lP14kZFXZjfrDYmVu50Gw+mNhwDNHdmRbMyTa9Bz1+trjpApG5
-	U4k0ybrepF9rsZNeuLbRz+dZ9g==
-X-Google-Smtp-Source: AGHT+IGPy7KhvL+Vh9CdntT6E5HwvFrlqr3eklQ4VeiTiQyrrF2uZXnNDAVhZcP6OhhXKtoX14Y4jlCdlHSqJRwPh+Y=
-X-Received: by 2002:a17:902:c411:b0:276:305b:14a7 with SMTP id
- d9443c01a7336-2948ba0d467mr37007185ad.33.1761324167479; Fri, 24 Oct 2025
- 09:42:47 -0700 (PDT)
+	s=arc-20240116; t=1761325060; c=relaxed/simple;
+	bh=DJwgWQV6LS0y1HCZdTukbp7eZ5b2oG/b60BU6bAySRA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iUBGVZ0DW4xmLLTuOpuTwN4xkPGH298BvxawQYpuxuzu2WGUxA/sCuYqy3Jd3I/kZX3aRQjCQMt6tvVIZ8kSWitBEaAtrFDbLhmhDWy+6np0acDrMgUJ+OVhW9njrJGz2Gsw+Tpnrl0lyIc0TyG3UwRiTtW8igY/NG0gmho/iBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bDeNgxpx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 356DAC4CEF7;
+	Fri, 24 Oct 2025 16:57:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761325060;
+	bh=DJwgWQV6LS0y1HCZdTukbp7eZ5b2oG/b60BU6bAySRA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bDeNgxpxlfWKCDa5lCi+7eDV6CLbBTSTQ0BI8fCL4g3akCIqJee7S0pfUG+TKpkb1
+	 EO1iPBo5W+rlWfRyhW4bdyKJUH6YS3FvDWnPCzgrQy9UjzouQzSTyp4RgzV4+IKpeu
+	 oXj119hem00USE8NLX6A+mqmmg8RhiW5+J/VzwiU7TtI6O4IiYctQBbvj4WLqJjvHI
+	 fhfbIO8fESHwCfSxtXXu6p3rJrNKhhlQBgLSAVx9BzhTJHJj2x//XVoMOzy37z3V7O
+	 mzk3OzVCJT7mkghK3wt4fjeMC8Y9SeOkvcDZt1UKOEBcav6XVkq6AngqfHHKz0VKRx
+	 +LHUfZaSgpkYw==
+Date: Fri, 24 Oct 2025 17:57:34 +0100
+From: Simon Horman <horms@kernel.org>
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Matthew Gerlach <matthew.gerlach@altera.com>, kernel@pengutronix.de,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Austin Zhang <austin.zhang@intel.com>,
+	Adrian Ng Ho Yin <adrian.ho.yin.ng@intel.com>
+Subject: Re: [PATCH v5 04/10] arm64: dts: socfpga: agilex5: smmu enablement
+Message-ID: <aPuv_q3beG7kEj9N@horms.kernel.org>
+References: <20251024-v6-12-topic-socfpga-agilex5-v5-0-4c4a51159eeb@pengutronix.de>
+ <20251024-v6-12-topic-socfpga-agilex5-v5-4-4c4a51159eeb@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251022054004.2514876-1-kuniyu@google.com> <20251022054004.2514876-6-kuniyu@google.com>
- <CANn89i+Wv_tzq7LR64bN=x76=HBBmtR+GG5nDEi4fX8zokj71A@mail.gmail.com>
-In-Reply-To: <CANn89i+Wv_tzq7LR64bN=x76=HBBmtR+GG5nDEi4fX8zokj71A@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Fri, 24 Oct 2025 09:42:36 -0700
-X-Gm-Features: AS18NWDGHdOsctcREgMajhYcpopFJDWJv4Lws-fZ97Ld370tVIR0Rdqj4OTYlhk
-Message-ID: <CAAVpQUBd8ZW1BZMN0FAPbr=MzP7drSN8YsxdJLmQVeTfmvNqVw@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 5/5] neighbour: Convert rwlock of struct
- neigh_table to spinlock.
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251024-v6-12-topic-socfpga-agilex5-v5-4-4c4a51159eeb@pengutronix.de>
 
-On Fri, Oct 24, 2025 at 5:31=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Tue, Oct 21, 2025 at 10:40=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google=
-.com> wrote:
-> >
-> > Only neigh_for_each() and neigh_seq_start/stop() are on the
-> > reader side of neigh_table.lock.
-> >
-> > Let's convert rwlock to the plain spinlock.
-> >
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> >
->
-> Do we still need _bh prefix ?
+On Fri, Oct 24, 2025 at 01:49:56PM +0200, Steffen Trumtrar wrote:
+> From: Austin Zhang <austin.zhang@intel.com>
+> 
+> Add iommu property for peripherals connected to TBU.
+> 
+> Signed-off-by: Adrian Ng Ho Yin <adrian.ho.yin.ng@intel.com>
+> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 
-Yes, I think _bh is just for IPv6 ndisc calling neigh_update().
+As Austin Zhang is the author (as listed in the from line),
+their Signed-off-by is needed.
+
+...
 
