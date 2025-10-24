@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-232307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 233EBC03FF2
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 03:10:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 004F9C0400E
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 03:13:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A8623B7770
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 01:10:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B10813B1A35
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 01:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4541BD9D3;
-	Fri, 24 Oct 2025 01:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC0F18C933;
+	Fri, 24 Oct 2025 01:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WrKHmuPa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NNtTK093"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA671B85F8;
-	Fri, 24 Oct 2025 01:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D243757EA;
+	Fri, 24 Oct 2025 01:13:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761268215; cv=none; b=qUlHc0M4ww3c+tSwez8KaVwMTZXD6GDboAqKhl46W44ytWmAN9FW0/ziQuGUHxAQa1sb2muqiPk1nFpUcgypeZodfNj/hbHNoUtC7R7LO5xyGowV5MjCv2SaWi/Q/V9omRSDA31ZB0cGlVg+3G0zgn3r8Yry22xIT/n9SxizT3I=
+	t=1761268426; cv=none; b=YPt9pg64U6qxs7UTjEa7rXxkBbEP2K+4JFlRE23h7s77FfEiYv8nN3asuVxddEO1kph906v6xsIr6fwtSYoNLJu1/EKtdELeTNKP0UwKDP+gB3NjG1wYxwv63AqosOVJAe2JMQSUtmm/xI0CRF/ceSqHqlaNyi8WcN6tf/maHO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761268215; c=relaxed/simple;
-	bh=OLXoSnqBAFgBwoQMFtvAMOPLw94jaNvTQASIeLyNyII=;
+	s=arc-20240116; t=1761268426; c=relaxed/simple;
+	bh=E52/C2NI1v8LOeNlODaaZwoSzzKa4S3nQNDgy67egio=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VEox005NoE9Nm3+x4Znm/nBy0mxit5DaXd1O+9m60qbU+Xt4gi6ncWp5Iam51wcpPZYiZ5Bz9AxNfC5dNCIktNui4FC+PXRJdb0FAAeyIrXdofdJ1r2NP2fUBrHurl42BbgXtUTzCgW1GlZeERTyakr8uCKFT1e6HvY952vW0hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WrKHmuPa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8DAEC113D0;
-	Fri, 24 Oct 2025 01:10:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cHrHOOzkJLmveeZANYODO2zTXICwZnTLMZz5AhTSp1Mdmu5nQnL+wmw63TQg3CwIsed1LBVXGxRvTlNWMJwp76nUGXyc8960LaJ1eOlKhfILX0ld96QlB4wyqAvZT1weYskFbdFF4xydePMl1mFz9N5Ao/i9ICkiII/tfxBif6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NNtTK093; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C47D5C4CEE7;
+	Fri, 24 Oct 2025 01:13:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761268214;
-	bh=OLXoSnqBAFgBwoQMFtvAMOPLw94jaNvTQASIeLyNyII=;
+	s=k20201202; t=1761268425;
+	bh=E52/C2NI1v8LOeNlODaaZwoSzzKa4S3nQNDgy67egio=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WrKHmuPagZflA2cQbaM+uEDIZWz7+utTLmFSlMSAPNEEw+e+E1yQnm0YZ+3sskOqS
-	 qEtXImiN9VvvlIjlo6qCtvWgut2rDBAnCNhkTPNb93e7uoiU0Vvyyz4aon7zGDm/d9
-	 35g9lMWnqGFAW1mHhfkRQnVIYBEjU7KxUu5F405kPF3ShnXDxdmGqlL57HFnOPLSht
-	 z3Doxp2nBxo9ElMu2bt2yFm4xMyuqsEV+WG8LAk5nDoE3464Ym6qR9jlfKMl7Nexze
-	 bQtKShADtwAyzv5zY1mV3J59MgzusTVAH2ses4qh3Zl8oYa2eGPWDt+G/GeR1zKC1U
-	 PjZ9K9aEWyIvg==
-Date: Thu, 23 Oct 2025 18:10:12 -0700
+	b=NNtTK093imMpKanJSxAsIZmnS8ey1uab6wfwn+tI9uMTJlDmexMFDgg+gvV5Zd4nx
+	 LnIoKrQTk/JWVlYy19tad6hDNIiipggQ4qMoENFfcPLLoDSPT1dTh6N78Nr/OhoDvB
+	 tMfgm6k9kl85NsXHVaji+1rWne0+kSi7mskQXzf736FKGE9TwmGqoO540eqAM8hDKv
+	 2ZFINyal8rmWZYmH4fNXrfEOzKsABIin9zEZi3CuBj1RyB4WBGNyNlWgNv5BS6KL2X
+	 SgnU9uI1FQOKrI7rrdvOV/Gi097hwejFgosOVjTHKnBPVcdsMdeXBgJSCrWPM/B7He
+	 tqJILxY+5TQNQ==
+Date: Thu, 23 Oct 2025 18:13:43 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Oleksij Rempel <o.rempel@pengutronix.de>
 Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
@@ -55,12 +55,12 @@ Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
  netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
  linux-doc@vger.kernel.org, Michal Kubecek <mkubecek@suse.cz>, Roan van Dijk
  <roan@protonic.nl>
-Subject: Re: [PATCH net-next v7 3/5] ethtool: netlink: add lightweight MSE
- reporting to LINKSTATE_GET
-Message-ID: <20251023181012.6bf107a6@kernel.org>
-In-Reply-To: <20251020103147.2626645-4-o.rempel@pengutronix.de>
+Subject: Re: [PATCH net-next v7 2/5] ethtool: netlink: add
+ ETHTOOL_MSG_MSE_GET and wire up PHY MSE access
+Message-ID: <20251023181343.30e883a4@kernel.org>
+In-Reply-To: <20251020103147.2626645-3-o.rempel@pengutronix.de>
 References: <20251020103147.2626645-1-o.rempel@pengutronix.de>
-	<20251020103147.2626645-4-o.rempel@pengutronix.de>
+	<20251020103147.2626645-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,34 +70,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 20 Oct 2025 12:31:45 +0200 Oleksij Rempel wrote:
-> Extend ETHTOOL_MSG_LINKSTATE_GET to optionally return a simplified
-> Mean Square Error (MSE) reading alongside existing link status fields.
-> 
-> The new attributes are:
->   - ETHTOOL_A_LINKSTATE_MSE_VALUE: current average MSE value
->   - ETHTOOL_A_LINKSTATE_MSE_MAX: scale limit for the reported value
->   - ETHTOOL_A_LINKSTATE_MSE_CHANNEL: source channel selector
-> 
-> This path reuses the PHY MSE core API (struct phy_mse_capability and
-> struct phy_mse_snapshot), but only retrieves a single value intended for
-> quick link-health checks:
->   * If the PHY supports a WORST channel selector, report its current
->     average MSE.
->   * Otherwise, if LINK-wide measurements are supported, report those.
->   * If neither is available, omit the attributes.
-> 
-> Unlike the full MSE_GET interface, LINKSTATE_GET does not expose
-> per-channel or peak/worst-peak values and incurs minimal overhead.
-> Drivers that implement get_mse_capability() / get_mse_snapshot() will
-> automatically populate this data.
-> 
-> The intent is to provide tooling with a "fast path" health indicator
-> without issuing a separate MSE_GET request, though the long-term overlap
-> with the full interface may need reevaluation.
+On Mon, 20 Oct 2025 12:31:44 +0200 Oleksij Rempel wrote:
+> +      -
+> +        name: supported-caps
+> +        type: nest
+> +        nested-attributes: bitset
+> +        enum: phy-mse-capability
 
-I don't think this justification is sufficient, we don't normally
-duplicate information in uAPI to make user space have to issue
-fewer calls. ethtool $link already issues a number of calls to
-the kernel.
+This is read only, does it really have to be a bitset?
+YNL will generate the string table automatically for user space to map
+the bits to names. And we have to do a bunch of const_ilog2() and render
+the MASK in the uAPI...
 
