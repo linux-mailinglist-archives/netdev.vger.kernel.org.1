@@ -1,153 +1,123 @@
-Return-Path: <netdev+bounces-232566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C9B3C069EC
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:09:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1D6FC06A4B
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:13:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 62388564B45
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:09:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 46736540592
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:11:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E52321F51;
-	Fri, 24 Oct 2025 14:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12E03218BA;
+	Fri, 24 Oct 2025 14:11:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="hlVWpuEo";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Q3qANt1i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BBL/0gMF"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-b8-smtp.messagingengine.com (flow-b8-smtp.messagingengine.com [202.12.124.143])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C8B31814A;
-	Fri, 24 Oct 2025 14:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624DD186E40;
+	Fri, 24 Oct 2025 14:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761314920; cv=none; b=bIZwyYOF/2PbpKOMKnewspX4vNdkrR4gNlEMt4uxz3ixb4VUqifHp6ERPdW2Tu5GljA58BTfGUCfaXntArIQ5zLJ5hjuoLrKVCSMKPl7rx8YSX/BPKXhizUYk3eIJVOx16skUAVEbnqjGRyPAKw2s/SiZPo4LggJxHyV7RkWSEI=
+	t=1761315105; cv=none; b=muj2LB5VBnEBemqBU3s3uKwSqYX4a1uoEvGbVZQw8d4bg7eB2/edmz7EYjq5pW5WsQt/8WLkmfaiwaNXnzzclaai7PhouexvLcvu68d1huqpZNwRcKsKnyCs5ByHAUxSa+Xx6an3RfcTArPCdaHtfKd9vm4qZTu4O1Sw0VD1rpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761314920; c=relaxed/simple;
-	bh=VB7MUbFzQw0hGAqr2p+CQiUuP9dG3eG52n6sxVb7FEk=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=Kn2EGa8N1ppsuIUSU6uAfpeEARpbX/XGo5RvU0xrWrMURr/3d58/k0aUW8VpAK6OybhfNsI/CBCKMchy2MuGPRfxlahOqDyh1m2K3gE2IILuvYRGfMOUmz3EphKnBOqwV65MPhFemfhbl/oQ0ze15RP7vF8g4GU9gfpFsGxHo4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=hlVWpuEo; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Q3qANt1i; arc=none smtp.client-ip=202.12.124.143
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailflow.stl.internal (Postfix) with ESMTP id AEEFD13006B5;
-	Fri, 24 Oct 2025 10:08:37 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-05.internal (MEProxy); Fri, 24 Oct 2025 10:08:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1761314917;
-	 x=1761322117; bh=Cb+ptnx07ebPr7o44PcZpvCH+xBEfVRPWdIj9Bu8PAI=; b=
-	hlVWpuEowvcQ6T6uZqLHfrUU9JlFXqGHcV8BHQkCM0MzrkM4uyGfftYu1MeCSqni
-	QUWKUgEfY83yORtU0utfCF2h4y0inSZNJyvQdZtaxL5NNctp0Xdcf53q8wtR7E9c
-	xvUMbDaI5R/3AGOwHOlOGpQBi0tChugU5qRNoml9LZuXqNSMOYFRH0KMgVHAT0/I
-	gRfJh3uJDQGKxtA/lwkNSoeG9L92ihfF9XSiEwauzOyY80tA/Mge612399gJSGxJ
-	kUpnX157bWwSifx3GLcd8eaEmERuOkWZSJgFDhu6CRNExLfKS6Jh7urUEzMXadoB
-	zoGexToHJXiWQMTgw8ynEA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1761314917; x=
-	1761322117; bh=Cb+ptnx07ebPr7o44PcZpvCH+xBEfVRPWdIj9Bu8PAI=; b=Q
-	3qANt1i+zXY6oUOAlXErT5FKFmPLwU+e0ZdhkeYCRbn8e8NVgiOQoa4NhDvRL+0Z
-	J7MIR9cWPfn96kD8nYrOZVFb1vlglmDP24GBi5iYU7+0GVoSgwVdXyL0h68qPMVR
-	BXD02sO1Ls9m7FOWtVaMLms+Wjv6KgV5URYsYaJJKChl87/+WPQE3QmDyrsZxrBH
-	X8564wcaN4vIXrhYz9ggib+c0Nsm/xbM2LwhrMasDqVksXgZwAev+id6/75mFMHP
-	Tsw4pQwkaJl1IZC2JzW+5LizuevV3AdysERGuzFlTqHnujuGdElQWJMaDBX8ZCDB
-	i4vO+HXb1nqngVqDTnkGA==
-X-ME-Sender: <xms:ZIj7aA3Eg3Y0rlzk26ezjCER1IzRbSwN2wjgyobpPn-bU88Qf21ZAQ>
-    <xme:ZIj7aF77yLXSQjINknf_EQXACdywcpQQUYKqCnaMnAKK8PTIjJT8EVsUlpIE2YeBc
-    9Ly1OQd9u0EbOnRqmT7Y1GJn6AczAC_Jx25CRn-xdDC47-qzdNu>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddugeelheegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
-    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
-    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
-    necuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
-    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepvddvpdhmohguvgepshhmthhpohhu
-    thdprhgtphhtthhopehmiiigrhgvrghrhiestdhpohhinhhtvghrrdguvgdprhgtphhtth
-    hopehhrghnnhgvshestghmphigtghhghdrohhrghdprhgtphhtthhopegthihphhgrrhes
-    tgihphhhrghrrdgtohhmpdhrtghpthhtoheprghmihhrjeefihhlsehgmhgrihhlrdgtoh
-    hmpdhrtghpthhtohepuggrrghnrdhjrdguvghmvgihvghrsehgmhgrihhlrdgtohhmpdhr
-    tghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehjrg
-    hnnhhhsehgohhoghhlvgdrtghomhdprhgtphhtthhopeiisgihshiivghksehinhdrfigr
-    fidrphhlpdhrtghpthhtohepsghrrghunhgvrheskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:ZYj7aG4UJ2M8mc3pnSzWeFpW2CG5XHRvFuvCPGbR3JoK59nl83qsmQ>
-    <xmx:ZYj7aBPgrinlB_DSWtycLsEcaniQY6W2WbSpix2NBrnlgimoI32iDQ>
-    <xmx:ZYj7aH7BdLb6AqXBIH_FZBmjsIWL8OL5ThWIUAzV5tYwajH9yU0IbA>
-    <xmx:ZYj7aIzWcoJTsQ_UTsWxc6_N0j7AIb1XaVzd0jMwaWXpD3G9F5ukbQ>
-    <xmx:ZYj7aPDZv86yheOLByNFoKdlBVjT8Z9V_vZax3GzdYaa2VPAbx1q-aCp>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id DCF42700054; Fri, 24 Oct 2025 10:08:36 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1761315105; c=relaxed/simple;
+	bh=A2ibR8D3vX5O91d0A6dlXuJ33auKQkMfaPv3Zg/W9+8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZB/p3dOAgnUddBU+Fi0lXwpw7voXFbL6PSTG97f6IbO5/zHZX1RArPl0GqP27YxrjkGxGFj1EI/Vep6MjCLehZZvFUVeSES9AOhj3F8HSMtjhcu93L6wIA7IT4Gn0iud4LBRHrMPt7g+0PZbbGyyZxhd5HO9v0jVq7/zh89xMKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BBL/0gMF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1996AC4CEF1;
+	Fri, 24 Oct 2025 14:11:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761315104;
+	bh=A2ibR8D3vX5O91d0A6dlXuJ33auKQkMfaPv3Zg/W9+8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BBL/0gMFAB6iXWn/03INztg9bjGFUFVZB5eEkShmlnZW6695iBe3ceBH7QqlkxLDu
+	 nF6DS3kY/hsSXGtbh3Nxk7Co4cRPzlPx//JB5m+xT2RmdIBEeH4YhCnuBClgHEkxOF
+	 TzjCuo9FD2PPHxhnIOKKdCZU0iw6F2v5AkruSO1vsmyNPpZgNlb1gVWIotAWmdcL7J
+	 nL2MB7mV5ifb7Y7EkH9R/jEE5kV0lq28zC2GmIJIniekDVOQ5pHjfExxhIYDXkYi3C
+	 5YSx+ApTyOqtJhIHDgos29oXb9L0QedvgUuT2eYn42m4MNZNdNZMbKC3GqbYlOaYK4
+	 dqC39Qu5dgZDA==
+Date: Fri, 24 Oct 2025 19:41:40 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Stephen Boyd <sboyd@kernel.org>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Andrzej Hajda <andrzej.hajda@intel.com>,
+	Robert Foss <rfoss@kernel.org>, Moritz Fischer <mdf@kernel.org>,
+	Xu Yilun <yilun.xu@intel.com>, Bartosz Golaszewski <brgl@bgdev.pl>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Georgi Djakov <djakov@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Joerg Roedel <joro@8bytes.org>,
+	Jassi Brar <jassisinghbrar@gmail.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Sebastian Reichel <sre@kernel.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-clk@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-fbdev@vger.kernel.org, dmaengine@vger.kernel.org,
+	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org,
+	linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+	linux-pm@vger.kernel.org, iommu@lists.linux.dev,
+	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-phy@lists.infradead.org,
+	linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-sound@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: Remove extra blank lines
+Message-ID: <aPuJHM6SRbMpAZ8t@vaman>
+References: <20251023143957.2899600-1-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AvgbtRMgB1Po
-Date: Fri, 24 Oct 2025 16:08:16 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Christian Brauner" <brauner@kernel.org>, linux-fsdevel@vger.kernel.org,
- "Josef Bacik" <josef@toxicpanda.com>, "Jeff Layton" <jlayton@kernel.org>
-Cc: "Jann Horn" <jannh@google.com>, "Mike Yuan" <me@yhndnzj.com>,
- =?UTF-8?Q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
- "Lennart Poettering" <mzxreary@0pointer.de>,
- "Daan De Meyer" <daan.j.demeyer@gmail.com>,
- "Aleksa Sarai" <cyphar@cyphar.com>, "Amir Goldstein" <amir73il@gmail.com>,
- "Tejun Heo" <tj@kernel.org>, "Johannes Weiner" <hannes@cmpxchg.org>,
- "Thomas Gleixner" <tglx@linutronix.de>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>, "Jan Kara" <jack@suse.cz>,
- linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, bpf@vger.kernel.org,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- Netdev <netdev@vger.kernel.org>
-Message-Id: <cfefa1c8-4cd2-478e-8c68-627a0a767f7d@app.fastmail.com>
-In-Reply-To: 
- <20251024-work-namespace-nstree-listns-v3-18-b6241981b72b@kernel.org>
-References: 
- <20251024-work-namespace-nstree-listns-v3-0-b6241981b72b@kernel.org>
- <20251024-work-namespace-nstree-listns-v3-18-b6241981b72b@kernel.org>
-Subject: Re: [PATCH v3 18/70] arch: hookup listns() system call
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251023143957.2899600-1-robh@kernel.org>
 
-On Fri, Oct 24, 2025, at 12:52, Christian Brauner wrote:
-> Add the listns() system call to all architectures.
->
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
-
-This looks correct to me,
-
-Reviewed-by: Arnd Bergmann <arnd@arndb.de>
-
-> diff --git a/include/uapi/asm-generic/unistd.h 
-> b/include/uapi/asm-generic/unistd.h
-> index 04e0077fb4c9..942370b3f5d2 100644
-> --- a/include/uapi/asm-generic/unistd.h
-> +++ b/include/uapi/asm-generic/unistd.h
-> @@ -857,9 +857,11 @@ __SYSCALL(__NR_open_tree_attr, sys_open_tree_attr)
->  __SYSCALL(__NR_file_getattr, sys_file_getattr)
->  #define __NR_file_setattr 469
->  __SYSCALL(__NR_file_setattr, sys_file_setattr)
-> +#define __NR_listns 470
-> +__SYSCALL(__NR_listns, sys_listns)
+On 23-10-25, 09:37, Rob Herring (Arm) wrote:
+> Generally at most 1 blank line is the standard style for DT schema
+> files. Remove the few cases with more than 1 so that the yamllint check
+> for this can be enabled.
 > 
->  #undef __NR_syscalls
-> -#define __NR_syscalls 470
-> +#define __NR_syscalls 471
-> 
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 
-I still need to remove this unused file, but that is my problem,
-not yours. No need to add patch 71 to your series ;-)
+Acked-by: Vinod Koul <vkoul@kernel.org>
 
-    Arnd
+-- 
+~Vinod
 
