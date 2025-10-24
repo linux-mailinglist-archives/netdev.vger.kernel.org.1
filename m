@@ -1,187 +1,243 @@
-Return-Path: <netdev+bounces-232578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B8F8C06C3E
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:47:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2226C06C56
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:48:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6C0494E1E29
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:47:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 94B4F4E41A0
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D7620F079;
-	Fri, 24 Oct 2025 14:47:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33435233735;
+	Fri, 24 Oct 2025 14:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="myKeebTQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gk8bG6Fe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5EC230270
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 14:47:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672F1242D6F
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 14:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761317265; cv=none; b=X0k6vwQU2I6SWgaEr4ba+eM3iLF8fV2U5cTkvgwx87OF2eIIg4yA1DrHlwk5cYRgxwSOMTSLAOuDecypAysM5tONXWlcmz2LO12GeGx3SaUHSDZ2F0MpqnvIDkEcFz08c7aLC8d3m59vp1yA7mSXA+/Gc8Ivk6x5SZIotSNClqc=
+	t=1761317304; cv=none; b=NvcajYpibH80Trb76VbM85EBZ5e7JtHR2rd9JpWzjvIorUgNWmMgUDzfGe3A9xA3tp3/7imh5oTFkSu8NE3aiP7cSNNOIiof+WtqsVECGFVZe05ltOVCxNk0DbGlMTWERcSgBoWIa4Q30k9DRt06p6eRhcA5wY+dSnYtFZdTYdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761317265; c=relaxed/simple;
-	bh=g0OQj2odqnKGjjUCjL4JSUE+49bnKRi0zUdHPIjn5Po=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UuR/eozJnbGeXSio/ikhSpZ6w6SdRTFej2QcLP5k1PiihvZMkDKUqkElN548EpXxjpfrQseeTYHzQHKErtYTJYdnP6LHy7K6UggBUGgmlLcBC3sLjTf3HiX0J8UlLvrG0TQvZ+TrjjEfoWYtM37Gqj3r/5WiAKo4i3Ew+nrrfTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=myKeebTQ; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4e88cacc5d9so18994601cf.0
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 07:47:43 -0700 (PDT)
+	s=arc-20240116; t=1761317304; c=relaxed/simple;
+	bh=0jMM1wYOZVVDSwxT4cFzdZUe+9j1Dgac2qCcTr6Wbuk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=JNuLM75s3jwAQvaReIa0Eq0/sIiLxAhMajm+NVkJVA1mK8tcTIRIM1nVSWhL3l/NOztpNzhkAZdQg+pe0AECs8CuKIo1RFAHIGygsZIww1/J/WkshXfz/SPt4reekhjllVlojPvTc3uiwi9TUyX7jMvw16+xLbkLz5GHAhNEyzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gk8bG6Fe; arc=none smtp.client-ip=209.85.222.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-932c247fb9aso887399241.2
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 07:48:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761317263; x=1761922063; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1761317301; x=1761922101; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4zsathjUD8Tufz0Hkfd/J7QuTnTEjh6BgaqtFOpsb0E=;
-        b=myKeebTQW/DXzYuQuQZ0Di+cldBua/d+py3z4rWvsjsfzwF4eV+y7FmOSu7sKqScNm
-         039lvedbzJy3aT6SCFFcrS7GKGIWpn+TUMu6MRqXO4dCdw5BiNUtCbxczHj6flPnFBhf
-         aCGjEs+7l+2GLpdtf14ihCTRy2efInayMH2NjYh1Y8b09oJwPutTGjXDGBulh8LYK0vA
-         nB0+ozz+WipzGy53FitbLw5hSsP+c3FjSpnoeeNmASzo1+O69FDcmRgPFsKmKePgowxr
-         T0UJ4YC7LANsTEQGiqiVfrfK+4SefRbi7Ubrov0ocQ6vqanArdUo8ptrQWQCPqzzxvLN
-         RXeA==
+        bh=7B82nDB9ireFKjPrxyVD+jWmcw9kN5uE/UhHOHx832I=;
+        b=Gk8bG6FegYkXdG1HjlY3pvy4Q5b5cB6ul1V2FaFubtSO+xszGlAgarV0HM+1CLxUzL
+         hA8uci+s5RD2+4taO98wbMyv4PIbNxO2G9Afzty5TzGROtXmU7iwsiBLwLR4iwg46TUU
+         yGTb6Nv3e8y8+S2oaBvckzYiRFVWZD6uufKYb5d6OiNhrwIR8J4j3lNM9lP3zEODlk7d
+         Dg3uC07bX/ctLzsbavoPUHruTIRi1AuXLFNAEgFChRYo/fowJUOIx4HapNqiQMiH7uwR
+         jVHKDXdBTLLQUaRCmQ76ZCmb+kDEddIwW6yilCMUXI2F1zVO4FFPJ4pmjPMDiUQLkKjg
+         Dwkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761317263; x=1761922063;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4zsathjUD8Tufz0Hkfd/J7QuTnTEjh6BgaqtFOpsb0E=;
-        b=rZt3O74o1oHKIZZXM1qU8fhE07dihc1k1GG3MzjESfJha1ze5G308ZZCR2zH+kYk0X
-         7xD8Aa4Gad7+twS71uZcoIJIixAhNBuXj2j4W6ihLIpwt9mL3NH9NuCauAj291nlqW/J
-         GOGmouQSWDMjh9V36TmMR632B6OhYioGDRvpCScqXfsV5Mh2ejphahT/nN5yVu0k4NUP
-         j/XlWb0IsYHkLezgQ+ISTjfApZF1T5zC6SiYFj8GeN33ODRXCZ30/b9kSM2TZP3ZcpT/
-         q8uCMJbho7w8zHEbIMwC2EerZbNb4NODqDcSgk1WiMyWM01BGiU+xMcIjiwfCw9QlqNL
-         xSFw==
-X-Forwarded-Encrypted: i=1; AJvYcCVN7jGD0MSuaTkAb1AKjDBhqbxYWYYoTu0TESakXdUDzJwprwij3GFw3143WWuE+dO7T9IxqjE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHDPXSrWKKaVwP5ZtYiYd+cClLSIdDrX28nD4prqZZDxeapTrd
-	p7dDw3mf55ZYfSILhHIWg5NfoE+0zVbhBXq9I98ALNE4HQqs6eL+5UDCczL6Z/8ix0D8U40bkQR
-	8HG8VKOaN1Pb5tYzVMGJZKeBHSso4i7hCXIVHaf46
-X-Gm-Gg: ASbGncsLIi7bd2xaCYa5Ic2FJPqjM3KsNULdQkZfH4delzyCviWa38Lh7H+C2RPhVwX
-	CP+OhKknzQlXhb8gisS/5u7IXtoy/3vqmqh4vjTMDtC/fFbHHmaE+osXZAdQD0RgoEpbkjqLXVP
-	ykr1vwWXiFWvI+AU+iV62s0xAAqBYRQZ9uVy44Kd8ST4KHAvOc25Wy8ehj9GTexYdmdYeCBDuD8
-	ioOGVV5bFms7JSpAUw5VDZCoCL83ylXACqLNC395MQyDYJW4N5pSZ99sV9kXe4OqITjnQ==
-X-Google-Smtp-Source: AGHT+IFrRie5LZwAXyGo8VdA/dW0Kw6zQOvMyJ84skrhz0SomwbTbyAoOgLOsZ/ffDKChWlscWABZ7AWSLtoQ3SeUFY=
-X-Received: by 2002:ac8:5e0c:0:b0:4e8:a870:a608 with SMTP id
- d75a77b69052e-4e8a870ab1emr345457141cf.76.1761317262327; Fri, 24 Oct 2025
- 07:47:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761317301; x=1761922101;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=7B82nDB9ireFKjPrxyVD+jWmcw9kN5uE/UhHOHx832I=;
+        b=NNaIiq/BnZf6zZ80jPegTMx5n5a/9eebmCDxMCS3YE/J7jbEqKkyvJ9Bb1J5jTFPWZ
+         tjJChb3wRBrDGIrKRNKacIDM5XGgKJyqwoxvEuvZquWMSnXqaAWNPSqtBq0jKN0Px9Vu
+         s91lktxwF6QVajf0Cfj+X+8a+U1DGkdc50MTZQnMDD/YSofLkqVzw+10QqpuOXCypXd9
+         t5KXneOFxhCWBz/07j1wUBIvQfqF+p3aoHhC8HwvTJA/k3fKlI8Sntb+qaeXPtaKIdSU
+         XVa6LiWOIClZChRL3zlY+ht9apfK/+OxdPb4fm8eh/YkioHOROyFVdypvbNeNFkWc/5P
+         EJEg==
+X-Forwarded-Encrypted: i=1; AJvYcCXA8ojH54kz5+iT3kJFSGuo4Ip4Xrs5s2jxnx55WeZRco92k+XU3HwqLTqykj5qEOg0zXi3zeA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTj2bKLTkWazULS0PKH1ivAaPF/Mf3RVn/hpHzYDRyc+0tWgfO
+	YFnbD+EcnDZpsol9EeOAaDuENB8bmUadCGOkYBsuY7X6n18IZv81GY7N
+X-Gm-Gg: ASbGnctL1synYNOnzeYjciZhh1rPHx8FORxgszayGtf7URaT4TQbDD/W5+amwfd5BX+
+	xpvyOJ9xJ1ufCh8tXTEc6p2H7+iyIY5HDlyhtROje2GN+0aROrUQvPEFlEaLETrHYlcgBj5sa3S
+	ACGbV6P+1qvNvflMEkHkGKmwLF15xC0J9CaqrAB0tz/cUzq1R8u4IV6Fq1cZ50d31VgJhBHUfD4
+	EtwQhOQggRPLqbl2oijsw2VO9omqh5oLuwpLTIbtxqqeNa5p5UD8rgoJT8X32+UE5M0pZZ64LWp
+	0r2ueHgbPNjhgnHW9mCD4VOU6B3l06urJ4EFqIwxCKH9qyjH17QPmQrxWNp7i5f03Mw4TiBPdu1
+	wNhnKaQh4qg5udQ+0m/SHav48iJ7Z/6fExKS3gEJi1EMNIDUBpJ/pjax7tNoFQp195gUBO2bzfs
+	VA4vabhPjLtFcmjbzr32Hu3iF09ycaEwSB6nQfzax1ZOTvwL7nOLMpHti2E73WrGc=
+X-Google-Smtp-Source: AGHT+IHwUj1UGZPq4japhLxPuwlciVfLWtRzXl24HeV3YNAXWLEASniwcLfN7MYaay9sE494z8nl3A==
+X-Received: by 2002:a05:6102:3a0a:b0:5d5:f6ae:38ca with SMTP id ada2fe7eead31-5db2e5b4d6cmr1881460137.41.1761317300887;
+        Fri, 24 Oct 2025 07:48:20 -0700 (PDT)
+Received: from gmail.com (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with UTF8SMTPSA id ada2fe7eead31-5db2cca25a9sm2128784137.14.2025.10.24.07.48.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Oct 2025 07:48:20 -0700 (PDT)
+Date: Fri, 24 Oct 2025 10:48:20 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <willemdebruijn.kernel.1ba874bc7bc@gmail.com>
+In-Reply-To: <CANn89iLidq+WTYkg2-U6g8tK5W=squKoQcYECc=RjF_h7-g-wg@mail.gmail.com>
+References: <20251024090517.3289181-1-edumazet@google.com>
+ <willemdebruijn.kernel.249e3b8331c2c@gmail.com>
+ <CANn89iLidq+WTYkg2-U6g8tK5W=squKoQcYECc=RjF_h7-g-wg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: optimize enqueue_to_backlog() for the fast
+ path
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251024075027.3178786-1-edumazet@google.com> <20251024075027.3178786-3-edumazet@google.com>
- <67abed58-2014-4df6-847e-3e82bc0957fe@redhat.com> <CANn89iLjPLbzBprZp3KFcbzsBYWefLgB3witokh5fvk3P2SFsA@mail.gmail.com>
- <44b10f91-1e19-48d0-9578-9b033b07fab7@kernel.org>
-In-Reply-To: <44b10f91-1e19-48d0-9578-9b033b07fab7@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 24 Oct 2025 07:47:31 -0700
-X-Gm-Features: AS18NWBzi8QtBKdD5zQiZ8is6b_JvGVdtA3bpgRArMUuLXYqOKpQhORIPeWKac0
-Message-ID: <CANn89iKgqF_9pn6FeyjKtq-oVS-TsYYhvyVRbOs3RzYqXY0DWQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] tcp: add newval parameter to tcp_rcvbuf_grow()
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 24, 2025 at 7:02=E2=80=AFAM Matthieu Baerts <matttbe@kernel.org=
-> wrote:
->
-> Hi Eric,
->
-> On 24/10/2025 13:19, Eric Dumazet wrote:
-> > On Fri, Oct 24, 2025 at 3:09=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
- wrote:
-> >>
-> >> Hi Eric,
-> >>
-> >> Many thanks for tracking this down!
-> >>
-> >> Recently we are observing mptcp selftests instabilities in
-> >> simult_flows.sh, Geliang bisected them to e118cdc34dd1 ("mptcp: rcvbuf
-> >> auto-tuning improvement") and the rcvbuf growing less. I *think* mptcp
-> >> selftests provide some value even for plain tcp :)
-> >>
-> >> On 10/24/25 9:50 AM, Eric Dumazet wrote:
-> >>> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-> >>> index 94a5f6dcc5775e1265bb9f3c925fa80ae8c42924..2795acc96341765a3ec65=
-657ec179cfd52ede483 100644
-> >>> --- a/net/mptcp/protocol.c
-> >>> +++ b/net/mptcp/protocol.c
-> >>> @@ -194,17 +194,19 @@ static bool mptcp_ooo_try_coalesce(struct mptcp=
-_sock *msk, struct sk_buff *to,
-> >>>   * - mptcp does not maintain a msk-level window clamp
-> >>>   * - returns true when  the receive buffer is actually updated
-> >>>   */
-> >>> -static bool mptcp_rcvbuf_grow(struct sock *sk)
-> >>> +static bool mptcp_rcvbuf_grow(struct sock *sk, u32 newval)
-> >>>  {
-> >>>       struct mptcp_sock *msk =3D mptcp_sk(sk);
-> >>>       const struct net *net =3D sock_net(sk);
-> >>> -     int rcvwin, rcvbuf, cap;
-> >>> +     u32 rcvwin, rcvbuf, cap, oldval;
-> >>>
-> >>> +     oldval =3D msk->rcvq_space.copied;
-> >>> +     msk->rcvq_space.copied =3D newval;
-> >>
-> >> I *think* the above should be:
-> >>
-> >>         oldval =3D msk->rcvq_space.space;
-> >>         msk->rcvq_space.space =3D newval;
-> >>
+Eric Dumazet wrote:
+> On Fri, Oct 24, 2025 at 7:03=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
 > >
-> > You are right, thanks for catching this.
+> > Eric Dumazet wrote:
+> > > Add likely() and unlikely() clauses for the common cases:
+> > >
+> > > Device is running.
+> > > Queue is not full.
+> > > Queue is less than half capacity.
+> > >
+> > > Add max_backlog parameter to skb_flow_limit() to avoid
+> > > a second READ_ONCE(net_hotdata.max_backlog).
+> > >
+> > > skb_flow_limit() does not need the backlog_lock protection,
+> > > and can be called before we acquire the lock, for even better
+> > > resistance to attacks.
+> > >
+> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > Cc: Willem de Bruijn <willemb@google.com>
+
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+
+> > > ---
+> > >  net/core/dev.c | 18 ++++++++++--------
+> > >  1 file changed, 10 insertions(+), 8 deletions(-)
+> > >
+> > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > index 378c2d010faf251ffd874ebf0cc3dd6968eee447..d32f0b0c03bbd069d36=
+51f5a6b772c8029baf96c 100644
+> > > --- a/net/core/dev.c
+> > > +++ b/net/core/dev.c
+> > > @@ -5249,14 +5249,15 @@ void kick_defer_list_purge(unsigned int cpu=
+)
+> > >  int netdev_flow_limit_table_len __read_mostly =3D (1 << 12);
+> > >  #endif
+> > >
+> > > -static bool skb_flow_limit(struct sk_buff *skb, unsigned int qlen)=
+
+> > > +static bool skb_flow_limit(struct sk_buff *skb, unsigned int qlen,=
+
+> > > +                        int max_backlog)
+> > >  {
+> > >  #ifdef CONFIG_NET_FLOW_LIMIT
+> > > -     struct sd_flow_limit *fl;
+> > > -     struct softnet_data *sd;
+> > >       unsigned int old_flow, new_flow;
+> > > +     const struct softnet_data *sd;
+> > > +     struct sd_flow_limit *fl;
+> > >
+> > > -     if (qlen < (READ_ONCE(net_hotdata.max_backlog) >> 1))
+> > > +     if (likely(qlen < (max_backlog >> 1)))
+> > >               return false;
+> > >
+> > >       sd =3D this_cpu_ptr(&softnet_data);
 > >
-> > I developed / tested this series on a kernel where MPTCP changes were
-> > not there yet.
+> > I assume sd is warm here. Else we could even move skb_flow_limit
+> > behind a static_branch seeing how rarely it is likely used.
+> =
+
+> this_cpu_ptr(&ANY_VAR) only loads very hot this_cpu_off. In modern
+> kernels this is
+> =
+
+> DEFINE_PER_CPU_CACHE_HOT(unsigned long, this_cpu_off);
+> =
+
+> rest is in the offsets used in the code.
+> =
+
 > >
-> > Only when rebasing to net-next I realized MPTCP had to be changed.
->
-> Thank you for the fix, and for having adapted MPTCP as well!
->
-> >> mptcp tracks the copied bytes incrementally - msk->rcvq_space.copied i=
-s
-> >> updated at each rcvmesg() iteration - and such difference IMHO makes
-> >> porting this kind of changes to mptcp a little more difficult.
-> >>
-> >> If you prefer, I can take care of the mptcp bits afterwards - I'll als=
-o
-> >> try to remove the mentioned difference and possibly move the algebra i=
-n
-> >> a common helper.
+> > > @@ -5301,19 +5302,19 @@ static int enqueue_to_backlog(struct sk_buf=
+f *skb, int cpu,
+> > >       u32 tail;
+> > >
+> > >       reason =3D SKB_DROP_REASON_DEV_READY;
+> > > -     if (!netif_running(skb->dev))
+> > > +     if (unlikely(!netif_running(skb->dev)))
+> > >               goto bad_dev;
 > >
-> > Do you want me to split this patch in two parts or is it okay if I
-> > send a V2 with
-> > the a/msk->rcvq_space.copied/msk->rcvq_space.space/ ?
->
-> If you send a v2, could it eventually target "net" instead please?
->
-> If the idea is to delay the fix to stable, it is always possible to ask
-> the stable team to backport it to stable in a few weeks / months, e.g.
->
->   Cc: <stable@vger.kernel.org> # after -rc6
->
+> > Isn't unlikely usually predicted for branches without an else?
+> =
 
-I usually stack multiple patches, and net-next allows for less merge confli=
-cts.
+> I am not sure this is a hardcoded rule that all compilers will stick wi=
+th.
+> Do you have a reference ?
 
-See for instance
-https://lore.kernel.org/netdev/20251024120707.3516550-1-edumazet@google.com=
-/T/#u
-which touches tcp_rcv_space_adjust(), and definitely net-next candidate.
+Actually I was thinking CPU branch prediction if no prior data.
 
-Bug was added 5 months ago, and does not seem critical to me
-(otherwise we would have caught it much much earlier) ?
+According to the Intel=C2=AE 64 and IA-32 Architectures
+Optimization Reference Manual, Aug 2023, 3.4.1.2 Static Prediction
 
-Truth be told, I had first to fix TSO defer code, and thought the fix
-was not good enough.
+Branches that do not have a history in the BTB (see Section 3.4.1)
+are predicted using a static prediction algorithm:
+- Predict forward conditional branches to be NOT taken.
+[..]
+
+But online threads mention that there even for x86_64 between
+microarch generations there are differences on the actual
+prediction behavior, as well as of explicit prediction hints.
+And that's only Intel x86_64. So not a universal guide, perhaps.
+
+> >
+> > And that is ignoring both FDO and actual branch prediction hardware
+> > improving on the simple compiler heuristic.
+> =
+
+> Lets not assume FDO is always used, and close the gap.
+> This will allow us to iterate faster.
+> FDO brings its own class of problems...
+> =
+
+> >
+> > No immediately concerns. Just want to avoid precedence for others
+> > to sprinkle code with likely/unlikely with abandon. As is sometimes
+> > seen.
+> =
+
+> Sure.
+> =
+
+> I have not included a change on the apparently _very_ expensive
+> =
+
+> if (!__test_and_set_bit(NAPI_STATE_SCHED,
+>                                     &sd->backlog.state))
+> =
+
+> btsq   $0x0,0x160(%r13)
+> =
+
+> I tried to test the bit, then set it if needed, but got no
+> improvement, for some reason
+> (This was after the other patch making sure to group the dirtied
+> fields in a single cache line)
+
+
 
