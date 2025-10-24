@@ -1,55 +1,46 @@
-Return-Path: <netdev+bounces-232356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4138DC048C1
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 08:44:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B139AC048BB
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 08:44:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D93E3BAADE
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 06:44:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAAFB3BA818
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 06:44:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C7DB273D6C;
-	Fri, 24 Oct 2025 06:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KYtGg25+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C391923A9AE;
+	Fri, 24 Oct 2025 06:44:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827A51EE7DC
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 06:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C581EE7DC;
+	Fri, 24 Oct 2025 06:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761288267; cv=none; b=Q5ea39D3set9YtI5AaPs/XP6w04FxUvm7BbGHLPE/Q5LRsSaxblI5i5OgFw+HsAgmeQVaVZbois0jKw2EPCeM1z5dg+dTr3VlLEQ2PdAlUd/RVjuE3Ow/zGMoMI4ZRfrZRhfNcUcs+ExNVARk9sBneu/YUPvTkF2XUA2ElFbp8k=
+	t=1761288257; cv=none; b=kp7FZIcwrj4W+pMjOrfh0WTon48GYaMT23KrL4xoVacy6cqdjO8Woz7IDlWARAtUi4H5HvnVQaJsJuW+ysL/kz25DLrn18sYFcw/8QaH5gAnv39t4BmW+1M55Pa/r+fx7ubxfS50O8fpHb7/9YY+A6KbVKbpjz9V5e955o76rpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761288267; c=relaxed/simple;
-	bh=OMrkExLxeo5n6zdxsI3+y2dFchD/7zAtf9EgEGt265Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K8QIRKLpSh33VvjwYaSf1yU7OM4D0XBqQGPN4DmKdRdc4z2OjXb34ZCUDU1pIjoTtAier/lzUmfnflpPT3VJUfLkEFNzxo5kd4emz0BG7YsVSK+6hN84PNv+CkV/Mna6uA99urPLlITwgiDRwg+onkNUh8m4tSy/UwtQ0TFfAJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KYtGg25+; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 3A3BD1A1636;
-	Fri, 24 Oct 2025 06:44:20 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 0E44660703;
-	Fri, 24 Oct 2025 06:44:20 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 689A9102F244A;
-	Fri, 24 Oct 2025 08:44:09 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761288259; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=23XHfjip0xavJrBGmNRM/VDGO8Z67OrHnHQ9YooOSIE=;
-	b=KYtGg25+hcycycAL+yfAnApj7zKCwrcjHD0C1XmCTEWz6G7WnS9cc30XTSyOgJ7icxC/Rk
-	BqgI0luB56xoC4ypAxklxqw+6dS0yUfe7IIHk658RN8QGGhIaoGUoyCH36Ds/llVKwuL2G
-	cyXkCiSkeGeITCYPhWpveysp++p/PCtKkPKbcYWiK1O9O1S2hTqj3/KiknDuIrbPbEwx8N
-	9f89N0J4qw/LPTkrbdvkIapLZMRr96Mp0gc71NlRrw8JLnVAG48SlzxBF5BCoE0yj4PYzr
-	Lm2PpayjuUmiKTH+iCuMujhGHnik45A6axwDm0WHsU+hp71f45Jyrhhu62cuqA==
-Message-ID: <28d91eca-28dd-4e5b-ae60-021e777ee064@bootlin.com>
-Date: Fri, 24 Oct 2025 08:44:07 +0200
+	s=arc-20240116; t=1761288257; c=relaxed/simple;
+	bh=KJpXpAKN9nyKg+2cpmeiSgbQlrzUvUr7V7KWuCjx5Wc=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Elph4DtkpOPcCC0pCuBVxZv7uDL2G46xbHb8ibGPJHwHEqQk+cn6tXYvcZXrpYNY5kTItuGtPoWUz+vYckUW7juNEaI6WdM1ZzOkLAIUSYT1oHmFifU2jDD0jHZcsnyqrs2sa4IK5aTLEBE799p7x/6k01XF88O4rGHyNnQfXjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4ctCtJ3JgJz2Cg9b;
+	Fri, 24 Oct 2025 14:39:20 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 842A21A016C;
+	Fri, 24 Oct 2025 14:44:12 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 24 Oct 2025 14:44:11 +0800
+Message-ID: <b89389e7-7939-4c10-8522-6c8b6ce71b77@huawei.com>
+Date: Fri, 24 Oct 2025 14:44:11 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,66 +48,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/8] net: stmmac: hwif.c cleanups
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>
-References: <aPn3MSQvjUWBb92P@shell.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <aPn3MSQvjUWBb92P@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
+CC: <shaojijie@huawei.com>, <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <lantao5@huawei.com>,
+	<huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
+	<jonathan.cameron@huawei.com>, <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net 2/3] net: hibmcge: remove unnecessary check for
+ np_link_fail in scenarios without phy.
+To: Jacob Keller <jacob.e.keller@intel.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<andrew+netdev@lunn.ch>, <horms@kernel.org>
+References: <20251021140016.3020739-1-shaojijie@huawei.com>
+ <20251021140016.3020739-3-shaojijie@huawei.com>
+ <ebc90ce4-382b-4a0f-891a-5305599f9ae2@intel.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <ebc90ce4-382b-4a0f-891a-5305599f9ae2@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-Hello Russell,
 
-On 23/10/2025 11:36, Russell King (Oracle) wrote:
-> Hi,
-> 
-> This series cleans up hwif.c:
-> 
-> - move the reading of the version information out of stmmac_hwif_init()
->   into its own function, stmmac_get_version(), storing the result in a
->   new struct.
-> 
-> - simplify stmmac_get_version().
-> 
-> - read the version register once, passing it to stmmac_get_id() and
->   stmmac_get_dev_id().
-> 
-> - move stmmac_get_id() and stmmac_get_dev_id() into
->   stmmac_get_version()
-> 
-> - define version register fields and use FIELD_GET() to decode
-> 
-> - start tackling the big loop in stmmac_hwif_init() - provide a
->   function, stmmac_hwif_find(), which looks up the hwif entry, thus
->   making a much smaller loop, which improves readability of this code.
-> 
-> - change the use of '^' to '!=' when comparing the dev_id, which is
->   what is really meant here.
-> 
-> - reorganise the test after calling stmmac_hwif_init() so that we
->   handle the error case in the indented code, and the success case
->   with no indent, which is the classical arrangement.
-> 
->  drivers/net/ethernet/stmicro/stmmac/common.h |   3 +
->  drivers/net/ethernet/stmicro/stmmac/hwif.c   | 166 +++++++++++++++------------
->  2 files changed, 98 insertions(+), 71 deletions(-)
+on 2025/10/24 9:10, Jacob Keller wrote:
+>
+> On 10/21/2025 7:00 AM, Jijie Shao wrote:
+>> hibmcge driver uses fixed_phy to configure scenarios without PHY,
+>> where the driver is always in a linked state. However,
+>> there might be no link in hardware, so the np_link error
+>> is detected in hbg_hw_adjust_link(), which can cause abnormal logs.
+>>
+> Perhaps I am missing something here. You mention the driver is always in
+> a linked state, but that there could be no link in hardware?
+>
+> I'm not sure I properly understand whats going wrong here..
 
-I didn't have the bandwidth to do a full review, however I ran tests
-with this series on dwmac-socfpga and dwmac-stm32, no regressions found.
+No, fixed_phy is a fake PHY that is always in link state and will call adjust_link().
 
-For the series,
+If you are interested, you can take a look at the code for initializing the fixed PHY
+in the hibmcge driver: hbg_fixed_phy_init()
 
-Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Thanks,
+Jijie Shao
 
-Maxime
+>
+>> Therefore, in scenarios without a PHY, the driver no longer
+>> checks the np_link status.
+>>
+>> Fixes: 1d7cd7a9c69c ("net: hibmcge: support scenario without PHY")
+>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+>> ---
+>>   drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h | 1 +
+>>   drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c     | 3 +++
+>>   drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c   | 1 -
+>>   3 files changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
+>> index ea09a09c451b..2097e4c2b3d7 100644
+>> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
+>> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
+>> @@ -17,6 +17,7 @@
+>>   #define HBG_PCU_CACHE_LINE_SIZE		32
+>>   #define HBG_TX_TIMEOUT_BUF_LEN		1024
+>>   #define HBG_RX_DESCR			0x01
+>> +#define HBG_NO_PHY			0xFF
+>>   
+>>   #define HBG_PACKET_HEAD_SIZE	((HBG_RX_SKIP1 + HBG_RX_SKIP2 + \
+>>   				  HBG_RX_DESCR) * HBG_PCU_CACHE_LINE_SIZE)
+>> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
+>> index d0aa0661ecd4..d6e8ce8e351a 100644
+>> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
+>> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
+>> @@ -244,6 +244,9 @@ void hbg_hw_adjust_link(struct hbg_priv *priv, u32 speed, u32 duplex)
+>>   
+>>   	hbg_hw_mac_enable(priv, HBG_STATUS_ENABLE);
+>>   
+>> +	if (priv->mac.phy_addr == HBG_NO_PHY)
+>> +		return;
+>> +
+>>   	/* wait MAC link up */
+>>   	ret = readl_poll_timeout(priv->io_base + HBG_REG_AN_NEG_STATE_ADDR,
+>>   				 link_status,
+>> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
+>> index 37791de47f6f..b6f0a2780ea8 100644
+>> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
+>> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
+>> @@ -20,7 +20,6 @@
+>>   #define HBG_MDIO_OP_INTERVAL_US		(5 * 1000)
+>>   
+>>   #define HBG_NP_LINK_FAIL_RETRY_TIMES	5
+>> -#define HBG_NO_PHY			0xFF
+>>   
+>>   static void hbg_mdio_set_command(struct hbg_mac *mac, u32 cmd)
+>>   {
 
