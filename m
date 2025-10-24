@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-232600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3747C06FA2
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 17:30:30 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB720C06F81
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 17:29:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DE6F3A4878
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 15:26:27 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A1C8D4F439D
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 15:27:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE1731D727;
-	Fri, 24 Oct 2025 15:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B55326D53;
+	Fri, 24 Oct 2025 15:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g0KIq5/H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nIqDjPxl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F283AC1C
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 15:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0987326D68
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 15:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761319585; cv=none; b=VDw52Q0HblC4VyCkbeDpLaGGSj5V6rYKY8a7zSdFALQhN8T/vlCOuKO4uqaOB8AwzccjpBDCSEGnx/GJo2FViJ9JAnntx6JWrJHAnooFiON0C8JWKLYKwbTyUVUOJtyEugNBRrrt8kQoA9NYct+O2J6wVrIoe1EOC7gqCS4Em8E=
+	t=1761319670; cv=none; b=DNpjINuKg7fgpp70dRRgycJ57XQM5Jq1qGwRJ1ouzZynvit6nTDHU77n3BCLvc2rtpphuiKjt1iZ1fjZgOlw1lD9A/S0X9KqRLYPAztPKNcau9osG3fYdKnVtqZtHZY/v9vRaCIeYM3m7d3buQ458ineKKtMC4GOJ+YNFmEgoHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761319585; c=relaxed/simple;
-	bh=h/b/7B8erCyrj3JILyJdzAZuB7zL6Tarc/A8a8l+KZU=;
+	s=arc-20240116; t=1761319670; c=relaxed/simple;
+	bh=mZUwLoRhzQZCFpDyDkkPff1q32CTDK5uaQBs2fNy31U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JAvGfAW5dpBTutRKDVx1jV0oQqnT/tWrBMoRLRdqyCDwBnqpWjN5TWsunSijQhYP+1VrzxKT9P1+tJ3KxBi8VXFLe/QfqfuIjnFCd/zJBMKczXHupLMonfgTWqYEA8Ej7rhaa9Y1ofp59hbjoEBpcIU20pWe/pcfm2aH/gnKyQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g0KIq5/H; arc=none smtp.client-ip=209.85.214.169
+	 To:Cc:Content-Type; b=Tgp+hQ3YXPfGjjavDu5YwP4Cs6THUT1vKs43/YnEFsotFbjuQsESee/UnqciesHw+dMKh3S06caJ5h0FhZu6agBS53t4q/afL6fFTP+7w2uz7vwoCxxrC5p8aPBDFyaebTuF59k23EKOIptLqv+Vihr2S1Rw+SG//UI/wvfcSIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nIqDjPxl; arc=none smtp.client-ip=209.85.217.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2897522a1dfso21742005ad.1
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 08:26:23 -0700 (PDT)
+Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-5db2dc4e42dso2124262137.1
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 08:27:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761319583; x=1761924383; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761319668; x=1761924468; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h/b/7B8erCyrj3JILyJdzAZuB7zL6Tarc/A8a8l+KZU=;
-        b=g0KIq5/HZZf3ko/3+l2iddwU0TggiQp08dyB7an8s/wTYN7KiVTRI9A2dpf/E1JMMk
-         VTj4gGg6R7yT43GIQM7yI6ZDElG0esYFNVO/h7uS4GVFIR3lFrVyigu53FVnmuMeWOmE
-         7mR6OsnlC4vumadBl0SUfluN2NZChXhRc73DQopaGbchDoPNEsfM8BQRabowY9qFO/zp
-         v7sXQKMphHDhbUje1KldF96MmuOMniJdhflZJ5RTBxR7cbiwXe8nb+2KzynixOOUhYcA
-         2ml2cFSGwlTY5LTPQb+36oOkS+53/7P80IoeoRIdMP3yqPjXeSb0u7mVyr+lUJ7wnN1x
-         LLDA==
+        bh=mZUwLoRhzQZCFpDyDkkPff1q32CTDK5uaQBs2fNy31U=;
+        b=nIqDjPxlztsCVIzTHKFW7I1d+Lu1FIuTO9PwrAOlL1FEn3kBilNjzNBf09utzFHPJl
+         BczbPz+YhczmefI52dYWmOASq+yB8bXjPPtWJIrhqtXJOc02iyVEwxLQOtWKPobsBPYG
+         ClbOj6shMp8wcY9nf4yHp5h2agUsxU0Remq2PI0yzYq0mBZujVybdIExJAm7h9GfzAjk
+         I85XHPYue8U2AJ9hlBISZwSi8WH8XJuedfDBjpLzllisXcFnkHD35uGQC3OtrPAfnfsl
+         J/72yiZaUt6bLLvMPFkn/RpM6ZxLBgOD7iMiPIAAPXBSWhB5fv4sxCvw7A79TnDLgFb9
+         DdOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761319583; x=1761924383;
+        d=1e100.net; s=20230601; t=1761319668; x=1761924468;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=h/b/7B8erCyrj3JILyJdzAZuB7zL6Tarc/A8a8l+KZU=;
-        b=H4ViXEEY97ljTNmyRw/hCYr0m3ztS0ae2TmtAV8R6sEL3hAD869SULUrcQq6FnUnts
-         7y/ChFYB2/KuHwElt/kRIHNN1hqVOK7FZwUbfO+Did5LZf1Tv7Fd5Jqk8n6zJl3q2NIX
-         WH23fjYGQqre3T6dVcPM7fDi8qwS8v9P/QfBrOr5aur3VnHFHU+7tnrubBOusyfp6d4v
-         zX5ZrYN84gTVKZKroooEHd1Vu2FeRpZYTa0v7baJZHSB58NcJF+J4ohIaBEPjTm8jQa8
-         dSyeprAgr5fgbbt5p7fEyuVkUCB1+y403RoVmHHfS5+m16hDziCDurcIz0KSDe9YGNJn
-         vnsA==
-X-Forwarded-Encrypted: i=1; AJvYcCUeosD0s4X3RC9w4DwKTeeZpuQ8JJIZlqT5F9q+pDkFtyz97Y9sGqqvFB0cSxJdtsErIEcNgWY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz33T7Zd7w/fXXwcnV4s8b9mAx9HHUSrL3fX93hcB3fh1l0bM2h
-	X4TqCJG8T6+4N9ZTCLZ9pFAOjCDYy91XleeKJor23cxygFjg/L56fKsk1yC6gvOqRXLh7/o2laX
-	Fo1LO8RdESmYA/ITmJNSo1tFyNKDvF2Q=
-X-Gm-Gg: ASbGnctzW5j+qpyZcOw98CgrkYc8WLOXDO9B7I5ITr9CCF3VqDfs7qoc1F3cmph0hmA
-	Qzc2rkzDkzMKbwwnv7tkppApCWk3TGru/qfcxAFZ4/luajh0ABIL2g552D/DL8Onijl5j5HdUEN
-	lQ4skXequu5nltcetqGrtk4GH7h8MnQGmUVghoGQkQFZSNnEsbhSup36mOyS5Xjf7WLkSDnkJwI
-	c6j8zejOW4JeiEcqu8b7akH4A42os4QKrG4YfzFR3mGWMwbG6ICoGCRk5qBW9s=
-X-Google-Smtp-Source: AGHT+IEOKdDxMb9HRkXEYTo6SU095pGaTWP1Is+4rDD/byL+J1nKnOMtorV+TskGEVX3KZgpNdKNwa4mrFcTz3mie8Q=
-X-Received: by 2002:a17:902:f68c:b0:27b:defc:802d with SMTP id
- d9443c01a7336-2946e0ebeffmr84709465ad.28.1761319582838; Fri, 24 Oct 2025
- 08:26:22 -0700 (PDT)
+        bh=mZUwLoRhzQZCFpDyDkkPff1q32CTDK5uaQBs2fNy31U=;
+        b=DboXWytksYPR6vGHwn/lLvuG5RUBq3xFlLfdK0v9TsKmk27gKpa26K7TULHumTuLri
+         V2q1Twhah8e+BDTUaskra1Qe5IZaW8rgIg4sX1OSGrimtyBCAzYYDFvPtdMhYyDErKdN
+         bsRn5Y8C9fJIJyExq3d1l0RPPgfb4FsLnSHHhZeFnLUnqZ/dl3ExA3+xiGZ+66QZUOLJ
+         ycafnZfEVS7EES26j5atICvMd+vxwiU7VEYRBOjPjZckhKXVlkewAQgZIn0mXJ+slZnW
+         kGNn/1RyXMKcAaSCrz/83d3sApswBr0K9svCFHOvpcLbiJcdp32S5zOvtgtcR6D0+q2x
+         uYRA==
+X-Forwarded-Encrypted: i=1; AJvYcCUJDKINPfNGnBqqSH8OAj6Tan0sPWy5ejmgtogPsX9o707ZZj3JfHJlMJIFkZf6rX3ElL1UQzw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzX0AbOVLH+VexT3QLIFXKqpieT60hhP/YR9UJm4vHNktK0NV4v
+	QF4l0Z3oLVU98fOU014aVwXSWt6bVGkhY2EZb/3WbKX0ijnJJjoxElMUy52XWYc7aV86BKgbEZ5
+	92cj1kNdBxzhX3z6LftDvRF+8JPehVeE=
+X-Gm-Gg: ASbGncvWGbsWcMYcOODjLFFwnSks7kABXWHKVhaz/moAGIcddhg+eBm92SMN4qzgUAI
+	87uCEL4ye3+rZyt065ens9L3kh8lGOtRqi6Ymc6YG0KJzgKa4kEteUchAukwTkPmwl4Q8oGtOTe
+	L46ZxeB8kSOXWOasRmuS5bM5XP73Pzcn5zEqXmZJ/tgUtB8CJ9iLLh+qHBrnJw0RVPbAJr69RIC
+	rA8VlmdYNfpPTDpUka2MGWQRhTSrcLHxqnReI8QNLB+eTRz9PbGWK/gx8I6B0fDI0yAG3o5pA==
+X-Google-Smtp-Source: AGHT+IHO6jbdwKewZ+aopol3D/t0siB5pKFXflfKqanP1Lzne19T0FSC237EONrcwcBGE1+D2XZVqHChOX/PZGHrpDM=
+X-Received: by 2002:a05:6102:4412:b0:5d5:f6ae:3914 with SMTP id
+ ada2fe7eead31-5db3e1edb23mr1087557137.22.1761319667779; Fri, 24 Oct 2025
+ 08:27:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251023231751.4168390-1-kuniyu@google.com> <20251023231751.4168390-8-kuniyu@google.com>
-In-Reply-To: <20251023231751.4168390-8-kuniyu@google.com>
+References: <20251023231751.4168390-1-kuniyu@google.com> <20251023231751.4168390-9-kuniyu@google.com>
+In-Reply-To: <20251023231751.4168390-9-kuniyu@google.com>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 24 Oct 2025 11:26:09 -0400
-X-Gm-Features: AWmQ_bnzIhVV3MsPnWM2jSZ2tqW9zy4mQ0zFymu--KHSuU72fnUF-ZQu5fEvqAs
-Message-ID: <CADvbK_cBbHfXyKe9=_+BH0VB-c73hRsNG0Jiitvh+48Y3_ydUA@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 7/8] sctp: Use sctp_clone_sock() in sctp_do_peeloff().
+Date: Fri, 24 Oct 2025 11:27:35 -0400
+X-Gm-Features: AWmQ_bna7aWrX9MYc169qOTlnpqj03VGgvqTIlz7J2pxgV8dC1npZp8UKxvl4Dc
+Message-ID: <CADvbK_c_xQL2RpOog7sA9QK7uRL=3gWEUtvCaxYaCoKHyT1XJg@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next 8/8] sctp: Remove sctp_copy_sock() and sctp_copy_descendant().
 To: Kuniyuki Iwashima <kuniyu@google.com>
 Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -93,13 +93,10 @@ Content-Transfer-Encoding: quoted-printable
 On Thu, Oct 23, 2025 at 7:18=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
 m> wrote:
 >
-> sctp_do_peeloff() calls sock_create() to allocate and initialise
-> struct sock, inet_sock, and sctp_sock, but later sctp_copy_sock()
-> and sctp_sock_migrate() overwrite most fields.
+> Now, sctp_accept() and sctp_do_peeloff() use sk_clone(), and
+> we no longer need sctp_copy_sock() and sctp_copy_descendant().
 >
-> What sctp_do_peeloff() does is more like accept().
->
-> Let's use sock_create_lite() and sctp_clone_sock().
+> Let's remove them.
 >
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 Acked-by: Xin Long <lucien.xin@gmail.com>
