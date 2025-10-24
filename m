@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-232536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DA62C0650B
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:49:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C69A5C06514
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:49:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35CE81A62371
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 12:49:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DF731A63FE2
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 12:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94D630C636;
-	Fri, 24 Oct 2025 12:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA02431960A;
+	Fri, 24 Oct 2025 12:49:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XPXWl1gf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="I2ygWatt"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AEE818E20
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 12:49:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF91B18E20
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 12:49:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761310154; cv=none; b=tqaai94zf0PxTynimv4VnwTXsIkz/aFAprupB/Zi9Y4z5uzGJyvygbzRnpBaWx4vnvkIqnjCZjv5YHqPiZ97iakA1g3/n5EheuZROPFTlZKgIkpixw6xuaXWGFeZjkAKFNXZiTA577XjADdT0imL60tRcaNmHia6DGPVKBWYRPo=
+	t=1761310159; cv=none; b=SjStF8Rk/Q3ArWXyndQUIXvWbpuHYL19r2Pz1J6ZuZwFnW78/KPbiTzUo4ziNTXORqDKPvlkqP/Wluew1hz1dxeU87/3HFAx3BmabwAvfl5Zp0UyLyyp9cUdvPZC1x1UQEG6Ljw1yKnR3TIbDHNoZZxLth1fI53ClNxQIdRpn5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761310154; c=relaxed/simple;
-	bh=/2MMBRLdB3gkuv+SLL1IleBBRlFOR4IcSXHOUC5OmjA=;
+	s=arc-20240116; t=1761310159; c=relaxed/simple;
+	bh=ogT/hKTSN2JpCwXUIcwsIVfV4R4E20+YkU0fVTF+1wg=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=AjnSRJuT4A9yvf7ZaXYmv8JyfRSfwVcdK4U3ViZeKKH8jluMRETeLUlvi2ocrcv9x/qAlbmPWpY/cp+kfkpVZUW8Af3xTf48UrnARVkxw7VLoHKSdmLlhV+YBAqHwPKPFS/IutZqIsHYKLqGDW4A2S6yfuu0/tGIqwc864WsnVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XPXWl1gf; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=MAE30z6enj7YM79DfQFdCFYf7bn0IWHSzH9VXbl3HGQbGXf3QLHZQO+INXXJSwHJ382TLUfMRDaqBtSzmjAaLJLoQN+n148YMa50wT2P1fUrl6JA8hGbgBLRX46hzlM2GEeaadG+XPHHk86oMVQ9LrKEsahkMyTZOxQwWeaNx5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=I2ygWatt; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,22 +37,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=sDbLc9KE3adeNWD5XjWtz5cZLPV8xFkcGEgD8CnOEFg=; b=XPXWl1gfluFYY1D5DoSGkX5ZoM
-	drYKpMr0/l9dAskhKQp9mg+mgdGFhvi/NUc5y1qTHh/fFmhcv3NtDxpFT0ky0jBV1lTnDOIy8KhgT
-	YIfHZFF/BwCaJ6Kih3xQDl7lASp4oipVG52Lc63aJwVH4ijpvZiDI5VkyxFFeqejMFkoHSURhdXir
-	sqVtQ5KI5BrmMyppXk/ce6yA8DeQZBgZ7iz4l2JAL3pFo+rm9CE+ouLfUCpVnJbeiZK7rCcnAB3y0
-	7JscUJ6GwpRxGaNtLKMTbYHBrNelnOFyvjMoYGPSBgVYgBfcYOkXATc6GUALXA+YYXOvFwiesZ8TD
-	jVMsUR6Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:59462 helo=rmk-PC.armlinux.org.uk)
+	bh=1DBVmkORiObKi/mtbHrI6pyrFSaGIBlKIWc0uf+aGHI=; b=I2ygWatt8YcqRGUlS+/BI4KZbj
+	ccP9fCaqRn44FKDb3Za9yM62VoOU/b1u9JebulZZXMztRD/YWrIgzkYNnsi8Gt/GQjIce8EAhXwvD
+	Vp/CsxEM5tmVwQ4kNnTyX9bq26D+OF614EOEAgk545kr2QIWrWphWf3HzpML0I7n++oMtjTPP0xS+
+	6LEMOFK9Q4Xcck92TmKok8B7IIhiBwOfBqXIH5EMWMO1hfJDXbVKpyn6uMF3R7uVI/x5b7fPvbrgC
+	CYc6sQUSiRNDLC9PR1KJiK+5m6dnPvz/9ErlfCWVLlu/Dj/p9uJxYrSY35szxIuTFeZWNt3MS8Fkb
+	H+jpYxMg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51294 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vCHE9-000000007Zl-3m6Y;
-	Fri, 24 Oct 2025 13:49:05 +0100
+	id 1vCHEF-000000007Zz-0Ck9;
+	Fri, 24 Oct 2025 13:49:11 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vCHE9-0000000BPTg-0jdL;
-	Fri, 24 Oct 2025 13:49:05 +0100
+	id 1vCHEE-0000000BPTm-1CTA;
+	Fri, 24 Oct 2025 13:49:10 +0100
 In-Reply-To: <aPt1l6ocBCg4YlyS@shell.armlinux.org.uk>
 References: <aPt1l6ocBCg4YlyS@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -69,8 +69,7 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Richard Cochran <richardcochran@gmail.com>
-Subject: [PATCH net-next v2 1/8] net: stmmac: move version handling into own
- function
+Subject: [PATCH net-next v2 2/8] net: stmmac: simplify stmmac_get_version()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,107 +79,60 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vCHE9-0000000BPTg-0jdL@rmk-PC.armlinux.org.uk>
+Message-Id: <E1vCHEE-0000000BPTm-1CTA@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 24 Oct 2025 13:49:05 +0100
+Date: Fri, 24 Oct 2025 13:49:10 +0100
 
-Move the version handling out of stmmac_hwif_init() and into its own
-function, returning the version information through a structure.
+We can simplify stmmac_get_version() by pre-initialising the version
+members to zero, detecting the MAC100 core and returning, otherwise
+determining the version register offset separately from calling
+stmmac_get_id() and stmmac_get_dev_id(). Do this.
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+--
+v2: fix "verison" -> "version" typo (and subsequent patches)
 ---
- drivers/net/ethernet/stmicro/stmmac/hwif.c | 42 +++++++++++++++-------
- 1 file changed, 29 insertions(+), 13 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/hwif.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-index 00083ce52549..44e34b6ab90a 100644
+index 44e34b6ab90a..6b001d3f57c6 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-@@ -13,6 +13,11 @@
- #include "dwmac4_descs.h"
- #include "dwxgmac2.h"
- 
-+struct stmmac_version {
-+	u8 snpsver;
-+	u8 dev_id;
-+};
-+
- static u32 stmmac_get_id(struct stmmac_priv *priv, u32 id_reg)
- {
- 	u32 reg = readl(priv->ioaddr + id_reg);
-@@ -40,6 +45,24 @@ static u32 stmmac_get_dev_id(struct stmmac_priv *priv, u32 id_reg)
- 	return (reg & GENMASK(15, 8)) >> 8;
- }
- 
-+static void stmmac_get_version(struct stmmac_priv *priv,
-+			       struct stmmac_version *ver)
-+{
-+	enum dwmac_core_type core_type = priv->plat->core_type;
-+
-+	ver->dev_id = 0;
-+
-+	if (core_type == DWMAC_CORE_GMAC) {
-+		ver->snpsver = stmmac_get_id(priv, GMAC_VERSION);
-+	} else if (dwmac_is_xmac(core_type)) {
-+		ver->snpsver = stmmac_get_id(priv, GMAC4_VERSION);
-+		if (core_type == DWMAC_CORE_XGMAC)
-+			ver->dev_id = stmmac_get_dev_id(priv, GMAC4_VERSION);
-+	} else {
-+		ver->snpsver = 0;
-+	}
-+}
-+
- static void stmmac_dwmac_mode_quirk(struct stmmac_priv *priv)
- {
- 	struct mac_device_info *mac = priv->hw;
-@@ -292,23 +315,15 @@ int stmmac_hwif_init(struct stmmac_priv *priv)
+@@ -49,18 +49,22 @@ static void stmmac_get_version(struct stmmac_priv *priv,
+ 			       struct stmmac_version *ver)
  {
  	enum dwmac_core_type core_type = priv->plat->core_type;
- 	const struct stmmac_hwif_entry *entry;
-+	struct stmmac_version version;
- 	struct mac_device_info *mac;
- 	bool needs_setup = true;
--	u32 id, dev_id = 0;
- 	int i, ret;
++	unsigned int version_offset;
+ 
++	ver->snpsver = 0;
+ 	ver->dev_id = 0;
  
 -	if (core_type == DWMAC_CORE_GMAC) {
--		id = stmmac_get_id(priv, GMAC_VERSION);
+-		ver->snpsver = stmmac_get_id(priv, GMAC_VERSION);
 -	} else if (dwmac_is_xmac(core_type)) {
--		id = stmmac_get_id(priv, GMAC4_VERSION);
+-		ver->snpsver = stmmac_get_id(priv, GMAC4_VERSION);
 -		if (core_type == DWMAC_CORE_XGMAC)
--			dev_id = stmmac_get_dev_id(priv, GMAC4_VERSION);
+-			ver->dev_id = stmmac_get_dev_id(priv, GMAC4_VERSION);
 -	} else {
--		id = 0;
+-		ver->snpsver = 0;
 -	}
-+	stmmac_get_version(priv, &version);
- 
- 	/* Save ID for later use */
--	priv->synopsys_id = id;
-+	priv->synopsys_id = version.snpsver;
- 
- 	/* Lets assume some safe values first */
- 	if (core_type == DWMAC_CORE_GMAC4) {
-@@ -342,7 +357,8 @@ int stmmac_hwif_init(struct stmmac_priv *priv)
- 		/* Use synopsys_id var because some setups can override this */
- 		if (priv->synopsys_id < entry->min_id)
- 			continue;
--		if (core_type == DWMAC_CORE_XGMAC && (dev_id ^ entry->dev_id))
-+		if (core_type == DWMAC_CORE_XGMAC &&
-+		    (version.dev_id ^ entry->dev_id))
- 			continue;
- 
- 		/* Only use generic HW helpers if needed */
-@@ -378,7 +394,7 @@ int stmmac_hwif_init(struct stmmac_priv *priv)
- 	}
- 
- 	dev_err(priv->device, "Failed to find HW IF (id=0x%x, gmac=%d/%d)\n",
--		id, core_type == DWMAC_CORE_GMAC,
-+		version.snpsver, core_type == DWMAC_CORE_GMAC,
- 		core_type == DWMAC_CORE_GMAC4);
- 	return -EINVAL;
++	if (core_type == DWMAC_CORE_MAC100)
++		return;
++
++	if (core_type == DWMAC_CORE_GMAC)
++		version_offset = GMAC_VERSION;
++	else
++		version_offset = GMAC4_VERSION;
++
++	ver->snpsver = stmmac_get_id(priv, version_offset);
++	if (core_type == DWMAC_CORE_XGMAC)
++		ver->dev_id = stmmac_get_dev_id(priv, version_offset);
  }
+ 
+ static void stmmac_dwmac_mode_quirk(struct stmmac_priv *priv)
 -- 
 2.47.3
 
