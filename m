@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-232342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2590DC0442E
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 05:33:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E88BC0443A
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 05:34:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 829E719A5405
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 03:33:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5125E3B9528
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 03:33:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B756272805;
-	Fri, 24 Oct 2025 03:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A6927B4EE;
+	Fri, 24 Oct 2025 03:33:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HlRgqQ5Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aW3WuWI0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E1D2749D7
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 03:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02AE72749D7
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 03:33:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761276790; cv=none; b=g8Jj/JZKcwTN6MzSYiJpj14LnFzxWAqbmrQb9/f95NNqQ/LFq36A+iG1AS27jd84Jq5mwiYDn1uFeZs3iU9/FCt/arnA+xRf1jKcUmtmHXAa5iZASVQlX/OynfdT8rvzTmYNEJNF5FSZmIblAAzyr0D0xJDl7Hp5nYT47HFdMC4=
+	t=1761276794; cv=none; b=WO5/1tzr4uKGLolIwQ4ArphUhjDIBD8IkSRiPhLr/cbIZ+3sLl1TSNBioRm8cyHf1nuZMIjnb+a90gHCkkdhz47rJ895pQRtEJ2c225BEzpz9rCR3fNp+gmpYhS/0WnfaqXV39d4wwXwtiZAhCxXkEO1RHw2dNHGaQsnSy+l/Is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761276790; c=relaxed/simple;
-	bh=vtBgyCttMlcJ2RTqD0BEiKGo9nxWhGDqE+BNz5XY7hA=;
+	s=arc-20240116; t=1761276794; c=relaxed/simple;
+	bh=Y4/7kxOvf+Po4ZQ5WfwfaUNB9yGYyDH1l93lR+I4MvA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qgXOaBQWP4D4Mv3UN21Jl7/uP4gdRggoz85n9M6eHmacmzRPSmSEavcmfdEq3lQ5lhzPs4eRlMgguLBTqqY4XVpmYO5oDXpwPcFezjE5COjuXKR9xyBAZqt1f3gWJFXMaOHjhUPxJmqbe65RxWh03oXeFy4X+ccGD0jmmqRAKWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HlRgqQ5Q; arc=none smtp.client-ip=209.85.214.177
+	 MIME-Version; b=AUoIXsSWKYv6GF8b7oiqzJbJiTtH8ThRNSgJI8FcMDY4b3tikD3MYpfAGhe+xXJ/zbTXCfvqfJR/QtwCH0VlE6bj1ir3OzktOL3oD0ABqUCxPtS0sonSmAQh8JjiMlrlBxnY9PB3+8IJ1ZryR8yEUhPAFC2vJvH7Ge2EAUZ+DwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aW3WuWI0; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-29292eca5dbso21562555ad.0
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 20:33:08 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-29470bc80ceso16717535ad.1
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 20:33:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761276788; x=1761881588; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761276792; x=1761881592; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AIHXLN1jSs0Gveu8jOX7vUP/RM8P/HJmwm5LBtcMRtg=;
-        b=HlRgqQ5Q5iY95kF19yTHZpZfaoUz8drShFDFL+b2RZtIM8nLr9/i9YZ9pFnD/S7ieL
-         3qbUpSoIS5DsXuKKxPnRfQ9RTnLkadWzNTteGbaZ9JETiZsBe4NRsSNx/fl2pqq0sXqt
-         MHzZx3A8QZdZFZNWrUMSaoOd3FPwtRprYdjDvbCVuLy2VBJSO+Ptm47tOshVLPxg+xjp
-         J6KKRV+36dVhrYDKkF/CZsWnWsGPUQivNcLSOJTgzEYcrOGTYDSU8rZdozzFHnIdLdxD
-         dKw5SR7SXu3F321qBvZyopwck8BJ6j/3a8kIV7aCJ72tuUjIYmXk3yT1CGgGO3G5FJph
-         ecLg==
+        bh=DqGjoL6ZxqRuvTgBTFhR7XlvSN01n0xXPYNgq1DkmvE=;
+        b=aW3WuWI0NUPfR9YlELKW2iINtEi9XYNs0i4Y9fLgvCypp+m2sjps9MdXGxMROBWn2m
+         nzXAf8BUg8Y0aW+WIKHiCt3gdHFSi9znKpOQAGyYGmuh1jeOWX0vHCKGHeZQSS5fMG7c
+         oNjoZ1oSIUALqe/SZvu846/2MG0CUywpqMTjFBDHsk12BKZceZMTjzzzfEZJFCLJLVxE
+         QGvOoC3fju57Gb25FbqcHwOmHPbhUE6kaSOTEoR7qzNT4L6EDqRUs1Mm8x+HT3Hmo4ZD
+         RBbnm6OhwaD3wYYlXwNmLoSFTQH766zujxsdLTBOY3DEf2yj1YZdMZ/8LebMQdgEyFee
+         oDBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761276788; x=1761881588;
+        d=1e100.net; s=20230601; t=1761276792; x=1761881592;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AIHXLN1jSs0Gveu8jOX7vUP/RM8P/HJmwm5LBtcMRtg=;
-        b=NtNyL9QE8sJ7TQrkA4x0yJF+xLUXz4wyV8Ii76GqK8TnEbFYq+O/mB1N97Z8xEdUrK
-         ylWHD2KXwSYAzsoKycI65WPSYzvZo9zN8mD6gmHbdQkDZ7nJF8uWgIfumams0IrlFjue
-         9EnKezcQlgflhI3mAw6Cyv+HrxCaVSotgmuLd0bCPd1k5XalX0Jny4yU/Jptety7VZJ4
-         lZOdL7wi/OYTFeECJF1qmxn4E+yPPIdqBJDirTcTa7sDGjCO+AqWCbsSHrU3p8fujADu
-         NExhW0J/iQpYNu2x1WFYxsIrew+HDaus6qdNvWO9vrIxf+7BHIKIWQm7eiNUTIcqqXBr
-         +WGg==
-X-Gm-Message-State: AOJu0YwDdbaIfmPZ5v17B14Y6tcHTvkK+tjePekVbAd7kq9dsACa16BM
-	+J91IKsdaioXrz9boVETOkR9IYXOgQajDWYp4B6Ej2mdeDCbY0jjQNYJa4CGd1I4HJc=
-X-Gm-Gg: ASbGncv9vznjUXUX+7eEJjyxJyPDaYri+Lsmt9lGtxxifxhEaxqFed4zb0AMOYSYcsu
-	wYZmD1vzd8p1sI4n8gKT1imuB3z4CAsjrms2H3gUku930jFuUihGkhDdgt5PyAR3WEn5fNDUoFa
-	M3RPAAlD8B8AyYmlw79AZCqC0YuHfMPioU6+Rb3FukbnwCgyEm6pmdqAP93SbQNUBrefvoqzAIK
-	rACj9dvzyqDKvUDgRkdiY+UP3ld/dVppjxr7NooZJPYmWO3zAB30B5khfWyyZd8MyTLMAIAiBoy
-	WmfYlWtWtoBQfterwy2HtEfHwSEb+WITZtvpakjtX1Pj0rXDavH57rANZBpAy480/OFE/w875b8
-	I+NW9z1e4Hj5YG6a7KZcCDxcKIaHwCqfTUfv2tDFqd0LLRjlR+2nP1uGmK2AInOLRV5qrF6ULLk
-	IyF3xjh3I=
-X-Google-Smtp-Source: AGHT+IFWzmMLIdXwRN3RNcZHRt4Ga/+I9rtN5rJOzaIkYrpyCjPo7izMGQ1mB0Zrag6Kd78YfLzZ7w==
-X-Received: by 2002:a17:903:2441:b0:271:479d:3de3 with SMTP id d9443c01a7336-290c9c93d94mr340310505ad.12.1761276787541;
-        Thu, 23 Oct 2025 20:33:07 -0700 (PDT)
+        bh=DqGjoL6ZxqRuvTgBTFhR7XlvSN01n0xXPYNgq1DkmvE=;
+        b=sU3fruADVyzeilxbMqtdka/OzQ7BveyDCpNoVLCSCtX9qPjJBkgbbUzNQr+xakrQAU
+         IjKzyum2xVaCvS7hh72YWx+WJkn8F4H+/wnMte/9BGay5Te7Faa5+sygbD4/DfomyFd/
+         6+FFhVq55MzWMHOHylVwcgTFX/ur+WY36i8Py/kt6Zf4qBR/eoeFUPBxpQ21xPiTLlKf
+         sXvUkzSRxhkOXJso8UrlEIgq9Oki5dZuvjpDZz1nvuKyyAy6Qd1gV8e9FjbD8JkL6SRp
+         3wvqCqOz8XsLtVwWIhsFa/O1TbTxm5iJc9oIv4fjvqZO8fhyoGEnHLnDt3N9yDUmy13T
+         90qQ==
+X-Gm-Message-State: AOJu0Yzrk5U7tauU2EaNk6ykFHFysiO1fOYbqtQiXW0NMFM0hmfc00zP
+	tyevVT2S++jH3XI+1b8bayS73TQz9jm7JiWs3z5yCACgeO7toy3URsPMxUYden7PUGY=
+X-Gm-Gg: ASbGncsVtGXKyJnIuH2n+sPz7dxrbTnULV9tpeF7ItIpsWQUVqywpubHyp2mBkrNcse
+	BMEMjBqJXTed7amSPHgrre6TeNla4FTp1R3pzHnHjmBEYPNGzBTJZ9Y1imp1sapZH236NeFromP
+	NhLCqEG41D7ahYFa+g9/AByYnh/Sb2vgcnQjIoiQQGJzybZGfjkmPV8Piu24nUafAsq640TywFM
+	waIaYGTFcWHqZYmmXrifR+iZz4RdSBZnVelDjVB2RGHZAyV3KWBDwyU7EcycQdjBE4NxQkD17MI
+	HfYqP9++MlZlCxPZa8wXvq/sxU+rqhJBjdCtw4NaFxEq7zQW7AVu6reGEdJ/xqpFnUtaH1zmMqA
+	rXR/lzGPrr2MS8zXZj/1p7P7PajsiBfc5exhMkf/Ov11S2lTC5uhT9aCoymmOGGUSx1gxZhDZSa
+	4pPYVHG1Q/slux22intg==
+X-Google-Smtp-Source: AGHT+IEvpsqt6uv0HWRQnHevKvtcDn8gVEGvS5rTwnsQrRLfJgzSufjkPD3j+2HYjJHz0o3hCrw3MQ==
+X-Received: by 2002:a17:902:e805:b0:26a:6d5a:944e with SMTP id d9443c01a7336-29489e3e784mr11842035ad.24.1761276791160;
+        Thu, 23 Oct 2025 20:33:11 -0700 (PDT)
 Received: from d.home.yangfl.dn42 ([45.32.227.231])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2946dda7949sm40394265ad.3.2025.10.23.20.33.04
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2946dda7949sm40394265ad.3.2025.10.23.20.33.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Oct 2025 20:33:07 -0700 (PDT)
+        Thu, 23 Oct 2025 20:33:10 -0700 (PDT)
 From: David Yang <mmyangfl@gmail.com>
 To: netdev@vger.kernel.org
 Cc: David Yang <mmyangfl@gmail.com>,
@@ -85,9 +85,9 @@ Cc: David Yang <mmyangfl@gmail.com>,
 	Simon Horman <horms@kernel.org>,
 	Russell King <linux@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 1/3] net: dsa: yt921x: Add STP/MST support
-Date: Fri, 24 Oct 2025 11:32:27 +0800
-Message-ID: <20251024033237.1336249-2-mmyangfl@gmail.com>
+Subject: [PATCH net-next 2/3] net: dsa: yt921x: Add HSR offloading support
+Date: Fri, 24 Oct 2025 11:32:28 +0800
+Message-ID: <20251024033237.1336249-3-mmyangfl@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251024033237.1336249-1-mmyangfl@gmail.com>
 References: <20251024033237.1336249-1-mmyangfl@gmail.com>
@@ -99,175 +99,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Support for STP/MST was deferred from the initial submission of the
-driver.
+Add offloading for packet duplication supported by the YT921x switches.
 
 Signed-off-by: David Yang <mmyangfl@gmail.com>
 ---
- drivers/net/dsa/yt921x.c | 115 +++++++++++++++++++++++++++++++++++++++
- drivers/net/dsa/yt921x.h |   9 +++
- 2 files changed, 124 insertions(+)
+ drivers/net/dsa/yt921x.c | 24 ++++++++++++++++++++++++
+ net/dsa/tag_yt921x.c     |  4 ++++
+ 2 files changed, 28 insertions(+)
 
 diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-index ab762ffc4661..485fec3ac74f 100644
+index 485fec3ac74f..885a63f2b978 100644
 --- a/drivers/net/dsa/yt921x.c
 +++ b/drivers/net/dsa/yt921x.c
-@@ -2103,6 +2103,117 @@ yt921x_dsa_port_bridge_join(struct dsa_switch *ds, int port,
- 	return res;
+@@ -1038,6 +1038,27 @@ static int yt921x_dsa_port_max_mtu(struct dsa_switch *ds, int port)
+ 	return YT921X_FRAME_SIZE_MAX - ETH_HLEN - ETH_FCS_LEN - YT921X_TAG_LEN;
  }
  
 +static int
-+yt921x_dsa_port_mst_state_set(struct dsa_switch *ds, int port,
-+			      const struct switchdev_mst_state *st)
++yt921x_dsa_port_hsr_leave(struct dsa_switch *ds, int port,
++			  struct net_device *hsr)
 +{
-+	struct yt921x_priv *priv = to_yt921x_priv(ds);
-+	u32 mask;
-+	u32 ctrl;
-+	int res;
-+
-+	mask = YT921X_STP_PORTn_M(port);
-+	switch (st->state) {
-+	case BR_STATE_DISABLED:
-+		ctrl = YT921X_STP_PORTn_DISABLED(port);
-+		break;
-+	case BR_STATE_LISTENING:
-+	case BR_STATE_LEARNING:
-+		ctrl = YT921X_STP_PORTn_LEARNING(port);
-+		break;
-+	case BR_STATE_FORWARDING:
-+	default:
-+		ctrl = YT921X_STP_PORTn_FORWARD(port);
-+		break;
-+	case BR_STATE_BLOCKING:
-+		ctrl = YT921X_STP_PORTn_BLOCKING(port);
-+		break;
-+	}
-+
-+	mutex_lock(&priv->reg_lock);
-+	res = yt921x_reg_update_bits(priv, YT921X_STPn(st->msti), mask, ctrl);
-+	mutex_unlock(&priv->reg_lock);
-+
-+	return res;
++	return 0;
 +}
 +
 +static int
-+yt921x_dsa_vlan_msti_set(struct dsa_switch *ds, struct dsa_bridge bridge,
-+			 const struct switchdev_vlan_msti *msti)
++yt921x_dsa_port_hsr_join(struct dsa_switch *ds, int port,
++			 struct net_device *hsr, struct netlink_ext_ack *extack)
 +{
-+	struct yt921x_priv *priv = to_yt921x_priv(ds);
-+	u64 mask64;
-+	u64 ctrl64;
-+	int res;
-+
-+	if (!msti->vid)
-+		return -EINVAL;
-+	if (msti->msti <= 0 || msti->msti >= YT921X_MSTI_NUM)
-+		return -EINVAL;
-+
-+	mask64 = YT921X_VLAN_CTRL_STP_ID_M;
-+	ctrl64 = YT921X_VLAN_CTRL_STP_ID(msti->msti);
-+
-+	mutex_lock(&priv->reg_lock);
-+	res = yt921x_reg64_update_bits(priv, YT921X_VLANn_CTRL(msti->vid),
-+				       mask64, ctrl64);
-+	mutex_unlock(&priv->reg_lock);
-+
-+	return res;
-+}
-+
-+static void
-+yt921x_dsa_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
-+{
-+	struct yt921x_priv *priv = to_yt921x_priv(ds);
 +	struct dsa_port *dp = dsa_to_port(ds, port);
-+	struct device *dev = to_device(priv);
-+	bool learning;
-+	u32 mask;
-+	u32 ctrl;
-+	int res;
++	struct net_device *user = dp->user;
 +
-+	mask = YT921X_STP_PORTn_M(port);
-+	learning = false;
-+	switch (state) {
-+	case BR_STATE_DISABLED:
-+		ctrl = YT921X_STP_PORTn_DISABLED(port);
-+		break;
-+	case BR_STATE_LISTENING:
-+		ctrl = YT921X_STP_PORTn_LEARNING(port);
-+		break;
-+	case BR_STATE_LEARNING:
-+		ctrl = YT921X_STP_PORTn_LEARNING(port);
-+		learning = dp->learning;
-+		break;
-+	case BR_STATE_FORWARDING:
-+	default:
-+		ctrl = YT921X_STP_PORTn_FORWARD(port);
-+		learning = dp->learning;
-+		break;
-+	case BR_STATE_BLOCKING:
-+		ctrl = YT921X_STP_PORTn_BLOCKING(port);
-+		break;
-+	}
++	/* Nothing special here; we natively support tx packet duplication */
 +
-+	mutex_lock(&priv->reg_lock);
-+	do {
-+		res = yt921x_reg_update_bits(priv, YT921X_STPn(0), mask, ctrl);
-+		if (res)
-+			break;
++	user->features |= NETIF_F_HW_HSR_DUP;
 +
-+		mask = YT921X_PORT_LEARN_DIS;
-+		ctrl = !learning ? YT921X_PORT_LEARN_DIS : 0;
-+		res = yt921x_reg_update_bits(priv, YT921X_PORTn_LEARN(port),
-+					     mask, ctrl);
-+	} while (0);
-+	mutex_unlock(&priv->reg_lock);
-+
-+	if (res)
-+		dev_err(dev, "Failed to %s port %d: %i\n", "set STP state for",
-+			port, res);
++	return 0;
 +}
 +
- static int yt921x_port_down(struct yt921x_priv *priv, int port)
+ static int
+ yt921x_mirror_del(struct yt921x_priv *priv, int port, bool ingress)
  {
- 	u32 mask;
-@@ -2788,6 +2899,10 @@ static const struct dsa_switch_ops yt921x_dsa_switch_ops = {
- 	.port_bridge_flags	= yt921x_dsa_port_bridge_flags,
- 	.port_bridge_leave	= yt921x_dsa_port_bridge_leave,
- 	.port_bridge_join	= yt921x_dsa_port_bridge_join,
-+	/* mst */
-+	.port_mst_state_set	= yt921x_dsa_port_mst_state_set,
-+	.vlan_msti_set		= yt921x_dsa_vlan_msti_set,
-+	.port_stp_state_set	= yt921x_dsa_port_stp_state_set,
- 	/* port */
- 	.get_tag_protocol	= yt921x_dsa_get_tag_protocol,
- 	.phylink_get_caps	= yt921x_dsa_phylink_get_caps,
-diff --git a/drivers/net/dsa/yt921x.h b/drivers/net/dsa/yt921x.h
-index 3e85d90826fb..3546a94f380e 100644
---- a/drivers/net/dsa/yt921x.h
-+++ b/drivers/net/dsa/yt921x.h
-@@ -220,6 +220,13 @@
- #define  YT921X_VLAN_IGR_FILTER_PORTn(port)	BIT(port)
- #define YT921X_PORTn_ISOLATION(port)	(0x180294 + 4 * (port))
- #define  YT921X_PORT_ISOLATION_BLOCKn(port)	BIT(port)
-+#define YT921X_STPn(n)			(0x18038c + 4 * (n))
-+#define  YT921X_STP_PORTn_M(port)		GENMASK(2 * (port) + 1, 2 * (port))
-+#define   YT921X_STP_PORTn(port, x)			((x) << (2 * (port)))
-+#define   YT921X_STP_PORTn_DISABLED(port)		YT921X_STP_PORTn(port, 0)
-+#define   YT921X_STP_PORTn_LEARNING(port)		YT921X_STP_PORTn(port, 1)
-+#define   YT921X_STP_PORTn_BLOCKING(port)		YT921X_STP_PORTn(port, 2)
-+#define   YT921X_STP_PORTn_FORWARD(port)		YT921X_STP_PORTn(port, 3)
- #define YT921X_PORTn_LEARN(port)	(0x1803d0 + 4 * (port))
- #define  YT921X_PORT_LEARN_VID_LEARN_MULTI_EN	BIT(22)
- #define  YT921X_PORT_LEARN_VID_LEARN_MODE	BIT(21)
-@@ -395,6 +402,8 @@ enum yt921x_fdb_entry_status {
- 	YT921X_FDB_ENTRY_STATUS_STATIC = 7,
- };
+@@ -2879,6 +2900,9 @@ static const struct dsa_switch_ops yt921x_dsa_switch_ops = {
+ 	/* mtu */
+ 	.port_change_mtu	= yt921x_dsa_port_change_mtu,
+ 	.port_max_mtu		= yt921x_dsa_port_max_mtu,
++	/* hsr */
++	.port_hsr_leave		= yt921x_dsa_port_hsr_leave,
++	.port_hsr_join		= yt921x_dsa_port_hsr_join,
+ 	/* mirror */
+ 	.port_mirror_del	= yt921x_dsa_port_mirror_del,
+ 	.port_mirror_add	= yt921x_dsa_port_mirror_add,
+diff --git a/net/dsa/tag_yt921x.c b/net/dsa/tag_yt921x.c
+index 995da44f0a2a..0ad83924fda1 100644
+--- a/net/dsa/tag_yt921x.c
++++ b/net/dsa/tag_yt921x.c
+@@ -46,6 +46,7 @@ yt921x_tag_xmit(struct sk_buff *skb, struct net_device *netdev)
+ {
+ 	struct dsa_port *dp = dsa_user_to_port(netdev);
+ 	unsigned int port = dp->index;
++	struct dsa_port *partner;
+ 	__be16 *tag;
+ 	u16 tx;
  
-+#define YT921X_MSTI_NUM		16
-+
- #define YT9215_MAJOR	0x9002
- #define YT9218_MAJOR	0x9001
+@@ -59,6 +60,9 @@ yt921x_tag_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 	tag[1] = 0;
+ 	tag[2] = 0;
+ 	tx = YT921X_TAG_PORT_EN | YT921X_TAG_TX_PORTn(port);
++	if (dp->hsr_dev)
++		dsa_hsr_foreach_port(partner, dp->ds, dp->hsr_dev)
++			tx |= YT921X_TAG_TX_PORTn(partner->index);
+ 	tag[3] = htons(tx);
  
+ 	return skb;
 -- 
 2.51.0
 
