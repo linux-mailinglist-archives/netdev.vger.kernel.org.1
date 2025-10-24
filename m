@@ -1,93 +1,50 @@
-Return-Path: <netdev+bounces-232688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B380C08185
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 22:42:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED626C0819A
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 22:46:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAB1C3AD7C6
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 20:41:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 578FD1B85AD9
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 20:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB3CC2F7443;
-	Fri, 24 Oct 2025 20:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4662F9DAF;
+	Fri, 24 Oct 2025 20:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EqZQCuRL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VrcstpGC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 461E42F7442
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 20:41:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEB91993B9;
+	Fri, 24 Oct 2025 20:46:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761338492; cv=none; b=DaXg4ELjMTMH+sEZbHHMdrU0IcxyThpV7dKU7qSn6hwYhadD0VQ88LaXPzSSz1DV+BsmT3T6KL0SbjTerPCW1JzxjD/F4HGBfrKyac/ijmMcRZoyhffQhPuqAdPaiTFjVctCYAi2tRq7PdqTFCSMi0GiPX/Q2Iwxa2TZY6K/NFo=
+	t=1761338773; cv=none; b=MZ5rbkuK4Fe3I8vAD8dkstQ+wCeQNi0nu7KuFoas2FRNj6WrcNFX1cVREMzPHckPUyJlVQpqbMSJFjxT6p6NBW88C2/aTrdVjVpqD2Vwo3ynirwOXJBHWst72+t7dIjYkbJaXRiLxwKmdd/h28UnPy3BPAJywBiQy626ISOd7RM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761338492; c=relaxed/simple;
-	bh=6Ig5JvJqdUnu5NrtnRLqoxp1NSWP5pVlnBBNn1lIA8Y=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K2L0eBoubhF9QU1tOyW865GEmLn7R3zTbv8B26RJnJEE3ly1/x2LZIFnBE8e3PTiZH4q9Hx9ID0oA8B4KpmTUcd9XN/GfxLwsgRkNo6QwMosFF7lsvJ7z0HNCUta/mkwz7sx3O4Udtlr31CsRgsE3GvFYajzytpw8HboWVDzkH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EqZQCuRL; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7a28226dd13so1556622b3a.3
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 13:41:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761338490; x=1761943290; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=9XZzo5/abI/P2a526BPNM1QX2CIMe2iREhHaWzwR9dI=;
-        b=EqZQCuRLyYsX1RvtzmYQafSllZB85pCs6dSFkDS6G7j26Vne92YEweQ/JoMJ1sQx4V
-         7vk0DIZz7rK95zr9pfe9WoitrS1mJyCXv1TXD7S5cvqiMwLxr1haDiivTalwl5BHkiPA
-         p/YI6XSnKu7yNvOEp6CtNk55ipWxT9jHhfrQipFwfonToG6oN1piuX5e0fIxb67tlOUE
-         a04qeWTVBGNB6e+CF0FEAgNSnXFZDvjGSIoS96BewxD4TJs3MWDhgpvW4jxesxZy6xUV
-         wdvHXUGMNQN01d1s5daaeOOZVKACohRHCLTtdogzojFGthTJzng88Gebp6paf1qfWfbB
-         7FLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761338490; x=1761943290;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9XZzo5/abI/P2a526BPNM1QX2CIMe2iREhHaWzwR9dI=;
-        b=lqxf4nAJEmWjKaliNXP+PBGaCyUE9VPeefQfdwvzejMzmq7oS/rppSdzGLlHgvTU12
-         +qlXliiqQmbXGit/HwesYqWDEOCxD0SizIhSXP78HX6LXZeztSe4q2665TXr4/cK4GE/
-         X3zPZGSPSPhaDdd55U9To4FpKo1yIuiQwOEoBhlJNWF0m48SwJNOYjo8s8AsvE39GPgd
-         0/6o8KZ2t8Ur2wOu3slTZfp3GOf9ddMFWPibnoq8Hm69vu6+Yu+DHFtmONQVOhJqhVSp
-         EbQ5BScDqH3QHARSRptWRiGTOsHyJbUHw7lCCIUdLycDD9Up83ZOQOmiUdsjxkAzUWoM
-         eswQ==
-X-Gm-Message-State: AOJu0Yz174+HXvcY3DFfHGo3wAORM3IkC4uvUsmQouwEbK7nOzXX1ul4
-	id3f94SbrBqER0Sb7jPJ3OTwuZnshqj9gRtkYB/P55A8XHUVG0DsIh6u
-X-Gm-Gg: ASbGncsB8Sz/ESkEVJCHr3jahfeoN9b6eCdfsyYfZsk1tznohtew7wF4NppFt4v9UMU
-	hCJXYt1ObcFJiPpJYZUVwADQKc+qphNeQz++JaXF1qQMkVVbVQiddNngntV5Ltmmow++M6tKCRo
-	whtyoFO++e+5T4Pjqzu252mSKamciqKNEJ9za1e/yeKGHIMYILL4mMN19txiHlqqSaNeV7UbWxQ
-	x8fnqnqCPVpsK8IH7EQj03Nv3g5lGLC5iDK5sexiybMdu5+sRbx53skdNIpW5i+iYJDuxIffTH4
-	XNjZZqQevtrG89sG481M1w+snYg/qz8b7tlKPaX4rQtyrwdwUUqZv3rpnACYuimUn6UGTwD0wqW
-	lMee6JoDz43r+CVzEf/cS7x9FE5awPN94KHp7d1SiG5Z4rNS5hp97AX+5tKX6t5XuwSFJfcBq8a
-	8MG2V48dXYOiEbff5SBf1eLJiJFXeTLu9opQ==
-X-Google-Smtp-Source: AGHT+IHUfBgwoqza/GrXnhsrybG9gjHhVeM2FPBW1p5LniC07VlvVV0lkUx1twTFi8vTGFD0wTlAxg==
-X-Received: by 2002:a05:6a00:1803:b0:7a2:7abf:75cf with SMTP id d2e1a72fcca58-7a27abf782bmr6545121b3a.22.1761338490551;
-        Fri, 24 Oct 2025 13:41:30 -0700 (PDT)
-Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a4140301f7sm122802b3a.19.2025.10.24.13.41.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Oct 2025 13:41:29 -0700 (PDT)
-Subject: [net-next PATCH 8/8] fbnic: Add phydev representing PMD to phylink
- setup
-From: Alexander Duyck <alexander.duyck@gmail.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
- davem@davemloft.net
-Date: Fri, 24 Oct 2025 13:41:28 -0700
-Message-ID: 
- <176133848870.2245037.4413688703874426341.stgit@ahduyck-xeon-server.home.arpa>
-In-Reply-To: 
- <176133835222.2245037.11430728108477849570.stgit@ahduyck-xeon-server.home.arpa>
-References: 
- <176133835222.2245037.11430728108477849570.stgit@ahduyck-xeon-server.home.arpa>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1761338773; c=relaxed/simple;
+	bh=1cEn5EkVxOeFdajbMeWOdHmfRz8KZQgSrkq69UCUNas=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ICkE+bVbWCqe8/ka32WIwzOBJLGS2wrup3+BLUcNnVcFklHCxVxGoryRWk8qKI1/uQRkjdTcdkWtGSh0K9SF3FtuxNbtmcKRnu+WKuuxcuQu9RUyga8wzJL/zzkhQhOWmoneCzJAZENSRkFdDRhQmfsClYxH5hFl1R5ahUwglAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VrcstpGC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6506BC4CEF1;
+	Fri, 24 Oct 2025 20:46:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761338770;
+	bh=1cEn5EkVxOeFdajbMeWOdHmfRz8KZQgSrkq69UCUNas=;
+	h=From:Subject:Date:To:Cc:From;
+	b=VrcstpGCn7t7z1hRFlY/VtyXDcEY53f1IViTEyzAUEXPCz8/cLr+iuE5fI5qhiMx1
+	 tRRquxMkACMH07c1LE4+SQkLTG65W9j7M4MTqD1RF/IS6jG+GmFG1LuLhOSfuYYjzQ
+	 qMcqVnCoWUmvOhUEooYtpFiMerDuT5yJgKoFhQ4BJjOhlG8h/kZy7X987waWvF12Gj
+	 RSsVrP82+aAuo+Uh2Eob5+hp8qf2Tp02qF6smR3P4yQlcuhPlR1iynVJ/zvtYHzNPe
+	 OgTZgHAfR7p/7aV4Em8B81iR1+bSG1Sc9MdRo8J/k4+xIr0yhEc75kxvvE3uVYk58C
+	 5v2mOfQnJ4T8A==
+From: Roger Quadros <rogerq@kernel.org>
+Subject: [PATCH net-next v5 0/9] net: ethernet: ti: am65-cpsw: add network
+ flow classification support
+Date: Fri, 24 Oct 2025 23:45:59 +0300
+Message-Id: <20251024-am65-cpsw-rx-class-v5-0-c7c2950a2d25@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,155 +53,144 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIfl+2gC/23OPQ7CMAwF4KugzBjlH8LEPRBD2rgQAWmVVKEI9
+ e6EMgCi45OfP/tBEkaPiWwXDxIx++TbUIJaLkh9suGI4F3JhFOuqKAK7FUrqLt0gzhAfbEpgda
+ aUt3YyjhHymIXsfHDhO5JwB4CDj05lMnJp76N9+laZtP8DTMzB2cGFHjVOHR0LQ3F3RljwMuqj
+ cfJy/xjqPnnMi+GEsqgLS0m5Z8hvgwmZg1RDGm4M5arja70nyG/DTlryNcfpeE2jBku2Y8xjuM
+ TfeBMkIsBAAA=
+X-Change-ID: 20250305-am65-cpsw-rx-class-666006fab9dd
+To: Siddharth Vadapalli <s-vadapalli@ti.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>, danishanwar@ti.com
+Cc: srk@ti.com, linux-omap@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Roger Quadros <rogerq@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4495; i=rogerq@kernel.org;
+ h=from:subject:message-id; bh=1cEn5EkVxOeFdajbMeWOdHmfRz8KZQgSrkq69UCUNas=;
+ b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBo++WO6M6iNT1vg8GhZe2FZhg2zWPav+1exf+zQ
+ OjdzleXH6KJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCaPvljgAKCRDSWmvTvnYw
+ k4eaD/4lXG/w6ZJlltsISC9fckqhI2RrWKnFAptLxwC+5I9mJNAeG4ZHHZ+mwMZB34kx5W76hdD
+ SYr4Q68uRvVuAFEVSyH5E/sIIBcRIj6bPclFFv6H4P0HTLPU5rKM3p/j16Gb1exAOvwW6qVnmn2
+ 7Rgawsr9iXoxISKfyNSVzKHO8kBlgkMEKGkb47RDHKjLQxmQHB2MdO+qXgOFU/CDvLIXdz2/CBQ
+ GdutsrKGFfv4FYuMoTpUVyuBMEweL8QWCElBzfX042YYbyIn6ByKkb2GE3ZJoq01Rg/+Ft4Vd+W
+ 4SCFyRyQ2gF5aUJ+JBH1RH9KqCnoHmM1hHuLF6bLO45iX5xPxBteTUNNALgA5E3WvYn0gGtvXmO
+ OxkHF74U3vA+bubNc40jaqdN/BvAnal7mB4Re0MYyxquhdBiH5k0GxbfabXmK+vhYLER93OiLcw
+ 84J1TgimXLV2lBrhj1dXCJmix/emz9W4oiYAjSI9tZeIKLHGg2aLoKxriRyBmwp/HoIM6/kY6tJ
+ 5HCgeyHcR6wyFbsKS95Yk3Q0PTE4eg26dLqGqGHJBBBrL1ZGE/4dE61/s/HnGFUIcNIqiXLg3/O
+ tPJsIRr7J8lqoDSYacFrYPZdh5BezxQg2mQtFodwROyN7FUd0pjVu46UggqbXgRCSuBlRTtNe3C
+ mMyjgL2AOGMW57w==
+X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
+ fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
 
-From: Alexander Duyck <alexanderduyck@fb.com>
+Adds support for -N/--config-nfc ethtool command for
+configuring RX classfiers.
 
-With this patch we add support for a phydev which represents the PMD state
-to the phylink interface. As we now have this path we can separate the link
-state from the PCS and instead report it through the phydev which allows us
-to more easily transition to using the XPCS when the time comes.
+Currently only raw Ethernet (flow-type ether) matching is added
+based on source/destination addresses and VLAN Priority (PCP).
 
-Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+The ALE policer engine is used to perform the matching and routing to
+a specific RX channel.
+
+Test cases:
+
+Increase number of RX channels to 8
+ip link set end1 down
+ip link set end0 down
+ethtool -L end0 rx 8
+
+1) Ether source address test
+	ethtool -N end0 flow-type ether src xx:yy:zz:aa:bb:cc action 5
+
+  Traffic from that address should route to channel 5
+
+2) Ether destination address test
+	ethtool -N eth0 flow-type ether dst yy:zz:aa:bb:cc:dd action 4
+
+  Traffic to that address should route to channel 4
+
+3) Drop test
+	ethtool -N end0 flow-type ether src xx:yy:zz:aa:bb:cc action -1
+
+  Traffic from that address should be dropped
+
+4) VLAN PCP test
+
+on Remote create VLAN with ID 5 and all traffic mapping to required priority to test. e.g. 7
+	sudo ip link add link eno1 name eno1.5 type vlan id 5 egress-qos-map 0:7 1:7 2:7 3:7 4:7 5:7 6:7 7:7
+	sudo ifconfig eno1.5 192.168.10.1
+
+on DUT create VLAN with id 5
+	ip link add link end0 name end0.5 type vlan id 5
+	ifconfig end0.5 192.168.10.5
+
+VLAN pcp 7 vid 5 route to RX channel 6
+	ethtool -N end0 flow-type ether vlan 0xe005 action 6
+
+  Traffic from that VLAN with PCP 7 should route to channel 6
+
+Signed-off-by: Roger Quadros <rogerq@kernel.org>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_irq.c     |    2 -
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.c  |    7 +--
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.h  |    1 
- drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |   50 +++++++++++++++++++++--
- 4 files changed, 51 insertions(+), 9 deletions(-)
+Changes in v5:
+- support RX_CLS_LOC_SPECIAL by plumbing our own logic of offering free classifier entires
+  for rules when rule location is not specified by user.
+- Updated commit log message for remove cpsw_ale_classifier_setup_default() on how
+  traffic will behave by default.
+- Link to v4: https://lore.kernel.org/r/20250514-am65-cpsw-rx-class-v4-0-5202d8119241@kernel.org
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-index 45af6c1331fb..432b053b5ed6 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-@@ -140,7 +140,7 @@ static irqreturn_t fbnic_mac_msix_intr(int __always_unused irq, void *data)
- 	/* Record link down events */
- 	if (!fbd->mac->get_link(fbd, fbn->aui, fbn->fec)) {
- 		fbn->link_down_events = link_down_events;
--		phylink_mac_change(fbn->phylink, false);
-+		phy_mac_interrupt(fbd->netdev->phydev);
- 	}
- 
- 	return IRQ_HANDLED;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index 2d5ae89b4a15..1d732cf22ec5 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -44,7 +44,7 @@ int __fbnic_open(struct fbnic_net *fbn)
- 	if (err)
- 		goto time_stop;
- 
--	err = fbnic_mac_request_irq(fbd);
-+	err = fbnic_phylink_connect(fbn);
- 	if (err)
- 		goto time_stop;
- 
-@@ -52,8 +52,6 @@ int __fbnic_open(struct fbnic_net *fbn)
- 	fbnic_bmc_rpc_init(fbd);
- 	fbnic_rss_reinit(fbd, fbn);
- 
--	phylink_resume(fbn->phylink);
--
- 	return 0;
- time_stop:
- 	fbnic_time_stop(fbn);
-@@ -86,10 +84,11 @@ static int fbnic_stop(struct net_device *netdev)
- {
- 	struct fbnic_net *fbn = netdev_priv(netdev);
- 
-+	fbnic_mac_free_irq(fbn->fbd);
-+	phylink_disconnect_phy(fbn->phylink);
- 	phylink_suspend(fbn->phylink, fbnic_bmc_present(fbn->fbd));
- 
- 	fbnic_down(fbn);
--	fbnic_mac_free_irq(fbn->fbd);
- 
- 	fbnic_time_stop(fbn);
- 	fbnic_fw_xmit_ownership_msg(fbn->fbd, false);
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-index 7b773c06e245..f8807f6e443d 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-@@ -107,6 +107,7 @@ int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
- int fbnic_phylink_get_fecparam(struct net_device *netdev,
- 			       struct ethtool_fecparam *fecparam);
- int fbnic_phylink_init(struct net_device *netdev);
-+int fbnic_phylink_connect(struct fbnic_net *fbn);
- void fbnic_phylink_pmd_training_complete_notify(struct fbnic_net *fbn);
- bool fbnic_check_split_frames(struct bpf_prog *prog,
- 			      unsigned int mtu, u32 hds_threshold);
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-index a9b2fc8108b7..b42cc5ad3055 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-@@ -132,9 +132,8 @@ fbnic_phylink_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 
- 	state->duplex = DUPLEX_FULL;
- 
--	state->link = (fbd->pmd_state == FBNIC_PMD_SEND_DATA) &&
--		      (rd32(fbd, FBNIC_PCS(MDIO_STAT1, 0)) &
--		       MDIO_STAT1_LSTATUS);
-+	state->link = !!(rd32(fbd, FBNIC_PCS(MDIO_STAT1, 0)) &
-+			 MDIO_STAT1_LSTATUS);
- }
- 
- static int
-@@ -264,6 +263,49 @@ int fbnic_phylink_init(struct net_device *netdev)
- 	return 0;
- }
- 
-+/**
-+ * fbnic_phylink_connect - Connect phylink structure to IRQ, PHY, and enable it
-+ * @fbn: FBNIC Netdev private data struct phylink device attached to
-+ *
-+ * This function connects the phylink structure to the PHY and IRQ and then
-+ * enables it to resuem operations. With this function completed the PHY will
-+ * be able to obtain link and notify the netdev of its current state.
-+ **/
-+int fbnic_phylink_connect(struct fbnic_net *fbn)
-+{
-+	struct fbnic_dev *fbd = fbn->fbd;
-+	struct phy_device *phydev;
-+	int err;
-+
-+	phydev = phy_find_first(fbd->mii_bus);
-+	if (!phydev) {
-+		dev_err(fbd->dev, "No PHY found\n");
-+		return -ENODEV;
-+	}
-+
-+	/* We don't need to poll, the MAC will notify us of events */
-+	phydev->irq = PHY_MAC_INTERRUPT;
-+
-+	phy_attached_info(phydev);
-+
-+	err = phylink_connect_phy(fbn->phylink, phydev);
-+	if (err) {
-+		dev_err(fbd->dev, "Error connecting phy, err: %d\n", err);
-+		return err;
-+	}
-+
-+	err = fbnic_mac_request_irq(fbd);
-+	if (err) {
-+		phylink_disconnect_phy(fbn->phylink);
-+		dev_err(fbd->dev, "Error requesting MAC IRQ, err: %d", err);
-+		return err;
-+	}
-+
-+	phylink_resume(fbn->phylink);
-+
-+	return 0;
-+}
-+
- /**
-  * fbnic_phylink_pmd_training_complete_notify - PMD training complete notifier
-  * @fbn: FBNIC Netdev private data struct phylink device attached to
-@@ -285,5 +327,5 @@ void fbnic_phylink_pmd_training_complete_notify(struct fbnic_net *fbn)
- 		return;
- 
- 	fbd->pmd_state = FBNIC_PMD_SEND_DATA;
--	phylink_mac_change(fbn->phylink, true);
-+	phy_mac_interrupt(fbd->netdev->phydev);
- }
+Changes in v4:
+- Added missing mutex_unlock in error case in am65_cpsw_rxnfc_add_rule()
+- Stop using devm_ variant for kalloc/kfree for rxnfc rules as we explictly
+  manage freeing.
+- Dropped unnecessary print message in am65_cpsw_set_rxnfc()
+- Link to v3: https://lore.kernel.org/r/20250513-am65-cpsw-rx-class-v3-0-492d9a2586b6@kernel.org
 
+Changes in v3:
+- Fixed bug in cpsw_ale_policer_save/restore(). '* 4' is not needed for
+  a u32 pointer.
+- Fixed reverse Christmas tree order
+- Moved mutex acquiring out of am65_cpsw_policer_find_match() and
+  at beginning of am65_cpsw_rxnfc_add_rule()
+- Link to v2: https://lore.kernel.org/r/20250505-am65-cpsw-rx-class-v2-0-5359ea025144@kernel.org
+
+Changes in v2:
+- Error out if VLAN_ID > 0 as VLAN ID based flow routing still doesn't
+   seem to work. Drop commented out code.
+- Limit lines to 80 characters whereever possible.
+- Change struct am65_cpsw_rxnfc_rule.location from int to unsigned int.
+- Add information about order of rules evaluation and multiple matches
+   in commit log.
+- Link to v1: https://lore.kernel.org/r/20250319-am65-cpsw-rx-class-v1-0-2bfded07490e@kernel.org
+
+---
+Roger Quadros (9):
+      net: ethernet: ti: cpsw_ale: Update Policer fields for more ALE size/ports
+      net: ethernet: ti: cpsw_ale: return ALE index in cpsw_ale_add_vlan()
+      net: ethernet: ti: cpsw_ale: return ALE index in cpsw_ale_vlan_add_modify()
+      net: ethernet: ti: cpsw_ale: return ALE index in cpsw_ale_add_ucast()
+      net: ethernet: ti: cpsw_ale: add cpsw_ale_policer_reset_entry()
+      net: ethernet: ti: cpsw_ale: add cpsw_ale_policer_set/clr_entry()
+      net: ethernet: ti: cpsw_ale: add policer save restore for PM sleep
+      net: ethernet: ti: am65-cpsw: add network flow classification support
+      net: ethernet: ti: am65-cpsw: remove cpsw_ale_classifier_setup_default()
+
+ drivers/net/ethernet/ti/am65-cpsw-ethtool.c   | 395 ++++++++++++++++++++++++++
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c      |  32 ++-
+ drivers/net/ethernet/ti/am65-cpsw-nuss.h      |  17 ++
+ drivers/net/ethernet/ti/am65-cpsw-switchdev.c |   6 +-
+ drivers/net/ethernet/ti/cpsw.c                |   4 +-
+ drivers/net/ethernet/ti/cpsw_ale.c            | 214 +++++++++-----
+ drivers/net/ethernet/ti/cpsw_ale.h            |  37 ++-
+ drivers/net/ethernet/ti/cpsw_new.c            |   4 +-
+ drivers/net/ethernet/ti/cpsw_switchdev.c      |   6 +-
+ 9 files changed, 622 insertions(+), 93 deletions(-)
+---
+base-commit: d1d7998df9d7d3ee20bcfc876065fa897b11506d
+change-id: 20250305-am65-cpsw-rx-class-666006fab9dd
+
+Best regards,
+-- 
+Roger Quadros <rogerq@kernel.org>
 
 
