@@ -1,63 +1,55 @@
-Return-Path: <netdev+bounces-232384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F47DC0531C
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 10:55:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 803EFC05298
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 10:48:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B54B154165A
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 08:45:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 066A51A00D5E
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 08:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF19D307AC6;
-	Fri, 24 Oct 2025 08:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 824D7305E19;
+	Fri, 24 Oct 2025 08:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="PIAWQ+3k"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fF/h/IEp"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC333074AF;
-	Fri, 24 Oct 2025 08:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB0B1E1C1A
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 08:46:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761295488; cv=none; b=KRPEM8hYcWXQbr4sZ152Ox4u8VabUOnSVlHmZKHeDS9YJSn49RY+Xr9k5QNv1otsm/0amBT/b1aV/ajhSo+zfONFLMAtL46fGP+vFAlco29efEkFT76W6WlnDtrZMBlxbG5L05p8tc9D/hSPAYqzuZiWUvqPnEbgXboKZK8k0wE=
+	t=1761295608; cv=none; b=rCAczUsTiuUx6lAiWjb5RNMY6C6IgB9Et3GhkY7Ul1MK6uirKi541rA+GByjuX9FFZObVpAVmdiEkfxCFXoeLpZrQuj+x7hP3gqZXGGOptopIxqq1X9/KPohmPDCWa1JpULbodLyjdB1zyhC6mfG/ji+ea/y+q8OiLmkOeuIHFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761295488; c=relaxed/simple;
-	bh=RUBNPB3AtMD0d3mNB+/CT5Me4yU+FU3u7SnGmbBeVas=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=peVoLt2OAU8wpE0NcbM26rRY5jTUKfLcx0sYX6ugTyfsSD9GiY1EER9lsxbVy1oa5RHQnQ7SDsOmBZ56wFIu90OepZ1KwJFZQLQKu7wk9A2ABdW/dYYkvCkuXiPWgLDVionwLcOQAHuygntKAzR4PA/f4UARFvZWS5sk4a6N9dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=PIAWQ+3k; arc=none smtp.client-ip=198.47.23.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 59O8hquH723152;
-	Fri, 24 Oct 2025 03:43:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1761295432;
-	bh=ZvFR30qFwvZDHVGLed7EJCdp64TbpYruso0PUk2iDPA=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=PIAWQ+3ks1HLabNDuXtiE78yWF1Uy6I+QQ2OkdKTByw0Uee5iZvpFkK5lpy/M/Srk
-	 sfQiJnsMDw0SokScbRv4/s79+iin2u0XXE3AYVHEMwHjQn1aIbysLrxcOh/9OT+7UR
-	 eJKocEi9lwikTjSAbuD3jH+NKsbwJPuRqrYR5Hi0=
-Received: from DFLE201.ent.ti.com (dfle201.ent.ti.com [10.64.6.59])
-	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 59O8hq7m3046177
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 24 Oct 2025 03:43:52 -0500
-Received: from DFLE213.ent.ti.com (10.64.6.71) by DFLE201.ent.ti.com
- (10.64.6.59) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 24 Oct
- 2025 03:43:51 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE213.ent.ti.com
- (10.64.6.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Fri, 24 Oct 2025 03:43:51 -0500
-Received: from [172.24.18.185] (lt9560gk3.dhcp.ti.com [172.24.18.185])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 59O8hipM077707;
-	Fri, 24 Oct 2025 03:43:45 -0500
-Message-ID: <dc82e53c-c565-460d-b268-26d0d5a9ed68@ti.com>
-Date: Fri, 24 Oct 2025 14:13:43 +0530
+	s=arc-20240116; t=1761295608; c=relaxed/simple;
+	bh=7NTSYxzKGmhxTqjYGUpBrKwqj3vK5IEOp4i6e4/crwI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=phaAssyMSjlGaz3/LlF1xYbvEI59UnT1pfjuTUuCN1GzFRL4jzzA9gxxMHaMT/shMIZku2iV91UWk1L1Q2tQre9v/U5lgXTnWNS0ZUnxHZH2AqTzfzo4U3dMNa7pOUCCdMnv5M/hSVryodQHQrtwh9PjsiHzf7dJURdbi8tFJfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fF/h/IEp; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 22E434E41268;
+	Fri, 24 Oct 2025 08:46:39 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id E676660703;
+	Fri, 24 Oct 2025 08:46:38 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E84D1102F2418;
+	Fri, 24 Oct 2025 10:46:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761295598; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=/FJvkjQlV+KcGybdpGHVwySBniEBQVrsx6zHgsH/Pm8=;
+	b=fF/h/IEpLmEYbGv8AIc21gmNOHFWK3B8F/+Czaw1MnNl2oiavQ842+VmD66TRUKib0YWKx
+	YoPH1Tx0VXwdrqpn4Xw9Y271XqVglfNrno0bzj27T0OcKAkRZPPNc9brloyCFCSSHXNf7p
+	5bZm73prx9a9l+nnWrjn7X/QsQA8CwS/FGBKDd4uqbLv7wvJ+rrChrcnQ0L1F8SVcd+MMp
+	VAEmU6VLE47rzEaF8Uxzwf6i35m5FZTzjXkD2+1lUJMtttwqg8hbF8mmYL8lG9bhKw6QJC
+	qhcsRPXzHsNTi3Z7bAwWUw2+eobj1thoWMOYJuMiN3zrR3watF80WpbuFFTPXQ==
+Message-ID: <e9aa0470-2bd2-4825-8333-ad9dbc7f40a0@bootlin.com>
+Date: Fri, 24 Oct 2025 10:46:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,66 +57,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 0/6] Add AF_XDP zero copy support
-To: Jacob Keller <jacob.e.keller@intel.com>, <horms@kernel.org>,
-        <namcao@linutronix.de>, <vadim.fedorenko@linux.dev>,
-        <christian.koenig@amd.com>, <sumit.semwal@linaro.org>,
-        <sdf@fomichev.me>, <john.fastabend@gmail.com>, <hawk@kernel.org>,
-        <daniel@iogearbox.net>, <ast@kernel.org>, <pabeni@redhat.com>,
-        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
-        <andrew+netdev@lunn.ch>
-CC: <linaro-mm-sig@lists.linaro.org>, <dri-devel@lists.freedesktop.org>,
-        <linux-media@vger.kernel.org>, <bpf@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-References: <20251023093927.1878411-1-m-malladi@ti.com>
- <def1cb92-c0cd-440f-933a-55a5be71251b@intel.com>
+Subject: Re: [RFC net-next] net: loopback: Extend netdev features with new
+ loopback modes
+To: Hariprasad Kelam <hkelam@marvell.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Sunil Goutham <sgoutham@marvell.com>,
+ Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
+ <sbhatta@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Kory Maincent <kory.maincent@bootlin.com>, Gal Pressman <gal@nvidia.com>,
+ Jianbo Liu <jianbol@nvidia.com>, Edward Cree <ecree.xilinx@gmail.com>,
+ Breno Leitao <leitao@debian.org>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Russell King <linux@armlinux.org.uk>
+References: <20251024044849.1098222-1-hkelam@marvell.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Content-Language: en-US
-From: "Malladi, Meghana" <m-malladi@ti.com>
-In-Reply-To: <def1cb92-c0cd-440f-933a-55a5be71251b@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+In-Reply-To: <20251024044849.1098222-1-hkelam@marvell.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Jacob,
+Hi,
 
-On 10/24/2025 6:26 AM, Jacob Keller wrote:
-> 
-> 
-> On 10/23/2025 2:39 AM, Meghana Malladi wrote:
->> This series adds AF_XDP zero coppy support to icssg driver.
->>
->> Tests were performed on AM64x-EVM with xdpsock application [1].
->>
->> A clear improvement is seen Transmit (txonly) and receive (rxdrop)
->> for 64 byte packets. 1500 byte test seems to be limited by line
->> rate (1G link) so no improvement seen there in packet rate
->>
->> Having some issue with l2fwd as the benchmarking numbers show 0
->> for 64 byte packets after forwading first batch packets and I am
->> currently looking into it.
->>
-> 
-> Do you think this means there is an issue with the patches or your test
-> setup?
-> 
-> I didn't see anything stand out as a problem to me when reading the series:
-> 
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> 
++Russell +Oleksij
 
-The setup is quite simple. I send broadcast traffic to the dut on which 
-I run l2fwd (with xdpsock) and expect the stats to increase. But after 
-4096 packets, the stats stop incrementing. And I see this issue only 
-with 64 byte packet and not with 1500 byte packets. I am suspecting 
-could be some race condition or some bug in our dma controller. I am 
-tracking this issue and post a fix for this separately.
+On 24/10/2025 06:48, Hariprasad Kelam wrote:
+> This patch enhances loopback support by exposing new loopback modes
+> (e.g., MAC, SERDES) to userspace. These new modes are added extension
+> to the existing netdev features.
+> 
+> This allows users to select the loopback at specific layer.
+> 
+> Below are new modes added:
+> 
+> MAC near end loopback
+> 
+> MAC far end loopback
+> 
+> SERDES loopback
+> 
+> Depending on the feedback will submit ethtool changes.
 
--- 
-Thanks,
-Meghana Malladi
+Good to see you're willing to tackle this work. However as Eric says,
+I don't think the netdev_features is the right place for this :
+ - These 3 loopback modes here may not be enough for some plaforms
+ - This eludes all PHY-side and PCS-side loopback modes that we could
+   also use.
+
+If we want to expose these loopback modes to userspace, we may actually
+need a dedicated ethtool netlink command for loopback configuration and
+control. This could then hit netdev ethtool ops or phy_device ethtool
+ops depending on the selected loopback point.
+
+If you don't want to deal with the whole complexity of PHY loopback, you
+can for now only hook into a newly introduced netdev ethtool ops dedicated
+to loopback on the ethnl side, but keep the door open for PHY-side
+loopback later on.
+
+Maxime
 
 
