@@ -1,106 +1,152 @@
-Return-Path: <netdev+bounces-232569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C684C06A7B
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:15:24 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ABD5C06AD0
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:22:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBA723A2DFA
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:15:19 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 443FE507C23
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87F51DE2A7;
-	Fri, 24 Oct 2025 14:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6438D1FF7C7;
+	Fri, 24 Oct 2025 14:20:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="evZP0PKO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OJTzsgoQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419C31A262D
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 14:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B3E1F462C
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 14:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761315317; cv=none; b=iso5VE/SmIDgf30LHJoU+Qb8cz9qrjjHX7l/2xA7dWDCyGV6jujW46/cUTTaKMYCf0dl6dzw0l6bfLItGDhm86y9OcCm/KdaBJ0/FyVnloG51D3ocQDUM6KWMzQyrc1MaRlw/FnizUffniC6IDVPv1iPqAuz+2gwtZkJcHGv2mE=
+	t=1761315644; cv=none; b=Qgz36k4L9iYnpbiPgYfCX0FO8FjDQq3glEx3g8aC3SnPZIq1cqvbAjKuMIGIWd/UEU4UH9YFNW1mhI8zh26LrjnTbVtIYQhgOc15GmdnihaFqhGi3+FORmjLCINtnHBv8gmUTZX2xZkW8MpQVJNo4cNc5ObsoVqety5QjXUT1iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761315317; c=relaxed/simple;
-	bh=uvQ+jkhqGKk1WpblEFgGkHsvG8VKbSBMqxWVYLkcBAs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dhGciFdwPo5ZqOF/AypZ8JvKXBJddO4cFSWOFv3q5AKtVgW8A5PpM1GVLZJmYM5K3AQ4VtTUND8gl1ocTIPVZXFcKTyx8yTssosF42wUegXe2NZ3Ek0ot1Ns2o+EQKUEoCxlaNrBSbA8qkv5YNQCNTBCEcpIMdw71xVWL+Ke8kY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=evZP0PKO; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b6cf1a95274so1547215a12.1
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 07:15:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761315315; x=1761920115; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uvQ+jkhqGKk1WpblEFgGkHsvG8VKbSBMqxWVYLkcBAs=;
-        b=evZP0PKOhGzqRaVUQt7pa827Zu1vLR+hRo8SMJNNEfo2IdMfpNGXm2Rs7RwFWnQT6D
-         T5z29NcXoVvQG1LGvxmpKpzoLMuwg7wQaCggmkx3e/nTN7v5RsTKcji99hwt2EDibw/T
-         UuVb3HP+qR+lkcxh6Li/1T2XbGZniWqXNnCZgtcsqV6bYjStH0GLOszeV9yqWoStRxb4
-         lduZNu+KeN2kXbphoIY+LmIzC6NhbPM1+DjVG42CVbtxDNu5ZnFxxnq+mIfVlWoigucm
-         5/+H2d/2RPKi1qeitd9cf3GkOay+/Ww6AQWPHIrp2W/5z88d/1s1eu04aCkIYwcyK+vL
-         dLQw==
+	s=arc-20240116; t=1761315644; c=relaxed/simple;
+	bh=7bNrS0idSyoOK5HTHFIzxp/9RrnqV0K6hYOGVJ2o9c8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=PZy5q84AIAd4zgwtS+s/kyzsF5t3TJ+gsN6qq1ErNEhSjJ10Cc/cCorOQV1XQe7CTGj755uKQ8rhRSC20ZrpflCNTgrXk7MmqCwOKubs8w8lS3TP/JrAuI/hVSKD/Efi2zDarQD5zfQNtRAEvHWQRAwh2g+NnbkibHmLYXIx8sA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OJTzsgoQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761315640;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j0zG4FmLeJZKywQ/yv1mXTKBR1/QBymmCDORQZLAZOU=;
+	b=OJTzsgoQg4nCuYHEcADj1FAeNCZvkTXFI4pW27NSqEHP1VerYLs6Ov3aGCIGnhyHOM9QDj
+	Y5qfsmhpNAgXJ9ptCU5U0MtEW0+6TsjegyHXxjULjjyr4gw7ZQG7TE7OLDl1WEpopMj6+j
+	jEyxnpGKRb7pWiGQskkWNL/VguwaZHI=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-626-t3_quZesM4i5rxFO_-Wrkg-1; Fri, 24 Oct 2025 10:20:39 -0400
+X-MC-Unique: t3_quZesM4i5rxFO_-Wrkg-1
+X-Mimecast-MFC-AGG-ID: t3_quZesM4i5rxFO_-Wrkg_1761315638
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b6d584a5147so164462666b.2
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 07:20:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761315315; x=1761920115;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uvQ+jkhqGKk1WpblEFgGkHsvG8VKbSBMqxWVYLkcBAs=;
-        b=wcry8tgeFzpTXTj4Fhaqc3aAWH1gdqnOdPg6oqOIp0vJm5/XM0WgwaEMyD0qvcATbM
-         hP4CnZjFgoxX9Jf9bvolWYS47KcKKgJQRKp9sA5KpLDd/uG2BqabyFQAGYk7gshwybGg
-         N9CTy5OaV9keck9cUFfQRPr35j0sFDRDMvqbcLXj8SKxThpyM9P6RWaCrn1ZrBEnrre9
-         bQe3FCi6toK+/gN48JQKdpnsXG3j0UFRLmnUmziimsR2zcrCTXhQh4GBLIm3QsZGMKSC
-         +sRuI0/NAwZpaCraWXwoEHICBWgMb4ZGV3FL+713zvf4UaQaz/I2ES1Tr3ZRXpRohmV1
-         nkdA==
-X-Forwarded-Encrypted: i=1; AJvYcCVOnV9QhSb12y8mwhzAURAYYpqTdkpW7cpRv+649zAN1prtwacevyY8uSdG65NLWtvHvLoQDF4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVyMs/C5QqDufsjzZHBIpYsw7okAbNzU2ACK3CbBaYzM4ltWIc
-	b3NSOagzAtOfdSIENpIqvsk7ergE6AeWJ8d90mb6AoptiGNIT8vpMjxNA4TXgvU0Cbri2+3Lh7y
-	FGiQc5HosEqk8sbPtXaRHCfriJHQL4A4=
-X-Gm-Gg: ASbGncv0UGuDOCTIxqWVTi3QJXSQw/lnvJJ/jcHVL0mOGGs+abVBxPvyPMs7/Rz1kGc
-	p5rhPDD1pdrvHq8av2SsJZ81B4pNCoT60UMLeb7eTQ0Y4HP0YZvCh5/isFVhVKch4QEyV8uzuuE
-	pSXsQhgaqXfwHXJc6aJgH+O1c8OcW1UpGY44FUCRnaCwjgUOKixKGETYCScl+Dn/r40E/V4QMbv
-	WAjNrEjRoijU318FisR8blAJZQb06/RHYltG158gsRZfPX9LdYWJ4NILz9XO/Nuibhgp6X2Hg==
-X-Google-Smtp-Source: AGHT+IEA5W7eu0BLPVxoxUEV/CvApTWO74PEQfhYdsvQ+n8nBGSFVPwTgxTq/YcM5nUWFMdEJw1vfxFmiGfSUME+Myg=
-X-Received: by 2002:a17:902:e944:b0:26e:e6ab:66fe with SMTP id
- d9443c01a7336-290c9c89033mr333543875ad.5.1761315315142; Fri, 24 Oct 2025
- 07:15:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761315638; x=1761920438;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j0zG4FmLeJZKywQ/yv1mXTKBR1/QBymmCDORQZLAZOU=;
+        b=VDvglrkmnHctG7/JOzpg6mfrUcNYchEGR0l2CQXUMvKbzLh29nZ/Ox55XaEjjq6q+9
+         szdkM/LAX30RwTBhHTx2/RCfq5Um4t+jwFrUR09d3S23PlZDHK/BGrDPMPpdHn2+uTIs
+         nIp44YcBtdzMTKLpRId7fhqGl2ai3xYXlGsyCM9Bv2VjXbNM0SYLdWT/S+yCwlXk92uG
+         1mto3A4yA71beyncpq4loZgIrC1yEYXfholZNK+0kAYbWt4Bp+D3AXn8Kibh9ZQXyuh0
+         us0roV9jAineOvQ7jWZtpyWvnkWi3EKSu77TGTpx89ORzDZg8mclz2f5kxIFIeSdfZ4o
+         6LHg==
+X-Forwarded-Encrypted: i=1; AJvYcCVj2o+CfuIDsa/is3gcQPrrwCcLqNLlIjCQcBNVTLdIz7eYPh0s5a2+9xnAunyMn5dm2STjF2A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTcFW8X+IvOtQ/JbvK50qe9FLMgAjguqrlLB02bffUvjshAB0Q
+	eGJjtu6TSZw40oevRx5mXcXp7suHqVKbqu7AWCMbjoi5y0oaAT/u7imYAY8QN7JdKczSnELr8Ky
+	Ibs8jLQ3FYwrlV/mTccxTfkTq7OGNkQU99s8Asu+Cs4dSZzBHyGtE7jdP6g==
+X-Gm-Gg: ASbGnctjan01odxxj3W4Q3nuSku4k4vbQ+d2I22AHT/TWIlK5Yu/KFm7iAXYyPev0ge
+	LMzWM4/ncyBl4+g3e5+WKG2nY84pys+OgUp9N1YH0pVtzOobAKdYhQKdqlLAoG73Ts1UM8BEfN2
+	/y6N7kh07zsFtgfSadN/W+CkRjWj5T84n+DoMjEogzdCpEhTlclkUx4kvJAQbf7iE8qVig4vD+z
+	1CPvVOTY/JrOVvRiEZ3QAT5rYup5RM9TjVo88tS2jDki4iDme549zeg10sEGsoGPvK+5fC99U96
+	Wal0CH7XwOnqU6CxMdmGCBn82s/4eaFE5lQU7WXJ6O6NNMh9C40dwAXB0pXeJqK/RbC6bv83CJw
+	wjfSeNtuWBZegaSnjA0eHb6A=
+X-Received: by 2002:a17:907:fd15:b0:b60:18d5:4293 with SMTP id a640c23a62f3a-b6471d45e76mr3455762566b.9.1761315638092;
+        Fri, 24 Oct 2025 07:20:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEh/0Q+22Fax089EqYk+r+im+q7S8/f/gRHSVQ7yD+yp9r3NCNb9dQdJV5y04Li0W418orApw==
+X-Received: by 2002:a17:907:fd15:b0:b60:18d5:4293 with SMTP id a640c23a62f3a-b6471d45e76mr3455759566b.9.1761315637667;
+        Fri, 24 Oct 2025 07:20:37 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d727b4338sm203849866b.52.2025.10.24.07.20.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Oct 2025 07:20:37 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 4FB972EA574; Fri, 24 Oct 2025 16:20:36 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
+Cc: Adrian Moreno <amorenoz@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, Stanislav
+ Fomichev <sdf@fomichev.me>, Xiao Liang <shaw.leon@gmail.com>, Nicolas
+ Dichtel <nicolas.dichtel@6wind.com>, Cong Wang <cong.wang@bytedance.com>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] rtnetlink: honor RTEXT_FILTER_SKIP_STATS in
+ IFLA_STATS
+In-Reply-To: <20251023083450.1215111-1-amorenoz@redhat.com>
+References: <20251023083450.1215111-1-amorenoz@redhat.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 24 Oct 2025 16:20:36 +0200
+Message-ID: <874irofkjv.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251023231751.4168390-1-kuniyu@google.com> <20251023231751.4168390-5-kuniyu@google.com>
-In-Reply-To: <20251023231751.4168390-5-kuniyu@google.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 24 Oct 2025 10:15:01 -0400
-X-Gm-Features: AWmQ_bmHnAeK2WlclRwGHjmwPGnZNFsUuJasTWT6C2yNaoAUurma4moeeIvQWtM
-Message-ID: <CADvbK_c50x2-OzGhNRfrRK9u0so7fsf92MKoaYTWXAxJoTp=uQ@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 4/8] net: Add sk_clone().
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	linux-sctp@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Thu, Oct 23, 2025 at 7:18=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
-m> wrote:
+Adrian Moreno <amorenoz@redhat.com> writes:
+
+> Gathering interface statistics can be a relatively expensive operation
+> on certain systems as it requires iterating over all the cpus.
 >
-> sctp_accept() will use sk_clone_lock(), but it will be called
-> with the parent socket locked, and sctp_migrate() acquires the
-> child lock later.
+> RTEXT_FILTER_SKIP_STATS was first introduced [1] to skip AF_INET6
+> statistics from interface dumps and it was then extended [2] to
+> also exclude IFLA_VF_INFO.
 >
-> Let's add no lock version of sk_clone_lock().
+> The semantics of the flag does not seem to be limited to AF_INET
+> or VF statistics and having a way to query the interface status
+> (e.g: carrier, address) without retrieving its statistics seems
+> reasonable. So this patch extends the use RTEXT_FILTER_SKIP_STATS
+> to also affect IFLA_STATS.
 >
-> Note that lockdep complains if we simply use bh_lock_sock_nested().
+> [1] https://lore.kernel.org/all/20150911204848.GC9687@oracle.com/
+> [2] https://lore.kernel.org/all/20230611105108.122586-1-gal@nvidia.com/
 >
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-Reviewed-by: Xin Long <lucien.xin@gmail.com>
+> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> ---
+>  net/core/rtnetlink.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> index 8040ff7c356e..88d52157ef1c 100644
+> --- a/net/core/rtnetlink.c
+> +++ b/net/core/rtnetlink.c
+> @@ -2123,7 +2123,8 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
+>  	if (rtnl_phys_switch_id_fill(skb, dev))
+>  		goto nla_put_failure;
+>  
+> -	if (rtnl_fill_stats(skb, dev))
+> +	if (~ext_filter_mask & RTEXT_FILTER_SKIP_STATS &&
+> +	    rtnl_fill_stats(skb, dev))
+
+Nit: I find this:
+
+	if (!(ext_filter_mask & RTEXT_FILTER_SKIP_STATS) &&
+	    rtnl_fill_stats(skb, dev))
+
+more readable. It's a logical operation, so the bitwise negation is less
+clear IMO.
+
+-Toke
+
 
