@@ -1,132 +1,130 @@
-Return-Path: <netdev+bounces-232383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66B5EC0518E
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 10:40:46 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F47DC0531C
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 10:55:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B78A1898C0D
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 08:41:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B54B154165A
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 08:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E229307AD8;
-	Fri, 24 Oct 2025 08:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF19D307AC6;
+	Fri, 24 Oct 2025 08:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="0T2yW/9O"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="PIAWQ+3k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED36305E2E
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 08:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC333074AF;
+	Fri, 24 Oct 2025 08:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761295113; cv=none; b=cAVNetbzpzkJCko2G4NuYO1tAWSpz5Fz1qYCyyq9kNx5hUeILAKsJb/Be9ljCRsE+EBwf7REZgpTu328KlWZWGRU+Dgt8HQ9oaMGlw+xInuEzfrD68JRflw8V6XHvCGz9flC94P07rYgARYCKd5R4i6zGPodrLfA77tG4vpTl4c=
+	t=1761295488; cv=none; b=KRPEM8hYcWXQbr4sZ152Ox4u8VabUOnSVlHmZKHeDS9YJSn49RY+Xr9k5QNv1otsm/0amBT/b1aV/ajhSo+zfONFLMAtL46fGP+vFAlco29efEkFT76W6WlnDtrZMBlxbG5L05p8tc9D/hSPAYqzuZiWUvqPnEbgXboKZK8k0wE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761295113; c=relaxed/simple;
-	bh=1sYWKH6IC2Atu0efAqlDzjFXOWx4uiUsQvNOsdd4ofA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rL21B3q6pjanESCQMQKiC3dLO/IkaANRZ+k2Wy+53qq2ZvS842WOjp3sFHX4+PqKDpBVENAWmiZUttHDMgG8uRZ9dX8jmoKEX3uHRQ4Gm7hpJtTlyh+gJQT424A5RqHyCCqVAw4WAvfzyoGYqj//uNri++6gP/s16z9qx3f+ld0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=0T2yW/9O; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-471193a9d9eso20221065e9.2
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 01:38:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1761295110; x=1761899910; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=80QdPW8xs3jigAZkYOK79HscTaaMenUE7Hqh9AqASfs=;
-        b=0T2yW/9O9LdPHrzd7ZPypyJmm6fy4Pw7e7hTWzEUBiDXjA7bYW0Bil26nj5dYG1Ovo
-         De8KMSxbMAE1Xmefv5h2ItwcDqQfIoJbvJDM5xF7KOP0i6ktlXHez5Zh0aKyTryVWRI2
-         B9sr17FNIh39NwailfrvW4+c++kMNnQz8Y0B/UChJs0uBvTRFFKC1KhIc49d5uLrDitq
-         yW/iiwOadW6D6Onq/B2NQoGVtCD6LgzNCWYAJYzMTr1Q2ASHlbIQAIb8TOBaX3zYhlf5
-         zP5yHgubffGBFoItkc6iPOSKdP8xyxebPOUULsfbh5aGSavjvKDjfg/bBE2QYXRGB+ww
-         jbTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761295110; x=1761899910;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=80QdPW8xs3jigAZkYOK79HscTaaMenUE7Hqh9AqASfs=;
-        b=j5qc0cwDSQdFxs039N5teJYHzSwNumMMqlbbzU2iJy72lV7cn1+g7KCxecm4CDkF7a
-         km5huXZNyCqQ5MsaFnd62k77zt8Ejr8cAKNb0Pxs/ZbunC7J8Cc0wJ6dBxSV5TqH2wxE
-         YViXEJd1+OdrWeTJkqfGw8tef1JtQ64zSlfjZu+dNXwKv73+2RiUvFW7niF9RHilJ6Bh
-         v1y1NkDJfAYMNQ5fl2MuGKrt4IlQJ0Mc7urwIjPPi/qpEUU/5AEdGWbIIHqpfScTuw8g
-         jSOCwLLQRHqRo9OCQe0Mr9o7a4WK8lZZbe+ShZaAg/H206QTaHVc03+WjwgywfTAgu6E
-         RMVw==
-X-Forwarded-Encrypted: i=1; AJvYcCXsEH+ZjdJwqAHNQfwblQqPJTQBu+SZDYfO7VfcrONqf/hUOPdIo2kALZJnwqtK4x9oc2nCfV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1qCYVyH/zToVjSUYXV1tsnlIAcfsHJqDgBZf6hc4KHn1Gbom8
-	gGj0AHrJM6YEm3WQiEkEiV1Db+0wDVgDsNrHu2YFJcEYZ3jcUfQblFG/z0GmpRjQWFE=
-X-Gm-Gg: ASbGncteQW4bDn+eyj6sShBed+bgQyWTNNeh3KZIUSEmZ9M7ctuF+wkoWFTYhuGG6qZ
-	zO/ZjKSqnG50QtYWKrDNJHGVvROp8heOxIqQB2w1Oppf95SGCylLL/5rbV+WO7kZh3hvEFqRdkn
-	RZWFC2I2a/K2Z5yWyb6aTjKXP15R88C1pj4d1NL0ltP4+4VDQf3EKdileQoziI2A0vBeaKxQSXh
-	lzNeX4D8zhFr44HKEICS2oyBGPL42X1uWINR7Tk7KGbK84PwGz3CAgxQ0aO+cgAmyVt1/MY4oe1
-	zRsE1/DKYEeyqZjV62OwDZfp/sTQdMcA+xZXqVGcepwjy5IPYDtZLsw8BFajFsumqbYcS7IyZ5/
-	qERU6yCjRIlGjSM2kHNPwJwKOZAcKqU9A1ZaxWURFX0mEyYJnQbRBk7VLeQAlYfHhkZAtJRoV5Z
-	JwBhwBU89XJa9Wk8dh6aa/mLQw+ig+TbyG46ywvg==
-X-Google-Smtp-Source: AGHT+IFebyV9pIuNei9GxC51FTBt0x05QRPgJ+uhxLLSTuVNX5j3YbmdoROIxdQ6NS0xF46TN4guIw==
-X-Received: by 2002:a05:600c:a00f:b0:46e:330a:1762 with SMTP id 5b1f17b1804b1-475d2ec570bmr12961075e9.22.1761295108775;
-        Fri, 24 Oct 2025 01:38:28 -0700 (PDT)
-Received: from jiri-mlt.client.nvidia.com ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475c4342946sm138764075e9.10.2025.10.24.01.38.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Oct 2025 01:38:28 -0700 (PDT)
-Date: Fri, 24 Oct 2025 10:38:26 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Tariq Toukan <tariqt@nvidia.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Leon Romanovsky <leon@kernel.org>, 
-	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Vlad Dumitrescu <vdumitrescu@nvidia.com>, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next] net/mlx5: Implement swp_l4_csum_mode via
- devlink params
-Message-ID: <mywwk6443uvf5mluxqzeylgsfblpsgfefdnrrpjfoerfhmdprw@bfjgiz5cvfou>
-References: <20251022190932.1073898-1-daniel.zahka@gmail.com>
- <uqbng3vzz2ybmrrhdcocsfjtfxitck2rs76hcrsk7aiddjssp2@haqcnmzrljws>
- <ae217501-b1e0-4f85-a965-a99d1c44a55b@gmail.com>
+	s=arc-20240116; t=1761295488; c=relaxed/simple;
+	bh=RUBNPB3AtMD0d3mNB+/CT5Me4yU+FU3u7SnGmbBeVas=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=peVoLt2OAU8wpE0NcbM26rRY5jTUKfLcx0sYX6ugTyfsSD9GiY1EER9lsxbVy1oa5RHQnQ7SDsOmBZ56wFIu90OepZ1KwJFZQLQKu7wk9A2ABdW/dYYkvCkuXiPWgLDVionwLcOQAHuygntKAzR4PA/f4UARFvZWS5sk4a6N9dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=PIAWQ+3k; arc=none smtp.client-ip=198.47.23.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 59O8hquH723152;
+	Fri, 24 Oct 2025 03:43:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1761295432;
+	bh=ZvFR30qFwvZDHVGLed7EJCdp64TbpYruso0PUk2iDPA=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=PIAWQ+3ks1HLabNDuXtiE78yWF1Uy6I+QQ2OkdKTByw0Uee5iZvpFkK5lpy/M/Srk
+	 sfQiJnsMDw0SokScbRv4/s79+iin2u0XXE3AYVHEMwHjQn1aIbysLrxcOh/9OT+7UR
+	 eJKocEi9lwikTjSAbuD3jH+NKsbwJPuRqrYR5Hi0=
+Received: from DFLE201.ent.ti.com (dfle201.ent.ti.com [10.64.6.59])
+	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 59O8hq7m3046177
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 24 Oct 2025 03:43:52 -0500
+Received: from DFLE213.ent.ti.com (10.64.6.71) by DFLE201.ent.ti.com
+ (10.64.6.59) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 24 Oct
+ 2025 03:43:51 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE213.ent.ti.com
+ (10.64.6.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Fri, 24 Oct 2025 03:43:51 -0500
+Received: from [172.24.18.185] (lt9560gk3.dhcp.ti.com [172.24.18.185])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 59O8hipM077707;
+	Fri, 24 Oct 2025 03:43:45 -0500
+Message-ID: <dc82e53c-c565-460d-b268-26d0d5a9ed68@ti.com>
+Date: Fri, 24 Oct 2025 14:13:43 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ae217501-b1e0-4f85-a965-a99d1c44a55b@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 0/6] Add AF_XDP zero copy support
+To: Jacob Keller <jacob.e.keller@intel.com>, <horms@kernel.org>,
+        <namcao@linutronix.de>, <vadim.fedorenko@linux.dev>,
+        <christian.koenig@amd.com>, <sumit.semwal@linaro.org>,
+        <sdf@fomichev.me>, <john.fastabend@gmail.com>, <hawk@kernel.org>,
+        <daniel@iogearbox.net>, <ast@kernel.org>, <pabeni@redhat.com>,
+        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
+        <andrew+netdev@lunn.ch>
+CC: <linaro-mm-sig@lists.linaro.org>, <dri-devel@lists.freedesktop.org>,
+        <linux-media@vger.kernel.org>, <bpf@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+References: <20251023093927.1878411-1-m-malladi@ti.com>
+ <def1cb92-c0cd-440f-933a-55a5be71251b@intel.com>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <def1cb92-c0cd-440f-933a-55a5be71251b@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Thu, Oct 23, 2025 at 04:34:15PM +0200, daniel.zahka@gmail.com wrote:
->
->
->On 10/23/25 8:18 AM, Jiri Pirko wrote:
->> Wed, Oct 22, 2025 at 09:09:31PM +0200, daniel.zahka@gmail.com wrote:
->> > swp_l4_csum_mode controls how L4 transmit checksums are computed when
->> > using Software Parser (SWP) hints for header locations.
->> > 
->> > Supported values:
->> >   1. device_default: use device default setting.
->> Is this different between devices/fw_versions?
->
->That is what I presume. I believe the current setting for swp_l4_csum_mode is
->ultimately encoded in the capabilities advertised to the driver during
->initialization. For example, I am mostly interested in mlx5e_psp_init(),
->which depends on:
->
->    if (!MLX5_CAP_ETH(mdev, swp_csum_l4_partial)) {
->        mlx5_core_dbg(mdev, "SWP L4 partial checksum not supported\n");
->        return 0;
->    }
->
->My guess is that "device_default" means that this bit would depend on the
->device/fw_version.
+Hi Jacob,
 
-Hmm, I would like to clear the meaning of this before we add it to UAPI.
-Asked internally, will let you know. 
+On 10/24/2025 6:26 AM, Jacob Keller wrote:
+> 
+> 
+> On 10/23/2025 2:39 AM, Meghana Malladi wrote:
+>> This series adds AF_XDP zero coppy support to icssg driver.
+>>
+>> Tests were performed on AM64x-EVM with xdpsock application [1].
+>>
+>> A clear improvement is seen Transmit (txonly) and receive (rxdrop)
+>> for 64 byte packets. 1500 byte test seems to be limited by line
+>> rate (1G link) so no improvement seen there in packet rate
+>>
+>> Having some issue with l2fwd as the benchmarking numbers show 0
+>> for 64 byte packets after forwading first batch packets and I am
+>> currently looking into it.
+>>
+> 
+> Do you think this means there is an issue with the patches or your test
+> setup?
+> 
+> I didn't see anything stand out as a problem to me when reading the series:
+> 
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> 
+
+The setup is quite simple. I send broadcast traffic to the dut on which 
+I run l2fwd (with xdpsock) and expect the stats to increase. But after 
+4096 packets, the stats stop incrementing. And I see this issue only 
+with 64 byte packet and not with 1500 byte packets. I am suspecting 
+could be some race condition or some bug in our dma controller. I am 
+tracking this issue and post a fix for this separately.
+
+-- 
+Thanks,
+Meghana Malladi
+
 
