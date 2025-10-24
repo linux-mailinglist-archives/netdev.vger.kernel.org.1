@@ -1,121 +1,167 @@
-Return-Path: <netdev+bounces-232353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC198C0489C
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 08:39:13 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CD15C048AC
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 08:43:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E19A71888868
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 06:39:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CE4904F5A41
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 06:43:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6AB265CB2;
-	Fri, 24 Oct 2025 06:39:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB062798F3;
+	Fri, 24 Oct 2025 06:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nHA3U3Ws"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AFC618EB0;
-	Fri, 24 Oct 2025 06:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD52C277CA4
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 06:43:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761287947; cv=none; b=MZANjrPsNw3GhZaM+qRV3fmzBs1U4D8tmGI2vGdM4uh2QVDcoca0XlwYrb2zfJSx67fEk538+Rf/4iJCxWCvmV8irbSnAjfM2G02r46slvJl0LRqowav6RBTNND6SEJ+jCA4XMitZL1Qao85deod5wbJaZ2sk/dH25a9oXkNTs8=
+	t=1761288221; cv=none; b=bXVZNQGM1GNM5sksqD5iokbDUVc7LVBQiC4d4WUCIsy3sZNAVS+jurKintYnXQYI1aB7XPOLycqGiTUy9HxV7JpLXXU+Z37+BvJMwp18ELU82dNAE7v6Rnd6nQeWV3sqBbRSAlxLGqPoSzU3uAUb3d01Kr9P31gm5oY1zOERYxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761287947; c=relaxed/simple;
-	bh=RUHE8iJmBlRsQEc5EW4vCzzCdD+8XbCcV/ItdmFqlT0=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=U/ywqdadCuzbc0Q7M398eA34O5apF+6VBLHFpVDfLBazFz0VSjZddvdVNiNDr19Dk1OyaU88qmmy20Lzta1Qc4qroawPNQsdoW8bYTlhhPHwsUhGbpChPm7Ny83EzgM7f24asz5gKM7POKR5B3nUdgchn758Zk4Lh8V2A19zAkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ctCmC4hDyzxX6n;
-	Fri, 24 Oct 2025 14:34:03 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id F40E5180489;
-	Fri, 24 Oct 2025 14:39:01 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 24 Oct 2025 14:39:00 +0800
-Message-ID: <cc7362e8-e8ae-4813-a73b-d752b403332a@huawei.com>
-Date: Fri, 24 Oct 2025 14:39:00 +0800
+	s=arc-20240116; t=1761288221; c=relaxed/simple;
+	bh=h2do/o72s1S1CroaAeWrkIDYcS+e5vX7dYGFhfPZhPU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=khQ3tj1u7HNT4VBNOxswW7O0oLmyYKR68JDgzdAYR50pfgPyWHso9MTdVVmoow3ze89717Kjjbg69feheEEiAxLxM4CNfnY/s7MG0nxiOMm8CvEUIA8pCO42njj/ra1LXlf4Cc7RKgrBe0pltrqkjEG2k0qMRF3po1BM0rUWrjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nHA3U3Ws; arc=none smtp.client-ip=74.125.224.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-63e336b1ac4so2869599d50.1
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 23:43:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761288218; x=1761893018; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e2UFjwfCheMSDPhpGuyj3HSoQ9LJMT/wq2yi5Xk/+fI=;
+        b=nHA3U3WsN7mOTeoNeolfMS8TaMNQHYvssmz4Bz1fZaSuZgBr0Dpr2nPpNb06gfzyw2
+         m2XglHuFzsyM6eMA33z1GFsrw/LgmiV8+TDJNTl2BJ87DVGjyixDsbvguNWxZHxIJz2Z
+         VBT5UwqvqfoKBbdQXHfGT/cqMVCsmtQBTSRfpJhl4OGgFlJl01sqY6P3Oco6Sks4lsDF
+         u4q71fA9wwa6Y3zkbLIcvWgUmVUVnaLVnf9WGxmwVOKrJMeQ6iY33gLVVqkX//lOOBt1
+         BnLQHgnRWJMGFWB2v/zktoMWsoWBnZXevyitSGwFYS6wa7E5efHudzeyJ7+2wYN8QOLc
+         Wz4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761288218; x=1761893018;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e2UFjwfCheMSDPhpGuyj3HSoQ9LJMT/wq2yi5Xk/+fI=;
+        b=EdWAfQ3TZHio2d3RHtMtpkoLKq4dFiA1Lm+Z11MpvMLiALt9IWnjXesXlZ+u92Ipkk
+         lvWFFk026Kjh5h/Ru4WEapQwhOEDCDMYrR9ds3pHd1eRggrf/6rbqATax/dKGg5jcoym
+         YoGZYiNFfVU+BJ5h2FQDrOG70GYM7Nuife+BvL408YaxanKbx/peI5iRiDVWkNtdX/hw
+         Nm/Ix3oszr/z4ia2xOx+Oflq+uQDVjMveJpc+Lfp/wTk1fSeY63QdClmnmRf9jOHhTh5
+         iVATE8WlajpXNT+hLroYT1FZAeurq/LdSj2YCH9S023LIDcionUjcQlHJe4BpYDFRJrn
+         hNOw==
+X-Gm-Message-State: AOJu0Yzb446UM8fsHSTJEGxzR8qeNerIZMRJquBTV50P3OI+Nwf4ia/2
+	m5LdUH/fLjuYDUBcJwKjHbL1WQfRWeyOJNKh9SANOV25OE4w0MCvDiG827UGZKAdyj15iJfk0Kk
+	T75gOCKLHhZV/FHIJlo3egIoauTVAlqzUaFMsZAA9
+X-Gm-Gg: ASbGnctPQF/YiEcAYtKyc537S2Eb1FNKfFIBbpfr7EC12L2Rj4f8GXMfLTxwvMXmKr5
+	R86eDOmNucWXDH5PCFbTnvZwmyaNQkS83jD264AQfo15jMMcP12XbL0QRYd/LgQ8qraMpscoSc+
+	+ZT5U80E13G7Dv+youNX4adH1GT5t7cvg4y9ilFhVk+y/a30K/oAP6KmjgMcPl5t88y8bGUTdIO
+	2bRxd5YoOSDUZZzYquH3mqy0qPXbzR040hbcdmQCOLYNfkrZE/UfNFhML3n
+X-Google-Smtp-Source: AGHT+IF1HVSnu6HsUGLipnhFezBFZO84eR0OgQFQffQJBEg1eFTIaGcwBZzC2UliCBsgQ5v+CoTvGXzZDqC/JNbTkjE=
+X-Received: by 2002:a05:690e:1409:b0:63e:2366:7ce1 with SMTP id
+ 956f58d0204a3-63f42a200d8mr1145430d50.0.1761288218376; Thu, 23 Oct 2025
+ 23:43:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <lantao5@huawei.com>,
-	<huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
-	<jonathan.cameron@huawei.com>, <salil.mehta@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net 1/3] net: hibmcge: fix rx buf avl irq is not
- re-enabled in irq_handle issue
-To: Jacob Keller <jacob.e.keller@intel.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<andrew+netdev@lunn.ch>, <horms@kernel.org>
-References: <20251021140016.3020739-1-shaojijie@huawei.com>
- <20251021140016.3020739-2-shaojijie@huawei.com>
- <759b7628-76b2-4830-97b2-d3ef28830c08@intel.com>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <759b7628-76b2-4830-97b2-d3ef28830c08@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+References: <1761286996-39440-1-git-send-email-liyonglong@chinatelecom.cn> <1761286996-39440-2-git-send-email-liyonglong@chinatelecom.cn>
+In-Reply-To: <1761286996-39440-2-git-send-email-liyonglong@chinatelecom.cn>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 23 Oct 2025 23:43:25 -0700
+X-Gm-Features: AWmQ_blbjdPZKhGT9XBif5vxZmEROBogKMIVtgj_e_I3KnoOsKnizLtuSDPMwUI
+Message-ID: <CANn89i+TsY67y-pCkOkJHsh11Leg77Ek7n2-j6X6ed-U20eR=g@mail.gmail.com>
+Subject: Re: [PATH net 1/2] net: ip: add drop reasons when handling ip fragments
+To: Yonglong Li <liyonglong@chinatelecom.cn>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
+	pabeni@redhat.com, kuba@kernel.org, horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-on 2025/10/24 9:15, Jacob Keller wrote:
+On Thu, Oct 23, 2025 at 11:23=E2=80=AFPM Yonglong Li <liyonglong@chinatelec=
+om.cn> wrote:
 >
-> On 10/21/2025 7:00 AM, Jijie Shao wrote:
->> irq initialized with the macro HBG_ERR_IRQ_I will automatically
->> be re-enabled, whereas those initialized with the macro HBG_IRQ_I
->> will not be re-enabled.
->>
->> Since the rx buf avl irq is initialized using the macro HBG_IRQ_I,
->> it needs to be actively re-enabled.
->>
-> This seems like it would be quite a severe issue. Do you have
-> reproduction or example of what the failure state looks like?
-
-priv->stats.rx_fifo_less_empty_thrsld_cnt can only be increased to 1
-and cannot be increased further.
-
-It is not a very serious issue, it affects the accuracy of a statistical item.
-
+> 1, add new drop reason FRAG_FAILED, and use it in ip_do_fragment
+> 2, use drop reasons PKT_TOO_BIG in ip_fragment
 >
->  From the fixed commit, the RX_BUF_AVL used to be HBG_ERR_IRQ_I but now
-> it uses HBG_IRQ_I so that it can have its own custom handler.. but
-> HBG_IRQ_I doesn't set re_enable to true...
+> Signed-off-by: Yonglong Li <liyonglong@chinatelecom.cn>
+> ---
+>  include/net/dropreason-core.h | 3 +++
+>  net/ipv4/ip_output.c          | 6 +++---
+>  2 files changed, 6 insertions(+), 3 deletions(-)
 >
-> It seems like a better fix would be having an HBG_ERR_IRQ_I variant that
-> lets you pass your own function instead of making the handler have to do
-> the hbg_hw_irq_enable call in its handler?
+> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.=
+h
+> index 58d91cc..7da80f4 100644
+> --- a/include/net/dropreason-core.h
+> +++ b/include/net/dropreason-core.h
+> @@ -99,6 +99,7 @@
+>         FN(DUP_FRAG)                    \
+>         FN(FRAG_REASM_TIMEOUT)          \
+>         FN(FRAG_TOO_FAR)                \
+> +       FN(FRAG_FAILED)                 \
+>         FN(TCP_MINTTL)                  \
+>         FN(IPV6_BAD_EXTHDR)             \
+>         FN(IPV6_NDISC_FRAG)             \
+> @@ -500,6 +501,8 @@ enum skb_drop_reason {
+>          * (/proc/sys/net/ipv4/ipfrag_max_dist)
+>          */
+>         SKB_DROP_REASON_FRAG_TOO_FAR,
+> +       /* do ip/ip6 fragment failed */
+> +       SKB_DROP_REASON_FRAG_FAILED,
+>         /**
+>          * @SKB_DROP_REASON_TCP_MINTTL: ipv4 ttl or ipv6 hoplimit below
+>          * the threshold (IP_MINTTL or IPV6_MINHOPCOUNT).
+> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+> index ff11d3a..879fe49 100644
+> --- a/net/ipv4/ip_output.c
+> +++ b/net/ipv4/ip_output.c
+> @@ -588,7 +588,7 @@ static int ip_fragment(struct net *net, struct sock *=
+sk, struct sk_buff *skb,
+>                 IP_INC_STATS(net, IPSTATS_MIB_FRAGFAILS);
+>                 icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED,
+>                           htonl(mtu));
+> -               kfree_skb(skb);
+> +               kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
 
-Currently, only the RX_BUF_AVL interrupt needs to be enabled separately.
-Personally, I think it is acceptable to temporarily not use the an HBG_ERR_IRQ_I variant.
+This part looks fine.
 
+>                 return -EMSGSIZE;
+>         }
 >
->> Fixes: fd394a334b1c ("net: hibmcge: Add support for abnormal irq handling feature")
->> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
->> ---
->>   drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
->> index 8af0bc4cca21..ae4cb35186d8 100644
->> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
->> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
->> @@ -32,6 +32,7 @@ static void hbg_irq_handle_rx_buf_val(struct hbg_priv *priv,
->>   				      const struct hbg_irq_info *irq_info)
->>   {
->>   	priv->stats.rx_fifo_less_empty_thrsld_cnt++;
->> +	hbg_hw_irq_enable(priv, irq_info->mask, true);
->>   }
->>   
->>   #define HBG_IRQ_I(name, handle) \
+> @@ -871,7 +871,7 @@ int ip_do_fragment(struct net *net, struct sock *sk, =
+struct sk_buff *skb,
+>                         return 0;
+>                 }
+>
+> -               kfree_skb_list(iter.frag);
+> +               kfree_skb_list_reason(iter.frag, SKB_DROP_REASON_FRAG_FAI=
+LED);
+>
+>                 IP_INC_STATS(net, IPSTATS_MIB_FRAGFAILS);
+>                 return err;
+> @@ -923,7 +923,7 @@ int ip_do_fragment(struct net *net, struct sock *sk, =
+struct sk_buff *skb,
+>         return err;
+>
+>  fail:
+> -       kfree_skb(skb);
+> +       kfree_skb_reason(skb, SKB_DROP_REASON_FRAG_FAILED);
+
+There are many different reasons for the possible failures ?
+skb_checksum_help() error,
+ip_frag_next() error
+output() error.
+
+I think that having the distinction could really help, especially the
+output() one...
 
