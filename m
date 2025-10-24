@@ -1,221 +1,116 @@
-Return-Path: <netdev+bounces-232608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F979C07142
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 17:50:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C25EC0719D
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 17:54:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8A065508893
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 15:49:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7334A1B81397
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 15:53:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34FEB32E73D;
-	Fri, 24 Oct 2025 15:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E258322C99;
+	Fri, 24 Oct 2025 15:52:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="V4tYt5W5";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="KDfVtia9";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="V4tYt5W5";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="KDfVtia9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C25tWL8s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C194328B45
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 15:49:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A75289340;
+	Fri, 24 Oct 2025 15:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761320967; cv=none; b=hsZHZmScEEU/w5DK4oirhd4qEQs3wmFfCi2Srwj2bXekCRpSEoEkjUR0Bp8VWybeJ69FwqUSkWIYKH7ZnIBQ5k4Btc9sbf5I7vHaCqpqrxUBd3qP5eT3jNWM92RImy/Ib6CH8AVwnqB5gdfMPJ4wEvcSpXD+xZds4YlYzmzzO8Y=
+	t=1761321159; cv=none; b=NkACyqA7VvJ7C/6Rmwg+NUMO5Mzdn8K2yWSeQLdOqQHZXDR2zUaOq//UGIc9ByM6yPl2W04KxxDi3tv29ZZZzEi5S15xZG9NwvP6gu0+JOhbLKDrEOg3cFEIbzK9AUTC2hcK1PaJy9hO8B3WF2pQK7a3DwZrfvW6wxPLDhdusOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761320967; c=relaxed/simple;
-	bh=pUt3macq9aC/xFaDi3e0yXOG0jr8Yic6Te5qWIr9YL0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BPmK6sKbreqmtC+6WxvNt0flngrFsuikJvMXip57B6w61lXYy03fToMod3rHE5ki40ZhLKaOExDZc5wLZ3GY28nP/x4uHuDdwiGcalk41khEvCImb45odu6kfEKOEUWAekpvh8JBIkYSc4SNq8eBz0JRPHbNx3cBnCfWetPgT9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=V4tYt5W5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=KDfVtia9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=V4tYt5W5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=KDfVtia9; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id C36D61F451;
-	Fri, 24 Oct 2025 15:49:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1761320957; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AeJWPKRttC8nCexjJ0wKvKpK6/EWWl/jl5GEx61dRGE=;
-	b=V4tYt5W52XcpJTFDnMImJOtiYqiEMS3tNVLKQbucp/bA2bhyDcnI82fPHBmP4PrjcQ754a
-	7aw61tHzv2G4NLYjr7i83eqRfPoexqfDSqCbUper+FFH6wBylmLJQbAv8NOQMtlHghvWxn
-	xdBRxRBbMgiSEy6XvjllODuQG7tH9bw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1761320957;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AeJWPKRttC8nCexjJ0wKvKpK6/EWWl/jl5GEx61dRGE=;
-	b=KDfVtia9M7SqRrY55IMJxLo4Y0FGP7cxJUvmZqpU9s3C53MtyY1x35ZKrUP+zenpX4gZi2
-	IB27mY2bFJ+PHYAQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=V4tYt5W5;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=KDfVtia9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1761320957; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AeJWPKRttC8nCexjJ0wKvKpK6/EWWl/jl5GEx61dRGE=;
-	b=V4tYt5W52XcpJTFDnMImJOtiYqiEMS3tNVLKQbucp/bA2bhyDcnI82fPHBmP4PrjcQ754a
-	7aw61tHzv2G4NLYjr7i83eqRfPoexqfDSqCbUper+FFH6wBylmLJQbAv8NOQMtlHghvWxn
-	xdBRxRBbMgiSEy6XvjllODuQG7tH9bw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1761320957;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AeJWPKRttC8nCexjJ0wKvKpK6/EWWl/jl5GEx61dRGE=;
-	b=KDfVtia9M7SqRrY55IMJxLo4Y0FGP7cxJUvmZqpU9s3C53MtyY1x35ZKrUP+zenpX4gZi2
-	IB27mY2bFJ+PHYAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7CCB5132C2;
-	Fri, 24 Oct 2025 15:49:17 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 9cc/Ev2f+2gOEQAAD6G6ig
-	(envelope-from <krisman@suse.de>); Fri, 24 Oct 2025 15:49:17 +0000
-From: Gabriel Krisman Bertazi <krisman@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Gabriel Krisman Bertazi <krisman@suse.de>,
-	netdev@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Subject: [PATCH 3/3] io_uring: Introduce getsockname io_uring cmd
-Date: Fri, 24 Oct 2025 11:49:00 -0400
-Message-ID: <20251024154901.797262-4-krisman@suse.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251024154901.797262-1-krisman@suse.de>
-References: <20251024154901.797262-1-krisman@suse.de>
+	s=arc-20240116; t=1761321159; c=relaxed/simple;
+	bh=EasIsdul3hK96kw5dNYavpFbf3KHAIl4PmdqMLK95ZM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g9OBGHjqVY4t2iZi9sSd5CMtp+eM7DLs2GM/MA1/F3g95uzCBiDd3QbjVFSyQE/KGV/cuzbnTtJO5POyT2swus2mJ0IAn0joCpfTAqF2eA0A2I+E6bY9y6DSTBcDM6Z8RmBco25tSQL6uC84Gl+laKGlvOOQ7wWZQxX17tYorwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C25tWL8s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F452C4CEF1;
+	Fri, 24 Oct 2025 15:52:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761321159;
+	bh=EasIsdul3hK96kw5dNYavpFbf3KHAIl4PmdqMLK95ZM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C25tWL8sCyev2m35cwgb29ICIPC0wAOzANasXYJ+hjODalwKx7j41LrjNt+C0Cv2l
+	 PNRffrFVJwBF28ZC13nyjCZZ71a7AnbPb1Jj61E3l6EoBvjcnQHDdJkXqSNzb5lrg5
+	 iCvV5Md/gEw1tyccJv4ntR8xBeWQemm5v+vszbVCQNJ7Lqn1ob/wQ1h6H8VXrlJGBM
+	 6Fg2ZCyPmpNUjj0MTKzbh+Q07mQsGLoQyJe3brwvhUB8rSokUU860yzW/OLvYT8RVX
+	 H5IAIglX3pPTTX1WglzfZWZt815tsdlcI2A+d6LxZYZh5x6y0wpkF8p7vYZglJd+1S
+	 2jd7jUcmFYv/Q==
+Date: Fri, 24 Oct 2025 16:52:34 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] net: dsa: yt921x: Add STP/MST support
+Message-ID: <aPugwiMrKqlDW4c1@horms.kernel.org>
+References: <20251024033237.1336249-1-mmyangfl@gmail.com>
+ <20251024033237.1336249-2-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C36D61F451
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251024033237.1336249-2-mmyangfl@gmail.com>
 
-Introduce a socket-specific io_uring_cmd to support
-getsockname/getpeername via io_uring.  I made this an io_uring_cmd
-instead of a new operation to avoid polluting the command namespace with
-what is exclusively a socket operation.  In addition, since we don't
-need to conform to existing interfaces, this merges the
-getsockname/getpeername in a single operation, since the implementation
-is pretty much the same.
+On Fri, Oct 24, 2025 at 11:32:27AM +0800, David Yang wrote:
 
-This has been frequently requested, for instance at [1] and more
-recently in the project Discord channel. The main use-case is to support
-fixed socket file descriptors.
+...
 
-[1] https://github.com/axboe/liburing/issues/1356
+> +static int
+> +yt921x_dsa_vlan_msti_set(struct dsa_switch *ds, struct dsa_bridge bridge,
+> +			 const struct switchdev_vlan_msti *msti)
+> +{
+> +	struct yt921x_priv *priv = to_yt921x_priv(ds);
+> +	u64 mask64;
+> +	u64 ctrl64;
+> +	int res;
+> +
+> +	if (!msti->vid)
+> +		return -EINVAL;
+> +	if (msti->msti <= 0 || msti->msti >= YT921X_MSTI_NUM)
+> +		return -EINVAL;
+> +
+> +	mask64 = YT921X_VLAN_CTRL_STP_ID_M;
 
-Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
----
- include/uapi/linux/io_uring.h |  1 +
- io_uring/cmd_net.c            | 24 ++++++++++++++++++++++++
- 2 files changed, 25 insertions(+)
+Hi David,
 
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index 263bed13473e..6bab32efabef 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -1001,6 +1001,7 @@ enum io_uring_socket_op {
- 	SOCKET_URING_OP_GETSOCKOPT,
- 	SOCKET_URING_OP_SETSOCKOPT,
- 	SOCKET_URING_OP_TX_TIMESTAMP,
-+	SOCKET_URING_OP_GETSOCKNAME,
- };
- 
- /*
-diff --git a/io_uring/cmd_net.c b/io_uring/cmd_net.c
-index 27a09aa4c9d0..092844358729 100644
---- a/io_uring/cmd_net.c
-+++ b/io_uring/cmd_net.c
-@@ -132,6 +132,28 @@ static int io_uring_cmd_timestamp(struct socket *sock,
- 	return -EAGAIN;
- }
- 
-+static int io_uring_cmd_getsockname(struct socket *sock,
-+				    struct io_uring_cmd *cmd,
-+				    unsigned int issue_flags)
-+{
-+	const struct io_uring_sqe *sqe = cmd->sqe;
-+
-+	struct sockaddr_storage address;
-+	struct sockaddr __user *uaddr;
-+	int __user *ulen;
-+	unsigned int peer;
-+
-+	uaddr = u64_to_user_ptr(READ_ONCE(sqe->addr));
-+	ulen = u64_to_user_ptr(sqe->addr3);
-+	peer = READ_ONCE(sqe->optlen);
-+
-+	if (sqe->ioprio || sqe->__pad1 || sqe->len || sqe->rw_flags)
-+		return -EINVAL;
-+	if (peer > 1)
-+		return -EINVAL;
-+	return do_getsockname(sock, &address, 0, uaddr, ulen);
-+}
-+
- int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
- {
- 	struct socket *sock = cmd->file->private_data;
-@@ -159,6 +181,8 @@ int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 		return io_uring_cmd_setsockopt(sock, cmd, issue_flags);
- 	case SOCKET_URING_OP_TX_TIMESTAMP:
- 		return io_uring_cmd_timestamp(sock, cmd, issue_flags);
-+	case SOCKET_URING_OP_GETSOCKNAME:
-+		return io_uring_cmd_getsockname(sock, cmd, issue_flags);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
+YT921X_VLAN_CTRL_STP_ID_M is defined as follows in yt931x.h
+
+#define  YT921X_VLAN_CTRL_STP_ID_M              GENMASK(39, 36)
+
+This creates an unsigned long mask. However, on 32bit systems,
+unsigned long is only 32 bits wide. So this will result in
+a build error on such systems.
+
+In order to avoid this I think the declaration of YT921X_VLAN_CTRL_STP_ID_M
+should be updated to use GENMASK_ULL. This is also likely true
+for other, as yet unused, #defines in yt931x.h.
+
+
+> +	ctrl64 = YT921X_VLAN_CTRL_STP_ID(msti->msti);
+> +
+> +	mutex_lock(&priv->reg_lock);
+> +	res = yt921x_reg64_update_bits(priv, YT921X_VLANn_CTRL(msti->vid),
+> +				       mask64, ctrl64);
+> +	mutex_unlock(&priv->reg_lock);
+> +
+> +	return res;
+> +}
+
+...
+
 -- 
-2.51.0
-
+pw-bot: changes-requested
 
