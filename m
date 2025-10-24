@@ -1,162 +1,125 @@
-Return-Path: <netdev+bounces-232556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17400C068BA
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 15:41:45 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55FEDC06905
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 15:47:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1A803B52F0
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 13:39:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AC71B4F28B7
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 13:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3938D31D36B;
-	Fri, 24 Oct 2025 13:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446342DC77B;
+	Fri, 24 Oct 2025 13:47:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OVRytX6l"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="MK24m6GL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954E8255F31
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 13:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C517B2566DF
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 13:47:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761313170; cv=none; b=qJybVhjxaoiZiSI0OlbSq5g6jMhQ9cSlYYSr8ciu7tg0kx9v2RBu+xJbY5uJgB5KsrzUz3olWscUkwO+gJqtpfbk8EO3bUVrboV34W1vn1X4NLrMphI0uXsKjEcxAAPFD+YL/jpgPGdTyJGNo4CXJy3e9CCBIoiOrnyGxKVm5pQ=
+	t=1761313625; cv=none; b=YurrhnDlCpIYFJcfX3lUrKL8WXDk1wWAg8JVy7itYr/VNB5aSYz36/D/mrxvF4ADSvITS0IuzbuIaQoSSHdWVuetr2MREFmfovo2BghytiQ7Fv4lk+FFFAO3X1fIH6rsdyFiCK8FQe9YSMmOJxVCuJiDpypKe+nwT2ZACu5bdh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761313170; c=relaxed/simple;
-	bh=0a2kqt6iVxlZdKDlZmDEyPfN7lXlndVaRP9a7YHS/HI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=mCDt8LLkOOOPvPvSupLWsOqzYMB1jtXLgjPNERBc2FApsHdjQsP7g0z1cS8cSB25bKxcbi5XvsaGYK0oC+TXQkQs4MdfdMW77i0E3U6hbihkSS6OdVmzSlQnnrbYuhENWonNeQS/LPB9h6vmCeusmgYHcxpdyAg2t8/+/e8TBsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OVRytX6l; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761313167;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fG1DHSPbDkPo2/41ZMex3EtNSlx98sY6rv/jsEJLq4g=;
-	b=OVRytX6lHH6GTDXQFkcWn68qjy3z+YMvHdunCXP/kOz5Y9Dy6xLtJas6uGxwHYjAS4krhx
-	MGKhWaL1RFT/lfXN4h0J+HChLTnSWbOA+amNaCB57Ypdh1iVwXxR5uA4Xoljs5l5qN5cTD
-	UrFnqRIgDWrJPX/2B9GT22nZBhLlkjA=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-583-Vdxt0q63PmuWoobL4KF_Fw-1; Fri, 24 Oct 2025 09:39:25 -0400
-X-MC-Unique: Vdxt0q63PmuWoobL4KF_Fw-1
-X-Mimecast-MFC-AGG-ID: Vdxt0q63PmuWoobL4KF_Fw_1761313161
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-b479e43ad46so151105966b.2
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 06:39:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761313161; x=1761917961;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fG1DHSPbDkPo2/41ZMex3EtNSlx98sY6rv/jsEJLq4g=;
-        b=pBCtZrfX8hGIPR4l+hu/OpDYoStpxrsTMVdyG4SY1s1Zi4UlNYbQcqU9ct8V3IKGTj
-         FGC9Ezo5gb+6k53+5lRHMkimyBPR4uCi48dSWWk3OrdvWFORtRxiSl5FGVVFj0p/t5r4
-         ETvEkkgrcj26USLkz/Rr8QYw6pAeVpsl8venLxgJFzHe4I8vbz54Wl2yWnyg0XlvN7Nb
-         f/m42Ohz0oBOVO5gdCicGUS1atBrE2UucfARXuiJon9ufhfhwHwWNQnKZe+70T+EsIdH
-         sWajGfhZM+ORvAvZc1zulnlfasIPR2DkHkn4cwcUrortNRge0L8gKJEiYAwCNr6lKKuQ
-         l/KA==
-X-Forwarded-Encrypted: i=1; AJvYcCXLY8CE4uyWMK+2oFXZMGn6eeOQlDdMR+xrIfGe2ZlYkws7irrcz/BT/rdjD2x95HgNqiyP84g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuHcAdnFck6QLN+URWw6Hh9hVauUBX4hiYPSnE86hNoIO8AXMg
-	AWi+6TbJngfeWNejfyr2LqbAIfMcR9QNAkfUaUuO4DkZVwCIhAjDsMYyOIzgzJZWBi/ywsBzIA0
-	YLQsvJCgrnKzfmXeJUM/n+Bca4pLsialXxYbQNHVfpzBHll6lp4R93dxpag==
-X-Gm-Gg: ASbGncuJLErC5LniQ9X/IT1Mo+rvYW9HO+owFx80VtCJGbFUBM3yG+TdbK/aAaWUwxp
-	KLfwR9MNs+BJA8ycZRcLIVzffWORSMWtVe1wKx4r3cUlXbRc1w+kc/fhhjDR/iM1yb3p9QHGXxi
-	3mdx4XUSCNpaWHY3xIwPxtE9HFTro1yNaYFeVOCgQLY046Qz2AxThW6MV17q4kQgNeNfv9emhKX
-	Ee3JtENyqjCbrOALCeUfJhnvbhLVzRXEUtEGrkPAXHB1PvKJRY1U55jVbwe/IPp2f3QWqLfnO4X
-	MwdL4JNipHW/m5pvvKKWcITCa4Yr1v6SJ+TagPUCdM/vVJNGqU2UmFI310MgjxpEClUe18nSQoL
-	tK/nOTbzedYHe3ghPy+6uWsRUEw==
-X-Received: by 2002:a17:907:3e90:b0:b3f:ccac:af47 with SMTP id a640c23a62f3a-b6d6ffa8aedmr262717666b.31.1761313159946;
-        Fri, 24 Oct 2025 06:39:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH1Mowrct2anncqbgqXnkT9wHJ5bHC9THXx7DoXugw/+p5rNYtBxKqachux7PP31bYCorHybA==
-X-Received: by 2002:a17:907:3e90:b0:b3f:ccac:af47 with SMTP id a640c23a62f3a-b6d6ffa8aedmr262714066b.31.1761313159376;
-        Fri, 24 Oct 2025 06:39:19 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d514172besm534099066b.46.2025.10.24.06.39.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Oct 2025 06:39:18 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 6ECCE2EA565; Fri, 24 Oct 2025 15:39:16 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
- makita.toshiaki@lab.ntt.co.jp
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Eric Dumazet
- <eric.dumazet@gmail.com>, "David S. Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- ihor.solodrai@linux.dev, toshiaki.makita1@gmail.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-team@cloudflare.com
-Subject: Re: [PATCH net V1 1/3] veth: enable dev_watchdog for detecting
- stalled TXQs
-In-Reply-To: <176123157173.2281302.7040578942230212638.stgit@firesoul>
-References: <176123150256.2281302.7000617032469740443.stgit@firesoul>
- <176123157173.2281302.7040578942230212638.stgit@firesoul>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 24 Oct 2025 15:39:16 +0200
-Message-ID: <877bwkfmgr.fsf@toke.dk>
+	s=arc-20240116; t=1761313625; c=relaxed/simple;
+	bh=wGuksP5GFdLEQKYlv5zuBqT09EyUrzTjd8olXremcuI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qq332WRp3pBVB7KYyoTitO+PHPA8Fy3uY7yWA7NgCCrXCigzqiyz16hciIt676pKPXLV4JVaQTNLo3ZlksJlOcINMDCNOk3t98mcZ4fNdweD9Q3MTXgJuCzb2gbP2tsB2YSLXkZdiVOzy0fVdwLUoui4Ym63VudX6LHr8oSTJus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=MK24m6GL; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59O3NaST013827;
+	Fri, 24 Oct 2025 13:46:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=mf4Pgy6pFL7S0hO85hk88NuMCd3f+
+	Bxj+YF0GpXw1q4=; b=MK24m6GLpOc9KrFqEEmf1dz1u5wZGgbKBMdfT8IRfpqIe
+	7qiJ2WSTmpG902G8hURsWDaaUSmO+7SbtR7x8+jRqMOxuslu7g5Nw+eFTlMvyqTA
+	u98QFS+HJmdfBI8Q9MBNzoh18Fg7LWGqQMm2zQRzEjXbQRHJqPswPOPy+90arDXH
+	Hp+puibhV/DRdmaK5ScXsT5T4iQBUq/WfcCBFR6wPQ5mfO68zyuhkxy3MnWsAIyh
+	tXlUBR6k6HvW8yOdsfWhqfOEy7PBhk5EE66xs6y6+OvZGjHiwjqUjkxaTg9y2VF9
+	QIOKR2+2mT1Ars/cMTR39HFt0IRXfZT0GhPfHL8iw==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49ykah2g70-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 24 Oct 2025 13:46:45 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59OCBlvM007741;
+	Fri, 24 Oct 2025 13:46:44 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 49v1bg5k68-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 24 Oct 2025 13:46:44 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 59ODki5m027958;
+	Fri, 24 Oct 2025 13:46:44 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 49v1bg5k2w-1;
+	Fri, 24 Oct 2025 13:46:44 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: aleksander.lobakin@intel.com, anthony.l.nguyen@intel.com,
+        przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, kuba@kernel.org,
+        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+        horms@kernel.org, intel-wired-lan@lists.osuosl.org,
+        netdev@vger.kernel.org
+Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
+Subject: [PATCH net-next] iavf: fix incorrect warning message in iavf_del_vlans()
+Date: Fri, 24 Oct 2025 06:46:26 -0700
+Message-ID: <20251024134636.1464666-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-24_02,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 suspectscore=0
+ malwarescore=0 bulkscore=0 phishscore=0 spamscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510020000
+ definitions=main-2510240123
+X-Proofpoint-ORIG-GUID: JOij40voZ86C1wTNPgj0xgeVnL63-AOM
+X-Authority-Analysis: v=2.4 cv=XJc9iAhE c=1 sm=1 tr=0 ts=68fb8345 cx=c_pps
+ a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
+ a=UV6hcFBDGNwxlG23zUoA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIzMDEwMiBTYWx0ZWRfXyfG+r9NVtUS1
+ tLUVknovR891bMe1BOHliwHLElt5noL0uKT+JQVM9OkozqHfY0zyvjNlmOdqGwJ1RLzsZo1mt/c
+ u4WLJCNQC2SmemfFd4fdpgXFEG7pb81j66Dbg0/R7eEmA0AxTgVo1dXzWHtzA+UksITp48dBFS9
+ wt0AW7PV1FMV24dGbrDQn7TydlIQF8hMnTvb9CHSgXmU5V6uE/RCkG/by0tB7NqIVpPldsezanU
+ Xz38vXQmCSl884sNhsFID9H4BJNNYyiQxMSACXtiBQb716n0mYZxtawt5cJ2+YjVyt2rkTro3d+
+ Kc6Id7gScrRwRjcZrZgIwGZwfriMploaLfzlUbPErXN4XF3duXFD/akWBVmIyywvSMI9wmGUjz7
+ R2qdFiLKW0KumaHdXKbXjXV2+SVWXQ==
+X-Proofpoint-GUID: JOij40voZ86C1wTNPgj0xgeVnL63-AOM
 
-Jesper Dangaard Brouer <hawk@kernel.org> writes:
+The warning message refers to "add VLAN changes" instead of
+"delete VLAN changes". Update the log string to use the correct text.
 
-> The changes introduced in commit dc82a33297fc ("veth: apply qdisc
-> backpressure on full ptr_ring to reduce TX drops") have been found to cause
-> a race condition in production environments.
->
-> Under specific circumstances, observed exclusively on ARM64 (aarch64)
-> systems with Ampere Altra Max CPUs, a transmit queue (TXQ) can become
-> permanently stalled. This happens when the race condition leads to the TXQ
-> entering the QUEUE_STATE_DRV_XOFF state without a corresponding queue wake-up,
-> preventing the attached qdisc from dequeueing packets and causing the
-> network link to halt.
->
-> As a first step towards resolving this issue, this patch introduces a
-> failsafe mechanism. It enables the net device watchdog by setting a timeout
-> value and implements the .ndo_tx_timeout callback.
->
-> If a TXQ stalls, the watchdog will trigger the veth_tx_timeout() function,
-> which logs a warning and calls netif_tx_wake_queue() to unstall the queue
-> and allow traffic to resume.
->
-> The log message will look like this:
->
->  veth42: NETDEV WATCHDOG: CPU: 34: transmit queue 0 timed out 5393 ms
->  veth42: veth backpressure stalled(n:1) TXQ(0) re-enable
->
-> This provides a necessary recovery mechanism while the underlying race
-> condition is investigated further. Subsequent patches will address the root
-> cause and add more robust state handling in ndo_open/ndo_stop.
->
-> Fixes: dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to reduce TX drops")
-> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> ---
->  drivers/net/veth.c |   16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-> index a3046142cb8e..7b1a9805b270 100644
-> --- a/drivers/net/veth.c
-> +++ b/drivers/net/veth.c
-> @@ -959,8 +959,10 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
->  	rq->stats.vs.xdp_packets += done;
->  	u64_stats_update_end(&rq->stats.syncp);
->  
-> -	if (peer_txq && unlikely(netif_tx_queue_stopped(peer_txq)))
-> +	if (peer_txq && unlikely(netif_tx_queue_stopped(peer_txq))) {
-> +		txq_trans_cond_update(peer_txq);
->  		netif_tx_wake_queue(peer_txq);
-> +	}
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ drivers/net/ethernet/intel/iavf/iavf_virtchnl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hmm, seems a bit weird that this call to txq_trans_cond_update() is only
-in veth_xdp_recv(). Shouldn't there (also?) be one in veth_xmit()?
-
--Toke
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+index 34a422a4a29c..6ad91db027d3 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+@@ -987,7 +987,7 @@ void iavf_del_vlans(struct iavf_adapter *adapter)
+ 
+ 		len = virtchnl_struct_size(vvfl_v2, filters, count);
+ 		if (len > IAVF_MAX_AQ_BUF_SIZE) {
+-			dev_warn(&adapter->pdev->dev, "Too many add VLAN changes in one request\n");
++			dev_warn(&adapter->pdev->dev, "Too many delete VLAN changes in one request\n");
+ 			while (len > IAVF_MAX_AQ_BUF_SIZE)
+ 				len = virtchnl_struct_size(vvfl_v2, filters,
+ 							   --count);
+-- 
+2.50.1
 
 
