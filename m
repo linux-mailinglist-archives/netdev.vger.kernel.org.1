@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-232314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB197C04093
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 03:44:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD26DC040B3
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 03:49:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 611FF3B136A
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 01:44:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD9881892B47
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 01:49:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F311C860E;
-	Fri, 24 Oct 2025 01:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B6119DF6A;
+	Fri, 24 Oct 2025 01:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ouUbOohm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KtY4AfNS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B056338FA6;
-	Fri, 24 Oct 2025 01:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5191D24B28
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 01:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761270248; cv=none; b=mSxZQC8RsQse+ABlelLVc4Thu/868Idf8JLi0shmRTz035VvNaPNsxgB+a8X/5U4cFjmbqlI6G4mxGpUwKcLYDphd+eXQzFhhElsD8p195WEFfIRAg/kdcI/mZXQ4oyTO6mKYw7ZDZZKx2sEMv1mRlYysXojFlqro4NoE3mBLwM=
+	t=1761270539; cv=none; b=XvOBcrPp0V/TlgmDQvcmBQ6qOO0xBK4YUkFaLBymxMEiEN/QRwxaHfGWWP8wjUPQrengdaowMgKwGirtKH+/brTQQ9O25sfErA39bNIj80vwjJGFMiVjwHDgE65iCTJRmw6PgKu933ft5pPI7MVGc/CFxkCc0kWFUGZE1gMwnEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761270248; c=relaxed/simple;
-	bh=axiWZbssjlpH1aFl7mg+golcYlw6gkQMBkAvr0ja23s=;
+	s=arc-20240116; t=1761270539; c=relaxed/simple;
+	bh=L+mUYv0VX4crC/NG7fH+AStQQ5waEx1Ev/rWiY5RII8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZeTA389PaaahGBL02fBv6IMUKd37x0ZZl7YRXrQZpo/3Quqyzp2dyarnshhj2yPOmEjWJpcdB2HUd4hYtxSpk/sSenms6yE9eoEODSmanRURpEPvIUr+Y+W8o3cApO5AUlEFwrI9wPGuiWDashFKEHZBcbbxkvPdPxqR8pFYDWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ouUbOohm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 727FAC4CEE7;
-	Fri, 24 Oct 2025 01:44:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=k1LuZTuR/tkHY3q45ip2NiOpNGJkPPxLs1zec7nzPdJC/u5ufy4Fd/jWx2kyeFrdKLKzSrI76NZu52Dm/EPS9wdMwMlLRRey6J9GC8UIoU4lX7Zb4TtmFwwbTF/yjTUGhifuPepJH9uCEOanXvTkyvw/oqu9zJysy0rzayd+oWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KtY4AfNS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CC04C4CEE7;
+	Fri, 24 Oct 2025 01:48:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761270246;
-	bh=axiWZbssjlpH1aFl7mg+golcYlw6gkQMBkAvr0ja23s=;
+	s=k20201202; t=1761270538;
+	bh=L+mUYv0VX4crC/NG7fH+AStQQ5waEx1Ev/rWiY5RII8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ouUbOohmzSE5kKxvkHQ+qoiD369U/2WAfU+44lSxnZIB3JmmNxl2ypBy3UyIUbAU1
-	 W+BaQkk+B74MG9QlEmPVicFy3+nE8qt61HCrpeAKqU+1cVm97KU7ILDS85m+D421ks
-	 HD+n7f7zNOUm+zNd6ODja0+nhxjeJifwDXSOedHQ10hpTFI+zOQS7KEOq1a/Fwkc1m
-	 hdyNf//vazgKOqE8jumapXnzgSPuLmBrnW+1SCiHiShVyd124qTfA4M7p7ZS+Vne1w
-	 V1NB7tXEdfvu1F4gkvxtdYDtxky2pwLzmvM+E4G4nPK6vnoG4LbRVSWHPDIhuyB8s4
-	 ZhluJuGJTjPJg==
-Date: Thu, 23 Oct 2025 18:44:04 -0700
+	b=KtY4AfNS3Pxd2NJjIkstrouWBR2QmQcW/KNnbz/dvNfs/xfD1BGBwRh25V7ZbWYY+
+	 QwPwIEEMHJfIlwR7g47a7KQiJN3zVIOfUGjJQLGRVb2bNoxsPpwRH3UW7Mx4HjRheI
+	 80Z8yWB8/IIggPsN2w7SKYSoyQ4P4z4oaYLxXnMH6Anm44G9idG7Ft6Z+uXttswc5s
+	 CAWg0GlMu58RnVWPzPyN78CRvzjgZkDnA2OQFSKxe/g9Zquky/gmY/N9KbPF7PyQuB
+	 KJ2/UTIgTrw9ULNtM5eJWiWuOhSyUXlfyaiso2Rn/4YJ8IgM5TufeOSH4y1RDtLiHI
+	 j9/K6zMw4UOXw==
+Date: Thu, 23 Oct 2025 18:48:57 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Wilfred Mallawa <wilfred.opensource@gmail.com>, Sabrina Dubroca
- <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Simon Horman
- <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Shuah Khan
- <shuah@kernel.org>, Wilfred Mallawa <wilfred.mallawa@wdc.com>
-Subject: Re: [PATCH net-next v8 1/2] net/tls: support setting the maximum
- payload size
-Message-ID: <20251023184404.4dd617f0@kernel.org>
-In-Reply-To: <20251022001937.20155-1-wilfred.opensource@gmail.com>
-References: <20251022001937.20155-1-wilfred.opensource@gmail.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, horms@kernel.org, dsahern@kernel.org,
+ petrm@nvidia.com, willemb@google.com, daniel@iogearbox.net, fw@strlen.de,
+ ishaangandhi@gmail.com, rbonica@juniper.net, tom@herbertland.com
+Subject: Re: [PATCH net-next 0/3] icmp: Add RFC 5837 support
+Message-ID: <20251023184857.1c8c94f1@kernel.org>
+In-Reply-To: <20251022173843.3df955a4@kernel.org>
+References: <20251022065349.434123-1-idosch@nvidia.com>
+	<20251022062635.007f508b@kernel.org>
+	<aPjjFeSFT0hlItHf@shredder>
+	<20251022081004.72b6d3cc@kernel.org>
+	<aPj5u_jSFPc5xOfg@shredder>
+	<20251022173843.3df955a4@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,40 +66,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 22 Oct 2025 10:19:36 +1000 Wilfred Mallawa wrote:
-> +TLS_TX_MAX_PAYLOAD_LEN
-> +~~~~~~~~~~~~~~~~~~~~~~
-> +
-> +Specifies the maximum size of the plaintext payload for transmitted TLS records.
-> +
-> +When this option is set, the kernel enforces the specified limit on all outgoing
-> +TLS records. No plaintext fragment will exceed this size. This option can be used
-> +to implement the TLS Record Size Limit extension [1].
-> +
-> +* For TLS 1.2, the value corresponds directly to the record size limit.
-> +* For TLS 1.3, the value should be set to record_size_limit - 1, since
-> +  the record size limit includes one additional byte for the ContentType
-> +  field.
-> +
-> +The valid range for this option is 64 to 16384 bytes for TLS 1.2, and 63 to
-> +16384 bytes for TLS 1.3. The lower minimum for TLS 1.3 accounts for the
-> +extra byte used by the ContentType field.
-> +
-> +[1] https://datatracker.ietf.org/doc/html/rfc8449
+On Wed, 22 Oct 2025 17:38:43 -0700 Jakub Kicinski wrote:
+> On Wed, 22 Oct 2025 18:35:23 +0300 Ido Schimmel wrote:
+> > I will change the test to require at least version 2.1.5. Can you please
+> > update traceroute in the CI and see if it helps?  
+> 
+> Will do but I'm a little behind on everything, so it may be tomorrow 
+> or even Friday. So ignore NIPA for now, worse case we'll follow up.
 
-Sorry for not paying attention to the last few revisions.
+Updated now, next run should have it updated.
+Current one has traceroute updated but not traceroute6
+https://netdev-3.bots.linux.dev/vmksft-net/results/354402/27-traceroute-sh/stdout
 
-So we decided to go with the non-RFC definition of the sockopt
-parameter? Is there a reason for that? I like how the "per RFC"
-behavior shifts any blame away from us :)
+This doesn't sound related to the traceroute version tho:
 
-> +	err = nla_put_u16(skb, TLS_INFO_TX_MAX_PAYLOAD_LEN,
-> +			  ctx->tx_max_payload_len);
-> +
-
-nit: unnecessary empty line 
-
-> +	if (err)
-> +		goto nla_failure;
-
+# 34.51 [+6.48] TEST: IPv4 traceroute with ICMP extensions                          [FAIL]
+# 34.51 [+0.00] Unsupported sysctl value was not rejected
 
