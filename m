@@ -1,88 +1,87 @@
-Return-Path: <netdev+bounces-232529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D477CC06451
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:32:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E49E1C06457
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:34:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0DF4D4F28C1
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 12:32:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C65774E136B
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 12:34:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874933148BE;
-	Fri, 24 Oct 2025 12:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E55B315D3C;
+	Fri, 24 Oct 2025 12:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JSi1zaGo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rA/xKWXe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4752DD5EF
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 12:32:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D562DD5EF
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 12:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761309125; cv=none; b=Ro8m1MeaXx/IMinfBctfch3fIk5ImuoUfHg1NiGrMr+7h7AS39iMzvlKP9vHFlXUdudzkJYZi5YZj06xNrEwGp0m/xH0gCe/XBUYYUO3POADcZLHByuH8lgRsyrvnCPCClIdjhg+c/RZVcU7LCfW9rFyVWSQ6KIsbzqZI9jBxh0=
+	t=1761309244; cv=none; b=He0289BrZGYvfl9K4UHPEdTi2uoiuoKiHp1jlp+2pvICVXsn7zFn5i/nY5G/Bnu0SLm7cCET0yZUup5lFpe8sIyIUg33AR+4yGbpoz75noBcMUSdX2T27RES94SeuqnckF+v4ttLF5PrIh8wM9ZuaVVFPyhoerzpnCH72pMeJHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761309125; c=relaxed/simple;
-	bh=7gLYHRhoow2qKgNmazhQw5eqd82SKJYSy8cdKXaqBYQ=;
+	s=arc-20240116; t=1761309244; c=relaxed/simple;
+	bh=EbljtvjF2yao3HtbfBt9tU/PRjhMRtsx1WLRywsS2p4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pqofCq1hbK5MkvBrsxQ+krC97FhlRIiQFey2RDzlOzNnWgVCw3nYSyRKTK9bYPd9xJtIjFTBpcc+mAq1ySc/qsPqRrVCSdrf/UjAgchqQfechCJs7liLe6nGs+mS1sUFidbYHL2Np80Ouud6Sev3q1MIX1+H1qPeV7H4hOnyV0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JSi1zaGo; arc=none smtp.client-ip=74.125.224.48
+	 To:Cc:Content-Type; b=lrvih1Uw/JkgEpPpzMGq4BmONYVFBAtsTFo5/KVp7ya8jMvdq3VTgxhukmrHuohuyRbOQ+j76vqhaIp9JxgaO66R3/JkU7z8qDjxjnSfkA3I5HtYw0Yh8HaK0Vr7RB5ZCt4c1kwj9o/5jNL8H0BVcOdlHY+1nWoJxj3BNIHo0wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rA/xKWXe; arc=none smtp.client-ip=209.85.128.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-63e1a326253so2183872d50.2
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 05:32:03 -0700 (PDT)
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-781421f5be6so22783197b3.0
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 05:34:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761309123; x=1761913923; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761309241; x=1761914041; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7gLYHRhoow2qKgNmazhQw5eqd82SKJYSy8cdKXaqBYQ=;
-        b=JSi1zaGoJNgj0bVTQrj9ukdkIQ153vfOymcR02TjmIG6wxmXAhoeZ25LAUqrP92re0
-         CQuCtzz4krW8EvqAQ1+HnpoSuqJfYn0n/cnIkN0L/6OTMIk3RfOQWWV2yh/UEmOiUY0F
-         lDTse3M3PaHWEcoIAUnL1C6bIV9R3HbE353JdEZNsISnl1nZq2KlRTd44Y2e12MTAC2W
-         viKw/w/MxywjkHgO4SGfz476eLAkV33/Y8jqqR0wSLElY94xxOBu/XDEVpW8HAqeD8UL
-         AESU11uXzChgQzeiLD/0ttjMEe/AjlzVEScaQtIBWU16uEfVa1LHALLeoT/A7ctDaeuE
-         ljIA==
+        bh=/ww+Sf6Zad31I+q2xI2rPMkY6AtTsh2Gk7ESx80POzw=;
+        b=rA/xKWXeUMS9s760hgiIY6ajngYiOUbthOECfFfS+SQnpLlnP9G+wXBjNlaDbULxBi
+         Q7EMeEOhD0flkH8RemPrJbLqtuJT/KVyRDVl6Ew7bI0sh5kZ7orUjFF+1I3rqR39a5B5
+         Y3ayOf3nrsuMpdz14CHU+VxIihn/zdSFl75N7An3Lxm2D9j5NAOaRW3fs3ZbjQ2JphsX
+         TGkw3xI8guZk8Y6qgmvyfVaDJgwRzC+/zI1UDhmkx62DX+04hKYwsWqkMhN0Vxrzfy/U
+         wvvPav92ezLC5dxMV3h513VAQ8IJOfyJ45XIT5pww9FZl3hMM/WxlDuEPLsjcnZPlm69
+         ENqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761309123; x=1761913923;
+        d=1e100.net; s=20230601; t=1761309241; x=1761914041;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7gLYHRhoow2qKgNmazhQw5eqd82SKJYSy8cdKXaqBYQ=;
-        b=TAXBXJoZqBdCY0aB8CDiHpD/HXBUD88dGGyNTkm+gpMHnnOoDFzzNO4rzqXSTfSwXe
-         yQnQknQotdzaxTc2rUDrVaTgLRGN5kMLICXLRQAgzJSzpUUFV8CikbK8vWzi7WHeyiK+
-         p0TuRB7EadBX+bPDXwommhWt1IWZnnKJlN16eQBpCQcov5adL0fK+5lQqwnZ1ICbBVjz
-         ZdTLZ6ukUK1f26soi6b2IyXv/oD/ZyzmZmYIAbP91cs47tU1fOu+Cd7GOl+lRyBrhqsB
-         X4i7bVnrYZvlH9iTwlzeNoDJWPcWwwJxticj7zGYN0LdLBoxzdDTYmna09+sgdPhUXxT
-         IvJg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjxBxEs9vt+opW8nigD0qCHZaUPCxQjO/ldzcZekJb93NdNw2++dfzxurGhBM+b8FXLjGBtxM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlnRmV2ZTH0CMa8lkcISzBuQW6T1Jd1gNhkehEHakFtGbociyV
-	+9J1/7kJrJB9Z8gQibslZbbBB+Qt81Ay/OrqDlmCnZc+w1OJQ0TaT8S7w7KqJcChFmw1KFjmeD0
-	2FUT0Rn//HRYiSMoRfFJzrUu38JK8bDpTRbFjasRz
-X-Gm-Gg: ASbGncud9gGn2BtxZtLlTDLPyJrZvg3fLINNf+BaoxXM3MirQPZ5htW8SUZprLwIMCB
-	ZVRHzjRUJAVTM/AinPuvXgOSN9FOyC6Fx11TbtmYlwewAMS88kwr6gWmX8Dx7fP3HqnxfT2BP3X
-	huQfcCgDHUmF5qQ0qHCjm8GW1XypHde8iu4iwYzDtrnRi6OHmOUcCpRbEnnyypze8lSn6NbyH0c
-	ODQ97PhqQ2KDX5y6JwGDwwszRoTjGulXNFrNjkMBujRy6KY4DsopfDgcvhggRdCKOlLLg==
-X-Google-Smtp-Source: AGHT+IFEu8FX/AbgejU8y1GVfudXWrqcu+Qd39D68oVKUszWLMLZaQeVfTuXqQriuZQnZpAIx802ReGhWXK3o/TssCY=
-X-Received: by 2002:a05:690e:1403:b0:63e:2715:5acf with SMTP id
- 956f58d0204a3-63e271560camr18363155d50.30.1761309122605; Fri, 24 Oct 2025
- 05:32:02 -0700 (PDT)
+        bh=/ww+Sf6Zad31I+q2xI2rPMkY6AtTsh2Gk7ESx80POzw=;
+        b=BaiEsYoIiJxSKSZG+xfBaAwc3IGGKGIE8Ld5FiC7NrBFepnjPsMZ7vEY5CwfF4qZqO
+         p57QHNnxTuszje0jgWUj5HlGruWV8BSqKsGd4nHmu8prlLY2LyF2Eh6NLmR+os8F+6z2
+         +zQasM1U75BvDSpW8fIOwhyBwt5Zr3OPEDKGqnOoRX9mkTOEntIRGB5Sk2ZV+s26r136
+         RROttsu4vbcs5O3rJ9DQ9Gz/Za6vrk9711GjvXSobkO8UiZWGbfVEegCsiN87RWriqbw
+         hTaD7q0hpO0JqMCeR+KVDtST4O/0NgEy3TE+K4xqkN+Ifs7xxz9j7wtj3afzM4Fy6qj5
+         HbnA==
+X-Forwarded-Encrypted: i=1; AJvYcCVElB6L+nZ9mw0KB49YdjH/ZkeVL25Vu925t4pSOxzVTsv+xuMaOAjHEtQCZ+AIq3aINxbLOc8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyW2F5las+wEJllTyVODYNZStQ9Ti6Quyj4gx1kOJqp9c5Uk0s7
+	3MB5MPduPOIycbhpSju8pquhrTiJKmLRzkmVQOoYBuMtQ5rAnQgSF/CX+uL0jD0gDiHUffcwADY
+	M+pmOPo1n8MjeGfLU8PM98uoWKgALmjsdsxF5MQf8
+X-Gm-Gg: ASbGncv+cb7Xou4m3/1Tc5ve8NZJI+YBymHKuKoquka8TzG69mDo2+HUMjuAhFSTmAd
+	u58NXzVwpnVsLqhbzNbXlApMVCoUHFaWLXTb63aNTfautL3Df5n0ZQQE5YzPDbO8yczmuSyJzfl
+	m/FwoQz0zTdr+4LqPVlSFGIeZpbaExD6w9r/1lmlntbh9Mc5iTX9WbAK6mhBxC2zVLZkGUY5T9Z
+	UpVqIsDWWzgPMZTTfEKvhbJGh56POEk+RUut3iy6EWf7YQfEVQopO6Cm0KddqqNGo1Xpw==
+X-Google-Smtp-Source: AGHT+IH6faZH+je2EtgyA8ASqeu/+dFhcPQHGgEYDJCRjjyFrrkdzmGJWFcCy30MHwkoH8+aVIRIkQKr63REYMSkPjY=
+X-Received: by 2002:a53:d015:0:b0:63e:27e7:c792 with SMTP id
+ 956f58d0204a3-63f434eeea3mr1438683d50.24.1761309241265; Fri, 24 Oct 2025
+ 05:34:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251022054004.2514876-1-kuniyu@google.com> <20251022054004.2514876-2-kuniyu@google.com>
-In-Reply-To: <20251022054004.2514876-2-kuniyu@google.com>
+References: <20251022054004.2514876-1-kuniyu@google.com> <20251022054004.2514876-3-kuniyu@google.com>
+In-Reply-To: <20251022054004.2514876-3-kuniyu@google.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 24 Oct 2025 05:31:49 -0700
-X-Gm-Features: AS18NWAd1D-YboL27KXOQ9_FTHv3iyyJDg5eKDUMmawJP-cRVK72FeROOybylEM
-Message-ID: <CANn89iKRwd3_2AcD3bR47VmgqQObc2y_7Z4OimDRMw05d4MLww@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 1/5] neighbour: Use RCU list helpers for
- neigh_parms.list writers.
+Date: Fri, 24 Oct 2025 05:33:50 -0700
+X-Gm-Features: AS18NWAzWxWCkg3sJjTn_7aGa2cI5wC6VEfiwzlQjp4L_4P2rt4x6Lad8XCdpuc
+Message-ID: <CANn89iJSoijSbzagUEptz=qp9p+WDgZR-Uf8099j7ahaqce+nA@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 2/5] neighbour: Annotate access to neigh_parms fields.
 To: Kuniyuki Iwashima <kuniyu@google.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, 
@@ -93,17 +92,22 @@ Content-Transfer-Encoding: quoted-printable
 On Tue, Oct 21, 2025 at 10:40=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.c=
 om> wrote:
 >
-> We will convert RTM_GETNEIGHTBL to RCU soon, where we traverse
-> tbl->parms_list under RCU in neightbl_dump_info().
+> NEIGH_VAR() is read locklessly in the fast path, and IPv6 ndisc uses
+> NEIGH_VAR_SET() locklessly.
 >
-> Let's use RCU list helper for neigh_parms in neigh_parms_alloc()
-> and neigh_parms_release().
+> The next patch will convert neightbl_dump_info() to RCU.
 >
-> neigh_table_init() uses the plain list_add() for the default
-> neigh_parm that is embedded in the table and not yet published.
+> Let's annotate accesses to neigh_param with READ_ONCE() and WRITE_ONCE().
 >
-> Note that neigh_parms_release() already uses call_rcu() to free
-> neigh_parms.
+> Note that ndisc_ifinfo_sysctl_change() uses &NEIGH_VAR() and we cannot
+> use '&' with READ_ONCE(), so NEIGH_VAR_PTR() is introduced.
+>
+> Note also that NEIGH_VAR_INIT() does not need WRITE_ONCE() as it is befor=
+e
+> parms is published.  Also, the only user hippi_neigh_setup_dev() is no
+> longer called since commit e3804cbebb67 ("net: remove COMPAT_NET_DEV_OPS"=
+),
+> which looks wrong, but probably no one uses HIPPI and RoadRunner.
 >
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 
