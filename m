@@ -1,267 +1,137 @@
-Return-Path: <netdev+bounces-232493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5EA3C05FA4
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 13:32:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB92AC05BF9
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 13:01:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C21691C800B7
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 11:26:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D13933A7E55
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 11:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D058337DBD9;
-	Fri, 24 Oct 2025 10:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FC031D742;
+	Fri, 24 Oct 2025 10:54:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W5fkK2O6"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="wFOTnljM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC9931A053;
-	Fri, 24 Oct 2025 10:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD9B313527
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 10:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761303565; cv=none; b=sPh+42rNnvXvX63m1qQkHCMgl517SpdG8W2TgT+6i8upuaThxTR2V/hbzC2gxSL6vmsMRehpsUaYvOurOXM6z9q/1IJ3zQjGQFwwkhTmfO6S6000MR0/oUvcgM3XStEDoOav7UG8e8HTdrD1JuCrWsku/EteCoTsvAKR2BARXrc=
+	t=1761303262; cv=none; b=tjP2xEQk+7GQjVKa6fRefP65SAIkxcZzwtR7GXgFE2GTgpNZCh6FpxNU6ox4pSbjn4Pu0blQhW4Yw/+PLU/OLLUSojWYwSKfOKU8zCAk0GGpdtnscsu7Te8LHbjUX+9Wj5CEuPCo4KhNBeaij82+P1nxYd6H4hayf1g3YWMgGhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761303565; c=relaxed/simple;
-	bh=QwDkSH3kLhu9Ya7BrIayv5fawfziMOL3Z/w1iCrFClA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=scrvy6DTZvMuHGWqDqsrhJeUwj3xve6ij20nk6eAVriiUpqAhB98iobvoXHXYIis3lAqbRBGzsk7eCyR3HaDE3He72G9nsWOF5TARkDNK8b5L3lQ+of3uLIAGCCai4/v2uOCFicM5D/lPIrFaylr761nD31biCKE+0eS2c64qPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W5fkK2O6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF4C7C4CEF5;
-	Fri, 24 Oct 2025 10:59:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761303565;
-	bh=QwDkSH3kLhu9Ya7BrIayv5fawfziMOL3Z/w1iCrFClA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=W5fkK2O6ood/eZ2MioGr5FOn8MmFQgD5BK6WGd1JeyrwnpVvGLZEYHcG6bPgBzYIs
-	 Y+336uTvHOglol8wNJCZvPtXdrEDGJr4/0OcjlAuY+mxGIcIEuObbol67F3Ii3jfVV
-	 Iy1UQBgGyesZQTK5pQbEefGHsZvUC+QOVj2H+/F/Iu9S7Yv4KF2asv4dJdfdkLCY28
-	 qa1eswPqtIUJdHU6A7XqqiCl3+FUGq9ClRaPm+U/Q4t5jLyv48rZCJpWIsJt85elvp
-	 tdW4PRDx09+DGk8pMigmVYFmFDaO60Tn5v9TOqWXs6ioFnNYyYhBw57oOFoDrh54l2
-	 qyZcM9wQG2ZKw==
-From: Christian Brauner <brauner@kernel.org>
-Date: Fri, 24 Oct 2025 12:53:39 +0200
-Subject: [PATCH v3 70/70] selftests/namespace: test listns() pagination
+	s=arc-20240116; t=1761303262; c=relaxed/simple;
+	bh=YRuUk72X48LKbl0NGFTto3u3r+cewoHN+3hW6sCm2Bg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Lu7fY3qJvQUFQ7od4V2iXKRdXj1BaXKb/koQ+WzS8BmDrEC5MgBKeFks0mYODU3tuEpuf0KR3+TAOnOUUlIBtNvps8TaOjDLiRcEG+XMXlLwmc6RCcYNVNhbUwvEFML7zI8eqUy2kRlWmVCNKAdKHRSXN2UxbKt3au6Cx6vshqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=wFOTnljM; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 340764E412D8;
+	Fri, 24 Oct 2025 10:54:17 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id ECEF160703;
+	Fri, 24 Oct 2025 10:54:16 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 96ECB102F2355;
+	Fri, 24 Oct 2025 12:53:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761303255; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=y1Ao409MtaPgUYRpBahYZXHRywkGhOPNNwYQ3CbOmSk=;
+	b=wFOTnljMgZcJ9fFHGVUItDYZLELl/nQ9UUjZkKVBZJ440S5fcemvTZjmbaMAdRgSKyuPz/
+	8lsfoDzhq2GxO9LzzfOwG4pEW1uh+ApYVf0cjxtPFBmz3Z3b41IxtAqXOjgpkrg4ZMVwRf
+	LsrdvvwKXqgxFfBn+dwd1CAiRrutSKALKw/kGdv9Xuxfu8LVqJ4+jn821L91R9OTL6Mdu6
+	NcFpnAtXY3nHeQn1imhGR8o123Lrkivf8wYdoLljGN/f/V2m/fW7MHsCuz0u2op1dJNw5L
+	6yL9i5xDEF+X/qPX1MthiIvhw+8BJruccXktW9g7OJwJ8DS4bhbeNq4ZuA74Sw==
+Message-ID: <1a1cacb5-0005-4b32-8e68-624644a38f92@bootlin.com>
+Date: Fri, 24 Oct 2025 12:53:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/8] net: stmmac: hwif.c cleanups
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>
+References: <aPn3MSQvjUWBb92P@shell.armlinux.org.uk>
+ <28d91eca-28dd-4e5b-ae60-021e777ee064@bootlin.com>
+ <aPtZg_v3H53hiQXo@shell.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <aPtZg_v3H53hiQXo@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251024-work-namespace-nstree-listns-v3-70-b6241981b72b@kernel.org>
-References: <20251024-work-namespace-nstree-listns-v3-0-b6241981b72b@kernel.org>
-In-Reply-To: <20251024-work-namespace-nstree-listns-v3-0-b6241981b72b@kernel.org>
-To: linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
- Jeff Layton <jlayton@kernel.org>
-Cc: Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, 
- =?utf-8?q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, 
- Lennart Poettering <mzxreary@0pointer.de>, 
- Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
- Amir Goldstein <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>, 
- Johannes Weiner <hannes@cmpxchg.org>, Thomas Gleixner <tglx@linutronix.de>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
- linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, bpf@vger.kernel.org, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- netdev@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
- Christian Brauner <brauner@kernel.org>
-X-Mailer: b4 0.15-dev-96507
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5137; i=brauner@kernel.org;
- h=from:subject:message-id; bh=QwDkSH3kLhu9Ya7BrIayv5fawfziMOL3Z/w1iCrFClA=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWT8juow+zIx/fDv6H+C/RdiSyec6pjWoPXUwj55555dR
- 3/7KAqHdZSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAEzkohnDf++O1yWdBXr3tb58
- LF/AfGue19KoIBGbV0IrKy3uGN2UzGH47/LuQgrz69u3Zqt6P6tNbtzx4MXKx5ei2U5WWRV9z5C
- 6wwgA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+X-Last-TLS-Session-Version: TLSv1.3
 
-Minimal test case to reproduce KASAN out-of-bounds in listns pagination.
+Hi Russell,
 
-Signed-off-by: Christian Brauner <brauner@kernel.org>
----
- tools/testing/selftests/namespaces/.gitignore      |   1 +
- tools/testing/selftests/namespaces/Makefile        |   4 +-
- .../selftests/namespaces/listns_pagination_bug.c   | 138 +++++++++++++++++++++
- 3 files changed, 142 insertions(+), 1 deletion(-)
+On 24/10/2025 12:48, Russell King (Oracle) wrote:
+> On Fri, Oct 24, 2025 at 08:44:07AM +0200, Maxime Chevallier wrote:
+>> Hello Russell,
+>>
+>> On 23/10/2025 11:36, Russell King (Oracle) wrote:
+>>> Hi,
+>>>
+>>> This series cleans up hwif.c:
+>>>
+>>> - move the reading of the version information out of stmmac_hwif_init()
+>>>   into its own function, stmmac_get_version(), storing the result in a
+>>>   new struct.
+>>>
+>>> - simplify stmmac_get_version().
+>>>
+>>> - read the version register once, passing it to stmmac_get_id() and
+>>>   stmmac_get_dev_id().
+>>>
+>>> - move stmmac_get_id() and stmmac_get_dev_id() into
+>>>   stmmac_get_version()
+>>>
+>>> - define version register fields and use FIELD_GET() to decode
+>>>
+>>> - start tackling the big loop in stmmac_hwif_init() - provide a
+>>>   function, stmmac_hwif_find(), which looks up the hwif entry, thus
+>>>   making a much smaller loop, which improves readability of this code.
+>>>
+>>> - change the use of '^' to '!=' when comparing the dev_id, which is
+>>>   what is really meant here.
+>>>
+>>> - reorganise the test after calling stmmac_hwif_init() so that we
+>>>   handle the error case in the indented code, and the success case
+>>>   with no indent, which is the classical arrangement.
+>>>
+>>>  drivers/net/ethernet/stmicro/stmmac/common.h |   3 +
+>>>  drivers/net/ethernet/stmicro/stmmac/hwif.c   | 166 +++++++++++++++------------
+>>>  2 files changed, 98 insertions(+), 71 deletions(-)
+>>
+>> I didn't have the bandwidth to do a full review, however I ran tests
+>> with this series on dwmac-socfpga and dwmac-stm32, no regressions found.
+>>
+>> For the series,
+>>
+>> Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> 
+> Thanks, it's good to have someone else testing. I do need to post v2
+> with some tweaks to patches 2, 3 and 4 due to a typo that gets
+> eliminated in later patches. "verison*" -> "version*" in one instance.
+> 
+If it's only typos, feel free to keep the t-b tag :)
 
-diff --git a/tools/testing/selftests/namespaces/.gitignore b/tools/testing/selftests/namespaces/.gitignore
-index f6dcf769f150..f4d2209ca4e4 100644
---- a/tools/testing/selftests/namespaces/.gitignore
-+++ b/tools/testing/selftests/namespaces/.gitignore
-@@ -7,3 +7,4 @@ listns_permissions_test
- siocgskns_test
- cred_change_test
- stress_test
-+listns_pagination_bug
-diff --git a/tools/testing/selftests/namespaces/Makefile b/tools/testing/selftests/namespaces/Makefile
-index 3c776740f3ac..01569e0abbdb 100644
---- a/tools/testing/selftests/namespaces/Makefile
-+++ b/tools/testing/selftests/namespaces/Makefile
-@@ -10,7 +10,8 @@ TEST_GEN_PROGS := nsid_test \
- 		  listns_permissions_test \
- 		  siocgskns_test \
- 		  cred_change_test \
--		  stress_test
-+		  stress_test \
-+		  listns_pagination_bug
- 
- include ../lib.mk
- 
-@@ -20,4 +21,5 @@ $(OUTPUT)/listns_permissions_test: ../filesystems/utils.c
- $(OUTPUT)/siocgskns_test: ../filesystems/utils.c
- $(OUTPUT)/cred_change_test: ../filesystems/utils.c
- $(OUTPUT)/stress_test: ../filesystems/utils.c
-+$(OUTPUT)/listns_pagination_bug: ../filesystems/utils.c
- 
-diff --git a/tools/testing/selftests/namespaces/listns_pagination_bug.c b/tools/testing/selftests/namespaces/listns_pagination_bug.c
-new file mode 100644
-index 000000000000..da7d33f96397
---- /dev/null
-+++ b/tools/testing/selftests/namespaces/listns_pagination_bug.c
-@@ -0,0 +1,138 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define _GNU_SOURCE
-+#include <errno.h>
-+#include <sched.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <sys/socket.h>
-+#include <sys/wait.h>
-+#include <unistd.h>
-+#include "../kselftest_harness.h"
-+#include "../filesystems/utils.h"
-+#include "wrappers.h"
-+
-+/*
-+ * Minimal test case to reproduce KASAN out-of-bounds in listns pagination.
-+ *
-+ * The bug occurs when:
-+ * 1. Filtering by a specific namespace type (e.g., CLONE_NEWUSER)
-+ * 2. Using pagination (req.ns_id != 0)
-+ * 3. The lookup_ns_id_at() call in do_listns() passes ns_type=0 instead of
-+ *    the filtered type, causing it to search the unified tree and potentially
-+ *    return a namespace of the wrong type.
-+ */
-+TEST(pagination_with_type_filter)
-+{
-+	struct ns_id_req req = {
-+		.size = sizeof(req),
-+		.spare = 0,
-+		.ns_id = 0,
-+		.ns_type = CLONE_NEWUSER,  /* Filter by user namespace */
-+		.spare2 = 0,
-+		.user_ns_id = 0,
-+	};
-+	pid_t pids[10];
-+	int num_children = 10;
-+	int i;
-+	int sv[2];
-+	__u64 first_batch[3];
-+	ssize_t ret;
-+
-+	ASSERT_EQ(socketpair(AF_UNIX, SOCK_STREAM, 0, sv), 0);
-+
-+	/* Create children with user namespaces */
-+	for (i = 0; i < num_children; i++) {
-+		pids[i] = fork();
-+		ASSERT_GE(pids[i], 0);
-+
-+		if (pids[i] == 0) {
-+			char c;
-+			close(sv[0]);
-+
-+			if (setup_userns() < 0) {
-+				close(sv[1]);
-+				exit(1);
-+			}
-+
-+			/* Signal parent we're ready */
-+			if (write(sv[1], &c, 1) != 1) {
-+				close(sv[1]);
-+				exit(1);
-+			}
-+
-+			/* Wait for parent signal to exit */
-+			if (read(sv[1], &c, 1) != 1) {
-+				close(sv[1]);
-+				exit(1);
-+			}
-+
-+			close(sv[1]);
-+			exit(0);
-+		}
-+	}
-+
-+	close(sv[1]);
-+
-+	/* Wait for all children to signal ready */
-+	for (i = 0; i < num_children; i++) {
-+		char c;
-+		if (read(sv[0], &c, 1) != 1) {
-+			close(sv[0]);
-+			for (int j = 0; j < num_children; j++)
-+				kill(pids[j], SIGKILL);
-+			for (int j = 0; j < num_children; j++)
-+				waitpid(pids[j], NULL, 0);
-+			ASSERT_TRUE(false);
-+		}
-+	}
-+
-+	/* First batch - this should work */
-+	ret = sys_listns(&req, first_batch, 3, 0);
-+	if (ret < 0) {
-+		if (errno == ENOSYS) {
-+			close(sv[0]);
-+			for (i = 0; i < num_children; i++)
-+				kill(pids[i], SIGKILL);
-+			for (i = 0; i < num_children; i++)
-+				waitpid(pids[i], NULL, 0);
-+			SKIP(return, "listns() not supported");
-+		}
-+		ASSERT_GE(ret, 0);
-+	}
-+
-+	TH_LOG("First batch returned %zd entries", ret);
-+
-+	if (ret == 3) {
-+		__u64 second_batch[3];
-+
-+		/* Second batch - pagination triggers the bug */
-+		req.ns_id = first_batch[2];  /* Continue from last ID */
-+		ret = sys_listns(&req, second_batch, 3, 0);
-+
-+		TH_LOG("Second batch returned %zd entries", ret);
-+		ASSERT_GE(ret, 0);
-+	}
-+
-+	/* Signal all children to exit */
-+	for (i = 0; i < num_children; i++) {
-+		char c = 'X';
-+		if (write(sv[0], &c, 1) != 1) {
-+			close(sv[0]);
-+			for (int j = i; j < num_children; j++)
-+				kill(pids[j], SIGKILL);
-+			for (int j = 0; j < num_children; j++)
-+				waitpid(pids[j], NULL, 0);
-+			ASSERT_TRUE(false);
-+		}
-+	}
-+
-+	close(sv[0]);
-+
-+	/* Cleanup */
-+	for (i = 0; i < num_children; i++) {
-+		int status;
-+		waitpid(pids[i], &status, 0);
-+	}
-+}
-+
-+TEST_HARNESS_MAIN
+Thanks,
 
--- 
-2.47.3
+Maxime
 
 
