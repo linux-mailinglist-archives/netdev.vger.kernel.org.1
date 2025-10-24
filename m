@@ -1,118 +1,114 @@
-Return-Path: <netdev+bounces-232340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EBBBC043D4
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 05:23:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B37FC0442B
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 05:33:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C7686354426
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 03:23:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9E983B8E47
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 03:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB8626E146;
-	Fri, 24 Oct 2025 03:23:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69364270553;
+	Fri, 24 Oct 2025 03:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PAZW1d9n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NGgKV3oN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3F2248F48;
-	Fri, 24 Oct 2025 03:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07A71EE7DC
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 03:33:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761276213; cv=none; b=krRsHLvN0c1hWxmqcNCYdZUQAo2X9xA5c3B9IpV8Vx8nfXGUn1lYyZOe0WFVFDMLcch2GS1FTykTCv/MHoNyG4Re01YNZSN3mOmKR5g3+a69kZhgPXbbDfcaQ8m4H98aJ4cEpm2CnSSKUZw73WjWBe9rijOVS8b8Wup0ve+Okys=
+	t=1761276787; cv=none; b=H9391+eJqpeKV1qi9uJDO6yhCnlC1jszKUHvzNTA7U5Jf40t7aeKbBMuvN/kG/Hao9HHTAH6UPotiXgkwvhs6gQSnMNO4RfSC7OaLVvl9C9c6MBK8AjfN7tdG4FgFcLM66kpRr79NGvbQx7/2aacTsaERcF9Arphxku6T3/wyDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761276213; c=relaxed/simple;
-	bh=CNwnT8O4JG4Ottnhbl1cNUX0P6pAoK8TTMrHAWFkULg=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=gDrTUt6jnCX7UkrRjSXj/0q7adxAyMHDwx4V9yWMawSe7Fi6YoZlS1gspEkxT9Pp9o6+sm8nLmTSrNRZQI4iA8APmZ+4hd5Pw3eSLYznLKEtkEGNFYy09+5T/s1xRq4UbD87FuuhGjaQGoayDPkOTVfc/j4J8c/ibUQqVHpC6mg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PAZW1d9n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A10ABC4CEE7;
-	Fri, 24 Oct 2025 03:23:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761276212;
-	bh=CNwnT8O4JG4Ottnhbl1cNUX0P6pAoK8TTMrHAWFkULg=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=PAZW1d9nE4BKbSDO5YSLJIHFY7fvvq7/qb+KsjUsGRLmxi56jdxvmOARnYJv4d2ld
-	 Ic/xOGBjxwDNwmiwJ7cwI4V+apON+qMOt3p6cSvOAfiZ8jtjp0hXvhPBg0AM77I1zp
-	 g6i8gpSAFD7DosiR9Fi+RdTt41wplPyJOLqBMx3xzyWe4tOmA43TExpxPsd4IS8kb2
-	 ffQAI4FNvAT46dKsdBSkShyj3Tac9+wpugnoPlwOkCefGTwchZzYXux2HTezbtbDFb
-	 cD2F6SLTQmqfuVuj5vCgghi+8YZx5WXGvZntDmaWeqh9aFw3ZihEuSB6O7yksVD5ou
-	 igWnqilxSCITA==
-Date: Thu, 23 Oct 2025 22:23:30 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1761276787; c=relaxed/simple;
+	bh=vLCgzMyCThpgQ64scTXHgaNMRBa1NmayEDllSs4DkOU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WdGnBzZMpTzIYTXCef+LUMpkjmqnDaactQRLp52Du7+1k/rR49iDvo2h4NMsFoV8LsJqSuBB/peSPgckNPhRVSlGUEqHjYlO1z/DAgEz1Db1OHrTBum0nX5TXx8bJENx9dSa0dalEbgJHUOUMyKgJLLD23F/5J1l7ij150M8VKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NGgKV3oN; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-290b48e09a7so19454045ad.0
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 20:33:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761276784; x=1761881584; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fbhN64OUg842qsJQSGfmVy1u+1iZgam9qWQhuawKECs=;
+        b=NGgKV3oN2kL9sY6hRnQbHiCZTimT5sXguX2PJvLh+3vuwEgJilu1KJboUuScl/0gY8
+         NNO7VEk7TMk9O3axiHEaSNHxF8WMAniS6pLQBlLUP6cVZGmBSrkNsYg20ETxOW+aQRa5
+         BxOvPZZnQt4dGjJj+fBt7qy+SzL31uhO8I0BDdA68fUndtpa4EcTTEXCQZmxBrZvptdB
+         gwSifwmhnSkY09r1+9JV8UVRObbENbMGIStElDQAfkt1TfLvRMb7Dkw255ww6KBDUAW9
+         bLkYmVZJMms2J+hcfzjm4No1AB1kDBYyM5tc3atp5grODOGeKL6S8JrEyzEK1sYskc7y
+         WXZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761276784; x=1761881584;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fbhN64OUg842qsJQSGfmVy1u+1iZgam9qWQhuawKECs=;
+        b=siAyOYqX1Gf7rxFh0L+hcj1cfUGpRI9vGzq3vCV+JdP30z41lK4ibj7I7Xj7/Lg396
+         SGxdO4kTKscABfFyoX6EcbCAQQ2Lk0joUozV8AhCsVaXAoEgQLVFG2q4CQS77KJaQI8M
+         kWRVdkGuuHxrTiGXyJGJU5vGtWjos/okrNEjgBXH/WwKTncADCslr3qA/SrsTM8OkbTR
+         bcEsrXI1z+h+PTflEwS1/FnAWNFOH63cgiP6uEPZtNX3vJ8rVmUHGLR7u6+waf1aIfT1
+         1pylLruiN1nhvHDohWpBAHZwF4Vj0i8942L5mi9OwI52UMS9nzn6K0ljG+DKKtVNKtbx
+         EckA==
+X-Gm-Message-State: AOJu0YyCnB2n+Jx9dLU5XJ/+Hx6lZzNgS3dvCB3jjTqO527yetpCXQtE
+	RKNVaZV+T8tifIXXt2XLbY2YW5rHr8w7sLk2HdhdLnexhnARZ92b2HK/4yyyc3K+2ks=
+X-Gm-Gg: ASbGncsWrPdFu/t16uPYCVhZRdnnLtt+tGyIJLkP3Q2bk3sDLKDNkbcIoIKmzHZ47Aj
+	7JSKBWJuKbPW/A8VH+0dr6TFhKKNF7ancm+nE3wAtHFT56ZKYghnqsEo4WTXwFzF1jyOHfc1Mo1
+	HXfzIV5An1jTE77Btl+wYsgf+pKjJUp1fIiHPD+BecIBsYeSU1DtSr2Hwovy5Noxb2b7Ejw4cql
+	skZ2/GIMRhIYSElhXUxktOM9IqFIg3Gz/eFeH0S7jebH0Pe6jbb/SZG5QFad+oAiNrhLzZr40l0
+	YwEAnNYCJKDduuu9+RnbARmuwQ2I42mt1NjUEyWFwkrEKl2JQRQkjNtn/gsneZ38WShkvQgDSS/
+	5LjDb6cI6ALda2GqkCIPrzyG91Abuv1YWcuYqOgiCEbzlzOWYkUPlsvWJO/RDOyZfS+167Dl+dA
+	49CorAt57CppCsfSZj2g==
+X-Google-Smtp-Source: AGHT+IGg+i6jZ7Vc8khvsM0OhsbcyBpi7wwmvLoWQaXSJN/oltobDQLp3m3RiNLSjGcA1vXLKS5jrQ==
+X-Received: by 2002:a17:902:dad2:b0:293:e5f:85b7 with SMTP id d9443c01a7336-2930e5f9113mr106534885ad.11.1761276783905;
+        Thu, 23 Oct 2025 20:33:03 -0700 (PDT)
+Received: from d.home.yangfl.dn42 ([45.32.227.231])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2946dda7949sm40394265ad.3.2025.10.23.20.33.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Oct 2025 20:33:03 -0700 (PDT)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/3] net: dsa: yt921x: Add STP/MST/HSR/LAG support
+Date: Fri, 24 Oct 2025 11:32:26 +0800
+Message-ID: <20251024033237.1336249-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, netdev@vger.kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
- Icenowy Zheng <uwu@icenowy.me>, Vivian Wang <wangruikang@iscas.ac.cn>, 
- Yixun Lan <dlan@gentoo.org>, linux-kernel@vger.kernel.org, 
- Conor Dooley <conor+dt@kernel.org>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Eric Dumazet <edumazet@google.com>, Chen Wang <unicorn_wang@outlook.com>, 
- Yao Zi <ziyao@disroot.org>, linux-stm32@st-md-mailman.stormreply.com, 
- Longbin Li <looong.bin@gmail.com>, linux-arm-kernel@lists.infradead.org, 
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, devicetree@vger.kernel.org, 
- sophgo@lists.linux.dev, Han Gao <rabenda.cn@gmail.com>
-To: Inochi Amaoto <inochiama@gmail.com>
-In-Reply-To: <20251024015524.291013-2-inochiama@gmail.com>
-References: <20251024015524.291013-1-inochiama@gmail.com>
- <20251024015524.291013-2-inochiama@gmail.com>
-Message-Id: <176127621096.199631.1552825919177332173.robh@kernel.org>
-Subject: Re: [PATCH v3 1/3] dt-bindings: net: sophgo,sg2044-dwmac: add phy
- mode restriction
+Content-Transfer-Encoding: 8bit
 
+Support for these features was deferred from the initial submission of the
+driver.
 
-On Fri, 24 Oct 2025 09:55:22 +0800, Inochi Amaoto wrote:
-> As the ethernet controller of SG2044 and SG2042 only supports
-> RGMII phy. Add phy-mode property to restrict the value.
-> 
-> Also, since SG2042 has internal rx delay in its mac, make
-> only "rgmii-txid" and "rgmii-id" valid for phy-mode.
-> 
-> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-> ---
->  .../bindings/net/sophgo,sg2044-dwmac.yaml       | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
-> 
+David Yang (3):
+  net: dsa: yt921x: Add STP/MST support
+  net: dsa: yt921x: Add HSR offloading support
+  net: dsa: yt921x: Add LAG offloading support
 
-My bot found errors running 'make dt_binding_check' on your patch:
+ drivers/net/dsa/yt921x.c | 323 +++++++++++++++++++++++++++++++++++++++
+ drivers/net/dsa/yt921x.h |  29 ++++
+ net/dsa/tag_yt921x.c     |   4 +
+ 3 files changed, 356 insertions(+)
 
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml: allOf:1:then: 'anyOf' conditional failed, one must be fixed:
-	'phy-mode' is not one of ['$ref', 'additionalItems', 'additionalProperties', 'allOf', 'anyOf', 'const', 'contains', 'default', 'dependencies', 'dependentRequired', 'dependentSchemas', 'deprecated', 'description', 'else', 'enum', 'exclusiveMaximum', 'exclusiveMinimum', 'items', 'if', 'minItems', 'minimum', 'maxItems', 'maximum', 'multipleOf', 'not', 'oneOf', 'pattern', 'patternProperties', 'properties', 'required', 'then', 'typeSize', 'unevaluatedProperties', 'uniqueItems']
-	'type' was expected
-	from schema $id: http://devicetree.org/meta-schemas/keywords.yaml
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20251024015524.291013-2-inochiama@gmail.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+-- 
+2.51.0
 
 
