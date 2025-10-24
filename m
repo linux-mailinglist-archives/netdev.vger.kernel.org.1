@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-232582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3D72C06C8C
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:50:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FE1BC06C9B
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:51:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23CEF3B386D
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:50:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2995E1B89022
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2397131D740;
-	Fri, 24 Oct 2025 14:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E7E32254E;
+	Fri, 24 Oct 2025 14:49:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rih41H7+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oty1z26H"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039CF3161B0
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 14:49:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3512E3161B0
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 14:49:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761317388; cv=none; b=XE21RvHKo9C8ELOhTvBe7GpMKBYB3+XHFPBmBvr4YlZJ+Us1P8t5bvryjmKogq24fGOxf/9Y+RdC6kXrlwBFWWIzby53NxiVOw7WC0mccPyBwV/dKkcqwsBwSdpClFATVcpRkD8IO88/BeKtSUIgUngRv+pYsTaK+I/RCtfG2B8=
+	t=1761317393; cv=none; b=No3sU8u9ddXDZo4v4V3T3JHfH5zr6CTqcTsrkH5mZ5Xgf+Wivih1raZJc280mXCLKfdTg023PkFim2hirXuXPLDy7tyrOKPGoEEwaNtWmmA3+eTRunjh1LNNCAXlX9sRZpHbk0IkjG08i/WLvSqQiLqkAKVFGP+pgKjrjD5lo5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761317388; c=relaxed/simple;
-	bh=xrdigYRxKpj5vIOybY8cE7VPl6i9cbWxb86HMGufpS0=;
+	s=arc-20240116; t=1761317393; c=relaxed/simple;
+	bh=0VKsaDZSLAjLoOHR254mlzeS422ganxlJ9cm2w7HBhc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JCCEhG/kyi0+LjqCwQ5N9W6dGhBJPi2S5MDeWkrtJETGm1Ja8F74WASSZv3K0whYEdgPLrDWFYl6zqa5v4xL8St+OE2b5UOfg93jHvVkZO3lrBLhQwc0NgKdQFgM7BAZWmsI3U3ANSUNP5jM4WzejVhztY970uo2RXX7r5AJGBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rih41H7+; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=OYljos8nqWuVNngIglcj1KvfmIoRY+kKHYZMYQE0VQYPPeLMg0PbrUdMP9S0vwi5qjOYIL2NuVeTELeE9eKjJ9C+xT81t6+MUkrVju1OTGSz0l+Rs54pJfSyC2OhyDKxMQdHeaDEeimUr4uUbouadlcsHLTI7MIOZXjTzAebiNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Oty1z26H; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761317385;
+	s=mimecast20190719; t=1761317390;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qGWwrpB03/b8nv3UX3bS5C5fRG07pIt+uxTUNOcYdH8=;
-	b=Rih41H7+O6D96ie9WNzgCvq5XF0MC0Zfs+NDL/v+WP7knjLM2bDrI/FSFwnDp4LbK2vyVj
-	YmDSurUwcvc1w2xWpgdUJEbVBpdXtaG2rnhs8DtbAW4FLDXv0mttoUoyu8BIww7/GacnHc
-	e77s75w+c2nGQtTbFLf6GJJbDDvxIWU=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=o+ZiOSqwX8czYY5sNRyZRcVCPhX4LM5H0YHmt/3WRIk=;
+	b=Oty1z26HsKH7c4fCKSsNlcBee3gxp4j821KrLVzB5iGH0Z4N3pxZoua16s2iqe4AmtnB+F
+	0+mlY2G1VFkeyQn2Nk7XJt4CflGzBY2eKVDUmZglyE/dcMT3P9oUm6Q4MJ0CEJuOCcRMSO
+	f/OHlfZvCIqzNv6+i3UUaxaDqQ7hxSo=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-352-PGs32Ue_Mo-iTXct8cyKBQ-1; Fri,
- 24 Oct 2025 10:49:41 -0400
-X-MC-Unique: PGs32Ue_Mo-iTXct8cyKBQ-1
-X-Mimecast-MFC-AGG-ID: PGs32Ue_Mo-iTXct8cyKBQ_1761317379
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-495-ssWzKrEzNB-uXmg_QADRvg-1; Fri,
+ 24 Oct 2025 10:49:47 -0400
+X-MC-Unique: ssWzKrEzNB-uXmg_QADRvg-1
+X-Mimecast-MFC-AGG-ID: ssWzKrEzNB-uXmg_QADRvg_1761317385
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 91B2819540CE;
-	Fri, 24 Oct 2025 14:49:39 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DC2C219560B7;
+	Fri, 24 Oct 2025 14:49:44 +0000 (UTC)
 Received: from p16v.redhat.com (unknown [10.44.33.203])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5C67C195398C;
-	Fri, 24 Oct 2025 14:49:34 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0AE7119540EB;
+	Fri, 24 Oct 2025 14:49:39 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Michal Schmidt <mschmidt@redhat.com>,
@@ -74,9 +74,9 @@ Cc: Michal Schmidt <mschmidt@redhat.com>,
 	Donald Hunter <donald.hunter@gmail.com>,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 1/2] dpll: add phase-adjust-gran pin attribute
-Date: Fri, 24 Oct 2025 16:49:26 +0200
-Message-ID: <20251024144927.587097-2-ivecera@redhat.com>
+Subject: [PATCH net-next 2/2] dpll: zl3073x: Specify phase adjustment granularity for pins
+Date: Fri, 24 Oct 2025 16:49:27 +0200
+Message-ID: <20251024144927.587097-3-ivecera@redhat.com>
 In-Reply-To: <20251024144927.587097-1-ivecera@redhat.com>
 References: <20251024144927.587097-1-ivecera@redhat.com>
 Precedence: bulk
@@ -88,163 +88,162 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Phase-adjust values are currently limited by a min-max range. Some
-hardware requires, for certain pin types, that values be multiples of
-a specific granularity, as in the zl3073x driver.
-
-Add a `phase-adjust-gran` pin attribute and an appropriate field in
-dpll_pin_properties. If set by the driver, use its value to validate
-user-provided phase-adjust values.
+Output pins phase adjustment values in the device are expressed
+in half synth clock cycles. Use this number of cycles as output
+pins' phase adjust granularity and simplify both get/set callbacks.
 
 Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
 Reviewed-by: Petr Oros <poros@redhat.com>
 Tested-by: Prathosh Satish <Prathosh.Satish@microchip.com>
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
- Documentation/driver-api/dpll.rst     | 36 +++++++++++++++------------
- Documentation/netlink/specs/dpll.yaml |  7 ++++++
- drivers/dpll/dpll_netlink.c           | 12 ++++++++-
- include/linux/dpll.h                  |  1 +
- include/uapi/linux/dpll.h             |  1 +
- 5 files changed, 40 insertions(+), 17 deletions(-)
+ drivers/dpll/zl3073x/dpll.c | 58 +++++++++----------------------------
+ drivers/dpll/zl3073x/prop.c | 11 +++++++
+ 2 files changed, 25 insertions(+), 44 deletions(-)
 
-diff --git a/Documentation/driver-api/dpll.rst b/Documentation/driver-api/dpll.rst
-index be1fc643b645e..83118c728ed90 100644
---- a/Documentation/driver-api/dpll.rst
-+++ b/Documentation/driver-api/dpll.rst
-@@ -198,26 +198,28 @@ be requested with the same attribute with ``DPLL_CMD_DEVICE_SET`` command.
-   ================================== ======================================
+diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
+index 93dc93eec79ed..b13eb4e342d58 100644
+--- a/drivers/dpll/zl3073x/dpll.c
++++ b/drivers/dpll/zl3073x/dpll.c
+@@ -35,6 +35,7 @@
+  * @prio: pin priority <0, 14>
+  * @selectable: pin is selectable in automatic mode
+  * @esync_control: embedded sync is controllable
++ * @phase_gran: phase adjustment granularity
+  * @pin_state: last saved pin state
+  * @phase_offset: last saved pin phase offset
+  * @freq_offset: last saved fractional frequency offset
+@@ -49,6 +50,7 @@ struct zl3073x_dpll_pin {
+ 	u8			prio;
+ 	bool			selectable;
+ 	bool			esync_control;
++	s32			phase_gran;
+ 	enum dpll_pin_state	pin_state;
+ 	s64			phase_offset;
+ 	s64			freq_offset;
+@@ -1388,25 +1390,14 @@ zl3073x_dpll_output_pin_phase_adjust_get(const struct dpll_pin *dpll_pin,
+ 	struct zl3073x_dpll *zldpll = dpll_priv;
+ 	struct zl3073x_dev *zldev = zldpll->dev;
+ 	struct zl3073x_dpll_pin *pin = pin_priv;
+-	u32 synth_freq;
+ 	s32 phase_comp;
+-	u8 out, synth;
++	u8 out;
+ 	int rc;
  
- Device may also provide ability to adjust a signal phase on a pin.
--If pin phase adjustment is supported, minimal and maximal values that pin
--handle shall be provide to the user on ``DPLL_CMD_PIN_GET`` respond
--with ``DPLL_A_PIN_PHASE_ADJUST_MIN`` and ``DPLL_A_PIN_PHASE_ADJUST_MAX``
-+If pin phase adjustment is supported, minimal and maximal values and
-+granularity that pin handle shall be provided to the user on
-+``DPLL_CMD_PIN_GET`` respond with ``DPLL_A_PIN_PHASE_ADJUST_MIN``,
-+``DPLL_A_PIN_PHASE_ADJUST_MAX`` and ``DPLL_A_PIN_PHASE_ADJUST_GRAN``
- attributes. Configured phase adjust value is provided with
- ``DPLL_A_PIN_PHASE_ADJUST`` attribute of a pin, and value change can be
- requested with the same attribute with ``DPLL_CMD_PIN_SET`` command.
+-	out = zl3073x_output_pin_out_get(pin->id);
+-	synth = zl3073x_out_synth_get(zldev, out);
+-	synth_freq = zl3073x_synth_freq_get(zldev, synth);
+-
+-	/* Check synth freq for zero */
+-	if (!synth_freq) {
+-		dev_err(zldev->dev, "Got zero synth frequency for output %u\n",
+-			out);
+-		return -EINVAL;
+-	}
+-
+ 	guard(mutex)(&zldev->multiop_lock);
  
--  =============================== ======================================
--  ``DPLL_A_PIN_ID``               configured pin id
--  ``DPLL_A_PIN_PHASE_ADJUST_MIN`` attr minimum value of phase adjustment
--  ``DPLL_A_PIN_PHASE_ADJUST_MAX`` attr maximum value of phase adjustment
--  ``DPLL_A_PIN_PHASE_ADJUST``     attr configured value of phase
--                                  adjustment on parent dpll device
--  ``DPLL_A_PIN_PARENT_DEVICE``    nested attribute for requesting
--                                  configuration on given parent dpll
--                                  device
--    ``DPLL_A_PIN_PARENT_ID``      parent dpll device id
--    ``DPLL_A_PIN_PHASE_OFFSET``   attr measured phase difference
--                                  between a pin and parent dpll device
--  =============================== ======================================
-+  ================================ ==========================================
-+  ``DPLL_A_PIN_ID``                configured pin id
-+  ``DPLL_A_PIN_PHASE_ADJUST_GRAN`` attr granularity of phase adjustment value
-+  ``DPLL_A_PIN_PHASE_ADJUST_MIN``  attr minimum value of phase adjustment
-+  ``DPLL_A_PIN_PHASE_ADJUST_MAX``  attr maximum value of phase adjustment
-+  ``DPLL_A_PIN_PHASE_ADJUST``      attr configured value of phase
-+                                   adjustment on parent dpll device
-+  ``DPLL_A_PIN_PARENT_DEVICE``     nested attribute for requesting
-+                                   configuration on given parent dpll
-+                                   device
-+    ``DPLL_A_PIN_PARENT_ID``       parent dpll device id
-+    ``DPLL_A_PIN_PHASE_OFFSET``    attr measured phase difference
-+                                   between a pin and parent dpll device
-+  ================================ ==========================================
+ 	/* Read output configuration */
++	out = zl3073x_output_pin_out_get(pin->id);
+ 	rc = zl3073x_mb_op(zldev, ZL_REG_OUTPUT_MB_SEM, ZL_OUTPUT_MB_SEM_RD,
+ 			   ZL_REG_OUTPUT_MB_MASK, BIT(out));
+ 	if (rc)
+@@ -1417,11 +1408,10 @@ zl3073x_dpll_output_pin_phase_adjust_get(const struct dpll_pin *dpll_pin,
+ 	if (rc)
+ 		return rc;
  
- All phase related values are provided in pico seconds, which represents
- time difference between signals phase. The negative value means that
-@@ -384,6 +386,8 @@ according to attribute purpose.
-                                        frequencies
-       ``DPLL_A_PIN_ANY_FREQUENCY_MIN`` attr minimum value of frequency
-       ``DPLL_A_PIN_ANY_FREQUENCY_MAX`` attr maximum value of frequency
-+    ``DPLL_A_PIN_PHASE_ADJUST_GRAN``   attr granularity of phase
-+                                       adjustment value
-     ``DPLL_A_PIN_PHASE_ADJUST_MIN``    attr minimum value of phase
-                                        adjustment
-     ``DPLL_A_PIN_PHASE_ADJUST_MAX``    attr maximum value of phase
-diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
-index cafb4ec20447e..e9b476b5db1b4 100644
---- a/Documentation/netlink/specs/dpll.yaml
-+++ b/Documentation/netlink/specs/dpll.yaml
-@@ -440,6 +440,12 @@ attribute-sets:
-         doc: |
-           Capable pin provides list of pins that can be bound to create a
-           reference-sync pin pair.
-+      -
-+        name: phase-adjust-gran
-+        type: s32
-+        doc: |
-+          Granularity of phase adjustment, in picoseconds. The value of
-+          phase adjustment must be a multiple of this granularity.
+-	/* Value in register is expressed in half synth clock cycles */
+-	phase_comp *= (int)div_u64(PSEC_PER_SEC, 2 * synth_freq);
+-
+-	/* Reverse two's complement negation applied during 'set' */
+-	*phase_adjust = -phase_comp;
++	/* Convert value to ps and reverse two's complement negation applied
++	 * during 'set'
++	 */
++	*phase_adjust = -phase_comp * pin->phase_gran;
  
-   -
-     name: pin-parent-device
-@@ -614,6 +620,7 @@ operations:
-             - capabilities
-             - parent-device
-             - parent-pin
-+            - phase-adjust-gran
-             - phase-adjust-min
-             - phase-adjust-max
-             - phase-adjust
-diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
-index 74c1f0ca95f24..25d3a46e889b5 100644
---- a/drivers/dpll/dpll_netlink.c
-+++ b/drivers/dpll/dpll_netlink.c
-@@ -637,6 +637,10 @@ dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
- 	ret = dpll_msg_add_pin_freq(msg, pin, ref, extack);
- 	if (ret)
- 		return ret;
-+	if (prop->phase_gran &&
-+	    nla_put_s32(msg, DPLL_A_PIN_PHASE_ADJUST_GRAN,
-+			prop->phase_gran))
-+		return -EMSGSIZE;
- 	if (nla_put_s32(msg, DPLL_A_PIN_PHASE_ADJUST_MIN,
- 			prop->phase_range.min))
- 		return -EMSGSIZE;
-@@ -1261,7 +1265,13 @@ dpll_pin_phase_adj_set(struct dpll_pin *pin, struct nlattr *phase_adj_attr,
- 	if (phase_adj > pin->prop.phase_range.max ||
- 	    phase_adj < pin->prop.phase_range.min) {
- 		NL_SET_ERR_MSG_ATTR(extack, phase_adj_attr,
--				    "phase adjust value not supported");
-+				    "phase adjust value of out range");
-+		return -EINVAL;
-+	}
-+	if (pin->prop.phase_gran && phase_adj % pin->prop.phase_gran) {
-+		NL_SET_ERR_MSG_ATTR_FMT(extack, phase_adj_attr,
-+					"phase adjust value not multiple of %u",
-+					pin->prop.phase_gran);
- 		return -EINVAL;
+ 	return rc;
+ }
+@@ -1437,39 +1427,18 @@ zl3073x_dpll_output_pin_phase_adjust_set(const struct dpll_pin *dpll_pin,
+ 	struct zl3073x_dpll *zldpll = dpll_priv;
+ 	struct zl3073x_dev *zldev = zldpll->dev;
+ 	struct zl3073x_dpll_pin *pin = pin_priv;
+-	int half_synth_cycle;
+-	u32 synth_freq;
+-	u8 out, synth;
++	u8 out;
+ 	int rc;
+ 
+-	/* Get attached synth */
+-	out = zl3073x_output_pin_out_get(pin->id);
+-	synth = zl3073x_out_synth_get(zldev, out);
+-
+-	/* Get synth's frequency */
+-	synth_freq = zl3073x_synth_freq_get(zldev, synth);
+-
+-	/* Value in register is expressed in half synth clock cycles so
+-	 * the given phase adjustment a multiple of half synth clock.
+-	 */
+-	half_synth_cycle = (int)div_u64(PSEC_PER_SEC, 2 * synth_freq);
+-
+-	if ((phase_adjust % half_synth_cycle) != 0) {
+-		NL_SET_ERR_MSG_FMT(extack,
+-				   "Phase adjustment value has to be multiple of %d",
+-				   half_synth_cycle);
+-		return -EINVAL;
+-	}
+-	phase_adjust /= half_synth_cycle;
+-
+ 	/* The value in the register is stored as two's complement negation
+-	 * of requested value.
++	 * of requested value and expressed in half synth clock cycles.
+ 	 */
+-	phase_adjust = -phase_adjust;
++	phase_adjust = -phase_adjust / pin->phase_gran;
+ 
+ 	guard(mutex)(&zldev->multiop_lock);
+ 
+ 	/* Read output configuration */
++	out = zl3073x_output_pin_out_get(pin->id);
+ 	rc = zl3073x_mb_op(zldev, ZL_REG_OUTPUT_MB_SEM, ZL_OUTPUT_MB_SEM_RD,
+ 			   ZL_REG_OUTPUT_MB_MASK, BIT(out));
+ 	if (rc)
+@@ -1758,9 +1727,10 @@ zl3073x_dpll_pin_register(struct zl3073x_dpll_pin *pin, u32 index)
+ 	if (IS_ERR(props))
+ 		return PTR_ERR(props);
+ 
+-	/* Save package label & esync capability */
++	/* Save package label, esync capability and phase adjust granularity */
+ 	strscpy(pin->label, props->package_label);
+ 	pin->esync_control = props->esync_control;
++	pin->phase_gran = props->dpll_props.phase_gran;
+ 
+ 	if (zl3073x_dpll_is_input_pin(pin)) {
+ 		rc = zl3073x_dpll_ref_prio_get(pin, &pin->prio);
+diff --git a/drivers/dpll/zl3073x/prop.c b/drivers/dpll/zl3073x/prop.c
+index 4cf7e8aefcb37..af43b19e35a18 100644
+--- a/drivers/dpll/zl3073x/prop.c
++++ b/drivers/dpll/zl3073x/prop.c
+@@ -208,7 +208,18 @@ struct zl3073x_pin_props *zl3073x_pin_props_get(struct zl3073x_dev *zldev,
+ 			DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE |
+ 			DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE;
+ 	} else {
++		u8 out, synth;
++		s32 f;
++
+ 		props->dpll_props.type = DPLL_PIN_TYPE_GNSS;
++
++		/* The output pin phase adjustment granularity equals half of
++		 * the synth frequency count.
++		 */
++		out = zl3073x_output_pin_out_get(index);
++		synth = zl3073x_out_synth_get(zldev, out);
++		f = 2 * zl3073x_synth_freq_get(zldev, synth);
++		props->dpll_props.phase_gran = f ? div_s64(PSEC_PER_SEC, f) : 1;
  	}
  
-diff --git a/include/linux/dpll.h b/include/linux/dpll.h
-index 25be745bf41f1..4455d095925e9 100644
---- a/include/linux/dpll.h
-+++ b/include/linux/dpll.h
-@@ -163,6 +163,7 @@ struct dpll_pin_properties {
- 	u32 freq_supported_num;
- 	struct dpll_pin_frequency *freq_supported;
- 	struct dpll_pin_phase_adjust_range phase_range;
-+	s32 phase_gran;
- };
- 
- #if IS_ENABLED(CONFIG_DPLL)
-diff --git a/include/uapi/linux/dpll.h b/include/uapi/linux/dpll.h
-index ab1725a954d74..69d35570ac4f1 100644
---- a/include/uapi/linux/dpll.h
-+++ b/include/uapi/linux/dpll.h
-@@ -251,6 +251,7 @@ enum dpll_a_pin {
- 	DPLL_A_PIN_ESYNC_FREQUENCY_SUPPORTED,
- 	DPLL_A_PIN_ESYNC_PULSE,
- 	DPLL_A_PIN_REFERENCE_SYNC,
-+	DPLL_A_PIN_PHASE_ADJUST_GRAN,
- 
- 	__DPLL_A_PIN_MAX,
- 	DPLL_A_PIN_MAX = (__DPLL_A_PIN_MAX - 1)
+ 	props->dpll_props.phase_range.min = S32_MIN;
 -- 
 2.51.0
 
