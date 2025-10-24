@@ -1,121 +1,120 @@
-Return-Path: <netdev+bounces-232374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F95C04CCE
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 09:43:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6C89C04D9F
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 09:51:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7F42D3440CB
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 07:43:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 962A31A059B3
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 07:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40ED02EBB89;
-	Fri, 24 Oct 2025 07:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404322EF66A;
+	Fri, 24 Oct 2025 07:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="PkL5KFp/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wi3l/Cve"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F2B2EB86F
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 07:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2652EC0B7
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 07:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761291803; cv=none; b=ddpFXSxZpbnWQT+3HcWo8D8h7cHqvrI4SNP5kXo6oDbnVZZejh6KkHQJ7eJL30BItwBlY9JwnS9sDDmdPLGZe+dpxNWxNhyWTAWXsweJHDmpVBHoJBgXlGkqLClNVJtVGZY8c0crSDjk4CMuNtv4rl7ye8E7XQbLDygY/kwXafg=
+	t=1761292232; cv=none; b=LNjc/6JRITf5M7AJNjxQvAkzrmfaoKeWEMMBZjqJoRMJY5dG5Q2wPZ5MbTtrMbjyjnesMP6zvUo13Xo87HPMZWCwI/Une4XB9SpgvXJPnX34MAfrS8cqDL0nc/OpeXEyfa+VYhLVtkw4shQQvFHXqjefgEas2+OBEa1xsEGhhWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761291803; c=relaxed/simple;
-	bh=n9vrj8rw3vvgLnp0wFhiU0wr83DTSKQ91SlzmqgRO7A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WAE4c520mIbeBMJiR6ReyabP4c/Wixw/lP67TJgm5kHYWcGHp/ki6+toIJZgteSlfe/ch4qef1+KqM0Kx9rd3ploakrrZpXEc/7196H27mv5OZjg9Wcm1PTiRN4z33tHrlPAIzd6f9Mn81AJYoI/B/oKocGoHwceiyM99XaIvwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=PkL5KFp/; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b472842981fso227613766b.1
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 00:43:21 -0700 (PDT)
+	s=arc-20240116; t=1761292232; c=relaxed/simple;
+	bh=aoaT+3+tLrh0C5tTqgmTA40dwVt6zWOm+YP5eq9NiYE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=f8mBIREY5bDtptIfi6LtZZxAyx9aBhaHVB1aqvD2cb8heJbkLGGayR4JLPdvbVdubjH+8jtFedZOiGkSV1OkFwyJ3Ryg4H4Quer8HM+PpZmsTos6sf/nzUgO47WvVmgY+aboxnSvC48vubKLrCivkewMXGo4DR+MlLzkctpYxVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wi3l/Cve; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-7849f565200so25882117b3.0
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 00:50:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1761291800; x=1761896600; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=btg6WWXpIi0CWUiiHvKL1LewBs3OVn+no42TB4G5pPk=;
-        b=PkL5KFp/7P3i8NiDEWB0LFmIDPhX+9t6CAfkDZ3joMpWEfkIkpwJRz0UmMYeivRgUl
-         525dlBX/WxfXNFVpVhgBiOmpM0XLrhCsS+wut04tg+042TZX9eDL3vAVNCNVUCl2VDfa
-         mLVi+bVeNG9A+jo8Ct0mpbMgvtuCuS/5ydSQoEPgKjjiLwdFIP+k+q5vvlB7aMYRz2Be
-         2TQvjOz5XuMwmOUFi1/qwL0skLx6+A1oLHo9kZ4ajgseuvDY4DZH0JkTDnuMD6J1b/fr
-         O5Nd7d1jL5PEEF1HA1roD5l9YRkce72xMzlAwSC177bF4bYm6QarF/2XO82h+m8jBlbC
-         UgUA==
+        d=google.com; s=20230601; t=1761292229; x=1761897029; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Y/O1kPBatbiZkz5n1IIyL8jtPdh19uNtu6br1KkewK8=;
+        b=wi3l/CveimWviuan+6caVFvnty6OMBqZZiqAzTZOocUrRsi7F5rtCTOZlKht9KfJnc
+         8gPuGz0z36UTPQje/5e0jSWrOEjKI70HtNyzLJIViRO8Od2N1x4Shzkh5N+zZFHPaB0c
+         PbcJc5Ngz/eWm7EM1QIgoegx0YYQ8dowpgF74mmkMRKoJhKrWdD6vrJeuh0V1MsP9iIs
+         3ZqijL9fPqS+3zbQERcEcI67jcjOwZtPSuUfbbmn1NkDo+JV8CGspZOn/uxNezUKMn+F
+         A8B20X4oPB6himPeMWJKtNAgCW4kNWzCAnY2r7jDIkmqi1Uc3MG5HNLTQ9FsbRQB+Tfu
+         JqHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761291800; x=1761896600;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=btg6WWXpIi0CWUiiHvKL1LewBs3OVn+no42TB4G5pPk=;
-        b=AFygiduUCo4LMZmmZXGfuWywToNetmnQBOnXk769zmXpHy6iEfMzCuHYAjQOmFtj8I
-         9sHR+rk1dP/k9szGAloQc89QD5JEnE4y4DbFG772bjSbxbw2NZcNWxgA793s32CNf+6d
-         eLBObrAljOYRWXE4IJC2TZqGkdC9u8TaaukxXdtgzhvOFJHNMKGEJhr0zDjpWeTU1b9g
-         fQ8VeFqdvGCHD2TxHwV6lae/llhB3xBwtqKNSmE+JiPuytDgQwFWiSkMuDYJQgSy/Y5b
-         8sfkkg3nd8oNml4B2cvNBLIDRLGO2U/bkBzRDNry6+hvLS/nmuNABlVyv9N8A10Ozc/d
-         9F5A==
-X-Forwarded-Encrypted: i=1; AJvYcCWk99Gl45qNGj5kc34EsYf39/JyINe5rt3NaR/y/b1CIWd7rR085yKlMXqqpycGygwGcHZXwuY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1ZvTX7UVstF96b9E0y5liyfJ1O3spRQRev8OUY8Yuhy8xjOvr
-	f6It1Uh6Gb9vELpqAU4fQlzqf8sn+wykQthxop4BTbrWd51rEjwhBMGLWFQTZiATQsQ=
-X-Gm-Gg: ASbGncta6dMBy3eywXamIgjB9NjKVZkY0aW1GIUAr+CTcjIAHtm0DhVXkBTM63xl/VN
-	k/WD3laTgtAu8BtrsdGH6AkGQII0uyeyv3GNz6x6D+iWS7hKOBALdYFB5DpAxmxg7GVxuKHfFYE
-	1Koy2O4X/tV/lCqjJ6SGTM/OATm0Yy1GLSQKZcy8Wauu9FcC88M6MYXxC7rArtHz3kpmCgvH0YF
-	K1sCAsigtUB+Y4vGSJoiRKHGorKMFCHUuJzXd/k1BQNSxYKN6c5UTOffCFPSokHS6Vg0ygw4CuT
-	HZCUZ3aKROaEMvpEAOt8369ZB0yrz5O18TXCR53cXYyN/arvBI7kmmgnd8KhAt3BFH/xSuS2GOh
-	+JYytYOUH1jVrdK2ChZJQ6APNnb2tLqNMu/ABqHB3cnpAnAsEP/ZhqELmNMwh3ZnLVSFV/zNsba
-	9q5EA/Wje2JH+SPQe9elxiFo73a//9d+fB3hiPDlnCHsY=
-X-Google-Smtp-Source: AGHT+IENVgAAY05iZMjJCVKA8oSGaw8hZMk+fKU5hdYwbKNdz8hghfeyg+3i0gPeAqEdHdSGOTqcCA==
-X-Received: by 2002:a17:907:1c21:b0:b6d:536f:ada with SMTP id a640c23a62f3a-b6d536f1134mr702214066b.43.1761291799580;
-        Fri, 24 Oct 2025 00:43:19 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63e3f316847sm3676823a12.23.2025.10.24.00.43.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Oct 2025 00:43:19 -0700 (PDT)
-Message-ID: <4cb007ea-c29a-44e7-933c-cfe3f728d42c@blackwall.org>
-Date: Fri, 24 Oct 2025 10:43:18 +0300
+        d=1e100.net; s=20230601; t=1761292229; x=1761897029;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y/O1kPBatbiZkz5n1IIyL8jtPdh19uNtu6br1KkewK8=;
+        b=YygzXoBhg3EfvXcPmxI6LOBs0+7rPNYyEaobnVxyC2+fytSSIA5H6jpfW6zbo0YoJN
+         nMSLqvlXCyF73L5jCeBjqqt7/kwF+VXbqOmEgS4DL+Rv5G9K7waPFRnNLkXkrjuvxI6y
+         j0VWRYN943Y6d8JOiy2m9rvm+5vWoa55vklaqbFrtibGJDi5hrOpWI1+4nSbNATlQ6hl
+         9Dj7DuI1yrt7etGS1vzM+Ga3N8IpZlA4csB4K2b0B/8b0rsmqcYHgTaOcx07NAnuEyD/
+         FvUU9I/84nKP0iseC3d50CPfDQBbFiwccqNRWQ+v/sM95FP34rFkV8twZao48J9mzR/e
+         TEVg==
+X-Forwarded-Encrypted: i=1; AJvYcCXw5bKGF48LC+oLsCaILmlz+iKOj/i5BuGKvOKDkTxS5QtIooOOupwEDHPTsojfMU4byQveiE4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYadBuihUBcRR7iQ6hEcwzs+jSvb4TYh3i1Z/3lx71IHuNmwFa
+	aH/BrVYlymwGNT9yQDDC6rtXXENBDQemr8y+8yHNyiYOtm2/gCQnMqiszW85cY8NDYirp4xr5Pa
+	pZlGHiobzqpS3+w==
+X-Google-Smtp-Source: AGHT+IG3ZzN9wFAXwNsF/yz6sWq9HkI8YBGQAGOLGrouSs6N/pjvkfo/ofseXxDRhaMB1X8uY0Ku2LoqDSz2fw==
+X-Received: from ywbif4.prod.google.com ([2002:a05:690c:6904:b0:773:bc4a:5cae])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:690c:e1b:b0:781:b22:1f5a with SMTP id 00721157ae682-7836d3c2e52mr216579227b3.70.1761292229466;
+ Fri, 24 Oct 2025 00:50:29 -0700 (PDT)
+Date: Fri, 24 Oct 2025 07:50:24 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] selftests: bridge_mdb: Add a test for MDB
- flush on snooping disable
-To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
- bridge@lists.linux.dev, mlxsw@nvidia.com, linux-kselftest@vger.kernel.org,
- Shuah Khan <shuah@kernel.org>
-References: <5e992df1bb93b88e19c0ea5819e23b669e3dde5d.1761228273.git.petrm@nvidia.com>
- <9420dfbcf26c8e1134d31244e9e7d6a49d677a69.1761228273.git.petrm@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <9420dfbcf26c8e1134d31244e9e7d6a49d677a69.1761228273.git.petrm@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.1.821.gb6fe4d2222-goog
+Message-ID: <20251024075027.3178786-1-edumazet@google.com>
+Subject: [PATCH net-next 0/3] tcp: fix receive autotune again
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 10/23/25 17:45, Petr Machata wrote:
-> Check that non-permanent MDB entries are removed as IGMP / MLD snooping is
-> disabled.
-> 
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> ---
-> 
-> Notes:
-> CC: linux-kselftest@vger.kernel.org
-> CC: Shuah Khan <shuah@kernel.org>
-> 
->  .../selftests/net/forwarding/bridge_mdb.sh    | 100 +++++++++++++++++-
->  1 file changed, 98 insertions(+), 2 deletions(-)
-> 
+Neal Cardwell found that recent kernels were having RWIN limited
+issues, even when net.ipv4.tcp_rmem[2] was set to a very big value like 512MB
 
+He suspected that tcp_stream default buffer size (64KB) was triggering
+heuristic added in ea33537d8292 ("tcp: add receive queue awareness
+in tcp_rcv_space_adjust()").
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+After more testing, it turns out the bug was added earlier
+with commit 65c5287892e9 ("tcp: fix sk_rcvbuf overshoot").
+
+I forgot once again that DRS has one RTT latency.
+
+MPTCP also got the same issue.
+
+This series :
+
+- adds rcv_ssthresh, window_clamp and rcv_wnd to trace_tcp_rcvbuf_grow().
+- Refactors code in a patch with no functional changes.
+- Fixes the issue in the final patch.
+
+Eric Dumazet (3):
+  trace: tcp: add three metrics to trace_tcp_rcvbuf_grow()
+  tcp: add newval parameter to tcp_rcvbuf_grow()
+  tcp: fix too slow tcp_rcvbuf_grow() action
+
+ include/net/tcp.h          |  2 +-
+ include/trace/events/tcp.h |  9 +++++++++
+ net/ipv4/tcp_input.c       | 21 ++++++++++++++-------
+ net/mptcp/protocol.c       | 23 +++++++++++++++--------
+ 4 files changed, 39 insertions(+), 16 deletions(-)
+
+-- 
+2.51.1.821.gb6fe4d2222-goog
 
 
