@@ -1,61 +1,81 @@
-Return-Path: <netdev+bounces-232546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48323C06642
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 15:03:59 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 500D8C06624
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 15:02:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0D6E3A2219
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 13:00:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 58975500639
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 13:01:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB5531B131;
-	Fri, 24 Oct 2025 13:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7782C31B13F;
+	Fri, 24 Oct 2025 13:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="LSFwkTuu"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="cLFrjVWI"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D33931B118;
-	Fri, 24 Oct 2025 13:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F168C31B113
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 13:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761310815; cv=none; b=or20EzJvoXM8OcLS9nB8y8wPbfR2cJMCVQuLwmIyYo7liRJVBWjWpy2g1CgyyaJ9TakeYCqxbOPJSc1v22j8flLiq6Ce58ajVZfbiV5aZBAd2imcDEOWZx/rWWGVh8GIHG6cjBqnHfdRzYjjTNBAf4UYv0hDi2FCR3ZL9aF5ca0=
+	t=1761310881; cv=none; b=RzoiXIEbo2afjfEIAaVV/orCtCRcNwgA959Wl3KO2sXu/AktlHqgT+v72XDvntHfzgkHUFCou5z3MpqYafUAiBojiHTgYcmLkx03EtNx0QruyR6S4pXEJ7FaOtbsomjzD9wMAOlc6jugelDcu/3ACoYgOvcGWvcvozwLyPLjYDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761310815; c=relaxed/simple;
-	bh=faU95ZbOOu6GTOJQUGA+ImBbqOf0Wqn72nvPg1PEk+M=;
+	s=arc-20240116; t=1761310881; c=relaxed/simple;
+	bh=f7UbUA5LJOa66b3nzPxh+hNtLqNDKnoi8F7izy8OU4M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QOYq+jn8eLxOMAi9LR+4XYdI2LHhbYNtb3Ly09sXWujxoRyTfRYgmIV9v/gnRZ62yY8As6eNWy+qGIH15nMEORyFiSroMAx660xRypBeWk9xF2QTbUUMmCqEvzLi3hNmo118zp9wS9FYhLf5iXKgZwa/2II2KkJiGVf1HOXUKqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=LSFwkTuu; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=wxO/Ewjx39hr/k3Km8ouJlGw58hbXgKpfyZ7//fw/Uc=; b=LSFwkTuu7t/wcb2qrLbFONujWi
-	HWj3RF8O4GnuhS3b37pnOTkdmfwAM9IAeLUiYJs7rRt+wfCS6MHxqNF9Ez3d5TuiXWADA6F9ac1ez
-	fLAqsia8F69+nptJc8tuk6J/5BzTDPpoLI4XQrSXqhpiEK6t5XxMyDWYV3Iq9d2Fp022u8mpT/l1S
-	8QJ7zKGUAtvt/yWJMlPNq1pdmw+AOJyXHEtayr6jqwPHngC1Gm7t2jLFdFaNKRteAU4z5R8wFDDlK
-	Ov0by9a5gT2XM06D8NHt82UGh9l42AOcC3IbPSlBuU1ob2/SloENrBhlS+xUXyyAJWlEK6Zbd4SMr
-	yGQEW/og==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1vCHOP-000Hyf-1A;
-	Fri, 24 Oct 2025 14:59:41 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1vCHOO-000Im4-1D;
-	Fri, 24 Oct 2025 14:59:40 +0200
-Message-ID: <17f5b871-9bd9-4313-b123-67afa0f69272@iogearbox.net>
-Date: Fri, 24 Oct 2025 14:59:39 +0200
+	 In-Reply-To:Content-Type; b=uF+l/TW5EbJon5HJ4Mfeg8sg6E0Ln4zSzNXAXhEg0Q+SQcuhoyDnB8BPfIgQYUFJQBJFuf8lGTPVbct+X7FvOwjqslw4wHzeVlLXM2JmCpagJ86xxg+fJ/XCgVqNOKcd2HE0Nzgi/XjsxSQrZbAddN2lqh2g6h34icuFZuMrN5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=cLFrjVWI; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-940d27610b8so74755639f.1
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 06:01:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761310878; x=1761915678; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KWEW053UFU2OjqR3n7wSbRDn2Q1gyHVFRCkY9g7mqfg=;
+        b=cLFrjVWI4NbRi2iDfLOyBv9HcLimVwl7CWsiq96+LrKYzti0uRzFMsCmQIB+t1OXgI
+         e9B28gTAk/39+H1kxtsOrp4PUH8lML+yqzmdVSlJi86EMHPnTczn+okl9g8H6vleh+yy
+         sl1vn2OThK5sSEyA10VCiDwvcOEUgV/q/Uh+2XwRMDg9MdUck7qaerv5cmXxS4QjnZSc
+         ryL1riyc8SZHoBBCJQ0k/ZOfFx1xTLHZZFEkXIC7pV8aQpaeEofDCwxx0HAuUUahN41F
+         nIrPo/MOmcuVqtRrAyODsdYILcWs8vqPGMcdM0cBAqa1WlHGIDZ01CnzWqwtqXHqj8sG
+         kmRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761310878; x=1761915678;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KWEW053UFU2OjqR3n7wSbRDn2Q1gyHVFRCkY9g7mqfg=;
+        b=tDYSulVtegVTnZaaWZNpJxZDsAiB+sFPIrM+yO/jpWggFpjlhIWkdsg/nUaZw4nuCN
+         dw55ry2LaLWOOx+yFqkMlvvos/UQ2Mke/UIiKrE+EEoXMA2ZFO9JpqcbfWsjLq329oD8
+         VJvK1DfrckBcyM70CHHIktkOKyHOB9bfHyD0Hobb03AkXDPZimic5EAsnhYXvI3j6QIf
+         /CpgCho8hCipGJsTxRzawePMHfl1OSWVZOTLhn3II5+FdlSj5SomuxpymNk0lAlLbns1
+         +WPKgx7YaLJOP0ie3st+QP+liAgarS6yBEzmvAS4Hn61azpamUr/xBEhtiQ8FtMuWysU
+         3Ing==
+X-Forwarded-Encrypted: i=1; AJvYcCV+LqheSP1utqNhWZdosSuk6ubyAgY/a9Zi6FW8bVjdgJPBckMDUfmiE9tWtOAhUgI4kSh3KE0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHWC3RF4lxi7/2ES9uQMWdlSO2k/NkEFQ4MF+w4QCrcZ827UgI
+	WAisEorKEA1skTNxkAs97KSYEAOE/1YZVzawpAJl16ADBkOEhPRak1reKJNuGAHYA+A=
+X-Gm-Gg: ASbGncsH62eOqWQmo3Tk9wCAQ63DG0fSxvPncN71WVRoxd23aXT3yyCr/Ad4w8dFCy5
+	Qwo8b/vlNGWXoK18tkGPik7R7sUFeHOdnqZPvfefUVUjzowVRugx7mNUhxRQkDZGyerhf/imAjt
+	aRLc+8GTDcYM7jLeFsm7EoAuCPaSvW2PY7jWQ5KorW4CisRulgkj/1eqoqgDoDpb3sfR6L9hBQ1
+	UPebuUexyFnxe43s8jCXEg1HZQVix+/7ftK+yMznJzugF2drRTYCxXjnxEyOs9vj1sIxuF+o+5S
+	+ZDSw6WQeUnvEfXun6SJvV2fukzoP05rh+/hkV8zLfm8ljdFJF6XW0puYo4a2//uef+ZclNkeV2
+	vasTdiFlSxMEJ0mb5h1GV9p/KftVWZuvIM0fyi8biHDIp6JQxRIA8S/peBNqyQS7kAZeLQUaiWA
+	==
+X-Google-Smtp-Source: AGHT+IGpvX5SQasHnb2hnXJKXCopVxmccJ7n56Ub1lHMlmleJ7FVE++8WbJKETpki6AXprqZOR5QDA==
+X-Received: by 2002:a05:6e02:1a42:b0:430:b338:e55 with SMTP id e9e14a558f8ab-430c53068c3mr412734055ab.29.1761310877249;
+        Fri, 24 Oct 2025 06:01:17 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-431dbc3185asm21743765ab.14.2025.10.24.06.01.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Oct 2025 06:01:16 -0700 (PDT)
+Message-ID: <e3c4b0c5-72e1-4a2d-a9bf-2e57b1e191ae@kernel.dk>
+Date: Fri, 24 Oct 2025 07:01:15 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,100 +83,74 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 03/15] net: Add peer info to queue-get
- response
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
- john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, dw@davidwei.uk,
- toke@redhat.com, yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-References: <20251020162355.136118-1-daniel@iogearbox.net>
- <20251020162355.136118-4-daniel@iogearbox.net>
- <20251023193333.751b686a@kernel.org>
+Subject: Re: [PATCH v1] io_uring zcrx: allow sharing of ifqs with other
+ instances
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>
+References: <20251023213922.3451751-1-dw@davidwei.uk>
 Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <20251023193333.751b686a@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20251023213922.3451751-1-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: Clear (ClamAV 1.0.9/27802/Fri Oct 24 11:42:12 2025)
 
-On 10/24/25 4:33 AM, Jakub Kicinski wrote:
-> On Mon, 20 Oct 2025 18:23:43 +0200 Daniel Borkmann wrote:
->> Add a nested peer field to the queue-get response that returns the peered
->> ifindex and queue id.
->>
->> Example with ynl client:
->>
->>    # ip netns exec foo ./pyynl/cli.py \
->>        --spec ~/netlink/specs/netdev.yaml \
->>        --do queue-get \
->>        --json '{"ifindex": 3, "id": 1, "type": "rx"}'
->>    {'id': 1, 'ifindex': 3, 'peer': {'id': 15, 'ifindex': 4, 'netns-id': 21}, 'type': 'rx'}
+On 10/23/25 3:39 PM, David Wei wrote:
+> Each ifq is bound to a HW RX queue with no way to share this across
+> multiple io_uring instances. It is possible that one io_uring instance
+> will not be able to fully saturate an entire HW RX queue. To handle more
+> work the only way is to add additional io_uring instances w/ ifqs, but
+> HW RX queues are a limited resource on a system.
 > 
-> I'm struggling with the roles of what is src and dst and peer :(
-> No great suggestion off the top of my head but better terms would
-> make this much easier to review.
+> From userspace it is possible to move work from this io_uring instance
+> w/ an ifq to other threads, but this will incur context switch overhead.
+> What I'd like to do is share an ifq (and hence a HW RX queue) across
+> multiple rings.
 > 
-> The example seems to be from the container side. Do we need to show peer
-> info on the container side? Not just on the host side?
+> Add a way for io_uring instances to clone an ifq from another. This is
+> done by passing a new flag IORING_ZCRX_IFQ_REG_CLONE in the registration
+> struct io_uring_zcrx_ifq_reg, alongside the fd and ifq id of the ifq to
+> be cloned.
+> 
+> The cloned ifq holds two refs:
+>   1. On the source io_ring_ctx percpu_ref
+>   2. On the source ifq refcount_t
+> 
+> This ensures that the source ifq and ring ctx remains valid while there
+> are proxies.
+> 
+> The only way to destroy an ifq today is to destroy the entire ring, so
+> both the real ifq and the proxy ifq are freed together.
+> 
+> At runtime, io_zcrx_recv_frag checks the ifq in the net_iov->priv field.
+> This is expected to be the primary ifq that is bound to a HW RX queue,
+> and is what prevents another ring from issuing io_recvzc on a zero copy
+> socket. Once a secondary ring clones the ifq, this check will pass.
+> 
+> It's expected for userspace to coordinate the sharing and
+> synchronisation of the refill queue when returning buffers. The kernel
+> is not involved at all.
+> 
+> It's also expected userspace to distributed accepted sockets with
+> connections steered to zero copy queues across multiple rings for load
+> balancing.
 
-I think up to us which side we want to show. My thinking was to allow user
-introspection from both, but we don't have to. Right now the above example
-was from the container side, but technically it could be either side depending
-in which netns the phys dev would be located.
+I think this would be a lot easier to review, if you split out a few
+things. Like:
 
-The user knows which is which based on the ifindex passed to the queue-get
-query: if the ifindex is from a virtual device (e.g. netkit type), then the
-'peer' section shows the phys dev, and vice versa, if the ifindex is from a
-phys device (say, mlx5), then the 'peer' section shows the virtual one.
+The locking of two rings, just make that a prep patch. You also need
+to change the name, it's too generic. That was fine when it was a
+static in a single file, but should be better now.
 
-Maybe I'll provide a better more in-depth example with both sides and above
-explanation in the commit msg for v4..
+Add the reference counting. It looks a bit suspicious on the
+io_shutdown_zcrx_ifqs() side, having it separate would also make
+that clearer.
 
-Thanks,
-Daniel
+And then you can have the meat of it on top of those.
+
+Side note - you need to check the return value of kzalloc(), it can
+indeed return NULL.
+
+-- 
+Jens Axboe
 
