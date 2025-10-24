@@ -1,111 +1,84 @@
-Return-Path: <netdev+bounces-232325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB262C041C9
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 04:26:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D255FC041D2
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 04:28:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF5971899E00
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 02:27:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF8861AA44D8
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 02:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA26B23D7F4;
-	Fri, 24 Oct 2025 02:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C8A23E35E;
+	Fri, 24 Oct 2025 02:28:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="iDlBOWn9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="biLt8+iI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86492288CB;
-	Fri, 24 Oct 2025 02:26:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2C72288CB;
+	Fri, 24 Oct 2025 02:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761272805; cv=none; b=aVPMvWManTmxHCvA6RhsMzRxpeu916xAgjhYZGoTbCPVL/uYcOGJ1X4f+9f2XP/pTHCERyHZ4Zwy60t8eqWvYjVSH5mo4SFDoBKgXFeILR2ninfYrajLGx3TE2KQbdmKk6M7hhZUt0fz0QdC3nzT3mBfVy8SdwHo89Y5kA0NVbs=
+	t=1761272925; cv=none; b=A0PJrlvZmVvp2awye5Gl9Rbqq9zYkhmANrxt+RoKRXLTsXgPImA23qajQZ8ZkpzgaSD1VRC2N69b66g/j9Akx0inYIaVBKsxtO2Ktu6dpD88jLRx5rqRREfYVkizTWhkv0/SahmYocFxtmxVb6SxDF8sw54VJXcneOO3Rphnzzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761272805; c=relaxed/simple;
-	bh=wQpmCdnPiZWmAmsFyUglq5MuxoHdirnRwcGRhM90wec=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r4V+kA4bq9fbXdMfIwrDOrvg70DmuqLt/PN07i6Gu1GbVpMRvoKxwYdVzHbINM+uhwodVXy08klSdLy3VDKWZ9vAHsexJ0RYW4rCxzq5xhVHGf4yPdV0TPcR9PciImR/fCM6BMvTHh3hCFwjUnnVVqQLGICJwOBvi5DQmJBfJDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=iDlBOWn9; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1761272794; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=rMRovXo+3+MpvXSuGPioYnBEqG1+1rhN5W4ESciS63M=;
-	b=iDlBOWn9TE0HnZUOdh42Z1zpVlKa+HiZsGMR47kAtBXhnwgBq/AzU+WZuxvQzwP8waTTZ3UvZv3jBNZYmRuxCTDMmjUcCP43cMnalZgrdA5za5wg4OjB+Jx+z/PRKb1lcKYEKNLTw4zcYNYNeUtc5iPXWsMq9+Efm4D62Lr5AoA=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WqskSC1_1761272793 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 24 Oct 2025 10:26:33 +0800
-Date: Fri, 24 Oct 2025 10:26:32 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Alexandra Winter <wintera@linux.ibm.com>,
-	Julian Ruess <julianr@linux.ibm.com>,
-	Mete Durlu <meted@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next 1/2] dibs: Remove reset of static vars in
- dibs_init()
-Message-ID: <aPrj2FCKi5NGPF8u@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20251023150636.3995476-1-wintera@linux.ibm.com>
+	s=arc-20240116; t=1761272925; c=relaxed/simple;
+	bh=qcWpSJpnvwW5Bdea8Eat881m5aAkhS4so/TAMpDJhHE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Na542qE6ICfNbWAPpYezVxmWrnHJAExmzFvKKt+6v1peMyw1KFoTz0XZsT5T+AktjRHeJgI/BKN/Www+EqVyQJBZwPuDzMFS/j5ZVwZGj3mjxH0BL1pV6o8lgiLIhBF0195yNcfUFAKS/2KF+zeic5y+FGk8nniKv/+EFaXB9tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=biLt8+iI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBC9CC4CEE7;
+	Fri, 24 Oct 2025 02:28:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761272924;
+	bh=qcWpSJpnvwW5Bdea8Eat881m5aAkhS4so/TAMpDJhHE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=biLt8+iIS7V5COE0EEtRUqEDXv4weiSb+S6tcekJlSzU2x2KFPNwLVBaHBMZpPHUl
+	 KcCv6gjMF0QXYscQp+FpX5QAUzcK7v5dPTcIczlTNIhEvH4/EIK12fdwmTRiqDskAE
+	 R+a8Kro+QE3+6L39w6PxCQ9AIf6jLZUUjdRDF9sQJDHI+8X4aQEBcuWIkT2o0YcCTS
+	 NWCaRKdcTR6bFfJtvBbJqbQ9s8OHfApmgxB2dZynbFJwMxa5AU057eK/2FMRugha4r
+	 ZYT/aQwFtmMEmsgEKU7b+BatJ2VkERaaVwWxPjy08NeFUEOLLe8kcPjNZJGJX0qMul
+	 G6u5DoM7+je4g==
+Date: Thu, 23 Oct 2025 19:28:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ razor@blackwall.org, pabeni@redhat.com, willemb@google.com,
+ sdf@fomichev.me, john.fastabend@gmail.com, martin.lau@kernel.org,
+ jordan@jrife.io, maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
+ dw@davidwei.uk, toke@redhat.com, yangzhenze@bytedance.com,
+ wangdongdong.6@bytedance.com
+Subject: Re: [PATCH net-next v3 02/15] net: Implement
+ netdev_nl_bind_queue_doit
+Message-ID: <20251023192842.31a2efc0@kernel.org>
+In-Reply-To: <20251020162355.136118-3-daniel@iogearbox.net>
+References: <20251020162355.136118-1-daniel@iogearbox.net>
+	<20251020162355.136118-3-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251023150636.3995476-1-wintera@linux.ibm.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 2025-10-23 17:06:35, Alexandra Winter wrote:
->'clients' and 'max_client' are static variables and therefore don't need to
->be initialized.
->
->Reported-by: Mete Durlu <meted@linux.ibm.com>
->Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+On Mon, 20 Oct 2025 18:23:42 +0200 Daniel Borkmann wrote:
+> +void netdev_rx_queue_peer(struct net_device *src_dev,
+> +			  struct netdev_rx_queue *src_rxq,
+> +			  struct netdev_rx_queue *dst_rxq)
+> +{
+> +	netdev_assert_locked(src_dev);
+> +	netdev_assert_locked(dst_rxq->dev);
+> +
+> +	netdev_hold(src_dev, &src_rxq->dev_tracker, GFP_KERNEL);
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+Isn't ->dev_tracker already used by sysfs?
 
-Best regards,
-Dust
+Are you handling the underlying device going away?
 
->---
-> drivers/dibs/dibs_main.c | 3 ---
-> 1 file changed, 3 deletions(-)
->
->diff --git a/drivers/dibs/dibs_main.c b/drivers/dibs/dibs_main.c
->index 0374f8350ff7..b015578b4d2e 100644
->--- a/drivers/dibs/dibs_main.c
->+++ b/drivers/dibs/dibs_main.c
->@@ -254,9 +254,6 @@ static int __init dibs_init(void)
-> {
-> 	int rc;
-> 
->-	memset(clients, 0, sizeof(clients));
->-	max_client = 0;
->-
-> 	dibs_class = class_create("dibs");
-> 	if (IS_ERR(dibs_class))
-> 		return PTR_ERR(dibs_class);
->-- 
->2.48.1
+> +	__netdev_rx_queue_peer(src_rxq, dst_rxq);
+> +}
 
