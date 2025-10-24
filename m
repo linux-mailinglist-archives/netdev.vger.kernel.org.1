@@ -1,195 +1,161 @@
-Return-Path: <netdev+bounces-232662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4581C07D87
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 21:08:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CB76C07E11
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 21:19:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2200819A78FF
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 19:08:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B21B01C269A4
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 19:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74D13557FA;
-	Fri, 24 Oct 2025 19:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2584283FDF;
+	Fri, 24 Oct 2025 19:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="byz1qzGg"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="IJ73bu07"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0AFF1EFF80
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 19:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E68927E05F;
+	Fri, 24 Oct 2025 19:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761332874; cv=none; b=qjU0tFEC1a7R0CEjl4/asg1N0YI2/l674stcYV8SYKWRtq3389JowmLSMdk5R6+4/ray4facvma7+8ZFA15oI2E5lhkjq2AGvdW5EzVhfTk9NRTo0xRR3vM4pGOHgmDXmyOgzKsxPcBHMwk3iLXDs8CC17+JdJs41koYTeOyCHs=
+	t=1761333384; cv=none; b=vDIe+K0riQv0N7FVYd3tarfTIqv+Fe/VMmI9X9xGoS9MNZClIZ6nGz1Jesi1+PaPkYt4YojhE3pGjWrQOi5ebip0XC8AMDUl3eN3NREP/w42wtsABafPB89MsNXmrtzdHqMrTWFN65ZReGRqO0izdPEOhAvYsxZH9cMHXgP34Lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761332874; c=relaxed/simple;
-	bh=Rp0S1cz5R3mZoSK1gypCqO4bXsp2In1jV1KtJpGfMGI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ItW6yxGFsx7R6Y7F7l6yKU/3eqUppDw8Ng50bzHBcdJaMTGs9ADfy2vA09yGM84hT8OkseT2FBJsY1xPkl7kKunEV0tnGDxF+prE0z/L5G3eZfTdG6CG/2LHqUQ/Xe4S+O4xr0amPqX7xCtsKO/p2zJst/zRmMa6Vn41wvLsuHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=byz1qzGg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761332871;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=eC+zTvafGlTgn+UU2Bj+Z+f8183EJxEhCVpC3+v5f0c=;
-	b=byz1qzGgKMuUIQGgwOy4Wg/zDRKrxFrWvpbZen7DppHmtmijQ4C8oHc0hRTQsJleJ9pTYt
-	zb21k/rr3mbG3v/mcK5BNkTO/xSAjkdWgeEH2maHYouQj+PFsJgxR4TGCxnsGlYxPs32ZI
-	S/tAv2B06ommw3PBd96akyZYGyoryaY=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-562-76fJApRKPMyqamEK_hIWlw-1; Fri,
- 24 Oct 2025 15:07:49 -0400
-X-MC-Unique: 76fJApRKPMyqamEK_hIWlw-1
-X-Mimecast-MFC-AGG-ID: 76fJApRKPMyqamEK_hIWlw_1761332868
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 554891954102;
-	Fri, 24 Oct 2025 19:07:48 +0000 (UTC)
-Received: from ShadowPeak.redhat.com (unknown [10.44.33.192])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B31FF1800353;
-	Fri, 24 Oct 2025 19:07:45 +0000 (UTC)
-From: Petr Oros <poros@redhat.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	netdev@vger.kernel.org (open list:DPLL SUBSYSTEM),
-	linux-kernel@vger.kernel.org (open list)
-Cc: ivecera@redhat.com,
-	mschmidt@redhat.com,
-	Petr Oros <poros@redhat.com>
-Subject: [PATCH net] dpll: fix device-id-get and pin-id-get to return errors properly
-Date: Fri, 24 Oct 2025 21:07:33 +0200
-Message-ID: <20251024190733.364101-1-poros@redhat.com>
+	s=arc-20240116; t=1761333384; c=relaxed/simple;
+	bh=yYmRR4TttRC5UImQITsbqbKt9vQgaZvhpVOrfLMFYLQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mcEQxVQH3JSD9UcBvbHRXbbbp12s1lbAmdVdngMQDFB7DG+/4UzF0OPktFQSkxJDLNWEQ+LC5CowChLmcZ8mT+AQAnx9esVOB2onp+3f9yBi2WdXEucTLLjLF9bVsBz1OA7UYnpej3R+v1ZPhJztT3UYb3M5oDVJLE0mWCa5SBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=IJ73bu07; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=2ripltC+8ZS9TujwdQjGiTa2vWeauSg+y554vy8DnsQ=; b=IJ73bu07J10/2KpsWXSISkBOBC
+	VQ2CWfZkevPtPbH733aPqXFjyuaAZ1WwM2SEXdNextMSf1SdZfvxp8HWmSBRJf2yCt/kIX33iKxzS
+	K5xwKVd3LB2eEuQqkXu/Jqs7Ex5KOaamof2LD6JL11Aqr+MQi9SVG/qIfG3vYiOIG3kpGYTOuK+vk
+	q0Bo2xvQwbX64fMjRHmQkZYNrC1d/1olZkeAXAoWVgxPeyxDbC2d3IoCEHkOBZr+47s+oghh1BHFC
+	ORAXL0fB00KQheJZH25xvX47+xySF3Kgh8F25FqlOp3mVJVAq/C6Vz6qhMYKBRKE+6O/U3TMbT659
+	oqkHTbyw==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1vCNGZ-000HIL-0G;
+	Fri, 24 Oct 2025 21:15:59 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1vCNGY-000Pcg-0B;
+	Fri, 24 Oct 2025 21:15:58 +0200
+Message-ID: <0d85faff-50d7-4ac5-8e82-fe406c87e3ad@iogearbox.net>
+Date: Fri, 24 Oct 2025 21:15:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 02/15] net: Implement
+ netdev_nl_bind_queue_doit
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, kuba@kernel.org,
+ davem@davemloft.net, razor@blackwall.org, pabeni@redhat.com,
+ willemb@google.com, sdf@fomichev.me, john.fastabend@gmail.com,
+ martin.lau@kernel.org, jordan@jrife.io, maciej.fijalkowski@intel.com,
+ magnus.karlsson@intel.com, dw@davidwei.uk, toke@redhat.com,
+ yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+References: <20251020162355.136118-1-daniel@iogearbox.net>
+ <20251020162355.136118-3-daniel@iogearbox.net> <aPvDW0o89kmtGFfH@mini-arch>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <aPvDW0o89kmtGFfH@mini-arch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: Clear (ClamAV 1.0.9/27802/Fri Oct 24 11:42:12 2025)
 
-The device-id-get and pin-id-get handlers were ignoring errors from
-the find functions and sending empty replies instead of returning
-error codes to userspace.
+On 10/24/25 8:20 PM, Stanislav Fomichev wrote:
+[...]
+>> +	/* Locking order is always from the virtual to the physical device
+>> +	 * since this is also the same order when applications open the
+>> +	 * memory provider later on.
+>> +	 */
+>> +	dst_dev = netdev_get_by_index_lock(genl_info_net(info), dst_ifidx);
+>> +	if (!dst_dev) {
+>> +		err = -ENODEV;
+>> +		goto err_genlmsg_free;
+>> +	}
+> 
+> ...
+> 
+>> +	src_dev = netdev_get_by_index_lock(genl_info_net(info), src_ifidx);
+>> +	if (!src_dev) {
+>> +		err = -ENODEV;
+>> +		goto err_unlock_dst_dev;
+>> +	}
+> 
+> But isn't the above susceptible to ABBA exploitation from the userspace?
+> I can try to concurrently do two requests, the second one being with
+> dst_dev and src_dev swapped. Or do we assume that we exit earlier for
+> the swapped case based on some other condition?
 
-When dpll_device_find_from_nlattr() or dpll_pin_find_from_nlattr()
-returned an error (e.g., -EINVAL for "multiple matches" or -ENODEV
-for "not found"), the handlers checked `if (!IS_ERR(ptr))` and
-skipped adding the device/pin handle to the message, but then still
-sent the empty message as a successful reply.
+Hm, in all of the locking that was reworked, we only ever let the case succeed
+where it locks both devices when the dst_dev is a virtual device, and the
+src_dev is a phys device. If this is not given and the dst_dev is a phys device,
+we error out via err_unlock_dst_dev and unlock the dst_dev again but never
+proceed further to attempt to lock src_dev (as mentioned in the comment) -
+basically what you mentioned the swapped case cannot lock both devs.
 
-This caused userspace tools to receive empty responses with id=0
-instead of proper netlink errors with extack messages like
-"multiple matches".
-
-The bug is visible via strace, which shows the kernel sending TWO
-netlink messages in response to a single request:
-
-1. Empty reply (20 bytes, just header, no attributes):
-   recvfrom(3, [{nlmsg_len=20, nlmsg_type=dpll, nlmsg_flags=0, ...},
-                {cmd=0x7, version=1}], ...)
-
-2. NLMSG_ERROR ACK with extack (because of NLM_F_ACK flag):
-   recvfrom(3, [{nlmsg_len=60, nlmsg_type=NLMSG_ERROR,
-                 nlmsg_flags=NLM_F_CAPPED|NLM_F_ACK_TLVS, ...},
-                [{error=0, msg={...}},
-                 [{nla_type=NLMSGERR_ATTR_MSG}, "multiple matches"]]], ...)
-
-The C YNL library parses the first message, sees an empty response,
-and creates a result object with calloc() which zero-initializes all
-fields, resulting in id=0.
-
-The Python YNL library parses both messages and displays the extack
-from the second NLMSG_ERROR message.
-
-Fix by checking `if (IS_ERR(ptr))` first and returning the error
-code immediately, so that netlink properly sends only NLMSG_ERROR with
-the extack message to userspace. After this fix, both C and Python
-YNL tools receive only the NLMSG_ERROR and behave consistently.
-
-This affects:
-- DPLL_CMD_DEVICE_ID_GET: now properly returns error when multiple
-  devices match the criteria (e.g., same module-name + clock-id)
-- DPLL_CMD_PIN_ID_GET: now properly returns error when multiple pins
-  match the criteria (e.g., same module-name)
-
-Before fix:
-  $ dpll pin id-get module-name ice
-  0  (wrong - should be error, there are 17 pins with module-name "ice")
-
-After fix:
-  $ dpll pin id-get module-name ice
-  Error: multiple matches
-  (correct - kernel reports the ambiguity via extack)
-
-Signed-off-by: Petr Oros <poros@redhat.com>
----
- drivers/dpll/dpll_netlink.c | 36 ++++++++++++++++++++----------------
- 1 file changed, 20 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
-index 74c1f0ca95f24a..a4153bcb6dcfe1 100644
---- a/drivers/dpll/dpll_netlink.c
-+++ b/drivers/dpll/dpll_netlink.c
-@@ -1559,16 +1559,18 @@ int dpll_nl_pin_id_get_doit(struct sk_buff *skb, struct genl_info *info)
- 		return -EMSGSIZE;
- 	}
- 	pin = dpll_pin_find_from_nlattr(info);
--	if (!IS_ERR(pin)) {
--		if (!dpll_pin_available(pin)) {
--			nlmsg_free(msg);
--			return -ENODEV;
--		}
--		ret = dpll_msg_add_pin_handle(msg, pin);
--		if (ret) {
--			nlmsg_free(msg);
--			return ret;
--		}
-+	if (IS_ERR(pin)) {
-+		nlmsg_free(msg);
-+		return PTR_ERR(pin);
-+	}
-+	if (!dpll_pin_available(pin)) {
-+		nlmsg_free(msg);
-+		return -ENODEV;
-+	}
-+	ret = dpll_msg_add_pin_handle(msg, pin);
-+	if (ret) {
-+		nlmsg_free(msg);
-+		return ret;
- 	}
- 	genlmsg_end(msg, hdr);
- 
-@@ -1735,12 +1737,14 @@ int dpll_nl_device_id_get_doit(struct sk_buff *skb, struct genl_info *info)
- 	}
- 
- 	dpll = dpll_device_find_from_nlattr(info);
--	if (!IS_ERR(dpll)) {
--		ret = dpll_msg_add_dev_handle(msg, dpll);
--		if (ret) {
--			nlmsg_free(msg);
--			return ret;
--		}
-+	if (IS_ERR(dpll)) {
-+		nlmsg_free(msg);
-+		return PTR_ERR(dpll);
-+	}
-+	ret = dpll_msg_add_dev_handle(msg, dpll);
-+	if (ret) {
-+		nlmsg_free(msg);
-+		return ret;
- 	}
- 	genlmsg_end(msg, hdr);
- 
--- 
-2.51.0
-
+Thanks,
+Daniel
 
