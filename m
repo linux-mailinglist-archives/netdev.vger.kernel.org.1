@@ -1,99 +1,98 @@
-Return-Path: <netdev+bounces-232643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 261D5C07890
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 19:27:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50845C078B4
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 19:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAF793AB5D9
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 17:27:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E2B319A727B
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 17:30:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5429A341ADF;
-	Fri, 24 Oct 2025 17:27:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1995F343D93;
+	Fri, 24 Oct 2025 17:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XxDTzZAf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="duBXUyKi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B64F280A29;
-	Fri, 24 Oct 2025 17:27:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC4C76026;
+	Fri, 24 Oct 2025 17:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761326863; cv=none; b=XeYuydYiw8KKVRiSuxLT7O+5rjqRA/WoGxbfkPK3sYdO/Btn++gfTEV0FIXbt8Bx4oWFRY6H7nNxPZA1k6gkGnJZJJXAiinbEvhVpz5qwIBL6kP+a/diL27zXJoTWLFZKFiywFJDm/lqr747RuEw23bxEz5JeVZcbPvAEi3PH7A=
+	t=1761327028; cv=none; b=WNoqj75RsKgOw2NUooxKm1PcaZodm0pIPAQgH185meIPS8rUP9TclPWKV+YFty/ZMU3MDGkxK4k5hgPQ6KQiD96YybTY1N0lFytrvSIR+0txAIhe2JN7WgsMJeiHll0O9DvVTLeTR9VgU+yA6mz4SSPExYCJAqOCpzZUR06dKo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761326863; c=relaxed/simple;
-	bh=oiQZJQaA9tzYYyWvZEkw5psXk/MzntRZD/uGjLvb8ag=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sT5C7kzhKQNaqfqR+H0HIcnwnHv8VmUumy5nPJxUPjJDOiONxvvTKYu12uAJyIXT2SXH2ur4R9R9OHumZvi1XPQ9NsFOWj7X2W4PIg7d4zIge7WJTxBzJhLHo3BrLWDhB7JLn2ofUXhE3GWIXaRZdJCFPaGQG4wlUA7ev6dNl8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XxDTzZAf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 367FAC4CEF1;
-	Fri, 24 Oct 2025 17:27:41 +0000 (UTC)
+	s=arc-20240116; t=1761327028; c=relaxed/simple;
+	bh=srsHMANt5Lk/UaQ7m5DJ4Z4en71AEbC71W6CSZjih38=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Gr7g5g6K+1b3P8fb4Q6SbR8Hsf+OG8aJwTAngx32SrPfuBgNHEaf5NRyxuQWLdm0JhCnRqLh8ju+gvpmss0M7EDtOnSUMqlv+/zsznu6rkpMNeGdteODfwIWUD1XaogJZPsHw54DU+5OJ+igk2sx4PKGDQbypipLolKxam3O968=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=duBXUyKi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65C20C4CEF1;
+	Fri, 24 Oct 2025 17:30:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761326863;
-	bh=oiQZJQaA9tzYYyWvZEkw5psXk/MzntRZD/uGjLvb8ag=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XxDTzZAfDIirGYnlZUSBVjNxANm/UANrYdEA+RtKfhd0zGqaqOmRbkjsjfV3Tjwbe
-	 EsJpkTngM1qhEUzPGaciyt17AAFGzR220uLscdbXGGKYdjtQ2aqNgovcEetAxAba3n
-	 Tgb26y2t4r6H+pjj3Vpc+sSVMZAvYJWfqvXY7qxG5Xv/kbgALb1BIDeLrHX2K+GU3A
-	 iUJonc/UsuiBQ52FijwCFsioN4gbIlS3AbMeUSW+lVyy2nTZxtRvqWahxI+Wy+cHvG
-	 lMKEkw+LkFicg1e179U2Mj+JYb0bYwbwjVWRkK5meuIOf5uqbwMkb6FChOaQqhkAVU
-	 i06emX40GiYtQ==
-Date: Fri, 24 Oct 2025 18:27:39 +0100
-From: Simon Horman <horms@kernel.org>
-To: Chu Guangqing <chuguangqing@inspur.com>
-Cc: cooldavid@cooldavid.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH for-next 1/1] net: jme: migrate to dma_map_phys instead
- of map_page
-Message-ID: <aPu3C8QUYLYE8ZpG@horms.kernel.org>
-References: <20251024070734.34353-1-chuguangqing@inspur.com>
- <20251024070734.34353-2-chuguangqing@inspur.com>
+	s=k20201202; t=1761327026;
+	bh=srsHMANt5Lk/UaQ7m5DJ4Z4en71AEbC71W6CSZjih38=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=duBXUyKiWqIYFbG9OikTq2XGFolLTL1gvY3rGyNfr/yFroYIrSgY33+1eKUBq3JIb
+	 Y2cJqqoVEuRrvCfzTo0fsNeQf/yWkrKsIggljYxOpkseixlpQ5gN/vKJEMKbRfWlJt
+	 /OChc+XrxyXpaOCrQYp717hPtHRcYpOhjFMcpLaTx4Q5vBXjTD+IZ5c1/2dpubh348
+	 iFdD2p+qKJMllZUg5Bllq7UL+kKDZA355GFsA8p3c0Rbpvroto3zwHGmUMFA7Sxgm5
+	 H6dv7G3qP1WFRn5Yx3VRUeQ4ndhDYtdOBMgvtmDzCf/0b/44mijvaBzbW1aqa5JrAC
+	 9KflvqB5OeHmA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70FC5380AA4A;
+	Fri, 24 Oct 2025 17:30:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251024070734.34353-2-chuguangqing@inspur.com>
+Subject: Re: [PATCH v3] dt-bindings: net: Convert Marvell 8897/8997 bindings
+ to DT
+ schema
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176132700625.4002741.4029402760245569227.git-patchwork-notify@kernel.org>
+Date: Fri, 24 Oct 2025 17:30:06 +0000
+References: <20251001183320.83221-1-ariel.dalessandro@collabora.com>
+In-Reply-To: <20251001183320.83221-1-ariel.dalessandro@collabora.com>
+To: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+Cc: andrew+netdev@lunn.ch, angelogioacchino.delregno@collabora.com,
+ conor+dt@kernel.org, davem@davemloft.net, edumazet@google.com,
+ krzk+dt@kernel.org, kuba@kernel.org, luiz.dentz@gmail.com, pabeni@redhat.com,
+ robh@kernel.org, devicetree@vger.kernel.org, kernel@collabora.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
 
-On Fri, Oct 24, 2025 at 03:07:34PM +0800, Chu Guangqing wrote:
-> After introduction of dma_map_phys(), there is no need to convert
-> from physical address to struct page in order to map page. So let's
-> use it directly.
+Hello:
+
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Wed,  1 Oct 2025 15:33:20 -0300 you wrote:
+> Convert the existing text-based DT bindings for Marvell 8897/8997
+> (sd8897/sd8997) bluetooth devices controller to a DT schema.
 > 
-> Signed-off-by: Chu Guangqing <chuguangqing@inspur.com>
+> While here, bindings for "usb1286,204e" (USB interface) are dropped from
+> the DT   schema definition as these are currently documented in file [0].
+> 
+> [0] Documentation/devicetree/bindings/net/btusb.txt
+> 
+> [...]
 
-Although there have been a number minor updates since, mainly for in-kernel
-API changes, it seems to me that the last change of substance to this
-driver - a feature or bug fix - was the following commit in 2016.
+Here is the summary with links:
+  - [v3] dt-bindings: net: Convert Marvell 8897/8997 bindings to DT schema
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f63037a3f252
 
-commit 81422e672f81 ("jme: Fix device PM wakeup API usage")
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-So, unless there is a tree-wide effort to move to the pattern you describe,
-I am wondering if it would be better to just leave this code as-is.
 
-Quoting documentation:
-
-1.6.6. Clean-up patches¶
-
-Netdev discourages patches which perform simple clean-ups, which are not in the context of other work. For example:
-
-    Addressing checkpatch.pl, and other trivial coding style warnings
-
-    Addressing Local variable ordering issues
-
-    Conversions to device-managed APIs (devm_ helpers)
-
-This is because it is felt that the churn that such changes produce comes at a greater cost than the value of such clean-ups.
-
-Conversely, spelling and grammar fixes are not discouraged.
-
-https://docs.kernel.org/process/maintainer-netdev.html#clean-up-patches
 
