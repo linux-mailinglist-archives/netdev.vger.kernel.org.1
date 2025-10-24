@@ -1,115 +1,144 @@
-Return-Path: <netdev+bounces-232549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13712C06721
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 15:18:31 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC5E5C067B4
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 15:25:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D38584E4106
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 13:18:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C47754F0B23
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 13:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C9031B13A;
-	Fri, 24 Oct 2025 13:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2729631D389;
+	Fri, 24 Oct 2025 13:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dQS0ub4B"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5752317708
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 13:18:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A7231CA5B
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 13:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761311906; cv=none; b=eob1xJurD232tS6PIWqTKvuT3OXY585bVQ6CS2iaSFcT72lBEjXkm1TVImreoFTLioMy/uCG2quRhVTjoNL3lBLToc0ZTEuklqq6qECWxbTc17tQebkMfBgCFy6G9MM/Ccx15noylGsI3ohLkZAcMGK9UHyWv/Ti8j2Ze+0Fv40=
+	t=1761312334; cv=none; b=G9IFL6SzomjhDlU2aTc98fWu+GZyWrtxso8huMTu9cTMyjPp9s4JfnYVBErSqmeLbh/gojtlHyLQvqk0zUz7eYKN0k149j2jibO6ChSqGnbmemEjAcTX2r7J18GI2OBh62jQUgylujbZ6oe0kiBG2wAk9Eh4aTAqx4Q6k7RX5i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761311906; c=relaxed/simple;
-	bh=5gwLBZAwmz9kkOBD504Qy/puGjfNFwfKuF+sFzrbAWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BkKLeLnskjrnKmLsa7Q8QNATJhFcDGVQbVbcGPIGqRKSaOKtBneR5pl2n4zmqHB9jhl7TFOETak2DxYuT1QtQFGS9eMgtcQB8tQ7eUyktHNlGORHSbkBKT++qvm5P0+RyHLdyeRcu8V4f87N5fQkaxFVrZ9oUVSQJswqDHhgqh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vCHgF-0002Tr-3t; Fri, 24 Oct 2025 15:18:07 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vCHgC-005ETD-1z;
-	Fri, 24 Oct 2025 15:18:04 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vCHgC-00FB7D-1U;
-	Fri, 24 Oct 2025 15:18:04 +0200
-Date: Fri, 24 Oct 2025 15:18:04 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1761312334; c=relaxed/simple;
+	bh=mBf4mnaGcfALj0V00XU63ToI/IMNO7pa5UlytqOLXb0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h/I+wl7zX+50RKQqGd5vQoLQN7guxpKU86iBtnuKe0jBR4vJTHMcmPEVtYGKU3nQfoVfLf4UwXk+pp9OChzQn7aqJc6YoTgGigW6i1iLOeFgswl/eRO14fFQUw8Q2Izu83SpD7RjzjOmWyLv9hY4bLxaHteKHsfcB3CKBAtJlzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dQS0ub4B; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761312331;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FlzBCflH9SvRTtMrOksDcMHlWo7c8Sb/jjoLNT1rHCc=;
+	b=dQS0ub4B/HAo6PwHNezwkL4yokQBC39hob4xuS51ssCnvj14uzFqOrwbUmk6cngp8JhHgz
+	FO3zc1ohjg0oK+pFqeFb51KGPJ8EFxc0zGkffQQxpYJkhFU0qWPxfL85i9nCF0hbl71xeT
+	u5+uaw7vwFoWEHuKKdsFBe3bMScGKBY=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-663-P4oJxubeOzaD9znGgDpfeQ-1; Fri,
+ 24 Oct 2025 09:25:28 -0400
+X-MC-Unique: P4oJxubeOzaD9znGgDpfeQ-1
+X-Mimecast-MFC-AGG-ID: P4oJxubeOzaD9znGgDpfeQ_1761312326
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 61F2519560B4;
+	Fri, 24 Oct 2025 13:25:26 +0000 (UTC)
+Received: from ShadowPeak.redhat.com (unknown [10.44.33.192])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7C2CC19540EB;
+	Fri, 24 Oct 2025 13:25:22 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Nishanth Menon <nm@ti.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, linux-doc@vger.kernel.org,
-	Michal Kubecek <mkubecek@suse.cz>, Roan van Dijk <roan@protonic.nl>
-Subject: Re: [PATCH net-next v7 2/5] ethtool: netlink: add
- ETHTOOL_MSG_MSE_GET and wire up PHY MSE access
-Message-ID: <aPt8jAXU0l1f2zPG@pengutronix.de>
-References: <20251020103147.2626645-1-o.rempel@pengutronix.de>
- <20251020103147.2626645-3-o.rempel@pengutronix.de>
- <20251023181343.30e883a4@kernel.org>
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Petr Oros <poros@redhat.com>,
+	=?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+	linux-kernel@vger.kernel.org (open list)
+Cc: ivecera@redhat.com,
+	mschmidt@redhat.com
+Subject: [PATCH net] tools: ynl: fix string attribute length to include null terminator
+Date: Fri, 24 Oct 2025 15:24:38 +0200
+Message-ID: <20251024132438.351290-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251023181343.30e883a4@kernel.org>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hi Jakub,
+The ynl_attr_put_str() function was not including the null terminator
+in the attribute length calculation. This caused kernel to reject
+CTRL_CMD_GETFAMILY requests with EINVAL:
+"Attribute failed policy validation".
 
-On Thu, Oct 23, 2025 at 06:13:43PM -0700, Jakub Kicinski wrote:
-> On Mon, 20 Oct 2025 12:31:44 +0200 Oleksij Rempel wrote:
-> > +      -
-> > +        name: supported-caps
-> > +        type: nest
-> > +        nested-attributes: bitset
-> > +        enum: phy-mse-capability
-> 
-> This is read only, does it really have to be a bitset?
+For a 4-character family name like "dpll":
+- Sent: nla_len=8 (4 byte header + 4 byte string without null)
+- Expected: nla_len=9 (4 byte header + 5 byte string with null)
 
-It describes the capabilities of the driver/hardware. You can get always
-everything... Hm... I think we continue without capabilities for now and
-also remove the specific channel request.
+The bug was introduced in commit 15d2540e0d62 ("tools: ynl: check for
+overflow of constructed messages") when refactoring from stpcpy() to
+strlen(). The original code correctly included the null terminator:
 
-> YNL will generate the string table automatically for user space to map
-> the bits to names. And we have to do a bunch of const_ilog2() and render
-> the MASK in the uAPI...
+  end = stpcpy(ynl_attr_data(attr), str);
+  attr->nla_len = NLA_HDRLEN + NLA_ALIGN(end -
+                                (char *)ynl_attr_data(attr));
 
-regards,
-Oleksij & Marc
+Since stpcpy() returns a pointer past the null terminator, the length
+included it. The refactored version using strlen() omitted the +1.
 
+The fix also removes NLA_ALIGN() from nla_len calculation, since
+nla_len should contain actual attribute length, not aligned length.
+Alignment is only for calculating next attribute position. This makes
+the code consistent with ynl_attr_put().
+
+CTRL_ATTR_FAMILY_NAME uses NLA_NUL_STRING policy which requires
+null terminator. Kernel validates with memchr() and rejects if not
+found.
+
+Fixes: 15d2540e0d62 ("tools: ynl: check for overflow of constructed messages")
+Signed-off-by: Petr Oros <poros@redhat.com>
+---
+ tools/net/ynl/lib/ynl-priv.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/net/ynl/lib/ynl-priv.h b/tools/net/ynl/lib/ynl-priv.h
+index 29481989ea7662..ced7dce44efb43 100644
+--- a/tools/net/ynl/lib/ynl-priv.h
++++ b/tools/net/ynl/lib/ynl-priv.h
+@@ -313,7 +313,7 @@ ynl_attr_put_str(struct nlmsghdr *nlh, unsigned int attr_type, const char *str)
+ 	struct nlattr *attr;
+ 	size_t len;
+ 
+-	len = strlen(str);
++	len = strlen(str) + 1;
+ 	if (__ynl_attr_put_overflow(nlh, len))
+ 		return;
+ 
+@@ -321,7 +321,7 @@ ynl_attr_put_str(struct nlmsghdr *nlh, unsigned int attr_type, const char *str)
+ 	attr->nla_type = attr_type;
+ 
+ 	strcpy((char *)ynl_attr_data(attr), str);
+-	attr->nla_len = NLA_HDRLEN + NLA_ALIGN(len);
++	attr->nla_len = NLA_HDRLEN + len;
+ 
+ 	nlh->nlmsg_len += NLMSG_ALIGN(attr->nla_len);
+ }
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.51.0
+
 
