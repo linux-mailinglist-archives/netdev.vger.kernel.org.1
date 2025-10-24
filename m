@@ -1,137 +1,109 @@
-Return-Path: <netdev+bounces-232439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB92AC05BF9
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 13:01:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71237C0603D
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 13:38:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D13933A7E55
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 11:01:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B10113B80DE
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 11:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FC031D742;
-	Fri, 24 Oct 2025 10:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250EF314B69;
+	Fri, 24 Oct 2025 11:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="wFOTnljM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Th81nqUL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD9B313527
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 10:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5513A3126BC
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 11:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761303262; cv=none; b=tjP2xEQk+7GQjVKa6fRefP65SAIkxcZzwtR7GXgFE2GTgpNZCh6FpxNU6ox4pSbjn4Pu0blQhW4Yw/+PLU/OLLUSojWYwSKfOKU8zCAk0GGpdtnscsu7Te8LHbjUX+9Wj5CEuPCo4KhNBeaij82+P1nxYd6H4hayf1g3YWMgGhg=
+	t=1761304244; cv=none; b=Rb8I8njyYhGwW2WVzQFNjzLwjs+e5ThlLoRM8jEkS1jCD+/SyYEdQ3AW3TBNS6cVTqsaRxNMgjtsi82iyt+YCw/Q4cQzgEidrTAi6JDYv343pCUFzYo0t3mo6Hj4Yvy8f21u6EJhszTny3v4FBZJHiB4lZxseOuJvtFpebHKRO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761303262; c=relaxed/simple;
-	bh=YRuUk72X48LKbl0NGFTto3u3r+cewoHN+3hW6sCm2Bg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Lu7fY3qJvQUFQ7od4V2iXKRdXj1BaXKb/koQ+WzS8BmDrEC5MgBKeFks0mYODU3tuEpuf0KR3+TAOnOUUlIBtNvps8TaOjDLiRcEG+XMXlLwmc6RCcYNVNhbUwvEFML7zI8eqUy2kRlWmVCNKAdKHRSXN2UxbKt3au6Cx6vshqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=wFOTnljM; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 340764E412D8;
-	Fri, 24 Oct 2025 10:54:17 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id ECEF160703;
-	Fri, 24 Oct 2025 10:54:16 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 96ECB102F2355;
-	Fri, 24 Oct 2025 12:53:56 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761303255; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=y1Ao409MtaPgUYRpBahYZXHRywkGhOPNNwYQ3CbOmSk=;
-	b=wFOTnljMgZcJ9fFHGVUItDYZLELl/nQ9UUjZkKVBZJ440S5fcemvTZjmbaMAdRgSKyuPz/
-	8lsfoDzhq2GxO9LzzfOwG4pEW1uh+ApYVf0cjxtPFBmz3Z3b41IxtAqXOjgpkrg4ZMVwRf
-	LsrdvvwKXqgxFfBn+dwd1CAiRrutSKALKw/kGdv9Xuxfu8LVqJ4+jn821L91R9OTL6Mdu6
-	NcFpnAtXY3nHeQn1imhGR8o123Lrkivf8wYdoLljGN/f/V2m/fW7MHsCuz0u2op1dJNw5L
-	6yL9i5xDEF+X/qPX1MthiIvhw+8BJruccXktW9g7OJwJ8DS4bhbeNq4ZuA74Sw==
-Message-ID: <1a1cacb5-0005-4b32-8e68-624644a38f92@bootlin.com>
-Date: Fri, 24 Oct 2025 12:53:55 +0200
+	s=arc-20240116; t=1761304244; c=relaxed/simple;
+	bh=H4vk7sU2Qnl0eVRIIetDW9raRcKnUHAUMXH/1YBkp9g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J3q6cCdis/2vVLcvTU+yN4i/0ReIUUmjbfsmcUe3j1AKd/G3XJzIKPacv0i1wUY+aCRx8JoqenvNdjl3/B5bv7+Y4ncuRdrjuqEVaDwXTsB0pIVrhfBnldTOU6yVO1kfNWye8cxQs4bFt39CUpZhibR1jIsiCK8zbiNVNZYQN9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Th81nqUL; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=GDpctzUzikXL5mr7jsd57bMJaOx9W5e5E6CpNx8Gahs=; b=Th81nqULbGbjjKR79CdwmOIGcr
+	y8WpnOEojfstJp+/4umsKlu5NcCELKDaYKbYzNk4ur+8ttLlqOQqXlwwP1E93EyieKwk20UgdI5/B
+	UjJXbqUrVKZBjQCM+cyrUrNOk1APRGuUUHPo+fQENFGS7VGEcHeBefQuQpks7paGWWrsXGqCUpnPC
+	ffUFQroNmlxwD97xCyLh9LvXNxn1ZoqAb0AeWRDyLm4WJoLOEStLdzlyE+Hx3Sqk+GcytzkR1e9x+
+	1kax5UAp049Jhkl9cfjWrC5fAbzMBNvQ1kyqBdsWPQoq/03JCVMua3CSCPMihnLxg1RsyJZIMqKL7
+	HDE89+1g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39360)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vCFgp-000000007Sj-1qqU;
+	Fri, 24 Oct 2025 12:10:35 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vCFgn-000000002eS-0hGl;
+	Fri, 24 Oct 2025 12:10:33 +0100
+Date: Fri, 24 Oct 2025 12:10:33 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH net-next 2/8] net: stmmac: simplify stmmac_get_version()
+Message-ID: <aPteqZ57fWULRfNy@shell.armlinux.org.uk>
+References: <aPn3MSQvjUWBb92P@shell.armlinux.org.uk>
+ <E1vBrlB-0000000BMPs-1eS9@rmk-PC.armlinux.org.uk>
+ <81d5c1f2-e912-40de-a870-290b0cf054b3@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/8] net: stmmac: hwif.c cleanups
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>
-References: <aPn3MSQvjUWBb92P@shell.armlinux.org.uk>
- <28d91eca-28dd-4e5b-ae60-021e777ee064@bootlin.com>
- <aPtZg_v3H53hiQXo@shell.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <aPtZg_v3H53hiQXo@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <81d5c1f2-e912-40de-a870-290b0cf054b3@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Russell,
-
-On 24/10/2025 12:48, Russell King (Oracle) wrote:
-> On Fri, Oct 24, 2025 at 08:44:07AM +0200, Maxime Chevallier wrote:
->> Hello Russell,
->>
->> On 23/10/2025 11:36, Russell King (Oracle) wrote:
->>> Hi,
->>>
->>> This series cleans up hwif.c:
->>>
->>> - move the reading of the version information out of stmmac_hwif_init()
->>>   into its own function, stmmac_get_version(), storing the result in a
->>>   new struct.
->>>
->>> - simplify stmmac_get_version().
->>>
->>> - read the version register once, passing it to stmmac_get_id() and
->>>   stmmac_get_dev_id().
->>>
->>> - move stmmac_get_id() and stmmac_get_dev_id() into
->>>   stmmac_get_version()
->>>
->>> - define version register fields and use FIELD_GET() to decode
->>>
->>> - start tackling the big loop in stmmac_hwif_init() - provide a
->>>   function, stmmac_hwif_find(), which looks up the hwif entry, thus
->>>   making a much smaller loop, which improves readability of this code.
->>>
->>> - change the use of '^' to '!=' when comparing the dev_id, which is
->>>   what is really meant here.
->>>
->>> - reorganise the test after calling stmmac_hwif_init() so that we
->>>   handle the error case in the indented code, and the success case
->>>   with no indent, which is the classical arrangement.
->>>
->>>  drivers/net/ethernet/stmicro/stmmac/common.h |   3 +
->>>  drivers/net/ethernet/stmicro/stmmac/hwif.c   | 166 +++++++++++++++------------
->>>  2 files changed, 98 insertions(+), 71 deletions(-)
->>
->> I didn't have the bandwidth to do a full review, however I ran tests
->> with this series on dwmac-socfpga and dwmac-stm32, no regressions found.
->>
->> For the series,
->>
->> Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+On Thu, Oct 23, 2025 at 08:46:00PM +0200, Andrew Lunn wrote:
+> On Thu, Oct 23, 2025 at 10:37:29AM +0100, Russell King (Oracle) wrote:
+> > We can simplify stmmac_get_version() by pre-initialising the version
+> > members to zero, detecting the MAC100 core and returning, otherwise
+> > determining the version register offset separately from calling
+> > stmmac_get_id() and stmmac_get_dev_id(). Do this.
+> > 
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > 
-> Thanks, it's good to have someone else testing. I do need to post v2
-> with some tweaks to patches 2, 3 and 4 due to a typo that gets
-> eliminated in later patches. "verison*" -> "version*" in one instance.
-> 
-If it's only typos, feel free to keep the t-b tag :)
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Thanks,
 
-Maxime
+Hi Andrew,
 
+It seems I had a typo "verison" which should've been "version" in this
+patch, which carried through patches 3 and 4. Are you happy for me to
+retain your r-b with this typo fixed please?
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
