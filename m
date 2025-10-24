@@ -1,154 +1,118 @@
-Return-Path: <netdev+bounces-232339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05EFBC043B0
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 05:18:10 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EBBBC043D4
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 05:23:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A1B6E34B4CB
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 03:18:09 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C7686354426
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 03:23:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1599D2609C5;
-	Fri, 24 Oct 2025 03:18:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB8626E146;
+	Fri, 24 Oct 2025 03:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3X8C14bl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PAZW1d9n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A1333086
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 03:18:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3F2248F48;
+	Fri, 24 Oct 2025 03:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761275885; cv=none; b=DIjUcQE8mbQCcNpUPDtVcn2osq/RqmojSub8zUzNAlQzLoemJskH8fOWyHcyah3nvP2bco84QUcTLR+T3y6PugP1uE+z3761QNAwmaY1M5o0CWNWiLhwLS2asa/Ene3HCdFLziawWws1lnJm3Qz1l24vKI1QnPsOqTLRo0H0Q1E=
+	t=1761276213; cv=none; b=krRsHLvN0c1hWxmqcNCYdZUQAo2X9xA5c3B9IpV8Vx8nfXGUn1lYyZOe0WFVFDMLcch2GS1FTykTCv/MHoNyG4Re01YNZSN3mOmKR5g3+a69kZhgPXbbDfcaQ8m4H98aJ4cEpm2CnSSKUZw73WjWBe9rijOVS8b8Wup0ve+Okys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761275885; c=relaxed/simple;
-	bh=Mm2VyaI4Igfss9i7TU8/z7aHTWUycbu8XrGKZEVvMDM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SqW1mb9LU4P7TMk/BVLSxIbNEQzDCEBhOfjynedLKTmKn6wGl1SGtGRbaMDDOgmIyYEDbHUu2gZxPQI2TwV9TpHyFHj8lHF/2bHYIaBSnMPHYu7I7weFVouvd0vy5zZuFvxtly4C/SRQSygj579nRblRc3JOl4Y+4CjhZD5KGEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3X8C14bl; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2697410e7f9so36495155ad.2
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 20:18:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761275883; x=1761880683; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=86TD3UzM8BdgXc7Yqd4HgeHYcCczwfuxg2J/6uVoESo=;
-        b=3X8C14blxZrrQslcVrMTQFDI4WRmtE1Lu1graPsoUsBZ1ghExnhKSRrvwqTlhyfJnp
-         H2TwGiQTruWEQIjJXhkoqQF0AvXmvgvd3rdnW/yYSFLBw6FSJ1tW1tuPtu7GUnNr+L90
-         V7y5/14PnkifDQslPICtXoKwRnS+zbPhfDvocXR8dJFcHCbXmyEHciWzF67jD9/7Bzya
-         9wvr9TODXQAkUtSM2IdP/NUoHFURgPRw+2tFuHCWKOZrtVtudswlQKRuGuSjXrcvveLM
-         W+CMqaCHXsb1ETMcIqsnxwrGz1Sah1do30s13cY1ho1VeYQfgnJt/SatNzl+DiKNladl
-         cO7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761275883; x=1761880683;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=86TD3UzM8BdgXc7Yqd4HgeHYcCczwfuxg2J/6uVoESo=;
-        b=hMH3qcdZRl/+ZBLDNlQfptFXMArMQRfGt2wO/Do/tuPiDoI+ccmOg5wLdG1EJ5HjEm
-         gTWc6k7rEX2gUMzrTcNXGnYoJlBj+779ewmzL92V1X6GEygNWx7XOk6Byk8KV16SjzSx
-         KEbNhury/EN5EyQdpEA8iGWzFAaeoMjioDadCGRBmgG1LyvX3ykESAYtGP49V+EgWMqh
-         18JmROiJ7R+taW3xEP9KQvtgFIk1lywpNyRPTGxdqWdYWUJ/xx6NtCnne1LnZ31SOUUN
-         YJYoBIVktCpOVtGhslfyw8TNnPvfSlaOKsM2w7jc8obSG9pi3TkpFHzDfq+znTe3dkJF
-         XndA==
-X-Forwarded-Encrypted: i=1; AJvYcCUUS4t+ExaMcRHisG1Z/mw0c65IWSySZKT3pvP7cDBIDaC+WZA0n5XSr8YufiZpfV/5yPerEbo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyrnv0BfhioYGFt34eKRcXmiyzNnyBUqUXElIBbWZnDbLuNgjZu
-	XJEBNzToHV3pK2HORpAcWU4mASXSUa5VUA+O08p5FfFOO6g8n/ngR1DMVAGhPyQK8igIpG33Zo4
-	RPYDZlw==
-X-Google-Smtp-Source: AGHT+IGbDXf3zXQD4ouIpOm4qwyHLbnbWkwJ/gIVE7mT+Z9sFC3feertEA2eWKr2O8i5iT2f1gFWGeayNYw=
-X-Received: from pjbbk16.prod.google.com ([2002:a17:90b:810:b0:32d:a4d4:bb17])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3d0c:b0:267:af07:6526
- with SMTP id d9443c01a7336-290cb65c541mr349189525ad.55.1761275882800; Thu, 23
- Oct 2025 20:18:02 -0700 (PDT)
-Date: Fri, 24 Oct 2025 03:17:06 +0000
-In-Reply-To: <20251024013153.2811796-1-lizhi.xu@windriver.com>
+	s=arc-20240116; t=1761276213; c=relaxed/simple;
+	bh=CNwnT8O4JG4Ottnhbl1cNUX0P6pAoK8TTMrHAWFkULg=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=gDrTUt6jnCX7UkrRjSXj/0q7adxAyMHDwx4V9yWMawSe7Fi6YoZlS1gspEkxT9Pp9o6+sm8nLmTSrNRZQI4iA8APmZ+4hd5Pw3eSLYznLKEtkEGNFYy09+5T/s1xRq4UbD87FuuhGjaQGoayDPkOTVfc/j4J8c/ibUQqVHpC6mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PAZW1d9n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A10ABC4CEE7;
+	Fri, 24 Oct 2025 03:23:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761276212;
+	bh=CNwnT8O4JG4Ottnhbl1cNUX0P6pAoK8TTMrHAWFkULg=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=PAZW1d9nE4BKbSDO5YSLJIHFY7fvvq7/qb+KsjUsGRLmxi56jdxvmOARnYJv4d2ld
+	 Ic/xOGBjxwDNwmiwJ7cwI4V+apON+qMOt3p6cSvOAfiZ8jtjp0hXvhPBg0AM77I1zp
+	 g6i8gpSAFD7DosiR9Fi+RdTt41wplPyJOLqBMx3xzyWe4tOmA43TExpxPsd4IS8kb2
+	 ffQAI4FNvAT46dKsdBSkShyj3Tac9+wpugnoPlwOkCefGTwchZzYXux2HTezbtbDFb
+	 cD2F6SLTQmqfuVuj5vCgghi+8YZx5WXGvZntDmaWeqh9aFw3ZihEuSB6O7yksVD5ou
+	 igWnqilxSCITA==
+Date: Thu, 23 Oct 2025 22:23:30 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251024013153.2811796-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.51.1.851.g4ebd6896fd-goog
-Message-ID: <20251024031801.35583-1-kuniyu@google.com>
-Subject: Re: [PATCH] net: rose: Prevent the use of freed digipeat
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: lizhi.xu@windriver.com
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jreuter@yaina.de, kuba@kernel.org, linux-hams@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com, kuniyu@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, netdev@vger.kernel.org, 
+ Jakub Kicinski <kuba@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
+ Icenowy Zheng <uwu@icenowy.me>, Vivian Wang <wangruikang@iscas.ac.cn>, 
+ Yixun Lan <dlan@gentoo.org>, linux-kernel@vger.kernel.org, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Eric Dumazet <edumazet@google.com>, Chen Wang <unicorn_wang@outlook.com>, 
+ Yao Zi <ziyao@disroot.org>, linux-stm32@st-md-mailman.stormreply.com, 
+ Longbin Li <looong.bin@gmail.com>, linux-arm-kernel@lists.infradead.org, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, devicetree@vger.kernel.org, 
+ sophgo@lists.linux.dev, Han Gao <rabenda.cn@gmail.com>
+To: Inochi Amaoto <inochiama@gmail.com>
+In-Reply-To: <20251024015524.291013-2-inochiama@gmail.com>
+References: <20251024015524.291013-1-inochiama@gmail.com>
+ <20251024015524.291013-2-inochiama@gmail.com>
+Message-Id: <176127621096.199631.1552825919177332173.robh@kernel.org>
+Subject: Re: [PATCH v3 1/3] dt-bindings: net: sophgo,sg2044-dwmac: add phy
+ mode restriction
 
-From: Lizhi Xu <lizhi.xu@windriver.com>
-Date: Fri, 24 Oct 2025 09:31:53 +0800
-> There is no synchronization between the two timers, rose_t0timer_expiry
-> and rose_timer_expiry.
-> rose_timer_expiry() puts the neighbor when the rose state is ROSE_STATE_2.
-> However, rose_t0timer_expiry() does initiate a restart request on the
-> neighbor.
-> When rose_t0timer_expiry() accesses the released neighbor member digipeat,
-> a UAF is triggered.
+
+On Fri, 24 Oct 2025 09:55:22 +0800, Inochi Amaoto wrote:
+> As the ethernet controller of SG2044 and SG2042 only supports
+> RGMII phy. Add phy-mode property to restrict the value.
 > 
-> To avoid this uaf, when rose_timer_expiry() puts the neighbor, the base
-> member digipeat is set to NULL.
+> Also, since SG2042 has internal rx delay in its mac, make
+> only "rgmii-txid" and "rgmii-id" valid for phy-mode.
 > 
-> syzbot reported a slab-use-after-free Read in ax25_find_cb.
-> BUG: KASAN: slab-use-after-free in ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
-> Read of size 1 at addr ffff888059c704c0 by task syz.6.2733/17200
-> 
-> Call Trace:
->  ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
->  ax25_send_frame+0x157/0xb60 net/ax25/ax25_out.c:55
->  rose_send_frame+0xcc/0x2c0 net/rose/rose_link.c:106
->  rose_transmit_restart_request+0x1b8/0x240 net/rose/rose_link.c:198
->  rose_t0timer_expiry+0x1d/0x150 net/rose/rose_link.c:83
-> 
-> Freed by task 17183:
->  kfree+0x2b8/0x6d0 mm/slub.c:6826
->  rose_neigh_put include/net/rose.h:165 [inline]
->  rose_timer_expiry+0x537/0x630 net/rose/rose_timer.c:183
->  call_timer_fn+0x19a/0x620 kernel/time/timer.c:1747
-> 
-> Fixes: dcb34659028f ("net: rose: split remove and free operations in rose_remove_neigh()")
-> Reported-by: syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com
-> Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
 > ---
->  include/net/rose.h | 1 +
->  1 file changed, 1 insertion(+)
+>  .../bindings/net/sophgo,sg2044-dwmac.yaml       | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
 > 
-> diff --git a/include/net/rose.h b/include/net/rose.h
-> index 2b5491bbf39a..9b0dc81a9589 100644
-> --- a/include/net/rose.h
-> +++ b/include/net/rose.h
-> @@ -163,6 +163,7 @@ static inline void rose_neigh_put(struct rose_neigh *rose_neigh)
->  		if (rose_neigh->ax25)
->  			ax25_cb_put(rose_neigh->ax25);
->  		kfree(rose_neigh->digipeat);
-> +		rose_neigh->digipeat = NULL;
 
-How does this synchronise with the timer which is going to
-touch rose_neigh being freed below ?
+My bot found errors running 'make dt_binding_check' on your patch:
 
+yamllint warnings/errors:
 
->  		kfree(rose_neigh);
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml: allOf:1:then: 'anyOf' conditional failed, one must be fixed:
+	'phy-mode' is not one of ['$ref', 'additionalItems', 'additionalProperties', 'allOf', 'anyOf', 'const', 'contains', 'default', 'dependencies', 'dependentRequired', 'dependentSchemas', 'deprecated', 'description', 'else', 'enum', 'exclusiveMaximum', 'exclusiveMinimum', 'items', 'if', 'minItems', 'minimum', 'maxItems', 'maximum', 'multipleOf', 'not', 'oneOf', 'pattern', 'patternProperties', 'properties', 'required', 'then', 'typeSize', 'unevaluatedProperties', 'uniqueItems']
+	'type' was expected
+	from schema $id: http://devicetree.org/meta-schemas/keywords.yaml
 
-Isn't the problem that we reach here without stopping all timers
-or that a timer does not hold refcnt ?
+doc reference errors (make refcheckdocs):
 
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20251024015524.291013-2-inochiama@gmail.com
 
-Also, please post a patch in a separate thread so that patchwork
-will not be confused.
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#resending-after-review
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
 
----8<---
-The new version of patches should be posted as a separate
-thread, not as a reply to the previous posting.
----8<---
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
