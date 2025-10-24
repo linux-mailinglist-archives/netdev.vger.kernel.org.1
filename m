@@ -1,101 +1,95 @@
-Return-Path: <netdev+bounces-232368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FF4AC04B4E
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 09:25:15 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 165C5C04C77
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 09:41:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4F9E64E4E62
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 07:25:02 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 82A4435A930
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 07:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A98F2C17B2;
-	Fri, 24 Oct 2025 07:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E29832E8DED;
+	Fri, 24 Oct 2025 07:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mhkaCvLe"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B9423E35E;
-	Fri, 24 Oct 2025 07:24:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0794D8CE
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 07:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761290699; cv=none; b=VCGWydMhXDb8tXOj2YVzzyTBPNPtt7LBTIl97RtUGk3baMI3HeexMrQxR4mghNj0vzcvbFNXPcZMz+pgqSAsjxW7bfke+8hFCLEOYNvU1PDv0Wt9yeZZAsBo01OHqK+GquQw9lWB9jXRDquy6l89YOmyLYi+omRrz0ADjFcCRas=
+	t=1761291696; cv=none; b=PkVUJxKo3k94gNkke3PGwyKBdPkOYkfqiwXLJWCEhHovi+uJCPvcey40kO12EczU8aKCYSv94tWm85QiG9yPCixajmmIhYNqv6KOZfXtetQRZC1Pl3SkVbDa3xT8QimJXLfYiwlLYLP21FkuyGV5eoWZrQzfxQIxXXDy83g1EdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761290699; c=relaxed/simple;
-	bh=fwedoOSehN9OYgxnwRWiJB7Z7malJPodTXNiVHLi9TI=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=D4Gkh8UTsz8ZUrUQlVlj+q7JwuPQsxB+tJqDSZFUq8Sk6gJ59PaBQgI83vlKizGmDDxvcA5XDxhdezTircWiAlYOZ+50e0p7KsfAuurIDqWvgpp8wV8dZofHhiovqv8fjiO0v1niEkm5fj/yVIpJMzDFqFAb5jLIYwU3y7jLu+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4ctDsz0vXmznffp;
-	Fri, 24 Oct 2025 15:24:07 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 01FAD1401F3;
-	Fri, 24 Oct 2025 15:24:55 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 24 Oct 2025 15:24:53 +0800
-Message-ID: <f99d878c-abf3-41ae-ae7f-b1db4f205561@huawei.com>
-Date: Fri, 24 Oct 2025 15:24:53 +0800
+	s=arc-20240116; t=1761291696; c=relaxed/simple;
+	bh=zJJTIMGSOwxKfb2US6KEAP1oCsZIQ0qpCABmkMTLQYk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bSj8Tg3nK60hCBZ2I9YXwrbu1z2aLF/l4TqjjNpRn8qfQsy8FsOxWxpccDYJywFUWM4vYg0i+69RLMaLOwFIhrBe2lENcOFjtYwkuu7b1UefVlcDtbM5VQEfsjePQwl5ylCnrUtvxHzC1h0Az/f9tJLKS5xJbehKUNH/rfjG0bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mhkaCvLe; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1761291691; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=P4t7EHVBxzPFlbSFx++Y2HgFlVp6dY0965Mu6URnaQA=;
+	b=mhkaCvLeD7vKTtCCPN9t/PD2Hurhkn/g+r6pmE1XR9x/3aSuHyw8UcXvJr/4XO0Wnb/2P7nHbdMRfkxGmd3oupJl8XSUN4sMpiSrkkgWUpI9p5k53Yj9obb71pTaqgfvTwGKYqsVfZcjoKKv5c5FfQAiJDKWCX1b5lQNdK4WeoY=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WqtaKOo_1761291690 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 24 Oct 2025 15:41:30 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Alvaro Karsz <alvaro.karsz@solid-run.com>,
+	Heng Qi <hengqi@linux.alibaba.com>,
+	virtualization@lists.linux.dev
+Subject: [PATCH net v3 0/3] fixes two virtio-net related bugs.
+Date: Fri, 24 Oct 2025 15:41:27 +0800
+Message-Id: <20251024074130.65580-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <lantao5@huawei.com>,
-	<huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
-	<jonathan.cameron@huawei.com>, <salil.mehta@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net 0/3] There are some bugfix for hibmcge ethernet driver
-To: Jacob Keller <jacob.e.keller@intel.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<andrew+netdev@lunn.ch>, <horms@kernel.org>
-References: <20251021140016.3020739-1-shaojijie@huawei.com>
- <49a1be1b-36c2-463e-8684-8781d4654da8@intel.com>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <49a1be1b-36c2-463e-8684-8781d4654da8@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+X-Git-Hash: deaf684dfaeb
+Content-Transfer-Encoding: 8bit
+
+As discussed in http://lore.kernel.org/all/20250919013450.111424-1-xuanzhuo@linux.alibaba.com
+Commit #1 Move the flags into the existing if condition; the issue is that it introduces a
+small amount of code duplication.
+
+Commit #3 is new to fix the hdr len in tunnel gso feature.
 
 
-on 2025/10/24 9:08, Jacob Keller wrote:
->
-> On 10/21/2025 7:00 AM, Jijie Shao wrote:
->> This patch set is intended to fix several issues for hibmcge driver:
->> 1. Patch1 fixes the issue where buf avl irq is disabled after irq_handle.
->> 2. Patch2 eliminates the error logs in scenarios without phy.
->> 3. Patch3 fixes the issue where the network port becomes unusable
->>     after a PCIe RAS event.
->>
->>
-> We typically suggest using imperative wording for the subject such as
-> "bug fixes for the hibmcge ethernet driver".
+Thanks.
 
-Ok, I will change in V2
+v3:
+   1. recode the #3 for tunnel gso, and test it
 
-Thanks,
-Jijie Shao
 
->> Jijie Shao (3):
->>    net: hibmcge: fix rx buf avl irq is not re-enabled in irq_handle issue
->>    net: hibmcge: remove unnecessary check for np_link_fail in scenarios
->>      without phy.
->>    net: hibmcge: fix the inappropriate netif_device_detach()
->>
->>   drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h |  1 +
->>   drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c    | 10 ++++++----
->>   drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c     |  3 +++
->>   drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c    |  1 +
->>   drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c   |  1 -
->>   5 files changed, 11 insertions(+), 5 deletions(-)
->>
+Xuan Zhuo (3):
+  virtio-net: fix incorrect flags recording in big mode
+  virtio-net: correct hdr_len handling for VIRTIO_NET_F_GUEST_HDRLEN
+  virtio-net: correct hdr_len handling for tunnel gso
+
+ drivers/net/virtio_net.c   | 16 +++++++++----
+ include/linux/virtio_net.h | 47 ++++++++++++++++++++++++++++++--------
+ 2 files changed, 48 insertions(+), 15 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
+
 
