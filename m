@@ -1,81 +1,95 @@
-Return-Path: <netdev+bounces-232381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAF52C04FB6
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 10:09:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EAECC05047
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 10:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2F831B817EA
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 08:08:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 556B81896A3F
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 08:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66AC43016F5;
-	Fri, 24 Oct 2025 08:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F2E3016FD;
+	Fri, 24 Oct 2025 08:16:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ivwmwOoU"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="V9KvNY0k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5395C2FDC44;
-	Fri, 24 Oct 2025 08:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51E52FF168
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 08:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761293286; cv=none; b=pla9ynO2FI2mJmwnC0wIeSVDrjtV0AvM/aVUFGd/JPoHc32D4/nxpcqECG89BshAPnBk95RtPNKRXz39B2Yryl+zZYjjmrLRqWeusXdT5IvYK/wE1+Y31naI6QpsDpcmUcDvlMigFWFtMJrNKSFJhlWQOSj+oBO3WgVfkvckgu0=
+	t=1761293803; cv=none; b=mnVV2FpCxzzYBrQMS+0c0lUC3Ib1kFreIr8vqZQrwEkvBw7G6/2m1VrMIJ2Eq1q1bHlt4oM64IwrkLiVY04rf8zQPAYVJ4T+Bp6dbFJr4Z5zsNJtCx+hkzNInm0k2jBElCtvrYxnZP3RM47QlUNxvbNj/CfnmytNnmqG75ieolI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761293286; c=relaxed/simple;
-	bh=UTt/Q0XaE240mGhbyc0GBR+vGT+S8mXRNkiX+CKXR2g=;
+	s=arc-20240116; t=1761293803; c=relaxed/simple;
+	bh=RWdGPNS1iDQpL3AYAMrng6/fsuBkytsPx/WEa5J21x0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OjxIeiI5OkcABR3xgVcbPGDsLcPF2liKgshEIOK/sxNHDttgn/XtPEUWqMjuembZpgelvmginvULQHr26yNFM0OJxTWC4Y9jBoyd0IePhr0aSQA9ExDYcMgrrNAIHGsqeSYrNCMemZV2GDsXGHnCqm8CKsEOh24R6svYDhUmiCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ivwmwOoU; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761293284; x=1792829284;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UTt/Q0XaE240mGhbyc0GBR+vGT+S8mXRNkiX+CKXR2g=;
-  b=ivwmwOoU9Bd/cH4Wf+HuCtuJGRkesBmqZwiIy2UQgfGPPy8+6r+YtrlX
-   iNlXfqntenWLEPbywW5OxklGbeZwntSbWf3WocDLF+FbzIPU8qokMsdAO
-   8acOSeG37kdJFpoCP7c6hQaUUvGhctXia9RuXk/q0V+vOUYWwxsq7QjfB
-   CsDaI8FkUvfqxinxlnOQpI7DPVjg3jy1yH2iJp20blbwCgzzGN6NsiTDP
-   LTPg5hT3JLiGLxQm+g+1YEK9kyyZQ0kzlTji7b8zZX6KtCrgGbhDwGLgh
-   eVYnH9gzkwS1Cg5alp9txDqbW3QJqnvC8ETnPlfTpD0Tmr+nxz2J/fJkb
-   Q==;
-X-CSE-ConnectionGUID: /4TprjiHTwGvQ/kc6GCxoQ==
-X-CSE-MsgGUID: v9ejTz52TDqDF/FNxhp66Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63620713"
-X-IronPort-AV: E=Sophos;i="6.19,251,1754982000"; 
-   d="scan'208";a="63620713"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2025 01:08:03 -0700
-X-CSE-ConnectionGUID: cCFN/iBWRGahFx9FoHfx9Q==
-X-CSE-MsgGUID: zqkBOcvTQa22Dhk4feXAcA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,251,1754982000"; 
-   d="scan'208";a="184441717"
-Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
-  by orviesa008.jf.intel.com with ESMTP; 24 Oct 2025 01:08:00 -0700
-Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vCCq5-000EJv-16;
-	Fri, 24 Oct 2025 08:07:57 +0000
-Date: Fri, 24 Oct 2025 16:07:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	magnus.karlsson@intel.com, aleksander.lobakin@intel.com,
-	ilias.apalodimas@linaro.org, toke@redhat.com, lorenzo@kernel.org,
-	kuba@kernel.org, Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com,
-	Ihor Solodrai <ihor.solodrai@linux.dev>,
-	Octavian Purdila <tavip@google.com>
-Subject: Re: [PATCH v3 bpf 1/2] xdp: introduce xdp_convert_skb_to_buff()
-Message-ID: <202510241549.mWZqm0BR-lkp@intel.com>
-References: <20251022125209.2649287-2-maciej.fijalkowski@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GXKX7WdnFBVbYXs8rrV+0tRqxby+6Hx2DbEOwIHXk0fdAK2GrcRKiHO0UzopKqmQwyOdl3A4NCdh3DQHnoqvgb8/5THfUwK6T62lVXlqujnjWi7zwett+uD2p6DDkHDYoHQWefR8ZcTVzCvOr5zvmwUpSk31hhVz81FwUQHw70Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=V9KvNY0k; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-4270a3464caso770421f8f.1
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 01:16:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1761293800; x=1761898600; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=i5cjUqGbM0RrW05do79zm+nugfOI5OuKl18rgtRfqvY=;
+        b=V9KvNY0kI67U/PdaJYXieop8BZiy4MZiedSzwXjemnFqsCbENvl/lA7gCz6OcHQIzL
+         eiJWHzZxk7urBdwxlCv2X5tYbJD7YsYQ5zYjkdYOEmi6YSf+hQWxb/rcX2AwZb3LpzR1
+         nkQmvDmsq0WaQZ7Ffc1NFdMOQwNW19vXZXIh5yNE1CxGKjBgy3rhCCbKLpfwTvDW4xDO
+         6N0M2i/BaAT8lGP58ZNoDGGIinx6LvhTr1kaOKWif3GriTPFo99fcKHMmRJ0pQwsStc6
+         cJRUvn3fOj2g+6FujJ6mOHKhfWTmLnTdJ86cisoxKz2rpTdtjHhqQFBvtbRLSiM0+FXr
+         kXjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761293800; x=1761898600;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i5cjUqGbM0RrW05do79zm+nugfOI5OuKl18rgtRfqvY=;
+        b=L9ld3IDlYtyj0hMVJdh5OiBT3OOyfcRV1Bd/3dyvjttfRVqOvOGrhW3fQx5LgqtB50
+         4cSbssvo2VsP97FBS3qK69ufc+2znQJ0xKjMBKJGfdDAUGpGl0Lx5KkzIYU3YQ9OQMgO
+         DDCrpGiIz1lpkLkAnRDJ1melePoR4GueN9YJVySrmzi2MjMhr3G8YCBcSTiS86yNv9CX
+         B41A2iZvzzA+vwnLwUq2E7zFYkysBWDHsAfl7GCfTb1kMVGBPV0lr0IsCD7r0/uEZ/vv
+         h0L2dnpManeAXuGWeHC2qmrWKjWi7JKCH9TIvSkX/6AoMm81cxBiyPBbem34S5RiKfs5
+         YmTg==
+X-Forwarded-Encrypted: i=1; AJvYcCVI4vK5PIITVHD7vpwMIE6hCrinKTRP+9W4DyjAB18g8RdRlvuo8mqHs+vCefxMYXTA22KxKB4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YylH096r0Ne2YqLNjVGuEn0ScyJOheTs4W25RIBFcen0nAyBhdU
+	vdgvdV3nc9PsxNu5LIUeDl86RISshMWwnuwP1cB1FM8iFRsaWHSlzpmgQH7wPZm9Qkc=
+X-Gm-Gg: ASbGncuUr3yI+TiUOEKQRLMIb4KePQHuD2qdDyX1k9EZ/M0V3vMkl2Nv7pnxZ8t4CVb
+	4Ni42jnRqY1M/Kl4XVvHTfWC53abUhjkvHpJI5R6jQg7uv2IX6A9FZhFlinN7aeT3PggwQKgtTq
+	U698r/1b6zaafeVL5YlXhYZzSY7c3Eof19Q+d2XGgNYv6TCiVzmb7S93zeENLOFb6yKqrvLneV7
+	MwrajeeBIk3RDbsPaQAJsq47Ong5f3H3AapPNjsjRzrC8qJbg2rLAbpOAA0YWV/QnKi1m+5aqA0
+	SDTTQSSBDLuEGprHoOofurTKiUT+tZEd88gXXvLjG1iRL/p4yroy2yunvGMAujO3z8GemGLa/QH
+	dRUehvIBeBKDNlZWmheyuTU9ieoDM/mh2BeYZThq8ryn36FU9XBDrjuQwLz1EOvo3Et1QXSXQ1r
+	yfB23GlG4Eu/kXIkMzTwvSy2XeHaxS2tQinpnypQ==
+X-Google-Smtp-Source: AGHT+IEjgDbqn3z5tjHECw3913ThgDrQE5n6C5KutSqEORLETt+ny0gQGMO4mUMda0NT2ai8gi8/9Q==
+X-Received: by 2002:a05:6000:2203:b0:428:5659:81d6 with SMTP id ffacd0b85a97d-4298a0a9200mr3119153f8f.37.1761293799579;
+        Fri, 24 Oct 2025 01:16:39 -0700 (PDT)
+Received: from jiri-mlt.client.nvidia.com ([140.209.217.211])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4298d4a49ffsm4043496f8f.13.2025.10.24.01.16.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Oct 2025 01:16:39 -0700 (PDT)
+Date: Fri, 24 Oct 2025 10:16:36 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Daniel Zahka <daniel.zahka@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Tariq Toukan <tariqt@nvidia.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Leon Romanovsky <leon@kernel.org>, 
+	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Vlad Dumitrescu <vdumitrescu@nvidia.com>, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next] net/mlx5: Implement swp_l4_csum_mode via
+ devlink params
+Message-ID: <uez74rl75ner76kl3i5ps4huyxmzerrhananjw4vyo74tvev64@nk2lwjivr6ho>
+References: <20251022190932.1073898-1-daniel.zahka@gmail.com>
+ <uqbng3vzz2ybmrrhdcocsfjtfxitck2rs76hcrsk7aiddjssp2@haqcnmzrljws>
+ <20251023063805.5635e50e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,71 +98,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251022125209.2649287-2-maciej.fijalkowski@intel.com>
+In-Reply-To: <20251023063805.5635e50e@kernel.org>
 
-Hi Maciej,
+Thu, Oct 23, 2025 at 03:38:05PM +0200, kuba@kernel.org wrote:
+>On Thu, 23 Oct 2025 14:18:20 +0200 Jiri Pirko wrote:
+>> >+	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_SWP_L4_CSUM_MODE,  
+>> 
+>> Why this is driver specific? Isn't this something other drivers might
+>> eventually implement as well?
+>
+>Seems highly unlikely, TBH.
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on bpf/master]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Maciej-Fijalkowski/xdp-introduce-xdp_convert_skb_to_buff/20251022-210958
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git master
-patch link:    https://lore.kernel.org/r/20251022125209.2649287-2-maciej.fijalkowski%40intel.com
-patch subject: [PATCH v3 bpf 1/2] xdp: introduce xdp_convert_skb_to_buff()
-config: sh-randconfig-r111-20251024 (https://download.01.org/0day-ci/archive/20251024/202510241549.mWZqm0BR-lkp@intel.com/config)
-compiler: sh4-linux-gcc (GCC) 10.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251024/202510241549.mWZqm0BR-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202510241549.mWZqm0BR-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
-   net/core/dev.c:4164:17: sparse: sparse: context imbalance in '__dev_queue_xmit' - different lock contexts for basic block
-   net/core/dev.c:5188:9: sparse: sparse: context imbalance in 'kick_defer_list_purge' - different lock contexts for basic block
-   net/core/dev.c:5290:22: sparse: sparse: context imbalance in 'enqueue_to_backlog' - different lock contexts for basic block
-   net/core/dev.c: note: in included file (through include/trace/events/xdp.h, include/linux/bpf_trace.h):
->> include/net/xdp.h:398:17: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned int [usertype] pkt_len @@     got unsigned char * @@
-   include/net/xdp.h:398:17: sparse:     expected unsigned int [usertype] pkt_len
-   include/net/xdp.h:398:17: sparse:     got unsigned char *
-   net/core/dev.c:5678:17: sparse: sparse: context imbalance in 'net_tx_action' - different lock contexts for basic block
-   net/core/dev.c:6373:9: sparse: sparse: context imbalance in 'flush_backlog' - different lock contexts for basic block
-   net/core/dev.c:6520:9: sparse: sparse: context imbalance in 'process_backlog' - different lock contexts for basic block
-
-vim +398 include/net/xdp.h
-
-   386	
-   387	static inline
-   388	void xdp_convert_skb_to_buff(struct sk_buff *skb, struct xdp_buff *xdp,
-   389				     struct xdp_rxq_info *xdp_rxq)
-   390	{
-   391		u32 frame_sz, pkt_len;
-   392	
-   393		/* SKB "head" area always have tailroom for skb_shared_info */
-   394		frame_sz = skb_end_pointer(skb) - skb->head;
-   395		frame_sz += SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-   396	
-   397		DEBUG_NET_WARN_ON_ONCE(!skb_mac_header_was_set(skb));
- > 398		pkt_len =  skb->tail - skb->mac_header;
-   399	
-   400		xdp_init_buff(xdp, frame_sz, xdp_rxq);
-   401		xdp_prepare_buff(xdp, skb->head, skb->mac_header, pkt_len, true);
-   402	
-   403		if (skb_is_nonlinear(skb)) {
-   404			skb_shinfo(skb)->xdp_frags_size = skb->data_len;
-   405			xdp_buff_set_frags_flag(xdp);
-   406		} else {
-   407			xdp_buff_clear_frags_flag(xdp);
-   408		}
-   409	
-   410		xdp->rxq->mem.type = page_pool_page_is_pp(virt_to_head_page(xdp->data)) ?
-   411					MEM_TYPE_PAGE_POOL : MEM_TYPE_PAGE_SHARED;
-   412	}
-   413	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Well even unlikely, looks like a generic param, not something
+driver-specific. That is my point.
 
