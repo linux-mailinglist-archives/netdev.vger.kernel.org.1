@@ -1,71 +1,66 @@
-Return-Path: <netdev+bounces-232622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E533C076C7
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 19:00:41 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C569CC076D0
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 19:01:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91B601C42E2F
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 17:01:04 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 716F34E14C7
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 17:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831DF20CCCA;
-	Fri, 24 Oct 2025 17:00:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NuOyzL52"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0573433B958;
+	Fri, 24 Oct 2025 17:01:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C4B12B94;
-	Fri, 24 Oct 2025 17:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDAD9267B94;
+	Fri, 24 Oct 2025 17:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761325236; cv=none; b=h0/tVv4EM6fN4zbmsBHKJ0SGL1rrCDlIySx2xNoWWJpzTYFEJLTdQHLHtClmMDtPYI9tsHqU0REWuoWx/AuFkL9fmZEbix2RhlnEwvzM82XasrQ6e6Qq5Yr8T+tNmst+bw/C6wSHArNGS89/2WLTIb4U+4fXHnR+8aMrQ4aK400=
+	t=1761325296; cv=none; b=MKWe2XF7ZxZvTIWk00tGumzRt6GL5runA9oevyndEr/19qgnTE9ChbpIU7mVJz/iyLmaX19/o3PpXJSPpTunQ4hq4ETPEXJDGOyVv3NFoJvWuC5KLdzNgjzmhSNiwvH/9eyIEETf0VxHVluglrZ7ICozJe54oUHX95hTleSP0wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761325236; c=relaxed/simple;
-	bh=P30Amz6t4gClv82kJnXzJCEXNT49i1otAZuXWkHsM8w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FHLb4bKvlyfU60DS26R6Cwb/opYIxwKrNtCAYYbag7hmKImRm7u+wJ9EXmzDeL3HH3tAQSqk1yN+xRRU4rSMSeBUs1GERacABP2mCyjFAbJRqZxn/RMugiP1uQF0IA+kRiDSP/qtYWGprv8QVu2w+0zSHEpSWjtciaoCbtMgUFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NuOyzL52; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F798C4CEF1;
-	Fri, 24 Oct 2025 17:00:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761325235;
-	bh=P30Amz6t4gClv82kJnXzJCEXNT49i1otAZuXWkHsM8w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NuOyzL52sbbNkLTISaUiZcxVPMMcvE6/aTHVBAKCncbKyPyCpaTJbaelkUrzmIvHW
-	 /IQIIQH7hbBF2AjPQD68Pt4oJ7flSwE7WTcAmsTRXwZtluGJBM1hUtep1EscNVEtGw
-	 DYRvG672/gLhggR5E6rPmBLHOgHJ0I7vmRWesKniWEjE7PYFofpc114Sqd9bHnYefw
-	 YRVO6uihtxFDs4fa/4bV22aIP/BWlz6ieB2svEgOX2KesQ1bU3NzQaHK9ECvbm/oa4
-	 SFvLUUzabBni7gjMcjnMStoX+T31dDTY4yTdYVozPoXLDTCriC69BpwkCCFOXhlatN
-	 soVUdWoN86OOQ==
-Date: Fri, 24 Oct 2025 18:00:30 +0100
-From: Simon Horman <horms@kernel.org>
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1761325296; c=relaxed/simple;
+	bh=0N2/d6yUtXE3S70YxSnz4iBWRRGfzBHKpZqJm3x4wA8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=htOMv2iz66WUuzi3eV5IcIjOX0nIBDsN3Bek+ONq2nF7+0r6dcypo+XSha6EuAWendUvHzk7SSSi07r+7o5sCZo8ymwLPO6uLkBNKq7dyf4+WA4Zmgkh1uahidx+0/bUzTqwPn+74FZVVCnngQN2djBgMdp4b7Q8cxlCCvlH9gE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vCLAE-0000000065e-3Shq;
+	Fri, 24 Oct 2025 17:01:18 +0000
+Date: Fri, 24 Oct 2025 18:01:07 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Matthew Gerlach <matthew.gerlach@altera.com>, kernel@pengutronix.de,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Teoh Ji Sheng <ji.sheng.teoh@intel.com>
-Subject: Re: [PATCH v5 02/10] net: stmmac: Use interrupt mode INTM=1 for per
- channel irq
-Message-ID: <aPuwrvGOgfBifrmC@horms.kernel.org>
-References: <20251024-v6-12-topic-socfpga-agilex5-v5-0-4c4a51159eeb@pengutronix.de>
- <20251024-v6-12-topic-socfpga-agilex5-v5-2-4c4a51159eeb@pengutronix.de>
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [PATCH net-next 00/13] net: dsa: lantiq_gswip: Add support for
+ MaxLinear GSW1xx switch family
+Message-ID: <cover.1761324950.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,42 +69,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251024-v6-12-topic-socfpga-agilex5-v5-2-4c4a51159eeb@pengutronix.de>
 
-On Fri, Oct 24, 2025 at 01:49:54PM +0200, Steffen Trumtrar wrote:
+This patch series extends the existing lantiq_gswip DSA driver to support
+the MaxLinear GSW1xx family of dedicated Ethernet switch ICs. These switches
+are based on the same IP as the Lantiq/Intel GSWIP found in VR9 and xRX
+MIPS router SoCs, but are connected via MDIO instead of memory-mapped I/O.
 
-...
+The series includes several improvements and refactoring to prepare for the
+new hardware support.
 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+The GSW1xx family includes several variants:
+ - GSW120: 4 ports, 2 PHYs, RGMII & SGMII/2500Base-X
+ - GSW125: 4 ports, 2 PHYs, RGMII & SGMII/2500Base-X, industrial temperature
+ - GSW140: 6 ports, 4 PHYs, RGMII & SGMII/2500Base-X
+ - GSW141: 6 ports, 4 PHYs, RGMII & SGMII
+ - GSW145: 6 ports, 4 PHYs, RGMII & SGMII/2500Base-X, industrial temperature
 
-...
+Key features implemented:
+ - MDIO-based register access using regmap
+ - Support for SGMII/1000Base-X/2500Base-X SerDes interfaces
+ - Configurable MII delays via device tree properties
+ - Energy Efficient Ethernet (EEE) support
+ - enabling/disabling learning
 
-> @@ -746,6 +750,22 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
->  	if (stmmac_res->irq < 0)
->  		return stmmac_res->irq;
->  
-> +	/* For RX Channel */
-> +	for (i = 0; i < MTL_MAX_RX_QUEUES; i++) {
-> +		sprintf(irq_name, "%s%d", "macirq_rx", i);
-> +		stmmac_res->rx_irq[i] = platform_get_irq_byname(pdev, irq_name);
-> +		if (stmmac_res->rx_irq[i] < 0)
-> +			break;
-> +	}
-> +
-> +	/* For TX Channel */
-> +	for (i = 0; i < MTL_MAX_TX_QUEUES; i++) {
-> +		sprintf(irq_name, "%s%d", "macirq_tx", i);
-> +		stmmac_res->tx_irq[i] = platform_get_irq_byname(pdev, irq_name);
-> +			if (stmmac_res->tx_irq[i] < 0)
-> +				break;
+Daniel Golle (13):
+  net: dsa: lantiq_gswip: split into common and MMIO parts
+  net: dsa: lantiq_gswip: support enable/disable learning
+  net: dsa: lantiq_gswip: support Energy Efficient Ethernet
+  net: dsa: lantiq_gswip: set link parameters also for CPU port
+  net: dsa: lantiq_gswip: define and use
+    GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID
+  dt-bindings: net: dsa: lantiq,gswip: add support for MII delay
+    properties
+  net: dsa: lantiq_gswip: allow adjusting MII delays
+  dt-bindings: net: dsa: lantiq,gswip: add MaxLinear RMII refclk output
+    property
+  net: dsa: lantiq_gswip: add vendor property to setup MII refclk output
+  dt-bindings: net: dsa: lantiq,gswip: add support for MaxLinear GSW1xx
+    switches
+  net: dsa: add tagging driver for MaxLinear GSW1xx switch family
+  net: dsa: lantiq_gswip: add registers specific for MaxLinear GSW1xx
+  net: dsa: add driver for MaxLinear GSW1xx switch family
 
-nit: The two lines above abbove to be indented a bit too much.
+ .../bindings/net/dsa/lantiq,gswip.yaml        |  290 ++-
+ MAINTAINERS                                   |    3 +-
+ drivers/net/dsa/lantiq/Kconfig                |   18 +-
+ drivers/net/dsa/lantiq/Makefile               |    2 +
+ drivers/net/dsa/lantiq/lantiq_gswip.c         | 1617 +--------------
+ drivers/net/dsa/lantiq/lantiq_gswip.h         |  128 ++
+ drivers/net/dsa/lantiq/lantiq_gswip_common.c  | 1747 +++++++++++++++++
+ drivers/net/dsa/lantiq/mxl-gsw1xx.c           |  685 +++++++
+ drivers/net/dsa/lantiq/mxl-gsw1xx_pce.h       |  154 ++
+ include/net/dsa.h                             |    2 +
+ net/dsa/Kconfig                               |    8 +
+ net/dsa/Makefile                              |    1 +
+ net/dsa/tag_mxl-gsw1xx.c                      |  138 ++
+ 13 files changed, 3127 insertions(+), 1666 deletions(-)
+ create mode 100644 drivers/net/dsa/lantiq/lantiq_gswip_common.c
+ create mode 100644 drivers/net/dsa/lantiq/mxl-gsw1xx.c
+ create mode 100644 drivers/net/dsa/lantiq/mxl-gsw1xx_pce.h
+ create mode 100644 net/dsa/tag_mxl-gsw1xx.c
 
-> +	}
-> +
->  	/* On some platforms e.g. SPEAr the wake up irq differs from the mac irq
->  	 * The external wake up irq can be passed through the platform code
->  	 * named as "eth_wake_irq"
-
-...
+-- 
+2.51.0
 
