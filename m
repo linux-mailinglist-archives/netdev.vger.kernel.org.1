@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-232311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8AB6C0403E
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 03:20:57 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 075F7C04047
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 03:21:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 50E2F4F5017
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 01:20:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0F1D44FF1E5
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 01:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8DE91C860C;
-	Fri, 24 Oct 2025 01:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010141E7660;
+	Fri, 24 Oct 2025 01:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ugsVxT2k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S3PnmmlH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D51A1C3F36;
-	Fri, 24 Oct 2025 01:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80471ACED5;
+	Fri, 24 Oct 2025 01:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761268829; cv=none; b=pXMcOniz3A+LGObMzv1pei+WR+ct/37okOQTGpPfEWsH4GiZMBDFJ1ZH1zUOn7UiPUrBMOdhPyiI6QoQqCTHHsJOZ5C58DXIC+sdWcXxqiZGtZAhSB7INPbNa399ObmnAqaFVmTK96Xwkd3NOv6EEIVks4wPzjuBaJ5JAhqTgOo=
+	t=1761268833; cv=none; b=BLDQ2/aS6Ccz9XyMGEY4bW+CIwrb7IDagSoKbtMWruSizvMroOeeexyOamuCghhl4YPWFHWBlDB+RhA7N8KXo2K2lJRr2wntoLT4ZbxQLKJaf16Xx0tJ+ngY5CQ+Ybz9HGadqHHrprC8JWcZOqxDFurIOFLcpljlx8nknIRxfVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761268829; c=relaxed/simple;
-	bh=aARtou9nCbXC3uTPpXL2tm/ef62gFzMMXNs0ouEQbCE=;
+	s=arc-20240116; t=1761268833; c=relaxed/simple;
+	bh=tlDojOMPUzmLOzZJJ/z+jWO/8mkgNeXOeHjTh0VzK5w=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LTeocaNZEtVDUF6HcA2acdMu578CtT+aU2DFEPeSVRpHd/a+gkmDFE+zzDhNGZZNm9ftVuTqRQjnXnMA5KNwf5o/C4g2aW+74UXJid4KPu1GAqWWAQgu2VnmNuuggsI0lYTOcXuSft/zPEapn9E8DqXqj3hbmSR9zz5YLf+Q23Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ugsVxT2k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E22EC4CEFF;
-	Fri, 24 Oct 2025 01:20:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=YQnmixAxhOJMiYTjpKtKxUZ5tFAAHgb55cGU1a14N9S7aCXiB8GGVolyzk21yGax6pGwTO8o0KKA77RAaVA/iAMZ1TBSlCpkT2UI4+obLGIus9w+kGNa2hiKKuw5LPt2BE7VY9gHVtlYB1qj7sZaQSMUidtLVUSJ+tqBptg8jww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S3PnmmlH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BD1DC4CEE7;
+	Fri, 24 Oct 2025 01:20:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761268829;
-	bh=aARtou9nCbXC3uTPpXL2tm/ef62gFzMMXNs0ouEQbCE=;
+	s=k20201202; t=1761268833;
+	bh=tlDojOMPUzmLOzZJJ/z+jWO/8mkgNeXOeHjTh0VzK5w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ugsVxT2kXj1753qRfcMkCY+0nXjbm560Z7NaAnyAX80OJtA471rlfPdPClo8IZgK7
-	 d/YRt+MrCbMwTAJ7vKhwOsj2sxoE5k4JD9zm78kfxSh+XQpA++KJSY2uIsLASVZVjS
-	 hrEODT98yXvclbh6Csme44+Jb2Fums/NU8Ub12YSg9i+fnWC3gVCaCKMncgBWBz4Fi
-	 v0oAcw4Ts8dkKcEeiDW9jNsKuYm/IYu+3C5ihdmtRuhEL0a5mkuoz1FqXXXnVIqm2v
-	 IoH311DNVA4eeKtNvDeM9xskFsp+Ks9eEWfn5McXklvlOezGMG5g/CMMhsa/jMHvKt
-	 6UEf62F23U+og==
+	b=S3PnmmlHUbs3tfjcpuK1BmQJm1dno8xdTWiKUbS8ETYWB/+LH6m41na8VgwmZX+pa
+	 vdlj/f8vxkpvfwFyhCxhPD58MbTWernDuALpHqy+gO2sZDFLYHIy7Y9LoLhFUg+V2z
+	 R9u8sbJlPwqAF78aNctmPRPZOg5o+QF5aZ7ObmwaCZqznW+Xtd0obvMwkI9/r14lLC
+	 Ko6rxWK371W3NFXDg1vpWcDGIB/gM/7kwMS/1CY6NRx8UH5wa7lTYHkHStCZXxlpa4
+	 2Db0EIDJmWKS5C3PFIGpwS/mPM2a5fNWpis51Y1emReUrAlwiVIPaAYCC0uw8a1Alh
+	 eoSs8XqczOpxQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 89DB63809A38;
-	Fri, 24 Oct 2025 01:20:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE21B3809A38;
+	Fri, 24 Oct 2025 01:20:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] virtio-net: drop the multi-buffer XDP packet in
- zerocopy
+Subject: Re: [PATCH net-next v2] net: rmnet: Use section heading markup for
+ packet
+ format subsections
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176126880925.3310205.7564806694016358052.git-patchwork-notify@kernel.org>
-Date: Fri, 24 Oct 2025 01:20:09 +0000
-References: <20251022155630.49272-1-minhquangbui99@gmail.com>
-In-Reply-To: <20251022155630.49272-1-minhquangbui99@gmail.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, eperezma@redhat.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, stable@vger.kernel.org
+ <176126881324.3310205.2043841398135141215.git-patchwork-notify@kernel.org>
+Date: Fri, 24 Oct 2025 01:20:13 +0000
+References: <20251022025456.19004-2-bagasdotme@gmail.com>
+In-Reply-To: <20251022025456.19004-2-bagasdotme@gmail.com>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org, subash.a.kasiviswanathan@oss.qualcomm.com,
+ sean.tranchetti@oss.qualcomm.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 22 Oct 2025 22:56:30 +0700 you wrote:
-> In virtio-net, we have not yet supported multi-buffer XDP packet in
-> zerocopy mode when there is a binding XDP program. However, in that
-> case, when receiving multi-buffer XDP packet, we skip the XDP program
-> and return XDP_PASS. As a result, the packet is passed to normal network
-> stack which is an incorrect behavior (e.g. a XDP program for packet
-> count is installed, multi-buffer XDP packet arrives and does go through
-> XDP program. As a result, the packet count does not increase but the
-> packet is still received from network stack).This commit instead returns
-> XDP_ABORTED in that case.
+On Wed, 22 Oct 2025 09:54:57 +0700 you wrote:
+> Format subsections of "Packet format" section as reST subsections.
+> 
+> Link: https://lore.kernel.org/linux-doc/aO_MefPIlQQrCU3j@horms.kernel.org/
+> Suggested-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> ---
+> Changes since v1 [1]:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] virtio-net: drop the multi-buffer XDP packet in zerocopy
-    https://git.kernel.org/netdev/net/c/1ab665817448
+  - [net-next,v2] net: rmnet: Use section heading markup for packet format subsections
+    https://git.kernel.org/netdev/net-next/c/9ff86092655f
 
 You are awesome, thank you!
 -- 
