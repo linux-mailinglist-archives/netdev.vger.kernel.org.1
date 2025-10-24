@@ -1,192 +1,80 @@
-Return-Path: <netdev+bounces-232405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24921C05629
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 11:41:36 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAD1DC05635
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 11:42:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42D203B25D8
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 09:39:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BD7FB4E1F56
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 09:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14AE30BB98;
-	Fri, 24 Oct 2025 09:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB37430BBB6;
+	Fri, 24 Oct 2025 09:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="TNDLV88d"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="MUbx/8pZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30092308F24;
-	Fri, 24 Oct 2025 09:39:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A04230BF4F
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 09:42:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761298764; cv=none; b=c67qiSl7hXmdIdG63NLBKZgMA+UeMXgVno/mrvAJen/hJcOtZpKlsnMhdqJnFZcVIHkXueNXe18QIWdhuzSvBkt86ThSPTYZtJt2djMKRiFSGc4k8Z6nRmVcTlBdkbvr79Cd1/OD4ygAhQl3uc9GX+7xb8Yt3eMxzbbbleYFQyc=
+	t=1761298969; cv=none; b=Se02Vui3iHxjScxDX3DQDEx7mxsG4yuU8wkpfiLg7WbqeuWJF2td5O7wMQMv0oS/W6Sy82/rFVkzPzAx7LWQ/GKM8nWjue8d0pLx7VyGrv0O7fUuLgCZ1h0RFHDFdGJoyHyYj/AX3jBxhj2qkgXsQWLF4HM607lXsbYdsXvl5XA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761298764; c=relaxed/simple;
-	bh=0RYoFADo1EPuktB0O9d6dPLkdJjpepS5ikmz2890HCw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ly2IirJsps01rJ1EKQbKajUD4szdkBOwOyZoS7qIq2BBOp740QCZ0uxvRAUMH0OwwvAOwQerJdDPy2Ra2a9j2cjL6wlgIkYGqoLac8eIX7W0CXuWNJxtTsjYEMGSDuH8tpgZ9bl1GddmpwPoO7ozdRv4pkQEMOJ+kIPl9J/MLEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=TNDLV88d; arc=none smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59O6FvCf3793347;
-	Fri, 24 Oct 2025 09:39:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:message-id:mime-version:subject:to; s=PPS06212021; bh=JwGjQsJ2w
-	kdo6/actkEfv+tcXoAKIynQ/bX0pzAr1dc=; b=TNDLV88dO4J+4qoqrRxk4gKky
-	etdUE5VQXi4we/w5c+EDD+eUJdDPNPwm4YAiIdAUNEbJFeBwmMEPCdwilXkUU2MN
-	vhxgTxAPVm716aaHPVqMjefLkMzCVHAg4XiifPohSwOu087B+FtvoJV0sUyfo1GF
-	YRN2YgnwA/NEbJuiWdvhKxrCMTKfJRq1fFG1tzjfinNWIe1K2LklRXppLRavuFYg
-	YS2mttoVVDC2VihYCG8XSw7wnVtLigRgnWQ1P29IPhalPYvfKZ5SAQrNPpM/9M7H
-	TfQSJ4BuD4K4CFbPplvrXK0/ayPZ9xMcS3cMF6HlVTclF01xc1nst/8X5STTw==
-Received: from ala-exchng02.corp.ad.wrs.com ([128.224.246.37])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 49wrpxd234-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Fri, 24 Oct 2025 09:39:07 +0000 (GMT)
-Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
- ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.59; Fri, 24 Oct 2025 02:39:04 -0700
-Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
- ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
- 15.1.2507.59 via Frontend Transport; Fri, 24 Oct 2025 02:39:01 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <horms@kernel.org>, <jreuter@yaina.de>,
-        <kuba@kernel.org>, <kuniyu@google.com>, <linux-hams@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
-        <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-        <syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH V3] net: rose: Prevent the use of freed digipeat
-Date: Fri, 24 Oct 2025 17:39:01 +0800
-Message-ID: <20251024093901.1202924-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1761298969; c=relaxed/simple;
+	bh=v6zZ/xFOejo7boXqRMIsAbGB0NF9X4qEXPtYrhfvpSg=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=bVg/4UHcUu1FzPvMBwpk4zIivKs0K6mDmsTXC1OT1uG3DKuUi4kcB5CUeNb2LkCo09l/frYpk2MAdmokRERfHEPukvD15VKh5BOh2CXAOz5/jt3lTc3flub95VWbg5h5wtFea9/J22kWL4jxCDjkC1u7UkE/Dy+SkFhE3GGLRYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=MUbx/8pZ; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1761298958; h=Message-ID:Subject:Date:From:To;
+	bh=8rZN9o6PveF97o8zjC+fmoeterg0twTcX2+0jC1zd80=;
+	b=MUbx/8pZQU/GQuq3CToPtKVsIMlW2MGxBZq4Xg+vz5nURwOPKCRpC01a6MJstGrOXyUjwUXr4D4JEaU1zxzV3JJt8pQmEBU3OnfsS4bLQBLJwsfL4iNsl1N2Er/0nwg4M1xXtadapbGtJ4Mug6XUFOZfTwW3E1Mvd7iFT31u9hU=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Wqu3869_1761298957 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 24 Oct 2025 17:42:37 +0800
+Message-ID: <1761298922.6304543-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net v3 3/3] virtio-net: correct hdr_len handling for tunnel gso
+Date: Fri, 24 Oct 2025 17:42:02 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Alvaro Karsz <alvaro.karsz@solid-run.com>,
+ Heng Qi <hengqi@linux.alibaba.com>,
+ virtualization@lists.linux.dev,
+ netdev@vger.kernel.org
+References: <20251024074130.65580-1-xuanzhuo@linux.alibaba.com>
+ <20251024074130.65580-4-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20251024074130.65580-4-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=b9O/I9Gx c=1 sm=1 tr=0 ts=68fb493b cx=c_pps
- a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=hSkVLCK3AAAA:8 a=t7CeM3EgAAAA:8
- a=gSEv5m7Pi2YCfdlV860A:9 a=cQPPKAXgyycSBL8etih5:22 a=FdTzh2GWekK77mhwV6Dw:22
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: EitY1rHNFda6al5u31pAczI-Va6z52-1
-X-Proofpoint-ORIG-GUID: EitY1rHNFda6al5u31pAczI-Va6z52-1
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI0MDA4NSBTYWx0ZWRfX/NPJeP1CEAzk
- oxSYTL5kESDtVFvYyFPDndPtFeugj11OBkg20Kg2EMiOWio5Pm1pFr07KNq3DhLIESejjdQFun7
- f2IdACeFiNEavcKjHle8w4yffmlRGLvnes8XJ4SICcH0xB2JxVS8RygWfb+H6ZncSwXzyVb5B+g
- 5zdjKnL0B7nSnmyFSb8eeVlXdEXqaUcgQ6xQA5izmEt+lZ1Y7sZDN1POfl3nM3TNzOkioBi951m
- pQhU4yNzXTJ1kQWWUhOnorD4mnxGdZGb25QNKApFGID3JZbfqN59PMpZdcik7PskEo/TJdm6YpK
- AezSBL7GOZy0Vl1nSTr3/vrbhTIZmtuj77sjbHPRzRJowYU4C6xtmWG/ggbNM0Fhbk/G+tDo031
- xJIQsCo/o/nIG3gBz0tDUrkeCAwWFQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-24_01,2025-10-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 clxscore=1015 phishscore=0 priorityscore=1501 malwarescore=0
- spamscore=0 adultscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510240085
 
-There is no synchronization between the two timers, rose_t0timer_expiry
-and rose_timer_expiry.
-rose_timer_expiry() puts the neighbor when the rose state is ROSE_STATE_2.
-However, rose_t0timer_expiry() does initiate a restart request on the
-neighbor.
-When rose_t0timer_expiry() accesses the released neighbor member digipeat,
-a UAF is triggered.
+Test:
 
-To avoid this UAF, defer the put operation to rose_t0timer_expiry() and
-stop restarting t0timer after putting the neighbor.
+ I observed that the "hdr_len" is 116 for this packet:
 
-When putting the neighbor, set the neighbor to NULL. Setting neighbor to
-NULL prevents rose_t0timer_expiry() from restarting t0timer.
+        17:36:18.241105 52:55:00:d1:27:0a > 2e:2c:df:46:a9:e1, ethertype IPv4 (0x0800), length 2912: (tos 0x0, ttl 64, id 45197, offset 0, flags [none], proto UDP (17), length 2898)
+            192.168.122.100.50613 > 192.168.122.1.4789: [bad udp cksum 0x8106 -> 0x26a0!] VXLAN, flags [I] (0x08), vni 1
+        fa:c3:ba:82:05:ee > ce:85:0c:31:77:e5, ethertype IPv4 (0x0800), length 2862: (tos 0x0, ttl 64, id 14678, offset 0, flags [DF], proto TCP (6), length 2848)
+            192.168.3.1.49880 > 192.168.3.2.9898: Flags [P.], cksum 0x9266 (incorrect -> 0xaa20), seq 515667:518463, ack 1, win 64, options [nop,nop,TS val 2990048824 ecr 2798801412], length 2796
 
-syzbot reported a slab-use-after-free Read in ax25_find_cb.
-BUG: KASAN: slab-use-after-free in ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
-Read of size 1 at addr ffff888059c704c0 by task syz.6.2733/17200
-Call Trace:
- ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
- ax25_send_frame+0x157/0xb60 net/ax25/ax25_out.c:55
- rose_send_frame+0xcc/0x2c0 net/rose/rose_link.c:106
- rose_transmit_restart_request+0x1b8/0x240 net/rose/rose_link.c:198
- rose_t0timer_expiry+0x1d/0x150 net/rose/rose_link.c:83
-
-Freed by task 17183:
- kfree+0x2b8/0x6d0 mm/slub.c:6826
- rose_neigh_put include/net/rose.h:165 [inline]
- rose_timer_expiry+0x537/0x630 net/rose/rose_timer.c:183
-
-Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_t")
-Reported-by: syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
----
-V1 -> V2: Putting the neighbor stops t0timer from automatically starting
-V2 -> V3: add rose_neigh_putex for set rose neigh to NULL
-
- include/net/rose.h   | 12 ++++++++++++
- net/rose/rose_link.c |  5 +++++
- 2 files changed, 17 insertions(+)
-
-diff --git a/include/net/rose.h b/include/net/rose.h
-index 2b5491bbf39a..33de310ba778 100644
---- a/include/net/rose.h
-+++ b/include/net/rose.h
-@@ -167,6 +167,18 @@ static inline void rose_neigh_put(struct rose_neigh *rose_neigh)
- 	}
- }
- 
-+static inline void rose_neigh_putex(struct rose_neigh **roseneigh)
-+{
-+	struct rose_neigh *rose_neigh = *roseneigh;
-+	if (refcount_dec_and_test(&rose_neigh->use)) {
-+		if (rose_neigh->ax25)
-+			ax25_cb_put(rose_neigh->ax25);
-+		kfree(rose_neigh->digipeat);
-+		kfree(rose_neigh);
-+		*roseneigh = NULL;
-+	}
-+}
-+
- /* af_rose.c */
- extern ax25_address rose_callsign;
- extern int  sysctl_rose_restart_request_timeout;
-diff --git a/net/rose/rose_link.c b/net/rose/rose_link.c
-index 7746229fdc8c..334c8cc0876d 100644
---- a/net/rose/rose_link.c
-+++ b/net/rose/rose_link.c
-@@ -43,6 +43,9 @@ void rose_start_ftimer(struct rose_neigh *neigh)
- 
- static void rose_start_t0timer(struct rose_neigh *neigh)
- {
-+	if (!neigh)
-+		return;
-+
- 	timer_delete(&neigh->t0timer);
- 
- 	neigh->t0timer.function = rose_t0timer_expiry;
-@@ -80,10 +83,12 @@ static void rose_t0timer_expiry(struct timer_list *t)
- {
- 	struct rose_neigh *neigh = timer_container_of(neigh, t, t0timer);
- 
-+	rose_neigh_hold(neigh);
- 	rose_transmit_restart_request(neigh);
- 
- 	neigh->dce_mode = 0;
- 
-+	rose_neigh_putex(&neigh);
- 	rose_start_t0timer(neigh);
- }
- 
--- 
-2.43.0
+    116 = 14(mac) + 20(ip) + 8(udp) + 8(vxlan) + 14(inner mac) + 20(inner ip) + 32(innner tcp)
 
 
