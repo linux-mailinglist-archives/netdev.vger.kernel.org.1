@@ -1,328 +1,236 @@
-Return-Path: <netdev+bounces-232346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55280C045B4
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 07:00:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1387FC04648
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 07:29:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E576C18C279C
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 05:00:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3C171A07715
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 05:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D98C71ACED5;
-	Fri, 24 Oct 2025 05:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AB7422259F;
+	Fri, 24 Oct 2025 05:29:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Rb4IEWbR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nyPRLprx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39CAC8FE;
-	Fri, 24 Oct 2025 05:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4AAF1FC3
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 05:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761282021; cv=none; b=BmOFi31zL0OAt7OpofwaVBCXDpCv540piTEqatRMH5QdsoNTZKD/x+SyWz9E9MDSBfK6WW7DM5lCgls0S9nmAI7PzhmM061DeKyQ0l8kWfWtpc3NkZ5mqtqBnlxagL2qZwgakrJvep84B3fYfBPGSNgE80ltjQwFuABV4YF/CFs=
+	t=1761283755; cv=none; b=NTjuDh5dIbEkpFnHM5LO+UE/XaysBFUXXfn5bAGQ/W/bXzZMw2l8V3cYAazIiA90C4c8poqDcxov+0hUqQuezasBexx1lhUZcdBO+NT27u1VxRDOoR1Abdo3nWLJzjiZJGTrZP0fXFw89vIG5eH0rH/A/szWJDGkb/UzVIhJYw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761282021; c=relaxed/simple;
-	bh=J2AVCqJTAGqKJVL2P67f2NzX7cPdI9hNGd+bFU6Ilnc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dDniYlMYfqO11KEYCIfDFH2/CKnSoLbHMrj/A+1mDyO4yRxcWvmCyKbk6irMtx1Dr7h6gDAXRTooBbV1eGWBX/Nc7AxcTLjT/i4yOnCF2kIzSqTbuklbW5CPCcGbIbKb5Nr8T+s/GtIIY9XmCVTmKQZQ+DXHjcguaiGvfgtR5pU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Rb4IEWbR; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59O3D1tU023013;
-	Thu, 23 Oct 2025 21:49:27 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=Vm+8XCT0Gg/06ESrA5UFQL6
-	vNcgQ1Buv1tUTm/7yCkA=; b=Rb4IEWbRnk1zUl/NSHMHUmEU3U0tFiFsjcNRhRJ
-	ItEVbF6EmVddxgVnjNtVBcaLjAs0Az1jXTrPOm83pPrWZF2Pz1oXrtWcGIvHObxq
-	ze9UeJPnJgijhoUbj04HwQq+SJec2EVPrk5BJVHjIO4JuqFrT+xjrxNKeHZbc3i1
-	LcRYP2ji3XggZ98UsnbE+HqEBz/BIHSBxNjGyj4N5JjHdyCL+6W4Nl7DyrJLWKG/
-	xw7zWfqvsxVrAso9XNcyUrBhLo47UkNM3YXJgw4YQBxZzfUkP0AqZ88yYqZL0Wsn
-	onik/oZHodZKif20jSjqzLko7V0Ji4V3XMblbCznLSkVtBw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 49yx2j0fq4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Oct 2025 21:49:26 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 23 Oct 2025 21:49:36 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Thu, 23 Oct 2025 21:49:36 -0700
-Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with ESMTP id C1BF53F7068;
-	Thu, 23 Oct 2025 21:49:20 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Hariprasad Kelam <hkelam@marvell.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sunil Goutham
-	<sgoutham@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>,
-        "Subbaraya
- Sundeep" <sbhatta@marvell.com>,
-        Bharat Bhushan <bbhushan2@marvell.com>,
-        "Andrew Lunn" <andrew+netdev@lunn.ch>,
-        Kory Maincent
-	<kory.maincent@bootlin.com>,
-        "Gal Pressman" <gal@nvidia.com>, Jianbo Liu
-	<jianbol@nvidia.com>,
-        Edward Cree <ecree.xilinx@gmail.com>,
-        Breno Leitao
-	<leitao@debian.org>
-Subject: [RFC net-next] net: loopback: Extend netdev features with new loopback modes
-Date: Fri, 24 Oct 2025 10:18:48 +0530
-Message-ID: <20251024044849.1098222-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1761283755; c=relaxed/simple;
+	bh=EGW2YTt66cTLaTBmMO6v6OzfTWN87FdVhhJX9e3jrpo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uD+HRZ9hY0MctXtEk0H0BM59h/OilofCLTT51m350+BODk926ttynZoEojMJaY6C0ggDDcCEw/xCIJh+8yvw7/CBqyxlIKpcrYsJ3YdFOLJJtMMm5NB5/e+iSeIFXiNExL4sAge7snkIe38dIgQSS8++/W9tgj6o7x1JOenM+iA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nyPRLprx; arc=none smtp.client-ip=74.125.224.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-63d8788b18dso1881944d50.2
+        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 22:29:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761283752; x=1761888552; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jtU3Y24Ljw4UIWB6yN2r0XFxelbsz8H3TFrkQC4xpO4=;
+        b=nyPRLprxnTIl86MAoKWGrCioJbdCM3qhG+ylKpUySZ38nlitN8JZwCW5ZH/L5db+RY
+         bVeRaAtfPWBlOA1svVByurzavjP8BKSfU7EJLv7ROAtbpe6QzgtvVaJR8bTjubjUlBOe
+         q3pB6yxxpIXNkV71dklHaCF0ess2gfowlA1hu0zBTYAR9u0J7xg+WXczIDO4XeqPB34w
+         kF8+EPOIzHAtNbPnhLfp+7OS5skD+VX8TT92p9Yu0mj/YS7L8mY8ONnRZnvvUWAeJpE8
+         DwKDTcqq9kyRjnI5ZVbo8EZ3QR34AkoHR793uFm91NQbZwXixvvgr3zmcIKXYA45YI6y
+         icAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761283752; x=1761888552;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jtU3Y24Ljw4UIWB6yN2r0XFxelbsz8H3TFrkQC4xpO4=;
+        b=fQ2PxjbRg0uNwoSGt6oY3BH4e0NMHemQ/jMmPn/oy5Ht8JVVM8uoJnmzIBjn8aaG/D
+         Ut5HaSD32bcnjZbeyqmtpwchNDOsjhvQNiE5fSLb/Aa+BlhSQ5N1QYMx6Yn3Twv/YAbY
+         4L8XMxlLXa9P6AgIlOf6t6pfAXyK+YbXq+7B2nRqBy9FMtkDYXxcCf2x9LeHwi3TljCO
+         oPrY1BRqUgQGa1UVbns14PhrrVZDNd6k54djftA7gqf1HBt4Lh6lq8QVCYdoIYX92MaI
+         BbEogBiw+jia+h0TP/QPF/ftWKhiuQK/VHoJwcauJObjCRw2cK5aLsr9marOCp/cQH/2
+         2Kxg==
+X-Forwarded-Encrypted: i=1; AJvYcCVmRLWQVxzgczCZsxIhErk5xlmNa9o1PRbjMAV4wNlz5Vvz0GXdmkmHZrJLe0++RuGSkx9bwm8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxYGytTTCIgSxS0tAQBslNuoJr9ENnhAvO6M79mvjYwT9cjaEx
+	OFjT0Ve8TzdisgHndhls9kspJxqsR8d8hAP8AemWP82f0I/cSdlk1hpPu3JEJ09LY90kjbR/5c3
+	E4FUe4/LbiKwiKpBbHBEiN1SRP2/njVJ8Wfbndvqq
+X-Gm-Gg: ASbGncs890yrvv6rOz+EolY7AQ9iaufVW+uIyJxbG70mvrdL1dwwH5oDrsEs5LEINCt
+	Z0Pugv8zafrtvIG4N8pETBoyYSxMwJQZ92GZxo0VRHbrE2FnKlIcROUcbUf+mp3iE8HdQB0DNxL
+	0eEZBvCfJdjVzytZOU0zD7nmUI7xtOEUUsGU8Bsm/D5X0m0Vj6jQxgqkvRMiC9F4Ph9ErOWq/3v
+	12Rtgmv+mNVNBytbbIInmLpYhPEcHLYvxvNpv9nAeToxGVIgqI0NbAfZuQyURXA4yutDgU=
+X-Google-Smtp-Source: AGHT+IGEtUrnHJPNh804jqx8cdPFtGHdpuYk90QslCcAvUKwaCYlql8lwi2/KgzteDZ/Dr1mznYWsyOWdHPAiD6aOts=
+X-Received: by 2002:a05:690e:11ce:b0:63e:2809:354c with SMTP id
+ 956f58d0204a3-63e2809357dmr17541566d50.61.1761283752275; Thu, 23 Oct 2025
+ 22:29:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIzMDIxNCBTYWx0ZWRfX6OTRG3Z2hmq/
- UXHgTV5mhQ8hbrangT0m8VWHGzwSJLK1qCT4hS4LdfrfMdS5yy4voqUpDP8RgJzJXLbOb32N4JC
- vbvJ79s9cjm4sC0KsmVpEUMAZ6Ff7f7FGcEFy30BJOLmkgAUU99n7TtuWZJiXaI6DGFZIlnb3uG
- XRx7AHstZLb+VKSgNM6hr9YGoPSV6WAHTsNv5XiYYcO5FeF/74MR8Enp7pgHWUcKE7XDezfH9fX
- arFToolmBo2MW4YpEu0jnOlTGv8Ou3fsX99+aHAZd0IFeqnxCj8/njpJPPU8Xgg3xK2BMZzQABy
- Ln124W+u+YtEog2OHDOr3Dr5zqq+wxIQHhPVHoQWUZFReAfqtoTfoIgZyJh4+myXJv+1zyRJFz1
- 2oNZiuOzrBFPnU3pFzcl1EAZJtBtzg==
-X-Proofpoint-GUID: F01pi-IkULeLM6k17YFshUrWhpX2rKx-
-X-Proofpoint-ORIG-GUID: F01pi-IkULeLM6k17YFshUrWhpX2rKx-
-X-Authority-Analysis: v=2.4 cv=Rs7I7SmK c=1 sm=1 tr=0 ts=68fb0556 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=rHH5SKvytUcD9PMnC3QA:9 a=OBjm3rFKGHvpk9ecZwUJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-23_03,2025-10-22_01,2025-03-28_01
+References: <CA+suKw5OhWLJe_7uth4q=qxVpsD4qpwGRENORwA=beNLpiDuwg@mail.gmail.com>
+ <CADVnQy=Bm2oNE7Ra7aiA2AQGcMUPjHcmhvQsp+ubvncU2YeN2A@mail.gmail.com> <bcff860e-749b-4911-9eba-41b47c00c305@arista.com>
+In-Reply-To: <bcff860e-749b-4911-9eba-41b47c00c305@arista.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 23 Oct 2025 22:29:01 -0700
+X-Gm-Features: AWmQ_bmo0xU0IlinU9NmBUCchlhM_NBOi14wTFghmp4M_7C7ZIwYFVEJ4jPdfjg
+Message-ID: <CANn89iKRXpKkCzRw_7+VyG6jD2Tm5VUPQ-0bhQKUwh2sgzJZuA@mail.gmail.com>
+Subject: Re: TCP sender stuck despite receiving ACKs from the peer
+To: Christoph Schwarz <cschwarz@arista.com>
+Cc: Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This patch enhances loopback support by exposing new loopback modes
-(e.g., MAC, SERDES) to userspace. These new modes are added extension
-to the existing netdev features.
+On Thu, Oct 23, 2025 at 3:52=E2=80=AFPM Christoph Schwarz <cschwarz@arista.=
+com> wrote:
+>
+> On 10/3/25 18:24, Neal Cardwell wrote:
+> [...]
+> > Thanks for the report!
+> >
+> > A few thoughts:
+> >
+> [...]
+> >
+> > (2) After that, would it be possible to try this test with a newer
+> > kernel? You mentioned this is with kernel version 5.10.165, but that's
+> > more than 2.5 years old at this point, and it's possible the bug has
+> > been fixed since then.  Could you please try this test with the newest
+> > kernel that is available in your distribution? (If you are forced to
+> > use 5.10.x on your distribution, note that even with 5.10.x there is
+> > v5.10.245, which was released yesterday.)
+> >
+> > (3) If this bug is still reproducible with a recent kernel, would it
+> > be possible to gather .pcap traces from both client and server,
+> > including SYN and SYN/ACK? Sometimes it can be helpful to see the
+> > perspective of both ends, especially if there are middleboxes
+> > manipulating the packets in some way.
+> >
+> > Thanks!
+> >
+> > Best regards,
+> > neal
+>
+> Hi,
+>
+> I want to give an update as we made some progress.
+>
+> We tried with the 6.12.40 kernel, but it was much harder to reproduce
+> and we were not able to do a successful packet capture and reproduction
+> at the same time. So we went back to 5.10.165, added more tracing and
+> eventually figured out how the TCP connection got into the bad state.
+>
+> This is a backtrace from the TCP stack calling down to the device driver:
+>   =3D> fdev_tx    // ndo_start_xmit hook of a proprietary device driver
+>   =3D> dev_hard_start_xmit
+>   =3D> sch_direct_xmit
+>   =3D> __qdisc_run
+>   =3D> __dev_queue_xmit
+>   =3D> vlan_dev_hard_start_xmit
+>   =3D> dev_hard_start_xmit
+>   =3D> __dev_queue_xmit
+>   =3D> ip_finish_output2
+>   =3D> __ip_queue_xmit
+>   =3D> __tcp_transmit_skb
+>   =3D> tcp_write_xmit
+>
+> tcp_write_xmit sends segments of 65160 bytes. Due to an MSS of 1448,
+> they get broken down into 45 packets of 1448 bytes each.
 
-This allows users to select the loopback at specific layer.
+So the driver does not support TSO ? Quite odd in 2025...
 
-Below are new modes added:
+One thing you want is to make sure your vlan device (the one without a
+Qdisc on it)
+advertizes tso support.
 
-MAC near end loopback
+ethtool -k vlan0
 
-MAC far end loopback
 
-SERDES loopback
+> These 45
+> packets eventually reach dev_hard_start_xmit, which is a simple loop
+> forwarding packets one by one. When the problem occurs, we see that
+> dev_hard_start_xmit transmits the initial N packets successfully, but
+> the remaining 45-N ones fail with error code 1. The loop runs to
+> completion and does not break.
+>
+> The error code 1 from dev_hard_start_xmit gets returned through the call
+> stack up to tcp_write_xmit, which treats this as error and breaks its
+> own loop without advancing snd_nxt:
+>
+>                 if (unlikely(tcp_transmit_skb(sk, skb, 1, gfp)))
+>                         break; // <<< breaks here
+>
+> repair:
+>                 /* Advance the send_head.  This one is sent out.
+>                  * This call will increment packets_out.
+>                  */
+>                 tcp_event_new_data_sent(sk, skb);
+>
+>  From packet captures we can prove that the 45 packets show up on the
+> kernel device on the sender. In addition, the first N of those 45
+> packets show up on the kernel device on the peer. The connection is now
+> in the problem state where the peer is N packets ahead of the sender and
+> the sender thinks that it never those packets, leading to the problem as
+> described in my initial mail.
+>
+> Furthermore, we noticed that the N-45 missing packets show up as drops
+> on the sender's kernel device:
+>
+> vlan0: flags=3D4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+>          inet 127.2.0.1  netmask 255.255.255.0  broadcast 0.0.0.0
+>          [...]
+>          TX errors 0  dropped 36 overruns 0  carrier 0  collisions 0
+>
+> This device is a vlan device stacked on another device like this:
+>
+> 49: vlan0@parent: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc
+> noqueue state UP mode DEFAULT group default qlen 1000
+>      link/ether 02:1c:a7:00:00:01 brd ff:ff:ff:ff:ff:ff
+> 3: parent: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 10000 qdisc prio state
+> UNKNOWN mode DEFAULT group default qlen 1000
+>      link/ether xx:xx:xx:xx:xx:xx brd ff:ff:ff:ff:ff:ff
+>
+> Eventually packets need to go through the device driver, which has only
+> a limited number of TX buffers. The driver implements flow control: when
+> it is about to exhaust its buffers, it stops TX by calling
+> netif_stop_queue. Once more buffers become available again, it resumes
+> TX by calling netif_wake_queue. From packet counters we can tell that
+> this is happening frequently.
+>
+> At this point we suspected "qdisc noqueue" to be a factor, and indeed,
+> after adding a queue to vlan0 the problem no longer happened, although
+> there are still TX drops on the vlan0 device.
+>
+> Missing queue or not, we think there is a disconnect between the device
+> driver API and the TCP stack. The device driver API only allows
+> transmitting packets one by one (ndo_start_xmit). The TCP stack operates
+> on larger segments that is breaks down into smaller pieces
+> (tcp_write_xmit / __tcp_transmit_skb). This can lead to a classic "short
+> write" condition which the network stack doesn't seem to handle well in
+> all cases.
+>
+> Appreciate you comments,
 
-Depending on the feedback will submit ethtool changes.
+Very nice analysis, very much appreciated.
 
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
----
- Documentation/networking/netdev-features.rst  | 15 +++
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 93 ++++++++++++++++++-
- include/linux/netdev_features.h               |  9 +-
- net/ethtool/common.c                          |  3 +
- 4 files changed, 116 insertions(+), 4 deletions(-)
+I think the issue here is that __tcp_transmit_skb() trusts the return
+of icsk->icsk_af_ops->queue_xmit()
 
-diff --git a/Documentation/networking/netdev-features.rst b/Documentation/networking/netdev-features.rst
-index 02bd7536fc0c..dcad5e875f32 100644
---- a/Documentation/networking/netdev-features.rst
-+++ b/Documentation/networking/netdev-features.rst
-@@ -193,3 +193,18 @@ frames in hardware.
- 
- This should be set for devices which support netmem TX. See
- Documentation/networking/netmem.rst
-+
-+* mac-nearend-loopback
-+
-+This requests that the NIC enables MAC nearend loopback i.e egress traffic is
-+routed back to ingress traffic.
-+
-+* mac-farend-loopback
-+
-+This requests that the NIC enables MAC farend loopback i.e ingress traffic is
-+routed back to egress traffic.
-+
-+
-+* serdes-loopback
-+
-+This request that the NIC enables SERDES near end digital loopback.
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index e808995703cf..14be6a9206c8 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -1316,6 +1316,84 @@ static int otx2_cgx_config_loopback(struct otx2_nic *pf, bool enable)
- 	return err;
- }
- 
-+static int otx2_cgx_mac_nearend_loopback(struct otx2_nic *pf, bool enable)
-+{
-+	struct msg_req *msg;
-+	int err;
-+
-+	if (enable && !bitmap_empty(pf->flow_cfg->dmacflt_bmap,
-+				    pf->flow_cfg->dmacflt_max_flows))
-+		netdev_warn(pf->netdev,
-+			    "CGX/RPM nearend loopback might not work as DMAC filters are active\n");
-+
-+	mutex_lock(&pf->mbox.lock);
-+	if (enable)
-+		msg = otx2_mbox_alloc_msg_cgx_intlbk_enable(&pf->mbox);
-+	else
-+		msg = otx2_mbox_alloc_msg_cgx_intlbk_disable(&pf->mbox);
-+
-+	if (!msg) {
-+		mutex_unlock(&pf->mbox.lock);
-+		return -ENOMEM;
-+	}
-+
-+	err = otx2_sync_mbox_msg(&pf->mbox);
-+	mutex_unlock(&pf->mbox.lock);
-+	return err;
-+}
-+
-+static int otx2_cgx_mac_farend_loopback(struct otx2_nic *pf, bool enable)
-+{
-+	struct msg_req *msg;
-+	int err;
-+
-+	if (enable && !bitmap_empty(pf->flow_cfg->dmacflt_bmap,
-+				    pf->flow_cfg->dmacflt_max_flows))
-+		netdev_warn(pf->netdev,
-+			    "CGX/RPM farend loopback might not work as DMAC filters are active\n");
-+
-+	mutex_lock(&pf->mbox.lock);
-+	if (enable)
-+		msg = otx2_mbox_alloc_msg_cgx_intlbk_enable(&pf->mbox);
-+	else
-+		msg = otx2_mbox_alloc_msg_cgx_intlbk_disable(&pf->mbox);
-+
-+	if (!msg) {
-+		mutex_unlock(&pf->mbox.lock);
-+		return -ENOMEM;
-+	}
-+
-+	err = otx2_sync_mbox_msg(&pf->mbox);
-+	mutex_unlock(&pf->mbox.lock);
-+	return err;
-+}
-+
-+static int otx2_cgx_serdes_loopback(struct otx2_nic *pf, bool enable)
-+{
-+	struct msg_req *msg;
-+	int err;
-+
-+	if (enable && !bitmap_empty(pf->flow_cfg->dmacflt_bmap,
-+				    pf->flow_cfg->dmacflt_max_flows))
-+		netdev_warn(pf->netdev,
-+			    "CGX/RPM serdes loopback might not work as DMAC filters are active\n");
-+
-+	mutex_lock(&pf->mbox.lock);
-+	if (enable)
-+		msg = otx2_mbox_alloc_msg_cgx_intlbk_enable(&pf->mbox);
-+	else
-+		msg = otx2_mbox_alloc_msg_cgx_intlbk_disable(&pf->mbox);
-+
-+	if (!msg) {
-+		mutex_unlock(&pf->mbox.lock);
-+		return -ENOMEM;
-+	}
-+
-+	err = otx2_sync_mbox_msg(&pf->mbox);
-+	mutex_unlock(&pf->mbox.lock);
-+	return err;
-+}
-+
- int otx2_set_real_num_queues(struct net_device *netdev,
- 			     int tx_queues, int rx_queues)
- {
-@@ -2363,6 +2441,18 @@ static int otx2_set_features(struct net_device *netdev,
- 		return cn10k_ipsec_ethtool_init(netdev,
- 						features & NETIF_F_HW_ESP);
- 
-+	if ((changed & NETIF_F_MAC_LBK_NE) && netif_running(netdev))
-+		return otx2_cgx_mac_nearend_loopback(pf,
-+						     features & NETIF_F_MAC_LBK_NE);
-+
-+	if ((changed & NETIF_F_MAC_LBK_FE) && netif_running(netdev))
-+		return otx2_cgx_mac_farend_loopback(pf,
-+						    features & NETIF_F_MAC_LBK_FE);
-+
-+	if ((changed & NETIF_F_SERDES_LBK) && netif_running(netdev))
-+		return otx2_cgx_serdes_loopback(pf,
-+						features & NETIF_F_SERDES_LBK);
-+
- 	return otx2_handle_ntuple_tc_features(netdev, features);
- }
- 
-@@ -3249,7 +3339,8 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	if (pf->flags & OTX2_FLAG_TC_FLOWER_SUPPORT)
- 		netdev->hw_features |= NETIF_F_HW_TC;
- 
--	netdev->hw_features |= NETIF_F_LOOPBACK | NETIF_F_RXALL;
-+	netdev->hw_features |= NETIF_F_LOOPBACK | NETIF_F_RXALL |
-+			       NETIF_F_MAC_LBK_NE | NETIF_F_MAC_LBK_FE | NETIF_F_SERDES_LBK;
- 
- 	netif_set_tso_max_segs(netdev, OTX2_MAX_GSO_SEGS);
- 	netdev->watchdog_timeo = OTX2_TX_TIMEOUT;
-diff --git a/include/linux/netdev_features.h b/include/linux/netdev_features.h
-index 93e4da7046a1..124f83223361 100644
---- a/include/linux/netdev_features.h
-+++ b/include/linux/netdev_features.h
-@@ -14,7 +14,7 @@ typedef u64 netdev_features_t;
- enum {
- 	NETIF_F_SG_BIT,			/* Scatter/gather IO. */
- 	NETIF_F_IP_CSUM_BIT,		/* Can checksum TCP/UDP over IPv4. */
--	__UNUSED_NETIF_F_1,
-+	NETIF_F_MAC_LBK_NE_BIT,		/* MAC near end loopback */
- 	NETIF_F_HW_CSUM_BIT,		/* Can checksum all the packets. */
- 	NETIF_F_IPV6_CSUM_BIT,		/* Can checksum TCP/UDP over IPV6 */
- 	NETIF_F_HIGHDMA_BIT,		/* Can DMA to high memory. */
-@@ -24,8 +24,8 @@ enum {
- 	NETIF_F_HW_VLAN_CTAG_FILTER_BIT,/* Receive filtering on VLAN CTAGs */
- 	NETIF_F_VLAN_CHALLENGED_BIT,	/* Device cannot handle VLAN packets */
- 	NETIF_F_GSO_BIT,		/* Enable software GSO. */
--	__UNUSED_NETIF_F_12,
--	__UNUSED_NETIF_F_13,
-+	NETIF_F_MAC_LBK_FE_BIT,		/* MAC far end loopback */
-+	NETIF_F_SERDES_LBK_BIT,		/* SERDES loopback */
- 	NETIF_F_GRO_BIT,		/* Generic receive offload */
- 	NETIF_F_LRO_BIT,		/* large receive offload */
- 
-@@ -165,6 +165,9 @@ enum {
- #define NETIF_F_HW_HSR_TAG_RM	__NETIF_F(HW_HSR_TAG_RM)
- #define NETIF_F_HW_HSR_FWD	__NETIF_F(HW_HSR_FWD)
- #define NETIF_F_HW_HSR_DUP	__NETIF_F(HW_HSR_DUP)
-+#define NETIF_F_MAC_LBK_NE	__NETIF_F(MAC_LBK_NE)
-+#define NETIF_F_MAC_LBK_FE	__NETIF_F(MAC_LBK_FE)
-+#define NETIF_F_SERDES_LBK	__NETIF_F(SERDES_LBK)
- 
- /* Finds the next feature with the highest number of the range of start-1 till 0.
-  */
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index 55223ebc2a7e..4a6a400a7c69 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -77,6 +77,9 @@ const char netdev_features_strings[NETDEV_FEATURE_COUNT][ETH_GSTRING_LEN] = {
- 	[NETIF_F_HW_HSR_TAG_RM_BIT] =	 "hsr-tag-rm-offload",
- 	[NETIF_F_HW_HSR_FWD_BIT] =	 "hsr-fwd-offload",
- 	[NETIF_F_HW_HSR_DUP_BIT] =	 "hsr-dup-offload",
-+	[NETIF_F_MAC_LBK_NE_BIT] =	 "mac-nearend-loopback",
-+	[NETIF_F_MAC_LBK_FE_BIT] =	 "mac-farend-loopback",
-+	[NETIF_F_SERDES_LBK_BIT] =	 "serdes-loopback",
- };
- 
- const char
--- 
-2.34.1
+An error means : the packet was _not_ sent at all.
 
+Here, it seems that the GSO layer returns an error, even if some
+segments were sent.
+This needs to be confirmed and fixed, but in the meantime, make sure
+vlan0 has TSO support.
+It will also be more efficient to segment (if you ethernet device has
+no TSO capability) at the last moment,
+because all the segments will be sent in  the described scenario
+thanks to qdisc requeues.
 
