@@ -1,111 +1,85 @@
-Return-Path: <netdev+bounces-232336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36A1CC04271
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 04:41:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 264D4C041D8
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 04:29:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 79A344EF8BE
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 02:41:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9F433A55ED
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 02:29:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48BF264602;
-	Fri, 24 Oct 2025 02:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bHByPPrG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4C223F41A;
+	Fri, 24 Oct 2025 02:29:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6BC263F22
-	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 02:41:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F21392288CB;
+	Fri, 24 Oct 2025 02:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761273673; cv=none; b=AAefBFMgj/z7Bz1/3gl0kOTUbCtEKfkCHfK0vCKab6v4oi1oT4sYcB4JfEHa9bRxtgjPZc4tPGWl2j7qRO3nNLhG1NjSXtspOCIAOAYZvf/MTjx8PO2FJqjMfSKBeGsyv2o/pgaY7ni1RwO5hNBkgkobAXE7yj8XcX2CTOGnDLU=
+	t=1761272955; cv=none; b=ED2E/l/nsDj4EwePjES/HEFyGbqzq/46dxP/OjHFTis5A9fxzpifSi5QWGf5rP8TsAGZ0asvKo6PuM2mOtiaWz2yOIKO19VMuNhBAFYU1MAOgUi/i9IFM4pSVqnp3XmZIYYXsk40V6qhbCq16/ol7BjNCPVq2Y/YDVJHxfpbDjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761273673; c=relaxed/simple;
-	bh=95YboF54tH5QUvRm/hmBFW/Owf76+Rdb3bIAoi1mBHM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NyD7sWPjCEmD2nWpE84zyuDrrkwcWOv6nJO2WuQa9n+7CuFrrge3fYMQpWFzZSmFPu++uV5LmEZZZt5wdSu8yayVQ9QawcUaILWq7AqW9dERCzhroNACWMvKhPZrzPkpu3qHNAY0YCNo6acMlggtSycQhlxp7+3tGo5leEs3FRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bHByPPrG; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-587bdad8919so3804e87.0
-        for <netdev@vger.kernel.org>; Thu, 23 Oct 2025 19:41:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761273670; x=1761878470; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=95YboF54tH5QUvRm/hmBFW/Owf76+Rdb3bIAoi1mBHM=;
-        b=bHByPPrGVGNBME39NDM7DzYyInHKZXSuEAyai2sNjnzjwkpIIOdFRCV1Ebk8A84KmP
-         SLL092XajniNYsvQyYuA9YG1WfLlRKdJ030SJxNkglLdKLGSRg4I3dQa3E73VM4oH2tn
-         ZpH4i58woKnrE0XUORt/v699GbpXbwtaPNNFgWKCSHm5AJ3d71NB8GSeJrjDSEYExhBZ
-         DUgExMs/bBrdORmY2cFdqgPZpacZvOcoDPsqibdJBv96kmzipEkIbtxY+a7G8N33zQsI
-         8PhTz9UMktbo5eHaA9py+2X5UQJV3ojyicO9Qsjh917iAh3pDiUVa3wWQVOVgVrfvunY
-         qo2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761273670; x=1761878470;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=95YboF54tH5QUvRm/hmBFW/Owf76+Rdb3bIAoi1mBHM=;
-        b=T04RvIRAC7naplJuIDb1AHepUa76ibSi+QoF+K2S/5dZ03zn+N8RoR4nrnf0dwIlV0
-         TyFwr/fIZhjfgvneFItOuY6K2iIQ04Uro8MK0a5B+mfDzEPIeZwfnv0yOVxKBTzsQ0Vz
-         Pxg1PPk7n2PNxRCBhckQb7vnwmQSV1kjhN4PBgDa0gmOvpQYooKLE+CHU/HaYM1kLl0g
-         0Jw0HqMUq7slGpsYINVmhiK9iaJvYZSJLGaJWZxKVkij0hqZ8S+TLL6mlpPXFk1CBy97
-         EMo3ZVSygkT3MATWz6Do0FpDT0PPio9jaJEXgYeSIMx1rc0Y6EgXVLzqaVwLGxVK+hkM
-         x+og==
-X-Forwarded-Encrypted: i=1; AJvYcCW+ysEpN8R5zfkvWnVxkZWgXBmmeR6piZLBZHui6tdrjJ+5ECZGXt7G/hylzfdI7mdASVE+Z8M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyY/k0H6GY5FpbF/FbVDswU7RFZ/Ntgwe1EbyU+Nu/LnUumMocM
-	PxWS7fL2JVzouRRykQ2XxwSpcDPvx12LXRKGpVI1NMQz9hD4WBwVJZLo/7UvLcAR9AuCpBxn9/x
-	KTx7CPLT4zVT3VeIjdOxv7BImo9Up1awOSudZiMkE
-X-Gm-Gg: ASbGncuZ7z6TOy5Z/jozLYh06rzYy2LA2N1z2M9rHuRLolTnH+J70cqJEpQzX0iYK8N
-	jpIl2Opit6QeYCAyY7wUkku77ZTCVFj2Y5x1WDXdj14+XDk+rAUnTlvGLIvwGgbCgcVH6VXpiya
-	4Puw36JaCzGYJEYst6C7Xpl1d5b3i9GWI5DvvL4qJ5882ExLAELVyN7QTrYxxL2Jw82kLmMCuq+
-	6LVhRqB8xDYiya7h8ug2CwndCYecynEi2XxawStdUr9jATla4ueQUAdlvqa
-X-Google-Smtp-Source: AGHT+IHjqFgIWuDm7vTLkbQJe6dPh2ExN1tguhxjItVjNMaKUM8/M1t8ZmcBnb8MeAuwemGPGhUNlk1JAwuwKccnuAg=
-X-Received: by 2002:ac2:5f0b:0:b0:592:ee58:60a4 with SMTP id
- 2adb3069b0e04-592fb709440mr159459e87.0.1761273669601; Thu, 23 Oct 2025
- 19:41:09 -0700 (PDT)
+	s=arc-20240116; t=1761272955; c=relaxed/simple;
+	bh=oB/wXapqWLj7Bp5kmlG6+rgKm1/NpjYznJeuvkRv/Rk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nQuKb4tcm9z4mnTUayuWYFlxRHnS90OPCqX8Z4RJGDToK/pdFyoQI13MaY99gCn4bLzYpH3p5GUhXrDXQix+CP2EpMybT9wjsaKJ/TybF0/EaPqeo5JHzUf2lly+id8dNfIASTG4Tv3ul0KAXVVzGIQchFXKoykG4bNsTD+EYOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4ct6Fj63V3z1R9G1;
+	Fri, 24 Oct 2025 10:25:45 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id 446ED14022E;
+	Fri, 24 Oct 2025 10:29:08 +0800 (CST)
+Received: from huawei.com (10.50.85.128) by dggpemf500002.china.huawei.com
+ (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 24 Oct
+ 2025 10:29:07 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <jhs@mojatatu.com>, <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <xmei5@asu.edu>,
+	<yuehaibing@huawei.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next] net/sched: Remove unused typedef psched_tdiff_t
+Date: Fri, 24 Oct 2025 10:51:45 +0800
+Message-ID: <20251024025145.4069583-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251022182301.1005777-1-joshwash@google.com> <20251023171246.78bea1d8@kernel.org>
-In-Reply-To: <20251023171246.78bea1d8@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 23 Oct 2025 19:40:50 -0700
-X-Gm-Features: AS18NWAb_LNjVdcEftVOiVwgVz-rs6pCDPHRwcZsuhICKQ5KS-oc4ABC6PYB2qM
-Message-ID: <CAHS8izOynoK_7pGumZGefecdThsH=oXr1HJJ7+BQMF_ZyTL7=A@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/3] gve: Improve RX buffer length management
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Joshua Washington <joshwash@google.com>, netdev@vger.kernel.org, 
-	Ankit Garg <nktgrg@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-On Thu, Oct 23, 2025 at 5:12=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 22 Oct 2025 11:22:22 -0700 Joshua Washington wrote:
-> > This patch series improves the management of the RX buffer length for
-> > the DQO queue format in the gve driver. The goal is to make RX buffer
-> > length config more explicit, easy to change, and performant by default.
->
-> I suppose this was done in prep for later buffers for ZC?
-> It's less urgent given the change of plans in
-> https://lore.kernel.org/all/20251016184031.66c92962@kernel.org/
-> but still relevant AFAICT. Just wanted to confirm.. Mina?
+Since commit 051d44209842 ("net/sched: Retire CBQ qdisc")
+this is not used anymore.
 
-This is very likely unrelated to the large ZC buffers and instead
-related to another effort we're preparing for. Not really 'urgent' but
-as always a bit pressing :D
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+---
+ include/net/pkt_sched.h | 1 -
+ 1 file changed, 1 deletion(-)
 
---=20
-Thanks,
-Mina
+diff --git a/include/net/pkt_sched.h b/include/net/pkt_sched.h
+index c660ac871083..4678db45832a 100644
+--- a/include/net/pkt_sched.h
++++ b/include/net/pkt_sched.h
+@@ -43,7 +43,6 @@ struct qdisc_walker {
+  */
+ 
+ typedef u64	psched_time_t;
+-typedef long	psched_tdiff_t;
+ 
+ /* Avoid doing 64 bit divide */
+ #define PSCHED_SHIFT			6
+-- 
+2.34.1
+
 
