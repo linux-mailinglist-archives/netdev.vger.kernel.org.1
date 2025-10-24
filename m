@@ -1,114 +1,112 @@
-Return-Path: <netdev+bounces-232619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFDF1C075B0
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 18:40:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 671CBC075D7
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 18:43:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5ACB250621B
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:39:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 800531A635B7
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 16:43:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF9D27EFEE;
-	Fri, 24 Oct 2025 16:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5FDC283686;
+	Fri, 24 Oct 2025 16:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a6RA67Xf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bAGp3pVD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80FB327587C;
-	Fri, 24 Oct 2025 16:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E68327FD52
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 16:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761323946; cv=none; b=Ad5tIlbMBiRYLzPD46PCEWZXy5lHlbN+mZKyXIh/cqzVDas/fFSaq65bWQHX3PMwCaU0u/Cq1ht2eqsJw3FwBcxrNk7GG9Rw6AQhrZYdGjMu9BtR7N2QMcneKcX8sTt9Szvdj/tGMcn28I2gKK29rBCi20hakWavqPHUBc/ifHg=
+	t=1761324169; cv=none; b=RqurKnrAX/pM3dsrwzyqMCmQyDDc/6kokGT8uA8CLZRqaFOgdwC6XEcrf4JqjYyB9ZeiJOkQqGGVDqp6WD6FIgArtidc7nJdK128ly9a/73M1nVdqvh2t+nLoApeDNFurYM1DaSXdsRMrMZPAQ9/lZshQj8wekzO3MqClkqBm/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761323946; c=relaxed/simple;
-	bh=rZPzuGrpbN1ns2DrPxp+zGyO8euKRTB+zg/Ttmz+NdY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KP7PCa7HbpECgJCk6Y3/1KBGntq/Us+TwpxA+zDFkJ5YUgiz0FnlprPqYGC5Oe2ev4W26SbcPfG96mHdTpfTGXZW1Xq6A0z7WLtuAwsneI8/QIBrQJEnQMzQMZ0cj3TltQacsSLSkhrkvoyvxyXQu4o3Julv2ELqJsIo3L38/H4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a6RA67Xf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A504BC4CEF1;
-	Fri, 24 Oct 2025 16:39:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761323946;
-	bh=rZPzuGrpbN1ns2DrPxp+zGyO8euKRTB+zg/Ttmz+NdY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a6RA67XfrZaRX4vYPzUAnK1dKe5neW7QnMfJ1P5tYHWF6Dfyq51IM3akRdeuvZ8Vh
-	 Z04RmouNK363a+Hs/TBylmlgrDj+ub2p99s+OiMmCWvBL+i9L1ulLxcDH7AFJnILal
-	 h9Ylo99NqFmwVUlyjVbDoTEnsOb9zJ4IqV5y113O51UJgMGauHpIoJQBXx7hXOZ+so
-	 33qjTgBAsbdEiw9o9DtqW8zU81HuH/MaD4NJh5l+kPzrYQ+NbSAK6aqfcsOQz3eznj
-	 Uckv1aE7p37GtNUHizeJdf9Dabo0A/0fQ6O94duB0I0BsfTEkFO0013krP/TCipjKS
-	 XDXY5rs+u6mzA==
-Date: Fri, 24 Oct 2025 17:39:01 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ranganath V N <vnranganath.20@gmail.com>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-	syzbot+d101e12bccd4095460e7@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2] net: sctp: fix KMSAN uninit-value in sctp_inq_pop
-Message-ID: <aPurpdMe6BHfSHEH@horms.kernel.org>
-References: <20251024-kmsan_fix-v2-1-dc393cfb9071@gmail.com>
+	s=arc-20240116; t=1761324169; c=relaxed/simple;
+	bh=/blf/azS5NEQNvNlO3JBJPajNsZb+Sbs7B77kxrnl7U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jHNYyck1h7Z/razrNTvpiS8EQN6oCCFUrbQ9MEVVdCNKEHn1tdsf3vV9E4rZmYZDBZGUD+3xWsW1XdiFt9Cc5TXzJxlyPQp+BcO0UgoE6ZW2Us6h/y6/AFGgNlqck9+d5kdFDryk57GB3+UGeptzU4vL97uh9J78dagCyhvTQPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bAGp3pVD; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-292fd52d527so25262135ad.2
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 09:42:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761324168; x=1761928968; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/blf/azS5NEQNvNlO3JBJPajNsZb+Sbs7B77kxrnl7U=;
+        b=bAGp3pVDkboELtC5bvodpi+jgo1LU7vfLp/ihi5rsLTVQLxBNbjg8Wy1swpMhN+O6t
+         ZW7CWICV+ZPkYY8Ts215tpoy+vl75oYGLYjhE6VG2Z9xRWJ9cmsGZMWxmgU3Q0zaAOoI
+         IHzqO2N8qCVaHTmA1ZV82+vZsad3GXTifaWuM/YLGJeBqjc7fzltLd6i6RyCGBasMhNk
+         2c4gqnZzQ6YJRkxsUHGSy7iNG+itU/85PWTD9CXAF11BTz9uPEv4tjwgwqdYxZsPcYhN
+         h6NBK3Mgg/tW5XI5V0xE0rllwmvkR3PTqTkvkCIwR/FFfsdBnzjuNkNBgX/wbQWKuyqw
+         zktQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761324168; x=1761928968;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/blf/azS5NEQNvNlO3JBJPajNsZb+Sbs7B77kxrnl7U=;
+        b=S+UpGgxtd4HyZkebYfORXUCO9ymcLkYjSxId+6DI+TT8PwTgGbDp7PIjd0CNzk/e5I
+         6VCSD+veDkmn6Yygz+TRbc22nBatJxbQXPvC3DmJ1OVDCzLwn09pJumBvF0eH/0dad04
+         5mBkanZWxFKt8eHURvgG/WvPUytaIev3K71z18eHB3C9B7oMkxDdefIJTTHZeVjulNLV
+         dFBifT9rxvmeW88hpP768PcrrKPeiAlmDviY+/wSqDxOOukam8PR1E8tXNZcpx5NXPhW
+         CWgVDgqhuVfvFlK7QqdXAGBhBMnZOjCfYwWlvZtYwmwnX4q/dL/hqBwgLvBb9t0h4a69
+         VhKA==
+X-Forwarded-Encrypted: i=1; AJvYcCUHDeWgQxEUT3TXM2w3QXZiqewJRS4vFpcWBJginTaqqkyDUSAk6yJcaVjuZMQ0Sq+r0ZNHzSE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbUvrFXU5PprOP0vHYzKFbWST8RTAYRlBKxEZkCqjaSTygBzvB
+	WhFzUnzUSpvXXTCKwTjpIbJ7xfUVbBxpoUQeTQ6KXlFJYMauhvHjOkbMH4jpApfjy5KxK3oBrX5
+	0jBLoAsKr2BSDOE/vv2Xg6/+0tyh+triVV/tsrlbK
+X-Gm-Gg: ASbGncuaXhznVeBUWs9U/6huKRs+qWG7jV2yyRb4/RP8KSfhVnrr7quL6kJDI53jH/V
+	93nmvjgoHqSfgdTexJRpu3AIjxHjSaeL2DCVMFZMBpstH0qo6cAzc/+CJpK5cmqAEyaDgk4Ntcg
+	gYV/2Ajh/F3GLMnW+y92BkFC7sOXgiwP+S/vzRZsyzJbDlu77+IdMZSy/y55ItefGX8mUgwoPWo
+	AHPh4mm7+tLkSByrPH0yjoWF/lP14kZFXZjfrDYmVu50Gw+mNhwDNHdmRbMyTa9Bz1+trjpApG5
+	U4k0ybrepF9rsZNeuLbRz+dZ9g==
+X-Google-Smtp-Source: AGHT+IGPy7KhvL+Vh9CdntT6E5HwvFrlqr3eklQ4VeiTiQyrrF2uZXnNDAVhZcP6OhhXKtoX14Y4jlCdlHSqJRwPh+Y=
+X-Received: by 2002:a17:902:c411:b0:276:305b:14a7 with SMTP id
+ d9443c01a7336-2948ba0d467mr37007185ad.33.1761324167479; Fri, 24 Oct 2025
+ 09:42:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251024-kmsan_fix-v2-1-dc393cfb9071@gmail.com>
+References: <20251022054004.2514876-1-kuniyu@google.com> <20251022054004.2514876-6-kuniyu@google.com>
+ <CANn89i+Wv_tzq7LR64bN=x76=HBBmtR+GG5nDEi4fX8zokj71A@mail.gmail.com>
+In-Reply-To: <CANn89i+Wv_tzq7LR64bN=x76=HBBmtR+GG5nDEi4fX8zokj71A@mail.gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Fri, 24 Oct 2025 09:42:36 -0700
+X-Gm-Features: AS18NWDGHdOsctcREgMajhYcpopFJDWJv4Lws-fZ97Ld370tVIR0Rdqj4OTYlhk
+Message-ID: <CAAVpQUBd8ZW1BZMN0FAPbr=MzP7drSN8YsxdJLmQVeTfmvNqVw@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 5/5] neighbour: Convert rwlock of struct
+ neigh_table to spinlock.
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 24, 2025 at 05:14:17PM +0530, Ranganath V N wrote:
-> Fix an issue detected by syzbot:
-> 
-> KMSAN reported an uninitialized-value access in sctp_inq_pop
-> BUG: KMSAN: uninit-value in sctp_inq_pop
-> 
-> The issue is actually caused by skb trimming via sk_filter() in sctp_rcv().
-> In the reproducer, skb->len becomes 1 after sk_filter(), which bypassed the
-> original check:
-> 
->         if (skb->len < sizeof(struct sctphdr) + sizeof(struct sctp_chunkhdr) +
->                        skb_transport_offset(skb))
-> To handle this safely, a new check should be performed after sk_filter().
-> 
-> Reported-by: syzbot+d101e12bccd4095460e7@syzkaller.appspotmail.com
-> Tested-by: syzbot+d101e12bccd4095460e7@syzkaller.appspotmail.com
-> Fixes: https://syzkaller.appspot.com/bug?extid=d101e12bccd4095460e7
+On Fri, Oct 24, 2025 at 5:31=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, Oct 21, 2025 at 10:40=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google=
+.com> wrote:
+> >
+> > Only neigh_for_each() and neigh_seq_start/stop() are on the
+> > reader side of neigh_table.lock.
+> >
+> > Let's convert rwlock to the plain spinlock.
+> >
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> >
+>
+> Do we still need _bh prefix ?
 
-Hi,
-
-Thanks for your patch.
-
-Unfortunately, this is not the correct format for a fixes tag.
-A fixes tag should reference the commit where the bug
-was introduced into the tree. In this case, perhaps that
-is the beginning of git history. If so:
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-
-I think the URL you provide is appropriate for a Closed tag.
-
-Closes: https://syzkaller.appspot.com/bug?extid=d101e12bccd4095460e7
-
-See https://docs.kernel.org/process/submitting-patches.html
-
-> Suggested-by: Xin Long <lucien.xin@gmail.com>
-> Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
-> ---
-> KMSAN reported an uninitialized-value access in sctp_inq_pop
-> ---
-> Changes in v2:
-> - changes in commit message as per the code changes.
-> - fixed as per the suggestion.
-> - Link to v1: https://lore.kernel.org/r/20251023-kmsan_fix-v1-1-d08c18db8877@gmail.com
-
-...
+Yes, I think _bh is just for IPv6 ndisc calling neigh_update().
 
