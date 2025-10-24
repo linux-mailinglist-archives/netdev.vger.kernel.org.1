@@ -1,122 +1,123 @@
-Return-Path: <netdev+bounces-232519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96FFFC062EB
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:12:16 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C328C0634F
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 14:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 859591B873F1
-	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 12:12:40 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8D933349B82
+	for <lists+netdev@lfdr.de>; Fri, 24 Oct 2025 12:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFC762E7652;
-	Fri, 24 Oct 2025 12:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371ED315D31;
+	Fri, 24 Oct 2025 12:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JllN/EZ/"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Ml1fy9PO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A9E1DB127;
-	Fri, 24 Oct 2025 12:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B44F2FC877
+	for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 12:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761307931; cv=none; b=e8YQ5LJKdFr0C1AsrTRbRXaexhnS2bTFXSy1evlwlcAjQG5LDDXmvnw2zgoWCSmgxNxuTdHf6ADy2qiqb3yh1O6ym24neJrNNa0gJs6LFikqGU18/UEs2cb3fey7JRYX/UWk44J0HDvH9sjtmn9LSvKFi7At6asbB4JdV591JBc=
+	t=1761308281; cv=none; b=c85YKFbgmF8cIxRl5iRB1nZHi4KX33wJutNYXC5+7uGzgZayzUkovBynxMkTzjXViA5JIy6r+GcoTpNo4kPkhRI6LPDtvNpNUq2MS/S/bixopTxeJ84MJ9J0tqxHY+b5zgUvQ6OrJk1/k7MIZ1HYK8Rb2NLlvx9apAfKQHYQbi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761307931; c=relaxed/simple;
-	bh=/zFFutCPy+n8j87wgq9tHUe0ADsqAV6k9QBgeuL8/0o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V3xGvqGjAG+8CAqccQHJ8vM+4JW+7AY19K7TjGRR3VAHFrWh0xfP4a8jyqBRjmi906ZN53Y/4yw9NmjyqmxKblKoBVxbo7/ZlokwNUupVxzVFF/ROdCD58038trBYuPX+PT2QXwUYtdb3m52bxm5EOrfCYtpf5ek69SBtJRmEn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JllN/EZ/; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id CBA701A1648;
-	Fri, 24 Oct 2025 12:12:01 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 9BBC060703;
-	Fri, 24 Oct 2025 12:12:01 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 337CE102F248D;
-	Fri, 24 Oct 2025 14:11:47 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761307920; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=JEt/kqGoBRuvo1mSCkAMwChIUVantu5YXampMxAZaZY=;
-	b=JllN/EZ/YRLRi+nQ0w7t9ZcaWf1s409bOeKeWf7oYmIbrP/q6TGYFlW4m8WAQ6Nn/EhOt6
-	EeJFLluQLB/IQYHO1BxyBTNjXyOXt1abGjxziSrwMJBihy4k9eclU5c8qCDN/9/4VDvHsV
-	tyGnQnSP8t8s09/YzWXdsFJMbcivhgXrt1qsPvgF/1fk7bn9VcT+kQgywQ72DOXzErUFKT
-	E1cGoTWkUDSx8yYo/xysPbJ+5ISMb76ttfwNCgexU+f5iPXHEd64/I1Z7GttAb5JOm9foI
-	nKQWZZbJ0sGGsF0QfVjISMt/t8JnFpedYJRFSrTwUJXYAG6mfCcn3ypxj7reew==
-Message-ID: <92e953b8-4581-4647-8173-6c7fa05a7895@bootlin.com>
-Date: Fri, 24 Oct 2025 14:11:45 +0200
+	s=arc-20240116; t=1761308281; c=relaxed/simple;
+	bh=ILD40X74to4JJxXmIV9fExfJmF8MLUGSaGPvFP7I+ko=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=D+mZd5xj936MryiaVYvC4LYcRvu+w2KlERz+yUkRvAmeC6WTHkzN08Sa0C+DQd+SibwGoxam4LJiiflNSxz8TlJhw1zJzUOMNkQ+5Plux1A5sQdizAmM1p7vHEyUh2RBZYit6DXk1UFR43p3F44J5lwp5ZpjANjDAZXStL0lfqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Ml1fy9PO; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-63e18829aa7so2853306a12.3
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 05:17:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1761308277; x=1761913077; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ILD40X74to4JJxXmIV9fExfJmF8MLUGSaGPvFP7I+ko=;
+        b=Ml1fy9PO83aU5AY114Nb5D04dYtIyDdv/07o2jD8P2uslzoKFfALBSFwdpG2nMHOS0
+         MhnHUCGLOOEQg3TWw1Mi3pPKEbJnpZsGEM8KbStCEH8v9+kkX26AjVTUn6ZjL44LolSn
+         lWyLfwnRDAQ7hnpTKRe/klBDWGVlx+TGos3EHr4WKTg3V6qyC3En8OZ24yhEVc/085mz
+         o+QGgqogEIbMZtncjLSZThygk7Hw20NHPZxzWI6zPu/jZYwC5oHnB6+c3Lfbp1/AQMyH
+         Aj8YZlXcXVuWyFErh33GULgzpPc7GUxpL7Ml9k+pPXTYuaJdixYLBh3JCusR0csInie6
+         IXRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761308277; x=1761913077;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ILD40X74to4JJxXmIV9fExfJmF8MLUGSaGPvFP7I+ko=;
+        b=FNVuIQSW62KpxFwTJUHaQUqozsPXOnnQEcYZSnzBqUVttM1vsihCthg5ZMB40w/CT+
+         wkSLDiN4ju3v4w2LSwBRtJumwyOvWGdHgRmUNhifaAHLpVxs4urAYxqyqY9y2t6w1hib
+         Ab/Yp3jn3UzCa37t1WImu/5MJ2gYvy0BVZmrWuvigBpkwAl4LcBBOewSNjxjjS31pcfm
+         q0xFWXu3ZSEWTkyYwPcoP+pEKcqvElORUO22lBIBXNY4VB21iqkRLoCQ5B7nDqgYpamV
+         nEPjJDspTPz6c0zSLrxyi5YHVoWF1DYAb9CJWi31LwGiFcNqwW0pBvC/325NecQuapSf
+         9oZA==
+X-Forwarded-Encrypted: i=1; AJvYcCXjYb1NK/+fj1xa593YqfNkLhZj2nEyTXJIWAydfdz1Shi3FziRvGelvexd1m7Lsq6O13ejtNE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwX+1GR4/iDpccUADvnomWgT864w0DKDzWcd8ikCLN0S2RN6xW
+	A1gtuk3GQAuPwHFfPF/Lildq4R64siQAGsWEZATEc6vHkuEMIW2Ja7aJ0GPQjVYWGB4=
+X-Gm-Gg: ASbGncvZwRarP0jY4ayarN118f1LP80k5YFCVVP47bOq+ywmEZBzAuxZ0jpfi/US0J0
+	sFv4AWr1g9turrUgCnHPBy3+2W9KRsnq4AxuLPh69t+XPl0uj6P+Rmm8jAJJj/tmgSEhQmDGiai
+	1dkX43v9gdbCgFtC6ZKdgdOmdBCofzu9VQmBbT+kzXcCCXUU0LZA27/sVgp6vzbYU8PLJWnkH9t
+	HXeo7L120FfBoxBqyNSEUvIFzFiRQNqJNsW+DbRYXtmZTG4htUWIAm6T/EU4G/3fmA3DDT7mzgx
+	MO+zBtWaKLQh1Ahss/Qql85R0McFfawfJ2HsN4dQzPcNlV/UrMLZlJn+tEE8FeyBqz/moiB6VcR
+	x/L1MWvNORuMpxo2rY5GgXKGmlMXjqMsnofpR+ADF48Gyjt2pztv5Z07XcKEgq/gbEzzGfKiQV2
+	1bzA==
+X-Google-Smtp-Source: AGHT+IHOfSLnLjNWUqFngN92+6HXjYXo+BBWQIQXvbkaxZXMdy4qeqH1cAY92A2uNRHh3J89ZB/3fw==
+X-Received: by 2002:a05:6402:2686:b0:63c:1a7b:b3bb with SMTP id 4fb4d7f45d1cf-63c1f631befmr27471260a12.1.1761308277518;
+        Fri, 24 Oct 2025 05:17:57 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2dc::49:12f])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63e3ebcd742sm4414983a12.15.2025.10.24.05.17.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Oct 2025 05:17:57 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: bpf@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Simon
+ Horman <horms@kernel.org>,  Martin KaFai Lau <martin.lau@linux.dev>,
+  Daniel Borkmann <daniel@iogearbox.net>,  John Fastabend
+ <john.fastabend@gmail.com>,  Stanislav Fomichev <sdf@fomichev.me>,  Alexei
+ Starovoitov <ast@kernel.org>,  Andrii Nakryiko <andrii@kernel.org>,
+  Eduard Zingerman <eddyz87@gmail.com>,  Song Liu <song@kernel.org>,
+  Yonghong Song <yonghong.song@linux.dev>,  KP Singh <kpsingh@kernel.org>,
+  Hao Luo <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Arthur Fabre
+ <arthur@arthurfabre.com>,  netdev@vger.kernel.org,
+  kernel-team@cloudflare.com
+Subject: Re: [PATCH bpf-next v2 01/15] net: Preserve metadata on
+ pskb_expand_head
+In-Reply-To: <20251023175119.62785270@kernel.org> (Jakub Kicinski's message of
+	"Thu, 23 Oct 2025 17:51:19 -0700")
+References: <20251019-skb-meta-rx-path-v2-0-f9a58f3eb6d6@cloudflare.com>
+	<20251019-skb-meta-rx-path-v2-1-f9a58f3eb6d6@cloudflare.com>
+	<20251023175119.62785270@kernel.org>
+Date: Fri, 24 Oct 2025 14:17:56 +0200
+Message-ID: <87ikg4v6h7.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 01/10] net: stmmac: dwmac-socfpga: don't set has_gmac
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Dinh Nguyen <dinguyen@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Matthew Gerlach <matthew.gerlach@altera.com>
-Cc: kernel@pengutronix.de, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20251024-v6-12-topic-socfpga-agilex5-v5-0-4c4a51159eeb@pengutronix.de>
- <20251024-v6-12-topic-socfpga-agilex5-v5-1-4c4a51159eeb@pengutronix.de>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20251024-v6-12-topic-socfpga-agilex5-v5-1-4c4a51159eeb@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain
 
-Hi Steffen
+On Thu, Oct 23, 2025 at 05:51 PM -07, Jakub Kicinski wrote:
+> On Sun, 19 Oct 2025 14:45:25 +0200 Jakub Sitnicki wrote:
+>> pskb_expand_head() copies headroom, including skb metadata, into the newly
+>> allocated head, but then clears the metadata. As a result, metadata is lost
+>> when BPF helpers trigger an skb head reallocation.
+>
+> True, then again if someone is reallocating headroom they may very well
+> push a header after, shifting metadata into an uninitialized part of
+> the headroom. Not sure we can do much about that, but perhaps worth
+> being more explicit in the commit msg?
 
-On 24/10/2025 13:49, Steffen Trumtrar wrote:
-> Instead of setting the has_gmac or has_xgmac fields, let
-> stmmac_probe_config_dt()) fill these fields according to the more
-> generic compatibles.
-> 
-> Without setting the has_xgmac/has_gmac field correctly, even basic
-> functions will fail, because the register offsets are different.
-> 
-> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-> index 354f01184e6cc..7ed125dcc73ea 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-> @@ -497,7 +497,6 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
->  	plat_dat->pcs_init = socfpga_dwmac_pcs_init;
->  	plat_dat->pcs_exit = socfpga_dwmac_pcs_exit;
->  	plat_dat->select_pcs = socfpga_dwmac_select_pcs;
-> -	plat_dat->has_gmac = true;
+This is where the skb_data_move() helper, proposed by the next patch,
+comes in. We will try to move the metadata out of the way if possible,
+and clear it if don't have enough headroom left. That approach relies on
+all pskb_expand_head users adopting the helper, which is no simple task.
 
-Note that this field is now gone as per :
-
-  26ab9830beab ("net: stmmac: replace has_xxxx with core_type")
-
-You'll need to rebase the series :)
-
-Maxime
-
-
->  
->  	plat_dat->riwt_off = 1;
->  
-> 
-
+I can add guidance for pskb_expand_head users to the commit description,
+or maybe better yet, add a note in pskb_expand_head docs.
 
