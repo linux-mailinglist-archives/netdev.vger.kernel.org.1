@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-232941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00850C09FED
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 22:53:54 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE717C09FF6
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 22:54:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9F76734C5DD
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 20:53:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0E7BA4E3B2B
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 20:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A43E3090CB;
-	Sat, 25 Oct 2025 20:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781F5309F00;
+	Sat, 25 Oct 2025 20:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gyBS+m3+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tIOI0fBX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA4E1E633C;
-	Sat, 25 Oct 2025 20:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4033081B8;
+	Sat, 25 Oct 2025 20:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761425621; cv=none; b=XXGZ/Hv7irlRke9FE3LSidg+mBraoU8t8ft55w6EKIKu5HzvyOBN8De/dOJYLLhd6Bq90W8FEaIsL2URtvc6UjN/V7ih98iPW40T/eFCaG932xSmaDV1jPfP62soXi9LmuCxWb/Hw1GgKFj5KvfKoEK/k/XapfhRF3c44rZSUuY=
+	t=1761425626; cv=none; b=bbJk1+PCYyr5DXoS0pPTLMD04G4PzNGBIoMgjjMmU3umx6lr7gNFI/PlzalAoiQeHDC0rVla3ADu4xlhstxLUcUVAkT2hR3QXPfGDf5gyTP27lZvNZKPaYSTun8/SfhXbmyIzp++K4BFZxdjdltiO9dZ+fYTMCsBXUnl+ZHgNYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761425621; c=relaxed/simple;
-	bh=k3f56oOKXrHPQQfnFbh//sCNF5j+f6kxvvopfboCJxQ=;
+	s=arc-20240116; t=1761425626; c=relaxed/simple;
+	bh=iG5SfyTk4AKapcKPPrgaFC/L53w+793p/xw4lohb8j4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YZakyUPdcMfnGIqwFLmXzuMdejw2CV7DItWOjdY7psEy1Fx+7uH5ko9qxgb2IeYj02r9aAMKcE8wFZVHR/DqK9Spr5Lz6CEtM5dLG2PkLEde/Xt3JBj5Mp0hk1akFs/bxdQ+kXz3qjB5QmSYpjpqzN5BgkTkS20EwqMgpfceCC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gyBS+m3+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 677E7C113D0;
-	Sat, 25 Oct 2025 20:53:37 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=gcaO0ml15nfyXs1UEiGFrY3QIJJYTAU1Ty0rKv1q1C9xzvsQmA+NzMpwaycGR6pZIzqevDMotftWwwMYDyo5t8wBAXP9IGAOgLc3rpN7PIjZeweCp1Cniz4dtvYzEkK9ZNnhpMeWMfV7Xy92o1CmdlhmFbS7sd6/DtxAV8vQrjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tIOI0fBX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0286C4CEFF;
+	Sat, 25 Oct 2025 20:53:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761425621;
-	bh=k3f56oOKXrHPQQfnFbh//sCNF5j+f6kxvvopfboCJxQ=;
+	s=k20201202; t=1761425625;
+	bh=iG5SfyTk4AKapcKPPrgaFC/L53w+793p/xw4lohb8j4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=gyBS+m3+QuJhhVlVHOUu0JiISZ/k5A2IXJFsl4NJpggJCKVvIjEa5DDaYcuanepEl
-	 ZX8qFwgLj5h05w3VNQIwz095yPKdIr0J5hR9EYXxYcccTZgWrEYO5mBRVxL5xjP1SO
-	 e1vM74f58O9uKTNpKGok29peiZRWauNITxgfFEv4bGO5LjmYkZjTGFSsRpyvTVywkm
-	 o8XZXwwutNJLzUUdXK8JQMrWlxwFwbJAgv7rVCE7Bd97fyfmilTCi84cM/+WbrgSaD
-	 NJiBenCNc79SH8VjATqKJUrXw9UEcHG5CxPFvfdcSjyz6Mpkkqd3DNIoEe58TCEw0a
-	 IWJ/jpi1hdY8Q==
+	b=tIOI0fBX3xZrYkIIJKOTTujgZFS5HWbD5Fq0jy1bprFv8lhHtqpaHaNXYfigNsuvV
+	 IPJSVSUUb/H19XVseECrJfWHff5FzANCf/bFsgYXSmZ/XitcJLQDCQGQ202ZyXySnC
+	 djE0aeNgokJhBAFjxVoNpURGUPu2DzKnoiu2vgAb900a+kKkBB0z2R6qGyQHX9QfRF
+	 1U4yvR2tstfL8mdlQBpehKXVDp/ifN51kZf6nVyfEZIRrNPsGSDhaEalZBTe+tnZ9h
+	 A+qqxJAg6ovg04sN7aHZT34rLlamKBuPYTeqC6s31CrnnGAbsnTjvE6oV5d2oD76aQ
+	 ctQrpfhR7nA/w==
 From: Nathan Chancellor <nathan@kernel.org>
-Date: Sat, 25 Oct 2025 21:53:18 +0100
-Subject: [PATCH 1/3] compiler_types: Introduce __nocfi_generic
+Date: Sat, 25 Oct 2025 21:53:19 +0100
+Subject: [PATCH 2/3] ARM: Select ARCH_USES_CFI_GENERIC_LLVM_PASS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251025-idpf-fix-arm-kcfi-build-error-v1-1-ec57221153ae@kernel.org>
+Message-Id: <20251025-idpf-fix-arm-kcfi-build-error-v1-2-ec57221153ae@kernel.org>
 References: <20251025-idpf-fix-arm-kcfi-build-error-v1-0-ec57221153ae@kernel.org>
 In-Reply-To: <20251025-idpf-fix-arm-kcfi-build-error-v1-0-ec57221153ae@kernel.org>
 To: Kees Cook <kees@kernel.org>, 
@@ -69,70 +69,39 @@ Cc: Simon Horman <horms@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
  llvm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
  netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2120; i=nathan@kernel.org;
- h=from:subject:message-id; bh=k3f56oOKXrHPQQfnFbh//sCNF5j+f6kxvvopfboCJxQ=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDBl/Lc5InyyKcb3JcHTHf8mWDxptnkqzlkza4fp4wuf3C
- y70+sbs7ShlYRDjYpAVU2Spfqx63NBwzlnGG6cmwcxhZQIZwsDFKQATEYxgZLhgKXhcWan09CFZ
- rfM/z319Pnl1bPAMkYg83hl63neLNTIZ/lmsZ9aZkmEVs8JC9pVNn9NCf3O+vncMWzprc9f/3ea
- 0iwsA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1058; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=iG5SfyTk4AKapcKPPrgaFC/L53w+793p/xw4lohb8j4=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDBl/Lc7cXRGgEvFzhe+9sFOGP38axfW9tZlhLmOZX/NkW
+ wwnw6SbHaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAiySwM/wxDz1zd/XRjSMYZ
+ vym50b0nP25112lec31i1Ha1lzW5idmMDF3XTz96kqbppmE8gT+FIdqm4Ne2c1cVVkeGynAsFN3
+ FxQ4A
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-There are two different ways that LLVM can expand kCFI operand bundles
-in LLVM IR: generically in the middle end or using an architecture
-specific sequence when lowering LLVM IR to machine code in the backend.
-The generic pass allows any architecture to take advantage of kCFI but
-the expansion of these bundles in the middle end can mess with
-optimizations that may turn indirect calls into direct calls when the
-call target is known at compile time, such as after inlining.
+Prior to clang 22.0.0 [1], ARM did not have an architecture specific
+kCFI bundle lowering in the backend, which may cause issues. Select
+CONFIG_ARCH_USES_CFI_GENERIC_LLVM_PASS to enable use of __nocfi_generic.
 
-Add __nocfi_generic, dependent on an architecture selecting
-CONFIG_ARCH_USES_CFI_GENERIC_LLVM_PASS, to disable kCFI bundle
-generation in functions where only the generic kCFI pass may cause
-problems.
-
+Link: https://github.com/llvm/llvm-project/commit/d130f402642fba3d065aacb506cb061c899558de [1]
 Link: https://github.com/ClangBuiltLinux/linux/issues/2124
 Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 ---
- arch/Kconfig                   | 7 +++++++
- include/linux/compiler_types.h | 6 ++++++
- 2 files changed, 13 insertions(+)
+ arch/arm/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/Kconfig b/arch/Kconfig
-index 74ff01133532..61130b88964b 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -917,6 +917,13 @@ config ARCH_USES_CFI_TRAPS
- 	  An architecture should select this option if it requires the
- 	  .kcfi_traps section for KCFI trap handling.
- 
-+config ARCH_USES_CFI_GENERIC_LLVM_PASS
-+	bool
-+	help
-+	  An architecture should select this option if it uses the generic
-+	  KCFIPass in LLVM to expand kCFI bundles instead of architecture-specific
-+	  lowering.
-+
- config CFI
- 	bool "Use Kernel Control Flow Integrity (kCFI)"
- 	default CFI_CLANG
-diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-index 59288a2c1ad2..1414be493738 100644
---- a/include/linux/compiler_types.h
-+++ b/include/linux/compiler_types.h
-@@ -461,6 +461,12 @@ struct ftrace_likely_data {
- # define __nocfi
- #endif
- 
-+#if defined(CONFIG_ARCH_USES_CFI_GENERIC_LLVM_PASS)
-+# define __nocfi_generic	__nocfi
-+#else
-+# define __nocfi_generic
-+#endif
-+
- /*
-  * Any place that could be marked with the "alloc_size" attribute is also
-  * a place to be marked with the "malloc" attribute, except those that may
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 2e3f93b690f4..4fb985b76e97 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -44,6 +44,8 @@ config ARM
+ 	select ARCH_USE_BUILTIN_BSWAP
+ 	select ARCH_USE_CMPXCHG_LOCKREF
+ 	select ARCH_USE_MEMTEST
++	# https://github.com/llvm/llvm-project/commit/d130f402642fba3d065aacb506cb061c899558de
++	select ARCH_USES_CFI_GENERIC_LLVM_PASS if CLANG_VERSION < 220000
+ 	select ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT if MMU
+ 	select ARCH_WANT_GENERAL_HUGETLB
+ 	select ARCH_WANT_IPC_PARSE_VERSION
 
 -- 
 2.51.1
