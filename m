@@ -1,60 +1,59 @@
-Return-Path: <netdev+bounces-232890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36B26C09AA7
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:44:23 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6654C099D7
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:41:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45F5F188A755
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:38:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5B74B34E956
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:41:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 675B72475E3;
-	Sat, 25 Oct 2025 16:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E597328B4F;
+	Sat, 25 Oct 2025 16:29:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aux/AYzp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fj7sT2G9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F19F3043B7;
-	Sat, 25 Oct 2025 16:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0949306D2A;
+	Sat, 25 Oct 2025 16:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761409712; cv=none; b=Gtq0Ok+bUBbd4CAzCZASnpeAUEkAZvfpF9FkyE6qkyOExXgs9ctKbVmml/tW739xoL2uoJPViTrzHaEaxW4moLVRqZqVfFGTZ7w7Q5bkq/qaSan+N1LsCaH2u0x5TLDtO+oQpqBoHHx3M+4Yhs3vdDHKUSdtMJqiG7azdu7ZMK4=
+	t=1761409768; cv=none; b=Sky++BxxQw5V6FY1KEHBydXO6l0x1RS4vrNuYhhwJjSNOOnCqZAVQs7PKPEU9lhuALlx2kd1HGjqj+maJG2YniKOwMJlVQ0yFucMBje9olJXxBRTIy2uow4k6AlPrjaJpByRpbu3cEql8RQyY4BJW1gtqG3a4/2GhVVh/+r8j6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761409712; c=relaxed/simple;
-	bh=D8Nbd0Uf19WsIu6RUTCrkEJFRO65F/k3bcyx0m49Gfs=;
+	s=arc-20240116; t=1761409768; c=relaxed/simple;
+	bh=yg3XI9YzjlpQi6prDmKnR1os5FFYDrA0vGFt3yZ4Prk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qLQDTz/BFYtD0dIF/naEk4OKyoYros5iADMgYBsPrNPQQ5RR8k5qJkUqLHBxeAXf39xQovJBra1djS3Xzz5a384/y9Z1uPllOjLSwCInXDralnmWmwPmblj55ka/ew4REPfw6vAEaOp3eL8neU5/PkbZ31Fi3ZTGNZptG/I167o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aux/AYzp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A53DC113D0;
-	Sat, 25 Oct 2025 16:28:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=TjSJ54ykNP/Qk/H//w5dlf7d//e2FhupbJX0DSpXCepkE8J6TaqY7kwwfawJ7AbYgcuNGKprhkZUlbbZdGczr6L2D042KzWIsKMEj0s0Q82WBRtwXzjdXp268OqJ68QMg//z2U6Q2B/W5yZPXHeCjhgZmYjXA3SVLdr6Iwl73jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fj7sT2G9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2D4BC4CEFB;
+	Sat, 25 Oct 2025 16:29:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761409712;
-	bh=D8Nbd0Uf19WsIu6RUTCrkEJFRO65F/k3bcyx0m49Gfs=;
+	s=k20201202; t=1761409767;
+	bh=yg3XI9YzjlpQi6prDmKnR1os5FFYDrA0vGFt3yZ4Prk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aux/AYzpaJ0f1m70a5hKTSHZXxK6pOWrXSQkorSQUBh5IG5yae1UnscNXuaFlHwva
-	 RlxLnoEJpHjiCnxC+R9PgFg/d8PVlyZvzDGYZO0eOCfCW/6KbknjHFvdWaxlmrB/57
-	 2Eq/5/N53tZ6ccUmJGqK0tZosWx5xgYHqCnwq8yLDCZkBmzLHXEq/GzTSJzmKw2cUJ
-	 Srew6T1ZKJjdDcjUsGN4iWS3njyhVS5Ksb4Y6MRHMc45T3cmO34gtY2LPcKm0LYXHn
-	 puCkiS1Vl/Or/hbswekw1TlrY0JE7uigMoBzK1RuggwYuNAIlCtRD+DajsJVm6Dznv
-	 b6lIRSpwpQQjw==
+	b=Fj7sT2G9ekuZgrPA3SxvuS5nogT0yqkCmmH6d51JMexI6va4l5ukIZ7tthPuDlgF6
+	 2P+9Zz/L+U7oAef3RQDCSC0ngmr/cCw16Y1/n+n2gVgOz3M0zY/OMlRw8wVloF9T/F
+	 f4QhEHQHGo4ZyNFALtM4lrUaeoVt3zfEygV0f1qCY6ynMwSFhh5pFNI4JvRb0a4oOB
+	 /2KDPQa16tQMJPJCLkrQ6+kiHQqf7VEtWnghf5eBeyqH0EWckyhDcjMOwK2aMNZ2xz
+	 VI2Cx6XK2HodPbRDI6n8NRDD+pGIhJKVVhKuZWRQomAEURmB9JSsfy5zrol65je+/M
+	 5e7+4Ern6mg6Q==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>,
+Cc: Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
+	dsahern@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-5.4] selftests: Replace sleep with slowwait
-Date: Sat, 25 Oct 2025 12:01:02 -0400
-Message-ID: <20251025160905.3857885-431-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17-6.12] inet_diag: annotate data-races in inet_diag_bc_sk()
+Date: Sat, 25 Oct 2025 12:01:27 -0400
+Message-ID: <20251025160905.3857885-456-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -70,15 +69,16 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: David Ahern <dsahern@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit 2f186dd5585c3afb415df80e52f71af16c9d3655 ]
+[ Upstream commit 4fd84a0aaf2ba125b441aa09d415022385e66bf2 ]
 
-Replace the sleep in kill_procs with slowwait.
+inet_diag_bc_sk() runs with an unlocked socket,
+annotate potential races with READ_ONCE().
 
-Signed-off-by: David Ahern <dsahern@kernel.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20250910025828.38900-2-dsahern@kernel.org
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Link: https://patch.msgid.link/20250828102738.2065992-4-edumazet@google.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -87,70 +87,117 @@ LLM Generated explanations, may be completely bogus:
 
 YES
 
-- What changed
-  - Replaces a fixed delay with a condition-based wait in `kill_procs()`
-    so test cleanup actually completes before proceeding:
-    `tools/testing/selftests/net/fcnal-test.sh:192`.
-  - Old behavior: `sleep 1` after `killall nettest ping ping6`.
-  - New behavior: `slowwait 2 sh -c 'test -z "$(pgrep
-    "^(nettest|ping|ping6)$")"'` to poll until those processes are gone,
-    up to 2 seconds.
+Explanation
 
-- Why it matters
-  - `kill_procs()` is called at test start to ensure a clean slate:
-    `tools/testing/selftests/net/fcnal-test.sh:161-166`. A fixed sleep
-    can be too short on slower or loaded systems, leaving straggler
-    `ping`/`ping6`/`nettest` processes that interfere with subsequent
-    tests, causing flakiness or false failures. The condition-based wait
-    removes that flakiness by verifying process exit.
+- Fixes unlocked read races: inet_diag_bc_sk() runs without the socket
+  lock; the patch snapshots fields using READ_ONCE() to avoid data races
+  and torn/unstable reads when populating the filter entry used by the
+  bytecode engine.
+  - Snapshots `sk_family`: `net/ipv4/inet_diag.c:603` (`entry.family =
+    READ_ONCE(sk->sk_family);`)
+  - Snapshots ports and ifindex: `net/ipv4/inet_diag.c:605`
+    (`entry.sport = READ_ONCE(inet->inet_num);`),
+    `net/ipv4/inet_diag.c:606` (`entry.dport =
+    ntohs(READ_ONCE(inet->inet_dport));`), `net/ipv4/inet_diag.c:607`
+    (`entry.ifindex = READ_ONCE(sk->sk_bound_dev_if);`)
+  - Snapshots userlocks and mark: `net/ipv4/inet_diag.c:609`
+    (`entry.userlocks = sk_fullsock(sk) ? READ_ONCE(sk->sk_userlocks) :
+    0;`), `net/ipv4/inet_diag.c:612` (`entry.mark =
+    READ_ONCE(sk->sk_mark);`)
+  - Adds harmless const-correctness for `inet`:
+    `net/ipv4/inet_diag.c:597` (`const struct inet_sock *inet =
+    inet_sk(sk);`)
 
-- How `slowwait` works (and why it’s safe)
-  - `slowwait()` is a common helper in net selftests that polls every
-    100ms until a command succeeds or a timeout is hit:
-    `tools/testing/selftests/net/lib.sh:105-110`. It uses `loopy_wait
-    "sleep 0.1" ...`, causing no architectural or API changes, and only
-    affects selftest behavior.
-  - This is consistent with broader selftests usage (e.g.,
-    `tools/testing/selftests/net/rtnetlink.sh:314`,
-    `tools/testing/selftests/net/forwarding/lib.sh:566`), standardizing
-    on proven patterns already used across the test suite.
+- Consistent family/address decision: entry_fill_addrs() now branches on
+  the single, snapshotted family stored in entry, rather than re-reading
+  the socket family, removing a possible inconsistency window between
+  family read and address selection.
+  - Uses `entry->family` instead of `sk->sk_family`:
+    `net/ipv4/inet_diag.c:583` (`if (entry->family == AF_INET6) { ...
+    }`)
 
-- Scope and risk
-  - Selftests-only change; no in-kernel code touched.
-  - Small and contained; no interface changes.
-  - Failure mode is limited: if the processes don’t exit, `slowwait`
-    times out in 2s and `kill_procs()`’s non-zero exit code is not fatal
-    in callers (no `set -e`); the tests proceed, but the added wait
-    significantly lowers flakiness vs. a blind `sleep 1`.
-  - The `pgrep` anchored regex `^(nettest|ping|ping6)$` targets the
-    exact processes, avoiding false positives.
+- Impact and correctness:
+  - inet_diag_bc_sk() collects a snapshot which the bytecode interpreter
+    compares against filters. Without READ_ONCE(), unlocked reads may be
+    optimized into multiple loads or observe mixed values, causing
+    spurious filter mismatches (missing or extra sockets in diagnostics)
+    or KCSAN data-race reports.
+  - No behavioral change beyond stabilizing a read snapshot; avoids
+    inconsistencies and better documents concurrency expectations.
 
-- Stable backport fit
-  - Fixes a real test bug (flaky cleanup) that affects test reliability
-    on stable trees.
-  - Minimal risk, no architectural changes, not a new feature.
-  - Improves determinism of selftests run against stable kernels,
-    aligning with stable policy to accept selftest reliability fixes.
+- Small, contained change:
+  - Single file (`net/ipv4/inet_diag.c`) and localized to entry
+    construction in inet_diag_bc_sk() and to a helper branch condition.
+  - No API/ABI changes; only read-side annotations and a trivial const
+    qualifier.
 
-Conclusion: This is a low-risk, selftests-only robustness fix that
-improves test reliability and should be backported.
+- Low regression risk:
+  - READ_ONCE() is a read-only annotation; it neither introduces
+    ordering constraints beyond the atomic access nor changes control
+    flow.
+  - entry_fill_addrs() uses the already-read family for a consistent
+    decision, which is strictly safer than re-reading an unlocked field.
 
- tools/testing/selftests/net/fcnal-test.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+- Broad but safe applicability:
+  - inet_diag_bc_sk() is called across protocols (e.g.,
+    `net/ipv4/udp_diag.c:16`, `net/ipv4/tcp_diag.c:366`,
+    `net/ipv4/raw_diag.c:131`, `net/mptcp/mptcp_diag.c:20`). All benefit
+    from a consistent snapshot without requiring additional locking.
 
-diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testing/selftests/net/fcnal-test.sh
-index cf535c23a959a..dfd368371fb3c 100755
---- a/tools/testing/selftests/net/fcnal-test.sh
-+++ b/tools/testing/selftests/net/fcnal-test.sh
-@@ -189,7 +189,7 @@ show_hint()
- kill_procs()
+- Stable criteria assessment:
+  - Fixes a real bug class (lockless data races/inconsistent reads)
+    affecting user-visible diagnostics correctness, especially under
+    concurrent socket mutations.
+  - Minimal, non-architectural change with negligible risk.
+  - No new features or behavior changes beyond stabilizing reads.
+  - While there’s no explicit “Cc: stable” tag, the change aligns with
+    typical stable backports that annotate/fix data races in widely used
+    subsystems.
+
+Conclusion: This is a low-risk correctness fix to avoid unlocked read
+races in inet_diag filtering and should be backported to stable trees.
+
+ net/ipv4/inet_diag.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
+index 2fa53b16fe778..238b2a4a6cf43 100644
+--- a/net/ipv4/inet_diag.c
++++ b/net/ipv4/inet_diag.c
+@@ -785,7 +785,7 @@ static void entry_fill_addrs(struct inet_diag_entry *entry,
+ 			     const struct sock *sk)
  {
- 	killall nettest ping ping6 >/dev/null 2>&1
--	sleep 1
-+	slowwait 2 sh -c 'test -z "$(pgrep '"'^(nettest|ping|ping6)$'"')"'
- }
+ #if IS_ENABLED(CONFIG_IPV6)
+-	if (sk->sk_family == AF_INET6) {
++	if (entry->family == AF_INET6) {
+ 		entry->saddr = sk->sk_v6_rcv_saddr.s6_addr32;
+ 		entry->daddr = sk->sk_v6_daddr.s6_addr32;
+ 	} else
+@@ -798,18 +798,18 @@ static void entry_fill_addrs(struct inet_diag_entry *entry,
  
- set_ping_group()
+ int inet_diag_bc_sk(const struct nlattr *bc, struct sock *sk)
+ {
+-	struct inet_sock *inet = inet_sk(sk);
++	const struct inet_sock *inet = inet_sk(sk);
+ 	struct inet_diag_entry entry;
+ 
+ 	if (!bc)
+ 		return 1;
+ 
+-	entry.family = sk->sk_family;
++	entry.family = READ_ONCE(sk->sk_family);
+ 	entry_fill_addrs(&entry, sk);
+-	entry.sport = inet->inet_num;
+-	entry.dport = ntohs(inet->inet_dport);
+-	entry.ifindex = sk->sk_bound_dev_if;
+-	entry.userlocks = sk_fullsock(sk) ? sk->sk_userlocks : 0;
++	entry.sport = READ_ONCE(inet->inet_num);
++	entry.dport = ntohs(READ_ONCE(inet->inet_dport));
++	entry.ifindex = READ_ONCE(sk->sk_bound_dev_if);
++	entry.userlocks = sk_fullsock(sk) ? READ_ONCE(sk->sk_userlocks) : 0;
+ 	if (sk_fullsock(sk))
+ 		entry.mark = READ_ONCE(sk->sk_mark);
+ 	else if (sk->sk_state == TCP_NEW_SYN_RECV)
 -- 
 2.51.0
 
