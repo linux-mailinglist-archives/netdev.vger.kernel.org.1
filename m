@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-232828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC9C8C0921D
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:52:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5A95C09226
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:53:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A48814F034D
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 14:50:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7FDE42034D
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 14:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14103002A5;
-	Sat, 25 Oct 2025 14:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2DD3002AB;
+	Sat, 25 Oct 2025 14:50:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281F32FFFB9;
-	Sat, 25 Oct 2025 14:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD602F6176;
+	Sat, 25 Oct 2025 14:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761403831; cv=none; b=ZDX9ii9nPTlTxFiCyiCplnV2i6Lc0/R9ujzRq3uh75cK1umzAAcutEnx+V9w6iHWiCZVAJxOwXF4y2xYokjFjyZF6ziQtK+GRMvuTRrYQtGaQdEDRLx+82oCiwnz/v/gTNT+idMG3SzRyI/iyjscEdYVjSNlc7IyfWaftmyLKLk=
+	t=1761403848; cv=none; b=tV7OUGRMA04M7KGCfwXAsubNryWLl8kHTipaG/776a0nYSTov+x25nPqigHTe4jCiTZTzsJGMTi8bsxXrUwrj446DrqD7hEcifhpswZBoA86WepJ1PObpVEp7zDvWXzz55hLMJQ6cyHdLn0BLmLUK/DbEKkRSGEvjxhyOHmHLh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761403831; c=relaxed/simple;
-	bh=8HlISF9Kq2kHZ9aTeRsDCcdflBzJAj/wx133xuMqQZg=;
+	s=arc-20240116; t=1761403848; c=relaxed/simple;
+	bh=GCXWt31vqbKKrGa1PBOy1YCDk3c/1rJHA0cdEca2lJ8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s8avWAQC1393Hd2Ieboiw0gBht9fZdrfpM9INEP9tZCHSBy1TmSidRVALzRq6OQS4a33+XBrBkh8+roYxYDaiJhmIPm1kPy/6Im6b9ndFU10ATxqNaN4L5d7UxPnURTsvIYwC4ayZeJLLrbaWqbIsPBP/4Eyk0AK4YKVFHvZcp8=
+	 Content-Type:Content-Disposition:In-Reply-To; b=kg1uaEvF+DwamvU8xuJ4Zjvo8cd4MuxOccxVbv4XYCaaWKbdZQWewoSFtJGqELOLAGG13LX/dcEB1nSDvMcvWdYS4b0zRZvC967AoljLJn2uVQRtpNAyGST+4DpEmsSMDcu1NHoS8+2VCZ/GuC4F6sgsrwDoH3GEbAZURpN1rEY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vCfb6-000000001do-2hmD;
-	Sat, 25 Oct 2025 14:50:24 +0000
-Date: Sat, 25 Oct 2025 15:50:15 +0100
+	id 1vCfbO-000000001eE-0lPh;
+	Sat, 25 Oct 2025 14:50:42 +0000
+Date: Sat, 25 Oct 2025 15:50:32 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -58,9 +58,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v2 09/13] net: dsa: lantiq_gswip: add vendor
- property to setup MII refclk output
-Message-ID: <8bafc50056f8016fc1e8d2c20ddc01f72a720dfc.1761402873.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v2 10/13] dt-bindings: net: dsa: lantiq,gswip: add
+ support for MaxLinear GSW1xx switches
+Message-ID: <bb77711420db90fe50a2c1cc9abd77efe31ed18f.1761402873.git.daniel@makrotopia.org>
 References: <cover.1761402873.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -72,30 +72,325 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1761402873.git.daniel@makrotopia.org>
 
-Read boolean Device Tree property "maxlinear,rmii-refclk-out" and switch
-the RMII reference clock to be a clock output rather than an input if it
-is set.
+Extend the Lantiq GSWIP device tree binding to also cover MaxLinear
+GSW1xx switches which are based on the same hardware IP but connected
+via MDIO instead of being memory-mapped.
+
+Add compatible strings for MaxLinear GSW120, GSW125, GSW140, GSW141,
+and GSW145 switches and adjust the schema to handle the different
+connection methods with conditional properties.
+
+Add MaxLinear GSW125 example showing MDIO-connected configuration.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/net/dsa/lantiq/lantiq_gswip_common.c | 4 ++++
- 1 file changed, 4 insertions(+)
+v2:
+ * remove git conflict left-overs which somehow creeped in
+ * indent example with 4 spaces instead of tabs
 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-index 60a83093cd10..bf38ecc13f76 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-@@ -1442,6 +1442,10 @@ static void gswip_phylink_mac_config(struct phylink_config *config,
- 		return;
- 	}
+ .../bindings/net/dsa/lantiq,gswip.yaml        | 264 +++++++++++++-----
+ 1 file changed, 191 insertions(+), 73 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+index 48641c27da10..017021d3b511 100644
+--- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+@@ -4,7 +4,12 @@
+ $id: http://devicetree.org/schemas/net/dsa/lantiq,gswip.yaml#
+ $schema: http://devicetree.org/meta-schemas/core.yaml#
  
-+	if (of_property_read_bool(dp->dn, "maxlinear,rmii-refclk-out") &&
-+	    !(miicfg & GSWIP_MII_CFG_MODE_RGMII))
-+		miicfg |= GSWIP_MII_CFG_RMII_CLK;
+-title: Lantiq GSWIP Ethernet switches
++title: Lantiq GSWIP and MaxLinear GSW1xx Ethernet switches
 +
- 	gswip_mii_mask_cfg(priv,
- 			   GSWIP_MII_CFG_MODE_MASK | GSWIP_MII_CFG_RMII_CLK |
- 			   GSWIP_MII_CFG_RGMII_IBS | GSWIP_MII_CFG_LDCLKDIS,
++description:
++  Lantiq GSWIP and MaxLinear GSW1xx switches share the same hardware IP.
++  Lantiq switches are embedded in SoCs and accessed via memory-mapped I/O,
++  while MaxLinear switches are standalone ICs connected via MDIO.
+ 
+ allOf:
+   - $ref: dsa.yaml#/$defs/ethernet-ports
+@@ -33,6 +38,98 @@ allOf:
+                 description:
+                   Configure the RMII reference clock to be a clock output
+                   rather than an input. Only applicable for RMII mode.
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - lantiq,xrx200-gswip
++              - lantiq,xrx300-gswip
++              - lantiq,xrx330-gswip
++    then:
++      properties:
++        reg:
++          minItems: 3
++          maxItems: 3
++          description: Memory-mapped register regions (switch, mdio, mii)
++        reg-names:
++          items:
++            - const: switch
++            - const: mdio
++            - const: mii
++        mdio:
++          $ref: /schemas/net/mdio.yaml#
++          unevaluatedProperties: false
++
++          properties:
++            compatible:
++              const: lantiq,xrx200-mdio
++
++          required:
++            - compatible
++        gphy-fw:
++          type: object
++          properties:
++            '#address-cells':
++              const: 1
++
++            '#size-cells':
++              const: 0
++
++            compatible:
++              items:
++                - enum:
++                    - lantiq,xrx200-gphy-fw
++                    - lantiq,xrx300-gphy-fw
++                    - lantiq,xrx330-gphy-fw
++                - const: lantiq,gphy-fw
++
++            lantiq,rcu:
++              $ref: /schemas/types.yaml#/definitions/phandle
++              description: phandle to the RCU syscon
++
++          patternProperties:
++            "^gphy@[0-9a-f]{1,2}$":
++              type: object
++
++              additionalProperties: false
++
++              properties:
++                reg:
++                  minimum: 0
++                  maximum: 255
++                  description:
++                    Offset of the GPHY firmware register in the RCU register
++                    range
++
++                resets:
++                  items:
++                    - description: GPHY reset line
++
++                reset-names:
++                  items:
++                    - const: gphy
++
++              required:
++                - reg
++
++          required:
++            - compatible
++            - lantiq,rcu
++
++          additionalProperties: false
++      required:
++        - reg-names
++    else:
++      properties:
++        reg:
++          maxItems: 1
++          description: MDIO bus address
++        reg-names: false
++        gphy-fw: false
++        mdio:
++          $ref: /schemas/net/mdio.yaml#
++          unevaluatedProperties: false
+ 
+ maintainers:
+   - Hauke Mehrtens <hauke@hauke-m.de>
+@@ -43,78 +140,11 @@ properties:
+       - lantiq,xrx200-gswip
+       - lantiq,xrx300-gswip
+       - lantiq,xrx330-gswip
+-
+-  reg:
+-    minItems: 3
+-    maxItems: 3
+-
+-  reg-names:
+-    items:
+-      - const: switch
+-      - const: mdio
+-      - const: mii
+-
+-  mdio:
+-    $ref: /schemas/net/mdio.yaml#
+-    unevaluatedProperties: false
+-
+-    properties:
+-      compatible:
+-        const: lantiq,xrx200-mdio
+-
+-    required:
+-      - compatible
+-
+-  gphy-fw:
+-    type: object
+-    properties:
+-      '#address-cells':
+-        const: 1
+-
+-      '#size-cells':
+-        const: 0
+-
+-      compatible:
+-        items:
+-          - enum:
+-              - lantiq,xrx200-gphy-fw
+-              - lantiq,xrx300-gphy-fw
+-              - lantiq,xrx330-gphy-fw
+-          - const: lantiq,gphy-fw
+-
+-      lantiq,rcu:
+-        $ref: /schemas/types.yaml#/definitions/phandle
+-        description: phandle to the RCU syscon
+-
+-    patternProperties:
+-      "^gphy@[0-9a-f]{1,2}$":
+-        type: object
+-
+-        additionalProperties: false
+-
+-        properties:
+-          reg:
+-            minimum: 0
+-            maximum: 255
+-            description:
+-              Offset of the GPHY firmware register in the RCU register range
+-
+-          resets:
+-            items:
+-              - description: GPHY reset line
+-
+-          reset-names:
+-            items:
+-              - const: gphy
+-
+-        required:
+-          - reg
+-
+-    required:
+-      - compatible
+-      - lantiq,rcu
+-
+-    additionalProperties: false
++      - maxlinear,gsw120
++      - maxlinear,gsw125
++      - maxlinear,gsw140
++      - maxlinear,gsw141
++      - maxlinear,gsw145
+ 
+ required:
+   - compatible
+@@ -129,6 +159,7 @@ examples:
+             reg = <0xe108000 0x3100>,  /* switch */
+                   <0xe10b100 0xd8>,    /* mdio */
+                   <0xe10b1d8 0x130>;   /* mii */
++            reg-names = "switch", "mdio", "mii";
+             dsa,member = <0 0>;
+ 
+             ports {
+@@ -227,3 +258,90 @@ examples:
+                     };
+             };
+     };
++
++  - |
++    #include <dt-bindings/leds/common.h>
++
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        switch@1f {
++            compatible = "maxlinear,gsw125";
++            reg = <0x1f>;
++
++            ports {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                port@0 {
++                    reg = <0>;
++                    label = "lan0";
++                    phy-handle = <&switchphy0>;
++                    phy-mode = "internal";
++                };
++
++                port@1 {
++                    reg = <1>;
++                    label = "lan1";
++                    phy-handle = <&switchphy1>;
++                    phy-mode = "internal";
++                };
++
++                port@4 {
++                    reg = <4>;
++                    label = "wan";
++                    phy-mode = "sgmii";
++                    managed = "in-band-status";
++                };
++
++                port@5 {
++                    reg = <5>;
++                    phy-mode = "rgmii-id";
++                    tx-internal-delay-ps = <2000>;
++                    rx-internal-delay-ps = <2000>;
++                    ethernet = <&eth0>;
++
++                    fixed-link {
++                        speed = <1000>;
++                        full-duplex;
++                    };
++                };
++            };
++
++            mdio {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                switchphy0: switchphy@0 {
++                    reg = <0>;
++
++                    leds {
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++
++                        led@0 {
++                            reg = <0>;
++                            color = <LED_COLOR_ID_GREEN>;
++                            function = LED_FUNCTION_LAN;
++                        };
++                    };
++                };
++
++                switchphy1: switchphy@1 {
++                    reg = <1>;
++
++                    leds {
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++
++                        led@0 {
++                            reg = <0>;
++                            color = <LED_COLOR_ID_GREEN>;
++                            function = LED_FUNCTION_LAN;
++                        };
++                    };
++                };
++            };
++        };
++    };
 -- 
 2.51.0
 
