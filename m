@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-232836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7894C09265
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEBE2C09268
 	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 17:03:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 363C21A636FC
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 15:03:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D69CD4E17D4
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 15:03:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A39F8246797;
-	Sat, 25 Oct 2025 15:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27F42FFDFB;
+	Sat, 25 Oct 2025 15:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="JYtrq9Eq"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="fb+IGUpU"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.35.192.45])
+Received: from pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com [50.112.246.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 491A23002DF
-	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 15:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.35.192.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292E22C15B4
+	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 15:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=50.112.246.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761404571; cv=none; b=S+PKmlYEY6Whrf/F7e8logel6Y71Gd3cooCWj7d9pILWx6SnAUElWLi9w61kawJ+tQu8cMZGNkX/9YMVSgZZ0vNUWjrNif4KvTJJLi9p68I1M8OPOZ05pm6qj8kpHdL7oZwK9Sxf4DHDbqsOfS4IJ9sXXT7N+1o5nmxNv8zYFT8=
+	t=1761404592; cv=none; b=dV95RfjWwzslVycwZKMtzh/EtyU1C+5ZTpJX73VaHj2r/OT1NOM9fUYqLtNKUDQDP4GVNml0vcY3Qo28+Scwvw8LxhrT84KXHmwPtIJZwgBKQwdcdR0WErImgj8vFk3i+VAjuKueXP3WDg2mGzy3uKKZQzNYAg5soOKUIyWaHX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761404571; c=relaxed/simple;
-	bh=1ezpbTujOG/3uAec3FrvRf9xuLV7HLmBK7hWzgSjEzg=;
+	s=arc-20240116; t=1761404592; c=relaxed/simple;
+	bh=4hEZpo2hKqbp89YY8Nap1pGV04+dnR768N22kbgWfrw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OV8xeX7IacZBQy3yF6Zbjov5je5+L+ggeyZz8Id2pThgBAzTOZ11fFuQpgWn4SdxOiIRqjaTiW2lShUVveaDwFdAHqn9BvANORwBUQOfxCxWLWSni9o6IMhJVPDPnoTJGgvedNQcvaypG0dnN+8UhfeO+E5pfCpdV9BLf5eQcNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=JYtrq9Eq; arc=none smtp.client-ip=52.35.192.45
+	 MIME-Version:Content-Type; b=CjMna4rTWr/RXhxLxLBl7gzFGIYfZsLyXceB7+1PGcTkA5AIl8FesteSyDKtfMiZI7iq0yeJ69GeDeYcOjASymyz0QNAX5gM2mgyEe68DCh3/lh88KrmT2cswjRDEsfQCmZ4+7n8u0Iu3nPNbWOpva40e/ytnMjaBXdpHT7bcYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=fb+IGUpU; arc=none smtp.client-ip=50.112.246.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1761404569; x=1792940569;
+  t=1761404591; x=1792940591;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=YDmjnW0AsEL/okhqqHN2hED4Om4KL/j086oBDjwzykk=;
-  b=JYtrq9EqhuMOGjGOGG11RFtjbihhNKzTsDS1Mdbc92pmlv8ACnouASC6
-   8nMWN0wvSdYnWMSIwaepzx4pE9omjK/ChgoSPtBOCrSDxsRxJNPCqqG1i
-   eX4v0oAV6tlKBGW3MQRfSOJwCdXcGrrPi2X4FswMxFvH0maozrwQoaLY7
-   7ddfWJYoY7k8wrcoOL7RP1PPLxzoJ9Nt3EW9eYbpXtx/xMhszq0TxfA70
-   LFQ0BhyccOWc2KectIguAWDtnk074FFWJcrpWRORmPfA8cKR+Qjmd1Dsf
-   05cfRT74BX0485/3T32+kb1f2DawngLO7wXZmkAuyt3el1ffVrJceB9us
+  bh=Tsq9w8JRKEL450WkTNkNXkuHrLaLkKptl+VicofTqXY=;
+  b=fb+IGUpUZj3uvIGiwmJqlMKd4+onXYNN3q8R8pXAsLMqdq71Dn2Lfp+Y
+   z6vpaejferX20PMAz8pqDdvkg82r7y9fqufRNQuXlwlXe9FqhzURqbyOv
+   OXF6xLbRRleqBH0HY6XOJ/nAsyalu+V0+1lrwbBftZIgfmcD8jk5J7w2N
+   fcyydacOVucKXUGnB2gTNeqIxRBFKyN+uWjsfdmlIn0YiKTi8G1QAujuB
+   +UqJeeOySdYRS3+xRhmTCdPMvQx/Dx910ONGOZBsLsvAisWYZAE1Nzoi8
+   VOITAmrFmi7NvXubo8wO2+C80cFfRd9aOy4KnYtNDTGzjDs2l1eOQQ5uX
    A==;
-X-CSE-ConnectionGUID: SEaP4e3cS96GDA4Bx9RUeg==
-X-CSE-MsgGUID: a3+tNW4yS+SM8ZCHpzI1FQ==
+X-CSE-ConnectionGUID: XmkJ5SMmSmyLaeUyMUEudA==
+X-CSE-MsgGUID: xW9kgsUVTLq2eZ2O2lIOGg==
 X-IronPort-AV: E=Sophos;i="6.19,255,1754956800"; 
-   d="scan'208";a="5490755"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2025 15:02:48 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.234:23899]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.196:2525] with esmtp (Farcaster)
- id 3f31c109-dc24-4606-b5e4-47a8e8aaa521; Sat, 25 Oct 2025 15:02:48 +0000 (UTC)
-X-Farcaster-Flow-ID: 3f31c109-dc24-4606-b5e4-47a8e8aaa521
+   d="scan'208";a="5508493"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2025 15:03:07 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.104:17402]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.44:2525] with esmtp (Farcaster)
+ id f0b63301-7608-493c-a890-145cbbb0f4f6; Sat, 25 Oct 2025 15:03:07 +0000 (UTC)
+X-Farcaster-Flow-ID: f0b63301-7608-493c-a890-145cbbb0f4f6
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Sat, 25 Oct 2025 15:02:41 +0000
+ Sat, 25 Oct 2025 15:03:07 +0000
 Received: from b0be8375a521.amazon.com (10.37.244.8) by
  EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Sat, 25 Oct 2025 15:02:39 +0000
+ Sat, 25 Oct 2025 15:03:04 +0000
 From: Kohei Enju <enjuk@amazon.com>
 To: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
 CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
@@ -69,9 +69,9 @@ CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
  S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
  Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	<kohei.enju@gmail.com>, Kohei Enju <enjuk@amazon.com>
-Subject: [PATCH iwl-next v1 2/3] igc: expose RSS key via ethtool get_rxfh
-Date: Sun, 26 Oct 2025 00:01:31 +0900
-Message-ID: <20251025150136.47618-3-enjuk@amazon.com>
+Subject: [PATCH iwl-next v1 3/3] igc: allow configuring RSS key via ethtool set_rxfh
+Date: Sun, 26 Oct 2025 00:01:32 +0900
+Message-ID: <20251025150136.47618-4-enjuk@amazon.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20251025150136.47618-1-enjuk@amazon.com>
 References: <20251025150136.47618-1-enjuk@amazon.com>
@@ -83,61 +83,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWC003.ant.amazon.com (10.13.139.209) To
+X-ClientProxiedBy: EX19D043UWC002.ant.amazon.com (10.13.139.222) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Implement igc_ethtool_get_rxfh_key_size() and extend
-igc_ethtool_get_rxfh() to return the RSS key to userspace.
+Change igc_ethtool_set_rxfh() to accept and save a userspace-provided
+RSS key. When a key is provided, store it in the adapter and write the
+RSSRK registers accordingly.
 
-This can be tested using `ethtool -x <dev>`.
+This can be tested using `ethtool -X <dev> hkey <key>`.
 
 Signed-off-by: Kohei Enju <enjuk@amazon.com>
 ---
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/intel/igc/igc.h         |  1 +
+ drivers/net/ethernet/intel/igc/igc_ethtool.c | 31 ++++++++++++--------
+ drivers/net/ethernet/intel/igc/igc_main.c    |  3 +-
+ 3 files changed, 21 insertions(+), 14 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+index dd159397d191..c894a5a99fc0 100644
+--- a/drivers/net/ethernet/intel/igc/igc.h
++++ b/drivers/net/ethernet/intel/igc/igc.h
+@@ -304,6 +304,7 @@ struct igc_adapter {
+ 
+ 	u8 rss_indir_tbl[IGC_RETA_SIZE];
+ 	u8 rss_key[IGC_RSS_KEY_SIZE];
++	bool has_user_rss_key;
+ 
+ 	unsigned long link_check_timeout;
+ 	struct igc_info ei;
 diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index f89c2cbaace0..0482e590bc5a 100644
+index 0482e590bc5a..64eac1ccb3ff 100644
 --- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
 +++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1490,6 +1490,11 @@ void igc_write_rss_indir_tbl(struct igc_adapter *adapter)
- 	}
- }
- 
-+static u32 igc_ethtool_get_rxfh_key_size(struct net_device *netdev)
-+{
-+	return IGC_RSS_KEY_SIZE;
-+}
-+
- static u32 igc_ethtool_get_rxfh_indir_size(struct net_device *netdev)
- {
- 	return IGC_RETA_SIZE;
-@@ -1502,10 +1507,13 @@ static int igc_ethtool_get_rxfh(struct net_device *netdev,
+@@ -1527,24 +1527,29 @@ static int igc_ethtool_set_rxfh(struct net_device *netdev,
  	int i;
  
- 	rxfh->hfunc = ETH_RSS_HASH_TOP;
+ 	/* We do not allow change in unsupported parameters */
+-	if (rxfh->key ||
+-	    (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
+-	     rxfh->hfunc != ETH_RSS_HASH_TOP))
++	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
++	    rxfh->hfunc != ETH_RSS_HASH_TOP)
+ 		return -EOPNOTSUPP;
 -	if (!rxfh->indir)
 -		return 0;
+ 
+-	num_queues = adapter->rss_queues;
++	if (rxfh->indir) {
++		num_queues = adapter->rss_queues;
+ 
+-	/* Verify user input. */
 -	for (i = 0; i < IGC_RETA_SIZE; i++)
--		rxfh->indir[i] = adapter->rss_indir_tbl[i];
-+
-+	if (rxfh->indir)
+-		if (rxfh->indir[i] >= num_queues)
+-			return -EINVAL;
++		/* Verify user input. */
 +		for (i = 0; i < IGC_RETA_SIZE; i++)
-+			rxfh->indir[i] = adapter->rss_indir_tbl[i];
++			if (rxfh->indir[i] >= num_queues)
++				return -EINVAL;
+ 
+-	for (i = 0; i < IGC_RETA_SIZE; i++)
+-		adapter->rss_indir_tbl[i] = rxfh->indir[i];
++		for (i = 0; i < IGC_RETA_SIZE; i++)
++			adapter->rss_indir_tbl[i] = rxfh->indir[i];
+ 
+-	igc_write_rss_indir_tbl(adapter);
++		igc_write_rss_indir_tbl(adapter);
++	}
 +
-+	if (rxfh->key)
-+		memcpy(rxfh->key, adapter->rss_key, sizeof(adapter->rss_key));
++	if (rxfh->key) {
++		adapter->has_user_rss_key = true;
++		memcpy(adapter->rss_key, rxfh->key, sizeof(adapter->rss_key));
++		igc_write_rss_key(adapter);
++	}
  
  	return 0;
  }
-@@ -2182,6 +2190,7 @@ static const struct ethtool_ops igc_ethtool_ops = {
- 	.set_coalesce		= igc_ethtool_set_coalesce,
- 	.get_rxnfc		= igc_ethtool_get_rxnfc,
- 	.set_rxnfc		= igc_ethtool_set_rxnfc,
-+	.get_rxfh_key_size	= igc_ethtool_get_rxfh_key_size,
- 	.get_rxfh_indir_size	= igc_ethtool_get_rxfh_indir_size,
- 	.get_rxfh		= igc_ethtool_get_rxfh,
- 	.set_rxfh		= igc_ethtool_set_rxfh,
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 1f0a601cbcef..e977661bed2f 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -779,7 +779,8 @@ static void igc_setup_mrqc(struct igc_adapter *adapter)
+ 	u32 j, num_rx_queues;
+ 	u32 mrqc, rxcsum;
+ 
+-	netdev_rss_key_fill(adapter->rss_key, sizeof(adapter->rss_key));
++	if (!adapter->has_user_rss_key)
++		netdev_rss_key_fill(adapter->rss_key, sizeof(adapter->rss_key));
+ 	igc_write_rss_key(adapter);
+ 
+ 	num_rx_queues = adapter->rss_queues;
 -- 
 2.51.0
 
