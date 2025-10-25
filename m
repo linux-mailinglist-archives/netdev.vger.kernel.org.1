@@ -1,95 +1,103 @@
-Return-Path: <netdev+bounces-232764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D014C08B20
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 06:55:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7910FC08B66
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 07:29:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D56A1B26D39
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 04:55:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E4643B27C2
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 05:27:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4332882B7;
-	Sat, 25 Oct 2025 04:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F26023ABA0;
+	Sat, 25 Oct 2025 05:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="aadn7s8H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B46246BC7
-	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 04:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681621CAA7B;
+	Sat, 25 Oct 2025 05:27:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761368104; cv=none; b=KPI16YeVXRl/xkMpAxVWwm0Rn2eqPWUNITAu+XN0NCKHlcbKIVSxUxXAe2b+A5GhhID7NcFKojEH09QP1f/lXqWIOjkqnbpkvQC+eN3630IHf7Lv+eD0nzQ3BatVNYUa3TSlAIZuumSt1T/aWG/m3L5/RpcCiaBDq1GT11O/eFM=
+	t=1761370064; cv=none; b=dVx7WtUeXlbGf6Wtta7eLe6bnlDy1YJemA2MTchNeoVLN54Xp3W6FeDGHaNwgeRoX9X7e63uUWBytvVWDHKxXUovU4yrPXfMjkK504e9Eh3YyFMD+0gmLQPodr3+F8qjE1oZrwbD4LqbhKmLDRaJ9s5bUey9Ma5FdI2LulDome4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761368104; c=relaxed/simple;
-	bh=iktKT3WSsX5Eh5WpbJhRG4yNuP8WNCWNH5X4PESRAnc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=aaWMUG9t4K8buSkA5xzZS/59g5Rw4uEP2oCbM/OYhtUhJhYqffKam/OMAgisfqd8zKnCrlyoD2eBEBaK7ZUKB/cKeoHlonFVAu6+wu83OF5UXHrlwnNyqwk2CiqkQDhRYyuJswe6jNy6uq2IFhLhZIQIs5FzTY4FP7CTb/Rf1DU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-930db3a16c9so252913039f.0
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 21:55:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761368102; x=1761972902;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sfohFdAczWF1WzY/GrEVTuUSveF/6y4Geu8fq13XWG0=;
-        b=N7sc3hJwnjjTiNJ4xSNM89o6bavrL2NgLZW3OvNbweLUk2qvkhl8XWJhYnX9/nglg+
-         WU7sJ4eMgJxxpz5P4uxQlwHTU6W/p0p6cXjTkiS2s+D1n3Pa76lPmi+Kbsc1d8NP0PXC
-         9BcCWQG2DYs8Ey0QbLIC/FXXpIkUogOj0FRvS4kP17WXkLdymocXMfzYA8iYKHQzNm0z
-         ZrF48Et/e8N2jsNGl8VKW261ljkgB+1F/1+O0ZUy9TnhFrBiEpQOytfdYwAIPaSuzp1v
-         BkUpBSsR7TXLb5QbaajfA2PAeeD1pGQQlLeQYpI3jekz6IFadylVzaFHpxLpWy63glRN
-         fEIw==
-X-Forwarded-Encrypted: i=1; AJvYcCVxGXyNve1mfnCoTbn09vJzn6ucJmCXX2MDtg0ry/c/tcfUxSzPQW5PCKIXzEjrJudwROqTwwc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydZQKqu/sG82VYpX5mRi4WLcNCKFb+rU1Zs8HIr7alWn+8tHw9
-	Rtlkq/GI+YnALdSrOJegPEwBrxa+FFTJj3KfNQOGzs0bt6untjzNsVJDlXbi1XUqYyGMkuNU3Gq
-	43Jd+QtjJ+N4LncJsyqh4Iw80aZPWyfRWpuo/Qmu3jozZzLua3tZpdAOz/Oc=
-X-Google-Smtp-Source: AGHT+IGmzN3hj7nTSLkXk9l23ogDW9Jk3lYuOUnF/SmoXNtxlLUT1tNfps/Ib9eNuMT9GWLVCiL6ZSXIMp0XiubP6Fz4W3ASkXvN
+	s=arc-20240116; t=1761370064; c=relaxed/simple;
+	bh=T3/zY8kw1Mev1iNmTNBpghm/uKV9g60ZaH2PkeyOdvk=;
+	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ncEJojElLuQ1JK9QCiGZyi/0p1vaMn8H/tde2gHjR4VvPq0Ru1PkGcxcofvfgV04P1XRbY1FOdOsW7WJQF7wS0oskCapNMF92fk4xU3nXmmVVvk/GGhknr15u1A4MD1jOk7yGcof5Aj/S2mu3jR4yBv41RRiNoQtqh0Eh+90BbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=aadn7s8H; arc=none smtp.client-ip=198.47.19.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
+	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTP id 59P5RFED882330;
+	Sat, 25 Oct 2025 00:27:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1761370035;
+	bh=T3/zY8kw1Mev1iNmTNBpghm/uKV9g60ZaH2PkeyOdvk=;
+	h=Subject:From:To:CC:Date:In-Reply-To:References;
+	b=aadn7s8HRWMCq7myzp0vFzP/odwrszfXobbGvJpMjGmLXxuulpQ/QEC90vVlrtS18
+	 2zQ8T1nekg2FbJAnHVTNpCFE8xIwKHPCBQmqiZAPiqE9UcNQzE1LSsXY96Z9SUnzDr
+	 I23B1AgaBW2+P/KtvPKOSsiNLB4Ge1lZzwCrtG7s=
+Received: from DFLE200.ent.ti.com (dfle200.ent.ti.com [10.64.6.58])
+	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 59P5REVD4077799
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Sat, 25 Oct 2025 00:27:15 -0500
+Received: from DFLE205.ent.ti.com (10.64.6.63) by DFLE200.ent.ti.com
+ (10.64.6.58) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 25 Oct
+ 2025 00:27:14 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE205.ent.ti.com
+ (10.64.6.63) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Sat, 25 Oct 2025 00:27:14 -0500
+Received: from [10.24.73.74] (uda0492258.dhcp.ti.com [10.24.73.74])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 59P5RAQN1443472;
+	Sat, 25 Oct 2025 00:27:10 -0500
+Message-ID: <7151c443585fc1c68327385582cd2dbca620a810.camel@ti.com>
+Subject: Re: [PATCH v2 net-next 3/4] net: davinci_mdio: use new iterator
+ mdiobus_for_each_phy
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+CC: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+        "Clark
+ Wang" <xiaoning.wang@nxp.com>,
+        Roger Quadros <rogerq@kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        <imx@lists.linux.dev>, <linux-omap@vger.kernel.org>,
+        Andrew Lunn <andrew@lunn.ch>, Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        Russell King - ARM Linux <linux@armlinux.org.uk>,
+        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        David Miller <davem@davemloft.net>,
+        Siddharth
+ Vadapalli <s-vadapalli@ti.com>
+Date: Sat, 25 Oct 2025 10:57:19 +0530
+In-Reply-To: <aadd3bd7-5cc5-45f5-b14d-d0b63629d612@gmail.com>
+References: <9c6aeec5-f651-4cf0-8cca-d2455048e89e@gmail.com>
+	 <aadd3bd7-5cc5-45f5-b14d-d0b63629d612@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.1-1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:1414:b0:940:d395:fb53 with SMTP id
- ca18e2360f4ac-940d395fcbemr3180777839f.12.1761368102301; Fri, 24 Oct 2025
- 21:55:02 -0700 (PDT)
-Date: Fri, 24 Oct 2025 21:55:02 -0700
-In-Reply-To: <68ec1f21.050a0220.ac43.0010.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68fc5826.050a0220.346f24.01f5.GAE@google.com>
-Subject: Re: [syzbot] [net?] WARNING in xfrm6_tunnel_net_exit (4)
-From: syzbot <syzbot+3df59a64502c71cab3d5@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	herbert@gondor.apana.org.au, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sd@queasysnail.net, steffen.klassert@secunet.com, 
-	syzkaller-bugs@googlegroups.com, wangliang74@huawei.com, 
-	yuehaibing@huawei.com, zhangchangzhong@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-syzbot has bisected this issue to:
+On Fri, 2025-10-24 at 22:23 +0200, Heiner Kallweit wrote:
+> Use new iterator mdiobus_for_each_phy() to simplify the code.
+>=20
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-commit b441cf3f8c4b8576639d20c8eb4aa32917602ecd
-Author: Sabrina Dubroca <sd@queasysnail.net>
-Date:   Fri Jul 4 14:54:33 2025 +0000
+Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
 
-    xfrm: delete x->tunnel as we delete x
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=160c5d2f980000
-start commit:   cf1ea8854e4f Merge tag 'mmc-v6.18-rc1' of git://git.kernel..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=150c5d2f980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=110c5d2f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=af9170887d81dea1
-dashboard link: https://syzkaller.appspot.com/bug?extid=3df59a64502c71cab3d5
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=162c3de2580000
-
-Reported-by: syzbot+3df59a64502c71cab3d5@syzkaller.appspotmail.com
-Fixes: b441cf3f8c4b ("xfrm: delete x->tunnel as we delete x")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Regards,
+Siddharth.
 
