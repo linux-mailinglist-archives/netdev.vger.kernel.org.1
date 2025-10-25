@@ -1,128 +1,222 @@
-Return-Path: <netdev+bounces-232920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EFF9C09EE2
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 20:59:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD1F4C09EE9
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 21:01:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2BF1B4E1B74
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:59:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6287F3A94BD
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 19:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F59E2BE7B1;
-	Sat, 25 Oct 2025 18:59:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED302FBE03;
+	Sat, 25 Oct 2025 19:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iav1FlIC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="OtQu4SgJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968FA20ED
-	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 18:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823021C1F0C;
+	Sat, 25 Oct 2025 19:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761418755; cv=none; b=GweaUKZpOJTDPHNEj2rZp5ZTj/mE3IZq40y6JkOn8FRUGZZaiY10O391lLwa2a9FtH4znFYpyNBGRn0F4iUYkx/jEbm7kWt9PidiFxKqk2OG68yk9QaACzgIuqk9POmA3Djx/CeUjKyNt4sw6PmDRV7I2R6HCGCnvBNq7EaSszc=
+	t=1761418903; cv=none; b=Xx8dETFQbJhBJ0nqC2Vfau3O5f77f0LQVJ85p+vnYpzqgH20Im/VroDOhY7pX3IYS98obHBr3+2xFWdMbkb3W6szw10KmSFvXWqsnMAnYzGlt75mK8V85Ark5RDGCHWIrOsxv9373uWRybp8ZMybjFv4tV16l80u6/W6OKL36W0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761418755; c=relaxed/simple;
-	bh=8IETgLyA0+Ngz3PKpmB401z5C+rsj/BceKj1LriSqkc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AiUZFHiFE01HUoiHZThDnLtQN82HCxV9tlgP0sSsN35+ABD6micOTvC1HV05TFKtJRv/Jj3NTsDSuhBiJg8RLy2QIxN2VPtaCY9YbjrdiNsubYbXzU+ksbAqJLe0BolOdvC6cnof9ZRncCF9XlfvdTloViAebD10hyZ/s2tPAVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iav1FlIC; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-475dae5d473so9068155e9.2
-        for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 11:59:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761418752; x=1762023552; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GGPaeWFh3EC8/caqMOlhaVYPJ2R1kTiC1Nt5c5qtc+E=;
-        b=iav1FlICnL7bsERa8+FA6zqeI2ViXmw+FKf97R12QLrXzqGzzOOHb2OSeTUIGbfeVc
-         XM4hR8BpFHboPJgHkCvqAiWpW8X6j3usNpWLWjNS9FFYL47jQpmKyp+fcwCxXwfJGo6L
-         ZjJwrIXiWjAz7oq1beO4SXwYBbSw8yAZdZeBcJSf/VkB6u/jAFlBaAKX/I6nA5WGH1zP
-         spgZILNLMJwCEWMgbcCDeJSzH2pPMZC+NSoyeMFoVXUa3ak/sB4xZE1MIoJizk31ZCA6
-         lhdrO8tpLQZ/m7QX30DrDf+jVCTj5xzecASwmrwsV1aE++ZmLdFRcCupVujL9h6/898P
-         hViA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761418752; x=1762023552;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GGPaeWFh3EC8/caqMOlhaVYPJ2R1kTiC1Nt5c5qtc+E=;
-        b=oNJCwW1kceSkociXh9cEJdORtM0HNfF70pubBN0cTP7TX28wcD8tW1ROQtwrep17Cl
-         UWli3AP8fLwnG0P0AXU4DX+ndDqaXgNmeOmXKelPpDK8cjlZS0niik01Ps5ulPewDQ95
-         GxCaEFejceaHScDFRasBHHaSaYQvXzkin7b7e4fXWFZooI7ZBxYHgWiUZ7Qs1sucmZvd
-         G6T7P91Jmz98uaFlJsKoBbHBg0iXHN+EXs8Do3zN1EvA7ywBke6+n4dKsWxEWDwu4a17
-         yzMQW1iu6p4E9dWdOTfNMjLSBK1JFo98qjmuFkD6Ff7HMhdkJ+WD/o8mb+vG2f7LQ0kh
-         Rmkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUcXV8ffZgd2wLdyodA65gDln5VbQiawd+j9U7li+m0zc7ncw3FleXs6M8WeghoLAputO4v4Kk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZhifNAPqdCqp6LkBTyG49Tc4M2m6ErSVGwm88QgyVhNBW1n0a
-	LE+AV3w2WoX+IhZlMHnoBZzqDHHNPWUkRaOO1I2fvFvsVA+qNbc2Ils3
-X-Gm-Gg: ASbGncvidMu/FYjWa5rHt+HDdEPQfOFKDzDzeWjhwPk/hK7WheYLsl5gBBcMZ2BWth1
-	XmAhb0ykfOFt8a13fWnhem/Jwkhn4hQApDn8UtoStV1Rjcy8kAEy4hox9Olcb/14Z2DOwVMwvHF
-	5xvbM1h/eiZulAb6euzOMu4dP8DysL+q0VC6+2nU3OzSV1iMxRfGYCKQS2sZUfMCzGi44hUq8Aa
-	Xadt9Nn2Z5IIaCkLZWvVRPAHbqE04h6UeA6hUZlh9VFat7l/G7HKw/mmKGe8EB+5IvpizTQcLpe
-	VCnTDwqL21RLvqhF9UmJqoOnnLrIHL4XgT5FOpYWL/OPDAmX38P2k3fmnCDQkXrGFbTlHev5cq1
-	nqicCJnKGdE7TfuBVka9rQxqRg/8ydlsBobXcKqOMhgx3QUEctpSrzFVRL19sVj51JjCt1ULSAY
-	qPe89FMtyZegJyxu3OXLleN6JC/XuPFm6g039i5s0WzjQoS+Sv46Cn2jI1cfADZmus+k5dlyGJX
-	AkZMsIodO6nBCngYRTboKDrR2G8/Zs16XV1jsYhYveyWdhGuHgxcQ==
-X-Google-Smtp-Source: AGHT+IHZl0AnjfRRRKOYUZEXYm6W5vCY/z1ACKaTyuhGbN8vVZt4Y2hVsl3T1hwFAEO0MkBJHhP5Ng==
-X-Received: by 2002:a05:600c:6085:b0:471:133c:4b9a with SMTP id 5b1f17b1804b1-4711786c79emr272187845e9.6.1761418751765;
-        Sat, 25 Oct 2025 11:59:11 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f39:8b00:d401:6211:9005:e76e? (p200300ea8f398b00d40162119005e76e.dip0.t-ipconnect.de. [2003:ea:8f39:8b00:d401:6211:9005:e76e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475dd374e41sm45569965e9.12.2025.10.25.11.59.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Oct 2025 11:59:11 -0700 (PDT)
-Message-ID: <17b8fed7-fb42-4409-a831-1bdbf0eac33f@gmail.com>
-Date: Sat, 25 Oct 2025 20:59:10 +0200
+	s=arc-20240116; t=1761418903; c=relaxed/simple;
+	bh=hNbVZXep2YBK5Q7cJJO3VrBuF2XsUBotW/LD6SQAKE8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=awA9cteLNmGr3NYaEGbW23VXOFzZKXqha5BS3gUvEzeR1Cka0e6pOhdKJXZOuXj4IpnMKS5bbQHVUsnPTcqlCEQdNoVXbSc7ScW3FTvqjO0eZgXckqKBDqIZyageHuPMQGm5Y7TQqEtakjbX4zZGn2NuVleCwxvUrETxGZ2oJJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=OtQu4SgJ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=8yH6ltlgzcuD/G8TQM1TvHZqwPvMaP2kB7b6YbsIeio=; b=OtQu4SgJx7r1gzbQ8ofAl/iAwM
+	a3+yIOqMqAG77NWC0AZiqlrmXXqGuATnfkKhhuW+My5goCOkogktz02edZ5kMwpLjC52Zy5ArwexM
+	L8H6ooolBNM8/3Z1H8mUO87ucqsJ6/O4uNaodHBctzYYR1JvxdJSlrNONCUQcXoh7eDwGc0EqbW6w
+	AiNuPhnSRMM0IJogIY1CyPC3LjL+IDlG6Lw0hX/ZQy7eh8SI6Er5n4p87hA/3+gikWI1hitQCfDXJ
+	G8EQaeGYfoNof8tQ+nfQD+VeZqYKOJmaNYhxIDWWhzNtV/lpFkzjs79rwv7os0e2b+j4BKnCAM9Ka
+	nQVtfIww==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57248)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vCjVs-000000000K7-0V3V;
+	Sat, 25 Oct 2025 20:01:16 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vCjVp-000000003uC-1NV9;
+	Sat, 25 Oct 2025 20:01:13 +0100
+Date: Sat, 25 Oct 2025 20:01:13 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Matthew Gerlach <matthew.gerlach@altera.com>, kernel@pengutronix.de,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Teoh Ji Sheng <ji.sheng.teoh@intel.com>
+Subject: Re: [PATCH v5 02/10] net: stmmac: Use interrupt mode INTM=1 for per
+ channel irq
+Message-ID: <aP0eebM6ek-1fnA-@shell.armlinux.org.uk>
+References: <20251024-v6-12-topic-socfpga-agilex5-v5-0-4c4a51159eeb@pengutronix.de>
+ <20251024-v6-12-topic-socfpga-agilex5-v5-2-4c4a51159eeb@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/2] net: phy: fixed_phy: add helper
- fixed_phy_register_100fd
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <d6598983-83b1-4e1c-b621-8976520869c7@gmail.com>
- <20251021182021.15223c1e@kernel.org>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <20251021182021.15223c1e@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251024-v6-12-topic-socfpga-agilex5-v5-2-4c4a51159eeb@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 10/22/2025 3:20 AM, Jakub Kicinski wrote:
-> On Fri, 17 Oct 2025 22:11:44 +0200 Heiner Kallweit wrote:
->> In few places a 100FD fixed PHY is used. Create a helper so that users
->> don't have to define the struct fixed_phy_status. First user is the
->> dsa loop driver. A follow-up series will remove the usage of
->> fixed_phy_add() from bcm47xx and coldfire/m5272, then this helper
->> will be used too.
+On Fri, Oct 24, 2025 at 01:49:54PM +0200, Steffen Trumtrar wrote:
+> From: Teoh Ji Sheng <ji.sheng.teoh@intel.com>
 > 
-> Not knowing the area too well it looks like struct fixed_phy_status
-> is an argument struct to make it easier to add / pass thru extra
-> attrs without having to modify all the callers. This series goes
-> in the opposite direction trying to make the callers not have to
-> declare the argument struct.
+> commit 6ccf12ae111e ("net: stmmac: use interrupt mode INTM=1
+> for multi-MSI") is introduced for platform that uses MSI.
 > 
-> When reading the code it may also be easier to graps the code if 
-> the definition is local vs having to look at fixed_phy_register_100fd()
-> Granted the function name kinda makes it obvious what it does.
+> Similar approach is taken to enable per channel interrupt
+> that uses shared peripheral interrupt (SPI), so only per channel
+> TX and RX intr (TI/RI) are handled by TX/RX ISR without calling
+> common interrupt ISR.
 > 
-> Lastly: 19 insertions(+), 6 deletions(-)
+> TX/RX NORMAL interrupts check is now decoupled, since NIS bit
+> is not asserted for any TI/RI events when INTM=1.
 > 
-> So the improvement here is not immediately obvious to me.
-> Maybe it'd be easier to appreciate this series if it was in one
-> piece with what you mentioned as a follow up?
+> Signed-off-by: Teoh Ji Sheng <ji.sheng.teoh@intel.com>
+> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h       |  3 +++
+>  drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c   | 10 +++++++++-
+>  .../net/ethernet/stmicro/stmmac/stmmac_platform.c    | 20 ++++++++++++++++++++
+>  include/linux/stmmac.h                               |  2 ++
+>  4 files changed, 34 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> index 0d408ee17f337..64b533207e4a6 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> @@ -326,6 +326,9 @@
+>  /* DMA Registers */
+>  #define XGMAC_DMA_MODE			0x00003000
+>  #define XGMAC_SWR			BIT(0)
+> +#define DMA_MODE_INTM_MASK		GENMASK(13, 12)
+> +#define DMA_MODE_INTM_SHIFT		12
+> +#define DMA_MODE_INTM_MODE1		0x1
+>  #define XGMAC_DMA_SYSBUS_MODE		0x00003004
+>  #define XGMAC_WR_OSR_LMT		GENMASK(29, 24)
+>  #define XGMAC_WR_OSR_LMT_SHIFT		24
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+> index 4d6bb995d8d84..1e9ee1f10f0ef 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+> @@ -31,6 +31,13 @@ static void dwxgmac2_dma_init(void __iomem *ioaddr,
+>  		value |= XGMAC_EAME;
+>  
+>  	writel(value, ioaddr + XGMAC_DMA_SYSBUS_MODE);
+> +
+> +	if (dma_cfg->multi_irq_en) {
+> +		value = readl(ioaddr + XGMAC_DMA_MODE);
+> +		value &= ~DMA_MODE_INTM_MASK;
+> +		value |= (DMA_MODE_INTM_MODE1 << DMA_MODE_INTM_SHIFT);
 
-Makes sense, I'll prepare and submit the full series.
+No need for these parens. What is on the right hand side of |= is its
+own expression and can't be interpreted any other way.
+
+> +		writel(value, ioaddr + XGMAC_DMA_MODE);
+> +	}
+>  }
+>  
+>  static void dwxgmac2_dma_init_chan(struct stmmac_priv *priv,
+> @@ -359,13 +366,14 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
+>  		}
+>  	}
+>  
+> -	/* TX/RX NORMAL interrupts */
+> +	/* RX NORMAL interrupts */
+>  	if (likely(intr_status & XGMAC_RI)) {
+>  		u64_stats_update_begin(&stats->syncp);
+>  		u64_stats_inc(&stats->rx_normal_irq_n[chan]);
+>  		u64_stats_update_end(&stats->syncp);
+>  		ret |= handle_rx;
+>  	}
+> +	/* TX NORMAL interrupts */
+>  	if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
+>  		u64_stats_update_begin(&stats->syncp);
+>  		u64_stats_inc(&stats->tx_normal_irq_n[chan]);
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> index 27bcaae07a7f2..cfa82b8e04b94 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> @@ -607,6 +607,8 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+>  	dma_cfg->fixed_burst = of_property_read_bool(np, "snps,fixed-burst");
+>  	dma_cfg->mixed_burst = of_property_read_bool(np, "snps,mixed-burst");
+>  
+> +	dma_cfg->multi_irq_en = of_property_read_bool(np, "snps,multi-irq-en");
+> +
+>  	plat->force_thresh_dma_mode = of_property_read_bool(np, "snps,force_thresh_dma_mode");
+>  	if (plat->force_thresh_dma_mode && plat->force_sf_dma_mode) {
+>  		plat->force_sf_dma_mode = 0;
+> @@ -737,6 +739,8 @@ EXPORT_SYMBOL_GPL(stmmac_pltfr_find_clk);
+>  int stmmac_get_platform_resources(struct platform_device *pdev,
+>  				  struct stmmac_resources *stmmac_res)
+>  {
+> +	char irq_name[11];
+> +	int i;
+>  	memset(stmmac_res, 0, sizeof(*stmmac_res));
+
+We normally want to see a blank line between local variable declarations
+and code.
+
+>  
+>  	/* Get IRQ information early to have an ability to ask for deferred
+> @@ -746,6 +750,22 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
+>  	if (stmmac_res->irq < 0)
+>  		return stmmac_res->irq;
+>  
+> +	/* For RX Channel */
+> +	for (i = 0; i < MTL_MAX_RX_QUEUES; i++) {
+> +		sprintf(irq_name, "%s%d", "macirq_rx", i);
+> +		stmmac_res->rx_irq[i] = platform_get_irq_byname(pdev, irq_name);
+> +		if (stmmac_res->rx_irq[i] < 0)
+> +			break;
+> +	}
+> +
+> +	/* For TX Channel */
+> +	for (i = 0; i < MTL_MAX_TX_QUEUES; i++) {
+> +		sprintf(irq_name, "%s%d", "macirq_tx", i);
+> +		stmmac_res->tx_irq[i] = platform_get_irq_byname(pdev, irq_name);
+> +			if (stmmac_res->tx_irq[i] < 0)
+> +				break;
+> +	}
+> +
+
+It looks like multi-irq is a dwxgmac2 thing, should this be conditional
+on (a) multi_irq_en being set, and (b) should parsing multi_irq_en be
+conditional on dwxgmac2, (c) should the binding only allow
+snps,multi-irq-en if a dwxgmac2 compatible is indicated?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
