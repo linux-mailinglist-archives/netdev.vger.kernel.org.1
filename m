@@ -1,59 +1,69 @@
-Return-Path: <netdev+bounces-232861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FA1AC0988D
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:33:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3045C09877
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:33:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0DEF74FF9D8
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:24:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EEB71C23981
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 090C830E856;
-	Sat, 25 Oct 2025 16:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3164B3043BE;
+	Sat, 25 Oct 2025 16:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fL/dblZA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hCxNJVdE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB8BC30DEBD;
-	Sat, 25 Oct 2025 16:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071C52FC893;
+	Sat, 25 Oct 2025 16:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761409163; cv=none; b=U8u9BSLPQhhQE8geKba5IFmIWsP6euQ/fePRg2fj+Hu9R89/n5Azt7JrLX+1paWcjggVqZs/eJxqt0SuUdh9rEZA/Gh4fKAzGXAQG+l/AKxglP3c/QkYGwy1NqnXl0mFLtIwGzMBd+ftr53T5sxgrWcdDD11ZETqNCjW1henYLs=
+	t=1761409182; cv=none; b=bNf/0KG5Q49EqWeoOUt8RRJyjOV/zcf90fCkSk53ns2EaeRYG1QU8zcxD+/ES8n/u6ZlaLdg8SKX5K1A7VdEfUWfgvKhdW5GYl4OdYYltQr9DxRJoPRPt2XpN4rLIBhfT9y4NaPHhNuX47hy0G1JuWG1rULDnKrNo84ZWbPo8tI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761409163; c=relaxed/simple;
-	bh=+30FKIxEdVTz0B4kDF4g4b+6ckiJoxjBf4wxOUt1m8U=;
+	s=arc-20240116; t=1761409182; c=relaxed/simple;
+	bh=afWHb3gFsT0vDh4zieSFw/sUmsJjUwN4HXbzjwzZjfI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nG8jGWVfW05Gi2QdavP5+PWKws6gt7Nv7pfpDJjNccFZqKK7z5yLdFdsuali/2XwPge47m52MDWVtCOOqTNKS4o6n7bPoAZeP1WyE3decCHSxSLtvjs4aD+6mTglCxJmxTZgvphOCERO6o0QNVS883l/2PGPTXkGhtKL9VDNSA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fL/dblZA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE2DBC4CEF5;
-	Sat, 25 Oct 2025 16:19:22 +0000 (UTC)
+	 MIME-Version:Content-Type; b=JsjJv1usvEX7Hs7eg7vgfVXJArBvlAeESUH/aJVFosOkAHPAsX6XGfCY6e8Di1flckiRIhyDboZZYMo8hyJGWnPtYc4x1n68/Ux7Qp+3DWz8DQYcWqCvm1IRpHWuFnaGb2pVHh92F8+gRbWowGAYPh5NSiWp8ZWL4rLsz95ClWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hCxNJVdE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E39EDC4CEF5;
+	Sat, 25 Oct 2025 16:19:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761409163;
-	bh=+30FKIxEdVTz0B4kDF4g4b+6ckiJoxjBf4wxOUt1m8U=;
+	s=k20201202; t=1761409181;
+	bh=afWHb3gFsT0vDh4zieSFw/sUmsJjUwN4HXbzjwzZjfI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fL/dblZAbcnvrsK5M1mm2DBZ7rFU5hVfzdJNrpLdSdLtqrQOG1ejIyo+EW25boRIr
-	 x73pof3RaOeUtABMdsla8sRHoxcLF6nzIUmibpNOdw9u3Ze3kzikVVsYDEnosauQOK
-	 XInguzg8b2zM+38HoBDSyjgC+ERIa6NtDSopupJjoWuBMy0vHyJykBd+knKxLl2TUC
-	 i51/ywEMezVkHMM5/+DyrljeW/6etJKK8zwQcaa6e7idbJTyqrTq+V53mK9Pn4EcZN
-	 jRVJNSBSo+3oVPRQQ/vQzZSlw0XR2TV1TgRS9WWltOCiTvZTTAOxbNlU1p71PU0BBH
-	 DGoFpfi4nbVkA==
+	b=hCxNJVdE2/tZnEP+d9OpVyehdRxSDUkiMkcv/Q8QG8jfeG1xb/vcCI8U4Eo5Dt2bV
+	 MWVrIwi3bp53/OKMR8EBrS58lmJOhjNvpiS1ngWOsm4iCwz9NKjg30tFAdMYQnuGVR
+	 Y9Sj16kb0RFBQ9LpUA16J6oB+kIehp0pJNqU7ZdPILMLJxY3mvyK/gFuUTciEBvGHP
+	 fo2rJilzGeU2zUarTjYwrz/Rpk09s9dFAzzwNc6FKmarx64o09vGFQw1PeXU2hc1ra
+	 V4mPGT9uzkf0myAPEA3wJzYgaVmvXxCaq3BJjXah2RbmlJJraoCPAOnZcNYSu73GVl
+	 zgVKgXj7+B0xA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Ujwal Kundur <ujwal.kundur@gmail.com>,
-	Allison Henderson <allison.henderson@oracle.com>,
+Cc: Rohan G Thomas <rohan.g.thomas@altera.com>,
+	Matthew Gerlach <matthew.gerlach@altera.com>,
+	Furong Xu <0x1207@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk,
+	maxime.chevallier@bootlin.com,
+	jacob.e.keller@intel.com,
+	hayashi.kunihiko@socionext.com,
+	alexandre.f.demers@gmail.com,
+	alexander.deucher@amd.com,
+	alexis.lothore@bootlin.com,
 	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com
-Subject: [PATCH AUTOSEL 6.17-5.4] rds: Fix endianness annotation for RDS_MPATH_HASH
-Date: Sat, 25 Oct 2025 11:57:37 -0400
-Message-ID: <20251025160905.3857885-226-sashal@kernel.org>
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 6.17-6.12] net: stmmac: est: Drop frames causing HLBS error
+Date: Sat, 25 Oct 2025 11:57:42 -0400
+Message-ID: <20251025160905.3857885-231-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -69,273 +79,116 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Ujwal Kundur <ujwal.kundur@gmail.com>
+From: Rohan G Thomas <rohan.g.thomas@altera.com>
 
-[ Upstream commit 77907a068717fbefb25faf01fecca553aca6ccaa ]
+[ Upstream commit 7ce48d497475d7222bd8258c5c055eb7d928793c ]
 
-jhash_1word accepts host endian inputs while rs_bound_port is a be16
-value (sockaddr_in6.sin6_port). Use ntohs() for consistency.
+Drop those frames causing Head-of-Line Blocking due to Scheduling
+(HLBS) error to avoid HLBS interrupt flooding and netdev watchdog
+timeouts due to blocked packets. Tx queues can be configured to drop
+those blocked packets by setting Drop Frames causing Scheduling Error
+(DFBS) bit of EST_CONTROL register.
 
-Flagged by Sparse.
+Also, add per queue HLBS drop count.
 
-Signed-off-by: Ujwal Kundur <ujwal.kundur@gmail.com>
-Reviewed-by: Allison Henderson <allison.henderson@oracle.com>
-Link: https://patch.msgid.link/20250820175550.498-4-ujwal.kundur@gmail.com
+Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
+Reviewed-by: Furong Xu <0x1207@gmail.com>
+Link: https://patch.msgid.link/20250925-hlbs_2-v3-1-3b39472776c2@altera.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-## BACKPORT RECOMMENDATION: YES (Low Priority)
+YES
+- Enabling EST currently leaves blocked frames in the Tx queue when a
+  Head-of-Line Blocking due to Scheduling (HLBS) fault happens, so the
+  scheduler keeps retrying the same frame and continuously raises HLBS
+  interrupts, which ends in watchdog timeouts. The fix explicitly sets
+  the hardware “Drop Frames causing Scheduling error” bit when EST is
+  enabled (`drivers/net/ethernet/stmicro/stmmac/stmmac_est.c:66`
+  together with the new definition in `stmmac_est.h:19`), so those
+  unschedulable frames are discarded by the MAC instead of wedging the
+  queue.
+- The change is tightly scoped to the EST path: when EST is disabled
+  nothing changes (`stmmac_est.c:65-68`), so non-TSN users of stmmac are
+  unaffected. The additional per-queue accounting merely increments a
+  counter when HLBS drops occur (`stmmac_est.c:110-114` with storage
+  added in `common.h:231`); it does not alter behaviour and has no UAPI
+  impact.
+- This solves a real, user-visible failure (interrupt storms and `netdev
+  watchdog` fires) that exists in all builds with EST support since it
+  was introduced, while the code delta is minimal and self-contained.
+  There are no prerequisite refactors beyond what is already in stable,
+  and there is no evidence of regressions from setting this documented
+  control bit.
 
-## Executive Summary
+ drivers/net/ethernet/stmicro/stmmac/common.h     | 1 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac_est.c | 9 ++++++---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_est.h | 1 +
+ 3 files changed, 8 insertions(+), 3 deletions(-)
 
-This commit fixes a **real but subtle endianness bug** in the RDS
-(Reliable Datagram Sockets) multipath hashing mechanism that has existed
-since multipath support was introduced in Linux 4.10 (July 2016). The
-fix adds a single `ntohs()` call to properly convert network byte order
-to host byte order before hashing, ensuring correct behavior across all
-architectures.
-
-## Detailed Technical Analysis
-
-### The Bug (net/rds/rds.h:96)
-
-**Before (incorrect):**
-```c
-#define RDS_MPATH_HASH(rs, n) (jhash_1word((rs)->rs_bound_port, \
-                               (rs)->rs_hash_initval) & ((n) - 1))
-```
-
-**After (correct):**
-```c
-#define RDS_MPATH_HASH(rs, n) (jhash_1word(ntohs((rs)->rs_bound_port), \
-                               (rs)->rs_hash_initval) & ((n) - 1))
-```
-
-### Root Cause Analysis
-
-Using semcode tools, I verified that:
-
-1. **`rs_bound_port` is `__be16`** (net/rds/rds.h:600):
-   - Defined as `rs_bound_sin6.sin6_port` from `struct sockaddr_in6`
-   - Stored in network byte order (big-endian) as confirmed in
-     net/rds/bind.c:126: `rs->rs_bound_port = cpu_to_be16(rover);`
-
-2. **`jhash_1word()` expects `u32` in host byte order**
-   (tools/include/linux/jhash.h:170):
-  ```c
-  static inline u32 jhash_1word(u32 a, u32 initval)
-  ```
-
-3. **The macro violates type safety** by passing `__be16` where `u32`
-   (host endian) is expected
-
-### Functional Impact
-
-**On Little-Endian Systems (x86, x86_64, ARM-LE):**
-- Port 80 (0x0050 in network order) → hashed as 0x5000 (20480) ❌
-- Port 443 (0x01BB in network order) → hashed as 0xBB01 (47873) ❌
-- Results in **incorrect hash values** and **wrong multipath selection**
-
-**On Big-Endian Systems (SPARC, PowerPC in BE mode):**
-- Port 80 → hashed correctly as 80 ✓
-- Port 443 → hashed correctly as 443 ✓
-
-**Cross-Architecture Implications:**
-- Heterogeneous clusters (mixing LE and BE systems) would compute
-  different hashes for the same port
-- This violates the fundamental assumption that the same port should
-  select the same path consistently
-
-### Code Location and Usage
-
-The `RDS_MPATH_HASH` macro is used in **net/rds/send.c:1050-1052**:
-```c
-static int rds_send_mprds_hash(struct rds_sock *rs,
-                               struct rds_connection *conn, int
-nonblock)
-{
-    int hash;
-
-    if (conn->c_npaths == 0)
-        hash = RDS_MPATH_HASH(rs, RDS_MPATH_WORKERS);
-    else
-        hash = RDS_MPATH_HASH(rs, conn->c_npaths);
-    // ... path selection logic
-}
-```
-
-This function is called from `rds_sendmsg()` to determine which
-connection path to use for multipath RDS, affecting all RDS multipath
-traffic.
-
-### Historical Context
-
-- **Introduced:** July 14, 2016 in commit 5916e2c1554f3 ("RDS: TCP:
-  Enable multipath RDS for TCP")
-- **Bug duration:** ~9 years (2016-2025)
-- **Affected kernels:** All versions from v4.10 onwards
-- **Discovery method:** Sparse static analysis tool
-- **No Fixes: tag:** Indicating maintainer didn't consider it critical
-- **No Cc: stable tag:** Not marked for automatic stable backporting
-
-### Why This Bug Went Unnoticed
-
-1. **Limited Deployment Scope:**
-   - RDS is primarily used in Oracle RAC (Real Application Clusters)
-   - Niche protocol with specialized use cases
-   - Not commonly deployed in general-purpose environments
-
-2. **Homogeneous Architectures:**
-   - Most RDS deployments use identical hardware (typically x86_64)
-   - Within a single architecture, the bug is **consistent** (always
-     wrong, but deterministically wrong)
-   - Same port always selects the same path (even if it's the "wrong"
-     path)
-
-3. **Subtle Impact:**
-   - Doesn't cause crashes or data corruption
-   - Only affects multipath load distribution
-   - Performance impact may be attributed to other factors
-
-### Comparison with Correct Usage
-
-Looking at similar kernel code in **include/net/ip.h:714**, I found the
-correct pattern:
-```c
-static inline u32 ipv4_portaddr_hash(const struct net *net,
-                                     __be32 saddr,
-                                     unsigned int port)
-{
-    return jhash_1word((__force u32)saddr, net_hash_mix(net)) ^ port;
-}
-```
-
-Note the explicit `(__force u32)` cast to convert big-endian to host
-endian before passing to `jhash_1word()`.
-
-## Backporting Assessment
-
-### Criteria Evaluation
-
-| Criterion | Assessment | Details |
-|-----------|-----------|---------|
-| **Fixes a real bug** | ✅ YES | Endianness type mismatch causing
-incorrect hash on LE systems |
-| **Affects users** | ⚠️ LIMITED | RDS is niche; most deployments
-homogeneous |
-| **Small change** | ✅ YES | Single line, one function call added |
-| **Obviously correct** | ✅ YES | Standard byte order conversion;
-matches kernel patterns |
-| **No side effects** | ⚠️ MINOR | Hash values change on LE systems;
-path selection may differ |
-| **Architectural change** | ✅ NO | Correctness fix only |
-| **Risk of regression** | 🟡 LOW | Minimal; changes observable behavior
-but fixes incorrect behavior |
-
-### Benefits of Backporting
-
-1. **Correctness:** Fixes architecturally incorrect code that violates
-   API contracts
-2. **Sparse-clean:** Brings code in line with kernel coding standards
-3. **Cross-architecture consistency:** Ensures LE and BE systems hash
-   identically
-4. **Future-proofing:** Prevents potential issues in heterogeneous
-   deployments
-5. **Long-term stability:** Eliminates subtle load-balancing issues
-
-### Risks of Backporting
-
-1. **Behavior Change on LE Systems:**
-   - Hash values will change for all ports
-   - Existing multipath connections may select different paths after
-     upgrade
-   - Could cause brief connection disruption during kernel update
-
-2. **Limited Testing:**
-   - RDS multipath is not widely deployed
-   - Difficult to predict impact on production systems
-   - No specific bug reports to validate the fix against
-
-3. **Low Severity:**
-   - No CVE assigned
-   - No security implications
-   - Hasn't caused reported user-facing issues in 9 years
-
-## Related Commits
-
-This is part of a series of endianness annotation fixes by Ujwal Kundur:
-- **92b925297a2f** "rds: Fix endianness annotation of jhash wrappers"
-  (companion fix)
-- **5e9e8e376ae19** "rds: Fix endianness annotations for RDS extension
-  headers"
-
-These related commits further support the importance of proper
-endianness handling in the RDS subsystem.
-
-## Recommendation Rationale
-
-**YES, this commit should be backported**, but as a **low-priority
-correctness fix** rather than a critical bugfix:
-
-1. **It's the right thing to do technically:** The code is objectively
-   incorrect and violates the jhash_1word() API contract
-2. **Minimal risk:** One-line change with obvious semantics
-3. **Long-term benefit:** Prevents future issues and aligns with kernel
-   standards
-4. **Completeness:** Part of a broader effort to fix RDS endianness
-   issues
-5. **Stable kernel compatibility:** Follows stable tree rules (small,
-   obvious, no ABI change)
-
-**However, prioritization should be LOW because:**
-- No reported user issues in 9 years
-- Limited real-world impact (niche protocol, homogeneous deployments)
-- Maintainer didn't mark as Cc: stable
-- Behavior change (hash values) could surprise users
-
-## Suggested Backport Scope
-
-Backport to all **actively maintained stable kernels** where RDS
-multipath exists:
-- v6.x series (current)
-- v5.15+ LTS series
-- v5.10 LTS (if still maintained)
-
-**Do NOT backport to:**
-- EOL kernels (maintenance overhead not justified)
-- Kernels older than v4.10 (RDS_MPATH_HASH doesn't exist)
-
-## Final Verdict
-
-**Backport Status: YES**
-
-This is a **valid correctness fix** for a real architectural bug that
-should be backported to stable trees. While the practical impact is
-limited due to RDS's specialized usage, the fix is minimal, obviously
-correct, and brings the code in line with kernel standards. The small
-risk of path selection changes on little-endian systems is outweighed by
-the long-term benefits of having correct, Sparse-clean code that behaves
-consistently across all architectures.
-
- net/rds/rds.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/rds/rds.h b/net/rds/rds.h
-index dc360252c5157..5b1c072e2e7ff 100644
---- a/net/rds/rds.h
-+++ b/net/rds/rds.h
-@@ -93,7 +93,7 @@ enum {
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+index cbffccb3b9af0..450a51a994b92 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -228,6 +228,7 @@ struct stmmac_extra_stats {
+ 	unsigned long mtl_est_btrlm;
+ 	unsigned long max_sdu_txq_drop[MTL_MAX_TX_QUEUES];
+ 	unsigned long mtl_est_txq_hlbf[MTL_MAX_TX_QUEUES];
++	unsigned long mtl_est_txq_hlbs[MTL_MAX_TX_QUEUES];
+ 	/* per queue statistics */
+ 	struct stmmac_txq_stats txq_stats[MTL_MAX_TX_QUEUES];
+ 	struct stmmac_rxq_stats rxq_stats[MTL_MAX_RX_QUEUES];
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_est.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_est.c
+index ac6f2e3a3fcd2..4b513d27a9889 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_est.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_est.c
+@@ -63,7 +63,7 @@ static int est_configure(struct stmmac_priv *priv, struct stmmac_est *cfg,
+ 			 EST_GMAC5_PTOV_SHIFT;
+ 	}
+ 	if (cfg->enable)
+-		ctrl |= EST_EEST | EST_SSWL;
++		ctrl |= EST_EEST | EST_SSWL | EST_DFBS;
+ 	else
+ 		ctrl &= ~EST_EEST;
  
- /* Max number of multipaths per RDS connection. Must be a power of 2 */
- #define	RDS_MPATH_WORKERS	8
--#define	RDS_MPATH_HASH(rs, n) (jhash_1word((rs)->rs_bound_port, \
-+#define	RDS_MPATH_HASH(rs, n) (jhash_1word(ntohs((rs)->rs_bound_port), \
- 			       (rs)->rs_hash_initval) & ((n) - 1))
+@@ -109,6 +109,10 @@ static void est_irq_status(struct stmmac_priv *priv, struct net_device *dev,
  
- #define IS_CANONICAL(laddr, faddr) (htonl(laddr) < htonl(faddr))
+ 		x->mtl_est_hlbs++;
+ 
++		for (i = 0; i < txqcnt; i++)
++			if (value & BIT(i))
++				x->mtl_est_txq_hlbs[i]++;
++
+ 		/* Clear Interrupt */
+ 		writel(value, est_addr + EST_SCH_ERR);
+ 
+@@ -131,10 +135,9 @@ static void est_irq_status(struct stmmac_priv *priv, struct net_device *dev,
+ 
+ 		x->mtl_est_hlbf++;
+ 
+-		for (i = 0; i < txqcnt; i++) {
++		for (i = 0; i < txqcnt; i++)
+ 			if (feqn & BIT(i))
+ 				x->mtl_est_txq_hlbf[i]++;
+-		}
+ 
+ 		/* Clear Interrupt */
+ 		writel(feqn, est_addr + EST_FRM_SZ_ERR);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_est.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_est.h
+index d247fa383a6e4..f70221c9c84af 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_est.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_est.h
+@@ -16,6 +16,7 @@
+ #define EST_XGMAC_PTOV_MUL		9
+ #define EST_SSWL			BIT(1)
+ #define EST_EEST			BIT(0)
++#define EST_DFBS			BIT(5)
+ 
+ #define EST_STATUS			0x00000008
+ #define EST_GMAC5_BTRL			GENMASK(11, 8)
 -- 
 2.51.0
 
