@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-232800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6030CC08F2A
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 12:34:22 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEA67C08F27
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 12:34:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3D7D1B240A5
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 10:34:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0710B4E35AC
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 10:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58702F3C1A;
-	Sat, 25 Oct 2025 10:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7062F49FB;
+	Sat, 25 Oct 2025 10:33:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="D4yWgkYG"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BnX3OvTX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317282F39AF
-	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 10:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC00C2F39AF
+	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 10:33:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761388425; cv=none; b=pdWgfeKThpVgREG2hUjLitcUSEFMwnYe2tbIFg3Fgk2wunyEtUYr0ceWkVJRdebtY7BGk37r5aG3x3zeVDF7zsRw8W+uAaZ9FsbdgXDroCGl0igIBI1gf0sgNxZS9YWGM6h3P9+Ug6XG+nka/xncbfLdMasTNjSrhqJ75uA6CFU=
+	t=1761388429; cv=none; b=qkCP/wGP9WsegYXpuc5E9cbuwMCG7XJhMtEdQ2WBb54LejWczGf3okFtMXKMB+2aQDC8NZWhTRK0OizgLmDPnITv1Gk45NvA8SIDtWG/ggNRZzdplPaazxfcSdtEZL/tyJvPzR/joaxEi+UDYnKRytDfeR1TVi74HGjWH+CC4c8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761388425; c=relaxed/simple;
-	bh=fK+rr0TUr3i8ARlo8eb8YNWOU6xQGjwpn91a3rarmfo=;
+	s=arc-20240116; t=1761388429; c=relaxed/simple;
+	bh=G7W67MPG/IrUdRd+bXe6PfPkpnTwJkHeC8gOadafttI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TQREfWpB8A71aJvWzwNP0CU3PecnLb9HYSNRCToH6tzcHejqB2rTMAGHpqFCzJI80dIX4hMm3N4qKkFj8hra4btPN32pikb5oxDcyLYQkRU6ZKsuuhmQpH5PsvnUuEj1iupxVe2zY+fNPTHYoxlrpc2N0+LMQBHGHzUUHcSKmtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=D4yWgkYG; arc=none smtp.client-ip=67.231.148.174
+	 MIME-Version:Content-Type; b=DB7MsZ/NMxvbcUtcoICg1Gf/P8d41J0Sy14p5VClwIcQs/RdQ8DrCpxp59ogQ2HGYKyG2YwvMSTaZ4OcXBgkGUQ/+HBCBc4q/f/OJ762nfjhqtNiKWYqzcodNGyAjTeysMLJuN6XLGJa+xyJGaOkMyvw9FpgkK6uYv8DgrrkQBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=BnX3OvTX; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59P80O1e646474;
-	Sat, 25 Oct 2025 03:33:36 -0700
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59P5xTkU399042;
+	Sat, 25 Oct 2025 03:33:40 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=qB2oZtXM9TKZPT1mySxGAwa7P
-	yequ5rPH/+wmoQFScE=; b=D4yWgkYGMRUQhvWJpbzF9H1WhHG1wYWeXpROOdXrp
-	8Gr7K3rKVTKAQV2ZE860ium4QCVPyR6cliGtTLuD4XWakKT9gdVETdhmbFGxJp1R
-	SH7hj3x7F4yEc0wF/fMs0tChGMXB+Ij/2YpmyAtn7OvI4LLlXHHvjLHaTbRc65Tt
-	DxJZ7qMxTHO/e1kqQmo9xLZgkHXWzC1/J9zDsMkeTKlpnKPCylH5DeWLa/KiiUBe
-	VGd1eOQpbbgI+Y+HyXqL3NVgeIjlgDz+LTodEsqBcQvitGkVGBaOYfIyjwlbvkoT
-	katdsgDkoyxsxG+NqAE4l+vtEsPPYCNxc/S1RTBbheOYA==
+	:references:subject:to; s=pfpt0220; bh=YV3p4fde68sGt840L+KnI6tdd
+	lsx/BwsNHRLb8wAhzc=; b=BnX3OvTXTyAnE9w+ToEdP0jqlxOAdWK0cawzeUVBS
+	2Vk1B+Qs5RS7Yf4t/iiXTlBa+C4SedeYkZqQvp9a1cFO7k9yCBjyVf/CodBky2s1
+	Qt5oPyJ6Zvd2lIwLmmPk2FuQ+0Qj4qOUrOGcl+ws0Hxm4i9jtLlFgO0FRkyvF1qU
+	7F7FLlu3HEqiJPZtEmz78ko+eT+PpUdEfyvA3WwAEV529DcC+WZsINSCjdDZRWOt
+	RibZucXySojPhGViVviOIx2cXzWH+PpyDvpe5M4JplHajGdXZAqCGXuJA2/1XNoi
+	70Z1Fv9I9m36jJN9lZ3hG4qEiTB/pAHp25rTDxyDk59xQ==
 Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4a0nm3rjyx-1
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4a0p2g8gy1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 25 Oct 2025 03:33:36 -0700 (PDT)
+	Sat, 25 Oct 2025 03:33:40 -0700 (PDT)
 Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
  DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Sat, 25 Oct 2025 03:33:48 -0700
+ 15.2.1544.25; Sat, 25 Oct 2025 03:33:53 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
  (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Sat, 25 Oct 2025 03:33:47 -0700
+ Transport; Sat, 25 Oct 2025 03:33:52 -0700
 Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 3BC315B6921;
-	Sat, 25 Oct 2025 03:33:29 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id 33DB65B6921;
+	Sat, 25 Oct 2025 03:33:34 -0700 (PDT)
 From: Subbaraya Sundeep <sbhatta@marvell.com>
 To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
@@ -65,9 +65,9 @@ CC: <gakula@marvell.com>, <hkelam@marvell.com>, <bbhushan2@marvell.com>,
         <saikrishnag@marvell.com>, <netdev@vger.kernel.org>,
         Subbaraya Sundeep
 	<sbhatta@marvell.com>
-Subject: [net-next v4 05/11] octeontx2-af: Extend debugfs support for cn20k NPA
-Date: Sat, 25 Oct 2025 16:02:41 +0530
-Message-ID: <1761388367-16579-6-git-send-email-sbhatta@marvell.com>
+Subject: [net-next v4 06/11] octeontx2-af: Skip NDC operations for cn20k
+Date: Sat, 25 Oct 2025 16:02:42 +0530
+Message-ID: <1761388367-16579-7-git-send-email-sbhatta@marvell.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1761388367-16579-1-git-send-email-sbhatta@marvell.com>
 References: <1761388367-16579-1-git-send-email-sbhatta@marvell.com>
@@ -78,169 +78,105 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Proofpoint-GUID: B4M41HZ2cZ0K1qWFL0jzElgauizbjxkZ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI1MDA5NSBTYWx0ZWRfX3NpmYQbA3tBv
- JmGc5AUmdHAkJBm4qn5z9MG7t3HE58AyS17jEDlA3Zo/IxfCbgvsCM9NWmVEmCHYjIKwKHg9U7v
- MMkYcD/H5Ru34YflzDmXbP8rnA0F+wDCVT6IBf6R1Ucmdu2LBeNt/tUIeX4c/ABNzpyyzRvg8Xt
- EELQ8lAm3jSXis5Un+aKsJr+Hf6LMJNaQqrjXKh1BWoel3JX7p0tV+qc7sF0Xfp19vuMRZH8/t8
- x8r71Ws87hUJr9P+JHCHgnxGEdFP0HYdRm+KmMi/dM49u2963M1pRMKnoq4NmDcHwmGvOyB26e2
- lrb/Cu+YBUjqIt+NWZaUFFJkEFXCGN0U5+RrLsgje+av63DE8UTwEqVlhxinHk4GySufD2L5HNg
- 8cWMc8M8vwIR0BfOn93IUlMiwq0WOg==
-X-Proofpoint-ORIG-GUID: B4M41HZ2cZ0K1qWFL0jzElgauizbjxkZ
-X-Authority-Analysis: v=2.4 cv=bpJBxUai c=1 sm=1 tr=0 ts=68fca780 cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI1MDA5NSBTYWx0ZWRfX+ow8Y7CCYDFC
+ vzYSsrolclVrX9UPL7ToxggbJhSEjYIftPkXZgyt0e4SLbfVOOq7c2JAJvmggmVfyTBbaCCFpZw
+ MsFc3MF0eec59n64HZweysesk2ktfMvUuMURWzlwvGZZLF2a8ZOYWqj/6ujfziaq2SE3VWdQJ0S
+ np19v3jzIaMpMGhwg5K2kSCfx6SA4tllLT3x5PYkp1a1QEk1qZRUxGleq+yx4Imx1ZKwXLuyLRv
+ L+gliW0XcNddExnmFDVPVeb00XFpxoTuBwvMFlAMJK5wOoBXmT5lj38Y5b+2KFi53jkbfcVJ1fG
+ xiH8v3uTgg+09PX/MYkjuewB3umkJ3v055Z/uiJZQSai8gRdyM2hgbCv19G2/xsJZmmd243qwHe
+ rI/CRhtRtG951wb19kijLrbyQbw6VQ==
+X-Proofpoint-ORIG-GUID: rakG9A9efcBKWM5VypCEm7ze4OJS--Ze
+X-Authority-Analysis: v=2.4 cv=Bt6QAIX5 c=1 sm=1 tr=0 ts=68fca784 cx=c_pps
  a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
  a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=kt4yuNSx9aKLEnRRmMIA:9 a=OBjm3rFKGHvpk9ecZwUJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+ a=GFmy-jf8mh29BVtaGncA:9 a=OBjm3rFKGHvpk9ecZwUJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: rakG9A9efcBKWM5VypCEm7ze4OJS--Ze
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-10-25_03,2025-10-22_01,2025-03-28_01
 
 From: Linu Cherian <lcherian@marvell.com>
 
-Extend debugfs to display CN20K NPA aura and pool contexts.
+For cn20k, NPA block doesn't use the general purpose
+NDC (Near Coprocessor Bus Data cache Unit) for caching,
+hence skip the NDC related operations.
+Also refactor NDC configuration code to a helper function.
 
 Signed-off-by: Linu Cherian <lcherian@marvell.com>
 Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
 ---
- .../marvell/octeontx2/af/cn20k/debugfs.c      | 84 +++++++++++++++++++
- .../marvell/octeontx2/af/cn20k/debugfs.h      |  4 +
- .../marvell/octeontx2/af/rvu_debugfs.c        | 10 +++
- 3 files changed, 98 insertions(+)
+ .../marvell/octeontx2/af/rvu_debugfs.c        |  3 ++
+ .../ethernet/marvell/octeontx2/af/rvu_npa.c   | 29 ++++++++++++++-----
+ 2 files changed, 24 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
-index 50b1bd1d2c86..498968bf4cf5 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
-@@ -132,3 +132,87 @@ void print_nix_cn20k_cq_ctx(struct seq_file *m,
- 	seq_printf(m, "W4: lbpid_ext \t\t\t\t%d\n\n", cq_ctx->lbpid_ext);
- 	seq_printf(m, "W4: bpid_ext \t\t\t\t%d\n\n", cq_ctx->bpid_ext);
- }
-+
-+void print_npa_cn20k_aura_ctx(struct seq_file *m,
-+			      struct npa_cn20k_aq_enq_rsp *rsp)
-+{
-+	struct npa_cn20k_aura_s *aura = &rsp->aura;
-+
-+	seq_printf(m, "W0: Pool addr\t\t%llx\n", aura->pool_addr);
-+
-+	seq_printf(m, "W1: ena\t\t\t%d\nW1: pool caching\t%d\n",
-+		   aura->ena, aura->pool_caching);
-+	seq_printf(m, "W1: avg con\t\t%d\n", aura->avg_con);
-+	seq_printf(m, "W1: pool drop ena\t%d\nW1: aura drop ena\t%d\n",
-+		   aura->pool_drop_ena, aura->aura_drop_ena);
-+	seq_printf(m, "W1: bp_ena\t\t%d\nW1: aura drop\t\t%d\n",
-+		   aura->bp_ena, aura->aura_drop);
-+	seq_printf(m, "W1: aura shift\t\t%d\nW1: avg_level\t\t%d\n",
-+		   aura->shift, aura->avg_level);
-+
-+	seq_printf(m, "W2: count\t\t%llu\nW2: nix_bpid\t\t%d\n",
-+		   (u64)aura->count, aura->bpid);
-+
-+	seq_printf(m, "W3: limit\t\t%llu\nW3: bp\t\t\t%d\nW3: fc_ena\t\t%d\n",
-+		   (u64)aura->limit, aura->bp, aura->fc_ena);
-+
-+	seq_printf(m, "W3: fc_up_crossing\t%d\nW3: fc_stype\t\t%d\n",
-+		   aura->fc_up_crossing, aura->fc_stype);
-+	seq_printf(m, "W3: fc_hyst_bits\t%d\n", aura->fc_hyst_bits);
-+
-+	seq_printf(m, "W4: fc_addr\t\t%llx\n", aura->fc_addr);
-+
-+	seq_printf(m, "W5: pool_drop\t\t%d\nW5: update_time\t\t%d\n",
-+		   aura->pool_drop, aura->update_time);
-+	seq_printf(m, "W5: err_int \t\t%d\nW5: err_int_ena\t\t%d\n",
-+		   aura->err_int, aura->err_int_ena);
-+	seq_printf(m, "W5: thresh_int\t\t%d\nW5: thresh_int_ena \t%d\n",
-+		   aura->thresh_int, aura->thresh_int_ena);
-+	seq_printf(m, "W5: thresh_up\t\t%d\nW5: thresh_qint_idx\t%d\n",
-+		   aura->thresh_up, aura->thresh_qint_idx);
-+	seq_printf(m, "W5: err_qint_idx \t%d\n", aura->err_qint_idx);
-+
-+	seq_printf(m, "W6: thresh\t\t%llu\n", (u64)aura->thresh);
-+	seq_printf(m, "W6: fc_msh_dst\t\t%d\n", aura->fc_msh_dst);
-+}
-+
-+void print_npa_cn20k_pool_ctx(struct seq_file *m,
-+			      struct npa_cn20k_aq_enq_rsp *rsp)
-+{
-+	struct npa_cn20k_pool_s *pool = &rsp->pool;
-+
-+	seq_printf(m, "W0: Stack base\t\t%llx\n", pool->stack_base);
-+
-+	seq_printf(m, "W1: ena \t\t%d\nW1: nat_align \t\t%d\n",
-+		   pool->ena, pool->nat_align);
-+	seq_printf(m, "W1: stack_caching\t%d\n",
-+		   pool->stack_caching);
-+	seq_printf(m, "W1: buf_offset\t\t%d\nW1: buf_size\t\t%d\n",
-+		   pool->buf_offset, pool->buf_size);
-+
-+	seq_printf(m, "W2: stack_max_pages \t%d\nW2: stack_pages\t\t%d\n",
-+		   pool->stack_max_pages, pool->stack_pages);
-+
-+	seq_printf(m, "W4: stack_offset\t%d\nW4: shift\t\t%d\nW4: avg_level\t\t%d\n",
-+		   pool->stack_offset, pool->shift, pool->avg_level);
-+	seq_printf(m, "W4: avg_con \t\t%d\nW4: fc_ena\t\t%d\nW4: fc_stype\t\t%d\n",
-+		   pool->avg_con, pool->fc_ena, pool->fc_stype);
-+	seq_printf(m, "W4: fc_hyst_bits\t%d\nW4: fc_up_crossing\t%d\n",
-+		   pool->fc_hyst_bits, pool->fc_up_crossing);
-+	seq_printf(m, "W4: update_time\t\t%d\n", pool->update_time);
-+
-+	seq_printf(m, "W5: fc_addr\t\t%llx\n", pool->fc_addr);
-+
-+	seq_printf(m, "W6: ptr_start\t\t%llx\n", pool->ptr_start);
-+
-+	seq_printf(m, "W7: ptr_end\t\t%llx\n", pool->ptr_end);
-+
-+	seq_printf(m, "W8: err_int\t\t%d\nW8: err_int_ena\t\t%d\n",
-+		   pool->err_int, pool->err_int_ena);
-+	seq_printf(m, "W8: thresh_int\t\t%d\n", pool->thresh_int);
-+	seq_printf(m, "W8: thresh_int_ena\t%d\nW8: thresh_up\t\t%d\n",
-+		   pool->thresh_int_ena, pool->thresh_up);
-+	seq_printf(m, "W8: thresh_qint_idx\t%d\nW8: err_qint_idx\t%d\n",
-+		   pool->thresh_qint_idx, pool->err_qint_idx);
-+	seq_printf(m, "W8: fc_msh_dst\t\t%d\n", pool->fc_msh_dst);
-+}
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.h
-index 9d3a98dc3000..a2e3a2cd6edb 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.h
-@@ -20,5 +20,9 @@ void print_nix_cn20k_sq_ctx(struct seq_file *m,
- 			    struct nix_cn20k_sq_ctx_s *sq_ctx);
- void print_nix_cn20k_cq_ctx(struct seq_file *m,
- 			    struct nix_cn20k_aq_enq_rsp *rsp);
-+void print_npa_cn20k_aura_ctx(struct seq_file *m,
-+			      struct npa_cn20k_aq_enq_rsp *rsp);
-+void print_npa_cn20k_pool_ctx(struct seq_file *m,
-+			      struct npa_cn20k_aq_enq_rsp *rsp);
- 
- #endif
 diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index eeca8cef7964..c55a0f15380d 100644
+index c55a0f15380d..8ab82700e826 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -1103,6 +1103,11 @@ static void print_npa_aura_ctx(struct seq_file *m, struct npa_aq_enq_rsp *rsp)
- 	struct npa_aura_s *aura = &rsp->aura;
- 	struct rvu *rvu = m->private;
- 
-+	if (is_cn20k(rvu->pdev)) {
-+		print_npa_cn20k_aura_ctx(m, (struct npa_cn20k_aq_enq_rsp *)rsp);
-+		return;
-+	}
+@@ -2808,6 +2808,9 @@ static void rvu_dbg_npa_init(struct rvu *rvu)
+ 			    &rvu_dbg_npa_aura_ctx_fops);
+ 	debugfs_create_file("pool_ctx", 0600, rvu->rvu_dbg.npa, rvu,
+ 			    &rvu_dbg_npa_pool_ctx_fops);
 +
- 	seq_printf(m, "W0: Pool addr\t\t%llx\n", aura->pool_addr);
- 
- 	seq_printf(m, "W1: ena\t\t\t%d\nW1: pool caching\t%d\n",
-@@ -1151,6 +1156,11 @@ static void print_npa_pool_ctx(struct seq_file *m, struct npa_aq_enq_rsp *rsp)
- 	struct npa_pool_s *pool = &rsp->pool;
- 	struct rvu *rvu = m->private;
- 
-+	if (is_cn20k(rvu->pdev)) {
-+		print_npa_cn20k_pool_ctx(m, (struct npa_cn20k_aq_enq_rsp *)rsp);
++	if (is_cn20k(rvu->pdev)) /* NDC not appliable for cn20k */
 +		return;
-+	}
-+
- 	seq_printf(m, "W0: Stack base\t\t%llx\n", pool->stack_base);
+ 	debugfs_create_file("ndc_cache", 0600, rvu->rvu_dbg.npa, rvu,
+ 			    &rvu_dbg_npa_ndc_cache_fops);
+ 	debugfs_create_file("ndc_hits_miss", 0600, rvu->rvu_dbg.npa, rvu,
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npa.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npa.c
+index 4f5ca5ab13a4..e2a33e46b48a 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npa.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npa.c
+@@ -464,6 +464,23 @@ int rvu_mbox_handler_npa_lf_free(struct rvu *rvu, struct msg_req *req,
+ 	return 0;
+ }
  
- 	seq_printf(m, "W1: ena \t\t%d\nW1: nat_align \t\t%d\n",
++static void npa_aq_ndc_config(struct rvu *rvu, struct rvu_block *block)
++{
++	u64 cfg;
++
++	if (is_cn20k(rvu->pdev)) /* NDC not applicable to cn20k */
++		return;
++
++	/* Do not bypass NDC cache */
++	cfg = rvu_read64(rvu, block->addr, NPA_AF_NDC_CFG);
++	cfg &= ~0x03DULL;
++#ifdef CONFIG_NDC_DIS_DYNAMIC_CACHING
++	/* Disable caching of stack pages */
++	cfg |= 0x10ULL;
++#endif
++	rvu_write64(rvu, block->addr, NPA_AF_NDC_CFG, cfg);
++}
++
+ static int npa_aq_init(struct rvu *rvu, struct rvu_block *block)
+ {
+ 	u64 cfg;
+@@ -479,14 +496,7 @@ static int npa_aq_init(struct rvu *rvu, struct rvu_block *block)
+ 	rvu_write64(rvu, block->addr, NPA_AF_GEN_CFG, cfg);
+ #endif
+ 
+-	/* Do not bypass NDC cache */
+-	cfg = rvu_read64(rvu, block->addr, NPA_AF_NDC_CFG);
+-	cfg &= ~0x03DULL;
+-#ifdef CONFIG_NDC_DIS_DYNAMIC_CACHING
+-	/* Disable caching of stack pages */
+-	cfg |= 0x10ULL;
+-#endif
+-	rvu_write64(rvu, block->addr, NPA_AF_NDC_CFG, cfg);
++	npa_aq_ndc_config(rvu, block);
+ 
+ 	/* For CN10K NPA BATCH DMA set 35 cache lines */
+ 	if (!is_rvu_otx2(rvu)) {
+@@ -567,6 +577,9 @@ int rvu_ndc_fix_locked_cacheline(struct rvu *rvu, int blkaddr)
+ 	int bank, max_bank, line, max_line, err;
+ 	u64 reg, ndc_af_const;
+ 
++	if (is_cn20k(rvu->pdev)) /* NDC not applicable to cn20k */
++		return 0;
++
+ 	/* Set the ENABLE bit(63) to '0' */
+ 	reg = rvu_read64(rvu, blkaddr, NDC_AF_CAMS_RD_INTERVAL);
+ 	rvu_write64(rvu, blkaddr, NDC_AF_CAMS_RD_INTERVAL, reg & GENMASK_ULL(62, 0));
 -- 
 2.48.1
 
