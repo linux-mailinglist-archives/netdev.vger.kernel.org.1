@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-232854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65716C09779
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:28:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27293C096AD
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:25:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EFD464F6CD5
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:19:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E3EE1C26436
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 903223074BE;
-	Sat, 25 Oct 2025 16:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83CC307AC7;
+	Sat, 25 Oct 2025 16:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NRmzNg9x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AWGPpGUB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D863074B2;
-	Sat, 25 Oct 2025 16:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB3F305957;
+	Sat, 25 Oct 2025 16:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761408972; cv=none; b=H8YRkyvXTSR0xR3lAmyIbucAOs33plkdaZDAJdulG1gKgrvGEJEOkXoJec3kCvjK2laVqbEdu/Gs6qJahNYDry01y9X5dlEWd7F7KBkXUxcm6DwR+qNYqVuSbHsDNLUbLtYJY0PRcMQTSN5ddiA1sytRA5A1ux5t7zBxvg8nb7Q=
+	t=1761408998; cv=none; b=lAOWPmWsp7xvSN6WmRx88TsqkIYXkzd67wDQsDZvpfvH1zXkLjVnnIwYRZQX1aRAC/ZEFv8DqKGFbT+tFpSJtxwAVvQSK3xF75FzMqG1XEVxhWpzLmyZilyRWGMgrkjx7VFeT0XBh9lotkg3ud1Ny87nPsg1qOeLtuSbmdP90Bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761408972; c=relaxed/simple;
-	bh=3d+JS98l1QcouAqEyCnc0lMFvnZjQzclVdjFf/OvsIk=;
+	s=arc-20240116; t=1761408998; c=relaxed/simple;
+	bh=D66r0THAaqiaUxNKszvcN3SewIVNQzg5lzzpO44zkuk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uNqinuYbQ7VQZ1wQJMu8kw3fggF+ps9lKdinQPyIKTd+IgfSYapVJKC3bPsTV+ltg1cYV6vxFTTcIlb3A/8y5a1I+htF8miQ7Q0VbHXphf5aoOCKL8pFNJTKNnWGZDqfqZOeR2K2qyGmNSOxLRToboRxtDijrFmHalI4pUKQ09E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NRmzNg9x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44AE1C4CEFF;
-	Sat, 25 Oct 2025 16:16:11 +0000 (UTC)
+	 MIME-Version:Content-Type; b=l+3+yYZB5UDm9HgFtPzJC/sxm/Xc+Cg1QBR0ulTnnSypS8GyNHP+JX3dYxkjDTjXoXTnGiam8ZAFK+1yGV40aHIAqHwEUAALAZPOIB359lM54TScV/1CSYDrMaDLooFzWj7LiJJkI1TKu0CvVn0YzelEAWcd+7EChVKtGshuug0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AWGPpGUB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72D00C113D0;
+	Sat, 25 Oct 2025 16:16:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761408972;
-	bh=3d+JS98l1QcouAqEyCnc0lMFvnZjQzclVdjFf/OvsIk=;
+	s=k20201202; t=1761408998;
+	bh=D66r0THAaqiaUxNKszvcN3SewIVNQzg5lzzpO44zkuk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NRmzNg9xyfYGyYgmmgcLPfblSy0KD3ja79ooXmRhwDmwejwDYYP8yFb+c16TcBMR6
-	 rj1UCUsL7pVl+gyPpPlgf14jFLoPseSxaRa7PjGdx3dDaEQuHPgNPyO7HqnajZwWBo
-	 hwrOii8Tfw2tks53abAervpyP7d1wWhIrWSIxaJLRY9KfhT8oa7wGLOFJfTUFAoJ0O
-	 6xU9DBNJ83of0+2ZBzWoKeXTiktg0oUEvKZyQdmEdyQNtdbtjAI/H9c4RxUd9Ly0g8
-	 F6YPMyT2eHcA0ZcVJMQC0fQyadAV/SVydrR/wzmlD97GwJRDKFsqjj2VPFVEvtFr9b
-	 Lr1RaaMOd301Q==
+	b=AWGPpGUBYGywV680OOKUnH3cDSL8LLF8n1pvb1G2fwFE6Iz29OZiITbKvPASj2llS
+	 aCblOlGA3/aaR64OONwQnhV52CmUejZbv8BeyVzbIJ1vjhpCkrkL7eLNGM5OoaIP4N
+	 /ZHba4e49u4yMnwg/5ppl4tBq+sANfmlF1avipI9ITJE/yWTCK310CRUQ55hdYc/dl
+	 ELp1nWHPA7U/yeW7yMllQ7l1u1aA/LlwN6LSZyvhjev2FI2LYS/vupH3f8JD3sfrzc
+	 m7dmHonsksxviiSeuQKRGbUGR3GlBZsibhpJVIUBaX06/FkXz4Wjo8130N0zZlg23x
+	 4NWQDfO/bPsQg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Petr Machata <petrm@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
+Cc: Alessandro Zanni <alessandro.zanni87@gmail.com>,
+	Simon Horman <horms@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	bridge@lists.linux.dev,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-6.1] net: bridge: Install FDB for bridge MAC on VLAN 0
-Date: Sat, 25 Oct 2025 11:56:30 -0400
-Message-ID: <20251025160905.3857885-159-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17] selftest: net: Fix error message if empty variable
+Date: Sat, 25 Oct 2025 11:56:39 -0400
+Message-ID: <20251025160905.3857885-168-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -69,58 +70,24 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Petr Machata <petrm@nvidia.com>
+From: Alessandro Zanni <alessandro.zanni87@gmail.com>
 
-[ Upstream commit cd9a9562b2559973aa1b68c3af63021a2c5fd022 ]
+[ Upstream commit 81dcfdd21dbd7067068c7c341ee448c3f0d6f115 ]
 
-Currently, after the bridge is created, the FDB does not hold an FDB entry
-for the bridge MAC on VLAN 0:
+Fix to avoid cases where the `res` shell variable is
+empty in script comparisons.
+The comparison has been modified into string comparison to
+handle other possible values the variable could assume.
 
- # ip link add name br up type bridge
- # ip -br link show dev br
- br               UNKNOWN        92:19:8c:4e:01:ed <BROADCAST,MULTICAST,UP,LOWER_UP>
- # bridge fdb show | grep 92:19:8c:4e:01:ed
- 92:19:8c:4e:01:ed dev br vlan 1 master br permanent
+The issue can be reproduced with the command:
+make kselftest TARGETS=net
 
-Later when the bridge MAC is changed, or in fact when the address is given
-during netdevice creation, the entry appears:
+It solves the error:
+./tfo_passive.sh: line 98: [: -eq: unary operator expected
 
- # ip link add name br up address 00:11:22:33:44:55 type bridge
- # bridge fdb show | grep 00:11:22:33:44:55
- 00:11:22:33:44:55 dev br vlan 1 master br permanent
- 00:11:22:33:44:55 dev br master br permanent
-
-However when the bridge address is set by the user to the current bridge
-address before the first port is enslaved, none of the address handlers
-gets invoked, because the address is not actually changed. The address is
-however marked as NET_ADDR_SET. Then when a port is enslaved, the address
-is not changed, because it is NET_ADDR_SET. Thus the VLAN 0 entry is not
-added, and it has not been added previously either:
-
- # ip link add name br up type bridge
- # ip -br link show dev br
- br               UNKNOWN        7e:f0:a8:1a:be:c2 <BROADCAST,MULTICAST,UP,LOWER_UP>
- # ip link set dev br addr 7e:f0:a8:1a:be:c2
- # ip link add name v up type veth
- # ip link set dev v master br
- # ip -br link show dev br
- br               UNKNOWN        7e:f0:a8:1a:be:c2 <BROADCAST,MULTICAST,UP,LOWER_UP>
- # bridge fdb | grep 7e:f0:a8:1a:be:c2
- 7e:f0:a8:1a:be:c2 dev br vlan 1 master br permanent
-
-Then when the bridge MAC is used as DMAC, and br_handle_frame_finish()
-looks up an FDB entry with VLAN=0, it doesn't find any, and floods the
-traffic instead of passing it up.
-
-Fix this by simply adding the VLAN 0 FDB entry for the bridge itself always
-on netdevice creation. This also makes the behavior consistent with how
-ports are treated: ports always have an FDB entry for each member VLAN as
-well as VLAN 0.
-
-Signed-off-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
-Link: https://patch.msgid.link/415202b2d1b9b0899479a502bbe2ba188678f192.1758550408.git.petrm@nvidia.com
+Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20250925132832.9828-1-alessandro.zanni87@gmail.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -128,50 +95,41 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 LLM Generated explanations, may be completely bogus:
 
 YES
-- `net/bridge/br.c:39-55` now invokes `br_fdb_change_mac_address(br,
-  dev->dev_addr)` during the bridge master’s `NETDEV_REGISTER` notifier,
-  immediately installing the bridge’s own MAC into the FDB for VLAN 0.
-  Without this early call, a user who sets the bridge MAC to its current
-  value before enslaving any port leaves `addr_assign_type` at
-  `NET_ADDR_SET`, so later events never repopulate the missing VLAN‑0
-  entry.
-- When that entry is absent, `br_handle_frame_finish()`
-  (`net/bridge/br_input.c:204-235`) fails to resolve a local destination
-  for frames addressed to the bridge on VLAN 0, falls into the
-  `br_flood()` path, and never calls `br_pass_frame_up()`, so traffic to
-  the bridge itself is effectively dropped in exactly the scenario
-  described.
-- The added call simply reuses the existing, well-tested helper in
-  `net/bridge/br_fdb.c:501-536`, making bridge setup match the behavior
-  already applied whenever the MAC really changes; it keeps bridge and
-  port FDB handling consistent and generates the same notifications user
-  space would see after a later MAC change.
-- Risk is minimal: the new work executes under RTNL alongside existing
-  registration bookkeeping, adds no new data structures or semantics,
-  and on allocation failure merely falls back to the prior state. In
-  contrast, the bug is user-visible and causes incorrect flooding
-  instead of local delivery, so this qualifies as a focused, important
-  fix suitable for stable backporting.
+- `tools/testing/selftests/net/tfo_passive.sh:95-101` now quotes `res`
+  and switches to a string comparison, eliminating the `[: -eq: unary
+  operator expected` error that surfaces when the output file is empty
+  during `make kselftest TARGETS=net`; without the fix the harness stops
+  before it can report the real problem.
+- The test still fails only when the passive TFO socket actually returns
+  an invalid NAPI ID, because the server helper continues to emit the
+  decimal string produced in `tools/testing/selftests/net/tfo.c:80-85`,
+  so legitimate `"0"` results are caught exactly as before while other
+  values (including blanks) no longer crash the script.
+- This is a one-line, self-contained shell fix with no kernel-side
+  impact and no new feature work; once commit `137e7b5cceda2` (which
+  introduced the test) exists in a stable tree, backporting is trivial
+  and restores the test’s usefulness.
+- Risk of regression is essentially nil: the change follows standard
+  shell best practices (quoting and string equality) and only affects
+  the selftest infrastructure, improving reliability without touching
+  runtime behaviour.
 
- net/bridge/br.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ tools/testing/selftests/net/tfo_passive.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bridge/br.c b/net/bridge/br.c
-index c683baa3847f1..74706cb9283a2 100644
---- a/net/bridge/br.c
-+++ b/net/bridge/br.c
-@@ -37,6 +37,11 @@ static int br_device_event(struct notifier_block *unused, unsigned long event, v
- 	int err;
+diff --git a/tools/testing/selftests/net/tfo_passive.sh b/tools/testing/selftests/net/tfo_passive.sh
+index 80bf11fdc0462..a4550511830a9 100755
+--- a/tools/testing/selftests/net/tfo_passive.sh
++++ b/tools/testing/selftests/net/tfo_passive.sh
+@@ -95,7 +95,7 @@ wait
+ res=$(cat $out_file)
+ rm $out_file
  
- 	if (netif_is_bridge_master(dev)) {
-+		struct net_bridge *br = netdev_priv(dev);
-+
-+		if (event == NETDEV_REGISTER)
-+			br_fdb_change_mac_address(br, dev->dev_addr);
-+
- 		err = br_vlan_bridge_event(dev, event, ptr);
- 		if (err)
- 			return notifier_from_errno(err);
+-if [ $res -eq 0 ]; then
++if [ "$res" = "0" ]; then
+ 	echo "got invalid NAPI ID from passive TFO socket"
+ 	cleanup_ns
+ 	exit 1
 -- 
 2.51.0
 
