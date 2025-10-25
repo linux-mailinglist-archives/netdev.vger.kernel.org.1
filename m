@@ -1,59 +1,58 @@
-Return-Path: <netdev+bounces-232886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58785C09C36
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:54:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB058C09BF6
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:51:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15E63581DBE
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:37:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 338FC42392C
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86EBF30FC24;
-	Sat, 25 Oct 2025 16:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0F430FF37;
+	Sat, 25 Oct 2025 16:28:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B+e/rSnq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFVDcdTr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C8C63064B8;
-	Sat, 25 Oct 2025 16:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55558308F3B;
+	Sat, 25 Oct 2025 16:28:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761409681; cv=none; b=oxBKB1Av7K18erlqrWE+3nDv0Mgf0BHEYZLH+vi4DOMaEznNrIVPZrYQXORx8x8lx8jLcdhEyiO2Fm+CanwbeMfkMGhEFUOKbnKbzYJjJ/jpGXWanFC2CKsqF+0zHU9Do51n+ToDkBCZTSTejyn1vyZTYTVPcx45mwgK1E2pbVk=
+	t=1761409694; cv=none; b=C38Qn70nkAFiIdEFd1GJQ4XhpiYjG2f21f624rxpJKqZW5BOKXC2TxNbJbtXaDSzYbSUs3+gIcq9ynr/yMXBQUK1D1PDccN19JTuLlvbARi55dz5fl+zTCUu0np2guMJWFtBt9qgMGZlHSDZLumIMsXWY04gffAQ8+LTYPwSKEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761409681; c=relaxed/simple;
-	bh=uXV7XS7BXYinESnJI44OYBJ4XhTlm58QVMApSCWQBKU=;
+	s=arc-20240116; t=1761409694; c=relaxed/simple;
+	bh=gZxkSvZJ9V3UEqMCsEpcS4aIsFIbNceZgBs8ifVJj8E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=miSeOBElMov31kLXeeESQEnPjPCvNXxTfhO/tLb3R0ELpYWxMPWyYUiSs8odQko2q2gVZw+rjMFnPyPvvS0L2SvbHoAQch3SCCFR7uf6vBW8LXXvR5DgoPvll6TokGmuqWr4n3JUMwE6xY0hfsebmbfXGM6Ksn8E7NpejVV1Pb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B+e/rSnq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F02FC4CEFF;
-	Sat, 25 Oct 2025 16:28:00 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CJRB2RDxYwgStThOd0KfVsyMi6HO34+Oy+MtB3skx2YiekK5ZsJgp9fCajfyZvsBabsXD6uXdzGDfNJCm9YQ8oxaUcZyofk8q4kp931GjgW1YnnQ/fW6b9aCOTBwR9b0ol9hDLqSq4S41FVvVkTUwHgham7rt9v+ttHTwm+oFyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFVDcdTr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49083C4CEFB;
+	Sat, 25 Oct 2025 16:28:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761409681;
-	bh=uXV7XS7BXYinESnJI44OYBJ4XhTlm58QVMApSCWQBKU=;
+	s=k20201202; t=1761409694;
+	bh=gZxkSvZJ9V3UEqMCsEpcS4aIsFIbNceZgBs8ifVJj8E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=B+e/rSnqiOAZHWwpvPBXBsMrkK+/F1o7CwrlgyU/dTQ+jFu2mi2Za4ngqgiNbNgap
-	 9whbtMwv7bbWMrfn474nWQVoB9nBXK1PzqnXzTxWM/ABaMyISB0PbA4YXl21hlgV5s
-	 y0rPLK162f7JuyWue8i2Td2ieCS3GpQsK3Hl4V8JLthk6kcRTStDGF3y0GyZ5uN2z7
-	 BlrdSaPDTLLBe/XeWpl8xLgI4gBIhCge2quUhEoE1zigVolMNgPrJKRaOTPd1Sc9bF
-	 Ag69xv3ZFC7jVbONKC1VQzALeJhH17xLUxQ0e4umNxna+gSeBySRgJtxQkVP5ZA4/3
-	 eAlE48EPVK07g==
+	b=EFVDcdTrTeFuiRojcgps2IBc+rnnAPqsyXoK14X3NNRwXDBFhp66DB9rrCyeKEHaO
+	 KAi7ygcpW+/Li7Oqu5ywJGKHjtwr61upRt8cgjKB5Y86/QKpeyZ0Yf9+6lCCTrnYSx
+	 XeN+0OOmlNgfI65N+0iXLcf89CjxnQ+dBPIh4Jvpe5hlOtgK16tSJDib39lBJWIH0V
+	 FH4XqHNugYFB69vOHuPdy6NusvkZbjjlC82ITOexY+xbpurEFd+zEtP3j2zHHq3RM4
+	 YFeN3SsZ1Dc2iU5GsB57LIQkVlGH2hKWeaAvjxEVWkSzlHHmuz/9ugdwwHV2nZMq7r
+	 QfnAi6yWBZVKw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Rohan G Thomas <rohan.g.thomas@altera.com>,
-	Matthew Gerlach <matthew.gerlach@altera.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	hkallweit1@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-5.10] net: phy: marvell: Fix 88e1510 downshift counter errata
-Date: Sat, 25 Oct 2025 12:00:50 -0400
-Message-ID: <20251025160905.3857885-419-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17] selftests: net: make the dump test less sensitive to mem accounting
+Date: Sat, 25 Oct 2025 12:00:53 -0400
+Message-ID: <20251025160905.3857885-422-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -69,24 +68,18 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Rohan G Thomas <rohan.g.thomas@altera.com>
+From: Jakub Kicinski <kuba@kernel.org>
 
-[ Upstream commit deb105f49879dd50d595f7f55207d6e74dec34e6 ]
+[ Upstream commit 27bc5eaf004c437309dee1b9af24806262631d57 ]
 
-The 88e1510 PHY has an erratum where the phy downshift counter is not
-cleared after phy being suspended(BMCR_PDOWN set) and then later
-resumed(BMCR_PDOWN cleared). This can cause the gigabit link to
-intermittently downshift to a lower speed.
+Recent changes to make netlink socket memory accounting must
+have broken the implicit assumption of the netlink-dump test
+that we can fit exactly 64 dumps into the socket. Handle the
+failure mode properly, and increase the dump count to 80
+to make sure we still run into the error condition if
+the default buffer size increases in the future.
 
-Disabling and re-enabling the downshift feature clears the counter,
-allowing the PHY to retry gigabit link negotiation up to the programmed
-retry count times before downshifting. This behavior has been observed
-on copper links.
-
-Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
-Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Link: https://patch.msgid.link/20250906-marvell_fix-v2-1-f6efb286937f@altera.com
+Link: https://patch.msgid.link/20250906211351.3192412-1-kuba@kernel.org
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -95,127 +88,172 @@ LLM Generated explanations, may be completely bogus:
 
 YES
 
-- Bug fixed and user impact:
-  - The commit addresses a real erratum on 88E1510 where the PHY
-    downshift counter is not cleared across suspend/resume, which can
-    cause intermittent, user-visible downshift from gigabit to lower
-    speeds on copper links.
+Rationale
+- Fixes a real selftest failure mode caused by recent netlink socket
+  memory accounting changes. The original test assumed exactly 64 dumps
+  would fit in the socket; this is no longer reliable and leads to false
+  failures.
+- The change is confined to selftests and does not affect kernel
+  behavior or ABI, making regression risk extremely low while restoring
+  test correctness.
 
-- What the patch changes:
-  - Adds a device-specific resume wrapper `m88e1510_resume()` which
-    first performs the normal resume sequence and then clears the stale
-    downshift counter by toggling the downshift feature off and back on
-    with the existing configured retry count.
-    - `drivers/net/phy/marvell.c:1915` defines `m88e1510_resume(struct
-      phy_device *phydev)`: it calls `marvell_resume()` to do the
-      standard fiber/copper resume, then reads the configured downshift
-      count via `m88e1011_get_downshift()`. If non-zero, it disables and
-      re-enables downshift with the same count to clear the counter.
-    - `drivers/net/phy/marvell.c:1875` shows `marvell_resume(struct
-      phy_device *phydev)`, which handles the dual-mode (fiber/copper)
-      page sequencing and invokes `genphy_resume()`. `m88e1510_resume()`
-      invokes this first to keep existing resume behavior intact.
-    - `drivers/net/phy/marvell.c:1138` `m88e1011_get_downshift()` reads
-      the current downshift configuration (returns 0 if disabled).
-    - `drivers/net/phy/marvell.c:1154` `m88e1011_set_downshift()`
-      programs the downshift count and performs a soft reset to apply
-      the change, which is exactly what is needed to reliably clear the
-      counter.
-  - Hooks the new resume into the 88E1510 driver entry only:
-    - `drivers/net/phy/marvell.c:3961` sets `.resume = m88e1510_resume`
-      for `MARVELL_PHY_ID_88E1510`, replacing the generic
-      `marvell_resume` only for that PHY.
+Key Changes
+- Robust extack parsing:
+  - Introduces explicit return semantics for control messages via `enum
+    get_ea_ret` to distinguish done, error, and extack cases
+    (`tools/testing/selftests/net/netlink-dumps.c:34`).
+  - `nl_get_extack()` now treats both `NLMSG_ERROR` and `NLMSG_DONE` as
+    control messages and returns either the base result or
+    `FOUND_EXTACK` if TLVs are present
+    (`tools/testing/selftests/net/netlink-dumps.c:42`,
+    `tools/testing/selftests/net/netlink-dumps.c:55`,
+    `tools/testing/selftests/net/netlink-dumps.c:57`,
+    `tools/testing/selftests/net/netlink-dumps.c:64`,
+    `tools/testing/selftests/net/netlink-dumps.c:84`,
+    `tools/testing/selftests/net/netlink-dumps.c:87`).
+- Handle realistic error sequencing during dump pressure:
+  - After intentionally overfilling the socket, the test explicitly
+    tolerates one `ENOBUFS` and subsequent `EBUSY` responses before the
+    final DONE+extack, matching current kernel behavior under memory
+    pressure (`tools/testing/selftests/net/netlink-dumps.c:141`,
+    `tools/testing/selftests/net/netlink-dumps.c:156`,
+    `tools/testing/selftests/net/netlink-dumps.c:161`,
+    `tools/testing/selftests/net/netlink-dumps.c:168`).
+- Maintain correctness checks for the intended validation error:
+  - Still asserts the extack must carry `EINVAL` and a valid attribute
+    offset when the invalid attribute is parsed
+    (`tools/testing/selftests/net/netlink-dumps.c:164`,
+    `tools/testing/selftests/net/netlink-dumps.c:165`).
+- Future-proofing the buffer fill:
+  - Increases the dump count from 64 to 80 to ensure the test continues
+    to trigger the pressure condition if default buffer sizes grow
+    (`tools/testing/selftests/net/netlink-dumps.c:133`).
 
-- Why it’s safe and minimal:
-  - Scope-limited: Only 88E1510’s `.resume` is changed; other Marvell
-    PHYs keep their existing resume paths.
-  - No API or architectural changes: The patch only introduces a small
-    wrapper and uses existing helper functions already used elsewhere in
-    this driver.
-  - Preserves user configuration: It reads the current downshift setting
-    and restores the same count, doing nothing if downshift is disabled
-    (`cnt == 0`), so it does not override user-set policy.
-  - Correct sequencing and pages: `m88e1510_resume()` defers to
-    `marvell_resume()` first, which restores the page to copper before
-    calling the downshift helpers. The helpers operate on the copper
-    page registers.
-  - Side effects are minimal and expected: `m88e1011_set_downshift()`
-    performs a soft reset to apply changes; the wrapper may cause two
-    quick resets (disable then re-enable), slightly delaying link bring-
-    up on resume but preventing the intermittent low-speed fallback — a
-    clear net improvement for users.
+Why It Fits Stable Criteria
+- Important bugfix: Prevents false failures and flakiness in selftests
+  caused by legitimate kernel changes to memory accounting.
+- Small and contained: Touches a single selftest file with clear,
+  localized changes.
+- No features or architecture changes: Strictly test logic and
+  robustness improvements.
+- Minimal regression risk: Only affects testing; improves compatibility
+  across kernels that may return `ENOBUFS` and/or `EBUSY` under dump
+  pressure; still verifies the original `EINVAL` extack path when
+  applicable.
+- Helps keep stable trees’ selftests reliable as netlink memory
+  accounting changes are commonly backported.
 
-- Stable backport criteria:
-  - Fixes a real, user-facing bug (intermittent downshift after resume).
-  - Small, isolated change to a single driver with no cross-subsystem
-    impact.
-  - Low regression risk and no new features or behavior changes beyond
-    clearing the erratum condition.
-  - Aligns with existing driver patterns and uses proven helper
-    functions.
+Conclusion
+- This is a low-risk, clearly beneficial selftest robustness fix that
+  addresses real test failures. It should be backported to stable trees
+  to keep networking selftests passing and meaningful.
 
-Given the above, this is a good candidate for stable backporting.
+ tools/testing/selftests/net/netlink-dumps.c | 43 ++++++++++++++++-----
+ 1 file changed, 33 insertions(+), 10 deletions(-)
 
- drivers/net/phy/marvell.c | 39 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 38 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
-index 623292948fa70..0ea366c1217eb 100644
---- a/drivers/net/phy/marvell.c
-+++ b/drivers/net/phy/marvell.c
-@@ -1902,6 +1902,43 @@ static int marvell_resume(struct phy_device *phydev)
- 	return err;
+diff --git a/tools/testing/selftests/net/netlink-dumps.c b/tools/testing/selftests/net/netlink-dumps.c
+index 07423f256f963..7618ebe528a4c 100644
+--- a/tools/testing/selftests/net/netlink-dumps.c
++++ b/tools/testing/selftests/net/netlink-dumps.c
+@@ -31,9 +31,18 @@ struct ext_ack {
+ 	const char *str;
+ };
+ 
+-/* 0: no done, 1: done found, 2: extack found, -1: error */
+-static int nl_get_extack(char *buf, size_t n, struct ext_ack *ea)
++enum get_ea_ret {
++	ERROR = -1,
++	NO_CTRL = 0,
++	FOUND_DONE,
++	FOUND_ERR,
++	FOUND_EXTACK,
++};
++
++static enum get_ea_ret
++nl_get_extack(char *buf, size_t n, struct ext_ack *ea)
+ {
++	enum get_ea_ret ret = NO_CTRL;
+ 	const struct nlmsghdr *nlh;
+ 	const struct nlattr *attr;
+ 	ssize_t rem;
+@@ -41,15 +50,19 @@ static int nl_get_extack(char *buf, size_t n, struct ext_ack *ea)
+ 	for (rem = n; rem > 0; NLMSG_NEXT(nlh, rem)) {
+ 		nlh = (struct nlmsghdr *)&buf[n - rem];
+ 		if (!NLMSG_OK(nlh, rem))
+-			return -1;
++			return ERROR;
+ 
+-		if (nlh->nlmsg_type != NLMSG_DONE)
++		if (nlh->nlmsg_type == NLMSG_ERROR)
++			ret = FOUND_ERR;
++		else if (nlh->nlmsg_type == NLMSG_DONE)
++			ret = FOUND_DONE;
++		else
+ 			continue;
+ 
+ 		ea->err = -*(int *)NLMSG_DATA(nlh);
+ 
+ 		if (!(nlh->nlmsg_flags & NLM_F_ACK_TLVS))
+-			return 1;
++			return ret;
+ 
+ 		ynl_attr_for_each(attr, nlh, sizeof(int)) {
+ 			switch (ynl_attr_type(attr)) {
+@@ -68,10 +81,10 @@ static int nl_get_extack(char *buf, size_t n, struct ext_ack *ea)
+ 			}
+ 		}
+ 
+-		return 2;
++		return FOUND_EXTACK;
+ 	}
+ 
+-	return 0;
++	return ret;
  }
  
-+/* m88e1510_resume
-+ *
-+ * The 88e1510 PHY has an erratum where the phy downshift counter is not cleared
-+ * after phy being suspended(BMCR_PDOWN set) and then later resumed(BMCR_PDOWN
-+ * cleared). This can cause the link to intermittently downshift to a lower speed.
-+ *
-+ * Disabling and re-enabling the downshift feature clears the counter, allowing
-+ * the PHY to retry gigabit link negotiation up to the programmed retry count
-+ * before downshifting. This behavior has been observed on copper links.
-+ */
-+static int m88e1510_resume(struct phy_device *phydev)
-+{
-+	int err;
-+	u8 cnt = 0;
-+
-+	err = marvell_resume(phydev);
-+	if (err < 0)
-+		return err;
-+
-+	/* read downshift counter value */
-+	err = m88e1011_get_downshift(phydev, &cnt);
-+	if (err < 0)
-+		return err;
-+
-+	if (cnt) {
-+		/* downshift disabled */
-+		err = m88e1011_set_downshift(phydev, 0);
-+		if (err < 0)
-+			return err;
-+
-+		/* downshift enabled, with previous counter value */
-+		err = m88e1011_set_downshift(phydev, cnt);
-+	}
-+
-+	return err;
-+}
-+
- static int marvell_aneg_done(struct phy_device *phydev)
+ static const struct {
+@@ -99,9 +112,9 @@ static const struct {
+ TEST(dump_extack)
  {
- 	int retval = phy_read(phydev, MII_M1011_PHY_STATUS);
-@@ -3923,7 +3960,7 @@ static struct phy_driver marvell_drivers[] = {
- 		.handle_interrupt = marvell_handle_interrupt,
- 		.get_wol = m88e1318_get_wol,
- 		.set_wol = m88e1318_set_wol,
--		.resume = marvell_resume,
-+		.resume = m88e1510_resume,
- 		.suspend = marvell_suspend,
- 		.read_page = marvell_read_page,
- 		.write_page = marvell_write_page,
+ 	int netlink_sock;
++	int i, cnt, ret;
+ 	char buf[8192];
+ 	int one = 1;
+-	int i, cnt;
+ 	ssize_t n;
+ 
+ 	netlink_sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+@@ -118,7 +131,7 @@ TEST(dump_extack)
+ 	ASSERT_EQ(n, 0);
+ 
+ 	/* Dump so many times we fill up the buffer */
+-	cnt = 64;
++	cnt = 80;
+ 	for (i = 0; i < cnt; i++) {
+ 		n = send(netlink_sock, &dump_neigh_bad,
+ 			 sizeof(dump_neigh_bad), 0);
+@@ -140,10 +153,20 @@ TEST(dump_extack)
+ 		}
+ 		ASSERT_GE(n, (ssize_t)sizeof(struct nlmsghdr));
+ 
+-		EXPECT_EQ(nl_get_extack(buf, n, &ea), 2);
++		ret = nl_get_extack(buf, n, &ea);
++		/* Once we fill the buffer we'll see one ENOBUFS followed
++		 * by a number of EBUSYs. Then the last recv() will finally
++		 * trigger and complete the dump.
++		 */
++		if (ret == FOUND_ERR && (ea.err == ENOBUFS || ea.err == EBUSY))
++			continue;
++		EXPECT_EQ(ret, FOUND_EXTACK);
++		EXPECT_EQ(ea.err, EINVAL);
+ 		EXPECT_EQ(ea.attr_offs,
+ 			  sizeof(struct nlmsghdr) + sizeof(struct ndmsg));
+ 	}
++	/* Make sure last message was a full DONE+extack */
++	EXPECT_EQ(ret, FOUND_EXTACK);
+ }
+ 
+ static const struct {
 -- 
 2.51.0
 
