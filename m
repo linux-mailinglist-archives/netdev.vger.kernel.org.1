@@ -1,60 +1,59 @@
-Return-Path: <netdev+bounces-232855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27293C096AD
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:25:48 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69BEDC0955D
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:20:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E3EE1C26436
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:20:05 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CC2C234DE81
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:20:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83CC307AC7;
-	Sat, 25 Oct 2025 16:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 403FE2153D2;
+	Sat, 25 Oct 2025 16:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AWGPpGUB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BUmk0dkc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB3F305957;
-	Sat, 25 Oct 2025 16:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1754078F36;
+	Sat, 25 Oct 2025 16:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761408998; cv=none; b=lAOWPmWsp7xvSN6WmRx88TsqkIYXkzd67wDQsDZvpfvH1zXkLjVnnIwYRZQX1aRAC/ZEFv8DqKGFbT+tFpSJtxwAVvQSK3xF75FzMqG1XEVxhWpzLmyZilyRWGMgrkjx7VFeT0XBh9lotkg3ud1Ny87nPsg1qOeLtuSbmdP90Bg=
+	t=1761409050; cv=none; b=W+WCcDdoV+FwSRYahyFKBn61Y05fgQvlj0NpyOrUpKPNEfvu/9ewCYjPXTnQmVk/u8zh989vrRx1fvWHHcMtITsqWTDqXKhlyBAYPHjkQJ6yOK1QD3CceiUK651tyOJBHyYg0cBsPPcNqElBAbdrOlp+JwPt8ffoaAqDDRLtoyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761408998; c=relaxed/simple;
-	bh=D66r0THAaqiaUxNKszvcN3SewIVNQzg5lzzpO44zkuk=;
+	s=arc-20240116; t=1761409050; c=relaxed/simple;
+	bh=C43KW3vGlEt+q3uUBqwWjxYB5EjytjQhkqdm5zGjskc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l+3+yYZB5UDm9HgFtPzJC/sxm/Xc+Cg1QBR0ulTnnSypS8GyNHP+JX3dYxkjDTjXoXTnGiam8ZAFK+1yGV40aHIAqHwEUAALAZPOIB359lM54TScV/1CSYDrMaDLooFzWj7LiJJkI1TKu0CvVn0YzelEAWcd+7EChVKtGshuug0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AWGPpGUB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72D00C113D0;
-	Sat, 25 Oct 2025 16:16:37 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mPRKj7EZcRuzoqSgLRft1FU/DQsZ7tHarPVl6HusmbFIMkE0gIH9bNLHvyLXbTsB7Sd1nDOdbnP79fMEewYMk9i0y+wfbZAwaATuSIx7lLthuo4/PP0sKWa5aXWFDaoTAcI9Vluy6l1iTihABKNiSiQLomB95oKFKvWiFQllaiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BUmk0dkc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF604C4CEF5;
+	Sat, 25 Oct 2025 16:17:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761408998;
-	bh=D66r0THAaqiaUxNKszvcN3SewIVNQzg5lzzpO44zkuk=;
+	s=k20201202; t=1761409050;
+	bh=C43KW3vGlEt+q3uUBqwWjxYB5EjytjQhkqdm5zGjskc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AWGPpGUBYGywV680OOKUnH3cDSL8LLF8n1pvb1G2fwFE6Iz29OZiITbKvPASj2llS
-	 aCblOlGA3/aaR64OONwQnhV52CmUejZbv8BeyVzbIJ1vjhpCkrkL7eLNGM5OoaIP4N
-	 /ZHba4e49u4yMnwg/5ppl4tBq+sANfmlF1avipI9ITJE/yWTCK310CRUQ55hdYc/dl
-	 ELp1nWHPA7U/yeW7yMllQ7l1u1aA/LlwN6LSZyvhjev2FI2LYS/vupH3f8JD3sfrzc
-	 m7dmHonsksxviiSeuQKRGbUGR3GlBZsibhpJVIUBaX06/FkXz4Wjo8130N0zZlg23x
-	 4NWQDfO/bPsQg==
+	b=BUmk0dkcXk0wtz+n3FC8W+TISd+I/NW8PGt4Qx31BvxuFDCl8VYLjCUb+8EqLKrIA
+	 RYC7R8mhjJijsqtd1I5tb9Wq7ceX5TxmL1AygUeiDfViL2XQBQC6QUS/IMrvRtFNP1
+	 wrKsUDHP+602N356dmQA/LwyYhRYofi08LeCiJ9zqK0CZRHCCiGEUUQD7vfoXYJBOJ
+	 okO5o0CnyR2sLVRByFJSihCW55RBfGlcTD23zY6MXXi+AGe8MbJVfJOpBLHG25lyUI
+	 oC0tu35CJj/MRXkI1wKQ734QmtpLtgiyna7RYezccERoZv2nzHbIlUQFXYTtxDNpGd
+	 UCrVVlO9lpuyg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Alessandro Zanni <alessandro.zanni87@gmail.com>,
-	Simon Horman <horms@kernel.org>,
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
+	richardcochran@gmail.com,
+	andrew@lunn.ch,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17] selftest: net: Fix error message if empty variable
-Date: Sat, 25 Oct 2025 11:56:39 -0400
-Message-ID: <20251025160905.3857885-168-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17] net: phy: dp83640: improve phydev and driver removal handling
+Date: Sat, 25 Oct 2025 11:56:54 -0400
+Message-ID: <20251025160905.3857885-183-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -70,24 +69,20 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Alessandro Zanni <alessandro.zanni87@gmail.com>
+From: Heiner Kallweit <hkallweit1@gmail.com>
 
-[ Upstream commit 81dcfdd21dbd7067068c7c341ee448c3f0d6f115 ]
+[ Upstream commit 42e2a9e11a1dcb81c83d50d18c547dc9a1c6d6ed ]
 
-Fix to avoid cases where the `res` shell variable is
-empty in script comparisons.
-The comparison has been modified into string comparison to
-handle other possible values the variable could assume.
+Once the last user of a clock has been removed, the clock should be
+removed. So far orphaned clocks are cleaned up in dp83640_free_clocks()
+only. Add the logic to remove orphaned clocks in dp83640_remove().
+This allows to simplify the code, and use standard macro
+module_phy_driver(). dp83640 was the last external user of
+phy_driver_register(), so we can stop exporting this function afterwards.
 
-The issue can be reproduced with the command:
-make kselftest TARGETS=net
-
-It solves the error:
-./tfo_passive.sh: line 98: [: -eq: unary operator expected
-
-Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20250925132832.9828-1-alessandro.zanni87@gmail.com
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Link: https://patch.msgid.link/6d4e80e7-c684-4d95-abbd-ea62b79a9a8a@gmail.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -95,41 +90,133 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 LLM Generated explanations, may be completely bogus:
 
 YES
-- `tools/testing/selftests/net/tfo_passive.sh:95-101` now quotes `res`
-  and switches to a string comparison, eliminating the `[: -eq: unary
-  operator expected` error that surfaces when the output file is empty
-  during `make kselftest TARGETS=net`; without the fix the harness stops
-  before it can report the real problem.
-- The test still fails only when the passive TFO socket actually returns
-  an invalid NAPI ID, because the server helper continues to emit the
-  decimal string produced in `tools/testing/selftests/net/tfo.c:80-85`,
-  so legitimate `"0"` results are caught exactly as before while other
-  values (including blanks) no longer crash the script.
-- This is a one-line, self-contained shell fix with no kernel-side
-  impact and no new feature work; once commit `137e7b5cceda2` (which
-  introduced the test) exists in a stable tree, backporting is trivial
-  and restores the test’s usefulness.
-- Risk of regression is essentially nil: the change follows standard
-  shell best practices (quoting and string equality) and only affects
-  the selftest infrastructure, improving reliability without touching
-  runtime behaviour.
+- The driver grabs a reference on the MDIO bus every time it
+  instantiates a PTP clock (`drivers/net/phy/dp83640.c:956-988`),
+  but—before this change—those references were only dropped from the
+  module-exit helper that got deleted here. On built-in kernels or when
+  the MAC unregisters its MDIO bus without unloading the PHY module,
+  that meant the last PHY removal leaked the `struct dp83640_clock`, its
+  `pin_config` allocation, and the extra `get_device()` reference,
+  preventing clean bus teardown.
+- The new removal path now tears the clock down as soon as the last PHY
+  using it disappears, releasing every piece of state (`list_del`, mutex
+  destruction, `put_device`, frees;
+  `drivers/net/phy/dp83640.c:1486-1501`). That closes the leak for real-
+  world hot-unplug and unbind scenarios while keeping the existing
+  locking discipline (clock lock followed by `phyter_clocks_lock`).
+- The remaining diff is the mechanical switch to `module_phy_driver()`
+  (`drivers/net/phy/dp83640.c:1505-1520`); it just replaces open-coded
+  init/exit hooks and doesn’t alter runtime behaviour beyond the fix
+  above.
+- No new functionality is introduced, and the change stays confined to
+  the dp83640 PHY driver, so regression risk is low compared with the
+  benefit of finally releasing the bus and memory when the PHY is
+  removed.
 
- tools/testing/selftests/net/tfo_passive.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/phy/dp83640.c | 58 ++++++++++++++-------------------------
+ 1 file changed, 20 insertions(+), 38 deletions(-)
 
-diff --git a/tools/testing/selftests/net/tfo_passive.sh b/tools/testing/selftests/net/tfo_passive.sh
-index 80bf11fdc0462..a4550511830a9 100755
---- a/tools/testing/selftests/net/tfo_passive.sh
-+++ b/tools/testing/selftests/net/tfo_passive.sh
-@@ -95,7 +95,7 @@ wait
- res=$(cat $out_file)
- rm $out_file
+diff --git a/drivers/net/phy/dp83640.c b/drivers/net/phy/dp83640.c
+index daab555721df8..74396453f5bb2 100644
+--- a/drivers/net/phy/dp83640.c
++++ b/drivers/net/phy/dp83640.c
+@@ -953,30 +953,6 @@ static void decode_status_frame(struct dp83640_private *dp83640,
+ 	}
+ }
  
--if [ $res -eq 0 ]; then
-+if [ "$res" = "0" ]; then
- 	echo "got invalid NAPI ID from passive TFO socket"
- 	cleanup_ns
- 	exit 1
+-static void dp83640_free_clocks(void)
+-{
+-	struct dp83640_clock *clock;
+-	struct list_head *this, *next;
+-
+-	mutex_lock(&phyter_clocks_lock);
+-
+-	list_for_each_safe(this, next, &phyter_clocks) {
+-		clock = list_entry(this, struct dp83640_clock, list);
+-		if (!list_empty(&clock->phylist)) {
+-			pr_warn("phy list non-empty while unloading\n");
+-			BUG();
+-		}
+-		list_del(&clock->list);
+-		mutex_destroy(&clock->extreg_lock);
+-		mutex_destroy(&clock->clock_lock);
+-		put_device(&clock->bus->dev);
+-		kfree(clock->caps.pin_config);
+-		kfree(clock);
+-	}
+-
+-	mutex_unlock(&phyter_clocks_lock);
+-}
+-
+ static void dp83640_clock_init(struct dp83640_clock *clock, struct mii_bus *bus)
+ {
+ 	INIT_LIST_HEAD(&clock->list);
+@@ -1479,6 +1455,7 @@ static void dp83640_remove(struct phy_device *phydev)
+ 	struct dp83640_clock *clock;
+ 	struct list_head *this, *next;
+ 	struct dp83640_private *tmp, *dp83640 = phydev->priv;
++	bool remove_clock = false;
+ 
+ 	if (phydev->mdio.addr == BROADCAST_ADDR)
+ 		return;
+@@ -1506,11 +1483,27 @@ static void dp83640_remove(struct phy_device *phydev)
+ 		}
+ 	}
+ 
++	if (!clock->chosen && list_empty(&clock->phylist))
++		remove_clock = true;
++
+ 	dp83640_clock_put(clock);
+ 	kfree(dp83640);
++
++	if (remove_clock) {
++		mutex_lock(&phyter_clocks_lock);
++		list_del(&clock->list);
++		mutex_unlock(&phyter_clocks_lock);
++
++		mutex_destroy(&clock->extreg_lock);
++		mutex_destroy(&clock->clock_lock);
++		put_device(&clock->bus->dev);
++		kfree(clock->caps.pin_config);
++		kfree(clock);
++	}
+ }
+ 
+-static struct phy_driver dp83640_driver = {
++static struct phy_driver dp83640_driver[] = {
++{
+ 	.phy_id		= DP83640_PHY_ID,
+ 	.phy_id_mask	= 0xfffffff0,
+ 	.name		= "NatSemi DP83640",
+@@ -1521,26 +1514,15 @@ static struct phy_driver dp83640_driver = {
+ 	.config_init	= dp83640_config_init,
+ 	.config_intr    = dp83640_config_intr,
+ 	.handle_interrupt = dp83640_handle_interrupt,
++},
+ };
+ 
+-static int __init dp83640_init(void)
+-{
+-	return phy_driver_register(&dp83640_driver, THIS_MODULE);
+-}
+-
+-static void __exit dp83640_exit(void)
+-{
+-	dp83640_free_clocks();
+-	phy_driver_unregister(&dp83640_driver);
+-}
++module_phy_driver(dp83640_driver);
+ 
+ MODULE_DESCRIPTION("National Semiconductor DP83640 PHY driver");
+ MODULE_AUTHOR("Richard Cochran <richardcochran@gmail.com>");
+ MODULE_LICENSE("GPL");
+ 
+-module_init(dp83640_init);
+-module_exit(dp83640_exit);
+-
+ static const struct mdio_device_id __maybe_unused dp83640_tbl[] = {
+ 	{ DP83640_PHY_ID, 0xfffffff0 },
+ 	{ }
 -- 
 2.51.0
 
