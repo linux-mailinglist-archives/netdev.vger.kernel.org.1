@@ -1,164 +1,171 @@
-Return-Path: <netdev+bounces-232794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE18AC08E86
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 11:38:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 308C9C08F15
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 12:33:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A97F31AA7CF3
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 09:38:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48AE01B23E42
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 10:33:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89FE2E6CB4;
-	Sat, 25 Oct 2025 09:38:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275122F39A5;
+	Sat, 25 Oct 2025 10:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="nRFp7MWJ"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="AoeuFhww"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0851F1932;
-	Sat, 25 Oct 2025 09:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72FB323E35E
+	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 10:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761385092; cv=none; b=Qudh7sP5bkaXb75HZpDpeB+KAzrrapdvaAXz0aWrR1kuJPy9sciA8gRmq0B7J7cWIfMfcOKCnnmuZD2Ehvl1cj1+i78Y5HGgpyUapVsHUZpMQc6XC0XkcekFiwSX/hVIbcjVYG0qMLFPuWP1uKICkZ6NPjh95IL2rG6dckGfZDw=
+	t=1761388404; cv=none; b=aGEb8y6lhcXcpeclK5rBQeB1+gRn9CC0dTxCR4IodWmN9yB27aw48XjMjbsr8QbFvMcA7H9Ofo4OdJk4CM74HszDnXx/RjrwLhfZ6iutlHwlwawOT1CcsavoSWDJRXiQoNNdS479ymDKUKK2SSQ0p3yDlllOyNgtyAvlHPnRD3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761385092; c=relaxed/simple;
-	bh=qKeh5cxyw+7Gml1biLwuWJ/nM8sHMmP0hyx9XSDwCDk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fCmknSx8MA29IQdXuicxWg32UBFzGWZq5kaTUYXuIaybH636sOhATN5axjpyGkTTcg5MffovTfe9OwIren3hiG1AZmvRGypvBNacfIKTCBo19RvtjViV0gxMg8Nhup73MuclnwAbEUBZjxIimKtiNLiKwUipy/Z2xeE+EptUVhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=nRFp7MWJ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=m71c3FooNtQtr8y26hSGiucyyGJcYCSbaK6kuqcT358=; b=nRFp7MWJHcj0hBpft31gI2THeL
-	8ka0Zyuf5+40gCgGx0g4m4X07Mu43tVcHyY3Kxf3P9sLuFrsuhKcJEnnLCq8vu/9q1fSwRu12lE6W
-	owBAOq9DSBqKUixI0RrCiZJgl/H844rsqdHRdvJR27iq8I2v1xg6jr08b3gWzsEv/OI2s9yfA3q/r
-	wT98DDQKs8J5bKU74+s0wA5hJ2z0iHq3kXQOowrdiiglhx5W67RN3oYfgfVmbD3UO4U3W+jcoRL1W
-	LO1DkC2tQejGALxFelRQ+LEtRW7coFWYZKPJKWkMYBnNNJWxZ3qAap904IZj7TrGydoo2gQTImvAs
-	jc/EjOOw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56308)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vCain-000000008SL-45Ut;
-	Sat, 25 Oct 2025 10:38:02 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vCail-000000003Z0-15vv;
-	Sat, 25 Oct 2025 10:37:59 +0100
-Date: Sat, 25 Oct 2025 10:37:59 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Emanuele Ghidoli <ghidoliemanuele@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v1] net: phy: dp83867: Disable EEE support as not
- implemented
-Message-ID: <aPyad0PUR9lY70rk@shell.armlinux.org.uk>
-References: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
- <aPyN7z8Vk4EiS20b@shell.armlinux.org.uk>
- <aPyWHRphEYOdk2MG@pengutronix.de>
+	s=arc-20240116; t=1761388404; c=relaxed/simple;
+	bh=R5C1C/GFIBVTbF80hL5yPJzzAUNU91RQXblsoQIXnbc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ud7pPU3WfTl3hSHhikxQfjCx5tG2ob8X8Rch35kBNyz4e9oh5km+kSRyQjgm8cGzQxD8QB/vNP71k2/gnSYItmwGr+xIZj7RPQV14c/jMJZ85FZm7dNvlHBLCsK3R9rUq07CDFgRaTFwzV1t2NRdybt1ratM+fIHhOkzimpehZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=AoeuFhww; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59P80229613482;
+	Sat, 25 Oct 2025 03:33:10 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=9eDN6c30DO+JrR4XGNLEYvRMFahp3mUdFOIxhzvaN90=; b=Aoe
+	uFhww+TWrkcq/6rnVDXM6pvghRclqAhwccJraPObF3mSeo5PZYoS12x43NBg31lu
+	KyskwZOnrHABYSDpEw0O9PTzQXH2ydTx17VXiHiJGcp3fvae2tEpSARLu2vUG3Aq
+	Mc9BwuKPWhaLnOFwwUPO1D1/+2m9vbrvL9cbhC+bUVs+7WXZuRk+sEfEyKYkgGg4
+	hGifXI5zvpo+sA8g9VZOcc6SfxremyECXOaZeu5SJcE7yi33h0ClWPJg4t0uXgnf
+	485kpisQUvuPVnxdZaZ3PVcM+EZryihokMETQ/8fcZvci0VtcJICUHRn2AYEwX3V
+	doqsi2ua4G9P7L31Shg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4a0p2g8gxm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 25 Oct 2025 03:33:10 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Sat, 25 Oct 2025 03:33:19 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Sat, 25 Oct 2025 03:33:18 -0700
+Received: from hyd1358.marvell.com (unknown [10.29.37.11])
+	by maili.marvell.com (Postfix) with ESMTP id E4DB65B6921;
+	Sat, 25 Oct 2025 03:33:04 -0700 (PDT)
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
+CC: <gakula@marvell.com>, <hkelam@marvell.com>, <bbhushan2@marvell.com>,
+        <jerinj@marvell.com>, <lcherian@marvell.com>, <sgoutham@marvell.com>,
+        <saikrishnag@marvell.com>, <netdev@vger.kernel.org>,
+        Subbaraya Sundeep
+	<sbhatta@marvell.com>
+Subject: [net-next v4 00/11] Add CN20K NIX and NPA contexts
+Date: Sat, 25 Oct 2025 16:02:36 +0530
+Message-ID: <1761388367-16579-1-git-send-email-sbhatta@marvell.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aPyWHRphEYOdk2MG@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI1MDA5NSBTYWx0ZWRfX4l4zbwcPE0kq
+ qm+zpVhSNwqpSbAY7ZWapHce3B+647nVIW5zaCB6tAAHSB8mZotcd+V70OdlRAHbk+fnivBlEX8
+ +RQvYb3F2i70FGcdthqedBfSUbuE5cwXVl+7qzDS9LcgOn1iGTVYMOp7bIoH2fmAh/hE2Vf0Tk0
+ oM0yfN1eLtjjBEdWyAalrSroZdqDLpaWK4yWtJHvSUv3G4KPVSkhZBMngTx6XXrcd46BqUNL9O/
+ ySnvpbvtu6Vxfo4CzXIkZKqusfS5xBJKTvq7l8GVVwGdfTZxnfKWrIlNsYSjRzZCPsIHbB0o9/m
+ pUqMM6lFx50wMbRhvFhkmwxfL3muFOfrx0HRp2OthHSekUQ6YclQLzRd5Wf/ohvhuAh2u4AXBE4
+ 7BuEqSCNTioU0ydY6Mzt8MYFkUFieg==
+X-Proofpoint-ORIG-GUID: V1-k_YsqIsdb-tWPucuxYUBW2H5DILhl
+X-Authority-Analysis: v=2.4 cv=Bt6QAIX5 c=1 sm=1 tr=0 ts=68fca766 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=BODy_oOD_763Z0c2EKIA:9 a=OBjm3rFKGHvpk9ecZwUJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: V1-k_YsqIsdb-tWPucuxYUBW2H5DILhl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-25_03,2025-10-22_01,2025-03-28_01
 
-On Sat, Oct 25, 2025 at 11:19:25AM +0200, Oleksij Rempel wrote:
-> On Sat, Oct 25, 2025 at 09:44:31AM +0100, Russell King (Oracle) wrote:
-> > On Thu, Oct 23, 2025 at 04:48:53PM +0200, Emanuele Ghidoli wrote:
-> > > While the DP83867 PHYs report EEE capability through their feature
-> > > registers, the actual hardware does not support EEE (see Links).
-> > > When the connected MAC enables EEE, it causes link instability and
-> > > communication failures.
-> > > 
-> > > The issue is reproducible with a iMX8MP and relevant stmmac ethernet port.
-> > > Since the introduction of phylink-managed EEE support in the stmmac driver,
-> > > EEE is now enabled by default, leading to issues on systems using the
-> > > DP83867 PHY.
-> > 
-> > Wasn't it enabled before? See commit 4218647d4556 ("net: stmmac:
-> > convert to phylink managed EEE support").
-> > 
-> > stmmac's mac_link_up() was:
-> > 
-> > -       if (phy && priv->dma_cap.eee) {
-> > -               phy_eee_rx_clock_stop(phy, !(priv->plat->flags &
-> > -                                            STMMAC_FLAG_RX_CLK_RUNS_IN_LPI));
-> > -               priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
-> > -               stmmac_eee_init(priv, phy->enable_tx_lpi);
-> >                 stmmac_set_eee_pls(priv, priv->hw, true);
-> > -       }
-> > 
-> > So, if EEE is enabled in the core synthesis, then EEE will be
-> > configured depending on what phylib says.
-> > 
-> > In stmmac_init_phy(), there was this:
-> > 
-> > -               if (priv->dma_cap.eee)
-> > -                       phy_support_eee(phydev);
-> > -
-> >                 ret = phylink_connect_phy(priv->phylink, phydev);
-> > 
-> > So phylib was told to enable EEE support on the PHY if the dwmac
-> > core supports EEE.
-> > 
-> > So, from what I can see, converting to phylink managed EEE didn't
-> > change this. So what really did change?
-> 
-> I suspect it is a change in board designs. iMX8MP EVB variants are using
-> Realtek PHYs with the SmartEEE variant. Therefore, the MAC is not able
-> to control LPI behavior. Designs based on the EVB design (with the
-> Realtek PHY) are not affected. I mean, any bug on the MAC or software
-> side will stay invisible.
-> 
-> Some new designs with special requirements for TSN, for example
-> low-latency TI PHYs, are a different story. They promise "Extra low
-> latency TX < 90ns, RX < 290ns" and also announce EEE support. These two
-> promises are not compatible with each other anyway, and at the same
-> time, even if LPI does work, it will most probably fail with the FEC
-> driver. I do not know about STMMAC.
+The hardware contexts of blocks NIX and NPA in CN20K silicon are
+different than that of previous silicons CN10K and CN9XK. This
+patchset adds the new contexts of CN20K in AF and PF drivers.
+A new mailbox for enqueuing contexts to hardware is added.
 
-What's annoying me is this "we spotted a change in the driver, we're
-going to blame that for our problems" attitude that there seems to be
-towards phylink.
+Patch 1 simplifies context writing and reading by using max context
+size supported by hardware instead of using each context size.
+Patch 2 and 3 adds NIX block contexts in AF driver and extends
+debugfs to display those new contexts
+Patch 4 and 5 adds NPA block contexts in AF driver and extends
+debugfs to display those new contexts
+Patch 6 omits NDC configuration since CN20K NPA does not use NDC
+for caching its contexts
+Patch 7 and 8 uses the new NIX and NPA contexts in PF/VF driver.
+Patch 9, 10 and 11 are to support more bandwidth profiles present in
+CN20K for RX ratelimiting and to display new profiles in debugfs
 
-When I make changes such as when porting a driver to a new facility,
-I try to do it with _no_ behavioural change. Yet, people still blame
-phylink for their problems. In 99% of cases, it turns out to be
-incorrect blame.
+v4 changes:
+ As suggested by Simon
+ 	Added static_assert to all context structures
+	Fixed line wraps
+	constrained #ifdef to small helper in patch 7
+	Used FIELD_PREP and FIELD_GET in patch 9
+ As suggested by Jakub
+	Used order instead of page count for pp_params.order
+v3 changes:
+ Added static_assert as suggested by Michal Swiatkowski
+v2 changes:
+ Fixed string fortifier warnings by padding structures
 
-This commit description is stating that the conversion of stmmac to
-phylink-managed EEE changed the behaviour to default to enabling EEE.
-I claim that the driver _already_ defaulted to enabling EEE. So
-the commit description is nonsense, and just pulling at straws to
-justify the probem.
+Link till v3:
+https://lore.kernel.org/all/1752772063-6160-1-git-send-email-sbhatta@marvell.com/
 
-What I'm asking for is people to _properly_ investigate their problems
-rather than just looking at the commit history, and pulling out some
-random commit to blame, which invariably seems to be phylink related.
+Thanks,
+Sundeep
 
-Having one's hard efforts constantly slated in this way is unhelpful.
+Linu Cherian (4):
+  octeontx2-af: Add cn20k NPA block contexts
+  octeontx2-af: Extend debugfs support for cn20k NPA
+  octeontx2-af: Skip NDC operations for cn20k
+  octeontx2-pf: Initialize cn20k specific aura and pool contexts
+
+Subbaraya Sundeep (7):
+  octeontx2-af: Simplify context writing and reading to hardware
+  octeontx2-af: Add cn20k NIX block contexts
+  octeontx2-af: Extend debugfs support for cn20k NIX
+  octeontx2-pf: Initialize new NIX SQ context for cn20k
+  octeontx2-af: Accommodate more bandwidth profiles for cn20k
+  octeontx2-af: Display new bandwidth profiles too in debugfs
+  octeontx2-pf: Use new bandwidth profiles in receive queue
+
+ .../ethernet/marvell/octeontx2/af/Makefile    |   3 +-
+ .../marvell/octeontx2/af/cn20k/debugfs.c      | 218 +++++++++++
+ .../marvell/octeontx2/af/cn20k/debugfs.h      |  28 ++
+ .../ethernet/marvell/octeontx2/af/cn20k/nix.c |  20 ++
+ .../ethernet/marvell/octeontx2/af/cn20k/npa.c |  21 ++
+ .../marvell/octeontx2/af/cn20k/struct.h       | 340 ++++++++++++++++++
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  73 ++++
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  15 +-
+ .../marvell/octeontx2/af/rvu_debugfs.c        |  39 +-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  76 ++--
+ .../ethernet/marvell/octeontx2/af/rvu_npa.c   |  29 +-
+ .../marvell/octeontx2/af/rvu_struct.h         |  31 +-
+ .../ethernet/marvell/octeontx2/nic/cn10k.c    |  10 +
+ .../ethernet/marvell/octeontx2/nic/cn20k.c    | 220 +++++++++++-
+ .../marvell/octeontx2/nic/otx2_common.c       |  14 +
+ .../marvell/octeontx2/nic/otx2_common.h       |  10 +
+ 16 files changed, 1092 insertions(+), 55 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/nix.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/npa.c
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.48.1
+
 
