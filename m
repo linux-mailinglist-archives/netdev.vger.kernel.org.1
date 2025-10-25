@@ -1,291 +1,237 @@
-Return-Path: <netdev+bounces-232762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0EC2C08AB9
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 06:20:42 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40730C08AC6
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 06:25:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A43C83BC7F3
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 04:20:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BEDEF4E44A1
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 04:25:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EECD2281370;
-	Sat, 25 Oct 2025 04:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 084A428851F;
+	Sat, 25 Oct 2025 04:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E29BKJNL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nA2SMAru"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09AD27A122
-	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 04:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD202877E7
+	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 04:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761366038; cv=none; b=TCkr1/BD8Pk6F/nnRN72Q3KkQjgHrxjDI8yOrBZGBVeKZPjiZexXV/VbK4Pv93iaQZZAU7HkPzh2N/XAeEBkDh4G3YLz7LQuIQNFPiagA2H3M5h2NC5j4oJ4vT6eYV822/QUmFUUE8d8SfW6Ett41jIHpTmd07XNaynA4DI8SFI=
+	t=1761366334; cv=none; b=bIVJKieGie65b4u9GFoJhEK1mSBvXkJRIRvqlXabRSMyVOF9M0hbo1vTCCj4Quq8RgWmb+ijQcqPPHHxc59bZgi7p4F3RAtc92UruPOzTGnVX4h4dF4HX5ppPfX+Q9lBUZp9gDTmy/STnAokXXn44X6USOOVSTuKou0/D/ytlY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761366038; c=relaxed/simple;
-	bh=P22wUr3x08sSd7YJTryjvh2rA+koFVJGCh9mK+4faT0=;
+	s=arc-20240116; t=1761366334; c=relaxed/simple;
+	bh=T024JLzezhn/owYdSKp0XfQ7RUhl+MWD6QiZ4czgoTo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yd5o1E2evTtjTGCK0vKfjx0yzNa+RRFqLW4JZkjbPjrOi8dcDZAPbQezbwtnwxhwTqEaPt3zYeJGrNQK5nFQZidZ3/kyuyh6JfrMTeJ8/x5HSEXIhh4OLiorxLvqy1Av34jbEUnaqaHsyNMemAQ3w8hknv+qLCV1/P1CYOfE2Kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E29BKJNL; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4710665e7deso13305005e9.1
-        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 21:20:36 -0700 (PDT)
+	 To:Cc:Content-Type; b=LVeqGdwH/Sn67GS3fM+txIvP9/po8PG3TBtXTuD/hKvkprKfp671t3yUmAzTC80JW+mxAWHEXShcsmAMzDievqpccD3zSRQKkLw7MT9v7d/WJ34jOOqFEnt0hgufX4HXrgsH+XVa6dkwupKr0gGZKQibHcDP7hdx8MAnoj4yJEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nA2SMAru; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b6cfffbb1e3so1755907a12.3
+        for <netdev@vger.kernel.org>; Fri, 24 Oct 2025 21:25:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761366035; x=1761970835; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761366333; x=1761971133; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uLMsn4Fd4C/vDGn0sCjxZvTsu/rbZsiFR/9FbW92yMc=;
-        b=E29BKJNLiO+WjEoKnVkkWgv1h6LGKAeMpyYUoW2Nu3JtE2bMCKLe/sTPVTSObhv6W2
-         i9zeyVqEmUrKwVhVZW/cqifYrpDhqrzz6eIYlK+dFel7DFfWTavYkpPO585mRxaNyLpF
-         UIFAbPlmHOau9kHWdKoO5jvOS9Zrrt3hCQPxHWffam9OSRpUaGUscKU3x0jvKpQGQpAX
-         6KCkdgFREtplMpPbkjfclN+md6a2mjOtPnbx5MvLsIHb9AIdXlbJgOMw15U76bi1w4sX
-         Y7ds3hBkjxF8LQIOeU5AVDo2EGIjzj4w0rHUobTNZAn6asyCiZhRbNpZWaMdTdqJjg2a
-         JyIw==
+        bh=/PhHVYAu3GoqB9tOUrtNyZ6VllNlvh/UDz5NmlzDI5Q=;
+        b=nA2SMAruIFkndqX+KIawqn1fj8R02TJuA5DWQuQ7vOkKWLqQ7b7tIdBlFZxFTdX9v0
+         QSVFM9ATox47IooKm5u6VqVjnN6jIWWVcAxGyPQe/6p96gHOzE+SHwAV/x3c3reiF+jV
+         CU2Mo+p+Ic7frB/wl4j5y5i39ld7mStMtR4BR6i3+WoLGWGFO7Qdj//vKDtoxzF4VmQ8
+         mAS9WGmaZqC/ZqUYHld+yOnxsK3LHnONVfValJMnwMglFzagx0pOX7meSaGCLL1E2bwk
+         R1GMAqt3D393KY518KUEQEj3IiF7cNBf2mKS4lwr82ym6uF6qHMJUN95i1QbOViyIIUx
+         jwCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761366035; x=1761970835;
+        d=1e100.net; s=20230601; t=1761366333; x=1761971133;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uLMsn4Fd4C/vDGn0sCjxZvTsu/rbZsiFR/9FbW92yMc=;
-        b=cI07YeZ0jK0bwxLvjQg0Ui+r2vsNrOh2ZLQL4nnaSvziQgUTgxETr8XXKRmVM++t+c
-         +FHGqeatsFcTv1E+EDZEqf7YYFZSbwS+8uDKSnclw6Q2Jy9Ghcg68lKtjplSEMofDaqY
-         i/kw4x/3gKPEUdsu5S1z6rU2otR+a6oB6U9ScN7G3QVTBNZX1pfaxgB2vOQciV5YfZco
-         YVawEZE7eH99w/2+l4C4eLZdqB5xrwcs9jPTnDcuPcO7Z1vtNpbjbcKmknJI05zSlmqN
-         S08tTmFF1cu9QEnFkbncanmOA8ievHQkqvrKqNq+UmXCFJfanclCQPgmT0TvuhUm9JC8
-         8hig==
-X-Forwarded-Encrypted: i=1; AJvYcCVdICGI/ePODCzudAMElHoHjVQJuEty/rUONH0pBPB6C3ViotJhlM1GGQkkirPvSR5qgzV+WHM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsrkHQ1KxKK+v6lGT+S+w4RLNlWC5AVOJQl3VaUXjyUiKNBOYe
-	KNo+w0we0DNPZTSq6iElsF5C7ArERnmdKxocJv/6T7Z4LIjF/AqDitP125ZnRc5tKb8y2O2nFIw
-	2wiOiUowyr2auSNXbd/8ANlBlGbviYBo=
-X-Gm-Gg: ASbGnctiFIyYE4MWcXAIEpQMbc99o4ohGZ7lPm5TpCyb0n6r1gBCA+7a1p/cseVz8Qs
-	wzcq7inTFXZGBlsDxEzBR5S9NvrB6ibqxRMlQGFa3b1Bgv3Jk5Kq68TYlj6guth6Xriv1ufVafF
-	5hAuJDO8CRS9tl8yTWmxPTFWeaVIMw12teiDK8Yzq8NHZFxQlkIwqOR89ZuUPvqnwRonnYDmZK0
-	5Dwt1xWmgM+1CQ+1Flfc88ISwMs3iEMrUftpyjX6YUFp7jYPd6FDx3X47g/ScmwcK2/yLs=
-X-Google-Smtp-Source: AGHT+IGJMyVz63yP/GSXaMJAOLGx6fyPfMoVX1/oUbB8QYAV7ZaUxvisSMyEQ+TczyPPANns36vEqiEvvX2UTQl+tX4=
-X-Received: by 2002:a05:600c:4e45:b0:471:786:94d3 with SMTP id
- 5b1f17b1804b1-475cb02faa5mr65058745e9.22.1761366034734; Fri, 24 Oct 2025
- 21:20:34 -0700 (PDT)
+        bh=/PhHVYAu3GoqB9tOUrtNyZ6VllNlvh/UDz5NmlzDI5Q=;
+        b=uusdExrmCdSwwoMH7Cf97eJCMNFodCdmHZQNXrF/L6T3ZjlzMTMrOZvHyVjnkSELrX
+         oVbhbXE7HVLlrvVWnxA/Isp5R+ZlJzTibVZ7Hu2b8Js7/QNXgBA1skjYVbBCFMn3lrfs
+         vpYHyYJK2bzQvNJj4JX1yUVsbzMbuH5Yrbu7+IWBJc3PqDxZy3xrEHBOjKCoAJ4i2IsC
+         PxgmfjT0pP2tgcM10qH0A6AbYYWfUJeRWgD+xgyRUMCJknJF7Z4z67N5z8S12j2/SYHG
+         yH1PQudb+qqaRjR8kUn7v6NCpFujuGhpwyNsJNrJvmBnNZ5kC59Cfl/lfX3T0u+Lq5HD
+         r3BA==
+X-Forwarded-Encrypted: i=1; AJvYcCXux4yV2+FM9F2eEFDkPB9gIGKpEhrn4nxv9mdgPMcQBzSQQpgw9zq1lzsjDh+mmwEbbz884fc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YylsOj18AUOQgceyMfYServ/m0JJc5nOkOJl9O93CqA0mIVS9/e
+	K7YtmFXd+AAfLKm/zHuYk+zWst/gDUCPrOikQhNsYmIL8cS4ZAvzWqqjt/Ygut33hgOzYT2l3aG
+	YnNc1cVti0nIy3Dlq346Q6vyIvkBS1e/oaqx16wZ0
+X-Gm-Gg: ASbGncsZqe6ZFli4TSqEC29uiZhQPe/fbo7kSBG9wFlE6IcifO8+gB4c5gcsfQDYoos
+	v+TDuARXzqzjc0fBvENKgw3Jcmrk890ygm02EXqySW1XtijSzofgT4g2pbe2B9meIjfVnWxSu+x
+	N4boyya5004VrtrtRrW9umdv0jzuFBlByWHjammWvjGzY7BucpfUxsGIlQCPAcGQPrQGXiJ4+WK
+	GnGj8iBUft/sUgk6+7hUx8QY9QLPD9+bB8HOZcAfO2jTaohVQFN4w3zeS7ApReE+NkZYyo73uaz
+	6Pq18q6UvUk6svR0li/kPxBtMw==
+X-Google-Smtp-Source: AGHT+IE3YSxNIMuDra80sjllPz1FMOI4xMsMGSHUumbJrsGzXTOGgEeAdl92i/4ykKaEWjGEn4MI+t4Ip6reBjO6l1o=
+X-Received: by 2002:a17:903:2381:b0:266:cb8c:523 with SMTP id
+ d9443c01a7336-290cc9be17amr377871245ad.48.1761366332191; Fri, 24 Oct 2025
+ 21:25:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251024201836.317324-1-prabhakar.mahadev-lad.rj@bp.renesas.com> <20251024232010.GA2992158-robh@kernel.org>
-In-Reply-To: <20251024232010.GA2992158-robh@kernel.org>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Sat, 25 Oct 2025 05:20:08 +0100
-X-Gm-Features: AWmQ_bkQw9el4GpprHOa5Iaqen28UQ8ewlt4yoguZG3z40AiI3DxWU0FJ_UjXs0
-Message-ID: <CA+V-a8svLWD+qGTATNS5b4_4Oo7QuW2=v8jMZyNn-hJx99C_tQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] dt-bindings: net: phy: vsc8531: Convert to DT schema
-To: Rob Herring <robh@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Heiko Stuebner <heiko@sntech.de>, devicetree@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+References: <CAAVpQUCx9MOJobomXXBcXsCNgSn__U3mJp8LFxD515o-boyr=w@mail.gmail.com>
+ <20251025035147.2094258-1-lizhi.xu@windriver.com>
+In-Reply-To: <20251025035147.2094258-1-lizhi.xu@windriver.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Fri, 24 Oct 2025 21:25:20 -0700
+X-Gm-Features: AS18NWBRmH_2lAVRSFK1FC1NYFaseykjicIslllLmdlBt_n_d0eBcPdw3LG8pXk
+Message-ID: <CAAVpQUA_CqqUfoJb=NaQ7YnBUbW0UWQS4W++TXwRFekenkDM8Q@mail.gmail.com>
+Subject: Re: [PATCH V3] net: rose: Prevent the use of freed digipeat
+To: Lizhi Xu <lizhi.xu@windriver.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	jreuter@yaina.de, kuba@kernel.org, linux-hams@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Rob,
-
-Thank you for the review.
-
-On Sat, Oct 25, 2025 at 12:20=E2=80=AFAM Rob Herring <robh@kernel.org> wrot=
-e:
+On Fri, Oct 24, 2025 at 8:51=E2=80=AFPM Lizhi Xu <lizhi.xu@windriver.com> w=
+rote:
 >
-> On Fri, Oct 24, 2025 at 09:18:36PM +0100, Prabhakar wrote:
-> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> >
-> > Convert VSC8531 Gigabit ethernet phy binding to DT schema format. While
-> > at it add compatible string for VSC8541 PHY which is very much similar
-> > to the VSC8531 PHY and is already supported in the kernel. VSC8541 PHY
-> > is present on the Renesas RZ/T2H EVK.
-> >
-> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > ---
-> > Inspired from the DT warnings seen while running dtbs check [0],
-> > took an opportunity to convert this binding to DT schema format.
-> > As there was no entry in the maintainers file Ive added myself
-> > as the maintainer for this binding.
-> > [0] https://lore.kernel.org/all/176073765433.419659.2490051913988670515=
-.robh@kernel.org/
-> >
-> > Note,
-> > 1] dt_binding_check reports below warnings. But this looks like
-> > the same for other DT bindings too which have dependencies defined.
-> > ./Documentation/devicetree/bindings/net/mscc-phy-vsc8531.yaml:99:36: [w=
-arning] too few spaces after comma (commas)
-> > <path>/mscc-phy-vsc8531.example.dtb: ethernet-phy@0 (ethernet-phy-id000=
-7.0772): 'vsc8531' is a dependency of 'vsc8531,edge-slowdown'
-> >       from schema $id: http://devicetree.org/schemas/net/mscc-phy-vsc85=
-31.yaml
-> > <path>/mscc-phy-vsc8531.example.dtb: ethernet-phy@0 (ethernet-phy-id000=
-7.0772): 'vddmac' is a dependency of 'vsc8531,edge-slowdown'
-> > 2] As there is no entry in maintainers file for this binding, Ive added=
- myself
-> > as the maintainer for this binding.
-> > ---
-> >  .../bindings/net/mscc-phy-vsc8531.txt         |  73 ----------
-> >  .../bindings/net/mscc-phy-vsc8531.yaml        | 125 ++++++++++++++++++
-> >  .../devicetree/bindings/vendor-prefixes.yaml  |   2 +-
-> >  3 files changed, 126 insertions(+), 74 deletions(-)
-> >  delete mode 100644 Documentation/devicetree/bindings/net/mscc-phy-vsc8=
-531.txt
-> >  create mode 100644 Documentation/devicetree/bindings/net/mscc-phy-vsc8=
-531.yaml
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt=
- b/Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt
-> > deleted file mode 100644
-> > index 0a3647fe331b..000000000000
-> > --- a/Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt
-> > +++ /dev/null
-> > @@ -1,73 +0,0 @@
-> > -* Microsemi - vsc8531 Giga bit ethernet phy
-> > -
-<snip>
-> > +$id: http://devicetree.org/schemas/net/mscc-phy-vsc8531.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Microsemi VSC8531 Gigabit Ethernet PHY
-> > +
-> > +maintainers:
-> > +  - Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > +
-> > +description:
-> > +  The VSC8531 is a Gigabit Ethernet PHY with configurable MAC interfac=
-e
-> > +  drive strength and LED modes.
-> > +
-> > +allOf:
-> > +  - $ref: ethernet-phy.yaml#
-> > +
-> > +select:
-> > +  properties:
-> > +    compatible:
-> > +      contains:
-> > +        enum:
-> > +          - ethernet-phy-id0007.0570 # VSC8531
-> > +          - ethernet-phy-id0007.0772 # VSC8541
-> > +  required:
-> > +    - compatible
-> > +
-> > +properties:
-> > +  compatible:
-> > +    items:
-> > +      - enum:
-> > +          - ethernet-phy-id0007.0570 # VSC8531
-> > +          - ethernet-phy-id0007.0772 # VSC8541
-> > +      - const: ethernet-phy-ieee802.3-c22
-> > +
-> > +  vsc8531,vddmac:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    description:
-> > +      The VDDMAC voltage in millivolts. This property is used in combi=
-nation
-> > +      with the edge-slowdown property to control the drive strength of=
- the
-> > +      MAC interface output signals.
-> > +    enum: [3300, 2500, 1800, 1500]
-> > +    default: 3300
-> > +
-> > +  vsc8531,edge-slowdown:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    description:
->
-> Use '>' if you have formatting.
->
-OK.
-
-> > +      Percentage by which the edge rate should be slowed down relative=
+> On Fri, 24 Oct 2025 19:18:46 -0700, Kuniyuki Iwashima <kuniyu@google.com>=
+ wrote:
+> > On Fri, Oct 24, 2025 at 2:39=E2=80=AFAM Lizhi Xu <lizhi.xu@windriver.co=
+m> wrote:
+> > >
+> > > There is no synchronization between the two timers, rose_t0timer_expi=
+ry
+> > > and rose_timer_expiry.
+> > > rose_timer_expiry() puts the neighbor when the rose state is ROSE_STA=
+TE_2.
+> > > However, rose_t0timer_expiry() does initiate a restart request on the
+> > > neighbor.
+> > > When rose_t0timer_expiry() accesses the released neighbor member digi=
+peat,
+> > > a UAF is triggered.
+> > >
+> > > To avoid this UAF, defer the put operation to rose_t0timer_expiry() a=
+nd
+> > > stop restarting t0timer after putting the neighbor.
+> > >
+> > > When putting the neighbor, set the neighbor to NULL. Setting neighbor=
  to
-> > +      the fastest possible edge time. This setting helps reduce electr=
-omagnetic
-> > +      interference (EMI) by adjusting the drive strength of the MAC in=
-terface
-> > +      output signals. Valid values depend on the vddmac voltage settin=
-g
-> > +      according to the edge rate change table in the datasheet.
-> > +      For vddmac=3D3300mV valid values are 0, 2, 4, 7, 10, 17, 29, 53.=
- (7 recommended)
-> > +      For vddmac=3D2500mV valid values are 0, 3, 6, 10, 14, 23, 37, 63=
-. (10 recommended)
-> > +      For vddmac=3D1800mV valid values are 0, 5, 9, 16, 23, 35, 52, 76=
-. (0 recommended)
-> > +      For vddmac=3D1500mV valid values are 0, 6, 14, 21, 29, 42, 58, 7=
-7. (0 recommended)
->
-> Indent lists by 2 more spaces and a blank line before.
->
-Ok, will do.
+> > > NULL prevents rose_t0timer_expiry() from restarting t0timer.
+> > >
+> > > syzbot reported a slab-use-after-free Read in ax25_find_cb.
+> > > BUG: KASAN: slab-use-after-free in ax25_find_cb+0x3b8/0x3f0 net/ax25/=
+af_ax25.c:237
+> > > Read of size 1 at addr ffff888059c704c0 by task syz.6.2733/17200
+> > > Call Trace:
+> > >  ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
+> > >  ax25_send_frame+0x157/0xb60 net/ax25/ax25_out.c:55
+> > >  rose_send_frame+0xcc/0x2c0 net/rose/rose_link.c:106
+> > >  rose_transmit_restart_request+0x1b8/0x240 net/rose/rose_link.c:198
+> > >  rose_t0timer_expiry+0x1d/0x150 net/rose/rose_link.c:83
+> > >
+> > > Freed by task 17183:
+> > >  kfree+0x2b8/0x6d0 mm/slub.c:6826
+> > >  rose_neigh_put include/net/rose.h:165 [inline]
+> > >  rose_timer_expiry+0x537/0x630 net/rose/rose_timer.c:183
+> > >
+> > > Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_t")
+> > > Reported-by: syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com
+> > > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> > > ---
+> > > V1 -> V2: Putting the neighbor stops t0timer from automatically start=
+ing
+> > > V2 -> V3: add rose_neigh_putex for set rose neigh to NULL
+> > >
+> > >  include/net/rose.h   | 12 ++++++++++++
+> > >  net/rose/rose_link.c |  5 +++++
+> > >  2 files changed, 17 insertions(+)
+> > >
+> > > diff --git a/include/net/rose.h b/include/net/rose.h
+> > > index 2b5491bbf39a..33de310ba778 100644
+> > > --- a/include/net/rose.h
+> > > +++ b/include/net/rose.h
+> > > @@ -167,6 +167,18 @@ static inline void rose_neigh_put(struct rose_ne=
+igh *rose_neigh)
+> > >         }
+> > >  }
+> > >
+> > > +static inline void rose_neigh_putex(struct rose_neigh **roseneigh)
+> > > +{
+> > > +       struct rose_neigh *rose_neigh =3D *roseneigh;
+> > > +       if (refcount_dec_and_test(&rose_neigh->use)) {
+> > > +               if (rose_neigh->ax25)
+> > > +                       ax25_cb_put(rose_neigh->ax25);
+> > > +               kfree(rose_neigh->digipeat);
+> > > +               kfree(rose_neigh);
+> > > +               *roseneigh =3D NULL;
+> > > +       }
+> > > +}
+> > > +
+> > >  /* af_rose.c */
+> > >  extern ax25_address rose_callsign;
+> > >  extern int  sysctl_rose_restart_request_timeout;
+> > > diff --git a/net/rose/rose_link.c b/net/rose/rose_link.c
+> > > index 7746229fdc8c..334c8cc0876d 100644
+> > > --- a/net/rose/rose_link.c
+> > > +++ b/net/rose/rose_link.c
+> > > @@ -43,6 +43,9 @@ void rose_start_ftimer(struct rose_neigh *neigh)
+> > >
+> > >  static void rose_start_t0timer(struct rose_neigh *neigh)
+> > >  {
+> > > +       if (!neigh)
+> > > +               return;
+> > > +
+> > >         timer_delete(&neigh->t0timer);
+> > >
+> > >         neigh->t0timer.function =3D rose_t0timer_expiry;
+> > > @@ -80,10 +83,12 @@ static void rose_t0timer_expiry(struct timer_list=
+ *t)
+> > >  {
+> > >         struct rose_neigh *neigh =3D timer_container_of(neigh, t, t0t=
+imer);
+> > >
+> >
+> > What prevents rose_timer_expiry() from releasing the
+> > last refcnt here ?
+> The issue reported by syzbot is that rose_t0timer_expiry() is triggered
+> first, followed by rose_timer_expiry().
 
-> > +    enum: [0, 2, 3, 4, 5, 6, 7, 9, 10, 14, 16, 17, 21, 23, 29, 35, 37,=
- 42, 52, 53, 58, 63, 76, 77]
-> > +    default: 0
-> > +
-> > +  vsc8531,led-0-mode:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    description: LED[0] behavior mode. See include/dt-bindings/net/msc=
-c-phy-vsc8531.h
-> > +      for available modes.
-> > +    minimum: 0
-> > +    maximum: 15
-> > +    default: 1
-> > +
-> > +  vsc8531,led-1-mode:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    description: LED[1] behavior mode. See include/dt-bindings/net/msc=
-c-phy-vsc8531.h
-> > +      for available modes.
-> > +    minimum: 0
-> > +    maximum: 15
-> > +    default: 2
-> > +
-> > +  vsc8531,led-2-mode:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    description: LED[2] behavior mode. See include/dt-bindings/net/msc=
-c-phy-vsc8531.h
-> > +      for available modes.
-> > +    minimum: 0
-> > +    maximum: 15
-> > +    default: 0
-> > +
-> > +  vsc8531,led-3-mode:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    description: LED[3] behavior mode. See include/dt-bindings/net/msc=
-c-phy-vsc8531.h
-> > +      for available modes.
-> > +    minimum: 0
-> > +    maximum: 15
-> > +    default: 8
-> > +
-> > +  load-save-gpios:
-> > +    description: GPIO phandle used for the load/save operation of the =
-PTP hardware
-> > +      clock (PHC).
-> > +    maxItems: 1
-> > +
-> > +dependencies:
-> > +  vsc8531,edge-slowdown: [ vsc8531,vddmac ]
->
-> You either need quotes on 'vsc8531,vddmac' or use this style:
->
-If I use the quotes I get the below error, so I choose the below option ins=
-tead.
+I don't see how you read that ordering from the report.
+https://syzkaller.appspot.com/bug?extid=3Dcaa052a0958a9146870d
 
-mscc-phy-vsc8531.yaml:104:28: [error] string value is redundantly
-quoted with any quotes (quoted-strings)
+The only ordering I can find is that kfree() in rose_timer_expiry()
+happened before ax25_find_cb () in rose_t0timer_expiry().
 
-> vsc8531,edge-slowdown:
->   - vsc8531,vddmac
+> Therefore, in rose_t0timer_expiry(), the reference count of neigh is
+> increased before entering rose_transmit_restart_request() to prevent
+> neigh from being put in rose_timer_expiry(). Then, in rose_t0timer_expiry=
+(),
+> neigh is put before executing rose_start_t0timer() and the neigh value is
+> set to NULL to prevent t0timer restarts.
 >
+> The case where rose_timer_expiry() is triggered before rose_t0timer_expir=
+y()
+> is not considered at this time.
 
-Cheers,
-Prabhakar
+So this change just papers over the root cause.
+
+
+> >
+> > The t0timer could be triggered even after that happens.
+> >
+> >
+> > > +       rose_neigh_hold(neigh);
+> > >         rose_transmit_restart_request(neigh);
+> > >
+> > >         neigh->dce_mode =3D 0;
+> > >
+> > > +       rose_neigh_putex(&neigh);
+> > >         rose_start_t0timer(neigh);
+> > >  }
+> > >
+> > > --
+> > > 2.43.0
+> > >
 
