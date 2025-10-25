@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-232826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C06C09203
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:51:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3CA2C0920B
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:51:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8EC874E83E5
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 14:50:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9A691C22B72
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 14:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707C52FFF98;
-	Sat, 25 Oct 2025 14:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FBBF2FFFBE;
+	Sat, 25 Oct 2025 14:50:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49E42FFF92;
-	Sat, 25 Oct 2025 14:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022AC2FFDF4;
+	Sat, 25 Oct 2025 14:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761403798; cv=none; b=HfaBL+dIDprvL50LPxINJbUj/Tb0HG0dn7ShpBMTw9IhRWTBkA1N0yNp7afFWiUjqzX5/2eGdYE311MFwmicoxwkLy78ftK9kVCyqJDQAqe6E1YqSDBNtbU6xnTdXK77/flLtjgYESm1zmYncvv02OjOeRYSXX8GcKmn6pPwcCQ=
+	t=1761403816; cv=none; b=OTC0uu7vNbU3vQ+bR5CtXchJwCKY9Bup5iIXet7bGQ2cZcVTV0CcwJiQgtvcy71fTsNdlII39NcsQQWiaPiO0Tz685l4L/zYHc40UfjabVOQ0ZzVs5jLs4NFjraQZHvyQo/POOtcUUl0kmtmSynnn3FfCj+O9HRPkLwBJCKGhvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761403798; c=relaxed/simple;
-	bh=h/5WK388+QyX4y4F7C/GaLklOiqWSAeuaitnMMjH+iM=;
+	s=arc-20240116; t=1761403816; c=relaxed/simple;
+	bh=2BT6vYlpLIz17S7FZYvZUawSwLmLSpaSV3ovQAA6yN0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CXh74rFgUZuFxKIf6quCDNxVLVMrHfxoxrRQ9m8MfrU85pq5Ff1HaHnbt2qcLwWpB+6xGR9kHwgrItW+7e3IUbFr9xL8ueGizN2TLIJUQykpA/aeXQt/ydV4SAFwAUIRvJUIqYioswLHgZT7y5dVWBbVRQt7KVYahCZuYFtnd8w=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ezDl6Mogci62YFtJ4Cve9AZ8+Qh5kGFc7RzjN+bZAJ51Y+7I2F63YT0XCucujbMbo0xWOIcW8fhW8RSLc8+6mnB9GwERMdfFnNIcXKLCyLuEYQeGUBfpCSHohkzNS0A1GORwLdkvYdyUCzSLEUmatkI8VGK59+FYalx3L9XdwH8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vCfaZ-000000001d8-3voX;
-	Sat, 25 Oct 2025 14:49:52 +0000
-Date: Sat, 25 Oct 2025 15:49:42 +0100
+	id 1vCfar-000000001dY-1s4s;
+	Sat, 25 Oct 2025 14:50:09 +0000
+Date: Sat, 25 Oct 2025 15:50:00 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -58,9 +58,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v2 07/13] net: dsa: lantiq_gswip: allow adjusting
- MII delays
-Message-ID: <02098c3305529392d9fa7b5615cab2bdd02789c4.1761402873.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v2 08/13] dt-bindings: net: dsa: lantiq,gswip: add
+ MaxLinear RMII refclk output property
+Message-ID: <69053e3f65171a7435aaf14e3277bc7bfef71d6d.1761402873.git.daniel@makrotopia.org>
 References: <cover.1761402873.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -72,84 +72,47 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1761402873.git.daniel@makrotopia.org>
 
-Currently the MII clk vs. data delay is configured based on the PHY
-interface mode.
+Add support for the maxlinear,rmii-refclk-out boolean property on port
+nodes to configure the RMII reference clock to be an output rather than
+an input.
 
-In addition to that add support for setting up MII delays using the
-standard Device Tree properties 'tx-internal-delay-ps' and
-'rx-internal-delay-ps' and only fall back to using the PHY interface
-mode in case both properties are unused.
+This property is only applicable for non-RGMII ports and allows the
+switch to provide the reference clock for RMII-connected PHYs instead
+of requiring an external clock source.
+
+This corresponds to the driver changes that read this Device Tree
+property to configure the RMII clock direction.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/net/dsa/lantiq/lantiq_gswip.h        |  4 +++
- drivers/net/dsa/lantiq/lantiq_gswip_common.c | 31 ++++++++++++++++++++
- 2 files changed, 35 insertions(+)
+ .../devicetree/bindings/net/dsa/lantiq,gswip.yaml          | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
-index 42000954d842..0c32ec85e127 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.h
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
-@@ -82,6 +82,10 @@
- #define GSWIP_MII_PCDU5			0x05
- #define  GSWIP_MII_PCDU_TXDLY_MASK	GENMASK(2, 0)
- #define  GSWIP_MII_PCDU_RXDLY_MASK	GENMASK(9, 7)
-+#define  GSWIP_MII_PCDU_TXDLY(x)	u16_encode_bits(((x) / 500), GSWIP_MII_PCDU_TXDLY_MASK)
-+#define  GSWIP_MII_PCDU_RXDLY(x)	u16_encode_bits(((x) / 500), GSWIP_MII_PCDU_RXDLY_MASK)
-+#define GSWIP_MII_PCDU_RXDLY_DEFAULT	2000 /* picoseconds */
-+#define GSWIP_MII_PCDU_TXDLY_DEFAULT	2000 /* picoseconds */
+diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+index ed274bfb8d49..48641c27da10 100644
+--- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+@@ -13,6 +13,8 @@ allOf:
+         patternProperties:
+           "^port@[0-6]$":
+             type: object
++            allOf:
++              - $ref: /schemas/net/dsa/dsa-port.yaml#
+             properties:
+               tx-internal-delay-ps:
+                 enum: [0, 500, 1000, 1500, 2000, 2500, 3000, 3500]
+@@ -26,6 +28,11 @@ allOf:
+                 description:
+                   RGMII RX Clock Delay defined in pico seconds.
+                   The delay lines adjust the MII clock vs. data timing.
++              maxlinear,rmii-refclk-out:
++                type: boolean
++                description:
++                  Configure the RMII reference clock to be a clock output
++                  rather than an input. Only applicable for RMII mode.
  
- /* GSWIP Core Registers */
- #define GSWIP_SWRES			0x000
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-index 94b187899db6..60a83093cd10 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-@@ -622,6 +622,34 @@ static int gswip_port_vlan_filtering(struct dsa_switch *ds, int port,
- 	return 0;
- }
- 
-+static bool gswip_mii_delay_setup(struct gswip_priv *priv, struct dsa_port *dp)
-+{
-+	u32 tx_delay = GSWIP_MII_PCDU_TXDLY_DEFAULT;
-+	u32 rx_delay = GSWIP_MII_PCDU_RXDLY_DEFAULT;
-+	struct device_node *port_dn = dp->dn;
-+	bool used;
-+	int ret;
-+
-+	ret = of_property_read_u32(port_dn, "tx-internal-delay-ps", &tx_delay);
-+	if (ret && ret != -EINVAL)
-+		return ret;
-+	used = !ret;
-+
-+	ret = of_property_read_u32(port_dn, "rx-internal-delay-ps", &rx_delay);
-+	if (ret && ret != -EINVAL)
-+		return ret;
-+	used |= !ret;
-+
-+	if (used)
-+		gswip_mii_mask_pcdu(priv, GSWIP_MII_PCDU_TXDLY_MASK |
-+					  GSWIP_MII_PCDU_RXDLY_MASK,
-+					  GSWIP_MII_PCDU_TXDLY(tx_delay) |
-+					  GSWIP_MII_PCDU_RXDLY(rx_delay),
-+					  dp->index);
-+
-+	return used;
-+}
-+
- static int gswip_setup(struct dsa_switch *ds)
- {
- 	unsigned int cpu_ports = dsa_cpu_ports(ds);
-@@ -1419,6 +1447,9 @@ static void gswip_phylink_mac_config(struct phylink_config *config,
- 			   GSWIP_MII_CFG_RGMII_IBS | GSWIP_MII_CFG_LDCLKDIS,
- 			   miicfg, port);
- 
-+	if (gswip_mii_delay_setup(priv, dp))
-+		return;
-+
- 	switch (state->interface) {
- 	case PHY_INTERFACE_MODE_RGMII_ID:
- 		gswip_mii_mask_pcdu(priv, GSWIP_MII_PCDU_TXDLY_MASK |
+ maintainers:
+   - Hauke Mehrtens <hauke@hauke-m.de>
 -- 
 2.51.0
 
