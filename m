@@ -1,59 +1,62 @@
-Return-Path: <netdev+bounces-232839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E90BBC092D2
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:09:24 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50A1DC093C9
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:15:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2AD01AA2101
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:09:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E51DE4ED779
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6ED22689C;
-	Sat, 25 Oct 2025 16:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F01C11F1306;
+	Sat, 25 Oct 2025 16:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UF1ZPyhL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L8qcLsol"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CB12045B7;
-	Sat, 25 Oct 2025 16:09:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F632F5B;
+	Sat, 25 Oct 2025 16:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761408552; cv=none; b=JzvG9n6TU65xQGyk92FYgOBGWSLIwtXjHqFXgWrO9668knVrYIL7FlW1kV+/qVDW494wiveaJdSnq4AMDESNk3kZdj2jK6xD4ggGg+gxmo3ue2q44xIsgZSFAyVpSztrNIa1l4R4riUaPD6CPicBCYh35lamgwx2F9jtM5tSfCg=
+	t=1761408671; cv=none; b=k3qFWPobMpP+1l2ZOwF3ZEf+g911UH7WzYyVgRtKkp+cWDNuwhikfDJfl5Kj1XS8+VUV+BFAl6bGeBwkRXMiW99uLgyR8p6jXYVKcgY+1R5/Re2mzIqh/POjgIg+S6ReT8pk0upeeX19Ha9vIRoZM3LvwNaEE870RQrCs3T3JpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761408552; c=relaxed/simple;
-	bh=LwDxuiNSRrtBtV/0YrLTHRROukhsm97JHLR6dwLRW4E=;
+	s=arc-20240116; t=1761408671; c=relaxed/simple;
+	bh=rALhKopiYWtHnleB6VpyBTdJO5JhkyCn+Qu3tZTmoYE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CGufiTwvLIQBXUFwqoUrgLzKCU9G0yochYM60UanIfRu3I0IEkPr9lIhJezzO6bHzIkUTYXozINkClLSrsufOkq1QfVnBalALt7hA9V1rCCcVysEpNx58tnlw1JppC240gYGcdrq/eJTRpmgcM5nRe2p2UlrHln2pCRW85H+5GA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UF1ZPyhL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B9CCC4CEFB;
-	Sat, 25 Oct 2025 16:09:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=q85zNryV5FfTcQMfEfoosj/7LKidBhx/psZ6m2qGlkQihlmIaj7HjOrY9HT0dqKf+1nO1VH8wtsy4TrkRgcLClCJJJ0oufKU2cdVWe5juEVlsNzObCxeeCGA528ZP+9ZftrRBMiDt34tknXuhjcaTCeKG6pe5x3muWQy99f0q3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L8qcLsol; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EF24C4CEFF;
+	Sat, 25 Oct 2025 16:11:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761408551;
-	bh=LwDxuiNSRrtBtV/0YrLTHRROukhsm97JHLR6dwLRW4E=;
+	s=k20201202; t=1761408671;
+	bh=rALhKopiYWtHnleB6VpyBTdJO5JhkyCn+Qu3tZTmoYE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UF1ZPyhL+gKY0ZxSdbd/HbKqNbcIRrY2nZQdFamS9QAM0+o/bKbM38E6Sub1hVzeE
-	 PpFX/1sXdqd1swP+nXmNIiy2IKGg9NC6XQZMTKzipaeLygyf83DXJN3c+3kfUU+xpW
-	 b2PamVUGJXD1n/xCFAktrwRDGyXqd4/MlMwan5bYcFMoGEo0HGFFsXS+RNjMWQw9ld
-	 edjrvpfZQ1H9UuRJZYjwUl51V6hN2mA9y4jedTcx6SAINOx6vkITNfQ29XWCN/gH3Y
-	 Y3EptkqmImESknVsG/Mtg08hLaf/gP3+S5/pLSIpvOveQOIR8TDwZpPB0FJfJRHFRS
-	 uL6E5UyIro9pA==
+	b=L8qcLsolmX+VnJU1EZ7d/GeHj6II+TeJV87WWbTaATyfw4wB51GKX5Wz6IRnLKZLJ
+	 YTyK3dVlqR/WZkVz9DkW1LXuIhOfWgkWNGBR7b50mrRwgW/4MbPx60WgYxq+hxswqX
+	 ssxuS07oCzk/zcytGkzcofbrdFlrsPxYmHqG2u+i36hRfaRM45N4N3kkwMbCxCO/if
+	 sqEVFVf8USG/E06TwIpp+cHykYPKba+PPwK6KbmRvjzc6U3TzTa/W/wtW/Mho1+zrJ
+	 XjUEXzad3Oq2eQs1VF+o2wNOhjO0fm6qAsQDtrxh1j4QHq0fGT5oZPJTui6L6ouccA
+	 AfwqgE6OeScxg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+Cc: Eric Dumazet <edumazet@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
+	davem@davemloft.net,
+	willemdebruijn.kernel@gmail.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-6.1] net: phy: fixed_phy: let fixed_phy_unregister free the phy_device
-Date: Sat, 25 Oct 2025 11:53:54 -0400
-Message-ID: <20251025160905.3857885-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17-5.4] ipv6: np->rxpmtu race annotation
+Date: Sat, 25 Oct 2025 11:54:28 -0400
+Message-ID: <20251025160905.3857885-37-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -69,131 +72,83 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Heiner Kallweit <hkallweit1@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit a0f849c1cc6df0db9083b4c81c05a5456b1ed0fb ]
+[ Upstream commit 9fba1eb39e2f74d2002c5cbcf1d4435d37a4f752 ]
 
-fixed_phy_register() creates and registers the phy_device. To be
-symmetric, we should not only unregister, but also free the phy_device
-in fixed_phy_unregister(). This allows to simplify code in users.
+Add READ_ONCE() annotations because np->rxpmtu can be changed
+while udpv6_recvmsg() and rawv6_recvmsg() read it.
 
-Note wrt of_phy_deregister_fixed_link():
-put_device(&phydev->mdio.dev) and phy_device_free(phydev) are identical.
+Since this is a very rarely used feature, and that udpv6_recvmsg()
+and rawv6_recvmsg() read np->rxopt anyway, change the test order
+so that np->rxpmtu does not need to be in a hot cache line.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Link: https://patch.msgid.link/ad8dda9a-10ed-4060-916b-3f13bdbb899d@gmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Reviewed-by: David Ahern <dsahern@kernel.org>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Link: https://patch.msgid.link/20250916160951.541279-4-edumazet@google.com
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
 YES
+- `udpv6_recvmsg()` and `rawv6_recvmsg()` both dereference `np->rxpmtu`
+  without synchronization even though writers update it via
+  `xchg(&np->rxpmtu, skb)` in `ipv6_local_rxpmtu()`
+  (`net/ipv6/datagram.c:415`) and clear it in other contexts; that
+  unsupervised read is undefined behaviour under the kernel memory model
+  and is caught by KCSAN. Annotating the load with `READ_ONCE()` at
+  `net/ipv6/udp.c:483` and `net/ipv6/raw.c:448` guarantees an atomic,
+  non-reordered fetch, eliminating the data race.
+- The branch order swap (`np->rxopt.bits.rxpmtu` first) keeps the hot-
+  path behaviour identical—both functions already consult
+  `np->rxopt`—while avoiding an unnecessary cache-line touch of
+  `np->rxpmtu` unless the option is enabled, so the risk of regression
+  is negligible.
+- Older stable kernels share this lockless pattern and therefore the
+  same latent race, while the fix is self-contained (no new APIs, no
+  dependency churn). Delivering accurate IPV6_PATHMTU notifications to
+  user space is observable behaviour, so backporting this minimal
+  annotation is justified for correctness on stable branches.
 
-- Fix rationale and scope
-  - The change fixes an API asymmetry and a potential memory leak:
-    `fixed_phy_register()` allocates and registers a `phy_device`, but
-    pre‑patch `fixed_phy_unregister()` only removed it without freeing.
-    The commit makes `fixed_phy_unregister()` also free the
-    `phy_device`, preventing leaks and simplifying callers.
-  - The change is small and localized to fixed PHY/MDIO code; it does
-    not alter uAPI or architecture.
+Natural next step: consider running an IPv6 UDP/RAW recv regression or
+KCSAN sanity check once merged into stable to confirm the race no longer
+fires.
 
-- Core change
-  - `drivers/net/phy/fixed_phy.c:230` now frees the `phy_device` after
-    removal:
-    - Calls `phy_device_remove(phy)`, `of_node_put(...)`,
-      `fixed_phy_del(...)`, and then `phy_device_free(phy)` to drop the
-      device reference and free when the refcount reaches zero.
-  - `phy_device_free()` is just a `put_device(&phydev->mdio.dev)`:
-    - `drivers/net/phy/phy_device.c:212` confirms that
-      `phy_device_free()` equals a `put_device`, matching the commit
-      note about identical behavior.
+ net/ipv6/raw.c | 2 +-
+ net/ipv6/udp.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-- Callers adjusted to avoid double-free
-  - `drivers/net/dsa/dsa_loop.c:398` removes the explicit
-    `phy_device_free(phydevs[i])` after
-    `fixed_phy_unregister(phydevs[i])`.
-  - `drivers/net/mdio/of_mdio.c:475` now calls only
-    `fixed_phy_unregister(phydev)` followed by
-    `put_device(&phydev->mdio.dev)` at `drivers/net/mdio/of_mdio.c:477`,
-    which correctly drops the extra reference obtained by
-    `of_phy_find_device(np)` (see `drivers/net/mdio/of_mdio.c:471`).
-    This is safe because `fixed_phy_unregister()`’s `phy_device_free()`
-    and the extra `put_device()` account for two separate refs (the
-    device’s own and the one grabbed by `of_phy_find_device()`).
-
-- Other in-tree users remain correct and benefit
-  - Callers which already did not free explicitly remain correct and now
-    won’t leak:
-    - Example: `drivers/net/ethernet/faraday/ftgmac100.c:1763` calls
-      `fixed_phy_unregister(phydev)` (after `phy_disconnect()`), and
-      does not call `phy_device_free()`.
-    - `drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c:236` similarly
-      calls only `fixed_phy_unregister((struct phy_device *)data)`.
-  - We searched for all in-tree callers of `fixed_phy_unregister()` and
-    `of_phy_deregister_fixed_link()` and found no remaining explicit
-    frees which would cause a double free.
-
-- Risk and stable suitability
-  - Minimal regression risk: change is contained, behavior is well-
-    defined, and in‑tree callers are updated or already compatible. No
-    architectural changes; no uAPI impact.
-  - Positive impact: fixes a likely leak for paths that didn’t free
-    after unregister (e.g., NCSI fixed PHY path in `ftgmac100`).
-  - Meets stable criteria: it’s a bug fix (memory management), small and
-    self-contained, with low risk of regression.
-
- drivers/net/dsa/dsa_loop.c  | 9 +++------
- drivers/net/mdio/of_mdio.c  | 1 -
- drivers/net/phy/fixed_phy.c | 1 +
- 3 files changed, 4 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/dsa/dsa_loop.c b/drivers/net/dsa/dsa_loop.c
-index d8a35f25a4c82..ad907287a853a 100644
---- a/drivers/net/dsa/dsa_loop.c
-+++ b/drivers/net/dsa/dsa_loop.c
-@@ -386,13 +386,10 @@ static struct mdio_driver dsa_loop_drv = {
+diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
+index 4c3f8245c40f1..eceef8af1355f 100644
+--- a/net/ipv6/raw.c
++++ b/net/ipv6/raw.c
+@@ -445,7 +445,7 @@ static int rawv6_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 	if (flags & MSG_ERRQUEUE)
+ 		return ipv6_recv_error(sk, msg, len, addr_len);
  
- static void dsa_loop_phydevs_unregister(void)
- {
--	unsigned int i;
--
--	for (i = 0; i < NUM_FIXED_PHYS; i++)
--		if (!IS_ERR(phydevs[i])) {
-+	for (int i = 0; i < NUM_FIXED_PHYS; i++) {
-+		if (!IS_ERR(phydevs[i]))
- 			fixed_phy_unregister(phydevs[i]);
--			phy_device_free(phydevs[i]);
--		}
-+	}
- }
+-	if (np->rxpmtu && np->rxopt.bits.rxpmtu)
++	if (np->rxopt.bits.rxpmtu && READ_ONCE(np->rxpmtu))
+ 		return ipv6_recv_rxpmtu(sk, msg, len, addr_len);
  
- static int __init dsa_loop_init(void)
-diff --git a/drivers/net/mdio/of_mdio.c b/drivers/net/mdio/of_mdio.c
-index 98f667b121f7d..d8ca63ed87194 100644
---- a/drivers/net/mdio/of_mdio.c
-+++ b/drivers/net/mdio/of_mdio.c
-@@ -473,6 +473,5 @@ void of_phy_deregister_fixed_link(struct device_node *np)
- 	fixed_phy_unregister(phydev);
+ 	skb = skb_recv_datagram(sk, flags, &err);
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 6a68f77da44b5..7f53fcc82a9ec 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -479,7 +479,7 @@ int udpv6_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 	if (flags & MSG_ERRQUEUE)
+ 		return ipv6_recv_error(sk, msg, len, addr_len);
  
- 	put_device(&phydev->mdio.dev);	/* of_phy_find_device() */
--	phy_device_free(phydev);	/* fixed_phy_register() */
- }
- EXPORT_SYMBOL(of_phy_deregister_fixed_link);
-diff --git a/drivers/net/phy/fixed_phy.c b/drivers/net/phy/fixed_phy.c
-index 033656d574b89..b8bec7600ef8e 100644
---- a/drivers/net/phy/fixed_phy.c
-+++ b/drivers/net/phy/fixed_phy.c
-@@ -309,6 +309,7 @@ void fixed_phy_unregister(struct phy_device *phy)
- 	phy_device_remove(phy);
- 	of_node_put(phy->mdio.dev.of_node);
- 	fixed_phy_del(phy->mdio.addr);
-+	phy_device_free(phy);
- }
- EXPORT_SYMBOL_GPL(fixed_phy_unregister);
+-	if (np->rxpmtu && np->rxopt.bits.rxpmtu)
++	if (np->rxopt.bits.rxpmtu && READ_ONCE(np->rxpmtu))
+ 		return ipv6_recv_rxpmtu(sk, msg, len, addr_len);
  
+ try_again:
 -- 
 2.51.0
 
