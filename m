@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-232885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC77AC09A9D
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:44:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58785C09C36
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:54:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4E2F856406B
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:36:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15E63581DBE
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:37:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44FEC31B137;
-	Sat, 25 Oct 2025 16:27:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86EBF30FC24;
+	Sat, 25 Oct 2025 16:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZUasmcCT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B+e/rSnq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A32C306496;
-	Sat, 25 Oct 2025 16:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C8C63064B8;
+	Sat, 25 Oct 2025 16:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761409621; cv=none; b=sG4ZPgZct39q87TgaDnuxnUp+1d/2DCZW0Rg8FjQISkR5JqcuhO8ddU1n6S6X2tjMK0bc7x9hIjeuwJuv3P9UsY9dGaRC9B/PRDRY3m6KnCSLPfU2eWSl4Bdca0stopdeAvVeHDHNPYSNNsvT82dZdfgt3wW26CaZYwUUaoJAmM=
+	t=1761409681; cv=none; b=oxBKB1Av7K18erlqrWE+3nDv0Mgf0BHEYZLH+vi4DOMaEznNrIVPZrYQXORx8x8lx8jLcdhEyiO2Fm+CanwbeMfkMGhEFUOKbnKbzYJjJ/jpGXWanFC2CKsqF+0zHU9Do51n+ToDkBCZTSTejyn1vyZTYTVPcx45mwgK1E2pbVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761409621; c=relaxed/simple;
-	bh=lHXmSwpImaguJhdytnV4YsY9kThpja29e6/NdiB7iMI=;
+	s=arc-20240116; t=1761409681; c=relaxed/simple;
+	bh=uXV7XS7BXYinESnJI44OYBJ4XhTlm58QVMApSCWQBKU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MpipLN6Mx2pE4QAXiUcTPdwzNEWunXfKSU2pUYPQ6xsZLhOmdO6woGogPCmuJWrvBc2Am3lKmlgX7RKvbihOxcJ6jMGRLmf9H26UpI6BdrPT2HNWf3foFX8svlyg6EkBIhRmnDBujPAG40ANGB8kYUXg9yfIdeduxbhLvPoV8fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZUasmcCT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ECAFC116D0;
-	Sat, 25 Oct 2025 16:26:58 +0000 (UTC)
+	 MIME-Version:Content-Type; b=miSeOBElMov31kLXeeESQEnPjPCvNXxTfhO/tLb3R0ELpYWxMPWyYUiSs8odQko2q2gVZw+rjMFnPyPvvS0L2SvbHoAQch3SCCFR7uf6vBW8LXXvR5DgoPvll6TokGmuqWr4n3JUMwE6xY0hfsebmbfXGM6Ksn8E7NpejVV1Pb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B+e/rSnq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F02FC4CEFF;
+	Sat, 25 Oct 2025 16:28:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761409619;
-	bh=lHXmSwpImaguJhdytnV4YsY9kThpja29e6/NdiB7iMI=;
+	s=k20201202; t=1761409681;
+	bh=uXV7XS7BXYinESnJI44OYBJ4XhTlm58QVMApSCWQBKU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZUasmcCTXbIjeng+GBJyJ6uUiRjCpO8nbxm/mJsqTge0QDj2AFHmmgzNG6f/dQ0YL
-	 kr2ZpWnNRQwraeeeYleD4FaNzoJNVN5JfYAAPK8vNap5rl4GnQqMQWgOfb4E7WSFIh
-	 40WlsR57EggAL7csOK91Eb/J8IXcfukb5ZwgGfUpo9BxXmXghx562+Tnh0G6ZoUW22
-	 42KbxXV7lTBByQezDPdX/wxbizQspKAV2T3imEjQdF+/rFKSm9mtqjPsWY5NDbiCRM
-	 Dwt9ssXw4tgl5ur5D085hMXGeTIUY5ZvCISmBYAJ+1v6Yx1cwsgjKeU+9K0rftGeT6
-	 Vc+tXd1OdBhBA==
+	b=B+e/rSnqiOAZHWwpvPBXBsMrkK+/F1o7CwrlgyU/dTQ+jFu2mi2Za4ngqgiNbNgap
+	 9whbtMwv7bbWMrfn474nWQVoB9nBXK1PzqnXzTxWM/ABaMyISB0PbA4YXl21hlgV5s
+	 y0rPLK162f7JuyWue8i2Td2ieCS3GpQsK3Hl4V8JLthk6kcRTStDGF3y0GyZ5uN2z7
+	 BlrdSaPDTLLBe/XeWpl8xLgI4gBIhCge2quUhEoE1zigVolMNgPrJKRaOTPd1Sc9bF
+	 Ag69xv3ZFC7jVbONKC1VQzALeJhH17xLUxQ0e4umNxna+gSeBySRgJtxQkVP5ZA4/3
+	 eAlE48EPVK07g==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
+Cc: Rohan G Thomas <rohan.g.thomas@altera.com>,
+	Matthew Gerlach <matthew.gerlach@altera.com>,
+	Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	martineau@kernel.org,
-	netdev@vger.kernel.org,
-	mptcp@lists.linux.dev
-Subject: [PATCH AUTOSEL 6.17-6.12] selftests: mptcp: join: allow more time to send ADD_ADDR
-Date: Sat, 25 Oct 2025 12:00:27 -0400
-Message-ID: <20251025160905.3857885-396-sashal@kernel.org>
+	hkallweit1@gmail.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.17-5.10] net: phy: marvell: Fix 88e1510 downshift counter errata
+Date: Sat, 25 Oct 2025 12:00:50 -0400
+Message-ID: <20251025160905.3857885-419-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -69,20 +69,24 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+From: Rohan G Thomas <rohan.g.thomas@altera.com>
 
-[ Upstream commit e2cda6343bfe459c3331db5afcd675ab333112dd ]
+[ Upstream commit deb105f49879dd50d595f7f55207d6e74dec34e6 ]
 
-When many ADD_ADDR need to be sent, it can take some time to send each
-of them, and create new subflows. Some CIs seem to occasionally have
-issues with these tests, especially with "debug" kernels.
+The 88e1510 PHY has an erratum where the phy downshift counter is not
+cleared after phy being suspended(BMCR_PDOWN set) and then later
+resumed(BMCR_PDOWN cleared). This can cause the gigabit link to
+intermittently downshift to a lower speed.
 
-Two subtests will now run for a slightly longer time: the last two where
-3 or more ADD_ADDR are sent during the test.
+Disabling and re-enabling the downshift feature clears the counter,
+allowing the PHY to retry gigabit link negotiation up to the programmed
+retry count times before downshifting. This behavior has been observed
+on copper links.
 
-Reviewed-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Link: https://patch.msgid.link/20250907-net-next-mptcp-add_addr-retrans-adapt-v1-3-824cc805772b@kernel.org
+Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Link: https://patch.msgid.link/20250906-marvell_fix-v2-1-f6efb286937f@altera.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -91,88 +95,127 @@ LLM Generated explanations, may be completely bogus:
 
 YES
 
-- What changed: The patch slows two MPTCP selftests that signal three
-  addresses to reduce flakiness. It injects `speed=slow` for the “signal
-  addresses” and “signal invalid addresses” subtests so `run_tests` runs
-  in slow mode:
-  - tools/testing/selftests/net/mptcp/mptcp_join.sh:2271-2272 sets
-    `speed=slow` before `run_tests` in the “signal addresses” block.
-  - tools/testing/selftests/net/mptcp/mptcp_join.sh:2284-2285 sets
-    `speed=slow` before `run_tests` in the “signal invalid addresses”
-    block.
+- Bug fixed and user impact:
+  - The commit addresses a real erratum on 88E1510 where the PHY
+    downshift counter is not cleared across suspend/resume, which can
+    cause intermittent, user-visible downshift from gigabit to lower
+    speeds on copper links.
 
-- How it works: `speed=slow` is consumed by `do_transfer()` which maps
-  it to `-r 50` for `mptcp_connect`:
-  - Default/dispatch:
-    tools/testing/selftests/net/mptcp/mptcp_join.sh:953 defines `local
-    speed=${speed:-"fast"}` and at 967-972 maps `fast`→`-j`, `slow`→`-r
-    50`, or numeric speed→`-r <num>`.
-  - mptcp_connect semantics: the `-r` option enables “slow mode,
-    limiting each write to num bytes,” giving the protocol time to
-    exchange ADD_ADDR and create subflows
-    (tools/testing/selftests/net/mptcp/mptcp_connect.c:132, parsed in
-    1426 and handled in the ‘r’ case 1444-1450).
+- What the patch changes:
+  - Adds a device-specific resume wrapper `m88e1510_resume()` which
+    first performs the normal resume sequence and then clears the stale
+    downshift counter by toggling the downshift feature off and back on
+    with the existing configured retry count.
+    - `drivers/net/phy/marvell.c:1915` defines `m88e1510_resume(struct
+      phy_device *phydev)`: it calls `marvell_resume()` to do the
+      standard fiber/copper resume, then reads the configured downshift
+      count via `m88e1011_get_downshift()`. If non-zero, it disables and
+      re-enables downshift with the same count to clear the counter.
+    - `drivers/net/phy/marvell.c:1875` shows `marvell_resume(struct
+      phy_device *phydev)`, which handles the dual-mode (fiber/copper)
+      page sequencing and invokes `genphy_resume()`. `m88e1510_resume()`
+      invokes this first to keep existing resume behavior intact.
+    - `drivers/net/phy/marvell.c:1138` `m88e1011_get_downshift()` reads
+      the current downshift configuration (returns 0 if disabled).
+    - `drivers/net/phy/marvell.c:1154` `m88e1011_set_downshift()`
+      programs the downshift count and performs a soft reset to apply
+      the change, which is exactly what is needed to reliably clear the
+      counter.
+  - Hooks the new resume into the 88E1510 driver entry only:
+    - `drivers/net/phy/marvell.c:3961` sets `.resume = m88e1510_resume`
+      for `MARVELL_PHY_ID_88E1510`, replacing the generic
+      `marvell_resume` only for that PHY.
 
-- Why it’s needed: With three or more ADD_ADDR to send, debug kernels
-  and slower CI runners can time out or not complete subflow setup
-  before data transfer finishes. Slowing writes increases the window for
-  address signaling and subflow establishment, improving determinism.
-  This aligns with existing practice elsewhere in the script where many
-  subtests already run with `speed=slow` for similar reasons (e.g.,
-  numerous `speed=slow` calls throughout the file).
+- Why it’s safe and minimal:
+  - Scope-limited: Only 88E1510’s `.resume` is changed; other Marvell
+    PHYs keep their existing resume paths.
+  - No API or architectural changes: The patch only introduces a small
+    wrapper and uses existing helper functions already used elsewhere in
+    this driver.
+  - Preserves user configuration: It reads the current downshift setting
+    and restores the same count, doing nothing if downshift is disabled
+    (`cnt == 0`), so it does not override user-set policy.
+  - Correct sequencing and pages: `m88e1510_resume()` defers to
+    `marvell_resume()` first, which restores the page to copper before
+    calling the downshift helpers. The helpers operate on the copper
+    page registers.
+  - Side effects are minimal and expected: `m88e1011_set_downshift()`
+    performs a soft reset to apply changes; the wrapper may cause two
+    quick resets (disable then re-enable), slightly delaying link bring-
+    up on resume but preventing the intermittent low-speed fallback — a
+    clear net improvement for users.
 
-- Scope and risk:
-  - Test-only: Changes are confined to
-    `tools/testing/selftests/net/mptcp/mptcp_join.sh` and do not touch
-    kernel code paths or ABIs.
-  - Minimal and contained: Two call sites adjusted; no logic or
-    expectations changed, only pacing.
-  - Low regression risk: Only increases runtime slightly for two
-    subtests; expected counts remain the same (e.g., still `chk_join_nr
-    3 3 3` and `chk_add_nr 3 3` in
-    tools/testing/selftests/net/mptcp/mptcp_join.sh:2273-2274; and
-    unchanged checks after the invalid addresses case at 2286-2288).
+- Stable backport criteria:
+  - Fixes a real, user-facing bug (intermittent downshift after resume).
+  - Small, isolated change to a single driver with no cross-subsystem
+    impact.
+  - Low regression risk and no new features or behavior changes beyond
+    clearing the erratum condition.
+  - Aligns with existing driver patterns and uses proven helper
+    functions.
 
-- Stable-policy fit:
-  - Fixes test flakiness affecting CI/users running stable selftests
-    (practical impact for validation).
-  - No new features or architectural changes; very small diff; conforms
-    to stable rules for low-risk test fixes.
-  - No “Cc: stable” tag, but the change is a clear reliability fix for
-    selftests, which stable trees commonly accept to keep test suites
-    meaningful.
+Given the above, this is a good candidate for stable backporting.
 
-Given it’s a tiny, isolated selftest reliability improvement with no
-kernel-side risk and tangible benefit for CI stability, it is suitable
-for backporting.
+ drivers/net/phy/marvell.c | 39 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 38 insertions(+), 1 deletion(-)
 
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index 8e92dfead43bf..fed14a281a6d9 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -2151,7 +2151,8 @@ signal_address_tests()
- 		pm_nl_add_endpoint $ns1 10.0.3.1 flags signal
- 		pm_nl_add_endpoint $ns1 10.0.4.1 flags signal
- 		pm_nl_set_limits $ns2 3 3
--		run_tests $ns1 $ns2 10.0.1.1
-+		speed=slow \
-+			run_tests $ns1 $ns2 10.0.1.1
- 		chk_join_nr 3 3 3
- 		chk_add_nr 3 3
- 	fi
-@@ -2163,7 +2164,8 @@ signal_address_tests()
- 		pm_nl_add_endpoint $ns1 10.0.3.1 flags signal
- 		pm_nl_add_endpoint $ns1 10.0.14.1 flags signal
- 		pm_nl_set_limits $ns2 3 3
--		run_tests $ns1 $ns2 10.0.1.1
-+		speed=slow \
-+			run_tests $ns1 $ns2 10.0.1.1
- 		join_syn_tx=3 \
- 			chk_join_nr 1 1 1
- 		chk_add_nr 3 3
+diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
+index 623292948fa70..0ea366c1217eb 100644
+--- a/drivers/net/phy/marvell.c
++++ b/drivers/net/phy/marvell.c
+@@ -1902,6 +1902,43 @@ static int marvell_resume(struct phy_device *phydev)
+ 	return err;
+ }
+ 
++/* m88e1510_resume
++ *
++ * The 88e1510 PHY has an erratum where the phy downshift counter is not cleared
++ * after phy being suspended(BMCR_PDOWN set) and then later resumed(BMCR_PDOWN
++ * cleared). This can cause the link to intermittently downshift to a lower speed.
++ *
++ * Disabling and re-enabling the downshift feature clears the counter, allowing
++ * the PHY to retry gigabit link negotiation up to the programmed retry count
++ * before downshifting. This behavior has been observed on copper links.
++ */
++static int m88e1510_resume(struct phy_device *phydev)
++{
++	int err;
++	u8 cnt = 0;
++
++	err = marvell_resume(phydev);
++	if (err < 0)
++		return err;
++
++	/* read downshift counter value */
++	err = m88e1011_get_downshift(phydev, &cnt);
++	if (err < 0)
++		return err;
++
++	if (cnt) {
++		/* downshift disabled */
++		err = m88e1011_set_downshift(phydev, 0);
++		if (err < 0)
++			return err;
++
++		/* downshift enabled, with previous counter value */
++		err = m88e1011_set_downshift(phydev, cnt);
++	}
++
++	return err;
++}
++
+ static int marvell_aneg_done(struct phy_device *phydev)
+ {
+ 	int retval = phy_read(phydev, MII_M1011_PHY_STATUS);
+@@ -3923,7 +3960,7 @@ static struct phy_driver marvell_drivers[] = {
+ 		.handle_interrupt = marvell_handle_interrupt,
+ 		.get_wol = m88e1318_get_wol,
+ 		.set_wol = m88e1318_set_wol,
+-		.resume = marvell_resume,
++		.resume = m88e1510_resume,
+ 		.suspend = marvell_suspend,
+ 		.read_page = marvell_read_page,
+ 		.write_page = marvell_write_page,
 -- 
 2.51.0
 
