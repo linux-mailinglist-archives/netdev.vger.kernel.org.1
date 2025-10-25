@@ -1,210 +1,141 @@
-Return-Path: <netdev+bounces-232790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DC7BC08E46
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 11:12:07 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59B9BC08E5C
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 11:19:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 20DB84E0F28
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 09:12:04 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 57F104E2C4C
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 09:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BF592D7DD0;
-	Sat, 25 Oct 2025 09:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EhHlV+3j"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C0612DA755;
+	Sat, 25 Oct 2025 09:19:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C782D7381
-	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 09:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EECD2D9EE2
+	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 09:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761383521; cv=none; b=CKZ3iRCOyi37aZjoA3g3wsCkVbpUSRKBfUNnHLCEvaneI8RCfgemsFBUNHm/VYcZM+V9uZjJJJKwqkP37+rFD8km2sipVCDCFpqI+wjpUEb7XoNMmgO36VEruhYSiC060tVYlC6nRogZ1McugbZV0QfCQ3iE/oUz9SUzNNLaqXQ=
+	t=1761383980; cv=none; b=EK/YdLplwE0F2GvFaF8opsHy0Xvbro2QY6K3Cxjs7/op4HePx/ZC1YcZvCsgrpIwy/ohQMWGPChsGHWrrLPGB3pVbUJw36C8XAKUb081T8DvaNoEj/bZnCTTZYA2hdYF65c9/Nu2nJGbEUAjzroi40lKDWWMbbKHMrOISfjCUXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761383521; c=relaxed/simple;
-	bh=Lhq+NsnLG98t+AfKEhq0wOsx3dpzPR9hM91kFPXBgcQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NNXVcfaLrqoNosxABJKAoWMcywuVwqqP3/EBAYzpBykcyHZayGn83AtXHWYIsH67fTWabRUXkVNUYKaUhz36cvEgibAmGK78ct6kag4bbwtuwZEAQd9jTQd2+Ol117CExJ/4s5/3aAAPf8bx74CfYhtTaEEzyb00Nvim0esRNPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EhHlV+3j; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-940d2b701a3so290600839f.0
-        for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 02:12:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761383519; x=1761988319; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=om2YzHu3nCOqPwoqC+II/RAS9gh5R+taAfLDoGS7cb4=;
-        b=EhHlV+3jShaiHB6FFqX4P/xiZH6/CQid43iVolGTF9bGMfLMXHIceeKcH46AeqcA6I
-         iJ5Apucre51SsRZv2slxPUZQPuk1NV/OTUVgvusUth5W8FiOJd/8bZ1Zq+4w+/Bqzby8
-         oWt9g8ILJmiFC3OiA/MBiUsq9NMFh3bXU2AQFSD+yYkgoFEnXtMLO66BqM8TUghr2RT6
-         EbBUnkUC9hPlllt47z1HboRsc1Tw6dZl+DuEvEP/3LBI88WV4y1j53Vzq8SWThxKz9Kn
-         b3SX8zIoSmUfOhs10pDcO0qyxDqZ+GtOEi1CAPRyM43CsthBe9tPhGHdf7ib6Q36doF2
-         X3Sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761383519; x=1761988319;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=om2YzHu3nCOqPwoqC+II/RAS9gh5R+taAfLDoGS7cb4=;
-        b=WoQBiTpJjP4nvV9N5SqvPLySkw/vxvZ9hWBBNiFiIbXnYm6gqzOEKAUgHqzz5wQHcF
-         3V4UJKWYoRjdGaxePpWlXe5in/4RcJl4VqM0jy+9X+jzSzDpoq3cTRQOYzFSkAjooc/v
-         LL2B44tDH2g1Br36R4IdOC+M6gwAZQxtBolKebYdqG9ATorMTeYKnKv5DizN//zLtfzu
-         kygO+u0IKK5R6JywIWo+oClD/q4bEVbM5Eh4asvRhC6oDt5scs/1c7lSft4MKr3Xe/sH
-         /CwuyRCC2nYjDQnQHRoxtrCyjg7BxDcpLcG7V0NG35M+dhf6pNugnRgZW0PJx6xRqX4o
-         tLgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW1Brs89Mr5IFn5NeqEo4CCRnBACcR0/4vH5KHAcJJkyvo9C6sBSITuQiWcXeG0C2yLAbHilLc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXaejmhXI2u3y1EOR/eIXFTqxGsdtfXQJw8TzRb4dvWqE03Gwb
-	Dara9zaF5XMzeZ3I5Xi5ZJ59LvK52xwCi0bGoO0TYmsrSY2ocAtvKM6FnN5kZadphcPqth8tULe
-	SHlvd9+4xS/+WWQySWw7k/fI04qFhlPk=
-X-Gm-Gg: ASbGncsuXouWJtw8WEkDrk6Cam2mnsvtZCa5J2VKliBODL13SckQAeRb2C4whUmO9fE
-	sBLyQWUlsEKfE8VFU6zBVvlD7MP3lozFIH0YyQSSLeTpGZktqYXOnU/bpgYJqpzuTMjVK/rc+wo
-	zf6eNb+6t1dSWDlWax7qRsQYfU/Cne7ama3bU/XeqS6mGAAXTP8c7qxSeNSMhgm50A8wNMSz/Hz
-	hlnWGogkaoaGqTs0+U0tz2UB3wZx8RpFZGauhqat6Onz7JQIxJKaV5iG2I9qI2G7ght2Q==
-X-Google-Smtp-Source: AGHT+IH+QjMwOjg4gNFZDwJyTUOtFhKnkbWxOK1k+HPDITRbGv+joYzZONrTczYVCrJOvFdjVzMFrBmDxK76nn7t5qE=
-X-Received: by 2002:a05:6e02:156c:b0:430:acb1:e785 with SMTP id
- e9e14a558f8ab-430c5208dacmr442399545ab.6.1761383519507; Sat, 25 Oct 2025
- 02:11:59 -0700 (PDT)
+	s=arc-20240116; t=1761383980; c=relaxed/simple;
+	bh=HONwtuD6EIQPd3bdIrsre/LYS82ez4l+wh32OW9JNik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=POcKi9FV8Z7ECWCdrIswyehcKw+yAnJbeFoKDQJUE1Pl+nLWFRqvZTrWtSTURgBM2se9LahLZHqlNmq6S+chBNB3qaidpHSfBBDNDBQLZVjPf89qT1H6upifqARVmd4tGGwE3KVtUuCZuzcYnJUEdd3ek7bxxF1B/Ntu/d1nIEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vCaQp-0001p1-ES; Sat, 25 Oct 2025 11:19:27 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vCaQn-005Mjq-2Z;
+	Sat, 25 Oct 2025 11:19:25 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vCaQn-00H0pU-27;
+	Sat, 25 Oct 2025 11:19:25 +0200
+Date: Sat, 25 Oct 2025 11:19:25 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Emanuele Ghidoli <ghidoliemanuele@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1] net: phy: dp83867: Disable EEE support as not
+ implemented
+Message-ID: <aPyWHRphEYOdk2MG@pengutronix.de>
+References: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
+ <aPyN7z8Vk4EiS20b@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251021131209.41491-1-kerneljasonxing@gmail.com>
- <20251021131209.41491-4-kerneljasonxing@gmail.com> <aPvKNAZP8kKolwIm@mini-arch>
-In-Reply-To: <aPvKNAZP8kKolwIm@mini-arch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 25 Oct 2025 17:11:23 +0800
-X-Gm-Features: AWmQ_blde_31pqxo3Xh3exy7vgnbP-UcSbo33ZrvghygqceyyIUPT-jSUjSpLp0
-Message-ID: <CAL+tcoBNeghhUv=EG=NwGP+dYtXv-Ms489YBFh3rctxfRagUAQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/9] xsk: add xsk_alloc_batch_skb() to build
- skbs in batch
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aPyN7z8Vk4EiS20b@shell.armlinux.org.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Sat, Oct 25, 2025 at 2:49=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 10/21, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Support allocating and building skbs in batch.
-> >
-> > This patch uses kmem_cache_alloc_bulk() to complete the batch allocatio=
-n
-> > which relies on the global common cache 'net_hotdata.skbuff_cache'. Use
-> > a xsk standalone skb cache (namely, xs->skb_cache) to store allocated
-> > skbs instead of resorting to napi_alloc_cache that was designed for
-> > softirq condition.
-> >
-> > After allocating memory for each of skbs, in a 'for' loop, the patch
-> > borrows part of __allocate_skb() to initialize skb and then calls
-> > xsk_build_skb() to complete the rest of initialization process, like
-> > copying data and stuff.
-> >
-> > Add batch.send_queue and use the skb->list to make skbs into one chain
-> > so that they can be easily sent which is shown in the subsequent patche=
-s.
-> >
-> > In terms of freeing skbs process, napi_consume_skb() in the tx completi=
-on
-> > would put the skb into global cache 'net_hotdata.skbuff_cache' that
-> > implements the deferred freeing skb feature to avoid freeing skb one
-> > by one to improve the performance.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  include/net/xdp_sock.h |   3 ++
-> >  net/core/skbuff.c      | 101 +++++++++++++++++++++++++++++++++++++++++
-> >  net/xdp/xsk.c          |   1 +
-> >  3 files changed, 105 insertions(+)
-> >
-> > diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-> > index 8944f4782eb6..cb5aa8a314fe 100644
-> > --- a/include/net/xdp_sock.h
-> > +++ b/include/net/xdp_sock.h
-> > @@ -47,8 +47,10 @@ struct xsk_map {
-> >
-> >  struct xsk_batch {
-> >       u32 generic_xmit_batch;
-> > +     unsigned int skb_count;
-> >       struct sk_buff **skb_cache;
-> >       struct xdp_desc *desc_cache;
-> > +     struct sk_buff_head send_queue;
-> >  };
-> >
-> >  struct xdp_sock {
-> > @@ -130,6 +132,7 @@ struct xsk_tx_metadata_ops {
-> >  struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
-> >                             struct sk_buff *allocated_skb,
-> >                             struct xdp_desc *desc);
-> > +int xsk_alloc_batch_skb(struct xdp_sock *xs, u32 nb_pkts, u32 nb_descs=
-, int *err);
-> >  #ifdef CONFIG_XDP_SOCKETS
-> >
-> >  int xsk_generic_rcv(struct xdp_sock *xs, struct xdp_buff *xdp);
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index bc12790017b0..5b6d3b4fa895 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -81,6 +81,8 @@
-> >  #include <net/page_pool/helpers.h>
-> >  #include <net/psp/types.h>
-> >  #include <net/dropreason.h>
-> > +#include <net/xdp_sock.h>
-> > +#include <net/xsk_buff_pool.h>
-> >
-> >  #include <linux/uaccess.h>
-> >  #include <trace/events/skb.h>
-> > @@ -615,6 +617,105 @@ static void *kmalloc_reserve(unsigned int *size, =
-gfp_t flags, int node,
-> >       return obj;
-> >  }
-> >
-> > +int xsk_alloc_batch_skb(struct xdp_sock *xs, u32 nb_pkts, u32 nb_descs=
-, int *err)
-> > +{
-> > +     struct xsk_batch *batch =3D &xs->batch;
-> > +     struct xdp_desc *descs =3D batch->desc_cache;
-> > +     struct sk_buff **skbs =3D batch->skb_cache;
-> > +     gfp_t gfp_mask =3D xs->sk.sk_allocation;
-> > +     struct net_device *dev =3D xs->dev;
-> > +     int node =3D NUMA_NO_NODE;
-> > +     struct sk_buff *skb;
-> > +     u32 i =3D 0, j =3D 0;
-> > +     bool pfmemalloc;
-> > +     u32 base_len;
-> > +     u8 *data;
-> > +
-> > +     base_len =3D max(NET_SKB_PAD, L1_CACHE_ALIGN(dev->needed_headroom=
-));
-> > +     if (!(dev->priv_flags & IFF_TX_SKB_NO_LINEAR))
-> > +             base_len +=3D dev->needed_tailroom;
-> > +
-> > +     if (batch->skb_count >=3D nb_pkts)
-> > +             goto build;
-> > +
-> > +     if (xs->skb) {
-> > +             i =3D 1;
->
-> What is the point of setting i to 1 here? You always start the loop from
-> i=3D0.
+On Sat, Oct 25, 2025 at 09:44:31AM +0100, Russell King (Oracle) wrote:
+> On Thu, Oct 23, 2025 at 04:48:53PM +0200, Emanuele Ghidoli wrote:
+> > While the DP83867 PHYs report EEE capability through their feature
+> > registers, the actual hardware does not support EEE (see Links).
+> > When the connected MAC enables EEE, it causes link instability and
+> > communication failures.
+> > 
+> > The issue is reproducible with a iMX8MP and relevant stmmac ethernet port.
+> > Since the introduction of phylink-managed EEE support in the stmmac driver,
+> > EEE is now enabled by default, leading to issues on systems using the
+> > DP83867 PHY.
+> 
+> Wasn't it enabled before? See commit 4218647d4556 ("net: stmmac:
+> convert to phylink managed EEE support").
+> 
+> stmmac's mac_link_up() was:
+> 
+> -       if (phy && priv->dma_cap.eee) {
+> -               phy_eee_rx_clock_stop(phy, !(priv->plat->flags &
+> -                                            STMMAC_FLAG_RX_CLK_RUNS_IN_LPI));
+> -               priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
+> -               stmmac_eee_init(priv, phy->enable_tx_lpi);
+>                 stmmac_set_eee_pls(priv, priv->hw, true);
+> -       }
+> 
+> So, if EEE is enabled in the core synthesis, then EEE will be
+> configured depending on what phylib says.
+> 
+> In stmmac_init_phy(), there was this:
+> 
+> -               if (priv->dma_cap.eee)
+> -                       phy_support_eee(phydev);
+> -
+>                 ret = phylink_connect_phy(priv->phylink, phydev);
+> 
+> So phylib was told to enable EEE support on the PHY if the dwmac
+> core supports EEE.
+> 
+> So, from what I can see, converting to phylink managed EEE didn't
+> change this. So what really did change?
 
-Oh, right, I should've removed it!
+I suspect it is a change in board designs. iMX8MP EVB variants are using
+Realtek PHYs with the SmartEEE variant. Therefore, the MAC is not able
+to control LPI behavior. Designs based on the EVB design (with the
+Realtek PHY) are not affected. I mean, any bug on the MAC or software
+side will stay invisible.
 
-Thanks,
-Jason
+Some new designs with special requirements for TSN, for example
+low-latency TI PHYs, are a different story. They promise "Extra low
+latency TX < 90ns, RX < 290ns" and also announce EEE support. These two
+promises are not compatible with each other anyway, and at the same
+time, even if LPI does work, it will most probably fail with the FEC
+driver. I do not know about STMMAC.
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
