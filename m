@@ -1,156 +1,147 @@
-Return-Path: <netdev+bounces-232947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51ACCC0A123
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 01:41:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ABD04C0A130
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 02:00:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 899FD4E581A
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 23:41:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 967F34E2DB3
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 00:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6D022E6135;
-	Sat, 25 Oct 2025 23:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD972163B2;
+	Sun, 26 Oct 2025 00:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="V5QiEJRy"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rF/eTQIS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171BA2BE7A0
-	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 23:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1AE17C21E;
+	Sun, 26 Oct 2025 00:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761435680; cv=none; b=hKDNA+hNM53rqcpTKgluDwsNbzxXwc8xFSE7OXX7cs7fYWhfFySQZEqeXbHirCqQCuz/4zc0HaYCm3rFa3fIOqybUR0/oM3dbNLhX9N2/wXNIJRRkEd6btEg+ErJW/l07/al1KeEZ22lZC27CYYbDDcVAwd9k/pcD+j2M2sUy+4=
+	t=1761436827; cv=none; b=TmoCD9nBU6YOu1FPnESVxuxAJbboF7g7yh5fYQ5usIUqsc+0CJMlcepA9MG3cEUnS09thwxXXh8SlDXxa6I06pK4XW2a20njACTg5RjkVpT4nmunB6q6Mr6346X+vIVDwPLbPQSeHKSLsInF8vptskR1aRZy7TE96k4yJXF+drs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761435680; c=relaxed/simple;
-	bh=UWwXy6UzhIRLinQQbmwb1KG/M2Yo7LauXWQNdG35s04=;
+	s=arc-20240116; t=1761436827; c=relaxed/simple;
+	bh=BL9iIxGzcOrrn5GUC/h6Vz6nDiCCgt8tKcGksVUNAcY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ScX9p4G4H6yXOQdCUSdCay0LaY6U6R3yYQ2i1wVacpovPE9iWWfY0HgJ8K+13THCa42XGQOpblEmCpOKNjGmlcvr2JB8/gLF8tvaOBmCRO8xLLKEAW/JhUBoiXHJb7GhfAltAuVBAC1JmD7QRCncmIOz402pcUOl7911dHelcew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=V5QiEJRy; arc=none smtp.client-ip=209.85.166.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-938bf212b72so141494239f.1
-        for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 16:41:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761435677; x=1762040477; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=U+1U0oWnvhmV3gcT58peg4jR0wCVhjayAqtKoI/J3O8=;
-        b=V5QiEJRyTQ4qVEUcp/DLt9gynTeF/fqc1LAyGNVPl2ZKlDY5BRFCMT4cc/B3QX0/mf
-         3vgNPoYf3kRUo8udXEY43114NUnjV3NO3jx458+7W5oTuRoQBpPISJPhRfgaWVCJBDlU
-         t9EuyXo1Bn4/hJ2qpCx4/8eD31gYfMEH2sNmzdUUWBxIWmXxoxtbRSi6pTSMr1a4X4i+
-         9KYBbA6EEOcsr/WhbWL7SekaNHuMGf8LDWVIljP5tyyy3/hckDGvmEXd1qAA0fnCyo10
-         wcweBFmoxVKYAfBUOuRg9j7v1+Pn2x426ZVOtvU8CtkEKr7l5c1/LbwKpxkneZc/cu5y
-         cuBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761435677; x=1762040477;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U+1U0oWnvhmV3gcT58peg4jR0wCVhjayAqtKoI/J3O8=;
-        b=FuUGuNfsxYeNmmHiNVnF/UmWj0nWD8f1KsUiLxOsTKIBp3fmzdyN9ZbVjF6uJOxDVJ
-         kNESTljMWmfRFDc7KpgVxeIkG3iZkUFpoVZZC88hXbj3lcC16ArW9SEnGH2ADSFDaMLS
-         OBsNRaY8ZHHimZIIbDaRuf7fyMrFIqs/9NTPjZGjfmelhGdm/hqffC/tuefDK8blMsfU
-         KYIk+IgLDSdvPBVaWVkV6BWMZ57F24wBXa3pTopqBV6rehVYvX19EnY9e8yniGrir19A
-         nnoqkZY9/HVI+nmhCQ0RPuBQdri6y7WgDKjCc4UUTkHSDiT+/5xk0UOurrFxr3/P8YGq
-         qPPA==
-X-Forwarded-Encrypted: i=1; AJvYcCWGgKHnnEXpPy0mOnKc6RswmXQkxgP4ZAgrDxZ24JBsUi/BdHpRkEysCXJQLJV9pQ0NSG6JLvM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwfhW69owoH+g7v8WjPrjYo47S9IFTDsLuGIr5QAWlVCigZbGT
-	oUilee/2sr8jWwtXds1MlatvrX5MEwJcDN+6ergOjdMXvGmMddptdyl6fuHg6+2Yeu0=
-X-Gm-Gg: ASbGncshUK0YWDonWVBB/8GZs2PV5BEPOu7qE5MXvMQDhTlmkmO8lCJDM3bqZWaTULS
-	mdzrj84MDi0UUdkjd55p21eSOcZM2sI0LCp12awkjRm2sGutQstpkYORduX7BwW+u5mey0+ZXud
-	sAfX20HFgFpPgsipzqJOJrpcibkERRlqKNtKfD4a20cuVd/O1YwAUj42FuSurb5uObTF2NhGfnX
-	EqqNNQ9pmpu5D2oBYsFAfU5wEpqVAu0wZM9l1LqP8JypN1uA3gmcqQ9gYL5lgp8QDCthtn9+R1J
-	1WU1MlW90uae6qgZ+RAwMq5oPEY0DTsIveLXeiHAUguukUIkwFXs06yFkz3WuJ+DsX/Am/oY4Hg
-	WvNGqdCrQKvM3j0D1InGueM5a1Tnhs7OzNdMn3qzuKvdXhf6ZpFB1n7uVnK8456URLZi1QVVvmg
-	==
-X-Google-Smtp-Source: AGHT+IFpdI2tMF+arhoPCj90UOHrR1Z3J5OwTfJEWoq7vT59d1IQXp8f5M40xtA+2iJq460pdjdcYA==
-X-Received: by 2002:a05:6602:1651:b0:940:d1b4:1089 with SMTP id ca18e2360f4ac-940d1b41221mr3943054439f.1.1761435677214;
-        Sat, 25 Oct 2025 16:41:17 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5aea9e35f77sm1280344173.55.2025.10.25.16.41.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Oct 2025 16:41:16 -0700 (PDT)
-Message-ID: <f1fa5543-c637-435d-a189-5d942b1c7ebc@kernel.dk>
-Date: Sat, 25 Oct 2025 17:41:15 -0600
+	 In-Reply-To:Content-Type; b=mlrB8zNtxUAcLf9O+IFws7GqoZlCFjXukAwqktYRZAywb7Ur6hh5tAyswPhBjI9QhJ1r+AEFNWYMlxsS9QWVDAsrjQ0sKXguL2NQYZUE2D3Y8IE1gqWah0xo4rlLTTnfJqIko/snTuJsDNGR2xLtM20SkAXi688EuO1WUW/TWFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rF/eTQIS; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <328ebb4f-b1ce-4645-9cea-5fe81d3483e0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761436811;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bE6U4DIZJuvGeeM9mWvYcD6GNpIIZgiIJKMCn5NvN5s=;
+	b=rF/eTQISKdPGI3C7IDMbDet/37bE+bETIsWqYLnW9PK3MsBXqEnHv+W9CArj9rdIYFARY/
+	xCWk7Qo6XM6YOWr27u9Wb/0AmiDv56MGhS/dkROsBj0a0r33dgASUNSnvd86J66nMcIPSM
+	F30SLujwwBOepns6sDPiUDjnX0UIzZg=
+Date: Sat, 25 Oct 2025 16:59:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/5] io_uring/zcrx: share an ifq between rings
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>
-References: <20251025191504.3024224-1-dw@davidwei.uk>
- <20251025191504.3024224-4-dw@davidwei.uk>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20251025191504.3024224-4-dw@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net-next 0/5] net/mlx5: Add balance ID support for LAG
+ multiplane groups
+To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+ Shay Drori <shayd@nvidia.com>
+References: <1761211020-925651-1-git-send-email-tariqt@nvidia.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <1761211020-925651-1-git-send-email-tariqt@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 10/25/25 1:15 PM, David Wei wrote:
-> @@ -541,6 +541,74 @@ struct io_mapped_region *io_zcrx_get_region(struct io_ring_ctx *ctx,
->  	return ifq ? &ifq->region : NULL;
->  }
->  
-> +static int io_proxy_zcrx_ifq(struct io_ring_ctx *ctx,
-> +			     struct io_uring_zcrx_ifq_reg __user *arg,
-> +			     struct io_uring_zcrx_ifq_reg *reg)
-> +{
-> +	struct io_zcrx_ifq *ifq, *src_ifq;
-> +	struct io_ring_ctx *src_ctx;
-> +	struct file *file;
-> +	int src_fd, ret;
-> +	u32 src_id, id;
-> +
-> +	src_fd = reg->if_idx;
-> +	src_id = reg->if_rxq;
-> +
-> +	file = io_uring_register_get_file(src_fd, false);
-> +	if (IS_ERR(file))
-> +		return PTR_ERR(file);
-> +
-> +	src_ctx = file->private_data;
-> +	if (src_ctx == ctx)
-> +		return -EBADFD;
-> +
-> +	mutex_unlock(&ctx->uring_lock);
-> +	io_lock_two_rings(ctx, src_ctx);
-> +
-> +	ret = -EINVAL;
-> +	src_ifq = xa_load(&src_ctx->zcrx_ctxs, src_id);
-> +	if (!src_ifq || src_ifq->proxy)
-> +		goto err_unlock;
-> +
-> +	percpu_ref_get(&src_ctx->refs);
-> +	refcount_inc(&src_ifq->refs);
-> +
-> +	ifq = kzalloc(sizeof(*ifq), GFP_KERNEL);
+在 2025/10/23 2:16, Tariq Toukan 写道:
+> Hi,
+> 
+> This series adds balance ID support for MLX5 LAG in multiplane
+> configurations.
+> 
+> See detailed description by Mark below [1].
+> 
+> Regards,
+> Tariq
+> 
+> 
+> [1]
+> The problem: In complex multiplane LAG setups, we need finer control over LAG
+> groups. Currently, devices with the same system image GUID are treated
+> identically, but hardware now supports per-multiplane-group balance IDs that
+> let us differentiate between them. On such systems image system guid
+> isn't enough to decide which devices should be part of which LAG.
+> 
+> The solution: Extend the system image GUID with a balance ID byte when the
+> hardware supports it. This gives us the granularity we need without breaking
+> existing deployments.
+> 
+> What this series does:
+> 
+> 1. Add the hardware interface bits (load_balance_id and lag_per_mp_group)
+> 2. Clean up some duplicate code while we're here
+> 3. Rework the system image GUID infrastructure to handle variable lengths
+> 4. Update PTP clock pairing to use the new approach
+> 5. Restructure capability setting to make room for the new feature
+> 6. Actually implement the balance ID support
+> 
+> The key insight is in patch 6: we only append the balance ID when both
 
-This still needs a:
+In the above, patch 6 is the following patch? It should be patch 5?
 
-	if (!ifq)
-		handle error
+[PATCH net-next 5/5] net/mlx5: Add balance ID support for LAG multiplane 
+groups
 
-addition, like mentioned for v1. Would probably make sense to just
-assume that everything is honky dory and allocate it upfront/early, and
-just kill it in the error path. Would probably help remove one of the
-goto labels.
+Yanjun.Zhu
 
-> +	ifq->proxy = src_ifq;
+> capabilities are present, so older hardware and software continue to work
+> exactly as before. For newer setups, you get the extra byte that enables
+> per-multiplane-group load balancing.
+> 
+> This has been tested with both old and new hardware configurations.
+> 
+> 
+> Mark Bloch (5):
+>    net/mlx5: Use common mlx5_same_hw_devs function
+>    net/mlx5: Add software system image GUID infrastructure
+>    net/mlx5: Refactor PTP clock devcom pairing
+>    net/mlx5: Refactor HCA cap 2 setting
+>    net/mlx5: Add balance ID support for LAG multiplane groups
+> 
+>   drivers/net/ethernet/mellanox/mlx5/core/dev.c | 12 ++++---
+>   .../ethernet/mellanox/mlx5/core/en/devlink.c  |  7 ++--
+>   .../ethernet/mellanox/mlx5/core/en/mapping.c  | 13 +++++---
+>   .../ethernet/mellanox/mlx5/core/en/mapping.h  |  3 +-
+>   .../mellanox/mlx5/core/en/rep/bridge.c        |  6 +---
+>   .../mellanox/mlx5/core/en/tc/int_port.c       |  8 +++--
+>   .../ethernet/mellanox/mlx5/core/en/tc_ct.c    | 11 ++++---
+>   .../net/ethernet/mellanox/mlx5/core/en_tc.c   | 32 ++++++++++---------
+>   .../mellanox/mlx5/core/esw/devlink_port.c     |  6 +---
+>   .../mellanox/mlx5/core/eswitch_offloads.c     |  8 +++--
+>   .../net/ethernet/mellanox/mlx5/core/lag/lag.c |  4 ++-
+>   .../ethernet/mellanox/mlx5/core/lib/clock.c   | 19 ++++++-----
+>   .../ethernet/mellanox/mlx5/core/lib/devcom.h  |  2 ++
+>   .../net/ethernet/mellanox/mlx5/core/main.c    | 23 +++++++++----
+>   .../ethernet/mellanox/mlx5/core/mlx5_core.h   |  2 ++
+>   .../net/ethernet/mellanox/mlx5/core/vport.c   | 19 +++++++++++
+>   include/linux/mlx5/driver.h                   |  3 ++
+>   17 files changed, 112 insertions(+), 66 deletions(-)
+> 
+> 
+> base-commit: d550d63d0082268a31e93a10c64cbc2476b98b24
 
-For this, since the ifq is shared and reference counted, why don't they
-just point at the same memory here? Would avoid having this ->proxy
-thing and just skipping to that in other spots where the actual
-io_zcrx_ifq is required?
-
--- 
-Jens Axboe
 
