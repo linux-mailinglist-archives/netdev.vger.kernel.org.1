@@ -1,222 +1,323 @@
-Return-Path: <netdev+bounces-232921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD1F4C09EE9
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 21:01:47 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4AE1C09EF4
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 21:03:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6287F3A94BD
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 19:01:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 99E554E4414
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 19:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED302FBE03;
-	Sat, 25 Oct 2025 19:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20CD7302158;
+	Sat, 25 Oct 2025 19:03:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="OtQu4SgJ"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="QOycWTbs"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic316-54.consmr.mail.gq1.yahoo.com (sonic316-54.consmr.mail.gq1.yahoo.com [98.137.69.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823021C1F0C;
-	Sat, 25 Oct 2025 19:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7826F3009FF
+	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 19:03:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=98.137.69.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761418903; cv=none; b=Xx8dETFQbJhBJ0nqC2Vfau3O5f77f0LQVJ85p+vnYpzqgH20Im/VroDOhY7pX3IYS98obHBr3+2xFWdMbkb3W6szw10KmSFvXWqsnMAnYzGlt75mK8V85Ark5RDGCHWIrOsxv9373uWRybp8ZMybjFv4tV16l80u6/W6OKL36W0=
+	t=1761418996; cv=none; b=qo742XKOnyn52PVQcYNvD27WLX3v+9qmB9UMm1A/3XirlB0iR6EWpqVg+713zG9HImKyYhBhUsDvjHZrYgWjNCNEMLI1oj9xKJhRl6sAvkJJNj/3mGDvBXWfiVmrboKVgqgp4pnCNg+J9M3gCjTDEKWw45oxrD5HPwOUK67eH1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761418903; c=relaxed/simple;
-	bh=hNbVZXep2YBK5Q7cJJO3VrBuF2XsUBotW/LD6SQAKE8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=awA9cteLNmGr3NYaEGbW23VXOFzZKXqha5BS3gUvEzeR1Cka0e6pOhdKJXZOuXj4IpnMKS5bbQHVUsnPTcqlCEQdNoVXbSc7ScW3FTvqjO0eZgXckqKBDqIZyageHuPMQGm5Y7TQqEtakjbX4zZGn2NuVleCwxvUrETxGZ2oJJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=OtQu4SgJ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=8yH6ltlgzcuD/G8TQM1TvHZqwPvMaP2kB7b6YbsIeio=; b=OtQu4SgJx7r1gzbQ8ofAl/iAwM
-	a3+yIOqMqAG77NWC0AZiqlrmXXqGuATnfkKhhuW+My5goCOkogktz02edZ5kMwpLjC52Zy5ArwexM
-	L8H6ooolBNM8/3Z1H8mUO87ucqsJ6/O4uNaodHBctzYYR1JvxdJSlrNONCUQcXoh7eDwGc0EqbW6w
-	AiNuPhnSRMM0IJogIY1CyPC3LjL+IDlG6Lw0hX/ZQy7eh8SI6Er5n4p87hA/3+gikWI1hitQCfDXJ
-	G8EQaeGYfoNof8tQ+nfQD+VeZqYKOJmaNYhxIDWWhzNtV/lpFkzjs79rwv7os0e2b+j4BKnCAM9Ka
-	nQVtfIww==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57248)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vCjVs-000000000K7-0V3V;
-	Sat, 25 Oct 2025 20:01:16 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vCjVp-000000003uC-1NV9;
-	Sat, 25 Oct 2025 20:01:13 +0100
-Date: Sat, 25 Oct 2025 20:01:13 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1761418996; c=relaxed/simple;
+	bh=jFyEVJKbaMZMuZBCzdfHdAiwDKOcdgljSspCvmfpL9I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 References; b=kGqDIJxqPq0tadtBO+7hSuAsZ0Qcf3FuuP9o/T2x1wKPk6hN0HQN2DqFnu/gxOaX2hDf4QMtiAtAnK1wh8tbsZC8prtFj1VjTFkmvFhM4Sy+J24kuPRqU04FP+65gXZ/S6DRHxLeT2vu/CUaO+TS0Bi/+yskZ7/wCXdN7+zFQnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=QOycWTbs; arc=none smtp.client-ip=98.137.69.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1761418988; bh=Da/zyt0Nf2E3IbFyhnHrMpnX1b+VrIhAFYhJ++AQV7s=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=QOycWTbsLWpJl40qxRwzVt5qaCFMpnBHkKLyECyShDi0cYRnROqAtx7K0lxAVZY1E+TWMSscCDMnT/U0l/XTfXL2AS3DKHMwnDYOa2wzs+fmvtl02sszObspvofJqkdMPCNqAkOijac+ls8OoymGmRL6Wt8/Cp+3GXrJLc6kUp7dV76SH2D/xPj69v7nzDu13J+Dd7sOBx74WZGF79GnGMuKwTrunSjIoU1r/JflWXb9FED0Wd1M9mIk30b96sj9iNoNWFstUTKlaQG6UtWjRZ+xW4eOimASdCg0qQE6acr/5p0pdWJQpbKkn/OQvi1pukO4l05Sw0OfMlyOCU+brA==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1761418988; bh=PZ4kWfzKDXB8t5HUj+G/aPI9OmePkg+QzMG1n9NkSxg=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=Bx8NDdJ19WrGWuGxFNQyoOIIAkB0de8R+l1o0+r08G3meD/hEPJYFxvAIzPUGSbfBG3cRf5IivLUhurfevYB3TG+RpLdb353lLw1PZ5Mc+batOPP7OjRF1s5ntuUDb2ZZDhQkny4X6wHqxTRJnVTYdARynNz4e1phQUDsc3LHscIvKHAq61pLjg7a3eDahrAMITqBlS7Stwiyb3gN9eLUuZTfMbKCjmfaXWlYf7fVLAWBq3m0fqXH6cM6J0bLx65Y18yBp5U9+M4GrUg5SiR6nyyb1FiamTRb4lR4wbtgGxknkSOw2FxDA0q5V2YZBnlme7JgjRpUm16fhF9aCHJVQ==
+X-YMail-OSG: AqeFClMVM1lyuOGbVhTTItpzwbtu3lovdT23yfRd8Tawm8yn0vww0JjnqHVMnBL
+ fWNk7xn_Gwpew1vhSVtsf79m0biR720zax5bpVqUZ_09f87aITe9GhwR.Sv1x1jFSkEcLEJ9vLIo
+ Ix_AxdEBLxvxEmuhCv_noRLvrdEJKP6jBWNTRVOuQ2kyFhWAF6WVu78b..bJhkpAcl4L5Nl_i2F2
+ 8no1U74gLs8AjgBF1lDGpQZ7t3XHBSkwo5edFN7Hz8s6t4MYTiK_RIkuq3eRro34ecxsCLR91fID
+ Dwvf9hytAb5dGEk7JugxKaZRWFqn75TvKPHYSU.OhQcP.YB0ompw8IBGl4rGf.9vwEkf2e5Os_gE
+ YokMo5NKfE27mZFlTTRRhTe9QVThzU7vK1y60p32FvJ1rB6zi2wtNi662v24K4cnxTD9S2TmD3o3
+ Def0HEAVGmsNbwFEUp4MKnWpb9evwLXLh0cpjROWPU.F7WZqS.P9M5UU1ANzs8ks48LMU08QZxJZ
+ .Uieh1X2zdmR.OQv9Wf_A0XVcyo7phYyzOa2Ir5FFDpOnyps9JWlsioR4iicu6g2GSDmYjeI2qvz
+ rUbB.w1KKsezRkntKU2.mAoZkXnZVRKicjPKHPysjw8qRJpW2vDKu5IDpVzPvU0D5wEnjAPKVtgC
+ eFek5w11GDt8HD02roP9m4vKZaejdHtrbLSuvKJzZS6.F8bY2GNX.XOsdStR8Ai_lEcREWMTdcAg
+ M4loVLLV_HgtbIhN7tWLpFdfjVx3KQk1aGmsdRZNODy1Njbbp8amrCDryhvxoNJuZ9nYfinLGH7y
+ _eodKUgg0U1vjwAEdaJgZu3A3I4vecGJoEUVGdS4IS1Q.g4.atCzLcHAmgVpUeJ_i1D7SXLdGgD8
+ KkbnfGh9gfkj6IrKjYx.tnnEXJwbXclklN6n5y3gei0u15O8fAQ3f8sK5lXbfHBHyNl_A9e2ibLA
+ 9f6OjnK0iQ72txOL2K2fpF4kCt59d4UyvtmBVJ1gjfb_XjzvisYhS.u.qfF5z4GABIbYKXRgPO1H
+ yys5yoOV1nOvsFKjM7KTCCYomIKMXeUvvoCBBW1.KVNobDG30UF2ntglBYRR4z8vNNVEW8OPaxn5
+ h1SpFxyS.JJiEGITr0Gh44zWv.GmUYTSXxEEaSMhvsnrssJD3jI6EpkfJ4yyHj4dDy6u.2aQT3R9
+ _bXqp047q.I4MM1VI4yjlF0QPNtvPB8Lc5dr9eD1wr.UKKpVSEnEWoMNAqpoQl2E.xNG6uGkAkbF
+ N_xnQXgrbMBibNtdqX4H7nEwFX2qqXb2MwCU0Yu0lSstChq4KI6W2n25HBR7.Y2IkRQmLEsqCLsT
+ 4JPeSkhIysnJW2w8_jW0uII9MO_gc4n.R.uQRdVXuKlGJKC6QIzILpzPkBqbjgv5mDGmlFeAYlyN
+ 353grPRiGSvA_cKSxavs6tsXCOC13ESCX4JjayRIhQ3xrVAwGRcDkle5qtJsruxlV2GNlcMNMoHE
+ CtbVZCSC4PdIosAr0zHI_0fGZhtLn1o3zYjXUVPa9mTyVTEuzbHOEiMepybqSVMiRFzW.cQsIQeq
+ Ff3azk.mpu1rA_V.QSYtXbjudCkZXBth2_rixBoKKA1Ldz_Jq4SEtDm1JqbXs_.HDL7ZTznpyUX3
+ kkwi.Xhn7f.alKpirB0P8PVv.SeGMJ74M_yrao01T939t3Yc5564vKZW2dOQMkBMCcw33k80Bt6d
+ zBL.DWlxVJPZWUiieUw4xfaHSlbFaTRZffMcpcjq8om7hZCHhmUXz3Ak.F3et0mNh2Wy35aasWLH
+ s9fmXCzUQbPxM6DIIukp7o30ED6xsyrVSyqZKKBQqniI9ejp8Zw9QtutFpNOdZLpZ_zfLFOaE8Us
+ OJRcegH5QTgBlPhgfh5zYpNHRY8dEeiOvWJnrF6Zyut7i44eqesntuIe0XAxxeSHLA4Id.QJ5VXn
+ gDL0VC2r_tJEdRGthrz4riHeWjghsDOf.i1hYJ6j0bpYhukFL07i2qp5qilYRVaUyz4TE5WdOwrH
+ 4sIgnt9B29v7rZPt1vfhDzrAJgqTkn30_TYjCHpzzkz5Ekqhj6mLn04NKhB9YWxSsv_nqIirj5LM
+ o98YTnU_D5ITltGCuxYBY7rwC.NeAp.2n1uE4k2hLKJvZNZvEZ2Gr0U9RD3pguLYuCZzS8u996nt
+ fea.2DDZ4LJt4_6bk9P2ZKatdikyN1Pji47o1U5i0UgJP8Fd.waXF.3J4g73dC7Km5Q2eiCuVVX2
+ 7excDesPuz.o2FwgoW2oLAZ94uBvSb9U1KKm217C9kf_de9XA3PfnFQFhxCsGUol9DOEz3usX_nM
+ BvsTTSG68GGt_VMlpGEzK
+X-Sonic-MF: <adelodunolaoluwa@yahoo.com>
+X-Sonic-ID: 88fef660-61c4-4b80-ad1c-0c25f766fd14
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic316.consmr.mail.gq1.yahoo.com with HTTP; Sat, 25 Oct 2025 19:03:08 +0000
+Received: by hermes--production-bf1-554b85575-vmpgr (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 0ca7b4e896ed0ba71fcca8b2a04199fd;
+          Sat, 25 Oct 2025 19:03:06 +0000 (UTC)
+From: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+	"=David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Matthew Gerlach <matthew.gerlach@altera.com>, kernel@pengutronix.de,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>
+Cc: Shuah Khan <skhan@linuxfoundation.org>,
+	David Hunter <david.hunter.linux@gmail.com>,
 	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Teoh Ji Sheng <ji.sheng.teoh@intel.com>
-Subject: Re: [PATCH v5 02/10] net: stmmac: Use interrupt mode INTM=1 for per
- channel irq
-Message-ID: <aP0eebM6ek-1fnA-@shell.armlinux.org.uk>
-References: <20251024-v6-12-topic-socfpga-agilex5-v5-0-4c4a51159eeb@pengutronix.de>
- <20251024-v6-12-topic-socfpga-agilex5-v5-2-4c4a51159eeb@pengutronix.de>
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org,
+	Sunday Adelodun <adelodunolaoluwa@yahoo.com>
+Subject: [PATCH v2] selftests: af_unix: Add tests for ECONNRESET and EOF semantics
+Date: Sat, 25 Oct 2025 20:02:56 +0100
+Message-ID: <20251025190256.11352-1-adelodunolaoluwa@yahoo.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251024-v6-12-topic-socfpga-agilex5-v5-2-4c4a51159eeb@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+References: <20251025190256.11352-1-adelodunolaoluwa.ref@yahoo.com>
 
-On Fri, Oct 24, 2025 at 01:49:54PM +0200, Steffen Trumtrar wrote:
-> From: Teoh Ji Sheng <ji.sheng.teoh@intel.com>
-> 
-> commit 6ccf12ae111e ("net: stmmac: use interrupt mode INTM=1
-> for multi-MSI") is introduced for platform that uses MSI.
-> 
-> Similar approach is taken to enable per channel interrupt
-> that uses shared peripheral interrupt (SPI), so only per channel
-> TX and RX intr (TI/RI) are handled by TX/RX ISR without calling
-> common interrupt ISR.
-> 
-> TX/RX NORMAL interrupts check is now decoupled, since NIS bit
-> is not asserted for any TI/RI events when INTM=1.
-> 
-> Signed-off-by: Teoh Ji Sheng <ji.sheng.teoh@intel.com>
-> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h       |  3 +++
->  drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c   | 10 +++++++++-
->  .../net/ethernet/stmicro/stmmac/stmmac_platform.c    | 20 ++++++++++++++++++++
->  include/linux/stmmac.h                               |  2 ++
->  4 files changed, 34 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> index 0d408ee17f337..64b533207e4a6 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> @@ -326,6 +326,9 @@
->  /* DMA Registers */
->  #define XGMAC_DMA_MODE			0x00003000
->  #define XGMAC_SWR			BIT(0)
-> +#define DMA_MODE_INTM_MASK		GENMASK(13, 12)
-> +#define DMA_MODE_INTM_SHIFT		12
-> +#define DMA_MODE_INTM_MODE1		0x1
->  #define XGMAC_DMA_SYSBUS_MODE		0x00003004
->  #define XGMAC_WR_OSR_LMT		GENMASK(29, 24)
->  #define XGMAC_WR_OSR_LMT_SHIFT		24
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> index 4d6bb995d8d84..1e9ee1f10f0ef 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> @@ -31,6 +31,13 @@ static void dwxgmac2_dma_init(void __iomem *ioaddr,
->  		value |= XGMAC_EAME;
->  
->  	writel(value, ioaddr + XGMAC_DMA_SYSBUS_MODE);
-> +
-> +	if (dma_cfg->multi_irq_en) {
-> +		value = readl(ioaddr + XGMAC_DMA_MODE);
-> +		value &= ~DMA_MODE_INTM_MASK;
-> +		value |= (DMA_MODE_INTM_MODE1 << DMA_MODE_INTM_SHIFT);
+Add selftests to verify and document Linux’s intended behaviour for
+UNIX domain sockets (SOCK_STREAM and SOCK_DGRAM) when a peer closes.
+The tests cover:
 
-No need for these parens. What is on the right hand side of |= is its
-own expression and can't be interpreted any other way.
+  1. EOF returned when a SOCK_STREAM peer closes normally.
+  2. ECONNRESET returned when a SOCK_STREAM peer closes with unread data.
+  3. SOCK_DGRAM sockets not returning ECONNRESET on peer close.
 
-> +		writel(value, ioaddr + XGMAC_DMA_MODE);
-> +	}
->  }
->  
->  static void dwxgmac2_dma_init_chan(struct stmmac_priv *priv,
-> @@ -359,13 +366,14 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
->  		}
->  	}
->  
-> -	/* TX/RX NORMAL interrupts */
-> +	/* RX NORMAL interrupts */
->  	if (likely(intr_status & XGMAC_RI)) {
->  		u64_stats_update_begin(&stats->syncp);
->  		u64_stats_inc(&stats->rx_normal_irq_n[chan]);
->  		u64_stats_update_end(&stats->syncp);
->  		ret |= handle_rx;
->  	}
-> +	/* TX NORMAL interrupts */
->  	if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
->  		u64_stats_update_begin(&stats->syncp);
->  		u64_stats_inc(&stats->tx_normal_irq_n[chan]);
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> index 27bcaae07a7f2..cfa82b8e04b94 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -607,6 +607,8 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
->  	dma_cfg->fixed_burst = of_property_read_bool(np, "snps,fixed-burst");
->  	dma_cfg->mixed_burst = of_property_read_bool(np, "snps,mixed-burst");
->  
-> +	dma_cfg->multi_irq_en = of_property_read_bool(np, "snps,multi-irq-en");
-> +
->  	plat->force_thresh_dma_mode = of_property_read_bool(np, "snps,force_thresh_dma_mode");
->  	if (plat->force_thresh_dma_mode && plat->force_sf_dma_mode) {
->  		plat->force_sf_dma_mode = 0;
-> @@ -737,6 +739,8 @@ EXPORT_SYMBOL_GPL(stmmac_pltfr_find_clk);
->  int stmmac_get_platform_resources(struct platform_device *pdev,
->  				  struct stmmac_resources *stmmac_res)
->  {
-> +	char irq_name[11];
-> +	int i;
->  	memset(stmmac_res, 0, sizeof(*stmmac_res));
+This follows up on review feedback suggesting a selftest to clarify
+Linux’s semantics.
 
-We normally want to see a blank line between local variable declarations
-and code.
+Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+Signed-off-by: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
+---
+Changelog:
 
->  
->  	/* Get IRQ information early to have an ability to ask for deferred
-> @@ -746,6 +750,22 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
->  	if (stmmac_res->irq < 0)
->  		return stmmac_res->irq;
->  
-> +	/* For RX Channel */
-> +	for (i = 0; i < MTL_MAX_RX_QUEUES; i++) {
-> +		sprintf(irq_name, "%s%d", "macirq_rx", i);
-> +		stmmac_res->rx_irq[i] = platform_get_irq_byname(pdev, irq_name);
-> +		if (stmmac_res->rx_irq[i] < 0)
-> +			break;
-> +	}
-> +
-> +	/* For TX Channel */
-> +	for (i = 0; i < MTL_MAX_TX_QUEUES; i++) {
-> +		sprintf(irq_name, "%s%d", "macirq_tx", i);
-> +		stmmac_res->tx_irq[i] = platform_get_irq_byname(pdev, irq_name);
-> +			if (stmmac_res->tx_irq[i] < 0)
-> +				break;
-> +	}
-> +
+Changes made from v1:
 
-It looks like multi-irq is a dwxgmac2 thing, should this be conditional
-on (a) multi_irq_en being set, and (b) should parsing multi_irq_en be
-conditional on dwxgmac2, (c) should the binding only allow
-snps,multi-irq-en if a dwxgmac2 compatible is indicated?
+- Patch prefix updated to selftest: af_unix:.
 
+- All mentions of “UNIX” changed to AF_UNIX.
+
+- Removed BSD references from comments.
+
+- Shared setup refactored using FIXTURE_VARIANT().
+
+- Cleanup moved to FIXTURE_TEARDOWN() to always run.
+
+- Tests consolidated to reduce duplication: EOF, ECONNRESET, SOCK_DGRAM peer close.
+
+- Corrected ASSERT usage and initialization style.
+
+- Makefile updated for new directory af_unix.
+
+ tools/testing/selftests/net/af_unix/Makefile  |   1 +
+ .../selftests/net/af_unix/unix_connreset.c    | 161 ++++++++++++++++++
+ 2 files changed, 162 insertions(+)
+ create mode 100644 tools/testing/selftests/net/af_unix/unix_connreset.c
+
+diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/testing/selftests/net/af_unix/Makefile
+index de805cbbdf69..5826a8372451 100644
+--- a/tools/testing/selftests/net/af_unix/Makefile
++++ b/tools/testing/selftests/net/af_unix/Makefile
+@@ -7,6 +7,7 @@ TEST_GEN_PROGS := \
+ 	scm_pidfd \
+ 	scm_rights \
+ 	unix_connect \
++	unix_connreset \
+ # end of TEST_GEN_PROGS
+ 
+ include ../../lib.mk
+diff --git a/tools/testing/selftests/net/af_unix/unix_connreset.c b/tools/testing/selftests/net/af_unix/unix_connreset.c
+new file mode 100644
+index 000000000000..c65ec997d77d
+--- /dev/null
++++ b/tools/testing/selftests/net/af_unix/unix_connreset.c
+@@ -0,0 +1,161 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Selftest for AF_UNIX socket close and ECONNRESET behaviour.
++ *
++ * This test verifies that:
++ *  1. SOCK_STREAM sockets return EOF when peer closes normally.
++ *  2. SOCK_STREAM sockets return ECONNRESET if peer closes with unread data.
++ *  3. SOCK_DGRAM sockets do not return ECONNRESET when peer closes.
++ *
++ * These tests document the intended Linux behaviour.
++ *
++ */
++
++#define _GNU_SOURCE
++#include <stdlib.h>
++#include <string.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <errno.h>
++#include <sys/socket.h>
++#include <sys/un.h>
++#include "../../kselftest_harness.h"
++
++#define SOCK_PATH "/tmp/af_unix_connreset.sock"
++
++static void remove_socket_file(void)
++{
++	unlink(SOCK_PATH);
++}
++
++FIXTURE(unix_sock)
++{
++	int server;
++	int client;
++	int child;
++};
++
++FIXTURE_VARIANT(unix_sock)
++{
++	int socket_type;
++	const char *name;
++};
++
++/* Define variants: stream and datagram */
++FIXTURE_VARIANT_ADD(unix_sock, stream) {
++	.socket_type = SOCK_STREAM,
++	.name = "SOCK_STREAM",
++};
++
++FIXTURE_VARIANT_ADD(unix_sock, dgram) {
++	.socket_type = SOCK_DGRAM,
++	.name = "SOCK_DGRAM",
++};
++
++FIXTURE_SETUP(unix_sock)
++{
++	struct sockaddr_un addr = {};
++	int err;
++
++	addr.sun_family = AF_UNIX;
++	strcpy(addr.sun_path, SOCK_PATH);
++
++	self->server = socket(AF_UNIX, variant->socket_type, 0);
++	ASSERT_LT(-1, self->server);
++
++	err = bind(self->server, (struct sockaddr *)&addr, sizeof(addr));
++	ASSERT_EQ(0, err);
++
++	if (variant->socket_type == SOCK_STREAM) {
++		err = listen(self->server, 1);
++		ASSERT_EQ(0, err);
++
++		self->client = socket(AF_UNIX, SOCK_STREAM, 0);
++		ASSERT_LT(-1, self->client);
++
++		err = connect(self->client, (struct sockaddr *)&addr, sizeof(addr));
++		ASSERT_EQ(0, err);
++
++		self->child = accept(self->server, NULL, NULL);
++		ASSERT_LT(-1, self->child);
++	} else {
++		/* Datagram: bind and connect only */
++		self->client = socket(AF_UNIX, SOCK_DGRAM | SOCK_NONBLOCK, 0);
++		ASSERT_LT(-1, self->client);
++
++		err = connect(self->client, (struct sockaddr *)&addr, sizeof(addr));
++		ASSERT_EQ(0, err);
++	}
++}
++
++FIXTURE_TEARDOWN(unix_sock)
++{
++	if (variant->socket_type == SOCK_STREAM)
++		close(self->child);
++
++	close(self->client);
++	close(self->server);
++	remove_socket_file();
++}
++
++/* Test 1: peer closes normally */
++TEST_F(unix_sock, eof)
++{
++	char buf[16] = {};
++	ssize_t n;
++
++	if (variant->socket_type != SOCK_STREAM)
++		SKIP(return, "This test only applies to SOCK_STREAM");
++
++	/* Peer closes normally */
++	close(self->child);
++
++	n = recv(self->client, buf, sizeof(buf), 0);
++	TH_LOG("%s: recv=%zd errno=%d (%s)", variant->name, n, errno, strerror(errno));
++	if (n == -1)
++		ASSERT_EQ(ECONNRESET, errno);
++
++	if (n != -1)
++		ASSERT_EQ(0, n);
++}
++
++/* Test 2: peer closes with unread data */
++TEST_F(unix_sock, reset_unread)
++{
++	char buf[16] = {};
++	ssize_t n;
++
++	if (variant->socket_type != SOCK_STREAM)
++		SKIP(return, "This test only applies to SOCK_STREAM");
++
++	/* Send data that will remain unread by client */
++	send(self->client, "hello", 5, 0);
++	close(self->child);
++
++	n = recv(self->client, buf, sizeof(buf), 0);
++	TH_LOG("%s: recv=%zd errno=%d (%s)", variant->name, n, errno, strerror(errno));
++	ASSERT_EQ(-1, n);
++	ASSERT_EQ(ECONNRESET, errno);
++}
++
++/* Test 3: SOCK_DGRAM peer close */
++TEST_F(unix_sock, dgram_reset)
++{
++	char buf[16] = {};
++	ssize_t n;
++
++	if (variant->socket_type != SOCK_DGRAM)
++		SKIP(return, "This test only applies to SOCK_DGRAM");
++
++	send(self->client, "hello", 5, 0);
++	close(self->server);
++
++	n = recv(self->client, buf, sizeof(buf), 0);
++	TH_LOG("%s: recv=%zd errno=%d (%s)", variant->name, n, errno, strerror(errno));
++	/* Expect EAGAIN because there is no datagram and peer is closed. */
++	ASSERT_EQ(-1, n);
++	ASSERT_EQ(EAGAIN, errno);
++}
++
++TEST_HARNESS_MAIN
++
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
