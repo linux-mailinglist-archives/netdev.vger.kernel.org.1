@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-232878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEF3FC09D0D
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 19:02:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB508C09B75
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:48:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A09FC561BDD
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:34:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3453F4ECD41
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:34:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 409F33081D4;
-	Sat, 25 Oct 2025 16:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B2C26E6F0;
+	Sat, 25 Oct 2025 16:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C6BiGn+k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qrKCAqke"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CC222A813;
-	Sat, 25 Oct 2025 16:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F84A22A813;
+	Sat, 25 Oct 2025 16:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761409589; cv=none; b=MzOwmiW27YvICyHU8w5/7PLBv61/d+TfZwlNvgSLB9mrWqJeK25+rJEodj7TAoxQKkqwR4L5+yF0zoKYInuupOU187k4UJrgCUDvlSW/AcruRSSU2qQ4+VvalC/oYPTd+c/uoT/ztic3E3+XVYaNSTLl0YgX0AXewI6YZzmdaKE=
+	t=1761409595; cv=none; b=IQlXYzr8vuNoscs9QIUEEhTNf9AOHTE1UfiCY7ms9BwawwXfS5Zoss/r3ZJeLTuXkQjAJHFyAb81BpZCcpyHdYks632QUkfdgPlWUjCqSNbPtDoK+CzHjRmaYU5mgSeHTRmKqDAlt3C/skwQbnAFiJSWc2clsIHoJ/Zw/xm7b4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761409589; c=relaxed/simple;
-	bh=/IhRMrnVGIhxtU6N+34X448FuGb7y/8d+aNopWtQiBA=;
+	s=arc-20240116; t=1761409595; c=relaxed/simple;
+	bh=WMgKJKUFglfTw6umt4dbRhXzGNq4wSkMscRE4m0ySS8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CsdsD0VQQBfJzPGiinOkxnW59KgLjnf5k7+BNQOtyn7hwvyHnTDP1lsnF3xBcjl1sKEoZL6sFFaCtp1fwCIrzr3rPkg77M6pHBxYX8HVtCgD3d7rGgIgBGDV0nNpmwyTxSA2FqilX5QKzBuLeUQ5lu7tntlmbprEp6MoYVIm8uA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C6BiGn+k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C555C4CEF5;
-	Sat, 25 Oct 2025 16:26:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cIpnFAY2zeMidQz+R+BfbUoBu24jsNo/XJI8BaEeRzeXIkCootovlDeQWux9gam9Z++hdPS4iupxVp3tfoIr/jjhkBK4iTnvZRsUp5MhffeDwc36f3NyKxP2ybG/yFcK5f2kXp7o+yvW8hHlSE5HDUtlumwD9R+482oO5wl8QrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qrKCAqke; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 720EBC4CEFB;
+	Sat, 25 Oct 2025 16:26:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761409589;
-	bh=/IhRMrnVGIhxtU6N+34X448FuGb7y/8d+aNopWtQiBA=;
+	s=k20201202; t=1761409595;
+	bh=WMgKJKUFglfTw6umt4dbRhXzGNq4wSkMscRE4m0ySS8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=C6BiGn+klD6kM1bZtsjemwKg9MjZRucAAW+JIO2v44ffdqj+GWmBTVaF2bobW7nv6
-	 CzpG6C5MMadnj1A+olauOqdhGRjNweEO7kslkuOhGd5Czx5EYjls19FFVVu1+aHLpc
-	 OEpedE50C4cuQe/NDxVVS2bNza5ovDUfP2ygLuX7CbljpINTh2jkwOq95DeTvMjr9f
-	 hiKkOQfwi1jLinbpv1TkFSX+F4EpLFVFs9ysk9FYuL4Fy4HPoanovHnNzxj/Sy7Ghl
-	 XQXT/HkdahSAwdicyctWwAEhg4MxOrzI7d3vcalkWO2HxnaxnqXzE3TZ2kQz2burs7
-	 g+3X0ZhFrQeoQ==
+	b=qrKCAqkeRmGwZtiv9YyTt0ZEQLs9cUuycZyL+sU1q++E1E9+wuSFwNqhcIxof4uk5
+	 C9KcW2noKNFmFX0B+B3GD+4zmphpM77NTvPP2Wn0OR653gzFVh8asr8u+ngMz3sObz
+	 a7ueaSs3tlt5DmdsPkN0WvAB3x7Lgkf0T3VW+s/HnTRH/BVHbzvyaAIwV+BIykh9Q6
+	 92oAqvB/PekqPt4dTCLf7sCq1ZYVpkXy8X7tOw81fkP/XW9bi02CbESqUMcc8SMuDN
+	 4K+DaGbtzuOiBdNONtrotR3HBSUbA6FUkauMUv010b/PXx8HqwZyy4ShoSJqRydFDz
+	 w/o2IMEr8YzyA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	Vikas Gupta <vikas.gupta@broadcom.com>,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Dragos Tatulea <dtatulea@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17] bng_en: make bnge_alloc_ring() self-unwind on failure
-Date: Sat, 25 Oct 2025 12:00:10 -0400
-Message-ID: <20251025160905.3857885-379-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17-5.4] page_pool: Clamp pool size to max 16K pages
+Date: Sat, 25 Oct 2025 12:00:13 -0400
+Message-ID: <20251025160905.3857885-382-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -68,80 +69,80 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+From: Dragos Tatulea <dtatulea@nvidia.com>
 
-[ Upstream commit 9ee5994418bb527788e77361d338af40a126aa21 ]
+[ Upstream commit a1b501a8c6a87c9265fd03bd004035199e2e8128 ]
 
-Ensure bnge_alloc_ring() frees any intermediate allocations
-when it fails. This enables later patches to rely on this
-self-unwinding behavior.
+page_pool_init() returns E2BIG when the page_pool size goes above 32K
+pages. As some drivers are configuring the page_pool size according to
+the MTU and ring size, there are cases where this limit is exceeded and
+the queue creation fails.
 
-Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Link: https://patch.msgid.link/20250919174742.24969-2-bhargava.marreddy@broadcom.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+The page_pool size doesn't have to cover a full queue, especially for
+larger ring size. So clamp the size instead of returning an error. Do
+this in the core to avoid having each driver do the clamping.
+
+The current limit was deemed to high [1] so it was reduced to 16K to avoid
+page waste.
+
+[1] https://lore.kernel.org/all/1758532715-820422-3-git-send-email-tariqt@nvidia.com/
+
+Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Link: https://patch.msgid.link/20250926131605.2276734-2-dtatulea@nvidia.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
 YES
-- Change makes `bnge_alloc_ring()` jump to `err_free_ring` and call
-  `bnge_free_ring()` whenever a DMA page or the optional `vzalloc()`
-  fails (`drivers/net/ethernet/broadcom/bnge/bnge_rmem.c:93-125`). That
-  guarantees every partially allocated page, page-table entry, and vmem
-  buffer is released before the function returns `-ENOMEM`.
-- Without this patch, callers such as `alloc_one_cp_ring()` leak DMA
-  buffers on allocation failure: its error path only invokes
-  `bnge_free_cp_desc_arr()` which frees the host-side arrays but not the
-  coherent allocations
-  (`drivers/net/ethernet/broadcom/bnge/bnge_netdev.c:239-246` together
-  with `drivers/net/ethernet/broadcom/bnge/bnge_netdev.c:112-121`).
-  Similar allocation sites rely on `bnge_alloc_ring()` to clean up for
-  them, so the leak is user-visible under memory pressure.
-- `bnge_free_ring()` already tolerates partially initialized state,
-  skipping NULL slots and resetting pointers
-  (`drivers/net/ethernet/broadcom/bnge/bnge_rmem.c:36-66`), so even
-  callers that still run their normal unwind paths (e.g.
-  `bnge_free_nq_tree()` and `bnge_free_tx_rings()`) remain safe—double
-  frees are avoided because the pointers are nulled.
-- Scope is limited to the new `bng_en` driver; no interfaces or success
-  paths change. The fix eliminates a real leak and carries very low
-  regression risk, making it a good candidate for stable backporting.
+- The change at `net/core/page_pool.c:213` and
+  `net/core/page_pool.c:214` stops rejecting large pools and instead
+  clamps the ptr_ring allocation to 16k entries, which keeps queue setup
+  from failing with `-E2BIG` while still bounding the cached page
+  budget. Without this patch, any driver that computes a `pool_size`
+  above 32768 immediately aborts queue creation; for example,
+  `mlx5e_alloc_rq()` sets `pp_params.pool_size = pool_size` in
+  `drivers/net/ethernet/mellanox/mlx5/core/en_main.c:906` and again at
+  `drivers/net/ethernet/mellanox/mlx5/core/en_main.c:1011`, and on error
+  it propagates the failure (`goto err_free_by_rq_type`) so the RX queue
+  never comes up. `stmmac_init_rx_buffers()` follows the same pattern in
+  `drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:2051`–`drivers/net/
+  ethernet/stmicro/stmmac/stmmac_main.c:2066`, meaning larger rings or
+  MTU-derived pools currently make the interface unusable.
+- The lower cap is safe: when the ptr_ring fills, the existing slow-path
+  already frees excess pages (`page_pool_recycle_in_ring()` at
+  `net/core/page_pool.c:746` together with the fallback in
+  `page_pool_put_unrefed_netmem()` at `net/core/page_pool.c:873`), so a
+  smaller cache only increases occasional allocations but does not
+  change correctness. No ABI or driver interfaces are touched, and every
+  driver benefits automatically without per-driver clamps.
+- This is a minimal, localized fix that prevents hard user-visible
+  failures (device queues refusing to start) on systems with large RX
+  rings or jumbo MTUs, making it an excellent candidate for stable
+  backports.
 
- drivers/net/ethernet/broadcom/bnge/bnge_rmem.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ net/core/page_pool.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c b/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
-index 52ada65943a02..98b4e9f55bcbb 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
-@@ -95,7 +95,7 @@ int bnge_alloc_ring(struct bnge_dev *bd, struct bnge_ring_mem_info *rmem)
- 						     &rmem->dma_arr[i],
- 						     GFP_KERNEL);
- 		if (!rmem->pg_arr[i])
--			return -ENOMEM;
-+			goto err_free_ring;
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index e224d2145eed9..1a5edec485f14 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -211,11 +211,7 @@ static int page_pool_init(struct page_pool *pool,
+ 		return -EINVAL;
  
- 		if (rmem->ctx_mem)
- 			bnge_init_ctx_mem(rmem->ctx_mem, rmem->pg_arr[i],
-@@ -116,10 +116,13 @@ int bnge_alloc_ring(struct bnge_dev *bd, struct bnge_ring_mem_info *rmem)
- 	if (rmem->vmem_size) {
- 		*rmem->vmem = vzalloc(rmem->vmem_size);
- 		if (!(*rmem->vmem))
--			return -ENOMEM;
-+			goto err_free_ring;
- 	}
+ 	if (pool->p.pool_size)
+-		ring_qsize = pool->p.pool_size;
 -
- 	return 0;
-+
-+err_free_ring:
-+	bnge_free_ring(bd, rmem);
-+	return -ENOMEM;
- }
+-	/* Sanity limit mem that can be pinned down */
+-	if (ring_qsize > 32768)
+-		return -E2BIG;
++		ring_qsize = min(pool->p.pool_size, 16384);
  
- static int bnge_alloc_ctx_one_lvl(struct bnge_dev *bd,
+ 	/* DMA direction is either DMA_FROM_DEVICE or DMA_BIDIRECTIONAL.
+ 	 * DMA_BIDIRECTIONAL is for allowing page used for DMA sending,
 -- 
 2.51.0
 
