@@ -1,127 +1,538 @@
-Return-Path: <netdev+bounces-232910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5921DC09E77
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 20:43:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDB71C09E83
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 20:44:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EC68434D786
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:43:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 983783BD7A8
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:44:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7C92F60A7;
-	Sat, 25 Oct 2025 18:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3621A3016E1;
+	Sat, 25 Oct 2025 18:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cCVvP8HZ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gaVbIZmg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773C92C026F
-	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 18:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04A02E764A;
+	Sat, 25 Oct 2025 18:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761417810; cv=none; b=jzcDF+TBEuXu2X0vYebS5YjMWjoOGXAFW0Qah+wApAe2x6Fq/puQto2ApqW9uc9X8nzB+syr99mUWpg8JTn7PAIGZOW/34tgJsAxNOohhDTaINeVE2koamp6wU07IWM4oh+x1rn3BeS/aNWG9Mmmc0v5GG14+ojJSWMnz8oBCu0=
+	t=1761417880; cv=none; b=hN/gH8zqTmvCpKOIlhR7VjPnrZkhmvywfGoeCq756jxqaQBdkieYc698UfgZ+AnQCCH9pVtO/Mi6x2jbFyCuNL2L1dZgBVLKiEZZuW61oSqu/2KawgnoHkRRtzR/O6OY3psvYUhYkbxML+f5NccMOXtokJK2orU+P5ndM6oZ4Fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761417810; c=relaxed/simple;
-	bh=dxk8GxWYmXoS/kR/2B6MJ5d695nLp/wTtHjmfAoCuxk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Wut8psQ7AdzuOYMrBMVdebpK/K0OJBgq3KCzHTa62LutzEXpHiPRWQbPbyZeZEVzuYII18bDzsdMxTbOd5x1akezs9uks3zF3SX8vnnH8nlvgfZvH0tZker9EBrmazvEZnlaFPK5pHnMlF0AjCQlLVojSgsqnEuLUZb4cbBRn0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cCVvP8HZ; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-427091cd4fdso1896419f8f.1
-        for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 11:43:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761417807; x=1762022607; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CWNok4IQiL53qK04RvlXuFVO8RcguXVZm8vK7lpoxs4=;
-        b=cCVvP8HZ5rGuA3p8pjDknDdg/4DI8nBsbEqQ/7YgZJjdrcssnyHwzFuf/7Nbpn4ku3
-         x4D7PL0lpNpUdNbmkwyJgu0uawtY1I4ps42/1NEy+MAB/ZrW1j6xAGCrcl5HpsMOifH/
-         UKB2fNmQtzWdaxQ89tzw+XitBZH3k7lcwP4/VEo3OqD+h7nbvxVbptdMcicXx/i1dnNO
-         iSpGNqXz/G6S/0mVfG5CBZ2tSe1+m45ShJ0kGlOzh2o1VkAoAlRAF60CwYv8GanfJTeu
-         eAI06n3YolpKeNqySC4K/g4Ydx4b7jOIr/mCr0JErIUYNgKBWiSf/+etewOA7aZz9tK1
-         ta3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761417807; x=1762022607;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CWNok4IQiL53qK04RvlXuFVO8RcguXVZm8vK7lpoxs4=;
-        b=gBJKYI7wqUbfg6U+G4Qr/z4re2P52xyQKz/AyV6dyuj3X+tsCdQLwsKFkZJBGCutjB
-         kC0H14+zWcbPyd974aaM76s67uQt1b5PNlBTDPG18qPojnLog5/zLilwa5qCt/7czqrB
-         3obtWGrcTrlc1O6qtVUw8J+DE+w9P6pdjEP3gNHUlV6PwvQB71suR0liROuX8zNBwUPP
-         5ZWKc2M5hC6AYCiOJ5Q6pCf5PgQpZ5TWjM/atAzYbllGOpICK+rRivagL9ppbAVmEZVb
-         RkxnG1fvbxTHVCgUF/6x29JZkt3M/S043aVLJhconRI8oXgBUKl5oAIGwRG4Zpyt7WIR
-         0Ofg==
-X-Gm-Message-State: AOJu0Yzaq04FKJwc8RZxU2RB3DL42fcrbAqjvCrXNSpkXNPY6GjB5FQ1
-	4HSWpkH4P70sYYLHJhqQkZGjVbAVyOJHle2ZJD/bngTD2vJKft2sMBFn
-X-Gm-Gg: ASbGncsP7mpCjCvrD1/H0nPY9k/fmfVt/74hJE71wMOwQKoIEg4OXSMiS8wwn5EP7z0
-	98cQjdv/2s+gYI4c5+nHyZEIQ6vWNwbYL0R3bhLSi0lf0hnMbPxk4zFUMxYIwWbrJ2LNyyS04x8
-	KngOFzULB5IKxWgP2xNyyWZ2bmZPfGzXzxRFXZQk6ZjJlbICW5wv6XJ/234fe23ZDKC+BOVWqbT
-	MY5cILVxa6uVmysNoNTiDd0FVAZumIDLEchkpNNalh0i7wtuTT1JeFH9BT+K9XNfuUc0+XJn4rY
-	CHgUkKvgcUiqcmvysv7m0RxV182U925nEGXBISE1pZqkK+pZ1O+RAtvW1o886Fl7t0DWc3wgEbb
-	1t8dT3wiSPAegAT9wwHmV/XQ8Gwyb0Xc8F+8oHTw+VqSkJk2MT3cwYcVxLk76CJZqb6uTPiEsiY
-	GOH4hRtXLB2M6wqTPqcXODQY21wSQEfpIcfFe3+GzS/pQ3ErCVgFf5vF0KjVzIoP+h2dcyWyeP8
-	qmskWV61YWYEJT4ZpcRUcMB0U59f7fls6ZOC7D0Kz9OK6BT5mSd/g==
-X-Google-Smtp-Source: AGHT+IFk7dWmaGE9WDxnUoXGPQ/MaTOVi43Jwup+53sRtb28ew+/Wwb+XiqmvooubqMbrhcWmLx9dA==
-X-Received: by 2002:a05:6000:645:b0:429:8b94:b8d6 with SMTP id ffacd0b85a97d-4298b94bd76mr6021211f8f.57.1761417806671;
-        Sat, 25 Oct 2025 11:43:26 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f39:8b00:d401:6211:9005:e76e? (p200300ea8f398b00d40162119005e76e.dip0.t-ipconnect.de. [2003:ea:8f39:8b00:d401:6211:9005:e76e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952de5f9sm5006487f8f.38.2025.10.25.11.43.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Oct 2025 11:43:25 -0700 (PDT)
-Message-ID: <7eb1a046-aa14-4874-b03c-361ac6f8ffa7@gmail.com>
-Date: Sat, 25 Oct 2025 20:43:24 +0200
+	s=arc-20240116; t=1761417880; c=relaxed/simple;
+	bh=NhyFd3x0IcU36FVuiepdWTEQQ9K0ZZsa5YqEuNGaKE0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CnGF/ERgBuACb4xvWUER1uR+DE6j1aoYlDbvitWKfa6QPvi//cgspJ8x2S+EHco/YG7ZBEUiBpLEd2LMfaPf5zaRN2hNgf+92Xz84x03cCNREh2NdiLzD7iH2nEHwf96ByUkxLHqsHAA7qP42ZNf7Gvi5XnuwFoM8In6rLcedgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gaVbIZmg; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=PRsPHEz/DrVccg8l2DF/sDU8Gr7i5rfnTkQZ55zTx8E=; b=gaVbIZmgKEOK/wzt5X/J3Q7Tj9
+	PgT5SAo7NpImvMEF18QVk4/DMapCq/+hdTnmFd/jRAEzRNyoYMNNtgMHO4Z2frkx2aPrlVmAr4h0Q
+	HSrsVYs1HhU3eBpGX7CB4HHcmTWZuLGUqoDSNLH0t1BJeGo6X5uiSiBigZGueGT292QCUu2GtAGZQ
+	I5FxS1VUqnA+plfpHGbkBCkqNKeYFmehwThavgFaiKcg7LgZJ3Xwwi/AcK5U1JUuYdopn8WmA0uj5
+	uzD5dfwNNB9pR0ttH49cRBFvpQqC74TWfiqrV3tUFrCkU9uCmkBIu/zvo8rw0ybLtFNDPWJwuPRbm
+	9z7TLAZA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56004)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vCjFR-000000000Ha-2LEv;
+	Sat, 25 Oct 2025 19:44:17 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vCjFM-000000003tk-00ZH;
+	Sat, 25 Oct 2025 19:44:12 +0100
+Date: Sat, 25 Oct 2025 19:44:11 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v2 13/13] net: dsa: add driver for MaxLinear
+ GSW1xx switch family
+Message-ID: <aP0ae1rxKnaJUO-_@shell.armlinux.org.uk>
+References: <cover.1761402873.git.daniel@makrotopia.org>
+ <5a586b0441a18a1e0eca9ebe77668d6ebde79d1c.1761402873.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 0/4] net: phy: add iterator
- mdiobus_for_each_phy
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
- Clark Wang <xiaoning.wang@nxp.com>, Siddharth Vadapalli
- <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, imx@lists.linux.dev,
- linux-omap@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>
-References: <9c6aeec5-f651-4cf0-8cca-d2455048e89e@gmail.com>
-Content-Language: en-US
-In-Reply-To: <9c6aeec5-f651-4cf0-8cca-d2455048e89e@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5a586b0441a18a1e0eca9ebe77668d6ebde79d1c.1761402873.git.daniel@makrotopia.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 10/24/2025 10:20 PM, Heiner Kallweit wrote:
-> Add and use an iterator for all PHY's on a MII bus, and phy_find_next()
-> as a prerequisite.
-> 
-> v2:
-> - rename iterator to mdiobus_for_each_phy
-> 
-> Heiner Kallweit (4):
->   net: phy: add iterator mdiobus_for_each_phy
->   net: fec: use new iterator mdiobus_for_each_phy
->   net: davinci_mdio: use new iterator mdiobus_for_each_phy
->   net: phy: use new iterator mdiobus_for_each_phy in
->     mdiobus_prevent_c45_scan
-> 
->  drivers/net/ethernet/freescale/fec_main.c |  8 ++------
->  drivers/net/ethernet/ti/davinci_mdio.c    | 14 +++++---------
->  drivers/net/phy/mdio_bus_provider.c       | 13 ++++---------
->  drivers/net/phy/phy_device.c              | 14 +++++++-------
->  include/linux/phy.h                       | 11 ++++++++++-
->  5 files changed, 28 insertions(+), 32 deletions(-)
-> 
-CI complains about a missing return value description in kdoc.
-I'll send a v3.
+On Sat, Oct 25, 2025 at 03:51:23PM +0100, Daniel Golle wrote:
+> +static int gsw1xx_sgmii_pcs_config(struct phylink_pcs *pcs,
+> +				   unsigned int neg_mode,
+> +				   phy_interface_t interface,
+> +				   const unsigned long *advertising,
+> +				   bool permit_pause_to_mac)
+> +{
+> +	struct gsw1xx_priv *priv = sgmii_pcs_to_gsw1xx(pcs);
+> +	bool sgmii_mac_mode = dsa_is_user_port(priv->gswip.ds, GSW1XX_SGMII_PORT);
+> +	u16 txaneg, anegctl, val, nco_ctrl;
+> +	int ret;
+> +
+> +	/* Assert and deassert SGMII shell reset */
+> +	ret = regmap_set_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
+> +			      GSW1XX_RST_REQ_SGMII_SHELL);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = regmap_clear_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
+> +				GSW1XX_RST_REQ_SGMII_SHELL);
+> +	if (ret < 0)
+> +		return ret;
+
+So this is disruptive. Overall, at this point, having added every other
+comment below, this code has me wondering whether you are aware of the
+documentation I have written in phylink.h for pcs_config(). This code
+goes against this paragraph in that documentation:
+
+"
+ * pcs_config() will be called when configuration of the PCS is required
+ * or when the advertisement is possibly updated. It must not unnecessarily
+ * disrupt an established link.
+"
+
+Low quality implementations lead to poor user experiences.
+
+> +
+> +	/* Hardware Bringup FSM Enable  */
+> +	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_PHY_HWBU_CTRL,
+> +			   GSW1XX_SGMII_PHY_HWBU_CTRL_EN_HWBU_FSM |
+> +			   GSW1XX_SGMII_PHY_HWBU_CTRL_HW_FSM_EN);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Configure SGMII PHY Receiver */
+> +	val = FIELD_PREP(GSW1XX_SGMII_PHY_RX0_CFG2_EQ,
+> +			 GSW1XX_SGMII_PHY_RX0_CFG2_EQ_DEF) |
+> +	      GSW1XX_SGMII_PHY_RX0_CFG2_LOS_EN |
+> +	      GSW1XX_SGMII_PHY_RX0_CFG2_TERM_EN |
+> +	      FIELD_PREP(GSW1XX_SGMII_PHY_RX0_CFG2_FILT_CNT,
+> +			 GSW1XX_SGMII_PHY_RX0_CFG2_FILT_CNT_DEF);
+> +
+> +	// if (!priv->dts.sgmii_rx_invert)
+> +		val |= GSW1XX_SGMII_PHY_RX0_CFG2_INVERT;
+> +
+> +	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_PHY_RX0_CFG2, val);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Reset and Release TBI */
+> +	val = GSW1XX_SGMII_TBI_TBICTL_INITTBI | GSW1XX_SGMII_TBI_TBICTL_ENTBI |
+> +	      GSW1XX_SGMII_TBI_TBICTL_CRSTRR | GSW1XX_SGMII_TBI_TBICTL_CRSOFF;
+> +	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_TBI_TBICTL, val);
+> +	if (ret < 0)
+> +		return ret;
+> +	val &= ~GSW1XX_SGMII_TBI_TBICTL_INITTBI;
+> +	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_TBI_TBICTL, val);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Release Tx Data Buffers */
+> +	ret = regmap_set_bits(priv->sgmii, GSW1XX_SGMII_PCS_TXB_CTL,
+> +			      GSW1XX_SGMII_PCS_TXB_CTL_INIT_TX_TXB);
+> +	if (ret < 0)
+> +		return ret;
+> +	ret = regmap_clear_bits(priv->sgmii, GSW1XX_SGMII_PCS_TXB_CTL,
+> +				GSW1XX_SGMII_PCS_TXB_CTL_INIT_TX_TXB);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Release Rx Data Buffers */
+> +	ret = regmap_set_bits(priv->sgmii, GSW1XX_SGMII_PCS_RXB_CTL,
+> +			      GSW1XX_SGMII_PCS_RXB_CTL_INIT_RX_RXB);
+> +	if (ret < 0)
+> +		return ret;
+> +	ret = regmap_clear_bits(priv->sgmii, GSW1XX_SGMII_PCS_RXB_CTL,
+> +				GSW1XX_SGMII_PCS_RXB_CTL_INIT_RX_RXB);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	anegctl = GSW1XX_SGMII_TBI_ANEGCTL_OVRANEG;
+> +	if (neg_mode != PHYLINK_PCS_NEG_INBAND_ENABLED)
+> +		anegctl |= GSW1XX_SGMII_TBI_ANEGCTL_OVRABL;
+
+override aneg and override able? What's this doing?
+
+> +
+> +	switch (phylink_get_link_timer_ns(interface)) {
+> +	case 10000:
+> +		anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_LT,
+> +				      GSW1XX_SGMII_TBI_ANEGCTL_LT_10US);
+> +		break;
+> +	case 1600000:
+> +		anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_LT,
+> +				      GSW1XX_SGMII_TBI_ANEGCTL_LT_1_6MS);
+> +		break;
+> +	case 5000000:
+> +		anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_LT,
+> +				      GSW1XX_SGMII_TBI_ANEGCTL_LT_5MS);
+> +		break;
+> +	case 10000000:
+> +		anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_LT,
+> +				      GSW1XX_SGMII_TBI_ANEGCTL_LT_10MS);
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (interface == PHY_INTERFACE_MODE_SGMII) {
+> +		txaneg = ADVERTISE_SGMII;
+> +		if (sgmii_mac_mode) {
+> +			txaneg |= BIT(14); /* MAC should always send BIT 14 */
+
+Bit 14 is ADVERTISE_LPACK.
+
+I think I'd prefer:
+
+			txaneg = ADVERTISE_SGMII | ADVERTISE_LPACK;
+
+and...
+
+> +			anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_ANMODE,
+> +					      GSW1XX_SGMII_TBI_ANEGCTL_ANMODE_SGMII_MAC);
+> +		} else {
+> +			txaneg |= LPA_SGMII_1000FULL;
+
+			txaneg = LPA_SGMII | LPA_SGMII_1000FULL;
+
+here.
+
+> +			anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_ANMODE,
+> +					      GSW1XX_SGMII_TBI_ANEGCTL_ANMODE_SGMII_PHY);
+
+So this seems to be yet another case of reverse SGMII. Andrew, please
+can we get to a conclusion on PHY_INTERFACE_MODE_REVSGMII before we
+end up with a crapshow of drivers doing their own stuff *exactly*
+like we see here?
+
+> +		if (neg_mode & PHYLINK_PCS_NEG_INBAND)
+> +			anegctl |= GSW1XX_SGMII_TBI_ANEGCTL_ANEGEN;
+
+Please add a comment describing what is going on here. What does this
+register bit do...
+
+> +	} else if (interface == PHY_INTERFACE_MODE_1000BASEX ||
+> +		   interface == PHY_INTERFACE_MODE_2500BASEX) {
+> +		txaneg = BIT(5) | BIT(7);
+
+ADVERTISE_1000XFULL | ADVERTISE_1000XPAUSE ?
+
+> +		anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_ANMODE,
+> +				      GSW1XX_SGMII_TBI_ANEGCTL_ANMODE_1000BASEX);
+> +	} else {
+> +		dev_err(priv->gswip.dev, "%s: SGMII wrong interface mode %s\n",
+> +			__func__, phy_modes(interface));
+> +		return -EINVAL;
+> +	}
+> +
+> +	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_TBI_TXANEGH,
+> +			   FIELD_GET(GENMASK(15, 8), txaneg));
+> +	if (ret < 0)
+> +		return ret;
+> +	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_TBI_TXANEGL,
+> +			   FIELD_GET(GENMASK(7, 0), txaneg));
+> +	if (ret < 0)
+> +		return ret;
+> +	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL, anegctl);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* setup SerDes clock speed */
+> +	if (interface == PHY_INTERFACE_MODE_2500BASEX)
+> +		nco_ctrl = GSW1XX_SGMII_2G5 | GSW1XX_SGMII_2G5_NCO2;
+> +	else
+> +		nco_ctrl = GSW1XX_SGMII_1G | GSW1XX_SGMII_1G_NCO1;
+> +
+> +	ret = regmap_update_bits(priv->clk, GSW1XX_CLK_NCO_CTRL,
+> +				 GSW1XX_SGMII_HSP_MASK | GSW1XX_SGMII_SEL,
+> +				 nco_ctrl);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = gsw1xx_sgmii_phy_xaui_write(priv, 0x30, 0x80);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+> +static void gsw1xx_sgmii_pcs_link_up(struct phylink_pcs *pcs,
+> +				     unsigned int neg_mode,
+> +				     phy_interface_t interface, int speed,
+> +				     int duplex)
+> +{
+> +	struct gsw1xx_priv *priv = sgmii_pcs_to_gsw1xx(pcs);
+> +	u16 lpstat;
+> +
+> +	/* When in-band AN is enabled hardware will set lpstat */
+> +	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
+> +		return;
+> +
+> +	/* Force speed and duplex settings */
+> +	if (interface == PHY_INTERFACE_MODE_SGMII) {
+> +		if (speed == SPEED_10)
+> +			lpstat = FIELD_PREP(GSW1XX_SGMII_TBI_LPSTAT_SPEED,
+> +					    GSW1XX_SGMII_TBI_LPSTAT_SPEED_10);
+> +		else if (speed == SPEED_100)
+> +			lpstat = FIELD_PREP(GSW1XX_SGMII_TBI_LPSTAT_SPEED,
+> +					    GSW1XX_SGMII_TBI_LPSTAT_SPEED_100);
+> +		else
+> +			lpstat = FIELD_PREP(GSW1XX_SGMII_TBI_LPSTAT_SPEED,
+> +					    GSW1XX_SGMII_TBI_LPSTAT_SPEED_1000);
+> +	} else {
+> +		lpstat = FIELD_PREP(GSW1XX_SGMII_TBI_LPSTAT_SPEED,
+> +				    GSW1XX_SGMII_TBI_LPSTAT_SPEED_NOSGMII);
+> +	}
+> +
+> +	if (duplex == DUPLEX_FULL)
+> +		lpstat |= GSW1XX_SGMII_TBI_LPSTAT_DUPLEX;
+> +
+> +	regmap_write(priv->sgmii, GSW1XX_SGMII_TBI_LPSTAT, lpstat);
+> +}
+> +
+> +static void gsw1xx_sgmii_pcs_get_state(struct phylink_pcs *pcs,
+> +				       unsigned int neg_mode,
+> +				       struct phylink_link_state *state)
+> +{
+> +	struct gsw1xx_priv *priv = sgmii_pcs_to_gsw1xx(pcs);
+> +	int ret;
+> +	u32 val;
+> +
+> +	ret = regmap_read(priv->sgmii, GSW1XX_SGMII_TBI_TBISTAT, &val);
+> +	if (ret < 0)
+> +		return;
+> +
+> +	state->link = !!(val & GSW1XX_SGMII_TBI_TBISTAT_LINK);
+> +	state->an_complete = !!(val & GSW1XX_SGMII_TBI_TBISTAT_AN_COMPLETE);
+> +
+> +	ret = regmap_read(priv->sgmii, GSW1XX_SGMII_TBI_LPSTAT, &val);
+> +	if (ret < 0)
+> +		return;
+> +
+> +	state->duplex = (val & GSW1XX_SGMII_TBI_LPSTAT_DUPLEX) ?
+> +			 DUPLEX_FULL : DUPLEX_HALF;
+> +	if (val & GSW1XX_SGMII_TBI_LPSTAT_PAUSE_RX)
+> +		state->pause |= MLO_PAUSE_RX;
+> +
+> +	if (val & GSW1XX_SGMII_TBI_LPSTAT_PAUSE_TX)
+> +		state->pause |= MLO_PAUSE_TX;
+> +
+> +	switch (FIELD_GET(GSW1XX_SGMII_TBI_LPSTAT_SPEED, val)) {
+> +	case GSW1XX_SGMII_TBI_LPSTAT_SPEED_10:
+> +		state->speed = SPEED_10;
+> +		break;
+> +	case GSW1XX_SGMII_TBI_LPSTAT_SPEED_100:
+> +		state->speed = SPEED_100;
+> +		break;
+> +	case GSW1XX_SGMII_TBI_LPSTAT_SPEED_1000:
+> +		state->speed = SPEED_1000;
+> +		break;
+> +	case GSW1XX_SGMII_TBI_LPSTAT_SPEED_NOSGMII:
+> +		if (state->interface == PHY_INTERFACE_MODE_1000BASEX)
+> +			state->speed = SPEED_1000;
+> +		else if (state->interface == PHY_INTERFACE_MODE_2500BASEX)
+> +			state->speed = SPEED_2500;
+> +		else
+> +			state->speed = SPEED_UNKNOWN;
+> +		break;
+> +	}
+> +}
+> +
+> +static void gsw1xx_sgmii_pcs_an_restart(struct phylink_pcs *pcs)
+> +{
+> +	struct gsw1xx_priv *priv = sgmii_pcs_to_gsw1xx(pcs);
+> +
+> +	regmap_set_bits(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL,
+> +			GSW1XX_SGMII_TBI_ANEGCTL_RANEG);
+> +}
+> +
+> +static int gsw1xx_sgmii_pcs_enable(struct phylink_pcs *pcs)
+> +{
+> +	struct gsw1xx_priv *priv = sgmii_pcs_to_gsw1xx(pcs);
+> +
+> +	/* Deassert SGMII shell reset */
+> +	return regmap_clear_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
+> +				 GSW1XX_RST_REQ_SGMII_SHELL);
+> +}
+> +
+> +static void gsw1xx_sgmii_pcs_disable(struct phylink_pcs *pcs)
+> +{
+> +	struct gsw1xx_priv *priv = sgmii_pcs_to_gsw1xx(pcs);
+> +
+> +	/* Assert SGMII shell reset */
+> +	regmap_set_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
+> +			GSW1XX_RST_REQ_SGMII_SHELL);
+> +}
+> +
+> +static const struct phylink_pcs_ops gsw1xx_sgmii_pcs_ops = {
+> +	.pcs_an_restart = gsw1xx_sgmii_pcs_an_restart,
+> +	.pcs_config = gsw1xx_sgmii_pcs_config,
+> +	.pcs_disable = gsw1xx_sgmii_pcs_disable,
+> +	.pcs_enable = gsw1xx_sgmii_pcs_enable,
+> +	.pcs_get_state = gsw1xx_sgmii_pcs_get_state,
+> +	.pcs_link_up = gsw1xx_sgmii_pcs_link_up,
+
+Please order these in the same order as they appear in the struct, and
+please order your functions above in the same order. This makes it
+easier in future if new methods need to be added.
+
+Also, please add the .pcs_inband_caps method to describe the
+capabilities of the PCS.
+
+It seems to me that this is not just a Cisco SGMII PCS, but also
+supports IEEE 802.3 1000BASE-X. "SGMII" is an ambiguous term. Please
+avoid propagating this ambigutiy to the kernel. I think in this case
+merely "gsw1xx_pcs_xyz" will do.
+
+> +};
+> +
+> +static void gsw1xx_phylink_get_caps(struct dsa_switch *ds, int port,
+> +				    struct phylink_config *config)
+> +{
+> +	struct gswip_priv *priv = ds->priv;
+> +
+> +	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
+> +				   MAC_10 | MAC_100 | MAC_1000;
+> +
+> +	switch (port) {
+> +	case 0:
+> +	case 1:
+> +	case 2:
+> +	case 3:
+> +		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
+> +			  config->supported_interfaces);
+> +		break;
+> +	case 4: /* port 4: SGMII */
+> +		__set_bit(PHY_INTERFACE_MODE_SGMII,
+> +			  config->supported_interfaces);
+> +		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
+> +			  config->supported_interfaces);
+> +		if (priv->hw_info->supports_2500m) {
+> +			__set_bit(PHY_INTERFACE_MODE_2500BASEX,
+> +				  config->supported_interfaces);
+> +			config->mac_capabilities |= MAC_2500FD;
+> +		}
+> +		return; /* no support for EEE on SGMII port */
+> +	case 5: /* port 5: RGMII or RMII */
+> +		__set_bit(PHY_INTERFACE_MODE_RMII,
+> +			  config->supported_interfaces);
+> +		phy_interface_set_rgmii(config->supported_interfaces);
+> +		break;
+> +	}
+> +
+> +	config->lpi_capabilities = MAC_100FD | MAC_1000FD;
+> +	config->lpi_timer_default = 20;
+> +	memcpy(config->lpi_interfaces, config->supported_interfaces,
+> +	       sizeof(config->lpi_interfaces));
+> +}
+> +
+> +static struct phylink_pcs *gsw1xx_phylink_mac_select_pcs(struct phylink_config *config,
+> +							 phy_interface_t interface)
+> +{
+> +	struct dsa_port *dp = dsa_phylink_to_port(config);
+> +	struct gswip_priv *gswip_priv = dp->ds->priv;
+> +	struct gsw1xx_priv *gsw1xx_priv = container_of(gswip_priv,
+> +						       struct gsw1xx_priv,
+> +						       gswip);
+
+Reverse christmas tree?
+
+> +static int gsw1xx_probe(struct mdio_device *mdiodev)
+> +{
+> +	struct device *dev = &mdiodev->dev;
+> +	struct gsw1xx_priv *priv;
+> +	u32 version;
+> +	int ret;
+> +
+> +	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+> +	if (!priv)
+> +		return -ENOMEM;
+> +
+> +	priv->mdio_dev = mdiodev;
+> +	priv->smdio_badr = GSW1XX_SMDIO_BADR_UNKNOWN;
+> +
+> +	priv->gswip.dev = dev;
+> +	priv->gswip.hw_info = of_device_get_match_data(dev);
+> +	if (!priv->gswip.hw_info)
+> +		return -EINVAL;
+> +
+> +	priv->gswip.gswip = gsw1xx_regmap_init(priv, "switch",
+> +					       GSW1XX_SWITCH_BASE, 0xfff);
+> +	if (IS_ERR(priv->gswip.gswip))
+> +		return PTR_ERR(priv->gswip.gswip);
+> +
+> +	priv->gswip.mdio = gsw1xx_regmap_init(priv, "mdio", GSW1XX_MMDIO_BASE,
+> +					      0xff);
+> +	if (IS_ERR(priv->gswip.mdio))
+> +		return PTR_ERR(priv->gswip.mdio);
+> +
+> +	priv->gswip.mii = gsw1xx_regmap_init(priv, "mii", GSW1XX_RGMII_BASE,
+> +					     0xff);
+> +	if (IS_ERR(priv->gswip.mii))
+> +		return PTR_ERR(priv->gswip.mii);
+> +
+> +	priv->sgmii = gsw1xx_regmap_init(priv, "sgmii", GSW1XX_SGMII_BASE,
+> +					 0xfff);
+> +	if (IS_ERR(priv->sgmii))
+> +		return PTR_ERR(priv->sgmii);
+> +
+> +	priv->gpio = gsw1xx_regmap_init(priv, "gpio", GSW1XX_GPIO_BASE, 0xff);
+> +	if (IS_ERR(priv->gpio))
+> +		return PTR_ERR(priv->gpio);
+> +
+> +	priv->clk = gsw1xx_regmap_init(priv, "clk", GSW1XX_CLK_BASE, 0xff);
+> +	if (IS_ERR(priv->clk))
+> +		return PTR_ERR(priv->clk);
+> +
+> +	priv->shell = gsw1xx_regmap_init(priv, "shell", GSW1XX_SHELL_BASE,
+> +					 0xff);
+> +	if (IS_ERR(priv->shell))
+> +		return PTR_ERR(priv->shell);
+> +
+> +	priv->sgmii_pcs.ops = &gsw1xx_sgmii_pcs_ops;
+> +	priv->sgmii_pcs.poll = 1;
+
+This is declared as a C99 'bool'. It takes true/false values in
+preference to 0/1.
+
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
