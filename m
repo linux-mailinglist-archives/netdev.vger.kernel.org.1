@@ -1,218 +1,145 @@
-Return-Path: <netdev+bounces-232761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E111FC08A8A
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 05:52:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94639C08A7A
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 05:45:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E59AB3A57D6
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 03:52:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67F2B402204
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 03:45:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034C5253B71;
-	Sat, 25 Oct 2025 03:52:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6BF32571A5;
+	Sat, 25 Oct 2025 03:44:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="pRhuJTkq"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="T8pDU1Fw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3717615D5B6;
-	Sat, 25 Oct 2025 03:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319582147F9;
+	Sat, 25 Oct 2025 03:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761364337; cv=none; b=VCSpmq+Eoq190AAmb6ItZOP4s7SItwswgl/uvI9sWGWCuZ9jr26b/nsniL3vC+TX5tXOk//CJzhvLMYZ4y6xHtH/ZgK0bFxDjrYK+mxsibNEBexEMpqtmgHxGiPhJ1xLGQBcqFqd/xlT9cCcEKLSTvMcW1YSe99iSbjt3yKKk60=
+	t=1761363897; cv=none; b=W8aJfseyg7zox3gfCPa7ZM8X6Nz4AreKXzJzKMGkGt+sqaqpcWXgzr9OT6bRH+37Nm/ytE2jbMweEtWApTdk43oI6QFSgG3ulRTBPC9yH9nkSRBbKXb1H+XJIKqr6wYCpTDPzjD3fSWyBoVRGCNew/j30RcY3H0oyMtHzpD6Els=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761364337; c=relaxed/simple;
-	bh=YTYW5vBSfsEO9ayaSEhP488bKkk/YHs07xurfRZzw80=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SDKfF2LjFXqeRgY2LKhB6mESorimAYQdE4p6lMO651nVtbE3u18pamNWqSyvVXAszp4fbG1gk14eulmJ/k00zC3zi2yBQawmLuHWqFq3kF0I+5MjQ9X1i7zm2IkpTCI695V1mv474XbjT9KWsCNu1ZTt6RhE9I/4HltXsQXCSL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=pRhuJTkq; arc=none smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59P3bxjc3584526;
-	Fri, 24 Oct 2025 20:51:52 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	PPS06212021; bh=z/MBNB4kMT7awnjGpg1dffl9f7Fr2jprPP9E98or9OQ=; b=
-	pRhuJTkq6B3GJbi1HE82r2hpchT86TrolEVc5LWkFOfH+543jVIMt0tBM2c64LUm
-	tTG6wpEtPSka2WhQha2IT0mZUFYvB5K/gjnu06DJH06qSt7kUpKYshUx+BDVMMDb
-	oNNiLQ36NpVwnUAJlGXWucRWzL+5Ti8gOzNsGtVw/lkjsVEqEVOkhyttY3YM29vA
-	pn8gnTmaANZ2Dr7MZqRFV7HQ21rSIhgm8pAYaRNt5NrdDq1NzoHxtGZMd52asOhA
-	LY3c9eKgiY0reD8dwJ8mXYVxk+5bfKlNQHIfy2CclolxOgPfvvnEhghvsNYRpAQC
-	IvqzAR5Cyv1Z3MNvjP1ruQ==
-Received: from ala-exchng02.corp.ad.wrs.com ([128.224.246.37])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 49ys00hja7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Fri, 24 Oct 2025 20:51:52 -0700 (PDT)
-Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
- ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.61; Fri, 24 Oct 2025 20:51:51 -0700
-Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
- ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
- 15.1.2507.61 via Frontend Transport; Fri, 24 Oct 2025 20:51:48 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <kuniyu@google.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-        <jreuter@yaina.de>, <kuba@kernel.org>, <linux-hams@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
-        <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-        <syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: Re: [PATCH V3] net: rose: Prevent the use of freed digipeat
-Date: Sat, 25 Oct 2025 11:51:44 +0800
-Message-ID: <20251025035147.2094258-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <CAAVpQUCx9MOJobomXXBcXsCNgSn__U3mJp8LFxD515o-boyr=w@mail.gmail.com>
-References: <CAAVpQUCx9MOJobomXXBcXsCNgSn__U3mJp8LFxD515o-boyr=w@mail.gmail.com>
+	s=arc-20240116; t=1761363897; c=relaxed/simple;
+	bh=2bouS7hna0gClWKGkPD0t7YRPlEeO+s2XXR4RVd0lJU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Hk+TvrWqxh7AmlY6eQ6jEEoHe2fRCFVbm3+qsicGaIrBTIDo8cAt93b3UAcFE9i3sRvaTbEe6qL4H7k0uHkhz7AsC3YoOgn6oeHYzbEM1D/DdLRR58xksvdNQUW5CT4n2Zy72rGk5/BBnc6iFZUEorQ+tYF1jjBBHQOy/hoej8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=T8pDU1Fw; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=Y7Rj9E2CdLAIkXLhpNINjdklw1IJhaMfMqQhc80+fB4=;
+	b=T8pDU1FwYdR5RRmiX67izPdS9NVMhoZJZ6aWK1LfM5MzIj8S5CuiPMBmc2i9ZR/DOMT3Nbxhk
+	5YJgBhgh9yAjjW2M5AopCT3bmqTSEMwnfr+9yydDdmRjjBbFR2d+m7djIcC/oqkV9dmjAkCaUu6
+	d+HD5qU+HLdSL9J2eL7KHPM=
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4ctlxk6vMWznTVF;
+	Sat, 25 Oct 2025 11:44:10 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8DF1C140278;
+	Sat, 25 Oct 2025 11:44:50 +0800 (CST)
+Received: from huawei.com (10.50.85.128) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 25 Oct
+ 2025 11:44:49 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
+	<zhangchangzhong@huawei.com>, <wangliang74@huawei.com>
+Subject: [PATCH -next] i40e: Replace sscanf() with kstrtoint() in i40e_dbg_netdev_ops_write()
+Date: Sat, 25 Oct 2025 12:07:35 +0800
+Message-ID: <20251025040735.558953-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="y"
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI1MDAzMCBTYWx0ZWRfX2TBbPm4+q2wt
- IQH9NWdbgJGzEPPaVaF/nZmz30SjEKuo+u5d45B7KaANvljQOs4Ehthg0QIIPxoVdZ4/aC34ku/
- 0gIVZAK/D3Ce9C0o9up7lB8ir0ZOc+dmx2ThpVeKqU0PZfBRn4CdDsQAUYVAlrqngrXyo9pNlLw
- pmudLwWU0yzcqG3uDCDVjmVo+R2YU03ZFXPEXdzeIKVQ8u72WfTlqrHLAIMa8zL1SxMijDozYDD
- 3XsliMZAmdbGP8ECrv26erd4AmRHc2QG6lcEagqseRMLix3++7QsJHEiD/TEKC6YfJQpXsLgs2z
- kaPrU2hNxoGTqXOvVPinohVe0FfDZcl0wYBlUJPbMBCzU+FSyUOOj/7/8MpZKjNTRvYFH9zcgsh
- Kwi8hIiErCmxOWRu7C/xOB2f7MHOmw==
-X-Proofpoint-ORIG-GUID: j7opWahkZIPjUOdo93v6udwLHq2hoTfi
-X-Proofpoint-GUID: j7opWahkZIPjUOdo93v6udwLHq2hoTfi
-X-Authority-Analysis: v=2.4 cv=N/8k1m9B c=1 sm=1 tr=0 ts=68fc4958 cx=c_pps
- a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
- a=qf4gfuq51q0A:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=1XWaLZrsAAAA:8 a=t7CeM3EgAAAA:8 a=hSkVLCK3AAAA:8 a=1RhtLw8l69tUTrcMIoMA:9
- a=3ZKOabzyN94A:10 a=k40Crp0UdiQA:10 a=FdTzh2GWekK77mhwV6Dw:22
- a=cQPPKAXgyycSBL8etih5:22 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-25_01,2025-10-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 phishscore=0 priorityscore=1501 impostorscore=0
- suspectscore=0 bulkscore=0 malwarescore=0 adultscore=0 spamscore=0
- clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510020000
- definitions=main-2510250030
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-On Fri, 24 Oct 2025 19:18:46 -0700, Kuniyuki Iwashima <kuniyu@google.com> wrote:
-> On Fri, Oct 24, 2025 at 2:39 AM Lizhi Xu <lizhi.xu@windriver.com> wrote:
-> >
-> > There is no synchronization between the two timers, rose_t0timer_expiry
-> > and rose_timer_expiry.
-> > rose_timer_expiry() puts the neighbor when the rose state is ROSE_STATE_2.
-> > However, rose_t0timer_expiry() does initiate a restart request on the
-> > neighbor.
-> > When rose_t0timer_expiry() accesses the released neighbor member digipeat,
-> > a UAF is triggered.
-> >
-> > To avoid this UAF, defer the put operation to rose_t0timer_expiry() and
-> > stop restarting t0timer after putting the neighbor.
-> >
-> > When putting the neighbor, set the neighbor to NULL. Setting neighbor to
-> > NULL prevents rose_t0timer_expiry() from restarting t0timer.
-> >
-> > syzbot reported a slab-use-after-free Read in ax25_find_cb.
-> > BUG: KASAN: slab-use-after-free in ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
-> > Read of size 1 at addr ffff888059c704c0 by task syz.6.2733/17200
-> > Call Trace:
-> >  ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
-> >  ax25_send_frame+0x157/0xb60 net/ax25/ax25_out.c:55
-> >  rose_send_frame+0xcc/0x2c0 net/rose/rose_link.c:106
-> >  rose_transmit_restart_request+0x1b8/0x240 net/rose/rose_link.c:198
-> >  rose_t0timer_expiry+0x1d/0x150 net/rose/rose_link.c:83
-> >
-> > Freed by task 17183:
-> >  kfree+0x2b8/0x6d0 mm/slub.c:6826
-> >  rose_neigh_put include/net/rose.h:165 [inline]
-> >  rose_timer_expiry+0x537/0x630 net/rose/rose_timer.c:183
-> >
-> > Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_t")
-> > Reported-by: syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com
-> > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
-> > ---
-> > V1 -> V2: Putting the neighbor stops t0timer from automatically starting
-> > V2 -> V3: add rose_neigh_putex for set rose neigh to NULL
-> >
-> >  include/net/rose.h   | 12 ++++++++++++
-> >  net/rose/rose_link.c |  5 +++++
-> >  2 files changed, 17 insertions(+)
-> >
-> > diff --git a/include/net/rose.h b/include/net/rose.h
-> > index 2b5491bbf39a..33de310ba778 100644
-> > --- a/include/net/rose.h
-> > +++ b/include/net/rose.h
-> > @@ -167,6 +167,18 @@ static inline void rose_neigh_put(struct rose_neigh *rose_neigh)
-> >         }
-> >  }
-> >
-> > +static inline void rose_neigh_putex(struct rose_neigh **roseneigh)
-> > +{
-> > +       struct rose_neigh *rose_neigh = *roseneigh;
-> > +       if (refcount_dec_and_test(&rose_neigh->use)) {
-> > +               if (rose_neigh->ax25)
-> > +                       ax25_cb_put(rose_neigh->ax25);
-> > +               kfree(rose_neigh->digipeat);
-> > +               kfree(rose_neigh);
-> > +               *roseneigh = NULL;
-> > +       }
-> > +}
-> > +
-> >  /* af_rose.c */
-> >  extern ax25_address rose_callsign;
-> >  extern int  sysctl_rose_restart_request_timeout;
-> > diff --git a/net/rose/rose_link.c b/net/rose/rose_link.c
-> > index 7746229fdc8c..334c8cc0876d 100644
-> > --- a/net/rose/rose_link.c
-> > +++ b/net/rose/rose_link.c
-> > @@ -43,6 +43,9 @@ void rose_start_ftimer(struct rose_neigh *neigh)
-> >
-> >  static void rose_start_t0timer(struct rose_neigh *neigh)
-> >  {
-> > +       if (!neigh)
-> > +               return;
-> > +
-> >         timer_delete(&neigh->t0timer);
-> >
-> >         neigh->t0timer.function = rose_t0timer_expiry;
-> > @@ -80,10 +83,12 @@ static void rose_t0timer_expiry(struct timer_list *t)
-> >  {
-> >         struct rose_neigh *neigh = timer_container_of(neigh, t, t0timer);
-> >
-> 
-> What prevents rose_timer_expiry() from releasing the
-> last refcnt here ?
-The issue reported by syzbot is that rose_t0timer_expiry() is triggered
-first, followed by rose_timer_expiry().
-Therefore, in rose_t0timer_expiry(), the reference count of neigh is
-increased before entering rose_transmit_restart_request() to prevent
-neigh from being put in rose_timer_expiry(). Then, in rose_t0timer_expiry(),
-neigh is put before executing rose_start_t0timer() and the neigh value is
-set to NULL to prevent t0timer restarts.
+Commit 9fcdb1c3c4ba ("i40e: remove read access to debugfs files")
+introduced some checkpatch warnings like this:
 
-The case where rose_timer_expiry() is triggered before rose_t0timer_expiry()
-is not considered at this time.
-> 
-> The t0timer could be triggered even after that happens.
-> 
-> 
-> > +       rose_neigh_hold(neigh);
-> >         rose_transmit_restart_request(neigh);
-> >
-> >         neigh->dce_mode = 0;
-> >
-> > +       rose_neigh_putex(&neigh);
-> >         rose_start_t0timer(neigh);
-> >  }
-> >
-> > --
-> > 2.43.0
-> >
+  WARNING: Prefer kstrto<type> to single variable sscanf
+  #240: FILE: drivers/net/ethernet/intel/i40e/i40e_debugfs.c:1655:
+  +               cnt = sscanf(&cmd_buf[11], "%i", &vsi_seid);
+
+  WARNING: Prefer kstrto<type> to single variable sscanf
+  #251: FILE: drivers/net/ethernet/intel/i40e/i40e_debugfs.c:1676:
+  +               cnt = sscanf(&cmd_buf[4], "%i", &vsi_seid);
+
+  total: 0 errors, 2 warnings, 0 checks, 194 lines checked
+
+Function kstrtoint() provides better error detection, overflow protection,
+and consistent error handling than sscanf(). Replace sscanf() with
+kstrtoint() in i40e_dbg_netdev_ops_write() to silence the checkpatch
+warnings.
+
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_debugfs.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+index c17b5d290f0a..2abd12b62509 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+@@ -1604,7 +1604,7 @@ static ssize_t i40e_dbg_netdev_ops_write(struct file *filp,
+ 	int bytes_not_copied;
+ 	struct i40e_vsi *vsi;
+ 	int vsi_seid;
+-	int i, cnt;
++	int i, ret;
+ 
+ 	/* don't allow partial writes */
+ 	if (*ppos != 0)
+@@ -1629,9 +1629,9 @@ static ssize_t i40e_dbg_netdev_ops_write(struct file *filp,
+ 	if (strncmp(cmd_buf, "change_mtu", 10) == 0) {
+ 		int mtu;
+ 
+-		cnt = sscanf(&cmd_buf[11], "%i %i",
++		ret = sscanf(&cmd_buf[11], "%i %i",
+ 			     &vsi_seid, &mtu);
+-		if (cnt != 2) {
++		if (ret != 2) {
+ 			dev_info(&pf->pdev->dev, "change_mtu <vsi_seid> <mtu>\n");
+ 			goto netdev_ops_write_done;
+ 		}
+@@ -1652,8 +1652,8 @@ static ssize_t i40e_dbg_netdev_ops_write(struct file *filp,
+ 		}
+ 
+ 	} else if (strncmp(cmd_buf, "set_rx_mode", 11) == 0) {
+-		cnt = sscanf(&cmd_buf[11], "%i", &vsi_seid);
+-		if (cnt != 1) {
++		ret = kstrtoint(&cmd_buf[11], 0, &vsi_seid);
++		if (ret) {
+ 			dev_info(&pf->pdev->dev, "set_rx_mode <vsi_seid>\n");
+ 			goto netdev_ops_write_done;
+ 		}
+@@ -1673,8 +1673,8 @@ static ssize_t i40e_dbg_netdev_ops_write(struct file *filp,
+ 		}
+ 
+ 	} else if (strncmp(cmd_buf, "napi", 4) == 0) {
+-		cnt = sscanf(&cmd_buf[4], "%i", &vsi_seid);
+-		if (cnt != 1) {
++		ret = kstrtoint(&cmd_buf[4], 0, &vsi_seid);
++		if (ret) {
+ 			dev_info(&pf->pdev->dev, "napi <vsi_seid>\n");
+ 			goto netdev_ops_write_done;
+ 		}
+-- 
+2.34.1
+
 
