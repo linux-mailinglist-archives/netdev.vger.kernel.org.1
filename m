@@ -1,63 +1,57 @@
-Return-Path: <netdev+bounces-232867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B16DAC098F0
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:36:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 044BDC098C9
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:35:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB5E61C831C8
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:27:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47C053B62B4
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:28:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62E5D30BBBD;
-	Sat, 25 Oct 2025 16:22:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B1C310768;
+	Sat, 25 Oct 2025 16:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ccVn/F8P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S2aayUqa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362973054D1;
-	Sat, 25 Oct 2025 16:22:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31C231064B;
+	Sat, 25 Oct 2025 16:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761409323; cv=none; b=Yi3tQJ41peLDE+/i46JS6xrjJLLp4PZ1t3IJZG2uTE0ItWRPJDn5vgCPTfTj8EW3WHktnd6oB82MAsGq3q+o2scNNhgZIj0awwPiLXNDCaYN/AMO+83mEE7yLgRFJR4OQfB5AQ3UwKYvGa2AndZWdYtFX9GlvRxhufymYw8TURY=
+	t=1761409340; cv=none; b=SN6OhUJGNiCX/7di58IyPpbHan39rWT6Ftvjv2uRHKuMBx99Lmq9gbV8NZHKXpdrQ21QQhg/AQxGg66YEBvMg6oipJP5fQasBXxAvXmPfcLNUZMr75Z/K3OCRdHs1Zbdu9PU7lgR9dxtzLqK1GpXgL6DG5XZYm7h7eZcZ1eOZv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761409323; c=relaxed/simple;
-	bh=BymGNPj82NaSFZQ2tSGRk2+TuheCQrfQdfZVGqDguuY=;
+	s=arc-20240116; t=1761409340; c=relaxed/simple;
+	bh=9OTVpVCF5DtNbGlQFrrxYxz6PfUX+wljjRCRcsw6P4E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O2ybpPUV8ByqUZrbOMyvn3Wvnn8MlzZ92oerYa458eBv44FSo/ku2QTjJB0K8DONN9cwsH8pZuqPdDDcEpoweLBeZDKH7MFkqIVTQFtcvhvfWUSEvcpOH/zzHSqwnTqUunO+l0IXkuWmtCi+01xAOIn7TfS68ehne5+tOVtXAx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ccVn/F8P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAB71C2BCB8;
-	Sat, 25 Oct 2025 16:22:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=eIuQFJpE0XHOHhyPHa3+v0YqJypUm39j4MDgqg8/VmFddxs3Z+UGRf6DWBwv1qnQLb++EKIcz2i+rD5qKsZkAq8U0oAgxHmJPs52k+cyqGtSJSNeyfTYe+EuCbA0ZsowMCzw1vKG7ZS0heSbSeAWS6I4dX9Hp/REB9MmMmn7/eA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S2aayUqa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D938C4CEF5;
+	Sat, 25 Oct 2025 16:22:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761409323;
-	bh=BymGNPj82NaSFZQ2tSGRk2+TuheCQrfQdfZVGqDguuY=;
+	s=k20201202; t=1761409339;
+	bh=9OTVpVCF5DtNbGlQFrrxYxz6PfUX+wljjRCRcsw6P4E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ccVn/F8PQLXJIvD5+umydTKp462BojBiCWfuj2KMaBBhsMIbRrNJDvSPsuTAhQZu/
-	 W0pmwom++rKoQxgeBWQIdx8FWBr6EyQMlb190mN4WgsHAJ8ogI13cE4n6cZZpcB/S0
-	 3Fx6UY2/aKpOVCvQCyEQ1St9XTu2ePzQ2laXthyPZc3A2i5HkkqGVZ5DMe2EkY2YSo
-	 yOXiDN9vRMm04fEH1X6+Xl5yPrAAiO1U7J7T8T3UvDnJ1WT8kjCBczKnWwWHwl+40C
-	 RYDR0CvLtrS9chl7DWIb/RcmSad7VWr1mz9ICqLY+5l7iRJl24qZkSwG8WNxj6wDjt
-	 ArfXXI+S8IE1A==
+	b=S2aayUqanR4cWZU0O4+hJyJR0CIwKqrfrBF8qsbm53SBoKvG30mPmRKlWbo7N6ZsN
+	 nnS1NeQG3dr1pj7jvdTuWecZnvpsTqcczWjcxKSFHePdcRDj95yiBG4/uOD+uuSKKm
+	 bzmE4UMOc7RXZdvTsIsB3c1mBqL3H4YZLExaM+hxL6SPIKBt1rnxXBkLoiTghnsk09
+	 yV0ijf2VXDL1hD6bhIOrkz77JOiq2Lkvw4bKQGG1mYp1Xv3KP4PXtKsW0+kcbmDD9G
+	 E150yzDW5u4tZEn0QLsa6wmq/oP1y7cl+f8gVIpkXHGZD33ZZFMoldOqgFopoe0FXP
+	 JNUr++mC093vA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Jianbo Liu <jianbol@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>,
-	Jiri Pirko <jiri@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
+Cc: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	saeedm@nvidia.com,
-	mbloch@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17] net/mlx5e: Prevent entering switchdev mode with inconsistent netns
-Date: Sat, 25 Oct 2025 11:58:30 -0400
-Message-ID: <20251025160905.3857885-279-sashal@kernel.org>
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.17-6.12] microchip: lan865x: add ndo_eth_ioctl handler to enable PHY ioctl support
+Date: Sat, 25 Oct 2025 11:58:36 -0400
+Message-ID: <20251025160905.3857885-285-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -73,36 +67,23 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Jianbo Liu <jianbol@nvidia.com>
+From: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
 
-[ Upstream commit 06fdc45f16c392dc3394c67e7c17ae63935715d3 ]
+[ Upstream commit 34c21e91192aa1ff66f9d6cef8132717840d04e6 ]
 
-When a PF enters switchdev mode, its netdevice becomes the uplink
-representor but remains in its current network namespace. All other
-representors (VFs, SFs) are created in the netns of the devlink
-instance.
+Introduce support for standard MII ioctl operations in the LAN865x
+Ethernet driver by implementing the .ndo_eth_ioctl callback. This allows
+PHY-related ioctl commands to be handled via phy_do_ioctl_running() and
+enables support for ethtool and other user-space tools that rely on ioctl
+interface to perform PHY register access using commands like SIOCGMIIREG
+and SIOCSMIIREG.
 
-If the PF's netns has been moved and differs from the devlink's netns,
-enabling switchdev mode would create a state where the OVS control
-plane (ovs-vsctl) cannot manage the switch because the PF uplink
-representor and the other representors are split across different
-namespaces.
+This feature enables improved diagnostics and PHY configuration
+capabilities from userspace.
 
-To prevent this inconsistent configuration, block the request to enter
-switchdev mode if the PF netdevice's netns does not match the netns of
-its devlink instance.
-
-As part of this change, the PF's netns is first marked as immutable.
-This prevents race conditions where the netns could be changed after
-the check is performed but before the mode transition is complete, and
-it aligns the PF's behavior with that of the final uplink representor.
-
-Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Link: https://patch.msgid.link/1759094723-843774-3-git-send-email-tariqt@nvidia.com
+Signed-off-by: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Link: https://patch.msgid.link/20250828114549.46116-1-parthiban.veerasooran@microchip.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -110,92 +91,74 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 LLM Generated explanations, may be completely bogus:
 
 YES
-**Why Backport**
-- Rejects switchdev activation when the PF netdev sits in a different
-  netns than the devlink instance, avoiding the broken state where OVS
-  loses control of the split representors (`drivers/net/ethernet/mellano
-  x/mlx5/core/eswitch_offloads.c:3842-3847`).
-- New helper grabs the uplink netdev safely via the existing ref-counted
-  accessor and sets `netns_immutable` under RTNL so the PF behaves like
-  the eventual uplink representor, while immediately detecting namespace
-  divergence (`drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.
-  c:3777-3797`;
-  `drivers/net/ethernet/mellanox/mlx5/core/lib/mlx5.h:48-64`).
-- If the mode change later fails, the helper rolls the flag back to keep
-  legacy behavior untouched; successful transitions keep the flag set,
-  matching switchdev guidance to freeze port namespaces (`drivers/net/et
-  hernet/mellanox/mlx5/core/eswitch_offloads.c:3867-3869`;
-  `Documentation/networking/switchdev.rst:130-143`).
-- Locking the namespace leverages the core check that rejects moves of
-  immutable interfaces (`net/core/dev.c:12352-12355`), eliminating the
-  race window the commit message highlights without touching data-path
-  code.
-- The change is tightly scoped to the mode-set path, has no dependencies
-  on new infrastructure, and fixes a long-standing, user-visible bug
-  with minimal regression risk—strong fit for stable kernels that ship
-  mlx5 switchdev support.
 
- .../mellanox/mlx5/core/eswitch_offloads.c     | 33 +++++++++++++++++++
- 1 file changed, 33 insertions(+)
+Rationale
+- What changed: The driver adds a single netdev op in
+  drivers/net/ethernet/microchip/lan865x/lan865x.c to forward Ethernet
+  ioctls to the PHY layer:
+  - drivers/net/ethernet/microchip/lan865x/lan865x.c:330 sets
+    `.ndo_eth_ioctl = phy_do_ioctl_running,` alongside existing ops such
+    as `.ndo_open`, `.ndo_stop`, and `.ndo_set_mac_address`.
+- Behavior enabled: With `.ndo_eth_ioctl` wired to
+  `phy_do_ioctl_running`, standard MII ioctls are handled by the PHY
+  core’s generic handler, enabling tools to read/write PHY registers:
+  - `phy_do_ioctl_running()` checks the device is up (`netif_running`)
+    and defers to `phy_do_ioctl()` (drivers/net/phy/phy.c:456).
+  - `phy_do_ioctl()` dispatches to `phy_mii_ioctl()`, which implements
+    SIOCGMIIPHY/SIOCGMIIREG/SIOCSMIIREG and hwtstamp handling
+    (drivers/net/phy/phy.c:310, 322, 326, 345, 407).
+- Preconditions are satisfied in this driver: The LAN865x stack actually
+  attaches a PHY to the netdev via the OA-TC6 framework, so
+  `dev->phydev` is valid:
+  - `phy_connect_direct(tc6->netdev, tc6->phydev, ...)` in
+    drivers/net/ethernet/oa_tc6.c:565 ensures the PHY is registered and
+    attached, making the generic PHY ioctl path applicable.
+- User impact fixed: Without this hook, standard userspace
+  diagnostics/configuration via ioctl (mii-tool, legacy ethtool ioctl
+  paths, register access) fail against this device. Enabling
+  `.ndo_eth_ioctl` restores expected, widely used functionality for PHY
+  access (SIOCGMIIREG/SIOCSMIIREG).
+- Small, low-risk change:
+  - Single-line addition in the driver’s `net_device_ops`, no
+    architectural changes, no behavioral changes in normal TX/RX paths.
+  - The chosen helper is the conservative variant:
+    `phy_do_ioctl_running()` returns `-ENODEV` if the interface is down
+    (drivers/net/phy/phy.c:456), reducing risk.
+  - This pattern is standard across many Ethernet drivers (e.g.,
+    drivers/net/usb/lan78xx.c:4600,
+    drivers/net/ethernet/ti/cpsw_new.c:1135), indicating established
+    practice and low regression potential.
+- Stable criteria fit:
+  - Fixes a user-visible deficiency (inability to use standard PHY
+    ioctls) with a minimal, contained change.
+  - No new kernel ABI; it wires the driver into existing, generic PHY
+    ioctl support.
+  - Touches only one driver; no core subsystem churn.
+  - Although the commit message frames it as “introduce support,”
+    functionally it corrects missing standard behavior expected by
+    tooling, which is commonly accepted as a fix.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-index f358e8fe432cf..59a1a3a5fc8b5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-@@ -3739,6 +3739,29 @@ void mlx5_eswitch_unblock_mode(struct mlx5_core_dev *dev)
- 	up_write(&esw->mode_lock);
- }
+Recommendation
+- Backport to stable series that include both the LAN865x driver and the
+  `ndo_eth_ioctl`/`phy_do_ioctl_running` API (for older series lacking
+  `ndo_eth_ioctl`, the analogous `.ndo_do_ioctl = phy_do_ioctl_running`
+  pattern may be necessary).
+
+ drivers/net/ethernet/microchip/lan865x/lan865x.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/microchip/lan865x/lan865x.c b/drivers/net/ethernet/microchip/lan865x/lan865x.c
+index 79b800d2b72c2..b428ad6516c5e 100644
+--- a/drivers/net/ethernet/microchip/lan865x/lan865x.c
++++ b/drivers/net/ethernet/microchip/lan865x/lan865x.c
+@@ -326,6 +326,7 @@ static const struct net_device_ops lan865x_netdev_ops = {
+ 	.ndo_start_xmit		= lan865x_send_packet,
+ 	.ndo_set_rx_mode	= lan865x_set_multicast_list,
+ 	.ndo_set_mac_address	= lan865x_set_mac_address,
++	.ndo_eth_ioctl          = phy_do_ioctl_running,
+ };
  
-+/* Returns false only when uplink netdev exists and its netns is different from
-+ * devlink's netns. True for all others so entering switchdev mode is allowed.
-+ */
-+static bool mlx5_devlink_netdev_netns_immutable_set(struct devlink *devlink,
-+						    bool immutable)
-+{
-+	struct mlx5_core_dev *mdev = devlink_priv(devlink);
-+	struct net_device *netdev;
-+	bool ret;
-+
-+	netdev = mlx5_uplink_netdev_get(mdev);
-+	if (!netdev)
-+		return true;
-+
-+	rtnl_lock();
-+	netdev->netns_immutable = immutable;
-+	ret = net_eq(dev_net(netdev), devlink_net(devlink));
-+	rtnl_unlock();
-+
-+	mlx5_uplink_netdev_put(mdev, netdev);
-+	return ret;
-+}
-+
- int mlx5_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 				  struct netlink_ext_ack *extack)
- {
-@@ -3781,6 +3804,14 @@ int mlx5_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 	esw->eswitch_operation_in_progress = true;
- 	up_write(&esw->mode_lock);
- 
-+	if (mode == DEVLINK_ESWITCH_MODE_SWITCHDEV &&
-+	    !mlx5_devlink_netdev_netns_immutable_set(devlink, true)) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Can't change E-Switch mode to switchdev when netdev net namespace has diverged from the devlink's.");
-+		err = -EINVAL;
-+		goto skip;
-+	}
-+
- 	if (mode == DEVLINK_ESWITCH_MODE_LEGACY)
- 		esw->dev->priv.flags |= MLX5_PRIV_FLAGS_SWITCH_LEGACY;
- 	mlx5_eswitch_disable_locked(esw);
-@@ -3799,6 +3830,8 @@ int mlx5_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 	}
- 
- skip:
-+	if (mode == DEVLINK_ESWITCH_MODE_SWITCHDEV && err)
-+		mlx5_devlink_netdev_netns_immutable_set(devlink, false);
- 	down_write(&esw->mode_lock);
- 	esw->eswitch_operation_in_progress = false;
- unlock:
+ static int lan865x_probe(struct spi_device *spi)
 -- 
 2.51.0
 
