@@ -1,64 +1,59 @@
-Return-Path: <netdev+bounces-232842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0083C093BA
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:14:52 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F281C09433
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:17:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01CD01895732
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:12:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0858B4F1C50
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:12:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3EFC303CAB;
-	Sat, 25 Oct 2025 16:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE446303A1A;
+	Sat, 25 Oct 2025 16:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Goe8MHMI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WvVWU99+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F7F2F5B;
-	Sat, 25 Oct 2025 16:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FEA21767C;
+	Sat, 25 Oct 2025 16:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761408701; cv=none; b=U2Z3ddL65rIxJAwpKgxOjp7z5D/pvTRMG3EPgj4rIVOKQ7euCCF9Y67KLDtv1MzjVSdZ27eGx6EHCbaWu9hCZxwJ9N+/AHc351evCuTEcwwBSTCfvibDWozYv2Ox8b008lRVEOp8X0FmPWmUR+dqa14ffHPuFgRdZ9ftKj8E16I=
+	t=1761408714; cv=none; b=WmDdhv1iwufu4vnSEkRhbL1ZH1QNMt5VyZ3N8QvC9Zt3q8yU5d+WffjzAr6S1y1fmJqgogbiwLSr8Wzgk5IelJEViGSn8v7lKVtBZ3nAmDwk1qVNO+W4FuJIi74S1IRXg0uH8edHTwJeR7Zq1MYZESMJa55nsr43/hikOARygKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761408701; c=relaxed/simple;
-	bh=c+KxOQM1hdqOoWL5E0ejofcyZci2aCqJVEcaq1R1KPg=;
+	s=arc-20240116; t=1761408714; c=relaxed/simple;
+	bh=ml5iXBgMekbfkEjlemxXrIQft3qOOZyOi21L6BZUmsk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MQeb8QU+fwuXgdKLfYYdfKFYU3o9h8D3lLyk/j/QG8KsajF/amjuSkcmELhd4NhhWITVztoutp2Lmq5nSaLiDsx5pR3ZCc5GRabUyZHLh1O/QrwFA05v3AXLZvKc70+wbxA1LLj1ew5ZIZ6L59srjLk5x0j4WxZFCcgGlSkpAfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Goe8MHMI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07D5BC4CEF5;
-	Sat, 25 Oct 2025 16:11:39 +0000 (UTC)
+	 MIME-Version:Content-Type; b=LrMPiUfHDJWw9MOqbjdPZBWKo832UTsXF2c1rcadnFSeCCJz3ToAO2SXGJNkw2vFuHNVlmge3POTi8wl0Pe/p2C5Lynj8NhG6fPw1q8nAxlo6mRka2i+F+/6lB3NgbN+Rxzn5otVzEXjPVSvGx9oqOKRyh2InxPddzVem+nlttI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WvVWU99+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58832C4CEFB;
+	Sat, 25 Oct 2025 16:11:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761408701;
-	bh=c+KxOQM1hdqOoWL5E0ejofcyZci2aCqJVEcaq1R1KPg=;
+	s=k20201202; t=1761408714;
+	bh=ml5iXBgMekbfkEjlemxXrIQft3qOOZyOi21L6BZUmsk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Goe8MHMI8QdZWY3cQDSlfGKv3+k0MBvjMtwN7DaB2mIgFOfQ0ofK5tbzPGva/5l/l
-	 jolb6n78IxeXy5OjqjKfJxGo7mjMgAA39BQcAEKVEdlHTec9n6yTUJjkIGW2M4rW2U
-	 XBpTneF8+dn0O+Jxm7y6Wy/yJkjinluvEZ7Gz24gbGSaWaMkJuEP7YdXnNRYztSBTU
-	 QLedoWpgFRyjE6R6OQXjw/3uuEcsYd6ikcdn8geQmyJXpHywXRGw2YLQnVUqvENufE
-	 SMtYhcY4gHk1YuH4cmVbzZ/wmpm0G5FidKvDe2NtHLayhCnAhwqs92n1fnJfyudqZD
-	 ZM+OuG2BZNkCw==
+	b=WvVWU99+OHvQp7Zvufn36u+2T0hnq76OMMot4WyR1hjBkUh/zZw2uLNFy589OdngP
+	 Vt7KUHP+BgkxjG+VMEEplyQnXQVsgggeuQrp/MPdEYK9h6VwZ0VDfKaCV9I/tskvdX
+	 THkptY3aIDNhueovVgw3WJ9ArXNPOyuz8RV9WUsrDJWcTeG7KLWonHk1gsbVjfDVy6
+	 1O1OdqO0SjYB+FkqdU15PUdYruIH9KRdrFtkqyQgRwjrNxEDpVWxTI+jJfglDkgtoX
+	 ZPOjD3nEgPXt+O/HvSn2j5fRTybtJr8cwk4GDQX9tlV1RuQ45BApec4qOF5jzvGE1+
+	 YYsxxGkBykOTw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Lukas Wunner <lukas@wunner.de>,
-	Bjorn Helgaas <bhelgaas@google.com>,
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	shshaikh@marvell.com,
-	manishc@marvell.com,
-	GR-Linux-NIC-Dev@marvell.com,
-	mahesh@linux.ibm.com,
-	njavali@marvell.com,
-	GR-QLogic-Storage-Upstream@marvell.com,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-6.12] PCI/ERR: Update device error_state already after reset
-Date: Sat, 25 Oct 2025 11:54:37 -0400
-Message-ID: <20251025160905.3857885-46-sashal@kernel.org>
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.17-6.1] selftests: net: replace sleeps in fcnal-test with waits
+Date: Sat, 25 Oct 2025 11:54:41 -0400
+Message-ID: <20251025160905.3857885-50-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -74,42 +69,17 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Lukas Wunner <lukas@wunner.de>
+From: Jakub Kicinski <kuba@kernel.org>
 
-[ Upstream commit 45bc82563d5505327d97963bc54d3709939fa8f8 ]
+[ Upstream commit 15c068cb214d74a2faca9293b25f454242d0d65e ]
 
-After a Fatal Error has been reported by a device and has been recovered
-through a Secondary Bus Reset, AER updates the device's error_state to
-pci_channel_io_normal before invoking its driver's ->resume() callback.
+fcnal-test.sh already includes lib.sh, use relevant helpers
+instead of sleeping. Replace sleep after starting nettest
+as a server with wait_local_port_listen.
 
-By contrast, EEH updates the error_state earlier, namely after resetting
-the device and before invoking its driver's ->slot_reset() callback.
-Commit c58dc575f3c8 ("powerpc/pseries: Set error_state to
-pci_channel_io_normal in eeh_report_reset()") explains in great detail
-that the earlier invocation is necessitated by various drivers checking
-accessibility of the device with pci_channel_offline() and avoiding
-accesses if it returns true.  It returns true for any other error_state
-than pci_channel_io_normal.
-
-The device should be accessible already after reset, hence the reasoning
-is that it's safe to update the error_state immediately afterwards.
-
-This deviation between AER and EEH seems problematic because drivers
-behave differently depending on which error recovery mechanism the
-platform uses.  Three drivers have gone so far as to update the
-error_state themselves, presumably to work around AER's behavior.
-
-For consistency, amend AER to update the error_state at the same recovery
-steps as EEH.  Drop the now unnecessary workaround from the three drivers.
-
-Keep updating the error_state before ->resume() in case ->error_detected()
-or ->mmio_enabled() return PCI_ERS_RESULT_RECOVERED, which causes
-->slot_reset() to be skipped.  There are drivers doing this even for Fatal
-Errors, e.g. mhi_pci_error_detected().
-
-Signed-off-by: Lukas Wunner <lukas@wunner.de>
-Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
-Link: https://patch.msgid.link/4517af6359ffb9d66152b827a5d2833459144e3f.1755008151.git.lukas@wunner.de
+Reviewed-by: David Ahern <dsahern@kernel.org>
+Link: https://patch.msgid.link/20250909223837.863217-1-kuba@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
@@ -117,149 +87,1889 @@ LLM Generated explanations, may be completely bogus:
 
 YES
 
-- Summary
-  - Fixes a long-standing AER vs EEH inconsistency by setting
-    `dev->error_state = pci_channel_io_normal` immediately after reset
-    (before `->slot_reset()`), matching EEH behavior and removing per-
-    driver hacks.
-  - Small, targeted behavioral fix that improves error recovery
-    reliability for drivers that gate hardware access on
-    `pci_channel_offline()`.
+Explanation
+- What changed: Replaces fixed sleeps after starting nettest servers
+  with explicit readiness waits via lib.sh’s helper. Example
+  conversions:
+  - TCP example: tools/testing/selftests/net/fcnal-test.sh:880 waits for
+    server in `NSA` to LISTEN on `12345` before client connects.
+  - UDP example: tools/testing/selftests/net/fcnal-test.sh:1527 uses
+    `udp` to wait for the bound socket.
+  - Server in peer namespace: tools/testing/selftests/net/fcnal-
+    test.sh:1226 uses `${NSB}` to wait on the correct namespace.
+  - Port chosen dynamically: tools/testing/selftests/net/fcnal-
+    test.sh:4226, tools/testing/selftests/net/fcnal-test.sh:4231 wait on
+    `${port}`.
 
-- Why it’s a bug
-  - Under AER, `error_state` was previously restored to normal only
-    before `->resume()`, causing `pci_channel_offline()` to return true
-    during `->slot_reset()`. Drivers that correctly re-initialize
-    hardware in `->slot_reset()` could incorrectly self-gate and skip
-    needed accesses.
-  - EEH has set `error_state` to normal before `->slot_reset()` since
-    c58dc575f3c8 for exactly this reason. The mismatch forces drivers to
-    add workarounds under AER.
+- Why it’s safer: The helper `wait_local_port_listen()` is already
+  provided by the shared test library and included at the top of the
+  script:
+  - Sourced: tools/testing/selftests/net/fcnal-test.sh:40
+  - Helper definition: tools/testing/selftests/net/lib.sh:628 checks
+    `/proc/net/{tcp,udp}` in the proper namespace; for TCP it ensures
+    state `0A` (LISTEN).
+  - Many other selftests already rely on this helper, e.g.
+    tools/testing/selftests/net/tfo_passive.sh:89 and
+    tools/testing/selftests/net/udpgro.sh:54, so usage is consistent and
+    field-tested.
 
-- What changes (code specifics)
-  - Core AER: Set `error_state` early in the slot-reset phase
-    - Adds early state transition in `report_slot_reset()` so drivers
-      see the device as online during `->slot_reset()`:
-      - `drivers/pci/pcie/err.c:156`: `if (!pci_dev_set_io_state(dev,
-        pci_channel_io_normal) || !pdrv || !pdrv->err_handler ||
-        !pdrv->err_handler->slot_reset) goto out;`
-    - Keeps the existing update before `->resume()` to cover flows where
-      `->slot_reset()` is skipped (e.g., when `->error_detected()` or
-      `->mmio_enabled()` returns RECOVERED):
-      - `drivers/pci/pcie/err.c:170`: `if (!pci_dev_set_io_state(dev,
-        pci_channel_io_normal) || ... ) goto out;`
-    - Transition gating is safe: `pci_dev_set_io_state()` only returns
-      false for `pci_channel_io_perm_failure` (see semantics in
-      `drivers/pci/pci.h:456`), so we avoid calling `->slot_reset()` on
-      permanently failed devices (sensible safety net).
-  - Remove driver workarounds that manually forced `error_state =
-    normal`
-    - QLogic qlcnic:
-      - `drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c:4218`:
-        remove `pdev->error_state = pci_channel_io_normal;` from
-        `qlcnic_83xx_io_slot_reset()`.
-      - `drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c:3770`: remove
-        `pdev->error_state = pci_channel_io_normal;` from
-        `qlcnic_attach_func()` (used in 82xx `->slot_reset()` path at
-        `...:3864`).
-    - QLogic qla2xxx:
-      - `drivers/scsi/qla2xxx/qla_os.c:7902`: remove the workaround and
-        comment in `qla2xxx_pci_slot_reset()` that set
-        `pdev->error_state = pci_channel_io_normal;` to avoid mailbox
-        timeouts.
-  - The commit also notes drivers like MHI can return RECOVERED from
-    `->error_detected()`, skipping `->slot_reset()`; the resume-path
-    normalization remains to handle that path correctly (consistent with
-    code in `drivers/pci/pcie/err.c:170`).
+- Impact and risk:
+  - Selftests-only; no kernel code changes. Improves determinism and
+    reduces flakiness by waiting for readiness instead of sleeping a
+    fixed time.
+  - The helper polls up to ~1s total (10×0.1s); previous code slept 1s
+    unconditionally. This is strictly better or equal in both speed and
+    reliability.
+  - Correct protocol is used (`tcp` vs `udp`) and correct namespace is
+    passed in each updated call, matching where the server was started
+    (e.g., tools/testing/selftests/net/fcnal-test.sh:1218–1231,
+    1514–1532).
+  - Minor nit: one commented-out negative-test block gained an
+    uncommented wait, adding up to ~1s overhead even though the server
+    isn’t started (tools/testing/selftests/net/fcnal-test.sh:3164–3170).
+    This does not affect correctness, only adds a small delay; it’s
+    acceptable but could be trivially cleaned in a follow-up.
 
-- Risk/compatibility assessment
-  - Scope is minimal and contained: a single earlier state transition in
-    core AER and removal of redundant per-driver hacks.
-  - Aligns AER with EEH behavior proven since 2009 (c58dc575f3c8),
-    reducing platform-dependent behavioral differences in recovery
-    paths.
-  - Drivers that previously avoided IO in `->slot_reset()` because
-    `pci_channel_offline()` returned true will now proceed as intended
-    once the device is reset and accessible. This improves recovery
-    success rates rather than risking harm.
-  - The core change is guarded by `pci_dev_set_io_state()` semantics; it
-    will not “normalize” devices in permanent failure.
-  - No new features or architectural changes; no ABI/API changes.
+- Stable backport criteria:
+  - Important test reliability improvement; small, contained to
+    selftests; no API or architectural changes; minimal risk of
+    regression.
+  - The required helper exists in the same tree
+    (tools/testing/selftests/net/lib.sh:628). For older stable branches,
+    ensure lib.sh already contains this helper; for current 6.17 it
+    does.
 
-- Backport assessment
-  - Fixes real recovery failures/workarounds (e.g., qla2xxx mailbox
-    timeouts), affects users, and reduces platform-specific divergence
-    in error recovery semantics.
-  - Change is small and surgical; drivers touched only remove redundant
-    assignments now handled in the core.
-  - Even in stable, these driver-line removals are safe once the core
-    change is present; alternatively, stable could carry just the core
-    change and leave driver workarounds (harmless duplication). As a
-    single commit, it remains suitable.
-  - While the commit message snippet doesn’t show a “Fixes:” or “Cc:
-    stable” tag, the rationale, history, and limited blast radius make
-    it an appropriate stable backport candidate.
+Conclusion
+- This is a good, low-risk selftests improvement that reduces flakiness
+  and aligns with existing patterns. Recommend backporting to stable.
 
- drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c | 1 -
- drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c    | 2 --
- drivers/pci/pcie/err.c                              | 3 ++-
- drivers/scsi/qla2xxx/qla_os.c                       | 5 -----
- 4 files changed, 2 insertions(+), 9 deletions(-)
+ tools/testing/selftests/net/fcnal-test.sh | 428 +++++++++++-----------
+ 1 file changed, 214 insertions(+), 214 deletions(-)
 
-diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c
-index d7cdea8f604d0..91e7b38143ead 100644
---- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c
-+++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c
-@@ -4215,7 +4215,6 @@ static pci_ers_result_t qlcnic_83xx_io_slot_reset(struct pci_dev *pdev)
- 	struct qlcnic_adapter *adapter = pci_get_drvdata(pdev);
- 	int err = 0;
+diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testing/selftests/net/fcnal-test.sh
+index 4fcc38907e48e..f0fb114764b24 100755
+--- a/tools/testing/selftests/net/fcnal-test.sh
++++ b/tools/testing/selftests/net/fcnal-test.sh
+@@ -875,7 +875,7 @@ ipv4_tcp_md5_novrf()
+ 	# basic use case
+ 	log_start
+ 	run_cmd nettest -s -M ${MD5_PW} -m ${NSB_IP} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: Single address config"
  
--	pdev->error_state = pci_channel_io_normal;
- 	err = pci_enable_device(pdev);
- 	if (err)
- 		goto disconnect;
-diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c
-index 53cdd36c41236..e051d8c7a28d6 100644
---- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c
-+++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c
-@@ -3766,8 +3766,6 @@ static int qlcnic_attach_func(struct pci_dev *pdev)
- 	struct qlcnic_adapter *adapter = pci_get_drvdata(pdev);
- 	struct net_device *netdev = adapter->netdev;
+@@ -883,7 +883,7 @@ ipv4_tcp_md5_novrf()
+ 	log_start
+ 	show_hint "Should timeout due to MD5 mismatch"
+ 	run_cmd nettest -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: Server no config, client uses password"
  
--	pdev->error_state = pci_channel_io_normal;
--
- 	err = pci_enable_device(pdev);
- 	if (err)
- 		return err;
-diff --git a/drivers/pci/pcie/err.c b/drivers/pci/pcie/err.c
-index a4990c9ad493a..e85b9cd5fec1b 100644
---- a/drivers/pci/pcie/err.c
-+++ b/drivers/pci/pcie/err.c
-@@ -141,7 +141,8 @@ static int report_slot_reset(struct pci_dev *dev, void *data)
+@@ -891,7 +891,7 @@ ipv4_tcp_md5_novrf()
+ 	log_start
+ 	show_hint "Should timeout since client uses wrong password"
+ 	run_cmd nettest -s -M ${MD5_PW} -m ${NSB_IP} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_WRONG_PW}
+ 	log_test $? 2 "MD5: Client uses wrong password"
  
- 	device_lock(&dev->dev);
- 	pdrv = dev->driver;
--	if (!pdrv || !pdrv->err_handler || !pdrv->err_handler->slot_reset)
-+	if (!pci_dev_set_io_state(dev, pci_channel_io_normal) ||
-+	    !pdrv || !pdrv->err_handler || !pdrv->err_handler->slot_reset)
- 		goto out;
+@@ -899,7 +899,7 @@ ipv4_tcp_md5_novrf()
+ 	log_start
+ 	show_hint "Should timeout due to MD5 mismatch"
+ 	run_cmd nettest -s -M ${MD5_PW} -m ${NSB_LO_IP} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: Client address does not match address configured with password"
  
- 	err_handler = pdrv->err_handler;
-diff --git a/drivers/scsi/qla2xxx/qla_os.c b/drivers/scsi/qla2xxx/qla_os.c
-index d4b484c0fd9d7..4460421834cb2 100644
---- a/drivers/scsi/qla2xxx/qla_os.c
-+++ b/drivers/scsi/qla2xxx/qla_os.c
-@@ -7883,11 +7883,6 @@ qla2xxx_pci_slot_reset(struct pci_dev *pdev)
- 	       "Slot Reset.\n");
+@@ -910,7 +910,7 @@ ipv4_tcp_md5_novrf()
+ 	# client in prefix
+ 	log_start
+ 	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest  -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: Prefix config"
  
- 	ha->pci_error_state = QLA_PCI_SLOT_RESET;
--	/* Workaround: qla2xxx driver which access hardware earlier
--	 * needs error state to be pci_channel_io_online.
--	 * Otherwise mailbox command timesout.
--	 */
--	pdev->error_state = pci_channel_io_normal;
+@@ -918,7 +918,7 @@ ipv4_tcp_md5_novrf()
+ 	log_start
+ 	show_hint "Should timeout since client uses wrong password"
+ 	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_WRONG_PW}
+ 	log_test $? 2 "MD5: Prefix config, client uses wrong password"
  
- 	pci_restore_state(pdev);
+@@ -926,7 +926,7 @@ ipv4_tcp_md5_novrf()
+ 	log_start
+ 	show_hint "Should timeout due to MD5 mismatch"
+ 	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -c ${NSB_LO_IP} -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: Prefix config, client address not in configured prefix"
+ }
+@@ -943,7 +943,7 @@ ipv4_tcp_md5()
+ 	# basic use case
+ 	log_start
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: VRF: Single address config"
+ 
+@@ -951,7 +951,7 @@ ipv4_tcp_md5()
+ 	log_start
+ 	show_hint "Should timeout since server does not have MD5 auth"
+ 	run_cmd nettest -s -I ${VRF} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: VRF: Server no config, client uses password"
+ 
+@@ -959,7 +959,7 @@ ipv4_tcp_md5()
+ 	log_start
+ 	show_hint "Should timeout since client uses wrong password"
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_WRONG_PW}
+ 	log_test $? 2 "MD5: VRF: Client uses wrong password"
+ 
+@@ -967,7 +967,7 @@ ipv4_tcp_md5()
+ 	log_start
+ 	show_hint "Should timeout since server config differs from client"
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_LO_IP} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: VRF: Client address does not match address configured with password"
+ 
+@@ -978,7 +978,7 @@ ipv4_tcp_md5()
+ 	# client in prefix
+ 	log_start
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest  -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: VRF: Prefix config"
+ 
+@@ -986,7 +986,7 @@ ipv4_tcp_md5()
+ 	log_start
+ 	show_hint "Should timeout since client uses wrong password"
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_WRONG_PW}
+ 	log_test $? 2 "MD5: VRF: Prefix config, client uses wrong password"
+ 
+@@ -994,7 +994,7 @@ ipv4_tcp_md5()
+ 	log_start
+ 	show_hint "Should timeout since client address is outside of prefix"
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -c ${NSB_LO_IP} -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: VRF: Prefix config, client address not in configured prefix"
+ 
+@@ -1005,14 +1005,14 @@ ipv4_tcp_md5()
+ 	log_start
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP} &
+ 	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NSB_IP} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest  -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: VRF: Single address config in default VRF and VRF, conn in VRF"
+ 
+ 	log_start
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP} &
+ 	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NSB_IP} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsc nettest  -r ${NSA_IP} -X ${MD5_WRONG_PW}
+ 	log_test $? 0 "MD5: VRF: Single address config in default VRF and VRF, conn in default VRF"
+ 
+@@ -1020,7 +1020,7 @@ ipv4_tcp_md5()
+ 	show_hint "Should timeout since client in default VRF uses VRF password"
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP} &
+ 	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NSB_IP} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsc nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: VRF: Single address config in default VRF and VRF, conn in default VRF with VRF pw"
+ 
+@@ -1028,21 +1028,21 @@ ipv4_tcp_md5()
+ 	show_hint "Should timeout since client in VRF uses default VRF password"
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP} &
+ 	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NSB_IP} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_WRONG_PW}
+ 	log_test $? 2 "MD5: VRF: Single address config in default VRF and VRF, conn in VRF with default VRF pw"
+ 
+ 	log_start
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
+ 	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NS_NET} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest  -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: VRF: Prefix config in default VRF and VRF, conn in VRF"
+ 
+ 	log_start
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
+ 	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NS_NET} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsc nettest  -r ${NSA_IP} -X ${MD5_WRONG_PW}
+ 	log_test $? 0 "MD5: VRF: Prefix config in default VRF and VRF, conn in default VRF"
+ 
+@@ -1050,7 +1050,7 @@ ipv4_tcp_md5()
+ 	show_hint "Should timeout since client in default VRF uses VRF password"
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
+ 	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NS_NET} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsc nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: VRF: Prefix config in default VRF and VRF, conn in default VRF with VRF pw"
+ 
+@@ -1058,7 +1058,7 @@ ipv4_tcp_md5()
+ 	show_hint "Should timeout since client in VRF uses default VRF password"
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
+ 	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NS_NET} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_WRONG_PW}
+ 	log_test $? 2 "MD5: VRF: Prefix config in default VRF and VRF, conn in VRF with default VRF pw"
+ 
+@@ -1082,14 +1082,14 @@ test_ipv4_md5_vrf__vrf_server__no_bind_ifindex()
+ 	log_start
+ 	show_hint "Simulates applications using VRF without TCP_MD5SIG_FLAG_IFINDEX"
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} --no-bind-key-ifindex &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: VRF: VRF-bound server, unbound key accepts connection"
+ 
+ 	log_start
+ 	show_hint "Binding both the socket and the key is not required but it works"
+ 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} --force-bind-key-ifindex &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: VRF: VRF-bound server, bound key accepts connection"
+ }
+@@ -1103,25 +1103,25 @@ test_ipv4_md5_vrf__global_server__bind_ifindex0()
+ 
+ 	log_start
+ 	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} --force-bind-key-ifindex &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: VRF: Global server, Key bound to ifindex=0 rejects VRF connection"
+ 
+ 	log_start
+ 	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} --force-bind-key-ifindex &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsc nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: VRF: Global server, key bound to ifindex=0 accepts non-VRF connection"
+ 	log_start
+ 
+ 	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} --no-bind-key-ifindex &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: VRF: Global server, key not bound to ifindex accepts VRF connection"
+ 
+ 	log_start
+ 	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} --no-bind-key-ifindex &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsc nettest -r ${NSA_IP} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: VRF: Global server, key not bound to ifindex accepts non-VRF connection"
+ 
+@@ -1193,7 +1193,7 @@ ipv4_tcp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -r ${a}
+ 		log_test_addr ${a} $? 0 "Global server"
+ 	done
+@@ -1201,7 +1201,7 @@ ipv4_tcp_novrf()
+ 	a=${NSA_IP}
+ 	log_start
+ 	run_cmd nettest -s -I ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${a}
+ 	log_test_addr ${a} $? 0 "Device server"
+ 
+@@ -1221,13 +1221,13 @@ ipv4_tcp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd_nsb nettest -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 tcp
+ 		run_cmd nettest -r ${a} -0 ${NSA_IP}
+ 		log_test_addr ${a} $? 0 "Client"
+ 
+ 		log_start
+ 		run_cmd_nsb nettest -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 tcp
+ 		run_cmd nettest -r ${a} -d ${NSA_DEV}
+ 		log_test_addr ${a} $? 0 "Client, device bind"
+ 
+@@ -1249,7 +1249,7 @@ ipv4_tcp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest -r ${a} -0 ${a} -1 ${a}
+ 		log_test_addr ${a} $? 0 "Global server, local connection"
+ 	done
+@@ -1257,7 +1257,7 @@ ipv4_tcp_novrf()
+ 	a=${NSA_IP}
+ 	log_start
+ 	run_cmd nettest -s -I ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest -r ${a} -0 ${a}
+ 	log_test_addr ${a} $? 0 "Device server, unbound client, local connection"
+ 
+@@ -1266,7 +1266,7 @@ ipv4_tcp_novrf()
+ 		log_start
+ 		show_hint "Should fail 'Connection refused' since addresses on loopback are out of device scope"
+ 		run_cmd nettest -s -I ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest -r ${a}
+ 		log_test_addr ${a} $? 1 "Device server, unbound client, local connection"
+ 	done
+@@ -1274,7 +1274,7 @@ ipv4_tcp_novrf()
+ 	a=${NSA_IP}
+ 	log_start
+ 	run_cmd nettest -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest -r ${a} -0 ${a} -d ${NSA_DEV}
+ 	log_test_addr ${a} $? 0 "Global server, device client, local connection"
+ 
+@@ -1283,7 +1283,7 @@ ipv4_tcp_novrf()
+ 		log_start
+ 		show_hint "Should fail 'No route to host' since addresses on loopback are out of device scope"
+ 		run_cmd nettest -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest -r ${a} -d ${NSA_DEV}
+ 		log_test_addr ${a} $? 1 "Global server, device client, local connection"
+ 	done
+@@ -1291,7 +1291,7 @@ ipv4_tcp_novrf()
+ 	a=${NSA_IP}
+ 	log_start
+ 	run_cmd nettest -s -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest  -d ${NSA_DEV} -r ${a} -0 ${a}
+ 	log_test_addr ${a} $? 0 "Device server, device client, local connection"
+ 
+@@ -1323,19 +1323,19 @@ ipv4_tcp_vrf()
+ 		log_start
+ 		show_hint "Should fail 'Connection refused' since global server with VRF is disabled"
+ 		run_cmd nettest -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -r ${a}
+ 		log_test_addr ${a} $? 1 "Global server"
+ 
+ 		log_start
+ 		run_cmd nettest -s -I ${VRF} -3 ${VRF} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -r ${a}
+ 		log_test_addr ${a} $? 0 "VRF server"
+ 
+ 		log_start
+ 		run_cmd nettest -s -I ${NSA_DEV} -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -r ${a}
+ 		log_test_addr ${a} $? 0 "Device server"
+ 
+@@ -1352,7 +1352,7 @@ ipv4_tcp_vrf()
+ 	log_start
+ 	show_hint "Should fail 'Connection refused' since global server with VRF is disabled"
+ 	run_cmd nettest -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest -r ${a} -d ${NSA_DEV}
+ 	log_test_addr ${a} $? 1 "Global server, local connection"
+ 
+@@ -1374,14 +1374,14 @@ ipv4_tcp_vrf()
+ 		log_start
+ 		show_hint "client socket should be bound to VRF"
+ 		run_cmd nettest -s -3 ${VRF} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -r ${a}
+ 		log_test_addr ${a} $? 0 "Global server"
+ 
+ 		log_start
+ 		show_hint "client socket should be bound to VRF"
+ 		run_cmd nettest -s -I ${VRF} -3 ${VRF} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -r ${a}
+ 		log_test_addr ${a} $? 0 "VRF server"
+ 
+@@ -1396,7 +1396,7 @@ ipv4_tcp_vrf()
+ 	log_start
+ 	show_hint "client socket should be bound to device"
+ 	run_cmd nettest -s -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -r ${a}
+ 	log_test_addr ${a} $? 0 "Device server"
+ 
+@@ -1406,7 +1406,7 @@ ipv4_tcp_vrf()
+ 		log_start
+ 		show_hint "Should fail 'Connection refused' since client is not bound to VRF"
+ 		run_cmd nettest -s -I ${VRF} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest -r ${a}
+ 		log_test_addr ${a} $? 1 "Global server, local connection"
+ 	done
+@@ -1418,13 +1418,13 @@ ipv4_tcp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd_nsb nettest -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 tcp
+ 		run_cmd nettest -r ${a} -d ${VRF}
+ 		log_test_addr ${a} $? 0 "Client, VRF bind"
+ 
+ 		log_start
+ 		run_cmd_nsb nettest -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 tcp
+ 		run_cmd nettest -r ${a} -d ${NSA_DEV}
+ 		log_test_addr ${a} $? 0 "Client, device bind"
+ 
+@@ -1443,7 +1443,7 @@ ipv4_tcp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -s -I ${VRF} -3 ${VRF} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest -r ${a} -d ${VRF} -0 ${a}
+ 		log_test_addr ${a} $? 0 "VRF server, VRF client, local connection"
+ 	done
+@@ -1451,26 +1451,26 @@ ipv4_tcp_vrf()
+ 	a=${NSA_IP}
+ 	log_start
+ 	run_cmd nettest -s -I ${VRF} -3 ${VRF} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest -r ${a} -d ${NSA_DEV} -0 ${a}
+ 	log_test_addr ${a} $? 0 "VRF server, device client, local connection"
+ 
+ 	log_start
+ 	show_hint "Should fail 'No route to host' since client is out of VRF scope"
+ 	run_cmd nettest -s -I ${VRF} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest -r ${a}
+ 	log_test_addr ${a} $? 1 "VRF server, unbound client, local connection"
+ 
+ 	log_start
+ 	run_cmd nettest -s -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest -r ${a} -d ${VRF} -0 ${a}
+ 	log_test_addr ${a} $? 0 "Device server, VRF client, local connection"
+ 
+ 	log_start
+ 	run_cmd nettest -s -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest -r ${a} -d ${NSA_DEV} -0 ${a}
+ 	log_test_addr ${a} $? 0 "Device server, device client, local connection"
+ }
+@@ -1509,7 +1509,7 @@ ipv4_udp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -D -s -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -D -r ${a}
+ 		log_test_addr ${a} $? 0 "Global server"
+ 
+@@ -1522,7 +1522,7 @@ ipv4_udp_novrf()
+ 	a=${NSA_IP}
+ 	log_start
+ 	run_cmd nettest -D -I ${NSA_DEV} -s -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd_nsb nettest -D -r ${a}
+ 	log_test_addr ${a} $? 0 "Device server"
+ 
+@@ -1533,31 +1533,31 @@ ipv4_udp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd_nsb nettest -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 udp
+ 		run_cmd nettest -D -r ${a} -0 ${NSA_IP}
+ 		log_test_addr ${a} $? 0 "Client"
+ 
+ 		log_start
+ 		run_cmd_nsb nettest -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 udp
+ 		run_cmd nettest -D -r ${a} -d ${NSA_DEV} -0 ${NSA_IP}
+ 		log_test_addr ${a} $? 0 "Client, device bind"
+ 
+ 		log_start
+ 		run_cmd_nsb nettest -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 udp
+ 		run_cmd nettest -D -r ${a} -d ${NSA_DEV} -C -0 ${NSA_IP}
+ 		log_test_addr ${a} $? 0 "Client, device send via cmsg"
+ 
+ 		log_start
+ 		run_cmd_nsb nettest -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 udp
+ 		run_cmd nettest -D -r ${a} -d ${NSA_DEV} -S -0 ${NSA_IP}
+ 		log_test_addr ${a} $? 0 "Client, device bind via IP_UNICAST_IF"
+ 
+ 		log_start
+ 		run_cmd_nsb nettest -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 udp
+ 		run_cmd nettest -D -r ${a} -d ${NSA_DEV} -S -0 ${NSA_IP} -U
+ 		log_test_addr ${a} $? 0 "Client, device bind via IP_UNICAST_IF, with connect()"
+ 
+@@ -1580,7 +1580,7 @@ ipv4_udp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -D -r ${a} -0 ${a} -1 ${a}
+ 		log_test_addr ${a} $? 0 "Global server, local connection"
+ 	done
+@@ -1588,7 +1588,7 @@ ipv4_udp_novrf()
+ 	a=${NSA_IP}
+ 	log_start
+ 	run_cmd nettest -s -D -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -r ${a}
+ 	log_test_addr ${a} $? 0 "Device server, unbound client, local connection"
+ 
+@@ -1597,7 +1597,7 @@ ipv4_udp_novrf()
+ 		log_start
+ 		show_hint "Should fail 'Connection refused' since address is out of device scope"
+ 		run_cmd nettest -s -D -I ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -D -r ${a}
+ 		log_test_addr ${a} $? 1 "Device server, unbound client, local connection"
+ 	done
+@@ -1605,25 +1605,25 @@ ipv4_udp_novrf()
+ 	a=${NSA_IP}
+ 	log_start
+ 	run_cmd nettest -s -D &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${NSA_DEV} -r ${a}
+ 	log_test_addr ${a} $? 0 "Global server, device client, local connection"
+ 
+ 	log_start
+ 	run_cmd nettest -s -D &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${NSA_DEV} -C -r ${a}
+ 	log_test_addr ${a} $? 0 "Global server, device send via cmsg, local connection"
+ 
+ 	log_start
+ 	run_cmd nettest -s -D &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${NSA_DEV} -S -r ${a}
+ 	log_test_addr ${a} $? 0 "Global server, device client via IP_UNICAST_IF, local connection"
+ 
+ 	log_start
+ 	run_cmd nettest -s -D &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${NSA_DEV} -S -r ${a} -U
+ 	log_test_addr ${a} $? 0 "Global server, device client via IP_UNICAST_IF, local connection, with connect()"
+ 
+@@ -1636,28 +1636,28 @@ ipv4_udp_novrf()
+ 		log_start
+ 		show_hint "Should fail since addresses on loopback are out of device scope"
+ 		run_cmd nettest -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -D -r ${a} -d ${NSA_DEV}
+ 		log_test_addr ${a} $? 2 "Global server, device client, local connection"
+ 
+ 		log_start
+ 		show_hint "Should fail since addresses on loopback are out of device scope"
+ 		run_cmd nettest -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -D -r ${a} -d ${NSA_DEV} -C
+ 		log_test_addr ${a} $? 1 "Global server, device send via cmsg, local connection"
+ 
+ 		log_start
+ 		show_hint "Should fail since addresses on loopback are out of device scope"
+ 		run_cmd nettest -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -D -r ${a} -d ${NSA_DEV} -S
+ 		log_test_addr ${a} $? 1 "Global server, device client via IP_UNICAST_IF, local connection"
+ 
+ 		log_start
+ 		show_hint "Should fail since addresses on loopback are out of device scope"
+ 		run_cmd nettest -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -D -r ${a} -d ${NSA_DEV} -S -U
+ 		log_test_addr ${a} $? 1 "Global server, device client via IP_UNICAST_IF, local connection, with connect()"
+ 
+@@ -1667,7 +1667,7 @@ ipv4_udp_novrf()
+ 	a=${NSA_IP}
+ 	log_start
+ 	run_cmd nettest -D -s -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${NSA_DEV} -r ${a} -0 ${a}
+ 	log_test_addr ${a} $? 0 "Device server, device client, local conn"
+ 
+@@ -1709,19 +1709,19 @@ ipv4_udp_vrf()
+ 		log_start
+ 		show_hint "Fails because ingress is in a VRF and global server is disabled"
+ 		run_cmd nettest -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -D -r ${a}
+ 		log_test_addr ${a} $? 1 "Global server"
+ 
+ 		log_start
+ 		run_cmd nettest -D -I ${VRF} -s -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -D -r ${a}
+ 		log_test_addr ${a} $? 0 "VRF server"
+ 
+ 		log_start
+ 		run_cmd nettest -D -I ${NSA_DEV} -s -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -D -r ${a}
+ 		log_test_addr ${a} $? 0 "Enslaved device server"
+ 
+@@ -1733,7 +1733,7 @@ ipv4_udp_vrf()
+ 		log_start
+ 		show_hint "Should fail 'Connection refused' since global server is out of scope"
+ 		run_cmd nettest -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -D -d ${VRF} -r ${a}
+ 		log_test_addr ${a} $? 1 "Global server, VRF client, local connection"
+ 	done
+@@ -1741,26 +1741,26 @@ ipv4_udp_vrf()
+ 	a=${NSA_IP}
+ 	log_start
+ 	run_cmd nettest -s -D -I ${VRF} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${VRF} -r ${a}
+ 	log_test_addr ${a} $? 0 "VRF server, VRF client, local conn"
+ 
+ 	log_start
+ 	run_cmd nettest -s -D -I ${VRF} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${NSA_DEV} -r ${a}
+ 	log_test_addr ${a} $? 0 "VRF server, enslaved device client, local connection"
+ 
+ 	a=${NSA_IP}
+ 	log_start
+ 	run_cmd nettest -s -D -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${VRF} -r ${a}
+ 	log_test_addr ${a} $? 0 "Enslaved device server, VRF client, local conn"
+ 
+ 	log_start
+ 	run_cmd nettest -s -D -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${NSA_DEV} -r ${a}
+ 	log_test_addr ${a} $? 0 "Enslaved device server, device client, local conn"
+ 
+@@ -1775,19 +1775,19 @@ ipv4_udp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -D -s -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -D -r ${a}
+ 		log_test_addr ${a} $? 0 "Global server"
+ 
+ 		log_start
+ 		run_cmd nettest -D -I ${VRF} -s -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -D -r ${a}
+ 		log_test_addr ${a} $? 0 "VRF server"
+ 
+ 		log_start
+ 		run_cmd nettest -D -I ${NSA_DEV} -s -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -D -r ${a}
+ 		log_test_addr ${a} $? 0 "Enslaved device server"
+ 
+@@ -1802,13 +1802,13 @@ ipv4_udp_vrf()
+ 	#
+ 	log_start
+ 	run_cmd_nsb nettest -D -s &
+-	sleep 1
++	wait_local_port_listen ${NSB} 12345 udp
+ 	run_cmd nettest -d ${VRF} -D -r ${NSB_IP} -1 ${NSA_IP}
+ 	log_test $? 0 "VRF client"
+ 
+ 	log_start
+ 	run_cmd_nsb nettest -D -s &
+-	sleep 1
++	wait_local_port_listen ${NSB} 12345 udp
+ 	run_cmd nettest -d ${NSA_DEV} -D -r ${NSB_IP} -1 ${NSA_IP}
+ 	log_test $? 0 "Enslaved device client"
+ 
+@@ -1829,31 +1829,31 @@ ipv4_udp_vrf()
+ 	a=${NSA_IP}
+ 	log_start
+ 	run_cmd nettest -D -s -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${VRF} -r ${a}
+ 	log_test_addr ${a} $? 0 "Global server, VRF client, local conn"
+ 
+ 	log_start
+ 	run_cmd nettest -s -D -I ${VRF} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${VRF} -r ${a}
+ 	log_test_addr ${a} $? 0 "VRF server, VRF client, local conn"
+ 
+ 	log_start
+ 	run_cmd nettest -s -D -I ${VRF} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${NSA_DEV} -r ${a}
+ 	log_test_addr ${a} $? 0 "VRF server, device client, local conn"
+ 
+ 	log_start
+ 	run_cmd nettest -s -D -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${VRF} -r ${a}
+ 	log_test_addr ${a} $? 0 "Enslaved device server, VRF client, local conn"
+ 
+ 	log_start
+ 	run_cmd nettest -s -D -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -D -d ${NSA_DEV} -r ${a}
+ 	log_test_addr ${a} $? 0 "Enslaved device server, device client, local conn"
+ 
+@@ -1861,7 +1861,7 @@ ipv4_udp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -D -s -3 ${VRF} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -D -d ${VRF} -r ${a}
+ 		log_test_addr ${a} $? 0 "Global server, VRF client, local conn"
+ 	done
+@@ -1870,7 +1870,7 @@ ipv4_udp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -s -D -I ${VRF} -3 ${VRF} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -D -d ${VRF} -r ${a}
+ 		log_test_addr ${a} $? 0 "VRF server, VRF client, local conn"
+ 	done
+@@ -2093,7 +2093,7 @@ ipv4_rt()
+ 	do
+ 		log_start
+ 		run_cmd nettest ${varg} -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest ${varg} -r ${a} &
+ 		sleep 3
+ 		run_cmd ip link del ${VRF}
+@@ -2107,7 +2107,7 @@ ipv4_rt()
+ 	do
+ 		log_start
+ 		run_cmd nettest ${varg} -s -I ${VRF} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest ${varg} -r ${a} &
+ 		sleep 3
+ 		run_cmd ip link del ${VRF}
+@@ -2120,7 +2120,7 @@ ipv4_rt()
+ 	a=${NSA_IP}
+ 	log_start
+ 	run_cmd nettest ${varg} -s -I ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest ${varg} -r ${a} &
+ 	sleep 3
+ 	run_cmd ip link del ${VRF}
+@@ -2134,7 +2134,7 @@ ipv4_rt()
+ 	#
+ 	log_start
+ 	run_cmd_nsb nettest ${varg} -s &
+-	sleep 1
++	wait_local_port_listen ${NSB} 12345 tcp
+ 	run_cmd nettest ${varg} -d ${VRF} -r ${NSB_IP} &
+ 	sleep 3
+ 	run_cmd ip link del ${VRF}
+@@ -2145,7 +2145,7 @@ ipv4_rt()
+ 
+ 	log_start
+ 	run_cmd_nsb nettest ${varg} -s &
+-	sleep 1
++	wait_local_port_listen ${NSB} 12345 tcp
+ 	run_cmd nettest ${varg} -d ${NSA_DEV} -r ${NSB_IP} &
+ 	sleep 3
+ 	run_cmd ip link del ${VRF}
+@@ -2161,7 +2161,7 @@ ipv4_rt()
+ 	do
+ 		log_start
+ 		run_cmd nettest ${varg} -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest ${varg} -d ${VRF} -r ${a} &
+ 		sleep 3
+ 		run_cmd ip link del ${VRF}
+@@ -2175,7 +2175,7 @@ ipv4_rt()
+ 	do
+ 		log_start
+ 		run_cmd nettest ${varg} -I ${VRF} -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest ${varg} -d ${VRF} -r ${a} &
+ 		sleep 3
+ 		run_cmd ip link del ${VRF}
+@@ -2189,7 +2189,7 @@ ipv4_rt()
+ 	log_start
+ 
+ 	run_cmd nettest ${varg} -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest ${varg} -d ${NSA_DEV} -r ${a} &
+ 	sleep 3
+ 	run_cmd ip link del ${VRF}
+@@ -2200,7 +2200,7 @@ ipv4_rt()
+ 
+ 	log_start
+ 	run_cmd nettest ${varg} -I ${VRF} -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest ${varg} -d ${NSA_DEV} -r ${a} &
+ 	sleep 3
+ 	run_cmd ip link del ${VRF}
+@@ -2211,7 +2211,7 @@ ipv4_rt()
+ 
+ 	log_start
+ 	run_cmd nettest ${varg} -I ${NSA_DEV} -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest ${varg} -d ${NSA_DEV} -r ${a} &
+ 	sleep 3
+ 	run_cmd ip link del ${VRF}
+@@ -2561,7 +2561,7 @@ ipv6_tcp_md5_novrf()
+ 	# basic use case
+ 	log_start
+ 	run_cmd nettest -6 -s -M ${MD5_PW} -m ${NSB_IP6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: Single address config"
+ 
+@@ -2569,7 +2569,7 @@ ipv6_tcp_md5_novrf()
+ 	log_start
+ 	show_hint "Should timeout due to MD5 mismatch"
+ 	run_cmd nettest -6 -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: Server no config, client uses password"
+ 
+@@ -2577,7 +2577,7 @@ ipv6_tcp_md5_novrf()
+ 	log_start
+ 	show_hint "Should timeout since client uses wrong password"
+ 	run_cmd nettest -6 -s -M ${MD5_PW} -m ${NSB_IP6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
+ 	log_test $? 2 "MD5: Client uses wrong password"
+ 
+@@ -2585,7 +2585,7 @@ ipv6_tcp_md5_novrf()
+ 	log_start
+ 	show_hint "Should timeout due to MD5 mismatch"
+ 	run_cmd nettest -6 -s -M ${MD5_PW} -m ${NSB_LO_IP6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: Client address does not match address configured with password"
+ 
+@@ -2596,7 +2596,7 @@ ipv6_tcp_md5_novrf()
+ 	# client in prefix
+ 	log_start
+ 	run_cmd nettest -6 -s -M ${MD5_PW} -m ${NS_NET6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: Prefix config"
+ 
+@@ -2604,7 +2604,7 @@ ipv6_tcp_md5_novrf()
+ 	log_start
+ 	show_hint "Should timeout since client uses wrong password"
+ 	run_cmd nettest -6 -s -M ${MD5_PW} -m ${NS_NET6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
+ 	log_test $? 2 "MD5: Prefix config, client uses wrong password"
+ 
+@@ -2612,7 +2612,7 @@ ipv6_tcp_md5_novrf()
+ 	log_start
+ 	show_hint "Should timeout due to MD5 mismatch"
+ 	run_cmd nettest -6 -s -M ${MD5_PW} -m ${NS_NET6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -c ${NSB_LO_IP6} -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: Prefix config, client address not in configured prefix"
+ }
+@@ -2629,7 +2629,7 @@ ipv6_tcp_md5()
+ 	# basic use case
+ 	log_start
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: VRF: Single address config"
+ 
+@@ -2637,7 +2637,7 @@ ipv6_tcp_md5()
+ 	log_start
+ 	show_hint "Should timeout since server does not have MD5 auth"
+ 	run_cmd nettest -6 -s -I ${VRF} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: VRF: Server no config, client uses password"
+ 
+@@ -2645,7 +2645,7 @@ ipv6_tcp_md5()
+ 	log_start
+ 	show_hint "Should timeout since client uses wrong password"
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
+ 	log_test $? 2 "MD5: VRF: Client uses wrong password"
+ 
+@@ -2653,7 +2653,7 @@ ipv6_tcp_md5()
+ 	log_start
+ 	show_hint "Should timeout since server config differs from client"
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_LO_IP6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: VRF: Client address does not match address configured with password"
+ 
+@@ -2664,7 +2664,7 @@ ipv6_tcp_md5()
+ 	# client in prefix
+ 	log_start
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: VRF: Prefix config"
+ 
+@@ -2672,7 +2672,7 @@ ipv6_tcp_md5()
+ 	log_start
+ 	show_hint "Should timeout since client uses wrong password"
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
+ 	log_test $? 2 "MD5: VRF: Prefix config, client uses wrong password"
+ 
+@@ -2680,7 +2680,7 @@ ipv6_tcp_md5()
+ 	log_start
+ 	show_hint "Should timeout since client address is outside of prefix"
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -c ${NSB_LO_IP6} -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: VRF: Prefix config, client address not in configured prefix"
+ 
+@@ -2691,14 +2691,14 @@ ipv6_tcp_md5()
+ 	log_start
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP6} &
+ 	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NSB_IP6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: VRF: Single address config in default VRF and VRF, conn in VRF"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP6} &
+ 	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NSB_IP6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsc nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
+ 	log_test $? 0 "MD5: VRF: Single address config in default VRF and VRF, conn in default VRF"
+ 
+@@ -2706,7 +2706,7 @@ ipv6_tcp_md5()
+ 	show_hint "Should timeout since client in default VRF uses VRF password"
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP6} &
+ 	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NSB_IP6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsc nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: VRF: Single address config in default VRF and VRF, conn in default VRF with VRF pw"
+ 
+@@ -2714,21 +2714,21 @@ ipv6_tcp_md5()
+ 	show_hint "Should timeout since client in VRF uses default VRF password"
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP6} &
+ 	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NSB_IP6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
+ 	log_test $? 2 "MD5: VRF: Single address config in default VRF and VRF, conn in VRF with default VRF pw"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
+ 	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NS_NET6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 0 "MD5: VRF: Prefix config in default VRF and VRF, conn in VRF"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
+ 	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NS_NET6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsc nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
+ 	log_test $? 0 "MD5: VRF: Prefix config in default VRF and VRF, conn in default VRF"
+ 
+@@ -2736,7 +2736,7 @@ ipv6_tcp_md5()
+ 	show_hint "Should timeout since client in default VRF uses VRF password"
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
+ 	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NS_NET6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsc nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
+ 	log_test $? 2 "MD5: VRF: Prefix config in default VRF and VRF, conn in default VRF with VRF pw"
+ 
+@@ -2744,7 +2744,7 @@ ipv6_tcp_md5()
+ 	show_hint "Should timeout since client in VRF uses default VRF password"
+ 	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
+ 	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NS_NET6} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
+ 	log_test $? 2 "MD5: VRF: Prefix config in default VRF and VRF, conn in VRF with default VRF pw"
+ 
+@@ -2772,7 +2772,7 @@ ipv6_tcp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -6 -r ${a}
+ 		log_test_addr ${a} $? 0 "Global server"
+ 	done
+@@ -2793,7 +2793,7 @@ ipv6_tcp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd_nsb nettest -6 -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 tcp
+ 		run_cmd nettest -6 -r ${a}
+ 		log_test_addr ${a} $? 0 "Client"
+ 	done
+@@ -2802,7 +2802,7 @@ ipv6_tcp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd_nsb nettest -6 -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 tcp
+ 		run_cmd nettest -6 -r ${a} -d ${NSA_DEV}
+ 		log_test_addr ${a} $? 0 "Client, device bind"
+ 	done
+@@ -2822,7 +2822,7 @@ ipv6_tcp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest -6 -r ${a}
+ 		log_test_addr ${a} $? 0 "Global server, local connection"
+ 	done
+@@ -2830,7 +2830,7 @@ ipv6_tcp_novrf()
+ 	a=${NSA_IP6}
+ 	log_start
+ 	run_cmd nettest -6 -s -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest -6 -r ${a} -0 ${a}
+ 	log_test_addr ${a} $? 0 "Device server, unbound client, local connection"
+ 
+@@ -2839,7 +2839,7 @@ ipv6_tcp_novrf()
+ 		log_start
+ 		show_hint "Should fail 'Connection refused' since addresses on loopback are out of device scope"
+ 		run_cmd nettest -6 -s -I ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest -6 -r ${a}
+ 		log_test_addr ${a} $? 1 "Device server, unbound client, local connection"
+ 	done
+@@ -2847,7 +2847,7 @@ ipv6_tcp_novrf()
+ 	a=${NSA_IP6}
+ 	log_start
+ 	run_cmd nettest -6 -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest -6 -r ${a} -d ${NSA_DEV} -0 ${a}
+ 	log_test_addr ${a} $? 0 "Global server, device client, local connection"
+ 
+@@ -2856,7 +2856,7 @@ ipv6_tcp_novrf()
+ 		log_start
+ 		show_hint "Should fail 'Connection refused' since addresses on loopback are out of device scope"
+ 		run_cmd nettest -6 -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest -6 -r ${a} -d ${NSA_DEV}
+ 		log_test_addr ${a} $? 1 "Global server, device client, local connection"
+ 	done
+@@ -2865,7 +2865,7 @@ ipv6_tcp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -s -I ${NSA_DEV} -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest -6  -d ${NSA_DEV} -r ${a}
+ 		log_test_addr ${a} $? 0 "Device server, device client, local conn"
+ 	done
+@@ -2898,7 +2898,7 @@ ipv6_tcp_vrf()
+ 		log_start
+ 		show_hint "Should fail 'Connection refused' since global server with VRF is disabled"
+ 		run_cmd nettest -6 -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -6 -r ${a}
+ 		log_test_addr ${a} $? 1 "Global server"
+ 	done
+@@ -2907,7 +2907,7 @@ ipv6_tcp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -s -I ${VRF} -3 ${VRF} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -6 -r ${a}
+ 		log_test_addr ${a} $? 0 "VRF server"
+ 	done
+@@ -2916,7 +2916,7 @@ ipv6_tcp_vrf()
+ 	a=${NSA_LINKIP6}%${NSB_DEV}
+ 	log_start
+ 	run_cmd nettest -6 -s -I ${VRF} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${a}
+ 	log_test_addr ${a} $? 0 "VRF server"
+ 
+@@ -2924,7 +2924,7 @@ ipv6_tcp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -s -I ${NSA_DEV} -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -6 -r ${a}
+ 		log_test_addr ${a} $? 0 "Device server"
+ 	done
+@@ -2943,7 +2943,7 @@ ipv6_tcp_vrf()
+ 	log_start
+ 	show_hint "Should fail 'Connection refused' since global server with VRF is disabled"
+ 	run_cmd nettest -6 -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest -6 -r ${a} -d ${NSA_DEV}
+ 	log_test_addr ${a} $? 1 "Global server, local connection"
+ 
+@@ -2964,7 +2964,7 @@ ipv6_tcp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -s -3 ${VRF} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -6 -r ${a}
+ 		log_test_addr ${a} $? 0 "Global server"
+ 	done
+@@ -2973,7 +2973,7 @@ ipv6_tcp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -s -I ${VRF} -3 ${VRF} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -6 -r ${a}
+ 		log_test_addr ${a} $? 0 "VRF server"
+ 	done
+@@ -2982,13 +2982,13 @@ ipv6_tcp_vrf()
+ 	a=${NSA_LINKIP6}%${NSB_DEV}
+ 	log_start
+ 	run_cmd nettest -6 -s -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${a}
+ 	log_test_addr ${a} $? 0 "Global server"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -s -I ${VRF} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd_nsb nettest -6 -r ${a}
+ 	log_test_addr ${a} $? 0 "VRF server"
+ 
+@@ -2996,7 +2996,7 @@ ipv6_tcp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -s -I ${NSA_DEV} -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -6 -r ${a}
+ 		log_test_addr ${a} $? 0 "Device server"
+ 	done
+@@ -3016,7 +3016,7 @@ ipv6_tcp_vrf()
+ 		log_start
+ 		show_hint "Fails 'Connection refused' since client is not in VRF"
+ 		run_cmd nettest -6 -s -I ${VRF} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest -6 -r ${a}
+ 		log_test_addr ${a} $? 1 "Global server, local connection"
+ 	done
+@@ -3029,7 +3029,7 @@ ipv6_tcp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd_nsb nettest -6 -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 tcp
+ 		run_cmd nettest -6 -r ${a} -d ${VRF}
+ 		log_test_addr ${a} $? 0 "Client, VRF bind"
+ 	done
+@@ -3038,7 +3038,7 @@ ipv6_tcp_vrf()
+ 	log_start
+ 	show_hint "Fails since VRF device does not allow linklocal addresses"
+ 	run_cmd_nsb nettest -6 -s &
+-	sleep 1
++	wait_local_port_listen ${NSB} 12345 tcp
+ 	run_cmd nettest -6 -r ${a} -d ${VRF}
+ 	log_test_addr ${a} $? 1 "Client, VRF bind"
+ 
+@@ -3046,7 +3046,7 @@ ipv6_tcp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd_nsb nettest -6 -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 tcp
+ 		run_cmd nettest -6 -r ${a} -d ${NSA_DEV}
+ 		log_test_addr ${a} $? 0 "Client, device bind"
+ 	done
+@@ -3071,7 +3071,7 @@ ipv6_tcp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -s -I ${VRF} -3 ${VRF} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest -6 -r ${a} -d ${VRF} -0 ${a}
+ 		log_test_addr ${a} $? 0 "VRF server, VRF client, local connection"
+ 	done
+@@ -3079,7 +3079,7 @@ ipv6_tcp_vrf()
+ 	a=${NSA_IP6}
+ 	log_start
+ 	run_cmd nettest -6 -s -I ${VRF} -3 ${VRF} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest -6 -r ${a} -d ${NSA_DEV} -0 ${a}
+ 	log_test_addr ${a} $? 0 "VRF server, device client, local connection"
+ 
+@@ -3087,13 +3087,13 @@ ipv6_tcp_vrf()
+ 	log_start
+ 	show_hint "Should fail since unbound client is out of VRF scope"
+ 	run_cmd nettest -6 -s -I ${VRF} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest -6 -r ${a}
+ 	log_test_addr ${a} $? 1 "VRF server, unbound client, local connection"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -s -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest -6 -r ${a} -d ${VRF} -0 ${a}
+ 	log_test_addr ${a} $? 0 "Device server, VRF client, local connection"
+ 
+@@ -3101,7 +3101,7 @@ ipv6_tcp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -s -I ${NSA_DEV} -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest -6 -r ${a} -d ${NSA_DEV} -0 ${a}
+ 		log_test_addr ${a} $? 0 "Device server, device client, local connection"
+ 	done
+@@ -3141,13 +3141,13 @@ ipv6_udp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -D -s -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -6 -D -r ${a}
+ 		log_test_addr ${a} $? 0 "Global server"
+ 
+ 		log_start
+ 		run_cmd nettest -6 -D -I ${NSA_DEV} -s -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -6 -D -r ${a}
+ 		log_test_addr ${a} $? 0 "Device server"
+ 	done
+@@ -3155,7 +3155,7 @@ ipv6_udp_novrf()
+ 	a=${NSA_LO_IP6}
+ 	log_start
+ 	run_cmd nettest -6 -D -s -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd_nsb nettest -6 -D -r ${a}
+ 	log_test_addr ${a} $? 0 "Global server"
+ 
+@@ -3165,7 +3165,7 @@ ipv6_udp_novrf()
+ 	#log_start
+ 	#show_hint "Should fail since loopback address is out of scope"
+ 	#run_cmd nettest -6 -D -I ${NSA_DEV} -s -3 ${NSA_DEV} &
+-	#sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	#run_cmd_nsb nettest -6 -D -r ${a}
+ 	#log_test_addr ${a} $? 1 "Device server"
+ 
+@@ -3185,25 +3185,25 @@ ipv6_udp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd_nsb nettest -6 -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 udp
+ 		run_cmd nettest -6 -D -r ${a} -0 ${NSA_IP6}
+ 		log_test_addr ${a} $? 0 "Client"
+ 
+ 		log_start
+ 		run_cmd_nsb nettest -6 -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 udp
+ 		run_cmd nettest -6 -D -r ${a} -d ${NSA_DEV} -0 ${NSA_IP6}
+ 		log_test_addr ${a} $? 0 "Client, device bind"
+ 
+ 		log_start
+ 		run_cmd_nsb nettest -6 -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 udp
+ 		run_cmd nettest -6 -D -r ${a} -d ${NSA_DEV} -C -0 ${NSA_IP6}
+ 		log_test_addr ${a} $? 0 "Client, device send via cmsg"
+ 
+ 		log_start
+ 		run_cmd_nsb nettest -6 -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSB} 12345 udp
+ 		run_cmd nettest -6 -D -r ${a} -d ${NSA_DEV} -S -0 ${NSA_IP6}
+ 		log_test_addr ${a} $? 0 "Client, device bind via IPV6_UNICAST_IF"
+ 
+@@ -3225,7 +3225,7 @@ ipv6_udp_novrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -6 -D -r ${a} -0 ${a} -1 ${a}
+ 		log_test_addr ${a} $? 0 "Global server, local connection"
+ 	done
+@@ -3233,7 +3233,7 @@ ipv6_udp_novrf()
+ 	a=${NSA_IP6}
+ 	log_start
+ 	run_cmd nettest -6 -s -D -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -r ${a}
+ 	log_test_addr ${a} $? 0 "Device server, unbound client, local connection"
+ 
+@@ -3242,7 +3242,7 @@ ipv6_udp_novrf()
+ 		log_start
+ 		show_hint "Should fail 'Connection refused' since address is out of device scope"
+ 		run_cmd nettest -6 -s -D -I ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -6 -D -r ${a}
+ 		log_test_addr ${a} $? 1 "Device server, local connection"
+ 	done
+@@ -3250,19 +3250,19 @@ ipv6_udp_novrf()
+ 	a=${NSA_IP6}
+ 	log_start
+ 	run_cmd nettest -6 -s -D &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${NSA_DEV} -r ${a}
+ 	log_test_addr ${a} $? 0 "Global server, device client, local connection"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -s -D &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${NSA_DEV} -C -r ${a}
+ 	log_test_addr ${a} $? 0 "Global server, device send via cmsg, local connection"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -s -D &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${NSA_DEV} -S -r ${a}
+ 	log_test_addr ${a} $? 0 "Global server, device client via IPV6_UNICAST_IF, local connection"
+ 
+@@ -3271,28 +3271,28 @@ ipv6_udp_novrf()
+ 		log_start
+ 		show_hint "Should fail 'No route to host' since addresses on loopback are out of device scope"
+ 		run_cmd nettest -6 -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -6 -D -r ${a} -d ${NSA_DEV}
+ 		log_test_addr ${a} $? 1 "Global server, device client, local connection"
+ 
+ 		log_start
+ 		show_hint "Should fail 'No route to host' since addresses on loopback are out of device scope"
+ 		run_cmd nettest -6 -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -6 -D -r ${a} -d ${NSA_DEV} -C
+ 		log_test_addr ${a} $? 1 "Global server, device send via cmsg, local connection"
+ 
+ 		log_start
+ 		show_hint "Should fail 'No route to host' since addresses on loopback are out of device scope"
+ 		run_cmd nettest -6 -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -6 -D -r ${a} -d ${NSA_DEV} -S
+ 		log_test_addr ${a} $? 1 "Global server, device client via IP_UNICAST_IF, local connection"
+ 
+ 		log_start
+ 		show_hint "Should fail 'No route to host' since addresses on loopback are out of device scope"
+ 		run_cmd nettest -6 -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -6 -D -r ${a} -d ${NSA_DEV} -S -U
+ 		log_test_addr ${a} $? 1 "Global server, device client via IP_UNICAST_IF, local connection, with connect()"
+ 	done
+@@ -3300,7 +3300,7 @@ ipv6_udp_novrf()
+ 	a=${NSA_IP6}
+ 	log_start
+ 	run_cmd nettest -6 -D -s -I ${NSA_DEV} -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${NSA_DEV} -r ${a} -0 ${a}
+ 	log_test_addr ${a} $? 0 "Device server, device client, local conn"
+ 
+@@ -3314,7 +3314,7 @@ ipv6_udp_novrf()
+ 	run_cmd_nsb ip -6 ro add ${NSA_IP6}/128 dev ${NSB_DEV}
+ 	log_start
+ 	run_cmd nettest -6 -s -D &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd_nsb nettest -6 -D -r ${NSA_IP6}
+ 	log_test $? 0 "UDP in - LLA to GUA"
+ 
+@@ -3338,7 +3338,7 @@ ipv6_udp_vrf()
+ 		log_start
+ 		show_hint "Should fail 'Connection refused' since global server is disabled"
+ 		run_cmd nettest -6 -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -6 -D -r ${a}
+ 		log_test_addr ${a} $? 1 "Global server"
+ 	done
+@@ -3347,7 +3347,7 @@ ipv6_udp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -D -I ${VRF} -s -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -6 -D -r ${a}
+ 		log_test_addr ${a} $? 0 "VRF server"
+ 	done
+@@ -3356,7 +3356,7 @@ ipv6_udp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -D -I ${NSA_DEV} -s -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -6 -D -r ${a}
+ 		log_test_addr ${a} $? 0 "Enslaved device server"
+ 	done
+@@ -3378,7 +3378,7 @@ ipv6_udp_vrf()
+ 		log_start
+ 		show_hint "Should fail 'Connection refused' since global server is disabled"
+ 		run_cmd nettest -6 -D -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -6 -D -d ${VRF} -r ${a}
+ 		log_test_addr ${a} $? 1 "Global server, VRF client, local conn"
+ 	done
+@@ -3387,7 +3387,7 @@ ipv6_udp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -D -I ${VRF} -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd nettest -6 -D -d ${VRF} -r ${a}
+ 		log_test_addr ${a} $? 0 "VRF server, VRF client, local conn"
+ 	done
+@@ -3396,25 +3396,25 @@ ipv6_udp_vrf()
+ 	log_start
+ 	show_hint "Should fail 'Connection refused' since global server is disabled"
+ 	run_cmd nettest -6 -D -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${NSA_DEV} -r ${a}
+ 	log_test_addr ${a} $? 1 "Global server, device client, local conn"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -D -I ${VRF} -s -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${NSA_DEV} -r ${a}
+ 	log_test_addr ${a} $? 0 "VRF server, device client, local conn"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -D -I ${NSA_DEV} -s -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${VRF} -r ${a}
+ 	log_test_addr ${a} $? 0 "Enslaved device server, VRF client, local conn"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -D -I ${NSA_DEV} -s -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${NSA_DEV} -r ${a}
+ 	log_test_addr ${a} $? 0 "Enslaved device server, device client, local conn"
+ 
+@@ -3429,7 +3429,7 @@ ipv6_udp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -D -s -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -6 -D -r ${a}
+ 		log_test_addr ${a} $? 0 "Global server"
+ 	done
+@@ -3438,7 +3438,7 @@ ipv6_udp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -D -I ${VRF} -s -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -6 -D -r ${a}
+ 		log_test_addr ${a} $? 0 "VRF server"
+ 	done
+@@ -3447,7 +3447,7 @@ ipv6_udp_vrf()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -D -I ${NSA_DEV} -s -3 ${NSA_DEV} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 udp
+ 		run_cmd_nsb nettest -6 -D -r ${a}
+ 		log_test_addr ${a} $? 0 "Enslaved device server"
+ 	done
+@@ -3465,7 +3465,7 @@ ipv6_udp_vrf()
+ 	#
+ 	log_start
+ 	run_cmd_nsb nettest -6 -D -s &
+-	sleep 1
++	wait_local_port_listen ${NSB} 12345 udp
+ 	run_cmd nettest -6 -D -d ${VRF} -r ${NSB_IP6}
+ 	log_test $? 0 "VRF client"
+ 
+@@ -3476,7 +3476,7 @@ ipv6_udp_vrf()
+ 
+ 	log_start
+ 	run_cmd_nsb nettest -6 -D -s &
+-	sleep 1
++	wait_local_port_listen ${NSB} 12345 udp
+ 	run_cmd nettest -6 -D -d ${NSA_DEV} -r ${NSB_IP6}
+ 	log_test $? 0 "Enslaved device client"
+ 
+@@ -3491,13 +3491,13 @@ ipv6_udp_vrf()
+ 	a=${NSA_IP6}
+ 	log_start
+ 	run_cmd nettest -6 -D -s -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${VRF} -r ${a}
+ 	log_test_addr ${a} $? 0 "Global server, VRF client, local conn"
+ 
+ 	#log_start
+ 	run_cmd nettest -6 -D -I ${VRF} -s -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${VRF} -r ${a}
+ 	log_test_addr ${a} $? 0 "VRF server, VRF client, local conn"
+ 
+@@ -3505,13 +3505,13 @@ ipv6_udp_vrf()
+ 	a=${VRF_IP6}
+ 	log_start
+ 	run_cmd nettest -6 -D -s -3 ${VRF} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${VRF} -r ${a}
+ 	log_test_addr ${a} $? 0 "Global server, VRF client, local conn"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -D -I ${VRF} -s -3 ${VRF} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${VRF} -r ${a}
+ 	log_test_addr ${a} $? 0 "VRF server, VRF client, local conn"
+ 
+@@ -3527,25 +3527,25 @@ ipv6_udp_vrf()
+ 	a=${NSA_IP6}
+ 	log_start
+ 	run_cmd nettest -6 -D -s -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${NSA_DEV} -r ${a}
+ 	log_test_addr ${a} $? 0 "Global server, device client, local conn"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -D -I ${VRF} -s -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${NSA_DEV} -r ${a}
+ 	log_test_addr ${a} $? 0 "VRF server, device client, local conn"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -D -I ${NSA_DEV} -s -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${VRF} -r ${a}
+ 	log_test_addr ${a} $? 0 "Device server, VRF client, local conn"
+ 
+ 	log_start
+ 	run_cmd nettest -6 -D -I ${NSA_DEV} -s -3 ${NSA_DEV} &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${NSA_DEV} -r ${a}
+ 	log_test_addr ${a} $? 0 "Device server, device client, local conn"
+ 
+@@ -3557,7 +3557,7 @@ ipv6_udp_vrf()
+ 	# link local addresses
+ 	log_start
+ 	run_cmd nettest -6 -D -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd_nsb nettest -6 -D -d ${NSB_DEV} -r ${NSA_LINKIP6}
+ 	log_test $? 0 "Global server, linklocal IP"
+ 
+@@ -3568,7 +3568,7 @@ ipv6_udp_vrf()
+ 
+ 	log_start
+ 	run_cmd_nsb nettest -6 -D -s &
+-	sleep 1
++	wait_local_port_listen ${NSB} 12345 udp
+ 	run_cmd nettest -6 -D -d ${NSA_DEV} -r ${NSB_LINKIP6}
+ 	log_test $? 0 "Enslaved device client, linklocal IP"
+ 
+@@ -3579,7 +3579,7 @@ ipv6_udp_vrf()
+ 
+ 	log_start
+ 	run_cmd nettest -6 -D -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd nettest -6 -D -d ${NSA_DEV} -r ${NSA_LINKIP6}
+ 	log_test $? 0 "Enslaved device client, local conn - linklocal IP"
+ 
+@@ -3592,7 +3592,7 @@ ipv6_udp_vrf()
+ 	run_cmd_nsb ip -6 ro add ${NSA_IP6}/128 dev ${NSB_DEV}
+ 	log_start
+ 	run_cmd nettest -6 -s -D &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 udp
+ 	run_cmd_nsb nettest -6 -D -r ${NSA_IP6}
+ 	log_test $? 0 "UDP in - LLA to GUA"
+ 
+@@ -3771,7 +3771,7 @@ ipv6_rt()
+ 	do
+ 		log_start
+ 		run_cmd nettest ${varg} -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest ${varg} -r ${a} &
+ 		sleep 3
+ 		run_cmd ip link del ${VRF}
+@@ -3785,7 +3785,7 @@ ipv6_rt()
+ 	do
+ 		log_start
+ 		run_cmd nettest ${varg} -I ${VRF} -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest ${varg} -r ${a} &
+ 		sleep 3
+ 		run_cmd ip link del ${VRF}
+@@ -3799,7 +3799,7 @@ ipv6_rt()
+ 	do
+ 		log_start
+ 		run_cmd nettest ${varg} -I ${NSA_DEV} -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest ${varg} -r ${a} &
+ 		sleep 3
+ 		run_cmd ip link del ${VRF}
+@@ -3814,7 +3814,7 @@ ipv6_rt()
+ 	#
+ 	log_start
+ 	run_cmd_nsb nettest ${varg} -s &
+-	sleep 1
++	wait_local_port_listen ${NSB} 12345 tcp
+ 	run_cmd nettest ${varg} -d ${VRF} -r ${NSB_IP6} &
+ 	sleep 3
+ 	run_cmd ip link del ${VRF}
+@@ -3825,7 +3825,7 @@ ipv6_rt()
+ 
+ 	log_start
+ 	run_cmd_nsb nettest ${varg} -s &
+-	sleep 1
++	wait_local_port_listen ${NSB} 12345 tcp
+ 	run_cmd nettest ${varg} -d ${NSA_DEV} -r ${NSB_IP6} &
+ 	sleep 3
+ 	run_cmd ip link del ${VRF}
+@@ -3842,7 +3842,7 @@ ipv6_rt()
+ 	do
+ 		log_start
+ 		run_cmd nettest ${varg} -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest ${varg} -d ${VRF} -r ${a} &
+ 		sleep 3
+ 		run_cmd ip link del ${VRF}
+@@ -3856,7 +3856,7 @@ ipv6_rt()
+ 	do
+ 		log_start
+ 		run_cmd nettest ${varg} -I ${VRF} -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd nettest ${varg} -d ${VRF} -r ${a} &
+ 		sleep 3
+ 		run_cmd ip link del ${VRF}
+@@ -3869,7 +3869,7 @@ ipv6_rt()
+ 	a=${NSA_IP6}
+ 	log_start
+ 	run_cmd nettest ${varg} -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest ${varg} -d ${NSA_DEV} -r ${a} &
+ 	sleep 3
+ 	run_cmd ip link del ${VRF}
+@@ -3880,7 +3880,7 @@ ipv6_rt()
+ 
+ 	log_start
+ 	run_cmd nettest ${varg} -I ${VRF} -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest ${varg} -d ${NSA_DEV} -r ${a} &
+ 	sleep 3
+ 	run_cmd ip link del ${VRF}
+@@ -3891,7 +3891,7 @@ ipv6_rt()
+ 
+ 	log_start
+ 	run_cmd nettest ${varg} -I ${NSA_DEV} -s &
+-	sleep 1
++	wait_local_port_listen ${NSA} 12345 tcp
+ 	run_cmd nettest ${varg} -d ${NSA_DEV} -r ${a} &
+ 	sleep 3
+ 	run_cmd ip link del ${VRF}
+@@ -3950,7 +3950,7 @@ netfilter_tcp_reset()
+ 	do
+ 		log_start
+ 		run_cmd nettest -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -r ${a}
+ 		log_test_addr ${a} $? 1 "Global server, reject with TCP-reset on Rx"
+ 	done
+@@ -3968,7 +3968,7 @@ netfilter_icmp()
+ 	do
+ 		log_start
+ 		run_cmd nettest ${arg} -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest ${arg} -r ${a}
+ 		log_test_addr ${a} $? 1 "Global ${stype} server, Rx reject icmp-port-unreach"
+ 	done
+@@ -4007,7 +4007,7 @@ netfilter_tcp6_reset()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -s &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -6 -r ${a}
+ 		log_test_addr ${a} $? 1 "Global server, reject with TCP-reset on Rx"
+ 	done
+@@ -4025,7 +4025,7 @@ netfilter_icmp6()
+ 	do
+ 		log_start
+ 		run_cmd nettest -6 -s ${arg} &
+-		sleep 1
++		wait_local_port_listen ${NSA} 12345 tcp
+ 		run_cmd_nsb nettest -6 ${arg} -r ${a}
+ 		log_test_addr ${a} $? 1 "Global ${stype} server, Rx reject icmp-port-unreach"
+ 	done
+@@ -4221,12 +4221,12 @@ use_case_snat_on_vrf()
+ 	run_cmd ip6tables -t nat -A POSTROUTING -p tcp -m tcp --dport ${port} -j SNAT --to-source ${NSA_LO_IP6} -o ${VRF}
+ 
+ 	run_cmd_nsb nettest -s -l ${NSB_IP} -p ${port} &
+-	sleep 1
++	wait_local_port_listen ${NSB} ${port} tcp
+ 	run_cmd nettest -d ${VRF} -r ${NSB_IP} -p ${port}
+ 	log_test $? 0 "IPv4 TCP connection over VRF with SNAT"
+ 
+ 	run_cmd_nsb nettest -6 -s -l ${NSB_IP6} -p ${port} &
+-	sleep 1
++	wait_local_port_listen ${NSB} ${port} tcp
+ 	run_cmd nettest -6 -d ${VRF} -r ${NSB_IP6} -p ${port}
+ 	log_test $? 0 "IPv6 TCP connection over VRF with SNAT"
  
 -- 
 2.51.0
