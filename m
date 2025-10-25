@@ -1,58 +1,60 @@
-Return-Path: <netdev+bounces-232889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A64CC09B96
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:49:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36B26C09AA7
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:44:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9B75423FC7
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:37:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45F5F188A755
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6E031D378;
-	Sat, 25 Oct 2025 16:28:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 675B72475E3;
+	Sat, 25 Oct 2025 16:28:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rICQLr+P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aux/AYzp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83BB831D374;
-	Sat, 25 Oct 2025 16:28:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F19F3043B7;
+	Sat, 25 Oct 2025 16:28:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761409699; cv=none; b=DDUDm3plONMGPKybXDOY3ueJkTcCjYlBihVRLHJ8HKWabfLSVooNiy5BrAr/4660Xv1a7nCI5AFD8rdae3FCClIuHtoB+ZfHKRAZGpBWiJWJBiSdyX28sA2RQl09fAMqACYb3ZM3HaFr5VbwFn87AyokkpGad8vUK1CdiBb2Jzs=
+	t=1761409712; cv=none; b=Gtq0Ok+bUBbd4CAzCZASnpeAUEkAZvfpF9FkyE6qkyOExXgs9ctKbVmml/tW739xoL2uoJPViTrzHaEaxW4moLVRqZqVfFGTZ7w7Q5bkq/qaSan+N1LsCaH2u0x5TLDtO+oQpqBoHHx3M+4Yhs3vdDHKUSdtMJqiG7azdu7ZMK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761409699; c=relaxed/simple;
-	bh=qMWLDHS2xACDEWl+ZGTXI/I25ilu1OHVgMQ7gxdd47s=;
+	s=arc-20240116; t=1761409712; c=relaxed/simple;
+	bh=D8Nbd0Uf19WsIu6RUTCrkEJFRO65F/k3bcyx0m49Gfs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vEtl5uD6PuF7smH0iflqQr4xUmt7T/clXcpCXqCX68skZPtJfuEcH2FzrrVSUPEmY1lINH7sHoLhv+/mV4mQt1WY0TZEAZGSBcV8dO2KFXntbWuwtCwCpFODEX4BRiiRnA1yrK8JAVoOos8rW+WyHFH8ZwT2u9RC/uVwbYl0ppY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rICQLr+P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 794B2C4CEF5;
-	Sat, 25 Oct 2025 16:28:18 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qLQDTz/BFYtD0dIF/naEk4OKyoYros5iADMgYBsPrNPQQ5RR8k5qJkUqLHBxeAXf39xQovJBra1djS3Xzz5a384/y9Z1uPllOjLSwCInXDralnmWmwPmblj55ka/ew4REPfw6vAEaOp3eL8neU5/PkbZ31Fi3ZTGNZptG/I167o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aux/AYzp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A53DC113D0;
+	Sat, 25 Oct 2025 16:28:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761409699;
-	bh=qMWLDHS2xACDEWl+ZGTXI/I25ilu1OHVgMQ7gxdd47s=;
+	s=k20201202; t=1761409712;
+	bh=D8Nbd0Uf19WsIu6RUTCrkEJFRO65F/k3bcyx0m49Gfs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rICQLr+PfsS5JRG9nKMmuUZUKuEXsUTIxM4Bupyq9fRVKhkEPPKiFpw1ohwmikwNz
-	 AAucq4M5KiM78R4/E+KC6hYbQ3vl3xi0tpxqR5LqIPtkRXL8kE+0b/sLgeZE45Kk7K
-	 IIvLeUtdOTCR5IkHd/yW7yrRBG4OWdyQAfdV0Y8yP3l/cQv3xPpd7XQuCNLHTVaxuM
-	 EoR2H2H48jZypj68a+vy5PUXb5BtUfIwym96Gnjq6sw+kyUVfbhx17QomID8DLeL/X
-	 levAJAGT3UvV60DBKXC3ebBnMXUKslaQsJL98xfApT/v1zGqbXmFhZAHP6fwKOCbda
-	 SgAG3uRWwjjmw==
+	b=aux/AYzpaJ0f1m70a5hKTSHZXxK6pOWrXSQkorSQUBh5IG5yae1UnscNXuaFlHwva
+	 RlxLnoEJpHjiCnxC+R9PgFg/d8PVlyZvzDGYZO0eOCfCW/6KbknjHFvdWaxlmrB/57
+	 2Eq/5/N53tZ6ccUmJGqK0tZosWx5xgYHqCnwq8yLDCZkBmzLHXEq/GzTSJzmKw2cUJ
+	 Srew6T1ZKJjdDcjUsGN4iWS3njyhVS5Ksb4Y6MRHMc45T3cmO34gtY2LPcKm0LYXHn
+	 puCkiS1Vl/Or/hbswekw1TlrY0JE7uigMoBzK1RuggwYuNAIlCtRD+DajsJVm6Dznv
+	 b6lIRSpwpQQjw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Fan Gong <gongfan1@huawei.com>,
-	Zhu Yikai <zhuyikai1@h-partners.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: David Ahern <dsahern@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17] hinic3: Fix missing napi->dev in netif_queue_set_napi
-Date: Sat, 25 Oct 2025 12:00:56 -0400
-Message-ID: <20251025160905.3857885-425-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17-5.4] selftests: Replace sleep with slowwait
+Date: Sat, 25 Oct 2025 12:01:02 -0400
+Message-ID: <20251025160905.3857885-431-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -68,69 +70,87 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Fan Gong <gongfan1@huawei.com>
+From: David Ahern <dsahern@kernel.org>
 
-[ Upstream commit 4404f6af810829588a51968959c6b85574109c13 ]
+[ Upstream commit 2f186dd5585c3afb415df80e52f71af16c9d3655 ]
 
-As netif_queue_set_napi checks napi->dev, if it doesn't have it and
-it will warn_on and return. So we should use netif_napi_add before
-netif_queue_set_napi because netif_napi_add has "napi->dev = dev".
+Replace the sleep in kill_procs with slowwait.
 
-Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Fan Gong <gongfan1@huawei.com>
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Link: https://patch.msgid.link/a17a5a087350eaf2e081dcd879779ca2c69b0908.1757653621.git.zhuyikai1@h-partners.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: David Ahern <dsahern@kernel.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20250910025828.38900-2-dsahern@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-YES – The patch fixes a real bug that every hinic3 user will hit, and it
-does so with a minimal, obviously-correct change.
+YES
 
-- `drivers/net/ethernet/huawei/hinic3/hinic3_irq.c:45-50` now calls
-  `netif_napi_add()` before `netif_queue_set_napi()`. Before this change
-  the calls were reversed, so the queue registration happened while
-  `napi->dev` was still NULL.
-- `net/core/dev.c:7159-7166` shows `netif_queue_set_napi()` emits
-  `WARN_ON_ONCE(napi && !napi->dev)` and returns early. That warning
-  fires on every queue bring-up in current kernels because
-  `qp_add_napi()` tried to attach the queue first, and the association
-  silently failed.
-- Because the helper bails out, the driver leaves
-  `rxq->napi`/`txq->napi` unset, meaning busy-polling, queue
-  diagnostics, and any code using `netif_queue_get_napi()` lose the
-  mapping, on top of the user-visible WARN splat. `netif_napi_add()` is
-  precisely where `napi->dev` becomes valid (`net/core/dev.c:7440`), so
-  executing it first is required.
-- The fix is a one-line reordering with no side effects or dependencies,
-  so the regression risk is negligible while the benefit is immediate.
+- What changed
+  - Replaces a fixed delay with a condition-based wait in `kill_procs()`
+    so test cleanup actually completes before proceeding:
+    `tools/testing/selftests/net/fcnal-test.sh:192`.
+  - Old behavior: `sleep 1` after `killall nettest ping ping6`.
+  - New behavior: `slowwait 2 sh -c 'test -z "$(pgrep
+    "^(nettest|ping|ping6)$")"'` to poll until those processes are gone,
+    up to 2 seconds.
 
-Given the always-on warning and missing queue-to-NAPI wiring, this is a
-good and safe candidate for stable backporting.
+- Why it matters
+  - `kill_procs()` is called at test start to ensure a clean slate:
+    `tools/testing/selftests/net/fcnal-test.sh:161-166`. A fixed sleep
+    can be too short on slower or loaded systems, leaving straggler
+    `ping`/`ping6`/`nettest` processes that interfere with subsequent
+    tests, causing flakiness or false failures. The condition-based wait
+    removes that flakiness by verifying process exit.
 
- drivers/net/ethernet/huawei/hinic3/hinic3_irq.c | 2 +-
+- How `slowwait` works (and why it’s safe)
+  - `slowwait()` is a common helper in net selftests that polls every
+    100ms until a command succeeds or a timeout is hit:
+    `tools/testing/selftests/net/lib.sh:105-110`. It uses `loopy_wait
+    "sleep 0.1" ...`, causing no architectural or API changes, and only
+    affects selftest behavior.
+  - This is consistent with broader selftests usage (e.g.,
+    `tools/testing/selftests/net/rtnetlink.sh:314`,
+    `tools/testing/selftests/net/forwarding/lib.sh:566`), standardizing
+    on proven patterns already used across the test suite.
+
+- Scope and risk
+  - Selftests-only change; no in-kernel code touched.
+  - Small and contained; no interface changes.
+  - Failure mode is limited: if the processes don’t exit, `slowwait`
+    times out in 2s and `kill_procs()`’s non-zero exit code is not fatal
+    in callers (no `set -e`); the tests proceed, but the added wait
+    significantly lowers flakiness vs. a blind `sleep 1`.
+  - The `pgrep` anchored regex `^(nettest|ping|ping6)$` targets the
+    exact processes, avoiding false positives.
+
+- Stable backport fit
+  - Fixes a real test bug (flaky cleanup) that affects test reliability
+    on stable trees.
+  - Minimal risk, no architectural changes, not a new feature.
+  - Improves determinism of selftests run against stable kernels,
+    aligning with stable policy to accept selftest reliability fixes.
+
+Conclusion: This is a low-risk, selftests-only robustness fix that
+improves test reliability and should be backported.
+
+ tools/testing/selftests/net/fcnal-test.sh | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c b/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-index 8b92eed25edfe..aba1a1d579c50 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-@@ -42,11 +42,11 @@ void qp_add_napi(struct hinic3_irq_cfg *irq_cfg)
+diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testing/selftests/net/fcnal-test.sh
+index cf535c23a959a..dfd368371fb3c 100755
+--- a/tools/testing/selftests/net/fcnal-test.sh
++++ b/tools/testing/selftests/net/fcnal-test.sh
+@@ -189,7 +189,7 @@ show_hint()
+ kill_procs()
  {
- 	struct hinic3_nic_dev *nic_dev = netdev_priv(irq_cfg->netdev);
- 
-+	netif_napi_add(nic_dev->netdev, &irq_cfg->napi, hinic3_poll);
- 	netif_queue_set_napi(irq_cfg->netdev, irq_cfg->irq_id,
- 			     NETDEV_QUEUE_TYPE_RX, &irq_cfg->napi);
- 	netif_queue_set_napi(irq_cfg->netdev, irq_cfg->irq_id,
- 			     NETDEV_QUEUE_TYPE_TX, &irq_cfg->napi);
--	netif_napi_add(nic_dev->netdev, &irq_cfg->napi, hinic3_poll);
- 	napi_enable(&irq_cfg->napi);
+ 	killall nettest ping ping6 >/dev/null 2>&1
+-	sleep 1
++	slowwait 2 sh -c 'test -z "$(pgrep '"'^(nettest|ping|ping6)$'"')"'
  }
  
+ set_ping_group()
 -- 
 2.51.0
 
