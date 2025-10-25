@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-232871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4464DC0990E
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:36:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 679A3C09917
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:36:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A34E423A0A
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:29:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BE75423C8C
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:30:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF049313527;
-	Sat, 25 Oct 2025 16:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B089E30DD0A;
+	Sat, 25 Oct 2025 16:23:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="frffo4kX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TVDOCQy+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851473074A4;
-	Sat, 25 Oct 2025 16:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC0330CDBF;
+	Sat, 25 Oct 2025 16:23:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761409391; cv=none; b=F4abrpOjdBgXpMbeeUHHc7nsHAF/qEtKvPQ1K82MmzOxq4PXbpuR5FW6VJn2hL6YwyUAABGJxZr1OyRg32zB0eXINlAKFBxQcB0RjVuLSJlKVwc6PivlxqHkmgxkW9nfHzsJCDPwsZmHpj9utNnIbyLC7CTutollc+LndA/PRUc=
+	t=1761409407; cv=none; b=YYfmD8ruDyOtXlF5Y9kKV53MGTdvJ+P7+tG1gqnRTpxzg1ZEZeuOr09VvQbHNv0v9Z/QUs2flq6zhBPdXGk0sR2R1zVZWDTt1qHGjXnvj2QvN3HOdhONhNVE0VthnB6jFdswP3QobZjZVDFTVZpOpO1OpRWkHjxhdcSADLPkcI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761409391; c=relaxed/simple;
-	bh=Eo1dzXjyZ4j2Et5f+6SWckQLSKp7VD275jrVBd3zdBw=;
+	s=arc-20240116; t=1761409407; c=relaxed/simple;
+	bh=+JWPeq66ZgliSKi8RN7Ifwh0FIgoMR4yXPN39vlrryw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oGD656SvChlO+IrwM9B00ZUX4mS4kVjOqfi0y9wQIJFpjERYC+I69tRrhf3NpX4kkenWoTnJA4yKGbiZNMeUpWnmCI7qkxg/0OxnkF0nYk2uNFp6Xh1MrgUCASpO9107Y1NHJk+QHh1DJEbuylOefAI3vASgVT/nlKdY3KGOIqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=frffo4kX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 688C6C4CEF5;
-	Sat, 25 Oct 2025 16:23:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ccUz1FtM3Pigh7Sjlg8FppnG7He7TRlOAHB7c5HnDGscGcjtle8ZM0WsT4pnF6iF7YxtZ/6ljzDgSR0arqWNdSERSDLBdI9WgFS+kEK1dmxZfueqw9+ZxXT696l/Q6lATATsWghyZtzVZwgLJJRhncAHfQlDS1JO2rUfw6Z/L6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TVDOCQy+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40C2BC4CEF5;
+	Sat, 25 Oct 2025 16:23:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761409391;
-	bh=Eo1dzXjyZ4j2Et5f+6SWckQLSKp7VD275jrVBd3zdBw=;
+	s=k20201202; t=1761409407;
+	bh=+JWPeq66ZgliSKi8RN7Ifwh0FIgoMR4yXPN39vlrryw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=frffo4kXwWag4ETZ9TXSEotj3lsFEDbXpX5gJHQA21QB8nhRclU6JfojSsHH2Ic3L
-	 pIQ6p/AxwJRpj4WtfKlu//J19qjKYoJM2r7Ji4ejKJ1Dcb9ClHnKdy1qtjKHfEqIlT
-	 D4LeCWypXqrj0k0zMJqstGU3tjv5Gb7ixMz9T40mvO+YKjNVDbrEDC3/ID4z+yJtF2
-	 CmrYIC4lquUe9agsIl4tMXGpm5T0tcnVYIzyQsKe2lNlwEPTsx+uaRaXhaxDPD1eYz
-	 bN79Y+jvXhCV7Vog3KGv+xVF4F0OjyOraSXpHEhbwhgw3iQ0hN2SrEYedCBoGytz1p
-	 K0MksCbe9Y2Ag==
+	b=TVDOCQy+Y/kUuVpTkgLHLPPkrBLCY+IpK/4KHdIL9XdkELgeG/GS4NOOdL0KPz+s8
+	 ooZZ4yAgiHeMBPhfFywL8M6yysW0oAksvQEIDe4RmYqDwwvSeye1wf8jouK89FkzxJ
+	 blzZ817KrFr734zCQ540dLZTSTo1/hs+3CHk+eC4H2JCN8i5QahiSfdX1S7m64PW9/
+	 UtT9tG/5Q2tFBCSamnz2IY6b3v+IPxk6MWOWB7tNURUIv7ZgZ45cWsrxEg6VnfOeWb
+	 A3uOkgOFzcXmT38t37JS8pBsPS/JL+n/GrVV5FlJeryx4cFR4Hqd1Mzav0x71dmNHe
+	 OwSjnF9//E6WA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	David Ahern <dsahern@kernel.org>,
+Cc: Petr Machata <petrm@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	ncardwell@google.com,
 	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-6.12] tcp: use dst_dev_rcu() in tcp_fastopen_active_disable_ofo_check()
-Date: Sat, 25 Oct 2025 11:58:54 -0400
-Message-ID: <20251025160905.3857885-303-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17] selftests: net: lib.sh: Don't defer failed commands
+Date: Sat, 25 Oct 2025 11:59:00 -0400
+Message-ID: <20251025160905.3857885-309-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -69,16 +70,23 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Eric Dumazet <edumazet@google.com>
+From: Petr Machata <petrm@nvidia.com>
 
-[ Upstream commit b62a59c18b692f892dcb8109c1c2e653b2abc95c ]
+[ Upstream commit fa57032941d4b451c7264ebf3ad595bc98e3a9a9 ]
 
-Use RCU to avoid a pair of atomic operations and a potential
-UAF on dst_dev()->flags.
+Usually the autodefer helpers in lib.sh are expected to be run in context
+where success is the expected outcome. However when using them for feature
+detection, failure can legitimately occur. But the failed command still
+schedules a cleanup, which will likely fail again.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: David Ahern <dsahern@kernel.org>
-Link: https://patch.msgid.link/20250828195823.3958522-8-edumazet@google.com
+Instead, only schedule deferred cleanup when the positive command succeeds.
+
+This way of organizing the cleanup has the added benefit that now the
+return code from these functions reflects whether the command passed.
+
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+Link: https://patch.msgid.link/af10a5bb82ea11ead978cf903550089e006d7e70.1757004393.git.petrm@nvidia.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -87,97 +95,153 @@ LLM Generated explanations, may be completely bogus:
 
 YES
 
-Explanation and rationale
 - What it fixes
-  - Eliminates a race that can lead to a use-after-free when reading
-    `dev->flags` from a `dst_entry` without RCU protection. The pre-
-    change pattern `sk_dst_get()` → `dst_dev()` → `dev->flags` →
-    `dst_release()` can observe a freed `struct net_device` and
-    dereference `dev->flags`, risking UAF.
-  - The change uses RCU to safely dereference the route device and avoid
-    the refcount pair on `dst` (performance benefit is secondary to
-    correctness).
+  - In tools/testing/selftests/net/lib.sh: wrapper helpers schedule
+    deferred cleanups even when the “positive” command fails, and they
+    unintentionally mask failures because the last executed command
+    (defer) returns success. This leads to confusing follow-up errors
+    and unreliable feature-detection logic.
+  - The change makes deferred cleanup conditional on success and
+    preserves the original command’s exit status, so failures are
+    detected and reported correctly.
 
-- Code specifics
-  - Affected function: `net/ipv4/tcp_fastopen.c:559`
-    (tcp_fastopen_active_disable_ofo_check)
-  - Before (conceptually): `dst = sk_dst_get(sk); dev = dst ?
-    dst_dev(dst) : NULL; if (!(dev && (dev->flags & IFF_LOOPBACK)))
-    atomic_set(..., 0); dst_release(dst);`
-    - Problem: `dev->flags` is read without RCU or a device reference;
-      `struct net_device` is RCU-freed, so this can race and UAF.
-  - After:
-    - `rcu_read_lock();`
-    - `dst = __sk_dst_get(sk);` (RCU-protected view of
-      `sk->sk_dst_cache`; `include/net/sock.h:2142`)
-    - `dev = dst ? dst_dev_rcu(dst) : NULL;` (RCU-safe deref of device;
-      `include/net/dst.h:574`)
-    - `if (!(dev && (dev->flags & IFF_LOOPBACK)))
-      atomic_set(&sock_net(sk)->ipv4.tfo_active_disable_times, 0);`
-    - `rcu_read_unlock();`
-    - See current code at `net/ipv4/tcp_fastopen.c:581` for the RCU
-      pattern.
-  - The function is invoked in normal teardown paths, so it can be hit
-    in practice:
-    - `net/ipv4/tcp_ipv4.c:2570`
-    - `net/ipv4/tcp.c:3382`
+- Specific code changes
+  - ip_link_add(): from running defer unconditionally to chaining with
+    success, i.e. `ip link add ... && defer ip link del dev "$name"`
+    (tools/testing/selftests/net/lib.sh).
+  - ip_link_set_master(): `ip link set dev "$member" master "$master" &&
+    defer ip link set dev "$member" nomaster`.
+  - ip_link_set_addr(): captures `old_addr=$(mac_get "$name")` and only
+    schedules rollback if setting the new address succeeds: `... &&
+    defer ip link set dev "$name" address "$old_addr"`.
+  - ip_link_set_up()/ip_link_set_down(): only schedule the opposite
+    action if the set operation actually succeeded, e.g. `... && defer
+    ip link set dev "$name" down/up`.
+  - ip_addr_add(): `ip addr add dev "$name" "$@" && defer ip addr del
+    dev "$name" "$@"`.
+  - ip_route_add(): `ip route add "$@" && defer ip route del "$@"`.
+  - bridge_vlan_add(): `bridge vlan add "$@" && defer bridge vlan del
+    "$@"`.
+  - Net effect: cleanup commands are deferred only after successful
+    state changes; failure paths do not schedule doomed cleanups.
 
-- Scope and risk
-  - Small, contained change in a single function, no ABI changes, no
-    architectural refactors.
-  - Only affects active TCP Fast Open logic when clearing the global
-    backoff counter on non-loopback devices.
-  - Behavior is unchanged except making the device lookup and flag read
-    concurrency-safe and cheaper (no `dst` refcount inc/dec).
-  - Reading `IFF_LOOPBACK` under RCU is safe; the bit is effectively
-    stable for the loopback device, and RCU guarantees pointer lifetime
-    during the check.
+- Why it’s a good stable backport
+  - User impact: Fixes real test flakiness and misleading pass/fail
+    reporting in widely used net selftests. Feature detection can
+    legitimately fail; previously that failure both scheduled a failing
+    cleanup and could be hidden by a succeeding defer, making debugging
+    hard.
+  - Scope and size: Small, contained changes to a single selftests shell
+    library file; no kernel/runtime code affected.
+  - Risk profile: Minimal. The helpers now return the true result of the
+    underlying ip/bridge command and don’t enqueue impossible cleanups.
+    Tests that “passed” due to masked errors will start failing earlier
+    and more clearly, which is the correct behavior.
+  - Architecture/ABI: No architectural changes, no new features;
+    strictly test reliability and correctness improvement.
+  - Stable policy fit: Important bugfix for selftests that improves
+    determinism and correctness with minimal risk.
 
-- Stable backport fit
-  - Fixes a real concurrency/UAF bug that can crash the kernel; it’s not
-    a feature change.
-  - Minimal risk of regression and confined to TCP/TFO.
-  - Uses widely available helpers:
-    - `__sk_dst_get()` at `include/net/sock.h:2142`
-    - `dst_dev_rcu()` at `include/net/dst.h:574`
-  - If an older stable branch lacked `dst_dev_rcu()`, the change is
-    trivially adaptable using `rcu_dereference(dst->dev)` under
-    `rcu_read_lock()`. But in maintained series this helper is already
-    present in the networking core.
+- Side effects considered
+  - Return codes of these helpers now reflect the command outcome. Any
+    test inadvertently relying on the old, incorrect “always succeed”
+    behavior may fail earlier, but that exposes pre-existing issues
+    rather than introducing regressions.
+  - Cleanup behavior in failure paths becomes a no-op (correct),
+    avoiding secondary errors and noise.
 
-- Why it matters
-  - Even if exploitation is unlikely (requires racing TFO teardown with
-    route/device changes), it’s a correctness and reliability fix in a
-    core network path and should be in stable trees.
+Given the correctness fix, limited scope, and low risk, this commit is
+well-suited for stable backporting.
 
-Conclusion
-- This is a clear bug fix for a potential UAF with a minimal, localized
-  RCU conversion. It aligns with stable criteria and should be
-  backported.
+ tools/testing/selftests/net/lib.sh | 32 +++++++++++++++---------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
- net/ipv4/tcp_fastopen.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
-index f1884f0c9e523..7d945a527daf0 100644
---- a/net/ipv4/tcp_fastopen.c
-+++ b/net/ipv4/tcp_fastopen.c
-@@ -576,11 +576,12 @@ void tcp_fastopen_active_disable_ofo_check(struct sock *sk)
- 		}
- 	} else if (tp->syn_fastopen_ch &&
- 		   atomic_read(&sock_net(sk)->ipv4.tfo_active_disable_times)) {
--		dst = sk_dst_get(sk);
--		dev = dst ? dst_dev(dst) : NULL;
-+		rcu_read_lock();
-+		dst = __sk_dst_get(sk);
-+		dev = dst ? dst_dev_rcu(dst) : NULL;
- 		if (!(dev && (dev->flags & IFF_LOOPBACK)))
- 			atomic_set(&sock_net(sk)->ipv4.tfo_active_disable_times, 0);
--		dst_release(dst);
-+		rcu_read_unlock();
- 	}
+diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
+index c7add0dc4c605..80cf1a75136cf 100644
+--- a/tools/testing/selftests/net/lib.sh
++++ b/tools/testing/selftests/net/lib.sh
+@@ -547,8 +547,8 @@ ip_link_add()
+ {
+ 	local name=$1; shift
+ 
+-	ip link add name "$name" "$@"
+-	defer ip link del dev "$name"
++	ip link add name "$name" "$@" && \
++		defer ip link del dev "$name"
  }
  
+ ip_link_set_master()
+@@ -556,8 +556,8 @@ ip_link_set_master()
+ 	local member=$1; shift
+ 	local master=$1; shift
+ 
+-	ip link set dev "$member" master "$master"
+-	defer ip link set dev "$member" nomaster
++	ip link set dev "$member" master "$master" && \
++		defer ip link set dev "$member" nomaster
+ }
+ 
+ ip_link_set_addr()
+@@ -566,8 +566,8 @@ ip_link_set_addr()
+ 	local addr=$1; shift
+ 
+ 	local old_addr=$(mac_get "$name")
+-	ip link set dev "$name" address "$addr"
+-	defer ip link set dev "$name" address "$old_addr"
++	ip link set dev "$name" address "$addr" && \
++		defer ip link set dev "$name" address "$old_addr"
+ }
+ 
+ ip_link_has_flag()
+@@ -590,8 +590,8 @@ ip_link_set_up()
+ 	local name=$1; shift
+ 
+ 	if ! ip_link_is_up "$name"; then
+-		ip link set dev "$name" up
+-		defer ip link set dev "$name" down
++		ip link set dev "$name" up && \
++			defer ip link set dev "$name" down
+ 	fi
+ }
+ 
+@@ -600,8 +600,8 @@ ip_link_set_down()
+ 	local name=$1; shift
+ 
+ 	if ip_link_is_up "$name"; then
+-		ip link set dev "$name" down
+-		defer ip link set dev "$name" up
++		ip link set dev "$name" down && \
++			defer ip link set dev "$name" up
+ 	fi
+ }
+ 
+@@ -609,20 +609,20 @@ ip_addr_add()
+ {
+ 	local name=$1; shift
+ 
+-	ip addr add dev "$name" "$@"
+-	defer ip addr del dev "$name" "$@"
++	ip addr add dev "$name" "$@" && \
++		defer ip addr del dev "$name" "$@"
+ }
+ 
+ ip_route_add()
+ {
+-	ip route add "$@"
+-	defer ip route del "$@"
++	ip route add "$@" && \
++		defer ip route del "$@"
+ }
+ 
+ bridge_vlan_add()
+ {
+-	bridge vlan add "$@"
+-	defer bridge vlan del "$@"
++	bridge vlan add "$@" && \
++		defer bridge vlan del "$@"
+ }
+ 
+ wait_local_port_listen()
 -- 
 2.51.0
 
