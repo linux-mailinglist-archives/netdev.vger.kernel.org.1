@@ -1,114 +1,121 @@
-Return-Path: <netdev+bounces-232833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF101C0924D
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:57:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 836B9C09257
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 17:01:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7A0104EA7F5
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 14:53:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2ECE3A775B
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 15:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 787DC3009C0;
-	Sat, 25 Oct 2025 14:53:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 271713002DF;
+	Sat, 25 Oct 2025 15:01:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="mGCUG53T"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZADcKZji"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.245.243.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAFF12FF16E
-	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 14:53:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6AE21322F
+	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 15:01:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.245.243.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761404004; cv=none; b=cE4z5Fux/KbPd5qQWWIitEiN3sT9SbC5ysmMKgz16rLYHRYSsQoCEBDhJGmPYeg1WViqguvEz99hGiQPtMRQtEZq7tHMP1badrYlc1Rk/h2zsbYAuMloyAKksQZH6pzdWqd4BrTQxHpb/7B9pCovLftgF1W2KYc7lqWrttBhQDk=
+	t=1761404515; cv=none; b=upLsyPQGmXx8EbjyurZUEMQXbTvkJ5xdYpa0ohl0btbAs4bV0ZcioBh/qwyx7Cqk8c/ijBo4IlV9eX+Aqkxqe7cZIbRtfFAlZbJfdsH001aQJx+KEEKYmmjXqz1fo0p/nj32Qku92mDyeki70oDBW9qr0sMwCXsk025mfBIdNHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761404004; c=relaxed/simple;
-	bh=JaSfmXv94VXl1jyPk4wPKXuHmTVcW+XYQIoaz8cq1sc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OABI3+VOa61AiC3xyeZcLHd7Ywh2nCcNo9vYlp4WBUO+MiUnECWjUOvNhenP7eSsOJa2bJ+oFPM6SnA3i5FVs4BiXwb1TS1gu3FXudjpv5em4ErqRKaOKHR1kcVJfaqE3pyX+a7+naoZ8STRBQdcNR0Og1Z3ez/FTpmQvnagoT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=mGCUG53T; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=s8P1sxLgEuKRZ6dvxoVDBmjehIiKI0ixhEHlFaCTQFs=; b=mGCUG53TFjcHedFm6fwVH+6lWd
-	aVyMvQ9GdkajhSknyP/Dppubm787ZKAMj9nyQVFPhuoCbY/Wp5rmANBQ25H76wXTQHXRkME9wT+ER
-	ziAdOL7AZLCsoyEfUurnxH0hccb/0OnTo24m1o/t6doB9i6PMcloWkzMli435VcpZdTCLZCxpd9d/
-	102rXdZLNhmJNTHXWRop07MPQsD0L989sdvp0PSsjDSafXjenEMc3o8yMgt7we6K1HB0i523Y2zPC
-	3tt++PvXWRMg7m1wVCDEgtE9NLWHnxy/Ij0yAWk0Rou32ldPyFZmFicFnC6Pd8kzOvQRfX6OXFBFd
-	bT8R25Pg==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <carnil@debian.org>)
-	id 1vCfdo-009sNR-Nm; Sat, 25 Oct 2025 14:53:13 +0000
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id 07F7BBE2EE7; Sat, 25 Oct 2025 16:53:12 +0200 (CEST)
-Date: Sat, 25 Oct 2025 16:53:11 +0200
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Garri Djavadyan <g.djavadyan@gmail.com>, netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>, 1117959@bugs.debian.org
-Subject: Re: Bug#1117959: ipv6_route flags RTF_ADDRCONF and RTF_PREFIX_RT are
- not cleared when static on-link routes are added during IPv6 address
- configuration
-Message-ID: <aPzkVzX77z9CMVyy@eldamar.lan>
-References: <ba807d39aca5b4dcf395cc11dca61a130a52cfd3.camel@gmail.com>
- <0df1840663483a9cebac9f3291bc2bd59f2b3c39.camel@gmail.com>
- <20251018013902.67802981@phoenix.lan>
+	s=arc-20240116; t=1761404515; c=relaxed/simple;
+	bh=c0kR08R5IAcF8RDrt05yjaWw2A/pmKNvO+hvr6PFZYM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J1I2X+z7UEpWDcMjen6lQjOZwwcSLNSsloKzi+eEM/rEVNF2XrjAeCq302479BjrmcgoqrUVNQ5zFnipUpclsRtJcs9JmN+dG1+rDx4uTtf2wIajxZzzPJ+bw8Cd6dfXYvD0hg6gBblnwzcsZxcj5jC2E7JGM9X4azxsPKyapow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZADcKZji; arc=none smtp.client-ip=44.245.243.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1761404512; x=1792940512;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=6rH7qvf1RZBkjVdwkDlcJfm9sBHxPRv2fdKfMYL++g0=;
+  b=ZADcKZjiKmnJ9UxVe1HGYUEcwc0MbNimwrIfh/lUWjm0ZAuXBGV61EJC
+   jkseczYKvjpX2x4tlwuKV3afcR4cUqL/u6MQt/gvm6qpf9rGjk+23cTRi
+   ESxperAw8aeE5s3fu0r96lVZr/xPaWbhNvmEMQ/4UmAg2gDMHP+15cC3u
+   9uvrNCOSdDgmXAEQQyjRCqr1/s3GqJ06ykjQwfDUelG9m8Yr4Rrr2PgTO
+   D3qWwu1GZEl4VBuBMcsJXSSthdYvnc/9FRh2bCpxA9uwN00HdijeUzbPZ
+   Rk/PNbdBPxcwEFGytR3+AArKQMXcnwj0bEhUMUE9c2ldW7BpteBFJPDVV
+   A==;
+X-CSE-ConnectionGUID: JqhhCBMlSdSNihIDIsM+Zg==
+X-CSE-MsgGUID: yD1g/CtZQSyg3bF4O+czxw==
+X-IronPort-AV: E=Sophos;i="6.18,281,1751241600"; 
+   d="scan'208";a="5710376"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2025 15:01:50 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.234:6857]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.17.61:2525] with esmtp (Farcaster)
+ id aceeaefd-0e9d-4774-a592-5cce947f4747; Sat, 25 Oct 2025 15:01:50 +0000 (UTC)
+X-Farcaster-Flow-ID: aceeaefd-0e9d-4774-a592-5cce947f4747
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Sat, 25 Oct 2025 15:01:50 +0000
+Received: from b0be8375a521.amazon.com (10.37.244.8) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Sat, 25 Oct 2025 15:01:47 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<kohei.enju@gmail.com>, Kohei Enju <enjuk@amazon.com>
+Subject: [PATCH iwl-next v1 0/3] igc: add RSS key get/set support
+Date: Sun, 26 Oct 2025 00:01:29 +0900
+Message-ID: <20251025150136.47618-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251018013902.67802981@phoenix.lan>
-X-Debian-User: carnil
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D039UWA004.ant.amazon.com (10.13.139.68) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Hi Garri,
+This series adds ethtool get/set support for the RSS hash key in the igc
+driver.
+- `ethtool -x <dev>` to display the RSS key
+- `ethtool -X <dev> hkey <key>` to configure the RSS key
 
-On Sat, Oct 18, 2025 at 01:39:02AM -0700, Stephen Hemminger wrote:
-> On Thu, 16 Oct 2025 00:12:40 +0200
-> Garri Djavadyan <g.djavadyan@gmail.com> wrote:
-> 
-> > Hi Everyone,
-> > 
-> > A year ago I noticed a problem with handling ipv6_route flags that in
-> > some scenarios can lead to reachability issues. It was reported here:
-> > 
-> > https://bugzilla.kernel.org/show_bug.cgi?id=219205
-> > 
-> > 
-> > Also it was recently reported in the Debian tracker after checking if
-> > the latest Debian stable is still affected:
-> > 
-> > https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1117959
-> > 
-> > 
-> > Unfortunately, the Debian team cannot act on the report because no one
-> > from the upstream kernel team has confirmed if the report in the
-> > upstream tracker is valid or not. Therefore, I am checking if anyone
-> > can help confirm if the observed behavior is indeed a bug.
-> > 
-> > Many thanks in advance!
-> > 
-> > Regards,
-> > Garri
-> > 
-> 
-> Linux networking does not actively use kernel bugzilla.
-> I forward the reports to the mailing list, that is all.
-> After than sometimes developers go back and update bugzilla
-> but it is not required or expected.
+Without patch:
+ # ethtool -x $DEV | grep key -A1
+ RSS hash key:
+ Operation not supported
+ # ethtool -X $DEV hkey be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef
+ Cannot set RX flow hash configuration:
+  Hash key setting not supported
 
-Garri, best action would likely be to really post your full report on
-netdev directly.
+With patch:
+ # ethtool -x $DEV | grep key -A1
+ RSS hash key:
+ dd:7c:1f:06:1a:42:dc:e5:7e:90:2c:48:aa:3f:5d:5a:d7:da:ec:44:3e:3f:df:78:89:1e:3c:68:2e:59:da:a0:23:5a:32:5c:cf:5e:7e:7b
+ # ethtool -X $DEV hkey be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef
+ # ethtool -x $DEV | grep key -A1
+ RSS hash key:
+ be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef
 
-Regards,
-Salvatore
+Kohei Enju (3):
+  igc: prepare for RSS key get/set support
+  igc: expose RSS key via ethtool get_rxfh
+  igc: allow configuring RSS key via ethtool set_rxfh
+
+ drivers/net/ethernet/intel/igc/igc.h         |  4 ++
+ drivers/net/ethernet/intel/igc/igc_ethtool.c | 60 ++++++++++++++------
+ drivers/net/ethernet/intel/igc/igc_main.c    |  7 +--
+ 3 files changed, 50 insertions(+), 21 deletions(-)
+
+-- 
+2.51.0
+
 
