@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-232940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A774CC09FF3
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 22:54:05 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00850C09FED
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 22:53:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97B3D3B0197
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 20:53:40 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9F76734C5DD
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 20:53:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B346D30596A;
-	Sat, 25 Oct 2025 20:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A43E3090CB;
+	Sat, 25 Oct 2025 20:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dO/6fv8U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gyBS+m3+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826A11367;
-	Sat, 25 Oct 2025 20:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA4E1E633C;
+	Sat, 25 Oct 2025 20:53:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761425617; cv=none; b=XSZmT1XhkEGpAZseMV7zkYbrzUZM60P16+5Lu24qGxMeKfg416ozRTRNl3+pzHljyXlY+0eTIii1Zvw6zxqUFyVWm0KNboV2ZYLsD/PxEAlav0HnIYWGx9yfBUheHsL4lFl6VlvEjfCrwNmnj3rGOqKSpKUo1Z4ma0TKb9GRt3c=
+	t=1761425621; cv=none; b=XXGZ/Hv7irlRke9FE3LSidg+mBraoU8t8ft55w6EKIKu5HzvyOBN8De/dOJYLLhd6Bq90W8FEaIsL2URtvc6UjN/V7ih98iPW40T/eFCaG932xSmaDV1jPfP62soXi9LmuCxWb/Hw1GgKFj5KvfKoEK/k/XapfhRF3c44rZSUuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761425617; c=relaxed/simple;
-	bh=rFP6/tMgv7qEPLocj8aUGISHZ+Qd8YkLgA3SOHA7IFg=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=rzqgXjZdY+k5KajFF5NrroJzgTy78X3IHiY8z+bc2ca3kl3hOBfFPHmOIrOzs+6JcL6ObmwCakFqyHyl1YXwXBf6cmA4H5z0nXKp+xnrJXOcNCwayXD886RiXiE6HBhFwxixLvC/ZPSAx2GKzgblIkFOaPWmoQ1uZxIczCAiS7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dO/6fv8U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E19D9C4CEF5;
-	Sat, 25 Oct 2025 20:53:32 +0000 (UTC)
+	s=arc-20240116; t=1761425621; c=relaxed/simple;
+	bh=k3f56oOKXrHPQQfnFbh//sCNF5j+f6kxvvopfboCJxQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=YZakyUPdcMfnGIqwFLmXzuMdejw2CV7DItWOjdY7psEy1Fx+7uH5ko9qxgb2IeYj02r9aAMKcE8wFZVHR/DqK9Spr5Lz6CEtM5dLG2PkLEde/Xt3JBj5Mp0hk1akFs/bxdQ+kXz3qjB5QmSYpjpqzN5BgkTkS20EwqMgpfceCC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gyBS+m3+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 677E7C113D0;
+	Sat, 25 Oct 2025 20:53:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761425616;
-	bh=rFP6/tMgv7qEPLocj8aUGISHZ+Qd8YkLgA3SOHA7IFg=;
-	h=From:Subject:Date:To:Cc:From;
-	b=dO/6fv8UzBrVLHCd0fc5uz0cG4KMB4yZCCKfEv9PNfJyt84N4HvvFkr9SLnMqoDFq
-	 MC6eeGlHxKjdFusduqS7whF3+LI8uKHHteq3L9cWbYdyemGHfH0ZSATjn/+MON4nS+
-	 SGGq1Cu+x5RfhbSJy4JDd4k8QNud+Gl3MRmzbK3Ov/jHNuzYhE+y1BYrF3vbNNsq+Z
-	 VmnU+g43DmrJD1Yeb54OmFGrJsvhVL+6rzRnlCyQruroujbYpynmGyUkhljT/ulpWi
-	 Xeeaa19Wt57Ra1CCiMogevG+w3M2zt0PY0oPJYav6FKkRGvOhDbcTjcx4VqYVYJpKr
-	 0oc7OvhL9PEMA==
+	s=k20201202; t=1761425621;
+	bh=k3f56oOKXrHPQQfnFbh//sCNF5j+f6kxvvopfboCJxQ=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=gyBS+m3+QuJhhVlVHOUu0JiISZ/k5A2IXJFsl4NJpggJCKVvIjEa5DDaYcuanepEl
+	 ZX8qFwgLj5h05w3VNQIwz095yPKdIr0J5hR9EYXxYcccTZgWrEYO5mBRVxL5xjP1SO
+	 e1vM74f58O9uKTNpKGok29peiZRWauNITxgfFEv4bGO5LjmYkZjTGFSsRpyvTVywkm
+	 o8XZXwwutNJLzUUdXK8JQMrWlxwFwbJAgv7rVCE7Bd97fyfmilTCi84cM/+WbrgSaD
+	 NJiBenCNc79SH8VjATqKJUrXw9UEcHG5CxPFvfdcSjyz6Mpkkqd3DNIoEe58TCEw0a
+	 IWJ/jpi1hdY8Q==
 From: Nathan Chancellor <nathan@kernel.org>
-Subject: [PATCH 0/3] Resolve ARM kCFI build failure in idpf xsk.c
-Date: Sat, 25 Oct 2025 21:53:17 +0100
-Message-Id: <20251025-idpf-fix-arm-kcfi-build-error-v1-0-ec57221153ae@kernel.org>
+Date: Sat, 25 Oct 2025 21:53:18 +0100
+Subject: [PATCH 1/3] compiler_types: Introduce __nocfi_generic
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,10 +52,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAL04/WgC/x3MQQoCMQyF4auUrA3YajvoVcRFp001jM6UFEUov
- fsEF2/xwePv0EiYGlxNB6EvN95WhT0YSM+4Pgg5q8Ednbc6ZS1Y+IdR3rikwjh/+JWRRDbB4CP
- 5S7DhNJ1BG1VIv//+7T7GDuPH3rVvAAAA
-X-Change-ID: 20251025-idpf-fix-arm-kcfi-build-error-65ae59616374
+Message-Id: <20251025-idpf-fix-arm-kcfi-build-error-v1-1-ec57221153ae@kernel.org>
+References: <20251025-idpf-fix-arm-kcfi-build-error-v1-0-ec57221153ae@kernel.org>
+In-Reply-To: <20251025-idpf-fix-arm-kcfi-build-error-v1-0-ec57221153ae@kernel.org>
 To: Kees Cook <kees@kernel.org>, 
  Alexander Lobakin <aleksander.lobakin@intel.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -70,42 +69,72 @@ Cc: Simon Horman <horms@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
  llvm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
  netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=939; i=nathan@kernel.org;
- h=from:subject:message-id; bh=rFP6/tMgv7qEPLocj8aUGISHZ+Qd8YkLgA3SOHA7IFg=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDBl/Lc6kLCj/wcq3yeGsWg7TjF1BU1OvzJSQmSEluq/5j
- HWb2Dr/jlIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjARxxhGhpMGy3/Le1eG6FrY
- x++odOT0dJn48p5ImrV8U3D8r61Bbgx/+Lv3M71ZtCXF/VdhpWPpuyP58q4bnoSFhR9hYrlkFtP
- KCgA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2120; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=k3f56oOKXrHPQQfnFbh//sCNF5j+f6kxvvopfboCJxQ=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDBl/Lc5InyyKcb3JcHTHf8mWDxptnkqzlkza4fp4wuf3C
+ y70+sbs7ShlYRDjYpAVU2Spfqx63NBwzlnGG6cmwcxhZQIZwsDFKQATEYxgZLhgKXhcWan09CFZ
+ rfM/z319Pnl1bPAMkYg83hl63neLNTIZ/lmsZ9aZkmEVs8JC9pVNn9NCf3O+vncMWzprc9f/3ea
+ 0iwsA
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-Hi all,
+There are two different ways that LLVM can expand kCFI operand bundles
+in LLVM IR: generically in the middle end or using an architecture
+specific sequence when lowering LLVM IR to machine code in the backend.
+The generic pass allows any architecture to take advantage of kCFI but
+the expansion of these bundles in the middle end can mess with
+optimizations that may turn indirect calls into direct calls when the
+call target is known at compile time, such as after inlining.
 
-This series resolves a build failure that is seen in
-drivers/net/ethernet/intel/idpf/xsk.c after commit 9705d6552f58 ("idpf:
-implement Rx path for AF_XDP") in 6.18-rc1 with ARCH=arm and
-CONFIG_CFI=y. See patch 3 for a simplified reproducer on top of
-defconfig.
+Add __nocfi_generic, dependent on an architecture selecting
+CONFIG_ARCH_USES_CFI_GENERIC_LLVM_PASS, to disable kCFI bundle
+generation in functions where only the generic kCFI pass may cause
+problems.
 
-I think this could go via hardening or net.
-
+Link: https://github.com/ClangBuiltLinux/linux/issues/2124
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 ---
-Nathan Chancellor (3):
-      compiler_types: Introduce __nocfi_generic
-      ARM: Select ARCH_USES_CFI_GENERIC_LLVM_PASS
-      libeth: xdp: Disable generic kCFI pass for libeth_xdp_tx_xmit_bulk()
-
  arch/Kconfig                   | 7 +++++++
- arch/arm/Kconfig               | 2 ++
  include/linux/compiler_types.h | 6 ++++++
- include/net/libeth/xdp.h       | 2 +-
- 4 files changed, 16 insertions(+), 1 deletion(-)
----
-base-commit: 211ddde0823f1442e4ad052a2f30f050145ccada
-change-id: 20251025-idpf-fix-arm-kcfi-build-error-65ae59616374
+ 2 files changed, 13 insertions(+)
 
-Best regards,
---  
-Nathan Chancellor <nathan@kernel.org>
+diff --git a/arch/Kconfig b/arch/Kconfig
+index 74ff01133532..61130b88964b 100644
+--- a/arch/Kconfig
++++ b/arch/Kconfig
+@@ -917,6 +917,13 @@ config ARCH_USES_CFI_TRAPS
+ 	  An architecture should select this option if it requires the
+ 	  .kcfi_traps section for KCFI trap handling.
+ 
++config ARCH_USES_CFI_GENERIC_LLVM_PASS
++	bool
++	help
++	  An architecture should select this option if it uses the generic
++	  KCFIPass in LLVM to expand kCFI bundles instead of architecture-specific
++	  lowering.
++
+ config CFI
+ 	bool "Use Kernel Control Flow Integrity (kCFI)"
+ 	default CFI_CLANG
+diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+index 59288a2c1ad2..1414be493738 100644
+--- a/include/linux/compiler_types.h
++++ b/include/linux/compiler_types.h
+@@ -461,6 +461,12 @@ struct ftrace_likely_data {
+ # define __nocfi
+ #endif
+ 
++#if defined(CONFIG_ARCH_USES_CFI_GENERIC_LLVM_PASS)
++# define __nocfi_generic	__nocfi
++#else
++# define __nocfi_generic
++#endif
++
+ /*
+  * Any place that could be marked with the "alloc_size" attribute is also
+  * a place to be marked with the "malloc" attribute, except those that may
+
+-- 
+2.51.1
 
 
