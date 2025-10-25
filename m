@@ -1,59 +1,63 @@
-Return-Path: <netdev+bounces-232852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C987C0968F
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:25:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8CB6C09602
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:23:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3EF2C50107F
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:17:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62D2E1AA6CA5
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD80306489;
-	Sat, 25 Oct 2025 16:15:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B0E3064B1;
+	Sat, 25 Oct 2025 16:15:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cGALKVVf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qi0n8Wul"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936AD3019DE;
-	Sat, 25 Oct 2025 16:15:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D9B3064A4;
+	Sat, 25 Oct 2025 16:15:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761408912; cv=none; b=WOKYHjQVOr4lhR76tUt28p846T4Q6AwZJt/z4v6sO0GhGni4IfkOmxBAcK35eMLO0cQDH3XR2P2J8LJBjz7e32u+UpKmrJxFlamWhwT9bbkugV6Y+sRbEqP1c6kKCVUJmSg7314t59B7dn9AxiyggPTS3+O9aNXEwjL6xEZ44DY=
+	t=1761408933; cv=none; b=BOsmuDyQdIooZJ91QSNeILCepEB5GRgBpTwARoMjJ/PHBr2adud5vinPVsMfK/GELFe8iItisALQSQs5mfCpxaSX/AYlRGaHI+NOjOa/LpynooprNkwXspxIWcXQ4Hj2Yky2Yb/0kW2NCnOUz2Xf9kjCnBgAfAJQN/p0qwqG33g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761408912; c=relaxed/simple;
-	bh=k8/4ps8OSedv+JB05M3ZP54FkmGycvsB9HQbCElcfRY=;
+	s=arc-20240116; t=1761408933; c=relaxed/simple;
+	bh=Y4BzcZ9tcJlc2uDydHrRVqoVntNvpKSQkwr746If3vU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iTGNVbOIwXzD5q89Ln0nuJq5m+hKweZq34pKQ3pjn/66qmLF2Xxz/Fboxwk4KESPUoLmEvR1mN8vVPwXucd3omA1ZOtBEY4TmzyysQkrXysTqFFAdPhH7x6BDeeWeUc5jcUF3+wXU2Z6iOyqAo/TeccKMfzWTPc8KAhropX+/3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cGALKVVf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24986C4AF09;
-	Sat, 25 Oct 2025 16:15:11 +0000 (UTC)
+	 MIME-Version:Content-Type; b=tvfUFyCAx0bJ8dtlpA3LyDriRHNyEVS3WdNstug6a1DiIRuexFkoXcWvc6PxSZ+so7nqjUXJgrLNhlKWaKKH3D0XvMwguxX8HXFc8Jk8FYoSA1DKO5hikte3YuWEc02nun8BXCCrN/YhLBeIq6PaQjUv94NCQ1kUDP3Hl/YtBQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qi0n8Wul; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14B4AC4CEFB;
+	Sat, 25 Oct 2025 16:15:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761408912;
-	bh=k8/4ps8OSedv+JB05M3ZP54FkmGycvsB9HQbCElcfRY=;
+	s=k20201202; t=1761408933;
+	bh=Y4BzcZ9tcJlc2uDydHrRVqoVntNvpKSQkwr746If3vU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cGALKVVf7Z+gYyMSrnV/bA8FcvFrDB/kYjtnRW6zFiScEZP1hE6ono+rBKG84dCt/
-	 ItmWrvTN5IIR2LwvorWJ4oLau/exvYvv300BWI7sFYJ3ft3+jX6bsBEa74E6yk3sfR
-	 +4vRNqC1uNej5VDbjmR3zCMKZc48ZdnAAPWvvaLyf5vupmgaf/1y+vpv3y3XipWPbu
-	 t25DuIyPaX8ffXw1RMLXVtVEYus8IVFyA55sFgtB7sKifFgbGwXxwUyjZf4bdHx+6J
-	 /ZZl4tzIBxbVG8BW1cbX+zQ8ICHRxaBnocL4Wa7QGSRIpJK5gzYtN0Rj/s02KbUfBN
-	 9aRc8QB4neBSA==
+	b=qi0n8WulKFCQfuHiRucjwOri+DAfcmjy7VYoSuSUZUn/w/nCE2rqI24HnfQyqYN66
+	 xs2nE/F6fjsdCT7ic7/0GmrQIh1v1EjERIyxksCyE6VlxKS+jqRlxEQjdEMAmuaHdw
+	 kftAXBqSWAVfRVcZ8+c01Jd5kT3oxgd5NJlyPaXUU144TGAvqh5QNafJtoFxYqJGQc
+	 rrVfZd6Far1DX/HIaqAEuzCIDditQV8mOZiVL3FdCo7Da+JTADtA7dS7T2zqPKrgzJ
+	 MHCY/Xscz/+ga9B4pynflfp3m2QYU4yWhFJT4SO/tma0Syk+NHu3NY9luc77pTRZPl
+	 t5B8x1lmnOq0w==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Alok Tiwari <alok.a.tiwari@oracle.com>,
-	Simon Horman <horms@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Jakub Sitnicki <jakub@cloudflare.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	willemb@google.com,
+	ncardwell@google.com,
 	dsahern@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-5.10] udp_tunnel: use netdev_warn() instead of netdev_WARN()
-Date: Sat, 25 Oct 2025 11:55:57 -0400
-Message-ID: <20251025160905.3857885-126-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17] tcp: Update bind bucket state on port release
+Date: Sat, 25 Oct 2025 11:56:09 -0400
+Message-ID: <20251025160905.3857885-138-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -69,221 +73,320 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
+From: Jakub Sitnicki <jakub@cloudflare.com>
 
-[ Upstream commit dc2f650f7e6857bf384069c1a56b2937a1ee370d ]
+[ Upstream commit d57f4b874946e997be52f5ebb5e0e1dad368c16f ]
 
-netdev_WARN() uses WARN/WARN_ON to print a backtrace along with
-file and line information. In this case, udp_tunnel_nic_register()
-returning an error is just a failed operation, not a kernel bug.
+Today, once an inet_bind_bucket enters a state where fastreuse >= 0 or
+fastreuseport >= 0 after a socket is explicitly bound to a port, it remains
+in that state until all sockets are removed and the bucket is destroyed.
 
-udp_tunnel_nic_register() can fail due to a memory allocation
-failure (kzalloc() or udp_tunnel_nic_alloc()).
-This is a normal runtime error and not a kernel bug.
+In this state, the bucket is skipped during ephemeral port selection in
+connect(). For applications using a reduced ephemeral port
+range (IP_LOCAL_PORT_RANGE socket option), this can cause faster port
+exhaustion since blocked buckets are excluded from reuse.
 
-Replace netdev_WARN() with netdev_warn() accordingly.
+The reason the bucket state isn't updated on port release is unclear.
+Possibly a performance trade-off to avoid scanning bucket owners, or just
+an oversight.
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20250910195031.3784748-1-alok.a.tiwari@oracle.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Fix it by recalculating the bucket state when a socket releases a port. To
+limit overhead, each inet_bind2_bucket stores its own (fastreuse,
+fastreuseport) state. On port release, only the relevant port-addr bucket
+is scanned, and the overall state is derived from these.
+
+Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Link: https://patch.msgid.link/20250917-update-bind-bucket-state-on-unhash-v5-1-57168b661b47@cloudflare.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-## Backport Recommendation: **YES**
+YES – this fixes a real port-exhaustion bug without introducing invasive
+redesign, and the risk of regression looks manageable.
 
-After conducting an exhaustive analysis of this commit, I strongly
-recommend backporting it to stable kernel trees.
+- **Bug visibility**: `__inet_hash_connect()` refuses ports whenever
+  `fastreuse >= 0 || fastreuseport >= 0`
+  (`net/ipv4/inet_hashtables.c:1095-1116`). Once a port bucket hits that
+  state because of an explicit bind, it never returns to -1, so future
+  auto-`connect()` calls skip the entire bucket even after the binders
+  are gone—triggering premature `EADDRNOTAVAIL` for workloads that
+  narrow `IP_LOCAL_PORT_RANGE`.
+- **Fix mechanics**: Each per-(port,addr) bucket now tracks its own
+  fastreuse state (`include/net/inet_hashtables.h:111-112`). Auto-bound
+  sockets are tagged via the new `SOCK_CONNECT_BIND` bit
+  (`include/net/sock.h:1498-1500`, set in `inet_hash_connect()` at
+  `net/ipv4/inet_hashtables.c:1156-1177` and copied into time-wait state
+  at `net/ipv4/inet_timewait_sock.c:211`). When such a socket releases
+  the port, `inet_bind2_bucket_destroy()` notices that all remaining
+  owners are `SOCK_CONNECT_BIND` and flips the per-bucket state back to
+  -1 (`net/ipv4/inet_hashtables.c:166-184`), and
+  `inet_bind_bucket_destroy()` bubbles that up to the whole port bucket
+  (`net/ipv4/inet_hashtables.c:96-113`). This makes the port eligible
+  again for the allocator, eliminating the exhaustion scenario
+  described.
+- **State hygiene**: The commit consistently clears the tag during
+  unhash (`net/ipv4/inet_hashtables.c:215-241`) and even handles address
+  rebinds (`net/ipv4/inet_hashtables.c:962-999`), so the fastreuse cache
+  can be rebuilt accurately without scanning unrelated sockets.
+- **Risk check**: Changes are confined to TCP/DCCP bind bookkeeping;
+  data structures touched are internal, and the extra scans run only
+  while holding the existing locks. No external ABI changes, and there
+  are no follow-up fixes in tree, so the patch is self-contained.
+  Remaining risk is moderate (core TCP paths), but the logic mirrors
+  existing fastreuse handling and should backport cleanly.
+- **Next step**: Validate by reproducing a tight `IP_LOCAL_PORT_RANGE`
+  workload before/after the backport to confirm the allocator now
+  recycles ports as expected.
 
----
+Given the clear user-visible failure and the contained nature of the
+fix, this is a good stable-candidate.
 
-## Detailed Technical Analysis
+ include/net/inet_connection_sock.h |  5 ++--
+ include/net/inet_hashtables.h      |  2 ++
+ include/net/inet_timewait_sock.h   |  3 +-
+ include/net/sock.h                 |  4 +++
+ net/ipv4/inet_connection_sock.c    | 12 +++++---
+ net/ipv4/inet_hashtables.c         | 44 +++++++++++++++++++++++++++++-
+ net/ipv4/inet_timewait_sock.c      |  1 +
+ 7 files changed, 63 insertions(+), 8 deletions(-)
 
-### 1. Understanding the Code Change
-
-The commit changes a single line in `net/ipv4/udp_tunnel_nic.c` at line
-933 (in the `udp_tunnel_nic_netdevice_event()` function):
-
-**Before:**
-```c
-netdev_WARN(dev, "failed to register for UDP tunnel offloads: %d", err);
-```
-
-**After:**
-```c
-netdev_warn(dev, "failed to register for UDP tunnel offloads: %d", err);
-```
-
-### 2. Critical Difference Between netdev_WARN() and netdev_warn()
-
-Through my investigation of the kernel source:
-
-- **netdev_WARN()** (defined in `include/linux/netdevice.h:5559-5561`):
-  - Expands to `WARN(1, "netdevice: %s%s: " format, ...)`
-  - Unconditionally triggers a full kernel WARN with:
-    - Complete backtrace
-    - File and line information
-    - Treats the condition as a kernel bug
-
-- **netdev_warn()** (declared in `include/net/net_debug.h:22`):
-  - A regular logging function
-  - Prints a warning message at KERN_WARNING level
-  - No backtrace, no panic potential
-  - Appropriate for normal runtime errors
-
-### 3. Analysis of Failure Conditions
-
-Through semantic code analysis using `mcp__semcode__find_function`, I
-determined that `udp_tunnel_nic_register()` can fail with `-ENOMEM` in
-exactly two scenarios (lines 823-825 and 833-836):
-
-1. **Node allocation failure**: `kzalloc(sizeof(*node), GFP_KERNEL)`
-   returns NULL
-2. **State structure allocation failure**: `udp_tunnel_nic_alloc(info,
-   n_tables)` returns NULL
-
-Both failures are **normal runtime memory allocation failures**, not
-kernel bugs. The commit message correctly identifies this.
-
-### 4. Critical Issue: panic_on_warn Impact
-
-From `Documentation/admin-guide/sysctl/kernel.rst`:
-> panic_on_warn: Calls panic() in the WARN() path when set to 1. This is
-useful to avoid a kernel rebuild when attempting to kdump at the
-location of a WARN().
-
-**Problem**: Systems with `panic_on_warn=1` (commonly used in production
-environments for catching real kernel bugs) will **panic** when
-encountering a simple memory allocation failure during network device
-registration. This is clearly inappropriate behavior.
-
-### 5. Kernel Coding Standards Compliance
-
-From `Documentation/process/coding-style.rst`:
-
-> **WARN*() is intended for unexpected, this-should-never-happen
-situations.**
->
-> **WARN*() macros are not to be used for anything that is expected to
-happen during normal operation.**
-
-Memory allocation failures ARE expected during normal operation. The
-current code violates kernel coding standards.
-
-Additionally, the documentation states:
-> **These generic allocation functions all emit a stack dump on failure
-when used without __GFP_NOWARN so there is no use in emitting an
-additional failure message when NULL is returned.**
-
-The WARN() is redundant and inappropriate.
-
-### 6. Historical Precedent
-
-I found similar precedent in commit `abfb2a58a5377` ("ionic: remove
-WARN_ON to prevent panic_on_warn"):
-- Similar rationale: removing WARN for non-bug conditions
-- Had a Fixes: tag and was backported
-- Explicitly mentions preventing panic_on_warn issues
-
-### 7. Risk Assessment
-
-**Risk Level: MINIMAL**
-
-- **Functional Impact**: None - this is purely a logging change
-- **Error Handling**: Unchanged - error is still returned and propagated
-  via `notifier_from_errno(err)`
-- **Side Effects**: None - only changes log output format
-- **Dependencies**: None - netdev_warn() has existed since 2014
-- **Compatibility**: Full - change applies cleanly to all maintained
-  stable kernels
-
-### 8. Impact Analysis
-
-**Before the change:**
-- Memory allocation failure during NETDEV_REGISTER event triggers WARN()
-- Systems with panic_on_warn=1 will panic
-- Logs filled with unnecessary backtraces
-- False kernel bug reports generated
-
-**After the change:**
-- Memory allocation failure logged as simple warning
-- No panic on panic_on_warn=1 systems
-- Clean, appropriate log messages
-- Correct signal to users (runtime error, not kernel bug)
-
-### 9. Stable Tree Criteria Evaluation
-
-| Criterion | Met? | Analysis |
-|-----------|------|----------|
-| Important bugfix | ✅ YES | Prevents inappropriate panics on production
-systems |
-| Minimal risk | ✅ YES | Logging-only change, zero functional impact |
-| Small and contained | ✅ YES | Single line change in one file |
-| No architectural changes | ✅ YES | Pure logging modification |
-| No new features | ✅ YES | Only fixes incorrect behavior |
-| Obvious correctness | ✅ YES | Clearly aligns with kernel coding
-standards |
-
-### 10. Why Author Didn't Add Stable Tags
-
-The absence of `Fixes:` or `Cc: stable` tags is **not** a reason to
-reject backporting. This appears to be a coding standards fix that the
-author may not have considered critical enough for explicit stable
-tagging. However, the technical merits clearly support backporting:
-
-1. Fixes incorrect API usage
-2. Prevents panic_on_warn issues
-3. Reduces log noise
-4. Zero risk of regression
-
-### 11. User-Visible Benefit
-
-**Critical benefit**: Production systems using `panic_on_warn=1` for
-debugging will no longer inappropriately panic when network devices fail
-to allocate memory during registration. This is especially important in:
-- High-availability environments
-- Systems with memory pressure
-- Environments with many network devices
-- kdump configurations
-
----
-
-## Final Recommendation
-
-**YES - Strongly recommend backporting to all maintained stable trees.**
-
-**Rationale:**
-1. Fixes a clear violation of kernel coding standards (WARN used for
-   normal runtime condition)
-2. Prevents system panics on panic_on_warn=1 systems for expected errors
-3. Zero risk of regression (logging-only change)
-4. Small, contained, and obviously correct
-5. Improves user experience by reducing log noise
-6. Prevents false bug reports
-7. Has precedent in similar backported commits
-
-This commit should be backported despite lacking explicit stable tags,
-as the technical merits and user benefit clearly warrant inclusion in
-stable trees.
-
- net/ipv4/udp_tunnel_nic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/ipv4/udp_tunnel_nic.c b/net/ipv4/udp_tunnel_nic.c
-index ff66db48453cf..944b3cf25468e 100644
---- a/net/ipv4/udp_tunnel_nic.c
-+++ b/net/ipv4/udp_tunnel_nic.c
-@@ -930,7 +930,7 @@ udp_tunnel_nic_netdevice_event(struct notifier_block *unused,
+diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
+index 1735db332aab5..072347f164830 100644
+--- a/include/net/inet_connection_sock.h
++++ b/include/net/inet_connection_sock.h
+@@ -322,8 +322,9 @@ int inet_csk_listen_start(struct sock *sk);
+ void inet_csk_listen_stop(struct sock *sk);
  
- 		err = udp_tunnel_nic_register(dev);
- 		if (err)
--			netdev_WARN(dev, "failed to register for UDP tunnel offloads: %d", err);
-+			netdev_warn(dev, "failed to register for UDP tunnel offloads: %d", err);
- 		return notifier_from_errno(err);
+ /* update the fast reuse flag when adding a socket */
+-void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
+-			       struct sock *sk);
++void inet_csk_update_fastreuse(const struct sock *sk,
++			       struct inet_bind_bucket *tb,
++			       struct inet_bind2_bucket *tb2);
+ 
+ struct dst_entry *inet_csk_update_pmtu(struct sock *sk, u32 mtu);
+ 
+diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
+index 19dbd9081d5a5..d6676746dabfe 100644
+--- a/include/net/inet_hashtables.h
++++ b/include/net/inet_hashtables.h
+@@ -108,6 +108,8 @@ struct inet_bind2_bucket {
+ 	struct hlist_node	bhash_node;
+ 	/* List of sockets hashed to this bucket */
+ 	struct hlist_head	owners;
++	signed char		fastreuse;
++	signed char		fastreuseport;
+ };
+ 
+ static inline struct net *ib_net(const struct inet_bind_bucket *ib)
+diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_sock.h
+index 67a3135757809..baafef24318e0 100644
+--- a/include/net/inet_timewait_sock.h
++++ b/include/net/inet_timewait_sock.h
+@@ -70,7 +70,8 @@ struct inet_timewait_sock {
+ 	unsigned int		tw_transparent  : 1,
+ 				tw_flowlabel	: 20,
+ 				tw_usec_ts	: 1,
+-				tw_pad		: 2,	/* 2 bits hole */
++				tw_connect_bind	: 1,
++				tw_pad		: 1,	/* 1 bit hole */
+ 				tw_tos		: 8;
+ 	u32			tw_txhash;
+ 	u32			tw_priority;
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 2e14283c5be1a..57c0df29ee964 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -1488,6 +1488,10 @@ static inline int __sk_prot_rehash(struct sock *sk)
+ 
+ #define SOCK_BINDADDR_LOCK	4
+ #define SOCK_BINDPORT_LOCK	8
++/**
++ * define SOCK_CONNECT_BIND - &sock->sk_userlocks flag for auto-bind at connect() time
++ */
++#define SOCK_CONNECT_BIND	16
+ 
+ struct socket_alloc {
+ 	struct socket socket;
+diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+index 1e2df51427fed..0076c67d9bd41 100644
+--- a/net/ipv4/inet_connection_sock.c
++++ b/net/ipv4/inet_connection_sock.c
+@@ -423,7 +423,7 @@ inet_csk_find_open_port(const struct sock *sk, struct inet_bind_bucket **tb_ret,
+ }
+ 
+ static inline int sk_reuseport_match(struct inet_bind_bucket *tb,
+-				     struct sock *sk)
++				     const struct sock *sk)
+ {
+ 	if (tb->fastreuseport <= 0)
+ 		return 0;
+@@ -453,8 +453,9 @@ static inline int sk_reuseport_match(struct inet_bind_bucket *tb,
+ 				    ipv6_only_sock(sk), true, false);
+ }
+ 
+-void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
+-			       struct sock *sk)
++void inet_csk_update_fastreuse(const struct sock *sk,
++			       struct inet_bind_bucket *tb,
++			       struct inet_bind2_bucket *tb2)
+ {
+ 	bool reuse = sk->sk_reuse && sk->sk_state != TCP_LISTEN;
+ 
+@@ -501,6 +502,9 @@ void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
+ 			tb->fastreuseport = 0;
+ 		}
  	}
- 	/* All other events will need the udp_tunnel_nic state */
++
++	tb2->fastreuse = tb->fastreuse;
++	tb2->fastreuseport = tb->fastreuseport;
+ }
+ 
+ /* Obtain a reference to a local port for the given sock,
+@@ -582,7 +586,7 @@ int inet_csk_get_port(struct sock *sk, unsigned short snum)
+ 	}
+ 
+ success:
+-	inet_csk_update_fastreuse(tb, sk);
++	inet_csk_update_fastreuse(sk, tb, tb2);
+ 
+ 	if (!inet_csk(sk)->icsk_bind_hash)
+ 		inet_bind_hash(sk, tb, tb2, port);
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index ceeeec9b7290a..4316c127f7896 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -58,6 +58,14 @@ static u32 sk_ehashfn(const struct sock *sk)
+ 			    sk->sk_daddr, sk->sk_dport);
+ }
+ 
++static bool sk_is_connect_bind(const struct sock *sk)
++{
++	if (sk->sk_state == TCP_TIME_WAIT)
++		return inet_twsk(sk)->tw_connect_bind;
++	else
++		return sk->sk_userlocks & SOCK_CONNECT_BIND;
++}
++
+ /*
+  * Allocate and initialize a new local port bind bucket.
+  * The bindhash mutex for snum's hash chain must be held here.
+@@ -87,10 +95,22 @@ struct inet_bind_bucket *inet_bind_bucket_create(struct kmem_cache *cachep,
+  */
+ void inet_bind_bucket_destroy(struct inet_bind_bucket *tb)
+ {
++	const struct inet_bind2_bucket *tb2;
++
+ 	if (hlist_empty(&tb->bhash2)) {
+ 		hlist_del_rcu(&tb->node);
+ 		kfree_rcu(tb, rcu);
++		return;
++	}
++
++	if (tb->fastreuse == -1 && tb->fastreuseport == -1)
++		return;
++	hlist_for_each_entry(tb2, &tb->bhash2, bhash_node) {
++		if (tb2->fastreuse != -1 || tb2->fastreuseport != -1)
++			return;
+ 	}
++	tb->fastreuse = -1;
++	tb->fastreuseport = -1;
+ }
+ 
+ bool inet_bind_bucket_match(const struct inet_bind_bucket *tb, const struct net *net,
+@@ -121,6 +141,8 @@ static void inet_bind2_bucket_init(struct inet_bind2_bucket *tb2,
+ #else
+ 	tb2->rcv_saddr = sk->sk_rcv_saddr;
+ #endif
++	tb2->fastreuse = 0;
++	tb2->fastreuseport = 0;
+ 	INIT_HLIST_HEAD(&tb2->owners);
+ 	hlist_add_head(&tb2->node, &head->chain);
+ 	hlist_add_head(&tb2->bhash_node, &tb->bhash2);
+@@ -143,11 +165,23 @@ struct inet_bind2_bucket *inet_bind2_bucket_create(struct kmem_cache *cachep,
+ /* Caller must hold hashbucket lock for this tb with local BH disabled */
+ void inet_bind2_bucket_destroy(struct kmem_cache *cachep, struct inet_bind2_bucket *tb)
+ {
++	const struct sock *sk;
++
+ 	if (hlist_empty(&tb->owners)) {
+ 		__hlist_del(&tb->node);
+ 		__hlist_del(&tb->bhash_node);
+ 		kmem_cache_free(cachep, tb);
++		return;
+ 	}
++
++	if (tb->fastreuse == -1 && tb->fastreuseport == -1)
++		return;
++	sk_for_each_bound(sk, &tb->owners) {
++		if (!sk_is_connect_bind(sk))
++			return;
++	}
++	tb->fastreuse = -1;
++	tb->fastreuseport = -1;
+ }
+ 
+ static bool inet_bind2_bucket_addr_match(const struct inet_bind2_bucket *tb2,
+@@ -191,6 +225,7 @@ static void __inet_put_port(struct sock *sk)
+ 	tb = inet_csk(sk)->icsk_bind_hash;
+ 	inet_csk(sk)->icsk_bind_hash = NULL;
+ 	inet_sk(sk)->inet_num = 0;
++	sk->sk_userlocks &= ~SOCK_CONNECT_BIND;
+ 
+ 	spin_lock(&head2->lock);
+ 	if (inet_csk(sk)->icsk_bind2_hash) {
+@@ -277,7 +312,7 @@ int __inet_inherit_port(const struct sock *sk, struct sock *child)
+ 		}
+ 	}
+ 	if (update_fastreuse)
+-		inet_csk_update_fastreuse(tb, child);
++		inet_csk_update_fastreuse(child, tb, tb2);
+ 	inet_bind_hash(child, tb, tb2, port);
+ 	spin_unlock(&head2->lock);
+ 	spin_unlock(&head->lock);
+@@ -966,6 +1001,10 @@ static int __inet_bhash2_update_saddr(struct sock *sk, void *saddr, int family,
+ 	if (!tb2) {
+ 		tb2 = new_tb2;
+ 		inet_bind2_bucket_init(tb2, net, head2, inet_csk(sk)->icsk_bind_hash, sk);
++		if (sk_is_connect_bind(sk)) {
++			tb2->fastreuse = -1;
++			tb2->fastreuseport = -1;
++		}
+ 	}
+ 	inet_csk(sk)->icsk_bind2_hash = tb2;
+ 	sk_add_bind_node(sk, &tb2->owners);
+@@ -1136,6 +1175,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 					       head2, tb, sk);
+ 		if (!tb2)
+ 			goto error;
++		tb2->fastreuse = -1;
++		tb2->fastreuseport = -1;
+ 	}
+ 
+ 	/* Here we want to add a little bit of randomness to the next source
+@@ -1148,6 +1189,7 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 
+ 	/* Head lock still held and bh's disabled */
+ 	inet_bind_hash(sk, tb, tb2, port);
++	sk->sk_userlocks |= SOCK_CONNECT_BIND;
+ 
+ 	if (sk_unhashed(sk)) {
+ 		inet_sk(sk)->inet_sport = htons(port);
+diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+index 875ff923a8ed0..6fb9efdbee27a 100644
+--- a/net/ipv4/inet_timewait_sock.c
++++ b/net/ipv4/inet_timewait_sock.c
+@@ -206,6 +206,7 @@ struct inet_timewait_sock *inet_twsk_alloc(const struct sock *sk,
+ 		tw->tw_hash	    = sk->sk_hash;
+ 		tw->tw_ipv6only	    = 0;
+ 		tw->tw_transparent  = inet_test_bit(TRANSPARENT, sk);
++		tw->tw_connect_bind = !!(sk->sk_userlocks & SOCK_CONNECT_BIND);
+ 		tw->tw_prot	    = sk->sk_prot_creator;
+ 		atomic64_set(&tw->tw_cookie, atomic64_read(&sk->sk_cookie));
+ 		twsk_net_set(tw, sock_net(sk));
 -- 
 2.51.0
 
