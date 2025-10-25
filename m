@@ -1,62 +1,65 @@
-Return-Path: <netdev+bounces-232840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50A1DC093C9
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:15:13 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 136FDC093FA
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:16:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E51DE4ED779
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:11:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 77D354F07BF
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F01C11F1306;
-	Sat, 25 Oct 2025 16:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91FD3043C9;
+	Sat, 25 Oct 2025 16:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L8qcLsol"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TtFGxYzg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F632F5B;
-	Sat, 25 Oct 2025 16:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9733043C3;
+	Sat, 25 Oct 2025 16:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761408671; cv=none; b=k3qFWPobMpP+1l2ZOwF3ZEf+g911UH7WzYyVgRtKkp+cWDNuwhikfDJfl5Kj1XS8+VUV+BFAl6bGeBwkRXMiW99uLgyR8p6jXYVKcgY+1R5/Re2mzIqh/POjgIg+S6ReT8pk0upeeX19Ha9vIRoZM3LvwNaEE870RQrCs3T3JpQ=
+	t=1761408690; cv=none; b=KVrc36GoZX0hVE6xQbsdEabA6lBTXkowcuZUXgOE3PXcS3zge++dtMRl/SAivBZ2+QiBGZj1DzA0d9y0hK/yFl6kpSEB1C77V7+9QHuYVB4bhT1hCOmkMmJFDZXM+vrsHAJZecsQ3a0iRs+ijQHtgf9dbHMRA19CnvBmXBzBqBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761408671; c=relaxed/simple;
-	bh=rALhKopiYWtHnleB6VpyBTdJO5JhkyCn+Qu3tZTmoYE=;
+	s=arc-20240116; t=1761408690; c=relaxed/simple;
+	bh=vrmfGPPZkkFSTu8sMYYwr9TG++mbACEvOKTUh9kuzwU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q85zNryV5FfTcQMfEfoosj/7LKidBhx/psZ6m2qGlkQihlmIaj7HjOrY9HT0dqKf+1nO1VH8wtsy4TrkRgcLClCJJJ0oufKU2cdVWe5juEVlsNzObCxeeCGA528ZP+9ZftrRBMiDt34tknXuhjcaTCeKG6pe5x3muWQy99f0q3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L8qcLsol; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EF24C4CEFF;
-	Sat, 25 Oct 2025 16:11:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Fqmwl/Q/9JkoTIl+bSFRzBNVeVFl7e0pLmFl6fDh/uHNfrNKniU7EhaguIGe4AYG4A8wVv881tUEqZBcKSVzjIzWnl+AJymprkPoUSWy0/ozqRWHw1lzV5UIHet2bxb/v0oJ7WLFEqGpP4CuQJhSSFZJCZwA6Vojwp58md8LTJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TtFGxYzg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B243AC4CEFB;
+	Sat, 25 Oct 2025 16:11:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761408671;
-	bh=rALhKopiYWtHnleB6VpyBTdJO5JhkyCn+Qu3tZTmoYE=;
+	s=k20201202; t=1761408690;
+	bh=vrmfGPPZkkFSTu8sMYYwr9TG++mbACEvOKTUh9kuzwU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=L8qcLsolmX+VnJU1EZ7d/GeHj6II+TeJV87WWbTaATyfw4wB51GKX5Wz6IRnLKZLJ
-	 YTyK3dVlqR/WZkVz9DkW1LXuIhOfWgkWNGBR7b50mrRwgW/4MbPx60WgYxq+hxswqX
-	 ssxuS07oCzk/zcytGkzcofbrdFlrsPxYmHqG2u+i36hRfaRM45N4N3kkwMbCxCO/if
-	 sqEVFVf8USG/E06TwIpp+cHykYPKba+PPwK6KbmRvjzc6U3TzTa/W/wtW/Mho1+zrJ
-	 XjUEXzad3Oq2eQs1VF+o2wNOhjO0fm6qAsQDtrxh1j4QHq0fGT5oZPJTui6L6ouccA
-	 AfwqgE6OeScxg==
+	b=TtFGxYzgw9mkwhoWbVyMBwFgof4ZvEFQOhYmsHQd4b+fruOvuy/YcMb05g9c1AGAl
+	 Vqasrl4pkSgoBiH27S+clZjTzyqRDFLoUVhzUxgc8ZSC1ye318FJRz7uiUor+vkk+0
+	 agsSqw0VQIsi5ebdvRvZ1EIyLy9JAIBYORHUbG7Jz41UqEp69GafZnx9hUigwEhD8K
+	 YamrvaNKypV7Lx5xvn4kSV7+pPmQS/CVJMngB5yHeJR4NL4HjaedXLKVOVyoRe1jVU
+	 MhBc15p+Sb3HvcrGedFEWSKHLSlbomLJUjDWqN1ciCnLXsjTrQLxgrWtxKg/8yhiMD
+	 iuUcn36IEth6A==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	willemdebruijn.kernel@gmail.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-5.4] ipv6: np->rxpmtu race annotation
-Date: Sat, 25 Oct 2025 11:54:28 -0400
-Message-ID: <20251025160905.3857885-37-sashal@kernel.org>
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk,
+	andrew@lunn.ch,
+	0x1207@gmail.com,
+	pabeni@redhat.com,
+	alexandre.f.demers@gmail.com,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 6.17-6.6] net: stmmac: Correctly handle Rx checksum offload errors
+Date: Sat, 25 Oct 2025 11:54:33 -0400
+Message-ID: <20251025160905.3857885-42-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -72,83 +75,130 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Eric Dumazet <edumazet@google.com>
+From: Oleksij Rempel <o.rempel@pengutronix.de>
 
-[ Upstream commit 9fba1eb39e2f74d2002c5cbcf1d4435d37a4f752 ]
+[ Upstream commit ee0aace5f844ef59335148875d05bec8764e71e8 ]
 
-Add READ_ONCE() annotations because np->rxpmtu can be changed
-while udpv6_recvmsg() and rawv6_recvmsg() read it.
+The stmmac_rx function would previously set skb->ip_summed to
+CHECKSUM_UNNECESSARY if hardware checksum offload (CoE) was enabled
+and the packet was of a known IP ethertype.
 
-Since this is a very rarely used feature, and that udpv6_recvmsg()
-and rawv6_recvmsg() read np->rxopt anyway, change the test order
-so that np->rxpmtu does not need to be in a hot cache line.
+However, this logic failed to check if the hardware had actually
+reported a checksum error. The hardware status, indicating a header or
+payload checksum failure, was being ignored at this stage. This could
+cause corrupt packets to be passed up the network stack as valid.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Reviewed-by: David Ahern <dsahern@kernel.org>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-Link: https://patch.msgid.link/20250916160951.541279-4-edumazet@google.com
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+This patch corrects the logic by checking the `csum_none` status flag,
+which is set when the hardware reports a checksum error. If this flag
+is set, skb->ip_summed is now correctly set to CHECKSUM_NONE,
+ensuring the kernel's network stack will perform its own validation and
+properly handle the corrupt packet.
+
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Link: https://patch.msgid.link/20250818090217.2789521-2-o.rempel@pengutronix.de
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
 YES
-- `udpv6_recvmsg()` and `rawv6_recvmsg()` both dereference `np->rxpmtu`
-  without synchronization even though writers update it via
-  `xchg(&np->rxpmtu, skb)` in `ipv6_local_rxpmtu()`
-  (`net/ipv6/datagram.c:415`) and clear it in other contexts; that
-  unsupervised read is undefined behaviour under the kernel memory model
-  and is caught by KCSAN. Annotating the load with `READ_ONCE()` at
-  `net/ipv6/udp.c:483` and `net/ipv6/raw.c:448` guarantees an atomic,
-  non-reordered fetch, eliminating the data race.
-- The branch order swap (`np->rxopt.bits.rxpmtu` first) keeps the hot-
-  path behaviour identical—both functions already consult
-  `np->rxopt`—while avoiding an unnecessary cache-line touch of
-  `np->rxpmtu` unless the option is enabled, so the risk of regression
-  is negligible.
-- Older stable kernels share this lockless pattern and therefore the
-  same latent race, while the fix is self-contained (no new APIs, no
-  dependency churn). Delivering accurate IPV6_PATHMTU notifications to
-  user space is observable behaviour, so backporting this minimal
-  annotation is justified for correctness on stable branches.
 
-Natural next step: consider running an IPv6 UDP/RAW recv regression or
-KCSAN sanity check once merged into stable to confirm the race no longer
-fires.
+Explanation
 
- net/ipv6/raw.c | 2 +-
- net/ipv6/udp.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+- Bug fixed and user-visible
+  - Current code marks all IP packets as hardware-verified when Rx
+    checksum offload is enabled, even if hardware flagged a checksum
+    error. See
+    drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:5738-5741: it sets
+    `skb->ip_summed = CHECKSUM_UNNECESSARY` whenever `coe` is enabled
+    and the packet has an IP ethertype, without considering hardware
+    error status.
+  - With enhanced descriptors, the hardware reports header or payload
+    checksum failures via the `csum_none` status. The driver currently
+    ignores this and can pass corrupted packets up the stack as if
+    checksum was valid.
 
-diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
-index 4c3f8245c40f1..eceef8af1355f 100644
---- a/net/ipv6/raw.c
-+++ b/net/ipv6/raw.c
-@@ -445,7 +445,7 @@ static int rawv6_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 	if (flags & MSG_ERRQUEUE)
- 		return ipv6_recv_error(sk, msg, len, addr_len);
+- What the patch changes
+  - The patch adds the hardware error check to the decision: if `status
+    & csum_none` is set, the driver does not mark the checksum as
+    verified. Concretely, it changes the condition to
+    - from: `if (unlikely(!coe) || !stmmac_has_ip_ethertype(skb)) ...
+      else skb->ip_summed = CHECKSUM_UNNECESSARY;`
+    - to: `if (unlikely(!coe) || !stmmac_has_ip_ethertype(skb) ||
+      (status & csum_none)) ... else skb->ip_summed =
+      CHECKSUM_UNNECESSARY;`
+  - This ensures `skb->ip_summed` remains `CHECKSUM_NONE` (asserted by
+    `skb_checksum_none_assert(skb)`), so the network stack will
+    compute/verify checksums in software and properly drop/handle
+    corrupted packets.
+
+- Why this is correct
+  - For enhanced descriptors, the driver maps hardware status
+    combinations indicating IP header or payload checksum errors to
+    `csum_none` (i.e., “checksum not good”). See
+    drivers/net/ethernet/stmicro/stmmac/enh_desc.c:105, 107, 109 where
+    `enh_desc_coe_rdes0()` returns `csum_none` when the hardware
+    indicates header/payload checksum errors.
+  - The `csum_none` bit is explicitly defined as an Rx frame status in
+    drivers/net/ethernet/stmicro/stmmac/common.h:343 (`enum
+    rx_frame_status { ... csum_none = 0x2, ... }`).
+  - Normal descriptor paths already drop errored frames early (e.g., see
+    drivers/net/ethernet/stmicro/stmmac/norm_desc.c:52-100), so this
+    change primarily corrects behavior for enhanced descriptors.
+
+- Scope and risk
+  - The change is small, localized to a single if-condition in
+    `stmmac_rx()`. No architectural changes, no ABI changes.
+  - If `csum_none` is set, the fix only downgrades to software
+    verification, which is conservative and safe. The worst-case impact
+    is mild extra CPU work for packets with checksum errors, which is
+    acceptable.
+  - For hardware/paths that never set `csum_none` (e.g., normal
+    descriptors), behavior is unchanged.
+
+- Security and correctness impact
+  - Previously, packets with failed L3/L4 checksum could be marked as
+    checksum-validated and accepted by upper layers. This is a
+    correctness bug with potential security implications (transport-
+    layer checksum bypass). The patch prevents that by forcing software
+    verification when hardware signals errors.
+
+- Additional note for completeness
+  - There is a similar unconditional checksum-trust in the zero-copy/XDP
+    dispatch path:
+    drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:5221-5224. It uses
+    the same pattern and likely needs the same `(status & csum_none)`
+    check. While not a blocker for this fix, stable trees should
+    consider pulling a companion patch for the ZC path to ensure
+    consistent behavior across receive paths.
+
+- Stable backport criteria
+  - Important bugfix affecting data integrity/correctness.
+  - Minimal, contained change in a driver subsystem.
+  - No new features, no architectural change, low regression risk.
+  - Clear positive safety/security implications.
+
+Given the above, this commit is a strong candidate for backporting to
+stable trees.
+
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index b9f55e4e360fb..7a375de2258c4 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -5735,7 +5735,8 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
  
--	if (np->rxpmtu && np->rxopt.bits.rxpmtu)
-+	if (np->rxopt.bits.rxpmtu && READ_ONCE(np->rxpmtu))
- 		return ipv6_recv_rxpmtu(sk, msg, len, addr_len);
+ 		skb->protocol = eth_type_trans(skb, priv->dev);
  
- 	skb = skb_recv_datagram(sk, flags, &err);
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 6a68f77da44b5..7f53fcc82a9ec 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -479,7 +479,7 @@ int udpv6_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 	if (flags & MSG_ERRQUEUE)
- 		return ipv6_recv_error(sk, msg, len, addr_len);
- 
--	if (np->rxpmtu && np->rxopt.bits.rxpmtu)
-+	if (np->rxopt.bits.rxpmtu && READ_ONCE(np->rxpmtu))
- 		return ipv6_recv_rxpmtu(sk, msg, len, addr_len);
- 
- try_again:
+-		if (unlikely(!coe) || !stmmac_has_ip_ethertype(skb))
++		if (unlikely(!coe) || !stmmac_has_ip_ethertype(skb) ||
++		    (status & csum_none))
+ 			skb_checksum_none_assert(skb);
+ 		else
+ 			skb->ip_summed = CHECKSUM_UNNECESSARY;
 -- 
 2.51.0
 
