@@ -1,305 +1,228 @@
-Return-Path: <netdev+bounces-232906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9986C09DB0
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 19:14:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ECC0CC09E3E
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 20:18:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5AE371A60A96
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 17:14:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B771C1C25F84
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:18:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC95E303C9B;
-	Sat, 25 Oct 2025 17:13:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D37E26FA56;
+	Sat, 25 Oct 2025 18:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bs88pHsP"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bUOkB++1";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qR+RTbk6";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bUOkB++1";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qR+RTbk6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 203EF27057D
-	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 17:13:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB45E2522B6
+	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 18:18:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761412412; cv=none; b=d2qPRZ6Mpd88Tigjlu1wc4AtuZ6Tnqi5SE8ZjYhIWK9cJy/+UTPg4LpjrKylP45we53WVrgn3fyVs7EfeSIT98wz4L6pPP0i+7g61ppUP9ogHXL50ORSeYBXwI/LSG6z+N9+5/8hnNvJR1axy/21elS6rlJBkux3Kt0Anxok188=
+	t=1761416308; cv=none; b=DiDuTw68DkUT5ZqXUHPP3YgOYC3hN5LzLByPqxHFOB+ZAMS7mCaqF2KRTfdbxnoTwedh1qR2S2VZEFjjerattt2PAQvzadd6QXC9q0JXthKvOQ7da0q/RHqjHMdLtCGvSAwm27plb+frRPM5wo3z1Wcrhd7iGSeCrKljr09H/Vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761412412; c=relaxed/simple;
-	bh=uOFfSvYybj5U/YMLdHhj4kE0AVO6RfvG+9hqVvgsk+M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YwxeP5m+iEfDk6Z15N1uUyYNBKSdxw0/XdzZQnc4x8mDIyHyQUiu8fCOxCgl2Bg4DkwUHHwilZyqmbdSjL1NvugxI/R/kscojqzjQ2HdoZmMmhceolatUcUOEns/vXhGhiMRcwN0sM9JaUf8Bl72HH7HzTsl4A3+15GNb32Za3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bs88pHsP; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7833765433cso4115346b3a.0
-        for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 10:13:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761412410; x=1762017210; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=skkIsPjZzdIgiE62Lq5VQ7m30JaRsLRctIZwjBpQojY=;
-        b=Bs88pHsPdWJ6e67+xU6Ifv4t/Mrl5R0GW/zuT6h09P/FS5nuWLrJmpaKZy2nq6vzKb
-         NjEPGNG60xiq9KDxaKq7DnYZ+FLnqlNNsFocKw+U2956/TLeS3lwzs6nU9qGvd5zZnP4
-         hw3IhNXo5i+Y+wN+Q0kktfSOzDgYy09ZOUzCflYrOiGQ9weWLMUzWm1hpUctl5NhC6kb
-         mk+FVZdqKmoNNCObPeux7ZI1UplaVawCRbHOWlJ2rdd3FOuvVY7/QlVbS3sEEAygbCyp
-         eSGwonu/zdRsHUKvxq3UFV8SwWTsZ5q2klSif4VCX8Iw+7UKomQfQyXBE0MgXe6XFRWv
-         Mlmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761412410; x=1762017210;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=skkIsPjZzdIgiE62Lq5VQ7m30JaRsLRctIZwjBpQojY=;
-        b=NTy2lx22rJNzwXoeaAYrxiGowRQXloNtehjYfUJn4wO7gRNAGTAu2qvW3OqYNfY211
-         iu0JJd9TqgmJ7swZf05bUMsPJ7BnZGF1fjsVUBRmIZarjWUQONpd+7brMKwYgYEqWL5K
-         9D3BaUc9MfBIQvw5S15eQ6XACqcYyexCGEVA8dximgUHKLbUxPOZshkWr0etf9/Uye+z
-         HAbW7T7bExzIADk8bWkeVWbFeQvWuTg7D1isuOWEZZilGAl2WPCdLL9gyteq8DMWl0JD
-         QM+aI9dIdrEwFKBKwULu9e9MKsMzqQrbk/i9Xc2VAAYunj/69EMEcdc8NNp5C83VqgPA
-         /nVA==
-X-Gm-Message-State: AOJu0YzzQhX82u7vzTFJyiySM2o9mQA6d6P9aj2IM8fp3+LVIUBSjIxx
-	IZcBPGfyn9do6nJ1kayT2DrNpkIzcOGWwY4095/xvPuMtELVqSaZgJF8OAhnT6Er
-X-Gm-Gg: ASbGnctz/bqLNVBstW2squm6E/qF6CiU8VQsVEQ02uzUDwgaV1/ci1z/T47+CKLoG+F
-	RCXjh9f0OlGV57v6PQ8VKqCZKCrk0wsIcbCxcxdPkqFWsou0kuBJj2Hh2wW69I5yuWZfjFetk60
-	4P0ZooRwzkiNxP2SGxu8lZe0n4j/lBszoYgH/tuAWZZTp7gjGIWTu6QUxf7MIGJiuwgDxey9MYF
-	qZ02GMshoT4iXIlkPj+2nZkaXaIdIPRgmjyKk8Vzyy6UEpf7vDlzkSpMZ0Vpq1/EoYWM7Bv2aQx
-	pUmugNOnr051JAHQj37yFOACIqhgCvj1HMohG7yYucucvPTQAoMuZOsOYbf70cRBp6qzOjgabBx
-	EILhb+R2mqGm3nZpa9PH2AkY07Rt+gIMFoy316CzW2wDalcDlapcTY/fMFmRIuJIMXpJKdYLmG7
-	gsf0hA/kqLQr5zlvAilg==
-X-Google-Smtp-Source: AGHT+IFrE/I5QcKhRbXEdfK7JwyY2O+27cboGMuNOwu2tayp52hBp3cLe68UEO4DrutT6WE5Naid3g==
-X-Received: by 2002:a05:6a00:94d5:b0:780:7eaa:938 with SMTP id d2e1a72fcca58-7a220a7f285mr41815292b3a.12.1761412409917;
-        Sat, 25 Oct 2025 10:13:29 -0700 (PDT)
-Received: from d.home.yangfl.dn42 ([45.32.227.231])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a414012bcesm2850481b3a.8.2025.10.25.10.13.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Oct 2025 10:13:29 -0700 (PDT)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 2/2] net: dsa: yt921x: Protect MIB stats with a lock
-Date: Sun, 26 Oct 2025 01:13:11 +0800
-Message-ID: <20251025171314.1939608-3-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251025171314.1939608-1-mmyangfl@gmail.com>
-References: <20251025171314.1939608-1-mmyangfl@gmail.com>
+	s=arc-20240116; t=1761416308; c=relaxed/simple;
+	bh=MgTkyjzbbWGtf4QXTLlrunC8tf3D+dtlWXUNAaUc0MY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=udmBdjkQ4GjIRVR57quWiaxoqj5N9PJ+U0Z0+y+hIzDs/8kVVFdRjUbhv8SEzbhaXa4KwVqbeHgQjegWeySuxDm0JRwcfUJpfLZSPik84KF+9YCtLk7NWAT8In2MHrAHeLoaI+HaDvCFvmWddi7un2DLE5n9Ms7K0tEFkQC/Oyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bUOkB++1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qR+RTbk6; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bUOkB++1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qR+RTbk6; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id BEBFC1F44E;
+	Sat, 25 Oct 2025 18:18:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761416298; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=167V8NKcDcZXJggUPgmp3qs3XOBKPwVKuVpBeOQ6GaE=;
+	b=bUOkB++1w8QEAfZMO3Y7RrhMCXtKQvcoyxXJ+SRZLZwbtm61SuzTL+0Ty42NSx28YEImTY
+	SUPK3K5ABgbDEgNYGvXBTTIvfIE3hKF4aXGOiY/2eE2u/dc3egYMFEoVWVaLFnae/UOfqb
+	Ctp2aOpLl9gy7FqhQ8wUi5ZcqoO0Fus=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761416298;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=167V8NKcDcZXJggUPgmp3qs3XOBKPwVKuVpBeOQ6GaE=;
+	b=qR+RTbk6sFkpBHXBqfnRlZSrUM1DFENVxlkeb6vhKDgEnxKRBD/lZpTCzooNIcsoL+73HJ
+	s8Ubf3edJxH4VWBA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761416298; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=167V8NKcDcZXJggUPgmp3qs3XOBKPwVKuVpBeOQ6GaE=;
+	b=bUOkB++1w8QEAfZMO3Y7RrhMCXtKQvcoyxXJ+SRZLZwbtm61SuzTL+0Ty42NSx28YEImTY
+	SUPK3K5ABgbDEgNYGvXBTTIvfIE3hKF4aXGOiY/2eE2u/dc3egYMFEoVWVaLFnae/UOfqb
+	Ctp2aOpLl9gy7FqhQ8wUi5ZcqoO0Fus=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761416298;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=167V8NKcDcZXJggUPgmp3qs3XOBKPwVKuVpBeOQ6GaE=;
+	b=qR+RTbk6sFkpBHXBqfnRlZSrUM1DFENVxlkeb6vhKDgEnxKRBD/lZpTCzooNIcsoL+73HJ
+	s8Ubf3edJxH4VWBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0293A1377F;
+	Sat, 25 Oct 2025 18:18:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id FU3aOGkU/WhgTQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Sat, 25 Oct 2025 18:18:17 +0000
+Message-ID: <4723fa89-17d3-4204-b490-979df9182454@suse.de>
+Date: Sat, 25 Oct 2025 20:18:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] xsk: avoid data corruption on cq descriptor number
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: netdev@vger.kernel.org, csmate@nop.hu, kerneljasonxing@gmail.com,
+ bjorn@kernel.org, sdf@fomichev.me, jonathan.lemon@gmail.com,
+ bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+References: <20251024104049.20902-1-fmancera@suse.de> <aPu0WdUqZCB3xQgb@boxer>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <aPu0WdUqZCB3xQgb@boxer>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TAGGED_RCPT(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nop.hu,gmail.com,kernel.org,fomichev.me,davemloft.net,google.com,redhat.com];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid]
+X-Spam-Flag: NO
+X-Spam-Score: -2.80
 
-64bit variables might not be atomic on 32bit architectures, thus cannot
-be made lock-free. Protect them with a spin lock since get_stats64()
-cannot sleep.
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
- drivers/net/dsa/yt921x.c | 63 ++++++++++++++++++++++++++--------------
- drivers/net/dsa/yt921x.h |  4 +++
- 2 files changed, 45 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-index 97a7eeb4ea15..e5d7c6820089 100644
---- a/drivers/net/dsa/yt921x.c
-+++ b/drivers/net/dsa/yt921x.c
-@@ -671,22 +671,16 @@ yt921x_mbus_ext_init(struct yt921x_priv *priv, struct device_node *mnp)
- static int yt921x_read_mib(struct yt921x_priv *priv, int port)
- {
- 	struct yt921x_port *pp = &priv->ports[port];
-+	struct yt921x_mib *mib_new = &pp->mib_new;
- 	struct device *dev = to_device(priv);
- 	struct yt921x_mib *mib = &pp->mib;
-+	u64 rx_frames;
-+	u64 tx_frames;
- 	int res = 0;
- 
--	/* Reading of yt921x_port::mib is not protected by a lock and it's vain
--	 * to keep its consistency, since we have to read registers one by one
--	 * and there is no way to make a snapshot of MIB stats.
--	 *
--	 * Writing (by this function only) is and should be protected by
--	 * reg_lock.
--	 */
--
- 	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
- 		const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
- 		u32 reg = YT921X_MIBn_DATA0(port) + desc->offset;
--		u64 *valp = &((u64 *)mib)[i];
- 		u64 val;
- 		u32 val0;
- 
-@@ -695,7 +689,7 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
- 			break;
- 
- 		if (desc->size <= 1) {
--			u64 old_val = *valp;
-+			u64 old_val = ((u64 *)mib)[i];
- 
- 			val = (old_val & ~(u64)U32_MAX) | val0;
- 			if (val < old_val)
-@@ -709,22 +703,31 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
- 			val = ((u64)val0 << 32) | val1;
- 		}
- 
--		WRITE_ONCE(*valp, val);
-+		((u64 *)mib_new)[i] = val;
- 	}
- 
--	pp->rx_frames = mib->rx_64byte + mib->rx_65_127byte +
--			mib->rx_128_255byte + mib->rx_256_511byte +
--			mib->rx_512_1023byte + mib->rx_1024_1518byte +
--			mib->rx_jumbo;
--	pp->tx_frames = mib->tx_64byte + mib->tx_65_127byte +
--			mib->tx_128_255byte + mib->tx_256_511byte +
--			mib->tx_512_1023byte + mib->tx_1024_1518byte +
--			mib->tx_jumbo;
--
--	if (res)
-+	if (res) {
- 		dev_err(dev, "Failed to %s port %d: %i\n", "read stats for",
- 			port, res);
--	return res;
-+		return res;
-+	}
-+
-+	rx_frames = mib->rx_64byte + mib->rx_65_127byte +
-+		    mib->rx_128_255byte + mib->rx_256_511byte +
-+		    mib->rx_512_1023byte + mib->rx_1024_1518byte +
-+		    mib->rx_jumbo;
-+	tx_frames = mib->tx_64byte + mib->tx_65_127byte +
-+		    mib->tx_128_255byte + mib->tx_256_511byte +
-+		    mib->tx_512_1023byte + mib->tx_1024_1518byte +
-+		    mib->tx_jumbo;
-+
-+	spin_lock(&pp->stats_lock);
-+	*mib = *mib_new;
-+	pp->rx_frames = rx_frames;
-+	pp->tx_frames = tx_frames;
-+	spin_unlock(&pp->stats_lock);
-+
-+	return 0;
- }
- 
- static void yt921x_poll_mib(struct work_struct *work)
-@@ -773,6 +776,7 @@ yt921x_dsa_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *data)
- 	yt921x_read_mib(priv, port);
- 	mutex_unlock(&priv->reg_lock);
- 
-+	spin_lock(&pp->stats_lock);
- 	j = 0;
- 	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
- 		const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
-@@ -783,6 +787,7 @@ yt921x_dsa_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *data)
- 		data[j] = ((u64 *)mib)[i];
- 		j++;
- 	}
-+	spin_unlock(&pp->stats_lock);
- }
- 
- static int yt921x_dsa_get_sset_count(struct dsa_switch *ds, int port, int sset)
-@@ -814,6 +819,7 @@ yt921x_dsa_get_eth_mac_stats(struct dsa_switch *ds, int port,
- 	yt921x_read_mib(priv, port);
- 	mutex_unlock(&priv->reg_lock);
- 
-+	spin_lock(&pp->stats_lock);
- 	mac_stats->FramesTransmittedOK = pp->tx_frames;
- 	mac_stats->SingleCollisionFrames = mib->tx_single_collisions;
- 	mac_stats->MultipleCollisionFrames = mib->tx_multiple_collisions;
-@@ -836,6 +842,7 @@ yt921x_dsa_get_eth_mac_stats(struct dsa_switch *ds, int port,
- 	/* mac_stats->InRangeLengthErrors */
- 	/* mac_stats->OutOfRangeLengthField */
- 	mac_stats->FrameTooLongErrors = mib->rx_oversize_errors;
-+	spin_unlock(&pp->stats_lock);
- }
- 
- static void
-@@ -850,9 +857,11 @@ yt921x_dsa_get_eth_ctrl_stats(struct dsa_switch *ds, int port,
- 	yt921x_read_mib(priv, port);
- 	mutex_unlock(&priv->reg_lock);
- 
-+	spin_lock(&pp->stats_lock);
- 	ctrl_stats->MACControlFramesTransmitted = mib->tx_pause;
- 	ctrl_stats->MACControlFramesReceived = mib->rx_pause;
- 	/* ctrl_stats->UnsupportedOpcodesReceived */
-+	spin_unlock(&pp->stats_lock);
- }
- 
- static const struct ethtool_rmon_hist_range yt921x_rmon_ranges[] = {
-@@ -881,6 +890,8 @@ yt921x_dsa_get_rmon_stats(struct dsa_switch *ds, int port,
- 
- 	*ranges = yt921x_rmon_ranges;
- 
-+	spin_lock(&pp->stats_lock);
-+
- 	rmon_stats->undersize_pkts = mib->rx_undersize_errors;
- 	rmon_stats->oversize_pkts = mib->rx_oversize_errors;
- 	rmon_stats->fragments = mib->rx_alignment_errors;
-@@ -901,6 +912,8 @@ yt921x_dsa_get_rmon_stats(struct dsa_switch *ds, int port,
- 	rmon_stats->hist_tx[4] = mib->tx_512_1023byte;
- 	rmon_stats->hist_tx[5] = mib->tx_1024_1518byte;
- 	rmon_stats->hist_tx[6] = mib->tx_jumbo;
-+
-+	spin_unlock(&pp->stats_lock);
- }
- 
- static void
-@@ -911,6 +924,8 @@ yt921x_dsa_get_stats64(struct dsa_switch *ds, int port,
- 	struct yt921x_port *pp = &priv->ports[port];
- 	struct yt921x_mib *mib = &pp->mib;
- 
-+	spin_lock(&pp->stats_lock);
-+
- 	stats->rx_length_errors = mib->rx_undersize_errors +
- 				  mib->rx_fragment_errors;
- 	stats->rx_over_errors = mib->rx_oversize_errors;
-@@ -937,6 +952,8 @@ yt921x_dsa_get_stats64(struct dsa_switch *ds, int port,
- 	/* stats->tx_dropped */
- 	stats->multicast = mib->rx_multicast;
- 	stats->collisions = mib->tx_collisions;
-+
-+	spin_unlock(&pp->stats_lock);
- }
- 
- static void
-@@ -951,8 +968,10 @@ yt921x_dsa_get_pause_stats(struct dsa_switch *ds, int port,
- 	yt921x_read_mib(priv, port);
- 	mutex_unlock(&priv->reg_lock);
- 
-+	spin_lock(&pp->stats_lock);
- 	pause_stats->tx_pause_frames = mib->tx_pause;
- 	pause_stats->rx_pause_frames = mib->rx_pause;
-+	spin_unlock(&pp->stats_lock);
- }
- 
- static int
-diff --git a/drivers/net/dsa/yt921x.h b/drivers/net/dsa/yt921x.h
-index 3e85d90826fb..be69c3508da8 100644
---- a/drivers/net/dsa/yt921x.h
-+++ b/drivers/net/dsa/yt921x.h
-@@ -470,9 +470,13 @@ struct yt921x_port {
- 	bool isolated;
- 
- 	struct delayed_work mib_read;
-+	spinlock_t stats_lock;
- 	struct yt921x_mib mib;
- 	u64 rx_frames;
- 	u64 tx_frames;
-+
-+	/* only used by read routine to avoid huge allocations on the stack */
-+	struct yt921x_mib mib_new;
- };
- 
- struct yt921x_reg_ops {
--- 
-2.51.0
+On 10/24/25 7:16 PM, Maciej Fijalkowski wrote:
+> On Fri, Oct 24, 2025 at 12:40:49PM +0200, Fernando Fernandez Mancera wrote:
+>> Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
+>> production"), the descriptor number is stored in skb control block and
+>> xsk_cq_submit_addr_locked() relies on it to put the umem addrs onto
+>> pool's completion queue.
+>>
+>> skb control block shouldn't be used for this purpose as after transmit
+>> xsk doesn't have control over it and other subsystems could use it. This
+>> leads to the following kernel panic due to a NULL pointer dereference.
+>>
+>>   BUG: kernel NULL pointer dereference, address: 0000000000000000
+>>   #PF: supervisor read access in kernel mode
+>>   #PF: error_code(0x0000) - not-present page
+>>   PGD 0 P4D 0
+>>   Oops: Oops: 0000 [#1] SMP NOPTI
+>>   CPU: 2 UID: 1 PID: 927 Comm: p4xsk.bin Not tainted 6.16.12+deb14-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.16.12-1
+>>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
+>>   RIP: 0010:xsk_destruct_skb+0xd0/0x180
+>>   [...]
+>>   Call Trace:
+>>    <IRQ>
+>>    ? napi_complete_done+0x7a/0x1a0
+>>    ip_rcv_core+0x1bb/0x340
+>>    ip_rcv+0x30/0x1f0
+>>    __netif_receive_skb_one_core+0x85/0xa0
+>>    process_backlog+0x87/0x130
+>>    __napi_poll+0x28/0x180
+>>    net_rx_action+0x339/0x420
+>>    handle_softirqs+0xdc/0x320
+>>    ? handle_edge_irq+0x90/0x1e0
+>>    do_softirq.part.0+0x3b/0x60
+>>    </IRQ>
+>>    <TASK>
+>>    __local_bh_enable_ip+0x60/0x70
+>>    __dev_direct_xmit+0x14e/0x1f0
+>>    __xsk_generic_xmit+0x482/0xb70
+>>    ? __remove_hrtimer+0x41/0xa0
+>>    ? __xsk_generic_xmit+0x51/0xb70
+>>    ? _raw_spin_unlock_irqrestore+0xe/0x40
+>>    xsk_sendmsg+0xda/0x1c0
+>>    __sys_sendto+0x1ee/0x200
+>>    __x64_sys_sendto+0x24/0x30
+>>    do_syscall_64+0x84/0x2f0
+>>    ? __pfx_pollwake+0x10/0x10
+>>    ? __rseq_handle_notify_resume+0xad/0x4c0
+>>    ? restore_fpregs_from_fpstate+0x3c/0x90
+>>    ? switch_fpu_return+0x5b/0xe0
+>>    ? do_syscall_64+0x204/0x2f0
+>>    ? do_syscall_64+0x204/0x2f0
+>>    ? do_syscall_64+0x204/0x2f0
+>>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>>    </TASK>
+>>   [...]
+>>   Kernel panic - not syncing: Fatal exception in interrupt
+>>   Kernel Offset: 0x1c000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+>>
+>> The approach proposed stores the first address also in the xsk_addr_node
+>> along with the number of descriptors. The head xsk_addr_node is
+>> referenced in skb_shinfo(skb)->destructor_arg. The rest of the fragments
+>> store the address on the list.
+>>
+>> This is less efficient as 4 bytes are wasted when storing each address.
+> 
+> Hi Fernando,
+> it's not about 4 bytes being wasted but rather memory allocation that you
+> introduce here. I tried hard to avoid hurting non-fragmented traffic,
+> below you can find impact reported by Jason from similar approach as
+> yours:
+> https://lore.kernel.org/bpf/CAL+tcoD=Gn6ZmJ+_Y48vPRyHVHmP-7irsx=fRVRnyhDrpTrEtQ@mail.gmail.com/
+> 
+> I assume this patch will yield a similar performance degradation...
+> 
 
+It does, thank you for explaining Maciej. I have been thinking about 
+possible solutions and remembered skb extensions. If I am not wrong, it 
+shouldn't yield a performance degratation or at least it should be a 
+much less severe one. Although, XDP_SOCKETS Kconfig would require 
+"select SKB_EXTENSIONS".
+
+What do you think about this approach? I could draft a series for 
+net-next.. I am just looking for different options other than using skb 
+control block because I believe similar issues will arise in the future 
+even if we fix the current one on ip_rcv..
+
+Thanks,
+Fernando.
 
