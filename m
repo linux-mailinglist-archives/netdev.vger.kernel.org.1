@@ -1,62 +1,61 @@
-Return-Path: <netdev+bounces-232873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01C27C09A4C
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:42:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ED4CC09970
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:39:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F2BB9546D78
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:30:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84BA11A6699E
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:31:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F59D30CDBE;
-	Sat, 25 Oct 2025 16:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D258B314B93;
+	Sat, 25 Oct 2025 16:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="un/cnnqn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u4wgKOdE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371D63054EE;
-	Sat, 25 Oct 2025 16:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A31314B87;
+	Sat, 25 Oct 2025 16:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761409409; cv=none; b=qZwYc/4HI5wBKzXS8rvx4BYGSaCLUVM1+TmYb10IKUxmKx0JBa4R1Q9gydPpVZiML3Q+8NaG5kfrLKWjoA2+2ADzisHveLYv5YUJGFR49OJS5AjphZpeB/QeaPTqk520o7gUYJ8UjL2JzDaByHuc2gKMKEeYAT8F6sOcLW5ZBIU=
+	t=1761409426; cv=none; b=sssD9kLuIaZNUrAnvzbuAjCGRrqUcD0gRHNPj5V3M7XMIT+XH+yEwcpp1rHE1T/a1bP1N2XiERNP/IhY+/nynHWgroXNWh2FcRFHWLmlpf+K12tBGljVLahHfSZVKHl7yjmZ6k8NSOAKKwmK4jdU5NdPsj28/nRcV85amIpYyS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761409409; c=relaxed/simple;
-	bh=8sd6ZvIbwHXgWSyrfjIj/d9CwFax6FAnVASmaZQIAUo=;
+	s=arc-20240116; t=1761409426; c=relaxed/simple;
+	bh=yXpQY07Tafmj/Pdwexa/B6VXHHHJCtffvKSXKK8lIeU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iY4jL/S6gOehxf1PDqj8veP2+1aMw36+21rQAb+z+ayx/MtKGG8ozXPAyQIBQ1z8B6HsQoKiXffohU6+jVpNVeRJtxpENKixGcuPhcGqb5c8nuviBbl9Rg+Kv+ldvzr5hMRhT/FQQijXsXwM4Pbad1ORg/bxZSmTa5d5SV38cbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=un/cnnqn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFF92C4CEFF;
-	Sat, 25 Oct 2025 16:23:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=rF5PyCmRSRQC0Gwvawc6FTpT6EPWQhWMELyxuhSnks4uDDyefy4xLX//nQUh8F49k/0vH0/1/8lx0UVpj75NibAgVw4Q9n8XKLgiGSodKpKiN828BzJiFHNwZP8vjoBk4JFxI6QJbHxw/gtiND3mv83t8wBn68EszmTbyXYfwpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u4wgKOdE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 564D3C4CEFB;
+	Sat, 25 Oct 2025 16:23:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761409409;
-	bh=8sd6ZvIbwHXgWSyrfjIj/d9CwFax6FAnVASmaZQIAUo=;
+	s=k20201202; t=1761409426;
+	bh=yXpQY07Tafmj/Pdwexa/B6VXHHHJCtffvKSXKK8lIeU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=un/cnnqn31uNImb968fU4L1aj+VDxeyXVQXOcs/XbgqXS1KZ3l3ZCAKboV+A9ojW5
-	 QXakWuN9mZjClnFSqVnkiZoTpmfTOLoJ2ABpEh2bOr1e8VC5loxHP6F3mYgeZ6vISs
-	 LcGNO0kXMiG8oc6m6sDs7pSQkDkHtk/OkxL1jBZkcxWDloYJh/tW6dAtgy47CprqFL
-	 faTo/o73dXL2EcSEWwizHvPtj2QN/DJEXXieaIAqWWbgSMIENOXhu5Ofrzl9WFXPt4
-	 3x2qadZ4l84qFmdtxheUmRWBii/uzza9uqjQ+rP6wyGQBcqBpYHqfqnnBWO5G2J05T
-	 LVO8EjEDwaISw==
+	b=u4wgKOdEeCF1+oL+4NyTzPLihvVNURyWdbtdYm4gSnjINiXls/7xyyKu9FiNkP3BH
+	 G0mUxPd9T0B+r8z0L1nUVERdVgJdQrJ+YKxUBZ4XinPXlsSFmq0Mi/N50U/lLlRaHy
+	 VOHIWGsenKNz+queFyoaYOKBXoHkRKCXluUFfuCeTCQUG9ByYH+SQfX8QY9POvF+7c
+	 h36th0tIiUHmZDmQKL5TzYKURVFk+NcQKm8wtgUqKrWKQHXOnH6F6gZMn36CFuMflT
+	 qMmZOcFRO5C8WSphN/seAfEKl1+1NRhlpH3+lc8cNKwEpWvj7l8skiP2I+ta7cwEfs
+	 O5uaM6vEY+ZSw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	David Ahern <dsahern@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	jonathan.lemon@gmail.com,
-	richardcochran@gmail.com,
-	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
+	kuba@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17] ptp_ocp: make ptp_ocp driver compatible with PTP_EXTTS_REQUEST2
-Date: Sat, 25 Oct 2025 11:59:01 -0400
-Message-ID: <20251025160905.3857885-310-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17-5.10] selftests: traceroute: Use require_command()
+Date: Sat, 25 Oct 2025 11:59:12 -0400
+Message-ID: <20251025160905.3857885-321-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -72,81 +71,138 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+From: Ido Schimmel <idosch@nvidia.com>
 
-[ Upstream commit d3ca2ef0c915d219e0d958e0bdcc4be6c02c210b ]
+[ Upstream commit 47efbac9b768553331b9459743a29861e0acd797 ]
 
-Originally ptp_ocp driver was not strictly checking flags for external
-timestamper and was always activating rising edge timestamping as it's
-the only supported mode. Recent changes to ptp made it incompatible with
-PTP_EXTTS_REQUEST2 ioctl. Adjust ptp_clock_info to provide supported
-mode and be compatible with new infra.
+Use require_command() so that the test will return SKIP (4) when a
+required command is not present.
 
-While at here remove explicit check of periodic output flags from the
-driver and provide supported flags for ptp core to check.
+Before:
 
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Link: https://patch.msgid.link/20250918131146.651468-1-vadim.fedorenko@linux.dev
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+ # ./traceroute.sh
+ SKIP: Could not run IPV6 test without traceroute6
+ SKIP: Could not run IPV4 test without traceroute
+ $ echo $?
+ 0
+
+After:
+
+ # ./traceroute.sh
+ TEST: traceroute6 not installed                                    [SKIP]
+ $ echo $?
+ 4
+
+Reviewed-by: Petr Machata <petrm@nvidia.com>
+Reviewed-by: David Ahern <dsahern@kernel.org>
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+Link: https://patch.msgid.link/20250908073238.119240-6-idosch@nvidia.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
 YES
-- `drivers/ptp/ptp_ocp.c:1488` now sets `.supported_extts_flags =
-  PTP_STRICT_FLAGS | PTP_RISING_EDGE`, which lets the core treat the
-  driver as “strict”. Without this, PTP_EXTTS_REQUEST2 always injects
-  the `PTP_STRICT_FLAGS` bit, so the core rejects every extts enable
-  with `-EOPNOTSUPP` (see the check in
-  `drivers/ptp/ptp_chardev.c:230-241`). That regression breaks external
-  timestamping as soon as user space starts using the new ioctl.
-- The same block advertises `.supported_perout_flags =
-  PTP_PEROUT_DUTY_CYCLE | PTP_PEROUT_PHASE`
-  (`drivers/ptp/ptp_ocp.c:1489`). When the v2 per-out ioctl validates
-  flags against this mask (`drivers/ptp/ptp_chardev.c:247-304`), the old
-  behavior of honoring duty-cycle and phase requests is preserved;
-  without it every flagged request is refused.
-- The redundant in-driver mask test just above
-  `ptp_ocp_signal_from_perout()` was dropped
-  (`drivers/ptp/ptp_ocp.c:2095-2120`), because the core now rejects
-  unsupported bits before the driver runs. Functionality stays the same,
-  but it avoids double-checks and is required so valid requests survive
-  the new core gatekeepers.
-- The patch is small, self-contained to the PTP OCP driver, and only
-  supplies capability metadata to match behavior the hardware already
-  implements (rising-edge extts, duty-cycle/phase per-out). No timing
-  logic or register programming changed, so regression risk is very low.
-- Failing to pick this up leaves the device unusable with the new ioctls
-  introduced this cycle, which is a clear user-visible regression.
 
- drivers/ptp/ptp_ocp.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+- Fixes a real bug in selftests reporting: when traceroute binaries are
+  missing, the script previously exited 0 (PASS) after printing a manual
+  “SKIP” message, which hides missing test coverage from harnesses and
+  CI. The change standardizes behavior to return the kselftest skip code
+  (4), matching framework expectations.
+- Small, contained change limited to selftests; no kernel code touched,
+  no ABI or API impact, no architectural changes.
 
-diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-index 4e1286ce05c9a..794ec6e71990c 100644
---- a/drivers/ptp/ptp_ocp.c
-+++ b/drivers/ptp/ptp_ocp.c
-@@ -1485,6 +1485,8 @@ static const struct ptp_clock_info ptp_ocp_clock_info = {
- 	.pps		= true,
- 	.n_ext_ts	= 6,
- 	.n_per_out	= 5,
-+	.supported_extts_flags = PTP_STRICT_FLAGS | PTP_RISING_EDGE,
-+	.supported_perout_flags = PTP_PEROUT_DUTY_CYCLE | PTP_PEROUT_PHASE,
- };
+Specifics in the code:
+- The script sources the common helpers, so `require_command()` is
+  available: tools/testing/selftests/net/traceroute.sh:7.
+- Inline, ad hoc checks are removed from the test bodies:
+  - run_traceroute6(): drops the `command -v traceroute6` guard and
+    manual “SKIP” echo shown in the diff.
+  - run_traceroute(): drops the `command -v traceroute` guard and manual
+    “SKIP” echo shown in the diff.
+  This eliminates duplicate logic and prevents returning success on
+missing deps.
+- Centralized, framework-compliant dependency checks are added before
+  running tests:
+  - tools/testing/selftests/net/traceroute.sh:463 `require_command
+    traceroute6`
+  - tools/testing/selftests/net/traceroute.sh:464 `require_command
+    traceroute`
+- The helper `require_command()` is defined in the shared library:
+  - tools/testing/selftests/net/lib.sh:537 `require_command()` calls
+    `check_command`, which logs a SKIP via `log_test_skip` and then
+    exits with `EXIT_STATUS`.
+  - The kselftest constants define skip as 4:
+    tools/testing/selftests/net/lib.sh:22 `ksft_skip=4`.
+  Consequently, when the command is missing, the script prints “TEST:
+<cmd> not installed [SKIP]” and exits 4, exactly as described in the
+commit message.
+
+Risk and compatibility:
+- Effect is limited to how the test reports missing prerequisites. This
+  aligns traceroute.sh with many other selftests already using
+  `require_command` (e.g.,
+  tools/testing/selftests/net/rtnetlink_notification.sh:108), improving
+  consistency across the selftests suite.
+- One behavioral change: if either `traceroute6` or `traceroute` is
+  missing, the entire script will SKIP early rather than partially
+  running the remaining tests. This is a reasonable and common selftests
+  convention, and it avoids false PASS outcomes. It does not affect
+  kernel behavior.
+
+Stable backport criteria:
+- Addresses test correctness and CI signal integrity (important for
+  users running selftests).
+- Minimal, localized change with very low regression risk.
+- No features or architectural shifts; purely a selftest reliability
+  fix.
+- Consistent with established kselftest patterns and constants.
+
+Given these points, this is a safe and beneficial selftest fix
+appropriate for stable trees.
+
+ tools/testing/selftests/net/traceroute.sh | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
+
+diff --git a/tools/testing/selftests/net/traceroute.sh b/tools/testing/selftests/net/traceroute.sh
+index 282f14760940d..b50e52afa4f49 100755
+--- a/tools/testing/selftests/net/traceroute.sh
++++ b/tools/testing/selftests/net/traceroute.sh
+@@ -203,11 +203,6 @@ setup_traceroute6()
  
- static void
-@@ -2095,10 +2097,6 @@ ptp_ocp_signal_from_perout(struct ptp_ocp *bp, int gen,
+ run_traceroute6()
  {
- 	struct ptp_ocp_signal s = { };
- 
--	if (req->flags & ~(PTP_PEROUT_DUTY_CYCLE |
--			   PTP_PEROUT_PHASE))
--		return -EOPNOTSUPP;
+-	if [ ! -x "$(command -v traceroute6)" ]; then
+-		echo "SKIP: Could not run IPV6 test without traceroute6"
+-		return
+-	fi
 -
- 	s.polarity = bp->signal[gen].polarity;
- 	s.period = ktime_set(req->period.sec, req->period.nsec);
- 	if (!s.period)
+ 	setup_traceroute6
+ 
+ 	# traceroute6 host-2 from host-1 (expects 2000:102::2)
+@@ -268,11 +263,6 @@ setup_traceroute()
+ 
+ run_traceroute()
+ {
+-	if [ ! -x "$(command -v traceroute)" ]; then
+-		echo "SKIP: Could not run IPV4 test without traceroute"
+-		return
+-	fi
+-
+ 	setup_traceroute
+ 
+ 	# traceroute host-2 from host-1 (expects 1.0.1.1). Takes a while.
+@@ -306,6 +296,9 @@ do
+ 	esac
+ done
+ 
++require_command traceroute6
++require_command traceroute
++
+ run_tests
+ 
+ printf "\nTests passed: %3d\n" ${nsuccess}
 -- 
 2.51.0
 
