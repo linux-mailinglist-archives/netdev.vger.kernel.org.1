@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-232870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 445CCC09929
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:37:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4464DC0990E
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:36:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D2EC40122E
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:29:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A34E423A0A
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:29:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEDB630C63E;
-	Sat, 25 Oct 2025 16:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF049313527;
+	Sat, 25 Oct 2025 16:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AlftwVTv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="frffo4kX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A626C309EF7;
-	Sat, 25 Oct 2025 16:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851473074A4;
+	Sat, 25 Oct 2025 16:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761409388; cv=none; b=dXmDDQH93WStHJ2DFS3KerF96LdDrl/Ano5RJ+vLZ0ZH3cs9ve4EDkkXMgt0iw8cfGJb4G+i7J47FlrmZHLpEhHz933W7Ga2Rl5sYawL9nR0HC3E/KiNbM9BGOiXErxWqwNWQHCxMns/TvWQ+pk2UomQ73CKh/l8I8rR40XmmUY=
+	t=1761409391; cv=none; b=F4abrpOjdBgXpMbeeUHHc7nsHAF/qEtKvPQ1K82MmzOxq4PXbpuR5FW6VJn2hL6YwyUAABGJxZr1OyRg32zB0eXINlAKFBxQcB0RjVuLSJlKVwc6PivlxqHkmgxkW9nfHzsJCDPwsZmHpj9utNnIbyLC7CTutollc+LndA/PRUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761409388; c=relaxed/simple;
-	bh=2BytTBVf22JRRNwNudRZs96gVnu3n/E07bOA1sh3iZw=;
+	s=arc-20240116; t=1761409391; c=relaxed/simple;
+	bh=Eo1dzXjyZ4j2Et5f+6SWckQLSKp7VD275jrVBd3zdBw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OqR3XReSPMFK/k1+dmqFXHaII3PF3tNb2W+if0/QoSDJOSZXfvaoZkTIJjcg5MTw1FDXO9ikSWATsb6Ij8W1q09NDnGaGT0dA2WF/bKQvycNJadz8JNIdDTlquE99c4fWPWsl8McX/orPt8Lr4D1tROdif9+A+N3WcSsfZri7ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AlftwVTv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82B40C4CEFF;
-	Sat, 25 Oct 2025 16:23:07 +0000 (UTC)
+	 MIME-Version:Content-Type; b=oGD656SvChlO+IrwM9B00ZUX4mS4kVjOqfi0y9wQIJFpjERYC+I69tRrhf3NpX4kkenWoTnJA4yKGbiZNMeUpWnmCI7qkxg/0OxnkF0nYk2uNFp6Xh1MrgUCASpO9107Y1NHJk+QHh1DJEbuylOefAI3vASgVT/nlKdY3KGOIqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=frffo4kX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 688C6C4CEF5;
+	Sat, 25 Oct 2025 16:23:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761409388;
-	bh=2BytTBVf22JRRNwNudRZs96gVnu3n/E07bOA1sh3iZw=;
+	s=k20201202; t=1761409391;
+	bh=Eo1dzXjyZ4j2Et5f+6SWckQLSKp7VD275jrVBd3zdBw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AlftwVTv5MeNhOFxP5uP7z8XOfuqpuaslCq70pcNmbPOMhaQIPCTltDm8e64UMZkm
-	 iNETClkMA+JiS2SC6HTzwQcw67gs0lyV+DXDI1whhL4d4vuaO8fFBUVhNhXJnq4cgy
-	 WUEua/2r7M+I4PfpK3PCMNTkkYvDzCnH++TvqsHvG5lo8fy/4XFrWJvAbPk0gdvoBi
-	 IKUrO7eY/b4jHO8IxSXkI9P99x1SzNe7QGpbQ4GZjYIG7u8rB6TjMkrt2ZQ2J7LG21
-	 KZiWitRqkZA65GZmhRWMKD4nwXxxle2kJrTQvRQQszmnJikU9c62bpDV6409hydBgJ
-	 FBuH4yZZa1t1Q==
+	b=frffo4kXwWag4ETZ9TXSEotj3lsFEDbXpX5gJHQA21QB8nhRclU6JfojSsHH2Ic3L
+	 pIQ6p/AxwJRpj4WtfKlu//J19qjKYoJM2r7Ji4ejKJ1Dcb9ClHnKdy1qtjKHfEqIlT
+	 D4LeCWypXqrj0k0zMJqstGU3tjv5Gb7ixMz9T40mvO+YKjNVDbrEDC3/ID4z+yJtF2
+	 CmrYIC4lquUe9agsIl4tMXGpm5T0tcnVYIzyQsKe2lNlwEPTsx+uaRaXhaxDPD1eYz
+	 bN79Y+jvXhCV7Vog3KGv+xVF4F0OjyOraSXpHEhbwhgw3iQ0hN2SrEYedCBoGytz1p
+	 K0MksCbe9Y2Ag==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Fan Gong <gongfan1@huawei.com>,
-	Zhu Yikai <zhuyikai1@h-partners.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Eric Dumazet <edumazet@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	ncardwell@google.com,
+	davem@davemloft.net,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17] hinic3: Queue pair endianness improvements
-Date: Sat, 25 Oct 2025 11:58:52 -0400
-Message-ID: <20251025160905.3857885-301-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17-6.12] tcp: use dst_dev_rcu() in tcp_fastopen_active_disable_ofo_check()
+Date: Sat, 25 Oct 2025 11:58:54 -0400
+Message-ID: <20251025160905.3857885-303-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -69,402 +69,115 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Fan Gong <gongfan1@huawei.com>
+From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit 6b822b658aafe840ffd6d7f1af5bf4f77df15a11 ]
+[ Upstream commit b62a59c18b692f892dcb8109c1c2e653b2abc95c ]
 
-Explicitly use little-endian & big-endian structs to support big
-endian hosts.
+Use RCU to avoid a pair of atomic operations and a potential
+UAF on dst_dev()->flags.
 
-Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Fan Gong <gongfan1@huawei.com>
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/9b995a10f1e209a878bf98e4e1cdfb926f386695.1757653621.git.zhuyikai1@h-partners.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: David Ahern <dsahern@kernel.org>
+Link: https://patch.msgid.link/20250828195823.3958522-8-edumazet@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-YES – this keeps the hinic3 data path functional on big-endian systems
-with very low regression risk.
+YES
 
-- `drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h:77-93` now stores
-  doorbell metadata as `__le32` and uses `cpu_to_le32()`, fixing the
-  MMIO write ordering bug that prevents queue pairs from working on big-
-  endian hosts.
-- RX descriptors and completions are switched to little-endian storage
-  (`hinic3_rx.h:29-44`, `hinic3_rx.c:114-117`), and incoming CQE fields
-  are decoded with `le32_to_cpu()` (`hinic3_rx.c:363-533`), so
-  checksum/LRO handling no longer reads garbage on big-endian.
-- The TX path stores DMA addresses, lengths, and offload metadata in
-  little-endian (`hinic3_tx.h:79-91`, `hinic3_tx.c:55-107`,
-  `hinic3_tx.c:277-372`, `hinic3_tx.c:466-502`), and the helper macros
-  now convert back to CPU order when inspected, preventing incorrect
-  TSO/PLDOFF decisions.
-- These changes are confined to the hinic3 driver, introduce no new
-  features, and simply make the existing hardware interface endian-safe;
-  they are essentially no-ops on little-endian machines via
-  `cpu_to_le32()` / `le32_to_cpu()`.
+Explanation and rationale
+- What it fixes
+  - Eliminates a race that can lead to a use-after-free when reading
+    `dev->flags` from a `dst_entry` without RCU protection. The pre-
+    change pattern `sk_dst_get()` → `dst_dev()` → `dev->flags` →
+    `dst_release()` can observe a freed `struct net_device` and
+    dereference `dev->flags`, risking UAF.
+  - The change uses RCU to safely dereference the route device and avoid
+    the refcount pair on `dst` (performance benefit is secondary to
+    correctness).
 
-Natural follow-up: 1) Run basic Tx/Rx regression on a big-endian
-platform to confirm the fix; 2) Ensure the change applies cleanly to the
-desired stable branches.
+- Code specifics
+  - Affected function: `net/ipv4/tcp_fastopen.c:559`
+    (tcp_fastopen_active_disable_ofo_check)
+  - Before (conceptually): `dst = sk_dst_get(sk); dev = dst ?
+    dst_dev(dst) : NULL; if (!(dev && (dev->flags & IFF_LOOPBACK)))
+    atomic_set(..., 0); dst_release(dst);`
+    - Problem: `dev->flags` is read without RCU or a device reference;
+      `struct net_device` is RCU-freed, so this can race and UAF.
+  - After:
+    - `rcu_read_lock();`
+    - `dst = __sk_dst_get(sk);` (RCU-protected view of
+      `sk->sk_dst_cache`; `include/net/sock.h:2142`)
+    - `dev = dst ? dst_dev_rcu(dst) : NULL;` (RCU-safe deref of device;
+      `include/net/dst.h:574`)
+    - `if (!(dev && (dev->flags & IFF_LOOPBACK)))
+      atomic_set(&sock_net(sk)->ipv4.tfo_active_disable_times, 0);`
+    - `rcu_read_unlock();`
+    - See current code at `net/ipv4/tcp_fastopen.c:581` for the RCU
+      pattern.
+  - The function is invoked in normal teardown paths, so it can be hit
+    in practice:
+    - `net/ipv4/tcp_ipv4.c:2570`
+    - `net/ipv4/tcp.c:3382`
 
- .../ethernet/huawei/hinic3/hinic3_nic_io.h    | 15 ++--
- .../net/ethernet/huawei/hinic3/hinic3_rx.c    | 10 +--
- .../net/ethernet/huawei/hinic3/hinic3_rx.h    | 24 +++---
- .../net/ethernet/huawei/hinic3/hinic3_tx.c    | 81 ++++++++++---------
- .../net/ethernet/huawei/hinic3/hinic3_tx.h    | 18 ++---
- 5 files changed, 79 insertions(+), 69 deletions(-)
+- Scope and risk
+  - Small, contained change in a single function, no ABI changes, no
+    architectural refactors.
+  - Only affects active TCP Fast Open logic when clearing the global
+    backoff counter on non-loopback devices.
+  - Behavior is unchanged except making the device lookup and flag read
+    concurrency-safe and cheaper (no `dst` refcount inc/dec).
+  - Reading `IFF_LOOPBACK` under RCU is safe; the bit is effectively
+    stable for the loopback device, and RCU guarantees pointer lifetime
+    during the check.
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h
-index 865ba6878c483..1808d37e7cf71 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h
-@@ -75,8 +75,8 @@ static inline u16 hinic3_get_sq_hw_ci(const struct hinic3_io_queue *sq)
- #define DB_CFLAG_DP_RQ   1
- 
- struct hinic3_nic_db {
--	u32 db_info;
--	u32 pi_hi;
-+	__le32 db_info;
-+	__le32 pi_hi;
- };
- 
- static inline void hinic3_write_db(struct hinic3_io_queue *queue, int cos,
-@@ -84,11 +84,12 @@ static inline void hinic3_write_db(struct hinic3_io_queue *queue, int cos,
- {
- 	struct hinic3_nic_db db;
- 
--	db.db_info = DB_INFO_SET(DB_SRC_TYPE, TYPE) |
--		     DB_INFO_SET(cflag, CFLAG) |
--		     DB_INFO_SET(cos, COS) |
--		     DB_INFO_SET(queue->q_id, QID);
--	db.pi_hi = DB_PI_HIGH(pi);
-+	db.db_info =
-+		cpu_to_le32(DB_INFO_SET(DB_SRC_TYPE, TYPE) |
-+			    DB_INFO_SET(cflag, CFLAG) |
-+			    DB_INFO_SET(cos, COS) |
-+			    DB_INFO_SET(queue->q_id, QID));
-+	db.pi_hi = cpu_to_le32(DB_PI_HIGH(pi));
- 
- 	writeq(*((u64 *)&db), DB_ADDR(queue, pi));
- }
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
-index 860163e9d66cf..ac04e3a192ada 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
-@@ -66,8 +66,8 @@ static void rq_wqe_buf_set(struct hinic3_io_queue *rq, uint32_t wqe_idx,
- 	struct hinic3_rq_wqe *rq_wqe;
- 
- 	rq_wqe = get_q_element(&rq->wq.qpages, wqe_idx, NULL);
--	rq_wqe->buf_hi_addr = upper_32_bits(dma_addr);
--	rq_wqe->buf_lo_addr = lower_32_bits(dma_addr);
-+	rq_wqe->buf_hi_addr = cpu_to_le32(upper_32_bits(dma_addr));
-+	rq_wqe->buf_lo_addr = cpu_to_le32(lower_32_bits(dma_addr));
- }
- 
- static u32 hinic3_rx_fill_buffers(struct hinic3_rxq *rxq)
-@@ -279,7 +279,7 @@ static int recv_one_pkt(struct hinic3_rxq *rxq, struct hinic3_rq_cqe *rx_cqe,
- 	if (skb_is_nonlinear(skb))
- 		hinic3_pull_tail(skb);
- 
--	offload_type = rx_cqe->offload_type;
-+	offload_type = le32_to_cpu(rx_cqe->offload_type);
- 	hinic3_rx_csum(rxq, offload_type, status, skb);
- 
- 	num_lro = RQ_CQE_STATUS_GET(status, NUM_LRO);
-@@ -311,14 +311,14 @@ int hinic3_rx_poll(struct hinic3_rxq *rxq, int budget)
- 	while (likely(nr_pkts < budget)) {
- 		sw_ci = rxq->cons_idx & rxq->q_mask;
- 		rx_cqe = rxq->cqe_arr + sw_ci;
--		status = rx_cqe->status;
-+		status = le32_to_cpu(rx_cqe->status);
- 		if (!RQ_CQE_STATUS_GET(status, RXDONE))
- 			break;
- 
- 		/* make sure we read rx_done before packet length */
- 		rmb();
- 
--		vlan_len = rx_cqe->vlan_len;
-+		vlan_len = le32_to_cpu(rx_cqe->vlan_len);
- 		pkt_len = RQ_CQE_SGE_GET(vlan_len, LEN);
- 		if (recv_one_pkt(rxq, rx_cqe, pkt_len, vlan_len, status))
- 			break;
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
-index 1cca21858d40e..e7b496d13a697 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
-@@ -27,21 +27,21 @@
- 
- /* RX Completion information that is provided by HW for a specific RX WQE */
- struct hinic3_rq_cqe {
--	u32 status;
--	u32 vlan_len;
--	u32 offload_type;
--	u32 rsvd3;
--	u32 rsvd4;
--	u32 rsvd5;
--	u32 rsvd6;
--	u32 pkt_info;
-+	__le32 status;
-+	__le32 vlan_len;
-+	__le32 offload_type;
-+	__le32 rsvd3;
-+	__le32 rsvd4;
-+	__le32 rsvd5;
-+	__le32 rsvd6;
-+	__le32 pkt_info;
- };
- 
- struct hinic3_rq_wqe {
--	u32 buf_hi_addr;
--	u32 buf_lo_addr;
--	u32 cqe_hi_addr;
--	u32 cqe_lo_addr;
-+	__le32 buf_hi_addr;
-+	__le32 buf_lo_addr;
-+	__le32 cqe_hi_addr;
-+	__le32 cqe_lo_addr;
- };
- 
- struct hinic3_rx_info {
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-index 3f7f73430be41..dd8f362ded185 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-@@ -81,10 +81,10 @@ static int hinic3_tx_map_skb(struct net_device *netdev, struct sk_buff *skb,
- 
- 	dma_info[0].len = skb_headlen(skb);
- 
--	wqe_desc->hi_addr = upper_32_bits(dma_info[0].dma);
--	wqe_desc->lo_addr = lower_32_bits(dma_info[0].dma);
-+	wqe_desc->hi_addr = cpu_to_le32(upper_32_bits(dma_info[0].dma));
-+	wqe_desc->lo_addr = cpu_to_le32(lower_32_bits(dma_info[0].dma));
- 
--	wqe_desc->ctrl_len = dma_info[0].len;
-+	wqe_desc->ctrl_len = cpu_to_le32(dma_info[0].len);
- 
- 	for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
- 		frag = &(skb_shinfo(skb)->frags[i]);
-@@ -197,7 +197,8 @@ static int hinic3_tx_csum(struct hinic3_txq *txq, struct hinic3_sq_task *task,
- 		union hinic3_ip ip;
- 		u8 l4_proto;
- 
--		task->pkt_info0 |= SQ_TASK_INFO0_SET(1, TUNNEL_FLAG);
-+		task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1,
-+								 TUNNEL_FLAG));
- 
- 		ip.hdr = skb_network_header(skb);
- 		if (ip.v4->version == 4) {
-@@ -226,7 +227,7 @@ static int hinic3_tx_csum(struct hinic3_txq *txq, struct hinic3_sq_task *task,
+- Stable backport fit
+  - Fixes a real concurrency/UAF bug that can crash the kernel; it’s not
+    a feature change.
+  - Minimal risk of regression and confined to TCP/TFO.
+  - Uses widely available helpers:
+    - `__sk_dst_get()` at `include/net/sock.h:2142`
+    - `dst_dev_rcu()` at `include/net/dst.h:574`
+  - If an older stable branch lacked `dst_dev_rcu()`, the change is
+    trivially adaptable using `rcu_dereference(dst->dev)` under
+    `rcu_read_lock()`. But in maintained series this helper is already
+    present in the networking core.
+
+- Why it matters
+  - Even if exploitation is unlikely (requires racing TFO teardown with
+    route/device changes), it’s a correctness and reliability fix in a
+    core network path and should be in stable trees.
+
+Conclusion
+- This is a clear bug fix for a potential UAF with a minimal, localized
+  RCU conversion. It aligns with stable criteria and should be
+  backported.
+
+ net/ipv4/tcp_fastopen.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
+index f1884f0c9e523..7d945a527daf0 100644
+--- a/net/ipv4/tcp_fastopen.c
++++ b/net/ipv4/tcp_fastopen.c
+@@ -576,11 +576,12 @@ void tcp_fastopen_active_disable_ofo_check(struct sock *sk)
  		}
- 	}
- 
--	task->pkt_info0 |= SQ_TASK_INFO0_SET(1, INNER_L4_EN);
-+	task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1, INNER_L4_EN));
- 
- 	return 1;
- }
-@@ -255,26 +256,28 @@ static void get_inner_l3_l4_type(struct sk_buff *skb, union hinic3_ip *ip,
- 	}
- }
- 
--static void hinic3_set_tso_info(struct hinic3_sq_task *task, u32 *queue_info,
-+static void hinic3_set_tso_info(struct hinic3_sq_task *task, __le32 *queue_info,
- 				enum hinic3_l4_offload_type l4_offload,
- 				u32 offset, u32 mss)
- {
- 	if (l4_offload == HINIC3_L4_OFFLOAD_TCP) {
--		*queue_info |= SQ_CTRL_QUEUE_INFO_SET(1, TSO);
--		task->pkt_info0 |= SQ_TASK_INFO0_SET(1, INNER_L4_EN);
-+		*queue_info |= cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(1, TSO));
-+		task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1,
-+								 INNER_L4_EN));
- 	} else if (l4_offload == HINIC3_L4_OFFLOAD_UDP) {
--		*queue_info |= SQ_CTRL_QUEUE_INFO_SET(1, UFO);
--		task->pkt_info0 |= SQ_TASK_INFO0_SET(1, INNER_L4_EN);
-+		*queue_info |= cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(1, UFO));
-+		task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1,
-+								 INNER_L4_EN));
- 	}
- 
- 	/* enable L3 calculation */
--	task->pkt_info0 |= SQ_TASK_INFO0_SET(1, INNER_L3_EN);
-+	task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1, INNER_L3_EN));
- 
--	*queue_info |= SQ_CTRL_QUEUE_INFO_SET(offset >> 1, PLDOFF);
-+	*queue_info |= cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(offset >> 1, PLDOFF));
- 
- 	/* set MSS value */
--	*queue_info &= ~SQ_CTRL_QUEUE_INFO_MSS_MASK;
--	*queue_info |= SQ_CTRL_QUEUE_INFO_SET(mss, MSS);
-+	*queue_info &= cpu_to_le32(~SQ_CTRL_QUEUE_INFO_MSS_MASK);
-+	*queue_info |= cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(mss, MSS));
- }
- 
- static __sum16 csum_magic(union hinic3_ip *ip, unsigned short proto)
-@@ -284,7 +287,7 @@ static __sum16 csum_magic(union hinic3_ip *ip, unsigned short proto)
- 		csum_ipv6_magic(&ip->v6->saddr, &ip->v6->daddr, 0, proto, 0);
- }
- 
--static int hinic3_tso(struct hinic3_sq_task *task, u32 *queue_info,
-+static int hinic3_tso(struct hinic3_sq_task *task, __le32 *queue_info,
- 		      struct sk_buff *skb)
- {
- 	enum hinic3_l4_offload_type l4_offload;
-@@ -305,15 +308,17 @@ static int hinic3_tso(struct hinic3_sq_task *task, u32 *queue_info,
- 	if (skb->encapsulation) {
- 		u32 gso_type = skb_shinfo(skb)->gso_type;
- 		/* L3 checksum is always enabled */
--		task->pkt_info0 |= SQ_TASK_INFO0_SET(1, OUT_L3_EN);
--		task->pkt_info0 |= SQ_TASK_INFO0_SET(1, TUNNEL_FLAG);
-+		task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1, OUT_L3_EN));
-+		task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1,
-+								 TUNNEL_FLAG));
- 
- 		l4.hdr = skb_transport_header(skb);
- 		ip.hdr = skb_network_header(skb);
- 
- 		if (gso_type & SKB_GSO_UDP_TUNNEL_CSUM) {
- 			l4.udp->check = ~csum_magic(&ip, IPPROTO_UDP);
--			task->pkt_info0 |= SQ_TASK_INFO0_SET(1, OUT_L4_EN);
-+			task->pkt_info0 |=
-+				cpu_to_le32(SQ_TASK_INFO0_SET(1, OUT_L4_EN));
- 		}
- 
- 		ip.hdr = skb_inner_network_header(skb);
-@@ -343,13 +348,14 @@ static void hinic3_set_vlan_tx_offload(struct hinic3_sq_task *task,
- 	 * 2=select TPID2 in IPSU, 3=select TPID3 in IPSU,
- 	 * 4=select TPID4 in IPSU
- 	 */
--	task->vlan_offload = SQ_TASK_INFO3_SET(vlan_tag, VLAN_TAG) |
--			     SQ_TASK_INFO3_SET(vlan_tpid, VLAN_TPID) |
--			     SQ_TASK_INFO3_SET(1, VLAN_TAG_VALID);
-+	task->vlan_offload =
-+		cpu_to_le32(SQ_TASK_INFO3_SET(vlan_tag, VLAN_TAG) |
-+			    SQ_TASK_INFO3_SET(vlan_tpid, VLAN_TPID) |
-+			    SQ_TASK_INFO3_SET(1, VLAN_TAG_VALID));
- }
- 
- static u32 hinic3_tx_offload(struct sk_buff *skb, struct hinic3_sq_task *task,
--			     u32 *queue_info, struct hinic3_txq *txq)
-+			     __le32 *queue_info, struct hinic3_txq *txq)
- {
- 	u32 offload = 0;
- 	int tso_cs_en;
-@@ -440,39 +446,41 @@ static u16 hinic3_set_wqe_combo(struct hinic3_txq *txq,
- }
- 
- static void hinic3_prepare_sq_ctrl(struct hinic3_sq_wqe_combo *wqe_combo,
--				   u32 queue_info, int nr_descs, u16 owner)
-+				   __le32 queue_info, int nr_descs, u16 owner)
- {
- 	struct hinic3_sq_wqe_desc *wqe_desc = wqe_combo->ctrl_bd0;
- 
- 	if (wqe_combo->wqe_type == SQ_WQE_COMPACT_TYPE) {
- 		wqe_desc->ctrl_len |=
--		    SQ_CTRL_SET(SQ_NORMAL_WQE, DATA_FORMAT) |
--		    SQ_CTRL_SET(wqe_combo->wqe_type, EXTENDED) |
--		    SQ_CTRL_SET(owner, OWNER);
-+			cpu_to_le32(SQ_CTRL_SET(SQ_NORMAL_WQE, DATA_FORMAT) |
-+				    SQ_CTRL_SET(wqe_combo->wqe_type, EXTENDED) |
-+				    SQ_CTRL_SET(owner, OWNER));
- 
- 		/* compact wqe queue_info will transfer to chip */
- 		wqe_desc->queue_info = 0;
- 		return;
- 	}
- 
--	wqe_desc->ctrl_len |= SQ_CTRL_SET(nr_descs, BUFDESC_NUM) |
--			      SQ_CTRL_SET(wqe_combo->task_type, TASKSECT_LEN) |
--			      SQ_CTRL_SET(SQ_NORMAL_WQE, DATA_FORMAT) |
--			      SQ_CTRL_SET(wqe_combo->wqe_type, EXTENDED) |
--			      SQ_CTRL_SET(owner, OWNER);
-+	wqe_desc->ctrl_len |=
-+		cpu_to_le32(SQ_CTRL_SET(nr_descs, BUFDESC_NUM) |
-+			    SQ_CTRL_SET(wqe_combo->task_type, TASKSECT_LEN) |
-+			    SQ_CTRL_SET(SQ_NORMAL_WQE, DATA_FORMAT) |
-+			    SQ_CTRL_SET(wqe_combo->wqe_type, EXTENDED) |
-+			    SQ_CTRL_SET(owner, OWNER));
- 
- 	wqe_desc->queue_info = queue_info;
--	wqe_desc->queue_info |= SQ_CTRL_QUEUE_INFO_SET(1, UC);
-+	wqe_desc->queue_info |= cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(1, UC));
- 
- 	if (!SQ_CTRL_QUEUE_INFO_GET(wqe_desc->queue_info, MSS)) {
- 		wqe_desc->queue_info |=
--		    SQ_CTRL_QUEUE_INFO_SET(HINIC3_TX_MSS_DEFAULT, MSS);
-+		    cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(HINIC3_TX_MSS_DEFAULT, MSS));
- 	} else if (SQ_CTRL_QUEUE_INFO_GET(wqe_desc->queue_info, MSS) <
- 		   HINIC3_TX_MSS_MIN) {
- 		/* mss should not be less than 80 */
--		wqe_desc->queue_info &= ~SQ_CTRL_QUEUE_INFO_MSS_MASK;
-+		wqe_desc->queue_info &=
-+		    cpu_to_le32(~SQ_CTRL_QUEUE_INFO_MSS_MASK);
- 		wqe_desc->queue_info |=
--		    SQ_CTRL_QUEUE_INFO_SET(HINIC3_TX_MSS_MIN, MSS);
-+		    cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(HINIC3_TX_MSS_MIN, MSS));
+ 	} else if (tp->syn_fastopen_ch &&
+ 		   atomic_read(&sock_net(sk)->ipv4.tfo_active_disable_times)) {
+-		dst = sk_dst_get(sk);
+-		dev = dst ? dst_dev(dst) : NULL;
++		rcu_read_lock();
++		dst = __sk_dst_get(sk);
++		dev = dst ? dst_dev_rcu(dst) : NULL;
+ 		if (!(dev && (dev->flags & IFF_LOOPBACK)))
+ 			atomic_set(&sock_net(sk)->ipv4.tfo_active_disable_times, 0);
+-		dst_release(dst);
++		rcu_read_unlock();
  	}
  }
  
-@@ -482,12 +490,13 @@ static netdev_tx_t hinic3_send_one_skb(struct sk_buff *skb,
- {
- 	struct hinic3_sq_wqe_combo wqe_combo = {};
- 	struct hinic3_tx_info *tx_info;
--	u32 offload, queue_info = 0;
- 	struct hinic3_sq_task task;
- 	u16 wqebb_cnt, num_sge;
-+	__le32 queue_info = 0;
- 	u16 saved_wq_prod_idx;
- 	u16 owner, pi = 0;
- 	u8 saved_sq_owner;
-+	u32 offload;
- 	int err;
- 
- 	if (unlikely(skb->len < MIN_SKB_LEN)) {
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.h b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
-index 9e505cc19dd55..21dfe879a29a2 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
-@@ -58,7 +58,7 @@ enum hinic3_tx_offload_type {
- #define SQ_CTRL_QUEUE_INFO_SET(val, member) \
- 	FIELD_PREP(SQ_CTRL_QUEUE_INFO_##member##_MASK, val)
- #define SQ_CTRL_QUEUE_INFO_GET(val, member) \
--	FIELD_GET(SQ_CTRL_QUEUE_INFO_##member##_MASK, val)
-+	FIELD_GET(SQ_CTRL_QUEUE_INFO_##member##_MASK, le32_to_cpu(val))
- 
- #define SQ_CTRL_MAX_PLDOFF  221
- 
-@@ -77,17 +77,17 @@ enum hinic3_tx_offload_type {
- 	FIELD_PREP(SQ_TASK_INFO3_##member##_MASK, val)
- 
- struct hinic3_sq_wqe_desc {
--	u32 ctrl_len;
--	u32 queue_info;
--	u32 hi_addr;
--	u32 lo_addr;
-+	__le32 ctrl_len;
-+	__le32 queue_info;
-+	__le32 hi_addr;
-+	__le32 lo_addr;
- };
- 
- struct hinic3_sq_task {
--	u32 pkt_info0;
--	u32 ip_identify;
--	u32 rsvd;
--	u32 vlan_offload;
-+	__le32 pkt_info0;
-+	__le32 ip_identify;
-+	__le32 rsvd;
-+	__le32 vlan_offload;
- };
- 
- struct hinic3_sq_wqe_combo {
 -- 
 2.51.0
 
