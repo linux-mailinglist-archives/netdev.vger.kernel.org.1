@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-232815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92E46C090CC
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 15:27:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 481BCC090CF
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 15:27:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 019703A8A39
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 13:27:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7917018971B0
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 13:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 066042DE1E5;
-	Sat, 25 Oct 2025 13:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38CF92DEA86;
+	Sat, 25 Oct 2025 13:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="jm2erwky"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Q7YymhDY"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526D32C235B
-	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 13:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD13242D70
+	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 13:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761398827; cv=none; b=PLgcevSD5uxRpkEey9oREXO8Bu1Vu8DZZkLCyDvwxn/g28ZlJtAbYOdLFod8alH/7hVxvbaacf2iwvwDKMIOHSeVeMrke6u08lKJS3g9bICdE9QTvMbuEaRnktsAKcH2kdHh9s7EnzrNUWN/sFZkFfZbBv80RkYWquKf7JgF2CU=
+	t=1761398862; cv=none; b=b6NzNF21tGf7J5iLS1drWbFfEZ8kTtGs5Psx4kvPMpsxByIH71wmJ2RD2CftVkzb7oVA2TLzAk8Oj9AKN2lGrAMjxI4esej4L7gzqnjSRPrita5PTDEQUpeL1VMsrVT9W2mSmQubT0d/MdYiXi57J94vIlYMNizqKfrKuK5fRdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761398827; c=relaxed/simple;
-	bh=k8cXpNCmR28LWIgyErSMJlosiGhqYYVc3+Boi9DrAIE=;
+	s=arc-20240116; t=1761398862; c=relaxed/simple;
+	bh=i3aR6XG7SCZKLYqvuLJClAEOhq3SLQqddyDbw2SSnPE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zlz4QSd6RCaK2nrbVTxIiiV/ePPJhxQVEE/pjp+ZcCQ33fHXbxLFYcoUSmhsKbDHVrKucDeVk+bI7qe9pSIHjtcmT1BoMrEGX+Oa6tl7P+78FRqxCDeNaGE/op5dNwCeqgTntVm9QLtVdTfdEBk+2lkeRBit6GeJ/mDQuN7C1qI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=jm2erwky; arc=none smtp.client-ip=209.85.166.45
+	 In-Reply-To:Content-Type; b=OOpVMB/2Z8Cm5n/cC0S2OgRlDEgJhevQTvi2eZJPX5/jdtAfmYQpIKyHm0UoUCI3Vwc2dvZ115EgfppXd+fVQduCT7xAlM9j7E4k7ANRSz7gbiaNGh25HCw4ya0VM8w/XkaKUQfaTjvliSHVQj2oX7eOm5WEqmNLt8Dk3ECwZfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Q7YymhDY; arc=none smtp.client-ip=209.85.166.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-943b8b69734so58400839f.3
-        for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 06:27:04 -0700 (PDT)
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-938bf212b72so125376139f.1
+        for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 06:27:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761398824; x=1762003624; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761398859; x=1762003659; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q0o8C4vMoT/wqtVhCd1qilOO7b4cOo0+Z3kwre8J7x8=;
-        b=jm2erwkyMmeoq2eZ8lFjQYOfUoNvzIBmpq9P3slJRf+HGVL2jbGvrmM3OrnCHPIGQ4
-         +wDY61hK1/Hq26T53pJ/I9b5S0BIXonX+x2w2adRV50oQoKp4EWxA8D0mqUvwJ+F5vSm
-         YV0pGNEC4MPP59Vp2jBOR1881zNHVmKB5+c08kKNGGblljk2pPsdOUh13++2nGtNb+gh
-         sQLCGiNSAZtX7PpicU4/Gu/CCt3eyTcNuvOuRgnffBW8oToTrlobvPfkQGoH43XB/XXP
-         V4437r+FyPUv2aepTPQms3KxdbGUh0ORFCIQksZKnMMeBkMFb92jzi/EHAWAjtvohupk
-         KW5A==
+        bh=HXr/4gmeQBCobcp1e59rIPiZ2OM+tq/HT4CMRTfBtng=;
+        b=Q7YymhDYF4uDwtwyMkr960KOs3U3famiaMCG/Q+j5pBGj2inciD2CdHtH/W5KrzQx4
+         LiUoTDOs7/cb3bfAY0/EsR5NDAKpYS1Xg8CEXFUswimYvOnCAbxuKGWC+lv3uTMl7gS9
+         6Vhr8AVLma8GYKuDT/zHFKSd+VbxPJ/WowNnQRko77+UMQ3H7hgOhWQTr6RObfYCh2d1
+         7z1USsQm9IIM0nFozTqpvEhEUUGlvJnGqPB7A0yAAHnKbURx22LOuTUUOQtLwABIZHli
+         fiPAO0DNyiw9GEytnbnl9FeocU2YQtydU8DBRogTHYjJdpvoYGpEVaUSnMQuOsLQ1CG9
+         sF4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761398824; x=1762003624;
-        h=content-transfer-encoding:in-reply-to:content-language:from
+        d=1e100.net; s=20230601; t=1761398859; x=1762003659;
+        h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q0o8C4vMoT/wqtVhCd1qilOO7b4cOo0+Z3kwre8J7x8=;
-        b=CN+d/tl8udY1lkDlKiuVwxkAdRSPEaU57PkMA39zyzbBD0j3zL9SK64ugBnJ88fgBI
-         9fkq4UkPQPUtpM4rwBPvuEgk8DpqkDGxvbxy5ErLhZGxcfNkNjPG44Oq4AA0LAQN7rIA
-         bJsNcrBpE+WVErGVevz5MAIEr89sDszM9GPv9ru7cZgZgfUc2GUWvrW93OUjQYJvZ+uW
-         S3b5z32TmVvmH5XAekszHx7LZBtATFNCtkd/8q0DX1BHQti6zS6gPIhhbd0H+FfXn2rz
-         STg0AmwG5EQtZfUfrx+d8xFVDiozQX8XlbgIBd+W89a/uWgBqhtDIc+yDbbZ0DxKfg6m
-         XTRw==
-X-Gm-Message-State: AOJu0YxUr/LoM5cYu+mvhc30433lxExmsMX6n66PYUi6lh0FDcYKihI2
-	wdNe25LAVawbiRE5faumLA7nx6aUiRZO6UevRyq4IOpuMgClCt0yx79vNgBMPp8QRc9AYe05L5A
-	QMJPvSj4=
-X-Gm-Gg: ASbGncsWIhjZzpG58z2N8THBchDFqsxFRGHbGOO0ig9HW70X1ETuk31kOMmQNwIRRCo
-	JwPtl2e0CVpQAFxnmubz8pFSw7eRshJYxe0FWQ6AuP8Y7xDjBfRMwOjdRRATa8EKNFTTz0fWnLN
-	GPOKZKJBQ5TZjaEa/tX+MJkX3o4yWxiA6gHszF23p46CqRQETfXfc0B/Upo1NecmeeA9ygmCWSI
-	z0DMtMg3s8yA++1nussE/16h/VT4W7DVMtvjQgjrv2ppJLCJSwy/RUUzoNSdRVrf2zyrAt8j6SG
-	pUj4qgPjoUKruqOg2w4iFad0OeoAbVTy+xKbj+o1E06r56MJONZAC7xFrNd2/BxYbHiSwl+gMfi
-	fhRNybSih1Fv7LAtctVksRSWzsZPXCAemIsqoIzFSim+UGrjqoNviFGb4zLTlBQi4Bb6AodAVyQ
-	==
-X-Google-Smtp-Source: AGHT+IEcl+ouTWzQondoTJD6nHB5VGbeQjWrfedXKmB7gFnl4vZIVF56W7+RyOoq7o8xM20OVp6aJQ==
-X-Received: by 2002:a05:6e02:300a:b0:431:d864:364c with SMTP id e9e14a558f8ab-431d86438femr149277995ab.17.1761398824146;
-        Sat, 25 Oct 2025 06:27:04 -0700 (PDT)
+        bh=HXr/4gmeQBCobcp1e59rIPiZ2OM+tq/HT4CMRTfBtng=;
+        b=NJLh+ixKBCAda6Hd18GNs/102XETZgGmlNbforC7fk3wMTOSFSjxYl/GOPhzydwSCH
+         cJ4AlZFS/SSF3cQPKNbuBoSkLWNLxt1kUhq0mKuvp4S30xGoM9s+wFWRvC4zVQGIG1eY
+         HAkdfIq6TAZjbOJdOzTP3Mvf+ocdzJdv6wDopg2ZAiq0C+S8vaHCKKeKA0BY9Nw1gzeH
+         XCLyGdglWtmZlnLQdkTeg8R71PU6tEYRDGYpdunCkuwX0G6KB7BuJFaSryFtkBNuOuMT
+         Vmxzn4nXrdloJaurImBlARmhRTUC7xmnudDTj4a0wr2xmJHc1ldRb0RmvE7ZvynWDWC5
+         aCtQ==
+X-Gm-Message-State: AOJu0Yz+kvUKj5i5td8p9/QUuLI3vTCkXEm7IRvweP3mKnTTcda06C0N
+	hE4PsQqk+fupZtGUG1lXigO7sONG1n72TxMhCMhcV0Tws60cFUk9hXLFnolHUuEcj2UI1xRqPUY
+	c0HKPD5M=
+X-Gm-Gg: ASbGncvTilVsoMto0a6+mNK37UDY1/kz09xF9csEbLp4fq3aVe9A1yX+dNNohHgaZoV
+	+qMylX8iK2jHaV8Yq9wgJkLuWmdQiEhf8ITPm3XzknwVapRe1fLFdbb7cjtasYtTV2uof03mWwx
+	1XKbqoPOnd6OSgvs/dxnMh3NBGDKD3BEGFcnZn6JEiHGhm182GrywOdOwLFXF/wuD8dXaB++vfi
+	PEGmhh2/PleiOtJnQife0OHYlc+5fOgoeHuI48NbeRcep5mV1d4DaZojhYbmYztYSz+T+OUlfCB
+	6piQVqbhF+y/hU7vs2ctakNat0eE1G1pD/6NMGPep5gT3UT5G2+V3v0yfobvGrm4wKZkabsCKMp
+	hgUY3eqrjyOa1Gw5M4NXTsywJBHvjnSaUYg1AK/uteWc9NYGceZxVQZAtOyN8WbQl1bALoEoqK6
+	kotcyGhyr4
+X-Google-Smtp-Source: AGHT+IG4Y2HZ0MyC30nUKDZ+xtNAM0kFpk2+Pw7r1CzWuz5LJp3/Q4U/QRnl0mYnHV6GLCYfZXOvaw==
+X-Received: by 2002:a05:6602:6015:b0:93f:c5a3:2ad7 with SMTP id ca18e2360f4ac-93fc5a32d96mr3801899039f.6.1761398859503;
+        Sat, 25 Oct 2025 06:27:39 -0700 (PDT)
 Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-431f68747b2sm8084375ab.17.2025.10.25.06.27.02
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-94359f324b3sm69240539f.21.2025.10.25.06.27.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Oct 2025 06:27:02 -0700 (PDT)
-Message-ID: <f61afa55-f610-478b-9079-d37ad9c2f232@kernel.dk>
-Date: Sat, 25 Oct 2025 07:27:01 -0600
+        Sat, 25 Oct 2025 06:27:38 -0700 (PDT)
+Message-ID: <c344d845-99ba-4c3c-9382-cf401712a689@kernel.dk>
+Date: Sat, 25 Oct 2025 07:27:37 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,67 +83,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] io_uring: Introduce getsockname io_uring cmd
+Subject: Re: [PATCH 0/3] Introduce getsockname io_uring_cmd
 To: Gabriel Krisman Bertazi <krisman@suse.de>
 Cc: netdev@vger.kernel.org, io-uring@vger.kernel.org,
  Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>
 References: <20251024154901.797262-1-krisman@suse.de>
- <20251024154901.797262-4-krisman@suse.de>
-From: Jens Axboe <axboe@kernel.dk>
 Content-Language: en-US
-In-Reply-To: <20251024154901.797262-4-krisman@suse.de>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20251024154901.797262-1-krisman@suse.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/24/25 9:49 AM, Gabriel Krisman Bertazi wrote:
-> Introduce a socket-specific io_uring_cmd to support
-> getsockname/getpeername via io_uring.  I made this an io_uring_cmd
-> instead of a new operation to avoid polluting the command namespace with
-> what is exclusively a socket operation.  In addition, since we don't
-> need to conform to existing interfaces, this merges the
-> getsockname/getpeername in a single operation, since the implementation
-> is pretty much the same.
+On 10/24/25 9:48 AM, Gabriel Krisman Bertazi wrote:
 > 
-> This has been frequently requested, for instance at [1] and more
-> recently in the project Discord channel. The main use-case is to support
-> fixed socket file descriptors.
+> This feature has been requested a few times in the liburing repository
+> and Discord channels, such as in [1,2].  If anything, it also helps
+> solve a long standing issue in the bind-listen test that results in
+> occasional test failures.
+> 
+> The patchset is divided in three parts: Patch 1 merges the getpeername
+> and getsockname implementation in the network layer, making further
+> patches easier; Patch 2 splits out a helper used by io_uring, like done
+> for other network commands; Finally, patch 3 plumbs the new command in
+> io_uring.
+> 
+> The syscall path was tested by booting a Linux distro, which does all
+> sorts of getsockname/getpeername syscalls.  The io_uring side was tested
+> with a couple of new liburing subtests available at:
+> 
+>    https://github.com/krisman/liburing.git -b socket
+> 
+> Based on top of Jens' for-next.
+> 
+> [1] https://github.com/axboe/liburing/issues/1356
+> [2] https://discord.com/channels/1241076672589991966/1241076672589991970/1429975797912830074
 
-Just two nits below, otherwise looks good!
+Looks good to me, and it's not often you can add a new feature and
+have:
 
-> diff --git a/io_uring/cmd_net.c b/io_uring/cmd_net.c
-> index 27a09aa4c9d0..092844358729 100644
-> --- a/io_uring/cmd_net.c
-> +++ b/io_uring/cmd_net.c
-> @@ -132,6 +132,28 @@ static int io_uring_cmd_timestamp(struct socket *sock,
->  	return -EAGAIN;
->  }
->  
-> +static int io_uring_cmd_getsockname(struct socket *sock,
-> +				    struct io_uring_cmd *cmd,
-> +				    unsigned int issue_flags)
-> +{
-> +	const struct io_uring_sqe *sqe = cmd->sqe;
-> +
+>  5 files changed, 52 insertions(+), 52 deletions(-)
 
-Random newline.
-
-> +	struct sockaddr_storage address;
-> +	struct sockaddr __user *uaddr;
-> +	int __user *ulen;
-> +	unsigned int peer;
-> +
-> +	uaddr = u64_to_user_ptr(READ_ONCE(sqe->addr));
-> +	ulen = u64_to_user_ptr(sqe->addr3);
-> +	peer = READ_ONCE(sqe->optlen);
-> +
-> +	if (sqe->ioprio || sqe->__pad1 || sqe->len || sqe->rw_flags)
-> +		return -EINVAL;
-
-Most/all prep handlers tend to check these first, then proceed with
-setting up if not set. Would probably make sense to mirror that here
-too.
+a net zero diffstat! Nice.
 
 -- 
 Jens Axboe
+
 
