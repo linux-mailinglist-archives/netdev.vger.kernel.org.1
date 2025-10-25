@@ -1,71 +1,74 @@
-Return-Path: <netdev+bounces-232775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90D99C08C0D
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 08:20:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB326C08C52
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 08:46:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 14F923504FD
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 06:20:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DE8C3BF547
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 06:46:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68612DEA7D;
-	Sat, 25 Oct 2025 06:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E4027E05E;
+	Sat, 25 Oct 2025 06:46:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ffavJ6Nu"
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="pawxbhdZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4B6DDA9;
-	Sat, 25 Oct 2025 06:19:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A2C27380A;
+	Sat, 25 Oct 2025 06:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761373151; cv=none; b=JehbSaQ6RXv1BEPT4m+W7qnmyKEwz50w3pBp6YgEX4nWpodH7agBWJnYhITCv/nMenbN+TSqBusHskRPXnP2OzZkUGK3RbQpOcRwhP21e3CLgdnxKHRb9BojKB6e19jNt+W2zPVOHirJI/NkEC9VgwNxCjqEN04mX8W9wZfE9yU=
+	t=1761374803; cv=none; b=IqeacRBEw6zTnpILVHqIRoKP1/plAJRDm/i/Oq0+M5Yq4DpmeA371+MQhoV9HNGacQWrlkDjLueu5m+MoN+GByWYWp/lybMBMj2FZgOO9JTIOdE7eRhUc32wLhyKPYFGutWThVZmoFfySK59f3NoIyAMyhgMI8/ltGdulU/cp6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761373151; c=relaxed/simple;
-	bh=s0JB4Er/9OWU0poO+dBQ5448vIExojbrVjP+me6tqv4=;
+	s=arc-20240116; t=1761374803; c=relaxed/simple;
+	bh=FSJHWW9m9cdy0TRoQ5njzCk1BM0S5lweNjXmNAaJi/o=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ehWerjxcxteWJNbxze1ElRSgis/TExbgbjiH5cEozxkzEgJ5dSV+I9pxPyjdisl6TIM6fykYAXcFinKVRYlqYRivbIR4K1AqIwW0X4g/DIrf0YC+fpb2aiCVtiXh98kKeLdL3XwEzwsqTWYS8gZ51zJgjj6AO/HyUjv5gf4xcGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ffavJ6Nu; arc=none smtp.client-ip=113.46.200.222
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=QRN3qv61eGwFKyrvzpriS162yyhwq5apNLjydtwF/Jc=;
-	b=ffavJ6NuuRkAjwVMrzBHJ5HmI2Wyge5iytztWBm2Cu7PAi9lhaM6Y64noII1tivBzjIwUI5Kp
-	VukmbTKz/Z4cvJ8GbzYeM8SSDw/FLu4WCzmlXFdy/ICuvNuyTxLAD0WNwPxf3mMjBWBY/BNN2Md
-	MWWg4/fFCVKyIOJsKp4w6S0=
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4ctqMr5QykzLlVc;
-	Sat, 25 Oct 2025 14:18:32 +0800 (CST)
-Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 16A141A0188;
-	Sat, 25 Oct 2025 14:18:59 +0800 (CST)
-Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.188.120) by
- kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 25 Oct 2025 14:18:57 +0800
-From: Fan Gong <gongfan1@huawei.com>
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
-	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, <Markus.Elfring@web.de>, <pavan.chebbi@broadcom.com>
-CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
-	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Shen Chenyang
-	<shenchenyang1@hisilicon.com>, Zhou Shuai <zhoushuai28@huawei.com>, Wu Like
-	<wulike1@huawei.com>, Shi Jing <shijing34@huawei.com>, Luo Yang
-	<luoyang82@h-partners.com>, Meny Yossefi <meny.yossefi@huawei.com>, Gur Stavi
-	<gur.stavi@huawei.com>
-Subject: [PATCH net-next v03 5/5] hinic3: Add netdev register interfaces
-Date: Sat, 25 Oct 2025 14:18:36 +0800
-Message-ID: <ac8e9b39a9d9515b68036bfcf985a4a21c5e5493.1761362580.git.zhuyikai1@h-partners.com>
-X-Mailer: git-send-email 2.51.0.windows.1
-In-Reply-To: <cover.1761362580.git.zhuyikai1@h-partners.com>
-References: <cover.1761362580.git.zhuyikai1@h-partners.com>
+	 MIME-Version:Content-Type; b=L77oNr+IVzPyc9Ead1xl1ElG31nlb8kWv66UK7Bp8E6ySfSOCPYwBNZ3gfCucWCEZpiU9RyO8C8L9D+kzUsoSCXSI4nibYKRntuTdcav7Q7ao4qHP8daDxopkwg7eFF1Vfhh8qz3D0bCdDvephOJm/DlijjF2t7sZBxMMrTwb4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=pawxbhdZ; arc=none smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59P6kTKO3887718;
+	Fri, 24 Oct 2025 23:46:29 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	PPS06212021; bh=kulrq5VcxRmjBR/rmKsV6NKlKnOQcqaQRJRATTGOT3A=; b=
+	pawxbhdZ7GXWEuiG7cpIWEMgRKiwhJfsquYEfjRdFvxZu7L3+kaii1VHIpGumjKs
+	DB1DBTft4Bj+3jbUcDyoBTfNnDiarKx0CxBau2EsleVHE3MUXVDpnp4QAU4pmQbe
+	qrQIiXkJhJ78UuwVNkmZtrWcmsnWOJgddtmQkoiJtGnOwRtwl2WYmb/cpwDtC3mw
+	1YuKU4r6VgcVhag70ES3jzVOkMyfXJNJcE8Mnq4z561koLvX+m43dJAwzcw1q6Tf
+	wOXcEv5swLhPw9F1nxvpdZ3Ja6eH/9IFPhnlAVcuLW06bjgKa9w58ZUnqqdIY70P
+	RMc2xjetv9MyA/EZ8up6Ww==
+Received: from ala-exchng01.corp.ad.wrs.com ([128.224.246.36])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 49ys00hmkk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Fri, 24 Oct 2025 23:46:29 -0700 (PDT)
+Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.61; Fri, 24 Oct 2025 23:46:28 -0700
+Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
+ 15.1.2507.61 via Frontend Transport; Fri, 24 Oct 2025 23:46:24 -0700
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <kuniyu@google.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+        <jreuter@yaina.de>, <kuba@kernel.org>, <linux-hams@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
+        <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+        <syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>
+Subject: Re: [PATCH V3] net: rose: Prevent the use of freed digipeat
+Date: Sat, 25 Oct 2025 14:46:24 +0800
+Message-ID: <20251025064624.2972311-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <CAAVpQUA_CqqUfoJb=NaQ7YnBUbW0UWQS4W++TXwRFekenkDM8Q@mail.gmail.com>
+References: <CAAVpQUA_CqqUfoJb=NaQ7YnBUbW0UWQS4W++TXwRFekenkDM8Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,421 +77,175 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemf100013.china.huawei.com (7.202.181.12)
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI1MDA1OCBTYWx0ZWRfX1kmP4GP2+Wwx
+ hT4zW3pd0jCNXK2GyVuudk1dlySOvZZ/cs8C+So1rGaYgovG9O4W2r1rhaWtSSn8T7Rxe/zB93Z
+ Yg37ym5qub8Eq8S2qJkYaEeHdIUCmlKJyUR15DC4nCLYUErXExKrgLbYvVq5+tK7jSg3INlFniL
+ rtsFx2qbq6AJf0NeOuz24u55uLI52MjBbDRaXTGi3nypvVHRcKLL0dZW51GXc1krN4f+YCUkDC6
+ zdSe0BfyVdMOtQS9bypzFxSTAEryb5s0/X3ZdgRkssGVVbD1POoC4SW2+6rFpSA2xtca1c7XyUM
+ 7ZyOSbGoHXx0iPYu9hQpJMQLbfgCy1kgmF4T4CGkNtuOP7n6y1KjSoYT/mjLKR28aD9KfFPLhXw
+ 8ooqHchAY/jHyhHZktp+WWZ9YOh8iw==
+X-Proofpoint-ORIG-GUID: 9X3lRVVseBSacNSTyCcuC6vCqUnXmT-u
+X-Proofpoint-GUID: 9X3lRVVseBSacNSTyCcuC6vCqUnXmT-u
+X-Authority-Analysis: v=2.4 cv=N/8k1m9B c=1 sm=1 tr=0 ts=68fc7245 cx=c_pps
+ a=AbJuCvi4Y3V6hpbCNWx0WA==:117 a=AbJuCvi4Y3V6hpbCNWx0WA==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=edf1wS77AAAA:8 a=1XWaLZrsAAAA:8
+ a=t7CeM3EgAAAA:8 a=hSkVLCK3AAAA:8 a=vLL4qzFmy0LRcLh0ccMA:9
+ a=DcSpbTIhAlouE1Uv7lRv:22 a=FdTzh2GWekK77mhwV6Dw:22 a=cQPPKAXgyycSBL8etih5:22
+ a=poXaRoVlC6wW9_mwW8W4:22 a=cPQSjfK2_nFv0Q5t_7PE:22 a=Z5ABNNGmrOfJ6cZ5bIyy:22
+ a=SsAZrZ5W_gNWK9tOzrEV:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-25_02,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 phishscore=0 priorityscore=1501 impostorscore=0
+ suspectscore=0 bulkscore=0 malwarescore=0 adultscore=0 spamscore=0
+ clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510020000
+ definitions=main-2510250058
 
-Add netdev notifier to accept netdev event.
-Refine port event type to change link status.
+On Fri, 24 Oct 2025 21:25:20 -0700, Kuniyuki Iwashima <kuniyu@google.com> wrote:
+> On Fri, Oct 24, 2025 at 8:51 PM Lizhi Xu <lizhi.xu@windriver.com> wrote:
+> >
+> > On Fri, 24 Oct 2025 19:18:46 -0700, Kuniyuki Iwashima <kuniyu@google.com> wrote:
+> > > On Fri, Oct 24, 2025 at 2:39 AM Lizhi Xu <lizhi.xu@windriver.com> wrote:
+> > > >
+> > > > There is no synchronization between the two timers, rose_t0timer_expiry
+> > > > and rose_timer_expiry.
+> > > > rose_timer_expiry() puts the neighbor when the rose state is ROSE_STATE_2.
+> > > > However, rose_t0timer_expiry() does initiate a restart request on the
+> > > > neighbor.
+> > > > When rose_t0timer_expiry() accesses the released neighbor member digipeat,
+> > > > a UAF is triggered.
+> > > >
+> > > > To avoid this UAF, defer the put operation to rose_t0timer_expiry() and
+> > > > stop restarting t0timer after putting the neighbor.
+> > > >
+> > > > When putting the neighbor, set the neighbor to NULL. Setting neighbor to
+> > > > NULL prevents rose_t0timer_expiry() from restarting t0timer.
+> > > >
+> > > > syzbot reported a slab-use-after-free Read in ax25_find_cb.
+> > > > BUG: KASAN: slab-use-after-free in ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
+> > > > Read of size 1 at addr ffff888059c704c0 by task syz.6.2733/17200
+> > > > Call Trace:
+> > > >  ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
+> > > >  ax25_send_frame+0x157/0xb60 net/ax25/ax25_out.c:55
+> > > >  rose_send_frame+0xcc/0x2c0 net/rose/rose_link.c:106
+> > > >  rose_transmit_restart_request+0x1b8/0x240 net/rose/rose_link.c:198
+> > > >  rose_t0timer_expiry+0x1d/0x150 net/rose/rose_link.c:83
+> > > >
+> > > > Freed by task 17183:
+> > > >  kfree+0x2b8/0x6d0 mm/slub.c:6826
+> > > >  rose_neigh_put include/net/rose.h:165 [inline]
+> > > >  rose_timer_expiry+0x537/0x630 net/rose/rose_timer.c:183
+> > > >
+> > > > Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_t")
+> > > > Reported-by: syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com
+> > > > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> > > > ---
+> > > > V1 -> V2: Putting the neighbor stops t0timer from automatically starting
+> > > > V2 -> V3: add rose_neigh_putex for set rose neigh to NULL
+> > > >
+> > > >  include/net/rose.h   | 12 ++++++++++++
+> > > >  net/rose/rose_link.c |  5 +++++
+> > > >  2 files changed, 17 insertions(+)
+> > > >
+> > > > diff --git a/include/net/rose.h b/include/net/rose.h
+> > > > index 2b5491bbf39a..33de310ba778 100644
+> > > > --- a/include/net/rose.h
+> > > > +++ b/include/net/rose.h
+> > > > @@ -167,6 +167,18 @@ static inline void rose_neigh_put(struct rose_neigh *rose_neigh)
+> > > >         }
+> > > >  }
+> > > >
+> > > > +static inline void rose_neigh_putex(struct rose_neigh **roseneigh)
+> > > > +{
+> > > > +       struct rose_neigh *rose_neigh = *roseneigh;
+> > > > +       if (refcount_dec_and_test(&rose_neigh->use)) {
+> > > > +               if (rose_neigh->ax25)
+> > > > +                       ax25_cb_put(rose_neigh->ax25);
+> > > > +               kfree(rose_neigh->digipeat);
+> > > > +               kfree(rose_neigh);
+> > > > +               *roseneigh = NULL;
+> > > > +       }
+> > > > +}
+> > > > +
+> > > >  /* af_rose.c */
+> > > >  extern ax25_address rose_callsign;
+> > > >  extern int  sysctl_rose_restart_request_timeout;
+> > > > diff --git a/net/rose/rose_link.c b/net/rose/rose_link.c
+> > > > index 7746229fdc8c..334c8cc0876d 100644
+> > > > --- a/net/rose/rose_link.c
+> > > > +++ b/net/rose/rose_link.c
+> > > > @@ -43,6 +43,9 @@ void rose_start_ftimer(struct rose_neigh *neigh)
+> > > >
+> > > >  static void rose_start_t0timer(struct rose_neigh *neigh)
+> > > >  {
+> > > > +       if (!neigh)
+> > > > +               return;
+> > > > +
+> > > >         timer_delete(&neigh->t0timer);
+> > > >
+> > > >         neigh->t0timer.function = rose_t0timer_expiry;
+> > > > @@ -80,10 +83,12 @@ static void rose_t0timer_expiry(struct timer_list *t)
+> > > >  {
+> > > >         struct rose_neigh *neigh = timer_container_of(neigh, t, t0timer);
+> > > >
+> > >
+> > > What prevents rose_timer_expiry() from releasing the
+> > > last refcnt here ?
+> > The issue reported by syzbot is that rose_t0timer_expiry() is triggered
+> > first, followed by rose_timer_expiry().
+> 
+> I don't see how you read that ordering from the report.
+> https://syzkaller.appspot.com/bug?extid=caa052a0958a9146870d
+Here's my understanding: See the two calltraces below.
+[1] Line 111 occurs after rose_neigh_put(). Otherwise, accessing
+neigh->digipeat would result in a UAF. Therefore, rose_t0timer_expiry()
+must be triggered before rose_timer_expiry().
 
-Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Fan Gong <gongfan1@huawei.com>
----
- .../net/ethernet/huawei/hinic3/hinic3_hwdev.h |   9 +
- .../net/ethernet/huawei/hinic3/hinic3_irq.c   |   2 +
- .../net/ethernet/huawei/hinic3/hinic3_main.c  | 180 +++++++++++++++++-
- .../huawei/hinic3/hinic3_netdev_ops.c         |  12 ++
- .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  18 ++
- .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |   2 +
- 6 files changed, 220 insertions(+), 3 deletions(-)
+[2] syzbot reports that line 237 generates a UAF when accessing digi->ndigi.
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.h b/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.h
-index 58bc561f95b3..9686c2600b46 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.h
-@@ -17,6 +17,15 @@ enum hinic3_event_service_type {
- 	HINIC3_EVENT_SRV_NIC  = 1
- };
- 
-+enum hinic3_comm_event_type {
-+	HINIC3_COMM_EVENT_PCIE_LINK_DOWN = 0,
-+	HINIC3_COMM_EVENT_HEART_LOST = 1,
-+	HINIC3_COMM_EVENT_FAULT = 2,
-+	HINIC3_COMM_EVENT_SRIOV_STATE_CHANGE = 3,
-+	HINIC3_COMM_EVENT_CARD_REMOVE = 4,
-+	HINIC3_COMM_EVENT_MGMT_WATCHDOG = 5,
-+};
-+
- enum hinic3_fault_err_level {
- 	HINIC3_FAULT_LEVEL_SERIOUS_FLR = 3,
- };
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c b/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-index cb9412986c26..d793dff88109 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-@@ -215,6 +215,8 @@ static void hinic3_auto_moderation_work(struct work_struct *work)
- 	nic_dev = container_of(delay, struct hinic3_nic_dev, moderation_task);
- 	period = (unsigned long)(jiffies - nic_dev->last_moder_jiffies);
- 	netdev = nic_dev->netdev;
-+	if (!test_bit(HINIC3_INTF_UP, &nic_dev->flags))
-+		return;
- 
- 	queue_delayed_work(nic_dev->workq, &nic_dev->moderation_task,
- 			   HINIC3_MODERATONE_DELAY);
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-index 294ed9bc17b0..733d2780e56e 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-@@ -29,6 +29,65 @@
- #define HINIC3_DEFAULT_TXRX_MSIX_COALESC_TIMER_CFG  25
- #define HINIC3_DEFAULT_TXRX_MSIX_RESEND_TIMER_CFG   7
- 
-+#define HINIC3_MAX_VLAN_DEPTH_OFFLOAD_SUPPORT  1
-+#define HINIC3_VLAN_CLEAR_OFFLOAD \
-+	(NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM | \
-+	 NETIF_F_SCTP_CRC | NETIF_F_RXCSUM | NETIF_F_ALL_TSO)
-+
-+/* used for netdev notifier register/unregister */
-+static DEFINE_MUTEX(hinic3_netdev_notifiers_mutex);
-+static int hinic3_netdev_notifiers_ref_cnt;
-+
-+static u16 hinic3_get_vlan_depth(struct net_device *netdev)
-+{
-+	u16 vlan_depth = 0;
-+
-+#if defined(CONFIG_VLAN_8021Q) || defined(CONFIG_VLAN_8021Q_MODULE)
-+	while (is_vlan_dev(netdev)) {
-+		netdev = vlan_dev_priv(netdev)->real_dev;
-+		vlan_depth++;
-+	}
-+#endif
-+	return vlan_depth;
-+}
-+
-+static int hinic3_netdev_event(struct notifier_block *notifier,
-+			       unsigned long event, void *ptr)
-+{
-+	struct net_device *ndev = netdev_notifier_info_to_dev(ptr);
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(ndev);
-+	u16 vlan_depth;
-+
-+	if (!is_vlan_dev(ndev))
-+		return NOTIFY_DONE;
-+
-+	netdev_hold(ndev, &nic_dev->tracker, GFP_ATOMIC);
-+
-+	switch (event) {
-+	case NETDEV_REGISTER:
-+		vlan_depth = hinic3_get_vlan_depth(ndev);
-+		if (vlan_depth == HINIC3_MAX_VLAN_DEPTH_OFFLOAD_SUPPORT) {
-+			ndev->vlan_features &= (~HINIC3_VLAN_CLEAR_OFFLOAD);
-+		} else if (vlan_depth > HINIC3_MAX_VLAN_DEPTH_OFFLOAD_SUPPORT) {
-+			ndev->hw_features &= (~HINIC3_VLAN_CLEAR_OFFLOAD);
-+			ndev->features &= (~HINIC3_VLAN_CLEAR_OFFLOAD);
-+		}
-+
-+		break;
-+
-+	default:
-+		break;
-+	}
-+
-+	netdev_put(ndev, &nic_dev->tracker);
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block hinic3_netdev_notifier = {
-+	.notifier_call = hinic3_netdev_event,
-+};
-+
- static void init_intr_coal_param(struct net_device *netdev)
- {
- 	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-@@ -161,6 +220,14 @@ static int hinic3_init_nic_dev(struct net_device *netdev,
- 	return 0;
- }
- 
-+static void hinic3_free_nic_dev(struct net_device *netdev)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+
-+	destroy_workqueue(nic_dev->workq);
-+	kfree(nic_dev->vlan_bitmap);
-+}
-+
- static int hinic3_sw_init(struct net_device *netdev)
- {
- 	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-@@ -238,6 +305,8 @@ static void hinic3_assign_netdev_ops(struct net_device *netdev)
- static void netdev_feature_init(struct net_device *netdev)
- {
- 	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	netdev_features_t hw_features = 0;
-+	netdev_features_t vlan_fts = 0;
- 	netdev_features_t cso_fts = 0;
- 	netdev_features_t tso_fts = 0;
- 	netdev_features_t dft_fts;
-@@ -250,7 +319,29 @@ static void netdev_feature_init(struct net_device *netdev)
- 	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_TSO))
- 		tso_fts |= NETIF_F_TSO | NETIF_F_TSO6;
- 
--	netdev->features |= dft_fts | cso_fts | tso_fts;
-+	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_RX_VLAN_STRIP |
-+				HINIC3_NIC_F_TX_VLAN_INSERT))
-+		vlan_fts |= NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_CTAG_RX;
-+
-+	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_RX_VLAN_FILTER))
-+		vlan_fts |= NETIF_F_HW_VLAN_CTAG_FILTER;
-+
-+	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_VXLAN_OFFLOAD))
-+		tso_fts |= NETIF_F_GSO_UDP_TUNNEL | NETIF_F_GSO_UDP_TUNNEL_CSUM;
-+
-+	/* LRO is disabled by default, only set hw features */
-+	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_LRO))
-+		hw_features |= NETIF_F_LRO;
-+
-+	netdev->features |= dft_fts | cso_fts | tso_fts | vlan_fts;
-+	netdev->vlan_features |= dft_fts | cso_fts | tso_fts;
-+		hw_features |= netdev->hw_features | netdev->features;
-+	netdev->hw_features = hw_features;
-+	netdev->priv_flags |= IFF_UNICAST_FLT;
-+
-+	netdev->hw_enc_features |= dft_fts;
-+	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_VXLAN_OFFLOAD))
-+		netdev->hw_enc_features |= cso_fts | tso_fts | NETIF_F_TSO_ECN;
- }
- 
- static int hinic3_set_default_hw_feature(struct net_device *netdev)
-@@ -275,6 +366,36 @@ static int hinic3_set_default_hw_feature(struct net_device *netdev)
- 	return 0;
- }
- 
-+static void hinic3_register_notifier(struct net_device *netdev)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	int err;
-+
-+	mutex_lock(&hinic3_netdev_notifiers_mutex);
-+	hinic3_netdev_notifiers_ref_cnt++;
-+	if (hinic3_netdev_notifiers_ref_cnt == 1) {
-+		err = register_netdevice_notifier(&hinic3_netdev_notifier);
-+		if (err) {
-+			dev_dbg(nic_dev->hwdev->dev,
-+				"Register netdevice notifier failed, err: %d\n",
-+				err);
-+			hinic3_netdev_notifiers_ref_cnt--;
-+		}
-+	}
-+	mutex_unlock(&hinic3_netdev_notifiers_mutex);
-+}
-+
-+static void hinic3_unregister_notifier(void)
-+{
-+	mutex_lock(&hinic3_netdev_notifiers_mutex);
-+	if (hinic3_netdev_notifiers_ref_cnt == 1)
-+		unregister_netdevice_notifier(&hinic3_netdev_notifier);
-+
-+	if (hinic3_netdev_notifiers_ref_cnt)
-+		hinic3_netdev_notifiers_ref_cnt--;
-+	mutex_unlock(&hinic3_netdev_notifiers_mutex);
-+}
-+
- static void hinic3_link_status_change(struct net_device *netdev,
- 				      bool link_status_up)
- {
-@@ -297,6 +418,42 @@ static void hinic3_link_status_change(struct net_device *netdev,
- 	}
- }
- 
-+static void hinic3_port_module_event_handler(struct net_device *netdev,
-+					     struct hinic3_event_info *event)
-+{
-+	const char *g_hinic3_module_link_err[LINK_ERR_NUM] = { "Unrecognized module" };
-+	struct hinic3_port_module_event *module_event;
-+	enum port_module_event_type type;
-+	enum link_err_type err_type;
-+
-+	module_event = (struct hinic3_port_module_event *)event->event_data;
-+	type = module_event->type;
-+	err_type = module_event->err_type;
-+
-+	switch (type) {
-+	case HINIC3_PORT_MODULE_CABLE_PLUGGED:
-+	case HINIC3_PORT_MODULE_CABLE_UNPLUGGED:
-+		netdev_info(netdev, "Port module event: Cable %s\n",
-+			    type == HINIC3_PORT_MODULE_CABLE_PLUGGED ?
-+			    "plugged" : "unplugged");
-+		break;
-+	case HINIC3_PORT_MODULE_LINK_ERR:
-+		if (err_type >= LINK_ERR_NUM) {
-+			netdev_info(netdev, "Link failed, Unknown error type: 0x%x\n",
-+				    err_type);
-+		} else {
-+			netdev_info(netdev,
-+				    "Link failed, error type: 0x%x: %s\n",
-+				    err_type,
-+				    g_hinic3_module_link_err[err_type]);
-+		}
-+		break;
-+	default:
-+		netdev_err(netdev, "Unknown port module type %d\n", type);
-+		break;
-+	}
-+}
-+
- static void hinic3_nic_event(struct auxiliary_device *adev,
- 			     struct hinic3_event_info *event)
- {
-@@ -310,8 +467,20 @@ static void hinic3_nic_event(struct auxiliary_device *adev,
- 				   HINIC3_NIC_EVENT_LINK_UP):
- 		hinic3_link_status_change(netdev, true);
- 		break;
-+	case HINIC3_SRV_EVENT_TYPE(HINIC3_EVENT_SRV_NIC,
-+				   HINIC3_NIC_EVENT_PORT_MODULE_EVENT):
-+		hinic3_port_module_event_handler(netdev, event);
-+		break;
- 	case HINIC3_SRV_EVENT_TYPE(HINIC3_EVENT_SRV_NIC,
- 				   HINIC3_NIC_EVENT_LINK_DOWN):
-+	case HINIC3_SRV_EVENT_TYPE(HINIC3_EVENT_SRV_COMM,
-+				   HINIC3_COMM_EVENT_FAULT):
-+	case HINIC3_SRV_EVENT_TYPE(HINIC3_EVENT_SRV_COMM,
-+				   HINIC3_COMM_EVENT_PCIE_LINK_DOWN):
-+	case HINIC3_SRV_EVENT_TYPE(HINIC3_EVENT_SRV_COMM,
-+				   HINIC3_COMM_EVENT_HEART_LOST):
-+	case HINIC3_SRV_EVENT_TYPE(HINIC3_EVENT_SRV_COMM,
-+				   HINIC3_COMM_EVENT_MGMT_WATCHDOG):
- 		hinic3_link_status_change(netdev, false);
- 		break;
- 	default:
-@@ -359,7 +528,7 @@ static int hinic3_nic_probe(struct auxiliary_device *adev,
- 
- 	err = hinic3_init_nic_io(nic_dev);
- 	if (err)
--		goto err_free_netdev;
-+		goto err_free_nic_dev;
- 
- 	err = hinic3_sw_init(netdev);
- 	if (err)
-@@ -372,6 +541,8 @@ static int hinic3_nic_probe(struct auxiliary_device *adev,
- 	if (err)
- 		goto err_uninit_sw;
- 
-+	hinic3_register_notifier(netdev);
-+
- 	queue_delayed_work(nic_dev->workq, &nic_dev->periodic_work, HZ);
- 	netif_carrier_off(netdev);
- 
-@@ -382,6 +553,7 @@ static int hinic3_nic_probe(struct auxiliary_device *adev,
- 	return 0;
- 
- err_uninit_nic_feature:
-+	hinic3_unregister_notifier();
- 	hinic3_update_nic_feature(nic_dev, 0);
- 	hinic3_set_nic_feature_to_hw(nic_dev);
- 
-@@ -390,7 +562,8 @@ static int hinic3_nic_probe(struct auxiliary_device *adev,
- 
- err_free_nic_io:
- 	hinic3_free_nic_io(nic_dev);
--
-+err_free_nic_dev:
-+	hinic3_free_nic_dev(netdev);
- err_free_netdev:
- 	free_netdev(netdev);
- 
-@@ -411,6 +584,7 @@ static void hinic3_nic_remove(struct auxiliary_device *adev)
- 
- 	netdev = nic_dev->netdev;
- 	unregister_netdev(netdev);
-+	hinic3_unregister_notifier();
- 
- 	disable_delayed_work_sync(&nic_dev->periodic_work);
- 	cancel_work_sync(&nic_dev->rx_mode_work);
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-index 99edea85658c..b3a47855965d 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-@@ -435,6 +435,11 @@ static int hinic3_open(struct net_device *netdev)
- 	struct hinic3_dyna_qp_params qp_params;
- 	int err;
- 
-+	if (test_bit(HINIC3_INTF_UP, &nic_dev->flags)) {
-+		netdev_dbg(netdev, "Netdev already open, do nothing\n");
-+		return 0;
-+	}
-+
- 	err = hinic3_init_nicio_res(nic_dev);
- 	if (err) {
- 		netdev_err(netdev, "Failed to init nicio resources\n");
-@@ -462,6 +467,8 @@ static int hinic3_open(struct net_device *netdev)
- 	if (err)
- 		goto err_close_channel;
- 
-+	set_bit(HINIC3_INTF_UP, &nic_dev->flags);
-+
- 	return 0;
- 
- err_close_channel:
-@@ -482,6 +489,11 @@ static int hinic3_close(struct net_device *netdev)
- 	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
- 	struct hinic3_dyna_qp_params qp_params;
- 
-+	if (!test_and_clear_bit(HINIC3_INTF_UP, &nic_dev->flags)) {
-+		netdev_dbg(netdev, "Netdev already close, do nothing\n");
-+		return 0;
-+	}
-+
- 	hinic3_vport_down(netdev);
- 	hinic3_close_channel(netdev);
- 	hinic3_uninit_qps(nic_dev, &qp_params);
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
-index 2c129de241eb..d7a299fb2d51 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
-@@ -22,6 +22,7 @@ struct hinic3_nic_dev;
- enum hinic3_nic_event_type {
- 	HINIC3_NIC_EVENT_LINK_DOWN = 0,
- 	HINIC3_NIC_EVENT_LINK_UP   = 1,
-+	HINIC3_NIC_EVENT_PORT_MODULE_EVENT = 2,
- };
- 
- struct hinic3_sq_attr {
-@@ -51,6 +52,23 @@ struct mag_cmd_set_port_enable {
- 	u8                   rsvd1[3];
- };
- 
-+enum link_err_type {
-+	LINK_ERR_MODULE_UNRECOGENIZED,
-+	LINK_ERR_NUM,
-+};
-+
-+enum port_module_event_type {
-+	HINIC3_PORT_MODULE_CABLE_PLUGGED,
-+	HINIC3_PORT_MODULE_CABLE_UNPLUGGED,
-+	HINIC3_PORT_MODULE_LINK_ERR,
-+	HINIC3_PORT_MODULE_MAX_EVENT,
-+};
-+
-+struct hinic3_port_module_event {
-+	enum port_module_event_type type;
-+	enum link_err_type          err_type;
-+};
-+
- int hinic3_get_nic_feature_from_hw(struct hinic3_nic_dev *nic_dev);
- int hinic3_set_nic_feature_to_hw(struct hinic3_nic_dev *nic_dev);
- bool hinic3_test_support(struct hinic3_nic_dev *nic_dev,
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-index 985cbd91b7c8..1e8d41fc112c 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-@@ -17,6 +17,7 @@
- #define HINIC3_MODERATONE_DELAY  HZ
- 
- enum hinic3_flags {
-+	HINIC3_INTF_UP,
- 	HINIC3_MAC_FILTER_CHANGED,
- 	HINIC3_RSS_ENABLE,
- 	HINIC3_UPDATE_MAC_FILTER,
-@@ -119,6 +120,7 @@ struct hinic3_intr_coal_info {
- struct hinic3_nic_dev {
- 	struct pci_dev                  *pdev;
- 	struct net_device               *netdev;
-+	netdevice_tracker               tracker;
- 	struct hinic3_hwdev             *hwdev;
- 	struct hinic3_nic_io            *nic_io;
- 
--- 
-2.43.0
+UAF Task1:
+rose_t0timer_expiry()->
+  rose_transmit_restart_request()->
+    rose_send_frame(.., neigh->digipeat, ..)-> // [1] line 111
+      ax25_find_cb()->
+        if (digi != NULL && digi->ndigi != 0)  // [2] line 237
 
+Freed neigh Task2:
+ rose_timer_expiry()->
+   rose_neigh_put(neigh)->
+     kfree(neigh)
+> 
+> The only ordering I can find is that kfree() in rose_timer_expiry()
+> happened before ax25_find_cb () in rose_t0timer_expiry().
+> 
+> > Therefore, in rose_t0timer_expiry(), the reference count of neigh is
+> > increased before entering rose_transmit_restart_request() to prevent
+> > neigh from being put in rose_timer_expiry(). Then, in rose_t0timer_expiry(),
+> > neigh is put before executing rose_start_t0timer() and the neigh value is
+> > set to NULL to prevent t0timer restarts.
+> >
+> > The case where rose_timer_expiry() is triggered before rose_t0timer_expiry()
+> > is not considered at this time.
+> 
+> So this change just papers over the root cause.
+> 
+> 
+> > >
+> > > The t0timer could be triggered even after that happens.
+> > >
+> > >
+> > > > +       rose_neigh_hold(neigh);
+> > > >         rose_transmit_restart_request(neigh);
+> > > >
+> > > >         neigh->dce_mode = 0;
+> > > >
+> > > > +       rose_neigh_putex(&neigh);
+> > > >         rose_start_t0timer(neigh);
+> > > >  }
+> > > >
+> > > > --
+> > > > 2.43.0
+> > > >
 
