@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-232857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19C8CC09773
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:28:22 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id EECE0C09599
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 18:21:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27DB81C802DD
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:21:51 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4D76E34E0AA
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 16:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F24B30505E;
-	Sat, 25 Oct 2025 16:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6624B308F1B;
+	Sat, 25 Oct 2025 16:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SRIuMW8w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MyOzOI6Q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACAC305044;
-	Sat, 25 Oct 2025 16:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DAB0308F15;
+	Sat, 25 Oct 2025 16:18:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761409071; cv=none; b=EROmKMXbq3jZW6mjA6cXJVQM2W/ACrd+9G90J0WJzX1Wo9eqit6pTks2AJzXtM4dVI0gPm3w1WCydoyw287w5+K49EJMHJ11kZOHIQyN71LV4IQhkGyvPHEWiB8T57kPZm8p9qcYoV2JEdMfnpedWaI50WKxMTyjhzamdlM7MPw=
+	t=1761409087; cv=none; b=SJN47hvVGUdOiWrhD9oc9CiDiP2EFMSXB0KGhfgL5Fibjs8C0u+wbGYilWZloLDyQ8i4Qo3w8rppi8iYAHlBd9MYP2krTH9NKE3ewa/lRLJiBJIX9c6ugAVyQTkSFTbMLk3P/Z4KmV5VWgjzqAHUcjHg683PKnHzyu4kp/fnqgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761409071; c=relaxed/simple;
-	bh=oi0FjETQX+W7dZXME9M5RtKaF9y51UgpKRa6LGQ2e20=;
+	s=arc-20240116; t=1761409087; c=relaxed/simple;
+	bh=dtRqBps7HNYjOjd7L3qSxUDDs2O4Z5CyFLs4nFhe+tU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dvXhpKIy/003g6IvmZGLXF6UVwvw15cLWsWlB8oA4pEiasUn4syiO4MVgphD8XleU1vz6hFxghr9VTtCE26rX0AiJEPQrsV9UMn7r1xSboK2x0LC+p0lYGN+tAfjRsgpZR5TnxMpHVskGUV8TXw9cZX/AxTKETcwsy7MrPl7rDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SRIuMW8w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B51DAC4CEFF;
-	Sat, 25 Oct 2025 16:17:49 +0000 (UTC)
+	 MIME-Version; b=SwNgYZ01m7WnsPscYw9BwwNie7qiakOjLUhcJJR04/RFT+sjHoFoCM4nDMy/0JaAgSZ6jxWWI6IMbs+g2NGTWRIpHonrWvppnJxv2oUsct65Sl7iWJVBmPct+/1Qe4tSLuBHTKu0aoqSA2+JX6fJWJSyzto4bnMtRl/RXoacTiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MyOzOI6Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA9A9C4CEF5;
+	Sat, 25 Oct 2025 16:18:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761409070;
-	bh=oi0FjETQX+W7dZXME9M5RtKaF9y51UgpKRa6LGQ2e20=;
+	s=k20201202; t=1761409084;
+	bh=dtRqBps7HNYjOjd7L3qSxUDDs2O4Z5CyFLs4nFhe+tU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SRIuMW8wOi3LJI3MqIWkQMkFU/UdFLS+ZXn5uGwCDlJUHuG28W4sUtkRMG1LSfBZ+
-	 LbJgTdHUpl2iAVaypHoQ/5TF7hCi3xvbFSML/S6+dGdKPGfaX7ha6oxZn7R0owf7xN
-	 1h1KsVvN/k/61Qr5cb01fZUCRsDRsUyFeObI3LnWT7lce651uclIsS1n6qf1C7mrRp
-	 5x6+lwEUt7qh53mpq+L5zmim8/hBf4rQXtCTSSwlxCOMX5ysTi1zuu/D5Cgl4rAASE
-	 nYypphyOh1zhJrjBXmZZFm0Ro0fCLjvawDIMYCXWEAvpOig8agXFpOMje8eCNwkA1o
-	 /M2WCJCUt2IjA==
+	b=MyOzOI6QjC3qKxByz78um/XNs3zN8qPHSU/j82YQYe0qEMvNk6qkTNvLYjgrxvwJy
+	 omMeKSVnY5JNVDT4VanX5XKrk+NXdHnliYJTCRbw7eQwKZ3xO9FsLaKuaK4CLcnT3/
+	 LYAmLjFX+TSDA32Rmb5YB3p7BTOLQXj0VC/TpbyaNrkU7/SZag1tkGrH9PfWUExnWF
+	 6eljRisJkoOHPNX41+VyBk4mYZRJ1j/8QepdW1/WvTBcZ5fkoaZWBmSqz/ceTMZqQF
+	 3AJk3CeITh7Ubn8u/Q/eZ0mEVw8/0R5iD+zNHz49aFF8ZY2PgnODS48rjUDHU+oV62
+	 mBeJJ4ahjUGuA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>,
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
+	hkallweit1@gmail.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-5.4] selftests: Disable dad for ipv6 in fcnal-test.sh
-Date: Sat, 25 Oct 2025 11:57:02 -0400
-Message-ID: <20251025160905.3857885-191-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17-6.6] net: phy: clear link parameters on admin link down
+Date: Sat, 25 Oct 2025 11:57:07 -0400
+Message-ID: <20251025160905.3857885-196-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -67,19 +65,32 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.17.5
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: David Ahern <dsahern@kernel.org>
+From: Oleksij Rempel <o.rempel@pengutronix.de>
 
-[ Upstream commit 53d591730ea34f97a82f7ec6e7c987ca6e34dc21 ]
+[ Upstream commit 60f887b1290b43a4f5a3497982a725687b193fa4 ]
 
-Constrained test environment; duplicate address detection is not needed
-and causes races so disable it.
+When a PHY is halted (e.g. `ip link set dev lan2 down`), several
+fields in struct phy_device may still reflect the last active
+connection. This leads to ethtool showing stale values even though
+the link is down.
 
-Signed-off-by: David Ahern <dsahern@kernel.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20250910025828.38900-1-dsahern@kernel.org
+Reset selected fields in _phy_state_machine() when transitioning
+to PHY_HALTED and the link was previously up:
+
+- speed/duplex -> UNKNOWN, but only in autoneg mode (in forced mode
+  these fields carry configuration, not status)
+- master_slave_state -> UNKNOWN if previously supported
+- mdix -> INVALID (state only, same meaning as "unknown")
+- lp_advertising -> always cleared
+
+The cleanup is skipped if the PHY is in PHY_ERROR state, so the
+last values remain available for diagnostics.
+
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Link: https://patch.msgid.link/20250917094751.2101285-1-o.rempel@pengutronix.de
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -87,83 +98,55 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 LLM Generated explanations, may be completely bogus:
 
 YES
+- `_phy_state_machine()` now clears the runtime status fields (speed,
+  duplex, master/slave, MDI-X, partner advertising) when transitioning a
+  previously up PHY into `PHY_HALTED`, so administrative link-down stops
+  reporting stale values to ethtool (`drivers/net/phy/phy.c:1551-1561`).
+- These members are exactly what `phy_ethtool_ksettings_get()` surfaces
+  to user space, so leaving them stale makes `ethtool link`/`ip link`
+  misreport the link after an admin down; the new resets ensure the
+  user-visible API reflects that the link is unknown/down
+  (`drivers/net/phy/phy.c:273-296`).
+- The change is careful to leave forced-mode configurations intact
+  (`phydev->autoneg == AUTONEG_ENABLE` guard at
+  `drivers/net/phy/phy.c:1552-1555`) and avoids touching hardware
+  registers, which keeps the risk of behavioural regressions low.
+- Master/slave state is only reset when the feature is supported, while
+  diagnostics in `PHY_ERROR` still retain the last negotiated
+  information thanks to the guarded fall-through
+  (`drivers/net/phy/phy.c:1556-1569`).
+- The touched fields are long-standing members of `struct phy_device`
+  (`include/linux/phy.h:665-713`), so the patch is self-contained,
+  architecture-neutral, and aligns with an earlier mainline fix that
+  already clears EEE runtime flags on the same state transition.
 
-**Rationale**
-- Fixes real test flakiness: IPv6 Duplicate Address Detection (DAD) in
-  constrained netns-based selftests can leave addresses “tentative” and
-  create timing races. Disabling DAD makes IPv6 addresses usable
-  immediately, eliminating nondeterministic failures the commit message
-  calls out.
-- Small, surgical change: Adds two `sysctl` writes in the namespace
-  setup function to disable DAD; no broader logic changes.
-- Consistent with existing practice: Many net selftests already disable
-  DAD to stabilize execution, so this aligns `fcnal-test.sh` with the
-  rest of the suite.
+ drivers/net/phy/phy.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-**Scope and Risk**
-- Test-only change under `tools/testing/selftests/`; no impact on kernel
-  runtime or userspace APIs.
-- No architectural changes; confined to `create_ns()` namespace
-  initialization.
-- Low regression risk: `fcnal-test.sh` does not validate DAD behavior
-  and already uses `nodad` where needed and even sleeps for DAD in
-  places, indicating this is purely to avoid races, not to test DAD.
-
-**Code References**
-- New sysctls added to `create_ns()` disable DAD for both existing and
-  future interfaces in the ns:
-  - `tools/testing/selftests/net/fcnal-test.sh:427`: `ip netns exec
-    ${ns} sysctl -qw net.ipv6.conf.default.accept_dad=0`
-  - `tools/testing/selftests/net/fcnal-test.sh:428`: `ip netns exec
-    ${ns} sysctl -qw net.ipv6.conf.all.accept_dad=0`
-- Context shows this is part of standard IPv6 netns setup already
-  setting related sysctls:
-  - `tools/testing/selftests/net/fcnal-test.sh:424`:
-    `net.ipv6.conf.all.keep_addr_on_down=1`
-  - `tools/testing/selftests/net/fcnal-test.sh:425`:
-    `net.ipv6.conf.all.forwarding=1`
-  - `tools/testing/selftests/net/fcnal-test.sh:426`:
-    `net.ipv6.conf.default.forwarding=1`
-- The script already works around DAD in specific places (underscoring
-  the race):
-  - `tools/testing/selftests/net/fcnal-test.sh:4084`: `sleep 5 # DAD`
-  - Multiple address additions use `nodad` (e.g.,
-    `tools/testing/selftests/net/fcnal-test.sh:393`, `3324`, `3602`,
-    `4076`, `4125`, `4129`).
-- Precedent across other net selftests (common pattern to disable DAD):
-  - `tools/testing/selftests/net/traceroute.sh:65`:
-    `net.ipv6.conf.default.accept_dad=0`
-  - `tools/testing/selftests/net/fib_nexthops.sh:168`:
-    `net.ipv6.conf.all.accept_dad=0`
-  - `tools/testing/selftests/net/fib_nexthops.sh:169`:
-    `net.ipv6.conf.default.accept_dad=0`
-
-**Stable Criteria**
-- Fixes important flakiness affecting users of stable selftests.
-- Minimal, contained change with negligible risk.
-- No features or architectural shifts; strictly improves test
-  determinism.
-- Touches only selftests; safe for all stable series carrying this test.
-
-Given the above, this is a good candidate for stable backport to keep
-the selftests reliable and deterministic.
-
- tools/testing/selftests/net/fcnal-test.sh | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testing/selftests/net/fcnal-test.sh
-index f0fb114764b24..cf535c23a959a 100755
---- a/tools/testing/selftests/net/fcnal-test.sh
-+++ b/tools/testing/selftests/net/fcnal-test.sh
-@@ -424,6 +424,8 @@ create_ns()
- 	ip netns exec ${ns} sysctl -qw net.ipv6.conf.all.keep_addr_on_down=1
- 	ip netns exec ${ns} sysctl -qw net.ipv6.conf.all.forwarding=1
- 	ip netns exec ${ns} sysctl -qw net.ipv6.conf.default.forwarding=1
-+	ip netns exec ${ns} sysctl -qw net.ipv6.conf.default.accept_dad=0
-+	ip netns exec ${ns} sysctl -qw net.ipv6.conf.all.accept_dad=0
- }
- 
- # create veth pair to connect namespaces and apply addresses.
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index e046dd858f151..02da4a203ddd4 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1548,6 +1548,19 @@ static enum phy_state_work _phy_state_machine(struct phy_device *phydev)
+ 		}
+ 		break;
+ 	case PHY_HALTED:
++		if (phydev->link) {
++			if (phydev->autoneg == AUTONEG_ENABLE) {
++				phydev->speed = SPEED_UNKNOWN;
++				phydev->duplex = DUPLEX_UNKNOWN;
++			}
++			if (phydev->master_slave_state !=
++						MASTER_SLAVE_STATE_UNSUPPORTED)
++				phydev->master_slave_state =
++						MASTER_SLAVE_STATE_UNKNOWN;
++			phydev->mdix = ETH_TP_MDI_INVALID;
++			linkmode_zero(phydev->lp_advertising);
++		}
++		fallthrough;
+ 	case PHY_ERROR:
+ 		if (phydev->link) {
+ 			phydev->link = 0;
 -- 
 2.51.0
 
