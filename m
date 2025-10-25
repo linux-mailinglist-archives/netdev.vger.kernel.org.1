@@ -1,132 +1,153 @@
-Return-Path: <netdev+bounces-232816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 481BCC090CF
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 15:27:47 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 246A1C090F7
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 15:47:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7917018971B0
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 13:28:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DB8864E5692
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 13:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38CF92DEA86;
-	Sat, 25 Oct 2025 13:27:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B022E03FA;
+	Sat, 25 Oct 2025 13:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Q7YymhDY"
+	dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b="eXUCbD6z";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bZjCSH9F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-b7-smtp.messagingengine.com (flow-b7-smtp.messagingengine.com [202.12.124.142])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD13242D70
-	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 13:27:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53001FDA82;
+	Sat, 25 Oct 2025 13:46:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761398862; cv=none; b=b6NzNF21tGf7J5iLS1drWbFfEZ8kTtGs5Psx4kvPMpsxByIH71wmJ2RD2CftVkzb7oVA2TLzAk8Oj9AKN2lGrAMjxI4esej4L7gzqnjSRPrita5PTDEQUpeL1VMsrVT9W2mSmQubT0d/MdYiXi57J94vIlYMNizqKfrKuK5fRdI=
+	t=1761399996; cv=none; b=nIQXSTtpe/OaSpZDqJJCPsrp4MY1l5Ex2LHzwdl3bkpwnsJQBHZncD2pFVHdSLrNFRTrUfdYO1FTWsNdlbp9lwJxkq3iGIBhlMhAma4bnC1jjyjBZzBI3JNyZNa0YINDDO2QCgc+zjvCV5Umsuq56Y6+i3VByxNAOsvV4aO4Cow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761398862; c=relaxed/simple;
-	bh=i3aR6XG7SCZKLYqvuLJClAEOhq3SLQqddyDbw2SSnPE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OOpVMB/2Z8Cm5n/cC0S2OgRlDEgJhevQTvi2eZJPX5/jdtAfmYQpIKyHm0UoUCI3Vwc2dvZ115EgfppXd+fVQduCT7xAlM9j7E4k7ANRSz7gbiaNGh25HCw4ya0VM8w/XkaKUQfaTjvliSHVQj2oX7eOm5WEqmNLt8Dk3ECwZfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Q7YymhDY; arc=none smtp.client-ip=209.85.166.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-938bf212b72so125376139f.1
-        for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 06:27:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761398859; x=1762003659; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HXr/4gmeQBCobcp1e59rIPiZ2OM+tq/HT4CMRTfBtng=;
-        b=Q7YymhDYF4uDwtwyMkr960KOs3U3famiaMCG/Q+j5pBGj2inciD2CdHtH/W5KrzQx4
-         LiUoTDOs7/cb3bfAY0/EsR5NDAKpYS1Xg8CEXFUswimYvOnCAbxuKGWC+lv3uTMl7gS9
-         6Vhr8AVLma8GYKuDT/zHFKSd+VbxPJ/WowNnQRko77+UMQ3H7hgOhWQTr6RObfYCh2d1
-         7z1USsQm9IIM0nFozTqpvEhEUUGlvJnGqPB7A0yAAHnKbURx22LOuTUUOQtLwABIZHli
-         fiPAO0DNyiw9GEytnbnl9FeocU2YQtydU8DBRogTHYjJdpvoYGpEVaUSnMQuOsLQ1CG9
-         sF4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761398859; x=1762003659;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HXr/4gmeQBCobcp1e59rIPiZ2OM+tq/HT4CMRTfBtng=;
-        b=NJLh+ixKBCAda6Hd18GNs/102XETZgGmlNbforC7fk3wMTOSFSjxYl/GOPhzydwSCH
-         cJ4AlZFS/SSF3cQPKNbuBoSkLWNLxt1kUhq0mKuvp4S30xGoM9s+wFWRvC4zVQGIG1eY
-         HAkdfIq6TAZjbOJdOzTP3Mvf+ocdzJdv6wDopg2ZAiq0C+S8vaHCKKeKA0BY9Nw1gzeH
-         XCLyGdglWtmZlnLQdkTeg8R71PU6tEYRDGYpdunCkuwX0G6KB7BuJFaSryFtkBNuOuMT
-         Vmxzn4nXrdloJaurImBlARmhRTUC7xmnudDTj4a0wr2xmJHc1ldRb0RmvE7ZvynWDWC5
-         aCtQ==
-X-Gm-Message-State: AOJu0Yz+kvUKj5i5td8p9/QUuLI3vTCkXEm7IRvweP3mKnTTcda06C0N
-	hE4PsQqk+fupZtGUG1lXigO7sONG1n72TxMhCMhcV0Tws60cFUk9hXLFnolHUuEcj2UI1xRqPUY
-	c0HKPD5M=
-X-Gm-Gg: ASbGncvTilVsoMto0a6+mNK37UDY1/kz09xF9csEbLp4fq3aVe9A1yX+dNNohHgaZoV
-	+qMylX8iK2jHaV8Yq9wgJkLuWmdQiEhf8ITPm3XzknwVapRe1fLFdbb7cjtasYtTV2uof03mWwx
-	1XKbqoPOnd6OSgvs/dxnMh3NBGDKD3BEGFcnZn6JEiHGhm182GrywOdOwLFXF/wuD8dXaB++vfi
-	PEGmhh2/PleiOtJnQife0OHYlc+5fOgoeHuI48NbeRcep5mV1d4DaZojhYbmYztYSz+T+OUlfCB
-	6piQVqbhF+y/hU7vs2ctakNat0eE1G1pD/6NMGPep5gT3UT5G2+V3v0yfobvGrm4wKZkabsCKMp
-	hgUY3eqrjyOa1Gw5M4NXTsywJBHvjnSaUYg1AK/uteWc9NYGceZxVQZAtOyN8WbQl1bALoEoqK6
-	kotcyGhyr4
-X-Google-Smtp-Source: AGHT+IG4Y2HZ0MyC30nUKDZ+xtNAM0kFpk2+Pw7r1CzWuz5LJp3/Q4U/QRnl0mYnHV6GLCYfZXOvaw==
-X-Received: by 2002:a05:6602:6015:b0:93f:c5a3:2ad7 with SMTP id ca18e2360f4ac-93fc5a32d96mr3801899039f.6.1761398859503;
-        Sat, 25 Oct 2025 06:27:39 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-94359f324b3sm69240539f.21.2025.10.25.06.27.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Oct 2025 06:27:38 -0700 (PDT)
-Message-ID: <c344d845-99ba-4c3c-9382-cf401712a689@kernel.dk>
-Date: Sat, 25 Oct 2025 07:27:37 -0600
+	s=arc-20240116; t=1761399996; c=relaxed/simple;
+	bh=PLH2h8aR2Zfs+u3J2KCSHSDkqN/53x9ORdlVeaqdWGI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P3a0ae6wrQwhIyIFOU6HOPUwRGoMc0D0NA3DgYBZV7IN/oQeSKlBDkG9RqqM0dM6zWsEbjDWvnj6guJiLPOGSlNco7QJDRDgeMtOqtBElS5QL7H1fH131EfRRBY0GPzE2LJ2vftjBGD38TuFL8BlwFPHfYkPrE/4A60HqHZW8Cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com; spf=pass smtp.mailfrom=fastmail.com; dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b=eXUCbD6z; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=bZjCSH9F; arc=none smtp.client-ip=202.12.124.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.com
+Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
+	by mailflow.stl.internal (Postfix) with ESMTP id 1B51B1300167;
+	Sat, 25 Oct 2025 09:46:07 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-07.internal (MEProxy); Sat, 25 Oct 2025 09:46:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1761399966; x=1761403566; bh=Mb8xNyg4KVc2AAZRCSe0v
+	ulnapyIE3FuDLo/Ugvz9h4=; b=eXUCbD6zimg7QawLOnQ0VDd7GWTq4eArw9Pej
+	U96PgkkfqsPwgLfHFVLWkMFLGUEhLPM7uEyHt9hTVamdJsF5Oc5hnvi7pBX7kUOZ
+	0/rAF8tcOJurNF0J/Enn/ZuqqiEYcFzZSNOXLa1DrFrza6btxE4oEp7dNij/sT9+
+	STUPbFMVVrLJP9F70axzlIjubcx65RpMLJaPuV03kP3skMH60HrcfTla73+QZ7kd
+	3wBuje3yvNmzJonAA8yitEGqj9htf2kxJHOP3+kArpn5cIBD7co0IZyqyq1KqMC8
+	9XK0phit3iyijBHfoJj5BXamDD8etSuUd5NcabTQ4Up5NCGmQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1761399966; x=1761403566; bh=Mb8xNyg4KVc2AAZRCSe0vulnapyIE3FuDLo
+	/Ugvz9h4=; b=bZjCSH9Fo1rNSmidbI9iXIKGn1j9qSsUjxpbPBENKVWd0ntmBWu
+	FB31YZkYBj6WYh6y776KePrptvYpogqrqsbevpGurb31gNvA8r/a4I+aQUFgJzV8
+	IrL7iTTtdFQoHEd/1yA9s1/b2l62HuS0ONGywsUGqqiiBBiHy2T/HR/tREDGc90I
+	WQxGj3igDQriH8VsRw5CvOQaavTNwY8WMS9tICbSU7qaiMo5WS8zUNRcJ1QCL02b
+	p27OfwJPnKCTC/0GvsD9JqX6aJDmocLLIp68cmdfDktr+xZWCsxwZ3V/MM61/hrY
+	Sq4csRGPZx/u188M33XO3XHh3h2GTmFJI4w==
+X-ME-Sender: <xms:ntT8aIzZa3alzTPGXSxM667ZdJs3c0xKDX90mdW34UCa_lowHrPRaQ>
+    <xme:ntT8aLNtmtroQA4_Pyzq6YJeUvb0PbV_Bktuc7KDy2FooLmzrEsQ7gQMhG_gzt_Wu
+    k6kTSRsXpFwFj2lh2xbywRHVnyTSzzArztKuHwiFaSE2oxR00YBpGM>
+X-ME-Received: <xmr:ntT8aGb6_WChhPxPUQJXTO2xWMgo-Ahjc1ehCPKQ-2lqpoQti_CHiBSwI5X6ISbxanNbNQm4fEM>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduhedvfeekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffoggfgsedtkeertdertd
+    dtnecuhfhrohhmpegjihiihhgvucfuuhhnuceoshhunhihihiihhgvsehfrghsthhmrghi
+    lhdrtghomheqnecuggftrfgrthhtvghrnhepudeliefhjeduhfdugfelgeehleejjeejle
+    dutdekheetvdefgffhheehteffhedtnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsuhhnhi
+    hiiihhvgesfhgrshhtmhgrihhlrdgtohhmpdhnsggprhgtphhtthhopeduhedpmhhouggv
+    pehsmhhtphhouhhtpdhrtghpthhtohepfhhujhhithgrrdhtohhmohhnohhrihesghhmrg
+    hilhdrtghomhdprhgtphhtthhopehojhgvuggrsehkvghrnhgvlhdrohhrghdprhgtphht
+    thhopegrlhgvgidrghgrhihnohhrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepthhmgh
+    hrohhsshesuhhmihgthhdrvgguuhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhk
+    vghrnhgvlhdrohhrghdprhgtphhtthhopegsohhquhhnrdhfvghnghesghhmrghilhdrtg
+    homhdprhgtphhtthhopehgrghrhiesghgrrhihghhuohdrnhgvthdprhgtphhtthhopegs
+    jhhorhhnfegpghhhsehprhhothhonhhmrghilhdrtghomhdprhgtphhtthhopehlohhssh
+    hinheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:ntT8aKCxBiYgWJwvcjgUIWty2kOzmSk6kuCNSKiYTfKR5Om0Lm4okw>
+    <xmx:ntT8aMEwgQr6GPoXpPi4E01AjT6IKFmnvh2n5-2jNTJ4QrsyC8aOwg>
+    <xmx:ntT8aNMyZvWFft61azamWJzV9m4vdAUShWSpuP257-TxvWsLJ51EKw>
+    <xmx:ntT8aFiVZNalnbrxpp5aa1044Peu5tgiwLzV0GbKc-ES7KhytW7t7w>
+    <xmx:ntT8aBg_qqc98wX6rw8VUBovt54hOytWemao9feyesc2iNrByd8QiUrF>
+Feedback-ID: i1736481b:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 25 Oct 2025 09:46:01 -0400 (EDT)
+From: Yizhe Sun <sunyizhe@fastmail.com>
+To: fujita.tomonori@gmail.com,
+	ojeda@kernel.org,
+	alex.gaynor@gmail.com
+Cc: tmgross@umich.edu,
+	netdev@vger.kernel.org,
+	boqun.feng@gmail.com,
+	gary@garyguo.net,
+	bjorn3_gh@protonmail.com,
+	lossin@kernel.org,
+	a.hindborg@kernel.org,
+	aliceryhl@google.com,
+	dakr@kernel.org,
+	rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yizhe Sun <sunyizhe@fastmail.com>
+Subject: [PATCH v2] rust: phy: replace `MaybeUninit::zeroed().assume_init()` with `pin_init::zeroed()`
+Date: Sat, 25 Oct 2025 21:44:26 +0800
+Message-ID: <20251025134516.40302-1-sunyizhe@fastmail.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] Introduce getsockname io_uring_cmd
-To: Gabriel Krisman Bertazi <krisman@suse.de>
-Cc: netdev@vger.kernel.org, io-uring@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>
-References: <20251024154901.797262-1-krisman@suse.de>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20251024154901.797262-1-krisman@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/24/25 9:48 AM, Gabriel Krisman Bertazi wrote:
-> 
-> This feature has been requested a few times in the liburing repository
-> and Discord channels, such as in [1,2].  If anything, it also helps
-> solve a long standing issue in the bind-listen test that results in
-> occasional test failures.
-> 
-> The patchset is divided in three parts: Patch 1 merges the getpeername
-> and getsockname implementation in the network layer, making further
-> patches easier; Patch 2 splits out a helper used by io_uring, like done
-> for other network commands; Finally, patch 3 plumbs the new command in
-> io_uring.
-> 
-> The syscall path was tested by booting a Linux distro, which does all
-> sorts of getsockname/getpeername syscalls.  The io_uring side was tested
-> with a couple of new liburing subtests available at:
-> 
->    https://github.com/krisman/liburing.git -b socket
-> 
-> Based on top of Jens' for-next.
-> 
-> [1] https://github.com/axboe/liburing/issues/1356
-> [2] https://discord.com/channels/1241076672589991966/1241076672589991970/1429975797912830074
+From: Benno Lossin <lossin@kernel.org>
 
-Looks good to me, and it's not often you can add a new feature and
-have:
+All types in `bindings` implement `Zeroable` if they can, so use
+`pin_init::zeroed` instead of relying on `unsafe` code.
 
->  5 files changed, 52 insertions(+), 52 deletions(-)
+If this ends up not compiling in the future, something in bindgen or on
+the C side changed and is most likely incorrect.
 
-a net zero diffstat! Nice.
+Signed-off-by: Benno Lossin <lossin@kernel.org>
+Signed-off-by: Yizhe Sun <sunyizhe@fastmail.com>
+---
+This is a resend. Original: https://lore.kernel.org/rust-for-linux/20250814093046.2071971-5-lossin@kernel.org/
 
+ rust/kernel/net/phy.rs | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
+index bf6272d87a7b..46c693c5768a 100644
+--- a/rust/kernel/net/phy.rs
++++ b/rust/kernel/net/phy.rs
+@@ -553,9 +553,7 @@ pub const fn create_phy_driver<T: Driver>() -> DriverVTable {
+         } else {
+             None
+         },
+-        // SAFETY: The rest is zeroed out to initialize `struct phy_driver`,
+-        // sets `Option<&F>` to be `None`.
+-        ..unsafe { core::mem::MaybeUninit::<bindings::phy_driver>::zeroed().assume_init() }
++        ..pin_init::zeroed()
+     }))
+ }
+ 
+
+base-commit: 211ddde0823f1442e4ad052a2f30f050145ccada
 -- 
-Jens Axboe
+2.51.1
 
 
