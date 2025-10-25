@@ -1,283 +1,282 @@
-Return-Path: <netdev+bounces-232781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEFA3C08D1D
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 09:11:58 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68943C08D3E
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 09:16:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E2771C61056
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 07:12:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 793C74E9477
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 07:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1402E2C0F8F;
-	Sat, 25 Oct 2025 07:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A612288CB;
+	Sat, 25 Oct 2025 07:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ik/fkAGS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nsxhePH/"
 X-Original-To: netdev@vger.kernel.org
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012046.outbound.protection.outlook.com [52.101.53.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC61212B31;
-	Sat, 25 Oct 2025 07:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761376296; cv=fail; b=m4slpjZ5ryvrU4fhf2bwQRPVqd0RqjhWcOh8qx3qHdOxLSvcpGtI6N6ipUy1r7TJbMjMKx+YxpLJXMxc08Rg71mQ2rNpRLO6V9x9WU5giUiF6OG2G32xn5B3RHWovLZFr6wnGprAr3jU5LWsytWDXxd2kJqH+M/L3jHW4ll1L+Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761376296; c=relaxed/simple;
-	bh=nzy118G83XhApnaqE8DvaaHfXAj/vXYpBCqyNdeOERc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=oh7syhVpf1EUzv8s/hcmf7HP4tI3zVn7FnRdtqf4y/3CCQz7/z4F5yL5tdbX+LV6G+drWqkSQtrJL23gpMlcvZWM8pW01EC8s0cZsc9QFTrGrhCvE2Z57+vIlgfekBWvYaEAOS00klY436KvDfVOrb962qsbzttyFyBXDgExr4A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ik/fkAGS; arc=fail smtp.client-ip=52.101.53.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FLIb4QMy7XHeQAXYqNqVyBj0ghKtkb7+UFVQgxQwWWc4LZ31UeVI3T5yLtijrkZW4oDv4UmJHMT0xz219KsFeoguPZKRETQ0/xVL7wkO2JvxCtgh0P8jhryGQs3jhOtNNvMKja4hU4jitfvMwSA6v8DZ+Fvb3a9sdYiA5om+A8DsnWFq1UrGWA/KYRuS96fGyLqhhduIOC2merbW3wwU6z5QgUftP1W9n6UA34s3S+wXpOQu6iowHj/ao52MTxHU+wzz/pBB7IK53c+gkrYmmD0XGzJ0rhkKy0K0BMaHEcycv7WIRr1ObkNEjhwr+MBepeBQeQVFo+l1v7hjR65esA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aQxEoD97t6d+CwsajJVTpANw9nJXLjt3wGOLAdUch5w=;
- b=A8a/JmvGba5HIDT+7rqAP4tNDB6uITdZwNSshSXpZMrGqn1vykaR81Jy2uOA/YlBNolz20wrkh2cmbLrN0V9pIvj87SBDEKAsORWUVwLHBi65k8wqA8sgr9hKvuQ5O+GpPnry8B+RsyhPncoXZHqPECE+wte3n58LZx83TXKE/M7YA8Omp8yeBgt8Fi6pIxKRf2l1QfVOoI1HGC4Or/4t9/jehuV+bQdd9hPi5R78w9VDKQmyei7HLaN5CTHPskByUfaDMyacmBV0t3X1hRQmTchdQsdsbn76JtVlLNykKUnFCxjavdq80lkI4CEkMacyTewbn8ataMuxIrKX9VFSg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aQxEoD97t6d+CwsajJVTpANw9nJXLjt3wGOLAdUch5w=;
- b=ik/fkAGSjHx/En91WWxXarlbim4DmhuJrAXcaWaYJyUHOePePayrNd+KTBdYfqy19WBM02PBvdSdzRTDGLJSyPtmQisRnxKfsjgZwrcr/+EH7oqibZE7ag6OIGmjTLHSv4xGSNQSDmfyI8xaIurKygNB47a921jpl/hP2537hLlPDwknFQjy8Coa484Gi3/pveaGzJ9pcLDfX+sILGC66edO82m+7kRHIjfqiwl4/qS50p/6YcZH3x2kfOd/+QT77QFFiTxXha5cZEQXPjktgO6+7kPFoU/Pka0VuKHpxaUCWdNHooKqE1mfuLslNNo/Z4CLMjgFidURs/DvbEtssg==
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com (2603:10b6:930:59::11)
- by DS7PR12MB9550.namprd12.prod.outlook.com (2603:10b6:8:24e::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.13; Sat, 25 Oct
- 2025 07:11:30 +0000
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::e571:5f76:2b46:e0f8]) by CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::e571:5f76:2b46:e0f8%5]) with mapi id 15.20.9253.011; Sat, 25 Oct 2025
- 07:11:30 +0000
-From: Parav Pandit <parav@nvidia.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?iso-8859-1?Q?Eugenio_P=E9rez?=
-	<eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Minggang(Gavin) Li"
-	<gavinl@nvidia.com>, Gavi Teitz <gavi@nvidia.com>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [PATCH net v5] virtio-net: fix received length check in big
- packets
-Thread-Topic: [PATCH net v5] virtio-net: fix received length check in big
- packets
-Thread-Index: AQHcRPgJwKk3Q45MeUGTanh0wr8u4LTSclGg
-Date: Sat, 25 Oct 2025 07:11:30 +0000
-Message-ID:
- <CY8PR12MB71951A2ADD74508A9FC60956DCFEA@CY8PR12MB7195.namprd12.prod.outlook.com>
-References: <20251024150649.22906-1-minhquangbui99@gmail.com>
-In-Reply-To: <20251024150649.22906-1-minhquangbui99@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR12MB7195:EE_|DS7PR12MB9550:EE_
-x-ms-office365-filtering-correlation-id: 88a8f1b0-637b-4af7-2a2c-08de1395b8f8
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|366016|376014|1800799024|7053199007|38070700021;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?ZCIivwdTVEDjx9SdMmtrkZLYEgbMXgSZKmJ0zzGtniEHovEaH00qdYZO0+?=
- =?iso-8859-1?Q?1lmISE+ndKgvdy71Q26eHpDfv/9PuVB88Qg39wjag/K9BXfHFFCoMu3D/u?=
- =?iso-8859-1?Q?l7Fzccd6NeeZYxtY08uIZanjB9ClU3AC6VRU/5b1pPq9aRVkcX4yReX5KP?=
- =?iso-8859-1?Q?JbA5Cqabsfi7X7lbilxCjFxTEt5mmUkuy/l1nG9aDPPL9C+tXnobMR9eM/?=
- =?iso-8859-1?Q?0PbhdQmzrBFKY2eeiXjfNjri9nWTfRlG+nq1NEKFGxfkoXwXkBHedFY301?=
- =?iso-8859-1?Q?Fa7PPtnADn0DY4U54ItIOkZeh/WM9tbZIYVbmQC8SVY628/fIWHRNF5/Jq?=
- =?iso-8859-1?Q?mGBOkFLcbqvmAwVVCzwPkun8qohPMw5H1fsirCmBDMQrOmeU3tZSkzxTdi?=
- =?iso-8859-1?Q?Y8F9Yw8csKhwnI1pFyekUAaktd7RSu5XKNyENuosbg2sTSebCF3w4BK6K6?=
- =?iso-8859-1?Q?WmQm3HW7Kv3kwis3H+IoWinybcEBYhy3nPEEs10rZX8qu5FZR38gy2CYN7?=
- =?iso-8859-1?Q?qyvXozrjUbxVokbdFeu/cuQgd+3G5ICcZNskiN5DVTaU5bIdOtz88nQ1iC?=
- =?iso-8859-1?Q?UEQ20yzHyn/UNAoPjsZAieneVdnNw1+501iL5CHU9iELboEajg7P+9JE1f?=
- =?iso-8859-1?Q?1JxhACC+Ox+rLdkfMKx5Eq7C4KRTcWg0hvTzo++BYKYPbQf/lf8zfr9wdY?=
- =?iso-8859-1?Q?3IoTvED1PWhMuh/p/HOibEVTkBIBv/G+T2vrCc695eFuIC2/Gqf8cG+Ako?=
- =?iso-8859-1?Q?RTCJlQb+2s7JrHtXLaWr2e2kvvlQXLyXuHm6Htl8H57o3+ACK/sC+VJs/j?=
- =?iso-8859-1?Q?nRuk7MNjacLRbQz2LFysywLUJ2cQfCoZ/VqowRZhsTKnmC6sYazG0F+dtf?=
- =?iso-8859-1?Q?RLZ6bGLsU151kV2GC9a2IeXh92mLjDpBwVIJ18jRNgXrqWHCvblXmBwaKJ?=
- =?iso-8859-1?Q?H3J3DZRhxC7GLN8cqnSDmRNNaAmFW1BVU0n4QXZLZ/qyVkI1qTgnzcAf1+?=
- =?iso-8859-1?Q?dfaEbEXNQifkYlLKzKfMlJ1ShuZWhV1e5uR0Lr6yibcuaPFK7upOfq2D/q?=
- =?iso-8859-1?Q?ORRJPOVWMkDEkreS5dpa8pshEH8L4gxWucHROtkIyVm/hIDtPdr03PDx4+?=
- =?iso-8859-1?Q?WNpoqPYlrhCEfTStBDChbqERM6ERuHb+mBTVx23eODV1V0JIdJ26xcDDQk?=
- =?iso-8859-1?Q?aWTiad4M7jkkjWHlF/y5F3MRcKopluJ3lTiMnvVhRbBddGoiudAwgEHHV2?=
- =?iso-8859-1?Q?o1vK11zDWb8zEl+dcSOUdi6Ia0R1kZkdncIdExbW7/W7M3PPtHDrerd8ZF?=
- =?iso-8859-1?Q?8rg8HzuwQoGh9FdYjbYH/peHlm0M8gtua0aaJk/q1cBuMmIDk0XYsoI7yx?=
- =?iso-8859-1?Q?Aw5KGv9z1hM0JT5ZKLZOaPAsgE7Mqxd8sRmezX2GX8rcAzVd3nhQaLlr2k?=
- =?iso-8859-1?Q?YX/eKicLBjzjgmO7RRm7XsQsBvHWyrYaxerxiG3sptX3oMiJ9H3Q63SQXh?=
- =?iso-8859-1?Q?RJ1szmWM9YdJTOn66D+hCsFuLeTay0CIiTo3JUkU9DVPJqP7W+paNyB3EP?=
- =?iso-8859-1?Q?eU5q4ywUeq++9vWHTAIXWtH8Fn530YEcHBoNwApdSTlXaPnriA=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB7195.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024)(7053199007)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?b58TvYfLJm4Vkb+wcQB+L3VsLbQKzK/psN4RU4OCl8gvot3INj38O4qrCc?=
- =?iso-8859-1?Q?GpVUVzcRXNSqN8Owa2M2V3SzGaMrIXVTYeCFswh4jmPX65OMkBtacrprhH?=
- =?iso-8859-1?Q?5O/gMW2rP2ni9izt5ZjYJq8v6Wfl/+tYrGgzWYPhZ6BgJGlg+iV6PVZoGv?=
- =?iso-8859-1?Q?R24z3aR8Fmg623AATdAU33hJQCI+8mlqJjPVKQ9pgrlNcDkK36xSpg5mpZ?=
- =?iso-8859-1?Q?bqLl8kc+lPQk4M+g2QKpXBoUoii6O1FxyjxiTDPz9oIBpQM1NBrMUKOXcV?=
- =?iso-8859-1?Q?KfLFnDowxF5kXWgJuDMZPG6fkzMM/GKlA6b5NBB07ZXy7Af7dosglEvwCV?=
- =?iso-8859-1?Q?234zrxUeRb9+9NxqUepdtkC6OkOpjGMwJbexBtD2TuEEUKjOgvVsdCKtw8?=
- =?iso-8859-1?Q?kijkb9mOsCnFDGGi9Z7DpsChqQvsfAdcczLZNOKLpcyL9OV4XngIEPT6It?=
- =?iso-8859-1?Q?rRAo0GDAi0zYpBSeos1buFxyWGyXTMKoKAhqHMa0XoRJ9hLw+Pn1pVe/mQ?=
- =?iso-8859-1?Q?K61zyK7Xe9a57M1HHPwKHYLRj9qwVOPeK5AFtlUFuumdJT6T3mScmF0Z4x?=
- =?iso-8859-1?Q?i/1Mc7RUtrXB7fxhaC7AXPQ7DvMiO8YSXFzLybRRL+REmGdVkq7/pUVCks?=
- =?iso-8859-1?Q?fNI7clu45VIc99AivB6R9aP31NeWBg+Qa9KD8vqn+ihtE8C6q4mctC47By?=
- =?iso-8859-1?Q?vbeMBKE958pJ2aQVB4tspGL8t4XzSny7OgH4UrDg9+4C3otjXhB8osKVfG?=
- =?iso-8859-1?Q?C6ynxgVgHLSnbwNOjjCzG/9b1tpkp4bAgreAJ6WQusIwb8/CJzbvJAia+d?=
- =?iso-8859-1?Q?412mUd3rFl2OeVHksGeM3C6wHzTE7z2xmoPmwE+hlZH65VnBYxBCM68lcg?=
- =?iso-8859-1?Q?Kvt7Em98zW92bU5eXYE+2wSsOWJ+TkGHj3viriZnPD3VOBF616RxR2zlzG?=
- =?iso-8859-1?Q?GqKN174zO5KPAffbcWQ+ObtM2b6iZVl2JqPrFBxiJxjDzBqMakTZOqCkyD?=
- =?iso-8859-1?Q?SrOJpV4n2lMRHr2KBCX3Tiht6wTjVTxQmhtskp45Cl2SqEWB0nnVbBJQb5?=
- =?iso-8859-1?Q?YJ1FqgHLAjI54p4MustaOvopyj6dfdDxV+7Tp957aNvtO8xbD4g5K02/tw?=
- =?iso-8859-1?Q?QqBniBFPZIUcbtxRSx2yy9cZiBFrh+t3/aG25HvTjTy5VciB66E8qHpzku?=
- =?iso-8859-1?Q?nAI9M3aQDPCUWwTuYC3W/iWla6ihAcFk5B6uEkkNrT8PiL9/Ww+F9o55GG?=
- =?iso-8859-1?Q?iH4sDR95abjwMghcCtK/ZUEJS1PMFpt5EWmkioHoOtY72mtCemwL16FFG9?=
- =?iso-8859-1?Q?diClzu3i41+8aNhopFTYihlOxXty64LjMOh8F4X2OgJdcdY2rAbt+4hCia?=
- =?iso-8859-1?Q?FaAJ8qVSchLm74nS/yNC/28/HvA1dsnkFBJv4Pjc5Xgbt8/23eMhTI73GK?=
- =?iso-8859-1?Q?jT8Yy5w5UtQdRyf30zckz74JxmbTSeZ6XNEW3l1k9I+jQIxuOEVeQt4rot?=
- =?iso-8859-1?Q?X4nV0seIIwtm6zph7OQ95VfjmbUm8fe0M693e1ewYA/BhcZC4KOspoL8jt?=
- =?iso-8859-1?Q?isJmeXzilP4aLZtBRIeIR194XRvc7O66BUxsITB7mWl1EsVOCikxEx6oaQ?=
- =?iso-8859-1?Q?75Qn8EvTiZQ1c=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A45450FE
+	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 07:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761376565; cv=none; b=nbEGXsJJyWjLAqoGV8Psr9SOAhddeRYeoNSu6rcEU1myP9PWIxANU7N1Z1t67O1XVD5iqm5Tzh1gkdxr1JdKKvh3VHAA4L6pWf0Kkx5Lh3DsEhitdqFgfaCn8DKOweDruymL3Mirq5tm2TfSNywr8RhQbAu/I8zuW42RguaHH/U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761376565; c=relaxed/simple;
+	bh=biEA5MpSib2IYJUahdExDpnVZxpN4RYOjrYtsmVXVdA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uLiA5yzJ9iPsXcjBwfIgnjfRQ02Yr01khbe6LZvlHdGgpkLd75QguHerZRNbyfWuEtcZ7HwkTgLvsMT1r1T6LVpC/5kKaJBM99LZ2oZw+3He8vLUZ+sq0woa0GndD5sgWVlk50o9fVGM46B+cOoYE4BU7Gq0mxC/pqWGbbrdOQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nsxhePH/; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-27eec33b737so41264775ad.1
+        for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 00:16:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761376563; x=1761981363; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=svbY4zNoxF4qCqZuyqm3Pf2YrS++BcI9qAc5aeejeds=;
+        b=nsxhePH/FatANoHhNcLwFtxlVJAiB8hMF6tHvD6CjmizjnHz3iMdKrnq4F28qELeis
+         Xp6ElIAYyL4DmkS5TBypMa2Uh+QORfFpCx1evfPH4vYfibFaeaeTT7kbX54Jdwa6b9o3
+         eGhHNUhCjqvyXmBj9FtkZThz8Q31ZuGtOv1mBBMjyYwxYC5CwWHVIyxfPAory52fAMJ/
+         WJVw/XdUHpuqK6IsPdZh1dpkbcnfBUtPKwFEYEcMSCe6FgDsm9yyi3hjgA6I9er+QViu
+         v5k3WfiY5WV9xdNfJI7S+GPXkjTRhuZQ3UryV6XTZZFvpveGDDFUVCodgPoJSw3It9iY
+         wnMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761376563; x=1761981363;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=svbY4zNoxF4qCqZuyqm3Pf2YrS++BcI9qAc5aeejeds=;
+        b=c+2rqIPQbmMTYEhjMED47aGHeN7oZa4Ps5IfS8N4gqhvCMzZQjjJoSZZQ/EURBVMRX
+         kTgHLkz1k410HAQkHMzM5TxzqyN8vFWGMK/m8I4WroXieF4X8wvCeSG+9WMsCfnlXHgp
+         ZnBj0N1iszvXw9CCx6vKqA1afgO6BGM+CDykfCwSrAw8VEaMbGYlZBKdix9tH8aKy/Z7
+         hYoJxmlm6GnOirjH4Uz1pa4OIJXTP3nASDS7jIZiq3KMd7jUunhVBWrlKL2ZPhYL7lZY
+         EihFIsd0qa7DUxW+qER72USLiWO5eV/6KcgAccwDVdoV80tnO+huFq7VAb+QLHPNzOVB
+         zg8g==
+X-Forwarded-Encrypted: i=1; AJvYcCV5pAzWPIRS+P/D4aW9NBoB3E+weSYw/Ah5EdC75OhqOlPwaRlN0Mw3O6nWN9F8R9JBSqIz4VE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOuRuPWQN1z46VYnbbYriWPMhVC/8IuBgINh53SRMHk6LIgWZl
+	0yOWSWzgbbnMNsBsypuOdtv/0lA7nca10U3tJU+YgQIz2WbJe+Zt7m6NWpOMeh4HxsDoW/tTLbT
+	HlApRhoZs0e7WNIqIQ/mEHmCpW5nZ1Fx1aQ7ex9x7
+X-Gm-Gg: ASbGncsOw9EHkNP9ShOjmLgBcool0EZ31MyxFL2DYAKOKXRW/7lqtXaI9r7W39IQ+8W
+	02XVL4SkGKkKUcLCTFmhqkY3QxAijXEDKxmABkzJ3pdFogSs6kBE22Ki3KJK51kaXYPU1ibE1y8
+	aEJzMHHO1Cndel2BPusZJnsCBCPHobSLik1u5uuUrwwoderjr0Ed0PrXLj1EWOEbmn6RyF4tJNS
+	hxoqE/hYTB27Ki5bkaOpvMqtpX7V1zDE4GQ5aVO3CjGP1v2AvV7tEiagx7lk0si7dJZwkC/VXiq
+	uDH0C64J5zaOvbcVVivAal0Jcw==
+X-Google-Smtp-Source: AGHT+IFrWwE9daGcrnOfrKeIJ9mdYxb9a2TtdwZpEtwG5NORQI/kMcHd2F/VG7L16reRUqtaYYJKSGRr0DNq7pJl2L8=
+X-Received: by 2002:a17:902:e80c:b0:290:2735:7285 with SMTP id
+ d9443c01a7336-290cb278acamr426432255ad.47.1761376563027; Sat, 25 Oct 2025
+ 00:16:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB7195.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 88a8f1b0-637b-4af7-2a2c-08de1395b8f8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Oct 2025 07:11:30.7002
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pTZ+PY+EgqZJJtd9eP0uHiJ/jCaYWR8Ey8yK2ZUKlKEmLOZesUtfoGx5vkBkUGojUhDQj2RzcKPu2kFuwYOnEQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB9550
+References: <CAAVpQUA_CqqUfoJb=NaQ7YnBUbW0UWQS4W++TXwRFekenkDM8Q@mail.gmail.com>
+ <20251025064624.2972311-1-lizhi.xu@windriver.com>
+In-Reply-To: <20251025064624.2972311-1-lizhi.xu@windriver.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Sat, 25 Oct 2025 00:15:51 -0700
+X-Gm-Features: AS18NWD0aLvE28ntXYp7r9GroSd8L7O3b06gP8_GGwZZ_4MXTHaYRgFqmkW-eeM
+Message-ID: <CAAVpQUAEBgTZF5GMvRgZybC0pHUuaN-4JBaff79L6AABNKSNWw@mail.gmail.com>
+Subject: Re: [PATCH V3] net: rose: Prevent the use of freed digipeat
+To: Lizhi Xu <lizhi.xu@windriver.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	jreuter@yaina.de, kuba@kernel.org, linux-hams@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Oct 24, 2025 at 11:46=E2=80=AFPM Lizhi Xu <lizhi.xu@windriver.com> =
+wrote:
+>
+> On Fri, 24 Oct 2025 21:25:20 -0700, Kuniyuki Iwashima <kuniyu@google.com>=
+ wrote:
+> > On Fri, Oct 24, 2025 at 8:51 PM Lizhi Xu <lizhi.xu@windriver.com> wrote=
+:
+> > >
+> > > On Fri, 24 Oct 2025 19:18:46 -0700, Kuniyuki Iwashima <kuniyu@google.=
+com> wrote:
+> > > > On Fri, Oct 24, 2025 at 2:39 AM Lizhi Xu <lizhi.xu@windriver.com> w=
+rote:
+> > > > >
+> > > > > There is no synchronization between the two timers, rose_t0timer_=
+expiry
+> > > > > and rose_timer_expiry.
+> > > > > rose_timer_expiry() puts the neighbor when the rose state is ROSE=
+_STATE_2.
+> > > > > However, rose_t0timer_expiry() does initiate a restart request on=
+ the
+> > > > > neighbor.
+> > > > > When rose_t0timer_expiry() accesses the released neighbor member =
+digipeat,
+> > > > > a UAF is triggered.
+> > > > >
+> > > > > To avoid this UAF, defer the put operation to rose_t0timer_expiry=
+() and
+> > > > > stop restarting t0timer after putting the neighbor.
+> > > > >
+> > > > > When putting the neighbor, set the neighbor to NULL. Setting neig=
+hbor to
+> > > > > NULL prevents rose_t0timer_expiry() from restarting t0timer.
+> > > > >
+> > > > > syzbot reported a slab-use-after-free Read in ax25_find_cb.
+> > > > > BUG: KASAN: slab-use-after-free in ax25_find_cb+0x3b8/0x3f0 net/a=
+x25/af_ax25.c:237
+> > > > > Read of size 1 at addr ffff888059c704c0 by task syz.6.2733/17200
+> > > > > Call Trace:
+> > > > >  ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
+> > > > >  ax25_send_frame+0x157/0xb60 net/ax25/ax25_out.c:55
+> > > > >  rose_send_frame+0xcc/0x2c0 net/rose/rose_link.c:106
+> > > > >  rose_transmit_restart_request+0x1b8/0x240 net/rose/rose_link.c:1=
+98
+> > > > >  rose_t0timer_expiry+0x1d/0x150 net/rose/rose_link.c:83
+> > > > >
+> > > > > Freed by task 17183:
+> > > > >  kfree+0x2b8/0x6d0 mm/slub.c:6826
+> > > > >  rose_neigh_put include/net/rose.h:165 [inline]
+> > > > >  rose_timer_expiry+0x537/0x630 net/rose/rose_timer.c:183
+> > > > >
+> > > > > Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_=
+t")
+> > > > > Reported-by: syzbot+caa052a0958a9146870d@syzkaller.appspotmail.co=
+m
+> > > > > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> > > > > ---
+> > > > > V1 -> V2: Putting the neighbor stops t0timer from automatically s=
+tarting
+> > > > > V2 -> V3: add rose_neigh_putex for set rose neigh to NULL
+> > > > >
+> > > > >  include/net/rose.h   | 12 ++++++++++++
+> > > > >  net/rose/rose_link.c |  5 +++++
+> > > > >  2 files changed, 17 insertions(+)
+> > > > >
+> > > > > diff --git a/include/net/rose.h b/include/net/rose.h
+> > > > > index 2b5491bbf39a..33de310ba778 100644
+> > > > > --- a/include/net/rose.h
+> > > > > +++ b/include/net/rose.h
+> > > > > @@ -167,6 +167,18 @@ static inline void rose_neigh_put(struct ros=
+e_neigh *rose_neigh)
+> > > > >         }
+> > > > >  }
+> > > > >
+> > > > > +static inline void rose_neigh_putex(struct rose_neigh **roseneig=
+h)
+> > > > > +{
+> > > > > +       struct rose_neigh *rose_neigh =3D *roseneigh;
+> > > > > +       if (refcount_dec_and_test(&rose_neigh->use)) {
+> > > > > +               if (rose_neigh->ax25)
+> > > > > +                       ax25_cb_put(rose_neigh->ax25);
+> > > > > +               kfree(rose_neigh->digipeat);
+> > > > > +               kfree(rose_neigh);
+> > > > > +               *roseneigh =3D NULL;
+> > > > > +       }
+> > > > > +}
+> > > > > +
+> > > > >  /* af_rose.c */
+> > > > >  extern ax25_address rose_callsign;
+> > > > >  extern int  sysctl_rose_restart_request_timeout;
+> > > > > diff --git a/net/rose/rose_link.c b/net/rose/rose_link.c
+> > > > > index 7746229fdc8c..334c8cc0876d 100644
+> > > > > --- a/net/rose/rose_link.c
+> > > > > +++ b/net/rose/rose_link.c
+> > > > > @@ -43,6 +43,9 @@ void rose_start_ftimer(struct rose_neigh *neigh=
+)
+> > > > >
+> > > > >  static void rose_start_t0timer(struct rose_neigh *neigh)
+> > > > >  {
+> > > > > +       if (!neigh)
+> > > > > +               return;
+> > > > > +
+> > > > >         timer_delete(&neigh->t0timer);
+> > > > >
+> > > > >         neigh->t0timer.function =3D rose_t0timer_expiry;
+> > > > > @@ -80,10 +83,12 @@ static void rose_t0timer_expiry(struct timer_=
+list *t)
+> > > > >  {
+> > > > >         struct rose_neigh *neigh =3D timer_container_of(neigh, t,=
+ t0timer);
+> > > > >
+> > > >
+> > > > What prevents rose_timer_expiry() from releasing the
+> > > > last refcnt here ?
+> > > The issue reported by syzbot is that rose_t0timer_expiry() is trigger=
+ed
+> > > first, followed by rose_timer_expiry().
+> >
+> > I don't see how you read that ordering from the report.
+> > https://syzkaller.appspot.com/bug?extid=3Dcaa052a0958a9146870d
+> Here's my understanding: See the two calltraces below.
+
+The same question still applies.
+
+What prevents rose_timer_expiry() from releasing the last
+refcnt before [1] ?
+
+For example, why is accessing neigh->dev in rose_send_frame()
+safe then ?
+
+The commit message mentions that two timers are not
+synchronised, but the diff adds no such synchronisation.
 
 
-> From: Bui Quang Minh <minhquangbui99@gmail.com>
-> Sent: 24 October 2025 08:37 PM
->=20
-> Since commit 4959aebba8c0 ("virtio-net: use mtu size as buffer length for=
- big
-> packets"), when guest gso is off, the allocated size for big packets is n=
-ot
-> MAX_SKB_FRAGS * PAGE_SIZE anymore but depends on negotiated MTU. The
-> number of allocated frags for big packets is stored in vi-
-> >big_packets_num_skbfrags.
->=20
-> Because the host announced buffer length can be malicious (e.g. the host
-> vhost_net driver's get_rx_bufs is modified to announce incorrect length),=
- we
-> need a check in virtio_net receive path. Currently, the check is not adap=
-ted to
-> the new change which can lead to NULL page pointer dereference in the bel=
-ow
-> while loop when receiving length that is larger than the allocated one.
->=20
-This looks wrong.
-A device DMAed N bytes, and it reports N + M bytes in the completion?
-Such devices should be fixed.
-
-If driver allocated X bytes, and device copied X + Y bytes on receive packe=
-t, it will crash the driver host anyway.
-
-The fixes tag in this patch is incorrect because this is not a driver bug.
-It is just adding resiliency in driver for broken device. So driver cannot =
-have fixes tag here.
-
-> This commit fixes the received length check corresponding to the new chan=
-ge.
->=20
-> Fixes: 4959aebba8c0 ("virtio-net: use mtu size as buffer length for big
-> packets")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
-> ---
-> Changes in v5:
-> - Move the length check to receive_big
-> - Link to v4: https://lore.kernel.org/netdev/20251022160623.51191-1-
-> minhquangbui99@gmail.com/
-> Changes in v4:
-> - Remove unrelated changes, add more comments
-> - Link to v3: https://lore.kernel.org/netdev/20251021154534.53045-1-
-> minhquangbui99@gmail.com/
-> Changes in v3:
-> - Convert BUG_ON to WARN_ON_ONCE
-> - Link to v2: https://lore.kernel.org/netdev/20250708144206.95091-1-
-> minhquangbui99@gmail.com/
-> Changes in v2:
-> - Remove incorrect give_pages call
-> - Link to v1: https://lore.kernel.org/netdev/20250706141150.25344-1-
-> minhquangbui99@gmail.com/
-> ---
->  drivers/net/virtio_net.c | 25 ++++++++++++-------------
->  1 file changed, 12 insertions(+), 13 deletions(-)
->=20
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c index
-> a757cbcab87f..2c3f544add5e 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -910,17 +910,6 @@ static struct sk_buff *page_to_skb(struct
-> virtnet_info *vi,
->  		goto ok;
->  	}
->=20
-> -	/*
-> -	 * Verify that we can indeed put this data into a skb.
-> -	 * This is here to handle cases when the device erroneously
-> -	 * tries to receive more than is possible. This is usually
-> -	 * the case of a broken device.
-> -	 */
-> -	if (unlikely(len > MAX_SKB_FRAGS * PAGE_SIZE)) {
-> -		net_dbg_ratelimited("%s: too much data\n", skb->dev-
-> >name);
-> -		dev_kfree_skb(skb);
-> -		return NULL;
-> -	}
->  	BUG_ON(offset >=3D PAGE_SIZE);
->  	while (len) {
->  		unsigned int frag_size =3D min((unsigned)PAGE_SIZE - offset,
-> len); @@ -2107,9 +2096,19 @@ static struct sk_buff *receive_big(struct
-> net_device *dev,
->  				   struct virtnet_rq_stats *stats)
->  {
->  	struct page *page =3D buf;
-> -	struct sk_buff *skb =3D
-> -		page_to_skb(vi, rq, page, 0, len, PAGE_SIZE, 0);
-> +	struct sk_buff *skb;
-> +
-> +	/* Make sure that len does not exceed the allocated size in
-> +	 * add_recvbuf_big.
-> +	 */
-> +	if (unlikely(len > vi->big_packets_num_skbfrags * PAGE_SIZE)) {
-> +		pr_debug("%s: rx error: len %u exceeds allocate size %lu\n",
-> +			 dev->name, len,
-> +			 vi->big_packets_num_skbfrags * PAGE_SIZE);
-> +		goto err;
-> +	}
->=20
-> +	skb =3D page_to_skb(vi, rq, page, 0, len, PAGE_SIZE, 0);
->  	u64_stats_add(&stats->bytes, len - vi->hdr_len);
->  	if (unlikely(!skb))
->  		goto err;
-> --
-> 2.43.0
-
+> [1] Line 111 occurs after rose_neigh_put(). Otherwise, accessing
+> neigh->digipeat would result in a UAF. Therefore, rose_t0timer_expiry()
+> must be triggered before rose_timer_expiry().
+>
+> [2] syzbot reports that line 237 generates a UAF when accessing digi->ndi=
+gi.
+>
+> UAF Task1:
+> rose_t0timer_expiry()->
+>   rose_transmit_restart_request()->
+>     rose_send_frame(.., neigh->digipeat, ..)-> // [1] line 111
+>       ax25_find_cb()->
+>         if (digi !=3D NULL && digi->ndigi !=3D 0)  // [2] line 237
+>
+> Freed neigh Task2:
+>  rose_timer_expiry()->
+>    rose_neigh_put(neigh)->
+>      kfree(neigh)
+> >
+> > The only ordering I can find is that kfree() in rose_timer_expiry()
+> > happened before ax25_find_cb () in rose_t0timer_expiry().
+> >
+> > > Therefore, in rose_t0timer_expiry(), the reference count of neigh is
+> > > increased before entering rose_transmit_restart_request() to prevent
+> > > neigh from being put in rose_timer_expiry(). Then, in rose_t0timer_ex=
+piry(),
+> > > neigh is put before executing rose_start_t0timer() and the neigh valu=
+e is
+> > > set to NULL to prevent t0timer restarts.
+> > >
+> > > The case where rose_timer_expiry() is triggered before rose_t0timer_e=
+xpiry()
+> > > is not considered at this time.
+> >
+> > So this change just papers over the root cause.
+> >
+> >
+> > > >
+> > > > The t0timer could be triggered even after that happens.
+> > > >
+> > > >
+> > > > > +       rose_neigh_hold(neigh);
+> > > > >         rose_transmit_restart_request(neigh);
+> > > > >
+> > > > >         neigh->dce_mode =3D 0;
+> > > > >
+> > > > > +       rose_neigh_putex(&neigh);
+> > > > >         rose_start_t0timer(neigh);
+> > > > >  }
+> > > > >
+> > > > > --
+> > > > > 2.43.0
+> > > > >
 
