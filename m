@@ -1,89 +1,101 @@
-Return-Path: <netdev+bounces-232737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 372FDC087B2
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 02:54:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 006FFC087E6
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 03:10:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 218C54E2E01
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 00:54:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADAC33BA866
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 01:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 501F61EF39F;
-	Sat, 25 Oct 2025 00:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A341920FAAB;
+	Sat, 25 Oct 2025 01:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QCm1ENVv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u3K2qR2x"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CA91E633C;
-	Sat, 25 Oct 2025 00:54:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E82F20CCE4
+	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 01:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761353644; cv=none; b=nHUsVXunNWJUXfY/Ak8m1XoHGE9wMCBx9h7nt21WL+bRkCYisJOnWI0amxqBsSZx+YvyX+8Uxwhgz579ZofLSMk6ODJdDfw/c/ud2fEkSQXA7tMP9BuAMhOw4fhc647Y9gC1pa7PC0Hm/QBRjem/Qrk3u4/q+Bov6KLPQhwdiDA=
+	t=1761354633; cv=none; b=a2wqigRbv/Ka/TpNMiuGZf/rzsddOAbxQpkwrVacO1OtpP9ipM0S1rDt2bIQt+iW8vxOoOxtEkU9SzTqnKXhSNEhrybEDDU9sF0Wf34ZUz1dyJif5aMBo/JJcBg0gNS/gBdBPE9YHzuiR/zWZBH+K1srzjvUlEmiRvsoJRbuyLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761353644; c=relaxed/simple;
-	bh=mDTG24SA/D6Zl2v+cxxSNFpswm6/adPBv6yaf/7vO8Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rBrvW/TP7/smQPH2wfTRiB1WkD7Mfx9YyqzHaCL/LcZDKlBKE+ps3nnxqxQIslg+cEW68n231/385+CocxkGrAI/nge4ue0OWKepFJc7yLr7V/4GQzdA5VIRu2QHxPElUo7XGuCxZCQQGgph5Gs9sqjT8bjEQHQIZcvu46PAQ+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QCm1ENVv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE681C4CEF1;
-	Sat, 25 Oct 2025 00:54:02 +0000 (UTC)
+	s=arc-20240116; t=1761354633; c=relaxed/simple;
+	bh=PAXHIvo6r6jeEeG93sabn8tZFxG1xAWkfzKA7U2GC3c=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=C6FSMUSkvY2+F+hRuy0NzV3qQxMo1C3NUcvVsjgEX67vb0sm9NEA2z05emyDR80hC0fY4gUG7BCNzuwS/0s3Lso8Qhp3hSyeGmdLbuRLSC7qZPGJsJKY94OcZntJs0F6MNHL5R0xLJNBRl6Jo1Wx9toxptEw9Qi4cRNi3uOO6g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u3K2qR2x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B3AAC4CEF1;
+	Sat, 25 Oct 2025 01:10:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761353643;
-	bh=mDTG24SA/D6Zl2v+cxxSNFpswm6/adPBv6yaf/7vO8Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QCm1ENVvbA0/KJyuOBvSRd9yC/waAyYd73az37Pd5i1iSz5cQTqVw7DuxPjAd8yGk
-	 QkzhCkhargWJHnZgTvbydoi4OyJ7kdm9toOeG8RqWh6xSGEI9JPImV1tSubQVbtySt
-	 HX1I8y9KcAnQm8bcKSEWliknJ9ZzeH4gI1oyRbSZMTQQce/fiKiAozssLvGlAc4A34
-	 NSJOZz0jJG7rkKk2oQWJxr+B/W01vMz2x/WGyN0v3ACCV+h0it4/nv01wAmqZYqRwV
-	 RbYzuzl5CU7ihTYEzZ3GhUYJ1cSKl91EdR+HLH9fAKTUp7RKIGXo3sz66mH6IYy+WT
-	 ekAPR773bV4Ww==
-Date: Fri, 24 Oct 2025 17:54:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, makita.toshiaki@lab.ntt.co.jp, Eric Dumazet
- <eric.dumazet@gmail.com>, "David S. Miller" <davem@davemloft.net>, Paolo
- Abeni <pabeni@redhat.com>, ihor.solodrai@linux.dev,
- toshiaki.makita1@gmail.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-team@cloudflare.com
-Subject: Re: [PATCH net V1 2/3] veth: stop and start all TX queue in netdev
- down/up
-Message-ID: <20251024175402.397c05a9@kernel.org>
-In-Reply-To: <176123157775.2281302.5972243809904783041.stgit@firesoul>
-References: <176123150256.2281302.7000617032469740443.stgit@firesoul>
-	<176123157775.2281302.5972243809904783041.stgit@firesoul>
+	s=k20201202; t=1761354633;
+	bh=PAXHIvo6r6jeEeG93sabn8tZFxG1xAWkfzKA7U2GC3c=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=u3K2qR2xFnYrH7jYWKLyaVgimf/1KV3Q30WoswCSOgX7KKC5RoreQtkOpEts/coba
+	 O2SzC3JqcvXhv7xj2vggCYGWJPpGZSrBSTAkmTpg67aCscjnYyyvaF8eU38RVbsztJ
+	 5LE9NZUTnQ4W7cCuxRbD7iSpVgT6bj42xC6uNI029JgyGczvlwBs0i3czJzBIos0c4
+	 kgt20LbGAGg0j+qNpGBEk5dJKmBD9Yb83KHs6bDugrfUKoJXHGbOH0lUc+/M7W93AU
+	 z5RAcCwjy+H09zdMtk4wXu4bekJS/AE3cGRld+WVdNleCH4h684MDufStIrAby0dtm
+	 ys3BUP9ZDxNYA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAC7A380AA59;
+	Sat, 25 Oct 2025 01:10:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 net-next 0/5] neighbour: Convert RTM_GETNEIGHTBL and
+ RTM_SETNEIGHTBL to RCU.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176135461275.4113798.10349813341332406170.git-patchwork-notify@kernel.org>
+Date: Sat, 25 Oct 2025 01:10:12 +0000
+References: <20251022054004.2514876-1-kuniyu@google.com>
+In-Reply-To: <20251022054004.2514876-1-kuniyu@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org, kuni1840@gmail.com,
+ netdev@vger.kernel.org
 
-On Thu, 23 Oct 2025 16:59:37 +0200 Jesper Dangaard Brouer wrote:
-> The veth driver started manipulating TXQ states in commit
-> dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring
-> to reduce TX drops").
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 22 Oct 2025 05:39:44 +0000 you wrote:
+> Patch 1 & 2 are prep for RCU conversion for RTM_GETNEIGHTBL.
 > 
-> Other drivers manipulating TXQ states takes care of stopping
-> and starting TXQs in NDOs.  Thus, adding this to veth .ndo_open
-> and .ndo_stop.
+> Patch 3 & 4 converts RTM_GETNEIGHTBL and RTM_SETNEIGHTBL to RCU.
+> 
+> Patch 5 converts the neighbour table rwlock to the plain spinlock.
+> 
+> 
+> [...]
 
-Kinda, but taking a device up or down resets the qdisc, IIRC.
+Here is the summary with links:
+  - [v1,net-next,1/5] neighbour: Use RCU list helpers for neigh_parms.list writers.
+    https://git.kernel.org/netdev/net-next/c/06d6322280d9
+  - [v1,net-next,2/5] neighbour: Annotate access to neigh_parms fields.
+    https://git.kernel.org/netdev/net-next/c/35d7c7087033
+  - [v1,net-next,3/5] neighbour: Convert RTM_GETNEIGHTBL to RCU.
+    https://git.kernel.org/netdev/net-next/c/4ae34be50064
+  - [v1,net-next,4/5] neighbour: Convert RTM_SETNEIGHTBL to RCU.
+    https://git.kernel.org/netdev/net-next/c/55a6046b48a8
+  - [v1,net-next,5/5] neighbour: Convert rwlock of struct neigh_table to spinlock.
+    https://git.kernel.org/netdev/net-next/c/3064d0fe02af
 
-So stopping the qdisc for real drivers is mostly a way to make sure
-that there's nothing entering the xmit handler as the driver dismantles
-its state.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I'm not sure if this is an official rule, but I'm under the impression
-that stopping the queues or carrier loss (and
-netif_tx_stop_all_queues(peer) in close() is stopping peer's Tx queue
-on carrier loss) is inadvisable as it may lead to old packets getting
-transmitted when carrier comes back.
 
-IOW based on the commit msg - I'm not sure this patch is needed..
 
