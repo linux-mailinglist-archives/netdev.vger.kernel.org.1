@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-232926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5746CC09F0C
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 21:15:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1DBEC09F12
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 21:15:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39F081B26211
-	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 19:15:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C23C3AE8F4
+	for <lists+netdev@lfdr.de>; Sat, 25 Oct 2025 19:15:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDFC3054EE;
-	Sat, 25 Oct 2025 19:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2598306491;
+	Sat, 25 Oct 2025 19:15:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="H3LJdNdK"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="WlVp7H2j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA272D481F
-	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 19:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2863054FB
+	for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 19:15:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761419714; cv=none; b=NbPcND8yT19zAgJtySMzu+b8KEwOBeGtW912NF3WZ7SrQSciVQa7oGPtj2bqzBWGpCLjKZVi6g/mHm6mib4u17skkmDNOHfDV+51SjI59Fiph7OIX16V2G+Rh2lNVD/Byh/7yRDs4IBYpWWZ2n5scxB/TN0Q10D3sG8tT6XZ208=
+	t=1761419715; cv=none; b=GiRSoKYB7GTG6jpJBrYpteZFOwqXj+jTp91mEptQoePTQa5pMjK7pw6mTA8nxd0hFWZdkGH+CoqWllUeeXQd8FUwmwdj529zwiqi0stmZ7oOyJ/J0Lqz4J+eaYP5j1eW9m+xrAoXdINuS89LGcr3sGTOUlsh2qqrb4qq3wmhBQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761419714; c=relaxed/simple;
-	bh=qUT88k04TtiGmgEuMnwQRr8knEBK/P3H3YijIBSs3Jg=;
+	s=arc-20240116; t=1761419715; c=relaxed/simple;
+	bh=ucFR12aXX4nkZAC+cILJgoMYYPjytPdbh2AHCMWelEA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GRYXMFqKV45b7/pkIAWb9AipJBQlnYlmYbX4tzBo/uEu4x+7gzGhKEbIMubdPD2ZhV3zuCesXzf20BZ9YPxvC5wXANgcBzLq9THtHoGxFdfbNQ/llpwZCZG0gscCyQF7GzCEYAc6Z/qyBhdDUqJSNDxMAA/EP9QNKk3PTUzhYH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=H3LJdNdK; arc=none smtp.client-ip=209.85.167.177
+	 MIME-Version; b=hOalLGP/crCbVNfW8wVZJL5LMrLPqnkln8KlZvx3TobpUV+2WaLPJGIaYiPtOuo9WFc4JGDx90jVc2RsRbKbad7ZW94j6UTmKrP0zBvD6DcRzM3/Oyo1PoXLr5zVW54OUBfNoOqwA++1D96LfWTkfcmVAr8yk4h1kkyH4ArrYRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=WlVp7H2j; arc=none smtp.client-ip=209.85.210.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-43f935f7d14so1339721b6e.3
-        for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 12:15:12 -0700 (PDT)
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7c5333e7033so110379a34.2
+        for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 12:15:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761419712; x=1762024512; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761419713; x=1762024513; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V9UaKz+G9gYr1eZsyVRK+FYNTjIwCQnZpOwbbwcqlNY=;
-        b=H3LJdNdKJO+zQ3tqffgcCZa1UUOG7UVJvcjqO96WVg1xlGNL7+7fq55aC0TqYt2qF1
-         I+tw9n5+hLLK5eEtkg/L1PQwZLzWD49dneDREqhf0GWrkFA3ZTLw8M0338dJ7HhAtTFL
-         GVj2tZX9xagBSLDVTOUb+5gjOr/4cbenHKuKmzfUUlASRYWY263o3fMiBWKZsLHLs2ef
-         xtVwqyrp7aqpYr9n4AFAXnYmL31jTMY4YOsPnzfxX6c6GzdjPsi0Ps+67ZyMvkY6C30O
-         KgKVcfItwTEoX+dLSabn/Ka+4Y0z7qGYaTwR7qxFJX9lhdHHmWhNQcIAInNXCNv2Xkf+
-         t3vg==
+        bh=vTyN43M0AVODz40WwOJi9olgyOCW2gYVIejIuZtFEBU=;
+        b=WlVp7H2j9LfeJxJp+8JtJtE4WwWst5Ye+IoAa1GNGkpzjosAjI5WeQ0YbqSFpCi3v7
+         0JYfqo1L53wwAfWwEKkBArkD/s61+cDimLt09j70ueNLrbOpr5qOHb5nC3s5rf84rLv1
+         V8G+8yFKTAM7/cOYUc6Gl+QZHdAWWHlwb4Gwkl83ut6mC+hf2BTGUSKGINrCHgDddERN
+         jwYfFKv7mZ3u7cAtvkmzyhSBsN5/fz2nYo/nlLK2oANlMEVNwv1+5akKbyq1PAmCoAnH
+         ezMVZFgsE1btWTQlGjIdzPwic+MK7m/KayNKeCRw3uY4HRthN9PMOTEIEzOAwGwMEMAQ
+         +axQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761419712; x=1762024512;
+        d=1e100.net; s=20230601; t=1761419713; x=1762024513;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=V9UaKz+G9gYr1eZsyVRK+FYNTjIwCQnZpOwbbwcqlNY=;
-        b=B3CC2cVRBC/Am39C2P5Dt5LwzQ5TmGZfniFjfAIrdVrrnLohgqCy2joLDyvKTpH/WF
-         rm+uk47OC5CJP6viCytwxmOdA3i72yYb6ugnFUO8graCW8lY9cKSw13zAEgqMa6Zghh8
-         Yy7QkT2j9Y+RtvlP5aBX0LsKPhqSvsBCrb0suVSk6W2YumMrOOADGqPvccGMnCfBoECH
-         2oQv9U+9+8pI9OpPRyRgnLWmpIbSeMFP0AJcyUpb0MbgbRpC7MMvveDUIExCDFvvE6MR
-         43/bHgX/QSTj5A3tm+EfVKYVArDTkzanUcbOfeYs2nh35XgmUUG7BxBi8quTXkbBXQr3
-         B+WA==
-X-Forwarded-Encrypted: i=1; AJvYcCV0QEv9mTqrOJ7ammYsUUsrRf364T7wEQIksWZJlr/8TNAR0AZYwuhm9g8N1UnTYYJy89BWnio=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYMYdtboef9qanv3ZNsOIvjhagU+gL+WYfHPqwT6wU7o8sA60R
-	lwAXN9UvtSeKrUAmlh1QWUQQ5mtCSAO3rgEC/QGKd5BlObdxNLkcf+TBXOuTkpYXWwE=
-X-Gm-Gg: ASbGncsIZH42mrW/STrK03HmwbgD26+BoErJAlvXFh3onFfEY80HxMqHeMbjHCeb5mp
-	AzbZuwZc08/8otamzQYXUKzLbTonMnToKnFLwWNAZYh/0lOQtva5KHfQ5xmLjf2Xa8WU1d0SF31
-	K7pA48UcJFPAPFGw9bFaJHJOtsnKXY+fptq3vhVslXy11ChK/F3qK0LsFhM21NaaoQJuSDS++Nt
-	nnVllSzodnn5mkAtwjItHxaTDNGRt0OYxGUdNsNUOxXqPvHQxG4Z6+n4JSvhSGncWxVFhySuYKL
-	Y1N89MufC1MqoXYSqQXxu9/mkO97C/pu53xOtGX0VeRu7ZE9MBfrMgwqluW/C+KzvfUOqXi/pcv
-	T+1g7zmJvMHAEZmsANdz4fzwbB9KOsU1LxjPE3bfR5g+4pBhTs13t5gVeSdjEq6WzPz3PLagOvF
-	57SHdy+rLw+AihfP/0bn28o6j2Xajw
-X-Google-Smtp-Source: AGHT+IF4zBK/2r5KkaO29cjT+RW4obQ9KQ0UlYObpX4dW4J3s66nJE8fIvKJwOPuqxPgUFI41hMTRQ==
-X-Received: by 2002:a05:6808:1b0d:b0:441:8f74:fce with SMTP id 5614622812f47-443a30be2bdmr14439909b6e.59.1761419711853;
-        Sat, 25 Oct 2025 12:15:11 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:8::])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-44da3ebc7ffsm647989b6e.22.2025.10.25.12.15.11
+        bh=vTyN43M0AVODz40WwOJi9olgyOCW2gYVIejIuZtFEBU=;
+        b=FQK7fJLGilw/qu04tjRxB7QhoB7246jPMAx/5yJTMVc1FJV1qRkecinftnioh5tUGk
+         XZVXk+soRSgdgRhIzH7+iVdO/hP0HcmaSz/SIRTCjHc+CHUVYudaldQ7hKvQh9gS1dVi
+         W9jSSoSn8OiE5GsUx1XjykOGkT50LlNEqlsSIEhSlXg8CCSKjFoUXTYu4JcJEpeSFcVS
+         LjMBtzt5bG+5QMo3FyInO/R9brOqolImjR2gMeug99nnKcPWUoyrSFWhAUBKZW2oQyJm
+         wIyyZlu4LEXEd+AAfRdtyQHt1vPzPblchXXtVXr+OtRQuU7kLa2B8vtw4iMLM0dEo7K7
+         JmwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXvfe36QkDrL1DzjepmbiXYFWplOaP4CTSY8E6aZ+T3llhW4AWa+NByEdAeI8BeB7o6DAVQ0oM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yze2VI71Qru7yxm0wJRj/h32xOWCEPnWKoAh3Fdi0s6bhvs7dmV
+	9N2tyJpv7NTgi/9ez47yuXr03j41+npDy8AkLy8aWVhiVxJyU+MXLvyT134GCXL4gLo=
+X-Gm-Gg: ASbGncvhx8k8lYdkGskTODrd16SeWEY8A7q5xvYs+jSEnrvnkiKn0HWn0eQiV5RJdQ5
+	i5z1mmXBanAbZ4N6EDkb+qIPydsVOsypcDncVR8lD7dlXRlTO5SgqMJFAdx2IFayeGA3D6NXD1j
+	GeQ+KqmQf42xCjrFstf7jDN+ngfljz//Z/gzejKIlDKC+TvFyV2ZS1AiDN8zVoUfq2TWf//P2RV
+	px2ekMZ9kOkG7z4jP2TT/lmfiT05UwBEGo05mN4SXmrELk/denyL9IpeZWfKH5ye8Izcyh7jZ7e
+	aV6iRADVickihurrdDhWbcihjkI2rx4WQRFhtCSRaB5Pny+nMbDkS2XibHJf0TkZ9NElpiuqbpY
+	MiySILzIoXDtTiE6mEQg/c0zT8w3yRowq0qw7CqVjSBrcty9fVvEOuqk4uFxz6TLJSaZwZ5p1B9
+	DWoFCLqVVQRZNubltCog==
+X-Google-Smtp-Source: AGHT+IHZyXuxtYDqvOvduDQTElKwsWGyiSDlQerlgMWGZk7JveEdfvM8R4JWH5j0ns4dDn4DBRsAOw==
+X-Received: by 2002:a05:6871:9c24:b0:3d2:c10b:cb45 with SMTP id 586e51a60fabf-3d2c10bd09dmr433476fac.9.1761419713012;
+        Sat, 25 Oct 2025 12:15:13 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:4::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3d1e2711a64sm902920fac.6.2025.10.25.12.15.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Oct 2025 12:15:11 -0700 (PDT)
+        Sat, 25 Oct 2025 12:15:12 -0700 (PDT)
 From: David Wei <dw@davidwei.uk>
 To: io-uring@vger.kernel.org,
 	netdev@vger.kernel.org
 Cc: Jens Axboe <axboe@kernel.dk>,
 	Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH v2 1/5] io_uring/rsrc: rename and export io_lock_two_rings()
-Date: Sat, 25 Oct 2025 12:15:00 -0700
-Message-ID: <20251025191504.3024224-2-dw@davidwei.uk>
+Subject: [PATCH v2 2/5] io_uring/zcrx: add refcount to struct io_zcrx_ifq
+Date: Sat, 25 Oct 2025 12:15:01 -0700
+Message-ID: <20251025191504.3024224-3-dw@davidwei.uk>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251025191504.3024224-1-dw@davidwei.uk>
 References: <20251025191504.3024224-1-dw@davidwei.uk>
@@ -93,51 +93,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Rename lock_two_rings() to io_lock_two_rings() and export. This will be
-used when registering a src ifq owned by one ring as a proxy in another
-ring. During this process both rings need to be locked in a
-deterministic order, similar to the current user io_clone_buffers().
+Add a refcount to struct io_zcrx_ifq to track the number of proxy ifqs
+that refer to it. The init count is 1 and means there are no proxy ifqs.
+
+This ref is checked in io_shutdown_zcrx_ifqs() to ensure that an ifq is
+not cleaned up while there are still proxy ifqs alive.
+
+Opted for a bog standard refcount_t. The increment and decrement
+operations are expected to happen during the slow setup/teardown paths
+only, and a src ifq is only expected to be shared a handful of times at
+most.
 
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- io_uring/rsrc.c | 4 ++--
- io_uring/rsrc.h | 1 +
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ io_uring/zcrx.c | 3 +++
+ io_uring/zcrx.h | 2 ++
+ 2 files changed, 5 insertions(+)
 
-diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-index d787c16dc1c3..d245b7592eee 100644
---- a/io_uring/rsrc.c
-+++ b/io_uring/rsrc.c
-@@ -1148,7 +1148,7 @@ int io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
- }
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index a816f5902091..22d759307c16 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -587,6 +587,7 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+ 	if (!ifq)
+ 		return -ENOMEM;
+ 	ifq->rq_entries = reg.rq_entries;
++	refcount_set(&ifq->refs, 1);
  
- /* Lock two rings at once. The rings must be different! */
--static void lock_two_rings(struct io_ring_ctx *ctx1, struct io_ring_ctx *ctx2)
-+void io_lock_two_rings(struct io_ring_ctx *ctx1, struct io_ring_ctx *ctx2)
- {
- 	if (ctx1 > ctx2)
- 		swap(ctx1, ctx2);
-@@ -1299,7 +1299,7 @@ int io_register_clone_buffers(struct io_ring_ctx *ctx, void __user *arg)
- 	src_ctx = file->private_data;
- 	if (src_ctx != ctx) {
- 		mutex_unlock(&ctx->uring_lock);
--		lock_two_rings(ctx, src_ctx);
-+		io_lock_two_rings(ctx, src_ctx);
+ 	scoped_guard(mutex, &ctx->mmap_lock) {
+ 		/* preallocate id */
+@@ -730,6 +731,8 @@ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
+ 	lockdep_assert_held(&ctx->uring_lock);
  
- 		if (src_ctx->submitter_task &&
- 		    src_ctx->submitter_task != current) {
-diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
-index a3ca6ba66596..b002c4a5a8cd 100644
---- a/io_uring/rsrc.h
-+++ b/io_uring/rsrc.h
-@@ -70,6 +70,7 @@ int io_import_reg_vec(int ddir, struct iov_iter *iter,
- int io_prep_reg_iovec(struct io_kiocb *req, struct iou_vec *iv,
- 			const struct iovec __user *uvec, size_t uvec_segs);
+ 	xa_for_each(&ctx->zcrx_ctxs, index, ifq) {
++		if (refcount_read(&ifq->refs) > 1)
++			continue;
+ 		io_zcrx_scrub(ifq);
+ 		io_close_queue(ifq);
+ 	}
+diff --git a/io_uring/zcrx.h b/io_uring/zcrx.h
+index 33ef61503092..566d519cbaf6 100644
+--- a/io_uring/zcrx.h
++++ b/io_uring/zcrx.h
+@@ -60,6 +60,8 @@ struct io_zcrx_ifq {
+ 	 */
+ 	struct mutex			pp_lock;
+ 	struct io_mapped_region		region;
++
++	refcount_t			refs;
+ };
  
-+void io_lock_two_rings(struct io_ring_ctx *ctx1, struct io_ring_ctx *ctx2);
- int io_register_clone_buffers(struct io_ring_ctx *ctx, void __user *arg);
- int io_sqe_buffers_unregister(struct io_ring_ctx *ctx);
- int io_sqe_buffers_register(struct io_ring_ctx *ctx, void __user *arg,
+ #if defined(CONFIG_IO_URING_ZCRX)
 -- 
 2.47.3
 
