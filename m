@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-232953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F419C0A4D9
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 09:50:53 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FECDC0A4EA
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 09:53:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CFA134E4E45
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 08:50:47 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E14AE349DB6
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 08:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CEAE286408;
-	Sun, 26 Oct 2025 08:50:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021E1285CAD;
+	Sun, 26 Oct 2025 08:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kejM9QgW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eebruFlf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0973611E;
-	Sun, 26 Oct 2025 08:50:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98D81D5154;
+	Sun, 26 Oct 2025 08:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761468643; cv=none; b=JTQ2zC1pleYY7VzBMye2mkVn6trYfVzOIL6kXRNBJbvKxAjMjCugMuNoHyN+pf12ziY4d64+NeX4IkknYA5RHnad53cSzkuyH+9tw/BJEta+sSiFZKfqj0Ddqk8XtT2wmBdcsCSgDHvd7pD+qoVww4QlxlX2sZJQQcb3iOiqpWI=
+	t=1761468798; cv=none; b=Z235p4EL0zbvsiagHF9sFNEPUsetZk/rrjDhzU66K/kppSNsNceat1+IW1wgpVvymE1fm+zqc8FU+/+bY5wY6qwawEqkZsQj4fq5VurgXNqVkgDaxP0hTHy+0rrvF1VDZqUWDYVvkgh+fYCZHiyLIsFVxRqDMiVcIiZaaZsOVbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761468643; c=relaxed/simple;
-	bh=oP9r+izdqj4wtIPWIKwEKuljhS1FCmk4lSnwOX0lRis=;
+	s=arc-20240116; t=1761468798; c=relaxed/simple;
+	bh=ETFWaSzahPsIU/f0IDtZ2cbGfc13FYOQRJh3Ot+xAbI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SBDLAk5qUNckJnbHerJRi4yyVfsGFAlHr6p1mnKLaF+1b7EWYu3eYVdnECOOh7uXklI+kDuXoz5n2/w8q2UlCyDSshdR+N5quqytP6sykWVn6IsX+FlehRtD1sf22JE5Kj+LBwB0docUZKaPIF/+EyXymBBd+zqxQgTIK6Eb4dI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kejM9QgW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FF7FC4CEE7;
-	Sun, 26 Oct 2025 08:50:38 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=rDMbEZ/f1wZ7/JevBdJB9XCR2MUIWs4Nq82uEJnKtFqemj35vjzHJ6N4G9aP9k72IDIhq0xLGnOT8twcpF6OYTW0VFPzdZpgY8hYSSPLJsoYwJXhds9eoDgk7zlhkjJLwuGQ3ER32e1st+Ll1mynA83rRBGQKMCKlOyt5gImGM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eebruFlf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD7C9C4CEE7;
+	Sun, 26 Oct 2025 08:53:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761468642;
-	bh=oP9r+izdqj4wtIPWIKwEKuljhS1FCmk4lSnwOX0lRis=;
+	s=k20201202; t=1761468798;
+	bh=ETFWaSzahPsIU/f0IDtZ2cbGfc13FYOQRJh3Ot+xAbI=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=kejM9QgWHbt2ooSE+OPtoWwWdzmMWHUSzaS2VuKkTxU+ayEbs7nYinD4Vu8gDCo1s
-	 Ql/fy/wmBhfjcL6K2C0/r9QzBSVECa9NwsAaQnaOl0fvRm0CxHQ28DBDSHs7qs9x1e
-	 dae0/LjIErAdajUH55c8SwnpD0K0bUwoOU/7UDz6ADU/RpTdsECjV//1i8A6md2yCK
-	 rrHH17ql6QdAidwdvcRCG+AYw7ndI2VI7sMIwab5Cr/xfhvnlOnG+gjTEWjW5lvAnL
-	 FaE+SckBqcNl1N3b+eY8ba2qvRklGv/Vjctd8vWzLfBv5fiugJgFUe00w9yLSeJ483
-	 /MsjZvvoivJMA==
-Message-ID: <749bdc31-e34d-449b-9ab8-ba542276ee8d@kernel.org>
-Date: Sun, 26 Oct 2025 09:50:36 +0100
+	b=eebruFlfGd6ZRt+naeqmWT15LN4otiyVnoS1OMafAA7mHskCk9n3mdoicK7qGeQx5
+	 013eA5386qeA06t7K9pJXNTKikbEhQ9BxlKG1KE4WKIwG/eYFgtsOKUWxCOTN2BUMG
+	 0aGtVi9fm8qWYYS3VtBthAIhIXg1ZvQgJTiQpS9YQTg+WZgnD56H2Hbj2pjhU34s5o
+	 6UpbNZ6vke378jW8lLB8xwjizSHCy4OthPKCCap3LKz9JioIDpzzDKEcIaVq4GtoXv
+	 uQPRm3T8vx7a2Pqg9qPB8DOBVwL40JH8mep38iV+Qj0VtRrCidUqbbdgt5aPLNonGR
+	 7l1pThwn3e2ig==
+Message-ID: <e6a34c11-4ec8-4b96-ad61-642a4be3eef6@kernel.org>
+Date: Sun, 26 Oct 2025 09:53:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 07/10] dt-bindings: net: altr,socfpga-stmmac: allow
- dma-coherent property
+Subject: Re: [PATCH v5 05/10] dt-bindings: net: altr,socfpga-stmmac: add
+ generic dwxgmac compatible
 To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -67,7 +67,7 @@ Cc: kernel@pengutronix.de, netdev@vger.kernel.org,
  linux-stm32@st-md-mailman.stormreply.com,
  linux-arm-kernel@lists.infradead.org
 References: <20251024-v6-12-topic-socfpga-agilex5-v5-0-4c4a51159eeb@pengutronix.de>
- <20251024-v6-12-topic-socfpga-agilex5-v5-7-4c4a51159eeb@pengutronix.de>
+ <20251024-v6-12-topic-socfpga-agilex5-v5-5-4c4a51159eeb@pengutronix.de>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -113,20 +113,29 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20251024-v6-12-topic-socfpga-agilex5-v5-7-4c4a51159eeb@pengutronix.de>
+In-Reply-To: <20251024-v6-12-topic-socfpga-agilex5-v5-5-4c4a51159eeb@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 24/10/2025 13:49, Steffen Trumtrar wrote:
-> The DMA operations on the SoCFPGA stmmac can be dma-coherent. Add as
-> optional property.
+> Add the more generic "snps,dwxgmac" compatible to the list of
+> compatibles for the agilex5.
 > 
-> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> The snps,dwmac binding explicitly uses the "snps,dwxgmac-2.10",
 
-There is little point in mixing two subsystems in one patchset.
-Especially without marking this net-next how maintainers are supposed to
-take it?
+Hm? No, binding says only dwxgmac-2.10, DTS only dwxgmac-2.10.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> "snps,dwxgmac" combination as example; the stmmac driver only checks on
 
+Example does not matter.
+
+> dwmac and dwxgmac compatibles to decide what kind of gmac it is working
+
+Huh? I clearly see snps,dwxgmac-2.10 in dwmac-generic.c
+
+> with.
+This change really lacks proper rationale.
+
+Best regards,
+Krzysztof
 
