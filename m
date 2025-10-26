@@ -1,141 +1,198 @@
-Return-Path: <netdev+bounces-232954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FECDC0A4EA
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 09:53:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 616D8C0A59D
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 10:45:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E14AE349DB6
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 08:53:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A2F23A9954
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 09:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021E1285CAD;
-	Sun, 26 Oct 2025 08:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A8D35B150;
+	Sun, 26 Oct 2025 09:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eebruFlf"
+	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="rT+dnhsp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98D81D5154;
-	Sun, 26 Oct 2025 08:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D27BA3D;
+	Sun, 26 Oct 2025 09:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761468798; cv=none; b=Z235p4EL0zbvsiagHF9sFNEPUsetZk/rrjDhzU66K/kppSNsNceat1+IW1wgpVvymE1fm+zqc8FU+/+bY5wY6qwawEqkZsQj4fq5VurgXNqVkgDaxP0hTHy+0rrvF1VDZqUWDYVvkgh+fYCZHiyLIsFVxRqDMiVcIiZaaZsOVbo=
+	t=1761471935; cv=none; b=FFU44P0cZscC0ik9/aBEm04XDhGl8xLaAB/o25hma776xULcor1/67BC2ab+RkYuaawdn8GmOw5SoHM/yNwxRFtoToW1L4B6uxTFyGirKbAESRyQ6pvwimuhVP7MMrAJzRABT+cGucBWpQ1utx0upLo4/izpipcvwjobN+NJxyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761468798; c=relaxed/simple;
-	bh=ETFWaSzahPsIU/f0IDtZ2cbGfc13FYOQRJh3Ot+xAbI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rDMbEZ/f1wZ7/JevBdJB9XCR2MUIWs4Nq82uEJnKtFqemj35vjzHJ6N4G9aP9k72IDIhq0xLGnOT8twcpF6OYTW0VFPzdZpgY8hYSSPLJsoYwJXhds9eoDgk7zlhkjJLwuGQ3ER32e1st+Ll1mynA83rRBGQKMCKlOyt5gImGM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eebruFlf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD7C9C4CEE7;
-	Sun, 26 Oct 2025 08:53:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761468798;
-	bh=ETFWaSzahPsIU/f0IDtZ2cbGfc13FYOQRJh3Ot+xAbI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eebruFlfGd6ZRt+naeqmWT15LN4otiyVnoS1OMafAA7mHskCk9n3mdoicK7qGeQx5
-	 013eA5386qeA06t7K9pJXNTKikbEhQ9BxlKG1KE4WKIwG/eYFgtsOKUWxCOTN2BUMG
-	 0aGtVi9fm8qWYYS3VtBthAIhIXg1ZvQgJTiQpS9YQTg+WZgnD56H2Hbj2pjhU34s5o
-	 6UpbNZ6vke378jW8lLB8xwjizSHCy4OthPKCCap3LKz9JioIDpzzDKEcIaVq4GtoXv
-	 uQPRm3T8vx7a2Pqg9qPB8DOBVwL40JH8mep38iV+Qj0VtRrCidUqbbdgt5aPLNonGR
-	 7l1pThwn3e2ig==
-Message-ID: <e6a34c11-4ec8-4b96-ad61-642a4be3eef6@kernel.org>
-Date: Sun, 26 Oct 2025 09:53:11 +0100
+	s=arc-20240116; t=1761471935; c=relaxed/simple;
+	bh=xBnkMbU5LPW/ByA6yBUTuR5R4BJYX1dWFXFSbs1kEY8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=KAw2Glc/qS5lPUZb8lWAuGo+BB8uZNG8bHn4nPBqCtLW+FYzWemKqzvLbCllea3g7M6gjkib5ZJTAFFxaSyXqaRNA5gtbXQ0GiTh+fa9aFWPd/PwVaAEB6sjvFRNO0orsskRiA7RnVAMTL5gS40fYjFtcF1+utZB2q0xgsGzsXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=rT+dnhsp; arc=none smtp.client-ip=206.189.21.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mails.tsinghua.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-Id:In-Reply-To:References:MIME-Version:
+	Content-Transfer-Encoding; bh=9YIt7ruUm8P8zHlzSMb4xWNgs3nRvcOTja
+	H9d6uRHzg=; b=rT+dnhsp5wx2i7ZgOxfME6H54Ud+IuKIQHTXkZKBDHRJThQ7Pc
+	jhpmM29FcgUMj4zxdhm1PrEoKvsv5ADKdSfmSzPVAuaYBfptWtnizlq+a3d+dmN8
+	1eYsYiGNDrq+QlhTSdAvCigwvisDzIjBrfkcqpptGwc3PRl3mxIQq6fAM=
+Received: from estar-Super-Server.. (unknown [103.233.162.254])
+	by web3 (Coremail) with SMTP id ygQGZQBHAtmI7f1oDaI5BQ--.55062S2;
+	Sun, 26 Oct 2025 17:44:57 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: zhaoyz24@mails.tsinghua.edu.cn
+Cc: netdev@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH RESEND v3] net/dccp: validate Reset/Close/CloseReq in DCCP_REQUESTING
+Date: Sun, 26 Oct 2025 17:44:23 +0800
+Message-Id: <20251026094423.941754-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250929062609.3771416-1-zhaoyz24@mails.tsinghua.edu.cn>
+References: <20250929062609.3771416-1-zhaoyz24@mails.tsinghua.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 05/10] dt-bindings: net: altr,socfpga-stmmac: add
- generic dwxgmac compatible
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Dinh Nguyen <dinguyen@kernel.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Matthew Gerlach <matthew.gerlach@altera.com>
-Cc: kernel@pengutronix.de, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20251024-v6-12-topic-socfpga-agilex5-v5-0-4c4a51159eeb@pengutronix.de>
- <20251024-v6-12-topic-socfpga-agilex5-v5-5-4c4a51159eeb@pengutronix.de>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
- QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
- +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
- ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
- 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
- hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
- tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
- 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
- naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
- hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
- whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
- qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
- RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
- Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
- H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
- dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
- AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
- jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
- zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
- XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20251024-v6-12-topic-socfpga-agilex5-v5-5-4c4a51159eeb@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygQGZQBHAtmI7f1oDaI5BQ--.55062S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxAF17tryfJryrAF1DKw1rJFb_yoWrWF4fpF
+	y7KrW5Kr4DJryxtFnayw4kXr15Cr48AryfGFnFqrW8Z3WDZryfu39IkFWjvry5CFZak342
+	g3y2qFZ5Gr47Za7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvq14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+	rcIFxwCY02Avz4vE14v_GFWl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26r1Y6r17MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
+	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0x
+	ZFpf9x0JU4mhwUUUUU=
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQEFAWj67Ia3TAABsG
 
-On 24/10/2025 13:49, Steffen Trumtrar wrote:
-> Add the more generic "snps,dwxgmac" compatible to the list of
-> compatibles for the agilex5.
-> 
-> The snps,dwmac binding explicitly uses the "snps,dwxgmac-2.10",
+This is a resend with a clarified commit message based on earlier feedback.
+The code change is the same; only the description is improved to better
+explain the issue, impact and rationale. I appreciate your time.
 
-Hm? No, binding says only dwxgmac-2.10, DTS only dwxgmac-2.10.
+This patch should be applied to stable versions *only* before Linux 6.16,
+since DCCP implementation is removed in Linux 6.16.
 
-> "snps,dwxgmac" combination as example; the stmmac driver only checks on
+Affected versions include:
+- 3.1-3.19
+- 4.0-4.20
+- 5.0-5.19
+- 6.0-6.15
 
-Example does not matter.
+DCCP sockets in DCCP_REQUESTING state do not check the sequence number
+or acknowledgment number for incoming Reset, CloseReq, and Close packets.
 
-> dwmac and dwxgmac compatibles to decide what kind of gmac it is working
+As a result, an attacker can send a spoofed Reset packet while the client
+is in the requesting state. The client will accept the packet without
+verification and immediately close the connection, causing a denial of
+service (DoS) attack.
 
-Huh? I clearly see snps,dwxgmac-2.10 in dwmac-generic.c
+This patch moves the processing of Reset, Close, and CloseReq packets
+into dccp_rcv_request_sent_state_process() and validates the ack number
+before accepting them.
 
-> with.
-This change really lacks proper rationale.
+We tested it on Ubuntu 24.04 LTS (Linux 6.8) and it worked as expected.
 
-Best regards,
-Krzysztof
+Fixes: c0c2015056d7b ("dccp: Clean up slow-path input processing")
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Cc: stable@vger.kernel.org
+---
+ net/dccp/input.c | 54 ++++++++++++++++++++++++++++--------------------
+ 1 file changed, 32 insertions(+), 22 deletions(-)
+
+diff --git a/net/dccp/input.c b/net/dccp/input.c
+index 2cbb757a8..0b1ffb044 100644
+--- a/net/dccp/input.c
++++ b/net/dccp/input.c
+@@ -397,21 +397,22 @@ static int dccp_rcv_request_sent_state_process(struct sock *sk,
+ 	 *	     / * Response processing continues in Step 10; Reset
+ 	 *		processing continues in Step 9 * /
+ 	*/
++	struct dccp_sock *dp = dccp_sk(sk);
++
++	if (!between48(DCCP_SKB_CB(skb)->dccpd_ack_seq,
++				dp->dccps_awl, dp->dccps_awh)) {
++		dccp_pr_debug("invalid ackno: S.AWL=%llu, "
++					"P.ackno=%llu, S.AWH=%llu\n",
++					(unsigned long long)dp->dccps_awl,
++			(unsigned long long)DCCP_SKB_CB(skb)->dccpd_ack_seq,
++					(unsigned long long)dp->dccps_awh);
++		goto out_invalid_packet;
++	}
++
+ 	if (dh->dccph_type == DCCP_PKT_RESPONSE) {
+ 		const struct inet_connection_sock *icsk = inet_csk(sk);
+-		struct dccp_sock *dp = dccp_sk(sk);
+-		long tstamp = dccp_timestamp();
+-
+-		if (!between48(DCCP_SKB_CB(skb)->dccpd_ack_seq,
+-			       dp->dccps_awl, dp->dccps_awh)) {
+-			dccp_pr_debug("invalid ackno: S.AWL=%llu, "
+-				      "P.ackno=%llu, S.AWH=%llu\n",
+-				      (unsigned long long)dp->dccps_awl,
+-			   (unsigned long long)DCCP_SKB_CB(skb)->dccpd_ack_seq,
+-				      (unsigned long long)dp->dccps_awh);
+-			goto out_invalid_packet;
+-		}
+ 
++		long tstamp = dccp_timestamp();
+ 		/*
+ 		 * If option processing (Step 8) failed, return 1 here so that
+ 		 * dccp_v4_do_rcv() sends a Reset. The Reset code depends on
+@@ -496,6 +497,13 @@ static int dccp_rcv_request_sent_state_process(struct sock *sk,
+ 		}
+ 		dccp_send_ack(sk);
+ 		return -1;
++	} else if (dh->dccph_type == DCCP_PKT_RESET) {
++		dccp_rcv_reset(sk, skb);
++		return 0;
++	} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {
++		return dccp_rcv_closereq(sk, skb);
++	} else if (dh->dccph_type == DCCP_PKT_CLOSE) {
++		return dccp_rcv_close(sk, skb);
+ 	}
+ 
+ out_invalid_packet:
+@@ -658,17 +666,19 @@ int dccp_rcv_state_process(struct sock *sk, struct sk_buff *skb,
+ 	 *		Set TIMEWAIT timer
+ 	 *		Drop packet and return
+ 	 */
+-	if (dh->dccph_type == DCCP_PKT_RESET) {
+-		dccp_rcv_reset(sk, skb);
+-		return 0;
+-	} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {	/* Step 13 */
+-		if (dccp_rcv_closereq(sk, skb))
+-			return 0;
+-		goto discard;
+-	} else if (dh->dccph_type == DCCP_PKT_CLOSE) {		/* Step 14 */
+-		if (dccp_rcv_close(sk, skb))
++	if (sk->sk_state != DCCP_REQUESTING) {
++		if (dh->dccph_type == DCCP_PKT_RESET) {
++			dccp_rcv_reset(sk, skb);
+ 			return 0;
+-		goto discard;
++		} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {	/* Step 13 */
++			if (dccp_rcv_closereq(sk, skb))
++				return 0;
++			goto discard;
++		} else if (dh->dccph_type == DCCP_PKT_CLOSE) {		/* Step 14 */
++			if (dccp_rcv_close(sk, skb))
++				return 0;
++			goto discard;
++		}
+ 	}
+ 
+ 	switch (sk->sk_state) {
+-- 
+2.34.1
+
 
