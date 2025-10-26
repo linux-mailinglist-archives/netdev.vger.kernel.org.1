@@ -1,67 +1,63 @@
-Return-Path: <netdev+bounces-233032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0275C0B79E
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 00:46:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44806C0B7A1
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 00:46:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67D5C3B98C8
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 23:45:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5493B4EDAEA
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 23:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32EFD3016FC;
-	Sun, 26 Oct 2025 23:45:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DBE53016EA;
+	Sun, 26 Oct 2025 23:45:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dHB6KI1b"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9531C3016F6;
-	Sun, 26 Oct 2025 23:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1DF729C33D;
+	Sun, 26 Oct 2025 23:45:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761522300; cv=none; b=egyb4RQkV8SuIjm19M2+zZJaQBnZFDm89NzAWHsADUZuWEYzCdrnY5/NuVhegRutRttxa529fyqdFq7p/GeJAxMtN7oMcyL9Tr+A1qXK5xFUAulh3M/K+6OTfRJJXqvk+7qsDSDCrsIA/ZbyN1viogFTMiPoluEmbRPX96LMAXk=
+	t=1761522338; cv=none; b=TPmnvFZaYuLGheaTqhNPdqr4Bdjtv84YxEJgKhZ8+uY3jJ1tcpC1E8de/9Ah/INNZbfPVc5/jtvCwMMq2DWS1cHwaYX5hpBQGg5pa0ktCsDulbtjJOFHTvx/xc25eDg4GX3toef+W3IFuBGR/VezKxvv4f4ZxMWz6Tsq3FwAjm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761522300; c=relaxed/simple;
-	bh=/Gc4DVTLxO+ZYQjBzSS61HK4SdKf/wbGZG5HJeo73u4=;
+	s=arc-20240116; t=1761522338; c=relaxed/simple;
+	bh=MKUJpePeI/vtRd7eFD066XMq9RN4z0wlVKNuiMPgvvI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mv+V+uKB+ynBs/bu9DArlSmJsHFFT4Dmk88yrhwN5IEZfVAHMDsHO5Kgki2MoSwf3vnxnJe5NDZOLaQ7GsXrTTOtXES1AW6pWcQwSZd7/PBkYAcbkngW2J/EPtA1jkycYEtz9C1BjpV+Bv5VrxgLoj6UHIySOP7DlIIxfCpEQH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vDAPu-000000007dZ-1PGR;
-	Sun, 26 Oct 2025 23:44:54 +0000
-Date: Sun, 26 Oct 2025 23:44:50 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=cfS+HA+NE4ZbhfaA5Ad67zlyCqj1/gcWPhFvDbiqBSer5J3TgJtIYAMoOeLaW9Q6wQ9dh9hwFohipV5W0zrFXNfTtIX2/K3Rug2YlePIo3wIXUTBvK/8oOGmQYPrK5iag+wOSKuZP2wOutppDz+dgfhcay2GArtBsfLKHNy6o90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dHB6KI1b; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=YaOEzrYe7KzWArBLHgosFV2IzuOoDe3pQTN6GaTMAoo=; b=dHB6KI1bRwMYBVJ+J8qHo1TWHD
+	+66h+GtG6dLRDOkUtFnS+E0coZlmhAzlUiHyE8GFFDLkMCX80RMPXms/pnmFYwufMzuphpq6yD0Fo
+	MFYol03n4yNEJKFfoBUIBXHl3FFIh9DWloqnIa0r2qaLRfu309+EfW8MQfYWiYRt/OAM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vDAQB-00C8jB-Sr; Mon, 27 Oct 2025 00:45:11 +0100
+Date: Mon, 27 Oct 2025 00:45:11 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Emanuele Ghidoli <ghidoliemanuele@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v3 05/12] net: dsa: lantiq_gswip: define and use
- GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID
-Message-ID: <78a2743dc2b903b650cc0ff16de8d93cf334b391.1761521845.git.daniel@makrotopia.org>
-References: <cover.1761521845.git.daniel@makrotopia.org>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1] net: phy: dp83867: Disable EEE support as not
+ implemented
+Message-ID: <ae723e7c-f876-45ef-bc41-3b39dc1dc76b@lunn.ch>
+References: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,45 +66,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1761521845.git.daniel@makrotopia.org>
+In-Reply-To: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
 
-When adding FDB entries to the MAC bridge table it is needed to set an
-(undocumented) bit to mark the entry as valid. If this bit isn't set for
-entries in the MAC bridge table, then those entries won't be considered as
-valid MAC addresses.
+> Since the introduction of phylink-managed EEE support in the stmmac driver,
+> EEE is now enabled by default, leading to issues on systems using the
+> DP83867 PHY.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/dsa/lantiq/lantiq_gswip.h        | 1 +
- drivers/net/dsa/lantiq/lantiq_gswip_common.c | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+Did you do a bisect to prove this?
 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
-index 56de869fc472..42000954d842 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.h
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
-@@ -224,6 +224,7 @@
- #define  GSWIP_TABLE_MAC_BRIDGE_KEY3_FID	GENMASK(5, 0)	/* Filtering identifier */
- #define  GSWIP_TABLE_MAC_BRIDGE_VAL0_PORT	GENMASK(7, 4)	/* Port on learned entries */
- #define  GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC	BIT(0)		/* Static, non-aging entry */
-+#define  GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID	BIT(1)		/* Valid bit */
+> Fixes: 2a10154abcb7 ("net: phy: dp83867: Add TI dp83867 phy")
+
+What has this Fixes: tag got to do with phylink?
+
+I hope you have seen Russell is not so happy you claim phylink is to
+blame here...
+
+	Andrew
  
- #define XRX200_GPHY_FW_ALIGN	(16 * 1024)
- 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-index 0ac87eb23bb5..94b187899db6 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-@@ -1149,7 +1149,8 @@ static int gswip_port_fdb(struct dsa_switch *ds, int port,
- 	mac_bridge.key[2] = addr[1] | (addr[0] << 8);
- 	mac_bridge.key[3] = FIELD_PREP(GSWIP_TABLE_MAC_BRIDGE_KEY3_FID, fid);
- 	mac_bridge.val[0] = add ? BIT(port) : 0; /* port map */
--	mac_bridge.val[1] = GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC;
-+	mac_bridge.val[1] = add ? (GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC |
-+				   GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID) : 0;
- 	mac_bridge.valid = add;
- 
- 	err = gswip_pce_table_entry_write(priv, &mac_bridge);
--- 
-2.51.1
 
