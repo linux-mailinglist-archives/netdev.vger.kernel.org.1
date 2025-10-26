@@ -1,164 +1,141 @@
-Return-Path: <netdev+bounces-232951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF10CC0A254
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 05:12:49 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3278FC0A4D0
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 09:50:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 603E83AF6F8
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 04:12:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5ECE84E1272
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 08:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FADD24BBFD;
-	Sun, 26 Oct 2025 04:12:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C0962853E9;
+	Sun, 26 Oct 2025 08:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="FAaDj5JM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mr4GcKvx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FA11D5154
-	for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 04:12:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2106E26E708
+	for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 08:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761451966; cv=none; b=CjDa6ip6Qyoews4eIC7Cnf0l7pSgQyOmz6pmLvLFgv7qOB0dLQt9hGHnoFrY/vRSc7A7L6TYrO7hcfqHZmwICVbU0J8hq6Ya+nraF5J98UwMIOniAPbGKKouRQHGF0/qRciBUpmGit4WJWU8AwDTJPHsgqdLR2KTGkRkJ7X/a/k=
+	t=1761468630; cv=none; b=Sdu9gAMFL4TcK5I4m24s+JiS6ac030RsXllYxu1pjtJ7sUxN2Fq3MSPCIhT3SzNBOhmlskwFUGst6lPcv8P2Q9dsMl3p6QjscDEKaUJ/xb1QBgEQAzu+MkPYaT386Ufuiht8P/F/WEMlA6Y1xhbd+9B5GfeJS3hycpzIDtBcLrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761451966; c=relaxed/simple;
-	bh=2/dZHmhJhlH4MffiFhm3aPFvIGWaDB0g96M31n6qWZo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QgF5tIH12+WkFBEsp1fZ2tGUlDur99L14ImkKtebHEZ3grJu1rgTR3R7QbhBmffXK6yEgnDUXL9+7M4J2XbW7wx1/JmWahwo1MhQPUQfF88luiJn9b1/4v61eZgSb0jcgdeyAMXh6fRw3nT7sJcUTBXAG5sEYXIK1xFZGMuPm7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=FAaDj5JM; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b6ceba7c97eso3258857a12.0
-        for <netdev@vger.kernel.org>; Sat, 25 Oct 2025 21:12:45 -0700 (PDT)
+	s=arc-20240116; t=1761468630; c=relaxed/simple;
+	bh=qUv97I7rJ7EfeUfzdIMw6A9QYkrO8FwT2r0vGFlDE0k=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=pahQS9KX3eJ9Fa3t6ObLtPMz0gtZb67b/TRUeBhNJ9Y1mAJZeQwKHdWa4Mdl2uZWNZuIzA0vh65ihhU4g86kl0pMf/Q8KESIK6PQSlVFzSDfrOcGzX1l2B749vY6TEhZDsiBJ+QkiIcqXO7mpMPCdnr5nOFyW496bkWcIgOniOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mr4GcKvx; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-290b48e09a7so44346285ad.0
+        for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 01:50:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761451964; x=1762056764; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UlWJak6gj08ZQP7zjfQtpMw/7X0ftaT95s6fHCzAXV0=;
-        b=FAaDj5JMHJPxqj4K726ngE18Piv37CoxqfHE+1gTzTtFZh0kmhImGCgLqa6vW0Ao7d
-         noIOqoCnpTDgs8z1za2uXzhMndTNsdaPBcpi9/TiaRLBkqKFsvfmUCjQTxWBJ0JOTjeD
-         X6U4gBcv2+hV5tnl1K/dwjGVWwED5UwtLkoehoC6TW8OcB4kTwKurOWOR9Vv2xHIcCkg
-         3HwLnbDVSVc2VE22gdgcUgMNq+fIK4LicfcmjHeekU5j16EDfa68bXcIgR7rmctelFsA
-         t3Kx6muIzari6wdN/KpLcQx5NS5kUpZpGrTU83weMJg6/ukYkZgK2Yfzef5qhQdMdI7Y
-         LHnA==
+        d=gmail.com; s=20230601; t=1761468628; x=1762073428; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=p4erMBwQ48N3S4QlFMJdE0eCyGlP05V530oLjHStsso=;
+        b=Mr4GcKvx/LAtW1SssMM2PWEumNXy4snQNK6JCJ/s7U0old5m/wLeZPPW1WPbLsK2gp
+         etP6tLgEBBVptpxrIhVPh82Zxy9YQySOWLLf6ybPoezzda3U/uNiS5FHVjAsd8kNPyh0
+         2JK/By4Lhn2mm3+sGD9NQEJieMInCXif/F/QO3GmaIFFvSwItRb6xl+DA1JBqTlKoGwy
+         OmMmOon3TlcGxsaqjVCoBWZNe+hutEoCEfv0jvTOQn3iyHQqzPm21rf3smocNxpdFHEw
+         DN4S2fzQV75unZHQv4FV2uUoJvJy4MukvhhIddleb9p976y2tzrgIDwWEv3Wslbqf3V2
+         MZgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761451964; x=1762056764;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UlWJak6gj08ZQP7zjfQtpMw/7X0ftaT95s6fHCzAXV0=;
-        b=f7EkAfZrOT3hHIZfOL8NrEBlhy2azjPBxkinq8SeXEnM/1D2ye5z9kPBNH2kSlzjQw
-         eXQq/C/SohUqZY9TQXt/+wWzPqF1ZSIFT87w2RFiLmLc4USnOCuLvZFNyFCV1SYml48Q
-         KlOXx/modR9QYMfLy3tzhMJoJuQ9FUShPkaR663jMSsWxcKDa3u7ROrwQeO9PAuKZF8v
-         291gPBg1C+MmQFshRULnO1TIWYIlQXh8ANE9S/A72VuWRga/exDSrzUBSfPZma3Kx0LD
-         f2iX3oG0thF32RgBtQNQZ++VK8mqEFavEPRjBnN5kv4AmEeGC73UY6TAOJqq4IsEstFV
-         MLNw==
-X-Forwarded-Encrypted: i=1; AJvYcCWZm6f0PIADD05Y8VnZqedcpeqjGBGbjx5ZdWSmeOTjDeiU6tCWzSDoKYmC3Ix2FgIM783ZdYk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytFY0JwXJ91Afimnrcm6gi1sOyWxTqW7sCfuvEt75edFZj0Gxu
-	17yxf1Mod2+cM2QX2QYzwigrHEhNWkDNglPx+5a6HOwSZWbN915/rahTx9TVGshJdyz8tXNn0sI
-	tHaB9Ou8=
-X-Gm-Gg: ASbGncvDGzvkBRMI8ojLMeQcRjrvhJR/Ndusmy0Qg0r9M3+Hw0FNIeTpOpG1f7TkLiw
-	Q/F69kTexqfU5MlTp6GexG2siYolX9QWoxzZA1ZNOp46ERSxS77BdgHKjxu3WCoz0oZMAHNIPZu
-	M87gSKJqq0ES57U8kRA1x0mUA5sh19+f1J8+B4+zfurxPfa66zoQVMAW/ruDa/471cMX+kRZ5Pg
-	UXM4olllZ4Q7YiVaZ/LoWkUjNI9iBdB9/1DQFKOhGp+5DXgrxVd3fxH/Xl+XLUI93VDHEj11XGt
-	GDkwWmUVQiOi2uTDeokiZdMMomDS/DcU9vXR9TuTDzScLC7j3xRZCTOjq8JrwAyoQKkXKEfQZVM
-	QPzQ0M3AgxYExHpiOMLmf6yh1FO/O2MBcd5Ls3M3ex7qWNFNMzg4RQJ2G4u23KZMrL/du45O1aS
-	qaqYO67IKus0KJ1P8rJPtPetjLy4hDHGcjCFvb9VeGkiMItQERPw==
-X-Google-Smtp-Source: AGHT+IGB7CshQnduUy0EMlQ3fnGIaKG+LbcCIrjXUUhwz4rAG/fY5wM474RGdgCo8RoqbOh85gVPbA==
-X-Received: by 2002:a17:902:fc4b:b0:267:b0e4:314e with SMTP id d9443c01a7336-290c9cbc851mr382015575ad.23.1761451964538;
-        Sat, 25 Oct 2025 21:12:44 -0700 (PDT)
-Received: from [192.168.86.109] ([136.27.45.11])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498d426e5sm39620705ad.79.2025.10.25.21.12.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Oct 2025 21:12:44 -0700 (PDT)
-Message-ID: <ffdd2619-15d5-4393-87db-7a893f6d1fbf@davidwei.uk>
-Date: Sat, 25 Oct 2025 21:12:43 -0700
+        d=1e100.net; s=20230601; t=1761468628; x=1762073428;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=p4erMBwQ48N3S4QlFMJdE0eCyGlP05V530oLjHStsso=;
+        b=GtOUAQsZckw+JOec6/v8lURWZUUhuKOl/OjZTn7L9ym9t3NtRDdovNy2r+JDCKANCE
+         wWzcaIFhkafvOlIhReghuerywDIGxGyL0P8rGSz6bSAz2djprlT/J4ZU9nV4d4Lg0sKg
+         qdtKo6YUzehJ1o9Z5Lh2zKvf2hhwc6fvASx+gua6H/hBeBlRCv3QmWUqOUSfEGCHDOkn
+         WpzLN0daLpI/8LWAQvE2prapvzcOqZ/pZ3bh1J8IPysr6Ul4Ds5YOgkzkIwrniY3fsl3
+         IJK2bKTiCW5PyA40jhmzv2P9nMRnAXpesPhqH3gP1OXUiJmcdNzBv8GRcs2vIkjYb4uT
+         TioQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXqobI8uhsMkA4DLMm9s4eSnQXwiC+vA44A4UTrXXa1WRYfO/XZcbQcB4Z5byg6JHeiNeQ3bVU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrqJcHlykvBtgLz0bZRw+ncqSgpAfprfqw+kmSBikeW/N1oO0J
+	0JzyQws2lil1DvshpHbYbZ5wSIZt/uBEMdRFyBCIFE9gpTz/ODRv9EtQ
+X-Gm-Gg: ASbGncvLQzaFbtiuMpsJhZXFqQ/s/kXU63tkk2eLAXTtyMljVg9WSbP02a7WDctjwxy
+	qYCwLSaDjLIbA9ZLnjQW7Jlpcobw7L7DoI4LhkG3HC68A09qfMkKuKIaP6+NRD1wFoyVngjtQNt
+	/9OM39Ly9VYxctyQZRBW7k8hbAxLOLruLq9YCMSt4eW2qtvmk5Vltb8JhuCyoDg+FAZL7LBZh3F
+	EUPfulGSof3BDfAYjEyI2r+Vx8cQhNFmdWlXzzGMc1SRribprXd/6KshQ6OSvSE5/Xd1/KSdYp+
+	TYJCfO525Ba7wTbyiT/7o9V2HTQtpufhBKgMbnJP1z6YPM/mFrOUPGujY8OiER2nOMD7mqBMUzg
+	94sHaffSl777EpQ0KjWNgh6xGrFYA2L7mwsrffEsMKO2Oy81OZo1gcbCHiw7ulmUwzmh0wvQDIn
+	rciDsAmZPECWSS+lw=
+X-Google-Smtp-Source: AGHT+IF/m6/+800gB7/6liHmYwj+jJvYjxHcXB/tEA5NbSYwquOHX9mUISDWYTYNNgTYOtc6bmcQGg==
+X-Received: by 2002:a17:902:f689:b0:294:92be:64d4 with SMTP id d9443c01a7336-29492be682cmr90289775ad.18.1761468628250;
+        Sun, 26 Oct 2025 01:50:28 -0700 (PDT)
+Received: from [192.168.0.69] ([159.196.5.243])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498d27541sm44678205ad.61.2025.10.26.01.50.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Oct 2025 01:50:27 -0700 (PDT)
+Message-ID: <d52862c17afab501453c3fbb5167f78d24b1f807.camel@gmail.com>
+Subject: Re: [PATCH net-next v8 1/2] net/tls: support setting the maximum
+ payload size
+From: Wilfred Mallawa <wilfred.opensource@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>,  Simon Horman <horms@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Shuah Khan <shuah@kernel.org>
+Date: Sun, 26 Oct 2025 18:50:19 +1000
+In-Reply-To: <20251024163336.5fba5cd1@kernel.org>
+References: <20251022001937.20155-1-wilfred.opensource@gmail.com>
+		<20251023184404.4dd617f0@kernel.org>
+		<cd557c5b11b04da060f07d3849dc46e7b3625ed1.camel@gmail.com>
+	 <20251024163336.5fba5cd1@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/5] io_uring/zcrx: share an ifq between rings
-To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>
-References: <20251025191504.3024224-1-dw@davidwei.uk>
- <20251025191504.3024224-4-dw@davidwei.uk>
- <f1fa5543-c637-435d-a189-5d942b1c7ebc@kernel.dk>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <f1fa5543-c637-435d-a189-5d942b1c7ebc@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 2025-10-25 16:41, Jens Axboe wrote:
-> On 10/25/25 1:15 PM, David Wei wrote:
->> @@ -541,6 +541,74 @@ struct io_mapped_region *io_zcrx_get_region(struct io_ring_ctx *ctx,
->>   	return ifq ? &ifq->region : NULL;
->>   }
->>   
->> +static int io_proxy_zcrx_ifq(struct io_ring_ctx *ctx,
->> +			     struct io_uring_zcrx_ifq_reg __user *arg,
->> +			     struct io_uring_zcrx_ifq_reg *reg)
->> +{
->> +	struct io_zcrx_ifq *ifq, *src_ifq;
->> +	struct io_ring_ctx *src_ctx;
->> +	struct file *file;
->> +	int src_fd, ret;
->> +	u32 src_id, id;
->> +
->> +	src_fd = reg->if_idx;
->> +	src_id = reg->if_rxq;
->> +
->> +	file = io_uring_register_get_file(src_fd, false);
->> +	if (IS_ERR(file))
->> +		return PTR_ERR(file);
->> +
->> +	src_ctx = file->private_data;
->> +	if (src_ctx == ctx)
->> +		return -EBADFD;
->> +
->> +	mutex_unlock(&ctx->uring_lock);
->> +	io_lock_two_rings(ctx, src_ctx);
->> +
->> +	ret = -EINVAL;
->> +	src_ifq = xa_load(&src_ctx->zcrx_ctxs, src_id);
->> +	if (!src_ifq || src_ifq->proxy)
->> +		goto err_unlock;
->> +
->> +	percpu_ref_get(&src_ctx->refs);
->> +	refcount_inc(&src_ifq->refs);
->> +
->> +	ifq = kzalloc(sizeof(*ifq), GFP_KERNEL);
-> 
-> This still needs a:
-> 
-> 	if (!ifq)
-> 		handle error
-> 
-> addition, like mentioned for v1. Would probably make sense to just
-> assume that everything is honky dory and allocate it upfront/early, and
-> just kill it in the error path. Would probably help remove one of the
-> goto labels.
+On Fri, 2025-10-24 at 16:33 -0700, Jakub Kicinski wrote:
+> On Fri, 24 Oct 2025 12:11:11 +1000 Wilfred Mallawa wrote:
+> > In the previous record_size_limit approach for TLS 1.3, we need to
+> > account for the ContentType byte. Which complicates
+> > get/setsockopt()
+> > and tls_get_info(), where in setsockopt() for TLS 1.3 we need to
+> > subtract 1 to the user provided value and in getsockopt() we need
+> > add 1
+> > to keep the symmetry between the two (similarly in tls_get_info()).
+> > The
+> > underlying assumption was that userspace passes up directly what
+> > the
+> > endpoint specified as the record_size_limit.
+> >=20
+> > With this approach we don't need to worry about it and we can pass
+> > the
+> > responsibility to user-space as documented, which I think makes the
+> > kernel code simpler.
+>=20
+> But we haven't managed to avoid that completely:
+>=20
+> +	if (value < TLS_MIN_RECORD_SIZE_LIM - (tls_13 ? 1 : 0) ||
+>=20
+> I understand the motivation, the kernel code is indeed simpler.
+>=20
+> Last night I read the RFC and then this patch, and it took me like
+> 10min to get all of it straight in my head. Maybe I was tried but
+> I feel like the user space developers will judge us harshly for=20
+> the current uAPI.
 
-Sorry I missed this during the splitting. Will include in v3.
+I am open to reverting this to `record_size_limit` in that case. I
+think the only trade off is just a bit more complexity in the kernel
+side for the additional checks. Does that sound good to you
+Jakub/Sabrina?
 
-> 
->> +	ifq->proxy = src_ifq;
-> 
-> For this, since the ifq is shared and reference counted, why don't they
-> just point at the same memory here? Would avoid having this ->proxy
-> thing and just skipping to that in other spots where the actual
-> io_zcrx_ifq is required?
-> 
-
-I wanted a way to separate src and dst rings, while also decrementing
-refcounts once and only once. I used separate ifq objects to do this,
-but having learnt about xarray marks, I think I can use that instead.
+Regards,
+Wilfred
 
