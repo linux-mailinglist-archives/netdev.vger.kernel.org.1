@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-232976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CE7EC0A972
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 15:20:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD3DBC0A98A
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 15:21:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9333C18A0855
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 14:20:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB0E93B2D77
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 14:19:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82ABF2E92B3;
-	Sun, 26 Oct 2025 14:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD08A2E9EAA;
+	Sun, 26 Oct 2025 14:18:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Jmewu0WS"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="A6dn64r3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97622E2EF9
-	for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 14:18:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3CC2E8E13
+	for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 14:18:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761488332; cv=none; b=ha4pCLnNl6DXOcZnbR1KDfftcRYABx6GEfvEFq/8cmxx1/6cTnmgxxV5Qd6S1vnl+Ukgc3hPeL3K3rznttO4SCK5GE1zhLQAL2aIzTgX7jSrb6POQBqkZai5SQdImnK1w4mZazVRcA9xP7LVcLR65wDbQxdjdajBlN2gyEoO/aI=
+	t=1761488333; cv=none; b=dJLuyRxqMT70zHMW16g5KYvpa7gbkNrrH7epiOVZ/FPBQK3wJSCI95N8110KTxHHY8vsz6lbRABBs8gK5lzbdPoAsW27eloixJ6RXrIPaKVuMhpLV660klKW9WN9ahD2eKS/znvN4D2tHbyNnmxON3Nnm1erV2LGofLxGMLRPz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761488332; c=relaxed/simple;
-	bh=Gak4HRUwBOd2FQnLiXDTXLRpQgivj1vf/nGp3J5rI+w=;
+	s=arc-20240116; t=1761488333; c=relaxed/simple;
+	bh=UhRnZxPKGVuuOuQb5qRk96XqSFF/BCmMMYfjJSYcsHA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=c690h8cECEdwzTuELW7ErUU7kJSbBFcOP+0eS85CLe2d4brhqLGacfIfCcrTBriESUyMsw9HvDDH9FQ02KG9fyqc0XHzKIajS7lWno5jBNyzVjRqB9Pu36TOe7X93CsP6eRY5eVSBQiOvesRnNEbmuIqeF71oxukq/02xiLpHXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Jmewu0WS; arc=none smtp.client-ip=209.85.208.53
+	 In-Reply-To:To:Cc; b=Ng1TIFQT8I9CIpXA+Ecm0KwCF0L+QKtvsrhvlmUmdVFDK10ZuO+PFwZI9Rm1YMwWhkS6RORa94TDvR4/WTETq/bJKHiLA0HsxvwKVY3+aN+w9xj4VgEFfAX4fshgbDsAcYpNBQnvy4ffsqTiGi2fhnuo34sEOWGrwSDUkDS+/Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=A6dn64r3; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-63c3d7e2217so7244205a12.3
-        for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 07:18:50 -0700 (PDT)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b4aed12cea3so378581966b.1
+        for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 07:18:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1761488329; x=1762093129; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1761488330; x=1762093130; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FSYvzngXAX+S+IrAJeNpu+SkdlG3R21JATkFTa33X3I=;
-        b=Jmewu0WSaFA/F7m74l/d4W5oJyVqTrsastsCWQBhevkifAYnZYrlK8C/O5HYZhAaBP
-         7pga/+977XfLPAQtR/QAadHi4mqNtWSSO1tAVKckmVooh/LkZAipU9ETOu2Pmt4wLQ3q
-         WkhpbbZzEJbTcobPEnJypxtZafD1ttX/qSkJ81YQUQaaxnYR0FJMJ2mYdy6MeUhOcHcf
-         bMLHbmk6Kq6jnLgCM9kLWO0WT2IP9ZPIFZMBt0KFAegL/RvkzNu3RPXqCGq9+dkS+MY5
-         YsneHBAG0C1J87wPK1bD8xtXiaa/ezsiBVZYmx6NWOiqYmcYJpZyaOIbMP8tiw9103PR
-         qnyw==
+        bh=cmluj4MnRwKAAu/c6HXjSmgF+5mTcBLf8ktoHdBKxf4=;
+        b=A6dn64r3Mep2XO6irVMroVAFlOa00AbHjUyRS3/05ZrEcdjPpTpkMXlzi/QhCurNog
+         ZmXgZkeu8L67JN1FqKCI6s3WDKepri7+thvssns67uOxxYTH6BIf7ojE/w1cq0Chhv2q
+         kszvxRM3BBDOqKF28A6z4PK+PqBjEZugy+L4UGwaLOUX/LjS55NbzfdxJsQgxVsHtveA
+         IVNwj/0NMLLOcDhYStJqb8Z55S3LFdJmAyfXE9tB5z0CJKVCg3xmT7b7pzyRKGlRHoP0
+         HZITvWWI9sckR5f/+H/eyslQz5EDxQj1iRlMaA/I6JPRkQWJW7+Fm4NXJfNMbEL2C1PV
+         r7RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761488329; x=1762093129;
+        d=1e100.net; s=20230601; t=1761488330; x=1762093130;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FSYvzngXAX+S+IrAJeNpu+SkdlG3R21JATkFTa33X3I=;
-        b=UaTXOodb+tJIibXOloO5t+x8aDg4adIAQNN9fNbU04gs8tTpIwDyJ9m/eHy7QDj+Ug
-         xmlNgBmS23p7sY48SBHVkCWumSrJuxr+eiYk4+EOBb2Y4ItlHDb2q1Kya1E1uqgDXpvT
-         uuTwF/Qli/6QWmbh9SCvmGLflWYFxWQiU7g/JLSnuT/fEcdPLNy/+diEr1a6fFHORT0h
-         br+eXNtknJG/Tmgq8PUezgCmTPxzd5QjZ+K8rcJ+svNb3cNYYxDShAm4Ig95Kqjh/KLD
-         A1jt0h9Em7eOkvdd6OqRrz1x1bMnXSsNTtQzUB7Mj10ucK5U7XRq1gWBbPdDelge9jXY
-         bFnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXxlU2Ms35sJm6Kda9jG9tFdruWx2uCZcqrNxZM+61AzV7dG+vbWUHpYVDBG5/hw/GfpSAOPL8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyc5DcbTVBMWOtXxOy75w32nvTlZKSfOZrGfmUzY6RMPAyuRhdn
-	jnPgKqfCAlZBuV6GtvkiR3GUnQ3jspv3RZOy8vr/Vwc33pN0lE/c8lihpxEDOvBmUFQ=
-X-Gm-Gg: ASbGncsvjMjFiAMr4QCP7JC6w7+i99RHsF47MZ+vWZwreU48W/ARx5dnwdxlwht8ShL
-	bORrmTJiyNji7jeG3Jrwz2Cojd7H2xgi1WEtj0KuF0Ecpjkx0dVFNBFcmJHpYFTWF+qUwDWnpwQ
-	RbLNPieahdgciQipfPT0rXOEAYTZ4/G2XiILdfBmRQD9Sk7T6t32us2Rjkd4+6H9Uoyaq5O2mjg
-	JxHf5uyDSfSRcQ8rSxpM0f/AWY837fCf4b86rMxZ2UsrhAWgfbVmgK/0pL9R79kHzBCZaacq3oD
-	selquBPacXsbha2LLn2HCKbRF+DhgYGlfztfnQdv+CNVPmZc4REyFAZgcBuDN7ZWpOE46M1ndgD
-	1Gy5i02H9vcLwxfVZ0YXUQTgyUL1ay9IMOOfDUeg22ssuX2ztt5ld/rerqoaJOrwVlJA+6oqjBY
-	txqf6+Y4SjDtne9+ZUrY58zEmJfr93Nw0UqBc17nAPjSzV0g==
-X-Google-Smtp-Source: AGHT+IElR+KKTIQUVvqZHLDN1tnFR/WtdI9kHI8UMta06H3SpUZDJM8GEaSmKEppAf94BbKvhvPh3Q==
-X-Received: by 2002:a05:6402:5107:b0:63a:5d3:6a1e with SMTP id 4fb4d7f45d1cf-63e600f2646mr7077995a12.33.1761488329226;
-        Sun, 26 Oct 2025 07:18:49 -0700 (PDT)
+        bh=cmluj4MnRwKAAu/c6HXjSmgF+5mTcBLf8ktoHdBKxf4=;
+        b=brDZVooM19aDgkX0uF5amFHZztZM4S/hRXI77c+dLHLPhwQYe5FEDaVn13HzepQxDu
+         K89FIgS7YqOCl/etfNIOVL+NRSirVP2VpCl9g8b3OdSEnc1M1Yrt3qDsMWTmBLLcoWH0
+         re5dv2i/DZhyVnR5FDJW8EQrvMmpo0gP6zE+IAukopDo4UZZ/jgETf6FPzjxsTVFzqAH
+         yMsYKXzKC+JedmIDaYBQCNP+vU1UoQCB8OE1zfFgJtVEHziWfTUn3RVpLSfK/r9J4lTO
+         qwm6rinApLUtFkl8K5ul7xAWV5BiYEefzrxHZLgFh+y8hAm3DI4auokiv9g8nC4cfqgA
+         JXoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWFDZS3XmM8MkY2CApzvN3O4gomA+2Y8IMHknCeHuYtugr23UbIgnGw/Us67A0LhTBTw/FoVBI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeGNY+Xi4JRkFQeQdkEzBp+eEAreORYUX/9TvKkREcOm45o8pj
+	DXiqaTIByBfmc46sStFRlvQ8IVrMYemH+9dQ6YvUbyHxK9/hU1R6Q9N+PwREMwqls0U=
+X-Gm-Gg: ASbGncsrBwRDPyvtzmu6FUAF8L0VckbbczdtmRnQITx3dPk/6/7DmA10268xHn2j6VX
+	oKblHJyD3DwN695zqjYrFUifB48UZFYlexD7iH7Fk6pfFTXAHA7z8EDmZIzYrlLHqUYgx8ly7mk
+	o1ch2OXjrgdexT+H16EXUdhFd1r3kluqXsHY+W8g1j/ihhTHoSkQr0DYbhtB7tcuzQeN6oNWXFT
+	jqSKR+QdosifvjaaMQo9iJBWZXUrYUyGWoDRRB1ORQuwJZ1zcSC3nbLRNj9EW1Rn1Yunxx6ZDB4
+	RQJOHmuVgKHVPiueaIy+kl8cK0qjrD8M9AlTdJ0B1T9E/TUSjTmvGBzC/qOZF3EVLQXVtLphqne
+	TjF4S6PHgHM9oLOm93Oe1hQQhFUVHYRwHkn7E/cCFveJonbr4zSsLNs/55giX8lvbanvUFmsrO2
+	HwAClivNeiQ0WrEgEWPOf03kWekwbma3Z+J4M70VVAXl9gJA==
+X-Google-Smtp-Source: AGHT+IHYEZUc0PCYiR9LIi0xrC5j1dImYFwuHlOX8FBHT5WMg+2WuwxE9uz5JJggz/6AKHomGQVGBA==
+X-Received: by 2002:a17:906:4fc4:b0:b2e:6b3b:fbe7 with SMTP id a640c23a62f3a-b646ff85d64mr3673013666b.0.1761488330359;
+        Sun, 26 Oct 2025 07:18:50 -0700 (PDT)
 Received: from cloudflare.com (79.184.211.13.ipv4.supernova.orange.pl. [79.184.211.13])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63e7ef9a5cbsm4076717a12.23.2025.10.26.07.18.48
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d853c5c0dsm469046866b.40.2025.10.26.07.18.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Oct 2025 07:18:48 -0700 (PDT)
+        Sun, 26 Oct 2025 07:18:50 -0700 (PDT)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Sun, 26 Oct 2025 15:18:28 +0100
-Subject: [PATCH bpf-next v3 08/16] bpf: Make bpf_skb_change_proto helper
+Date: Sun, 26 Oct 2025 15:18:29 +0100
+Subject: [PATCH bpf-next v3 09/16] bpf: Make bpf_skb_change_head helper
  metadata-safe
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,7 +86,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251026-skb-meta-rx-path-v3-8-37cceebb95d3@cloudflare.com>
+Message-Id: <20251026-skb-meta-rx-path-v3-9-37cceebb95d3@cloudflare.com>
 References: <20251026-skb-meta-rx-path-v3-0-37cceebb95d3@cloudflare.com>
 In-Reply-To: <20251026-skb-meta-rx-path-v3-0-37cceebb95d3@cloudflare.com>
 To: bpf@vger.kernel.org
@@ -105,34 +105,44 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  kernel-team@cloudflare.com
 X-Mailer: b4 0.15-dev-07fe9
 
-bpf_skb_change_proto reuses the same headroom operations as
-bpf_skb_adjust_room, already updated to handle metadata safely.
-
-The remaining step is to ensure that there is sufficient headroom to
-accommodate metadata on skb_push().
+Although bpf_skb_change_head() doesn't move packet data after skb_push(),
+skb metadata still needs to be relocated. Use the dedicated helper to
+handle it.
 
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- net/core/filter.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/core/filter.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/net/core/filter.c b/net/core/filter.c
-index 80a7061102b5..09a094546ddb 100644
+index 09a094546ddb..6d69bf56ab54 100644
 --- a/net/core/filter.c
 +++ b/net/core/filter.c
-@@ -3333,10 +3333,11 @@ static int bpf_skb_net_hdr_pop(struct sk_buff *skb, u32 off, u32 len)
- static int bpf_skb_proto_4_to_6(struct sk_buff *skb)
+@@ -3882,6 +3882,7 @@ static const struct bpf_func_proto sk_skb_change_tail_proto = {
+ static inline int __bpf_skb_change_head(struct sk_buff *skb, u32 head_room,
+ 					u64 flags)
  {
- 	const u32 len_diff = sizeof(struct ipv6hdr) - sizeof(struct iphdr);
 +	const u8 meta_len = skb_metadata_len(skb);
- 	u32 off = skb_mac_header_len(skb);
+ 	u32 max_len = BPF_SKB_MAX_LEN;
+ 	u32 new_len = skb->len + head_room;
  	int ret;
+@@ -3890,7 +3891,7 @@ static inline int __bpf_skb_change_head(struct sk_buff *skb, u32 head_room,
+ 		     new_len < skb->len))
+ 		return -EINVAL;
  
--	ret = skb_cow(skb, len_diff);
-+	ret = skb_cow(skb, meta_len + len_diff);
- 	if (unlikely(ret < 0))
- 		return ret;
- 
+-	ret = skb_cow(skb, head_room);
++	ret = skb_cow(skb, meta_len + head_room);
+ 	if (likely(!ret)) {
+ 		/* Idea for this helper is that we currently only
+ 		 * allow to expand on mac header. This means that
+@@ -3902,6 +3903,7 @@ static inline int __bpf_skb_change_head(struct sk_buff *skb, u32 head_room,
+ 		 * for redirection into L2 device.
+ 		 */
+ 		__skb_push(skb, head_room);
++		skb_postpush_data_move(skb, head_room, 0);
+ 		memset(skb->data, 0, head_room);
+ 		skb_reset_mac_header(skb);
+ 		skb_reset_mac_len(skb);
 
 -- 
 2.43.0
