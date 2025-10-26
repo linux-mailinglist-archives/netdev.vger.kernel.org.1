@@ -1,166 +1,333 @@
-Return-Path: <netdev+bounces-233007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50A07C0AE15
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 17:44:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C07CC0AE4C
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 17:57:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE3B23B4C72
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 16:43:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 154C53B119D
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 16:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1554F2877E7;
-	Sun, 26 Oct 2025 16:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CA723AE62;
+	Sun, 26 Oct 2025 16:57:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DxAXl5sQ"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="rd1eo4i5";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="NNB5cHAJ";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="pWfK26dh";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="SZJx/Y/d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6987124E4A8
-	for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 16:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495DA8F7D
+	for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 16:57:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761497021; cv=none; b=jAi8sU7sM2yAYHuBud5fEhJ8W9es922OZRiHz/WKvjSPWTooLZG2ElSRdff5612ZOVs4oWK6CogOj+uqfZT7zuTL06II1e9bL+NFfexHQYdl3KxVaGs/l7+wymh8+Q5qIfNb4yuGB254FbjD2hfF1REm3BLC1aniV97oEbFxK8o=
+	t=1761497843; cv=none; b=FMleG3g8o3Czp8YFIOxcMN08p2S9qYJwd9wbK7L3dMRStraLkJ0s0VIDJrST3B0WKPoxeVWd2n/wn88ojhQkdWQZLoA8ov01fi2v2sYuf0+IS+aX0w7hiRq5W5S9N3D3VVLDI9KjbS70xT9wxZMKY22Gi/idsrJEhOZbNmHYDMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761497021; c=relaxed/simple;
-	bh=2blCvwW/JNfSePtiQhOpyFAVkiDR84ySlcLJfmQoOvc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=s1h9I64IbMDr8k8b7hw9szJVoH0/XxSVZ8l298Hcz5oj1fZwOS+imNtkOWNjhYyjN/R5wWYwpZFCxb6lgJFe0DR8AVSkz//DLMbW0/xkK4uTwTRoND3K5FXMN5qmxVDGYVyPbRvbnWPq6WNeP2FTERQ4vvB5UejbTJHt/ngOI6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DxAXl5sQ; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-339d7c403b6so3799414a91.2
-        for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 09:43:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761497018; x=1762101818; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jCF061NAS8FhFP3hNpS05moHDGkV+h3U/U3CN5+nY3Y=;
-        b=DxAXl5sQtELRP1vcSZKU/GpY9atRPG/tlMzgWNQqc6HLf0hkZWybnzK7UbPByM98hn
-         Za0+1LO4s9ryppsa1kUqDjYSOxw0yMVtUAQwNo80OkcPKVh6Xmz55KvA0704fhyd4edn
-         dgqFKS4Dj1l/wHvZJqaeMPE054Yc+NqKGL5aefM5iba2iVEbzsUqvxcAthlx76k+ri7f
-         uE1RdSVkJvk8Kq0zgLEnp/rjyBNQQvp7UMmqjYE+LOo6aoIgRpohGWilR9XYq81sy0QS
-         F1WEzUBKhEVM5LCJqcrOD26IWhmOtvRU7/GGDzf28RQV2diUrJrX9ABeMt9rOYSPNL2E
-         wkig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761497018; x=1762101818;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jCF061NAS8FhFP3hNpS05moHDGkV+h3U/U3CN5+nY3Y=;
-        b=N5gF3A5y4WpmMw4hcO9RELh/vNFBYS4yhhHabwE+ciyfnowceQcfYPHb+CUNcNld6r
-         ZOxmQgbpwMZXfTIx5WqkQaPFrKUUWcllTMqORkLxP7SAbvfux6ZaBsU580DaePumiJJH
-         FAJM7wAHjexWNRzGb0I854uGFfSCxkJlPsPgGSQFe3dK1eCuStVIhYib3q7NzqdZEMgc
-         rySnIjd5y2QtVjCUeuksa1AqR1nXAAr9/JLR3dQnqCyog3dQAUhpDWVINsG/3d6kti1g
-         U7qVO9B3Ow7bpt6n2v5+gU9hp4KkWF9wdZyU/0trDIOmISG36nj43VdgNZdbaeDE31l6
-         +Kow==
-X-Forwarded-Encrypted: i=1; AJvYcCW8L5YNbIhQ+k67ibZsCBdRjEUIUtuyaM6k2phtWPX1NBOUCMt+5ujcZnmeRxiKMunduQ8weXM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiezCgZQHjjg9pbUGG6s2Hq9Sy6mJK67utCPn6nO6jqE1blkhQ
-	qRm1s0mzMDPUybuPUfmVI1DMHVpK7yMjVYP+8FF9GtjrSlQbsj6RZ8rI
-X-Gm-Gg: ASbGncu/2zaO28ggjNf6FUIpVSsBCTygs8ei2yfY/JjBn4ziNZ3OeuQGA/JH/sPUroe
-	3TwKsSfd13eII1kngVBsN0vp+m7qxNTbK62aq6KQSsjPkYQF6kFsKIwJK7mfMgI+B2WfSVWDnL8
-	my5Bywy74vG9fqFhEFac/YRzZ89GdS25rtlPy+DLtPlErCpGpQuwPDs8bwOLrOPdZ7Bo9DJ73kx
-	HQKnYjTKBqowf0XRIGmL7UWyfQWy5cak21wWCr1OwRkkXuO9eLnjpUG/A8kXQfnu/9zt6xZKY7b
-	qsDJW+83/FId5gLJygSOqeZV5rNXiQOvd7ZA6+jL7AJjcoT91eLjT1LNGhRu9p2VolaIB255oa0
-	QQnJdoxciEiK5HyhFLCP0P6ceUfcM/nls/ADA0o2a03s7f+SQCzpw7NYigEVLvBglowR+ikvP/A
-	N8VLOEvIG4Hactx20HE3QUzBjKziSIJzeFn4Rr8pyqJE8=
-X-Google-Smtp-Source: AGHT+IFf+qjeyS6hjsC0nfYxfHIiI+ppqXHvuLXgsxBumfjvvdYcGEtHm3eqB+rkAU1cSh6c7pSxUA==
-X-Received: by 2002:a17:903:2446:b0:290:6b30:fb3 with SMTP id d9443c01a7336-2948b97658bmr102681155ad.16.1761497017589;
-        Sun, 26 Oct 2025 09:43:37 -0700 (PDT)
-Received: from localhost.localdomain ([124.77.218.104])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-33fee8014f6sm2961731a91.0.2025.10.26.09.43.32
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 26 Oct 2025 09:43:37 -0700 (PDT)
-From: Miaoqian Lin <linmq006@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Xu Yang <xu.yang_2@nxp.com>,
-	Yuichiro Tsuji <yuichtsu@amazon.com>,
-	Max Schulze <max.schulze@online.de>,
-	=?UTF-8?q?Krzysztof=20Ha=C5=82asa?= <khalasa@piap.pl>,
-	David Hollis <dhollis@davehollis.com>,
-	Greg Kroah-Hartman <gregkh@suse.de>,
-	David Brownell <david-b@pacbell.net>,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: linmq006@gmail.com,
-	stable@vger.kernel.org
-Subject: [PATCH v2] net: usb: asix_devices: Check return value of usbnet_get_endpoints
-Date: Mon, 27 Oct 2025 00:43:16 +0800
-Message-Id: <20251026164318.57624-1-linmq006@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1761497843; c=relaxed/simple;
+	bh=3EUdY8Qy5tGBvj561GdZlfhm8BLI+Lnb8J62UNYQkCs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I6WENw334d1BpZnAJ4sOBNGHKKfdOYV3IbTzsXaQ7NreRabq0/s1yhingBq5fXMqZYJycozeYvUtDkB1G3fnywAc8CbrMqHOKFeKxkBO0fkTgRVNFcx+WRG7LtSKzR2y3SYFeaPTbzqCdiHHFZOmFJ7X6Tcks66EYsk/6UW2F8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=rd1eo4i5; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=NNB5cHAJ; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=pWfK26dh; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=SZJx/Y/d; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from lion.mk-sys.cz (unknown [10.100.225.114])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id DE910218D5;
+	Sun, 26 Oct 2025 16:57:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1761497833; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8kB/rs8X+HMHLL3O/JfwK3tkyxOMmnVN17ubjZsEEQo=;
+	b=rd1eo4i56Vn7QQCOgnWbOvoDcLiP8JfFnOtgSC+6hWp+aX1EeLKPRmpykdjXlp8ZYv2FyT
+	S45u6tzEnyXGA4IciUcVaAqOpN2YkJVS5Y3B+ApgfQa1d1uBGVAUKqmMVvQ9+bcnHd83Ix
+	EGJ3yC8JCLhD7VNI6whUW1X94Kz3q58=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1761497833;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8kB/rs8X+HMHLL3O/JfwK3tkyxOMmnVN17ubjZsEEQo=;
+	b=NNB5cHAJOpCCl2ghvhcOtrGBeC0LN9vPSEcJR//XJ3A+ofupqu4cGJSUmVITv5rJf8G/cv
+	QTTUzunmNN4FuDDA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1761497832; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8kB/rs8X+HMHLL3O/JfwK3tkyxOMmnVN17ubjZsEEQo=;
+	b=pWfK26dhY9M3oVibKEqt/4CtF2QBjciVyomOV7dLDEq9TBIm7mUvwx/3qAKAW+PsBf0E7c
+	9WdFKslw1n9yktGoqOPSvqyM04sj9LB5OXlMr/brkV7nUe2idkadcBgT59QG+LYsXtfUJr
+	/ptX2dLhajUwo5OzbD3f/ZiXYNm59Us=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1761497832;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8kB/rs8X+HMHLL3O/JfwK3tkyxOMmnVN17ubjZsEEQo=;
+	b=SZJx/Y/ds8VLJB3SyDQL7B04hDV/3fLfPtnYWyoNFzHcqHIVKe1nlz5FodLfPuIt4bUdEj
+	qT2vqD6kE+/DmMBQ==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id AEA3020057; Sun, 26 Oct 2025 17:57:12 +0100 (CET)
+Date: Sun, 26 Oct 2025 17:57:12 +0100
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Kory Maincent <kory.maincent@bootlin.com>
+Subject: Re: [PATCH ethtool-next] netlink: tsconfig: add HW time stamping
+ configuration
+Message-ID: <5w25bm7gnbrq4cwtefmunmcylqav524roamuvoz2zv5piadpek@4vpzw533uuyd>
+References: <20251004202715.9238-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="4v4jjwtlcvn5wfhr"
+Content-Disposition: inline
+In-Reply-To: <20251004202715.9238-1-vadim.fedorenko@linux.dev>
+X-Spamd-Result: default: False [-5.77 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SIGNED_PGP(-2.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	NEURAL_HAM_SHORT(-0.07)[-0.348];
+	RCVD_COUNT_ONE(0.00)[1];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ARC_NA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_EQ_ENVFROM(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email]
+X-Spam-Flag: NO
+X-Spam-Score: -5.77
+X-Spam-Level: 
 
-The code did not check the return value of usbnet_get_endpoints.
-Add checks and return the error if it fails to transfer the error.
 
-Found via static anlaysis and this is similar to
-commit 07161b2416f7 ("sr9800: Add check for usbnet_get_endpoints").
+--4v4jjwtlcvn5wfhr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Fixes: 933a27d39e0e ("USB: asix - Add AX88178 support and many other changes")
-Fixes: 2e55cc7210fe ("[PATCH] USB: usbnet (3/9) module for ASIX Ethernet adapters")
-Cc: stable@vger.kernel.org
-Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
----
-- v1:http://lore.kernel.org/all/20250830103743.2118777-1-linmq006@gmail.com
-changes in v2:
-- fix the blank line.
-- update message to clarify how this is detected
-- add Cc: stable
----
- drivers/net/usb/asix_devices.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+On Sat, Oct 04, 2025 at 08:27:15PM GMT, Vadim Fedorenko wrote:
+> The kernel supports configuring HW time stamping modes via netlink
+> messages, but previous implementation added support for HW time stamping
+> source configuration. Add support to configure TX/RX time stamping.
+>=20
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
-diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-index 85bd5d845409..232bbd79a4de 100644
---- a/drivers/net/usb/asix_devices.c
-+++ b/drivers/net/usb/asix_devices.c
-@@ -230,7 +230,9 @@ static int ax88172_bind(struct usbnet *dev, struct usb_interface *intf)
- 	int i;
- 	unsigned long gpio_bits = dev->driver_info->data;
- 
--	usbnet_get_endpoints(dev,intf);
-+	ret = usbnet_get_endpoints(dev, intf);
-+	if (ret)
-+		goto out;
- 
- 	/* Toggle the GPIOs in a manufacturer/model specific way */
- 	for (i = 2; i >= 0; i--) {
-@@ -848,7 +850,9 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
- 
- 	dev->driver_priv = priv;
- 
--	usbnet_get_endpoints(dev, intf);
-+	ret = usbnet_get_endpoints(dev, intf);
-+	if (ret)
-+		return ret;
- 
- 	/* Maybe the boot loader passed the MAC address via device tree */
- 	if (!eth_platform_get_mac_address(&dev->udev->dev, buf)) {
-@@ -1281,7 +1285,9 @@ static int ax88178_bind(struct usbnet *dev, struct usb_interface *intf)
- 	int ret;
- 	u8 buf[ETH_ALEN] = {0};
- 
--	usbnet_get_endpoints(dev,intf);
-+	ret = usbnet_get_endpoints(dev, intf);
-+	if (ret)
-+		return ret;
- 
- 	/* Get the MAC address */
- 	ret = asix_read_cmd(dev, AX_CMD_READ_NODE_ID, 0, 0, ETH_ALEN, buf, 0);
--- 
-2.39.5 (Apple Git-154)
+As far as I can see, you only allow one bit to be set in each of=20
+ETHTOOL_A_TSCONFIG_TX_TYPES and ETHTOOL_A_TSCONFIG_RX_FILTERS. If only
+one bit is supposed to be set, why are they passed as bitmaps?
+(The netlink interface only mirrors what (read-only) ioctl interface
+did.)
 
+Michal
+
+> ---
+>  ethtool.8.in       | 12 ++++++-
+>  ethtool.c          |  1 +
+>  netlink/tsconfig.c | 78 +++++++++++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 89 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/ethtool.8.in b/ethtool.8.in
+> index 553592b..e9eb2d7 100644
+> --- a/ethtool.8.in
+> +++ b/ethtool.8.in
+> @@ -357,6 +357,10 @@ ethtool \- query or control network driver and hardw=
+are settings
+>  .IR N
+>  .BI qualifier
+>  .IR precise|approx ]
+> +.RB [ tx
+> +.IR TX-TYPE ]
+> +.RB [ rx-filter
+> +.IR RX-FILTER ]
+>  .HP
+>  .B ethtool \-x|\-\-show\-rxfh\-indir|\-\-show\-rxfh
+>  .I devname
+> @@ -1286,7 +1290,7 @@ for IEEE 1588 quality and "approx" is for NICs DMA =
+point.
+>  Show the selected time stamping PTP hardware clock configuration.
+>  .TP
+>  .B \-\-set\-hwtimestamp\-cfg
+> -Select the device's time stamping PTP hardware clock.
+> +Sets the device's time stamping PTP hardware clock configuration.
+>  .RS 4
+>  .TP
+>  .BI index \ N
+> @@ -1295,6 +1299,12 @@ Index of the ptp hardware clock
+>  .BI qualifier \ precise | approx
+>  Qualifier of the ptp hardware clock. Mainly "precise" the default one is
+>  for IEEE 1588 quality and "approx" is for NICs DMA point.
+> +.TP
+> +.BI tx \ TX-TYPE
+> +Type of TX time stamping to configure
+> +.TP
+> +.BI rx-filter \ RX-FILTER
+> +Type of RX time stamping filter to configure
+>  .RE
+>  .TP
+>  .B \-x \-\-show\-rxfh\-indir \-\-show\-rxfh
+> diff --git a/ethtool.c b/ethtool.c
+> index 948d551..2e03b74 100644
+> --- a/ethtool.c
+> +++ b/ethtool.c
+> @@ -6063,6 +6063,7 @@ static const struct option args[] =3D {
+>  		.nlfunc	=3D nl_stsconfig,
+>  		.help	=3D "Select hardware time stamping",
+>  		.xhelp	=3D "		[ index N qualifier precise|approx ]\n"
+> +			  "		[ tx TX-TYPE ] [ rx-filter RX-FILTER ]\n"
+>  	},
+>  	{
+>  		.opts	=3D "-x|--show-rxfh-indir|--show-rxfh",
+> diff --git a/netlink/tsconfig.c b/netlink/tsconfig.c
+> index d427c7b..7dee4d1 100644
+> --- a/netlink/tsconfig.c
+> +++ b/netlink/tsconfig.c
+> @@ -17,6 +17,7 @@
+>  #include "netlink.h"
+>  #include "bitset.h"
+>  #include "parser.h"
+> +#include "strset.h"
+>  #include "ts.h"
+> =20
+>  /* TSCONFIG_GET */
+> @@ -94,6 +95,67 @@ int nl_gtsconfig(struct cmd_context *ctx)
+> =20
+>  /* TSCONFIG_SET */
+> =20
+> +int tsconfig_txrx_parser(struct nl_context *nlctx, uint16_t type,
+> +			 const void *data __maybe_unused,
+> +			 struct nl_msg_buff *msgbuff,
+> +			 void *dest __maybe_unused)
+> +{
+> +	const struct stringset *values;
+> +	const char *arg =3D *nlctx->argp;
+> +	unsigned int count, i;
+> +
+> +	nlctx->argp++;
+> +	nlctx->argc--;
+> +	if (netlink_init_ethnl2_socket(nlctx) < 0)
+> +		return -EIO;
+> +
+> +	switch (type) {
+> +	case ETHTOOL_A_TSCONFIG_TX_TYPES:
+> +		values =3D global_stringset(ETH_SS_TS_TX_TYPES, nlctx->ethnl2_socket);
+> +		break;
+> +	case ETHTOOL_A_TSCONFIG_RX_FILTERS:
+> +		values =3D global_stringset(ETH_SS_TS_RX_FILTERS, nlctx->ethnl2_socket=
+);
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	count =3D get_count(values);
+> +	for (i =3D 0; i < count; i++) {
+> +		const char *name =3D get_string(values, i);
+> +
+> +		if (!strcmp(name, arg))
+> +			break;
+> +	}
+> +
+> +	if (i !=3D count) {
+> +		struct nlattr *bits_attr, *bit_attr;
+> +
+> +		if (ethnla_put_flag(msgbuff, ETHTOOL_A_BITSET_NOMASK, true))
+> +			return -EMSGSIZE;
+> +
+> +		bits_attr =3D ethnla_nest_start(msgbuff, ETHTOOL_A_BITSET_BITS);
+> +		if (!bits_attr)
+> +			return -EMSGSIZE;
+> +
+> +		bit_attr =3D ethnla_nest_start(msgbuff, ETHTOOL_A_BITSET_BITS_BIT);
+> +		if (!bit_attr) {
+> +			ethnla_nest_cancel(msgbuff, bits_attr);
+> +			return -EMSGSIZE;
+> +		}
+> +		if (ethnla_put_u32(msgbuff, ETHTOOL_A_BITSET_BIT_INDEX, i) ||
+> +		    ethnla_put_flag(msgbuff, ETHTOOL_A_BITSET_BIT_VALUE, true)) {
+> +			ethnla_nest_cancel(msgbuff, bits_attr);
+> +			ethnla_nest_cancel(msgbuff, bit_attr);
+> +			return -EMSGSIZE;
+> +		}
+> +		mnl_attr_nest_end(msgbuff->nlhdr, bit_attr);
+> +		mnl_attr_nest_end(msgbuff->nlhdr, bits_attr);
+> +		return 0;
+> +	}
+> +	return -EINVAL;
+> +}
+> +
+>  static const struct param_parser stsconfig_params[] =3D {
+>  	{
+>  		.arg		=3D "index",
+> @@ -109,6 +171,20 @@ static const struct param_parser stsconfig_params[] =
+=3D {
+>  		.handler	=3D tsinfo_qualifier_parser,
+>  		.min_argc	=3D 1,
+>  	},
+> +	{
+> +		.arg		=3D "tx",
+> +		.type		=3D ETHTOOL_A_TSCONFIG_TX_TYPES,
+> +		.handler	=3D tsconfig_txrx_parser,
+> +		.group		=3D ETHTOOL_A_TSCONFIG_TX_TYPES,
+> +		.min_argc	=3D 1,
+> +	},
+> +	{
+> +		.arg		=3D "rx-filter",
+> +		.type		=3D ETHTOOL_A_TSCONFIG_RX_FILTERS,
+> +		.handler	=3D tsconfig_txrx_parser,
+> +		.group		=3D ETHTOOL_A_TSCONFIG_RX_FILTERS,
+> +		.min_argc	=3D 1,
+> +	},
+>  	{}
+>  };
+> =20
+> @@ -134,7 +210,7 @@ int nl_stsconfig(struct cmd_context *ctx)
+>  	if (ret < 0)
+>  		return ret;
+>  	if (ethnla_fill_header(msgbuff, ETHTOOL_A_TSCONFIG_HEADER,
+> -			       ctx->devname, 0))
+> +			       ctx->devname, ETHTOOL_FLAG_COMPACT_BITSETS))
+>  		return -EMSGSIZE;
+> =20
+>  	ret =3D nl_parser(nlctx, stsconfig_params, NULL, PARSER_GROUP_NEST, NUL=
+L);
+> --=20
+> 2.47.3
+>=20
+
+--4v4jjwtlcvn5wfhr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEyBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmj+UuQACgkQ538sG/LR
+dpVnqQf0CEPfvFWqTwabf/XW8myPwzlrM5p/jxbFxz0HfuKJGO34BUS5RYIAim9/
+6OZ2MXJdA1yhiXB/ePEEgnKhQWVW4Uwei4DU4SX7uwMyV6sNPdqOwjGxJlmtF53s
+z8pYBfvsrgWFQ65P3Jylmv5WvG6wHMaNbcZRd4QLjK+T3RQ1IpeyWDw+EonTGslV
+hJb3NPZFNzv8O9oEx6axebyQvAMJpTi06BIU5NgkCvnuaGQ51ZlEzY11s7xEQKT/
+YNzQCxAP/JLyFqcfRRgeZOWQpvJ5Jf403GLAQCvLBHlH7x5qaDVe2ePmKWJ1Tgwj
+EZl9XFpKnKUxrXhWjj8Mtisw7Vn3
+=c/X+
+-----END PGP SIGNATURE-----
+
+--4v4jjwtlcvn5wfhr--
 
