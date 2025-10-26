@@ -1,132 +1,179 @@
-Return-Path: <netdev+bounces-232987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3104C0ABDD
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 16:07:03 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C113DC0ABEB
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 16:10:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A4A444E9138
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 15:07:01 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 387F8349659
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 15:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23C522222A0;
-	Sun, 26 Oct 2025 15:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 274332248A8;
+	Sun, 26 Oct 2025 15:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="rQevN++t"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="IxVWALNu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A0D1FC0EF
-	for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 15:06:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7132D19539F;
+	Sun, 26 Oct 2025 15:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761491219; cv=none; b=U2Df7cUAYVkytzXx/h8VThAP6seu+wQy9OYSjtGkVfAjNF+jOsAPLftOa6B0HFjLA7hBbKEzhhvUDx/pfT4odpxD2uLK8K48p78XlBNUM5tik1+rrnv7vo9C76ewnnGjNEQ8UrZZ5Ov6JunS8NlDfz+BYiOVQhgVxPicsrW8Byw=
+	t=1761491413; cv=none; b=p/ZvEKzvceWyoYhpIfw/Na8ANx91alQjmzglNXFk33Rw7zyH6VH+qqc8q9qgN5RrhH89iJ8hu/+mrg01jdMpYUjQ4RTbKOKZRaiRPKi7ev//eCvX31bAxzvAyWN8mlVDOiOWn9KBR/alt/e9OrPPJ5p6xTHk756YAMnWwLxt5zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761491219; c=relaxed/simple;
-	bh=5GGMRkSI4d8+tD4TA6r4LveMpYENo9Im+iO54sNr+iw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z7lcW6drzjrjx3EnxVd8o1J2dfzJP5FwaqepWoOEtX+taxppf9kbnxDTFw9nPZSil9hLhgQegJhFv8SiAG3Ul6vww4Q5DMgDBwb+a+3IiKNJ/hAz++ZSJyuEyZYP/Idvt5bhUDGelxN6FZv/8wA34KljNC2KsvDRcjDwSFUlJBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=rQevN++t; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-33be037cf73so3943179a91.2
-        for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 08:06:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761491217; x=1762096017; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Bejr6fb3023EKDlNvUJHi45ybr5AGE7VVK5YDyAbObE=;
-        b=rQevN++twTVK1p4Y/L330Ovy8L1HuDVekPXADMruRyuplStEsl0lR2no555DdYorVY
-         cP+a4UnAP6TBokx24yZ7mnn9v5EUFYO43Nh140ZUpUaVwQU+dciuWfX9L/7TI0W21Ue4
-         7n2GlOLt/WIMre5ytZvLbgdIUN7kIPx8o5RUW0SVaLcbKyMvnVMsO2LpxKQzv41bGbwl
-         dfF/tPfUkU5Mn3nEvKXqQWOCt5B9XLhESKLqKv7zDHM0stlg9SlCzDW3Y0eCj853ADH0
-         7b8SUjs8nUFmSPaBA9SG35nUGHHXx2wI1VmVxfoWLHtR6G47yX1gIax/IIzNoQV9JV8A
-         iZSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761491217; x=1762096017;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bejr6fb3023EKDlNvUJHi45ybr5AGE7VVK5YDyAbObE=;
-        b=GhsM2G/nI789fve881AVIV9KnQQibytni80ck06caMMP42+xJCOllioZr+aS7eV3BE
-         bnPfltKejN7j+/5ed0qJpu3wX3WudORnJdsytdoWQ91crAjjHvOqtUTWvd7QdKAjLHvS
-         t/1BJeluXzX7sy1jyxvlmdNqjcFCU9O+GCMr+zSHL/eVnOsp3McuHcfnAlZtzJxNAv6g
-         OgKpGbcdzmMX57Pxlw3koKL3HZ+UJj71MVwf1ejdukfSq52zGbwKWYUCrXpXamVeQ+4W
-         eZJseZ5/CmSN1CdYlWa5iYKoAiM+dOIImzB82F663E+o/t/Yf4ksGm5EVypDURTnVzWt
-         Js9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUWFWwD4WxYmt5FpwhjU0HJXADQ9Lx/yE/GBU/K463B3XK9gD2WaF5YTSK1WxOCu8aOvd4KSjo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKdjf+ixStv/2OixfnPJE/LznoR8DmbYFSEq1rvl5IeWUpnh7Y
-	x8HRvOwGUthGjODhs2yaQwhWFIzICIRaCO7dkvOm/VRVUa9Q/NDa9ScUiz5PvinhwGE=
-X-Gm-Gg: ASbGncvVaJjHvYzqheMT6iC/Q6Jroz0FSm/eqb3rro398h+mXlb2VFPOm5FVp10cKvi
-	0coms+aYm82e9mOUTmiugT86jOfHo48vk7CXsgyC90GtPbcqjmF3WdFzjeCU/U1pktt5q1na3Sd
-	fsW3O+7ikH2+Dz2iHbGjUztvrXAIchHfoXjKYpnN4QQnhXATxppdgpcf6je/qX79s2tyZqKRFuX
-	0GkH/vVAX7FshNkKaeIWc5vkyJkaNOIJ07NaPVCoo/Fm4LKYanprUVeJ02iG5VlS0tP3kf3XPqv
-	DP3MuxmtsKAJOzcuq+V/aAs5LOzRkxIrHQmOEgTJHHNfc626zXR4AMfT7F2C1dAar/0uLh5adwL
-	lZ0fdQ3kEIr0uvTMpKuslfoiFQ+1aPvlIVKRaV8gcJ7lfNI3PD5PQDGvAh2tWLfOaTv34EBykSL
-	E0BxSQFNjkN1kZGfrpIvwdm6GWNMnqrKqINTm0XTc=
-X-Google-Smtp-Source: AGHT+IGSuYMw+4qbYl+40pf0ckK/243HZTwuCGugNqPM4I8wLgPesKwVZp1Pad0qkipjtPwGM8UElg==
-X-Received: by 2002:a17:90b:1d88:b0:32b:df0e:9283 with SMTP id 98e67ed59e1d1-33bcf90e86cmr44489521a91.34.1761491216967;
-        Sun, 26 Oct 2025 08:06:56 -0700 (PDT)
-Received: from [192.168.86.109] ([136.27.45.11])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33fed8178d5sm5502198a91.18.2025.10.26.08.06.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Oct 2025 08:06:56 -0700 (PDT)
-Message-ID: <fdf328c5-c933-4b9c-a683-c910c6fc16a4@davidwei.uk>
-Date: Sun, 26 Oct 2025 08:06:55 -0700
+	s=arc-20240116; t=1761491413; c=relaxed/simple;
+	bh=KH1ox9mHfRvUW3ky2/6vb4uyW86DfQGq2VDJQBj/j5s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=p1iNnq9oLV3jNLxhtZWLYkBJ5F3TJr4eoF9deoZXQjxnLtwKgGJS97WvremmLpRTzgo88wg7aInS9nr+eOfnRcFSRU0gudMCrAys0Kp820j6xPBsAj2xT8Jh5Z6DvpWir0rGE9yY96HD/v5lODpFLd5ZVf0m14ypi9F6kb9t4bE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=IxVWALNu; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59QDWx8Z3735070;
+	Sun, 26 Oct 2025 08:09:58 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=Ne2GRUkpOKNzTyqpYWnsKU2
+	nvGFP1B9RF9QeWQenQPY=; b=IxVWALNus2JvhhAPIeLft6wPg3W3njWas2Gu1Af
+	0xAjd42s/7Zg1QLmWJzg8XekMqP6XlbjGKuOPWtuO0wrD3gIpiyX7H193giMqbPr
+	Z70RzZRaZFVqEI0kYyQuyRF9FxsySg9ZgPGKW9VQDSBgeHedkfDCXPI50CN+z6aJ
+	XLm/PJs93RHj511zMdSe+0YV+7Jzb77xMAh5jpKKs2zwUesmiVzmTuHo2VSGfuwB
+	uYhIouDer7ejU76xx1c9e9EtxB+uSoo8pHQe5/i1z5gjSMgQyQrZRt+/Oop4hzpV
+	0kbD3vNWD8Vc5sjDwybHzxS1vUaGUgisvQMaqjx6FV3++6A==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4a1fa5rfw2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 26 Oct 2025 08:09:57 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Sun, 26 Oct 2025 08:10:07 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Sun, 26 Oct 2025 08:10:07 -0700
+Received: from optiplex.marvell.com (unknown [10.28.34.253])
+	by maili.marvell.com (Postfix) with ESMTP id 4B5763F70B4;
+	Sun, 26 Oct 2025 08:09:54 -0700 (PDT)
+From: Tanmay Jagdale <tanmay@marvell.com>
+To: <davem@davemloft.net>, <horms@kernel.org>, <leon@kernel.org>,
+        <herbert@gondor.apana.org.au>, <bbhushan2@marvell.com>,
+        <sgoutham@marvell.com>
+CC: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
+        Tanmay Jagdale
+	<tanmay@marvell.com>
+Subject: [PATCH net-next v5 00/15] Enable Inbound IPsec offload on Marvell CN10K SoC
+Date: Sun, 26 Oct 2025 20:38:55 +0530
+Message-ID: <20251026150916.352061-1-tanmay@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/5] io_uring/zcrx: share an ifq between rings
-To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>
-References: <20251025191504.3024224-1-dw@davidwei.uk>
- <20251025191504.3024224-4-dw@davidwei.uk>
- <f1fa5543-c637-435d-a189-5d942b1c7ebc@kernel.dk>
- <ffdd2619-15d5-4393-87db-7a893f6d1fbf@davidwei.uk>
- <3a7a2318-09fb-41d2-9ba1-9d60c7e417a6@kernel.dk>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <3a7a2318-09fb-41d2-9ba1-9d60c7e417a6@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI2MDE0NSBTYWx0ZWRfX60Ch/FymfVTC
+ Q3x5h65R1nCaaEoc6NNAaq2D/sYUiubv8AT+EFUpFjzFK0D9n5eqdqCtjZZqtht9P8JTEF9cLkq
+ 3tvPFPfbMOrW2TQaXGk/XJRykdnQeQt4IjI4EtHGJ84GZN4XAizD1Yvgn+Ja+YLW+ko/x3kd2c1
+ p+qEK99oMVKC//GjoEXgV8e9se0ZR+zNrF56sHDRGazgabYHtNtol08DfvUc+vFnh2slfz2FHpq
+ STWI8B5k5uRVCvJzP0+5c+/Kj8mXFZXH+CC8OtBz+R7DTM6iEE4N9kX2atVDffj2cdh2SbepV1g
+ 83GA00iwHs6mdRs7BgvVTz4UKghfOaHHu+Xzp0g1zK47UQO72cORXPxhfyLf5S1HMfAYJWzG1u4
+ xX0YjmnEYH1RRq3+shWQKHmo8NEXbQ==
+X-Authority-Analysis: v=2.4 cv=VOnQXtPX c=1 sm=1 tr=0 ts=68fe39c5 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=wSMj3bjwG01oINX3TXIA:9
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: zwagvTggpXj7g5UUM4hizTws1BtEiQxn
+X-Proofpoint-ORIG-GUID: zwagvTggpXj7g5UUM4hizTws1BtEiQxn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-26_06,2025-10-22_01,2025-03-28_01
 
-On 2025-10-26 06:16, Jens Axboe wrote:
-> On 10/25/25 10:12 PM, David Wei wrote:
->> Sorry I missed this during the splitting. Will include in v3.
->>
->>>
->>>> +    ifq->proxy = src_ifq;
->>>
->>> For this, since the ifq is shared and reference counted, why don't they
->>> just point at the same memory here? Would avoid having this ->proxy
->>> thing and just skipping to that in other spots where the actual
->>> io_zcrx_ifq is required?
->>>
->>
->> I wanted a way to separate src and dst rings, while also decrementing
->> refcounts once and only once. I used separate ifq objects to do this,
->> but having learnt about xarray marks, I think I can use that instead.
-> 
-> I'm confused, why do you even need that? You already have
-> ifq->proxy which is just a "link" to the shared queue, why aren't both
-> rings just using the same ifq structure? You already increment the
-> refcount when you add proxy, why can't the new ring just store the same
-> ifq?
-> 
+This patch series adds support for IPsec packet offload for the
+Marvell CN10K SoC.
 
-The main reason is I want only-once semantics for decrementing the
-refcounts. I used a separate ifq to do this, marking it with -1
-afterwards, but I learnt about xarray marks which lets me do the same
-thing.
+The packet flow
+---------------
+An encrypted IPSec packet goes through two passes in the RVU hardware
+before reaching the CPU.
+First Pass:
+  The first pass involves identifying the packet as IPSec, assigning an RQ,
+  allocating a buffer from the Aura pool and then send it to CPT for decryption.
 
-Hopefully v3 will make it clearer what I mean. It's looking really
-clean.
+Second Pass:
+  After CPT decrypts the packet, it sends a metapacket to NIXRX via the X2P
+  bus. The metapacket contains CPT_PARSE_HDR_S structure and some initial
+  bytes of the decrypted packet which would help NIXRX in classification.
+  CPT also sets BIT(11) of channel number to further help in identification.
+  NIXRX allocates a new buffer for this packet and submits it to the CPU.
+
+Once the decrypted metapacket packet is delivered to the CPU, get the WQE
+pointer from CPT_PARSE_HDR_S in the packet buffer. This WQE points to the
+complete decrypted packet. We create an skb using this, set the relevant
+XFRM packet mode flags to indicate successful decryption, and submit it
+to the network stack.
+
+Bharat Bhushan (4):
+  crypto: octeontx2: Share engine group info with AF driver
+  octeontx2-af: Configure crypto hardware for inline ipsec
+  octeontx2-af: Setup Large Memory Transaction for crypto
+  octeontx2-af: Handle inbound inline ipsec config in AF
+
+Geetha sowjanya (1):
+  octeontx2-af: Add mbox to alloc/free BPIDs
+
+Kiran Kumar K (1):
+  octeontx2-af: Add support for SPI to SA index translation
+
+Rakesh Kudurumalla (1):
+  octeontx2-af: Add support for CPT second pass
+
+Tanmay Jagdale (8):
+  octeontx2-pf: ipsec: Setup NIX HW resources for inbound flows
+  octeontx2-pf: ipsec: Allocate Ingress SA table
+  octeontx2-pf: ipsec: Handle NPA threshold interrupt
+  octeontx2-pf: ipsec: Initialize ingress IPsec
+  octeontx2-pf: ipsec: Configure backpressure
+  octeontx2-pf: ipsec: Process CPT metapackets
+  octeontx2-pf: ipsec: Manage NPC rules and SPI-to-SA table entries
+  octeontx2-pf: ipsec: Add XFRM state and policy hooks for inbound flows
+
+ .../marvell/octeontx2/otx2_cpt_common.h       |    8 -
+ drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   10 -
+ .../marvell/octeontx2/otx2_cptpf_main.c       |   50 +-
+ .../marvell/octeontx2/otx2_cptpf_mbox.c       |  282 +---
+ .../marvell/octeontx2/otx2_cptpf_ucode.c      |  116 +-
+ .../marvell/octeontx2/otx2_cptpf_ucode.h      |    3 +-
+ .../ethernet/marvell/octeontx2/af/Makefile    |    2 +-
+ .../ethernet/marvell/octeontx2/af/common.h    |    1 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.c  |    3 -
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  119 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |    8 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   71 +
+ .../ethernet/marvell/octeontx2/af/rvu_cn10k.c |   11 +
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  708 ++++++++-
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.h   |   71 +
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  235 ++-
+ .../marvell/octeontx2/af/rvu_nix_spi.c        |  211 +++
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   40 +
+ .../marvell/octeontx2/af/rvu_struct.h         |    4 +-
+ .../marvell/octeontx2/nic/cn10k_ipsec.c       | 1357 ++++++++++++++++-
+ .../marvell/octeontx2/nic/cn10k_ipsec.h       |  140 ++
+ .../marvell/octeontx2/nic/otx2_common.c       |   26 +-
+ .../marvell/octeontx2/nic/otx2_common.h       |   16 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   21 +
+ .../ethernet/marvell/octeontx2/nic/otx2_reg.h |   18 +
+ .../marvell/octeontx2/nic/otx2_struct.h       |   16 +
+ .../marvell/octeontx2/nic/otx2_txrx.c         |   31 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |    4 +
+ 28 files changed, 3105 insertions(+), 477 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_nix_spi.c
+
+-- 
+2.43.0
+
 
