@@ -1,321 +1,223 @@
-Return-Path: <netdev+bounces-233023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6132CC0B1B7
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 21:06:24 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACD51C0B2CC
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 21:29:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CF581899E59
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 20:06:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 31B114EBFEB
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 20:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452C826B0B3;
-	Sun, 26 Oct 2025 20:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5789E2FF643;
+	Sun, 26 Oct 2025 20:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NRX+1Lpa"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AvFMn5h+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010003.outbound.protection.outlook.com [52.101.56.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED4622D795
-	for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 20:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761509178; cv=none; b=qjxCrC9QfF74QGhX/0IKpkGz4oqR21Oj+7XKfuxCcgAG/j7K3ybQHSho3TAPc4qTiS3T2UTHQ6U9odGkHSqcMnOGje+zbppvz0go/G8h4Y0KUUEy8TdTwrwop7HUNSEH4nVn5myAqx/zBzlGua2F91eYY5UIcX+jpZc8BlkqZL0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761509178; c=relaxed/simple;
-	bh=VrkW14uqGip0Bk2+38JuH4m4s5WOxAyeoaDxqc6rezw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jf0Ju7LjHkf0jpW/cIhF4up98jQe3MjhCIPJbZO4iJh90LbQqrICJkyU25CbJInHAGcR8VXlA+mg47zCXLKwiGaGhScFt3AndAf//MO2Sp1nTPOO4o4YlKA0GCDDDjazSABF5Wn+Cqkn1mnBq/RjUxllZuoWWMOaKi1WSsWdgBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NRX+1Lpa; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-27eec33b737so56676005ad.1
-        for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 13:06:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761509175; x=1762113975; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NLnr/ncBHj2yG+qse5NSNQc2ilWvF/iAF5vKMIBHC4I=;
-        b=NRX+1LpaBLlitRafAIda7l07vJP5b2KLnqkE86EUjiboheyXst6K+m0tqwORKsCjeF
-         xLF+DOEhJgvTRxKAAvzBA9//mir1QJiiKe5n3cbj/togo8D4hnP7rKcTSdAy4He2B1T7
-         onPdktbxPrOyg/iHT2yU5/m1dKKmNbTpdKXJrEGTypzwlQPDZ7WzPIk6WqpUefDmyPdk
-         BcpOAMeheDTD9U628EfbgNs4XwyVAWth7AXg6IDsN+SA8r92VDBu0P+KztcJ9Fm4gUSD
-         C/LiDtQq7kGvaiUHAFEu45r9B3JAKgjCmbizyUghOSLDjC40yLBNf+J1D1jTe+GldEBr
-         fLhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761509175; x=1762113975;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NLnr/ncBHj2yG+qse5NSNQc2ilWvF/iAF5vKMIBHC4I=;
-        b=rI2GOHd4U1YPkbnV+AIVt3R1ARO0AYZgYLB2QOdK4jOJcEBCC5D350jx8zYygCwzGV
-         IE6xma7fUIzUHljX/HCWeNIgl1QPLH91fC7PZT6l9NCJ0qTkLghKyAweB3WLHlnprRxs
-         MBGr8IfHgoj46Kz0Lm0RJEn3SrN9i/xUcQ2vho/ihdtzCFYj0ZU6IFRLT325YgnK8DGB
-         9eLjdnqMzquLNagb8oThnxMj33L6+jhlvoeo+wTJ9Y818uyqK7z1v59Y4wJ+V45H25/h
-         yYwCUNv7mYeXOXbM9i7IQWJoC4p4yM16m9p9Gsf21jCSorIXC983QjrjMkhkR3VI2EFX
-         oDAw==
-X-Forwarded-Encrypted: i=1; AJvYcCUdpV6hZRR11o96sfod7tMPlZJHwsSC53SK3sSTe7HPIEpa0vofnZbQfy1jaBjKpQ/DQzoUweo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbAl6p4wn+zgSDoWgnu2TPWpdI6udTyrAlj1mPl32hJa1Nqoe2
-	uAlmULYRnGrHxAQz3jP5cYEwCGOW/4TW7PkqsWvlrt7Sp4ktAtfLQ+7y
-X-Gm-Gg: ASbGncuUiPwssAuJtl8KktO9MgU1Gya1wPYHT1A4nJgVpcEmwrwKqKLS9vnw+4NyI0P
-	ck0mENhJoIMUYczJuL2ee0uMrKOFNTBMn9EaeXoCpmzFIGIYSEmiF23C3Jep9+nJdYXI17ZDa/L
-	bUdkT6tAXPlShR2UrSlpqEJjV2cUrKt26qvKWVm23PitEsiag+MS1fDDlthAoDSTKsBMcvUfQe/
-	32BYhyUcNknCFpywAks9lYCOrf0lWbDlMKHAo2g7UDN2wpOT+LsKSXHLpRDYLlmMMaAeo+tZbc7
-	SBNGDrgl6tEPHWrtxL6QOV43gYlfV1oMn+boIv0T/itMNZFEPgJfsGHA3tY4T+yJ3j0KD/WpWIB
-	pV5ApGJwz/OWt46aH6suGH6iDLk0DI3r3z7RDkfu+p65wcd8nG7WPyEjyW3+jMLfSXoUWyGG65K
-	MX8rWd+s6MHyn6CGlg/LR9DjXp8hA=
-X-Google-Smtp-Source: AGHT+IEeZ5+5Z7bpIdsGVtc+udutyYjxYW6a5bceAwOzU5KRn9m5dxZq4bxZWwLlRZgCxC+SzyGeog==
-X-Received: by 2002:a17:903:3d0c:b0:267:af07:6526 with SMTP id d9443c01a7336-290cb65c541mr451329865ad.55.1761509175229;
-        Sun, 26 Oct 2025 13:06:15 -0700 (PDT)
-Received: from chandna.localdomain ([106.222.228.122])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498d0987fsm56798615ad.25.2025.10.26.13.06.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Oct 2025 13:06:14 -0700 (PDT)
-Date: Mon, 27 Oct 2025 01:35:57 +0530
-From: Sahil Chandna <chandna.sahil@gmail.com>
-To: Yonghong Song <yonghong.song@linux.dev>
-Cc: syzbot+b0cff308140f79a9c4cb@syzkaller.appspotmail.com,
-	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com,
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
-	linux-kernel@vger.kernel.org, listout@listout.xyz,
-	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me,
-	song@kernel.org, syzkaller-bugs@googlegroups.com,
-	linux-rt-devel@lists.linux.dev, bigeasy@linutronix.de
-Subject: Re: [syzbot] [bpf?] WARNING in bpf_bprintf_prepare (3)
-Message-ID: <aP5_JbddrpnDs-WN@chandna.localdomain>
-References: <68f6a4c8.050a0220.1be48.0011.GAE@google.com>
- <14371cf8-e49a-4c68-b763-fa7563a9c764@linux.dev>
- <aPklOxw0W-xUbMEI@chandna.localdomain>
- <8dd359dd-b42f-4676-bb94-07288b38fac1@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006292FDC3F;
+	Sun, 26 Oct 2025 20:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.3
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761510072; cv=fail; b=VPFHX9KebMtNnyVPa+R5HJv1EglNq5q6EEwlLn6eJXTYecjkqSwFPAGsitatfZDA1sSNhxcRWkofs2eA2pCeYpIGT5fe/YLnanhlyYsT1TnzLZ8mfGpEoPZzZWduODnry5zMeODDcfczHwe+UoBGxHeFPEYmaJm1uGBtYRFKvkY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761510072; c=relaxed/simple;
+	bh=w6jD+E9glNaCf68IY1QGBoy1nIkrh6LIGMH5f9itmoY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=N3/e0vCVcxZjA2hU1SbkFg9TOS3txnlYSoBv2ovMMUPVAbgFprTMWxQ7KAIhvDRHW6FVbkp8JcWVkTD8/kHaChqdGJqEii/KiRvLZIN2cTsPAS+YjYxEcxiqsvPuHLh62poqwdIcT4aXADHcSkb19KGSRKuN9Q9L9OPVGClnNRA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AvFMn5h+; arc=fail smtp.client-ip=52.101.56.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=C2YfsNCnBdkdnxdl9O4R0XjXHU/7vagw0rx09E1yCU/+ITHguTHaDUfg2z7d+vcmVRGL/fI10qzA1orGOcm7gTH1rDwT/8RXu4+Hx+u6LyAf4o3wPklLV3iKZ0xB9px5vzw3IGc5P0gOhabDefNAjqnlh1DzD6FplxLE7syRucDE2FwgCbuX1PFlRxJY7NZqFMDqavyNlf6Gtm8faucVc73gd7vtkmab5RuvzC0ev00U/5O3IboTKdUbhHvfdrJXKRVtdC5zK+8zW1DGl3k+V/QJ5yPsk1F+5X3aLum3E+ogxDAW9xg7+niVCJHCilJCxSP2LVV6ICZrTw3/qP8Svw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=a77WkG2LnOwubNWFj7SJSplUu77bvpIJHLBv7hf6u60=;
+ b=suk8+yiEBmvwlSbYeCIArtTJ1UVlMMLDkLf6drH2H+CmUprlYa8+WyiO1Ydd5srYo7wABfaf3zssXs8NtGtA3IOSMtMNLbkHL2orCRd1Vihn7Hpl0ABAah/UDBpKVpodTp0JtumWcqkj+2IXBoHEOlTLOLZsjrSS0jfhfYjDXj/jvSvGLCWSZiu9Bsa2snRKJmZMfviue46O7xJYR2jXTC6q0mH4OmK5R61Zj5CqWLNtGJcjqthrLe/aPDJ0hm2yErofJ21eJdkdcaKBuEtxaLQnSRIdIaCXas4dKqUfuyTshhs/WeG4ApOshBsLVCDjGgfABxRdzzXQNpcTOMQTNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=a77WkG2LnOwubNWFj7SJSplUu77bvpIJHLBv7hf6u60=;
+ b=AvFMn5h+oY1Nro1z70i8ny6EyWPQOwRUu9ccLHH7nKspoZCy7y6uBhf5yvDH67tlhfkAQXjlP+YCCg/ULbRzpIfEw9sJCjZD6i3v+1p+lAk6TS18+j/qi52eMrVfuAAshWkZ8YAciUYoJMx2URJeHV5VHloal6NcOBptQ847YYYD5fnxE/NsoEOSPSjVvvMzA1ImKzq9/5K/AZ6VQujA3iAZumHm6BnzHknIkgNmsx9xNe9l6U7dRmwkvIepiOkeDiVHPLepfQSDMzDozzpRfb90wwOBWiue4pQFy0CuNKqhLo0rWXSRQgR0nKw49LVK4lARxfXDDhr4JbnxCedTbA==
+Received: from BYAPR05CA0063.namprd05.prod.outlook.com (2603:10b6:a03:74::40)
+ by CYXPR12MB9427.namprd12.prod.outlook.com (2603:10b6:930:d6::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.17; Sun, 26 Oct
+ 2025 20:21:05 +0000
+Received: from SJ1PEPF00001CE1.namprd05.prod.outlook.com
+ (2603:10b6:a03:74:cafe::80) by BYAPR05CA0063.outlook.office365.com
+ (2603:10b6:a03:74::40) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9275.5 via Frontend Transport; Sun,
+ 26 Oct 2025 20:21:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ1PEPF00001CE1.mail.protection.outlook.com (10.167.242.9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9275.10 via Frontend Transport; Sun, 26 Oct 2025 20:21:04 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.34; Sun, 26 Oct
+ 2025 13:20:54 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 26 Oct
+ 2025 13:20:54 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Sun, 26
+ Oct 2025 13:20:50 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Dragos Tatulea
+	<dtatulea@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
+Subject: [PATCH net] net/mlx5: Don't zero user_count when destroying FDB tables
+Date: Sun, 26 Oct 2025 22:20:19 +0200
+Message-ID: <1761510019-938772-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8dd359dd-b42f-4676-bb94-07288b38fac1@linux.dev>
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE1:EE_|CYXPR12MB9427:EE_
+X-MS-Office365-Filtering-Correlation-Id: b8023cd0-7212-407d-234c-08de14cd3095
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?CY1w0LXF39cFAubzBW/6Gycy04KTlWaB+8NPuaVcTzAvDZ9l2xtvmCdlufQ7?=
+ =?us-ascii?Q?Hb7iNQXm+uQCBryI6fmXAfBJBF13oRB/w0TeL4a5qXTzUf+o/LgUavO2JHE4?=
+ =?us-ascii?Q?ZEzMcM4iOBqBHQXSKhBN1aEecnkZh8h1DpzO1XKHsqtqcPFJjJsh6+fUggv9?=
+ =?us-ascii?Q?+SOEQ7ej7rZmcw12k4Blp4hnAnE0Hj0Mv01lGVm5MjcYUJ4YLb/6hIzuHC/v?=
+ =?us-ascii?Q?Cm479OOigAszWXjlhe+0gS+GrWyDuVYZw/MmE2VZC9iIwV82NltX8l6+tts5?=
+ =?us-ascii?Q?HQkzz6S3NOKwuM/581U64hERUmYCB98O+/fZgNiS+BNW4zRdeDayeY4MPXyk?=
+ =?us-ascii?Q?0s1TEoT3KYx2yh6XXiET+yYWmMpWl7s/qQLbamxyAK+PYPtbvABFLpoM/do8?=
+ =?us-ascii?Q?XVyGQtVZio2HX9+W3lwOMVBNFs4RD93GS86cM/ZjTTyL6ZXYm97P8/3Kd0QG?=
+ =?us-ascii?Q?HA95jL6PV/WxD9QcCio5hIqyqj0HVgKjmI/ppURajav7n62LmAdngVqNuEd/?=
+ =?us-ascii?Q?4cKDLx1q/m633aTV9tu53R5naULqRcP+efYsoQS/ddamiTU0Go409kHlvS4L?=
+ =?us-ascii?Q?OxILEGgRhN8S8UWsagdQ9wjy+S9pANd3A6+cBUFDSpf0SrCZA3+4qf6A4y1L?=
+ =?us-ascii?Q?eUTHymjnuhMUy0WxD4iAedZcbKuEKxs4PpVK4RttgSuU+VxEpJjuyjUyUs4O?=
+ =?us-ascii?Q?7XAcTbLG/qUZC0Pa7JzMGPF6cznTIUlp7X2lwUk8aiDt3OW8b4yghyeU+LxG?=
+ =?us-ascii?Q?2wJTcb5p5sAUVRL2HF+Y6OrvV3Abchr7yuku2ovvT7ImopK/mEVZ3tZvnjY9?=
+ =?us-ascii?Q?y3zW8rnKKzeuZEQvPdQPIbyOZyX04dRgoxnVD27JNeN/QEgMmbDSDOUKeUhN?=
+ =?us-ascii?Q?3bXVy4fGP8a9ZClBx8bhXYMcYn0fLlPAfnV06ePT18lUkWCLAav0+YsgsyKk?=
+ =?us-ascii?Q?U0abKt0cQE+Uv3OEMYtmX/C81nkeS/XNDuGsT+9lYxHFQPlFrnXyQ5dJBBba?=
+ =?us-ascii?Q?qwXM7LdC5AVOXC/ipAD63SauQYhd+CaN1rJTg+2c6Dxg23DYPQugqasHOAtn?=
+ =?us-ascii?Q?irYL/ECxUBBiYA6eaMsCJnL8GQdjuVzXllhCNUqbCpSbXHtfWLYGWOsl3A1b?=
+ =?us-ascii?Q?LtSH2I8u7QnWGCot5iGRYMxaPEkZKVcFhvvOPzVkjpkGe/g9lm/bIVrz2we7?=
+ =?us-ascii?Q?MKPVDfQh1wlFNF4MmMad4YU89ro2DciJHQBu8gyxEsdBVLTkRMvOWcn5U2l2?=
+ =?us-ascii?Q?J6CxLU3Bc6VuobO2Kz6xYpm/vgwNA+LPiIliMdCFcd9sMOp8BpkOpXXYgNGe?=
+ =?us-ascii?Q?cCtABQJWrYzpih/2VY/ohBUG39hUiiEKLFc39bFbbEJxzZzO7KMNOIYF/GEj?=
+ =?us-ascii?Q?LJWvHNrReRQQpUWsqjTg3I/wQluEmqONfX+goDyvhQWF2WFpC+bwfGgc46lE?=
+ =?us-ascii?Q?96LcplxdVlcHl8jtTZ9F1g0FQH8BJR99chtPLugGNASSE1rScFr9KlktuTZr?=
+ =?us-ascii?Q?r9uE0tvPjwaDlqdi82i2dHv2YMTcox3oXLE5yxw4PGQyNNKCHQ8S2wbDs79+?=
+ =?us-ascii?Q?UOWJHAkSt23NBm5VPvs=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2025 20:21:04.8678
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b8023cd0-7212-407d-234c-08de14cd3095
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CE1.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9427
 
-On Wed, Oct 22, 2025 at 12:56:25PM -0700, Yonghong Song wrote:
->
->
->On 10/22/25 11:40 AM, Sahil Chandna wrote:
->>On Wed, Oct 22, 2025 at 09:57:22AM -0700, Yonghong Song wrote:
->>>
->>>
->>>On 10/20/25 2:08 PM, syzbot wrote:
->>>>Hello,
->>>>
->>>>syzbot found the following issue on:
->>>>
->>>>HEAD commit:    a1e83d4c0361 selftests/bpf: Fix redefinition of 
->>>>'off' as d..
->>>>git tree:       bpf
->>>>console output: 
->>>>https://syzkaller.appspot.com/x/log.txt?x=12d21de2580000
->>>>kernel config: 
->>>>https://syzkaller.appspot.com/x/.config?x=9ad7b090a18654a7
->>>>dashboard link: 
->>>>https://syzkaller.appspot.com/bug?extid=b0cff308140f79a9c4cb
->>>>compiler:       Debian clang version 20.1.8 
->>>>(++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), 
->>>>Debian LLD 20.1.8
->>>>syz repro: https://syzkaller.appspot.com/x/repro.syz?x=160cf542580000
->>>>C reproducer: https://syzkaller.appspot.com/x/repro.c?x=128d5c58580000
->>>>
->>>>Downloadable assets:
->>>>disk image: https://storage.googleapis.com/syzbot-assets/2f6a7a0cd1b7/disk-a1e83d4c.raw.xz
->>>>vmlinux: https://storage.googleapis.com/syzbot-assets/873984cfc71e/vmlinux-a1e83d4c.xz
->>>>kernel image: https://storage.googleapis.com/syzbot-assets/16711d84070c/bzImage-a1e83d4c.xz
->>>>
->>>>The issue was bisected to:
->>>>
->>>>commit 7c33e97a6ef5d84e98b892c3e00c6d1678d20395
->>>>Author: Sahil Chandna <chandna.sahil@gmail.com>
->>>>Date:   Tue Oct 14 18:56:35 2025 +0000
->>>>
->>>>    bpf: Do not disable preemption in bpf_test_run().
->>>>
->>>>bisection log: 
->>>>https://syzkaller.appspot.com/x/bisect.txt?x=172fe492580000
->>>>final oops: https://syzkaller.appspot.com/x/report.txt?x=14afe492580000
->>>>console output: 
->>>>https://syzkaller.appspot.com/x/log.txt?x=10afe492580000
->>>>
->>>>IMPORTANT: if you fix the issue, please add the following tag to 
->>>>the commit:
->>>>Reported-by: syzbot+b0cff308140f79a9c4cb@syzkaller.appspotmail.com
->>>>Fixes: 7c33e97a6ef5 ("bpf: Do not disable preemption in 
->>>>bpf_test_run().")
->>>>
->>>>------------[ cut here ]------------
->>>>WARNING: CPU: 1 PID: 6145 at kernel/bpf/helpers.c:781 
->>>>bpf_try_get_buffers kernel/bpf/helpers.c:781 [inline]
->>>>WARNING: CPU: 1 PID: 6145 at kernel/bpf/helpers.c:781 
->>>>bpf_bprintf_prepare+0x12cf/0x13a0 kernel/bpf/helpers.c:834
->>>
->>>Okay, the warning is due to the following WARN_ON_ONCE:
->>>
->>>static DEFINE_PER_CPU(struct 
->>>bpf_bprintf_buffers[MAX_BPRINTF_NEST_LEVEL], bpf_bprintf_bufs);
->>>static DEFINE_PER_CPU(int, bpf_bprintf_nest_level);
->>>
->>>int bpf_try_get_buffers(struct bpf_bprintf_buffers **bufs)
->>>{
->>>       int nest_level;
->>>
->>>       nest_level = this_cpu_inc_return(bpf_bprintf_nest_level);
->>>       if (WARN_ON_ONCE(nest_level > MAX_BPRINTF_NEST_LEVEL)) {
->>>               this_cpu_dec(bpf_bprintf_nest_level);
->>>               return -EBUSY;
->>>       }
->>>       *bufs = this_cpu_ptr(&bpf_bprintf_bufs[nest_level - 1]);
->>>
->>>       return 0;
->>>}
->>>
->>>Basically without preempt disable, at process level, it is possible
->>>more than one process may trying to take bpf_bprintf_buffers.
->>>Adding softirq and nmi, it is totally likely to have more than 3
->>>level for buffers. Also, more than one process with bpf_bprintf_buffers
->>>will cause problem in releasing buffers, so we need to have
->>>preempt_disable surrounding bpf_try_get_buffers() and
->>>bpf_put_buffers().
->>Right, but using preempt_disable() may impact builds with
->>CONFIG_PREEMPT_RT=y, similar to bug[1]? Do you think local_lock() 
->>could be used here
->
->We should be okay. for all the kfuncs/helpers I mentioned below,
->with the help of AI, I didn't find any spin_lock in the code path
->and all these helpers although they try to *print* some contents,
->but the kfuncs/helpers itself is only to deal with buffers and
->actual print will happen asynchronously.
->
->>as nest level is per cpu variable and local lock semantics can work
->>for both RT and non rt builds ?
->
->I am not sure about local_lock() in RT as for RT, local_lock() could
->be nested and the release may not in proper order. See
->  https://www.kernel.org/doc/html/v5.8/locking/locktypes.html
->
->  local_lock is not suitable to protect against preemption or interrupts on a
->  PREEMPT_RT kernel due to the PREEMPT_RT specific spinlock_t semantics.
->
->So I suggest to stick to preempt_disable/enable approach.
->
->>>
->>>There are some kfuncs/helpers need such preempt_disable
->>>protection, e.g. bpf_stream_printk, bpf_snprintf,
->>>bpf_trace_printk, bpf_trace_vprintk, bpf_seq_printf.
->>>But please double check.
->>>
->>Sure, thanks!
+From: Cosmin Ratiu <cratiu@nvidia.com>
 
-Since these helpers eventually call bpf_bprintf_prepare(),
-I figured adding protection around bpf_try_get_buffers(),
-which triggers the original warning, should be sufficient.
-I tried a few approaches to address the warning as below :
+esw->user_count tracks how many TC rules are added on an esw via
+mlx5e_configure_flower -> mlx5_esw_get -> atomic64_inc(&esw->user_count)
 
-1. preempt_disable() / preempt_enable() around bpf_prog_run_pin_on_cpu()
-diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-index 1b61bb25ba0e..6a128179a26f 100644
---- a/net/core/flow_dissector.c
-+++ b/net/core/flow_dissector.c
-@@ -1021,7 +1021,9 @@ u32 bpf_flow_dissect(struct bpf_prog *prog, struct bpf_flow_dissector *ctx,
-   		     (int)FLOW_DISSECTOR_F_STOP_AT_ENCAP);
-   	flow_keys->flags = flags;
+esw.user_count was unconditionally set to 0 in
+esw_destroy_legacy_fdb_table and esw_destroy_offloads_fdb_tables.
 
-+	preempt_disable();
-   	result = bpf_prog_run_pin_on_cpu(prog, ctx);
-+	preempt_enable();
+These two together can lead to the following sequence of events:
+1. echo 1 > /sys/class/net/eth2/device/sriov_numvfs
+  - mlx5_core_sriov_configure -...-> esw_create_legacy_table ->
+    atomic64_set(&esw->user_count, 0)
+2. tc qdisc add dev eth2 ingress && \
+   tc filter replace dev eth2 pref 1 protocol ip chain 0 ingress \
+       handle 1 flower action ct nat zone 64000 pipe
+  - mlx5e_configure_flower -> mlx5_esw_get ->
+    atomic64_inc(&esw->user_count)
+3. echo 0 > /sys/class/net/eth2/device/sriov_numvfs
+  - mlx5_core_sriov_configure -..-> esw_destroy_legacy_fdb_table
+    -> atomic64_set(&esw->user_count, 0)
+4. devlink dev eswitch set pci/0000:08:00.0 mode switchdev
+  - mlx5_devlink_eswitch_mode_set -> mlx5_esw_try_lock ->
+    atomic64_read(&esw->user_count) == 0
+  - then proceed to a WARN_ON in:
+  esw_offloads_start -> mlx5_eswitch_enable_locke -> esw_offloads_enable
+  -> mlx5_esw_offloads_rep_load -> mlx5e_vport_rep_load ->
+  mlx5e_netdev_change_profile -> mlx5e_detach_netdev ->
+  mlx5e_cleanup_nic_rx -> mlx5e_tc_nic_cleanup ->
+  mlx5e_mod_hdr_tbl_destroy
 
-   	flow_keys->nhoff = clamp_t(u16, flow_keys->nhoff, nhoff, hlen);
-   	flow_keys->thoff = clamp_t(u16, flow_keys->thoff,
-This fixes the original WARN_ON in both PREEMPT_FULL and RT builds.
-However, when tested with the syz reproducer of the original bug [1], it
-still triggers the expected DEBUG_LOCKS_WARN_ON(this_cpu_read(softirq_ctrl.cnt)) 
-warning from __local_bh_disable_ip(), due to the preempt_disable() 
-interacting with RT spinlock semantics.
-[1] [https://syzkaller.appspot.com/bug?extid=1f1fbecb9413cdbfbef8](https://syzkaller.appspot.com/bug?extid=1f1fbecb9413cdbfbef8)
-So this approach avoids the buffer nesting issue, but re-introduces the following issue:
-[  363.968103][T21257] DEBUG_LOCKS_WARN_ON(this_cpu_read(softirq_ctrl.cnt))
-[  363.968922][T21257] WARNING: CPU: 0 PID: 21257 at kernel/softirq.c:176 __local_bh_disable_ip+0x3d9/0x540
-[  363.969046][T21257] Modules linked in:
-[  363.969176][T21257] Call Trace:
-[  363.969181][T21257]  <TASK>
-[  363.969186][T21257]  ? __local_bh_disable_ip+0xa1/0x540
-[  363.969197][T21257]  ? sock_map_delete_elem+0xa2/0x170
-[  363.969209][T21257]  ? preempt_schedule_common+0x83/0xd0
-[  363.969252][T21257]  ? rt_spin_unlock+0x161/0x200
-[  363.969269][T21257]  sock_map_delete_elem+0xaf/0x170
-[  363.969280][T21257]  bpf_prog_464bc2be3fc7c272+0x43/0x47
-[  363.969289][T21257]  bpf_flow_dissect+0x22b/0x750
-[  363.969299][T21257]  bpf_prog_test_run_flow_dissector+0x37c/0x5c0
+Fix this by not clearing out the user_count when destroying FDB tables,
+so that the check in mlx5_esw_try_lock can prevent the mode change when
+there are TC rules configured, as originally intended.
 
-2. preempt_disable() inside bpf_try_get_buffers() and bpf_put_buffers()
+Fixes: 2318b8bb94a3 ("net/mlx5: E-switch, Destroy legacy fdb table when needed")
+Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/esw/legacy.c       | 1 -
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c | 1 -
+ 2 files changed, 2 deletions(-)
 
-diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
-index 8eb117c52817..bc8630833a94 100644
---- a/kernel/bpf/helpers.c
-+++ b/kernel/bpf/helpers.c
-@@ -777,12 +777,14 @@ int bpf_try_get_buffers(struct bpf_bprintf_buffers **bufs)
-  {
-         int nest_level;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/legacy.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/legacy.c
+index 76382626ad41..929adeb50a98 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/legacy.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/legacy.c
+@@ -66,7 +66,6 @@ static void esw_destroy_legacy_fdb_table(struct mlx5_eswitch *esw)
+ 	esw->fdb_table.legacy.addr_grp = NULL;
+ 	esw->fdb_table.legacy.allmulti_grp = NULL;
+ 	esw->fdb_table.legacy.promisc_grp = NULL;
+-	atomic64_set(&esw->user_count, 0);
+ }
+ 
+ static int esw_create_legacy_fdb_table(struct mlx5_eswitch *esw)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+index 34749814f19b..44a142a041b2 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+@@ -1978,7 +1978,6 @@ static void esw_destroy_offloads_fdb_tables(struct mlx5_eswitch *esw)
+ 	/* Holds true only as long as DMFS is the default */
+ 	mlx5_flow_namespace_set_mode(esw->fdb_table.offloads.ns,
+ 				     MLX5_FLOW_STEERING_MODE_DMFS);
+-	atomic64_set(&esw->user_count, 0);
+ }
+ 
+ static int esw_get_nr_ft_offloads_steering_src_ports(struct mlx5_eswitch *esw)
 
-+       preempt_disable();
-         nest_level = this_cpu_inc_return(bpf_bprintf_nest_level);
-         if (WARN_ON_ONCE(nest_level > MAX_BPRINTF_NEST_LEVEL)) {
-                 this_cpu_dec(bpf_bprintf_nest_level);
-                 return -EBUSY;
-         }
-         *bufs = this_cpu_ptr(&bpf_bprintf_bufs[nest_level - 1]);
-+       preempt_enable();
+base-commit: 84a905290cb4c3d9a71a9e3b2f2e02e031e7512f
+-- 
+2.31.1
 
-         return 0;
-  }
-@@ -791,7 +793,10 @@ void bpf_put_buffers(void)
-  {
-         if (WARN_ON_ONCE(this_cpu_read(bpf_bprintf_nest_level) == 0))
-                 return;
-+
-+       preempt_disable();
-         this_cpu_dec(bpf_bprintf_nest_level);
-+       preempt_enable();
-  }
-This *still* reproduces the original syz issue, so the protection needs to be 
-placed around the entire program run, not inside the helper itself as
-in above experiment.
-
-3. Using a per-CPU local_lock
-Finally, I tested with a per-CPU local_lock around bpf_prog_run_pin_on_cpu():
-+struct bpf_cpu_lock {
-+	local_lock_t lock;
-+};
-+
-+static DEFINE_PER_CPU(struct bpf_cpu_lock, bpf_cpu_lock) = {
-+	.lock = INIT_LOCAL_LOCK(),
-+};
-@@ -1021,7 +1030,9 @@ u32 bpf_flow_dissect(struct bpf_prog *prog, struct bpf_flow_dissector *ctx,
-                      (int)FLOW_DISSECTOR_F_STOP_AT_ENCAP);
-         flow_keys->flags = flags;
-
-+       local_lock(&bpf_cpu_lock.lock);
-         result = bpf_prog_run_pin_on_cpu(prog, ctx);
-+       local_unlock(&bpf_cpu_lock.lock);
-
-This approach avoid the warning on both RT and non-RT builds, with both the 
-syz reproducer. The intention of introducing the per-CPU local_lock is to 
-maintain consistent per-CPU execution semantics between RT and non-RT kernels.
-On non-RT builds, local_lock maps to preempt_disable()/enable(),
-which provides the same semantics as before.
-On RT builds, it maps to an RT-safe per-CPU spinlock, avoiding the
-softirq_ctrl.cnt issue.
-
-Let me know if you’d like me to run some more experiments on this.
 
