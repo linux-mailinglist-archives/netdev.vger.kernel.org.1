@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-232964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-232965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11E7BC0A84A
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 13:54:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C770C0A878
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 14:16:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C58CA4E77E1
-	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 12:54:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 371203AECE8
+	for <lists+netdev@lfdr.de>; Sun, 26 Oct 2025 13:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B60B2DA74D;
-	Sun, 26 Oct 2025 12:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFB219F40B;
+	Sun, 26 Oct 2025 13:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C7vztKOR"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="K4DCAOJX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979D424A04A
-	for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 12:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AD7749C
+	for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 13:16:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761483238; cv=none; b=eE6bwb+4V+R4toWrpClw4veuvCPbIHI8mmlWHIWQoLOlfL+YNj5tc2nY9+/MrilBLKGVuRr2DhZBNbUko71K5jFYCGteBQHdufg9Oi8066S5tSIMX9BzAROUA+dbKLY7nrpTfqo2t2x+Y2Dxm+9Y9OfRgyAMDFFAJB5s2kLIVmw=
+	t=1761484595; cv=none; b=djPZGaont32ByLwg6YAolLcTnjbAHfEyU1S0toq1XcWtdSZRpnkH743ijviMTeqeBM/gG8sgAA23jOHI5k62m50fmBRnqZbqPiTjEzPbr2TWUNOUEqcFIiH5BbojmNorbWZd6v5nsypqmIczGi9qCdUnCxgH8mpTuQ0kOW8fz8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761483238; c=relaxed/simple;
-	bh=CyL6U2fX8FZXu00nUcb3mHVole2/hj1X1E6kj7nMlt0=;
+	s=arc-20240116; t=1761484595; c=relaxed/simple;
+	bh=SERo0fpHLJ6iN9CZvXvaItAVNwQzTh5UAwKP7FYDghI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TMp/t2Mo1NOhScgOe1tbvtDYqSuCXy8WELaa5L8Poa10FZm8gy52zjoW9HUkB9Tz7onnG16i1+uNxotFYxy6uoKjZlevtAbt221cDKWhanZO6dxngwgxq+TfdVCx1LnqqAKpIbIVqI2DA1KDXJ0rHCoqhm6QzuKTr6cnoyYBMeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C7vztKOR; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-47109187c32so18493215e9.2
-        for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 05:53:56 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=KqFNxL7agt+BZCeAKOziqUwK6BmiSZF+sHKskmcdsZQ0ZmYiOxVoNRoJugpmlud4DPE0KYD+cL6eVzem3Hqap1Yqk1l7zTkpMNawXj92P5d8e4nd5Dyr8mxPV2CpPvnhZFpVKwt0B5Gr8X5004iBqUmhR4IxHbIDHDGiQN0fvBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=K4DCAOJX; arc=none smtp.client-ip=209.85.166.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-430d78a15b1so36988075ab.3
+        for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 06:16:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761483235; x=1762088035; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761484592; x=1762089392; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=i26CRJcrGe4BdHM3xxFhCLRVQ9kLMqkWcqoTK+HJaKU=;
-        b=C7vztKORaQfMOw3YlBAyiSUSui+Is6YuWLwmV7o3aZD5ez71EqJADvXa3VkU+M7IoC
-         PyeUQSnaWqt5V0F7JUhs4bNYgKh6nmmXgRUqrpHyE/s0AFW8eOMNwyMIMPm6sxeNWrLl
-         kQwZ7wb+tVTrkiY+0O21GgiMgGmSOzTV0rJ4btR/ni5oqk98MxN/Z2PVqjfsdYt0QnQ2
-         p6WHfA8OFp8ueWdvycKvxrxRxnQS+MpbuR6Z1Fj4zEjiJfLnREpKLPICzKmj3wcM4/SN
-         1aWq+vyM/lK48/uIFVSjDnDxNC8oobSAsN196vekgWP1FmZAzlMw+POumGL0ALyAtvbA
-         tZmA==
+        bh=Je2G6oS0diRsBc1xkoypa2q+3cXAdySawINjZn0hOes=;
+        b=K4DCAOJXcOR87xnT3rI6SUlnE9nU96qH6cRHiy+Z/OKc44i8ILL3cnLDwae9w/pBbj
+         kK+GkhqekXPse3FgDWmBJQZ424o1AQr3omUwKwURKz8fYbAhd0zzQ8liKXmFTgLglVGN
+         wpo9fYOLer9O2OW6Ts++N3ESmriYW7d8k2pcaKdiRBk4tNpmXulNwOV5W8oRQX859UIp
+         /kEoAPYvpPXHV0RDumnNQQHk3iLFdjFMCdcuNR8foaC+mwc+NVLAqZ2l05dDBe4E5J9g
+         wg7iPPGtR1lYoUzCA7+JbZ1XY23zSS9EXQegdYAukMAmnB8ZK1e7b4KnUI5o249aQ+Kt
+         5FnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761483235; x=1762088035;
-        h=content-transfer-encoding:in-reply-to:from:content-language
+        d=1e100.net; s=20230601; t=1761484592; x=1762089392;
+        h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i26CRJcrGe4BdHM3xxFhCLRVQ9kLMqkWcqoTK+HJaKU=;
-        b=ii1klaG+lYti0KCzA5Mrj5FtPvQSbAxq5V142IPf8nJMArn3wbyHrhm14MuDFdXD5x
-         Xp7SXC2IlpflmMKy85a/RGl9nbST46HsvRv6E4w3zewJdXnFFM05N4tfbWmOo4HYWP2g
-         sFFOoPpP1rlCeOEOMhmtFRk5XM8rY/ZSDb1Q7HHuzOJsmkf0NLmrievbXbvxt0oltkhX
-         I1nt2MwjWeBactashJPCcXVleyChvbyFvY4I7f64ITUoEN06wsy7zy7DlxhgWJWZc/+Q
-         5wjjLsgWSEDDg8AoRBzezDFfaSXuldNLh7rpKA/UE/luaTu1FBbYTiq6j9qYq3u3Z4tS
-         y0jA==
-X-Forwarded-Encrypted: i=1; AJvYcCXshTitN+QzA99r2ItJp3bRaTfO6AGHtOXnsNnCOcQ58XM+FNLiAexdf2u90+dbeua0nU6rdt4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoMKmJWfCMsny7RjIRmN9Rkxsx0CADaEUA9ch1tF93Q4S3cgBU
-	XS6eVZphaOfMKBzJxvBSRmbH1bxW7LFwqJteEQ/zy9H/j9sWOfkneU0E
-X-Gm-Gg: ASbGncsfbPxZr0j8+4i8O9C960UYqdOoLMmNbK8qNwQbgrHI+RLESWCxxnRHMuhsuma
-	BNxwjS5uhZFkvMM/LQ3dQdoqV/ke7gDTMzz0KgSqncygpvmMZKIzdDEYiDT4keGMHmFkazun6bX
-	gWTalhALXP19UIOJCKro3MU00HxCcThbENPZ9fX1IJ24zlKmizhq3itCjj3m5mppDQa1/vbK0pU
-	X/cQBZMXIph5aN1ZCB6DWriKO3PlUS7WNy8trhG6KscOatrxOoKooCj0xsRXM7RLAiVSSEGKoS/
-	la1EktPDkP3e3h3UChBnWBh+z+NdZWiO2rfXukJjWUU9pcHljyTaxZjKQ0M8FCBDmNv811g76fv
-	cNU1O2GTHrJnvDJuyc2+DLh7Ztw1vvhF89UXJ5xurw5XrHoi+caFBW5ou3Mfpd4YOkYUCfSjsSs
-	U0xk25pSG7J0J6I3hsp2FGkks=
-X-Google-Smtp-Source: AGHT+IFJUSS1Q8cwzkZUDDbdeQa6stYxe8rs4Tv4IO8zl8FPI2XfyzYE3FyOP61Il7yGxBXwHY0cSQ==
-X-Received: by 2002:a05:600c:3f08:b0:470:ffd1:782d with SMTP id 5b1f17b1804b1-47117876a19mr281885455e9.6.1761483234846;
-        Sun, 26 Oct 2025 05:53:54 -0700 (PDT)
-Received: from [10.221.206.54] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952cbc16sm8399094f8f.15.2025.10.26.05.53.52
+        bh=Je2G6oS0diRsBc1xkoypa2q+3cXAdySawINjZn0hOes=;
+        b=NyBeNMfyq46RJPMSMLIi5X1YFQPR8fSSJr64l0ZdxMk+Cj2GB1DCtDFZr/5iuZI7Lb
+         7WpVNjGm7Vwu3bS8UwdCi1BNbeY+PTjJgCeUThU7w+yZ+BcNSwUcYyNZuGhGjf9XBv/z
+         L1pktsltQv4mBS+1K0Ec/MIOwqYXWKIRYkSSKWkYWHXJo2UnJ6lUzW2D6gFCNNs9GTeE
+         /usfUlGs1UKraNKLZrnUo30f/3jkApdlcGxEM5RrY9JFNYJqGZfCn4jD4ArjUz2RmqAO
+         LUDLLhoAZgFLlYHPlF1GYPIQVCVATQqF1uevioNwFzGu0omHzlI5aOE6Ou/0G7oy1LqU
+         PsTA==
+X-Forwarded-Encrypted: i=1; AJvYcCXoaB7tT4xfC40zVmxgjbUxiKALcSHiWmyJJ03teQI1QjMTwsDmS/ee4FFOhA/JuiUILwt6jsI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywnqj7luEUYbYP26ObM8/BM3JkGNrAPRm76P+SAIdVsT5K0DZKs
+	H45v5v2XahvtgH8vZOiFT/iJ1hbaj1lHqWVlRUOBnz+TPQG6/ixeeQWc7OWlmPNltSdn/umpoEr
+	D4fRFuSM=
+X-Gm-Gg: ASbGncueH4ss/Rs0OTiKxYJzRm16lp2ljQ3UhLjwIZFk8k/noPCH7zM7nUfNXRhlVSj
+	g5OAYaDrEVPW/Khs9lTdMNxz8S8+5ErVJvr1OfsWJMMWZBdTlja1LwRpT3LFwfJu1zvkeZ7tDQ5
+	jxodwai44E6aP6pzdDX6/ZsRcA/scWGOXUM3uCY3bXxwaZZiZ63ojrnUG5PH+Jx0TBjGUXTfGd2
+	va2p0xg2vl6aVvaDWY8epwC5o24q5xKacMHsN2DdICXgypDYS/9n3SCv5oQHHtjEMjBniDuDma/
+	RXZTOpLdDS2RSGaDGpevet79MtuzF8toHVM5o3zcUgNNb4qhhENRc1/dcb7PhLmjletZox/lNrl
+	VMNTN7Sl3cewKa3LU/vFgCSVg14lU2cviDfdSAcCY1hzTDIKzdo6+tQbsgCIx1vDQQZskwxf1fI
+	1aOmzU2PpW
+X-Google-Smtp-Source: AGHT+IFYc55UFA7cxHsnoKidSYgwjCNGGkmSuK1XFsIhHJj5qglvRcSPZriyxg1o6xWyafqqzNnJ+g==
+X-Received: by 2002:a92:cda3:0:b0:430:c1ba:3558 with SMTP id e9e14a558f8ab-430c5268daamr314115775ab.18.1761484591776;
+        Sun, 26 Oct 2025 06:16:31 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-431f6899e76sm18805135ab.34.2025.10.26.06.16.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Oct 2025 05:53:53 -0700 (PDT)
-Message-ID: <2f84a4ee-8e45-460a-8e62-3f9a48da892a@gmail.com>
-Date: Sun, 26 Oct 2025 14:53:51 +0200
+        Sun, 26 Oct 2025 06:16:30 -0700 (PDT)
+Message-ID: <3a7a2318-09fb-41d2-9ba1-9d60c7e417a6@kernel.dk>
+Date: Sun, 26 Oct 2025 07:16:29 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,115 +84,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/5] net/mlx5: Add balance ID support for LAG
- multiplane groups
-To: Zhu Yanjun <yanjun.zhu@linux.dev>, Tariq Toukan <tariqt@nvidia.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
- Shay Drori <shayd@nvidia.com>
-References: <1761211020-925651-1-git-send-email-tariqt@nvidia.com>
- <328ebb4f-b1ce-4645-9cea-5fe81d3483e0@linux.dev>
+Subject: Re: [PATCH v2 3/5] io_uring/zcrx: share an ifq between rings
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>
+References: <20251025191504.3024224-1-dw@davidwei.uk>
+ <20251025191504.3024224-4-dw@davidwei.uk>
+ <f1fa5543-c637-435d-a189-5d942b1c7ebc@kernel.dk>
+ <ffdd2619-15d5-4393-87db-7a893f6d1fbf@davidwei.uk>
+From: Jens Axboe <axboe@kernel.dk>
 Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <328ebb4f-b1ce-4645-9cea-5fe81d3483e0@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <ffdd2619-15d5-4393-87db-7a893f6d1fbf@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On 26/10/2025 1:59, Zhu Yanjun wrote:
-> 在 2025/10/23 2:16, Tariq Toukan 写道:
->> Hi,
->>
->> This series adds balance ID support for MLX5 LAG in multiplane
->> configurations.
->>
->> See detailed description by Mark below [1].
->>
->> Regards,
->> Tariq
->>
->>
->> [1]
->> The problem: In complex multiplane LAG setups, we need finer control 
->> over LAG
->> groups. Currently, devices with the same system image GUID are treated
->> identically, but hardware now supports per-multiplane-group balance 
->> IDs that
->> let us differentiate between them. On such systems image system guid
->> isn't enough to decide which devices should be part of which LAG.
->>
->> The solution: Extend the system image GUID with a balance ID byte when 
->> the
->> hardware supports it. This gives us the granularity we need without 
->> breaking
->> existing deployments.
->>
->> What this series does:
->>
->> 1. Add the hardware interface bits (load_balance_id and lag_per_mp_group)
->> 2. Clean up some duplicate code while we're here
->> 3. Rework the system image GUID infrastructure to handle variable lengths
->> 4. Update PTP clock pairing to use the new approach
->> 5. Restructure capability setting to make room for the new feature
->> 6. Actually implement the balance ID support
->>
->> The key insight is in patch 6: we only append the balance ID when both
+On 10/25/25 10:12 PM, David Wei wrote:
+> Sorry I missed this during the splitting. Will include in v3.
 > 
-> In the above, patch 6 is the following patch? It should be patch 5?
+>>
+>>> +    ifq->proxy = src_ifq;
+>>
+>> For this, since the ifq is shared and reference counted, why don't they
+>> just point at the same memory here? Would avoid having this ->proxy
+>> thing and just skipping to that in other spots where the actual
+>> io_zcrx_ifq is required?
+>>
 > 
-> [PATCH net-next 5/5] net/mlx5: Add balance ID support for LAG multiplane 
-> groups
-> 
-> Yanjun.Zhu
-> 
+> I wanted a way to separate src and dst rings, while also decrementing
+> refcounts once and only once. I used separate ifq objects to do this,
+> but having learnt about xarray marks, I think I can use that instead.
 
-Right.
+I'm confused, why do you even need that? You already have
+ifq->proxy which is just a "link" to the shared queue, why aren't both
+rings just using the same ifq structure? You already increment the
+refcount when you add proxy, why can't the new ring just store the same
+ifq?
 
-Indices shifted because we sent the preparation IFC patch a priori:
-137d1a635513 net/mlx5: IFC add balance ID and LAG per MP group bits
-
->> capabilities are present, so older hardware and software continue to work
->> exactly as before. For newer setups, you get the extra byte that enables
->> per-multiplane-group load balancing.
->>
->> This has been tested with both old and new hardware configurations.
->>
->>
->> Mark Bloch (5):
->>    net/mlx5: Use common mlx5_same_hw_devs function
->>    net/mlx5: Add software system image GUID infrastructure
->>    net/mlx5: Refactor PTP clock devcom pairing
->>    net/mlx5: Refactor HCA cap 2 setting
->>    net/mlx5: Add balance ID support for LAG multiplane groups
->>
->>   drivers/net/ethernet/mellanox/mlx5/core/dev.c | 12 ++++---
->>   .../ethernet/mellanox/mlx5/core/en/devlink.c  |  7 ++--
->>   .../ethernet/mellanox/mlx5/core/en/mapping.c  | 13 +++++---
->>   .../ethernet/mellanox/mlx5/core/en/mapping.h  |  3 +-
->>   .../mellanox/mlx5/core/en/rep/bridge.c        |  6 +---
->>   .../mellanox/mlx5/core/en/tc/int_port.c       |  8 +++--
->>   .../ethernet/mellanox/mlx5/core/en/tc_ct.c    | 11 ++++---
->>   .../net/ethernet/mellanox/mlx5/core/en_tc.c   | 32 ++++++++++---------
->>   .../mellanox/mlx5/core/esw/devlink_port.c     |  6 +---
->>   .../mellanox/mlx5/core/eswitch_offloads.c     |  8 +++--
->>   .../net/ethernet/mellanox/mlx5/core/lag/lag.c |  4 ++-
->>   .../ethernet/mellanox/mlx5/core/lib/clock.c   | 19 ++++++-----
->>   .../ethernet/mellanox/mlx5/core/lib/devcom.h  |  2 ++
->>   .../net/ethernet/mellanox/mlx5/core/main.c    | 23 +++++++++----
->>   .../ethernet/mellanox/mlx5/core/mlx5_core.h   |  2 ++
->>   .../net/ethernet/mellanox/mlx5/core/vport.c   | 19 +++++++++++
->>   include/linux/mlx5/driver.h                   |  3 ++
->>   17 files changed, 112 insertions(+), 66 deletions(-)
->>
->>
->> base-commit: d550d63d0082268a31e93a10c64cbc2476b98b24
-> 
-> 
-
+-- 
+Jens Axboe
 
