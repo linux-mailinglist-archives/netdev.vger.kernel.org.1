@@ -1,131 +1,152 @@
-Return-Path: <netdev+bounces-233251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03071C0F686
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:44:51 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4197CC0F6A4
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:45:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28A731883D90
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 16:45:15 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D661634DEE5
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 16:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540BB30CD9D;
-	Mon, 27 Oct 2025 16:44:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97D0E2D2499;
+	Mon, 27 Oct 2025 16:45:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ghH1DooK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pkQjl9h9"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A75730C615;
-	Mon, 27 Oct 2025 16:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65540239E63;
+	Mon, 27 Oct 2025 16:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761583485; cv=none; b=CMyycHpHFoscmhyQDragZ+YCpZuytXtiuuLPW5HLPt0Avx1Ep+3DIQfuhdl4VAvnUDbWC6x3iY6mJDzzhFsBgFJKC8KVX0bfTx91haeoZXSz7H6qLK/quW2js6kguI5wdHaXdrlj3YT92P4y7qcxARMR03DQTuRMFcSMZ0QU2/M=
+	t=1761583532; cv=none; b=PsBkOCq/FqE/4xc6BXqPrCATYhqRVJPgpDk9uY+kEKnOxUc2SjSS0TJyZMwa3bon3EXeyFcmMAdijGIGt3BexuavkExgVCZjoffukppHOym2Dke+NEG/x32edFk+OiGrpSciTNLBzUIZC+SibOSB6iU4coQl93ggksYWGKL/iBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761583485; c=relaxed/simple;
-	bh=OFlj4QGnrs2E3fl/0ujJ9X4ekencKhGEKiw/mctCT/I=;
+	s=arc-20240116; t=1761583532; c=relaxed/simple;
+	bh=iKOVWF2RnfnIr0oOaw/PDTKY+Q3jxgn4qKv3p2eNTkw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uDOK6HEJNZ92zLohvA2cg2JdmV1cqbQe6oJcU6nTVlpXIhjVwEAHYPTwjGUt9swdvSKgrkJMG3slQLIULYHy4tSN53y78I/vVElEW5UbqhaIEqFCp8uMu7dNMSRx0QJ+mK5XaWzYlj4v4Dq4eAQSUnm5zmps5uXH9reXW4uXrak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ghH1DooK; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=5CP7gRt0BblrjBDXAO/3HHhQ8A2T8uZzDR6yvnegDug=; b=ghH1DooKmkmLdJXWxXedWnU15v
-	ZVCXtgDvd+7aaDvknLD7KfrqAbbh5Y1S6A7CHrwNY91J13EqMnCaspEqILKrexhyVFpqn06DgqN1o
-	yvP/jZHR+E7BlwiQJw45D4qHvgkDX1LkbhGxEMLFyeOghMU8ZENl4LQ7AxO3JlE6mA12lDlddFphx
-	rsYhIlMpjkpudqsSZdZJVhTKnNO2vPJpYnFKMfNcWo96W3/Wwp4PSfUb2Yche/GY3TLsA1eGXVR9D
-	Y7OLQrhcd0LF6fua4WZKSoEdFXUJjcEQTeuMq8B5NRM5TojiE1+qF9Ek07/pf1eiHPusM8RshePVO
-	h+Ys3XJQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52316)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vDQKh-0000000026D-2lSw;
-	Mon, 27 Oct 2025 16:44:35 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vDQKf-000000005kr-0qgI;
-	Mon, 27 Oct 2025 16:44:33 +0000
-Date: Mon, 27 Oct 2025 16:44:33 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Emanuele Ghidoli <ghidoliemanuele@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v1] net: phy: dp83867: Disable EEE support as not
- implemented
-Message-ID: <aP-hca4pDsDlEGUt@shell.armlinux.org.uk>
-References: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
- <ae723e7c-f876-45ef-bc41-3b39dc1dc76b@lunn.ch>
- <664ef58b-d7e6-4f08-b88f-e7c2cf08c83c@gmail.com>
- <aP-Hgo5mf7BQyee_@shell.armlinux.org.uk>
- <f65c1650-22c3-4363-8b7e-00d19bf7af88@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SPYhKR7UEta/E9EKy6AAwQ8rpKuvV5HEFikwzgcCABNqJW7MHLxOsJ3Nyq6Wectj/dOCm+ASqv09MuzO2QVMXrzWggM4+IBbkn+jDjD4xtaEsK234xRzICFyQ4Lq7s3xOpUWrUn5DYFdJrf1T22jKoU2vHmvAnien0NRPruWgUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pkQjl9h9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0377CC4CEFD;
+	Mon, 27 Oct 2025 16:45:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761583531;
+	bh=iKOVWF2RnfnIr0oOaw/PDTKY+Q3jxgn4qKv3p2eNTkw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pkQjl9h9KohVvz65bHU+yH04xkh+S8fYTnr8QeHrTV4PSsCyK71TLKAPocn4quoeS
+	 ntVDFx10SoLftdxXvKGbgOFZKokROQylrGH0FYJ9IJs5bdrEXbpki0LTSn8qx9CjJm
+	 8EA4N8ot1fReXS9FxgYFa1M+G9EBiF6N1QQhbQsdrE6GHoBXTOSJyGqx92rNgEFIZE
+	 nv5LCIgrybSDCuXTvlCZJY23r0TccWdxSS/MTbl5QJlK4Em8N4ycnMR/fzEo7dq4Cf
+	 J9LDNjjZs9PE1dSbCNCs+debXClghryq+/W2++unwGI5THXvUk1EbAKYU2D3HncncK
+	 wgC1Ld0SOho3w==
+Date: Mon, 27 Oct 2025 16:45:27 +0000
+From: Simon Horman <horms@kernel.org>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next 01/12] selftests/vsock: improve logging in
+ vmtest.sh
+Message-ID: <aP-hpxMgB5tN7KJ3@horms.kernel.org>
+References: <20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com>
+ <20251022-vsock-selftests-fixes-and-improvements-v1-1-edeb179d6463@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f65c1650-22c3-4363-8b7e-00d19bf7af88@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20251022-vsock-selftests-fixes-and-improvements-v1-1-edeb179d6463@meta.com>
 
-On Mon, Oct 27, 2025 at 04:34:54PM +0100, Emanuele Ghidoli wrote:
-> > So, this needs to be tested - please modify phylib's
-> > genphy_c45_read_eee_cap1() to print the value read from the register.
-> > 
-> > If it is 0xffff, that confirms that theory.
-> It’s not 0xffff; I verified that the value read is:
-> TI DP83867 stmmac-0:02: Reading EEE capabilities from MDIO_PCS_EEE_ABLE: 0x0006
+On Wed, Oct 22, 2025 at 06:00:05PM -0700, Bobby Eshleman wrote:
+> From: Bobby Eshleman <bobbyeshleman@meta.com>
+> 
+> Improve usability of logging functions. Remove the test name prefix from
+> logging functions so that logging calls can be made deeper into the call
+> stack without passing down the test name or setting some global. Teach
+> log function to accept a LOG_PREFIX variable to avoid unnecessary
+> argument shifting.
+> 
+> Remove log_setup() and instead use log_host(). The host/guest prefixes
+> are useful to show whether a failure happened on the guest or host side,
+> but "setup" doesn't really give additional useful information. Since all
+> log_setup() calls happen on the host, lets just use log_host() instead.
+> 
+> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
 
-Thanks for testing. So the published manual for this PHY is wrong.
-https://www.ti.com/lit/ds/symlink/dp83867ir.pdf page 64.
+...
 
-The comment I quoted from that page implies that the PCS and AN
-MMD registers shouldn't be implemented.
+>  log() {
+> -	local prefix="$1"
+> +	local redirect
+> +	local prefix
+>  
+> -	shift
+> -	local redirect=
+>  	if [[ ${VERBOSE} -eq 0 ]]; then
+>  		redirect=/dev/null
+>  	else
+>  		redirect=/dev/stdout
+>  	fi
+>  
+> +	prefix="${LOG_PREFIX:-}"
+> +
+>  	if [[ "$#" -eq 0 ]]; then
+> -		__log_stdin | tee -a "${LOG}" > ${redirect}
+> +		if [[ -n "${prefix}" ]]; then
+> +			cat | awk -v prefix="${prefix}" '{printf "%s: %s\n", prefix, $0}'
 
-Given what we now know, I'd suggest TI PHYs are a mess. Stuff they
-say in the documentation that is ignored plainly isn't, and their
-PHYs report stuff as capable but their PHYs aren't capable.
+FIWIIW, I would drop cat from this line.
 
-I was suggesting to clear phydev->supported_eee, but that won't
-work if the MDIO_AN_EEE_ADV register is implemented even as far
-as exchanging EEE capabilities with the link partner. We use the
-supported_eee bitmap to know whether a register is implemented.
-Clearing ->supported_eee will mean we won't write to the advertisement
-register. That's risky. Given the brokenness so far, I wouldn't like
-to assume that the MDIO_AN_EEE_ADV register contains zero by default.
+> +		else
+> +			cat
+> +		fi
+>  	else
+> -		__log_args "$@" | tee -a "${LOG}" > ${redirect}
+> -	fi
+> -}
+> -
+> -log_setup() {
+> -	log "setup" "$@"
+> +		if [[ -n "${prefix}" ]]; then
+> +			echo "${prefix}: " "$@"
+> +		else
+> +			echo "$@"
+> +		fi
+> +	fi | tee -a "${LOG}" > ${redirect}
+>  }
+>  
+>  log_host() {
+> -	local testname=$1
+> -
+> -	shift
+> -	log "test:${testname}:host" "$@"
+> +	LOG_PREFIX=host log $@
 
-Calling phy_disable_eee() from .get_features() won't work, because
-after we call that method, of_set_phy_eee_broken() will then be
-called, which will clear phydev->eee_disabled_modes. I think that is
-a mistake. Is there any reason why we would want to clear the
-disabled modes? Isn't it already zero? (note that if OF_MDIO is
-disabled, or there's no DT node, we don't zero this.)
+shellcheck suggests keeping the quoting of $@.
+This seems reasonable to me. Although in practice I don't think
+it will change the behaviour of this script.
 
-Your placement is the only possible location as the code currently
-stands, but I would like to suggest that of_set_phy_eee_broken()
-should _not_ be calling linkmode_zero(modes), and we should be able
-to set phydev->eee_disabled_modes in the .get_features() method.
+>  }
+>  log_host
+>  log_guest() {
+> -	local testname=$1
+> -
+> -	shift
+> -	log "test:${testname}:guest" "$@"
+> +	LOG_PREFIX=guest log $@
 
-Andrew, would you agree?
+shellcheck also points out that log_guest is never passed
+arguments, so $@ can be dropped. If you prefer to keep
+it then, as per log_host, it seems reasonable for it to be quoted.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>  }
+
+...
 
