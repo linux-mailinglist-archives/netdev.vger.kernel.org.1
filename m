@@ -1,484 +1,190 @@
-Return-Path: <netdev+bounces-233189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DEE2C0E290
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 14:51:14 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01B15C0E2AB
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 14:51:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DAAD3B1316
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 13:42:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9CC294EA46C
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 13:48:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 048E413AD26;
-	Mon, 27 Oct 2025 13:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A353019B2;
+	Mon, 27 Oct 2025 13:48:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LRczY+hy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bDf68vmF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2F01F19A;
-	Mon, 27 Oct 2025 13:42:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B412C0286;
+	Mon, 27 Oct 2025 13:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761572551; cv=none; b=KNIEnaM8SL1Bj9ESc8NJFYrWV4bzSDlM2HHZvShNhZj7Xs6HQOOmL6dkF3h0gDh3PFkF96+pXxYHPwCseTkFbbrSixMolcuGfrzaV21Uy3IbITPrLnaVvr+ESPLTmyEtjdKn+8G87bf4HwB9kYIv9XsP646zGOc2L0EJRJzpam4=
+	t=1761572899; cv=none; b=kXW/QkG8jXl1SYYA53ks0zU8ydA2L9P2DbRbLMThZafOfltc8hANRSSpaCk5bYa5Ex/WvqFODgbdpbXI27naFbJ7wlHeNwZ6LL2eF4V0jxJhw5dnJNETJVxALPiI+9crujlzITp7R5+IiL5u7MAyxntABYbTDmd1w8dTh9B6f4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761572551; c=relaxed/simple;
-	bh=hZnX9VvEMNOg9c34tU42PaAD9KRUlN43Rla4Jgw2Q50=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SyBTEuxttqwO0BAlND9D0b4SyxHXrJtic5bQ29WyFPB1QM/NQxDLggUvZ+HDvYUD9iBOoEJY/oBJBx1RjeYWatxGkRFs+ObTtM85AIClVfV2RICwjMJwFyRtPyzAWI8Fzm9o+o7U9/ALYu1c693sIeU5DNLuOT0VIFfJmafv8hE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LRczY+hy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97BAFC4CEFF;
-	Mon, 27 Oct 2025 13:42:30 +0000 (UTC)
+	s=arc-20240116; t=1761572899; c=relaxed/simple;
+	bh=TFh1rUOXhmwRs8h1YytlKXcFsKZhDUWH+d00dt4v5qw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OGu5yIFzGlA2Yc90KoDxMUNUg5WajSoPjlhq+rU9/RomeCd4JTpT1CtoC4m2u7MTbrk4sIhfwCA2BXvsvtPvFR/FQxcNouga8dNFBgD93dL/dl/JbsCAL6ogHFYscMt/3YiuEkJvsuMG8e2xy10/SKhzxzVhJWcGsZx/aYHdG5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bDf68vmF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3F8CC4CEF1;
+	Mon, 27 Oct 2025 13:48:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761572551;
-	bh=hZnX9VvEMNOg9c34tU42PaAD9KRUlN43Rla4Jgw2Q50=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LRczY+hye4Ut8vHvx2239mNnbceTvANS7RL3xz6hmsrYI3LQHaJriyqyfO1kqYNg9
-	 xo6kYkk1U0jNOQdMUvewUOFPwXwhpt8HmBz15p2Cd0nWQds1a8X4RbPnPjHH44ZBuI
-	 UzaIQ0XMABhmOVV8q/YaDTjmIl/7BIOHLT/RHaGEiO64q4GOmiW3+XYN0ba53qqEIv
-	 uK1UxRgK17Tpq32jCJGzYuY7xc/WbP3GYvvl5l4qHJGURWBLfwiI+2Y0FrcanQ4gX7
-	 TJM1W72ZhTKd8h3IJVXPAEKUlj8jsqEUYSwXhCiTG9qkcPzP7CFV9riuw5AGRnjoT0
-	 FRXzYlrARGV5w==
-Date: Mon, 27 Oct 2025 15:42:27 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: mjambigi@linux.ibm.com, wenjia@linux.ibm.com, wintera@linux.ibm.com,
-	dust.li@linux.alibaba.com, tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com, kuba@kernel.org, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
-	sidraya@linux.ibm.com, jaka@linux.ibm.com
-Subject: Re: [PATCH net-next v2] net/smc: add full IPv6 support for SMC
-Message-ID: <20251027134227.GL12554@unreal>
-References: <20251022032309.66386-1-alibuda@linux.alibaba.com>
+	s=k20201202; t=1761572898;
+	bh=TFh1rUOXhmwRs8h1YytlKXcFsKZhDUWH+d00dt4v5qw=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=bDf68vmFNJkUAbcr79AqDRGq4x9EY8FE52oyBg+hQgpzMAGbjV9vr9IpJPjuopCQz
+	 e7uPE6YCJzwT/l5kqvI4vTTnMT38qUEyV8akVXgCFtdYjaJAvN41daQ8405JeWY8iF
+	 uRUa5uOUcsIR56OE90wkq/W0lLqNfKZlGiVDggI3EzdJswf1o9bliNiwayEHZl1+2n
+	 VB2RaSz1mqmLvVW+uq4ILWAX7sbodi5OoZcCokw5xEWy4AmPgmqENPrTVL0mqzLfX8
+	 mrmlodhwK9XzyI3XeXEVl5pWpeifnUp+wEGTRtoGo3ScaeCydcf2omh6dbGNIwL7RB
+	 q9VPuzyzT4VfQ==
+Message-ID: <58b165011cd8c38ed08d612a2a27af01c74ced95.camel@kernel.org>
+Subject: Re: [PATCH v3 14/70] nstree: allow lookup solely based on inode
+From: Jeff Layton <jlayton@kernel.org>
+To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org, 
+ Josef Bacik <josef@toxicpanda.com>
+Cc: Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, Zbigniew
+ =?UTF-8?Q?J=C4=99drzejewski-Szmek?=	 <zbyszek@in.waw.pl>, Lennart
+ Poettering <mzxreary@0pointer.de>, Daan De Meyer	
+ <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, Amir
+ Goldstein	 <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner
+	 <hannes@cmpxchg.org>, Thomas Gleixner <tglx@linutronix.de>, Alexander Viro
+	 <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, bpf@vger.kernel.org,
+  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, Arnd Bergmann	 <arnd@arndb.de>
+Date: Mon, 27 Oct 2025 09:48:15 -0400
+In-Reply-To: <20251024-work-namespace-nstree-listns-v3-14-b6241981b72b@kernel.org>
+References: 
+	<20251024-work-namespace-nstree-listns-v3-0-b6241981b72b@kernel.org>
+	 <20251024-work-namespace-nstree-listns-v3-14-b6241981b72b@kernel.org>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251022032309.66386-1-alibuda@linux.alibaba.com>
 
-On Wed, Oct 22, 2025 at 11:23:09AM +0800, D. Wythe wrote:
-> The current SMC implementation is IPv4-centric. While it contains a
-> workaround for IPv4-mapped IPv6 addresses, it lacks a functional path
-> for native IPv6, preventing its use in modern dual-stack or IPv6-only
-> networks.
-> 
-> This patch introduces full, native IPv6 support by refactoring the
-> address handling mechanism to be IP-version agnostic, which is
-> achieved by:
-> 
-> - Introducing a generic `struct smc_ipaddr` to abstract IP addresses.
-> - Implementing an IPv6-specific route lookup function.
-> - Extend GID matching logic for both IPv4 and IPv6 addresses
-> 
-> With these changes, SMC can now discover RDMA devices and establish
-> connections over both native IPv4 and IPv6 networks.
+On Fri, 2025-10-24 at 12:52 +0200, Christian Brauner wrote:
+> The namespace file handle struct nsfs_file_handle is uapi and userspace
+> is expressly allowed to generate file handles without going through
+> name_to_handle_at().
+>=20
+> Allow userspace to generate a file handle where both the inode number
+> and the namespace type are zero and just pass in the unique namespace
+> id. The kernel uses the unified namespace tree to find the namespace and
+> open the file handle.
+>=20
+> When the kernel creates a file handle via name_to_handle_at() it will
+> always fill in the type and the inode number allowing userspace to
+> retrieve core information.
+>=20
 
-Why can't you use rdma-cm in-kernel API like any other in-kernel RDMA consumers?
+Where is the nsfs filehandle format documented? I didn't see any
+reference to it in the manpages.
 
-Thanks
-
-> 
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
 > ---
-> v2: Fix build failure with CONFIG_IPV6 disabled
-> ---
->  net/smc/af_smc.c   |  48 +++++++++++----
->  net/smc/smc_core.h |  40 ++++++++++++-
->  net/smc/smc_ib.c   | 145 ++++++++++++++++++++++++++++++++++++++-------
->  net/smc/smc_ib.h   |   9 +++
->  net/smc/smc_llc.c  |   6 +-
->  5 files changed, 209 insertions(+), 39 deletions(-)
-> 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 77b99e8ef35a..b435c8ba95f5 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -1132,12 +1132,15 @@ static int smc_find_proposal_devices(struct smc_sock *smc,
->  
->  	/* check if there is an rdma v2 device available */
->  	ini->check_smcrv2 = true;
-> -	ini->smcrv2.saddr = smc->clcsock->sk->sk_rcv_saddr;
-> -	if (!(ini->smcr_version & SMC_V2) ||
-> +
-> +	if (smc->clcsock->sk->sk_family == AF_INET)
-> +		smc_ipaddr_from_v4addr(&ini->smcrv2.saddr, smc->clcsock->sk->sk_rcv_saddr);
->  #if IS_ENABLED(CONFIG_IPV6)
-> -	    (smc->clcsock->sk->sk_family == AF_INET6 &&
-> -	     !ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)) ||
-> -#endif
-> +	else
-> +		smc_ipaddr_from_v6addr(&ini->smcrv2.saddr, &smc->clcsock->sk->sk_v6_rcv_saddr);
-> +#endif /* CONFIG_IPV6 */
-> +
-> +	if (!(ini->smcr_version & SMC_V2) ||
->  	    !smc_clc_ueid_count() ||
->  	    smc_find_rdma_device(smc, ini))
->  		ini->smcr_version &= ~SMC_V2;
-> @@ -1230,11 +1233,27 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
->  		memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_ALEN);
->  		ini->smcrv2.uses_gateway = false;
->  	} else {
-> -		if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
-> -				      smc_ib_gid_to_ipv4(aclc->r0.lcl.gid),
-> -				      ini->smcrv2.nexthop_mac,
-> -				      &ini->smcrv2.uses_gateway))
-> +		struct smc_ipaddr peer_gid;
-> +
-> +		smc_ipaddr_from_gid(&peer_gid, aclc->r0.lcl.gid);
-> +		if (peer_gid.family == AF_INET) {
-> +			/* v4-mapped v6 address should also be treated as v4 address. */
-> +			if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
-> +					      peer_gid.addr,
-> +					      ini->smcrv2.nexthop_mac,
-> +					      &ini->smcrv2.uses_gateway))
-> +				return SMC_CLC_DECL_NOROUTE;
-> +		} else {
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +			if (smc_ib_find_route_v6(net, &smc->clcsock->sk->sk_v6_rcv_saddr,
-> +						 &peer_gid.addr_v6,
-> +						 ini->smcrv2.nexthop_mac,
-> +						 &ini->smcrv2.uses_gateway))
-> +				return SMC_CLC_DECL_NOROUTE;
-> +#else
->  			return SMC_CLC_DECL_NOROUTE;
-> +#endif /* CONFIG_IPV6 */
-> +		}
->  		if (!ini->smcrv2.uses_gateway) {
->  			/* mismatch: peer claims indirect, but its direct */
->  			return SMC_CLC_DECL_NOINDIRECT;
-> @@ -2307,8 +2326,15 @@ static void smc_find_rdma_v2_device_serv(struct smc_sock *new_smc,
->  	memcpy(ini->peer_mac, pclc->lcl.mac, ETH_ALEN);
->  	ini->check_smcrv2 = true;
->  	ini->smcrv2.clc_sk = new_smc->clcsock->sk;
-> -	ini->smcrv2.saddr = new_smc->clcsock->sk->sk_rcv_saddr;
-> -	ini->smcrv2.daddr = smc_ib_gid_to_ipv4(smc_v2_ext->roce);
-> +
-> +	if (new_smc->clcsock->sk->sk_family == AF_INET)
-> +		smc_ipaddr_from_v4addr(&ini->smcrv2.saddr, new_smc->clcsock->sk->sk_rcv_saddr);
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	else
-> +		smc_ipaddr_from_v6addr(&ini->smcrv2.saddr, &new_smc->clcsock->sk->sk_v6_rcv_saddr);
-> +#endif /* CONFIG_IPV6 */
-> +	smc_ipaddr_from_gid(&ini->smcrv2.daddr, smc_v2_ext->roce);
-> +
->  	rc = smc_find_rdma_device(new_smc, ini);
->  	if (rc) {
->  		smc_find_ism_store_rc(rc, ini);
-> diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
-> index a5a78cbff341..6b07785f9874 100644
-> --- a/net/smc/smc_core.h
-> +++ b/net/smc/smc_core.h
-> @@ -279,6 +279,14 @@ struct smc_llc_flow {
->  	struct smc_llc_qentry *qentry;
->  };
->  
-> +struct smc_ipaddr {
-> +	sa_family_t family;
-> +	union {
-> +		__be32          addr;
-> +		struct in6_addr addr_v6;
-> +	};
-> +};
-> +
->  struct smc_link_group {
->  	struct list_head	list;
->  	struct rb_root		conns_all;	/* connection tree */
-> @@ -359,7 +367,7 @@ struct smc_link_group {
->  						/* rsn code for termination */
->  			u8			nexthop_mac[ETH_ALEN];
->  			u8			uses_gateway;
-> -			__be32			saddr;
-> +			struct smc_ipaddr saddr;
->  						/* net namespace */
->  			struct net		*net;
->  			u8			max_conns;
-> @@ -389,9 +397,9 @@ struct smc_gidlist {
->  
->  struct smc_init_info_smcrv2 {
->  	/* Input fields */
-> -	__be32			saddr;
-> +	struct smc_ipaddr saddr;
->  	struct sock		*clc_sk;
-> -	__be32			daddr;
-> +	struct smc_ipaddr daddr;
->  
->  	/* Output fields when saddr is set */
->  	struct smc_ib_device	*ib_dev_v2;
-> @@ -618,4 +626,30 @@ static inline struct smc_link_group *smc_get_lgr(struct smc_link *link)
->  {
->  	return link->lgr;
->  }
-> +
-> +static inline void smc_ipaddr_from_v4addr(struct smc_ipaddr *ipaddr, __be32 v4_addr)
-> +{
-> +	ipaddr->family = AF_INET;
-> +	ipaddr->addr = v4_addr;
-> +}
-> +
-> +static inline void smc_ipaddr_from_v6addr(struct smc_ipaddr *ipaddr, const struct in6_addr *v6_addr)
-> +{
-> +	ipaddr->family = AF_INET6;
-> +	ipaddr->addr_v6 = *v6_addr;
-> +}
-> +
-> +static inline void smc_ipaddr_from_gid(struct smc_ipaddr *ipaddr, u8 gid[SMC_GID_SIZE])
-> +{
-> +	__be32 gid_v4 = smc_ib_gid_to_ipv4(gid);
-> +
-> +	if (gid_v4 != cpu_to_be32(INADDR_NONE)) {
-> +		ipaddr->family = AF_INET;
-> +		ipaddr->addr = gid_v4;
-> +	} else {
-> +		ipaddr->family = AF_INET6;
-> +		ipaddr->addr_v6 = *smc_ib_gid_to_ipv6(gid);
-> +	}
-> +}
-> +
->  #endif
-> diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-> index 0052f02756eb..9c4c53be7bfc 100644
-> --- a/net/smc/smc_ib.c
-> +++ b/net/smc/smc_ib.c
-> @@ -22,6 +22,7 @@
->  #include <linux/inetdevice.h>
->  #include <rdma/ib_verbs.h>
->  #include <rdma/ib_cache.h>
-> +#include <net/ip6_route.h>
->  
->  #include "smc_pnet.h"
->  #include "smc_ib.h"
-> @@ -225,48 +226,148 @@ int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
->  	return -ENOENT;
->  }
->  
-> -static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +int smc_ib_find_route_v6(struct net *net, struct in6_addr *saddr,
-> +			 struct in6_addr *daddr, u8 nexthop_mac[],
-> +			 u8 *uses_gateway)
-> +{
-> +	struct dst_entry *dst;
-> +	struct rt6_info *rt;
-> +	struct neighbour *neigh;
-> +	struct in6_addr *nexthop_addr;
-> +	int rc = -ENOENT;
-> +
-> +	struct flowi6 fl6 = {
-> +		.daddr = *daddr,
-> +		.saddr = *saddr,
-> +	};
-> +
-> +	if (ipv6_addr_any(daddr))
-> +		return -EINVAL;
-> +
-> +	dst = ip6_route_output(net, NULL, &fl6);
-> +	if (!dst || dst->error) {
-> +		rc = dst ? dst->error : -EINVAL;
-> +		goto out;
-> +	}
-> +	rt = (struct rt6_info *)dst;
-> +
-> +	if (ipv6_addr_type(&rt->rt6i_gateway) != IPV6_ADDR_ANY) {
-> +		*uses_gateway = 1;
-> +		nexthop_addr = &rt->rt6i_gateway;
-> +	} else {
-> +		*uses_gateway = 0;
-> +		nexthop_addr = daddr;
-> +	}
-> +
-> +	neigh = dst_neigh_lookup(dst, nexthop_addr);
-> +	if (!neigh)
-> +		goto out;
-> +
-> +	read_lock_bh(&neigh->lock);
-> +	if (neigh->nud_state & NUD_VALID) {
-> +		memcpy(nexthop_mac, neigh->ha, ETH_ALEN);
-> +		rc = 0;
-> +	}
-> +	read_unlock_bh(&neigh->lock);
-> +
-> +	neigh_release(neigh);
-> +out:
-> +	dst_release(dst);
-> +	return rc;
-> +}
-> +#endif /* CONFIG_IPV6 */
-> +
-> +static bool smc_ib_match_gid_rocev2(const struct net_device *ndev,
->  				    const struct ib_gid_attr *attr,
-> -				    u8 gid[], u8 *sgid_index,
->  				    struct smc_init_info_smcrv2 *smcrv2)
->  {
-> -	if (!smcrv2 && attr->gid_type == IB_GID_TYPE_ROCE) {
-> -		if (gid)
-> -			memcpy(gid, &attr->gid, SMC_GID_SIZE);
-> -		if (sgid_index)
-> -			*sgid_index = attr->index;
-> -		return 0;
-> -	}
-> -	if (smcrv2 && attr->gid_type == IB_GID_TYPE_ROCE_UDP_ENCAP &&
-> -	    smc_ib_gid_to_ipv4((u8 *)&attr->gid) != cpu_to_be32(INADDR_NONE)) {
-> +	struct net *net = dev_net(ndev);
-> +	bool subnet_match = false;
-> +
-> +	if (smc_ib_gid_to_ipv4((u8 *)&attr->gid) != cpu_to_be32(INADDR_NONE)) {
->  		struct in_device *in_dev = __in_dev_get_rcu(ndev);
-> -		struct net *net = dev_net(ndev);
->  		const struct in_ifaddr *ifa;
-> -		bool subnet_match = false;
->  
->  		if (!in_dev)
-> -			goto out;
-> +			return false;
-> +
-> +		if (smcrv2->saddr.family != AF_INET)
-> +			return false;
-> +
->  		in_dev_for_each_ifa_rcu(ifa, in_dev) {
-> -			if (!inet_ifa_match(smcrv2->saddr, ifa))
-> +			if (!inet_ifa_match(smcrv2->saddr.addr, ifa))
->  				continue;
->  			subnet_match = true;
->  			break;
->  		}
-> +
->  		if (!subnet_match)
-> -			goto out;
-> -		if (smcrv2->daddr && smc_ib_find_route(net, smcrv2->saddr,
-> -						       smcrv2->daddr,
-> -						       smcrv2->nexthop_mac,
-> -						       &smcrv2->uses_gateway))
-> -			goto out;
-> +			return false;
-> +
-> +		if (smcrv2->daddr.addr &&
-> +		    smc_ib_find_route(net, smcrv2->saddr.addr,
-> +				      smcrv2->daddr.addr,
-> +				      smcrv2->nexthop_mac,
-> +				      &smcrv2->uses_gateway))
-> +			return false;
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	} else if (!(ipv6_addr_type(smc_ib_gid_to_ipv6((u8 *)&attr->gid)) & IPV6_ADDR_LINKLOCAL)) {
-> +		struct inet6_dev *in6_dev = __in6_dev_get(ndev);
-> +		const struct inet6_ifaddr *if6;
-> +
-> +		if (!in6_dev)
-> +			return false;
-> +
-> +		if (smcrv2->saddr.family != AF_INET6)
-> +			return false;
-> +
-> +		list_for_each_entry_rcu(if6, &in6_dev->addr_list, if_list) {
-> +			if (ipv6_addr_type(&if6->addr) & IPV6_ADDR_LINKLOCAL)
-> +				continue;
-> +			if (!ipv6_prefix_equal(&if6->addr, &smcrv2->saddr.addr_v6, if6->prefix_len))
-> +				continue;
-> +			subnet_match = true;
-> +			break;
-> +		}
->  
-> +		if (!subnet_match)
-> +			return false;
-> +
-> +		if ((ipv6_addr_type(&smcrv2->daddr.addr_v6) != IPV6_ADDR_ANY) &&
-> +		    smc_ib_find_route_v6(net, &smcrv2->saddr.addr_v6,
-> +					 &smcrv2->daddr.addr_v6,
-> +					 smcrv2->nexthop_mac,
-> +					 &smcrv2->uses_gateway))
-> +			return false;
-> +#endif /* CONFIG_IPV6 */
-> +	} else {
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
-> +				    const struct ib_gid_attr *attr,
-> +				    u8 gid[], u8 *sgid_index,
-> +				    struct smc_init_info_smcrv2 *smcrv2)
-> +{
-> +	bool gid_match = false;
-> +
-> +	if (!smcrv2 && attr->gid_type == IB_GID_TYPE_ROCE)
-> +		gid_match = true;
-> +	else if (smcrv2 && attr->gid_type == IB_GID_TYPE_ROCE_UDP_ENCAP)
-> +		gid_match = smc_ib_match_gid_rocev2(ndev, attr, smcrv2);
-> +
-> +	if (gid_match) {
->  		if (gid)
->  			memcpy(gid, &attr->gid, SMC_GID_SIZE);
->  		if (sgid_index)
->  			*sgid_index = attr->index;
->  		return 0;
->  	}
-> -out:
-> +
->  	return -ENODEV;
->  }
->  
-> diff --git a/net/smc/smc_ib.h b/net/smc/smc_ib.h
-> index ef8ac2b7546d..7cbeb7350478 100644
-> --- a/net/smc/smc_ib.h
-> +++ b/net/smc/smc_ib.h
-> @@ -69,6 +69,12 @@ static inline __be32 smc_ib_gid_to_ipv4(u8 gid[SMC_GID_SIZE])
->  	return cpu_to_be32(INADDR_NONE);
->  }
->  
-> +static inline struct in6_addr *smc_ib_gid_to_ipv6(u8 gid[SMC_GID_SIZE])
-> +{
-> +	struct in6_addr *addr6 = (struct in6_addr *)gid;
-> +	return addr6;
-> +}
-> +
->  static inline struct net *smc_ib_net(struct smc_ib_device *smcibdev)
->  {
->  	if (smcibdev && smcibdev->ibdev)
-> @@ -114,6 +120,9 @@ int smc_ib_determine_gid(struct smc_ib_device *smcibdev, u8 ibport,
->  			 struct smc_init_info_smcrv2 *smcrv2);
->  int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
->  		      u8 nexthop_mac[], u8 *uses_gateway);
-> +int smc_ib_find_route_v6(struct net *net, struct in6_addr *saddr,
-> +			 struct in6_addr *daddr, u8 nexthop_mac[],
-> +			 u8 *uses_gateway);
->  bool smc_ib_is_valid_local_systemid(void);
->  int smcr_nl_get_device(struct sk_buff *skb, struct netlink_callback *cb);
->  #endif
-> diff --git a/net/smc/smc_llc.c b/net/smc/smc_llc.c
-> index f865c58c3aa7..f2a02611ab25 100644
-> --- a/net/smc/smc_llc.c
-> +++ b/net/smc/smc_llc.c
-> @@ -1055,8 +1055,9 @@ int smc_llc_cli_add_link(struct smc_link *link, struct smc_llc_qentry *qentry)
->  	if (lgr->smc_version == SMC_V2) {
->  		ini->check_smcrv2 = true;
->  		ini->smcrv2.saddr = lgr->saddr;
-> -		ini->smcrv2.daddr = smc_ib_gid_to_ipv4(llc->sender_gid);
-> +		smc_ipaddr_from_gid(&ini->smcrv2.daddr, llc->sender_gid);
->  	}
-> +
->  	smc_pnet_find_alt_roce(lgr, ini, link->smcibdev);
->  	if (!memcmp(llc->sender_gid, link->peer_gid, SMC_GID_SIZE) &&
->  	    (lgr->smc_version == SMC_V2 ||
-> @@ -1438,8 +1439,7 @@ int smc_llc_srv_add_link(struct smc_link *link,
->  		if (send_req_add_link_resp) {
->  			struct smc_llc_msg_req_add_link_v2 *req_add =
->  				&req_qentry->msg.req_add_link;
-> -
-> -			ini->smcrv2.daddr = smc_ib_gid_to_ipv4(req_add->gid[0]);
-> +			smc_ipaddr_from_gid(&ini->smcrv2.daddr, req_add->gid[0]);
->  		}
->  	}
->  	smc_pnet_find_alt_roce(lgr, ini, link->smcibdev);
-> -- 
-> 2.45.0
-> 
-> 
+>  fs/nsfs.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/fs/nsfs.c b/fs/nsfs.c
+> index 8b9bebd11c49..19dc28742a42 100644
+> --- a/fs/nsfs.c
+> +++ b/fs/nsfs.c
+> @@ -502,8 +502,8 @@ static struct dentry *nsfs_fh_to_dentry(struct super_=
+block *sb, struct fid *fh,
+>  			return NULL;
+> =20
+>  		VFS_WARN_ON_ONCE(ns->ns_id !=3D fid->ns_id);
+> -		VFS_WARN_ON_ONCE(ns->ns_type !=3D fid->ns_type);
+> -		VFS_WARN_ON_ONCE(ns->inum !=3D fid->ns_inum);
+> +		if (fid->ns_inum && (fid->ns_inum !=3D ns->inum))
+> +			return NULL;
+> =20
+>  		/*
+>  		 * This is racy because we're not actually taking an
+
+--=20
+Jeff Layton <jlayton@kernel.org>
 
