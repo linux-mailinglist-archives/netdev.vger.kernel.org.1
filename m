@@ -1,115 +1,127 @@
-Return-Path: <netdev+bounces-233139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DE7EC0CED4
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 11:20:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D987C0CE13
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 11:08:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 339BD1897232
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 10:20:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8378E404E53
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 10:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD192F5A39;
-	Mon, 27 Oct 2025 10:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91662F6905;
+	Mon, 27 Oct 2025 10:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="ZzmW5z4H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pE1ta6m8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AEEB22424E;
-	Mon, 27 Oct 2025 10:20:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DDED2F6569;
+	Mon, 27 Oct 2025 10:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761560406; cv=none; b=uVAJKjG2iat3vebtjuxuNsOcQd7AnUZInFZmmZs1XP1D2JieHKBoBzPkE+w6ZGebNIpi7hkLTYpu2y2f6F6TaHr+wzafrG/5ktTPVeIlh1ExTniAFhMATGDy5Gw5pnBjnCdhbKcUT18SJ26J08jqmoHAtkohYrwELtQ/BEAfqOc=
+	t=1761559240; cv=none; b=FosGXDaZPjPEZ7lIm8MoLIjPFFZkyCFD/WAhrRTIFUzSX2ZerVak3+X5cIuQMfdoKXK+D65rPAfrXD70O3jwKDQndJaHPVW7ep1T1wOfZiizYfdbMLEktS6QCZk1wZNde3GNjxuSBQBDfOJMM90fOnydgh4sjVNtcoeJAGzo2ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761560406; c=relaxed/simple;
-	bh=+RKvzDmt0Q1uLzUachi8BYSnc2ITFmHUfx22gc9qmZQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ouqNr+sceprsn/E8caFJGpS6IAjSqofc+8oUTGdF12OZj4LjjAIqSzY/8ncvc5ogg+kUoKL+8tCqdK3U8ZB8LDxbH+6FsxqnJXO0Mj8mw/A9zTH5ni7eyiPMumcihMyTZOoPRnup65DCeLQG0JWB4HqSKSKxUZixpc+rl28jflI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=ZzmW5z4H; arc=none smtp.client-ip=185.125.188.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from Nerpa.home (2.general.phlin.uk.vpn [10.172.194.39])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id B109042AFF;
-	Mon, 27 Oct 2025 09:57:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1761559048;
-	bh=lqt8/ZZGBb7asywG0Q0MskjIZofOfjZFSBYGrUMsxAc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version;
-	b=ZzmW5z4HGSMBocWbErJGn++r6bcvBniGbCrvhgRZ2r+EJtRsv697lf6QUH+iegidx
-	 5QwhFnvcULyqhBiQh0KybLZhXRNqOcmmAYD84caiBiR4RnZbsC/2LPUGNXHa+8O6eI
-	 N2fmI8KNTfPZ+filSfrTGCh9AHSru9sgoB86AnMpRhYr4WL/4qvOUaBoPu2N88hg/s
-	 OGKKXUIlgpuIlC0HTmtXr0d9z7kqOkoDi2O7FqtQue3TP4j1TrMxK1AAbam2wNKDC8
-	 Pbg9XXX1wpWff8iYh9D4xUM2CQa+sS3luTMWi+sGgDTNRYZV8yUAbLuPSeHidQKvWT
-	 qNoQaMrkSG07D4qcRu2Lf9vkN8b52ntyB6exOR1YkZIxfx+2Uf6tEGNKWWlNRboP8L
-	 M2aPvnGoUyEEnoPRDRapE/wcJ2gXR9UkAOy1NU77XAwEZj4YasxBYYmpJHS5Tau4tF
-	 uthgLXQzfcHF/3nDS2VAJfvo/i3gPxZmbyN9qeyNEI6dCiBdaGG0CFe9ttWSunU+k8
-	 6ukCb8ch/QeM15YsPe1BufrXeGG87VpP6muwmWLR7JiZ5EWhiTBTATcFZ9oy7ZESL8
-	 wCJcG+P7SjgUoyozcheaPwA8OYeQb17W76w92HwRhziQioJefIJjTxqxN3f0WfUmPo
-	 ZkfAEVtFWmaz/nEURJzheyRQ=
-From: Po-Hsu Lin <po-hsu.lin@canonical.com>
-To: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: po-hsu.lin@canonical.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	edoardo.canepa@canonical.com
-Subject: [PATCH 1/1] selftests: net: use BASH for bareudp testing
-Date: Mon, 27 Oct 2025 17:57:10 +0800
-Message-ID: <20251027095710.2036108-2-po-hsu.lin@canonical.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251027095710.2036108-1-po-hsu.lin@canonical.com>
-References: <20251027095710.2036108-1-po-hsu.lin@canonical.com>
+	s=arc-20240116; t=1761559240; c=relaxed/simple;
+	bh=+xMfW2hYgWUM+DUd/Q4D7QQsf+nszvvdVnL2yFSt6Bo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d1q9OVcFzP8WlOBpokrrfQNNJhww9GAQeavnfc/st7D0Ljgi/5H70ElHfb8TjKULDcc3utb4Zy3JQeFl1hJ1jpf9uhKPE1DxgYgmCtIxmNlrc2o/Hhae2aki/owaUxsH2y4lTwQbLxQQYFlQlcJ9M21/FQF4WZ1chZCRQ2K8UEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pE1ta6m8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B176C4CEF1;
+	Mon, 27 Oct 2025 10:00:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761559240;
+	bh=+xMfW2hYgWUM+DUd/Q4D7QQsf+nszvvdVnL2yFSt6Bo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pE1ta6m8XcyYS8r7GxUKvmy90HBEUoOVw0WeiSEQFRic39Eb48KbfkpRdvEiattVv
+	 9HBcZOPx1q8E2EF2ouxuxabXs4FyhCMjux40rwGbDExeUXsvebwwwB8dNFJqiYGrw4
+	 KOsi6eJ/wViCTdhET2xPpgZycWT1jBvnFlrAH8Of8gZysWvhCrpm2UOK9DHEcWf9z2
+	 BSnldWQENrlL8uC/LDI8iKzPjFMa2rBD0YxcULT5G9YT/ZT7lzVck8Uh0XDgrP/fpt
+	 GI8Ki4TK5sM9Ie9UmqFIUC/ogAppt66+uEACikr7o+8YemGff3sH2QgpR5cd5pr0+h
+	 ma2igso0Uf1lg==
+Date: Mon, 27 Oct 2025 10:00:32 +0000
+From: Simon Horman <horms@kernel.org>
+To: Fan Gong <gongfan1@huawei.com>
+Cc: Zhu Yikai <zhuyikai1@h-partners.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>,
+	Bjorn Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>,
+	Xin Guo <guoxin09@huawei.com>,
+	Shen Chenyang <shenchenyang1@hisilicon.com>,
+	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+	Shi Jing <shijing34@huawei.com>,
+	Luo Yang <luoyang82@h-partners.com>,
+	Meny Yossefi <meny.yossefi@huawei.com>,
+	Gur Stavi <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Suman Ghosh <sumang@marvell.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Joe Damato <jdamato@fastly.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH net-next v01 1/9] hinic3: Add PF framework
+Message-ID: <aP9CwKkLdgcqHvkc@horms.kernel.org>
+References: <cover.1760502478.git.zhuyikai1@h-partners.com>
+ <905df406fd870da528361f47c48067802588cfb5.1760502478.git.zhuyikai1@h-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <905df406fd870da528361f47c48067802588cfb5.1760502478.git.zhuyikai1@h-partners.com>
 
-In bareudp.sh, this script uses /bin/sh and it will load another lib.sh
-BASH script at the very beginning.
+On Wed, Oct 15, 2025 at 03:15:27PM +0800, Fan Gong wrote:
+> Add support for PF framework based on the VF code.
+> 
+> Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
+> Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
+> Signed-off-by: Fan Gong <gongfan1@huawei.com>
 
-But on some operating systems like Ubuntu, /bin/sh is actually pointed to
-DASH, thus it will try to run BASH commands with DASH and consequently
-leads to syntax issues:
-  # ./bareudp.sh: 4: ./lib.sh: Bad substitution
-  # ./bareudp.sh: 5: ./lib.sh: source: not found
-  # ./bareudp.sh: 24: ./lib.sh: Syntax error: "(" unexpected
+...
 
-Fix this by explicitly using BASH for bareudp.sh. This fixes test
-execution failures on systems where /bin/sh is not BASH.
+> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+> index 979f47ca77f9..2b93026845ff 100644
+> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+> @@ -117,17 +117,49 @@ int hinic3_set_port_mtu(struct net_device *netdev, u16 new_mtu)
+>  					 &func_tbl_cfg);
+>  }
+>  
+> +#define PF_SET_VF_MAC(hwdev, status) \
+> +	(HINIC3_IS_VF(hwdev) && (status) == HINIC3_PF_SET_VF_ALREADY)
+> +
 
-Reported-by: Edoardo Canepa <edoardo.canepa@canonical.com>
-Link: https://bugs.launchpad.net/bugs/2129812
-Signed-off-by: Po-Hsu Lin <po-hsu.lin@canonical.com>
----
- tools/testing/selftests/net/bareudp.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+nit: I think the above could be a function rather than a macro.
 
-diff --git a/tools/testing/selftests/net/bareudp.sh b/tools/testing/selftests/net/bareudp.sh
-index 4046131e7888..d9e5b967f815 100755
---- a/tools/testing/selftests/net/bareudp.sh
-+++ b/tools/testing/selftests/net/bareudp.sh
-@@ -1,4 +1,4 @@
--#!/bin/sh
-+#!/bin/bash
- # SPDX-License-Identifier: GPL-2.0
- 
- # Test various bareudp tunnel configurations.
--- 
-2.34.1
+...
 
+> @@ -157,9 +189,9 @@ int hinic3_set_mac(struct hinic3_hwdev *hwdev, const u8 *mac_addr, u16 vlan_id,
+>  		return -EIO;
+>  	}
+>  
+> -	if (mac_info.msg_head.status == MGMT_STATUS_PF_SET_VF_ALREADY) {
+> +	if (PF_SET_VF_MAC(hwdev, mac_info.msg_head.status)) {
+>  		dev_warn(hwdev->dev, "PF has already set VF mac, Ignore set operation\n");
+> -		return 0;
+> +		return HINIC3_PF_SET_VF_ALREADY;
+
+It seems to me that this custom return value can be propagated up
+and returned by the probe function. If so, this doesn't seem desirable.
+And, overall, I would recommend against the custom calling convention
+that custom return values imply.
+
+>  	}
+>  
+>  	if (mac_info.msg_head.status == MGMT_STATUS_EXIST) {
+
+...
 
