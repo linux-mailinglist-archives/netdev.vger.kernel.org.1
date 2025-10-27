@@ -1,275 +1,198 @@
-Return-Path: <netdev+bounces-233216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A705C0EA4C
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 15:56:14 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F31EC0EB33
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 15:59:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0787C4FEA16
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 14:50:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EFD9A4FC38F
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 14:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CCC92C0269;
-	Mon, 27 Oct 2025 14:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1ED2C235A;
+	Mon, 27 Oct 2025 14:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="irefmkdV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tJ0SRt4c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B0713B7A3
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 14:50:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFD062BE7D9;
+	Mon, 27 Oct 2025 14:54:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761576608; cv=none; b=PUJUzY0dWwqRIVyLXbFahTvndMSvvvNnFDlxmmcWGS3U8BNhf8nfoAQn15wSAPtxoZJpZSyxwg9LfSTw67+ErvVqds0j+uLKHXnSKJ9jldLAfRe8jyhh/Nn1Qd2ZHfuZV9PYIdZKZ21Xs9renwPCsQmEYJ/SFALw6dny5Afwz5Q=
+	t=1761576851; cv=none; b=gOyjARc62HpDGQ4vioOivmQyZEHyxomvY3UO3Ovu9w95ortYYkJ9JUXx7i/98F4BWYOrK/urAOueicwy4wcU8ChmX1CrzFaIp7mZxcHiP6btDIjru8xppda6O1xgJETlSzGuoFJ8cPJmtFpldX40yTyXP9RJWsspZ+2P70Zxizs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761576608; c=relaxed/simple;
-	bh=ZaYc0AXzN+1Lo1qTbRp6ynukLO72J/oqO7y+iagLfL8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fjjDgV97rncWRrFRi6X6h5XRRX0TxAQsHl2dpvXvNeU3NeW1Tz1oRP1S8+z0cP6dohsOhwaSvqonbroqBE5g1RZf3T/xZrgNjkwiE3wVVq8v/P+yvaE0S/f1pr4Iks33ga6Ngj0ytyeJ5G1LVhNUkI9/GDfPT9WeqSWEeQSVleA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=irefmkdV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6FBCC4CEF1;
-	Mon, 27 Oct 2025 14:50:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761576606;
-	bh=ZaYc0AXzN+1Lo1qTbRp6ynukLO72J/oqO7y+iagLfL8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=irefmkdVXNOJ21VTG+Uqa8tsjEA7czd4DUSUKrcvgNOEHa4O3VjEtWAhy5ifcQ5UO
-	 L5GED2YgEruQ6pM/Bl1jJ7p4QMaO1b5C5spXNVM/gIqmAQV7qDcg113DiUshgrrm3A
-	 wfME3Zp89fMkJlsRtyRXM2ecRuAmzmJmBMYA9i7b8pqGDQXDryYx0AW0nGRhIJbUQK
-	 /BcltzHfyvUqB+2k4CSAFZfl3qCk2/wK/cZdTfB/Miuwa4M9puzh5QLvn3wSBDfErn
-	 6W0qoTQhC1jIaXskocMxdfC4wlQHBzmGFX81p6SaflmGtwWLq2C1pS117E9KPJfs15
-	 5pFRkmFFdQaMQ==
-Message-ID: <d4d71883-d249-4fbd-a703-930e62a16b96@kernel.org>
-Date: Mon, 27 Oct 2025 15:50:00 +0100
+	s=arc-20240116; t=1761576851; c=relaxed/simple;
+	bh=CFtQi3W9Wpk2UNpC+QN9fl+vSK7ews1i8/9jkHGSpzM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KYwIGAau25T0z/0dmV4KR7pUr7jEQNpcf+eua6EsYp3cmvUIjxvbsUN6+EFTfaRAY30zpZ95AmkywUa8AqrcUFNVXg3+GRE7MXl2iXbPkoHhdPiHY83q8+EU5fnEoBsp4T9UIq4iiKkypQx50caCC8/9p0vXG8YRJ4SPcZwCyr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tJ0SRt4c; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+XaUSZ8sj54yy88kQ5J30N+g5e/B7bSDezU+OegbPWg=; b=tJ0SRt4cUCdS3oGEtUqJKkwtBh
+	MsWPtmpoTWBye7Mg1WN0TjHe/VIteu/SoGWC3Q3LGPapW2NBMOqQMWWk7oXuqQN8E1HoTdQUBZYPO
+	lfYbuQVEc5cuz4bUjRkoSB2n0mY2GHvBpJ2ei3Q7TzDxYahSgbo9muPYQDnv0Y5KLu7PCpf7GOm7i
+	eY9fNIpv8nZ1pZRuLoCVR1iIif0cxfKkQ+YAsxyPOVpL43P/H35nQQ1NGxEKUMC0VNvFZW3JRq5UD
+	57ueCS/a3TlC9SmhZUwVfH5Nia8iZkQbeUWC4HqLF4wpwPESPCHk5/jLQ5ToLvpRqj9CY6Gn0zSZA
+	hHJ3DRiw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36070)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vDObd-000000001z1-2VoR;
+	Mon, 27 Oct 2025 14:53:57 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vDObb-000000005fo-03LC;
+	Mon, 27 Oct 2025 14:53:55 +0000
+Date: Mon, 27 Oct 2025 14:53:54 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Emanuele Ghidoli <ghidoliemanuele@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1] net: phy: dp83867: Disable EEE support as not
+ implemented
+Message-ID: <aP-Hgo5mf7BQyee_@shell.armlinux.org.uk>
+References: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
+ <ae723e7c-f876-45ef-bc41-3b39dc1dc76b@lunn.ch>
+ <664ef58b-d7e6-4f08-b88f-e7c2cf08c83c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net 2/3] tcp: add newval parameter to tcp_rcvbuf_grow()
-Content-Language: en-GB, fr-BE
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
- Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima
- <kuniyu@google.com>, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20251027073809.2112498-1-edumazet@google.com>
- <20251027073809.2112498-3-edumazet@google.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20251027073809.2112498-3-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <664ef58b-d7e6-4f08-b88f-e7c2cf08c83c@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Eric,
-
-On 27/10/2025 08:38, Eric Dumazet wrote:
-> This patch has no functional change, and prepares the following one.
+On Mon, Oct 27, 2025 at 01:57:48PM +0100, Emanuele Ghidoli wrote:
 > 
-> tcp_rcvbuf_grow() will need to have access to tp->rcvq_space.space
-> old and new values.
 > 
-> Change mptcp_rcvbuf_grow() in a similar way.
-
-Thank you for the v2, and for having adapted MPTCP as well.
-
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  include/net/tcp.h    |  2 +-
->  net/ipv4/tcp_input.c | 15 ++++++++-------
->  net/mptcp/protocol.c | 16 ++++++++--------
->  3 files changed, 17 insertions(+), 16 deletions(-)
+> On 27/10/2025 00:45, Andrew Lunn wrote:
+> >> Since the introduction of phylink-managed EEE support in the stmmac driver,
+> >> EEE is now enabled by default, leading to issues on systems using the
+> >> DP83867 PHY.
+> > 
+> > Did you do a bisect to prove this?
+> Yes, I have done a bisect and the commit that introduced the behavior on our
+> board is 4218647d4556 ("net: stmmac: convert to phylink managed EEE support").
 > 
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index 5ca230ed526ae02711e8d2a409b91664b73390f2..ab20f549b8f9143671b75ed0a3f87d64b9e73583 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -370,7 +370,7 @@ void tcp_delack_timer_handler(struct sock *sk);
->  int tcp_ioctl(struct sock *sk, int cmd, int *karg);
->  enum skb_drop_reason tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb);
->  void tcp_rcv_established(struct sock *sk, struct sk_buff *skb);
-> -void tcp_rcvbuf_grow(struct sock *sk);
-> +void tcp_rcvbuf_grow(struct sock *sk, u32 newval);
->  void tcp_rcv_space_adjust(struct sock *sk);
->  int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp);
->  void tcp_twsk_destructor(struct sock *sk);
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index 31ea5af49f2dc8a6f95f3f8c24065369765b8987..600b733e7fb554c36178e432996ecc7d4439268a 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -891,18 +891,21 @@ static inline void tcp_rcv_rtt_measure_ts(struct sock *sk,
->  	}
->  }
->  
-> -void tcp_rcvbuf_grow(struct sock *sk)
-> +void tcp_rcvbuf_grow(struct sock *sk, u32 newval)
->  {
->  	const struct net *net = sock_net(sk);
->  	struct tcp_sock *tp = tcp_sk(sk);
-> -	int rcvwin, rcvbuf, cap;
-> +	u32 rcvwin, rcvbuf, cap, oldval;
-> +
-> +	oldval = tp->rcvq_space.space;
+> > 
+> >> Fixes: 2a10154abcb7 ("net: phy: dp83867: Add TI dp83867 phy")
+> > 
+> > What has this Fixes: tag got to do with phylink?
+> I think that the phylink commit is just enabling by default the EEE support,
+> and my commit is not really fixing that. It is why I didn't put a Fixes: tag
+> pointing to that.
+> 
+> I’ve tried to trace the behavior, but it’s quite complex. From my testing, I
+> can summarize the situation as follows:
+> 
+> - ethtool, after that patch, returns:
+> ethtool --show-eee end0
+> EEE settings for end0:
+>         EEE status: enabled - active
+>         Tx LPI: 1000000 (us)
+>         Supported EEE link modes:  100baseT/Full
+>                                    1000baseT/Full
+>         Advertised EEE link modes:  100baseT/Full
+>                                     1000baseT/Full
+>         Link partner advertised EEE link modes:  100baseT/Full
+>                                                  1000baseT/Full
+> - before that patch returns, after boot:
+> EEE settings for end0:
+>         EEE status: disabled
+>         Tx LPI: disabled
+>         Supported EEE link modes:  100baseT/Full
+>                                    1000baseT/Full
+>         Advertised EEE link modes:  Not reported
+>         Link partner advertised EEE link modes:  100baseT/Full
+>                                                  1000baseT/Full
 
-Even if the series as a whole is OK, NIPA (and the MPTCP CI) are
-complaining about this line, because in this patch, 'oldval' is set but
-not used. It is used in the next patch.
+Oh damn. I see why now:
 
-I guess we want to fix this to prevent issues with 'git bisect'. If yes,
-do you mind moving the declaration to the next patch please?
+        /* Some DT bindings do not set-up the PHY handle. Let's try to
+         * manually parse it
+         */
+        if (!phy_fwnode || IS_ERR(phy_fwnode)) {
+                int addr = priv->plat->phy_addr;
+		...
+                if (priv->dma_cap.eee)
+                        phy_support_eee(phydev);
 
-> +	tp->rcvq_space.space = newval;
->  
->  	if (!READ_ONCE(net->ipv4.sysctl_tcp_moderate_rcvbuf) ||
->  	    (sk->sk_userlocks & SOCK_RCVBUF_LOCK))
->  		return;
->  
->  	/* slow start: allow the sender to double its rate. */
-> -	rcvwin = tp->rcvq_space.space << 1;
-> +	rcvwin = newval << 1;
->  
->  	if (!RB_EMPTY_ROOT(&tp->out_of_order_queue))
->  		rcvwin += TCP_SKB_CB(tp->ooo_last_skb)->end_seq - tp->rcv_nxt;
-> @@ -943,9 +946,7 @@ void tcp_rcv_space_adjust(struct sock *sk)
->  
->  	trace_tcp_rcvbuf_grow(sk, time);
->  
-> -	tp->rcvq_space.space = copied;
-> -
-> -	tcp_rcvbuf_grow(sk);
-> +	tcp_rcvbuf_grow(sk, copied);
->  
->  new_measure:
->  	tp->rcvq_space.seq = tp->copied_seq;
-> @@ -5270,7 +5271,7 @@ static void tcp_data_queue_ofo(struct sock *sk, struct sk_buff *skb)
->  	}
->  	/* do not grow rcvbuf for not-yet-accepted or orphaned sockets. */
->  	if (sk->sk_socket)
-> -		tcp_rcvbuf_grow(sk);
-> +		tcp_rcvbuf_grow(sk, tp->rcvq_space.space);
->  }
->  
->  static int __must_check tcp_queue_rcv(struct sock *sk, struct sk_buff *skb,
-> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-> index 0292162a14eedffde166cc2a2d4eaa7c3aa6760d..f12c5806f1c861ca74d2375914073abc37c940d6 100644
-> --- a/net/mptcp/protocol.c
-> +++ b/net/mptcp/protocol.c
-> @@ -194,17 +194,19 @@ static bool mptcp_ooo_try_coalesce(struct mptcp_sock *msk, struct sk_buff *to,
->   * - mptcp does not maintain a msk-level window clamp
->   * - returns true when  the receive buffer is actually updated
->   */
-> -static bool mptcp_rcvbuf_grow(struct sock *sk)
-> +static bool mptcp_rcvbuf_grow(struct sock *sk, u32 newval)
->  {
->  	struct mptcp_sock *msk = mptcp_sk(sk);
->  	const struct net *net = sock_net(sk);
-> -	int rcvwin, rcvbuf, cap;
-> +	u32 rcvwin, rcvbuf, cap, oldval;
->  
-> +	oldval = msk->rcvq_space.space;
+                ret = phylink_connect_phy(priv->phylink, phydev);
+        } else {
+                fwnode_handle_put(phy_fwnode);
+                ret = phylink_fwnode_phy_connect(priv->phylink, fwnode, 0);
+        }
 
-Same here in MPTCP:
+The driver only considers calling phy_support_eee() when DT fails to
+describe the PHY (because in the other path, it doesn't have access to
+the struct phy_device to make this call.)
 
->   net/mptcp/protocol.c: In function 'mptcp_rcvbuf_grow':
->   net/mptcp/protocol.c:201:34: error: variable 'oldval' set but not used [-Werror=unused-but-set-variable]
->     201 |         u32 rcvwin, rcvbuf, cap, oldval;
->         |                                  ^~~~~~
+My commit makes it apply even to DT described PHYs, so now (as has been
+shown when you enable EEE manually) it's uncovering latent problems.
 
-Apart from this small detail, the rest looks good to me.
+So now we understand why the change has occurred - this is important.
+Now the question becomes, what to do about it.
 
-> +	msk->rcvq_space.space = newval;
->  	if (!READ_ONCE(net->ipv4.sysctl_tcp_moderate_rcvbuf) ||
->  	    (sk->sk_userlocks & SOCK_RCVBUF_LOCK))
->  		return false;
->  
-> -	rcvwin = msk->rcvq_space.space << 1;
-> +	rcvwin = newval << 1;
->  
->  	if (!RB_EMPTY_ROOT(&msk->out_of_order_queue))
->  		rcvwin += MPTCP_SKB_CB(msk->ooo_last_skb)->end_seq - msk->ack_seq;
-> @@ -334,7 +336,7 @@ static void mptcp_data_queue_ofo(struct mptcp_sock *msk, struct sk_buff *skb)
->  	skb_set_owner_r(skb, sk);
->  	/* do not grow rcvbuf for not-yet-accepted or orphaned sockets. */
->  	if (sk->sk_socket)
-> -		mptcp_rcvbuf_grow(sk);
-> +		mptcp_rcvbuf_grow(sk, msk->rcvq_space.space);
->  }
->  
->  static void mptcp_init_skb(struct sock *ssk, struct sk_buff *skb, int offset,
-> @@ -2049,8 +2051,7 @@ static void mptcp_rcv_space_adjust(struct mptcp_sock *msk, int copied)
->  	if (msk->rcvq_space.copied <= msk->rcvq_space.space)
->  		goto new_measure;
->  
-> -	msk->rcvq_space.space = msk->rcvq_space.copied;
-> -	if (mptcp_rcvbuf_grow(sk)) {
-> +	if (mptcp_rcvbuf_grow(sk, msk->rcvq_space.copied)) {
->  
->  		/* Make subflows follow along.  If we do not do this, we
->  		 * get drops at subflow level if skbs can't be moved to
-> @@ -2063,8 +2064,7 @@ static void mptcp_rcv_space_adjust(struct mptcp_sock *msk, int copied)
->  
->  			ssk = mptcp_subflow_tcp_sock(subflow);
->  			slow = lock_sock_fast(ssk);
-> -			tcp_sk(ssk)->rcvq_space.space = msk->rcvq_space.copied;
-> -			tcp_rcvbuf_grow(ssk);
-> +			tcp_rcvbuf_grow(ssk, msk->rcvq_space.copied);
->  			unlock_sock_fast(ssk, slow);
->  		}
->  	}
+For your issue, given that we have statements from TI that indicate
+none of their gigabit PHYs support EEE, we really should not be
+reporting to userspace that there is any EEE support. Therefore,
+"Supported EEE link modes" should be completely empty.
 
-Cheers,
-Matt
+I think I understand why we're getting EEE modes supported. In the
+DP83867 manual, it states for the DEVAD field of the C45 indirect
+access registers:
+
+"Device Address: In general, these bits [4:0] are the device address
+DEVAD that directs any accesses of ADDAR register (0x000E) to the
+appropriate MMD. Specifically, the DP83867 uses the vendor specific
+DEVAD [4:0] = 11111 for accesses. All accesses through registers
+REGCR and ADDAR can use this DEVAD. Transactions with other
+DEVAD are ignored."
+
+Specifically, that last sentence, and the use of "ignored". If this
+means the PHY does not drive the MDIO data line when registers are
+read, they will return 0xffff, which is actually against the IEEE
+requirements for C45 registers (unimplemented C45 registers are
+supposed to be zero.)
+
+So, this needs to be tested - please modify phylib's
+genphy_c45_read_eee_cap1() to print the value read from the register.
+
+If it is 0xffff, that confirms that theory.
+
+The correct solution here, to stop other MAC drivers running into this
+is for TI PHY drivers to implement the .get_features() phylib method,
+call genphy_read_abilities() or genphy_c45_pma_read_abilities() as
+appropriate, and then clear phydev->supported_eee so the PHY driver
+reports (correctly according to TI's statements) that EEE modes are not
+supported.
+
+So, while my commit does have an unintended change of behaviour (thanks
+for helping to locate that), it would appear that it has revealed a
+latent bug in likely all TI PHY gigabit drivers that needs fixing
+independently of what we do about this.
+
 -- 
-Sponsored by the NGI0 Core fund.
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
