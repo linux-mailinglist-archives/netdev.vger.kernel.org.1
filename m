@@ -1,298 +1,266 @@
-Return-Path: <netdev+bounces-233156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ECC4C0D3FB
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 12:49:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AB99C0D470
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 12:51:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B213B3AA52C
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 11:45:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1488B19A78E0
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 11:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B114F2EFDB2;
-	Mon, 27 Oct 2025 11:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BFCF2FFDD6;
+	Mon, 27 Oct 2025 11:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="TOpz4b+7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GLHlXzjB"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1401D90DF;
-	Mon, 27 Oct 2025 11:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170CE2F6198
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 11:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761565551; cv=none; b=RqwM38dztmpOCeY3EqpX1ucVHBkgElFwR71JHyRDCMauWWoqJmO3gGzp9XFZKDiLz7i73XP6CpAwAF1wnpAiymlxGaJThhBsoYoJbgby+R1MHL3rhMuKvvQA4xzPmp6gQyYzJTbhiz4SrbWJlZGICaNRftGFJ9rAf24RHkajB8w=
+	t=1761565678; cv=none; b=EJuhbnAZ1WbFuyRkXJCi+UxInaMvVd1P5yCP/3vFf75LRYEzQYQmX37kV1ggOUc0eqoZOaOOWyCp0xWZEhbxnza/pH+O5UiEP6kaIK7iZfKYU9j8UdwtpymBfDAMt9UuiwCSzXT9K1gC+b6cWJVs3JSPdOQkmsiXvbqZZtfZdsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761565551; c=relaxed/simple;
-	bh=KO2IrWeJHJdKPvb52YaopHekBfLBYLKCW7Q8p3wqhOo=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=SW2k4A770nHQiqt67pMad+hkDLJzf78hoAFBGeV8ofVF6kPA9nF6M935tXF7jlfs0VsWmBXPVEk9zSZDCTAmq1AsPGKjUBtreWKr91geCIQEvSH+uf9puODQ3vV4dEg01ia1S2OS+I7d74cfphqb1BaDQFOfkHGVhPUwXRxA5cI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=TOpz4b+7; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id 8A0542128FB1; Mon, 27 Oct 2025 04:45:49 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8A0542128FB1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1761565549;
-	bh=48OMDO+6+e8aouweX6tft0JyL5JnB0rHgl/40+u1N1U=;
-	h=Date:From:To:Subject:From;
-	b=TOpz4b+7bPCn0FXc2uyGb1BG7+Nxpc08OBahq4mdGfRbg6D6lRl3M5qUHteeVBPoi
-	 Nm+H2FyWc9T7oekSjUSM3Ndo2X11Gq4Vr59/oah7wgdwH+Jf3quxavbwSfkIboJ6AS
-	 StTJmsgjwDxvPPUhVGmvTnFe0+dgQ3JkA/gDazYs=
-Date: Mon, 27 Oct 2025 04:45:49 -0700
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	dipayanroy@microsoft.com
-Subject: [PATCH net-next] net: mana: Implement ndo_tx_timeout and serialize
- queue resets per port.
-Message-ID: <20251027114549.GA12252@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1761565678; c=relaxed/simple;
+	bh=U9SNMx+fV+Va8o/LukhMQZHECepGfJmsPoivgTCQKFg=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=VI4CZMu0dyKDfl4bF8+JfGLWl3VfvUixVTlj7NWhdfov8iH5ixu+6lRm/3UYIC8P8dCPXj4RRjxAc9TEvuSuFNV/tGDpwmrMj5AbcAJi2NEeYU2Ga9+Xoub13IyJlYKA8r1GvWnafuioNa/j6s/xLdURsQvahV+kYKgGkOKPBmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GLHlXzjB; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4770c2cd96fso11162145e9.3
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 04:47:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761565675; x=1762170475; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ZWa46kCiP/0KhlYyyl/8q2vhghsnL07ZEKG4lLnpBpg=;
+        b=GLHlXzjBIPx7UnNdTuy+VeVrFcd6LOFkXVGzJWJOc6VIUUE3Nu/m/c41Zrqq+4v9lq
+         Ua4ElspusDr3CQyV7aM+LYyO1SdLaTfBWyWPkni1AnT4Wld/zIbjJpkMH8+NrMM0fBMF
+         4gql1UZJpuV30brQK4Y32BBYOsWX7cSU7RRIBxDdOumY/Efh877anEtDjTB1z//otlfC
+         vzslgcwH3vPhEXh5Gd4F1Q/jh/dOe5GgFhoVm6PrDCSu/RzNIL9IdeGJR+Ltb1nXlLKR
+         5gyBfZww28GMmEQWoYYbprpYdzVvU7uY8Z0YUmHy7ANYRRA4SwlqD6pFGNqWY4Pp44xu
+         LoJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761565675; x=1762170475;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZWa46kCiP/0KhlYyyl/8q2vhghsnL07ZEKG4lLnpBpg=;
+        b=LUUrKD1XNdNc11FHJzm0XEuHOAXdDCylDNL+pDMVb63nLkIPzcxX3k6XG1q58m+9Cr
+         nti0EWlbVnbyxwzmUYOWWpTM0aLdDs8xBClW6TQd6zNYLZgnNMZFBr9w0Ts0kcc47guy
+         kfqiI4kemkT9XOvvm7nnFudygErKl1QztMOjZDOdOOyBht6e7Hzx3jqwx5C0ybIf8YjE
+         qxfwWEq2ALTBL6dJpEPVLKj8M4N2rIsNKc1xCJaFLdmxdw7m7ieTKeIxAW09DiJ7EL2U
+         UK3zQgkqj1xAaAQHyDR7c1ZYSgYvCQBrpYr7k5+lA8KR4/gc7RAZGKudDLT1aorP35QU
+         om3g==
+X-Forwarded-Encrypted: i=1; AJvYcCXjfSQ8VL+VD/Sn9BKlyIRnKlP62WLcnJwJ6896hqhZd87JsaY/4HSasmr2anHzpcRsY5kJggc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAoWAeEiSf4Ajo8cYnppbnY0jJFRyOZ4qLh/aRbcHYLL1tk8S8
+	poy9dZbMDDG0zf6x3ZctQT9sLc9LzBKEeFFF65qKQ2v1ye2bxCQE7Iv6M/LvIg==
+X-Gm-Gg: ASbGncuudWck1eh577bXwWIFGarveFqsWAk3ijGPdIcXuHpgKBdPOBtIaaIyNLvSrAk
+	Y+z1OsIV+JA7w75hRfL5zl204knZBkO2FA/4V+HfCirgbsItE84nwbx3dKybLEcmenTZS5jA8wh
+	/JHD/zGAriPU8K+6lsDu6hCJn1WuhLhdR/R4R8bodPmhlDFn0uwHEsxNuscSZKyMKre1PfOKyMM
+	ngNUoXcqX6C6r1F0z9bYHNJm/4z7TgjtSd23QddVmU7evVmAILFQcfoTvvXNqfFRfRt0TvYqZ4N
+	U5b0RT6STVQ7esKE8j2SIOJVz1aNVNlsKMTjOENDgBuJp+JaONzQPS7InACR5lXmLUL7YnVOlBJ
+	PwbbKfUaeKTQ/BODcykSOeZR2dUPRc9rWUo9ZIuxRgQDVUYGPUYJbAVIrjr9tiQXoWi7+obgd0j
+	o0lMaaKlGggk5UXmSn3aErKFw31C9dWqz8W9uQN6AgltM=
+X-Google-Smtp-Source: AGHT+IFuKsBzi+0bBlURymc3hSXFC5LQaTmO0O5eBsOEF/yGhEgbbdb0jNBilwg3MuycxW+6wEs8PA==
+X-Received: by 2002:a05:600c:8410:b0:477:b83:7d1 with SMTP id 5b1f17b1804b1-4770b830926mr43938765e9.40.1761565675133;
+        Mon, 27 Oct 2025 04:47:55 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:6fd4])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952d3532sm14259036f8f.20.2025.10.27.04.47.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Oct 2025 04:47:54 -0700 (PDT)
+Message-ID: <60f630cf-0057-4675-afcd-2b4e46430a44@gmail.com>
+Date: Mon, 27 Oct 2025 11:47:51 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/3] io_uring/zcrx: share an ifq between rings
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+References: <20251026173434.3669748-1-dw@davidwei.uk>
+ <20251026173434.3669748-4-dw@davidwei.uk>
+ <309cb5ce-b19a-47b8-ba82-e75f69fe5bb3@gmail.com>
+Content-Language: en-US
+In-Reply-To: <309cb5ce-b19a-47b8-ba82-e75f69fe5bb3@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detected
-and a device-controlled port reset for all queues can be scheduled to an
-ordered workqueue. The reset for all queues on stall detection is
-recomended by hardware team.
+On 10/27/25 10:20, Pavel Begunkov wrote:
+> On 10/26/25 17:34, David Wei wrote:
+>> Add a way to share an ifq from a src ring that is real i.e. bound to a
+>> HW RX queue with other rings. This is done by passing a new flag
+>> IORING_ZCRX_IFQ_REG_SHARE in the registration struct
+>> io_uring_zcrx_ifq_reg, alongside the fd of the src ring and the ifq id
+>> to be shared.
+>>
+>> To prevent the src ring or ifq from being cleaned up or freed while
+>> there are still shared ifqs, take the appropriate refs on the src ring
+>> (ctx->refs) and src ifq (ifq->refs).
+>>
+>> Signed-off-by: David Wei <dw@davidwei.uk>
+>> ---
+>>   include/uapi/linux/io_uring.h |  4 ++
+>>   io_uring/zcrx.c               | 74 ++++++++++++++++++++++++++++++++++-
+>>   2 files changed, 76 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+>> index 04797a9b76bc..4da4552a4215 100644
+>> --- a/include/uapi/linux/io_uring.h
+>> +++ b/include/uapi/linux/io_uring.h
+>> @@ -1063,6 +1063,10 @@ struct io_uring_zcrx_area_reg {
+>>       __u64    __resv2[2];
+>>   };
+>> +enum io_uring_zcrx_ifq_reg_flags {
+>> +    IORING_ZCRX_IFQ_REG_SHARE    = 1,
+>> +};
+>> +
+>>   /*
+>>    * Argument for IORING_REGISTER_ZCRX_IFQ
+>>    */
+>> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+>> index 569cc0338acb..7418c959390a 100644
+>> --- a/io_uring/zcrx.c
+>> +++ b/io_uring/zcrx.c
+>> @@ -22,10 +22,10 @@
+>>   #include <uapi/linux/io_uring.h>
+>>   #include "io_uring.h"
+>> -#include "kbuf.h"
+>>   #include "memmap.h"
+>>   #include "zcrx.h"
+>>   #include "rsrc.h"
+>> +#include "register.h"
+>>   #define IO_ZCRX_AREA_SUPPORTED_FLAGS    (IORING_ZCRX_AREA_DMABUF)
+>> @@ -541,6 +541,67 @@ struct io_mapped_region *io_zcrx_get_region(struct io_ring_ctx *ctx,
+>>       return ifq ? &ifq->region : NULL;
+>>   }
+>> +static int io_share_zcrx_ifq(struct io_ring_ctx *ctx,
+>> +                 struct io_uring_zcrx_ifq_reg __user *arg,
+>> +                 struct io_uring_zcrx_ifq_reg *reg)
+>> +{
+>> +    struct io_ring_ctx *src_ctx;
+>> +    struct io_zcrx_ifq *src_ifq;
+>> +    struct file *file;
+>> +    int src_fd, ret;
+>> +    u32 src_id, id;
+>> +
+>> +    src_fd = reg->if_idx;
+>> +    src_id = reg->if_rxq;
+>> +
+>> +    file = io_uring_register_get_file(src_fd, false);
+>> +    if (IS_ERR(file))
+>> +        return PTR_ERR(file);
+>> +
+>> +    src_ctx = file->private_data;
+>> +    if (src_ctx == ctx)
+>> +        return -EBADFD;
+>> +
+>> +    mutex_unlock(&ctx->uring_lock);
+>> +    io_lock_two_rings(ctx, src_ctx);
+>> +
+>> +    ret = -EINVAL;
+>> +    src_ifq = xa_load(&src_ctx->zcrx_ctxs, src_id);
+>> +    if (!src_ifq)
+>> +        goto err_unlock;
+>> +
+>> +    percpu_ref_get(&src_ctx->refs);
+>> +    refcount_inc(&src_ifq->refs);
+>> +
+>> +    scoped_guard(mutex, &ctx->mmap_lock) {
+>> +        ret = xa_alloc(&ctx->zcrx_ctxs, &id, NULL, xa_limit_31b, GFP_KERNEL);
+>> +        if (ret)
+>> +            goto err_unlock;
+>> +
+>> +        ret = -ENOMEM;
+>> +        if (xa_store(&ctx->zcrx_ctxs, id, src_ifq, GFP_KERNEL)) {
+>> +            xa_erase(&ctx->zcrx_ctxs, id);
+>> +            goto err_unlock;
+>> +        }
+> 
+> It's just xa_alloc(..., src_ifq, ...);
+> 
+>> +    }
+>> +
+>> +    reg->zcrx_id = id;
+>> +    if (copy_to_user(arg, reg, sizeof(*reg))) {
+>> +        ret = -EFAULT;
+>> +        goto err;
+>> +    }
+> 
+> Better to do that before publishing zcrx into ctx->zcrx_ctxs
+> 
+>> +    mutex_unlock(&src_ctx->uring_lock);
+>> +    fput(file);
+>> +    return 0;
+>> +err:
+>> +    scoped_guard(mutex, &ctx->mmap_lock)
+>> +        xa_erase(&ctx->zcrx_ctxs, id);
+>> +err_unlock:
+>> +    mutex_unlock(&src_ctx->uring_lock);
+>> +    fput(file);
+>> +    return ret;
+>> +}
+>> +
+>>   int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+>>                 struct io_uring_zcrx_ifq_reg __user *arg)
+>>   {
+>> @@ -566,6 +627,8 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+>>           return -EINVAL;
+>>       if (copy_from_user(&reg, arg, sizeof(reg)))
+>>           return -EFAULT;
+>> +    if (reg.flags & IORING_ZCRX_IFQ_REG_SHARE)
+>> +        return io_share_zcrx_ifq(ctx, arg, &reg);
+>>       if (copy_from_user(&rd, u64_to_user_ptr(reg.region_ptr), sizeof(rd)))
+>>           return -EFAULT;
+>>       if (!mem_is_zero(&reg.__resv, sizeof(reg.__resv)) ||
+>> @@ -663,7 +726,7 @@ void io_unregister_zcrx_ifqs(struct io_ring_ctx *ctx)
+>>               if (ifq)
+>>                   xa_erase(&ctx->zcrx_ctxs, id);
+>>           }
+>> -        if (!ifq)
+>> +        if (!ifq || ctx != ifq->ctx)
+>>               break;
+>>           io_zcrx_ifq_free(ifq);
+>>       }
+>> @@ -734,6 +797,13 @@ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
+>>           if (xa_get_mark(&ctx->zcrx_ctxs, index, XA_MARK_0))
+>>               continue;
+>> +        /*
+>> +         * Only shared ifqs want to put ctx->refs on the owning ifq
+>> +         * ring. This matches the get in io_share_zcrx_ifq().
+>> +         */
+>> +        if (ctx != ifq->ctx)
+>> +            percpu_ref_put(&ifq->ctx->refs);
+> 
+> After you put this and ifq->refs below down, the zcrx object can get
+> destroyed, but this ctx might still have requests using the object.
+> Waiting on ctx refs would ensure requests are killed, but that'd
+> create a cycle.
 
-The change introduces a single ordered workqueue
-("mana_per_port_queue_reset_wq") with WQ_UNBOUND | WQ_MEM_RECLAIM and
-queues exactly one work_struct per port onto it. This achieves:
+Another concerning part is long term cross ctx referencing,
+which is even worse than pp locking it up. I mentioned
+that it'd be great to reverse the refcounting relation,
+but that'd also need additional ground work to break
+dependencies.
 
-  * Global FIFO across all port reset requests (alloc_ordered_workqueue).
-  * Natural per-port de-duplication: the same work_struct cannot be
-    queued twice while pending/running.
-  * Avoids hogging a per-CPU kworker for long, may-sleep reset paths
-    (WQ_UNBOUND).
-  * Guarantees forward progress during memory pressure
-    (WQ_MEM_RECLAIM rescuer).
+> 
+>> +
+>>           /* Safe to clean up from any ring. */
+>>           if (refcount_dec_and_test(&ifq->refs)) {
+>>               io_zcrx_scrub(ifq);
+> 
 
-Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 83 +++++++++++++++++++
- include/net/mana/gdma.h                       |  6 +-
- include/net/mana/mana.h                       | 12 +++
- 3 files changed, 100 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index f4fc86f20213..2833f66d8b2b 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -258,6 +258,45 @@ static int mana_get_gso_hs(struct sk_buff *skb)
- 	return gso_hs;
- }
- 
-+static void mana_per_port_queue_reset_work_handler(struct work_struct *work)
-+{
-+	struct mana_queue_reset_work *reset_queue_work =
-+			container_of(work, struct mana_queue_reset_work, work);
-+	struct mana_port_context *apc = reset_queue_work->apc;
-+	struct net_device *ndev = apc->ndev;
-+	struct mana_context *ac = apc->ac;
-+	int err;
-+
-+	if (!rtnl_trylock()) {
-+		/* Someone else holds RTNL, requeue and exit. */
-+		queue_work(ac->per_port_queue_reset_wq,
-+			   &apc->queue_reset_work.work);
-+		return;
-+	}
-+
-+	/* Pre-allocate buffers to prevent failure in mana_attach later */
-+	err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
-+	if (err) {
-+		netdev_err(ndev, "Insufficient memory for reset post tx stall detection\n");
-+		goto out;
-+	}
-+
-+	err = mana_detach(ndev, false);
-+	if (err) {
-+		netdev_err(ndev, "mana_detach failed: %d\n", err);
-+		goto dealloc_pre_rxbufs;
-+	}
-+
-+	err = mana_attach(ndev);
-+	if (err)
-+		netdev_err(ndev, "mana_attach failed: %d\n", err);
-+
-+dealloc_pre_rxbufs:
-+	mana_pre_dealloc_rxbufs(apc);
-+out:
-+	rtnl_unlock();
-+}
-+
- netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
- {
- 	enum mana_tx_pkt_format pkt_fmt = MANA_SHORT_PKT_FMT;
-@@ -762,6 +801,25 @@ static int mana_change_mtu(struct net_device *ndev, int new_mtu)
- 	return err;
- }
- 
-+static void mana_tx_timeout(struct net_device *netdev, unsigned int txqueue)
-+{
-+	struct mana_port_context *apc = netdev_priv(netdev);
-+	struct mana_context *ac = apc->ac;
-+	struct gdma_context *gc = ac->gdma_dev->gdma_context;
-+
-+	netdev_warn(netdev, "%s(): called on txq: %u\n", __func__, txqueue);
-+
-+	/* Already in service, hence tx queue reset is not required.*/
-+	if (gc->in_service)
-+		return;
-+
-+	/* Note: If there are pending queue reset work for this port(apc),
-+	 * subsequent request queued up drom here are ignored. This is because
-+	 * we are using the same work instance per port(apc).
-+	 */
-+	queue_work(ac->per_port_queue_reset_wq, &apc->queue_reset_work.work);
-+}
-+
- static int mana_shaper_set(struct net_shaper_binding *binding,
- 			   const struct net_shaper *shaper,
- 			   struct netlink_ext_ack *extack)
-@@ -844,7 +902,9 @@ static const struct net_device_ops mana_devops = {
- 	.ndo_bpf		= mana_bpf,
- 	.ndo_xdp_xmit		= mana_xdp_xmit,
- 	.ndo_change_mtu		= mana_change_mtu,
-+	.ndo_tx_timeout     = mana_tx_timeout,
- 	.net_shaper_ops         = &mana_shaper_ops,
-+
- };
- 
- static void mana_cleanup_port_context(struct mana_port_context *apc)
-@@ -3218,6 +3278,7 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
- 	ndev->min_mtu = ETH_MIN_MTU;
- 	ndev->needed_headroom = MANA_HEADROOM;
- 	ndev->dev_port = port_idx;
-+	ndev->watchdog_timeo = MANA_TXQ_TIMEOUT;
- 	SET_NETDEV_DEV(ndev, gc->dev);
- 
- 	netif_set_tso_max_size(ndev, GSO_MAX_SIZE);
-@@ -3255,6 +3316,11 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
- 
- 	debugfs_create_u32("current_speed", 0400, apc->mana_port_debugfs, &apc->speed);
- 
-+	/* Initialize the per port queue reset work.*/
-+	apc->queue_reset_work.apc = apc;
-+	INIT_WORK(&apc->queue_reset_work.work,
-+		  mana_per_port_queue_reset_work_handler);
-+
- 	return 0;
- 
- free_indir:
-@@ -3456,6 +3522,15 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
- 	if (ac->num_ports > MAX_PORTS_IN_MANA_DEV)
- 		ac->num_ports = MAX_PORTS_IN_MANA_DEV;
- 
-+	ac->per_port_queue_reset_wq =
-+			alloc_ordered_workqueue("mana_per_port_queue_reset_wq",
-+						WQ_UNBOUND | WQ_MEM_RECLAIM);
-+	if (!ac->per_port_queue_reset_wq) {
-+		dev_err(dev, "Failed to allocate per port queue reset workqueue\n");
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
- 	if (!resuming) {
- 		for (i = 0; i < ac->num_ports; i++) {
- 			err = mana_probe_port(ac, i, &ac->ports[i]);
-@@ -3528,6 +3603,8 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
- 		 */
- 		rtnl_lock();
- 
-+		cancel_work_sync(&apc->queue_reset_work.work);
-+
- 		err = mana_detach(ndev, false);
- 		if (err)
- 			netdev_err(ndev, "Failed to detach vPort %d: %d\n",
-@@ -3547,6 +3624,12 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
- 		free_netdev(ndev);
- 	}
- 
-+	if (ac->per_port_queue_reset_wq) {
-+		drain_workqueue(ac->per_port_queue_reset_wq);
-+		destroy_workqueue(ac->per_port_queue_reset_wq);
-+		ac->per_port_queue_reset_wq = NULL;
-+	}
-+
- 	mana_destroy_eq(ac);
- out:
- 	mana_gd_deregister_device(gd);
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 57df78cfbf82..1f8c536ba3be 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -591,6 +591,9 @@ enum {
- /* Driver can self reset on FPGA Reconfig EQE notification */
- #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
- 
-+/* Driver detects stalled send queues and recovers them */
-+#define GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY BIT(18)
-+
- #define GDMA_DRV_CAP_FLAGS1 \
- 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
- 	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
-@@ -599,7 +602,8 @@ enum {
- 	 GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP | \
- 	 GDMA_DRV_CAP_FLAG_1_DYNAMIC_IRQ_ALLOC_SUPPORT | \
- 	 GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE | \
--	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE)
-+	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE | \
-+	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY)
- 
- #define GDMA_DRV_CAP_FLAGS2 0
- 
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 0921485565c0..9b8f236f27c9 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -67,6 +67,11 @@ enum TRI_STATE {
- 
- #define MANA_RX_FRAG_ALIGNMENT 64
- 
-+/* Timeout value for Txq stall detetcion & recovery used by ndo_tx_timeout.
-+ * The value is chosen after considering fpga re-config scenarios.
-+ */
-+#define MANA_TXQ_TIMEOUT (15 * HZ)
-+
- struct mana_stats_rx {
- 	u64 packets;
- 	u64 bytes;
-@@ -475,13 +480,20 @@ struct mana_context {
- 
- 	struct mana_eq *eqs;
- 	struct dentry *mana_eqs_debugfs;
-+	struct workqueue_struct *per_port_queue_reset_wq;
- 
- 	struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
- };
- 
-+struct mana_queue_reset_work {
-+	struct work_struct work;              // Work structure
-+	struct mana_port_context *apc;        // Pointer to the port context
-+};
-+
- struct mana_port_context {
- 	struct mana_context *ac;
- 	struct net_device *ndev;
-+	struct mana_queue_reset_work queue_reset_work;
- 
- 	u8 mac_addr[ETH_ALEN];
- 
 -- 
-2.43.0
+Pavel Begunkov
 
 
