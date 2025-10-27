@@ -1,377 +1,91 @@
-Return-Path: <netdev+bounces-233078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 922BAC0BD49
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 06:37:22 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D46A5C0BE46
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 07:04:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB4363B80EA
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 05:37:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C49E84E99CE
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 06:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C7E2D47E2;
-	Mon, 27 Oct 2025 05:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151A32D97A8;
+	Mon, 27 Oct 2025 06:04:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="qJjEJF6F"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="NDWa+G6M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m16.yeah.net (mail-m16.yeah.net [1.95.21.14])
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41BED198A11;
-	Mon, 27 Oct 2025 05:37:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.95.21.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF13239E7E;
+	Mon, 27 Oct 2025 06:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761543438; cv=none; b=rLa1x5Lr0qyyxOjgM6632Gh3lF82cENki4Ok3p0cUr7ta8idjG+Hh3jx27AvScuFJsXrVxv9LMM+TzUubof7cf8C/ZD2we9WHj7WWwrGYyPGeUz3AGjukZGuMZWEoN4/K7Il40hoorVvrr8h3/Pvu2i9ZQoqoMCRlL+8Z985GFs=
+	t=1761545059; cv=none; b=icfF3pixKb8Wk8XScBuxa7M6eIQeeZScpe9X3w9nXpH/hC1g0XLIuy9a7JhivRhPA3JXmokMhZbVRamzvuJndmaK6sCNTIV7d7jgLjh9AKxtwUHjbMSTVJ/Wkolax8w3/AOtt2xHf9w8kMWxgCjVX/hzivi/1chbbuN6o+lFKY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761543438; c=relaxed/simple;
-	bh=bvmH6+soryGKZ5gEos9mE85vYchLmLIzCBHYBswlpVM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ig5Ec88iod3eVHHaZTjJv5yDThUBGuZhwgyYUe2TwT1AxayUiXkQiQpyw3IfN4+KlDqqjV9Vm3SegyOTSe3gciSNbDBdB90qrxusMl5yOOUDYpS0C30bXcsgMHTj1L2k9T/Ms908jrr9DRVP5S+X6ktnKXNYeQS946xNn0qBB48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=qJjEJF6F; arc=none smtp.client-ip=1.95.21.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
-	s=s110527; h=Date:From:To:Subject:Message-ID:MIME-Version:
-	Content-Type; bh=r7WBuk2/uLe2meaXUWqKZJpLgBzXsYM73eCP13b2d4g=;
-	b=qJjEJF6FhjYwipyWgYF0kUsgDCasEyNzCOv7vo1X68rIkAYLFtV3qPemM05Tp8
-	uwSHK9cGgIyuCXG9hdvXGGtzDnqUA0aXRqWyoaEE5+m8LrA/w8x/sGZLgAri3Gzy
-	Jdn+4uCIhd1MRKPJyw8tjiX3Q87EX/N6eeQ7qGIdhtNcc=
-Received: from dragon (unknown [])
-	by gzsmtp3 (Coremail) with SMTP id M88vCgCXXyDOBP9ok5+5AA--.1347S3;
-	Mon, 27 Oct 2025 13:36:17 +0800 (CST)
-Date: Mon, 27 Oct 2025 13:36:14 +0800
-From: Shawn Guo <shawnguo2@yeah.net>
-To: jan.petrous@oss.nxp.com
-Cc: Chester Lin <chester62515@gmail.com>,
-	Matthias Brugger <mbrugger@suse.com>,
-	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
-	NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] arm64: dts: freescale: Add GMAC Ethernet for S32G2 EVB
- and RDB2 and S32G3 RDB3
-Message-ID: <aP8Ezk_zjo-NZCD4@dragon>
-References: <20251006-nxp-s32g-boards-v1-1-f70a57b8087f@oss.nxp.com>
+	s=arc-20240116; t=1761545059; c=relaxed/simple;
+	bh=2SUWSfQ5/JEzuD+Pj/+BAvMxTnNY11/j2gq/d5Arp/Q=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=NevkuLQ/WCyYhaP5Oo4MS/6vaYBNN7hfMGSfSXxFyk2gA6aZE2I/7qLHw3qrJTyGJ9IrsxHss6EXxIuhLi/w565v0R7aVifMznalBleT9F5GsbcF0bAlU8fOWUY+2Y7ynvnVmNFCEaDivrHvV5gGaARB7ouJBx3ln47U2EOh5aE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=NDWa+G6M; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1761545050; h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
+	bh=vGQNREQK62jW8RTtaFJj64+WJ4MbuJlL8IZDBtzUYss=;
+	b=NDWa+G6M2OJBP2O+epO1OfE0XxMvMSUZS1uj7+OhSI3bnl3v3TKFSLCYlWUjoyqARTkWbPIjj6jByYePNVIVrW/y41eLWzEWU/SrnO6bkQi7L1/57ULufMOWFIkqY679XPtpeFnf9ZFioYQ3J8tS9Br+ZyZW0vz0g42buw5bJFs=
+Received: from 30.221.133.61(mailfrom:guoheyi@linux.alibaba.com fp:SMTPD_---0Wr02qh7_1761545025 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 27 Oct 2025 14:04:09 +0800
+Message-ID: <5e065a78-b371-4ef7-8ce6-a902f80e2b02@linux.alibaba.com>
+Date: Mon, 27 Oct 2025 14:04:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251006-nxp-s32g-boards-v1-1-f70a57b8087f@oss.nxp.com>
-X-CM-TRANSID:M88vCgCXXyDOBP9ok5+5AA--.1347S3
-X-Coremail-Antispam: 1Uf129KBjvJXoW3Gr4kCryruw1kWF48Jr17GFg_yoWxKFy7pF
-	97Ca93Xr1Igr12vasIg3Wkur90yws5Kr15urnFvrWjyr4avr9Ivr13JrsxWw10qFs8Ww4U
-	ZFnYvFn7C3ZxXw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UpCJQUUUUU=
-X-CM-SenderInfo: pvkd40hjxrjqh1hdxhhqhw/1tbiIhFPtGj-BNEzBQAA38
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Takashi Iwai <tiwai@suse.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From: Heyi Guo <guoheyi@linux.alibaba.com>
+Subject: Why hasn't the patch "r8152: Fix a deadlock by doubly PM resume" back
+ ported to stable branches?
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 06, 2025 at 06:31:28PM +0200, Jan Petrous via B4 Relay wrote:
-> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-> 
-> Add support for the Ethernet connection over GMAC controller connected to
-> the Micrel KSZ9031 Ethernet RGMII PHY located on the boards.
-> 
-> The mentioned GMAC controller is one of two network controllers
-> embedded on the NXP Automotive SoCs S32G2 and S32G3.
-> 
-> The supported boards:
->  * EVB:  S32G-VNP-EVB with S32G2 SoC
->  * RDB2: S32G-VNP-RDB2
->  * RDB3: S32G-VNP-RDB3
-> 
-> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
-> ---
->  arch/arm64/boot/dts/freescale/s32g2.dtsi        | 50 ++++++++++++++++++++++++-
->  arch/arm64/boot/dts/freescale/s32g274a-evb.dts  | 21 ++++++++++-
->  arch/arm64/boot/dts/freescale/s32g274a-rdb2.dts | 19 ++++++++++
->  arch/arm64/boot/dts/freescale/s32g3.dtsi        | 50 ++++++++++++++++++++++++-
->  arch/arm64/boot/dts/freescale/s32g399a-rdb3.dts | 21 ++++++++++-
->  5 files changed, 157 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/boot/dts/freescale/s32g2.dtsi b/arch/arm64/boot/dts/freescale/s32g2.dtsi
-> index d167624d1f0c..d06103e9564e 100644
-> --- a/arch/arm64/boot/dts/freescale/s32g2.dtsi
-> +++ b/arch/arm64/boot/dts/freescale/s32g2.dtsi
-> @@ -3,7 +3,7 @@
->   * NXP S32G2 SoC family
->   *
->   * Copyright (c) 2021 SUSE LLC
-> - * Copyright 2017-2021, 2024 NXP
-> + * Copyright 2017-2021, 2024-2025 NXP
->   */
->  
->  #include <dt-bindings/interrupt-controller/arm-gic.h>
-> @@ -738,5 +738,53 @@ gic: interrupt-controller@50800000 {
->  			interrupt-controller;
->  			#interrupt-cells = <3>;
->  		};
-> +
-> +		gmac0: ethernet@4033c000 {
+Hi all,
 
-Please sort devices in order of unit-address.
+We found that below bug fix patch had not been back ported to stable 
+branches, like linux-5.10.y. Is there any special reason?
 
-> +			compatible = "nxp,s32g2-dwmac";
-> +			reg = <0x4033c000 0x2000>, /* gmac IP */
-> +			      <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
-> +			interrupt-parent = <&gic>;
-> +			interrupts = <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>;
-> +			interrupt-names = "macirq";
-> +			snps,mtl-rx-config = <&mtl_rx_setup>;
-> +			snps,mtl-tx-config = <&mtl_tx_setup>;
-> +			status = "disabled";
-> +
-> +			mtl_rx_setup: rx-queues-config {
-> +				snps,rx-queues-to-use = <5>;
-> +
-> +				queue0 {
-> +				};
+commit 776ac63a986d211286230c4fd70f85390eabedcd
+Author:     Takashi Iwai <tiwai@suse.de>
+AuthorDate: Wed Jul 14 19:00:22 2021 +0200
+Commit:     David S. Miller <davem@davemloft.net>
+CommitDate: Wed Jul 14 14:57:55 2021 -0700
 
-We usually have newline between nodes.
+     r8152: Fix a deadlock by doubly PM resume
 
-> +				queue1 {
-> +				};
-> +				queue2 {
-> +				};
-> +				queue3 {
-> +				};
-> +				queue4 {
-> +				};
-> +			};
-> +
-> +			mtl_tx_setup: tx-queues-config {
-> +				snps,tx-queues-to-use = <5>;
-> +
-> +				queue0 {
-> +				};
-> +				queue1 {
-> +				};
-> +				queue2 {
-> +				};
-> +				queue3 {
-> +				};
-> +				queue4 {
-> +				};
-> +			};
-> +
-> +			gmac0mdio: mdio {
-> +				#address-cells = <1>;
-> +				#size-cells = <0>;
-> +				compatible = "snps,dwmac-mdio";
-> +			};
-> +		};
->  	};
->  };
-> diff --git a/arch/arm64/boot/dts/freescale/s32g274a-evb.dts b/arch/arm64/boot/dts/freescale/s32g274a-evb.dts
-> index c4a195dd67bf..f020da03979a 100644
-> --- a/arch/arm64/boot/dts/freescale/s32g274a-evb.dts
-> +++ b/arch/arm64/boot/dts/freescale/s32g274a-evb.dts
-> @@ -1,7 +1,7 @@
->  // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
->  /*
->   * Copyright (c) 2021 SUSE LLC
-> - * Copyright 2019-2021, 2024 NXP
-> + * Copyright 2019-2021, 2024-2025 NXP
->   */
->  
->  /dts-v1/;
-> @@ -15,6 +15,7 @@ / {
->  
->  	aliases {
->  		serial0 = &uart0;
-> +		ethernet0 = &gmac0;
+     r8152 driver sets up the MAC address at reset-resume, while
+     rtl8152_set_mac_address() has the temporary autopm get/put. This may
+     lead to a deadlock as the PM lock has been already taken for the
+     execution of the runtime PM callback.
 
-Sort aliases in alphabetical order.
+     This patch adds the workaround to avoid the superfluous autpm when
+     called from rtl8152_reset_resume().
 
-Shawn
+     Link: https://bugzilla.suse.com/show_bug.cgi?id=1186194
+     Signed-off-by: Takashi Iwai <tiwai@suse.de>
+     Signed-off-by: David S. Miller <davem@davemloft.net>
 
->  	};
->  
->  	chosen {
-> @@ -43,3 +44,21 @@ &usdhc0 {
->  	no-1-8-v;
->  	status = "okay";
->  };
-> +
-> +&gmac0 {
-> +	clocks = <&clks 24>, <&clks 19>, <&clks 18>, <&clks 15>;
-> +	clock-names = "stmmaceth", "tx", "rx", "ptp_ref";
-> +	phy-mode = "rgmii-id";
-> +	phy-handle = <&rgmiiaphy4>;
-> +	status = "okay";
-> +};
-> +
-> +&gmac0mdio {
-> +	#address-cells = <1>;
-> +	#size-cells = <0>;
-> +
-> +	/* KSZ 9031 on RGMII */
-> +	rgmiiaphy4: ethernet-phy@4 {
-> +		reg = <4>;
-> +	};
-> +};
-> diff --git a/arch/arm64/boot/dts/freescale/s32g274a-rdb2.dts b/arch/arm64/boot/dts/freescale/s32g274a-rdb2.dts
-> index 4f58be68c818..b9c2f964b3f7 100644
-> --- a/arch/arm64/boot/dts/freescale/s32g274a-rdb2.dts
-> +++ b/arch/arm64/boot/dts/freescale/s32g274a-rdb2.dts
-> @@ -16,6 +16,7 @@ / {
->  	aliases {
->  		serial0 = &uart0;
->  		serial1 = &uart1;
-> +		ethernet0 = &gmac0;
->  	};
->  
->  	chosen {
-> @@ -77,3 +78,21 @@ &usdhc0 {
->  	no-1-8-v;
->  	status = "okay";
->  };
-> +
-> +&gmac0 {
-> +	clocks = <&clks 24>, <&clks 19>, <&clks 18>, <&clks 15>;
-> +	clock-names = "stmmaceth", "tx", "rx", "ptp_ref";
-> +	phy-mode = "rgmii-id";
-> +	phy-handle = <&rgmiiaphy1>;
-> +	status = "okay";
-> +};
-> +
-> +&gmac0mdio {
-> +	#address-cells = <1>;
-> +	#size-cells = <0>;
-> +
-> +	/* KSZ 9031 on RGMII */
-> +	rgmiiaphy1: ethernet-phy@1 {
-> +		reg = <1>;
-> +	};
-> +};
-> diff --git a/arch/arm64/boot/dts/freescale/s32g3.dtsi b/arch/arm64/boot/dts/freescale/s32g3.dtsi
-> index be3a582ebc1b..e31184847371 100644
-> --- a/arch/arm64/boot/dts/freescale/s32g3.dtsi
-> +++ b/arch/arm64/boot/dts/freescale/s32g3.dtsi
-> @@ -1,6 +1,6 @@
->  // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
->  /*
-> - * Copyright 2021-2024 NXP
-> + * Copyright 2021-2025 NXP
->   *
->   * Authors: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
->   *          Ciprian Costea <ciprianmarian.costea@nxp.com>
-> @@ -883,6 +883,54 @@ gic: interrupt-controller@50800000 {
->  			      <0x50420000 0x2000>;
->  			interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
->  		};
-> +
-> +		gmac0: ethernet@4033c000 {
-> +			compatible = "nxp,s32g2-dwmac";
-> +			reg = <0x4033c000 0x2000>, /* gmac IP */
-> +			      <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
-> +			interrupt-parent = <&gic>;
-> +			interrupts = <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>;
-> +			interrupt-names = "macirq";
-> +			snps,mtl-rx-config = <&mtl_rx_setup>;
-> +			snps,mtl-tx-config = <&mtl_tx_setup>;
-> +			status = "disabled";
-> +
-> +			mtl_rx_setup: rx-queues-config {
-> +				snps,rx-queues-to-use = <5>;
-> +
-> +				queue0 {
-> +				};
-> +				queue1 {
-> +				};
-> +				queue2 {
-> +				};
-> +				queue3 {
-> +				};
-> +				queue4 {
-> +				};
-> +			};
-> +
-> +			mtl_tx_setup: tx-queues-config {
-> +				snps,tx-queues-to-use = <5>;
-> +
-> +				queue0 {
-> +				};
-> +				queue1 {
-> +				};
-> +				queue2 {
-> +				};
-> +				queue3 {
-> +				};
-> +				queue4 {
-> +				};
-> +			};
-> +
-> +			gmac0mdio: mdio {
-> +				#address-cells = <1>;
-> +				#size-cells = <0>;
-> +				compatible = "snps,dwmac-mdio";
-> +			};
-> +		};
->  	};
->  
->  	timer {
-> diff --git a/arch/arm64/boot/dts/freescale/s32g399a-rdb3.dts b/arch/arm64/boot/dts/freescale/s32g399a-rdb3.dts
-> index e94f70ad82d9..4a74923789ae 100644
-> --- a/arch/arm64/boot/dts/freescale/s32g399a-rdb3.dts
-> +++ b/arch/arm64/boot/dts/freescale/s32g399a-rdb3.dts
-> @@ -1,6 +1,6 @@
->  // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
->  /*
-> - * Copyright 2021-2024 NXP
-> + * Copyright 2021-2025 NXP
->   *
->   * NXP S32G3 Reference Design Board 3 (S32G-VNP-RDB3)
->   */
-> @@ -18,6 +18,7 @@ aliases {
->  		mmc0 = &usdhc0;
->  		serial0 = &uart0;
->  		serial1 = &uart1;
-> +		ethernet0 = &gmac0;
->  	};
->  
->  	chosen {
-> @@ -93,3 +94,21 @@ &usdhc0 {
->  	disable-wp;
->  	status = "okay";
->  };
-> +
-> +&gmac0 {
-> +	clocks = <&clks 24>, <&clks 19>, <&clks 18>, <&clks 15>;
-> +	clock-names = "stmmaceth", "tx", "rx", "ptp_ref";
-> +	phy-mode = "rgmii-id";
-> +	phy-handle = <&rgmiiaphy1>;
-> +	status = "okay";
-> +};
-> +
-> +&gmac0mdio {
-> +	#address-cells = <1>;
-> +	#size-cells = <0>;
-> +
-> +	/* KSZ 9031 on RGMII */
-> +	rgmiiaphy1: ethernet-phy@1 {
-> +		reg = <1>;
-> +	};
-> +};
-> 
-> ---
-> base-commit: fd94619c43360eb44d28bd3ef326a4f85c600a07
-> change-id: 20251006-nxp-s32g-boards-2d156255b592
-> 
-> Best regards,
-> -- 
-> Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
-> 
-> 
+Thanks,
+
+Guo, Heyi
 
 
