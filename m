@@ -1,101 +1,131 @@
-Return-Path: <netdev+bounces-233250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F19AC0F5D2
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:38:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03071C0F686
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:44:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AED96347807
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 16:38:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28A731883D90
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 16:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FA8314A8D;
-	Mon, 27 Oct 2025 16:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540BB30CD9D;
+	Mon, 27 Oct 2025 16:44:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ey7n90JD";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="xoIbsUk2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ghH1DooK"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7274830AAC8;
-	Mon, 27 Oct 2025 16:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A75730C615;
+	Mon, 27 Oct 2025 16:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761582990; cv=none; b=TQsRAK0ApbGR9hjH+fQW93uUhMw8UIsYUrvaRK1CSAzlDvDXwfIk3I+uZXqJYqfPnvq/K8lqOTGriXk+RyZAQ6ymJlIppLNJSdb/VuQx67MJ/X2GiZa39MIQ2dnK0wCYPaiCT5+Cq9HGryrK343KeutyRFjPGEcOHSBYbZ6T864=
+	t=1761583485; cv=none; b=CMyycHpHFoscmhyQDragZ+YCpZuytXtiuuLPW5HLPt0Avx1Ep+3DIQfuhdl4VAvnUDbWC6x3iY6mJDzzhFsBgFJKC8KVX0bfTx91haeoZXSz7H6qLK/quW2js6kguI5wdHaXdrlj3YT92P4y7qcxARMR03DQTuRMFcSMZ0QU2/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761582990; c=relaxed/simple;
-	bh=NF5bSX0dyXfyOuPerzSokt+xmjFMmp5Twg/WVnHSNyg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ieuymSF2TINMxXy0pJUb6SJu5c9OF/TQJY7CAtwjvy72TLxyjQzxpxYvrplfIq2IJXpt5qiGQNKEl3QYhMt9U/ncBzQPJ/IFSlXa3kFRSihUtYy3TayC1uMx7i0mgP3rI1BfAkdYI+hdV7bZ0b8hgIhFQrjGiBaAx9yDD/L0ukc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ey7n90JD; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=xoIbsUk2; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1761582987;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OY0q5YKTtT4E1ub/SpSB1ESrYQ5WABlmRfW9bRPjcDE=;
-	b=ey7n90JDMTUM2Zplf9hrF7CfTAUl/zYjlBdAveeVDbOc8ldRGQ5IgDRhRHEC4SjTCRCAwm
-	HOCpUiOITgnmyeuHcEyYNMhcgEr0MtJAvrjVP/dp9ZcO9VnXu1MlG19lmGMZFXK8pE9byb
-	qCvo2rU7soYJu5SvFyaIDcW3yws89FFOgfppQqSiXlA9smFcFvpdrpGARE1JWRzDS1xhjp
-	jAg2IyMcqyMUSfceTXxqam6QPuUYKbSBaWv++3QRy+0t5LncQkdMhcgyww7vKgjLgCUjvn
-	eyPFg3cyEP76bok5mJwZOa+CzK0KpYoJJm+3ZYX+aoDhkSnFpiQlm2+T2GoLEw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1761582987;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OY0q5YKTtT4E1ub/SpSB1ESrYQ5WABlmRfW9bRPjcDE=;
-	b=xoIbsUk2+vEfPCpIpLkF4GC+uw2r8MliQIR0TvsBpdisw3Dy96mpl0L1ViaoVKsVRemTKD
-	kVWEc+FYaY5tk6DA==
-To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org,
- Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>
-Cc: Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, Zbigniew
- =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering
- <mzxreary@0pointer.de>, Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa
- Sarai <cyphar@cyphar.com>, Amir Goldstein <amir73il@gmail.com>, Tejun Heo
- <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
- linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
- bpf@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, netdev@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
- Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v3 11/70] ns: add active reference count
-In-Reply-To: <20251024-work-namespace-nstree-listns-v3-11-b6241981b72b@kernel.org>
-References: <20251024-work-namespace-nstree-listns-v3-0-b6241981b72b@kernel.org>
- <20251024-work-namespace-nstree-listns-v3-11-b6241981b72b@kernel.org>
-Date: Mon, 27 Oct 2025 17:36:27 +0100
-Message-ID: <87a51cwbck.ffs@tglx>
+	s=arc-20240116; t=1761583485; c=relaxed/simple;
+	bh=OFlj4QGnrs2E3fl/0ujJ9X4ekencKhGEKiw/mctCT/I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uDOK6HEJNZ92zLohvA2cg2JdmV1cqbQe6oJcU6nTVlpXIhjVwEAHYPTwjGUt9swdvSKgrkJMG3slQLIULYHy4tSN53y78I/vVElEW5UbqhaIEqFCp8uMu7dNMSRx0QJ+mK5XaWzYlj4v4Dq4eAQSUnm5zmps5uXH9reXW4uXrak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ghH1DooK; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=5CP7gRt0BblrjBDXAO/3HHhQ8A2T8uZzDR6yvnegDug=; b=ghH1DooKmkmLdJXWxXedWnU15v
+	ZVCXtgDvd+7aaDvknLD7KfrqAbbh5Y1S6A7CHrwNY91J13EqMnCaspEqILKrexhyVFpqn06DgqN1o
+	yvP/jZHR+E7BlwiQJw45D4qHvgkDX1LkbhGxEMLFyeOghMU8ZENl4LQ7AxO3JlE6mA12lDlddFphx
+	rsYhIlMpjkpudqsSZdZJVhTKnNO2vPJpYnFKMfNcWo96W3/Wwp4PSfUb2Yche/GY3TLsA1eGXVR9D
+	Y7OLQrhcd0LF6fua4WZKSoEdFXUJjcEQTeuMq8B5NRM5TojiE1+qF9Ek07/pf1eiHPusM8RshePVO
+	h+Ys3XJQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52316)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vDQKh-0000000026D-2lSw;
+	Mon, 27 Oct 2025 16:44:35 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vDQKf-000000005kr-0qgI;
+	Mon, 27 Oct 2025 16:44:33 +0000
+Date: Mon, 27 Oct 2025 16:44:33 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Emanuele Ghidoli <ghidoliemanuele@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1] net: phy: dp83867: Disable EEE support as not
+ implemented
+Message-ID: <aP-hca4pDsDlEGUt@shell.armlinux.org.uk>
+References: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
+ <ae723e7c-f876-45ef-bc41-3b39dc1dc76b@lunn.ch>
+ <664ef58b-d7e6-4f08-b88f-e7c2cf08c83c@gmail.com>
+ <aP-Hgo5mf7BQyee_@shell.armlinux.org.uk>
+ <f65c1650-22c3-4363-8b7e-00d19bf7af88@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f65c1650-22c3-4363-8b7e-00d19bf7af88@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Oct 24 2025 at 12:52, Christian Brauner wrote:
-> diff --git a/kernel/time/namespace.c b/kernel/time/namespace.c
-> index ee05cad288da..2e7c110bd13f 100644
-> --- a/kernel/time/namespace.c
-> +++ b/kernel/time/namespace.c
-> @@ -106,6 +106,7 @@ static struct time_namespace *clone_time_ns(struct user_namespace *user_ns,
->  	ns->offsets = old_ns->offsets;
->  	ns->frozen_offsets = false;
->  	ns_tree_add(ns);
-> +	ns_ref_active_get_owner(ns);
+On Mon, Oct 27, 2025 at 04:34:54PM +0100, Emanuele Ghidoli wrote:
+> > So, this needs to be tested - please modify phylib's
+> > genphy_c45_read_eee_cap1() to print the value read from the register.
+> > 
+> > If it is 0xffff, that confirms that theory.
+> It’s not 0xffff; I verified that the value read is:
+> TI DP83867 stmmac-0:02: Reading EEE capabilities from MDIO_PCS_EEE_ABLE: 0x0006
 
-It seems all places where ns_ref_active_get_owner() is added it is
-preceeded by a variant of ns_tree_add(). So why don't you stilck that
-refcount thing into ns_tree_add()? I'm probably missing something here.
+Thanks for testing. So the published manual for this PHY is wrong.
+https://www.ti.com/lit/ds/symlink/dp83867ir.pdf page 64.
 
-Thanks,
+The comment I quoted from that page implies that the PCS and AN
+MMD registers shouldn't be implemented.
 
-        tglx
+Given what we now know, I'd suggest TI PHYs are a mess. Stuff they
+say in the documentation that is ignored plainly isn't, and their
+PHYs report stuff as capable but their PHYs aren't capable.
 
+I was suggesting to clear phydev->supported_eee, but that won't
+work if the MDIO_AN_EEE_ADV register is implemented even as far
+as exchanging EEE capabilities with the link partner. We use the
+supported_eee bitmap to know whether a register is implemented.
+Clearing ->supported_eee will mean we won't write to the advertisement
+register. That's risky. Given the brokenness so far, I wouldn't like
+to assume that the MDIO_AN_EEE_ADV register contains zero by default.
 
+Calling phy_disable_eee() from .get_features() won't work, because
+after we call that method, of_set_phy_eee_broken() will then be
+called, which will clear phydev->eee_disabled_modes. I think that is
+a mistake. Is there any reason why we would want to clear the
+disabled modes? Isn't it already zero? (note that if OF_MDIO is
+disabled, or there's no DT node, we don't zero this.)
+
+Your placement is the only possible location as the code currently
+stands, but I would like to suggest that of_set_phy_eee_broken()
+should _not_ be calling linkmode_zero(modes), and we should be able
+to set phydev->eee_disabled_modes in the .get_features() method.
+
+Andrew, would you agree?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
