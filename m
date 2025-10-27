@@ -1,132 +1,103 @@
-Return-Path: <netdev+bounces-233292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00F10C111A4
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 20:34:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4BB6C11129
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 20:33:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 592D6548C9E
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 19:24:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A2121A63667
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 19:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2B632AAD8;
-	Mon, 27 Oct 2025 19:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9773132C305;
+	Mon, 27 Oct 2025 19:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ircv7Jf+"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Mr6Lny8+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3EF31D754;
-	Mon, 27 Oct 2025 19:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9379932D0F9;
+	Mon, 27 Oct 2025 19:26:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761592965; cv=none; b=oo6kDQ7RK4BVq3YpYUuapX87iZgwskfbmUC8tLUwTFRxYvO11QbV5sZsSdSfcCg+CHrfWmzGS5lxfkXaVyo9XslgdARXnCPw4HRck3VT44IYwWRj2hOXrLjaLsFRXZ12hPsXpVyIt/d5yEuJbBmAz4qcieOGUTp8vqG2mkENr/Y=
+	t=1761593203; cv=none; b=uwFYOVlgWOB8WdvypcKryVIZw9JzjsH0W939puiw9umKeJLsuh8KWYMf+N5ed2RzM9hF2icJyCZXBm0nCesh03HmMrDF2ZBiu8SUs/i+IaxhnYLtiQ+t+qtlDirM6FhKkDPs8IO0O5C66pSoqlpWEJ0Fm67Ss74mYA7j44xm4zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761592965; c=relaxed/simple;
-	bh=hQQbdJvuhD/8foS4ARQ8GcU03ZoRHtan+ZrMHcsAB6Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LBMRcOOzJFfz/6yVjRzkVTIqQprjv183Xk4Jcezi20EvItmdHpPDftTRjXFrW2jW1YkwZnJtAMDlJjhBqtcbRjsssjs56gsc1g5s5555kCwCOdAw3FuZYGKXLa8A52aqtk9daLZRe5LGvttVoGnrt/5aU878VYBSUSqanaywTjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ircv7Jf+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E64AC4CEF1;
-	Mon, 27 Oct 2025 19:22:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761592965;
-	bh=hQQbdJvuhD/8foS4ARQ8GcU03ZoRHtan+ZrMHcsAB6Y=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ircv7Jf+nwA1kGvNQxD48lL3DEzeAoD74+yPKt9WZUkleONGceoE5KBzNGNiEXHP+
-	 /UAqMEpxIC6e1lJlmjjA2jZuJD291iDh5B0jCetjbjMc7JHH/dF3yCqHJcXjaWYeZz
-	 KJOHHDpKNjnZeyM87z2XUENY0NBq/WAza3QqMY61GDzUv0par8V62xKlsW5YdYbTUg
-	 GvrgrPkaNRcNVFfJ3ppD6S9CY5c1anIvY45/rSLYwDgRo3fTeL91OuquuxQuEkP64n
-	 2ApurkZymp6E0XnVomY0u4dL275FK5/zZfWBhXhhsE+LpFUvS95CZEUdgwlvZUcqwF
-	 wBkJNbKdek6Hw==
-Message-ID: <8275f7c6-1f2f-4734-8d2a-28bd67e11f6d@kernel.org>
-Date: Mon, 27 Oct 2025 20:22:40 +0100
+	s=arc-20240116; t=1761593203; c=relaxed/simple;
+	bh=wm0oUa3mKa5IPbDSdqoAVyrF4ABVV7bku4lO6iYefFo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e2H+lq3axsFbWB3kn1BLooaFi1DJGfYFVjfAf+C/P7sY0E/IjRB3Clt7+MrP1MJvF66nnBYuJXI8Gh2GqTnueTDaBXkJfKuB549q1xl8CIQxBxCUkNDO0GCcxpnWm98zz2Qaar1HzFAhtNsKrfCQxVOmHpfE1QfYgkZqmHuvmyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Mr6Lny8+; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=rltA5F3NOT3/02lZg9x1jrEu7cFJbW2XAm8Wg3w2ho0=; b=Mr6Lny8+3zCZLImDC3HPEWPRxK
+	zkL42IMNzI8TNT+0v/7QzXALMjbsFEEeWCf8lPLxS4CTsYHwXoJZpvez63CmdnOv5k7g35+7nG0BP
+	TwBrAH8Ir6QfNhVU+ra86rRvEmL9z4tM+cLmyvv95A/9UGDKLdwSkFvMMEJw3GfgbQb0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vDSrM-00CE8m-Tt; Mon, 27 Oct 2025 20:26:28 +0100
+Date: Mon, 27 Oct 2025 20:26:28 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Emanuele Ghidoli <ghidoliemanuele@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1] net: phy: dp83867: Disable EEE support as not
+ implemented
+Message-ID: <3a9240f6-442e-42f3-9c2d-7222c21d5e79@lunn.ch>
+References: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
+ <ae723e7c-f876-45ef-bc41-3b39dc1dc76b@lunn.ch>
+ <664ef58b-d7e6-4f08-b88f-e7c2cf08c83c@gmail.com>
+ <aP-Hgo5mf7BQyee_@shell.armlinux.org.uk>
+ <f65c1650-22c3-4363-8b7e-00d19bf7af88@gmail.com>
+ <aP-hca4pDsDlEGUt@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net V1 3/3] veth: more robust handing of race to avoid txq
- getting stuck
-To: netdev@vger.kernel.org
-Cc: Eric Dumazet <eric.dumazet@gmail.com>, makita.toshiaki@lab.ntt.co.jp,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, ihor.solodrai@linux.dev,
- toshiaki.makita1@gmail.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-team@cloudflare.com
-References: <176123150256.2281302.7000617032469740443.stgit@firesoul>
- <176123158453.2281302.11061466460805684097.stgit@firesoul>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <176123158453.2281302.11061466460805684097.stgit@firesoul>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aP-hca4pDsDlEGUt@shell.armlinux.org.uk>
 
-
-
-On 23/10/2025 16.59, Jesper Dangaard Brouer wrote:
-[...]
-> ---
->   drivers/net/veth.c |   42 +++++++++++++++++++++---------------------
->   1 file changed, 21 insertions(+), 21 deletions(-)
+> Your placement is the only possible location as the code currently
+> stands, but I would like to suggest that of_set_phy_eee_broken()
+> should _not_ be calling linkmode_zero(modes), and we should be able
+> to set phydev->eee_disabled_modes in the .get_features() method.
 > 
-> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-> index 3976ddda5fb8..1d70377481eb 100644
-> --- a/drivers/net/veth.c
-> +++ b/drivers/net/veth.c
-> @@ -392,14 +392,12 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
->   		}
->   		/* Restore Eth hdr pulled by dev_forward_skb/eth_type_trans */
->   		__skb_push(skb, ETH_HLEN);
-> -		/* Depend on prior success packets started NAPI consumer via
-> -		 * __veth_xdp_flush(). Cancel TXQ stop if consumer stopped,
-> -		 * paired with empty check in veth_poll().
-> -		 */
->   		netif_tx_stop_queue(txq);
-> -		smp_mb__after_atomic();
-> -		if (unlikely(__ptr_ring_empty(&rq->xdp_ring)))
-> -			netif_tx_wake_queue(txq);
-> +		/* Handle race: Makes sure NAPI peer consumer runs. Consumer is
-> +		 * responsible for starting txq again, until then ndo_start_xmit
-> +		 * (this function) will not be invoked by the netstack again.
-> +		 */
-> +		__veth_xdp_flush(rq);
->   		break;
->   	case NET_RX_DROP: /* same as NET_XMIT_DROP */
->   drop:
-[...]
-> @@ -986,7 +979,8 @@ static int veth_poll(struct napi_struct *napi, int budget)
->   	if (done < budget && napi_complete_done(napi, done)) {
->   		/* Write rx_notify_masked before reading ptr_ring */
->   		smp_store_mb(rq->rx_notify_masked, false);
-> -		if (unlikely(!__ptr_ring_empty(&rq->xdp_ring))) {
-> +		if (unlikely(!__ptr_ring_empty(&rq->xdp_ring) ||
-> +			     (peer_txq && netif_tx_queue_stopped(peer_txq)))) {
->   			if (napi_schedule_prep(&rq->xdp_napi)) {
->   				WRITE_ONCE(rq->rx_notify_masked, true);
->   				__napi_schedule(&rq->xdp_napi);
-> @@ -998,6 +992,12 @@ static int veth_poll(struct napi_struct *napi, int budget)
->   		veth_xdp_flush(rq, &bq);
->   	xdp_clear_return_frame_no_direct();
->   
-> +	/* Release backpressure per NAPI poll */
-> +	if (peer_txq && netif_tx_queue_stopped(peer_txq)) {
-                         ^^^^^^^^^^^^^^^^^^^^^^
-The check netif_tx_queue_stopped() use a non-atomic test_bit().
-Thus, I'm considering adding a smp_rmb() before the if statement, to be
-paired with the netif_tx_stop_queue() in veth_xmit().
+> Andrew, would you agree?
 
+I dug back through the git history. Originally, the code would read a
+value from DT which was literally used as a mask against the value in
+MDIO_MMD_AN. If the mask was not zero, it was applied. That later got
+converted to a collection of Boolean DT properties, one per link
+speed, and the mask was created as a collection of |= statements, with
+the initial value being 0, and the result assigned to
+phydev->eee_broken_modes. It would of been possible at that stage to
+do phydev->eee_broken_modes |=, but it guess a local variable was used
+to keep the lines shorter. The u32 then got converted to a linux
+bitmap, with the initial = 0; replaced with a linkmode_zero().
 
-> +		txq_trans_cond_update(peer_txq);
-> +		netif_tx_wake_queue(peer_txq);
-> +	}
-> +
->   	return done;
->   }
+I don't see anything in any of the commit messages to indicate there
+was a reason to initialise phydev->eee_broken_modes to 0 before
+parsing the DT properties.
 
---Jesper
+So i think it should be O.K. to remove the linkmode_zero(). For broken
+PHYs like this, the earlier we mask out the broken behaviour the
+better.
+
+	Andrew
 
