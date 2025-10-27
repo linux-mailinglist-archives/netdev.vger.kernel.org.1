@@ -1,70 +1,60 @@
-Return-Path: <netdev+bounces-233043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59098C0B83F
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 01:09:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0516DC0B851
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 01:16:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1F593BA120
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 00:08:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2187218A01A7
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 00:16:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3880078F59;
-	Mon, 27 Oct 2025 00:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505331D5147;
+	Mon, 27 Oct 2025 00:16:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wKXFNreY"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930201388;
-	Mon, 27 Oct 2025 00:08:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D081A8412;
+	Mon, 27 Oct 2025 00:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761523714; cv=none; b=uv56OKpuOjT7E1C9MJKlxqlFJVlll8bHAjFFmRyX9WSHAD0EbKIIihxISwUfl0wce1QXZkd9Br/+Un6+Z84JzVtBN74myOUjAosd2fOf/7rtVPTwloH9IYkBs0WN3IR3HWdY22e1msJRvmlXIh53GRiQBk5u0eMurvq1LOaMKZY=
+	t=1761524183; cv=none; b=lmea079azs1r7QkJcEff9sXXCapi8wTS/Jy3oOMOl+mNCKXzy7bo4WtHbeZIimHzUJTrfOmRcOBnWY1eozrgHSN/V8RQ5Epezw307sVmVa/71YwBjFtno316+XYd1e0NPccY1E5uVJh7M1srlwe8N/rDCgqiJdKsrg0uq6NtslA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761523714; c=relaxed/simple;
-	bh=98yruYel77rmM913pXEoK+w2NRx8Q3hzcTD9iLuIYTQ=;
+	s=arc-20240116; t=1761524183; c=relaxed/simple;
+	bh=MvxIqb08vtaPVJQcd+G4zeThHfYf8zRAtzZWMDrXRaA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TMj/TEvd7XwSq93/FP7OABSjVXOwjc9Mt/EdcbNFTnqQAjbgjkb5zatOmAW83j8WIxJOmcoOdeq/jd2mqR4YCUWubnHBV3LtQUxlTmhP9GzQVcCTkHCuZBDx26Ph17qFVJHtu4hbrWP4wJkKOh/a+z0jEiQhMLctqR0w1WvdhBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vDAmg-000000007mw-3V9M;
-	Mon, 27 Oct 2025 00:08:26 +0000
-Date: Mon, 27 Oct 2025 00:08:23 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=GuAXPLsZHnPbybh8rjr+f6OAfaw28+Mey8db3ZOYckh05GQXvZ6DpG4cSdDe+ePFVfvtTrJ0EluqH0Iia4G7sXnvWGNtdhm+JOLc+6McVbKg+mD3GFcWZeKIM+WA/kfMLieKSn1IhmADpYmsIZZDEuzAcpd/tQiwjaE2cd0mDV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wKXFNreY; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=doOsOCCGyVbII0A8WSOdhf0gKKP0PqbpiZs6rvKkxhY=; b=wKXFNreYTB35c7gLsAkCnBty91
+	xRjYrx69Z+0FSyeoXfCr9Vqtp+06ko6ljb5BSkU8qzV9ivmM/8UHahf/vi/zec7GUganbYK6X2Ivc
+	rRuOOBInBB6W/6G0s+DSTwExLztlLNkJq5LCCDnB5BsS/uqZTKS6N1X+SYF7fxHzkZzw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vDAuC-00C8vM-52; Mon, 27 Oct 2025 01:16:12 +0100
+Date: Mon, 27 Oct 2025 01:16:12 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sven Eckelmann <se@simonwunderlich.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v2 13/13] net: dsa: add driver for MaxLinear
- GSW1xx switch family
-Message-ID: <aP6395j1lbzld4U6@makrotopia.org>
-References: <cover.1761402873.git.daniel@makrotopia.org>
- <5a586b0441a18a1e0eca9ebe77668d6ebde79d1c.1761402873.git.daniel@makrotopia.org>
- <aP0ae1rxKnaJUO-_@shell.armlinux.org.uk>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sw@simonwunderlich.de, Issam Hamdi <ih@simonwunderlich.de>
+Subject: Re: [PATCH] net: phy: realtek: Add RTL8224 cable testing support
+Message-ID: <3b1d35d7-ed62-4351-9e94-28e614d7f763@lunn.ch>
+References: <20251024-rtl8224-cable-test-v1-1-e3cda89ac98f@simonwunderlich.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,158 +63,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aP0ae1rxKnaJUO-_@shell.armlinux.org.uk>
+In-Reply-To: <20251024-rtl8224-cable-test-v1-1-e3cda89ac98f@simonwunderlich.de>
 
-Hi Russell,
+> +#define RTL8224_SRAM_RTCT_FAULT_BUSY		BIT(0)
+> +#define RTL8224_SRAM_RTCT_FAULT_OPEN		BIT(3)
+> +#define RTL8224_SRAM_RTCT_FAULT_SAME_SHORT	BIT(4)
+> +#define RTL8224_SRAM_RTCT_FAULT_OK		BIT(5)
+> +#define RTL8224_SRAM_RTCT_FAULT_DONE		BIT(6)
+> +#define RTL8224_SRAM_RTCT_FAULT_CROSS_SHORT	BIT(7)
 
-thank you for the review and for not getting tired to teach me ;)
+It is unusual these are bits. Does the datasheet say what happens if
+the cable is both same short and cross short?
 
-On Sat, Oct 25, 2025 at 07:44:11PM +0100, Russell King (Oracle) wrote:
-> On Sat, Oct 25, 2025 at 03:51:23PM +0100, Daniel Golle wrote:
-> > [...]
-> > +	/* Assert and deassert SGMII shell reset */
-> > +	ret = regmap_set_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
-> > +			      GSW1XX_RST_REQ_SGMII_SHELL);
-> > +	if (ret < 0)
-> > +		return ret;
-> > +
-> > +	ret = regmap_clear_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
-> > +				GSW1XX_RST_REQ_SGMII_SHELL);
-> > +	if (ret < 0)
-> > +		return ret;
-> 
-> So this is disruptive. Overall, at this point, having added every other
-> comment below, this code has me wondering whether you are aware of the
-> documentation I have written in phylink.h for pcs_config(). This code
-> goes against this paragraph in that documentation:
-> 
-> "
->  * pcs_config() will be called when configuration of the PCS is required
->  * or when the advertisement is possibly updated. It must not unnecessarily
->  * disrupt an established link.
-> "
-> 
-> Low quality implementations lead to poor user experiences.
+> +static int rtl8224_cable_test_result_trans(u32 result)
+> +{
+> +	if (result & RTL8224_SRAM_RTCT_FAULT_SAME_SHORT)
+> +		return ETHTOOL_A_CABLE_RESULT_CODE_SAME_SHORT;
+> +
+> +	if (result & RTL8224_SRAM_RTCT_FAULT_BUSY)
+> +		return ETHTOOL_A_CABLE_RESULT_CODE_UNSPEC;
+> +
+> +	if (result & RTL8224_SRAM_RTCT_FAULT_CROSS_SHORT)
+> +		return ETHTOOL_A_CABLE_RESULT_CODE_CROSS_SHORT;
 
-I've improved this in v3 which I have just sent, unless the TBI block came
-out of reset or the interface mode had changed since the previous call to
-.pcs_config() I'm now avoiding any disruptive operations.
+I don't remember seeing a PHY able to report both same short and cross
+short at the same time. Maybe there has been, but there is no code for
+it. We could add such a code.
 
-> > [...]
-> > +	if (interface == PHY_INTERFACE_MODE_SGMII) {
-> > +		txaneg = ADVERTISE_SGMII;
-> > +		if (sgmii_mac_mode) {
-> > +			txaneg |= BIT(14); /* MAC should always send BIT 14 */
-> 
-> Bit 14 is ADVERTISE_LPACK.
-
-Thanks for that, always learning ;)
-
-> 
-> I think I'd prefer:
-> 
-> 			txaneg = ADVERTISE_SGMII | ADVERTISE_LPACK;
-> 
-> and...
-> 
-> > +			anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_ANMODE,
-> > +					      GSW1XX_SGMII_TBI_ANEGCTL_ANMODE_SGMII_MAC);
-> > +		} else {
-> > +			txaneg |= LPA_SGMII_1000FULL;
-> 
-> 			txaneg = LPA_SGMII | LPA_SGMII_1000FULL;
-> 
-> here.
-
-Ack.
-
-> 
-> > +			anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_ANMODE,
-> > +					      GSW1XX_SGMII_TBI_ANEGCTL_ANMODE_SGMII_PHY);
-> 
-> So this seems to be yet another case of reverse SGMII. Andrew, please
-> can we get to a conclusion on PHY_INTERFACE_MODE_REVSGMII before we
-> end up with a crapshow of drivers doing their own stuff *exactly*
-> like we see here?
-
-I agree that PHY_INTERFACE_MODE_REVSGMII would make sense, and I have
-now at least added a comment indicating that.
-As on DSA switches it is very common for the same SerDes interface
-being potentially used to connect a PHY or SFP cage, but be used as CPU
-port, it will be important to clearly state which end of such links
-is described as SGMII or REVSGMII, as one side is always MAC side and
-the other side is PHY side, so its a bit ambigous to use the 'foward'
-(aka. 'normal') vs. 'reverse' language...
-
-> > [...] (regarding GSW1XX_SGMII_TBI_ANEGCTL_OVRANEG and
-> >        GSW1XX_SGMII_TBI_ANEGCTL_OVRABL bits)
-> Please add a comment describing what is going on here. What does this
-> register bit do...
-
-I've added a comment describing the override bits in detail and it
-also turned out that it makes most sense to always set both override
-bits.
-
-> 
-> > +	} else if (interface == PHY_INTERFACE_MODE_1000BASEX ||
-> > +		   interface == PHY_INTERFACE_MODE_2500BASEX) {
-> > +		txaneg = BIT(5) | BIT(7);
-> 
-> ADVERTISE_1000XFULL | ADVERTISE_1000XPAUSE ?
-
-Actually phylink_mii_c22_pcs_encode_advertisement() seemed like a good
-match here and I've used that for the Base-X modes.
-
-> > [...]
-> > +
-> > +static const struct phylink_pcs_ops gsw1xx_sgmii_pcs_ops = {
-> > +	.pcs_an_restart = gsw1xx_sgmii_pcs_an_restart,
-> > +	.pcs_config = gsw1xx_sgmii_pcs_config,
-> > +	.pcs_disable = gsw1xx_sgmii_pcs_disable,
-> > +	.pcs_enable = gsw1xx_sgmii_pcs_enable,
-> > +	.pcs_get_state = gsw1xx_sgmii_pcs_get_state,
-> > +	.pcs_link_up = gsw1xx_sgmii_pcs_link_up,
-> 
-> Please order these in the same order as they appear in the struct, and
-> please order your functions above in the same order. This makes it
-> easier in future if new methods need to be added.
-
-Ack, done.
-
-> 
-> Also, please add the .pcs_inband_caps method to describe the
-> capabilities of the PCS.
-
-Ack.
-
-> 
-> It seems to me that this is not just a Cisco SGMII PCS, but also
-> supports IEEE 802.3 1000BASE-X. "SGMII" is an ambiguous term. Please
-> avoid propagating this ambigutiy to the kernel. I think in this case
-> merely "gsw1xx_pcs_xyz" will do.
-
-I've renamed all functions according to your suggestions, but kept
-register names as-is to still match how they are called in the (btw
-public) datasheet.
-
-> > [...]
-> > +static struct phylink_pcs *gsw1xx_phylink_mac_select_pcs(struct phylink_config *config,
-> > +							 phy_interface_t interface)
-> > +{
-> > +	struct dsa_port *dp = dsa_phylink_to_port(config);
-> > +	struct gswip_priv *gswip_priv = dp->ds->priv;
-> > +	struct gsw1xx_priv *gsw1xx_priv = container_of(gswip_priv,
-> > +						       struct gsw1xx_priv,
-> > +						       gswip);
-> 
-> Reverse christmas tree?
-
-Not possible as each declaration uses the previously declared
-variable in its initializer.
-
-
-Cheers
-
-
-Daniel
+	Andrew
 
