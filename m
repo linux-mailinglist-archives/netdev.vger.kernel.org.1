@@ -1,223 +1,304 @@
-Return-Path: <netdev+bounces-233302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD284C114F5
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 21:08:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82581C1159A
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 21:15:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC15B3A35CB
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 20:06:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9570E1A26AE6
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 20:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48CB73203A9;
-	Mon, 27 Oct 2025 20:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1278B322A27;
+	Mon, 27 Oct 2025 20:13:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M0cPGwKt"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="gEXJRdK/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D63B31E0F7;
-	Mon, 27 Oct 2025 20:05:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24BB231E0E1;
+	Mon, 27 Oct 2025 20:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761595545; cv=none; b=IKumdY2xXs7VUwv2FNwlWTk1L14mAiYhjAC1No2hFULcdDanOhadFeJui4oLOj5NJ+RbiQrlwhKLsGuA6MIjTkkL7ALhrlxGgWBxwe4xp3ldfBqfuHctujZUlPcExMIu23pByvv15JE186e7EVnwJ149mj49Xs5cDuIxN0IP+80=
+	t=1761596035; cv=none; b=ObPmvyzLJyFGE5a4TgSJSDpNi/3vqndu5jb2csJbStyicmMuA/W3gJnN3ADZgTJk5Pwym+F08pySmTHIY3RkclhcLWo+mqlmB/V86znVC3kI2rgmWtcSeC8LZHZengVM0JkQ/HEm1J6k0Do+ceBkh/N4O/xaOYf0y6T67wDZUXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761595545; c=relaxed/simple;
-	bh=cNDDtH0hky+OllvZrPvk4rMF2qkS6qWh+tOSm96kfl8=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aYpDg7ZsxbdFF2hffqOlXSBHSBFZAFTQFMiyliCpEImVaknKvhygF3/umtjLD2zffQy0kB5Vp1mNRb6aUY3A29yJEze3cPsQNCwE2zQvI1M8IPmIPghBnnE0xLLOUmobxkwViEFC+il+TlWBeotdkG20LYJyI8PDpxC7rWtyQ7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M0cPGwKt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B1EFC116B1;
-	Mon, 27 Oct 2025 20:05:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761595544;
-	bh=cNDDtH0hky+OllvZrPvk4rMF2qkS6qWh+tOSm96kfl8=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=M0cPGwKtUiiHM1cQ12FCFRnPV5QRohX5P4Cvv4u6b5PQWmkuFNY9eNlvSd5g3GX/j
-	 cAHQMWexMV1aDYvC+LQ/BF2LghJuXUhCE2XKdkKkZswyF/SmhKOMZN1XDJhivbA7Ta
-	 jM8u0ikgpR2bu16ket//ruPNPNQlRG4c9/Tuwp69WykprwISoonzbEhAysXKhaGgm+
-	 L/tkXrmOxnM5O1SyBUL1ipKzhnxw7UYBTJVkWotmldh6Rw1qVUTsrEo1KEJi2qSUAs
-	 QxonblxXEVM12B61nQ4INW+s3Le4OnyRswLDzWkJLhnpLItEp48pv8LzngP0lhhH0P
-	 55PHen4erJnmA==
-Subject: [PATCH net V2 2/2] veth: more robust handing of race to avoid txq
- getting stuck
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: netdev@vger.kernel.org,
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
- Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, ihor.solodrai@linux.dev,
- "Michael S. Tsirkin" <mst@redhat.com>, makita.toshiaki@lab.ntt.co.jp,
- toshiaki.makita1@gmail.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kernel-team@cloudflare.com
-Date: Mon, 27 Oct 2025 21:05:39 +0100
-Message-ID: <176159553930.5396.4492315010562655785.stgit@firesoul>
-In-Reply-To: <176159549627.5396.15971398227283515867.stgit@firesoul>
-References: <176159549627.5396.15971398227283515867.stgit@firesoul>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1761596035; c=relaxed/simple;
+	bh=qAoL97mVWNBlEzBqceQMKVbc97B+mdox/FBuGbZWd1k=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=YOogET/PmkEz5pJwqQk8Yq082Xp6G55IC4kKHWEYbGLvSsmClwS/7vDY5vyfbMhVlZKyL18rLDQkyMvPxd/oZ6fTvTwWSOsgq5EyqURzco8e6uKxW5tv+Qv/8Su+LhFFbZwWxicWB5HFkgRC2ICCuWhz3KDldFapiuX+V28mrs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=gEXJRdK/; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 9F49E200FE5C; Mon, 27 Oct 2025 13:13:51 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9F49E200FE5C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1761596031;
+	bh=wbDZw8zUMN0sJ9HpsSY/XVaoDfM4XNY+CvNzT8a+XZQ=;
+	h=Date:From:To:Subject:From;
+	b=gEXJRdK/dmEm9SKYLco+IHf58FTq5qXRV8jh1HSmlD8x4Nap11h8Tv19/Yd/alFQP
+	 UCwCwoDpbBhv+XD1L/ey0CjVL93U93D6KHtbzGwlIMsY8Ylucp31pxGdDPVfuTekVe
+	 KbvyfkUG1/L2mgDDZaf1QL2kJ5SiVLvRZSQCUFhQ=
+Date: Mon, 27 Oct 2025 13:13:51 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dipayanroy@microsoft.com
+Subject: [PATCH net-next v2] net: mana: Implement ndo_tx_timeout and
+ serialize queue resets per port.
+Message-ID: <20251027201351.GA8995@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Commit dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to
-reduce TX drops") introduced a race condition that can lead to a permanently
-stalled TXQ. This was observed in production on ARM64 systems (Ampere Altra
-Max).
+Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detected
+and a device-controlled port reset for all queues can be scheduled to a
+ordered workqueue. The reset for all queues on stall detection is
+recomended by hardware team.
 
-The race occurs in veth_xmit(). The producer observes a full ptr_ring and
-stops the queue (netif_tx_stop_queue()). The subsequent conditional logic,
-intended to re-wake the queue if the consumer had just emptied it (if
-(__ptr_ring_empty(...)) netif_tx_wake_queue()), can fail. This leads to a
-"lost wakeup" where the TXQ remains stopped (QUEUE_STATE_DRV_XOFF) and
-traffic halts.
+The change introduces a single ordered workqueue
+("mana_per_port_queue_reset_wq") with WQ_UNBOUND | WQ_MEM_RECLAIM and
+queues exactly one work_struct per port onto it. This achieves:
 
-This failure is caused by an incorrect use of the __ptr_ring_empty() API
-from the producer side. As noted in kernel comments, this check is not
-guaranteed to be correct if a consumer is operating on another CPU. The
-empty test is based on ptr_ring->consumer_head, making it reliable only for
-the consumer. Using this check from the producer side is fundamentally racy.
+  * Global FIFO across all port reset requests (alloc_ordered_workqueue).
+  * Natural per-port de-duplication: the same work_struct cannot be
+    queued twice while pending/running.
+  * Avoids hogging a per-CPU kworker for long, may-sleep reset paths
+    (WQ_UNBOUND).
+  * Guarantees forward progress during memory pressure
+    (WQ_MEM_RECLAIM rescuer).
 
-This patch fixes the race by adopting the more robust logic from an earlier
-version V4 of the patchset, which always flushed the peer:
-
-(1) In veth_xmit(), the racy conditional wake-up logic and its memory barrier
-are removed. Instead, after stopping the queue, we unconditionally call
-__veth_xdp_flush(rq). This guarantees that the NAPI consumer is scheduled,
-making it solely responsible for re-waking the TXQ.
-
-(2) On the consumer side, the logic for waking the peer TXQ is moved out of
-veth_xdp_rcv() and placed at the end of the veth_poll() function. This
-placement is part of fixing the race, as the netif_tx_queue_stopped() check
-must occur after rx_notify_masked is potentially set to false during NAPI
-completion.
- This handles the race where veth_poll() consumes all packets and completes
-NAPI before veth_xmit() on the producer side has called netif_tx_stop_queue().
-In this state, the producer's __veth_xdp_flush(rq) call will see
-rx_notify_masked is false and reschedule NAPI. This new NAPI poll, even if it
-processes no packets, is now guaranteed to run the netif_tx_queue_stopped()
-check, see the stopped queue, and wake it up, allowing veth_xmit() to proceed.
-
-(3) Finally, the NAPI completion check in veth_poll() is updated. If NAPI is
-about to complete (napi_complete_done), it now also checks if the peer TXQ
-is stopped. If the ring is empty but the peer TXQ is stopped, NAPI will
-reschedule itself. This prevents a new race where the producer stops the
-queue just as the consumer is finishing its poll, ensuring the wakeup is not
-missed.
-
-Fixes: dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to reduce TX drops")
-Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
 ---
- drivers/net/veth.c |   43 ++++++++++++++++++++++---------------------
- 1 file changed, 22 insertions(+), 21 deletions(-)
+Changes in v2:
+  - Fixed cosmetic changes.
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 82 +++++++++++++++++++
+ include/net/mana/gdma.h                       |  6 +-
+ include/net/mana/mana.h                       | 15 ++++
+ 3 files changed, 102 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 7b1a9805b270..828b62916f50 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -392,14 +392,12 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
- 		}
- 		/* Restore Eth hdr pulled by dev_forward_skb/eth_type_trans */
- 		__skb_push(skb, ETH_HLEN);
--		/* Depend on prior success packets started NAPI consumer via
--		 * __veth_xdp_flush(). Cancel TXQ stop if consumer stopped,
--		 * paired with empty check in veth_poll().
--		 */
- 		netif_tx_stop_queue(txq);
--		smp_mb__after_atomic();
--		if (unlikely(__ptr_ring_empty(&rq->xdp_ring)))
--			netif_tx_wake_queue(txq);
-+		/* Makes sure NAPI peer consumer runs. Consumer is responsible
-+		 * for starting txq again, until then ndo_start_xmit (this
-+		 * function) will not be invoked by the netstack again.
-+		 */
-+		__veth_xdp_flush(rq);
- 		break;
- 	case NET_RX_DROP: /* same as NET_XMIT_DROP */
- drop:
-@@ -900,17 +898,9 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
- 			struct veth_xdp_tx_bq *bq,
- 			struct veth_stats *stats)
- {
--	struct veth_priv *priv = netdev_priv(rq->dev);
--	int queue_idx = rq->xdp_rxq.queue_index;
--	struct netdev_queue *peer_txq;
--	struct net_device *peer_dev;
- 	int i, done = 0, n_xdpf = 0;
- 	void *xdpf[VETH_XDP_BATCH];
- 
--	/* NAPI functions as RCU section */
--	peer_dev = rcu_dereference_check(priv->peer, rcu_read_lock_bh_held());
--	peer_txq = peer_dev ? netdev_get_tx_queue(peer_dev, queue_idx) : NULL;
--
- 	for (i = 0; i < budget; i++) {
- 		void *ptr = __ptr_ring_consume(&rq->xdp_ring);
- 
-@@ -959,11 +949,6 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
- 	rq->stats.vs.xdp_packets += done;
- 	u64_stats_update_end(&rq->stats.syncp);
- 
--	if (peer_txq && unlikely(netif_tx_queue_stopped(peer_txq))) {
--		txq_trans_cond_update(peer_txq);
--		netif_tx_wake_queue(peer_txq);
--	}
--
- 	return done;
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index f4fc86f20213..05b7046ae3b5 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -258,6 +258,45 @@ static int mana_get_gso_hs(struct sk_buff *skb)
+ 	return gso_hs;
  }
  
-@@ -971,12 +956,20 @@ static int veth_poll(struct napi_struct *napi, int budget)
- {
- 	struct veth_rq *rq =
- 		container_of(napi, struct veth_rq, xdp_napi);
-+	struct veth_priv *priv = netdev_priv(rq->dev);
-+	int queue_idx = rq->xdp_rxq.queue_index;
-+	struct netdev_queue *peer_txq;
- 	struct veth_stats stats = {};
-+	struct net_device *peer_dev;
- 	struct veth_xdp_tx_bq bq;
- 	int done;
- 
- 	bq.count = 0;
- 
-+	/* NAPI functions as RCU section */
-+	peer_dev = rcu_dereference_check(priv->peer, rcu_read_lock_bh_held());
-+	peer_txq = peer_dev ? netdev_get_tx_queue(peer_dev, queue_idx) : NULL;
++static void mana_per_port_queue_reset_work_handler(struct work_struct *work)
++{
++	struct mana_queue_reset_work *reset_queue_work =
++			container_of(work, struct mana_queue_reset_work, work);
++	struct mana_port_context *apc = reset_queue_work->apc;
++	struct net_device *ndev = apc->ndev;
++	struct mana_context *ac = apc->ac;
++	int err;
 +
- 	xdp_set_return_frame_no_direct();
- 	done = veth_xdp_rcv(rq, budget, &bq, &stats);
- 
-@@ -986,7 +979,8 @@ static int veth_poll(struct napi_struct *napi, int budget)
- 	if (done < budget && napi_complete_done(napi, done)) {
- 		/* Write rx_notify_masked before reading ptr_ring */
- 		smp_store_mb(rq->rx_notify_masked, false);
--		if (unlikely(!__ptr_ring_empty(&rq->xdp_ring))) {
-+		if (unlikely(!__ptr_ring_empty(&rq->xdp_ring) ||
-+			     (peer_txq && netif_tx_queue_stopped(peer_txq)))) {
- 			if (napi_schedule_prep(&rq->xdp_napi)) {
- 				WRITE_ONCE(rq->rx_notify_masked, true);
- 				__napi_schedule(&rq->xdp_napi);
-@@ -998,6 +992,13 @@ static int veth_poll(struct napi_struct *napi, int budget)
- 		veth_xdp_flush(rq, &bq);
- 	xdp_clear_return_frame_no_direct();
- 
-+	/* Release backpressure per NAPI poll */
-+	smp_rmb(); /* Paired with netif_tx_stop_queue set_bit */
-+	if (peer_txq && netif_tx_queue_stopped(peer_txq)) {
-+		txq_trans_cond_update(peer_txq);
-+		netif_tx_wake_queue(peer_txq);
++	if (!rtnl_trylock()) {
++		/* Someone else holds RTNL, requeue and exit. */
++		queue_work(ac->per_port_queue_reset_wq,
++			   &apc->queue_reset_work.work);
++		return;
 +	}
 +
- 	return done;
++	/* Pre-allocate buffers to prevent failure in mana_attach later */
++	err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
++	if (err) {
++		netdev_err(ndev, "Insufficient memory for reset post tx stall detection\n");
++		goto out;
++	}
++
++	err = mana_detach(ndev, false);
++	if (err) {
++		netdev_err(ndev, "mana_detach failed: %d\n", err);
++		goto dealloc_pre_rxbufs;
++	}
++
++	err = mana_attach(ndev);
++	if (err)
++		netdev_err(ndev, "mana_attach failed: %d\n", err);
++
++dealloc_pre_rxbufs:
++	mana_pre_dealloc_rxbufs(apc);
++out:
++	rtnl_unlock();
++}
++
+ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ {
+ 	enum mana_tx_pkt_format pkt_fmt = MANA_SHORT_PKT_FMT;
+@@ -762,6 +801,25 @@ static int mana_change_mtu(struct net_device *ndev, int new_mtu)
+ 	return err;
  }
  
-
++static void mana_tx_timeout(struct net_device *netdev, unsigned int txqueue)
++{
++	struct mana_port_context *apc = netdev_priv(netdev);
++	struct mana_context *ac = apc->ac;
++	struct gdma_context *gc = ac->gdma_dev->gdma_context;
++
++	netdev_warn(netdev, "%s(): called on txq: %u\n", __func__, txqueue);
++
++	/* Already in service, hence tx queue reset is not required.*/
++	if (gc->in_service)
++		return;
++
++	/* Note: If there are pending queue reset work for this port(apc),
++	 * subsequent request queued up from here are ignored. This is because
++	 * we are using the same work instance per port(apc).
++	 */
++	queue_work(ac->per_port_queue_reset_wq, &apc->queue_reset_work.work);
++}
++
+ static int mana_shaper_set(struct net_shaper_binding *binding,
+ 			   const struct net_shaper *shaper,
+ 			   struct netlink_ext_ack *extack)
+@@ -844,7 +902,9 @@ static const struct net_device_ops mana_devops = {
+ 	.ndo_bpf		= mana_bpf,
+ 	.ndo_xdp_xmit		= mana_xdp_xmit,
+ 	.ndo_change_mtu		= mana_change_mtu,
++	.ndo_tx_timeout     = mana_tx_timeout,
+ 	.net_shaper_ops         = &mana_shaper_ops,
++
+ };
+ 
+ static void mana_cleanup_port_context(struct mana_port_context *apc)
+@@ -3218,6 +3278,7 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 	ndev->min_mtu = ETH_MIN_MTU;
+ 	ndev->needed_headroom = MANA_HEADROOM;
+ 	ndev->dev_port = port_idx;
++	ndev->watchdog_timeo = MANA_TXQ_TIMEOUT;
+ 	SET_NETDEV_DEV(ndev, gc->dev);
+ 
+ 	netif_set_tso_max_size(ndev, GSO_MAX_SIZE);
+@@ -3255,6 +3316,11 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 
+ 	debugfs_create_u32("current_speed", 0400, apc->mana_port_debugfs, &apc->speed);
+ 
++	/* Initialize the per port queue reset work.*/
++	apc->queue_reset_work.apc = apc;
++	INIT_WORK(&apc->queue_reset_work.work,
++		  mana_per_port_queue_reset_work_handler);
++
+ 	return 0;
+ 
+ free_indir:
+@@ -3456,6 +3522,15 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+ 	if (ac->num_ports > MAX_PORTS_IN_MANA_DEV)
+ 		ac->num_ports = MAX_PORTS_IN_MANA_DEV;
+ 
++	ac->per_port_queue_reset_wq =
++			alloc_ordered_workqueue("mana_per_port_queue_reset_wq",
++						WQ_UNBOUND | WQ_MEM_RECLAIM);
++	if (!ac->per_port_queue_reset_wq) {
++		dev_err(dev, "Failed to allocate per port queue reset workqueue\n");
++		err = -ENOMEM;
++		goto out;
++	}
++
+ 	if (!resuming) {
+ 		for (i = 0; i < ac->num_ports; i++) {
+ 			err = mana_probe_port(ac, i, &ac->ports[i]);
+@@ -3528,6 +3603,8 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 		 */
+ 		rtnl_lock();
+ 
++		cancel_work_sync(&apc->queue_reset_work.work);
++
+ 		err = mana_detach(ndev, false);
+ 		if (err)
+ 			netdev_err(ndev, "Failed to detach vPort %d: %d\n",
+@@ -3547,6 +3624,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 		free_netdev(ndev);
+ 	}
+ 
++	if (ac->per_port_queue_reset_wq) {
++		destroy_workqueue(ac->per_port_queue_reset_wq);
++		ac->per_port_queue_reset_wq = NULL;
++	}
++
+ 	mana_destroy_eq(ac);
+ out:
+ 	mana_gd_deregister_device(gd);
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index 57df78cfbf82..1f8c536ba3be 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -591,6 +591,9 @@ enum {
+ /* Driver can self reset on FPGA Reconfig EQE notification */
+ #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
+ 
++/* Driver detects stalled send queues and recovers them */
++#define GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY BIT(18)
++
+ #define GDMA_DRV_CAP_FLAGS1 \
+ 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
+ 	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
+@@ -599,7 +602,8 @@ enum {
+ 	 GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP | \
+ 	 GDMA_DRV_CAP_FLAG_1_DYNAMIC_IRQ_ALLOC_SUPPORT | \
+ 	 GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE | \
+-	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE)
++	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE | \
++	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY)
+ 
+ #define GDMA_DRV_CAP_FLAGS2 0
+ 
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 0921485565c0..e0b44ae2226a 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -67,6 +67,11 @@ enum TRI_STATE {
+ 
+ #define MANA_RX_FRAG_ALIGNMENT 64
+ 
++/* Timeout value for Txq stall detection & recovery used by ndo_tx_timeout.
++ * The value is chosen after considering fpga re-config scenarios.
++ */
++#define MANA_TXQ_TIMEOUT (15 * HZ)
++
+ struct mana_stats_rx {
+ 	u64 packets;
+ 	u64 bytes;
+@@ -475,13 +480,23 @@ struct mana_context {
+ 
+ 	struct mana_eq *eqs;
+ 	struct dentry *mana_eqs_debugfs;
++	struct workqueue_struct *per_port_queue_reset_wq;
+ 
+ 	struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
+ };
+ 
++struct mana_queue_reset_work {
++
++	/* Work structure */
++	struct work_struct work;
++	/* Pointer to the port context */
++	struct mana_port_context *apc;
++};
++
+ struct mana_port_context {
+ 	struct mana_context *ac;
+ 	struct net_device *ndev;
++	struct mana_queue_reset_work queue_reset_work;
+ 
+ 	u8 mac_addr[ETH_ALEN];
+ 
+-- 
+2.43.0
 
 
