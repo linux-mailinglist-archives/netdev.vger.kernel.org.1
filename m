@@ -1,171 +1,111 @@
-Return-Path: <netdev+bounces-233182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14F7DC0DD5B
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 14:07:41 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CDFDC0DF4C
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 14:17:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1345A403913
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 13:01:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3E3254F7965
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 13:03:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7610D2472BA;
-	Mon, 27 Oct 2025 12:57:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12AF62472BA;
+	Mon, 27 Oct 2025 13:01:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="goIKsUGh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3wWirdwW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C1A246BB7
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 12:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8113D248166;
+	Mon, 27 Oct 2025 13:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761569873; cv=none; b=Cve2IAu7vbSSLDn3Gr5Cis9v1ZmpOgpbl74hRHHtvZfbhXKC8FTCGk9PyRIBdvg4ALbEUDA1BUyKJKvxOGsJV29Tf73EMSvWB8u2QDcNURPudExVK7UmKQLdpj0kFnSI/p9YTTbY3C2AtF4MEIG1sQ6wFCyCB0iKxjHcfKoIqYc=
+	t=1761570098; cv=none; b=ovTvakrb4+8y2Iu8QShoeYR4eltyBhsoRHKPsLwfodoV2udX7Q+9b66eivgmjhf9AISOLokkcr/LDKpCl6TmoyZm2ahAe0u+uxm9PaawBsj2KnoRt7hfdRz6CnJbodtiRhBf6kLVqieY0BKUc4BDC8o4hvpPE5A/dChQ3YcHQe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761569873; c=relaxed/simple;
-	bh=pyPde2tD7sta07ClcWgjDqzIlXAZYN7QTmeWbVa9+zs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T6Kkt5KnJrUkl5/sfBz+ZyDIxxIQ09O8Qd2/ikbFlS0sqim3QwerfgZQ0WtHPh8w4WL/3o5MLVEiihZZEy5acbfexw+Jk3UOqsQp3tnkHYFLwOXD5cL0GwfvPjsL3gGx3aL2rSqwNYAMAvbT6HL/rc8YqpJzz9mhooP9mAiiuv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=goIKsUGh; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b3c2db014easo1015544866b.0
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 05:57:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761569870; x=1762174670; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bt8hfhs9I+4cz9Kty8JRd8Yh2y/LgGssMY+3G+FzciA=;
-        b=goIKsUGhOjoRtQk1Jt59gsWztP48EVpJqsOEkocv1dUwH1WXrcyWnlepn3HRu6jRc6
-         WXlzVIG9SxQoOITptfv+el+tFXH2HfrrTS/ffZrmVmZxV4uJyD8mJz2dq0kyc9hn0YfM
-         RNNgZF7CYLuo3OOFz9S5/UIdQnR9y7Ld2qlVXgYnXb+RSDKfgNKxiGdLiSzqrBbUVVzJ
-         lBmewy1frf4pK//CzRIM6bVRjrNR1wGzqwmQF9hkzhwGjVHmd0rm1YsGblOAy3rlQUE7
-         jFtnHA2vXDL1bXaEwDZIqNcvzOWyqcikQpq3GwUIm41hwDLn7MElkA/YQZwIpfilaCno
-         2jwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761569870; x=1762174670;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bt8hfhs9I+4cz9Kty8JRd8Yh2y/LgGssMY+3G+FzciA=;
-        b=aG3a9aK2GHh6SLbJqlVvJvggCkIGBsKOLvhv6Wq/kYd+OIoiUMQpixG5z/AiW158n1
-         kPejmy/faXtZLycQrqp7im7FsmWCa63CS/CKhhZChf/8KRTbk2Z7OuiYgvADj3cHEGSA
-         33LGQYrWp9ETW8oKhXK85SKb9Qb+jaAaeEHYrBLhoINFAoabFguklLywsyi7FkuzFJLe
-         7PjillC8oXVfRdsjHG7iFCCo2S6IgBJBKYNmUxJyDtV7z/YTP502mMqgdZuVFrvMgMKw
-         dP1TrWkck+8HRdMA6T120cu/kiYGmV7KSEzo5b0XEcH9QUz80ngezwN/y5IM6JEk0w4X
-         oxLA==
-X-Forwarded-Encrypted: i=1; AJvYcCV7d42g3R7FHSyzEAZCZl+Vra7mZocRXKNQ+FHclhyv89RuvsI+zjDOfFk95pVZk5zRySzq9/M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwIXzdvWFz4/z0CrxkNlXQwy0SRcGi9JnHir4je5lyYptOA8UF
-	3hhCC+brJWKCKZdttU926u/QDNnrn3FxV0Gqv6n37yIDI8AGm0dU0HXZjsMptc98n5I=
-X-Gm-Gg: ASbGnctYEUF5DZmgZjY96xM8xZ+kykVJkQjQrDFtFtHxMawmGWUvMqhEcJneJ8fFPpB
-	2gEzShdzWuHMQcfUtAEZQVQgnRC+NV/LHn0PgvQos4ukON3HqmrISamWVizaxLXg/vF2D8T1sHy
-	hdgl+UXFBLc1Inzk3P6Ip5orsxVxwIr8MiuEgKznVyMxORuHU5kbSLcvZOVIwjmGwW0GeWY+AEt
-	L3Zrh7zW5glQy0wm8dLvrMtdJyPiPMvgcu07v246QCN0hoRrculG4w2AsPaPxt/RkyIVArZ5qtC
-	/ceMDbqBG0KQ3NhhmApswUUOiLoaY6Eli4n+jRxZFeql1/QCQkqsDaIXPD6t8ekzhn0MFiyR6qR
-	alf2mTmS35Xmon+RpvuHvzJ7sdNUljnu9IdsNPGtUchaQNXsDYi6HFBUQkY/hkVwCrvRn9Q20PD
-	q5ZWV7c2AafKbYGhc10cjch6tRTISq6U3P4wmcUsGDELTqGtp55/n6WYCp/pf4x+Ca33TN
-X-Google-Smtp-Source: AGHT+IED0eySwGPSv4J4ugqV6CUDIFAw1J6FA5wA/AsapNt34ctbaLqKSrQbZ5/x2zVCw69/ezCHyg==
-X-Received: by 2002:a17:907:728a:b0:b2e:9926:3919 with SMTP id a640c23a62f3a-b6d51b0d5cdmr1586027866b.22.1761569869610;
-        Mon, 27 Oct 2025 05:57:49 -0700 (PDT)
-Received: from [10.0.1.60] (248.201.173.83.static.wline.lns.sme.cust.swisscom.ch. [83.173.201.248])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d853c5bd8sm753870466b.38.2025.10.27.05.57.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Oct 2025 05:57:49 -0700 (PDT)
-Message-ID: <664ef58b-d7e6-4f08-b88f-e7c2cf08c83c@gmail.com>
-Date: Mon, 27 Oct 2025 13:57:48 +0100
+	s=arc-20240116; t=1761570098; c=relaxed/simple;
+	bh=AKKN2c1kBYwMdSjaTh3C9AgUeN+bJF5BFv8aHmXQN2c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JXuuWc+wgCerXwG5ZzwMuxYWdFlR0u7A2NSoM9X64yUQYNnl/642TWxjNy0bMKfmj1U46cShC0473adVpmGq3FFMDg1JgshBVWcXNpvKW1xbXAhKtwW8AfjM5aB0yJennu78PnQTcW83qLf6jB2IambOUluJLrUUo0ru25CPDkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3wWirdwW; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=eqMmPsbXkPqmT8ZSYhoENewFeCKX7DIxuxmp0MwYrk8=; b=3wWirdwWDGSewTR2fQLrCPlupw
+	ymc8Z1nfEg52zHsRzg4YU8MmDkNeOGDTUFhGX75tc7zgeewRctVUTGc+U0tG1A3zjmNrkqITq2Lov
+	KBVPQu1fy88izGFYuJQFkiKKf0oYZQUKrsEIiADbOJvXDz/0kIvWJDQQLLiCTrseRp4Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vDMqm-00CC0J-K2; Mon, 27 Oct 2025 14:01:28 +0100
+Date: Mon, 27 Oct 2025 14:01:28 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Paul SAGE <paul.sage@42.fr>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, linux-kernel@vger.kernel.org, mchan@broadcom.com,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	pavan.chebbi@broadcom.com, vinc@42.fr
+Subject: Re: Andrew Lunn
+Message-ID: <76aaa176-9012-4897-9403-92802610188c@lunn.ch>
+References: <6e1641fe-e681-414e-bd51-e20cf511f85a@lunn.ch>
+ <20251027095139.399855-1-paul.sage@42.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] net: phy: dp83867: Disable EEE support as not
- implemented
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
- Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
- Russell King <linux@armlinux.org.uk>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
- <ae723e7c-f876-45ef-bc41-3b39dc1dc76b@lunn.ch>
-From: Emanuele Ghidoli <ghidoliemanuele@gmail.com>
-Content-Language: en-US
-In-Reply-To: <ae723e7c-f876-45ef-bc41-3b39dc1dc76b@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251027095139.399855-1-paul.sage@42.fr>
 
-
-
-On 27/10/2025 00:45, Andrew Lunn wrote:
->> Since the introduction of phylink-managed EEE support in the stmmac driver,
->> EEE is now enabled by default, leading to issues on systems using the
->> DP83867 PHY.
+On Mon, Oct 27, 2025 at 10:51:39AM +0100, Paul SAGE wrote:
+> The tg3 currently call eth_platform_get_mac_address to retrieve the
+> MAC address from the device tree before trying the mailbox,
+> NVRAM and MAC registers.
+> However, this function only retrieves the MAC address from the device
+> tree using of_get_mac_address.
 > 
-> Did you do a bisect to prove this?
-Yes, I have done a bisect and the commit that introduced the behavior on our
-board is 4218647d4556 ("net: stmmac: convert to phylink managed EEE support").
-
+> We are using device_get_mac_address, which use fwnode to obtain a MAC
+> address using the ACPI, so as we understand fwnode is an
+> abstraction layer for both the device tree (on ARM) and ACPI (on x86)
 > 
->> Fixes: 2a10154abcb7 ("net: phy: dp83867: Add TI dp83867 phy")
+> If true, it could be appropriate to replace the call to replace
+> eth_platform_get_mac_address with device_get_mac_address. This would
+> avoid running the entire function only to later check for a dummy
+> address.
 > 
-> What has this Fixes: tag got to do with phylink?
-I think that the phylink commit is just enabling by default the EEE support,
-and my commit is not really fixing that. It is why I didn't put a Fixes: tag
-pointing to that.
+> Do you see any regression possible with this change ?
 
-I’ve tried to trace the behavior, but it’s quite complex. From my testing, I
-can summarize the situation as follows:
+I don't know ACPI too well, DT is more advanced, and i tend to keep to
+ARM platforms.
 
-- ethtool, after that patch, returns:
-ethtool --show-eee end0
-EEE settings for end0:
-        EEE status: enabled - active
-        Tx LPI: 1000000 (us)
-        Supported EEE link modes:  100baseT/Full
-                                   1000baseT/Full
-        Advertised EEE link modes:  100baseT/Full
-                                    1000baseT/Full
-        Link partner advertised EEE link modes:  100baseT/Full
-                                                 1000baseT/Full
-- before that patch returns, after boot:
-EEE settings for end0:
-        EEE status: disabled
-        Tx LPI: disabled
-        Supported EEE link modes:  100baseT/Full
-                                   1000baseT/Full
-        Advertised EEE link modes:  Not reported
-        Link partner advertised EEE link modes:  100baseT/Full
-                                                 1000baseT/Full
-- Enabling EEE manually using ethtool, triggers the problem too (and ethtool
--show-eee report eee status enabled):
-ethtool --set-eee end0 eee on tx-lpi on
-ethtool --show-eee end0
-EEE settings for end0:
-        EEE status: enabled - active
-        Tx LPI: 1000000 (us)
-        Supported EEE link modes:  100baseT/Full
-                                   1000baseT/Full
-        Advertised EEE link modes:  100baseT/Full
-                                    1000baseT/Full
-        Link partner advertised EEE link modes:  100baseT/Full
-                                                 1000baseT/Full
+Does ACPI actually have a standardised mechanism for storing MAC
+address? Is there anything in the standard?
 
-I understand Russell point of view but from my point of view EEE is now
-enabled by default, and before it wasn't, at least on my setup.
+If you do make use of device_get_mac_address(), how is the MAC address
+stored in ACPI?
 
-> 
-> I hope you have seen Russell is not so happy you claim phylink is to
-> blame here...
-> 
-> 	Andrew
->  
+Documentation/firmware-guide/acpi/dsd/phy.rst says:
 
-Emanuele
+  These properties are defined in accordance with the "Device
+  Properties UUID For _DSD" [dsd-guide] document and the
+  daffd814-6eba-4d8c-8a91-bc9bbf4aa301 UUID must be used in the Device
+  Data Descriptors containing them.
+
+Is that what you are doing?
+
+Have you looked through other MAC drivers? Are there any others
+getting the MAC address from ACPI? Is it all proprietary, or is there
+some standardisation?
+
+If you do decide ACPI is missing this, and you want to move forward,
+please also add a document under Documentation/firmware-guide/acpi/dsd
+describing it.
+
+	Andrew
 
