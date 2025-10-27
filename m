@@ -1,292 +1,171 @@
-Return-Path: <netdev+bounces-233181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77309C0DB26
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 13:54:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14F7DC0DD5B
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 14:07:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5D1574F5EB5
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 12:46:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1345A403913
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 13:01:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7566C22A4EE;
-	Mon, 27 Oct 2025 12:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7610D2472BA;
+	Mon, 27 Oct 2025 12:57:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Jy3oKCA2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="goIKsUGh"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFDA226CFD;
-	Mon, 27 Oct 2025 12:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C1A246BB7
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 12:57:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761569176; cv=none; b=kwLft0q1BE+W2tFeiUJyunX/z8QzhbuWChTU0zA87UPHpLHkcB++g6ulLFHOVSQ3DmlJzSCUCvicLxF4SCBE7//gsoBPFqte/9UBRD2tLKT4o9QRFzv+5SWuAznnVcEBRjY7pQxPYJswpO/4hfMM1ieGyrCy6RYGf9BC0T5hSyw=
+	t=1761569873; cv=none; b=Cve2IAu7vbSSLDn3Gr5Cis9v1ZmpOgpbl74hRHHtvZfbhXKC8FTCGk9PyRIBdvg4ALbEUDA1BUyKJKvxOGsJV29Tf73EMSvWB8u2QDcNURPudExVK7UmKQLdpj0kFnSI/p9YTTbY3C2AtF4MEIG1sQ6wFCyCB0iKxjHcfKoIqYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761569176; c=relaxed/simple;
-	bh=TdxuPqLZziFnxsPOgN04mmsgtUByweKcrhEQE8hk0ok=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eRViZIJzOQdkvibf40gEtH8wHQeGenG0mDgeYFPYD+vEfIP5usMLrxXahqpi8YGODxYmbxnWaPxz2nHj39eENZq7mjDcAumOT32+1VJc+rp6dxFVabZQuybNWfTy15dw5NCypaQ3i7/AS8GGFwINDfFE7sr83E32VlmP6/5SSSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Jy3oKCA2; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1761569175; x=1793105175;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=TdxuPqLZziFnxsPOgN04mmsgtUByweKcrhEQE8hk0ok=;
-  b=Jy3oKCA2noVmg7nRXyXIVjhuqYjCmVBLxOAtNgxF5plaKMJ/nCpVOCwN
-   wTF/T6lDjn93LYFteqo7Vqh9xJpkfewvEKKNEWAEmMzB/+USdUuGV7NbF
-   glGBEOhr0dSWsH2vp1uYv0qe3/eO26/osUE5Yp+qZew4AaXpDeLVG/p0m
-   mOc7kuAv+mRZK1AUcfdfKq8lju1RMrSOkrXOs1ZVxTjCXRbl3NKin3GPL
-   LJP0Uu1kwhOq6qz/Nqo2iOAbJffc/UwZSoOfCfn8fnSUKt1EQLhzIx1Q6
-   kzXrnN63WY87xjzIFFH/f5w0E1W+uKXbK8UXe78AKiwC+SuV/zrvo4I9P
-   w==;
-X-CSE-ConnectionGUID: CRg2JnddQXqvHrHDe8eZOQ==
-X-CSE-MsgGUID: p1KyY9n1TaCHml4dmxlesg==
-X-IronPort-AV: E=Sophos;i="6.19,258,1754982000"; 
-   d="scan'208";a="279676605"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Oct 2025 05:46:08 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Mon, 27 Oct 2025 05:45:45 -0700
-Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Mon, 27 Oct 2025 05:45:43 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>
-Subject: [PATCH net-next] net: phy:  micrel: lan8842 erratas
-Date: Mon, 27 Oct 2025 13:40:26 +0100
-Message-ID: <20251027124026.64232-1-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1761569873; c=relaxed/simple;
+	bh=pyPde2tD7sta07ClcWgjDqzIlXAZYN7QTmeWbVa9+zs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T6Kkt5KnJrUkl5/sfBz+ZyDIxxIQ09O8Qd2/ikbFlS0sqim3QwerfgZQ0WtHPh8w4WL/3o5MLVEiihZZEy5acbfexw+Jk3UOqsQp3tnkHYFLwOXD5cL0GwfvPjsL3gGx3aL2rSqwNYAMAvbT6HL/rc8YqpJzz9mhooP9mAiiuv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=goIKsUGh; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b3c2db014easo1015544866b.0
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 05:57:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761569870; x=1762174670; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bt8hfhs9I+4cz9Kty8JRd8Yh2y/LgGssMY+3G+FzciA=;
+        b=goIKsUGhOjoRtQk1Jt59gsWztP48EVpJqsOEkocv1dUwH1WXrcyWnlepn3HRu6jRc6
+         WXlzVIG9SxQoOITptfv+el+tFXH2HfrrTS/ffZrmVmZxV4uJyD8mJz2dq0kyc9hn0YfM
+         RNNgZF7CYLuo3OOFz9S5/UIdQnR9y7Ld2qlVXgYnXb+RSDKfgNKxiGdLiSzqrBbUVVzJ
+         lBmewy1frf4pK//CzRIM6bVRjrNR1wGzqwmQF9hkzhwGjVHmd0rm1YsGblOAy3rlQUE7
+         jFtnHA2vXDL1bXaEwDZIqNcvzOWyqcikQpq3GwUIm41hwDLn7MElkA/YQZwIpfilaCno
+         2jwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761569870; x=1762174670;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bt8hfhs9I+4cz9Kty8JRd8Yh2y/LgGssMY+3G+FzciA=;
+        b=aG3a9aK2GHh6SLbJqlVvJvggCkIGBsKOLvhv6Wq/kYd+OIoiUMQpixG5z/AiW158n1
+         kPejmy/faXtZLycQrqp7im7FsmWCa63CS/CKhhZChf/8KRTbk2Z7OuiYgvADj3cHEGSA
+         33LGQYrWp9ETW8oKhXK85SKb9Qb+jaAaeEHYrBLhoINFAoabFguklLywsyi7FkuzFJLe
+         7PjillC8oXVfRdsjHG7iFCCo2S6IgBJBKYNmUxJyDtV7z/YTP502mMqgdZuVFrvMgMKw
+         dP1TrWkck+8HRdMA6T120cu/kiYGmV7KSEzo5b0XEcH9QUz80ngezwN/y5IM6JEk0w4X
+         oxLA==
+X-Forwarded-Encrypted: i=1; AJvYcCV7d42g3R7FHSyzEAZCZl+Vra7mZocRXKNQ+FHclhyv89RuvsI+zjDOfFk95pVZk5zRySzq9/M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwIXzdvWFz4/z0CrxkNlXQwy0SRcGi9JnHir4je5lyYptOA8UF
+	3hhCC+brJWKCKZdttU926u/QDNnrn3FxV0Gqv6n37yIDI8AGm0dU0HXZjsMptc98n5I=
+X-Gm-Gg: ASbGnctYEUF5DZmgZjY96xM8xZ+kykVJkQjQrDFtFtHxMawmGWUvMqhEcJneJ8fFPpB
+	2gEzShdzWuHMQcfUtAEZQVQgnRC+NV/LHn0PgvQos4ukON3HqmrISamWVizaxLXg/vF2D8T1sHy
+	hdgl+UXFBLc1Inzk3P6Ip5orsxVxwIr8MiuEgKznVyMxORuHU5kbSLcvZOVIwjmGwW0GeWY+AEt
+	L3Zrh7zW5glQy0wm8dLvrMtdJyPiPMvgcu07v246QCN0hoRrculG4w2AsPaPxt/RkyIVArZ5qtC
+	/ceMDbqBG0KQ3NhhmApswUUOiLoaY6Eli4n+jRxZFeql1/QCQkqsDaIXPD6t8ekzhn0MFiyR6qR
+	alf2mTmS35Xmon+RpvuHvzJ7sdNUljnu9IdsNPGtUchaQNXsDYi6HFBUQkY/hkVwCrvRn9Q20PD
+	q5ZWV7c2AafKbYGhc10cjch6tRTISq6U3P4wmcUsGDELTqGtp55/n6WYCp/pf4x+Ca33TN
+X-Google-Smtp-Source: AGHT+IED0eySwGPSv4J4ugqV6CUDIFAw1J6FA5wA/AsapNt34ctbaLqKSrQbZ5/x2zVCw69/ezCHyg==
+X-Received: by 2002:a17:907:728a:b0:b2e:9926:3919 with SMTP id a640c23a62f3a-b6d51b0d5cdmr1586027866b.22.1761569869610;
+        Mon, 27 Oct 2025 05:57:49 -0700 (PDT)
+Received: from [10.0.1.60] (248.201.173.83.static.wline.lns.sme.cust.swisscom.ch. [83.173.201.248])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d853c5bd8sm753870466b.38.2025.10.27.05.57.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Oct 2025 05:57:49 -0700 (PDT)
+Message-ID: <664ef58b-d7e6-4f08-b88f-e7c2cf08c83c@gmail.com>
+Date: Mon, 27 Oct 2025 13:57:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] net: phy: dp83867: Disable EEE support as not
+ implemented
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+ Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
+ <ae723e7c-f876-45ef-bc41-3b39dc1dc76b@lunn.ch>
+From: Emanuele Ghidoli <ghidoliemanuele@gmail.com>
+Content-Language: en-US
+In-Reply-To: <ae723e7c-f876-45ef-bc41-3b39dc1dc76b@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-Add two erratas for lan8842. The errata document can be found here [1].
-This is fixing the module 2 ("Analog front-end not optimized for
-PHY-side shorted center taps") and module 7 ("1000BASE-T PMA EEE TX wake
-timer is non-compliant")
 
-[1] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/Errata/LAN8842-Errata-DS80001172.pdf
 
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
----
- drivers/net/phy/micrel.c | 166 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 166 insertions(+)
+On 27/10/2025 00:45, Andrew Lunn wrote:
+>> Since the introduction of phylink-managed EEE support in the stmmac driver,
+>> EEE is now enabled by default, leading to issues on systems using the
+>> DP83867 PHY.
+> 
+> Did you do a bisect to prove this?
+Yes, I have done a bisect and the commit that introduced the behavior on our
+board is 4218647d4556 ("net: stmmac: convert to phylink managed EEE support").
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index edca0024b7c73..60788dba3ee8d 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -2837,6 +2837,13 @@ static int ksz886x_cable_test_get_status(struct phy_device *phydev,
-  */
- #define LAN8814_PAGE_PCS_DIGITAL 2
- 
-+/**
-+ * LAN8814_PAGE_EEE - Selects Extended Page 3.
-+ *
-+ * This page contains EEE registers
-+ */
-+#define LAN8814_PAGE_EEE 3
-+
- /**
-  * LAN8814_PAGE_COMMON_REGS - Selects Extended Page 4.
-  *
-@@ -2855,6 +2862,13 @@ static int ksz886x_cable_test_get_status(struct phy_device *phydev,
-  */
- #define LAN8814_PAGE_PORT_REGS 5
- 
-+/**
-+ * LAN8814_PAGE_POWER_REGS - Selects Extended Page 28.
-+ *
-+ * This page contains analog control registers and power mode registers.
-+ */
-+#define LAN8814_PAGE_POWER_REGS 28
-+
- /**
-  * LAN8814_PAGE_SYSTEM_CTRL - Selects Extended Page 31.
-  *
-@@ -5918,6 +5932,153 @@ static int lan8842_probe(struct phy_device *phydev)
- 	return 0;
- }
- 
-+#define LAN8814_POWER_MGMT_MODE_3_ANEG_MDI		0x13
-+#define LAN8814_POWER_MGMT_MODE_4_ANEG_MDIX		0x14
-+#define LAN8814_POWER_MGMT_MODE_5_10BT_MDI		0x15
-+#define LAN8814_POWER_MGMT_MODE_6_10BT_MDIX		0x15
-+#define LAN8814_POWER_MGMT_MODE_7_100BT_TRAIN		0x15
-+#define LAN8814_POWER_MGMT_MODE_8_100BT_MDI		0x15
-+#define LAN8814_POWER_MGMT_MODE_9_100BT_EEE_MDI_TX	0x15
-+#define LAN8814_POWER_MGMT_MODE_10_100BT_EEE_MDI_RX	0x15
-+#define LAN8814_POWER_MGMT_MODE_11_100BT_MDIX		0x1b
-+#define LAN8814_POWER_MGMT_MODE_12_100BT_EEE_MDIX_TX	0x15
-+#define LAN8814_POWER_MGMT_MODE_13_100BT_EEE_MDIX_RX	0x15
-+#define LAN8814_POWER_MGMT_MODE_14_100BTX_EEE_TX_RX	0x1e
-+
-+#define LAN8814_POWER_MGMT_DLLPD_D			BIT(0)
-+#define LAN8814_POWER_MGMT_ADCPD_D			BIT(1)
-+#define LAN8814_POWER_MGMT_PGAPD_D			BIT(2)
-+#define LAN8814_POWER_MGMT_TXPD_D			BIT(3)
-+#define LAN8814_POWER_MGMT_DLLPD_C			BIT(4)
-+#define LAN8814_POWER_MGMT_ADCPD_C			BIT(5)
-+#define LAN8814_POWER_MGMT_PGAPD_C			BIT(6)
-+#define LAN8814_POWER_MGMT_TXPD_C			BIT(7)
-+#define LAN8814_POWER_MGMT_DLLPD_B			BIT(8)
-+#define LAN8814_POWER_MGMT_ADCPD_B			BIT(9)
-+#define LAN8814_POWER_MGMT_PGAPD_B			BIT(10)
-+#define LAN8814_POWER_MGMT_TXPD_B			BIT(11)
-+#define LAN8814_POWER_MGMT_DLLPD_A			BIT(12)
-+#define LAN8814_POWER_MGMT_ADCPD_A			BIT(13)
-+#define LAN8814_POWER_MGMT_PGAPD_A			BIT(14)
-+#define LAN8814_POWER_MGMT_TXPD_A			BIT(15)
-+
-+#define LAN8814_POWER_MGMT_C_D		(LAN8814_POWER_MGMT_DLLPD_D | \
-+					 LAN8814_POWER_MGMT_ADCPD_D | \
-+					 LAN8814_POWER_MGMT_PGAPD_D | \
-+					 LAN8814_POWER_MGMT_DLLPD_C | \
-+					 LAN8814_POWER_MGMT_ADCPD_C | \
-+					 LAN8814_POWER_MGMT_PGAPD_C)
-+
-+#define LAN8814_POWER_MGMT_B_C_D	(LAN8814_POWER_MGMT_C_D | \
-+					 LAN8814_POWER_MGMT_DLLPD_B | \
-+					 LAN8814_POWER_MGMT_ADCPD_B | \
-+					 LAN8814_POWER_MGMT_PGAPD_B)
-+
-+#define LAN8814_POWER_MGMT_VAL1		(LAN8814_POWER_MGMT_C_D | \
-+					 LAN8814_POWER_MGMT_ADCPD_B | \
-+					 LAN8814_POWER_MGMT_PGAPD_B | \
-+					 LAN8814_POWER_MGMT_ADCPD_A | \
-+					 LAN8814_POWER_MGMT_PGAPD_A)
-+
-+#define LAN8814_POWER_MGMT_VAL2		LAN8814_POWER_MGMT_C_D
-+
-+#define LAN8814_POWER_MGMT_VAL3		(LAN8814_POWER_MGMT_C_D | \
-+					 LAN8814_POWER_MGMT_DLLPD_B | \
-+					 LAN8814_POWER_MGMT_ADCPD_B | \
-+					 LAN8814_POWER_MGMT_PGAPD_A)
-+
-+#define LAN8814_POWER_MGMT_VAL4		(LAN8814_POWER_MGMT_B_C_D | \
-+					 LAN8814_POWER_MGMT_ADCPD_A | \
-+					 LAN8814_POWER_MGMT_PGAPD_A)
-+
-+#define LAN8814_POWER_MGMT_VAL5		LAN8814_POWER_MGMT_B_C_D
-+
-+#define LAN8814_EEE_WAKE_TX_TIMER			0x0e
-+#define LAN8814_EEE_WAKE_TX_TIMER_MAX_VAL		0x1f
-+
-+static int lan8842_erratas(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* Magjack center tapped ports */
-+	ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
-+				    LAN8814_POWER_MGMT_MODE_3_ANEG_MDI,
-+				    LAN8814_POWER_MGMT_VAL1);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
-+				    LAN8814_POWER_MGMT_MODE_4_ANEG_MDIX,
-+				    LAN8814_POWER_MGMT_VAL1);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
-+				    LAN8814_POWER_MGMT_MODE_5_10BT_MDI,
-+				    LAN8814_POWER_MGMT_VAL1);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
-+				    LAN8814_POWER_MGMT_MODE_6_10BT_MDIX,
-+				    LAN8814_POWER_MGMT_VAL1);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
-+				    LAN8814_POWER_MGMT_MODE_7_100BT_TRAIN,
-+				    LAN8814_POWER_MGMT_VAL2);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
-+				    LAN8814_POWER_MGMT_MODE_8_100BT_MDI,
-+				    LAN8814_POWER_MGMT_VAL3);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
-+				    LAN8814_POWER_MGMT_MODE_9_100BT_EEE_MDI_TX,
-+				    LAN8814_POWER_MGMT_VAL3);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
-+				    LAN8814_POWER_MGMT_MODE_10_100BT_EEE_MDI_RX,
-+				    LAN8814_POWER_MGMT_VAL4);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
-+				    LAN8814_POWER_MGMT_MODE_11_100BT_MDIX,
-+				    LAN8814_POWER_MGMT_VAL5);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
-+				    LAN8814_POWER_MGMT_MODE_12_100BT_EEE_MDIX_TX,
-+				    LAN8814_POWER_MGMT_VAL5);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
-+				    LAN8814_POWER_MGMT_MODE_13_100BT_EEE_MDIX_RX,
-+				    LAN8814_POWER_MGMT_VAL4);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
-+				    LAN8814_POWER_MGMT_MODE_14_100BTX_EEE_TX_RX,
-+				    LAN8814_POWER_MGMT_VAL4);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* Refresh time Waketx timer */
-+	return lanphy_write_page_reg(phydev, LAN8814_PAGE_EEE,
-+				     LAN8814_EEE_WAKE_TX_TIMER,
-+				     LAN8814_EEE_WAKE_TX_TIMER_MAX_VAL);
-+}
-+
- static int lan8842_config_init(struct phy_device *phydev)
- {
- 	int ret;
-@@ -5930,6 +6091,11 @@ static int lan8842_config_init(struct phy_device *phydev)
- 	if (ret < 0)
- 		return ret;
- 
-+	/* Apply the erratas for this device */
-+	ret = lan8842_erratas(phydev);
-+	if (ret < 0)
-+		return ret;
-+
- 	/* Even if the GPIOs are set to control the LEDs the behaviour of the
- 	 * LEDs is wrong, they are not blinking when there is traffic.
- 	 * To fix this it is required to set extended LED mode
--- 
-2.34.1
+> 
+>> Fixes: 2a10154abcb7 ("net: phy: dp83867: Add TI dp83867 phy")
+> 
+> What has this Fixes: tag got to do with phylink?
+I think that the phylink commit is just enabling by default the EEE support,
+and my commit is not really fixing that. It is why I didn't put a Fixes: tag
+pointing to that.
 
+I’ve tried to trace the behavior, but it’s quite complex. From my testing, I
+can summarize the situation as follows:
+
+- ethtool, after that patch, returns:
+ethtool --show-eee end0
+EEE settings for end0:
+        EEE status: enabled - active
+        Tx LPI: 1000000 (us)
+        Supported EEE link modes:  100baseT/Full
+                                   1000baseT/Full
+        Advertised EEE link modes:  100baseT/Full
+                                    1000baseT/Full
+        Link partner advertised EEE link modes:  100baseT/Full
+                                                 1000baseT/Full
+- before that patch returns, after boot:
+EEE settings for end0:
+        EEE status: disabled
+        Tx LPI: disabled
+        Supported EEE link modes:  100baseT/Full
+                                   1000baseT/Full
+        Advertised EEE link modes:  Not reported
+        Link partner advertised EEE link modes:  100baseT/Full
+                                                 1000baseT/Full
+- Enabling EEE manually using ethtool, triggers the problem too (and ethtool
+-show-eee report eee status enabled):
+ethtool --set-eee end0 eee on tx-lpi on
+ethtool --show-eee end0
+EEE settings for end0:
+        EEE status: enabled - active
+        Tx LPI: 1000000 (us)
+        Supported EEE link modes:  100baseT/Full
+                                   1000baseT/Full
+        Advertised EEE link modes:  100baseT/Full
+                                    1000baseT/Full
+        Link partner advertised EEE link modes:  100baseT/Full
+                                                 1000baseT/Full
+
+I understand Russell point of view but from my point of view EEE is now
+enabled by default, and before it wasn't, at least on my setup.
+
+> 
+> I hope you have seen Russell is not so happy you claim phylink is to
+> blame here...
+> 
+> 	Andrew
+>  
+
+Emanuele
 
