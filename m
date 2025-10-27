@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-233205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7761CC0E5B2
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 15:19:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 073C0C0E645
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 15:25:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8290819A5650
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 14:16:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF46C46118F
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 14:16:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FA94308F3A;
-	Mon, 27 Oct 2025 14:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E533074B3;
+	Mon, 27 Oct 2025 14:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PW2jXaGX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="csHT2hQQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AABD227707
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 14:15:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED9E309F1E
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 14:15:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761574556; cv=none; b=jiXsuSBp6r3RkPnH2MXR4pjgMAB/ynmroou78uaax9NbAwwTo3T8J791x1FxnQ3mzLvRto4AIzIgk31p/cnEXgIXp9q99fr18xatsOthjZVdK6ZxxyxjUTitd5bVt6hxZ74zMvv4cAVPhuUQY9B80ip1c0Gj1hbVqYZ6GTlV0Yk=
+	t=1761574560; cv=none; b=fLa6dSnDqE2F/4K3CezpfJwlMwBfolc/vAx97ETbFZSokfLV1VWVNzUm6h0ARA9+MMOcbpMf5Qq/AM/kJ8X9pBiDRYK+mbbBD1gtVB4Rx3ZMTgDc4XaN+OVC/gkkZHbbzMMrICwIrCwGtVcda0DOA6/hhwfHnVxzwBgFoKiK1iI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761574556; c=relaxed/simple;
-	bh=JZj9auJ7JYGycI9LrR62D2gYRthD2d4QaIrDPfu4Mqw=;
+	s=arc-20240116; t=1761574560; c=relaxed/simple;
+	bh=r2j2jmIGxd8yJ+ncT0Nh3b22vmiTsqW1aGomQOkJiko=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mnN0oqTcoSdM2DpW19fGZiTWh3tc+tOyIaMR0qvPB2Fw7UDgMeKaiMS0uHeCaOefUq9+gML+hg6nlZCTRUNpxYAHEQfZl0SI5ZIQJ/x+vswfnVRYVcYnLTEBaM9cdIMMXBxuz6c7AQTgUdra4djhZp4+gSc1JcM9+gCUxWX8wy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PW2jXaGX; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version; b=CUYn3cKw9x5Ei6YBaHqnTE9ll3yxn4bh0YUvcwhHt+2asAprFxLhgTN4hp2blokgxgXsVKhYz4xw7vwengAR4eoH/yXx/AfLeDqC1q8GuVbpxShBeFdJ98UJWeW5/gOqmzY9CPL4VcZznjr/Q587wFyrd55GkOo3Xyj123DOG0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=csHT2hQQ; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7a27c67cdc4so3526582b3a.3
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 07:15:54 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-76e2ea933b7so4547017b3a.1
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 07:15:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761574554; x=1762179354; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761574559; x=1762179359; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=szAE+bPsPINah1q0UtkV9PIi4Hs5RhSjEz/DHr/a1dA=;
-        b=PW2jXaGXr8d8MXnoC/F/rUW6bezF7tGwtdmG9+abD60GHBL9XIBd/Z6dBC5pI6nu4X
-         LOKZyIbO9Qe/P63CnKuunwInSgVrSWbvsDYX0C71h4QWJpYUXrfjyXhj+KjStsmUZ3SA
-         AMCIykmxhaDyE7n6pZaBhRzZ7CP9cXU4mint0z/uQNFRTRtV61pSaWTr6sXEQa3zN45b
-         k/52fA6UNGaI9BlOzi2mMBric5BHxZGOqbk02bragPVOG+sMmsmOiAamgixNnz0Nsy+W
-         nMdT0H34biT3x2yXPWsbak3ImnahfTZ1HEKcE9aonx/cKgDWg0iPLGMHNBzfemiyH08W
-         uItw==
+        bh=kz9Z4afZ/MX9EMzXnfrbbAuJDkgFajfhVvb01g4JIP0=;
+        b=csHT2hQQLAPDVg4ugm2eHNGZRfdHTmDQVzAtwkWStY2dVd6RIs1QU2+qBv1JR4vvwb
+         8fvzmrITFPQb2gEOUNkJaXoJKuEOupo1EE4Fb7DvnRpTry2V7ia9dMk5fAtBA/kmPawI
+         3nquuGX3ppDB5icYxfh8ZHmp3cDYcPEO6128hCakuB+cA2QwJMaAxMcKo68vFDHex27j
+         O2kYrEJbYxkgwLoUQeQ7yydje3DawtvvUQ9xS/xY+ZKNDmKE+JbQHdz3qfxQ2lQ40RGm
+         IV91TMFNYYTlnIFx7KZSsp5HmL3gBuWQ1F9kjABuAeTpNBVYWVie2U75GOckluA5z/xP
+         1D1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761574554; x=1762179354;
+        d=1e100.net; s=20230601; t=1761574559; x=1762179359;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=szAE+bPsPINah1q0UtkV9PIi4Hs5RhSjEz/DHr/a1dA=;
-        b=He4EPIY5gYm9pf6a1nBgNnIj/ub5tgMezKEQnPNiybhms/2SJ21xeUkBfmppjRk5v2
-         ZmA/NEkfThmugP9DeR9PKQvg53b6gAwTzdJUrhyPTdAlhkYOnmIx4vPj9uzRivitvfSb
-         nRn2KP6xqEDnI95ZkOdJocK9ft3xSiCwxhF+DojZ92OXjnCXC1iAd/X3f9scLj3miany
-         uNh/KR+cW+elOE4NgicgqNug+JOrIRvWKSN+qFCXTFh+11xV8/CdKaLoi5EbVGicktcA
-         REX0K0du8dlNi8rh+p4vgrnjmirSX2GAgD5lAi4EVVr0QnhP91sDEKXfS9KsX5s2z59H
-         n24Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVLDtLmSLC2Dcoy4HVtExoA+U4A2nE4JRQPm51Sjx7SUD+vie1GwXa5aVSo600FNuDSq0f5xLg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaH1JKvcnac5TNN0TTQkjFaS6PT2OxbQLueGa2CWwmyVVA/DmE
-	c1oLispUD3SszolvDiVOspiLRHiRrG96MXaDiGG8O/V0Dn324L2C/0aj
-X-Gm-Gg: ASbGnct4lYa5wIUdg3PAHIiYVfR+70zkNZwILIewImQzMU+5SNg1KvXNb/bNQ7Sq3Xz
-	PHt7Ylyqcb7rYEyFxTxf+j9ZjRvHbgccJi8KT4N/tYJNAqhZ3OEl27GlMw9eq3MMM6mePisqREv
-	s1hmKfReSvRLi/JJYodFGP0jDJhvb+clss6qQWSaJMjZxjx3aO0ZX2lfOUqfNe2mjJSizwpFTEL
-	lKJLYM8bCKbEvEnt99CncslHXq3mEa5CjCZMW9a+xWW7t+hGWeQISivrJKZ9cvnFU9/pVE6K5R8
-	AFVUzzZbNS43VDYZWS6w27MurTQ0L4zU8gwkbAsSzWxhVBUhOLuD5Js2Vnm+S0moRpq1lBmf3LJ
-	sbjICY3qKh8vVbnercuxMHtmaKyEH98e/Q9InNULWpGHwjmeCYiUQ9g+/C8U0I5zmVMoDLICvPc
-	IGrCY/5sbAGzZrRzV3ZPT0v+Ad6YzvxeNPuA==
-X-Google-Smtp-Source: AGHT+IE4ewuhHOjIKzBuurO8PWyGcEPZzNSnYycAofW4be6Zd5cxVgsCUw64WxG7+RbjBFiYdXSD8A==
-X-Received: by 2002:a05:6a20:158a:b0:32b:83af:317 with SMTP id adf61e73a8af0-334a854648fmr51702392637.15.1761574553752;
-        Mon, 27 Oct 2025 07:15:53 -0700 (PDT)
+        bh=kz9Z4afZ/MX9EMzXnfrbbAuJDkgFajfhVvb01g4JIP0=;
+        b=vpwK9qMiszYNMYi0ZWGzi7/cz9wp3zQfUOumEdZDXCw6e41febkeTeCvNRbfKZcGnc
+         s9cXyaKC1Uu2Te8gearTAuaqeYXOS0sL2ZGT9LEUuu9necV8NvR3RbfPfejFtp24fDdL
+         XUHcPB5ucgoplbe0I5YhmiwJuc5pcOVBMzUQ3dmyStGilgXHEJmPL8aH+C1b75rigzmp
+         53NH5Wssmr32lmcLlVSo2qnTZT07dw2k77CZa3H92804AmHe4Sc/pEBMOE5ULhbLmU4j
+         Ln/SnzpCGs9XhWyZp3uWjFjm5ddrPJSaD2DGXeap4eRKYf2Z3Dq95YwHdOGoe2bPRfs2
+         3Juw==
+X-Forwarded-Encrypted: i=1; AJvYcCXRMAgcagxWR20Y+4uBzaWY3WghReCgKSdr7ZajrxL0U2V9wQk5B/rp3sh9WXzl7N9TEsjOclw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUpEvvzMT4tA6fFZ6/fevZiTKWRgF93z2ouPgYI44ZD9PEKIbR
+	TlGQqONgmAs+zA/NV8IDACyLPK26yRL6MQFnG/zEbJW7Ej5gHLqy2nzQ
+X-Gm-Gg: ASbGncv8PJ/n5By0wmF5l0+SdC3Uukbm0/hhXCjxJLf4aSxBzCaaF3b57c7BXyLDb4i
+	wnn44Y7GjFOAO6BV7YqmT275rnW8T7c6wvS/1F3CyuhtbUQpD/xYOYwPHGpH40CtZJnQ1zUxmUD
+	mV/EyJ0HrvhXobK114JomQBpHnmo6EDKyFIfM4swX728PwocP4J+7HIAyuVqIP3J7JqTPhrefXB
+	T9QxAWZ0AN1qSYQ0Ap4+vfysXx8dRuw5dL9CC+hNdJwR3/HbSsfGSQVB/KpiowA4i/oDMJe1tHj
+	F6cuUIWrGTbHGCNZy1jJfXT8Obnq7dNWZ0NOh37WWRp4ssQbG+EeUKFRO5WePxUpfGuVTMygpje
+	kh4BHSeuxW7uN0Q0159GzUSzFtf7K6kpgm0BGJWiIT5i8Uoy2AYGVlIONbMuuhtia//Zf5xsFzp
+	q2JxhboFB+qz1u
+X-Google-Smtp-Source: AGHT+IGNUIDuEJIeDAsm3sk6staAfqpCLBkB6gWkOGH/BlTye1wNGWj1yoUZzePJ8yU9optoV3abJw==
+X-Received: by 2002:a05:6a00:2b94:b0:746:195b:bf1c with SMTP id d2e1a72fcca58-7a284dcfee5mr10739641b3a.10.1761574558415;
+        Mon, 27 Oct 2025 07:15:58 -0700 (PDT)
 Received: from localhost.localdomain ([150.109.25.78])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a41c70ea64sm6788166b3a.3.2025.10.27.07.15.51
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a41c70ea64sm6788166b3a.3.2025.10.27.07.15.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 07:15:53 -0700 (PDT)
+        Mon, 27 Oct 2025 07:15:58 -0700 (PDT)
 From: HaiYang Zhong <wokezhong@gmail.com>
 X-Google-Original-From: HaiYang Zhong <wokezhong@tencent.com>
 To: kuniyu@google.com
@@ -88,9 +88,9 @@ Cc: davem@davemloft.net,
 	pabeni@redhat.com,
 	wokezhong@gmail.com,
 	wokezhong@tencent.com
-Subject: [PATCH v3 1/2] net/tcp: fix permanent FIN-WAIT-1 state with continuous zero window packets
-Date: Mon, 27 Oct 2025 22:15:41 +0800
-Message-ID: <20251027141542.3746029-2-wokezhong@tencent.com>
+Subject: [PATCH v3 2/2] net/tcp: add packetdrill test for FIN-WAIT-1 zero-window fix
+Date: Mon, 27 Oct 2025 22:15:42 +0800
+Message-ID: <20251027141542.3746029-3-wokezhong@tencent.com>
 X-Mailer: git-send-email 2.43.7
 In-Reply-To: <20251027141542.3746029-1-wokezhong@tencent.com>
 References: <CAAVpQUC7qk_1Dj+fuC-wfesHkUMQhNoVdUY9GXo=vYzmJJ1WdA@mail.gmail.com>
@@ -103,47 +103,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When a TCP connection is in FIN-WAIT-1 state with the FIN packet blocked in
-the send buffer, and the peer continuously sends zero-window advertisements,
-the current implementation reset the zero-window probe timer while maintaining
-the current `icsk->icsk_backoff`, causing the connection to remain permanently
-in FIN-WAIT-1 state.
+Move the packetdrill test to the packetdrill directory and shorten
+the test duration.
 
-Reproduce conditions:
-1. Peer's receive window is full and actively sending continuous zero window
-   advertisements.
-2. Local FIN packet is blocked in send buffer due to peer's zero-window.
-3. Local socket has been closed (entered orphan state).
+In the previous packetdrill test script, the long duration was due to
+presenting the entire zero-window probe backoff process. The test has
+been modified to only observe the first few packets to shorten the test
+time while still effectively verifying the fix.
 
-The root cause lies in the tcp_ack_probe() function: when receiving a zero-window ACK,
-- It reset the probe timer while keeping the current `icsk->icsk_backoff`.
-- This would result in the condition `icsk->icsk_backoff >= max_probes` false.
-- Orphaned socket cannot be set to close.
-
-This patch modifies the tcp_ack_probe() logic: when the socket is dead,
-upon receiving a zero-window packet, instead of resetting the probe timer,
-we maintain the current timer, ensuring the probe interval grows according
-to 'icsk->icsk_backoff', thus causing the zero-window probe timer to eventually
-timeout and close the socket.
+- Moved test to tools/testing/selftests/net/packetdrill/
+- Reduced test duration from 360+ seconds to under 4 seconds
 
 Signed-off-by: HaiYang Zhong <wokezhong@tencent.com>
 ---
- net/ipv4/tcp_input.c | 2 ++
- 1 file changed, 2 insertions(+)
+ .../packetdrill/tcp_fin_wait1_zero_window.pkt | 34 +++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+ create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fin_wait1_zero_window.pkt
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 71b76e98371a..22fc82cb6b73 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -3440,6 +3440,8 @@ static void tcp_ack_probe(struct sock *sk)
- 	} else {
- 		unsigned long when = tcp_probe0_when(sk, tcp_rto_max(sk));
- 
-+		if (sock_flag(sk, SOCK_DEAD) && icsk->icsk_backoff != 0)
-+			return;
- 		when = tcp_clamp_probe0_to_user_timeout(sk, when);
- 		tcp_reset_xmit_timer(sk, ICSK_TIME_PROBE0, when, true);
- 	}
+diff --git a/tools/testing/selftests/net/packetdrill/tcp_fin_wait1_zero_window.pkt b/tools/testing/selftests/net/packetdrill/tcp_fin_wait1_zero_window.pkt
+new file mode 100644
+index 000000000000..854ede56e7dd
+--- /dev/null
++++ b/tools/testing/selftests/net/packetdrill/tcp_fin_wait1_zero_window.pkt
+@@ -0,0 +1,34 @@
++// Test for permanent FIN-WAIT-1 state with continuous zero-window advertisements
++// Author: HaiYang Zhong <wokezhong@tencent.com>
++
++
++0.000 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
++0.000 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
++0.000 bind(3, ..., ...) = 0
++0.000 listen(3, 1) = 0
++
++0.100 < S 0:0(0) win 65535 <mss 1460>
++0.100 > S. 0:0(0) ack 1 <mss 1460>
++0.100 < . 1:1(0) ack 1 win 65535
++0.100 accept(3, ..., ...) = 4
++
++// Send data to fill receive window
++0.200 write(4, ..., 5) = 5
++0.200 > P. 1:6(5) ack 1
++
++// Advertise zero-window
++0.200 < . 1:1(0) ack 6 win 0
++
++// Application closes connection, sends FIN (but blocked by zero window)
++0.200 close(4) = 0
++
++//Send zero-window probe packet
+++0.200 > . 5:5(0) ack 1
+++0.400 > . 5:5(0) ack 1
+++0.800 > . 5:5(0) ack 1
++
+++1.000 < . 1:1(0) ack 6 win 0
++
++// Without fix: This probe won't match - timer was reset, probe will be sent 2.600s after the previous probe
++// With fix: This probe matches - exponential backoff continues (1.600s after previous probe)
+++0.600~+0.700 > . 5:5(0) ack 1
 -- 
 2.43.7
 
