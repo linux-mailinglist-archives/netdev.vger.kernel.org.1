@@ -1,208 +1,150 @@
-Return-Path: <netdev+bounces-233174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id A480EC0D846
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 13:29:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 875FBC0D993
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 13:39:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 50ABF34D5B6
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 12:29:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D29E93BE73C
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 12:32:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED61A30F7E0;
-	Mon, 27 Oct 2025 12:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06CD530E0E7;
+	Mon, 27 Oct 2025 12:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="OFMt15Oj"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD59630E0F3
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 12:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C5E2FC017
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 12:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761568116; cv=none; b=RU30KCCpOocaX0Hn37quhrE2fP8i3N09CAQyb0VS4Tdmo+KY2Df0PUaE5LvyvrXsm5yWNn9QXtdnVJJFO9YW/kzQ+zySBk/iyvtI+9psOfCHAxP850ehlve5C4RvJpgqbF+gslHA+pOpOF1cIS9HK8GaCdy1FxljXh7h0mlrEx4=
+	t=1761568197; cv=none; b=PU+fZU4Hs5/oAPrGf9CEuEi8pE03J7rKutXgspZonhYirdEqtAmxhmtQQrR5Xub6hs8vC0Gz32GYUER6QZ1avtD2Y+KGPVqoTvFq4RCJ47PMMSvUEoIcEoiomzyq9VzGmkKD/N1YR/72cSPYYnNjY5udBwePTHxqnqGx/v4G0QY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761568116; c=relaxed/simple;
-	bh=L9LxTCJnLidjQ0FINVcgyW2iNiTY0y7dkDTbhCm44l4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ihbBS96Lbb0AVZGIs0FBHkYBY2rWvaNK/EtpQQaoN8cl4XCNVh+OZAQjfrRlJt2ZLmej/sZqqPCU6IhrVXHNRaGFiUTgSRyUb8WM611gUJGPPriTuTRm2g7fUZ5bDdvMMx/HEvKnojnSheUZ1KXcc3EnijHb9HnWv6EbnQx25rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vDMKX-0004fr-TA; Mon, 27 Oct 2025 13:28:09 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vDMKV-005he0-1l;
-	Mon, 27 Oct 2025 13:28:07 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.98.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vDMKV-000000047aM-1o48;
-	Mon, 27 Oct 2025 13:28:07 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Nishanth Menon <nm@ti.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	linux-doc@vger.kernel.org,
-	Michal Kubecek <mkubecek@suse.cz>,
-	Roan van Dijk <roan@protonic.nl>
-Subject: [PATCH net-next v8 4/4] net: phy: dp83td510: add MSE interface support for 10BASE-T1L
-Date: Mon, 27 Oct 2025 13:28:01 +0100
-Message-ID: <20251027122801.982364-5-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251027122801.982364-1-o.rempel@pengutronix.de>
-References: <20251027122801.982364-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1761568197; c=relaxed/simple;
+	bh=ucRUjaFUh4wuCN79M3qC1TeCIQU45MZBzHlpsc3ZQE4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=rAJlJQErEI2XrMlGVKxyo+8Pu+6rl7Txuw+xc6JijDWZCziU/hFCDBqML55KDiSOXCqBIJTiHI+rw69+DFdgnxKRkf7hG5pdDXzZPJrClB7FxN1Vq+hymvU9zoiqnwOrNDx8NiDENB0aj+dZWbhb9+IkJeurJAe7rq5aGkj1x8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=OFMt15Oj; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b6d345d7ff7so865266166b.1
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 05:29:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1761568194; x=1762172994; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IN/kv8APfQMa2huCv3Xk01i+/7i6hyVUYtFQPNtwkSI=;
+        b=OFMt15OjqowuiNXi4nDo4EXBx7ZaPuhvTYsjC15/s0FubVr89xlb5BDuo+/+edvQVx
+         yO+g10hzKWmcPBzKAICk+ZCzf+lT0y75vmutWXaZyixgidgpSeq5J8anmMxNqS5RdLce
+         F74U8M9lJi2Q7spXRMy+dC9VJu45wo0PZ2EJCNdCg2slIE4Cd8rBcbkE8OENPjSAdcGi
+         E8iiWL2T7wXJiyaUBsnRrPsc3G8NMtJV3xg7HuhIJFgqQCvMKw8VM7dhvVFYJ+PI9eeM
+         0sF0qwCxOIw0dEENJxGBQ0x1eNeKYfsjuNMkeRPIIQ/9jMf10tgw4yJkQPSq2o+oTbLb
+         mpVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761568194; x=1762172994;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IN/kv8APfQMa2huCv3Xk01i+/7i6hyVUYtFQPNtwkSI=;
+        b=VF28lOEvU6QlYr8MpljZ/uHewQKiWWsCk0i8vqWE8eDtlosDKI6nhtYMugDdTb7LWt
+         /6UYZek9AeXyB92tG+g6DYVwuYot5OxYD5HwsYwVKMflr9gehvkt42Nn8npw4NDn4lpU
+         c5Upj4nhT2ObF+rZQ3TXOsc1NFGyCww+N/6ebWRl1Z2WvFhG60lNYmYi4goTldyGkbsn
+         226jGBYRbl7z3vS714XVtwXUbCLdrUFIhZzSYB+ROVOiLKVY1sVbAd6Des1OtXd0eNen
+         M1sB0va0BnLL6LmDB4wDWPFlb+u2NJ/6c29V+8TyGVNNzVVZ/wO9Vf5H9iyGD+QtrT63
+         2QKg==
+X-Forwarded-Encrypted: i=1; AJvYcCXy6qw3CMepFw7r/Ljlm7uF3fGNPbyV99CVCKSG4Y/cY6r09sHlMpw/W9MordvFuAs13JPDggo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yww6bo3rUcwwQI1PQVrI4PJhiQGtkin8rceZmgMx6oA78GQA8VE
+	ZbzA171Dzam2q7FOv2XknfRDkWk8L7ENmIm9dZx/yUv1hUeLlU95+7Hz4mZSyXa3oYc=
+X-Gm-Gg: ASbGncsXTC71Kpj0Ce6GB/hgizkNOskrcyRzLNCvD/5mN5Hl7e+GZOiaAfz5WeDiVuR
+	M4WQZTB4EnGkkZAtzoR9uG1AcN2oNL+AhovuB98xV/Waj6b/Okg2qPbNvbMR/TOdRG/OWelBZIs
+	qu9Bj7Sa00I+ZjfMYUAl1CnhB8r59ebyBCkDXfbe/HilRXQ9dI00BCRnwKo7T01SvjomqlH0dye
+	xClBnHSMoJsuoDBRIXu0++MnAW3b0wvyHRcw/JhLU/NaHEQ2aVxw5BaN0tU4o4pqbnCs+XpMbe6
+	GXtPepdpUYbJ/p/E+7hG1a/bGkXxLPR1aJLxK4mdTLoRs/w7uZUHAdS8Y1UylCGqS693GUMqjpQ
+	4aIgDmrnVz81I23FUaeMHyJz0QXS2SS4Y05PACy3r6NDJYY4fW9gRhv8aPSRRzXtayhnA
+X-Google-Smtp-Source: AGHT+IEaRROLfwzsAXjkPAqbXfJjDsjm8F0/yEVZdxDCagl9W47A6AQtHXtH2xvL+W66nksNqD+7Cw==
+X-Received: by 2002:a17:906:ee89:b0:b6d:595b:f54d with SMTP id a640c23a62f3a-b6d6ba8f860mr1225636766b.7.1761568194340;
+        Mon, 27 Oct 2025 05:29:54 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:c9])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6db1c84813sm113256866b.19.2025.10.27.05.29.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Oct 2025 05:29:53 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: bpf@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,  Martin KaFai Lau
+ <martin.lau@linux.dev>,  Daniel Borkmann <daniel@iogearbox.net>,  John
+ Fastabend <john.fastabend@gmail.com>,  Stanislav Fomichev
+ <sdf@fomichev.me>,  Alexei Starovoitov <ast@kernel.org>,  Andrii Nakryiko
+ <andrii@kernel.org>,  Eduard Zingerman <eddyz87@gmail.com>,  Song Liu
+ <song@kernel.org>,  Yonghong Song <yonghong.song@linux.dev>,  KP Singh
+ <kpsingh@kernel.org>,  Hao Luo <haoluo@google.com>,  Jiri Olsa
+ <jolsa@kernel.org>,  Arthur Fabre <arthur@arthurfabre.com>,  Jesper
+ Dangaard Brouer <hawk@kernel.org>,  netdev@vger.kernel.org,
+  kernel-team@cloudflare.com
+Subject: Re: [PATCH bpf-next v3 11/16] selftests/bpf: Dump skb metadata on
+ verification failure
+In-Reply-To: <20251026-skb-meta-rx-path-v3-11-37cceebb95d3@cloudflare.com>
+	(Jakub Sitnicki's message of "Sun, 26 Oct 2025 15:18:31 +0100")
+References: <20251026-skb-meta-rx-path-v3-0-37cceebb95d3@cloudflare.com>
+	<20251026-skb-meta-rx-path-v3-11-37cceebb95d3@cloudflare.com>
+Date: Mon, 27 Oct 2025 13:29:53 +0100
+Message-ID: <871pmottmm.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain
 
-Implement get_mse_capability() and get_mse_snapshot() for the DP83TD510E
-to expose its Mean Square Error (MSE) register via the new PHY MSE
-UAPI.
+On Sun, Oct 26, 2025 at 03:18 PM +01, Jakub Sitnicki wrote:
+> Add diagnostic output when metadata verification fails to help with
+> troubleshooting test failures. Introduce a check_metadata() helper that
+> prints both expected and received metadata to the BPF program's stderr
+> stream on mismatch. The userspace test reads and dumps this stream on
+> failure.
+>
+> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+> ---
 
-The DP83TD510E does not document any peak MSE values; it only exposes
-a single average MSE register used internally to derive SQI. This
-implementation therefore advertises only PHY_MSE_CAP_AVG, along with
-LINK and channel-A selectors. Scaling is fixed to 0xFFFF, and the
-refresh interval/number of symbols are estimated from 10BASE-T1L
-symbol rate (7.5 MBd) and typical diagnostic intervals (~1 ms).
+[...]
 
-For 10BASE-T1L deployments, SQI is a reliable indicator of link
-modulation quality once the link is established, but it does not
-indicate whether autonegotiation pulses will be correctly received
-in marginal conditions. MSE provides a direct measurement of slicer
-error rate that can be used to evaluate if autonegotiation is likely
-to succeed under a given cable length and condition. In practice,
-testing such scenarios often requires forcing a fixed-link setup to
-isolate MSE behaviour from the autonegotiation process.
+> diff --git a/tools/testing/selftests/bpf/progs/test_xdp_meta.c b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
+> index 11288b20f56c..74d7e2aab2ef 100644
+> --- a/tools/testing/selftests/bpf/progs/test_xdp_meta.c
+> +++ b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
+> @@ -27,6 +27,23 @@ static const __u8 meta_want[META_SIZE] = {
+>  	0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
+>  };
+>  
+> +static bool check_metadata(const char *file, int line, __u8 *meta_have)
+> +{
+> +	if (!__builtin_memcmp(meta_have, meta_want, META_SIZE))
+> +		return true;
+> +
+> +	bpf_stream_printk(BPF_STREAM_STDERR,
+> +			  "FAIL:%s:%d: metadata mismatch\n"
+> +			  "  have:\n    %pI6\n    %pI6\n"
+> +			  "  want:\n    %pI6\n    %pI6\n",
+> +			  file, line,
+> +			  &meta_have[0x00], &meta_have[0x10],
+> +			  &meta_want[0x00], &meta_have[0x10]);
+                                             ^^^^^^^^^
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
-changes v8:
-- use enum phy_mse_channel channel instead of u32
-changes v7:
-- add Reviewed-by
----
- drivers/net/phy/dp83td510.c | 62 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+FYI: AI review pointed to a copy-paste bug here.
 
-diff --git a/drivers/net/phy/dp83td510.c b/drivers/net/phy/dp83td510.c
-index 23af1ac194fa..d75dae6071ad 100644
---- a/drivers/net/phy/dp83td510.c
-+++ b/drivers/net/phy/dp83td510.c
-@@ -61,6 +61,7 @@
- #define DP83TD510E_MASTER_SLAVE_RESOL_FAIL	BIT(15)
- 
- #define DP83TD510E_MSE_DETECT			0xa85
-+#define DP83TD510E_MSE_MAX			U16_MAX
- 
- #define DP83TD510_SQI_MAX	7
- 
-@@ -249,6 +250,64 @@ struct dp83td510_priv {
- #define DP83TD510E_ALCD_COMPLETE			BIT(15)
- #define DP83TD510E_ALCD_CABLE_LENGTH			GENMASK(10, 0)
- 
-+static int dp83td510_get_mse_capability(struct phy_device *phydev,
-+					struct phy_mse_capability *cap)
-+{
-+	/* DP83TD510E documents only a single (average) MSE register
-+	 * (used to derive SQI); no peak or worst-peak counters are
-+	 * described. Advertise only PHY_MSE_CAP_AVG.
-+	 */
-+	cap->supported_caps = PHY_MSE_CAP_AVG;
-+	/* 10BASE-T1L is a single-pair medium, so there are no B/C/D channels.
-+	 * We still advertise PHY_MSE_CAP_CHANNEL_A to indicate that the PHY
-+	 * can attribute the measurement to a specific pair (the only one),
-+	 * rather than exposing it only as a link-aggregate.
-+	 *
-+	 * Rationale:
-+	 *  - Keeps the ethtool MSE_GET selection logic consistent: per-channel
-+	 *    (A/B/C/D) is preferred over WORST/LINK, so userspace receives a
-+	 *    CHANNEL_A nest instead of LINK.
-+	 *  - Signals to tools that "per-pair" data is available (even if there's
-+	 *    just one pair), avoiding the impression that only aggregate values
-+	 *    are supported.
-+	 *  - Remains compatible with multi-pair PHYs and uniform UI handling.
-+	 *
-+	 * Note: WORST and other channels are not advertised on 10BASE-T1L.
-+	 */
-+	cap->supported_caps |= PHY_MSE_CHANNEL_A | PHY_MSE_CAP_LINK;
-+	cap->max_average_mse = DP83TD510E_MSE_MAX;
-+
-+	/* The datasheet does not specify the refresh rate or symbol count,
-+	 * but based on similar PHYs and standards, we can assume a common
-+	 * value. For 10BASE-T1L, the symbol rate is 7.5 MBd. A common
-+	 * diagnostic interval is around 1ms.
-+	 * 7.5e6 symbols/sec * 0.001 sec = 7500 symbols.
-+	 */
-+	cap->refresh_rate_ps = 1000000000; /* 1 ms */
-+	cap->num_symbols = 7500;
-+
-+	return 0;
-+}
-+
-+static int dp83td510_get_mse_snapshot(struct phy_device *phydev,
-+				      enum phy_mse_channel channel,
-+				      struct phy_mse_snapshot *snapshot)
-+{
-+	int ret;
-+
-+	if (channel != PHY_MSE_CHANNEL_LINK &&
-+	    channel != PHY_MSE_CHANNEL_A)
-+		return -EOPNOTSUPP;
-+
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_MSE_DETECT);
-+	if (ret < 0)
-+		return ret;
-+
-+	snapshot->average_mse = ret;
-+
-+	return 0;
-+}
-+
- static int dp83td510_led_brightness_set(struct phy_device *phydev, u8 index,
- 					enum led_brightness brightness)
- {
-@@ -893,6 +952,9 @@ static struct phy_driver dp83td510_driver[] = {
- 	.get_phy_stats	= dp83td510_get_phy_stats,
- 	.update_stats	= dp83td510_update_stats,
- 
-+	.get_mse_capability = dp83td510_get_mse_capability,
-+	.get_mse_snapshot = dp83td510_get_mse_snapshot,
-+
- 	.led_brightness_set = dp83td510_led_brightness_set,
- 	.led_hw_is_supported = dp83td510_led_hw_is_supported,
- 	.led_hw_control_set = dp83td510_led_hw_control_set,
--- 
-2.47.3
+> +	return false;
+> +}
+> +
+> +#define check_metadata(meta_have) check_metadata(__FILE__, __LINE__, meta_have)
+> +
+>  SEC("tc")
+>  int ing_cls(struct __sk_buff *ctx)
+>  {
 
+[...]
 
