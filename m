@@ -1,167 +1,188 @@
-Return-Path: <netdev+bounces-233248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9064C0F3E0
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:23:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7EA0C0F4E8
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:31:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0044C4E3C08
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 16:18:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B37334669DE
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 16:23:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47FDB311957;
-	Mon, 27 Oct 2025 16:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8A3305E24;
+	Mon, 27 Oct 2025 16:23:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mIOT8hYQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bg/wY72m"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A67C305943;
-	Mon, 27 Oct 2025 16:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E75274FE8;
+	Mon, 27 Oct 2025 16:23:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761581928; cv=none; b=l1pKKo/oCSOO3WMgkl71MZqCOpqlgdur4z0aIRSrq3DDG+MHUFraBHz0TNyWiKG8k8gl3zGRWsusFnqeGb1QvYGo/9QZX5fMYb7/Zvx5aQy4BmjofGC8eG+1l57Q7lsfZCQs0ghnH+Xuh6n2vcK4yjKqYOZFFtD+NxXOWTOoTGg=
+	t=1761582212; cv=none; b=c9c+G6uv6p8vHrjSVF7CMB+08/pTanuAdc8x8lazlt/U5dwHBsz13+A3bFdfQvw/TL67o0Pkkp1eHSgkx/b4LZtIhpuT2sIx/t8kYswa6xAdDfewdsP2/+KlEAD4e4ptiZy2SSsTRDLIFEfMSI3mFVh6IBDufFEOF87B6C4FwDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761581928; c=relaxed/simple;
-	bh=tzRQhQnGp/ULOZcZf2fXRW+FzJisJmo8dgomx7BetHk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GEEYhbqL+CHSj2NHLcLjzOeiZzzTkhrKuMn+5eEbEqKMQEUbqbkzF8lU0JmTNxluPmhexMHYUtaB7vO2vY7fH1VQvmp1HUtwO1Jg+bEW+KUIroAZlJn/+KfWEmbIL8wqPaa/W+EIpS6nvl6icQxo2JyFppQd4vKT+i4TDPGJn5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mIOT8hYQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47711C4CEF1;
-	Mon, 27 Oct 2025 16:18:45 +0000 (UTC)
+	s=arc-20240116; t=1761582212; c=relaxed/simple;
+	bh=QFbmOufzCSKxHmY0QccnxuCe5JH8xj8PfL6ljCe973Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rBlu0o46aSBi3RfLSutPW707sFQCls+QS2RW4X1AGcGpTa3lD7H8ft4SHhrvf8bPxhapo5pe1SAc5uwJ3RGk4D0lK+/fLERyrCjD6l0N0n9G78DCTq7SNsdQKY/zIow21nNnMtNexjGr0gKX2cZ/bwK/rluTeqNL7QTku11c8Ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bg/wY72m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BF85C4CEF1;
+	Mon, 27 Oct 2025 16:23:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761581928;
-	bh=tzRQhQnGp/ULOZcZf2fXRW+FzJisJmo8dgomx7BetHk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mIOT8hYQYy5X2pmcEPtNXr5zley3DAxly8rODs402eZ4Yy7WlLToQpvtUZ3scafYn
-	 pAw9mrHwheRCbMWoBqSIilxGYa2ZtVTDlshMzPUbdyK2fk3szN/UC9f95YRI168N/z
-	 FEf6dHMAGvKQz/cJRCa57F7AO+le9+wwvsTzaRzaj0K+319G3QyZ687iW7C2G1HZ48
-	 h3239A/IGNNQrQVkfBBo0+0uWrHa0i4tV1U9TBnSLcANI+F47HOofOAX8HeUh9306W
-	 PQYMbVpNVhAlglL+5+fwgcCCmkqJjiVU//iAIU9RyRKCXYZL3XGYE2/J8HigkTnAU8
-	 7B90R7zbih9GQ==
-Message-ID: <c8ea44e0-e8f5-4356-af80-efa7f56921df@kernel.org>
-Date: Mon, 27 Oct 2025 17:18:43 +0100
+	s=k20201202; t=1761582212;
+	bh=QFbmOufzCSKxHmY0QccnxuCe5JH8xj8PfL6ljCe973Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Bg/wY72mo8btLtpDPdTklIw4ZjgyWtIXqEVuIdpNTnxM+wEilrk3HthuXJkQiCKF8
+	 KgT+GWJ6/wxGh1ouPSxTJY9s17bKffYSux/OM7mQu0s1AiXLHwy2DtZiD2a4j1djak
+	 1YnIVHgGQB+AP+nyOC2wqdviBd4ZWRZJfCWQPZqwgqS48YaC6xbWl8ilFwUB7kpQni
+	 qmn+TlmrIaF7umK2/K3H0FBe6C+5a11TpQdDCYQwgpfY2QgbBTqOaluTcNkYYW/Ey5
+	 m8f4/egrxbUo0/Ta/msccPRkev/U/3FoJYLZB0cQHRxrf4xN4/xmWYyI6CDetLSPg6
+	 oR+IzG5minzyQ==
+Date: Mon, 27 Oct 2025 16:23:28 +0000
+From: Simon Horman <horms@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	nxne.cnse.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH iwl-next] ice: implement configurable header split for
+ regular Rx
+Message-ID: <aP-cgMiJ-y_PX7Xa@horms.kernel.org>
+References: <20251006162053.3550824-1-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net V1 1/3] veth: enable dev_watchdog for detecting
- stalled TXQs
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- netdev@vger.kernel.org, makita.toshiaki@lab.ntt.co.jp
-Cc: Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, ihor.solodrai@linux.dev,
- toshiaki.makita1@gmail.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-team@cloudflare.com
-References: <176123150256.2281302.7000617032469740443.stgit@firesoul>
- <176123157173.2281302.7040578942230212638.stgit@firesoul>
- <877bwkfmgr.fsf@toke.dk> <b6d13746-7921-4825-97cc-7136cdccafde@kernel.org>
- <87v7k0e8qz.fsf@toke.dk>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <87v7k0e8qz.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251006162053.3550824-1-aleksander.lobakin@intel.com>
 
-
-
-On 27/10/2025 15.09, Toke Høiland-Jørgensen wrote:
-> Jesper Dangaard Brouer <hawk@kernel.org> writes:
+On Mon, Oct 06, 2025 at 06:20:53PM +0200, Alexander Lobakin wrote:
+> Add second page_pool for header buffers to each Rx queue and ability
+> to toggle the header split on/off using Ethtool (default to off to
+> match the current behaviour).
+> Unlike idpf, all HW backed up by ice doesn't require any W/As and
+> correctly splits all types of packets as configured: after L4 headers
+> for TCP/UDP/SCTP, after L3 headers for other IPv4/IPv6 frames, after
+> the Ethernet header otherwise (in case of tunneling, same as above,
+> but after innermost headers).
+> This doesn't affect the XSk path as there are no benefits of having
+> it there.
 > 
->> On 24/10/2025 15.39, Toke Høiland-Jørgensen wrote:
->>> Jesper Dangaard Brouer <hawk@kernel.org> writes:
->>>
->>>> The changes introduced in commit dc82a33297fc ("veth: apply qdisc
->>>> backpressure on full ptr_ring to reduce TX drops") have been found to cause
->>>> a race condition in production environments.
->>>>
->>>> Under specific circumstances, observed exclusively on ARM64 (aarch64)
->>>> systems with Ampere Altra Max CPUs, a transmit queue (TXQ) can become
->>>> permanently stalled. This happens when the race condition leads to the TXQ
->>>> entering the QUEUE_STATE_DRV_XOFF state without a corresponding queue wake-up,
->>>> preventing the attached qdisc from dequeueing packets and causing the
->>>> network link to halt.
->>>>
->>>> As a first step towards resolving this issue, this patch introduces a
->>>> failsafe mechanism. It enables the net device watchdog by setting a timeout
->>>> value and implements the .ndo_tx_timeout callback.
->>>>
->>>> If a TXQ stalls, the watchdog will trigger the veth_tx_timeout() function,
->>>> which logs a warning and calls netif_tx_wake_queue() to unstall the queue
->>>> and allow traffic to resume.
->>>>
->>>> The log message will look like this:
->>>>
->>>>    veth42: NETDEV WATCHDOG: CPU: 34: transmit queue 0 timed out 5393 ms
->>>>    veth42: veth backpressure stalled(n:1) TXQ(0) re-enable
->>>>
->>>> This provides a necessary recovery mechanism while the underlying race
->>>> condition is investigated further. Subsequent patches will address the root
->>>> cause and add more robust state handling in ndo_open/ndo_stop.
->>>>
->>>> Fixes: dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to reduce TX drops")
->>>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>>> ---
->>>>    drivers/net/veth.c |   16 +++++++++++++++-
->>>>    1 file changed, 15 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
->>>> index a3046142cb8e..7b1a9805b270 100644
->>>> --- a/drivers/net/veth.c
->>>> +++ b/drivers/net/veth.c
->>>> @@ -959,8 +959,10 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
->>>>    	rq->stats.vs.xdp_packets += done;
->>>>    	u64_stats_update_end(&rq->stats.syncp);
->>>>    
->>>> -	if (peer_txq && unlikely(netif_tx_queue_stopped(peer_txq)))
->>>> +	if (peer_txq && unlikely(netif_tx_queue_stopped(peer_txq))) {
->>>> +		txq_trans_cond_update(peer_txq);
->>>>    		netif_tx_wake_queue(peer_txq);
->>>> +	}
->>>
->>> Hmm, seems a bit weird that this call to txq_trans_cond_update() is only
->>> in veth_xdp_recv(). Shouldn't there (also?) be one in veth_xmit()?
->>>
->>
->> The veth_xmit() call (indirectly) *do* update the txq_trans start
->> timestamp, but only for return code NET_RX_SUCCESS / NETDEV_TX_OK.
->> As .ndo_start_xmit = veth_xmit and netdev_start_xmit[1] will call
->> txq_trans_update on NETDEV_TX_OK.
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+> Applies on top of Tony's next-queue, depends on Michał's Page Pool
+> conversion series.
 > 
-> Ah, right; didn't think of checking the caller, thanks for the pointer :)
+> Sending for review and validation purposes.
 > 
->> This call to txq_trans_cond_update() isn't strictly necessary, as
->> veth_xmit() call will update it later, and the netif_tx_stop_queue()
->> call also updates trans_start.
->>
->> I primarily added it because other drivers that use BQL have their
->> helper functions update txq_trans.  As I see the veth implementation as
->> a simplified BQL, that we hopefully can extend to become more dynamic
->> like BQL.
->>
->> Do you prefer that I remove this?  (call to txq_trans_cond_update)
+> Testing hints: traffic testing with and without header split enabled.
+> The header split can be turned on/off using Ethtool:
 > 
-> Hmm, don't we need it for the XDP path? I.e., if there's no traffic
-> other than XDP_REDIRECT traffic, ndo_start_xmit() will not get called,
-> so we need some way other to keep the watchdog from firing, I think?
-> 
+> sudo ethtool -G <iface> tcp-data-split on (or off)
 
-Yes, perhaps you are right.  Even-though the stop call
-netif_tx_stop_queue() also updates the txq_trans start, then with XDP
-redirect something else can keep the ptr_ring full.  The
-netif_tx_wake_queue() call doesn't update txq_trans itself (it depend on
-a successful netstack packet).  So, without this txq_trans update it can
-get very old (out-of-date) if we starve normal network stack packets.
-  I'm not 100% sure this will trigger a watchdog even, as the queue
-stopped bit should have been cleared.  It is might worth keeping to
-avoid it gets too much out-of-date due to XDP traffic.
+Nice, I'm very pleased to see this feature in the pipeline for the ice driver.
 
---Jesper
+...
 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+
+...
+
+> @@ -836,6 +858,20 @@ bool ice_alloc_rx_bufs(struct ice_rx_ring *rx_ring, unsigned int cleaned_count)
+>  		 */
+>  		rx_desc->read.pkt_addr = cpu_to_le64(addr);
+>  
+> +		if (!hdr_fq.pp)
+> +			goto next;
+> +
+> +		addr = libeth_rx_alloc(&hdr_fq, ntu);
+> +		if (addr == DMA_MAPPING_ERROR) {
+> +			rx_ring->ring_stats->rx_stats.alloc_page_failed++;
+> +
+> +			libeth_rx_recycle_slow(fq.fqes[ntu].netmem);
+> +			break;
+> +		}
+> +
+> +		rx_desc->read.hdr_addr = cpu_to_le64(addr);
+> +
+> +next:
+
+Is performance the reason that a goto is used here, rather than, say, putting
+the conditional code in an if condition? Likewise in ice_clean_rx_irq?
+
+>  		rx_desc++;
+>  		ntu++;
+>  		if (unlikely(ntu == rx_ring->count)) {
+> @@ -933,14 +969,16 @@ static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+>  		unsigned int size;
+>  		u16 stat_err_bits;
+>  		u16 vlan_tci;
+> +		bool rxe;
+>  
+>  		/* get the Rx desc from Rx ring based on 'next_to_clean' */
+>  		rx_desc = ICE_RX_DESC(rx_ring, ntc);
+>  
+> -		/* status_error_len will always be zero for unused descriptors
+> -		 * because it's cleared in cleanup, and overlaps with hdr_addr
+> -		 * which is always zero because packet split isn't used, if the
+> -		 * hardware wrote DD then it will be non-zero
+> +		/*
+> +		 * The DD bit will always be zero for unused descriptors
+> +		 * because it's cleared in cleanup or when setting the DMA
+> +		 * address of the header buffer, which never uses the DD bit.
+> +		 * If the hardware wrote the descriptor, it will be non-zero.
+>  		 */
+
+The update to this comment feels like it could be a separate patch.
+(I know, I often say something like that...)
+
+>  		stat_err_bits = BIT(ICE_RX_FLEX_DESC_STATUS0_DD_S);
+>  		if (!ice_test_staterr(rx_desc->wb.status_error0, stat_err_bits))
+> @@ -954,12 +992,27 @@ static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+>  
+>  		ice_trace(clean_rx_irq, rx_ring, rx_desc);
+>  
+> +		stat_err_bits = BIT(ICE_RX_FLEX_DESC_STATUS0_HBO_S) |
+> +				BIT(ICE_RX_FLEX_DESC_STATUS0_RXE_S);
+> +		rxe = ice_test_staterr(rx_desc->wb.status_error0,
+> +				       stat_err_bits);
+> +
+> +		if (!rx_ring->hdr_pp)
+> +			goto payload;
+> +
+> +		size = le16_get_bits(rx_desc->wb.hdr_len_sph_flex_flags1,
+> +				     ICE_RX_FLEX_DESC_HDR_LEN_M);
+> +		if (unlikely(rxe))
+> +			size = 0;
+> +
+> +		rx_buf = &rx_ring->hdr_fqes[ntc];
+> +		libeth_xdp_process_buff(xdp, rx_buf, size);
+> +		rx_buf->netmem = 0;
+> +
+> +payload:
+>  		size = le16_to_cpu(rx_desc->wb.pkt_len) &
+>  			ICE_RX_FLX_DESC_PKT_LEN_M;
+> -
+> -		stat_err_bits = BIT(ICE_RX_FLEX_DESC_STATUS0_RXE_S);
+> -		if (unlikely(ice_test_staterr(rx_desc->wb.status_error0,
+> -					      stat_err_bits)))
+> +		if (unlikely(rxe))
+>  			size = 0;
+>  
+>  		/* retrieve a buffer from the ring */
+> -- 
+> 2.51.0
+> 
 
