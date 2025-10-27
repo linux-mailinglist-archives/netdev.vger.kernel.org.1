@@ -1,165 +1,103 @@
-Return-Path: <netdev+bounces-233299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF2C5C11464
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 20:53:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D48EC11516
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 21:09:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E63A14FE79C
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 19:46:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7CC6B4F185B
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 20:05:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 390031FA859;
-	Mon, 27 Oct 2025 19:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F1B31D75E;
+	Mon, 27 Oct 2025 20:05:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cHxajL7a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EXEvNlGu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F70A2D7DC7
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 19:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC7B1CDFAC;
+	Mon, 27 Oct 2025 20:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761594395; cv=none; b=Q2xmdmnEyKzRPEiFrcbxr/o70u3/GJ+pq2z29kyymZd3beim1ishZe70H73GPU4svjQC2IELI4UTN1UCzZMNOXHfVkdHeOuVXmLakjwGtbheQj2zpYYbnOR+3y3x6ISniyjPpUr+1EMAS0bCDJ8HG4tx02rUUTstBcWDzmSvCSw=
+	t=1761595532; cv=none; b=YHvIfTOdTJjPnNZPfM07yEuDBaGA5P7z9F/UtHuwcwBfB4icATJNUwaYc0UkX8DJs3ZQGiDO85ngEqAouvFj43UpwJs8b00ThVWrz/0U2wBjIEg+kziBYox1kFk+K3GpUHQoWFR7Eh/+I7d6KKdsXxiy0XBE215HVIG4KrrTkjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761594395; c=relaxed/simple;
-	bh=znaD9C1ITWlqa4RUrGrN4zi74wNoaCwyD9gcXPwB/h4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aCbVfxNoPAX6yv2owolPhq4chxL8HMOH7aAYoqgFopBmGjqfCW/TB7G18mC3FS3aP0QV83jOVCQGRliMyjAEK93d0CM4R5hoI5FyKGhek+7gmNvpTo0l1baiXWg03HyK7Slsx+hspQn3NAmCVTEMSoXM9lQ3uPEpV3xtfccxo54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cHxajL7a; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-63c489f1e6cso8128755a12.1
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 12:46:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761594392; x=1762199192; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mfHwNRKmLdBsQOGHfDtNbPOh+J8Tob6C3j78UQkTd5c=;
-        b=cHxajL7aQYaMbf3bHhbnBgGDxxlSUUi3CsB4Y0WLXZzuTNXMAQXeHHNSDQyrzIXUzf
-         FV8mxEF8jKWhq5J5Fhf7rAzitR0nvuUklaPpsg5XZdsthPQ2eSlnIPZ2wQDQiQTGwXkA
-         mdfItaZKxWQ6ucmn6PTV9by14b8lj+4SvNNdnHrlu01lhbJplMVMPZFvMw0KJ+EWv4pG
-         lLlmm+nj6N9H0nZue+gfMJtwgTMgSUCouZ28DURFX29C08LC7ls0Ydh7dkEVFPXr9BME
-         OtzZu0rhcCa4k0D/owlaOt72Wufy9FXQAXWwEYhOouMWGfIct8Kl37YluRUhH6dxFNmb
-         YKvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761594392; x=1762199192;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mfHwNRKmLdBsQOGHfDtNbPOh+J8Tob6C3j78UQkTd5c=;
-        b=DPQpj6jwI5poj6Jv3jnd4KNCOENybPpb7vrbMrF0bXdT9V7lUQqB3eJrWzic1zVdym
-         eai4cxZoejABSDnECk9Cc6HfL4PIK3g/AGm21PwGI0v85ChFpJZGW+2l4vgdKFz7OgF0
-         daA4BMNwaI7nVq7V+t5guv/ywBIWWu3LweNouUIG2tYxDPODuHujMNaL0q0LCYd6S3S8
-         6fB2fkArDd6STvH22hxHMPgd5Zsw/UshI2ne7BboaaeyYhnKfqYLRluR2LbiKauPTeXu
-         iwOO4wGFHY7SMczCefkBKjC+jl0rMW6jVKDsm3CwV7rLUgNsiIldmfWVyj6iYIxqpRuL
-         KquQ==
-X-Gm-Message-State: AOJu0YwZOp2y9GNTI4byPlAuPBtj2VTIlufRv4o5TrPkTzOChSiEuxNY
-	ZaB1zWMfp6OJBr27TN595LWa0E3F5NolboZIWythLKsEX8IS9DhMzavB
-X-Gm-Gg: ASbGncvpzea0UlumMGpKTIjmxLskUxqnPUgjN/4S5RsQ5Vpllg8ug+kMytOgAO49s0F
-	4GZCjdJAtah7xgSP3niiyV1vZuJhBFKrPnGOiDxn0hnPMi8mNxbD3M2TXZaVy7X0xz/bp1Pkwfv
-	bzMWAwEogjUC5XgWpLP/VKmPtx35/KcFTNaTA7eeEsxpoZIntjqwoocgVopH8sLBi4B/UquaTzj
-	/jq3lCBIIwuQm9kTFedJOJrte2p1bhWdJx7SsiaspSsi3nk/o5AKJXElbiKk2otH5bx6KRY6BCG
-	CjLNUlSkZ4Z9PFAN1nXEvjP87s/ZRzNFIBwOISHgJ0LtgRFns1QTLwXopZ4H7N3A4XpOXeK3pVf
-	JyabFlG7SnYjPOKpDaTWqNJA9cxVp1Ou/8kCqPVymwL4rFjM3XwDaifGQfaTV6G3AEy3DT9fFQa
-	QrYduiF2y++cF6kDXa2tPBcFqCqzIwjYYSE5vVG102o3GtwL5hmKRjI8QZlZLDoIf5BA==
-X-Google-Smtp-Source: AGHT+IFaQrXgEZiPvJMRaaPNtsLgHDcXezwU0wDasdjJ3W+gyc1PWGYIPhmSCVU2aunfIh4C6JTOOA==
-X-Received: by 2002:a05:6402:50d4:b0:63c:13b9:58b0 with SMTP id 4fb4d7f45d1cf-63f4bcb05bemr575785a12.5.1761594391575;
-        Mon, 27 Oct 2025 12:46:31 -0700 (PDT)
-Received: from localhost (dslb-002-205-023-060.002.205.pools.vodafone-ip.de. [2.205.23.60])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63e7efb9fa6sm7039317a12.31.2025.10.27.12.46.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 12:46:30 -0700 (PDT)
-From: Jonas Gorski <jonas.gorski@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	=?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] net: dsa: tag_brcm: legacy: fix untagged rx on unbridged ports for bcm63xx
-Date: Mon, 27 Oct 2025 20:46:21 +0100
-Message-ID: <20251027194621.133301-1-jonas.gorski@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1761595532; c=relaxed/simple;
+	bh=1XlzM+jAXF2KkKQm0DOR3UvVjTCMQIwuND6ijwUR7xY=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=uv7crseSLPvz5hXslla3VNYLQY3GASFmyzwKgpLGH4vKRbXS/MCv3gZvRUF1U4bZK8reWKZfhQTMRzMD9QJbiOD0R+JmJtmkeX8vz5UQwbPHN+yHou2lM/AZ8SYiatncILipsLodTBI8+36TO3WDqoGFr/U0p8suAIIOlZpVmAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EXEvNlGu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BC3CC4CEF1;
+	Mon, 27 Oct 2025 20:05:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761595531;
+	bh=1XlzM+jAXF2KkKQm0DOR3UvVjTCMQIwuND6ijwUR7xY=;
+	h=Subject:From:To:Cc:Date:From;
+	b=EXEvNlGui5KgTr+ppiMJGdRJoLOwgsQlTuA1qHK4sJtKWZ1IotN3MQD7NrWqvRkz7
+	 4Lre7J+H82DLsM3RP95GQnA4uChAJ3oEqqkDFMFqs6C7XFzvIuxwVEi5lmqvrTWItU
+	 xhOZYUH4Y+6YyIM3mfA7urNlgaU2Ti8pQTxn4cuiVJ72iw2O2gJ3HZml9AdXxkaq+F
+	 sdUeV1OwYNIGHdi73T8lC7aLP2fYoSoqng3QRmG1L212L0SU0w4MT/6N83c/oU5p4W
+	 W9brh4mTXgzBbyRdxlvnZ2on8xP3H8iunN3r4JT9mDzcu+8dXDyFimPKU49s+DanMM
+	 jZr1S+JvDq9gQ==
+Subject: [PATCH net V2 0/2] veth: Fix TXQ stall race condition and add
+ recovery
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: netdev@vger.kernel.org,
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
+ Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, ihor.solodrai@linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>, makita.toshiaki@lab.ntt.co.jp,
+ toshiaki.makita1@gmail.com, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kernel-team@cloudflare.com
+Date: Mon, 27 Oct 2025 21:05:25 +0100
+Message-ID: <176159549627.5396.15971398227283515867.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-The internal switch on BCM63XX SoCs will unconditionally add 802.1Q VLAN
-tags on egress to CPU when 802.1Q mode is enabled. We do this
-unconditionally since commit ed409f3bbaa5 ("net: dsa: b53: Configure
-VLANs while not filtering").
+This patchset addresses a race condition introduced in commit dc82a33297fc
+("veth: apply qdisc backpressure on full ptr_ring to reduce TX drops"). In
+production, this has been observed to cause a permanently stalled transmit
+queue (TXQ) on ARM64 (Ampere Altra Max) systems, leading to a "lost wakeup"
+scenario where the TXQ remains in the QUEUE_STATE_DRV_XOFF state and traffic
+halts.
 
-This is fine for VLAN aware bridges, but for standalone ports and vlan
-unaware bridges this means all packets are tagged with the default VID,
-which is 0.
+The root cause, which is fixed in patch 2, is a racy use of the
+__ptr_ring_empty() API from the producer side (veth_xmit). The producer
+stops the queue and then checks the ptr_ring consumer's head, but this is
+not guaranteed to be correct, when observed from the producer side,
+when the NAPI consumer on another CPU has just finished consuming.
 
-While the kernel will treat that like untagged, this can break userspace
-applications processing raw packets, expecting untagged traffic, like
-STP daemons.
+This series fixes the bug and make the driver more resilient to recover.
+The patches are ordered to first add recovery mechanisms, then fix the
+underlying race.
 
-This also breaks several bridge tests, where the tcpdump output then
-does not match the expected output anymore.
+V2:
+ - Drop patch that changed up/down NDOs
+ - For race fix add a smb_rmb and improve commit message reasoning for race cases
 
-Since 0 isn't a valid VID, just strip out the VLAN tag if we encounter
-it, unless the priority field is set, since that would be a valid tag
-again.
+V1: https://lore.kernel.org/all/176123150256.2281302.7000617032469740443.stgit@firesoul/
 
-Fixes: 964dbf186eaa ("net: dsa: tag_brcm: add support for legacy tags")
-Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
 ---
-v1 -> v2:
- * rewrote the comment to make it less wordy (hopefully not too terse)
 
- net/dsa/tag_brcm.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Jesper Dangaard Brouer (2):
+      veth: enable dev_watchdog for detecting stalled TXQs
+      veth: more robust handing of race to avoid txq getting stuck
 
-diff --git a/net/dsa/tag_brcm.c b/net/dsa/tag_brcm.c
-index 26bb657ceac3..d9c77fa553b5 100644
---- a/net/dsa/tag_brcm.c
-+++ b/net/dsa/tag_brcm.c
-@@ -224,12 +224,14 @@ static struct sk_buff *brcm_leg_tag_rcv(struct sk_buff *skb,
- {
- 	int len = BRCM_LEG_TAG_LEN;
- 	int source_port;
-+	__be16 *proto;
- 	u8 *brcm_tag;
- 
- 	if (unlikely(!pskb_may_pull(skb, BRCM_LEG_TAG_LEN + VLAN_HLEN)))
- 		return NULL;
- 
- 	brcm_tag = dsa_etype_header_pos_rx(skb);
-+	proto = (__be16 *)(brcm_tag + BRCM_LEG_TAG_LEN);
- 
- 	source_port = brcm_tag[5] & BRCM_LEG_PORT_ID;
- 
-@@ -237,8 +239,12 @@ static struct sk_buff *brcm_leg_tag_rcv(struct sk_buff *skb,
- 	if (!skb->dev)
- 		return NULL;
- 
--	/* VLAN tag is added by BCM63xx internal switch */
--	if (netdev_uses_dsa(skb->dev))
-+	/* The internal switch in BCM63XX SoCs always tags on egress on the CPU
-+	 * port. We use VID 0 internally for untagged traffic, so strip the tag
-+	 * if the TCI field is all 0, and keep it otherwise to also retain
-+	 * e.g. 802.1p tagged packets.
-+	 */
-+	if (proto[0] == htons(ETH_P_8021Q) && proto[1] == 0)
- 		len += VLAN_HLEN;
- 
- 	/* Remove Broadcom tag and update checksum */
 
-base-commit: 84a905290cb4c3d9a71a9e3b2f2e02e031e7512f
--- 
-2.43.0
+ drivers/net/veth.c | 53 +++++++++++++++++++++++++++++-----------------
+ 1 file changed, 34 insertions(+), 19 deletions(-)
+
+--
 
 
