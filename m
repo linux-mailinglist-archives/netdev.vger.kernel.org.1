@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-233058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6519C0BAE9
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 03:17:25 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE68EC0BB04
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 03:31:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57E133A3BE1
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 02:16:55 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5ACBC349818
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 02:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 304512C21F4;
-	Mon, 27 Oct 2025 02:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23C6B2D0C8F;
+	Mon, 27 Oct 2025 02:30:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kW3tg6W/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Yu+kPtf3"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554732C21D3
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 02:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7722215C158;
+	Mon, 27 Oct 2025 02:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761531413; cv=none; b=LHHvpgYQ0GtOB740+4/eB8n66mc2yffwEUJH06a5cq+xItAYGmuplkW5fKD5gmo/i6YLxsIvAHf9IaYY1j4vaDZ8SOZtnt+2ToXzzcKZU1fWx022ly9+445usScypJbv0jFqLlJcZUVl6U8sonroVYfx2Y1HfBBIu6Yo3I9Gnmc=
+	t=1761532256; cv=none; b=DXj5kW4lsNTXs6Lzfp2i9eaIEQgVvs1Sqd/V87gLb/Vs8XyZfzAIepeG/OoGqYA8YvShmRK+3gKhM6q9NIFM/XSFQQZhYIwTqmrp3Gm36K7grepZ4apCXwZiJEGRWMXtDa2hK5llNnD2bnIFU7DGAwX4IIPQKatZoc4/xo0JgBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761531413; c=relaxed/simple;
-	bh=m8okZ+vHavx4szDuDfnXQBUHDXlnW9pc84oaCewpiiM=;
+	s=arc-20240116; t=1761532256; c=relaxed/simple;
+	bh=oqvc5v4ranmC5iE3oWnXlMsOHgF5s6guC5HLfROWycY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vfys5NYJonkChepAxthHjgGzRFrx4pOn+78AFIJ/ORNvm1BvOZVvGHVkfBGksdnGOPs3aK2GLleIdlTPz1KVJEX1XhPGCuicbmnqM4nkCOdl+dvvgUvnNwzX8d/nH1U1BGW6h6tm9M0xnjm/w7cWLq3m/12dOYgK0Wjrg/Z/6JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kW3tg6W/; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=ga3ImN03HE/ZO3ZZZzc400jx1ZkqSU8ucZ/fWrcXf3yRL3yC8WdGoJgSkyNObNCVyglIfCpqI36B+GIBJ7jywa1fq1fBXL0c60DEIZRJZiXFt2eZhlKAcJ/uHDNC9Ez7C7ZAN+Bp3R4zREI1E+kRFCJ6PpAEQF8k+AGbKeYE7Mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Yu+kPtf3; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,22 +36,27 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=bp8lv/RA8SKOpDTvF6SAQrhIwgjiI6DBXHsUFbpxpgM=; b=kW3tg6W/6rRWkLido61J+vLRuo
-	nsrMhnSZhLeeJFA5FxJRY5Y8Eqpmgv8uLQPX7VpfQRwO59U5HOvpsDM4sOAjltQGNFsJPdi0qry2+
-	F+UeqC1HUhOL26S4Rr3MCoO+oFlX1Qe5KvY4m7TJGUi+BPFLaDO4DGCm7ZxJKaCgQ1Jk=;
+	bh=xp/wA3Fp4AJdWr9N7jvPoaU+e4cgftlch+OYMg6F3A8=; b=Yu+kPtf3oqnzzpHlUHpgNe/dRY
+	lAZ2Xm/Ma4TmwiJ7dpgqoRFXzYSU+GR5GDvVlGklamiTSSbE2tlpKBG+0hzIL0SKlI8fLVJJuOzNB
+	ThEuEP/mvzlnZLbd1+qan1j/g+DI9QOjGYI7iRA3Xj27O8KtGrHxDrN+V7z4zWPjpwD0=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vDCmu-00C9Ll-QB; Mon, 27 Oct 2025 03:16:48 +0100
-Date: Mon, 27 Oct 2025 03:16:48 +0100
+	id 1vDD0P-00C9OF-7c; Mon, 27 Oct 2025 03:30:45 +0100
+Date: Mon, 27 Oct 2025 03:30:45 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Johannes Eigner <johannes.eigner@a-eberle.de>
-Cc: netdev@vger.kernel.org, Michal Kubecek <mkubecek@suse.cz>,
-	Danielle Ratson <danieller@nvidia.com>,
-	Stephan Wurm <stephan.wurm@a-eberle.de>
-Subject: Re: [PATCH ethtool v3 2/2] module info: Fix duplicated JSON keys
-Message-ID: <f0e2f7ba-e53d-499e-827c-0866dabea861@lunn.ch>
-References: <20251024-fix-module-info-json-v3-0-36862ce701ae@a-eberle.de>
- <20251024-fix-module-info-json-v3-2-36862ce701ae@a-eberle.de>
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	David Laight <david.laight.linux@gmail.com>
+Subject: Re: [PATCH net-next v2 1/2] net: dsa: yt921x: Fix MIB overflow
+ wraparound routine
+Message-ID: <cc89ca15-cfb4-4a1a-97c9-5715f793bddd@lunn.ch>
+References: <20251025171314.1939608-1-mmyangfl@gmail.com>
+ <20251025171314.1939608-2-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,69 +65,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251024-fix-module-info-json-v3-2-36862ce701ae@a-eberle.de>
+In-Reply-To: <20251025171314.1939608-2-mmyangfl@gmail.com>
 
-On Fri, Oct 24, 2025 at 12:32:52PM +0200, Johannes Eigner wrote:
-> Fix duplicated JSON keys in the module diagnostics output.
-> This changes the JSON API in an incompatible way, but leaving it as it
-> is is not an option either. The API change is limited to the following
-> keys for measured values on QSFP and CMIS modules:
-> * "module_temperature" renamed to "module_temperature_measurement"
-> * "module_voltage" renamed to "module_voltage_measurement"
-> Keys with the same names for threshold values are kept unchanged to
-> maximize backward compatibility. Keys for SFP modules are changed as
-> well, but since it was never possible to get the diagnostics in JSON
-> format for SFP modules, this does not introduce any backward
-> compatibility issues for SFP modules. Used key names for SFP modules are
-> aligned with QSFP and CMIS modules.
+On Sun, Oct 26, 2025 at 01:13:10AM +0800, David Yang wrote:
+> Reported by the following Smatch static checker warning:
 > 
-> Duplicated JSON keys result in undefined behavior which is handled
-> differently by different JSON parsers. From RFC 8259:
->    Many implementations report the last name/value pair
->    only. Other implementations report an error or fail to parse the
->    object, and some implementations report all of the name/value pairs,
->    including duplicates.
-> First behavior can be confirmed for Boost.JSON, nlohmann json,
-> javascript (running in Firefox and Chromium), jq, php, python and ruby.
-> With these parsers it was not possible to get the measured module
-> temperature and voltage, since they were silently overwritten by the
-> threshold values.
+>   drivers/net/dsa/yt921x.c:702 yt921x_read_mib()
+>   warn: was expecting a 64 bit value instead of '(~0)'
 > 
-> Shortened example output for module temperature.
-> Without patch:
->   $ ethtool -j -m sfp1
->   [ {
->   ...
->           "module_temperature": 26.5898,
->   ...
->           "module_temperature": {
->               "high_alarm_threshold": 110,
->               "low_alarm_threshold": -45,
->               "high_warning_threshold": 95,
->               "low_warning_threshold": -42
->           },
->   ...
->       } ]
-> With patch:
->   $ ethtool -j -m sfp1
->   [ {
->   ...
->           "module_temperature_measurement": 35.793,
->   ...
->           "module_temperature": {
->               "high_alarm_threshold": 110,
->               "low_alarm_threshold": -45,
->               "high_warning_threshold": 95,
->               "low_warning_threshold": -42
->           },
->   ...
->       } ]
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/netdev/aPsjYKQMzpY0nSXm@stanley.mountain/
+> Suggested-by: David Laight <david.laight.linux@gmail.com>
+> Signed-off-by: David Yang <mmyangfl@gmail.com>
+> ---
+>  drivers/net/dsa/yt921x.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
 > 
-> Fixes: 3448a2f73e77 (cmis: Add JSON output handling to --module-info in CMIS modules)
-> Fixes: 008167804e54 (module_common: Add helpers to support JSON printing for common value types)
-> Signed-off-by: Johannes Eigner <johannes.eigner@a-eberle.de>
+> diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
+> index ab762ffc4661..97a7eeb4ea15 100644
+> --- a/drivers/net/dsa/yt921x.c
+> +++ b/drivers/net/dsa/yt921x.c
+> @@ -687,21 +687,22 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
+>  		const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
+>  		u32 reg = YT921X_MIBn_DATA0(port) + desc->offset;
+>  		u64 *valp = &((u64 *)mib)[i];
+> -		u64 val = *valp;
+> +		u64 val;
+>  		u32 val0;
+> -		u32 val1;
+>  
+>  		res = yt921x_reg_read(priv, reg, &val0);
+>  		if (res)
+>  			break;
+>  
+>  		if (desc->size <= 1) {
+> -			if (val < (u32)val)
+> -				/* overflow */
+> -				val += (u64)U32_MAX + 1;
+> -			val &= ~U32_MAX;
+> -			val |= val0;
+> +			u64 old_val = *valp;
+> +
+> +			val = (old_val & ~(u64)U32_MAX) | val0;
+> +			if (val < old_val)
+> +				val += 1ull << 32;
+>  		} else {
+> +			u32 val1;
+> +
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+What David suggested, https://lore.kernel.org/all/20251024132117.43f39504@pumpkin/ was
 
-    Andrew
+		if (desc->size <= 1) {
+			u64 old_val = *valp;
+			val = upper32_bits(old_val) | val0;
+			if (val < old_val)
+				val += 1ull << 32;
+		}
+
+I believe there is a minor typo here, it should be upper_32_bits(),
+but what you implemented is not really what David suggested.
+
+	Andrew
 
