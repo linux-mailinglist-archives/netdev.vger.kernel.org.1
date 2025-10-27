@@ -1,63 +1,93 @@
-Return-Path: <netdev+bounces-233288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BA46C10570
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 19:58:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E787DC10B92
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 20:17:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 307514FA28C
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 18:57:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7780E463F25
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 19:11:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3244832B9A2;
-	Mon, 27 Oct 2025 18:54:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 946DA32D7D9;
+	Mon, 27 Oct 2025 19:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DV2r+MXV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hVSwdn4J"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0543F246BB7;
-	Mon, 27 Oct 2025 18:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A069232D7C7
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 19:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761591261; cv=none; b=X2+ZOgxSCTBMvnAo2/3USXzC9WXQV8FRCVt3YoOvwW0u2vndifxJDzIad4uqtQvfg4lJzwQw+z7AUc/irsO4BKMVVheewZblfF+Ff7vmM2QOq1UgDxwp+A9qkyCLd1l+UM/h7tTBvwvEHaO9gjRtIMEZOJzaPAQSmQuaJQnZV58=
+	t=1761592135; cv=none; b=fyvFHzhXf6N6ASZQtADt3UDBukZPQVrOGtPhyaKlPaAgA4M6ya+IimQryLr+dwdmozNPFuk+p+htyrrczGeJi1JuiwUxrSkRbgPdK83P99R/hMDTMGbKLs65lPRU/qH9LIvG5tbD+HTYZUK2Nbz0FhF7zjCJv+9e5j3mE501Rgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761591261; c=relaxed/simple;
-	bh=GFYVrpsOhV/IDMS7pxMo1goftmWnsj824iiTB3K/kLA=;
+	s=arc-20240116; t=1761592135; c=relaxed/simple;
+	bh=LwAmk/7MTnIWI2oZ7HDPyu3lp0S1pBrNDG9x+kH9r9M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YoV6FP2ZxE7pbg/qlYK3spt29Y5XgJxn+ojj4qvS/TggzSEllC7MyhY+DumR51Z9Y67ofh3AbJCuQyEJgBj4VJe4vnzdxQX3lmpAOZdFc0gy1rwRCFcxTZENm7msnxaH6ADW5nU+qlF6ARys35S4r9oOLtmiuu3yKW56q47IUno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DV2r+MXV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7675BC116B1;
-	Mon, 27 Oct 2025 18:54:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761591260;
-	bh=GFYVrpsOhV/IDMS7pxMo1goftmWnsj824iiTB3K/kLA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DV2r+MXVqDP7hNaS7Zfg/b6Aw/fUNBkTRGbrdVNn4fqcY6VZs/0ivvzBd8JNL4MBX
-	 Nu5glfecNS5S03aV/cxn23Qz3MtmQuXzL75RpQkGcyVM7r5w6aZS97ZOtKeqVFDtdu
-	 zXvq9WCB81uIFqaQvrPQNNuTvvU3VV3D7odoCgzKvg/8TZSuNVrQikF3ja0+Ag3trM
-	 3Pt2kBuekfha8mQ5IfXbERZPkSl2jdKG7UoypxDSVl1b0FVL8I6v1K9t6FzViixUW0
-	 qJC/IpM78qbW1c/MpUowiADH+2myLwbDV5Ts8hrodnCsgOW7aHPIgupCU4sd4Uh3IN
-	 kuWVKmFnKCqzA==
-Date: Mon, 27 Oct 2025 13:54:19 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	devicetree@vger.kernel.org,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2] dt-bindings: net: phy: vsc8531: Convert to
- DT schema
-Message-ID: <176159122491.1402525.10322213596595945549.robh@kernel.org>
-References: <20251025064850.393797-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EaDbjwX1QGVIF/zgHbp8J+O3iYdSuNXLDiv/nUnROW7+5F5/20gTY2HojhYD1vkkV84ekFdTiC72NxGcncEFacLvpymoRi87/7PGA7XG5rPJPThGI+gNdIf0kbdJ3TkPG6F3jyf9nFjPZooSTKsXCbgN3JPBQYjElZLwe4gTtNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hVSwdn4J; arc=none smtp.client-ip=74.125.224.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-63e3a7a67a4so5519028d50.1
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 12:08:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761592132; x=1762196932; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lBa16o2HS8qCHNhSfYkAhXZ4L9FP6XeHVGIquo4j2vI=;
+        b=hVSwdn4JOcoqaHNLFfLQxTu7eWx01Rgqd59pBAURulTcRJlYT9XZil8D64vaoIKaOU
+         gfhxXps4MOYzdEvxMaV1knXwOsJHCSSn408048iYjmlqbWP/0AcrxiPSiyjj1Ssa8OPP
+         p7Lio09UtU4OeVO4jyJOTDKLcTpqHqFVjBhsUNQ0nesJO4M46fw4zBeXMfl5M8TyZhOg
+         E0/Zy38JkAphtr6W7H6oRnKX5ujQ/DAJqP9JlL8+Fmhd5ptzzNnOOqmaIhKJqyuKwyWy
+         9X146AywMJ0HzBTfXY5bZettFAhXL5zRIs/afSJUQRFwHucVtfLCnF7+aGlI4DkFiRGW
+         XE3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761592132; x=1762196932;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lBa16o2HS8qCHNhSfYkAhXZ4L9FP6XeHVGIquo4j2vI=;
+        b=UZO3G+bXD1HdHvNKqEwei29SSJHsKqtBjCTPh+cfshv2ByNlIyjldKINMHUBqN522c
+         SCC5CBNrGF26XnI0k5moMh03EJGoRTZHN+aoHwUcEiCg62EKlzy/0MaAgGaQDzvG4yQx
+         V78pHJYZ8r8BweSgcJRDkEr1gb6tYpyVj7hj5r8k1VB/l+WGPZ9YMWAzvt0hSHsyZNwx
+         NkoH+iGfle0Lpl5DiGRV/CDTa3/V/JDcm7k0Q9/MJjLtgMBDGIw9r9tkZDVi+dxAuwve
+         gN2+sQuPMc1Roh8cHpAiLJ81rivlrftMmnZAfRDgMtHEOYi3WO4YVYJ9fNK0K3YRt/TY
+         5S9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWLRr4y8uXzVdh7iHI4w79NywZTS1yESm3SZxnNe3iIxw5XgtZh3YMna4MiEhOIcvcTR+UD9cU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeNHVO+oBjMMZzPbYxm/Imevfv7KnjTi9ZFpNmGs/RksOYHS0f
+	Z3hdr0S1QuCoCsk+iARMz5qP8uwF4lHyKacsy9WJJkNKuysqQtZ2XYSX
+X-Gm-Gg: ASbGncuYgSaButBucRDqlMYirV/qkbFwT4fkGcLM9EQAqWXIswOP+MXt/yZDjGCaRnl
+	beVnfaUaPZExffIALLCNFP9nO53tY2giZXQpEI8S7Bp2j4em5Kkhfmt3WGHuJdzsV5gWq80mM5Q
+	GsKi4ySYbi5UzrhsHx0zN6XnsEk46KuM9SW1CsfaAB2zPKfW1xhcj8RPsWUmdPLPsu7hR6kagy5
+	KKV/zAjOOuoL1YU3euinsIoxsWN4LG4psqJ/W4TqDgV/syYYyAugWVRWK0kAvAJ0iNwSoG9y8FK
+	jtG1OXhG9jNcemoNwMRtGHriGnUvX6nfyQv0vnDD2F0ai4gLPJHcVU7Ija5btc6X20SM5mYoqc6
+	zydiP+FyaEvVvWLZ31ZYCv5STAwYcOQ1uoJgXJTd3JuQRRzYF11LosvrJ1sWc59eMl37jHZfbRW
+	EYiLAcMTRQvBqzzlIyAJxv+eXEhf09IrFze66xjwTNsGZ8Drs=
+X-Google-Smtp-Source: AGHT+IGyyVhNMyFPJ1iH6VB3LobfrBQTkhvZ12vnfHgjuauZlHjFnodUEDbnz8J1VMMlZEjH/eQK1A==
+X-Received: by 2002:a53:cd41:0:b0:63c:f5a6:f2ef with SMTP id 956f58d0204a3-63f6bab5662mr707347d50.65.1761592130958;
+        Mon, 27 Oct 2025 12:08:50 -0700 (PDT)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:56::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-63f4c441fe2sm2525648d50.15.2025.10.27.12.08.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Oct 2025 12:08:50 -0700 (PDT)
+Date: Mon, 27 Oct 2025 12:08:48 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next 03/12] selftests/vsock: reuse logic for
+ vsock_test through wrapper functions
+Message-ID: <aP/DQLcX9uaY6kXN@devvm11784.nha0.facebook.com>
+References: <20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com>
+ <20251022-vsock-selftests-fixes-and-improvements-v1-3-edeb179d6463@meta.com>
+ <aP-kmqhvo4AFv1qm@horms.kernel.org>
+ <aP+zgF7zF9T3ovuS@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,41 +96,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251025064850.393797-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <aP+zgF7zF9T3ovuS@devvm11784.nha0.facebook.com>
 
-
-On Sat, 25 Oct 2025 07:48:50 +0100, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> 
-> Convert VSC8531 Gigabit ethernet phy binding to DT schema format. While
-> at it add compatible string for VSC8541 PHY which is very much similar
-> to the VSC8531 PHY and is already supported in the kernel. VSC8541 PHY
-> is present on the Renesas RZ/T2H EVK.
-> 
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> ---
-> Inspired from the DT warnings seen while running dtbs check [0],
-> took an opportunity to convert this binding to DT schema format.
-> As there was no entry in the maintainers file Ive added myself
-> as the maintainer for this binding.
-> [0] https://lore.kernel.org/all/176073765433.419659.2490051913988670515.robh@kernel.org/
-> 
-> Note,
-> 1] As there is no entry in maintainers file for this binding, Ive added myself
-> as the maintainer for this binding.
-> 
-> v1->v2:
-> - Updated dependencies format as per review comments.
-> - Updated vsc8531,edge-slowdown description to use formatting.
-> ---
->  .../bindings/net/mscc-phy-vsc8531.txt         |  73 ----------
->  .../bindings/net/mscc-phy-vsc8531.yaml        | 131 ++++++++++++++++++
->  .../devicetree/bindings/vendor-prefixes.yaml  |   2 +-
->  3 files changed, 132 insertions(+), 74 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt
->  create mode 100644 Documentation/devicetree/bindings/net/mscc-phy-vsc8531.yaml
+On Mon, Oct 27, 2025 at 11:01:36AM -0700, Bobby Eshleman wrote:
+> On Mon, Oct 27, 2025 at 04:58:02PM +0000, Simon Horman wrote:
+> > On Wed, Oct 22, 2025 at 06:00:07PM -0700, Bobby Eshleman wrote:
+> > > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > > 
+> > > Add wrapper functions vm_vsock_test() and host_vsock_test() to invoke
+> > > the vsock_test binary. This encapsulates several items of repeat logic,
+> > > such as waiting for the server to reach listening state and
+> > > enabling/disabling the bash option pipefail to avoid pipe-style logging
+> > > from hiding failures.
+> > > 
+> > > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > 
+> > shellcheck has some (new) things to say about this patch too.
+> > Could you take a look over them?
+> > 
+> > ...
 > 
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+It looks like the errors are SC2317 and SC2119, but are false-positives.
+Invoking a program as a variable (e.g., "${VSOCK_TEST}") is tripping
+SC2317 (command unreachable), and SC2119 is due to log_{guest,host}()
+being passed zero arguments (logging its stdin instead).
 
+I also see that SC2317 has many other false positives elsewhere in the
+file (80+), reporting even lines like `rm "${QEMU_PIDFILE}"` as
+unreachable. I wonder if we should add a patch to this series to disable
+this check at the file-level?
+
+Best,
+Bobby
 
