@@ -1,123 +1,230 @@
-Return-Path: <netdev+bounces-233285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB099C0FD33
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 19:02:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00FBBC0FDF9
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 19:15:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 21717350717
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 18:01:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC5CC19A5EFF
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 18:16:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C97C3093CB;
-	Mon, 27 Oct 2025 18:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630CA239591;
+	Mon, 27 Oct 2025 18:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O6Cx6GGS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s3fs/Xy4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE162D6E63
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 18:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1DB3223324
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 18:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761588101; cv=none; b=PuQe73JPwiFH+aZBMYw8OV6KS9n69Z7FPpZPJyfLGyCS+q/iIugXdj2/jTogMS2otdnK57U5ESxE4QYdCjDgEbjOb5d749o0vna6rUbcfJvjrMbppa0/QjqO36JrOnCxPJopQFoNxSYYvFINtXpjEkU1ALzSrRa3Ah2j3cAx22c=
+	t=1761588939; cv=none; b=b8292LGFb6N9BYmnt+M+/c/erJsCiuldCop91fj7u0ajmr9mWSImFtjqQ5GdJEhWw+ALmZljQ+fi1uTK3UdXZc9YkBujANulha56Xd/90m2mS4fSvYs7om182/iDYUBfjVPbNNty5ORFxYkLkTpcQQF2b+czSnJ5UhEubGze4tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761588101; c=relaxed/simple;
-	bh=F+dHEiFLnh8A5KzJ58bksVScGa0jeuzf/tPIICsdU6E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DuT5ydU0u8Apuy6q7x9kxIBZszgn2NgtbuVQyWdsQgKUVQ5qGM7Gk4pYhmp2BgJrbBuMiVW4TC7tPFUDE53EpzO55tAQVqWSMYuj63sKD0XREnis/Uf+4qPT+fgEskQ3V/wP6PTM6CuH3Iy8KyvxxKJkeHdcFY39hc0BHyQudXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O6Cx6GGS; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-781421f5be6so55453967b3.0
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 11:01:39 -0700 (PDT)
+	s=arc-20240116; t=1761588939; c=relaxed/simple;
+	bh=Ndav6bSyVLF8rqPtP+/b+NUrC+mkmsfI3kyI5ZSK5iM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cEMm0ZrpmN5CDYPAHB1vVeMcK0yWAD/W65hF1vVOGp5qApJvx/8yQgqYLuZVnORpTym4FOof/RBIGA0gHrMUHhmKo/69LWUSbleYKlZJ7lHJRhitofpLxtt4sjHP37vmAvKxxbe6my5BZcb7dKIL1WJ7Mz5fmrLRFeFASoQvNsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s3fs/Xy4; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-290aaff555eso46054955ad.2
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 11:15:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761588098; x=1762192898; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BiovYXP3PtaA9Kfj7XU3nz29JiqSsYJIIOo4G6t3ivA=;
-        b=O6Cx6GGSJIbiI2nx+yk+XY+6BIUZ60igmRyRnixex/8rG+NRQXEQ7mt9+dHbkKPida
-         BMChyTjviwcfxMxqNp+wP4i7iO2D7FWRgC6MaZR7/GqQ6KYGC37nvhB/MRCmY58teC8w
-         sztrkM+/oQORh7mDIDZ1gFI823xwKucQ4cdAyazgCqwWGNXR1nI9HJ5PqYY3tZ9p1yNz
-         5cZEOeQLJ8Rz2CZ+7avlKRQFpW2Wax5/oJElUYrPpxAeVuEg6YqGBi5nanESCKYoYqGw
-         b9ZITqXUzv0m+7aQ269qHr7ppIWhhRoNPZHlMjBDPwfnqyI5mQLDUBiXVcLb/hg4Nn9D
-         mDOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761588098; x=1762192898;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1761588937; x=1762193737; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BiovYXP3PtaA9Kfj7XU3nz29JiqSsYJIIOo4G6t3ivA=;
-        b=cPQLkTb2Yq16qnbpe5srSyCOWxe3b0Gcp8TxUv75LICcDf9jjoy7oH4+gZwWAhhcOc
-         Gfu1P+oy0+yyUcbNaqmz45afiPGtjOKdCzZY7EX0O36BfZT06H+NMhobVshjVMO/fLXd
-         gLAnVJgdTeSpB6C251wRijujWaBpiS0subWhVeVRLptS6cFOh6Wwx5+s0K6cBA/DXyFz
-         mQpKyMwl8YoW0xVg9whgrzTBF/0xmYp63MT4fkSjwLBrj2kOsrwIvE6eQSV4LPKkffrf
-         GlsT3hM6zOh+fKLDGKANgD5NQL+vCFeTiaXZ3sdODOodehEGha+n943gJkF1n3m2Z5S0
-         65vQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXDaqHnW6Ir1NXLkiWVtIjc5dR+eOPJoSS+O9z7OMOY+yIiwlAktOprYsLaAKxBBlpkjCHl8ns=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhBltGHKtqqX5fS5+niBRAtNBZo4Dir2pbOT6ZxouMYW378t3P
-	mdmzxezONkYsrPuCdn50WQxU/o/t+6Xv8zE15OJYPSV42kR1pvE2fc23
-X-Gm-Gg: ASbGncue00sbm9WDz8F+PEYPSjGgiEyZhx4B8vBpNtoPfgcwC8nYxi1do5mivvZBvs1
-	s2xhFNYNhUBvo/jO0Jg/gdQ+6PbD7XTatP0mvfWXi9fU12H4okqX7/LWbmlAM01yDCFbfRcqVWD
-	zVVZpOV2nXnf39bSKjCIq1pS2QOh/NSHCRRUBuTabewMsyDLiK0hht2WKY/2sx3bpWIda+cG75v
-	g1NPTSIOQudYlJYvmLtj/jS0ujSvQXckM5wfbE0sOUO6x9kujev9QqrJWBBFtfPl77sZq6r4c4F
-	c/MLJ4unqm7TzFMGP7vA1gKcns0QPIM+qocD3ar8ffCy8C0R8TsBkMk2ECRJ14uJMEHB7LklCIa
-	xkkVcl61e1dZ07HsvNbh6gXIybI1JDf/PS7swqvAZmgkc7oyP2B9ylOrJXt1rOoratsR+KmJuon
-	dZvtlzOaeSikf1DPXmIDMuauVzfBQ1uCOB8KqG
-X-Google-Smtp-Source: AGHT+IGY7m5xCBIjhFzMJJMeIr2LMm+2g2vwUGpyuiJ3FoHQ+eVB5BYIwqC2NkP1JlPdGSmbLHfPDg==
-X-Received: by 2002:a05:690c:ec9:b0:785:bfd8:c4c0 with SMTP id 00721157ae682-78617e03ba5mr7395497b3.4.1761588098317;
-        Mon, 27 Oct 2025 11:01:38 -0700 (PDT)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:70::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-785ed1c875bsm20767397b3.46.2025.10.27.11.01.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 11:01:37 -0700 (PDT)
-Date: Mon, 27 Oct 2025 11:01:36 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next 03/12] selftests/vsock: reuse logic for
- vsock_test through wrapper functions
-Message-ID: <aP+zgF7zF9T3ovuS@devvm11784.nha0.facebook.com>
-References: <20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com>
- <20251022-vsock-selftests-fixes-and-improvements-v1-3-edeb179d6463@meta.com>
- <aP-kmqhvo4AFv1qm@horms.kernel.org>
+        bh=MYH7nghhEg0YUGLySFkQDlQG2+RdT/Q4uVWeEm/p3DE=;
+        b=s3fs/Xy4ToeifPMfm4EQj1ORi6ScrFBn5u//8fu7jiLF272RM/AP7rNssR7k+i6u1U
+         /hBmnzHguv6slQmLDZNlJq3j1QY39X+wAV96sK5muq2NugkzcebTCRqupNtrfjsuBURA
+         2eYh+FIc1YPBzmVRkiHx5nTbroevVfGwhH+Z17f93zKFFncU6rEK4KtLGYcdLa9r0ux3
+         EKIl/RC7Ch2P2A8oLzqzhjQw8qpng5I0v+VrNJy6RH2ZdwUdl+WM5declfm7667PxsFw
+         6tUMEgswBGHNu4a6BanHK8F0hTFnm5EkVCdcp6//ZRV3NUSCzIwCOwvJ+2tZbYDnQIyi
+         YYJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761588937; x=1762193737;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MYH7nghhEg0YUGLySFkQDlQG2+RdT/Q4uVWeEm/p3DE=;
+        b=ZTrGl4buAhhUFkkFb0Hj3zxL6HLJH8nHBrsdglkhuQeSsxL6id7hNciZJgdJ/q02mW
+         O3urMl6aspTgpWwW3QOdKGHPTLs+EY9UQOxquCWGnuFIr4VEFSxzZZOXotktj/1NYNoa
+         s5BcaiE4dWOwPcNN1deAZ2DO6G2Nu2f2yOg84rvYM39ap2UbvvX5uboKn2ZqY2K1Efdk
+         bzLg8PzY1N9J1W87WmheFQI+lHLc/5J0c6jW7OBJPm6oPSLQufTh2KWST6/t9fWR4Pko
+         xtqy4NLhhIxFSSfrZDOeHylX+qNyickOpZopW18Wddx9FxFPZpX4Rr3nU2rp+Sp5sta7
+         5rDA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWxzW+pwHYyRs/GzHyvuuV8SN4odn1j1qd9916UEhW542m5/wWy/L2K2UUxEi7zWk5QSkIIZQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJpFyS9kd8Viwg2PJBDgCmgSLYzn1LGEv5C/B41e1qRMG5VSNA
+	zsYzojk6r1mOqFgazpPRtYDzT1LMsyvc3rrIAOAXnEP0y1K7bJJreYY7rs1xbFO14IZDX/Qrlc2
+	4YtUupD4XDDXJRS/OttWujt+o0294nXDjRLbAiMCb
+X-Gm-Gg: ASbGnctoWFQw5UZmtVjnpXgU8q0iNmHTJUFqbKoMmS1oy5ecX9R+DpZa/o/9gyvIkwZ
+	YA45ugIgTt/0WD0E39YgamFC5FvU2J+an5ul4O4Nv35L8xvt35xl0r4D58Ughv1K6USTSnwx/Hy
+	5zVsiIV0qM0Y/OsbpmwwdOuElZ+Ai2T6Dq9a6mcxxzFNTBNtrsvEaXIDljHMmHEjYdXVIm2Yz6V
+	IFIjNQYsHce/NGwxyYugA5hkofo7DInZKXakKN3GP2OD3pax0j+b9wFvpg18iWjtbbCDmqzfcIW
+	TjWB7TNJgmybqlQ=
+X-Google-Smtp-Source: AGHT+IH0/yPR9pI5EUDlinIHhD4QEnlY4GqIjrMC8XS2wpNTSZd6gJP06Ts90zAf8xELmICWxAA/xOpY3opR0ncGc3o=
+X-Received: by 2002:a17:902:f542:b0:27e:f018:d2fb with SMTP id
+ d9443c01a7336-294cb395888mr10157835ad.6.1761588936668; Mon, 27 Oct 2025
+ 11:15:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aP-kmqhvo4AFv1qm@horms.kernel.org>
+References: <CAAVpQUC7qk_1Dj+fuC-wfesHkUMQhNoVdUY9GXo=vYzmJJ1WdA@mail.gmail.com>
+ <20251027141542.3746029-1-wokezhong@tencent.com> <20251027141542.3746029-3-wokezhong@tencent.com>
+ <CADVnQynj=5GQbwhiFXFe2gWzodH802ijvFk55xgzxLa6ipRoow@mail.gmail.com>
+In-Reply-To: <CADVnQynj=5GQbwhiFXFe2gWzodH802ijvFk55xgzxLa6ipRoow@mail.gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 27 Oct 2025 11:15:25 -0700
+X-Gm-Features: AWmQ_bljej8UTn1AIJNmxrwPawpAV-lYyoto6yOvLfPMEjhrVyxBQdS8dFAPwU4
+Message-ID: <CAAVpQUBAKZvSpcrOiGXPXwzEZL5soXBMGZca6qcsAahyWLXRKQ@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] net/tcp: add packetdrill test for FIN-WAIT-1
+ zero-window fix
+To: Neal Cardwell <ncardwell@google.com>
+Cc: HaiYang Zhong <wokezhong@gmail.com>, davem@davemloft.net, dsahern@kernel.org, 
+	edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	wokezhong@tencent.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 27, 2025 at 04:58:02PM +0000, Simon Horman wrote:
-> On Wed, Oct 22, 2025 at 06:00:07PM -0700, Bobby Eshleman wrote:
-> > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > 
-> > Add wrapper functions vm_vsock_test() and host_vsock_test() to invoke
-> > the vsock_test binary. This encapsulates several items of repeat logic,
-> > such as waiting for the server to reach listening state and
-> > enabling/disabling the bash option pipefail to avoid pipe-style logging
-> > from hiding failures.
-> > 
-> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> 
-> shellcheck has some (new) things to say about this patch too.
-> Could you take a look over them?
-> 
-> ...
+On Mon, Oct 27, 2025 at 8:08=E2=80=AFAM Neal Cardwell <ncardwell@google.com=
+> wrote:
+>
+> On Mon, Oct 27, 2025 at 10:15=E2=80=AFAM HaiYang Zhong <wokezhong@gmail.c=
+om> wrote:
+> >
+> > Move the packetdrill test to the packetdrill directory and shorten
+> > the test duration.
+> >
+> > In the previous packetdrill test script, the long duration was due to
+> > presenting the entire zero-window probe backoff process. The test has
+> > been modified to only observe the first few packets to shorten the test
+> > time while still effectively verifying the fix.
+> >
+> > - Moved test to tools/testing/selftests/net/packetdrill/
+> > - Reduced test duration from 360+ seconds to under 4 seconds
+> >
+> > Signed-off-by: HaiYang Zhong <wokezhong@tencent.com>
+> > ---
+> >  .../packetdrill/tcp_fin_wait1_zero_window.pkt | 34 +++++++++++++++++++
+> >  1 file changed, 34 insertions(+)
+> >  create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fin_wai=
+t1_zero_window.pkt
+> >
+> > diff --git a/tools/testing/selftests/net/packetdrill/tcp_fin_wait1_zero=
+_window.pkt b/tools/testing/selftests/net/packetdrill/tcp_fin_wait1_zero_wi=
+ndow.pkt
+> > new file mode 100644
+> > index 000000000000..854ede56e7dd
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/net/packetdrill/tcp_fin_wait1_zero_window=
+.pkt
+> > @@ -0,0 +1,34 @@
+> > +// Test for permanent FIN-WAIT-1 state with continuous zero-window adv=
+ertisements
+> > +// Author: HaiYang Zhong <wokezhong@tencent.com>
+> > +
+> > +
+> > +0.000 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
+> > +0.000 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
+> > +0.000 bind(3, ..., ...) =3D 0
+> > +0.000 listen(3, 1) =3D 0
+> > +
+> > +0.100 < S 0:0(0) win 65535 <mss 1460>
+> > +0.100 > S. 0:0(0) ack 1 <mss 1460>
+> > +0.100 < . 1:1(0) ack 1 win 65535
+> > +0.100 accept(3, ..., ...) =3D 4
+> > +
+> > +// Send data to fill receive window
+> > +0.200 write(4, ..., 5) =3D 5
+> > +0.200 > P. 1:6(5) ack 1
+> > +
+> > +// Advertise zero-window
+> > +0.200 < . 1:1(0) ack 6 win 0
+> > +
+> > +// Application closes connection, sends FIN (but blocked by zero windo=
+w)
+> > +0.200 close(4) =3D 0
+> > +
+> > +//Send zero-window probe packet
+> > ++0.200 > . 5:5(0) ack 1
+> > ++0.400 > . 5:5(0) ack 1
+> > ++0.800 > . 5:5(0) ack 1
+> > +
+> > ++1.000 < . 1:1(0) ack 6 win 0
+> > +
+> > +// Without fix: This probe won't match - timer was reset, probe will b=
+e sent 2.600s after the previous probe
+> > +// With fix: This probe matches - exponential backoff continues (1.600=
+s after previous probe)
+> > ++0.600~+0.700 > . 5:5(0) ack 1
+> > --
+>
+> Thanks for this test!
+>
+> Kuniyuki rightly raised a concern about the test execution time.
+>
+> But IMHO it was very nice that the original version of the test
+> verified that the connection would eventually be timed out. With this
+> shorter version of the test, AFAICT the test does not verify that the
+> connection actually times out eventually.
+>
+> Perhaps if we tune the timeout settings we can achieve both (a) fast
+> execution (say, less than 10 secs?), and (b) verify that the
+> connection does time out?
 
-No problem, will do.
++1 for the original test with shorter timeout settings.
 
-Thanks for the reviews!
+If the test still takes longer than 45s with the Neal's
+recommendation applied, we can adjust the kselftest timeout like :
 
-Best,
-Bobby
+diff --git a/tools/testing/selftests/net/packetdrill/Makefile
+b/tools/testing/selftests/net/packetdrill/Makefile
+index ff54641493e9..33e3311e3ef5 100644
+--- a/tools/testing/selftests/net/packetdrill/Makefile
++++ b/tools/testing/selftests/net/packetdrill/Makefile
+@@ -1,5 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+
++export kselftest_override_timeout=3D360
++
+ TEST_INCLUDES :=3D \
+  defaults.sh \
+  ksft_runner.sh \
+
+
+Also, please post the next version as a separate thread so that
+patchwork will not be confused.
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#resen=
+ding-after-review
+---8<---
+The new version of patches should be posted as a separate thread,
+not as a reply to the previous posting. Change log should include a
+link to the previous posting
+---8<---
+
+Thanks!
+
+>
+> Perhaps you can try:
+>
+> + setting net.ipv4.tcp_orphan_retries to something small, like 3 or 4
+> (instead of the default of 0, which dynamically sets the retry count
+> to 8 in tcp_orphan_retries())
+>
+> + setting net.ipv4.tcp_rto_max_ms to something small, like 5000
+> (instead of the default of 120000, aka 120 secs)
+>
+> Another thought: the original test injected a lot of extra rwin=3D0 ACKs
+> that AFAICT a real remote peer would not have sent. IMHO it's better
+> to keep the test simpler and more realistic by not having the test
+> inject those extra rwin=3D0 ACKs.
 
