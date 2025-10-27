@@ -1,172 +1,124 @@
-Return-Path: <netdev+bounces-233092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD8C9C0C256
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 08:34:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3DEAC0C286
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 08:39:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12FA33B920D
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 07:34:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E34413A6164
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 07:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9F162E06EF;
-	Mon, 27 Oct 2025 07:34:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184132DCF52;
+	Mon, 27 Oct 2025 07:38:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ghA9J1FL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UlByw9bQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC622DFF1D
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 07:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9972DF3E7
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 07:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761550464; cv=none; b=CE1NUymx3LVAcT1WPzUx6GivrXlJEl684BUUPkt/e6NrreATGY0Syl786KKYx4K8pVY+Z/LVYPWIiRyPSnF7ETJqqnRQpsFTZfCMh+JLXLq3pcyt31eNJgqdy4USp7jYqgS10wUw8eY85J+BfVJTV05M/lvsLJj5UhfvQHxDinQ=
+	t=1761550694; cv=none; b=i469cxy67LaSe62O6mLZk7HbLDcGHiPUxNMgNN9D0HRxjPAahNP9zpMhD5SgMqMgSL5KWCAj3e4qcnHJ6gLFNQrAhQUQXw4Yi3zcfU03+A+fyX5SUHfigM++YY8yxxb/0SiifWtozxdo4iZiyJmMxeAQXsqhnycBUJDy0Tc18m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761550464; c=relaxed/simple;
-	bh=VLS73N+k0m8pm2jfMn0bQ+AxVZEGfiR67VwsmEn/FAk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o7jKpCAjpu6qkef3NEX+PEOizMaOUTMlyQZsLxuPv88UOYIgV2OV021HbxRcGfct3hJ6tKm5gEwEOX1rMiFGwZ4nJtftODOLfQnQq5jNC8jH5n4uRTQUTzcpHg9GCYTsShF9BbTJRwWaRJE6BLX8nNHFQLxgD+o2o6sTH6Ag27U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ghA9J1FL; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-945a5a42f1eso45555739f.0
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 00:34:21 -0700 (PDT)
+	s=arc-20240116; t=1761550694; c=relaxed/simple;
+	bh=RfaRHOxyFPFQn4VUY1f1XT9UjO/SBtxZvgOQdr8gOFU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=btnkQ7Mm5cJVsvsZ0mYEOLDraVKSZBi7HcslSZnN3tPmSR2hRWUGeSxsJt9z1QRru0TDdxuysrlbBauQZeJvpr/UACpB5RAQ/qQTntFIQcFyqIztCMzyx3xdWmqlOvwg5G9YK8eisifH+uEsMgCxDzAS5eCfBVZ45RtYkSB0ni4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UlByw9bQ; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-86df46fa013so1184040485a.2
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 00:38:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761550460; x=1762155260; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nLRKSCpsYmwhIoBpLKvnpHRYxz12yXBw9ZjyLu+9T0M=;
-        b=ghA9J1FLNNV2Q+/50p63l9mAdqufw01gfa6NrKcnhX65vJ6vOZWFGmbozP5wRgZ+gD
-         JUydxddDjlg3SbvjZAw63IVdsfJ5T/tNapREXvJu60WRK9Xg5UixiTWa8Ui5uxr/1nkj
-         AmmY5gF1JeSSz4UfiXtUeAI6P4CIgsYk87O4Osxu6V+qBlaGGiqq5MTb9IwYnRoP90ll
-         6YCce6+/k1+hbtTPEIRFjPWKV8+OcrVBb/8vCgSNWI8PnA+DUcWRo7lJ46JDIw0DBGXi
-         pAdtnIYbV0reH1R9hklIZy7K8jRTI1GTwbDSjstUqO0lolhg9HesAG3g0+fXo4Sd5m5Z
-         /zWg==
+        d=google.com; s=20230601; t=1761550691; x=1762155491; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MOGHALr6gWCVB1/LcCazMLczhahHXUuAmU6aaiOis1U=;
+        b=UlByw9bQnMjvQDautG9ajfk6u7HvPZtAsfhPyGjka4WPwVxmxshUKltLn9dFK91lV2
+         f6ic5IfVvikcc3+s2lk4wpdXsRokJGkk9LZVEa5BtSpoMYbtP1Z5IGLnP3t+Ln6HEf8+
+         amlrs2EO+R2Jj+TkYdkHe549yHGvr3QPEetneioy+bq09UV3/qIDQN0Ju+AEJWmFhIgY
+         ZewkoaUfN3AbVU+yOQsH11EHogjmDuwld44UmLbZ547T1lD/FsAn0ceYvxbL+Hq50PxZ
+         +R6gdYEKBIO6y80gMit+1c5X82zZQpyXv5+GiMUd0E+MW5hZZBQn62Potdurr6mAtX6Z
+         iWIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761550460; x=1762155260;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nLRKSCpsYmwhIoBpLKvnpHRYxz12yXBw9ZjyLu+9T0M=;
-        b=mjs8Gx9Vw+1gH28jTMFJUH/Y8bOGO88PBGpIYni4NYZlh5j0yUWe9aBDY39rLJbiPt
-         W2d94vcFImeWzIKEVLe/+ZO9Xbw+QPFYy7geHqqqexbcWdFCSQNykGteHaXQ5Xl0Cn2U
-         G0OqgBfMfxh0q7VFf/7TVjaww0tTzdqrsmE2lnlfAg2qWgj0rM2/BjeCXQfnB05UYabH
-         FuiH8AwwGC93ckrBpJEG/EIUwn/DkOmrI1kaOleO5k2/8iqmXjNudTwfyNqiOmprwk3u
-         U9EDtlfXtJWEkfd3Vw9QXRqjjSvjfHgYMsTQUmSn71SLMiB4bANNmWAicWDDzK4k9c1A
-         QiVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUmc+co2WQJ2zcyh6/ve1PGV/jpfHYtHHKrwvF6LvAvcSh4FhqrtUJdaMt9K9qXBlpVrMRYyr0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfwO5DLA6zUqrQCEonavwQZT/fL79XIO54Afgz1ikOMejiGoG3
-	HzriAy7hCoDQe5pg6ZQuIRjfnRdi5t/42/dswJQng61eC5CwaRWvUZCGXvmEAry3ijO875vrYm0
-	vgbBDrGt5+GcJkji4himGHGpg9U/g3HE=
-X-Gm-Gg: ASbGncs28h5Syvq63OzjL9EpByL6Fwk/kGJ4Ibk8EYYAesk2hDJfXApUZPfw8QaclRB
-	UQRDPxTlDBJaKbGyu2i1pQWbxwNdSpCRCow5ZTjIXwmIIgoHurobYYRhgpL8IEUInPoVICdbBit
-	1m2yPS+BbXSxek7K7dqD/N3shf4fdTdgkADaSdOi6QlxqkBlylmTDxQIFJzbvLvBwS+2JB0065E
-	Qh0lUI5Hq8zKyISIQHRuJ6wUxzOPixWxEfH+AURBNdFHcD9w3OlHjbqmyU=
-X-Google-Smtp-Source: AGHT+IE4yTFQB/Sz1Hvmf1eohFHURvb676RfwgjWsjq1mbVjiRUKXUxdP/I+N8rdBuajxo0qe5dILr2G07V8SzV/+rY=
-X-Received: by 2002:a05:6e02:1c0c:b0:430:b787:1c7a with SMTP id
- e9e14a558f8ab-430c52b43b0mr510390015ab.17.1761550460332; Mon, 27 Oct 2025
- 00:34:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761550691; x=1762155491;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MOGHALr6gWCVB1/LcCazMLczhahHXUuAmU6aaiOis1U=;
+        b=lKfKhdYz9M5rxeoNIKC38JMuw25+hK4y+LsDcdjvvLC1FcTzHWCCwx8XeYCT68IR/9
+         nKx2Cq9PUfUmaJSjDr8i3ZgpU5JzVBmwrpRoj4oFVckJj7yoJPeg2bTjMuTzgZLsYbOC
+         hr4hki6/zRWIlf/KSYFV74khj7WcI3u8dqUqYjUcoeraWXKjWvg8RPROyZTrSL9l7YxY
+         TNBsJDUM6nWLHuZZchEGtguU5J3m9rq22N0zKurW7efppt0KvAs1M2QDTZL3SXAyJz0X
+         SuYkYGJdlZpE5I06IG5RjcJBQN61RR9twMWzduKJwNE4fwz9PPmDweL/wWBXQF/2xra2
+         1IiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVL5I11hT9psH6YhPXo9ciruMSWoLHfJs/vpgYty0fMS8UFxKXmV3UlwDwsf2mGSQg0lzqwMz8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzr9oQ0P1wlGO2uyfXQSD/tAGoQTGN5JNUVsvqGPqa8pQ/pc7YY
+	wTmwbTGsKZgAsqpGWppU5rt0EDffill5NXfJ7aodoGo8oMsCznArVO1CTg9ERa0T4rtSMlN+vFF
+	FAE6yhtXtM68J5Q==
+X-Google-Smtp-Source: AGHT+IEs3lkhE92Lhk4EVKcuAB87jkcf/9/0fp06nPGxjEOD2yuLMAu63WVhuiygcyrF+hacMnWyonEl2+qsbw==
+X-Received: from qkau1.prod.google.com ([2002:a05:620a:a1c1:b0:89f:6751:13d5])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:1991:b0:880:d691:2af7 with SMTP id af79cd13be357-89c12d077edmr1746854385a.79.1761550691289;
+ Mon, 27 Oct 2025 00:38:11 -0700 (PDT)
+Date: Mon, 27 Oct 2025 07:38:06 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251027053156.34368-1-ankitkhushwaha.linux@gmail.com>
-In-Reply-To: <20251027053156.34368-1-ankitkhushwaha.linux@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 27 Oct 2025 15:33:43 +0800
-X-Gm-Features: AWmQ_bmSUZhPR6p4SLQBN6A4GJHnkpFAQUKFPm5PcXL0KgaMnnMufzd-em_1cRE
-Message-ID: <CAL+tcoANtVUp=tFD=JgR34_TvmrKVr7zz8gZMgoTKNDnjCzLTg@mail.gmail.com>
-Subject: Re: [PATCH v2] selftest: net: fix variable sized type issue not at
- the end of a struct
-To: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Jason Xing <kernelxing@tencent.com>, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kernel-mentees@lists.linuxfoundation.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.1.821.gb6fe4d2222-goog
+Message-ID: <20251027073809.2112498-1-edumazet@google.com>
+Subject: [PATCH v2 net 0/3] tcp: fix receive autotune again
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 27, 2025 at 1:32=E2=80=AFPM Ankit Khushwaha
-<ankitkhushwaha.linux@gmail.com> wrote:
->
-> Some network selftests defined variable-sized types variable at the middl=
-e
-> of struct causing -Wgnu-variable-sized-type-not-at-end warning.
->
-> warning:
-> timestamping.c:285:18: warning: field 'cm' with variable sized type
-> 'struct cmsghdr' not at the end of a struct or class is a GNU
-> extension [-Wgnu-variable-sized-type-not-at-end]
->   285 |                 struct cmsghdr cm;
->       |                                ^
->
-> ipsec.c:835:5: warning: field 'u' with variable sized type 'union
-> (unnamed union at ipsec.c:831:3)' not at the end of a struct or class
-> is a GNU extension [-Wgnu-variable-sized-type-not-at-end]
->   835 |                 } u;
->       |                   ^
->
-> This patch move these field at the end of struct to fix these warnings.
->
-> Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-> ---
-> Changelog:
-> v2: https://lore.kernel.org/linux-kselftest/20251027050856.30270-1-ankitk=
-hushwaha.linux@gmail.com/
-> - fixed typos in the commit msg.
->
-> ---
->  tools/testing/selftests/net/ipsec.c        | 2 +-
->  tools/testing/selftests/net/timestamping.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tools/testing/selftests/net/ipsec.c b/tools/testing/selftest=
-s/net/ipsec.c
-> index 0ccf484b1d9d..36083c8f884f 100644
-> --- a/tools/testing/selftests/net/ipsec.c
-> +++ b/tools/testing/selftests/net/ipsec.c
-> @@ -828,12 +828,12 @@ static int xfrm_state_pack_algo(struct nlmsghdr *nh=
-, size_t req_sz,
->                 struct xfrm_desc *desc)
->  {
->         struct {
-> +               char buf[XFRM_ALGO_KEY_BUF_SIZE];
->                 union {
->                         struct xfrm_algo        alg;
->                         struct xfrm_algo_aead   aead;
->                         struct xfrm_algo_auth   auth;
->                 } u;
-> -               char buf[XFRM_ALGO_KEY_BUF_SIZE];
->         } alg =3D {};
->         size_t alen, elen, clen, aelen;
->         unsigned short type;
-> diff --git a/tools/testing/selftests/net/timestamping.c b/tools/testing/s=
-elftests/net/timestamping.c
-> index 044bc0e9ed81..ad2be2143698 100644
-> --- a/tools/testing/selftests/net/timestamping.c
-> +++ b/tools/testing/selftests/net/timestamping.c
-> @@ -282,8 +282,8 @@ static void recvpacket(int sock, int recvmsg_flags,
->         struct iovec entry;
->         struct sockaddr_in from_addr;
->         struct {
-> -               struct cmsghdr cm;
->                 char control[512];
-> +               struct cmsghdr cm;
->         } control;
->         int res;
+Neal Cardwell found that recent kernels were having RWIN limited
+issues, even when net.ipv4.tcp_rmem[2] was set to a very big value like 512MB
 
-For the timestamping part:
+He suspected that tcp_stream default buffer size (64KB) was triggering
+heuristic added in ea33537d8292 ("tcp: add receive queue awareness
+in tcp_rcv_space_adjust()").
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+After more testing, it turns out the bug was added earlier
+with commit 65c5287892e9 ("tcp: fix sk_rcvbuf overshoot").
 
-Thanks,
-Jason
+I forgot once again that DRS has one RTT latency.
+
+MPTCP also got the same issue.
+
+This series :
+
+- adds rcv_ssthresh, window_clamp and rcv_wnd to trace_tcp_rcvbuf_grow().
+- Refactors code in a patch with no functional changes.
+- Fixes the issue in the final patch.
+
+v2: Rebased to net tree
+    Changed mptcp_rcvbuf_grow() to read/write msk->rcvq_space.space (Paolo)
+v1: https://lore.kernel.org/netdev/20251024075027.3178786-1-edumazet@google.com/T/#ma0fc25b4fec0c616bdcd7633aa348043d4d39ee8
+
+Eric Dumazet (3):
+  trace: tcp: add three metrics to trace_tcp_rcvbuf_grow()
+  tcp: add newval parameter to tcp_rcvbuf_grow()
+  tcp: fix too slow tcp_rcvbuf_grow() action
+
+ include/net/tcp.h          |  2 +-
+ include/trace/events/tcp.h |  9 +++++++++
+ net/ipv4/tcp_input.c       | 21 ++++++++++++++-------
+ net/mptcp/protocol.c       | 23 +++++++++++++++--------
+ 4 files changed, 39 insertions(+), 16 deletions(-)
+
+-- 
+2.51.1.821.gb6fe4d2222-goog
+
 
