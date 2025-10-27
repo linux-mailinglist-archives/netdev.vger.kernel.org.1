@@ -1,91 +1,105 @@
-Return-Path: <netdev+bounces-233080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43457C0BE76
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 07:07:50 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0656CC0BEA0
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 07:11:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3F183B21F4
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 06:07:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2EA084EE5A0
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 06:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879FE2D9EDC;
-	Mon, 27 Oct 2025 06:07:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267AE2D9EF4;
+	Mon, 27 Oct 2025 06:11:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="NUu4nwSv"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Nm9kZX4b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m16.yeah.net (mail-m16.yeah.net [220.197.32.16])
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55BA42D6E58;
-	Mon, 27 Oct 2025 06:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.32.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD2627FD62;
+	Mon, 27 Oct 2025 06:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761545264; cv=none; b=ONhZBgfslClnvj2xBT2+4YNDTb8930q7EC16XtPNzp0gJs5GYbUvjpyYi6mDz4FA4j29TsV56MA263QMSekR5I8lVNfUoTdmlQKEeNmY3ZXkfDvpi8c1kcKOf0SxhIZoLMz2NS00KWXOxRcwAC57OBx7Wfq48KqK66PK5WN4am8=
+	t=1761545491; cv=none; b=UxQK84/omkfyLqCYB/MlgDMwFeXmbY0khfiWTIo/TDwr6txMYyiEhM5LyeGPE3eMsZLCKczpXdHN970w61e4kfLMqo9tNW3dWkrhOIJAvo59KgX5q3x0WupK9Wi4TCuoDsLjBZRvjcy1TNGkcyVwePxr70ex7dOHZpeeLFvOd2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761545264; c=relaxed/simple;
-	bh=avkOs55f7P9lPmiFz2OLaiSF7OlFmzbNHKp1T2Jv8LA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e9WbHG3oI7IcpbhXIncOLWjFxZpjUWiV7a3OYSHRp/Y/GsoE+k7XQL4uJFUYb6TUE8n5sZTgdAyfrZ4WNnH9E0ap+2pqM1u7TfyeAx/j5WG8JUGYddP0yjmR/Bs1kyDLXxahb4ZhFlsE+uP0hBZuY5bA+DiSMyLi72rZ3WmpW6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=NUu4nwSv; arc=none smtp.client-ip=220.197.32.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
-	s=s110527; h=Date:From:To:Subject:Message-ID:MIME-Version:
-	Content-Type; bh=SSnBpXFr6UaDyoCUOpqPlNQbbbgbwumFKZey7Ajea30=;
-	b=NUu4nwSvx0K7ohAoRZemwdB0PwhVz2iSweBvNEbGOCpbKNqgmn+DKtm19AQwAQ
-	do3KElpdwMi6IITro1AMmKKQG7d1B85lmvJ0/u005vFc1gtzJHDtWWcU+NEbcm6f
-	EEnQ+eK5nzeZgk0DpYKmfFewg+U+AfQY9A0negkNE3vHY=
-Received: from dragon (unknown [])
-	by gzsmtp1 (Coremail) with UTF8SMTPSA id Mc8vCgCnr3jcC_9o9QE_AA--.49326S3;
-	Mon, 27 Oct 2025 14:06:23 +0800 (CST)
-Date: Mon, 27 Oct 2025 14:06:20 +0800
-From: Shawn Guo <shawnguo2@yeah.net>
-To: Jonas Rebmann <jre@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Shengjiu Wang <shengjiu.wang@nxp.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-sound@vger.kernel.org, imx@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Peng Fan <peng.fan@oss.nxp.com>, David Jander <david@protonic.nl>,
-	Lucas Stach <l.stach@pengutronix.de>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: Re: [PATCH v4 0/2] Mainline Protonic PRT8ML board
-Message-ID: <aP8L3JkMGzHsVPId@dragon>
-References: <20251014-imx8mp-prt8ml-v4-0-88fed69b1af2@pengutronix.de>
+	s=arc-20240116; t=1761545491; c=relaxed/simple;
+	bh=cntqfXxT1Qhp0sdDSsUHNzX5CNHB9d1v+Yy+uTCRo0A=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=fA5+3ceQNZIje0YS7jzyewWRiw94T/MapxoF5Ysr7SCuMcCz2Jxd7MsmlRokyPTQFj027moG8BKPJ96lfpHPXSsoXB1l2sGvkALRj6CDgnzt11XTMcAPL8afsEKyv5lrb+6Bi2wPNMaOlXEj7HhnyJ0So+Z6hJ4/6nbb0ribGLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Nm9kZX4b; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=TMUs/ucMAf7vLbvKotDBlLyJQtlAH147syuwMq7y3ZQ=;
+	b=Nm9kZX4boUFlHbQFVz+q4+50Fcei0K87KrG98tqWw1PKB7+dAQLahRQuEZJ1LMGnviHbYzPIe
+	0PipPWdmFborBSf0f8VgogXuK/xV+fWkAQnM/6zstUnr4IQvNiZhnaYoRMk/hLU/SHqVUAKoLgg
+	rSzEe4HwBA4LSr0MEZTqCKA=
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4cw35z0GPBz12LDD;
+	Mon, 27 Oct 2025 14:10:47 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 712DF18007F;
+	Mon, 27 Oct 2025 14:11:25 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 27 Oct 2025 14:11:24 +0800
+Message-ID: <80fb8bee-20bf-4eea-9719-045e85f8f181@huawei.com>
+Date: Mon, 27 Oct 2025 14:11:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251014-imx8mp-prt8ml-v4-0-88fed69b1af2@pengutronix.de>
-X-CM-TRANSID:Mc8vCgCnr3jcC_9o9QE_AA--.49326S3
-X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxU8hL0UUUUU
-X-CM-SenderInfo: pvkd40hjxrjqh1hdxhhqhw/1tbiNh8UeWj-C98t-AAA3W
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net: phy: motorcomm: Add support for PHY LEDs on YT8531
+To: Tianling Shen <cnsztl@gmail.com>, Frank Sae <Frank.Sae@motor-comm.com>,
+	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell
+ King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+References: <20251026133652.1288732-1-cnsztl@gmail.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20251026133652.1288732-1-cnsztl@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-On Tue, Oct 14, 2025 at 03:09:30PM +0200, Jonas Rebmann wrote:
-> Jonas Rebmann (2):
->       dt-bindings: arm: fsl: Add Protonic PRT8ML
->       arm64: dts: add Protonic PRT8ML board
 
-Applied both, thanks!
+on 2025/10/26 21:36, Tianling Shen wrote:
+> The LED registers on YT8531 are exactly same as YT8521, so simply
+> reuse yt8521_led_hw_* functions.
+>
+> Tested on OrangePi R1 Plus LTS and Zero3.
+>
+> Signed-off-by: Tianling Shen <cnsztl@gmail.com>
 
+Reviewed-by: Jijie Shao<shaojijie@huawei.com>
+
+> ---
+>   drivers/net/phy/motorcomm.c | 3 +++
+>   1 file changed, 3 insertions(+)
+>
+> diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
+> index a3593e663059..89b5b19a9bd2 100644
+> --- a/drivers/net/phy/motorcomm.c
+> +++ b/drivers/net/phy/motorcomm.c
+> @@ -3048,6 +3048,9 @@ static struct phy_driver motorcomm_phy_drvs[] = {
+>   		.get_wol	= ytphy_get_wol,
+>   		.set_wol	= yt8531_set_wol,
+>   		.link_change_notify = yt8531_link_change_notify,
+> +		.led_hw_is_supported = yt8521_led_hw_is_supported,
+> +		.led_hw_control_set = yt8521_led_hw_control_set,
+> +		.led_hw_control_get = yt8521_led_hw_control_get,
+>   	},
+>   	{
+>   		PHY_ID_MATCH_EXACT(PHY_ID_YT8531S),
 
