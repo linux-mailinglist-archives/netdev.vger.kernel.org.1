@@ -1,224 +1,164 @@
-Return-Path: <netdev+bounces-233282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E35ECC0FCD6
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 18:55:10 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10FC9C0FCF7
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 18:56:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 58A1B4F93D1
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:52:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 677DB4E5984
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:55:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB423168EC;
-	Mon, 27 Oct 2025 17:52:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AAAD3191A8;
+	Mon, 27 Oct 2025 17:55:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="V2S2BfcH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NNv7Tnmo"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11020118.outbound.protection.outlook.com [52.101.193.118])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663B3306B3B;
-	Mon, 27 Oct 2025 17:52:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.118
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761587533; cv=fail; b=NffCeDQ8GwfcD44wrCQ6BGCuV8Oz0oInhWdEQnAnkaNfE7SbGPl1bj6HziQ5HnFEkhVl8grN9uCI30Agx0v0T1fF8UmAj5SVL1Ekb+iuPqmS1Uol9xmyDqlVlhzIFoYWRhEJUqSV81CTQVJP5tE78iAnSK6eaL4rHh4JU5k9rWA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761587533; c=relaxed/simple;
-	bh=HPBFKEccBIElAjV0c2BW+nsRVgTNn8fQ07TI82dKlOY=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=FO6GSq3lZ+F9vEQx88xwyHm+gyK4tR9Sp0apj93ksWlsFx+EXAvMKAiavETRTcN7pfazWwH2c33rQC+qu2vwgiM96zB2Cj2f7hqUjmHXSCERuA9uJuR4Q6GcXYX/x0U7D0zv0gWVU365NUQlsCTCaJTydemYnSOPvxX2wXw5+pA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=V2S2BfcH; arc=fail smtp.client-ip=52.101.193.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cPf1v5ymhhO+NpdPHQGMfARJRmeEg1wu6AiPnVIQkdqF1r1UKAXGobH5LUjDeg+HVocp6a15XlYvdu8TrZHqqfR64ia7/r5EnB/NQO1uUh2tI6d+YSt92qjXS1s9K0RIO0fcAaEHjD3gFR0fYoQw7mULrOvRptCRrUeRM7dqttQqIzDy05b4PPgh61h9+zIMCzKzunxLbpxSg0/+ZS736UHWyESIBRv8yQqj/ZwsAn/nXQ8r0MluRXtnSUHch5nGt4NylKMxAPZrI6zPXOOXKlYyB2vlvRaWUGp3Jfq1+j4TSDmqjlVpK7/2YLuKME5vw8WqE8nxv6fYRfz1th3i2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YXLA4bjRnSvsGjW4hGnvhLjaoKnjySdp3qAGnGIg4E4=;
- b=ZQwlq27hkmKCHqVlvS5DuQCCRaSs5XSlaGnAeE0IX0o+zaGIcET3a4SS9z+/aE9jjPVWVedlJTw2pHrV6UVJpi2OTy3aUV0zvKWOe8lsLCX2xBnaN7vAUSNsqZmdQM8J1oXCTGxDC6/fx2Wai+3mJUt6nhe89ngJfv5kLTMI9OpnU6jKrRs5eb+OOqhYBoU7x/sg0lpVRRz9bHLDi58OUY9JQrKUp4lfcYeUdiiTOn84TS4UOa22LWiJW7vAe64FPjvQ6585av9mQvrbA533Czlt9BE3rp1SvLL1gJARPJh4ZoR5Pd/OJ6izJiYTKGkuMODI0KJ6wyvyQJUhmN7rIQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YXLA4bjRnSvsGjW4hGnvhLjaoKnjySdp3qAGnGIg4E4=;
- b=V2S2BfcHJxN3V2sVJymJ8JqOV5HqR1TPiEuMqrUFFtcFaIgf2oQfsmXp0WS+IqHNVn7b5POMvlhz0+cOjIY7ucCHCP+o4QAQpe7yGIEPlcDeOpQ4soxCSoE/iQAMnxq/+MeMR0cKKnoN4EBWKMn5jpZKh4jPNC6m1IQI608KcH0=
-Received: from SA3PR21MB3867.namprd21.prod.outlook.com (2603:10b6:806:2fc::15)
- by SA1PR21MB2019.namprd21.prod.outlook.com (2603:10b6:806:1b6::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.1; Mon, 27 Oct
- 2025 17:52:07 +0000
-Received: from SA3PR21MB3867.namprd21.prod.outlook.com
- ([fe80::70ff:4d3:2cb6:92a3]) by SA3PR21MB3867.namprd21.prod.outlook.com
- ([fe80::70ff:4d3:2cb6:92a3%4]) with mapi id 15.20.9298.001; Mon, 27 Oct 2025
- 17:52:07 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>, KY Srinivasan
-	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
-	<DECUI@microsoft.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, Long Li <longli@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>, "horms@kernel.org"
-	<horms@kernel.org>, "shradhagupta@linux.microsoft.com"
-	<shradhagupta@linux.microsoft.com>, "ssengar@linux.microsoft.com"
-	<ssengar@linux.microsoft.com>, "ernis@linux.microsoft.com"
-	<ernis@linux.microsoft.com>, Shiraz Saleem <shirazsaleem@microsoft.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, Dipayaan Roy
-	<dipayanroy@microsoft.com>
-Subject: RE: [PATCH net-next] net: mana: Implement ndo_tx_timeout and
- serialize queue resets per port.
-Thread-Topic: [PATCH net-next] net: mana: Implement ndo_tx_timeout and
- serialize queue resets per port.
-Thread-Index: AQHcRzdAFI1Tk26EHEia77G9UEyz0rTWRb6g
-Date: Mon, 27 Oct 2025 17:52:07 +0000
-Message-ID:
- <SA3PR21MB3867E1DE0A3783D14621B220CAFCA@SA3PR21MB3867.namprd21.prod.outlook.com>
-References:
- <20251027114549.GA12252@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-In-Reply-To:
- <20251027114549.GA12252@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=583527dd-1db6-49d4-8192-634b899d19a7;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-10-27T17:49:48Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA3PR21MB3867:EE_|SA1PR21MB2019:EE_
-x-ms-office365-filtering-correlation-id: 601d2162-7b28-41fa-81af-08de15818bf7
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700021|921020|7053199007;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?F+bwTPjTLhEq4ztt3ib+/xNXsP1Lh6Wc3HW1O4xtpFkvBXmwdMCFyPvFKFvm?=
- =?us-ascii?Q?hWjDFN8XtQPg0hlcPTxwrLvUh3bVBMu18LFbBADfHVvslS/dGryN8He7KM3P?=
- =?us-ascii?Q?ymAce1QttzAWXoJ3l/Spr4NKsPTOP8Y9pYeI7R0lvgB/gwBhiAPCwybWaoQ5?=
- =?us-ascii?Q?EZjBtqTSzbiiXSwLEgEV8Uqi5xzzf1vBYzR9vqhfLO6JIVZuNmirPRrBMO+F?=
- =?us-ascii?Q?8PDWRk7wIj4PHQAV7t6K6NgvivKMiNRjK9tg+a8NQUC36K1MJPauHFd/c17d?=
- =?us-ascii?Q?AXlJXC6adwoal9w5KWI9oVtRl9yvEkIgFcnHghdlT23Z+GXClrmQ5+QfLX4G?=
- =?us-ascii?Q?oL0qJezmHOPL2uCauOmsrya9lWQHwC59a2MiWs2iWS3LcpYThrVTSRUcf+2y?=
- =?us-ascii?Q?Y7oWwhdcnNCgpaKSs+b/73pAw91GSnCT7GH2GYxkOunaH5h/AEYfqzxGPTHH?=
- =?us-ascii?Q?fmEZNc62JAzu4qSV4gkDdUVwj4xv+xGAZGrZlw2jvfwkbfrutmCm8iV4Qvir?=
- =?us-ascii?Q?PLJdgDXXgLOWxGQsypMiNkahuQ0OhnAJxjdOCANrOwwIdafW6lvQXWSRS2T9?=
- =?us-ascii?Q?axAYEErzhDyBHKxjpHDqw2iYJ4MBVQtGKIJ+onb8/IT337VRQ4iE6EMrJNMG?=
- =?us-ascii?Q?lRndNRQmdEFTQ9iQlN08K0Rrp+FfcRfTEGBDz751B0hsSz2ZY2Ksl7ocPUjh?=
- =?us-ascii?Q?pb3vbGIZB4j3pPGb+2cgLRbA4ZfY0Ri0ZJ28SDOG9ioUoqjFddlp7fIkVsl+?=
- =?us-ascii?Q?UzsOD5okzQiK2wRAY02U2suEQ6JG6/9hy+HdI21QnlrizEAtyBPwjbFIicPZ?=
- =?us-ascii?Q?UKeWsGZ5bq3/2DmD8/qA3FIMgeP9LNFki+ECnXPiDtlWlMHiP3b7xw/NuOyM?=
- =?us-ascii?Q?0IPyaQH7VrYy8U1JiAS8E1CwZm5lYjIY6z/B+ISRsVvmOLoF3wPqOAmMUIbx?=
- =?us-ascii?Q?XczIcFZg+nHo5Q7CyL+rEVOUzjNJ92ahOciALYrUFZetPc3twP3ASY19WHq8?=
- =?us-ascii?Q?2a4k22HQwQ1CzbPKG0WKykf8V9/8NgMWMvj27IvHUmG/3vPJOasAXCEAKLsp?=
- =?us-ascii?Q?mp3rx2CNAg+Vw1HCX2fk3fOEu7b9KHCBiK3gu9jynhIlPp1FhQMoPJSW3C4B?=
- =?us-ascii?Q?qfrU2TQbEY1J/d0LrY3OMjzruxhRrlZS7FLykDVJ6iILHIY9vi1KdO2oQwJF?=
- =?us-ascii?Q?1cCxE+40E6E9IveE0CW++HOpf578T4fYoKLjMHjer+zonQdFgf0QggqESP2u?=
- =?us-ascii?Q?N2d2c5WaBm8l1z6A61dxKGA/0Z6HPkFaLG2e4NKzs7cuWeg4RtEmHi44ybkI?=
- =?us-ascii?Q?d5fXNIa36Xw3cBRTLBv4Dz0C9sP+WNPUNDKuK/QePEQlQYbBcn/V2ynZKal0?=
- =?us-ascii?Q?T4E/fGjsXyrl8utn/eKsYVezyBQvAYt2F7oWyEDTd9TLyXpKzPh8b1GS0fxr?=
- =?us-ascii?Q?pA5o9xPNtqVtvHP5v2L1c4NOzw09nyjauEDGKjRTXG2evsqZl6pp9KQQVAYm?=
- =?us-ascii?Q?ZmxP5phDSijm7LT1cNB20gIi+GPjdgNzARK1XR0xQmWieBiTv3V/LuktYg?=
- =?us-ascii?Q?=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR21MB3867.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700021)(921020)(7053199007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?NxiP6O2EdeQh0Ye6ErY1az5bBNbiJW54CrvU7WULw+8HiWA3fY57E9lxh0Tq?=
- =?us-ascii?Q?Y7d3t3KxEthk5MGRnnmv/vECrERiAOVgzbXcL4YVa0dwxd/ztqCSgV7gR00m?=
- =?us-ascii?Q?7gFGHxqFkWGOrkc5rhXhXVdHQo1/m9nDv6kwUkMX0zsuC1T0bIiHj2AofA+f?=
- =?us-ascii?Q?WNDgdPFxQupQaS+LocyVpA0YnrwDOHB8P+3GPvSW+iZ5UOnhl+zae5AeRTi+?=
- =?us-ascii?Q?ym+KDdq70U6OHIVjmG79PoMGeZ/qH6yyCeOQL/I247mhktUvmPeNegR8sBnX?=
- =?us-ascii?Q?TRYceHE7z2ngjdmC5kexBDFhr2vEPukIpqqMxLnpAboUpxT+1TgqcTEGHTPj?=
- =?us-ascii?Q?KiqocqsGjK4CE++vICEAghiQJKPq7mwgFbQcZTFAEO3syrgK7XGhqzSj0a/7?=
- =?us-ascii?Q?BaQ0O+EkhHD8ND6B+vPUCkKtu4XKPs699ge5LYDsmJV7tbJTAKjRxzPCsxA5?=
- =?us-ascii?Q?/ehDgKRGFp3UkgkB3LLDr8AETTxErPO/J8CETBPEiPhx4KZCBY1WVYOPeA7Y?=
- =?us-ascii?Q?o1x3O7zkOUDxOwHBSfJIu2ht6jniOL8ql9ytnqyc6LkiCQ+/fi33jC9UtmoK?=
- =?us-ascii?Q?wWhpM4yu/kRF47u+cotuwTz6m7nFjI/HjxVh3QN034nwaLIMzN+ohEcMI+gQ?=
- =?us-ascii?Q?MwLpmTfh5NOFgxy7tTrH/vxSGtLJWdTBeeID0ShpLqADw1b0+e7gLhRfIVpz?=
- =?us-ascii?Q?ZHPaXrupsfLZ/wxRc5xS1kl3go3k5lTG2B/kfzjqqYvfxZRep3tX2H3GetV0?=
- =?us-ascii?Q?y6yjs5NqO2SAUSNJ7nMpKOi3h1HKlWX4HNhuBytgHaI7/l3QRB9M54WBucpe?=
- =?us-ascii?Q?svW/Qge2srD/B2WiC/TbPPuLiEFQS72AMhMWmpmFfyCPaP7ao2XOdo6UzrIf?=
- =?us-ascii?Q?YVjeV2Bj+31aok7b9zHKgtCJMUIcEFwOYmCp9HSYlMOqZ9fjeOKntCqS/6nV?=
- =?us-ascii?Q?mQZBJ52lATSJKSB7Ig5eKx4MSAIsD5g9AEteb7uqVk3SPCT8Oiu/6E70TTJX?=
- =?us-ascii?Q?tgEwejDXzuPhA49w2F01UxlurRBBvpJ98W8C8KxNndLTfEuCqlkwOQtUKAaL?=
- =?us-ascii?Q?gyO1fNZAZhWcOuelXDb5XRpHyS+UUpECgBS9fGR1C5Sm4jrilYNp6yiSu7KW?=
- =?us-ascii?Q?Hdm8jYfGwaqUxBa3PdlC5wpKXyC+0JMHeBJfYdbzuv+g0lQL8URuy4Nw42Dt?=
- =?us-ascii?Q?EMGcz+U7jZe7OPtMe22iyA0kU9T8sE/Wo085nGQh5BeIj3K290iIBEJWBlZ2?=
- =?us-ascii?Q?WoIyPd3ihDOoxMehoK5hc/gwhHHGWv+lrzyjdQplCOzkk+EIFYDrkQVR4Axu?=
- =?us-ascii?Q?pozc4+QMFkItfIGIujBpb/xBwoW5NE/fMoR4xeNVzSI/F7KMy2hjR9rQkki7?=
- =?us-ascii?Q?d25U20Tfv3oQ9M/Snf3W1qWbnYD1JKApgHd5ulpG3yeAfVksoWRTF1F96Tl8?=
- =?us-ascii?Q?BtipXMK72pf9hKuMxslwqBTYX32DD8uiHki8G1MGH2GyWnNRH5Jt8AiU/0m1?=
- =?us-ascii?Q?SqFU2c3tqstXNUuiGWEzbhry20y1T+8HHczy8YkxLjcjxMjPbHlMfBZ8hSH+?=
- =?us-ascii?Q?QeGfE0cJg9WsllO7e98DRhQy5NiE/+R4QuESJ2pn?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7103161AD
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 17:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761587757; cv=none; b=BBQYrNpmi1QOxiDKQYID/pyeqBGSwOWQTKgwfVUK4WQ9fEpKJGKwoVM3SaQeycnBUsTSGC32TkQGeoS7G+jWV66+/nmYYrZw1Bh/nwliI7lyxH5ksKSE3diYVUaLr35xeD0Hwg1XgpfTjKL1qL+gM7O16QxZ4RmHkXJvOWYZkDE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761587757; c=relaxed/simple;
+	bh=s0NTkuxgo9nTW1wwUPyDTmWbVEsjdGmA1omaFkoHwoA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ku+MvvZkpDBPEy9fsqR15aQV0QIOUTRsRshY/BblcvULhFVTHhPcz0URXYUSbRVWk9VdVRAhSXuOFg/ZRkgSgPgoXYfbx12ORlgsGKhP4aXhRGKuGzk0eBgQFjbXRwjOo3fIVfgAxHuajz95nZ9f8pkERDR2HuTSEzhNpyvwNJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NNv7Tnmo; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-7849c889ac8so87116717b3.0
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 10:55:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761587754; x=1762192554; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=t90v++bIrJi1Md65JkXT8gm2ApX72FdJn0ubPYfRRrY=;
+        b=NNv7Tnmo+Azwrh0iUS0X2c0KZzVe6HOnkbfCcP3tFCY4MGEDOpb3X4nL4ifDr45dA0
+         EUcN5oQ6VdOxfOzZLS54nVnP7eXTd1Jl7oUrQiNbUlz+b/vF5XilYSc2ERfpX/LW4dNa
+         d9XEAbxlFydDrVh9Lps/H05SNJhrQxRcPXwmPu3Pgy8CAJlv18lbjo6Tfsb8O13GSxEP
+         6D4zYfFjd3xfcWtsB8QzTFIWhXKR74WsX6ZB9NNWoCHvGdf8QqJ6014YOcZ99tSrLIZu
+         rfdOBSw9WQyV+L9HTcgBnzvs33YsBCtPg2Tt6crbteGRjvBwwpTbAoObyHN/kkBOPcbT
+         /GFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761587754; x=1762192554;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t90v++bIrJi1Md65JkXT8gm2ApX72FdJn0ubPYfRRrY=;
+        b=DmwCPxNINpxSPrlV4MOP8eCSJVr92VHbUTSefpfPDF2ikn1Da8tnD5d/8FVb3YaSgr
+         2YqhM2yeXkzgfh0JVKskLNvH0inZ3A6FgXyL6dSzLvVVIMHFChQZcspZAYOpbyXUMjQ/
+         xyhhIGtkBHcNIrhk4BZMaZxOBKiCdwSiAnnGlM1B1pvxs0vlaaLTY4Dz9UkSZgLBIsWS
+         mrmuEdNN0IUboW4/93K6L5Chp3iytDFf8ZeCMeOVsZxdzjZ6LH7ocQvwTJaOEYJxeYD6
+         zCSuZIVQD9DxiU87U8/84SYs1CMGV4ISMN+smYiPwjnp64ElcUOdKMRlpzw5dA/PlNHA
+         B03Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXjukHG3TXdru/4e5I8o+Z/rKUOzMn2VFkPhDjwDvjHkFh/fJW3w3OAHIX/vSkP/X/4O6RxFQM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3L7uGQqOpQ5NE8KxRnZ4tSDZ0kczz2SfpiBNNHRf7tslOVT7/
+	ZQ5yWK/0XIQwiQxzES4WqCdHZGOnxpUTjHovdvkxbhl2DwoYkvIEO3uDZsBYvTDJ
+X-Gm-Gg: ASbGncs6OU8NeAJsmUi6WyRC3WEHniocAxvuW7KB/piO8xUec8llCVKzODOsvbP0IIB
+	vqMaFfVmxDsbFDmYmoDg6cSbwmmEho702S6ApStyqEgSoQVKwP4yEaZHUyZN6W5UI50gD8QrSTk
+	ygC/QDfveqViPXHitoX5WGngbEhtZ0wSTLVoEu2F9RYKZvwfQ1qU7s0sP0P/6yUe0lPPimVLsY3
+	SzTDd+0sbtejneUBhBwi0hURaOn9URmlwWMvz1v+OSgBmhzGl9Jt58WTArebzmm9faNJBsfhA+2
+	x9s+vaotGCc75wzFPZHMO9+4KFMMJETeSC0DRVYo/N/d6V71/tn2UIjlYBQMj3YkdCymfM3gAGr
+	dLGOzGg4B2ZHfHOWKmUnVBjDF7dudyveSi/n5zFVi94k7B2nNDtLJpoX2lyxBW49IKRhYeROepS
+	UJEH3jgAF95exPRCGPAih4WBXDAT2y1zmOV7x7x+eU0Tj7Mqk=
+X-Google-Smtp-Source: AGHT+IEnq7T6tW6sESfh2/pS/VtVB6j5wsUZrO0cK7EA3RoMmtv5EedE7kUOtkxVYgtnLyJeX69FZg==
+X-Received: by 2002:a05:690c:3510:b0:781:64f:2b74 with SMTP id 00721157ae682-786191bda08mr3102477b3.29.1761587754496;
+        Mon, 27 Oct 2025 10:55:54 -0700 (PDT)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:59::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-785ed1f2457sm20784977b3.58.2025.10.27.10.55.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Oct 2025 10:55:54 -0700 (PDT)
+Date: Mon, 27 Oct 2025 10:55:52 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next 02/12] selftests/vsock: make wait_for_listener()
+ work even if pipefail is on
+Message-ID: <aP+yKDYZR6+/kzI2@devvm11784.nha0.facebook.com>
+References: <20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com>
+ <20251022-vsock-selftests-fixes-and-improvements-v1-2-edeb179d6463@meta.com>
+ <aP-iXJQVPBCjfPHi@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR21MB3867.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 601d2162-7b28-41fa-81af-08de15818bf7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Oct 2025 17:52:07.6167
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: UTvPm9XaXLoqcKcjJHSfxrg5nyN1jW4eVioSiJlySpXMbUTlkGcdXf1BA+GGS+nzzMq1LZJPrz6Z5LA9OU0Xdw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR21MB2019
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aP-iXJQVPBCjfPHi@horms.kernel.org>
 
+On Mon, Oct 27, 2025 at 04:48:28PM +0000, Simon Horman wrote:
+> On Wed, Oct 22, 2025 at 06:00:06PM -0700, Bobby Eshleman wrote:
+> > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > 
+> > Save/restore pipefail to not mistakenly trip the if-condition
+> > in wait_for_listener().
+> > 
+> > awk doesn't gracefully handle SIGPIPE with a non-zero exit code, so grep
+> > exiting upon finding a match causes false-positives when the pipefail
+> > option is used. This will enable pipefail usage, so that we can losing
+> > failures when piping test output into log() functions.
+> > 
+> > Fixes: a4a65c6fe08b ("selftests/vsock: add initial vmtest.sh for vsock")
+> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > ---
+> >  tools/testing/selftests/vsock/vmtest.sh | 12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
+> > 
+> > diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+> > index 561600814bef..ec3ff443f49a 100755
+> > --- a/tools/testing/selftests/vsock/vmtest.sh
+> > +++ b/tools/testing/selftests/vsock/vmtest.sh
+> > @@ -243,6 +243,7 @@ wait_for_listener()
+> >  	local port=$1
+> >  	local interval=$2
+> >  	local max_intervals=$3
+> > +	local old_pipefail
+> >  	local protocol=tcp
+> >  	local pattern
+> >  	local i
+> > @@ -251,6 +252,13 @@ wait_for_listener()
+> >  
+> >  	# for tcp protocol additionally check the socket state
+> >  	[ "${protocol}" = "tcp" ] && pattern="${pattern}0A"
+> > +
+> > +	# 'grep -q' exits on match, sending SIGPIPE to 'awk', which exits with
+> > +	# an error, causing the if-condition to fail when pipefail is set.
+> > +	# Instead, temporarily disable pipefail and restore it later.
+> > +	old_pipefail=$(set -o | awk '/^pipefail[[:space:]]+(on|off)$/{print $2}')
+> > +	set +o pipefail
+> > +
+> >  	for i in $(seq "${max_intervals}"); do
+> >  		if awk '{print $2" "$4}' /proc/net/"${protocol}"* | \
+> >  		   grep -q "${pattern}"; then
+> 
+> Hi Bobby,
+> 
+> I agree this is a problem. But I'm wondering if you considered
+> moving the pattern matching into the awk script. I'm no awk expert.
+> But suspect that would lead to a more elegant solution.
+> 
 
+I bet you are right.
 
-> -----Original Message-----
-> From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-> Sent: Monday, October 27, 2025 7:46 AM
-> To: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
-> <haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
-> <DECUI@microsoft.com>; andrew+netdev@lunn.ch; davem@davemloft.net;
-> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; Long Li
-> <longli@microsoft.com>; Konstantin Taranov <kotaranov@microsoft.com>;
-> horms@kernel.org; shradhagupta@linux.microsoft.com;
-> ssengar@linux.microsoft.com; ernis@linux.microsoft.com; Shiraz Saleem
-> <shirazsaleem@microsoft.com>; linux-hyperv@vger.kernel.org;
-> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
-> rdma@vger.kernel.org; Dipayaan Roy <dipayanroy@microsoft.com>
-> Subject: [PATCH net-next] net: mana: Implement ndo_tx_timeout and
-> serialize queue resets per port.
->=20
-> Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detecte=
-d
-> and a device-controlled port reset for all queues can be scheduled to an
-> ordered workqueue. The reset for all queues on stall detection is
-> recomended by hardware team.
->=20
-> The change introduces a single ordered workqueue
-> ("mana_per_port_queue_reset_wq") with WQ_UNBOUND | WQ_MEM_RECLAIM and
-> queues exactly one work_struct per port onto it. This achieves:
->=20
->   * Global FIFO across all port reset requests (alloc_ordered_workqueue).
->   * Natural per-port de-duplication: the same work_struct cannot be
->     queued twice while pending/running.
->   * Avoids hogging a per-CPU kworker for long, may-sleep reset paths
->     (WQ_UNBOUND).
->   * Guarantees forward progress during memory pressure
->     (WQ_MEM_RECLAIM rescuer).
->=20
-> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Playing around with awk, I find that this seems to work:
 
-Looks good, except for the comments from Pavan.
+$ pattern=":$(printf '%04X' ${port}) 0A"
+$ awk -v pattern="${pattern}" 'BEGIN {rc=1} $2" "$4 ~ pattern {rc=0}
+	END {exit rc}' /proc/net/tcp && echo FOUND
 
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+I think it beats doing the save/restore on pipefail?
 
+Best,
+Bobby
 
