@@ -1,129 +1,125 @@
-Return-Path: <netdev+bounces-233082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFE94C0BEFB
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 07:17:33 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC0AAC0BFAD
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 07:44:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 17734345D97
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 06:17:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7F3B24EC193
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 06:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71ADC298CA6;
-	Mon, 27 Oct 2025 06:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BF02D5937;
+	Mon, 27 Oct 2025 06:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Te4zu4eU"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="jGpULUo5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF3D1946DA
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 06:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A55723A98D;
+	Mon, 27 Oct 2025 06:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761545849; cv=none; b=MNpF8WpJyMcBwqRFSgA/dOsz0LxlHyvWLekVInGNcen4i+rw4ZtM2MA8eoKr88OERAYPcD45wHm6f8Q8WNTNIsUoK43+CrtPwQNN2tdFFWlQdHcW0mz2kRaKdwLjCm8m+xNbg3xmfms0F3b9LQiBevC0cxgvZxDFwo18pBPmHvo=
+	t=1761547330; cv=none; b=fr4peGHvHv9dyCBdiaLCvVY4mSntOhGU8TEKjj4vngcnctIoOPm01eNQ2mFEXkdC7kWqj2Waxq3pZoV+xMe+JtVfu7bdLgtHbA89/SiBNFiSrg0ZzsQD6hEUWCSeztzG7m5sPgYtvuGLGX3eM3jgW/KLr3x9+7zMuJM4ApryabU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761545849; c=relaxed/simple;
-	bh=s2y9IfOAbXVKdsFD+bd7mUEWaAn36Kc0djLxRb2Yg/8=;
+	s=arc-20240116; t=1761547330; c=relaxed/simple;
+	bh=RZMk3Z2Ubja+UgFYdzBWNWwnLSK1IfVopnzGJIdkMnk=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=OcUwYzmTBwdxovI48+9H1s2TnBuuS8U8XZbwDxFnVLHgK3bhr0kvCgYPtjq4uglj1UybIX4/mIj2tG1UccvRKZHcwrJucFn9jiXhWnUmGCKhN3XQvZGcMa2wjKp3QgaJ/zxMydtBYFzwE4ruIHy6Z+yBXwpPIHicLbJpHh999MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Te4zu4eU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7538C4CEF1;
-	Mon, 27 Oct 2025 06:17:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761545848;
-	bh=s2y9IfOAbXVKdsFD+bd7mUEWaAn36Kc0djLxRb2Yg/8=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=Te4zu4eU2OIkUie4Cv+Y90UJI8H4XMxQgf0vUo0Nd9GKBPmFvZQIAzlti+abz5jiL
-	 fJosq5hGB5c6RXDrE3909I4hiy+WAvsGpckbku9EUI6XBkzbF+4VxhaDVMBmpk/YQV
-	 EGzJ1AxRXos/ZWI7Zs0n0i+Y/uYkWnpUUrovH0EHFYinJD9pDraVtqR5vBIFkb5tis
-	 AK3/oW4ZPBNpimnkI2z/RRIsjk0qKvf97qefgpcOOgZDxpXoUF/9yG1cNRCCTZ/sR1
-	 9CZmKp+gW3b8BAS8oamMX9CGRpVUeXGSoClIvayzi2+dQMpQSDFyn4cn8lGibOt2O0
-	 8UxDm4XS7zRBQ==
-Message-ID: <b6964938358dc1af41c9fefda071c19e81c8e64a.camel@kernel.org>
-Subject: Re: [PATCH net-next 2/3] tcp: add newval parameter to
- tcp_rcvbuf_grow()
-From: Geliang Tang <geliang@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>, Eric Dumazet
- <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>,  Simon Horman <horms@kernel.org>, Neal Cardwell
- <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,  Kuniyuki
- Iwashima <kuniyu@google.com>, Mat Martineau <martineau@kernel.org>, 
- netdev@vger.kernel.org, eric.dumazet@gmail.com
-Date: Mon, 27 Oct 2025 14:17:21 +0800
-In-Reply-To: <22536cac-4731-4b09-b1ba-f69755128665@kernel.org>
-References: <20251024075027.3178786-1-edumazet@google.com>
-	 <20251024075027.3178786-3-edumazet@google.com>
-	 <67abed58-2014-4df6-847e-3e82bc0957fe@redhat.com>
-	 <CANn89iLjPLbzBprZp3KFcbzsBYWefLgB3witokh5fvk3P2SFsA@mail.gmail.com>
-	 <44b10f91-1e19-48d0-9578-9b033b07fab7@kernel.org>
-	 <CANn89iKgqF_9pn6FeyjKtq-oVS-TsYYhvyVRbOs3RzYqXY0DWQ@mail.gmail.com>
-	 <CANn89iJThdC=avrdYAfNE4LqRvPtkGS-7fLQdLOYG-ZOTinjRw@mail.gmail.com>
-	 <22536cac-4731-4b09-b1ba-f69755128665@kernel.org>
+	 Content-Type:MIME-Version; b=jHaNaArwHa1+36wV3FUxQ4bJTuB+F+qUjLsCALrXGqhWqW0NRTDrzWa5SyakSRiSoc7N8+84KUV8RPf8AhQtjziGhl5mN94jDdcjgyFkxrYl4PwfSUblytZ2RGh42P5MrBR7NLVXUKBaMQzt+PnYq7MS9c9Ij9xuAsd2lLO/eeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=jGpULUo5; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1761547320;
+	bh=RZMk3Z2Ubja+UgFYdzBWNWwnLSK1IfVopnzGJIdkMnk=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=jGpULUo5EaxMyyCKOSxYmVzFiHtShL38jAazQIawldmhhLnDD3nWcUIR8r0KB8iy9
+	 XMi69c1oW+dkz6cxySX0NsVyW9iZiO+xNNX0msK2N4DUNBGP8Ge8x1uk1/Do3Gk9cy
+	 Nl9DoPY1QQyNCLRGwcvpKQ1Ssl5gmy20t2X3BtgFdYWWMODHw0TJZjxYJ6+Q0lLCAM
+	 ILkD8qhkshSLt+mof1iLUdlvexR1BVsaX4Umoe2wfNI5kxc4LPxZ1qi2Z9nrr7g8w3
+	 lNKPwbmcRLdrcOnzISMvXM5Hi6YEOipAmNBc/qwMvInanMmuBgY/PwuxzvXI+I9RcH
+	 PqRR5BQYpjS/w==
+Received: from [192.168.72.160] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 8CBF9641F5;
+	Mon, 27 Oct 2025 14:41:59 +0800 (AWST)
+Message-ID: <a24255faaf750bad30adefa24b510d0ccbaf37b0.camel@codeconstruct.com.au>
+Subject: Re: [PATCH v2] net: mctp: Fix tx queue stall
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Jinliang Wang <jinliangw@google.com>, Matt Johnston
+	 <matt@codeconstruct.com.au>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ linux-kernel@vger.kernel.org
+Date: Mon, 27 Oct 2025 14:41:59 +0800
+In-Reply-To: <20251025054452.1220262-1-jinliangw@google.com>
+References: <20251025053048.1215109-1-jinliangw@google.com>
+	 <20251025054452.1220262-1-jinliangw@google.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Hi Eric, Paolo, Matt,
+Hi Jinliang,
 
-On Fri, 2025-10-24 at 17:27 +0200, Matthieu Baerts wrote:
-> On 24/10/2025 16:58, Eric Dumazet wrote:
-> > On Fri, Oct 24, 2025 at 7:47 AM Eric Dumazet <edumazet@google.com>
-> > wrote:
-> > > 
-> > 
-> > > 
-> > > I usually stack multiple patches, and net-next allows for less
-> > > merge conflicts.
-> > > 
-> > > See for instance
-> > > https://lore.kernel.org/netdev/20251024120707.3516550-1-edumazet@google.com/T/#u
-> > > which touches tcp_rcv_space_adjust(), and definitely net-next
-> > > candidate.
-> > > 
-> > > Bug was added 5 months ago, and does not seem critical to me
-> > > (otherwise we would have caught it much much earlier) ?
-> > > 
-> > > Truth be told, I had first to fix TSO defer code, and thought the
-> > > fix
-> > > was not good enough.
-> > 
-> > To clarify, I will send the V2 targeting net tree, since you asked
-> > for it ;)
-> 
-> Thank you very much!
-> 
-> Note that the bug was apparently more visible with MPTCP, but only
-> since
-> a few weeks ago, after the modifications on MPTCP side. When I looked
-> at
-> the issue, I didn't suspect anything wrong on the algorithm that was
-> copied from TCP side, because this original code was there for a few
-> months (and its author is very trustable :) ). So again, thank you
-> for
-> having fixed that!
+Thanks for the fix! A couple of comments on the metadata:
 
-I have just tested and confirmed that this series, together with
-Paolo's correction (changing msk->rcvq_space.copied to msk-
->rcvq_space.space in mptcp_rcvbuf_grow()), fixes the simult_flows.sh
-issue mentioned in [1].
+> Subject: [PATCH v2] net: mctp: Fix tx queue stall
 
-Thanks,
--Geliang
+You'll want to indicate that this is for net rather than net-next in
+the subject prefix, so:
 
-[1]
-https://github.com/multipath-tcp/mptcp_net-next/issues/589
+> Subject: [PATCH net v2] net: mctp: Fix tx queue stall
 
-> 
-> Cheers,
-> Matt
+Then, since we're targeting net, we'll want a fixes tag too. I would
+suggest:
 
+Fixes: 0791c0327a6e ("net: mctp: Add MCTP USB transport driver")
+
+- so we get appropriate backports. No need to reply to the original
+message for subsequent versions either, a new thread is best.
+
+Also, it's helpful to indicate changes between submitted versions,
+under the '---' marker, which doesn't end up in the git commit.
+Something like:
+
+---
+v3:
+ - target net tree, add fixes tag
+
+v2:
+ - remove duplicate comment in commit message
+
+---
+ drivers/net/mctp/mctp-usb.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+> The tx queue can become permanently stuck in a stopped state due to a
+> race condition between the URB submission path and its completion
+> callback.
+>=20
+> The URB completion callback can run immediately after usb_submit_urb()
+> returns, before the submitting function calls netif_stop_queue(). If
+> this occurs, the queue state management becomes desynchronized, leading
+> to a stall where the queue is never woken.
+>=20
+> Fix this by moving the netif_stop_queue() call to before submitting the
+> URB. This closes the race window by ensuring the network stack is aware
+> the queue is stopped before the URB completion can possibly run.
+
+LGTM. With the changes above:
+
+Acked-by: Jeremy Kerr <jk@codeconstruct.com.au>
+
+Cheers,
+
+
+Jeremy
 
