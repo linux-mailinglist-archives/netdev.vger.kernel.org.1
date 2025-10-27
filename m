@@ -1,219 +1,226 @@
-Return-Path: <netdev+bounces-233142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20A33C0CF5F
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 11:30:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 461D8C0CF41
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 11:27:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6B4054E6737
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 10:29:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03F324029A7
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 10:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DA22F6174;
-	Mon, 27 Oct 2025 10:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA912F5473;
+	Mon, 27 Oct 2025 10:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b="iI9O9ykj"
+	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="Fon/lqKC"
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013043.outbound.protection.outlook.com [40.107.162.43])
+Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [67.231.149.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D459E10F1;
-	Mon, 27 Oct 2025 10:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761560943; cv=fail; b=ESUFsnMIGL/zLGSQp85N9J+m8z3RpOSH+zJYGzXAJ2oqFMvZltmHkHCnniknxOLpWoGZ9Bq6CvWsbzfExl8xEZUjn+xJi6u92B5HssouZzYvlZp2G41La4UiTKlYNXrwb0z/rof6/n74z3WfmN1CXn14piwIbgmDkYZhOGfbcBw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761560943; c=relaxed/simple;
-	bh=3kCULEDu/+Kpv/FhzqOmxNeXWesnpFuWKAlnIlLUwbQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=gwFpqQG81aOQOKxULqJrpHSst2FVBIXtKopExCzNv6xgZPFRQZO2F2GXg1vug4QOPGCbCUYvTiMHW9pQtZlNfYjBJok+lgIBFhY5jhODmTSB6W5FPZJA0BC6nGPiDSZ8dAcqFJLqGTu/yspdXlBL3hRRdBFn201eo+sQh5IRtew=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com; spf=fail smtp.mailfrom=nokia.com; dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b=iI9O9ykj; arc=fail smtp.client-ip=40.107.162.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JWDw39v7vrg0vfhCQ5z3+z1Q4QPHNRFc1gm4S9hcpYxLuzax7t0whMcHsu5pZBWjG+ZY2H1DCZAehHBOZF8f7QKtjROG+Hs6+4T6b+F46kwPYCHeueHzr3aJ5ThiE5IBR96T1FMt9A7PueoXj/NrR91t+VjdvSAuqqG5s9WA+IPCfHHbic+mI5TiTVez5nG3FfKH258Y39p/vrB/hpJ/TSlYOdVJaiNO6c/0iSudH82O8yEa99SpcDvIdG7qu3CyfgbCJdJkpFKKyoUQET5LcU1OdnNxdMAo+VhY0wxAzlcOiGs4q5R4dt+Fdl17B8wh2xIqzG1ThJRjdSC80opKAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Az1mZEKieiQdqzD2uJV7NW/8VC6SdI7pWtrCbH/MiJs=;
- b=hTMA2++yOhokXy+Xu1KVGUYDajmR6u4az8K6lEfUmA6DDi/6Ee+U/LH2QcUnVfatt6EZLyNWaih/nWPCFnAuf83H+9Y6ANwQE2uRMevuApwmOHls3mAHn3c9tr/GQVuiT3Xja+iO2nNfpUeAsalDOBCdh2rgQveQk1nOULSIrM9tAH/mvKPkdQlA5N5euQO6MDQUmgYoBRzt/cl31BCda5BuVjR0E+L1f3X3jDWfxgee8iLcdKjfte54fr0D86okIlc+LaWWmkvEx7xiERFXHrRjMAVSEBVzbd8bdKs3Y6DFiezDhZEFy32LPy0+RI/NUzN9mqORYVPu6UsQkS3VAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nokia.com; dmarc=pass action=none header.from=nokia.com;
- dkim=pass header.d=nokia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Az1mZEKieiQdqzD2uJV7NW/8VC6SdI7pWtrCbH/MiJs=;
- b=iI9O9ykj3swFlWjYFdwCNMR1gUMd2JYU2wnRT3WN+Pnqh0EbnKnbvuqIivKCTSeu0nfhb5dXLYo87eu/FAbcsOaR5LORGWpOY/JbXi2cc10HVUUd+zysHEx/KInnI2nHRc98QoxqRQlcMCR0iGz86W74yx0WONPDjw+/dEUpZ1jzqL7tQgFwAW7E+UNPPhhFmTwIDSJQQ8g31+iCafX2Gus86MH4PoAblXokHvAQ9QtUKBfDjjplgAxFaL+eNtLeCYRZZNJQyHZNuRlkyUyHcr1tf6xJmPJzEOs7cirb5WmkBGU01YHrJbEvgsofcGKQs8TggrQ5Qbqn//WVk0lJ9g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nokia.com;
-Received: from PAWPR07MB9688.eurprd07.prod.outlook.com (2603:10a6:102:383::17)
- by VI1PR07MB6672.eurprd07.prod.outlook.com (2603:10a6:800:18f::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.18; Mon, 27 Oct
- 2025 10:28:55 +0000
-Received: from PAWPR07MB9688.eurprd07.prod.outlook.com
- ([fe80::3a2d:5997:c1c7:3809]) by PAWPR07MB9688.eurprd07.prod.outlook.com
- ([fe80::3a2d:5997:c1c7:3809%6]) with mapi id 15.20.9253.017; Mon, 27 Oct 2025
- 10:28:55 +0000
-From: Stefan Wiehler <stefan.wiehler@nokia.com>
-To: Xin Long <lucien.xin@gmail.com>,
-	"David S . Miller " <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Cc: linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stefan Wiehler <stefan.wiehler@nokia.com>
-Subject: [PATCH net v2] sctp: Hold sock lock while iterating over address list
-Date: Mon, 27 Oct 2025 11:25:42 +0100
-Message-ID: <20251027102541.2320627-2-stefan.wiehler@nokia.com>
-X-Mailer: git-send-email 2.51.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FR4P281CA0421.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:d1::6) To PAWPR07MB9688.eurprd07.prod.outlook.com
- (2603:10a6:102:383::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E8D2F3C26;
+	Mon, 27 Oct 2025 10:27:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.149.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761560844; cv=none; b=QxrDW+tjShm97ljd99nHEmc5WSxvzEBG4bgSAbnPUhYUCSIJYmK2GX4xDHgPOz0+BTc+vfUZmjqGmeqjrchMSamtE+qVpMSJIkpxi3x7DBFJMcEIQxMCJcrwbIG5+pbz4F+SjXRMUhr8IN/nbrPA1gx8mdZQYjTgY+PdsD27+34=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761560844; c=relaxed/simple;
+	bh=jXAAj67VByP6AXYtptL0mITMT/dGFN5VXSakFK1aluQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AVoC+qPVO5Y40gZVpGzDbeZaILNe3i+oQ+JiKuVfsG5xQ/SlFuqPWVHKqqEO6i6TPTx2l5+eWlUIpXVytDHeb3n84KKmiS/w2PY87L2d8E7hKQI+EPJCBZiqBQRSEa9zfLzbIaS6LVxHT/NZuJaMQ6p08Zsm9GBI9ncvau0CBkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=Fon/lqKC; arc=none smtp.client-ip=67.231.149.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
+Received: from pps.filterd (m0122333.ppops.net [127.0.0.1])
+	by mx0a-00190b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59RA1oEW3083451;
+	Mon, 27 Oct 2025 10:27:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=jan2016.eng; bh=vjpGgOHUOzQBJjbmi3ZzYe0ig6bvhvg6P
+	zLW4ciotmE=; b=Fon/lqKCUNmllPTKFr/WJwBjjFND8w0JqGTOH6vAchohzKkQf
+	ZfICq86h8skzCX4V6dO5fu2Io86e5TslrImL9bqHV5c3RMOm6a2WHI95zRDpV10d
+	UD/EvSl0N7fkZBJJELJyHQAyeZMA5B5qXaN86LmdzKpU8EGXrFQZj8QvCLxFW7n2
+	IGAxwKt46/a4Zrb0xne/SHkrl+h4pUY6SnDwXn+Ox7EKVTNA86AMQc7LA1cAG83q
+	i7MX6QfjGzqKmm7UbE6Db/UtY5pheXAntDNBp1NK9RnXMmvNTl0I36jNGi6HqvUz
+	DviL8vhPHxIrkXW3YalcPaLCuknuFi0ImKXIg==
+Received: from prod-mail-ppoint5 (prod-mail-ppoint5.akamai.com [184.51.33.60])
+	by mx0a-00190b01.pphosted.com (PPS) with ESMTPS id 4a0nt8sqmn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 27 Oct 2025 10:27:11 +0000 (GMT)
+Received: from pps.filterd (prod-mail-ppoint5.akamai.com [127.0.0.1])
+	by prod-mail-ppoint5.akamai.com (8.18.1.2/8.18.1.2) with ESMTP id 59R73c2B025840;
+	Mon, 27 Oct 2025 03:27:10 -0700
+Received: from prod-mail-relay02.akamai.com ([172.27.118.35])
+	by prod-mail-ppoint5.akamai.com (PPS) with ESMTP id 4a0vh86pyc-1;
+	Mon, 27 Oct 2025 03:27:09 -0700
+Received: from muc-lhvdhd.munich.corp.akamai.com (muc-lhvdhd.munich.corp.akamai.com [172.29.2.201])
+	by prod-mail-relay02.akamai.com (Postfix) with ESMTP id 9162C83;
+	Mon, 27 Oct 2025 10:27:08 +0000 (UTC)
+From: Nick Hudson <nhudson@akamai.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+Cc: Nick Hudson <nhudson@akamai.com>, Max Tottenham <mtottenh@akamai.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux.dev,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] vhost: add a new ioctl VHOST_GET_VRING_WORKER_INFO and use in net.c
+Date: Mon, 27 Oct 2025 10:26:44 +0000
+Message-Id: <20251027102644.622305-1-nhudson@akamai.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAWPR07MB9688:EE_|VI1PR07MB6672:EE_
-X-MS-Office365-Filtering-Correlation-Id: 108d4798-9a67-49a2-c883-08de1543a1ce
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|10070799003|366016|376014|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?84khXZ0QDObo+nxTzm0Y5v2cHnPWy+qK7RKw2Es+p0H/wZDZYQD64jvoJJXh?=
- =?us-ascii?Q?UASTX14+IHAV3ld3JZrbkqwdLEwKDiThhh2IutzFEeEn9GOC/4Ma3SEaia5J?=
- =?us-ascii?Q?QyKTOQq4T+aBvwNGjFcR9fCfJXCkLz+KYZyUt1jPFbMy7pmpABPpiS2NTGQG?=
- =?us-ascii?Q?08rUFLMXrZraojA4QQEKG8yjOGFdzQz/fOvJJfvsPGyZtHUtq40F/gBYid8A?=
- =?us-ascii?Q?hjRTriy2KX+8kyKdkhfMspLMXwVKJMEsaQM2Gg0MaKJkId/SEcuj/ITTbLab?=
- =?us-ascii?Q?lQY078TguBVvsaP2JtwCbAbM3BEu2UePSq16jMU8kZ/jWbw1c2IbP8ZyX1ey?=
- =?us-ascii?Q?6ESkUlAzCztP8OFPvwbyqSoeMkc5OCa3cchYKEKkiJA9W8enWP5RlOkV8K54?=
- =?us-ascii?Q?VklrSbN4fAM+JmRi8Pqknd+Q7+EC62YCxPsC0JZ271hlIs+sHQCm9FuB4Kza?=
- =?us-ascii?Q?+Pp2d6EXO8wf4YRJoMPTmwIg0XESWTRQfsuO95S6zSDxSr9cR7cYmY2UyRmV?=
- =?us-ascii?Q?8oTY0BueXQ14wHzA7CoEffiJn9FZSo+spB6+TSON964xdpvIbAsxYEdvAfNT?=
- =?us-ascii?Q?fDrOr5TB0jVjFcOazBI1duVfaI0Qh4jUMpoDlixkgPlLxmuPBBWQrz+gk1hz?=
- =?us-ascii?Q?uMqAJ7CY2/d9IUIZ+QNS76s7F4U6/0J9xFDaMq9XrElWOvgr3or6uQY4A2NB?=
- =?us-ascii?Q?8bOKhR518SZy4/Oi1neanMJsExLSn22B4/Iw1626k0/22pgCOb7NJScKez7I?=
- =?us-ascii?Q?ZInyT9jcZ/LGRMjIbhCxPMGOVFFFMvB0Ah25hnfWxvjF3NfGr0yt1n3F9iJy?=
- =?us-ascii?Q?3NgnVy4YDe7zaYe+SZEPaAXE19Uc1yU7GaL+aXi5o415I41TH0799bgo8SRO?=
- =?us-ascii?Q?ZjO0/VGrhYXTNDneqNo4dlaXKj9PMR67L7dSWpGU6fwds0QOgZF5YllzZbcU?=
- =?us-ascii?Q?X0kyb0j6loQ0QskYFNOqznjl6jFNRX056uG+LG2bs7yxuGWZ64juBnEW+dKU?=
- =?us-ascii?Q?N0PT7Gdv5TMexJJH2hSA6Tta/9You8GWBrDLmkjN0wl47ey8pvEgJzla2cYd?=
- =?us-ascii?Q?ZnAGtfMyHx+5PGWErYTjeZBITYDU2kEp4gDoA3l6dg0FdQ23nJHtJQdVHnu3?=
- =?us-ascii?Q?XirTPpwMiaaVTn6H/jCy2q5jy3ZCWy9usd+YFo475Lmywf7yc1zEMBH1izm2?=
- =?us-ascii?Q?mg4qyUHg9oichUI+rAEw8tYERp1SG9wV7Lj7r9n6oIZpSElBUYMXtlVbCKXi?=
- =?us-ascii?Q?oPrglKRc4ud67bZ3FqmIRC0zo+F0+LI8P2WCU64W3PQEpXA42/jZb5BZB2H4?=
- =?us-ascii?Q?2JhqiYkN6z91bc2+t5xYpwsXI3UJyRb8KCKGyANLtzXO+gmHS/HphC7fLIrx?=
- =?us-ascii?Q?a2+WpQSyWwaG8fDezR2ok7a6J/E+3r+vEOghhCg9AxVKa/42TXGgywJfWCpL?=
- =?us-ascii?Q?w2q2Nah3Batey7qgwGnQmCzezVw4iCa3?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAWPR07MB9688.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(10070799003)(366016)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?SXRRfPgdbSjPQObMNGLIqwEw1GGpaduI6Xjd3mmPlsIAECtG8MENvLaiVS8+?=
- =?us-ascii?Q?qbRuny3Ih9Lv1ZMidG3oFNyFIIO0u7xlPotIAPnUVThkWREnaINVeG0KE4Ge?=
- =?us-ascii?Q?3HMIfEC8u+7J8/5G20Pmf1y1Qct08T8Nx5bIpg3TliDBB+aUlQJogXBYqfFa?=
- =?us-ascii?Q?WCoeaOlZCTUskra+mGebaHW4ciEB+hx7Ourxdok7DpoHHWr8W6L4VaAA8uKJ?=
- =?us-ascii?Q?bGo3OHsmA1+awfDAr8wbgITmnG1ZL9sl+iUUKZ91X9cK18cCIgUiO6bUTTZP?=
- =?us-ascii?Q?CSd8uLB82H074OWvCPxWxLU6K6nWDfJi3/xZWNL85cFLENTdc8gx8a1ZLbVg?=
- =?us-ascii?Q?8Enz7+Y4/osG5OyjzgTiLusblt9Bg6KD0B9AF7pugdItZXzcOl2TTCZN/Wch?=
- =?us-ascii?Q?uNQo6JWwFMFd5tSzv4p7rJNuQkLDzmnZcLKVkHJ1IANmxAVhFAuHe1dC+8Mt?=
- =?us-ascii?Q?5EHshED2rHDEXVboQYd1uMf7CezovKMBEaLTN52MArxbidH44tDzGyTu6hUN?=
- =?us-ascii?Q?ts45/0uccOIMRoN/9VvDghUNwhUrIydx4UfBaefWVIspk/xYYNgcvigukew+?=
- =?us-ascii?Q?fT560rj7mQs65P9mxON2onX2n/y0mItmo/7vo1dr0IGQDcbt8EnvE89rE6eN?=
- =?us-ascii?Q?vG8CKhgeHl3vd+sFz4Ompqxe86NnJm2VYiPYry8hBrM9eiGEwz4mDRENDn+S?=
- =?us-ascii?Q?H7w112VcIs3lvqhN8uqZwiSW1V7FTJkhmfVI8jE9nQoQF5X9X7e37dB1LonL?=
- =?us-ascii?Q?TU0qvMSchRfjY2bzxl99F7+moomq/F0E6fa+sf+AYXdiXvLojRX27D0yoKf1?=
- =?us-ascii?Q?RnLATVTdKAJSNp8IcpyKz2wqwr8a98+vQIkqwC0ZMNkZ63SfF6RSkv/yMrsk?=
- =?us-ascii?Q?gjAXlMrwyT2Fr2d+8XV12uzutOrDUszTxOQz/gjzMExVhpUP0rZmhnlNHf5d?=
- =?us-ascii?Q?+z6paZ50hYy+S00t0wqEp4SwZFZJXZhpWtgXveSAzCBnyOVpFzS55WCY9uYA?=
- =?us-ascii?Q?gieJ7nT1+oHzKu0kZW2ihBuguwrIWIzT91LcO2jRF9nVsvPbamrcgC45ZhFo?=
- =?us-ascii?Q?Ym38AwkmBat1ihRg6cZ4IxgKohThgcJYXZ4BB/Z69exw90bYi/+b5T58oQBH?=
- =?us-ascii?Q?iqpjpcEPUlzsgusa8gVMwdhdtrlf4s2vqmfOOPZGHIGUq7q0Jy6Quix1QdYC?=
- =?us-ascii?Q?KxL/SYWosGTHDA9wj6ev6s7K3LEQLEK9p3BRerueVBS07VvGbcOMwrYvvIUk?=
- =?us-ascii?Q?P0bp8QQxpONHlCY0PH81+xHVvSHRaeImeYegO643D2zl+q1snsVP/bht2x4a?=
- =?us-ascii?Q?wrGI00vAg45PHlloqcWFbdGEVNa7Zmsh+soA9LnQEWnSs7augaWBYKtdbLoJ?=
- =?us-ascii?Q?/ZaI9hcOEYvjLTs21PDN5m1N9jkdrbQwBcZgjhvzzTpQRcb5ko69tUvppD84?=
- =?us-ascii?Q?rE6EuKjbki9Wq0ftt29ofigj01MLLVk1aaKlchtxEEin1Rf/REdqey9kYvwW?=
- =?us-ascii?Q?Jm0pmp8thbGkBetzD3X3QuYUJGyqlk7EWN7+QN38cFxW1Jnn+JeB9u9jfSXc?=
- =?us-ascii?Q?7bJnDCnsCFSxJ+y3wD6WZ7/4te0V4U8BckN4bNmQBzUM8uv6ZfWxISEDVdlp?=
- =?us-ascii?Q?82XZd3F/p9bVGFtRjxgttqIl56b+8zAX+a95Zu1nqrZII43lVFQ7SF7KwFBb?=
- =?us-ascii?Q?Pt51Iw=3D=3D?=
-X-OriginatorOrg: nokia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 108d4798-9a67-49a2-c883-08de1543a1ce
-X-MS-Exchange-CrossTenant-AuthSource: PAWPR07MB9688.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2025 10:28:55.6510
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xzKcDSsw77q25bS2H9Ir/fLAJBzxWfIf8gCq/M/JLez5V/askGh510eSKZx3DAmvKguX7Q/J/q1KUufGzPj61Y59U6o4d6kTLo3lPeQMbCM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR07MB6672
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-27_04,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 spamscore=0
+ phishscore=0 malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510020000
+ definitions=main-2510270096
+X-Authority-Analysis: v=2.4 cv=QaRrf8bv c=1 sm=1 tr=0 ts=68ff48ff cx=c_pps
+ a=NpDlK6FjLPvvy7XAFEyJFw==:117 a=NpDlK6FjLPvvy7XAFEyJFw==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=X7Ea-ya5AAAA:8
+ a=s2F8ZfxWFg2Xnt8VUUoA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: 3_hAfG8Jii9R6Ttd3oyXC2qDXGaXWTnw
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI3MDA5NyBTYWx0ZWRfX0JYiNUNqObp8
+ JSHsznxaXuUnKUXZEPfIh5l+6VdbhfQgEhhbg6uy1bZKkvJsbnTSBGTAKSJNmZLA4Jc+0Y8mEFr
+ s3BN1ElBHHIfugkuIJ1VNg2f8XYlWrP1XHSqBD0oEhtv7M64eQR1A+POuA00bIEFhNqZ9MWbpfe
+ Sz+KiyUl7g89Bl41ET/JhLkW7E/j+rs8tmsm7sX2rk7WNPgS1RhOHYsm2DuoIxA0hHd35rGgzf6
+ iZDfadQ+U8y3tA3ItJ2tELK4tmQkAZaCfWzpilp5+kBhiKEmBAIWXBIP5Xk7Pk0lnKC2qmNj1jT
+ tgZgMwgzqyiBerScIUmoG8dyHggPVCj0703xnXza84fpeRpNRmmFe4Muz9jhT45Vc+F2Kok75R+
+ b3Iavehd92S2qd/MSPMCfJBbX+kHOg==
+X-Proofpoint-ORIG-GUID: 3_hAfG8Jii9R6Ttd3oyXC2qDXGaXWTnw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-27_04,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0
+ priorityscore=1501 suspectscore=0 bulkscore=0 clxscore=1011 phishscore=0
+ adultscore=0 spamscore=0 lowpriorityscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510210000 definitions=main-2510270097
 
-Move address list traversal in inet_assoc_attr_size() under the sock
-lock to avoid holding the RCU read lock.
+The vhost_net (and vhost_sock) drivers create worker tasks to handle
+the virtual queues. Provide a new ioctl VHOST_GET_VRING_WORKER_INFO that
+can be used to determine the PID of these tasks so that, for example,
+they can be pinned to specific CPU(s).
 
-Suggested-by: Xin Long <lucien.xin@gmail.com>
-Fixes: 8f840e47f190 ("sctp: add the sctp_diag.c file")
-Signed-off-by: Stefan Wiehler <stefan.wiehler@nokia.com>
+Signed-off-by: Nick Hudson <nhudson@akamai.com>
+Reviewed-by: Max Tottenham <mtottenh@akamai.com>
 ---
-V1 -> V2: Add changelog and credit, release sock lock in ENOMEM error path
----
- net/sctp/diag.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ drivers/vhost/net.c              |  5 +++++
+ drivers/vhost/vhost.c            | 16 ++++++++++++++++
+ include/uapi/linux/vhost.h       |  3 +++
+ include/uapi/linux/vhost_types.h | 13 +++++++++++++
+ kernel/vhost_task.c              | 12 ++++++++++++
+ 5 files changed, 49 insertions(+)
 
-diff --git a/net/sctp/diag.c b/net/sctp/diag.c
-index 996c2018f0e6..2cb5693d6af8 100644
---- a/net/sctp/diag.c
-+++ b/net/sctp/diag.c
-@@ -223,14 +223,15 @@ struct sctp_comm_param {
- 	bool net_admin;
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index 35ded4330431..e86bd5d7d202 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -1804,6 +1804,11 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+ 		return vhost_net_reset_owner(n);
+ 	case VHOST_SET_OWNER:
+ 		return vhost_net_set_owner(n);
++	case VHOST_GET_VRING_WORKER_INFO:
++		mutex_lock(&n->dev.mutex);
++		r = vhost_worker_ioctl(&n->dev, ioctl, argp);
++		mutex_unlock(&n->dev.mutex);
++		return r;
+ 	default:
+ 		mutex_lock(&n->dev.mutex);
+ 		r = vhost_dev_ioctl(&n->dev, ioctl, argp);
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 8570fdf2e14a..8b52fd5723c3 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -2399,6 +2399,22 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
+ 		if (ctx)
+ 			eventfd_ctx_put(ctx);
+ 		break;
++	case VHOST_GET_VRING_WORKER_INFO:
++		worker = rcu_dereference_check(vq->worker,
++					       lockdep_is_held(&dev->mutex));
++		if (!worker) {
++			ret = -EINVAL;
++			break;
++		}
++
++		memset(&ring_worker_info, 0, sizeof(ring_worker_info));
++		ring_worker_info.index = idx;
++		ring_worker_info.worker_id = worker->id;
++		ring_worker_info.worker_pid = task_pid_vnr(vhost_get_task(worker->vtsk));
++
++		if (copy_to_user(argp, &ring_worker_info, sizeof(ring_worker_info)))
++			ret = -EFAULT;
++		break;
+ 	default:
+ 		r = -ENOIOCTLCMD;
+ 		break;
+diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+index c57674a6aa0d..c32aa8c71952 100644
+--- a/include/uapi/linux/vhost.h
++++ b/include/uapi/linux/vhost.h
+@@ -101,6 +101,9 @@
+ /* Return the vring worker's ID */
+ #define VHOST_GET_VRING_WORKER _IOWR(VHOST_VIRTIO, 0x16,		\
+ 				     struct vhost_vring_worker)
++/* Return the vring worker's ID and PID */
++#define VHOST_GET_VRING_WORKER_INFO _IOWR(VHOST_VIRTIO, 0x17,	\
++				     struct vhost_vring_worker_info)
+ 
+ /* The following ioctls use eventfd file descriptors to signal and poll
+  * for events. */
+diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
+index 1c39cc5f5a31..28e00f8ade85 100644
+--- a/include/uapi/linux/vhost_types.h
++++ b/include/uapi/linux/vhost_types.h
+@@ -63,6 +63,19 @@ struct vhost_vring_worker {
+ 	unsigned int worker_id;
  };
  
--static size_t inet_assoc_attr_size(struct sctp_association *asoc)
-+static size_t inet_assoc_attr_size(struct sock *sk,
-+				   struct sctp_association *asoc)
- {
- 	int addrlen = sizeof(struct sockaddr_storage);
- 	int addrcnt = 0;
- 	struct sctp_sockaddr_entry *laddr;
- 
- 	list_for_each_entry_rcu(laddr, &asoc->base.bind_addr.address_list,
--				list)
-+				list, lockdep_sock_is_held(sk))
- 		addrcnt++;
- 
- 	return	  nla_total_size(sizeof(struct sctp_info))
-@@ -256,11 +257,14 @@ static int sctp_sock_dump_one(struct sctp_endpoint *ep, struct sctp_transport *t
- 	if (err)
- 		return err;
- 
--	rep = nlmsg_new(inet_assoc_attr_size(assoc), GFP_KERNEL);
--	if (!rep)
-+	lock_sock(sk);
++/* Per-virtqueue worker mapping entry */
++struct vhost_vring_worker_info {
++	/* vring index */
++	unsigned int index;
++	/*
++	 * The id of the vhost_worker returned from VHOST_NEW_WORKER or
++	 * allocated as part of vhost_dev_set_owner.
++	 */
++	unsigned int worker_id;
 +
-+	rep = nlmsg_new(inet_assoc_attr_size(sk, assoc), GFP_KERNEL);
-+	if (!rep) {
-+		release_sock(sk);
- 		return -ENOMEM;
-+	}
++	__kernel_pid_t worker_pid;  /* PID/TID of worker thread, -1 if none */
++};
++
+ /* no alignment requirement */
+ struct vhost_iotlb_msg {
+ 	__u64 iova;
+diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
+index 27107dcc1cbf..aa87a7f0c98a 100644
+--- a/kernel/vhost_task.c
++++ b/kernel/vhost_task.c
+@@ -67,6 +67,18 @@ static int vhost_task_fn(void *data)
+ 	do_exit(0);
+ }
  
--	lock_sock(sk);
- 	if (ep != assoc->ep) {
- 		err = -EAGAIN;
- 		goto out;
++/**
++ * vhost_get_task - get a pointer to the vhost_task's task_struct
++ * @vtsk: vhost_task to return the task for
++ *
++ * return the vhost_task's task.
++ */
++struct task_struct *vhost_get_task(struct vhost_task *vtsk)
++{
++	return vtsk->task;
++}
++EXPORT_SYMBOL_GPL(vhost_get_task);
++
+ /**
+  * vhost_task_wake - wakeup the vhost_task
+  * @vtsk: vhost_task to wake
 -- 
-2.51.0
+2.34.1
 
 
