@@ -1,194 +1,153 @@
-Return-Path: <netdev+bounces-233222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 135E5C0EE15
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 16:17:32 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD74DC0EE2A
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 16:17:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A99B3465A2C
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 15:08:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DE25A4FCF67
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 15:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE7062C324E;
-	Mon, 27 Oct 2025 15:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6475F283FE5;
+	Mon, 27 Oct 2025 15:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="io+ZDnGE"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="gMxpHuoD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40314749C
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 15:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2FED749C
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 15:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761577681; cv=none; b=ZJvJu/a6k3oSKB0thrPWAB5rlZiP3BWsIYnH5sEYhPQ9/+pc/sZpjH5lBe3vfwkSOH5oNZj1vbHV6vozPYoPXxf2CG0p6SAORMFRRcYlznsQOzUXcObEkDd/t5dNIc0fmqrISPOI9PMdHZ3YovGKxDwZ61rFtrsmcJq72yU67do=
+	t=1761577832; cv=none; b=XJ12wxXZkRixmKsf2D/DIKzoROvCqWKRfCYtRX/790rZfwK4Q+l/kWKIHguJXPKuODjxuccoSmTh1quf5Hp6P0GSbaPZIZExS6S5zFN89kLudpUhxrZYLKqCIEj1i6b5s+4yosh170dihFb4wcKI5D5aAlT/8hhhLAiRh+xFFXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761577681; c=relaxed/simple;
-	bh=Hj0l0j5fI+kXzEXNngd9fmM+TUubJmytvIAHFMvoWdI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IkG6fKrzYOBaOp0EIvP8ToG/6iARf6GFKowk4EqumuA563BjUjIYLG3xNzVLQ6294W8MtFlTb7YXUrsAEcAF6uzgmWd0aoMgbrRYPtmKcX97nw12GsUf0f8USSRizr7cgJinZmFmNXn1mmJIGFjSpfJMbbKqaw01whUUiii/I1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=io+ZDnGE; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ecfd66059eso223191cf.0
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 08:07:59 -0700 (PDT)
+	s=arc-20240116; t=1761577832; c=relaxed/simple;
+	bh=kqofIg89nc5Z32IB2dr/5ahmgNeRwPpcxCLz+3QcxA4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FRR0ssLAM13LmYJuAvFlkFhf8/Sr60K3BDrEMvSG12BCmjS1xsHYZoriBJrJ414cNy0UK8h2xNkdo75/H5jYt6WJ/U1wQ17dOrdk7w/z7uG7vcE9DiE1WuJ3qXEEzuh9zrMU7Yf8TclE020rlKF8L0Ir/sFx+a45/dXZlwiy5Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=gMxpHuoD; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-34003f73a05so1683885a91.1
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 08:10:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761577679; x=1762182479; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VFmNRNpiYRbSyKjivx5b46rxwRPMOYECqNZ5ldemnk4=;
-        b=io+ZDnGE8DzB6jBf8IrNiggYJVzU+ivn0hd8no3mx0BSFH6yjcRj7JouWB9s8xRAKQ
-         C/YzB0yf2pSHtm3Jj03nChPY3fxE0JiLvTWhywi2VgAGNfp0dWeLu3RqKmTMebGIx11K
-         mT7VqaadNwiib9D3CSkTbAEqXMQq7fYeUBYFCm1vJ/ry7jOKFqJC52CXdB3pg7LSmr4f
-         KAxLxH+MG7KutQTSuDnNwL+CAf2dCYo1n7nhvdlRx+zXlWUlFPqWQo7WAA4rDyjV8bpC
-         8D72pbUMWY+Vn0qZM9ZkPwlA/JixPDU4ZclKLHnhXyg2fFhHWnGj/7X9jlTnUIRHckCs
-         TKrw==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761577829; x=1762182629; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lyxrirk+6tjDBtbmJu3GhvQyRi0O9TS3VoH7obQDPgI=;
+        b=gMxpHuoD2hh3XbWPT6/x+X7Nn0aswz6FxuHds0Di2p1m7yw9b06r0lvnBrrfXUqOe3
+         TohBVQxsXjn2iQ0nQ2bDylMM5NZOWNaw7BdDA7mqAQb0HT/QZNc10av5+k1EzHB0eBav
+         Np+PdghGztTdayUaE0TEOSO4h1X6DqzdrgMG+t67zgqetKUUoTXAansDv/cc4iaUgFe+
+         QJ/Jyvm0LDzi36vfU5cEkLpZfiheOxP7JYdxNusvuF2Ss9FTIgclH0lZZSK52fV/k8Wu
+         1/y4a6DrLpcJxzg9OcIajME/mI0UJRjkpkK/o6XrTkGmgbIFdJcExtKN6mb+w3npPmD+
+         4tJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761577679; x=1762182479;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VFmNRNpiYRbSyKjivx5b46rxwRPMOYECqNZ5ldemnk4=;
-        b=rsO6akzrIRrsW9Wb29ezFings4qIptZE/36p8MALh7n3HStSYG49vQ3KiY+f9atyDn
-         bfqdqrN6/fUtsHDqzDeu5DGfp0mUrigq+uVG+qYd5/hxeidceCaR+jPgyBkCclQSCj/7
-         d2jG+veDfn8Gv9qanLtPjv8002ATVhnZcd/XHoEwMr6V/gvF9JJRGjXuWrfid929I59L
-         94mT2pcQlZIJgNnmMcvXaikQJQu3SWjtEh/hZVuy12H2C9Vk5IbXJGkZs0M5OofdHcQU
-         Fq0aTubgPTzm6f97RG2yjUuLxqEvJJuFTfkpjKCPzgLjC6Ja+9GPcTD7NIGFlCF01SMN
-         +TgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWKt3/EwT5Ubo3io3oxhI5TjE4ZoRYuTicggqXxkwtSIbMie7AjJScbMA0aWpT/25mnV6EJD4c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNRizn+ucfgJ2jdsRd6VCatgJF1JdWUur8WN7v9cPX55n5AIlZ
-	N2riGUnYBSX5rRZdOtD1ee8Urcqg083v+Gfc3nCyjRer/4tXTdEdB+IXf77r9tlvj6EAsAInCGf
-	bHCQQHyQPg5okaHReRWyKe8A1ckeJAw/0xi/0esxX
-X-Gm-Gg: ASbGncs2uYRgePP6F/1zjrz9AMKNNJfTcELlAobqDnMQNTlfBuqsF3NuJfwTQHrOoiw
-	6kwvoyQUTmVW9fByPMK1afMT0ReCtR8ZNV9L3NhNGc3RMvFXg8TCMwLtc/whbTxfi6NKwhOVYVy
-	HG9pzMXX0o7552qpMBPutOjXpw4lhRht38cV5DQqfYmFPFLMFoTsutww0UkIlPR3ZtXVH6QMdpc
-	SEFP5V8xefgRqFHW7cSPdblyPxcbBp6bzFb3JFJg2O0CZeZzrmqPjKwMNAemmO2Dw5mtVbiB8Ca
-	jUhqMX0c5BuMeL27sA==
-X-Google-Smtp-Source: AGHT+IE/VRXLeFnFj7efFctBux16bp+sFLD27Fv9XqtJYX3+YZY6I8ih1yzTjHgLLfWUWhd+g5Oo5nCtGKvoCiF7y+A=
-X-Received: by 2002:a05:622a:2b05:b0:4b3:1617:e617 with SMTP id
- d75a77b69052e-4ed06efff0cmr823271cf.11.1761577677167; Mon, 27 Oct 2025
- 08:07:57 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761577829; x=1762182629;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lyxrirk+6tjDBtbmJu3GhvQyRi0O9TS3VoH7obQDPgI=;
+        b=xR9OYR+SowoVgK8SpaQvTU0pI48UBbdlwXOr5E/bDNiIDJsRG/tFkX6oa9JZ+fIOht
+         OAPKrFkAs2NBonDKnNrflxQcLvswHmV8SealEXYppZzJ2t3LFo8L8IP5Kq0iEH+2m+KJ
+         DoKt2i2O7l128y2e2y/L/bnO6lLKIsc47KOy7S731ulOlzXft78pOqQyeuBTOwpYfAbL
+         rQnpICwzGrQX3h8wdyapIA/1ix+TtV3YEzNhFIWEwx/Y2ShfaKK3GREsB9E+pd2pTHOP
+         MHKvneTmpmtIp2JcJH6l5R3HlrGOkucMTdS5XIPX8Xw4ZQHSZl2cvKrYTr3aludbArhm
+         tNsw==
+X-Forwarded-Encrypted: i=1; AJvYcCWKtBObdtBI9sW3dstVDXT9GArsZMIqZQusf95+7SCVjh0EBes/8p2f4c5pW3vTeAGpSS3HbHE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3T+GtivkCTEZ+21dR+tafNpxG/JC0jV/7+YF7QQhOFZf0lYjp
+	1H9FD28HphZteYA89CSv4VE/6SH1JSVGWqWM4grPxD5jkjMWIRAcGEKCWR52J1tDZu0=
+X-Gm-Gg: ASbGncsZ34fYoS4Vhtb5ONiMgCP5N4NXjPHB18FdQ4mskjioY1p+kf2MS3iOohMfFoa
+	8v2Pyfn6hmP3dAMa0mRu3JsQmd1mwLiWhJQ4BrImi+W3KRYKy5URTU0iI9Hca9g9SdrqbwJiBEi
+	TbTOtMrUvT7fud9UtnigQR4eq2r7sgI6foQOL/ADRZe9J5HhX48hvGv8D+6j4m4/Cu1pnpbkaAV
+	fsOD+bBKPm1pVZGcM5oeB5hUxpnOXaaceHROeiwC5IjHSKmdykDWircT+l5407v4Qa3tEWfFn/t
+	ibjrkuHKatVqRimd9PD86RcwRGEyrz60gkOFaczfmhjnXiJx0ukEyv1Z9xCv5QTuDJKbsy1Om9P
+	Xyxj/X0mI8RJ5aBIffKBgvrMfKjkpkZmLRkFaUDooOJ2S4nC9xbUYwGSvoVVMkS0Fr00DBBqlnr
+	Esm4Ryw13PnohA2WgXFx4ipNVN7RDwr9sLQTxaLjk=
+X-Google-Smtp-Source: AGHT+IHcidZucLYAPn70DfrrmAT01Hh/eHmgzrlMaLiS7elvN97pNgYPBo5zW7jQaNtOY1fy2mYVig==
+X-Received: by 2002:a17:90b:1c04:b0:330:b9e8:32e3 with SMTP id 98e67ed59e1d1-34025c65a32mr477193a91.12.1761577828748;
+        Mon, 27 Oct 2025 08:10:28 -0700 (PDT)
+Received: from [192.168.86.109] ([136.27.45.11])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33fed73b5bbsm8870070a91.7.2025.10.27.08.10.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Oct 2025 08:10:28 -0700 (PDT)
+Message-ID: <03daf5d3-2019-4fc0-b032-8d24ad61d7c0@davidwei.uk>
+Date: Mon, 27 Oct 2025 08:10:27 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAAVpQUC7qk_1Dj+fuC-wfesHkUMQhNoVdUY9GXo=vYzmJJ1WdA@mail.gmail.com>
- <20251027141542.3746029-1-wokezhong@tencent.com> <20251027141542.3746029-3-wokezhong@tencent.com>
-In-Reply-To: <20251027141542.3746029-3-wokezhong@tencent.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Mon, 27 Oct 2025 11:07:40 -0400
-X-Gm-Features: AWmQ_bm-jSbBd_NCN3Fm-69xCK7y8NSPpwczuYFYDkOIScJKpoudLfKYwGsdrS0
-Message-ID: <CADVnQynj=5GQbwhiFXFe2gWzodH802ijvFk55xgzxLa6ipRoow@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] net/tcp: add packetdrill test for FIN-WAIT-1
- zero-window fix
-To: HaiYang Zhong <wokezhong@gmail.com>
-Cc: kuniyu@google.com, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	wokezhong@tencent.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/3] io_uring/zcrx: share an ifq between rings
+To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+References: <20251026173434.3669748-1-dw@davidwei.uk>
+ <20251026173434.3669748-4-dw@davidwei.uk>
+ <309cb5ce-b19a-47b8-ba82-e75f69fe5bb3@gmail.com>
+ <60f630cf-0057-4675-afcd-2b4e46430a44@gmail.com>
+Content-Language: en-US
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <60f630cf-0057-4675-afcd-2b4e46430a44@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 27, 2025 at 10:15=E2=80=AFAM HaiYang Zhong <wokezhong@gmail.com=
-> wrote:
->
-> Move the packetdrill test to the packetdrill directory and shorten
-> the test duration.
->
-> In the previous packetdrill test script, the long duration was due to
-> presenting the entire zero-window probe backoff process. The test has
-> been modified to only observe the first few packets to shorten the test
-> time while still effectively verifying the fix.
->
-> - Moved test to tools/testing/selftests/net/packetdrill/
-> - Reduced test duration from 360+ seconds to under 4 seconds
->
-> Signed-off-by: HaiYang Zhong <wokezhong@tencent.com>
-> ---
->  .../packetdrill/tcp_fin_wait1_zero_window.pkt | 34 +++++++++++++++++++
->  1 file changed, 34 insertions(+)
->  create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fin_wait1=
-_zero_window.pkt
->
-> diff --git a/tools/testing/selftests/net/packetdrill/tcp_fin_wait1_zero_w=
-indow.pkt b/tools/testing/selftests/net/packetdrill/tcp_fin_wait1_zero_wind=
-ow.pkt
-> new file mode 100644
-> index 000000000000..854ede56e7dd
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/packetdrill/tcp_fin_wait1_zero_window.p=
-kt
-> @@ -0,0 +1,34 @@
-> +// Test for permanent FIN-WAIT-1 state with continuous zero-window adver=
-tisements
-> +// Author: HaiYang Zhong <wokezhong@tencent.com>
-> +
-> +
-> +0.000 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
-> +0.000 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
-> +0.000 bind(3, ..., ...) =3D 0
-> +0.000 listen(3, 1) =3D 0
-> +
-> +0.100 < S 0:0(0) win 65535 <mss 1460>
-> +0.100 > S. 0:0(0) ack 1 <mss 1460>
-> +0.100 < . 1:1(0) ack 1 win 65535
-> +0.100 accept(3, ..., ...) =3D 4
-> +
-> +// Send data to fill receive window
-> +0.200 write(4, ..., 5) =3D 5
-> +0.200 > P. 1:6(5) ack 1
-> +
-> +// Advertise zero-window
-> +0.200 < . 1:1(0) ack 6 win 0
-> +
-> +// Application closes connection, sends FIN (but blocked by zero window)
-> +0.200 close(4) =3D 0
-> +
-> +//Send zero-window probe packet
-> ++0.200 > . 5:5(0) ack 1
-> ++0.400 > . 5:5(0) ack 1
-> ++0.800 > . 5:5(0) ack 1
-> +
-> ++1.000 < . 1:1(0) ack 6 win 0
-> +
-> +// Without fix: This probe won't match - timer was reset, probe will be =
-sent 2.600s after the previous probe
-> +// With fix: This probe matches - exponential backoff continues (1.600s =
-after previous probe)
-> ++0.600~+0.700 > . 5:5(0) ack 1
-> --
+On 2025-10-27 04:47, Pavel Begunkov wrote:
+> On 10/27/25 10:20, Pavel Begunkov wrote:
+>> On 10/26/25 17:34, David Wei wrote:
+>>> Add a way to share an ifq from a src ring that is real i.e. bound to a
+>>> HW RX queue with other rings. This is done by passing a new flag
+>>> IORING_ZCRX_IFQ_REG_SHARE in the registration struct
+>>> io_uring_zcrx_ifq_reg, alongside the fd of the src ring and the ifq id
+>>> to be shared.
+>>>
+>>> To prevent the src ring or ifq from being cleaned up or freed while
+>>> there are still shared ifqs, take the appropriate refs on the src ring
+>>> (ctx->refs) and src ifq (ifq->refs).
+>>>
+>>> Signed-off-by: David Wei <dw@davidwei.uk>
+>>> ---
+>>>   include/uapi/linux/io_uring.h |  4 ++
+>>>   io_uring/zcrx.c               | 74 ++++++++++++++++++++++++++++++++++-
+>>>   2 files changed, 76 insertions(+), 2 deletions(-)
+>>>
+[...]
+>>> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+>>> index 569cc0338acb..7418c959390a 100644
+>>> --- a/io_uring/zcrx.c
+>>> +++ b/io_uring/zcrx.c
+[...]
+>>> @@ -734,6 +797,13 @@ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
+>>>           if (xa_get_mark(&ctx->zcrx_ctxs, index, XA_MARK_0))
+>>>               continue;
+>>> +        /*
+>>> +         * Only shared ifqs want to put ctx->refs on the owning ifq
+>>> +         * ring. This matches the get in io_share_zcrx_ifq().
+>>> +         */
+>>> +        if (ctx != ifq->ctx)
+>>> +            percpu_ref_put(&ifq->ctx->refs);
+>>
+>> After you put this and ifq->refs below down, the zcrx object can get
+>> destroyed, but this ctx might still have requests using the object.
+>> Waiting on ctx refs would ensure requests are killed, but that'd
+>> create a cycle.
+> 
+> Another concerning part is long term cross ctx referencing,
+> which is even worse than pp locking it up. I mentioned
+> that it'd be great to reverse the refcounting relation,
+> but that'd also need additional ground work to break
+> dependencies.
 
-Thanks for this test!
+Yeah, Jens said the same. I did refactoring to break the dep, so now
+rings take refs on ifqs that have an independent lifetime.
+io_shutdown_zcrx_ifqs() is gone, and all cleanup is done after ctx->refs
+drops to 0 in io_unregister_zcrx_ifqs(). From each ring's perspective,
+the ifq remains alive until all of its requests are done, and the last
+ring frees the ifq. I'll send it a bit later today.
 
-Kuniyuki rightly raised a concern about the test execution time.
-
-But IMHO it was very nice that the original version of the test
-verified that the connection would eventually be timed out. With this
-shorter version of the test, AFAICT the test does not verify that the
-connection actually times out eventually.
-
-Perhaps if we tune the timeout settings we can achieve both (a) fast
-execution (say, less than 10 secs?), and (b) verify that the
-connection does time out?
-
-Perhaps you can try:
-
-+ setting net.ipv4.tcp_orphan_retries to something small, like 3 or 4
-(instead of the default of 0, which dynamically sets the retry count
-to 8 in tcp_orphan_retries())
-
-+ setting net.ipv4.tcp_rto_max_ms to something small, like 5000
-(instead of the default of 120000, aka 120 secs)
-
-Another thought: the original test injected a lot of extra rwin=3D0 ACKs
-that AFAICT a real remote peer would not have sent. IMHO it's better
-to keep the test simpler and more realistic by not having the test
-inject those extra rwin=3D0 ACKs.
-
-Thanks,
-neal
 
