@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-233100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39FF2C0C499
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 09:24:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC9BC0C49C
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 09:25:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE90F19A08C5
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 08:25:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A82119A09DA
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 08:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C382E7BC0;
-	Mon, 27 Oct 2025 08:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5E72E7F11;
+	Mon, 27 Oct 2025 08:24:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RMl6mCzR"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="bN11CMRy"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010070.outbound.protection.outlook.com [52.101.193.70])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010014.outbound.protection.outlook.com [52.101.56.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F93B2E7641
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 08:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641062E7BA7
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 08:24:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.14
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761553491; cv=fail; b=OtHzI24CJd7hWlk+hcDnOl3dpcceCNbogub/y4D2cqa9tQOE+NQXrmH7RfBpkrEBTRwsnuyYLo2tTxmPorz2WQlwZ/PHlvW/l6sSzRqynm1jRwbcCtHT/4vLhhjApc4GG4HKRwm/zuL6iDz7WBZU9IPvOMPK2KngeWcpRSFhEnk=
+	t=1761553493; cv=fail; b=f2HlF27iuVXiFNDGbZQ2uDrF4uvg+ltFrqeTKYpoMjRmEintmsQovq/N0jUpJcIoe2qz3XgXgZQasIE+WxK/Ldu6ttnA/tpOqnedDo2hIGEZDRqGOeEE99Wi7rQByIUaMhULfJNFaUR1YTz8sVtVgJPPTIo6Fusqd3edPaPnZ6Y=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761553491; c=relaxed/simple;
-	bh=abLvuMj3F9tK7q4nMyCvdDSPPsu/A6jyK5wwUw7qV6Q=;
+	s=arc-20240116; t=1761553493; c=relaxed/simple;
+	bh=wYegj+OGnw+pvx68izjKqQBHLW13xVm49DPgjmRBQ3o=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ddgWAqLLpYZmNduDH5sCVqKQHjsGA8k+MyT42rQGHLziMcJFruNShPm9epaBxbpinzYLdnYrGTPb5w++Mvfdi9i7fGf77B7Mp2W+q48unbIHqBSbmBWomuUTiffFJOl/X9/BsHxVhR5LeLF4esxwaedMnmW9jzKE8wzyFNSPAAA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RMl6mCzR; arc=fail smtp.client-ip=52.101.193.70
+	 MIME-Version:Content-Type; b=dhiIVQVNB6OsLrwkCpsZOWCWBWbjHe+tLXR633dLeSIa9EPTBLwPggtgRS8zNLE89nzd8Oi3BpAOF6j7PAZl5Hsbg6nSeXIxNSebpCH+ldgBDYm7uRXEZeMwYmalk7TJL1F3ewM7FjKJDiQVEbWvD30ypVWkY7bl38gReXwpuJg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bN11CMRy; arc=fail smtp.client-ip=52.101.56.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lIvaIGLLuUYJx5+uL33dYUQNHUlsbCzTuzHNN1Sz5e5G7t9KyBR9lK1qrGbPOjh75Mz8FbPSOmvIxICKmE2Yi3Ce4wo5yuiRakgfIl2GXgjLh6CKfP8+qF8OqdAwdagxKXHu2D6ANWJiCIfI2yA76HzwjFTa/5zWlBDDEr90atVHwr7DjYg+T0GfCgCsyIiIpX8dklOsGL8Gan0L0s5Zz994l/cPx6fEBmyrlZKAhxvj6CtjkJfc+0P08K2M4cc2R2of/hY/OAii7J31UrvmCu9EUhHEJ5eQkbsZJ2yuCLKaLoXSjzUeH2Dxsivk6reUbBQlFMgVnxX5E3cdiXH0vA==
+ b=ItWwa/sG6gzBB4NVB62n0+jixNjVA98Suv44SzEZjUJ95DSkL7wGfthKtbJ/Btw9WGkvmmldeGtzp6bxccF5cyj1ZYRO/toMpmyoeMsVhykSQ3z41EYdLNgOz56pXIdNsTz1VB5s0/ZaQvtnfp2QX3mJ1vXHQhFU1b/SjIzGnxviUjfm+xDSNGn0CEUJivVEuFeaYahNvUdO1kVMFzYhN9d6E4UXXSC6gJ/9cMd7VO3mdM9WwCHn/1On4g35XzXTjp2KE4b0BTJ2HIXV8oBv8oo1t/P8pPAbyAQsVz5mO2k2fRX7X11xrMxk4eN4QYjPPHa5nQFZN+K0740WJctcog==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Vy66yZoqMwlQqgDwHio4osfBngWLEAAwyekFXvpNtBA=;
- b=S+APg8Z9Yiec5zFGPzeNokPIEyrCn23JJz5Ulf/gHWJXB+L18Zg8yLgj2OgN7JwkgSjMZW0r04yQfMTQHLF1Vco4NqXtKJyI6ZClZQPY0tJRqxYhCiKfxUoU/KrrHtey1LBopw9MSTUKUzewbcImCSissftLKgpYTpoYRTYeXY+Ywqva6r3P+zNnqhEHIlmPrfCkD4qbuyUdeXQI/jyG+HXpvNL2CVI8Hmr6MUWnu+OMu0u5rvKwEx+PwiBjVaIeGpKOWgpCg+8UAskJapzeW//b26hnb3vCrbQFDfL1sxWrjtdC2VOp0od0ubF3yap2yuyM53ZczImDKF+5SffpwA==
+ bh=EPr0pYiAcUIL9DMbN1806tof6O0L+Shk62VcYP90fmE=;
+ b=qFs9211+rKIJ9gOvwmi3UV6vOF5+zNlS6CmiM5AXxW2N3Ou54VAolNV/DI3US/io3iIP/oUkodg4OA8FBHbHFPZhYhyxWjGMnTDcwrMwK75ndUL0WM04RDQpsO+nO5BORBmgi6qKY0wsQVyXAawVpfS6zpX4KifH5OKWBB4qkGe67FmXjn+K623TD3KC+hL4kL6uzEYpeaHmJM95BTQSoFcdYpxaWgAK7YHvHjnnVb1y1YuUxtkyNl7gZdSOiDuZUeR1AL4Vsp7jUF9rTCzbwmUz8fDLHuLSHrteh1NlBdWULeb+fdgR/Z+bHjT0z1XV8RX4h/IPAeRWBVZ8F6P99w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vy66yZoqMwlQqgDwHio4osfBngWLEAAwyekFXvpNtBA=;
- b=RMl6mCzRMf9rNeNj7+PzTwv19wAdEoOYIEqKqo5PTIoOBcud+6EreNG38NqBjPK3wSssMB6GEDAiNDd0MoaMDtzyTfSLboy1aPxCf4GQoMBLAzmvw/wW5H7uMIj1a5Rr7HmpmL7KoLl2MpJvQxkyLgkH2f/mg0HdBcbvQOeNGNl74IbBFT8+XS9HpfqAf9GWzs8SZznNxZsBjlUZWX7ARPVTcf5oe+LgCUd71JZ23vpR2rI979I7PYyyr8ueI7fGAPU9yLAOvBsHZgYdtyDY/AwM26mb3L5n3b2lkEtvw03JWmTnjzBM0NOhqxkhuaRQVmAst9wz1dkpmb8M6jliVg==
-Received: from BY3PR05CA0022.namprd05.prod.outlook.com (2603:10b6:a03:254::27)
- by IA0PR12MB7750.namprd12.prod.outlook.com (2603:10b6:208:431::16) with
+ bh=EPr0pYiAcUIL9DMbN1806tof6O0L+Shk62VcYP90fmE=;
+ b=bN11CMRyqOIkoTLstXOk9Lit2K0N9ljqPlxb4XPN5B7oQyuO06t1fzJaLaiKoWrvrsLdaRA8WUGUSbnWtgeg9Z2E2NV2zuJIqWd46Qg3j5uwf1qzF2ZkrVN7OUA7CxVmXyBKsg4bkk4x5pi6xBE6dYyLqpNa2Dn47PGDOB/k5c5YCubIevmv5ZomQKSVGRJRv0BOdt0zKrDQZtilblXtOBVzN1mQGIY+pYSpE7nrfB5ZOCjTmhA+J4tB81h6BMehR7S6JLfqGiq2CIdmRELmQwSvWCCo0E8JaAYlRABAznkGBDiZC7h6ceAJQtKdJcZOd2eA9qnEJ9pNb9evVS+wOQ==
+Received: from BYAPR04CA0006.namprd04.prod.outlook.com (2603:10b6:a03:40::19)
+ by CH2PR12MB9542.namprd12.prod.outlook.com (2603:10b6:610:27d::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.18; Mon, 27 Oct
- 2025 08:24:38 +0000
-Received: from SJ1PEPF00001CEA.namprd03.prod.outlook.com
- (2603:10b6:a03:254:cafe::e2) by BY3PR05CA0022.outlook.office365.com
- (2603:10b6:a03:254::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9275.9 via Frontend Transport; Mon,
- 27 Oct 2025 08:24:37 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.17; Mon, 27 Oct
+ 2025 08:24:43 +0000
+Received: from SJ1PEPF00001CEB.namprd03.prod.outlook.com
+ (2603:10b6:a03:40:cafe::aa) by BYAPR04CA0006.outlook.office365.com
+ (2603:10b6:a03:40::19) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9253.18 via Frontend Transport; Mon,
+ 27 Oct 2025 08:24:43 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,17 +64,17 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- SJ1PEPF00001CEA.mail.protection.outlook.com (10.167.242.26) with Microsoft
+ SJ1PEPF00001CEB.mail.protection.outlook.com (10.167.242.27) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9275.10 via Frontend Transport; Mon, 27 Oct 2025 08:24:37 +0000
+ 15.20.9275.10 via Frontend Transport; Mon, 27 Oct 2025 08:24:43 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 27 Oct
- 2025 01:24:22 -0700
+ 2025 01:24:27 -0700
 Received: from shredder.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 27 Oct
- 2025 01:24:18 -0700
+ 2025 01:24:22 -0700
 From: Ido Schimmel <idosch@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
@@ -82,9 +82,9 @@ CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<petrm@nvidia.com>, <willemb@google.com>, <daniel@iogearbox.net>,
 	<fw@strlen.de>, <ishaangandhi@gmail.com>, <rbonica@juniper.net>,
 	<tom@herbertland.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next v2 1/3] ipv4: icmp: Add RFC 5837 support
-Date: Mon, 27 Oct 2025 10:22:30 +0200
-Message-ID: <20251027082232.232571-2-idosch@nvidia.com>
+Subject: [PATCH net-next v2 2/3] ipv6: icmp: Add RFC 5837 support
+Date: Mon, 27 Oct 2025 10:22:31 +0200
+Message-ID: <20251027082232.232571-3-idosch@nvidia.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251027082232.232571-1-idosch@nvidia.com>
 References: <20251027082232.232571-1-idosch@nvidia.com>
@@ -100,66 +100,66 @@ X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CEA:EE_|IA0PR12MB7750:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1582d5cb-5ca3-44fe-cef9-08de153244b7
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CEB:EE_|CH2PR12MB9542:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4b762301-dd36-4472-520a-08de15324806
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026|7416014;
+	BCL:0;ARA:13230040|82310400026|376014|7416014|1800799024|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?9ZlHxnUTvp5Lzdp8AXeEZWZQt8aKqwfbsZ3nRVCePAhfHxseoD92PGjxSEBv?=
- =?us-ascii?Q?HQDX2cUWwOOdgUJWm5tz22VYoUDZ/21MOBbm8NhMnX9OG8RSjzksA6/it5Pf?=
- =?us-ascii?Q?Mz2aQ/LU8mTiF1/lIW86p0ekKIuHGubMBxCUjGjU83uoLZgZoDujXR14GuFh?=
- =?us-ascii?Q?w5IBRKYEUi06qeXUcHkgrWHEqIkLWuiO+maH8HY96eBtcbcyo1B+nkHVfkQn?=
- =?us-ascii?Q?8/5fkhb1HYSuC3IYE3/TDSbizsN5pn3M+7WkUlo7Nf8up8a6leJNctOtyDqq?=
- =?us-ascii?Q?NHixmif2+BzdyTST8irAQTrApKnKs2qB2TNAcCv45fcmhNoTkcEey0h406SG?=
- =?us-ascii?Q?93unPaMuUeXLP6dpM5Z78RIHY+NdKDmiCf/wJ07o6EHXjfVWHvUNEK5aauTq?=
- =?us-ascii?Q?8Ms1/vALkVK2/lpVPLl48RHYWj7uEEzDUYoTK9S7Ax2CSe0RSp4aRuiBcgqN?=
- =?us-ascii?Q?o5KfNyfPlwyQ/XO5XrPTtO2bxVMBHgiNQN4N1tl235Gow0hYB234XvGUA00b?=
- =?us-ascii?Q?UfYXWyq02Kxk508+y2ozFKqFTM0SpJXQrlxxIilYk4orWWbi+Vh/+ZVTLE1V?=
- =?us-ascii?Q?UcXSnChcCdFnc3zXlOTFCC6W8M2NyP43a8Ioyc8jukbM3LJmACONtFC+cor8?=
- =?us-ascii?Q?OFsdtwgFTXnpTWzW9ZpxC3G798+oY0hSJ/j5rtxMAetaUTFjDESSroukJyB9?=
- =?us-ascii?Q?NbGSFYUWyNGGjmfq9CMrEbqqO5o5T9o+NF//EXrKGDzEUvjIVXpmnqoY8dRd?=
- =?us-ascii?Q?S/xbroIoLrAa8N6dGJeiUDLB/JgvqGIOZdQ6sj4MWh6hSs4xgKQ5UaMZgHX3?=
- =?us-ascii?Q?jDpRdIuSA3J0HIluiq3e8OS97/qXqLJivof3cT3FZcBJi56KsNhdQUy7qjJ7?=
- =?us-ascii?Q?s7K4x8+SdFBF1IDVGLtpej38qAgSfTiM0WYK9JgxUTkP3Dh+T5SbzvF+zoWa?=
- =?us-ascii?Q?ZbW71Wo0FVgJzWUUKpjmSDbMkXWo0zx8rKCT9DcmxUJKkNwP+lAmfoA7c3pg?=
- =?us-ascii?Q?+HgxIlMrkIyMg7b5B721KMH4xrjKNFB1FTBzDQn4M/0aFcTir382mMYIPrdp?=
- =?us-ascii?Q?4N4CBme8+/CBsmtciIUuqQpknmhWT9HAM9Va+J9D9tjWtxbJaTUF8SmdpKi1?=
- =?us-ascii?Q?UgK6+pA/ow5edoKEwt7YxiLMhhIdwK3r80B15PIrtAeYT23H8txz2qb1K/bJ?=
- =?us-ascii?Q?WftG2DHrxPF+QgJvHGJvsrQo2xRMDHOLW/fPRMLFvcVHo8JqGhrv1usy34Ux?=
- =?us-ascii?Q?dSechdXHfW7nKIsT/U0OE3M8RbUkXtk1si09ODtCAqKPuG3bqZ0SnO3yGzAu?=
- =?us-ascii?Q?zbMQoEIaNVJItoKUAKnNE+nT4DjGvh4rrtP/8yKthDAJLofIqMqC9PFO3Dsm?=
- =?us-ascii?Q?yeDVZ+/dn6svHU6leLlwnYNDwDBHclnBWWQ6KFfjU6zf8n24s3apKvpo/mQH?=
- =?us-ascii?Q?ibFLVzqG6fsmeSCK6Y+DXd4F0BVlbEnx5bBY/5lTARlHc1b0WemlpmgS1bRF?=
- =?us-ascii?Q?87w1NFtiwy76QIvcBXBwdyVtJuSiXRhiDBRJA1CTti5KTyNMP3XQ0gVQMWJG?=
- =?us-ascii?Q?ASP9/Jq6yzBn1XH2ypk=3D?=
+	=?us-ascii?Q?OxZ9BdMbAaiGJdqCmQWFZAXFy2P1eAv3pHJamt01EfMI4R7pjPWJNFsSSGFa?=
+ =?us-ascii?Q?e+euS1ztxwKtacDvuESXji+/HSkmi6z8KEgxFoXhH9m4lcxnuS/pshf1gzaa?=
+ =?us-ascii?Q?xAYok3t0pG0XNLf09+E0AewPSHg//J7cn0D+N9MprfjvvPmed4K7vPMJojkp?=
+ =?us-ascii?Q?x9fXuvYreVdrFs2l57y5ROJlVRjuiAOH/nnHDg8oObrb6CpRXEBsLcShWzQQ?=
+ =?us-ascii?Q?H5BqisT6wXqBj2DrYt+ilTIl6WR8HUr+CB1c7IApStdfskE1aLTePk7yic6R?=
+ =?us-ascii?Q?YVltP+AbtGhGXLOAwM48qRmioj1V05qPJg94OCk8ATpEhk617t8G4Alz3PkK?=
+ =?us-ascii?Q?Di0VcbuNbYRZN5FM9qweBDshyEpYts5UsMIZ1sjDDApNAu4Zs5224IjhFL3j?=
+ =?us-ascii?Q?9QKaZYRiA0eHIVC6ioz/YwKseFcUcYphrZak+CCNIxI7Sh6lHm50W6Jekz5D?=
+ =?us-ascii?Q?npNoFWE7YoM4r1xiWGbo7LszZX3le6/T+lFdYYxP2ofw/mZuRcz89To7jTlv?=
+ =?us-ascii?Q?LeEhxtRCLXX/Mz28oIMskh21aoVgM6Jr3d5uL3Yv99/HGN36E3IaJjhtI3mh?=
+ =?us-ascii?Q?F4F8erJeRssKrGl1tw9qqpp6RdbnJWpDbkPC6Vc/2FJWZBpuHICL2IacBpQ3?=
+ =?us-ascii?Q?ckiFQSIt+6gVxRo0/Mlajniq50TPaSUEs/8fgF12VRfwyIrIs0ETWl3pTXyW?=
+ =?us-ascii?Q?Z11wD8qdgoi/5y/O6+kzGCpDfE8zM/GgPPWNl0vrljDv/AoDd95wBoTckoDu?=
+ =?us-ascii?Q?sxzxU/SR2q8XFe3fUvRvXRy0kcTGIYtp05bvDlw0og0lMDKIoNKyILCqShZX?=
+ =?us-ascii?Q?RvbYi4cmc4wSCng7q1aJBAKVDdkjArvtlQ/V+lARzsOpbW8wmCuDeKEm3Y41?=
+ =?us-ascii?Q?lxGFvGsWcvM+U5hFPIfXo/jx0gBQKrXqcStrl41u+H04p/Rukj0/hwZIU1q1?=
+ =?us-ascii?Q?5jE3cNjtwmJMtgyoXzqnRwjgYQCVb5LO21sir7ZIEjX5yRQz9iwdELIKj8W6?=
+ =?us-ascii?Q?XjKhrYn3k5OgHgunsIxhi4uOD7D0U+yiWZq7ZiQH+b++xBvPNa58Hu9Horzj?=
+ =?us-ascii?Q?Pu+hMWFQEjhI1FIZ/8zlX/2jCm3ZsXACGH+VRUzyRZAKRLlWZ3bBN0Qp53rU?=
+ =?us-ascii?Q?rT7mhxaAv/IGUtL++Zy736thnBQGOtcDkJh3pzPZbCIMFyBbaINBDE8Ky8oX?=
+ =?us-ascii?Q?ftJde7O4L+tF7xAkklwGE3lplbIRQb7nvapU/v5OQMWpw9BuOUdjOGE4Dm/y?=
+ =?us-ascii?Q?L0Z/N1UG8EzTmvudTnpcvwPV0lRiP+mctPI3efe7C4p8bhQWDIgkTzdDrMEC?=
+ =?us-ascii?Q?GU+xqY6mCrt54ppOmB8vRdiYtcnr/5ijW+52e+qITENJZlgt4EPFlfZ9ZAdF?=
+ =?us-ascii?Q?TBLKrVRLB4QrooQsWKTkiFsvngPZSRseJFFt1Er9kaxs5JHsHZe8M8RdvZxF?=
+ =?us-ascii?Q?aLdHYzCA9IMfuAUGhGpf04h8+VrA+PSWayK9BUWImbTviP94gItgZ8w6Oaw8?=
+ =?us-ascii?Q?eFUejIqvDEJ1r6tn2Dh55Bncwnp020MVTIUvAna9hm8pOyhSQhG1vluw0W0+?=
+ =?us-ascii?Q?HQB8S6gCMSfFThTeK/Y=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026)(7416014);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(7416014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2025 08:24:37.7071
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2025 08:24:43.2832
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1582d5cb-5ca3-44fe-cef9-08de153244b7
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4b762301-dd36-4472-520a-08de15324806
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CEA.namprd03.prod.outlook.com
+	SJ1PEPF00001CEB.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7750
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB9542
 
 Add the ability to append the incoming IP interface information to
-ICMPv4 error messages in accordance with RFC 5837 and RFC 4884. This is
+ICMPv6 error messages in accordance with RFC 5837 and RFC 4884. This is
 required for more meaningful traceroute results in unnumbered networks.
 
 The feature is disabled by default and controlled via a new sysctl
-("net.ipv4.icmp_errors_extension_mask") which accepts a bitmask of ICMP
+("net.ipv6.icmp.errors_extension_mask") which accepts a bitmask of ICMP
 extensions to append to ICMP error messages. Currently, only a single
 value is supported, but the interface and the implementation should be
 able to support more extensions, if needed.
 
 Clone the skb and copy the relevant data portions before modifying the
-skb as the caller of __icmp_send() still owns the skb after the function
+skb as the caller of icmp6_send() still owns the skb after the function
 returns. This should be fine since by default ICMP error messages are
 rate limited to 1000 per second and no more than 1 per second per
 specific host.
@@ -168,6 +168,19 @@ Trim or pad the packet to 128 bytes before appending the ICMP extension
 structure in order to be compatible with legacy applications that assume
 that the ICMP extension structure always starts at this offset (the
 minimum length specified by RFC 4884).
+
+Since commit 20e1954fe238 ("ipv6: RFC 4884 partial support for SIT/GRE
+tunnels") it is possible for icmp6_send() to be called with an skb that
+already contains ICMP extensions. This can happen when we receive an
+ICMPv4 message with extensions from a tunnel and translate it to an
+ICMPv6 message towards an IPv6 host in the overlay network. I could not
+find an RFC that supports this behavior, but it makes sense to not
+overwrite the original extensions that were appended to the packet.
+Therefore, avoid appending extensions if the length field in the
+provided ICMPv6 header is already filled.
+
+Export netdev_copy_name() using EXPORT_IPV6_MOD_GPL() to make it
+available to IPv6 when it is built as a module.
 
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 Reviewed-by: David Ahern <dsahern@kernel.org>
@@ -179,115 +192,98 @@ Notes:
     v2:
     * Add a comment about field ordering.
 
- Documentation/networking/ip-sysctl.rst |  17 +++
- include/linux/icmp.h                   |  32 +++++
- include/net/netns/ipv4.h               |   1 +
- net/ipv4/icmp.c                        | 191 ++++++++++++++++++++++++-
- net/ipv4/sysctl_net_ipv4.c             |  11 ++
- 5 files changed, 251 insertions(+), 1 deletion(-)
+ Documentation/networking/ip-sysctl.rst |  17 ++
+ include/net/netns/ipv6.h               |   1 +
+ net/core/dev.c                         |   1 +
+ net/ipv6/af_inet6.c                    |   1 +
+ net/ipv6/icmp.c                        | 214 ++++++++++++++++++++++++-
+ 5 files changed, 232 insertions(+), 2 deletions(-)
 
 diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index a06cb99d66dc..ece1187ba0f1 100644
+index ece1187ba0f1..7cd35bfd39e6 100644
 --- a/Documentation/networking/ip-sysctl.rst
 +++ b/Documentation/networking/ip-sysctl.rst
-@@ -1796,6 +1796,23 @@ icmp_errors_use_inbound_ifaddr - BOOLEAN
+@@ -3279,6 +3279,23 @@ error_anycast_as_unicast - BOOLEAN
  
  	Default: 0 (disabled)
  
-+icmp_errors_extension_mask - UNSIGNED INTEGER
-+	Bitmask of ICMP extensions to append to ICMPv4 error messages
-+	("Destination Unreachable", "Time Exceeded" and "Parameter Problem").
-+	The original datagram is trimmed / padded to 128 bytes in order to be
-+	compatible with applications that do not comply with RFC 4884.
++errors_extension_mask - UNSIGNED INTEGER
++	Bitmask of ICMP extensions to append to ICMPv6 error messages
++	("Destination Unreachable" and "Time Exceeded"). The original datagram
++	is trimmed / padded to 128 bytes in order to be compatible with
++	applications that do not comply with RFC 4884.
 +
 +	Possible extensions are:
 +
 +	==== ==============================================================
 +	0x01 Incoming IP interface information according to RFC 5837.
-+	     Extension will include the index, IPv4 address (if present),
++	     Extension will include the index, IPv6 address (if present),
 +	     name and MTU of the IP interface that received the datagram
 +	     which elicited the ICMP error.
 +	==== ==============================================================
 +
 +	Default: 0x00 (no extensions)
 +
- igmp_max_memberships - INTEGER
- 	Change the maximum number of multicast groups we can subscribe to.
- 	Default: 20
-diff --git a/include/linux/icmp.h b/include/linux/icmp.h
-index 0af4d210ee31..043ec5d9c882 100644
---- a/include/linux/icmp.h
-+++ b/include/linux/icmp.h
-@@ -40,4 +40,36 @@ void ip_icmp_error_rfc4884(const struct sk_buff *skb,
- 			   struct sock_ee_data_rfc4884 *out,
- 			   int thlen, int off);
+ xfrm6_gc_thresh - INTEGER
+ 	(Obsolete since linux-4.14)
+ 	The threshold at which we will start garbage collecting for IPv6
+diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
+index 47dc70d8100a..08d2ecc96e2b 100644
+--- a/include/net/netns/ipv6.h
++++ b/include/net/netns/ipv6.h
+@@ -56,6 +56,7 @@ struct netns_sysctl_ipv6 {
+ 	u8 skip_notify_on_dev_down;
+ 	u8 fib_notify_on_flag_change;
+ 	u8 icmpv6_error_anycast_as_unicast;
++	u8 icmpv6_errors_extension_mask;
+ };
  
-+/* RFC 4884 */
-+#define ICMP_EXT_ORIG_DGRAM_MIN_LEN	128
-+#define ICMP_EXT_VERSION_2		2
-+
-+/* ICMP Extension Object Classes */
-+#define ICMP_EXT_OBJ_CLASS_IIO		2	/* RFC 5837 */
-+
-+/* Interface Information Object - RFC 5837 */
-+enum {
-+	ICMP_EXT_CTYPE_IIO_ROLE_IIF,
-+};
-+
-+#define ICMP_EXT_CTYPE_IIO_ROLE(ROLE)	((ROLE) << 6)
-+#define ICMP_EXT_CTYPE_IIO_MTU		BIT(0)
-+#define ICMP_EXT_CTYPE_IIO_NAME		BIT(1)
-+#define ICMP_EXT_CTYPE_IIO_IPADDR	BIT(2)
-+#define ICMP_EXT_CTYPE_IIO_IFINDEX	BIT(3)
-+
-+struct icmp_ext_iio_name_subobj {
-+	u8 len;
-+	char name[IFNAMSIZ];
-+};
-+
-+enum {
-+	/* RFC 5837 - Incoming IP Interface Role */
-+	ICMP_ERR_EXT_IIO_IIF,
-+	/* Add new constants above. Used by "icmp_errors_extension_mask"
-+	 * sysctl.
-+	 */
-+	ICMP_ERR_EXT_COUNT,
-+};
-+
- #endif	/* _LINUX_ICMP_H */
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index 34eb3aecb3f2..0e96c90e56c6 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -135,6 +135,7 @@ struct netns_ipv4 {
- 	u8 sysctl_icmp_echo_ignore_broadcasts;
- 	u8 sysctl_icmp_ignore_bogus_error_responses;
- 	u8 sysctl_icmp_errors_use_inbound_ifaddr;
-+	u8 sysctl_icmp_errors_extension_mask;
- 	int sysctl_icmp_ratelimit;
- 	int sysctl_icmp_ratemask;
- 	int sysctl_icmp_msgs_per_sec;
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index 1b7fb5d935ed..4abbec2f47ef 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -582,6 +582,185 @@ static struct rtable *icmp_route_lookup(struct net *net, struct flowi4 *fl4,
- 	return ERR_PTR(err);
+ struct netns_ipv6 {
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 378c2d010faf..e6cc0fbc5e2a 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1163,6 +1163,7 @@ void netdev_copy_name(struct net_device *dev, char *name)
+ 		strscpy(name, dev->name, IFNAMSIZ);
+ 	} while (read_seqretry(&netdev_rename_lock, seq));
+ }
++EXPORT_IPV6_MOD_GPL(netdev_copy_name);
+ 
+ /**
+  *	netdev_get_name - get a netdevice name, knowing its ifindex.
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index 1b0314644e0c..44d7de1eec4f 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -960,6 +960,7 @@ static int __net_init inet6_net_init(struct net *net)
+ 	net->ipv6.sysctl.icmpv6_echo_ignore_multicast = 0;
+ 	net->ipv6.sysctl.icmpv6_echo_ignore_anycast = 0;
+ 	net->ipv6.sysctl.icmpv6_error_anycast_as_unicast = 0;
++	net->ipv6.sysctl.icmpv6_errors_extension_mask = 0;
+ 
+ 	/* By default, rate limit error messages.
+ 	 * Except for pmtu discovery, it would break it.
+diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
+index 56c974cf75d1..5d2f90babaa5 100644
+--- a/net/ipv6/icmp.c
++++ b/net/ipv6/icmp.c
+@@ -444,6 +444,193 @@ static int icmp6_iif(const struct sk_buff *skb)
+ 	return icmp6_dev(skb)->ifindex;
  }
  
-+struct icmp_ext_iio_addr4_subobj {
++struct icmp6_ext_iio_addr6_subobj {
 +	__be16 afi;
 +	__be16 reserved;
-+	__be32 addr4;
++	struct in6_addr addr6;
 +};
 +
-+static unsigned int icmp_ext_iio_len(void)
++static unsigned int icmp6_ext_iio_len(void)
 +{
 +	return sizeof(struct icmp_extobj_hdr) +
 +		/* ifIndex */
 +		sizeof(__be32) +
 +		/* Interface Address Sub-Object */
-+		sizeof(struct icmp_ext_iio_addr4_subobj) +
++		sizeof(struct icmp6_ext_iio_addr6_subobj) +
 +		/* Interface Name Sub-Object. Length must be a multiple of 4
 +		 * bytes.
 +		 */
@@ -296,48 +292,49 @@ index 1b7fb5d935ed..4abbec2f47ef 100644
 +		sizeof(__be32);
 +}
 +
-+static unsigned int icmp_ext_max_len(u8 ext_objs)
++static unsigned int icmp6_ext_max_len(u8 ext_objs)
 +{
 +	unsigned int ext_max_len;
 +
 +	ext_max_len = sizeof(struct icmp_ext_hdr);
 +
 +	if (ext_objs & BIT(ICMP_ERR_EXT_IIO_IIF))
-+		ext_max_len += icmp_ext_iio_len();
++		ext_max_len += icmp6_ext_iio_len();
 +
 +	return ext_max_len;
 +}
 +
-+static __be32 icmp_ext_iio_addr4_find(const struct net_device *dev)
++static struct in6_addr *icmp6_ext_iio_addr6_find(const struct net_device *dev)
 +{
-+	struct in_device *in_dev;
-+	struct in_ifaddr *ifa;
++	struct inet6_dev *in6_dev;
++	struct inet6_ifaddr *ifa;
 +
-+	in_dev = __in_dev_get_rcu(dev);
-+	if (!in_dev)
-+		return 0;
++	in6_dev = __in6_dev_get(dev);
++	if (!in6_dev)
++		return NULL;
 +
 +	/* It is unclear from RFC 5837 which IP address should be chosen, but
 +	 * it makes sense to choose a global unicast address.
 +	 */
-+	in_dev_for_each_ifa_rcu(ifa, in_dev) {
-+		if (READ_ONCE(ifa->ifa_flags) & IFA_F_SECONDARY)
++	list_for_each_entry_rcu(ifa, &in6_dev->addr_list, if_list) {
++		if (ifa->flags & (IFA_F_TENTATIVE | IFA_F_DADFAILED))
 +			continue;
-+		if (ifa->ifa_scope != RT_SCOPE_UNIVERSE ||
-+		    ipv4_is_multicast(ifa->ifa_address))
++		if (ipv6_addr_type(&ifa->addr) != IPV6_ADDR_UNICAST ||
++		    ipv6_addr_src_scope(&ifa->addr) != IPV6_ADDR_SCOPE_GLOBAL)
 +			continue;
-+		return ifa->ifa_address;
++		return &ifa->addr;
 +	}
 +
-+	return 0;
++	return NULL;
 +}
 +
-+static void icmp_ext_iio_iif_append(struct net *net, struct sk_buff *skb,
-+				    int iif)
++static void icmp6_ext_iio_iif_append(struct net *net, struct sk_buff *skb,
++				     int iif)
 +{
 +	struct icmp_ext_iio_name_subobj *name_subobj;
 +	struct icmp_extobj_hdr *objh;
 +	struct net_device *dev;
++	struct in6_addr *addr6;
 +	__be32 data;
 +
 +	if (!iif)
@@ -358,13 +355,13 @@ index 1b7fb5d935ed..4abbec2f47ef 100644
 +	if (!dev)
 +		goto out;
 +
-+	data = icmp_ext_iio_addr4_find(dev);
-+	if (data) {
-+		struct icmp_ext_iio_addr4_subobj *addr4_subobj;
++	addr6 = icmp6_ext_iio_addr6_find(dev);
++	if (addr6) {
++		struct icmp6_ext_iio_addr6_subobj *addr6_subobj;
 +
-+		addr4_subobj = skb_put_zero(skb, sizeof(*addr4_subobj));
-+		addr4_subobj->afi = htons(ICMP_AFI_IP);
-+		addr4_subobj->addr4 = data;
++		addr6_subobj = skb_put_zero(skb, sizeof(*addr6_subobj));
++		addr6_subobj->afi = htons(ICMP_AFI_IP6);
++		addr6_subobj->addr6 = *addr6;
 +		objh->class_type |= ICMP_EXT_CTYPE_IIO_IPADDR;
 +	}
 +
@@ -382,16 +379,16 @@ index 1b7fb5d935ed..4abbec2f47ef 100644
 +	objh->length = htons(skb_tail_pointer(skb) - (unsigned char *)objh);
 +}
 +
-+static void icmp_ext_objs_append(struct net *net, struct sk_buff *skb,
-+				 u8 ext_objs, int iif)
++static void icmp6_ext_objs_append(struct net *net, struct sk_buff *skb,
++				  u8 ext_objs, int iif)
 +{
 +	if (ext_objs & BIT(ICMP_ERR_EXT_IIO_IIF))
-+		icmp_ext_iio_iif_append(net, skb, iif);
++		icmp6_ext_iio_iif_append(net, skb, iif);
 +}
 +
 +static struct sk_buff *
-+icmp_ext_append(struct net *net, struct sk_buff *skb_in, struct icmphdr *icmph,
-+		unsigned int room, int iif)
++icmp6_ext_append(struct net *net, struct sk_buff *skb_in,
++		 struct icmp6hdr *icmp6h, unsigned int room, int iif)
 +{
 +	unsigned int payload_len, ext_max_len, ext_len;
 +	struct icmp_ext_hdr *ext_hdr;
@@ -399,20 +396,27 @@ index 1b7fb5d935ed..4abbec2f47ef 100644
 +	u8 ext_objs;
 +	int nhoff;
 +
-+	switch (icmph->type) {
-+	case ICMP_DEST_UNREACH:
-+	case ICMP_TIME_EXCEEDED:
-+	case ICMP_PARAMETERPROB:
++	switch (icmp6h->icmp6_type) {
++	case ICMPV6_DEST_UNREACH:
++	case ICMPV6_TIME_EXCEED:
 +		break;
 +	default:
 +		return NULL;
 +	}
 +
-+	ext_objs = READ_ONCE(net->ipv4.sysctl_icmp_errors_extension_mask);
++	/* Do not overwrite existing extensions. This can happen when we
++	 * receive an ICMPv4 message with extensions from a tunnel and
++	 * translate it to an ICMPv6 message towards an IPv6 host in the
++	 * overlay network.
++	 */
++	if (icmp6h->icmp6_datagram_len)
++		return NULL;
++
++	ext_objs = READ_ONCE(net->ipv6.sysctl.icmpv6_errors_extension_mask);
 +	if (!ext_objs)
 +		return NULL;
 +
-+	ext_max_len = icmp_ext_max_len(ext_objs);
++	ext_max_len = icmp6_ext_max_len(ext_objs);
 +	if (ICMP_EXT_ORIG_DGRAM_MIN_LEN + ext_max_len > room)
 +		return NULL;
 +
@@ -436,7 +440,7 @@ index 1b7fb5d935ed..4abbec2f47ef 100644
 +	ext_hdr = skb_put_zero(skb, sizeof(*ext_hdr));
 +	ext_hdr->version = ICMP_EXT_VERSION_2;
 +
-+	icmp_ext_objs_append(net, skb, ext_objs, iif);
++	icmp6_ext_objs_append(net, skb, ext_objs, iif);
 +
 +	/* Do not send an empty extension structure. */
 +	ext_len = skb_tail_pointer(skb) - (unsigned char *)ext_hdr;
@@ -444,8 +448,8 @@ index 1b7fb5d935ed..4abbec2f47ef 100644
 +		goto free_skb;
 +
 +	ext_hdr->checksum = ip_compute_csum(ext_hdr, ext_len);
-+	/* The length of the original datagram in 32-bit words (RFC 4884). */
-+	icmph->un.reserved[1] = ICMP_EXT_ORIG_DGRAM_MIN_LEN / sizeof(u32);
++	/* The length of the original datagram in 64-bit words (RFC 4884). */
++	icmp6h->icmp6_datagram_len = ICMP_EXT_ORIG_DGRAM_MIN_LEN / sizeof(u64);
 +
 +	return skb;
 +
@@ -455,77 +459,78 @@ index 1b7fb5d935ed..4abbec2f47ef 100644
 +}
 +
  /*
-  *	Send an ICMP message in response to a situation
-  *
-@@ -601,6 +780,7 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
- 	struct icmp_bxm icmp_param;
- 	struct rtable *rt = skb_rtable(skb_in);
+  *	Send an ICMP message in response to a packet in error
+  */
+@@ -458,7 +645,9 @@ void icmp6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
+ 	struct ipv6_pinfo *np;
+ 	const struct in6_addr *saddr = NULL;
  	bool apply_ratelimit = false;
 +	struct sk_buff *ext_skb;
- 	struct ipcm_cookie ipc;
- 	struct flowi4 fl4;
- 	__be32 saddr;
-@@ -770,7 +950,12 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
- 	if (room <= (int)sizeof(struct iphdr))
- 		goto ende;
+ 	struct dst_entry *dst;
++	unsigned int room;
+ 	struct icmp6hdr tmp_hdr;
+ 	struct flowi6 fl6;
+ 	struct icmpv6_msg msg;
+@@ -612,8 +801,13 @@ void icmp6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
+ 	msg.offset = skb_network_offset(skb);
+ 	msg.type = type;
  
--	icmp_param.data_len = skb_in->len - icmp_param.offset;
-+	ext_skb = icmp_ext_append(net, skb_in, &icmp_param.data.icmph, room,
-+				  parm->iif);
+-	len = skb->len - msg.offset;
+-	len = min_t(unsigned int, len, IPV6_MIN_MTU - sizeof(struct ipv6hdr) - sizeof(struct icmp6hdr));
++	room = IPV6_MIN_MTU - sizeof(struct ipv6hdr) - sizeof(struct icmp6hdr);
++	ext_skb = icmp6_ext_append(net, skb, &tmp_hdr, room, parm->iif);
 +	if (ext_skb)
-+		icmp_param.skb = ext_skb;
++		msg.skb = ext_skb;
 +
-+	icmp_param.data_len = icmp_param.skb->len - icmp_param.offset;
- 	if (icmp_param.data_len > room)
- 		icmp_param.data_len = room;
- 	icmp_param.head_len = sizeof(struct icmphdr);
-@@ -785,6 +970,9 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
- 	trace_icmp_send(skb_in, type, code);
++	len = msg.skb->len - msg.offset;
++	len = min_t(unsigned int, len, room);
+ 	if (len < 0) {
+ 		net_dbg_ratelimited("icmp: len problem [%pI6c > %pI6c]\n",
+ 				    &hdr->saddr, &hdr->daddr);
+@@ -635,6 +829,8 @@ void icmp6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
+ 	}
  
- 	icmp_push_reply(sk, &icmp_param, &fl4, &ipc, &rt);
-+
+ out_dst_release:
 +	if (ext_skb)
 +		consume_skb(ext_skb);
- ende:
- 	ip_rt_put(rt);
+ 	dst_release(dst);
  out_unlock:
-@@ -1502,6 +1690,7 @@ static int __net_init icmp_sk_init(struct net *net)
- 	net->ipv4.sysctl_icmp_ratelimit = 1 * HZ;
- 	net->ipv4.sysctl_icmp_ratemask = 0x1818;
- 	net->ipv4.sysctl_icmp_errors_use_inbound_ifaddr = 0;
-+	net->ipv4.sysctl_icmp_errors_extension_mask = 0;
- 	net->ipv4.sysctl_icmp_msgs_per_sec = 1000;
- 	net->ipv4.sysctl_icmp_msgs_burst = 50;
+ 	icmpv6_xmit_unlock(sk);
+@@ -1171,6 +1367,10 @@ int icmpv6_err_convert(u8 type, u8 code, int *err)
+ EXPORT_SYMBOL(icmpv6_err_convert);
  
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index 24dbc603cc44..0c7c8f9041cb 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -48,6 +48,8 @@ static int tcp_plb_max_rounds = 31;
- static int tcp_plb_max_cong_thresh = 256;
- static unsigned int tcp_tw_reuse_delay_max = TCP_PAWS_MSL * MSEC_PER_SEC;
- static int tcp_ecn_mode_max = 2;
-+static u32 icmp_errors_extension_mask_all =
+ #ifdef CONFIG_SYSCTL
++
++static u32 icmpv6_errors_extension_mask_all =
 +	GENMASK_U8(ICMP_ERR_EXT_COUNT - 1, 0);
- 
- /* obsolete */
- static int sysctl_tcp_low_latency __read_mostly;
-@@ -674,6 +676,15 @@ static struct ctl_table ipv4_net_table[] = {
++
+ static struct ctl_table ipv6_icmp_table_template[] = {
+ 	{
+ 		.procname	= "ratelimit",
+@@ -1216,6 +1416,15 @@ static struct ctl_table ipv6_icmp_table_template[] = {
  		.extra1		= SYSCTL_ZERO,
- 		.extra2		= SYSCTL_ONE
+ 		.extra2		= SYSCTL_ONE,
  	},
 +	{
-+		.procname	= "icmp_errors_extension_mask",
-+		.data		= &init_net.ipv4.sysctl_icmp_errors_extension_mask,
++		.procname	= "errors_extension_mask",
++		.data		= &init_net.ipv6.sysctl.icmpv6_errors_extension_mask,
 +		.maxlen		= sizeof(u8),
 +		.mode		= 0644,
 +		.proc_handler	= proc_dou8vec_minmax,
 +		.extra1		= SYSCTL_ZERO,
-+		.extra2		= &icmp_errors_extension_mask_all,
++		.extra2		= &icmpv6_errors_extension_mask_all,
 +	},
- 	{
- 		.procname	= "icmp_ratelimit",
- 		.data		= &init_net.ipv4.sysctl_icmp_ratelimit,
+ };
+ 
+ struct ctl_table * __net_init ipv6_icmp_sysctl_init(struct net *net)
+@@ -1233,6 +1442,7 @@ struct ctl_table * __net_init ipv6_icmp_sysctl_init(struct net *net)
+ 		table[3].data = &net->ipv6.sysctl.icmpv6_echo_ignore_anycast;
+ 		table[4].data = &net->ipv6.sysctl.icmpv6_ratemask_ptr;
+ 		table[5].data = &net->ipv6.sysctl.icmpv6_error_anycast_as_unicast;
++		table[6].data = &net->ipv6.sysctl.icmpv6_errors_extension_mask;
+ 	}
+ 	return table;
+ }
 -- 
 2.51.0
 
