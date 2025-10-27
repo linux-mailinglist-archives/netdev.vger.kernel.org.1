@@ -1,106 +1,115 @@
-Return-Path: <netdev+bounces-233297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEBDCC1130F
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 20:40:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FF97C11437
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 20:50:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 853671895A67
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 19:37:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0E053B7A4D
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 19:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7254E2D5A14;
-	Mon, 27 Oct 2025 19:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3202DC766;
+	Mon, 27 Oct 2025 19:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rJboMH3C"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yxIXJJHz"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A868A21576E;
-	Mon, 27 Oct 2025 19:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3965E1FA859;
+	Mon, 27 Oct 2025 19:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761593837; cv=none; b=Fz5z6slrWrOyrZSWy/hwoYSzJziU6X2WC3diIeNRZ/RMOqypx5vHEHD7GR3wDxkasqERSZI5E/vgXkI3trnTG9+XolLLwEseOItwFPwEZL6+bpF9bkCb32ZQmlh7R9tNheFk8pmlNonQ/hSK8ftys5z2ncj/nlE36zMPNia6odA=
+	t=1761594371; cv=none; b=sdyFdQm0UHjDK/ajD1YacUFOpUKRA+FP7AQaYhMWMYt3zNY2XsZEdp/+KaSvOZG5bh43ugH5/qWCQowCCwrRnQNXM7+T2ou86qlZLd1xtD7tZqH9HBxwHSsrlfuga/aNbUcHuc+xOMRBXeQtGtRpefBXouIhyzMDjdkpAlEfQyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761593837; c=relaxed/simple;
-	bh=FXWMy8I5Mg64Tba4DqwmP2O/F44S7/SL5KQ7cjD+FFA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gQkGdrVUJ78ueNlhrA41B4eZC0UvMyTRIBzFJoBEWgECpvMCn4aE4nq8KafTkOu4z40bvTK/2eTnLF+Ospp39aWo+QrApQYRxPF6iJ4lAqnaWlrwe06RGXY9k21JojwNbBnFyvczsGaIcr3HDG+PSNOAK3DUEO9yJhwTI1UGguQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=rJboMH3C; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=OUeGYoPHNs62uCqJ5pjVhz5EO6V14o61GpjtJFSfqK0=; b=rJboMH3C6c65fDZ2aAFg9X7O3c
-	dGRHEKq823u9rBU2GypE3vXe6fI/3YgNNvLur7ozBDMNGv4sLHmmfrH2FZ5CF5IM9uRBQ7KD+hiin
-	Pjqk9x8L31+U2UAg791hI7m3J8Vm46ITH28a9djhiipHd3+zGIFWO3/hq6zCpIu1iZTOzYLJzTfVk
-	O6V2u7byX40xjO2KCTqjOuAZe7g7qN1VK9mfgcrzP118T9CRWqrJawwDMU6BNaGBdeuJDpFXYa6od
-	x+p5cBx3IYxX2KwydjPirhrl90pcmQYq6tHLRhQNhCwU3hiBAJdXD114KP12mINO3dHKlz+fm8DpA
-	Ye7K7lKg==;
-Received: from [50.53.43.113] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vDT1k-0000000EgXD-264v;
-	Mon, 27 Oct 2025 19:37:12 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: netdev@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Bagas Sanjaya <bagasdotme@gmail.com>,
-	Michael Grzeschik <m.grzeschik@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net] documentation: networking: arcnet: correct the ARCNET web URL
-Date: Mon, 27 Oct 2025 12:37:11 -0700
-Message-ID: <20251027193711.600556-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.51.1
+	s=arc-20240116; t=1761594371; c=relaxed/simple;
+	bh=7GWwiStjtDAbbnkF2zYQxdt4B/0h1K8bSVhtEvQUAbQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=csURWJsrrnScRyIBjoP6QCw2v2bWkmjSUPI19Im7A9W2n1Qu8ToqUPyR35v45A7F7bTA5UqmLS2nYwQRLd+mcesGo4Ocj4LfTTInrEHtfKm7WiPMw8s/gezfpBfSgjh8Q2RAqEbrTUEPDI30+i5vxBcpBZ8MMe19cU0IxDotBm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yxIXJJHz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=QgVHnEB9dbxI4tOIpbAUdE9ckXhIXrcdZxqomo85tvM=; b=yxIXJJHzNssHdI9lAPrjZEukGA
+	Jxmb9ZzWfKNBbtoKTvy+Qv0PVqHS23awerM6FrII1AaZwtIQbk8FPWbQuk++BPDkEv83asiyu77wi
+	DHZ0KECwxg780e/1G/pVvHE4DcDl9jOOjWQx7iucvUpkaE1i2cUkh+8ChPIL4Bhon3sE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vDTAG-00CEF6-TU; Mon, 27 Oct 2025 20:46:00 +0100
+Date: Mon, 27 Oct 2025 20:46:00 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	shuah@kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2] selftests: drv-net: replace the nsim ring
+ test with a drv-net one
+Message-ID: <57359fb9-195c-4a4a-b102-f7739453a94f@lunn.ch>
+References: <20251027192131.2053792-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251027192131.2053792-1-kuba@kernel.org>
 
-The arcnet.com domain has become something other than ARCNET (it is
-something about AIoT and begins with an application/registration;
-no other info.) ARCNET info is now at arcnet.cc so update the
-ARCNET hardware documentation with this URL and page title.
+> +    def test_config(config):
+> +        try:
+> +            cfg.eth.channels_set(ehdr | config)
+> +            get = cfg.eth.channels_get(ehdr)
+> +            for k, v in config.items():
+> +                ksft_eq(get.get(k, 0), v)
+> +        except NlError as e:
+> +            failed.append(mix)
+> +            ksft_pr("Can't set", config, e)
+> +        else:
+> +            ksft_pr("Okay", config)
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
----
-Cc: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Michael Grzeschik <m.grzeschik@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: linux-doc@vger.kernel.org
----
- Documentation/networking/arcnet-hardware.rst |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+We expect failure to leave the configuration unchanged. So i would
+actually do:
 
---- linux-next-20251024.orig/Documentation/networking/arcnet-hardware.rst
-+++ linux-next-20251024/Documentation/networking/arcnet-hardware.rst
-@@ -73,10 +73,10 @@ splitting," that allows "virtual packets
- although they are generally kept down to the Ethernet-style 1500 bytes.
- 
- For more information on the advantages and disadvantages (mostly the
--advantages) of ARCnet networks, you might try the "ARCnet Trade Association"
-+advantages) of ARCnet networks, you might try the "ARCNET Resource Center"
- WWW page:
- 
--	http://www.arcnet.com
-+	http://www.arcnet.cc
- 
- 
- Cabling ARCnet Networks
+try:
+	before = get()
+	set()
+except:
+	after = get()
+	fail(after != before)
+
+Also, does nlError contain the error code?
+
+        fail(e.errcode not in (EINVAL, EOPNOTSUPP))
+
+It would be good to detect and fail ENOTSUPP, which does appear every
+so often, when it should not.
+
+> +    # Try to reach min on all settings
+> +    for param in params:
+> +        val = rings[param]
+> +        while True:
+> +            try:
+> +                cfg.eth.rings_set({'header':{'dev-index': cfg.ifindex},
+> +                                   param: val // 2})
+> +                val //= 2
+> +                if val <= 1:
+> +                    break
+> +            except NlError:
+> +                break
+
+Is 0 ever valid? I would actually test 0 and make sure it fails with
+EINVAL, or EOPNOTSUPP. Getting range checks wrong is a typical bug, so
+it is good to test them. The happy days cases are boring because
+developers tend to test those, so they are hardly worth testings. Its
+the edge cases which should be tested.
+
+	Andrew
+
 
