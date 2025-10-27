@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-233057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE0C6C0BADF
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 03:11:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6519C0BAE9
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 03:17:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4898D18A2F8D
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 02:11:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57E133A3BE1
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 02:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D097B2C08D1;
-	Mon, 27 Oct 2025 02:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 304512C21F4;
+	Mon, 27 Oct 2025 02:16:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kqQVxuCS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kW3tg6W/"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D442C0269;
-	Mon, 27 Oct 2025 02:10:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554732C21D3
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 02:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761531044; cv=none; b=dnBi3hS/GHV3q7niivcI6D2SyOUFiVpPLt3ABC3qJEjWokebn3FGZg17p9YeF/mOGvuBeaxx3lpmqbTHCtAqeXM0jPbF6cg9jKCT/PdYSjSpVzXjpzcGa8PoT6GpRAlvTwNp4C5lXNOwSD6aVUXc0TPH2Pc4aXu337EDwS5BTh8=
+	t=1761531413; cv=none; b=LHHvpgYQ0GtOB740+4/eB8n66mc2yffwEUJH06a5cq+xItAYGmuplkW5fKD5gmo/i6YLxsIvAHf9IaYY1j4vaDZ8SOZtnt+2ToXzzcKZU1fWx022ly9+445usScypJbv0jFqLlJcZUVl6U8sonroVYfx2Y1HfBBIu6Yo3I9Gnmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761531044; c=relaxed/simple;
-	bh=NbdLCrUjtfVlTEdHY9PLnvIAzhp5OlD1x2Oh838UX2g=;
+	s=arc-20240116; t=1761531413; c=relaxed/simple;
+	bh=m8okZ+vHavx4szDuDfnXQBUHDXlnW9pc84oaCewpiiM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L6Ly1HoC0cAyad3IUriYXpaFhrSCywfjNbcOMHU+45BOKKPnrjgfP+PCawrIsed8vsbu+mwvqn5kS0CY5QHXOey2GUgPiUZ4hpL4ovJP26PPThRJpTQu75UuMZQkyInx8ov0xCRD1NHmmJm3LQl70DgaFcLpluEoSmEds4sGRnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kqQVxuCS; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vfys5NYJonkChepAxthHjgGzRFrx4pOn+78AFIJ/ORNvm1BvOZVvGHVkfBGksdnGOPs3aK2GLleIdlTPz1KVJEX1XhPGCuicbmnqM4nkCOdl+dvvgUvnNwzX8d/nH1U1BGW6h6tm9M0xnjm/w7cWLq3m/12dOYgK0Wjrg/Z/6JQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kW3tg6W/; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,26 +36,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=T10yHN9xQQhtSif+fMluAF713gT0sRu+SWOyNYIrMSk=; b=kqQVxuCSWCkzmMRudTI2APnVqQ
-	n6+wbguUSzN19EbGFiVxo6HmhPjwOUEIJ1RjkQ8IgJQd0fUJ35PLyQV403aTthkWT8U6XGMUptxrC
-	dez6ThjbfwUX9h3TnCsEdYqOsbLAOfgaTZ6W8kNnpweww1GR0uG4F6jtyhde+3ujCZRw=;
+	bh=bp8lv/RA8SKOpDTvF6SAQrhIwgjiI6DBXHsUFbpxpgM=; b=kW3tg6W/6rRWkLido61J+vLRuo
+	nsrMhnSZhLeeJFA5FxJRY5Y8Eqpmgv8uLQPX7VpfQRwO59U5HOvpsDM4sOAjltQGNFsJPdi0qry2+
+	F+UeqC1HUhOL26S4Rr3MCoO+oFlX1Qe5KvY4m7TJGUi+BPFLaDO4DGCm7ZxJKaCgQ1Jk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vDCgi-00C9K9-Mc; Mon, 27 Oct 2025 03:10:24 +0100
-Date: Mon, 27 Oct 2025 03:10:24 +0100
+	id 1vDCmu-00C9Ll-QB; Mon, 27 Oct 2025 03:16:48 +0100
+Date: Mon, 27 Oct 2025 03:16:48 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Tianling Shen <cnsztl@gmail.com>
-Cc: Frank Sae <Frank.Sae@motor-comm.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jijie Shao <shaojijie@huawei.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: motorcomm: Add support for PHY LEDs on YT8531
-Message-ID: <70e72da6-9f07-457a-9e0f-c5570ab6fe9c@lunn.ch>
-References: <20251026133652.1288732-1-cnsztl@gmail.com>
+To: Johannes Eigner <johannes.eigner@a-eberle.de>
+Cc: netdev@vger.kernel.org, Michal Kubecek <mkubecek@suse.cz>,
+	Danielle Ratson <danieller@nvidia.com>,
+	Stephan Wurm <stephan.wurm@a-eberle.de>
+Subject: Re: [PATCH ethtool v3 2/2] module info: Fix duplicated JSON keys
+Message-ID: <f0e2f7ba-e53d-499e-827c-0866dabea861@lunn.ch>
+References: <20251024-fix-module-info-json-v3-0-36862ce701ae@a-eberle.de>
+ <20251024-fix-module-info-json-v3-2-36862ce701ae@a-eberle.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,20 +60,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251026133652.1288732-1-cnsztl@gmail.com>
+In-Reply-To: <20251024-fix-module-info-json-v3-2-36862ce701ae@a-eberle.de>
 
-On Sun, Oct 26, 2025 at 09:36:52PM +0800, Tianling Shen wrote:
-> The LED registers on YT8531 are exactly same as YT8521, so simply
-> reuse yt8521_led_hw_* functions.
+On Fri, Oct 24, 2025 at 12:32:52PM +0200, Johannes Eigner wrote:
+> Fix duplicated JSON keys in the module diagnostics output.
+> This changes the JSON API in an incompatible way, but leaving it as it
+> is is not an option either. The API change is limited to the following
+> keys for measured values on QSFP and CMIS modules:
+> * "module_temperature" renamed to "module_temperature_measurement"
+> * "module_voltage" renamed to "module_voltage_measurement"
+> Keys with the same names for threshold values are kept unchanged to
+> maximize backward compatibility. Keys for SFP modules are changed as
+> well, but since it was never possible to get the diagnostics in JSON
+> format for SFP modules, this does not introduce any backward
+> compatibility issues for SFP modules. Used key names for SFP modules are
+> aligned with QSFP and CMIS modules.
 > 
-> Tested on OrangePi R1 Plus LTS and Zero3.
-
-In future, please could you put the tree name into the subject.
-See:
-
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
- 
-> Signed-off-by: Tianling Shen <cnsztl@gmail.com>
+> Duplicated JSON keys result in undefined behavior which is handled
+> differently by different JSON parsers. From RFC 8259:
+>    Many implementations report the last name/value pair
+>    only. Other implementations report an error or fail to parse the
+>    object, and some implementations report all of the name/value pairs,
+>    including duplicates.
+> First behavior can be confirmed for Boost.JSON, nlohmann json,
+> javascript (running in Firefox and Chromium), jq, php, python and ruby.
+> With these parsers it was not possible to get the measured module
+> temperature and voltage, since they were silently overwritten by the
+> threshold values.
+> 
+> Shortened example output for module temperature.
+> Without patch:
+>   $ ethtool -j -m sfp1
+>   [ {
+>   ...
+>           "module_temperature": 26.5898,
+>   ...
+>           "module_temperature": {
+>               "high_alarm_threshold": 110,
+>               "low_alarm_threshold": -45,
+>               "high_warning_threshold": 95,
+>               "low_warning_threshold": -42
+>           },
+>   ...
+>       } ]
+> With patch:
+>   $ ethtool -j -m sfp1
+>   [ {
+>   ...
+>           "module_temperature_measurement": 35.793,
+>   ...
+>           "module_temperature": {
+>               "high_alarm_threshold": 110,
+>               "low_alarm_threshold": -45,
+>               "high_warning_threshold": 95,
+>               "low_warning_threshold": -42
+>           },
+>   ...
+>       } ]
+> 
+> Fixes: 3448a2f73e77 (cmis: Add JSON output handling to --module-info in CMIS modules)
+> Fixes: 008167804e54 (module_common: Add helpers to support JSON printing for common value types)
+> Signed-off-by: Johannes Eigner <johannes.eigner@a-eberle.de>
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
