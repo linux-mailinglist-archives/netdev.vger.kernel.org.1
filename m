@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-233079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D46A5C0BE46
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 07:04:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43457C0BE76
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 07:07:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C49E84E99CE
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 06:04:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3F183B21F4
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 06:07:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151A32D97A8;
-	Mon, 27 Oct 2025 06:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879FE2D9EDC;
+	Mon, 27 Oct 2025 06:07:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="NDWa+G6M"
+	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="NUu4nwSv"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from mail-m16.yeah.net (mail-m16.yeah.net [220.197.32.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF13239E7E;
-	Mon, 27 Oct 2025 06:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55BA42D6E58;
+	Mon, 27 Oct 2025 06:07:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.32.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761545059; cv=none; b=icfF3pixKb8Wk8XScBuxa7M6eIQeeZScpe9X3w9nXpH/hC1g0XLIuy9a7JhivRhPA3JXmokMhZbVRamzvuJndmaK6sCNTIV7d7jgLjh9AKxtwUHjbMSTVJ/Wkolax8w3/AOtt2xHf9w8kMWxgCjVX/hzivi/1chbbuN6o+lFKY8=
+	t=1761545264; cv=none; b=ONhZBgfslClnvj2xBT2+4YNDTb8930q7EC16XtPNzp0gJs5GYbUvjpyYi6mDz4FA4j29TsV56MA263QMSekR5I8lVNfUoTdmlQKEeNmY3ZXkfDvpi8c1kcKOf0SxhIZoLMz2NS00KWXOxRcwAC57OBx7Wfq48KqK66PK5WN4am8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761545059; c=relaxed/simple;
-	bh=2SUWSfQ5/JEzuD+Pj/+BAvMxTnNY11/j2gq/d5Arp/Q=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=NevkuLQ/WCyYhaP5Oo4MS/6vaYBNN7hfMGSfSXxFyk2gA6aZE2I/7qLHw3qrJTyGJ9IrsxHss6EXxIuhLi/w565v0R7aVifMznalBleT9F5GsbcF0bAlU8fOWUY+2Y7ynvnVmNFCEaDivrHvV5gGaARB7ouJBx3ln47U2EOh5aE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=NDWa+G6M; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1761545050; h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
-	bh=vGQNREQK62jW8RTtaFJj64+WJ4MbuJlL8IZDBtzUYss=;
-	b=NDWa+G6M2OJBP2O+epO1OfE0XxMvMSUZS1uj7+OhSI3bnl3v3TKFSLCYlWUjoyqARTkWbPIjj6jByYePNVIVrW/y41eLWzEWU/SrnO6bkQi7L1/57ULufMOWFIkqY679XPtpeFnf9ZFioYQ3J8tS9Br+ZyZW0vz0g42buw5bJFs=
-Received: from 30.221.133.61(mailfrom:guoheyi@linux.alibaba.com fp:SMTPD_---0Wr02qh7_1761545025 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 27 Oct 2025 14:04:09 +0800
-Message-ID: <5e065a78-b371-4ef7-8ce6-a902f80e2b02@linux.alibaba.com>
-Date: Mon, 27 Oct 2025 14:04:09 +0800
+	s=arc-20240116; t=1761545264; c=relaxed/simple;
+	bh=avkOs55f7P9lPmiFz2OLaiSF7OlFmzbNHKp1T2Jv8LA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e9WbHG3oI7IcpbhXIncOLWjFxZpjUWiV7a3OYSHRp/Y/GsoE+k7XQL4uJFUYb6TUE8n5sZTgdAyfrZ4WNnH9E0ap+2pqM1u7TfyeAx/j5WG8JUGYddP0yjmR/Bs1kyDLXxahb4ZhFlsE+uP0hBZuY5bA+DiSMyLi72rZ3WmpW6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=NUu4nwSv; arc=none smtp.client-ip=220.197.32.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
+	s=s110527; h=Date:From:To:Subject:Message-ID:MIME-Version:
+	Content-Type; bh=SSnBpXFr6UaDyoCUOpqPlNQbbbgbwumFKZey7Ajea30=;
+	b=NUu4nwSvx0K7ohAoRZemwdB0PwhVz2iSweBvNEbGOCpbKNqgmn+DKtm19AQwAQ
+	do3KElpdwMi6IITro1AMmKKQG7d1B85lmvJ0/u005vFc1gtzJHDtWWcU+NEbcm6f
+	EEnQ+eK5nzeZgk0DpYKmfFewg+U+AfQY9A0negkNE3vHY=
+Received: from dragon (unknown [])
+	by gzsmtp1 (Coremail) with UTF8SMTPSA id Mc8vCgCnr3jcC_9o9QE_AA--.49326S3;
+	Mon, 27 Oct 2025 14:06:23 +0800 (CST)
+Date: Mon, 27 Oct 2025 14:06:20 +0800
+From: Shawn Guo <shawnguo2@yeah.net>
+To: Jonas Rebmann <jre@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Shengjiu Wang <shengjiu.wang@nxp.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-sound@vger.kernel.org, imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Peng Fan <peng.fan@oss.nxp.com>, David Jander <david@protonic.nl>,
+	Lucas Stach <l.stach@pengutronix.de>,
+	Oleksij Rempel <o.rempel@pengutronix.de>
+Subject: Re: [PATCH v4 0/2] Mainline Protonic PRT8ML board
+Message-ID: <aP8L3JkMGzHsVPId@dragon>
+References: <20251014-imx8mp-prt8ml-v4-0-88fed69b1af2@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Takashi Iwai <tiwai@suse.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-From: Heyi Guo <guoheyi@linux.alibaba.com>
-Subject: Why hasn't the patch "r8152: Fix a deadlock by doubly PM resume" back
- ported to stable branches?
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251014-imx8mp-prt8ml-v4-0-88fed69b1af2@pengutronix.de>
+X-CM-TRANSID:Mc8vCgCnr3jcC_9o9QE_AA--.49326S3
+X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxU8hL0UUUUU
+X-CM-SenderInfo: pvkd40hjxrjqh1hdxhhqhw/1tbiNh8UeWj-C98t-AAA3W
 
-Hi all,
+On Tue, Oct 14, 2025 at 03:09:30PM +0200, Jonas Rebmann wrote:
+> Jonas Rebmann (2):
+>       dt-bindings: arm: fsl: Add Protonic PRT8ML
+>       arm64: dts: add Protonic PRT8ML board
 
-We found that below bug fix patch had not been back ported to stable 
-branches, like linux-5.10.y. Is there any special reason?
-
-commit 776ac63a986d211286230c4fd70f85390eabedcd
-Author:     Takashi Iwai <tiwai@suse.de>
-AuthorDate: Wed Jul 14 19:00:22 2021 +0200
-Commit:     David S. Miller <davem@davemloft.net>
-CommitDate: Wed Jul 14 14:57:55 2021 -0700
-
-     r8152: Fix a deadlock by doubly PM resume
-
-     r8152 driver sets up the MAC address at reset-resume, while
-     rtl8152_set_mac_address() has the temporary autopm get/put. This may
-     lead to a deadlock as the PM lock has been already taken for the
-     execution of the runtime PM callback.
-
-     This patch adds the workaround to avoid the superfluous autpm when
-     called from rtl8152_reset_resume().
-
-     Link: https://bugzilla.suse.com/show_bug.cgi?id=1186194
-     Signed-off-by: Takashi Iwai <tiwai@suse.de>
-     Signed-off-by: David S. Miller <davem@davemloft.net>
-
-Thanks,
-
-Guo, Heyi
+Applied both, thanks!
 
 
