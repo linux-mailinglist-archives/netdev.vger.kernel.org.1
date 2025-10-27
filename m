@@ -1,87 +1,101 @@
-Return-Path: <netdev+bounces-233327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8043CC11FE4
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 00:24:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29992C12041
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 00:27:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2B3C13519A0
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 23:24:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CF28188AFA3
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 23:27:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5803E332EB4;
-	Mon, 27 Oct 2025 23:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4109330B0D;
+	Mon, 27 Oct 2025 23:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lkNM3vyb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YMgQzw5k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26829332EAD;
-	Mon, 27 Oct 2025 23:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C15B33032B
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 23:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761607367; cv=none; b=tMustF73gS92WwMpMYgvb+ulO4uazI/FG35qdJJZ3gK2SxzBRhF32CdJQOxCTZ06rymhO97o8hkitmYJPgZ6LIvqCcQSUh5osJ95pw4PEemKAw2AsObYBhC3FITUmNVS98IHo3p/A7G8S1wH+nPknLHfflSNKLRMT6J8Yp2rvBA=
+	t=1761607568; cv=none; b=W8y+9eDICu6bC0/rYrCKYBFcNuHurUROUKEG+DU80KeF5/esViqp7UdX3AEfj0tSQA/Ghqt6BryhsZOc75nJhUum9Hc+BxEu8NyB+ix+WRgn/jaNm9SUwNlWQqBUjnZDHGN9rAqZe6p4lHv/tWp/yxx3dr5nyWFAYlOPx0qbaz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761607367; c=relaxed/simple;
-	bh=ZWxyQz5K6dbJDOK535AKreA5DglUpUVB45lZid+YI4o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KZwMAOX5428LA7acfa/T/nVF5osX8Wia1wXgmpg3IcZzD07exEUwx4tyXVOU0gxFCA2GSsAtvDC81hDzgwm18yamTg+W5uSQ9O+i07ObUeGT1jH6qRu5nYS/K21KkhSm/NeeWreHVIxRq+EpC7JM+eL78f5amlKTvWboeHA9PWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lkNM3vyb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34EE9C116D0;
-	Mon, 27 Oct 2025 23:22:45 +0000 (UTC)
+	s=arc-20240116; t=1761607568; c=relaxed/simple;
+	bh=LP08PxMOy3+q7wsXIRxd+k6qF4bhNukjRqN2R7SnbJo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hjcvGDllIdoxnVfAlgxLzRtYdgyBRE++jHuAswM2H9eMb5sc2XrzS2LjR45NR5R3Vg366QsVSBEaqBehb5KIQISn7wKfuHv8xAepRj4kzKFzTQDKGIaORezJmoipWHxxZJpoBlGOGFLgMLO2+aKzaeV2hPV5Ut4OmlWz3vGixWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YMgQzw5k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E1D5C19424
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 23:26:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761607365;
-	bh=ZWxyQz5K6dbJDOK535AKreA5DglUpUVB45lZid+YI4o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lkNM3vybzlx7ssdfIjtUQg23Lj69ZBSDOwBrwb8AMgD+M9gGE+MuwJtqLMuCXpFT+
-	 EFPBkm2fYSORLAX9UhuNYc8P0Vwds4HNQBUnkgSclPp00BwuD+iG7JL/BnsoRg/tD8
-	 Hzdyz6zUujimZTBsjIyUfxD99u8RNwdNnk60ydj5CK5+nLSOHu2JMCfHkHwft7BxDH
-	 QGdW30O8WI0CS3d/AYCnltylKtjzcc78PWbYmEhzoVaK21+omv8YAcgPpL21244TBS
-	 tNyUlpZ/BIahTr6xuVYMzgxZYkXsgbDLarKDfgJWbQFfSFlQPX9ePf0/ZlegDKva2Z
-	 DsCIVbfdnVQyw==
-Date: Mon, 27 Oct 2025 16:22:44 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Simon Horman <horms@kernel.org>, Stefano Garzarella
- <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, Bobby
- Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next 03/12] selftests/vsock: reuse logic for
- vsock_test through wrapper functions
-Message-ID: <20251027162244.0101a099@kernel.org>
-In-Reply-To: <aP/DQLcX9uaY6kXN@devvm11784.nha0.facebook.com>
-References: <20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com>
-	<20251022-vsock-selftests-fixes-and-improvements-v1-3-edeb179d6463@meta.com>
-	<aP-kmqhvo4AFv1qm@horms.kernel.org>
-	<aP+zgF7zF9T3ovuS@devvm11784.nha0.facebook.com>
-	<aP/DQLcX9uaY6kXN@devvm11784.nha0.facebook.com>
+	s=k20201202; t=1761607568;
+	bh=LP08PxMOy3+q7wsXIRxd+k6qF4bhNukjRqN2R7SnbJo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=YMgQzw5ktHHkIoZDDp8fmeIIxPhW3KmOp1ndU12agoAwMolAYuds0tzDxoZ3lLwvi
+	 90D8GNBcJ5MR9tZIXs60SeU1xedeWKwJkcxCo+fnrKG3wubGnSvNPIS+HfWrdLYQNg
+	 +QSePw5bDWFRgOUuvQNlInvHah694lOFOQ+Je4wFctkGmNBKJjadfuhUTLtiAP5aRu
+	 Et+cYmW/xRrC7IqJAPdd45iUVRI44kgi1zY/VHtGQLamY389aw1FUk6hzrog1UZ21F
+	 x0I3LxUKX8UbrDXDNuKXePMos3odZblAdMODdYIFLTVqc/zNEk1eMhBxdxThXcNTRA
+	 WeDELGSbTY49w==
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-637e9f9f9fbso9699074a12.0
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 16:26:08 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU+Ox1wzZ+CsVgavW1FgaRC9fnCRRVy9zwBn74ThbZ5xSU2d4eXsHQ1xg7/Vc72VePKzWyfYW8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxE8RGkHvdqWGcdGmXu2YfG00mxfDRg1taTkmA4HBVaWQGe1d9F
+	qXzytlCOk2/eIhSVj2wZ4/QoY/hTkHZKl/jqLhjOEgGyYmEOeu4FM+uKHxlqMHlJzI0rVgW0DJq
+	0ioHIMzFLVcFShfZY2O6yYOfW4KhZyw==
+X-Google-Smtp-Source: AGHT+IEX1xGnmtwVGoDLaZVp4aFh7ruN9LkPKkhMyM+i6wHN4ucAhYDTaXvbn65T7tutgmjdp+KLABvK7KA+7GmnR/0=
+X-Received: by 2002:a05:6402:5cd:b0:63b:ee26:5449 with SMTP id
+ 4fb4d7f45d1cf-63ed84b8529mr1554449a12.32.1761607566727; Mon, 27 Oct 2025
+ 16:26:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20251022165509.3917655-2-robh@kernel.org> <CACRpkdYioyktQ5is6TJnkgX=MHk2-zf-XO-gx6sKcST2GABNiA@mail.gmail.com>
+In-Reply-To: <CACRpkdYioyktQ5is6TJnkgX=MHk2-zf-XO-gx6sKcST2GABNiA@mail.gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Mon, 27 Oct 2025 18:25:55 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqJh=ccCR_TR2sgMJJ9ChkBC4zx0d0s_imGjHNt0Mbp=Bg@mail.gmail.com>
+X-Gm-Features: AWmQ_bnoPPjAhNXAPXCoKnPtawt5o6d_64F1B37jF33JCalDTEepaJ4EpcJjEG4
+Message-ID: <CAL_JsqJh=ccCR_TR2sgMJJ9ChkBC4zx0d0s_imGjHNt0Mbp=Bg@mail.gmail.com>
+Subject: Re: [PATCH v2] dt-bindings: arm: Convert Marvell CP110 System
+ Controller to DT schema
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Gregory Clement <gregory.clement@bootlin.com>, 
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, linux-arm-kernel@lists.infradead.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 27 Oct 2025 12:08:48 -0700 Bobby Eshleman wrote:
-> > > shellcheck has some (new) things to say about this patch too.
-> > > Could you take a look over them?
-> 
-> It looks like the errors are SC2317 and SC2119, but are false-positives.
-> Invoking a program as a variable (e.g., "${VSOCK_TEST}") is tripping
-> SC2317 (command unreachable), and SC2119 is due to log_{guest,host}()
-> being passed zero arguments (logging its stdin instead).
-> 
-> I also see that SC2317 has many other false positives elsewhere in the
-> file (80+), reporting even lines like `rm "${QEMU_PIDFILE}"` as
-> unreachable. I wonder if we should add a patch to this series to disable
-> this check at the file-level?
+On Mon, Oct 27, 2025 at 4:58=E2=80=AFPM Linus Walleij <linus.walleij@linaro=
+.org> wrote:
+>
+> On Wed, Oct 22, 2025 at 6:56=E2=80=AFPM Rob Herring (Arm) <robh@kernel.or=
+g> wrote:
+>
+> > Convert the Marvell CP110 System Controller binding to DT schema
+> > format.
+> >
+> > There's not any specific compatible for the whole block which is a
+> > separate problem, so just the child nodes are documented. Only the
+> > pinctrl and clock child nodes need to be converted as the GPIO node
+> > already has a schema.
+> >
+> > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+>
+> Patch applied!
 
-Yes, FWIW, don't hesitate to disable things at the file level.
-We should probably revisit which of the checks need to be disabled
-globally. But file level is also useful for manual testing.
+I already applied as it is clock and pinctrl.
+
+Rob
 
