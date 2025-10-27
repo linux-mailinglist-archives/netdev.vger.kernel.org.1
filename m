@@ -1,166 +1,184 @@
-Return-Path: <netdev+bounces-233076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA48C0BD32
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 06:32:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0581C0BD3E
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 06:34:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9D39C4E031E
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 05:32:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6430F4E39C5
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 05:34:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F71239E7E;
-	Mon, 27 Oct 2025 05:32:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FB8239E7E;
+	Mon, 27 Oct 2025 05:34:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VWJLei58"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HjdHXKsm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f65.google.com (mail-pj1-f65.google.com [209.85.216.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA091DE2AF
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 05:32:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A803198A11
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 05:34:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761543137; cv=none; b=j7q4q6l+gJD/2n7/FmMNR+VuJcKpqbFWYynho0igSxx3hwkzHkMK/6Hbn7nJQoWMyxzBEOf6VLmxjAWnt+Qi/7q/Eu61zIRN15N3yFBD5MCoGfByD6Mmz1sQ52hISec0uySWthY6k4pWLFCRQ5U7EFBxsd/vg6GjbW8F+u8w5eU=
+	t=1761543260; cv=none; b=U/45AUjZbTKDTr5yc7EQYfSkwm3pGi3/vYg/j7AoUXZHj3TFEgqHUbfFV8W2koLwrMCwXz1kELzD+8ZmbLCj/9yIsKk9yh8zwP2OewRE8TYRZGs80aB/Z2n4iHciqcbJhMhpLsjzCC5EOwXtNyKvsvHGvJV4v6ybchdtA+Ltftk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761543137; c=relaxed/simple;
-	bh=BiZQZWYzCEbU/wZ9q9vihxV/NEjhA6GMCF121pXKmzA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g4u32riz7vCCKO4MNuwJQVRnRxRoz8yaeYSeZTB7c/St1HgU/2hzml5RbIxtxGwIqN15RfCHIOELntg3M8+/60f1CW3D37aEkq6Hl7613qdnCXmUwkCsFu+KzyljQdmgOzFoW9fumPdtUwslAq1crNDlZao5dou0HDWYCyxN4/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VWJLei58; arc=none smtp.client-ip=209.85.216.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f65.google.com with SMTP id 98e67ed59e1d1-33d463e79ddso5305514a91.0
-        for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 22:32:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761543135; x=1762147935; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XvaWnuts0+GAzN1C4s4frRI39aWzTgLO69HpFB7yOYY=;
-        b=VWJLei5800qFQKNLzx0eFu3KsQKOQHwaX1ugKh3/uhksJ0r++UBgaR0N9iE2XKuIyq
-         RV0BmrF3eu46ABvcYO44fEdj6uDLsgaIzVbZRQebWGqfKHtV+s3A9KMCBHHdH2aYrfn3
-         K4LuBDkGjLQg+9uBTTGZ/R5oxc4QErad+0DlviZ/6JqHuuOV0g7/4iuyCZTHvLLLwYdy
-         DynleRefFHcLzZYWR75vbwK1OhalyoXw2jKYHJeSuhpKOvnl97h/cdtzKOonrlo1llbe
-         XMQchco1w3XVRz3ejjjANQteGujmR+FFoINGwVIMWnzclcjilGfoFoz5rDVw9MOkJJV1
-         APNQ==
+	s=arc-20240116; t=1761543260; c=relaxed/simple;
+	bh=VeHi30FPvS0E1mPLOV2Rmu1L/d/UXODaf1G6DymqOCM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HMWvNPeAY8HzOxTLA3dBqeiLlk/j24B3y5JnPoT7KBOBQlWVaqMG0fXaPcrAFbNNpxCsodkFW4pDah5SbUNKG6zeMvp/mk+H8GKFIyL4ABYewlOxJ0zgAMFMXE61OiEywrjHJtHkQb7QrBEjjSD84Pa6bzMCQJQZk0nwMit6Zrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HjdHXKsm; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761543257;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e4poMbsgbm/wTcWkoIVEYoSm+itLN2T4gDpEs8mFFYI=;
+	b=HjdHXKsm70CqBe5/yBQltVQ2EklPdSLxhUchXRfEe0ay29sxMKRl7BrfmpmyPS4gbWp97k
+	1D54f41QWkPBmZCks0wMf7PdRhvvDGQ/gIw7auaGXCYjHjgbWe7/92GPApfQF2r2XRU9lM
+	ioOgSJn2WA8nSH8A8fA6I0nsuMDcxUY=
+Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
+ [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-13-PnEHoZ4UPoOB6X-DnBdsrQ-1; Mon, 27 Oct 2025 01:34:15 -0400
+X-MC-Unique: PnEHoZ4UPoOB6X-DnBdsrQ-1
+X-Mimecast-MFC-AGG-ID: PnEHoZ4UPoOB6X-DnBdsrQ_1761543255
+Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-5d7e04f9f20so9579255137.1
+        for <netdev@vger.kernel.org>; Sun, 26 Oct 2025 22:34:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761543135; x=1762147935;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XvaWnuts0+GAzN1C4s4frRI39aWzTgLO69HpFB7yOYY=;
-        b=uAq80rST3a5cViC5uCxmEnwbm+H8J5DG6tniPg6blwBbOwCCQ4vQHRGaOEbAb0TzRg
-         1jItES29Icd5mslGzy8ZVpb5h16/Dpyx9353pKHPBIIi0D+bvxhAgDU1+CIjJLyRdA/R
-         YNGeHzg+qkktyq7J6Y6VipJQYUQrbQqUTS/vQceV8jmFGi8DLPAQCfWxUt40k0fci6R4
-         2yhUmGRNi8k+U2GbpEO3McvrwyecMqBcwLR/9uw8T2Fm2GX+OOYiYJkOIDcUJLzslZTd
-         V7qkQw2C0dtPaPBY2Q9dYrEm705RzcnOAaMjmn7BoTu8K3BjmliMMb9Gy4cP3caysDnw
-         ohBw==
-X-Gm-Message-State: AOJu0YymsNUQqLIljCkqbeuOhllX3pqHvotnZT+9kLhOl5gDkYY+Z5RY
-	CpxAjeTVoExht+ykxXZB/LoV9eas8qcWXsY1aHsi/WsP6NCHF46TDE90
-X-Gm-Gg: ASbGnctqENUddeWdJUaIPFOTiHuU6RfugAyipnYi2G8J2prIRha8b+s2dW96CDNQKoE
-	YRXShhB2Ha5euH4u5UchVaQ5TpmLZ3qxSxKsuFnNq411CpPMiTEoYiIELdEBMY36NuiwhbSU2eq
-	OxadE7j/gfM9h+lHbI+7WH//08gX7th7V9i1uIJx0GJF7ZuCjlJrtKD+ASIH2RJ8sF6qMnMsutx
-	HBBPVJsk233Ab7cOsGRElVemzrHEkVjjlO2iDBnZ+pO3ahobGWXrB1X1OzVIde6nTrE7VcXJqwT
-	TT0khh7cMrjnxELnwUBpAaEdR+EFAlh5uZfqYdRhLRAf1KfIyzBC8taloXy9C1zEc+K8b5TXHCl
-	HuvHWvcywsiTMBPJnXDGiwaQPQGlJHjDTp/YiTiIOybW41KE17M6SdJ/uJTuwbNW9Lo81cV7bCt
-	uhd1aIvtklF8EjvS8Mvuw=
-X-Google-Smtp-Source: AGHT+IGFxkBGGf3onfO8Chr2ltK6y4LuXfk+2qofYqflJam8vbY4kH2nypV/mGTAj8xXg0sXgRUULQ==
-X-Received: by 2002:a17:903:1746:b0:269:a4ed:13c9 with SMTP id d9443c01a7336-290caf85146mr423652875ad.30.1761543135506;
-        Sun, 26 Oct 2025 22:32:15 -0700 (PDT)
-Received: from fedora ([103.120.31.122])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498e41125sm67120155ad.94.2025.10.26.22.32.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Oct 2025 22:32:15 -0700 (PDT)
-From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Xing <kernelxing@tencent.com>
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-Subject: [PATCH v2] selftest: net: fix variable sized type issue not at the end of a struct
-Date: Mon, 27 Oct 2025 11:01:56 +0530
-Message-ID: <20251027053156.34368-1-ankitkhushwaha.linux@gmail.com>
-X-Mailer: git-send-email 2.51.0
+        d=1e100.net; s=20230601; t=1761543255; x=1762148055;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e4poMbsgbm/wTcWkoIVEYoSm+itLN2T4gDpEs8mFFYI=;
+        b=S82HjpKNOu4mjs3k1p553zOEy55MFKtO9oxF5ymyEwQqgCGCXW0UDRJi+HqTmi+8Ag
+         6W3SijW8lGaXXgQxvqu/ZDD4UhxF0q/1+k4yg45ygMPWA/yTNQEFK6tQoiUQsX1VYxIx
+         1INP829RzU+UI7kRIEo4prw5IpxrYBXf3kW8w0zIJtW5bkfNT+lSTVO+xREsHTfY4I+q
+         7+2/mtYOCv6Pv/mrP8pziDhGqoYvkf7387FymNU3ij+Xw6+PphUN4jBhoTtGs4G7MGuq
+         7LWqyHckvzm67KOR6PjVNx3lqGEZFfCtP1RpMgJ3giBH0603gy8iXB1bMfOmcv4hD6Wy
+         YtAw==
+X-Gm-Message-State: AOJu0YzElHoW9SdQx/G2zu0YocbVICmLfeuqTM9/aQb3lbDSyJ6C7o+6
+	dKbeC6aOoCsXFrp1Q/ehkVvMP0+udBcJkxSsBlQNwzoIB8nlDgeVPf1vG1OMINakKEZtLb1A8lg
+	enNQywx1Kc0QKvOy/Y0QgcPf8q89DpjNmC9CcFAfLyAKW1i9OAZv5d15kvIkh5/LhX9ANVqNvO7
+	rSkclhcqyrJqiSlbyGCYmkwBIoExLyERG6
+X-Gm-Gg: ASbGncspVBqoHwdh40XmehWjdG2kdnYN/+jgGtyA9ALfhkLq7OP6l3e6uQ82rUu+80e
+	lTg43/1eOKU0oXNXb5q+nU+J6nlRHQ4DXLDaKK1l8Igify3I2m+QmmGxHIyzlXRVl5Gqd4kJ4Nk
+	4Yk5M1c3GWV4Q7ENje43JdrGYAIuWypEoDYqH2nXPBRfZs82KIjssh
+X-Received: by 2002:a05:6102:c94:b0:5d5:f6ae:38f0 with SMTP id ada2fe7eead31-5db3fa8297dmr3197094137.39.1761543254794;
+        Sun, 26 Oct 2025 22:34:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGXxLp95liTwOuaQHppp1XxJZ6TzkMeY4wR/alp4tgZ/UX1fVHxKyWI5KlURF6UfqUGGBV31GC1JGInptq70YY=
+X-Received: by 2002:a05:6102:c94:b0:5d5:f6ae:38f0 with SMTP id
+ ada2fe7eead31-5db3fa8297dmr3197081137.39.1761543254410; Sun, 26 Oct 2025
+ 22:34:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251024074130.65580-1-xuanzhuo@linux.alibaba.com> <20251024074130.65580-3-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20251024074130.65580-3-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 27 Oct 2025 13:34:01 +0800
+X-Gm-Features: AWmQ_blDXFXKymmUmrrTzT3nQl1-sxWJV-05bny0vZMdr9XPAbpU5X67He0JoIc
+Message-ID: <CACGkMEvvjjb_KgHsGiuAvUJaGsBWoijKOz9ELfNOo_qxYWcsrw@mail.gmail.com>
+Subject: Re: [PATCH net v3 2/3] virtio-net: correct hdr_len handling for VIRTIO_NET_F_GUEST_HDRLEN
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Alvaro Karsz <alvaro.karsz@solid-run.com>, Heng Qi <hengqi@linux.alibaba.com>, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Some network selftests defined variable-sized types variable at the middle
-of struct causing -Wgnu-variable-sized-type-not-at-end warning.
+On Fri, Oct 24, 2025 at 3:41=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
+>
+> The commit be50da3e9d4a ("net: virtio_net: implement exact header length
+> guest feature") introduces support for the VIRTIO_NET_F_GUEST_HDRLEN
+> feature in virtio-net.
+>
+> This feature requires virtio-net to set hdr_len to the actual header
+> length of the packet when transmitting, the number of
+> bytes from the start of the packet to the beginning of the
+> transport-layer payload.
+>
+> However, in practice, hdr_len was being set using skb_headlen(skb),
+> which is clearly incorrect. This commit fixes that issue.
+>
+> Fixes: be50da3e9d4a ("net: virtio_net: implement exact header length gues=
+t feature")
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  include/linux/virtio_net.h | 28 +++++++++++++++++++++-------
+>  1 file changed, 21 insertions(+), 7 deletions(-)
+>
+> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+> index 4d1780848d0e..a2ade702b369 100644
+> --- a/include/linux/virtio_net.h
+> +++ b/include/linux/virtio_net.h
+> @@ -217,20 +217,34 @@ static inline int virtio_net_hdr_from_skb(const str=
+uct sk_buff *skb,
+>
+>         if (skb_is_gso(skb)) {
+>                 struct skb_shared_info *sinfo =3D skb_shinfo(skb);
+> +               u16 hdr_len =3D 0;
+> +
+> +               /* In certain code paths (such as the af_packet.c receive=
+ path),
+> +                * this function may be called without a transport header=
+.
+> +                */
+> +               if (skb_transport_header_was_set(skb))
+> +                       hdr_len =3D skb_transport_offset(skb);
 
-warning:
-timestamping.c:285:18: warning: field 'cm' with variable sized type 
-'struct cmsghdr' not at the end of a struct or class is a GNU 
-extension [-Wgnu-variable-sized-type-not-at-end]
-  285 |                 struct cmsghdr cm;
-      |                                ^
+This deserve an independent fix?
 
-ipsec.c:835:5: warning: field 'u' with variable sized type 'union 
-(unnamed union at ipsec.c:831:3)' not at the end of a struct or class 
-is a GNU extension [-Wgnu-variable-sized-type-not-at-end]
-  835 |                 } u;
-      |                   ^
+>
+> -               /* This is a hint as to how much should be linear. */
+> -               hdr->hdr_len =3D __cpu_to_virtio16(little_endian,
+> -                                                skb_headlen(skb));
+>                 hdr->gso_size =3D __cpu_to_virtio16(little_endian,
+>                                                   sinfo->gso_size);
+> -               if (sinfo->gso_type & SKB_GSO_TCPV4)
+> +               if (sinfo->gso_type & SKB_GSO_TCPV4) {
+>                         hdr->gso_type =3D VIRTIO_NET_HDR_GSO_TCPV4;
+> -               else if (sinfo->gso_type & SKB_GSO_TCPV6)
+> +                       if (hdr_len)
+> +                               hdr_len +=3D tcp_hdrlen(skb);
+> +               } else if (sinfo->gso_type & SKB_GSO_TCPV6) {
+>                         hdr->gso_type =3D VIRTIO_NET_HDR_GSO_TCPV6;
+> -               else if (sinfo->gso_type & SKB_GSO_UDP_L4)
+> +                       if (hdr_len)
+> +                               hdr_len +=3D tcp_hdrlen(skb);
+> +               } else if (sinfo->gso_type & SKB_GSO_UDP_L4) {
+>                         hdr->gso_type =3D VIRTIO_NET_HDR_GSO_UDP_L4;
+> -               else
+> +                       if (hdr_len)
+> +                               hdr_len +=3D sizeof(struct udphdr);
+> +               } else {
+>                         return -EINVAL;
+> +               }
+> +
+> +               hdr->hdr_len =3D __cpu_to_virtio16(little_endian, hdr_len=
+);
+> +
+>                 if (sinfo->gso_type & SKB_GSO_TCP_ECN)
+>                         hdr->gso_type |=3D VIRTIO_NET_HDR_GSO_ECN;
+>         } else
+> --
+> 2.32.0.3.g01195cf9f
+>
 
-This patch move these field at the end of struct to fix these warnings.
+Others look good.
 
-Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
----
-Changelog:
-v2: https://lore.kernel.org/linux-kselftest/20251027050856.30270-1-ankitkhushwaha.linux@gmail.com/
-- fixed typos in the commit msg.
-
----
- tools/testing/selftests/net/ipsec.c        | 2 +-
- tools/testing/selftests/net/timestamping.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/net/ipsec.c b/tools/testing/selftests/net/ipsec.c
-index 0ccf484b1d9d..36083c8f884f 100644
---- a/tools/testing/selftests/net/ipsec.c
-+++ b/tools/testing/selftests/net/ipsec.c
-@@ -828,12 +828,12 @@ static int xfrm_state_pack_algo(struct nlmsghdr *nh, size_t req_sz,
- 		struct xfrm_desc *desc)
- {
- 	struct {
-+		char buf[XFRM_ALGO_KEY_BUF_SIZE];
- 		union {
- 			struct xfrm_algo	alg;
- 			struct xfrm_algo_aead	aead;
- 			struct xfrm_algo_auth	auth;
- 		} u;
--		char buf[XFRM_ALGO_KEY_BUF_SIZE];
- 	} alg = {};
- 	size_t alen, elen, clen, aelen;
- 	unsigned short type;
-diff --git a/tools/testing/selftests/net/timestamping.c b/tools/testing/selftests/net/timestamping.c
-index 044bc0e9ed81..ad2be2143698 100644
---- a/tools/testing/selftests/net/timestamping.c
-+++ b/tools/testing/selftests/net/timestamping.c
-@@ -282,8 +282,8 @@ static void recvpacket(int sock, int recvmsg_flags,
- 	struct iovec entry;
- 	struct sockaddr_in from_addr;
- 	struct {
--		struct cmsghdr cm;
- 		char control[512];
-+		struct cmsghdr cm;
- 	} control;
- 	int res;
- 
--- 
-2.51.0
+Thanks
 
 
