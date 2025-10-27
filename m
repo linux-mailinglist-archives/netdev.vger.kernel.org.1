@@ -1,127 +1,114 @@
-Return-Path: <netdev+bounces-233134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D987C0CE13
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 11:08:09 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A4D8C0CDC5
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 11:05:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8378E404E53
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 10:02:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 12AA44E1DCB
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 10:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91662F6905;
-	Mon, 27 Oct 2025 10:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 045581E1DFC;
+	Mon, 27 Oct 2025 10:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pE1ta6m8"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="jnNW8aaQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DDED2F6569;
-	Mon, 27 Oct 2025 10:00:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C9813B280;
+	Mon, 27 Oct 2025 10:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761559240; cv=none; b=FosGXDaZPjPEZ7lIm8MoLIjPFFZkyCFD/WAhrRTIFUzSX2ZerVak3+X5cIuQMfdoKXK+D65rPAfrXD70O3jwKDQndJaHPVW7ep1T1wOfZiizYfdbMLEktS6QCZk1wZNde3GNjxuSBQBDfOJMM90fOnydgh4sjVNtcoeJAGzo2ag=
+	t=1761559417; cv=none; b=KpZZAnu9wVVQvhqghoUnA5AT1jYHEehwuuhVanSJPCs/bk/73ILSx7V5O+e8oIpF3YgLoPjRSypM/fo/RAwBDN2oBoxyl0c+sZqIm2b6sHvO974xg+o8leUM2Tupp3tz3phyIEsWBgN5agxZHjtfNYXmys5OzrhZp8eMnCgPlMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761559240; c=relaxed/simple;
-	bh=+xMfW2hYgWUM+DUd/Q4D7QQsf+nszvvdVnL2yFSt6Bo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d1q9OVcFzP8WlOBpokrrfQNNJhww9GAQeavnfc/st7D0Ljgi/5H70ElHfb8TjKULDcc3utb4Zy3JQeFl1hJ1jpf9uhKPE1DxgYgmCtIxmNlrc2o/Hhae2aki/owaUxsH2y4lTwQbLxQQYFlQlcJ9M21/FQF4WZ1chZCRQ2K8UEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pE1ta6m8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B176C4CEF1;
-	Mon, 27 Oct 2025 10:00:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761559240;
-	bh=+xMfW2hYgWUM+DUd/Q4D7QQsf+nszvvdVnL2yFSt6Bo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pE1ta6m8XcyYS8r7GxUKvmy90HBEUoOVw0WeiSEQFRic39Eb48KbfkpRdvEiattVv
-	 9HBcZOPx1q8E2EF2ouxuxabXs4FyhCMjux40rwGbDExeUXsvebwwwB8dNFJqiYGrw4
-	 KOsi6eJ/wViCTdhET2xPpgZycWT1jBvnFlrAH8Of8gZysWvhCrpm2UOK9DHEcWf9z2
-	 BSnldWQENrlL8uC/LDI8iKzPjFMa2rBD0YxcULT5G9YT/ZT7lzVck8Uh0XDgrP/fpt
-	 GI8Ki4TK5sM9Ie9UmqFIUC/ogAppt66+uEACikr7o+8YemGff3sH2QgpR5cd5pr0+h
-	 ma2igso0Uf1lg==
-Date: Mon, 27 Oct 2025 10:00:32 +0000
-From: Simon Horman <horms@kernel.org>
-To: Fan Gong <gongfan1@huawei.com>
-Cc: Zhu Yikai <zhuyikai1@h-partners.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Bjorn Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>,
-	Xin Guo <guoxin09@huawei.com>,
-	Shen Chenyang <shenchenyang1@hisilicon.com>,
-	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
-	Shi Jing <shijing34@huawei.com>,
-	Luo Yang <luoyang82@h-partners.com>,
-	Meny Yossefi <meny.yossefi@huawei.com>,
-	Gur Stavi <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Suman Ghosh <sumang@marvell.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Joe Damato <jdamato@fastly.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: Re: [PATCH net-next v01 1/9] hinic3: Add PF framework
-Message-ID: <aP9CwKkLdgcqHvkc@horms.kernel.org>
-References: <cover.1760502478.git.zhuyikai1@h-partners.com>
- <905df406fd870da528361f47c48067802588cfb5.1760502478.git.zhuyikai1@h-partners.com>
+	s=arc-20240116; t=1761559417; c=relaxed/simple;
+	bh=JHwarkqBPq72JFpOasQzHaDBamKHSrbmH4YRuweybHs=;
+	h=From:To:Subject:Date:Message-Id; b=FrMYIu82mMCtITTv/3gFpqT58TdkqSxdPI1hQ4jTWo97EbNMzATxzbFXj1eE2ONYHhVIXk9EKMipaR9I8wDOsddcbBYempO90OlCdw5uLIt+0rSsiUiGxTd00lXoh8y7sPSn0s/PPTAtIQU3DmOr0btSJrutJ8rhPPAnpDX/9Lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=jnNW8aaQ; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id AD1F2211D8D8; Mon, 27 Oct 2025 03:03:30 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AD1F2211D8D8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1761559410;
+	bh=EuEAS/gEv10XHC56mPN6AvDAFFpqsTPL7sGSBrWVkXg=;
+	h=From:To:Subject:Date:From;
+	b=jnNW8aaQWFLG60KQSHonqS8ElLyVj/5WkHt+1CWbbsffYBag6VmwPSBmVZvcwkOeq
+	 O84blQ+3W9eSYscSv8nvc3x5es91LV38pa/R0F7MvwD0O7tNO22ogfzQfRXRdZ2Y9D
+	 Jbn9tAum4UvzGvIs17nMZibO2ha7Pjed43XouiDs=
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com,
+	shirazsaleem@microsoft.com,
+	kotaranov@microsoft.com,
+	longli@microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: mana: Fix incorrect speed reported by debugfs
+Date: Mon, 27 Oct 2025 03:03:28 -0700
+Message-Id: <1761559408-22534-1-git-send-email-ernis@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <905df406fd870da528361f47c48067802588cfb5.1760502478.git.zhuyikai1@h-partners.com>
 
-On Wed, Oct 15, 2025 at 03:15:27PM +0800, Fan Gong wrote:
-> Add support for PF framework based on the VF code.
-> 
-> Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-> Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-> Signed-off-by: Fan Gong <gongfan1@huawei.com>
+Once the netshaper is created for MANA, the current bandwidth
+is reported in debugfs like this:
 
-...
+$ sudo ./tools/net/ynl/pyynl/cli.py \
+  --spec Documentation/netlink/specs/net_shaper.yaml \
+  --do set \
+  --json '{"ifindex":'3',
+           "handle":{ "scope": "netdev", "id":'1' },
+           "bw-max": 200000000 }'
+None
 
-> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-> index 979f47ca77f9..2b93026845ff 100644
-> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-> @@ -117,17 +117,49 @@ int hinic3_set_port_mtu(struct net_device *netdev, u16 new_mtu)
->  					 &func_tbl_cfg);
->  }
->  
-> +#define PF_SET_VF_MAC(hwdev, status) \
-> +	(HINIC3_IS_VF(hwdev) && (status) == HINIC3_PF_SET_VF_ALREADY)
-> +
+$ sudo cat /sys/kernel/debug/mana/1/vport0/current_speed
+200
 
-nit: I think the above could be a function rather than a macro.
+After the shaper  is deleted, it is expected to report
+the maximum speed supported by the SKU. But currently it is
+reporting 0, which is incorrect.
 
-...
+Fix this inconsistency, by resetting apc->speed to apc->max_speed
+during deletion of the shaper object. This will improve
+readability and debuggability.
 
-> @@ -157,9 +189,9 @@ int hinic3_set_mac(struct hinic3_hwdev *hwdev, const u8 *mac_addr, u16 vlan_id,
->  		return -EIO;
->  	}
->  
-> -	if (mac_info.msg_head.status == MGMT_STATUS_PF_SET_VF_ALREADY) {
-> +	if (PF_SET_VF_MAC(hwdev, mac_info.msg_head.status)) {
->  		dev_warn(hwdev->dev, "PF has already set VF mac, Ignore set operation\n");
-> -		return 0;
-> +		return HINIC3_PF_SET_VF_ALREADY;
+Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-It seems to me that this custom return value can be propagated up
-and returned by the probe function. If so, this doesn't seem desirable.
-And, overall, I would recommend against the custom calling convention
-that custom return values imply.
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 0142fd98392c..9d56bfefd755 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -814,7 +814,7 @@ static int mana_shaper_del(struct net_shaper_binding *binding,
+ 		/* Reset mana port context parameters */
+ 		apc->handle.id = 0;
+ 		apc->handle.scope = NET_SHAPER_SCOPE_UNSPEC;
+-		apc->speed = 0;
++		apc->speed = apc->max_speed;
+ 	}
+ 
+ 	return err;
+-- 
+2.43.0
 
->  	}
->  
->  	if (mac_info.msg_head.status == MGMT_STATUS_EXIST) {
-
-...
 
