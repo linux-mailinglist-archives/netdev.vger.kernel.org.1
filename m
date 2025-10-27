@@ -1,136 +1,114 @@
-Return-Path: <netdev+bounces-233332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63462C12139
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 00:42:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9642C121C9
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 00:51:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 831C31A2332E
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 23:42:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 555E0562055
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 23:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9AD2330323;
-	Mon, 27 Oct 2025 23:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jycW97YE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA3032D42D;
+	Mon, 27 Oct 2025 23:48:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F322032E68C
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 23:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AABA32E7F29;
+	Mon, 27 Oct 2025 23:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761608488; cv=none; b=Jtj/Rr+xnYJ3Nl7hy4NaDDFLoqaCX2DfjnpgtZzP1gpD3UjfWq90RNYliMKHdDiFjqGih2VfIFrTMP8NPj93OxQH263C7XKCK+rqUZk20GKJYzMxmQOFAT/C7jC6DOo7BZpx2VeLJZ72uzOSLg2wGLRX/3dAIULd2smk4Q/R7Ko=
+	t=1761608926; cv=none; b=Q75BdSbTsqtYw8EUCZatHQvwceF587DlLBHPKgNzGSBOXUOpGeGdE3ueAAAex+9rzuvXCjt/7Jfrr6Vbgk/UIpo7bfVw98+xek7tOS9B1RV2/7qvGuZojZcK9nirckmzf3aOx9R0w2JKw//Vy3a+ApnAQVqYHukNPBTDL0wwnHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761608488; c=relaxed/simple;
-	bh=s3TSreP4LnoaIqwTPt/6jjce6Jv8PhhiuGIE2VBvxQg=;
+	s=arc-20240116; t=1761608926; c=relaxed/simple;
+	bh=RyuheOr7KUHRCZ0DHpD522l5GBSjeCB0/rIpoJcMwbA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ripYk7l4ElqNjNYARJMgZi3j1dFZAZLmd1A3UHu9/zXr20Q0Ik2pdyHmIOsme9GH6d3MHK9y4OwzWPUL8iIKKUuEa5if0cVkyO/Rs7v6B6SAU92ImF44fG8KPLa7+43/vGpxAtt7o8AvMDsWOlDfr9g5h23h3/xzxWRDSzVUb2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jycW97YE; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b679450ecb6so3916820a12.2
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 16:41:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761608486; x=1762213286; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=s3TSreP4LnoaIqwTPt/6jjce6Jv8PhhiuGIE2VBvxQg=;
-        b=jycW97YEWCsbo9DaXwNFPsIwcfXgTClw+zYMM09uK8TzURJ0gqVTWBbeTuALcNvVA0
-         rxq/1jdzJIhVU4Uaw4znVqCb1lBaGDtt6YG/BuiDNg5bT2yRuEH8msFsdz7zoW19/djP
-         GL8TcJwHpR9oVilsml5Ddu9KNTEwjTLeDIoWAr/9qjFOxNNyWVsibCOw5Ber2DGKxl4t
-         ur06DRTInldMCQyBsfQi3/OES2d9glNwkdOHKG9lnyZWWrmL0ETVHb0lksLcv2upij5D
-         QhKN7RJucXyt4GNGMF6F5xUolrUcNto55CyALsvUEwriRXTC0tz4ICza/7FYr9KrGISg
-         ojgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761608486; x=1762213286;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s3TSreP4LnoaIqwTPt/6jjce6Jv8PhhiuGIE2VBvxQg=;
-        b=DBNteSMznYYLE3vMmFGzuMrtQBWVJM0YoNNxTSoWypi8ngBNN7mxF27MVb2iPur8bt
-         dIYP9xaeMygxRz/zhzsgBf/eKnVH9cgjHt4WQ12kILwyWj2nJwezH9rFGc+crYUpngBi
-         iOfysITWQtBpemJOLHvhjdZKMbAGodeGIgJo3rcLylts3Rcm8KWv/eJecbogC+Qptgtr
-         chiFZx1LhlKiHHePrpRs8X7hHn8IsmIEXzzbTP930sh4B8ajrI+ZMKPVs5GgRceV2art
-         b46/2dcaDCsICwCsotu1ynxoe78aJRE4WtKiGjVgOjXW7XD1ljB5Utj1C2cGi+D2wME1
-         SlvA==
-X-Forwarded-Encrypted: i=1; AJvYcCXH4amXFZDXHpwxol201qxknlMV9UIs81iovJw4dIDJFVlqgPo+M/xotOgyfOSfFDjttH/zdY4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLVgUhq1JOONxCvhaSG1BMa0mPD//Npe3sddKYZrIjQSWvkoCl
-	edOfkEqrYV5guv/h7kzABRG2FRjRq2p91b74zV/zT6eQ3DAKH2Z/EELw
-X-Gm-Gg: ASbGncv/4iUVEhz83ktj32x877a3GYymeUtra7RfhUBO+k37JjO7eFeesiI6ehitfAf
-	whnIKOs+BOp73HrnhXxhL1ud98nLtfWr/QmF6mSXWYRuPHPW4MqaOLk0nSw8n2dWLo/dMuSMxGH
-	y/ynd52MAW8whFiF98RgP0tHAKztRtqq6ltqMYvOcj/qUUv7PaixxbJttwTHk5Nga6zfGVPM8OV
-	MPtMnqIHBOAh18tlzcVgb16Y/rox2xExDo4zXMBkxZ6mckRHdDV3ponph2uQOaFR8NuFhyuUjMT
-	WQUb7kgJ/CNX/WsjETA6smDV/1q3tZ9vAG08LlzC1p6tKLsYskUVkj6tMy5jF5bwu2BDQ6iZOd3
-	wKliyMvaP/Yy7CtH9vvK3tah9O8oFFLch8Opa5P/6pO7uA6oZBbdNWW9rRA7xb0E7z6RlSvPeHn
-	pbaB6sWs0RRXg=
-X-Google-Smtp-Source: AGHT+IElurffGRVabfwITQEOqntwzhUO8dSeIfiaVBREZKYDlvN/XqwOxblskEBswWTWEZMbSi3BXQ==
-X-Received: by 2002:a17:903:2346:b0:270:ced4:911a with SMTP id d9443c01a7336-294cb36e45amr16790625ad.9.1761608486117;
-        Mon, 27 Oct 2025 16:41:26 -0700 (PDT)
-Received: from archie.me ([210.87.74.117])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498cf341bsm93730455ad.14.2025.10.27.16.41.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 16:41:25 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id D53664209E50; Tue, 28 Oct 2025 06:41:22 +0700 (WIB)
-Date: Tue, 28 Oct 2025 06:41:22 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org
-Cc: Michael Grzeschik <m.grzeschik@pengutronix.de>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=M85OgCfYY8iK839J/HOR4iq6ZJVxBPbMWIDPSYgXgRBicWiA7Wq1T65CSRjwN7zttKYhFyKQzKC33s+VdITfNF/kdx2CVpFrFZltFYUHOfU5jEipb6rHaHraG/zcJCdPWYwvrfdY3HU8tolmpZVALjMD2fbNdkNpf5wabOGgYjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vDWwv-000000005i7-2paV;
+	Mon, 27 Oct 2025 23:48:29 +0000
+Date: Mon, 27 Oct 2025 23:48:26 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net] documentation: networking: arcnet: correct the
- ARCNET web URL
-Message-ID: <aQADIpGASbUxRDzx@archie.me>
-References: <20251027193711.600556-1-rdunlap@infradead.org>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v3 09/12] net: dsa: lantiq_gswip: add vendor
+ property to setup MII refclk output
+Message-ID: <aQAEyn08Q3DCedUU@makrotopia.org>
+References: <cover.1761521845.git.daniel@makrotopia.org>
+ <869f4ea37de1c54b35eb92f1b8c55a022d125bd3.1761521845.git.daniel@makrotopia.org>
+ <20251027233626.d6vzb45gwcfvvorh@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="aqE60w0Sukhk/Ofa"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251027193711.600556-1-rdunlap@infradead.org>
+In-Reply-To: <20251027233626.d6vzb45gwcfvvorh@skbuf>
 
+On Tue, Oct 28, 2025 at 01:36:26AM +0200, Vladimir Oltean wrote:
+> On Sun, Oct 26, 2025 at 11:47:21PM +0000, Daniel Golle wrote:
+> > Read boolean Device Tree property "maxlinear,rmii-refclk-out" and switch
+> > the RMII reference clock to be a clock output rather than an input if it
+> > is set.
+> > 
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > ---
+> >  drivers/net/dsa/lantiq/lantiq_gswip_common.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
+> > index 60a83093cd10..bf38ecc13f76 100644
+> > --- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
+> > +++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
+> > @@ -1442,6 +1442,10 @@ static void gswip_phylink_mac_config(struct phylink_config *config,
+> >  		return;
+> >  	}
+> >  
+> > +	if (of_property_read_bool(dp->dn, "maxlinear,rmii-refclk-out") &&
+> > +	    !(miicfg & GSWIP_MII_CFG_MODE_RGMII))
+> > +		miicfg |= GSWIP_MII_CFG_RMII_CLK;
+> > +
+> 
+> What did you mean with the !(miicfg & GSWIP_MII_CFG_MODE_RGMII) test?
+> If the schema says "Only applicable for RMII mode.", what's the purpose
+> of this extra condition? For example, GSWIP_MII_CFG_MODE_GMII also has
+> the "GSWIP_MII_CFG_MODE_RGMII" bit (0x4) unset. Does this have any significance?
 
---aqE60w0Sukhk/Ofa
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You are right, probably the best would be to test (if at all) that
+(miicfg == GSWIP_MII_CFG_MODE_RMIIM || miicfg ==
+GSWIP_MII_CFG_MODE_RMIIP) and only in this case allow setting the
+GSWIP_MII_CFG_RMII_CLK bit.
 
-On Mon, Oct 27, 2025 at 12:37:11PM -0700, Randy Dunlap wrote:
-> The arcnet.com domain has become something other than ARCNET (it is
-> something about AIoT and begins with an application/registration;
-> no other info.) ARCNET info is now at arcnet.cc so update the
-> ARCNET hardware documentation with this URL and page title.
-
-I'll fold this into my patch [1] when I roll the v3.
-
-Thanks.
-
-[1]: https://lore.kernel.org/linux-doc/20251023025506.23779-1-bagasdotme@gm=
-ail.com/
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---aqE60w0Sukhk/Ofa
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaQADHQAKCRD2uYlJVVFO
-o2EcAQDqLQCDDc9q+5KW8KHHfbp/58DyQrfeH9wX5LjLgi7B4QEAjuouAs2BOgN7
-hFukh6lzYvKSRVRLCnPlSNMjFutJtQw=
-=ft2/
------END PGP SIGNATURE-----
-
---aqE60w0Sukhk/Ofa--
+I forgot that there is older hardware which supports "full" MII, and MII
+MAC as well as MII PHY modes also shouldn't allow to set the
+GSWIP_MII_CFG_RMII_CLK bit to not end up with undefined behavior.
 
