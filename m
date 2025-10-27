@@ -1,192 +1,221 @@
-Return-Path: <netdev+bounces-233231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F3F9C0EFD6
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 16:36:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1545DC0F022
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 16:40:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C80B83A51C5
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 15:33:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B9C94044F1
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 15:35:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5848E25C6FF;
-	Mon, 27 Oct 2025 15:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CDD30CD91;
+	Mon, 27 Oct 2025 15:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="NLTFfCAB";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lAheerMx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V5zBToHb"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BACCD2C21DC
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 15:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 956A730C34A
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 15:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761579207; cv=none; b=RiFDycGCUT5cRKpIQYzzxv9fOp5UphTgJWkeO0hg/u9zl/UTq1z7xkSQz/JVSFs166GXBBHzDeOGnpvp0z+MktNBX2mPC15FPkYS1lM4ybnVcK3EP4uwnQeUvUy/zkEI5LWwe1i39614YhT7a4/+vZgXGrMuRDDUNsGdE5Yhpyo=
+	t=1761579299; cv=none; b=tcLv2dSXbnvI89/v0foxj/jXmUMZPn3uDL1gaA5RNyB7CogWuKmZEGDuy/jI3JVzH0nmYkVwwyNMKygol0sDLskkncmYc22ZxwgdnzuoE+PCMiSNH0A3CdJDUP6vSVcuoL9chkFrLYhQxhx8xUy8z1aVCrQXSGP0c84CKillB/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761579207; c=relaxed/simple;
-	bh=bl5ZEtE2ZTjL+CZF+ZGvmn1gylRlFfUoXKA3jQIjrkM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MMQciQIu28+dIE0wfQ61WpaeOjAzpUaLh1um4c0ukQKsqx8GCdd+cXzasZ1q5VU5gXhNvMLFY2WcfS3t4eNxCvWeRqAZ77bVWYs3dsW4JgxtxR4zx76Rz1OhP/jFzbD0zGHM9kRwZm9ZO9KlGQO8GE7OAmQUMhb4J7Qclpl+AZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=NLTFfCAB; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lAheerMx; arc=none smtp.client-ip=103.168.172.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id ADB401400204;
-	Mon, 27 Oct 2025 11:33:21 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Mon, 27 Oct 2025 11:33:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1761579201; x=
-	1761665601; bh=fbHI2YBz8jk5m9kPXoHIUADu8vi8crwsg4smerYH19I=; b=N
-	LTFfCABx+e6meT2jMx1aWDCnkYp7px2VD/CuaJU/vhAbJupd70HjzMtSoojBph0N
-	8NxiayCDfXq57X2ldhQ12/X02dJZEYFCQMLMa5yfko3NPHYC5rgl5WtyWdbW9Wnz
-	1khjvXcd8UkSXAnklmS0wDvmD1yssSGJOJMJu6rnM9NRMakS6TasnbgyJbZdPNSB
-	izVQqR2DJ5Gwk9Pck4bxkZbZfEsRgQHoYC0FWNWcaQAvI67IEpRF7wsfV4S4S6PQ
-	9eV62Q46w0DYTnmhyT0dR4NbhlNlfw1hRuYA1wo92IwyWNd83dqnkgkXYYlg271F
-	Cn4EylfxIu8pP+ajIPu6g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1761579201; x=1761665601; bh=fbHI2YBz8jk5m9kPXoHIUADu8vi8crwsg4s
-	merYH19I=; b=lAheerMxUl78mJ93AQG1J/8MRP4FNVSko+juBGha9y09Zg5vVrK
-	um3bKdjejb2Tx+4Qa7S3wUUlJ5aggPuO24SRWw8UL3AhzPv1kVz2A4EzRRUvLTPq
-	vG8tLnftnIsoIl2qPf2scH1vgYfrnqqftot84gW4DJxYkrsHFKEVjmIal49/XVkh
-	0pZKss4sGr3f8yANPL/jBLPn6PoXnXw2aSkh3XdhPtyvvYCan94ujha85OEKtNW5
-	nE06iEDPeyn5GBffO0CvUoNPSfcX+fBBrCvLRmE32yx1S7SagNnKrAlEnWznifQK
-	xXkboGXup7txlihQXE2jdyy0iaVxr+ACXsg==
-X-ME-Sender: <xms:wJD_aDxEwZ1dG6ZeWMfFzX8jZj18dRxkClPXEGi8DEbnrdSKqFNMJw>
-    <xme:wJD_aHLIzLThLhP4gmFsBsQVZqvLqf6bf7jpgd6vH3MFjX3DeS3ej1OPD_48ORx4B
-    MzxEpKHt9ZXUNMwmfWwpdpqy4en1j8dDzCUc2AWf7t3Npx95BLMc2df>
-X-ME-Received: <xmr:wJD_aKXfKmx35KlJysr-rf0pYoYMtJkDwGYoTrd1K6qKJjNMuTqZdh3Awruw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduheekfeegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepueeuleevieefveefjeevhfeuleefvefgveegkeffvdeugeduffevueek
-    leelueejnecuffhomhgrihhnpehtrghgrdhnvghtnecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvght
-    pdhnsggprhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepjh
-    hirghnsgholhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgv
-    rhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfth
-    drnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
-    shhtvghffhgvnhdrkhhlrghsshgvrhhtsehsvggtuhhnvghtrdgtohhmpdhrtghpthhtoh
-    eptghrrghtihhusehnvhhiughirgdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehg
-    ohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepughsrghhvghrnheskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtgho
-    mh
-X-ME-Proxy: <xmx:wJD_aCbifJII4GKa-rzm3l3-fODjX27b3CEpANVolj4Hg5-fVoLkQg>
-    <xmx:wJD_aJyns8mzhnl4gKYtMHUH6ntA4Sn4P_tMUVzpUitVLbZKItSTTg>
-    <xmx:wJD_aK3CkkgFXsOWguKhRXQeHijB2zg17q-R6MMHC6SamcvVOUqZyw>
-    <xmx:wJD_aCnoaoWNt4K9xGfZptdBtcGovjupxpwq1b1aFBc0jz7vg0RCNw>
-    <xmx:wZD_aNkLv4kb7Ez2g3WWAH-10109EdR5aJqMpv0A221RdCI8jxeJhwij>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 27 Oct 2025 11:33:19 -0400 (EDT)
-Date: Mon, 27 Oct 2025 16:33:18 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jianbo Liu <jianbol@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	steffen.klassert@secunet.com, Cosmin Ratiu <cratiu@nvidia.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH ipsec v2 2/2] xfrm: Determine inner GSO type from packet
- inner protocol
-Message-ID: <aP-QvtNf-Vp5oHLX@krikkit>
-References: <20251027025006.46596-1-jianbol@nvidia.com>
- <20251027025006.46596-3-jianbol@nvidia.com>
+	s=arc-20240116; t=1761579299; c=relaxed/simple;
+	bh=npqMQNG+kkSJMj44DV9b43q2YLq0woSQU+hbY1FcfDE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FCxhZMHLld5uJ+u9JXzNyFil0gZJSGDGk+FFen7MnRkBVgHRnXsOXW85CjdbSFJmE9u7e+clSXDRkAupUpimD7zxPJ1aLUoYfA4mXszdoCdbzYJeYPzT9uKM+fAMIeV44DKle+Eh0SmETDQsSDskIMUuu5eZ9rrCHgaPj0h6OsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V5zBToHb; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b403bb7843eso1057237066b.3
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 08:34:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761579296; x=1762184096; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gPnVe0RYSSxW7eGWUnBIAZE7h+8589Z4nUqKP2rDTXA=;
+        b=V5zBToHbUc/EPblZEnyEAuMXFv8OZDgHuYk6ojh/B76r+shKrC04Iu7L05OqKb3eOn
+         ZwYlOGW49fNJl0unr++t3OXQf1xbZfiJ0j7t8pPHn1JhfJ/eoAECiuTfgP0lub0x4caD
+         M1honsWVJ72V1PC1+gKu5ozD6O3tMl9btTejeONVlG0m0cY6B4gALkOOikEot60WZiYz
+         2OaM9zZC+gErJ1THLVxJ1Obcjhivxyp97t/fga7mPmJ6Vor8Ulo/kIUmrJDPBx0B3l0/
+         kZYMzO+iB8XvFBdot5UxEMigsMpWpTJrymF8MiBylQZy+LY5F1iwrIb4GB6LVPK+DxOw
+         cAqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761579296; x=1762184096;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gPnVe0RYSSxW7eGWUnBIAZE7h+8589Z4nUqKP2rDTXA=;
+        b=hnAcK3IY8/DvL+WbGUqilqyBNp+bKbmkZ10H5Zg67bfM0XC0Q0fvowmfN4Qwxyve+A
+         nuzOpBkIGY+FWlUP6tW66BBu7TRDj1wRmDnwTtwMRtGbMkl0oVqUrgjNzK1CsQzQhfoF
+         sqcBBAm8QxDLGgJYEYBGJZokEvIHiUUJWxMuiYHdzdqciFrsIIEsSCaodUCMUdJlI8ZM
+         vGZWAWCSyd64Cdrk8PjHRfsl84LBUfpPeQCNf9LeI+Y9scb3QuVuYDKxmWicAigaTFSf
+         TSIWfYnV2ynvhv+iLsouAnaB3drKWyEmdu3T7WhF3jerIJmbhHzJrsLAJemok1mvS1px
+         PHdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUbS+OKHQ29XeHnXMEiuYoWzFL06z8am56r6v3CMOxR1s3pKnF+zAraP2PRh+9tYLdraXYu2jY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBjwaGzJaJ0t9HvOpuFkW330sdixdIUNY+eCIcSAcLi7koAVgn
+	tvH8C+EAMbHlJaXV9UhMJx4/CjF6mMLRk91FN0/vM1D0SBqCMu61lBTh
+X-Gm-Gg: ASbGncszd0YtLEplRPAwgfAQ+GjaatfxD6BkuR6u3CrqrCeIncM1Hm5myJsihiHlfPM
+	Bnn0qRr6XeQY6r/1tigIA/WvOuCDk8a5Po3Mb865Wo37uAiQ37Sr0BD+ViXtZ/7VtqdXs8VpB+Z
+	dnbCWnbLdAw0DHIMHkKT8SR8YjXG5akJFyZNTICIgAMedS32c5S0tc1Y3qdB2jwjibRvDP1hZ+j
+	mA/XLpO++ofSFx5OcnCpP8x+X/MI4rdQVWVyCbI67/XIleHgjeVwy3WRv+cqxq74JMpELr6LOLy
+	nwBm/7lrcM4yk28p6mhK+2WZv2jkUGrwMSbxzgm3dmaQ5q+ii/apVSzw2oV0SuM5WX6IDtBI5cJ
+	4TBOaW+7hIw/IyUrbuPbCTXK0AjVKwdwVRLbpc+hX12BV7KGNj5wQSfk1VEXmF/wSdYLo5duzPn
+	KfcO7lhSVQttyjpyJZ9i4Ck5lhQFWcbbMw5BFjt/9CTSAydLP7Wmd+AXQP3JOx5ZbFSVbK
+X-Google-Smtp-Source: AGHT+IGIpwg05cYy7GcfgDxvaJSzOwaLJWS181MgeK2o+O5O1IAwUMBmynB9pTF9eZUsL20El/MxCw==
+X-Received: by 2002:a17:907:96ab:b0:b04:aadd:b8d7 with SMTP id a640c23a62f3a-b6dba4460f5mr33178366b.13.1761579295540;
+        Mon, 27 Oct 2025 08:34:55 -0700 (PDT)
+Received: from [10.0.1.60] (248.201.173.83.static.wline.lns.sme.cust.swisscom.ch. [83.173.201.248])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d85308cbbsm809169366b.4.2025.10.27.08.34.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Oct 2025 08:34:55 -0700 (PDT)
+Message-ID: <f65c1650-22c3-4363-8b7e-00d19bf7af88@gmail.com>
+Date: Mon, 27 Oct 2025 16:34:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251027025006.46596-3-jianbol@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] net: phy: dp83867: Disable EEE support as not
+ implemented
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
+ <ae723e7c-f876-45ef-bc41-3b39dc1dc76b@lunn.ch>
+ <664ef58b-d7e6-4f08-b88f-e7c2cf08c83c@gmail.com>
+ <aP-Hgo5mf7BQyee_@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Emanuele Ghidoli <ghidoliemanuele@gmail.com>
+In-Reply-To: <aP-Hgo5mf7BQyee_@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-2025-10-27, 04:40:59 +0200, Jianbo Liu wrote:
-> The GSO segmentation functions for ESP tunnel mode
-> (xfrm4_tunnel_gso_segment and xfrm6_tunnel_gso_segment) were
-> determining the inner packet's L2 protocol type by checking the static
-> x->inner_mode.family field from the xfrm state.
+
+
+On 27/10/2025 15:53, Russell King (Oracle) wrote:
+> On Mon, Oct 27, 2025 at 01:57:48PM +0100, Emanuele Ghidoli wrote:
+>>
+>>
+>> On 27/10/2025 00:45, Andrew Lunn wrote:
+>>>> Since the introduction of phylink-managed EEE support in the stmmac driver,
+>>>> EEE is now enabled by default, leading to issues on systems using the
+>>>> DP83867 PHY.
+>>>
+>>> Did you do a bisect to prove this?
+>> Yes, I have done a bisect and the commit that introduced the behavior on our
+>> board is 4218647d4556 ("net: stmmac: convert to phylink managed EEE support").
+>>
+>>>
+>>>> Fixes: 2a10154abcb7 ("net: phy: dp83867: Add TI dp83867 phy")
+>>>
+>>> What has this Fixes: tag got to do with phylink?
+>> I think that the phylink commit is just enabling by default the EEE support,
+>> and my commit is not really fixing that. It is why I didn't put a Fixes: tag
+>> pointing to that.
+>>
+>> I’ve tried to trace the behavior, but it’s quite complex. From my testing, I
+>> can summarize the situation as follows:
+>>
+>> - ethtool, after that patch, returns:
+>> ethtool --show-eee end0
+>> EEE settings for end0:
+>>         EEE status: enabled - active
+>>         Tx LPI: 1000000 (us)
+>>         Supported EEE link modes:  100baseT/Full
+>>                                    1000baseT/Full
+>>         Advertised EEE link modes:  100baseT/Full
+>>                                     1000baseT/Full
+>>         Link partner advertised EEE link modes:  100baseT/Full
+>>                                                  1000baseT/Full
+>> - before that patch returns, after boot:
+>> EEE settings for end0:
+>>         EEE status: disabled
+>>         Tx LPI: disabled
+>>         Supported EEE link modes:  100baseT/Full
+>>                                    1000baseT/Full
+>>         Advertised EEE link modes:  Not reported
+>>         Link partner advertised EEE link modes:  100baseT/Full
+>>                                                  1000baseT/Full
 > 
-> This is unreliable. In tunnel mode, the state's actual inner family
-> could be defined by x->inner_mode.family or by
-> x->inner_mode_iaf.family. Checking only the former can lead to a
-> mismatch with the actual packet being processed, causing GSO to create
-> segments with the wrong L2 header type.
+> Oh damn. I see why now:
 > 
-> This patch fixes the bug by deriving the inner mode directly from the
-> packet's inner protocol stored in XFRM_MODE_SKB_CB(skb)->protocol.
+>         /* Some DT bindings do not set-up the PHY handle. Let's try to
+>          * manually parse it
+>          */
+>         if (!phy_fwnode || IS_ERR(phy_fwnode)) {
+>                 int addr = priv->plat->phy_addr;
+> 		...
+>                 if (priv->dma_cap.eee)
+>                         phy_support_eee(phydev);
 > 
-> Fixes: 26dbd66eab80 ("esp: choose the correct inner protocol for GSO on inter address family tunnels")
-> Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
-> ---
-> V2:
->  - Change subject prefix, and send to "ipsec".
->  - Add Fixes tag.
+>                 ret = phylink_connect_phy(priv->phylink, phydev);
+>         } else {
+>                 fwnode_handle_put(phy_fwnode);
+>                 ret = phylink_fwnode_phy_connect(priv->phylink, fwnode, 0);
+>         }
 > 
->  net/ipv4/esp4_offload.c | 6 ++++--
->  net/ipv6/esp6_offload.c | 6 ++++--
->  2 files changed, 8 insertions(+), 4 deletions(-)
+> The driver only considers calling phy_support_eee() when DT fails to
+> describe the PHY (because in the other path, it doesn't have access to
+> the struct phy_device to make this call.)
 > 
-> diff --git a/net/ipv4/esp4_offload.c b/net/ipv4/esp4_offload.c
-> index e0d94270da28..05828d4cb6cd 100644
-> --- a/net/ipv4/esp4_offload.c
-> +++ b/net/ipv4/esp4_offload.c
-> @@ -122,8 +122,10 @@ static struct sk_buff *xfrm4_tunnel_gso_segment(struct xfrm_state *x,
->  						struct sk_buff *skb,
->  						netdev_features_t features)
->  {
-> -	__be16 type = x->inner_mode.family == AF_INET6 ? htons(ETH_P_IPV6)
-> -						       : htons(ETH_P_IP);
-> +	const struct xfrm_mode *inner_mode = xfrm_ip2inner_mode(x,
-> +					XFRM_MODE_SKB_CB(skb)->protocol);
+> My commit makes it apply even to DT described PHYs, so now (as has been
+> shown when you enable EEE manually) it's uncovering latent problems.
+> 
+> So now we understand why the change has occurred - this is important.
+Good. Thanks.> Now the question becomes, what to do about it.
+> 
+> For your issue, given that we have statements from TI that indicate
+> none of their gigabit PHYs support EEE, we really should not be
+> reporting to userspace that there is any EEE support. Therefore,
+> "Supported EEE link modes" should be completely empty.
+> 
+> I think I understand why we're getting EEE modes supported. In the
+> DP83867 manual, it states for the DEVAD field of the C45 indirect
+> access registers:
+> 
+> "Device Address: In general, these bits [4:0] are the device address
+> DEVAD that directs any accesses of ADDAR register (0x000E) to the
+> appropriate MMD. Specifically, the DP83867 uses the vendor specific
+> DEVAD [4:0] = 11111 for accesses. All accesses through registers
+> REGCR and ADDAR can use this DEVAD. Transactions with other
+> DEVAD are ignored."
+> 
+> Specifically, that last sentence, and the use of "ignored". If this
+> means the PHY does not drive the MDIO data line when registers are
+> read, they will return 0xffff, which is actually against the IEEE
+> requirements for C45 registers (unimplemented C45 registers are
+> supposed to be zero.)
+> 
+> So, this needs to be tested - please modify phylib's
+> genphy_c45_read_eee_cap1() to print the value read from the register.
+> 
+> If it is 0xffff, that confirms that theory.
+It’s not 0xffff; I verified that the value read is:
+TI DP83867 stmmac-0:02: Reading EEE capabilities from MDIO_PCS_EEE_ABLE: 0x0006
 
-I don't think this is correct. inner_mode_iaf is not always set by
-__xfrm_init_state, only when we have a AF_UNSPEC selector, which is
-not always the case for cross-family tunnels. So we would end up with
-inner_mode->family = 0 here, and pass the wrong type to
-skb_eth_gso_segment.
+This indicates that EEE is reported as supported, according to:
+#define MDIO_AN_EEE_ADV_100TX	0x0002	/* Advertise 100TX EEE cap */
+#define MDIO_AN_EEE_ADV_1000T	0x0004	/* Advertise 1000T EEE cap */
 
-Other users of xfrm_ip2inner_mode (in ip_vti/ip6_vti, xfrmi) only call
-it when we have an AF_UNSPEC selector, then we know inner_mode_iaf is
-valid and can be used. Otherwise, the selector (ie x->inner_mode)
-should have the right family for the packet (and all callers of
-xfrm_ip2inner_mode use x->inner_mode when the selector is not
-AF_UNSPEC).
+So the PHY simply reports the capability as present.
 
+I verified this behaviour before submitting the patch, which is why I wrote:
+"While the DP83867 PHYs report EEE capability through their feature registers."
 
-Maybe it would be better to move the AF_UNSPEC check into
-xfrm_ip2inner_mode, something like:
+Anyway, if the value were 0xffff, the code already handles it as not supported.
 
-static inline const struct xfrm_mode *xfrm_ip2inner_mode(struct xfrm_state *x, int ipproto)
-{
-	if (x->sel.family != AF_UNSPEC)
-		return &x->inner_mode;
+Let me know if I should test anything else.
 
-	if ((ipproto == IPPROTO_IPIP && x->props.family == AF_INET) ||
-	    (ipproto == IPPROTO_IPV6 && x->props.family == AF_INET6))
-		return &x->inner_mode;
-	else
-		return &x->inner_mode_iaf;
-}
-
-
-since that's what all the callers are doing anyway?
-
-Then it would be valid to use xfrm_ip2inner_mode like you're doing.
-
--- 
-Sabrina
 
