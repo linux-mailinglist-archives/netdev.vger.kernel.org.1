@@ -1,160 +1,183 @@
-Return-Path: <netdev+bounces-233172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAF2DC0D7EC
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 13:25:02 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 950F0C0D8B3
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 13:33:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 39B4B34D4A4
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 12:25:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 774024F68EC
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 12:30:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1617D3009F7;
-	Mon, 27 Oct 2025 12:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="F0Ci4ne2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26C530FF23;
+	Mon, 27 Oct 2025 12:28:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com [34.218.115.239])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF432FDC3F
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 12:24:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.218.115.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0D630F93D
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 12:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761567894; cv=none; b=JkRl0zJHfTAbBrs9D2BgTSDm6liFcwtBurM0Xcw2YypgwRwiHInoDG9ok1mwFrn9lbjRHPT4jvt6PcW6RddSULcfHzd+14LA1o8Onvb7pI00Pg43xf7BVdd7U8IB+8Ss33dJN7yj0OJ7pEg7ymD9XUox5io3CK8aHBVqrtua8EM=
+	t=1761568119; cv=none; b=gDsz08xqBLHe1hFaU5GqO1qs+NoYBz3839hclWXwpIr9WICN1sT3bl9hkFwbcW3khIeTAFcz4Ma4CUrO68rWHtg8Y3OObep2Pj1tEmt4Lf9KjxqJqyqnZJSbkBTzS08SgLWsIMZ5BAiwOHrVQggRQDlBFALWR2P5R3+LyVLzVnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761567894; c=relaxed/simple;
-	bh=+RyZMr44ePS9IxhF1+DAq/fz9kbSF4Uu8qUbK8YCFR0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h8yPWmXGdjTN5d2g0xfOBngZTBocJOJk+WT49MnsTD9nUXhFDE8cIV3ov+A2NwnT23aCTAZ92rM3j/myZon8ANMdrjoPmUE+9MQqdZ4XADut+y/ujh/7UEuvpbuExoIN6pKcfBjKtoTy0V2WWynBhsVahAsE8VcKLV5UnnXBQas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=F0Ci4ne2; arc=none smtp.client-ip=34.218.115.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1761567892; x=1793103892;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=WrJLIDy5DjO1Qi1gKZCpTvgxvq7dxgqrY3OppodPWIs=;
-  b=F0Ci4ne2JK0PNDUmQ1DG1Zc0krcxhh/lM2384XYmliX22m9iinOtC12j
-   G3jESGR246jo3lJXjnwAmxhJYHQQ0fEJIQQ54ZeBAm9Kz/Bdi/1HOZyjL
-   nQpWXnyeaRsBOTSZFHTb0ykbzWUYUDirbIsf2xkAhxajuZYJEstAiOg/p
-   V7DmMwjDe4LH4+JTnF57AYJMSmLBrf8r+Tsqg7Pojfv8E0DmQ7wPDQSrp
-   g6pJ5FoGUczStgDHTXHOqMMF3tAH9HzGO7SW/PCLRixP2a4plR+CI1usr
-   tppESiFO/7ukI2MaEmFqvdlW2H0HUg6qz9ysgFvJkCZM1dpDkZTJQzlbo
-   w==;
-X-CSE-ConnectionGUID: LzM7aC4yS8ayhj9JELmetQ==
-X-CSE-MsgGUID: sQM+1O4oQkuQLKQYyS0+QQ==
-X-IronPort-AV: E=Sophos;i="6.19,258,1754956800"; 
-   d="scan'208";a="5597335"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 12:24:50 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.51:18342]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.17.61:2525] with esmtp (Farcaster)
- id a5010076-be11-4429-adff-4f15b9de8100; Mon, 27 Oct 2025 12:24:49 +0000 (UTC)
-X-Farcaster-Flow-ID: a5010076-be11-4429-adff-4f15b9de8100
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Mon, 27 Oct 2025 12:24:47 +0000
-Received: from b0be8375a521.amazon.com (10.37.245.8) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Mon, 27 Oct 2025 12:24:44 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <przemyslaw.kitszel@intel.com>
-CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
-	<intel-wired-lan@lists.osuosl.org>, <kohei.enju@gmail.com>,
-	<kuba@kernel.org>, <mitch.a.williams@intel.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] iavf: fix off-by-one issues in iavf_config_rss_reg()
-Date: Mon, 27 Oct 2025 21:24:21 +0900
-Message-ID: <20251027122435.22442-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <ada06185-257b-46de-9e5b-470f2724f014@intel.com>
-References: <ada06185-257b-46de-9e5b-470f2724f014@intel.com>
+	s=arc-20240116; t=1761568119; c=relaxed/simple;
+	bh=asSCZ97O28svJQnAb6Beu2n1OE4U3rerw0j0Qjaw7sY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=F1eBCL742aaGd7MHCav1SwFICAmpQYkZG2Z6Xs2qgg/EcxYR3vKCUAc1Q3lU0RKGNiNmmMVN6+5o9/L7cSHLNWUumbSz9y2mYnfLywN2xqigkvtxGZPvRJSbybqeFe3YYPq23MpDPkVIgJ2M20/n5EqcHNxE+aJYKrjQx1Rn7fQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vDMKX-0004fn-TB; Mon, 27 Oct 2025 13:28:09 +0100
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vDMKV-005hdu-1C;
+	Mon, 27 Oct 2025 13:28:07 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.98.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vDMKV-000000047Zh-1AZo;
+	Mon, 27 Oct 2025 13:28:07 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Nishanth Menon <nm@ti.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	linux-doc@vger.kernel.org,
+	Michal Kubecek <mkubecek@suse.cz>,
+	Roan van Dijk <roan@protonic.nl>
+Subject: [PATCH net-next v8 0/4] ethtool: introduce PHY MSE diagnostics UAPI and drivers
+Date: Mon, 27 Oct 2025 13:27:57 +0100
+Message-ID: <20251027122801.982364-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB004.ant.amazon.com (10.13.139.143) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, 27 Oct 2025 13:13:54 +0100, Przemek Kitszel wrote:
+changes v8:
+- Drop capability bitfield support from UAPI
+- Drop channel selection support from user space
+- Kernel now returns all available channels automatically
+- Add OA Technical Committee numbers (TC1 / TC12)
+- Minor doc and type cleanups
+changes v7:
+- htmldoc fixes
+changes v6:
+- rework the code to use uint instead of u32/u64
+- use bitset for flags
+- use nest for each separate channel
+changes v5:
+- add struct phy_mse_snapshot and phy_mse_config to the documentation
+changes v4:
+- remove -ENETDOWN as expected error value for get_mse_config() and
+  get_mse_snapshot()
+- fix htmldocs builds
+- s/__ethtool-a-mse/--ethtool-a-mse
+changes v3:
+- add missing ETHTOOL_A_LINKSTATE_MSE_* yaml changes
+changes v2:
+- rebase on latest net-next
 
->On 10/25/25 18:58, Kohei Enju wrote:
->> There are off-by-one bugs when configuring RSS hash key and lookup
->> table, causing out-of-bounds reads to memory [1] and out-of-bounds
->> writes to device registers.
->> 
->> Before commit 43a3d9ba34c9 ("i40evf: Allow PF driver to configure RSS"),
->> the loop upper bounds were:
->>      i <= I40E_VFQF_{HKEY,HLUT}_MAX_INDEX
->> which is safe since the value is the last valid index.
->> 
->> That commit changed the bounds to:
->>      i <= adapter->rss_{key,lut}_size / 4
->> where `rss_{key,lut}_size / 4` is the number of dwords, so the last
->> valid index is `(rss_{key,lut}_size / 4) - 1`. Therefore, using `<=`
->> accesses one element past the end.
->> 
->> Fix the issues by using `<` instead of `<=`, ensuring we do not exceed
->> the bounds.
->> 
->> [1] KASAN splat about rss_key_size off-by-one
->>    BUG: KASAN: slab-out-of-bounds in iavf_config_rss+0x619/0x800
->>    Read of size 4 at addr ffff888102c50134 by task kworker/u8:6/63
->> 
->
->[...]
->
->> 
->> Fixes: 43a3d9ba34c9 ("i40evf: Allow PF driver to configure RSS")
->> Signed-off-by: Kohei Enju <enjuk@amazon.com>
->> ---
->>   drivers/net/ethernet/intel/iavf/iavf_main.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->> 
->> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
->> index c2fbe443ef85..4b0fc8f354bc 100644
->> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
->> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
->> @@ -1726,11 +1726,11 @@ static int iavf_config_rss_reg(struct iavf_adapter *adapter)
->>   	u16 i;
->>   
->>   	dw = (u32 *)adapter->rss_key;
->> -	for (i = 0; i <= adapter->rss_key_size / 4; i++)
->> +	for (i = 0; i < adapter->rss_key_size / 4; i++)
->>   		wr32(hw, IAVF_VFQF_HKEY(i), dw[i]);
->>   
->>   	dw = (u32 *)adapter->rss_lut;
->> -	for (i = 0; i <= adapter->rss_lut_size / 4; i++)
->> +	for (i = 0; i < adapter->rss_lut_size / 4; i++)
->>   		wr32(hw, IAVF_VFQF_HLUT(i), dw[i]);
->
->this is generally the last defined register mapping,
->so I get why KASAN is able to report a violation here
->(I assume that we map "just enough")
+This series introduces a generic kernel-userspace API for retrieving PHY
+Mean Square Error (MSE) diagnostics, together with netlink integration,
+a fast-path reporting hook in LINKSTATE_GET, and initial driver
+implementations for the KSZ9477 and DP83TD510E PHYs.
 
-Just to clarify, I think KASAN is detecting OOB read access to the slab
-memory region (dw[i]), and not detecting register write access (wr32())
-directly. 
+MSE is defined by the OPEN Alliance "Advanced diagnostic features for
+100BASE-T1 automotive Ethernet PHYs" specification [1] as a measure of
+slicer error rate, typically used internally to derive the Signal
+Quality Indicator (SQI). While SQI is useful as a normalized quality
+index, it hides raw measurement data, varies in scaling and thresholds
+between vendors, and may not indicate certain failure modes - for
+example, cases where autonegotiation would fail even though SQI reports
+a good link. In practice, such scenarios can only be investigated in
+fixed-link mode; here, MSE can provide an empirically estimated value
+indicating conditions under which autonegotiation would not succeed.
 
-Anyway, thank you for reviewing, Przemek!
+Example output with current implementation:
+root@DistroKit:~ ethtool lan1
+Settings for lan1:
+...
+        Speed: 1000Mb/s
+        Duplex: Full
+...
+        Link detected: yes
+        SQI: 5/7
+        MSE: 3/127 (channel: worst)
 
->
->impressive, and thanks for the fix!
->
->Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->
->>   
->>   	iavf_flush(hw);
->
->
+root@DistroKit:~ ethtool --show-mse lan1
+MSE diagnostics for lan1:
+MSE Configuration:
+        Max Average MSE: 127
+        Refresh Rate: 2000000 ps
+        Symbols per Sample: 250
+        Supported capabilities: average channel-a channel-b channel-c
+                                channel-d worst
+
+MSE Snapshot (Channel: a):
+        Average MSE: 4
+
+MSE Snapshot (Channel: b):
+        Average MSE: 3
+
+MSE Snapshot (Channel: c):
+        Average MSE: 2
+
+MSE Snapshot (Channel: d):
+        Average MSE: 3
+
+[1] https://opensig.org/wp-content/uploads/2024/01/Advanced_PHY_features_for_automotive_Ethernet_V1.0.pdf
+
+Oleksij R
+
+Oleksij Rempel (4):
+  net: phy: introduce internal API for PHY MSE diagnostics
+  ethtool: netlink: add ETHTOOL_MSG_MSE_GET and wire up PHY MSE access
+  net: phy: micrel: add MSE interface support for KSZ9477 family
+  net: phy: dp83td510: add MSE interface support for 10BASE-T1L
+
+ Documentation/netlink/specs/ethtool.yaml      |  86 +++++
+ Documentation/networking/ethtool-netlink.rst  |  64 ++++
+ drivers/net/phy/dp83td510.c                   |  62 ++++
+ drivers/net/phy/micrel.c                      | 102 ++++++
+ include/linux/phy.h                           | 206 +++++++++++
+ .../uapi/linux/ethtool_netlink_generated.h    |  35 ++
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/mse.c                             | 329 ++++++++++++++++++
+ net/ethtool/netlink.c                         |  10 +
+ net/ethtool/netlink.h                         |   2 +
+ 10 files changed, 897 insertions(+), 1 deletion(-)
+ create mode 100644 net/ethtool/mse.c
+
+--
+2.47.3
+
 
