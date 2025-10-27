@@ -1,105 +1,129 @@
-Return-Path: <netdev+bounces-233081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0656CC0BEA0
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 07:11:53 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFE94C0BEFB
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 07:17:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2EA084EE5A0
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 06:11:35 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 17734345D97
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 06:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267AE2D9EF4;
-	Mon, 27 Oct 2025 06:11:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71ADC298CA6;
+	Mon, 27 Oct 2025 06:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Nm9kZX4b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Te4zu4eU"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD2627FD62;
-	Mon, 27 Oct 2025 06:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF3D1946DA
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 06:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761545491; cv=none; b=UxQK84/omkfyLqCYB/MlgDMwFeXmbY0khfiWTIo/TDwr6txMYyiEhM5LyeGPE3eMsZLCKczpXdHN970w61e4kfLMqo9tNW3dWkrhOIJAvo59KgX5q3x0WupK9Wi4TCuoDsLjBZRvjcy1TNGkcyVwePxr70ex7dOHZpeeLFvOd2A=
+	t=1761545849; cv=none; b=MNpF8WpJyMcBwqRFSgA/dOsz0LxlHyvWLekVInGNcen4i+rw4ZtM2MA8eoKr88OERAYPcD45wHm6f8Q8WNTNIsUoK43+CrtPwQNN2tdFFWlQdHcW0mz2kRaKdwLjCm8m+xNbg3xmfms0F3b9LQiBevC0cxgvZxDFwo18pBPmHvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761545491; c=relaxed/simple;
-	bh=cntqfXxT1Qhp0sdDSsUHNzX5CNHB9d1v+Yy+uTCRo0A=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=fA5+3ceQNZIje0YS7jzyewWRiw94T/MapxoF5Ysr7SCuMcCz2Jxd7MsmlRokyPTQFj027moG8BKPJ96lfpHPXSsoXB1l2sGvkALRj6CDgnzt11XTMcAPL8afsEKyv5lrb+6Bi2wPNMaOlXEj7HhnyJ0So+Z6hJ4/6nbb0ribGLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Nm9kZX4b; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=TMUs/ucMAf7vLbvKotDBlLyJQtlAH147syuwMq7y3ZQ=;
-	b=Nm9kZX4boUFlHbQFVz+q4+50Fcei0K87KrG98tqWw1PKB7+dAQLahRQuEZJ1LMGnviHbYzPIe
-	0PipPWdmFborBSf0f8VgogXuK/xV+fWkAQnM/6zstUnr4IQvNiZhnaYoRMk/hLU/SHqVUAKoLgg
-	rSzEe4HwBA4LSr0MEZTqCKA=
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4cw35z0GPBz12LDD;
-	Mon, 27 Oct 2025 14:10:47 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 712DF18007F;
-	Mon, 27 Oct 2025 14:11:25 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 27 Oct 2025 14:11:24 +0800
-Message-ID: <80fb8bee-20bf-4eea-9719-045e85f8f181@huawei.com>
-Date: Mon, 27 Oct 2025 14:11:23 +0800
+	s=arc-20240116; t=1761545849; c=relaxed/simple;
+	bh=s2y9IfOAbXVKdsFD+bd7mUEWaAn36Kc0djLxRb2Yg/8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OcUwYzmTBwdxovI48+9H1s2TnBuuS8U8XZbwDxFnVLHgK3bhr0kvCgYPtjq4uglj1UybIX4/mIj2tG1UccvRKZHcwrJucFn9jiXhWnUmGCKhN3XQvZGcMa2wjKp3QgaJ/zxMydtBYFzwE4ruIHy6Z+yBXwpPIHicLbJpHh999MI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Te4zu4eU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7538C4CEF1;
+	Mon, 27 Oct 2025 06:17:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761545848;
+	bh=s2y9IfOAbXVKdsFD+bd7mUEWaAn36Kc0djLxRb2Yg/8=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=Te4zu4eU2OIkUie4Cv+Y90UJI8H4XMxQgf0vUo0Nd9GKBPmFvZQIAzlti+abz5jiL
+	 fJosq5hGB5c6RXDrE3909I4hiy+WAvsGpckbku9EUI6XBkzbF+4VxhaDVMBmpk/YQV
+	 EGzJ1AxRXos/ZWI7Zs0n0i+Y/uYkWnpUUrovH0EHFYinJD9pDraVtqR5vBIFkb5tis
+	 AK3/oW4ZPBNpimnkI2z/RRIsjk0qKvf97qefgpcOOgZDxpXoUF/9yG1cNRCCTZ/sR1
+	 9CZmKp+gW3b8BAS8oamMX9CGRpVUeXGSoClIvayzi2+dQMpQSDFyn4cn8lGibOt2O0
+	 8UxDm4XS7zRBQ==
+Message-ID: <b6964938358dc1af41c9fefda071c19e81c8e64a.camel@kernel.org>
+Subject: Re: [PATCH net-next 2/3] tcp: add newval parameter to
+ tcp_rcvbuf_grow()
+From: Geliang Tang <geliang@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>, Eric Dumazet
+ <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>,  Simon Horman <horms@kernel.org>, Neal Cardwell
+ <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,  Kuniyuki
+ Iwashima <kuniyu@google.com>, Mat Martineau <martineau@kernel.org>, 
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
+Date: Mon, 27 Oct 2025 14:17:21 +0800
+In-Reply-To: <22536cac-4731-4b09-b1ba-f69755128665@kernel.org>
+References: <20251024075027.3178786-1-edumazet@google.com>
+	 <20251024075027.3178786-3-edumazet@google.com>
+	 <67abed58-2014-4df6-847e-3e82bc0957fe@redhat.com>
+	 <CANn89iLjPLbzBprZp3KFcbzsBYWefLgB3witokh5fvk3P2SFsA@mail.gmail.com>
+	 <44b10f91-1e19-48d0-9578-9b033b07fab7@kernel.org>
+	 <CANn89iKgqF_9pn6FeyjKtq-oVS-TsYYhvyVRbOs3RzYqXY0DWQ@mail.gmail.com>
+	 <CANn89iJThdC=avrdYAfNE4LqRvPtkGS-7fLQdLOYG-ZOTinjRw@mail.gmail.com>
+	 <22536cac-4731-4b09-b1ba-f69755128665@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: phy: motorcomm: Add support for PHY LEDs on YT8531
-To: Tianling Shen <cnsztl@gmail.com>, Frank Sae <Frank.Sae@motor-comm.com>,
-	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell
- King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-References: <20251026133652.1288732-1-cnsztl@gmail.com>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20251026133652.1288732-1-cnsztl@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Transfer-Encoding: 8bit
 
+Hi Eric, Paolo, Matt,
 
-on 2025/10/26 21:36, Tianling Shen wrote:
-> The LED registers on YT8531 are exactly same as YT8521, so simply
-> reuse yt8521_led_hw_* functions.
->
-> Tested on OrangePi R1 Plus LTS and Zero3.
->
-> Signed-off-by: Tianling Shen <cnsztl@gmail.com>
+On Fri, 2025-10-24 at 17:27 +0200, Matthieu Baerts wrote:
+> On 24/10/2025 16:58, Eric Dumazet wrote:
+> > On Fri, Oct 24, 2025 at 7:47 AM Eric Dumazet <edumazet@google.com>
+> > wrote:
+> > > 
+> > 
+> > > 
+> > > I usually stack multiple patches, and net-next allows for less
+> > > merge conflicts.
+> > > 
+> > > See for instance
+> > > https://lore.kernel.org/netdev/20251024120707.3516550-1-edumazet@google.com/T/#u
+> > > which touches tcp_rcv_space_adjust(), and definitely net-next
+> > > candidate.
+> > > 
+> > > Bug was added 5 months ago, and does not seem critical to me
+> > > (otherwise we would have caught it much much earlier) ?
+> > > 
+> > > Truth be told, I had first to fix TSO defer code, and thought the
+> > > fix
+> > > was not good enough.
+> > 
+> > To clarify, I will send the V2 targeting net tree, since you asked
+> > for it ;)
+> 
+> Thank you very much!
+> 
+> Note that the bug was apparently more visible with MPTCP, but only
+> since
+> a few weeks ago, after the modifications on MPTCP side. When I looked
+> at
+> the issue, I didn't suspect anything wrong on the algorithm that was
+> copied from TCP side, because this original code was there for a few
+> months (and its author is very trustable :) ). So again, thank you
+> for
+> having fixed that!
 
-Reviewed-by: Jijie Shao<shaojijie@huawei.com>
+I have just tested and confirmed that this series, together with
+Paolo's correction (changing msk->rcvq_space.copied to msk-
+>rcvq_space.space in mptcp_rcvbuf_grow()), fixes the simult_flows.sh
+issue mentioned in [1].
 
-> ---
->   drivers/net/phy/motorcomm.c | 3 +++
->   1 file changed, 3 insertions(+)
->
-> diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
-> index a3593e663059..89b5b19a9bd2 100644
-> --- a/drivers/net/phy/motorcomm.c
-> +++ b/drivers/net/phy/motorcomm.c
-> @@ -3048,6 +3048,9 @@ static struct phy_driver motorcomm_phy_drvs[] = {
->   		.get_wol	= ytphy_get_wol,
->   		.set_wol	= yt8531_set_wol,
->   		.link_change_notify = yt8531_link_change_notify,
-> +		.led_hw_is_supported = yt8521_led_hw_is_supported,
-> +		.led_hw_control_set = yt8521_led_hw_control_set,
-> +		.led_hw_control_get = yt8521_led_hw_control_get,
->   	},
->   	{
->   		PHY_ID_MATCH_EXACT(PHY_ID_YT8531S),
+Thanks,
+-Geliang
+
+[1]
+https://github.com/multipath-tcp/mptcp_net-next/issues/589
+
+> 
+> Cheers,
+> Matt
+
 
