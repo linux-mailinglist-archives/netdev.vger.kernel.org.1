@@ -1,102 +1,191 @@
-Return-Path: <netdev+bounces-233211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B12C0E9DE
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 15:51:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4293C0E82A
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 15:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90387466713
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 14:37:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79A263BCD05
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 14:37:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC074308F36;
-	Mon, 27 Oct 2025 14:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A312B2BDC23;
+	Mon, 27 Oct 2025 14:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XaMIeQ/e"
+	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="hSmKKWD5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9442B1E505;
-	Mon, 27 Oct 2025 14:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB1023E355;
+	Mon, 27 Oct 2025 14:35:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761575721; cv=none; b=rvHv5Png3Ut+QztvsOPOfRMqwB/3vGOaTmxEdMk6D2y73GtkKK2Mv7NNqQdKwxkjdWpdHn1fz+7dD4nT2hagc1jH/PQ7BKT79s4A9rFm9CAXuwjpszR+MHnpaNWkwUU7Lq0WJQVdqKZ0A4cqd4CC5o0JQE5eDE/iNUSrJSSi4Q8=
+	t=1761575739; cv=none; b=Fsfs8GHn++iNyjabgLVaCqb+7iU6tR3GsWeZXIp+bVPZNhT6nGWdQsFFtU4pQIKEbRYiddFmvb5kPnlNLS7OyG16OwdmOMS3+f9tb/CRSjIOhQtvLCSVqQX43rfc0EjDJn4bXf+yBWs3Ul3kg1HxfuIOJujywQ9thaZDmbervg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761575721; c=relaxed/simple;
-	bh=KMompSoz2y155bQ0qAq+gXfUc2mS23P0LNhll3E9WTk=;
+	s=arc-20240116; t=1761575739; c=relaxed/simple;
+	bh=r5CubwPSgel9Kbfug9bRhlGBAU1MiZJ3lZEaLzdKfjM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s6YTMtcopsEVKBBFFUxhtOofqR1gz4+yJzFe5qUcpBi/d88hgBM0rGr81JsZmuzEf2ISgt+TIKhsY0DSEwngjfvoqpIuRbxAHwmDKuYqwJvz8pP3zq68yB/BHZ/Tx1ZoEcxS9UCaqva6ClDfM0kMGZlorRS2wasDxPGJNOmrQ94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XaMIeQ/e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 675D3C4CEF1;
-	Mon, 27 Oct 2025 14:35:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761575720;
-	bh=KMompSoz2y155bQ0qAq+gXfUc2mS23P0LNhll3E9WTk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XaMIeQ/eSyQhHs7WHZc9h4YqLc0maiNnXKRd2uaZ4BgTf0RaK1k8bmUk2aP1Ipn8Y
-	 +Nmyk+egooCCFU36HOKl6kx61fakn4cjNphws4vBq+WWMVvWV8qj+VlVMA6SV3SiuY
-	 mTBDNLuyv7crVgGufGn2U79JBaH53NrRYinr1awex6tIHZPtX/5VnVKoZiDQKPw86K
-	 T6MatMgXg8qP3NKpxXllnH7IhvLD+VfuXRPRI7f5e2eVSAwnfxB9QlOf0DyOBDP9mt
-	 Fheg6jppmylgV7cYRhVt1veBbXRi0hhODu7dpCyfDnz7hKgBFweoP4Li2vZackV7Fn
-	 4zpDae+1iLrIw==
-Date: Mon, 27 Oct 2025 16:35:16 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Chu Guangqing <chuguangqing@inspur.com>
-Cc: cooldavid@cooldavid.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH for-next 1/1] net: jme: migrate to dma_map_phys instead
- of map_page
-Message-ID: <20251027143516.GN12554@unreal>
-References: <20251024070734.34353-1-chuguangqing@inspur.com>
- <20251024070734.34353-2-chuguangqing@inspur.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=B+/86Q0YGHTLPmv4k8HsjIwBwlRu7PIHkqpV63LuDOLL4PCwW8fAKSXc7naYGml/XkVR4MdMKWLKHtSkW0VR2IRwOx6eNDk6MIVCdiP+kqwTZXuDS1U51bk2KJ5TYg9vdkqMRMtoIv7VMz2TIS3qldNu8lMrKvt/vIOBz6kFHs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=hSmKKWD5; arc=none smtp.client-ip=217.194.8.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
+Received: from francesco-nb (248.201.173.83.static.wline.lns.sme.cust.swisscom.ch [83.173.201.248])
+	by mail11.truemail.it (Postfix) with ESMTPA id 5844321E50;
+	Mon, 27 Oct 2025 15:35:26 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
+	s=default; t=1761575726;
+	bh=8GGEgENZ1Vbe/2oA2ExOI5P6StTcMkX9+lb/DIzzw+k=; h=From:To:Subject;
+	b=hSmKKWD5RlUsXX84DlnGt9tQK3iinQHeJKVdKvorRGtoHbNNKnsxYszN0rIZeqHDm
+	 59UDEeDMSQK9KFlAXGVwV/G2fTStj9zYorqDxRw7G4YRkCmP6jEm8smZB+Shs0jvOK
+	 +T3wA10zIHWZiGFf3iFcT55QfkSFMNHLReAZFOyIcUSK1JAXLC9HNO8/frDxKfa3kB
+	 NehBY0neZ/6gCc0wWZH0Ygf6aE8Wcold9fUk+VlvIJsX9woFLf5+OyUi1HrGmI/y2x
+	 Rz8SzYnNctjv2T5Z9PPSbAeUh0ICNCPc4H/n2C/IeR+U5dxWUR3FcKAP1rk8GX/R4G
+	 PK7bG/Wf8J/Vg==
+Date: Mon, 27 Oct 2025 15:35:22 +0100
+From: Francesco Dolcini <francesco@dolcini.it>
+To: Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>
+Cc: Emanuele Ghidoli <ghidoliemanuele@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1] net: phy: dp83867: Disable EEE support as not
+ implemented
+Message-ID: <20251027143522.GA57409@francesco-nb>
+References: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
+ <ae723e7c-f876-45ef-bc41-3b39dc1dc76b@lunn.ch>
+ <664ef58b-d7e6-4f08-b88f-e7c2cf08c83c@gmail.com>
+ <df3aac25-e8e9-46cb-bd92-637822665080@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251024070734.34353-2-chuguangqing@inspur.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <df3aac25-e8e9-46cb-bd92-637822665080@lunn.ch>
 
-On Fri, Oct 24, 2025 at 03:07:34PM +0800, Chu Guangqing wrote:
-> After introduction of dma_map_phys(), there is no need to convert
-> from physical address to struct page in order to map page. So let's
-> use it directly.
-> 
-> Signed-off-by: Chu Guangqing <chuguangqing@inspur.com>
-> ---
->  drivers/net/ethernet/jme.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/jme.c b/drivers/net/ethernet/jme.c
-> index d8be0e4dcb07..7ceeb706939d 100644
-> --- a/drivers/net/ethernet/jme.c
-> +++ b/drivers/net/ethernet/jme.c
-> @@ -735,9 +735,10 @@ jme_make_new_rx_buf(struct jme_adapter *jme, int i)
->  	if (unlikely(!skb))
->  		return -ENOMEM;
->  
-> -	mapping = dma_map_page(&jme->pdev->dev, virt_to_page(skb->data),
-> -			       offset_in_page(skb->data), skb_tailroom(skb),
-> -			       DMA_FROM_DEVICE);
-> +	mapping = dma_map_phys(&jme->pdev->dev, virt_to_phys(skb->data),
-> +			       skb_tailroom(skb),
-> +			       DMA_FROM_DEVICE,
-> +			       0);
+Hello Andrew and Russel,
 
-Same comment as before, dma_map_phys() should be paired with dma_unmap_phys().
-
-Thanks
-
->  	if (unlikely(dma_mapping_error(&jme->pdev->dev, mapping))) {
->  		dev_kfree_skb(skb);
->  		return -ENOMEM;
-> -- 
-> 2.43.7
+On Mon, Oct 27, 2025 at 02:25:12PM +0100, Andrew Lunn wrote:
+> On Mon, Oct 27, 2025 at 01:57:48PM +0100, Emanuele Ghidoli wrote:
+> > On 27/10/2025 00:45, Andrew Lunn wrote:
+> > >> Since the introduction of phylink-managed EEE support in the stmmac driver,
+> > >> EEE is now enabled by default, leading to issues on systems using the
+> > >> DP83867 PHY.
+> > >> Fixes: 2a10154abcb7 ("net: phy: dp83867: Add TI dp83867 phy")
+> > > 
+> > > What has this Fixes: tag got to do with phylink?
+> > I think that the phylink commit is just enabling by default the EEE support,
+> > and my commit is not really fixing that. It is why I didn't put a Fixes: tag
+> > pointing to that.
+> > 
+> > I’ve tried to trace the behavior, but it’s quite complex. From my testing, I
+> > can summarize the situation as follows:
+> > 
+> > - ethtool, after that patch, returns:
+> > ethtool --show-eee end0
+> > EEE settings for end0:
+> >         EEE status: enabled - active
+> >         Tx LPI: 1000000 (us)
+> >         Supported EEE link modes:  100baseT/Full
+> >                                    1000baseT/Full
+> >         Advertised EEE link modes:  100baseT/Full
+> >                                     1000baseT/Full
+> >         Link partner advertised EEE link modes:  100baseT/Full
+> >                                                  1000baseT/Full
+> > - before that patch returns, after boot:
+> > EEE settings for end0:
+> >         EEE status: disabled
+> >         Tx LPI: disabled
+> >         Supported EEE link modes:  100baseT/Full
+> >                                    1000baseT/Full
+> >         Advertised EEE link modes:  Not reported
+> >         Link partner advertised EEE link modes:  100baseT/Full
+> >                                                  1000baseT/Full
+> > - Enabling EEE manually using ethtool, triggers the problem too (and ethtool
+> > -show-eee report eee status enabled):
+> > ethtool --set-eee end0 eee on tx-lpi on
+> > ethtool --show-eee end0
+> > EEE settings for end0:
+> >         EEE status: enabled - active
+> >         Tx LPI: 1000000 (us)
+> >         Supported EEE link modes:  100baseT/Full
+> >                                    1000baseT/Full
+> >         Advertised EEE link modes:  100baseT/Full
+> >                                     1000baseT/Full
+> >         Link partner advertised EEE link modes:  100baseT/Full
+> >                                                  1000baseT/Full
+> > 
+> > I understand Russell point of view but from my point of view EEE is now
+> > enabled by default, and before it wasn't, at least on my setup.
 > 
+> We like to try to understand what is going on, and give accurate
+> descriptions. You have given us important information here, which at
+> minimum should go into the commit message, but more likely, it will
+> help lead us to the correct fix.
 > 
+> So, two things here. You say:
+> 
+> > I think that the phylink commit is just enabling by default the EEE support,
+> 
+> That needs confirming, because you are blaming the conversion to
+> phylink, not that phylink now enabled EEE by default. Russell also
+> tries to avoid behaviour change, which this clearly is. We want a
+> better understanding what caused this behaviour change.
+> 
+> Also:
+> 
+> > - Enabling EEE manually using ethtool, triggers the problem too (and ethtool
+> > -show-eee report eee status enabled):
+> 
+> This indicates EEE has always been broken. This brokenness has been
+> somewhat hidden in the past, and it is the change in behaviour in
+> phylink which exposed this brokenness. A commit message using these
+> words would be much more factually correct, and it would also fit with
+> the Fixes: tag you used.
+> 
+> So, please work with Russell. I see two things which would be good to
+> understand before a new version of the patch is submitted:
+> 
+> What cause the behaviour change such that EEE is now enabled? Was it
+> deliberate? Should something be change to revert that behaviour
+> change?
+> 
+> Given that EEE has always been broken, do we understand it
+> sufficiently to say it is not fixable? Is there an errata? Are we sure
+> it is the PHY and not the MAC which is broken?
+
+I was talking together with Emanuele on this topic and we are confused
+on how to proceed.
+
+From the various comments and tests in this thread, to me the actual
+code change is correct, the dp83867 does not support EEE and we have to
+explicitly disable it in the dp83867 driver.
+
+As of now we do not have a clear shared understanding on what is going
+on in the stmmac driver. And the commit message is not correct on this
+regard.
+
+This patch is already merged [1] in netdev tree, should we send a series
+reverting this commit and another commit with just the same change and a
+different commit message? 
+
+In parallel, unrelated to the dp83867 topic, Emanuele is trying to help
+figuring out why the actual behavior of the stmmac changed after Russell
+refactoring. And it's clear that this change in behavior is not expected.
+
+[1] commit 84a905290cb4 ("net: phy: dp83867: Disable EEE support as not implemented")
+
+Francesco
+
 
