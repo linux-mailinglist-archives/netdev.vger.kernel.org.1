@@ -1,78 +1,81 @@
-Return-Path: <netdev+bounces-233093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3DEAC0C286
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 08:39:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E533C0C289
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 08:39:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E34413A6164
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 07:38:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18C693A9A6D
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 07:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184132DCF52;
-	Mon, 27 Oct 2025 07:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FA72E03EE;
+	Mon, 27 Oct 2025 07:38:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UlByw9bQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Sao7PeIa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9972DF3E7
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 07:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB892DF700
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 07:38:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761550694; cv=none; b=i469cxy67LaSe62O6mLZk7HbLDcGHiPUxNMgNN9D0HRxjPAahNP9zpMhD5SgMqMgSL5KWCAj3e4qcnHJ6gLFNQrAhQUQXw4Yi3zcfU03+A+fyX5SUHfigM++YY8yxxb/0SiifWtozxdo4iZiyJmMxeAQXsqhnycBUJDy0Tc18m0=
+	t=1761550696; cv=none; b=JWfIqRVAoQ7SgMtH+mW+YY6QkFqrjHDwX4b7PsASYv5E5+E6jcEWSl4FOcPPlVaCshguWKTY/dBLhKf0CmZFKzeWnLV640O0rOoL7R6rApL+l/ns+t06QAaPF7/5xOaCuFWM9qVmUGvNbPGL/KCk6e7lsO15WdgKS3Jg6g2Q7YA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761550694; c=relaxed/simple;
-	bh=RfaRHOxyFPFQn4VUY1f1XT9UjO/SBtxZvgOQdr8gOFU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=btnkQ7Mm5cJVsvsZ0mYEOLDraVKSZBi7HcslSZnN3tPmSR2hRWUGeSxsJt9z1QRru0TDdxuysrlbBauQZeJvpr/UACpB5RAQ/qQTntFIQcFyqIztCMzyx3xdWmqlOvwg5G9YK8eisifH+uEsMgCxDzAS5eCfBVZ45RtYkSB0ni4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UlByw9bQ; arc=none smtp.client-ip=209.85.222.202
+	s=arc-20240116; t=1761550696; c=relaxed/simple;
+	bh=HYeNLajkD+lS/7fLxxyM+Uku76cK7IqcHQNsW9OVm0U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VBjDp/ctoVfQ1BiLf0DLRVkr1OsLisC7z2hhkq467W8pZKVsjui5SR2pvGiGOQrylUQk1UoebQ8vwQgW1MtPYzkI7MJ6TWMO/+jsCzvUeLl6nyotpNFH0tWtlsiW0tboUoteIZWxk5AiR7ElnqTUQlTY3L6eG8CaAZTSvPEdYNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Sao7PeIa; arc=none smtp.client-ip=209.85.219.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-86df46fa013so1184040485a.2
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 00:38:12 -0700 (PDT)
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-78f2b1bacfcso100980866d6.3
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 00:38:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761550691; x=1762155491; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MOGHALr6gWCVB1/LcCazMLczhahHXUuAmU6aaiOis1U=;
-        b=UlByw9bQnMjvQDautG9ajfk6u7HvPZtAsfhPyGjka4WPwVxmxshUKltLn9dFK91lV2
-         f6ic5IfVvikcc3+s2lk4wpdXsRokJGkk9LZVEa5BtSpoMYbtP1Z5IGLnP3t+Ln6HEf8+
-         amlrs2EO+R2Jj+TkYdkHe549yHGvr3QPEetneioy+bq09UV3/qIDQN0Ju+AEJWmFhIgY
-         ZewkoaUfN3AbVU+yOQsH11EHogjmDuwld44UmLbZ547T1lD/FsAn0ceYvxbL+Hq50PxZ
-         +R6gdYEKBIO6y80gMit+1c5X82zZQpyXv5+GiMUd0E+MW5hZZBQn62Potdurr6mAtX6Z
-         iWIQ==
+        d=google.com; s=20230601; t=1761550693; x=1762155493; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uh6V4ej3tUSQu9dfieVhc8CIMklXd4yFOnTxayFJ/qQ=;
+        b=Sao7PeIabR/qAdZYsvTwuT7yxemdj2GaqgHMdh4VSLxbtuMWrh6e/IWX0bJS7GECJ8
+         bDAMY8avc1pTvZZGb9y6XBwKb64B5Tm06jfHTwJiIlk+5T8AnCa0Ip22JlwO+CQSPZ8e
+         DB17wFOqIMvZZYeJhWhVSfNqVDK2Nua5KEMobM2+QcoHqz8B37VBIkRydU5cTmuyw2tF
+         E6gJKwDy4o73EtcsDR7iJMwx9Gnv5cJfXFsFjgY4M8eSNfGMzXw5Cpalh7sLOynyJsjn
+         9+kSP9Bmcf/yxAEVZFxuVt0SeeLjJsjJxwLDkG+RIwmGiAyfi71zTUqobWddKXGJml8z
+         ZrvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761550691; x=1762155491;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MOGHALr6gWCVB1/LcCazMLczhahHXUuAmU6aaiOis1U=;
-        b=lKfKhdYz9M5rxeoNIKC38JMuw25+hK4y+LsDcdjvvLC1FcTzHWCCwx8XeYCT68IR/9
-         nKx2Cq9PUfUmaJSjDr8i3ZgpU5JzVBmwrpRoj4oFVckJj7yoJPeg2bTjMuTzgZLsYbOC
-         hr4hki6/zRWIlf/KSYFV74khj7WcI3u8dqUqYjUcoeraWXKjWvg8RPROyZTrSL9l7YxY
-         TNBsJDUM6nWLHuZZchEGtguU5J3m9rq22N0zKurW7efppt0KvAs1M2QDTZL3SXAyJz0X
-         SuYkYGJdlZpE5I06IG5RjcJBQN61RR9twMWzduKJwNE4fwz9PPmDweL/wWBXQF/2xra2
-         1IiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVL5I11hT9psH6YhPXo9ciruMSWoLHfJs/vpgYty0fMS8UFxKXmV3UlwDwsf2mGSQg0lzqwMz8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzr9oQ0P1wlGO2uyfXQSD/tAGoQTGN5JNUVsvqGPqa8pQ/pc7YY
-	wTmwbTGsKZgAsqpGWppU5rt0EDffill5NXfJ7aodoGo8oMsCznArVO1CTg9ERa0T4rtSMlN+vFF
-	FAE6yhtXtM68J5Q==
-X-Google-Smtp-Source: AGHT+IEs3lkhE92Lhk4EVKcuAB87jkcf/9/0fp06nPGxjEOD2yuLMAu63WVhuiygcyrF+hacMnWyonEl2+qsbw==
-X-Received: from qkau1.prod.google.com ([2002:a05:620a:a1c1:b0:89f:6751:13d5])
+        d=1e100.net; s=20230601; t=1761550693; x=1762155493;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uh6V4ej3tUSQu9dfieVhc8CIMklXd4yFOnTxayFJ/qQ=;
+        b=jHypwI2MCNO5UrRYHq4gNrzImZxRsenWbSh9xZAhXucnN9Ztyip8MZ5K2+4ul4EsSA
+         xmK96qLpr57ldQHX7f6ofAlZJZGf9n+NBgYP8iw1OyNz0+qc4qZxrdPjjuOtz7oL2+sx
+         RyGIicOrDlsV7XLNWBLpXfV+2fXcMgA27kQUiFd74ZKNr3+8WAe0uk/ztfwR0unYSCeP
+         RISN/efwVWOHvb0SSzFhib5FYuoYqWXrsJpwzjCdO3Trf3l+KpTMWwWclU7W3kebEMpj
+         xsWXr4zokOr1mGziDg8zcWvI+yVDuCrVhvHrLFQFjhqEh08y4EpCYEaLvzdpBujQa/7n
+         0xRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXEqrTB5FaplIHtubtqHDoHGUGKwLidOYPDMbUFWYkU+90NfencSuWNBkqnyWasFlVU9Hi8qtM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXK1phaqTBM9zgdI7AIDoHHRbLtPesjDP0ZR+2MIkYT6lYV6ss
+	lshCtlPAQXHi7yvJcB9Q33zM8BMK02uzQEb9o0OsKEFLV4VXHUFAOF4lJgsHBHuRSh5v5cBHq2N
+	rc0zOJBNzta6cgA==
+X-Google-Smtp-Source: AGHT+IH9ha7ywWpJ2PLo6/QknNnwWKZ9dSfJ/JFZicMBk9BKuEgn3pMXLdhlaJ5XRnaqRMyRGKl59b6mK7V5YA==
+X-Received: from qvbmf2.prod.google.com ([2002:a05:6214:5d82:b0:87d:cc41:af01])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:1991:b0:880:d691:2af7 with SMTP id af79cd13be357-89c12d077edmr1746854385a.79.1761550691289;
- Mon, 27 Oct 2025 00:38:11 -0700 (PDT)
-Date: Mon, 27 Oct 2025 07:38:06 +0000
+ 2002:a05:6214:21c6:b0:87c:2c76:62a2 with SMTP id 6a1803df08f44-87fb6487b37mr117500416d6.64.1761550692801;
+ Mon, 27 Oct 2025 00:38:12 -0700 (PDT)
+Date: Mon, 27 Oct 2025 07:38:07 +0000
+In-Reply-To: <20251027073809.2112498-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20251027073809.2112498-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.1.821.gb6fe4d2222-goog
-Message-ID: <20251027073809.2112498-1-edumazet@google.com>
-Subject: [PATCH v2 net 0/3] tcp: fix receive autotune again
+Message-ID: <20251027073809.2112498-2-edumazet@google.com>
+Subject: [PATCH v2 net 1/3] trace: tcp: add three metrics to trace_tcp_rcvbuf_grow()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,41 +86,59 @@ Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Neal Cardwell found that recent kernels were having RWIN limited
-issues, even when net.ipv4.tcp_rmem[2] was set to a very big value like 512MB
+While chasing yet another receive autotuning bug,
+I found useful to add rcv_ssthresh, window_clamp and rcv_wnd.
 
-He suspected that tcp_stream default buffer size (64KB) was triggering
-heuristic added in ea33537d8292 ("tcp: add receive queue awareness
-in tcp_rcv_space_adjust()").
+tcp_stream 40597 [068]  2172.978198: tcp:tcp_rcvbuf_grow: time=50307 rtt_us=50179 copied=77824 inq=0 space=40960 ooo=0 scaling_ratio=219 rcvbuf=131072 rcv_ssthresh=107474 window_clamp=112128 rcv_wnd=110592
+tcp_stream 40597 [068]  2173.028528: tcp:tcp_rcvbuf_grow: time=50336 rtt_us=50206 copied=110592 inq=0 space=77824 ooo=0 scaling_ratio=219 rcvbuf=509444 rcv_ssthresh=328658 window_clamp=435813 rcv_wnd=331776
+tcp_stream 40597 [068]  2173.078830: tcp:tcp_rcvbuf_grow: time=50305 rtt_us=50070 copied=270336 inq=0 space=110592 ooo=0 scaling_ratio=219 rcvbuf=509444 rcv_ssthresh=431159 window_clamp=435813 rcv_wnd=434176
+tcp_stream 40597 [068]  2173.129137: tcp:tcp_rcvbuf_grow: time=50313 rtt_us=50118 copied=434176 inq=0 space=270336 ooo=0 scaling_ratio=219 rcvbuf=2457847 rcv_ssthresh=1299511 window_clamp=2102611 rcv_wnd=1302528
+tcp_stream 40597 [068]  2173.179451: tcp:tcp_rcvbuf_grow: time=50318 rtt_us=50041 copied=1019904 inq=0 space=434176 ooo=0 scaling_ratio=219 rcvbuf=2457847 rcv_ssthresh=2087445 window_clamp=2102611 rcv_wnd=2088960
 
-After more testing, it turns out the bug was added earlier
-with commit 65c5287892e9 ("tcp: fix sk_rcvbuf overshoot").
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/trace/events/tcp.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-I forgot once again that DRS has one RTT latency.
-
-MPTCP also got the same issue.
-
-This series :
-
-- adds rcv_ssthresh, window_clamp and rcv_wnd to trace_tcp_rcvbuf_grow().
-- Refactors code in a patch with no functional changes.
-- Fixes the issue in the final patch.
-
-v2: Rebased to net tree
-    Changed mptcp_rcvbuf_grow() to read/write msk->rcvq_space.space (Paolo)
-v1: https://lore.kernel.org/netdev/20251024075027.3178786-1-edumazet@google.com/T/#ma0fc25b4fec0c616bdcd7633aa348043d4d39ee8
-
-Eric Dumazet (3):
-  trace: tcp: add three metrics to trace_tcp_rcvbuf_grow()
-  tcp: add newval parameter to tcp_rcvbuf_grow()
-  tcp: fix too slow tcp_rcvbuf_grow() action
-
- include/net/tcp.h          |  2 +-
- include/trace/events/tcp.h |  9 +++++++++
- net/ipv4/tcp_input.c       | 21 ++++++++++++++-------
- net/mptcp/protocol.c       | 23 +++++++++++++++--------
- 4 files changed, 39 insertions(+), 16 deletions(-)
-
+diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+index 9d2c36c6a0ed74c82306f347ff41fabed7ada8c4..6757233bd0641778ce3ee260c9d757070adc0fcf 100644
+--- a/include/trace/events/tcp.h
++++ b/include/trace/events/tcp.h
+@@ -218,6 +218,9 @@ TRACE_EVENT(tcp_rcvbuf_grow,
+ 		__field(__u32, space)
+ 		__field(__u32, ooo_space)
+ 		__field(__u32, rcvbuf)
++		__field(__u32, rcv_ssthresh)
++		__field(__u32, window_clamp)
++		__field(__u32, rcv_wnd)
+ 		__field(__u8, scaling_ratio)
+ 		__field(__u16, sport)
+ 		__field(__u16, dport)
+@@ -245,6 +248,9 @@ TRACE_EVENT(tcp_rcvbuf_grow,
+ 				     tp->rcv_nxt;
+ 
+ 		__entry->rcvbuf = sk->sk_rcvbuf;
++		__entry->rcv_ssthresh = tp->rcv_ssthresh;
++		__entry->window_clamp = tp->window_clamp;
++		__entry->rcv_wnd = tp->rcv_wnd;
+ 		__entry->scaling_ratio = tp->scaling_ratio;
+ 		__entry->sport = ntohs(inet->inet_sport);
+ 		__entry->dport = ntohs(inet->inet_dport);
+@@ -264,11 +270,14 @@ TRACE_EVENT(tcp_rcvbuf_grow,
+ 	),
+ 
+ 	TP_printk("time=%u rtt_us=%u copied=%u inq=%u space=%u ooo=%u scaling_ratio=%u rcvbuf=%u "
++		  "rcv_ssthresh=%u window_clamp=%u rcv_wnd=%u "
+ 		  "family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 "
+ 		  "saddrv6=%pI6c daddrv6=%pI6c skaddr=%p sock_cookie=%llx",
+ 		  __entry->time, __entry->rtt_us, __entry->copied,
+ 		  __entry->inq, __entry->space, __entry->ooo_space,
+ 		  __entry->scaling_ratio, __entry->rcvbuf,
++		  __entry->rcv_ssthresh, __entry->window_clamp,
++		  __entry->rcv_wnd,
+ 		  show_family_name(__entry->family),
+ 		  __entry->sport, __entry->dport,
+ 		  __entry->saddr, __entry->daddr,
 -- 
 2.51.1.821.gb6fe4d2222-goog
 
