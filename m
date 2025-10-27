@@ -1,112 +1,100 @@
-Return-Path: <netdev+bounces-233257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC2C7C0F87B
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 18:08:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38AF2C0F996
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 18:19:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2C1819C0844
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:08:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB3AC461192
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BC9315D48;
-	Mon, 27 Oct 2025 17:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0033164CD;
+	Mon, 27 Oct 2025 17:14:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K4enI5y2"
+	dkim=pass (1024-bit key) header.d=nohats.ca header.i=@nohats.ca header.b="Qn68k6sL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.nohats.ca (mx.nohats.ca [193.110.157.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 076E4315D21
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 17:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835493164BB
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 17:14:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.85
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761584854; cv=none; b=tmwLXuO8Yt4x/zSndeoFNebdXABI7xLcJFIEgGD1rPrB/tQYDESPQWLFiamBqOwrmC1uRrFDSgc/8JXOykCXEXLxkn79W4x1mKWzKNojF1zBODw60U+4uNtt+IDui+lXsS8NNHqj1OpA+roZGBGHFjPhBEssSIzc6EycMtH2j6E=
+	t=1761585293; cv=none; b=h1qpJm7iblnerp3TeASPa4hrwQ42z/MBtUreXaSpeIIK0oROroE790pj9VuWwFfs0xpuc4A5Bf9btd8q4Mxpf+f3AcQZ197nNiJ/kion0qvUdoRlRhl+Su85BvdnTQtzZXYBTPMYgof49At1qpIA6TpZ4aikxQR08jtrZ20lhE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761584854; c=relaxed/simple;
-	bh=pXhyWAWuGnSUpajeVnpBPQzXFWmidBoPTWSdt4kyAJ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iyaeVC/fBmIerbjTnEguZxZxW3Y7aG929xOXq+wx1eB1no4LEaNuL+jwh1VfX2uQI3xTH/O1L5MrZ9rCgYrIVEsXifdLHIFH9W8uZjF5hch4XQODfU6NlspqHiujjCVki1rXU+bUDOCjy9aL67FtbE2D9OnbW/QITLl/z3jgm/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K4enI5y2; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-290dc63fabbso46923695ad.0
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 10:07:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761584852; x=1762189652; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pXhyWAWuGnSUpajeVnpBPQzXFWmidBoPTWSdt4kyAJ0=;
-        b=K4enI5y20l8fIH5u0qFACoovSg1fwSi2b3l0MjGSPnnBeaMxjytIY4lXd98U7sCTXK
-         seRS+OsTaRJfeyPdN9FWG++SfihE8Dj6EBTmeFYS+MIf1/npvutuxA7T7uC60nJIiXiQ
-         9iCoVJ3GE1MleXeFqIUiJWg/x+ZwhWXjI8gZkFI3ViGyE+pF/5aN74It6SyXcQ6rnexq
-         5dfrQ8sMTdEteUpr0hT0U7Cvr5KNDtJ7WgArcR/1YaS9yo2bb+wLtAmxsUnihS8dmcvT
-         wm9geLo/fqbzWM238/1GvHWlpJHhXG0J32RmUmdEjC7HfjYCxoh1K6kyG0wNK7w410kt
-         +NBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761584852; x=1762189652;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pXhyWAWuGnSUpajeVnpBPQzXFWmidBoPTWSdt4kyAJ0=;
-        b=F7NRcGX6boQdaniJ/OiiM3r38bBd40A1LIChd1beZk077QaYUoJgh+kOPMi2hccOok
-         Uf0duZRDOYsOWY8HXYqTPANnM8ybTKnkpI89M5ls5DmhPNkRsWQRqgGhBEh0MGBLrUUL
-         Iwwv4V9bUtR4g2JSonUTxs8atg1NuYt5cy6oNDcWSDoXEBGfv6CxDWPrxsrqIRCCbrUG
-         zIEYMUCFe7NRmOchWXPN/91hSeTuY1OloNDgnTRHIeNfPpOKkzPb6Vt2jh+DNO1x/dCb
-         X8q2wJ8lhjuYQUQWh4zaVpiDa98YJGgQRf8gUu4FV27UuFC1f2LGo4joQfTKD2F1hK5Z
-         3NQA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIDD8pR5Za0HqOTMZyh87aLZc6mTW/eL42R+EfbAA331kwlgom7ZL/Zh81ew4GEC/GnmdBH/E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmuHwLQAZ2tz40bT7c1danaFPDZHwjWnmpmh7r6U6BLDuOEnhT
-	K3HoDfLhqY/jzms0CraP5twni5RdiaskGmfhmaFAYhGKPd8hG7p1LM+XFXWwPofsKeGUFiVeZCC
-	/MhyRIGpUh3/UTS9N0ktJAZUzQ7mJC0z8YXjXidEc
-X-Gm-Gg: ASbGncsMLbLdawCJzjrmBmt7WwJIWaHHqqPZBl0MrR7d8h9daQ1x/o4zUnUkiTMZKv3
-	+8saKGRw/qMCUC6n8eRgppAn1AfNQwQJvqR+XbqXOoAgN94ppBPDgLGDDsb47ofG7CU2Exru9qP
-	lZ9XeuF6sPVjQXrU+TcYPeY98irS4DntBMDTN3sB5EMOC5jklbAGdiC7WcUwu7cAm1S/XbuXbk6
-	GHaqdtaDqvwzE4sdNr2R1qvl7Oz6wJAm69JpaRGMRS8TMTDsXIAQZQtFcbQvcQc9BoaGKU1Rdro
-	1SUWi97uwdfLVLYTlIHPw7iNyg==
-X-Google-Smtp-Source: AGHT+IGdxT0iOAl8sO+2gv2Hl8b1Yxxk7F5THOUZoQnJ9Xb8hx4TOyF4K4n5Lv/dFQm/oZVKuAxFLrI6/IGqrGKV8Vs=
-X-Received: by 2002:a17:902:ce12:b0:27e:ef27:1e47 with SMTP id
- d9443c01a7336-294cb50e38bmr7221485ad.31.1761584851883; Mon, 27 Oct 2025
- 10:07:31 -0700 (PDT)
+	s=arc-20240116; t=1761585293; c=relaxed/simple;
+	bh=Px/+m+lGlk/4qwzYi4W+xpw2LPCFvnggAQNLQPbXnBI=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Icm7j4N+QGolLPxTE0OSzaSoPi8MxpvJ0Q5wlGLRrCeqfGwf+7esWhPasrDNs+coARxnVUv5wtSNMlMmRV2861i8VYfcmI5G2dzp4dWBKVY6O0OKRt6wrDEnrBd5n4yY8n4ItillMJAZSydxEZIabodmsdWGg5vd9ktgvY/Za/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nohats.ca; spf=pass smtp.mailfrom=nohats.ca; dkim=pass (1024-bit key) header.d=nohats.ca header.i=@nohats.ca header.b=Qn68k6sL; arc=none smtp.client-ip=193.110.157.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nohats.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nohats.ca
+Received: from localhost (localhost [IPv6:::1])
+	by mx.nohats.ca (Postfix) with ESMTP id 4cwKr31Fkkz38B;
+	Mon, 27 Oct 2025 18:14:43 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nohats.ca;
+	s=default; t=1761585283;
+	bh=CIzzzY56/bSFvbgnHMd+JRK6/Vmz9ty2l6pc0sHwssU=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=Qn68k6sLK+55AwCC+Jks+hu+epr1kr6nJ8qmvWvS9633t1obhyqX9fM60dHGpjiSA
+	 nKUzAy2ZcjvAvevtoMqf/jwsy2iYDe13vz+1G4HsEtb1Tf/vRwCxWtlr2ISIRrURJq
+	 Yc32APR7D+1upiWMNbzoymDOH9U5Fz7B9Fna5Js8=
+X-Virus-Scanned: amavisd-new at mx.nohats.ca
+X-Spam-Flag: NO
+X-Spam-Score: 1.206
+X-Spam-Level: *
+Received: from mx.nohats.ca ([IPv6:::1])
+	by localhost (mx.nohats.ca [IPv6:::1]) (amavisd-new, port 10024)
+	with ESMTP id eB9CGxJQaPRc; Mon, 27 Oct 2025 18:14:42 +0100 (CET)
+Received: from bofh.nohats.ca (bofh.nohats.ca [193.110.157.194])
+	(using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx.nohats.ca (Postfix) with ESMTPS;
+	Mon, 27 Oct 2025 18:14:42 +0100 (CET)
+Received: by bofh.nohats.ca (Postfix, from userid 1000)
+	id 4BE09177FF41; Mon, 27 Oct 2025 13:14:41 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+	by bofh.nohats.ca (Postfix) with ESMTP id 4883B177FF40;
+	Mon, 27 Oct 2025 13:14:41 -0400 (EDT)
+Date: Mon, 27 Oct 2025 13:14:41 -0400 (EDT)
+From: Paul Wouters <paul@nohats.ca>
+To: Sabrina Dubroca <sd@queasysnail.net>
+cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, 
+    devel@linux-ipsec.org
+Subject: Re: [devel-ipsec] Re: [PATCH RFC ipsec-next] esp: Consolidate esp4
+ and esp6.
+In-Reply-To: <aP-jXvmys9D37Hp6@krikkit>
+Message-ID: <6ceb36e2-383b-b30f-bc99-a95dff5e7008@nohats.ca>
+References: <aPhzm0lzMXGSpf22@secunet.com> <aP-jXvmys9D37Hp6@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251024090517.3289181-1-edumazet@google.com>
-In-Reply-To: <20251024090517.3289181-1-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 27 Oct 2025 10:07:20 -0700
-X-Gm-Features: AWmQ_bm924ol2jlKpR6m6x-64aia0uqBbx2LhphdSf3eKc4dFQCX-Brra5CXjWc
-Message-ID: <CAAVpQUDfHEqJFw-g5fp7BWeam=WYnX_Rf9yEHWBjqKrGEzworQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: optimize enqueue_to_backlog() for the fast path
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-On Fri, Oct 24, 2025 at 2:05=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> Add likely() and unlikely() clauses for the common cases:
->
-> Device is running.
-> Queue is not full.
-> Queue is less than half capacity.
->
-> Add max_backlog parameter to skb_flow_limit() to avoid
-> a second READ_ONCE(net_hotdata.max_backlog).
->
-> skb_flow_limit() does not need the backlog_lock protection,
-> and can be called before we acquire the lock, for even better
-> resistance to attacks.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On Mon, 27 Oct 2025, Sabrina Dubroca via Devel wrote:
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+>> +		/* XXX: perhaps add an extra
+>> +		 * policy check here, to see
+>> +		 * if we should allow or
+>> +		 * reject a packet from a
+>> +		 * different source
+>> +		 * address/port.
+>>  		 */
+>
+> Maybe we can get rid of those "XXX" comments? Unless you think the
+> suggestion still makes sense. But the comments (here and in
+> esp6_input_done2) have been here a long time and it doesn't seem to
+> bother users.
+
+The whole NAT-T mapping assumptions / rewriting are not RFC compliant
+anyway, and need fixing. Similar to accepting encap/non-encap
+with a single state. So I guess yes, this one comment on the whole issue
+might as well get removed here.
+
+Paul
 
