@@ -1,165 +1,189 @@
-Return-Path: <netdev+bounces-233310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B64D0C11827
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 22:15:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52F43C11895
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 22:21:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A8D444E1836
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 21:15:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A51F565E05
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 21:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9356B30F930;
-	Mon, 27 Oct 2025 21:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2741D32AACD;
+	Mon, 27 Oct 2025 21:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FZ2d+pVb"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fB+KAZJN";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="gmZ07OOD";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fB+KAZJN";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="gmZ07OOD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBDC1E5724
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 21:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09F131B83D
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 21:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761599747; cv=none; b=pmV4cn+Ow7tYwKUSP1mE7QLrs0pee4fyPRNlMRKVkTLgKTpH/Q9g1SOXAV79Itj/nXFI4GB8Mbano7o7hJM1IeI0W/b+mMAiPbtIi54Aann8WLvP2OnWc473BCiGstCVtSw/ngP7QernYA1Zop8ZXpjAwprkMMbwL1x4U9cE/M8=
+	t=1761600033; cv=none; b=ZARRHI5IdOmNBfZLeVO8rNcTX/rHybWVncHaRMdxUDcPE2kM83J0CZVR6+4LkSdAdokvfgH0HzzxgPbej0Gufd30s3MkpzI2jW92/WkecbTwDHeKe25tZlfw7SdxfIme6zBDR29S3cdDINGFJz+qzrG2MzuGFm69d0MfFuBrJb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761599747; c=relaxed/simple;
-	bh=BvG8AUf8NN6rZ/ehI7IqoOiJlXIB7OaMY/Iqi3A0kPo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VvgaR9SHA+zHMEeCmJVPyNwB6ycJSsVz68Xid/mCxfO8ARY3+ZCzqZlBubMnKpcIl67tedgjk9SpCDQVFxw3LtxsX7uxRicaGEzN8juItEf3LVuZE4MD9EkryD3T9bB6T/f6wOC1iuZ0T5WFAHTAuNQgKtO7p1jYtKHvfAa/lIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FZ2d+pVb; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-4270a072a0bso897201f8f.0
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 14:15:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761599744; x=1762204544; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=q+lSoLN8i9YckeiTu4zcJOQuV8QC283u18C2Hio83s8=;
-        b=FZ2d+pVbe8WWXVyNTdduxiEQHfAi4oZte4kkkmwbDNG3DjB6xJ3e/0hJzL6YKoZbhy
-         IkxaXfi0CbeN1o9xc47wSgKvkvSM9zkhmlcZOpIFvC9ZDSsldlggl/+9LBtyJmAYKwwD
-         b063jCW5rL+7PupwqKegP9IdEzEerMnMC6tZsJ/iKs+AwKMHBlJNrcYXic7JqI2WXCoR
-         8u5vJFr5MiPJvwRxiQ/cU5IxfOob05tluG7DXbnM6znnDPkhJtjcN18Cf6vjp+DQLqvo
-         slo6Yh3utUuf7YOKZUeblF6rZujU1RMR2/4DK7Hkvrbtrg//EIQTc6tMNbR7QtfYlzGD
-         oASw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761599744; x=1762204544;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q+lSoLN8i9YckeiTu4zcJOQuV8QC283u18C2Hio83s8=;
-        b=l5k6lzPWJMvFa3Dhm9hjx4k3/rH2zkezhTEpERKyGAimGf2LNHg/f1OUqWnWOMh9SD
-         +32Y5dRLDZGzNUAYHlvNN0ug+mmwd+KlAQ06FIRNCXdDTJhlk2ohTZwdLpNZ1inl9t04
-         uN+eNV9I8qqyQ3BEIJERa08KL/sb0YOeP+na5jPVNG55yE2AhsDvyVIpPQ909+O0VPyC
-         CeEhUoTJ50CRg74V53jotQVkVy2wYNZSWap4B5cg/iG+kR0cwWskebxoOll17pYwF6Pn
-         mIj9C1hx20gpD00JBdXsX8RTOhetV7hQVcj1BuzCkK0f+ohB4hJ2oPMqPnI8PUyohdpv
-         sV8g==
-X-Forwarded-Encrypted: i=1; AJvYcCXnVlxbAJWhYDrlemTrvrXwTjjwgcSwJUHA4G39Dn4gzTq59HMmmKaKPxHECk+Q+TZDnrY+O7E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyS1G2rdlvQuH1Bae662QEprnzJTmF/X0IzTDisbFLtPMdaXqPd
-	60m5t/GvSnUfhW6+g99gikau2cR5ntZUUs8aL2DLr2kaikH6Hi8xI73Ty/TuE5xL
-X-Gm-Gg: ASbGncvUTHoklYhxv6aJ0t+fexp9pkFKxV9ZaO3+ezgB2uZRfy7Yh2G1mihcGx3KTpo
-	FnA1OzHlMjpx0/bi/OlXdNt+aywLnOaReVPAP5yLn86cux0i49eIEH7JRCqHsvizEeu0uk8aLmn
-	2u2c5fVhjK6NMKwvkHND0pP8es12D7BZLPbn810BqM5vyKAamx3wLSWsya+6FmwT1xBH7bUQ8In
-	yhPoMYw7ehqlYBTn7RURZPt+w+j5GN+EviLonebDVmwZTvmPJ97EJcE4K0isMToshEl2s5cV1UD
-	wsosNw0mCytiGtuKjt3LS5fejOoaGW8Lo1RGPNT6S0DjAUysVv+6u1hmXu/0a2nLUdquwDewd9/
-	myQUF9Nc98VloxCsxDsu8Cffvbxhr6fQZVTGicTDsIVThs6E2h8XcnDlFDXLTzSvHBPbgAD/zqY
-	th8lo=
-X-Google-Smtp-Source: AGHT+IFh12DrNry+1f/bNAHrJL6pcvzNP2C93hPckDgSQBHTy0o9MGQQybcLPrWQEBZ/cNilLsQO7g==
-X-Received: by 2002:a05:6000:2382:b0:425:86cf:43bb with SMTP id ffacd0b85a97d-429a7e7212fmr608481f8f.5.1761599743675;
-        Mon, 27 Oct 2025 14:15:43 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d406:ee00:3eb9:f316:6516:8b90])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952db99asm16489890f8f.32.2025.10.27.14.15.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 14:15:42 -0700 (PDT)
-Date: Mon, 27 Oct 2025 23:15:40 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	=?utf-8?B?w4FsdmFybyBGZXJuw6FuZGV6?= Rojas <noltari@gmail.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net: dsa: tag_brcm: legacy: fix untagged rx on
- unbridged ports for bcm63xx
-Message-ID: <20251027211540.dnjanhdbolt5asxi@skbuf>
-References: <20251027194621.133301-1-jonas.gorski@gmail.com>
- <20251027194621.133301-1-jonas.gorski@gmail.com>
+	s=arc-20240116; t=1761600033; c=relaxed/simple;
+	bh=9TIwkH4I1E4ZLdCbAgkOe7fZ5rmnAJOlsMOgCChMBwY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ZZM/WOMKFXBmI5OIhGj+BDARJnNvAql+3NDWH0sQsk7LGfFUSi4xN3UJPQW8Oc33VVCDrigHmfe1dJs2GQP1QzY5qaFneO+16v+3nyL0rQ5kAPHzJTz7CffUJXENgWgpYgUU3vI744vBuk3Wnz1k7XYuq1vO+DebgHBEq2CiuJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fB+KAZJN; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=gmZ07OOD; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fB+KAZJN; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=gmZ07OOD; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 71E4521841;
+	Mon, 27 Oct 2025 21:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761600023; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cn3Ugr+qdQ01HAR+/u2rORvT+w57WeB4KaJS1A4oVhc=;
+	b=fB+KAZJNv0YHA2E32CEzJ7L1BRnVA5egaklgaLZSbfg6rgo2Aj5+4TRRu1y0V4Yn3FhIVI
+	LTMC1AR9rWDFAOn4WbA7Hz3tKaFFX1zu6AMAe2eApluYKMZL0kVgpXijmyy9QiQm6Kyjn8
+	aJw7ew9PA8j+CLvtDvnhgZyBWbb5Ozw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761600023;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cn3Ugr+qdQ01HAR+/u2rORvT+w57WeB4KaJS1A4oVhc=;
+	b=gmZ07OOD57Ub3kZwpwstIHy9yQC1azhvbpufeSgTN/b5fI/SzEZrSxTgYsQMxvppW3G455
+	TbgxlZc003l0jRCw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761600023; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cn3Ugr+qdQ01HAR+/u2rORvT+w57WeB4KaJS1A4oVhc=;
+	b=fB+KAZJNv0YHA2E32CEzJ7L1BRnVA5egaklgaLZSbfg6rgo2Aj5+4TRRu1y0V4Yn3FhIVI
+	LTMC1AR9rWDFAOn4WbA7Hz3tKaFFX1zu6AMAe2eApluYKMZL0kVgpXijmyy9QiQm6Kyjn8
+	aJw7ew9PA8j+CLvtDvnhgZyBWbb5Ozw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761600023;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cn3Ugr+qdQ01HAR+/u2rORvT+w57WeB4KaJS1A4oVhc=;
+	b=gmZ07OOD57Ub3kZwpwstIHy9yQC1azhvbpufeSgTN/b5fI/SzEZrSxTgYsQMxvppW3G455
+	TbgxlZc003l0jRCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 20C1A136CF;
+	Mon, 27 Oct 2025 21:20:22 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Wa10Nxbi/2gtKQAAD6G6ig
+	(envelope-from <krisman@suse.de>); Mon, 27 Oct 2025 21:20:22 +0000
+From: Gabriel Krisman Bertazi <krisman@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: netdev@vger.kernel.org,  io-uring@vger.kernel.org,  Jakub Kicinski
+ <kuba@kernel.org>,  "David S . Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>
+Subject: Re: [PATCH 3/3] io_uring: Introduce getsockname io_uring cmd
+In-Reply-To: <f61afa55-f610-478b-9079-d37ad9c2f232@kernel.dk> (Jens Axboe's
+	message of "Sat, 25 Oct 2025 07:27:01 -0600")
+Organization: SUSE
+References: <20251024154901.797262-1-krisman@suse.de>
+	<20251024154901.797262-4-krisman@suse.de>
+	<f61afa55-f610-478b-9079-d37ad9c2f232@kernel.dk>
+Date: Mon, 27 Oct 2025 17:20:16 -0400
+Message-ID: <87ldkwyrcf.fsf@mailhost.krisman.be>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251027194621.133301-1-jonas.gorski@gmail.com>
- <20251027194621.133301-1-jonas.gorski@gmail.com>
+Content-Type: text/plain
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.997];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_FIVE(0.00)[6]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
 
-On Mon, Oct 27, 2025 at 08:46:21PM +0100, Jonas Gorski wrote:
-> The internal switch on BCM63XX SoCs will unconditionally add 802.1Q VLAN
-> tags on egress to CPU when 802.1Q mode is enabled. We do this
-> unconditionally since commit ed409f3bbaa5 ("net: dsa: b53: Configure
-> VLANs while not filtering").
-> 
-> This is fine for VLAN aware bridges, but for standalone ports and vlan
-> unaware bridges this means all packets are tagged with the default VID,
-> which is 0.
-> 
-> While the kernel will treat that like untagged, this can break userspace
-> applications processing raw packets, expecting untagged traffic, like
-> STP daemons.
-> 
-> This also breaks several bridge tests, where the tcpdump output then
-> does not match the expected output anymore.
-> 
-> Since 0 isn't a valid VID, just strip out the VLAN tag if we encounter
-> it, unless the priority field is set, since that would be a valid tag
-> again.
-> 
-> Fixes: 964dbf186eaa ("net: dsa: tag_brcm: add support for legacy tags")
-> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
-> ---
+Jens Axboe <axboe@kernel.dk> writes:
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+> On 10/24/25 9:49 AM, Gabriel Krisman Bertazi wrote:
+>> Introduce a socket-specific io_uring_cmd to support
+>> getsockname/getpeername via io_uring.  I made this an io_uring_cmd
+>> instead of a new operation to avoid polluting the command namespace with
+>> what is exclusively a socket operation.  In addition, since we don't
+>> need to conform to existing interfaces, this merges the
+>> getsockname/getpeername in a single operation, since the implementation
+>> is pretty much the same.
+>> 
+>> This has been frequently requested, for instance at [1] and more
+>> recently in the project Discord channel. The main use-case is to support
+>> fixed socket file descriptors.
+>
+> Just two nits below, otherwise looks good!
+>
+>> diff --git a/io_uring/cmd_net.c b/io_uring/cmd_net.c
+>> index 27a09aa4c9d0..092844358729 100644
+>> --- a/io_uring/cmd_net.c
+>> +++ b/io_uring/cmd_net.c
+>> @@ -132,6 +132,28 @@ static int io_uring_cmd_timestamp(struct socket *sock,
+>>  	return -EAGAIN;
+>>  }
+>>  
+>> +static int io_uring_cmd_getsockname(struct socket *sock,
+>> +				    struct io_uring_cmd *cmd,
+>> +				    unsigned int issue_flags)
+>> +{
+>> +	const struct io_uring_sqe *sqe = cmd->sqe;
+>> +
+>
+> Random newline.
 
-Sorry for dropping the ball on v1. To reply to your reply there,
-https://lore.kernel.org/netdev/CAOiHx=mNnMJTnAN35D6=LPYVTQB+oEmedwqrkA6VRLRVi13Kjw@mail.gmail.com/
-I hadn't realized that b53 sets ds->untag_bridge_pvid conditionally,
-which makes any consolidation work in stable trees very complicated
-(although still desirable in net-next).
+Done, but this fix will totally ruin the diffstat.  :(
 
-| And to sidetrack the discussion a bit, I wonder if calling
-| __vlan_hwaccel_clear_tag() in
-| dsa_software_untag_vlan_(un)aware_bridge() without checking the
-| vlan_tci field strips 802.1p information from packets that have it. I
-| fail to find if this is already parsed and stored somewhere at a first
-| glance.
+>
+>> +	struct sockaddr_storage address;
+>> +	struct sockaddr __user *uaddr;
+>> +	int __user *ulen;
+>> +	unsigned int peer;
+>> +
+>> +	uaddr = u64_to_user_ptr(READ_ONCE(sqe->addr));
+>> +	ulen = u64_to_user_ptr(sqe->addr3);
+>> +	peer = READ_ONCE(sqe->optlen);
+>> +
+>> +	if (sqe->ioprio || sqe->__pad1 || sqe->len || sqe->rw_flags)
+>> +		return -EINVAL;
+>
+> Most/all prep handlers tend to check these first, then proceed with
+> setting up if not set. Would probably make sense to mirror that here
+> too.
 
-802.1p information should be parsed in vlan_do_receive() if vlan_find_dev()
-found something:
+Ack. will wait a few days for feedback on the network side before the
+v2.
 
-	skb->priority = vlan_get_ingress_priority(vlan_dev, skb->vlan_tci);
-
-This logic is invoked straight from __netif_receive_skb_core(), and
-relative to dsa_switch_rcv(), it hasn't run yet.
-
-Apart from that and user-configured netfilter/tc rules, I don't think
-there's anything else in the kernel that processes the vlan_tci on
-ingress (of course that isn't to say anything about user space).
-
-With regard to dsa_software_untag_vlan_unaware_bridge(), which I'd like
-to see removed rather than reworked, it does force you to use a br0.0
-VLAN upper to not strip the 802.1p info, which is OK.
-
-With regard to dsa_software_untag_vlan_aware_bridge(), it only strips
-VID values which are != 0 (because the bridge PVID iself is != 0 - if it
-was zero that would be another bug, the port should have dropped the
-packet with a VLAN-aware bridge). So it doesn't discard pure 802.1p
-information, but it might strip the PCP of a PVID-tagged packet. This
-appears to be an area of improvement. It seems reasonable to say that
-if the PCP is non-zero, it looked like that on the wire, and wasn't
-inserted by the switch.
+-- 
+Gabriel Krisman Bertazi
 
