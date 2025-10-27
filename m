@@ -1,204 +1,494 @@
-Return-Path: <netdev+bounces-233194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BC7FC0E3E6
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 15:07:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48128C0E3C8
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 15:06:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ECD1050097E
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 13:57:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A46B3ACA6C
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 13:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10DF72874FB;
-	Mon, 27 Oct 2025 13:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60BB2286D6D;
+	Mon, 27 Oct 2025 13:58:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cJE+ADfm"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f225.google.com (mail-il1-f225.google.com [209.85.166.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070FD2472BA
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 13:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC9519ADBA
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 13:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761573458; cv=none; b=Be38WCJteDqInT1XgKT1RhoRihfHStMzrq3iwfsd1I55Km8G131EiCXL5de+EhYej47VmHq3VdpMGAxjpcHWtCfn70+CgVBL+bXUr5OTfd1cibm/k1fyLPt4pm/mkoZ5DOc0xeoic0NiOh83hviUpTzii5Bc0p9NysajuyJz8fw=
+	t=1761573531; cv=none; b=Y64stGgGoSEfkfw/FNByoSd9c/ylM+gdxcgrbJCEzBFgALMLul739HqUnRn+LUQuXlSebyJP8lm3OZ1n4QDp7eD3fKzyz5apR/Ea9Cd646Hm8kRRkE6ed9bdGFW49kWPe1Ml35LGHqd7VZoFNRDtqAe44qYBrF0CnfvzF/ehoMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761573458; c=relaxed/simple;
-	bh=s5ydlXE4nNlwua1OJy3Gc8lsdx7wWBSAUSvBSEnAlgs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IrP361iLjFpJu0Px0FEPMm0aKA0M9H7saZmHddkFKeQ2hf0mWr14saqtU+jezVsEPRtCV9uWSF9RQA7Vi2CC9PadwHMi0LHzXsvxsfUEPivghSCz/y2VOcpiIcAtdCgzPAn1cwAaPXsT5ahSkV+i404N0Pwob+93hXtYxbHS6Hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vDNiw-0003CX-Tf; Mon, 27 Oct 2025 14:57:26 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vDNiv-005iVn-2K;
-	Mon, 27 Oct 2025 14:57:25 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vDNiv-003COV-1v;
-	Mon, 27 Oct 2025 14:57:25 +0100
-Date: Mon, 27 Oct 2025 14:57:25 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Emanuele Ghidoli <ghidoliemanuele@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v1] net: phy: dp83867: Disable EEE support as not
- implemented
-Message-ID: <aP96RVclYQaoBxSO@pengutronix.de>
-References: <20251023144857.529566-1-ghidoliemanuele@gmail.com>
- <ae723e7c-f876-45ef-bc41-3b39dc1dc76b@lunn.ch>
- <664ef58b-d7e6-4f08-b88f-e7c2cf08c83c@gmail.com>
- <df3aac25-e8e9-46cb-bd92-637822665080@lunn.ch>
+	s=arc-20240116; t=1761573531; c=relaxed/simple;
+	bh=DuE8g04rWYk7BKi9uGu+tphpMmB+X+zcwmRcyZMFjFA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oYvht+QHz1qIp+ABWkobZb7f53OFPtkZ5SX/4EGjjEEMBqxAzgT9FKCVpxFmpVAlgNW6YBusziFlMT4Ia9rbooPMQzNiOTzlKgGMZ9SafxXEPFk+dtcsDJdjYblge78bbY7gwqySNjGW5GW8gMJFfY8wH9XluC6MIsqxcRy6OlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cJE+ADfm; arc=none smtp.client-ip=209.85.166.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-il1-f225.google.com with SMTP id e9e14a558f8ab-430abca3354so46607685ab.2
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 06:58:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761573528; x=1762178328;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=X66EBdamHLz+OnKI3l+cPRCsqvngOvVbzTQXJ55/Ky8=;
+        b=E/GwTqkBCpUVfiPh5GKGGY2R/zmH/6nkFh8JGT2tlT9tTvzH7YCjrfCsUyuiarHC6V
+         WDYPuJvZ2LPgM3M6R8Y3kT5UZ+ZdCHEL4W4MVHSBSxY55u/f0KNBThM6Esi+I1OyHac8
+         s2TNZUA4euYVe0p2Hmpn37OlzcUUfsJ/dsC6t3NKF72b2gckBeTMbJX8ZhN3pRgnZIVj
+         A9xzWjFVZ0P5o0ihClZd4XLAza8GxMPihUDfxEq4uLvtCyJUieCW5TLbTNiw1Bv4LW/T
+         h6nTTxDJugLCGGsnzvObc9p1oaj9NNcSKkZ9j6WjnJC1doaUiTZwGPzmTZzAL32oU086
+         QGyg==
+X-Forwarded-Encrypted: i=1; AJvYcCWw9GSW0UMPDQGOiNhXoJDFmMt5iWPHtWJLg1wSn+lTuF/B8kPNJm/MAfCzm/9QIjLxkt3w5Ak=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFF0qOKb3oWjTcmHQ44wg+aM9lUSWvxXWyog9gM1FXSYiYQbvA
+	htMp+X8BK/nAyaYEqQyhgxOupgCmfczzeME/sKpbfmn+egTWfm4JUCD5QlbbMrzwieyv1xyOJ1m
+	JHj82WWVwdoRUGMop+wHbphAm5nAXScw0OaVb8iTbUkXtiHK4dDd7lRrME6FDn51gFk1LkdmkOo
+	4wt4Yz6ijS4NHNMAjZ+DGBKgxxLnL7yJnFQcTjaVS0XXvDo9dEUwJO1wvow+UDxnoqsqUYMVZ0x
+	51pgYktBEM=
+X-Gm-Gg: ASbGncsCyBABrRa5nB1UC1Pd8Mxl9xZNG+F/DhR1HQUsguZZnt8vVAwaqLbbKjiKTGK
+	C5yrAeW7f9PH60i5rKqxxzIuIkJm8fD6kkKNOvUQnJj1ETizYVunKzQ0uukjdyWr2t6wSfRoAeK
+	nZiArmP5P7WQ8X4QeRZJTaUTW1NrQOekKdQ8MH7Zg/BQBmk3oWIb9U3l4k+VrDqZz/q3/FdCPrh
+	SJSPxwaWg0Z+blHiRHnzxtzFfGksr8Z3cnpaH4BCJ8UKpD5QxsvAnWiWPz2PoeGsFgCWTpDLag+
+	KSDUp19HnFcfzLuBTCgHsr6uTs2gD09MRe6o0x4J987JhEND/DDfY9i6BWsUsVhyeCi2l6xjZXc
+	g6e7buCfxzqTHDEanRPdJ5pkEjlIouNIDoRV8xPgcP7PN5OVPr5awwU8G+m1kdiLXT2f7Uou4pQ
+	jCYnKS5RlQmlVK9XOJkmQMvF4zVgh10+GZfg==
+X-Google-Smtp-Source: AGHT+IGiXsxsB4p1N6eoZiRhnRdzlVEb2FiIUxEDuP4QtjyBr9hcyTNc8v6PNzjj6VI1OtVhuAkQp3drdSK/
+X-Received: by 2002:a92:cd82:0:b0:430:c0cf:7920 with SMTP id e9e14a558f8ab-4320f833718mr1795775ab.19.1761573528458;
+        Mon, 27 Oct 2025 06:58:48 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-72.dlp.protect.broadcom.com. [144.49.247.72])
+        by smtp-relay.gmail.com with ESMTPS id 8926c6da1cb9f-5aeaa31af65sm581425173.35.2025.10.27.06.58.48
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 27 Oct 2025 06:58:48 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-33da1f30fdfso11106152a91.3
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 06:58:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1761573527; x=1762178327; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=X66EBdamHLz+OnKI3l+cPRCsqvngOvVbzTQXJ55/Ky8=;
+        b=cJE+ADfmJlji6fsHn0+GWHD7ohiAAOLl6Y/v/0RUqFU0wS7okk9pQiZyY1prw33GJ6
+         PjNCEJcQSE85OkRp98xlmBDhU6y4DZl7cIwdcSySS+L3juoplmy9rvJp02S0Qq1PQ1rC
+         bCVmAzCYCEUZRUj2X7lUn2d0k7DiuqwhVuLyo=
+X-Forwarded-Encrypted: i=1; AJvYcCXZqdwTfBvU+OZWvg/gETifJ/pcjpMd8bScMvnnbXo4n5/AH5cNoZcDc27AD4KpqzCboJga8V8=@vger.kernel.org
+X-Received: by 2002:a17:90a:e70f:b0:32e:3837:284f with SMTP id 98e67ed59e1d1-33bcf8e312bmr49267042a91.21.1761573526835;
+        Mon, 27 Oct 2025 06:58:46 -0700 (PDT)
+X-Received: by 2002:a17:90a:e70f:b0:32e:3837:284f with SMTP id
+ 98e67ed59e1d1-33bcf8e312bmr49266977a91.21.1761573526247; Mon, 27 Oct 2025
+ 06:58:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <df3aac25-e8e9-46cb-bd92-637822665080@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20251027114549.GA12252@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+In-Reply-To: <20251027114549.GA12252@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Mon, 27 Oct 2025 19:28:33 +0530
+X-Gm-Features: AWmQ_bmzEfgpSndeiq-9iS4yCkSn75YGTpoaLIz0hY6H0GvjPdC0KxT6Me-7G1k
+Message-ID: <CALs4sv0dPZWOZGC9HCMkFDR6hDGJ=SZSebhm5v6m-MKNOgA1JA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: mana: Implement ndo_tx_timeout and
+ serialize queue resets per port.
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org, 
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com, 
+	kotaranov@microsoft.com, horms@kernel.org, shradhagupta@linux.microsoft.com, 
+	ssengar@linux.microsoft.com, ernis@linux.microsoft.com, 
+	shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, dipayanroy@microsoft.com
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000577cae0642244c8e"
 
-On Mon, Oct 27, 2025 at 02:25:12PM +0100, Andrew Lunn wrote:
-> On Mon, Oct 27, 2025 at 01:57:48PM +0100, Emanuele Ghidoli wrote:
-> > 
-> > 
-> > On 27/10/2025 00:45, Andrew Lunn wrote:
-> > >> Since the introduction of phylink-managed EEE support in the stmmac driver,
-> > >> EEE is now enabled by default, leading to issues on systems using the
-> > >> DP83867 PHY.
-> > > 
-> > > Did you do a bisect to prove this?
-> > Yes, I have done a bisect and the commit that introduced the behavior on our
-> > board is 4218647d4556 ("net: stmmac: convert to phylink managed EEE support").
-> > 
-> > > 
-> > >> Fixes: 2a10154abcb7 ("net: phy: dp83867: Add TI dp83867 phy")
-> > > 
-> > > What has this Fixes: tag got to do with phylink?
-> > I think that the phylink commit is just enabling by default the EEE support,
-> > and my commit is not really fixing that. It is why I didn't put a Fixes: tag
-> > pointing to that.
-> > 
-> > I’ve tried to trace the behavior, but it’s quite complex. From my testing, I
-> > can summarize the situation as follows:
-> > 
-> > - ethtool, after that patch, returns:
-> > ethtool --show-eee end0
-> > EEE settings for end0:
-> >         EEE status: enabled - active
-> >         Tx LPI: 1000000 (us)
-> >         Supported EEE link modes:  100baseT/Full
-> >                                    1000baseT/Full
-> >         Advertised EEE link modes:  100baseT/Full
-> >                                     1000baseT/Full
-> >         Link partner advertised EEE link modes:  100baseT/Full
-> >                                                  1000baseT/Full
-> > - before that patch returns, after boot:
-> > EEE settings for end0:
-> >         EEE status: disabled
-> >         Tx LPI: disabled
-> >         Supported EEE link modes:  100baseT/Full
-> >                                    1000baseT/Full
-> >         Advertised EEE link modes:  Not reported
-> >         Link partner advertised EEE link modes:  100baseT/Full
-> >                                                  1000baseT/Full
-> > - Enabling EEE manually using ethtool, triggers the problem too (and ethtool
-> > -show-eee report eee status enabled):
-> > ethtool --set-eee end0 eee on tx-lpi on
-> > ethtool --show-eee end0
-> > EEE settings for end0:
-> >         EEE status: enabled - active
-> >         Tx LPI: 1000000 (us)
-> >         Supported EEE link modes:  100baseT/Full
-> >                                    1000baseT/Full
-> >         Advertised EEE link modes:  100baseT/Full
-> >                                     1000baseT/Full
-> >         Link partner advertised EEE link modes:  100baseT/Full
-> >                                                  1000baseT/Full
-> > 
-> > I understand Russell point of view but from my point of view EEE is now
-> > enabled by default, and before it wasn't, at least on my setup.
-> 
-> We like to try to understand what is going on, and give accurate
-> descriptions. You have given us important information here, which at
-> minimum should go into the commit message, but more likely, it will
-> help lead us to the correct fix.
-> 
-> So, two things here. You say:
-> 
-> > I think that the phylink commit is just enabling by default the EEE support,
-> 
-> That needs confirming, because you are blaming the conversion to
-> phylink, not that phylink now enabled EEE by default. Russell also
-> tries to avoid behaviour change, which this clearly is. We want a
-> better understanding what caused this behaviour change.
-> 
-> Also:
-> 
-> > - Enabling EEE manually using ethtool, triggers the problem too (and ethtool
-> > -show-eee report eee status enabled):
-> 
-> This indicates EEE has always been broken. This brokenness has been
-> somewhat hidden in the past, and it is the change in behaviour in
-> phylink which exposed this brokenness. A commit message using these
-> words would be much more factually correct, and it would also fit with
-> the Fixes: tag you used.
-> 
-> So, please work with Russell. I see two things which would be good to
-> understand before a new version of the patch is submitted:
-> 
-> What cause the behaviour change such that EEE is now enabled? Was it
-> deliberate? Should something be change to revert that behaviour
-> change?
-> 
-> Given that EEE has always been broken, do we understand it
-> sufficiently to say it is not fixable? Is there an errata?
+--000000000000577cae0642244c8e
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-None of following TI Gbit PHYs claim EEE support:
-dp83867cr/ir  https://www.ti.com/de/lit/gpn/dp83867cr
-dp83867e/cs/is  https://www.ti.com/de/lit/gpn/dp83867cs
-dp83869hm https://www.ti.com/lit/gpn/dp83869hm
+On Mon, Oct 27, 2025 at 5:19=E2=80=AFPM Dipayaan Roy
+<dipayanroy@linux.microsoft.com> wrote:
+>
+> Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detecte=
+d
+> and a device-controlled port reset for all queues can be scheduled to an
+> ordered workqueue. The reset for all queues on stall detection is
+> recomended by hardware team.
+>
+> The change introduces a single ordered workqueue
+> ("mana_per_port_queue_reset_wq") with WQ_UNBOUND | WQ_MEM_RECLAIM and
+> queues exactly one work_struct per port onto it. This achieves:
+>
+>   * Global FIFO across all port reset requests (alloc_ordered_workqueue).
+>   * Natural per-port de-duplication: the same work_struct cannot be
+>     queued twice while pending/running.
+>   * Avoids hogging a per-CPU kworker for long, may-sleep reset paths
+>     (WQ_UNBOUND).
+>   * Guarantees forward progress during memory pressure
+>     (WQ_MEM_RECLAIM rescuer).
+>
+> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+> ---
+>  drivers/net/ethernet/microsoft/mana/mana_en.c | 83 +++++++++++++++++++
+>  include/net/mana/gdma.h                       |  6 +-
+>  include/net/mana/mana.h                       | 12 +++
+>  3 files changed, 100 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/=
+ethernet/microsoft/mana/mana_en.c
+> index f4fc86f20213..2833f66d8b2b 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> @@ -258,6 +258,45 @@ static int mana_get_gso_hs(struct sk_buff *skb)
+>         return gso_hs;
+>  }
+>
+> +static void mana_per_port_queue_reset_work_handler(struct work_struct *w=
+ork)
+> +{
+> +       struct mana_queue_reset_work *reset_queue_work =3D
+> +                       container_of(work, struct mana_queue_reset_work, =
+work);
+> +       struct mana_port_context *apc =3D reset_queue_work->apc;
+> +       struct net_device *ndev =3D apc->ndev;
+> +       struct mana_context *ac =3D apc->ac;
+> +       int err;
+> +
+> +       if (!rtnl_trylock()) {
+> +               /* Someone else holds RTNL, requeue and exit. */
+> +               queue_work(ac->per_port_queue_reset_wq,
+> +                          &apc->queue_reset_work.work);
+> +               return;
+> +       }
+> +
+> +       /* Pre-allocate buffers to prevent failure in mana_attach later *=
+/
+> +       err =3D mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
+> +       if (err) {
+> +               netdev_err(ndev, "Insufficient memory for reset post tx s=
+tall detection\n");
+> +               goto out;
+> +       }
+> +
+> +       err =3D mana_detach(ndev, false);
+> +       if (err) {
+> +               netdev_err(ndev, "mana_detach failed: %d\n", err);
+> +               goto dealloc_pre_rxbufs;
+> +       }
+> +
+> +       err =3D mana_attach(ndev);
+> +       if (err)
+> +               netdev_err(ndev, "mana_attach failed: %d\n", err);
+> +
+> +dealloc_pre_rxbufs:
+> +       mana_pre_dealloc_rxbufs(apc);
+> +out:
+> +       rtnl_unlock();
+> +}
+> +
+>  netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev=
+)
+>  {
+>         enum mana_tx_pkt_format pkt_fmt =3D MANA_SHORT_PKT_FMT;
+> @@ -762,6 +801,25 @@ static int mana_change_mtu(struct net_device *ndev, =
+int new_mtu)
+>         return err;
+>  }
+>
+> +static void mana_tx_timeout(struct net_device *netdev, unsigned int txqu=
+eue)
+> +{
+> +       struct mana_port_context *apc =3D netdev_priv(netdev);
+> +       struct mana_context *ac =3D apc->ac;
+> +       struct gdma_context *gc =3D ac->gdma_dev->gdma_context;
+> +
+> +       netdev_warn(netdev, "%s(): called on txq: %u\n", __func__, txqueu=
+e);
+> +
+> +       /* Already in service, hence tx queue reset is not required.*/
+> +       if (gc->in_service)
+> +               return;
+> +
+> +       /* Note: If there are pending queue reset work for this port(apc)=
+,
+> +        * subsequent request queued up drom here are ignored. This is be=
+cause
 
-For comparison, TI 100Mbit PHYs list EEE as supported:
-dp83826a*  https://www.ti.com/de/lit/gpn/dp83826ae
-dp83826i https://www.ti.com/de/lit/gpn/dp83826i
+%s/drom/from/
 
-If vendor do not see it as selling point, or it is just broken beyond
-repair, there is nothing we can do here. I guess it is ok to sync the
-driver with vendors claim.
+> +        * we are using the same work instance per port(apc).
+> +        */
+> +       queue_work(ac->per_port_queue_reset_wq, &apc->queue_reset_work.wo=
+rk);
+> +}
+> +
+>  static int mana_shaper_set(struct net_shaper_binding *binding,
+>                            const struct net_shaper *shaper,
+>                            struct netlink_ext_ack *extack)
+> @@ -844,7 +902,9 @@ static const struct net_device_ops mana_devops =3D {
+>         .ndo_bpf                =3D mana_bpf,
+>         .ndo_xdp_xmit           =3D mana_xdp_xmit,
+>         .ndo_change_mtu         =3D mana_change_mtu,
+> +       .ndo_tx_timeout     =3D mana_tx_timeout,
+>         .net_shaper_ops         =3D &mana_shaper_ops,
+> +
+>  };
+>
+>  static void mana_cleanup_port_context(struct mana_port_context *apc)
+> @@ -3218,6 +3278,7 @@ static int mana_probe_port(struct mana_context *ac,=
+ int port_idx,
+>         ndev->min_mtu =3D ETH_MIN_MTU;
+>         ndev->needed_headroom =3D MANA_HEADROOM;
+>         ndev->dev_port =3D port_idx;
+> +       ndev->watchdog_timeo =3D MANA_TXQ_TIMEOUT;
+>         SET_NETDEV_DEV(ndev, gc->dev);
+>
+>         netif_set_tso_max_size(ndev, GSO_MAX_SIZE);
+> @@ -3255,6 +3316,11 @@ static int mana_probe_port(struct mana_context *ac=
+, int port_idx,
+>
+>         debugfs_create_u32("current_speed", 0400, apc->mana_port_debugfs,=
+ &apc->speed);
+>
+> +       /* Initialize the per port queue reset work.*/
+> +       apc->queue_reset_work.apc =3D apc;
+> +       INIT_WORK(&apc->queue_reset_work.work,
+> +                 mana_per_port_queue_reset_work_handler);
+> +
+>         return 0;
+>
+>  free_indir:
+> @@ -3456,6 +3522,15 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+>         if (ac->num_ports > MAX_PORTS_IN_MANA_DEV)
+>                 ac->num_ports =3D MAX_PORTS_IN_MANA_DEV;
+>
+> +       ac->per_port_queue_reset_wq =3D
+> +                       alloc_ordered_workqueue("mana_per_port_queue_rese=
+t_wq",
+> +                                               WQ_UNBOUND | WQ_MEM_RECLA=
+IM);
+> +       if (!ac->per_port_queue_reset_wq) {
+> +               dev_err(dev, "Failed to allocate per port queue reset wor=
+kqueue\n");
+> +               err =3D -ENOMEM;
+> +               goto out;
+> +       }
+> +
+>         if (!resuming) {
+>                 for (i =3D 0; i < ac->num_ports; i++) {
+>                         err =3D mana_probe_port(ac, i, &ac->ports[i]);
+> @@ -3528,6 +3603,8 @@ void mana_remove(struct gdma_dev *gd, bool suspendi=
+ng)
+>                  */
+>                 rtnl_lock();
+>
+> +               cancel_work_sync(&apc->queue_reset_work.work);
+> +
+>                 err =3D mana_detach(ndev, false);
+>                 if (err)
+>                         netdev_err(ndev, "Failed to detach vPort %d: %d\n=
+",
+> @@ -3547,6 +3624,12 @@ void mana_remove(struct gdma_dev *gd, bool suspend=
+ing)
+>                 free_netdev(ndev);
+>         }
+>
+> +       if (ac->per_port_queue_reset_wq) {
+> +               drain_workqueue(ac->per_port_queue_reset_wq);
+> +               destroy_workqueue(ac->per_port_queue_reset_wq);
 
-> Are we sure it is the PHY and not the MAC which is broken?
+destroy will take care of the drain.
 
-I personally still do not have suitable reference board for testing.
-There are some with Realtek or TI PHYs. It will be good to find board
-with iMX8MP + KSZ9131 on both MACs (FEC and STMMAC).
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> +               ac->per_port_queue_reset_wq =3D NULL;
+> +       }
+> +
+>         mana_destroy_eq(ac);
+>  out:
+>         mana_gd_deregister_device(gd);
+> diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+> index 57df78cfbf82..1f8c536ba3be 100644
+> --- a/include/net/mana/gdma.h
+> +++ b/include/net/mana/gdma.h
+> @@ -591,6 +591,9 @@ enum {
+>  /* Driver can self reset on FPGA Reconfig EQE notification */
+>  #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
+>
+> +/* Driver detects stalled send queues and recovers them */
+> +#define GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY BIT(18)
+> +
+>  #define GDMA_DRV_CAP_FLAGS1 \
+>         (GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
+>          GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
+> @@ -599,7 +602,8 @@ enum {
+>          GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP | \
+>          GDMA_DRV_CAP_FLAG_1_DYNAMIC_IRQ_ALLOC_SUPPORT | \
+>          GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE | \
+> -        GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE)
+> +        GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE | \
+> +        GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY)
+>
+>  #define GDMA_DRV_CAP_FLAGS2 0
+>
+> diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+> index 0921485565c0..9b8f236f27c9 100644
+> --- a/include/net/mana/mana.h
+> +++ b/include/net/mana/mana.h
+> @@ -67,6 +67,11 @@ enum TRI_STATE {
+>
+>  #define MANA_RX_FRAG_ALIGNMENT 64
+>
+> +/* Timeout value for Txq stall detetcion & recovery used by ndo_tx_timeo=
+ut.
+
+%s/detetcion/detection/
+
+> + * The value is chosen after considering fpga re-config scenarios.
+> + */
+> +#define MANA_TXQ_TIMEOUT (15 * HZ)
+> +
+>  struct mana_stats_rx {
+>         u64 packets;
+>         u64 bytes;
+> @@ -475,13 +480,20 @@ struct mana_context {
+>
+>         struct mana_eq *eqs;
+>         struct dentry *mana_eqs_debugfs;
+> +       struct workqueue_struct *per_port_queue_reset_wq;
+>
+>         struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
+>  };
+>
+> +struct mana_queue_reset_work {
+> +       struct work_struct work;              // Work structure
+> +       struct mana_port_context *apc;        // Pointer to the port cont=
+ext
+
+Block comment style is preferred instead of  //
+
+> +};
+> +
+>  struct mana_port_context {
+>         struct mana_context *ac;
+>         struct net_device *ndev;
+> +       struct mana_queue_reset_work queue_reset_work;
+>
+>         u8 mac_addr[ETH_ALEN];
+>
+> --
+> 2.43.0
+>
+>
+
+--000000000000577cae0642244c8e
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+/HTPxpDrr4vzZL0yoc9XefyCbdiwfyFl99oBekp+1ZxXc5bZsVhRPVyEWFtCys66nqu5cU2GPT3a
+ySQEHOtIKyGGgzMVvitOzO2suQkoMvu/swsftfgCY/PObdlBZhv0BD97+WwR6CQJh/YEuDDEHYCy
+NDeiVtF3/jwT04bHB7lR9n+AiCSLr9wlgBHGdBFIOmT/XMX3K8fuMMGLq9PpGQEMvYa9QTkE9+zc
+MddiNNh1xtCTG0+kC7KIttdXTnffisXKsX44B8ECAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
+oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
+Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
+BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
+IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
+FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
+hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUxJ6fps/yOGneJRYDWUKPuLPk
+miYwDQYJKoZIhvcNAQELBQADggIBAI2j2qBMKYV8SLK1ysjOOS54Lpm3geezjBYrWor/BAKGP7kT
+QN61VWg3QlZqiX21KLNeBWzJH7r+zWiS8ykHApTnBlTjfNGF8ihZz7GkpBTa3xDW5rT/oLfyVQ5k
+Wr2OZ268FfZPyAgHYnrfhmojupPS4c7bT9fQyep3P0sAm6TQxmhLDh/HcsloIn7w1QywGRyesbRw
+CFkRbTnhhTS9Tz3pYs5kHbphHY5oF3HNdKgFPrfpF9ei6dL4LlwvQgNlRB6PhdUBL80CJ0UlY2Oz
+jIAKPusiSluFH+NvwqsI8VuId34ug+B5VOM2dWXR/jY0as0Va5Fpjpn1G+jG2pzr1FQu2OHR5GAh
+6Uw50Yh3H77mYK67fCzQVcHrl0qdOLSZVsz/T3qjRGjAZlIDyFRjewxLNunJl/TGtu1jk1ij7Uzh
+PtF4nfZaVnWJowp/gE+Hr21BXA1nj+wBINHA0eufDHd/Y0/MLK+++i3gPTermGBIfadXUj8NGCGe
+eIj4fd2b29HwMCvfX78QR4JQM9dkDoD1ZFClV17bxRPtxhwEU8DzzcGlLfKJhj8IxkLoww9hqNul
+Md+LwA5kUTLPBBl9irP7Rn3jfftdK1MgrNyomyZUZSI1pisbv0Zn/ru3KD3QZLE17esvHAqCfXAZ
+a2vE+o+ZbomB5XkihtQpb/DYrfjAMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
+ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
+MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCC/78pa
+T12PAErEoA2vELe/9hhHsmlztLhMCEnuM0DoDTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNTEwMjcxMzU4NDdaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBnE5rbXWftWIerAFHyoZHrdUiYoM5kpmJ3NI/do31B
+zijsUc9T9PU3wu0BP4PlNjM1p+eZsdJycd8b7PeCby+ePvlFunoaxYoemH5IRVf6ywH+vQWncaeh
+rEoG0mSgouh5hnE+cCimY1CnFF4Od5Vl11OAd8NVUg0tyo/wMMLMNyaPhEczjFZXHE2yzE0Sc4XQ
+hfKUwJBHJjweX1xFJ32BJe0ss7GSQZ4wljYv3dP8lj/WNPUu1kr5g0J1IPdTKCz3io4FjnJkhZyb
+pus1sRGq9VCedH9OdUsBv67eXfl3u1zFcuEC0vwgVzryE/0zhzS917wstuCXZYxouqDAAOCW
+--000000000000577cae0642244c8e--
 
