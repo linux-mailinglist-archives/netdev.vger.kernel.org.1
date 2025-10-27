@@ -1,200 +1,465 @@
-Return-Path: <netdev+bounces-233103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8053C0C4B4
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 09:27:07 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B20AC0C53D
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 09:36:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9AAD14E4B69
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 08:27:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CB2894E58D6
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 08:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB0DF2E7F03;
-	Mon, 27 Oct 2025 08:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F235E1E51EB;
+	Mon, 27 Oct 2025 08:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="iFmn4Lik"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NO75qzRe"
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013003.outbound.protection.outlook.com [40.107.162.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0D42E6CD4;
-	Mon, 27 Oct 2025 08:27:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.3
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761553622; cv=fail; b=GZoc+/G/lEwN5qF1HKbDsFu7tj7eVfTAao4JxlLPxvof3qLNsLuxTAlUOS4KHmGRv+uoQ/dTcmJCybZRgWsrE0A2jkY/3zLFkSk4Sl0Vg/ceSf05P3ScdFt/bxXORhYloAhYdZPBwjXnd1Ve8Nop8xJ8FSVDuDFJe1L+mHUWf3Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761553622; c=relaxed/simple;
-	bh=cLbtnLL9v8a1mnEbZ+/1NupB+BOTb7elAMWn7UUSPbg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=bhx04f5iEYmZU9PmkXLSR4X/ME2mPZSVGOJUFIEJwPjYtfugLILwzrnVH+egiyyLCPLdMEta9rt8ZmBu42iTB5FlpiO7IRb+UwzvuKqpL1ni/FJU6cTQRa0ikIlh0vq6fYMtmaKeHFZn2crq8XW5GJ5+xf8lttMYYQrgdgP8uaQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=iFmn4Lik; arc=fail smtp.client-ip=40.107.162.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DyD9FxeCuxR59GePEBW+L/7aCaSiG8lubcs6eNmlW6+WRwJjH3nsGBRPXdsXahe8g/fu6a6egBOXDeI9Wdhd9/NlamqMO60RBppoy2MO+zzaGt5p802O39RiZAPGe+JNI/uZ7lon/PQxNfgKgYzxs0/XiBHFttclmV4EMEAXZ1Wx8ijPd+JSRZuEgZZxjHKWtJrxq89XHn/5O/ZOyLY5mOFuzXdhoi7gPUsrn5u2tH5nlkyq9/c8+QOVkgEBJDTIKAgzZztfR9YaJsVeTZ+6DC8Tf/f9G4bgqJcBth3SKsBiqpaXB1ee/xrbQTL6cjPyQgIUezvyUK6cJf/FoVdL7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cLbtnLL9v8a1mnEbZ+/1NupB+BOTb7elAMWn7UUSPbg=;
- b=isYulcDVJMwA+JnRx2QALcdcVA/be70xT2i0mh3LRZExPl2Ds5i4LwANzy0GVGjY78p/Z0/lBEiEsyfccM9q5nGa9Wwn4Kpzo8+nJySFRpUF5JMD2G80jic932B+qj8PUY4IlGcM879dWlRs1E9Uxlh/PlS0BzqgIXCmHCyIOeVhEbmHLhPmTQoKcKrqXMv+S2UTQ0Tm0ORolemIHXgXDRd96278cPevXa0c57jue8x0EFNnJmXOokfrvW1M/gby+DxxKSwRmCtLGYNuH3s2liJ0VK1DiWDrrnuQvKz4bKW5xnrJssGI2XA2Qhyn0BZHRwRkudmViyLgl8/hrZ7Qiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cLbtnLL9v8a1mnEbZ+/1NupB+BOTb7elAMWn7UUSPbg=;
- b=iFmn4LikpAcAWZDv2JclwpQh5xMgfehRrk7fzoIVKyZDdi2c3MelNmfNLIK9LGYWO9VJnq9H+b4wVpT/cBdDdkgDLf9Cnf3K5srAvajI3l+Narh3XTZ8747ZbcTQu8YqJjD3geSV60PLHySItdgWJJixs4GbRX3KjQExi5rJsx/duNfxcXfJ8c12/zTVWzJw2eyIXk0wU6KwwuA+WjkIF6HGf4MR+TG6buQ/sT7LyG0tTQ1GU/vlERyNgbBOajlxFEOhwWB28rP4/NMSaL4rPMzGdOuUOBvA9nDDEkee0m2Dgmj3Cfp/wtE6idLsSspY4MNiWtiOZLXWcfc2Au4Ohw==
-Received: from AM7PR04MB7142.eurprd04.prod.outlook.com (2603:10a6:20b:113::9)
- by DB8PR04MB6907.eurprd04.prod.outlook.com (2603:10a6:10:119::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.18; Mon, 27 Oct
- 2025 08:26:56 +0000
-Received: from AM7PR04MB7142.eurprd04.prod.outlook.com
- ([fe80::6247:e209:1229:69af]) by AM7PR04MB7142.eurprd04.prod.outlook.com
- ([fe80::6247:e209:1229:69af%6]) with mapi id 15.20.9253.017; Mon, 27 Oct 2025
- 08:26:55 +0000
-From: Claudiu Manoil <claudiu.manoil@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>, "robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
-	<conor+dt@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, Frank Li <frank.li@nxp.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>
-CC: "imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>
-Subject: RE: [PATCH v3 net-next 5/6] net: enetc: add basic support for the
- ENETC with pseudo MAC for i.MX94
-Thread-Topic: [PATCH v3 net-next 5/6] net: enetc: add basic support for the
- ENETC with pseudo MAC for i.MX94
-Thread-Index: AQHcRuaDYWINwDLAukOlcUFMrdP/NLTVqLKA
-Date: Mon, 27 Oct 2025 08:26:55 +0000
-Message-ID:
- <AM7PR04MB71421B44BFAD7BA1C96A60EB96FCA@AM7PR04MB7142.eurprd04.prod.outlook.com>
-References: <20251027014503.176237-1-wei.fang@nxp.com>
- <20251027014503.176237-6-wei.fang@nxp.com>
-In-Reply-To: <20251027014503.176237-6-wei.fang@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM7PR04MB7142:EE_|DB8PR04MB6907:EE_
-x-ms-office365-filtering-correlation-id: 78b7db89-0818-437c-6f5f-08de153296f8
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|19092799006|1800799024|7416014|376014|366016|921020|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?NRn0zz7oJSMWsL0cZRhhWK/mGfc4ppm3W2nEHCSq+2dArt3SCeqs14uYUu/N?=
- =?us-ascii?Q?mA++/L/YIUdgutZVTcYXAY8inQjJqDFYlP3MraEcdKa1ZPXkOCWL9NDeTxXC?=
- =?us-ascii?Q?aVOlsD5PBn/LiexAL0uW2INHsRdXHPaCFl8H3WCToVWSsGBUHP1bVomDxxNC?=
- =?us-ascii?Q?yIhPH0iO+s8BNOU91dav9tK5WtsQ/dyxrKwFSD2v29uodL1lSn2g/7ZvOj2U?=
- =?us-ascii?Q?aiqeMfWzNoHp/NrKH6w/CbdYVmmiWw79hmtczNHeRfBq85apL9CxEoHNlbHp?=
- =?us-ascii?Q?9oWB03FcfzLe4wdH8I1G7bsKpzzmLwaAFzPbujU3A3jmtaWx/hbS1Pbk15I3?=
- =?us-ascii?Q?Hla3h2mC7DJvE4M3nNELOo1TIpo+CyK/cwGJjJv3ll4F2AMWyN9c/SzyI1cB?=
- =?us-ascii?Q?sczLmZt9CpmkfFloLIfBOw8Qb6R3DDer+oxPdBwcx4zTl3W7pgrZ5LO+3sHW?=
- =?us-ascii?Q?WShTuusRfcSH6szOjfibJo5fnObpWGzt1d2cKuS+X5aDIp1s3gkwjjBvSalX?=
- =?us-ascii?Q?zICIUhkuTcZd53UrEoO5mcxd/4WXdXzZygzLMBMfhku2pR+u0vg54IIjx7qT?=
- =?us-ascii?Q?U9ggYVj7l7k1GY/0YsHSY1CLvD9XqwlOBJZiAtATGpzNXzkUH1EGDjFlkFw6?=
- =?us-ascii?Q?LYtcvdMyeQ0n6F/hUNgK00QElW8pBxEzhtha+E8n+IqAktlj0u+bB81ppgyo?=
- =?us-ascii?Q?2vNDmJZb9v06kXlf3Z4KKzWrZPvgbz5bLu2r3iB4P0b6fkb3Os8Ka3z12Plu?=
- =?us-ascii?Q?iOl9WlvIsFdyifiaQe/aemiKCuwtiEEn3k44VAmiVrjk5GtGunsO7h+3ZXsH?=
- =?us-ascii?Q?6PQu2hwgYGIEEMPSiOtYvJlv91LDpjt4fp9bIZyA9pJFM7y7rnXeEP5XFWaE?=
- =?us-ascii?Q?RZYAHsW6SUfiFgHVG8t4C8jPyzCRqBHzIQVOHo/2cmwUN38XcWvRk9/OZfFr?=
- =?us-ascii?Q?hwpvhFWnVStZH/LwNrK/bqUxnplLBdVlnyVanPm8GotJ8bJ8H+4Q3j5WbBEP?=
- =?us-ascii?Q?8LfQ2yJnm1NPCVSA1xNni+2rz9OYlgqJEqntUYTTzg3yZJsIiiO2hNGWG9NB?=
- =?us-ascii?Q?CZRSqwCpqVx/jBnoz69Q//SxziadMnR3MpIBV9JrXehE07cTpQYNxKPLPdIN?=
- =?us-ascii?Q?aUp/jBCBdM3zsa8lwi6AMzMajD8MTPgKzwdAsR5X13eGTdLwA+c0peeyrnFm?=
- =?us-ascii?Q?bbac82Y0tKzn5yL3kteLBV3rx91c36Qqdgz0BPZYI+ehzaBo/hLQAB8Zq3mw?=
- =?us-ascii?Q?vGQsIeOujOu9rPbbqjzgzCJHRUU1lJXlnb68SO/oYRMbRjJL3dJd6K9U1vy9?=
- =?us-ascii?Q?QTTlq2cNxPNpqdZ4Y1Hg2Ubxf3RgRrLYuExW4Zx3ZbgzXcOnCSUzryVJyKeL?=
- =?us-ascii?Q?lJoQK4zu+FOiDubpsSzgvmHqAw8JE3hbdayq2AnemBJ7ue+VjyJJ6fH0swRQ?=
- =?us-ascii?Q?ceeaifdG0FjEqkttJ2ePOJf0SNSN+V4tw2sqNja33Et1cCaD5kjPa3cHRMzg?=
- =?us-ascii?Q?SWY9zgKjp42xQCoIFf3VaFLvFcudf2oZ/Hyf?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM7PR04MB7142.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(1800799024)(7416014)(376014)(366016)(921020)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?bWWbVJf+rvBLpydpKcjHqbnwXvz00U7onp1H7FZSr/0ONKRbVcKiHuTuPv+D?=
- =?us-ascii?Q?1IF/ytzVkvOQn8897xSqZ7pQER/OnkHnIslAZuZ5L1zR/QilWsBtdXTI/miY?=
- =?us-ascii?Q?rRbSBT2rL/0innd5vucggisxEfRZEo4m1/hZGd0c5QamdMIv4oFyMnNMm1Wv?=
- =?us-ascii?Q?EVsUAI2o4SfNsVhBeN7KvieyOI0Peo8CCq2zHibbe7zRXGFABpHXYREI6BNd?=
- =?us-ascii?Q?ngFXB27Cj0XEtg3E5CYDLFpMufOSnGa4PQqT/fj8gPs443bgTeTtisyVUK4q?=
- =?us-ascii?Q?83wPQTfA8ZulUXJVXJi/TUg8LFS2cUuu5Kv2byg/3MmZdB+uPUDCLyT0Vr5n?=
- =?us-ascii?Q?3x7ic+3dVsVY+ryTHzz9/S28v+yU6IUMZJ9pOo+4TQo3KkfPlR2+pZAPv7Gl?=
- =?us-ascii?Q?MN8ICHallBUBfLoxyKEHe/l7Y8NtCael0l5YtrOpAWAlaMx8LM7DK06Dlyl4?=
- =?us-ascii?Q?z60lQJMUqHxs5zwnZWdVZdwPrmKbM4HEO6j5dodBwaT2mFjsMUK5SKIev/ME?=
- =?us-ascii?Q?hO5XaFLG/FAQlu3u8WaM70FtnIGkMrbJ/FdmndoPIapSlx8NP12OtpaYk7Zm?=
- =?us-ascii?Q?N2v85MphdZnZFbos+au7qDod/Uvr/u66G0ffB9YueB+S7onN2opGEmng0qlH?=
- =?us-ascii?Q?d1Tqh4jn+EWMIhHkg7fP+W0ufuUdO+cNlMmqa1PkqVGnfYLc34RLu7ygnbJN?=
- =?us-ascii?Q?tiKscQU3kIbRq/SWghkcmpPaoHS0YYFy1XkIntxUyS30fo5eoTpAJ1NIyfan?=
- =?us-ascii?Q?UFyUqByqcD3P+OEXP/jJyy5jv6+Y0xhKtv7WR4Dzh+4rm+uyuazpOXZHl7BF?=
- =?us-ascii?Q?2m1WK9TE73JY4Qmgh5bQxorNuH+0RA3UmJl3Jm13scHlqjH6+6TrcsAaFR5d?=
- =?us-ascii?Q?WCHSoJIuvjLw7F4fzvSmVQ+mrZ6NEcI23zvHKSYNLwrrJ1P5ZyPXOiys6jIb?=
- =?us-ascii?Q?/PT3Wj5g+8oDWzNWqUJ8chr5pOUeakdGtgoytqxuWOI/IVUTaswVcgAa8Jgt?=
- =?us-ascii?Q?QwrIpvL7lWD61o0CwNHInPwfSa+xMmd+9amwbeyags+BX63O5klX0NQnaYDi?=
- =?us-ascii?Q?GfRakhXB5o/S5NqyTq94i035s5+k/dd8yJckC/7owesgPLlu6DVeNhR/IwjY?=
- =?us-ascii?Q?tubCWCWqlEMYGm/R1MMAAEplrBj6HHsOm8QzMEXDHc84WvJX1DU/8uey9MSo?=
- =?us-ascii?Q?vLIZ2QQrMDS7Df8sF4+EJozTBLVWbJMZZyIFCo9P/TRchhLoU7ZL2XGRhSIM?=
- =?us-ascii?Q?W2Qoueu8t29nUWk3R1AtKYz7/4S/RRH4RCWb+YqY2cUcMOsT7+GU40aKFRLC?=
- =?us-ascii?Q?eHQnpf+hcqaFEpUWt7/lXdnMSvP14CsrC24mSAdYJnFK++cJTJ20074erCO+?=
- =?us-ascii?Q?ass48hKnN6b1sOCWPD//gsM+tUT1UyprVJ9k27RWoOdMJc3XK2PKmrd5zU3S?=
- =?us-ascii?Q?hQV7BI7DnTOsGIUlQjqjnicvNNVkOuOpD8boDfegyMVoBtilDHHFMH+LgFWH?=
- =?us-ascii?Q?17glwDO4w0J5oVJtc92jKXmiaIQxijCGnR4lS9IQD5QqV2vBn2kEkamR+pU5?=
- =?us-ascii?Q?4uPtPmNopMh6EDui0iNEiv0AIK1QQix0kiaoJH/8?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06671C6A3
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 08:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761554158; cv=none; b=Ah5GlOd/RZbFpLL6hiuxXngP/JYJx3wVcgi709MnAtJD1z3HQhBvwTSgvhGCO2oe0vB3DEALBTquJ6qsSI9gV8tQhG6sjiByvG8oBENpsUcCzM3yCQydHIaZVoqsEJPOpKQR/EqMMdOOxc9lSKjgVqipRsloatUQC8dAtWZZCMQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761554158; c=relaxed/simple;
+	bh=hdOv3SkzQ9VfmPlWIlevS+L/0sbaFxgTKZLNVQDk3go=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Fp61jyIOW555ov/ibhyqTgyj2At1kniaiQQub8GVzF38C2phnkjNA0RgBVw+ClYF37V9l624lI0999KfUEFL10s9YeZkr0nVkdavBuKgzJpgsOBDFNgI289eEF2Tm1lfcc/ujVnED8ghkWjPkuluqcO/quOJapMzB27RpSAJOIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NO75qzRe; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4eceef055fbso26109441cf.0
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 01:35:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761554156; x=1762158956; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RvXa4rNuo7xaahT/wKUZoGz9/g6nOVpn8EsIPl0e07Y=;
+        b=NO75qzReSAKYlKtyVWrRrha2Y4RZR7mhJcIpiG3h8gFThcGZ7oG0wZdXW1Ef048i9J
+         vA5rDGZpjZc3jw0KcjHRwdtpPimgQ7rWPBMTkkbzi7cj3wYYqp9WoIueswYKl/zgl0+e
+         WGBGVt86wKxjlmtVS6MnI+z6+87jgG2tYXlFB8OMQgkyypD3NKVTjRQvSY6IjdcjalRi
+         yv2WrCVJJtLvu/IgC16/4fHDRse0jrR5ZpZTlK5E8sCnBnad2qavUosgLzCRyVpWmWgP
+         7u/7E5W3hAzjbgYwwpv7J1S5ZrLsw11MbXwxpldsf/3eLHz1/0tuBHRrZmJsmxqDkYJV
+         tWVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761554156; x=1762158956;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RvXa4rNuo7xaahT/wKUZoGz9/g6nOVpn8EsIPl0e07Y=;
+        b=sy3Qa5hcrKphTDwowdqxUd69KmmCYiXKShTUz5FTvAe7YW3mJQ232n3joGSVxleIxO
+         hjDbXnKuXg+CLuU/qBVsqhQQsEhdDbJHAgMg2PPhR2hb7dM8fDzIgpHASiRhkcD1A42e
+         MzLNnyAnXatcWfznGpZkPZB6AphULP5gegqQRakLLUBPrR0NrtmYBlDh6fJFop3Un0Z9
+         4X1DqbmvQk3OoiTk4tm/KOTF5B0K6vs1ODTdujA9iekRtzyjyS107b9KdUuaRl86B+bc
+         W2CWSScqh966o8c/rY3P77L8k3k/0WbMW9x+/bAFaizT+bXSRPy+J6WqhuMsc0KD5aC9
+         65/Q==
+X-Gm-Message-State: AOJu0YxN4IC0aK15EzKpsGuqyJoX8YDmQ9szUqbWOPTwBNAnFHTzIusK
+	EDCZNg4WLg05V6MBVAi5XHFHEc1yFDU1u2dSH9KGy1d9FVAH6ToNQKM6SpsZ3Q/K5Mt8pzvjlPD
+	GL57BBfQD7DhnNLdrhW0qlf4LgEkc1LFdXr5HSATj
+X-Gm-Gg: ASbGncuYyf/tUn0qwBx76gjVtr53QmOlqwBTtSACwCBzs6BhGbBHbqeb2wlZxOwv06/
+	xsC4xksqloruZFVp+9TgVILV5ldgCCDvEvbfcomjqglpPJFfsT2bAtWAY0H6rjS+eG+9NcJeRgv
+	ddE+ZUCeTRy8UVYwV2LjgbCTfGJ4YTTjj98451JAXkoO/rAKuUc/pMmr2YgyDk4fXT6ZbeCY2gK
+	M0Qwz7CD0jMNBdASC7XomKdc54fQTSRhtgdntARqNlDkAhGHb0dVi66SVT4/TH54f0eDxo=
+X-Google-Smtp-Source: AGHT+IHvQ8aZbRoq/8ABVt+4UJKxmJTKEDAzKn6DuiW2s6Xl5HiwiVRa96ORm+D8nNJwaqztk1Ph1QOl4F9Vf1pgr5I=
+X-Received: by 2002:ac8:5f93:0:b0:4e7:216e:1fcd with SMTP id
+ d75a77b69052e-4e89d35c9ebmr463440341cf.54.1761554155338; Mon, 27 Oct 2025
+ 01:35:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR04MB7142.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 78b7db89-0818-437c-6f5f-08de153296f8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Oct 2025 08:26:55.7706
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CVxSiLuhQi8e9l8kM423udIheYJLxFBk91NoVgX6Xnh3XV80SbOWsLbwMSKjwNSLAHjuF7AEJChpngemX+JveQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB6907
+References: <20251027082232.232571-1-idosch@nvidia.com> <20251027082232.232571-2-idosch@nvidia.com>
+In-Reply-To: <20251027082232.232571-2-idosch@nvidia.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 27 Oct 2025 01:35:44 -0700
+X-Gm-Features: AWmQ_bkrnHnd5fdf8fKPdNODNykxdGP_g9qF-EpPysj6dyfE-9npxTpCku4rLVU
+Message-ID: <CANn89iL0y+0axq5RtshyLrZcJ8cJBqJ=OzCH3BW8qUjfqkdG7Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/3] ipv4: icmp: Add RFC 5837 support
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org, petrm@nvidia.com, 
+	willemb@google.com, daniel@iogearbox.net, fw@strlen.de, 
+	ishaangandhi@gmail.com, rbonica@juniper.net, tom@herbertland.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: Wei Fang <wei.fang@nxp.com>
-> Sent: Monday, October 27, 2025 3:45 AM
-[...]
-> Subject: [PATCH v3 net-next 5/6] net: enetc: add basic support for the EN=
-ETC
-> with pseudo MAC for i.MX94
->=20
-> The ENETC with pseudo MAC is an internal port which connects to the CPU
-> port of the switch. The switch CPU/host ENETC is fully integrated with
-> the switch and does not require a back-to-back MAC, instead a light
-> weight "pseudo MAC" provides the delineation between switch and ENETC.
-> This translates to lower power (less logic and memory) and lower delay
-> (as there is no serialization delay across this link).
->=20
-> Different from the standalone ENETC which is used as the external port,
-> the internal ENETC has a different PCIe device ID, and it does not have
-> Ethernet MAC port registers, instead, it has a small number of pseudo
-> MAC port registers, so some features are not supported by pseudo MAC,
-> such as loopback, half duplex, one-step timestamping and so on.
->=20
-> Therefore, the configuration of this internal ENETC is also somewhat
-> different from that of the standalone ENETC. So add the basic support
-> for ENETC with pseudo MAC. More supports will be added in the future.
->=20
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+On Mon, Oct 27, 2025 at 1:24=E2=80=AFAM Ido Schimmel <idosch@nvidia.com> wr=
+ote:
+>
+> Add the ability to append the incoming IP interface information to
+> ICMPv4 error messages in accordance with RFC 5837 and RFC 4884. This is
+> required for more meaningful traceroute results in unnumbered networks.
+>
+> The feature is disabled by default and controlled via a new sysctl
+> ("net.ipv4.icmp_errors_extension_mask") which accepts a bitmask of ICMP
+> extensions to append to ICMP error messages. Currently, only a single
+> value is supported, but the interface and the implementation should be
+> able to support more extensions, if needed.
+>
+> Clone the skb and copy the relevant data portions before modifying the
+> skb as the caller of __icmp_send() still owns the skb after the function
+> returns. This should be fine since by default ICMP error messages are
+> rate limited to 1000 per second and no more than 1 per second per
+> specific host.
+>
+> Trim or pad the packet to 128 bytes before appending the ICMP extension
+> structure in order to be compatible with legacy applications that assume
+> that the ICMP extension structure always starts at this offset (the
+> minimum length specified by RFC 4884).
+>
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Reviewed-by: David Ahern <dsahern@kernel.org>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>
+> Notes:
+>     v2:
+>     * Add a comment about field ordering.
+>
+>  Documentation/networking/ip-sysctl.rst |  17 +++
+>  include/linux/icmp.h                   |  32 +++++
+>  include/net/netns/ipv4.h               |   1 +
+>  net/ipv4/icmp.c                        | 191 ++++++++++++++++++++++++-
+>  net/ipv4/sysctl_net_ipv4.c             |  11 ++
+>  5 files changed, 251 insertions(+), 1 deletion(-)
+>
+> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/netwo=
+rking/ip-sysctl.rst
+> index a06cb99d66dc..ece1187ba0f1 100644
+> --- a/Documentation/networking/ip-sysctl.rst
+> +++ b/Documentation/networking/ip-sysctl.rst
+> @@ -1796,6 +1796,23 @@ icmp_errors_use_inbound_ifaddr - BOOLEAN
+>
+>         Default: 0 (disabled)
+>
+> +icmp_errors_extension_mask - UNSIGNED INTEGER
+> +       Bitmask of ICMP extensions to append to ICMPv4 error messages
+> +       ("Destination Unreachable", "Time Exceeded" and "Parameter Proble=
+m").
+> +       The original datagram is trimmed / padded to 128 bytes in order t=
+o be
+> +       compatible with applications that do not comply with RFC 4884.
+> +
+> +       Possible extensions are:
+> +
+> +       =3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +       0x01 Incoming IP interface information according to RFC 5837.
+> +            Extension will include the index, IPv4 address (if present),
+> +            name and MTU of the IP interface that received the datagram
+> +            which elicited the ICMP error.
+> +       =3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +       Default: 0x00 (no extensions)
+> +
+>  igmp_max_memberships - INTEGER
+>         Change the maximum number of multicast groups we can subscribe to=
+.
+>         Default: 20
+> diff --git a/include/linux/icmp.h b/include/linux/icmp.h
+> index 0af4d210ee31..043ec5d9c882 100644
+> --- a/include/linux/icmp.h
+> +++ b/include/linux/icmp.h
+> @@ -40,4 +40,36 @@ void ip_icmp_error_rfc4884(const struct sk_buff *skb,
+>                            struct sock_ee_data_rfc4884 *out,
+>                            int thlen, int off);
+>
+> +/* RFC 4884 */
+> +#define ICMP_EXT_ORIG_DGRAM_MIN_LEN    128
+> +#define ICMP_EXT_VERSION_2             2
+> +
+> +/* ICMP Extension Object Classes */
+> +#define ICMP_EXT_OBJ_CLASS_IIO         2       /* RFC 5837 */
+> +
+> +/* Interface Information Object - RFC 5837 */
+> +enum {
+> +       ICMP_EXT_CTYPE_IIO_ROLE_IIF,
+> +};
+> +
+> +#define ICMP_EXT_CTYPE_IIO_ROLE(ROLE)  ((ROLE) << 6)
+> +#define ICMP_EXT_CTYPE_IIO_MTU         BIT(0)
+> +#define ICMP_EXT_CTYPE_IIO_NAME                BIT(1)
+> +#define ICMP_EXT_CTYPE_IIO_IPADDR      BIT(2)
+> +#define ICMP_EXT_CTYPE_IIO_IFINDEX     BIT(3)
+> +
+> +struct icmp_ext_iio_name_subobj {
+> +       u8 len;
+> +       char name[IFNAMSIZ];
+> +};
+> +
+> +enum {
+> +       /* RFC 5837 - Incoming IP Interface Role */
+> +       ICMP_ERR_EXT_IIO_IIF,
+> +       /* Add new constants above. Used by "icmp_errors_extension_mask"
+> +        * sysctl.
+> +        */
+> +       ICMP_ERR_EXT_COUNT,
+> +};
+> +
+>  #endif /* _LINUX_ICMP_H */
+> diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+> index 34eb3aecb3f2..0e96c90e56c6 100644
+> --- a/include/net/netns/ipv4.h
+> +++ b/include/net/netns/ipv4.h
+> @@ -135,6 +135,7 @@ struct netns_ipv4 {
+>         u8 sysctl_icmp_echo_ignore_broadcasts;
+>         u8 sysctl_icmp_ignore_bogus_error_responses;
+>         u8 sysctl_icmp_errors_use_inbound_ifaddr;
+> +       u8 sysctl_icmp_errors_extension_mask;
+>         int sysctl_icmp_ratelimit;
+>         int sysctl_icmp_ratemask;
+>         int sysctl_icmp_msgs_per_sec;
+> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+> index 1b7fb5d935ed..4abbec2f47ef 100644
+> --- a/net/ipv4/icmp.c
+> +++ b/net/ipv4/icmp.c
+> @@ -582,6 +582,185 @@ static struct rtable *icmp_route_lookup(struct net =
+*net, struct flowi4 *fl4,
+>         return ERR_PTR(err);
+>  }
+>
+> +struct icmp_ext_iio_addr4_subobj {
+> +       __be16 afi;
+> +       __be16 reserved;
+> +       __be32 addr4;
+> +};
+> +
+> +static unsigned int icmp_ext_iio_len(void)
+> +{
+> +       return sizeof(struct icmp_extobj_hdr) +
+> +               /* ifIndex */
+> +               sizeof(__be32) +
+> +               /* Interface Address Sub-Object */
+> +               sizeof(struct icmp_ext_iio_addr4_subobj) +
+> +               /* Interface Name Sub-Object. Length must be a multiple o=
+f 4
+> +                * bytes.
+> +                */
+> +               ALIGN(sizeof(struct icmp_ext_iio_name_subobj), 4) +
+> +               /* MTU */
+> +               sizeof(__be32);
+> +}
+> +
+> +static unsigned int icmp_ext_max_len(u8 ext_objs)
+> +{
+> +       unsigned int ext_max_len;
+> +
+> +       ext_max_len =3D sizeof(struct icmp_ext_hdr);
+> +
+> +       if (ext_objs & BIT(ICMP_ERR_EXT_IIO_IIF))
+> +               ext_max_len +=3D icmp_ext_iio_len();
+> +
+> +       return ext_max_len;
+> +}
+> +
+> +static __be32 icmp_ext_iio_addr4_find(const struct net_device *dev)
+> +{
+> +       struct in_device *in_dev;
+> +       struct in_ifaddr *ifa;
+> +
+> +       in_dev =3D __in_dev_get_rcu(dev);
+> +       if (!in_dev)
+> +               return 0;
+> +
+> +       /* It is unclear from RFC 5837 which IP address should be chosen,=
+ but
+> +        * it makes sense to choose a global unicast address.
+> +        */
+> +       in_dev_for_each_ifa_rcu(ifa, in_dev) {
+> +               if (READ_ONCE(ifa->ifa_flags) & IFA_F_SECONDARY)
+> +                       continue;
+> +               if (ifa->ifa_scope !=3D RT_SCOPE_UNIVERSE ||
+> +                   ipv4_is_multicast(ifa->ifa_address))
+> +                       continue;
+> +               return ifa->ifa_address;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static void icmp_ext_iio_iif_append(struct net *net, struct sk_buff *skb=
+,
+> +                                   int iif)
+> +{
+> +       struct icmp_ext_iio_name_subobj *name_subobj;
+> +       struct icmp_extobj_hdr *objh;
+> +       struct net_device *dev;
+> +       __be32 data;
+> +
+> +       if (!iif)
+> +               return;
+> +
+> +       /* Add the fields in the order specified by RFC 5837. */
+> +       objh =3D skb_put(skb, sizeof(*objh));
+> +       objh->class_num =3D ICMP_EXT_OBJ_CLASS_IIO;
+> +       objh->class_type =3D ICMP_EXT_CTYPE_IIO_ROLE(ICMP_EXT_CTYPE_IIO_R=
+OLE_IIF);
+> +
+> +       data =3D htonl(iif);
+> +       skb_put_data(skb, &data, sizeof(__be32));
+> +       objh->class_type |=3D ICMP_EXT_CTYPE_IIO_IFINDEX;
+> +
+> +       rcu_read_lock();
+> +
+> +       dev =3D dev_get_by_index_rcu(net, iif);
+> +       if (!dev)
+> +               goto out;
+> +
+> +       data =3D icmp_ext_iio_addr4_find(dev);
+> +       if (data) {
+> +               struct icmp_ext_iio_addr4_subobj *addr4_subobj;
+> +
+> +               addr4_subobj =3D skb_put_zero(skb, sizeof(*addr4_subobj))=
+;
+> +               addr4_subobj->afi =3D htons(ICMP_AFI_IP);
+> +               addr4_subobj->addr4 =3D data;
+> +               objh->class_type |=3D ICMP_EXT_CTYPE_IIO_IPADDR;
+> +       }
+> +
+> +       name_subobj =3D skb_put_zero(skb, ALIGN(sizeof(*name_subobj), 4))=
+;
+> +       name_subobj->len =3D ALIGN(sizeof(*name_subobj), 4);
+> +       netdev_copy_name(dev, name_subobj->name);
+> +       objh->class_type |=3D ICMP_EXT_CTYPE_IIO_NAME;
+> +
+> +       data =3D htonl(READ_ONCE(dev->mtu));
+> +       skb_put_data(skb, &data, sizeof(__be32));
+> +       objh->class_type |=3D ICMP_EXT_CTYPE_IIO_MTU;
+> +
+> +out:
+> +       rcu_read_unlock();
+> +       objh->length =3D htons(skb_tail_pointer(skb) - (unsigned char *)o=
+bjh);
+> +}
+> +
+> +static void icmp_ext_objs_append(struct net *net, struct sk_buff *skb,
+> +                                u8 ext_objs, int iif)
+> +{
+> +       if (ext_objs & BIT(ICMP_ERR_EXT_IIO_IIF))
+> +               icmp_ext_iio_iif_append(net, skb, iif);
+> +}
+> +
+> +static struct sk_buff *
+> +icmp_ext_append(struct net *net, struct sk_buff *skb_in, struct icmphdr =
+*icmph,
+> +               unsigned int room, int iif)
+> +{
+> +       unsigned int payload_len, ext_max_len, ext_len;
+> +       struct icmp_ext_hdr *ext_hdr;
+> +       struct sk_buff *skb;
+> +       u8 ext_objs;
+> +       int nhoff;
+> +
+> +       switch (icmph->type) {
+> +       case ICMP_DEST_UNREACH:
+> +       case ICMP_TIME_EXCEEDED:
+> +       case ICMP_PARAMETERPROB:
+> +               break;
+> +       default:
+> +               return NULL;
+> +       }
+> +
+> +       ext_objs =3D READ_ONCE(net->ipv4.sysctl_icmp_errors_extension_mas=
+k);
+> +       if (!ext_objs)
+> +               return NULL;
+> +
+> +       ext_max_len =3D icmp_ext_max_len(ext_objs);
+> +       if (ICMP_EXT_ORIG_DGRAM_MIN_LEN + ext_max_len > room)
+> +               return NULL;
+> +
+> +       skb =3D skb_clone(skb_in, GFP_ATOMIC);
+> +       if (!skb)
+> +               return NULL;
+> +
+> +       nhoff =3D skb_network_offset(skb);
+> +       payload_len =3D min(skb->len - nhoff, ICMP_EXT_ORIG_DGRAM_MIN_LEN=
+);
+> +
+> +       if (!pskb_network_may_pull(skb, payload_len))
+> +               goto free_skb;
+> +
+> +       if (pskb_trim(skb, nhoff + ICMP_EXT_ORIG_DGRAM_MIN_LEN) ||
+> +           __skb_put_padto(skb, nhoff + ICMP_EXT_ORIG_DGRAM_MIN_LEN, fal=
+se))
+> +               goto free_skb;
+> +
+> +       if (pskb_expand_head(skb, 0, ext_max_len, GFP_ATOMIC))
+> +               goto free_skb;
+> +
+> +       ext_hdr =3D skb_put_zero(skb, sizeof(*ext_hdr));
+> +       ext_hdr->version =3D ICMP_EXT_VERSION_2;
+> +
+> +       icmp_ext_objs_append(net, skb, ext_objs, iif);
+> +
+> +       /* Do not send an empty extension structure. */
+> +       ext_len =3D skb_tail_pointer(skb) - (unsigned char *)ext_hdr;
+> +       if (ext_len =3D=3D sizeof(*ext_hdr))
+> +               goto free_skb;
+> +
+> +       ext_hdr->checksum =3D ip_compute_csum(ext_hdr, ext_len);
+> +       /* The length of the original datagram in 32-bit words (RFC 4884)=
+. */
+> +       icmph->un.reserved[1] =3D ICMP_EXT_ORIG_DGRAM_MIN_LEN / sizeof(u3=
+2);
+> +
+> +       return skb;
+> +
+> +free_skb:
+> +       consume_skb(skb);
+> +       return NULL;
+> +}
+> +
+>  /*
+>   *     Send an ICMP message in response to a situation
+>   *
+> @@ -601,6 +780,7 @@ void __icmp_send(struct sk_buff *skb_in, int type, in=
+t code, __be32 info,
+>         struct icmp_bxm icmp_param;
+>         struct rtable *rt =3D skb_rtable(skb_in);
+>         bool apply_ratelimit =3D false;
+> +       struct sk_buff *ext_skb;
+>         struct ipcm_cookie ipc;
+>         struct flowi4 fl4;
+>         __be32 saddr;
+> @@ -770,7 +950,12 @@ void __icmp_send(struct sk_buff *skb_in, int type, i=
+nt code, __be32 info,
+>         if (room <=3D (int)sizeof(struct iphdr))
+>                 goto ende;
+>
+> -       icmp_param.data_len =3D skb_in->len - icmp_param.offset;
+> +       ext_skb =3D icmp_ext_append(net, skb_in, &icmp_param.data.icmph, =
+room,
+> +                                 parm->iif);
+> +       if (ext_skb)
+> +               icmp_param.skb =3D ext_skb;
+> +
+> +       icmp_param.data_len =3D icmp_param.skb->len - icmp_param.offset;
+>         if (icmp_param.data_len > room)
+>                 icmp_param.data_len =3D room;
+>         icmp_param.head_len =3D sizeof(struct icmphdr);
+> @@ -785,6 +970,9 @@ void __icmp_send(struct sk_buff *skb_in, int type, in=
+t code, __be32 info,
+>         trace_icmp_send(skb_in, type, code);
+>
+>         icmp_push_reply(sk, &icmp_param, &fl4, &ipc, &rt);
+> +
+> +       if (ext_skb)
+> +               consume_skb(ext_skb);
 
-Reviewed-by: Claudiu Manoil <claudiu.manoil@nxp.com>
+nit : if (ext_skb) is not needed, consume_skb(NULL) is ok.
+
+No need to resend.
+
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
