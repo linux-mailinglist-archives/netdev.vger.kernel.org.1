@@ -1,138 +1,113 @@
-Return-Path: <netdev+bounces-233105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06AC3C0C573
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 09:39:22 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46B8AC0C5DD
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 09:44:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E7083B3B3F
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 08:39:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A8F364F30CE
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 08:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AD92E7F2C;
-	Mon, 27 Oct 2025 08:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B9ywkqFw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C9262F12A2;
+	Mon, 27 Oct 2025 08:42:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427D4254B1F
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 08:39:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65EB62F0690
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 08:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761554357; cv=none; b=rlTTKdjbx3PI7Erk1vGetDuC4QMbKXIOrC6c82ae0NRNE1cH+0RjlxVhwfV5RKduQyh4Ah1IVfHtS25y39rwXA7aKyxCo0Sbi3vxYdwoE5Hfi90n8id8em04wHL5w2tcMWH8sk96t2Fhcfq1yjSMGXXODp/xtcH3VThAzVv21t0=
+	t=1761554544; cv=none; b=HWV2/ojTKbBVCMpsuST+WG/Bwqs/eUiPaTERL6X0k50ar+JVHp83PpFE0tEeXHs7bqIXimrLvkoGr5sVD48jDWl4EOvGbTuRL3a3lhhkRIEDuVuQ4asv9/zym4Hd1X5ezj8lMSRg7Mx/2ofbokSaY505fxSE39aW/PWOdEK/ihA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761554357; c=relaxed/simple;
-	bh=GLiLZMSjaCs2xW4XMjRxYexu0HaP4oAlngKEAgwbMhk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tfyM9WwdQweRMigqVjFRsV6g+e+h4souFbI79b6xBuEQJv56hmSTDamie20PvR/iK0YOBLIaezm5dWDgbyJ+epB/Xuhn0H/71vz+3QZT/9VKxIOTMVPpnccBBmIyttCUV/kBjaWf/gry+wBEMskea5yulpJWCdS15tJweaJ2MCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B9ywkqFw; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4eceef055fbso26155131cf.0
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 01:39:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761554355; x=1762159155; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GLiLZMSjaCs2xW4XMjRxYexu0HaP4oAlngKEAgwbMhk=;
-        b=B9ywkqFwO+RvAMqtAuQRCWRC/ig1/SNrIKKZgkHk+RLAkQS/4zYOxjhFMv9hhsEq4+
-         BZYng2DqG98nG/u5NEjEZwrKQRtW45N6Aaokl5Zfw6gvQb2ohTg5uitlUV1R68poVc/P
-         ZOHEgp8AAkpELr7rvSHwB/jueHQZ3GfcC/XD+g1WNcZXdCfQuRKaHO1Om/cr/EYr4UHn
-         06p2z1l8RfImH3Tk+Sv4cTUeSJwv73CbCGq06ucoDI6Si7GksyDrjiVBSec761vD0Mzc
-         BGKjqeOXhdXdYmE1v7zrjHEztKN4HV1Ia1nAX8Hh80H66se4igoBWnCWiisZkjHJYNAO
-         jxcg==
+	s=arc-20240116; t=1761554544; c=relaxed/simple;
+	bh=uw6SuKPEw9ILyDhG15sYXFLunD4TsxnKEIFs3HWKFYw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=g63H9cnleF2V50p8Lxx5c/o5MaJqjoEYG5H92jWWO76xsTkAXElLKSpjo0JBLzcPonXO8SvcAzJ6p3/FU3cVnN7oqJyiZ6TLcyVBuzSWJpkEmpSnfttF3Q60j9RLPGhFy3FGR4qcHnWoO07MvjZ1H0wKQi2cZNV5HsZ8jAQNJUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-925332ba890so1294183339f.0
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 01:42:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761554355; x=1762159155;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GLiLZMSjaCs2xW4XMjRxYexu0HaP4oAlngKEAgwbMhk=;
-        b=uXsfJV5cbSWz+X77zQW9jg8Ucf1akwRyw8nSlyxCfLuIfyTHHkTMLpX78Z2F3O/9CQ
-         QTlGn2cpFz3jLbRwOoaB641veox+TdryhVLGJ0SIdGzJJh0AM4igae8YFTuCiFH8DJmp
-         PNcRSFCP5P8ODfzPwFjhSlfFmLfdauxZllnyJ3Ns+/O4tW3osa3e7cdO25Nwa/vH3mPE
-         i5JNaapkDPTTCcAuFqd+h6POqdNnoaXlgtBeK/xbzqV+KqhOX/RtfjmC2Ybnv/BU0dFW
-         CCuVViyxnZkggr8opVJPU/yU9BFEaCbuaGk7A9CzeHb7yGcvYrp38Z3VCGp5ajTZcYFk
-         PW+Q==
-X-Gm-Message-State: AOJu0YzPRCfQyquUDrr109J+8mOIoWR30eGQzCHncp0XmVTu2MYMktt0
-	gwOo1zDt/A1fyRdOAjWvLxb/O/MDsopHHRmSW+kn3Xvv4W1UNtghwPkGCxLOtoDWlD4cPgyT4i9
-	7pZztA9BvjT96Cy6CaeRBBU4rRbb+1whzEwT+AzWm
-X-Gm-Gg: ASbGncs/gFYx1VeDAMdHq8vcrT3nOaJZEhse0Hw8E0ERLZwoux6zZIVhhWJ1xdz7ygo
-	TpmQh7HO/wIarG5pWf7l9ulsyX4z4u/P4GBO43tIKmYDA6CeJOUiWvRP+eg4C59zdfj+Pi6TDFc
-	GEkZubvi14g1aGUzdRm8DHPNeWYZ+rjWD4tc7Zp0Kl03SBCZYko89Oy3E1GnnOJ7FTuM9LbG2M8
-	SjNfJIFtVXi0U8yZwVd5JI9YtB4sIoDJmpURREtLxW8FDTyJLDDVkvEVDrrDRzf52vaHIc=
-X-Google-Smtp-Source: AGHT+IGSAALqOIqQPqdQW5kpcKbc87z25QrKaKOBki5wfjcgLuf0TR4cPnmEu6tnthtNf4Gm3b8KYiJdEnllG4ytex0=
-X-Received: by 2002:ac8:5708:0:b0:4e8:8ed6:9be3 with SMTP id
- d75a77b69052e-4e89d335819mr503244081cf.52.1761554354749; Mon, 27 Oct 2025
- 01:39:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761554541; x=1762159341;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XNrT0X/VmxwDKtQarc0omjL6KzdSddilOyB81dzZzsI=;
+        b=BaLOoAhNM4CM43Zw8ngefGiUWy2JS95LICYoa3dVWeaYRXNNq/GHHGJQhd7gc3XIdA
+         O/s0ZAt10X6mFBTZw7bczvZxevaTemiuED3eEktM0SuJbw9xfetlPxv7Od1/ib3p+tkf
+         f6IJH3m6zPyo6m1zKHhwuk7gumh0T5hb2gXKZ+bd8s0t3spMm0rZnkXnwM9Qkzi/pGW6
+         sSjgSdQqWRebE1bJt6M52gC8NQBPotnTJP/Nl8nIyMES1EvsYYMNqe+YuRJDywiLhu2Y
+         H+9azRRqGy1V/VgEnVuzbwFksOOySK2furz10G5fPlAyVX7S+duKtz6+jfHq3lKY1h8V
+         5BHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWppHE56H2djuRUPgms3pWYZeKXJvCrNfVsaSQZ/8YJAKwDTTXKH6JXT06BeJKIhhgIXwT8Lo0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqrKP2vxHvd6ozlYv7xsYLn6d7TEZToQ3mnCiK46ZoezH5MXZW
+	4Zp2f86cxQx0hW6+GB6bOFKSW2fLZD6Bf1iB8g4FJPv8nI7rzgLVueIqTdHFG4DhR729G+BviDL
+	kxVqsHvfJ6HROcf9dynW2LOCQm/9z2SmycpVyHLvDHEnaxI0VoQFUTwVfl94=
+X-Google-Smtp-Source: AGHT+IG++kRyzF4oUbz/cWZZzqub111RjqBwcOHY2xI+WnSx7+MeU5kEIOHXV1wYL7SxDjkbXhDFnNzeBqcnAT/HOHMFsUkFaSWg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251027082232.232571-1-idosch@nvidia.com> <20251027082232.232571-3-idosch@nvidia.com>
-In-Reply-To: <20251027082232.232571-3-idosch@nvidia.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 27 Oct 2025 01:39:03 -0700
-X-Gm-Features: AWmQ_blIpYAZ4Gelqj9PP6PEcpBOGCL9M9g_33zQNNsiCwQqG81g9EEb6QQWJiU
-Message-ID: <CANn89iK-YDrmLdJKANDkb6WVSZdiPOYf3e18Hzx6xBk8cAgeUA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 2/3] ipv6: icmp: Add RFC 5837 support
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org, petrm@nvidia.com, 
-	willemb@google.com, daniel@iogearbox.net, fw@strlen.de, 
-	ishaangandhi@gmail.com, rbonica@juniper.net, tom@herbertland.com
+X-Received: by 2002:a05:6602:6425:b0:940:d37b:8957 with SMTP id
+ ca18e2360f4ac-94281994459mr1343513939f.11.1761554541490; Mon, 27 Oct 2025
+ 01:42:21 -0700 (PDT)
+Date: Mon, 27 Oct 2025 01:42:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68ff306d.050a0220.32483.0014.GAE@google.com>
+Subject: [syzbot] Monthly wireless report (Oct 2025)
+From: syzbot <syzbot+list7b82037e64efa8c01de6@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 27, 2025 at 1:24=E2=80=AFAM Ido Schimmel <idosch@nvidia.com> wr=
-ote:
->
-> Add the ability to append the incoming IP interface information to
-> ICMPv6 error messages in accordance with RFC 5837 and RFC 4884. This is
-> required for more meaningful traceroute results in unnumbered networks.
->
-> The feature is disabled by default and controlled via a new sysctl
-> ("net.ipv6.icmp.errors_extension_mask") which accepts a bitmask of ICMP
-> extensions to append to ICMP error messages. Currently, only a single
-> value is supported, but the interface and the implementation should be
-> able to support more extensions, if needed.
->
-> Clone the skb and copy the relevant data portions before modifying the
-> skb as the caller of icmp6_send() still owns the skb after the function
-> returns. This should be fine since by default ICMP error messages are
-> rate limited to 1000 per second and no more than 1 per second per
-> specific host.
->
-> Trim or pad the packet to 128 bytes before appending the ICMP extension
-> structure in order to be compatible with legacy applications that assume
-> that the ICMP extension structure always starts at this offset (the
-> minimum length specified by RFC 4884).
->
-> Since commit 20e1954fe238 ("ipv6: RFC 4884 partial support for SIT/GRE
-> tunnels") it is possible for icmp6_send() to be called with an skb that
-> already contains ICMP extensions. This can happen when we receive an
-> ICMPv4 message with extensions from a tunnel and translate it to an
-> ICMPv6 message towards an IPv6 host in the overlay network. I could not
-> find an RFC that supports this behavior, but it makes sense to not
-> overwrite the original extensions that were appended to the packet.
-> Therefore, avoid appending extensions if the length field in the
-> provided ICMPv6 header is already filled.
->
-> Export netdev_copy_name() using EXPORT_IPV6_MOD_GPL() to make it
-> available to IPv6 when it is built as a module.
->
-> Reviewed-by: Petr Machata <petrm@nvidia.com>
-> Reviewed-by: David Ahern <dsahern@kernel.org>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
+Hello wireless maintainers/developers,
 
-Same small remark about consume_skb().
+This is a 31-day syzbot report for the wireless subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireless
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+During the period, 2 new issues were detected and 0 were fixed.
+In total, 56 issues are still open and 168 have already been fixed.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  18147   Yes   WARNING in rate_control_rate_init (3)
+                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
+<2>  10351   Yes   WARNING in __rate_control_send_low (3)
+                   https://syzkaller.appspot.com/bug?extid=34463a129786910405dd
+<3>  6869    Yes   WARNING in __cfg80211_ibss_joined (2)
+                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
+<4>  2043    No    WARNING in drv_unassign_vif_chanctx (3)
+                   https://syzkaller.appspot.com/bug?extid=6506f7abde798179ecc4
+<5>  1546    No    WARNING in kcov_remote_start (6)
+                   https://syzkaller.appspot.com/bug?extid=3f51ad7ac3ae57a6fdcc
+<6>  1225    Yes   WARNING in ieee80211_start_next_roc
+                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
+<7>  864     Yes   INFO: task hung in reg_process_self_managed_hints
+                   https://syzkaller.appspot.com/bug?extid=1f16507d9ec05f64210a
+<8>  760     Yes   INFO: task hung in reg_check_chans_work (7)
+                   https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
+<9>  602     Yes   INFO: rcu detected stall in ieee80211_handle_queued_frames
+                   https://syzkaller.appspot.com/bug?extid=1c991592da3ef18957c0
+<10> 599     Yes   INFO: task hung in crda_timeout_work (8)
+                   https://syzkaller.appspot.com/bug?extid=d41f74db64598e0b5016
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
