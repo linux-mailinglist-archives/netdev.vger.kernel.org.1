@@ -1,188 +1,101 @@
-Return-Path: <netdev+bounces-233249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7EA0C0F4E8
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:31:41 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F19AC0F5D2
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:38:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B37334669DE
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 16:23:35 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AED96347807
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 16:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8A3305E24;
-	Mon, 27 Oct 2025 16:23:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FA8314A8D;
+	Mon, 27 Oct 2025 16:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bg/wY72m"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ey7n90JD";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="xoIbsUk2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E75274FE8;
-	Mon, 27 Oct 2025 16:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7274830AAC8;
+	Mon, 27 Oct 2025 16:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761582212; cv=none; b=c9c+G6uv6p8vHrjSVF7CMB+08/pTanuAdc8x8lazlt/U5dwHBsz13+A3bFdfQvw/TL67o0Pkkp1eHSgkx/b4LZtIhpuT2sIx/t8kYswa6xAdDfewdsP2/+KlEAD4e4ptiZy2SSsTRDLIFEfMSI3mFVh6IBDufFEOF87B6C4FwDc=
+	t=1761582990; cv=none; b=TQsRAK0ApbGR9hjH+fQW93uUhMw8UIsYUrvaRK1CSAzlDvDXwfIk3I+uZXqJYqfPnvq/K8lqOTGriXk+RyZAQ6ymJlIppLNJSdb/VuQx67MJ/X2GiZa39MIQ2dnK0wCYPaiCT5+Cq9HGryrK343KeutyRFjPGEcOHSBYbZ6T864=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761582212; c=relaxed/simple;
-	bh=QFbmOufzCSKxHmY0QccnxuCe5JH8xj8PfL6ljCe973Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rBlu0o46aSBi3RfLSutPW707sFQCls+QS2RW4X1AGcGpTa3lD7H8ft4SHhrvf8bPxhapo5pe1SAc5uwJ3RGk4D0lK+/fLERyrCjD6l0N0n9G78DCTq7SNsdQKY/zIow21nNnMtNexjGr0gKX2cZ/bwK/rluTeqNL7QTku11c8Ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bg/wY72m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BF85C4CEF1;
-	Mon, 27 Oct 2025 16:23:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761582212;
-	bh=QFbmOufzCSKxHmY0QccnxuCe5JH8xj8PfL6ljCe973Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Bg/wY72mo8btLtpDPdTklIw4ZjgyWtIXqEVuIdpNTnxM+wEilrk3HthuXJkQiCKF8
-	 KgT+GWJ6/wxGh1ouPSxTJY9s17bKffYSux/OM7mQu0s1AiXLHwy2DtZiD2a4j1djak
-	 1YnIVHgGQB+AP+nyOC2wqdviBd4ZWRZJfCWQPZqwgqS48YaC6xbWl8ilFwUB7kpQni
-	 qmn+TlmrIaF7umK2/K3H0FBe6C+5a11TpQdDCYQwgpfY2QgbBTqOaluTcNkYYW/Ey5
-	 m8f4/egrxbUo0/Ta/msccPRkev/U/3FoJYLZB0cQHRxrf4xN4/xmWYyI6CDetLSPg6
-	 oR+IzG5minzyQ==
-Date: Mon, 27 Oct 2025 16:23:28 +0000
-From: Simon Horman <horms@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	nxne.cnse.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH iwl-next] ice: implement configurable header split for
- regular Rx
-Message-ID: <aP-cgMiJ-y_PX7Xa@horms.kernel.org>
-References: <20251006162053.3550824-1-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1761582990; c=relaxed/simple;
+	bh=NF5bSX0dyXfyOuPerzSokt+xmjFMmp5Twg/WVnHSNyg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ieuymSF2TINMxXy0pJUb6SJu5c9OF/TQJY7CAtwjvy72TLxyjQzxpxYvrplfIq2IJXpt5qiGQNKEl3QYhMt9U/ncBzQPJ/IFSlXa3kFRSihUtYy3TayC1uMx7i0mgP3rI1BfAkdYI+hdV7bZ0b8hgIhFQrjGiBaAx9yDD/L0ukc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ey7n90JD; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=xoIbsUk2; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1761582987;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OY0q5YKTtT4E1ub/SpSB1ESrYQ5WABlmRfW9bRPjcDE=;
+	b=ey7n90JDMTUM2Zplf9hrF7CfTAUl/zYjlBdAveeVDbOc8ldRGQ5IgDRhRHEC4SjTCRCAwm
+	HOCpUiOITgnmyeuHcEyYNMhcgEr0MtJAvrjVP/dp9ZcO9VnXu1MlG19lmGMZFXK8pE9byb
+	qCvo2rU7soYJu5SvFyaIDcW3yws89FFOgfppQqSiXlA9smFcFvpdrpGARE1JWRzDS1xhjp
+	jAg2IyMcqyMUSfceTXxqam6QPuUYKbSBaWv++3QRy+0t5LncQkdMhcgyww7vKgjLgCUjvn
+	eyPFg3cyEP76bok5mJwZOa+CzK0KpYoJJm+3ZYX+aoDhkSnFpiQlm2+T2GoLEw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1761582987;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OY0q5YKTtT4E1ub/SpSB1ESrYQ5WABlmRfW9bRPjcDE=;
+	b=xoIbsUk2+vEfPCpIpLkF4GC+uw2r8MliQIR0TvsBpdisw3Dy96mpl0L1ViaoVKsVRemTKD
+	kVWEc+FYaY5tk6DA==
+To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org,
+ Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>
+Cc: Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, Zbigniew
+ =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering
+ <mzxreary@0pointer.de>, Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa
+ Sarai <cyphar@cyphar.com>, Amir Goldstein <amir73il@gmail.com>, Tejun Heo
+ <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+ linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+ bpf@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, netdev@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+ Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v3 11/70] ns: add active reference count
+In-Reply-To: <20251024-work-namespace-nstree-listns-v3-11-b6241981b72b@kernel.org>
+References: <20251024-work-namespace-nstree-listns-v3-0-b6241981b72b@kernel.org>
+ <20251024-work-namespace-nstree-listns-v3-11-b6241981b72b@kernel.org>
+Date: Mon, 27 Oct 2025 17:36:27 +0100
+Message-ID: <87a51cwbck.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251006162053.3550824-1-aleksander.lobakin@intel.com>
+Content-Type: text/plain
 
-On Mon, Oct 06, 2025 at 06:20:53PM +0200, Alexander Lobakin wrote:
-> Add second page_pool for header buffers to each Rx queue and ability
-> to toggle the header split on/off using Ethtool (default to off to
-> match the current behaviour).
-> Unlike idpf, all HW backed up by ice doesn't require any W/As and
-> correctly splits all types of packets as configured: after L4 headers
-> for TCP/UDP/SCTP, after L3 headers for other IPv4/IPv6 frames, after
-> the Ethernet header otherwise (in case of tunneling, same as above,
-> but after innermost headers).
-> This doesn't affect the XSk path as there are no benefits of having
-> it there.
-> 
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
-> Applies on top of Tony's next-queue, depends on Michał's Page Pool
-> conversion series.
-> 
-> Sending for review and validation purposes.
-> 
-> Testing hints: traffic testing with and without header split enabled.
-> The header split can be turned on/off using Ethtool:
-> 
-> sudo ethtool -G <iface> tcp-data-split on (or off)
+On Fri, Oct 24 2025 at 12:52, Christian Brauner wrote:
+> diff --git a/kernel/time/namespace.c b/kernel/time/namespace.c
+> index ee05cad288da..2e7c110bd13f 100644
+> --- a/kernel/time/namespace.c
+> +++ b/kernel/time/namespace.c
+> @@ -106,6 +106,7 @@ static struct time_namespace *clone_time_ns(struct user_namespace *user_ns,
+>  	ns->offsets = old_ns->offsets;
+>  	ns->frozen_offsets = false;
+>  	ns_tree_add(ns);
+> +	ns_ref_active_get_owner(ns);
 
-Nice, I'm very pleased to see this feature in the pipeline for the ice driver.
+It seems all places where ns_ref_active_get_owner() is added it is
+preceeded by a variant of ns_tree_add(). So why don't you stilck that
+refcount thing into ns_tree_add()? I'm probably missing something here.
 
-...
+Thanks,
 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+        tglx
 
-...
 
-> @@ -836,6 +858,20 @@ bool ice_alloc_rx_bufs(struct ice_rx_ring *rx_ring, unsigned int cleaned_count)
->  		 */
->  		rx_desc->read.pkt_addr = cpu_to_le64(addr);
->  
-> +		if (!hdr_fq.pp)
-> +			goto next;
-> +
-> +		addr = libeth_rx_alloc(&hdr_fq, ntu);
-> +		if (addr == DMA_MAPPING_ERROR) {
-> +			rx_ring->ring_stats->rx_stats.alloc_page_failed++;
-> +
-> +			libeth_rx_recycle_slow(fq.fqes[ntu].netmem);
-> +			break;
-> +		}
-> +
-> +		rx_desc->read.hdr_addr = cpu_to_le64(addr);
-> +
-> +next:
-
-Is performance the reason that a goto is used here, rather than, say, putting
-the conditional code in an if condition? Likewise in ice_clean_rx_irq?
-
->  		rx_desc++;
->  		ntu++;
->  		if (unlikely(ntu == rx_ring->count)) {
-> @@ -933,14 +969,16 @@ static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
->  		unsigned int size;
->  		u16 stat_err_bits;
->  		u16 vlan_tci;
-> +		bool rxe;
->  
->  		/* get the Rx desc from Rx ring based on 'next_to_clean' */
->  		rx_desc = ICE_RX_DESC(rx_ring, ntc);
->  
-> -		/* status_error_len will always be zero for unused descriptors
-> -		 * because it's cleared in cleanup, and overlaps with hdr_addr
-> -		 * which is always zero because packet split isn't used, if the
-> -		 * hardware wrote DD then it will be non-zero
-> +		/*
-> +		 * The DD bit will always be zero for unused descriptors
-> +		 * because it's cleared in cleanup or when setting the DMA
-> +		 * address of the header buffer, which never uses the DD bit.
-> +		 * If the hardware wrote the descriptor, it will be non-zero.
->  		 */
-
-The update to this comment feels like it could be a separate patch.
-(I know, I often say something like that...)
-
->  		stat_err_bits = BIT(ICE_RX_FLEX_DESC_STATUS0_DD_S);
->  		if (!ice_test_staterr(rx_desc->wb.status_error0, stat_err_bits))
-> @@ -954,12 +992,27 @@ static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
->  
->  		ice_trace(clean_rx_irq, rx_ring, rx_desc);
->  
-> +		stat_err_bits = BIT(ICE_RX_FLEX_DESC_STATUS0_HBO_S) |
-> +				BIT(ICE_RX_FLEX_DESC_STATUS0_RXE_S);
-> +		rxe = ice_test_staterr(rx_desc->wb.status_error0,
-> +				       stat_err_bits);
-> +
-> +		if (!rx_ring->hdr_pp)
-> +			goto payload;
-> +
-> +		size = le16_get_bits(rx_desc->wb.hdr_len_sph_flex_flags1,
-> +				     ICE_RX_FLEX_DESC_HDR_LEN_M);
-> +		if (unlikely(rxe))
-> +			size = 0;
-> +
-> +		rx_buf = &rx_ring->hdr_fqes[ntc];
-> +		libeth_xdp_process_buff(xdp, rx_buf, size);
-> +		rx_buf->netmem = 0;
-> +
-> +payload:
->  		size = le16_to_cpu(rx_desc->wb.pkt_len) &
->  			ICE_RX_FLX_DESC_PKT_LEN_M;
-> -
-> -		stat_err_bits = BIT(ICE_RX_FLEX_DESC_STATUS0_RXE_S);
-> -		if (unlikely(ice_test_staterr(rx_desc->wb.status_error0,
-> -					      stat_err_bits)))
-> +		if (unlikely(rxe))
->  			size = 0;
->  
->  		/* retrieve a buffer from the ring */
-> -- 
-> 2.51.0
-> 
 
