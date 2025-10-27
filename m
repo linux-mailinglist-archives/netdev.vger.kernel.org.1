@@ -1,177 +1,113 @@
-Return-Path: <netdev+bounces-233264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26813C0FA18
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 18:28:48 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 204A2C0FAC9
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 18:33:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 010844E1C8A
-	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:28:47 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F27054E8168
+	for <lists+netdev@lfdr.de>; Mon, 27 Oct 2025 17:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8343090C1;
-	Mon, 27 Oct 2025 17:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1C0631197B;
+	Mon, 27 Oct 2025 17:33:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W3RNxoTo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a9puPOaC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3943A27A122
-	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 17:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540CD1A5B8B
+	for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 17:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761586124; cv=none; b=i4AJnniuQbQz+2U5tE1zD6qZbzRnbhHe3zYApcFRZgVjOaDKwSAxSiEK/6KRLVsoRju4fQBJDrTlau5wtvOBxTCkYIOmRugxpGF+G+mss1RceRCjaAFgFeGQaPLPi4HcLy7XcIdgVBzsb4j+RN0WmwNdosdZo7gK1QkdRA9da20=
+	t=1761586410; cv=none; b=jRtUBvu2v2yN8kblco39eTI1L3NIdhg4v6gHDj/2alNpBHb7HJqx2NSvriERbrRYuKRKotd6zyeA5RYAJjWh1NezI62XHDvqRUkQ7Ai2nEI73txAuyNI+Hf3+koYP+4f1UJIHMVRZOdzPeYenTc3B4SHQOOguMnB3XhwEUk7WCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761586124; c=relaxed/simple;
-	bh=n15GkVGRlM82y8bsXWGWKv4Ru0ouDE1mhKQda2Lxd3I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZND0E3wzzEfaL73kx45GIrbbM6f4yYBLPKFp7ZQUb+ktEZ1Kf0cUw7iXkUfJ+Fdls8ApTohcSXxXW0NjK4aBup2Pt/bjn8KloSqkzEyGYrl8ynlfM3Y4PRiOvT2EKxcmRvy84NiXMVl+YO1EUoOBCmz3Z7npoaDZXO51zCDw+gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W3RNxoTo; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-784a5f53e60so58755627b3.2
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 10:28:43 -0700 (PDT)
+	s=arc-20240116; t=1761586410; c=relaxed/simple;
+	bh=dOaMOgWdPSwBQaDAtIKDfnU/2HKoBN8nAiCUEaGdvqo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G+z4eKQW+zzVhJOhvCvzCFfgZ81G2BFdRyvg5y8LMK29AZSp1SmN6Hf9KZmtUgxmzqjUvjKLMQO86bmAD9lxxApYV6dSIYrw+7sqfqmBTn1Z2ZdWRoWov4lyv3ZE/nLJXygXb1kKeunCAYWTAmd8Z2hHuuz+BGiXoZwL2G3GTv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a9puPOaC; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b6cf257f325so4013423a12.2
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 10:33:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761586122; x=1762190922; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gKbTf0ElmduUelZrYEJiaRrNvJO3TsTMSPfSoF30NGQ=;
-        b=W3RNxoToAcmeXPfx5Lef5kG3LqvhP2a+x4eCRJPsXpSfbugs5gw9pvySwndsflcKcg
-         /SrF0fVltryWnZcR6D4Bs4EWseD+5ykSuK/w6UAdRfwPZXWIOGzB3i7AmttfXfPdQeGH
-         ku9Gv0V3No0+pBOG6Tya++NPkhOG+m5zS+31mU4GPUR09KPCnJgiqfLnddZQdia1KPU2
-         +GxBaZ+qiLqBpvxfhw9YsvfIxsp637zlJnMfCL/jOUW9HrjKU1BqOFjvifVX7YmipqRM
-         E3aDLz5nLDvmsLKLY2Jx3XItKcViG+Q6SnACPK+9QWTvXChaG91Ae6Raq40cafssBS7s
-         q+2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761586122; x=1762190922;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1761586408; x=1762191208; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gKbTf0ElmduUelZrYEJiaRrNvJO3TsTMSPfSoF30NGQ=;
-        b=ZytiX9wSM59nS/T8Jp3OFPYkLb7SFJn/qI+c91E63Nb3MbAQET+KY9IJrK/sLHcLJL
-         dNgEFodrHdFNw838lCll6VqbiNlSuePcVy14dasQOaMc13IgdKFLXQrCoz1IhW0+QGdJ
-         7tb5VoB9FXMFbozULQcFl0IGLPo5eO9HONOp61bQyxFc0RnshOxMTcoGeV7DyqeLquoc
-         T70mYkY+RIoEnJpDrY68BXfs1opGDxeaRxlzfEJtl6gKLoy8ZBozZZondq4K6PrW3zKS
-         z9eZXahWPNgbytkxmk4lJFwFM+yPVEM9qtbGFfeVJGpyRaN7ACdk6+0wedUgZRsojEx2
-         j6DA==
-X-Forwarded-Encrypted: i=1; AJvYcCX7dawCoSCOKuynxYA1zknmtcZYURyr7on6JoYaAF9eAMQvv0CvMkMTl9bWCGBot0ri8EwwKvI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXtkudv75ji6xG8cNvD36AUi6lF2GzsUmbguEzEcYUzZPjGasA
-	t9NP3vQkZDDIlNds7ZoQ9uoRhe1hWNjxO6RDh10Xx+yzJTmjoSeUOJraA+M+S7ts
-X-Gm-Gg: ASbGncvI1q/mua2CPjwrdvP+nJvOSBQahn6SSljSPBmkYCarolco9mLh+3/vJoy7Gxr
-	8t/4eUfB9bXQPji/4asXyEPQzqbiivV4UDyU1XfJag7CVbamo30EPSa1PFfYqZbraI81rJUCpU/
-	3cYkE7+lbU0AVxgPlc3O7Wq4Vvum6e/L3JNEsc3tdmDGpuLmONcv0LFjWPbrZlCTXatfhq39gBi
-	9Seocbyfg2R4060sqDyjiYy3UrfNLoy81MH3NK+mUghoS+HconSscWtP9PQvrX8iirmGRfRu4TU
-	czS/s7cS06xXc6nkLSyrSnRfcrl1RmO39OQL0MvCqSviRO8k5QuwKACG9VzikOPV5ptI3RoX2bF
-	zsyN396BD+iSmqRDHEZXrBVLiIAR0bq3HPZXiWC56JGTYlwFwRtk53n4BdndO36xdiF38YQoawr
-	d6KTKjEDZeKrNOIdRVM5zzxfF3b3pHIyibyzapsSraZ8Iu8zc=
-X-Google-Smtp-Source: AGHT+IHM1NI9jlgl7YyHEw6xfZ2NvWKARzYo9jjqycdlEoc48MLVHrBBixAozXkHMEqVBYRHZIgJww==
-X-Received: by 2002:a05:690c:9312:b0:785:eb11:647b with SMTP id 00721157ae682-78618357840mr4674427b3.33.1761586122152;
-        Mon, 27 Oct 2025 10:28:42 -0700 (PDT)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:5b::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-785ed1a4391sm20417647b3.33.2025.10.27.10.28.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 10:28:41 -0700 (PDT)
-Date: Mon, 27 Oct 2025 10:28:40 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next 01/12] selftests/vsock: improve logging in
- vmtest.sh
-Message-ID: <aP+ryNxS2A45WT7f@devvm11784.nha0.facebook.com>
-References: <20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com>
- <20251022-vsock-selftests-fixes-and-improvements-v1-1-edeb179d6463@meta.com>
- <aP-hpxMgB5tN7KJ3@horms.kernel.org>
+        bh=dOaMOgWdPSwBQaDAtIKDfnU/2HKoBN8nAiCUEaGdvqo=;
+        b=a9puPOaCEnAwHm76G0OPbU4f3IF2OAIc17xGmnECwMThF/EDEfF+b+VnEvouU8856u
+         mPoFWsz48v+heeofifvwHkWOX2rJBuxzLa7KZxwl75dgoHyi8RAfCJivimWzDzbcI/MZ
+         sFfaxN5CCpcD/ZkebYJb9v+gu8Ejn+tf4oGf5t85p6los6990yDTFrVVHQilWMv10HyN
+         dxgpleNUyNjbkQvvEaQD/6CQKyW/osvJsIWNEGC2bz0KOBaXmD4WlOAjqvxCHhxFcmp2
+         OVrKyNE3v/A6RPJA7pg0GID/Bf4UJ7htUUPxKQQBEDOCn46T6eBkcTuy7uTdNDGnO8Ms
+         A3bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761586408; x=1762191208;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dOaMOgWdPSwBQaDAtIKDfnU/2HKoBN8nAiCUEaGdvqo=;
+        b=aA8S9DKDD+uHedt8XigA5rhhWOIwXzc+r1YJUCEfq/6hFXwXNK5FCP+arBNQhMRgQw
+         0MNblg42RqlS117Iza7xoZTvTZs25/XvPe8jGyGcvoiWDJ7+wXw2DDfWOWG3mgqKEkpg
+         JVajGLCx7RW5puNRbL/1X0mq8RRfdwV1cdqXkjvzNSflzgNj5o+CytRoDrKE62Azafhj
+         T/7RMFC0ZbVunijSTocabJmHnIE0pS9bR1dMygpNsfEIbxphh60KswIIa4G7lyFw97pe
+         M+6oYoDJef6PzLi8Q2YLLlp0En9Vfqs9/CljkJi3uLPvkpIBRitTzgLoCsIQTWa6+YQm
+         nePg==
+X-Forwarded-Encrypted: i=1; AJvYcCUrm3uQC521cDueou88m6bQMqrNFJCC32NW2YQepg//mzrCKmuqrc5iPykCZqP0omsibXgIXTg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyszyXfftUOy4fog+g19sCGPAgYv37bMqmFfX3h0hdrWuwTukqz
+	UYg7WKg3aacjOgSopGvdtokosgISdUQx6x6kynnSgJeIA+B+hTWPFViLrxU6jBQ2QSctlb/XhTZ
+	lxM43w6mKnivTrJYM6difKgQbcj/an67csbz8l8pwWdGJl09x3rufncL+D00=
+X-Gm-Gg: ASbGnctLLcVCZ8vSI7wQlZ7sRcGkyir3yAf2bM3jkFAhwmUUy0rj4GsDC6kMIwiUwTt
+	fhk7oTJ8PF7QXgIDbrhxTNiptS17DrDyh4O6QLjP8sWdWOjeUolthKc0law+g9rWFrYghyfi5iI
+	w4S+lLzrWEITr398BZB3PQP5gFcszfWj/90GgbJpanKjh00a/NUcKbBiF2iNgFj/oYccdn/L+1y
+	CMr1KdDQ+FU8lR33DMz3mNdIbM+TrO+MPDs3JsjpC28EOtOUJwQi3pxZshaavv3DuBqZjfu8E98
+	X2x9ygFtU4nE42Qc3eMpi4A+8w==
+X-Google-Smtp-Source: AGHT+IGVyFzmmT8KAE40Vr+40sEeQEEraeWaw/Va6KNWp2UmPyIPvjwYZZf6uUwC1GRO1zVxYdIJciayFW8fona361Y=
+X-Received: by 2002:a17:903:38c8:b0:290:2a14:2eab with SMTP id
+ d9443c01a7336-294cb3785a8mr8345225ad.11.1761586408263; Mon, 27 Oct 2025
+ 10:33:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aP-hpxMgB5tN7KJ3@horms.kernel.org>
+References: <20251024120707.3516550-1-edumazet@google.com>
+In-Reply-To: <20251024120707.3516550-1-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 27 Oct 2025 10:33:16 -0700
+X-Gm-Features: AWmQ_blhLuLkzfgTgvBjZT5bQIuWVv2Azv7M8xWXUiBwRoywNXbeC_iLrrgLF2w
+Message-ID: <CAAVpQUC4W2apjwr87D-bxJgGzyAJ82OPZiKRai6+4TFfre+NQQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: remove one ktime_get() from recvmsg() fast path
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 27, 2025 at 04:45:27PM +0000, Simon Horman wrote:
-> >  log() {
-> > -	local prefix="$1"
-> > +	local redirect
-> > +	local prefix
-> >  
-> > -	shift
-> > -	local redirect=
-> >  	if [[ ${VERBOSE} -eq 0 ]]; then
-> >  		redirect=/dev/null
-> >  	else
-> >  		redirect=/dev/stdout
-> >  	fi
-> >  
-> > +	prefix="${LOG_PREFIX:-}"
-> > +
-> >  	if [[ "$#" -eq 0 ]]; then
-> > -		__log_stdin | tee -a "${LOG}" > ${redirect}
-> > +		if [[ -n "${prefix}" ]]; then
-> > +			cat | awk -v prefix="${prefix}" '{printf "%s: %s\n", prefix, $0}'
-> 
-> FIWIIW, I would drop cat from this line.
-> 
+On Fri, Oct 24, 2025 at 5:07=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> Each time some payload is consumed by user space (recvmsg() and friends),
+> TCP calls tcp_rcv_space_adjust() to run DRS algorithm to check
+> if an increase of sk->sk_rcvbuf is needed.
+>
+> This function is based on time sampling, and currently calls
+> tcp_mstamp_refresh(tp), which is a wrapper around ktime_get_ns().
+>
+> ktime_get_ns() has a high cost on some platforms.
+> 100+ cycles for rdtscp on AMD EPYC Turin for instance.
+>
+> We do not have to refresh tp->tcp_mpstamp, using the last cached value
+> is enough. We only need to refresh it from __tcp_cleanup_rbuf()
+> if an ACK must be sent (this is a rare event).
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-sgtm!
-
-> > +		else
-> > +			cat
-> > +		fi
-> >  	else
-> > -		__log_args "$@" | tee -a "${LOG}" > ${redirect}
-> > -	fi
-> > -}
-> > -
-> > -log_setup() {
-> > -	log "setup" "$@"
-> > +		if [[ -n "${prefix}" ]]; then
-> > +			echo "${prefix}: " "$@"
-> > +		else
-> > +			echo "$@"
-> > +		fi
-> > +	fi | tee -a "${LOG}" > ${redirect}
-> >  }
-> >  
-> >  log_host() {
-> > -	local testname=$1
-> > -
-> > -	shift
-> > -	log "test:${testname}:host" "$@"
-> > +	LOG_PREFIX=host log $@
-> 
-> shellcheck suggests keeping the quoting of $@.
-> This seems reasonable to me. Although in practice I don't think
-> it will change the behaviour of this script.
-> 
-
-Ah right, makes sense to me.
-
-> >  }
-> >  log_host
-> >  log_guest() {
-> > -	local testname=$1
-> > -
-> > -	shift
-> > -	log "test:${testname}:guest" "$@"
-> > +	LOG_PREFIX=guest log $@
-> 
-> shellcheck also points out that log_guest is never passed
-> arguments, so $@ can be dropped. If you prefer to keep
-> it then, as per log_host, it seems reasonable for it to be quoted.
-> 
-
-Quoting it sounds best to me, in keeping with log_host().
-
-
-Thanks,
-Bobby
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
