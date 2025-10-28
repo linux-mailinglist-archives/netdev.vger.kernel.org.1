@@ -1,242 +1,204 @@
-Return-Path: <netdev+bounces-233388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B69AC12A12
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 03:07:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AC7EC12A4C
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 03:15:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B8BCB4E47C7
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:06:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F0E474E0663
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:14:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7BB1A8412;
-	Tue, 28 Oct 2025 02:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="SvDVz/Kv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422711D5151;
+	Tue, 28 Oct 2025 02:14:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A90F50F;
-	Tue, 28 Oct 2025 02:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FFC62DF68;
+	Tue, 28 Oct 2025 02:14:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761617188; cv=none; b=dj7iYegM9aT2CPV8FWc5byTc0QaciQ7bP+bisZjuTLEVQBh2qgdufUYbh+AvK1JsXCdT2NS8DaIOrMv34M7xD1YRgyLUnBxgFwyAWkh8Sq/tzYCrA4D/sTA1esZG6k7DcZJPapUdurUXb6wh/8kzFAGC/dMOAU07KQOIX8BABVk=
+	t=1761617697; cv=none; b=FWhT4rK7fivicgwX29GRmW5kBdkfQHPL4aa77JIAXNcA/qw7kwjyPw9INdA+hJVO2yHMDSXTRWS9onUBB8DNpWzch3fIJ0G/u5swmofT8kXl3rZigcmt2No3G0+mjxpoFmUSRhMERn1itjwNA4EQ6vixUy2me7VJPoWiJAK6Pw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761617188; c=relaxed/simple;
-	bh=hB0F0f3czaGrMW/cqojaLSFWSVcNLZ93V4c7pu+q15k=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VnVDGU+I9vC4U/2e6RmU3wu1DrLbFX9+Llkk5L+jeEKs6gECK481U1qX4JME441Jf7AtRuXUg/v2+p9tEs/KBuVs5+jEdDncTbHXAQy1uAnwkjxge2bpomq2ZQlayoLow/+MaZfAIFNFgrI+jblphBrlNezLtBKMGcr4v0mFLcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=SvDVz/Kv; arc=none smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59S0ADVC2710318;
-	Mon, 27 Oct 2025 19:06:04 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	PPS06212021; bh=Odw5CO1GMwiID/662eBOMWyp09TTAmRXFX0uj18/NiQ=; b=
-	SvDVz/KvxVmSGMb1NU2v8jrHJK+u15XNgCpAP1SC1aA8cNRgH76fGOjsGSk9jpHF
-	faemMjpur56QJh4w6GZj3AKxny4U6P5YvESNECL8y0/YnzEJAKGfdjRaAty/Uqj9
-	65ueVymPHj137NSj13ebyXnXdoPeX9Qz6j97TzI9K0CfTB+8ETN0/7CiwnpLL0IV
-	+S2038tW49tEaTKs02lHv4b1AgimQ+b2TkZIgQQ2MWJApyGr49WMRBCpAsBKtfNE
-	DWyp0FJ+U4veS3pYQPAdBz03OqM6VFyIRpyLE9nAUFTY8CKxNg7iWCyHsmAoh3BI
-	70YSADh9CAU+TiS40Hshmg==
-Received: from ala-exchng02.corp.ad.wrs.com ([128.224.246.37])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4a0su1jgtd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Mon, 27 Oct 2025 19:06:03 -0700 (PDT)
-Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
- ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.61; Mon, 27 Oct 2025 19:06:03 -0700
-Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
- ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
- 15.1.2507.61 via Frontend Transport; Mon, 27 Oct 2025 19:06:00 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <kuniyu@google.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-        <jreuter@yaina.de>, <kuba@kernel.org>, <linux-hams@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
-        <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-        <syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: Re: [PATCH V3] net: rose: Prevent the use of freed digipeat
-Date: Tue, 28 Oct 2025 10:05:59 +0800
-Message-ID: <20251028020559.2527458-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <CAAVpQUA1v+LDYfpGGcTJ3sGGhmo6BCBrwWUwaj9cUbBVrw28GQ@mail.gmail.com>
-References: <CAAVpQUA1v+LDYfpGGcTJ3sGGhmo6BCBrwWUwaj9cUbBVrw28GQ@mail.gmail.com>
+	s=arc-20240116; t=1761617697; c=relaxed/simple;
+	bh=8GA2HWQ3CnTTZU4f0v/SuliTNBNdDaZ0tSnmxpynxRg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sVjRi2/fXIQvnWxN2s1dQ5pkolreFuBoPiZ9/bvifbRPSrmvSi0uCFLYEimwtq7Xr4TNGPbEh5bMaeKr4zlgPjw93h0wYSZSjJ6xLEU8IbT4Bjs287odqhrXpJ8tMIyzA6O6b4PJ+GmS95zU0zsSFNvIJcM3haO3aR4U9FP2vPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vDZEX-000000006K5-0QLG;
+	Tue, 28 Oct 2025 02:14:49 +0000
+Date: Tue, 28 Oct 2025 02:14:45 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v3 12/12] net: dsa: add driver for MaxLinear
+ GSW1xx switch family
+Message-ID: <aQAnFXYZXIe4VA0Q@makrotopia.org>
+References: <cover.1761521845.git.daniel@makrotopia.org>
+ <cover.1761521845.git.daniel@makrotopia.org>
+ <5055f997f3dea3c26d6a34f94ed06bceda020790.1761521845.git.daniel@makrotopia.org>
+ <5055f997f3dea3c26d6a34f94ed06bceda020790.1761521845.git.daniel@makrotopia.org>
+ <20251028012430.2khnl6hts2twyrz3@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=SuadKfO0 c=1 sm=1 tr=0 ts=6900250b cx=c_pps
- a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=edf1wS77AAAA:8 a=1XWaLZrsAAAA:8
- a=t7CeM3EgAAAA:8 a=hSkVLCK3AAAA:8 a=FmatfasXnMZaY-i_3HAA:9
- a=DcSpbTIhAlouE1Uv7lRv:22 a=FdTzh2GWekK77mhwV6Dw:22 a=cQPPKAXgyycSBL8etih5:22
- a=poXaRoVlC6wW9_mwW8W4:22 a=cPQSjfK2_nFv0Q5t_7PE:22 a=Z5ABNNGmrOfJ6cZ5bIyy:22
- a=SsAZrZ5W_gNWK9tOzrEV:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI4MDAxNyBTYWx0ZWRfXzutfacNwVav5
- 7MzKHQcfvwS60xUlrPqY65JhS0CQkSxLb79TyXvSzMxkRKjno46VgeYfrfBTmtrXCpuyxXRP/2m
- whAt66emVDE+QhBnk8CpLgw9TSFKKSxxNkoTVbMY/ef8AGIcVamMC7l4cur6ik65HRqVv3DqJ5Y
- Uz/0GrAysNy4sxaVC7mT31fMHo6CRp/xjbMSDgAP/1E2Jzc198sRb4bxyJh9/AWAUt94z15S48y
- dhq/pJ/iUr4E88RfuNMOSdGix3zwGQTbf7o4FcisiGmzXJxaoFxI/iifvUs6ORwi9+lxnQAfWN/
- G2QTIK2cqt0kvT/FdyPySmvOHCWlNljBn9xPlAmyqmk8WZj8nu0Qe48ImStksyGtCXAcL9u3qaV
- yLAmOELluM89J/VeV1MbB/Bc/6xbzw==
-X-Proofpoint-GUID: eIPEPaC6TD0wL_su1l6R_PHRRa5GQyLH
-X-Proofpoint-ORIG-GUID: eIPEPaC6TD0wL_su1l6R_PHRRa5GQyLH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-28_01,2025-10-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 clxscore=1015 bulkscore=0 suspectscore=0 spamscore=0
- adultscore=0 lowpriorityscore=0 phishscore=0 impostorscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510280017
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251028012430.2khnl6hts2twyrz3@skbuf>
 
-On Mon, 27 Oct 2025 10:40:34 -0700, Kuniyuki Iwashima <kuniyu@google.com> wrote:
-> On Sat, Oct 25, 2025 at 12:53 AM Lizhi Xu <lizhi.xu@windriver.com> wrote:
-> >
-> > On Sat, 25 Oct 2025 00:15:51 -0700, Kuniyuki Iwashima <kuniyu@google.com> wrote:
-> > > On Fri, Oct 24, 2025 at 11:46 PM Lizhi Xu <lizhi.xu@windriver.com> wrote:
-> > > >
-> > > > On Fri, 24 Oct 2025 21:25:20 -0700, Kuniyuki Iwashima <kuniyu@google.com> wrote:
-> > > > > On Fri, Oct 24, 2025 at 8:51 PM Lizhi Xu <lizhi.xu@windriver.com> wrote:
-> > > > > >
-> > > > > > On Fri, 24 Oct 2025 19:18:46 -0700, Kuniyuki Iwashima <kuniyu@google.com> wrote:
-> > > > > > > On Fri, Oct 24, 2025 at 2:39 AM Lizhi Xu <lizhi.xu@windriver.com> wrote:
-> > > > > > > >
-> > > > > > > > There is no synchronization between the two timers, rose_t0timer_expiry
-> > > > > > > > and rose_timer_expiry.
-> > > > > > > > rose_timer_expiry() puts the neighbor when the rose state is ROSE_STATE_2.
-> > > > > > > > However, rose_t0timer_expiry() does initiate a restart request on the
-> > > > > > > > neighbor.
-> > > > > > > > When rose_t0timer_expiry() accesses the released neighbor member digipeat,
-> > > > > > > > a UAF is triggered.
-> > > > > > > >
-> > > > > > > > To avoid this UAF, defer the put operation to rose_t0timer_expiry() and
-> > > > > > > > stop restarting t0timer after putting the neighbor.
-> > > > > > > >
-> > > > > > > > When putting the neighbor, set the neighbor to NULL. Setting neighbor to
-> > > > > > > > NULL prevents rose_t0timer_expiry() from restarting t0timer.
-> > > > > > > >
-> > > > > > > > syzbot reported a slab-use-after-free Read in ax25_find_cb.
-> > > > > > > > BUG: KASAN: slab-use-after-free in ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
-> > > > > > > > Read of size 1 at addr ffff888059c704c0 by task syz.6.2733/17200
-> > > > > > > > Call Trace:
-> > > > > > > >  ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
-> > > > > > > >  ax25_send_frame+0x157/0xb60 net/ax25/ax25_out.c:55
-> > > > > > > >  rose_send_frame+0xcc/0x2c0 net/rose/rose_link.c:106
-> > > > > > > >  rose_transmit_restart_request+0x1b8/0x240 net/rose/rose_link.c:198
-> > > > > > > >  rose_t0timer_expiry+0x1d/0x150 net/rose/rose_link.c:83
-> > > > > > > >
-> > > > > > > > Freed by task 17183:
-> > > > > > > >  kfree+0x2b8/0x6d0 mm/slub.c:6826
-> > > > > > > >  rose_neigh_put include/net/rose.h:165 [inline]
-> > > > > > > >  rose_timer_expiry+0x537/0x630 net/rose/rose_timer.c:183
-> > > > > > > >
-> > > > > > > > Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_t")
-> > > > > > > > Reported-by: syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com
-> > > > > > > > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
-> > > > > > > > ---
-> > > > > > > > V1 -> V2: Putting the neighbor stops t0timer from automatically starting
-> > > > > > > > V2 -> V3: add rose_neigh_putex for set rose neigh to NULL
-> > > > > > > >
-> > > > > > > >  include/net/rose.h   | 12 ++++++++++++
-> > > > > > > >  net/rose/rose_link.c |  5 +++++
-> > > > > > > >  2 files changed, 17 insertions(+)
-> > > > > > > >
-> > > > > > > > diff --git a/include/net/rose.h b/include/net/rose.h
-> > > > > > > > index 2b5491bbf39a..33de310ba778 100644
-> > > > > > > > --- a/include/net/rose.h
-> > > > > > > > +++ b/include/net/rose.h
-> > > > > > > > @@ -167,6 +167,18 @@ static inline void rose_neigh_put(struct rose_neigh *rose_neigh)
-> > > > > > > >         }
-> > > > > > > >  }
-> > > > > > > >
-> > > > > > > > +static inline void rose_neigh_putex(struct rose_neigh **roseneigh)
-> > > > > > > > +{
-> > > > > > > > +       struct rose_neigh *rose_neigh = *roseneigh;
-> > > > > > > > +       if (refcount_dec_and_test(&rose_neigh->use)) {
-> > > > > > > > +               if (rose_neigh->ax25)
-> > > > > > > > +                       ax25_cb_put(rose_neigh->ax25);
-> > > > > > > > +               kfree(rose_neigh->digipeat);
-> > > > > > > > +               kfree(rose_neigh);
-> > > > > > > > +               *roseneigh = NULL;
-> > > > > > > > +       }
-> > > > > > > > +}
-> > > > > > > > +
-> > > > > > > >  /* af_rose.c */
-> > > > > > > >  extern ax25_address rose_callsign;
-> > > > > > > >  extern int  sysctl_rose_restart_request_timeout;
-> > > > > > > > diff --git a/net/rose/rose_link.c b/net/rose/rose_link.c
-> > > > > > > > index 7746229fdc8c..334c8cc0876d 100644
-> > > > > > > > --- a/net/rose/rose_link.c
-> > > > > > > > +++ b/net/rose/rose_link.c
-> > > > > > > > @@ -43,6 +43,9 @@ void rose_start_ftimer(struct rose_neigh *neigh)
-> > > > > > > >
-> > > > > > > >  static void rose_start_t0timer(struct rose_neigh *neigh)
-> > > > > > > >  {
-> > > > > > > > +       if (!neigh)
-> > > > > > > > +               return;
-> > > > > > > > +
-> > > > > > > >         timer_delete(&neigh->t0timer);
-> > > > > > > >
-> > > > > > > >         neigh->t0timer.function = rose_t0timer_expiry;
-> > > > > > > > @@ -80,10 +83,12 @@ static void rose_t0timer_expiry(struct timer_list *t)
-> > > > > > > >  {
-> > > > > > > >         struct rose_neigh *neigh = timer_container_of(neigh, t, t0timer);
-> > > > > > > >
-> > > > > > >
-> > > > > > > What prevents rose_timer_expiry() from releasing the
-> > > > > > > last refcnt here ?
-> > > > > > The issue reported by syzbot is that rose_t0timer_expiry() is triggered
-> > > > > > first, followed by rose_timer_expiry().
-> > > > >
-> > > > > I don't see how you read that ordering from the report.
-> > > > > https://syzkaller.appspot.com/bug?extid=caa052a0958a9146870d
-> > > > Here's my understanding: See the two calltraces below.
-> > >
-> > > The same question still applies.
-> > >
-> > > What prevents rose_timer_expiry() from releasing the last
-> > > refcnt before [1] ?
-> > @@ -80,10 +83,12 @@ static void rose_t0timer_expiry(struct timer_list *t)
-> >  {
-> >         struct rose_neigh *neigh = timer_container_of(neigh, t, t0timer);
-> >
-> > +       rose_neigh_hold(neigh); // [3] This prevents rose_timer_expiry() from putting neigh.
+On Tue, Oct 28, 2025 at 03:24:30AM +0200, Vladimir Oltean wrote:
+> On Sun, Oct 26, 2025 at 11:49:10PM +0000, Daniel Golle wrote:
+> > Add driver for the MaxLinear GSW1xx family of Ethernet switch ICs which
+> > are based on the same IP as the Lantiq/Intel GSWIP found in the Lantiq VR9
+> > and Intel GRX MIPS router SoCs. The main difference is that instead of
+> > using memory-mapped I/O to communicate with the host CPU these ICs are
+> > connected via MDIO (or SPI, which isn't supported by this driver).
+> > Implement the regmap API to access the switch registers over MDIO to allow
+> > reusing lantiq_gswip_common for all core functionality.
+> > 
+> > The GSW1xx also comes with a SerDes port capable of 1000Base-X, SGMII and
+> > 2500Base-X, which can either be used to connect an external PHY or SFP
+> > cage, or as the CPU port. Support for the SerDes interface is implemented
+> > in this driver using the phylink_pcs interface.
 > 
-> If you ask yourself the same question once more here,
-> you will notice the fix is broken.
+> I opened the GSW145 datasheet and it seems borderline in terms of what
+> I'd suggest to implement via MFD, keeping the DSA driver to be just for
+> the switch fabric, vs implementing everything in the DSA driver.
 > 
-> What prevents rose_timer_expiry() from releasing the
-> last refcnt before rose_neigh_hold() ?
-The UAF issue reported by syzbot is shown below:
-	CPU0				CPU1
-	====				====
- rose_t0timer_expiry()
- rose_transmit_restart_request()
- rose_send_frame()
- ax25_send_frame()			rose_timer_expiry()
- 					rose_neigh_put()
-					kfree(neigh)
- ax25_find_cb()
+> Just to know what to expect in the future. Are there higher-spec'd
+> switches with an embedded CPU, waiting to be supported by Linux?
 
-My patch calls rose_neigh_hold() before executing rose_transmit_restart_request()
-in rose_t0timer_expiry(). It then calls rose_neigh_putex() to release and
-set neigh to NULL before executing rose_start_t0timer(). This also prevents
-timer0 from restarting.
+In terms of dedicated switches the short answer is "no".
+The Lantiq/Intel/MaxLinear GSWIP family afaik ends with GSWIP 3.0 which
+can be found in some of the PON SoCs build around the Intel Atom which
+are marketed by MaxLinear. Supporting also those is on my agenda
+once I get hold of the hardware. The switch IP found in those SoCs
+generally is still just an improved and extended PCE, just with more
+tables and more table entries to implement layer-3 features like PPPoE,
+NAT and flow-offloading all within the switch-part of the SoC.
 
-I think the only questionable part of the patch is the expiration time of
-rose_timer. I don't know the expiration time because I don't have a reproducer.
-If the value is very small, the result may be different.
+> Linux running outside, but also potentially inside?
+
+No. The GSW1xx switches and the switch IP found inside those SoCs are
+still basically programmable store-(modify-)and-forward ASICs rathern
+than general purpose processors with offloading paths.
+
+> Maybe you'll need full-fledged clock, pinmux, GPIO drivers, due to IPs
+> reused in other parts? Interrupt controller support? The SGMII "PHY"
+> block also seems distinct from the "PCS" block, more like a driver in
+> drivers/phy/ would control.
+
+I don't think we'll see those blocks in anything else than those
+dedicated switch ICs.
+
+Newer MaxLinear switches (with more than 1 Gbit/s TP ports) are
+completely different animals, they do run an RTOS on a general purpose
+CPU internally, and offer a complex API to be used by the host rather
+than allowing raw access to the internal registers. They can even be
+turned into a standalone web-managed switch, ie. the CPU is capable of
+providing a HTTP server, SNMP, ...
+
+It is, of course, possible that some parts of GSW1xx series may or may
+not have been reused, but as the RTOS running on those MxL862xx chips is
+proprietary and there is no documentation of the bare-metal hardware it
+is impossible for me to tell. What I can tell for sure that there isn't
+any external DRAM, so they won't ever run Linux for resource reasons.
+
+> 
+> > +
+> > +static int gsw1xx_pcs_phy_xaui_write(struct gsw1xx_priv *priv, u16 addr,
+> > +				     u16 data)
+> > +{
+> > +	int ret, val;
+> > +
+> > +	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_PHY_D, data);
+> > +	if (ret < 0)
+> > +		return ret;
+> > +
+> > +	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_PHY_A, addr);
+> > +	if (ret < 0)
+> > +		return ret;
+> > +
+> > +	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_PHY_C,
+> > +			   GSW1XX_SGMII_PHY_WRITE |
+> > +			   GSW1XX_SGMII_PHY_RESET_N);
+> > +	if (ret < 0)
+> > +		return ret;
+> > +
+> > +	return regmap_read_poll_timeout(priv->sgmii, GSW1XX_SGMII_PHY_C,
+> > +					val, val & GSW1XX_SGMII_PHY_STATUS,
+> > +					1000, 100000);
+> > +}
+> > +
+> > +static int gsw1xx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+> > +			     phy_interface_t interface,
+> > +			     const unsigned long *advertising,
+> > +			     bool permit_pause_to_mac)
+> > +{
+> > +	struct gsw1xx_priv *priv = pcs_to_gsw1xx(pcs);
+> > +	bool sgmii_mac_mode = dsa_is_user_port(priv->gswip.ds,
+> > +					       GSW1XX_SGMII_PORT);
+> 
+> In lack of the phy-mode = "revsgmii" that you also mention, can we just
+> assume that any port with phy-mode = "sgmii" is in "MAC mode"?
+
+That would result in SGMII generally not be useful for being used as
+interface mode for the CPU port, because in that case the switch would
+need to operate in "SGMII PHY mode". It is true, however, that in most
+cases it is likely possible to just use 1000Base-X or 2500Base-X instead
+of SGMII to connect the switch to the CPU.
+
+> > [...]
+> 
+> Can you split up this function in multiple smaller logical blocks?
+> The control flow with "reconf" and "skip_init_reset" is a bit difficult
+> to follow. I can't say I understood what's going on. Ideally
+> gsw1xx_pcs_config() fits in one-two screen.
+
+I think breaking out the intial reset and flush into a seperate
+function makes sense.
+
+> 
+> > +static int gsw1xx_probe(struct mdio_device *mdiodev)
+> > +{
+> > [...]
+> > +	/* configure GPIO pin-mux for MMDIO in case of external PHY connected to
+> 
+> Can you explain that MMDIO stands for MDIO master interface? On first
+> sight it looks like a typo.
+
+Yes, MMDIO = Master MDIO (ie. to connect external PHYs to the switch in
+this case, but also to access the built-in TP PHYs). As opposed to the
+MDIO Slave module which is used to allow the CPU to access the switch
+registers. I'll change the comment to make it more clear.
 
