@@ -1,116 +1,151 @@
-Return-Path: <netdev+bounces-233660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE8D6C17178
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 22:49:07 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B06DC171AB
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 22:59:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34A9D188624B
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 21:49:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 629BD4E2A99
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 21:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381832F12CE;
-	Tue, 28 Oct 2025 21:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B44AE2FFF8F;
+	Tue, 28 Oct 2025 21:59:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="J5FDAelo"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="PaO5IVF6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 355ED2264C9
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 21:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B79828152A
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 21:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761688144; cv=none; b=OH4mQ1TR6A+AsIFCaGKVNX/JtNK6PBRjA6yplgeud2PajOyu3FwOjlH3tigLVYuRD57wGGuAhgUg0QPhCB6BIWuUF7BCEcxjoEBXEwYMfT3UA0lX7WXX7ONfpjWhCx0UnIylrY/YNB5QKrueG/T3ru3tZrrtTRY/sLpEv8aakyU=
+	t=1761688749; cv=none; b=h0ahWprzU7IzNB+1/YUAhLzIOIt3pa+6ghwEQR+lEtomMU833YDxZ6iceHa9QpP6sGYfHGXs51HAArYPcVa3ZxnvUntFSF5+jECy8wpVooiVEPPKlvoz+EVKInyCqFyWWaaxm30QEjrKKh2kKsl9xnnUm1ilDbu7FNnY9TpE+9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761688144; c=relaxed/simple;
-	bh=yXWQv5pEWWhGJWD8HuLexSuae2Oi5ITJ50rYOdCPtEk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iEoYKxBZwgpiYhtoABz/ZrEH6QDYrlTVVV+Wf3npt8C/oNEw1zvemp0PXaOWzTsEt6Z2KFXRRFB4xZhSnHavRHJxH0gRvpGkuwjDhg0wuXQmrkf3blDvg+eHuCu2c4C/azpZ3BwWE+XoTVExxiVPyABE5Uo2cxiDqk6cX/U+eCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=J5FDAelo; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-475dae5d473so39053705e9.2
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 14:49:01 -0700 (PDT)
+	s=arc-20240116; t=1761688749; c=relaxed/simple;
+	bh=C6g0A0cOE4AkGdUOdxz1HhnC5GCH/e/DvvgbquG05wc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Tccgwl73lRo19N37kBobCnUiuavDNJaf8cSPxw/gEGoV34y9yGubNnioBpF/5Jde4CAHzaJGtjBBKjJfGxDM/Ck1qWOBixRn3a3Vqy5eUVixV23cUFyDXXnxsBYpX/kOYTpOyeJHah3TkYmY8uV0x3gybWBr8MRabCIrAMTBwk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=PaO5IVF6; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-26e68904f0eso69976005ad.0
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 14:59:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1761688140; x=1762292940; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aH+eIcCh8QSF1xXWTlSKlqYoUpBJQcwSPy1LqPlXAhU=;
-        b=J5FDAeloph1ZMiGFKK4xi/fwusEl4942AuY0kvLED8oid3g5H5jsariGRZ3VDZb+a8
-         8VVLz71UoWJq0BK3Vgy+9hdvKBTlp4Vm5GW5UoawaQQQmCGK+/6JOUCCokjmkqRoOCgf
-         TDUEFs8j1BD7qkMVOvz2PUtANaJsjvNkprXai9hQ+A4vCpW/pMgcdZtIQ15W4Y5WR40e
-         SeoIkmQd/dBdHuUJQD9AZ6Kbri0DYt499zt+iq+OGVDO2MmRHvnkyAbDZTYyEcglncNh
-         M3SGbJ7NQmALEV+BHqycqQFcNjcyeo6nufUaxH5bBNFJv2mOTNBRU3LXjFznatxPtu4I
-         /+oQ==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761688747; x=1762293547; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tij0vdBARhZU7Q7nZ9g6692s1qvrdH+ldHofNw13hX0=;
+        b=PaO5IVF6MdVaCkJfbjB51J6cBTJxeU2ymdevJnTSN75mFzRSpxPptftTXVlugJJdz7
+         juax61q9+HlD17loWXC7hKNHGNVxOSVOuoAxnkTv12rmOscDLaPNLctcv1f3TxBEBKuB
+         iw1zPtGvy16Lliy0Lm7lb6c4gVs0de6YS06lV2DvAkkKaejpoOsDjG+mfngje7a4x7Op
+         x1OnyVKer8EfQVaLuaW95EJ4aQSwplCzjKzw4p9zJIQ4GD0gmDyf4CeVC+Bccic1t/xI
+         XgZAZ3G/Uo4eyal1kc4kZrOi41snUNH/iGkIbJIj6ZwryAA861YbUGtzdxT/xBLV85va
+         7oig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761688140; x=1762292940;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aH+eIcCh8QSF1xXWTlSKlqYoUpBJQcwSPy1LqPlXAhU=;
-        b=ZgNGJMn89vkXiG71cZCrBHZUZk0qIa96m0RB8i1FPF7p9JLHpjv7kPBKMFHNARdgiI
-         F3Ti2Yi+76ffrVu0OQ2idZw+elPRUVNht8ZZjQiowaXbv1jEYtap5wbRPVffXgqD1Nwm
-         qRJRmOej/JUuhj5J0b4Myo4x6K1X0o13DS5a+KYY2q1o+IH/mMyUKAlEKy0asmPOh3XF
-         6FbkKao2ZZ54SXwtjjKYB7wNcfmmS+uW+FPJIskm/sft3g/nAYPBeEhD+bQCpUn5wYfX
-         Up+iQMnMGJaQSvTS9iC2zdIxptP8jlpIUVUHWp0jlgrReNikTFVavSQj9G0ri4rT3sHJ
-         3kKw==
-X-Forwarded-Encrypted: i=1; AJvYcCXAvWJRE9/hm9heELxEhVIyIQJnziR0pd/m6tWC4vXBmdwP7fwbiJhJTt/X9NUlINArop3BppU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+ggC//kxiXj7MLOXXt5cp6H5Dcu+X3dQtfoUGxNYikrzXHHm5
-	NNyv85FNZxBs+t36kbvzj8256ocMMhOYoltzKTnh1FoMKWS9DIlnZZ71lBjjFIRXcr8=
-X-Gm-Gg: ASbGncs1mikmAoJNiWBmB/DhPp8Fd4cTPW4O2TRGu8Jc4JKLfX5w3a+l/TCcVI2zRBO
-	WZNO8ggA39R1/QoowLLdcRzJk2csLwb5x6ZGi1M3tJBBCrN1E1FuLQUnKO2oJ5aJqrgUPeu5TxS
-	gVI4xsf1N2OZIgqpFxCI0EKy/wYVpNLeZkzd39N6J5kZtKTzkRZCj7lfPiVBkQknkOdTyfnbg7P
-	G8hMP3fLB58AknfTLk58c/AOJ9s6wHx0bzVqjPE7OhqOLARJ3xmAjQgY8GZAN7ZqlfeoRqd8iYj
-	k89g+P9nO8TjitSgWu8WGE34xlRpkO8D87qnzsz9tSKdLXDtXxByU7TT/eV9POVb77+t0eZkJ0g
-	sshyVpdq2F/wiFFVIzcC8ci/1677jnGeEn43um9zODxTDH365Lw/7YxXStbYtEnxwJnFbNuZXzI
-	zbMGskrNBvve1ffIOcMTetTLTeyA==
-X-Google-Smtp-Source: AGHT+IF6hxU9USpXbM0LLFfsCoDfhgqDmuUicDIZW/rOvAhruBbvjA5zvNGzzqOFBcPIxFW6lG+jwA==
-X-Received: by 2002:a05:600c:1992:b0:476:929e:d07c with SMTP id 5b1f17b1804b1-4771e34aa72mr6615025e9.14.1761688140565;
-        Tue, 28 Oct 2025 14:49:00 -0700 (PDT)
-Received: from dev-mattc2.dev.purestorage.com ([208.88.159.128])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4771e202182sm13125455e9.10.2025.10.28.14.48.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Oct 2025 14:49:00 -0700 (PDT)
-From: Matthew W Carlis <mattc@purestorage.com>
-To: gal@nvidia.com
-Cc: adailey@purestorage.com,
-	ashishk@purestorage.com,
-	mattc@purestorage.com,
-	mbloch@nvidia.com,
-	msaggi@purestorage.com,
-	netdev@vger.kernel.org,
-	saeedm@nvidia.com,
-	tariqt@nvidia.com
-Subject: Re: [PATCH 1/1] net/mlx5: query_mcia_reg fail logging at debug severity
-Date: Tue, 28 Oct 2025 15:48:39 -0600
-Message-ID: <20251028214839.5015-1-mattc@purestorage.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <40a43641-adfa-4fbe-902b-a6c436f3ccd6@nvidia.com>
-References: <40a43641-adfa-4fbe-902b-a6c436f3ccd6@nvidia.com>
+        d=1e100.net; s=20230601; t=1761688747; x=1762293547;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tij0vdBARhZU7Q7nZ9g6692s1qvrdH+ldHofNw13hX0=;
+        b=OAuRb2bamPILsQH59cGKby948vuIQ/qH4MvqXih5wHjevP6KMIZMq55tCMzMgrqaZQ
+         3JgXVZboX+2HYsnLeTbOptIUtoK03RO+jTcqdkMVHEzy4rufFbG9nBjl4HwFg1OLxlpF
+         TBaZ8jzINsJSJFO58HIvTV/dx7UFV83UPp+xkvtv7mVo5x8ZN6gcIVlVKfvR/GaPMJ7W
+         Zn4aCMwqcExh/7TCw6KsgPtrtyDuCDPDMrSqExDGTfYuJvbKYLEJkUin0XfkxMvpBvO7
+         Bpsa2LNA71zvca49aBIZXzHx2Xf/GfWCuOawSD6PGJJ9b+mkMyTPEgjOT/KG4NyLBcHI
+         UtGA==
+X-Forwarded-Encrypted: i=1; AJvYcCWUfeBZY5nmE5AGhapBcW5Ryz9sgQUQ+9iHk+WlD5xrSpN8nazKUEufo9n+/841P3wkr89A29s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySgfHlhNgRLZeS2W/ZB1XmRdIEVYtpX9Xt9rCOg6OOiXJ2Bp5q
+	Z7X1FPh6Z7xrXlW37tssy+6SMJKyG1E+4l2/jxxo50X9bZz0Plp1wxHNZqE4BI9lcmKsP0rNuDD
+	1Xn3mv0c=
+X-Gm-Gg: ASbGncuKtL2mcImpFW9i/zCApRRDduglvJDa/jWYb1SB6ZIHcGKfJzgYYGbgLcBSegW
+	jiwFRP2J0RkHNs26+9BU9WQN32OUgeXVbBbaKDrg2x0X8hzI7Hfefn05JY7V23Bm0qFpL80TQuM
+	DbdKbUhNJtUcBQUEBIxniOBSBo+strVlaSoDL6C654L/FfikyR3ZJ1yDiGroeHX03jxcsibec5F
+	D273210cxmFApTwccZIA6JesYxyTa1Oh6M2YN+0/ZiK6pbyvmje9tEtDVeeRPJbbslxIuR5BJYQ
+	qjMZXyQFIU/hkoe0z1C9Kh57Lrdoiqiuu5fE+NVnWN0j9jiRCXM7Uy9HBqftPNFvXcG+hoLlrHE
+	ToWyIhFwWPJDCp5rpkzUzPsltEg0uz8IXtyJM0gfma9PWGF64/cWFkUzJYv56b3YhB9BNkA6+W0
+	oeksmt5De2qM8uYOz+wooIAWpqKugp9IfWAnvcVUyxfMG6t0/w+ZP0unhYMidFEA/lNw7oQQPzB
+	P+MUQk=
+X-Google-Smtp-Source: AGHT+IFm9U3smQa6+NdE28V6JGiqAx7ls0qtePHR+YPiXlASo8b2JGls0Au4/g3Ffd+thu3U7V938w==
+X-Received: by 2002:a17:902:ea0f:b0:246:7a43:3f66 with SMTP id d9443c01a7336-294dedd214fmr7872585ad.7.1761688747430;
+        Tue, 28 Oct 2025 14:59:07 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1156:1:c8f:b917:4342:fa09? ([2620:10d:c090:500::5:1375])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498e45a4csm126965515ad.108.2025.10.28.14.59.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Oct 2025 14:59:06 -0700 (PDT)
+Message-ID: <77a3eb52-b0e0-440e-80a0-6e89322e33e9@davidwei.uk>
+Date: Tue, 28 Oct 2025 14:59:05 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 02/15] net: Implement
+ netdev_nl_bind_queue_doit
+To: Jakub Kicinski <kuba@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, davem@davemloft.net, razor@blackwall.org,
+ willemb@google.com, sdf@fomichev.me, john.fastabend@gmail.com,
+ martin.lau@kernel.org, jordan@jrife.io, maciej.fijalkowski@intel.com,
+ magnus.karlsson@intel.com, toke@redhat.com, yangzhenze@bytedance.com,
+ wangdongdong.6@bytedance.com
+References: <20251020162355.136118-1-daniel@iogearbox.net>
+ <20251020162355.136118-3-daniel@iogearbox.net>
+ <412f4b9a-61bb-4ac8-9069-16a62338bd87@redhat.com>
+ <34c1e9d1-bfc1-48f9-a0ce-78762574fa10@iogearbox.net>
+ <20251023190851.435e2afa@kernel.org>
+Content-Language: en-US
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20251023190851.435e2afa@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Tue, 28 Oct 2025 22:27:39, Gal Pressman wrote:
-> And if he knows, I would expect him to not run the command again?
+On 2025-10-23 19:08, Jakub Kicinski wrote:
+> On Thu, 23 Oct 2025 14:48:15 +0200 Daniel Borkmann wrote:
+>> On 10/23/25 12:27 PM, Paolo Abeni wrote:
+>>> On 10/20/25 6:23 PM, Daniel Borkmann wrote:
+>>>> +	if (!src_dev->dev.parent) {
+>>>> +		err = -EOPNOTSUPP;
+>>>> +		NL_SET_ERR_MSG(info->extack,
+>>>> +			       "Source device is a virtual device");
+>>>> +		goto err_unlock_src_dev;
+>>>> +	}
+>>>
+>>> Is this check strictly needed? I think that if we relax it, it could be
+>>> simpler to create all-virtual selftests.
+>> It is needed given we need to always ensure lock ordering for the two devices,
+>> that is, the order is always from the virtual to the physical device.
+> 
+> You do seem to be taking the lock before you check if the device was
+> the type you expected tho.
 
-Sometimes a user is a script or an inventory automation tool. 
+I believe this is okay. Let's say we have two netdevs, A that is real
+and B that is virtual. User calls netdev_nl_bind_queue_doit() twice in
+two different contexts, 1 with the correct order (A as src, B as dst)
+and 2 with the incorrect order (B as src, A as dst). We always try to
+lock dst first, then src.
 
-> It is an error, as evident by the fact that you only changed the log
-> level, not the error return value.
+         1                 2
+lock(dst == B)
+                   lock(dst == A)
+                   is not virtual...
+                   unlock(A)
+lock(src == A)
 
-I don't know of any strict convention in terms of when error return codes
-should have associated log messages. I wonder if there is something more targeted
-that could be done. For example, if there is a "physical presence" mechanism
-& a module is not present simply skip the logging.
 
-Cheers!
-- Matt
+         1                 2
+                   lock(dst == A)
+lock(dst == B)
+                   is not virtual...
+                   unlock(A)
+lock(src == A)
+
+The check will prevent ABBA by never taking that final lock to complete
+the cycle. Please check and lmk if I'm off, stuff like this makes my
+brain hurt.
 
