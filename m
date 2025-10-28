@@ -1,68 +1,83 @@
-Return-Path: <netdev+bounces-233483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E698C141FB
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:36:42 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93457C1433F
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:54:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 588E33B476F
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 10:36:40 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4A8D85402F7
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 10:51:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF032F691A;
-	Tue, 28 Oct 2025 10:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51452302150;
+	Tue, 28 Oct 2025 10:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="StPuP6aX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FmlJ9xZ3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15CEF2BE65E;
-	Tue, 28 Oct 2025 10:36:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DA72D73A5
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 10:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761647797; cv=none; b=HbiQc2wTBCml9duJZAn3WDMOi4gJZSmrfffDxYBzuCq1OvWC8R/Y1m77YksqS9oHKnXJ2/xHRqZWOgdhH8r3lGeLaot2eqvOuTGO58gaWimblkt67E6bNmXTZd9M9w4xMS/f+vy04ef1lWOTiBI4rrk6zUrG581iduxDwYWSMv0=
+	t=1761648062; cv=none; b=Ozj2F1taqHAeE4rRvKIMhzof4cGDgiTl2+g88gLaP3a7j+pdr+Mv3MWC32d3EMMIlIOMj3dA8FqDxR0t28xDihHJrLHXZ8dwWeqPtAPAyC6xVrTJVLE8ERxxfNEKKAZScYGfLcr1xF13fJVMXmqfxUVSHt4FHV8OVSOEtLZZSds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761647797; c=relaxed/simple;
-	bh=5XbkQBaVMcIBV6/nt9qmxsvLTVz+pIg1JTzr795jX4o=;
+	s=arc-20240116; t=1761648062; c=relaxed/simple;
+	bh=DeTwFzhPx+qK1HHpl+YgMGztxI9YizNfhUcr9TRNn0k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NJ2h+/aUAhwYvsy2W2S3lcTuZ5XnZlg2jxrFkh4F5IwNj1FFmu55y7yR+rJ2bkYCQBOUj+bwfopxDtYoMeuenSDcvD8OMYcJt+Joj7BTiQegpw+hO3v8BZkPueGqVM716pNMDI/stQVXcGK/K9aOzs87sDofnkLDNulCMy8YxHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=StPuP6aX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75C1CC4CEE7;
-	Tue, 28 Oct 2025 10:36:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761647796;
-	bh=5XbkQBaVMcIBV6/nt9qmxsvLTVz+pIg1JTzr795jX4o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=StPuP6aXMOhlEtXNVEXfjtdSvwQQMgKxOn5UPzz2/ZBPY5DCbjyVc88mLtzhTRmva
-	 DLCObG9SHb2CYVuvAQDeFcP5AAvWaOemRd0QfBA25BC66BfmMWPjPZ9Hnh5erJBSM9
-	 nPV6PV9LKK6e/g1fGhxdsP5hbIRL3gNRdt7Pg+hF8niCbLRPXvZQY9Q0jLMjoRoZo8
-	 p2C8jhLQzxYaxG0SEL3lSXEQrzqkfcxldejj88fwL9rXtHhrhroNCKHX8M3j8HfOJH
-	 iFaBduOdoPLHeJbC6w1E9UsdCjLZwba4jZrZ+znxQCrBOHll60j8DlbwkTvKulcNgD
-	 TAOqGoYBgXstA==
-Date: Tue, 28 Oct 2025 10:36:30 +0000
-From: Simon Horman <horms@kernel.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
-	Jeff Layton <jlayton@kernel.org>, Jann Horn <jannh@google.com>,
-	Mike Yuan <me@yhndnzj.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
-	Lennart Poettering <mzxreary@0pointer.de>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Aleksa Sarai <cyphar@cyphar.com>,
-	Amir Goldstein <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
-	bpf@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v3 17/70] nstree: add listns()
-Message-ID: <aQCcrqp7qxY8ew8T@horms.kernel.org>
-References: <20251024-work-namespace-nstree-listns-v3-0-b6241981b72b@kernel.org>
- <20251024-work-namespace-nstree-listns-v3-17-b6241981b72b@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=u+FwTGLlN6FHTdjkyBfj+jRI8uVLirTeOkHs+3GSOx/GAHaYDiAYRNdyCt3x0r4zFrG4vDJr9uIb3i1nvv899Vyo87aFek3aPCXoQg7FYiHHA5h/rbtyFFGktbAEsTyRWDpvwAaDvKaqKS/Pb93dlZA0mr35bNX/seggxwuJsNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FmlJ9xZ3; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=c0wxYpGazz/mbNZkEG1ty2jCdBuuX7dP/ZCMsktvXgQ=; b=FmlJ9xZ3AY35fJOn9eqW4EynqN
+	4md0M+JNO60HV64L82O8Q+kAXwSzTSZN8aPxxeiMYBVZ5WP19k8UPJijuTrqIHxsC0ulDf0Y8VZBf
+	89DqVHJNgHjrNestsskRMz2dSzcy5w+Qk60EoQJpRKekZw5LrmWRhUY05mp0C6EJZavc1tAyv1C0G
+	YNQNMpI+PJxz0WCx4Msg8YSUo0vG59zHvmIsWEMh0+sCJJrbs4QmpT6PkbNSUQoC0HviSuoGnRme3
+	ShHPYC/bh9+TgDXHb+WrxgoXMqgc48fmiCQmFGfzRS3wmGhJcbhuhil3H9l4pPIsVzj2qh5PT4wqf
+	7FMhcGww==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57222)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vDh8A-0000000034l-3TOU;
+	Tue, 28 Oct 2025 10:40:46 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vDh88-000000006V0-1YLu;
+	Tue, 28 Oct 2025 10:40:44 +0000
+Date: Tue, 28 Oct 2025 10:40:44 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexis Lothor__ <alexis.lothore@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Furong Xu <0x1207@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: stmmac: add support specifying PCS
+ supported interfaces
+Message-ID: <aQCdrNQHF07BVPti@shell.armlinux.org.uk>
+References: <aP03aQLADMg-J_4W@shell.armlinux.org.uk>
+ <E1vClC5-0000000Bcbb-1WUk@rmk-PC.armlinux.org.uk>
+ <604b68ce-595f-4d50-92ad-3d1d5a1b4989@bootlin.com>
+ <aQCcVOYV15SeHAMU@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,93 +86,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251024-work-namespace-nstree-listns-v3-17-b6241981b72b@kernel.org>
+In-Reply-To: <aQCcVOYV15SeHAMU@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Oct 24, 2025 at 12:52:46PM +0200, Christian Brauner wrote:
+On Tue, Oct 28, 2025 at 10:35:00AM +0000, Russell King (Oracle) wrote:
+> Thanks for giving Jakub a reason to mark this "changes required." :D
+> I'm not really expecting this to be merged as-is. So why didn't I
+> post it as RFC? Too many people see "RFC" as a sign to ignore the
+> patch series. Some people claim that "RFC" means it isn't ready and
+> thus isn't worth reviewing/testing/etc. I say to those people... I
+> can learn their game and work around their behaviour.
+> 
+> Yes, it will need a better commit log, but what I'm much much more
+> interested in is having people who are using the integrated PCS (in
+> SGMII mode as that's all we support) to test this, especially
+> dwmac-qcom-ethqos folk.
+> 
+> The 2.5G support was submitted by Sneh Shah, and my attempts to make
+> contact have resulted in no response.
 
-...
+I should add - I'm expecting dwmac-qcom-ethqos to reveal that we need
+to include 2500BASE-X for the PCS, and possibly 1000BASE-X as well
+(which in dwmac terms uses the TBI interface to a platform integrator
+provided serdes block.)
 
-> diff --git a/kernel/nstree.c b/kernel/nstree.c
+The most important thing is for people with the hardware that would be
+affected by these patches to test. However, I'm expecting no testing
+feedback from such people based on experience - it seems stmmac is rife
+for "throw code over the wall into mainline and run away" behaviour. :(
 
-...
-
-> +static ssize_t do_listns(struct klistns *kls)
-> +{
-> +	u64 *ns_ids = kls->kns_ids;
-> +	size_t nr_ns_ids = kls->nr_ns_ids;
-> +	struct ns_common *ns, *first_ns = NULL;
-> +	struct ns_tree *ns_tree = NULL;
-> +	const struct list_head *head;
-> +	struct user_namespace *user_ns;
-> +	u32 ns_type;
-> +	ssize_t ret;
-> +
-> +	if (hweight32(kls->ns_type) == 1)
-> +		ns_type = kls->ns_type;
-> +	else
-> +		ns_type = 0;
-> +
-> +	if (ns_type) {
-> +		ns_tree = ns_tree_from_type(ns_type);
-> +		if (!ns_tree)
-> +			return -EINVAL;
-> +	}
-> +
-> +	if (kls->last_ns_id) {
-> +		kls->first_ns = lookup_ns_id_at(kls->last_ns_id + 1, ns_type);
-> +		if (!kls->first_ns)
-> +			return -ENOENT;
-> +		first_ns = kls->first_ns;
-> +	}
-> +
-> +	ret = 0;
-> +	if (ns_tree)
-> +		head = &ns_tree->ns_list;
-> +	else
-> +		head = &ns_unified_list;
-> +
-> +	guard(rcu)();
-> +	if (!first_ns)
-> +		first_ns = first_ns_common(head, ns_tree);
-> +
-> +	for (ns = first_ns; !ns_common_is_head(ns, head, ns_tree) && nr_ns_ids;
-> +	     ns = next_ns_common(ns, ns_tree)) {
-> +		if (kls->ns_type && !(kls->ns_type & ns->ns_type))
-> +			continue;
-> +		if (!ns_get_unless_inactive(ns))
-> +			continue;
-> +		/* Check permissions */
-> +		if (!ns->ops)
-> +			user_ns = NULL;
-
-Hi Christian,
-
-Here it is assumed that ns->ops may be NULL.
-
-> +		else
-> +			user_ns = ns->ops->owner(ns);
-> +		if (!user_ns)
-> +			user_ns = &init_user_ns;
-> +		if (ns_capable_noaudit(user_ns, CAP_SYS_ADMIN) ||
-> +		    is_current_namespace(ns) ||
-> +		    ((ns->ns_type == CLONE_NEWUSER) && ns_capable_noaudit(to_user_ns(ns), CAP_SYS_ADMIN))) {
-> +			*ns_ids++ = ns->ns_id;
-> +			nr_ns_ids--;
-> +			ret++;
-> +		}
-> +		if (need_resched())
-> +			cond_resched_rcu();
-> +		/* doesn't sleep */
-> +		ns->ops->put(ns);
-
-And, if so, it isn't clear to me why that wouldn't also be the case here.
-
-Flagged by Smatch.
-
-> +	}
-> +
-> +	return ret;
-> +}
-
-...
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
