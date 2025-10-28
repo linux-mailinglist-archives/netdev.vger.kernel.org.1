@@ -1,143 +1,323 @@
-Return-Path: <netdev+bounces-233576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04972C15B3E
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:12:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5ACCC15BB7
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:18:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CECD54E8B29
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:09:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E61F1890AFE
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145DC342141;
-	Tue, 28 Oct 2025 16:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F026342C80;
+	Tue, 28 Oct 2025 16:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20230601.gappssmtp.com header.i=@cse-iitm-ac-in.20230601.gappssmtp.com header.b="NC1KV/ga"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kTFwPIyW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F20341AAE
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 16:09:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EE723ABBD
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 16:12:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761667746; cv=none; b=eEWb1LKHTOauxtBV7w97m/QIS5wFLrMKt7Ikl8OIMKIR4u53zNYFBZmtlP/wLYIlviL9UnK4ccfCRtQ16Jkkq6g48JGCEQZt9VPalcrp/slfWj3zMyyURCHTHQeJR9yWt1d1eHZZIW1R9FK9/PIW1OsfJWxe0Tq4PIxoOQFfTTs=
+	t=1761667938; cv=none; b=a1xc8S18QnDYkqRtPPJCtqJqVYP5vE3tL3sy9l6wwuLuUcE8ktMQ0mk4vhCxbs0MFZdYy5McorbAYG0c5bAxcstH9uL8v8qK05nG4N0CtkIItz6dPkevQ6lm3WejwGwqNGuwC/Un9btY9vS1ppfHkm1QmXcmgWRO5EXt9sLmeX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761667746; c=relaxed/simple;
-	bh=uKru//0VQi4ASSMxc7mTC8Gha4EFBzhbzVqnz9jdgZQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sHbHjmr9tyDrBdxkcxSDv5NEUMwQySB2UYP+3VbR7nQ67VRoDdNcfcXYvazqb2Z5kQu7nUQ2PpUivs752kHGEgmgP1Hi6/k+4KCiy3an6ScK1XPivEs0t9rpsNzVFW1toY3paKGd9lsp41hkPM8Vz8h8bpk8mcSImO9s4htlfkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in; spf=pass smtp.mailfrom=cse.iitm.ac.in; dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20230601.gappssmtp.com header.i=@cse-iitm-ac-in.20230601.gappssmtp.com header.b=NC1KV/ga; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cse.iitm.ac.in
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-782e93932ffso4653540b3a.3
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 09:09:02 -0700 (PDT)
+	s=arc-20240116; t=1761667938; c=relaxed/simple;
+	bh=YmU+S2dpj2lpvbkcXW1CLOnuN+/RJrukgDz9Fq/nJcg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZPKvWf+NSR7xsC63VJ0DxYuSDjaEO77Hj0j7JXua6s6n40CDHurThsXkCIEhuNzRg8gG9fdRUXeiQHRSq0oRTPZ38EIGkkuVo7qTTVCtVewMd2ZcnKJUFA85U4lr+Rx5qvynzPVHwa1+07ygP3iOvrObdBgFICywURlpV9JKv+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kTFwPIyW; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-58b027beea6so9389e87.1
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 09:12:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cse-iitm-ac-in.20230601.gappssmtp.com; s=20230601; t=1761667742; x=1762272542; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LW9OsLXnsz6ESKwP6hNF8dP8JhMECKTtQ8QnPSKrIms=;
-        b=NC1KV/gao/Qk1W5ZLKJuGPeQXsVRZOo3KkED0xaunQ5jdB6XrbZMOXX8A98M55im4N
-         2bdFcM7b9TmIesiuQjOrfPYFq3ungSAA/V/9zuj5nkmwCO34Qc9efvXKk4Kupr/eiKNv
-         KEBY39gdgfDgyb1mXY/6wpdCDxgBsMgyzRSEKhY5FiikZOeOZcnlyAGIJ/n+xLKjR4+c
-         8woS6LEWZ4y0futUDecu42SiMFY8zLWmUiqyjXBL62BktL+lCnnRX8EtQ4TVHlV/opBj
-         9t22flZ7VfUdVHzRGryYRV9smCMrR78twTkEVqOK9cdaqBXu8yRWsXhi5dTmqdSotfhq
-         dx3Q==
+        d=google.com; s=20230601; t=1761667935; x=1762272735; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qxRI++0kUA4C88E54g3jys1xp+GEI9qFS2ZGVb0fFIA=;
+        b=kTFwPIyW2dqp1qBON3q/aXQV5MLtLqLwIwvT8Pdqff9vx1eZEwHjNAZlcA0PgpDmJ2
+         glAR3Wzmw91lfDywd77xM/fDySLBzYiGwZc8nQOsrH8GkOXPyfDbSeeQ/ClWeqe9rR8A
+         4djVL1fkGJGx9aTTDyx0PdjpkDFCmNlCAAqh28LyBfBw5tmjxqMoIBAWrqAQGCOP92M6
+         YJTW5Jclzi5nmQhqNNsG6dXfGcBXEXCMj5U9KZ6tz7lrUVg5kSZ4/U52vHtbUzIZ8XtI
+         awBqQoOcC6cYOz96B/dYfXAUAnxDrsEjGhZjVHERUUONPO1uC3k7OAa5cS8/C1+beTCA
+         HGLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761667742; x=1762272542;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LW9OsLXnsz6ESKwP6hNF8dP8JhMECKTtQ8QnPSKrIms=;
-        b=eHGEBM0tqYmYi8b++x7C7+xm0mPmXUezwZB+bZZn9ZSUvCKaYOvRly0A0B+X+fMZ6/
-         JTrtQbzzscdTdVlE6fDjvHRwirq+mY5hhu1gyklmR+RHS06a7OhNFuTyMWhxxz7epCMo
-         cWA3TaKO0RCA8sTTpoF6CRCxsdnAA7qZe55sPBxGz69hNcNX8hPoPeANvhjLUqNXVr4u
-         xf6HlCb6UjyiYsjHEyB+ZonStufGJDIEPL1pO9KLb1SywVsKncEpz7gJZgICdV2A2Qg7
-         IUw5rmCnku6EVHmigO5/QeH3Ipnw+tCFlFXdhtGwkSa4tR5kleyekySCsmQhTlmhfzmB
-         TQ0A==
-X-Forwarded-Encrypted: i=1; AJvYcCVTBa11WIPZzsM7gmBRpBawzu36wxLY6XIaWnkq1DInSUb/de3t1VJLNkpKZDReIyRwBAuIXS4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOHEqmwKB8Wku/9jhnav3a1NgeicKAuJ1lYzWytdKuEWHGN4AJ
-	PWlNe1v7IgcTW0GB/HqxjXHcHrXLI/+OS++Ch/7ytywDlnONbZzagpFvSUmjsstt3uk=
-X-Gm-Gg: ASbGncv/G5lRi8M/RfVhtEMLQByBsh4T7d3m0eUDs2TqjcSjhe6I9c8NIQA7yduEasX
-	vcd1UveKrwemrmL+wtYsp/65rbBtWtiFJMuOkdYx7Gq+FcKd/J54PRMFHAlKzdwXqZ8mrQpGhvO
-	70a2MSAWq4/fQscEHpYLGohTU/kXLbKG6f0QWXrJwyvS990npCqu/t4Y8ybPsf3JZ4Xu7xSLJrJ
-	1oIjOHl0zJptYn2dFtp0jwKW68X/2NTmcyxmiY1H3bP3lLS6aQEPKjsjsP7GTyWPBSpG4QcpnvM
-	7I3Grx4atl68EtIi+LmkuNVXYE2CDbFU0p3uTH/EdxLJ4YJPCCoyF8jOdtop1ktmmg5hqzCDp5y
-	+dE3fpZaFshZV+ob7XXxjcp6qe1DcJyedirCAUXorPNIvNPJf3W5DgSBolL2X2R4+vr29Cps5Fw
-	J55yJLIg9TnUAT
-X-Google-Smtp-Source: AGHT+IGe3tFN1gphFBUjZXPd9OJZ1HjB7mWf55osHZpxQwESJNdZoVeXL2KpEYWRTA1tLGoUZmVqHw==
-X-Received: by 2002:a05:6a00:1caa:b0:7a4:460e:f86a with SMTP id d2e1a72fcca58-7a4460efe29mr2876540b3a.25.1761667741436;
-        Tue, 28 Oct 2025 09:09:01 -0700 (PDT)
-Received: from localhost.localdomain ([49.37.217.46])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7a41402ec82sm12317675b3a.21.2025.10.28.09.08.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Oct 2025 09:09:00 -0700 (PDT)
-From: Abdun Nihaal <nihaal@cse.iitm.ac.in>
-To: kuba@kernel.org
-Cc: Abdun Nihaal <nihaal@cse.iitm.ac.in>,
-	horms@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	oss-drivers@corigine.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] nfp: xsk: fix memory leak in nfp_net_alloc()
-Date: Tue, 28 Oct 2025 21:38:41 +0530
-Message-ID: <20251028160845.126919-1-nihaal@cse.iitm.ac.in>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1761667935; x=1762272735;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qxRI++0kUA4C88E54g3jys1xp+GEI9qFS2ZGVb0fFIA=;
+        b=H7kmCoMml2e7qOOQhrrUiKNDhr4qPIskPtJR7kWbxc2rquWhQ52hD0Q/9k4pW6XUCm
+         BM296qCY3MP1JK6QPhToU+rXJaK/IBEx/Wl7GgYrdhbFrbRVGsqcgUGyDYaSkaD5/LRn
+         Zoieu/whd1eFrogLa4J3BLuR+8gOYCpv7mbi4J5tZU7l8d7xqntWAbGRQy130hiAnM3+
+         p8MA63tloHC0n/SvvVDnqwVtiYgiDBRIX0jQQ+cmZCSnSCJ46Plr5S2GIzMhL0xI+OE4
+         Fd1E5rbeybHtNd2CqCSsMboXzA7wh3mJyyVFP6vB0vpaxJWQnz/WRc3i0sH7KTep2Ryb
+         Y11g==
+X-Forwarded-Encrypted: i=1; AJvYcCU/AfP7BE87d2Mpe56CNIAhi3ivcueI+LKR4dwq3H7/w5DdZP4xuLi8miW6LEsz4WNByO9L75M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzW4/KulQn4DOtIjf0Ss19JKb7M3m+q3RjlXvIooxv23bIoNU+j
+	UVpc8PPKwQjTcL2ZTajszFTQJt3h6JRMjs759iiMeAGg3QYXaTk7mXQ3emQk2flTwTaSTR50EIO
+	sf2g3f9p5ExifjCUxbmtwARcd8bJ9LfZLO05ZqXGY
+X-Gm-Gg: ASbGncsWheM57usHaMODn6cixhsnB0PpvH7A2XjiRpzfiSHZ6fyOYYxVjENiR37aFCJ
+	9+fS9DttFBMppnX/8k3vgaKBCBAobOBY2ko7GsGo/QJybMkBnzJsqMT4m+aINkwU9uRbknn1ZeK
+	N0HZDWObN3l863UGiBzX+XOqBSsZiT9791nO75Jo1VePuZuiVD9FlMRxSkQtRASvx0etMiL/OA3
+	fmNK6j/BwJ8Pb7zLCxc1nHdjRSQxzhMvya/erVrahw3cMlAS7GYgiGkAXzB7YBVPE470t4Bl2yF
+	7ynHSPRpyebBAnWj/Get4CXT2w==
+X-Google-Smtp-Source: AGHT+IGHjnuV06Q110K/XiF/19HksKvviTMay1daMlenEI88sIR67s4zP4V81F71auWP2H80fovhcnl0+5UV0L8pGUg=
+X-Received: by 2002:a05:6512:b84:b0:586:8e3c:9456 with SMTP id
+ 2adb3069b0e04-5930eed566dmr430517e87.0.1761667934253; Tue, 28 Oct 2025
+ 09:12:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251023074410.78650-1-byungchul@sk.com> <20251023074410.78650-3-byungchul@sk.com>
+ <CAHS8izME4W3ENXNXf4Cxegmk9xnRmKajpRMQ18L0=FGTFebeaw@mail.gmail.com> <64E18E02-727B-47C4-8849-486AB98CACD8@nvidia.com>
+In-Reply-To: <64E18E02-727B-47C4-8849-486AB98CACD8@nvidia.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 28 Oct 2025 09:12:00 -0700
+X-Gm-Features: AWmQ_bmxv3BL-tBNLLwsdAEGZyVMyLK1NK7F8-nJ_Ys_3boWKRkq5vfhkylVKmE
+Message-ID: <CAHS8izNuSkxn1HZJ-1W_wa7QsQFE5yKUjbfSgKEzv9tLLOYveQ@mail.gmail.com>
+Subject: Re: [RFC mm v4 2/2] mm: introduce a new page type for page pool in
+ page type
+To: Zi Yan <ziy@nvidia.com>
+Cc: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel_team@skhynix.com, harry.yoo@oracle.com, 
+	ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, 
+	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com, 
+	leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com, andrew+netdev@lunn.ch, 
+	edumazet@google.com, pabeni@redhat.com, akpm@linux-foundation.org, 
+	david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, 
+	vbabka@suse.cz, rppt@kernel.org, surenb@google.com, mhocko@suse.com, 
+	horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org, 
+	ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org, 
+	kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com, 
+	baolin.wang@linux.alibaba.com, toke@redhat.com, asml.silence@gmail.com, 
+	bpf@vger.kernel.org, linux-rdma@vger.kernel.org, sfr@canb.auug.org.au, 
+	dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In nfp_net_alloc(), the memory allocated for xsk_pools is not freed in
-the subsequent error paths, leading to a memory leak. Fix that by
-freeing it in the error path.
+On Mon, Oct 27, 2025 at 6:45=E2=80=AFPM Zi Yan <ziy@nvidia.com> wrote:
+>
+> On 27 Oct 2025, at 21:28, Mina Almasry wrote:
+>
+> > On Thu, Oct 23, 2025 at 12:45=E2=80=AFAM Byungchul Park <byungchul@sk.c=
+om> wrote:
+> >>
+> >> ->pp_magic field in struct page is current used to identify if a page
+> >> belongs to a page pool.  However, ->pp_magic will be removed and page
+> >> type bit in struct page e.i. PGTY_netpp can be used for that purpose.
+> >>
+> >> Introduce and use the page type APIs e.g. PageNetpp(), __SetPageNetpp(=
+),
+> >> and __ClearPageNetpp() instead, and remove the existing APIs accessing
+> >> ->pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
+> >> netmem_clear_pp_magic().
+> >>
+> >> This work was inspired by the following link:
+> >>
+> >> [1] https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@g=
+mail.com/
+> >>
+> >> While at it, move the sanity check for page pool to on free.
+> >>
+> >> Suggested-by: David Hildenbrand <david@redhat.com>
+> >> Co-developed-by: Pavel Begunkov <asml.silence@gmail.com>
+> >> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> >> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> >> Acked-by: David Hildenbrand <david@redhat.com>
+> >> Acked-by: Zi Yan <ziy@nvidia.com>
+> >> ---
+> >> Hi Mina,
+> >>
+> >> I dropped your Reviewed-by tag since there are updates on some comment=
+s
+> >> in network part.  Can I still keep your Reviewed-by?
+> >>
+> >>         Byungchul
+> >> ---
+> >>  .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  2 +-
+> >>  include/linux/mm.h                            | 27 +++---------------=
+-
+> >>  include/linux/page-flags.h                    |  6 +++++
+> >>  include/net/netmem.h                          |  2 +-
+> >>  mm/page_alloc.c                               |  8 +++---
+> >>  net/core/netmem_priv.h                        | 17 +++---------
+> >>  net/core/page_pool.c                          | 14 +++++-----
+> >>  7 files changed, 25 insertions(+), 51 deletions(-)
+> >>
+> >> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/driver=
+s/net/ethernet/mellanox/mlx5/core/en/xdp.c
+> >> index 5d51600935a6..def274f5c1ca 100644
+> >> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+> >> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+> >> @@ -707,7 +707,7 @@ static void mlx5e_free_xdpsq_desc(struct mlx5e_xdp=
+sq *sq,
+> >>                                 xdpi =3D mlx5e_xdpi_fifo_pop(xdpi_fifo=
+);
+> >>                                 page =3D xdpi.page.page;
+> >>
+> >> -                               /* No need to check page_pool_page_is_=
+pp() as we
+> >> +                               /* No need to check PageNetpp() as we
+> >>                                  * know this is a page_pool page.
+> >>                                  */
+> >>                                 page_pool_recycle_direct(pp_page_to_nm=
+desc(page)->pp,
+> >> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> >> index b6fdf3557807..f5155f1c75f5 100644
+> >> --- a/include/linux/mm.h
+> >> +++ b/include/linux/mm.h
+> >> @@ -4361,10 +4361,9 @@ int arch_lock_shadow_stack_status(struct task_s=
+truct *t, unsigned long status);
+> >>   * DMA mapping IDs for page_pool
+> >>   *
+> >>   * When DMA-mapping a page, page_pool allocates an ID (from an xarray=
+) and
+> >> - * stashes it in the upper bits of page->pp_magic. We always want to =
+be able to
+> >> - * unambiguously identify page pool pages (using page_pool_page_is_pp=
+()). Non-PP
+> >> - * pages can have arbitrary kernel pointers stored in the same field =
+as pp_magic
+> >> - * (since it overlaps with page->lru.next), so we must ensure that we=
+ cannot
+> >> + * stashes it in the upper bits of page->pp_magic. Non-PP pages can h=
+ave
+> >> + * arbitrary kernel pointers stored in the same field as pp_magic (si=
+nce
+> >> + * it overlaps with page->lru.next), so we must ensure that we cannot
+> >>   * mistake a valid kernel pointer with any of the values we write int=
+o this
+> >>   * field.
+> >>   *
+> >> @@ -4399,26 +4398,6 @@ int arch_lock_shadow_stack_status(struct task_s=
+truct *t, unsigned long status);
+> >>  #define PP_DMA_INDEX_MASK GENMASK(PP_DMA_INDEX_BITS + PP_DMA_INDEX_SH=
+IFT - 1, \
+> >>                                   PP_DMA_INDEX_SHIFT)
+> >>
+> >> -/* Mask used for checking in page_pool_page_is_pp() below. page->pp_m=
+agic is
+> >> - * OR'ed with PP_SIGNATURE after the allocation in order to preserve =
+bit 0 for
+> >> - * the head page of compound page and bit 1 for pfmemalloc page, as w=
+ell as the
+> >> - * bits used for the DMA index. page_is_pfmemalloc() is checked in
+> >> - * __page_pool_put_page() to avoid recycling the pfmemalloc page.
+> >> - */
+> >> -#define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
+> >> -
+> >> -#ifdef CONFIG_PAGE_POOL
+> >> -static inline bool page_pool_page_is_pp(const struct page *page)
+> >> -{
+> >> -       return (page->pp_magic & PP_MAGIC_MASK) =3D=3D PP_SIGNATURE;
+> >> -}
+> >> -#else
+> >> -static inline bool page_pool_page_is_pp(const struct page *page)
+> >> -{
+> >> -       return false;
+> >> -}
+> >> -#endif
+> >> -
+> >>  #define PAGE_SNAPSHOT_FAITHFUL (1 << 0)
+> >>  #define PAGE_SNAPSHOT_PG_BUDDY (1 << 1)
+> >>  #define PAGE_SNAPSHOT_PG_IDLE  (1 << 2)
+> >> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+> >> index 0091ad1986bf..edf5418c91dd 100644
+> >> --- a/include/linux/page-flags.h
+> >> +++ b/include/linux/page-flags.h
+> >> @@ -934,6 +934,7 @@ enum pagetype {
+> >>         PGTY_zsmalloc           =3D 0xf6,
+> >>         PGTY_unaccepted         =3D 0xf7,
+> >>         PGTY_large_kmalloc      =3D 0xf8,
+> >> +       PGTY_netpp              =3D 0xf9,
+> >>
+> >>         PGTY_mapcount_underflow =3D 0xff
+> >>  };
+> >> @@ -1078,6 +1079,11 @@ PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
+> >>  PAGE_TYPE_OPS(Unaccepted, unaccepted, unaccepted)
+> >>  FOLIO_TYPE_OPS(large_kmalloc, large_kmalloc)
+> >>
+> >> +/*
+> >> + * Marks page_pool allocated pages.
+> >> + */
+> >> +PAGE_TYPE_OPS(Netpp, netpp, netpp)
+> >> +
+> >>  /**
+> >>   * PageHuge - Determine if the page belongs to hugetlbfs
+> >>   * @page: The page to test.
+> >> diff --git a/include/net/netmem.h b/include/net/netmem.h
+> >> index 651e2c62d1dd..0ec4c7561081 100644
+> >> --- a/include/net/netmem.h
+> >> +++ b/include/net/netmem.h
+> >> @@ -260,7 +260,7 @@ static inline unsigned long netmem_pfn_trace(netme=
+m_ref netmem)
+> >>   */
+> >>  #define pp_page_to_nmdesc(p)                                         =
+  \
+> >>  ({                                                                   =
+  \
+> >> -       DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));             =
+  \
+> >> +       DEBUG_NET_WARN_ON_ONCE(!PageNetpp(p));                        =
+  \
+> >>         __pp_page_to_nmdesc(p);                                       =
+  \
+> >>  })
+> >>
+> >> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> >> index fb91c566327c..c69ed3741bbc 100644
+> >> --- a/mm/page_alloc.c
+> >> +++ b/mm/page_alloc.c
+> >> @@ -1042,7 +1042,6 @@ static inline bool page_expected_state(struct pa=
+ge *page,
+> >>  #ifdef CONFIG_MEMCG
+> >>                         page->memcg_data |
+> >>  #endif
+> >> -                       page_pool_page_is_pp(page) |
+> >
+> > Shouldn't you replace the page_pool_page_is_pp check with a PageNetpp
+> > check in this call site and below? Or is that no longer necessary for
+> > some reason?
+>
+> It is done in the hunk below this one:
+>
+> @@ -1379,9 +1376,12 @@ __always_inline bool free_pages_prepare(struct pag=
+e *page,
+>                 mod_mthp_stat(order, MTHP_STAT_NR_ANON, -1);
+>                 folio->mapping =3D NULL;
+>         }
+> -       if (unlikely(page_has_type(page)))
+> +       if (unlikely(page_has_type(page))) {
+> +               /* networking expects to clear its page type before relea=
+sing */
+> +               WARN_ON_ONCE(PageNetpp(page));
+>                 /* Reset the page_type (which overlays _mapcount) */
+>                 page->page_type =3D UINT_MAX;
+> +       }
+>
+>         if (is_check_pages_enabled()) {
+>                 if (free_page_is_bad(page))
+>
+> where
+> free_pages_prepare()
+>   -> free_page_is_bad()
+>     -> page_expected_state()
+>
 
-Fixes: 6402528b7a0b ("nfp: xsk: add AF_XDP zero-copy Rx and Tx support")
-Signed-off-by: Abdun Nihaal <nihaal@cse.iitm.ac.in>
----
-Compile tested only. Found using static analysis.
+Thanks, looks fine to me then. I'm not extremely familiar with this
+code so I won't give a Reviewed-by, but here is an ack, FWIW:
 
-v1->v2
-- Used dedicated jump labels to free the xsk_pools 
-  as suggested by Jakub Kicinski
+Acked-by: Mina Almasry <almasrymina@google.com>
 
-Link to v1:
-- https://patchwork.kernel.org/project/netdevbpf/patch/20251024152528.275533-1-nihaal@cse.iitm.ac.in/
-
- drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-index 132626a3f9f7..9ef72f294117 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-@@ -2557,14 +2557,16 @@ nfp_net_alloc(struct pci_dev *pdev, const struct nfp_dev_info *dev_info,
- 	err = nfp_net_tlv_caps_parse(&nn->pdev->dev, nn->dp.ctrl_bar,
- 				     &nn->tlv_caps);
- 	if (err)
--		goto err_free_nn;
-+		goto err_free_xsk_pools;
- 
- 	err = nfp_ccm_mbox_alloc(nn);
- 	if (err)
--		goto err_free_nn;
-+		goto err_free_xsk_pools;
- 
- 	return nn;
- 
-+err_free_xsk_pools:
-+	kfree(nn->dp.xsk_pools);
- err_free_nn:
- 	if (nn->dp.netdev)
- 		free_netdev(nn->dp.netdev);
--- 
-2.43.0
-
+--=20
+Thanks,
+Mina
 
