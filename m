@@ -1,121 +1,148 @@
-Return-Path: <netdev+bounces-233510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53E51C14A56
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:34:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A16C7C14A32
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:32:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F6E81A63452
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:31:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94C28582D7B
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:32:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F73F302773;
-	Tue, 28 Oct 2025 12:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC47306B0C;
+	Tue, 28 Oct 2025 12:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MqhYqjzw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m/AO2EjB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B571D5147;
-	Tue, 28 Oct 2025 12:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93BC72C15AE;
+	Tue, 28 Oct 2025 12:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761654668; cv=none; b=WQvYjKB4+7G+zt68kqbMd07gM6Vxc1W5792Ih3bzfYn0umJIF4MQI6clBv4MhPEoVvi9GJ8otmOmUNY3NlrAYf4tRifdnO+WPAZ3VPPYYYldIhIigoYSu3LKXDPN4ClLTUv9twZX3qvmIkNmKeHTG/TIprOA9FbxtMInYNYrnbY=
+	t=1761654754; cv=none; b=d/1rHTi3Jdf2X8EQN15P4Yf+ti9KowL2lcxj7kqC/v9kd3zsKzMrZWEDxKCSau1zcO+oODTwGIOfgObQksnHD3Esds6ThylMbAhg9nX5iNphOcAhDYpJgPpk5afZcm59SgYH1clovSkg4Vu4Q2FFVHidRk2S5R+D0H0qiW/EDfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761654668; c=relaxed/simple;
-	bh=bp3dDj7WuCgUaozIZmBCOLT7S6dPjUy422kqru/krws=;
+	s=arc-20240116; t=1761654754; c=relaxed/simple;
+	bh=2A7U/X5bLGA6vGpMY0H0RP01Pafks7/ACnaqbh4msvI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gbbIPw4B/Ur6oOx/5IKKXZ0jr/nB8+RIBo6TKHxm/LWwAWsDnB6DvkZq+pzcUedHZaSjOVMIPWoizuRsb7xhkSPWKZkrCWQo9USXjOG+PSUDKgAKYOD1a0EWBDiqShvySQ789bHFmGR/07Z7KQtYwJtCfL/KFkadpp47MATrVqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MqhYqjzw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6128C4CEE7;
-	Tue, 28 Oct 2025 12:31:05 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=H5ITYMXX05w90IhUu3c/DNmjB7XK1ZAgdVDcFUXCwos7Ng1+WJlWsMsy6i0Y+bFJkRH80dFYs3j+kmhx02gM6q+SeyZfAL+mvAkVbWsaCSzA1ZsNISxMUhVnWA88Nu2/D96P8wymMU2WTBkwNM19k83qpdwxP/vWRLZXGXTFxHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m/AO2EjB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C9A1C4CEE7;
+	Tue, 28 Oct 2025 12:32:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761654666;
-	bh=bp3dDj7WuCgUaozIZmBCOLT7S6dPjUy422kqru/krws=;
+	s=k20201202; t=1761654754;
+	bh=2A7U/X5bLGA6vGpMY0H0RP01Pafks7/ACnaqbh4msvI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MqhYqjzwPAqrvZy+5lthpH7b+sHTqLCG3GPCT/sK1zBLYshcGv57uRgmwywUHvEdX
-	 5sammRMOG23AlLMM3m0AoRRBpwJzKvJTbbRvUZisAp5DIbueJkQihcWM2VNHu57inM
-	 Nwe3yv15/0dAqcafexYvDx5JQ0E8K2/tGy3Zq4ms5TpUD+f3cmWp4yq4fRl8JEftc2
-	 K38c+XOVnKgfP2WIR2lL6T8MwvZOFhggFN89K/3iqug0c4Cbr8fxrVlyITjJwc2Df3
-	 8gnyzGdDeL26rlulVbiCkl+WSVo8gy8Axggq0M4PIa29tIOI1Db6pk6n1GJeX+llBf
-	 leMHOZuTLRwLw==
-Date: Tue, 28 Oct 2025 14:31:01 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: mjambigi@linux.ibm.com, wenjia@linux.ibm.com, wintera@linux.ibm.com,
-	dust.li@linux.alibaba.com, tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com, kuba@kernel.org, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
-	sidraya@linux.ibm.com, jaka@linux.ibm.com
-Subject: Re: [PATCH net-next v2] net/smc: add full IPv6 support for SMC
-Message-ID: <20251028123101.GR12554@unreal>
-References: <20251022032309.66386-1-alibuda@linux.alibaba.com>
- <20251027134227.GL12554@unreal>
- <20251028095450.GA38488@j66a10360.sqa.eu95>
+	b=m/AO2EjBDdD6gU1Al30ZhJgdqArLSUE1GQM9Qq1GmqLdi0GFH0LacO5Q0lEDq7X5D
+	 Cphkdqw7x+iz/xNRGByikfeXX2EPUFNpOwEbToHhF+g2xXK0uZjfY8Z4bHPezTcNHb
+	 mFmjAkEE+AW2dVhrSAZeV00RWGEyPNrtEWokM2JwTTiv4+tFGugD5l8YUCCtdJE4IZ
+	 x0LDu5gIsFPPdgGsZz36Hv3VtMef7jcKdZfXBboPYsss6tTKr78VIXBetLxo80q3PB
+	 a3T6f2SWkWRNv/lDCacUQhuC1w3UBjfThbff8dcE3+SJBUwewiOIhIoV4+/tR4xy/k
+	 s4VUtDyTGZkOw==
+Date: Tue, 28 Oct 2025 12:32:31 +0000
+From: Simon Horman <horms@kernel.org>
+To: Abdun Nihaal <nihaal@cse.iitm.ac.in>
+Cc: isdn@linux-pingi.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] isdn: mISDN: hfcsusb: fix memory leak in
+ hfcsusb_probe()
+Message-ID: <aQC333bzOkMNOFAG@horms.kernel.org>
+References: <20251024173458.283837-1-nihaal@cse.iitm.ac.in>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251028095450.GA38488@j66a10360.sqa.eu95>
+In-Reply-To: <20251024173458.283837-1-nihaal@cse.iitm.ac.in>
 
-On Tue, Oct 28, 2025 at 05:54:50PM +0800, D. Wythe wrote:
-> On Mon, Oct 27, 2025 at 03:42:27PM +0200, Leon Romanovsky wrote:
-> > On Wed, Oct 22, 2025 at 11:23:09AM +0800, D. Wythe wrote:
-> > > The current SMC implementation is IPv4-centric. While it contains a
-> > > workaround for IPv4-mapped IPv6 addresses, it lacks a functional path
-> > > for native IPv6, preventing its use in modern dual-stack or IPv6-only
-> > > networks.
-> > > 
-> > > This patch introduces full, native IPv6 support by refactoring the
-> > > address handling mechanism to be IP-version agnostic, which is
-> > > achieved by:
-> > > 
-> > > - Introducing a generic `struct smc_ipaddr` to abstract IP addresses.
-> > > - Implementing an IPv6-specific route lookup function.
-> > > - Extend GID matching logic for both IPv4 and IPv6 addresses
-> > > 
-> > > With these changes, SMC can now discover RDMA devices and establish
-> > > connections over both native IPv4 and IPv6 networks.
-> > 
-> > Why can't you use rdma-cm in-kernel API like any other in-kernel RDMA consumers?
-> > 
-> > Thanks
-> > 
-> > >
+On Fri, Oct 24, 2025 at 11:04:55PM +0530, Abdun Nihaal wrote:
+> In hfcsusb_probe(), the memory allocated for ctrl_urb gets leaked when
+> setup_instance() fails with an error code. Fix that by freeing the urb
+> before freeing the hw structure.
 > 
-> Hi Leon,
-> 
-> Regarding RDMA-CM, I’m not sure if I’ve fully grasped your point, but
-> based on my current understanding, I believe SMC cannot use RDMA-CM.
-> There are a few reasons for this:
-> 
-> Firstly, SMC is designed to work not only with RDMA devices but also
-> needs to negotiate with DIBS(DIRECT INTERNAL BUFFER SHARING) devices. This
-> means we must support scenarios where no RDMA device is present.
-> Therefore, we require a round of out-of-band negotiation regardless of
-> the final device choice. In this context, even if we ultimately select
-> an RDMA device, using rdma-cm to establish the connection would be
-> redundant.
+> Fixes: 69f52adb2d53 ("mISDN: Add HFC USB driver")
+> Signed-off-by: Abdun Nihaal <nihaal@cse.iitm.ac.in>
 
-Ahh, yes, I always failed to remember this.
+Thanks,
 
-Thanks
+I agree that this is a bug, and that it was introduced in the cited commit.
 
+I think it would be good to add something to the commit message
+regarding how the problem was found, e.g. which tool was used, or
+by inspection; and what testing has been done, e.g. compile tested only.
+
+> ---
+>  drivers/isdn/hardware/mISDN/hfcsusb.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> Additionally, SMC requires multiplexing multiple connections over a
-> single QP. We need to decide during the out-of-band negotiation which
-> specific QP to reuse for the connection. From what I know, rdma-cm does
-> not seem to offer this capability either.
-> 
-> Best regards,
-> D. Wythe
-> 
+> diff --git a/drivers/isdn/hardware/mISDN/hfcsusb.c b/drivers/isdn/hardware/mISDN/hfcsusb.c
+
+...
+
+> @@ -2109,8 +2108,11 @@ hfcsusb_probe(struct usb_interface *intf, const struct usb_device_id *id)
+>  		hw->name, __func__, driver_info->vend_name,
+>  		conf_str[small_match], ifnum, alt_used);
+>  
+> -	if (setup_instance(hw, dev->dev.parent))
+> +	if (setup_instance(hw, dev->dev.parent)) {
+> +		usb_free_urb(hw->ctrl_urb);
+> +		kfree(hw);
+>  		return -EIO;
+> +	}
+>  
+>  	hw->intf = intf;
+>  	usb_set_intfdata(hw->intf, hw);
+
+I think it would be best to follow the idiomatic pattern and
+introduce a ladder of goto statements to handle unwind on error.
+
+Something like this (compile tested only!):
+
+diff --git a/drivers/isdn/hardware/mISDN/hfcsusb.c b/drivers/isdn/hardware/mISDN/hfcsusb.c
+@@ -1921,6 +1920,7 @@ hfcsusb_probe(struct usb_interface *intf, const struct usb_device_id *id)
+ 		probe_alt_setting, vend_idx, cfg_used, *vcf, attr, cfg_found,
+ 		ep_addr, cmptbl[16], small_match, iso_packet_size, packet_size,
+ 		alt_used = 0;
++	int err;
+ 
+ 	vend_idx = 0xffff;
+ 	for (i = 0; hfcsusb_idtab[i].idVendor; i++) {
+@@ -2101,20 +2101,28 @@ hfcsusb_probe(struct usb_interface *intf, const struct usb_device_id *id)
+ 	if (!hw->ctrl_urb) {
+ 		pr_warn("%s: No memory for control urb\n",
+ 			driver_info->vend_name);
+-		kfree(hw);
+-		return -ENOMEM;
++		err = -ENOMEM;
++		goto err_free_urb;
+ 	}
+ 
+ 	pr_info("%s: %s: detected \"%s\" (%s, if=%d alt=%d)\n",
+ 		hw->name, __func__, driver_info->vend_name,
+ 		conf_str[small_match], ifnum, alt_used);
+ 
+-	if (setup_instance(hw, dev->dev.parent))
+-		return -EIO;
++	if (setup_instance(hw, dev->dev.parent)) {
++		err = -EIO;
++		goto err_free_hw;
++	}
+ 
+ 	hw->intf = intf;
+ 	usb_set_intfdata(hw->intf, hw);
+ 	return 0;
++
++err_free_urb:
++	usb_free_urb(hw->ctrl_urb);
++err_free_hw:
++	kfree(hw);
++	return err;
+ }
+ 
+ /* function called when an active device is removed */
 
