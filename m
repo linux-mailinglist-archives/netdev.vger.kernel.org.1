@@ -1,79 +1,107 @@
-Return-Path: <netdev+bounces-233517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E05EC14B97
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:57:28 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACD4EC14BD1
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 14:01:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD6A11B23704
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:57:51 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 55646350F76
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:01:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04CC732ABCC;
-	Tue, 28 Oct 2025 12:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43BD63314D3;
+	Tue, 28 Oct 2025 13:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="REpZddWG"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="v1RUAwQj"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4861730F536
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 12:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A74463314AB;
+	Tue, 28 Oct 2025 13:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761656243; cv=none; b=ATHztir1RYNt98rC2m8biHanTxoBlzx3TrXfUYxbIk5NnrgLm9McbBSjx3uwjzUb3p5eEBC3swwI75lxnxeONnovETNUeHkW1QOL6dPwLEmXTEgkgmoAaiG4hGphO6FRojUbO758xbZuAFB7I0mza0tqhLG1xZ/970LZSIbrRg0=
+	t=1761656479; cv=none; b=OtGEfvefoaOfZTgPDF+uqEWMshrAB+WLgcBEiiQdfcyFHgihde3qO5Um0+qayoJGRJ96geSnRERqGYmea6m2nxeyNW4JvPu+4H6Rv8qQBjdyvBxUZeyFUIBagiGun7aT+7gEKWTrp3RsqoIKwiR1j1fiQT3wpDQPZjFuEM9LAck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761656243; c=relaxed/simple;
-	bh=BZlvQ5adigxbCIOZC8ENgkSkD2oFCh2Hrb2JoDFLDAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GFTPKOeHviRZl/gh1CWKrNoPXSulq1srROoHoAC5WT3TVeqbJlpgAOmdvT5NJobmBXdM7oIqPEJ5OTEsJHLonlayTIb/uyD/ECZcUx9M9VbUxC5+iHxuJvtT1Kyfjabu2xA6bHCoNONPnu5c/JbZPpuyaYtW/NekS7OZPyG1gVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=REpZddWG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3UjlmCdFD7aPWW1NJHa4UYv4qhXN283+wsfv+4LoR8I=; b=REpZddWGlet/Q2zb5zISgYINyN
-	e7/JlEaKUwTzgS+m5K2j/6zyF5oXovcy7dx4Xuu+iZoALTHRYp6m/S6Etme/eLjmyEsKm+T72v7EF
-	zHUtbnvGfP6SWgoakLRmknaxRlujIf2mNrHjbLtnDkLqkvWJb4GxcCH/yRCAD71hzOIY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vDjGJ-00CIPH-Cf; Tue, 28 Oct 2025 13:57:19 +0100
-Date: Tue, 28 Oct 2025 13:57:19 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, kernel-team@meta.com,
-	andrew+netdev@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	pabeni@redhat.com, davem@davemloft.net
-Subject: Re: [net-next PATCH 3/8] net: phy: Add 25G-CR, 50G-CR, 100G-CR2
- support to C45 genphy
-Message-ID: <59f1c869-58c0-4158-82d7-e7b11870b790@lunn.ch>
-References: <176133835222.2245037.11430728108477849570.stgit@ahduyck-xeon-server.home.arpa>
- <176133845391.2245037.2378678349333571121.stgit@ahduyck-xeon-server.home.arpa>
+	s=arc-20240116; t=1761656479; c=relaxed/simple;
+	bh=Ip0/Cn7Eq8CRmBNQPrUXFmsK1Z7fBv8Q9ArF72Fhztw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XlvqtiBuj5O3tz6GOL/YGC2GiTve6iBhfJCzeefwGoqYI7wvmQ4LqDriC2mPUS703V32wt0qIzz8/Osb3J7Z+/K4bRJSVSNJdnTPcNXZQRKMmCNWAfA6BHUIf5waRRnbi7X0028dupVDRB6MWGumH2/wiHaTo59eMW5bsyUSKTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=v1RUAwQj; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1761656477; x=1793192477;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Ip0/Cn7Eq8CRmBNQPrUXFmsK1Z7fBv8Q9ArF72Fhztw=;
+  b=v1RUAwQjzS3HMSe4k2ir4jPY/RJhp7FMWsYjkOacyreF2Ln2FUd++lD3
+   HiNUdTS8AerG6GKL8R3ReV6MUCfxFYz5kGvdzp/PXwHHzFgcLRokUJThU
+   /VN5Jl/N4X5AZbrE6M9M2lQdfBQqm0qggKwtEJFpU9m6yToep6F4WjqiH
+   /cQ1vYVsvgPdFcPnxDMKf0KYkgSIrckTTZyG+QUHRqwKh3JFgTKQOWqqI
+   MFyBIQE5QFzWAvxhFpfyxIJrwyVPmJH3uAHe9/cWoPXAYvIx15+mv2dYb
+   wq8hD0lkUz42qoUSgqb3ekj7yFQSNarNxC0eRiDc14IcrwpYsdsoAoKs8
+   Q==;
+X-CSE-ConnectionGUID: Gg7jUh6qR9u+EJ1jhFrNyQ==
+X-CSE-MsgGUID: pDMRFxr/QW+1zSyrHNClDg==
+X-IronPort-AV: E=Sophos;i="6.19,261,1754982000"; 
+   d="scan'208";a="48858559"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 06:01:13 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
+ chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Tue, 28 Oct 2025 06:00:02 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Tue, 28 Oct 2025 06:00:01 -0700
+Date: Tue, 28 Oct 2025 13:58:47 +0100
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: phy:  micrel: lan8842 erratas
+Message-ID: <20251028125847.y2uracj2csvqhxy6@DEN-DL-M31836.microchip.com>
+References: <20251027124026.64232-1-horatiu.vultur@microchip.com>
+ <4eefecbe-fa8f-41de-aeae-4d261cce5c1f@lunn.ch>
+ <20251028073354.7r5pgrbrcqtqxcjt@DEN-DL-M31836.microchip.com>
+ <8b14b2b8-709e-4c83-8028-19ab2df1bac2@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <176133845391.2245037.2378678349333571121.stgit@ahduyck-xeon-server.home.arpa>
+In-Reply-To: <8b14b2b8-709e-4c83-8028-19ab2df1bac2@lunn.ch>
 
-On Fri, Oct 24, 2025 at 01:40:53PM -0700, Alexander Duyck wrote:
-> From: Alexander Duyck <alexanderduyck@fb.com>
+The 10/28/2025 13:04, Andrew Lunn wrote:
 > 
-> Add support for 25G-CR, 50G-CR, 50G-CR2, and 100G-CR2 the c45 genphy. Note
-> that 3 of the 4 are IEEE compliant so they are a direct copy from the
-> clause 45 specification, the only exception to this is 50G-CR2 which is
-> part of the Ethernet Consortium specification which never referenced how to
-> handle this in the MDIO registers.
+> > > I notice there is no Fixes: tag. So you don't think these are worth
+> > > back porting?
+> >
+> > Definetly I would like to be ported but the issue was there from
+> > beginning when the lan8842 was added, so I was not sure if it is OK to
+> > send it to net.
+> 
+> https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+> 
+> says:
+> 
+> It must either fix a real bug that bothers people or just add a device ID.
+> 
+> Does this bother people?
 
-Does the Ethernet Consortium have other media types which are not in
-802.3? Does your scheme work for all of them?
+Yes, I would say so.
 
-	Andrew
+> 
+>         Andrew
+
+-- 
+/Horatiu
 
