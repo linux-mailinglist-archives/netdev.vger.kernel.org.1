@@ -1,221 +1,563 @@
-Return-Path: <netdev+bounces-233648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A56FAC16C7D
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 21:30:29 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66FC7C16D10
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 21:49:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FF001C24D9E
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 20:30:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 00B2F4E052B
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 20:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4666B34CFA3;
-	Tue, 28 Oct 2025 20:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72BA2D12EB;
+	Tue, 28 Oct 2025 20:49:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hVJT0B4/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BABaMUMQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82DBC2D6E62
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 20:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2EC4502F
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 20:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761683414; cv=none; b=K8d8TAGcsT7Xodrv0SsDoCIV6HTDTRVtepTnUjEFlyAwgqYGXMZkMcGyxLJl4V1GaTaseBq3QNUPmlLidVtNkvwOa3NuvW89yMwtZciuLIM3gB8/C5/jV0+um/KcRRpX2Re2pEH4AgJPT0wRO09Vs48YKK4mLTjsoS/1kM/Rgj0=
+	t=1761684583; cv=none; b=fDmLK7RrR/FFOZtIVpqJz2pKAOK+EjQa7r9fzfLR0D9ceoeLLYbfJKrxDHut6q2Qk3PYOpLchB0jjotmxZEcJXFt2FQjbwP8ox+PmLzS6C4Ql6r40E0CEv0EX6zzpkFFADZxx5/5Kw+eIHJAvWSmaEc8kocI/vfYwrW7W/Pz74k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761683414; c=relaxed/simple;
-	bh=qGyFO386U+kmYqETXmE7yfFZ0qYCyLX1HVIuqhVgtKs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Vnh/59kQbyJ9a05cUAlgp6sn3G0EZ60UBlNddAPLMLinzm53EqUSDgI1RHnCE03IIMXzKUyTcBA6F4Qm5wAaTQD+n7XvP8gJ77I08IaSOsjYH6RaweA/Cg0M20/fIItBL3SAjQObuKAPjdDG9W5z01Rn1tBhFOLzAlcl+x/ZxN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hVJT0B4/; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b6cdfcb112bso12426674a12.0
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 13:30:12 -0700 (PDT)
+	s=arc-20240116; t=1761684583; c=relaxed/simple;
+	bh=3uRVfwobrviSUOQPmVoT1gxf3NUHjqRJW2+JVHbI8OM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aBCFgsUUgY3RKuBGG4bYib7chOXs1/5CJbOjdviE8a7KysbMDA4R2McNWet555vOTSBC6y+o2zVPECo1duq3XTy1dmyfN1bfDwrgrBlMMV16ZbT2FQN2Z6SHkrrysokYPBVkyFxbEPtoSF9FvprF1TqbyNWN2aWmbAXXqKLvCdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BABaMUMQ; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-783fa3aa122so4813757b3.0
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 13:49:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761683412; x=1762288212; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6QlLBK1dO279KLObKzPUpdI8BqAf/SLckVAwoN3WEgU=;
-        b=hVJT0B4/um364w+64y8HpKzBYFo2HPFlRlul2rDZ3/Poqrqv7mkpjyQOOeZzNUSkmC
-         MOq4v8Z+iUGxW+scVTcRwgs5V4w3HZvwz8RgU+2oVxdM1zzQnt6HAIa/Z8q9hGbBtsEj
-         zNO+FQnyquuoIzH/PjLtGvigQzIkPI/Wp19t1Bc82AEcjzRJroLgfef/t1hOqvdm87tM
-         rFCyflvlfjC8qeQZ80HZXEsiTcyi41DRc2uV3VZ1mpoUYWoXrC96Gv5JghHzyPdTHKIL
-         BPPjMVpL90Fovl8X4IQ57evG9UG9VlIJeYyt1oap5qsZqkAlTy/vQQsRJozp0thu9Tpw
-         jhjA==
+        d=gmail.com; s=20230601; t=1761684580; x=1762289380; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=sM+8Xpw+fiWwGJwmnf4Q7eFZwklLCg+AbUQ10lHz4xM=;
+        b=BABaMUMQNB/KXyNw/paiUVYKfnF9Die4eOeBjenkNb969xSczf5ybfJFIfoW/IG1iX
+         McRrDaVVC6O3Kvqulq6obbrzCIIeWZqPBpatTMCaFwpGgZ8OsIlLTbFI3/sb/RVPky/c
+         SdcBvsjJh8AdEdaGqJZLFH3srXkaUvtbt7tTeGfdhvnGUJf5KP4zoJQ1JQYO6ZUjyMF1
+         BqSUZb4JcAWwe1RfHfMJ/KBFV5mmusgiZ6MWulj8A3JcQOTC6NmwpPDFUZjv72Gsvrjh
+         Tu4ZGhz1S/3OZ84l2OTPH9leMJJgzMR2pyD6JfbDzO+WJxP8cf0ATWVn2B+XhHHpGG6H
+         w0Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761683412; x=1762288212;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6QlLBK1dO279KLObKzPUpdI8BqAf/SLckVAwoN3WEgU=;
-        b=CQsbtaiti/+FZqwvKI+TjNEA90wJswIfSs4nyqJs5Y2ZcvPDzrrl7YQaI6LsSyIH9n
-         FmL/TTYPts1DSzYRC/rmMlkvWpBt5iy3K+DBSw0hxJJXptzVen+eKFIGsbA/c/YnilQH
-         EFCKxtGDnY/62ifNCmTtMfMXJWYzIX26HcKWCGb+wr3L207kgcGbhTVwmFB3qor6dBcM
-         3rHP5XHH79e/4omxKR1LcIGx0mz6h+0VdWEe05NI/BTLmIUKFs7CSIEMYn3RYE02Aqaa
-         xMRDvOQfSzKtQmWCyoz+s9T/yqUA3ibNPoxYtk3Fu9QTvigve53RGG/Cr+zfGVnRh6fP
-         GqYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUOJCOoY7sYjlW1cXYHx/9dAQ0RrdFNjsZPieyTei96hH2aQa3hRpOMHT/6obw0mHzjRCxbtGA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVitXQuvGDM0ouPoQGxyhH36RDrHOOzIg1ErtjJSV4HW2OZNPm
-	qVuiHZ/SBbGgnuGLx/xj7/3KIpwiwdf4sEswURN3I9Q6AGXVzjmcXt9ZpWVfoeO0lNnMKGciBsN
-	/FxHqFMKknrsA2w==
-X-Google-Smtp-Source: AGHT+IFXim7aLw6aynthOgMnNQNOfsDFkNt2r/feRdZClo3i696CJNaTX5FHbL0yH+UqwtoNJVj2J9I7L2PQ2A==
-X-Received: from pjbft22.prod.google.com ([2002:a17:90b:f96:b0:32e:d644:b829])
- (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:3d1a:b0:341:8e52:4ca with SMTP id adf61e73a8af0-3465798aa5cmr263464637.5.1761683411795;
- Tue, 28 Oct 2025 13:30:11 -0700 (PDT)
-Date: Tue, 28 Oct 2025 20:30:06 +0000
-In-Reply-To: <20251028203007.575686-1-skhawaja@google.com>
+        d=1e100.net; s=20230601; t=1761684580; x=1762289380;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sM+8Xpw+fiWwGJwmnf4Q7eFZwklLCg+AbUQ10lHz4xM=;
+        b=IGdf2TVKYtd0rhf8cBtJ6ncOeNczkGzrGDooRuATVHuwOh8+0VXGhtc7IcKO2+2LgZ
+         FbKVm057CwT5m0KPBiZ6Ghv2Ka2+5FkVnPpogrDoub3bJYcTdrNni0TAJYXeSWM4BiSf
+         8+St4YAONmMtD1v9tavwlKUOKeHu8/Hs1BTJVkDuaW3K44WeP8X7YD+WqTbjHlYsBMgQ
+         opTGYGDpGLW8twiSb5dKfdcfX5hdZr4irXXFRDMg/7Y5exyd6Ykg+AokAm/UpvXICVhA
+         pKLi0efLaCFINo8WFhZzXsSbKviljwi4WcpGH0UC/BYIH5BJaEYzZ493bRPn99DkAE34
+         Lhdw==
+X-Forwarded-Encrypted: i=1; AJvYcCUFaIxkQODiQHPvM6KijXGbwabNYfGuuYgwq32VyZc/xwNb6R9OktZQnVzsuqWGuCZ0lWnLtGk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZV+W4Jvf1eDFXL0u+rJ9FyFfidWSX5ejOHYIdxjylfASdMNry
+	iMM3ey5OPOvHlmq8M+xc0kEVh1OwpK3O3kyUnsgAxZz3NPULodGqr15J
+X-Gm-Gg: ASbGnct+ntczV+JeLddU4Q3/I3dtRxq7XKcZKzjGZ9KazR9nDSm96pWpewlHqgtGMWD
+	HFuibHpo+bQKGGrCTheH8145jVfVlmXXKDk7x3wLjFEIL4HyNVN24WoEOTP5eGLylMOf3H1AuWC
+	YBUrtRbxc4qk8lo3Wb+NCuX1nIyGz0FcfJOYFG8RGfKBbnR5DVUcHau9Qe3NBm092pYnADRUHeb
+	vUwWWlXOVi4tDkBllUc3l0Q9xshLnFVTKn+GJ9/NsoRYxGw7/UZTvjUIIrGkL4/Gjx6p1WMndKd
+	erEfSJNmrGRnhllvEqHR3mtSYWX83R49LXXBp97WY78oiDFuPG/33DO9Qoe+d9R2Hxg+k6gJvo1
+	yZuK8zCkHVAn2/EC+4criFj1pa4kSCwwzwtCBLEvH2DiLwAxw8t1PDCQwf4PbPsZxBMxf06xyM/
+	p2V2ExaQr3Ah5U6Xs2c2YH89gTpXeEjD/Eoec=
+X-Google-Smtp-Source: AGHT+IGMIk7G4VEIOcnQjRo7HDDcQFq7QrXC6UjkgP+zjw6QKkpZyY4VxxNdWhbQkLBWbXGpSCSzWw==
+X-Received: by 2002:a05:690c:3604:b0:782:9291:493b with SMTP id 00721157ae682-786191d385amr46890717b3.32.1761684580372;
+        Tue, 28 Oct 2025 13:49:40 -0700 (PDT)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:6::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-785ed17ec77sm30280977b3.23.2025.10.28.13.49.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Oct 2025 13:49:40 -0700 (PDT)
+Date: Tue, 28 Oct 2025 13:49:38 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v5 3/4] net: devmem: use niov array for token
+ management
+Message-ID: <aQEsYs5yJC7eXgKS@devvm11784.nha0.facebook.com>
+References: <20251023-scratch-bobbyeshleman-devmem-tcp-token-upstream-v5-0-47cb85f5259e@meta.com>
+ <20251023-scratch-bobbyeshleman-devmem-tcp-token-upstream-v5-3-47cb85f5259e@meta.com>
+ <CAHS8izOKWxw=T8zk1jQL6sB8bTSK0HvNxnX=XXYLCAFtuiAwRw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251028203007.575686-1-skhawaja@google.com>
-X-Mailer: git-send-email 2.51.1.851.g4ebd6896fd-goog
-Message-ID: <20251028203007.575686-3-skhawaja@google.com>
-Subject: [PATCH net-next v10 2/2] selftests: Add napi threaded busy poll test
- in `busy_poller`
-From: Samiullah Khawaja <skhawaja@google.com>
-To: Jakub Kicinski <kuba@kernel.org>, "David S . Miller " <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
-	willemb@google.com
-Cc: Joe Damato <joe@dama.to>, mkarsten@uwaterloo.ca, netdev@vger.kernel.org, 
-	skhawaja@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izOKWxw=T8zk1jQL6sB8bTSK0HvNxnX=XXYLCAFtuiAwRw@mail.gmail.com>
 
-Add testcase to run busy poll test with threaded napi busy poll enabled.
+On Mon, Oct 27, 2025 at 06:20:20PM -0700, Mina Almasry wrote:
+> On Thu, Oct 23, 2025 at 2:00 PM Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
+> >
 
-Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
----
- tools/testing/selftests/net/busy_poll_test.sh | 24 ++++++++++++++++++-
- tools/testing/selftests/net/busy_poller.c     | 16 ++++++++++---
- 2 files changed, 36 insertions(+), 4 deletions(-)
+[...]
 
-diff --git a/tools/testing/selftests/net/busy_poll_test.sh b/tools/testing/selftests/net/busy_poll_test.sh
-index 7d2d40812074..5ec1c85c1623 100755
---- a/tools/testing/selftests/net/busy_poll_test.sh
-+++ b/tools/testing/selftests/net/busy_poll_test.sh
-@@ -27,6 +27,8 @@ NAPI_DEFER_HARD_IRQS=100
- GRO_FLUSH_TIMEOUT=50000
- SUSPEND_TIMEOUT=20000000
- 
-+NAPI_THREADED_MODE_BUSY_POLL=2
-+
- setup_ns()
- {
- 	set -e
-@@ -62,6 +64,9 @@ cleanup_ns()
- test_busypoll()
- {
- 	suspend_value=${1:-0}
-+	napi_threaded_value=${2:-0}
-+	prefer_busy_poll_value=${3:-$PREFER_BUSY_POLL}
-+
- 	tmp_file=$(mktemp)
- 	out_file=$(mktemp)
- 
-@@ -73,10 +78,11 @@ test_busypoll()
- 					     -b${SERVER_IP}        \
- 					     -m${MAX_EVENTS}       \
- 					     -u${BUSY_POLL_USECS}  \
--					     -P${PREFER_BUSY_POLL} \
-+					     -P${prefer_busy_poll_value} \
- 					     -g${BUSY_POLL_BUDGET} \
- 					     -i${NSIM_SV_IFIDX}    \
- 					     -s${suspend_value}    \
-+					     -t${napi_threaded_value} \
- 					     -o${out_file}&
- 
- 	wait_local_port_listen nssv ${SERVER_PORT} tcp
-@@ -109,6 +115,15 @@ test_busypoll_with_suspend()
- 	return $?
- }
- 
-+test_busypoll_with_napi_threaded()
-+{
-+	# Only enable napi threaded poll. Set suspend timeout and prefer busy
-+	# poll to 0.
-+	test_busypoll 0 ${NAPI_THREADED_MODE_BUSY_POLL} 0
-+
-+	return $?
-+}
-+
- ###
- ### Code start
- ###
-@@ -154,6 +169,13 @@ if [ $? -ne 0 ]; then
- 	exit 1
- fi
- 
-+test_busypoll_with_napi_threaded
-+if [ $? -ne 0 ]; then
-+	echo "test_busypoll_with_napi_threaded failed"
-+	cleanup_ns
-+	exit 1
-+fi
-+
- echo "$NSIM_SV_FD:$NSIM_SV_IFIDX" > $NSIM_DEV_SYS_UNLINK
- 
- echo $NSIM_CL_ID > $NSIM_DEV_SYS_DEL
-diff --git a/tools/testing/selftests/net/busy_poller.c b/tools/testing/selftests/net/busy_poller.c
-index 04c7ff577bb8..3a81f9c94795 100644
---- a/tools/testing/selftests/net/busy_poller.c
-+++ b/tools/testing/selftests/net/busy_poller.c
-@@ -65,15 +65,16 @@ static uint32_t cfg_busy_poll_usecs;
- static uint16_t cfg_busy_poll_budget;
- static uint8_t cfg_prefer_busy_poll;
- 
--/* IRQ params */
-+/* NAPI params */
- static uint32_t cfg_defer_hard_irqs;
- static uint64_t cfg_gro_flush_timeout;
- static uint64_t cfg_irq_suspend_timeout;
-+static enum netdev_napi_threaded cfg_napi_threaded_poll = NETDEV_NAPI_THREADED_DISABLED;
- 
- static void usage(const char *filepath)
- {
- 	error(1, 0,
--	      "Usage: %s -p<port> -b<addr> -m<max_events> -u<busy_poll_usecs> -P<prefer_busy_poll> -g<busy_poll_budget> -o<outfile> -d<defer_hard_irqs> -r<gro_flush_timeout> -s<irq_suspend_timeout> -i<ifindex>",
-+	      "Usage: %s -p<port> -b<addr> -m<max_events> -u<busy_poll_usecs> -P<prefer_busy_poll> -g<busy_poll_budget> -o<outfile> -d<defer_hard_irqs> -r<gro_flush_timeout> -s<irq_suspend_timeout> -t<napi_threaded_poll> -i<ifindex>",
- 	      filepath);
- }
- 
-@@ -86,7 +87,7 @@ static void parse_opts(int argc, char **argv)
- 	if (argc <= 1)
- 		usage(argv[0]);
- 
--	while ((c = getopt(argc, argv, "p:m:b:u:P:g:o:d:r:s:i:")) != -1) {
-+	while ((c = getopt(argc, argv, "p:m:b:u:P:g:o:d:r:s:i:t:")) != -1) {
- 		/* most options take integer values, except o and b, so reduce
- 		 * code duplication a bit for the common case by calling
- 		 * strtoull here and leave bounds checking and casting per
-@@ -168,6 +169,12 @@ static void parse_opts(int argc, char **argv)
- 
- 			cfg_ifindex = (int)tmp;
- 			break;
-+		case 't':
-+			if (tmp > 2)
-+				error(1, ERANGE, "napi threaded poll value must be 0-2");
-+
-+			cfg_napi_threaded_poll = (enum netdev_napi_threaded)tmp;
-+			break;
- 		}
- 	}
- 
-@@ -247,6 +254,9 @@ static void setup_queue(void)
- 	netdev_napi_set_req_set_irq_suspend_timeout(set_req,
- 						    cfg_irq_suspend_timeout);
- 
-+	if (cfg_napi_threaded_poll)
-+		netdev_napi_set_req_set_threaded(set_req, cfg_napi_threaded_poll);
-+
- 	if (netdev_napi_set(ys, set_req))
- 		error(1, 0, "can't set NAPI params: %s\n", yerr.msg);
- 
--- 
-2.51.1.838.g19442a804e-goog
+> > diff --git a/include/net/sock.h b/include/net/sock.h
+> > index 01ce231603db..1963ab54c465 100644
+> > --- a/include/net/sock.h
+> > +++ b/include/net/sock.h
+> > @@ -350,7 +350,7 @@ struct sk_filter;
+> >    *    @sk_scm_rights: flagged by SO_PASSRIGHTS to recv SCM_RIGHTS
+> >    *    @sk_scm_unused: unused flags for scm_recv()
+> >    *    @ns_tracker: tracker for netns reference
+> > -  *    @sk_user_frags: xarray of pages the user is holding a reference on.
+> > +  *    @sk_devmem_info: the devmem binding information for the socket
+> >    *    @sk_owner: reference to the real owner of the socket that calls
+> >    *               sock_lock_init_class_and_name().
+> >    */
+> > @@ -579,7 +579,11 @@ struct sock {
+> >         struct numa_drop_counters *sk_drop_counters;
+> >         struct rcu_head         sk_rcu;
+> >         netns_tracker           ns_tracker;
+> > -       struct xarray           sk_user_frags;
+> > +       struct {
+> > +               struct xarray                           frags;
+> > +               struct net_devmem_dmabuf_binding        *binding;
+> > +               bool                                    autorelease;
+> 
+> Maybe autorelease should be a property of the binding, no? I can't
+> wrap my head around a binding that has some autorelease sockets and
+> some non-autorelease sockets, semantically.
+> 
 
+Right, it is definitely ill placed here. It never deviates from
+binding->autorelease, so no need for it.
+
+> > +       } sk_devmem_info;
+> >
+> >  #if IS_ENABLED(CONFIG_PROVE_LOCKING) && IS_ENABLED(CONFIG_MODULES)
+> >         struct module           *sk_owner;
+> > diff --git a/net/core/devmem.c b/net/core/devmem.c
+> > index b4c570d4f37a..8f3199fe0f7b 100644
+> > --- a/net/core/devmem.c
+> > +++ b/net/core/devmem.c
+> > @@ -11,6 +11,7 @@
+> >  #include <linux/genalloc.h>
+> >  #include <linux/mm.h>
+> >  #include <linux/netdevice.h>
+> > +#include <linux/skbuff_ref.h>
+> >  #include <linux/types.h>
+> >  #include <net/netdev_queues.h>
+> >  #include <net/netdev_rx_queue.h>
+> > @@ -115,6 +116,29 @@ void net_devmem_free_dmabuf(struct net_iov *niov)
+> >         gen_pool_free(binding->chunk_pool, dma_addr, PAGE_SIZE);
+> >  }
+> >
+> > +static void
+> > +net_devmem_dmabuf_binding_put_urefs(struct net_devmem_dmabuf_binding *binding)
+> > +{
+> > +       int i;
+> > +
+> > +       if (binding->autorelease)
+> > +               return;
+> > +
+> 
+> I think cosmetically it's better to put this check in the caller.
+> 
+
+Sounds good!
+
+> > +       for (i = 0; i < binding->dmabuf->size / PAGE_SIZE; i++) {
+> > +               struct net_iov *niov;
+> > +               netmem_ref netmem;
+> > +
+> > +               niov = binding->vec[i];
+> > +
+> > +               if (!net_is_devmem_iov(niov))
+> > +                       continue;
+> > +
+> 
+> This is an extremely defensive check. I have no idea how we could
+> possibly have a non devmem iov here. Maybe DEBUG_NET_WARN_ON instead?
+> Or remove.
+> 
+
+Makes sense. I did not run into any real issues, I mistakenly borrowed
+this check from the skb->frag handling code... will remove.
+
+> > +               netmem = net_iov_to_netmem(niov);
+> > +               if (atomic_xchg(&niov->uref, 0) > 0)
+> > +                       WARN_ON_ONCE(!napi_pp_put_page(netmem));
+> 
+> This is subtle enough that it can use a comment. Multiple urefs map to
+> only 1 netmem ref.
+> 
+
+Will do.
+
+[...]
+
+> > @@ -291,10 +315,10 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+> >                         niov = &owner->area.niovs[i];
+> >                         niov->type = NET_IOV_DMABUF;
+> >                         niov->owner = &owner->area;
+> > +                       atomic_set(&niov->uref, 0);
+> >                         page_pool_set_dma_addr_netmem(net_iov_to_netmem(niov),
+> >                                                       net_devmem_get_dma_addr(niov));
+> > -                       if (direction == DMA_TO_DEVICE)
+> > -                               binding->vec[owner->area.base_virtual / PAGE_SIZE + i] = niov;
+> > +                       binding->vec[owner->area.base_virtual / PAGE_SIZE + i] = niov;
+> >                 }
+> >
+> >                 virtual += len;
+> > @@ -307,6 +331,7 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+> >                 goto err_free_chunks;
+> >
+> >         list_add(&binding->list, &priv->bindings);
+> > +       binding->autorelease = true;
+> >
+> 
+> So autorelease is indeed a property of the binding. Not sure why a
+> copy exists in sk_devmem_info. Perf optimization to reduce pointer
+> chasing?
+> 
+
+Just stale code from prior design... Originally, I was going to try to
+allow the autorelease == true case to be free of the
+one-binding-per-socket restriction, in which case sk_devmem_info.binding
+would be NULL (or otherwise meaningless). sk_devmem_info.autorelease
+allowed sock_devmem_dontneed to choose the right path even when
+sk_devmem_info.binding == NULL.
+
+...but then I realized we still needed some restriction to avoid sockets
+from steering into different dmabufs with different autorelease configs,
+so kept the one-binding restriction for both modes. I abandoned the
+effort, but forgot to revert this change.
+
+Now I'm realizing that we could relax the restriction more though... We
+could allow sockets to steer into other bindings if they all have the
+same autorelease value? Then we could still use
+sk_devmem_info.binding->autorelease in the sock_devmem_dontneed path and
+relax the restriction to "steering must only be to bindings of the same
+autorelease mode"?
+
+> I thought autorelease would be 'false' by default. I.e. the user gets
+> better perf by default. Maybe this is flipped in the following patch I
+> haven't opened yet.
+> 
+
+That is right, it is in the next patch. I didn't want to change the
+default without also adding the ability to revert back.
+
+> >         return binding;
+> >
+> > diff --git a/net/core/devmem.h b/net/core/devmem.h
+> > index 2ada54fb63d7..7662e9e42c35 100644
+> > --- a/net/core/devmem.h
+> > +++ b/net/core/devmem.h
+> > @@ -61,11 +61,20 @@ struct net_devmem_dmabuf_binding {
+> >
+> >         /* Array of net_iov pointers for this binding, sorted by virtual
+> >          * address. This array is convenient to map the virtual addresses to
+> > -        * net_iovs in the TX path.
+> > +        * net_iovs.
+> >          */
+> >         struct net_iov **vec;
+> >
+> >         struct work_struct unbind_w;
+> > +
+> > +       /* If true, outstanding tokens will be automatically released upon each
+> > +        * socket's close(2).
+> > +        *
+> > +        * If false, then sockets are responsible for releasing tokens before
+> > +        * close(2). The kernel will only release lingering tokens when the
+> > +        * dmabuf is unbound.
+> > +        */
+> 
+> Needs devmem.rst doc update.
+> 
+
+Will do.
+
+> > +       bool autorelease;
+> >  };
+> >
+> >  #if defined(CONFIG_NET_DEVMEM)
+> > diff --git a/net/core/sock.c b/net/core/sock.c
+> > index e7b378753763..595b5a858d03 100644
+> > --- a/net/core/sock.c
+> > +++ b/net/core/sock.c
+> > @@ -87,6 +87,7 @@
+> >
+> >  #include <linux/unaligned.h>
+> >  #include <linux/capability.h>
+> > +#include <linux/dma-buf.h>
+> >  #include <linux/errno.h>
+> >  #include <linux/errqueue.h>
+> >  #include <linux/types.h>
+> > @@ -151,6 +152,7 @@
+> >  #include <uapi/linux/pidfd.h>
+> >
+> >  #include "dev.h"
+> > +#include "devmem.h"
+> >
+> >  static DEFINE_MUTEX(proto_list_mutex);
+> >  static LIST_HEAD(proto_list);
+> > @@ -1081,6 +1083,57 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
+> >  #define MAX_DONTNEED_TOKENS 128
+> >  #define MAX_DONTNEED_FRAGS 1024
+> >
+> > +static noinline_for_stack int
+> > +sock_devmem_dontneed_manual_release(struct sock *sk, struct dmabuf_token *tokens,
+> > +                                   unsigned int num_tokens)
+> > +{
+> > +       unsigned int netmem_num = 0;
+> > +       int ret = 0, num_frags = 0;
+> > +       netmem_ref netmems[16];
+> > +       struct net_iov *niov;
+> > +       unsigned int i, j, k;
+> > +
+> > +       for (i = 0; i < num_tokens; i++) {
+> > +               for (j = 0; j < tokens[i].token_count; j++) {
+> > +                       struct net_iov *niov;
+> > +                       unsigned int token;
+> > +                       netmem_ref netmem;
+> > +
+> > +                       token = tokens[i].token_start + j;
+> > +                       if (token >= sk->sk_devmem_info.binding->dmabuf->size / PAGE_SIZE)
+> > +                               break;
+> > +
+> 
+> This requires some thought. The correct thing to do here is EINVAL
+> without modifying the urefs at all I think. You may need an
+> input-verification loop. Breaking and returning success here is not
+> great, I think.
+> 
+
+Should this also be changed for the other path as well? Right now if
+__xa_erase returns NULL (e.g., user passed in a bad token), then we hit
+"continue" and process the next token... eventually just returning the
+number of tokens that were successfully processed and omitting the wrong
+ones.
+
+> > +                       if (++num_frags > MAX_DONTNEED_FRAGS)
+> > +                               goto frag_limit_reached;
+> > +                       niov = sk->sk_devmem_info.binding->vec[token];
+> > +                       netmem = net_iov_to_netmem(niov);
+> > +
+> > +                       if (!netmem || WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
+> > +                               continue;
+> > +
+> 
+> This check is extremely defensive. There is no way netmem is not a
+> netiov (you just converted it). It's also very hard for it to be NULL.
+> Remove maybe.
+> 
+
+Removing sounds good to me.
+
+> > +                       netmems[netmem_num++] = netmem;
+> > +                       if (netmem_num == ARRAY_SIZE(netmems)) {
+> > +                               for (k = 0; k < netmem_num; k++) {
+> > +                                       niov = netmem_to_net_iov(netmems[k]);
+> 
+> No need to upcast to netmem only to downcast here back to net_iov.
+> Just keep it net_iov?
+> 
+
+Sounds good.
+
+> > +                                       if (atomic_dec_and_test(&niov->uref))
+> > +                                               WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
+> 
+> I see. So you're only only napi_pp_put_pageing the last uref dec, but
+> why? How about you
+
+Just to minimize cache bus noise from the extra atomic.
+
+> > +                               }
+> > +                               netmem_num = 0;
+> > +                       }
+> 
+> From a quick look, I don't think you need the netmems[] array or this
+> inner loop.
+> 
+> dontneed_autorelease is complicatingly written because it acquires a
+> lock, and we wanted to minimize the lock acquire. You are acquiring no
+> lock here. AFAICT you can just loop over the tokens and free all of
+> them in one (nested) loop.
+
+Oh good point. There is no need to batch at all here.
+
+> 
+> > +                       ret++;
+> > +               }
+> > +       }
+> > +
+> > +frag_limit_reached:
+> > +       for (k = 0; k < netmem_num; k++) {
+> > +               niov = netmem_to_net_iov(netmems[k]);
+> > +               if (atomic_dec_and_test(&niov->uref))
+> > +                       WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
+> > +       }
+> > +
+> > +       return ret;
+> > +}
+> > +
+> >  static noinline_for_stack int
+> >  sock_devmem_dontneed_autorelease(struct sock *sk, struct dmabuf_token *tokens,
+> >                                  unsigned int num_tokens)
+> > @@ -1089,32 +1142,32 @@ sock_devmem_dontneed_autorelease(struct sock *sk, struct dmabuf_token *tokens,
+> >         int ret = 0, num_frags = 0;
+> >         netmem_ref netmems[16];
+> >
+> > -       xa_lock_bh(&sk->sk_user_frags);
+> > +       xa_lock_bh(&sk->sk_devmem_info.frags);
+> >         for (i = 0; i < num_tokens; i++) {
+> >                 for (j = 0; j < tokens[i].token_count; j++) {
+> >                         if (++num_frags > MAX_DONTNEED_FRAGS)
+> >                                 goto frag_limit_reached;
+> >
+> >                         netmem_ref netmem = (__force netmem_ref)__xa_erase(
+> > -                               &sk->sk_user_frags, tokens[i].token_start + j);
+> > +                               &sk->sk_devmem_info.frags, tokens[i].token_start + j);
+> >
+> >                         if (!netmem || WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
+> >                                 continue;
+> >
+> >                         netmems[netmem_num++] = netmem;
+> >                         if (netmem_num == ARRAY_SIZE(netmems)) {
+> > -                               xa_unlock_bh(&sk->sk_user_frags);
+> > +                               xa_unlock_bh(&sk->sk_devmem_info.frags);
+> >                                 for (k = 0; k < netmem_num; k++)
+> >                                         WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
+> >                                 netmem_num = 0;
+> > -                               xa_lock_bh(&sk->sk_user_frags);
+> > +                               xa_lock_bh(&sk->sk_devmem_info.frags);
+> >                         }
+> >                         ret++;
+> >                 }
+> >         }
+> >
+> >  frag_limit_reached:
+> > -       xa_unlock_bh(&sk->sk_user_frags);
+> > +       xa_unlock_bh(&sk->sk_devmem_info.frags);
+> >         for (k = 0; k < netmem_num; k++)
+> >                 WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
+> >
+> > @@ -1135,6 +1188,12 @@ sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> >             optlen > sizeof(*tokens) * MAX_DONTNEED_TOKENS)
+> >                 return -EINVAL;
+> >
+> > +       /* recvmsg() has never returned a token for this socket, which needs to
+> > +        * happen before we know if the dmabuf has autorelease set or not.
+> > +        */
+> > +       if (!sk->sk_devmem_info.binding)
+> > +               return -EINVAL;
+> > +
+> 
+> Hmm. At first glance I don't think enforcing this condition if
+> binding->autorelease is necessary, no?
+> 
+> If autorelease is on, then we track the tokens the old way, and we
+> don't need a binding, no? If it's off, then we need an associated
+> binding, to look up the urefs array.
+> 
+
+We at least need the binding to know if binding->autorelease is on,
+since without that we don't know whether the tokens are in the xarray or
+binding->vec... but I guess we could also check if the xarray is
+non-empty and infer that autorelease == true from that?
+
+[...]
+
+> > +                               if (binding->autorelease) {
+> > +                                       err = tcp_xa_pool_refill(sk, &tcp_xa_pool,
+> > +                                                                skb_shinfo(skb)->nr_frags - i);
+> > +                                       if (err)
+> > +                                               goto out;
+> > +
+> > +                                       dmabuf_cmsg.frag_token =
+> > +                                               tcp_xa_pool.tokens[tcp_xa_pool.idx];
+> > +                               } else {
+> > +                                       token = net_iov_virtual_addr(niov) >> PAGE_SHIFT;
+> > +                                       dmabuf_cmsg.frag_token = token;
+> > +                               }
+> > +
+> 
+> Consider refactoring this into a helper:
+> 
+> tcp_xa_pool_add(...., autorelease);
+> 
+
+Will do.
+
+> >
+> >                                 /* Will perform the exchange later */
+> > -                               dmabuf_cmsg.frag_token = tcp_xa_pool.tokens[tcp_xa_pool.idx];
+> >                                 dmabuf_cmsg.dmabuf_id = net_devmem_iov_binding_id(niov);
+> >
+> >                                 offset += copy;
+> > @@ -2585,8 +2612,14 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
+> >                                 if (err)
+> >                                         goto out;
+> >
+> > -                               atomic_long_inc(&niov->pp_ref_count);
+> > -                               tcp_xa_pool.netmems[tcp_xa_pool.idx++] = skb_frag_netmem(frag);
+> > +                               if (sk->sk_devmem_info.autorelease) {
+> > +                                       atomic_long_inc(&niov->pp_ref_count);
+> > +                                       tcp_xa_pool.netmems[tcp_xa_pool.idx++] =
+> > +                                               skb_frag_netmem(frag);
+> > +                               } else {
+> > +                                       if (atomic_inc_return(&niov->uref) == 1)
+> > +                                               atomic_long_inc(&niov->pp_ref_count);
+> 
+> I think we have a helper that does the pp_ref_count increment with a
+> nice name, so we don't have to look into the niov details in this
+> function.
+> 
+> Consider also factoring this into a helper, maybe:
+> 
+> tcp_xa_pool_get_niov(...., tcp_xa_pool, autorelease);
+> 
+
+Sounds good.
+
+> > +                               }
+> >
+> >                                 sent += copy;
+> >
+> > @@ -2596,7 +2629,9 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
+> >                         start = end;
+> >                 }
+> >
+> > -               tcp_xa_pool_commit(sk, &tcp_xa_pool);
+> > +               if (sk->sk_devmem_info.autorelease)
+> > +                       tcp_xa_pool_commit(sk, &tcp_xa_pool);
+> > +
+> 
+> Consider doing the autorelease cehck inside of tcp_xa_pool_commit to
+> remove the if statements from this function, maybe nicer.
+> 
+
+Sounds good.
+
+[...]
+
+> -- 
+> Thanks,
+> Mina
+
+Thanks!
+
+-Bobby
 
