@@ -1,114 +1,131 @@
-Return-Path: <netdev+bounces-233672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 712FFC17372
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:40:27 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72339C1737E
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:43:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C9321C6214C
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 22:40:51 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2108D4FB1F9
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 22:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC683570A4;
-	Tue, 28 Oct 2025 22:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B76A357719;
+	Tue, 28 Oct 2025 22:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="npzPWHl5"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="pQssramd"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 514623563FD
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 22:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B5E3570D5
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 22:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761691221; cv=none; b=oki4NsOEIrizbM8OeHfix8nWsh31RMFPKMxwWcJewJ3OUjLkIzYdxHEdlLQ16YzOKcC2wqPaENjqX2X8RNlVesY4J68yZnwGu86qRIEUN7jeQ84BnMO+I+Qi0ZqppUl0xHh7jqSAQ+idSVj5vYX9q3b+N0NSCNLHNwl8VmoLUGk=
+	t=1761691320; cv=none; b=Kf57bEb5RVwUfsVWtsmb8HAouK8+xTMysiUgjQEiakJ5bUotKWQI6rAjraOdF7unc/kpPs3CebtdwGDWHcCABzE/+3/wG6jfy+y1k3qKD5ffHVdSyCeSE4lvy4IUx3nyGRNUdrxMfAksQEdVZIA1MsvBeGUckWhEpkJr7a3F1GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761691221; c=relaxed/simple;
-	bh=9qPGT5/hyQCqOkmnpFMkk14KvZOwJ3zgv3UXYB/0Ta4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u/xYkJheFDQ8Wu7GDi9AMbCnH3wNazUM0hzjiEzOVkU89Hqkh48N7xcHqd7nYOlUveqXjSby52butGI7n9LYNyNGvTbUK1JbiX/cnjm+olQUPM9sUgpQID8rQI4uv9tVh89AnnCwE5KXxuWeldnA3IWbvhla4u0i9E0SZl+1z94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=npzPWHl5; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Tbwe1MrTnwet8PXUX0le34BIelpr3J1l3iqS0vSOdNc=; b=npzPWHl5Bf1voLCiP8nTa0a1wL
-	O5CzHwxro9h3YRxCkaHFT2Ys973WmNkdduW82uu3KLuga5pAzteHyU+zBd/FWDj2D/sIVEnpsYoym
-	CqbSLjyQCPicaJzXmQc48H7zYbo48waBjk/zllFLIufmXXKyyH1LAhwDPiK88/PZBp3I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vDsMQ-00CKzm-6w; Tue, 28 Oct 2025 23:40:14 +0100
-Date: Tue, 28 Oct 2025 23:40:14 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
-	kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
-	davem@davemloft.net
-Subject: Re: [net-next PATCH 3/8] net: phy: Add 25G-CR, 50G-CR, 100G-CR2
- support to C45 genphy
-Message-ID: <b1a3229b-50cc-4f99-a5fd-54335f1a8f83@lunn.ch>
-References: <176133835222.2245037.11430728108477849570.stgit@ahduyck-xeon-server.home.arpa>
- <176133845391.2245037.2378678349333571121.stgit@ahduyck-xeon-server.home.arpa>
- <c06dc4a6-85b4-41e9-9060-06303f7bbdbc@bootlin.com>
+	s=arc-20240116; t=1761691320; c=relaxed/simple;
+	bh=83BsrsHd9DtHXIvdniBfXhWCcsdNkwUdX9oNRcxQWWA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IMyZehMPQNSp9EX0GZtTKMEz2VzsM1VUP3EVtfk5wRzlgM0TKgA2PPm7X8lnAyWlWyip8Cz63FVNxjEur9FlgBHSv+lJEq5ucxuxY1bSNLrBhp+R0Qx8TMQQeLG7hqfqtlyrpNWKClYombI5k3ozZTSVkUgcYyABLRtFBMgykOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=pQssramd; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-33d962c0e9aso378221a91.0
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 15:41:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761691318; x=1762296118; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rhdhypFJDWIT7pOJW2kZUfFCC11WfHBrz2Nq1/pPCBQ=;
+        b=pQssramdldvU+onZlFa28wD8JgrFRyeL3IrR/aJioO0jQ/255UX+naCkWP+mX9SqSQ
+         +lNHcB25t1k0zI6/t/Pf0bDAdJDU3yLYWGk9PZt81kEuqQzvVz9AqpYv9tWprH80XZg4
+         tgbycR2DBtSxkOmP2S5zqdv1PRovgJnoBRcTWXjeR/cCf3DRVO0loEr/Pf+DwR3tXpPk
+         qFvE6tqVKouzNXjQg0DBTo20YnThIB2znsMA6rBgQBuUkXdThGYPN1X2S+SQl+AndbdZ
+         QV/G39u8Lpl4i5iWxmtfAU58xOulFG1LfwkNGA/j91blo9ZckOWAZlmtwrQv99878dfa
+         YFpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761691318; x=1762296118;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rhdhypFJDWIT7pOJW2kZUfFCC11WfHBrz2Nq1/pPCBQ=;
+        b=nHC4b7sPvCmuQjTuWngzMjpkkx6dhTurCJN5VZKXVmO7DQXlVD94yx2wj9HtuJnl6/
+         SeFWDNkCIFWPhn5lgZtrh9vC8eU6Q/y+RFOpIaB+CFUSnZIHps/ZDB6phcKTgh2Ox1yK
+         KB1b/ZdE+dDpCjZEkHC2WFkCkNLpmaZBOBG+1KDDjlu0vFD6bK8MVCXB6ZB2erMBntYb
+         8ahIC9kfAdFrM3gOv1yqoealgd8NK5rTZ4i8RTIXsLJlnPx61oM13q5tgUV9TuTGrHso
+         Hc3gOqggbXGtge07g3NbCB9KwYpA1TPFNV2oW3eOnjlKqRKcG+2le9VkNP8UJ/fyExe0
+         8iCg==
+X-Gm-Message-State: AOJu0Yxsjc5EFCFQqUZY1po2DAOMmK/XbxBunYa5HzFKhUJ0VGvCDVEJ
+	dqHZn5jLiUmFJHFr7VGhTa4gDSoQSg33ACZC8+a4nZsFdEMiFJSVevzjHcolHGAnpJRZdijt2Eb
+	2VHHwBSw=
+X-Gm-Gg: ASbGnctwlheMeF4gjWdiv63FRHU3Uu11OTPkx0hNx3HSUGENfsPj2DHmryby95VAYZ0
+	vg0L+ARs5UGg+5CJ/+GjBEe3d3ePG3IV6gKwCO/OYeX8Q8O6cnagAKj4QvEaCPCmhdn5Vxtx1Yn
+	ScI2QvZ2BcQR/T6FhkV3W57qVqbF/ktGGuZn6JUNDXVI7T+XTLHVI4ufdgvB4ondMDCsM1NKDXm
+	7Tt4li+7MGJn8YYn7G6sj6t23BPkaovpbv28/wJcsmyGynjeUMa0B5gHoj+keaxfEV9xygkpCAP
+	siyHlITdtPEZXy+GsLm6AVYe2278Fg0GM67ETOrcmSo6bjcELPlcOEI9bFLGo1H50CajBzD6Dt2
+	qzGsTYqYPE1VROKSS5t3Dc16zZyUYBiTb8FWF/9KVmtB0Fnu25LBDAQQ7V9keiP9jTTQMmufWkx
+	1ccHDJy+GK+9evRlEfRzyiQPKQ9yesiqnKKkLB8qyWj8LNDIgqpKkTGQ0/CoBxY/ixiFiO
+X-Google-Smtp-Source: AGHT+IG0iE584jRlKe5lISrbNMv41T1x67kLdkM9KYyyXjy+vROKVbk6iFfK4oAYQFvskuvGDu3KNw==
+X-Received: by 2002:a17:90b:134c:b0:32e:72bd:6d5a with SMTP id 98e67ed59e1d1-3403963d448mr861274a91.1.1761691317762;
+        Tue, 28 Oct 2025 15:41:57 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1156:1:c8f:b917:4342:fa09? ([2620:10d:c090:500::5:1375])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33fed81b40fsm13255992a91.16.2025.10.28.15.41.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Oct 2025 15:41:57 -0700 (PDT)
+Message-ID: <2f2333fb-707a-4d21-a32d-776489ddc343@davidwei.uk>
+Date: Tue, 28 Oct 2025 15:41:55 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c06dc4a6-85b4-41e9-9060-06303f7bbdbc@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 02/15] net: Implement
+ netdev_nl_bind_queue_doit
+To: Jakub Kicinski <kuba@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, toke@redhat.com,
+ yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+References: <20251020162355.136118-1-daniel@iogearbox.net>
+ <20251020162355.136118-3-daniel@iogearbox.net>
+ <20251023192842.31a2efc0@kernel.org>
+Content-Language: en-US
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20251023192842.31a2efc0@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 28, 2025 at 08:32:03AM +0100, Maxime Chevallier wrote:
-> Hi Alexander,
+On 2025-10-23 19:28, Jakub Kicinski wrote:
+> On Mon, 20 Oct 2025 18:23:42 +0200 Daniel Borkmann wrote:
+>> +void netdev_rx_queue_peer(struct net_device *src_dev,
+>> +			  struct netdev_rx_queue *src_rxq,
+>> +			  struct netdev_rx_queue *dst_rxq)
+>> +{
+>> +	netdev_assert_locked(src_dev);
+>> +	netdev_assert_locked(dst_rxq->dev);
+>> +
+>> +	netdev_hold(src_dev, &src_rxq->dev_tracker, GFP_KERNEL);
 > 
-> On 24/10/2025 22:40, Alexander Duyck wrote:
-> > From: Alexander Duyck <alexanderduyck@fb.com>
-> > 
-> > Add support for 25G-CR, 50G-CR, 50G-CR2, and 100G-CR2 the c45 genphy. Note
-> > that 3 of the 4 are IEEE compliant so they are a direct copy from the
-> > clause 45 specification, the only exception to this is 50G-CR2 which is
-> > part of the Ethernet Consortium specification which never referenced how to
-> > handle this in the MDIO registers.
-> > 
-> > Since 50GBase-CR2 isn't an IEEE standard it doesn't have a value in the
-> > extended capabilities registers. To account for that I am adding a define
-> > that is aliasing the 100GBase-CR4 to represent it as that is the media type
-> > used to carry data for 50R2, it is just that the PHY is carrying two 2 with
-> > 2 lanes each over the 4 lane cable. For now I am representing it with ctrl1
-> > set to 50G and ctrl2 being set to 100R4, and using the 100R4 capability to
-> > identify if it is supported or not.I
+> Isn't ->dev_tracker already used by sysfs?
+
+You're right, it is. Can netdevice_tracker not be shared?
+
 > 
-> If 50GBase-CR2 isn't part of IEEE standards and doesn't appear in the
-> C45 ext caps, does it really belong in a genphy helper ?
+> Are you handling the underlying device going away?
 
-I agree with you here. We should not pollute our nice clean 802.3
-implementation. If the Ethernet Consortium had defined how these modes
-are represented in MDIO registers, we could of added helpers which
-look at the vendor registers they chose to use. We have done this in
-the past, for the Open Alliance TC14 10BASE-T1S PLCA. But since each
-vendor is going to implement this differently, it should not be in the
-core.
+Ah, good point, no we're not handling that right now. Reading the code
+and intuitively, it doesn't look like holding the netdev refc will
+prevent something like unplugging the device...
 
-> You should be able to support it through the .config_aneg() callback in
-> the PHY driver.
+I take it an unregistration notifier e.g. xsk_notifier() is the way to
+handle it?
 
-It is probably a little more than .config_aneg(), but yes.
-
-I assume FB/META have an OUI for their MAC addresses? I _think_ the
-same OUI can be used for registers 2 and 3 in MDIO. So your fake PHY
-can indicate it is a FB/META PHY and cause the FB/META PHY driver to
-load. The .get_features callback can append this 50GBase-CR2 link
-mode. The .read_status() can indicate if it is in use etc. And you can
-do all the other link modes by just calling the helpers. I assume you
-are currently using the genphy_c45_driver? That can be used as a
-template.
-
-	Andrew
+> 
+>> +	__netdev_rx_queue_peer(src_rxq, dst_rxq);
+>> +}
 
