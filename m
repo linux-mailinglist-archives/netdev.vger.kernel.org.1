@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-233636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4988EC16C1B
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 21:25:28 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85776C16C1E
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 21:25:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A42A18973CD
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 20:25:52 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 27233355CBF
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 20:25:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78852BD59C;
-	Tue, 28 Oct 2025 20:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A98F2C11CB;
+	Tue, 28 Oct 2025 20:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gdqC5sIS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cbxakLAk"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3328A21D5B0
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 20:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8A429E0F8
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 20:25:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761683124; cv=none; b=tE09Z3VL4Aw8FKYFrAPtFmMKdvKA+vnOsAzH5hLRUSHTVRmOsTZuyCMqHXoKCj+PL3WngrMv1K36ouHk+aXM8sy7f5qkgvZ8RJnP/nQLXlQgS9s7PrCGKsk3zoeJHNKv8jD+zAlT9QzBUCbxu/joqwIUqIPiNSns5QpSW44GIS0=
+	t=1761683126; cv=none; b=DW3tiHmJoM1aJEEz6w8T3vsA/VP7i+/42ZrbuT9K9zvs+txKaTfkb69AP4n9UgA/iX4pior4s9HG/pMPGAFvRiFeLvBOwi2yXqI5QUape0TQsxxxIUXWTxsuJRBLWICWzbUXiqgR8AnFf/LxDVCB2xpupGXxto23lk9gJYxff9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761683124; c=relaxed/simple;
-	bh=Xi70oGj/LPSRXBpiVxBQDbD1wenV1opYVOibDp97Q0Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TCfjal/TAlonpJkI/6m2cOV3dOHmvBldv/ClfZ0KRuAs+AsxqApS9/WtdB6w61ThvPBwul/P4LMGxUXi7Oge59DUTV6wOqwzu+BSyjoXamAVtPMUlwuD5I+Cluua3JIZ0k7L8s8TMIZmFwhS6crjqX/VO7ZMeZAAsQjm/lORXb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gdqC5sIS; arc=none smtp.client-ip=192.198.163.19
+	s=arc-20240116; t=1761683126; c=relaxed/simple;
+	bh=kXgIwPeEnZwQf/ag7q7910rKMp4/bOnVeQrPrPEt8g4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fJoCND1xLKboeM2NydN3U/0WY99+YnOa1PN+Fg3ltIn7ia/QdML84AR845evxXBThZVbGalA3r//atnhw6wW8b8JSzBOlPAM/t1eFJIrsABgMH98WT+q4DqIjQo8io9RlMMmiGD+cE0vDp4FwLfM53+X2FWmCljl5eurtWH6pwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cbxakLAk; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761683123; x=1793219123;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Xi70oGj/LPSRXBpiVxBQDbD1wenV1opYVOibDp97Q0Q=;
-  b=gdqC5sISNBwGJrCZvf26HUWlXTT793NurA8TKrDh3epO9Q4RvwdfAM9e
-   0cZWv5g5vty2tNWCrFyx7eZSudVtH3rdnmQ5b6Q6XX6RBuS/TWQhJbbpv
-   Bnz3um3cMzpGnfjBURGRKWU/BylFVL3DkhZ4hkFNT9fwMVZBBcVVgpTEf
-   AZLNJ23cxaaRAO2Lfvu+BQvTQh9rsucOdbx5Wbd02tu4gpgftk+txK1Dc
-   SjtkGpGf8FuDC5QVvMfX1oCafLlU1lMkdiFRX/ftb0TDyW+5UiIrnvur5
-   KLMBm5zcDEnwxXQLVZW+hB54LHr6RRlgBCRG44grQlLIRySQBo/rKuEyD
-   w==;
-X-CSE-ConnectionGUID: +uilc4MqTPilFpoquBgEFA==
-X-CSE-MsgGUID: x9lP+JFpTN63Bj0Cph9aUA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="62825145"
+  t=1761683124; x=1793219124;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=kXgIwPeEnZwQf/ag7q7910rKMp4/bOnVeQrPrPEt8g4=;
+  b=cbxakLAkFr5K2Em9fxAAytVFV55gq5T5fO93YhPOBv4ccOSBdyPdPujw
+   zynqUuCjXw2XhsFs08PUAM7ooop7P3QKRcf6kQbGE5Zao8wTbpTU5Qh6c
+   XcWBmbR2sKLLsWldnnDiXbyT5BVoydoHmq+u72gsyIWDfzDIDkMKquJWO
+   473thI8kAF1t4BgJw6foXTFFqv2/duwo1ksJ+QMyLzSWGckhP+BpSddIR
+   5Q2l9s0CNKGnTyBCXaeQyXX6uzjOZ7dw9sct+Y5/F3d7QOzIWnJ8KPAjY
+   eKYChDUkN2E5sCqc6T8EGQtNjZSKfBC2XfkpOrwD10/naQsGKJZuTvRnX
+   Q==;
+X-CSE-ConnectionGUID: JSTVohgRQ6+JTOT3PvyqWw==
+X-CSE-MsgGUID: Pwp3AAmhRXGhCLzvlGRwbw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="62825146"
 X-IronPort-AV: E=Sophos;i="6.19,262,1754982000"; 
-   d="scan'208";a="62825145"
+   d="scan'208";a="62825146"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 13:25:22 -0700
-X-CSE-ConnectionGUID: I+cZiujNSRauRYwwQ/bJ2A==
-X-CSE-MsgGUID: w0bQ7BYbQpSmSiNqNJVtDg==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 13:25:23 -0700
+X-CSE-ConnectionGUID: vIBTi6UQRdmwa55pVS8p3A==
+X-CSE-MsgGUID: 4hBTSLGaSpusQLEcs32Q9A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,262,1754982000"; 
-   d="scan'208";a="185790141"
+   d="scan'208";a="185790148"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa008.fm.intel.com with ESMTP; 28 Oct 2025 13:25:22 -0700
+  by fmviesa008.fm.intel.com with ESMTP; 28 Oct 2025 13:25:23 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -64,11 +65,19 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: [PATCH net 0/8][pull request] Intel Wired LAN Driver Updates 2025-10-28 (ice, ixgbe, igb, igc)
-Date: Tue, 28 Oct 2025 13:25:05 -0700
-Message-ID: <20251028202515.675129-1-anthony.l.nguyen@intel.com>
+Cc: Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	anthony.l.nguyen@intel.com,
+	arkadiusz.kubalewski@intel.com,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Milena Olech <milena.olech@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Rinitha S <sx.rinitha@intel.com>
+Subject: [PATCH net 1/8] ice: fix lane number calculation
+Date: Tue, 28 Oct 2025 13:25:06 -0700
+Message-ID: <20251028202515.675129-2-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20251028202515.675129-1-anthony.l.nguyen@intel.com>
+References: <20251028202515.675129-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,43 +86,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For ice, Grzegorz fixes setting of PHY lane number and logical PF ID for
-E82x devices. He also corrects access of CGU (Clock Generation Unit) on
-dual complex devices.
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 
-Kohei Enju resolves issues with error path cleanup for probe when in
-recovery mode on ixgbe and ensures PHY is powered on for link testing
-on igc. Lastly, he converts incorrect use of -ENOTSUPP to -EOPNOTSUPP
-on igb, igc, and ixgbe.
+E82X adapters do not have sequential IDs, lane number is PF ID.
 
-The following are changes since commit 210b35d6a7ea415494ce75490c4b43b4e717d935:
-  dt-bindings: net: sparx5: Narrow properly LAN969x register space windows
-and are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 100GbE
+Add check for ICE_MAC_GENERIC and skip checking port options.
 
-Grzegorz Nitka (3):
-  ice: fix lane number calculation
-  ice: fix destination CGU for dual complex E825
-  ice: fix usage of logical PF id
+Also, adjust logical port number for specific E825 device with external
+PHY support (PCI device id 0x579F). For this particular device,
+with 2x25G (PHY0) and 2x10G (PHY1) port configuration, modification of
+pf_id -> lane_number mapping is required. PF IDs on the 2nd PHY start
+from 4 in such scenario. Otherwise, the lane number cannot be
+determined correctly, leading to PTP init errors during PF initialization.
 
-Kohei Enju (5):
-  ixgbe: fix memory leak and use-after-free in ixgbe_recovery_probe()
-  igc: power up the PHY before the link test
-  igb: use EOPNOTSUPP instead of ENOTSUPP in igb_get_sset_count()
-  igc: use EOPNOTSUPP instead of ENOTSUPP in
-    igc_ethtool_get_sset_count()
-  ixgbe: use EOPNOTSUPP instead of ENOTSUPP in
-    ixgbe_ptp_feature_enable()
+Fixes: 258f5f9058159 ("ice: Add correct PHY lane assignment")
+Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Milena Olech <milena.olech@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_common.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
- drivers/net/ethernet/intel/ice/ice_common.c   | 35 +++++++++++++++++--
- .../net/ethernet/intel/ice/ice_flex_pipe.c    |  2 +-
- drivers/net/ethernet/intel/ice/ice_sbq_cmd.h  |  1 +
- drivers/net/ethernet/intel/igb/igb_ethtool.c  |  2 +-
- drivers/net/ethernet/intel/igc/igc_ethtool.c  |  5 ++-
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c  |  2 +-
- 7 files changed, 42 insertions(+), 7 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 2250426ec91b..28d74bf56ffc 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -4382,6 +4382,15 @@ int ice_get_phy_lane_number(struct ice_hw *hw)
+ 	unsigned int lane;
+ 	int err;
+ 
++	/* E82X does not have sequential IDs, lane number is PF ID.
++	 * For E825 device, the exception is the variant with external
++	 * PHY (0x579F), in which there is also 1:1 pf_id -> lane_number
++	 * mapping.
++	 */
++	if (hw->mac_type == ICE_MAC_GENERIC ||
++	    hw->device_id == ICE_DEV_ID_E825C_SGMII)
++		return hw->pf_id;
++
+ 	options = kcalloc(ICE_AQC_PORT_OPT_MAX, sizeof(*options), GFP_KERNEL);
+ 	if (!options)
+ 		return -ENOMEM;
 -- 
 2.47.1
 
