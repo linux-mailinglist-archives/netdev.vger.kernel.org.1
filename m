@@ -1,314 +1,193 @@
-Return-Path: <netdev+bounces-233559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C08AC156BE
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:25:38 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D372CC1566F
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:22:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 581E85044E8
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:20:31 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 46BF135510E
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A179434028B;
-	Tue, 28 Oct 2025 15:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867782E7BAA;
+	Tue, 28 Oct 2025 15:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qq+aDogl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d+BLODnj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69CA733F8DC;
-	Tue, 28 Oct 2025 15:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A938F23E355
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 15:22:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761664812; cv=none; b=U4QxA6zwuaIZVu8bbOnGlL+ZHIEMfqAZzipnKW6ZolmLo8vcPnTGruwCoVMHvJHTa3/x9aLly2LKn31IAsaAqjCQZYbA3RVQP3KEwzxdxJ1DQC4JDnXxuwTza3OZPbQCq1FSQQa3m06PTGIno1U7q2KsWaGKJwquUDL7o4NnL/I=
+	t=1761664939; cv=none; b=fatxvfvEQG9m9e6KURxVGA9Icd1SjQ05R5yamSk640B2byFnx77M1LFxCGNzkNdmEvNvGmThZEAwJXLUjGh9aH5a6vQGUZsRDBqQXMrFC4w148SR7mQc+nAZYXeWj2CJBH3lxecq5a+ruwBEkghjnqh0O+I0j7qIocVyBqS17Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761664812; c=relaxed/simple;
-	bh=v9Rv1HV3ikERpxpW7AFoVZzI5l2h0fNjA8LM+9vK5U4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HnXQHB4OBCQzqBTJebwgXNdIs3hUPL8QPzGH81+DX2aTHOW/uKpxNT9lH/WO6h1oVHh1DIh8IWT4zciDz0tvQKPr18uBGWD4tIdoYWY/Yl7pSJakorMtg9WK1G1p79RdBcxwuHdmD9dJLpe46QQc7++nl1MojpZOQZtTONR1tA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qq+aDogl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11D2CC4CEE7;
-	Tue, 28 Oct 2025 15:20:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761664812;
-	bh=v9Rv1HV3ikERpxpW7AFoVZzI5l2h0fNjA8LM+9vK5U4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Qq+aDoglEAEQeZj43j1Ad6bErXdWun4BUqRgwXwoPFKAf/z011GLNFY7bIPgOKkBw
-	 0xwuuW7/3ijghyDkNnHVsZVgy+w2I86WF+S0DFH6R6pou2EiYfmwr1OR+91OsYR2cC
-	 YzsGU/+kV1g+48Y9C2KzvIeVZ8bpGhcgJbx+hdSZIgRcSTo3ye1jcxTBgPLG+538s7
-	 tvNOfs8wSga3jNoEnPPnBTYKW7kSRn40U5+aWQEF0jb8/kccNi01lfrQRf/VbEOg1O
-	 ZmAFI+7NoT6i575j/FD4+FLa4JZ1mOfawv9/MV9efOtLb7W99c5tz5Mbv03wOPlsVW
-	 Fh4aS/RkNfevg==
-Date: Tue, 28 Oct 2025 16:20:04 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
-	Jeff Layton <jlayton@kernel.org>, Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Amir Goldstein <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	bpf@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH v3 17/70] nstree: add listns()
-Message-ID: <20251028-landhaus-akademie-875cd140fbbb@brauner>
-References: <20251024-work-namespace-nstree-listns-v3-0-b6241981b72b@kernel.org>
- <20251024-work-namespace-nstree-listns-v3-17-b6241981b72b@kernel.org>
- <481c973c-3ae5-4184-976e-96ab633dd09a@app.fastmail.com>
+	s=arc-20240116; t=1761664939; c=relaxed/simple;
+	bh=bZ55QK+UJTgOBscIivnjq8lKsYP/XcmuAJEd7jZIHFc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mcdTkRi2mI/BrctPHBhf4SjqJyLBFXwCqBM57xqjWNx2M2dmxJlxASBdZ7R91QsxpkzDYPSssCs0iH0yFMAWj34BoRH0sPvRK19gWaRw3knKQO03ajskihcyYGO/TSFqDqUzStaW2d81O/e/WJBDIdSBMi8C10OoZdH9SEbsCDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d+BLODnj; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-475dd559a83so20346945e9.1
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 08:22:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761664936; x=1762269736; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZOG8l11v2spqZc+zU8CHcKzAc9L+U6Lb+jKyLh1lIIg=;
+        b=d+BLODnjX1DWgk11JzX68j64oS35IM0vYfrAFWzBw34swFOxNo7gUAvHb1ZAl4HS6x
+         ZttrKI0f05MPjIb86xsBRLGR6hwwBhFJLeVVcXRSI61zNTAP19ZJ44jjXR1ZWjG4HGZw
+         nT3UdNsqvA6+LhJUw8EOhVeaEVYvLhuGoNUr8Rty4+R8aoEIhMZYsqtQ3WB6HnffiRcZ
+         Fj5Cd4EOtae91td8DcIskeGR5G9F45fBnDDMYtaRl+/wrfops37BG8IE8DdwuA04erCV
+         e+SxeMcdQf8oyLeS2n+E7j4pe8eW/UaNZu1ZlX7tGjQIb7l3u6oygVNjVPtbs6Ssb7zM
+         AVpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761664936; x=1762269736;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZOG8l11v2spqZc+zU8CHcKzAc9L+U6Lb+jKyLh1lIIg=;
+        b=hEINOMElZmpKqfLm5TLPwPrqg18OMDdKX9P4UGWzz8CYqHPvFylV68QUIUacspwi6J
+         MNXaurKaGnvoTw7OMA5xRGF84B0EUrUqFtt+YjrR7c1QRcpGStZ/ZDhn9MOL0AEhwVl3
+         u7r/dJ2qEfkeKxyakLln7QnWsA5XEaTegFGSqyItP94fD7o4nEo/eKL7TKuEYheY3dGz
+         Q+a75jUVlDahAwfwdpbPB03Aaf9e1wz7/f0G6UQi7HBaF5wv0okNqQCXzAa7AHWkaDq9
+         j9YGEt6KPg/pEalHsNn/+aO4x7haKd65yeeZn7cMb+6j2vJXxSpFsjXyRlVrIGE1Ar75
+         UsOA==
+X-Forwarded-Encrypted: i=1; AJvYcCWdUyDuZ/b/QxTCRYOJPdK2iA1Vv1KJfkp9MVCHKx9IR3/4ptSpjr8weBMMnAmL8uFaXnw1ZzQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYW3QCx0wfxk0xyH7Xk9FrJqm6JHMZTBt2URGrIsXAPjiw7Yd/
+	QE5dNk7NRg6IuUvDEMGVN84nuAlKhEVvemKDS7PxYrYCdFlTXloK5gmA
+X-Gm-Gg: ASbGncvwASPt17OBR3QLf2L5yTKPeH41X09KJTwIRPNoqNpO/atZ8IK5zn6dQ7FabII
+	OZaf3G0wGH3DTOESNGYGZ7G40q3BtMlOQJdU/gDoFL6wQI21hXACHlPxEkbEdeP+1QdoYtZvoy+
+	ZOkQqh5SoU71sMPVQYahgU6C+lgKtUsQF3+Nu29ILkc0dzZCe3o/8s3hexNTWTk2BYO9i6zXS4F
+	vEBr4qItCQC+FhzvEva0P0/X0TMMv/XHKBnEcUTPHrIg4NAdxPYhAqbPzpgWz8rCVSPliJqd1bX
+	WQqDmiJ56U78sall7d+Hso8o7/h0V8UKzjma8O62mzi3tU0hJzj36WDzNUZQGJtbS9IIsT1abYU
+	vRJ2KtFEsv7Ss5pCwPugySuxYUuAc0jCtlFYO/Z8SPnmwPlPEBn+iaYhDw2nUj9T5xGPaSq+Enw
+	WVh+qFgvJKsrgbQrDpTGCoY4K2D+mnqsoCp+0U8L9IGRLUHAZZzXM=
+X-Google-Smtp-Source: AGHT+IFRElJe62Xb8s7qSrjr6kyFkD31Ah3etFBxj6GTGAkmpSgwGWXZOzawiteETRfJZI44QPlxIg==
+X-Received: by 2002:a05:600c:354c:b0:471:14af:c715 with SMTP id 5b1f17b1804b1-47717df8437mr38712565e9.3.1761664935742;
+        Tue, 28 Oct 2025 08:22:15 -0700 (PDT)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475dd48942dsm204991395e9.4.2025.10.28.08.22.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Oct 2025 08:22:14 -0700 (PDT)
+Message-ID: <4efc2d91-49df-4606-894e-92ac89c3ae9c@gmail.com>
+Date: Tue, 28 Oct 2025 15:22:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <481c973c-3ae5-4184-976e-96ab633dd09a@app.fastmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/3] io_uring/zcrx: share an ifq between rings
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+References: <20251026173434.3669748-1-dw@davidwei.uk>
+ <20251026173434.3669748-4-dw@davidwei.uk>
+ <309cb5ce-b19a-47b8-ba82-e75f69fe5bb3@gmail.com>
+ <acb27d6b-5602-41c8-8fe5-4e88827713a4@davidwei.uk>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <acb27d6b-5602-41c8-8fe5-4e88827713a4@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 24, 2025 at 04:06:57PM +0200, Arnd Bergmann wrote:
-> On Fri, Oct 24, 2025, at 12:52, Christian Brauner wrote:
-> > Add a new listns() system call that allows userspace to iterate through
-> > namespaces in the system. This provides a programmatic interface to
-> > discover and inspect namespaces, enhancing existing namespace apis.
+On 10/28/25 14:55, David Wei wrote:
+> On 2025-10-27 03:20, Pavel Begunkov wrote:
+>> On 10/26/25 17:34, David Wei wrote:
+>>> Add a way to share an ifq from a src ring that is real i.e. bound to a
+>>> HW RX queue with other rings. This is done by passing a new flag
+>>> IORING_ZCRX_IFQ_REG_SHARE in the registration struct
+>>> io_uring_zcrx_ifq_reg, alongside the fd of the src ring and the ifq id
+>>> to be shared.
+>>>
+>>> To prevent the src ring or ifq from being cleaned up or freed while
+>>> there are still shared ifqs, take the appropriate refs on the src ring
+>>> (ctx->refs) and src ifq (ifq->refs).
+>>>
+>>> Signed-off-by: David Wei <dw@davidwei.uk>
+>>> ---
+>>>   include/uapi/linux/io_uring.h |  4 ++
+>>>   io_uring/zcrx.c               | 74 ++++++++++++++++++++++++++++++++++-
+>>>   2 files changed, 76 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+>>> index 569cc0338acb..7418c959390a 100644
+>>> --- a/io_uring/zcrx.c
+>>> +++ b/io_uring/zcrx.c
+> [...]
+>>> @@ -541,6 +541,67 @@ struct io_mapped_region *io_zcrx_get_region(struct io_ring_ctx *ctx,
+>>>       return ifq ? &ifq->region : NULL;
+>>>   }
+>>> +static int io_share_zcrx_ifq(struct io_ring_ctx *ctx,
+>>> +                 struct io_uring_zcrx_ifq_reg __user *arg,
+>>> +                 struct io_uring_zcrx_ifq_reg *reg)
+>>> +{
+>>> +    struct io_ring_ctx *src_ctx;
+>>> +    struct io_zcrx_ifq *src_ifq;
+>>> +    struct file *file;
+>>> +    int src_fd, ret;
+>>> +    u32 src_id, id;
+>>> +
+>>> +    src_fd = reg->if_idx;
+>>> +    src_id = reg->if_rxq;
+>>> +
+>>> +    file = io_uring_register_get_file(src_fd, false);
+>>> +    if (IS_ERR(file))
+>>> +        return PTR_ERR(file);
+>>> +
+>>> +    src_ctx = file->private_data;
+>>> +    if (src_ctx == ctx)
+>>> +        return -EBADFD;
+>>> +
+>>> +    mutex_unlock(&ctx->uring_lock);
+>>> +    io_lock_two_rings(ctx, src_ctx);
+>>> +
+>>> +    ret = -EINVAL;
+>>> +    src_ifq = xa_load(&src_ctx->zcrx_ctxs, src_id);
+>>> +    if (!src_ifq)
+>>> +        goto err_unlock;
+>>> +
+>>> +    percpu_ref_get(&src_ctx->refs);
+>>> +    refcount_inc(&src_ifq->refs);
+>>> +
+>>> +    scoped_guard(mutex, &ctx->mmap_lock) {
+>>> +        ret = xa_alloc(&ctx->zcrx_ctxs, &id, NULL, xa_limit_31b, GFP_KERNEL);
+>>> +        if (ret)
+>>> +            goto err_unlock;
+>>> +
+>>> +        ret = -ENOMEM;
+>>> +        if (xa_store(&ctx->zcrx_ctxs, id, src_ifq, GFP_KERNEL)) {
+>>> +            xa_erase(&ctx->zcrx_ctxs, id);
+>>> +            goto err_unlock;
+>>> +        }
+>>
+>> It's just xa_alloc(..., src_ifq, ...);
+>>
+>>> +    }
+>>> +
+>>> +    reg->zcrx_id = id;
+>>> +    if (copy_to_user(arg, reg, sizeof(*reg))) {
+>>> +        ret = -EFAULT;
+>>> +        goto err;
+>>> +    }
+>>
+>> Better to do that before publishing zcrx into ctx->zcrx_ctxs
 > 
-> I double-checked that the ABI is well-formed and works the same
-> way on all supported architectures, though I did not check the functional
-> aspects.
-> 
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
-> 
-> One small thing I noticed:
-> 
-> > +SYSCALL_DEFINE4(listns, const struct ns_id_req __user *, req,
-> > +		u64 __user *, ns_ids, size_t, nr_ns_ids, unsigned int, flags)
-> > +{
-> > +	struct klistns klns __free(klistns_free) = {};
-> > +	const size_t maxcount = 1000000;
-> > +	struct ns_id_req kreq;
-> > +	ssize_t ret;
-> > +
-> > +	if (flags)
-> > +		return -EINVAL;
-> > +
-> > +	if (unlikely(nr_ns_ids > maxcount))
-> > +		return -EOVERFLOW;
-> > +
-> > +	if (!access_ok(ns_ids, nr_ns_ids * sizeof(*ns_ids)))
-> > +		return -EFAULT;
-> 
-> I'm a bit worried about hardcoding the maxcount value here, which
-> seems to limit both the size of the allocation and prevent overflowing
-> the multiplication of the access_ok() argument, though that isn't
-> completely clear from the implementation.
-> 
-> Allowing 8MB of vmalloc space to be filled can be bad on 32-bit
-> systems that may only have 100MB in total. The access_ok() check
-> looks like it tries to provide an early-fail error return but
-> should not actually be needed since there is a single copy_to_user()
-> in the end, and that is more likely to fail for unmapped memory than
-> an access_ok() failure.
-> 
-> Would it make sense to just drop the kvmalloc() completely and
-> instead put_user() the output values individually? That way you
-> can avoid both a hardwired limit and a potential DoS from vmalloc
-> exhaustion.
+> I can only do one of the two suggestions above. No valid id until
+> xa_alloc() returns, so I either split xa_alloc()/xa_store() with
+> copy_to_user() in between, or I do a single xa_alloc() and
+> copy_to_user() after.
 
-Initially this wasn't possible because we walked all of this completely
-with only rcu protection. But now that we always have to take a passive
-reference its possible to do what you suggest. This would mean
-ping-ponging the rcu_read_lock()/rcu_read_unlock() but that's probably
-fine. How do you feel about the following?: 
+Makes sense, I'd do splitting then, at least this way it's
+not exposing it to the user space for a brief moment.
 
-diff --git a/kernel/nstree.c b/kernel/nstree.c
-index 1455573e774e..e4c8508e97c7 100644
---- a/kernel/nstree.c
-+++ b/kernel/nstree.c
-@@ -382,7 +382,7 @@ u64 __ns_tree_gen_id(struct ns_common *ns, u64 id)
- }
- 
- struct klistns {
--	u64 *kns_ids;
-+	u64 __user *uns_ids;
- 	u32 nr_ns_ids;
- 	u64 last_ns_id;
- 	u64 user_ns_id;
-@@ -395,9 +395,8 @@ static void __free_klistns_free(const struct klistns *kls)
- {
- 	if (kls->user_ns_id != LISTNS_CURRENT_USER)
- 		put_user_ns(kls->user_ns);
--	if (kls->first_ns)
-+	if (kls->first_ns && kls->first_ns->ops)
- 		kls->first_ns->ops->put(kls->first_ns);
--	kvfree(kls->kns_ids);
- }
- 
- #define NS_ALL (PID_NS | USER_NS | MNT_NS | UTS_NS | IPC_NS | NET_NS | CGROUP_NS | TIME_NS)
-@@ -429,18 +428,13 @@ static int copy_ns_id_req(const struct ns_id_req __user *req,
- }
- 
- static inline int prepare_klistns(struct klistns *kls, struct ns_id_req *kreq,
--				  size_t nr_ns_ids)
-+				  u64 __user *ns_ids, size_t nr_ns_ids)
- {
- 	kls->last_ns_id = kreq->ns_id;
- 	kls->user_ns_id = kreq->user_ns_id;
--	kls->nr_ns_ids = nr_ns_ids;
--	kls->ns_type = kreq->ns_type;
--
--	kls->kns_ids = kvmalloc_array(nr_ns_ids, sizeof(*kls->kns_ids),
--				      GFP_KERNEL_ACCOUNT);
--	if (!kls->kns_ids)
--		return -ENOMEM;
--
-+	kls->nr_ns_ids	= nr_ns_ids;
-+	kls->ns_type	= kreq->ns_type;
-+	kls->uns_ids	= ns_ids;
- 	return 0;
- }
- 
-@@ -459,8 +453,9 @@ static struct ns_common *lookup_ns_owner_at(u64 ns_id, struct ns_common *owner)
- 	node = owner->ns_owner_tree.rb_node;
- 
- 	while (node) {
--		struct ns_common *ns = node_to_ns_owner(node);
-+		struct ns_common *ns;
- 
-+		ns = node_to_ns_owner(node);
- 		if (ns_id <= ns->ns_id) {
- 			ret = ns;
- 			if (ns_id == ns->ns_id)
-@@ -494,7 +489,7 @@ static struct ns_common *lookup_ns_id(u64 mnt_ns_id, int ns_type)
- 
- static ssize_t do_listns_userns(struct klistns *kls)
- {
--	u64 *ns_ids = kls->kns_ids;
-+	u64 __user *ns_ids = kls->uns_ids;
- 	size_t nr_ns_ids = kls->nr_ns_ids;
- 	struct ns_common *ns = NULL, *first_ns = NULL;
- 	const struct list_head *head;
-@@ -525,7 +520,9 @@ static ssize_t do_listns_userns(struct klistns *kls)
- 	ret = 0;
- 	head = &to_ns_common(kls->user_ns)->ns_owner;
- 	userns_capable = ns_capable_noaudit(kls->user_ns, CAP_SYS_ADMIN);
--	guard(rcu)();
-+
-+	rcu_read_lock();
-+
- 	if (!first_ns)
- 		first_ns = list_entry_rcu(head->next, typeof(*ns), ns_owner_entry);
- 	for (ns = first_ns; &ns->ns_owner_entry != head && nr_ns_ids;
-@@ -534,19 +531,28 @@ static ssize_t do_listns_userns(struct klistns *kls)
- 			continue;
- 		if (!ns_get_unless_inactive(ns))
- 			continue;
-+
-+		rcu_read_unlock();
-+
- 		if (userns_capable || is_current_namespace(ns) ||
- 		    ((ns->ns_type == CLONE_NEWUSER) && ns_capable_noaudit(to_user_ns(ns), CAP_SYS_ADMIN))) {
--			*ns_ids = ns->ns_id;
--			ns_ids++;
-+			if (put_user(ns->ns_id, ns_ids + ret))
-+				return -EINVAL;
- 			nr_ns_ids--;
- 			ret++;
- 		}
-+
- 		if (need_resched())
--			cond_resched_rcu();
-+			cond_resched();
-+
-+		rcu_read_lock();
-+
- 		/* doesn't sleep */
--		ns->ops->put(ns);
-+		if (ns->ops)
-+			ns->ops->put(ns);
- 	}
- 
-+	rcu_read_unlock();
- 	return ret;
- }
- 
-@@ -626,7 +632,7 @@ static inline bool ns_common_is_head(struct ns_common *ns,
- 
- static ssize_t do_listns(struct klistns *kls)
- {
--	u64 *ns_ids = kls->kns_ids;
-+	u64 __user *ns_ids = kls->uns_ids;
- 	size_t nr_ns_ids = kls->nr_ns_ids;
- 	struct ns_common *ns, *first_ns = NULL;
- 	struct ns_tree *ns_tree = NULL;
-@@ -659,7 +665,8 @@ static ssize_t do_listns(struct klistns *kls)
- 	else
- 		head = &ns_unified_list;
- 
--	guard(rcu)();
-+	rcu_read_lock();
-+
- 	if (!first_ns)
- 		first_ns = first_ns_common(head, ns_tree);
- 
-@@ -669,6 +676,9 @@ static ssize_t do_listns(struct klistns *kls)
- 			continue;
- 		if (!ns_get_unless_inactive(ns))
- 			continue;
-+
-+		rcu_read_unlock();
-+
- 		/* Check permissions */
- 		if (!ns->ops)
- 			user_ns = NULL;
-@@ -679,16 +689,22 @@ static ssize_t do_listns(struct klistns *kls)
- 		if (ns_capable_noaudit(user_ns, CAP_SYS_ADMIN) ||
- 		    is_current_namespace(ns) ||
- 		    ((ns->ns_type == CLONE_NEWUSER) && ns_capable_noaudit(to_user_ns(ns), CAP_SYS_ADMIN))) {
--			*ns_ids++ = ns->ns_id;
-+			if (put_user(ns->ns_id, ns_ids + ret))
-+				return -EINVAL;
- 			nr_ns_ids--;
- 			ret++;
- 		}
- 		if (need_resched())
--			cond_resched_rcu();
-+			cond_resched();
-+
-+		rcu_read_lock();
-+
- 		/* doesn't sleep */
--		ns->ops->put(ns);
-+		if (ns->ops)
-+			ns->ops->put(ns);
- 	}
- 
-+	rcu_read_unlock();
- 	return ret;
- }
- 
-@@ -713,19 +729,12 @@ SYSCALL_DEFINE4(listns, const struct ns_id_req __user *, req,
- 	if (ret)
- 		return ret;
- 
--	ret = prepare_klistns(&klns, &kreq, nr_ns_ids);
-+	ret = prepare_klistns(&klns, &kreq, ns_ids, nr_ns_ids);
- 	if (ret)
- 		return ret;
- 
- 	if (kreq.user_ns_id)
--		ret = do_listns_userns(&klns);
--	else
--		ret = do_listns(&klns);
--	if (ret <= 0)
--		return ret;
-+		return do_listns_userns(&klns);
- 
--	if (copy_to_user(ns_ids, klns.kns_ids, ret * sizeof(*ns_ids)))
--		return -EFAULT;
--
--	return ret;
-+	return do_listns(&klns);
- }
+-- 
+Pavel Begunkov
+
 
