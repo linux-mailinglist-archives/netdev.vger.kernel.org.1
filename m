@@ -1,97 +1,152 @@
-Return-Path: <netdev+bounces-233522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0DC4C14D00
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 14:25:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C632C14E67
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 14:37:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 816D63ABC01
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:25:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFE1D3A9F22
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0553C2DA746;
-	Tue, 28 Oct 2025 13:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 608FA337108;
+	Tue, 28 Oct 2025 13:33:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ucPQCc0C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qmEwP7kC"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26AB933E7;
-	Tue, 28 Oct 2025 13:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2460B335063;
+	Tue, 28 Oct 2025 13:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761657912; cv=none; b=SW6noalhAzn3g8I6DtLhR1LqRp45QRJ9MbLT8StS/7N7g9ifLmmkQDoxA3v9JpszseDtqrXOD55wgaRq8mmMJjf6ktxGKtyGOwZsQUgSR8hbDROFR2XrWwwEynfJZfvumCR710u3DVdbJUxWeO2qeWrBHeKaO16aKEbKrvRN2w0=
+	t=1761658391; cv=none; b=ZkV7gpEPfR9pH/ktFfXtcN9rsAzmO9BjzrYaj6WmTZqewe9EwVwid+7g6Z5OI/Hme6ZiaiaMVqWQLEHEeXPBlI3uuyc2QuzRtMMGSvjhsa7LRyf4kIy4B8MOcVjhtSbpMkN/jPNHQwjrNsC4e40FobMZ0NJVzGmlM9vu8/mOFag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761657912; c=relaxed/simple;
-	bh=+73ES3vFky/WtRPYBzIKEqLPdiDRYFGkszb9lqjt6Qs=;
+	s=arc-20240116; t=1761658391; c=relaxed/simple;
+	bh=zHgFOuY5SFOlmk5HuLBk82BmMu84ypaw7kIZB0Jb67g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H94d8XHLYNZlqZRWt9Fk89VhL5s3JWFCedXKThbH9V+ilQY6vCYrwfzXJawW/qx+fEdJ9KShEU48z2TVTPc334LWWp/iePWf0oeIMd2AJ4rAfuqjOdULvnEHWPYmrIUSiFc8DPugnaio0l8n+xGtDW8OBP4mQQKt2JmuY1qce64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ucPQCc0C; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=LcpMDj9tWoxdju0hl6lEoaXx3jgSRxXpNSpSh7vQ4CM=; b=ucPQCc0CUvKJvPqiLRZcdJ8be9
-	rzZDWziELaVIRjEiEoDeM1AsK30jqmeI1nlTVCEdrrcDVtax8U4bgM3r/CnYYFWEYHmR4e/9Zg4Mk
-	e6IMXrNZbe3HSmJ/KpChTYGn5zAa6lWz5YaLB5P0pG1qpjJJSQeXq5c/+qvx8O6Wpbxk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vDjh2-00CIUx-T4; Tue, 28 Oct 2025 14:24:56 +0100
-Date: Tue, 28 Oct 2025 14:24:56 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dharanitharan R <dharanitharan725@gmail.com>
-Cc: sammy@sammy.net, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: i825xx: replace printk() with pr_*() macros for
- cleaner logging
-Message-ID: <fcb18197-af45-4f7d-a435-39796c51c1e7@lunn.ch>
-References: <20251028100127.14839-1-dharanitharan725@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kDYzFO+0hQwTB4OtoiFLwXIKBFzD5Wpun20rJFfBYpUzFzjfs1XL5s85+MNyJieF7hpEOIDjByu7ve0Rg/ATjEvqXNljIdgiAJWIL+JVkrfWC+0De5ylVtcN8mTQv6eeblWl14e4oqorPgA55D1CGIs4S345nDVDnBV9dSXdvYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qmEwP7kC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85C9FC4CEFD;
+	Tue, 28 Oct 2025 13:33:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761658389;
+	bh=zHgFOuY5SFOlmk5HuLBk82BmMu84ypaw7kIZB0Jb67g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qmEwP7kCXosfzQMpvMsWAoDgsyCyr9vumhoiyjhDQSMhSj//+fr3N8ViVDH/1DqCg
+	 iAMw0x2GF3UG7huzPYCoPAkfzimdyOxCJhjb5mf05XfiEQVYhCFA+4QAFPtts3IlXB
+	 lPdUPauefx0LtL5fiP4/Mj2+61oLsJl41mmeNNYpba65hCxz3HEel+JqqHudtWIHKo
+	 jgkirCJx9EF8ri80XldJOfj3NU3a5MJ7wL09fNTco1ScemLB3nG9W9WRJNRWMeelew
+	 kkwy/5o3D12FZKSUQ+CpGyeYWNpXg5lEx26xNf8uLQm98HShqQbOzn2XDomyCTGTbR
+	 MNaHUqpecxTiQ==
+Date: Tue, 28 Oct 2025 14:33:02 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
+	Jeff Layton <jlayton@kernel.org>, Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	Amir Goldstein <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
+	bpf@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH v3 17/70] nstree: add listns()
+Message-ID: <20251028-fenchel-roman-75c1c7e13c93@brauner>
+References: <20251024-work-namespace-nstree-listns-v3-0-b6241981b72b@kernel.org>
+ <20251024-work-namespace-nstree-listns-v3-17-b6241981b72b@kernel.org>
+ <aQCcrqp7qxY8ew8T@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251028100127.14839-1-dharanitharan725@gmail.com>
+In-Reply-To: <aQCcrqp7qxY8ew8T@horms.kernel.org>
 
-On Tue, Oct 28, 2025 at 10:01:27AM +0000, Dharanitharan R wrote:
-> This patch replaces printk() calls in sun3_82586.c with appropriate pr_*()
-> macros (pr_err, pr_info, etc.) according to Linux kernel logging conventions.
+On Tue, Oct 28, 2025 at 10:36:30AM +0000, Simon Horman wrote:
+> On Fri, Oct 24, 2025 at 12:52:46PM +0200, Christian Brauner wrote:
+> 
+> ...
+> 
+> > diff --git a/kernel/nstree.c b/kernel/nstree.c
+> 
+> ...
+> 
+> > +static ssize_t do_listns(struct klistns *kls)
+> > +{
+> > +	u64 *ns_ids = kls->kns_ids;
+> > +	size_t nr_ns_ids = kls->nr_ns_ids;
+> > +	struct ns_common *ns, *first_ns = NULL;
+> > +	struct ns_tree *ns_tree = NULL;
+> > +	const struct list_head *head;
+> > +	struct user_namespace *user_ns;
+> > +	u32 ns_type;
+> > +	ssize_t ret;
+> > +
+> > +	if (hweight32(kls->ns_type) == 1)
+> > +		ns_type = kls->ns_type;
+> > +	else
+> > +		ns_type = 0;
+> > +
+> > +	if (ns_type) {
+> > +		ns_tree = ns_tree_from_type(ns_type);
+> > +		if (!ns_tree)
+> > +			return -EINVAL;
+> > +	}
+> > +
+> > +	if (kls->last_ns_id) {
+> > +		kls->first_ns = lookup_ns_id_at(kls->last_ns_id + 1, ns_type);
+> > +		if (!kls->first_ns)
+> > +			return -ENOENT;
+> > +		first_ns = kls->first_ns;
+> > +	}
+> > +
+> > +	ret = 0;
+> > +	if (ns_tree)
+> > +		head = &ns_tree->ns_list;
+> > +	else
+> > +		head = &ns_unified_list;
+> > +
+> > +	guard(rcu)();
+> > +	if (!first_ns)
+> > +		first_ns = first_ns_common(head, ns_tree);
+> > +
+> > +	for (ns = first_ns; !ns_common_is_head(ns, head, ns_tree) && nr_ns_ids;
+> > +	     ns = next_ns_common(ns, ns_tree)) {
+> > +		if (kls->ns_type && !(kls->ns_type & ns->ns_type))
+> > +			continue;
+> > +		if (!ns_get_unless_inactive(ns))
+> > +			continue;
+> > +		/* Check permissions */
+> > +		if (!ns->ops)
+> > +			user_ns = NULL;
+> 
+> Hi Christian,
+> 
+> Here it is assumed that ns->ops may be NULL.
+> 
+> > +		else
+> > +			user_ns = ns->ops->owner(ns);
+> > +		if (!user_ns)
+> > +			user_ns = &init_user_ns;
+> > +		if (ns_capable_noaudit(user_ns, CAP_SYS_ADMIN) ||
+> > +		    is_current_namespace(ns) ||
+> > +		    ((ns->ns_type == CLONE_NEWUSER) && ns_capable_noaudit(to_user_ns(ns), CAP_SYS_ADMIN))) {
+> > +			*ns_ids++ = ns->ns_id;
+> > +			nr_ns_ids--;
+> > +			ret++;
+> > +		}
+> > +		if (need_resched())
+> > +			cond_resched_rcu();
+> > +		/* doesn't sleep */
+> > +		ns->ops->put(ns);
+> 
+> And, if so, it isn't clear to me why that wouldn't also be the case here.
 
-You have a Sun3? I've not seen one in maybe 25 years.
-
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-says:
-
-1.6.6. Clean-up patches
-
-Netdev discourages patches which perform simple clean-ups, which are
-not in the context of other work. For example:
-
-Addressing checkpatch.pl, and other trivial coding style warnings
-
-Addressing Local variable ordering issues
-
-Conversions to device-managed APIs (devm_ helpers)
-
-This is because it is felt that the churn that such changes produce
-comes at a greater cost than the value of such clean-ups.
-
-Please state in the commit message if you have run these patches on
-hardware, and plan to do other work on the Sun3 driver, new features
-etc.
-
-    Andrew
-
----
-pw-bot: cr
+Right you are. Fixed.
 
