@@ -1,144 +1,117 @@
-Return-Path: <netdev+bounces-233534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E99BC152CD
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:32:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1330C152D9
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:32:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CF645824E5
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 14:27:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD2AF584582
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 14:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A71232ABC3;
-	Tue, 28 Oct 2025 14:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79652305E26;
+	Tue, 28 Oct 2025 14:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EEJhAqup"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="ldy13xPC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from forwardcorp1b.mail.yandex.net (forwardcorp1b.mail.yandex.net [178.154.239.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147432FFDC2
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 14:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D79A3081AC;
+	Tue, 28 Oct 2025 14:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761661665; cv=none; b=cO8fhm1nQJospGsIdGP1FOCESClgn6ZQr8sF+Pcrku0crCbMQM3dwbAwZYHss50xPtMvW69m73XepQRHJGSMUGgRLFoctCRCbphKCiYskyIxOHX5Nbcnz4gaooDI5kH2eqxG0m3fiyMeMkVu0CQ/sYyVHpzfRNjjZ8qPNxwnAAg=
+	t=1761661691; cv=none; b=Dt5AzyEYJ3nlXcHcBWiC23KkFR5Zua386W1p99DnzYlzLIQgoS6j/PcwvOb7kBSgnrblW+PL9PTYwM5v5GrFDg58RFxWY/ze5OMJwz/phqmxZLi8dSdNpR4DPrEXz2rusIfzHytVdEchjgDeHvwP9jJVKwQctzT8/x12V7u3tcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761661665; c=relaxed/simple;
-	bh=wIpOHx9wXqfE+nMCB386FF93OASZcscl5qRTfZCgkUQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CugxNikM4tquo454fSoLVv7UncTJwp79A8OFj139fHFdQzNP4Snr4uWAwCfJPXT5YOCXYyIoLJAFjsgdUSinupSaRiTtrmk4KvE7n/Pnn4KelNjXByVfSH0JYMsFTJeqMw5z/8wHLP0VVddoTkGKSb2cZuasvtUDQHrJj2dwzsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EEJhAqup; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e4e528ea-f641-4ab9-bdde-5bd6beb65b8c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761661661;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CBEHPJdb/QvpxdS/JR+fDEp1zAvCfYjRdkyxYCfFyKE=;
-	b=EEJhAqup00uoOtKmh4ttbv8nil35vumAUP34rxGjRJ8IL23P2uXkfTMhqT1Ne/XPufcJyj
-	T0QN+3i2mNLL5QxZEcyC8/odlQ7s/P/xf7OnUsMM1UmS3U8+DhVAojynFnF92nweGAfuTA
-	udNMz3qGCKcaGKCRtZ0sUQj7l7z1ioE=
-Date: Tue, 28 Oct 2025 07:27:36 -0700
+	s=arc-20240116; t=1761661691; c=relaxed/simple;
+	bh=RPppPMVEQPsh2y1GjpYuNxHxtRlMaDPmxSkKWCrYkjA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cw4akZgQhnmaFRR27kqS4BLRKKhMzn+0EbQmnTBXlL6lBtdmiz38sb2dzcCE7EQe+NyymR4wOyu2L4GHoB/G7GOCKSNGlxcrwKTJtzEA4em2c/fTkfGele9nRcwZyuNFAY51gxFCTMlOFPd/C9sBMtXxSP7MeN6dDutXTZRbYPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=ldy13xPC; arc=none smtp.client-ip=178.154.239.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
+Received: from mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net (mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net [IPv6:2a02:6b8:c10:49f:0:640:b99a:0])
+	by forwardcorp1b.mail.yandex.net (Yandex) with ESMTPS id 808E180A9D;
+	Tue, 28 Oct 2025 17:27:57 +0300 (MSK)
+Received: from i111667286.ld.yandex.ru (unknown [2a02:6bf:8080:2::1:3d])
+	by mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id qReQdZ2b5W20-gMxKwSGD;
+	Tue, 28 Oct 2025 17:27:56 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+	s=default; t=1761661676;
+	bh=sk8MoiTs5k5APW6gtqgCF2xdeZ/K2hxjvJJvk7+8Gco=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=ldy13xPCco84f30jCUKGJK2uye3U0A4XDxBVSzjuUzDP/hE3rCRahp0ngOdPLzjuO
+	 9bx/+jxFXKx1KQjjHiyT+URHWikCkLFn6JkRaG4GjuFJeQ3NwkPQ5R+417i7hiMKYU
+	 auX0v2/if7KFGUbpkkOUMj63prQGubGFDCe+R4BI=
+Authentication-Results: mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+From: Andrey Troshin <drtrosh@yandex-team.ru>
+To: stable@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Andrey Troshin <drtrosh@yandex-team.ru>,
+	"David S . Miller" <davem@davemloft.net>,
+	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 5.10] ipv6: sr: Fix MAC comparison to be constant-time
+Date: Tue, 28 Oct 2025 17:27:55 +0300
+Message-ID: <20251028142755.2059-1-drtrosh@yandex-team.ru>
+X-Mailer: git-send-email 2.51.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH ipsec v3 1/2] xfrm: Check inner packet family directly
- from skb_dst
-To: Jianbo Liu <jianbol@nvidia.com>, netdev@vger.kernel.org,
- davem@davemloft.net, kuba@kernel.org, steffen.klassert@secunet.com,
- sd@queasysnail.net
-Cc: Cosmin Ratiu <cratiu@nvidia.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Leon Romanovsky <leon@kernel.org>, Raed Salem <raeds@nvidia.com>
-References: <20251028023013.9836-1-jianbol@nvidia.com>
- <20251028023013.9836-2-jianbol@nvidia.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20251028023013.9836-2-jianbol@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
+From: Eric Biggers <ebiggers@kernel.org>
 
-在 2025/10/27 19:22, Jianbo Liu 写道:
-> In the output path, xfrm_dev_offload_ok and xfrm_get_inner_ipproto
-> need to determine the protocol family of the inner packet (skb) before
-> it gets encapsulated.
->
-> In xfrm_dev_offload_ok, the code checked x->inner_mode.family. This is
-> unreliable because, for states handling both IPv4 and IPv6, the
-> relevant inner family could be either x->inner_mode.family or
-> x->inner_mode_iaf.family. Checking only the former can lead to a
-> mismatch with the actual packet being processed.
->
-> In xfrm_get_inner_ipproto, the code checked x->outer_mode.family. This
-> is also incorrect for tunnel mode, as the inner packet's family can be
-> different from the outer header's family.
->
-> At both of these call sites, the skb variable holds the original inner
-> packet. The most direct and reliable source of truth for its protocol
-> family is its destination entry. This patch fixes the issue by using
-> skb_dst(skb)->ops->family to ensure protocol-specific headers are only
-> accessed for the correct packet type.
->
-> Fixes: 91d8a53db219 ("xfrm: fix offloading of cross-family tunnels")
-> Fixes: 45a98ef4922d ("net/xfrm: IPsec tunnel mode fix inner_ipproto setting in sec_path")
-> Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+commit a458b2902115b26a25d67393b12ddd57d1216aaa upstream.
 
-Thanks a lot. I am fine with this.
+To prevent timing attacks, MACs need to be compared in constant time.
+Use the appropriate helper function for this.
 
-Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+Reviewed-by: Andrea Mayer <andrea.mayer@uniroma2.it>
+Link: https://patch.msgid.link/20250818202724.15713-1-ebiggers@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+[Andrey Troshin: backport fix for 5.10]
+Signed-off-by: Andrey Troshin <drtrosh@yandex-team.ru>
+---
+Backport fix for CVE-2025-39702
+Link: https://nvd.nist.gov/vuln/detail/CVE-2025-39702
+---
+ net/ipv6/seg6_hmac.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Zhu Yanjun
-
-> ---
-> V2:
->   - Change subject prefix, and send to "ipsec".
->   - Update commit msg.
->   - Add Fixes tag.
->
->   net/xfrm/xfrm_device.c | 2 +-
->   net/xfrm/xfrm_output.c | 2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-> index 44b9de6e4e77..52ae0e034d29 100644
-> --- a/net/xfrm/xfrm_device.c
-> +++ b/net/xfrm/xfrm_device.c
-> @@ -438,7 +438,7 @@ bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
->   
->   	check_tunnel_size = x->xso.type == XFRM_DEV_OFFLOAD_PACKET &&
->   			    x->props.mode == XFRM_MODE_TUNNEL;
-> -	switch (x->inner_mode.family) {
-> +	switch (skb_dst(skb)->ops->family) {
->   	case AF_INET:
->   		/* Check for IPv4 options */
->   		if (ip_hdr(skb)->ihl != 5)
-> diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-> index 9077730ff7d0..a98b5bf55ac3 100644
-> --- a/net/xfrm/xfrm_output.c
-> +++ b/net/xfrm/xfrm_output.c
-> @@ -698,7 +698,7 @@ static void xfrm_get_inner_ipproto(struct sk_buff *skb, struct xfrm_state *x)
->   		return;
->   
->   	if (x->outer_mode.encap == XFRM_MODE_TUNNEL) {
-> -		switch (x->outer_mode.family) {
-> +		switch (skb_dst(skb)->ops->family) {
->   		case AF_INET:
->   			xo->inner_ipproto = ip_hdr(skb)->protocol;
->   			break;
-
+diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
+index 4a3f7bb027ed..8bb7f94cba1e 100644
+--- a/net/ipv6/seg6_hmac.c
++++ b/net/ipv6/seg6_hmac.c
+@@ -35,6 +35,7 @@
+ #include <net/xfrm.h>
+ 
+ #include <crypto/hash.h>
++#include <crypto/algapi.h>
+ #include <crypto/sha.h>
+ #include <net/seg6.h>
+ #include <net/genetlink.h>
+@@ -270,7 +271,7 @@ bool seg6_hmac_validate_skb(struct sk_buff *skb)
+ 	if (seg6_hmac_compute(hinfo, srh, &ipv6_hdr(skb)->saddr, hmac_output))
+ 		return false;
+ 
+-	if (memcmp(hmac_output, tlv->hmac, SEG6_HMAC_FIELD_LEN) != 0)
++	if (crypto_memneq(hmac_output, tlv->hmac, SEG6_HMAC_FIELD_LEN))
+ 		return false;
+ 
+ 	return true;
 -- 
-Best Regards,
-Yanjun.Zhu
+2.34.1
 
 
