@@ -1,122 +1,121 @@
-Return-Path: <netdev+bounces-233509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E14F6C1493C
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:19:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53E51C14A56
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:34:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 081411AA0E9B
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:20:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F6E81A63452
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:31:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5232532ABC6;
-	Tue, 28 Oct 2025 12:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F73F302773;
+	Tue, 28 Oct 2025 12:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PVJ+5bHE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MqhYqjzw"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E12526ED57;
-	Tue, 28 Oct 2025 12:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B571D5147;
+	Tue, 28 Oct 2025 12:31:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761653993; cv=none; b=l6mIUCPb7v9RZBaroTC0c9vwJDCiEAKk5MGILNAgkUkZwAeWRMDpH482OMZmM/WiN772ZV4A2/h22PfjtqTN0OWk8LqKi7YMw4mgw4waxJvlW4wAex728ZxBAZnNd5f4QJBce4Kkq2KO0qyg8QG8VswvRNXO+F/Y1/VV+N/5gzE=
+	t=1761654668; cv=none; b=WQvYjKB4+7G+zt68kqbMd07gM6Vxc1W5792Ih3bzfYn0umJIF4MQI6clBv4MhPEoVvi9GJ8otmOmUNY3NlrAYf4tRifdnO+WPAZ3VPPYYYldIhIigoYSu3LKXDPN4ClLTUv9twZX3qvmIkNmKeHTG/TIprOA9FbxtMInYNYrnbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761653993; c=relaxed/simple;
-	bh=QKHpKLl44uwhzX0yR8l8NyNpX/dvwMMWUn48o9hqBmU=;
+	s=arc-20240116; t=1761654668; c=relaxed/simple;
+	bh=bp3dDj7WuCgUaozIZmBCOLT7S6dPjUy422kqru/krws=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fLHErzDLny7SuV2I8leX8GBfGBgn60m5aEabS4iI6NbydNBdexLzMsl5+GElvJX7UgDxQAO2JhfVy2UH8TsTHZrSd0pJJeK76sEOsbzxxl7qYJNNkyzMKnX/Eosl2im1eBKWVRrfV98rx1KphDMpDEbZVOxQDwXhN91OZ2j4GD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PVJ+5bHE; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=iAcTB0pexrytfdjO3k8iLmGtnWGjntECalzhziLvSqc=; b=PVJ+5bHEgyfW3CMkystoei5+mQ
-	aG7fyM/0Bef3t4MGKcVPHcyMU9R0hmQ58ruj8uppd3By7GyACdoA0y/NzOXEismdi7gEKUTIsQFGs
-	T3eDkDsgJ18b/TcNKo3FpY8ZEeqDlhDh+I7Dqvpbr6AIIIyeNZzdRHB9xNBhsr3KyJWlpaBdYbCVC
-	k5Ou/P16w2Th+q0W3RYBiwW2ayffU3vMl/YMjHbLHdYy1CoGGbEESd1LYMVNTkfA8K0OqYsKX+PbD
-	XewYf726Q0v0vrb9gNTuaWPWQq+glvrHn38MX2N+YbSt9TEMQThrAk+RriY2kJIzY4fD3YnigZYzV
-	jUBY4qmw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40962)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vDifr-0000000039t-1vkF;
-	Tue, 28 Oct 2025 12:19:39 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vDifl-000000006YC-09gl;
-	Tue, 28 Oct 2025 12:19:33 +0000
-Date: Tue, 28 Oct 2025 12:19:32 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Yi Cong <cong.yi@linux.dev>, Frank.Sae@motor-comm.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, hkallweit1@gmail.com,
-	kuba@kernel.org, netdev@vger.kernel.org, stable@vger.kernel.org,
-	yicong@kylinos.cn
-Subject: Re: [PATCH] net: phy: motorcomm: Fix the issue in the code regarding
- the incorrect use of time units
-Message-ID: <aQC01GDPr-WclcZS@shell.armlinux.org.uk>
-References: <e1311746-9882-4063-84af-3939466096e9@lunn.ch>
- <20251028062110.296530-1-cong.yi@linux.dev>
- <2610bc26-44e6-48a3-87c6-acfa30f60dad@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gbbIPw4B/Ur6oOx/5IKKXZ0jr/nB8+RIBo6TKHxm/LWwAWsDnB6DvkZq+pzcUedHZaSjOVMIPWoizuRsb7xhkSPWKZkrCWQo9USXjOG+PSUDKgAKYOD1a0EWBDiqShvySQ789bHFmGR/07Z7KQtYwJtCfL/KFkadpp47MATrVqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MqhYqjzw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6128C4CEE7;
+	Tue, 28 Oct 2025 12:31:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761654666;
+	bh=bp3dDj7WuCgUaozIZmBCOLT7S6dPjUy422kqru/krws=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MqhYqjzwPAqrvZy+5lthpH7b+sHTqLCG3GPCT/sK1zBLYshcGv57uRgmwywUHvEdX
+	 5sammRMOG23AlLMM3m0AoRRBpwJzKvJTbbRvUZisAp5DIbueJkQihcWM2VNHu57inM
+	 Nwe3yv15/0dAqcafexYvDx5JQ0E8K2/tGy3Zq4ms5TpUD+f3cmWp4yq4fRl8JEftc2
+	 K38c+XOVnKgfP2WIR2lL6T8MwvZOFhggFN89K/3iqug0c4Cbr8fxrVlyITjJwc2Df3
+	 8gnyzGdDeL26rlulVbiCkl+WSVo8gy8Axggq0M4PIa29tIOI1Db6pk6n1GJeX+llBf
+	 leMHOZuTLRwLw==
+Date: Tue, 28 Oct 2025 14:31:01 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: mjambigi@linux.ibm.com, wenjia@linux.ibm.com, wintera@linux.ibm.com,
+	dust.li@linux.alibaba.com, tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com, kuba@kernel.org, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+	sidraya@linux.ibm.com, jaka@linux.ibm.com
+Subject: Re: [PATCH net-next v2] net/smc: add full IPv6 support for SMC
+Message-ID: <20251028123101.GR12554@unreal>
+References: <20251022032309.66386-1-alibuda@linux.alibaba.com>
+ <20251027134227.GL12554@unreal>
+ <20251028095450.GA38488@j66a10360.sqa.eu95>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2610bc26-44e6-48a3-87c6-acfa30f60dad@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251028095450.GA38488@j66a10360.sqa.eu95>
 
-On Tue, Oct 28, 2025 at 01:07:34PM +0100, Andrew Lunn wrote:
-> > > >  #define YT8521_CCR_RXC_DLY_EN			BIT(8)
-> > > > -#define YT8521_CCR_RXC_DLY_1_900_NS		1900
-> > > > +#define YT8521_CCR_RXC_DLY_1_900_PS		1900
-> > >
-> > > This could be down to interpretation.
-> > >
-> > > #define YT8521_CCR_RXC_DLY_1.900_NS		1900
-> > >
-> > > would be technically correct, but not valid for cpp(1). So the . is
-> > > replaced with a _ .
-> > >
-> > > #define YT8521_CCR_RXC_DLY_1900_PS		1900
-> > >
-> > > would also be correct, but that is not what you have in your patch,
-> > > you leave the _ in place.
+On Tue, Oct 28, 2025 at 05:54:50PM +0800, D. Wythe wrote:
+> On Mon, Oct 27, 2025 at 03:42:27PM +0200, Leon Romanovsky wrote:
+> > On Wed, Oct 22, 2025 at 11:23:09AM +0800, D. Wythe wrote:
+> > > The current SMC implementation is IPv4-centric. While it contains a
+> > > workaround for IPv4-mapped IPv6 addresses, it lacks a functional path
+> > > for native IPv6, preventing its use in modern dual-stack or IPv6-only
+> > > networks.
+> > > 
+> > > This patch introduces full, native IPv6 support by refactoring the
+> > > address handling mechanism to be IP-version agnostic, which is
+> > > achieved by:
+> > > 
+> > > - Introducing a generic `struct smc_ipaddr` to abstract IP addresses.
+> > > - Implementing an IPv6-specific route lookup function.
+> > > - Extend GID matching logic for both IPv4 and IPv6 addresses
+> > > 
+> > > With these changes, SMC can now discover RDMA devices and establish
+> > > connections over both native IPv4 and IPv6 networks.
 > > 
-> > Alright, I didn't realize that 1_950 represents 1.950;
-> > I thought the underscores were used for code neatness,
-> > making numbers like 900 and 1050 the same length, for example:
-> > #define YT8521_RC1R_RGMII_0_900_PS
-> > #define YT8521_RC1R_RGMII_1_050_PS
+> > Why can't you use rdma-cm in-kernel API like any other in-kernel RDMA consumers?
 > > 
-> > In that case, is my patch still necessary?
+> > Thanks
+> > 
+> > >
 > 
-> I think it is unnecessary.
+> Hi Leon,
 > 
-> If you want, you could add a comment which explains that the _ should
-> be read as a .  However, this does appear elsewhere in Linux, it is
-> one of those things you learn with time.
+> Regarding RDMA-CM, I’m not sure if I’ve fully grasped your point, but
+> based on my current understanding, I believe SMC cannot use RDMA-CM.
+> There are a few reasons for this:
+> 
+> Firstly, SMC is designed to work not only with RDMA devices but also
+> needs to negotiate with DIBS(DIRECT INTERNAL BUFFER SHARING) devices. This
+> means we must support scenarios where no RDMA device is present.
+> Therefore, we require a round of out-of-band negotiation regardless of
+> the final device choice. In this context, even if we ultimately select
+> an RDMA device, using rdma-cm to establish the connection would be
+> redundant.
 
-Hang on.
+Ahh, yes, I always failed to remember this.
 
-Is the "1900" 1.9ns or 1.9ps ?
+Thanks
 
-If YT8521_CCR_RXC_DLY_1_900_NS means 1.9ns, and the value is in ps,
-then surely if it's being renamed to _PS, then it _must_ become
-YT8521_CCR_RXC_DLY_1900_NS, because 1.900ps is wrong?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> 
+> Additionally, SMC requires multiplexing multiple connections over a
+> single QP. We need to decide during the out-of-band negotiation which
+> specific QP to reuse for the connection. From what I know, rdma-cm does
+> not seem to offer this capability either.
+> 
+> Best regards,
+> D. Wythe
+> 
 
