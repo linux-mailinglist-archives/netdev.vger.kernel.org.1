@@ -1,147 +1,109 @@
-Return-Path: <netdev+bounces-233570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D490AC159B5
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:52:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E571C159F1
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:56:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A1E0E541AA5
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:47:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E9091C22BB4
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84986347FEC;
-	Tue, 28 Oct 2025 15:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B577327991E;
+	Tue, 28 Oct 2025 15:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="b1J6mFwY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PZd8z5EU"
 X-Original-To: netdev@vger.kernel.org
-Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C238C3451C8;
-	Tue, 28 Oct 2025 15:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2102B23FC4C
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 15:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761666325; cv=none; b=BX3TsRowIVQeOqnDKB1b5nBzoWjakt19H9sbywgwEtKtqY1GabxwJY+MSC/25bSpteIRqE2nn5MXgGvHAghsVJm+Xd0mc8d1oubhbYfohW7fAScCCfPR2w8T16kqwyRQCOEBh6lRw6qqBw1exMryaSNh4OKYlauVZlQd9duAyHg=
+	t=1761666506; cv=none; b=kMOEkn/6FM2m6nZSB2KaPQKdIl80WLxurd7OGj4QK5XLzg5MDXNsJ9jn+mXnEq4X4cyHUU5ok46vPgGRDAF4lWuFaMNcRYtfTEYDLSYRE2jR/Omtw1s0vDAwxjXHI/c3ykryArBWevWV52fx6KvS9ARTHdeRH4+N8jmCkt71A/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761666325; c=relaxed/simple;
-	bh=+3Inzpf1mG0SJMoSxelog+i63O9kJIZxuw8kRM1j/nU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mc/vJz/1EfD1xGdZSwp6Wku7Y5rYYxp+1cNxBZ/GPVxHHuG1ddBikHBQxQR8FGja+r8ZpDshXFtxnQtJNiAi4Q7HkD9WikGRZsH3GPGkM+Xjou7OtxCeagOUqkPxITZOnQLDNvrKmPFloXHWemuiUu9pmepV2rKYgXgB8yL+0xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=b1J6mFwY; arc=none smtp.client-ip=178.21.23.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
-Received: from mail01.disroot.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id 4130D22F3A;
-	Tue, 28 Oct 2025 16:45:22 +0100 (CET)
-X-Virus-Scanned: SPAM Filter at disroot.org
-Received: from layka.disroot.org ([127.0.0.1])
- by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id MEOBRD312jZF; Tue, 28 Oct 2025 16:45:21 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1761666321; bh=+3Inzpf1mG0SJMoSxelog+i63O9kJIZxuw8kRM1j/nU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=b1J6mFwYWAnGe2UnNr2ZvdTizOW4HgR/VxnmUahyRDew8vDK+/spVyWgpjhPJy1Sg
-	 LXWYwSod0EmIFibhXBKDIDZSx0WnWhtCnziALI4iSW8nFcvP3lbMSiTsjfdwhVdhbq
-	 /lmMBdVGEsBGyrEVY0L6+5SXH642yIe4mWVdaA5kR++cLRQBbSNoengKoXuxYpkvJc
-	 JObhfJNOLp/UO72ZeH1ubbxlmx9xAidoVtGujDPMJiPyb5vycWzhB0cNLL5Z1ecHC3
-	 ivX99mxZkUUHFiX2oqpwUGR5qvmnmPY5/lRHGKdekWdx8B/Lfwj3RM5CdSfcS9BZl0
-	 vKcrzPe7ZGnNw==
-From: Yao Zi <ziyao@disroot.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Yanteng Si <si.yanteng@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Philipp Stanner <phasta@kernel.org>,
-	Tiezhu Yang <yangtiezhu@loongson.cn>,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>,
-	Yao Zi <ziyao@disroot.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Furong Xu <0x1207@gmail.com>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 3/3] net: stmmac: pci: Use generic PCI suspend/resume routines
-Date: Tue, 28 Oct 2025 15:43:32 +0000
-Message-ID: <20251028154332.59118-4-ziyao@disroot.org>
-In-Reply-To: <20251028154332.59118-1-ziyao@disroot.org>
-References: <20251028154332.59118-1-ziyao@disroot.org>
+	s=arc-20240116; t=1761666506; c=relaxed/simple;
+	bh=2bOY6gnUwb4nFCgw2yqY+36HofjZmkIDlMsu7BOd0iU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=maY/5EPH6Y5yUe1oJGDS2Evc79MQiONYEqn/EAPll2FOZSOQkn6jbOOPLF2hHYGacBj85EAa/PQXaxFOYEUs3hbhg4L2t8Xm4aKPZVuCH7XJck/SDrUeVlqpyAqVf74PUp/EZLR9adaCTm8hH46NeAVDnQPLlcprjBTXD3TTUFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PZd8z5EU; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-475dab5a5acso22269905e9.0
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 08:48:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761666503; x=1762271303; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=upZIuMB9ObsKnLxIeEEbncHV6JDOCPeXZREqtGp1TxQ=;
+        b=PZd8z5EUOqmps3EyqEBGE2slhNnuO3Lqs7gjlQLBxam+BW4RXYObosvcNB1la7Jsgc
+         KswyupMLzAALk+PD4uJNDFPSRiYpo9vH0mz9uK/JtIbJCXzPqoqLbvPr3CCrHC/46/TS
+         rcy0q7lrG9XTYzZlIfSu2VjQjSrE/Pyz8KyhHa/W/XtIwvl3iGbweHGmfIpsMfYA07AX
+         OVOXMEI5U+Sbk+pJ9iwu2G7Im2IXOJvwYrOznFgHAjKuyCHJORiN9OYVQlYCEUYt9q3Y
+         sEb5YkE06S1OELw+L1TGenhXNnj780VYVMZNyQfBvKwjdDpE5+qxzPJBnv3289Y473AK
+         jMRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761666503; x=1762271303;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=upZIuMB9ObsKnLxIeEEbncHV6JDOCPeXZREqtGp1TxQ=;
+        b=Fbcs2Hi3Of+PKPoYlq8YKwW/bidnLShhy1Xn0yI+j7sj4ixA4J9h0M/01Evy5MQbR1
+         8CVN58BF809h/4SnLBNt5FjY6yXnEMvNjeP4iP57txp2vNSmJIXYAuNJM0tef8o3ejKK
+         2s1caFDWpgXKXuxjuCue11koHCtieFKWznGSlx0XSj9qTewpI5AcrZi0v4zSKG19q7Sl
+         f3rlPfJycM2/R8bruJOTP1TMlyjf5JPj347IYUVkB0j2MqT9E1N4KHJI5COMuZewt4Rj
+         c0FFpG8nQunlqdtz1ZAPKZ69lRNjF9I8p+gyWMm0w3qUcw8HamiTxTMIq/Gihcu5aaAe
+         9QEA==
+X-Gm-Message-State: AOJu0YxCAoJodqz4Xd2RAzZ3a4aDwiS34JoznEwXMBbIvjzYcyRO8W5L
+	GzvSAeBARbB2RgFjlXXlSybaT/x07gA2024jY9ckfS6Vkt9ztMsY+Sllj574zYrEZIV+sLLJSmP
+	divtLM1emP7d4BkPp0Fst3Wn3qAIynpw=
+X-Gm-Gg: ASbGncu1MFlU9Q7O8hphDKZpgfk5sb/gRFCDbHsSOr1DtMZVUffHmPqUm4HY7dv8jjr
+	foJJw1FFuc+WJGIuC3HnSJGy3Vt9iTm324jGbC0H8nSRHodwW+pNp1QmFIDG08gMzBJXY1pHvc7
+	/ZBs90sn4ytUP8CKWlFnjsr4GX+eSubzapwiTxUeOaPOISCl7xqWp08/zin6FKnChaqnIvHUY9+
+	Fezj39e1R6pBkPOIbyg4kStyg9kmCDcm0qkinUyaMcKWcAfOgrpDD4bjEIpKqj5JWA7+TT9KanC
+	FR72MmwKFBwADIm27A==
+X-Google-Smtp-Source: AGHT+IF789c3V0PqzWIYueqeJM5wXvGmj4WgXd+sc7NbTJncHGH4wM2ozJi5DdEb6LUDxgd5G6mnjH6E1dCesSbigSY=
+X-Received: by 2002:a05:6000:2f85:b0:427:490:68d2 with SMTP id
+ ffacd0b85a97d-429a7e4af41mr3536115f8f.10.1761666503370; Tue, 28 Oct 2025
+ 08:48:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <176133835222.2245037.11430728108477849570.stgit@ahduyck-xeon-server.home.arpa>
+ <176133844020.2245037.14851736632255812541.stgit@ahduyck-xeon-server.home.arpa>
+ <691b8687-65ec-44c0-8c19-c3bd8bb6ed2b@lunn.ch>
+In-Reply-To: <691b8687-65ec-44c0-8c19-c3bd8bb6ed2b@lunn.ch>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 28 Oct 2025 08:47:47 -0700
+X-Gm-Features: AWmQ_blwrUH1fDQ6eFM1-B7FkdxRHWtYLldi7s9tfca0c2hnl2_7KxuiuyWeCA8
+Message-ID: <CAKgT0UcORiTryUFGiz7mb6j-WK_cXOWW=v+ktQxMoBjfBjoCVw@mail.gmail.com>
+Subject: Re: [net-next PATCH 1/8] net: phy: Add support for 25, 50 and 100Gbps
+ PMA to genphy_c45_read_pma
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, kernel-team@meta.com, 
+	andrew+netdev@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk, 
+	pabeni@redhat.com, davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Convert STMMAC PCI glue driver to use the generic platform
-suspend/resume routines for PCI controllers, instead of implementing its
-own one.
+On Mon, Oct 27, 2025 at 8:12=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> >  #define MDIO_PMA_SPEED_2B            0x0002  /* 2BASE-TL capable */
+> >  #define MDIO_PMA_SPEED_10P           0x0004  /* 10PASS-TS capable */
+> > +#define MDIO_PMA_SPEED_50G           0x0800  /* 50G capable */
+>
+> This is 45.2.1.4 PMA/PMD speed ability (Register 1.4) ??
+>
+> 50G is bit 3. So is 0x0800 correct? I think it should be 0x0008.
+>
+>     Andrew
 
-Signed-off-by: Yao Zi <ziyao@disroot.org>
----
- .../net/ethernet/stmicro/stmmac/stmmac_pci.c  | 35 ++-----------------
- 1 file changed, 2 insertions(+), 33 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-index 94b3a3b27270..9e48e9b0016e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-@@ -139,37 +139,6 @@ static const struct stmmac_pci_info snps_gmac5_pci_info = {
- 	.setup = snps_gmac5_default_data,
- };
- 
--static int stmmac_pci_suspend(struct device *dev, void *bsp_priv)
--{
--	struct pci_dev *pdev = to_pci_dev(dev);
--	int ret;
--
--	ret = pci_save_state(pdev);
--	if (ret)
--		return ret;
--
--	pci_disable_device(pdev);
--	pci_wake_from_d3(pdev, true);
--	return 0;
--}
--
--static int stmmac_pci_resume(struct device *dev, void *bsp_priv)
--{
--	struct pci_dev *pdev = to_pci_dev(dev);
--	int ret;
--
--	pci_restore_state(pdev);
--	pci_set_power_state(pdev, PCI_D0);
--
--	ret = pci_enable_device(pdev);
--	if (ret)
--		return ret;
--
--	pci_set_master(pdev);
--
--	return 0;
--}
--
- /**
-  * stmmac_pci_probe
-  *
-@@ -249,8 +218,8 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
- 	plat->safety_feat_cfg->prtyen = 1;
- 	plat->safety_feat_cfg->tmouten = 1;
- 
--	plat->suspend = stmmac_pci_suspend;
--	plat->resume = stmmac_pci_resume;
-+	plat->suspend = stmmac_pci_plat_suspend;
-+	plat->resume = stmmac_pci_plat_resume;
- 
- 	return stmmac_dvr_probe(&pdev->dev, plat, &res);
- }
--- 
-2.50.1
-
+Yeah, looks like it was a copy/paste error as that was the correct
+value for 25G.
 
