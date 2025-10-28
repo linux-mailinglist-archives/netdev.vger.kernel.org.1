@@ -1,193 +1,142 @@
-Return-Path: <netdev+bounces-233560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D372CC1566F
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:22:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7483C1570E
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:28:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 46BF135510E
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:22:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 328C440564F
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:27:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867782E7BAA;
-	Tue, 28 Oct 2025 15:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF38341AC3;
+	Tue, 28 Oct 2025 15:26:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d+BLODnj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H+4v4gLk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A938F23E355
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 15:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD9C340DA4
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 15:26:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761664939; cv=none; b=fatxvfvEQG9m9e6KURxVGA9Icd1SjQ05R5yamSk640B2byFnx77M1LFxCGNzkNdmEvNvGmThZEAwJXLUjGh9aH5a6vQGUZsRDBqQXMrFC4w148SR7mQc+nAZYXeWj2CJBH3lxecq5a+ruwBEkghjnqh0O+I0j7qIocVyBqS17Sc=
+	t=1761665198; cv=none; b=qrJI+Ma/+mqwK+fDWfUdZFmMWnJymc/gt4gsgGYugkcPu4XisvdVqvnLxlUZPV9JtdTgXEwBnBOvrqp36flSJpBgluTSRWaBdWrZvmjqb6SiGwM+FV40uSC05cciUrqmfvZxm7iMEJ7hGTg/Vb7X6PoCrdPxWHsqy4iVsIA5zJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761664939; c=relaxed/simple;
-	bh=bZ55QK+UJTgOBscIivnjq8lKsYP/XcmuAJEd7jZIHFc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mcdTkRi2mI/BrctPHBhf4SjqJyLBFXwCqBM57xqjWNx2M2dmxJlxASBdZ7R91QsxpkzDYPSssCs0iH0yFMAWj34BoRH0sPvRK19gWaRw3knKQO03ajskihcyYGO/TSFqDqUzStaW2d81O/e/WJBDIdSBMi8C10OoZdH9SEbsCDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d+BLODnj; arc=none smtp.client-ip=209.85.128.43
+	s=arc-20240116; t=1761665198; c=relaxed/simple;
+	bh=4M2/3ejgEOnPWTU2k4hO2uU/c3DMXoSdd9TFkij3CjA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BFwO0wd5OjHb4IE6p7zvr88S97rfX+cttE3+MAcVtHAHbYvpdEIgbGIit8A+542K/w7EgOYwJVNGAQF1RPHm2ZkduqT5D4C5cAP0U/nf1rK1arherUQw4j4EnVdtDEaDufNO2SWJQW29xKeu1q9fbVPpSIWE8LwOPZ23fb7WqkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H+4v4gLk; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-475dd559a83so20346945e9.1
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 08:22:17 -0700 (PDT)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-475dbc3c9efso25884175e9.0
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 08:26:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761664936; x=1762269736; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZOG8l11v2spqZc+zU8CHcKzAc9L+U6Lb+jKyLh1lIIg=;
-        b=d+BLODnjX1DWgk11JzX68j64oS35IM0vYfrAFWzBw34swFOxNo7gUAvHb1ZAl4HS6x
-         ZttrKI0f05MPjIb86xsBRLGR6hwwBhFJLeVVcXRSI61zNTAP19ZJ44jjXR1ZWjG4HGZw
-         nT3UdNsqvA6+LhJUw8EOhVeaEVYvLhuGoNUr8Rty4+R8aoEIhMZYsqtQ3WB6HnffiRcZ
-         Fj5Cd4EOtae91td8DcIskeGR5G9F45fBnDDMYtaRl+/wrfops37BG8IE8DdwuA04erCV
-         e+SxeMcdQf8oyLeS2n+E7j4pe8eW/UaNZu1ZlX7tGjQIb7l3u6oygVNjVPtbs6Ssb7zM
-         AVpw==
+        d=gmail.com; s=20230601; t=1761665194; x=1762269994; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IMaVfQlDtYuJ6c5NZttg0Mv3ou88wdr4jRmdcFT8ouM=;
+        b=H+4v4gLktyhkWnO7rIvfpaDbP1EZoak/ELNlG+aWCfSIyjmweJzP4qr/KzOkYurWYB
+         yv/nXmXbRxYPaF9C55CiKtriWItZytTj2aI3KHdclvZT8ySVryPTUZCYV7QiyDC4Sp6S
+         xX+d3Gz1o0GZmOeTfCbsduadmbmLgI5UUxq7j8LVYDAloFBK3SOLFNm+31cD8ZECGNF+
+         NhRxi8lKh+p32c/6WVVGmahp2Xj+eEw8QRWIaqN33uijiLA4jTCnJoKMGvP3XLWSRgXT
+         KhGDnIeRUnFJ3ONf7cZDUt8tCFSi8WPsf44ThO+7skv40UKVCatVggN5xXocoTNAarM2
+         lrbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761664936; x=1762269736;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZOG8l11v2spqZc+zU8CHcKzAc9L+U6Lb+jKyLh1lIIg=;
-        b=hEINOMElZmpKqfLm5TLPwPrqg18OMDdKX9P4UGWzz8CYqHPvFylV68QUIUacspwi6J
-         MNXaurKaGnvoTw7OMA5xRGF84B0EUrUqFtt+YjrR7c1QRcpGStZ/ZDhn9MOL0AEhwVl3
-         u7r/dJ2qEfkeKxyakLln7QnWsA5XEaTegFGSqyItP94fD7o4nEo/eKL7TKuEYheY3dGz
-         Q+a75jUVlDahAwfwdpbPB03Aaf9e1wz7/f0G6UQi7HBaF5wv0okNqQCXzAa7AHWkaDq9
-         j9YGEt6KPg/pEalHsNn/+aO4x7haKd65yeeZn7cMb+6j2vJXxSpFsjXyRlVrIGE1Ar75
-         UsOA==
-X-Forwarded-Encrypted: i=1; AJvYcCWdUyDuZ/b/QxTCRYOJPdK2iA1Vv1KJfkp9MVCHKx9IR3/4ptSpjr8weBMMnAmL8uFaXnw1ZzQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYW3QCx0wfxk0xyH7Xk9FrJqm6JHMZTBt2URGrIsXAPjiw7Yd/
-	QE5dNk7NRg6IuUvDEMGVN84nuAlKhEVvemKDS7PxYrYCdFlTXloK5gmA
-X-Gm-Gg: ASbGncvwASPt17OBR3QLf2L5yTKPeH41X09KJTwIRPNoqNpO/atZ8IK5zn6dQ7FabII
-	OZaf3G0wGH3DTOESNGYGZ7G40q3BtMlOQJdU/gDoFL6wQI21hXACHlPxEkbEdeP+1QdoYtZvoy+
-	ZOkQqh5SoU71sMPVQYahgU6C+lgKtUsQF3+Nu29ILkc0dzZCe3o/8s3hexNTWTk2BYO9i6zXS4F
-	vEBr4qItCQC+FhzvEva0P0/X0TMMv/XHKBnEcUTPHrIg4NAdxPYhAqbPzpgWz8rCVSPliJqd1bX
-	WQqDmiJ56U78sall7d+Hso8o7/h0V8UKzjma8O62mzi3tU0hJzj36WDzNUZQGJtbS9IIsT1abYU
-	vRJ2KtFEsv7Ss5pCwPugySuxYUuAc0jCtlFYO/Z8SPnmwPlPEBn+iaYhDw2nUj9T5xGPaSq+Enw
-	WVh+qFgvJKsrgbQrDpTGCoY4K2D+mnqsoCp+0U8L9IGRLUHAZZzXM=
-X-Google-Smtp-Source: AGHT+IFRElJe62Xb8s7qSrjr6kyFkD31Ah3etFBxj6GTGAkmpSgwGWXZOzawiteETRfJZI44QPlxIg==
-X-Received: by 2002:a05:600c:354c:b0:471:14af:c715 with SMTP id 5b1f17b1804b1-47717df8437mr38712565e9.3.1761664935742;
-        Tue, 28 Oct 2025 08:22:15 -0700 (PDT)
-Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475dd48942dsm204991395e9.4.2025.10.28.08.22.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Oct 2025 08:22:14 -0700 (PDT)
-Message-ID: <4efc2d91-49df-4606-894e-92ac89c3ae9c@gmail.com>
-Date: Tue, 28 Oct 2025 15:22:13 +0000
+        d=1e100.net; s=20230601; t=1761665194; x=1762269994;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IMaVfQlDtYuJ6c5NZttg0Mv3ou88wdr4jRmdcFT8ouM=;
+        b=ez4F2e5xHRHwYuWOJiXY50+OiV/fRQ9wRn54GWzFV1diihFbaIy/nXsEoNzFHdjk87
+         0HwKvk3Z1PBmJX4qpnIA5rU/NTVuziS1LuEWg7l+pEjeyJffJ3XKTZsVnoLgHV1kkMos
+         exkkYjfnkNrwRzDNikn2mo/H6iTs3GjH5cW+QQGPo8WiSDhajUxxIJ+XozsJ8z7Qn1HI
+         ftZgxgIXHDvMHOu9inyvGgoJMAJW8GiuJIM7LSEsFklXFHpGV6j8yE3rbUYVvVNzH7kX
+         y/KRQ5sbRIssQ7WHVaPNwdY0sdSGGtoH1pdgvgEXUvs71aNpjPiB3CIVajlJ51/SjXRW
+         zAZw==
+X-Gm-Message-State: AOJu0YyLmoHGPwbcyJHN/c/VoPcdpca1aS2FOSEUc6AN9Bpgk5D6vF51
+	4kP1UO3BtWYMroCGsQnNECQuxVmzD24xYoKhf11nvF/vtXfL4vIAoHgNB4RqN1Ec9wtsKLRlHJV
+	Wr0DQRO4PHJ2D0JP2vjLncyKFL8HCC7M=
+X-Gm-Gg: ASbGncu68tFRBWkHk8Rk8QO0I7IwiLH7Fvgkac9pEpB51jTPsTuJfmvyrUc2tnQFzlL
+	tMcS/ryampmFGdBR1HnNTLt4j9B6xogl7QDNA9pIGNqk9HHW7e0dKMWkGwMhUTw+DgVASgOaMWX
+	GrTNAa4l/6cn+E88OTkOFp7VIJercmk58pc4r5hctRGmVnzd9/7YcTXPZ9qGeGVsoAlTN/kKawx
+	w4QWNmxP5Is2QLcltfecbzqmu2uTSJIZj5qcdtryD4e57WOSXA/PRNQyzVWqdJcrVt+I1RC6X7l
+	SQjF30gmOFH+bFK8sw==
+X-Google-Smtp-Source: AGHT+IFecXEBer9gY3Fw6bXmh2cLauGwvMSJKmcd/nJJQmi8Wb6V42y+e2nXPa7xL85yaGozx7KScirkyKtgA+pwrqA=
+X-Received: by 2002:a05:600c:8216:b0:471:d2f:7987 with SMTP id
+ 5b1f17b1804b1-47717e30970mr33123315e9.26.1761665194193; Tue, 28 Oct 2025
+ 08:26:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/3] io_uring/zcrx: share an ifq between rings
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-References: <20251026173434.3669748-1-dw@davidwei.uk>
- <20251026173434.3669748-4-dw@davidwei.uk>
- <309cb5ce-b19a-47b8-ba82-e75f69fe5bb3@gmail.com>
- <acb27d6b-5602-41c8-8fe5-4e88827713a4@davidwei.uk>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <acb27d6b-5602-41c8-8fe5-4e88827713a4@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <176133835222.2245037.11430728108477849570.stgit@ahduyck-xeon-server.home.arpa>
+ <176133845391.2245037.2378678349333571121.stgit@ahduyck-xeon-server.home.arpa>
+ <59f1c869-58c0-4158-82d7-e7b11870b790@lunn.ch>
+In-Reply-To: <59f1c869-58c0-4158-82d7-e7b11870b790@lunn.ch>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 28 Oct 2025 08:25:56 -0700
+X-Gm-Features: AWmQ_bkaUO1kkrdof1AVi8vi6kcMrBG7lqOhVJnvIyuE4P4QiZgjLGqZ7Jd_MEU
+Message-ID: <CAKgT0UduBJYty0WRzQMuzg64rbdMyZ_ubhgOh-q_Df6NPXsA9A@mail.gmail.com>
+Subject: Re: [net-next PATCH 3/8] net: phy: Add 25G-CR, 50G-CR, 100G-CR2
+ support to C45 genphy
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, kernel-team@meta.com, 
+	andrew+netdev@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk, 
+	pabeni@redhat.com, davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/28/25 14:55, David Wei wrote:
-> On 2025-10-27 03:20, Pavel Begunkov wrote:
->> On 10/26/25 17:34, David Wei wrote:
->>> Add a way to share an ifq from a src ring that is real i.e. bound to a
->>> HW RX queue with other rings. This is done by passing a new flag
->>> IORING_ZCRX_IFQ_REG_SHARE in the registration struct
->>> io_uring_zcrx_ifq_reg, alongside the fd of the src ring and the ifq id
->>> to be shared.
->>>
->>> To prevent the src ring or ifq from being cleaned up or freed while
->>> there are still shared ifqs, take the appropriate refs on the src ring
->>> (ctx->refs) and src ifq (ifq->refs).
->>>
->>> Signed-off-by: David Wei <dw@davidwei.uk>
->>> ---
->>>   include/uapi/linux/io_uring.h |  4 ++
->>>   io_uring/zcrx.c               | 74 ++++++++++++++++++++++++++++++++++-
->>>   2 files changed, 76 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
->>> index 569cc0338acb..7418c959390a 100644
->>> --- a/io_uring/zcrx.c
->>> +++ b/io_uring/zcrx.c
-> [...]
->>> @@ -541,6 +541,67 @@ struct io_mapped_region *io_zcrx_get_region(struct io_ring_ctx *ctx,
->>>       return ifq ? &ifq->region : NULL;
->>>   }
->>> +static int io_share_zcrx_ifq(struct io_ring_ctx *ctx,
->>> +                 struct io_uring_zcrx_ifq_reg __user *arg,
->>> +                 struct io_uring_zcrx_ifq_reg *reg)
->>> +{
->>> +    struct io_ring_ctx *src_ctx;
->>> +    struct io_zcrx_ifq *src_ifq;
->>> +    struct file *file;
->>> +    int src_fd, ret;
->>> +    u32 src_id, id;
->>> +
->>> +    src_fd = reg->if_idx;
->>> +    src_id = reg->if_rxq;
->>> +
->>> +    file = io_uring_register_get_file(src_fd, false);
->>> +    if (IS_ERR(file))
->>> +        return PTR_ERR(file);
->>> +
->>> +    src_ctx = file->private_data;
->>> +    if (src_ctx == ctx)
->>> +        return -EBADFD;
->>> +
->>> +    mutex_unlock(&ctx->uring_lock);
->>> +    io_lock_two_rings(ctx, src_ctx);
->>> +
->>> +    ret = -EINVAL;
->>> +    src_ifq = xa_load(&src_ctx->zcrx_ctxs, src_id);
->>> +    if (!src_ifq)
->>> +        goto err_unlock;
->>> +
->>> +    percpu_ref_get(&src_ctx->refs);
->>> +    refcount_inc(&src_ifq->refs);
->>> +
->>> +    scoped_guard(mutex, &ctx->mmap_lock) {
->>> +        ret = xa_alloc(&ctx->zcrx_ctxs, &id, NULL, xa_limit_31b, GFP_KERNEL);
->>> +        if (ret)
->>> +            goto err_unlock;
->>> +
->>> +        ret = -ENOMEM;
->>> +        if (xa_store(&ctx->zcrx_ctxs, id, src_ifq, GFP_KERNEL)) {
->>> +            xa_erase(&ctx->zcrx_ctxs, id);
->>> +            goto err_unlock;
->>> +        }
->>
->> It's just xa_alloc(..., src_ifq, ...);
->>
->>> +    }
->>> +
->>> +    reg->zcrx_id = id;
->>> +    if (copy_to_user(arg, reg, sizeof(*reg))) {
->>> +        ret = -EFAULT;
->>> +        goto err;
->>> +    }
->>
->> Better to do that before publishing zcrx into ctx->zcrx_ctxs
-> 
-> I can only do one of the two suggestions above. No valid id until
-> xa_alloc() returns, so I either split xa_alloc()/xa_store() with
-> copy_to_user() in between, or I do a single xa_alloc() and
-> copy_to_user() after.
+On Tue, Oct 28, 2025 at 5:57=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Fri, Oct 24, 2025 at 01:40:53PM -0700, Alexander Duyck wrote:
+> > From: Alexander Duyck <alexanderduyck@fb.com>
+> >
+> > Add support for 25G-CR, 50G-CR, 50G-CR2, and 100G-CR2 the c45 genphy. N=
+ote
+> > that 3 of the 4 are IEEE compliant so they are a direct copy from the
+> > clause 45 specification, the only exception to this is 50G-CR2 which is
+> > part of the Ethernet Consortium specification which never referenced ho=
+w to
+> > handle this in the MDIO registers.
 
-Makes sense, I'd do splitting then, at least this way it's
-not exposing it to the user space for a brief moment.
+I will go ahead and split this up as you suggested in the other email.
 
--- 
-Pavel Begunkov
+> Does the Ethernet Consortium have other media types which are not in
+> 802.3? Does your scheme work for all of them?
+>
+>         Andrew
 
+Looking at the latest spec on the consortium website
+(https://ethernettechnologyconsortium.org/wp-content/uploads/2021/10/Ethern=
+et-Technology-Consortium_800G-Specification_r1.1.pdf)
+it looks like they are adding 800G-KR8/CR8 and 400G-KR8/CR8. In the
+case of these two we would have to come up with a different approach
+as the implementation for them appears to be doing some sort of
+bonding of a pair of 4 lane links.
+
+The only other "consortium mode" is another implementation of
+25G-KR/CR which I could have followed the same approach on. The IEEE
+mode is close enough for now that there wasn't a point in splitting it
+off as a type of its own. In fact I got this idea from copying how the
+SFP bus code handles this
+(https://elixir.bootlin.com/linux/v6.18-rc3/source/drivers/net/phy/sfp-bus.=
+c#L251).
+There is already logic that is setting the 25G link capability when it
+detects the 100G cable. The general idea would be that we would end up
+with the 50R2 eventually slipping in there as well since the same
+cable can support all 3 types.
+
+I suppose if we wanted to be more consistent between these setups we
+could treat this more like the setup described for the 400/800 setup
+and instead of having one PHY doing 1/2 of 100G we could treat it as a
+bonded pair of PHYs doing 25G. As it stands I am going to have to
+present 2 instances of the PCS/PMA anyway as the vendor config and
+RSFEC ultimately has to be setup twice even though we are managing the
+core PCS logic through only the first instance.
 
