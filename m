@@ -1,60 +1,65 @@
-Return-Path: <netdev+bounces-233685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32EB0C1763E
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:43:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A5DF4C17641
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:44:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6D833A9C72
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:43:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CE9A4012D2
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:44:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB91D3563CC;
-	Tue, 28 Oct 2025 23:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6EB36A5F2;
+	Tue, 28 Oct 2025 23:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kDdCQXRq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qcxC+VpR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D86286891
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 23:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A3F280033;
+	Tue, 28 Oct 2025 23:44:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761694979; cv=none; b=rZTiT9cWmh5ezd4+lIoqkAUwehnR3yUCH3IsYDOHM4O2/0YfT/qA9n2Ec7wb4+SHaavwRt42ph3TDNAL/6NkOS7K6WFXNaKEZbH3y1FehN7ViaY62SB3WZ3j+2s+54kava8o4mQ+yHU0hOBLF2zJo/OdRPqLQlDNEGmQ2+noQKg=
+	t=1761695079; cv=none; b=cpqGieIfHy+rdK814oGNGBhqJMfUS41h+tLqAvDAOLaBviKwXCNULNjxYk0+PDg9ZD9HHUV0gp7DA7GiVNCJLNRuJcqyfnBeVbq+LrpKmooWMEmTHG0TOId4AALuBcSeNsuV7zIWYL69JUtGR60Mv5Y4pdb1GMBEXx/v3OLdfJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761694979; c=relaxed/simple;
-	bh=yf6La/yW+fAW9vXD7xqyZT4cnQekTq6yWJ+U87ek5aU=;
+	s=arc-20240116; t=1761695079; c=relaxed/simple;
+	bh=XV5KEoN5jVwlWM4qV2jaupzENzhi6N4X0KoX4O9lcMI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BowQi2DdBiMkDtS9BU+V+EurZQje3IfHDdEYAUbgm2TAF+c9CtrFyJyjr9PdOmhbJCR38zvQEGu9y6eQxO/M1rjxti8fCl0Kr6+FsBNYF4BtB0NYHMlce9FxBkApSnNtncRWCoMDvhTASiCsOr5//BycX/2ke/fO9aL0oLk4mV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kDdCQXRq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C87C0C4CEE7;
-	Tue, 28 Oct 2025 23:42:58 +0000 (UTC)
+	 MIME-Version:Content-Type; b=EjKrohds+hF8n/XtOGz9rffjetlkQYBuXzKq7kWcaqXe07KKAABdsmG1aqynA6dRGNOFYcg/jtpECYJ6KjdlCJFFouo+1oyeYcHb5XMKLtbc4b76/n59YaX2gbEEKzl23hn2Lhms37U1Ew7O3Vz3Z/admfTK02EdDSR0f8DK8F8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qcxC+VpR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0722FC4CEE7;
+	Tue, 28 Oct 2025 23:44:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761694979;
-	bh=yf6La/yW+fAW9vXD7xqyZT4cnQekTq6yWJ+U87ek5aU=;
+	s=k20201202; t=1761695078;
+	bh=XV5KEoN5jVwlWM4qV2jaupzENzhi6N4X0KoX4O9lcMI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kDdCQXRqa1q+juk8aW57ol8x2a/4OlhvmYypN4PEefUdMp65mfzmqMwchQ20wagfq
-	 5S2HWPiYLc7BMPhFBkuKpoTIGAp4bdpRtncHyUQb+ABiu4zav6/WxgEXrzVAuAVloW
-	 Fc0nc4+EjLEr3eyZ1hv3yF1KfPoIQ24vo8LVKkJQwlrD5NVUTB6+NDnfwNYgPstmpE
-	 F24HwJqZFjbLZUkXx40fVmaauBUnFhK2HGjSlJAMKhofod9Q4XH6CgJtxs87pofUDt
-	 /177iltAlTicNcWjkgdPOjMWy7uaRUDpruZhwk1boJm8ndFh3/Y64gIMYyaSqZcIQb
-	 FTeNdikC6e4ow==
-Date: Tue, 28 Oct 2025 16:42:57 -0700
+	b=qcxC+VpRGSxvjnAptq7vMQhAjA3xm8GK7cR2b0MYTw44nGtUNN+s3VNU1kIlmc1Wl
+	 UxLIWGbgBpHFj7akzF3LBarMQSVU2N0EjOtcfU6Bh+29lneFI84Y2R07cX9nrsaibi
+	 3LUGa0zyU5pnDJYgR8ep81+varLgqxGgw6yHggaE6dCfloGHcR/RusaEdUcU+vWLuK
+	 FVfJpCo7eR3c2Zapx0I6k8OLdVAc5CirrF9ASiqvgMKWCVZEykxkobE32DKh9i6gQw
+	 RPx8XsjiJm4snCgnT3ZsLhUqdqny9iwyJraXmeQUMXmIUFseDzrVaPOwye+q9plFEz
+	 PpYEOkY1MlcJw==
+Date: Tue, 28 Oct 2025 16:44:37 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni
- <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH net-next 0/8] net: stmmac: hwif.c cleanups
-Message-ID: <20251028164257.067bdbcd@kernel.org>
-In-Reply-To: <aPt1l6ocBCg4YlyS@shell.armlinux.org.uk>
-References: <aPt1l6ocBCg4YlyS@shell.armlinux.org.uk>
+To: David Wei <dw@davidwei.uk>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ razor@blackwall.org, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, toke@redhat.com,
+ yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+Subject: Re: [PATCH net-next v3 02/15] net: Implement
+ netdev_nl_bind_queue_doit
+Message-ID: <20251028164437.20b48513@kernel.org>
+In-Reply-To: <77a3eb52-b0e0-440e-80a0-6e89322e33e9@davidwei.uk>
+References: <20251020162355.136118-1-daniel@iogearbox.net>
+	<20251020162355.136118-3-daniel@iogearbox.net>
+	<412f4b9a-61bb-4ac8-9069-16a62338bd87@redhat.com>
+	<34c1e9d1-bfc1-48f9-a0ce-78762574fa10@iogearbox.net>
+	<20251023190851.435e2afa@kernel.org>
+	<77a3eb52-b0e0-440e-80a0-6e89322e33e9@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,33 +69,42 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 24 Oct 2025 13:48:23 +0100 Russell King (Oracle) wrote:
-> This series cleans up hwif.c:
+On Tue, 28 Oct 2025 14:59:05 -0700 David Wei wrote:
+> On 2025-10-23 19:08, Jakub Kicinski wrote:
+> > On Thu, 23 Oct 2025 14:48:15 +0200 Daniel Borkmann wrote:  
+> >> It is needed given we need to always ensure lock ordering for the two devices,
+> >> that is, the order is always from the virtual to the physical device.  
+> > 
+> > You do seem to be taking the lock before you check if the device was
+> > the type you expected tho.  
 > 
-> - move the reading of the version information out of stmmac_hwif_init()
->   into its own function, stmmac_get_version(), storing the result in a
->   new struct.
-> 
-> - simplify stmmac_get_version().
-> 
-> - read the version register once, passing it to stmmac_get_id() and
->   stmmac_get_dev_id().
-> 
-> - move stmmac_get_id() and stmmac_get_dev_id() into
->   stmmac_get_version()
-> 
-> - define version register fields and use FIELD_GET() to decode
-> 
-> - start tackling the big loop in stmmac_hwif_init() - provide a
->   function, stmmac_hwif_find(), which looks up the hwif entry, thus
->   making a much smaller loop, which improves readability of this code.
-> 
-> - change the use of '^' to '!=' when comparing the dev_id, which is
->   what is really meant here.
-> 
-> - reorganise the test after calling stmmac_hwif_init() so that we
->   handle the error case in the indented code, and the success case
->   with no indent, which is the classical arrangement.
+> I believe this is okay. Let's say we have two netdevs, A that is real
+> and B that is virtual. 
 
-This one needs a respin (patch 6 vs your IRQ masking changes?).
+Now imagine they are both virtual.
+
+> User calls netdev_nl_bind_queue_doit() twice in
+> two different contexts, 1 with the correct order (A as src, B as dst)
+> and 2 with the incorrect order (B as src, A as dst). We always try to
+> lock dst first, then src.
+> 
+>          1                 2
+> lock(dst == B)
+>                    lock(dst == A)
+>                    is not virtual...
+>                    unlock(A)
+> lock(src == A)
+> 
+> 
+>          1                 2
+>                    lock(dst == A)
+> lock(dst == B)
+>                    is not virtual...
+>                    unlock(A)
+> lock(src == A)
+> 
+> The check will prevent ABBA by never taking that final lock to complete
+> the cycle. Please check and lmk if I'm off, stuff like this makes my
+> brain hurt.
+
 
