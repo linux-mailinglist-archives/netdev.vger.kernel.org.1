@@ -1,109 +1,102 @@
-Return-Path: <netdev+bounces-233571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E571C159F1
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:56:32 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A301BC15A66
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:02:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E9091C22BB4
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:51:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8BEF756777C
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:53:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B577327991E;
-	Tue, 28 Oct 2025 15:48:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3687F33290A;
+	Tue, 28 Oct 2025 15:53:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PZd8z5EU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zD7qzO2c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2102B23FC4C
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 15:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7A232D0C4
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 15:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761666506; cv=none; b=kMOEkn/6FM2m6nZSB2KaPQKdIl80WLxurd7OGj4QK5XLzg5MDXNsJ9jn+mXnEq4X4cyHUU5ok46vPgGRDAF4lWuFaMNcRYtfTEYDLSYRE2jR/Omtw1s0vDAwxjXHI/c3ykryArBWevWV52fx6KvS9ARTHdeRH4+N8jmCkt71A/w=
+	t=1761666802; cv=none; b=bye4W4SftMYYAaAAtUGfvRA3A1IiXfNlWboe/mhASo4v7g4YcDA+gqnEOvwr2sluFmuvTJdvq1frYZbuVhqFOMVOjoLpg7rhlXLrw4AEEMpqePOs4A7bcEaJF4EiNtxgonSjNlj/FVaIjb0T0x1hoGDepZ5iNsTqEZbrNbdQDwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761666506; c=relaxed/simple;
-	bh=2bOY6gnUwb4nFCgw2yqY+36HofjZmkIDlMsu7BOd0iU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=maY/5EPH6Y5yUe1oJGDS2Evc79MQiONYEqn/EAPll2FOZSOQkn6jbOOPLF2hHYGacBj85EAa/PQXaxFOYEUs3hbhg4L2t8Xm4aKPZVuCH7XJck/SDrUeVlqpyAqVf74PUp/EZLR9adaCTm8hH46NeAVDnQPLlcprjBTXD3TTUFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PZd8z5EU; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-475dab5a5acso22269905e9.0
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 08:48:24 -0700 (PDT)
+	s=arc-20240116; t=1761666802; c=relaxed/simple;
+	bh=bvubLNry8i2KgFkZtrgq5oxD9xLD4eBmItr1+AV//cQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=mTC4d+U3p9vJVLwT7vbu789dbwrwpTFXb+3ytjvgny1iI5pMKUMnsEiywou7gbdc6uWva9pboj+A7eGqY1YO0i623MQ/eXmYgtxPLUuZuTKMlOGxBzazuZMaUFAoM0cN1+cArir3NBkIGs7nMn+49eiUzJm1jZmH52sqLDWdqro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zD7qzO2c; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-336b646768eso6344108a91.1
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 08:53:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761666503; x=1762271303; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=upZIuMB9ObsKnLxIeEEbncHV6JDOCPeXZREqtGp1TxQ=;
-        b=PZd8z5EUOqmps3EyqEBGE2slhNnuO3Lqs7gjlQLBxam+BW4RXYObosvcNB1la7Jsgc
-         KswyupMLzAALk+PD4uJNDFPSRiYpo9vH0mz9uK/JtIbJCXzPqoqLbvPr3CCrHC/46/TS
-         rcy0q7lrG9XTYzZlIfSu2VjQjSrE/Pyz8KyhHa/W/XtIwvl3iGbweHGmfIpsMfYA07AX
-         OVOXMEI5U+Sbk+pJ9iwu2G7Im2IXOJvwYrOznFgHAjKuyCHJORiN9OYVQlYCEUYt9q3Y
-         sEb5YkE06S1OELw+L1TGenhXNnj780VYVMZNyQfBvKwjdDpE5+qxzPJBnv3289Y473AK
-         jMRQ==
+        d=google.com; s=20230601; t=1761666800; x=1762271600; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ghHNPpIkVrYu62/YqFMFKRWudpG1mODk+3kt3NmNBok=;
+        b=zD7qzO2cJnFg9n+oilba0f/J69xmkMPbY/mbMWM6V9Pf69cL7kWebvmq/BK3PCBWze
+         BMfiRW8uiuumUlyRvm/Um0ih9HFx0ecFiUwle4RetUGUGt8/S8myskPuUKMid5GoPuUG
+         OMvHYsQms202Czb+FvR1ttrm31VUlHesNhgW6g6Uc/P05IpGyms0MXpj5ACk/mewW4KE
+         toabygEvXx4GJMSGbx6DFUHZdmtPqEgB/x0Ow+aCTibpviTSy+hqLUfdjNaRXecq4JsN
+         U/cnt6Cn5EY76Av6wRk9mZOOpmvw9O+hmj54eLptI8uteBa8nlkwbVF8X2fv191MB7GX
+         XEHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761666503; x=1762271303;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=upZIuMB9ObsKnLxIeEEbncHV6JDOCPeXZREqtGp1TxQ=;
-        b=Fbcs2Hi3Of+PKPoYlq8YKwW/bidnLShhy1Xn0yI+j7sj4ixA4J9h0M/01Evy5MQbR1
-         8CVN58BF809h/4SnLBNt5FjY6yXnEMvNjeP4iP57txp2vNSmJIXYAuNJM0tef8o3ejKK
-         2s1caFDWpgXKXuxjuCue11koHCtieFKWznGSlx0XSj9qTewpI5AcrZi0v4zSKG19q7Sl
-         f3rlPfJycM2/R8bruJOTP1TMlyjf5JPj347IYUVkB0j2MqT9E1N4KHJI5COMuZewt4Rj
-         c0FFpG8nQunlqdtz1ZAPKZ69lRNjF9I8p+gyWMm0w3qUcw8HamiTxTMIq/Gihcu5aaAe
-         9QEA==
-X-Gm-Message-State: AOJu0YxCAoJodqz4Xd2RAzZ3a4aDwiS34JoznEwXMBbIvjzYcyRO8W5L
-	GzvSAeBARbB2RgFjlXXlSybaT/x07gA2024jY9ckfS6Vkt9ztMsY+Sllj574zYrEZIV+sLLJSmP
-	divtLM1emP7d4BkPp0Fst3Wn3qAIynpw=
-X-Gm-Gg: ASbGncu1MFlU9Q7O8hphDKZpgfk5sb/gRFCDbHsSOr1DtMZVUffHmPqUm4HY7dv8jjr
-	foJJw1FFuc+WJGIuC3HnSJGy3Vt9iTm324jGbC0H8nSRHodwW+pNp1QmFIDG08gMzBJXY1pHvc7
-	/ZBs90sn4ytUP8CKWlFnjsr4GX+eSubzapwiTxUeOaPOISCl7xqWp08/zin6FKnChaqnIvHUY9+
-	Fezj39e1R6pBkPOIbyg4kStyg9kmCDcm0qkinUyaMcKWcAfOgrpDD4bjEIpKqj5JWA7+TT9KanC
-	FR72MmwKFBwADIm27A==
-X-Google-Smtp-Source: AGHT+IF789c3V0PqzWIYueqeJM5wXvGmj4WgXd+sc7NbTJncHGH4wM2ozJi5DdEb6LUDxgd5G6mnjH6E1dCesSbigSY=
-X-Received: by 2002:a05:6000:2f85:b0:427:490:68d2 with SMTP id
- ffacd0b85a97d-429a7e4af41mr3536115f8f.10.1761666503370; Tue, 28 Oct 2025
- 08:48:23 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761666800; x=1762271600;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ghHNPpIkVrYu62/YqFMFKRWudpG1mODk+3kt3NmNBok=;
+        b=dJlu7hs5rvDocmXwHhujZ9JD5v1aMT8xb9LxPZISnFfCAzfVwnqTGI1nfZ+EAb3JpB
+         V/FoPBLmo4iho3Qx9raOdNXodjKOONJFGhvVvHuXLO9XeV0+th4/lS1h4QZhbaV/oJ7a
+         Gm2g5jFa6bPBbgjgT30VRxZanKFIerUJytAxILbs1AsXzyHuDB3a+xCEKUDzTWIRkdQX
+         Zur1IJwneL65RzTbvtWCQZroS5tlkS5Ipj6sAaIzYatX6zhoeXsVAXskSfpW32rRJFHj
+         u5qd3sf2TJlG6aHsoyTRIPiMlMMMAIXmFoBjepdP/Q3nlwinw47aBRO7kqLG3YFBmCzy
+         Brvg==
+X-Forwarded-Encrypted: i=1; AJvYcCUqa5IlgDKlpGv40xqr+KL6Xh+FmR5SrA4JgDNPLSAvj7J6hFOcpJlpK/4j5U0XQkf+K3KnSLk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBjEyGqdCs3m0PhU+xCvCzlY2k4pdaSAtW1JOlhdCqppeqi09x
+	aC8NuLEUgsbHV6bQGTNCARU1K2rIDerNZm5c1VkIES9cnO5tEtJXKA3t5v33Dt3rehcSYuRs5Vx
+	Pxuww0Q==
+X-Google-Smtp-Source: AGHT+IHFuR5DYWudiyV7h1agovuZqNOF3NC0YcpaGD25SCPgJSDGq9HjUwprk8+VKQsrML4GoiDI522EkQ0=
+X-Received: from pjbsb7.prod.google.com ([2002:a17:90b:50c7:b0:33b:51fe:1a94])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c8c:b0:33f:eca0:47c6
+ with SMTP id 98e67ed59e1d1-34027aac14fmr4416665a91.30.1761666800026; Tue, 28
+ Oct 2025 08:53:20 -0700 (PDT)
+Date: Tue, 28 Oct 2025 15:51:50 +0000
+In-Reply-To: <aQDOpeQIU1G4nA1F@hoboy.vegasvil.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <176133835222.2245037.11430728108477849570.stgit@ahduyck-xeon-server.home.arpa>
- <176133844020.2245037.14851736632255812541.stgit@ahduyck-xeon-server.home.arpa>
- <691b8687-65ec-44c0-8c19-c3bd8bb6ed2b@lunn.ch>
-In-Reply-To: <691b8687-65ec-44c0-8c19-c3bd8bb6ed2b@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 28 Oct 2025 08:47:47 -0700
-X-Gm-Features: AWmQ_blwrUH1fDQ6eFM1-B7FkdxRHWtYLldi7s9tfca0c2hnl2_7KxuiuyWeCA8
-Message-ID: <CAKgT0UcORiTryUFGiz7mb6j-WK_cXOWW=v+ktQxMoBjfBjoCVw@mail.gmail.com>
-Subject: Re: [net-next PATCH 1/8] net: phy: Add support for 25, 50 and 100Gbps
- PMA to genphy_c45_read_pma
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, kernel-team@meta.com, 
-	andrew+netdev@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk, 
-	pabeni@redhat.com, davem@davemloft.net
+Mime-Version: 1.0
+References: <aQDOpeQIU1G4nA1F@hoboy.vegasvil.org>
+X-Mailer: git-send-email 2.51.1.838.g19442a804e-goog
+Message-ID: <20251028155318.2537122-1-kuniyu@google.com>
+Subject: Re: [PATCH] ptp: guard ptp_clock_gettime() if neither gettimex64 nor
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: richardcochran@gmail.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	junjie.cao@intel.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzbot+c8c0e7ccabd456541612@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com, kuniyu@google.com, thostet@google.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 27, 2025 at 8:12=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> >  #define MDIO_PMA_SPEED_2B            0x0002  /* 2BASE-TL capable */
-> >  #define MDIO_PMA_SPEED_10P           0x0004  /* 10PASS-TS capable */
-> > +#define MDIO_PMA_SPEED_50G           0x0800  /* 50G capable */
->
-> This is 45.2.1.4 PMA/PMD speed ability (Register 1.4) ??
->
-> 50G is bit 3. So is 0x0800 correct? I think it should be 0x0008.
->
->     Andrew
+From: Richard Cochran <richardcochran@gmail.com>
+Date: Tue, 28 Oct 2025 07:09:41 -0700
+> On Tue, Oct 28, 2025 at 05:51:43PM +0800, Junjie Cao wrote:
+> > Syzbot reports a NULL function pointer call on arm64 when
+> > ptp_clock_gettime() falls back to ->gettime64() and the driver provides
+> > neither ->gettimex64() nor ->gettime64(). This leads to a crash in the
+> > posix clock gettime path.
+> 
+> Drivers must provide a gettime method.
+> 
+> If they do not, then that is a bug in the driver.
 
-Yeah, looks like it was a copy/paste error as that was the correct
-value for 25G.
+AFAICT, only GVE does not have gettime() and settime(), and
+Tim (CCed) was preparing a fix and mostly ready to post it.
 
