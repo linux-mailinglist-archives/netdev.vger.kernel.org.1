@@ -1,134 +1,97 @@
-Return-Path: <netdev+bounces-233523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FF75C14D09
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 14:25:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0DC4C14D00
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 14:25:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 99D2B4EC307
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:25:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 816D63ABC01
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:25:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2DA32863F;
-	Tue, 28 Oct 2025 13:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0553C2DA746;
+	Tue, 28 Oct 2025 13:25:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=sjoerd@collabora.com header.b="ZwoIEHXc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ucPQCc0C"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C165D2765E3;
-	Tue, 28 Oct 2025 13:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761657921; cv=pass; b=fmGbrkrFwIFaSm+IepdyktW/4UR8YbCvMiiyfgSLGtfE565eQavs5WN6HPj05tz4nFRdGrfkyrmZ0HXi9j2VfYcoQnFDE9NdswZ+2jsSnkjcx1cxcQIyLOhGQ7dsAYhmmobD1Um70meQ3+cleyn1bhdeqOfqxdzxAkcuAdxnJH0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761657921; c=relaxed/simple;
-	bh=98jTqZUcQ5Qf4P1DNrN2dsmZVex8R7C740H3NeDUBVI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Cs+20O9UKgFWH9KMG880Jl6i6bNmlJFihvDb7upIHTDW4zJeQUWM85vLHEFmzLulPg1MpeFy/uGrZdjhhU5/0ENjDDHVHC0lLHxdMkWbPfwL+rW5UYN+ERmx4BcKr5Q5hLIjsv+JWXNYnkirMYINSvnzCQFcfaUpnAIejjc/KPY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=sjoerd@collabora.com header.b=ZwoIEHXc; arc=pass smtp.client-ip=136.143.188.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1761657869; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=ZCTOLf2S+q8m7fxAVIx8Y+bCTP95emO4YmHpi3NRritxQmxe3ATRHjgeW0BrRIv/SbQdJcPkYSIUlLoL7Sl45gi2zztEIUBUCnLkgM8wr8gLtilOLj+4p0mgiYOXQchJqvmPzkbMfQ+hjVO2mN6HwX4WU2/7ifnbvDnEokHm7os=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1761657869; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=8/d3UUUhdWoIZXpk8NwqSpg4DExzAbF8PYQkQhgem3s=; 
-	b=mVNRJGLaKBa+FnpaA60HLtOXJLBTBabrws/EXB4240rOpfhff5FXpf/VNKnYWCwBu00BOQ3NWKiZVwJqhU0Q3gMtrBNyvabfFoH3VOmcPyKqHEO88TmrhOh57Z7cNaIbziW7X/3hIqvD/KY4twXCtuQs4aGT6BhvdTOPnX+n6xw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=sjoerd@collabora.com;
-	dmarc=pass header.from=<sjoerd@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1761657869;
-	s=zohomail; d=collabora.com; i=sjoerd@collabora.com;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
-	bh=8/d3UUUhdWoIZXpk8NwqSpg4DExzAbF8PYQkQhgem3s=;
-	b=ZwoIEHXchlDN8s9MvkdPt0IM1C2ZQYDwtGfbijZC9gXXVKG93gOrptfLgnMCk5QN
-	KWqWvywAsKEtYwEZm6+KZfkQE2jPZsK7IM4T470U+hBGQFBMILmP97pYYcSjTIEpo1C
-	3viKQ0jStrCNXpRAwgnP937Ec/N+iwr3jwOZzaVI=
-Received: by mx.zohomail.com with SMTPS id 1761657866228953.45389749315;
-	Tue, 28 Oct 2025 06:24:26 -0700 (PDT)
-Message-ID: <408842eda1caa53247ff759cd9ea75dcab624594.camel@collabora.com>
-Subject: Re: [PATCH 12/15] arm64: dts: mediatek: mt7981b-openwrt-one: Enable
- Ethernet
-From: Sjoerd Simons <sjoerd@collabora.com>
-To: Eric Woudstra <ericwouds@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
- "Lucien.Jheng" <lucienzx159@gmail.com>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-  Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno	
- <angelogioacchino.delregno@collabora.com>, Ryder Lee
- <ryder.lee@mediatek.com>,  Jianjun Wang <jianjun.wang@mediatek.com>, Bjorn
- Helgaas <bhelgaas@google.com>, Lorenzo Pieralisi	 <lpieralisi@kernel.org>,
- Krzysztof =?UTF-8?Q?Wilczy=C5=84ski?=	 <kwilczynski@kernel.org>, Manivannan
- Sadhasivam <mani@kernel.org>, Chunfeng Yun	 <chunfeng.yun@mediatek.com>,
- Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
- Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,  "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
-	kernel@collabora.com, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, 	linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, 	linux-pci@vger.kernel.org,
- linux-phy@lists.infradead.org, netdev@vger.kernel.org,  Daniel Golle
- <daniel@makrotopia.org>, Bryan Hinton <bryan@bryanhinton.com>
-Date: Tue, 28 Oct 2025 14:24:19 +0100
-In-Reply-To: <05610ae5-4a8a-47e9-808b-7ff98fade78e@gmail.com>
-References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
-	 <20251016-openwrt-one-network-v1-12-de259719b6f2@collabora.com>
-	 <4f82aa17-1bf8-4d72-bc1f-b32f364e1cf6@lunn.ch>
-	 <8f5335a703905dea9d8d0c1840862a3478da1ca7.camel@collabora.com>
-	 <05610ae5-4a8a-47e9-808b-7ff98fade78e@gmail.com>
-Organization: Collabora
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2-5 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26AB933E7;
+	Tue, 28 Oct 2025 13:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761657912; cv=none; b=SW6noalhAzn3g8I6DtLhR1LqRp45QRJ9MbLT8StS/7N7g9ifLmmkQDoxA3v9JpszseDtqrXOD55wgaRq8mmMJjf6ktxGKtyGOwZsQUgSR8hbDROFR2XrWwwEynfJZfvumCR710u3DVdbJUxWeO2qeWrBHeKaO16aKEbKrvRN2w0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761657912; c=relaxed/simple;
+	bh=+73ES3vFky/WtRPYBzIKEqLPdiDRYFGkszb9lqjt6Qs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H94d8XHLYNZlqZRWt9Fk89VhL5s3JWFCedXKThbH9V+ilQY6vCYrwfzXJawW/qx+fEdJ9KShEU48z2TVTPc334LWWp/iePWf0oeIMd2AJ4rAfuqjOdULvnEHWPYmrIUSiFc8DPugnaio0l8n+xGtDW8OBP4mQQKt2JmuY1qce64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ucPQCc0C; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=LcpMDj9tWoxdju0hl6lEoaXx3jgSRxXpNSpSh7vQ4CM=; b=ucPQCc0CUvKJvPqiLRZcdJ8be9
+	rzZDWziELaVIRjEiEoDeM1AsK30jqmeI1nlTVCEdrrcDVtax8U4bgM3r/CnYYFWEYHmR4e/9Zg4Mk
+	e6IMXrNZbe3HSmJ/KpChTYGn5zAa6lWz5YaLB5P0pG1qpjJJSQeXq5c/+qvx8O6Wpbxk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vDjh2-00CIUx-T4; Tue, 28 Oct 2025 14:24:56 +0100
+Date: Tue, 28 Oct 2025 14:24:56 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Dharanitharan R <dharanitharan725@gmail.com>
+Cc: sammy@sammy.net, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: i825xx: replace printk() with pr_*() macros for
+ cleaner logging
+Message-ID: <fcb18197-af45-4f7d-a435-39796c51c1e7@lunn.ch>
+References: <20251028100127.14839-1-dharanitharan725@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251028100127.14839-1-dharanitharan725@gmail.com>
 
-On Tue, 2025-10-28 at 12:14 +0100, Eric Woudstra wrote:
->=20
->=20
-> On 10/21/25 10:21 PM, Sjoerd Simons wrote:
-> > On Fri, 2025-10-17 at 19:31 +0200, Andrew Lunn wrote:
-> > > > +&mdio_bus {
-> > > > +	phy15: ethernet-phy@f {
-> > > > +		compatible =3D "ethernet-phy-id03a2.a411";
-> > > > +		reg =3D <0xf>;
-> > > > +		interrupt-parent =3D <&pio>;
-> > > > +		interrupts =3D <38 IRQ_TYPE_EDGE_FALLING>;
-> > >=20
-> > > This is probably wrong. PHY interrupts are generally level, not edge.
-> >=20
-> > Sadly i can't find a datasheet for the PHY, so can't really validate th=
-at
-> > easily. Maybe Eric can
-> > comment here as the author of the relevant PHY driver.
-> >=20
-> > I'd note that the mt7986a-bananapi-bpi-r3-mini dts has the same setup f=
-or
-> > this PHY, however that's
-> > ofcourse not authoritative.
-> >=20
->=20
-> Lucien would have access to the correct information about the interrupt.
+On Tue, Oct 28, 2025 at 10:01:27AM +0000, Dharanitharan R wrote:
+> This patch replaces printk() calls in sun3_82586.c with appropriate pr_*()
+> macros (pr_err, pr_info, etc.) according to Linux kernel logging conventions.
 
-Thanks! For what it's worth i got around to putting a scope on the line las=
-t
-night. It looks like the interrupt line is pulled down until cleared, so it
-appears it's indeed a Level interrupt as Andrew guessed. But would be great=
- to
-have this confirmed based on the documentation :)
+You have a Sun3? I've not seen one in maybe 25 years.
 
---=20
-Sjoerd Simons <sjoerd@collabora.com>
-Collabora
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+says:
+
+1.6.6. Clean-up patches
+
+Netdev discourages patches which perform simple clean-ups, which are
+not in the context of other work. For example:
+
+Addressing checkpatch.pl, and other trivial coding style warnings
+
+Addressing Local variable ordering issues
+
+Conversions to device-managed APIs (devm_ helpers)
+
+This is because it is felt that the churn that such changes produce
+comes at a greater cost than the value of such clean-ups.
+
+Please state in the commit message if you have run these patches on
+hardware, and plan to do other work on the Sun3 driver, new features
+etc.
+
+    Andrew
+
+---
+pw-bot: cr
 
