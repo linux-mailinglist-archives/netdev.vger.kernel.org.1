@@ -1,353 +1,221 @@
-Return-Path: <netdev+bounces-233626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F056C167C2
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 19:30:45 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17A11C167C5
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 19:30:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52F013BFD78
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:28:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9C6064E96AF
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508F034403C;
-	Tue, 28 Oct 2025 18:28:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C0329D268;
+	Tue, 28 Oct 2025 18:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YTz29piu"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ITQtUuGb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ASbHOI0E";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ITQtUuGb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ASbHOI0E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6996429BD9B
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 18:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8F41DDC1B
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 18:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761676109; cv=none; b=T/QKb5Zpe9C9CjxJUk/E6+dkJ6S4VqSsiyd8aIYPYZDtFZeH6pVd1Wx1FgUQ0yslYUmy6VozoYNWqpFFfX4VjFB1YtfTM5dcNdtrsjyr/nSdLmi9qxW10ThJiR0LkSpgaEcHH3dQW2IbA8gD/B3wIBl8uhcmB/KtrqYHi3kG2Nc=
+	t=1761676247; cv=none; b=Jf//s25877mP6ocrf+31K/hNrPcQiLOw65CxCsltHv2k5J1Q+1VBfhBKfVd6mGa9C5v3yRmLtVvix/z7y1TtIpe5I9AWd8+4n/G+B/ABG1CXYwZnNG0pUFNgKvTS8vtQ5uRnmgHdUXDUCgJj8zYEAsxg78rh+9LSbb30VwcOdMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761676109; c=relaxed/simple;
-	bh=2a2XJVs9ZstRVlMwHGaX/LzLjoMWBC1o41QfM3zzQls=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SjaXI0+mmdHD+xKkoNFuuNObqCU8GThnLu1Irwc99+rcdGvjyeyNrgRHhH/FFi8hnMgP2u5Pvr1mfZUW7ld0TvaDOYKX8pcPLSk4wHKL4JeimBaO1pZzdNqORFQp+bAdbzeGAxYubDgKCtL8DSSBByD6Lup7IBU6Q5iLD6hpUqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YTz29piu; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b6ceb3b68eeso4782325a12.2
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 11:28:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761676106; x=1762280906; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JwwqbizLme2jEhCIP8tyn9yg6ZUbIw3HVu7qFcIaTlE=;
-        b=YTz29piuOCg+8uK1h4ozQLgivuKvzIO25hPhFzPkYaX5xPUEUUMT0NYzUsDmmGUxHZ
-         ZSi7gE9C7lM0TlthlA6J0SP5nZFf9jGfnlBChuWp5j1RVqZhEU5ncZP3K4EAAM2S63ed
-         xqVeFB4DCZohSuFyemHTIXxF3BEz/PwiAISzH5EsBYtfWx6kSWN5kj8alm4UMmSSq3HF
-         gPm7wv47cOqU2Cdra0q8yJb3fDLoaFqOvQFvGztG3vmUols6ihFm8KMb0PdCPWcOtquw
-         4WVzTcZUQWRGS/hGpcEsZP2iaBXr0sJOD5excu3lSq82RPPnYTGS/neZHMf7rphoFUcd
-         UIjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761676106; x=1762280906;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JwwqbizLme2jEhCIP8tyn9yg6ZUbIw3HVu7qFcIaTlE=;
-        b=BsgOUTSzkt1kb9nSRUF0rZGZfSpNk9JkIFLP4SVOy56iLF5sMXwCrGfMK6GsX8V7W4
-         D2cfnWPw5YXOQbPkh3jKT1qXlBhbKTPtjocOSC2RpIQOcAilqKvUNjw+ChH5l2NQBz2j
-         Tt5+cE1fscrp4XeG1ynHfwFVcwymENjpZ30H+Ch2wVqEyT3yN9SY0E5oEAPAgmCMGVVq
-         Ji4pXF+095X7vCZMdZUwHom8TXkMO7vO57xZivPYyilqJG15NuMGV587jhA9btiExDba
-         cNRaT2DUOXmjrdtCR2h+vXwVmRgT8wi+DAIY/oCC2/S3LEuR+Kg0gmnIySyG3vguVPSL
-         /hGA==
-X-Forwarded-Encrypted: i=1; AJvYcCW/wNyxvdUN1X0VssrIl9+rztJVxgl2pd4+IYKvODbqRfgrjGFiKdQE4qfQNu/TMu8caAgXcoU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSIt31ugx2DAvT/uDzSiP5BWTHsqhF/7MRVS7Ct8GYs0LpKeLR
-	MdNBbASyXOm5do4/Hd7qv1vA0z9JeBpZ/gFE+X4a/ae2q7FHd6jaPwwLTeomeeNxu/fYrl6VjWn
-	uYmzGtv5WddPfFONn6v/M0BaaRTFsWgWGSzIRgWjz
-X-Gm-Gg: ASbGnctTaUpfUNB9vU615HGfmHB0xJotHdke4eulCB9y8Ls6dmZKEiPm2X2zMVP3s0K
-	HgqQggXw2mjil7+NgsribB+EJXJ/5vOU7s/Cl5ca9hWIh/vCnlcUvIfgbdtD+xvfblDHFTvqhVi
-	3EGwz7KveArP2zmqIvxN1VhoSe0TsyvpbS5AjurdMEfp80cp3n438RIE1g8exP51yB/12RNkGYw
-	hFhPEHhd/kD65mVgyO3WNQKH+9RHAWSyKjIt/r7MlhVXO0BM0626S47R1YNN8BuVtQVeUNtvZUW
-	UeLS9KWuHLB37Zg=
-X-Google-Smtp-Source: AGHT+IHGQgiHurQaRm5BB7XlGFbutHXsTrKesjHVFoO64zS/IwuXtf9Zc3l3Dd5HGQS+OWR2w/kG1Uyuv84suWGXdkw=
-X-Received: by 2002:a17:902:e802:b0:279:fa:30fe with SMTP id
- d9443c01a7336-294dee25c62mr1768945ad.26.1761676105954; Tue, 28 Oct 2025
- 11:28:25 -0700 (PDT)
+	s=arc-20240116; t=1761676247; c=relaxed/simple;
+	bh=3hjdAAQoputesmOF+x18w1HhE/O4ueavNyEBqju3h6c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p94NziUQs11oP2haKT1ivyE8j51I98oUFDGbLwQsYSWIetqyoBixxiTlTUQurgC1S25gM735pVeW+9nglazs4rH2wUmYFJqvBmCNXrdb+dNv7S0TIYS31Tly4YAINi478hj21OieF2av5HdaHXTRx8caBe32XCeGbyrD9RJphVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ITQtUuGb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ASbHOI0E; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ITQtUuGb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ASbHOI0E; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id A43ED1F749;
+	Tue, 28 Oct 2025 18:30:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761676243; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=U2q76lj0xN+R4PacIP1fgChSB9f8M+/V7F/TqVzF32I=;
+	b=ITQtUuGbxS+pHb1RiF+GswJeTwIa1jFbAQLGcS3Yup4NUC6KwSfsjoyhhw9rRMeZMV5RL3
+	670iSaJuBXQIh0oZl5Ggq5enKtKGTR8/lD7YHR6x0B+5qRUK32IUU8Go8qQE7Qcsz2HVKF
+	rYQHNIB40R5CnAAhUaoI7YWFHstffIA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761676243;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=U2q76lj0xN+R4PacIP1fgChSB9f8M+/V7F/TqVzF32I=;
+	b=ASbHOI0EPn2EHfNMPIIGvjzMGOvfeNtW0gDo/+yNIm5LYMn8GzBoutsnoMXIr+Miwitz6d
+	GbYWnb+AH16qGTCg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ITQtUuGb;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=ASbHOI0E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761676243; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=U2q76lj0xN+R4PacIP1fgChSB9f8M+/V7F/TqVzF32I=;
+	b=ITQtUuGbxS+pHb1RiF+GswJeTwIa1jFbAQLGcS3Yup4NUC6KwSfsjoyhhw9rRMeZMV5RL3
+	670iSaJuBXQIh0oZl5Ggq5enKtKGTR8/lD7YHR6x0B+5qRUK32IUU8Go8qQE7Qcsz2HVKF
+	rYQHNIB40R5CnAAhUaoI7YWFHstffIA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761676243;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=U2q76lj0xN+R4PacIP1fgChSB9f8M+/V7F/TqVzF32I=;
+	b=ASbHOI0EPn2EHfNMPIIGvjzMGOvfeNtW0gDo/+yNIm5LYMn8GzBoutsnoMXIr+Miwitz6d
+	GbYWnb+AH16qGTCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1D32A13693;
+	Tue, 28 Oct 2025 18:30:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id t0iAA9MLAWlINAAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 28 Oct 2025 18:30:43 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	sdf@fomichev.me,
+	kerneljasonxing@gmail.com,
+	fw@strlen.de,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Subject: [PATCH 1/2 bpf v2] xdp: add XDP extension to skb
+Date: Tue, 28 Oct 2025 19:30:31 +0100
+Message-ID: <20251028183032.5350-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251025190256.11352-1-adelodunolaoluwa.ref@yahoo.com> <20251025190256.11352-1-adelodunolaoluwa@yahoo.com>
-In-Reply-To: <20251025190256.11352-1-adelodunolaoluwa@yahoo.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 28 Oct 2025 11:28:14 -0700
-X-Gm-Features: AWmQ_bnalw5IhlnCx13TaCPkqkExXAVy8q757FeR1BQMDD21F7CRcXs2Z3K0uq0
-Message-ID: <CAAVpQUAbDfaiAZ_NCppGE5vsafWoU7V1xvnqtQQM44cwv6jHsA@mail.gmail.com>
-Subject: Re: [PATCH v2] selftests: af_unix: Add tests for ECONNRESET and EOF semantics
-To: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
-Cc: "=David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>, 
-	David Hunter <david.hunter.linux@gmail.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel-mentees@lists.linuxfoundation.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: A43ED1F749
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,fomichev.me,gmail.com,strlen.de,suse.de];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_HAS_DN(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,suse.de:dkim];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
 
-On Sat, Oct 25, 2025 at 12:03=E2=80=AFPM Sunday Adelodun
-<adelodunolaoluwa@yahoo.com> wrote:
->
-> Add selftests to verify and document Linux=E2=80=99s intended behaviour f=
-or
-> UNIX domain sockets (SOCK_STREAM and SOCK_DGRAM) when a peer closes.
-> The tests cover:
->
->   1. EOF returned when a SOCK_STREAM peer closes normally.
->   2. ECONNRESET returned when a SOCK_STREAM peer closes with unread data.
->   3. SOCK_DGRAM sockets not returning ECONNRESET on peer close.
->
-> This follows up on review feedback suggesting a selftest to clarify
-> Linux=E2=80=99s semantics.
->
-> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
-> Signed-off-by: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
-> ---
-> Changelog:
->
-> Changes made from v1:
->
-> - Patch prefix updated to selftest: af_unix:.
->
-> - All mentions of =E2=80=9CUNIX=E2=80=9D changed to AF_UNIX.
->
-> - Removed BSD references from comments.
->
-> - Shared setup refactored using FIXTURE_VARIANT().
->
-> - Cleanup moved to FIXTURE_TEARDOWN() to always run.
->
-> - Tests consolidated to reduce duplication: EOF, ECONNRESET, SOCK_DGRAM p=
-eer close.
->
-> - Corrected ASSERT usage and initialization style.
->
-> - Makefile updated for new directory af_unix.
->
->  tools/testing/selftests/net/af_unix/Makefile  |   1 +
->  .../selftests/net/af_unix/unix_connreset.c    | 161 ++++++++++++++++++
->  2 files changed, 162 insertions(+)
->  create mode 100644 tools/testing/selftests/net/af_unix/unix_connreset.c
->
-> diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/testing=
-/selftests/net/af_unix/Makefile
-> index de805cbbdf69..5826a8372451 100644
-> --- a/tools/testing/selftests/net/af_unix/Makefile
-> +++ b/tools/testing/selftests/net/af_unix/Makefile
-> @@ -7,6 +7,7 @@ TEST_GEN_PROGS :=3D \
->         scm_pidfd \
->         scm_rights \
->         unix_connect \
-> +       unix_connreset \
->  # end of TEST_GEN_PROGS
->
->  include ../../lib.mk
-> diff --git a/tools/testing/selftests/net/af_unix/unix_connreset.c b/tools=
-/testing/selftests/net/af_unix/unix_connreset.c
-> new file mode 100644
-> index 000000000000..c65ec997d77d
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/af_unix/unix_connreset.c
-> @@ -0,0 +1,161 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Selftest for AF_UNIX socket close and ECONNRESET behaviour.
-> + *
-> + * This test verifies that:
-> + *  1. SOCK_STREAM sockets return EOF when peer closes normally.
-> + *  2. SOCK_STREAM sockets return ECONNRESET if peer closes with unread =
-data.
-> + *  3. SOCK_DGRAM sockets do not return ECONNRESET when peer closes.
-> + *
-> + * These tests document the intended Linux behaviour.
-> + *
-> + */
-> +
-> +#define _GNU_SOURCE
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <fcntl.h>
-> +#include <unistd.h>
-> +#include <errno.h>
-> +#include <sys/socket.h>
-> +#include <sys/un.h>
-> +#include "../../kselftest_harness.h"
-> +
-> +#define SOCK_PATH "/tmp/af_unix_connreset.sock"
-> +
-> +static void remove_socket_file(void)
-> +{
-> +       unlink(SOCK_PATH);
-> +}
-> +
-> +FIXTURE(unix_sock)
-> +{
-> +       int server;
-> +       int client;
-> +       int child;
-> +};
-> +
-> +FIXTURE_VARIANT(unix_sock)
-> +{
-> +       int socket_type;
-> +       const char *name;
-> +};
-> +
-> +/* Define variants: stream and datagram */
-> +FIXTURE_VARIANT_ADD(unix_sock, stream) {
-> +       .socket_type =3D SOCK_STREAM,
-> +       .name =3D "SOCK_STREAM",
-> +};
-> +
-> +FIXTURE_VARIANT_ADD(unix_sock, dgram) {
-> +       .socket_type =3D SOCK_DGRAM,
-> +       .name =3D "SOCK_DGRAM",
-> +};
+This patch adds a new skb extension for XDP representing the number of
+cq descriptors and a linked list of umem addresses.
 
-Let's add coverage for SOCK_SEQPACKET,
-which needs listen() / connect() but other semantics
-are similar to SOCK_DGRAM.
+This is going to be used from the xsk skb destructor to put the umem
+addresses onto pool's completion queue.
 
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+---
+Note: CC'ing Florian Westphal in case I have missed a relevant detail.
+---
+ include/linux/skbuff.h | 3 +++
+ include/net/xdp_sock.h | 5 +++++
+ net/core/skbuff.c      | 4 ++++
+ net/xdp/Kconfig        | 1 +
+ 4 files changed, 13 insertions(+)
 
-> +
-> +FIXTURE_SETUP(unix_sock)
-> +{
-> +       struct sockaddr_un addr =3D {};
-> +       int err;
-> +
-> +       addr.sun_family =3D AF_UNIX;
-> +       strcpy(addr.sun_path, SOCK_PATH);
-> +
-> +       self->server =3D socket(AF_UNIX, variant->socket_type, 0);
-> +       ASSERT_LT(-1, self->server);
-> +
-> +       err =3D bind(self->server, (struct sockaddr *)&addr, sizeof(addr)=
-);
-> +       ASSERT_EQ(0, err);
-> +
-> +       if (variant->socket_type =3D=3D SOCK_STREAM) {
-> +               err =3D listen(self->server, 1);
-> +               ASSERT_EQ(0, err);
-> +
-> +               self->client =3D socket(AF_UNIX, SOCK_STREAM, 0);
-> +               ASSERT_LT(-1, self->client);
-> +
-> +               err =3D connect(self->client, (struct sockaddr *)&addr, s=
-izeof(addr));
-> +               ASSERT_EQ(0, err);
-> +
-> +               self->child =3D accept(self->server, NULL, NULL);
-> +               ASSERT_LT(-1, self->child);
-> +       } else {
-> +               /* Datagram: bind and connect only */
-> +               self->client =3D socket(AF_UNIX, SOCK_DGRAM | SOCK_NONBLO=
-CK, 0);
-> +               ASSERT_LT(-1, self->client);
-> +
-> +               err =3D connect(self->client, (struct sockaddr *)&addr, s=
-izeof(addr));
-> +               ASSERT_EQ(0, err);
-> +       }
-> +}
-> +
-> +FIXTURE_TEARDOWN(unix_sock)
-> +{
-> +       if (variant->socket_type =3D=3D SOCK_STREAM)
-> +               close(self->child);
-> +
-> +       close(self->client);
-> +       close(self->server);
-> +       remove_socket_file();
-> +}
-> +
-> +/* Test 1: peer closes normally */
-> +TEST_F(unix_sock, eof)
-> +{
-> +       char buf[16] =3D {};
-> +       ssize_t n;
-> +
-> +       if (variant->socket_type !=3D SOCK_STREAM)
-> +               SKIP(return, "This test only applies to SOCK_STREAM");
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index fb3fec9affaa..1c4a598b6564 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -4910,6 +4910,9 @@ enum skb_ext_id {
+ #endif
+ #if IS_ENABLED(CONFIG_INET_PSP)
+ 	SKB_EXT_PSP,
++#endif
++#if IS_ENABLED(CONFIG_XDP_SOCKETS)
++	SKB_EXT_XDP,
+ #endif
+ 	SKB_EXT_NUM, /* must be last */
+ };
+diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+index ce587a225661..94c607093768 100644
+--- a/include/net/xdp_sock.h
++++ b/include/net/xdp_sock.h
+@@ -120,6 +120,11 @@ struct xsk_tx_metadata_ops {
+ 	void	(*tmo_request_launch_time)(u64 launch_time, void *priv);
+ };
+ 
++struct xdp_skb_ext {
++	u32 num_descs;
++	struct list_head addrs_list;
++};
++
+ #ifdef CONFIG_XDP_SOCKETS
+ 
+ int xsk_generic_rcv(struct xdp_sock *xs, struct xdp_buff *xdp);
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 6be01454f262..f3966b8c61ee 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -81,6 +81,7 @@
+ #include <net/page_pool/helpers.h>
+ #include <net/psp/types.h>
+ #include <net/dropreason.h>
++#include <net/xdp_sock.h>
+ 
+ #include <linux/uaccess.h>
+ #include <trace/events/skb.h>
+@@ -5066,6 +5067,9 @@ static const u8 skb_ext_type_len[] = {
+ #if IS_ENABLED(CONFIG_INET_PSP)
+ 	[SKB_EXT_PSP] = SKB_EXT_CHUNKSIZEOF(struct psp_skb_ext),
+ #endif
++#if IS_ENABLED(CONFIG_XDP_SOCKETS)
++	[SKB_EXT_XDP] = SKB_EXT_CHUNKSIZEOF(struct xdp_skb_ext),
++#endif
+ };
+ 
+ static __always_inline unsigned int skb_ext_total_length(void)
+diff --git a/net/xdp/Kconfig b/net/xdp/Kconfig
+index 71af2febe72a..89546c48ac2a 100644
+--- a/net/xdp/Kconfig
++++ b/net/xdp/Kconfig
+@@ -2,6 +2,7 @@
+ config XDP_SOCKETS
+ 	bool "XDP sockets"
+ 	depends on BPF_SYSCALL
++	select SKB_EXTENSIONS
+ 	default n
+ 	help
+ 	  XDP sockets allows a channel between XDP programs and
+-- 
+2.51.0
 
-Instead of skipping, let's define final ASSERT() results
-for each type.
-
-Same for other 2 tests.
-
-
-> +
-> +       /* Peer closes normally */
-> +       close(self->child);
-> +
-> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> +       TH_LOG("%s: recv=3D%zd errno=3D%d (%s)", variant->name, n, errno,=
- strerror(errno));
-> +       if (n =3D=3D -1)
-> +               ASSERT_EQ(ECONNRESET, errno);
-
-... otherwise, we don't see an error here
-
-> +
-> +       if (n !=3D -1)
-> +               ASSERT_EQ(0, n);
-
-and this can be checked unconditionally.
-
-
-> +}
-> +
-> +/* Test 2: peer closes with unread data */
-> +TEST_F(unix_sock, reset_unread)
-> +{
-> +       char buf[16] =3D {};
-> +       ssize_t n;
-> +
-> +       if (variant->socket_type !=3D SOCK_STREAM)
-> +               SKIP(return, "This test only applies to SOCK_STREAM");
-> +
-> +       /* Send data that will remain unread by client */
-> +       send(self->client, "hello", 5, 0);
-> +       close(self->child);
-> +
-> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> +       TH_LOG("%s: recv=3D%zd errno=3D%d (%s)", variant->name, n, errno,=
- strerror(errno));
-> +       ASSERT_EQ(-1, n);
-> +       ASSERT_EQ(ECONNRESET, errno);
-> +}
-> +
-> +/* Test 3: SOCK_DGRAM peer close */
-> +TEST_F(unix_sock, dgram_reset)
-> +{
-> +       char buf[16] =3D {};
-> +       ssize_t n;
-> +
-> +       if (variant->socket_type !=3D SOCK_DGRAM)
-> +               SKIP(return, "This test only applies to SOCK_DGRAM");
-> +
-> +       send(self->client, "hello", 5, 0);
-> +       close(self->server);
-> +
-> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> +       TH_LOG("%s: recv=3D%zd errno=3D%d (%s)", variant->name, n, errno,=
- strerror(errno));
-> +       /* Expect EAGAIN because there is no datagram and peer is closed.=
- */
-> +       ASSERT_EQ(-1, n);
-> +       ASSERT_EQ(EAGAIN, errno);
-> +}
-> +
-> +TEST_HARNESS_MAIN
-> +
-> --
-> 2.43.0
->
 
