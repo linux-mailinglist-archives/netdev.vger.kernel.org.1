@@ -1,91 +1,94 @@
-Return-Path: <netdev+bounces-233551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DA57C15529
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:06:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E09BFC15539
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:07:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F239188891C
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:03:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 927CE1894F1A
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2195267B01;
-	Tue, 28 Oct 2025 15:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HzVMbkK/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78B8274643;
+	Tue, 28 Oct 2025 15:04:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF5A264A86
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 15:03:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A7126B2C8
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 15:04:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761663791; cv=none; b=PsAOAKdWmWd52yJqaZrB9K+wsVtcOm8KdlG5L4qBaDNu4BpjL5cVOilmnyCcTT37yskqOC+QLNGxLD6l3ppnEofqjG+vW71PfIIWzVDXcG43cKpZDy/J6Lp3DjaglC5i4yxYM56gyqKEzqifmwRRMkRYeOY8oZXDFo4tvm04uBA=
+	t=1761663847; cv=none; b=U6UQQ+GXu4o0ZBBMucCAf8WzkEXBhZcUr2HJE4Z6//J1ta4PUwDFUhr0knEO2F9wmN8JDaTbDJm1Gt9voRECv7p6njz1wx5dfPHhFtPcmq+0dunvCyJcgc3j24gpjFCvMy/iUGU5GTBUw8oJahnafuUdQ1Hsqflq2jlkwBWo/NU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761663791; c=relaxed/simple;
-	bh=Z36D+6ZhfHgGmJy7pQ7Lwnpln/Jx0aH9L4PEgSkS4cM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L+3EdvP88jL6C1cbaZD/Vy9H3l0qAh9zRq0A/nJtmbDw2638s2Q2zSAs8PXDJmtOzWWyDXLxVxVfW2xUMOBizCGlw3zTPIHomcGF/UYd2db3t9t9PuynEHMLtdVt6QpC7+nWPxzhWUrDQAbd+n3xYQvwDUK+8LHUNbK54F0tBF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HzVMbkK/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A04DC4CEE7;
-	Tue, 28 Oct 2025 15:03:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761663790;
-	bh=Z36D+6ZhfHgGmJy7pQ7Lwnpln/Jx0aH9L4PEgSkS4cM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HzVMbkK/3Fgb9ijFlyUS4iB1uC23xI0ZWZkIdfJ6RogXnWbv2lzNYqJ5EZfVySMc1
-	 SB0DKWP4a80haIV3+eNxvAxMxegcgSl0pH0ouiVYimn7wLLo4q6cG1hg/MJLijGkLn
-	 J/keK8Jax3TsCJTpUdStSyMwztf2rGgq0UV3SFX22tlrT0wwT6SssPtzFnN7TjgRm/
-	 f99Wn7XzOr3SyxQrGBtScpV+ELzWNeWby/ogLFK9rqL5dN9qSPQUNE+lq8DpjDf0Pz
-	 RANtYBei63HupbcZg6lFxV1k15YxeDwEsuPfsutaROIVrcLbDZhBNSXtbGCHw5ZOlB
-	 t3v+G2BLEbK8A==
-Date: Tue, 28 Oct 2025 15:03:05 +0000
-From: Simon Horman <horms@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	David Miller <davem@davemloft.net>,
-	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH v2 net-next] net: stmmac: mdio: fix incorrect phy address
- check
-Message-ID: <aQDbKYMtgiQaGgHX@horms.kernel.org>
-References: <e869999b-2d4b-4dc1-9890-c2d3d1e8d0f8@gmail.com>
+	s=arc-20240116; t=1761663847; c=relaxed/simple;
+	bh=YHNJ3+2Bl0kXz1AE7uKw8z2pj21d9oEcl/qcI/UkoCc=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=GEQkEpzoUo91vcW3xeMrDj3H9kltlFUi5m2wnWwb4x/vj8dg+hLRC/rA/TxKa2uEqcC5emn4LCeCYiCF0LWW/MqaGmsamW81GHZOgkGJOAtgqEj0DBYP0SF2b0n84x2m7TvXtMc5MocLGRxBRak6dzqewy1oZm+v8c9HI+AKExQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-430d4a4dec5so231545615ab.1
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 08:04:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761663843; x=1762268643;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2WbENtpIuxc4z77nqKLhall3y31i7mXKp7vtElyIPCA=;
+        b=dN+c3GWaon1K6X69Z+XUTUziV+tdwd6zPJVSM7lGCJkyYIOwJbs/UZru//9aFerRaX
+         v1EWKiZiHr8D5q2OezibsdY6AI1CjHVl8/5jJpEcWq/4+f+mHG9jeV7uo+9fjlWqRHEo
+         EVb1a6BGVT50OKP4/RXQfdVj3bjvQBMyVNzTjoU8iPLrNW+qxomSy8u5U+jiSnGTEVs7
+         ej64Y1vc8bX+GqXW2nANLpL/21xyhdVhevi492t3ZWHLRedBJWAPxBYGOaI3XQiybSWJ
+         7H/S1diBnraq/ygzkkSJKWc99nO1vd1haym/l5unkSUKRvmzxG/HwzpWegbtR6prTqLz
+         037A==
+X-Forwarded-Encrypted: i=1; AJvYcCXw68SwDBuBv//RFtSv1X1hVF5bux9RRwAMlQ9et9BSsKsFovZrH1NoY/YNIIN0MuuHDgXxLCg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwROfJOCvmrjjqTxbODXXS+l0Oaw3XWWRWTStEEgKkltQ49VSu9
+	JJe3Pz/rhMqHAEa/jxue2yrTX/UFxzf7aQjkBDbWW3sHs30NvqotPFiGZ12MVhJxY+d+lKf2gBG
+	uPui3aVvweBpCqEa/rycArgTXjRXYL+iS+Dnkr58BZKVB0DmjE7UhWUVup0c=
+X-Google-Smtp-Source: AGHT+IF+EohZbBrSDQXXa4N4mZZlU7T6UimJk72y+wdqPoE4ji9fLb3tKUW2m3rfuTPzLylKbckQOUKWRw9X7p6OZ45VrZPr0uoA
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e869999b-2d4b-4dc1-9890-c2d3d1e8d0f8@gmail.com>
+X-Received: by 2002:a05:6e02:b4f:b0:431:d763:193a with SMTP id
+ e9e14a558f8ab-4320f8388e4mr49779265ab.21.1761663843270; Tue, 28 Oct 2025
+ 08:04:03 -0700 (PDT)
+Date: Tue, 28 Oct 2025 08:04:03 -0700
+In-Reply-To: <6890f71a.050a0220.7f033.0010.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6900db63.050a0220.17b81f.0026.GAE@google.com>
+Subject: Re: [syzbot] [kernfs?] possible deadlock in kernfs_remove
+From: syzbot <syzbot+2d7d0fbb5fb979113ff3@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, eadavis@qq.com, gregkh@linuxfoundation.org, 
+	hdanton@sina.com, linux-kernel@vger.kernel.org, ming.lei@redhat.com, 
+	netdev@vger.kernel.org, nilay@linux.ibm.com, sunjunchao2870@gmail.com, 
+	sunjunchao@bytedance.com, syzkaller-bugs@googlegroups.com, tj@kernel.org, 
+	yukuai3@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Oct 25, 2025 at 08:35:47PM +0200, Heiner Kallweit wrote:
-> max_addr is the max number of addresses, not the highest possible address,
-> therefore check phydev->mdio.addr > max_addr isn't correct.
-> To fix this change the semantics of max_addr, so that it represents
-> the highest possible address. IMO this is also a little bit more intuitive
-> wrt name max_addr.
-> 
-> Fixes: 4a107a0e8361 ("net: stmmac: mdio: use phy_find_first to simplify stmmac_mdio_register")
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Reported-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
-> v2:
-> - improve subject
+syzbot suspects this issue was fixed by commit:
 
-Thanks, this versions looks good to me.
+commit 8f5845e0743bf3512b71b3cb8afe06c192d6acc4
+Author: Julian Sun <sunjunchao2870@gmail.com>
+Date:   Tue Aug 12 15:42:57 2025 +0000
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+    block: restore default wbt enablement
 
-...
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13b977e2580000
+start commit:   759dfc7d04ba netlink: avoid infinite retry looping in netl..
+git tree:       net
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ac0888b9ad46cd69
+dashboard link: https://syzkaller.appspot.com/bug?extid=2d7d0fbb5fb979113ff3
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1136d9bc580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1536d9bc580000
+
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: block: restore default wbt enablement
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
