@@ -1,117 +1,218 @@
-Return-Path: <netdev+bounces-233385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B062C1297C
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:55:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 73ECCC129D3
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 03:00:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 556E44E1CA6
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 01:55:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 554EB4E19EE
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17E2125A2C7;
-	Tue, 28 Oct 2025 01:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53CF01E86E;
+	Tue, 28 Oct 2025 02:00:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Tw4NOIvc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Eoff3n9C"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6FB1662E7;
-	Tue, 28 Oct 2025 01:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E7028E9
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 02:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761616541; cv=none; b=NfMJ8RFWmeyevN98j3hz4hC34BMqVytP++BOMLKZHfbqw7oRmwwpm04bddwh8Dz/9eruXaRpT7yLNMVcCjMfqbEZFNgjRxULasBCc2f+sYL5CM893/Pfj2jgDdwdoHathT2P1dAKWnx1fgefMZWwMogCVbKTDi/woyUPjIrDObY=
+	t=1761616847; cv=none; b=tpXC5gP/NVxA2VwEPj1i+DryMq7M2UKKVmpQrsmHeNfuL4nrDO81PoJNPbjw9Gz8qsRMX7Kde/BiJJCBZVEQ87Kg7PrDO+NhXuGCe8Tfvi32kbbYPc+6j9DwFGxX6x7XPKvG6IMUlm3cHkOD3hqAyIvjckRKyL0okIZEMsIL09Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761616541; c=relaxed/simple;
-	bh=uns5HrGmuITUIqjhk0AYfVm1iY5hzrj4fRpnfjYl+mA=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=jq6fxAhztcED9a50vIN8YvKo5pfianR0xLb0aT66KvKdNZVq3TTdaN3RsObl0g7DYNIkh+08pKHpk0/P7YVUprzj1x1sDi3EP0xgMmd9JjRXFGJ8woaMW9JIs+hGhEAuJu0uD3KOUHbn2fkWZv+PdR24qxXXWi/zKDtjcFfFn+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Tw4NOIvc; arc=none smtp.client-ip=113.46.200.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=it2CGwrr8XPuER+Fzwz3Cppb788D/OOVWmIQqhmKuOk=;
-	b=Tw4NOIvcrG2onfPI4rJ5m3fGpfEYdbNiM2l79HoeyadfiaSXDXWUWCN185iTdcXRd8RYzoCll
-	ftO77acbkCIHDk51zSapOxp3u8B/0rkv6CIDNHvLfHL7vDPlmfbXtZuDipuO0+tKJY0N5or7I7N
-	qxYWmPoow/rR1R4BuJrvypo=
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4cwYMs2Ky1z1T4Fg;
-	Tue, 28 Oct 2025 09:54:33 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5C4F1140155;
-	Tue, 28 Oct 2025 09:55:35 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 28 Oct 2025 09:55:34 +0800
-Message-ID: <a0853cd9-cab5-441d-b181-8ba97f2f58b0@huawei.com>
-Date: Tue, 28 Oct 2025 09:55:33 +0800
+	s=arc-20240116; t=1761616847; c=relaxed/simple;
+	bh=rf4AIEHEW2a3laeNL4F6QNbR7b20jJ5mQqfGwNYjOKM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZtSRiS4xmcLTh/vvJhu+K5d6WaprpnZVueZ02UsL7JH+FhbO3Uiz5jiLh2fwKJnuhsS370Tpei57XUjemdhrqVx3wo+Dk6inrSga4Izdcn0N8VPyZcdPD9I7JL71f3IDtd/KTO6zoZQW4ZJwjSCUMhcEckK5/NK+aktZwi7Ycs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Eoff3n9C; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761616832;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=fOQmhmBDEYiwvDVP6Wx0SsY1m99stZnZK9xXTiCWbmI=;
+	b=Eoff3n9CRed5URbWwNozoIdyhrxXvgUMSnJE5AdRahNur0fht3tIpT2Mga2I5xckNBwrTw
+	xej/x8o+ULlHU6Nkphfp1w0Bwm7s6CKDNaWvgYpncCjFetGzpBUmZeGG0FVi+lpTHclHKU
+	jcxxB560oNolAfrYGbp2AQOWnYpqgfY=
+From: Yi Cong <cong.yi@linux.dev>
+To: Frank.Sae@motor-comm.com,
+	andrew+netdev@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net
+Cc: kuba@kernel.org,
+	netdev@vger.kernel.org,
+	Yi Cong <yicong@kylinos.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: phy: motorcomm: Fix the issue in the code regarding the incorrect use of time units
+Date: Tue, 28 Oct 2025 09:59:23 +0800
+Message-Id: <20251028015923.252909-1-cong.yi@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<shenjian15@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<lantao5@huawei.com>, <huangdonghua3@h-partners.com>,
-	<yangshuaisong@h-partners.com>, <jonathan.cameron@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net 2/2] net: hns3: fix null pointer in debugfs issue
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20251023131338.2642520-1-shaojijie@huawei.com>
- <20251023131338.2642520-3-shaojijie@huawei.com>
- <20251027175451.21b7bfe4@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20251027175451.21b7bfe4@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
+From: Yi Cong <yicong@kylinos.cn>
 
-on 2025/10/28 8:54, Jakub Kicinski wrote:
-> On Thu, 23 Oct 2025 21:13:38 +0800 Jijie Shao wrote:
->> Currently, when debugfs and reset are executed concurrently,
->> some resources are released during the reset process,
->> which may cause debugfs to read null pointers or other anomalies.
->>
->> Therefore, in this patch, interception protection has been added
->> to debugfs operations that are sensitive to reset.
-> You need to explain what prevents the state from changing immediately
-> after you did the bit check. With no obvious locking in place I don't
-> see how this reliably fixes the issue.
+Currently, NS (nanoseconds) is being used, but according to the datasheet,
+the correct unit should be PS (picoseconds).
 
-In July, we used seqfile to refactor debugfs.
+Fixes: 4869a146cd60 ("net: phy: Add BIT macro for Motorcomm yt8521/yt8531 gigabit ethernet phy")
+Cc: stable@vger.kernel.org
+Signed-off-by: Yi Cong <yicong@kylinos.cn>
+---
+ drivers/net/phy/motorcomm.c | 102 ++++++++++++++++++------------------
+ 1 file changed, 51 insertions(+), 51 deletions(-)
 
-Before the refactoring, all debugfs operations would check the reset status
-(HNS3_NIC_STATE_INITED and HNS3_NIC_STATE_RESETTING) in the entry function.
-After the refactoring, the entry function was removed, which led to the loss of protection.
-
-This patch restores the protection behavior that existed before the refactoring.
-Now our tests have already detected the null pointer issue.
-
-As for the problem you mentioned, we have been discussing it recently.
-There is a small time gap, checking the status before reading from debugfs is fine,
-but there could still be issues if the device enters the reset state during the read process:
-
-check state pass
-	debugfs read start...
-		do reset
-			debugfs read end
-			
-Currently, we are still assessing the risk and discussing solutions for this issue.
-After adding the entry protection, executing debugfs and reset concurrently has not
-resulted in null pointers or other exceptions.
-
-Thanks,
-Jijie Shao
+diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
+index a3593e663059..81491c71e75b 100644
+--- a/drivers/net/phy/motorcomm.c
++++ b/drivers/net/phy/motorcomm.c
+@@ -171,7 +171,7 @@
+  * 1b1 enable 1.9ns rxc clock delay
+  */
+ #define YT8521_CCR_RXC_DLY_EN			BIT(8)
+-#define YT8521_CCR_RXC_DLY_1_900_NS		1900
++#define YT8521_CCR_RXC_DLY_1_900_PS		1900
+ 
+ #define YT8521_CCR_MODE_SEL_MASK		(BIT(2) | BIT(1) | BIT(0))
+ #define YT8521_CCR_MODE_UTP_TO_RGMII		0
+@@ -196,22 +196,22 @@
+ #define YT8521_RC1R_RX_DELAY_MASK		GENMASK(13, 10)
+ #define YT8521_RC1R_FE_TX_DELAY_MASK		GENMASK(7, 4)
+ #define YT8521_RC1R_GE_TX_DELAY_MASK		GENMASK(3, 0)
+-#define YT8521_RC1R_RGMII_0_000_NS		0
+-#define YT8521_RC1R_RGMII_0_150_NS		1
+-#define YT8521_RC1R_RGMII_0_300_NS		2
+-#define YT8521_RC1R_RGMII_0_450_NS		3
+-#define YT8521_RC1R_RGMII_0_600_NS		4
+-#define YT8521_RC1R_RGMII_0_750_NS		5
+-#define YT8521_RC1R_RGMII_0_900_NS		6
+-#define YT8521_RC1R_RGMII_1_050_NS		7
+-#define YT8521_RC1R_RGMII_1_200_NS		8
+-#define YT8521_RC1R_RGMII_1_350_NS		9
+-#define YT8521_RC1R_RGMII_1_500_NS		10
+-#define YT8521_RC1R_RGMII_1_650_NS		11
+-#define YT8521_RC1R_RGMII_1_800_NS		12
+-#define YT8521_RC1R_RGMII_1_950_NS		13
+-#define YT8521_RC1R_RGMII_2_100_NS		14
+-#define YT8521_RC1R_RGMII_2_250_NS		15
++#define YT8521_RC1R_RGMII_0_000_PS		0
++#define YT8521_RC1R_RGMII_0_150_PS		1
++#define YT8521_RC1R_RGMII_0_300_PS		2
++#define YT8521_RC1R_RGMII_0_450_PS		3
++#define YT8521_RC1R_RGMII_0_600_PS		4
++#define YT8521_RC1R_RGMII_0_750_PS		5
++#define YT8521_RC1R_RGMII_0_900_PS		6
++#define YT8521_RC1R_RGMII_1_050_PS		7
++#define YT8521_RC1R_RGMII_1_200_PS		8
++#define YT8521_RC1R_RGMII_1_350_PS		9
++#define YT8521_RC1R_RGMII_1_500_PS		10
++#define YT8521_RC1R_RGMII_1_650_PS		11
++#define YT8521_RC1R_RGMII_1_800_PS		12
++#define YT8521_RC1R_RGMII_1_950_PS		13
++#define YT8521_RC1R_RGMII_2_100_PS		14
++#define YT8521_RC1R_RGMII_2_250_PS		15
+ 
+ /* LED CONFIG */
+ #define YT8521_MAX_LEDS				3
+@@ -800,40 +800,40 @@ struct ytphy_cfg_reg_map {
+ 
+ static const struct ytphy_cfg_reg_map ytphy_rgmii_delays[] = {
+ 	/* for tx delay / rx delay with YT8521_CCR_RXC_DLY_EN is not set. */
+-	{ 0,	YT8521_RC1R_RGMII_0_000_NS },
+-	{ 150,	YT8521_RC1R_RGMII_0_150_NS },
+-	{ 300,	YT8521_RC1R_RGMII_0_300_NS },
+-	{ 450,	YT8521_RC1R_RGMII_0_450_NS },
+-	{ 600,	YT8521_RC1R_RGMII_0_600_NS },
+-	{ 750,	YT8521_RC1R_RGMII_0_750_NS },
+-	{ 900,	YT8521_RC1R_RGMII_0_900_NS },
+-	{ 1050,	YT8521_RC1R_RGMII_1_050_NS },
+-	{ 1200,	YT8521_RC1R_RGMII_1_200_NS },
+-	{ 1350,	YT8521_RC1R_RGMII_1_350_NS },
+-	{ 1500,	YT8521_RC1R_RGMII_1_500_NS },
+-	{ 1650,	YT8521_RC1R_RGMII_1_650_NS },
+-	{ 1800,	YT8521_RC1R_RGMII_1_800_NS },
+-	{ 1950,	YT8521_RC1R_RGMII_1_950_NS },	/* default tx/rx delay */
+-	{ 2100,	YT8521_RC1R_RGMII_2_100_NS },
+-	{ 2250,	YT8521_RC1R_RGMII_2_250_NS },
++	{ 0,	YT8521_RC1R_RGMII_0_000_PS },
++	{ 150,	YT8521_RC1R_RGMII_0_150_PS },
++	{ 300,	YT8521_RC1R_RGMII_0_300_PS },
++	{ 450,	YT8521_RC1R_RGMII_0_450_PS },
++	{ 600,	YT8521_RC1R_RGMII_0_600_PS },
++	{ 750,	YT8521_RC1R_RGMII_0_750_PS },
++	{ 900,	YT8521_RC1R_RGMII_0_900_PS },
++	{ 1050,	YT8521_RC1R_RGMII_1_050_PS },
++	{ 1200,	YT8521_RC1R_RGMII_1_200_PS },
++	{ 1350,	YT8521_RC1R_RGMII_1_350_PS },
++	{ 1500,	YT8521_RC1R_RGMII_1_500_PS },
++	{ 1650,	YT8521_RC1R_RGMII_1_650_PS },
++	{ 1800,	YT8521_RC1R_RGMII_1_800_PS },
++	{ 1950,	YT8521_RC1R_RGMII_1_950_PS },	/* default tx/rx delay */
++	{ 2100,	YT8521_RC1R_RGMII_2_100_PS },
++	{ 2250,	YT8521_RC1R_RGMII_2_250_PS },
+ 
+ 	/* only for rx delay with YT8521_CCR_RXC_DLY_EN is set. */
+-	{ 0    + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_000_NS },
+-	{ 150  + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_150_NS },
+-	{ 300  + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_300_NS },
+-	{ 450  + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_450_NS },
+-	{ 600  + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_600_NS },
+-	{ 750  + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_750_NS },
+-	{ 900  + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_900_NS },
+-	{ 1050 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_050_NS },
+-	{ 1200 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_200_NS },
+-	{ 1350 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_350_NS },
+-	{ 1500 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_500_NS },
+-	{ 1650 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_650_NS },
+-	{ 1800 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_800_NS },
+-	{ 1950 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_950_NS },
+-	{ 2100 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_2_100_NS },
+-	{ 2250 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_2_250_NS }
++	{ 0    + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_000_PS },
++	{ 150  + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_150_PS },
++	{ 300  + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_300_PS },
++	{ 450  + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_450_PS },
++	{ 600  + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_600_PS },
++	{ 750  + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_750_PS },
++	{ 900  + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_900_PS },
++	{ 1050 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_050_PS },
++	{ 1200 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_200_PS },
++	{ 1350 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_350_PS },
++	{ 1500 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_500_PS },
++	{ 1650 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_650_PS },
++	{ 1800 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_800_PS },
++	{ 1950 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_950_PS },
++	{ 2100 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_2_100_PS },
++	{ 2250 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_2_250_PS }
+ };
+ 
+ static u32 ytphy_get_delay_reg_value(struct phy_device *phydev,
+@@ -890,10 +890,10 @@ static int ytphy_rgmii_clk_delay_config(struct phy_device *phydev)
+ 	rx_reg = ytphy_get_delay_reg_value(phydev, "rx-internal-delay-ps",
+ 					   ytphy_rgmii_delays, tb_size,
+ 					   &rxc_dly_en,
+-					   YT8521_RC1R_RGMII_1_950_NS);
++					   YT8521_RC1R_RGMII_1_950_PS);
+ 	tx_reg = ytphy_get_delay_reg_value(phydev, "tx-internal-delay-ps",
+ 					   ytphy_rgmii_delays, tb_size, NULL,
+-					   YT8521_RC1R_RGMII_1_950_NS);
++					   YT8521_RC1R_RGMII_1_950_PS);
+ 
+ 	switch (phydev->interface) {
+ 	case PHY_INTERFACE_MODE_RGMII:
+-- 
+2.25.1
 
 
