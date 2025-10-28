@@ -1,136 +1,119 @@
-Return-Path: <netdev+bounces-233478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA5DBC140AE
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:17:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B871FC14108
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:20:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5CEA0354C67
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 10:17:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47F825E0665
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 10:18:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49731306498;
-	Tue, 28 Oct 2025 10:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20241BC5C;
+	Tue, 28 Oct 2025 10:18:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="T2mWuyF1"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="TKGSypdL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006A5304963
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 10:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 789052DEA96;
+	Tue, 28 Oct 2025 10:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761646611; cv=none; b=AedKqa2SIul6cip7JWS70WJoiOI1JNAe7nOfne6ik696/Tad/Qa331YTjri6uqyAArJsh2bXURsR6hQ7nKKjEbDjgFQHOmNFracuoR7PlJwsiYdjSjqe2SeXcnlezVoerTDil7kdyS6dzauDk5+htphjwtQlzt2PmGjPLCsYLWo=
+	t=1761646715; cv=none; b=fvT/IXgnH9KKC6qZMeJJI97nJLKz/Omyw1xQR2ssz2xyKoOsOTHpOQ2mSskOGPyMoggR5QyRMgWXwJ7q6x62x4bawE3oWTTFN3cCaIMQCp9OsZfQKUEb3i/I8jYYhfd/8c0jSTWs7JEKUksHSUktpvK1imqe6B95WNRAq4aTWGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761646611; c=relaxed/simple;
-	bh=yJZzbNfqtoEwc2kYNlqzuH0OD+6uRNTN10RJVs8dHjw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ov5LXM/73wqg2THxP09dGXVb3wA5GLAaquiRZPCBriuAC5+cv+7cwBHj+/td602pU9kvfQXxFPS0LTdTYoHsB3Yd6WierG444hPx4BM7Idb/tr8ex35zMVedQmGLDN4p6vowKq2mukWe9dzBMpeuyTnF/+o+CxYc5zC16xGVWOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=T2mWuyF1; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id E8608C0BE99;
-	Tue, 28 Oct 2025 10:16:25 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 2EE15606AB;
-	Tue, 28 Oct 2025 10:16:46 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2EABC1179B169;
-	Tue, 28 Oct 2025 11:16:38 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761646605; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=ls9js8pk1OxApOPfHjg+6OhXCiFAAL8Poa+LHhv8b+I=;
-	b=T2mWuyF1Qd8XV3vwoWIodU+brS+15SaCjgzWX2XlEE5kUJTtJQyb0GGWuqTyZhH+FFDKpc
-	Xqqvn5L2mdvJ0MNnISgT0M6sIU8mXNXeLM9S2z65uY1z3ukIyHZ0Xwr68Hha+oAXOtfkIq
-	aA/mFYHiKksHLih9RQc5ooPMSLYOf1Ml8ex93rbVOk7S95p5VZ8JzIBngXxbW6J82SowfD
-	DOv2auU7aXka0nHFhn9wPan+sLhIOmuRtM3yeXOFknGNV3rsdnAvD2eS2hBfT0jIApcrSG
-	H/xvyhnJEHWwN3EkGE8s920SdZ66mHv5s4MtvnLKB7JooqhGCynqXJP8+XQIbA==
-Date: Tue, 28 Oct 2025 11:16:36 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
- <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>, Alexis =?UTF-8?B?TG90aG9yw6k=?=
- <alexis.lothore@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] net: stmmac: Add a devlink attribute to
- control timestamping mode
-Message-ID: <20251028111636.7eaba25e@kmaincent-XPS-13-7390>
-In-Reply-To: <20251024070720.71174-3-maxime.chevallier@bootlin.com>
-References: <20251024070720.71174-1-maxime.chevallier@bootlin.com>
-	<20251024070720.71174-3-maxime.chevallier@bootlin.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1761646715; c=relaxed/simple;
+	bh=0dl7aNojFkS4FkGh0OZhE+c1lQHg15xh2XWAgpYjbKQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jj8Vw4jDLU7kef3z88uopE76p1I+XIypmeljxfn2BC2G3Aw4zcf90RYjfsbRKg74NgYo1ZJcUZMfLbVrDA8T1MkIuDX1ewrn0Umb1TB/YKn4mT9r2LhXZRdbvEM8hoa8elM80n1Xhp5jEbJNNhhY+a0G25s+3nal273wcllxqlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=TKGSypdL; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1761646703; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=DpysrkxeeMCeHuAoOyQJZHU3zVl6/suIplaCsQZ0xkA=;
+	b=TKGSypdLWpu3HTaDrb0Ai/knfXKtTiU07wfOEadci1LvedQI+PAPqhv53IAAeSZ19xXTsh0AAPIJahAwpyo/M4lYPAEkK2YitAjv0s1em8eu9BQyRttDQXiDc1OwJ54wJVl288Y9cnWg+z7YMjzoMmdQzYXi4kT8zG/PiJwY88s=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WrBkanQ_1761646702 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 28 Oct 2025 18:18:23 +0800
+Date: Tue, 28 Oct 2025 18:18:22 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Dust Li <dust.li@linux.alibaba.com>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>, mjambigi@linux.ibm.com,
+	wenjia@linux.ibm.com, wintera@linux.ibm.com,
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com, kuba@kernel.org,
+	davem@davemloft.net, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+	pabeni@redhat.com, edumazet@google.com, sidraya@linux.ibm.com,
+	jaka@linux.ibm.com
+Subject: Re: [PATCH net-next v2] net/smc: add full IPv6 support for SMC
+Message-ID: <20251028101822.GB38488@j66a10360.sqa.eu95>
+References: <20251022032309.66386-1-alibuda@linux.alibaba.com>
+ <aPmGHm9qLwqJEtjF@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aPmGHm9qLwqJEtjF@linux.alibaba.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Fri, 24 Oct 2025 09:07:18 +0200
-Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+On Thu, Oct 23, 2025 at 09:34:22AM +0800, Dust Li wrote:
+> On 2025-10-22 11:23:09, D. Wythe wrote:
+> >The current SMC implementation is IPv4-centric. While it contains a
+> >workaround for IPv4-mapped IPv6 addresses, it lacks a functional path
+> >for native IPv6, preventing its use in modern dual-stack or IPv6-only
+> >networks.
+> >
+> >This patch introduces full, native IPv6 support by refactoring the
+> >address handling mechanism to be IP-version agnostic, which is
+> >achieved by:
+> >
+> >- Introducing a generic `struct smc_ipaddr` to abstract IP addresses.
+> >- Implementing an IPv6-specific route lookup function.
+> >- Extend GID matching logic for both IPv4 and IPv6 addresses
+> >
+> >With these changes, SMC can now discover RDMA devices and establish
+> >connections over both native IPv4 and IPv6 networks.
+> 
+> Tested it with link local ipv6 address, it still doesn't work as
+> expected, while TCP works fine.
+> 
+> #smc_run ./sockperf tp --tcp -i fe80::c679:7b0:4a4b:d5cc%eth2
+> sockperf: == version #3.10-23.gited92afb185e6.dirty ==
+> sockperf: ERROR: Can`t connect socket (errno=104 Connection reset by peer)
+> 
+> Best regards,
+> Dust
+>
 
-> The DWMAC1000 supports 2 timestamping configurations to configure how
-> frequency adjustments are made to the ptp_clock, as well as the reported
-> timestamp values.
->=20
-> There was a previous attempt at upstreaming support for configuring this
-> mode by Olivier Dautricourt and Julien Beraud a few years back [1]
->=20
-> In a nutshell, the timestamping can be either set in fine mode or in
-> coarse mode.
->=20
-> In fine mode, which is the default, we use the overflow of an accumulator=
- to
-> trigger frequency adjustments, but by doing so we lose precision on the
-> timetamps that are produced by the timestamping unit. The main drawback
-> is that the sub-second increment value, used to generate timestamps, can'=
-t be
-> set to lower than (2 / ptp_clock_freq).
->=20
-> The "fine" qualification comes from the frequent frequency adjustments we=
- are
-> able to do, which is perfect for a PTP follower usecase.
->=20
-> In Coarse mode, we don't do frequency adjustments based on an
-> accumulator overflow. We can therefore have very fine subsecond
-> increment values, allowing for better timestamping precision. However
-> this mode works best when the ptp clock frequency is adjusted based on
-> an external signal, such as a PPS input produced by a GPS clock. This
-> mode is therefore perfect for a Grand-master usecase.
->=20
-> Introduce a driver-specific devlink parameter "ts_coarse" to enable or
-> disable coarse mode, keeping the "fine" mode as a default.
->=20
-> This can then be changed with:
->=20
->   devlink dev param set <dev> name ts_coarse value true cmode runtime
->=20
-> The associated documentation is also added.
->=20
-> [1] :
-> https://lore.kernel.org/netdev/20200514102808.31163-1-olivier.dautricourt=
-@orolia.com/
+This is a long-standing bug. When both smcd and smcrv1 devices are
+present in the system, if the smc_clc_prfx_set function fails, the
+current logic only clears pclc_base->hdr.typev1 = SMC_TYPE_N, but
+neglects to clear ini->smc_type_v1.
 
+This leads to a serious issue: when subsequently constructing the smc
+proposal message, the message content is organized according to the v1 +
+smcd format based on the uncleared ini->smc_type_v1.
 
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+However, because pclc_base->hdr.typev1 has been cleared, When the server
+receives such a proposal message, where the type in the header does not
+match the content, it immediately fails.
 
-Thank you!
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Previously, I considered this issue to be logically unrelated to IPv6
+support, so I didn't plan to send this bugfix along. However, in an
+IPv6-only environment, this function is guaranteed to return an error
+when only link-local address is present. This inevitably triggers the
+problem in your test cases, which I hadn't anticipated. I will include
+its fix in the next release.
+
+Best wishes,
+D. Wythe
+
 
