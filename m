@@ -1,174 +1,199 @@
-Return-Path: <netdev+bounces-233590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FC70C15F39
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:52:20 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21C76C15EBB
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:47:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3E783A2CF2
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:45:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7AA83343C09
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF31340DBB;
-	Tue, 28 Oct 2025 16:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e5dBpYUL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F44343218;
+	Tue, 28 Oct 2025 16:46:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48882C0286;
-	Tue, 28 Oct 2025 16:45:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD49C299954
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 16:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761669941; cv=none; b=YExtVBQjkr+TcQDXFtQ6JUY82W3dI51C51GK59fXa1fKWzKGLT1lPh2Dkpw8tKZM2qgbHBqGcHeVnhYqxrcFvCWq3yARXu8IvZ6lxhUMxTXa/GJMARbhswNUk2yfgSfWwwBFUk5xNqrArZD6qGSNuQoBtcaUvhVyCtdJJCQyv20=
+	t=1761670018; cv=none; b=aFQLujCn/eaHC8Q0SgMfVPpjBa6rqzTJw0y1g97LKaugOgBVL0kJCoFkgiIN2qqTX06lmHu7E+gG3xcNP2d8PgZtXS46R9fTS864ZjQe0SJidQSBxo0Kv2SXEda317GWFB2lQO8K1UHbMx1QzJ24jFQ/ID3EAzkls9cya/adJYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761669941; c=relaxed/simple;
-	bh=yZ330NEhhUvCg2S6l+06VAtonuQXNHscx1TyS7+WG44=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=iOMcpPWXouzVnhI5Pk8z7aXoLQj2JlnIppGREzmqszvog3tO8hb4JqG3latFAAMBoWKxnQAOzxNWGDe9QKi8zsJLUaVPi6K03Epy+verywomD98ziRJ8TggQo0Z+zxwex9aXAl2mKuCiAVm8hSG76bs6o6PNUsRsIfTquEMPyI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e5dBpYUL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36BDEC4CEE7;
-	Tue, 28 Oct 2025 16:45:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761669941;
-	bh=yZ330NEhhUvCg2S6l+06VAtonuQXNHscx1TyS7+WG44=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=e5dBpYULUxrSnDnOQzz+uIp+OJ5vu4cRX1YYbMz1hXEUgHJogVwcg3cSFTcYo+muG
-	 kicl25pvM5xZao9UrOQU+5W2iaPV/ocTE6zR4/cPGm+YlEaRVzpcIxTDWr3zzfuBmD
-	 W7CGS2PxAddzt+lMCJSx/hS3/d032DGhnyLzaJI/QY5578+shywIBwpwJgVvnIt4K1
-	 7UNxhETCQZNyhJmh7diGjegG/E7Vqmq+zJQuUEVCgU4lgx2WHUykrVL9/6QKLDEorD
-	 IobV54JNmhd1Hpc/gUeaUZWXFgIdlGXRg9VXOHo+GAowXUiNK1hzbJIXUNyiXEqZkl
-	 QHcNvVh+3e2Ig==
-Content-Type: multipart/mixed; boundary="===============0226383592031790764=="
+	s=arc-20240116; t=1761670018; c=relaxed/simple;
+	bh=ekHHom5PfM1F2gUNZVpqnOaXeTa354EsGpk8jiSNYGA=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m3hD05hRk8X+k6KgvoDLgr4APBPysaY9vpswzSLNEeHdrTxpRfD+ycPqmR0UqrPhgUeuWwxRN1b8xbSIIPrOHSgIKDausrpi5fxls5OgZD32ZIj+oY2ok++f6B5zKh5L/3yHXGul5sIbcNKaSZeEMK7KCj7wXSbnCUl4TwSn6L8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cwx535Nz1z6M4hg;
+	Wed, 29 Oct 2025 00:43:03 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5F82A1402F7;
+	Wed, 29 Oct 2025 00:46:53 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 28 Oct
+ 2025 16:46:52 +0000
+Date: Tue, 28 Oct 2025 16:46:51 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+CC: <jgg@ziepe.ca>, <michael.chan@broadcom.com>, <dave.jiang@intel.com>,
+	<saeedm@nvidia.com>, <davem@davemloft.net>, <corbet@lwn.net>,
+	<edumazet@google.com>, <gospo@broadcom.com>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<selvin.xavier@broadcom.com>, <leon@kernel.org>,
+	<kalesh-anakkur.purayil@broadcom.com>
+Subject: Re: [PATCH net-next v5 5/5] bnxt_fwctl: Add documentation entries
+Message-ID: <20251028164651.00001823@huawei.com>
+In-Reply-To: <20251014081033.1175053-6-pavan.chebbi@broadcom.com>
+References: <20251014081033.1175053-1-pavan.chebbi@broadcom.com>
+	<20251014081033.1175053-6-pavan.chebbi@broadcom.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <5b54b160eacd11f9b17b8fed22313aa0c7344843b2a4d0b1a33553545b1b9a8e@mail.kernel.org>
-In-Reply-To: <20251028160200.4204-2-fmancera@suse.de>
-References: <20251028160200.4204-2-fmancera@suse.de>
-Subject: Re: [PATCH 2/2 bpf] xsk: avoid data corruption on cq descriptor number
-From: bot+bpf-ci@kernel.org
-To: fmancera@suse.de,bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,magnus.karlsson@intel.com,maciej.fijalkowski@intel.com,sdf@fomichev.me,kerneljasonxing@gmail.com,fw@strlen.de,fmancera@suse.de,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Tue, 28 Oct 2025 16:45:40 +0000 (UTC)
-
---===============0226383592031790764==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
+
+On Tue, 14 Oct 2025 01:10:33 -0700
+Pavan Chebbi <pavan.chebbi@broadcom.com> wrote:
+
+> Add bnxt_fwctl to the driver and fwctl documentation pages.
+> 
+> Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
+> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+
+Would be useful to provide a reference to userspace code that is
+making use of this.
+
+Jason / others, did we ever get the central repo for user space code
+set up?
 
 
-```
-commit 517548717cd8f9023f71443add6daabf21ef7135
-Author: Fernando Fernandez Mancera <fmancera@suse.de>
-
-xsk: avoid data corruption on cq descriptor number
-
-This patch fixes data corruption in AF_XDP by migrating descriptor
-information from skb->cb (which can be overwritten by other subsystems
-after transmit) to skb XDP extension.
-
-Closes: https://lore.kernel.org/netdev/0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu/
-
-> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> index 7b0c68a70..4f3fc005d 100644
-> --- a/net/xdp/xsk.c
-> +++ b/net/xdp/xsk.c
-
-[ ... ]
-
-> @@ -727,16 +730,32 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
->  				return ERR_PTR(err);
->  		}
->  	} else {
-> +		struct xdp_skb_ext *ext;
+> ---
+>  .../userspace-api/fwctl/bnxt_fwctl.rst        | 78 +++++++++++++++++++
+>  Documentation/userspace-api/fwctl/fwctl.rst   |  1 +
+>  Documentation/userspace-api/fwctl/index.rst   |  1 +
+>  3 files changed, 80 insertions(+)
+>  create mode 100644 Documentation/userspace-api/fwctl/bnxt_fwctl.rst
+> 
+> diff --git a/Documentation/userspace-api/fwctl/bnxt_fwctl.rst b/Documentation/userspace-api/fwctl/bnxt_fwctl.rst
+> new file mode 100644
+> index 000000000000..cbf6be4410cc
+> --- /dev/null
+> +++ b/Documentation/userspace-api/fwctl/bnxt_fwctl.rst
+> @@ -0,0 +1,78 @@
+> +.. SPDX-License-Identifier: GPL-2.0
 > +
->  		xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KERNEL);
->  		if (!xsk_addr)
->  			return ERR_PTR(-ENOMEM);
->
-> +		ext = skb_ext_find(skb, SKB_EXT_XDP);
-> +		if (!ext) {
-> +			ext = skb_ext_add(skb, SKB_EXT_XDP);
-> +			if (!ext)
-> +				return ERR_PTR(-ENOMEM);
-                                ^^^^
-
-In xsk_build_skb_zerocopy(), when skb_ext_add() fails after the
-kmem_cache_zalloc() succeeds, does this leak the xsk_addr allocation?
-
-The xsk_addr node is allocated first, then if skb_ext_add() returns
-NULL, the function returns ERR_PTR(-ENOMEM) without freeing xsk_addr.
-It hasn't been added to any list yet, so nothing will clean it up.
-
-> +			memset(ext, 0, sizeof(*ext));
-> +			INIT_LIST_HEAD(&ext->addrs_list);
-> +			ext->num_descs = 1;
-> +		} else if (ext->num_descs == 0) {
-> +			INIT_LIST_HEAD(&ext->addrs_list);
-> +			ext->num_descs = 1;
-> +		}
+> +=================
+> +fwctl bnxt driver
+> +=================
 > +
->  		/* in case of -EOVERFLOW that could happen below,
->  		 * xsk_consume_skb() will release this node as whole skb
->  		 * would be dropped, which implies freeing all list elements
->  		 */
->  		xsk_addr->addr = desc->addr;
-> -		list_add_tail(&xsk_addr->addr_node, &XSKCB(skb)->addrs_list);
-> +		list_add_tail(&xsk_addr->addr_node, &ext->addrs_list);
-> +		xsk_inc_num_desc(skb);
->  	}
-
-[ ... ]
-
-> @@ -804,6 +823,11 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
->  			if (unlikely(err))
->  				goto free_err;
->
-> +			if (!skb_ext_add(skb, SKB_EXT_XDP)) {
-> +				err = -ENOMEM;
-> +				goto free_err;
-> +			}
+> +:Author: Pavan Chebbi
 > +
-                ^^^^
+> +Overview
+> +========
+> +
+> +BNXT driver makes a fwctl service available through an auxiliary_device.
+> +The bnxt_fwctl driver binds to this device and registers itself with the
+> +fwctl subsystem.
+> +
+> +The bnxt_fwctl driver is agnostic to the device firmware internals. It
+> +uses the Upper Layer Protocol (ULP) conduit provided by bnxt to send
+> +HardWare Resource Manager (HWRM) commands to firmware.
+> +
+> +These commands can query or change firmware driven device configurations
+> +and read/write registers that are useful for debugging.
+> +
+> +bnxt_fwctl User API
+> +===================
+> +
+> +Each RPC request contains a message request structure (HWRM input),
+> +its length, optional request timeout, and dma buffers' information
+> +if the command needs any DMA. The request is then put together with
+> +the request data and sent through bnxt's message queue to the firmware,
+> +and the results are returned to the caller.
+> +
+> +A typical user application can send a FWCTL_INFO command using ioctl()
+> +to discover bnxt_fwctl's RPC capabilities as shown below:
+> +
+> +        ioctl(fd, FWCTL_INFO, &fwctl_info_msg);
+> +
+> +where fwctl_info_msg (of type struct fwctl_info) describes bnxt_info_msg
+> +(of type struct fwctl_info_bnxt). fwctl_info_msg is set up as follows:
+> +
+> +        size = sizeof(struct fwctl_info);
+> +        flags = 0;
+> +        device_data_len = sizeof(bnxt_info_msg);
+> +        out_device_data = (__aligned_u64)&bnxt_info_msg;
+> +
+> +The uctx_caps of bnxt_info_msg represents the capabilities as described
+> +in fwctl_bnxt_commands of include/uapi/fwctl/bnxt.h
+> +
+> +The FW RPC itself, FWCTL_RPC can be sent using ioctl() as:
+> +
+> +        ioctl(fd, FWCTL_RPC, &fwctl_rpc_msg);
+> +
+> +where fwctl_rpc_msg (of type struct fwctl_rpc) encapsulates fwctl_rpc_bnxt
+> +(see bnxt_rpc_msg below). fwctl_rpc_bnxt members are set up as per the
+> +requirements of specific HWRM commands described in include/bnxt/hsi.h.
+> +An example for HWRM_VER_GET is shown below:
+> +
+> +        struct fwctl_rpc_bnxt bnxt_rpc_msg;
+> +        struct hwrm_ver_get_output resp;
+> +        struct fwctl_rpc fwctl_rpc_msg;
+> +        struct hwrm_ver_get_input req;
+> +
+> +        req.req_type = HWRM_VER_GET;
+> +        req.hwrm_intf_maj = HWRM_VERSION_MAJOR;
+> +        req.hwrm_intf_min = HWRM_VERSION_MINOR;
+> +        req.hwrm_intf_upd = HWRM_VERSION_UPDATE;
+> +        req.cmpl_ring = -1;
+> +        req.target_id = -1;
+> +
+> +        bnxt_rpc_msg.req_len = sizeof(struct hwrm_ver_get_input);
+> +        bnxt_rpc_msg.num_dma = 0;
+> +        bnxt_rpc_msg.req = (__aligned_u64)&req;
+> +
+> +        fwctl_rpc_msg.size = sizeof(struct fwctl_rpc);
+> +        fwctl_rpc_msg.scope = FWCTL_RPC_DEBUG_READ_ONLY;
+> +        fwctl_rpc_msg.in_len = sizeof(bnxt_rpc_msg) + sizeof(req);
+> +        fwctl_rpc_msg.out_len = sizeof(struct hwrm_ver_get_output);
+> +        fwctl_rpc_msg.in = (__aligned_u64)&bnxt_rpc_msg;
+> +        fwctl_rpc_msg.out = (__aligned_u64)&resp;
+> diff --git a/Documentation/userspace-api/fwctl/fwctl.rst b/Documentation/userspace-api/fwctl/fwctl.rst
+> index a74eab8d14c6..826817bfd54d 100644
+> --- a/Documentation/userspace-api/fwctl/fwctl.rst
+> +++ b/Documentation/userspace-api/fwctl/fwctl.rst
+> @@ -148,6 +148,7 @@ area resulting in clashes will be resolved in favour of a kernel implementation.
+>  fwctl User API
+>  ==============
+>  
+> +.. kernel-doc:: include/uapi/fwctl/bnxt.h
+>  .. kernel-doc:: include/uapi/fwctl/fwctl.h
+>  .. kernel-doc:: include/uapi/fwctl/mlx5.h
+>  .. kernel-doc:: include/uapi/fwctl/pds.h
+> diff --git a/Documentation/userspace-api/fwctl/index.rst b/Documentation/userspace-api/fwctl/index.rst
+> index 316ac456ad3b..8062f7629654 100644
+> --- a/Documentation/userspace-api/fwctl/index.rst
+> +++ b/Documentation/userspace-api/fwctl/index.rst
+> @@ -10,5 +10,6 @@ to securely construct and execute RPCs inside device firmware.
+>     :maxdepth: 1
+>  
+>     fwctl
+> +   bnxt_fwctl
+>     fwctl-cxl
+>     pds_fwctl
 
-In xsk_build_skb() on the first-descriptor path, when skb_ext_add()
-succeeds, does the extension get initialized?
-
-The code adds the extension but doesn't capture the returned pointer
-or initialize it. Later, xsk_destruct_skb()->xsk_cq_submit_addr_locked()
-will read ext->num_descs, and for multi-buffer packets, subsequent
-descriptors will find this extension and try to use ext->addrs_list.
-
-Without initialization, ext->num_descs contains garbage which could be
-interpreted as > 1, and ext->addrs_list is an uninitialized list_head.
-This can cause the destructor to iterate a corrupt list, or
-list_add_tail() in the multi-buffer path to corrupt memory.
-
-Compare with the subsequent-descriptor path at lines 856-870 where
-the extension is properly initialized with memset() and INIT_LIST_HEAD()
-when added.
-
->  			xsk_skb_init_misc(skb, xs, desc->addr);
->  			if (desc->options & XDP_TX_METADATA) {
->  				err = xsk_skb_metadata(skb, buffer, desc,
-
-[ ... ]
-
-
-```
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-In-Reply-To-Subject: `xsk: avoid data corruption on cq descriptor number`
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/18881598580
-
---===============0226383592031790764==--
 
