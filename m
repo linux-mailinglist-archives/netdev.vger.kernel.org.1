@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-233684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90060C17605
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:35:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32EB0C1763E
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:43:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AE6294E2EA2
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:34:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6D833A9C72
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:43:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462872C15A8;
-	Tue, 28 Oct 2025 23:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB91D3563CC;
+	Tue, 28 Oct 2025 23:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SN5Net4e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kDdCQXRq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2141B280033
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 23:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D86286891
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 23:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761694496; cv=none; b=C1/cFCrCmeoQAlmULOPlTzUrHgfAKM8qxXq36LLon6IVTViBBNNR9uQw5rVsENMX5CT2NYpiEqrqGQQWeW/3amRU7wmPrEglcOsdjkRUqgi6j3XEPBlpALl/8wh+8FD/+T6V7nFbb6V2JevGWH5DUBEI+w36rRjxzttRchHcqLQ=
+	t=1761694979; cv=none; b=rZTiT9cWmh5ezd4+lIoqkAUwehnR3yUCH3IsYDOHM4O2/0YfT/qA9n2Ec7wb4+SHaavwRt42ph3TDNAL/6NkOS7K6WFXNaKEZbH3y1FehN7ViaY62SB3WZ3j+2s+54kava8o4mQ+yHU0hOBLF2zJo/OdRPqLQlDNEGmQ2+noQKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761694496; c=relaxed/simple;
-	bh=kLa4gjDOSeDQPpaDuFFI4V1VSh9j5HKheX4snjuiH4w=;
+	s=arc-20240116; t=1761694979; c=relaxed/simple;
+	bh=yf6La/yW+fAW9vXD7xqyZT4cnQekTq6yWJ+U87ek5aU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NL066dHI82+if54cEx2fiXSAAvz4oNxPKyHgxMmVQKD+Q9YqUj28sdaOr3oYkqkQ/+HnDGU0nB4nyUE+E257N+l9PCrC6Zyfm3HRRis8+6zQETTNhNW9dV8SfVvjjDiudB/+il3wF6+zseQFg7lnNmiIJZSOXyVKxBJgsKO4zqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SN5Net4e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36FABC4CEE7;
-	Tue, 28 Oct 2025 23:34:55 +0000 (UTC)
+	 MIME-Version:Content-Type; b=BowQi2DdBiMkDtS9BU+V+EurZQje3IfHDdEYAUbgm2TAF+c9CtrFyJyjr9PdOmhbJCR38zvQEGu9y6eQxO/M1rjxti8fCl0Kr6+FsBNYF4BtB0NYHMlce9FxBkApSnNtncRWCoMDvhTASiCsOr5//BycX/2ke/fO9aL0oLk4mV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kDdCQXRq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C87C0C4CEE7;
+	Tue, 28 Oct 2025 23:42:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761694495;
-	bh=kLa4gjDOSeDQPpaDuFFI4V1VSh9j5HKheX4snjuiH4w=;
+	s=k20201202; t=1761694979;
+	bh=yf6La/yW+fAW9vXD7xqyZT4cnQekTq6yWJ+U87ek5aU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SN5Net4eb8eLW3EcMlwf/KO+/bnCvyJPhSWBuCHYSRXxVmKF8AGyuT6Bzc+a52708
-	 9FhGV2KXgfWXTxBYJvq7JpoAPvSaVZ7f/Tg6mR/9sNt938FqBTglaJ3lsZkBuzUN2P
-	 9VmJKdEcUlRCcqZfcuENPPgszbycQmGqKAIctZyHaSmrvA5HgUmLAL6vYtL9az+M4O
-	 okTGlPM0ch8ClPq1tSBMeDmbxcN6FGoY6kn7YoE8ZDEMk0f4DsRNKyThdRHH4bTIJy
-	 Mh0IeMEygnBiWuSiOw6xsje3GofJuVdX0/JyGp7V4qrchRhAPBQkiqQe1YWQeh9MWD
-	 2iy6Bcg7p7XLg==
-Date: Tue, 28 Oct 2025 16:34:54 -0700
+	b=kDdCQXRqa1q+juk8aW57ol8x2a/4OlhvmYypN4PEefUdMp65mfzmqMwchQ20wagfq
+	 5S2HWPiYLc7BMPhFBkuKpoTIGAp4bdpRtncHyUQb+ABiu4zav6/WxgEXrzVAuAVloW
+	 Fc0nc4+EjLEr3eyZ1hv3yF1KfPoIQ24vo8LVKkJQwlrD5NVUTB6+NDnfwNYgPstmpE
+	 F24HwJqZFjbLZUkXx40fVmaauBUnFhK2HGjSlJAMKhofod9Q4XH6CgJtxs87pofUDt
+	 /177iltAlTicNcWjkgdPOjMWy7uaRUDpruZhwk1boJm8ndFh3/Y64gIMYyaSqZcIQb
+	 FTeNdikC6e4ow==
+Date: Tue, 28 Oct 2025 16:42:57 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- donald.hunter@gmail.com, ast@fiberby.net
-Subject: Re: [PATCH net-next v2 2/2] tools: ynl: rework the string
- representation of NlError
-Message-ID: <20251028163454.66ca7dc3@kernel.org>
-In-Reply-To: <53ad4e54-47c7-4afa-a296-635e10192f8c@lunn.ch>
-References: <20251027192958.2058340-1-kuba@kernel.org>
-	<20251027192958.2058340-2-kuba@kernel.org>
-	<53ad4e54-47c7-4afa-a296-635e10192f8c@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni
+ <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH net-next 0/8] net: stmmac: hwif.c cleanups
+Message-ID: <20251028164257.067bdbcd@kernel.org>
+In-Reply-To: <aPt1l6ocBCg4YlyS@shell.armlinux.org.uk>
+References: <aPt1l6ocBCg4YlyS@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,21 +64,33 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 28 Oct 2025 14:58:59 +0100 Andrew Lunn wrote:
-> I think as a kernel programmer, i would prefer EINVAL over Invalid
-> argument. If i'm going to be digging into the kernel sources to find
-> where the error is happening, it is one less translation i need to
-> make.
+On Fri, 24 Oct 2025 13:48:23 +0100 Russell King (Oracle) wrote:
+> This series cleans up hwif.c:
 > 
-> >>> print(errno.errorcode[1])  
-> EPERM
-> >>> print(errno.errorcode[2])  
-> ENOENT
-> >>> print(errno.errorcode[110])  
-> ETIMEDOUT
+> - move the reading of the version information out of stmmac_hwif_init()
+>   into its own function, stmmac_get_version(), storing the result in a
+>   new struct.
 > 
-> I suppose the question is, who is the intended user of ynl? Do we want
-> user friendly messages, or kernel developer friendly messages?
+> - simplify stmmac_get_version().
+> 
+> - read the version register once, passing it to stmmac_get_id() and
+>   stmmac_get_dev_id().
+> 
+> - move stmmac_get_id() and stmmac_get_dev_id() into
+>   stmmac_get_version()
+> 
+> - define version register fields and use FIELD_GET() to decode
+> 
+> - start tackling the big loop in stmmac_hwif_init() - provide a
+>   function, stmmac_hwif_find(), which looks up the hwif entry, thus
+>   making a much smaller loop, which improves readability of this code.
+> 
+> - change the use of '^' to '!=' when comparing the dev_id, which is
+>   what is really meant here.
+> 
+> - reorganise the test after calling stmmac_hwif_init() so that we
+>   handle the error case in the indented code, and the success case
+>   with no indent, which is the classical arrangement.
 
-A mix of both, it is packaged in distros.
+This one needs a respin (patch 6 vs your IRQ masking changes?).
 
