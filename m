@@ -1,124 +1,113 @@
-Return-Path: <netdev+bounces-233470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCF7AC13EB4
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 10:52:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42F2EC13F95
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 10:59:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 505C1189A68F
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 09:52:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3F16402B2D
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 09:55:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82C92D877B;
-	Tue, 28 Oct 2025 09:51:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF6C2EA475;
+	Tue, 28 Oct 2025 09:55:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XGuPwRhB"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="HV9/KtV3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24ED2C3769;
-	Tue, 28 Oct 2025 09:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 849D0224AEF;
+	Tue, 28 Oct 2025 09:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761645114; cv=none; b=IOWbofWtpjLbA0bshY0W/2sycBBSV/Y2g3PoftXhXu3WF6FHZF4iEchFUNVvsk6+xIHk53l34KIksYuDk3kneSZHL/Gyk3gn6Pj3PZd7xH6eWGEkCj/hmCmbbTu8eE5v+FJn5CtCvufj8v3nlimP50fiuYdAP0gf9m6yUM6IE/c=
+	t=1761645304; cv=none; b=ck6FkEJka4jI8LFa7ho9EJRieLRbpPcmosl2Jm7oqNt9skphrB9Nurfc63F0EquuUOFO80lc94zmPUp7DaNM+qsEb9OTQPQW4rlvMJxpmqElMA3nsxZnAD2DSQ5U4weWulpuvuSBwqPnOMcGZlc30l5wYfOfZH5/cGM3GSVgKCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761645114; c=relaxed/simple;
-	bh=0aJBsF0Nh35ZXCIg0A2MFQvLvoZv/+TME8lqz/VCkLE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V3ploH79bMOFxOHTM3EfjSQOyUliNGw6VO+kL9BBBkcIw2dJQcvxN9IPHuQriciTmt3k6aF7yjn0x+Mlw1dfPgLmyOcrm+3JH65OAHOmnJtpfsxDRclNR42UhnufI71SszzBStvREWrvtH8oT20H1odCXHuOHyk/JinpNPXdfwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XGuPwRhB; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761645113; x=1793181113;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=0aJBsF0Nh35ZXCIg0A2MFQvLvoZv/+TME8lqz/VCkLE=;
-  b=XGuPwRhBlwragNCqnss4es3QE0O4vN/VCR0oxq++wC+/M4FlXHvTxYSx
-   beLGMwq+EbA92IdqLqrLYBNhWh+rE/5MpZD0iCAwGb3kp0hzKc01Nt7In
-   9x637Iz9YX+oiekir0iv05rMoNs5GuU/pIYgOj/XALPp4sIt1jFUgOdS/
-   3ie3AD1e8W1osH6v74kBwzSbqf2aE9rWAk5KKpZ7LJdJJyIzA8JkS4zeK
-   4jozbwg7e72PdBrVTCc21DwdAsD/XlfFWM2MMnUjPEcUpsDjp/Bk29pz4
-   B6UOmTXDcVk6XqNHl/p6GfawLJlLy2MlRXDsA1acgi997Wihkf9Q9otcL
-   g==;
-X-CSE-ConnectionGUID: RwK1e3XyQrmj5/EK8cxiXA==
-X-CSE-MsgGUID: 3qO16LPdQPa3E20GrRd0Tg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="67604836"
-X-IronPort-AV: E=Sophos;i="6.19,261,1754982000"; 
-   d="scan'208";a="67604836"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 02:51:51 -0700
-X-CSE-ConnectionGUID: r9XAsKgXQ0+GpTj/ryCjAA==
-X-CSE-MsgGUID: 8fTScKfZSceEzg8NXNf90w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,261,1754982000"; 
-   d="scan'208";a="185390454"
-Received: from junjie-nuc14rvs.bj.intel.com ([10.238.152.23])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 02:51:48 -0700
-From: Junjie Cao <junjie.cao@intel.com>
-To: Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	Junjie Cao <junjie.cao@intel.com>,
-	syzbot+c8c0e7ccabd456541612@syzkaller.appspotmail.com
-Subject: [PATCH] ptp: guard ptp_clock_gettime() if neither gettimex64 nor
-Date: Tue, 28 Oct 2025 17:51:43 +0800
-Message-ID: <20251028095143.396385-1-junjie.cao@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1761645304; c=relaxed/simple;
+	bh=VkJJoaOgwKx/MG13uYO7dg2VnmHe+0dHluraTr6UaSo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sJS7FSQPfhoY7zoqwLh9WaTfUpYwstwn2ys3vYF5VEc8N3Py4xMZ7ZkhgByoi7yEjM5b2qk30A9tGOjdMQWfwIOjJlK8of3B1GU82MumfqBPPqJwhX8DJ2rUwGLXF3g1VK2x1xQiOiDDR8c08oiz2gX4lFKrc6BfJ9f+DLYIuP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=HV9/KtV3; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1761645292; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=XnLIEDazUQh+n+XUoqVL4fWSLTw/nU5T94rbHzt7llw=;
+	b=HV9/KtV3MWuOHoAmi/5IgrzXlJdAI7AHcQ506tZuCnqigQ36UdNTARhTKdy5kIPtBJt5RjHN4SoyWgiXrwPFmL02Zv/Qt8b6nJPSass6Nck5a74D0fWthBb3WkdjP15qC4jGPAiOyZ6UBtQGLpWfbXShbGrUwwYI8ZpM+mjf/I0=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WrBkTrX_1761645290 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 28 Oct 2025 17:54:51 +0800
+Date: Tue, 28 Oct 2025 17:54:50 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Leon Romanovsky <leon@kernel.org>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>, mjambigi@linux.ibm.com,
+	wenjia@linux.ibm.com, wintera@linux.ibm.com,
+	dust.li@linux.alibaba.com, tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com, kuba@kernel.org, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+	sidraya@linux.ibm.com, jaka@linux.ibm.com
+Subject: Re: [PATCH net-next v2] net/smc: add full IPv6 support for SMC
+Message-ID: <20251028095450.GA38488@j66a10360.sqa.eu95>
+References: <20251022032309.66386-1-alibuda@linux.alibaba.com>
+ <20251027134227.GL12554@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251027134227.GL12554@unreal>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Syzbot reports a NULL function pointer call on arm64 when
-ptp_clock_gettime() falls back to ->gettime64() and the driver provides
-neither ->gettimex64() nor ->gettime64(). This leads to a crash in the
-posix clock gettime path.
+On Mon, Oct 27, 2025 at 03:42:27PM +0200, Leon Romanovsky wrote:
+> On Wed, Oct 22, 2025 at 11:23:09AM +0800, D. Wythe wrote:
+> > The current SMC implementation is IPv4-centric. While it contains a
+> > workaround for IPv4-mapped IPv6 addresses, it lacks a functional path
+> > for native IPv6, preventing its use in modern dual-stack or IPv6-only
+> > networks.
+> > 
+> > This patch introduces full, native IPv6 support by refactoring the
+> > address handling mechanism to be IP-version agnostic, which is
+> > achieved by:
+> > 
+> > - Introducing a generic `struct smc_ipaddr` to abstract IP addresses.
+> > - Implementing an IPv6-specific route lookup function.
+> > - Extend GID matching logic for both IPv4 and IPv6 addresses
+> > 
+> > With these changes, SMC can now discover RDMA devices and establish
+> > connections over both native IPv4 and IPv6 networks.
+> 
+> Why can't you use rdma-cm in-kernel API like any other in-kernel RDMA consumers?
+> 
+> Thanks
+> 
+> >
 
-Return -EOPNOTSUPP when both callbacks are missing, avoiding the crash
-and matching the defensive style used in the posix clock layer.
+Hi Leon,
 
-Reported-by: syzbot+c8c0e7ccabd456541612@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=c8c0e7ccabd456541612
-Signed-off-by: Junjie Cao <junjie.cao@intel.com>
----
- drivers/ptp/ptp_clock.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(
-diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-index ef020599b771..764bd25220c1 100644
---- a/drivers/ptp/ptp_clock.c
-+++ b/drivers/ptp/ptp_clock.c
-@@ -110,12 +110,14 @@ static int ptp_clock_settime(struct posix_clock *pc, const struct timespec64 *tp
- static int ptp_clock_gettime(struct posix_clock *pc, struct timespec64 *tp)
- {
- 	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
--	int err;
-+	int err = -EOPNOTSUPP;
- 
- 	if (ptp->info->gettimex64)
--		err = ptp->info->gettimex64(ptp->info, tp, NULL);
--	else
--		err = ptp->info->gettime64(ptp->info, tp);
-+		return ptp->info->gettimex64(ptp->info, tp, NULL);
-+
-+	if (ptp->info->gettime64)
-+		return ptp->info->gettime64(ptp->info, tp);
-+
- 	return err;
- }
- 
--- 
-2.43.0
+Regarding RDMA-CM, I’m not sure if I’ve fully grasped your point, but
+based on my current understanding, I believe SMC cannot use RDMA-CM.
+There are a few reasons for this:
 
+Firstly, SMC is designed to work not only with RDMA devices but also
+needs to negotiate with DIBS(DIRECT INTERNAL BUFFER SHARING) devices. This
+means we must support scenarios where no RDMA device is present.
+Therefore, we require a round of out-of-band negotiation regardless of
+the final device choice. In this context, even if we ultimately select
+an RDMA device, using rdma-cm to establish the connection would be
+redundant.
+
+Additionally, SMC requires multiplexing multiple connections over a
+single QP. We need to decide during the out-of-band negotiation which
+specific QP to reuse for the connection. From what I know, rdma-cm does
+not seem to offer this capability either.
+
+Best regards,
+D. Wythe
 
