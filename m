@@ -1,148 +1,242 @@
-Return-Path: <netdev+bounces-233387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E9FCC12A06
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 03:05:25 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B69AC12A12
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 03:07:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5AB944E107A
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:05:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B8BCB4E47C7
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:06:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5991A8412;
-	Tue, 28 Oct 2025 02:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7BB1A8412;
+	Tue, 28 Oct 2025 02:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sGanh5Ne"
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="SvDVz/Kv"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5A0F50F;
-	Tue, 28 Oct 2025 02:05:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A90F50F;
+	Tue, 28 Oct 2025 02:06:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761617121; cv=none; b=WrB1JYUyZhpdz4ItHV/ljx8/bMYTnGHAOxEPNbX3+Co9B/TVgGzMXGdm92o1HoCN/u/EKkRHou5jqsgQkQbh0olOZZYUNqQ+zwFBwSc59+e0Foz/iSxZqx77ykpFs6Db8jr2CnEgz5TRUWbPmpq4j3fJsFQFAlgsG20YCMJPuGY=
+	t=1761617188; cv=none; b=dj7iYegM9aT2CPV8FWc5byTc0QaciQ7bP+bisZjuTLEVQBh2qgdufUYbh+AvK1JsXCdT2NS8DaIOrMv34M7xD1YRgyLUnBxgFwyAWkh8Sq/tzYCrA4D/sTA1esZG6k7DcZJPapUdurUXb6wh/8kzFAGC/dMOAU07KQOIX8BABVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761617121; c=relaxed/simple;
-	bh=/QtiO7t/dggNE4jC07IMjjMm/+jAfX83TmfutRs9W2g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hC+auW5GxyhiQb9fQ+E5VEtA/JYmwn9DrUNFmb7RdEd0a0ZYmhOcjJzpZ8IojX0RfRHgKgJINUxBwFb0pKbcq79Fr1J7ZXPsRy/86OZkXFgRoj5BZP1clgSWo/vpHdQ8HFSOiJjDMw6YAkdfHW29kbHus/l3wOAKZf61x/6gWoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sGanh5Ne; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GQuLB8waf5DwY5p0Hg1kGKo+ab3hK5Wpw4AlIb4e7Ro=; b=sGanh5Ne98mP44YSdlFCUu5WI5
-	bKVrHiVM//qLgkKjfnOr6y06C9e3zsiqQ4Fw/pbwP+/mN57FR+PhRLVXLMu/odZE7dzbrS3f8DIwD
-	lAs1BzN0eIscDZ+lPAQXfuICdjPM90mVuXQQOkgsWBpmiv3KCAFc/2nWXRHN/DCTMfrc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vDZ55-00CFpt-46; Tue, 28 Oct 2025 03:05:03 +0100
-Date: Tue, 28 Oct 2025 03:05:03 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shuah@kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v2] selftests: drv-net: replace the nsim ring
- test with a drv-net one
-Message-ID: <a55df0a7-4adf-45bf-b448-eeb68ba5592e@lunn.ch>
-References: <20251027192131.2053792-1-kuba@kernel.org>
- <57359fb9-195c-4a4a-b102-f7739453a94f@lunn.ch>
- <20251027171539.565e63f2@kernel.org>
+	s=arc-20240116; t=1761617188; c=relaxed/simple;
+	bh=hB0F0f3czaGrMW/cqojaLSFWSVcNLZ93V4c7pu+q15k=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VnVDGU+I9vC4U/2e6RmU3wu1DrLbFX9+Llkk5L+jeEKs6gECK481U1qX4JME441Jf7AtRuXUg/v2+p9tEs/KBuVs5+jEdDncTbHXAQy1uAnwkjxge2bpomq2ZQlayoLow/+MaZfAIFNFgrI+jblphBrlNezLtBKMGcr4v0mFLcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=SvDVz/Kv; arc=none smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59S0ADVC2710318;
+	Mon, 27 Oct 2025 19:06:04 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	PPS06212021; bh=Odw5CO1GMwiID/662eBOMWyp09TTAmRXFX0uj18/NiQ=; b=
+	SvDVz/KvxVmSGMb1NU2v8jrHJK+u15XNgCpAP1SC1aA8cNRgH76fGOjsGSk9jpHF
+	faemMjpur56QJh4w6GZj3AKxny4U6P5YvESNECL8y0/YnzEJAKGfdjRaAty/Uqj9
+	65ueVymPHj137NSj13ebyXnXdoPeX9Qz6j97TzI9K0CfTB+8ETN0/7CiwnpLL0IV
+	+S2038tW49tEaTKs02lHv4b1AgimQ+b2TkZIgQQ2MWJApyGr49WMRBCpAsBKtfNE
+	DWyp0FJ+U4veS3pYQPAdBz03OqM6VFyIRpyLE9nAUFTY8CKxNg7iWCyHsmAoh3BI
+	70YSADh9CAU+TiS40Hshmg==
+Received: from ala-exchng02.corp.ad.wrs.com ([128.224.246.37])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4a0su1jgtd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Mon, 27 Oct 2025 19:06:03 -0700 (PDT)
+Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
+ ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.61; Mon, 27 Oct 2025 19:06:03 -0700
+Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
+ 15.1.2507.61 via Frontend Transport; Mon, 27 Oct 2025 19:06:00 -0700
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <kuniyu@google.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+        <jreuter@yaina.de>, <kuba@kernel.org>, <linux-hams@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
+        <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+        <syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>
+Subject: Re: [PATCH V3] net: rose: Prevent the use of freed digipeat
+Date: Tue, 28 Oct 2025 10:05:59 +0800
+Message-ID: <20251028020559.2527458-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <CAAVpQUA1v+LDYfpGGcTJ3sGGhmo6BCBrwWUwaj9cUbBVrw28GQ@mail.gmail.com>
+References: <CAAVpQUA1v+LDYfpGGcTJ3sGGhmo6BCBrwWUwaj9cUbBVrw28GQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251027171539.565e63f2@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=SuadKfO0 c=1 sm=1 tr=0 ts=6900250b cx=c_pps
+ a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=edf1wS77AAAA:8 a=1XWaLZrsAAAA:8
+ a=t7CeM3EgAAAA:8 a=hSkVLCK3AAAA:8 a=FmatfasXnMZaY-i_3HAA:9
+ a=DcSpbTIhAlouE1Uv7lRv:22 a=FdTzh2GWekK77mhwV6Dw:22 a=cQPPKAXgyycSBL8etih5:22
+ a=poXaRoVlC6wW9_mwW8W4:22 a=cPQSjfK2_nFv0Q5t_7PE:22 a=Z5ABNNGmrOfJ6cZ5bIyy:22
+ a=SsAZrZ5W_gNWK9tOzrEV:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI4MDAxNyBTYWx0ZWRfXzutfacNwVav5
+ 7MzKHQcfvwS60xUlrPqY65JhS0CQkSxLb79TyXvSzMxkRKjno46VgeYfrfBTmtrXCpuyxXRP/2m
+ whAt66emVDE+QhBnk8CpLgw9TSFKKSxxNkoTVbMY/ef8AGIcVamMC7l4cur6ik65HRqVv3DqJ5Y
+ Uz/0GrAysNy4sxaVC7mT31fMHo6CRp/xjbMSDgAP/1E2Jzc198sRb4bxyJh9/AWAUt94z15S48y
+ dhq/pJ/iUr4E88RfuNMOSdGix3zwGQTbf7o4FcisiGmzXJxaoFxI/iifvUs6ORwi9+lxnQAfWN/
+ G2QTIK2cqt0kvT/FdyPySmvOHCWlNljBn9xPlAmyqmk8WZj8nu0Qe48ImStksyGtCXAcL9u3qaV
+ yLAmOELluM89J/VeV1MbB/Bc/6xbzw==
+X-Proofpoint-GUID: eIPEPaC6TD0wL_su1l6R_PHRRa5GQyLH
+X-Proofpoint-ORIG-GUID: eIPEPaC6TD0wL_su1l6R_PHRRa5GQyLH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-28_01,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 clxscore=1015 bulkscore=0 suspectscore=0 spamscore=0
+ adultscore=0 lowpriorityscore=0 phishscore=0 impostorscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510280017
 
-On Mon, Oct 27, 2025 at 05:15:39PM -0700, Jakub Kicinski wrote:
-> On Mon, 27 Oct 2025 20:46:00 +0100 Andrew Lunn wrote:
-> > > +    def test_config(config):
-> > > +        try:
-> > > +            cfg.eth.channels_set(ehdr | config)
-> > > +            get = cfg.eth.channels_get(ehdr)
-> > > +            for k, v in config.items():
-> > > +                ksft_eq(get.get(k, 0), v)
-> > > +        except NlError as e:
-> > > +            failed.append(mix)
-> > > +            ksft_pr("Can't set", config, e)
-> > > +        else:
-> > > +            ksft_pr("Okay", config)  
-> > 
-> > We expect failure to leave the configuration unchanged. So i would
-> > actually do:
-> > 
-> > try:
-> > 	before = get()
-> > 	set()
-> > except:
-> > 	after = get()
-> > 	fail(after != before)
+On Mon, 27 Oct 2025 10:40:34 -0700, Kuniyuki Iwashima <kuniyu@google.com> wrote:
+> On Sat, Oct 25, 2025 at 12:53 AM Lizhi Xu <lizhi.xu@windriver.com> wrote:
+> >
+> > On Sat, 25 Oct 2025 00:15:51 -0700, Kuniyuki Iwashima <kuniyu@google.com> wrote:
+> > > On Fri, Oct 24, 2025 at 11:46 PM Lizhi Xu <lizhi.xu@windriver.com> wrote:
+> > > >
+> > > > On Fri, 24 Oct 2025 21:25:20 -0700, Kuniyuki Iwashima <kuniyu@google.com> wrote:
+> > > > > On Fri, Oct 24, 2025 at 8:51 PM Lizhi Xu <lizhi.xu@windriver.com> wrote:
+> > > > > >
+> > > > > > On Fri, 24 Oct 2025 19:18:46 -0700, Kuniyuki Iwashima <kuniyu@google.com> wrote:
+> > > > > > > On Fri, Oct 24, 2025 at 2:39 AM Lizhi Xu <lizhi.xu@windriver.com> wrote:
+> > > > > > > >
+> > > > > > > > There is no synchronization between the two timers, rose_t0timer_expiry
+> > > > > > > > and rose_timer_expiry.
+> > > > > > > > rose_timer_expiry() puts the neighbor when the rose state is ROSE_STATE_2.
+> > > > > > > > However, rose_t0timer_expiry() does initiate a restart request on the
+> > > > > > > > neighbor.
+> > > > > > > > When rose_t0timer_expiry() accesses the released neighbor member digipeat,
+> > > > > > > > a UAF is triggered.
+> > > > > > > >
+> > > > > > > > To avoid this UAF, defer the put operation to rose_t0timer_expiry() and
+> > > > > > > > stop restarting t0timer after putting the neighbor.
+> > > > > > > >
+> > > > > > > > When putting the neighbor, set the neighbor to NULL. Setting neighbor to
+> > > > > > > > NULL prevents rose_t0timer_expiry() from restarting t0timer.
+> > > > > > > >
+> > > > > > > > syzbot reported a slab-use-after-free Read in ax25_find_cb.
+> > > > > > > > BUG: KASAN: slab-use-after-free in ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
+> > > > > > > > Read of size 1 at addr ffff888059c704c0 by task syz.6.2733/17200
+> > > > > > > > Call Trace:
+> > > > > > > >  ax25_find_cb+0x3b8/0x3f0 net/ax25/af_ax25.c:237
+> > > > > > > >  ax25_send_frame+0x157/0xb60 net/ax25/ax25_out.c:55
+> > > > > > > >  rose_send_frame+0xcc/0x2c0 net/rose/rose_link.c:106
+> > > > > > > >  rose_transmit_restart_request+0x1b8/0x240 net/rose/rose_link.c:198
+> > > > > > > >  rose_t0timer_expiry+0x1d/0x150 net/rose/rose_link.c:83
+> > > > > > > >
+> > > > > > > > Freed by task 17183:
+> > > > > > > >  kfree+0x2b8/0x6d0 mm/slub.c:6826
+> > > > > > > >  rose_neigh_put include/net/rose.h:165 [inline]
+> > > > > > > >  rose_timer_expiry+0x537/0x630 net/rose/rose_timer.c:183
+> > > > > > > >
+> > > > > > > > Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_t")
+> > > > > > > > Reported-by: syzbot+caa052a0958a9146870d@syzkaller.appspotmail.com
+> > > > > > > > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> > > > > > > > ---
+> > > > > > > > V1 -> V2: Putting the neighbor stops t0timer from automatically starting
+> > > > > > > > V2 -> V3: add rose_neigh_putex for set rose neigh to NULL
+> > > > > > > >
+> > > > > > > >  include/net/rose.h   | 12 ++++++++++++
+> > > > > > > >  net/rose/rose_link.c |  5 +++++
+> > > > > > > >  2 files changed, 17 insertions(+)
+> > > > > > > >
+> > > > > > > > diff --git a/include/net/rose.h b/include/net/rose.h
+> > > > > > > > index 2b5491bbf39a..33de310ba778 100644
+> > > > > > > > --- a/include/net/rose.h
+> > > > > > > > +++ b/include/net/rose.h
+> > > > > > > > @@ -167,6 +167,18 @@ static inline void rose_neigh_put(struct rose_neigh *rose_neigh)
+> > > > > > > >         }
+> > > > > > > >  }
+> > > > > > > >
+> > > > > > > > +static inline void rose_neigh_putex(struct rose_neigh **roseneigh)
+> > > > > > > > +{
+> > > > > > > > +       struct rose_neigh *rose_neigh = *roseneigh;
+> > > > > > > > +       if (refcount_dec_and_test(&rose_neigh->use)) {
+> > > > > > > > +               if (rose_neigh->ax25)
+> > > > > > > > +                       ax25_cb_put(rose_neigh->ax25);
+> > > > > > > > +               kfree(rose_neigh->digipeat);
+> > > > > > > > +               kfree(rose_neigh);
+> > > > > > > > +               *roseneigh = NULL;
+> > > > > > > > +       }
+> > > > > > > > +}
+> > > > > > > > +
+> > > > > > > >  /* af_rose.c */
+> > > > > > > >  extern ax25_address rose_callsign;
+> > > > > > > >  extern int  sysctl_rose_restart_request_timeout;
+> > > > > > > > diff --git a/net/rose/rose_link.c b/net/rose/rose_link.c
+> > > > > > > > index 7746229fdc8c..334c8cc0876d 100644
+> > > > > > > > --- a/net/rose/rose_link.c
+> > > > > > > > +++ b/net/rose/rose_link.c
+> > > > > > > > @@ -43,6 +43,9 @@ void rose_start_ftimer(struct rose_neigh *neigh)
+> > > > > > > >
+> > > > > > > >  static void rose_start_t0timer(struct rose_neigh *neigh)
+> > > > > > > >  {
+> > > > > > > > +       if (!neigh)
+> > > > > > > > +               return;
+> > > > > > > > +
+> > > > > > > >         timer_delete(&neigh->t0timer);
+> > > > > > > >
+> > > > > > > >         neigh->t0timer.function = rose_t0timer_expiry;
+> > > > > > > > @@ -80,10 +83,12 @@ static void rose_t0timer_expiry(struct timer_list *t)
+> > > > > > > >  {
+> > > > > > > >         struct rose_neigh *neigh = timer_container_of(neigh, t, t0timer);
+> > > > > > > >
+> > > > > > >
+> > > > > > > What prevents rose_timer_expiry() from releasing the
+> > > > > > > last refcnt here ?
+> > > > > > The issue reported by syzbot is that rose_t0timer_expiry() is triggered
+> > > > > > first, followed by rose_timer_expiry().
+> > > > >
+> > > > > I don't see how you read that ordering from the report.
+> > > > > https://syzkaller.appspot.com/bug?extid=caa052a0958a9146870d
+> > > > Here's my understanding: See the two calltraces below.
+> > >
+> > > The same question still applies.
+> > >
+> > > What prevents rose_timer_expiry() from releasing the last
+> > > refcnt before [1] ?
+> > @@ -80,10 +83,12 @@ static void rose_t0timer_expiry(struct timer_list *t)
+> >  {
+> >         struct rose_neigh *neigh = timer_container_of(neigh, t, t0timer);
+> >
+> > +       rose_neigh_hold(neigh); // [3] This prevents rose_timer_expiry() from putting neigh.
 > 
-> Please allow me to introduce you to the magic of defer() ;)
-
-That is why i don't like magic, especially in tests which have no
-documentation of the expected results. For me, tests should be dumb,
-often boringly repetitive, and at least 50% comments, explaining what
-is being tested, what the expected outcome is, and most importantly,
-why that is the expected outcome.
-
-> This registers a command to run after the test completely exits:
+> If you ask yourself the same question once more here,
+> you will notice the fix is broken.
 > 
-> +    defer(cfg.eth.channels_set, ehdr | restore)
-> 
-> > Also, does nlError contain the error code?
-> > 
-> >         fail(e.errcode not in (EINVAL, EOPNOTSUPP))
-> > 
-> > It would be good to detect and fail ENOTSUPP, which does appear every
-> > so often, when it should not.
-> 
-> Dunno, checkpatch warns about ENOTSUPP. I don't that think checking 
-> for funny error codes in every test scales :(
+> What prevents rose_timer_expiry() from releasing the
+> last refcnt before rose_neigh_hold() ?
+The UAF issue reported by syzbot is shown below:
+	CPU0				CPU1
+	====				====
+ rose_t0timer_expiry()
+ rose_transmit_restart_request()
+ rose_send_frame()
+ ax25_send_frame()			rose_timer_expiry()
+ 					rose_neigh_put()
+					kfree(neigh)
+ ax25_find_cb()
 
-How about in the nlError constructor? That gives you a single
-location, and you can accept EINVAL, EOPNOTSUPP, ENODEV, ENOMEM, maybe
-ETOOBIG. Cause the test to fail for everything else. If anybody
-reports test failures with other errno values, the list can be
-expanded, if they are sensible.
+My patch calls rose_neigh_hold() before executing rose_transmit_restart_request()
+in rose_t0timer_expiry(). It then calls rose_neigh_putex() to release and
+set neigh to NULL before executing rose_start_t0timer(). This also prevents
+timer0 from restarting.
 
-> > > +    # Try to reach min on all settings
-> > > +    for param in params:
-> > > +        val = rings[param]
-> > > +        while True:
-> > > +            try:
-> > > +                cfg.eth.rings_set({'header':{'dev-index': cfg.ifindex},
-> > > +                                   param: val // 2})
-> > > +                val //= 2
-> > > +                if val <= 1:
-> > > +                    break
-> > > +            except NlError:
-> > > +                break  
-> > 
-> > Is 0 ever valid? I would actually test 0 and make sure it fails with
-> > EINVAL, or EOPNOTSUPP. Getting range checks wrong is a typical bug, so
-> > it is good to test them. The happy days cases are boring because
-> > developers tend to test those, so they are hardly worth testings. Its
-> > the edge cases which should be tested.
-> 
-> I believe that 0 is a valid settings. I don't have much experience with
-> devices which support it. But presumably using 0 to disable mini/jumbo
-> rings would make sense for example? And max validation is done by the
-> core so nothing interesting to explore there at the driver level :(
-
-Looking at the code, it seems to cost nothing to actually test 0, if
-you say it could be valid. That might also find an off-by-one error,
-if it causes something to go negative/large positive.
-
-	Andrew
+I think the only questionable part of the patch is the expiration time of
+rose_timer. I don't know the expiration time because I don't have a reproducer.
+If the value is very small, the result may be different.
 
