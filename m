@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-233555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4688DC15632
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:20:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C6CEC155F9
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:17:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 684A64ECBCF
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:14:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E273188E573
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:18:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B463C330336;
-	Tue, 28 Oct 2025 15:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7967633CE9B;
+	Tue, 28 Oct 2025 15:17:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PbBhb5LM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UXTcg0jj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8735D1E0DFE;
-	Tue, 28 Oct 2025 15:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0B025F7B9;
+	Tue, 28 Oct 2025 15:17:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761664474; cv=none; b=SToTtHU2u+Yd+PG9GL5npnc/s55CxmzLVUuylKgejN6OFBQQxOHG4xKChbhSQkBG/QBs7L8k3Wfgfh6MZxIYVTGjIi1i10IN8lcvICFXRZX2kTbJu6aPOAuCciPBucOBlSc+57RR1zrJc0LlLO6Fwt+0efwVegmLl0eFji64Rq8=
+	t=1761664667; cv=none; b=tt8YQF+Hl2W1uKgx21RadZKyd40h+V4Rp5uFhtA15kyDMMxUxsKd69L3zog6OMgzeMqZ0zcg/hxJSqMb4lPoidHoOWQz5XXA7P+D26aEByO1nMp20HAfgMxZIG1Br3GX60bsHBHpX+kD/e9UhYW2JRCSG+GvW9XX90ezH9vXQPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761664474; c=relaxed/simple;
-	bh=mDhgGul5hx4gdszSsYNQpFYjmNebb6wxY38Qp+v8G9g=;
+	s=arc-20240116; t=1761664667; c=relaxed/simple;
+	bh=PQq14YNtGBdvwq+dX4gUGxliEpdbUTWWE8fvTpPA3h8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LNyxASWAdDw/w9maXAgOOMgt4AKd9AcnV7a+HCpw/THW6bW0S7bR37MNPNdn2RoEUz5C9/XzgEeoB5LhJyIAj1iAnZCEpG188vEHKeQn6k78L7ObFvFabY+hnpdrCUgdBHmjNw7I1LgDbAEQNtsdqoiDgDMKFnCKFWNWTjYKQhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PbBhb5LM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B25EC4CEE7;
-	Tue, 28 Oct 2025 15:14:31 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=qpH8gQt8CiGyblvbahRb4iLaQSAaVgruK96YGTQXm+I+8mAaR90haZhgDLbHwdGo17aj0GjfP+IixUi2G4VDuEV3uxLlhdrEJRnzGFewEjV6PK1CRT4CorPnO5RPvKxXa5XRv30LKAgOcy9lgLHq9EgSpSzVOxyBd7ZMuLIznRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UXTcg0jj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8D34C4CEE7;
+	Tue, 28 Oct 2025 15:17:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761664474;
-	bh=mDhgGul5hx4gdszSsYNQpFYjmNebb6wxY38Qp+v8G9g=;
+	s=k20201202; t=1761664667;
+	bh=PQq14YNtGBdvwq+dX4gUGxliEpdbUTWWE8fvTpPA3h8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PbBhb5LMDypnzhM3erO305HwnsEZWP9KQF7Fc+xB5TOvs1lfdqJIGZJ817bufANA7
-	 1FICaVp2ohB+0de0/hyJnhEbn6Z3IuQjSTXNkiu+hnasiGa2PErCis44RZLcV68OfY
-	 Jgl0J8e2F48RwX3ZlTfk9TA+nOA1RFGiwwZk2fIerdD63Bc7eXQGMfJ6Vat/sn3+gW
-	 hxGhcyOH5WTSiNv/aQhhULmujsHp0K2bCA5swNJWgguUNvOxDW4ZmJqy/8BObNrWxv
-	 MtvQ1EKUr8q99XGEoY3dYlG+MV6YsUGKujkMBOL0b4Ouu9OTBWFzY7sCrfb9LEe9ju
-	 kQ6LV/PCwjiWg==
-Date: Tue, 28 Oct 2025 15:14:28 +0000
+	b=UXTcg0jjDTNN2sa1ucH7Hs+RVGNbGuuMblYlHZTp6eVzapA1h5JgOOxYio1sy2yDs
+	 bAjxj1WLzziIucc1OxXsWm/tUdEYHiPt1LrfsfpjxTjGgUJg4ITwDOMyZJ5U97vicC
+	 lIfH+09X6qJA7t3FHFyL7TXUN4HiO8AFnNmTQPYMaicjz5hFoHNNZnzHvCIqKaiU9O
+	 ot+X7d4JiL8QVkFNYTGBFbyeQQSPv0jjbLz5Nyu6FLQ2hinM4Xhz8UleJKBIPAhUxs
+	 Icw6KE7fizzbqBTapytd9SWzq2xLMb+tjkiY9aNueN7M81moLnndrGmRNfsA1Qy/6s
+	 OplAK6Bx2n7Dw==
+Date: Tue, 28 Oct 2025 15:17:41 +0000
 From: Simon Horman <horms@kernel.org>
-To: Ranganath V N <vnranganath.20@gmail.com>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-	syzbot+d101e12bccd4095460e7@syzkaller.appspotmail.com
-Subject: Re: [PATCH v3] net: sctp: fix KMSAN uninit-value in sctp_inq_pop
-Message-ID: <aQDd1OCGOiFt_Ntl@horms.kernel.org>
-References: <20251026-kmsan_fix-v3-1-2634a409fa5f@gmail.com>
+To: I Viswanath <viswanathiyyappan@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, sdf@fomichev.me, kuniyu@google.com,
+	ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
+	jacob.e.keller@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com,
+	khalid@kernel.org
+Subject: Re: [RFC PATCH net-next v2 2/2] net: ethernet: Implement
+ ndo_write_rx_config callback for the 8139cp driver
+Message-ID: <aQDelXtB1--OdERb@horms.kernel.org>
+References: <20251026175445.1519537-1-viswanathiyyappan@gmail.com>
+ <20251026175445.1519537-3-viswanathiyyappan@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,38 +64,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251026-kmsan_fix-v3-1-2634a409fa5f@gmail.com>
+In-Reply-To: <20251026175445.1519537-3-viswanathiyyappan@gmail.com>
 
-On Sun, Oct 26, 2025 at 10:03:12PM +0530, Ranganath V N wrote:
-> Fix an issue detected by syzbot:
+On Sun, Oct 26, 2025 at 11:24:45PM +0530, I Viswanath wrote:
+> Implement ndo_write_rx_config for the 8139cp driver
 > 
-> KMSAN reported an uninitialized-value access in sctp_inq_pop
-> BUG: KMSAN: uninit-value in sctp_inq_pop
-> 
-> The issue is actually caused by skb trimming via sk_filter() in sctp_rcv().
-> In the reproducer, skb->len becomes 1 after sk_filter(), which bypassed the
-> original check:
-> 
->         if (skb->len < sizeof(struct sctphdr) + sizeof(struct sctp_chunkhdr) +
->                        skb_transport_offset(skb))
-> To handle this safely, a new check should be performed after sk_filter().
-> 
-> Reported-by: syzbot+d101e12bccd4095460e7@syzkaller.appspotmail.com
-> Tested-by: syzbot+d101e12bccd4095460e7@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=d101e12bccd4095460e7
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Suggested-by: Xin Long <lucien.xin@gmail.com>
-> Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
-> ---
-> KMSAN reported an uninitialized-value access in sctp_inq_pop
-> ---
-> Changes in v3:
-> - fixes the patch format like fixes and closes tags.
-> - Link to v2: https://lore.kernel.org/r/20251024-kmsan_fix-v2-1-dc393cfb9071@gmail.com
+> Signed-off-by: I Viswanath <viswanathiyyappan@gmail.com>
 
-Thanks for the update. This version looks good to me.
-And I assume it is for net.
+...
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> @@ -882,55 +886,53 @@ static netdev_tx_t cp_start_xmit (struct sk_buff *skb,
+>  	goto out_unlock;
+>  }
+>  
+> +static void cp_write_rx_config(struct net_device *dev)
+> +{
+> +	struct cp_private *cp = netdev_priv(dev);
+> +	struct cp_rx_config snapshot;
+> +
+> +	read_snapshot((&snapshot), struct cp_private);
+> +
+> +	/* We can safely update without stopping the chip. */
+> +	cpw32_f(RxConfig, snapshot.rx_mode);
+> +
+> +	cpw32_f(MAR0 + 0, snapshot.mc_filter[0]);
+> +	cpw32_f(MAR0 + 4, snapshot.mc_filter[1]);
+> +}Firstly, think whether you have a bug fix or new "next-like" content.
+> Then once decided, assuming that you use git, use the prefix flag, i.e.
 
+FWIIW, this patch is mangled, e.g. the lines above.
+
+> +
+>  /* Set or clear the multicast filter for this adaptor.
+>     This routine is not state sensitive and need not be SMP locked. */
+
+...
 
