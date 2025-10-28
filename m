@@ -1,249 +1,198 @@
-Return-Path: <netdev+bounces-233461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD533C13B19
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 10:06:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E014CC13BE5
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 10:14:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 22BB84FFA2B
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 09:02:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1B0464E7DCB
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 09:10:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CDF72DD5F6;
-	Tue, 28 Oct 2025 09:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1609B2E7F11;
+	Tue, 28 Oct 2025 09:10:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D4BZ+aoX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FS81pukt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBD4257842
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 09:02:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9383E284898
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 09:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761642148; cv=none; b=XCxt36O+Ye6obj6OMPybp8tzY/31L29o3ZubvsG6F0d7jmlp43UMtCAFiKA1Xc0dl4JM2/c9bahqAKZgAUo2w2zyupoIUNQCtVpaqKaEdrAbyWxftlt/5FIMV4oXfe7R7mAUGnRFaEFxpMUmT/0ZWCL7VsA6wotrGCXcvEDFXFs=
+	t=1761642634; cv=none; b=Uz5I2pRNtsECjADGUX08u6Povr92Q4yB/Seib5oNmA4uxW5yIRSei3kGcFy86kxPvr+6dfzXnVoNMn+dJ7IWMzRLFZw/NkR4ofqw2ez3qLBoFiKINUdizGK1rA988q/+EntNfqLTQrqkioWLVinQDnmqg73G28ROc5CjPP9gZ0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761642148; c=relaxed/simple;
-	bh=K+XIvjGwAhafKHItCiqDzhO8w2fQiwJCC6KEGx4Lk4I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hDxfwKYy5ANxC4F41p2pJ3KdXydSCqt1QjM4kAWEKqj7Op0voNK+R0wo1enTM0BMr0+xJPYwQ2TpTnqHFwrfSmrcQl2nvvlX32C2cbqiRGi9Yx1iA/W1Z67Y4BuEXMv+sdsUVZvJoYo5oxjESq+2ePpDVPTzsRadCIvQ6xd7G0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D4BZ+aoX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761642144;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SM05/jRXXBYsYn0Ee/zuHF8a76j5Ke84+LpUeLrwUuw=;
-	b=D4BZ+aoXDJ5icCWKJgFJJojkMpnuINQjvWm9JImTIairWybsLf0Wcr6X07z0zle7hv93Yk
-	flLVyEilg90/hs1f8ZQaAjhSyfFQcLlL+tpRHqtWdGSh4zrK3etlyjNYXWNjqf6sJlLwtZ
-	PKghjJBRcmHvU0V0PR7ffWsFrNikg8Q=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-593-d8D6EOKGPjCqKqG9Shc1aA-1; Tue, 28 Oct 2025 05:02:22 -0400
-X-MC-Unique: d8D6EOKGPjCqKqG9Shc1aA-1
-X-Mimecast-MFC-AGG-ID: d8D6EOKGPjCqKqG9Shc1aA_1761642141
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-47717c2737bso2245205e9.2
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 02:02:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761642141; x=1762246941;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SM05/jRXXBYsYn0Ee/zuHF8a76j5Ke84+LpUeLrwUuw=;
-        b=uE7KAxL/iX4sX5NS309cqdJq6vTGMyA6JdW6svFHTWd4U9OBQ3HGzJCcX/rKeEi8Kz
-         z4Yo3Ww6Pe8BIpULKdflaq3zDQ9MFlomUGPRTe/ccKYuMi2mMaMVlT9O8FA14gtpIbu5
-         sotXFLOXk091cu/PtspcegMEXe2QNxHKhxMd4DZC0xX/DqlOEmRwhiRrroB4sqGOtOvg
-         0KQ+cJuNC1MqiXIO2fFZOcfWuSp6jG3mg4gcrt+QlHWiyRDHXjBWsyOvgeFeA91z9nGL
-         e++B83elYiPP/a2h7M7s/GN4sVes7N1xDgN8jluOsqnim3MihoMfpWePucT7+OqrMS59
-         TJIg==
-X-Gm-Message-State: AOJu0YypYEW5LSeEpDA+KdUc3J0dIoe2kG+9frhRKlT3K5EQGNFUkVO5
-	nddMRL4seSDbzFHw3Iisf4yqCcZivotNoSJVY/FeZawc1JF0fkGNTuDZWi+JGGSqM/4d07Hibs8
-	s4ZwVcoPNqB2+Vb5UpFBj6q7UQdKB60IqXV0jgk+tfyhnRzKUm1Y59YMSog==
-X-Gm-Gg: ASbGncvrf5HKOcftjeKj552RlbC6EcRdHHNGuExhQpYJl3rlb5ZP00RmwL1RrcUOm2Y
-	Z3isUV4BacWBxgqIYVgAz1CDOp3GCLavEXJtdfZjlL0NQPeebt6+WoFmvGKr05px41efuHIjZX+
-	aCenQrMIZ771Vwi3jHIdMnWycqQeXKz7XJi0w/5k++o59Q1LPFww1MOLn+IZ7aZ5+9EJn50mGML
-	+zXMkthUS+0L1LSWFaf8fmZ5fx/CGM7XgZTPzOa693LD1dNQ+l9OYa0L6e9zoOZ2f9i0ajHTUVX
-	9AuB0Znd7GOuUdpkaoFxH+xM4vctuNEmL/uizB1Q8kJtYirzCWwnzOHW222SHzivxXbqkI2Rk8a
-	jUA2K/tDPXq52eK7RIAuaS25tvW8JILBUprIp898t3P8QEgA=
-X-Received: by 2002:a05:600c:45c7:b0:476:57b4:72b6 with SMTP id 5b1f17b1804b1-47717df8103mr25596785e9.8.1761642140904;
-        Tue, 28 Oct 2025 02:02:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHagBoGdK6HupPPgFH0PFJ3o2Bp7w6V7AVH9KHPBJxphqC148YxWSmBSskq2/Z3uCr0SXEhlw==
-X-Received: by 2002:a05:600c:45c7:b0:476:57b4:72b6 with SMTP id 5b1f17b1804b1-47717df8103mr25594805e9.8.1761642138824;
-        Tue, 28 Oct 2025 02:02:18 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952de5f9sm19115071f8f.38.2025.10.28.02.02.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Oct 2025 02:02:18 -0700 (PDT)
-Message-ID: <d4c31a2f-590a-4b83-b6b3-25f33a51193a@redhat.com>
-Date: Tue, 28 Oct 2025 10:02:16 +0100
+	s=arc-20240116; t=1761642634; c=relaxed/simple;
+	bh=lbcYMNWtSmGXCpuFko3OMESYsLMpkByTHzCvLQRpQIM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BQ20DZ0jaKm45uKLfEuHXXQQAtO/RR7ceVAvKWmtkgoiECGt1KyX+6bhK8VpKi74EMuV7JgGPZ/f1YDB7V1sVm1WPf1nTPa40oc/MBhmz7YZPDhfWCc1+i5K6a7Pl30otM7V2VIPoMErtA8gKfeazLiI2ljACI+UU/SM/KbdCxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FS81pukt; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761642633; x=1793178633;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lbcYMNWtSmGXCpuFko3OMESYsLMpkByTHzCvLQRpQIM=;
+  b=FS81puktEboQKHmfN/7clpVNh1gFIKjmXVN9fIiGpYtBNXOXZI0/WG4r
+   pvHkzrMVQdeceH2b8vOGSf3ZbHMtTdYE9oLaAf3mSEfI/X+kofcmeInSh
+   9guv2ePasImbYi9fLG6v2AK1eMZQ4cS2Ou//r/S7KJBsQoZ/81G1O8YJm
+   V6kIcAvCWS2TpfsEeVPTkDRHtUmwL+WfagZcT/4TLJxecEzrPe5iIsEVN
+   dRGI2iwjWuKC75H2MW5NkAQ4l2pvrGISMGraJ5SpuCTUTcc5E7tYjCOkh
+   Gi+xZ/ZlABpgkGR2nD/MlQaGnNkQwDljoR+HtPZGB3JnyfeqJWgxVbnwZ
+   A==;
+X-CSE-ConnectionGUID: eI7sEwYbRiiNuKzZb1CbMg==
+X-CSE-MsgGUID: a3/K9ov+SHSVKWs0ZWveaQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="67574316"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="67574316"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 02:10:32 -0700
+X-CSE-ConnectionGUID: VZj/1pnaQaCTQUFRJRnfTg==
+X-CSE-MsgGUID: 2VYCyRV4TLCpymx491eKJQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,261,1754982000"; 
+   d="scan'208";a="184525905"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 02:10:30 -0700
+Date: Tue, 28 Oct 2025 10:08:24 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>,
+	"Lobakin, Aleksander" <aleksander.lobakin@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"Keller, Jacob E" <jacob.e.keller@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ice: use
+ netif_get_num_default_rss_queues()
+Message-ID: <aQCICC7S4JCaImJa@mev-dev.igk.intel.com>
+References: <20251028070634.2124215-1-michal.swiatkowski@linux.intel.com>
+ <IA3PR11MB898627B7BCB9ACEEE31A377BE5FDA@IA3PR11MB8986.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 3/5] psp: add stats from psp spec to driver
- facing api
-To: Daniel Zahka <daniel.zahka@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
- Boris Pismenny <borisp@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20251028000018.3869664-1-daniel.zahka@gmail.com>
- <20251028000018.3869664-4-daniel.zahka@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251028000018.3869664-4-daniel.zahka@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <IA3PR11MB898627B7BCB9ACEEE31A377BE5FDA@IA3PR11MB8986.namprd11.prod.outlook.com>
 
-On 10/28/25 1:00 AM, Daniel Zahka wrote:
-> From: Jakub Kicinski <kuba@kernel.org>
+On Tue, Oct 28, 2025 at 07:48:11AM +0000, Loktionov, Aleksandr wrote:
 > 
-> Provide a driver api for reporting device statistics required by the
-> "Implementation Requirements" section of the PSP Architecture
-> Specification. Use a warning to ensure drivers report stats required
-> by the spec.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
-> ---
->  Documentation/netlink/specs/psp.yaml | 55 ++++++++++++++++++++++++++++
->  include/net/psp/types.h              | 26 +++++++++++++
->  include/uapi/linux/psp.h             |  8 ++++
->  net/psp/psp_main.c                   |  3 +-
->  net/psp/psp_nl.c                     | 22 ++++++++++-
->  5 files changed, 112 insertions(+), 2 deletions(-)
+> > -----Original Message-----
+> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > Of Michal Swiatkowski
+> > Sent: Tuesday, October 28, 2025 8:07 AM
+> > To: intel-wired-lan@lists.osuosl.org
+> > Cc: netdev@vger.kernel.org; pmenzel@molgen.mpg.de; Lobakin, Aleksander
+> > <aleksander.lobakin@intel.com>; Kitszel, Przemyslaw
+> > <przemyslaw.kitszel@intel.com>; Keller, Jacob E
+> > <jacob.e.keller@intel.com>; Michal Swiatkowski
+> > <michal.swiatkowski@linux.intel.com>
+> > Subject: [Intel-wired-lan] [PATCH iwl-next v2] ice: use
+> > netif_get_num_default_rss_queues()
+> > 
+> > On some high-core systems (like AMD EPYC Bergamo, Intel Clearwater
+> > Forest) loading ice driver with default values can lead to queue/irq
+> > exhaustion. It will result in no additional resources for SR-IOV.
+> > 
+> > In most cases there is no performance reason for more than half
+> > num_cpus(). Limit the default value to it using generic
+> > netif_get_num_default_rss_queues().
+> > 
+> > Still, using ethtool the number of queues can be changed up to
+> > num_online_cpus(). It can be done by calling:
+> > $ethtool -L ethX combined max_cpu
+> > 
+> It could be nice to use $(nproc)?
+>  $ ethtool -L ethX combined $(nproc)
+
+Will change
+
 > 
-> diff --git a/Documentation/netlink/specs/psp.yaml b/Documentation/netlink/specs/psp.yaml
-> index 914148221384..f3a57782d2cf 100644
-> --- a/Documentation/netlink/specs/psp.yaml
-> +++ b/Documentation/netlink/specs/psp.yaml
-> @@ -98,6 +98,61 @@ attribute-sets:
->            Number of times a socket's Rx got shut down due to using
->            a key which went stale (fully rotated out).
->            Kernel statistic.
-> +      -
-> +        name: rx-packets
-> +        type: uint
-> +        doc: |
-> +          Number of successfully processed and authenticated PSP packets.
-> +          Device statistic (from the PSP spec).
-> +      -
-> +        name: rx-bytes
-> +        type: uint
-> +        doc: |
-> +          Number of successfully authenticated PSP bytes received, counting from
-> +          the first byte after the IV through the last byte of payload.
-> +          The fixed initial portion of the PSP header (16 bytes)
-> +          and the PSP trailer/ICV (16 bytes) are not included in this count.
-> +          Device statistic (from the PSP spec).
-> +      -
-> +        name: rx-auth-fail
-> +        type: uint
-> +        doc: |
-> +          Number of received PSP packets with unsuccessful authentication.
-> +          Device statistic (from the PSP spec).
-> +      -
-> +        name: rx-error
-> +        type: uint
-> +        doc: |
-> +          Number of received PSP packets with length/framing errors.
-> +          Device statistic (from the PSP spec).
-> +      -
-> +        name: rx-bad
-> +        type: uint
-> +        doc: |
-> +          Number of received PSP packets with miscellaneous errors
-> +          (invalid master key indicated by SPI, unsupported version, etc.)
-> +          Device statistic (from the PSP spec).
-> +      -
-> +        name: tx-packets
-> +        type: uint
-> +        doc: |
-> +          Number of successfully processed PSP packets for transmission.
-> +          Device statistic (from the PSP spec).
-> +      -
-> +        name: tx-bytes
-> +        type: uint
-> +        doc: |
-> +          Number of successfully processed PSP bytes for transmit, counting from
-> +          the first byte after the IV through the last byte of payload.
-> +          The fixed initial portion of the PSP header (16 bytes)
-> +          and the PSP trailer/ICV (16 bytes) are not included in this count.
-> +          Device statistic (from the PSP spec).
-> +      -
-> +        name: tx-error
-> +        type: uint
-> +        doc: |
-> +          Number of PSP packets for transmission with errors.
-> +          Device statistic (from the PSP spec).
->  
->  operations:
->    list:
-> diff --git a/include/net/psp/types.h b/include/net/psp/types.h
-> index 5b0ccaac3882..1aa3857a85c1 100644
-> --- a/include/net/psp/types.h
-> +++ b/include/net/psp/types.h
-> @@ -150,6 +150,25 @@ struct psp_assoc {
->  	u8 drv_data[] __aligned(8);
->  };
->  
-> +struct psp_dev_stats {
-> +	union {
-> +		struct {
-> +			u64 rx_packets;
-> +			u64 rx_bytes;
-> +			u64 rx_auth_fail;
-> +			u64 rx_error;
-> +			u64 rx_bad;
-> +			u64 tx_packets;
-> +			u64 tx_bytes;
-> +			u64 tx_error;
-> +		};
-> +		DECLARE_FLEX_ARRAY(u64, required);
-> +	};
-> +	char required_end[0];
+> > This change affects only the default queue amount.
+> > 
+> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> > ---
+> > v1 --> v2:
+> >  * Follow Olek's comment and switch from custom limiting to the
+> > generic
+> >    netif_...() function.
+> >  * Add more info in commit message (Paul)
+> >  * Dropping RB tags, as it is different patch now
+> > ---
+> >  drivers/net/ethernet/intel/ice/ice_irq.c |  5 +++--
+> >  drivers/net/ethernet/intel/ice/ice_lib.c | 12 ++++++++----
+> >  2 files changed, 11 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c
+> > b/drivers/net/ethernet/intel/ice/ice_irq.c
+> > index 30801fd375f0..1d9b2d646474 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_irq.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_irq.c
+> > @@ -106,9 +106,10 @@ static struct ice_irq_entry
+> > *ice_get_irq_res(struct ice_pf *pf,
+> >  #define ICE_RDMA_AEQ_MSIX 1
+> >  static int ice_get_default_msix_amount(struct ice_pf *pf)
+> >  {
+> > -	return ICE_MIN_LAN_OICR_MSIX + num_online_cpus() +
+> > +	return ICE_MIN_LAN_OICR_MSIX +
+> > netif_get_num_default_rss_queues() +
+> >  	       (test_bit(ICE_FLAG_FD_ENA, pf->flags) ? ICE_FDIR_MSIX :
+> > 0) +
+> > -	       (ice_is_rdma_ena(pf) ? num_online_cpus() +
+> > ICE_RDMA_AEQ_MSIX : 0);
+> > +	       (ice_is_rdma_ena(pf) ?
+> > netif_get_num_default_rss_queues() +
+> > +				      ICE_RDMA_AEQ_MSIX : 0);
+> >  }
+> > 
+> >  /**
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c
+> > b/drivers/net/ethernet/intel/ice/ice_lib.c
+> > index bac481e8140d..e366d089bef9 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_lib.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+> > @@ -159,12 +159,14 @@ static void ice_vsi_set_num_desc(struct ice_vsi
+> > *vsi)
+> > 
+> >  static u16 ice_get_rxq_count(struct ice_pf *pf)
+> >  {
+> > -	return min(ice_get_avail_rxq_count(pf), num_online_cpus());
+> > +	return min(ice_get_avail_rxq_count(pf),
+> > +		   netif_get_num_default_rss_queues());
+> >  }
+> min(a, b) resolves to the type of the expression, which here will be int due to netif_get_num_default_rss_queues() returning int. 
+> That implicitly truncates to u16 on return.
+> What do you think about to make this explicit with min_t() to avoid type surprises?
 
-This makes static checker unhappy:
+We will just hide the truncing in the min_t() call. Probably if we
+assuming that cpu / 2 can be higher than U16_MAX we should check that
+here. Is it needed? (Previous situation is the same, num_online_cpus() is
+returning int).
 
-/home/cocci/testing/include/net/psp/types.h:167:6-18: WARNING use
-flexible-array member instead
-(https://www.kernel.org/doc/html/latest/process/deprecated.html#zero-length-and-one-element-arrays)
+> 
+> > 
+> >  static u16 ice_get_txq_count(struct ice_pf *pf)
+> >  {
+> > -	return min(ice_get_avail_txq_count(pf), num_online_cpus());
+> > +	return min(ice_get_avail_txq_count(pf),
+> > +		   netif_get_num_default_rss_queues());
+> >  }
+> 
+> Same min_t() ?
+> 
+> Otherwise, fine for me.
 
-I think/guess the warning could be avoided using something alike the
-following (completely untested!!!):
+Thanks
 
-struct psp_dev_stats {
-	struct_group(required,
-		union {
-			struct {
-				u64 rx_packets;
-				u64 rx_bytes;
-				u64 rx_auth_fail;
-				u64 rx_error;
-				u64 rx_bad;
-				u64 tx_packets;
-				u64 tx_bytes;
-				u64 tx_error;
-			};
-			DECLARE_FLEX_ARRAY(u64, required);
-		};
-	);
-};
-
-// ...
-const unsigned int required_cnt = sizeof(stats.required) / sizeof(u64);
-
+> 
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
