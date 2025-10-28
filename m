@@ -1,83 +1,57 @@
-Return-Path: <netdev+bounces-233484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93457C1433F
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:54:26 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C694C14336
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:53:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4A8D85402F7
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 10:51:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 797EE4F366B
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 10:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51452302150;
-	Tue, 28 Oct 2025 10:41:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5EF83126B5;
+	Tue, 28 Oct 2025 10:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FmlJ9xZ3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c343zk4h"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DA72D73A5
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 10:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC53F308F11;
+	Tue, 28 Oct 2025 10:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761648062; cv=none; b=Ozj2F1taqHAeE4rRvKIMhzof4cGDgiTl2+g88gLaP3a7j+pdr+Mv3MWC32d3EMMIlIOMj3dA8FqDxR0t28xDihHJrLHXZ8dwWeqPtAPAyC6xVrTJVLE8ERxxfNEKKAZScYGfLcr1xF13fJVMXmqfxUVSHt4FHV8OVSOEtLZZSds=
+	t=1761648365; cv=none; b=uvtEAra1n42HYT/fswVuc7t8nwfgyKp+w+Onii7oO+cHsm8wuM5tpBjfKc1GSQHCfPWFS0zpkZ1/aqxwMV+Hra/pqZITFe5V1aKtj47TUWcSUGMyi/dtXlTdIdNiiVqlZjJrSdz89+ZZ2hR7097pd+M3aEgUQNooRAVHIt8Wchg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761648062; c=relaxed/simple;
-	bh=DeTwFzhPx+qK1HHpl+YgMGztxI9YizNfhUcr9TRNn0k=;
+	s=arc-20240116; t=1761648365; c=relaxed/simple;
+	bh=OR+uAfcQw2O6nFilneRt7rzxEcwejJ3fRf5OkOr0ieo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u+FwTGLlN6FHTdjkyBfj+jRI8uVLirTeOkHs+3GSOx/GAHaYDiAYRNdyCt3x0r4zFrG4vDJr9uIb3i1nvv899Vyo87aFek3aPCXoQg7FYiHHA5h/rbtyFFGktbAEsTyRWDpvwAaDvKaqKS/Pb93dlZA0mr35bNX/seggxwuJsNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FmlJ9xZ3; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=c0wxYpGazz/mbNZkEG1ty2jCdBuuX7dP/ZCMsktvXgQ=; b=FmlJ9xZ3AY35fJOn9eqW4EynqN
-	4md0M+JNO60HV64L82O8Q+kAXwSzTSZN8aPxxeiMYBVZ5WP19k8UPJijuTrqIHxsC0ulDf0Y8VZBf
-	89DqVHJNgHjrNestsskRMz2dSzcy5w+Qk60EoQJpRKekZw5LrmWRhUY05mp0C6EJZavc1tAyv1C0G
-	YNQNMpI+PJxz0WCx4Msg8YSUo0vG59zHvmIsWEMh0+sCJJrbs4QmpT6PkbNSUQoC0HviSuoGnRme3
-	ShHPYC/bh9+TgDXHb+WrxgoXMqgc48fmiCQmFGfzRS3wmGhJcbhuhil3H9l4pPIsVzj2qh5PT4wqf
-	7FMhcGww==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57222)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vDh8A-0000000034l-3TOU;
-	Tue, 28 Oct 2025 10:40:46 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vDh88-000000006V0-1YLu;
-	Tue, 28 Oct 2025 10:40:44 +0000
-Date: Tue, 28 Oct 2025 10:40:44 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexis Lothor__ <alexis.lothore@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Boon Khai Ng <boon.khai.ng@altera.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Furong Xu <0x1207@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH net-next 3/3] net: stmmac: add support specifying PCS
- supported interfaces
-Message-ID: <aQCdrNQHF07BVPti@shell.armlinux.org.uk>
-References: <aP03aQLADMg-J_4W@shell.armlinux.org.uk>
- <E1vClC5-0000000Bcbb-1WUk@rmk-PC.armlinux.org.uk>
- <604b68ce-595f-4d50-92ad-3d1d5a1b4989@bootlin.com>
- <aQCcVOYV15SeHAMU@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kjqNnBBSmyViu4pJK24Xf2owPsode0NnM6MnN6JpvzmUM1tvXQBgkciWINIfasTE0A9kFdtyowqqC/1cA1CDF83P0lJ++QDGZGamHP2Os5aXqvdZZKxEJPhQmE0AYB3X2U0cv7UWzrZ8kyDPMBWTWO9VZO7WPe/pktxSqAiwcHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c343zk4h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6753AC4CEF7;
+	Tue, 28 Oct 2025 10:46:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761648363;
+	bh=OR+uAfcQw2O6nFilneRt7rzxEcwejJ3fRf5OkOr0ieo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=c343zk4hY5mLI5zerO+zyY1QXAk/0q0p6I6PslbbeSJpGbJjw6YztTZvSr0e6buJF
+	 lHru3CLDS7Aq3CVCWGiMonqy3+EBkCcaU5BT9pyiV2DZtPhRdwIxich/veZ2PtmkGd
+	 E/pmpc4qVBUjJBfkT+SnhbWkJmmuXeEengv74MES4zuFs0qO+vuE/ZuwRfC2pLYQpS
+	 aHT+hrSdmK2Q0SOjPHWC9mR1Pkp0/vK+YxMZa8lOhsqTJ0HoIZ9PN1PEKGzdOmVGkF
+	 wlzNayTjmoQr3F1Lzi9ObJ0f0/RHhduYHlmbjeJPkcpe9uYy/vPQ8rRTWZ8BxGnrxE
+	 smPPTmedVXG4w==
+Date: Tue, 28 Oct 2025 10:45:59 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tanmay Jagdale <tanmay@marvell.com>
+Cc: davem@davemloft.net, leon@kernel.org, herbert@gondor.apana.org.au,
+	bbhushan2@marvell.com, sgoutham@marvell.com,
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v5 08/15] octeontx2-pf: ipsec: Setup NIX HW
+ resources for inbound flows
+Message-ID: <aQCe50-IRGsxbqUv@horms.kernel.org>
+References: <20251026150916.352061-1-tanmay@marvell.com>
+ <20251026150916.352061-9-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,36 +60,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aQCcVOYV15SeHAMU@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20251026150916.352061-9-tanmay@marvell.com>
 
-On Tue, Oct 28, 2025 at 10:35:00AM +0000, Russell King (Oracle) wrote:
-> Thanks for giving Jakub a reason to mark this "changes required." :D
-> I'm not really expecting this to be merged as-is. So why didn't I
-> post it as RFC? Too many people see "RFC" as a sign to ignore the
-> patch series. Some people claim that "RFC" means it isn't ready and
-> thus isn't worth reviewing/testing/etc. I say to those people... I
-> can learn their game and work around their behaviour.
-> 
-> Yes, it will need a better commit log, but what I'm much much more
-> interested in is having people who are using the integrated PCS (in
-> SGMII mode as that's all we support) to test this, especially
-> dwmac-qcom-ethqos folk.
-> 
-> The 2.5G support was submitted by Sneh Shah, and my attempts to make
-> contact have resulted in no response.
+On Sun, Oct 26, 2025 at 08:39:03PM +0530, Tanmay Jagdale wrote:
 
-I should add - I'm expecting dwmac-qcom-ethqos to reveal that we need
-to include 2500BASE-X for the PCS, and possibly 1000BASE-X as well
-(which in dwmac terms uses the TBI interface to a platform integrator
-provided serdes block.)
+...
 
-The most important thing is for people with the hardware that would be
-affected by these patches to test. However, I'm expecting no testing
-feedback from such people based on experience - it seems stmmac is rife
-for "throw code over the wall into mainline and run away" behaviour. :(
+> +static int cn10k_ipsec_setup_nix_rx_hw_resources(struct otx2_nic *pfvf)
+> +{
+> +	int rbsize, err, pool;
+> +
+> +	mutex_lock(&pfvf->mbox.lock);
+> +
+> +	/* Initialize Pool for first pass */
+> +	err = cn10k_ipsec_aura_and_pool_init(pfvf, pfvf->ipsec.inb_ipsec_pool);
+> +	if (err)
+
+Hi Tanmay,
+
+Not a full review by any means, but this appears to leak mbox.lock.
+
+> +		return err;
+> +
+> +	/* Initialize first pass RQ and map buffers from pool_id */
+> +	err = cn10k_ipsec_ingress_rq_init(pfvf, pfvf->ipsec.inb_ipsec_rq,
+> +					  pfvf->ipsec.inb_ipsec_pool);
+> +	if (err)
+> +		goto free_auras;
+> +
+> +	/* Initialize SPB pool for second pass */
+> +	rbsize = pfvf->rbsize;
+> +	pfvf->rbsize = 512;
+> +
+> +	for (pool = pfvf->ipsec.inb_ipsec_spb_pool;
+> +	     pool < pfvf->hw.rx_queues + pfvf->ipsec.inb_ipsec_spb_pool; pool++) {
+> +		err = cn10k_ipsec_aura_and_pool_init(pfvf, pool);
+> +		if (err)
+> +			goto free_auras;
+> +	}
+> +	pfvf->rbsize = rbsize;
+> +
+> +	mutex_unlock(&pfvf->mbox.lock);
+> +	return 0;
+> +
+> +free_auras:
+> +	cn10k_ipsec_free_aura_ptrs(pfvf);
+> +	mutex_unlock(&pfvf->mbox.lock);
+> +	otx2_mbox_reset(&pfvf->mbox.mbox, 0);
+> +	return err;
+> +}
+
+...
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+pw-bot: cr
 
