@@ -1,252 +1,243 @@
-Return-Path: <netdev+bounces-233420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AD5DC12D36
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 04:59:42 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4D7FC12DD8
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 05:33:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D926B1AA3B0A
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 03:59:27 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9B73E4E1D7F
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 04:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD2C7286D5C;
-	Tue, 28 Oct 2025 03:58:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="UjZE/4XK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1731C3F0C;
+	Tue, 28 Oct 2025 04:33:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f225.google.com (mail-pl1-f225.google.com [209.85.214.225])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FF51286D57
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 03:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919C1D271
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 04:33:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761623939; cv=none; b=PoR9hwi4aOPGfx9rWyKIq161obfIrRnQ1cR+YrKHPPYagB1CzEMV4Bmde4A6iLAh205S5E6uGlRqQDmGPmKWkpSzzXlXKawwSW3XazVEaRZCptmeCZUA7GdFKeQskkbbNDCt485F4fj0xyjDvzMF1oWkEKBeMP8+9zmDhvXNgsE=
+	t=1761626036; cv=none; b=KVZTRxtDJZcqbl1+RDY4HRiU19eUdKdSmITb8vYYSaCMC+rwi63n65+IdRQjxSjpvP8hLuszsuznEt3qlzjOU+NaKMpD9s7cTQjvhQ7yVIsCnmzQhCv3vv8MWVus0REStt+N9MruKpNJen0cj3Qv9m+YiZNzh7IItBM2A4L8Iy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761623939; c=relaxed/simple;
-	bh=H5n56FQg14FBlMXgt5HT6Ad2nBNJkrzf3IQGMBJmPy4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vg2NFWX2gRk2FErwYSsuPNprv5Ky3f/rbGNZISbVtgpndyY6+xjWSuoz8/W2tE6Et1idHTxe+uLX+5Ob4YeE2DDnnkDjB6kGnChDd64BTCCSu296w9h31yK+MMgtmiBcSiBb6rUkFbu3r6LZiGG5g78jfGuytQIM9lY1kyDYVIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=UjZE/4XK; arc=none smtp.client-ip=209.85.214.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f225.google.com with SMTP id d9443c01a7336-27eec33b737so78555965ad.1
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 20:58:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761623938; x=1762228738;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8YL8VlwOYi4ltveZDX1L7vesYp6hHeVZQpmco2i/3kw=;
-        b=WKjF91iiCstLKk8cESsci9tfji+2CUyeEK/t2AS3NxA/xyKHvyh8T0kRV4XHdp7XcM
-         1BYQZ+qgcSrOzx798mWYALC/siHwPCBmQy/+HVCil+OW2fNrAJO4oHOC9ur9uoM8oaDq
-         6MGkYHZ1OGIygetOWObS2jfjgbKXikBq1icDbeCC/w7Rm+ek/I8Sl6oI56rTxsPm2eLJ
-         h+2gYOy8uzYr8c1hL8AqNZDcIMteG40wtrzJF1tC8Ood4VPGh4JMkbIOZsERfVxP10at
-         WBBrlfiGkEqJX9IIiCXZ/YybYDUYWflWMzFbhTiqqz6Gm4hPyS/XJe1LqC5QYHh64ySX
-         n0Ug==
-X-Forwarded-Encrypted: i=1; AJvYcCWM4cmAJD4XI1S43Vh/lJUvi/NjUrTLKU3RSid836UEsDjqzpyPXYU/wo828WzEnmAFYFc6Ypw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBaOWgO3kO5BN0dtKR01fBqKdrckJlQleGla9VwOX7ovLFD5JJ
-	F/Riubc/f7BxGFjD/HfbqoaRIKLCR3ygC1gjbiCP2pCQ4abf7wshem/8Zj8/jtzZzxv57YINepg
-	qFf8ycL9ZLxSV9xNdPBXwMFW6Vl8FJvG+GqGz2AcwZ/P3yCXvEQZ9OqHnAiv2O0U3ZDHoK5PZQL
-	rSRhHeLoTnH1fh9KVl7h9ZGKIAjFGQQNjZ7+vRcJu+KE0zw53KZhIELPgaC1zavj8+Slqv57mvF
-	4JR9ZmffZE=
-X-Gm-Gg: ASbGncsgm/1SkT3XZAG8BbxZIcUhWLGMIw7dQDcPHVIy/siYfQqdR0iQ6MNTBH4Zt8D
-	ijHVdX4+eOiiwWmanlYzW5u89huqfMgUky5klM0LtnsZe5JLm8nocU1tIbGhXhJLOTgGlMMfbOj
-	LBZ4Ot7XFZ4rGkFRqrlSIfrG20RytTdGNB4C3AvuyTCsA2UxhBXID/T1MX7Tb8Q58JmCS78/WM1
-	jV9uhzIqWnigdGW9ph3jQ+Kn/OhXI64xW7Dk+O17R/rpZAqFCOWzyEVgMxORGaEnWOTtifpaxnK
-	HhWorMqSjE9DwvwnIGaLo9X9/vVxCvdL/BYVORMb/3dzrfQiz9NBD59e0kTXOWTU/4YO/7vzwRt
-	+YcBso97MX0WS/oWC0SfhILYq3e54y0nXNE4BCGv33lxMo7o3GGaCAFn1CKNT79pjHmnmxTKYE8
-	Fh6zoVdS1ScsXmOH8zD+7xRIR0m4a054kkTQ==
-X-Google-Smtp-Source: AGHT+IHTX0y72S+yX7HLYoq3N8fWWAXYQnFziYc9gQrCajmVKuoZsvZmg+pX3IfPOpwu9zqKRtzPtZKL3Y2r
-X-Received: by 2002:a17:903:2f86:b0:25c:d4b6:f117 with SMTP id d9443c01a7336-294cb507c6emr27462975ad.35.1761623937517;
-        Mon, 27 Oct 2025 20:58:57 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-72.dlp.protect.broadcom.com. [144.49.247.72])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-29498cf41cfsm8897985ad.7.2025.10.27.20.58.57
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 27 Oct 2025 20:58:57 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2698b5fbe5bso74162285ad.0
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 20:58:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1761623936; x=1762228736; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8YL8VlwOYi4ltveZDX1L7vesYp6hHeVZQpmco2i/3kw=;
-        b=UjZE/4XKYI7Ue4P4Wh49mBLECP2dUYUOxsMbfBihMEqo9jK/0bDylm5oJNOTsvTfSe
-         j7LFo1LrIZAHP8P5bMqUl4y0+BR9nGjCVr2dccf/Ce+8eqlUfcW/StAiO1b2eG7dzeZs
-         jz8T6ydH5q2byHD+4JTHb0egzooQ9++D7HHuo=
-X-Forwarded-Encrypted: i=1; AJvYcCXUhLu7acRghyjrDGllfNYNzFFrvgQukgF5T/Gg4Yvju+5cEWv5ym/b+uQOnGzRLOM/fiKq3ic=@vger.kernel.org
-X-Received: by 2002:a17:903:2a8c:b0:24c:cb60:f6f0 with SMTP id d9443c01a7336-294cb65b9bemr24860955ad.58.1761623935697;
-        Mon, 27 Oct 2025 20:58:55 -0700 (PDT)
-X-Received: by 2002:a17:903:2a8c:b0:24c:cb60:f6f0 with SMTP id
- d9443c01a7336-294cb65b9bemr24860555ad.58.1761623935350; Mon, 27 Oct 2025
- 20:58:55 -0700 (PDT)
+	s=arc-20240116; t=1761626036; c=relaxed/simple;
+	bh=as07/dPrxmzqQLahs6G2sHAVLOTrehCI2ymXP4ySSJ8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RDwZN8rgTf65k2j3ke8pabzOOLgcKgKh/XE5Tnknj6/OsaHB19D5P64q9+/kte58bS0FdPVCaCaQgpVM1U9Av96dB6bLLJKmZqfeX/oktQE2jviV9jwyROFz+ArshrpXu9RGQefSOU5bY+KeDdDIdDRHrR0PXqPt0Cj3986gQZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=none smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=15.184.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bamaicloud.com
+X-QQ-mid: esmtpgz10t1761625969t06a1d11a
+X-QQ-Originating-IP: HksmOUYL87llrRbdwQT6oORL0WJet6ObUW/QEiyYosw=
+Received: from localhost.localdomain ( [111.204.182.99])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 28 Oct 2025 12:32:47 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 7279934464400958128
+EX-QQ-RecipientCnt: 10
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+To: netdev@vger.kernel.org
+Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
+	Eran Ben Elisha <eranbe@mellanox.com>,
+	Jiri Pirko <jiri@mellanox.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Simon Horman <horms@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@idosch.org>
+Subject: [PATCH net-next] net: add net cookie for net device trace events
+Date: Tue, 28 Oct 2025 12:32:44 +0800
+Message-Id: <20251028043244.82288-1-tonghao@bamaicloud.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251027201351.GA8995@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-In-Reply-To: <20251027201351.GA8995@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Tue, 28 Oct 2025 09:28:43 +0530
-X-Gm-Features: AWmQ_bl75f7dqjFbUVPcV9v4im1W7jAziU_Y-4tInbqHdouUMsSEqWvfCXgRlgk
-Message-ID: <CALs4sv2_rXfTonX2E6Ny_SWb6p-R4_WkDpr+gaFK4yWOVO4s_A@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: mana: Implement ndo_tx_timeout and
- serialize queue resets per port.
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org, 
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com, 
-	kotaranov@microsoft.com, horms@kernel.org, shradhagupta@linux.microsoft.com, 
-	ssengar@linux.microsoft.com, ernis@linux.microsoft.com, 
-	shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, dipayanroy@microsoft.com
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000f06eaa0642300837"
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: MZQHlr9Il6uOBNH5VHVmavYxV6UXrF4R6wGwNK6pmQlekwIN83VijbZu
+	C9qW+4RIRbQtT02M8ToafYho1XtHP7eOmJKrmR0ng17Bek6wk5RH3d0TKHFzrbm0ywZdFej
+	T4k7ts92v4JqTr/VuMhvk1NfiJDW+7OWVhj31fIsiRcafkyXQik6Lym4At1IHRcC1tZ5M3N
+	LtK1RZw5QjF7tpez/cbhGJv/yt9/LmjrN+slQzVh2gjyYCDgoFPJK6h9XZXUM20LWEzUn9f
+	8knTx1qU8b8B+RBnN1XRp4KaA2bszvW6iYPtYBBBF1gRU4U1ohrUepQcnJzMAOWli3XQKHs
+	/ID2pt8PyiytGlDdQEzot9Gm/Ld+q6M+Umt0R/L3i7UAy08L+ZDjznGmldD07Ki5qW1+uqq
+	KwuVJjf1cQHGHneJBDGjHuZ61e5TnpVWYzGxu/lhxlu2rpMDrC0WAz3rv7Ob5PgNXpk2GOF
+	OlUE5/FxdrfwK4ZRuPehdBZE5SNnrS9+8/bqLSVyWIB+NWPhrrJwvzJkUfdLlr7ZzLu/vZs
+	1K3tDFpQFeFMC3k+OltiLIsgh/lHjLLFmMsiy2szERqxL+vcerIpmXskq3YU3Ea33joe5mE
+	C9MWDneX3CIdrhLa8j/xXIBNRkl3nkRATkbNpXS9uir1GiuQVYEJ3akkFNmFgFwhKA+IDo/
+	lVA3tIn58ZckZfFJUDE3jJue7oXp7YsskjPwf0+UGb8D6ceAtT/8SYjwbyI/59FlKSH6Y2n
+	5bT2NQTyPTgWlz5aNxvoEBiUgfhggWpUfh/6GrOWaAtg4SrYnoeBG54B+JNrAO9MzbuOyja
+	wXFJk0vALXtEtjYVHO5T2IHartdzVbcAw5YTQpYKX6GqkG7iuDSmnnyPtdnhDX/NvrobF1w
+	2+JIrQmNSY0pKQgug3xHGXh5+Q+A3OZTKstK8LoJbUss1JnZYSdVHVFwG35yjxZhAyNTEuA
+	6FAT8ffLP0NnOH8U/qrpkHHneadXNmKfQ2oumqpb1OwuqQ2kTL5hCn9NUDZ0yT2GUMpYeh2
+	EcT6BKjGh+FkqkYR1Tusv5qM3swS+gcIlos0S2qS4klTXH7VoeGp7Tq94YpnVXigOmDUI+6
+	xPK5rhf5zLN
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+X-QQ-RECHKSPAM: 0
 
---000000000000f06eaa0642300837
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In a multi-network card or container environment, this is needed in order
+to differentiate between trace events relating to net devices that exist
+in different network namespaces and share the same name.
 
-On Tue, Oct 28, 2025 at 1:45=E2=80=AFAM Dipayaan Roy
-<dipayanroy@linux.microsoft.com> wrote:
->
-> Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detecte=
-d
-> and a device-controlled port reset for all queues can be scheduled to a
-> ordered workqueue. The reset for all queues on stall detection is
-> recomended by hardware team.
->
-> The change introduces a single ordered workqueue
-> ("mana_per_port_queue_reset_wq") with WQ_UNBOUND | WQ_MEM_RECLAIM and
-> queues exactly one work_struct per port onto it. This achieves:
->
->   * Global FIFO across all port reset requests (alloc_ordered_workqueue).
->   * Natural per-port de-duplication: the same work_struct cannot be
->     queued twice while pending/running.
->   * Avoids hogging a per-CPU kworker for long, may-sleep reset paths
->     (WQ_UNBOUND).
->   * Guarantees forward progress during memory pressure
->     (WQ_MEM_RECLAIM rescuer).
->
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-> ---
-> Changes in v2:
->   - Fixed cosmetic changes.
-> ---
+for xmit_timeout trace events:
+[002] ..s1.  1838.311662: net_dev_xmit_timeout: dev=eth0 driver=virtio_net queue=10 net_cookie=3
+[007] ..s1.  1839.335650: net_dev_xmit_timeout: dev=eth0 driver=virtio_net queue=10 net_cookie=4100
+[007] ..s1.  1844.455659: net_dev_xmit_timeout: dev=eth0 driver=virtio_net queue=10 net_cookie=3
+[002] ..s1.  1850.087647: net_dev_xmit_timeout: dev=eth0 driver=virtio_net queue=10 net_cookie=3
 
-You must wait at least 24 hours before posting a new revision.
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: Eran Ben Elisha <eranbe@mellanox.com>
+Cc: Jiri Pirko <jiri@mellanox.com>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Suggested-by: Ido Schimmel <idosch@idosch.org>
+Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+---
+original patch: https://patchwork.kernel.org/project/netdevbpf/patch/20251024121853.94199-1-tonghao@bamaicloud.com/
+---
+ include/trace/events/net.h | 37 +++++++++++++++++++++++++++----------
+ 1 file changed, 27 insertions(+), 10 deletions(-)
 
---000000000000f06eaa0642300837
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+diff --git a/include/trace/events/net.h b/include/trace/events/net.h
+index d55162c12f90..fdd9ad474ce3 100644
+--- a/include/trace/events/net.h
++++ b/include/trace/events/net.h
+@@ -35,6 +35,7 @@ TRACE_EVENT(net_dev_start_xmit,
+ 		__field(	u16,			gso_size	)
+ 		__field(	u16,			gso_segs	)
+ 		__field(	u16,			gso_type	)
++		__field(	u64,			net_cookie	)
+ 	),
+ 
+ 	TP_fast_assign(
+@@ -57,16 +58,18 @@ TRACE_EVENT(net_dev_start_xmit,
+ 		__entry->gso_size = skb_shinfo(skb)->gso_size;
+ 		__entry->gso_segs = skb_shinfo(skb)->gso_segs;
+ 		__entry->gso_type = skb_shinfo(skb)->gso_type;
++		__entry->net_cookie = dev_net(dev)->net_cookie;
+ 	),
+ 
+-	TP_printk("dev=%s queue_mapping=%u skbaddr=%p vlan_tagged=%d vlan_proto=0x%04x vlan_tci=0x%04x protocol=0x%04x ip_summed=%d len=%u data_len=%u network_offset=%d transport_offset_valid=%d transport_offset=%d tx_flags=%d gso_size=%d gso_segs=%d gso_type=%#x",
++	TP_printk("dev=%s queue_mapping=%u skbaddr=%p vlan_tagged=%d vlan_proto=0x%04x vlan_tci=0x%04x protocol=0x%04x ip_summed=%d len=%u data_len=%u network_offset=%d transport_offset_valid=%d transport_offset=%d tx_flags=%d gso_size=%d gso_segs=%d gso_type=%#x net_cookie=%llu",
+ 		  __get_str(name), __entry->queue_mapping, __entry->skbaddr,
+ 		  __entry->vlan_tagged, __entry->vlan_proto, __entry->vlan_tci,
+ 		  __entry->protocol, __entry->ip_summed, __entry->len,
+ 		  __entry->data_len,
+ 		  __entry->network_offset, __entry->transport_offset_valid,
+ 		  __entry->transport_offset, __entry->tx_flags,
+-		  __entry->gso_size, __entry->gso_segs, __entry->gso_type)
++		  __entry->gso_size, __entry->gso_segs,
++		  __entry->gso_type, __entry->net_cookie)
+ );
+ 
+ TRACE_EVENT(net_dev_xmit,
+@@ -83,17 +86,21 @@ TRACE_EVENT(net_dev_xmit,
+ 		__field(	unsigned int,	len		)
+ 		__field(	int,		rc		)
+ 		__string(	name,		dev->name	)
++		__field(	u64,		net_cookie	)
+ 	),
+ 
+ 	TP_fast_assign(
+ 		__entry->skbaddr = skb;
+ 		__entry->len = skb_len;
+ 		__entry->rc = rc;
++		__entry->net_cookie = dev_net(dev)->net_cookie;
+ 		__assign_str(name);
+ 	),
+ 
+-	TP_printk("dev=%s skbaddr=%p len=%u rc=%d",
+-		__get_str(name), __entry->skbaddr, __entry->len, __entry->rc)
++	TP_printk("dev=%s skbaddr=%p len=%u rc=%d net_cookie=%llu",
++		__get_str(name), __entry->skbaddr,
++		__entry->len, __entry->rc,
++		__entry->net_cookie)
+ );
+ 
+ TRACE_EVENT(net_dev_xmit_timeout,
+@@ -107,16 +114,19 @@ TRACE_EVENT(net_dev_xmit_timeout,
+ 		__string(	name,		dev->name	)
+ 		__string(	driver,		netdev_drivername(dev))
+ 		__field(	int,		queue_index	)
++		__field(	u64,		net_cookie	)
+ 	),
+ 
+ 	TP_fast_assign(
+ 		__assign_str(name);
+ 		__assign_str(driver);
+ 		__entry->queue_index = queue_index;
++		__entry->net_cookie = dev_net(dev)->net_cookie;
+ 	),
+ 
+-	TP_printk("dev=%s driver=%s queue=%d",
+-		__get_str(name), __get_str(driver), __entry->queue_index)
++	TP_printk("dev=%s driver=%s queue=%d net_cookie=%llu",
++		__get_str(name), __get_str(driver),
++		__entry->queue_index, __entry->net_cookie)
+ );
+ 
+ DECLARE_EVENT_CLASS(net_dev_template,
+@@ -129,16 +139,20 @@ DECLARE_EVENT_CLASS(net_dev_template,
+ 		__field(	void *,		skbaddr		)
+ 		__field(	unsigned int,	len		)
+ 		__string(	name,		skb->dev->name	)
++		__field(	u64,		net_cookie	)
+ 	),
+ 
+ 	TP_fast_assign(
+ 		__entry->skbaddr = skb;
+ 		__entry->len = skb->len;
++		__entry->net_cookie = dev_net(skb->dev)->net_cookie;
+ 		__assign_str(name);
+ 	),
+ 
+-	TP_printk("dev=%s skbaddr=%p len=%u",
+-		__get_str(name), __entry->skbaddr, __entry->len)
++	TP_printk("dev=%s skbaddr=%p len=%u net_cookie=%llu",
++		__get_str(name), __entry->skbaddr,
++		__entry->len,
++		__entry->net_cookie)
+ )
+ 
+ DEFINE_EVENT(net_dev_template, net_dev_queue,
+@@ -188,6 +202,7 @@ DECLARE_EVENT_CLASS(net_dev_rx_verbose_template,
+ 		__field(	unsigned char,		nr_frags	)
+ 		__field(	u16,			gso_size	)
+ 		__field(	u16,			gso_type	)
++		__field(	u64,			net_cookie	)
+ 	),
+ 
+ 	TP_fast_assign(
+@@ -214,16 +229,18 @@ DECLARE_EVENT_CLASS(net_dev_rx_verbose_template,
+ 		__entry->nr_frags = skb_shinfo(skb)->nr_frags;
+ 		__entry->gso_size = skb_shinfo(skb)->gso_size;
+ 		__entry->gso_type = skb_shinfo(skb)->gso_type;
++		__entry->net_cookie = dev_net(skb->dev)->net_cookie;
+ 	),
+ 
+-	TP_printk("dev=%s napi_id=%#x queue_mapping=%u skbaddr=%p vlan_tagged=%d vlan_proto=0x%04x vlan_tci=0x%04x protocol=0x%04x ip_summed=%d hash=0x%08x l4_hash=%d len=%u data_len=%u truesize=%u mac_header_valid=%d mac_header=%d nr_frags=%d gso_size=%d gso_type=%#x",
++	TP_printk("dev=%s napi_id=%#x queue_mapping=%u skbaddr=%p vlan_tagged=%d vlan_proto=0x%04x vlan_tci=0x%04x protocol=0x%04x ip_summed=%d hash=0x%08x l4_hash=%d len=%u data_len=%u truesize=%u mac_header_valid=%d mac_header=%d nr_frags=%d gso_size=%d gso_type=%#x net_cookie=%llu",
+ 		  __get_str(name), __entry->napi_id, __entry->queue_mapping,
+ 		  __entry->skbaddr, __entry->vlan_tagged, __entry->vlan_proto,
+ 		  __entry->vlan_tci, __entry->protocol, __entry->ip_summed,
+ 		  __entry->hash, __entry->l4_hash, __entry->len,
+ 		  __entry->data_len, __entry->truesize,
+ 		  __entry->mac_header_valid, __entry->mac_header,
+-		  __entry->nr_frags, __entry->gso_size, __entry->gso_type)
++		  __entry->nr_frags, __entry->gso_size,
++		  __entry->gso_type, __entry->net_cookie)
+ );
+ 
+ DEFINE_EVENT(net_dev_rx_verbose_template, napi_gro_frags_entry,
+-- 
+2.34.1
 
-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
-/HTPxpDrr4vzZL0yoc9XefyCbdiwfyFl99oBekp+1ZxXc5bZsVhRPVyEWFtCys66nqu5cU2GPT3a
-ySQEHOtIKyGGgzMVvitOzO2suQkoMvu/swsftfgCY/PObdlBZhv0BD97+WwR6CQJh/YEuDDEHYCy
-NDeiVtF3/jwT04bHB7lR9n+AiCSLr9wlgBHGdBFIOmT/XMX3K8fuMMGLq9PpGQEMvYa9QTkE9+zc
-MddiNNh1xtCTG0+kC7KIttdXTnffisXKsX44B8ECAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
-oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
-Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
-BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
-IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
-FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
-hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
-BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUxJ6fps/yOGneJRYDWUKPuLPk
-miYwDQYJKoZIhvcNAQELBQADggIBAI2j2qBMKYV8SLK1ysjOOS54Lpm3geezjBYrWor/BAKGP7kT
-QN61VWg3QlZqiX21KLNeBWzJH7r+zWiS8ykHApTnBlTjfNGF8ihZz7GkpBTa3xDW5rT/oLfyVQ5k
-Wr2OZ268FfZPyAgHYnrfhmojupPS4c7bT9fQyep3P0sAm6TQxmhLDh/HcsloIn7w1QywGRyesbRw
-CFkRbTnhhTS9Tz3pYs5kHbphHY5oF3HNdKgFPrfpF9ei6dL4LlwvQgNlRB6PhdUBL80CJ0UlY2Oz
-jIAKPusiSluFH+NvwqsI8VuId34ug+B5VOM2dWXR/jY0as0Va5Fpjpn1G+jG2pzr1FQu2OHR5GAh
-6Uw50Yh3H77mYK67fCzQVcHrl0qdOLSZVsz/T3qjRGjAZlIDyFRjewxLNunJl/TGtu1jk1ij7Uzh
-PtF4nfZaVnWJowp/gE+Hr21BXA1nj+wBINHA0eufDHd/Y0/MLK+++i3gPTermGBIfadXUj8NGCGe
-eIj4fd2b29HwMCvfX78QR4JQM9dkDoD1ZFClV17bxRPtxhwEU8DzzcGlLfKJhj8IxkLoww9hqNul
-Md+LwA5kUTLPBBl9irP7Rn3jfftdK1MgrNyomyZUZSI1pisbv0Zn/ru3KD3QZLE17esvHAqCfXAZ
-a2vE+o+ZbomB5XkihtQpb/DYrfjAMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
-ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCCH3NRa
-DhmYA6nz0B6GgDpg+RwxgnkGYwYslnA434tOaTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNTEwMjgwMzU4NTZaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
-MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCrxaE0+7Uh3Aht0IMqpCfQp7/IT1APCC76QOwQwLq2
-ENzlAEK47KkDD2H6YqHiUOnEF6jUlpRv+aGhf7dh+koRTCH5p4BYDSCXL60I3R0bdKEabjo0wAth
-lSmG0/YcfY/YVj4AKGY+91kXMUZlaRCljO6Hk87MP/lQlpytaby9Zb40M7taNHXe/E96jr3L5FU/
-93NAzTcfyrY4jjebmSpUM8c37io70U/rH3MiIxwgv0VFADFYfyaYkArjw7wKw+rtB4P2tR1rRgUF
-5hAR3uQ5AG/fShpAo6puHVPmOp+1QvKiJvxYJtFTBXcXb3LZ9t81AZEPv3vhnHzH4ixlv/1C
---000000000000f06eaa0642300837--
 
