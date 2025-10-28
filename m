@@ -1,152 +1,199 @@
-Return-Path: <netdev+bounces-233447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7527EC1363A
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 08:54:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A82AAC13726
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 09:09:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11728566EB0
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 07:54:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2921188E06B
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 08:09:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1D6212FB9;
-	Tue, 28 Oct 2025 07:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2CC22BEC53;
+	Tue, 28 Oct 2025 08:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eBUWJTiC"
 X-Original-To: netdev@vger.kernel.org
-Received: from stargate.chelsio.com (unknown [12.32.117.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FFB7405A
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 07:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=12.32.117.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A082AE8E;
+	Tue, 28 Oct 2025 08:08:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761638052; cv=none; b=VZ96yEdC4CDepFzRqtfEgctIB9rNsqllYs9EmZ3PSuGXl9yVnxV2w9YZaxVZOaOEdncjmvNPNSh6yTEHwpGNkVAoNM4RA48Yx6Gc/xTeiQDue2uM+T74E9BD+bhQEqpCpwwad2yS+VdmRFc/zuLfssJ7UFYZdzvGIOy2uQNCJlU=
+	t=1761638938; cv=none; b=CuVpDP3dqAcuW4sQbszLCHmndFaD6vI8Zhzz/mLZyAD7QtMrlh3Hbrauq5XBKlwfAp+G5T8Vl59H2SAZwUysXbIyPRxKXmHm5y4O5PXJ9wfnJvl3Nj7YD1xpCyicjAbcfbqQlftkP3hMntwUquayocyvczePcfO9s+EJZwuE5IQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761638052; c=relaxed/simple;
-	bh=/nUgYEUyPA6TIENt//WlMDGNUaS7z9Hkn6eKAtIsvzE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UnsqALwRFSeyftwU64qZbQNZwr/+cdbHPbyvPSPjo+rReuPuHvX5yELqcnykp/IVR3SU+fFQ0grRAJfrFaf5ODcYspqwTD022/BBD8cdpkVk1BUnMPkBD8dFgPPEsKBpBnIQf/ViGVSnYSm5vdSpTDgkAveGzJTuVBfBYdn/5Rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chelsio.com; spf=pass smtp.mailfrom=chelsio.com; arc=none smtp.client-ip=12.32.117.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chelsio.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chelsio.com
-Received: from fcoeperf6.blr.asicdesigners.com (fcoeperf6.blr.asicdesigners.com [10.193.187.161])
-	by stargate.chelsio.com (8.14.7/8.14.7) with ESMTP id 59S7re3J027682;
-	Tue, 28 Oct 2025 00:53:41 -0700
-From: Harshita V Rajput <harshitha.vr@chelsio.com>
-To: kuba@kernel.org, davem@davemloft.net, kernelxing@tencent.com
-Cc: imx@lists.linux.dev, netdev@vger.kernel.org, edumazet@google.com,
-        pabeni@redhat.com, Harshita V Rajput <harshitha.vr@chelsio.com>,
-        Potnuri Bharat Teja <bharat@chelsio.com>
-Subject: [PATCH] cxgb4: flower: add support for fragmentation
-Date: Tue, 28 Oct 2025 13:22:55 +0530
-Message-ID: <20251028075255.1391596-1-harshitha.vr@chelsio.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1761638938; c=relaxed/simple;
+	bh=4sTJoE3Tj68a0XVvk4bdhjMbSBfYSqrGGw2z4DoVkBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZQnWA49hcuGO1UzmW4tEONLcFLZbp+Eh5yvcHwITVWhx9V/mo6DLKXLafqoA1kYarEbqZm/0fCTLyMy58VWeePAEtTW4RHhWnnLdWmP0QuF8lFhGu2WcUhZUVjyZZ9VGBesoSQoFpUVpqArlbOTx/P/mscHzMDkRN1PQ4EYLX6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eBUWJTiC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A866C4CEE7;
+	Tue, 28 Oct 2025 08:08:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761638937;
+	bh=4sTJoE3Tj68a0XVvk4bdhjMbSBfYSqrGGw2z4DoVkBg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eBUWJTiCpui8Y8h+rvZhpFQCXrOkAqagYnefylVdojremZPo7WYSML7ZocFScXett
+	 y67QVMobugvi0pXljU3f4XCwl+cah7D9PGCN0ATzbKvwz5zo3uGIF4y0knvVoskCgp
+	 2KBRN4H5Mot8OHVZzC5kYcVcLjuh0bhaJRB3uGmwC+oBAXGcxDGS/b3nlS4HN5ppQq
+	 EhsJ29jp31kjJQVnpGEaClfk80RQfqPIZ9Hgjj85w33y9h84gaxHQCHXyHn5CgdGiZ
+	 HsLJ5S5gGc1FpLD5WmL2ixlZSHdS+vZzrOHuFyeJASNexKja3mlqXlPMbf29mOoptY
+	 UqryBxuo5eAOg==
+Message-ID: <11142984-9bbe-4611-bbe7-fa5494036b8f@kernel.org>
+Date: Tue, 28 Oct 2025 09:08:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 bpf 1/2] xdp: introduce xdp_convert_skb_to_buff()
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
+ ast@kernel.org, daniel@iogearbox.net
+Cc: netdev@vger.kernel.org, magnus.karlsson@intel.com,
+ aleksander.lobakin@intel.com, ilias.apalodimas@linaro.org, toke@redhat.com,
+ lorenzo@kernel.org, kuba@kernel.org,
+ syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com,
+ Ihor Solodrai <ihor.solodrai@linux.dev>, Octavian Purdila <tavip@google.com>
+References: <20251027121318.2679226-1-maciej.fijalkowski@intel.com>
+ <20251027121318.2679226-2-maciej.fijalkowski@intel.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20251027121318.2679226-2-maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This patch adds support for matching fragmented packets in tc flower
-filters.
 
-Previously, commit 93a8540aac72 ("cxgb4: flower: validate control flags")
-added a check using flow_rule_match_has_control_flags() to reject
-any rules with control flags, as the driver did not support
-fragmentation at that time.
 
-Now, with this patch, support for FLOW_DIS_IS_FRAGMENT is added:
-- The driver checks for control flags using
-  flow_rule_is_supp_control_flags(), as recommended in
-  commit d11e63119432 ("flow_offload: add control flag checking helpers").
-- If the fragmentation flag is present, the driver sets `fs->val.frag` and
-  `fs->mask.frag` accordingly in the filter specification.
+On 27/10/2025 13.13, Maciej Fijalkowski wrote:
+> Currently, generic XDP hook uses xdp_rxq_info from netstack Rx queues
+> which do not have its XDP memory model registered. There is a case when
+> XDP program calls bpf_xdp_adjust_tail() BPF helper, which in turn
+> releases underlying memory. This happens when it consumes enough amount
+> of bytes and when XDP buffer has fragments. For this action the memory
+> model knowledge passed to XDP program is crucial so that core can call
+> suitable function for freeing/recycling the page.
+> 
+> For netstack queues it defaults to MEM_TYPE_PAGE_SHARED (0) due to lack
+> of mem model registration. The problem we're fixing here is when kernel
+> copied the skb to new buffer backed by system's page_pool and XDP buffer
+> is built around it. Then when bpf_xdp_adjust_tail() calls
+> __xdp_return(), it acts incorrectly due to mem type not being set to
+> MEM_TYPE_PAGE_POOL and causes a page leak.
+> 
+> Pull out the existing code from bpf_prog_run_generic_xdp() that
+> init/prepares xdp_buff onto new helper xdp_convert_skb_to_buff() and
+> embed there rxq's mem_type initialization that is assigned to xdp_buff.
+> Make it agnostic to current skb->data position.
+> 
+> This problem was triggered by syzbot as well as AF_XDP test suite which
+> is about to be integrated to BPF CI.
+> 
+> Reported-by: syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/6756c37b.050a0220.a30f1.019a.GAE@google.com/
+> Fixes: e6d5dbdd20aa ("xdp: add multi-buff support for xdp running in generic mode")
+> Tested-by: Ihor Solodrai <ihor.solodrai@linux.dev>
+> Co-developed-by: Octavian Purdila <tavip@google.com>
+> Signed-off-by: Octavian Purdila <tavip@google.com> # whole analysis, testing, initiating a fix
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com> # commit msg and proposed more robust fix
+> ---
+>   include/net/xdp.h | 25 +++++++++++++++++++++++++
+>   net/core/dev.c    | 25 ++++---------------------
+>   2 files changed, 29 insertions(+), 21 deletions(-)
+> 
+> diff --git a/include/net/xdp.h b/include/net/xdp.h
+> index aa742f413c35..eba1c0cd5800 100644
+> --- a/include/net/xdp.h
+> +++ b/include/net/xdp.h
+> @@ -384,6 +384,31 @@ struct sk_buff *xdp_build_skb_from_frame(struct xdp_frame *xdpf,
+>   					 struct net_device *dev);
+>   struct xdp_frame *xdpf_clone(struct xdp_frame *xdpf);
+>   
+> +static inline
+> +void xdp_convert_skb_to_buff(struct sk_buff *skb, struct xdp_buff *xdp,
+> +			     struct xdp_rxq_info *xdp_rxq)
+> +{
+> +	u32 frame_sz, pkt_len;
+> +
+> +	/* SKB "head" area always have tailroom for skb_shared_info */
+> +	frame_sz = skb_end_pointer(skb) - skb->head;
+> +	frame_sz += SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+> +	pkt_len =  skb_tail_pointer(skb) - skb_mac_header(skb);
+> +
+> +	xdp_init_buff(xdp, frame_sz, xdp_rxq);
+> +	xdp_prepare_buff(xdp, skb->head, skb->mac_header, pkt_len, true);
+> +
+> +	if (skb_is_nonlinear(skb)) {
+> +		skb_shinfo(skb)->xdp_frags_size = skb->data_len;
+> +		xdp_buff_set_frags_flag(xdp);
+> +	} else {
+> +		xdp_buff_clear_frags_flag(xdp);
+> +	}
+> +
+> +	xdp->rxq->mem.type = page_pool_page_is_pp(virt_to_head_page(xdp->data)) ?
+> +				MEM_TYPE_PAGE_POOL : MEM_TYPE_PAGE_SHARED;
 
-Since fragmentation is now supported, the earlier check that rejected all
-control flags (flow_rule_match_has_control_flags()) has been removed.
+We are slowly killing performance with these paper cuts.  The
+information we are looking for should be available via skb->pp_recycle,
+but instead we go lookup the page to deref that memory.  And plus the
+virt_to_head_page() is more expensive than virt_to_page().
 
-Signed-off-by: Harshita V Rajput <harshitha.vr@chelsio.com>
-Signed-off-by: Potnuri Bharat Teja <bharat@chelsio.com>
----
- .../ethernet/chelsio/cxgb4/cxgb4_tc_flower.c  | 40 +++++++++++--------
- 1 file changed, 24 insertions(+), 16 deletions(-)
+Why don't we check skb->pp_recycle first, and then fall-back to checking
+the page to catch the mentioned problems?
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
-index 0765d000eaef..e2b5554531b5 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
-@@ -161,20 +161,9 @@ static struct ch_tc_flower_entry *ch_flower_lookup(struct adapter *adap,
- 
- static void cxgb4_process_flow_match(struct net_device *dev,
- 				     struct flow_rule *rule,
-+				     u16 addr_type,
- 				     struct ch_filter_specification *fs)
- {
--	u16 addr_type = 0;
--
--	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CONTROL)) {
--		struct flow_match_control match;
--
--		flow_rule_match_control(rule, &match);
--		addr_type = match.key->addr_type;
--	} else if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV4_ADDRS)) {
--		addr_type = FLOW_DISSECTOR_KEY_IPV4_ADDRS;
--	} else if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV6_ADDRS)) {
--		addr_type = FLOW_DISSECTOR_KEY_IPV6_ADDRS;
--	}
- 
- 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
- 		struct flow_match_basic match;
-@@ -327,9 +316,6 @@ static int cxgb4_validate_flow_match(struct netlink_ext_ack *extack,
- 		return -EOPNOTSUPP;
- 	}
- 
--	if (flow_rule_match_has_control_flags(rule, extack))
--		return -EOPNOTSUPP;
--
- 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
- 		struct flow_match_basic match;
- 
-@@ -858,6 +844,7 @@ int cxgb4_flow_rule_replace(struct net_device *dev, struct flow_rule *rule,
- {
- 	struct adapter *adap = netdev2adap(dev);
- 	struct filter_ctx ctx;
-+	u16 addr_type = 0;
- 	u8 inet_family;
- 	int fidx, ret;
- 
-@@ -867,7 +854,28 @@ int cxgb4_flow_rule_replace(struct net_device *dev, struct flow_rule *rule,
- 	if (cxgb4_validate_flow_match(extack, rule))
- 		return -EOPNOTSUPP;
- 
--	cxgb4_process_flow_match(dev, rule, fs);
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CONTROL)) {
-+		struct flow_match_control match;
-+
-+		flow_rule_match_control(rule, &match);
-+		addr_type = match.key->addr_type;
-+
-+		if (match.mask->flags & FLOW_DIS_IS_FRAGMENT) {
-+			fs->val.frag = match.key->flags & FLOW_DIS_IS_FRAGMENT;
-+			fs->mask.frag = true;
-+		}
-+
-+		if (!flow_rule_is_supp_control_flags(FLOW_DIS_IS_FRAGMENT,
-+						     match.mask->flags, extack))
-+			return -EOPNOTSUPP;
-+
-+	} else if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV4_ADDRS)) {
-+		addr_type = FLOW_DISSECTOR_KEY_IPV4_ADDRS;
-+	} else if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV6_ADDRS)) {
-+		addr_type = FLOW_DISSECTOR_KEY_IPV6_ADDRS;
-+	}
-+
-+	cxgb4_process_flow_match(dev, rule, addr_type, fs);
- 	cxgb4_process_flow_actions(dev, &rule->action, fs);
- 
- 	fs->hash = is_filter_exact_match(adap, fs);
--- 
-2.43.0
+--Jesper
+
+> +}
+> +
+>   static inline
+>   void xdp_convert_frame_to_buff(const struct xdp_frame *frame,
+>   			       struct xdp_buff *xdp)
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 2acfa44927da..a71da4edc493 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -5320,35 +5320,18 @@ static struct netdev_rx_queue *netif_get_rxqueue(struct sk_buff *skb)
+>   u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
+>   			     const struct bpf_prog *xdp_prog)
+>   {
+> -	void *orig_data, *orig_data_end, *hard_start;
+> +	void *orig_data, *orig_data_end;
+>   	struct netdev_rx_queue *rxqueue;
+>   	bool orig_bcast, orig_host;
+> -	u32 mac_len, frame_sz;
+> +	u32 metalen, act, mac_len;
+>   	__be16 orig_eth_type;
+>   	struct ethhdr *eth;
+> -	u32 metalen, act;
+>   	int off;
+>   
+> -	/* The XDP program wants to see the packet starting at the MAC
+> -	 * header.
+> -	 */
+> +	rxqueue = netif_get_rxqueue(skb);
+>   	mac_len = skb->data - skb_mac_header(skb);
+> -	hard_start = skb->data - skb_headroom(skb);
+> -
+> -	/* SKB "head" area always have tailroom for skb_shared_info */
+> -	frame_sz = (void *)skb_end_pointer(skb) - hard_start;
+> -	frame_sz += SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+>   
+> -	rxqueue = netif_get_rxqueue(skb);
+> -	xdp_init_buff(xdp, frame_sz, &rxqueue->xdp_rxq);
+> -	xdp_prepare_buff(xdp, hard_start, skb_headroom(skb) - mac_len,
+> -			 skb_headlen(skb) + mac_len, true);
+> -	if (skb_is_nonlinear(skb)) {
+> -		skb_shinfo(skb)->xdp_frags_size = skb->data_len;
+> -		xdp_buff_set_frags_flag(xdp);
+> -	} else {
+> -		xdp_buff_clear_frags_flag(xdp);
+> -	}
+> +	xdp_convert_skb_to_buff(skb, xdp, &rxqueue->xdp_rxq);
+>   
+>   	orig_data_end = xdp->data_end;
+>   	orig_data = xdp->data;
 
 
