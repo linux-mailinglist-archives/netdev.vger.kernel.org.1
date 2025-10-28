@@ -1,60 +1,71 @@
-Return-Path: <netdev+bounces-233508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FB8CC1491A
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:15:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E14F6C1493C
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:19:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1F3104EA989
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:15:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 081411AA0E9B
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6DCB305E1B;
-	Tue, 28 Oct 2025 12:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5232532ABC6;
+	Tue, 28 Oct 2025 12:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="S1JVJxV/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PVJ+5bHE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A8E3090F1;
-	Tue, 28 Oct 2025 12:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E12526ED57;
+	Tue, 28 Oct 2025 12:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761653744; cv=none; b=tbi9kc1HD6+iTUTkJ6cNv+JY/p/68JFtRjhwrS/0j7k1zNwonu5JcFeYP/+AdxuVeFV6NudM9v8eCSu/Qx0MbgZU2xdnG+JLHr7rxI8OsMZd5IPsYXpqQPpJyT4B1EN/yaUAi+zub9LH1ke/umrSGfbH9Nxodf3Kx0F6JhjovaE=
+	t=1761653993; cv=none; b=l6mIUCPb7v9RZBaroTC0c9vwJDCiEAKk5MGILNAgkUkZwAeWRMDpH482OMZmM/WiN772ZV4A2/h22PfjtqTN0OWk8LqKi7YMw4mgw4waxJvlW4wAex728ZxBAZnNd5f4QJBce4Kkq2KO0qyg8QG8VswvRNXO+F/Y1/VV+N/5gzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761653744; c=relaxed/simple;
-	bh=ZGANUuUM1Ta5jSsaWQ1AP4sTctgoxZB4uBLp2dgy3Nk=;
+	s=arc-20240116; t=1761653993; c=relaxed/simple;
+	bh=QKHpKLl44uwhzX0yR8l8NyNpX/dvwMMWUn48o9hqBmU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oB5hoTT0mo/jNK+wfG+0aYfjIhrAn4/Tb393ARaOMOgMwvr8hbgQn7xTGIQvA0z1wDfoxNKyOyQSi53qoriaCo255pez86AjX7ltukKoSI6rzfZaCyaj2xntam+h4fRzF7rVEuMgt/HZODM+7wx1ny3ZOn0vPk2Fs9XXp76X9Ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=S1JVJxV/; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1761653733; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=5+s5aiR2bzoPUL8wi4Dwm6Sd2km5LFKo9GoEvip3NMs=;
-	b=S1JVJxV/+/QwQg8fsKfuVELjlR+sssL4wFTU9o4rKg+Q7kIqeuN6EQiCVMuNzZpKq1934pQybNlXF6Xzjt2ZAvYC/n1eJPtzE8R+UERfcI0Lx1yjEiD43kxK+gEnYNQENvUNzjb126/QPl/Ue/NyjtMP2dqKwYqsvFc5W+CF02w=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WrBwBVw_1761653731 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 28 Oct 2025 20:15:31 +0800
-Date: Tue, 28 Oct 2025 20:15:31 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: "D. Wythe" <alibuda@linux.alibaba.com>, martin.lau@linux.de,
-	ast@kernel.org, andrii.nakryiko@gmail.com
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
-	martin.lau@linux.dev, pabeni@redhat.com, song@kernel.org,
-	sdf@google.com, haoluo@google.com, yhs@fb.com, edumazet@google.com,
-	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
-	mjambigi@linux.ibm.com, wenjia@linux.ibm.com, wintera@linux.ibm.com,
-	dust.li@linux.alibaba.com, tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com, bpf@vger.kernel.org, davem@davemloft.net,
-	kuba@kernel.org, netdev@vger.kernel.org, sidraya@linux.ibm.com,
-	jaka@linux.ibm.com
-Subject: Re: [PATCH bpf-next v3 0/3] net/smc: Introduce smc_hs_ctrl
-Message-ID: <20251028121531.GA51645@j66a10360.sqa.eu95>
-References: <20250929063400.37939-1-alibuda@linux.alibaba.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fLHErzDLny7SuV2I8leX8GBfGBgn60m5aEabS4iI6NbydNBdexLzMsl5+GElvJX7UgDxQAO2JhfVy2UH8TsTHZrSd0pJJeK76sEOsbzxxl7qYJNNkyzMKnX/Eosl2im1eBKWVRrfV98rx1KphDMpDEbZVOxQDwXhN91OZ2j4GD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PVJ+5bHE; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=iAcTB0pexrytfdjO3k8iLmGtnWGjntECalzhziLvSqc=; b=PVJ+5bHEgyfW3CMkystoei5+mQ
+	aG7fyM/0Bef3t4MGKcVPHcyMU9R0hmQ58ruj8uppd3By7GyACdoA0y/NzOXEismdi7gEKUTIsQFGs
+	T3eDkDsgJ18b/TcNKo3FpY8ZEeqDlhDh+I7Dqvpbr6AIIIyeNZzdRHB9xNBhsr3KyJWlpaBdYbCVC
+	k5Ou/P16w2Th+q0W3RYBiwW2ayffU3vMl/YMjHbLHdYy1CoGGbEESd1LYMVNTkfA8K0OqYsKX+PbD
+	XewYf726Q0v0vrb9gNTuaWPWQq+glvrHn38MX2N+YbSt9TEMQThrAk+RriY2kJIzY4fD3YnigZYzV
+	jUBY4qmw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40962)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vDifr-0000000039t-1vkF;
+	Tue, 28 Oct 2025 12:19:39 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vDifl-000000006YC-09gl;
+	Tue, 28 Oct 2025 12:19:33 +0000
+Date: Tue, 28 Oct 2025 12:19:32 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Yi Cong <cong.yi@linux.dev>, Frank.Sae@motor-comm.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, hkallweit1@gmail.com,
+	kuba@kernel.org, netdev@vger.kernel.org, stable@vger.kernel.org,
+	yicong@kylinos.cn
+Subject: Re: [PATCH] net: phy: motorcomm: Fix the issue in the code regarding
+ the incorrect use of time units
+Message-ID: <aQC01GDPr-WclcZS@shell.armlinux.org.uk>
+References: <e1311746-9882-4063-84af-3939466096e9@lunn.ch>
+ <20251028062110.296530-1-cong.yi@linux.dev>
+ <2610bc26-44e6-48a3-87c6-acfa30f60dad@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,51 +74,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250929063400.37939-1-alibuda@linux.alibaba.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <2610bc26-44e6-48a3-87c6-acfa30f60dad@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Sep 29, 2025 at 02:33:57PM +0800, D. Wythe wrote:
-> This patch aims to introduce BPF injection capabilities for SMC and
-> includes a self-test to ensure code stability.
+On Tue, Oct 28, 2025 at 01:07:34PM +0100, Andrew Lunn wrote:
+> > > >  #define YT8521_CCR_RXC_DLY_EN			BIT(8)
+> > > > -#define YT8521_CCR_RXC_DLY_1_900_NS		1900
+> > > > +#define YT8521_CCR_RXC_DLY_1_900_PS		1900
+> > >
+> > > This could be down to interpretation.
+> > >
+> > > #define YT8521_CCR_RXC_DLY_1.900_NS		1900
+> > >
+> > > would be technically correct, but not valid for cpp(1). So the . is
+> > > replaced with a _ .
+> > >
+> > > #define YT8521_CCR_RXC_DLY_1900_PS		1900
+> > >
+> > > would also be correct, but that is not what you have in your patch,
+> > > you leave the _ in place.
+> > 
+> > Alright, I didn't realize that 1_950 represents 1.950;
+> > I thought the underscores were used for code neatness,
+> > making numbers like 900 and 1050 the same length, for example:
+> > #define YT8521_RC1R_RGMII_0_900_PS
+> > #define YT8521_RC1R_RGMII_1_050_PS
+> > 
+> > In that case, is my patch still necessary?
 > 
-> Since the SMC protocol isn't ideal for every situation, especially
-> short-lived ones, most applications can't guarantee the absence of
-> such scenarios. Consequently, applications may need specific strategies
-> to decide whether to use SMC. For example, an application might limit SMC
-> usage to certain IP addresses or ports.
+> I think it is unnecessary.
 > 
-> To maintain the principle of transparent replacement, we want applications
-> to remain unaffected even if they need specific SMC strategies. In other
-> words, they should not require recompilation of their code.
-> 
-> Additionally, we need to ensure the scalability of strategy implementation.
-> While using socket options or sysctl might be straightforward, it could
-> complicate future expansions.
-> 
-> Fortunately, BPF addresses these concerns effectively. Users can write
-> their own strategies in eBPF to determine whether to use SMC, and they can
-> easily modify those strategies in the future.
-> 
-> This is a rework of the series from [1]. Changes since [1] are limited to
-> the SMC parts:
-> 
-> 1. Rename smc_ops to smc_hs_ctrl and change interface name.
-> 2. Squash SMC patches, removing standalone non-BPF hook capability.
-> 3. Fix typos
+> If you want, you could add a comment which explains that the _ should
+> be read as a .  However, this does appear elsewhere in Linux, it is
+> one of those things you learn with time.
 
+Hang on.
 
-Hi bpf folks,
+Is the "1900" 1.9ns or 1.9ps ?
 
-I've noticed this patch has been pending for a while, and I wanted to
-gently check in. Is there any specific concerns or feedback regarding
-it from the BPF side? I'm keen to address any issues and move it
-forward.
+If YT8521_CCR_RXC_DLY_1_900_NS means 1.9ns, and the value is in ps,
+then surely if it's being renamed to _PS, then it _must_ become
+YT8521_CCR_RXC_DLY_1900_NS, because 1.900ps is wrong?
 
-Also, I'd appreciate your guidance on whether this patch should be
-targeted for net-next.
-
-Thanks for your time and consideration.
-
-Best regards,
-D. Wythe
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
