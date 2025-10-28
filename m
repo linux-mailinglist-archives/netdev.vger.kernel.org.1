@@ -1,92 +1,96 @@
-Return-Path: <netdev+bounces-233687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65B9EC17647
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:45:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C54CCC17653
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:50:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22B2D3A99C0
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:45:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE498402A32
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D6122D4E9;
-	Tue, 28 Oct 2025 23:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A264305040;
+	Tue, 28 Oct 2025 23:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s9hBZqgV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LP7152BF"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1144D7405A
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 23:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254FC2DECC2
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 23:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761695122; cv=none; b=QmlSJqZzLBSD1oWGTJLx0LJzoYUyN9oM763YmcL/uZVBfAmOwlo0EUfKVLjWdgZmj3i/wrvTcu3imiOMtzpsidaIQ4KwbC9KBrkYMcTVwVPBHqZgTasxGKyfdR7/vMgptDiS6JYYuqgAeIm9UfTx5ylv37CEfd9HCkpAJ4MmZ2M=
+	t=1761695429; cv=none; b=hSY9pXfQ1OXCVovbYgnrVM7b4cps5L3C8doKph7UtnZ6Gj0rwP4aRjSZYFsUjmplSJ9sOtHZql46+YnJ0NF8UrFzkHn6TDjcTipDQehK4R7z+sfJuCkc4iBNa45IDyoXC2sPPjFNVlyP3/Cyk97UtjPdjYV3ii2sj1lRZJJ3eUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761695122; c=relaxed/simple;
-	bh=pvORYJ5rE/jqWp1h5Wifw8LnZkhqt67QzZd23qnqtEs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EGRbBJHT+X2yTqRdCI6iZZiO5XzjG1BOujmdWRLHb8Z9sC5uRlF4EBQhe54K5IDtPbYy965m6mVN1/VeO7gEtBWy3oycRddCnpBvsRC+rvMdCqPyrZfboO3mufqikUzHTABobB0LpKE6Ti9ZC40CAv/13kwX4h3z9VHbkNwbgso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s9hBZqgV; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <cd154e3c-0cac-4ead-a3d0-39dc617efa74@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761695118;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bVdLbIqZfPVV9nzaikXAAecCSd3I2FTL+HXFgib0190=;
-	b=s9hBZqgVlWkSOYt6BK5gYHgMND6u8gafxaO3QunUF18Km/MlmW4ZJJnamgtdya4sIRTTe5
-	Krw+3ruO6soP5Svqstsmj+NMp81kDf572yxl555qKDIyUmenGdBF4GwGMzubUe6w2AHYYG
-	NjuB85dDSetbSCOCyivijDWUHG/XNBI=
-Date: Tue, 28 Oct 2025 23:45:13 +0000
+	s=arc-20240116; t=1761695429; c=relaxed/simple;
+	bh=13XZaThonvmVAaTjRXO1SOYGKUykjUwE8G3l6OZNPFM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pfj9/mbngObrEm7+AwfL4z0NDpHxYeEaWcBLi/bxChwBLKoLlXOlmIxlyFi/MaWkmXcqmKEutz6X0DqkYm0VsfMdDhL0TS2ImpV8bmEv9HY8DoJLesGYeC9sgkVjcUZdjf12xW6Yy4wtmkr2/uDSPdQMXKd1liNOrnmAelfdds0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LP7152BF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E85BC4CEE7;
+	Tue, 28 Oct 2025 23:50:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761695428;
+	bh=13XZaThonvmVAaTjRXO1SOYGKUykjUwE8G3l6OZNPFM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LP7152BFUXOrIfxpFWHZPwyf1WsGwD5kSKjs0MTTKVGOZaeCUe/cz9E0sZ8tXaw29
+	 mK0gFgTi3mPmLFyRmZnbRoI86zdR+Jd7h9oHutbHytcc/w4QSFBavDZ7XlkxbFh+W0
+	 GqKm914jlKQNcSbagJJKTzpidsgYug9bjc+IZ2l9DfL0YGUpC1FOaUsAQwIAkaK4HV
+	 y0/cJ9cRSs+3m4KOyMoT+1Y+sxHHBT8zf4+Jv6jLCplsvgGPRr/7/pG/ycQlBiwgJ0
+	 juvqxoAkt3kfcOXqMBLzoXKVBdAT/4He+QrXhN1Fia3JmXRjagb6mMAHM5hwjodCcf
+	 IULtaVZfhzWJA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C1339EFBBF;
+	Tue, 28 Oct 2025 23:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] ptp: guard ptp_clock_gettime() if neither gettimex64 nor
-To: Jakub Kicinski <kuba@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>
-Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, junjie.cao@intel.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com,
- syzbot+c8c0e7ccabd456541612@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com, thostet@google.com
-References: <aQDOpeQIU1G4nA1F@hoboy.vegasvil.org>
- <20251028155318.2537122-1-kuniyu@google.com>
- <20251028161309.596beef2@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20251028161309.596beef2@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 1/2] tools: ynl: fix indent issues in the main
+ Python lib
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176169540625.2425663.5316619299461217988.git-patchwork-notify@kernel.org>
+Date: Tue, 28 Oct 2025 23:50:06 +0000
+References: <20251027192958.2058340-1-kuba@kernel.org>
+In-Reply-To: <20251027192958.2058340-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, ast@fiberby.net
 
-On 28.10.2025 23:13, Jakub Kicinski wrote:
-> On Tue, 28 Oct 2025 15:51:50 +0000 Kuniyuki Iwashima wrote:
->> From: Richard Cochran <richardcochran@gmail.com>
->> Date: Tue, 28 Oct 2025 07:09:41 -0700
->>> On Tue, Oct 28, 2025 at 05:51:43PM +0800, Junjie Cao wrote:
->>>> Syzbot reports a NULL function pointer call on arm64 when
->>>> ptp_clock_gettime() falls back to ->gettime64() and the driver provides
->>>> neither ->gettimex64() nor ->gettime64(). This leads to a crash in the
->>>> posix clock gettime path.
->>>
->>> Drivers must provide a gettime method.
->>>
->>> If they do not, then that is a bug in the driver.
->>
->> AFAICT, only GVE does not have gettime() and settime(), and
->> Tim (CCed) was preparing a fix and mostly ready to post it.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 27 Oct 2025 12:29:57 -0700 you wrote:
+> Class NlError() and operation_do_attributes() are indented by 2 spaces
+> rather than 4 spaces used by the rest of the file.
 > 
-> cc: Vadim who promised me a PTP driver test :) Let's make sure we
-> tickle gettime/setting in that test..
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v2:
+>  - new patch
+> 
+> [...]
 
-Heh, call gettime/settime is easy. But in case of absence of these callbacks
-the kernel will crash - not sure we can gather good signal in such case?
+Here is the summary with links:
+  - [net-next,v2,1/2] tools: ynl: fix indent issues in the main Python lib
+    https://git.kernel.org/netdev/net-next/c/09e260351384
+  - [net-next,v2,2/2] tools: ynl: rework the string representation of NlError
+    https://git.kernel.org/netdev/net-next/c/34164142b5fd
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
